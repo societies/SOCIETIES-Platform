@@ -1,4 +1,4 @@
-package eu.societies.userdirectory.api;
+package org.societies.userdirectory.api;
 
 import java.util.Collection;
 
@@ -15,5 +15,7 @@ public interface IUserDirectory {
 	public boolean isUserExists(Object parameter);
 	
 	public Collection<Object> retrieveAllUser();
+	
+	// org.societies.common.userdirectory
 
 }

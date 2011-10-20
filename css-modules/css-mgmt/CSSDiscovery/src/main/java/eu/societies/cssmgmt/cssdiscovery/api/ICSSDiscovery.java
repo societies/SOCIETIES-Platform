@@ -1,4 +1,4 @@
-package eu.societies.CSSDiscovery.api;
+package eu.societies.cssmgmt.cssdiscovery.api;
 
 import java.util.Collection;
 import java.util.List;
