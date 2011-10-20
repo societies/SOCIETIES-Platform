@@ -1,4 +1,4 @@
-package org.societies.userdirectory.api;
+package org.societies.common.userdirectory.api;
 
 import java.util.Collection;
 

@@ -1,7 +1,7 @@
 /**
  * This is an initial interface for persisting user information 
  */
-package eu.societies.userdirectory.api;
+package org.societies.common.userdirectory.api;
 /**
  * 
  * 
