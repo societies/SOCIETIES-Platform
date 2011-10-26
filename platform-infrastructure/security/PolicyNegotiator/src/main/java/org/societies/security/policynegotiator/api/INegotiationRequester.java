@@ -14,7 +14,7 @@ public interface INegotiationRequuster {
 	 * 
 	 * @param callback The callback to be invoked to return the result.
 	 * 
-	 * @return All available options embedded in a single XML document
+	 * @return All available options embedded in a single XML document.
 	 */
 	public void getPolicyOptions(Object callback);
 	
