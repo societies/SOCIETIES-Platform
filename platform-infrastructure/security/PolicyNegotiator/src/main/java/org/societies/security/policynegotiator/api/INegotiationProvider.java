@@ -15,7 +15,7 @@ public interface INegotiationProvider {
 	/**
 	 * Get all available options for SLA.
 	 * 
-	 * @return All available options embedded in a single XML document
+	 * @return All available options embedded in a single XML document.
 	 */
 	public String getPolicyOptions();
 	
