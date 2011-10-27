@@ -1,5 +1,12 @@
 package org.societies.security.policynegotiator.api;
 
+/**
+ * Interface for invoking the requester.
+ * To be used by other components on same node.
+ * 
+ * @author Mitja Vardjan
+ *
+ */
 public interface INegotiationRequuster {
 
 	/**
@@ -21,6 +28,6 @@ public interface INegotiationRequuster {
 	/**
 	 * Reject all options and terminate negotiation.
 	 */
-	public void reject();
+	public void rejectPolicy();
 
 }
