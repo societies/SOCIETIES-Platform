@@ -7,7 +7,7 @@ package org.societies.security.policynegotiator.api;
  * @author Mitja Vardjan
  *
  */
-public interface INegotiationRequuster {
+public interface INegotiationRequester {
 
 	/**
 	 * Accept given policy option.
