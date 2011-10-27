@@ -2,7 +2,7 @@ package org.societies.slm.serviceregistry.api;
 
 import java.util.List;
 
-public interface IServiceRegistry {
+public interface IServiceRegistryCloud {
 
 	/*
 	 * Description: This method provides the interface to add a new list of services.
@@ -19,10 +19,10 @@ public interface IServiceRegistry {
 	public boolean UnregisterServiceList (List<Object> servicesList);
 
 	/* 
-	 * Description: This method syncs local registry with societies 
+	 * Description: This method syncs a remote registry with societies 
 	 */
 
-	public List<Object> UpdateLocalRegistry (Object CSSID);
+	public List<Object> SyncRemoteCSSRegistry (Object CSSID);
 
 	/* 
 	 * Description: Based on a Filter this method returns the services list inside the registry 
