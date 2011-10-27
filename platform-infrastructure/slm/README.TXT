@@ -1,1 +1,1 @@
-Service Lifecycyle & Monitoring Container
+Service Lifecycle & Monitoring Container
