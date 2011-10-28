@@ -12,14 +12,15 @@ public interface IServiceBrowserCloud {
 
 	/* 
 	 * Description: This method invokes the selected Services giving access to 
-	 * 				the Service RTE to make the service runs 
+	 * 				the Service RTE to make the service runs
+	 * @return 
 	 */
 
 	public void InvokeSelectedService (Object serviceID);
 	
 	/* 
 	 * Description: This method gives out more details on a particular selected service 
-	 * Returning parameter: an Object representing ServiceDetails
+	 * @return represents an Object containing details on the service
 	 */
 
 	public Object GetServiceDetail (Object serviceID);
