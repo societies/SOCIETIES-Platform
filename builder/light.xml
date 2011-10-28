@@ -1,0 +1,48 @@
+<!--  
+ - OPEN SOURCE LICENCE TEXT
+ - Copyright (C) 2011, SOCIETIES consortium
+ -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+			http://maven.apache.org/maven-v4_0_0.x">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- All builder projects should inherit from version-parent -->
+  <parent>
+    <groupId>org.societies</groupId>
+    <artifactId>version-parent</artifactId>
+    <version>0.1</version>
+    <relativePath>../parent/version.xml</relativePath>
+  </parent>
+
+  <!-- Setup the identity of this builder -->
+  <groupId>org.societies</groupId>
+  <artifactId>light-build</artifactId>
+  <packaging>pom</packaging>
+  <version>0.1</version>
+  <name>Light Node Build</name>
+  
+  <!-- 
+    What is included in the build
+    -->	
+  <modules>
+    <!-- An example entry
+      <module>CommsInfrstructure/PubSub</module>
+      -->
+     
+    <!-- API -->
+
+    <!-- Service Infrastructue -->
+    <!-- Communications Infrastructue -->
+    <!-- Security and Dependability Mgmt -->
+    <!-- CSS Mgmt --> 
+    <!-- CIS Mgmt -->
+
+    <!-- Intelligent community orchestration -->		
+    <!-- Context Management-->
+    <!-- Privacy Mgmt -->
+    <!-- User Agent --> 
+    <!-- Personalisation Mgmt -->
+   
+  </modules>
+</project>
