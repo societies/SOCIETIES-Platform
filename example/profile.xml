@@ -1,0 +1,20 @@
+<!-- 
+ Because the values of these variables are development machine specific add the following section to your 
+ ~/.m3/settings.xml file or specify both options via the command line
+ -Dandroid.home=somewhere -Dvirgo.home=somewhere/else
+ -->
+  <profiles>
+    <!-- Profile for use by SOCIETIES -->
+    <profile>
+      <id>societies</id>
+      <properties>
+        <virgo.home>/path/to/appserver</virgo.home>
+        <android.home>/path/to/appserver</android.home>
+      </properties>
+    </profile>
+  </profiles>
+
+  <!-- Activate profile for use by SOCIETIES -->
+  <activeProfiles>
+    <activeProfile>societies</activeProfile>
+  </activeProfiles>

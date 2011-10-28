@@ -1,0 +1,140 @@
+<!--  
+ - OPEN SOURCE LICENCE TEXT
+ - Copyright (C) 2011, SOCIETIES consortium
+ -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.societies</groupId>
+  <artifactId>android-parent</artifactId>
+  <version>0.1</version>
+  <packaging>pom</packaging>
+
+  <!-- All platform projects should inherit from version-parent
+    - so that a common versioning can be applied
+    -->
+  <parent>
+    <groupId>org.societies</groupId>
+    <artifactId>version-parent</artifactId>
+    <version>0.1</version>
+    <relativePath>./version.xml</relativePath>
+  </parent>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- The location of the android runtime should be configured in a *maven profile*
+      - and not in here (to prevent an accidential check in)
+      -
+      - The following variables are assumed to be declared:
+      -   android.home   - Where the Android SDK is deployed
+      -   android.deploy - Deployment folder/URL to deploy applications to
+      -
+      -->
+  </properties>
+
+  <!-- Defines from where toolkits and libraries are fetched -->
+  <repositories>
+    <!-- Main societies repository -->
+    <repository>
+      <id>societies</id>
+      <name>Societies Maven Repository</name>
+      <url>http://maven.ict-societies.eu/nexus/content/repositories/thirdparty/</url>
+    </repository>
+
+  </repositories>
+
+  <!-- Defines from where we get our plugin tools ie. tools used during the build -->
+  <pluginRepositories>
+    <pluginRepository>
+      <id>maven-repo</id>
+      <name>maven repo</name>
+      <url>http://repo1.maven.org/maven2/</url>
+    </pluginRepository>
+
+    <!-- Android tools 
+    <pluginRepository>
+      <id></id>
+      <name></name>
+      <url>http://</url>
+    </pluginRepository>
+      -->
+  </pluginRepositories>
+
+
+
+  <!-- 
+    - This section controls the versions of toolkits and frameworks used
+    -->
+  <dependencyManagement>
+    <dependencies>
+      <!-- Android target version -->
+      <dependency>
+        <groupId>com.google.android</groupId>
+        <artifactId>android</artifactId>
+        <version>2.2.1</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <!-- Smack versions used in the communication framework -->
+      <dependency>
+        <groupId>org.igniterealtime</groupId>
+        <artifactId>tinder</artifactId>
+        <version>1.2.2</version>
+        <type>jar</type>
+        <scope>compile</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+
+  <!-- Configure the build environment -->
+  <build>
+    <plugins>
+      <!-- Configures the plugins used in the build -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>1.0.1</version>
+        <executions>
+          <execution>
+            <id>enforce-property</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireProperty>
+                  <property>android.home</property>
+                  <message>You must specify the location of the Android SDK to with the property android.home.
+Hints use your profile ~/.m3/settings.xml or set via the command line -Dandroid.home=location.</message>
+                </requireProperty>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+    <!-- Defines versions of the plugin tools ie. tools used during the build -->
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+          <artifactId>maven-android-plugin</artifactId>
+          <version>2.8.4</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

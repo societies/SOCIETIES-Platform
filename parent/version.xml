@@ -1,0 +1,23 @@
+<!--  
+ - OPEN SOURCE LICENCE TEXT
+ - Copyright (C) 2011, SOCIETIES consortium
+ -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.societies</groupId>
+    <artifactId>version-parent</artifactId>
+    <version>0.1</version>
+    <packaging>pom</packaging>
+
+    <properties>
+	<!--
+		This is the master version number!
+		 <Public release>.<wp7 bugfix release>
+	-->
+	<release.version>0.1</release.version>
+
+	<!-- master properties for component blocks -->
+	<release.groupId>org.societies</release.groupId>
+    </properties>
+</project>
