@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface IServiceBrowserRich {
 	/*
-	 * Description: Based on a Filter this method returns the services list 
+	 * Description: Based on a filter this method returns the services list 
 	 * 				matching that particular filter
 	 * @return the whole list of services retrieved
 	 */
