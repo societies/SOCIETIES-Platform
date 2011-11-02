@@ -24,7 +24,7 @@ public interface IServiceRegistryRich {
 	 * @return true if the local registry was successfully synced
 	 */
 
-	public boolean SyncLocalRegistry ());
+	public boolean SyncLocalRegistry ();
 
 	/* 
 	 * Description: Based on a Filter this method returns the services list inside the registry 
