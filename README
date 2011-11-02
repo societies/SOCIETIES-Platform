@@ -1,0 +1,5 @@
+The vision of the SOCIETIES project is to research and develop a concept of Ambient Intelligent (AmI) Communities that extend ambient intelligent or pervasive systems beyond the individual to dynamic communities of users. Driven by context awareness, preference learning and privacy protection, AmI Communities will intelligently connect people & things to communicate, share, consume and organise communities. SOCIETIES will embrace online community services, such as Social Networking, thus offering new and powerful ways of working, communicating and socialising. The project intends developing and trialling use cases for disaster management, university living and conference support.
+
+SOCIETIES platform software includes the SOCIETIES core modules and the modules related to individual and community experience. These modules provide a prototype implementation that will realise the concept of an AmI Community and therefore supporting the third party services and end user scenarios that will be available in other societies repositories.
+
+This software is licensed under a BSD 2-Clause "Simplified" or "FreeBSD" License.
