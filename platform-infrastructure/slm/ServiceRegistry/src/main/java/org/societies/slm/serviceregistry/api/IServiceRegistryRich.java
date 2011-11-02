@@ -5,7 +5,7 @@ import java.util.List;
 public interface IServiceRegistryRich {
 
 	/*
-	 * Description: This method provides the interface to add a new list of services.
+	 * Description: This Method provides the interface to add a new list of services.
 	 * 				List services can be composed at least by only service at time
 	 * @return An Object representing ServiceID
 	 */
