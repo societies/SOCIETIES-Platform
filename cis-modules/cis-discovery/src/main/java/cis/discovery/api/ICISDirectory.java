@@ -11,7 +11,6 @@
 
 package cis.discovery.api;
 
-import cis.discovery.impl.*;
 
 public interface ICISDirectory {
 	/*
