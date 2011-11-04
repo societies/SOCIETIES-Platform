@@ -4,8 +4,9 @@
  * @author Babak Farshchian
  * @version 0
  */
-package cis.management.impl;
+package cis.management.api;
 
 public class CISRecord {
+	
 
 }

@@ -4,7 +4,7 @@
  * @author Babak Farshchian
  * @version 0
  */
-package cis.collaboration.impl;
+package cis.collaboration.api;
 
 public class ServiceSharingRecord {
 

@@ -6,7 +6,7 @@
  * 
  */
 
-package cis.discovery.impl;
+package cis.discovery.api;
 
 public class CISAdvertisementRecord {
 	private String name, id, uri;
