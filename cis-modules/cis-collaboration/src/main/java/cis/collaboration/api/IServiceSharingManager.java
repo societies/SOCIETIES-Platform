@@ -7,7 +7,6 @@
  */
 package cis.collaboration.api;
 
-import cis.collaboration.impl.*;
 
 public interface IServiceSharingManager {
 	
