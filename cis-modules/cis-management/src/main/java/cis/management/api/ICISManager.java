@@ -6,8 +6,6 @@
  */
 package cis.management.api;
 
-import cis.management.impl.*;
-
 public interface ICISManager {
 	//
 	//
