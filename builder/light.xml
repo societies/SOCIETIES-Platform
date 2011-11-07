@@ -26,9 +26,8 @@
     What is included in the build
     -->	
   <modules>
-    <!-- An example entry
-      <module>CommsInfrstructure/PubSub</module>
-      -->
+    <!-- An example entry -->
+      <module>../client-framework/PhoneGapReference</module>
      
     <!-- API -->
 
