@@ -27,8 +27,9 @@
     -->	
   <modules>
     <!-- An example entry -->
-      <module>../client-framework/PhoneGapReference</module>
      
+      <module>../client-framework/PhoneGapReference</module>
+      <module>../client-framework/MasterGUI</module>
     <!-- API -->
 
     <!-- Service Infrastructue -->
