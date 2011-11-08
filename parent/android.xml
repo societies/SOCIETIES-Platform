@@ -68,22 +68,31 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
     -->
   <dependencyManagement>
     <dependencies>
-      <!-- Android target version -->
-      <dependency>
-        <groupId>com.google.android</groupId>
-        <artifactId>android</artifactId>
-        <version>2.2.1</version>
-        <scope>provided</scope>
-      </dependency>
+      <!-- Android target version 1 assumes that Android JAR has been installed in local repository 
+	using the Android Maven SDK Helper Maven plugin-->
+        <dependency>
+            <groupId>android</groupId>
+            <artifactId>android</artifactId>
+            <version>2.2_r3</version>
+            <scope>provided</scope>
+        </dependency>
 
-      <!-- Smack versions used in the communication framework -->
+      <!-- Android target version 2 assumes that Android JAR is retrieved from remote repository -->
+        <!--dependency>
+            <groupId>com.google.android</groupId>
+            <artifactId>android</artifactId>
+            <version>2.2.1</version>
+            <scope>provided</scope>
+        </dependency-->
+
+      <!-- Smack versions used in the communication framework (not currently used)
       <dependency>
         <groupId>org.igniterealtime</groupId>
         <artifactId>tinder</artifactId>
         <version>1.2.2</version>
         <type>jar</type>
         <scope>compile</scope>
-      </dependency>
+      </dependency>-->
     </dependencies>
   </dependencyManagement>
 
@@ -105,7 +114,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
         <version>1.0.1</version>
-        <executions>
+        <executions>	
           <execution>
             <id>enforce-property</id>
             <goals>
@@ -116,7 +125,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
                 <requireProperty>
                   <property>android.home</property>
                   <message>You must specify the location of the Android SDK to with the property android.home.
-Hints use your profile ~/.m3/settings.xml or set via the command line -Dandroid.home=location.</message>
+Hints use your profile ~/.m2/settings.xml or set via the command line -Dandroid.home=location.</message>
                 </requireProperty>
               </rules>
               <fail>true</fail>
@@ -129,11 +138,24 @@ Hints use your profile ~/.m3/settings.xml or set via the command line -Dandroid.
     <!-- Defines versions of the plugin tools ie. tools used during the build -->
     <pluginManagement>
       <plugins>
-        <plugin>
-          <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-          <artifactId>maven-android-plugin</artifactId>
-          <version>2.8.4</version>
-        </plugin>
+            <plugin>
+                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <artifactId>maven-android-plugin</artifactId>
+                <version>2.8.4</version>
+                <configuration>
+                    <sdk>
+                        <!-- platform or api level (api level 4 = platform 1.6)-->
+                        <platform>8</platform>
+			<path>${android.home}</path>
+                    </sdk>
+                    <emulator>
+                        <!-- the name of the avd device to use for starting the emulator -->
+                        <avd>Test22Device</avd>
+                    </emulator>
+                    <undeployBeforeDeploy>true</undeployBeforeDeploy>
+                </configuration>
+                <extensions>true</extensions>
+            </plugin>
       </plugins>
     </pluginManagement>
   </build>
