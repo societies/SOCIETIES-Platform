@@ -10,8 +10,8 @@
 
 package org.societies.slm.softwaremarketplace.api;
 
-public interface ISofttwareMarketplaceUpdateListener {
+public interface ISoftwareMarketplaceUpdateListener {
 	
-	boolean NotifyServiceUdapte (String serviceId []);
+	boolean NotifySoftwareUdapte (String[] serviceId);
 
 }

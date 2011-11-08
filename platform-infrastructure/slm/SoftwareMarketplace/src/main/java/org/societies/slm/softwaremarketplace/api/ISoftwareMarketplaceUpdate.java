@@ -11,11 +11,11 @@ package org.societies.slm.softwaremarketplace.api;
 
 public interface ISoftwareMarketplaceUpdate {
 	
-	void checkServiceUpdate (String serviceID [], String queryResult);
-	byte [] selectAndInstallServiceUdapte (String serviceId);
-	byte [] installAllServiceUdapte (String serviceId []);
+	void checkSoftwareUpdate (String[] serviceID, String queryResult);
+	byte [] selectAndInstallSofwtareUdapte (String serviceId);
+	byte [] installAllSoftwareeUdapte (String[] serviceId);
 	
-	void registerServiceUpdate (String ListenerID, String serviceID [], ISofttwareMarketplaceUpdateListener iUpdateListener);
-	void unregisterServiceUpdate (String ListenerID);
+	void registerSoftwareUpdate (String ListenerID, String[] serviceID, ISoftwareMarketplaceUpdateListener iUpdateListener);
+	void unregisterSoftwareUpdate (String ListenerID);
 
 }
