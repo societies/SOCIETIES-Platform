@@ -1,11 +1,11 @@
-package org.societies.personalisation.preference.api;
+package org.societies.personalisation.preference.api.model;
 
 import java.io.Serializable;
 import java.util.Date;
 
 import javax.swing.tree.TreeModel;
 
-import org.societies.personalisation.common.api.ServiceResourceIdentifier;
+import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
 
 /**
  * @author Elizabeth

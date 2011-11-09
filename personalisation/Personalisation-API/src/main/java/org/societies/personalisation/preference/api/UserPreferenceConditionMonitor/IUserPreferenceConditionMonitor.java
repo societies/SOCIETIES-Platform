@@ -1,4 +1,4 @@
-package org.societies.personalisation.UserPreferenceConditionMonitor.api;
+package org.societies.personalisation.preference.api.UserPreferenceConditionMonitor;
 
 public interface IUserPreferenceConditionMonitor {
 

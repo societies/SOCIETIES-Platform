@@ -1,4 +1,4 @@
-package org.societies.personalisation.CRISTCommunityIntentDiscovery.api;
+package org.societies.personalisation.CRIST.api.CRISTCommunityIntentDiscovery;
 
 public interface ICRISTCommunityIntentDiscovery {
 

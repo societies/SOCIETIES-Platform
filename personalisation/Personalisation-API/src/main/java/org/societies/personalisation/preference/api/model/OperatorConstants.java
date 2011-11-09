@@ -1,4 +1,4 @@
-package org.societies.personalisation.preference.api;
+package org.societies.personalisation.preference.api.model;
 
 /**
  * Enum class used to define the operators used in the {@link

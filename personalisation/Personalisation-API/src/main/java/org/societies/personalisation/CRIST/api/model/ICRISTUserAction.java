@@ -1,6 +1,6 @@
-package org.societies.personalisation.CRIST.api;
+package org.societies.personalisation.CRIST.api.model;
 
-import org.societies.personalisation.common.api.IOutcome;
+import org.societies.personalisation.common.api.model.IOutcome;
 
 
 

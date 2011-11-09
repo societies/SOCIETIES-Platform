@@ -1,4 +1,4 @@
-package org.societies.personalisation.CACIDiscovery.api;
+package org.societies.personalisation.CACI.api.CACIDiscovery;
 
 public interface ICACIDiscovery {
 

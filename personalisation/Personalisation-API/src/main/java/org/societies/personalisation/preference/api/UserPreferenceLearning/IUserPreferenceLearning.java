@@ -1,4 +1,4 @@
-package org.societies.personalisation.UserPreferenceLearning.api;
+package org.societies.personalisation.preference.api.UserPreferenceLearning;
 
 public interface IUserPreferenceLearning {
 

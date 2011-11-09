@@ -1,4 +1,4 @@
-package org.societies.personalisation.CAUIDiscovery.api;
+package org.societies.personalisation.CAUI.api.CAUIDiscovery;
 
 public interface ICAUIDiscovery {
 

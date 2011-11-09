@@ -1,4 +1,4 @@
-package org.societies.personalisation.UserPreferenceMerging.api;
+package org.societies.personalisation.preference.api.UserPreferenceMerging;
 
 public interface IUserPreferenceMerging {
 

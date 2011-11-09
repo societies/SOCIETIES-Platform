@@ -1,4 +1,4 @@
-package org.societies.personalisation.preference.api;
+package org.societies.personalisation.preference.api.model;
 
 /**
  * @author Elizabeth
@@ -7,7 +7,7 @@ package org.societies.personalisation.preference.api;
  */
 import java.io.Serializable;
 
-import org.societies.personalisation.common.api.ICtxAttributeIdentifier;
+import org.societies.personalisation.common.api.model.ICtxAttributeIdentifier;
 
 
 

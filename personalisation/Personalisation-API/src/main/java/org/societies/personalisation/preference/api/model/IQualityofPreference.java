@@ -1,4 +1,4 @@
-package org.societies.personalisation.preference.api;
+package org.societies.personalisation.preference.api.model;
 
 import java.util.Date;
 

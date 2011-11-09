@@ -1,4 +1,4 @@
-package org.societies.personalisation.CAUITaskManager.api;
+package org.societies.personalisation.CAUI.api.CAUITaskManager;
 
 public interface ICAUITaskManager {
 

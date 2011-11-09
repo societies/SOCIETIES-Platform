@@ -1,6 +1,6 @@
-package org.societies.personalisation.DIANNE.api;
+package org.societies.personalisation.DIANNE.api.model;
 
-import org.societies.personalisation.common.api.IOutcome;
+import org.societies.personalisation.common.api.model.IOutcome;
 
 /**
  * @author sarah

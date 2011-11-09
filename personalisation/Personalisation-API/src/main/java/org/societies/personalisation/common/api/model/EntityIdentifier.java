@@ -1,4 +1,4 @@
-package org.societies.personalisation.common.api;
+package org.societies.personalisation.common.api.model;
 
 /**
  * This interface is going to be removed and replaced with the real interface from the identity model 

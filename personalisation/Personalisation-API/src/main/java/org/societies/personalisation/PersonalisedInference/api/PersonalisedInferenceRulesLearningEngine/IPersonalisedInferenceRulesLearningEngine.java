@@ -1,4 +1,4 @@
-package org.societies.personalisation.PersonalisedInferenceRulesLearningEngine.api;
+package org.societies.personalisation.PersonalisedInference.api.PersonalisedInferenceRulesLearningEngine;
 
 public interface IPersonalisedInferenceRulesLearningEngine {
 

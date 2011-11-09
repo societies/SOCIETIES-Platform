@@ -1,5 +1,5 @@
 
-package org.societies.personalisation.common.api;
+package org.societies.personalisation.common.api.model;
 
 import java.util.ArrayList;
 import java.util.List;

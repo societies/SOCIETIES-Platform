@@ -1,4 +1,4 @@
-package org.societies.personalisation.management.api;
+package org.societies.personalisation.common.api.management;
 
 /**
  * 

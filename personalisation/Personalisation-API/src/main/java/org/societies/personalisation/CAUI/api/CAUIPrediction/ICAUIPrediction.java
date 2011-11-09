@@ -1,4 +1,4 @@
-package org.societies.personalisation.CAUIPrediction.api;
+package org.societies.personalisation.CAUI.api.CAUIPrediction;
 
 public interface ICAUIPrediction {
 

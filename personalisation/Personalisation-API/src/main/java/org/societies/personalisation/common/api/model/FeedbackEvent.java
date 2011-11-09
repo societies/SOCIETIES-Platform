@@ -1,4 +1,4 @@
-package org.societies.personalisation.common.api;
+package org.societies.personalisation.common.api.model;
 
 import java.io.Serializable;
 

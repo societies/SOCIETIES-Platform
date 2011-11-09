@@ -1,4 +1,4 @@
-package org.societies.personalisation.UserPreferenceManagement.api;
+package org.societies.personalisation.preference.api.UserPreferenceManagement;
 
 public interface IUserPreferenceManagement {
 

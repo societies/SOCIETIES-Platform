@@ -1,8 +1,8 @@
-package org.societies.personalisation.CAUI.api;
+package org.societies.personalisation.CAUI.api.model;
 
 import java.io.Serializable;
 
-import org.societies.personalisation.common.api.IOutcome;
+import org.societies.personalisation.common.api.model.IOutcome;
 
 /**
  * @since 0.0.1

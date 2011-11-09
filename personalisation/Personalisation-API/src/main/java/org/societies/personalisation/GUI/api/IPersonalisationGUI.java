@@ -1,4 +1,4 @@
-package org.societies.personalisation.PersonalisationGUI.api;
+package org.societies.personalisation.GUI.api;
 
 public interface IPersonalisationGUI {
 

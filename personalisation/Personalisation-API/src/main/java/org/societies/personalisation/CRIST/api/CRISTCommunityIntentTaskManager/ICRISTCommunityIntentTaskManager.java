@@ -1,4 +1,4 @@
-package org.societies.personalisation.CRISTCommunityIntentTaskManager.api;
+package org.societies.personalisation.CRIST.api.CRISTCommunityIntentTaskManager;
 
 public interface ICRISTCommunityIntentTaskManager {
 
