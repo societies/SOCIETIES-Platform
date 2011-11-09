@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.societies.privacytrust.privacyprotection.api.internal;
 
 /**
