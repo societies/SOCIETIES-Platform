@@ -10,12 +10,12 @@ package org.societies.security.policynegotiator.api;
 public interface INegotiationProvider extends INegotiationRequester {
 	
 	/**
-	 * Get final SLA.
+	 * Get final policy.
 	 * 
-	 * @param policySignedByRequestor The option accepted by the requestor side.
-	 * Includes requestor identity and signature.
+	 * @param policySignedByRequester The option accepted by the requestor side.
+	 * Includes requester identity and signature.
 	 * 
-	 * @return Final SLA, signed by both parties.
+	 * @return Final policy, signed by both parties.
 	 */
-	public String getFinalPolicy(String policySignedByRequestor);
+	public String getFinalPolicy(String policySignedByRequester);
 }

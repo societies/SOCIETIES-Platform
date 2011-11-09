@@ -10,7 +10,7 @@ package org.societies.security.policynegotiator.api;
 public interface INegotiationRequester {
 
 	/**
-	 * Get all available options for SLA.
+	 * Get all available options for the policy.
 	 * 
 	 * @param callback The callback to be invoked to return the result.
 	 * 

@@ -14,7 +14,7 @@ public interface INegotiationRequesterInternal {
 	 * Async return for
 	 * {@link INegotiationRequester#getPolicyOptions(INegotiationRequesterInternal)}.
 	 * 
-	 * @param sops All available options for SLA, embedded in a single XML document.
+	 * @param sops All available options for policy, embedded in a single XML document.
 	 */
 	public void returnSignedPolicyOptions(String sops);
 	
@@ -31,7 +31,7 @@ public interface INegotiationRequesterInternal {
 	 * Async return for
 	 * {@link INegotiationRequester#acceptPolicy(int, ResponsePolicy, INegotiationRequesterInternal)}.
 	 * 
-	 * @param sla XML-based final SLA signed by both parties.
+	 * @param policy XML-based final policy signed by both parties.
 	 */
-	public void returnSla(String sla);
+	public void returnFinalPolicy(String policy);
 }
