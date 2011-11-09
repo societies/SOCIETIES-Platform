@@ -7,8 +7,8 @@ package org.societies.security.policynegotiator.api;
  * @author Mitja Vardjan
  *
  */
-public interface INegotiationProvider {
-
+public interface INegotiationProvider extends INegotiationRequester {
+	
 	/**
 	 * Get final SLA.
 	 * 
@@ -18,17 +18,4 @@ public interface INegotiationProvider {
 	 * @return Final SLA, signed by both parties.
 	 */
 	public String getFinalPolicy(String policySignedByRequestor);
-	
-	/**
-	 * Get all available options for SLA.
-	 * 
-	 * @return All available options embedded in a single XML document.
-	 */
-	public String getPolicyOptions();
-	
-	/**
-	 * Reject all options and terminate negotiation.
-	 */
-	public void reject();
-
 }
