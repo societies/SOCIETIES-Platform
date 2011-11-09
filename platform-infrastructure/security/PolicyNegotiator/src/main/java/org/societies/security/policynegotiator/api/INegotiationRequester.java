@@ -20,26 +20,28 @@ public interface INegotiationRequester {
 
 	/**
 	 * Accept given policy option unchanged, as provided by the provider side.
-	 * Alternatively, {@link negotiatePolicy(int, ResponsePolicy)} can be used
+	 * Alternatively, {@link negotiatePolicy(ResponsePolicy)} can be used
 	 * to try to negotiate a different policy if none of the options are
 	 * acceptable.
 	 * 
-	 * @param policyOptionId ID of the option accepted by the requestor side.
+	 * @param signedPolicyOption The selected policy alternative, accepted and
+	 * signed by the requester side. Includes requester identity and signature.
 	 */
-	public void acceptPolicy(int policyOptionId,
+	public void acceptPolicy(String signedPolicyOption,
 			INegotiationRequesterInternal callback);
 	
 	/**
 	 * Further negotiate given policy option. If any of the policy options
-	 * given by the provider suits the requestor, then {@link acceptPolicy(int)}
+	 * given by the provider suits the requester, then {@link acceptPolicy(String)}
 	 * should be used instead in order to save bandwidth and increase chances
 	 * of successful negotiation.
 	 * 
-	 * @param policyOptionId ID of the option the requestor side chose as a
+	 * @param policyOptionId ID of the option the requester side chose as a
 	 * basis for further negotiation.
 	 * 
 	 * @param modifiedPolicy Policy modified by requester side. The policy is
-	 * to be offered to the provider.
+	 * to be offered to the provider. It does not include the requester
+	 * identity nor signature (TBC). 
 	 */
 	public void negotiatePolicy(int policyOptionId, ResponsePolicy modifiedPolicy,
 			INegotiationRequesterInternal callback);
