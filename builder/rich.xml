@@ -43,6 +43,7 @@
     <!-- Privacy Mgmt -->
     <!-- User Agent --> 
     <!-- Personalisation Mgmt -->
+    <module>personalisation/Personalisation-API</module>
    
   </modules>
 </project>
