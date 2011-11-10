@@ -32,7 +32,12 @@
 
 	<!-- List dependencies here -->
 	<dependencies>
-
+			<dependency>
+     	   <groupId>${release.groupId}</groupId>
+        	<artifactId>css_personalisation_api</artifactId>
+        	<version>${version.pm}</version>
+        	<scope>provided</scope>
+      	</dependency>
 
 	</dependencies>
 
