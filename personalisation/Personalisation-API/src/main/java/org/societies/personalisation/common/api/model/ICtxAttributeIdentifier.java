@@ -9,6 +9,7 @@ public interface ICtxAttributeIdentifier {
 
 	public String getType();
 	
+	public String toUriString();
 	
 
 }
