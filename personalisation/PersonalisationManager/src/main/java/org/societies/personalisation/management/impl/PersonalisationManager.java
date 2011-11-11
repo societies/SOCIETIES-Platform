@@ -1,5 +1,7 @@
 package org.societies.personalisation.management.impl;
 
-public class PersonalisationManager {
+import org.societies.personalisation.common.api.management.IPersonalisationManager;
+
+public class PersonalisationManager implements IPersonalisationManager{
 
 }
