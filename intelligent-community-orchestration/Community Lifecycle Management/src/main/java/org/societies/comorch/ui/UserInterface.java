@@ -9,7 +9,7 @@ import org.societies.comorch.api.IUserNotification;
 public class UserInterface implements IUserInput, IUserNotification{
 
 	@Override
-	public boolean Configure(Object CIS, Object details) {
+	public boolean configureCIS(Object CIS, Object details) {
 		// TODO Auto-generated method stub
 		return false;
 	}
