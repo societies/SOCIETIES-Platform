@@ -3,7 +3,7 @@ package org.societies.personalisation.common.api.management;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
-import org.societies.personalisation.common.api.model.ContextAttributeIdentifier;
+import org.societies.personalisation.common.api.model.ICtxAttributeIdentifier;
 import org.societies.personalisation.common.api.model.ContextModelObject;
 import org.societies.personalisation.common.api.model.EntityIdentifier;
 import org.societies.personalisation.common.api.model.IAction;
@@ -77,7 +77,7 @@ public interface IInternalPersonalisationManager {
 	 * @param className
 	 * @param ctxAttributeId
 	 */
-	public void registerForContextUpdate(String className, ContextAttributeIdentifier ctxAttributeId);
+	public void registerForContextUpdate(String className, ICtxAttributeIdentifier ctxAttributeId);
 
 	/**
 	 * 

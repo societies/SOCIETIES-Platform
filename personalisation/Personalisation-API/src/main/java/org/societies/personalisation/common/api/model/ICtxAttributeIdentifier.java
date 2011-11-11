@@ -5,11 +5,10 @@ package org.societies.personalisation.common.api.model;
  * @author Eliza
  *
  */
-public class ICtxAttributeIdentifier {
+public interface ICtxAttributeIdentifier {
 
-	public String getType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public String getType();
+	
+	
 
 }
