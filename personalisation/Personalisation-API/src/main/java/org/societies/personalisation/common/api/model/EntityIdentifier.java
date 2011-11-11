@@ -7,4 +7,7 @@ package org.societies.personalisation.common.api.model;
  */
 public interface EntityIdentifier {
 
+	public String toUriString(){
+		return "";
+	}
 }
