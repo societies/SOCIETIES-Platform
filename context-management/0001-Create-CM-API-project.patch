@@ -1,0 +1,114 @@
+From 66d657ddef3882926da21bb84794cb401bea82e8 Mon Sep 17 00:00:00 2001
+From: Nicolas Liampotis <nicolas.liampotis@cn.ntua.gr>
+Date: Sat, 12 Nov 2011 16:32:38 +0200
+Subject: [PATCH] Create CM API project
+
+---
+ context-management/CM_API/pom.xml                  |   87 ++++++++++++++++++++
+ 1 files changed, 87 insertions(+), 0 deletions(-)
+ create mode 100644 context-management/CM_API/pom.xml
+ create mode 100644 context-management/CM_API/src/main/java/org/societies/context/broker/.gitignore
+ create mode 100644 context-management/CM_API/src/main/java/org/societies/context/source/.gitignore
+
+diff --git a/context-management/CM_API/pom.xml b/context-management/CM_API/pom.xml
+new file mode 100644
+index 0000000..8330583
+--- /dev/null
++++ b/context-management/CM_API/pom.xml
+@@ -0,0 +1,87 @@
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++	
++	<modelVersion>4.0.0</modelVersion>
++
++	<!-- All projects should inherit from societies-parent -->
++	<parent>
++		<groupId>org.societies</groupId>
++		<artifactId>virgo-parent</artifactId>
++		<version>0.1</version>
++                <relativePath>../../parent/virgo.xml</relativePath>
++	</parent>
++
++	<!-- groupId is set in parent pom -->
++	<artifactId>css_cm_api</artifactId>
++	<version>${version.cm}</version>
++	<name>CM API</name>
++	<packaging>bundle</packaging> 
++
++	<developers>
++    <developer>
++      <name>Nicolas Liampotis</name>
++      <email>nicolas.liampotis@cn.ntua.gr</email>
++      <organization>ICCS</organization>
++      <organizationUrl>http://www.iccs.gr/</organizationUrl>
++      <roles>
++        <role>Senior Developer</role>
++      </roles>
++      <timezone>+2</timezone>
++    </developer>
++	</developers>
++
++	<!-- List dependencies here -->
++	<!--  
++	<dependencies>
++		<dependency>
++			<groupId>junit</groupId>
++			<artifactId>junit</artifactId>
++		</dependency>
++
++	</dependencies>
++	 -->
++
++
++
++<build>
++	<plugins>
++	  <plugin>
++    		<groupId>org.codehaus.mojo</groupId>
++                <artifactId>cobertura-maven-plugin</artifactId>
++       </plugin>
++            
++       
++			<plugin>
++				<groupId>org.apache.felix</groupId>
++				<artifactId>maven-bundle-plugin</artifactId>
++				<extensions>true</extensions>
++				<configuration>
++				<instructions>
++						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
++						<Embed-Transitive>true</Embed-Transitive>
++					    <_nouses>true</_nouses>
++					</instructions>
++				</configuration>
++			</plugin>
++            <plugin>
++                <groupId>org.apache.maven.plugins</groupId>
++                <artifactId>maven-dependency-plugin</artifactId>
++                <configuration>
++                    <artifactItems>
++                        <artifactItem>
++                            <groupId>${groupId}</groupId>
++                            <artifactId>${artifactId}</artifactId>
++                            <version>${version.cm}</version>
++                            <type>jar</type>
++                            <overWrite>true</overWrite>
++                            <outputDirectory>${virgo.home}/pickup/</outputDirectory>                                                        
++                        </artifactItem>
++                    </artifactItems>                                                    
++                </configuration>
++      		</plugin>	
++         
++         </plugins>
++	</build>
++
++
++</project>
+diff --git a/context-management/CM_API/src/main/java/org/societies/context/broker/.gitignore b/context-management/CM_API/src/main/java/org/societies/context/broker/.gitignore
+new file mode 100644
+index 0000000..e69de29
+diff --git a/context-management/CM_API/src/main/java/org/societies/context/source/.gitignore b/context-management/CM_API/src/main/java/org/societies/context/source/.gitignore
+new file mode 100644
+index 0000000..e69de29
+-- 
+1.7.4.1
+
