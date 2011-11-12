@@ -21,5 +21,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 	<release.groupId>org.societies</release.groupId>
 	<!-- EPapadopoulou: added version.pm property -->
 	<version.pm>${release.version}.1</version.pm>
+	<version.spm>${release.version}.1</version.spm>
     </properties>
 </project>
