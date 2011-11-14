@@ -2,16 +2,44 @@ package org.societies.personalisation.CRIST.api.model;
 
 import org.societies.personalisation.common.api.model.IOutcome;
 
-
-
 /**
  * This interface consists of the public methods to manage the CRISTUserAction
  * class.
  * @author Zhu WANG
  * @version 1.0
- * @created 08-Nov-2011 13:55:08
+ * @created 14-Nov-2011 16:53:13
  */
 public interface ICRISTUserAction extends IOutcome {
 
+	public HashMap<String, Serializable> getActionContext();
+
+	/**
+	 * @return the identifier of the service to which this action is applied to
+	 */
+	public String getActionID();
+
+	public LinkedHashMap<ICRISTUserSituation, Double> getActionSituations();
+
+	public int getConfidenceLevel();
+
+	/**
+	 * 
+	 * @param context
+	 */
+	public void setActionContext(HashMap<String, Serializable> context);
+
+	/**
+	 * 
+	 * @param actionSituations
+	 */
+	public void setActionSituations(List<ICRISTUserSituation,Double> actionSituations);
+
+	/**
+	 * 
+	 * @param confidenceLevel
+	 */
+	public int setConfidenceLevel(int confidenceLevel);
+
+	public String toString();
 
 }
