@@ -19,5 +19,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 
 	<!-- master properties for component blocks -->
 	<release.groupId>org.societies</release.groupId>
+	<version.pm>${release.version}.1</version.pm>
+	<version.spm>${release.version}.1</version.spm>
     </properties>
 </project>

@@ -1,9 +1,15 @@
 package org.societies.privacytrust.privacyprotection.api.external;
 
+
+import org.societies.personalisation.common.api.model.EntityIdentifier;
+import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import org.societies.privacytrust.privacyprotection.api.model.privacyPolicy.IAgreementEnvelope;
+import org.societies.privacytrust.privacyprotection.api.model.privacyPolicy.RequestPolicy;
+import org.societies.privacytrust.privacyprotection.api.model.privacyPolicy.ResponsePolicy;
 /**
- * @author olivierm
+ * @author Eliza
  * @version 1.0
- * @created 08-nov.-2011 17:13:16
+ * @created 11-Nov-2011 18:55:01
  */
 public interface INegotiationAgent {
 
@@ -14,7 +20,7 @@ public interface INegotiationAgent {
 	 * 
 	 * @param contract    the agreement to acknowledge
 	 */
-	public boolean acknowledgeAgreement(Object contract);
+	public boolean acknowledgeAgreement(IAgreementEnvelope contract);
 
 	/**
 	 * this method is called by any PSS that wants to read the service's provider
@@ -24,7 +30,7 @@ public interface INegotiationAgent {
 	 * @param serviceID    the service identifier of the service for which the
 	 * negotiation will be performed
 	 */
-	public Object getPolicy(Object serviceID);
+	public RequestPolicy getPolicy(ServiceResourceIdentifier serviceID);
 
 	/**
 	 * This method is called by any PSS to get the Identity of the service provider.
@@ -32,7 +38,7 @@ public interface INegotiationAgent {
 	 * where applicable
 	 * @return				the identity of the service provider
 	 */
-	public Object getProviderIdentity();
+	public EntityIdentifier getProviderIdentity();
 
 	/**
 	 * this method is called by the client and informs the provider that it wants to
@@ -46,6 +52,6 @@ public interface INegotiationAgent {
 	 * to be performed
 	 * @param policy    the ResponsePolicy to the provider's privacy policy
 	 */
-	public Object negotiate(Object serviceID, Object policy);
+	public ResponsePolicy negotiate(ServiceResourceIdentifier serviceID, ResponsePolicy policy);
 
 }
