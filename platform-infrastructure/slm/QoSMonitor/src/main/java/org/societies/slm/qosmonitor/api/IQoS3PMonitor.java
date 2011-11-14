@@ -34,5 +34,5 @@ public interface IQoS3PMonitor {
 	 * 
 	 * @param data The returned data. The data are anonymized.
 	 */
-	public void returnCommunityData(String dataId, Serializable data);
+	public void onGetCommunityData(String dataId, Serializable data);
 }
