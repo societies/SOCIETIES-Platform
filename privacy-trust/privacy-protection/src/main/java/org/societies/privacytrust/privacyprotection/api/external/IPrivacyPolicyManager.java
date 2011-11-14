@@ -3,6 +3,8 @@ package org.societies.privacytrust.privacyprotection.api.external;
 import java.util.List;
 import java.util.Map;
 
+import org.societies.privacytrust.privacyprotection.api.model.privacyPolicy.RequestPolicy;
+
 /**
  * External Interface to do actions relative to a privacy policy or a privacy
  * agreement.
@@ -11,46 +13,39 @@ import java.util.Map;
  * @created 09-nov.-2011 16:45:29
  */
 public interface IPrivacyPolicyManager {
-
 	/**
 	 * Retrieve a (CIS or Service) privacy policy by its ID.
 	 * Example of use:
-	 * <ul>
-	 * 	<li>CIS Management, when it sends the CIS data (URI, description� and privacy
-	 * policy) to let a user join it.</li>
-	 * 	<li>CIS Management, to edit a policy (GUI call)</li>
-	 * </ul>
+	 * - CIS Management, when it sends the CIS data (URI, description and privacy
+	 * policy) to let a user join it.
+	 * - CIS Management, to edit a policy (GUI call)
 	 * 
 	 * @param id
 	 */
-	public Object getPrivacyPolicy(Object id);
+	public RequestPolicy getPrivacyPolicy(Object id);
 
 	/**
 	 * Retrieve (CIS or Service)  privacy policy using criteria
 	 * Example of use:
-	 * <ul>
-	 * 	<li>CIS Management, when it sends CIS data (URI, description� and privacy
-	 * policy) to let a user join it.</li>
-	 * 	<li>CIS Management, to edit a policy (GUI call)</li>
-	 * 	<li>CIS Management, to list policies (to choose one to edit for example)</li>
-	 * </ul>
+	 * - CIS Management, when it sends CIS data (URI, description and privacy
+	 * policy) to let a user join it.
+	 * - CIS Management, to edit a policy (GUI call)
+	 * - CIS Management, to list policies (to choose one to edit for example)
 	 * 
 	 * @param criteria
 	 */
-	public List<Object> getPrivacyPolicies(Map criteria);
+	public List<RequestPolicy> getPrivacyPolicies(Map criteria);
 
 	/**
 	 * Store or update a (CIS or Service) privacy policy
 	 * Example of use:
-	 * <ul>
-	 * 	<li>CIS Management, to create a policy for a CIS.</li>
-	 * 	<li>3rd Service Creation, to attach a policy to a service</li>
-	 * 	<li>More generally: GUI, to edit a policy.</li>
-	 * </ul>
+	 * - CIS Management, to create a policy for a CIS.
+	 * - 3rd Service Creation, to attach a policy to a service
+	 * - More generally: GUI, to edit a policy.
 	 * 
 	 * @param privacyPolicy
 	 */
-	public Object updatePrivacyPolicy(Object privacyPolicy);
+	public RequestPolicy updatePrivacyPolicy(RequestPolicy privacyPolicy);
 
 	/**
 	 * Delete a (CIS or Service) privacy policy by its ID.
@@ -73,13 +68,10 @@ public interface IPrivacyPolicyManager {
 	 * configuration contains information about geolocation data, the inference engine
 	 * will add geolocation data line to the privacy policy.
 	 * Example of use:
-	 * <ul>
-	 * 	<li>CIS Management, or 3rd Service Creation, to create a policy</li>
-	 * </ul>
+	 * - CIS Management, or 3rd Service Creation, to create a policy
 	 * 
 	 * @param configuration
-	 * @param privacyPolicyType    CIS or Service
+	 * @param privacyPolicyType CIS or Service
 	 */
-	public Object inferPrivacyPolicy(Map configuration, Object privacyPolicyType);
-
+	public RequestPolicy inferPrivacyPolicy(Map configuration, Object privacyPolicyType);
 }
