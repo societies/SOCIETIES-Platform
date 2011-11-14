@@ -4,3 +4,8 @@
 *.class
 *.class
 /.project
+**/bin
+**/gen
+*.apk
+R.java
+*.dex

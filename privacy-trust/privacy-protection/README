@@ -1,0 +1,9 @@
+Privacy & Trust : Privacy protection
+The Privacy Protection is the global privacy component.
+It is composed of several sub-components and provides
+several functions through three external interfaces:
+- PrivacyDataManager: to manage data access control and
+access conditions
+- PrivacyPolicyManager: to manage privacy policy
+- PrivacyPolicyNegotiationManager: to manage privacy
+policy negotiations with CIS or services

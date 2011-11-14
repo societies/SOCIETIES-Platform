@@ -1,0 +1,9 @@
+Privacy & Trust : Domain Authority
+A Domain Authority is an issuer of user accounts and pseudonyms.
+It is responsible for user authentication and identifier-based
+discovery. When a user requests an account, a domain authority
+is responsible for verifying user data for further assertion issuing.
+This verification can follow offline methods. Furthermore, it federates
+openly with other domain authorities, managing trust in a distributed way.
+In terms of interoperability, it may be able to federate with servers
+of other federated social networks or social networking sites.
