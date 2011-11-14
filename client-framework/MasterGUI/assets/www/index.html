@@ -8,6 +8,7 @@
 	<script type="text/javascript" src="jquery-1.6.4.js"></script> 
 	<script type="text/javascript" src="jquery.mobile-1.0rc2.js"></script>
 	<script type="text/javascript" src="reference.js"></script>
+	<link rel="stylesheet" href="societies.css" /> 
 	
 	<!-- Weinre target insert. Uncomment to Weinre -->
 	<!--script src="http://10.0.2.2:8081/target/target-script-min.js"></script-->
@@ -15,31 +16,62 @@
 </head> 
 <body> 
 <!-- Start of first page (cf. http://jquerymobile.com/themeroller/ to create custom themes -->
-<div data-role="page" id="main">
+<div data-role="page" id="main" >
 
-	<div data-role="header" data-theme="d" >
+	<div data-role="header" data-theme="d"  data-position="fixed" >
 		<h1>Android Client</h1>
 		<!-- Invoke a new page via an icon -->
 	</div><!-- /header -->
 
 	<div data-role="content" data-theme="e">	
-    	<a href="#deviceManager" data-theme="b" data-transition="pop" data-role="button" >Device Manager</a>
+
+   		<div id= "loginDialog">
+			<div data-role="fieldcontain">
+		    	<label for="username">User JID: </label>
+		    	<input type="text" name="userLogin" id="username" value=""  />
+			</div>
+
+			<div data-role="fieldcontain">
+		    	<label for="userpass">Password: </label>
+		    	<input type="password" name="userpass" id="userpass" value=""  />
+			</div>
+
+			<input id="connectXMPP" type="button" value="Connect" data-icon="gear" data-inline="true"/> 
+			
+		</div>
+    	
 	</div><!-- /content -->
 
-	<div data-role="footer" data-theme="d">
+	<div data-role="footer" data-theme="d"  data-position="fixed" >
 		<h4>SOCIETIES</h4>
-		<a href="#device" data-role="button" data-icon="gear" data-inline="true" data-theme="b"></a>
-		<a href="#information" data-role="button" data-icon="info" data-inline="true" data-theme="b"></a>
+		<a href="#device" data-role="button" data-icon="gear" data-inline="true" data-theme="b">Device</a>
+		<a href="#information" data-role="button" data-icon="info" data-inline="true" data-theme="b">Info</a>
 	</div><!-- /footer -->
 </div><!-- /page -->
 
 
+<!-- Start of Menu page -->
+<div data-role="page" id="menu" data-add-back-btn="true">
 
+	<div data-role="header" data-theme="d" data-position="fixed">
+		<h1>Menu</h1>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="e">	
+    	<a href="#deviceManager" data-theme="b" data-transition="pop" data-role="button" >Device Manager</a>
+	
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="d" data-position="fixed">
+		<h4>SOCIETIES</h4>
+		<a href="#main" data-role="button" data-icon="back" data-inline="true">Back to main</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
 
 <!-- Start of Device page -->
 <div data-role="page" id="device" data-add-back-btn="true">
 
-	<div data-role="header" data-theme="d">
+	<div data-role="header" data-theme="d" data-position="fixed">
 		<h1>Device Characteristics</h1>
 	</div><!-- /header -->
 
@@ -56,7 +88,7 @@
      	</div>
 	</div><!-- /content -->
 
-	<div data-role="footer" data-theme="d">
+	<div data-role="footer" data-theme="d" data-position="fixed">
 		<h4>SOCIETIES</h4>
 		<a href="#main" data-role="button" data-icon="back" data-inline="true">Back to main</a>
 	</div><!-- /footer -->
@@ -65,7 +97,7 @@
 <!-- Start of Information page -->
 <div data-role="page" id="information" data-add-back-btn="true">
 
-	<div data-role="header" data-theme="d">
+	<div data-role="header" data-theme="d" data-position="fixed">
 		<h1>Information</h1>
 	</div><!-- /header -->
 
@@ -74,7 +106,7 @@
 		Societies Android Client</p>
 	</div><!-- /content -->
 
-	<div data-role="footer" data-theme="d">
+	<div data-role="footer" data-theme="d" data-position="fixed">
 		<h4>SOCIETIES</h4>
 		<a href="#main" data-role="button" data-icon="back" data-inline="true">Back to main</a>
 	</div><!-- /footer -->
@@ -83,14 +115,14 @@
 <!-- Start of Device Manager example page -->
 <div data-role="page" id="deviceManager" data-add-back-btn="true">
 
-	<div data-role="header" data-theme="d">
+	<div data-role="header" data-theme="d" data-position="fixed">
 		<h1>Device Manager</h1>
 	</div><!-- /header -->
 
 	<div data-role="content" data-theme="e">	
 	</div><!-- /content -->
 
-	<div data-role="footer" data-theme="d">
+	<div data-role="footer" data-theme="d" data-position="fixed">
 		<h4>SOCIETIES</h4>
 		<a href="#main" data-role="button" data-icon="back" data-inline="true">Back to main</a>
 	</div><!-- /footer -->

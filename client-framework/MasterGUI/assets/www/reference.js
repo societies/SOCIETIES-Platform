@@ -54,6 +54,10 @@ var deviceInfo = function() {
 
 };
 
+var successfulLogin = function() {
+	$.mobile.changePage( ($("#menu")), { transition: "slideup"} );
+};
+
 /**
  * Add Javascript functions to various HTML tags using JQuery
  */
@@ -65,6 +69,10 @@ jQuery(function() {
 	
 	$('#deviceChar').click(function() {
 		deviceInfo();
+	});
+
+	$('#connectXMPP').click(function() {
+		successfulLogin();
 	});
 
 
