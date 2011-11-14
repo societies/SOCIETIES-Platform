@@ -16,7 +16,7 @@ public interface INegotiationRequesterCallback {
 	 * 
 	 * @param sops All available options for policy, embedded in a single XML document.
 	 */
-	public void onSignedPolicyOptions(String sops);
+	public void onGetPolicyOptions(String sops);
 	
 	/**
 	 * Async return for
@@ -25,7 +25,7 @@ public interface INegotiationRequesterCallback {
 	 * @param modifiedPolicy Policy possibly modified by provider side.
 	 * Based on the policy sent before by the requester side.
 	 */
-	public void onNegotiationResponse(ResponsePolicy modifiedPolicy);
+	public void onNegotiatePolicy(ResponsePolicy modifiedPolicy);
 	
 	/**
 	 * Async return for
@@ -33,5 +33,5 @@ public interface INegotiationRequesterCallback {
 	 * 
 	 * @param policy XML-based final policy signed by both parties.
 	 */
-	public void onFinalPolicy(String policy);
+	public void onAcceptPolicy(String policy);
 }
