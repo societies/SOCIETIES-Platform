@@ -2,6 +2,8 @@ package org.societies.context.source.api;
 
 import java.io.Serializable;
 
+import org.societies.context.model.api.CtxEntity;
+
 public interface ICtxSourceMgr {
 
 	/**
