@@ -1,6 +1,6 @@
-package org.societies.privacytrust.privacyprotection.api.model.dataObfuscation.listener;
+package org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.listener;
 
-import org.societies.privacytrust.privacyprotection.api.model.dataObfuscation.dataWrapper.IDataWrapper;
+import org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.wrapper.IDataWrapper;
 
 
 /**

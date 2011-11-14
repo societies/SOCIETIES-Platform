@@ -1,4 +1,4 @@
-package org.societies.privacytrust.privacyprotection.api.model.dataObfuscation.dataWrapper;
+package org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.wrapper;
 
 
 /**

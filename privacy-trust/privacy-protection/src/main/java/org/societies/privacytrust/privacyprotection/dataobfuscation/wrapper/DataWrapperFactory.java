@@ -1,6 +1,10 @@
-package org.societies.privacytrust.privacyprotection.api.model.dataObfuscation.dataWrapper;
+package org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper;
+
+import org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.wrapper.IDataWrapper;
 
 /**
+ * Utilities to instantiate DataWrapper for data obfuscation
+ * State: skeleton
  * @author olivierm
  * @date 14 oct. 2011
  */
