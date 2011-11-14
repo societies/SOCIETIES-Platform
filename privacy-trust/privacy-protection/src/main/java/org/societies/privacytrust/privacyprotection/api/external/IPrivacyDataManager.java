@@ -1,6 +1,8 @@
 package org.societies.privacytrust.privacyprotection.api.external;
 
 import org.societies.privacytrust.privacyprotection.api.internal.IDataObfuscationManager;
+import org.societies.privacytrust.privacyprotection.api.model.privacyPolicy.RequestPolicy;
+import org.societies.privacytrust.privacyprotection.api.model.privacyPolicy.ResponseItem;
 
 /**
  * External interface to do actions when using a data.
@@ -22,7 +24,7 @@ public interface IPrivacyDataManager extends IDataObfuscationManager{
 	 * @param serviceId The service_Id the service
 	 * @return A ResponseItem with permission information in it
 	 */
-	public Object checkPermission(Object dataId, Object ownerId, Object requestorId, Object serviceId);
+	public ResponseItem checkPermission(Object dataId, Object ownerId, Object requestorId, Object serviceId);
 
 	/**
 	 * Check permission to access/use/disclose a data for a CIS usage
@@ -37,7 +39,7 @@ public interface IPrivacyDataManager extends IDataObfuscationManager{
 	 * @param cisId the ID of the CIS which wants to access the data
 	 * @return A ResponseItem with permission information in it
 	 */
-	public Object checkPermission(Object dataId, Object ownerId, Object requestorId, String cisId);
+	public ResponseItem checkPermission(Object dataId, Object ownerId, Object requestorId, String cisId);
 
 	/**
 	 * Check permission to access/use/disclose a data in a case that no negotiation have been done.
@@ -52,5 +54,5 @@ public interface IPrivacyDataManager extends IDataObfuscationManager{
 	 * @param usage Information about the use of the data: purpose, retention-time, people who will access this data... Need to be formalised!
 	 * @return A ResponseItem with permission information in it
 	 */
-	public Object checkPermission(Object dataId, Object ownerId, String requestorId, String usage);
+	public ResponseItem checkPermission(Object dataId, Object ownerId, String requestorId, RequestPolicy usage);
 }

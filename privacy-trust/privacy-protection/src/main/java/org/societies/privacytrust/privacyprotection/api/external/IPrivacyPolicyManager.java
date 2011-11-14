@@ -3,6 +3,8 @@ package org.societies.privacytrust.privacyprotection.api.external;
 import java.util.List;
 import java.util.Map;
 
+import org.societies.privacytrust.privacyprotection.api.model.privacyPolicy.RequestPolicy;
+
 /**
  * External Interface to do actions relative to a privacy policy or a privacy
  * agreement.
@@ -20,7 +22,7 @@ public interface IPrivacyPolicyManager {
 	 * 
 	 * @param id
 	 */
-	public Object getPrivacyPolicy(Object id);
+	public RequestPolicy getPrivacyPolicy(Object id);
 
 	/**
 	 * Retrieve (CIS or Service)  privacy policy using criteria
@@ -32,7 +34,7 @@ public interface IPrivacyPolicyManager {
 	 * 
 	 * @param criteria
 	 */
-	public List<Object> getPrivacyPolicies(Map criteria);
+	public List<RequestPolicy> getPrivacyPolicies(Map criteria);
 
 	/**
 	 * Store or update a (CIS or Service) privacy policy
@@ -43,7 +45,7 @@ public interface IPrivacyPolicyManager {
 	 * 
 	 * @param privacyPolicy
 	 */
-	public Object updatePrivacyPolicy(Object privacyPolicy);
+	public RequestPolicy updatePrivacyPolicy(RequestPolicy privacyPolicy);
 
 	/**
 	 * Delete a (CIS or Service) privacy policy by its ID.
@@ -71,5 +73,5 @@ public interface IPrivacyPolicyManager {
 	 * @param configuration
 	 * @param privacyPolicyType CIS or Service
 	 */
-	public Object inferPrivacyPolicy(Map configuration, Object privacyPolicyType);
+	public RequestPolicy inferPrivacyPolicy(Map configuration, Object privacyPolicyType);
 }
