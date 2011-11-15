@@ -2,7 +2,7 @@ package org.societies.personalisation.CAUI.api.CAUITaskManager;
 
 /**
  * @since 0.0.1
- * @author NikosK(ICCS)
+ * @author nikosk(ICCS)
  * @version 1.0
  * @created 15-Nov-2011 1:42:10 PM
  */

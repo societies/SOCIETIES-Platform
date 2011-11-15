@@ -1,5 +1,13 @@
 package org.societies.personalisation.CAUI.api.CAUIPrediction;
 
+
+/**
+ * @since 0.0.1
+ * @author nikosk(ICCS)
+ * @version 1.0
+ * @created 15-Nov-2011 1:42:10 PM
+ */
+
 public interface ICAUIPrediction {
 
 	/**
@@ -21,25 +29,24 @@ public interface ICAUIPrediction {
 	 */
 	public IAction getCurrentIntentAction(EntityIdentifier requestor, EntityIdentifier ownerID, ServiceResourceIdentifier serviceID, String preferenceName);
 
+	
+	/**
+	 * Predicts next action based on the last performed action
+	 */
 	public UserIntentAction getPrediction();
 
 	/**
+	 * Predicts next action based on the last performed action
 	 * 
 	 * @param ctxAttribute
 	 */
 	public UserIntentAction getPrediction(ContextAttribute ctxAttribute);
 
+	/**
+	 * Returns a list with the performed predictions.
+	 * 
+	 */
+	
 	public List<List<String>> getPredictionHistory();
 
-	/**
-	 * 
-	 * @param FeedbackEvent
-	 */
-	public void sendFeedback(FeedbackEvent FeedbackEvent);
-
-	/**
-	 * 
-	 * @param ctxModelObj
-	 */
-	public void updateReceived(ContextModelObject ctxModelObj);
 }
