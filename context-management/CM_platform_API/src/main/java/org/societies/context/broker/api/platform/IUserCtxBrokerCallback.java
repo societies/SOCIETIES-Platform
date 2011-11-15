@@ -1,9 +1,21 @@
+package org.societies.context.broker.api.platform;
+
+import java.util.List;
+
+import org.societies.context.model.api.CtxAssociation;
+import org.societies.context.model.api.CtxAttribute;
+import org.societies.context.model.api.CtxEntity;
+import org.societies.context.model.api.CtxEntityIdentifier;
+import org.societies.context.model.api.CtxHistoryAttribute;
+import org.societies.context.model.api.CtxIdentifier;
+import org.societies.context.model.api.CtxModelObject;
+
 
 
 /**
  * This interface represents a callback interface for the IUserCtxBroker interface.
  * 
- * @author mcrotty
+ * @author nikosk
  * @version 1.0
  * @created 12-Nov-2011 7:15:15 PM
  */
@@ -14,97 +26,97 @@ public interface IUserCtxBrokerCallback {
 	 * @param c_id
 	 * @param reason
 	 */
-	public void cancel(ICtxIdentifier c_id, string reason);
+	public void cancel(CtxIdentifier c_id, String reason);
 
 	/**
 	 * 
 	 * @param ctxEntity
 	 */
-	public void ctxAssociationCreated(ContextAssociation ctxEntity);
+	public void ctxAssociationCreated(CtxAssociation ctxEntity);
 
 	/**
 	 * 
 	 * @param ctxAttribute
 	 */
-	public void ctxAttributeCreated(ContextAttribute ctxAttribute);
+	public void ctxAttributeCreated(CtxAttribute ctxAttribute);
 
 	/**
 	 * 
 	 * @param list
 	 */
-	public void ctxEntitiesLookedup(List<ContextEntityIdentifier> list);
+	public void ctxEntitiesLookedup(List<CtxEntityIdentifier> list);
 
 	/**
 	 * 
 	 * @param ctxEntity
 	 */
-	public void ctxEntityCreated(ContextEntity ctxEntity);
+	public void ctxEntityCreated(CtxEntity ctxEntity);
 
 	/**
 	 * 
 	 * @param ctxEntity
 	 */
-	public void ctxIndividualCtxEntityCreated(IndividualContextEntity ctxEntity);
+	public void ctxIndividualCtxEntityCreated(CtxEntity ctxEntity);
 
 	/**
 	 * 
 	 * @param ctxModelObject
 	 */
-	public void ctxModelObjectRemoved(ContextModelObject ctxModelObject);
+	public void ctxModelObjectRemoved(CtxModelObject ctxModelObject);
 
 	/**
 	 * 
 	 * @param ctxModelObject
 	 */
-	public void ctxModelObjectRetrieved(ContextModelObject ctxModelObject);
+	public void ctxModelObjectRetrieved(CtxModelObject ctxModelObject);
 
 	/**
 	 * 
 	 * @param list
 	 */
-	public void ctxModelObjectsLookedup(List<ContextIdentifier> list);
+	public void ctxModelObjectsLookedup(List<CtxIdentifier> list);
 
 	/**
 	 * 
 	 * @param ctxModelObject
 	 */
-	public void ctxModelObjectUpdated(ContextModelObject ctxModelObject);
+	public void ctxModelObjectUpdated(CtxModelObject ctxModelObject);
 
 	/**
 	 * 
 	 * @param futCtx
 	 */
-	public void futureCtxRetrieved(List <ContextAttribute> futCtx);
+	public void futureCtxRetrieved(List <CtxAttribute> futCtx);
 
 	/**
 	 * 
 	 * @param futCtx
 	 */
-	public void futureCtxRetrieved(ContextAttribute futCtx);
+	public void futureCtxRetrieved(CtxAttribute futCtx);
 
 	/**
 	 * 
 	 * @param hoc
 	 */
-	public void historyCtxRetrieved(ContextHistoryAttribute hoc);
+	public void historyCtxRetrieved(CtxHistoryAttribute hoc);
 
 	/**
 	 * 
 	 * @param hoc
 	 */
-	public void historyCtxRetrieved(List<ContextHistoryAttribute> hoc);
+	public void historyCtxRetrieved(List<CtxHistoryAttribute> hoc);
 
 	/**
 	 * 
 	 * @param c_id
 	 */
-	public void ok(ICtxIdentifier c_id);
+	public void ok(CtxIdentifier c_id);
 
 	/**
 	 * 
 	 * @param list
 	 */
-	public void ok_list(List<ICtxIdentifier> list);
+	public void ok_list(List<CtxIdentifier> list);
 
 	/**
 	 * 
@@ -117,12 +129,12 @@ public interface IUserCtxBrokerCallback {
 	 * 
 	 * @param results
 	 */
-	public void similartyResults(List<Objects> results);
+	public void similartyResults(List<Object> results);
 
 	/**
 	 * 
 	 * @param ctxModelObj
 	 */
-	public void updateReceived(ContextModelObject ctxModelObj);
+	public void updateReceived(CtxModelObject ctxModelObj);
 
 }

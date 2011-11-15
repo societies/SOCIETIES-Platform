@@ -1,3 +1,9 @@
+package org.societies.context.user.prediction.api.platform;
+
+import java.util.Date;
+
+import org.societies.context.model.api.CtxAttribute;
+import org.societies.context.model.api.CtxAttributeIdentifier;
 
 
 /**
@@ -25,21 +31,21 @@ public interface IUserCtxPredictionMgr {
 	 * @param ctxAttrID
 	 * @param date
 	 */
-	public ContextAttribute predictContext(PredictionModels predictionModel, ContextAttributeIdentifier ctxAttrID, Date date);
+	public CtxAttribute predictContext(PredictionMethod predictionModel, CtxAttributeIdentifier ctxAttrID, Date date);
 
 	/**
 	 * 
 	 * @param ctxAttrID
 	 * @param date
 	 */
-	public ContextAttribute predictContext(ContextAttributeIdentifier ctxAttrID, Date date);
+	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, Date date);
 
 	/**
 	 * 
 	 * @param ctxAttrID
 	 * @param index
 	 */
-	public ContextAttribute predictContext(ContextAttributeIdentifier ctxAttrID, int index);
+	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, int index);
 
 	/**
 	 * 
@@ -47,7 +53,7 @@ public interface IUserCtxPredictionMgr {
 	 * @param ctxAttrID
 	 * @param index
 	 */
-	public ContextAttribute predictContext(PredictionModels predictionModel, ContextAttributeIdentifier ctxAttrID, int index);
+	public CtxAttribute predictContext(PredictionMethod predictionModel, CtxAttributeIdentifier ctxAttrID, int index);
 
 	/**
 	 * 

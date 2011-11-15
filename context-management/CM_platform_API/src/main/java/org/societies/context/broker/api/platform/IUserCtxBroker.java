@@ -1,11 +1,26 @@
-import WP5.Context.Informational.ContextEntityIdentifier;
+package org.societies.context.broker.api.platform;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+
+import org.societies.context.model.api.CtxAttributeIdentifier;
+import org.societies.context.model.api.CtxAttributeValueType;
+import org.societies.context.model.api.CtxEntityIdentifier;
+import org.societies.context.model.api.CtxIdentifier;
+import org.societies.context.model.api.CtxModelObject;
+import org.societies.context.model.api.CtxModelType;
+import org.societies.context.user.prediction.api.platform.PredictionMethod;
+
+
+
 
 /**
- * @author mcrotty
+ * @author nikosk
  * @version 1.0
  * @created 12-Nov-2011 7:15:15 PM
  */
-public interface IUserCtxBroker {
+public interface IUserCtxBroker  extends org.societies.context.broker.api.IUserCtxBroker {
 
 	/**
 	 * Creates a CtxAssociation
@@ -23,7 +38,7 @@ public interface IUserCtxBroker {
 	 * @param type
 	 * @param callback
 	 */
-	public void createAttribute(ContextEntityIdentifier scope, ContextAttributeValueType enum, string type, IUserCtxBrokerCallback callback);
+	public void createAttribute(CtxEntityIdentifier scope, CtxAttributeValueType enumerate, String type, IUserCtxBrokerCallback callback);
 
 	/**
 	 * Creates a CtxEntity
@@ -37,7 +52,7 @@ public interface IUserCtxBroker {
 	 * 
 	 * @param type
 	 */
-	public disableCtxMonitoring(ContextAttributeValueType type);
+	public void disableCtxMonitoring(CtxAttributeValueType type);
 
 	public void disableCtxRecording();
 
@@ -45,7 +60,7 @@ public interface IUserCtxBroker {
 	 * 
 	 * @param type
 	 */
-	public enableCtxMonitoring(ContextAttributeValueType type);
+	public void  enableCtxMonitoring(CtxAttributeValueType type);
 
 	public void enableCtxRecording();
 
@@ -102,7 +117,7 @@ public interface IUserCtxBroker {
 	 * @param attrType
 	 * @param callback
 	 */
-	public void registerForUpdates(ContextEntityIdentifier scope, String attrType, IUserCtxBrokerCallback callback);
+	public void registerForUpdates(CtxEntityIdentifier scope, String attrType, IUserCtxBrokerCallback callback);
 
 	/**
 	 * Registers the specified EventListener for value modification events of the
@@ -111,7 +126,7 @@ public interface IUserCtxBroker {
 	 * @param attrId
 	 * @param callback
 	 */
-	public void registerForUpdates(ContextAttributeIdentifier attrId, IUserCtxBrokerCallback callback);
+	public void registerForUpdates(CtxAttributeIdentifier attrId, IUserCtxBrokerCallback callback);
 
 	/**
 	 * Removes the specified context model object.
@@ -119,7 +134,7 @@ public interface IUserCtxBroker {
 	 * @param identifier
 	 * @param callback
 	 */
-	public void remove(ContextIdentifier identifier, IUserCtxBrokerCallback callback);
+	public void remove(CtxIdentifier identifier, IUserCtxBrokerCallback callback);
 
 	/**
 	 * 
@@ -141,7 +156,7 @@ public interface IUserCtxBroker {
 	 * @param identifier
 	 * @param callback
 	 */
-	public void retrieve(ContextIdentifier identifier, IUserCtxBrokerCallback callback);
+	public void retrieve(CtxIdentifier identifier, IUserCtxBrokerCallback callback);
 
 	/**
 	 * Predicts a future context attribute for the specified time.
@@ -150,7 +165,7 @@ public interface IUserCtxBroker {
 	 * @param date
 	 * @param callback
 	 */
-	public void retrieveFuture(ContextAttributeIdentifier attrId, Date date, IUserCtxBrokerCallback callback);
+	public void retrieveFuture(CtxAttributeIdentifier attrId, Date date, IUserCtxBrokerCallback callback);
 
 	/**
 	 * Predicts the identified by the modification index  future context attribute.
@@ -159,7 +174,7 @@ public interface IUserCtxBroker {
 	 * @param modificationIndex
 	 * @param callback
 	 */
-	public void retrieveFuture(ContextAttributeIdentifier attrId, int modificationIndex, IUserCtxBrokerCallback callback);
+	public void retrieveFuture(CtxAttributeIdentifier attrId, int modificationIndex, IUserCtxBrokerCallback callback);
 
 	/**
 	 * Retrieves context attributes stored in the Context History Log based on the
@@ -169,7 +184,7 @@ public interface IUserCtxBroker {
 	 * @param modificationIndex
 	 * @param callback
 	 */
-	public void retrievePast(ContextAttributeIdentifier attrId, int modificationIndex, IUserCtxBrokerCallback callback);
+	public void retrievePast(CtxAttributeIdentifier attrId, int modificationIndex, IUserCtxBrokerCallback callback);
 
 	/**
 	 * Retrieves context attributes stored in the Context History Log based on the
@@ -180,7 +195,7 @@ public interface IUserCtxBroker {
 	 * @param endDate
 	 * @param callback
 	 */
-	public void retrievePast(ContextAttributeIdentifier attrId, Date startDate, Date endDate, IUserCtxBrokerCallback callback);
+	public void retrievePast(CtxAttributeIdentifier attrId, Date startDate, Date endDate, IUserCtxBrokerCallback callback);
 
 	/**
 	 * 
@@ -202,7 +217,7 @@ public interface IUserCtxBroker {
 	 * @param attrId
 	 * @param callback
 	 */
-	public void unregisterForUpdates(ContextAttributeIdentifier attrId, IUserCtxBrokerCallback callback);
+	public void unregisterForUpdates(CtxAttributeIdentifier attrId, IUserCtxBrokerCallback callback);
 
 	/**
 	 * Unregisters the specified EventListener for value modification events of
@@ -212,7 +227,7 @@ public interface IUserCtxBroker {
 	 * @param attributeType
 	 * @param callback
 	 */
-	public void unregisterForUpdates(ContextEntityIdentifier scope, String attributeType, IUserCtxBrokerCallback callback);
+	public void unregisterForUpdates(CtxEntityIdentifier scope, String attributeType, IUserCtxBrokerCallback callback);
 
 	/**
 	 * Updates a single context model object.
@@ -220,6 +235,6 @@ public interface IUserCtxBroker {
 	 * @param identifier
 	 * @param callback
 	 */
-	public void update(ContextModelObject identifier, IUserCtxBrokerCallback callback);
+	public void update(CtxModelObject identifier, IUserCtxBrokerCallback callback);
 
 }

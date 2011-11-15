@@ -1,5 +1,8 @@
-import WP5.Context.Informational.ContextAttribute;
-import WP5.Context.Informational.CtxAttributeSemanticDescription;
+package org.societies.context.taxonomy;
+
+import org.societies.context.model.api.CtxAttribute;
+import org.societies.context.model.api.CtxAttributeValueType;
+
 
 /**
  * @author TI
@@ -13,27 +16,27 @@ public interface ICtxTaxonomyMgr {
 	 * 
 	 * @param attrubute
 	 */
-	public ContextAttribute[] getChildren(ContextAttribute attrubute);
+	public CtxAttribute[] getChildren(CtxAttribute attrubute);
 
 	/**
 	 * 
 	 * @param attributeB
 	 * @param attributeA
 	 */
-	public int getDistance(ContextAttribute attributeB, ContextAttribute attributeA);
+	public int getDistance(CtxAttribute attributeB, CtxAttribute attributeA);
 
 	/**
 	 * it returns the parent of the element in the taxonomy tree
 	 * 
 	 * @param attribute
 	 */
-	public ContextAttribute getParent(ContextAttribute attribute);
+	public CtxAttribute getParent(CtxAttribute attribute);
 
 	/**
 	 * 
 	 * @param attribute
 	 */
-	public CtxAttributeSemanticDescription getSemanticDescription()(ContextAttribute attribute);
+	public CtxAttributeValueType getSemanticDescription(CtxAttribute attribute);
 
 	/**
 	 * It return an array of context attributes which are on the same level on the
@@ -41,12 +44,12 @@ public interface ICtxTaxonomyMgr {
 	 * 
 	 * @param attribute
 	 */
-	public ContextAttribute[] getSiblings()(ContextAttribute attribute);
+	public CtxAttribute[] getSiblings(CtxAttribute attribute);
 
 	/**
 	 * 
 	 * @param attrubute
 	 */
-	public boolean isContextAttributeAvailable(ContextAttribute attrubute);
+	public boolean isContextAttributeAvailable(CtxAttribute attrubute);
 
 }

@@ -1,4 +1,8 @@
-import WP5.Context.Informational.pobail.ContextBond;
+package org.societies.context.community.db.api.platform;
+
+import java.util.List;
+
+import org.societies.context.model.api.CtxEntityIdentifier;
 
 /**
  * @author nlia
@@ -14,24 +18,24 @@ public interface ICommunityCtxDBMgrCallback {
 	 * @param bond
 	 * @param community
 	 */
-	public void bondsRetrieved(ContextBond bond, ContextEntityIdentifier community);
+	public void bondsRetrieved(ContextBond bond, CtxEntityIdentifier community);
 
 	/**
 	 * 
 	 * @param community
 	 */
-	public void childCommunitiesRetrieved(List<ContextEntityIdentifier> community);
+	public void childCommunitiesRetrieved(List<CtxEntityIdentifier> community);
 
 	/**
 	 * 
 	 * @param community
 	 */
-	public void communityMembersRetrieved(List<ContextEntityIdentifier> community);
+	public void communityMembersRetrieved(List<CtxEntityIdentifier> community);
 
 	/**
 	 * 
 	 * @param community
 	 */
-	public void parentCommunitiesRetrieved(List<ContextEntityIdentifier> community);
+	public void parentCommunitiesRetrieved(List<CtxEntityIdentifier> community);
 
 }

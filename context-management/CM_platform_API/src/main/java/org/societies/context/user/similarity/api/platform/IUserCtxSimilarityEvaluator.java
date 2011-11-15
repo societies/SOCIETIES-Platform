@@ -1,3 +1,5 @@
+package org.societies.context.user.similarity.api.platform;
+
 
 
 /**

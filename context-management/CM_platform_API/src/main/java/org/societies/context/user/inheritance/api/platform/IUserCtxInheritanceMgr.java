@@ -1,3 +1,8 @@
+package org.societies.context.user.inheritance.api.platform;
+
+import org.societies.context.mock.spm.identity.EntityIdentifier;
+import org.societies.context.model.api.CtxAttributeIdentifier;
+import org.societies.context.model.api.CtxAttributeValueType;
 
 
 /**
@@ -11,7 +16,7 @@ public interface IUserCtxInheritanceMgr {
 	 * 
 	 * @param cisId
 	 */
-	public void getCIS(CisId cisId);
+	public void getCIS(EntityIdentifier cisId);
 
 	/**
 	 * 
@@ -19,14 +24,14 @@ public interface IUserCtxInheritanceMgr {
 	 * @param type
 	 * @param cisId
 	 */
-	public void getContextAttribute(ContextAttributeIdentifier contextAttributeIdentifier, ContextAttributeValueType type, CisId cisId);
+	public void getContextAttribute(CtxAttributeIdentifier contextAttributeIdentifier, CtxAttributeValueType type, EntityIdentifier cisId);
 
 	/**
 	 * 
 	 * @param contextAttributeIdentifier
 	 * @param type
 	 */
-	public void inheritContextAttribute(ContextAttributeIdentifier contextAttributeIdentifier, ContextAttributeValueType type);
+	public void inheritContextAttribute(CtxAttributeIdentifier contextAttributeIdentifier, CtxAttributeValueType type);
 
 	/**
 	 * 

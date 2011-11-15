@@ -1,4 +1,16 @@
-import WP5.Context.Informational.ContextModelObject;
+package org.societies.context.user.inference.api.platform;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.societies.context.mock.spm.identity.EntityIdentifier;
+import org.societies.context.model.api.CtxAttribute;
+import org.societies.context.model.api.CtxAttributeIdentifier;
+import org.societies.context.model.api.CtxAttributeValueType;
+import org.societies.context.model.api.CtxModelObject;
+import org.societies.context.user.prediction.api.platform.PredictionMethod;
+//import org.societies.context.user.prediction.api.platform.*;
 
 /**
  * @author nikosk
@@ -11,21 +23,21 @@ public interface IUserCtxInferenceMgr {
 	 * 
 	 * @param object
 	 */
-	public void checkQuality(ContextModelObject object);
+	public void checkQuality(CtxModelObject object);
 
 	/**
 	 * 
 	 * @param ctxID
 	 * @param ctxID2
 	 */
-	public Double evaluateSimilarity(ContextAttributeIdentifier ctxID, ContextAttributeIdentifier ctxID2);
+	public Double evaluateSimilarity(CtxAttributeIdentifier ctxID, CtxAttributeIdentifier ctxID2);
 
 	/**
 	 * 
 	 * @param listCtxID
 	 * @param listCtxID2
 	 */
-	public Map (<ContextAttributeIdentifier>,<double>) evaluateSimilarity(List<ContextAttributeIdentifier> listCtxID, List<ContextAttributeIdentifier> listCtxID2);
+	public Map<CtxAttributeIdentifier,Double> evaluateSimilarity(List<CtxAttributeIdentifier> listCtxID, List<CtxAttributeIdentifier> listCtxID2);
 
 	/**
 	 * 
@@ -37,7 +49,7 @@ public interface IUserCtxInferenceMgr {
 	 * 
 	 * @param predictionMethodl
 	 */
-	public void getPredictionMethod(PredictionMethod predictionMethodl);
+	public PredictionMethod getPredictionMethod(PredictionMethod predictionMethod);
 
 	/**
 	 * 
@@ -45,7 +57,7 @@ public interface IUserCtxInferenceMgr {
 	 * @param type
 	 * @param cisid
 	 */
-	public void inheritContext(ContextAttributeIdentifier ctxAttrId, ContextAttributeValueType type, CISid cisid);
+	public void inheritContext(CtxAttributeIdentifier ctxAttrId, CtxAttributeValueType type, EntityIdentifier cisid);
 
 	/**
 	 * 
@@ -53,7 +65,7 @@ public interface IUserCtxInferenceMgr {
 	 * @param predictionMethod
 	 * @param date
 	 */
-	public ContextAttribute predictContext(ContextAttributeIdentifier ctxAttrID, PredictionMethod predictionMethod, Date date);
+	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, PredictionMethod predictionMethod, Date date);
 
 	/**
 	 * 
@@ -61,27 +73,27 @@ public interface IUserCtxInferenceMgr {
 	 * @param predictionMethodl
 	 * @param int
 	 */
-	public ContextAttribute predictContext(ContextAttributeIdentifier ctxAttrID, PredictionMethod predictionMethodl, index int);
+	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, PredictionMethod predictionMethodl, int index );
 
 	/**
 	 * 
 	 * @param ctxAttrID
 	 * @param date
 	 */
-	public ContextAttribute predictContext(ContextAttributeIdentifier ctxAttrID, Date date);
+	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, Date date);
 
 	/**
 	 * 
 	 * @param ctxAttrID
 	 * @param index
 	 */
-	public ContextAttribute predictContext(ContextAttributeIdentifier ctxAttrID, int index);
+	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, int index);
 
 	/**
 	 * 
 	 * @param ctxAttrId
 	 */
-	public void refineContext(ContextAttributeIdentifier ctxAttrId);
+	public void refineContext(CtxAttributeIdentifier ctxAttrId);
 
 	/**
 	 * 
@@ -93,12 +105,12 @@ public interface IUserCtxInferenceMgr {
 	 * 
 	 * @param predMethod
 	 */
-	public setDefaultPredictionMethod(PredictionMethod predMethod);
+	public void setDefaultPredictionMethod(PredictionMethod predMethod);
 
 	/**
 	 * 
 	 * @param predMethod
 	 */
-	public setPredictionMethod(PredictionMethod predMethod);
+	public void setPredictionMethod(PredictionMethod predMethod);
 
 }

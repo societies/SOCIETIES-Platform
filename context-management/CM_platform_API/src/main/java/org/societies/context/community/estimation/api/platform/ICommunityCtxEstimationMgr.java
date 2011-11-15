@@ -1,3 +1,11 @@
+package org.societies.context.community.estimation.api.platform;
+
+import java.util.List;
+
+import org.societies.context.mock.spm.identity.EntityIdentifier;
+import org.societies.context.model.api.CtxAttribute;
+import org.societies.context.model.api.CtxEntity;
+
 
 
 /**
@@ -12,7 +20,7 @@ public interface ICommunityCtxEstimationMgr {
 	 * @param estimationModel
 	 * @param list
 	 */
-	public void estimateContext(EstimationModels estimationModel, List<ContextAttribute> list);
+	public void estimateContext(EstimationModels estimationModel, List<CtxAttribute> list);
 
 	/**
 	 * 
@@ -20,7 +28,7 @@ public interface ICommunityCtxEstimationMgr {
 	 * @param communityID
 	 * @param list
 	 */
-	public void retrieveCurrentCisContext(boolean Current, CisId communityID, List<ContextAttribute> list);
+	public void retrieveCurrentCisContext(boolean Current, EntityIdentifier communityID, List<CtxAttribute> list);
 
 	/**
 	 * 
@@ -28,12 +36,12 @@ public interface ICommunityCtxEstimationMgr {
 	 * @param communityID
 	 * @param list
 	 */
-	public void retrieveHistoryCisContext(boolean Current, CisId communityID, List<ContextAttribute> list);
+	public void retrieveHistoryCisContext(boolean Current, EntityIdentifier communityID, List<CtxAttribute> list);
 
 	/**
 	 * 
 	 * @param estimatedContext
 	 */
-	public void updateContextModelObject(ContextEntity estimatedContext);
+	public void updateContextModelObject(CtxEntity estimatedContext);
 
 }

@@ -1,4 +1,4 @@
-
+package org.societies.context.community.similarity.api.platform;
 
 /**
  * @author nlia

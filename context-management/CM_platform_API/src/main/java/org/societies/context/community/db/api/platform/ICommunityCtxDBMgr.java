@@ -1,3 +1,6 @@
+package org.societies.context.community.db.api.platform;
+
+import org.societies.context.model.api.CtxEntityIdentifier;
 
 
 /**
@@ -14,7 +17,7 @@ public interface ICommunityCtxDBMgr {
 	 * @param community
 	 * @param callback
 	 */
-	public void retrieveBonds(ContextEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
+	public void retrieveBonds(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
 
 	/**
 	 * This applies for Community hierarchies. Retrieves the child communities
@@ -23,7 +26,7 @@ public interface ICommunityCtxDBMgr {
 	 * @param community
 	 * @param callback
 	 */
-	public void retrieveChildCommunities(ContextEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
+	public void retrieveChildCommunities(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
 
 	/**
 	 * Retrievies a list of Individual Context Entities that are members of the
@@ -32,13 +35,13 @@ public interface ICommunityCtxDBMgr {
 	 * @param community
 	 * @param callback
 	 */
-	public void retrieveCommunityMembers(ContextEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
+	public void retrieveCommunityMembers(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
 
 	/**
 	 * 
 	 * @param community
 	 * @param callback
 	 */
-	public void retrieveParentCommunities(ContextEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
+	public void retrieveParentCommunities(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
 
 }

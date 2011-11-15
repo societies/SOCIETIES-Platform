@@ -12,9 +12,9 @@
 	</parent>
 
 	<!-- groupId is set in parent pom -->
-	<artifactId>css_cm_api</artifactId>
+	<artifactId>css_cm_platform_api</artifactId>
 	<version>${version.cm}</version>
-	<name>CM API</name>
+	<name>CM platform API</name>
 	<packaging>bundle</packaging> 
 
 	<developers>
@@ -28,6 +28,17 @@
       </roles>
       <timezone>+2</timezone>
     </developer>
+     <developer>
+      <name>Nikos Kalatzis</name>
+      <email>nikosk@cn.ntua.gr</email>
+      <organization>ICCS</organization>
+      <organizationUrl>http://www.iccs.gr/</organizationUrl>
+      <roles>
+        <role>Senior Developer</role>
+      </roles>
+      <timezone>+2</timezone>
+    </developer>
+    
 	</developers>
 
 	<!-- List dependencies here -->

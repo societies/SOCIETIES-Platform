@@ -1,42 +1,40 @@
+package org.societies.context.broker.api.platform;
 
+import java.util.List;
 
-/**
- * This interface represents a callback interface for the ICommunityCtxBroker
- * interface.
- * @author mcrotty
- * @version 1.0
- * @created 12-Nov-2011 7:15:14 PM
- */
+import org.societies.context.model.api.CtxAttribute;
+import org.societies.context.model.api.CtxEntity;
+import org.societies.context.model.api.CtxEntityIdentifier;
+
 public interface ICommunityCtxBrokerCallback {
-
 	/**
 	 * 
 	 * @param admCssRetr
 	 */
-	public void adminCSSRetrieved(ContextEntity admCssRetr);
+	public void adminCSSRetrieved(CtxEntity admCssRetr);
 
 	/**
 	 * 
 	 * @param ctxAttribute
 	 */
-	public void bondsRetrieved(ContextAttribute ctxAttribute);
+	public void bondsRetrieved(CtxAttribute ctxAttribute);
 
 	/**
 	 * 
 	 * @param childComms
 	 */
-	public void childCommsRetrieved(List<ContextEntityIdentifier> childComms);
+	public void childCommsRetrieved(List<CtxEntityIdentifier> childComms);
 
 	/**
 	 * 
 	 * @param commMembs
 	 */
-	public void commMembersRetrieved(List <ContextEntityIdentifier> commMembs);
+	public void commMembersRetrieved(List <CtxEntityIdentifier> commMembs);
 
 	/**
 	 * 
 	 * @param parentComms
 	 */
-	public void parentCommsRetrieved(List<ContextEntityIdentifier> parentComms);
+	public void parentCommsRetrieved(List<CtxEntityIdentifier> parentComms);
 
 }

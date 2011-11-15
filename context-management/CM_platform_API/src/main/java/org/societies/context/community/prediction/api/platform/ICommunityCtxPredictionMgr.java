@@ -1,3 +1,11 @@
+package org.societies.context.community.prediction.api.platform;
+
+import java.util.Date;
+
+import org.societies.context.mock.spm.identity.EntityIdentifier;
+import org.societies.context.model.api.CtxAttributeIdentifier;
+import org.societies.context.model.api.CtxIdentifier;
+import org.societies.context.user.prediction.api.platform.PredictionMethod;
 
 
 /**
@@ -11,7 +19,7 @@ public interface ICommunityCtxPredictionMgr {
 	 * 
 	 * @param cisID
 	 */
-	public void getCommunity(CisId cisID);
+	public void getCommunity(EntityIdentifier cisID);
 
 	/**
 	 * 
@@ -19,6 +27,6 @@ public interface ICommunityCtxPredictionMgr {
 	 * @param ctxObjModel
 	 * @param date
 	 */
-	public predicted context predictContext(PredictionModel predictionModel, ContextAttributeIdentifier ctxObjModel, Date date);
+	public CtxIdentifier predictContext(PredictionMethod predictionModel, CtxAttributeIdentifier ctxObjModel, Date date);
 
 }

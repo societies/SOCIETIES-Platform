@@ -1,3 +1,4 @@
+package org.societies.context.community.inference.api.platform;
 
 
 /**

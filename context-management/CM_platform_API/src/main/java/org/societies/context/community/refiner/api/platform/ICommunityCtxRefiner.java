@@ -1,4 +1,7 @@
-import WP5.Context.Informational.ContextAttributeIdentifier;
+package org.societies.context.community.refiner.api.platform;
+
+import org.societies.context.model.api.CtxAttributeIdentifier;
+
 
 /**
  * @author fran_ko
@@ -10,7 +13,8 @@ public interface ICommunityCtxRefiner {
 	/**
 	 * 
 	 * @param attrId
+	 * @return 
 	 */
-	public void[] refineContext(ContextAttributeIdentifier attrId);
+	public  void refineContext(CtxAttributeIdentifier attrId);
 
 }
