@@ -1,5 +1,10 @@
 package org.societies.personalisation.CAUI.api.CAUIPrediction;
 
+import java.util.List;
+
+import org.societies.personalisation.CAUI.api.model.UserIntentAction;
+import org.societies.personalisation.common.api.model.ContextAttribute;
+
 
 /**
  * @since 0.0.1
