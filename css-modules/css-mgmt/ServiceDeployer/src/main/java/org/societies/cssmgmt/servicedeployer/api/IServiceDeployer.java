@@ -9,7 +9,7 @@ package org.societies.cssmgmt.servicedeployer.api;
 public interface IServiceDeployer {
 
 	/**
-	 * Deploys given service to local CSS.
+	 * Downloads given service from marketplace and deploys the service to local CSS.
 	 * 
 	 * @param serviceId Service ID
 	 * 

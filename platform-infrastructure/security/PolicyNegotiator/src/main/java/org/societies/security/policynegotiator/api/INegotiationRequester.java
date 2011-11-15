@@ -16,7 +16,7 @@ public interface INegotiationRequester {
 	 * 
 	 * @return All available options embedded in a single XML document.
 	 */
-	public void getPolicyOptions(INegotiationRequesterInternal callback);
+	public void getPolicyOptions(INegotiationRequesterCallback callback);
 
 	/**
 	 * Accept given policy option unchanged, as provided by the provider side.
@@ -28,7 +28,7 @@ public interface INegotiationRequester {
 	 * signed by the requester side. Includes requester identity and signature.
 	 */
 	public void acceptPolicy(String signedPolicyOption,
-			INegotiationRequesterInternal callback);
+			INegotiationRequesterCallback callback);
 	
 	/**
 	 * Further negotiate given policy option. If any of the policy options
@@ -44,7 +44,7 @@ public interface INegotiationRequester {
 	 * identity nor signature (TBC). 
 	 */
 	public void negotiatePolicy(int policyOptionId, ResponsePolicy modifiedPolicy,
-			INegotiationRequesterInternal callback);
+			INegotiationRequesterCallback callback);
 	
 	/**
 	 * Reject all options and terminate negotiation.
