@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.societies.personalisation.CAUI.api.model.UserIntentAction;
 import org.societies.personalisation.common.api.model.ContextAttribute;
+import org.societies.personalisation.common.api.model.EntityIdentifier;
+import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
 
 
 /**
@@ -32,7 +34,7 @@ public interface ICAUIPrediction {
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
 	 */
-	public IAction getCurrentIntentAction(EntityIdentifier requestor, EntityIdentifier ownerID, ServiceResourceIdentifier serviceID, String preferenceName);
+	public UserIntentAction getCurrentIntentAction(EntityIdentifier requestor, EntityIdentifier ownerID, ServiceResourceIdentifier serviceID, String preferenceName);
 
 	
 	/**
