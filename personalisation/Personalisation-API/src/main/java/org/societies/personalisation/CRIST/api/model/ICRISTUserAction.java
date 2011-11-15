@@ -1,5 +1,10 @@
 package org.societies.personalisation.CRIST.api.model;
 
+import java.awt.List;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 import org.societies.personalisation.common.api.model.IOutcome;
 
 /**
@@ -32,7 +37,7 @@ public interface ICRISTUserAction extends IOutcome {
 	 * 
 	 * @param actionSituations
 	 */
-	public void setActionSituations(List<ICRISTUserSituation,Double> actionSituations);
+	public void setActionSituations(HashMap<ICRISTUserSituation,Double> actionSituations);
 
 	/**
 	 * 

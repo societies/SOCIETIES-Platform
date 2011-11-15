@@ -1,5 +1,13 @@
 package org.societies.personalisation.CRIST.api.model;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
+import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
+import org.societies.personalisation.common.api.model.EntityIdentifier;
+import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+
 /**
  * This class is responsible for defining the data structure of individual user
  * intent model, which is mainly based on three basic classes: CRISTUserAction,
@@ -46,7 +54,7 @@ public class CRISTUserTaskModelData {
 	 * @param actionList
 	 * @param situationList
 	 */
-	public CRISTUserTaskModelData(HashMap<ICRISTUserTask,HashMap<ICRISTUserTask, Double>> taskList, HashMap<IUserIntentActionITSUD,HashMap<IUserIntentActionITSUD,Double>> actionList, HashMap<ICRISTUserSituation,HashMap<ICRISTUserSituation,Double>> situationList){
+	public CRISTUserTaskModelData(HashMap<ICRISTUserTask,HashMap<ICRISTUserTask, Double>> taskList, HashMap<ICRISTUserAction,HashMap<ICRISTUserAction,Double>> actionList, HashMap<ICRISTUserSituation,HashMap<ICRISTUserSituation,Double>> situationList){
 
 	}
 
@@ -91,7 +99,7 @@ public class CRISTUserTaskModelData {
 		return null;
 	}
 
-	public HashMap<UserSituationITSUD,HashMap<ICRISTUserSituation,Double>> getSituationList(){
+	public HashMap<CRISTUserSituation,HashMap<ICRISTUserSituation,Double>> getSituationList(){
 		return null;
 	}
 
@@ -128,10 +136,10 @@ public class CRISTUserTaskModelData {
 	 * @param previousPredictionsTaskID
 	 * @param userCurrentContext
 	 */
-	public ICRISTUserAction identifyNextAction(Map<ICRISTUserSituation,ICRISTUserAction,ICRISTUserTask> identifiedActionTaskMap, String previousPredictionsTaskID, Map<String,Serializable> userCurrentContext){
+	public ICRISTUserAction identifyNextAction(HashMap<ICRISTUserAction,ICRISTUserTask> identifiedActionTaskMap, String previousPredictionsTaskID, HashMap<String,Serializable> userCurrentContext){
 		return null;
 	}
-
+	
 	/**
 	 * 
 	 * @param par

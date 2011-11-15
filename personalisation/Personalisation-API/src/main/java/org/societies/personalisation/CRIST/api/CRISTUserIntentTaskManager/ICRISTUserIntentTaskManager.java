@@ -1,5 +1,10 @@
 package org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 import org.societies.personalisation.common.api.model.EntityIdentifier;
 import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
@@ -35,7 +40,7 @@ public interface ICRISTUserIntentTaskManager {
 	 * @param actionType	- the type of user action
 	 * @param actionValue	- the value of user action
 	 */
-	public List<ICRISTUserAction> getActionsByType(String actionType, String actionValue);
+	public ArrayList<ICRISTUserAction> getActionsByType(String actionType, String actionValue);
 
 	/**
 	 * This method will retrive the user's current intent action
@@ -92,12 +97,12 @@ public interface ICRISTUserIntentTaskManager {
 	 * @param userAction	- the given user action
 	 * @param userSituation	- the given user situation
 	 */
-	public List<ICRISTUserTask> getTasks(ICRISTUserAction userAction, ICRISTUserSituation userSituation);
+	public ArrayList<ICRISTUserTask> getTasks(ICRISTUserAction userAction, ICRISTUserSituation userSituation);
 	
 	/**
 	 * This method will identify all the user actions based on historical recordings 
 	 */
-	public List<ICRISTUserAction> identifyActions();
+	public ArrayList<ICRISTUserAction> identifyActions();
 
 	/**
 	 * This method identifies user tasks accroding to the given action type and value
@@ -111,12 +116,12 @@ public interface ICRISTUserIntentTaskManager {
 	/**
 	 * This method will identify all the user situations based on historical recordings 
 	 */
-	public List<ICRISTUserSituation> identifySituations();
+	public ArrayList<ICRISTUserSituation> identifySituations();
 
 	/**
 	 * This method will identify all the user tasks 
 	 */
-	public List<ICRISTUserTask> identifyTasks();
+	public ArrayList<ICRISTUserTask> identifyTasks();
 
 	/**
 	 * This method resets the task model.

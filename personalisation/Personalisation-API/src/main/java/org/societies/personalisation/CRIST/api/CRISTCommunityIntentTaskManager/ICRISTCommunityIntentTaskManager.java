@@ -1,9 +1,13 @@
 package org.societies.personalisation.CRIST.api.CRISTCommunityIntentTaskManager;
 
-import org.societies.personalisation.CRIST.api.model.ICRISTCommunityAction;
-import org.societies.personalisation.CRIST.api.model.ICRISTCommunityTask;
-import org.societies.personalisation.CRIST.api.model.ICRISTCommunitySituation;
+import java.awt.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.societies.personalisation.CRIST.api.model.CRISTCommunityTaskModelData;
+import org.societies.personalisation.CRIST.api.model.ICRISTCommunityAction;
+import org.societies.personalisation.CRIST.api.model.ICRISTCommunitySituation;
+import org.societies.personalisation.CRIST.api.model.ICRISTCommunityTask;
 
 /**
  * @author Zhu WANG
@@ -24,7 +28,7 @@ public interface ICRISTCommunityIntentTaskManager {
 	 * @param actionType	- the type of user action
 	 * @param actionValue	- the value of user action
 	 */
-	public List<ICRISTCommunityAction> getCommunityActionsByType(String actionType, String actionValue);
+	public ArrayList<ICRISTCommunityAction> getCommunityActionsByType(String actionType, String actionValue);
 	
 	/**
 	 * This method will retrieve the community situation based on the given situation ID
@@ -59,17 +63,17 @@ public interface ICRISTCommunityIntentTaskManager {
 	/**
 	 * This method will identify all the community actions based on historical recordings 
 	 */
-	public List<ICRISTCommunityAction> identifyCommunityActions();
+	public ArrayList<ICRISTCommunityAction> identifyCommunityActions();
 	
 	/**
 	 * This method will identify all the community situations based on historical recordings 
 	 */
-	public List<ICRISTCommunitySituation> identifyCommunitySituations();
+	public ArrayList<ICRISTCommunitySituation> identifyCommunitySituations();
 	
 	/**
 	 * This method will identify all the community tasks 
 	 */
-	public List<ICRISTCommunityTask> identifyCommunityTasks();
+	public ArrayList<ICRISTCommunityTask> identifyCommunityTasks();
 	
 	/**
 	 * This method resets the task model.
