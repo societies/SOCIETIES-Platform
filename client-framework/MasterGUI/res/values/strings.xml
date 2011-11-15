@@ -2,4 +2,7 @@
 <resources>
     <string name="hello">Hello World, MasterGUIActivity!</string>
     <string name="app_name">MasterGUI</string>
+    <!-- menu titles-->
+    <string name="menu_about">About</string>
+    
 </resources>
