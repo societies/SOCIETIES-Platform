@@ -12,4 +12,6 @@ public interface IDecisionMaker{
 	 *  outside view for decision maker
 	 *  @author haoyi.xiong@it-sudparis.eu*/
 	void makeDecision(List<IOutcome> intents,List<IOutcome> preferences);
+	/*@param intents, the list of IOutcome instances referring intents
+	 *@param preferences, the list of IOutcome instances referring preferences */
 }

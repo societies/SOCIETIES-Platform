@@ -13,18 +13,23 @@ public interface IConflictResolutionManagerImp extends IConflictResolutionManage
 	 * @author haoyi.xiong@it-sudparis.eu*/
 	void addConflictResolutionRules
 		(Map<ConflictType, ConflictResolutionRule> rule);
-	/*add a rule*/
+	/*add a rule
+	 * @param rule, the rule to add*/
 	Map<ConflictType, ConflictResolutionRule> getConflictResolutionRules();
 	/*search a rule*/
-	IUserFeedback getUserFeedback(IAction action$1,
-			IAction action$2);
-	/*got feedback when it has no idea*/
+	IUserFeedback getUserFeedback(IAction action_1,
+			IAction action_2);
+	/*got feedback when it has no idea between
+	 * @param action_1
+	 * @param action_2*/
 	IAction getUserIntent();
 	/* get user intent*/
 	IAction getUserPreference();
 	/* get user preference*/
 	void setUserIntent(IAction intentaction);
-	/* set user intent*/
+	/* set user intent
+	 * @param intentaction, action by intent*/
 	void setUserPreference(IAction preferaction);
-	/* set user preference*/
+	/* set user preference
+	 * @param intentaction, action by preference*/
 }

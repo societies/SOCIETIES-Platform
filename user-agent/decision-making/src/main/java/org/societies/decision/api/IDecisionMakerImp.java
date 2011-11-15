@@ -10,7 +10,13 @@ public interface IDecisionMakerImp extends IDecisionMaker{
 	 * (2)implementation of decision is to
 	 * involke corresponding services by IAction.
 	 * @author haoyi.xiong@it-sudparis.eu*/
-	boolean detectConflict(IOutcome intent,IOutcome preference);
+	boolean detectConflict(IOutcome intent,
+			IOutcome preference);
+	/*detect conflict between intent and preference
+	 * @param intent, the instance of IOutcome referring intent of user
+	 * @param preference, the instance of IOutcome referring preference of user*/
 	void implementDecision(IAction action);
-	
+	/*implement the decision by corresponding IAction
+	 * @param action, the instance of IAction given by decision maker
+	 * which identifies the result of decision making*/
 }
