@@ -1,8 +1,9 @@
-package org.societies.conflict.api;
+package org.societies.conflict.api.imp;
 
 import java.util.Map;
 
 import org.societies.personalisation.common.api.model.*;
+import org.societies.conflict.api.IConflictResolutionManager;
 import org.societies.conflict.api.model.ConflictResolutionRule;
 import org.societies.conflict.api.model.ConflictType;
 import org.societies.feedback.api.*;

@@ -1,5 +1,6 @@
-package org.societies.decision.api;
+package org.societies.decision.api.imp;
 
+import org.societies.decision.api.IDecisionMaker;
 import org.societies.personalisation.common.api.model.*;
 
 public interface IDecisionMakerImp extends IDecisionMaker{
