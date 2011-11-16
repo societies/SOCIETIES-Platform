@@ -1,6 +1,7 @@
 package org.societies.personalisation.preference.api.UserPreferenceLearning;
 
 import java.util.Date;
+import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
 
 /**
  * 
