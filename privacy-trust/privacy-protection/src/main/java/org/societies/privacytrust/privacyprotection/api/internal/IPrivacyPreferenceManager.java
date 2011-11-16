@@ -5,7 +5,7 @@ import java.util.List;
 import org.societies.personalisation.common.api.model.EntityIdentifier;
 import org.societies.personalisation.common.api.model.ICtxAttributeIdentifier;
 import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
-import org.societies.privacytrust.privacyprotection.api.PrivacyPreferenceException;
+import org.societies.privacytrust.privacyprotection.api.PrivacyException;
 import org.societies.privacytrust.privacyprotection.api.model.preference.Action;
 import org.societies.privacytrust.privacyprotection.api.model.preference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.preference.IPrivacyPreferenceTreeModel;
@@ -32,7 +32,7 @@ public interface IPrivacyPreferenceManager {
 	 * @exception PrivacyPreferenceException PrivacyPreferenceException
 	 */
 	public PrivacyOutcomeConstants checkPermission(ICtxAttributeIdentifier ctxId, Action action, EntityIdentifier requestorIdentity)
-	  throws PrivacyPreferenceException;
+	  throws PrivacyException;
 
 	/**
 	 * Method to check the access control permission
@@ -44,7 +44,7 @@ public interface IPrivacyPreferenceManager {
 	 * @exception PrivacyPreferenceException PrivacyPreferenceException
 	 */
 	public PrivacyOutcomeConstants checkPermission(String contextType, Action action, EntityIdentifier requestorIdentity)
-	  throws PrivacyPreferenceException;
+	  throws PrivacyException;
 
 	/**
 	 * Method to delete the IDS preference referring to this dpi (only deletes the
