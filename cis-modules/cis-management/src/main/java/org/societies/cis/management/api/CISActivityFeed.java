@@ -4,7 +4,7 @@
  * @author Babak Farshchian
  * @version 0
  */
-package cis.management.api;
+package org.societies.cis.management.api;
 
 public class CISActivityFeed {
 
