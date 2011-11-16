@@ -1,5 +1,10 @@
 package org.societies.personalisation.DIANNE.api.DianneNetwork;
 
+import org.societies.personalisation.common.api.model.IOutcome;
+import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import org.societies.personalisation.common.api.model.EntityIdentifier;
+import org.societies.personalisation.common.api.model.ContextAttribute;
+
 /**
  * 
  * @author S.Gallacher@hw.ac.uk
