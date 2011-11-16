@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-	<string name="app_name">TestAndroid</string>
-    <string name="btnStartIntentService">Start Hello World IntentService</string>
-    <string name="btnStopIntentService">Stop Hello World IntentService</string>
-    <string name="btnStartService">Start Hello World Service</string>
-    <string name="btnStopService">Stop Hello World Service</string>
-</resources>
