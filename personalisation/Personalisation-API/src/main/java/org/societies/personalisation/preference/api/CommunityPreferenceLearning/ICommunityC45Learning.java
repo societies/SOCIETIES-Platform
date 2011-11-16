@@ -5,8 +5,6 @@ import java.util.Date;
 import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Consumer;
 
-
-
 /**
  * @author Eliza
  * @version 1.0

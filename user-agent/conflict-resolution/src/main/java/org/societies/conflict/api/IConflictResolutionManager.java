@@ -8,5 +8,7 @@ public interface IConflictResolutionManager{
 	 * @author haoyi.xiong@it-sudparis.eu*/
 	IAction resolveConflict(IAction intentaction
 			,IAction preferaction);
-	
+	/*resolve conflict between intent and preference
+	 * @param intentaction, the action by intent
+	 * @param preferaction, the action by preference*/
 }
