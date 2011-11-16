@@ -1,4 +1,4 @@
-package org.societies.privacytrust.privacyprotection.api.internal;
+package org.societies.privacytrust.privacyprotection.api.external;
 
 
 import org.societies.personalisation.common.api.model.EntityIdentifier;
