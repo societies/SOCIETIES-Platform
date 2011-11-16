@@ -17,23 +17,39 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api.internal;
+package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.ICtxAttributeIdentifier;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
+
+
 
 /**
+ * This class is used to define the level of obfuscation that has to be applied to
+ * a context attribute before being disclosed to an external entity.
  * @author Eliza
  * @version 1.0
- * @created 11-Nov-2011 19:17:12
+ * @created 11-Nov-2011 17:06:54
  */
-public interface IPrivacyPreferenceConditionMonitor {
+public class DObfOutcome implements IPrivacyOutcome, IDObfAction {
 
-	/**
-	 * 
-	 * @param contextId
-	 * @param userIdentity
-	 */
-	public void contextEventReceived(ICtxAttributeIdentifier contextId, EntityIdentifier userIdentity);
+	public DObfOutcome(){
+
+	}
+
+	public void finalize() throws Throwable {
+
+	}
+
+	public int getConfidenceLevel(){
+		return 0;
+	}
+
+	public PrivacyPreferenceTypeConstants getOutcomeType(){
+		return PrivacyPreferenceTypeConstants.DOBF;
+	}
+
+	public int getObfuscationLevel(){
+		return 0;
+	}
 
 }

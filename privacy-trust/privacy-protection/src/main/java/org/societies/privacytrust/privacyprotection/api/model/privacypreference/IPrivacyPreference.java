@@ -17,23 +17,30 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api.internal;
+package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.ICtxAttributeIdentifier;
+import java.io.Serializable;
+import java.util.Enumeration;
 
+import javax.swing.tree.MutableTreeNode;
 /**
- * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 19:17:12
+ * @author Elizabeth
+ *
  */
-public interface IPrivacyPreferenceConditionMonitor {
-
-	/**
-	 * 
-	 * @param contextId
-	 * @param userIdentity
-	 */
-	public void contextEventReceived(ICtxAttributeIdentifier contextId, EntityIdentifier userIdentity);
-
+public interface IPrivacyPreference extends MutableTreeNode, Serializable{
+	public IPrivacyPreferenceCondition getCondition();
+	public IPrivacyOutcome getOutcome();
+	public boolean isLeaf();
+	public boolean isBranch();
+	public Object[] getUserObjectPath();
+	public Object getUserObject();
+	public void add(IPrivacyPreference p);
+	public void remove(IPrivacyPreference p);
+	public Enumeration<IPrivacyPreference> depthFirstEnumeration();
+	public Enumeration<IPrivacyPreference> breadthFirstEnumeration();
+	public Enumeration<IPrivacyPreference> postorderEnumeration();
+	public Enumeration<IPrivacyPreference> preorderEnumeration();
+	public IPrivacyPreference getRoot();
+	public int getLevel();
+	public int getDepth();
 }

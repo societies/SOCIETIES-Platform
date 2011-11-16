@@ -17,23 +17,29 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api.internal;
+package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
+import java.util.List;
+
+import org.societies.personalisation.common.api.model.ContextAttribute;
 import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.ICtxAttributeIdentifier;
+import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
 
 /**
+ * This interface is used to represent an identity selection decision made by the
+ * user and is used by the Privacy PreferenceLearning component.
  * @author Eliza
  * @version 1.0
- * @created 11-Nov-2011 19:17:12
+ * @created 11-Nov-2011 17:06:55
  */
-public interface IPrivacyPreferenceConditionMonitor {
+public interface IIDSAction {
 
-	/**
-	 * 
-	 * @param contextId
-	 * @param userIdentity
-	 */
-	public void contextEventReceived(ICtxAttributeIdentifier contextId, EntityIdentifier userIdentity);
+	public List<ContextAttribute> getContext();
+
+	public EntityIdentifier getSelectedIdentity();
+
+	public ServiceResourceIdentifier getServiceIdentifier();
+
+	public EntityIdentifier getServiceIdentity();
 
 }

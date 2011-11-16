@@ -17,23 +17,22 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api.internal;
-
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.ICtxAttributeIdentifier;
+package org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants;
 
 /**
- * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 19:17:12
+ * @author Elizabeth
+ *
  */
-public interface IPrivacyPreferenceConditionMonitor {
+public enum TargetMatchConstants {
 
-	/**
-	 * 
-	 * @param contextId
-	 * @param userIdentity
-	 */
-	public void contextEventReceived(ICtxAttributeIdentifier contextId, EntityIdentifier userIdentity);
-
+	SUBJECT(0),RESOURCE(1),ACTION(2);
+	
+	int i = -1;
+	TargetMatchConstants(int i){
+		this.i=i;
+	}
+	
+	public int getInt(){
+		return this.i;
+	}
 }
