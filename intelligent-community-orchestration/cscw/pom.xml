@@ -3,4 +3,19 @@
   <groupId>org.societies.comorch.cscw</groupId>
   <artifactId>CSCWToolSet</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+	<dependencies>
+	<dependency>
+      <groupId>org.societies.cis.collaboration</groupId>
+      <artifactId>CISCollaboration</artifactId>
+    </dependency>
+    </dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.societies.cis.collaboration</groupId>
+				<artifactId>CISCollaboration</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>
