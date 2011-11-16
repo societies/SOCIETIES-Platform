@@ -9,7 +9,7 @@
  * 
  */
 
-package cis.discovery.api;
+package org.societies.cis.discovery.api;
 
 
 public interface ICISDirectory {
