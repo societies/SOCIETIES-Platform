@@ -7,7 +7,7 @@
  * 
  */
 
-package cis.collaboration.api;
+package org.societies.cis.collaboration.api;
 
 public class CISSubscriptionRecord {
 	private String cssId, cisId, subscriptionMode;
