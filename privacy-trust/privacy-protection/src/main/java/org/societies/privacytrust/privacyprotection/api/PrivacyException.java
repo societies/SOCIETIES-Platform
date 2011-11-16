@@ -4,12 +4,12 @@ package org.societies.privacytrust.privacyprotection.api;
  * @author Elizabeth
  *
  */
-public class PrivacyPreferenceException extends Exception{
+public class PrivacyException extends Exception{
     /**
      * Constructs a <code>PrivacyPreferenceException</code> with no detail
      * message.
      */
-    public PrivacyPreferenceException() {
+    public PrivacyException() {
         super();
     }
 
@@ -20,7 +20,7 @@ public class PrivacyPreferenceException extends Exception{
      * @param s
      *            the detail message.
      */
-    public PrivacyPreferenceException(String s) {
+    public PrivacyException(String s) {
         super(s);
     }
 
@@ -37,7 +37,7 @@ public class PrivacyPreferenceException extends Exception{
      *            permitted, and indicates that the cause is nonexistent or
      *            unknown.)
      */
-    public PrivacyPreferenceException(String message, Throwable cause) {
+    public PrivacyException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -53,7 +53,7 @@ public class PrivacyPreferenceException extends Exception{
      *            permitted, and indicates that the cause is nonexistent or
      *            unknown.)
      */
-    public PrivacyPreferenceException(Throwable cause) {
+    public PrivacyException(Throwable cause) {
         super(cause);
     }
 }
