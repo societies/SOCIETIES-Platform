@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-Version: 1.0.0
+Bundle-Name: CSSRegistry
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: CSSRegistry
+Export-Package: org.societies.css.serregistry.api
+Import-Package: org.hibernate,org.hibernate.cfg,org.hibernate.classic,
+ org.hsqldb
