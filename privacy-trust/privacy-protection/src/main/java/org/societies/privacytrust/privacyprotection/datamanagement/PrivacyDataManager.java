@@ -31,7 +31,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 * @see org.societies.privacytrust.privacyprotection.api.internal.IDataObfuscationManager#hasObfuscatedVersion(org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.listener.IDataObfuscationListener)
 	 */
 	@Override
-	public String hasObfuscatedVersion(IDataWrapper dataWrapper,
+	public DataIdentifier hasObfuscatedVersion(IDataWrapper dataWrapper,
 			double obfuscationLevel, IDataObfuscationListener listener)
 			throws PrivacyException {
 		// TODO Auto-generated method stub
