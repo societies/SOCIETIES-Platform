@@ -10,7 +10,7 @@ import org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.wr
  * and filling a type of data (needed to know how obfuscate them) 
  * This wrapper is linked to a specific data obfuscator
  * and know what kind of data is needed to launch the obfuscation. 
- * State: skeleton
+ * @state skeleton 
  * @author olivierm
  * @date 14 oct. 2011
  */

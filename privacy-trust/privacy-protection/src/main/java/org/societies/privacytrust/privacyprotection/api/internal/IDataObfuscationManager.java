@@ -1,6 +1,6 @@
 package org.societies.privacytrust.privacyprotection.api.internal;
 
-import org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.DataObfuscationException;
+import org.societies.privacytrust.privacyprotection.api.PrivacyException;
 import org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.listener.IDataObfuscationListener;
 import org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.wrapper.IDataWrapper;
 
@@ -28,7 +28,7 @@ public interface IDataObfuscationManager {
 	 * @return Obfuscated data wrapped in a DataWrapper (of the same type that the one used to instantiate the obfuscator)
 	 * @throws Exception
 	 */
-	public IDataWrapper obfuscateData(IDataWrapper dataWrapper, double obfuscationLevel, IDataObfuscationListener listener) throws DataObfuscationException;
+	public IDataWrapper obfuscateData(IDataWrapper dataWrapper, double obfuscationLevel, IDataObfuscationListener listener) throws PrivacyException;
 
 	/**
 	 * Check if there is an obfuscated version of the data and return its ID.
@@ -46,5 +46,5 @@ public interface IDataObfuscationManager {
 	 * @return otherwise ID of the non-obfuscated data
 	 * @throws Exception
 	 */
-	public String hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel, IDataObfuscationListener listener) throws DataObfuscationException;
+	public String hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel, IDataObfuscationListener listener) throws PrivacyException;
 }

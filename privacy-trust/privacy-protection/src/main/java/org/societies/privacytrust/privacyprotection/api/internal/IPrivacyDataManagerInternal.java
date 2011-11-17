@@ -6,7 +6,7 @@ package org.societies.privacytrust.privacyprotection.api.internal;
  * @version 1.0
  * @created 09-nov.-2011 16:45:57
  */
-public interface IInternalPrivacyDataManager {
+public interface IPrivacyDataManagerInternal {
 
 	/**
 	 * Update access control permissions over a data

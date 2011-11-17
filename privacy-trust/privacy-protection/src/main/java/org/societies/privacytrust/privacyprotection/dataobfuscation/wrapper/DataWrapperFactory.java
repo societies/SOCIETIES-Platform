@@ -1,10 +1,11 @@
 package org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper;
 
 import org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.privacytrust.privacyprotection.dataobfuscation.DataWrapper;
 
 /**
  * Utilities to instantiate DataWrapper for data obfuscation
- * State: skeleton
+ * @state skeleton 
  * @author olivierm
  * @date 14 oct. 2011
  */
@@ -19,15 +20,18 @@ public class DataWrapperFactory {
 	 * @throw RuntimeException
 	 */
 	public static IDataWrapper selectDataWrapper(Object contextData) throws RuntimeException{
+		// TODO : populate this stub function
 		try {
 			if (contextData.equals("A Data Type")) {
 //				return new [A Data Type]Wrapper(data);
 			}
+			// TODO STUB RETURN, TO BE REMOVED
+			return new SampleWrapper(3);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("No Obfuscator to obfuscate that type of data");
 		}
-		throw new RuntimeException("No Obfuscator to obfuscate that type of data");
+//		throw new RuntimeException("No Obfuscator to obfuscate that type of data");
 	}
 	
 //	// -- GEOLOCATION
