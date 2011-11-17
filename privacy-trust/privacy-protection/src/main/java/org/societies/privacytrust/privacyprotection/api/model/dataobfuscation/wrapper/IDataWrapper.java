@@ -1,5 +1,7 @@
 package org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.wrapper;
 
+import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
+
 
 /**
  * This data wrapper is an abstraction between obfuscation manager
@@ -23,7 +25,7 @@ public interface IDataWrapper {
 	 * 
 	 * @param dataId A unique ID of the data to obfuscate is needed to enable persistence
 	 */
-	public void enabledPersistence(String dataId);
+	public void enabledPersistence(DataIdentifier dataId);
 	/**
 	 * To disabled storage of obfuscated data
 	 */
@@ -46,9 +48,9 @@ public interface IDataWrapper {
 	/**
 	 * @return the dataId
 	 */
-	public String getDataId();
+	public DataIdentifier getDataId();
 	/**
 	 * @param dataId the dataId to set
 	 */
-	public void setDataId(String dataId);
+	public void setDataId(DataIdentifier dataId);
 }

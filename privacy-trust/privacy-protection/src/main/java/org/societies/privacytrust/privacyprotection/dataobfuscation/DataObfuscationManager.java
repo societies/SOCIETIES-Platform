@@ -4,6 +4,7 @@ import org.societies.privacytrust.privacyprotection.api.PrivacyException;
 import org.societies.privacytrust.privacyprotection.api.internal.IDataObfuscationManager;
 import org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.listener.IDataObfuscationListener;
 import org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
 
 /**
  * Implementation of IDataObfuscationManager
@@ -57,7 +58,7 @@ public class DataObfuscationManager implements IDataObfuscationManager {
 	}
 
 	@Override
-	public String hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel, IDataObfuscationListener listener) throws PrivacyException {
+	public DataIdentifier hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel, IDataObfuscationListener listener) throws PrivacyException {
 		// TODO : populate this stub function
 		
 		// -- Verify params

@@ -1,6 +1,7 @@
 package org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.listener;
 
 import org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
 
 
 /**
@@ -34,5 +35,5 @@ public interface IDataObfuscationListener {
 	 * @param dataId ID of the obfuscated version of the data if the persistence is enabled and if the obfuscated data exists, otherwise ID of the non-obfuscated data
 	 * @param retrieved True if an obfuscated version has been retrieved, else false
 	 */
-	public void onObfuscatedVersionRetrieved(String dataId, boolean retrieved);
+	public void onObfuscatedVersionRetrieved(DataIdentifier dataId, boolean retrieved);
 }

@@ -1,5 +1,8 @@
 package org.societies.privacytrust.privacyprotection.api.internal;
 
+import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
+import org.societies.privacytrust.privacyprotection.mock.EntityIdentifier;
+
 /**
  * Internal interface to manage data access control and data access conditions.
  * @author olivierm
@@ -16,6 +19,6 @@ public interface IPrivacyDataManagerInternal {
 	 * @param ownerId
 	 * @param requestorId
 	 */
-	public void updatePermissions(String dataId, String agreementId, String ownerId, String requestorId);
+	public void updatePermissions(DataIdentifier dataId, String agreementId, EntityIdentifier ownerId, EntityIdentifier requestorId);
 
 }

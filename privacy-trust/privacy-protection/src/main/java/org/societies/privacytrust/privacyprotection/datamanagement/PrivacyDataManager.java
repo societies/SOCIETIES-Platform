@@ -6,6 +6,9 @@ import org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.li
 import org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.privacytrust.privacyprotection.api.model.privacyPolicy.RequestPolicy;
 import org.societies.privacytrust.privacyprotection.api.model.privacyPolicy.ResponseItem;
+import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
+import org.societies.privacytrust.privacyprotection.mock.EntityIdentifier;
+import org.societies.privacytrust.privacyprotection.mock.ServiceResourceIdentifier;
 
 /**
  * @state skeleton 
@@ -39,8 +42,8 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 * @see org.societies.privacytrust.privacyprotection.api.external.IPrivacyDataManager#checkPermission(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)
 	 */
 	@Override
-	public ResponseItem checkPermission(Object dataId, Object ownerId,
-			Object requestorId, Object serviceId) {
+	public ResponseItem checkPermission(DataIdentifier dataId, EntityIdentifier ownerId,
+			EntityIdentifier requestorId, ServiceResourceIdentifier serviceId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -49,8 +52,8 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 * @see org.societies.privacytrust.privacyprotection.api.external.IPrivacyDataManager#checkPermission(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.String)
 	 */
 	@Override
-	public ResponseItem checkPermission(Object dataId, Object ownerId,
-			Object requestorId, String cisId) {
+	public ResponseItem checkPermission(DataIdentifier dataId, EntityIdentifier ownerId,
+			EntityIdentifier requestorId, EntityIdentifier cisId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -59,8 +62,8 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 * @see org.societies.privacytrust.privacyprotection.api.external.IPrivacyDataManager#checkPermission(java.lang.Object, java.lang.Object, java.lang.String, org.societies.privacytrust.privacyprotection.api.model.privacyPolicy.RequestPolicy)
 	 */
 	@Override
-	public ResponseItem checkPermission(Object dataId, Object ownerId,
-			String requestorId, RequestPolicy usage) {
+	public ResponseItem checkPermission(DataIdentifier dataId, EntityIdentifier ownerId,
+			EntityIdentifier requestorId, RequestPolicy usage) {
 		// TODO Auto-generated method stub
 		return null;
 	}

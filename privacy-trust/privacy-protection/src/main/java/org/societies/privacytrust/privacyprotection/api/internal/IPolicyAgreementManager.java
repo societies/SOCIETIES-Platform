@@ -5,6 +5,9 @@ import java.util.Map;
 
 import org.societies.privacytrust.privacyprotection.api.model.privacyPolicy.NegotiationAgreement;
 import org.societies.privacytrust.privacyprotection.api.model.privacyPolicy.ResponseItem;
+import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
+import org.societies.privacytrust.privacyprotection.mock.EntityIdentifier;
+import org.societies.privacytrust.privacyprotection.mock.ServiceResourceIdentifier;
 
 /**
  * @author olivierm
@@ -16,7 +19,7 @@ public interface IPolicyAgreementManager {
 	 * Delete and agreement
 	 * @param id
 	 */
-	public boolean deleteAgreement(EntityIdentifier id);
+	public boolean deleteAgreement(String id);
 
 	/**
 	 * Delete agreements following criteria
@@ -28,7 +31,7 @@ public interface IPolicyAgreementManager {
 	 * Retrieve an agreement
 	 * @param id
 	 */
-	public NegotiationAgreement getAgreement(EntityIdentifier id);
+	public NegotiationAgreement getAgreement(String id);
 
 	/**
 	 * Retrieve agreements following criteria
@@ -67,7 +70,7 @@ public interface IPolicyAgreementManager {
 	 * @param myId
 	 * @param serviceId
 	 */
-	public updateAgreement(NegotiationAgreement agreement, EntityIdentifier myId, ServiceResourceIdentifier serviceId);
+	public NegotiationAgreement updateAgreement(NegotiationAgreement agreement, EntityIdentifier myId, ServiceResourceIdentifier serviceId);
 
 	/**
 	 * Update Negotiation Agreement (with a CIS)
@@ -76,6 +79,6 @@ public interface IPolicyAgreementManager {
 	 * @param myId
 	 * @param cisId
 	 */
-	public updateAgreement(NegotiationAgreement agreement, EntityIdentifier myId, EntityIdentifier cisId);
+	public NegotiationAgreement updateAgreement(NegotiationAgreement agreement, EntityIdentifier myId, EntityIdentifier cisId);
 
 }

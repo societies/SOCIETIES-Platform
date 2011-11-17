@@ -2,6 +2,7 @@ package org.societies.privacytrust.privacyprotection.dataobfuscation;
 
 import org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.obfuscator.IDataObfuscator;
 import org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
 
 
 /**
@@ -32,7 +33,7 @@ public class DataWrapper implements IDataWrapper {
 	/**
 	 * ID of the data, useful for persistence
 	 */
-	private String dataId;
+	private DataIdentifier dataId;
 	
 	
 	// -- CONSTRUCTOR
@@ -49,7 +50,7 @@ public class DataWrapper implements IDataWrapper {
 	 * and the unique ID of the data to obfuscate will be used to retrieve obfuscated version of the data.  
 	 * @param dataId A unique ID of the data to obfuscate is needed to enable persistence
 	 */
-	protected DataWrapper(String dataId) {
+	protected DataWrapper(DataIdentifier dataId) {
 		this.dataId = dataId;
 		persistence = true;
 	}
@@ -68,7 +69,7 @@ public class DataWrapper implements IDataWrapper {
 	 * @param dataId A unique ID of the data to obfuscate is needed to enable persistence
 	 */
 	@Override
-	public void enabledPersistence(String dataId) {
+	public void enabledPersistence(DataIdentifier dataId) {
 		this.dataId = dataId;
 		persistence = true;
 	}
@@ -95,14 +96,14 @@ public class DataWrapper implements IDataWrapper {
 	 * @return the dataId
 	 */
 	@Override
-	public String getDataId() {
+	public DataIdentifier getDataId() {
 		return dataId;
 	}
 	/**
 	 * @param dataId the dataId to set
 	 */
 	@Override
-	public void setDataId(String dataId) {
+	public void setDataId(DataIdentifier dataId) {
 		this.dataId = dataId;
 	}
 	

@@ -2,6 +2,7 @@ package org.societies.privacytrust.privacyprotection.dataobfuscation.listener;
 
 import org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.listener.IDataObfuscationListener;
 import org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
 
 /**
  * @state skeleton 
@@ -25,7 +26,7 @@ public class SampleDataObfuscationListener implements IDataObfuscationListener {
 	}
 
 	@Override
-	public void onObfuscatedVersionRetrieved(String dataId, boolean retrieved) {
+	public void onObfuscatedVersionRetrieved(DataIdentifier dataId, boolean retrieved) {
 		if (retrieved) {
 			System.out.println("Obfuscated version retrieved: "+dataId);
 		}

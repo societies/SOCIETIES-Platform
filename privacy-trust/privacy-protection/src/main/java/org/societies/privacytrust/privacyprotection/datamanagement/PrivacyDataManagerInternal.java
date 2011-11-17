@@ -1,6 +1,8 @@
 package org.societies.privacytrust.privacyprotection.datamanagement;
 
 import org.societies.privacytrust.privacyprotection.api.internal.IPrivacyDataManagerInternal;
+import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
+import org.societies.privacytrust.privacyprotection.mock.EntityIdentifier;
 
 /**
  * @state skeleton 
@@ -11,8 +13,8 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	 * @see org.societies.privacytrust.privacyprotection.api.internal.IPrivacyDataManagerInternal#updatePermissions(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void updatePermissions(String dataId, String agreementId,
-			String ownerId, String requestorId) {
+	public void updatePermissions(DataIdentifier dataId, String agreementId,
+			EntityIdentifier ownerId, EntityIdentifier requestorId) {
 		// TODO Auto-generated method stub
 
 	}

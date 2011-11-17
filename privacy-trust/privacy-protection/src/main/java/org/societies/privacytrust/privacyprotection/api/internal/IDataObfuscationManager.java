@@ -3,6 +3,7 @@ package org.societies.privacytrust.privacyprotection.api.internal;
 import org.societies.privacytrust.privacyprotection.api.PrivacyException;
 import org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.listener.IDataObfuscationListener;
 import org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
 
 /**
  * Internal interface to protect a data by obfuscating it
@@ -46,5 +47,5 @@ public interface IDataObfuscationManager {
 	 * @return otherwise ID of the non-obfuscated data
 	 * @throws Exception
 	 */
-	public String hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel, IDataObfuscationListener listener) throws PrivacyException;
+	public DataIdentifier hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel, IDataObfuscationListener listener) throws PrivacyException;
 }
