@@ -17,31 +17,57 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api.model.privacyPolicy;
+package org.societies.privacytrust.privacyprotection.api.external;
 
-import java.util.List;
 
 import org.societies.personalisation.common.api.model.EntityIdentifier;
 import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import org.societies.privacytrust.privacyprotection.api.model.privacyPolicy.IAgreementEnvelope;
+import org.societies.privacytrust.privacyprotection.api.model.privacyPolicy.RequestPolicy;
+import org.societies.privacytrust.privacyprotection.api.model.privacyPolicy.ResponsePolicy;
+/**
+ * This interface defines the methods that should be implemented by the CSS that
+ * acts as a client in the Negotiation process. This means that this CSS is the
+ * one that initiates the starting of the service or requests to join a CIS.
+ * @author Elizabeth
+ * @version 1.0
+ * @created 11-Nov-2011 17:03:12
+ */
+public interface INegotiationClient {
 
-public interface IAgreement {
-	
-	
-	public List<RequestItem> getRequestedItems();
-	
-	public ServiceResourceIdentifier getServiceIdentifier();
-	
-	public void setServiceIdentifier(ServiceResourceIdentifier serviceId);
-	
-	public EntityIdentifier getServiceDPI();
-	
-	public void setServiceDPI(EntityIdentifier serviceDPI);
-	
-	public EntityIdentifier getUserDPI();
-	
-	public void setUserDPI(EntityIdentifier userDPI);
-	
-	public EntityIdentifier getUserPublicDPI();
-	
-	public void setUserPublicDPI(EntityIdentifier userPublicDPI);
+	/**
+	 * 
+	 * @param serviceID
+	 * @param providerIdentity
+	 * @param envelope
+	 * @param b
+	 */
+	public void acknowledgeAgreement(ServiceResourceIdentifier serviceID, EntityIdentifier providerIdentity, IAgreementEnvelope envelope, boolean b);
+
+	/**
+	 * 
+	 * @param policy
+	 */
+	public void receiveNegotiationResponse(ResponsePolicy policy);
+
+	/**
+	 * 
+	 * @param dpi
+	 */
+	public void receiveProviderIdentity(EntityIdentifier dpi);
+
+	/**
+	 * 
+	 * @param policy
+	 */
+	public void receiveProviderPolicy(RequestPolicy policy);
+
+	/**
+	 * 
+	 * @param policy
+	 * @param serviceIdentifier
+	 * @param serviceIdentity
+	 */
+	public void startPrivacyPolicyNegotiation(RequestPolicy policy, ServiceResourceIdentifier serviceIdentifier, EntityIdentifier serviceIdentity);
+
 }

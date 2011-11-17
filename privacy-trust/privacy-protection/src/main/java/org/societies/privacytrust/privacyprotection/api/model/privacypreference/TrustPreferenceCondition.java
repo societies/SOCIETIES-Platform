@@ -17,23 +17,52 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api.internal;
 
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.ICtxAttributeIdentifier;
+package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
+import java.io.Serializable;
+
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyConditionConstants;
 
 /**
- * @author Eliza
+ * @author Elizabeth
  * @version 1.0
- * @created 11-Nov-2011 19:17:12
+ * @updated 14-Mar-2009 21:06:49
  */
-public interface IPrivacyPreferenceConditionMonitor {
+public class TrustPreferenceCondition implements IPrivacyPreferenceCondition, Serializable {
 
-	/**
-	 * 
-	 * @param contextId
-	 * @param userIdentity
-	 */
-	public void contextEventReceived(ICtxAttributeIdentifier contextId, EntityIdentifier userIdentity);
+	/*
+	private ITrustValue trustValue;
+	private PrivacyConditionConstants myType;
+	
+	public TrustPreferenceCondition(ITrustValue trustVal){
+		this.trustValue = trustVal;
+		this.myType = PrivacyConditionConstants.TRUST;
+	}
+
+	public ITrustValue getTrustValue(){
+		return this.trustValue;
+	}
+	
+
+	public boolean equals(IPrivacyPreferenceCondition pc){
+
+		if (!(pc instanceof TrustPreferenceCondition)){
+			return false;
+		}
+		TrustPreferenceCondition tpc = (TrustPreferenceCondition) pc;
+		if (tpc.getTrustValue().compareTo(this.getTrustValue())!=0){
+			return false;
+		}
+
+		
+		return true;
+	}
+
+*/
+	@Override
+	public PrivacyConditionConstants getType() {
+		return PrivacyConditionConstants.TRUST; 
+	}
+
 
 }

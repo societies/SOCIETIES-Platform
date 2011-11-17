@@ -22,7 +22,7 @@ public interface IPrivacyPolicyManager {
 	 * 
 	 * @param id
 	 */
-	public RequestPolicy getPrivacyPolicy(Object id);
+	public RequestPolicy getPrivacyPolicy(String id);
 
 	/**
 	 * Retrieve (CIS or Service)  privacy policy using criteria
@@ -52,7 +52,7 @@ public interface IPrivacyPolicyManager {
 	 * 
 	 * @param id
 	 */
-	public boolean deletePrivacyPolicy(Object id);
+	public boolean deletePrivacyPolicy(String id);
 
 	/**
 	 * Delete one or more (CIS or Service) privacy policies.

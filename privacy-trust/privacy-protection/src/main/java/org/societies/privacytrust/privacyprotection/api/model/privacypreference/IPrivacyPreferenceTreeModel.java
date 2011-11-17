@@ -17,23 +17,21 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api.internal;
+package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.ICtxAttributeIdentifier;
+
+import java.io.Serializable;
+
+import javax.swing.tree.TreeModel;
+
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
 /**
- * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 19:17:12
+ * This interface defines the methods required from a class that encapsulates the tree model for a privacy preference.
+ * @author Elizabeth
+ *
  */
-public interface IPrivacyPreferenceConditionMonitor {
-
-	/**
-	 * 
-	 * @param contextId
-	 * @param userIdentity
-	 */
-	public void contextEventReceived(ICtxAttributeIdentifier contextId, EntityIdentifier userIdentity);
-
+public interface IPrivacyPreferenceTreeModel extends TreeModel,Serializable {
+	public IPrivacyPreference getRootPreference();
+	public PrivacyPreferenceTypeConstants getPrivacyType();
 }
