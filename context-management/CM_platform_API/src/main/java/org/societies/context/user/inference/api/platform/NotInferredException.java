@@ -1,7 +1,5 @@
-//package org.personalsmartspace.cm.reasoning.api.platform;
 package org.societies.context.user.inference.api.platform;
 
-//import org.personalsmartspace.cm.model.api.pss3p.ICtxAttribute;
 import org.societies.context.model.CtxAttribute;
 
 /**

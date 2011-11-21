@@ -1,4 +1,3 @@
-//package org.personalsmartspace.cm.model.api.pss3p;
 package org.societies.context.model.api;
 
 /**

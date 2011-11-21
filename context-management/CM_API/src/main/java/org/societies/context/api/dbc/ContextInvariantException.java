@@ -1,7 +1,5 @@
-//package org.personalsmartspace.cm.api.pss3p.dbc;
 package org.societies.context.api.dbc;
 
-//import org.personalsmartspace.cm.api.pss3p.ContextException;
 import org.societites.context.api.ContextException;
 
 /**
