@@ -22,5 +22,9 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 	<!-- EPapadopoulou: added version.pm property -->
 	<version.pm>${release.version}.1</version.pm>
 	<version.spm>${release.version}.1</version.spm>
+	<!-- SGallacher: added version.cm property (Context Management) -->
+	<version.cm>${release.version}.1</version.cm>
+	<!-- SGallacher: added version.ua property (User Agent) -->
+	<version.ua>${release.version}.1</version.ua>
     </properties>
 </project>
