@@ -25,41 +25,32 @@
 package org.societies.context.model.api;
 
 /**
- * Used to represent the origin of a context attribute value. This information
- * is part of the Quality of Context (QoC) parameters of
- * <code>CtxAttribute</code> objects. The context origin can be one of the
+ * Used to represent the origin of a context bond. It can be one of the
  * following types:
  * <ul>
- * <li>{@link #MANUALLY_SET}: Denotes a manually set context attribute value</li>
- * <li>{@link #SENSED}: Denotes a sensed context attribute value</li>
- * <li>{@link #INFERRED}: Denotes an inferred context attribute value</li>
- * <li>{@link #INHERITED}: Denotes an inherited context attribute value</li>
+ * <li>{@link #MANUALLY_SET}: Denotes a manually set context bond</li>
+ * <li>{@link #DISCOVERED}: Denotes a discovered context bond</li>
+ * <li>{@link #INHERITED}: Denotes an inherited context bond</li>
  * </ul>
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas
  *         Liampotis</a> (ICCS)
- * @see CtxQuality
  * @since 0.0.1
  */
 public enum CtxOriginType {
 
     /**
-     * The enum constant for manually set context attribute values
+     * The enum constant for manually set context bonds
      */
     MANUALLY_SET,
 
     /**
-     * The enum constant for sensed context attribute values
+     * The enum constant for discovered context bonds
      */
-    SENSED,
+    DISCOVERED,
 
     /**
-     * The enum constant for inferred context attribute values
-     */
-    INFERRED,
-    
-    /**
-     * The enum constant for inherited context attribute values
+     * The enum constant for inherited context bonds
      */
     INHERITED,
 }
