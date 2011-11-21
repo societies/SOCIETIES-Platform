@@ -42,6 +42,8 @@ public class MasterGUIActivity extends DroidGap {
         // Handle item selection
         switch (item.getItemId()) {
         case R.id.about:
+        	Intent aboutIntent = new Intent(this, AboutActivity.class);
+        	this.startActivity(aboutIntent);
             return true;
         case R.id.preference:
         	Intent prefIntent = new Intent(this, MasterPreferences.class);

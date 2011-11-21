@@ -10,4 +10,5 @@ public class MasterPreferences extends PreferenceActivity{
 
         addPreferencesFromResource(R.xml.preferences);
     }
+
 }
