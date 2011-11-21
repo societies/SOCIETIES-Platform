@@ -8,6 +8,7 @@ public class CtxQuality implements Serializable {
 	private static final long serialVersionUID = -5345272592676091780L;
 	
 	private Date lastUpdated;
+	private CtxOriginType originType;
 	private Double precision;
 	
 	private CtxQuality() {}
@@ -18,6 +19,14 @@ public class CtxQuality implements Serializable {
 	
 	public long getFreshness() {
 		return new Date().getTime() - this.lastUpdated.getTime();
+	}
+	
+	public CtxOriginType getOriginType() {
+		return this.originType;
+	}
+	
+	public void setOriginType(CtxOriginType originType) {
+		this.originType = originType;
 	}
 
 	public Double getPrecision() {
