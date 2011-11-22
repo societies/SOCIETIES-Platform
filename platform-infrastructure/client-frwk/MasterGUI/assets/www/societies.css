@@ -1,4 +1,5 @@
 .ui-page {
-background-image: url('./images/societies-background.png');
+background-image: url('./societies-images/societies-background.png');
 background-repeat:no-repeat;
+background-color:transparent;
 }

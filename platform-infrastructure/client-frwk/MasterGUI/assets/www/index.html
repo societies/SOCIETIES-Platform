@@ -4,7 +4,8 @@
 	<title>Societies</title> 
 	
 	<script type="text/javascript" charset="utf-8" src="phonegap-1.2.0.js"></script>
-	<link rel="stylesheet" href="themes/CoolGreen.css">
+	<!--  link rel="stylesheet" href="themes/CoolGreen.css"-->
+	<link rel="stylesheet" href="themes/Kilkenny.css">
 	<link rel="stylesheet" href="jquery.mobile.structure-1.0.css" /> 
 	<script src="jquery-1.6.4.js"></script>
 	<script src="jquery.mobile-1.0.js"></script>
@@ -17,30 +18,30 @@
 </head> 
 <body> 
 <!-- Start of first page (cf. http://jquerymobile.com/themeroller/ to create custom themes -->
-<div data-role="page" id="main" >
+<div data-role="page" id="main" data-theme="a" data-content-theme="a">
 
 	<div data-role="header" data-theme="a"  data-position="fixed" >
-		<h1><img src="images/societies_xsmall.png" alt="Societies" align="middle"/></h1>
+		<h1><img src="societies-images/societies_xsmall.png" alt="Societies" align="middle"/></h1>
 		<!-- Invoke a new page via an icon -->
 		<a href="#device" data-role="button" data-icon="gear" data-inline="true" data-theme="a">Device</a>
 		<a href="#information" data-role="button" data-icon="info" data-inline="true" data-theme="a">Info</a>
 		
 	</div><!-- /header -->
 
-	<div data-role="content" data-theme="a">	
+	<div data-role="content" >	
 
    		<div id= "loginDialog">
 			<div data-role="fieldcontain" >
 		    	<label for="username">User JID: </label>
-		    	<input type="text" name="userLogin" id="username" value="" data-theme="a" />
+		    	<input type="text" name="userLogin" id="username" value=""  />
 			</div>
 
-			<div data-role="fieldcontain" data-theme="a">
+			<div data-role="fieldcontain" >
 		    	<label for="userpass">Password: </label>
-		    	<input type="password" name="userpass" id="userpass" value="" data-theme="a" />
+		    	<input type="password" name="userpass" id="userpass" value="" />
 			</div>
 
-			<input id="connectXMPP" type="button" value="Connect" data-icon="gear" data-inline="true" data-theme="a"/> 
+			<input id="connectXMPP" type="button" value="Connect" data-icon="gear" data-inline="true" /> 
 			
 		</div>
     	
@@ -55,7 +56,7 @@
 <div data-role="page" id="menu">
 
 	<div data-role="header" data-theme="a" data-position="fixed">
-		<p><img src="images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Menu</p>
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Menu</p>
 	</div><!-- /header -->
 
 	<div data-role="content" data-theme="a">	
@@ -71,7 +72,7 @@
 <div data-role="page" id="device">
 
 	<div data-role="header" data-theme="a" data-position="fixed">
-		<p><img src="images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Device Characteristics</p>
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Device Characteristics</p>
 	</div><!-- /header -->
 
 	<div data-role="content" data-theme="a">	
@@ -96,7 +97,7 @@
 <div data-role="page" id="information">
 
 	<div data-role="header" data-theme="a" data-position="fixed">
-		<p><img src="images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Information</p>
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Information</p>
 	</div><!-- /header -->
 
 	<div data-role="content" data-theme="a">	
@@ -113,7 +114,7 @@
 <div data-role="page" id="deviceManager">
 
 	<div data-role="header" data-theme="a" data-position="fixed">
-		<p><img src="images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Device Manager</p>
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Device Manager</p>
 	</div><!-- /header -->
 
 	<div data-role="content" data-theme="a">	
