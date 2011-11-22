@@ -6,7 +6,7 @@
  * 
  */
 
-public class CISCreationTask extends CISOrchestrationTask {
+public class CisCreationTask extends CisOrchestrationTask {
 	
 	/*
      * Constructor for CISCreationTask.
@@ -17,7 +17,7 @@ public class CISCreationTask extends CISOrchestrationTask {
 	 * 				?
 	 */
 	
-	public CISCreationTask() {}
+	public CisCreationTask() {}
 	
 	/*
 	 * Description: The createCIS method creates a CIS based on the 
@@ -28,6 +28,6 @@ public class CISCreationTask extends CISOrchestrationTask {
 	 * 				?
 	 */
 	
-	public void createCIS(CIS cisToCreate) {}
+	public void createCis(Cis cisToCreate) {}
 	
 }

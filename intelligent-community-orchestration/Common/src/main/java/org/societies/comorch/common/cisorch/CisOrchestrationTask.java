@@ -6,7 +6,11 @@
  * 
  */
 
-public class CISOrchestrationTask extends CISOrchestrationTask {
+public class CisOrchestrationTask extends CisOrchestrationTask {
+	
+	String orchestrationType;
+	Cis cisToOrchestrate;
+	//ArrayList<Cis> otherCissInvolved;
 	
 	/*
      * Constructor for CISOrchestrationTask.
@@ -17,7 +21,7 @@ public class CISOrchestrationTask extends CISOrchestrationTask {
 	 * 				?
 	 */
 	
-	public CISOrchestrationTask() {}
+	public CisOrchestrationTask(String orchestrationType, Cis cisToOrchestrate) {}
 	
 	/*
 	 * Description: The orchestrateCIS method carries out orchestration
@@ -28,6 +32,10 @@ public class CISOrchestrationTask extends CISOrchestrationTask {
 	 * 				?
 	 */
 	
-	public void orchestrateCIS(CIS cisToOrchestrate) {}
+	//public CisOrchestrationTask(String orchestrationType, Cis cisToOrchestrate, ArrayList<Cis> otherCissInvolved) {}
+	
+	public void orchestrateCis(Cis cisToOrchestrate) {}
+	
+	public void orchestrateCis(Cis cisToOrchestrate, ArrayList<Cis> otherCissInvolved) {}
 	
 }

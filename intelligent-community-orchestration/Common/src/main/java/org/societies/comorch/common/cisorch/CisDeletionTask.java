@@ -6,7 +6,7 @@
  * 
  */
 
-public class CISDeletionTask extends CISOrchestrationTask {
+public class CisDeletionTask extends CisOrchestrationTask {
 	
 	/*
      * Constructor for CISDeletionTask.
@@ -17,7 +17,7 @@ public class CISDeletionTask extends CISOrchestrationTask {
 	 * 				?
 	 */
 	
-	public CISDeletionTask() {}
+	public CisDeletionTask() {}
 	
 	/*
 	 * Description: The deleteCIS method alters deletes the given CIS
@@ -28,6 +28,6 @@ public class CISDeletionTask extends CISOrchestrationTask {
 	 * 				?
 	 */
 	
-	public void deleteCIS(CIS cisToDelete) {}
+	public void deleteCis(Cis cisToDelete) {}
 	
 }
