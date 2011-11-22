@@ -1,4 +1,4 @@
-package org.societies.user-agent.UserControl.api.model;
+package org.societies.userAgent.UserControl.api.model;
 
 import java.util.List;
 

@@ -1,8 +1,9 @@
-package org.societies.user-agent.DecisionMaking.api;
+package org.societies.userAgent.DecisionMaking.api;
 
 import java.util.List;
 
-import org.societies.personalisation.common.api.model.*;
+//import org.societies.personalisation.common.api.model.*;
+import org.societies.userAgent.mock.api.model.IOutcome;
 
 public interface IDecisionMaker{
 	/*  make decision upon the list of 

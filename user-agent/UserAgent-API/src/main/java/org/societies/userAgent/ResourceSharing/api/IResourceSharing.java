@@ -1,4 +1,4 @@
-package org.societies.user-agent.ResourceSharing.api;
+package org.societies.userAgent.ResourceSharing.api;
 
 /**
  * 

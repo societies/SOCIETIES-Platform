@@ -1,4 +1,6 @@
-package org.societies.user-agent.UserFeedback.api;
+package org.societies.userAgent.UserFeedback.api;
+
+import org.societies.userAgent.UserFeedback.api.model.IProposal;
 
 /**
  * 

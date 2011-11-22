@@ -1,6 +1,7 @@
-package org.societies.user-agent.ConflictResolution.api;
+package org.societies.userAgent.ConflictResolution.api;
 
-import org.societies.personalisation.common.api.model.*;
+//import org.societies.personalisation.common.api.model.*;
+import org.societies.userAgent.mock.api.model.IAction;
 
 public interface IConflictResolutionManager{
 	/*conflict resolved between two IAction 

@@ -1,4 +1,4 @@
-package org.societies.user-agent.UserFeedback.api.model;
+package org.societies.userAgent.UserFeedback.api.model;
 
 public interface IProposal
 {
