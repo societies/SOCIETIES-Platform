@@ -15,7 +15,8 @@ public class CISRecord {
 	 */
 	public String permaLink;
 	public String[] membersCss;
-	private String password;
+	private String password = "none";
+	public ServiceSharingRecord[] sharedServices;
 	
 
 }
