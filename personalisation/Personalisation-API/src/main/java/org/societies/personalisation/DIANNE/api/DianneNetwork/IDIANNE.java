@@ -52,12 +52,14 @@ public interface IDIANNE {
 	
 	/**
 	 * This method will start DIANNE learning
+	 * @param ownerId  the DigitalIdentity for which DIANNE learning should be enabled
 	 */
-	public void enableDIANNELearning();
+	public void enableDIANNELearning(EntityIdentifier ownerId);
 	
 	/**
 	 * This method will stop DIANNE learning
+	 * @param ownerId  the DigitalIdentity for which DIANNE learning should be disabled
 	 */
-	public void disableDIANNELearning();
+	public void disableDIANNELearning(EntityIdentifier ownerId);
 
 }
