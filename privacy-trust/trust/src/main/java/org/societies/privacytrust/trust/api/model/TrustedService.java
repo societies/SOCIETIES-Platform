@@ -14,16 +14,16 @@ public class TrustedService extends TrustedEntity {
 
 	private static final long serialVersionUID = 8253551733059925542L;
 	
-	private Set<TrustedCommunity> communities;
+	private Set<TrustedCis> communities;
 	private URI id;
-	private TrustedUser provider;
+	private TrustedCss provider;
 	private String type;
 	public TrustedDeveloper developer;
 
 	public TrustedService() {
 	}
 
-	public Set<TrustedCommunity> getCommunities(){
+	public Set<TrustedCis> getCommunities(){
 		return this.communities;
 	}
 
@@ -31,7 +31,7 @@ public class TrustedService extends TrustedEntity {
 		return this.id;
 	}
 
-	public TrustedUser getProvider(){
+	public TrustedCss getProvider(){
 		return this.provider;
 	}
 

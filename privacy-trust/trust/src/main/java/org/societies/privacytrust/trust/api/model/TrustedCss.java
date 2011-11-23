@@ -8,18 +8,18 @@ import java.util.Set;
  * trustworthiness of this CSS, i.e. direct, indirect and user-perceived. Each
  * trusted CSS is assigned a set of TrustedService objects.
  */
-public class TrustedUser extends TrustedEntity {
+public class TrustedCss extends TrustedEntity {
 	
 	private static final long serialVersionUID = -5663024798098392757L;
 	
-	private Set<TrustedCommunity> communities;
+	private Set<TrustedCis> communities;
 	private Set<TrustedService> services;
 
-	public TrustedUser() {
+	public TrustedCss() {
 
 	}
 
-	public Set<TrustedCommunity> getCommunities(){
+	public Set<TrustedCis> getCommunities(){
 		return this.communities;
 	}
 

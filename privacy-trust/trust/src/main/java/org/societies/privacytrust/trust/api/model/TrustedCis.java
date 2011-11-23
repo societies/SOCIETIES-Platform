@@ -9,18 +9,18 @@ import java.util.Set;
  * Each trusted CIS is assigned a set of TrustedCSS objects, which represent its
  * members.
  */
-public class TrustedCommunity extends TrustedEntity {
+public class TrustedCis extends TrustedEntity {
 
 	private static final long serialVersionUID = -438368876927927076L;
 	
-	private Set<TrustedUser> members;
+	private Set<TrustedCss> members;
 	private Set<TrustedService> services;
 
-	public TrustedCommunity(){
+	public TrustedCis(){
 
 	}
 
-	public Set<TrustedUser> getMembers(){
+	public Set<TrustedCss> getMembers(){
 		return this.members;
 	}
 
