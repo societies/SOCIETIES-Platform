@@ -1,0 +1,115 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>CSSSerRegistry</groupId>
+  <artifactId>CSSSerRegistry</artifactId>
+  <version>1.0.0</version>
+ <packaging>bundle</packaging>
+  
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+  
+    <dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate</artifactId>
+		<version>3.2.6.ga</version>
+	</dependency>
+	
+	<dependency>
+		<groupId>hsqldb</groupId>
+		<artifactId>hsqldb</artifactId>
+		<version>1.8.0.7</version>
+	</dependency>
+  
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+    	<groupId>org.springframework</groupId>
+    	<artifactId>spring</artifactId>
+    	<version>2.5.6</version>
+    	<scope>provided</scope>    		
+    </dependency>
+    
+     <dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.5.8</version>
+			<scope>compile</scope>
+	</dependency>
+</dependencies>
+
+  <build>
+		<plugins>		
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+    				<instructions>
+    					<Bundle-Activator></Bundle-Activator>
+    				<Import-Package>!javax.*,!org.jaxen.*,
+    					!com.ibm.*,!com.opensymphony.*,!javassist.*,
+    					!org.apache.*,!org.objectweb.*,!net.sf.*,
+    					!com.sun.*,!org.xmlpull.*,!org.relaxng.*,
+    					!com.mchange.*,!org.logicalcobwebs.*,!sun.*,
+    					!org.xml.*,
+    					*;resolution=optional</Import-Package>    					
+    					<Export-Package>org.societies.css.serregistry.api.*</Export-Package>
+		           		<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
+						<_nouses>true</_nouses>
+		         	</instructions>
+	       		</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<configuration>
+	      			<artifactItems>
+		         		<artifactItem>
+		         			<groupId>${project.groupId}</groupId>
+		         			<artifactId>${project.artifactId}</artifactId>
+							<version>${version.release}</version>
+		           			<type>bundle</type>
+		           			<overWrite>true</overWrite>
+		           			<outputDirectory></outputDirectory>
+		         		</artifactItem>
+	      			</artifactItems> 			              			        			
+	    		</configuration>
+			</plugin>
+						
+		</plugins>
+	</build>
+    
+<repositories>
+	<repository>
+		<id>maven-repository.dev.java.net</id>
+		<name>Java Dev Net Repository</name>
+		<url>http://download.java.net/maven/2/</url>
+		<releases>
+		<enabled>true</enabled>
+		<updatePolicy>never</updatePolicy>
+		</releases>
+		<snapshots>
+		<enabled>false</enabled>
+		</snapshots>
+	</repository>
+ </repositories>
+    
+</project>

@@ -1,0 +1,130 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<title>Societies</title> 
+	
+	<script type="text/javascript" charset="utf-8" src="phonegap-1.2.0.js"></script>
+	<!--  link rel="stylesheet" href="themes/CoolGreen.css"-->
+	<link rel="stylesheet" href="themes/Kilkenny.css">
+	<link rel="stylesheet" href="jquery.mobile.structure-1.0.css" /> 
+	<script src="jquery-1.6.4.js"></script>
+	<script src="jquery.mobile-1.0.js"></script>
+	<script type="text/javascript" src="reference.js"></script>
+	<link rel="stylesheet" href="societies.css" /> 
+	
+	<!-- Weinre target insert. Uncomment to Weinre -->
+	<!--script src="http://10.0.2.2:8081/target/target-script-min.js"></script-->
+	
+</head> 
+<body> 
+<!-- Start of first page (cf. http://jquerymobile.com/themeroller/ to create custom themes -->
+<div data-role="page" id="main" data-theme="a" data-content-theme="a">
+
+	<div data-role="header" data-theme="a"  data-position="fixed" >
+		<h1><img src="societies-images/societies_xsmall.png" alt="Societies" align="middle"/></h1>
+		<!-- Invoke a new page via an icon -->
+		<a href="#device" data-role="button" data-icon="gear" data-inline="true" data-theme="a">Device</a>
+		<a href="#information" data-role="button" data-icon="info" data-inline="true" data-theme="a">Info</a>
+		
+	</div><!-- /header -->
+
+	<div data-role="content" >	
+
+   		<div id= "loginDialog">
+			<div data-role="fieldcontain" >
+		    	<label for="username">User JID: </label>
+		    	<input type="text" name="userLogin" id="username" value=""  />
+			</div>
+
+			<div data-role="fieldcontain" >
+		    	<label for="userpass">Password: </label>
+		    	<input type="password" name="userpass" id="userpass" value="" />
+			</div>
+
+			<input id="connectXMPP" type="button" value="Connect" data-icon="gear" data-inline="true" /> 
+			
+		</div>
+    	
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a"  data-position="fixed" >
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
+<!-- Start of Menu page -->
+<div data-role="page" id="menu">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Menu</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">	
+    	<a href="#deviceManager" data-theme="a" data-transition="pop" data-role="button" >Device Manager</a>
+	
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" data-position="fixed">
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Device page -->
+<div data-role="page" id="device">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Device Characteristics</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">	
+	
+		<button id="deviceChar" data-theme="a">Characteristics</button>	
+		
+    	<div id="info">
+        	<h4>PhoneGap: <span id="phoneGapVer"> &nbsp;</span>,   Platform: <span id="platform"> &nbsp;</span>,   Version: <span id="version">&nbsp;</span></h4>
+        	<h4>UUID: <span id="uuid"> &nbsp;</span>,   Name: <span id="name">&nbsp;</span></h4>
+        	<h4>Width: <span id="width"> &nbsp;</span>,   Height: <span id="height">&nbsp;
+                   </span>, Colour Depth: <span id="colorDepth"></span>, Pixel Depth: <span id="pixelDepth"></span></h4>
+        	<h4>Agent: <span id="browserAgent"></span></h4>
+     	</div>
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" data-position="fixed">
+		<a href="#main" data-role="button" data-icon="home" data-inline="true">home</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Information page -->
+<div data-role="page" id="information">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Information</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">	
+		<p> This page should be used to give some basic information to the user of the 
+		Societies Android Client</p>
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" data-position="fixed">
+		<a href="#main" data-role="button" data-icon="home" data-inline="true">home</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Device Manager example page -->
+<div data-role="page" id="deviceManager">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Device Manager</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">	
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" data-position="fixed">
+		<a href="#menu" data-role="button" data-icon="back" data-inline="true">menu</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+
+</body>
+</html>

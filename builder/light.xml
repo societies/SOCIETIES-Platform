@@ -28,8 +28,8 @@
   <modules>
     <!-- An example entry -->
      
-      <module>../client-framework/PhoneGapReference</module>
-      <module>../client-framework/MasterGUI</module>
+      <module>../platform-infrastructure/client-frwk/PhoneGapReference</module>
+      <module>../platform-infrastructure/client-frwk/MasterGUI</module>
     <!-- API -->
 
     <!-- Service Infrastructue -->

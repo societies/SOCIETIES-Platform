@@ -3,6 +3,9 @@ package org.societies.privacytrust.privacyprotection.api.external;
 import org.societies.privacytrust.privacyprotection.api.internal.IDataObfuscationManager;
 import org.societies.privacytrust.privacyprotection.api.model.privacyPolicy.RequestPolicy;
 import org.societies.privacytrust.privacyprotection.api.model.privacyPolicy.ResponseItem;
+import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
+import org.societies.privacytrust.privacyprotection.mock.EntityIdentifier;
+import org.societies.privacytrust.privacyprotection.mock.ServiceResourceIdentifier;
 
 /**
  * External interface to do actions when using a data.
@@ -24,7 +27,7 @@ public interface IPrivacyDataManager extends IDataObfuscationManager{
 	 * @param serviceId The service_Id the service
 	 * @return A ResponseItem with permission information in it
 	 */
-	public ResponseItem checkPermission(Object dataId, Object ownerId, Object requestorId, Object serviceId);
+	public ResponseItem checkPermission(DataIdentifier dataId, EntityIdentifier ownerId, EntityIdentifier requestorId, ServiceResourceIdentifier serviceId);
 
 	/**
 	 * Check permission to access/use/disclose a data for a CIS usage
@@ -39,7 +42,7 @@ public interface IPrivacyDataManager extends IDataObfuscationManager{
 	 * @param cisId the ID of the CIS which wants to access the data
 	 * @return A ResponseItem with permission information in it
 	 */
-	public ResponseItem checkPermission(Object dataId, Object ownerId, Object requestorId, String cisId);
+	public ResponseItem checkPermission(DataIdentifier dataId, EntityIdentifier ownerId, EntityIdentifier requestorId, EntityIdentifier cisId);
 
 	/**
 	 * Check permission to access/use/disclose a data in a case that no negotiation have been done.
@@ -54,5 +57,5 @@ public interface IPrivacyDataManager extends IDataObfuscationManager{
 	 * @param usage Information about the use of the data: purpose, retention-time, people who will access this data... Need to be formalised!
 	 * @return A ResponseItem with permission information in it
 	 */
-	public ResponseItem checkPermission(Object dataId, Object ownerId, String requestorId, RequestPolicy usage);
+	public ResponseItem checkPermission(DataIdentifier dataId, EntityIdentifier ownerId, EntityIdentifier requestorId, RequestPolicy usage);
 }
