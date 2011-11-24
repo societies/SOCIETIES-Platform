@@ -1,18 +1,10 @@
-/**
- * This components gets a CIS activity feed and can analyse it in order to find patterns
- * of collaboration. The input to the component is one or more CIS activity feeds, and
- * the output is a list of users/CSSs. The component can be fine-tuned by changing the 
- * weighting in the selection algorithm, e.g. the user can specify that location messages
- * should weight more than activity messages when suggesting sub-CISs.
- */
 package org.societies.comorch.cscw.api;
 
-import org.societies.cis.collaboration.api.*;
 import org.societies.cis.management.api.*;
 
 /**
- * This components gets a CIS activity feed and can analyse it in order to find patterns
- * of collaboration. The input to the component is one or more CIS activity feeds, and
+ * This interface gets a {@link CISActivityFeed} and can analyse it in order to find patterns
+ * of collaboration. The input to the component is one or more CISActivityFeeds, and
  * the output is a list of users/CSSs. The component can be fine-tuned by changing the 
  * weighting in the selection algorithm, e.g. the user can specify that location messages
  * should weight more than activity messages when suggesting sub-CISs.
@@ -35,6 +27,10 @@ public interface ICollaborationPatternAnalyzer {
 	 * @return list of recommended CISs in form of CISRecord data type.
 	 */
 	public CISRecord[] getRecommendedCisList(String cssId);
+	public CISRecord[] getRecommendedCisList(String cssId, String[] weights);
+	public void setWeights(String[] weights);
+	public void getWeights(String[] weights);
+	
 	
 
 }
