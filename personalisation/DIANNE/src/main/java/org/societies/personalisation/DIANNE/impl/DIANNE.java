@@ -19,6 +19,39 @@
  */
 package org.societies.personalisation.DIANNE.impl;
 
-public class DIANNE {
+import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE;
+import org.societies.personalisation.common.api.model.ContextAttribute;
+import org.societies.personalisation.common.api.model.EntityIdentifier;
+import org.societies.personalisation.common.api.model.IOutcome;
+import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+
+public class DIANNE implements IDIANNE{
+
+	@Override
+	public IOutcome getOutcome(EntityIdentifier ownerId,
+			ServiceResourceIdentifier serviceId, String preferenceName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IOutcome getOutcome(EntityIdentifier ownerId,
+			ServiceResourceIdentifier serviceId, String preferenceName,
+			ContextAttribute attribute) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void enableDIANNELearning(EntityIdentifier ownerId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void disableDIANNELearning(EntityIdentifier ownerId) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

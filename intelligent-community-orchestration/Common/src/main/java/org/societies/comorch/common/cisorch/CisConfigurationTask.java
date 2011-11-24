@@ -6,7 +6,9 @@
  * 
  */
 
-public class CISConfigurationTask extends CISOrchestrationTask {
+public class CisConfigurationTask extends CisOrchestrationTask {
+	
+	ArrayList<Cis> otherCissInvolved;
 	
 	/*
      * Constructor for CISConfigurationTask.
@@ -17,7 +19,7 @@ public class CISConfigurationTask extends CISOrchestrationTask {
 	 * 				?
 	 */
 	
-	public CISConfigurationTask() {}
+	public CisConfigurationTask() {}
 	
 	/*
 	 * Description: The configureCIS method alters configures the given CIS
@@ -28,6 +30,8 @@ public class CISConfigurationTask extends CISOrchestrationTask {
 	 * 				?
 	 */
 	
-	public void configureCIS(CIS cisToConfigure) {}
+	public void configureCis(Cis cisToConfigure) {}
+	
+	public void configureCis(Cis cisToConfigure, ArrayList<cis> otherCissInvolved) {}
 	
 }

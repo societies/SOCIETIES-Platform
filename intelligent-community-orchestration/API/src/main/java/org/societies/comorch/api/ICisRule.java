@@ -9,7 +9,7 @@
 
 package org.societies.comorch.api;
 
-public interface ICISRule {
+public interface ICisRule {
     
 	//States the type of the rule, which is one of the following three:
 	//  Lifecycle:  Relates to the creation, configuration,
@@ -44,7 +44,7 @@ public interface ICISRule {
 	 *                                in order to create it. 
 	 */
 	
-	public ICISRule(String ruleType, HashMap ruleToCreate);
+	public ICisRule(String ruleType, HashMap ruleToCreate);
 	
 	/*
 	 * Description: The modifyRule method alters the rule that the CISRule 
@@ -69,7 +69,7 @@ public interface ICISRule {
 	 *				* False if the method was unable to modify the CIS rule.
 	 */
     
-	public boolean modifyRule(CISRule replacingRule);
+	public boolean modifyRule(CisRule replacingRule);
 	
 	/*
 	 * Description: The deleteRule method causes the CISRule object
