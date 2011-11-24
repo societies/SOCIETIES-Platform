@@ -25,14 +25,16 @@
 package org.societies.context.model.api;
 
 import java.io.Serializable;
+import java.util.Set;
 
-public class ContextBond {
+public class CtxBond {
 
 	private CtxBondOriginType originType;
 	private CtxModelType modelType;
 	private String type;
 	private Serializable minValue;
 	private Serializable maxValue;
+	private Set<Serializable> values;
 	
 	public CtxBondOriginType getOriginType() {
 		return this.originType;

@@ -37,7 +37,7 @@ package org.societies.context.model.api;
  *         Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-public enum CtxOriginType {
+public enum CtxBondOriginType {
 
     /**
      * The enum constant for manually set context bonds
