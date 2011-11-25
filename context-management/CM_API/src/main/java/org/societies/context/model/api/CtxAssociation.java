@@ -156,4 +156,9 @@ public class CtxAssociation extends CtxModelObject {
 		
 		this.entities.remove(entityId);
 	}
+	
+	/* TODO
+	@Override
+	public String toString() {
+	}*/
 }
