@@ -1,4 +1,4 @@
-package org.societies.comorch.common.cisorch;
+package org.societies.comorch.common.cisrule;
 
 /**
  * This class represents a CIS configuration task
@@ -8,7 +8,7 @@ package org.societies.comorch.common.cisorch;
  * 
  */
 
-public class CisConfigurationTask extends CisOrchestrationTask {
+public class ICisRule {
 	
 	ArrayList<Cis> otherCissInvolved;
 	

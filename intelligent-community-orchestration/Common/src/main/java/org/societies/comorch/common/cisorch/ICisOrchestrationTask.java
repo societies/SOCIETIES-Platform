@@ -1,3 +1,5 @@
+package org.societies.comorch.common.cisorch;
+
 /**
  * This class represents a CIS orchestration task
  * 
@@ -6,7 +8,7 @@
  * 
  */
 
-public class CisOrchestrationTask extends CisOrchestrationTask {
+public interface ICisOrchestrationTask {
 	
 	String orchestrationType;
 	Cis cisToOrchestrate;
@@ -21,7 +23,7 @@ public class CisOrchestrationTask extends CisOrchestrationTask {
 	 * 				?
 	 */
 	
-	public CisOrchestrationTask(String orchestrationType, Cis cisToOrchestrate) {}
+	public CisOrchestrationTask(String orchestrationType, Cis cisToOrchestrate);
 	
 	/*
 	 * Description: The orchestrateCIS method carries out orchestration
@@ -34,8 +36,8 @@ public class CisOrchestrationTask extends CisOrchestrationTask {
 	
 	//public CisOrchestrationTask(String orchestrationType, Cis cisToOrchestrate, ArrayList<Cis> otherCissInvolved) {}
 	
-	public void orchestrateCis(Cis cisToOrchestrate) {}
+	public void orchestrateCis(Cis cisToOrchestrate);
 	
-	public void orchestrateCis(Cis cisToOrchestrate, ArrayList<Cis> otherCissInvolved) {}
+	public void orchestrateCis(Cis cisToOrchestrate, ArrayList<Cis> otherCissInvolved);
 	
 }

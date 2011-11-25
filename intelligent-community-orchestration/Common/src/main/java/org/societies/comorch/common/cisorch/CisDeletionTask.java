@@ -1,3 +1,5 @@
+package org.societies.comorch.common.cisorch;
+
 /**
  * This class represents a CIS deletion task
  * 
