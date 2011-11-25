@@ -10,26 +10,26 @@ package org.societies.comorch.common.cisorch;
 
 public class CisDeletionTask extends CisOrchestrationTask {
 	
+	private Cis cisToDelete;
+	
 	/*
      * Constructor for CISDeletionTask.
      * 
 	 * Description: The constructor creates a new CISDeletionTask with the details
 	 *              passed to it.
-	 * Parameters: 
-	 * 				?
 	 */
 	
 	public CisDeletionTask() {}
 	
 	/*
-	 * Description: The deleteCIS method alters deletes the given CIS
+	 * Description: The deleteCIS method deletes the given CIS.
 	 *          
 	 * Parameters: 
-	 * 				?
+	 * 				cisToDelete - The CIS that will be deleted.
 	 * Returns:
-	 * 				?
+	 * 				True if successful in deleting the CIS; false otherwise.
 	 */
 	
-	public void deleteCis(Cis cisToDelete) {}
+	public boolean deleteCis(Cis cisToDelete) {}
 	
 }

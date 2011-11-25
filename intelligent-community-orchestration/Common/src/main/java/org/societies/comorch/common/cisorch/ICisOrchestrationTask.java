@@ -12,6 +12,7 @@ public interface ICisOrchestrationTask {
 	
 	String orchestrationType;
 	Cis cisToOrchestrate;
+	
 	//ArrayList<Cis> otherCissInvolved;
 	
 	/*
@@ -19,25 +20,37 @@ public interface ICisOrchestrationTask {
      * 
 	 * Description: The constructor creates a new CISOrchestrationTask with the details
 	 *              passed to it.
-	 * Parameters: 
-	 * 				?
 	 */
 	
-	public CisOrchestrationTask(String orchestrationType, Cis cisToOrchestrate);
+	public CisOrchestrationTask();
 	
 	/*
 	 * Description: The orchestrateCIS method carries out orchestration
 	 *              on the CIS by creating the relevant lower-level task.
 	 * Parameters: 
-	 * 				?
+	 * 				cisToOrchestrate - The CIS that will be orchestrated.
 	 * Returns:
-	 * 				?
+	 * 				True if successful in orchestrating the CIS, false otherwise.
 	 */
 	
+	
+	
+	public boolean orchestrateCis(Cis cisToOrchestrate);
+	
+    public CisOrchestrationTask(String orchestrationType, Cis cisToOrchestrate);
+	
+	/*
+	 * Description: The orchestrateCIS method carries out orchestration
+	 *              on the CIS by creating the relevant lower-level task.
+	 * Parameters: 
+	 * 				cisToOrchestrate - The CIS that will be orchestrated.
+	 *              otherCissInvolved - Any other relevant CISs to the orchestration process.
+	 * Returns:
+	 * 				True if successful in orchestrating the CIS, false otherwise.
+	 */
+	
+	public boolean orchestrateCis(Cis cisToOrchestrate, ArrayList<Cis> otherCissInvolved);
+	
 	//public CisOrchestrationTask(String orchestrationType, Cis cisToOrchestrate, ArrayList<Cis> otherCissInvolved) {}
-	
-	public void orchestrateCis(Cis cisToOrchestrate);
-	
-	public void orchestrateCis(Cis cisToOrchestrate, ArrayList<Cis> otherCissInvolved);
 	
 }

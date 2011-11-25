@@ -10,30 +10,42 @@ package org.societies.comorch.common.cisorch;
 
 public class CisConfigurationTask extends CisOrchestrationTask {
 	
-	ArrayList<Cis> otherCissInvolved;
+	private Cis cisToConfigure;
+	private ArrayList<Cis> otherCissInvolved;
 	
 	/*
      * Constructor for CISConfigurationTask.
      * 
 	 * Description: The constructor creates a new CISConfigurationTask with the details
 	 *              passed to it.
-	 * Parameters: 
-	 * 				?
 	 */
 	
 	public CisConfigurationTask() {}
 	
 	/*
-	 * Description: The configureCIS method alters configures the given CIS
+	 * Description: The configureCIS method configures the given CIS
 	 *              in accordance with the configuration details provided
 	 * Parameters: 
-	 * 				?
+	 * 				cisToConfigure - The CIS that will be configured.
 	 * Returns:
-	 * 				?
+	 * 				True if successful in configuring the CIS, false otherwise.
 	 */
 	
 	public void configureCis(Cis cisToConfigure) {}
 	
-	public void configureCis(Cis cisToConfigure, ArrayList<cis> otherCissInvolved) {}
+	/*
+	 * Description: The configureCIS method configures the given CIS
+	 *              in accordance with the configuration details provided
+	 * Parameters: 
+	 * 				cisToConfigure - The CIS that will be configured.
+	 *              otherCissInvolved - Details on other CISs relevant to the
+	 *              configuration process; for example, the configuration may
+	 *              involve the basic CIS being replaced with two new CISs,
+	 *              in a 'splitting' action.
+	 * Returns:
+	 * 				True if successful in configuring the CIS, false otherwise.
+	 */
+	
+	public boolean configureCis(Cis cisToConfigure, ArrayList<cis> otherCissInvolved) {}
 	
 }

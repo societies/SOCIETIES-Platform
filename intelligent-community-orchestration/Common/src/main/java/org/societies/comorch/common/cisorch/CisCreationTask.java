@@ -10,13 +10,13 @@ package org.societies.comorch.common.cisorch;
 
 public class CisCreationTask extends CisOrchestrationTask {
 	
+	private Cis cisToCreate;
+	
 	/*
      * Constructor for CISCreationTask.
      * 
 	 * Description: The constructor creates a new CISCreationTask with the details
 	 *              passed to it.
-	 * Parameters: 
-	 * 				?
 	 */
 	
 	public CisCreationTask() {}
@@ -25,11 +25,11 @@ public class CisCreationTask extends CisOrchestrationTask {
 	 * Description: The createCIS method creates a CIS based on the 
 	 *              information passed.
 	 * Parameters: 
-	 * 				?
+	 * 				cisToCreate - The CIS that will be created.
 	 * Returns:
-	 * 				?
+	 * 				True if successful in creating the CIS, false otherwise.
 	 */
 	
-	public void createCis(Cis cisToCreate) {}
+	public boolean createCis(Cis cisToCreate) {}
 	
 }
