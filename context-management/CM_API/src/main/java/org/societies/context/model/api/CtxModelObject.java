@@ -27,6 +27,16 @@ package org.societies.context.model.api;
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * This class is used to represent context model objects.
+ * 
+ * @see CtxEntity
+ * @see CtxAttribute
+ * @see CtxAssociation
+ * @see CtxModelType
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
+ */
 public abstract class CtxModelObject implements Serializable {
 
 	private static final long serialVersionUID = 7349640661605024918L;
@@ -36,11 +46,62 @@ public abstract class CtxModelObject implements Serializable {
 
 	CtxModelObject() {}
 
+	/**
+	 * Returns the identifier of this context model object
+     * 
+     * @return the identifier of this context model object
+     * @see CtxIdentifier
+	 */
 	public CtxIdentifier getId(){
 		return this.id;
 	}
 
+	/**
+	 * Returns the last modification time of this context model object
+	 * 
+	 * @return the last modification time of this context model object
+	 */
 	public Date getLastModified(){
 		return this.lastModified;
 	}
+	
+	/**
+	 * Returns the model type of this context model object, i.e. Entity,
+	 * Attribute or Association
+	 * 
+	 * @return the enum constant for the context model type
+	 * @see CtxIdentifier#getModelType()
+	 */
+	public CtxModelType getModelType() {
+	    return this.getId().getModelType();
+	}
+	
+	/**
+	 * Returns the semantic tag (e.g. "person") of this context model object
+	 * 
+	 * @return the semantic tag of this context model object
+	 * @see CtxIdentifier#getType()
+	 */
+	public String getType() {
+		return this.getId().getType();
+	}
+	
+	/**
+	 * Returns the numeric part of this context model object identifier 
+	 * 
+	 * @return the numeric part of this context model object identifier
+	 * @see CtxIdentifier#getObjectNumber()
+	 */
+	public Long getObjectNumber() {
+		return this.getId().getObjectNumber();
+	}
+	
+	/* TODO
+	 * Returns a String representation of this context model object
+     * 
+     * @return a String representation of this context model object
+     * 
+	@Override
+	public String toString() {
+	}*/
 }
