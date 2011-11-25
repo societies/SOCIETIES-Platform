@@ -99,7 +99,7 @@ public class CtxEntity extends CtxModelObject {
 		if (type == null) {
 			result.addAll(this.attributes);
 		} else {
-			for (CtxAttribute attr : this.attributes)
+			for (final CtxAttribute attr : this.attributes)
 				if (type.equalsIgnoreCase(attr.getType()))
 						result.add(attr);
 		}
@@ -140,7 +140,7 @@ public class CtxEntity extends CtxModelObject {
 		if (type == null) {
 			result.addAll(this.associations);
 		} else {
-			for (CtxAssociationIdentifier assoc : this.associations)
+			for (final CtxAssociationIdentifier assoc : this.associations)
 				if (type.equalsIgnoreCase(assoc.getType()))
 						result.add(assoc);
 		}
