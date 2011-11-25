@@ -26,30 +26,84 @@ package org.societies.context.model.api;
 
 import java.io.Serializable;
 
+import org.societies.context.mock.spm.identity.EntityIdentifier;
+
+/**
+ * This abstract class is used to identify context model objects. It provides methods
+ * that return information about the identified model object including:
+ * <ul>
+ * <li><tt>OperatorId</tt>: A unique identifier of the CSS or CIS where the 
+ * identified context model object is stored.
+ * </li>
+ * <li><tt>ModelType</tt>: Describes the type of the identified context model
+ * object, i.e. is one of the following: {@link CtxModelType#ENTITY ENTITY},
+ * {@link CtxModelType#ATTRIBUTE ATTRIBUTE}, or {@link CtxModelType#ASSOCIATION
+ * ASSOCIATION}.</li>
+ * <li><tt>Type</tt>: A semantic tag that characterises the identified context
+ * model object. e.g. "person".</li>
+ * <li><tt>ObjectNumber</tt>: A unique number within the device where the
+ * respective context information was initially sensed/collected and stored.</li>
+ * </ul>
+ * 
+ * @see CtxModelType
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
+ */
 public abstract class CtxIdentifier implements Serializable {
 
 	private static final long serialVersionUID = 3552976823045895472L;
 	
+	private EntityIdentifier operatorId;
 	private String type;
-	private long objectNumber;
+	private Long objectNumber;
 
 	CtxIdentifier() {}
 
+	/**
+	 * Returns a unique identifier of the CSS or CIS where the identified
+	 * context model object is stored
+     * 
+	 * @return a unique identifier of the CSS or CIS where the identified 
+	 * context model object is stored
+	 */
+	public EntityIdentifier getOperatorId() {
+		return this.operatorId;
+	}
+	
+	/**
+	 * Returns the type of the identified context model object
+	 * 
+	 * @return the type of the identified context model object
+	 * @see CtxModelType
+	 */
 	public abstract CtxModelType getModelType();
 
 	/**
-	 *  
-	 * @return
+	 * Returns the semantic tag (e.g. "person") that characterises the
+	 * identified context model object
+     * 
+     * @return the semantic tag of the identified context model object 
 	 */
 	public String getType() {
 		return this.type;
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * Returns the numeric part of this context model object identifier
+     * 
+     * @return the numeric part of this context model object identifier
 	 */
-	public long getObjectNumber() {
+	public Long getObjectNumber() {
 		return this.objectNumber;
 	}
+	
+	/*
+	 * TODO 
+	 * Returns a String representation of this context model object identifier
+	 * 
+	 * @return a String representation of this context model object identifier
+	 *
+	@Override
+	public String toString() {
+	}*/
 }
