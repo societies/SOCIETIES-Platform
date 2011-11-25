@@ -1,4 +1,4 @@
-package org.societies.comorch.common.cisorch;
+package org.societies.comorch.api;
 
 /**
  * This class represents a CIS orchestration task
