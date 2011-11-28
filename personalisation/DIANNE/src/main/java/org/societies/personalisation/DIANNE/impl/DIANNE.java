@@ -19,6 +19,8 @@
  */
 package org.societies.personalisation.DIANNE.impl;
 
+import java.util.HashMap;
+
 import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE;
 import org.societies.personalisation.common.api.model.ContextAttribute;
 import org.societies.personalisation.common.api.model.EntityIdentifier;
@@ -26,6 +28,12 @@ import org.societies.personalisation.common.api.model.IOutcome;
 import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
 
 public class DIANNE implements IDIANNE{
+
+	private HashMap<EntityIdentifier, NetworkRunner> networks;
+
+	public DIANNE(){
+		networks = new HashMap<EntityIdentifier, NetworkRunner>();
+	}
 
 	@Override
 	public IOutcome getOutcome(EntityIdentifier ownerId,
@@ -44,14 +52,23 @@ public class DIANNE implements IDIANNE{
 
 	@Override
 	public void enableDIANNELearning(EntityIdentifier ownerId) {
-		// TODO Auto-generated method stub
-		
+		System.out.println("Enabling incremental learning for identity: "+ ownerId);
+		if(networks.containsKey(ownerId)){
+			NetworkRunner network = networks.get(ownerId);
+			network.play();
+		}else{
+			System.out.println("No networks exist for this identity");
+		}
 	}
 
 	@Override
 	public void disableDIANNELearning(EntityIdentifier ownerId) {
-		// TODO Auto-generated method stub
-		
+		System.out.println("Disabling incremental learning for identity: "+ ownerId);	
+		if(networks.containsKey(ownerId)){
+			NetworkRunner network = networks.get(ownerId);
+			network.pause();
+		}else{
+			System.out.println("No networks exist for this identity");
+		}
 	}
-
 }

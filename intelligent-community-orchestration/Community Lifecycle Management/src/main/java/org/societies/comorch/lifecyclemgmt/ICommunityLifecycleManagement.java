@@ -21,11 +21,11 @@ public interface ICommunityLifecycleManagement {
 	
 	
 	
-	public void createCISs();
+	public void createCiss();
 	
-	public void configureCISs();
+	public void configureCiss();
 	
-	public void deleteCISs();
+	public void deleteCiss();
 	
 	public void processPreviousLongTimeCycle();
 	

@@ -2,10 +2,14 @@ package org.societies.personalisation.DIANNE.impl.model;
 
 import java.util.Iterator;
 
+import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+
 public class OutcomeGroup extends Group
 {
-	public OutcomeNode winnerNode;
-	public OutcomeNode previousWinner;
+	private OutcomeNode winnerNode;
+	private OutcomeNode previousWinner;
+	private ServiceResourceIdentifier serviceId;
+	private String serviceType;
 
 	//gradient variables
 	private double gradient;
@@ -19,6 +23,19 @@ public class OutcomeGroup extends Group
 
 	public OutcomeGroup(String groupName){
 		super(groupName);
+		step = 10;
+		upperBound = step;
+		lowerBound = -step;
+		gradient = 2/(upperBound-lowerBound);
+		boost = null;
+		unboost = null;
+		winnerNode = null;
+	}
+	
+	public OutcomeGroup(ServiceResourceIdentifier serviceId, String serviceType, String groupName){
+		super(groupName);
+		this.serviceId = serviceId;
+		this.serviceType = serviceType;
 		step = 10;
 		upperBound = step;
 		lowerBound = -step;
@@ -264,6 +281,14 @@ public class OutcomeGroup extends Group
 	public OutcomeNode getWinnerNode()
 	{
 		return winnerNode;
+	}
+	
+	public ServiceResourceIdentifier getServiceId(){
+		return serviceId;
+	}
+	
+	public String getServiceType(){
+		return serviceType;
 	}
 
 	public double getGradient(){
