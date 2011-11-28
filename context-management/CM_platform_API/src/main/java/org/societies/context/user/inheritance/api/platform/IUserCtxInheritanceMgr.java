@@ -38,29 +38,37 @@ import org.societies.context.model.api.CtxAttributeValueType;
 public interface IUserCtxInheritanceMgr {
 
 	/**
+	 * Gets an indicated CIS.
 	 * 
 	 * @param cisId
+	 * @since 0.0.1
 	 */
 	public void getCIS(EntityIdentifier cisId);
 
 	/**
+	 * Gets the Context Attribe of an indicated type and CIS.
 	 * 
 	 * @param contextAttributeIdentifier
 	 * @param type
 	 * @param cisId
+	 * @since 0.0.1
 	 */
 	public void getContextAttribute(CtxAttributeIdentifier contextAttributeIdentifier, CtxAttributeValueType type, EntityIdentifier cisId);
 
 	/**
+	 * Inherits the Context Attribute of a specified type.
 	 * 
 	 * @param contextAttributeIdentifier
 	 * @param type
+	 * @since 0.0.1
 	 */
 	public void inheritContextAttribute(CtxAttributeIdentifier contextAttributeIdentifier, CtxAttributeValueType type);
 
 	/**
+	 * Resolves conflicts using specified algorithms.
 	 * 
 	 * @param conflictResolutionsAlgorithms
+	 * @since 0.0.1
 	 */
 	public void resolveConflicts(ConflictResolutionAlgorithm conflictResolutionsAlgorithms);
 

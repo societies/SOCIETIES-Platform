@@ -36,8 +36,10 @@ import org.societies.context.model.api.CtxAttributeIdentifier;
 public interface IUserCtxRefiner {
 
 	/**
+	 * Refines context for an indicate Context Attribute. 
 	 * 
 	 * @param attrId
+	 * @since 0.0.1
 	 */
 	public void refineContext(CtxAttributeIdentifier attrId);
 

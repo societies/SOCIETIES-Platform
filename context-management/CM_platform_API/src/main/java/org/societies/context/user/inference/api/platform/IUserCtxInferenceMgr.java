@@ -45,96 +45,133 @@ import org.societies.context.user.prediction.api.platform.PredictionMethod;
 public interface IUserCtxInferenceMgr {
 
 	/**
+	 * Checks the quality of an indicated Context Model Object.
 	 * 
 	 * @param object
+	 * @since 0.0.1
 	 */
 	public void checkQuality(CtxModelObject object);
 
 	/**
+	 * Evaluates the similatiry of two indicated Context Attributes.
 	 * 
 	 * @param ctxID
 	 * @param ctxID2
+	 * @return a number indicating the objects similarity
+	 * @since 0.0.1
 	 */
 	public Double evaluateSimilarity(CtxAttributeIdentifier ctxID, CtxAttributeIdentifier ctxID2);
 
 	/**
+	 * This method returns a linked map with key the recorded
+	 * CtxAttributeIdentifier and value the result of the 
+	 * similarity evaluation. 
 	 * 
 	 * @param listCtxID
 	 * @param listCtxID2
+	 * @since 0.0.1
 	 */
 	public Map<CtxAttributeIdentifier,Double> evaluateSimilarity(List<CtxAttributeIdentifier> listCtxID, List<CtxAttributeIdentifier> listCtxID2);
 
 	/**
+	 * Gets the default prediction method. 
 	 * 
 	 * @param predictionMethod
+	 * @return prediction method
+	 * @since 0.0.1
 	 */
 	public PredictionMethod getDefaultPredictionMethod(PredictionMethod predictionMethod);
 
 	/**
+	 * Gets a prediction method.
 	 * 
 	 * @param predictionMethodl
+	 * @return prediction method
+	 * @since 0.0.1
 	 */
 	public PredictionMethod getPredictionMethod(PredictionMethod predictionMethod);
 
 	/**
+	 * Inherits the Context Attribute belonging to a CIS.
 	 * 
 	 * @param ctxAttrId
 	 * @param type
 	 * @param cisid
+	 * @since 0.0.1
 	 */
 	public void inheritContext(CtxAttributeIdentifier ctxAttrId, CtxAttributeValueType type, EntityIdentifier cisid);
 
 	/**
-	 * 
+	 * Predicts context using indicated prediction method and date.
+	 *  
 	 * @param ctxAttrID
 	 * @param predictionMethod
 	 * @param date
+	 * @returns context attribute with predicted context
+	 * @since 0.0.1
 	 */
 	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, PredictionMethod predictionMethod, Date date);
 
 	/**
+	 * Predicts context using indicated prediction method and index. 
 	 * 
 	 * @param ctxAttrID
 	 * @param predictionMethodl
-	 * @param int
+	 * @param index
+	 * @returns context attribute with predicted context
+	 * @since 0.0.1
 	 */
-	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, PredictionMethod predictionMethodl, int index );
+	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, PredictionMethod predictionMethodl, int index);
 
 	/**
+	 * Predicts context using indicated date. 
 	 * 
 	 * @param ctxAttrID
 	 * @param date
+	 * @returns context attribute with predicted context
+	 * @since 0.0.1
 	 */
 	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, Date date);
 
 	/**
+	 * Predicts context using indicated index.
 	 * 
 	 * @param ctxAttrID
 	 * @param index
+	 * @returns context attribute with predicted context
+	 * @since 0.0.1
 	 */
 	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, int index);
 
 	/**
+	 * Refines context for an indicate Context Attribute. 
 	 * 
 	 * @param ctxAttrId
+	 * @since 0.0.1
 	 */
 	public void refineContext(CtxAttributeIdentifier ctxAttrId);
 
 	/**
+	 * Removes a specified prediction method.
 	 * 
 	 * @param predictionMethod
+	 * @since 0.0.1
 	 */
 	public void removePredictionMethod(PredictionMethod predictionMethod);
 
 	/**
+	 * Sets an indicated prediction method as default.
 	 * 
 	 * @param predMethod
+	 * @since 0.0.1
 	 */
 	public void setDefaultPredictionMethod(PredictionMethod predMethod);
 
 	/**
+	 * Sets a prediction method.
 	 * 
 	 * @param predMethod
+	 * @since 0.0.1
 	 */
 	public void setPredictionMethod(PredictionMethod predMethod);
 

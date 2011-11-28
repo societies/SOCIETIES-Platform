@@ -25,6 +25,12 @@
 
 package org.societies.context.user.inheritance.api.platform;
 
+/**
+ * This class is used to resolve conflicts.
+ * 
+ * @author <a href="mailto:pkosmidi@central.ntua.gr">Pavlos Kosmides</a> (ICCS)
+ * @since 0.0.1
+ */
 public class ConflictResolutionAlgorithm {
 
 }

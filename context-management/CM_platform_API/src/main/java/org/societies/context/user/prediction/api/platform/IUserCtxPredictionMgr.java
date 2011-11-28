@@ -39,62 +39,85 @@ import org.societies.context.model.api.CtxAttributeIdentifier;
 public interface IUserCtxPredictionMgr {
 
 	/**
+	 * Gets the default prediction method.
 	 * 
 	 * @param predMethod
+	 * @return prediction method
+	 * @since 0.0.1
 	 */
 	public PredictionMethod getDefaultPredictionMethod(PredictionMethod predMethod);
 
 	/**
+	 * Gets a prediction method.
 	 * 
 	 * @param predMethod
+	 * @return prediction method
+	 * @since 0.0.1
 	 */
 	public PredictionMethod getPredictionMethod(PredictionMethod predMethod);
 
 	/**
+	 * Predicts context using indicated prediction method and date.
 	 * 
 	 * @param predictionModel
 	 * @param ctxAttrID
 	 * @param date
+	 * @return context attribute with predicted context
+	 * @since 0.0.1
 	 */
 	public CtxAttribute predictContext(PredictionMethod predictionModel, CtxAttributeIdentifier ctxAttrID, Date date);
 
 	/**
+	 * Predicts context using indicated date.
 	 * 
 	 * @param ctxAttrID
 	 * @param date
+	 * @return context attribute with predicted context
+	 * @since 0.0.1
 	 */
 	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, Date date);
 
 	/**
+	 * Predicts context using indicated index.
 	 * 
 	 * @param ctxAttrID
 	 * @param index
+	 * @return context attribute with predicted context
+	 * @since 0.0.1
 	 */
 	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, int index);
 
 	/**
+	 * Predicts context using indicated prediction method and index.
 	 * 
 	 * @param predictionModel
 	 * @param ctxAttrID
 	 * @param index
+	 * @return context attribute with predicted context
+	 * @since 0.0.1
 	 */
 	public CtxAttribute predictContext(PredictionMethod predictionModel, CtxAttributeIdentifier ctxAttrID, int index);
 
 	/**
+	 * Removes an indicated prediction method.
 	 * 
 	 * @param predMethod
+	 * @since 0.0.1
 	 */
 	public void removePredictionMethod(PredictionMethod predMethod);
 
 	/**
+	 * Sets an indicated prediction method as default.
 	 * 
 	 * @param predMethod
+	 * @since 0.0.1
 	 */
 	public void setDefaultPredictionMethod(PredictionMethod predMethod);
 
 	/**
-	 * 
+	 * Sets a prediction method.
 	 * @param predMethod
+	 * @since 0.0.1
 	 */
 	public void setPredictionMethod(PredictionMethod predMethod);
 
