@@ -28,67 +28,175 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * This class contains the necessary parameters for the description of the quality of context characteristics
- * of a context attribute.
- *  
- * @author nikosk
- *
+ * This class is used to represent the quality characteristics of context
+ * attribute values. This information is known as Quality of Context (QoC) and
+ * contains the following properties:
+ * <ul>
+ * <li><b>Freshness</b>: Specifies the age of context information. This is
+ * derived from the time that particular piece of context information was last
+ * updated.</li>
+ * <li><b>Origin</b>: Denotes whether a context attribute value was
+ * {@link CtxOriginType#MANUALLY_SET manually set}, {@link CtxOriginType#SENSED
+ * sensed}, {@link CtxOriginType#INFERRED inferred}, or 
+ * {@link CtxOriginType#INHERITED inherited}.</li>
+ * <li><b>Precision:</b> Denotes the quality of coherence or reproducibility of
+ * measured context attribute values. It is usually expressed in terms of the
+ * standard deviation of the extended set of measurement results from a well
+ * defined measurement process. The standard deviation of the conceptual
+ * population is approximated by the standard deviation of an extended set of
+ * actual context attribute value measurements. For directly sensed context
+ * information this parameter is identical to the precision of the sensor used,
+ * e.g. the precision of a GPS device.</li>
+ * <li><b>Update Frequency</b>: Defines how often a piece of context information
+ * is updated. For directly sensed context information this parameter is
+ * identical to the sample rate of the sensor used.</li>
+ * </ul>
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @see CtxAttribute
+ * @see CtxOriginType
+ * @since 0.0.1
  */
 public class CtxQuality implements Serializable {
 
-	private static final long serialVersionUID = -5345272592676091780L;
+	private static final long serialVersionUID = 2596329083367854427L;
+
+	/** The context attribute this QoC information refers to. */
+	private CtxAttribute attribute;
 	
+	/** The time the current context attribute value was last updated. */
 	private Date lastUpdated;
+	
+	/** The origin type of the current context attribute value. */
 	private CtxOriginType originType;
+	
+	/** The precision of the current context attribute value. */
 	private Double precision;
 	
-	private CtxQuality() {}
+	/** The update frequency of the current context attribute value. */
+	private Double updateFrequency;
+	
+	/**
+	 * Constructs a <code>CtxQuality</code> object for the specified context
+	 * attribute.
+	 * 
+	 * @param attribute
+	 * the context attribute to associate with this QoC information.
+	 */
+	CtxQuality(CtxAttribute attribute) {
+		this.attribute = attribute;
+	}
+	
+	/**
+	 * Returns the context attribute associated to this QoC information.
+	 * 
+	 * @return the context attribute associated to this QoC information.
+	 */
+	public CtxAttribute getAttribute() {
+		return this.attribute;
+	}
 
 	/**
-	 * 
-	 * @return Date
-	 */
-	public Date getLastUpdated(){
-		return this.lastUpdated;
-	}
-	
-	/**
-	 * 
-	 * @return long
+	 * Returns the time in milliseconds since the last update of the current
+	 * context attribute value.
+     * 
+     * @return the time in milliseconds since the last update of the current
+     * context attribute value.
+     * @see #getLastUpdated()
 	 */
 	public long getFreshness() {
-		return new Date().getTime() - this.lastUpdated.getTime();
+		return new Date().getTime() - this.getLastUpdated().getTime();
 	}
 	
 	/**
-	 * 
-	 * @return CtxOriginType
+     * Returns the time when the current context attribute value was last updated.
+     * 
+     * @return the time when the current context attribute value was last updated.
+     * @see #getFreshness()
+     */
+	public Date getLastUpdated(){
+		return (this.lastUpdated != null) 
+				? new Date(this.lastUpdated.getTime())
+				: new Date(this.attribute.getLastModified().getTime());
+	}
+	
+	/**
+	 * Returns the origin type of the current context attribute value.
+     * <p>
+     * The method returns <code>null</code> if the origin type has not been set. 
+     * 
+     * @return the origin type of the current context attribute value.
+     * @see CtxOriginType 
 	 */
 	public CtxOriginType getOriginType() {
 		return this.originType;
 	}
 	
 	/**
-	 * 
-	 * @param originType
+	 * Sets the origin type of the current context attribute value.
+     * 
+     * @param originType
+     *            the origin type of the current context attribute value to set
+     * @throws NullPointerException if the specified origin type is <code>null</code>.
+     * @see CtxOriginType
 	 */
 	public void setOriginType(CtxOriginType originType) {
+		if (originType == null)
+			throw new NullPointerException("originType can't be null");
+			
 		this.originType = originType;
 	}
 
 	/**
-	 * 
-	 * @return Double
+	 * Returns the precision of the current context attribute value.
+     * <p>
+     * The method returns <code>null</code> if precision has not been set.
+     * 
+     * @return the precision of the current context attribute value.
 	 */
 	public Double getPrecision() {
-		return new Double(this.precision);
+		return (this.precision != null) ? new Double(this.precision) : null;
 	}
 
 	/**
-	 * 
-	 * @param precision
+	 * Sets the precision of the current context attribute value.
+     * 
+     * @param precision
+     *            the precision of the current context attribute value to set.
+     * @throws NullPointerException if the specified precision is <code>null</code>.
 	 */
 	public void setPrecision(Double precision){
-		this.precision = new Double(precision);
+		this.precision = (precision != null) ? new Double(precision) : null;
 	}
+	
+	/**
+	 * Returns the update frequency of the current context attribute value.
+	 * <p>
+	 * The method returns <code>null</code> if the update frequency has not been
+	 * set.
+	 * 
+	 * @return the update frequency of the current context attribute value
+	 */
+	public Double getUpdateFrequency() {
+		return (this.updateFrequency != null) ? new Double(this.updateFrequency) : null;
+	}
+	
+	/**
+	 * Sets the update frequency of the current context attribute value.
+	 * 
+	 * @param updateFrequency
+	 *            the update frequency of the current context attribute value to set.
+	 */
+	public void setUpdateFrequency(Double updateFrequency) {
+		this.updateFrequency = (updateFrequency != null) ? new Double(updateFrequency) : null;
+	}
+	
+	/**
+	 * TODO
+	 * Returns a String representation of this QoC information.
+	 * 
+	 * @return a String representation of this QoC information.
+	 *
+	public String toString() {
+	}*/
 }
