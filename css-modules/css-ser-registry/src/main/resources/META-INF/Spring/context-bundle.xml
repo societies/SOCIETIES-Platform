@@ -3,10 +3,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
-<bean id="cssRegistryService" class="org.societies.css.serregistry.db.impl.ServiceRegistryImpl" scope="prototype" >
-	<property name="cssRegistryDao" ref="cssRegistryDao"/>
+<bean id="cssRegistryService" class="org.societies.css.serregistry.db.impl.ServiceRegistryImpl">	
 </bean>	
 
-<bean id="cssRegistryDao" class="org.societies.css.serregistry.db.impl.ServiceRegistryDaoImpl" scope="prototype"/>
-
 </beans>
+	
