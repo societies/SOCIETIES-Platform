@@ -26,7 +26,7 @@ import android.widget.TextView;
  * @author olivierm
  * @date 28 nov. 2011
  */
-public class DeviceSatusActivity extends Activity {
+public class DeviceStatusActivity extends Activity {
 	private String TAG = "DeviceSatusActivity";
 
 	private TextView txtConnectivity;
