@@ -31,7 +31,7 @@ import org.societies.context.model.api.CtxEntityIdentifier;
 
 /**
  * @author nlia
- * @version 1.0
+ * @version 0.0.1
  * @created 12-Nov-2011 7:15:14 PM
  */
 public interface ICommunityCtxDBMgrCallback {

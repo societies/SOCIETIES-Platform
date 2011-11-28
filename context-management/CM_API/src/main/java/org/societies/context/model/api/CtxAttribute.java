@@ -26,6 +26,12 @@ package org.societies.context.model.api;
 
 import java.io.Serializable;
 
+/**
+ * This class is used to represent context attributes.
+ * 
+ * @author nikosk
+ * @version 0.0.1
+ */
 public class CtxAttribute extends CtxModelObject {
 
 	private static final long serialVersionUID = 2885099443175534995L;
@@ -47,15 +53,15 @@ public class CtxAttribute extends CtxModelObject {
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Returns the value of the CtxAttribute
+	 * @return Serializable
 	 */
 	public Serializable getValue(){
 		return this.value;
 	}
 
 	/**
-	 * 
+	 * Sets the value of the CtxAttribute
 	 * @param value
 	 */
 	public void setValue(Serializable value){
@@ -63,17 +69,28 @@ public class CtxAttribute extends CtxModelObject {
 	}
 	
 	/**
+	 * Returns the value type of the CtxAttribute
 	 * 
-	 * @return
+	 * @return CtxAttributeValueType
 	 */
 	public CtxAttributeValueType getValueType(){
 		return this.valueType;
 	}
 	
+	/**
+	 * Returns the metric for the context attribute value.
+	 * 
+	 * @return String
+	 */
 	public String getValueMetric() {
 		return this.valueMetric;
 	}
 	
+	/**
+	 * Sets tha metric for the context attribute value.
+	 * 
+	 * @param valueMetric
+	 */
 	public void setValueMetric(String valueMetric) {
 		this.valueMetric = valueMetric;
 	}

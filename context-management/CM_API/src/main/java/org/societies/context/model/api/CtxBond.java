@@ -24,9 +24,17 @@
  */
 package org.societies.context.model.api;
 
+
 import java.io.Serializable;
 import java.util.Set;
 
+/**
+ * This class describe the ContextAttribute that acts as a bond for a group of CtxEntity objects that form a CommunityCtxEntity.
+ * 
+ * @author nikosk
+ * @since 0.0.1
+ *  
+ */
 public class CtxBond {
 
 	private CtxBondOriginType originType;

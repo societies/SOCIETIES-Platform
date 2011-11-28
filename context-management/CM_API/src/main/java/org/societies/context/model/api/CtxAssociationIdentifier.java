@@ -24,6 +24,12 @@
  */
 package org.societies.context.model.api;
 
+/**
+ * This class is used in order to identify the CtxAssociation object.
+ * 
+ * @author nikosk
+ * @version 0.0.1
+ */
 public class CtxAssociationIdentifier extends CtxIdentifier {
 
 	private static final long serialVersionUID = -7991875953413583564L;
@@ -31,7 +37,9 @@ public class CtxAssociationIdentifier extends CtxIdentifier {
 	private CtxAssociationIdentifier() {}
 
 	/**
+	 * Returns the model type of the object 
 	 * 
+	 * @return CtxModelType
 	 */
 	@Override
 	public CtxModelType getModelType() {

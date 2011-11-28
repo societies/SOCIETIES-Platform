@@ -27,6 +27,13 @@ package org.societies.context.model.api;
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * This class contains the necessary parameters for the description of the quality of context characteristics
+ * of a context attribute.
+ *  
+ * @author nikosk
+ *
+ */
 public class CtxQuality implements Serializable {
 
 	private static final long serialVersionUID = -5345272592676091780L;
@@ -37,22 +44,42 @@ public class CtxQuality implements Serializable {
 	
 	private CtxQuality() {}
 
+	/**
+	 * 
+	 * @return Date
+	 */
 	public Date getLastUpdated(){
 		return this.lastUpdated;
 	}
 	
+	/**
+	 * 
+	 * @return long
+	 */
 	public long getFreshness() {
 		return new Date().getTime() - this.lastUpdated.getTime();
 	}
 	
+	/**
+	 * 
+	 * @return CtxOriginType
+	 */
 	public CtxOriginType getOriginType() {
 		return this.originType;
 	}
 	
+	/**
+	 * 
+	 * @param originType
+	 */
 	public void setOriginType(CtxOriginType originType) {
 		this.originType = originType;
 	}
 
+	/**
+	 * 
+	 * @return Double
+	 */
 	public Double getPrecision() {
 		return new Double(this.precision);
 	}

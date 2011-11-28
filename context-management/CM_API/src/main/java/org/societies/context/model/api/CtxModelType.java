@@ -24,6 +24,12 @@
  */
 package org.societies.context.model.api;
 
+/**
+ * Enumeration class that describes the context model type of a context model object. 
+ * 
+ * @author nikosk
+ * @version 0.0.1
+ */
 public enum CtxModelType {
 	
 	/**

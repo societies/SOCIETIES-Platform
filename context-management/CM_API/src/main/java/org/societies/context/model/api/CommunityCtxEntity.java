@@ -27,6 +27,26 @@ package org.societies.context.model.api;
 import java.util.HashSet;
 import java.util.Set;
 
+
+/**
+ * This class is used to represent community context entities. A
+ * <code>CommunityCtxEntity</code> is the core concept upon which the context model is
+ * built. It corresponds to an object of the physical or conceptual world. For
+ * example an entity could be a person, a device, or a service. The
+ * {@link CtxAttribute} class is used in order to describe an entity's
+ * properties. Concepts such as the name, the age, and the location of a person
+ * are described by different context attributes. Relations that may exist among
+ * different entities are described by the {@link CtxAssociation} class.
+ * <p>
+ * The <code>CtxEntity</code> class provides access to the contained
+ * context attributes and the associations this entity is member of.
+ * 
+ * @see CtxEntityIdentifier
+ * @see CtxAttribute
+ * @see CtxAssociation
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
+ */
 public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	
 	private static final long serialVersionUID = -8564823052068362334L;
@@ -35,14 +55,29 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 
 	private CommunityCtxEntity() {}
 
+	/**
+	 * Returns the members of this CommunityCtxEntity
+	 *  
+	 * @return
+	 */
 	public Set<CommunityMemberCtxEntity> getMembers() {
 		return new HashSet<CommunityMemberCtxEntity>(this.members);
 	}
 	
+	/**
+	 * Add a member to the community.
+	 * 
+	 * @param member
+	 */
 	public void addMember(CommunityMemberCtxEntity member) {
 		this.members.add(member);
 	}
 
+	/**
+	 * Remove a member from the community
+	 * 
+	 * @param member
+	 */
 	public void removeMember(CommunityMemberCtxEntity member) {
 		this.members.remove(member);
 	}

@@ -35,7 +35,7 @@ package org.societies.context.model.api;
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas
  *         Liampotis</a> (ICCS)
- * @since 0.0.1
+ * @version 0.0.1
  */
 public enum CtxBondOriginType {
 

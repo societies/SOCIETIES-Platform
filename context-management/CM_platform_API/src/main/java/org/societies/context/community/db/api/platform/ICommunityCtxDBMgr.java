@@ -32,7 +32,7 @@ import org.societies.context.model.api.CtxEntityIdentifier;
  * ICommunityCtxDBMgr platform interface. This interface provides access to community context database. 
  * 
  * @author nlia
- * @version 1.0
+ * @version 0.0.1
  * @created 12-Nov-2011 7:15:14 PM
  */
 public interface ICommunityCtxDBMgr {

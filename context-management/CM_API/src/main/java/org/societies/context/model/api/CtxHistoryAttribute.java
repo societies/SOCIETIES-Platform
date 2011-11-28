@@ -24,12 +24,18 @@
  */
 package org.societies.context.model.api;
 
+/**
+ * This class is user to represent context history attributes that will be stored in context history database.
+ * 
+ * @author nikosk
+ * 
+ */
 public class CtxHistoryAttribute extends CtxModelObject {
 	
 	private static final long serialVersionUID = -1908778456166623132L;
 
 	/**
-	 * 
+	 * Returns the id of the object.
 	 */
 	@Override
 	public CtxAttributeIdentifier getId() {

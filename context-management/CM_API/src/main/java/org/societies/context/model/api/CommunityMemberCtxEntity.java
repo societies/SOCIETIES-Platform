@@ -26,6 +26,12 @@ package org.societies.context.model.api;
 
 import java.util.HashSet;
 import java.util.Set;
+/**
+ * This class is used in order to model a CtxEntity that is a member of CommunityCtxEntities
+ * 
+ * @author nikosk
+ * @version 0.0.1
+ */
 
 public abstract class CommunityMemberCtxEntity extends CtxEntity {
 	
@@ -35,14 +41,29 @@ public abstract class CommunityMemberCtxEntity extends CtxEntity {
 
 	CommunityMemberCtxEntity() {}
 
+	/**
+	 * Returns a set with the community members.
+	 * 
+	 * @return set CommunityCtxEntity
+	 */
 	public Set<CommunityCtxEntity> getCommunities(){
 		return new HashSet<CommunityCtxEntity>(this.communities);
 	}
 	
+	/**
+	 * Add a CommunityCtxEntity to the community
+	 * 
+	 * @param community
+	 */
 	public void addCommunity(CommunityCtxEntity community) {
 		this.communities.add(community);
 	}
 	
+	/**
+	 * Remove a CommunityCtxEntity from the community.
+	 * 
+	 * @param community
+	 */
 	public void removeCommunity(CommunityCtxEntity community) {
 		this.communities.remove(community);
 	}

@@ -24,6 +24,11 @@
  */
 package org.societies.context.model.api;
 
+/**
+ * Specifies if the respectice CtxAttribute belongs to a community or individual CtxEntity.
+ * @author nikosk
+ *
+ */
 public enum CtxAttributeValueType {
 
 	/**

@@ -24,6 +24,13 @@
  */
 package org.societies.context.model.api;
 
+/**
+ * This class is used in order to identify the CtxAttribute object.
+ * 
+ * @author nikosk
+ * @version 0.0.1
+ *
+ */
 public class CtxAttributeIdentifier extends CtxIdentifier {
 	
 	private static final long serialVersionUID = -282171829285239788L;
@@ -32,12 +39,18 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 
 	private CtxAttributeIdentifier() {}
 	
+	/**
+	 * Returns the entity identifier which defines teh owner CtxEntity.
+	 * 
+	 *  @return CtxEntityIdentifier
+	 */
 	public CtxEntityIdentifier getScope() {
 		return this.scope;
 	}
 
 	/**
-	 * 
+	 *  Returns the model type of the object 
+	 *  @return CtxModelType
 	 */
 	@Override
 	public CtxModelType getModelType() {

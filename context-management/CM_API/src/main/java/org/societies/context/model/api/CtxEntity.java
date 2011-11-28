@@ -44,7 +44,7 @@ import java.util.Set;
  * @see CtxAttribute
  * @see CtxAssociation
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.1
+ * @version 0.0.1
  */
 public class CtxEntity extends CtxModelObject {
 
