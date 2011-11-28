@@ -25,25 +25,35 @@
 package org.societies.context.model.api;
 
 /**
- * Enumeration class that describes the context model type of a context model object. 
+ * Enumeration class that describes the context model type of a context model object.
+ * Context model objects can be of one of the following types:
+ * <ul>
+ * <li>{@link #ENTITY}: Denotes a context entity</li>
+ * <li>{@link #ATTRIBUTE}: Denotes a context attribute</li>
+ * <li>{@link #ASSOCIATION}: Denotes a context association</li>
+ * </ul>
  * 
- * @author nikosk
- * @version 0.0.1
+ * @author <a href="mailto:nliampotis@users.sourceforge.net">Nicolas Liampotis</a> (ICCS)
+ * @see CtxModelObject
+ * @see CtxEntity
+ * @see CtxAttribute 
+ * @see CtxAssociation
+ * @since 0.0.1 
  */
 public enum CtxModelType {
 	
 	/**
-	 * 
+	 * The enum constant for context entities
 	 */
 	ENTITY,
 	
 	/**
-	 * 
+	 * The enum constant for context attributes
 	 */
 	ATTRIBUTE,
 	
 	/**
-	 * 
+	 * The enum constant for context associations
 	 */
 	ASSOCIATION,
 }
