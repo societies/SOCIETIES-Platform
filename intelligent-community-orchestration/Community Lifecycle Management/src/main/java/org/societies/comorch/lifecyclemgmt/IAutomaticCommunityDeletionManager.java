@@ -12,13 +12,24 @@ public interface IAutomaticCommunityDeletionManager {
      * Constructor for IAutomaticCommunityDeletionManager
      * 
 	 * Description: The constructor creates the AutomaticCommunityDeletionManager
-	 *              component either on a given CSS, or abstractly at a domain/cloud-level.
+	 *              component on a given CSS.
 	 * Parameters: 
-	 * 				?
+	 * 				linkedCSS - the CSS that this object will operate on behalf of.
 	 */
 	
-	public IAutomaticCommunityDeletionManager();
+	public IAutomaticCommunityDeletionManager(Css linkedCss);
 	
-	public void determineCISsToDelete();
+	/*
+     * Constructor for IAutomaticCommunityDeletionManager
+     * 
+	 * Description: The constructor creates the AutomaticCommunityDeletionManager
+	 *              component abstractly at a domain/cloud-level.
+	 * Parameters: 
+	 * 				linkedDomain - the domain on behalf of which this object is to operate.
+	 */
+	
+	public IAutomaticCommunityDeletionManager(Domain linkedDomain);
+	
+	public void determineCissToDelete();
 
 }
