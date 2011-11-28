@@ -63,7 +63,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
     <!-- Privacy Mgmt -->
     <!-- User Agent --> 
     <!-- Personalisation Mgmt -->
-    <module>../personalisation/Personalisation-API</module>
+    <!-- <module>../personalisation/Personalisation-API</module>  -->
+    <module>../css-modules/css-ser-registry</module>
    
   </modules>
 </project>
