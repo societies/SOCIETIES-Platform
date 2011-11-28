@@ -31,8 +31,8 @@ import org.societies.context.model.CtxAttribute;
  * This exception is thrown whenever a CtxRefinement algorithm
  * is not able to infer a value for a Ctx Attribute.
  * 
- * @author <a href="mailto:pkosmidi@central.ntua.gr">Pavlos Kosmides</a>
- * @since 0.0.1
+ * @author <a href="mailto:pkosmidi@central.ntua.gr">Pavlos Kosmides</a> (ICCS)
+ * @version 0.0.1
  */
 public class NotInferredException extends Exception {
     

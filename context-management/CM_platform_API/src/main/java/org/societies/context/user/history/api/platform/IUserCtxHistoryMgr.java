@@ -34,9 +34,8 @@ import org.societies.context.model.api.CtxAttributeIdentifier;
 import org.societies.context.model.api.CtxHistoryAttribute;
 
 /**
- * @author nikosk
- * @version 1.0
- * @created 12-Nov-2011 7:15:15 PM
+ * @author <a href="mailto:nikosk@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
+ * @version 0.0.1
  */
 public interface IUserCtxHistoryMgr {
 

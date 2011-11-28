@@ -31,9 +31,8 @@ import org.societies.context.model.api.CtxAttributeValueType;
 
 
 /**
- * @author yboul
- * @version 1.0
- * @created 12-Nov-2011 7:15:15 PM
+ * @author <a href="mailto:ybouloudis@amitec.gr">Yiorgos Bouloudis</a> (AMITEC) 
+ * @version 0.0.1
  */
 public interface IUserCtxInheritanceMgr {
 
