@@ -2,13 +2,162 @@ package org.societies.personalisation.CRIST.api.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
 
-public class CRISTUserTask implements ICRISTUserTask{
+/**
+ * This class is used to define the data structure and methods for modelling and
+ * managing user tasks. Meanwhile, it is also responsible for establishing the
+ * relationship between user tasks and user actions as well as the relationship
+ * between user tasks and user actions.
+ * 
+ * @author Zhu WANG
+ * @version 1.0
+ * @created 28-Nov-2011 18:14:59
+ */
+public class CRISTUserTask implements ICRISTUserTask {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	Map<String, Serializable> taskContext;
+	String taskID;
+	LinkedHashMap<ICRISTUserSituation, Double> taskSituations;
+	LinkedHashMap<ICRISTUserAction, Double> userActions;
+
+	public void finalize() throws Throwable {
+
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param taskID
+	 * @param userActions
+	 * @param taskSituations
+	 */
+	public CRISTUserTask(String taskID,
+			LinkedHashMap<ICRISTUserAction, Double> userActions,
+			LinkedHashMap<ICRISTUserSituation, Double> taskSituations) {
+
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param taskID
+	 */
+	public CRISTUserTask(String taskID) {
+
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param taskID
+	 */
+	public CRISTUserTask() {
+
+	}
+
+	/**
+	 * This method will link the given ICRISTUserAction list to the current task
+	 * along with the corresponding transition probabilities
+	 * 
+	 * @param userActions
+	 */
+	public void addActions(LinkedHashMap<ICRISTUserAction, Double> userActions) {
+
+	}
+
+	/**
+	 * This method will link the given ICRISTUserSituation list to the current
+	 * task along with the corresponding transition probabilities
+	 * 
+	 * @param taskSituations
+	 */
+	public void addSituations(
+			LinkedHashMap<ICRISTUserSituation, Double> taskSituations) {
+
+	}
+
+	/**
+	 * This method will return the related actions of the current task
+	 * 
+	 * @return
+	 */
+	public LinkedHashMap<ICRISTUserAction, Double> getActions() {
+		LinkedHashMap<ICRISTUserAction, Double> actionMap = new LinkedHashMap<ICRISTUserAction, Double>();
+		// TODO
+
+		return actionMap;
+	}
+
+	/**
+	 * This method will return the related context information of the current
+	 * task
+	 * 
+	 * @return
+	 */
+	public Map<String, Serializable> getTaskContext() {
+		Map<String, Serializable> contextMap = null;
+		// TODO
+
+		return contextMap;
+	}
+
+	/**
+	 * This method will return the ID of the current task
+	 * 
+	 * @return
+	 */
+	public String getTaskID() {
+
+		return this.taskID;
+	}
+
+	/**
+	 * This method will return the related situations of the current task
+	 * 
+	 * @return
+	 */
+	public LinkedHashMap<ICRISTUserSituation, Double> getTaskSituations() {
+		LinkedHashMap<ICRISTUserSituation, Double> situationMap = new LinkedHashMap<ICRISTUserSituation, Double>();
+		// TODO
+
+		return situationMap;
+	}
+
+	/**
+	 * This method will set the related context information of the current task
+	 * with the given taskContext
+	 * 
+	 * @param taskContext
+	 */
+	public void setTaskContext(Map<String, Serializable> taskContext) {
+		this.taskContext = taskContext;
+
+	}
+
+	/**
+	 * This method will set the ID of the current task with the given taskID
+	 * 
+	 * @param taskID
+	 */
+	public void setTaskID(String taskID) {
+		this.taskID = taskID;
+	}
+
+	/**
+	 * This method will return the contents of this task in a String mode
+	 */
+	public String toString() {
+		return this.toString();
+	}
 
 	@Override
 	public int getConfidenceLevel() {
@@ -55,20 +204,19 @@ public class CRISTUserTask implements ICRISTUserTask{
 	@Override
 	public void setServiceID(ServiceResourceIdentifier id) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void setServiceType(String type) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void setServiceTypes(List<String> types) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	
 }

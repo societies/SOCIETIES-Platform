@@ -43,7 +43,7 @@ public interface ICRISTUserIntentTaskManager {
 	public ArrayList<ICRISTUserAction> getActionsByType(String actionType, String actionValue);
 
 	/**
-	 * This method will retrive the user's current intent action
+	 * This method will retrieve the user's current intent action
 	 * 
 	 * @param requestor		- the ID of the requestor of the current user intent action
 	 * @param ownerID		- the ID of the owner of the current user intent action
