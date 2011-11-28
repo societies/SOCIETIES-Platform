@@ -43,6 +43,7 @@ public interface ICommunityCtxDBMgr {
 	 * 
 	 * @param community identifier
 	 * @param callback 
+	 * @since 0.0.1
 	 */
 	public void retrieveBonds(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
 
@@ -52,6 +53,7 @@ public interface ICommunityCtxDBMgr {
 	 * 
 	 * @param community identifier
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void retrieveChildCommunities(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
 
@@ -61,6 +63,7 @@ public interface ICommunityCtxDBMgr {
 	 * 
 	 * @param community
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void retrieveCommunityMembers(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
 
@@ -69,6 +72,7 @@ public interface ICommunityCtxDBMgr {
 	 * 
 	 * @param community
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void retrieveParentCommunities(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
 

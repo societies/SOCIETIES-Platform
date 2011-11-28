@@ -35,7 +35,7 @@ import org.societies.context.user.prediction.api.platform.PredictionMethod;
 
 /**
  * @author yboul
- * @version 1.0
+ * @version 0.0.1
  * @created 12-Nov-2011 7:15:15 PM
  */
 public interface ICommunityCtxPredictionMgr {

@@ -41,8 +41,9 @@ import org.societies.context.user.prediction.api.platform.PredictionMethod;
 
 
 /**
+ * ICommunityCtxBroker interface allows to manage user context data. 
  * @author nikosk
- * @version 1.0
+ * @version 0.0.1
  * @created 12-Nov-2011 7:15:15 PM
  */
 public interface IUserCtxBroker  extends org.societies.context.broker.api.IUserCtxBroker {
@@ -52,6 +53,7 @@ public interface IUserCtxBroker  extends org.societies.context.broker.api.IUserC
 	 * 
 	 * @param type
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void createAssociation(String type, IUserCtxBrokerCallback callback);
 
@@ -62,6 +64,7 @@ public interface IUserCtxBroker  extends org.societies.context.broker.api.IUserC
 	 * @param enum
 	 * @param type
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void createAttribute(CtxEntityIdentifier scope, CtxAttributeValueType enumerate, String type, IUserCtxBrokerCallback callback);
 
@@ -70,23 +73,38 @@ public interface IUserCtxBroker  extends org.societies.context.broker.api.IUserC
 	 * 
 	 * @param type
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void createEntity(String type, IUserCtxBrokerCallback callback);
 
 	/**
+	 * Disables context monitoring to Context Database
 	 * 
 	 * @param type
+	 * @since 0.0.1
 	 */
 	public void disableCtxMonitoring(CtxAttributeValueType type);
-
+	
+	/**
+	 * Disables context recording to Context History Database
+	 * 
+	 * @since 0.0.1
+	 */
 	public void disableCtxRecording();
 
 	/**
+	 * Enables context monitoring to Context Database
 	 * 
 	 * @param type
+	 * @since 0.0.1
 	 */
 	public void  enableCtxMonitoring(CtxAttributeValueType type);
-
+	
+	/**
+	 * Enables context recording to Context History Database
+	 * 
+	 * @since 0.0.1
+	 */
 	public void enableCtxRecording();
 
 	/**
@@ -97,18 +115,23 @@ public interface IUserCtxBroker  extends org.societies.context.broker.api.IUserC
 	 * @param objectUnderComparison
 	 * @param referenceObjects
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void evaluateSimilarity(Serializable objectUnderComparison, List<Serializable> referenceObjects, IUserCtxBrokerCallback callback);
 
 	/**
+	 * Returns the default prediction method used by context prediction component. 
 	 * 
 	 * @param predMethod
+	 * @since 0.0.1
 	 */
-	public PredictionMethod  getDefaultPredictionMethod(PredictionMethod predMethod);
+	public PredictionMethod getDefaultPredictionMethod(PredictionMethod predMethod);
 
 	/**
+	 * Returns the prediction method used by context prediction component. 
 	 * 
 	 * @param predMethod
+	 * @since 0.0.1
 	 */
 	public PredictionMethod  getPredictionMethod(PredictionMethod predMethod);
 
@@ -119,6 +142,7 @@ public interface IUserCtxBroker  extends org.societies.context.broker.api.IUserC
 	 * @param modelType
 	 * @param type
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void lookup(CtxModelType modelType, String type, IUserCtxBrokerCallback callback);
 
@@ -131,6 +155,7 @@ public interface IUserCtxBroker  extends org.societies.context.broker.api.IUserC
 	 * @param minAttribValue
 	 * @param maxAttribValue
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue, IUserCtxBrokerCallback callback);
 
@@ -141,6 +166,7 @@ public interface IUserCtxBroker  extends org.societies.context.broker.api.IUserC
 	 * @param scope
 	 * @param attrType
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void registerForUpdates(CtxEntityIdentifier scope, String attrType, IUserCtxBrokerCallback callback);
 
@@ -150,6 +176,7 @@ public interface IUserCtxBroker  extends org.societies.context.broker.api.IUserC
 	 * 
 	 * @param attrId
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void registerForUpdates(CtxAttributeIdentifier attrId, IUserCtxBrokerCallback callback);
 
@@ -158,20 +185,25 @@ public interface IUserCtxBroker  extends org.societies.context.broker.api.IUserC
 	 * 
 	 * @param identifier
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void remove(CtxIdentifier identifier, IUserCtxBrokerCallback callback);
 
 	/**
+	 * Removes context history records defined by type for the specified time period. 
 	 * 
 	 * @param type
 	 * @param startDate
 	 * @param endDate
+	 * @since 0.0.1
 	 */
 	public int removeHistory(String type, Date startDate, Date endDate);
 
 	/**
+	 * Removes the specified prediction method.
 	 * 
 	 * @param predMethod
+	 * @since 0.0.1
 	 */
 	public void removePredictionMethod(PredictionMethod predMethod);
 
@@ -180,6 +212,7 @@ public interface IUserCtxBroker  extends org.societies.context.broker.api.IUserC
 	 * 
 	 * @param identifier
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void retrieve(CtxIdentifier identifier, IUserCtxBrokerCallback callback);
 
@@ -189,15 +222,17 @@ public interface IUserCtxBroker  extends org.societies.context.broker.api.IUserC
 	 * @param attrId
 	 * @param date
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void retrieveFuture(CtxAttributeIdentifier attrId, Date date, IUserCtxBrokerCallback callback);
 
 	/**
-	 * Predicts the identified by the modification index  future context attribute.
+	 * Predicts the identified by the modification index future context attribute.
 	 * 
 	 * @param attrId
 	 * @param modificationIndex
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void retrieveFuture(CtxAttributeIdentifier attrId, int modificationIndex, IUserCtxBrokerCallback callback);
 
@@ -208,6 +243,7 @@ public interface IUserCtxBroker  extends org.societies.context.broker.api.IUserC
 	 * @param attrId
 	 * @param modificationIndex
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void retrievePast(CtxAttributeIdentifier attrId, int modificationIndex, IUserCtxBrokerCallback callback);
 
@@ -219,19 +255,24 @@ public interface IUserCtxBroker  extends org.societies.context.broker.api.IUserC
 	 * @param startDate
 	 * @param endDate
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void retrievePast(CtxAttributeIdentifier attrId, Date startDate, Date endDate, IUserCtxBrokerCallback callback);
 
 	/**
+	 * Sets the specified prediction method as default.  
 	 * 
 	 * @param predMethod
+	 * @since 0.0.1
 	 */
 	public void setDefaultPredictionMethod(PredictionMethod predMethod);
 
 	/**
+	 * Sets the specified prediction method in order to be used by the context prediction component.
 	 * 
 	 * @param predMethod
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void setPredictionMethod(PredictionMethod predMethod, IUserCtxBrokerCallback callback);
 
@@ -241,6 +282,7 @@ public interface IUserCtxBroker  extends org.societies.context.broker.api.IUserC
 	 * 
 	 * @param attrId
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void unregisterForUpdates(CtxAttributeIdentifier attrId, IUserCtxBrokerCallback callback);
 
@@ -251,6 +293,7 @@ public interface IUserCtxBroker  extends org.societies.context.broker.api.IUserC
 	 * @param scope
 	 * @param attributeType
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void unregisterForUpdates(CtxEntityIdentifier scope, String attributeType, IUserCtxBrokerCallback callback);
 
@@ -259,6 +302,7 @@ public interface IUserCtxBroker  extends org.societies.context.broker.api.IUserC
 	 * 
 	 * @param identifier
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void update(CtxModelObject identifier, IUserCtxBrokerCallback callback);
 

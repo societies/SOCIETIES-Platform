@@ -31,7 +31,7 @@ import org.societies.context.model.api.CtxAttributeValueType;
 
 /**
  * @author yboul
- * @version 1.0
+ * @version 0.0.1
  * @created 12-Nov-2011 7:15:15 PM
  */
 public interface ICommunityCtxInheritanceMgr {
@@ -39,6 +39,7 @@ public interface ICommunityCtxInheritanceMgr {
 	/**
 	 * 
 	 * @param cidIdentifier
+	 * @since 0.0.1
 	 */
 	public void getParentCis(EntityIdentifier cidIdentifier);
 
@@ -47,6 +48,7 @@ public interface ICommunityCtxInheritanceMgr {
 	 * @param ctxAttributeIdentifier
 	 * @param type
 	 * @param cisId
+	 * @since 0.0.1
 	 */
 	public void inheritContext(CtxAttributeIdentifier ctxAttributeIdentifier, CtxAttributeValueType type, EntityIdentifier cisId);
 
@@ -55,6 +57,7 @@ public interface ICommunityCtxInheritanceMgr {
 	 * @param ctxAttributeIdentifier
 	 * @param type
 	 * @param cisId
+	 * @since 0.0.1
 	 */
 	public void retrieveCtx(CtxAttributeIdentifier ctxAttributeIdentifier, CtxAttributeValueType type, EntityIdentifier cisId);
 

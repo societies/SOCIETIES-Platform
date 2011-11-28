@@ -35,7 +35,7 @@ import org.societies.context.model.api.CtxEntity;
 
 /**
  * @author yboul
- * @version 1.0
+ * @version 0.0.1
  * @created 12-Nov-2011 7:15:14 PM
  */
 public interface ICommunityCtxEstimationMgr {
@@ -44,6 +44,7 @@ public interface ICommunityCtxEstimationMgr {
 	 * 
 	 * @param estimationModel
 	 * @param list
+	 * @since 0.0.1
 	 */
 	public void estimateContext(EstimationModels estimationModel, List<CtxAttribute> list);
 
@@ -52,6 +53,7 @@ public interface ICommunityCtxEstimationMgr {
 	 * @param Current
 	 * @param communityID
 	 * @param list
+	 * @since 0.0.1
 	 */
 	public void retrieveCurrentCisContext(boolean Current, EntityIdentifier communityID, List<CtxAttribute> list);
 
@@ -60,12 +62,14 @@ public interface ICommunityCtxEstimationMgr {
 	 * @param Current
 	 * @param communityID
 	 * @param list
+	 * @since 0.0.1
 	 */
 	public void retrieveHistoryCisContext(boolean Current, EntityIdentifier communityID, List<CtxAttribute> list);
 
 	/**
 	 * 
 	 * @param estimatedContext
+	 * @since 0.0.1
 	 */
 	public void updateContextModelObject(CtxEntity estimatedContext);
 

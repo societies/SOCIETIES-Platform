@@ -42,124 +42,178 @@ import org.societies.context.model.api.CtxModelObject;
  * This interface represents a callback interface for the IUserCtxBroker interface.
  * 
  * @author nikosk
- * @version 1.0
+ * @version 0.0.1
  * @created 12-Nov-2011 7:15:15 PM
  */
 public interface IUserCtxBrokerCallback {
 
 	/**
+	 * Generic callback method
 	 * 
 	 * @param c_id
 	 * @param reason
+	 * @since 0.0.1
 	 */
 	public void cancel(CtxIdentifier c_id, String reason);
 
 	/**
+	 * The callback of IUserCtxBroker method
+	 * createAssociation(String type, IUserCtxBrokerCallback callback)
 	 * 
 	 * @param ctxEntity
+	 * @since 0.0.1
 	 */
 	public void ctxAssociationCreated(CtxAssociation ctxEntity);
 
 	/**
+	 * The callback of IUserCtxBroker method
+	 * createAttribute(CtxEntityIdentifier scope, CtxAttributeValueType enumerate, String type, IUserCtxBrokerCallback callback)
 	 * 
 	 * @param ctxAttribute
+	 * @since 0.0.1
 	 */
 	public void ctxAttributeCreated(CtxAttribute ctxAttribute);
 
 	/**
-	 * 
+	 * The callback of IUserCtxBroker method
+	 * createAttribute(CtxEntityIdentifier scope, CtxAttributeValueType enumerate, String type, IUserCtxBrokerCallback callback)
+	 *
 	 * @param list
+	 * @since 0.0.1
 	 */
 	public void ctxEntitiesLookedup(List<CtxEntityIdentifier> list);
 
 	/**
+	 * The callback of IUserCtxBroker method
+	 * createEntity(String type, IUserCtxBrokerCallback callback) 
 	 * 
 	 * @param ctxEntity
+	 * @since 0.0.1
 	 */
 	public void ctxEntityCreated(CtxEntity ctxEntity);
 
 	/**
+	 * The callback of IUserCtxBroker method
+	 * createEntity(String type, IUserCtxBrokerCallback callback) 
 	 * 
 	 * @param ctxEntity
+	 * @since 0.0.1
 	 */
 	public void ctxIndividualCtxEntityCreated(CtxEntity ctxEntity);
 
 	/**
+	 * The callback of IUserCtxBroker method
+	 * remove(CtxIdentifier identifier, IUserCtxBrokerCallback callback)
 	 * 
 	 * @param ctxModelObject
+	 * @since 0.0.1
 	 */
 	public void ctxModelObjectRemoved(CtxModelObject ctxModelObject);
 
 	/**
+	 * The callback of IUserCtxBroker method
+	 * retrieve(CtxIdentifier identifier, IUserCtxBrokerCallback callback)
 	 * 
 	 * @param ctxModelObject
+	 * @since 0.0.1
 	 */
 	public void ctxModelObjectRetrieved(CtxModelObject ctxModelObject);
 
 	/**
+	 * The callback of IUserCtxBroker method
+	 * lookup(CtxModelType modelType, String type, IUserCtxBrokerCallback callback)
 	 * 
 	 * @param list
+	 * @since 0.0.1
 	 */
 	public void ctxModelObjectsLookedup(List<CtxIdentifier> list);
 
 	/**
+	 * The callback of IUserCtxBroker method
+	 * update(CtxModelObject identifier, IUserCtxBrokerCallback callback)
 	 * 
 	 * @param ctxModelObject
+	 * @since 0.0.1
 	 */
 	public void ctxModelObjectUpdated(CtxModelObject ctxModelObject);
 
 	/**
+	 * The callback of IUserCtxBroker method
+	 * retrieveFuture(CtxAttributeIdentifier attrId, int modificationIndex, IUserCtxBrokerCallback callback)
+	 * and retrieveFuture(CtxAttributeIdentifier attrId, Date date, IUserCtxBrokerCallback callback)
 	 * 
 	 * @param futCtx
+	 * @since 0.0.1
 	 */
 	public void futureCtxRetrieved(List <CtxAttribute> futCtx);
 
 	/**
+	 * The callback of IUserCtxBroker method
+	 * retrieveFuture(CtxAttributeIdentifier attrId, int modificationIndex, IUserCtxBrokerCallback callback)
+	 * and retrieveFuture(CtxAttributeIdentifier attrId, Date date, IUserCtxBrokerCallback callback)
 	 * 
 	 * @param futCtx
+	 * @since 0.0.1
 	 */
 	public void futureCtxRetrieved(CtxAttribute futCtx);
 
 	/**
+	 * The callback of IUserCtxBroker method
+	 * retrievePast(CtxAttributeIdentifier attrId, int modificationIndex, IUserCtxBrokerCallback callback)
 	 * 
 	 * @param hoc
+	 * @since 0.0.1
 	 */
 	public void historyCtxRetrieved(CtxHistoryAttribute hoc);
 
 	/**
+	 * The callback of IUserCtxBroker method
+	 * retrievePast(CtxAttributeIdentifier attrId, int modificationIndex, IUserCtxBrokerCallback callback)
 	 * 
 	 * @param hoc
+	 * @since 0.0.1
 	 */
 	public void historyCtxRetrieved(List<CtxHistoryAttribute> hoc);
 
 	/**
+	 * Generic call back method
 	 * 
 	 * @param c_id
+	 * @since 0.0.1
 	 */
 	public void ok(CtxIdentifier c_id);
 
 	/**
+	 * Generic call back method
 	 * 
 	 * @param list
+	 * @since 0.0.1
 	 */
 	public void ok_list(List<CtxIdentifier> list);
 
 	/**
+	 * Generic call back method
 	 * 
 	 * @param list
+	 * @since 0.0.1
 	 */
 	public void ok_values(List<Object> list);
 
 	/**
-	 * needs further refinement
+	 * The callback of IUserCtxBroker method
+	 * evaluateSimilarity(Serializable objectUnderComparison, List<Serializable> referenceObjects, IUserCtxBrokerCallback callback)
 	 * 
 	 * @param results
+	 * @since 0.0.1
 	 */
 	public void similartyResults(List<Object> results);
 
 	/**
+	 * The callback of IUserCtxBroker method
+	 * update(CtxModelObject identifier, IUserCtxBrokerCallback callback)
 	 * 
 	 * @param ctxModelObj
+	 * @since 0.0.1
 	 */
 	public void updateReceived(CtxModelObject ctxModelObj);
 

@@ -36,7 +36,7 @@ import org.societies.context.model.api.CtxEntityIdentifier;
  *  ICommunityCtxBrokerCallback interface. 
  * 
  * @author nikosk
- * @version 1.0
+ * @version 0.0.1
  * @created 12-Nov-2011 7:15:14 PM
  */
 public interface ICommunityCtxBrokerCallback {
@@ -46,6 +46,7 @@ public interface ICommunityCtxBrokerCallback {
 	 * retrieveAdministratingCSS(CtxEntityIdentifier community, ICommunityCtxBrokerCallback callback) 
 	 * 
 	 * @param admCssRetr
+	 * @since 0.0.1
 	 */
 	public void adminCSSRetrieved(CtxEntity admCssRetr);
 
@@ -54,6 +55,7 @@ public interface ICommunityCtxBrokerCallback {
 	 * retrieveBonds(CtxEntityIdentifier community, ICommunityCtxBrokerCallback callback)
 	 * 
 	 * @param ctxAttribute
+	 * @since 0.0.1
 	 */
 	public void bondsRetrieved(CtxAttribute ctxAttribute);
 
@@ -62,6 +64,7 @@ public interface ICommunityCtxBrokerCallback {
 	 * retrieveChildCommunities(CtxEntityIdentifier community, ICommunityCtxBrokerCallback callback)
 	 * 
 	 * @param childComms
+	 * @since 0.0.1
 	 */
 	public void childCommsRetrieved(List<CtxEntityIdentifier> childComms);
 
@@ -70,6 +73,7 @@ public interface ICommunityCtxBrokerCallback {
 	 * retrieveCommunityMembers(CtxEntityIdentifier community, ICommunityCtxBrokerCallback callback)
 	 * 
 	 * @param commMembs
+	 * @since 0.0.1
 	 */
 	public void commMembersRetrieved(List <CtxEntityIdentifier> commMembs);
 
@@ -78,6 +82,7 @@ public interface ICommunityCtxBrokerCallback {
 	 * retrieveParentCommunities(CtxEntityIdentifier community, ICommunityCtxBrokerCallback callback)
 	 * 
 	 * @param parentComms
+	 * @since 0.0.1
 	 */
 	public void parentCommsRetrieved(List<CtxEntityIdentifier> parentComms);
 

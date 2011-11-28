@@ -33,7 +33,7 @@ import org.societies.context.model.api.CtxEntityIdentifier;
  * 
  * 
  * @author nikosk
- * @version 1.0
+ * @version 0.0.1
  * @created 12-Nov-2011 7:15:14 PM
  */
 public interface ICommunityCtxBroker extends org.societies.context.broker.api.ICommunityCtxBroker {
@@ -42,6 +42,7 @@ public interface ICommunityCtxBroker extends org.societies.context.broker.api.IC
 	 * This method retrieves the CSS that is assigned with the community administration role.
 	 * @param community
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void retrieveAdministratingCSS(CtxEntityIdentifier community, ICommunityCtxBrokerCallback callback);
 
@@ -51,6 +52,7 @@ public interface ICommunityCtxBroker extends org.societies.context.broker.api.IC
 	 * 
 	 * @param community
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void retrieveBonds(CtxEntityIdentifier community, ICommunityCtxBrokerCallback callback);
 
@@ -60,6 +62,7 @@ public interface ICommunityCtxBroker extends org.societies.context.broker.api.IC
 	 * 
 	 * @param community
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void retrieveChildCommunities(CtxEntityIdentifier community, ICommunityCtxBrokerCallback callback);
 
@@ -69,6 +72,7 @@ public interface ICommunityCtxBroker extends org.societies.context.broker.api.IC
 	 * 
 	 * @param community
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void retrieveCommunityMembers(CtxEntityIdentifier community, ICommunityCtxBrokerCallback callback);
 
@@ -78,6 +82,7 @@ public interface ICommunityCtxBroker extends org.societies.context.broker.api.IC
 	 * 
 	 * @param community
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void retrieveParentCommunities(CtxEntityIdentifier community, ICommunityCtxBrokerCallback callback);
 

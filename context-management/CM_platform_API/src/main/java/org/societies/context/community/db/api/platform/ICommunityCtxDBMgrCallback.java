@@ -37,29 +37,39 @@ import org.societies.context.model.api.CtxEntityIdentifier;
 public interface ICommunityCtxDBMgrCallback {
 
 	/**
-	 * Retrieves the context attribute(s) that acts as a bond of the community of
-	 * entities specified by the CtxEntityIdentifier.
+	 * The callback of ICommunityCtxDBMgr method 
+	 * retrieveBonds(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback)
 	 * 
 	 * @param bond
 	 * @param community
+	 * @since 0.0.1
 	 */
 	public void bondsRetrieved(ContextBond bond, CtxEntityIdentifier community);
 
 	/**
+	 * The callback of ICommunityCtxDBMgr method 
+	 * retrieveChildCommunities(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback)
 	 * 
 	 * @param community
+	 * @since 0.0.1
 	 */
 	public void childCommunitiesRetrieved(List<CtxEntityIdentifier> community);
 
 	/**
+	 * The callback of ICommunityCtxDBMgr method
+	 * retrieveCommunityMembers(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback)
 	 * 
 	 * @param community
+	 * @since 0.0.1
 	 */
 	public void communityMembersRetrieved(List<CtxEntityIdentifier> community);
 
 	/**
+	 * The callback of ICommunityCtxDBMgr method
+	 * retrieveParentCommunities(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback)
 	 * 
 	 * @param community
+	 * @since 0.0.1
 	 */
 	public void parentCommunitiesRetrieved(List<CtxEntityIdentifier> community);
 
