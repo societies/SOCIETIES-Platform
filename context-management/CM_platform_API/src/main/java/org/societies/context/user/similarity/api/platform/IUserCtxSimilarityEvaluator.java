@@ -28,9 +28,8 @@ package org.societies.context.user.similarity.api.platform;
 
 
 /**
- * @author nlia
- * @version 1.0
- * @created 12-Nov-2011 7:15:16 PM
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @version 0.0.1
  */
 public interface IUserCtxSimilarityEvaluator {
 
