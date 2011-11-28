@@ -1,5 +1,5 @@
 package org.societies.userAgent.mock.api.model;
 
-public interface IOutcome{
+public interface IOutcome extends IAction{
 	
 }
