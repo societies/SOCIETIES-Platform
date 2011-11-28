@@ -27,6 +27,14 @@ package org.societies.context.model.api;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * This class is used to represent context associations.
+ * 
+ * @see CtxAssociationIdentifier
+ * @see CtxEntity
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
+ */
 public class CtxAssociation extends CtxModelObject {
 
 	private static final long serialVersionUID = 4837712964619525572L;
@@ -34,10 +42,12 @@ public class CtxAssociation extends CtxModelObject {
 	public CtxEntityIdentifier parentEntity;
 	public Set<CtxEntityIdentifier> entities = new HashSet<CtxEntityIdentifier>();
 
-	private CtxAssociation() {}
+	CtxAssociation() {}
 
 	/**
+	 * Returns the identifier of this context association.
 	 * 
+	 * @see CtxAssociationIdentifier
 	 */
 	@Override
 	public CtxAssociationIdentifier getId() {
@@ -45,16 +55,27 @@ public class CtxAssociation extends CtxModelObject {
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Returns the parent entity of this context association or
+     * <code>null</code> to indicate an undirected association.
+     * 
+     * @return the parent entity of this context association
+     * @see CtxEntity
 	 */
 	public CtxEntityIdentifier getParentEntity() {
 		return this.parentEntity;
 	}
 	
 	/**
-	 * 
+	 * Sets the parent entity of this context association. The method also adds
+     * the specified context entity to this association if it is not already a
+     * member. 
+     * <p>
+     * If a <code>null</code> parameter is specified then the current
+     * parent entity is unset but not removed from this association. Effectively,
+     * this association becomes undirected.
+     * 
 	 * @param parentEntity
+	 *            the identifier of the context entity to set as parent
 	 */
 	public void setParentEntity(CtxEntityIdentifier parentEntityId){
 		this.parentEntity = parentEntityId;
@@ -63,26 +84,81 @@ public class CtxAssociation extends CtxModelObject {
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * Returns a set containing the entities in this context association. The method
+	 * returns an <i>empty</i> set if this association contains no context entities.
+	 *
+	 * @return a set containing the entities in this context association
+	 * @see #getEntities(String)
 	 */
-	public Set<CtxEntityIdentifier> getEntities(){
-		return this.entities;
+	public Set<CtxEntityIdentifier> getEntities() {
+		return this.getEntities(null);
 	}
 	
 	/**
-	 * 
-	 * @param entityId
+	 * Returns a set containing the entities in this context association with the
+	 * specified type. The method returns an <i>empty</i> set if this association
+	 * contains no context entities with the specified type.
+     * <p>
+	 * Note that the method is equivalent to {@link #getEntities()} if the
+	 * specified context entity type is <code>null</code>, i.e. all
+	 * entities contained in this association are returned.
+	 *  
+     * @param type
+     *            the context entity type to match
+     * @return the associated context entities with the specified type
+     * @see #getEntities() 
 	 */
-	public void addEntity(CtxEntityIdentifier entityId){
+	public Set<CtxEntityIdentifier> getEntities(String type) {
+		final Set<CtxEntityIdentifier> result = new HashSet<CtxEntityIdentifier>();
+		
+		if (type == null) {
+			result.addAll(this.entities);
+		} else {
+			for (final CtxEntityIdentifier entity : this.entities)
+				if (type.equalsIgnoreCase(entity.getType()))
+					result.add(entity);
+		}
+		return result;
+	}
+	
+	/**
+	 * Adds the specified entity to this context association
+     * 
+     * @param entityId
+     *            the identifier of the context entity to add
+     * @throws NullPointerException
+     *             if the specified context entity identifier is
+     *             <code>null</code>
+     * @see CtxEntityIdentifier
+	 */
+	public void addEntity(CtxEntityIdentifier entityId) {
+		if (entityId == null)
+			throw new NullPointerException("entityId can't be null");
+		
 		this.entities.add(entityId);
 	}
 
 	/**
-	 * 
-	 * @param entityId
+	 * Removes the specified entity from this context association. As a side
+     * effect, if the entity to be removed is parent in this association then
+     * it is set to <code>null</code> after this operation.
+     * 
+     * @param entityId
+     *            the identifier of the context entity to remove
+     * @throws NullPointerException
+     *             if the specified context entity identifier is
+     *             <code>null</code>
+     * @see CtxEntityIdentifier
 	 */
-	public void removeEntity(CtxEntityIdentifier entityId){
+	public void removeEntity(CtxEntityIdentifier entityId) {
+		if (entityId == null)
+			throw new NullPointerException("entityId can't be null");
+		
 		this.entities.remove(entityId);
 	}
+	
+	/* TODO
+	@Override
+	public String toString() {
+	}*/
 }

@@ -24,19 +24,40 @@
  */
 package org.societies.context.model.api;
 
+import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * This class is used to represent context entities. A
+ * <code>CtxEntity</code> is the core concept upon which the context model is
+ * built. It corresponds to an object of the physical or conceptual world. For
+ * example an entity could be a person, a device, or a service. The
+ * {@link CtxAttribute} class is used in order to describe an entity's
+ * properties. Concepts such as the name, the age, and the location of a person
+ * are described by different context attributes. Relations that may exist among
+ * different entities are described by the {@link CtxAssociation} class.
+ * <p>
+ * The <code>CtxEntity</code> class provides access to the contained
+ * context attributes and the associations this entity is member of.
+ * 
+ * @see CtxEntityIdentifier
+ * @see CtxAttribute
+ * @see CtxAssociation
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
+ */
 public class CtxEntity extends CtxModelObject {
 
 	private static final long serialVersionUID = -9180016236230471418L;
 	
-	private Set<CtxAttribute> attributes;
-	private Set<CtxAssociationIdentifier> associationIds;
+	private Set<CtxAttribute> attributes = new HashSet<CtxAttribute>();
+	private Set<CtxAssociationIdentifier> associations;
 
 	CtxEntity() {}
 	
 	/**
-	 * 
+	 * Returns the identifier of this context entity.
+	 * @see CtxEntityIdentifier
 	 */
 	@Override
 	public CtxEntityIdentifier getId() {
@@ -44,18 +65,90 @@ public class CtxEntity extends CtxModelObject {
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Returns a set of the context attributes contained in this entity. The
+     * method returns an <i>empty</i> set if this entity contains no context
+     * attributes.
+     * 
+     * @return a set of the context attributes contained in this entity.
+     * @see CtxAttribute
+     * @see #getAttributes(String)
 	 */
 	public Set<CtxAttribute> getAttributes(){
-		return this.attributes;
+		return this.getAttributes(null);
 	}
 	
 	/**
+	 * Returns a set of the context attributes contained in this entity that
+	 * have the specified type. The method returns an <i>empty</i> set if this
+	 * entity contains no context attributes with the specified type.
+	 * <p>
+	 * Note that the method is equivalent to {@link #getAttributes()} if the
+	 * specified context attribute type is <code>null</code>, i.e. all
+	 * attributes contained in this entity are returned.
 	 * 
-	 * @return
+	 * @param type
+	 *            the context attribute type to match.
+	 * @return a set of the context attributes contained in this entity that
+	 *         have the specified type.
+	 * @see CtxAttribute
+	 * @see #getAttributes()
 	 */
-	public Set<CtxAssociationIdentifier> getAssociationIds(){
-		return this.associationIds;
+	public Set<CtxAttribute> getAttributes(String type) {
+		final Set<CtxAttribute> result = new HashSet<CtxAttribute>();
+		
+		if (type == null) {
+			result.addAll(this.attributes);
+		} else {
+			for (final CtxAttribute attr : this.attributes)
+				if (type.equalsIgnoreCase(attr.getType()))
+						result.add(attr);
+		}
+		return result;
 	}
+	
+	/**
+	 * Returns a set containing all association identifiers this entity is
+	 * member of. The method returns an <i>empty</i> set if this entity is not
+	 * member of any association.
+	 * 
+	 * @return a set containing all association identifiers this entity is member of
+	 * @see CtxAssociationIdentifier
+	 * @see #getAssociations(String)
+	 */
+	public Set<CtxAssociationIdentifier> getAssociations() {
+		return this.getAssociations(null);
+	}
+	
+	/**
+	 * Returns a set containing all association identifiers of the specified
+	 * type this entity is member of. The method returns an <i>empty</i> set if
+	 * this entity is not member of any association with the specified type.
+	 * <p>
+	 * Note that the method is equivalent to {@link #getAssociations()} if the
+	 * specified context association type is <code>null</code>, i.e. all
+	 * associations this entity is member of are returned.
+	 * @param type
+	 *            the context association type to match
+	 * @return a set containing all associations of the specified type this
+	 *         entity is member of
+	 * @see CtxAssociationIdentifier
+	 * @see #getAssociations()
+	 */
+	public Set<CtxAssociationIdentifier> getAssociations(String type) {
+		final Set<CtxAssociationIdentifier> result = new HashSet<CtxAssociationIdentifier>();
+		
+		if (type == null) {
+			result.addAll(this.associations);
+		} else {
+			for (final CtxAssociationIdentifier assoc : this.associations)
+				if (type.equalsIgnoreCase(assoc.getType()))
+						result.add(assoc);
+		}
+		return result;
+	}
+	
+	/* TODO
+	@Override
+	public String toString() {
+	}*/
 }

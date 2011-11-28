@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske druûbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVA«√O, SA (PTIN), IBM Corp., 
+ * informacijske dru≈æbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVA√á√ÉO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -43,38 +43,42 @@ import org.societies.context.model.api.CtxModelType;
 public interface IUserCtxDBMgr {
 
 	/**
-	 * Creates a CtxAssociation
+	 * Creates a Context Association
 	 * 
 	 * @param type
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void createAssociation(String type, IUserCtxDBMgrCallback callback);
 
 	/**
-	 * Creates a CtxAttribute
+	 * Creates a Context Attribute
 	 * 
 	 * @param source
 	 * @param enum
 	 * @param type
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void createAttribute(CtxEntityIdentifier source, CtxAttributeValueType enumeration, String type, IUserCtxDBMgrCallback callback);
 
 	/**
-	 * Creates a CtxEntity
+	 * Creates a Context Entity
 	 * 
 	 * @param type
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void createEntity(String type, IUserCtxDBMgrCallback callback);
 
 	/**
-	 * Looks up for a list of CtxModelObjects defined by the CtxModelType (CtxEntity,
-	 * CtxAttribute, CtxAssociation) of  the specified type.
+	 * Looks up for a list of CtxModelObjects defined by the <code>CtxModelType (CtxEntity,
+	 * CtxAttribute, CtxAssociation)</code> of  the specified type.
 	 * 
 	 * @param modelType
 	 * @param type
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void lookup(CtxModelType modelType, String type, IUserCtxDBMgrCallback callback);
 
@@ -87,6 +91,7 @@ public interface IUserCtxDBMgr {
 	 * @param minAttribValue
 	 * @param maxAttribValue
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue, IUserCtxDBMgrCallback callback);
 
@@ -97,6 +102,7 @@ public interface IUserCtxDBMgr {
 	 * @param scope
 	 * @param attrType
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void registerForUpdates(CtxEntityIdentifier scope, String attrType, IUserCtxDBMgrCallback callback);
 
@@ -106,6 +112,7 @@ public interface IUserCtxDBMgr {
 	 * 
 	 * @param attrId
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void registerForUpdates(CtxAttributeIdentifier attrId, IUserCtxDBMgrCallback callback);
 
@@ -114,6 +121,7 @@ public interface IUserCtxDBMgr {
 	 * 
 	 * @param identifier
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void remove(CtxIdentifier identifier, IUserCtxDBMgrCallback callback);
 
@@ -122,6 +130,7 @@ public interface IUserCtxDBMgr {
 	 * 
 	 * @param identifier
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void retrieve(CtxIdentifier identifier, IUserCtxDBMgrCallback callback);
 
@@ -131,6 +140,7 @@ public interface IUserCtxDBMgr {
 	 * 
 	 * @param attrId
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void unregisterForUpdates(CtxAttributeIdentifier attrId, IUserCtxDBMgrCallback callback);
 
@@ -141,6 +151,7 @@ public interface IUserCtxDBMgr {
 	 * @param scope
 	 * @param attributeType
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void unregisterForUpdates(CtxEntityIdentifier scope, String attributeType, IUserCtxDBMgrCallback callback);
 
@@ -149,6 +160,7 @@ public interface IUserCtxDBMgr {
 	 * 
 	 * @param identifier
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void update(CtxModelObject identifier, IUserCtxDBMgrCallback callback);
 
