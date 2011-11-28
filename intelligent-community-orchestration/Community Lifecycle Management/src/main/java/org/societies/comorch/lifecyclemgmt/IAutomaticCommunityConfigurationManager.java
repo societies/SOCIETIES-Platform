@@ -12,12 +12,34 @@ public interface IAutomaticCommunityConfigurationManager {
      * Constructor for IAutomaticCommunityConfigurationManager
      * 
 	 * Description: The constructor creates the AutomaticCommunityConfigurationManager
-	 *              component either on a given CSS, or abstractly at a domain/cloud-level.
+	 *              component on a given CSS.
 	 * Parameters: 
-	 * 				?
+	 * 				linkedCSS - the CSS that this object will operate on behalf of.
 	 */
 	
-	public IAutomaticCommunityConfigurationManager();
+	public IAutomaticCommunityConfigurationManager(Css linkedCss);
 	
-	public void determineCISsToConfigure(CISList ciss);
+	/*
+     * Constructor for IAutomaticCommunityConfigurationManager
+     * 
+	 * Description: The constructor creates the AutomaticCommunityConfigurationManager
+	 *              component abstractly at a domain/cloud-level.
+	 * Parameters: 
+	 * 				linkedDomain - the domain on behalf of which this object is to operate.
+	 */
+	
+	public IAutomaticCommunityConfigurationManager(Domain linkedDomain);
+	
+	/*
+     * Constructor for IAutomaticCommunityConfigurationManager
+     * 
+	 * Description: The constructor creates the AutomaticCommunityConfigurationManager
+	 *              component on a given CIS.
+	 * Parameters: 
+	 * 				linkedCis - the Cis that this object will be used to check for configuration on.
+	 */
+	
+	public IAutomaticCommunityConfigurationManager(Cis linkedCis);
+	
+	public void determineCissToConfigure(CisList ciss);
 }
