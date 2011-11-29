@@ -25,109 +25,72 @@
 package org.societies.personalisation.CAUI.api.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
- * This class represents an action performed by a user.
+ * This interface models user tasks that are part of the user intent model. 
  * 
  * @author <a href="mailto:nikoskal@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
- *
+ * @version 0.0.1
  */
+public interface IUserIntentTask {
 
-public class UserIntentAction implements IUserIntentAction{
 	
 	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+     * Returns a string with the UserTask ID. The task ID should be set upon creation of task.
+     * A task is created by the TaskModelManager.
+     * @return string id
+     */
+    public String getTaskID();
 
-	@Override
-	public String getvalue() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public String getparameterName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public ArrayList<String> getparameterNames() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * Returns a map with the userActions contained in the UserTask and the respective transition 
+     * probability from previous action to next action. 
+     * e.g. action1, 0
+     *      action2, 33
+     *      action3, 12
+     *    
+     * @return map
+     */
+    public Map<IUserIntentAction,Double > getActions();
 
-	@Override
-	public ServiceResourceIdentifier getServiceID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * Adds a map of userActions to the UserTask. The map contains the action object and the transition
+     * probability to the next action. 
+     * 
+     * @param userActions
+     */
+    public void addActions(LinkedHashMap<IUserIntentAction,Double> userActions);
 
-	@Override
-	public String getServiceType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public List<String> getServiceTypes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * Returns a map with context types and values associated with this task.
+     * In the map the key is the type of context model object and the object the 
+     * respective value.
+     * 
+     * @return map with context types and values
+     */
+    public Map<String, Serializable> getTaskContext() ;
 
-	@Override
-	public void setServiceID(ServiceResourceIdentifier id) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void setServiceType(String type) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * Associates a map of context types and values to the task.
+     * (Which context to use? Context data of the actions included in Task)?
+     * 
+     * @param taskContext
+     */
+    public void setTaskContext(Map<String, Serializable> taskContext);
 
-	@Override
-	public void setServiceTypes(List<String> types) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public String getActionID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public HashMap<String, Serializable> getActionContext() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setActionContext(HashMap<String, Serializable> context) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setConfidenceLevel(int confidenceLevel) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int getConfidenceLevel() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
+    /**
+     * Returns a string containing the task id and a string representation of the contained
+     * action ids and transition probabilities.
+     *  
+     * @return string
+     */
+    public String toString ();
 	
 }

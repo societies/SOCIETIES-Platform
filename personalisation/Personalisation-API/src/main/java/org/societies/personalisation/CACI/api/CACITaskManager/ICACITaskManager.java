@@ -2,8 +2,8 @@ package org.societies.personalisation.CACI.api.CACITaskManager;
 
 import java.util.List;
 
-import org.societies.personalisation.CAUI.api.model.CommIntentAction;
-import org.societies.personalisation.CAUI.api.model.CommIntentTask;
+import org.societies.personalisation.CAUI.api.model.CommunityIntentAction;
+import org.societies.personalisation.CAUI.api.model.CommunityIntentTask;
 import org.societies.personalisation.CAUI.api.model.TaskModelData;
 import org.societies.personalisation.CAUI.api.model.UserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentTask;
@@ -43,35 +43,35 @@ public interface ICACITaskManager {
 	 * 
 	 * @param type
 	 */
-	public List <CommIntentAction> getCommActByType(String type);
+	public List <CommunityIntentAction> getCommActByType(String type);
 
 	/**
 	 * This method returns a Community Action object based on the action ID.
 	 * 
 	 * @param actionID
 	 */
-	public CommIntentAction getCommAction(String actionID);
+	public CommunityIntentAction getCommAction(String actionID);
 
 	/**
 	 * This method returns a Community Task object based on the action ID.
 	 * 
 	 * @param taskID
 	 */
-	public CommIntentTask getCommTask(String taskID);
+	public CommunityIntentTask getCommTask(String taskID);
 
 	/**
 	 * This method returns the next Community Action object as it is defined in CAUI Model.
 	 * 
 	 * @param currentComAction
 	 */
-	public UserIntentAction getNextCommAction(CommIntentAction currentComAction);
+	public UserIntentAction getNextCommAction(CommunityIntentAction currentComAction);
 
 	/**
 	 * This method returns the next Community Task object as it is defined in CAUI Model.
 	 * 
 	 * @param currentComTask
 	 */
-	public UserIntentTask getNextCommTask(CommIntentTask currentComTask);
+	public UserIntentTask getNextCommTask(CommunityIntentTask currentComTask);
 
 	/**
 	 * This method returns the level of commonality for  a community task.
@@ -86,7 +86,7 @@ public interface ICACITaskManager {
 	 * @param commTaskID
 	 * @param listCommActions
 	 */
-	public void populateCommTask(String commTaskID, List<CommIntentAction> listCommActions);
+	public void populateCommTask(String commTaskID, List<CommunityIntentAction> listCommActions);
 
 	/**
 	 * resets the active task model.
