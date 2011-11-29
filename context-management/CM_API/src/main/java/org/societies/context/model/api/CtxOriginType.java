@@ -22,64 +22,44 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package org.societies.context.taxonomy;
-
-import org.societies.context.model.api.CtxAttribute;
-import org.societies.context.model.api.CtxAttributeValueType;
-
+package org.societies.context.model.api;
 
 /**
- * @author TI
- * @created 12-Nov-2011 7:15:15 PM
+ * Used to represent the origin of a context attribute value. This information
+ * is part of the Quality of Context (QoC) parameters of
+ * <code>CtxAttribute</code> objects. The context origin can be one of the
+ * following types:
+ * <ul>
+ * <li>{@link #MANUALLY_SET}: Denotes a manually set context attribute value</li>
+ * <li>{@link #SENSED}: Denotes a sensed context attribute value</li>
+ * <li>{@link #INFERRED}: Denotes an inferred context attribute value</li>
+ * <li>{@link #INHERITED}: Denotes an inherited context attribute value</li>
+ * </ul>
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas
+ *         Liampotis</a> (ICCS)
+ * @see CtxQuality
+ * @since 0.0.1
  */
-public interface ICtxTaxonomyMgr {
+public enum CtxOriginType {
 
-	/**
-	 * it returns the children of the element in the taxonomy tree
-	 * 
-	 * @param attrubute
-	 * @since 0.0.1
-	 */
-	public CtxAttribute[] getChildren(CtxAttribute attrubute);
+    /**
+     * The enum constant for manually set context attribute values
+     */
+    MANUALLY_SET,
 
-	/**
-	 * 
-	 * @param attributeB
-	 * @param attributeA
-	 * @since 0.0.1
-	 */
-	public int getDistance(CtxAttribute attributeB, CtxAttribute attributeA);
+    /**
+     * The enum constant for sensed context attribute values
+     */
+    SENSED,
 
-	/**
-	 * it returns the parent of the element in the taxonomy tree
-	 * 
-	 * @param attribute
-	 * @since 0.0.1
-	 */
-	public CtxAttribute getParent(CtxAttribute attribute);
-
-	/**
-	 * 
-	 * @param attribute
-	 * @since 0.0.1
-	 */
-	public CtxAttributeValueType getSemanticDescription(CtxAttribute attribute);
-
-	/**
-	 * It return an array of context attributes which are on the same level on the
-	 * specific tree leaf
-	 * 
-	 * @param attribute
-	 * @since 0.0.1
-	 */
-	public CtxAttribute[] getSiblings(CtxAttribute attribute);
-
-	/**
-	 * 
-	 * @param attrubute
-	 * @since 0.0.1
-	 */
-	public boolean isContextAttributeAvailable(CtxAttribute attrubute);
-
+    /**
+     * The enum constant for inferred context attribute values
+     */
+    INFERRED,
+    
+    /**
+     * The enum constant for inherited context attribute values
+     */
+    INHERITED,
 }
