@@ -25,109 +25,57 @@
 package org.societies.personalisation.CAUI.api.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
- * This class represents an action performed by a user.
+ * Implementation class of the ICommunityIntentTask.
  * 
  * @author <a href="mailto:nikoskal@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
- *
+ * @version 0.0.1
  */
-
-public class UserIntentAction implements IUserIntentAction{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class CommunityIntentTask implements ICommunityIntentTask{
 
 	@Override
-	public String getvalue() {
+	public String getTaskID() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String getparameterName() {
+	public Map<IUserIntentAction, Double> getActions() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public ArrayList<String> getparameterNames() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ServiceResourceIdentifier getServiceID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getServiceType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<String> getServiceTypes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setServiceID(ServiceResourceIdentifier id) {
+	public void addActions(LinkedHashMap<IUserIntentAction, Double> userActions) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void setServiceType(String type) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setServiceTypes(List<String> types) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getActionID() {
+	public Map<String, Serializable> getTaskContext() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public HashMap<String, Serializable> getActionContext() {
+	public void setTaskContext(Map<String, Serializable> taskContext) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Double getCommonalityLevel() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void setActionContext(HashMap<String, Serializable> context) {
+	public void setCommonalityLevel(Double doub) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
-	public void setConfidenceLevel(int confidenceLevel) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int getConfidenceLevel() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	
 }

@@ -32,18 +32,47 @@ import java.util.List;
 import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
 
 /**
- * This class represents an action performed by a user.
+ * Implementation class of the ICommunityIntentAction.
  * 
  * @author <a href="mailto:nikoskal@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
- *
+ * @version 0.0.1
  */
+public class CommunityIntentAction implements ICommunityIntentAction{
 
-public class UserIntentAction implements IUserIntentAction{
-	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+
+	@Override
+	public String getActionID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public HashMap<String, Serializable> getActionContext() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setActionContext(HashMap<String, Serializable> context) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setConfidenceLevel(int confidenceLevel) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getConfidenceLevel() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
 	@Override
 	public String getvalue() {
@@ -100,34 +129,16 @@ public class UserIntentAction implements IUserIntentAction{
 	}
 
 	@Override
-	public String getActionID() {
+	public Double getCommonalityLevel() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public HashMap<String, Serializable> getActionContext() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setActionContext(HashMap<String, Serializable> context) {
+	public void setCommonalityLevel(Double doub) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
-	public void setConfidenceLevel(int confidenceLevel) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int getConfidenceLevel() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	
 }
+

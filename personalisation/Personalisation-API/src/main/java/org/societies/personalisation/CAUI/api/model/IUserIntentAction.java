@@ -24,110 +24,65 @@
  */
 package org.societies.personalisation.CAUI.api.model;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import java.io.Serializable;
+import java.util.HashMap;
+
+import org.societies.personalisation.common.api.model.IOutcome;
 
 /**
- * This class represents an action performed by a user.
+ * This interface models user actions that are part of the user intent model.
  * 
  * @author <a href="mailto:nikoskal@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
- *
+ * @since 0.0.1
  */
+public interface IUserIntentAction  extends IOutcome, Serializable{
 
-public class UserIntentAction implements IUserIntentAction{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 
-	@Override
-	public String getvalue() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * Returns the id of the UserAction. This id is created and set upon creation 
+     * of the user action object. TaskModelManager creates the UserAction object.
+     * 
+     * @return string
+     */
+    public String getActionID();
 
-	@Override
-	public String getparameterName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+   
+    /**
+     * Returns a map with context types and values associated with this UserAction.
+     * In the map the key is the type of context model object and the object the 
+     * respective value.
+     * 
+     * @return map with context types and values
+     */
+    public HashMap<String, Serializable> getActionContext();
 
-	@Override
-	public ArrayList<String> getparameterNames() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * Associates a map of context types and values to the UserAction.
+     *
+     * @param context
+     */
+    public void setActionContext(HashMap<String, Serializable> context);
 
-	@Override
-	public ServiceResourceIdentifier getServiceID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getServiceType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<String> getServiceTypes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setServiceID(ServiceResourceIdentifier id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setServiceType(String type) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setServiceTypes(List<String> types) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getActionID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public HashMap<String, Serializable> getActionContext() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setActionContext(HashMap<String, Serializable> context) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setConfidenceLevel(int confidenceLevel) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int getConfidenceLevel() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	
+    /**
+     * Returns a string representation of the the action. 
+     *
+     * 
+     * @return string
+     */
+    public String toString();
+    
+    /**
+     * Sets the confidence level
+     * 
+     * @param confidenceLevel
+     */
+    public void setConfidenceLevel(int confidenceLevel);
+    
+    /**
+     * Retrieves the confidence level
+     * 
+     */
+    public int getConfidenceLevel();
 }
+
