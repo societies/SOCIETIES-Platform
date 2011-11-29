@@ -22,38 +22,71 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.model.api;
+package org.societies.context.api;
 
 /**
- * This class is used in order to identify the CtxAttribute object.
+ * Thrown to indicate problems related to context model objects
  * 
- * @author nikosk
- * @version 0.0.1
- *
+ * @author <a href="mailto:nliampotis@users.sourceforge.net">Nicolas Liampotis</a>
+ *         (ICCS)
+ * @since 0.1.0
  */
-public class CtxAttributeIdentifier extends CtxIdentifier {
-	
-	private static final long serialVersionUID = -282171829285239788L;
-	
-	private CtxEntityIdentifier scope;
+public class ContextModelException extends ContextException {
 
-	private CtxAttributeIdentifier() {}
-	
-	/**
-	 * Returns the entity identifier which defines teh owner CtxEntity.
-	 * 
-	 *  @return CtxEntityIdentifier
-	 */
-	public CtxEntityIdentifier getScope() {
-		return this.scope;
-	}
+    private static final long serialVersionUID = -358494894211675179L;
 
-	/**
-	 *  Returns the model type of the object 
-	 *  @return CtxModelType
-	 */
-	@Override
-	public CtxModelType getModelType() {
-		return CtxModelType.ATTRIBUTE;
-	}
+    /**
+     * Constructs a <code>ContextModelException</code> with no detail message.
+     */
+    public ContextModelException() {
+
+        super();
+    }
+
+    /**
+     * Constructs a <code>ContextModelException</code> with the specified detail
+     * message.
+     * 
+     * @param s
+     *            the detail message.
+     */
+    public ContextModelException(String s) {
+
+        super(s);
+    }
+
+    /**
+     * Creates a <code>ContextModelException</code> with the specified detail
+     * message and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public ContextModelException(String message, Throwable cause) {
+
+        super(message, cause);
+    }
+
+    /**
+     * Creates a <code>ContextModelException</code> with the specified cause and
+     * a detail message of <tt>(cause==null ? null : cause.toString())</tt>
+     * (which typically contains the class and detail message of <tt>cause</tt>
+     * ).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public ContextModelException(Throwable cause) {
+
+        super(cause);
+    }
 }

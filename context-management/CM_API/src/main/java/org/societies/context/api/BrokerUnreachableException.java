@@ -22,38 +22,36 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.model.api;
+package org.societies.context.api;
 
 /**
- * This class is used in order to identify the CtxAttribute object.
+ * Context broker un-reachable exception.
  * 
- * @author nikosk
- * @version 0.0.1
+ * @author <a href="mailto:phdn@users.sourceforge.net">phdn</a>
  *
+ * @since 0.5.2
  */
-public class CtxAttributeIdentifier extends CtxIdentifier {
-	
-	private static final long serialVersionUID = -282171829285239788L;
-	
-	private CtxEntityIdentifier scope;
+public class BrokerUnreachableException extends ContextBrokerException {
 
-	private CtxAttributeIdentifier() {}
-	
-	/**
-	 * Returns the entity identifier which defines teh owner CtxEntity.
-	 * 
-	 *  @return CtxEntityIdentifier
-	 */
-	public CtxEntityIdentifier getScope() {
-		return this.scope;
-	}
+    /**
+     * Serial version UID
+     */
+    private static final long serialVersionUID = 1801287956044223067L;
 
-	/**
-	 *  Returns the model type of the object 
-	 *  @return CtxModelType
-	 */
-	@Override
-	public CtxModelType getModelType() {
-		return CtxModelType.ATTRIBUTE;
-	}
+    public BrokerUnreachableException() {
+        super("Target context broker is un-reachable");
+    }
+
+    public BrokerUnreachableException(String s) {
+        super(s);
+    }
+
+    public BrokerUnreachableException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public BrokerUnreachableException(Throwable cause) {
+        super(cause);
+    }
+
 }

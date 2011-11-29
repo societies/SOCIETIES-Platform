@@ -23,63 +23,36 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.context.taxonomy;
+package org.societies.context.user.inference.api.platform;
 
-import org.societies.context.model.api.CtxAttribute;
-import org.societies.context.model.api.CtxAttributeValueType;
-
+import org.societies.context.model.CtxAttribute;
 
 /**
- * @author TI
- * @created 12-Nov-2011 7:15:15 PM
+ * This exception is thrown whenever a CtxRefinement algorithm
+ * is not able to infer a value for a Ctx Attribute.
+ * 
+ * @author <a href="mailto:pkosmidi@central.ntua.gr">Pavlos Kosmides</a> (ICCS)
  */
-public interface ICtxTaxonomyMgr {
+public class NotInferredException extends Exception {
+    
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * it returns the children of the element in the taxonomy tree
-	 * 
-	 * @param attrubute
-	 * @since 0.0.1
-	 */
-	public CtxAttribute[] getChildren(CtxAttribute attrubute);
-
-	/**
-	 * 
-	 * @param attributeB
-	 * @param attributeA
-	 * @since 0.0.1
-	 */
-	public int getDistance(CtxAttribute attributeB, CtxAttribute attributeA);
-
-	/**
-	 * it returns the parent of the element in the taxonomy tree
-	 * 
-	 * @param attribute
-	 * @since 0.0.1
-	 */
-	public CtxAttribute getParent(CtxAttribute attribute);
-
-	/**
-	 * 
-	 * @param attribute
-	 * @since 0.0.1
-	 */
-	public CtxAttributeValueType getSemanticDescription(CtxAttribute attribute);
-
-	/**
-	 * It return an array of context attributes which are on the same level on the
-	 * specific tree leaf
-	 * 
-	 * @param attribute
-	 * @since 0.0.1
-	 */
-	public CtxAttribute[] getSiblings(CtxAttribute attribute);
-
-	/**
-	 * 
-	 * @param attrubute
-	 * @since 0.0.1
-	 */
-	public boolean isContextAttributeAvailable(CtxAttribute attrubute);
-
+    public NotInferredException(CtxAttribute unrefinedAttr) {
+        super();
+        this.unrefinedAttr = unrefinedAttr;
+    }
+    
+    private CtxAttribute unrefinedAttr = null;
+    
+    /** 
+     * Returns the Ctx Attribute whose value has not been set
+     * through CtxInference
+     * 
+     * @return unrefined Context Attribute
+     * @since 0.0.1
+     */
+    public synchronized CtxAttribute getUnrefinedAttr() {
+        return unrefinedAttr;
+    }
+    
 }

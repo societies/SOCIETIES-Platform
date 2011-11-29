@@ -22,38 +22,39 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.model.api;
+package org.societies.context.api;
 
 /**
- * This class is used in order to identify the CtxAttribute object.
+ * Context broker remote exception.
  * 
- * @author nikosk
- * @version 0.0.1
+ * Thrown when a exception occurs while servicing a request in a remote
+ * context broker.
+ * 
+ * @author <a href="mailto:phdn@users.sourceforge.net">phdn</a>
  *
+ * @since 0.5.3
  */
-public class CtxAttributeIdentifier extends CtxIdentifier {
-	
-	private static final long serialVersionUID = -282171829285239788L;
-	
-	private CtxEntityIdentifier scope;
+public class BrokerRemoteException extends ContextException {
 
-	private CtxAttributeIdentifier() {}
-	
-	/**
-	 * Returns the entity identifier which defines teh owner CtxEntity.
-	 * 
-	 *  @return CtxEntityIdentifier
-	 */
-	public CtxEntityIdentifier getScope() {
-		return this.scope;
-	}
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7850309162651063303L;
 
-	/**
-	 *  Returns the model type of the object 
-	 *  @return CtxModelType
-	 */
-	@Override
-	public CtxModelType getModelType() {
-		return CtxModelType.ATTRIBUTE;
-	}
+    /**
+     * Empty constructor: required by XStream for de-serialisation
+     */
+    public BrokerRemoteException() {
+    }
+
+    /**
+     * Constructor: stack trace is required for serialisation.
+     * 
+     * @param message The error message.
+     * @param stackTrace The exception stack trace.
+     */
+    public BrokerRemoteException(String message, StackTraceElement[] stackTrace) {
+        super(message);
+        this.setStackTrace(stackTrace);
+    }
 }

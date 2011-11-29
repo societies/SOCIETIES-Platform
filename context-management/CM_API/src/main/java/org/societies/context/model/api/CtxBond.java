@@ -22,64 +22,45 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.context.model.api;
 
-package org.societies.context.taxonomy;
 
-import org.societies.context.model.api.CtxAttribute;
-import org.societies.context.model.api.CtxAttributeValueType;
-
+import java.io.Serializable;
+import java.util.Set;
 
 /**
- * @author TI
- * @created 12-Nov-2011 7:15:15 PM
+ * This class describe the ContextAttribute that acts as a bond for a group of CtxEntity objects that form a CommunityCtxEntity.
+ * 
+ * @author nikosk
+ * @since 0.0.1
+ *  
  */
-public interface ICtxTaxonomyMgr {
+public class CtxBond {
 
-	/**
-	 * it returns the children of the element in the taxonomy tree
-	 * 
-	 * @param attrubute
-	 * @since 0.0.1
-	 */
-	public CtxAttribute[] getChildren(CtxAttribute attrubute);
-
-	/**
-	 * 
-	 * @param attributeB
-	 * @param attributeA
-	 * @since 0.0.1
-	 */
-	public int getDistance(CtxAttribute attributeB, CtxAttribute attributeA);
-
-	/**
-	 * it returns the parent of the element in the taxonomy tree
-	 * 
-	 * @param attribute
-	 * @since 0.0.1
-	 */
-	public CtxAttribute getParent(CtxAttribute attribute);
-
-	/**
-	 * 
-	 * @param attribute
-	 * @since 0.0.1
-	 */
-	public CtxAttributeValueType getSemanticDescription(CtxAttribute attribute);
-
-	/**
-	 * It return an array of context attributes which are on the same level on the
-	 * specific tree leaf
-	 * 
-	 * @param attribute
-	 * @since 0.0.1
-	 */
-	public CtxAttribute[] getSiblings(CtxAttribute attribute);
-
-	/**
-	 * 
-	 * @param attrubute
-	 * @since 0.0.1
-	 */
-	public boolean isContextAttributeAvailable(CtxAttribute attrubute);
-
+	private CtxBondOriginType originType;
+	private CtxModelType modelType;
+	private String type;
+	private Serializable minValue;
+	private Serializable maxValue;
+	private Set<Serializable> values;
+	
+	public CtxBondOriginType getOriginType() {
+		return this.originType;
+	}
+	
+	public CtxModelType getModelType() {
+		return this.modelType;
+	}
+	
+	public String getType() {
+		return this.type;
+	}
+	
+	public Serializable getMinValue() {
+		return this.minValue;
+	}
+	
+	public Serializable getMaxValue() {
+		return this.maxValue;
+	}
 }
