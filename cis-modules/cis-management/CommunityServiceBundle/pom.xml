@@ -7,7 +7,7 @@
 		<groupId>org.societies</groupId>
 		<artifactId>virgo-parent</artifactId>
 		<version>0.1</version>
-		<relativePath>../../../parent/virgo.xml</relativePath>
+		<relativePath>../../../parent/spring-osgi.xml</relativePath>
 	 </parent>
 
     <modelVersion>4.0.0</modelVersion>
