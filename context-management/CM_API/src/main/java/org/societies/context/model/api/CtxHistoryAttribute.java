@@ -25,20 +25,32 @@
 package org.societies.context.model.api;
 
 /**
- * This class is user to represent context history attributes that will be stored in context history database.
+ * This class is user to represent context history attributes maintained in the context history database.
  * 
- * @author nikosk
- * 
+ * @author <a href="mailto:nikosk@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
+ * @since 0.0.1
  */
 public class CtxHistoryAttribute extends CtxModelObject {
 	
 	private static final long serialVersionUID = -1908778456166623132L;
 
 	/**
-	 * Returns the id of the object.
+	 * Returns the identifier of this historic context attribute.
+	 * 
+	 * @return the identifier of this historic context attribute.
 	 */
 	@Override
 	public CtxAttributeIdentifier getId() {
 		return (CtxAttributeIdentifier) super.getId();
 	}
+	
+	/**
+	 * TODO
+	 * Returns a String representation of this historic context attribute.
+	 * 
+	 * @return a String representation of this historic context attribute.
+	 *
+	@Override
+	public String toString() {
+	}*/
 }
