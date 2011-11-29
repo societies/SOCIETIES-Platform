@@ -30,7 +30,6 @@ import org.societies.context.model.api.CtxAttributeIdentifier;
 
 /**
  * @author fran_ko
- * @version 0.0.1
  */
 public interface IUserCtxRefiner {
 

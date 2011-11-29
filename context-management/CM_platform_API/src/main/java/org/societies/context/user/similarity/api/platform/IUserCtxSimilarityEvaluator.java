@@ -29,7 +29,6 @@ package org.societies.context.user.similarity.api.platform;
 
 /**
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @version 0.0.1
  */
 public interface IUserCtxSimilarityEvaluator {
 
