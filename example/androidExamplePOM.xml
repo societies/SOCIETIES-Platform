@@ -7,20 +7,22 @@
         <artifactId>android-parent</artifactId>
         <version>0.1</version>
         <relativePath>../../../parent/android.xml</relativePath>
+	<!-- modify if project root directory different to other projects-->
    </parent>
 
-   <groupId>org.societies.android</groupId>
-   <!-- groupId is org.societies for virgo components --> 
-   <artifactId>platform.MasterGUI</artifactId>
-   <!-- artifactId>componentgroup.componentname</artifactId> e.g. platform.mastergui -->
-   <!-- see Redmine wiki for componentgroup and componentname from project structure -->
-   <!-- <version>x.y.z</version> This is still being discussed -->
-   <name>MasterGUI</name>
+   <groupId>org.societies.android.platform</groupId>
+   <artifactId>MODIFY ME</artifactId>
+   <!-- see Redmine wiki for componentname from project structure -->
+   <version>0.1</version> 
+   <!-- still being discussed -->
+   <name>MODIFY ME</name>
    <packaging>apk</packaging>
    <developers>
       <developer>
-		 <name>John Smith</name>
-		 <email>jsmith@github.com</email>
+		 <name>MODIFY ME</name>
+		<!-- Name of component author-->
+		 <email>MODIFY ME</email>
+		<!-- Component author e-mail-->
 	  </developer>
    </developers>
 
