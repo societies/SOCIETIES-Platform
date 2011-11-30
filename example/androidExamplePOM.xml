@@ -17,7 +17,12 @@
    <!-- <version>x.y.z</version> This is still being discussed -->
    <name>MasterGUI</name>
    <packaging>apk</packaging>
-
+   <developers>
+      <developer>
+		 <name>John Smith</name>
+		 <email>jsmith@github.com</email>
+	  </developer>
+   </developers>
 
     <dependencies>
       <!-- Android target version 2 assumes that Android JAR is retrieved from remote repository -->

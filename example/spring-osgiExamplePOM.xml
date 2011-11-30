@@ -6,7 +6,13 @@
 	<artifactId>your.artifact.id</artifactId>
 	<packaging>bundle</packaging>
 	<version>${release.version}</version>
-
+	<developers>
+		<developer>
+			<name>John Smith</name>
+			<email>jsmith@github.com</email>
+		</developer>
+	</developers>
+	
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
