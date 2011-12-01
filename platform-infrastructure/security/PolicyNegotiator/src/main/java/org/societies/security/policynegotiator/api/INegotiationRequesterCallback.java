@@ -25,6 +25,8 @@
 
 package org.societies.security.policynegotiator.api;
 
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
+
 /**
  * Interface for invoking the requester side (either the policy negotiator or
  * some other component).
