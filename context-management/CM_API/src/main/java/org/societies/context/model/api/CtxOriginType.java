@@ -25,10 +25,10 @@
 package org.societies.context.model.api;
 
 /**
- * Used to represent the origin of a context attribute value. This information
- * is part of the Quality of Context (QoC) parameters of
- * <code>CtxAttribute</code> objects. The context origin can be one of the
- * following types:
+ * The constants of this enumerated type specify the origin of a context
+ * attribute value. This information is part of the Quality of Context (QoC)
+ * parameters of {@link CtxAttribute} objects. The context origin can be one of
+ * the following types:
  * <ul>
  * <li>{@link #MANUALLY_SET}: Denotes a manually set context attribute value</li>
  * <li>{@link #SENSED}: Denotes a sensed context attribute value</li>
