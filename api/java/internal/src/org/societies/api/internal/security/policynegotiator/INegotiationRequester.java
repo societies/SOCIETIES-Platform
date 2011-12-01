@@ -23,42 +23,59 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.security.policynegotiator.api;
+package org.societies.api.internal.security.policynegotiator;
 
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 
 /**
- * Interface for invoking the requester side (either the policy negotiator or
- * some other component).
- * To be used by policy negotiator from the provider side (from some other node).
+ * Interface for invoking the requester.
+ * To be used by other components on same node.
  * 
  * @author Mitja Vardjan
  *
  */
-public interface INegotiationRequesterCallback {
+public interface INegotiationRequester {
 
 	/**
-	 * Async return for
-	 * {@link INegotiationRequester#getPolicyOptions(INegotiationRequesterCallback)}.
+	 * Get all available options for the policy.
 	 * 
-	 * @param sops All available options for policy, embedded in a single XML document.
+	 * @param callback The callback to be invoked to return the result.
+	 * 
+	 * @return All available options embedded in a single XML document.
 	 */
-	public void onGetPolicyOptions(String sops);
+	public void getPolicyOptions(INegotiationRequesterCallback callback);
+
+	/**
+	 * Accept given policy option unchanged, as provided by the provider side.
+	 * Alternatively, {@link negotiatePolicy(ResponsePolicy)} can be used
+	 * to try to negotiate a different policy if none of the options are
+	 * acceptable.
+	 * 
+	 * @param signedPolicyOption The selected policy alternative, accepted and
+	 * signed by the requester side. Includes requester identity and signature.
+	 */
+	public void acceptPolicy(String signedPolicyOption,
+			INegotiationRequesterCallback callback);
 	
 	/**
-	 * Async return for
-	 * {@link INegotiationRequester#negotiatePolicy(int, ResponsePolicy, INegotiationRequesterCallback)}.
+	 * Further negotiate given policy option. If any of the policy options
+	 * given by the provider suits the requester, then {@link acceptPolicy(String)}
+	 * should be used instead in order to save bandwidth and increase chances
+	 * of successful negotiation.
 	 * 
-	 * @param modifiedPolicy Policy possibly modified by provider side.
-	 * Based on the policy sent before by the requester side.
+	 * @param policyOptionId ID of the option the requester side chose as a
+	 * basis for further negotiation.
+	 * 
+	 * @param modifiedPolicy Policy modified by requester side. The policy is
+	 * to be offered to the provider. It does not include the requester
+	 * identity nor signature (TBC). 
 	 */
-	public void onNegotiatePolicy(ResponsePolicy modifiedPolicy);
+	public void negotiatePolicy(int policyOptionId, ResponsePolicy modifiedPolicy,
+			INegotiationRequesterCallback callback);
 	
 	/**
-	 * Async return for
-	 * {@link INegotiationRequester#acceptPolicy(int, ResponsePolicy, INegotiationRequesterCallback)}.
-	 * 
-	 * @param policy XML-based final policy signed by both parties.
+	 * Reject all options and terminate negotiation.
 	 */
-	public void onAcceptPolicy(String policy);
+	public void reject();
+
 }

@@ -23,15 +23,42 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.security.policynegotiator.api;
+package org.societies.api.internal.security.policynegotiator;
+
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 
 /**
- * Interface for invoking the provider.
- * To be used by generic secure policy negotiator on the requester side.
+ * Interface for invoking the requester side (either the policy negotiator or
+ * some other component).
+ * To be used by policy negotiator from the provider side (from some other node).
  * 
  * @author Mitja Vardjan
  *
  */
-public interface INegotiationProvider extends INegotiationRequester {
+public interface INegotiationRequesterCallback {
 
+	/**
+	 * Async return for
+	 * {@link INegotiationRequester#getPolicyOptions(INegotiationRequesterCallback)}.
+	 * 
+	 * @param sops All available options for policy, embedded in a single XML document.
+	 */
+	public void onGetPolicyOptions(String sops);
+	
+	/**
+	 * Async return for
+	 * {@link INegotiationRequester#negotiatePolicy(int, ResponsePolicy, INegotiationRequesterCallback)}.
+	 * 
+	 * @param modifiedPolicy Policy possibly modified by provider side.
+	 * Based on the policy sent before by the requester side.
+	 */
+	public void onNegotiatePolicy(ResponsePolicy modifiedPolicy);
+	
+	/**
+	 * Async return for
+	 * {@link INegotiationRequester#acceptPolicy(int, ResponsePolicy, INegotiationRequesterCallback)}.
+	 * 
+	 * @param policy XML-based final policy signed by both parties.
+	 */
+	public void onAcceptPolicy(String policy);
 }

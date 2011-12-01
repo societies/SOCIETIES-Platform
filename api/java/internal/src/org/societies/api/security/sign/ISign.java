@@ -23,59 +23,36 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.security.policynegotiator.api;
-
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
+package org.societies.api.security.sign;
 
 /**
- * Interface for invoking the requester.
- * To be used by other components on same node.
+ * Methods to digitally sign given data and methods to verify given signatures.
  * 
  * @author Mitja Vardjan
  *
  */
-public interface INegotiationRequester {
+public interface ISign {
 
 	/**
-	 * Get all available options for the policy.
+	 * Digitally sign given XML data and embed the signature in the given XML.
 	 * 
-	 * @param callback The callback to be invoked to return the result.
+	 * @param xml The XML String to be signed.
 	 * 
-	 * @return All available options embedded in a single XML document.
+	 * @param xml The identity to be used for signature.
+	 * 
+	 * @return XML with embedded signature.
 	 */
-	public void getPolicyOptions(INegotiationRequesterCallback callback);
-
-	/**
-	 * Accept given policy option unchanged, as provided by the provider side.
-	 * Alternatively, {@link negotiatePolicy(ResponsePolicy)} can be used
-	 * to try to negotiate a different policy if none of the options are
-	 * acceptable.
-	 * 
-	 * @param signedPolicyOption The selected policy alternative, accepted and
-	 * signed by the requester side. Includes requester identity and signature.
-	 */
-	public void acceptPolicy(String signedPolicyOption,
-			INegotiationRequesterCallback callback);
+	public String signXml(String xml, String id);
 	
 	/**
-	 * Further negotiate given policy option. If any of the policy options
-	 * given by the provider suits the requester, then {@link acceptPolicy(String)}
-	 * should be used instead in order to save bandwidth and increase chances
-	 * of successful negotiation.
+	 * Verify all digital signatures embedded in given XML. Verify also if the
+	 * identities used are valid.
 	 * 
-	 * @param policyOptionId ID of the option the requester side chose as a
-	 * basis for further negotiation.
+	 * @param xml The XML containing embedded digital signatures to be verified.
 	 * 
-	 * @param modifiedPolicy Policy modified by requester side. The policy is
-	 * to be offered to the provider. It does not include the requester
-	 * identity nor signature (TBC). 
+	 * @return True if all digital signatures and identities are valid.
+	 * False otherwise or if no signatures found.
 	 */
-	public void negotiatePolicy(int policyOptionId, ResponsePolicy modifiedPolicy,
-			INegotiationRequesterCallback callback);
-	
-	/**
-	 * Reject all options and terminate negotiation.
-	 */
-	public void reject();
+	public boolean verify(String xml);
 
 }
