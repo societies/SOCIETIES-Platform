@@ -33,8 +33,6 @@ public interface ICisOrchestrationTask {
 	 * 				True if successful in orchestrating the CIS, false otherwise.
 	 */
 	
-	
-	
 	public boolean orchestrateCis(Cis cisToOrchestrate);
 	
     public CisOrchestrationTask(String orchestrationType, Cis cisToOrchestrate);
@@ -50,6 +48,15 @@ public interface ICisOrchestrationTask {
 	 */
 	
 	public boolean orchestrateCis(Cis cisToOrchestrate, ArrayList<Cis> otherCissInvolved);
+	
+	/*
+	 * Description: The getTask method returns the task.
+	 * 
+	 * Returns:
+	 * 				The task represented by the object implementing this interface.
+	 */
+	
+	public ICisOrchestrationTask getTask();
 	
 	//public CisOrchestrationTask(String orchestrationType, Cis cisToOrchestrate, ArrayList<Cis> otherCissInvolved) {}
 	

@@ -23,43 +23,42 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.slm.qosmonitor.api;
+package org.societies.api.internal.security.policynegotiator;
 
-import java.io.Serializable;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 
 /**
- * Interface for invoking the third party Quality of Service (QoS) Monitor.
- * To be used by QoS Reporter.
+ * Interface for invoking the requester side (either the policy negotiator or
+ * some other component).
+ * To be used by policy negotiator from the provider side (from some other node).
  * 
  * @author Mitja Vardjan
  *
  */
-public interface IQoS3PMonitor {
-	
-	/**
-	 * Evaluate QoS at the service backend side, i.e. at service provider side.
-	 * 
-	 * @param sla XML-formatted Service License Agreement
-	 * 
-	 * @param violations References to the QoS parameters to be investigated.
-	 * Given as array of XPath expressions that point to locations in SLA where
-	 * the QoS parameters are defined.
-	 * 
-	 * @param data Anonymized community data from service consumer. The purpose
-	 * of this data is to enable realistic evaluation of QoS by the 3rd party
-	 * monitor. It should include the data needed to experience the specified
-	 * QoS when using the service backend. Due to privacy concerns, any other
-	 * and unnecessary data should not be included. 
-	 */
-	public void evaluateQoS(String sla, String[] violations, Serializable data);
+public interface INegotiationRequesterCallback {
 
 	/**
 	 * Async return for
-	 * {@link IQoSReporter#getCommunityData(String, IQoS3PMonitor)}
+	 * {@link INegotiationRequester#getPolicyOptions(INegotiationRequesterCallback)}.
 	 * 
-	 * @param dataId Data ID
-	 * 
-	 * @param data The returned data. The data are anonymized.
+	 * @param sops All available options for policy, embedded in a single XML document.
 	 */
-	public void onGetCommunityData(String dataId, Serializable data);
+	public void onGetPolicyOptions(String sops);
+	
+	/**
+	 * Async return for
+	 * {@link INegotiationRequester#negotiatePolicy(int, ResponsePolicy, INegotiationRequesterCallback)}.
+	 * 
+	 * @param modifiedPolicy Policy possibly modified by provider side.
+	 * Based on the policy sent before by the requester side.
+	 */
+	public void onNegotiatePolicy(ResponsePolicy modifiedPolicy);
+	
+	/**
+	 * Async return for
+	 * {@link INegotiationRequester#acceptPolicy(int, ResponsePolicy, INegotiationRequesterCallback)}.
+	 * 
+	 * @param policy XML-based final policy signed by both parties.
+	 */
+	public void onAcceptPolicy(String policy);
 }

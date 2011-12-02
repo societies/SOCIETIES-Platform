@@ -23,43 +23,59 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.slm.qosmonitor.api;
+package org.societies.api.internal.security.policynegotiator;
 
-import java.io.Serializable;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 
 /**
- * Interface for invoking the third party Quality of Service (QoS) Monitor.
- * To be used by QoS Reporter.
+ * Interface for invoking the requester.
+ * To be used by other components on same node.
  * 
  * @author Mitja Vardjan
  *
  */
-public interface IQoS3PMonitor {
-	
-	/**
-	 * Evaluate QoS at the service backend side, i.e. at service provider side.
-	 * 
-	 * @param sla XML-formatted Service License Agreement
-	 * 
-	 * @param violations References to the QoS parameters to be investigated.
-	 * Given as array of XPath expressions that point to locations in SLA where
-	 * the QoS parameters are defined.
-	 * 
-	 * @param data Anonymized community data from service consumer. The purpose
-	 * of this data is to enable realistic evaluation of QoS by the 3rd party
-	 * monitor. It should include the data needed to experience the specified
-	 * QoS when using the service backend. Due to privacy concerns, any other
-	 * and unnecessary data should not be included. 
-	 */
-	public void evaluateQoS(String sla, String[] violations, Serializable data);
+public interface INegotiationRequester {
 
 	/**
-	 * Async return for
-	 * {@link IQoSReporter#getCommunityData(String, IQoS3PMonitor)}
+	 * Get all available options for the policy.
 	 * 
-	 * @param dataId Data ID
+	 * @param callback The callback to be invoked to return the result.
 	 * 
-	 * @param data The returned data. The data are anonymized.
+	 * @return All available options embedded in a single XML document.
 	 */
-	public void onGetCommunityData(String dataId, Serializable data);
+	public void getPolicyOptions(INegotiationRequesterCallback callback);
+
+	/**
+	 * Accept given policy option unchanged, as provided by the provider side.
+	 * Alternatively, {@link negotiatePolicy(ResponsePolicy)} can be used
+	 * to try to negotiate a different policy if none of the options are
+	 * acceptable.
+	 * 
+	 * @param signedPolicyOption The selected policy alternative, accepted and
+	 * signed by the requester side. Includes requester identity and signature.
+	 */
+	public void acceptPolicy(String signedPolicyOption,
+			INegotiationRequesterCallback callback);
+	
+	/**
+	 * Further negotiate given policy option. If any of the policy options
+	 * given by the provider suits the requester, then {@link acceptPolicy(String)}
+	 * should be used instead in order to save bandwidth and increase chances
+	 * of successful negotiation.
+	 * 
+	 * @param policyOptionId ID of the option the requester side chose as a
+	 * basis for further negotiation.
+	 * 
+	 * @param modifiedPolicy Policy modified by requester side. The policy is
+	 * to be offered to the provider. It does not include the requester
+	 * identity nor signature (TBC). 
+	 */
+	public void negotiatePolicy(int policyOptionId, ResponsePolicy modifiedPolicy,
+			INegotiationRequesterCallback callback);
+	
+	/**
+	 * Reject all options and terminate negotiation.
+	 */
+	public void reject();
+
 }
