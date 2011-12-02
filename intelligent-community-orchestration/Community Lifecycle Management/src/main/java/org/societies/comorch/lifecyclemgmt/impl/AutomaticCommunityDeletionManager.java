@@ -55,7 +55,20 @@ public class AutomaticCommunityDeletionManager {
 		
 	}
 	
+	public AutomaticCommunityDeletionManager(Cis linkedCis) {
+		
+	}
+	
 	public void determineCissToDelete() {
+		if (linkedCss != null) {
+			CISRecord[] records = ICISManager.getCisList(/** CISs administrated by the CSS */);
+		}
+		
+		//process
+		
+		//invoke UserAgent suggestion GUI for deletions
+		//OR
+		//automatically call CIS management functions to delete CISs
 		
 	}
 
