@@ -24,43 +24,90 @@
  */
 package org.societies.context.model.api;
 
-
 import java.io.Serializable;
-import java.util.Set;
 
 /**
- * This class describe the ContextAttribute that acts as a bond for a group of CtxEntity objects that form a CommunityCtxEntity.
+ * This class is used to represent context bonds among members of a 
+ * {@link CommunityCtxEntity}. Each bond refers to a {@link CtxAttribute}
+ * or {@link CtxAssociation} of a particular type that expresses a commonality
+ * shared by community members. For example, a <code>CtxBond</code> could be
+ * based on the context attribute of "location". The {@link CtxBondOriginType}
+ * is used to specify how the bond was identified. More specifically, a context
+ * bond may have been manually set, discovered or inherited.
  * 
- * @author nikosk
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
- *  
  */
-public class CtxBond {
-
-	private CtxBondOriginType originType;
-	private CtxModelType modelType;
-	private String type;
-	private Serializable minValue;
-	private Serializable maxValue;
-	private Set<Serializable> values;
+public abstract class CtxBond implements Serializable {
 	
-	public CtxBondOriginType getOriginType() {
-		return this.originType;
+	private static final long serialVersionUID = 2972314471738603009L;
+
+	/** The context model type of this bond. */
+	private final CtxModelType modelType;
+	
+	/** The context type of this bond. */
+	private final String type;
+	
+	/** The origin of this bond. */
+	private final CtxBondOriginType originType;
+	
+	/**
+	 * Constructs a <code>CtxBond</code> with the specified context model type, context type,
+	 * and origin.
+	 * 
+	 * @param modelType
+	 *            the context model type, i.e. {@link CtxModelType#ATTRIBUTE} or
+	 *            {@link CtxModelType#ASSOCIATION}
+	 * @param type
+	 *            the context type, e.g. "location"
+	 * @param originType
+	 *            the origin
+	 * @throws NullPointerException if any of the specified parameters is
+	 *         <code>null</code>
+	 * @throws IllegalArgumentException if the specified modelType is not one of
+	 *         {@link CtxModelType#ATTRIBUTE} or {@link CtxModelType#ASSOCIATION}
+	 */
+	public CtxBond(CtxModelType modelType, String type, CtxBondOriginType originType) {
+		if (modelType == null)
+			throw new NullPointerException("modelType can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+		if (originType == null)
+			throw new NullPointerException("originType can't be null");
+		if (modelType != CtxModelType.ATTRIBUTE || modelType != CtxModelType.ASSOCIATION)
+			throw new IllegalArgumentException("invalid modelType: "
+					+ modelType + ": valid values: " + CtxModelType.ATTRIBUTE
+					+ ", " + CtxModelType.ASSOCIATION);
+		
+		this.modelType = modelType;
+		this.type = type;
+		this.originType = originType;
 	}
 	
+	/**
+	 * Returns the context model type of this bond
+	 * 
+	 * @return the context model type of this bond
+	 */
 	public CtxModelType getModelType() {
 		return this.modelType;
 	}
 	
+	/**
+	 * Return the context type of this bond
+	 * 
+	 * @return The context type of this bond
+	 */
 	public String getType() {
 		return this.type;
 	}
 	
-	public Serializable getMinValue() {
-		return this.minValue;
-	}
-	
-	public Serializable getMaxValue() {
-		return this.maxValue;
+	/**
+	 * Returns the origin of this bond
+	 * 
+	 * @return the origin of this bond
+	 */
+	public CtxBondOriginType getOriginType() {
+		return this.originType;
 	}
 }
