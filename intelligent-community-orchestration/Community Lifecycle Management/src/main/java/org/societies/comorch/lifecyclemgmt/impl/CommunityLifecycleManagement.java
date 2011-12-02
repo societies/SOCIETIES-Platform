@@ -45,11 +45,14 @@ public class CommunityLifecycleManagement {
 	}
 	
 	public void processPreviousLongTimeCycle() {
-		AutomaticCommunityCreationManager();
+		autoCreationManager.determinCissToCreate("extensive");
+		autoConfigurationManager.determineCissToConfigure("extensive");
+		autoDeletionManager.determineCissToDelete("extensive");
 	}
 	
 	public void processPreviousShortTimeCycle() {
-		
+		autoCreationManager.determineCissToCreate("not extensive");
+		autoConfigurationManager.determineCissToConfigure("not extensive");
 	}
 	
 	public void loop() {
@@ -71,10 +74,11 @@ public class CommunityLifecycleManagement {
 	}
 	
 	public void stimulusForCommunityCreationDetected() {
-		
+		autoCreationManager.determineCissToCreate();
 	}
 	
 	public void stimulusForCommunityDeletionDetected() {
+		autoDeletionManager.determineCissToDelete();
 		
 	}
 }

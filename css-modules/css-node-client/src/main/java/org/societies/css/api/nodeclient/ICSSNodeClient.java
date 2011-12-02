@@ -1,4 +1,4 @@
-package org.societies.css;
+package org.societies.css.api.nodeclient;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public interface ICSSNodeClient {
 	 * @return boolean
 	 * Unregister the device 
 	 */
-	boolean unregisterCCNode();
+	boolean unregisterCSSNode();
 	/**
 	 * @return boolean
 	 * Change a CSS node device status 
