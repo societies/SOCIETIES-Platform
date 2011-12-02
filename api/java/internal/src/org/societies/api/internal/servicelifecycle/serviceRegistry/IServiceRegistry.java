@@ -63,9 +63,11 @@ public interface IServiceRegistry {
 	public List<Object> searchServices (Object filter);
 	
 	/**
-	 * * Description: This method is used to make shared a servcie previously registered into the Registry.
-	 * @param serviceId
-	 * @return true if the service was marked as shared false otherwise
+	 * Description: This method gives out more details on a particular selected service 
+	 * 
+	 * @param serviceID
+	 * @return represents an Object containing details on the service
 	 */
-	public boolean shareService(Object serviceId);
+	public Object getServiceDetail (Object serviceID);
+	
 }
