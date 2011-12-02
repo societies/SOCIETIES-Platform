@@ -1,4 +1,4 @@
-package org.societies.dataObject.internal.serviceRegistry;
+package org.societies.api.internal.servicelifecycle.serviceRegistry.model;
 
 /**
  * @author apanazzolo
