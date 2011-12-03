@@ -38,7 +38,7 @@ public class AutomaticCommunityDeletionManager {
 	 * 				linkedCSS - the CSS that this object will operate on behalf of.
 	 */
 	
-	public AutomaticCommunityDeletionManager(Css linkedCss) {
+	public AutomaticCommunityDeletionManager(Css linkedCss, EntityIdentifier dpi) {
 		
 	}
 	

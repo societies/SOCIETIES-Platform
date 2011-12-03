@@ -40,7 +40,7 @@ public class AutomaticCommunityCreationManager {
 	 * 				linkedCSS - the CSS that this object will operate on behalf of.
 	 */
 	
-	public AutomaticCommunityCreationManager(Css linkedCss) {
+	public AutomaticCommunityCreationManager(Css linkedCss, EntityIdentifier dpi) {
 		
 	}
 	

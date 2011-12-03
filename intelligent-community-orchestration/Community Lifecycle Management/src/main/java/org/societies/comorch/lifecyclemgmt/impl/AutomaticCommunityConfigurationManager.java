@@ -38,7 +38,7 @@ public class AutomaticCommunityConfigurationManager {
 	 * 				linkedCSS - the CSS that this object will operate on behalf of.
 	 */
 	
-	public AutomaticCommunityConfigurationManager(Css linkedCss) {
+	public AutomaticCommunityConfigurationManager(Css linkedCss, EntityIdentifier dpi) {
 		
 	}
 	
