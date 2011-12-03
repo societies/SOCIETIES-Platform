@@ -25,10 +25,26 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
  * @author Fraser Blackmun
  * @version 0
  * 
+ * The component is responsible for automating, and triggering the process of 
+ * suggesting to one or more relevant CSSs, the deletion of CISs. This 
+ * is achieved by perform various forms of analysis on CSSs, CISs, their attributes, and their
+ * connections, and using different algorithms. Social network analysis methods and similarity of users
+ * -based approaches and algorithms will be used, including an
+ * approach that views groups/CISs as either ongoing (non-terminating, with no deadline or 
+ * fulfillable purpose for existing) or temporary (not going to last, e.g. because it exists just
+ * for a goal that will be completed, or has a clear lifespan, or group breakdown is inevitable). 
+ * 
  */
 
 public class AutomaticCommunityDeletionManager {
 
+	private Css linkedCss;
+	private EntityIdentifier dpi;
+	
+    private CisRecord linkedCis;
+    
+    private Domain linkedDomain;
+	
 	/*
      * Constructor for AutomaticCommunityDeletionManager
      * 
@@ -39,7 +55,8 @@ public class AutomaticCommunityDeletionManager {
 	 */
 	
 	public AutomaticCommunityDeletionManager(Css linkedCss, EntityIdentifier dpi) {
-		
+		this.linkedCss = linkedCss;
+		this.dpi = dpi;
 	}
 	
 	/*
@@ -52,16 +69,40 @@ public class AutomaticCommunityDeletionManager {
 	 */
 	
 	public AutomaticCommunityDeletionManager(Domain linkedDomain) {
-		
+		this.linkedDomain = linkedDomain;
 	}
 	
-	public AutomaticCommunityDeletionManager(Cis linkedCis) {
-		
+	/*
+     * Constructor for AutomaticCommunityDeletionManager
+     * 
+	 * Description: The constructor creates the AutomaticCommunityDeletionManager
+	 *              component on a CIS, either at a domain/cloud level or for an administrating CSS.
+	 * Parameters: 
+	 * 				linkedCis - the CIS on behalf of which this object is to operate, i.e.
+	 *                          continually checking for whether to delete it/suggest deleting it.
+	 */
+	
+	public AutomaticCommunityDeletionManager(CisRecord linkedCis) {
+		this.linkedCis = linkedCis;
 	}
+	
+	/*
+	 * Description: The method looks for CISs to delete, using as a base the CIS records relevant
+	 *              to this object's 'linked' component (see the fields). If the linked component
+	 *              is just a CIS, it will only perform the check on that CIs. If the linked component
+	 *              is a CSS, it will check all CISs they administrate. If the linked component is 
+	 *              a domain, the check is done on all CISs in that domain.
+	 */
 	
 	public void determineCissToDelete() {
 		if (linkedCss != null) {
 			CISRecord[] records = ICISManager.getCisList(/** CISs administrated by the CSS */);
+		}
+		if (linkedCis != null) {
+			CISRecord[] records = ICISManager.getCisList(/** This CIS */);
+		}
+		if (linkedDomain != null) {
+			CISRecord[] records = ICISManager.getCisList(/** CISs in the domain */);
 		}
 		
 		//process

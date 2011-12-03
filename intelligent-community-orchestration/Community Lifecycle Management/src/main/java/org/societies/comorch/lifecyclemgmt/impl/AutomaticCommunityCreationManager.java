@@ -22,7 +22,17 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
 
 
 /**
- * This is the class for the Automatic Community Creation Manager component
+ * This is the class for the Automatic Community Creation Manager component.
+ * 
+ * The component is responsible for automating, and triggering the process of 
+ * suggesting to one or more relevant CSSs, the creation of CISs and sub-CISs. This 
+ * is achieved by perform various forms of analysis on CSSs, CISs, their attributes, and their
+ * connections, and using different algorithms. Social network analysis methods and similarity of users
+ * -based approaches and algorithms will be used, including an
+ * approach that views groups/CISs as either ongoing (non-terminating, with no deadline or 
+ * fulfillable purpose for existing) or temporary (not going to last, e.g. because it exists just
+ * for a goal that will be completed, or has a clear lifespan, or group breakdown is inevitable). 
+ * 
  * 
  * @author Fraser Blackmun
  * @version 0
@@ -30,6 +40,13 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
  */
 
 public class AutomaticCommunityCreationManager {
+	
+	private Css linkedCss;
+	private EntityIdentifier dpi;
+	
+    private CisRecord linkedSuperCis;
+    
+    private Domain linkedDomain;
 	
 	/*
      * Constructor for AutomaticCommunityCreationManager
@@ -41,7 +58,8 @@ public class AutomaticCommunityCreationManager {
 	 */
 	
 	public AutomaticCommunityCreationManager(Css linkedCss, EntityIdentifier dpi) {
-		
+		this.linkedCss = linkedCss;
+		this.dpi = dpi;
 	}
 	
 	/*
@@ -54,20 +72,48 @@ public class AutomaticCommunityCreationManager {
 	 */
 	
 	public AutomaticCommunityCreationManager(Domain linkedDomain) {
-		
+		this.linkedDomain = linkedDomain;
+	}
+	
+	/*
+     * Constructor for AutomaticCommunityCreationManager
+     * 
+	 * Description: The constructor creates the AutomaticCommunityCreationManager
+	 *              component abstractly at a CIS level.
+	 * Parameters: 
+	 * 				linkedSuperCis - the CIS on behalf of which this object is to operate, by
+	 *                               suggesting sub-CISs on it.
+	 */
+	
+	public AutomaticCommunityCreationManager(Cis linkedCis) {
+		this.linkedCis = linkedCis;
 	}
 	
 	public return ArrayList<String> getIDsOfInteractingCsss() {
 		
 	}
 	
-	public ArrayList<Cis> identifyCissToCreate() {
+	/*
+	 * Description: The method looks for CISs to create, using as a base the information related to
+	 *              this object's 'linked' component (see the fields). If the linked component
+	 *              is just a CIS, it will only try to create sub-CISs on it. If the linked component
+	 *              is a CSS, it will check all information relevant to that CSS to create
+	 *              CISs that would be relevant to them. If the linked component is 
+	 *              a domain (or something else like a local area?), the checks are not 'selfish'
+	 *              but try to objectively identify appropriate CISs for groups of people, based
+	 *              on collective aspects like context attributes.
+	 */
+	
+	public void identifyCissToCreate() {
 		ArrayList<String> cisIDs = getIDsOfInteractingCsss();
 		
 		ArrayList<Cis> cissToCreate;
+		
 		// processing
 		
-		return cissToCreate;
+		//invoke UserAgent suggestion GUI for creation of CISs
+		//OR
+		//automatically call CIS management functions to create CISs
 		
 	}
 	

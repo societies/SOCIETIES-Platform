@@ -22,12 +22,37 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
 /**
  * This is the class for the Automatic Community Configuration Manager component
  * 
+ * The component is responsible for automating, and triggering the process of 
+ * suggesting to one or more relevant CSSs, the configuration of CISs.
+ * Configuration here refers to the nature, or structure, of a CIS itself being changed, and not
+ * a sub-CIS or parent CIS being changed in any way, although a CIS 'splitting' into two or more
+ * CISs (where the original CIS is deleted in the process) is covered as configuration. It includes:
+ * 
+ *   - CIS members being added/removed
+ *   - CIS attributes being changed, including its name, definition, membership criteria, goal/purpose (if any), etc.
+ *   - CIS splitting or merging into/with other CISs.
+ *   - And more
+ *  
+ * This is achieved by perform various forms of analysis on CSSs, CISs, their attributes, and their
+ * connections, and using different algorithms. Social network analysis methods and similarity of users
+ * -based approaches and algorithms will be used, including an
+ * approach that views groups/CISs as either ongoing (non-terminating, with no deadline or 
+ * fulfillable purpose for existing) or temporary (not going to last, e.g. because it exists just
+ * for a goal that will be completed, or has a clear lifespan, or group breakdown is inevitable). 
+ * 
  * @author Fraser Blackmun
  * @version 0
  * 
  */
 
 public class AutomaticCommunityConfigurationManager {
+	
+	private Css linkedCss;
+	private EntityIdentifier dpi;
+	
+    private CisRecord linkedCis;
+    
+    private Domain linkedDomain;
 	
 	/*
      * Constructor for AutomaticCommunityConfigurationManager
@@ -39,7 +64,8 @@ public class AutomaticCommunityConfigurationManager {
 	 */
 	
 	public AutomaticCommunityConfigurationManager(Css linkedCss, EntityIdentifier dpi) {
-		
+		this.linkedCss = linkedCss;
+		this.dpi = dpi;
 	}
 	
 	/*
@@ -52,7 +78,8 @@ public class AutomaticCommunityConfigurationManager {
 	 */
 	
 	public AutomaticCommunityConfigurationManager(Domain linkedDomain) {
-	
+	    this.linkedDomain = linkedDomain;
+	}
 	/*
      * Constructor for IAutomaticCommunityConfigurationManager
      * 
@@ -63,10 +90,33 @@ public class AutomaticCommunityConfigurationManager {
 	 */
 	
 	public IAutomaticCommunityConfigurationManager(Cis linkedCis) {
-		
+		this.linkedCis = linkedCis;
 	}
 	
-	public void determineCissToConfigure(CisList ciss) {
+	/*
+	 * Description: The method looks for CISs to configure, using as a base the CIS records relevant
+	 *              to this object's 'linked' component (see the fields). If the linked component
+	 *              is just a CIS, it will only perform the check on that CIs. If the linked component
+	 *              is a CSS, it will check all CISs they administrate. If the linked component is 
+	 *              a domain, the check is done on all CISs in that domain.
+	 */
+	
+	public void determineCissToConfigure() {
+		if (linkedCss != null) {
+			CISRecord[] records = ICISManager.getCisList(/** CISs administrated by the CSS */);
+		}
+		if (linkedCis != null) {
+			CISRecord[] records = ICISManager.getCisList(/** This CIS */);
+		}
+		if (linkedDomain != null) {
+			CISRecord[] records = ICISManager.getCisList(/** CISs in the domain */);
+		}
+		
+		//process
+		
+		//invoke UserAgent suggestion GUI for configurations
+		//OR
+		//automatically call CIS management functions to configure CISs
 		
 	}
 }
