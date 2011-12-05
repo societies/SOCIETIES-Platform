@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy
+package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
 
 
 import java.io.Serializable;
@@ -30,10 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.Subject;
-
-
-
-
 
 /**
  * This class represents the Request Policy of the Provider and lists the context types it is requesting access to, the Actions it is going to perform 
@@ -62,7 +58,7 @@ public class RequestPolicy implements Serializable{
 	public List<RequestItem> getRequests(){
 		return this.requests;
 	}
-	
+
 	public Subject getRequestor(){
 		return this.requestor;
 	}
@@ -81,7 +77,7 @@ public class RequestPolicy implements Serializable{
 		str = str.concat("</RequestPolicy>");
 		return str;
 	}
-	
+
 	public boolean hasRequestor(){
 		return (this.requestor!=null);
 	}

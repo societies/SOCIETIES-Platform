@@ -25,11 +25,11 @@
 package org.societies.api.internal.privacytrust.privacyprotection;
 
 
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyPolicy.IAgreementEnvelope;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyPolicy.RequestPolicy;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyPolicy.ResponsePolicy;
+import org.societies.api.internal.mock.EntityIdentifier;
+import org.societies.api.internal.mock.ServiceResourceIdentifier;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 /**
  * @author Eliza
  * @version 1.0

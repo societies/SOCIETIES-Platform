@@ -22,57 +22,12 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection;
+package org.societies.api.internal.mock;
 
-
-import org.societies.api.internal.mock.EntityIdentifier;
-import org.societies.api.internal.mock.ServiceResourceIdentifier;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 /**
- * This interface defines the methods that should be implemented by the CSS that
- * acts as a client in the Negotiation process. This means that this CSS is the
- * one that initiates the starting of the service or requests to join a CIS.
- * @author Elizabeth
- * @version 1.0
- * @created 11-Nov-2011 17:03:12
+ * @author olivierm
+ * @date 5 déc. 2011
  */
-public interface INegotiationClient {
-
-	/**
-	 * 
-	 * @param serviceID
-	 * @param providerIdentity
-	 * @param envelope
-	 * @param b
-	 */
-	public void acknowledgeAgreement(ServiceResourceIdentifier serviceID, EntityIdentifier providerIdentity, IAgreementEnvelope envelope, boolean b);
-
-	/**
-	 * 
-	 * @param policy
-	 */
-	public void receiveNegotiationResponse(ResponsePolicy policy);
-
-	/**
-	 * 
-	 * @param dpi
-	 */
-	public void receiveProviderIdentity(EntityIdentifier dpi);
-
-	/**
-	 * 
-	 * @param policy
-	 */
-	public void receiveProviderPolicy(RequestPolicy policy);
-
-	/**
-	 * 
-	 * @param policy
-	 * @param serviceIdentifier
-	 * @param serviceIdentity
-	 */
-	public void startPrivacyPolicyNegotiation(RequestPolicy policy, ServiceResourceIdentifier serviceIdentifier, EntityIdentifier serviceIdentity);
+public class OperatorConstants {
 
 }
