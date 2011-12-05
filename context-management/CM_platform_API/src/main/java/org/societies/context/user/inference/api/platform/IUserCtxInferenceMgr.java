@@ -39,7 +39,6 @@ import org.societies.context.user.prediction.api.platform.PredictionMethod;
 
 /**
  * @author <a href="mailto:nikosk@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
- * @version 0.0.1
  */
 public interface IUserCtxInferenceMgr {
 

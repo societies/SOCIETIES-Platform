@@ -32,7 +32,6 @@ import org.societies.context.model.CtxAttribute;
  * is not able to infer a value for a Ctx Attribute.
  * 
  * @author <a href="mailto:pkosmidi@central.ntua.gr">Pavlos Kosmides</a> (ICCS)
- * @version 0.0.1
  */
 public class NotInferredException extends Exception {
     

@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske druûbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVA«√O, SA (PTIN), IBM Corp., 
+ * informacijske dru≈æbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVA√á√ÉO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -31,7 +31,6 @@ import org.societies.context.model.api.CtxAttributeValueType;
 
 /**
  * @author TI
- * @version 1.0
  * @created 12-Nov-2011 7:15:15 PM
  */
 public interface ICtxTaxonomyMgr {
@@ -40,6 +39,7 @@ public interface ICtxTaxonomyMgr {
 	 * it returns the children of the element in the taxonomy tree
 	 * 
 	 * @param attrubute
+	 * @since 0.0.1
 	 */
 	public CtxAttribute[] getChildren(CtxAttribute attrubute);
 
@@ -47,6 +47,7 @@ public interface ICtxTaxonomyMgr {
 	 * 
 	 * @param attributeB
 	 * @param attributeA
+	 * @since 0.0.1
 	 */
 	public int getDistance(CtxAttribute attributeB, CtxAttribute attributeA);
 
@@ -54,12 +55,14 @@ public interface ICtxTaxonomyMgr {
 	 * it returns the parent of the element in the taxonomy tree
 	 * 
 	 * @param attribute
+	 * @since 0.0.1
 	 */
 	public CtxAttribute getParent(CtxAttribute attribute);
 
 	/**
 	 * 
 	 * @param attribute
+	 * @since 0.0.1
 	 */
 	public CtxAttributeValueType getSemanticDescription(CtxAttribute attribute);
 
@@ -68,12 +71,14 @@ public interface ICtxTaxonomyMgr {
 	 * specific tree leaf
 	 * 
 	 * @param attribute
+	 * @since 0.0.1
 	 */
 	public CtxAttribute[] getSiblings(CtxAttribute attribute);
 
 	/**
 	 * 
 	 * @param attrubute
+	 * @since 0.0.1
 	 */
 	public boolean isContextAttributeAvailable(CtxAttribute attrubute);
 

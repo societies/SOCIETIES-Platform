@@ -29,7 +29,6 @@ package org.societies.context.user.prediction.api.platform;
  * This class is used to define a prediction method.
  * 
  * @author <a href="mailto:pkosmidi@central.ntua.gr">Pavlos Kosmides</a> (ICCS)
- * @version 0.0.1
  */
 public class PredictionMethod {
 

@@ -28,11 +28,12 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * This class is used to represent context model objects.
+ * Base class for representing context model objects. This class defines methods
+ * for accessing information common to all <code>CtxModelOject</code>
+ * implementations. More specifically, every context model object can be referenced
+ * by its {@link CtxIdentifier}. In addition, upon modification of a CtxModelOject
+ * the last modification time is updated.   
  * 
- * @see CtxEntity
- * @see CtxAttribute
- * @see CtxAssociation
  * @see CtxModelType
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
@@ -41,7 +42,10 @@ public abstract class CtxModelObject implements Serializable {
 
 	private static final long serialVersionUID = 7349640661605024918L;
 	
+	/** The identifier of this context model object. */
 	private CtxIdentifier id;
+	
+	/** The last modification time of this context model object. */
 	private Date lastModified;
 
 	CtxModelObject() {}
