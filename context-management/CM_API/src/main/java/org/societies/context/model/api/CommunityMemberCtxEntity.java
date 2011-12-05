@@ -47,7 +47,9 @@ public abstract class CommunityMemberCtxEntity extends CtxEntity {
 	
 	private Set<CommunityCtxEntity> communities = new HashSet<CommunityCtxEntity>();
 
-	CommunityMemberCtxEntity() {}
+	CommunityMemberCtxEntity(CtxEntityIdentifier id) {
+		super(id);
+	}
 
 	/**
 	 * Returns a set with the community members.

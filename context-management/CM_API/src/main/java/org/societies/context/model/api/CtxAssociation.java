@@ -42,7 +42,15 @@ public class CtxAssociation extends CtxModelObject {
 	public CtxEntityIdentifier parentEntity;
 	public Set<CtxEntityIdentifier> entities = new HashSet<CtxEntityIdentifier>();
 
-	CtxAssociation() {}
+	/**
+	 * Constructs a CtxAssociation with the specified identifier
+	 * 
+	 * @param id
+	 *            the identifier of the newly created cotnext association
+	 */
+	public CtxAssociation(CtxAssociationIdentifier id) {
+		super(id);
+	}
 
 	/**
 	 * Returns the identifier of this context association.

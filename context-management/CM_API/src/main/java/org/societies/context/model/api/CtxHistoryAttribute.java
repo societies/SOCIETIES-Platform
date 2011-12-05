@@ -34,6 +34,10 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	
 	private static final long serialVersionUID = -1908778456166623132L;
 
+	public CtxHistoryAttribute(CtxAttributeIdentifier id) {
+		super(id);
+	}
+	
 	/**
 	 * Returns the identifier of this historic context attribute.
 	 * 
