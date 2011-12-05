@@ -22,24 +22,82 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.datamanagement;
+package org.societies.privacytrust.privacyprotection.privacypolicy;
 
-import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
+import java.util.List;
+import java.util.Map;
+
+import org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
 import org.societies.privacytrust.privacyprotection.mock.EntityIdentifier;
+import org.societies.privacytrust.privacyprotection.mock.ServiceResourceIdentifier;
 
 /**
- * @state skeleton 
  * @author olivierm
+ * @date 5 déc. 2011
  */
-public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
+public class PolicyAgreementManager implements IPolicyAgreementManager {
+
 	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.internal.IPrivacyDataManagerInternal#updatePermissions(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager#deleteAgreement(java.lang.String)
 	 */
 	@Override
-	public void updatePermissions(DataIdentifier dataId, String agreementId,
-			EntityIdentifier ownerId, EntityIdentifier requestorId) {
+	public boolean deleteAgreement(String id) {
 		// TODO Auto-generated method stub
-
+		return false;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager#deleteAgreements(java.util.Map)
+	 */
+	@Override
+	public boolean deleteAgreements(Map criteria) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public NegotiationAgreement getAgreement(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<NegotiationAgreement> getAgreements(Map criteria) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResponseItem getPermissionConditionsInAgreement(
+			DataIdentifier dataId, EntityIdentifier ownerId,
+			EntityIdentifier requestorId, ServiceResourceIdentifier serviceId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResponseItem getPermissionConditionsInAgreement(
+			DataIdentifier dataId, EntityIdentifier ownerId,
+			EntityIdentifier requestorId, EntityIdentifier cisId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public NegotiationAgreement updateAgreement(NegotiationAgreement agreement,
+			EntityIdentifier myId, ServiceResourceIdentifier serviceId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public NegotiationAgreement updateAgreement(NegotiationAgreement agreement,
+			EntityIdentifier myId, EntityIdentifier cisId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

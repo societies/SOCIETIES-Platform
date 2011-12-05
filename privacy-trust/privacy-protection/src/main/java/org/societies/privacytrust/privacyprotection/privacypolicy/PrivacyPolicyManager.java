@@ -22,24 +22,40 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.datamanagement;
+package org.societies.privacytrust.privacyprotection.privacypolicy;
 
-import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
-import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
-import org.societies.privacytrust.privacyprotection.mock.EntityIdentifier;
+import java.util.List;
+import java.util.Map;
+
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 
 /**
- * @state skeleton 
  * @author olivierm
+ * @date 5 déc. 2011
  */
-public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.internal.IPrivacyDataManagerInternal#updatePermissions(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public void updatePermissions(DataIdentifier dataId, String agreementId,
-			EntityIdentifier ownerId, EntityIdentifier requestorId) {
-		// TODO Auto-generated method stub
+public class PrivacyPolicyManager implements IPrivacyPolicyManager {
+	public RequestPolicy getPrivacyPolicy(String id) {
+
+	}
+
+	public List<RequestPolicy> getPrivacyPolicies(Map criteria) {
+
+	}
+
+	public RequestPolicy updatePrivacyPolicy(RequestPolicy privacyPolicy) {
+
+	}
+
+	public boolean deletePrivacyPolicy(String id) {
+
+	}
+
+	public boolean deletePrivacyPolicies(Map criteria) {
+
+	}
+
+	public RequestPolicy inferPrivacyPolicy(Map configuration, Object privacyPolicyType) {
 
 	}
 }
