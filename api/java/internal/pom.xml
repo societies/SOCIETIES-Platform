@@ -1,16 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>spring-osgi-parent</artifactId>
+		<relativePath>../../../parent/spring-osgi.xml</relativePath>
+		<version>0.1</version>
+	</parent>
+
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.api</groupId>
-	<!-- change the artifactid to your project artifactid -->
-	<artifactId>societies-api</artifactId>
+	<groupId>org.societies.api.internal</groupId>
+	<artifactId>societies-api-internal</artifactId>
 	<version>${release.version}</version>
 	
-	<description>
-    	This bundle provides the external of the SOCIETIES platform version ${release.version).
-    </description>
-  
 	<developers>
 		<developer>
 			<name>SOCIETIES </name>
@@ -19,12 +21,6 @@
 		</developer>
 	</developers>
 	
-	<parent>
-		<groupId>org.societies</groupId>
-		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version>
-	</parent>
 
 	<dependencies>
 	<!-- add your dependencies here -->
@@ -40,24 +36,23 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
 						<Import-Package></Import-Package>
 						
-						<!-- the API will export all interfaces packages for the rest of modules. 
-						The exclusion of internal package can be avoided as the plugin excludes automatically 'internal' and 'impl' package names-->
+						<!-- the API will export all interfaces packages for the rest of modules -->
 						<Export-Package>
-						!org.societies.api.internal,
-						org.societies.api.*
+						org.societies.api.internal.*
 						</Export-Package>
 					</instructions>
 				</configuration>
 		
 			</plugin>
+			
+			<!-- although there is no test for API yet, we prefer to keep the following plugin -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
 			</plugin>
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -78,7 +73,7 @@
 		
 		<!-- the source directory has been set temporary because the 
 			current structure does not match the default maven setting -->
-        <sourceDirectory>.\src\</sourceDirectory>
-
+    	<sourceDirectory>.\src\</sourceDirectory>
+    	
 	</build>
 </project>
