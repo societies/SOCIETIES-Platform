@@ -24,15 +24,24 @@
  */
 package org.societies.context.model.api;
 
+import java.io.Serializable;
+
 /**
- * This class is user to represent context history attributes maintained in the context history database.
+ * This class is used in order tp represent context history attributes maintained in the context history database.
  * 
  * @author <a href="mailto:nikosk@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
  * @since 0.0.1
  */
 public class CtxHistoryAttribute extends CtxModelObject {
-	
+
 	private static final long serialVersionUID = -1908778456166623132L;
+
+
+	private String stringValue;
+	private Integer integerValue;
+	private Double doubleValue;
+	private byte[] blobValue;
+
 
 	/**
 	 * Returns the identifier of this historic context attribute.
@@ -43,14 +52,71 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	public CtxAttributeIdentifier getId() {
 		return (CtxAttributeIdentifier) super.getId();
 	}
+
+	/**
+	 * Returns the string value of this historic context attribute.
+	 * 
+	 * @return string value
+	 */
+	public String getStringValue() {
+		return this.stringValue;
+	}
+
+	/**
+	 * Returns the integer value of this historic context attribute.
+	 * 
+	 * @return integer value
+	 */
+	public Integer getIntegerValue() {
+		return this.integerValue;
+	}
+
+	/**
+	 * Returns the double value of this historic context attribute.
+	 * 
+	 * @return double value
+	 */
+	public Double getDoubleValue() {
+		return this.doubleValue;
+	}
+
+	/**
+	 * Returns the blob value of this historic context attribute.
+	 * 
+	 * @return blob value
+	 */
 	
+	public Serializable getBlobValue(ClassLoader classLoader) {
+
+		this.blobValue = null;
+		/*
+		if (classLoader == null)
+			throw new NullPointerException("classLoader can't be null");
+		if (this.blobValue == null)
+			return null;
+
+		Serializable result = null;
+		try {
+			result = SerializationHelper.deserialize(this.blobValue,
+					classLoader);
+		} catch (IOException ioe) {
+			throw new ContextModelException(ioe.getMessage(), ioe);
+		} catch (ClassNotFoundException cnfe) {
+			throw new ContextModelException(cnfe.getMessage(), cnfe);
+		}
+		*/
+		return blobValue;
+	}
+
 	/**
 	 * TODO
 	 * Returns a String representation of this historic context attribute.
 	 * 
 	 * @return a String representation of this historic context attribute.
-	 *
+	 */
 	@Override
 	public String toString() {
-	}*/
+		return getId().toString(); 
+	}
+
 }
