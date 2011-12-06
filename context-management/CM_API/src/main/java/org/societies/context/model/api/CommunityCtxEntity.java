@@ -51,7 +51,9 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	/** The context bond of this CIS. */
 	private Set<CtxBond> bonds = new HashSet<CtxBond>();
 
-	CommunityCtxEntity() {}
+	public CommunityCtxEntity(CtxEntityIdentifier id) {
+		super(id);
+	}
 
 	/**
 	 * Returns the members of this CIS.

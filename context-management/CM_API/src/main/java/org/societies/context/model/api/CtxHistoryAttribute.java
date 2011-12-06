@@ -43,6 +43,10 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	private byte[] blobValue;
 
 
+	public CtxHistoryAttribute(CtxAttributeIdentifier id) {
+		super(id);
+	}
+	
 	/**
 	 * Returns the identifier of this historic context attribute.
 	 * 

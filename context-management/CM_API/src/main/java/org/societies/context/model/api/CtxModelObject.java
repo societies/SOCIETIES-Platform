@@ -48,7 +48,15 @@ public abstract class CtxModelObject implements Serializable {
 	/** The last modification time of this context model object. */
 	private Date lastModified;
 
-	CtxModelObject() {}
+	/**
+	 * Constructs a CtxModelObject with the specified identifier
+	 * 
+	 * @param id
+	 *            the identifier of the newly created context model object
+	 */
+	CtxModelObject(CtxIdentifier id) {
+		this.id = id;
+	}
 
 	/**
 	 * Returns the identifier of this context model object
