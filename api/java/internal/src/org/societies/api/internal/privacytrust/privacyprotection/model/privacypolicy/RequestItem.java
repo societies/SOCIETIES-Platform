@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy
+package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
 
 
 import java.io.Serializable;
@@ -42,7 +42,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypr
  *
  */
 public class RequestItem implements Serializable{
-	
+
 	private Resource resource;
 	private List<Action> actions;
 	private List<Condition> conditions;
@@ -59,22 +59,22 @@ public class RequestItem implements Serializable{
 		this.conditions = conditions;
 		this.optional = false;
 	}
-	
+
 	public RequestItem(Resource r, List<Action> actions, List<Condition> conditions, boolean isOptional){
 		this.resource = r;
 		this.actions = actions;
 		this.conditions = conditions;
 		this.optional = isOptional;
 	}
-	
+
 	public Resource getResource(){
 		return this.resource;
 	}
-	
+
 	public List<Action> getActions(){
 		return this.actions;
 	}
-	
+
 	public List<Condition> getConditions(){
 		return this.conditions;
 	}
@@ -82,7 +82,7 @@ public class RequestItem implements Serializable{
 	public void setConditions(List<Condition> conditions){
 		this.conditions = conditions;
 	}
-	
+
 	public void setActions(List<Action> actions){
 		this.actions = actions;
 	}
@@ -99,11 +99,11 @@ public class RequestItem implements Serializable{
 		str = str.concat("\n</Target>");
 		return str;
 	}
-	
+
 	public boolean isOptional(){
 		return this.optional;
 	}
-	
+
 	public void setOptional(boolean isOptional){
 		this.optional = isOptional;
 	}

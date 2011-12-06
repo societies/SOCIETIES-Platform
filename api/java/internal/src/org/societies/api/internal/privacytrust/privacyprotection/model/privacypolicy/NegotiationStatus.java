@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy
+package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
 
 /**
  * @author Elizabeth
@@ -31,7 +31,7 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 public enum NegotiationStatus {
 
 	SUCCESSFUL("successful"), FAILED("failed"), ONGOING("ongoing");
-	
+
 	private String status;
 	NegotiationStatus(String status){
 		this.status = status;

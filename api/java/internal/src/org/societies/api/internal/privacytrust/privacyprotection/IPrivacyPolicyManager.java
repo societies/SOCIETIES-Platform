@@ -27,7 +27,7 @@ package org.societies.api.internal.privacytrust.privacyprotection;
 import java.util.List;
 import java.util.Map;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyPolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 
 /**
  * External Interface to do actions relative to a privacy policy or a privacy

@@ -26,8 +26,8 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.util.List;
 
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import org.societies.api.internal.mock.EntityIdentifier;
+import org.societies.api.internal.mock.ServiceResourceIdentifier;
 
 public interface IAgreement {
 	

@@ -26,8 +26,9 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.io.Serializable;
 
-import org.societies.personalisation.common.api.model.ICtxAttributeIdentifier;
-import org.societies.api.internal.personalisation.preference.model.OperatorConstants;
+import org.societies.api.internal.mock.ICtxAttributeIdentifier;
+//import org.societies.api.internal.personalisation.preference.model.OperatorConstants;
+import org.societies.api.internal.mock.OperatorConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyConditionConstants;
 
 /**
