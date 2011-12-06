@@ -25,6 +25,14 @@
 package org.societies.api.internal.servicelifecycle.serviceRegistry;
 
 import java.util.List;
+
+import org.societies.api.internal.servicelifecycle.serviceRegistry.model.QuerySubjectType;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.model.RegistryEntry;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.model.RegistryEntryOut;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.model.ServiceResourceIdentifier;
+import org.societies.comm.identity.Identity;
+
+import com.sun.servicetag.Registry;
 /**
  * @author Antonio Panazzolo, Massimo Mazzariol (SN)
  */
@@ -34,17 +42,17 @@ public interface IServiceRegistry {
 	 * Description: This method provides the interface to add a new list of services.
 	 * 				List services can be composed at least by only service at time
 	 * @param servicesList
-	 * @return an Object representing ServiceID
+	 * @return the list of services registered correctly
 	 */
-	public Object registerServiceList (List<Object> servicesList);
+	public List<ServiceResourceIdentifier> registerServiceList (List<RegistryEntry> servicesList);
 
 	
 	/**
 	 * Description: This method permits you to unregister a services list
 	 * @param servicesList
-	 * @return true if the services were successfully removed 
+	 * @return the list of services removed correctly
 	 */
-	public boolean unregisterServiceList (List<Object> servicesList);
+	public List<ServiceResourceIdentifier> unregisterServiceList (List<ServiceResourceIdentifier> servicesList);
 
 
 	/**
@@ -52,22 +60,39 @@ public interface IServiceRegistry {
 	 * @param CSSID
 	 * @return true if the remote registry was successfully synced
 	 */
-	public boolean syncRemoteCSSRegistry (Object CSSID);
+	public boolean syncRemoteCSSRegistry (Identity CSSID);
 
 
 	/**
-	 * Description: Based on a Filter this method returns the services list inside the registry
-	 * @param filter
+	 * Description: Based on a CSS identifier this method returns all services shared by CSS to other CSS or CIS 
+	 * @param CSS that represents the identifier for CSS, 
+	 * 		  type declare if the return list contains services shared to CIS or to CSS
 	 * @return a List of services retrieved
 	 */
-	public List<Object> searchServices (Object filter);
+	public List<RegistryEntryOut> retrieveServicesSharedByCSS (Identity CSS, QuerySubjectType type);
 	
 	/**
-	 * Description: This method gives out more details on a particular selected service 
-	 * 
-	 * @param serviceID
-	 * @return represents an Object containing details on the service
+	 * Description: Based on a CSS identifier this method returns all services that are available within the specified CSS 
+	 * @param CSS that represents the identifier for CSS
+	 * @return a List of services retrieved
 	 */
-	public Object getServiceDetail (Object serviceID);
+	public List<RegistryEntryOut> retrieveServicesInCSS (Identity CSS);
+	
+	/**
+	 * Description: Based on a CSS identifier this method returns all services that are available within the specified CIS 
+	 * @param CIS that represents the identifier for CIS
+	 * @return a List of services retrieved
+	 */
+	public List<RegistryEntryOut> retrieveServicesInCIS (Identity CIS);
+	
+	/**
+	 * Description: Based on a CSS identifier this method returns all services shared to CSS by other CSS or CIS 
+	 * @param CSS that represents the identifier for CSS, 
+	 * 		  type declare if the return list contains services shared by CIS or by CSS
+	 * @return a List of services retrieved
+	 */
+	public List<RegistryEntryOut> retrieveServicesSharedToCSS (Identity CSS, QuerySubjectType type);
+	
+	
 	
 }
