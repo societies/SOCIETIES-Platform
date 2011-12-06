@@ -82,5 +82,15 @@ public interface ICisRule {
 	 */
 	
 	public boolean deleteRule();
+	
+	/*
+	 * Description: The getRule method returns this rule.
+	 * Parameters: 
+	 * 				none
+	 * Returns:
+	 * 				The rule represented by the object implementing this interface.
+	 */
+	
+	public ICisRule getRule();
 
 }

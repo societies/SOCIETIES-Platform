@@ -25,6 +25,8 @@
 
 package org.societies.slm.qosmonitor.api;
 
+import java.io.Serializable;
+
 /**
  * Interface for invoking the third party Quality of Service (QoS) Monitor.
  * To be used by QoS Reporter.

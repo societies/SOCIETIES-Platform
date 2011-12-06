@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+   <parent>
+        <groupId>org.societies</groupId>
+        <artifactId>spring-osgi-parent</artifactId>
+        <version>0.1</version>
+        <relativePath>../../parent/spring-osgi.xml</relativePath>
+   </parent>
+
+    <groupId>org.societies.css</groupId>
+    <artifactId>node-client</artifactId>
+    <packaging>bundle</packaging>
+    <name>CSSNodeClient</name>
+    <version>0.1</version>
+    
+   <developers>
+      <developer>
+		 <name>WP4</name>
+		<!-- Name of component author-->
+		 <email>http://www.ict-societies.eu</email>
+		<!-- Component author e-mail-->
+	  </developer>
+   </developers>
+
+    <url>http://www.ict-societies.eu/</url>
+
+
+    <dependencies>
+    </dependencies>
+
+    
+    <build>
+        <resources>
+            <!-- standard Maven folder -->
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <!-- plus root folder -->
+            <resource>
+                <directory>.</directory>
+                <includes>
+                    <include>plugin.xml</include>
+                    <include>META-INF/*</include>
+                </includes>
+            </resource>
+        </resources>
+        
+        <plugins>
+			<plugin>    
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Export-Package>org.societies.css.api.*</Export-Package>
+						<Private-Package>org.societies.css.nodeclient</Private-Package>
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
+                		<Include-Resource>src/main/resources</Include-Resource>
+
+					</instructions>
+				</configuration>
+			</plugin>    
+      		<plugin>
+            	<groupId>org.apache.maven.plugins</groupId>
+            	<artifactId>maven-dependency-plugin</artifactId>
+            	<configuration>
+                  	<artifactItems>
+		        		<artifactItem>
+				   			<groupId>${project.groupId}</groupId>
+				   			<artifactId>${project.artifactId}</artifactId>
+				   			<version>${project.version}</version>
+		              		<type>jar</type>
+		              		<overWrite>true</overWrite>
+		            
+                            <outputDirectory>${virgo.home}/pickup</outputDirectory>
+		        		</artifactItem>
+                  	</artifactItems>
+                  
+                  <!-- this is where your dependent bundles will go e.g. junit, log4j etc. 
+                  <outputDirectory>${virgo.home}/pickup</outputDirectory>-->                                              
+            </configuration>
+      </plugin>
+        </plugins>
+    </build>
+
+
+</project>
