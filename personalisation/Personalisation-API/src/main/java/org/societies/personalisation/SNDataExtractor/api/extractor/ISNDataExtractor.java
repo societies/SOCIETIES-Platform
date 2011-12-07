@@ -1,6 +1,6 @@
 package org.societies.personalisation.SNDataExtractor.api.extractor;
 
-public interface ISNDataExtractor {
+public interface ISNDataExtractor  {
 	
 	/**
 	 * This method will add a new USER connection between an user (new or already provisioned) 
