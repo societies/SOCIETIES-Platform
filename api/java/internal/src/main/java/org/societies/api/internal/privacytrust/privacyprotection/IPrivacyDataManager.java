@@ -29,6 +29,8 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfus
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+
+//TODO : temporary mock package import to solve missing package in API folder
 import org.societies.api.internal.mock.DataIdentifier;
 import org.societies.api.internal.mock.EntityIdentifier;
 import org.societies.api.internal.mock.ServiceResourceIdentifier;

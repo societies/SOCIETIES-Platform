@@ -1,6 +1,8 @@
 package org.societies.api.internal.servicelifecycle.serviceRegistry.model;
 
 import java.net.URI;
+//TODO : temporary mock package import to solve missing package in API folder
+import org.societies.api.internal.mock.EndPoint;
 
 /**
  * This Class represents the output object contained in the List returned after a
@@ -14,8 +16,9 @@ public class RegistryEntryOut {
 	private String serviceName;
 	private String version;
 	private String serviceDescription;
-	private org.societies.comm.xmpp.Endpoint CSSInstalled;
-	private org.societies.comm.xmpp.Endpoint CSSNodeInstalled;
+	//BJB remove package reference as import as been added.
+	private EndPoint CSSInstalled;
+	private EndPoint CSSNodeInstalled;
 	private URI serviceURI;
 	private String organizationId;
 	private ServiceResourceIdentifier serviceIdentifier;

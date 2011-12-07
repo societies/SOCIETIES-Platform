@@ -30,8 +30,12 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.model.QuerySu
 import org.societies.api.internal.servicelifecycle.serviceRegistry.model.RegistryEntry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.model.RegistryEntryOut;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.model.ServiceResourceIdentifier;
-import org.societies.comm.identity.Identity;
 
+//TODO : temporary mock package import to solve missing package "org.societies.comm.identity" in API folder
+import org.societies.api.internal.mock.Identity;
+/*
+import org.societies.comm.identity.Identity;
+*/
 import com.sun.servicetag.Registry;
 /**
  * @author Antonio Panazzolo, Massimo Mazzariol (SN)

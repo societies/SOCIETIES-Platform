@@ -24,58 +24,56 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection;
 
-
+//TODO : temporary mock package import to solve missing package in API folder
 import org.societies.api.internal.mock.EntityIdentifier;
 import org.societies.api.internal.mock.ServiceResourceIdentifier;
+
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 /**
- * @author Eliza
+ * This interface defines the methods that should be implemented by the CSS that
+ * acts as a client in the Negotiation process. This means that this CSS is the
+ * one that initiates the starting of the service or requests to join a CIS.
+ * @author Elizabeth
  * @version 1.0
- * @created 11-Nov-2011 18:55:01
+ * @created 11-Nov-2011 17:03:12
  */
-public interface INegotiationAgent {
+public interface INegotiationClient {
 
 	/**
-	 * this method is called by the client and asks the provider to acknowledge the
-	 * agreement document.
-	 * @return				true if acknowledged, false if not acknowledged.
 	 * 
-	 * @param contract    the agreement to acknowledge
+	 * @param serviceID
+	 * @param providerIdentity
+	 * @param envelope
+	 * @param b
 	 */
-	public boolean acknowledgeAgreement(IAgreementEnvelope contract);
+	public void acknowledgeAgreement(ServiceResourceIdentifier serviceID, EntityIdentifier providerIdentity, IAgreementEnvelope envelope, boolean b);
 
 	/**
-	 * this method is called by any PSS that wants to read the service's provider
-	 * RequestPolicy for a specific service it provides
-	 * @return				the policy of the service provider in the format of RequestPolicy
 	 * 
-	 * @param serviceID    the service identifier of the service for which the
-	 * negotiation will be performed
+	 * @param policy
 	 */
-	public RequestPolicy getPolicy(ServiceResourceIdentifier serviceID);
+	public void receiveNegotiationResponse(ResponsePolicy policy);
 
 	/**
-	 * This method is called by any PSS to get the Identity of the service provider.
-	 * This is needed to do trust evaluation and evaluation of privacy preferences
-	 * where applicable
-	 * @return				the identity of the service provider
-	 */
-	public EntityIdentifier getProviderIdentity();
-
-	/**
-	 * this method is called by the client and informs the provider that it wants to
-	 * initiate a negotiation process for the specified serviceID and provides its
-	 * policy which is a response to the provider's advertised privacy policy. this
-	 * method can be called a number of times until the ResponsePolicy.getStatus
-	 * method returns SUCCESSFUL or FAILED status.
-	 * @return 				the ResponsePolicy to the client's privacy policy.
 	 * 
-	 * @param serviceID    the service identifier for which the negotiation is going
-	 * to be performed
-	 * @param policy    the ResponsePolicy to the provider's privacy policy
+	 * @param dpi
 	 */
-	public ResponsePolicy negotiate(ServiceResourceIdentifier serviceID, ResponsePolicy policy);
+	public void receiveProviderIdentity(EntityIdentifier dpi);
+
+	/**
+	 * 
+	 * @param policy
+	 */
+	public void receiveProviderPolicy(RequestPolicy policy);
+
+	/**
+	 * 
+	 * @param policy
+	 * @param serviceIdentifier
+	 * @param serviceIdentity
+	 */
+	public void startPrivacyPolicyNegotiation(RequestPolicy policy, ServiceResourceIdentifier serviceIdentifier, EntityIdentifier serviceIdentity);
 
 }
