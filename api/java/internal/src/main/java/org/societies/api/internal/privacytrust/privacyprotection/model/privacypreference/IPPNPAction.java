@@ -26,11 +26,11 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.util.List;
 
-import org.societies.api.internal.mock.ContextAttribute;
-import org.societies.api.internal.mock.EntityIdentifier;
-import org.societies.api.internal.mock.ICtxAttributeIdentifier;
-import org.societies.api.internal.mock.ServiceResourceIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
+import org.societies.api.mock.ContextAttribute;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ICtxAttributeIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
 /**
  * This interface is used to represent an access permission decision made by the

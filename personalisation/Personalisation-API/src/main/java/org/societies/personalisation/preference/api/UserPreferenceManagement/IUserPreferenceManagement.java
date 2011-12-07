@@ -21,15 +21,15 @@ package org.societies.personalisation.preference.api.UserPreferenceManagement;
 
 import java.util.List;
 
-import org.societies.personalisation.common.api.model.ContextAttribute;
-import org.societies.personalisation.common.api.model.ContextModelObject;
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.ICtxAttributeIdentifier;
-import org.societies.personalisation.common.api.model.IOutcome;
-import org.societies.personalisation.common.api.model.IPreferenceConditionIOutcomeName;
-import org.societies.personalisation.common.api.model.PreferenceDetails;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import org.societies.api.internal.personalisation.model.IOutcome;
+import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.mock.ContextAttribute;
+import org.societies.api.mock.ContextModelObject;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ICtxAttributeIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IPreference;
+import org.societies.personalisation.preference.api.model.IPreferenceConditionIOutcomeName;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 

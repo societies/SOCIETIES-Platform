@@ -1,12 +1,12 @@
 package org.societies.personalisation.CRIST.api.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.io.Serializable;
 
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
 /**
  * This class is used to define the data structure and methods for modelling and

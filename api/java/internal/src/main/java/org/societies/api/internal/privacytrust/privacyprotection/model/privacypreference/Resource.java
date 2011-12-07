@@ -26,8 +26,8 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.io.Serializable;
 
-import org.societies.api.internal.mock.ICtxAttributeIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.TargetMatchConstants;
+import org.societies.api.mock.ICtxAttributeIdentifier;
 
 /**
  * the Resource class is used to represent  a piece of data type belonging to the user 

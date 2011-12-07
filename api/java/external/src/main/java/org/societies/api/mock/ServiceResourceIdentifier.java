@@ -1,4 +1,4 @@
-package org.societies.api.internal.mock;
+package org.societies.api.mock;
 
 public class ServiceResourceIdentifier {
 	public String toUriString() {

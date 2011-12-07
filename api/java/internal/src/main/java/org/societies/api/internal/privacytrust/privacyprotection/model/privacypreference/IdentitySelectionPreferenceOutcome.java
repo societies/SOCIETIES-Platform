@@ -25,9 +25,9 @@
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference;
 
 
-import org.societies.api.internal.mock.EntityIdentifier;
-import org.societies.api.internal.mock.ServiceResourceIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
 
 

@@ -26,8 +26,8 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.io.Serializable;
 
-import org.societies.api.internal.mock.EntityIdentifier;
-import org.societies.api.internal.mock.ServiceResourceIdentifier;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
 public class IDSPreferenceDetails implements Serializable{
 

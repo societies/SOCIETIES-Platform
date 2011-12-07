@@ -25,10 +25,11 @@
 
 package org.societies.api.personalisation.mgmt;
 
-
-import org.societies.api.personalisation.model.EntityIdentifier;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.personalisation.model.ServiceResourceIdentifier;
+
+
 
 
 

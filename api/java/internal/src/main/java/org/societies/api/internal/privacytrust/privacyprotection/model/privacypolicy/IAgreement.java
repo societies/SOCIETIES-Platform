@@ -24,10 +24,11 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
 
+
 import java.util.List;
 
-import org.societies.api.internal.mock.EntityIdentifier;
-import org.societies.api.internal.mock.ServiceResourceIdentifier;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
 public interface IAgreement {
 	

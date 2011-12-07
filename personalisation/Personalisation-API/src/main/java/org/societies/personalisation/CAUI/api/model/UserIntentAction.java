@@ -29,7 +29,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
+
 
 /**
  * This class represents an action performed by a user.

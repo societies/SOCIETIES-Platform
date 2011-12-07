@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
-import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
-import org.societies.personalisation.CRIST.api.model.ICRISTUserTask;
-import org.societies.personalisation.CRIST.api.model.ICRISTUserSituation;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.personalisation.CRIST.api.model.CRISTUserTaskModelData;
+import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
+import org.societies.personalisation.CRIST.api.model.ICRISTUserSituation;
+import org.societies.personalisation.CRIST.api.model.ICRISTUserTask;
 
 /**
 * @author Zhu WANG

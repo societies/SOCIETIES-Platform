@@ -19,12 +19,12 @@
  */
 package org.societies.personalisation.preference.api.UserPreferenceConditionMonitor;
 
-import org.societies.personalisation.common.api.model.ContextAttribute;
-import org.societies.personalisation.common.api.model.ContextModelObject;
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.IFeedbackEvent;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import org.societies.api.internal.personalisation.model.IFeedbackEvent;
+import org.societies.api.mock.ContextAttribute;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
+import org.societies.api.mock.ContextModelObject;
 
 
 /**
