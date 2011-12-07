@@ -45,9 +45,7 @@
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>
-					<instructions>
-						<Import-Package></Import-Package>
-						
+					<instructions>						
 						<!-- the API will export all interfaces packages for the rest of modules -->
 						<Export-Package>
 						org.societies.api.internal.*
