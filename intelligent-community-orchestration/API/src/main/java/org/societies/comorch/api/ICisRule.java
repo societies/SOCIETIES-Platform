@@ -21,7 +21,7 @@ public interface ICisRule {
 	//              recommendation for joining
 	//  Merge:      Specifies if and/or when a CIS should be merged with other CISs.
 
-	private String ruleType;
+	public String ruleType;
 	
 	//The rule embodied by the CISRule object that this interface represents.
 	//The 'keys' in the HashMap may be the following (still in progress):
@@ -34,7 +34,7 @@ public interface ICisRule {
 	//  "CIS merging criteria" - value = array of conditions for a CIS to be merged with another
 	//  "CIS membership criteria" - value = the membership criteria for a CIS
 	//  
-	private HashMap ruleDetails;
+	public HashMap ruleDetails;
 
     /*
      * Constructor for ICISRule.
