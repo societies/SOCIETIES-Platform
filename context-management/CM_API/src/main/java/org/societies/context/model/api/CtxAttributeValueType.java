@@ -25,19 +25,23 @@
 package org.societies.context.model.api;
 
 /**
- * Specifies if the respectice CtxAttribute belongs to a community or individual CtxEntity.
- * @author nikosk
- *
+ * The constants of this enumerated type specify whether a {@link CtxAttribute}
+ * belongs to a community or individual context entity.
+ * 
+ * @see IndividualCtxEntity
+ * @see CommunityCtxEntity
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
  */
 public enum CtxAttributeValueType {
 
 	/**
-	 * 
+	 * Denotes that the {@link CtxAttribute} belongs to a {@link IndividualCtxEntity}
 	 */
 	INDIVIDUAL,
 	
 	/**
-	 * 
+	 * Denotes that the {@link CtxAttribute} belongs to a {@link CommunityCtxEntity}
 	 */
 	COMMUNITY,
 }
