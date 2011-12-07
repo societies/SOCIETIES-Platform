@@ -9,6 +9,9 @@
 
 package org.societies.api.internal.intelligentcommunityorchestration.comorch;
 
+import java.lang.String;
+import java.util.HashMap;
+
 public interface ICisRule {
     
 	//States the type of the rule, which is one of the following three:
@@ -58,19 +61,6 @@ public interface ICisRule {
 	 */
 	
     public boolean modifyRule(HashMap changesToRule);
-	
-    /*
-	 * Description: The modifyRule method alters the rule that the CISRule 
-	 *              object represents, using the information of the input
-	 *              CISRule.
-	 * Parameters: 
-	 * 				1) CISRule - The new rule that is replacing the existing one
-	 * Returns:
-	 * 				* True if the method was able to modify the CIS rule.
-	 *				* False if the method was unable to modify the CIS rule.
-	 */
-    
-	public boolean modifyRule(CisRule replacingRule);
 	
 	/*
 	 * Description: The deleteRule method causes the CISRule object
