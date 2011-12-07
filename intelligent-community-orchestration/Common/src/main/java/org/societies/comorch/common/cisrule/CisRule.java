@@ -12,7 +12,7 @@ package org.societies.api.internal.intelligentcommunityorchestration.comorch;
 import java.lang.String;
 import java.util.HashMap;
 
-public interface ICisRule {
+public interface CisRule {
     
 	//States the type of the rule, which is one of the following three:
 	//  Lifecycle:  Relates to the creation, configuration,
@@ -37,7 +37,7 @@ public interface ICisRule {
 	public HashMap ruleDetails;
 
     /*
-     * Constructor for ICISRule.
+     * Constructor for CISRule.
      * 
 	 * Description: The constructor creates a new CISRule with the details
 	 *              passed to it.
@@ -48,7 +48,7 @@ public interface ICisRule {
 	 *                                in order to create it. 
 	 */
 	
-	public ICisRule(String ruleType, HashMap ruleToCreate);
+	public CisRule(String ruleType, HashMap ruleToCreate);
 	
 	/*
 	 * Description: The modifyRule method alters the rule that the CISRule 
