@@ -24,9 +24,22 @@
  */
 package org.societies.context.model.api;
 
+/**
+ * This class is used to represent a single participant (CSS) of a
+ * {@link CommunityCtxEntity} (CIS). An <code>IndividualCtxEntity</code> may belong to
+ * zero or more CISs, simultaneously. The individual members of a pervasive community do
+ * not need to be human beings. They can also be organisations, smart space
+ * infrastructures, autonomous or semi-autonomous agents, etc.
+ * 
+ * @see CtxEntityIdentifier
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
+ */
 public class IndividualCtxEntity extends CommunityMemberCtxEntity {
 
 	private static final long serialVersionUID = -1841816618272931692L;
-
-	private IndividualCtxEntity() {}
+	
+	public IndividualCtxEntity(CtxEntityIdentifier id) {
+		super(id);
+	}
 }

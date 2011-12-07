@@ -53,7 +53,15 @@ public class CtxEntity extends CtxModelObject {
 	private Set<CtxAttribute> attributes = new HashSet<CtxAttribute>();
 	private Set<CtxAssociationIdentifier> associations;
 
-	CtxEntity() {}
+	/**
+	 * Constructs a CtxEntity with the specified identifier
+	 * 
+	 * @param id
+	 *            the identifier of the newly created context entity
+	 */
+	public CtxEntity(CtxEntityIdentifier id) {
+		super(id);
+	}
 	
 	/**
 	 * Returns the identifier of this context entity.

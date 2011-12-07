@@ -24,54 +24,245 @@
  */
 package org.societies.context.model.api;
 
-import java.io.Serializable;
+import java.util.Date;
 
 /**
- * This class is used to represent context attributes.
+ * This class is used to represent context attributes which describe the
+ * properties of a {@link CtxEntity}. Multiple <code>CtxAttribute</code>
+ * objects can be assigned to an entity. For example, concepts such as the name,
+ * the age, and the location of a person entity are described by different
+ * attributes. Similarly, attributes describing a device's properties might be
+ * the identity, the voltage, and the operational status of the device.
+ * Essentially, CtxAttribute objects are used to identify an entity's status in
+ * terms of its static and dynamic properties and therefore, capture all context
+ * information items that characterise the situation of the owner entity. Note
+ * that the containing entity is called the attribute's scope.
+ * <p>
+ * The value of a <code>CtxAttribute</code> can be set and retrieved using the
+ * appropriate setter and getter method. The following value types are supported:
+ * <dl>
+ * <dt><code>String</code></dt>
+ * <dd>Text value.</dd>
+ * <dt><code>Integer</code></dt>
+ * <dd>Integer value.</dd>
+ * <dt><code>Double</code></dt>
+ * <dd>Double-precision floating point numeric value.</dd>
+ * <dt><code>byte[]</code></dt>
+ * <dd>Binary value.</dd>
+ * </dl> 
+ * The following is an example of a context attribute holding a
+ * <code>String</code> value:
+ * <pre>
+ * // Assuming we have obtained a reference to the context attribute 
+ * CtxAttribute nameAttr;
+ * // Initialise or update its value 
+ * nameAttr.setStringValue(&quot;Sakis Rouvas&quot;);
+ * // Retrieve its value 
+ * String name = nameAttr.getStringValue();
+ * </pre>
+ * <p>
+ * The <code>CtxAttribute</code> class also provides access to the history flag
+ * which controls whether the represented attribute is maintained in the
+ * historic context database.
  * 
- * @author nikosk
- * @version 0.0.1
+ * @see CtxAttributeIdentifier
+ * @see CtxEntity
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
  */
 public class CtxAttribute extends CtxModelObject {
 
 	private static final long serialVersionUID = 2885099443175534995L;
 	
-	private Serializable value;
+	/** The text value of this context attribute. */
+	private String stringValue;
+	
+	/** The integer value of this context attribute. */
+	private Integer integerValue;
+	
+	/** The double-precision floating point numeric value of this context attribute.*/
+	private Double doubleValue;
+	
+	/** The binary value of this context attribute. */
+	private byte[] binaryValue;
+	
+	/** The value type of this context attribute, i.e. INDIVIDUAL or COMMUNITY */
 	private CtxAttributeValueType valueType;
+	
+	/** The metric for the current context attribute value */
 	private String valueMetric;
+	
+	/** The QoC meta-data. */
 	private CtxQuality quality;
+	
+	/** The identifier of the context source for the current attribute value. */
 	private String sourceId;
-
-	private CtxAttribute() {}
+	
+	/** The history flag of this context attribute. */
+	private boolean historyRecorded;
 
 	/**
+	 * Constructs a CtxAttribute with the specified identifier.
 	 * 
+	 * @param id
+	 *            the identifier of the newly created context attribute
+	 */
+	public CtxAttribute(CtxAttributeIdentifier id) {
+		super(id);
+		this.quality = new CtxQuality(this);
+	}
+	
+	/**
+	 * Returns the identifier of this context attribute.
+	 * 
+	 * @return the identifier of this context attribute.
 	 */
 	@Override
 	public CtxAttributeIdentifier getId() {
 		return (CtxAttributeIdentifier) super.getId();
 	}
-
+	
 	/**
-	 * Returns the value of the CtxAttribute
-	 * @return Serializable
+	 * Returns the identifier of the context entity containing this attribute
+	 * 
+	 * @return the identifier of the context entity containing this attribute
 	 */
-	public Serializable getValue(){
-		return this.value;
+	public CtxEntityIdentifier getScope() {
+		return this.getId().getScope();
 	}
 
 	/**
-	 * Sets the value of the CtxAttribute
-	 * @param value
+	 * Returns the value of this context attribute or <code>null</code>
+	 * if the value is not a String.
+	 * 
+	 * @return the value of this context attribute or <code>null</code>
+	 *         if the value is not a String.
+	 * @see #getIntegerValue()
+	 * @see #getDoubleValue()
+	 * @see #getBinaryValue()
 	 */
-	public void setValue(Serializable value){
-		this.value = value;
+	public String getStringValue() {
+		return this.stringValue;
 	}
 	
 	/**
-	 * Returns the value type of the CtxAttribute
+	 * Sets the value of this context attribute to the specified String.
 	 * 
-	 * @return CtxAttributeValueType
+	 * @param value
+	 *            the String value to set
+	 * @see #setIntegerValue(Integer)
+	 * @see #setDoubleValue(Double)
+	 * @see #setBinaryValue(byte[])
+	 */
+	public void setStringValue(String value) {
+		this.stringValue = value;
+		this.integerValue = null;
+		this.doubleValue = null;
+		this.binaryValue = null;
+		// Update the last update time
+		this.quality.setLastUpdated(new Date());
+	}
+
+	/**
+	 * Returns the value of this context attribute or <code>null</code>
+	 * if the value is not an Integer.
+	 * 
+	 * @return the value of this context attribute or <code>null</code>
+	 *         if the value is not an Integer.
+	 * @see #getStringValue()
+	 * @see #getDoubleValue()
+	 * @see #getBinaryValue()
+	 */
+	public Integer getIntegerValue() {
+		return this.integerValue;
+	}
+	
+	/**
+	 * Sets the value of this context attribute to the specified Integer.
+	 * 
+	 * @param value
+	 *            the Integer value to set
+	 * @see #setStringValue(String)
+	 * @see #setDoubleValue(Double)
+	 * @see #setBinaryValue(byte[])
+	 */
+	public void setIntegerValue(Integer value) {
+		this.stringValue = null;
+		this.integerValue = value;
+		this.doubleValue = null;
+		this.binaryValue = null;
+		// Update the last update time
+		this.quality.setLastUpdated(new Date());
+	}
+	
+	/**
+	 * Returns the value of this context attribute or <code>null</code>
+	 * if the value is not a Double.
+	 * 
+	 * @return the value of this context attribute or <code>null</code>
+	 *         if the value is not a Double.
+	 * @see #getStringValue()
+	 * @see #getIntegerValue()
+	 * @see #getBinaryValue()
+	 */
+	public Double getDoubleValue() {
+		return this.doubleValue;
+	}
+	
+	/**
+	 * Sets the value of this context attribute to the specified Double.
+	 * 
+	 * @param value
+	 *            the Double value to set
+	 * @see #setStringValue(String)
+	 * @see #setIntegerValue(Integer)
+	 * @see #setBinaryValue(byte[])
+	 */
+	public void setDoubleValue(Double value) {
+		this.stringValue = null;
+		this.integerValue = null;
+		this.doubleValue = value;
+		this.binaryValue = null;
+		// Update the last update time
+		this.quality.setLastUpdated(new Date());
+	}
+	
+	/**
+	 * Returns the value of this context attribute or <code>null</code>
+	 * if the value is not a byte array.
+	 * 
+	 * @return the value of this context attribute or <code>null</code>
+	 *         if the value is not a byte array.
+	 * @see #getStringValue()
+	 * @see #getIntegerValue()
+	 * @see #getDoubleValue()
+	 */
+	public byte[] getBinaryValue() {
+		return this.binaryValue;
+	}
+	
+	/**
+	 * Sets the value of this context attribute to the specified byte array.
+	 * 
+	 * @param value
+	 *            the byte array value to set
+	 * @see #setStringValue(String)
+	 * @see #setIntegerValue(Integer)
+	 * @see #setDoubleValue(Double)
+	 */
+	public void setBinaryValue(byte[] value) {
+		this.stringValue = null;
+		this.integerValue = null;
+		this.doubleValue = null;
+		this.binaryValue = value;
+		// Update the last update time
+		this.quality.setLastUpdated(new Date());
+	}
+	
+	/**
+	 * Returns the value type of this context attribute
+	 * 
+	 * @return the value type of this context attribute
 	 */
 	public CtxAttributeValueType getValueType(){
 		return this.valueType;
@@ -80,16 +271,17 @@ public class CtxAttribute extends CtxModelObject {
 	/**
 	 * Returns the metric for the context attribute value.
 	 * 
-	 * @return String
+	 * @return the metric for the context attribute value.
 	 */
 	public String getValueMetric() {
 		return this.valueMetric;
 	}
 	
 	/**
-	 * Sets tha metric for the context attribute value.
+	 * Sets the metric for the context attribute value.
 	 * 
 	 * @param valueMetric
+	 *            the metric for the context attribute value to set
 	 */
 	public void setValueMetric(String valueMetric) {
 		this.valueMetric = valueMetric;
@@ -108,21 +300,45 @@ public class CtxAttribute extends CtxModelObject {
 	}
 	
 	/**
-	 * Returns the identifier of the context source.
+	 * Returns the identifier of the context source for the current attribute value.
 	 * 
-	 * @return the identifier of the context source.
+	 * @return the identifier of the context source for the current attribute value.
 	 */
 	public String getSourceId() {
 		return this.sourceId;
 	}
 	
 	/**
-	 * Sets the identifier of the context source.
+	 * Sets the identifier of the context source for the current attribute value.
 	 * 
 	 * @param sourceId
 	 *            the identifier of the context source to set.
 	 */
 	public void setSourceId(String sourceId) {
 		this.sourceId = sourceId;
+	}
+	
+	/**
+	 * Checks if this context attribute is maintained in the context history
+	 * repository
+	 * 
+	 * @return <code>true</code> if this context attribute is maintained in the
+	 * context history repository; <code>false</code> otherwise
+	 */
+	public boolean isHistoryRecorded() {
+		return this.historyRecorded;
+	}
+		
+	/**
+	 * Controls if this context attribute is to be maintained in the context
+	 * history repository
+	 * 
+	 * @param historyRecorded
+	 *            set to <code>true</code> if this context attribute is to be
+	 *            maintained in the context history repository;
+	 *            <code>false</code> otherwise
+	 */
+	public void setHistoryRecorded(boolean historyRecorded) {
+		this.historyRecorded = historyRecorded;
 	}
 }

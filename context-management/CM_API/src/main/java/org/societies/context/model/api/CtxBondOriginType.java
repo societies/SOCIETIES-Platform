@@ -25,8 +25,8 @@
 package org.societies.context.model.api;
 
 /**
- * Used to represent the origin of a context bond. It can be one of the
- * following types:
+ * The constants of this enumerated type specify the origin of a context bond.
+ * More specifically, a {@link CtxBond} can be one of the following types:
  * <ul>
  * <li>{@link #MANUALLY_SET}: Denotes a manually set context bond</li>
  * <li>{@link #DISCOVERED}: Denotes a discovered context bond</li>
@@ -40,17 +40,17 @@ package org.societies.context.model.api;
 public enum CtxBondOriginType {
 
     /**
-     * The enum constant for manually set context bonds
+     * The enum constant for manually set context bonds.
      */
     MANUALLY_SET,
 
     /**
-     * The enum constant for discovered context bonds
+     * The enum constant for discovered context bonds.
      */
     DISCOVERED,
 
     /**
-     * The enum constant for inherited context bonds
+     * The enum constant for inherited context bonds.
      */
     INHERITED,
 }

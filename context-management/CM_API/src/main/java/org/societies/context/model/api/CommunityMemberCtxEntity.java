@@ -26,20 +26,30 @@ package org.societies.context.model.api;
 
 import java.util.HashSet;
 import java.util.Set;
+
 /**
- * This class is used in order to model a CtxEntity that is a member of CommunityCtxEntities
+ * This abstract class is used in order to represent members of a
+ * {@link CommunityCtxEntity} (CIS). A <code>CommunityMemberCtxEntity</code>
+ * can be an individual or a sub-community, hence, there are two concrete
+ * implementations of this class, namely {@link IndividualCtxEntity} and
+ * {@link CommunityCtxEntity}. A CommunityMemberCtxEntity may belong to
+ * multiple communities, simultaneously. This class provides methods for
+ * accessing and modifying these communities.
  * 
- * @author nikosk
- * @version 0.0.1
+ * @see CtxEntityIdentifier
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
  */
 
 public abstract class CommunityMemberCtxEntity extends CtxEntity {
 	
 	private static final long serialVersionUID = 3614587369237968591L;
 	
-	public Set<CommunityCtxEntity> communities = new HashSet<CommunityCtxEntity>();
+	private Set<CommunityCtxEntity> communities = new HashSet<CommunityCtxEntity>();
 
-	CommunityMemberCtxEntity() {}
+	CommunityMemberCtxEntity(CtxEntityIdentifier id) {
+		super(id);
+	}
 
 	/**
 	 * Returns a set with the community members.

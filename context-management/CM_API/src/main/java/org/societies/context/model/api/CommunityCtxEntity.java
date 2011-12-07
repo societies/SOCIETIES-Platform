@@ -27,23 +27,17 @@ package org.societies.context.model.api;
 import java.util.HashSet;
 import java.util.Set;
 
-
 /**
  * This class is used to represent community context entities. A
- * <code>CommunityCtxEntity</code> is the core concept upon which the context model is
- * built. It corresponds to an object of the physical or conceptual world. For
- * example an entity could be a person, a device, or a service. The
- * {@link CtxAttribute} class is used in order to describe an entity's
- * properties. Concepts such as the name, the age, and the location of a person
- * are described by different context attributes. Relations that may exist among
- * different entities are described by the {@link CtxAssociation} class.
- * <p>
- * The <code>CtxEntity</code> class provides access to the contained
- * context attributes and the associations this entity is member of.
+ * <code>CommunityCtxEntity</code> corresponds to a pervasive community (CIS)
+ * and is associated with a set of {@link CommunityMemberCtxEntity} objects
+ * representing its members, i.e. {@link IndividualCtxEntity individuals}
+ * and/or other {@link CommunityCtxEntity communities}. The {@link CtxAttribute}
+ * class is used in order to describe the community context attributes of a CIS.
+ * Common context characteristics shared among community members are described
+ * by the {@link CtxBond} class. 
  * 
  * @see CtxEntityIdentifier
- * @see CtxAttribute
- * @see CtxAssociation
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
@@ -51,25 +45,36 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	
 	private static final long serialVersionUID = -8564823052068362334L;
 	
-	public Set<CommunityMemberCtxEntity> members = new HashSet<CommunityMemberCtxEntity>();
+	/** The members of this CIS. */
+	private Set<CommunityMemberCtxEntity> members = new HashSet<CommunityMemberCtxEntity>();
+	
+	/** The context bond of this CIS. */
+	private Set<CtxBond> bonds = new HashSet<CtxBond>();
 
-	private CommunityCtxEntity() {}
+	public CommunityCtxEntity(CtxEntityIdentifier id) {
+		super(id);
+	}
 
 	/**
-	 * Returns the members of this CommunityCtxEntity
+	 * Returns the members of this CIS.
 	 *  
-	 * @return
+	 * @return a set containing the members of this CIS.
 	 */
 	public Set<CommunityMemberCtxEntity> getMembers() {
 		return new HashSet<CommunityMemberCtxEntity>(this.members);
 	}
 	
 	/**
-	 * Add a member to the community.
+	 * Adds a member to this CIS.
 	 * 
 	 * @param member
+	 *            the new member of this CIS
+	 * @throws NullPointerException if the specified member is <code>null</code>
 	 */
 	public void addMember(CommunityMemberCtxEntity member) {
+		if (member == null)
+			throw new NullPointerException("member can't be null");
+		
 		this.members.add(member);
 	}
 
@@ -77,8 +82,50 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 * Remove a member from the community
 	 * 
 	 * @param member
+	 *            the member to remove from this CIS
+	 * @throws NullPointerException if the specified member is <code>null</code>
 	 */
 	public void removeMember(CommunityMemberCtxEntity member) {
+		if (member == null)
+			throw new NullPointerException("member can't be null");
+		
 		this.members.remove(member);
+	}
+	
+	/**
+	 * Returns the context bonds of this CIS.
+	 *  
+	 * @return a set containing the context bonds of this CIS.
+	 */
+	public Set<CtxBond> getBonds() {
+		return new HashSet<CtxBond>(this.bonds);
+	}
+	
+	/**
+	 * Adds a context bond for this CIS.
+	 * 
+	 * @param bond
+	 *            the context bond to add
+	 * @throws NullPointerException if the specified context bond is <code>null</code>
+	 */
+	public void addBond(CtxBond bond) {
+		if (bond == null)
+			throw new NullPointerException("bond can't be null");
+		
+		this.bonds.add(bond);
+	}
+
+	/**
+	 * Removes a context bond from this CIS
+	 * 
+	 * @param bond
+	 *            the context bond to remove
+	 * @throws NullPointerException if the specified context bond is <code>null</code>
+	 */
+	public void removeBond(CtxBond bond) {
+		if (bond == null)
+			throw new NullPointerException("bond can't be null");
+		
+		this.bonds.remove(bond);
 	}
 }

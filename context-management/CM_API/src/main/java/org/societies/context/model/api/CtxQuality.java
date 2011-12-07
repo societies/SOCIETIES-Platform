@@ -114,10 +114,24 @@ public class CtxQuality implements Serializable {
      * @return the time when the current context attribute value was last updated.
      * @see #getFreshness()
      */
-	public Date getLastUpdated(){
+	public Date getLastUpdated() {
 		return (this.lastUpdated != null) 
 				? new Date(this.lastUpdated.getTime())
 				: new Date(this.attribute.getLastModified().getTime());
+	}
+	
+	/**
+	 * Sets the time when the current context attribute value was last updated.
+	 * 
+	 * @param lastUpdated
+	 *            the time when the current context attribute value was last updated
+	 * @throws NullPointerException if the specified last update time is <code>null</code>
+	 */
+	void setLastUpdated(Date lastUpdated) {
+		if (lastUpdated == null)
+			throw new NullPointerException("lastUpdated can't be null");
+		
+		this.lastUpdated = new Date(lastUpdated.getTime());
 	}
 	
 	/**
