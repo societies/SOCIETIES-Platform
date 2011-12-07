@@ -7,7 +7,7 @@
  * 
  */
 
-package org.societies.api.internal.intelligentcommunityorchestration.comorch;
+package org.societies.comorch.cisrule;
 
 import java.lang.String;
 import java.util.HashMap;

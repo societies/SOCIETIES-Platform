@@ -7,7 +7,7 @@
  * 
  */
 
-package org.societies.api.internal.intelligentcommunityorchestration.comorch;
+package org.societies.api.internal.orchestration;
 
 import java.lang.String;
 import java.util.HashMap;
