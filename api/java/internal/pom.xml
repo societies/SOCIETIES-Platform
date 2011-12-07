@@ -54,7 +54,16 @@
 				</configuration>
 		
 			</plugin>
-			
+						<!--  used to exclude  some certain files -->
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*ICisRule.java</exclude>
+                    </excludes>
+                </configuration>
+             </plugin>
 			<!-- although there is no test for API yet, we prefer to keep the following plugin -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>

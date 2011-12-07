@@ -9,8 +9,6 @@
 
 package org.societies.api.internal.intelligentcommunityorchestration.comorch;
 
-import java.util.HashMap;
-
 public interface ICisRule {
     
 	//States the type of the rule, which is one of the following three:
@@ -20,7 +18,7 @@ public interface ICisRule {
 	//              recommendation for joining
 	//  Merge:      Specifies if and/or when a CIS should be merged with other CISs.
 
-	//private String ruleType;
+	private String ruleType;
 	
 	//The rule embodied by the CISRule object that this interface represents.
 	//The 'keys' in the HashMap may be the following (still in progress):
@@ -33,7 +31,7 @@ public interface ICisRule {
 	//  "CIS merging criteria" - value = array of conditions for a CIS to be merged with another
 	//  "CIS membership criteria" - value = the membership criteria for a CIS
 	//  
-	//private HashMap ruleDetails;
+	private HashMap ruleDetails;
 
     /*
      * Constructor for ICISRule.
@@ -47,7 +45,7 @@ public interface ICisRule {
 	 *                                in order to create it. 
 	 */
 	
-	//public ICisRule(String ruleType, HashMap ruleToCreate);
+	public ICisRule(String ruleType, HashMap ruleToCreate);
 	
 	/*
 	 * Description: The modifyRule method alters the rule that the CISRule 
@@ -72,7 +70,7 @@ public interface ICisRule {
 	 *				* False if the method was unable to modify the CIS rule.
 	 */
     
-	public boolean modifyRule(ICisRule replacingRule);
+	public boolean modifyRule(CisRule replacingRule);
 	
 	/*
 	 * Description: The deleteRule method causes the CISRule object
