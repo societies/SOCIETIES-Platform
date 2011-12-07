@@ -22,8 +22,8 @@ package org.societies.personalisation.preference.api.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import org.societies.personalisation.common.api.model.Action;
-import org.societies.personalisation.common.api.model.IOutcome;
+import org.societies.api.internal.personalisation.model.IOutcome;
+import org.societies.api.personalisation.model.Action;
 
 
 

@@ -24,9 +24,12 @@
  */
 package org.societies.api.personalisation.model;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.io.Serializable;
+
+import org.societies.api.mock.ServiceResourceIdentifier;
 
 
 public class Action implements IAction, Serializable{

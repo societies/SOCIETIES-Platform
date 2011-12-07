@@ -20,11 +20,10 @@
 package org.societies.personalisation.preference.api.UserPreferenceMerging;
 
 import java.util.Date;
-import java.util.List;
 
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.IAction;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.personalisation.model.IAction;
 
 
 

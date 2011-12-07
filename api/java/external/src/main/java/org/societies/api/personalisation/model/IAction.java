@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.Serializable;
 
+import org.societies.api.mock.ServiceResourceIdentifier;
+
 /**
  * @author Elizabeth
  *

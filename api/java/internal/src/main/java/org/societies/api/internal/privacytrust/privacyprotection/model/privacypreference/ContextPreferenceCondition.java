@@ -26,10 +26,9 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.io.Serializable;
 
-import org.societies.api.internal.mock.ICtxAttributeIdentifier;
-//import org.societies.api.internal.personalisation.preference.model.OperatorConstants;
-import org.societies.api.internal.mock.OperatorConstants;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.OperatorConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyConditionConstants;
+import org.societies.api.mock.ICtxAttributeIdentifier;
 
 /**
  * This class represents a context condition. It is a name-value pair in which the name represents a type in 

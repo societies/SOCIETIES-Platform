@@ -17,19 +17,53 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.common.api.model;
+package org.societies.personalisation.preference.api.model;
+
+import org.societies.api.mock.ICtxAttributeIdentifier;
 
 /**
+ * Class that links a context condition that affects a specific PreferenceName
  * @author Elizabeth
  * @version 1.0
- * @created 08-Nov-2011 13:25:58
+ * @created 08-Nov-2011 14:02:56
  */
-public interface IActionProvider {
+public class IPreferenceConditionIOutcomeName {
+
+	private ICtxAttributeIdentifier ctxIdentifier;
+	private String prefName;
+
+	public IPreferenceConditionIOutcomeName(){
+
+	}
+
+	public void finalize() throws Throwable {
+
+	}
 
 	/**
 	 * 
-	 * @param FeedbackEvent
+	 * @param id
+	 * @param preferenceName
 	 */
-	public void sendFeedback(FeedbackEvent FeedbackEvent);
+	public IPreferenceConditionIOutcomeName(ICtxAttributeIdentifier id, String preferenceName){
+
+	}
+
+	/**
+	 * Method to get the context identifier of the condition that affects this
+	 * preference
+	 * @return 	the context identifier
+	 */
+	public ICtxAttributeIdentifier getICtxIdentifier(){
+		return null;
+	}
+
+	/**
+	 * Method to get the name of the outcome affected
+	 * @return	the name of the preference
+	 */
+	public String getPreferenceName(){
+		return "";
+	}
 
 }

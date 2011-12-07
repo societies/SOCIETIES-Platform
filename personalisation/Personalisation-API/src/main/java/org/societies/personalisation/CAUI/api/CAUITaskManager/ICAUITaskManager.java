@@ -1,16 +1,19 @@
 package org.societies.personalisation.CAUI.api.CAUITaskManager;
 
+
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.model.TaskModelData;
 import org.societies.personalisation.CAUI.api.model.UserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentTask;
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
 
 /**
  * @since 0.0.1

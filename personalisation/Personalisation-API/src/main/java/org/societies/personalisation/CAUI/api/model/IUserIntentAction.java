@@ -28,7 +28,7 @@ package org.societies.personalisation.CAUI.api.model;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import org.societies.personalisation.common.api.model.IOutcome;
+import org.societies.api.internal.personalisation.model.IOutcome;
 
 /**
  * This interface models user actions that are part of the user intent model.

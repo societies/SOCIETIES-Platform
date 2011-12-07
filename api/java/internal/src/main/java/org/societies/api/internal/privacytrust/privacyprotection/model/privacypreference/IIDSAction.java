@@ -26,9 +26,9 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.util.List;
 
-import org.societies.api.internal.mock.ContextAttribute;
-import org.societies.api.internal.mock.EntityIdentifier;
-import org.societies.api.internal.mock.ServiceResourceIdentifier;
+import org.societies.api.mock.ContextAttribute;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
 /**
  * This interface is used to represent an identity selection decision made by the

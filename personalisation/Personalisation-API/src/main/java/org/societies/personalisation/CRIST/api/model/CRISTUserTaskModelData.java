@@ -3,8 +3,8 @@ package org.societies.personalisation.CRIST.api.model;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
 /**
  * This class is responsible for defining the data structure of individual user

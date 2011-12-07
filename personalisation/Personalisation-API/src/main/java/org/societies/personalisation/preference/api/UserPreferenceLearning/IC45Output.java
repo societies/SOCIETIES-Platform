@@ -22,8 +22,8 @@ package org.societies.personalisation.preference.api.UserPreferenceLearning;
 
 import java.util.List;
 
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 
 

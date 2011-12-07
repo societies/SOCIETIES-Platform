@@ -17,8 +17,47 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.common.api.model;
+package org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants;
 
-public class ContextModelObject {
 
+/**
+ * Enum class used to define the operators used in the {@link
+ * IPreferenceCondition}
+ * @author Elizabeth
+ * @version 1.0
+ * @created 08-Nov-2011 14:02:57
+ */
+public enum OperatorConstants {
+
+	EQUALS("="), GREATER_THAN(">"), GREATER_OR_EQUAL_THAN(">="),LESS_THAN("<"),LESS_OR_EQUAL_THAN("<=");
+	
+	private String op;
+	OperatorConstants(String op){
+		this.op = op;
+	}
+	
+	public OperatorConstants fromString(String str){
+		if (str.equalsIgnoreCase("=")){
+			return EQUALS;
+		}
+		
+		if (str.equals(">")){
+			return GREATER_THAN;
+		}
+		
+		if (str.equals(">=")){
+			return GREATER_OR_EQUAL_THAN;
+		}
+		
+		if (str.equals("<")){
+			return LESS_THAN;
+		}
+		
+		if (str.equals("<="))
+		{
+			return LESS_OR_EQUAL_THAN;
+		}
+		
+		return EQUALS;
+	}
 }
