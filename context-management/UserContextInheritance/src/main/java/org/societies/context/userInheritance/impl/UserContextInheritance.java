@@ -24,6 +24,41 @@
  */
 package org.societies.context.userInheritance.impl;
 
-public class UserContextInheritance {
+import org.societies.context.mock.spm.identity.EntityIdentifier;
+import org.societies.context.model.api.CtxAttributeIdentifier;
+import org.societies.context.model.api.CtxAttributeValueType;
+import org.societies.context.user.inheritance.api.platform.ConflictResolutionAlgorithm;
+import org.societies.context.user.inheritance.api.platform.IUserCtxInheritanceMgr;
+
+public class UserContextInheritance implements IUserCtxInheritanceMgr{
+
+	@Override
+	public void getCIS(EntityIdentifier cisId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getContextAttribute(
+			CtxAttributeIdentifier contextAttributeIdentifier,
+			CtxAttributeValueType type, EntityIdentifier cisId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void inheritContextAttribute(
+			CtxAttributeIdentifier contextAttributeIdentifier,
+			CtxAttributeValueType type) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void resolveConflicts(
+			ConflictResolutionAlgorithm conflictResolutionsAlgorithms) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
