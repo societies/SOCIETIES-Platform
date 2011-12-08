@@ -24,6 +24,31 @@
  */
 package org.societies.context.communityInheritance.impl;
 
-public class CommunityContextInheritance {
+import org.societies.context.community.inheritance.api.platform.ICommunityCtxInheritanceMgr;
+import org.societies.context.mock.spm.identity.EntityIdentifier;
+import org.societies.context.model.api.CtxAttributeIdentifier;
+import org.societies.context.model.api.CtxAttributeValueType;
+
+public class CommunityContextInheritance implements ICommunityCtxInheritanceMgr {
+
+	@Override
+	public void getParentCis(EntityIdentifier cidIdentifier) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void inheritContext(CtxAttributeIdentifier ctxAttributeIdentifier,
+			CtxAttributeValueType type, EntityIdentifier cisId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void retrieveCtx(CtxAttributeIdentifier ctxAttributeIdentifier,
+			CtxAttributeValueType type, EntityIdentifier cisId) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

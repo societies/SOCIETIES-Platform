@@ -24,6 +24,41 @@
  */
 package org.societies.context.communityEstimation.test;
 
-public class CommunityContextEstimationTest {
+import java.util.List;
+
+import org.societies.context.community.estimation.api.platform.EstimationModels;
+import org.societies.context.community.estimation.api.platform.ICommunityCtxEstimationMgr;
+import org.societies.context.mock.spm.identity.EntityIdentifier;
+import org.societies.context.model.api.CtxAttribute;
+import org.societies.context.model.api.CtxEntity;
+
+public class CommunityContextEstimationTest implements ICommunityCtxEstimationMgr{
+
+	@Override
+	public void estimateContext(EstimationModels estimationModel,
+			List<CtxAttribute> list) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void retrieveCurrentCisContext(boolean Current,
+			EntityIdentifier communityID, List<CtxAttribute> list) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void retrieveHistoryCisContext(boolean Current,
+			EntityIdentifier communityID, List<CtxAttribute> list) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateContextModelObject(CtxEntity estimatedContext) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
