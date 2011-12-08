@@ -24,6 +24,27 @@
  */
 package org.societies.context.communityPrediction.impl;
 
-public class CommunityContextPrediction {
+import java.util.Date;
+
+import org.societies.context.community.prediction.api.platform.ICommunityCtxPredictionMgr;
+import org.societies.context.mock.spm.identity.EntityIdentifier;
+import org.societies.context.model.api.CtxAttributeIdentifier;
+import org.societies.context.model.api.CtxIdentifier;
+import org.societies.context.user.prediction.api.platform.PredictionMethod;
+
+public class CommunityContextPrediction implements ICommunityCtxPredictionMgr{
+
+	@Override
+	public void getCommunity(EntityIdentifier cisID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public CtxIdentifier predictContext(PredictionMethod predictionModel,
+			CtxAttributeIdentifier ctxObjModel, Date date) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
