@@ -23,7 +23,9 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package main.java.org.societies.api.internal.slm.qosmonitor;
+package org.societies.api.external.slm.qosmonitor;
+
+import org.societies.api.internal.slm.qosmonitor.IQoS3PMonitor;
 
 /**
  * Interface for invoking the Quality of Service (QoS) Reporter.
