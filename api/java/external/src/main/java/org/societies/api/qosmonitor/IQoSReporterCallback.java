@@ -25,32 +25,18 @@
 
 package org.societies.api.external.slm.qosmonitor;
 
-/**
- * Interface for invoking the Quality of Service (QoS) Reporter.
- * To be used by 3rd party QoS Monitor.
- * 
- * @author Mitja Vardjan
- *
- */
-public interface IQoSReporter {
-	
+import java.io.Serializable;
+
+public interface IQoSReporterCallback {
+
 	/**
-	 * Get additional community data required by 3rd party monitor in order to
-	 * use the service properly and evaluate QoS. This method has to be invoked
-	 * only when the data sent with original evaluation request are insufficient.
-	 * The data are anonymized before returning.
+	 * Async return for
+	 * {@link IQoSReporter#getCommunityData(String, IQoS3PMonitor)}
 	 * 
-	 * @param dataId Data ID. TODO: How will data be retrieved?
+	 * @param dataId Data ID
 	 * 
-	 * @param callback The callback for async return
+	 * @param data The returned data. The data are anonymized.
 	 */
-	public void getCommunityData(String dataId, IQoSReporterCallback callback);
-	
-	/**
-	 * Notify about completed evaluation of QoS.
-	 * 
-	 * @param report Evaluation report digitally signed by the 3rd party QoS
-	 * monitor.
-	 */
-	public void notifyEvaluationResult(String report);
+	public void onGetCommunityData(String dataId, Serializable data);
+
 }

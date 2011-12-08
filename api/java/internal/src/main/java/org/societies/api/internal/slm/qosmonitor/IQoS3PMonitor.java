@@ -52,14 +52,4 @@ public interface IQoS3PMonitor {
 	 * and unnecessary data should not be included. 
 	 */
 	public void evaluateQoS(String sla, String[] violations, Serializable data);
-
-	/**
-	 * Async return for
-	 * {@link IQoSReporter#getCommunityData(String, IQoS3PMonitor)}
-	 * 
-	 * @param dataId Data ID
-	 * 
-	 * @param data The returned data. The data are anonymized.
-	 */
-	public void onGetCommunityData(String dataId, Serializable data);
 }
