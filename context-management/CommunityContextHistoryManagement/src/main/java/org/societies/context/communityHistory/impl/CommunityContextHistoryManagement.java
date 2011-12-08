@@ -24,6 +24,8 @@
  */
 package org.societies.context.communityHistory.impl;
 
-public class CommunityContextHistoryManagement {
+import org.societies.context.community.history.api.platform;
+
+public class CommunityContextHistoryManagement implements  ICommunityCtxHistoryMgr {
 
 }
