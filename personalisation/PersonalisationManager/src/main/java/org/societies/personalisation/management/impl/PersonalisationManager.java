@@ -19,12 +19,21 @@
  */
 package org.societies.personalisation.management.impl;
 
-import org.societies.personalisation.common.api.management.IPersonalisationManager;
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.IAction;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import org.societies.api.internal.personalisation.model.IFeedbackEvent;
+import org.societies.api.mock.ContextModelObject;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ICtxAttributeIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.personalisation.mgmt.IPersonalisationManager;
+import org.societies.api.personalisation.model.IAction;
+import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
+import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
+import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
+import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 
-public class PersonalisationManager implements IPersonalisationManager{
+
+public class PersonalisationManager implements IPersonalisationManager, IInternalPersonalisationManager{
 
 	@Override
 	public IAction getIntentAction(EntityIdentifier arg0,
@@ -38,6 +47,74 @@ public class PersonalisationManager implements IPersonalisationManager{
 			String arg2, ServiceResourceIdentifier arg3, String arg4) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public IAction getIntentTask(EntityIdentifier arg0,
+			ServiceResourceIdentifier arg1, String arg2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IAction getIntentTask(EntityIdentifier arg0, EntityIdentifier arg1,
+			ServiceResourceIdentifier arg2, String arg3) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IAction getPreference(EntityIdentifier arg0, String arg1,
+			ServiceResourceIdentifier arg2, String arg3) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void registerForContextUpdate(String arg0,
+			ICtxAttributeIdentifier arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void returnFeedback(IFeedbackEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void sendCAUIOutcome(EntityIdentifier arg0,
+			ServiceResourceIdentifier arg1, IUserIntentAction arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void sendDianneOutcome(EntityIdentifier arg0,
+			ServiceResourceIdentifier arg1, IDIANNEOutcome arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void sendITSUDUserIntentOutcome(EntityIdentifier arg0,
+			ServiceResourceIdentifier arg1, ICRISTUserAction arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void sendPreferenceOutcome(EntityIdentifier arg0, String arg1,
+			ServiceResourceIdentifier arg2, IPreferenceOutcome arg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateReceived(ContextModelObject arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

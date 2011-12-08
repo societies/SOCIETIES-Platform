@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.personalisation</groupId>
 	<artifactId>personalisation_api</artifactId>
-	<version>${release.version}</version>
+	<version>${version.pm}</version>
 	<name>Personalisation API</name>
 	<packaging>bundle</packaging> 
 
