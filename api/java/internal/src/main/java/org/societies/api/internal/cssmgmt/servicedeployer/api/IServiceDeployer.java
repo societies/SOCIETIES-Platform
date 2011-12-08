@@ -1,4 +1,4 @@
-package org.societies.cssmgmt.servicedeployer.api;
+package org.societies.api.internal.cssmgmt.servicedeployer.api;
 
 /**
  * Interface for invoking Service Deployer.
