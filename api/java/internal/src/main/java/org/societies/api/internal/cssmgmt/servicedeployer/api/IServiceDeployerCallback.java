@@ -1,4 +1,4 @@
-package org.societies.cssmgmt.servicedeployer.api;
+package org.societies.api.internal.cssmgmt.servicedeployer.api;
 
 /**
  * Callbacks for {@link IServiceDeployer}.

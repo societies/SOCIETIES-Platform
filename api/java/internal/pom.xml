@@ -58,11 +58,6 @@
 			<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>**/*ICisRule.java</exclude>
-                    </excludes>
-                </configuration>
              </plugin>
 
 			
