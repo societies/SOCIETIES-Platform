@@ -28,9 +28,9 @@ import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import org.societies.api.internal.mock.ICtxAttributeIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyOutcomeConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
+import org.societies.api.mock.ICtxAttributeIdentifier;
 
 
 /**

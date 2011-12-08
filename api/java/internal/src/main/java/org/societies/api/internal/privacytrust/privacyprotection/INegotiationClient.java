@@ -25,12 +25,11 @@
 package org.societies.api.internal.privacytrust.privacyprotection;
 
 //TODO : temporary mock package import to solve missing package in API folder
-import org.societies.api.internal.mock.EntityIdentifier;
-import org.societies.api.internal.mock.ServiceResourceIdentifier;
-
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 /**
  * This interface defines the methods that should be implemented by the CSS that
  * acts as a client in the Negotiation process. This means that this CSS is the

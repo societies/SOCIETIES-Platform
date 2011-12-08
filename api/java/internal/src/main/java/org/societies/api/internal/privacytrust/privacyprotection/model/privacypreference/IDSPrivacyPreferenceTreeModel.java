@@ -28,9 +28,9 @@ import java.io.Serializable;
 
 import javax.swing.tree.DefaultTreeModel;
 
-import org.societies.api.internal.mock.EntityIdentifier;
-import org.societies.api.internal.mock.ServiceResourceIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
 /**
  * This class is used to represent a privacy preference for identity selection. This class represents a node in a tree. 

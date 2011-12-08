@@ -1,11 +1,13 @@
 package org.societies.personalisation.CAUI.api.CAUIPrediction;
 
+
 import java.util.List;
 
+
+import org.societies.api.mock.ContextAttribute;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.model.UserIntentAction;
-import org.societies.personalisation.common.api.model.ContextAttribute;
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
 
 
 /**

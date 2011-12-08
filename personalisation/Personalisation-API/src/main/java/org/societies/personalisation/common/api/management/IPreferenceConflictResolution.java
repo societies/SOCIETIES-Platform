@@ -20,11 +20,11 @@
 
 package org.societies.personalisation.common.api.management;
 
+import org.societies.api.internal.personalisation.model.IOutcome;
+import org.societies.api.mock.EntityIdentifier;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.IOutcome;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 
 

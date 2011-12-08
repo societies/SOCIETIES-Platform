@@ -1,10 +1,11 @@
 package org.societies.personalisation.CRIST.api.model;
 
+
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.societies.personalisation.common.api.model.IOutcome;
+import org.societies.api.internal.personalisation.model.IOutcome;
 
 public interface ICRISTCommunitySituation extends IOutcome{
 	/**

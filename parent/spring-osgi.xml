@@ -18,7 +18,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.osgi.deploy.dir>${env.VIRGO_HOME}\pickup</spring.osgi.deploy.dir>
+		<spring.osgi.deploy.dir>${env.VIRGO_HOME}${file.separator}pickup</spring.osgi.deploy.dir>
 		<!-- Specific properties for the Virgo environment -->
 		<!-- The location of the virgo runtime should be configured in a *maven 
 			profile* - and not in here (to prevent an accidential check in) - - The following 

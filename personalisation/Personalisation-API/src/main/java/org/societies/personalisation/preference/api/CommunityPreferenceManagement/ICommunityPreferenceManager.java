@@ -19,8 +19,8 @@
  */
 package org.societies.personalisation.preference.api.CommunityPreferenceManagement;
 
-import org.societies.personalisation.common.api.model.PreferenceDetails;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 

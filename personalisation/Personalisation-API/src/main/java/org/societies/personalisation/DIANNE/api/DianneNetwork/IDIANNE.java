@@ -19,11 +19,10 @@
  */
 package org.societies.personalisation.DIANNE.api.DianneNetwork;
 
-import org.societies.personalisation.common.api.model.IOutcome;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.ContextAttribute;
-//import org.societies.context.model.api.CtxAttribute;
+import org.societies.api.internal.personalisation.model.IOutcome;
+import org.societies.api.mock.ContextAttribute;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
 /**
  * 
