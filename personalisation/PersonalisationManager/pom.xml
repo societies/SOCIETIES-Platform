@@ -109,7 +109,8 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+					<Import-Package>org.springframework.beans.factory.annotation;version="0",org.springframework.stereotype;version="0"</Import-Package>
+						<Embed-Dependency>scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<_nouses>true</_nouses>
 					</instructions>
