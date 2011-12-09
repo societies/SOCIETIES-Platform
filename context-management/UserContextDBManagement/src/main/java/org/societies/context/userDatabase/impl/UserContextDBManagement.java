@@ -24,6 +24,96 @@
  */
 package org.societies.context.userDatabase.impl;
 
-public class UserContextDBManagement {
+import java.io.Serializable;
+
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
+import org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback;
+
+public class UserContextDBManagement implements IUserCtxDBMgr{
+
+	@Override
+	public void createAssociation(String arg0, IUserCtxDBMgrCallback arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void createAttribute(CtxEntityIdentifier arg0,
+			CtxAttributeValueType arg1, String arg2, IUserCtxDBMgrCallback arg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void createEntity(String arg0, IUserCtxDBMgrCallback arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void lookup(CtxModelType arg0, String arg1,
+			IUserCtxDBMgrCallback arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void lookupEntities(String arg0, String arg1, Serializable arg2,
+			Serializable arg3, IUserCtxDBMgrCallback arg4) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void registerForUpdates(CtxAttributeIdentifier arg0,
+			IUserCtxDBMgrCallback arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void registerForUpdates(CtxEntityIdentifier arg0, String arg1,
+			IUserCtxDBMgrCallback arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void remove(CtxIdentifier arg0, IUserCtxDBMgrCallback arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void retrieve(CtxIdentifier arg0, IUserCtxDBMgrCallback arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void unregisterForUpdates(CtxAttributeIdentifier arg0,
+			IUserCtxDBMgrCallback arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void unregisterForUpdates(CtxEntityIdentifier arg0, String arg1,
+			IUserCtxDBMgrCallback arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void update(CtxModelObject arg0, IUserCtxDBMgrCallback arg1) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
