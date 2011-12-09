@@ -39,7 +39,7 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 
 	@Autowired
 	public PersonalisationManager(){
-		
+		System.out.println("HELLO! I'm a brand new service and my interface is: "+this.getClass().getName());
 	}
 	@Override
 	public IAction getIntentAction(EntityIdentifier arg0,
