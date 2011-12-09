@@ -22,19 +22,40 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.repo;
+package org.societies.privacytrust.trust.api.model;
 
-public class TrustEntityEventListener {
+import java.util.Set;
 
-	public TrustEntityEventListener() {
+/**
+ * This class represents trusted CSSs. A TrustedCSS object is referenced by its
+ * TrustedEntityId, while the associated Trust value objects express the
+ * trustworthiness of this CSS, i.e. direct, indirect and user-perceived. Each
+ * trusted CSS is assigned a set of TrustedService objects.
+ */
+public class TrustedCss extends TrustedEntity {
+	
+	private static final long serialVersionUID = -5663024798098392757L;
+	
+	private Set<TrustedCis> communities;
+	private Set<TrustedService> services;
 
+	public TrustedCss() {
+
+	}
+
+	public Set<TrustedCis> getCommunities(){
+		return this.communities;
+	}
+
+	public Set<TrustedService> getServices(){
+		return this.services;
 	}
 
 	/**
 	 * 
-	 * @param event
+	 * @param s
 	 */
-	public void postTrustEntityEvent(TrustEntityEvent event){
-
+	public Set<TrustedService> getServices(String serviceType){
+		return null;
 	}
 }
