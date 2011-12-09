@@ -31,10 +31,16 @@ import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class PersonalisationManager implements IPersonalisationManager, IInternalPersonalisationManager{
 
+	@Autowired
+	public PersonalisationManager(){
+		
+	}
 	@Override
 	public IAction getIntentAction(EntityIdentifier arg0,
 			EntityIdentifier arg1, ServiceResourceIdentifier arg2, String arg3) {
