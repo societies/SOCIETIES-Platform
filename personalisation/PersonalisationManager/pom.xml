@@ -54,8 +54,40 @@
 			<artifactId>societies-api-internal</artifactId>
 			<version>${release.version}</version>
 		</dependency>
+		<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>org.springframework.core</artifactId>
+            <version>${spring.maven.artifact.version}</version>
+            <exclusions>
+              <exclusion>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+              </exclusion>
+            </exclusions>
+        </dependency>
 
-
+		<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>org.springframework.beans</artifactId>
+            <version>${spring.maven.artifact.version}</version>
+            <exclusions>
+              <exclusion>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+              </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>org.springframework.context</artifactId>
+            <version>${spring.maven.artifact.version}</version>
+            <exclusions>
+              <exclusion>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+              </exclusion>
+            </exclusions>
+        </dependency>
 	</dependencies>
 
 
