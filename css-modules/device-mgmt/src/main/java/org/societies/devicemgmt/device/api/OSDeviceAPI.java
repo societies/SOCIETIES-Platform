@@ -23,17 +23,31 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.device.api;
+package org.societies.devicemgmt.device.api;
 
+import org.societies.devicemgmt.device.common.OSDetails;
+import org.societies.devicemgmt.device.common.OSStatistics;
 
 /**
  * 
- * Interface for a GPS OS device API.  The methods represents the basic functionalities any GPS device offers.  
- * The implementor will use the OS device driver to produce the results. 
+ * Basic interface for the OSDeviceAPI. 
+ * Returns operating system details and statistics. 
  *
  */
-public interface GpsDeviceAPI {
+public interface OSDeviceAPI {
 	
-	GpsLocation getLastKnowLocation();
-
+	/*
+	 * Description:		Returns the OS details 
+	 * 				
+	 * @return 			OSDetails	
+	 */
+	OSDetails getOSDetails();
+	
+	
+	/*
+	 * Description:		Returns OS Statistic (e.g. memory and CPU usage)
+	 * 				
+	 * @return 			OSStatistics	
+	 */
+	OSStatistics getOSStatistics(); 
 }

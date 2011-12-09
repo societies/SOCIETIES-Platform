@@ -23,48 +23,27 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.device.api;
+package org.societies.devicemgmt.device.impl;
 
-/**
- * 
- * Interface for a GPS device.
- *
- */
-public interface GpsLocation {
+import org.societies.devicemgmt.device.api.GpsDeviceAPI;
+import org.societies.devicemgmt.device.api.GpsLocation;
+
+public class AndriodGpsDeviceAdapter extends AndriodOSDeviceAPI implements GpsDeviceAPI{
+
+	@Override
+	public GpsLocation getLastKnowLocation() {
+		
+		/*
+		 * The method will do something like this: 
+		 * 
+		 * 		LocationManager mlocManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+		 *		String locationProvider = LocationManager.GPS_PROVIDER;
+		 * 		Location lastKnownLocation = mlocManager.getLastKnownLocation(locationProvider);
+		 * 		//use the location object to initialize the "GpsLocation" object
+		 */
+		
+		return null;
+	}
+
 	
-	/*
-	 * 
-	 * @Return
-	 */
-	double getLatitude();
-	
-	/*
-	 * 
-	 * @Return
-	 */
-	double getLongtitude();
-	
-	/*
-	 * 
-	 * @Return
-	 */
-	float getAccuracy();
-	
-	/*
-	 * 
-	 * @return
-	 */
-	double getBearing();
-	
-	/*
-	 * 
-	 * @return
-	 */
-	String getProvider();
-	
-	/*
-	 * 
-	 * @return
-	 */
-	float getSpeed();
 }

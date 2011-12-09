@@ -1,4 +1,3 @@
-
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
@@ -23,15 +22,49 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package societies.device.common;
+
+package org.societies.devicemgmt.device.api;
 
 /**
  * 
- *	Some operating system specific statistics 
+ * Interface for a GPS device.
  *
  */
-public interface OSStatistics {
-	float getPercentageMemoryUsage();
-	float getPercentageCpuUsage();
-	float getBatteryPercentage();
+public interface GpsLocation {
+	
+	/*
+	 * 
+	 * @Return
+	 */
+	double getLatitude();
+	
+	/*
+	 * 
+	 * @Return
+	 */
+	double getLongtitude();
+	
+	/*
+	 * 
+	 * @Return
+	 */
+	float getAccuracy();
+	
+	/*
+	 * 
+	 * @return
+	 */
+	double getBearing();
+	
+	/*
+	 * 
+	 * @return
+	 */
+	String getProvider();
+	
+	/*
+	 * 
+	 * @return
+	 */
+	float getSpeed();
 }
