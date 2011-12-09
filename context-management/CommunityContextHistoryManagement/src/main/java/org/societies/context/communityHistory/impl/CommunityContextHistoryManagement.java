@@ -24,8 +24,93 @@
  */
 package org.societies.context.communityHistory.impl;
 
-import org.societies.context.community.history.api.platform;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
-public class CommunityContextHistoryManagement implements  ICommunityCtxHistoryMgr {
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxHistoryAttribute;
+import org.societies.api.internal.context.community.history.ICommunityCtxHistoryMgr;
+
+public class CommunityContextHistoryManagement  implements ICommunityCtxHistoryMgr{
+
+	@Override
+	public void disableCtxRecording() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void enableCtxRecording() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<List<CtxAttributeIdentifier>> getHistoryTuplesID(
+			CtxAttributeIdentifier arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void registerHistoryTuples(CtxAttributeIdentifier arg0,
+			List<CtxAttributeIdentifier> arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void registerHistoryTuples(CtxAttributeIdentifier arg0,
+			CtxAttributeIdentifier arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int removeHistory(CtxAttribute arg0, Date arg1, Date arg2) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int removeHistory(String arg0, Date arg1, Date arg2) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public List<CtxHistoryAttribute> retrieveHistory(CtxAttribute arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<CtxHistoryAttribute> retrieveHistory(CtxAttribute arg0,
+			Date arg1, Date arg2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<CtxAttribute, List<CtxAttribute>> retrieveHistoryTuples(
+			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1,
+			Date arg2, Date arg3) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void disableCommCtxRecording() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void enableCommCtxRecording() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
