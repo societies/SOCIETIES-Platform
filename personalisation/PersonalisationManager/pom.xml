@@ -58,6 +58,7 @@
             <groupId>org.springframework</groupId>
             <artifactId>org.springframework.core</artifactId>
             <version>${spring.maven.artifact.version}</version>
+            <scope>provided</scope>
             <exclusions>
               <exclusion>
                 <groupId>org.apache.commons</groupId>
@@ -70,6 +71,7 @@
             <groupId>org.springframework</groupId>
             <artifactId>org.springframework.beans</artifactId>
             <version>${spring.maven.artifact.version}</version>
+            <scope>provided</scope>
             <exclusions>
               <exclusion>
                 <groupId>org.apache.commons</groupId>
@@ -81,6 +83,7 @@
             <groupId>org.springframework</groupId>
             <artifactId>org.springframework.context</artifactId>
             <version>${spring.maven.artifact.version}</version>
+            <scope>provided</scope>
             <exclusions>
               <exclusion>
                 <groupId>org.apache.commons</groupId>
