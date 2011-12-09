@@ -7,9 +7,12 @@
  * 
  */
 
-package org.societies.api.internal.intelligentcommunityorchestration.comorch;
+package org.societies.comorch.cisrule;
 
-public interface ICisRule {
+import java.lang.String;
+import java.util.HashMap;
+
+public interface CisRule {
     
 	//States the type of the rule, which is one of the following three:
 	//  Lifecycle:  Relates to the creation, configuration,
@@ -18,7 +21,7 @@ public interface ICisRule {
 	//              recommendation for joining
 	//  Merge:      Specifies if and/or when a CIS should be merged with other CISs.
 
-	private String ruleType;
+	public String ruleType;
 	
 	//The rule embodied by the CISRule object that this interface represents.
 	//The 'keys' in the HashMap may be the following (still in progress):
@@ -31,10 +34,10 @@ public interface ICisRule {
 	//  "CIS merging criteria" - value = array of conditions for a CIS to be merged with another
 	//  "CIS membership criteria" - value = the membership criteria for a CIS
 	//  
-	private HashMap ruleDetails;
+	public HashMap ruleDetails;
 
     /*
-     * Constructor for ICISRule.
+     * Constructor for CISRule.
      * 
 	 * Description: The constructor creates a new CISRule with the details
 	 *              passed to it.
@@ -45,7 +48,7 @@ public interface ICisRule {
 	 *                                in order to create it. 
 	 */
 	
-	public ICisRule(String ruleType, HashMap ruleToCreate);
+	public CisRule(String ruleType, HashMap ruleToCreate);
 	
 	/*
 	 * Description: The modifyRule method alters the rule that the CISRule 
@@ -58,19 +61,6 @@ public interface ICisRule {
 	 */
 	
     public boolean modifyRule(HashMap changesToRule);
-	
-    /*
-	 * Description: The modifyRule method alters the rule that the CISRule 
-	 *              object represents, using the information of the input
-	 *              CISRule.
-	 * Parameters: 
-	 * 				1) CISRule - The new rule that is replacing the existing one
-	 * Returns:
-	 * 				* True if the method was able to modify the CIS rule.
-	 *				* False if the method was unable to modify the CIS rule.
-	 */
-    
-	public boolean modifyRule(CisRule replacingRule);
 	
 	/*
 	 * Description: The deleteRule method causes the CISRule object

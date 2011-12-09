@@ -23,14 +23,20 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.slm.qosmonitor.api;
+package org.societies.api.slm.qosmonitor;
 
-/**
- * Interface for invoking the Quality of Service (QoS) Monitor.
- * 
- * @author Mitja Vardjan
- *
- */
-public interface IQoSMonitor {
-	
+import java.io.Serializable;
+
+public interface IQoSReporterCallback {
+
+	/**
+	 * Async return for
+	 * {@link IQoSReporter#getCommunityData(String, IQoS3PMonitor)}
+	 * 
+	 * @param dataId Data ID
+	 * 
+	 * @param data The returned data. The data are anonymized.
+	 */
+	public void onGetCommunityData(String dataId, Serializable data);
+
 }
