@@ -28,453 +28,345 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import org.societies.context.broker.api.ICommunityCtxBroker;
-import org.societies.context.broker.api.ICommunityCtxBrokerCallback;
-import org.societies.context.broker.api.IUserCtxBroker;
-import org.societies.context.broker.api.IUserCtxBrokerCallback;
-import org.societies.context.mock.spm.identity.EntityIdentifier;
-import org.societies.context.model.api.CtxAssociation;
-import org.societies.context.model.api.CtxAttribute;
-import org.societies.context.model.api.CtxAttributeIdentifier;
-import org.societies.context.model.api.CtxAttributeValueType;
-import org.societies.context.model.api.CtxEntity;
-import org.societies.context.model.api.CtxEntityIdentifier;
-import org.societies.context.model.api.CtxHistoryAttribute;
-import org.societies.context.model.api.CtxIdentifier;
-import org.societies.context.model.api.CtxModelObject;
-import org.societies.context.model.api.CtxModelType;
-import org.societies.context.model.api.IndividualCtxEntity;
-
+import org.societies.api.context.broker.ICommunityCtxBroker;
+import org.societies.api.context.broker.ICommunityCtxBrokerCallback;
+import org.societies.api.context.broker.IUserCtxBroker;
+import org.societies.api.context.broker.IUserCtxBrokerCallback;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxHistoryAttribute;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.mock.EntityIdentifier;
 
 
 /*
  * 3p Context Broker Implementation
- * 
+ * This class implements the community and user broker api methods along with the callback methods 
+ * of the internal context broker api
  */
 
-public class ContextBroker implements ICommunityCtxBroker, ICommunityCtxBrokerCallback, IUserCtxBroker, IUserCtxBrokerCallback {
+public class ContextBroker implements org.societies.api.internal.context.broker.IUserCtxBrokerCallback, 
+										org.societies.api.internal.context.broker.ICommunityCtxBrokerCallback,
+										IUserCtxBroker, ICommunityCtxBroker {
 
 	
 	//ICommunityCtxBroker methods
-	/**
-	 * 
-	 * @param requester
-	 * @param community
-	 * @param callback
-	 */
-	public void retrieveAdministratingCSS(EntityIdentifier requester, CtxEntityIdentifier communityEntId, ICommunityCtxBrokerCallback callback) {
-	}
-
-	/**
-	 * Retrieves the context attribute(s) that acts as a bond of the community of
-	 * entities specified by the CtxEntityIdentifier.
-	 * 
-	 * @param requester
-	 * @param community
-	 * @param callback
-	 */
-	public void retrieveBonds(EntityIdentifier requester, CtxEntityIdentifier community, ICommunityCtxBrokerCallback callback) {
-	}
-
-	/**
-	 * This applies for Community hierarchies. Retrieves the child communities
-	 * (subcommunities of CtxEntities) of the specified parent CtxEntity
-	 * 
-	 * @param requester
-	 * @param community
-	 * @param callback
-	 */
-	public void retrieveChildCommunities(EntityIdentifier requester, CtxEntityIdentifier community, ICommunityCtxBrokerCallback callback) {
-	}
-
-	/**
-	 * Retrievies a list of Individual Context Entities that are members of the
-	 * specified community Entity.
-	 * 
-	 * @param requester
-	 * @param community
-	 * @param callback
-	 */
-	public void retrieveCommunityMembers(EntityIdentifier requester, CtxEntityIdentifier community, ICommunityCtxBrokerCallback callback) {
-	}
-
-	/**
-	 * 
-	 * @param requester
-	 * @param community
-	 * @param callback
-	 */
-	public void retrieveParentCommunities(EntityIdentifier requester, CtxEntityIdentifier community, ICommunityCtxBrokerCallback callback) {
-	}
-
-	
-	//ICommunityCtxBrokerCallback methods
-	/**
-	 * 
-	 * @param admCssRetr
-	 */
-	public void adminCSSRetrieved(CtxEntity admCssRetr) {
-	}
-
-	/**
-	 * 
-	 * @param ctxAttribute
-	 */
-	public void bondsRetrieved(CtxAttribute ctxAttribute) {
-	}
-
-	/**
-	 * 
-	 * @param childComms
-	 */
-	public void childCommsRetrieved(List<CtxEntityIdentifier> childComms) {
-	}
-
-	/**
-	 * 
-	 * @param commMembs
-	 */
-	public void commMembersRetrieved(List <CtxEntityIdentifier> commMembs) {
-	}
-
-	/**
-	 * 
-	 * @param parentComms
-	 */
-	public void parentCommsRetrieved(List<CtxEntityIdentifier> parentComms) {
-	}
-	
-	//IUserCtxBroker methods
-	/**
-	 * Creates a CtxAssociation
-	 * 
-	 * @param requester
-	 * @param type
-	 * @param callback
-	 */
-	public void createAssociation(EntityIdentifier requester, String type, IUserCtxBrokerCallback callback) {
-	}
-
-	/**
-	 * Creates a CtxAttribute
-	 * 
-	 * @param requester
-	 * @param scope
-	 * @param enum
-	 * @param type
-	 * @param callback
-	 */
-	public void createAttribute(EntityIdentifier requester, CtxEntityIdentifier scope, CtxAttributeValueType valueType, String type, IUserCtxBrokerCallback callback) {
-	}
-
-	/**
-	 * Creates a CtxEntity
-	 * 
-	 * @param requester
-	 * @param type
-	 * @param callback
-	 */
-	public void createEntity(EntityIdentifier requester, String type, IUserCtxBrokerCallback callback){
+	@Override
+	public void retrieveAdministratingCSS(EntityIdentifier arg0,
+			CtxEntityIdentifier arg1, ICommunityCtxBrokerCallback arg2) {
+		// TODO Auto-generated method stub
 		
 	}
 
-	/**
-	 * There are several methods missing that would express the similarity of context
-	 * values or objects in a quantifiable form (and not via a sorted list of
-	 * most/least similar reference objects/values).
-	 * 
-	 * @param objectUnderComparison
-	 * @param referenceObjects
-	 * @param callback
-	 */
-	public void evaluateSimilarity(Serializable objectUnderComparison, List<Serializable> referenceObjects, IUserCtxBrokerCallback callback) {
+	@Override
+	public void retrieveBonds(EntityIdentifier arg0, CtxEntityIdentifier arg1,
+			ICommunityCtxBrokerCallback arg2) {
+		// TODO Auto-generated method stub
+		
 	}
 
-	/**
-	 * Looks up for a list of CtxModelObjects defined by the CtxModelType (CtxEntity,
-	 * CtxAttribute, CtxAssociation) of  the specified type.
-	 * 
-	 * @param requester
-	 * @param modelType
-	 * @param type
-	 * @param callback
-	 */
-	public void lookup(EntityIdentifier requester, CtxModelType modelType, String type, IUserCtxBrokerCallback callback) {
+	@Override
+	public void retrieveChildCommunities(EntityIdentifier arg0,
+			CtxEntityIdentifier arg1, ICommunityCtxBrokerCallback arg2) {
+		// TODO Auto-generated method stub
+		
 	}
 
-	/**
-	 * Looks up for a list of CtxEntities of  the specified type, containing the
-	 * specified attributes
-	 * 
-	 * @param requester
-	 * @param entityType
-	 * @param attribType
-	 * @param minAttribValue
-	 * @param maxAttribValue
-	 * @param callback
-	 */
-	public void lookupEntities(EntityIdentifier requester, String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue, IUserCtxBrokerCallback callback) {
+	@Override
+	public void retrieveCommunityMembers(EntityIdentifier arg0,
+			CtxEntityIdentifier arg1, ICommunityCtxBrokerCallback arg2) {
+		// TODO Auto-generated method stub
+		
 	}
 
-	/**
-	 * Registers the specified EventListener for value modification events of context
-	 * attribute(s) with the supplied scope and type.
-	 * 
-	 * @param requester
-	 * @param scope
-	 * @param attrType
-	 * @param callback
-	 */
-	public void registerForUpdates(EntityIdentifier requester, CtxEntityIdentifier scope, String attrType, IUserCtxBrokerCallback callback) {
+	@Override
+	public void retrieveParentCommunities(EntityIdentifier arg0,
+			CtxEntityIdentifier arg1, ICommunityCtxBrokerCallback arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+	// end of ICommunityCtxBroker methods
+
+	//IUserCtxBroker methods
+	@Override
+	public void createAssociation(EntityIdentifier arg0, String arg1,
+			IUserCtxBrokerCallback arg2) {
+		// TODO Auto-generated method stub
+		
 	}
 
-	/**
-	 * Registers the specified EventListener for value modification events of the
-	 * specified context attribute.
-	 * 
-	 * @param requester
-	 * @param attrId
-	 * @param callback
-	 */
-	public void registerForUpdates(EntityIdentifier requester, CtxAttributeIdentifier attrId, IUserCtxBrokerCallback callback) {
+	@Override
+	public void createAttribute(EntityIdentifier arg0,
+			CtxEntityIdentifier arg1, CtxAttributeValueType arg2, String arg3,
+			IUserCtxBrokerCallback arg4) {
+		// TODO Auto-generated method stub
+		
 	}
 
-	/**
-	 * Removes the specified context model object.
-	 * 
-	 * @param requester
-	 * @param identifier
-	 * @param callback
-	 */
-	public void remove(EntityIdentifier requester, CtxIdentifier identifier, IUserCtxBrokerCallback callback) {
+	@Override
+	public void createEntity(EntityIdentifier arg0, String arg1,
+			IUserCtxBrokerCallback arg2) {
+		// TODO Auto-generated method stub
+		
 	}
 
-	/**
-	 * Retrieves the specified context model object.
-	 * 
-	 * @param requester
-	 * @param identifier
-	 * @param callback
-	 */
-	public void retrieve(EntityIdentifier requester, CtxIdentifier identifier, IUserCtxBrokerCallback callback) {
+	@Override
+	public void evaluateSimilarity(Serializable arg0, List<Serializable> arg1,
+			IUserCtxBrokerCallback arg2) {
+		// TODO Auto-generated method stub
+		
 	}
 
-	/**
-	 * Predicts a future context attribute for the specified time.
-	 * 
-	 * @param requester
-	 * @param attrId
-	 * @param date
-	 * @param callback
-	 */
-	public void retrieveFuture(EntityIdentifier requester, CtxAttributeIdentifier attrId, Date date, IUserCtxBrokerCallback callback) {
+	@Override
+	public void lookup(EntityIdentifier arg0, CtxModelType arg1, String arg2,
+			IUserCtxBrokerCallback arg3) {
+		// TODO Auto-generated method stub
+		
 	}
 
-	/**
-	 * Predicts the identified by the modification index  future context attribute.
-	 * 
-	 * @param requester
-	 * @param attrId
-	 * @param modificationIndex
-	 * @param callback
-	 */
-	public void retrieveFuture(EntityIdentifier requester, CtxAttributeIdentifier attrId, int modificationIndex, IUserCtxBrokerCallback callback) {
+	@Override
+	public void lookupEntities(EntityIdentifier arg0, String arg1, String arg2,
+			Serializable arg3, Serializable arg4, IUserCtxBrokerCallback arg5) {
+		// TODO Auto-generated method stub
+		
 	}
 
-	/**
-	 * Retrieves context attributes stored in the Context History Log based on the
-	 * specified modificationIndex.
-	 * 
-	 * @param requester
-	 * @param attrId
-	 * @param modificationIndex
-	 * @param callback
-	 */
-	public void retrievePast(EntityIdentifier requester, CtxAttributeIdentifier attrId, int modificationIndex, IUserCtxBrokerCallback callback) {
+	@Override
+	public void registerForUpdates(EntityIdentifier arg0,
+			CtxAttributeIdentifier arg1, IUserCtxBrokerCallback arg2) {
+		// TODO Auto-generated method stub
+		
 	}
 
-	/**
-	 * Retrieves context attributes stored in the Context History Log based on the
-	 * specified date and time information.
-	 * 
-	 * @param requester
-	 * @param attrId
-	 * @param startDate
-	 * @param endDate
-	 * @param callback
-	 */
-	public void retrievePast(EntityIdentifier requester, CtxAttributeIdentifier attrId, Date startDate, Date endDate, IUserCtxBrokerCallback callback) {
+	@Override
+	public void registerForUpdates(EntityIdentifier arg0,
+			CtxEntityIdentifier arg1, String arg2, IUserCtxBrokerCallback arg3) {
+		// TODO Auto-generated method stub
+		
 	}
 
-	/**
-	 * Registers the specified EventListener for value modification events of the
-	 * specified context attribute.
-	 * 
-	 * @param requester
-	 * @param attrId
-	 * @param callback
-	 */
-	public void unregisterForUpdates(EntityIdentifier requester, CtxAttributeIdentifier attrId, IUserCtxBrokerCallback callback) {
+	@Override
+	public void remove(EntityIdentifier arg0, CtxIdentifier arg1,
+			IUserCtxBrokerCallback arg2) {
+		// TODO Auto-generated method stub
+		
 	}
 
-	/**
-	 * Unregisters the specified EventListener for value modification events of
-	 * context attribute(s) with the supplied scope and type.
-	 * 
-	 * @param requester
-	 * @param scope
-	 * @param attributeType
-	 * @param callback
-	 */
-	public void unregisterForUpdates(EntityIdentifier requester, CtxEntityIdentifier scope, String attributeType, IUserCtxBrokerCallback callback) {
+	@Override
+	public void retrieve(EntityIdentifier arg0, CtxIdentifier arg1,
+			IUserCtxBrokerCallback arg2) {
+		// TODO Auto-generated method stub
+		
 	}
 
-	/**
-	 * Updates a single context model object.
-	 * 
-	 * @param requester
-	 * @param object
-	 * @param callback
-	 */
-	public void update(EntityIdentifier requester, CtxModelObject object, IUserCtxBrokerCallback callback) {
+	@Override
+	public void retrieveFuture(EntityIdentifier arg0,
+			CtxAttributeIdentifier arg1, Date arg2, IUserCtxBrokerCallback arg3) {
+		// TODO Auto-generated method stub
+		
 	}
 
+	@Override
+	public void retrieveFuture(EntityIdentifier arg0,
+			CtxAttributeIdentifier arg1, int arg2, IUserCtxBrokerCallback arg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void retrievePast(EntityIdentifier arg0,
+			CtxAttributeIdentifier arg1, int arg2, IUserCtxBrokerCallback arg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void retrievePast(EntityIdentifier arg0,
+			CtxAttributeIdentifier arg1, Date arg2, Date arg3,
+			IUserCtxBrokerCallback arg4) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void unregisterForUpdates(EntityIdentifier arg0,
+			CtxAttributeIdentifier arg1, IUserCtxBrokerCallback arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void unregisterForUpdates(EntityIdentifier arg0,
+			CtxEntityIdentifier arg1, String arg2, IUserCtxBrokerCallback arg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void update(EntityIdentifier arg0, CtxModelObject arg1,
+			IUserCtxBrokerCallback arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+	//end of IUserCtxBroker methods
+
+	//3P ContextBroker implements the callback methods of the internal context broker API
+	//ICommunityCtxBrokerCallback API methods (the internal one)
+	@Override
+	public void adminCSSRetrieved(CtxEntity arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void bondsRetrieved(CtxAttribute arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void childCommsRetrieved(List<CtxEntityIdentifier> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void commMembersRetrieved(List<CtxEntityIdentifier> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void parentCommsRetrieved(List<CtxEntityIdentifier> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	//end of ICommunityCtxBrokerCallback API methods (the internal one)
+
+	//IUserCtxBrokerCallback API methods (the internal one)
+	@Override
+	public void cancel(CtxIdentifier arg0, String arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ctxAssociationCreated(CtxAssociation arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ctxAttributeCreated(CtxAttribute arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ctxEntitiesLookedup(List<CtxEntityIdentifier> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ctxEntityCreated(CtxEntity arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ctxIndividualCtxEntityCreated(CtxEntity arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ctxModelObjectRemoved(CtxModelObject arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ctxModelObjectRetrieved(CtxModelObject arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ctxModelObjectUpdated(CtxModelObject arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ctxModelObjectsLookedup(List<CtxIdentifier> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void futureCtxRetrieved(List<CtxAttribute> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void futureCtxRetrieved(CtxAttribute arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void historyCtxRetrieved(CtxHistoryAttribute arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void historyCtxRetrieved(List<CtxHistoryAttribute> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ok(CtxIdentifier arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ok_list(List<CtxIdentifier> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ok_values(List<Object> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void similartyResults(List<Object> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateReceived(CtxModelObject arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	//end of IUserCtxBrokerCallback API methods 
 	
-	//IUserCtxBrokerCallback
-	/**
-	 * 
-	 * @param c_id
-	 * @param reason
-	 */
-	public void cancel(CtxIdentifier c_id, String reason) {
-	}
-
-	/**
-	 * 
-	 * @param ctxEntity
-	 */
-	public void ctxAssociationCreated(CtxAssociation ctxEntity) {
-	}
-
-	/**
-	 * 
-	 * @param ctxAttribute
-	 */
-	public void ctxAttributeCreated(CtxAttribute ctxAttribute) {
-	}
-
-	/**
-	 * 
-	 * @param list
-	 */
-	public void ctxEntitiesLookedup(List<CtxEntityIdentifier> list) {
-	}
-
-	/**
-	 * 
-	 * @param ctxEntity
-	 */
-	public void ctxEntityCreated(CtxEntity ctxEntity) {
-	}
-
-	/**
-	 * 
-	 * @param ctxEntity
-	 */
-	public void ctxIndividualCtxEntityCreated(IndividualCtxEntity ctxEntity) {
-	}
-
-	/**
-	 * 
-	 * @param ctxModelObject
-	 */
-	public void ctxModelObjectRemoved(CtxModelObject ctxModelObject) {
-	}
-
-	/**
-	 * 
-	 * @param ctxModelObject
-	 */
-	public void ctxModelObjectRetrieved(CtxModelObject ctxModelObject) {
-	}
-
-	/**
-	 * 
-	 * @param list
-	 */
-	public void ctxModelObjectsLookedup(List<CtxIdentifier> list) {
-	}
-
-	/**
-	 * 
-	 * @param ctxModelObject
-	 */
-	public void ctxModelObjectUpdated(CtxModelObject ctxModelObject) {
-	}
-
-	/**
-	 * 
-	 * @param futCtx
-	 */
-	public void futureCtxRetrieved(List <CtxAttribute> futCtx) {
-	}
-
-	/**
-	 * 
-	 * @param futCtx
-	 */
-	public void futureCtxRetrieved(CtxAttribute futCtx) {
-	}
-
-	/**
-	 * 
-	 * @param hoc
-	 */
-	public void historyCtxRetrieved(CtxHistoryAttribute hoc) {
-	}
-
-	/**
-	 * 
-	 * @param hoc
-	 */
-	public void historyCtxRetrieved(List<CtxHistoryAttribute> hoc) {
-	}
-
-	/**
-	 * 
-	 * @param c_id
-	 */
-	public void ok(CtxIdentifier c_id) {
-	}
-
-	/**
-	 * 
-	 * @param list
-	 */
-	public void ok_list(List<CtxIdentifier> list) {
-	}
-
-	/**
-	 * 
-	 * @param list
-	 */
-	public void ok_values(List<Object> list) {
-	}
-
-	/**
-	 * needs further refinement
-	 * 
-	 * @param results
-	 */
-	public void similartyResults(List<Object> results) {
-	}
-
-	/**
-	 * 
-	 * @param ctxModelObj
-	 */
-	public void updateReceived(CtxModelObject ctxModelObj) {
-	}
+	
+	
 	
 }
 
