@@ -22,8 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.userDatabase.impl;
-
+package org.societies.context.user.db.impl;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -42,34 +41,51 @@ import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
 import org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback;
 import org.societies.api.mock.EntityIdentifier;
 
-public class UserContextDBManagement implements IUserCtxDBMgr{
-
+public class UserCtxDBMgr implements IUserCtxDBMgr{
 
 	private final Map<CtxIdentifier, CtxModelObject> modelObjects;
 
-	EntityIdentifier entID = new EntityIdentifier();
+	private final EntityIdentifier privateId;
 
 	/**
-	 * Constructs and boots the standalone edition of the UserContextDBManagement
+	 * Constructs and boots the standalone edition of the UserCtxDBMgr
 	 */
-	public UserContextDBManagement() {
+	public UserCtxDBMgr() {
 		this.modelObjects =  new HashMap<CtxIdentifier, CtxModelObject>();
-
+		this.privateId = new EntityIdentifier();
 	}
-
-
 
 	@Override
 	public void createAssociation(String arg0, IUserCtxDBMgrCallback arg1) {
 		// TODO Auto-generated method stub
 
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.context.user.db.IUserCtxDBMgr#createAttribute(org.societies.api.context.model.CtxEntityIdentifier, org.societies.api.context.model.CtxAttributeValueType, java.lang.String, org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback)
+	 */
 	@Override
-	public void createAttribute(CtxEntityIdentifier arg0,
-			CtxAttributeValueType arg1, String arg2, IUserCtxDBMgrCallback arg3) {
-		// TODO Auto-generated method stub
+	public void createAttribute(CtxEntityIdentifier scope,
+			CtxAttributeValueType valueType, String type, IUserCtxDBMgrCallback callback) {
+		
+		if (scope == null)
+			throw new NullPointerException("scope can't be null");
 
+		final CtxEntity entity = (CtxEntity) modelObjects.get(scope);
+		
+		/**************************/
+		if (entity == null)
+			// F A I L (callback should throw an exception!!)
+			System.err.println("No such context entity: " + scope); // TEMP SOLUTION
+		/**************************/
+
+		CtxAttributeIdentifier attrIdentifier = new CtxAttributeIdentifier(scope, type, CtxModelObjectNumberGenerator.getNextValue());
+		final CtxAttribute attribute = new CtxAttribute(attrIdentifier);
+
+		this.modelObjects.put(attribute.getId(), attribute);
+		entity.addAttribute(attribute);
+		// AGAIN?? modelObjects.put(entity.getId(), entity);
 	}
 
 	public CtxAttribute createAttributeSynch(CtxEntityIdentifier scope, String type)  {
@@ -93,21 +109,25 @@ public class UserContextDBManagement implements IUserCtxDBMgr{
 
 
 	@Override
-	public void createEntity(String type, IUserCtxDBMgrCallback arg1) {
+	public void createEntity(String type, IUserCtxDBMgrCallback callback) {
 
-		CtxEntityIdentifier identifier = new CtxEntityIdentifier(entID, type, CtxModelObjectNumberGenerator.getNextValue());
-		CtxEntity ctxEntity = new  CtxEntity(identifier);
-		modelObjects.put(ctxEntity.getId(), ctxEntity);
+		final CtxEntityIdentifier identifier = new CtxEntityIdentifier(this.privateId, 
+				type, CtxModelObjectNumberGenerator.getNextValue());
+		final CtxEntity entity = new  CtxEntity(identifier);
+		this.modelObjects.put(entity.getId(), entity);
+		
+		callback.ctxEntityCreated(entity);
 	}
 
 
 	public CtxEntity createEntitySynch(String type, IUserCtxDBMgrCallback arg1) {
 
-		CtxEntityIdentifier identifier = new CtxEntityIdentifier(entID, type, CtxModelObjectNumberGenerator.getNextValue());
-		CtxEntity ctxEntity = new  CtxEntity(identifier);
-		modelObjects.put(ctxEntity.getId(), ctxEntity);
+		CtxEntityIdentifier identifier = new CtxEntityIdentifier(this.privateId,
+				type, CtxModelObjectNumberGenerator.getNextValue());
+		CtxEntity entity = new  CtxEntity(identifier);
+		modelObjects.put(entity.getId(), entity);
 
-		return ctxEntity;
+		return entity;
 	}
 
 
@@ -132,9 +152,10 @@ public class UserContextDBManagement implements IUserCtxDBMgr{
 
 	}
 
+	
 	@Override
-	public void registerForUpdates(CtxEntityIdentifier arg0, String arg1,
-			IUserCtxDBMgrCallback arg2) {
+	public void registerForUpdates(CtxEntityIdentifier scope, String attributeType,
+			IUserCtxDBMgrCallback callback) {
 		// TODO Auto-generated method stub
 
 	}
@@ -145,14 +166,17 @@ public class UserContextDBManagement implements IUserCtxDBMgr{
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.context.user.db.IUserCtxDBMgr#retrieve(org.societies.api.context.model.CtxIdentifier, org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback)
+	 */
 	@Override
-	public void retrieve(CtxIdentifier arg0, IUserCtxDBMgrCallback arg1) {
-
-
+	public void retrieve(CtxIdentifier id, IUserCtxDBMgrCallback callback) {
+		callback.ctxModelObjectRetrieved(this.modelObjects.get(id));
 	}
 
-	public CtxModelObject retrieveSynch(CtxIdentifier ctxIdentifier) {
-		return modelObjects.get(ctxIdentifier);
+	public CtxModelObject retrieveSynch(CtxIdentifier id) {
+		return this.modelObjects.get(id);
 	}
 
 	@Override
@@ -170,25 +194,28 @@ public class UserContextDBManagement implements IUserCtxDBMgr{
 	}
 
 	@Override
-	public void update(CtxModelObject ctxModelObject, IUserCtxDBMgrCallback arg1) {
+	public void update(CtxModelObject modelObject, IUserCtxDBMgrCallback callback) {
 
-
-		if (this.modelObjects.containsValue(ctxModelObject)) {
-			this.modelObjects.put(ctxModelObject.getId(), ctxModelObject);
+		if (this.modelObjects.containsValue(modelObject)) {
+			this.modelObjects.put(modelObject.getId(), modelObject);
+			
+			callback.ctxModelObjectUpdated(modelObject);
 		}
-
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.context.user.db.IUserCtxDBMgr#createIndividualCtxEntity(java.lang.String, org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback)
+	 */
 	@Override
 	public void createIndividualCtxEntity(String type,
 			IUserCtxDBMgrCallback callback)  {
 
-		CtxEntityIdentifier identifier = new CtxEntityIdentifier(entID, type, CtxModelObjectNumberGenerator.getNextValue());
+		CtxEntityIdentifier identifier = new CtxEntityIdentifier(this.privateId,
+				type, CtxModelObjectNumberGenerator.getNextValue());
 		IndividualCtxEntity entity = new IndividualCtxEntity(identifier);
-		modelObjects.put(entity.getId(), entity);
+		this.modelObjects.put(entity.getId(), entity);
 
-		// Return result via callback
-		//callback.ctxIndividualCtxEntityCreated(entity);
+		callback.ctxIndividualCtxEntityCreated(entity);
 	}
-
 }
