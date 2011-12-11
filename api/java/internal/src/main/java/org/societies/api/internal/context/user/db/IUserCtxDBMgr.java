@@ -61,7 +61,14 @@ public interface IUserCtxDBMgr {
 	public void createAttribute(CtxEntityIdentifier source, CtxAttributeValueType enumeration, String type, IUserCtxDBMgrCallback callback);
 
 	/**
-	 * Creates a Context Entity
+	 * Creates a Context Entity of a generic type. The created <code>CtxEntity</code> 
+	 * is the core concept upon which the context model is built. It corresponds 
+	 * to an object of the physical or conceptual world. For example an entity
+	 * could be a person, a device, or a service. The {@link CtxAttribute} class 
+	 * is used in order to describe an entity's properties. Concepts such as the name,
+	 * the age, and the location of a person are described by different context attributes.
+	 * Relations that may exist among different entities are described by the {@link CtxAssociation} class.
+	 * 
 	 * 
 	 * @param type
 	 * @param callback
@@ -69,6 +76,21 @@ public interface IUserCtxDBMgr {
 	 */
 	public void createEntity(String type, IUserCtxDBMgrCallback callback);
 
+	/**
+	 * Creates an individual Context Entity that is possible to join or to form a community. 
+	 * The  created <code>IndividualCtxEntity</code> is used to represent a single participant 
+	 * (CSS) of a {@link CommunityCtxEntity} (CIS). An <code>IndividualCtxEntity</code> may 
+	 * belong to zero or more CISs, simultaneously. The individual members of a pervasive 
+	 * community do not need to be human beings. They can also be organisations, smart space
+	 * infrastructures, autonomous or semi-autonomous agents, etc.
+	 *  
+	 * @param type
+	 * @param callback
+	 * @since 0.0.1
+	 */
+	public void createIndividualCtxEntity(String type, IUserCtxDBMgrCallback callback);
+	
+	
 	/**
 	 * Looks up for a list of CtxModelObjects defined by the <code>CtxModelType (CtxEntity,
 	 * CtxAttribute, CtxAssociation)</code> of  the specified type.

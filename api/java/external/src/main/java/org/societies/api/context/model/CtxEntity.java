@@ -155,6 +155,11 @@ public class CtxEntity extends CtxModelObject {
 		return result;
 	}
 	
+	
+	public void addAttribute(CtxAttribute attribute) {
+        attributes.add(attribute);
+    }
+
 	/* TODO
 	@Override
 	public String toString() {

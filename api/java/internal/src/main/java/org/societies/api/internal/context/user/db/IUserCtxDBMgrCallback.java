@@ -27,10 +27,11 @@ package org.societies.api.internal.context.user.db;
 
 import java.util.List;
 
-import org.societies.context.user.db.api.platform.CtxAttribute;
-import org.societies.context.user.db.api.platform.CtxEntity;
-import org.societies.context.user.db.api.platform.CtxEntityIdentifier;
-import org.societies.context.user.db.api.platform.CtxModelObject;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxModelObject;
+
 
 
 /**
