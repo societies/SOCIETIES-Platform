@@ -63,12 +63,12 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
 
 public class AutomaticCommunityDeletionManager {
 
-	private Css linkedCss;
+	private Css linkedCss; // No datatype yet defined for CSS
 	private EntityIdentifier dpi;
 	
     private CisRecord linkedCis;
     
-    private Domain linkedDomain;
+    private Domain linkedDomain;  // No datatype yet representing a domain
 	
 	/*
      * Constructor for AutomaticCommunityDeletionManager
