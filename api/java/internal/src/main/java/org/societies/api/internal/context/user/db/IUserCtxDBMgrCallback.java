@@ -25,10 +25,72 @@
 
 package org.societies.api.internal.context.user.db;
 
+import java.util.List;
+
+import org.societies.context.user.db.api.platform.CtxAttribute;
+import org.societies.context.user.db.api.platform.CtxEntity;
+import org.societies.context.user.db.api.platform.CtxEntityIdentifier;
+import org.societies.context.user.db.api.platform.CtxModelObject;
+
 
 /**
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  */
 public interface IUserCtxDBMgrCallback {
 
+	
+	/**
+	 * The callback of IUserCtxDBMgr method
+	 * createEntity(String type, IUserCtxBrokerCallback callback) 
+	 * 
+	 * @param ctxEntity
+	 * @since 0.0.1
+	 */
+	public void ctxEntityCreated(CtxEntity ctxEntity);
+	
+	
+	/**
+	 * The callback of IUserCtxDBMgr method
+	 * createEntity(String type, IUserCtxBrokerCallback callback) 
+	 * 
+	 * @param ctxEntity
+	 * @since 0.0.1
+	 */
+	public void ctxIndividualCtxEntityCreated(CtxEntity ctxEntity);
+	
+	/**
+	 * The callback of IUserCtxDBMgr method
+	 * createAttribute(CtxEntityIdentifier scope, CtxAttributeValueType enumerate, String type, IUserCtxDBMgr callback)
+	 * 
+	 * @param ctxAttribute
+	 * @since 0.0.1
+	 */
+	public void ctxAttributeCreated(CtxAttribute ctxAttribute);
+	
+	/**
+	 * The callback of IUserCtxDBMgr method
+	 * update(CtxModelObject identifier, IUserCtxDBMgr callback)
+	 * 
+	 * @param ctxModelObject
+	 * @since 0.0.1
+	 */
+	public void ctxModelObjectUpdated(CtxModelObject ctxModelObject);
+	
+	/**
+	 * The callback of IUserCtxDBMgr method
+	 * lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue, IUserCtxDBMgrCallback callback);
+	 *
+	 * @param list
+	 * @since 0.0.1
+	 */
+	public void ctxEntitiesLookedup(List<CtxEntityIdentifier> list);
+	
+	/**
+	 * The callback of IUserCtxDBMgr method
+	 * retrieve(CtxIdentifier identifier, IUserCtxDBMgrCallback callback);
+	 * 
+	 * @param ctxModelObject
+	 * @since 0.0.1
+	 */
+	public void ctxModelObjectRetrieved(CtxModelObject ctxModelObject);
 }
