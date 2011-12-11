@@ -50,8 +50,8 @@ public class CtxEntity extends CtxModelObject {
 
 	private static final long serialVersionUID = -9180016236230471418L;
 	
-	private Set<CtxAttribute> attributes = new HashSet<CtxAttribute>();
-	private Set<CtxAssociationIdentifier> associations;
+	private final Set<CtxAttribute> attributes = new HashSet<CtxAttribute>();
+	private final Set<CtxAssociationIdentifier> associations = new HashSet<CtxAssociationIdentifier>;
 
 	/**
 	 * Constructs a CtxEntity with the specified identifier
@@ -155,7 +155,10 @@ public class CtxEntity extends CtxModelObject {
 		return result;
 	}
 	
-	
+	/**
+	 * TO BE REMOVED DO NOT USE
+	 */
+	@Deprecated
 	public void addAttribute(CtxAttribute attribute) {
         attributes.add(attribute);
     }
