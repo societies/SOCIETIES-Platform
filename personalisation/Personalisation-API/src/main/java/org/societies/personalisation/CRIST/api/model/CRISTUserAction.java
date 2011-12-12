@@ -7,8 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.societies.personalisation.common.api.model.Action;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.personalisation.model.Action;
 
 /**
  * This class is used to define the data structure and methods for modelling and

@@ -28,10 +28,10 @@ import java.io.Serializable;
 
 import javax.swing.tree.DefaultTreeModel;
 
-import org.societies.api.internal.mock.EntityIdentifier;
-import org.societies.api.internal.mock.ICtxAttributeIdentifier;
-import org.societies.api.internal.mock.ServiceResourceIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ICtxAttributeIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
 /**
  * This class represents a tree model for Privacy Policy Negotiation Preferences and encapsulates a tree of IPrivacyPreference objects.

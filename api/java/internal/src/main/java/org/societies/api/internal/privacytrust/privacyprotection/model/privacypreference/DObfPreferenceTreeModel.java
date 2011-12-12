@@ -26,14 +26,12 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.io.Serializable;
 
-import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
 
-import org.societies.api.internal.mock.EntityIdentifier;
-import org.societies.api.internal.mock.ICtxAttributeIdentifier;
-import org.societies.api.internal.mock.ServiceResourceIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ICtxAttributeIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
 
 

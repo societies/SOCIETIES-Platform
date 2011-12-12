@@ -24,7 +24,7 @@ import java.util.Enumeration;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.societies.personalisation.common.api.model.IOutcome;
+import org.societies.api.internal.personalisation.model.IOutcome;
 
 
 

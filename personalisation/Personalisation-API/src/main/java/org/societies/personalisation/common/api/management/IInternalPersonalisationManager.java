@@ -19,17 +19,17 @@
  */
 package org.societies.personalisation.common.api.management;
 
+import org.societies.api.internal.personalisation.model.IFeedbackEvent;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ICtxAttributeIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.personalisation.mgmt.IPersonalisationManager;
+import org.societies.api.personalisation.model.IAction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
-import org.societies.personalisation.common.api.model.ICtxAttributeIdentifier;
-import org.societies.personalisation.common.api.model.ContextModelObject;
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.IAction;
-import org.societies.personalisation.common.api.model.IFeedbackEvent;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
-
+import org.societies.api.mock.ContextModelObject;
 
 
 /**
@@ -37,7 +37,7 @@ import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
  * @version 1.0
  * @created 11-Nov-2011 14:43:37
  */
-public interface IInternalPersonalisationManager {
+public interface IInternalPersonalisationManager extends IPersonalisationManager{
 
 	/**
 	 * Allows any service to request an context-based evaluated preference outcome.

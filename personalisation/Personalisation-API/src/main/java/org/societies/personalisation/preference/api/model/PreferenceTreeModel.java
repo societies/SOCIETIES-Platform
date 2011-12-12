@@ -24,7 +24,7 @@ import java.util.Date;
 
 import javax.swing.tree.DefaultTreeModel;
 
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
 /**
  * @author Elizabeth

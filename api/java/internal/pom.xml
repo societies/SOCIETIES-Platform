@@ -30,7 +30,11 @@
 
 	<dependencies>
 	<!-- add your dependencies here -->
-	
+	<dependency>
+	<groupId>org.societies.api.external</groupId>
+	<artifactId>societies-api</artifactId>
+	<version>${release.version}</version>
+	</dependency>
 
 	</dependencies>
 
@@ -41,17 +45,21 @@
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>
-					<instructions>
-						<Import-Package></Import-Package>
-						
+					<instructions>						
 						<!-- the API will export all interfaces packages for the rest of modules -->
 						<Export-Package>
-						org.societies.api.internal.*
+						org.societies.api.internal.**
 						</Export-Package>
 					</instructions>
 				</configuration>
 		
 			</plugin>
+						<!--  used to exclude  some certain files -->
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+             </plugin>
+
 			
 			<!-- although there is no test for API yet, we prefer to keep the following plugin -->
 			<plugin>

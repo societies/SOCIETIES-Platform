@@ -24,12 +24,13 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
 
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.api.internal.mock.EntityIdentifier;
-import org.societies.api.internal.mock.ServiceResourceIdentifier;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
 /**
  * The NegotiationAgreement class represents the agreement reached between the user and the service provider. 
