@@ -36,26 +36,26 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
  */
 public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 	public RequestPolicy getPrivacyPolicy(String id) {
-
+		return null;
 	}
 
 	public List<RequestPolicy> getPrivacyPolicies(Map criteria) {
-
+		return null;
 	}
 
 	public RequestPolicy updatePrivacyPolicy(RequestPolicy privacyPolicy) {
-
+		return null;
 	}
 
 	public boolean deletePrivacyPolicy(String id) {
-
+		return false;
 	}
 
 	public boolean deletePrivacyPolicies(Map criteria) {
-
+		return false;
 	}
 
 	public RequestPolicy inferPrivacyPolicy(Map configuration, Object privacyPolicyType) {
-
+		return null;
 	}
 }

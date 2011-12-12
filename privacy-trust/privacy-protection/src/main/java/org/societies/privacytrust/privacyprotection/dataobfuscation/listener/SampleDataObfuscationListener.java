@@ -26,7 +26,7 @@ package org.societies.privacytrust.privacyprotection.dataobfuscation.listener;
 
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
+import org.societies.api.internal.mock.DataIdentifier;
 
 /**
  * @state skeleton 

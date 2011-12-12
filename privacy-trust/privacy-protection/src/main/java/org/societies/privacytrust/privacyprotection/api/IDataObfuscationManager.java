@@ -27,7 +27,7 @@ package org.societies.privacytrust.privacyprotection.api;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
+import org.societies.api.internal.mock.DataIdentifier;
 
 /**
  * Internal interface to protect a data by obfuscating it

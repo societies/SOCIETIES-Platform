@@ -28,7 +28,7 @@ import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
+import org.societies.api.internal.mock.DataIdentifier;
 
 /**
  * Implementation of IDataObfuscationManager
