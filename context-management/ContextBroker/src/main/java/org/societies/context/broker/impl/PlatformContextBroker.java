@@ -29,21 +29,22 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+
 import org.societies.api.context.broker.ICommunityCtxBrokerCallback;
 import org.societies.api.context.broker.IUserCtxBrokerCallback;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 import org.societies.api.internal.context.broker.IUserCtxBroker;
-import org.societies.api.internal.context.community.db.ContextBond;
-import org.societies.api.internal.context.community.db.ICommunityCtxDBMgrCallback;
+import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
+import org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback;
 import org.societies.api.internal.context.user.prediction.PredictionMethod;
 import org.societies.api.mock.EntityIdentifier;
-
 
 /*
  * Platform Context Broker Implementation
@@ -51,8 +52,11 @@ import org.societies.api.mock.EntityIdentifier;
  * management in order to facilitate within platform db interaction 
  */
 
-public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserCtxBroker, ICommunityCtxBroker {
+public class PlatformContextBroker implements IUserCtxBroker, ICommunityCtxBroker {
 
+	private IUserCtxDBMgr userDB = null;
+
+	
 	//ICommunityCtxBroker methods (internal)
 	@Override
 	public void retrieveAdministratingCSS(EntityIdentifier arg0,
@@ -135,7 +139,10 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 	@Override
 	public void createAssociation(EntityIdentifier arg0, String arg1,
 			IUserCtxBrokerCallback arg2) {
+		
 		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg2);
+		userDB.createAssociation(arg1, callback);
 		
 	}
 
@@ -143,14 +150,19 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 	public void createAttribute(EntityIdentifier arg0,
 			CtxEntityIdentifier arg1, CtxAttributeValueType arg2, String arg3,
 			IUserCtxBrokerCallback arg4) {
-		// TODO Auto-generated method stub
 		
+		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg4);
+		userDB.createAttribute(arg1, arg2, arg3, callback);
 	}
 
 	@Override
 	public void createEntity(EntityIdentifier arg0, String arg1,
 			IUserCtxBrokerCallback arg2) {
+		
 		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg2);
+		userDB.createEntity(arg1, callback);
 		
 	}
 
@@ -179,13 +191,17 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 	public void registerForUpdates(EntityIdentifier arg0,
 			CtxAttributeIdentifier arg1, IUserCtxBrokerCallback arg2) {
 		// TODO Auto-generated method stub
-		
+		UserDBCallback callback = new UserDBCallback(arg2);
+		userDB.registerForUpdates(arg1, callback);
 	}
 
 	@Override
 	public void registerForUpdates(EntityIdentifier arg0,
 			CtxEntityIdentifier arg1, String arg2, IUserCtxBrokerCallback arg3) {
+		
 		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg3);
+		userDB.registerForUpdates(arg1, arg2, callback);
 		
 	}
 
@@ -193,6 +209,8 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 	public void remove(EntityIdentifier arg0, CtxIdentifier arg1,
 			IUserCtxBrokerCallback arg2) {
 		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg2);
+		userDB.remove(arg1, callback);
 		
 	}
 
@@ -200,6 +218,8 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 	public void retrieve(EntityIdentifier arg0, CtxIdentifier arg1,
 			IUserCtxBrokerCallback arg2) {
 		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg2);
+		userDB.retrieve(arg1, callback);
 		
 	}
 
@@ -236,6 +256,8 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 	public void unregisterForUpdates(EntityIdentifier arg0,
 			CtxAttributeIdentifier arg1, IUserCtxBrokerCallback arg2) {
 		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg2);
+		userDB.unregisterForUpdates(arg1, callback);
 		
 	}
 
@@ -243,6 +265,8 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 	public void unregisterForUpdates(EntityIdentifier arg0,
 			CtxEntityIdentifier arg1, String arg2, IUserCtxBrokerCallback arg3) {
 		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg3);
+		userDB.unregisterForUpdates(arg1, arg2, callback);
 		
 	}
 
@@ -250,6 +274,8 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 	public void update(EntityIdentifier arg0, CtxModelObject arg1,
 			IUserCtxBrokerCallback arg2) {
 		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg2);
+		userDB.update(arg1, callback);
 		
 	}
 
@@ -258,6 +284,8 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 			String arg0,
 			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg1) {
 		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg1);
+		userDB.createAssociation(arg0, callback);
 		
 	}
 
@@ -268,6 +296,8 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 			String arg2,
 			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg3) {
 		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg3);
+		userDB.createAttribute(arg0, arg1, arg2, callback);
 		
 	}
 
@@ -276,7 +306,8 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 			String arg0,
 			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg1) {
 		// TODO Auto-generated method stub
-		
+		UserDBCallback callback = new UserDBCallback(arg1);
+		userDB.createEntity(arg0, callback);
 	}
 
 	@Override
@@ -311,7 +342,7 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 		// TODO Auto-generated method stub
 		
 	}
-
+	
 	@Override
 	public PredictionMethod getDefaultPredictionMethod(PredictionMethod arg0) {
 		// TODO Auto-generated method stub
@@ -330,6 +361,8 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 			String arg1,
 			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg2) {
 		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg2);
+		userDB.lookup(arg0, arg1, callback);
 		
 	}
 
@@ -341,6 +374,8 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 			Serializable arg3,
 			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg4) {
 		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg4);
+		userDB.lookupEntities(arg0, arg1, arg2, arg3, callback);
 		
 	}
 
@@ -349,6 +384,8 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 			CtxAttributeIdentifier arg0,
 			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg1) {
 		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg1);
+		userDB.registerForUpdates(arg0, callback);
 		
 	}
 
@@ -358,6 +395,8 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 			String arg1,
 			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg2) {
 		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg2);
+		userDB.registerForUpdates(arg0, arg1, callback);
 		
 	}
 
@@ -366,6 +405,8 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 			CtxIdentifier arg0,
 			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg1) {
 		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg1);
+		userDB.remove(arg0, callback);
 		
 	}
 
@@ -386,6 +427,8 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 			CtxIdentifier arg0,
 			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg1) {
 		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg1);
+		userDB.retrieve(arg0, callback);
 		
 	}
 
@@ -445,7 +488,8 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 			CtxAttributeIdentifier arg0,
 			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg1) {
 		// TODO Auto-generated method stub
-		
+		UserDBCallback callback = new UserDBCallback(arg1);
+		userDB.unregisterForUpdates(arg0, callback);
 	}
 
 	@Override
@@ -454,6 +498,8 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 			String arg1,
 			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg2) {
 		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg2);
+		userDB.unregisterForUpdates(arg0, arg1, callback);
 		
 	}
 
@@ -462,33 +508,31 @@ public class PlatformContextBroker implements ICommunityCtxDBMgrCallback, IUserC
 			CtxModelObject arg0,
 			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg1) {
 		// TODO Auto-generated method stub
-		
+		UserDBCallback callback = new UserDBCallback(arg1);
+		userDB.update(arg0, callback);
+
 	}
 	//end of IUserCtxBroker methods (internal)
+	
+	
+	
+	private class UserDBCallback implements IUserCtxDBMgrCallback {
 
-	//ICommunityCtxDBMgrCallback methods
-	@Override
-	public void bondsRetrieved(ContextBond arg0, CtxEntityIdentifier arg1) {
-		// TODO Auto-generated method stub
-		
-	}
+	    private IUserCtxBrokerCallback brokerCallback;
+	    private org.societies.api.internal.context.broker.IUserCtxBrokerCallback inBrokerCallback;
 
-	@Override
-	public void childCommunitiesRetrieved(List<CtxEntityIdentifier> arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	    UserDBCallback(IUserCtxBrokerCallback brokerCallback) {
+	       this.brokerCallback = brokerCallback;
+	    } 
 
-	@Override
-	public void communityMembersRetrieved(List<CtxEntityIdentifier> arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	    public UserDBCallback(
+				org.societies.api.internal.context.broker.IUserCtxBrokerCallback brokerCallback) {
+			// TODO Auto-generated constructor stub
+	    	this.inBrokerCallback = brokerCallback;
+		}
 
-	@Override
-	public void parentCommunitiesRetrieved(List<CtxEntityIdentifier> arg0) {
-		// TODO Auto-generated method stub
-		
+		void ctxEntityCreated(CtxEntity entity) {
+	        this.brokerCallback.ctxEntityCreated(entity);
+	    }
 	}
-	//end of ICommunityCtxDBMgrCallback methods
 }
