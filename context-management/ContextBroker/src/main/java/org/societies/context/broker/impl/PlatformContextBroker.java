@@ -32,6 +32,7 @@ import java.util.List;
 
 import org.societies.api.context.broker.ICommunityCtxBrokerCallback;
 import org.societies.api.context.broker.IUserCtxBrokerCallback;
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
@@ -543,8 +544,20 @@ public class PlatformContextBroker implements IUserCtxBroker, ICommunityCtxBroke
 	    	this.inBrokerCallback = brokerCallback;
 		}
 
-		void ctxEntityCreated(CtxEntity entity) {
+	    public void ctxEntityCreated(CtxEntity entity) {
 	        this.brokerCallback.ctxEntityCreated(entity);
 	    }
+		
+		//abstract methods  
+	    public void ctxIndividualCtxEntityCreated(CtxEntity arg0) {}
+		  
+	    public void ctxAttributeCreated(CtxAttribute arg0) {}
+		  
+	    public void ctxModelObjectUpdated(CtxModelObject arg0) {}
+		  
+	    public void ctxEntitiesLookedup(List arg0) {}
+		  
+	    public void ctxModelObjectRetrieved(CtxModelObject arg0) {}
+		
 	}
 }
