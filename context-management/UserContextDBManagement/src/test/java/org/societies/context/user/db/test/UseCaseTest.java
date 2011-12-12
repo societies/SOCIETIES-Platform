@@ -27,6 +27,7 @@ package org.societies.context.user.db.test;
 import java.util.List;
 
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxModelObject;
@@ -36,18 +37,21 @@ import org.societies.context.user.db.impl.UserCtxDBMgr;
 public class UseCaseTest {
 
 	static UserCtxDBMgr userDB ;
+	static CtxEntity entity;
 	static CtxAttribute attribute;
-	
-	
+	CallbackImpl callback ;
+
 	UseCaseTest(){
 		userDB = new UserCtxDBMgr();
+		//callback = new CallbackImpl(userDB);
+		callback = new CallbackImpl();
+	
 		System.out.println("start testing");
-		testCreateEntitySynch();	
 		testCreateIndividualCtxEntity();
 		testCreateAttribute();
 		testRetrieveAttribute();
-		testUpdateAttributeValue();
-	}
+		testUpdateAttribute();
+		}
 
 
 	/**
@@ -59,68 +63,52 @@ public class UseCaseTest {
 
 
 	private void testCreateIndividualCtxEntity(){
-		
 		System.out.println("---- testCreateIndividualCtxEntity");
-		IUserCtxDBMgrCallback callback = new CallbackImpl();
 		userDB.createIndividualCtxEntity("person", callback);
+		entity = callback.getCtxEntity();
 	}
-
-	private void testCreateEntitySynch(){
-
-		System.out.println("---- testCreateEntitySynch");
-	
-		CtxEntity ctxEnt1 = userDB.createEntitySynch("sensor", null);
-		CtxEntity ctxEnt2 = userDB.createEntitySynch("sensor", null);
-
-		System.out.println("Created Sensor Entity 1 "+ ctxEnt1.getId());
-		System.out.println("Created Sensor Entity 2 "+ ctxEnt2.getId());
-
-		CtxEntity ctxEntRetrieved1 = (CtxEntity) userDB.retrieveSynch(ctxEnt1.getId());
-		System.out.println("Retieve entity from repository");
-		if (ctxEntRetrieved1.getId().equals(ctxEntRetrieved1.getId())) System.out.println("Retrieved Sensor Entities are equal");
-	
-	}
-
 
 	private void testCreateAttribute(){
-		
 		System.out.println("---- testCreateAttribute");
-		CtxEntity ctxEnt3 = userDB.createEntitySynch("sensor", null);
-		attribute = userDB.createAttributeSynch(ctxEnt3.getId(), "Temperature");
-		attribute.setIntegerValue(5);
-
-		System.out.println("attribute id: "+attribute.getId() +" type:"+attribute.getType()+" value:"+attribute.getIntegerValue());	
+		userDB.createAttribute(entity.getId(), CtxAttributeValueType.INDIVIDUAL, "name", callback);
+		attribute = callback.getCtxAttribute();
 	}
-	
+
 	private void testRetrieveAttribute(){
 		System.out.println("---- testRetrieveAttribute");
-		CtxAttribute ctxAttrRetrieved = (CtxAttribute) userDB.retrieveSynch(attribute.getId());
-		System.out.println("ctxAttrRetrieved id: "+ctxAttrRetrieved.getId() +" type:"+ctxAttrRetrieved.getType()+" ctxAttrRetrieved:"+attribute.getIntegerValue());	
-		if (attribute.getId().equals(ctxAttrRetrieved.getId())) System.out.println("Retrieved attributes are equal");
-
+		userDB.retrieve(attribute.getId(), callback);
+		attribute = (CtxAttribute) callback.getCtxModelObject();
 	}
 	
-	private void testUpdateAttributeValue(){
-		System.out.println("---- testUpdateAttributeValue");
-		final IUserCtxDBMgrCallback callback = new CallbackImpl();
-		
-		CtxAttribute ctxAttrRetrieved = (CtxAttribute) userDB.retrieveSynch(attribute.getId());
-		System.out.println("ctxAttrRetrieved id: "+ctxAttrRetrieved.getId() +" type:"+ctxAttrRetrieved.getType()+" ctxAttrRetrieved:"+ctxAttrRetrieved.getIntegerValue());	
-		ctxAttrRetrieved.setIntegerValue(10);
-		userDB.update(ctxAttrRetrieved, callback);
-		
-		CtxAttribute ctxAttrUpdated = (CtxAttribute) userDB.retrieveSynch(attribute.getId());
-		System.out.println("ctxAttrUpdated id: "+ctxAttrUpdated.getId() +" type:"+ctxAttrUpdated.getType()+" ctxAttrUpdated:"+ctxAttrUpdated.getIntegerValue());	
+	private void testUpdateAttribute(){
+		System.out.println("---- testUpdateAttribute");
+		userDB.retrieve(attribute.getId(), callback);
+		attribute = (CtxAttribute) callback.getCtxModelObject();
+		attribute.setIntegerValue(5);
+		userDB.update(attribute, callback);
+		//verify update
+		userDB.retrieve(attribute.getId(), callback);
+		attribute = (CtxAttribute) callback.getCtxModelObject();
+		System.out.println("attribute value should be 5 and it is:"+attribute.getIntegerValue());
 	}
-
+	
 	private class CallbackImpl implements IUserCtxDBMgrCallback {
 
+		CtxEntity callbackEntity = null;
+		CtxAttribute callbackAttribute = null;
+		CtxModelObject ctxModelObject = null;
+	
+		CallbackImpl(){
+		}
+
+		
 		/* (non-Javadoc)
 		 * @see org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback#ctxAttributeCreated(org.societies.api.context.model.CtxAttribute)
 		 */
 		@Override
 		public void ctxAttributeCreated(CtxAttribute attribute) {
 			System.out.println("Test attribute created: " + attribute.getId());
+			this.callbackAttribute = attribute;
 		}
 
 		/* (non-Javadoc)
@@ -129,7 +117,6 @@ public class UseCaseTest {
 		@Override
 		public void ctxEntitiesLookedup(List<CtxEntityIdentifier> arg0) {
 			// TODO Auto-generated method stub
-			
 		}
 
 		/* (non-Javadoc)
@@ -137,7 +124,9 @@ public class UseCaseTest {
 		 */
 		@Override
 		public void ctxEntityCreated(CtxEntity entity) {
-			System.out.println("Test entity created: " + entity.getId());
+			System.out.println("callback : Test entity created: " + entity.getId());
+
+			this.callbackEntity = entity;
 		}
 
 		/* (non-Javadoc)
@@ -145,7 +134,8 @@ public class UseCaseTest {
 		 */
 		@Override
 		public void ctxIndividualCtxEntityCreated(CtxEntity entity) {
-			System.out.println("Test individual entity created: " + entity.getId());
+			System.out.println("callback : Test individual entity created: " + entity.getId());
+			this.callbackEntity = entity;
 		}
 
 		/* (non-Javadoc)
@@ -153,7 +143,8 @@ public class UseCaseTest {
 		 */
 		@Override
 		public void ctxModelObjectRetrieved(CtxModelObject modelObject) {
-			System.out.println("Test model object retrieved: " + modelObject.getId());
+			System.out.println("callback : Test model object retrieved: " + modelObject.getId());
+			this.ctxModelObject =  modelObject;
 		}
 
 		/* (non-Javadoc)
@@ -161,7 +152,20 @@ public class UseCaseTest {
 		 */
 		@Override
 		public void ctxModelObjectUpdated(CtxModelObject modelObject) {
-			System.out.println("Test model object updated: " + modelObject.getId());
+			System.out.println("callback : Test model object updated: " + modelObject.getId());
 		}
+	
+		public CtxAttribute getCtxAttribute(){
+			return this.callbackAttribute;
+		}
+		
+		public CtxEntity getCtxEntity(){
+			return  this.callbackEntity;
+		}
+
+		public CtxModelObject getCtxModelObject(){
+			return  this.ctxModelObject;
+		}
+			
 	}
 }

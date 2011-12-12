@@ -87,28 +87,10 @@ public class UserCtxDBMgr implements IUserCtxDBMgr{
 		this.modelObjects.put(attribute.getId(), attribute);
 		entity.addAttribute(attribute);
 		// AGAIN?? modelObjects.put(entity.getId(), entity);
+		callback.ctxAttributeCreated(attribute);
 	}
 
-	public CtxAttribute createAttributeSynch(CtxEntityIdentifier scope, String type)  {
-
-		if (scope == null)
-			throw new IllegalArgumentException(
-					"The scope of an attribute cannot by null");
-
-		final CtxEntity entity = (CtxEntity) modelObjects.get(scope);
-
-		CtxAttributeIdentifier attrIdentifier = new CtxAttributeIdentifier(scope, type, CtxModelObjectNumberGenerator.getNextValue());
-		final CtxAttribute attribute = new CtxAttribute(attrIdentifier);
-
-		modelObjects.put(attribute.getId(), attribute);
-		entity.addAttribute(attribute);
-		modelObjects.put(entity.getId(), entity);	
-		
-		return attribute;
-	}
-
-
-
+	
 	@Override
 	public void createEntity(String type, IUserCtxDBMgrCallback callback) {
 
@@ -118,17 +100,6 @@ public class UserCtxDBMgr implements IUserCtxDBMgr{
 		this.modelObjects.put(entity.getId(), entity);
 		
 		callback.ctxEntityCreated(entity);
-	}
-
-
-	public CtxEntity createEntitySynch(String type, IUserCtxDBMgrCallback arg1) {
-
-		CtxEntityIdentifier identifier = new CtxEntityIdentifier(this.privateId,
-				type, CtxModelObjectNumberGenerator.getNextValue());
-		CtxEntity entity = new  CtxEntity(identifier);
-		modelObjects.put(entity.getId(), entity);
-
-		return entity;
 	}
 
 
