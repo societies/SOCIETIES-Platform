@@ -71,14 +71,26 @@ public class DeviceApi {
 		return deviceListenerList;
 	}
 	
+	/**
+	 * 
+	 * @param message
+	 */
 	protected void fireNewDeviceConnected(Message message){
 		
 	}
 	
+	/**
+	 * 
+	 * @param message
+	 */
 	protected void fireDeviceDisconnected(Message message){
 		
 	}
 	
+	/**
+	 * 
+	 * @param message
+	 */
 	protected void fireNewDeviceDataReceived(Message message){
 		
 	}
