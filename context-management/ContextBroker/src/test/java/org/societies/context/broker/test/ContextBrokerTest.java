@@ -26,4 +26,18 @@ package org.societies.context.broker.test;
 
 public class ContextBrokerTest {
 
+	//Constructor
+	ContextBrokerTest(){
+		//TODO
+		
+	}
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		new ContextBrokerTest();
+	}
+	
+	
 }

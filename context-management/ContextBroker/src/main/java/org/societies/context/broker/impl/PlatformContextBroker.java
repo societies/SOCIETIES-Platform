@@ -56,7 +56,15 @@ public class PlatformContextBroker implements IUserCtxBroker, ICommunityCtxBroke
 
 	private IUserCtxDBMgr userDB = null;
 
-	
+	//getters and setters for DB handlers
+	public IUserCtxDBMgr getUserDB() {
+		return userDB;
+	}
+
+	public void setUserDB(IUserCtxDBMgr userDB) {
+		this.userDB = userDB;
+	}
+
 	//ICommunityCtxBroker methods (internal)
 	@Override
 	public void retrieveAdministratingCSS(EntityIdentifier arg0,
