@@ -11,9 +11,10 @@
 		<relativePath>../../../parent/spring-osgi.xml</relativePath>
 	</parent>
 
-	<!-- groupId is set in parent pom -->
-	<artifactId>css_userCtxDB_impl</artifactId>
+	<groupId>org.societies.context.user.db.impl</groupId>
+	<artifactId>UserCtxDBMgmt</artifactId> 
 	<version>${version.cm}</version>
+	<name>User Context DB Management</name>
 	<packaging>bundle</packaging>
 
 	<developers>
@@ -29,14 +30,68 @@
 		</developer>
 	</developers>
 
+    <properties>
+        <slf4j.version>1.5.0</slf4j.version>
+        <spring.maven.artifact.version>2.5.6.SEC01</spring.maven.artifact.version>
+        <spring.osgi.version>1.2.1</spring.osgi.version>
+        <equinox.ver>3.2.2</equinox.ver>
+    </properties>
+
 	<!-- List dependencies here -->
+	
 	<dependencies>
+	
+		<!-- SOCIETIES dependencies -->
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<!-- Other dependencies -->
+		<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>org.springframework.core</artifactId>
+            <version>${spring.maven.artifact.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+              <exclusion>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+              </exclusion>
+            </exclusions>
+        </dependency> 
+		<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>org.springframework.beans</artifactId>
+            <version>${spring.maven.artifact.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+              <exclusion>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+              </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>org.springframework.context</artifactId>
+            <version>${spring.maven.artifact.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+              <exclusion>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+              </exclusion>
+            </exclusions>
+        </dependency>
 	</dependencies>
 
 	<build>
@@ -52,9 +107,10 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-						<_nouses>true</_nouses>
+					<!-- <Import-Package>org.springframework.beans.factory.annotation;version="0",org.springframework.stereotype;version="0"</Import-Package> -->
+						<!-- <Embed-Dependency>scope=compile|runtime</Embed-Dependency>  -->
+						<!-- <Embed-Transitive>true</Embed-Transitive> -->
+						<!-- <_nouses>true</_nouses> -->
 					</instructions>
 				</configuration>
 			</plugin>
@@ -77,8 +133,5 @@
 
 		</plugins>
 	</build>
-
-
-	<name>User Ctx DB Management</name>
 
 </project>
