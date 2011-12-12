@@ -177,6 +177,8 @@ public class PlatformContextBroker implements IUserCtxBroker, ICommunityCtxBroke
 	public void lookup(EntityIdentifier arg0, CtxModelType arg1, String arg2,
 			IUserCtxBrokerCallback arg3) {
 		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg3);
+		userDB.lookup(arg1, arg2, callback);
 		
 	}
 
@@ -184,6 +186,8 @@ public class PlatformContextBroker implements IUserCtxBroker, ICommunityCtxBroke
 	public void lookupEntities(EntityIdentifier arg0, String arg1, String arg2,
 			Serializable arg3, Serializable arg4, IUserCtxBrokerCallback arg5) {
 		// TODO Auto-generated method stub
+		UserDBCallback callback = new UserDBCallback(arg5);
+		userDB.lookupEntities(arg1, arg2, arg3, arg4, callback);
 		
 	}
 
