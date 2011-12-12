@@ -81,7 +81,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<Import-Package></Import-Package>
+						<Import-Package>!javax.swing.*</Import-Package>
 						<Export-Package></Export-Package>
 					</instructions>
 				</configuration>
@@ -101,7 +101,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 							<version>${release.version}</version>
 							<type>bundle</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+							<outputDirectory>${virgo.home}/pickup/</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>
