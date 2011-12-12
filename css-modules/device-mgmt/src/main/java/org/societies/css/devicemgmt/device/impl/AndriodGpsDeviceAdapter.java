@@ -23,27 +23,27 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.devicemgmt.deviceregistry.impl;
+package org.societies.css.devicemgmt.device.impl;
 
-public class RegistryUtility {
+import org.societies.css.devicemgmt.device.api.GpsDeviceAPI;
+import org.societies.css.devicemgmt.device.api.GpsLocation;
+
+public class AndriodGpsDeviceAdapter extends AndriodOSDeviceAPI implements GpsDeviceAPI{
+
+	@Override
+	public GpsLocation getLastKnowLocation() {
+		
+		/*
+		 * The method will do something like this: 
+		 * 
+		 * 		LocationManager mlocManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+		 *		String locationProvider = LocationManager.GPS_PROVIDER;
+		 * 		Location lastKnownLocation = mlocManager.getLastKnownLocation(locationProvider);
+		 * 		//use the location object to initialize the "GpsLocation" object
+		 */
+		
+		return null;
+	}
+
 	
-	/**
-     * 
-     */
-    private RegistryUtility() {
-    }
-
-
-    /**
-     * Create a key string for storing a device
-     *
-     * @param key
-     * @param value
-     * @return
-     */
-    public static String createKeyString(IDeviceIdentifier deviceId) {
-
-        return deviceId.toString();
-    }
-
 }

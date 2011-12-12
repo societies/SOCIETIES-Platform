@@ -23,31 +23,70 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.devicemgmt.device.common;
+package org.societies.css.devicemgmt.deviceregistry.api;
 
-public class OSDetailsImpl implements OSDetails {
-	
-	String name,  version, build;
-	
-	public OSDetailsImpl(String name, String version,String build){
-		this.name = name;
-		this.version = version;
-		this.build = build;
-	}
-	
-	@Override
-	public String getName() {
-		return name;
-	}
+import java.util.Collection;
+import java.util.List;
 
-	@Override
-	public String getVersion() {
-		return version;
-	}
+import org.societies.css.devicemgmt.deviceregistry.impl.CSSDevice;
+import org.societies.css.devicemgmt.deviceregistry.impl.IDeviceIdentifier;
 
-	@Override
-	public String getBuild() {
-		return build;
-	}
+public interface IDeviceRegistry {
+	
+	/*
+	 * Description:		Add new device to the device registry
+	 * 				
+	 * @return 			IDeviceidentifier
+	 */
+	public IDeviceIdentifier addDevice (CSSDevice device, Object CSSID);
+
+	/* 
+	 * Description: 	Remove device from the device registry
+	 * 				
+	 * @return 			boolean
+	 */
+
+	public boolean deleteDevice (CSSDevice device, Object CSSID);
+	
+	/* 
+	 * Description:		Search the device registry for a particular device given the deviceID 
+	 * @return 			CSSDevice
+	 */
+
+	public CSSDevice findDevice(IDeviceIdentifier deviceID);
+	
+	/* 
+	 * Description: 	Given a particular deviceID get all the services associated with that device 
+	 * @return 			collection
+	 */
+	public Collection<Object> getDeviceServiceList (Object deviceID);
+	
+	/* 
+	 * Description: 	Search the device registry for all devices registered 
+	 * @return 			collection
+	 */
+	
+	public Collection<CSSDevice> findAllDevices();
+	
+	
+	/* 
+	 * Description:		Search the device registry for a particular device type 
+	 * @return 			collection of device types
+	 */
+	public Collection<CSSDevice> findByDeviceType(String deviceType);
+	
+	
+	/* 
+	 * Description:		Clear the device registry of all entries
+	 * @return 			
+	 */
+    public void clearRegistry();
+
+    /* 
+	 * Description:		Determine the number of devices registered in the device registry
+	 * @return 			int
+	 */
+    public int registrySize();
+
 
 }

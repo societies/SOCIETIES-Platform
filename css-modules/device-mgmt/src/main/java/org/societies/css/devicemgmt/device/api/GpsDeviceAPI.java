@@ -1,4 +1,3 @@
-
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
@@ -23,15 +22,18 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.devicemgmt.device.common;
+
+package org.societies.css.devicemgmt.device.api;
+
 
 /**
  * 
- *	Some operating system specific statistics 
+ * Interface for a GPS OS device API.  The methods represents the basic functionalities any GPS device offers.  
+ * The implementor will use the OS device driver to produce the results. 
  *
  */
-public interface OSStatistics {
-	float getPercentageMemoryUsage();
-	float getPercentageCpuUsage();
-	float getBatteryPercentage();
+public interface GpsDeviceAPI {
+	
+	GpsLocation getLastKnowLocation();
+
 }

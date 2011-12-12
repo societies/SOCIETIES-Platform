@@ -23,17 +23,33 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.devicemgmt.device.api;
+package org.societies.css.devicemgmt.device.common;
 
 
 /**
- * 
- * Interface for a GPS OS device API.  The methods represents the basic functionalities any GPS device offers.  
- * The implementor will use the OS device driver to produce the results. 
+ * Some operating system specific details 
  *
  */
-public interface GpsDeviceAPI {
+public interface OSDetails {
+	/*
+	 * Description:		returns the OS name (e.g. Andriod / Linux)
+	 * 				
+	 * @return 			
+	 */
+	String getName();
 	
-	GpsLocation getLastKnowLocation();
 
+	/*
+	 * Description:		returns the OS version  (e.g. 2.3.6)
+	 * 				
+	 * @return 			
+	 */
+	String getVersion();
+
+	/*
+	 * Description:		returns specific build (e.g. GRK39F)
+	 * 				
+	 * @return 			
+	 */	
+	String getBuild();	
 }

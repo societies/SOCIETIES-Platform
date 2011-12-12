@@ -22,32 +22,32 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.devicemgmt.deviceapi;
+
+package org.societies.css.devicemgmt.device.api;
+
+import org.societies.css.devicemgmt.device.common.OSDetails;
+import org.societies.css.devicemgmt.device.common.OSStatistics;
 
 /**
- * Describe your class here...
- *
- * @author rafik
+ * 
+ * Basic interface for the OSDeviceAPI. 
+ * Returns operating system details and statistics. 
  *
  */
-public class DeviceListenerAdapter implements DeviceListener{
-
-	@Override
-	public void onNewDeviceConnected(Message message) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onNewDeviceDataReceived(Message message) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onDeviceDisconnected(Message message) {
-		// TODO Auto-generated method stub
-		
-	}
-
+public interface OSDeviceAPI {
+	
+	/*
+	 * Description:		Returns the OS details 
+	 * 				
+	 * @return 			OSDetails	
+	 */
+	OSDetails getOSDetails();
+	
+	
+	/*
+	 * Description:		Returns OS Statistic (e.g. memory and CPU usage)
+	 * 				
+	 * @return 			OSStatistics	
+	 */
+	OSStatistics getOSStatistics(); 
 }

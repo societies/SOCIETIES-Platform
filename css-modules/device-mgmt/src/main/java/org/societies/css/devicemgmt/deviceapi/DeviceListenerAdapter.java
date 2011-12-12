@@ -22,34 +22,32 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package org.societies.devicemgmt.device.common;
-
+package org.societies.css.devicemgmt.deviceapi;
 
 /**
- * Some operating system specific details 
+ * Describe your class here...
+ *
+ * @author rafik
  *
  */
-public interface OSDetails {
-	/*
-	 * Description:		returns the OS name (e.g. Andriod / Linux)
-	 * 				
-	 * @return 			
-	 */
-	String getName();
-	
+public class DeviceListenerAdapter implements DeviceListener{
 
-	/*
-	 * Description:		returns the OS version  (e.g. 2.3.6)
-	 * 				
-	 * @return 			
-	 */
-	String getVersion();
+	@Override
+	public void onNewDeviceConnected(Message message) {
+		// TODO Auto-generated method stub
+		
+	}
 
-	/*
-	 * Description:		returns specific build (e.g. GRK39F)
-	 * 				
-	 * @return 			
-	 */	
-	String getBuild();	
+	@Override
+	public void onNewDeviceDataReceived(Message message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onDeviceDisconnected(Message message) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

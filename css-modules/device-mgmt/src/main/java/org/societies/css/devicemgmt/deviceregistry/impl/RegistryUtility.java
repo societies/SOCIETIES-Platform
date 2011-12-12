@@ -23,24 +23,27 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.devicemgmt.device.impl;
+package org.societies.css.devicemgmt.deviceregistry.impl;
 
-import org.societies.devicemgmt.device.api.OSDeviceAPI;
-import org.societies.devicemgmt.device.common.OSDetails;
-import org.societies.devicemgmt.device.common.OSStatistics;
+public class RegistryUtility {
+	
+	/**
+     * 
+     */
+    private RegistryUtility() {
+    }
 
-public abstract class AndriodOSDeviceAPI implements OSDeviceAPI {
 
-	@Override
-	public OSDetails getOSDetails() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * Create a key string for storing a device
+     *
+     * @param key
+     * @param value
+     * @return
+     */
+    public static String createKeyString(IDeviceIdentifier deviceId) {
 
-	@Override
-	public OSStatistics getOSStatistics() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        return deviceId.toString();
+    }
 
 }

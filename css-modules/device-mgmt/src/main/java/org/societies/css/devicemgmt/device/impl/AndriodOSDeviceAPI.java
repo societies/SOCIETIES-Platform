@@ -23,31 +23,24 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.devicemgmt.device.api;
+package org.societies.css.devicemgmt.device.impl;
 
-import org.societies.devicemgmt.device.common.OSDetails;
-import org.societies.devicemgmt.device.common.OSStatistics;
+import org.societies.css.devicemgmt.device.api.OSDeviceAPI;
+import org.societies.css.devicemgmt.device.common.OSDetails;
+import org.societies.css.devicemgmt.device.common.OSStatistics;
 
-/**
- * 
- * Basic interface for the OSDeviceAPI. 
- * Returns operating system details and statistics. 
- *
- */
-public interface OSDeviceAPI {
-	
-	/*
-	 * Description:		Returns the OS details 
-	 * 				
-	 * @return 			OSDetails	
-	 */
-	OSDetails getOSDetails();
-	
-	
-	/*
-	 * Description:		Returns OS Statistic (e.g. memory and CPU usage)
-	 * 				
-	 * @return 			OSStatistics	
-	 */
-	OSStatistics getOSStatistics(); 
+public abstract class AndriodOSDeviceAPI implements OSDeviceAPI {
+
+	@Override
+	public OSDetails getOSDetails() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public OSStatistics getOSStatistics() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
