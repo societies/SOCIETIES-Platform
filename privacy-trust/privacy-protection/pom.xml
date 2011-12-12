@@ -79,9 +79,10 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 				<configuration>
 					<instructions>
 						<Bundle-Activator></Bundle-Activator>
-						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-						<Import-Package>!javax.swing.*</Import-Package>
+						<!-- <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency> -->
+						<!-- <Embed-Transitive>true</Embed-Transitive> -->
+						<!-- <Import-Package>!javax.swing.*</Import-Package> -->
+						<Import-Package>org.societies.api.*</Import-Package>
 						<Export-Package></Export-Package>
 					</instructions>
 				</configuration>
