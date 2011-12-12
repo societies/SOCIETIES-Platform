@@ -23,46 +23,19 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.devicemgmt.devicemanager;
+package org.societies.api.internal.css.devicemgmt.device.sensor.extended;
 
-import org.societies.api.internal.devicemgmt.device.Device;
+import org.societies.api.internal.css.devicemgmt.device.sensor.Sensor;
 
-public interface IDeviceManger {
-	
-	/**
-	 * 
-	 * @param device
-	 */
-	public void addDevice(Device device);
-	
-	
-	/**
-	 * 
-	 * @param deviceId
-	 */
-	public void deleteDevice(int deviceId);
-	
-	/**
-	 * 
-	 * @param deviceId
-	 * @param status
-	 */
-	public void deviceStatusChanged(int deviceId, int status);
-	
-	/**
-	 * 
-	 * @param deviceId
-	 * @param parameter
-	 */
-	public void configureDevice(int deviceId, Object parameter);
-	
-	/**
-	 * 
-	 * @param deviceId
-	 * @param data
-	 * 
-	 * 
-	 */
-	public void newDataReceived(int deviceId, Object data);
-	
+
+/**
+ * <font color="#3f5fbf">Interface <b>proposal</b> for a RFID sensor.</font>
+ * @author rafik
+ * @version 1.0
+ * @created 06-d�c.-2011 15:18:21
+ */
+public interface RFiDSensor extends Sensor {
+
+	public String getTagId();
+
 }

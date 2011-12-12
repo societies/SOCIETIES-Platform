@@ -23,38 +23,31 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.devicemgmt.device.actuator.extended;
+package org.societies.api.internal.css.devicemgmt.device.sensor.extended;
 
-import org.societies.api.internal.devicemgmt.device.actuator.Actuator;
+import org.societies.api.internal.css.devicemgmt.device.sensor.Sensor;
 
 
 /**
- * <font color="#3f5fbf">Interface <b>proposal</b> for a ligth actuator.</font>
+ * <font color="#3f5fbf">Interface <b>proposal</b> for a GPS sensor.</font>
  * @author rafik
  * @version 1.0
- * @created 06-dec.-2011 15:18:15
+ * @created 06-d�c.-2011 15:18:19
  */
-public interface LightActuator extends Actuator {
+public interface GpsSensor extends Sensor {
 
-	/**
-	 * <font color="#3f5fbf">Request actuator to toggle its state.</font>
-	 * <font color="#7f9fbf"><b>@return</b></font><font color="#3f5fbf"> Returns 0 if
-	 * sucess, other value if error.</font>
-	 */
-	public int toggle();
+	public float getAccuracy();
 
-	/**
-	 * <font color="#3f5fbf">Request actuator to switch into OFF state.</font>
-	 * <font color="#7f9fbf"><b>@return</b></font><font color="#3f5fbf"> Returns 0 if
-	 * sucess, other value if error.</font>
-	 */
-	public int turnOFF();
+	public double getAltitude();
 
-	/**
-	 * <font color="#3f5fbf">Request actuator to switch into ON state.</font>
-	 * <font color="#7f9fbf"><b>@return</b></font><font color="#3f5fbf"> Returns 0 if
-	 * sucess, other value if error.</font>
-	 */
-	public int turnON();
+	public float getBearing();
+
+	public double getLatitude();
+
+	public double getLongitude();
+
+	public String getProvider();
+
+	public float getSpeed();
 
 }

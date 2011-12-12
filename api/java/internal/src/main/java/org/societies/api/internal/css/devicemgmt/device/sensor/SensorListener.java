@@ -23,9 +23,9 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.devicemgmt.device.sensor;
+package org.societies.api.internal.css.devicemgmt.device.sensor;
 
-import org.societies.api.internal.devicemgmt.device.DeviceListener;
+import org.societies.api.internal.css.devicemgmt.device.DeviceListener;
 
 
 

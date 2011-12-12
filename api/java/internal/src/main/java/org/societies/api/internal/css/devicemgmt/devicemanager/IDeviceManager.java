@@ -23,31 +23,46 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.devicemgmt.device.sensor.extended;
+package org.societies.api.internal.css.devicemgmt.devicemanager;
 
-import org.societies.api.internal.devicemgmt.device.sensor.Sensor;
+import org.societies.api.internal.css.devicemgmt.device.Device;
 
-
-/**
- * <font color="#3f5fbf">Interface <b>proposal</b> for a GPS sensor.</font>
- * @author rafik
- * @version 1.0
- * @created 06-d�c.-2011 15:18:19
- */
-public interface GpsSensor extends Sensor {
-
-	public float getAccuracy();
-
-	public double getAltitude();
-
-	public float getBearing();
-
-	public double getLatitude();
-
-	public double getLongitude();
-
-	public String getProvider();
-
-	public float getSpeed();
-
+public interface IDeviceManager {
+	
+	/**
+	 * 
+	 * @param device
+	 */
+	public void addDevice(Device device);
+	
+	
+	/**
+	 * 
+	 * @param deviceId
+	 */
+	public void deleteDevice(int deviceId);
+	
+	/**
+	 * 
+	 * @param deviceId
+	 * @param status
+	 */
+	public void deviceStatusChanged(int deviceId, int status);
+	
+	/**
+	 * 
+	 * @param deviceId
+	 * @param parameter
+	 */
+	public void configureDevice(int deviceId, Object parameter);
+	
+	/**
+	 * 
+	 * @param deviceId
+	 * @param data
+	 * 
+	 * 
+	 */
+	public void newDataReceived(int deviceId, Object data);
+	
 }
