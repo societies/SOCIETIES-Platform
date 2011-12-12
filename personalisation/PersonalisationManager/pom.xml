@@ -109,7 +109,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-					<Import-Package>org.springframework.beans.factory.annotation;version="0",org.springframework.stereotype;version="0"</Import-Package>
+					<!--  <Import-Package>org.springframework.beans.factory.annotation;version="0",org.springframework.stereotype;version="0"</Import-Package>  -->
 						<Embed-Dependency>scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<_nouses>true</_nouses>
@@ -127,7 +127,7 @@
 							<version>${version.pm}</version>
 							<type>jar</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${virgo.home}/pickup/</outputDirectory>
+							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>
