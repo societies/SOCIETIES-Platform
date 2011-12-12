@@ -23,27 +23,80 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.devicemgmt.deviceregistry.impl;
+package org.societies.css.devicemgmt.deviceapi;
 
-public class RegistryUtility {
+import javax.swing.event.EventListenerList;
+
+/**
+ * Describe your class here...
+ *
+ * @author rafik
+ *
+ */
+public class DeviceApi {
+
+	private Message message;
+	private EventListenerList listenerList;
+	private DeviceListener [] deviceListenerList;
 	
 	/**
-     * 
-     */
-    private RegistryUtility() {
-    }
+	 * 
+	 * @param message
+	 */
+	public void setNewMessage (Message message){
+		
+	}
+	
+	/**
+	 * 
+	 * @param deviceListener
+	 */
+	public void addDeviceListener(DeviceListener deviceListener){
 
-
-    /**
-     * Create a key string for storing a device
-     *
-     * @param key
-     * @param value
-     * @return
-     */
-    public static String createKeyString(IDeviceIdentifier deviceId) {
-
-        return deviceId.toString();
-    }
-
+	}
+	
+	/**
+	 * 
+	 * @param deviceListener
+	 */
+	public void removeDeviceListener(DeviceListener deviceListener){
+		
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public DeviceListener[] getDeviceListeners(){
+		return deviceListenerList;
+	}
+	
+	/**
+	 * 
+	 * @param message
+	 */
+	protected void fireNewDeviceConnected(Message message){
+		
+	}
+	
+	/**
+	 * 
+	 * @param message
+	 */
+	protected void fireDeviceDisconnected(Message message){
+		
+	}
+	
+	/**
+	 * 
+	 * @param message
+	 */
+	protected void fireNewDeviceDataReceived(Message message){
+		
+	}
+	
+	
+	
+	
+	
 }

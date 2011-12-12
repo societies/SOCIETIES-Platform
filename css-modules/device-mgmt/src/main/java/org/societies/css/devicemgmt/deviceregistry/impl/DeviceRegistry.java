@@ -23,7 +23,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.devicemgmt.deviceregistry.impl;
+package org.societies.css.devicemgmt.deviceregistry.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.societies.devicemgmt.deviceregistry.api.IDeviceRegistry;
+import org.societies.css.devicemgmt.deviceregistry.api.IDeviceRegistry;
 
 
 

@@ -1,3 +1,4 @@
+
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
@@ -22,32 +23,15 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.css.devicemgmt.device.common;
 
-package org.societies.device.common;
-
-public class OSDetailsImpl implements OSDetails {
-	
-	String name,  version, build;
-	
-	public OSDetailsImpl(String name, String version,String build){
-		this.name = name;
-		this.version = version;
-		this.build = build;
-	}
-	
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public String getVersion() {
-		return version;
-	}
-
-	@Override
-	public String getBuild() {
-		return build;
-	}
-
+/**
+ * 
+ *	Some operating system specific statistics 
+ *
+ */
+public interface OSStatistics {
+	float getPercentageMemoryUsage();
+	float getPercentageCpuUsage();
+	float getBatteryPercentage();
 }

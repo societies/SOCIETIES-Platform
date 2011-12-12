@@ -23,10 +23,31 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.devicemgmt.deviceregistry.impl;
+package org.societies.css.devicemgmt.device.common;
 
-public enum IDeviceIdentifier {
-	//replace these with real device ID when they become available
-	DEVICE1, DEVICE2, DEVICE3, DEVICE4
+public class OSDetailsImpl implements OSDetails {
+	
+	String name,  version, build;
+	
+	public OSDetailsImpl(String name, String version,String build){
+		this.name = name;
+		this.version = version;
+		this.build = build;
+	}
+	
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public String getVersion() {
+		return version;
+	}
+
+	@Override
+	public String getBuild() {
+		return build;
+	}
 
 }

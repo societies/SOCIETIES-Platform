@@ -23,31 +23,33 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.device.api;
+package org.societies.css.devicemgmt.device.common;
 
-import org.societies.device.common.OSDetails;
-import org.societies.device.common.OSStatistics;
 
 /**
- * 
- * Basic interface for the OSDeviceAPI. 
- * Returns operating system details and statistics. 
+ * Some operating system specific details 
  *
  */
-public interface OSDeviceAPI {
-	
+public interface OSDetails {
 	/*
-	 * Description:		Returns the OS details 
+	 * Description:		returns the OS name (e.g. Andriod / Linux)
 	 * 				
-	 * @return 			OSDetails	
+	 * @return 			
 	 */
-	OSDetails getOSDetails();
+	String getName();
 	
-	
+
 	/*
-	 * Description:		Returns OS Statistic (e.g. memory and CPU usage)
+	 * Description:		returns the OS version  (e.g. 2.3.6)
 	 * 				
-	 * @return 			OSStatistics	
+	 * @return 			
 	 */
-	OSStatistics getOSStatistics(); 
+	String getVersion();
+
+	/*
+	 * Description:		returns specific build (e.g. GRK39F)
+	 * 				
+	 * @return 			
+	 */	
+	String getBuild();	
 }

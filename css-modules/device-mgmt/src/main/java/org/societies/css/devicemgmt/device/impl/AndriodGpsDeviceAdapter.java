@@ -1,4 +1,3 @@
-
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
@@ -23,15 +22,28 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package societies.device.common;
 
-/**
- * 
- *	Some operating system specific statistics 
- *
- */
-public interface OSStatistics {
-	float getPercentageMemoryUsage();
-	float getPercentageCpuUsage();
-	float getBatteryPercentage();
+package org.societies.css.devicemgmt.device.impl;
+
+import org.societies.css.devicemgmt.device.api.GpsDeviceAPI;
+import org.societies.css.devicemgmt.device.api.GpsLocation;
+
+public class AndriodGpsDeviceAdapter extends AndriodOSDeviceAPI implements GpsDeviceAPI{
+
+	@Override
+	public GpsLocation getLastKnowLocation() {
+		
+		/*
+		 * The method will do something like this: 
+		 * 
+		 * 		LocationManager mlocManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+		 *		String locationProvider = LocationManager.GPS_PROVIDER;
+		 * 		Location lastKnownLocation = mlocManager.getLastKnownLocation(locationProvider);
+		 * 		//use the location object to initialize the "GpsLocation" object
+		 */
+		
+		return null;
+	}
+
+	
 }

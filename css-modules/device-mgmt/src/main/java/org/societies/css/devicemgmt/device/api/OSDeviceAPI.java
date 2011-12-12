@@ -23,48 +23,31 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.device.api;
+package org.societies.css.devicemgmt.device.api;
+
+import org.societies.css.devicemgmt.device.common.OSDetails;
+import org.societies.css.devicemgmt.device.common.OSStatistics;
 
 /**
  * 
- * Interface for a GPS device.
+ * Basic interface for the OSDeviceAPI. 
+ * Returns operating system details and statistics. 
  *
  */
-public interface GpsLocation {
+public interface OSDeviceAPI {
 	
 	/*
-	 * 
-	 * @Return
+	 * Description:		Returns the OS details 
+	 * 				
+	 * @return 			OSDetails	
 	 */
-	double getLatitude();
+	OSDetails getOSDetails();
+	
 	
 	/*
-	 * 
-	 * @Return
+	 * Description:		Returns OS Statistic (e.g. memory and CPU usage)
+	 * 				
+	 * @return 			OSStatistics	
 	 */
-	double getLongtitude();
-	
-	/*
-	 * 
-	 * @Return
-	 */
-	float getAccuracy();
-	
-	/*
-	 * 
-	 * @return
-	 */
-	double getBearing();
-	
-	/*
-	 * 
-	 * @return
-	 */
-	String getProvider();
-	
-	/*
-	 * 
-	 * @return
-	 */
-	float getSpeed();
+	OSStatistics getOSStatistics(); 
 }

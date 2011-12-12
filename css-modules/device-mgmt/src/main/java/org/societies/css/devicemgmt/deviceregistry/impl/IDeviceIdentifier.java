@@ -23,27 +23,10 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.device.impl;
+package org.societies.css.devicemgmt.deviceregistry.impl;
 
-import org.societies.device.api.GpsLocation;
-import org.societies.device.api.GpsDeviceAPI;
+public enum IDeviceIdentifier {
+	//replace these with real device ID when they become available
+	DEVICE1, DEVICE2, DEVICE3, DEVICE4
 
-public class AndriodGpsDeviceAdapter extends AndriodOSDeviceAPI implements GpsDeviceAPI{
-
-	@Override
-	public GpsLocation getLastKnowLocation() {
-		
-		/*
-		 * The method will do something like this: 
-		 * 
-		 * 		LocationManager mlocManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-		 *		String locationProvider = LocationManager.GPS_PROVIDER;
-		 * 		Location lastKnownLocation = mlocManager.getLastKnownLocation(locationProvider);
-		 * 		//use the location object to initialize the "GpsLocation" object
-		 */
-		
-		return null;
-	}
-
-	
 }

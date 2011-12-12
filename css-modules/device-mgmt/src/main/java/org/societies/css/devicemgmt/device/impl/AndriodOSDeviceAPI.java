@@ -23,17 +23,24 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.device.api;
+package org.societies.css.devicemgmt.device.impl;
 
+import org.societies.css.devicemgmt.device.api.OSDeviceAPI;
+import org.societies.css.devicemgmt.device.common.OSDetails;
+import org.societies.css.devicemgmt.device.common.OSStatistics;
 
-/**
- * 
- * Interface for a GPS OS device API.  The methods represents the basic functionalities any GPS device offers.  
- * The implementor will use the OS device driver to produce the results. 
- *
- */
-public interface GpsDeviceAPI {
-	
-	GpsLocation getLastKnowLocation();
+public abstract class AndriodOSDeviceAPI implements OSDeviceAPI {
+
+	@Override
+	public OSDetails getOSDetails() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public OSStatistics getOSStatistics() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

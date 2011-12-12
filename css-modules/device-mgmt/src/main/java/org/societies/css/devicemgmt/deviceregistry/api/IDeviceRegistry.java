@@ -23,33 +23,70 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.device.common;
+package org.societies.css.devicemgmt.deviceregistry.api;
 
+import java.util.Collection;
+import java.util.List;
 
-/**
- * Some operating system specific details 
- *
- */
-public interface OSDetails {
-	/*
-	 * Description:		returns the OS name (e.g. Andriod / Linux)
-	 * 				
-	 * @return 			
-	 */
-	String getName();
+import org.societies.css.devicemgmt.deviceregistry.impl.CSSDevice;
+import org.societies.css.devicemgmt.deviceregistry.impl.IDeviceIdentifier;
+
+public interface IDeviceRegistry {
 	
-
 	/*
-	 * Description:		returns the OS version  (e.g. 2.3.6)
+	 * Description:		Add new device to the device registry
 	 * 				
+	 * @return 			IDeviceidentifier
+	 */
+	public IDeviceIdentifier addDevice (CSSDevice device, Object CSSID);
+
+	/* 
+	 * Description: 	Remove device from the device registry
+	 * 				
+	 * @return 			boolean
+	 */
+
+	public boolean deleteDevice (CSSDevice device, Object CSSID);
+	
+	/* 
+	 * Description:		Search the device registry for a particular device given the deviceID 
+	 * @return 			CSSDevice
+	 */
+
+	public CSSDevice findDevice(IDeviceIdentifier deviceID);
+	
+	/* 
+	 * Description: 	Given a particular deviceID get all the services associated with that device 
+	 * @return 			collection
+	 */
+	public Collection<Object> getDeviceServiceList (Object deviceID);
+	
+	/* 
+	 * Description: 	Search the device registry for all devices registered 
+	 * @return 			collection
+	 */
+	
+	public Collection<CSSDevice> findAllDevices();
+	
+	
+	/* 
+	 * Description:		Search the device registry for a particular device type 
+	 * @return 			collection of device types
+	 */
+	public Collection<CSSDevice> findByDeviceType(String deviceType);
+	
+	
+	/* 
+	 * Description:		Clear the device registry of all entries
 	 * @return 			
 	 */
-	String getVersion();
+    public void clearRegistry();
 
-	/*
-	 * Description:		returns specific build (e.g. GRK39F)
-	 * 				
-	 * @return 			
-	 */	
-	String getBuild();	
+    /* 
+	 * Description:		Determine the number of devices registered in the device registry
+	 * @return 			int
+	 */
+    public int registrySize();
+
+
 }
