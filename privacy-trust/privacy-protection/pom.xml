@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 	<groupId>org.societies.privacytrust.privacyprotection</groupId>
 	<artifactId>privacy-protection</artifactId>
 	<packaging>bundle</packaging>
-	<version>${release.version}</version>
+	<version>0.1</version>
 	<developers>
 		<developer>
 			<name>Olivier Maridat</name>

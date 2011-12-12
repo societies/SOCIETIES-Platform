@@ -30,9 +30,9 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfus
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
-import org.societies.privacytrust.privacyprotection.mock.EntityIdentifier;
-import org.societies.privacytrust.privacyprotection.mock.ServiceResourceIdentifier;
+import org.societies.api.internal.mock.DataIdentifier;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
 /**
  * @state skeleton 

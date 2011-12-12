@@ -26,7 +26,7 @@ package org.societies.privacytrust.privacyprotection.dataobfuscation;
 
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
+import org.societies.api.internal.mock.DataIdentifier;
 
 
 /**

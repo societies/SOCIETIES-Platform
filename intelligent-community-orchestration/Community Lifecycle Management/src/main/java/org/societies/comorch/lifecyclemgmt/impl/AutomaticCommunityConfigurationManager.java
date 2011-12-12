@@ -72,12 +72,12 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
 
 public class AutomaticCommunityConfigurationManager {
 	
-	private Css linkedCss;
+	private Css linkedCss; // No datatype yet defined for CSS
 	private EntityIdentifier dpi;
 	
     private CisRecord linkedCis;
     
-    private Domain linkedDomain;
+    private Domain linkedDomain;  // No datatype yet representing a domain
 	
 	/*
      * Constructor for AutomaticCommunityConfigurationManager
@@ -114,7 +114,7 @@ public class AutomaticCommunityConfigurationManager {
 	 * 				linkedCis - the Cis that this object will be used to check for configuration on.
 	 */
 	
-	public IAutomaticCommunityConfigurationManager(Cis linkedCis) {
+	public IAutomaticCommunityConfigurationManager(CisRecord linkedCis) {
 		this.linkedCis = linkedCis;
 	}
 	

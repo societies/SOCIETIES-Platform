@@ -66,12 +66,12 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
 
 public class AutomaticCommunityCreationManager {
 	
-	private Css linkedCss;
+	private Css linkedCss; // No datatype yet defined for CSS
 	private EntityIdentifier dpi;
 	
     private CisRecord linkedSuperCis;
     
-    private Domain linkedDomain;
+    private Domain linkedDomain; // No datatype yet representing a domain
 	
 	/*
      * Constructor for AutomaticCommunityCreationManager
@@ -110,11 +110,11 @@ public class AutomaticCommunityCreationManager {
 	 *                               suggesting sub-CISs on it.
 	 */
 	
-	public AutomaticCommunityCreationManager(Cis linkedCis) {
+	public AutomaticCommunityCreationManager(CisRecord linkedCis) {
 		this.linkedCis = linkedCis;
 	}
 	
-	public return ArrayList<String> getIDsOfInteractingCsss() {
+	public return ArrayList<EntityIdentifier> getIDsOfInteractingCsss() {
 		
 	}
 	
@@ -129,12 +129,39 @@ public class AutomaticCommunityCreationManager {
 	 *              on collective aspects like context attributes.
 	 */
 	
-	public void identifyCissToCreate() {
-		ArrayList<String> cisIDs = getIDsOfInteractingCsss();
+	public void identifyCissToCreate(String evaluationType) {
 		
-		ArrayList<Cis> cissToCreate;
+		ArrayList<EntityIdentifier> interactedCssIDs = null;
+		ArrayList<EntityIdentifier> friendCssIDs = null;
 		
-		// processing
+		// ...
+		
+		ArrayList<CisRecord> cissToCreate = null;
+		
+		
+		if (evaluationType.equals("extensive")) {
+			if (linkedCss != null) {
+				interactedCssIDs = getIDsOfInteractingCsss();
+				//retrieve as much context data on CSS user and inter-CSS connections 
+				//amongst their immediate connection neighbourhood as possible.
+				
+				// processing - here or delegated to local method
+			}
+		}
+			
+		else {
+			if (linkedCss != null) {
+				interactedCssIDs = getIDsOfInteractingCsss();
+				//retrieve recent history of certain kinds of context data on CSS user and inter-CSS connections 
+				//amongst their immediate connection neighbourhood as possible.
+				
+				// processing - here or delegated to local method
+			}
+		}
+		
+		
+		
+		
 		
 		//invoke UserAgent suggestion GUI for creation of CISs
 		//OR

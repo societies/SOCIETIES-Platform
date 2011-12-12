@@ -45,12 +45,12 @@ public class CommunityLifecycleManagement {
 	private AutomaticCommunityConfigurationManager autoConfigurationManager;
 	private AutomaticCommunityDeletionManager autoDeletionManager;
 	
-	private Css linkedCss;
+	private Css linkedCss; // No datatype yet defined for CSS
 	private EntityIdentifier dpi;
 	
     private CisRecord linkedCis;
     
-    private Domain linkedDomain;
+    private Domain linkedDomain;  // No datatype yet representing a domain
 	
 	/*
      * Constructor for CommunityLifecycleManagement
@@ -117,14 +117,14 @@ public class CommunityLifecycleManagement {
 	}
 	
 	public void processPreviousLongTimeCycle() {
-		autoCreationManager.determinCissToCreate("extensive");
-		autoConfigurationManager.determineCissToConfigure("extensive");
-		autoDeletionManager.determineCissToDelete("extensive");
+		autoCreationManager.identifyCissToCreate("extensive");
+		autoConfigurationManager.identifyCissToConfigure("extensive");
+		autoDeletionManager.identifyCissToDelete("extensive");
 	}
 	
 	public void processPreviousShortTimeCycle() {
-		autoCreationManager.determineCissToCreate("not extensive");
-		autoConfigurationManager.determineCissToConfigure("not extensive");
+		autoCreationManager.identifyCissToCreate("not extensive");
+		autoConfigurationManager.identifyCissToConfigure("not extensive");
 	}
 	
 	public void loop() {
