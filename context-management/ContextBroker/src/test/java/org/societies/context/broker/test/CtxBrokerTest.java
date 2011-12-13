@@ -24,6 +24,20 @@
  */
 package org.societies.context.broker.test;
 
-public class ContextBrokerTest {
+public class CtxBrokerTest {
 
+	//Constructor
+	CtxBrokerTest(){
+		//TODO
+		
+	}
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		new CtxBrokerTest();
+	}
+	
+	
 }

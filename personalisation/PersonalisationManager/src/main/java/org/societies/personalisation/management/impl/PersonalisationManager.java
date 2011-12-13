@@ -19,10 +19,10 @@
  */
 package org.societies.personalisation.management.impl;
 
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.internal.personalisation.model.IFeedbackEvent;
-import org.societies.api.mock.ContextModelObject;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ICtxAttributeIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.personalisation.model.IAction;
@@ -78,7 +78,7 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 
 	@Override
 	public void registerForContextUpdate(String arg0,
-			ICtxAttributeIdentifier arg1) {
+			CtxAttributeIdentifier arg1) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -118,7 +118,7 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 	}
 
 	@Override
-	public void updateReceived(ContextModelObject arg0) {
+	public void updateReceived(CtxModelObject arg0) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -22,8 +22,39 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.userDatabase.impl;
 
-public class UserContextDBManagement {
+package org.societies.api.internal.context.community.history;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxHistoryAttribute;
+
+
+/**
+ * ICommunityCtxHistory platform interface allows the management of community context history.
+ * 
+ * @author nikosk
+ * @created 12-Nov-2011 7:15:15 PM
+ */
+public interface ICommunityCtxHistoryMgr extends org.societies.api.internal.context.user.history.IUserCtxHistoryMgr{
+
+	/**
+	 * Disables recording of community context data to history database.
+	 *   
+	 * @since 0.0.1
+	 */
+	public void disableCommCtxRecording();
+
+	/**
+	 * Enables recording of community context data to history database.
+	 * 
+	 * @since 0.0.1
+	 */
+	public void enableCommCtxRecording();
+
+	
 }

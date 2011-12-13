@@ -24,6 +24,86 @@
  */
 package org.societies.context.userHistory.impl;
 
-public class UserContextHistoryManagement {
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxHistoryAttribute;
+
+
+
+public class UserContextHistoryManagement implements org.societies.api.internal.context.user.history.IUserCtxHistoryMgr {
+
+	@Override
+	public void disableCtxRecording() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void enableCtxRecording() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<List<CtxAttributeIdentifier>> getHistoryTuplesID(
+			CtxAttributeIdentifier primaryAttrIdentifier) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void registerHistoryTuples(
+			CtxAttributeIdentifier primaryAttrIdentifier,
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void registerHistoryTuples(
+			CtxAttributeIdentifier primaryAttrIdentifier,
+			CtxAttributeIdentifier listOfEscortingAttributeTypes) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int removeHistory(CtxAttribute ctxAttribute, Date startDate,
+			Date endDate) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int removeHistory(String type, Date startDate, Date endDate) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public List<CtxHistoryAttribute> retrieveHistory(CtxAttribute ctxAttribute) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<CtxHistoryAttribute> retrieveHistory(CtxAttribute ctxAttribute,
+			Date startDate, Date endDate) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<CtxAttribute, List<CtxAttribute>> retrieveHistoryTuples(
+			CtxAttributeIdentifier primaryAttrID,
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds,
+			Date startDate, Date endDate) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

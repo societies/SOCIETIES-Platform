@@ -26,9 +26,8 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.io.Serializable;
 
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.TargetMatchConstants;
-import org.societies.api.mock.ICtxAttributeIdentifier;
-
 /**
  * the Resource class is used to represent  a piece of data type belonging to the user 
  * (i.e context data, preference data, profile data). It contains the id of the data and the type of data. 
@@ -37,13 +36,13 @@ import org.societies.api.mock.ICtxAttributeIdentifier;
  */
 public class Resource implements Serializable{
 
-	private ICtxAttributeIdentifier ctxIdentifier;
+	private CtxAttributeIdentifier ctxIdentifier;
 	private String contextType;
 	
 	private Resource(){
 		
 	}
-	public Resource(ICtxAttributeIdentifier ctxId){
+	public Resource(CtxAttributeIdentifier ctxId){
 		this.ctxIdentifier = ctxId;
 		this.contextType = ctxId.getType();
 	}
@@ -59,7 +58,7 @@ public class Resource implements Serializable{
 		return this.contextType;
 	}
 	
-	public ICtxAttributeIdentifier getCtxIdentifier(){
+	public CtxAttributeIdentifier getCtxIdentifier(){
 		return this.ctxIdentifier;
 	}
 	
@@ -67,7 +66,7 @@ public class Resource implements Serializable{
 		this.ctxIdentifier = null;
 	}
 	
-	public void setPublicCtxIdentifier(ICtxAttributeIdentifier ctxId){
+	public void setPublicCtxIdentifier(CtxAttributeIdentifier ctxId){
 		this.ctxIdentifier = ctxId;
 	}
 	

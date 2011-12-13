@@ -19,9 +19,10 @@
  */
 package org.societies.personalisation.common.api.management;
 
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.internal.personalisation.model.IFeedbackEvent;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ICtxAttributeIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.personalisation.model.IAction;
@@ -29,7 +30,7 @@ import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
-import org.societies.api.mock.ContextModelObject;
+
 
 
 /**
@@ -96,7 +97,7 @@ public interface IInternalPersonalisationManager extends IPersonalisationManager
 	 * @param className
 	 * @param ctxAttributeId
 	 */
-	public void registerForContextUpdate(String className, ICtxAttributeIdentifier ctxAttributeId);
+	public void registerForContextUpdate(String className, CtxAttributeIdentifier ctxAttributeId);
 
 	/**
 	 * 
@@ -141,6 +142,6 @@ public interface IInternalPersonalisationManager extends IPersonalisationManager
 	 * 
 	 * @param ctxModelObj
 	 */
-	public void updateReceived(ContextModelObject ctxModelObj);
+	public void updateReceived(CtxModelObject ctxModelObj);
 
 }

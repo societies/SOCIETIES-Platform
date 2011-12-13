@@ -24,6 +24,74 @@
  */
 package org.societies.context.userPrediction.impl;
 
-public class UserContextPrediction {
+import java.util.Date;
+
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.internal.context.user.prediction.IUserCtxPredictionMgr;
+import org.societies.api.internal.context.user.prediction.PredictionMethod;
+
+
+
+public class UserContextPrediction implements IUserCtxPredictionMgr {
+
+	@Override
+	public PredictionMethod getDefaultPredictionMethod(
+			PredictionMethod predMethod) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PredictionMethod getPredictionMethod(PredictionMethod predMethod) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CtxAttribute predictContext(PredictionMethod predictionModel,
+			CtxAttributeIdentifier ctxAttrID, Date date) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID,
+			Date date) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID,
+			int index) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CtxAttribute predictContext(PredictionMethod predictionModel,
+			CtxAttributeIdentifier ctxAttrID, int index) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void removePredictionMethod(PredictionMethod predMethod) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setDefaultPredictionMethod(PredictionMethod predMethod) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setPredictionMethod(PredictionMethod predMethod) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
