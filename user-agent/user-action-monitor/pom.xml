@@ -3,7 +3,8 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<!-- change the artifactid to your project artifactid -->
-	<artifactId>useragent.monitoring</artifactId>
+	<groupId>org.societies.useragent</groupId>
+	<artifactId>monitoring</artifactId>
 	<packaging>bundle</packaging>
 	<version>${version.ua}</version>
 	<developers>
@@ -47,10 +48,8 @@
 				<configuration>
 					<instructions>
 						<Bundle-Activator></Bundle-Activator>
-						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Dependency>scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<Import-Package></Import-Package>
-						<Export-Package></Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>
