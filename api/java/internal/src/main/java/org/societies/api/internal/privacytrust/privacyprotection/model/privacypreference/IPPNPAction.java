@@ -26,10 +26,10 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.util.List;
 
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
-import org.societies.api.mock.ContextAttribute;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ICtxAttributeIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
 
 /**
@@ -41,9 +41,9 @@ import org.societies.api.mock.ServiceResourceIdentifier;
  */
 public interface IPPNPAction {
 
-	public List<ContextAttribute> getContext();
+	public List<CtxAttribute> getContext();
 
-	public ICtxAttributeIdentifier getICtxAttributeIdentifier();
+	public CtxAttributeIdentifier getICtxAttributeIdentifier();
 
 	public Decision getDecision();
 

@@ -26,9 +26,10 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.io.Serializable;
 
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.OperatorConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyConditionConstants;
-import org.societies.api.mock.ICtxAttributeIdentifier;
+
 
 /**
  * This class represents a context condition. It is a name-value pair in which the name represents a type in 
@@ -39,19 +40,19 @@ import org.societies.api.mock.ICtxAttributeIdentifier;
  */
 public class ContextPreferenceCondition implements IPrivacyPreferenceCondition, Serializable{
 
-	private ICtxAttributeIdentifier ctxID;
+	private CtxAttributeIdentifier ctxID;
 	private String value;
 	private PrivacyConditionConstants myConditionType;
 
 	private OperatorConstants operator;
-	public ContextPreferenceCondition(ICtxAttributeIdentifier ctxIdentifier, OperatorConstants op, String val){
+	public ContextPreferenceCondition(CtxAttributeIdentifier ctxIdentifier, OperatorConstants op, String val){
 		this.ctxID = ctxIdentifier;
 		this.operator = op;
 		this.value = val;
 		this.myConditionType = PrivacyConditionConstants.CONTEXT;
 	}
 	
-	public ICtxAttributeIdentifier getCtxIdentifier(){
+	public CtxAttributeIdentifier getCtxIdentifier(){
 		return this.ctxID;
 	}
 	

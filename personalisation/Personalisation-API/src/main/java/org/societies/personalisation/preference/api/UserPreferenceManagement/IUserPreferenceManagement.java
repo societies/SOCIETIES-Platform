@@ -21,12 +21,12 @@ package org.societies.personalisation.preference.api.UserPreferenceManagement;
 
 import java.util.List;
 
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
-import org.societies.api.mock.ContextAttribute;
-import org.societies.api.mock.ContextModelObject;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ICtxAttributeIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceConditionIOutcomeName;
@@ -62,7 +62,7 @@ public interface IUserPreferenceManagement {
 	 * @param ownerID
 	 * @param outcome
 	 */
-	public List<ICtxAttributeIdentifier> getConditions(EntityIdentifier ownerID, IOutcome outcome);
+	public List<CtxAttributeIdentifier> getConditions(EntityIdentifier ownerID, IOutcome outcome);
 
 	/**
 	 * 
@@ -104,7 +104,7 @@ public interface IUserPreferenceManagement {
 	 * @param serviceID
 	 * @param preferenceName
 	 */
-	public List<ICtxAttributeIdentifier> getPreferenceConditions(EntityIdentifier ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName);
+	public List<CtxAttributeIdentifier> getPreferenceConditions(EntityIdentifier ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName);
 
 	/**
 	 * 
@@ -112,7 +112,7 @@ public interface IUserPreferenceManagement {
 	 * @param attr
 	 * @param preferenceIdentifier
 	 */
-	public List<IOutcome> reEvaluatePreferences(EntityIdentifier userId, ContextAttribute attr, List<PreferenceDetails> preferenceIdentifier);
+	public List<IOutcome> reEvaluatePreferences(EntityIdentifier userId, CtxAttribute attr, List<PreferenceDetails> preferenceIdentifier);
 
 	/**
 	 * 
@@ -122,7 +122,7 @@ public interface IUserPreferenceManagement {
 	 * @param serviceID
 	 * @param preferenceName
 	 */
-	public IOutcome reEvaluatePreferences(EntityIdentifier ownerID, ContextAttribute attr, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName);
+	public IOutcome reEvaluatePreferences(EntityIdentifier ownerID, CtxAttribute attr, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName);
 
 	/**
 	 * 
@@ -146,6 +146,6 @@ public interface IUserPreferenceManagement {
 	 * 
 	 * @param ctxModelObj
 	 */
-	public void updateReceived(ContextModelObject ctxModelObj);
+	public void updateReceived(CtxModelObject ctxModelObj);
 
 }

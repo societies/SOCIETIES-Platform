@@ -1,17 +1,8 @@
 package org.societies.clientframework.contentprovider.services;
 
-import java.util.ArrayList;
-
-import javax.naming.Binding;
-
 import org.societies.clientframework.contentprovider.Constants;
-import org.societies.clientframework.contentprovider.Settings;
-import org.societies.clientframework.contentprovider.activities.TestActivity;
 import org.societies.clientframework.contentprovider.database.StoreResultsDB;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;

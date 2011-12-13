@@ -26,25 +26,25 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.io.Serializable;
 
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ICtxAttributeIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
 
 public class PPNPreferenceDetails implements Serializable{
 
 	private String contextType;
-	private ICtxAttributeIdentifier affectedCtxID;
+	private CtxAttributeIdentifier affectedCtxID;
 	private EntityIdentifier requestorDPI;
 	private ServiceResourceIdentifier serviceID;
 	public PPNPreferenceDetails(String contextType){
 		this.setContextType(contextType);
 	}
 
-	public void setAffectedCtxID(ICtxAttributeIdentifier affectedCtxID) {
+	public void setAffectedCtxID(CtxAttributeIdentifier affectedCtxID) {
 		this.affectedCtxID = affectedCtxID;
 	}
 
-	public ICtxAttributeIdentifier getAffectedCtxID() {
+	public CtxAttributeIdentifier getAffectedCtxID() {
 		return affectedCtxID;
 	}
 
@@ -103,7 +103,7 @@ public class PPNPreferenceDetails implements Serializable{
 			}
 		}
 	}
-	private boolean compareCtxIDs(ICtxAttributeIdentifier ctxID){
+	private boolean compareCtxIDs(CtxAttributeIdentifier ctxID){
 		if (ctxID==null){
 			if (this.affectedCtxID==null){
 				return true;
