@@ -21,7 +21,8 @@ package org.societies.personalisation.preference.api.model;
 
 import java.io.Serializable;
 
-import org.societies.api.mock.ICtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+
 
 /**
  * @author Elizabeth
@@ -51,7 +52,7 @@ public interface IPreferenceCondition extends Serializable {
 	 * condition
 	 * @return	the ICtxIdentifier of the context attribute
 	 */
-	public ICtxAttributeIdentifier getCtxIdentifier();
+	public CtxAttributeIdentifier getCtxIdentifier();
 
 	/**
 	 * Method to get the context type of the attribute included in this condition i.e.
@@ -86,7 +87,7 @@ public interface IPreferenceCondition extends Serializable {
 	 * 
 	 * @param ctxID    the ICtxIdentifier of the context attribute
 	 */
-	public void setCtxIdentifier(ICtxAttributeIdentifier ctxID);
+	public void setCtxIdentifier(CtxAttributeIdentifier ctxID);
 
 	/**
 	 * Method to set the context type of the attribute included in this condition

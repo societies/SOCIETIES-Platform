@@ -26,13 +26,14 @@ package org.societies.personalisation.preference.api.model;
  */
 import java.io.Serializable;
 
-import org.societies.api.mock.ICtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+
 
 
 
 public class ContextPreferenceCondition implements IPreferenceCondition, Serializable{
 
-	private ICtxAttributeIdentifier CtxIdentifier;
+	private CtxAttributeIdentifier CtxIdentifier;
 	//private String strCtxId;
 	private String type;
 	private String name;
@@ -40,7 +41,7 @@ public class ContextPreferenceCondition implements IPreferenceCondition, Seriali
 	private OperatorConstants operator;
 
 
-	public ContextPreferenceCondition(ICtxAttributeIdentifier ctxId, OperatorConstants op, String val, String name){
+	public ContextPreferenceCondition(CtxAttributeIdentifier ctxId, OperatorConstants op, String val, String name){
 		this.CtxIdentifier = ctxId;
 		this.operator = op;
 		this.value = val;
@@ -54,12 +55,12 @@ public class ContextPreferenceCondition implements IPreferenceCondition, Seriali
 	}
 
 
-	public ICtxAttributeIdentifier getCtxIdentifier(){
+	public CtxAttributeIdentifier getCtxIdentifier(){
 		return CtxIdentifier;
 	}
 
 
-	public void setCtxIdentifier(ICtxAttributeIdentifier newVal){
+	public void setCtxIdentifier(CtxAttributeIdentifier newVal){
 		CtxIdentifier = newVal;
 	}
 

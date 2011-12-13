@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske dru≈æbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVA√á√ÉO, SA (PTIN), IBM Corp., 
+ * informacijske druûbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVA«√O, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -25,10 +25,73 @@
 
 package org.societies.context.user.db.api.platform;
 
+import java.util.List;
+
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxModelObject;
+
 
 /**
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  */
 public interface IUserCtxDBMgrCallback {
+
+	
+	/**
+	 * The callback of IUserCtxDBMgr method
+	 * createEntity(String type, IUserCtxBrokerCallback callback) 
+	 * 
+	 * @param ctxEntity
+	 * @since 0.0.1
+	 */
+	public void ctxEntityCreated(CtxEntity ctxEntity);
+	
+	
+	/**
+	 * The callback of IUserCtxDBMgr method
+	 * createEntity(String type, IUserCtxBrokerCallback callback) 
+	 * 
+	 * @param ctxEntity
+	 * @since 0.0.1
+	 */
+	public void ctxIndividualCtxEntityCreated(CtxEntity ctxEntity);
+	
+	/**
+	 * The callback of IUserCtxDBMgr method
+	 * createAttribute(CtxEntityIdentifier scope, CtxAttributeValueType enumerate, String type, IUserCtxDBMgr callback)
+	 * 
+	 * @param ctxAttribute
+	 * @since 0.0.1
+	 */
+	public void ctxAttributeCreated(CtxAttribute ctxAttribute);
+	
+	/**
+	 * The callback of IUserCtxDBMgr method
+	 * update(CtxModelObject identifier, IUserCtxDBMgr callback)
+	 * 
+	 * @param ctxModelObject
+	 * @since 0.0.1
+	 */
+	public void ctxModelObjectUpdated(CtxModelObject ctxModelObject);
+	
+	/**
+	 * The callback of IUserCtxDBMgr method
+	 * lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue, IUserCtxDBMgrCallback callback);
+	 *
+	 * @param list
+	 * @since 0.0.1
+	 */
+	public void ctxEntitiesLookedup(List<CtxEntityIdentifier> list);
+	
+	/**
+	 * The callback of IUserCtxDBMgr method
+	 * retrieve(CtxIdentifier identifier, IUserCtxDBMgrCallback callback);
+	 * 
+	 * @param ctxModelObject
+	 * @since 0.0.1
+	 */
+	public void ctxModelObjectRetrieved(CtxModelObject ctxModelObject);
 
 }
