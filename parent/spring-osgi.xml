@@ -24,6 +24,8 @@
 			profile* - and not in here (to prevent an accidential check in) - - The following 
 			variables are assumed to be declared: - virgo.home - Where the virgo/equinox 
 			is deployed - virgo.deploy - Deployment folder to deploy artifacts to - -->
+		<!-- Spring dependency version -->
+		<spring.version>3.0.5.RELEASE</spring.version>
 	</properties>
 
 	<!-- Defines from where toolkits and libraries are fetched -->
@@ -169,8 +171,66 @@
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring</artifactId>
-				<version>3.0.5.RELEASE</version>
+				<version>${spring.version}</version>
 				<scope>provided</scope>
+			</dependency>
+			<dependency>
+			    <groupId>org.springframework</groupId>
+			    <artifactId>org.springframework.core</artifactId>
+			    <version>${spring.version}</version>
+			    <scope>provided</scope>
+			</dependency>
+			<dependency>
+			    <groupId>org.springframework</groupId>
+			    <artifactId>org.springframework.aop</artifactId>
+			    <version>${spring.version}</version>
+			    <scope>provided</scope>
+			</dependency>
+			<dependency>
+			    <groupId>org.springframework</groupId>
+			    <artifactId>org.springframework.asm</artifactId>
+			    <version>${spring.version}</version>
+			    <scope>provided</scope>
+			</dependency>
+			<dependency>
+			    <groupId>org.springframework</groupId>
+			    <artifactId>org.springframework.beans</artifactId>
+			    <version>${spring.version}</version>
+			    <scope>provided</scope>
+			</dependency>
+			<dependency>
+			    <groupId>org.springframework</groupId>
+			    <artifactId>org.springframework.context</artifactId>
+			    <version>${spring.version}</version>
+			    <scope>provided</scope>
+			</dependency>
+			<dependency>
+			    <groupId>org.springframework</groupId>
+			    <artifactId>org.springframework.expression</artifactId>
+			    <version>${spring.version}</version>
+			    <scope>provided</scope>
+			</dependency>
+			<dependency>
+			    <groupId>org.springframework</groupId>
+			    <artifactId>org.springframework.jdbc</artifactId>
+			    <version>${spring.version}</version>
+			    <scope>provided</scope>
+			</dependency>
+			<dependency>
+			    <groupId>org.springframework</groupId>
+			    <artifactId>org.springframework.orm</artifactId>
+			    <version>${spring.version}</version>
+			    <scope>provided</scope>
+			</dependency>
+			<dependency>
+			    <groupId>org.springframework</groupId>
+			    <artifactId>org.springframework.oxm</artifactId>
+			    <version>${spring.version}</version>
+			</dependency>
+			<dependency>
+			    <groupId>org.springframework</groupId>
+			    <artifactId>org.springframework.transaction</artifactId>
+			    <version>${spring.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
