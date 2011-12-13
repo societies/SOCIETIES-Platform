@@ -25,15 +25,8 @@
 
 package org.societies.useragent.monitoring;
 
-import org.societies.api.personalisation.model.IAction;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 
 public class UserActionMonitor implements IUserActionMonitor{
-
-	@Override
-	public void monitor(String userId, IAction action) {
-		// TODO Auto-generated method stub
-		
-	}
 
 }
