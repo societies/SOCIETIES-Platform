@@ -22,11 +22,9 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.societies.api.internal.context.broker;
 
 import org.societies.api.context.model.CtxEntityIdentifier;
-
 
 /**
  * ICommunityCtxBroker interface allows to manage community context data. 
@@ -35,7 +33,7 @@ import org.societies.api.context.model.CtxEntityIdentifier;
  * @author nikosk
  * @created 12-Nov-2011 7:15:14 PM
  */
-public interface ICommunityCtxBroker {
+public interface ICommunityCtxBroker extends org.societies.api.context.broker.ICommunityCtxBroker {
 
 	/**
 	 * This method retrieves the CSS that is assigned with the community administration role.

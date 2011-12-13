@@ -22,7 +22,6 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.societies.api.internal.context.broker;
 
 import java.io.Serializable;
@@ -37,15 +36,12 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.internal.context.user.prediction.PredictionMethod;
 
-
-
-
 /**
  * IUserCtxBroker interface allows to manage user context data. 
  * @author nikosk
  * @created 12-Nov-2011 7:15:15 PM
  */
-public interface IUserCtxBroker   {
+public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCtxBroker {
 
 	/**
 	 * Creates a CtxAssociation

@@ -22,7 +22,6 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.societies.context.broker.impl;
 
 import java.io.Serializable;
@@ -44,25 +43,22 @@ import org.societies.api.internal.context.broker.IUserCtxBroker;
 import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
 import org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback;
 import org.societies.api.internal.context.user.prediction.PredictionMethod;
-import org.societies.api.mock.EntityIdentifier;
 
-// this will be replaced by osgi CtxDBManager service reference
-import org.societies.context.user.db.impl.UserCtxDBMgr;
-
-/*
+/**
  * Platform Context Broker Implementation
  * This class implements the internal context broker interfaces and the callback interface of the community context db 
  * management in order to facilitate within platform db interaction 
  */
+public class InternalCtxBroker extends CtxBroker implements IUserCtxBroker, ICommunityCtxBroker {
 
-public class InternalCtxBroker implements IUserCtxBroker, ICommunityCtxBroker {
-
-	final UserCtxDBMgr userDB;
+	private IUserCtxDBMgr userDB;
 	
-	public InternalCtxBroker(){
-		 userDB = new UserCtxDBMgr();
+	public InternalCtxBroker() {
 	}
 	
+	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) {
+		this.userDB = userDB;
+	}
 
 	@Override
 	public void createAttribute(CtxEntityIdentifier scope,CtxAttributeValueType enumerate, String type,
