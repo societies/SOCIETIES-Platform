@@ -22,8 +22,6 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacya
 
 import java.util.Date;
 
-import org.societies.api.internal.privacytrust.privacyassessment.ChannelType;
-
 /**
  * Interface for appending to log
  * 
