@@ -72,6 +72,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<!-- Context Management -->
 		<!-- Privacy Mgmt -->
 		<!-- User Agent -->
+		<module>../user-agent/user-action-monitor</module>
+		<module>../user-agent/user-feedback</module>
 		<!-- Personalisation Mgmt -->
 		<!-- <module>../personalisation/Personalisation-API</module> -->
 
