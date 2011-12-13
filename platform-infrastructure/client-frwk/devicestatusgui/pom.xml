@@ -9,8 +9,8 @@
         <relativePath>../../../parent/android.xml</relativePath>
    </parent>
 
-   <groupId>org.societies.android</groupId>
-   <artifactId>platform.devicestatusgui</artifactId>
+   <groupId>org.societies.android.platform</groupId>
+   <artifactId>devicestatusgui</artifactId>
    <name>DeviceStatusGUI</name>
    <packaging>apk</packaging>
 
