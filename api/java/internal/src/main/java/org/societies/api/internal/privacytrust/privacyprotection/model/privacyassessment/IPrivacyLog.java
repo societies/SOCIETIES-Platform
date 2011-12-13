@@ -18,29 +18,13 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.privacytrust.privacyassessment;
-
-import java.util.Date;
-
-import org.societies.api.internal.privacytrust.privacyassessment.ChannelType;
+package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
 /**
- * Interface for appending to log
+ * Interface for reading and parsing the privacy breach log
  * 
  * @author Mitja Vardjan
  */
-public interface IPrivacyLogAppend {
+public interface IPrivacyLog {
 
-		/**
-		 * Log any outgoing information
-		 * 
-		 * @param dataType
-		 * @param time
-		 * @param sentToGroup    True if multicast
-		 * @param receiverId    CSS ID of the receiver
-		 * @param senderId    CSS ID of the sender
-		 * @param channelId    ID of the channel. Examples: facebook, facebook wall post,
-		 * twitter, XMPP
-		 */
-		public void log(String dataType, Date time, boolean sentToGroup, String receiverId, String senderId, ChannelType channelId);
 }
