@@ -36,6 +36,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
 import org.societies.context.broker.impl.InternalCtxBroker;
+import org.societies.context.user.db.impl.UserCtxDBMgr;
 
 public class InternalCtxBrokerTest {
 
@@ -48,6 +49,7 @@ public class InternalCtxBrokerTest {
 		callback = new  BrokerCallbackImpl();
 
 		internalCtxBroker = new InternalCtxBroker();
+		internalCtxBroker.setUserCtxDBMgr(new UserCtxDBMgr());
 
 		System.out.println("-- start of testing --");
 		testCreateCtxEntity();
