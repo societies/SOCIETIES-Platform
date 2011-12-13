@@ -97,7 +97,7 @@ public interface IInternalPersonalisationManager extends IPersonalisationManager
 	 * @param className
 	 * @param ctxAttributeId
 	 */
-	public void registerForContextUpdate(String className, CtxAttributeIdentifier ctxAttributeId);
+	public void registerForContextUpdate(EntityIdentifier id, String className, CtxAttributeIdentifier ctxAttributeId);
 
 	/**
 	 * 
