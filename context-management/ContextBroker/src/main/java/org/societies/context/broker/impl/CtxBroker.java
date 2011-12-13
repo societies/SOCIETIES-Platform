@@ -44,13 +44,11 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.mock.EntityIdentifier;
 
-
-/*
+/**
  * 3p Context Broker Implementation
  * This class implements the community and user broker api methods along with the callback methods 
  * of the internal context broker api
  */
-
 public class CtxBroker implements org.societies.api.internal.context.broker.IUserCtxBrokerCallback, 
 										org.societies.api.internal.context.broker.ICommunityCtxBrokerCallback,
 										IUserCtxBroker, ICommunityCtxBroker {
@@ -363,10 +361,5 @@ public class CtxBroker implements org.societies.api.internal.context.broker.IUse
 		// TODO Auto-generated method stub
 		
 	}
-	//end of IUserCtxBrokerCallback API methods 
-	
-	
-	
-	
+	//end of IUserCtxBrokerCallback API methods 	
 }
-
