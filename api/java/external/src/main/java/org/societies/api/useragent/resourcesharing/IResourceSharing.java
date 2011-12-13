@@ -22,29 +22,17 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference;
 
-import java.util.List;
-
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+package org.societies.api.useragent.resourcesharing;
 
 /**
- * This interface is used to represent an identity selection decision made by the
- * user and is used by the Privacy PreferenceLearning component.
- * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 17:06:55
+ * 
+ * @author S.Gallacher@hw.ac.uk
+ *
  */
-public interface IIDSAction {
-
-	public List<CtxAttribute> getContext();
-
-	public EntityIdentifier getSelectedIdentity();
-
-	public ServiceResourceIdentifier getServiceIdentifier();
-
-	public EntityIdentifier getServiceIdentity();
-
+public interface IResourceSharing
+{
+	public void addSharableResource();
+	
+	public void newSharingRequest();
 }
