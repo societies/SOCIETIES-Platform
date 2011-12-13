@@ -48,6 +48,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>../parent/spring-osgi.xml</module>
 		<module>../api/java/external</module>
 		<module>../api/java/internal</module>
+		<module>../personalisation/Personalisation-API</module>
+		<module>../personalisation/PersonalisationManager</module>
 
 		<!-- Communications Infrastructure -->
 		<module>../platform-infrastructure/comms-frwk/CommunicationFrameworkInterface
