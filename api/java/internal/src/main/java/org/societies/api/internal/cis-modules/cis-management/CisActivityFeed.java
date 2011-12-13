@@ -30,13 +30,13 @@
  * @author Babak.Farshchian@sintef.no
  * @version 0
  */
-package org.societies.cis.management.api;
+package org.societies.api.internal.cis-modules.cis-management;
 
-public class CISActivityFeed {
-	public CISActivity[] activities;
+public class CisActivityFeed {
+	public CisActivity[] activities;
 	public void getActivities(String CssId, String timePeriod){};
 	public void getActivities(String CssId, String query, String timePeriod){};
-	public void addCISActivity(CISActivity activity){};
+	public void addCisActivity(CisActivity activity){};
 	public void cleanupFeed(String criteria){};
 
 }

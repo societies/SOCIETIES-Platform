@@ -31,9 +31,10 @@
  * @author Babak Farshchian
  * @version 0
  */
-package org.societies.cis.collaboration.api;
+package org.societies.api.internal.cis-modules.cis-collaboration;
 
-import org.societies.cis.management.api.ServiceSharingRecord;
+
+import org.societies.api.internal.cis-modules.cis-management.ServiceSharingRecord;
 
 
 public interface IServiceSharingManager {
