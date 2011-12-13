@@ -11,20 +11,20 @@ import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
-import org.societies.context.broker.impl.PlatformContextBroker;
+import org.societies.context.broker.impl.InternalCtxBroker;
 
 
-public class PlatformContextBrokerTest {
+public class InternalCtxBrokerTest {
 
-	private static PlatformContextBroker platformCtxBroker = null;
+	private static InternalCtxBroker internalCtxBroker = null;
 	BrokerCallbackImpl callback ;
 
 	//Constructor
-	PlatformContextBrokerTest(){
+	InternalCtxBrokerTest(){
 
 		callback = new  BrokerCallbackImpl();
 
-		platformCtxBroker = new PlatformContextBroker();
+		internalCtxBroker = new InternalCtxBroker();
 
 		System.out.println("-- start of testing --");
 		testCreateCtxEntity();
@@ -38,36 +38,36 @@ public class PlatformContextBrokerTest {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		new PlatformContextBrokerTest();
+		new InternalCtxBrokerTest();
 	}
 
 
 	private void testCreateCtxEntity(){
 		System.out.println("---- test CreateCtxEntity");
-		platformCtxBroker.createEntity("person", callback);
+		internalCtxBroker.createEntity("person", callback);
 	}
 
 	private void testCreateCtxAttribute(){
 		System.out.println("---- test testCreateCtxAttribute");
-		platformCtxBroker.createAttribute(callback.getCtxEntity().getId(), CtxAttributeValueType.INDIVIDUAL, "name", callback);
+		internalCtxBroker.createAttribute(callback.getCtxEntity().getId(), CtxAttributeValueType.INDIVIDUAL, "name", callback);
 	}
 
 	private void testRetrieveAttribute(){
 		System.out.println("---- testRetrieveCtxAttribute");
 		CtxAttribute ctxAttribute = callback.getCtxAttribute();
-		platformCtxBroker.retrieve(ctxAttribute.getId(), callback);
+		internalCtxBroker.retrieve(ctxAttribute.getId(), callback);
 		ctxAttribute = (CtxAttribute) callback.getCtxModelObject();
 	}
 
 	private void testUpdateAttribute(){
 		System.out.println("---- testUpdateAttribute");
 		CtxAttribute ctxAttribute = (CtxAttribute) callback.getCtxModelObject();
-		platformCtxBroker.retrieve(ctxAttribute.getId(), callback);
+		internalCtxBroker.retrieve(ctxAttribute.getId(), callback);
 		ctxAttribute = (CtxAttribute) callback.getCtxModelObject();
 		ctxAttribute.setIntegerValue(100);
-		platformCtxBroker.update(ctxAttribute, callback);
+		internalCtxBroker.update(ctxAttribute, callback);
 		//verify update
-		platformCtxBroker.retrieve(ctxAttribute.getId(), callback);
+		internalCtxBroker.retrieve(ctxAttribute.getId(), callback);
 		ctxAttribute = (CtxAttribute) callback.getCtxModelObject();
 		System.out.println("attribute value should be 100 and it is:"+ctxAttribute.getIntegerValue());
 	}

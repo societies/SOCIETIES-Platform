@@ -51,7 +51,7 @@ import org.societies.api.mock.EntityIdentifier;
  * of the internal context broker api
  */
 
-public class ContextBroker implements org.societies.api.internal.context.broker.IUserCtxBrokerCallback, 
+public class CtxBroker implements org.societies.api.internal.context.broker.IUserCtxBrokerCallback, 
 										org.societies.api.internal.context.broker.ICommunityCtxBrokerCallback,
 										IUserCtxBroker, ICommunityCtxBroker {
 
@@ -216,7 +216,7 @@ public class ContextBroker implements org.societies.api.internal.context.broker.
 	}
 	//end of IUserCtxBroker methods
 
-	//3P ContextBroker implements the callback methods of the internal context broker API
+	//3P CtxBroker implements the callback methods of the internal context broker API
 	//ICommunityCtxBrokerCallback API methods (the internal one)
 	@Override
 	public void adminCSSRetrieved(CtxEntity arg0) {

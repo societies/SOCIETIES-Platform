@@ -24,10 +24,10 @@
  */
 package org.societies.context.broker.test;
 
-public class ContextBrokerTest {
+public class CtxBrokerTest {
 
 	//Constructor
-	ContextBrokerTest(){
+	CtxBrokerTest(){
 		//TODO
 		
 	}
@@ -36,7 +36,7 @@ public class ContextBrokerTest {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		new ContextBrokerTest();
+		new CtxBrokerTest();
 	}
 	
 	

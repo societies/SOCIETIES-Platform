@@ -55,11 +55,11 @@ import org.societies.context.user.db.impl.UserCtxDBMgr;
  * management in order to facilitate within platform db interaction 
  */
 
-public class PlatformContextBroker implements IUserCtxBroker, ICommunityCtxBroker {
+public class InternalCtxBroker implements IUserCtxBroker, ICommunityCtxBroker {
 
 	final UserCtxDBMgr userDB;
 	
-	public PlatformContextBroker(){
+	public InternalCtxBroker(){
 		 userDB = new UserCtxDBMgr();
 	}
 	
