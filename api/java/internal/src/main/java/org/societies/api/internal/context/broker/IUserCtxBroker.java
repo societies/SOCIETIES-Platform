@@ -41,11 +41,11 @@ import org.societies.api.internal.context.user.prediction.PredictionMethod;
 
 
 /**
- * ICommunityCtxBroker interface allows to manage user context data. 
+ * IUserCtxBroker interface allows to manage user context data. 
  * @author nikosk
  * @created 12-Nov-2011 7:15:15 PM
  */
-public interface IUserCtxBroker  extends org.societies.api.context.broker.IUserCtxBroker {
+public interface IUserCtxBroker   {
 
 	/**
 	 * Creates a CtxAssociation

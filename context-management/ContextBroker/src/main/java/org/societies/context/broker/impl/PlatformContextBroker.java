@@ -29,9 +29,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-
-import org.societies.api.context.broker.ICommunityCtxBrokerCallback;
-import org.societies.api.context.broker.IUserCtxBrokerCallback;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
@@ -41,11 +38,16 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.internal.context.broker.ICommunityCtxBroker;
+import org.societies.api.internal.context.broker.ICommunityCtxBrokerCallback;
+import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
 import org.societies.api.internal.context.broker.IUserCtxBroker;
 import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
 import org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback;
 import org.societies.api.internal.context.user.prediction.PredictionMethod;
 import org.societies.api.mock.EntityIdentifier;
+
+// this will be replaced by osgi CtxDBManager service reference
+import org.societies.context.user.db.impl.UserCtxDBMgr;
 
 /*
  * Platform Context Broker Implementation
@@ -55,276 +57,72 @@ import org.societies.api.mock.EntityIdentifier;
 
 public class PlatformContextBroker implements IUserCtxBroker, ICommunityCtxBroker {
 
-	private IUserCtxDBMgr userDB = null;
-
-	//getters and setters for DB handlers
-	public IUserCtxDBMgr getUserDB() {
-		return userDB;
-	}
-
-	public void setUserDB(IUserCtxDBMgr userDB) {
-		this.userDB = userDB;
-	}
-
-	//ICommunityCtxBroker methods (internal)
-	@Override
-	public void retrieveAdministratingCSS(EntityIdentifier arg0,
-			CtxEntityIdentifier arg1, ICommunityCtxBrokerCallback arg2) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void retrieveBonds(EntityIdentifier arg0, CtxEntityIdentifier arg1,
-			ICommunityCtxBrokerCallback arg2) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void retrieveChildCommunities(EntityIdentifier arg0,
-			CtxEntityIdentifier arg1, ICommunityCtxBrokerCallback arg2) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void retrieveCommunityMembers(EntityIdentifier arg0,
-			CtxEntityIdentifier arg1, ICommunityCtxBrokerCallback arg2) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void retrieveParentCommunities(EntityIdentifier arg0,
-			CtxEntityIdentifier arg1, ICommunityCtxBrokerCallback arg2) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void retrieveAdministratingCSS(
-			CtxEntityIdentifier arg0,
-			org.societies.api.internal.context.broker.ICommunityCtxBrokerCallback arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void retrieveBonds(
-			CtxEntityIdentifier arg0,
-			org.societies.api.internal.context.broker.ICommunityCtxBrokerCallback arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void retrieveChildCommunities(
-			CtxEntityIdentifier arg0,
-			org.societies.api.internal.context.broker.ICommunityCtxBrokerCallback arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void retrieveCommunityMembers(
-			CtxEntityIdentifier arg0,
-			org.societies.api.internal.context.broker.ICommunityCtxBrokerCallback arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void retrieveParentCommunities(
-			CtxEntityIdentifier arg0,
-			org.societies.api.internal.context.broker.ICommunityCtxBrokerCallback arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-	//end of ICommunityCtxBroker methods (internal)
-
+	final UserCtxDBMgr userDB;
 	
-	//IUserCtxBroker methods (internal)
+	public PlatformContextBroker(){
+		 userDB = new UserCtxDBMgr();
+	}
+	
+
 	@Override
-	public void createAssociation(EntityIdentifier arg0, String arg1,
-			IUserCtxBrokerCallback arg2) {
-		
-		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg2);
-		userDB.createAssociation(arg1, callback);
+	public void createAttribute(CtxEntityIdentifier scope,CtxAttributeValueType enumerate, String type,
+			IUserCtxBrokerCallback brokerCallback) {
+		UserDBCallback callback = new UserDBCallback(brokerCallback);
+		userDB.createAttribute(scope, enumerate, type, callback);
 		
 	}
 
 	@Override
-	public void createAttribute(EntityIdentifier arg0,
-			CtxEntityIdentifier arg1, CtxAttributeValueType arg2, String arg3,
-			IUserCtxBrokerCallback arg4) {
-		
-		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg4);
-		userDB.createAttribute(arg1, arg2, arg3, callback);
+	public void createEntity(String type, IUserCtxBrokerCallback brokerCallback) {
+		UserDBCallback callback = new UserDBCallback(brokerCallback);
+		userDB.createEntity(type, callback);		
 	}
 
 	@Override
-	public void createEntity(EntityIdentifier arg0, String arg1,
-			IUserCtxBrokerCallback arg2) {
-		
+	public void createAssociation(String type, IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg2);
-		userDB.createEntity(arg1, callback);
 		
 	}
-
+	
+	
 	@Override
-	public void evaluateSimilarity(Serializable arg0, List<Serializable> arg1,
-			IUserCtxBrokerCallback arg2) {
+	public void retrieveAdministratingCSS(CtxEntityIdentifier community,
+			ICommunityCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void lookup(EntityIdentifier arg0, CtxModelType arg1, String arg2,
-			IUserCtxBrokerCallback arg3) {
-		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg3);
-		userDB.lookup(arg1, arg2, callback);
-		
-	}
-
-	@Override
-	public void lookupEntities(EntityIdentifier arg0, String arg1, String arg2,
-			Serializable arg3, Serializable arg4, IUserCtxBrokerCallback arg5) {
-		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg5);
-		userDB.lookupEntities(arg1, arg2, arg3, arg4, callback);
-		
-	}
-
-	@Override
-	public void registerForUpdates(EntityIdentifier arg0,
-			CtxAttributeIdentifier arg1, IUserCtxBrokerCallback arg2) {
-		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg2);
-		userDB.registerForUpdates(arg1, callback);
-	}
-
-	@Override
-	public void registerForUpdates(EntityIdentifier arg0,
-			CtxEntityIdentifier arg1, String arg2, IUserCtxBrokerCallback arg3) {
-		
-		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg3);
-		userDB.registerForUpdates(arg1, arg2, callback);
-		
-	}
-
-	@Override
-	public void remove(EntityIdentifier arg0, CtxIdentifier arg1,
-			IUserCtxBrokerCallback arg2) {
-		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg2);
-		userDB.remove(arg1, callback);
-		
-	}
-
-	@Override
-	public void retrieve(EntityIdentifier arg0, CtxIdentifier arg1,
-			IUserCtxBrokerCallback arg2) {
-		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg2);
-		userDB.retrieve(arg1, callback);
-		
-	}
-
-	@Override
-	public void retrieveFuture(EntityIdentifier arg0,
-			CtxAttributeIdentifier arg1, Date arg2, IUserCtxBrokerCallback arg3) {
+	public void retrieveBonds(CtxEntityIdentifier community,
+			ICommunityCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void retrieveFuture(EntityIdentifier arg0,
-			CtxAttributeIdentifier arg1, int arg2, IUserCtxBrokerCallback arg3) {
+	public void retrieveChildCommunities(CtxEntityIdentifier community,
+			ICommunityCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void retrievePast(EntityIdentifier arg0,
-			CtxAttributeIdentifier arg1, int arg2, IUserCtxBrokerCallback arg3) {
+	public void retrieveCommunityMembers(CtxEntityIdentifier community,
+			ICommunityCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void retrievePast(EntityIdentifier arg0,
-			CtxAttributeIdentifier arg1, Date arg2, Date arg3,
-			IUserCtxBrokerCallback arg4) {
+	public void retrieveParentCommunities(CtxEntityIdentifier community,
+			ICommunityCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
-	public void unregisterForUpdates(EntityIdentifier arg0,
-			CtxAttributeIdentifier arg1, IUserCtxBrokerCallback arg2) {
-		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg2);
-		userDB.unregisterForUpdates(arg1, callback);
-		
-	}
 
 	@Override
-	public void unregisterForUpdates(EntityIdentifier arg0,
-			CtxEntityIdentifier arg1, String arg2, IUserCtxBrokerCallback arg3) {
-		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg3);
-		userDB.unregisterForUpdates(arg1, arg2, callback);
-		
-	}
-
-	@Override
-	public void update(EntityIdentifier arg0, CtxModelObject arg1,
-			IUserCtxBrokerCallback arg2) {
-		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg2);
-		userDB.update(arg1, callback);
-		
-	}
-
-	@Override
-	public void createAssociation(
-			String arg0,
-			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg1) {
-		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg1);
-		userDB.createAssociation(arg0, callback);
-		
-	}
-
-	@Override
-	public void createAttribute(
-			CtxEntityIdentifier arg0,
-			CtxAttributeValueType arg1,
-			String arg2,
-			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg3) {
-		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg3);
-		userDB.createAttribute(arg0, arg1, arg2, callback);
-		
-	}
-
-	@Override
-	public void createEntity(
-			String arg0,
-			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg1) {
-		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg1);
-		userDB.createEntity(arg0, callback);
-	}
-
-	@Override
-	public void disableCtxMonitoring(CtxAttributeValueType arg0) {
+	public void disableCtxMonitoring(CtxAttributeValueType type) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -336,7 +134,7 @@ public class PlatformContextBroker implements IUserCtxBroker, ICommunityCtxBroke
 	}
 
 	@Override
-	public void enableCtxMonitoring(CtxAttributeValueType arg0) {
+	public void enableCtxMonitoring(CtxAttributeValueType type) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -348,216 +146,176 @@ public class PlatformContextBroker implements IUserCtxBroker, ICommunityCtxBroke
 	}
 
 	@Override
-	public void evaluateSimilarity(
-			Serializable arg0,
-			List<Serializable> arg1,
-			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg2) {
+	public void evaluateSimilarity(Serializable objectUnderComparison,
+			List<Serializable> referenceObjects, IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
-	
+
 	@Override
-	public PredictionMethod getDefaultPredictionMethod(PredictionMethod arg0) {
+	public PredictionMethod getDefaultPredictionMethod(
+			PredictionMethod predMethod) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public PredictionMethod getPredictionMethod(PredictionMethod arg0) {
+	public PredictionMethod getPredictionMethod(PredictionMethod predMethod) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void lookup(
-			CtxModelType arg0,
-			String arg1,
-			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg2) {
+	public void lookup(CtxModelType modelType, String type,
+			IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg2);
-		userDB.lookup(arg0, arg1, callback);
 		
 	}
 
 	@Override
-	public void lookupEntities(
-			String arg0,
-			String arg1,
-			Serializable arg2,
-			Serializable arg3,
-			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg4) {
+	public void lookupEntities(String entityType, String attribType,
+			Serializable minAttribValue, Serializable maxAttribValue,
+			IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg4);
-		userDB.lookupEntities(arg0, arg1, arg2, arg3, callback);
 		
 	}
 
 	@Override
-	public void registerForUpdates(
-			CtxAttributeIdentifier arg0,
-			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg1) {
+	public void registerForUpdates(CtxEntityIdentifier scope, String attrType,
+			IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg1);
-		userDB.registerForUpdates(arg0, callback);
 		
 	}
 
 	@Override
-	public void registerForUpdates(
-			CtxEntityIdentifier arg0,
-			String arg1,
-			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg2) {
+	public void registerForUpdates(CtxAttributeIdentifier attrId,
+			IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg2);
-		userDB.registerForUpdates(arg0, arg1, callback);
 		
 	}
 
 	@Override
-	public void remove(
-			CtxIdentifier arg0,
-			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg1) {
+	public void remove(CtxIdentifier identifier, IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg1);
-		userDB.remove(arg0, callback);
 		
 	}
 
 	@Override
-	public int removeHistory(String arg0, Date arg1, Date arg2) {
+	public int removeHistory(String type, Date startDate, Date endDate) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
-	public void removePredictionMethod(PredictionMethod arg0) {
+	public void removePredictionMethod(PredictionMethod predMethod) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void retrieve(
-			CtxIdentifier arg0,
-			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg1) {
-		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg1);
-		userDB.retrieve(arg0, callback);
+	public void retrieve(CtxIdentifier identifier, IUserCtxBrokerCallback brokerCallback) {
+		UserDBCallback callback = new UserDBCallback(brokerCallback);
+		userDB.retrieve(identifier, callback);
 		
 	}
 
 	@Override
-	public void retrieveFuture(
-			CtxAttributeIdentifier arg0,
-			Date arg1,
-			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg2) {
+	public void retrieveFuture(CtxAttributeIdentifier attrId, Date date,
+			IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void retrieveFuture(
-			CtxAttributeIdentifier arg0,
-			int arg1,
-			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg2) {
+	public void retrieveFuture(CtxAttributeIdentifier attrId,
+			int modificationIndex, IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void retrievePast(
-			CtxAttributeIdentifier arg0,
-			int arg1,
-			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg2) {
+	public void retrievePast(CtxAttributeIdentifier attrId,
+			int modificationIndex, IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void retrievePast(
-			CtxAttributeIdentifier arg0,
-			Date arg1,
-			Date arg2,
-			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg3) {
+	public void retrievePast(CtxAttributeIdentifier attrId, Date startDate,
+			Date endDate, IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void setDefaultPredictionMethod(PredictionMethod arg0) {
+	public void setDefaultPredictionMethod(PredictionMethod predMethod) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void setPredictionMethod(
-			PredictionMethod arg0,
-			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg1) {
+	public void setPredictionMethod(PredictionMethod predMethod,
+			IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void unregisterForUpdates(
-			CtxAttributeIdentifier arg0,
-			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg1) {
+	public void unregisterForUpdates(CtxAttributeIdentifier attrId,
+			IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg1);
-		userDB.unregisterForUpdates(arg0, callback);
-	}
-
-	@Override
-	public void unregisterForUpdates(
-			CtxEntityIdentifier arg0,
-			String arg1,
-			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg2) {
-		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg2);
-		userDB.unregisterForUpdates(arg0, arg1, callback);
 		
 	}
 
 	@Override
-	public void update(
-			CtxModelObject arg0,
-			org.societies.api.internal.context.broker.IUserCtxBrokerCallback arg1) {
+	public void unregisterForUpdates(CtxEntityIdentifier scope,
+			String attributeType, IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback(arg1);
-		userDB.update(arg0, callback);
-
+		
 	}
-	//end of IUserCtxBroker methods (internal)
-	
-	
-	
+
+	@Override
+	public void update(CtxModelObject identifier,
+			IUserCtxBrokerCallback callback) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 	private class UserDBCallback implements IUserCtxDBMgrCallback {
 
 	    private IUserCtxBrokerCallback brokerCallback;
-	    private org.societies.api.internal.context.broker.IUserCtxBrokerCallback inBrokerCallback;
-
+	
 	    UserDBCallback(IUserCtxBrokerCallback brokerCallback) {
 	       this.brokerCallback = brokerCallback;
 	    } 
 
-	    public UserDBCallback(
-				org.societies.api.internal.context.broker.IUserCtxBrokerCallback brokerCallback) {
-			// TODO Auto-generated constructor stub
-	    	this.inBrokerCallback = brokerCallback;
-		}
-
-	    public void ctxEntityCreated(CtxEntity entity) {
-	        this.brokerCallback.ctxEntityCreated(entity);
+	    public void ctxEntityCreated(CtxEntity ctxEntity) {
+	       this.brokerCallback.ctxEntityCreated(ctxEntity);
 	    }
 		
-		//abstract methods  
-	    public void ctxIndividualCtxEntityCreated(CtxEntity arg0) {}
+	    public void ctxIndividualCtxEntityCreated(CtxEntity ctxEntity) {
+	    	this.brokerCallback.ctxIndividualCtxEntityCreated(ctxEntity);
+	    }
 		  
-	    public void ctxAttributeCreated(CtxAttribute arg0) {}
+	    public void ctxAttributeCreated(CtxAttribute ctxAttribute) {
+	    	this.brokerCallback.ctxAttributeCreated(ctxAttribute);
+	    	//System.out.println("Broker callback : Ctx Attribute Created: " + ctxAttribute.getId());
+	    }
 		  
-	    public void ctxModelObjectUpdated(CtxModelObject arg0) {}
+	    public void ctxModelObjectUpdated(CtxModelObject ctxModelObject) {
+	    	this.brokerCallback.ctxModelObjectUpdated(ctxModelObject);
+	    }
 		  
-	    public void ctxEntitiesLookedup(List arg0) {}
+	    public void ctxEntitiesLookedup(List<CtxEntityIdentifier> list) {
+	    	this.brokerCallback.ctxEntitiesLookedup(list);
+	    }
 		  
-	    public void ctxModelObjectRetrieved(CtxModelObject arg0) {}
+	    public void ctxModelObjectRetrieved(CtxModelObject ctxModelObject) {
+	    	this.brokerCallback.ctxModelObjectRetrieved(ctxModelObject);
+	    }
 		
 	}
+
+
 }

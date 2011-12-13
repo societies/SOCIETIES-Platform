@@ -11,7 +11,6 @@
 		<relativePath>../../../parent/spring-osgi.xml</relativePath>
 	</parent>
 
-	<groupId>org.societies.context.user.db.impl</groupId>
 	<artifactId>UserCtxDBMgmt</artifactId> 
 	<version>${version.cm}</version>
 	<name>User Context DB Management</name>
@@ -134,4 +133,5 @@
 		</plugins>
 	</build>
 
+	<groupId>org.societies.context-management</groupId>
 </project>

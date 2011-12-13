@@ -39,6 +39,8 @@ public class UseCaseTest {
 	static UserCtxDBMgr userDB ;
 	static CtxEntity entity;
 	static CtxAttribute attribute;
+	
+	// not using the IUserCtxDBMgrCallback because getEntity() is missing
 	CallbackImpl callback ;
 
 	UseCaseTest(){

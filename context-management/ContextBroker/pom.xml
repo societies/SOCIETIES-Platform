@@ -45,6 +45,14 @@
 			<scope>provided</scope>
 		</dependency>
 	
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>UserCtxDBMgmt</artifactId>
+			<version>${version.cm}</version>
+			<scope>provided</scope>
+			<type>bundle</type>
+		</dependency>
+	
 	</dependencies>
 
 	<build>
@@ -89,4 +97,5 @@
 
 	<name>Context Broker</name>
 
+	<groupId>org.societies.context-management</groupId>
 </project>

@@ -1,25 +1,38 @@
 package org.societies.context.broker.test;
 
-import org.societies.api.context.broker.IUserCtxBrokerCallback;
+import java.util.List;
+
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxHistoryAttribute;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
 import org.societies.context.broker.impl.PlatformContextBroker;
-import org.societies.api.mock.EntityIdentifier;
+
 
 public class PlatformContextBrokerTest {
 
 	private static PlatformContextBroker platformCtxBroker = null;
-	//private static IUserCtxDBMgr userDB;
-	
+	BrokerCallbackImpl callback ;
+
 	//Constructor
 	PlatformContextBrokerTest(){
-		
-		//here the user DB of the broker should be set using the setter: setUserDB(IUserCtxDBMgr userDB)
-		//setUserDB(userDB);
+
+		callback = new  BrokerCallbackImpl();
+
+		platformCtxBroker = new PlatformContextBroker();
+
 		System.out.println("-- start of testing --");
 		testCreateCtxEntity();
-		testCreateCtxAssociation();
-		
+		testCreateCtxAttribute();
+		testRetrieveAttribute();
+		testUpdateAttribute();
 	}
-	
+
 	/**
 	 * @param args
 	 */
@@ -28,31 +41,174 @@ public class PlatformContextBrokerTest {
 		new PlatformContextBrokerTest();
 	}
 
-	
-	private void testCreateCtxEntity(){
 
-		System.out.println("---- test CreateCtxEntity external");
-		IUserCtxBrokerCallback exCallback = null;
-		EntityIdentifier identifier = null;
-		platformCtxBroker.createEntity(identifier, "person", exCallback);
-		
-		System.out.println("---- test CreateCtxEntity internal");
-		org.societies.api.internal.context.broker.IUserCtxBrokerCallback inCallback = null;
-		platformCtxBroker.createEntity("person", inCallback);
-		
+	private void testCreateCtxEntity(){
+		System.out.println("---- test CreateCtxEntity");
+		platformCtxBroker.createEntity("person", callback);
+	}
+
+	private void testCreateCtxAttribute(){
+		System.out.println("---- test testCreateCtxAttribute");
+		platformCtxBroker.createAttribute(callback.getCtxEntity().getId(), CtxAttributeValueType.INDIVIDUAL, "name", callback);
+	}
+
+	private void testRetrieveAttribute(){
+		System.out.println("---- testRetrieveCtxAttribute");
+		CtxAttribute ctxAttribute = callback.getCtxAttribute();
+		platformCtxBroker.retrieve(ctxAttribute.getId(), callback);
+		ctxAttribute = (CtxAttribute) callback.getCtxModelObject();
+	}
+
+	private void testUpdateAttribute(){
+		System.out.println("---- testUpdateAttribute");
+		CtxAttribute ctxAttribute = (CtxAttribute) callback.getCtxModelObject();
+		platformCtxBroker.retrieve(ctxAttribute.getId(), callback);
+		ctxAttribute = (CtxAttribute) callback.getCtxModelObject();
+		ctxAttribute.setIntegerValue(100);
+		platformCtxBroker.update(ctxAttribute, callback);
+		//verify update
+		platformCtxBroker.retrieve(ctxAttribute.getId(), callback);
+		ctxAttribute = (CtxAttribute) callback.getCtxModelObject();
+		System.out.println("attribute value should be 100 and it is:"+ctxAttribute.getIntegerValue());
 	}
 	
-	private void testCreateCtxAssociation(){
+	
+
+
+	private class BrokerCallbackImpl implements IUserCtxBrokerCallback{
+
+		CtxEntity ctxEntity = null;
+		CtxAttribute ctxAttribute = null;
+		CtxModelObject ctxModelObject = null;
 		
-		System.out.println("---- test testCreateCtxAssociation external");
-		IUserCtxBrokerCallback exCallback = null;
-		EntityIdentifier identifier = null;
-		platformCtxBroker.createAssociation(identifier, "person", exCallback);
 		
-		System.out.println("---- test testCreateCtxAssociation internal");
-		org.societies.api.internal.context.broker.IUserCtxBrokerCallback inCallback = null;
-		platformCtxBroker.createAssociation("person", inCallback);
-		
+		public CtxEntity getCtxEntity(){
+			return ctxEntity;
+		}
+
+		public CtxAttribute getCtxAttribute(){
+			return ctxAttribute;
+		}
+
+		public CtxModelObject getCtxModelObject(){
+			return  this.ctxModelObject;
+		}
+
+		@Override
+		public void cancel(CtxIdentifier c_id, String reason) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void ctxAssociationCreated(CtxAssociation ctxEntity) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void ctxAttributeCreated(CtxAttribute ctxAttribute) {
+			System.out.println("CtxAttribute created "+ ctxAttribute.getId());
+			this.ctxAttribute = ctxAttribute;
+
+		}
+
+		@Override
+		public void ctxEntitiesLookedup(List<CtxEntityIdentifier> list) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void ctxEntityCreated(CtxEntity ctxEntity) {
+			System.out.println("Entity created "+ ctxEntity.getId());
+			this.ctxEntity = ctxEntity;
+		}
+
+		@Override
+		public void ctxIndividualCtxEntityCreated(CtxEntity ctxEntity) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void ctxModelObjectRemoved(CtxModelObject ctxModelObject) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void ctxModelObjectRetrieved(CtxModelObject ctxModelObject) {
+			System.out.println("ctxModelObject Retrieved "+ ctxModelObject.getId());
+			this.ctxModelObject = ctxModelObject;
+		}
+
+		@Override
+		public void ctxModelObjectsLookedup(List<CtxIdentifier> list) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void ctxModelObjectUpdated(CtxModelObject ctxModelObject) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void futureCtxRetrieved(List<CtxAttribute> futCtx) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void futureCtxRetrieved(CtxAttribute futCtx) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void historyCtxRetrieved(CtxHistoryAttribute hoc) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void historyCtxRetrieved(List<CtxHistoryAttribute> hoc) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void ok(CtxIdentifier c_id) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void ok_list(List<CtxIdentifier> list) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void ok_values(List<Object> list) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void similartyResults(List<Object> results) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void updateReceived(CtxModelObject ctxModelObj) {
+			// TODO Auto-generated method stub
+
+		}
+
 	}
 
 }

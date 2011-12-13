@@ -35,7 +35,7 @@ import org.societies.api.context.model.CtxEntityIdentifier;
  * @author nikosk
  * @created 12-Nov-2011 7:15:14 PM
  */
-public interface ICommunityCtxBroker extends org.societies.api.context.broker.ICommunityCtxBroker {
+public interface ICommunityCtxBroker {
 
 	/**
 	 * This method retrieves the CSS that is assigned with the community administration role.
