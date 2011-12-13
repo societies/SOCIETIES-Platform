@@ -22,8 +22,54 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.communityHistory.test;
 
-public class CommunityContextHistoryManagementTest {
+package org.societies.api.internal.context.community.db;
+
+import java.util.List;
+
+import org.societies.api.context.model.CtxEntityIdentifier;
+
+/**
+ * @author nlia
+ * @created 12-Nov-2011 7:15:14 PM
+ */
+public interface ICommunityCtxDBMgrCallback {
+
+	/**
+	 * The callback of ICommunityCtxDBMgr method 
+	 * retrieveBonds(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback)
+	 * 
+	 * @param bond
+	 * @param community
+	 * @since 0.0.1
+	 */
+	public void bondsRetrieved(ContextBond bond, CtxEntityIdentifier community);
+
+	/**
+	 * The callback of ICommunityCtxDBMgr method 
+	 * retrieveChildCommunities(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback)
+	 * 
+	 * @param community
+	 * @since 0.0.1
+	 */
+	public void childCommunitiesRetrieved(List<CtxEntityIdentifier> community);
+
+	/**
+	 * The callback of ICommunityCtxDBMgr method
+	 * retrieveCommunityMembers(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback)
+	 * 
+	 * @param community
+	 * @since 0.0.1
+	 */
+	public void communityMembersRetrieved(List<CtxEntityIdentifier> community);
+
+	/**
+	 * The callback of ICommunityCtxDBMgr method
+	 * retrieveParentCommunities(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback)
+	 * 
+	 * @param community
+	 * @since 0.0.1
+	 */
+	public void parentCommunitiesRetrieved(List<CtxEntityIdentifier> community);
 
 }

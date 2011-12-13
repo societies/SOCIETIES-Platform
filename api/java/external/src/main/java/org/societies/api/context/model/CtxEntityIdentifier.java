@@ -24,22 +24,58 @@
  */
 package org.societies.api.context.model;
 
+import org.societies.api.mock.EntityIdentifier;
+
 /**
- * This class is used in order to identify the CtxEntity object.
+ * This class is used to identify context entities. It provides methods that
+ * return information about the identified entity including:
+ * <ul>
+ * <li><tt>OperatorId</tt>: A unique identifier of the CSS or CIS where the 
+ * identified context entity is stored.</li>
+ * <li><tt>ModelType</tt>: Describes the type of the identified context model
+ * object, i.e. {@link CtxModelType#ENTITY ENTITY}.</li>
+ * <li><tt>Type</tt>: A semantic tag that characterises the identified context
+ * entity. e.g. "person".</li>
+ * <li><tt>ObjectNumber</tt>: A unique number within the CSS/CIS where the
+ * respective context information was initially sensed/collected and stored.</li>
+ * </ul>
+ * <p>
+ * A context entity identifier can be represented as a URI formatted String as
+ * follows:
+ * <pre>
+ * &lt;OperatorId&gt;/ENTITY/&lt;Type&gt;/&lt;ObjectNumber&gt;
+ * </pre>
  * 
- * @author nikosk
- * @version 0.0.1
+ * @see CtxIdentifier
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
  */
 public class CtxEntityIdentifier extends CtxIdentifier {
 
 	private static final long serialVersionUID = 1550923933016203797L;
 
-	private CtxEntityIdentifier() {}
+	/**
+	 * Creates a context entity identifier by specifying the CSS/CIS ID
+	 * where the identified context model object is stored, as well as,
+	 * the entity type and the unique numeric model object identifier.
+	 * 
+	 * @param operatorId
+	 *            the identifier of the CSS/CIS where the identified context
+	 *            model object is stored
+	 * @param type
+	 *            the entity type, e.g. "device"
+	 * @param objectNumber
+	 *            the unique numeric model object identifier
+	 */
+	public CtxEntityIdentifier(EntityIdentifier operatorId, String type, 
+			Long objectNumber) {
+		super(operatorId, type, objectNumber);
+	}
 
 	/**
-	 * Returns the model type of the object 
-	 * 
-	 * @return CtxModelType
+	 * Returns the type of the identified context model object, i.e. CtxModelType.ENTITY
+	 *   
+	 *  @return CtxModelType#ENTITY 
 	 */
 	@Override
 	public CtxModelType getModelType() {

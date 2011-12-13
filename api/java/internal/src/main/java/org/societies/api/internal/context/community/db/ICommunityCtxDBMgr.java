@@ -22,8 +22,57 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.communityHistory.test;
 
-public class CommunityContextHistoryManagementTest {
+package org.societies.api.internal.context.community.db;
+
+import org.societies.api.context.model.CtxEntityIdentifier;
+
+
+/**
+ * ICommunityCtxDBMgr platform interface. This interface provides access to community context database. 
+ * 
+ * @author nlia
+ * @created 12-Nov-2011 7:15:14 PM
+ */
+public interface ICommunityCtxDBMgr {
+
+	/**
+	 * Retrieves the context attribute(s) that acts as a bond of the community of
+	 * entities specified by the CtxEntityIdentifier.
+	 * 
+	 * @param community identifier
+	 * @param callback 
+	 * @since 0.0.1
+	 */
+	public void retrieveBonds(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
+
+	/**
+	 * This applies for Community hierarchies. Retrieves the child communities
+	 * (subcommunities of CtxEntities) of the specified parent CtxEntity
+	 * 
+	 * @param community identifier
+	 * @param callback
+	 * @since 0.0.1
+	 */
+	public void retrieveChildCommunities(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
+
+	/**
+	 * Retrieves a list of Individual Context Entities that are members of the
+	 * specified community Entity.
+	 * 
+	 * @param community
+	 * @param callback
+	 * @since 0.0.1
+	 */
+	public void retrieveCommunityMembers(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
+
+	/**
+	 * Retrieves communities characterized as parent for the community specified by the Community CtxEntityIdentifier  
+	 * 
+	 * @param community
+	 * @param callback
+	 * @since 0.0.1
+	 */
+	public void retrieveParentCommunities(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
 
 }

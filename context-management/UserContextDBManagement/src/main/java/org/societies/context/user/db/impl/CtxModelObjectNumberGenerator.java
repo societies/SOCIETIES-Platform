@@ -22,8 +22,14 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.communityHistory.test;
+package org.societies.context.user.db.impl;
 
-public class CommunityContextHistoryManagementTest {
+public class CtxModelObjectNumberGenerator {
 
+    private static Long nextValue = 0L;
+
+    public static Long getNextValue() {
+
+        return nextValue++;
+    }
 }

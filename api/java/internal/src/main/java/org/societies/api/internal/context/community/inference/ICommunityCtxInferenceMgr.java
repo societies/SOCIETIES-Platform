@@ -22,95 +22,107 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.communityHistory.impl;
+
+package org.societies.api.internal.context.community.inference;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxHistoryAttribute;
-import org.societies.api.internal.context.community.history.ICommunityCtxHistoryMgr;
+import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.internal.context.user.prediction.PredictionMethod;
 
-public class CommunityContextHistoryManagement  implements ICommunityCtxHistoryMgr{
 
-	@Override
-	public void disableCtxRecording() {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void enableCtxRecording() {
-		// TODO Auto-generated method stub
-		
-	}
+/**
+ * @author nikosk
+ * @created 12-Nov-2011 7:15:15 PM
+ */
+public interface ICommunityCtxInferenceMgr {
 
-	@Override
-	public List<List<CtxAttributeIdentifier>> getHistoryTuplesID(
-			CtxAttributeIdentifier arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	/**
+	 * 
+	 * @param predictionMethodl
+	 */
+	public void addPredictionMethod(PredictionMethod  predictionMethod );
 
-	@Override
-	public void registerHistoryTuples(CtxAttributeIdentifier arg0,
-			List<CtxAttributeIdentifier> arg1) {
-		// TODO Auto-generated method stub
-		
-	}
+	/**
+	 * 
+	 * @param ctxID
+	 * @param ctxID2
+	 */
+	public Double evaluateSimilarity(CtxAttributeIdentifier ctxID, CtxAttributeIdentifier ctxID2);
 
-	@Override
-	public void registerHistoryTuples(CtxAttributeIdentifier arg0,
-			CtxAttributeIdentifier arg1) {
-		// TODO Auto-generated method stub
-		
-	}
+	/**
+	 * 
+	 * @param listCtxID
+	 * @param listCtxID2
+	 */
+	public Map<CtxAttributeIdentifier,Double> evaluateSimilarity(List<CtxAttributeIdentifier> listCtxID, List<CtxAttributeIdentifier> listCtxID2);
 
-	@Override
-	public int removeHistory(CtxAttribute arg0, Date arg1, Date arg2) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	/**
+	 * 
+	 * @param predictionMethod
+	 */
+	public PredictionMethod getDefaultPredictionMethod(PredictionMethod predictionMethod);
 
-	@Override
-	public int removeHistory(String arg0, Date arg1, Date arg2) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	/**
+	 * 
+	 * @param ctxAttrId
+	 * @param type
+	 * @param cisid
+	 */
+	public void inheritContext(CtxAttributeIdentifier ctxAttrId, CtxAttributeValueType type, EntityIdentifier cisid);
 
-	@Override
-	public List<CtxHistoryAttribute> retrieveHistory(CtxAttribute arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	/**
+	 * 
+	 * @param ctxAttrID
+	 * @param predictionMethod
+	 * @param date
+	 */
+	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, PredictionMethod predictionMethod, Date date);
 
-	@Override
-	public List<CtxHistoryAttribute> retrieveHistory(CtxAttribute arg0,
-			Date arg1, Date arg2) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	/**
+	 * 
+	 * @param ctxAttrID
+	 * @param predictionMethodl
+	 * @param int
+	 */
+	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, PredictionMethod predictionMethodl, int index );
 
-	@Override
-	public Map<CtxAttribute, List<CtxAttribute>> retrieveHistoryTuples(
-			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1,
-			Date arg2, Date arg3) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	/**
+	 * 
+	 * @param ctxAttrID
+	 * @param date
+	 */
+	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, Date date);
 
-	@Override
-	public void disableCommCtxRecording() {
-		// TODO Auto-generated method stub
-		
-	}
+	/**
+	 * 
+	 * @param ctxAttrID
+	 * @param index
+	 */
+	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, int index);
 
-	@Override
-	public void enableCommCtxRecording() {
-		// TODO Auto-generated method stub
-		
-	}
+	/**
+	 * 
+	 * @param ctxAttrId
+	 */
+	public void refineContext(CtxAttributeIdentifier ctxAttrId);
+
+	/**
+	 * 
+	 * @param predictionMethod
+	 */
+	public void removePredictionMethod(PredictionMethod predictionMethod);
+
+	/**
+	 * 
+	 * @param predMethod
+	 */
+	public void setDefaultPredictionMethod(PredictionMethod predMethod);
 
 }

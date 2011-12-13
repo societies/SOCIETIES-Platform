@@ -22,8 +22,54 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.communityHistory.test;
 
-public class CommunityContextHistoryManagementTest {
+package org.societies.api.internal.context.community.estimation;
+
+import java.util.List;
+
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxEntity;
+
+
+
+/**
+ * @author yboul
+ * @created 12-Nov-2011 7:15:14 PM
+ */
+public interface ICommunityCtxEstimationMgr {
+
+	/**
+	 * 
+	 * @param estimationModel
+	 * @param list
+	 * @since 0.0.1
+	 */
+	public void estimateContext(EstimationModels estimationModel, List<CtxAttribute> list);
+
+	/**
+	 * 
+	 * @param Current
+	 * @param communityID
+	 * @param list
+	 * @since 0.0.1
+	 */
+	public void retrieveCurrentCisContext(boolean Current, EntityIdentifier communityID, List<CtxAttribute> list);
+
+	/**
+	 * 
+	 * @param Current
+	 * @param communityID
+	 * @param list
+	 * @since 0.0.1
+	 */
+	public void retrieveHistoryCisContext(boolean Current, EntityIdentifier communityID, List<CtxAttribute> list);
+
+	/**
+	 * 
+	 * @param estimatedContext
+	 * @since 0.0.1
+	 */
+	public void updateContextModelObject(CtxEntity estimatedContext);
 
 }

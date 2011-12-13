@@ -22,8 +22,42 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.communityHistory.test;
 
-public class CommunityContextHistoryManagementTest {
+package org.societies.api.internal.context.community.inheritance;
+
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeValueType;
+
+/**
+ * @author yboul
+ * @created 12-Nov-2011 7:15:15 PM
+ */
+public interface ICommunityCtxInheritanceMgr {
+
+	/**
+	 * 
+	 * @param cidIdentifier
+	 * @since 0.0.1
+	 */
+	public void getParentCis(EntityIdentifier cidIdentifier);
+
+	/**
+	 * 
+	 * @param ctxAttributeIdentifier
+	 * @param type
+	 * @param cisId
+	 * @since 0.0.1
+	 */
+	public void inheritContext(CtxAttributeIdentifier ctxAttributeIdentifier, CtxAttributeValueType type, EntityIdentifier cisId);
+
+	/**
+	 * 
+	 * @param ctxAttributeIdentifier
+	 * @param type
+	 * @param cisId
+	 * @since 0.0.1
+	 */
+	public void retrieveCtx(CtxAttributeIdentifier ctxAttributeIdentifier, CtxAttributeValueType type, EntityIdentifier cisId);
 
 }

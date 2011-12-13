@@ -22,8 +22,52 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.userDatabase.test;
 
-public class UserContextDBManagementTest {
+package org.societies.api.internal.context.user.inheritance;
+
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeValueType;
+
+
+/**
+ * @author <a href="mailto:ybouloudis@amitec.gr">Yiorgos Bouloudis</a> (AMITEC) 
+ */
+public interface IUserCtxInheritanceMgr {
+
+	/**
+	 * Gets an indicated CIS.
+	 * 
+	 * @param cisId
+	 * @since 0.0.1
+	 */
+	public void getCIS(EntityIdentifier cisId);
+
+	/**
+	 * Gets the Context Attribe of an indicated type and CIS.
+	 * 
+	 * @param contextAttributeIdentifier
+	 * @param type
+	 * @param cisId
+	 * @since 0.0.1
+	 */
+	public void getContextAttribute(CtxAttributeIdentifier contextAttributeIdentifier, CtxAttributeValueType type, EntityIdentifier cisId);
+
+	/**
+	 * Inherits the Context Attribute of a specified type.
+	 * 
+	 * @param contextAttributeIdentifier
+	 * @param type
+	 * @since 0.0.1
+	 */
+	public void inheritContextAttribute(CtxAttributeIdentifier contextAttributeIdentifier, CtxAttributeValueType type);
+
+	/**
+	 * Resolves conflicts using specified algorithms.
+	 * 
+	 * @param conflictResolutionsAlgorithms
+	 * @since 0.0.1
+	 */
+	public void resolveConflicts(ConflictResolutionAlgorithm conflictResolutionsAlgorithms);
 
 }

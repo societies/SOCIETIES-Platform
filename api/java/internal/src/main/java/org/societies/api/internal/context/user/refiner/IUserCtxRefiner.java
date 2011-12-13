@@ -22,8 +22,23 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.communityHistory.test;
 
-public class CommunityContextHistoryManagementTest {
+package org.societies.api.internal.context.user.refiner;
+
+import org.societies.api.context.model.CtxAttributeIdentifier;
+
+
+/**
+ * @author fran_ko
+ */
+public interface IUserCtxRefiner {
+
+	/**
+	 * Refines context for an indicate Context Attribute. 
+	 * 
+	 * @param attrId
+	 * @since 0.0.1
+	 */
+	public void refineContext(CtxAttributeIdentifier attrId);
 
 }

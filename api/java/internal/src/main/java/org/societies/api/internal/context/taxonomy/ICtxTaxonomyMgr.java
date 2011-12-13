@@ -22,8 +22,64 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.communityHistory.test;
 
-public class CommunityContextHistoryManagementTest {
+package org.societies.api.internal.context.taxonomy;
+
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeValueType;
+
+
+/**
+ * @author TI
+ * @created 12-Nov-2011 7:15:15 PM
+ */
+public interface ICtxTaxonomyMgr {
+
+	/**
+	 * it returns the children of the element in the taxonomy tree
+	 * 
+	 * @param attrubute
+	 * @since 0.0.1
+	 */
+	public CtxAttribute[] getChildren(CtxAttribute attrubute);
+
+	/**
+	 * 
+	 * @param attributeB
+	 * @param attributeA
+	 * @since 0.0.1
+	 */
+	public int getDistance(CtxAttribute attributeB, CtxAttribute attributeA);
+
+	/**
+	 * it returns the parent of the element in the taxonomy tree
+	 * 
+	 * @param attribute
+	 * @since 0.0.1
+	 */
+	public CtxAttribute getParent(CtxAttribute attribute);
+
+	/**
+	 * 
+	 * @param attribute
+	 * @since 0.0.1
+	 */
+	public CtxAttributeValueType getSemanticDescription(CtxAttribute attribute);
+
+	/**
+	 * It return an array of context attributes which are on the same level on the
+	 * specific tree leaf
+	 * 
+	 * @param attribute
+	 * @since 0.0.1
+	 */
+	public CtxAttribute[] getSiblings(CtxAttribute attribute);
+
+	/**
+	 * 
+	 * @param attrubute
+	 * @since 0.0.1
+	 */
+	public boolean isContextAttributeAvailable(CtxAttribute attrubute);
 
 }

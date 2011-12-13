@@ -22,8 +22,22 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.communityHistory.test;
+package org.societies.context.broker.test;
 
-public class CommunityContextHistoryManagementTest {
+public class CtxBrokerTest {
 
+	//Constructor
+	CtxBrokerTest(){
+		//TODO
+		
+	}
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		new CtxBrokerTest();
+	}
+	
+	
 }

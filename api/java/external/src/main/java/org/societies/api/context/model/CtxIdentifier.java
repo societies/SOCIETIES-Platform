@@ -29,19 +29,18 @@ import java.io.Serializable;
 import org.societies.api.mock.EntityIdentifier;
 
 /**
- * This abstract class is used to identify context model objects. It provides methods
- * that return information about the identified model object including:
+ * This abstract class is used to identify context model objects. It provides
+ * methods that return information about the identified model object including:
  * <ul>
  * <li><tt>OperatorId</tt>: A unique identifier of the CSS or CIS where the 
- * identified context model object is stored.
- * </li>
+ * identified context model object is stored.</li>
  * <li><tt>ModelType</tt>: Describes the type of the identified context model
  * object, i.e. is one of the following: {@link CtxModelType#ENTITY ENTITY},
  * {@link CtxModelType#ATTRIBUTE ATTRIBUTE}, or {@link CtxModelType#ASSOCIATION
  * ASSOCIATION}.</li>
  * <li><tt>Type</tt>: A semantic tag that characterises the identified context
  * model object. e.g. "person".</li>
- * <li><tt>ObjectNumber</tt>: A unique number within the device where the
+ * <li><tt>ObjectNumber</tt>: A unique number within the CSS/CIS where the
  * respective context information was initially sensed/collected and stored.</li>
  * </ul>
  * 
@@ -53,11 +52,29 @@ public abstract class CtxIdentifier implements Serializable {
 
 	private static final long serialVersionUID = 3552976823045895472L;
 	
-	private EntityIdentifier operatorId;
-	private String type;
-	private Long objectNumber;
+	private final EntityIdentifier operatorId;
+	private final String type;
+	private final Long objectNumber;
 
-	CtxIdentifier() {}
+	/**
+	 * Creates a context model object identifier by specifying the CSS/CIS ID
+	 * where the identified object is stored, as well as, the {@link CtxModelType}
+	 * and the unique numeric model object identifier.
+	 * 
+	 * @param operatorId
+	 *            the identifier of the CSS/CIS where the identified context
+	 *            model object is stored
+	 * @param type
+	 *            the semantic tag that characterises the identified context
+     *            model object. e.g. "person"
+	 * @param objectNumber
+	 *            the unique numeric model object identifier
+	 */
+	CtxIdentifier(EntityIdentifier operatorId, String type, Long objectNumber) {
+		this.operatorId = operatorId;
+		this.type = type;
+		this.objectNumber = objectNumber;
+	}
 
 	/**
 	 * Returns a unique identifier of the CSS or CIS where the identified
@@ -97,13 +114,32 @@ public abstract class CtxIdentifier implements Serializable {
 		return this.objectNumber;
 	}
 	
-	/*
-	 * TODO 
+	/**
+	 * Returns a URI formatted String representation of this context model
+	 * object identifier
+	 * 
+	 * @return a URI formatted String representation of this context model
+	 * object identifier
+	 */
+	public String toUriString() {
+		return this.toString();
+	}
+	
+	/**
 	 * Returns a String representation of this context model object identifier
 	 * 
 	 * @return a String representation of this context model object identifier
-	 *
+	 */
 	@Override
 	public String toString() {
-	}*/
+		StringBuilder result = new StringBuilder(); 
+		result.append(this.getOperatorId());
+		result.append("/");
+		result.append(this.getModelType());
+		result.append("/");
+		result.append(this.getType());
+		result.append("/");
+		result.append(this.getObjectNumber());
+		return result.toString();
+	}
 }

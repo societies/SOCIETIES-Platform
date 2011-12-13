@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske druï¿½be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÎ—Î“O, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -22,76 +22,65 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.api.internal.context.broker;
 
-package org.societies.context.user.db.api.platform;
-
-import java.util.List;
-
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxModelObject;
-
 
 /**
- * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * ICommunityCtxBroker interface allows to manage community context data. 
+ * 
+ * 
+ * @author nikosk
+ * @created 12-Nov-2011 7:15:14 PM
  */
-public interface IUserCtxDBMgrCallback {
+public interface ICommunityCtxBroker extends org.societies.api.context.broker.ICommunityCtxBroker {
 
-	
 	/**
-	 * The callback of IUserCtxDBMgr method
-	 * createEntity(String type, IUserCtxBrokerCallback callback) 
+	 * This method retrieves the CSS that is assigned with the community administration role.
+	 * @param community
+	 * @param callback
+	 * @since 0.0.1
+	 */
+	public void retrieveAdministratingCSS(CtxEntityIdentifier community, ICommunityCtxBrokerCallback callback);
+
+	/**
+	 * Retrieves the context attribute(s) that act as a bond for the community of
+	 * entities. The community is specified by the CtxEntityIdentifier.
 	 * 
-	 * @param ctxEntity
+	 * @param community
+	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void ctxEntityCreated(CtxEntity ctxEntity);
-	
-	
+	public void retrieveBonds(CtxEntityIdentifier community, ICommunityCtxBrokerCallback callback);
+
 	/**
-	 * The callback of IUserCtxDBMgr method
-	 * createEntity(String type, IUserCtxBrokerCallback callback) 
+	 * This applies for Community hierarchies. Retrieves the child communities
+	 * (subcommunities of CtxEntities) of the specified parent CtxEntity.
 	 * 
-	 * @param ctxEntity
+	 * @param community
+	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void ctxIndividualCtxEntityCreated(CtxEntity ctxEntity);
-	
+	public void retrieveChildCommunities(CtxEntityIdentifier community, ICommunityCtxBrokerCallback callback);
+
 	/**
-	 * The callback of IUserCtxDBMgr method
-	 * createAttribute(CtxEntityIdentifier scope, CtxAttributeValueType enumerate, String type, IUserCtxDBMgr callback)
+	 * Retrievies a list of Individual Context Entities that are members of the
+	 * specified community Entity.
 	 * 
-	 * @param ctxAttribute
+	 * @param community
+	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void ctxAttributeCreated(CtxAttribute ctxAttribute);
-	
+	public void retrieveCommunityMembers(CtxEntityIdentifier community, ICommunityCtxBrokerCallback callback);
+
 	/**
-	 * The callback of IUserCtxDBMgr method
-	 * update(CtxModelObject identifier, IUserCtxDBMgr callback)
+	 * This applies for Community hierarchies. Retrieves the parent communities
+	 * of the specified CtxEntity.
 	 * 
-	 * @param ctxModelObject
+	 * @param community
+	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void ctxModelObjectUpdated(CtxModelObject ctxModelObject);
-	
-	/**
-	 * The callback of IUserCtxDBMgr method
-	 * lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue, IUserCtxDBMgrCallback callback);
-	 *
-	 * @param list
-	 * @since 0.0.1
-	 */
-	public void ctxEntitiesLookedup(List<CtxEntityIdentifier> list);
-	
-	/**
-	 * The callback of IUserCtxDBMgr method
-	 * retrieve(CtxIdentifier identifier, IUserCtxDBMgrCallback callback);
-	 * 
-	 * @param ctxModelObject
-	 * @since 0.0.1
-	 */
-	public void ctxModelObjectRetrieved(CtxModelObject ctxModelObject);
+	public void retrieveParentCommunities(CtxEntityIdentifier community, ICommunityCtxBrokerCallback callback);
 
 }
