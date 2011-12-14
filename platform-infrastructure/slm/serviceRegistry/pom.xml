@@ -46,7 +46,6 @@
 			<version>4.10</version>
 			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
 
 	<build>
@@ -59,15 +58,15 @@
 					<instructions>
 						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<Export-Package>org.societies.api.internal.servicelifecycle.serviceRegistry.*</Export-Package>						
+						<Export-Package>org.societies.api.internal.servicelifecycle.serviceRegistry.*</Export-Package>
 						<Import-Package>*;resolution:=optional</Import-Package>
 						<Private-Package>
 							org.societies.internal.servicelifecycle.serviceRegistry.model.*,
 							org.societies.comm.xmpp.*,
 							org.societies.platform.servicelifecycle.serviceRegistry.*,
 							org.societies.comm.identity.*
-						</Private-Package>						
-						<_nouses>true</_nouses>						
+						</Private-Package>
+						<_nouses>true</_nouses>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -109,8 +108,5 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<!-- <repositories> <repository> <id>jboss</id> <url>https://repository.jboss.org/nexus/content/groups/public/</url> 
-		</repository> </repositories> -->
 
 </project>
