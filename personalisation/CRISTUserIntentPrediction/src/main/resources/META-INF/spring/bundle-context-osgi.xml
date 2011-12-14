@@ -16,6 +16,7 @@
 		</osgi:interfaces>
 	</osgi:service>
 
-
+	<bean name="CRISTUserIntentPrediction"
+		class="org.societies.personalisation.CRISTUserIntentPrediction.impl.CRISTUserIntentPrediction" />
 
 </beans>

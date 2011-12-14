@@ -2,7 +2,7 @@ package org.societies.personalisation.CRIST.api.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,10 +23,10 @@ public class CRISTUserSituation implements ICRISTUserSituation {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	LinkedHashMap<ICRISTUserAction,Double> situationActions;
+	HashMap<ICRISTUserAction,Double> situationActions;
 	Map<String, Serializable> situationContext;
 	String situationID;
-	LinkedHashMap<ICRISTUserTask,Double> situationTasks;
+	HashMap<ICRISTUserTask,Double> situationTasks;
 	public CRISTUserTask m_CRISTUserTask;
 
 
@@ -57,7 +57,7 @@ public class CRISTUserSituation implements ICRISTUserSituation {
 	 * 
 	 * @param userActions
 	 */
-	public void addActions(LinkedHashMap<ICRISTUserAction,Double> userActions){
+	public void addActions(HashMap<ICRISTUserAction,Double> userActions){
 
 	}
 
@@ -67,7 +67,7 @@ public class CRISTUserSituation implements ICRISTUserSituation {
 	 * 
 	 * @param userTasks
 	 */
-	public void addTasks(LinkedHashMap<ICRISTUserTask,Double> userTasks){
+	public void addTasks(HashMap<ICRISTUserTask,Double> userTasks){
 
 	}
 
@@ -76,8 +76,8 @@ public class CRISTUserSituation implements ICRISTUserSituation {
 	 * 
 	 * @return
 	 */
-	public LinkedHashMap<ICRISTUserAction,Double> getSituatioinActions(){
-		LinkedHashMap<ICRISTUserAction, Double> actionMap = new LinkedHashMap<ICRISTUserAction, Double>();
+	public HashMap<ICRISTUserAction,Double> getSituatioinActions(){
+		HashMap<ICRISTUserAction, Double> actionMap = new HashMap<ICRISTUserAction, Double>();
 		// TODO
 
 		return actionMap;
@@ -107,7 +107,7 @@ public class CRISTUserSituation implements ICRISTUserSituation {
 	 * 
 	 * @return
 	 */
-	public LinkedHashMap<ICRISTUserTask,Double> getSituationTasks(){
+	public HashMap<ICRISTUserTask,Double> getSituationTasks(){
 		return this.situationTasks;
 	}
 

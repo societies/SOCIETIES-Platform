@@ -3,9 +3,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<!-- change the artifactid to your project artifactid -->
+	<groupId>org.societies.context-management</groupId>
 	<artifactId>context_gui</artifactId>
 	<packaging>bundle</packaging>
-	<version>${release.version}</version>
+	<version>${version.cm}</version>
 	<developers>
 		<developer>
 			<name>Luca Lamorte</name>
@@ -17,7 +18,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
+		<relativePath>../../../parent/spring-osgi.xml</relativePath>
 		<version>0.1</version>
 	</parent>
 
@@ -31,14 +32,14 @@
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>	
+			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.societies.context-management</groupId>
-			<artifactId>css_contextBroker_impl</artifactId>
+			<artifactId>ContextBroker</artifactId>
 			<version>${version.cm}</version>
+			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>
@@ -52,10 +53,9 @@
 				<configuration>
 					<instructions>
 						<Bundle-Activator></Bundle-Activator>
-						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Dependency>scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<Import-Package></Import-Package>
-						<Export-Package></Export-Package>
+
 					</instructions>
 				</configuration>
 			</plugin>
@@ -63,22 +63,27 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
 			</plugin>
+
+
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<configuration>
 					<artifactItems>
 						<artifactItem>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>${project.artifactId}</artifactId>
-							<version>${release.version}</version>
-							<type>bundle</type>
+							<groupId>${groupId}</groupId>
+							<artifactId>${artifactId}</artifactId>
+							<version>${version.cm}</version>
+							<type>jar</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>
 			</plugin>
+
+
 		</plugins>
 	</build>
 </project>

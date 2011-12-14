@@ -2,7 +2,7 @@ package org.societies.personalisation.CRIST.api.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.societies.api.mock.ServiceResourceIdentifier;
@@ -31,7 +31,7 @@ public class CRISTCommunityAction extends Action implements
 	 * A list of situations and the corresponding probability related to the
 	 * CommunityIntentAction
 	 */
-	LinkedHashMap<ICRISTCommunitySituation, Double> communityActionSituations;
+	HashMap<ICRISTCommunitySituation, Double> communityActionSituations;
 	/**
 	 * The confidence level of the CommunityIntentAction
 	 */
@@ -65,7 +65,7 @@ public class CRISTCommunityAction extends Action implements
 	 * @param actionSituations
 	 */
 	public void addActionSituations(
-			LinkedHashMap<ICRISTCommunitySituation, Double> actionSituations) {
+			HashMap<ICRISTCommunitySituation, Double> actionSituations) {
 
 	}
 
@@ -93,7 +93,7 @@ public class CRISTCommunityAction extends Action implements
 	 * 
 	 * @return
 	 */
-	public LinkedHashMap<ICRISTCommunitySituation, Double> getActionSituations() {
+	public HashMap<ICRISTCommunitySituation, Double> getActionSituations() {
 		return this.communityActionSituations;
 	}
 

@@ -2,7 +2,7 @@ package org.societies.personalisation.CRIST.api.model;
 
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.societies.api.internal.personalisation.model.IOutcome;
@@ -15,7 +15,7 @@ public interface ICRISTCommunityTask extends IOutcome{
 	 * @param communityActions
 	 */
 	public void addActions(
-			LinkedHashMap<ICRISTCommunityAction, Double> communityActions);
+			HashMap<ICRISTCommunityAction, Double> communityActions);
 
 	/**
 	 * This method will link the given ICRISTCommunitySituation list to the
@@ -25,13 +25,13 @@ public interface ICRISTCommunityTask extends IOutcome{
 	 * @param taskSituations
 	 */
 	public void addSituations(
-			LinkedHashMap<ICRISTCommunitySituation, Double> taskSituations);
+			HashMap<ICRISTCommunitySituation, Double> taskSituations);
 	/**
 	 * This method will return the related actions of the current community task
 	 * 
 	 * @return
 	 */
-	public LinkedHashMap<ICRISTCommunityAction, Double> getActions();
+	public HashMap<ICRISTCommunityAction, Double> getActions();
 
 	/**
 	 * This method will return the related context information of the current
@@ -54,7 +54,7 @@ public interface ICRISTCommunityTask extends IOutcome{
 	 * 
 	 * @return
 	 */
-	public LinkedHashMap<ICRISTCommunitySituation, Double> getTaskSituations();
+	public HashMap<ICRISTCommunitySituation, Double> getTaskSituations();
 
 	/**
 	 * This method will set the related context information of the current

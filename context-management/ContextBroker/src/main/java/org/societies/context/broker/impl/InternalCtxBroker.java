@@ -52,10 +52,15 @@ import org.societies.api.internal.context.user.prediction.PredictionMethod;
 public class InternalCtxBroker extends CtxBroker implements IUserCtxBroker, ICommunityCtxBroker {
 
 	private IUserCtxDBMgr userDB;
-	
-	public InternalCtxBroker() {
+
+	public InternalCtxBroker(IUserCtxDBMgr userDB) {
+		this.userDB=userDB;
 	}
-	
+
+	public InternalCtxBroker() {
+
+	}
+
 	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) {
 		this.userDB = userDB;
 	}
@@ -65,7 +70,7 @@ public class InternalCtxBroker extends CtxBroker implements IUserCtxBroker, ICom
 			IUserCtxBrokerCallback brokerCallback) {
 		UserDBCallback callback = new UserDBCallback(brokerCallback);
 		userDB.createAttribute(scope, enumerate, type, callback);
-		
+
 	}
 
 	@Override
@@ -77,75 +82,75 @@ public class InternalCtxBroker extends CtxBroker implements IUserCtxBroker, ICom
 	@Override
 	public void createAssociation(String type, IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
-	
+
+
 	@Override
 	public void retrieveAdministratingCSS(CtxEntityIdentifier community,
 			ICommunityCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void retrieveBonds(CtxEntityIdentifier community,
 			ICommunityCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void retrieveChildCommunities(CtxEntityIdentifier community,
 			ICommunityCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void retrieveCommunityMembers(CtxEntityIdentifier community,
 			ICommunityCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void retrieveParentCommunities(CtxEntityIdentifier community,
 			ICommunityCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 
 	@Override
 	public void disableCtxMonitoring(CtxAttributeValueType type) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void disableCtxRecording() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void enableCtxMonitoring(CtxAttributeValueType type) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void enableCtxRecording() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void evaluateSimilarity(Serializable objectUnderComparison,
 			List<Serializable> referenceObjects, IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -165,7 +170,7 @@ public class InternalCtxBroker extends CtxBroker implements IUserCtxBroker, ICom
 	public void lookup(CtxModelType modelType, String type,
 			IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -173,27 +178,27 @@ public class InternalCtxBroker extends CtxBroker implements IUserCtxBroker, ICom
 			Serializable minAttribValue, Serializable maxAttribValue,
 			IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void registerForUpdates(CtxEntityIdentifier scope, String attrType,
 			IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void registerForUpdates(CtxAttributeIdentifier attrId,
 			IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void remove(CtxIdentifier identifier, IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -205,112 +210,113 @@ public class InternalCtxBroker extends CtxBroker implements IUserCtxBroker, ICom
 	@Override
 	public void removePredictionMethod(PredictionMethod predMethod) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void retrieve(CtxIdentifier identifier, IUserCtxBrokerCallback brokerCallback) {
 		UserDBCallback callback = new UserDBCallback(brokerCallback);
 		userDB.retrieve(identifier, callback);
-		
+
 	}
 
 	@Override
 	public void retrieveFuture(CtxAttributeIdentifier attrId, Date date,
 			IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void retrieveFuture(CtxAttributeIdentifier attrId,
 			int modificationIndex, IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void retrievePast(CtxAttributeIdentifier attrId,
 			int modificationIndex, IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void retrievePast(CtxAttributeIdentifier attrId, Date startDate,
 			Date endDate, IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void setDefaultPredictionMethod(PredictionMethod predMethod) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void setPredictionMethod(PredictionMethod predMethod,
 			IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void unregisterForUpdates(CtxAttributeIdentifier attrId,
 			IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void unregisterForUpdates(CtxEntityIdentifier scope,
 			String attributeType, IUserCtxBrokerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void update(CtxModelObject identifier,
-			IUserCtxBrokerCallback callback) {
-		// TODO Auto-generated method stub
-		
+			IUserCtxBrokerCallback brokerCallback) {
+		UserDBCallback callback = new UserDBCallback(brokerCallback);
+		userDB.update(identifier, callback);
+
 	}
 
 
 	private class UserDBCallback implements IUserCtxDBMgrCallback {
 
-	    private IUserCtxBrokerCallback brokerCallback;
-	
-	    UserDBCallback(IUserCtxBrokerCallback brokerCallback) {
-	       this.brokerCallback = brokerCallback;
-	    } 
+		private IUserCtxBrokerCallback brokerCallback;
 
-	    public void ctxEntityCreated(CtxEntity ctxEntity) {
-	       this.brokerCallback.ctxEntityCreated(ctxEntity);
-	    }
-		
-	    public void ctxIndividualCtxEntityCreated(CtxEntity ctxEntity) {
-	    	this.brokerCallback.ctxIndividualCtxEntityCreated(ctxEntity);
-	    }
-		  
-	    public void ctxAttributeCreated(CtxAttribute ctxAttribute) {
-	    	this.brokerCallback.ctxAttributeCreated(ctxAttribute);
-	    	//System.out.println("Broker callback : Ctx Attribute Created: " + ctxAttribute.getId());
-	    }
-		  
-	    public void ctxModelObjectUpdated(CtxModelObject ctxModelObject) {
-	    	this.brokerCallback.ctxModelObjectUpdated(ctxModelObject);
-	    }
-		  
-	    public void ctxEntitiesLookedup(List<CtxEntityIdentifier> list) {
-	    	this.brokerCallback.ctxEntitiesLookedup(list);
-	    }
-		  
-	    public void ctxModelObjectRetrieved(CtxModelObject ctxModelObject) {
-	    	this.brokerCallback.ctxModelObjectRetrieved(ctxModelObject);
-	    }
-		
+		UserDBCallback(IUserCtxBrokerCallback brokerCallback) {
+			this.brokerCallback = brokerCallback;
+		} 
+
+		public void ctxEntityCreated(CtxEntity ctxEntity) {
+			this.brokerCallback.ctxEntityCreated(ctxEntity);
+		}
+
+		public void ctxIndividualCtxEntityCreated(CtxEntity ctxEntity) {
+			this.brokerCallback.ctxIndividualCtxEntityCreated(ctxEntity);
+		}
+
+		public void ctxAttributeCreated(CtxAttribute ctxAttribute) {
+			this.brokerCallback.ctxAttributeCreated(ctxAttribute);
+			//System.out.println("Broker callback : Ctx Attribute Created: " + ctxAttribute.getId());
+		}
+
+		public void ctxModelObjectUpdated(CtxModelObject ctxModelObject) {
+			this.brokerCallback.ctxModelObjectUpdated(ctxModelObject);
+		}
+
+		public void ctxEntitiesLookedup(List<CtxEntityIdentifier> list) {
+			this.brokerCallback.ctxEntitiesLookedup(list);
+		}
+
+		public void ctxModelObjectRetrieved(CtxModelObject ctxModelObject) {
+			this.brokerCallback.ctxModelObjectRetrieved(ctxModelObject);
+		}
+
 	}
 
 
