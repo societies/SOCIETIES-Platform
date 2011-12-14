@@ -17,8 +17,5 @@
         <value>org.societies.api.useragent.monitoring.IUserActionMonitor</value>
         </osgi:interfaces>
         </osgi:service>
-        
-        <bean name="UserActionMonitor" class="org.societies.useragent.monitoring.UserActionMonitor" />
-
 
 </beans>
