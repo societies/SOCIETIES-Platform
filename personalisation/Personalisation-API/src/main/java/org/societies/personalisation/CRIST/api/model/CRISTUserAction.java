@@ -117,8 +117,8 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 * 
 	 * @param actionSituations
 	 */
-	public void setActionSituations(
-			LinkedHashMap<ICRISTUserSituation, Double> actionSituations) {
+	public void setActionSituations1(
+			HashMap<ICRISTUserSituation, Double> actionSituations) {
 		this.actionSituations = actionSituations;
 	}
 

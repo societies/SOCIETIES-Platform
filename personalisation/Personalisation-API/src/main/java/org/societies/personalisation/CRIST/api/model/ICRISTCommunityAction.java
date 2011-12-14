@@ -1,7 +1,7 @@
 package org.societies.personalisation.CRIST.api.model;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.societies.api.internal.personalisation.model.IOutcome;
@@ -14,7 +14,7 @@ public interface ICRISTCommunityAction extends IOutcome{
 	 */
 	public String getActionID();
 
-	public LinkedHashMap<ICRISTCommunitySituation, Double> getActionSituations();
+	public HashMap<ICRISTCommunitySituation, Double> getActionSituations();
 
 	public int getConfidenceLevel();
 
