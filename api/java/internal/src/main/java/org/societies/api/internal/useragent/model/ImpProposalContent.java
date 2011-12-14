@@ -23,21 +23,23 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.useragent.feedback;
+package org.societies.api.internal.useragent.model;
 
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ExpProposalType;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalType;
-
-/**
- * 
- * @author S.Gallacher@hw.ac.uk
- *
- */
-public interface IUserFeedback
-{
-	public boolean getExplicitFB(ExpProposalType type, ExpProposalContent content);
+public class ImpProposalContent {
 	
-	public boolean getImplicitFB(ImpProposalType type, ImpProposalContent content);
+	private String proposalText;
+	private int timeout;
+
+	public ImpProposalContent(String proposalText, int timeout){
+		this.proposalText = proposalText;
+		this.timeout = timeout;
+	}
+	
+	public String getProposalText(){
+		return this.proposalText;
+	}
+	
+	public int getTimeout(){
+		return this.timeout;
+	}
 }
