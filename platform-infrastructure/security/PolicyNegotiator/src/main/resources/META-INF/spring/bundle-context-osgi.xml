@@ -10,5 +10,6 @@
        in a separate file if you do not want to. The rationale for 
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
-<osgi:service ref="Sign" interface="org.societies.api.security.sign.ISign"/>
+<osgi:service ref="NegotionProvider" interface="org.societies.api.internal.security.policynegotiator.INegotiationProvider"/>
+<osgi:service ref="NegotionRequester" interface="org.societies.api.internal.security.policynegotiator.INegotiationRequester"/>
 </beans>

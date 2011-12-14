@@ -17,8 +17,5 @@
         <value>org.societies.api.useragent.feedback.IUserFeedback</value>
         </osgi:interfaces>
         </osgi:service>
-        
-        <bean name="UserFeedback" class="org.societies.useragent.feedback.UserFeedback" />
-
 
 </beans>
