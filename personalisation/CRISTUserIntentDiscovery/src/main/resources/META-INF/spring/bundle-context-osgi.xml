@@ -10,10 +10,9 @@
 		is to facilitate integration testing of the bundle outside of an OSGi container -->
 
 
-	<osgi:service ref="CRISTUserIntentDiscovery">
+	<osgi:service ref="CRISTUserIntentDiscoverer">
 		<osgi:interfaces>
 			<value>org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.ICRISTUserIntentDiscovery</value>
 		</osgi:interfaces>
 	</osgi:service>
-
 </beans>
