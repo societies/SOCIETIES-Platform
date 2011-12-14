@@ -12,9 +12,9 @@
        testing of the bundle outside of an OSGi container -->
        
         
-        <osgi:service ref="UserActionMonitor">
+        <osgi:service ref="ResourceSharing">
         <osgi:interfaces>
-        <value>org.societies.api.useragent.monitoring.IUserActionMonitor</value>
+        <value>org.societies.api.useragent.resourcesharing.IResourceSharing</value>
         </osgi:interfaces>
         </osgi:service>
 

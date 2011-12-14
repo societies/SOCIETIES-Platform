@@ -8,7 +8,7 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-  <bean id="UserActionMonitor" class="org.societies.useragent.monitoring.UserActionMonitor" />
+  <bean id="ResourceSharing" class="org.societies.useragent.resourcesharing.ResourceSharing" />
 
 </beans>
 
