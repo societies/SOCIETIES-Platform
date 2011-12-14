@@ -51,7 +51,7 @@
 						<Embed-Transitive>true</Embed-Transitive>
 						<Import-Package>*;resolution:=optional</Import-Package>
 						<Export-Package>
-							org.societies.api.security.sign.**
+							org.societies.api.security.sign.*
 						</Export-Package>
 						<!-- Private-Package>
 							org.societies.security.sign.*,
