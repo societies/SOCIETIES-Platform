@@ -35,7 +35,6 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.societies.personalisation</groupId>
 			<artifactId>personalisation_api</artifactId>
