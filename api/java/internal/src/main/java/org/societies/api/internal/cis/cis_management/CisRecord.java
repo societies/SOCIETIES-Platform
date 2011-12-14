@@ -23,17 +23,25 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.monitoring;
+/**
+ * Stores meta data relevant for a CIS.
+ * 
+ * @author Babak Farshchian
+ * @version 0
+ */
+package org.societies.api.internal.cis.cis_management;
 
-import org.societies.api.personalisation.model.IAction;
-import org.societies.api.useragent.monitoring.IUserActionMonitor;
-
-public class UserActionMonitor implements IUserActionMonitor{
-
-	@Override
-	public void monitor(String userId, IAction action) {
-		// TODO Auto-generated method stub
-		
-	}
+public class CisRecord {
+	public CisActivityFeed feed;
+	public String ownerCss;
+	public String membershipCriteria;
+	/**
+	 * permaLink is a permanent URL to this CIS. A type of CIS homepage.
+	 */
+	public String permaLink;
+	public String[] membersCss;
+	private String password = "none";
+	public ServiceSharingRecord[] sharedServices;
+	
 
 }

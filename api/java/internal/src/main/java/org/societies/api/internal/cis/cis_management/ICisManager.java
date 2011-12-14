@@ -29,7 +29,7 @@
  * @author Babak Farshchian
  * @version 0
  */
-package org.societies.api.internal.cis-modules.cis-management;
+package org.societies.api.internal.cis.cis_management;
 
 public interface ICisManager {
 	//

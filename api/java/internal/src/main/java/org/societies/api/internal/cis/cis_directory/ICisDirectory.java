@@ -23,58 +23,49 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.css-modules.css-directory;
-
-import java.util.Collection;
-
 /**
- * @author Perumal Kuppuudaiyar
+ * Main responsibilities of this interface:
+ * - Register and unregister CISs in form of CISAdvertisementRecords. (Note that CIS metadata
+ * is not stored here. this is only yellow pages).
+ * 
+ * 
+ * @author Babak Farshchian
+ * @version 0
+ * 
  */
-public interface ICssDirectory {
 
-	/**
-	 * Description: This method provide interface to add new CSS object to CSS
-	 * directory
+package org.societies.api.internal.cis.cis_directory;
+
+
+public interface ICisDirectory {
+	/*
+	 * Various search methods that return an array of CISAdvertisementRecords.
+	 */
+	CisAdvertisementRecord[] searchByName(String cisName);
+	CisAdvertisementRecord[] searchByOwner(String ownerId);
+	CisAdvertisementRecord[] searchByUri(String uri);
+	
+	Boolean RegisterCis (CisAdvertisementRecord cis);
+	Boolean UnregisterCis (CisAdvertisementRecord cis);
+	/*
+	 * This method is used to add CIS Directories that reside on other nodes.
 	 * 
-	 * @param css object to be added to directory
-	 */
-	void addCss(Object css);
-
-	/**
-	 * Description: This method allows to delete specific CSS entry from CSS
-	 * Directory
+	 * @param directoryURI URI for the directory to be added.
+	 * @param cssId ID for the CSS where the new directory resides.
+	 * @param synchMode One of several modes for synchronizing with the new directory. E.g. pull or push.
 	 * 
-	 * @param css object to be deleted from directory
 	 */
-	void deleteCss(Object css);
-
-	/**
-	 * Description : This method can be used to update the changes in the CSS
-	 * which is already exists in the CSS directory
-	 * 
-	 * @param css to be updated or replaced
-	 * @param update new css object to be placed in the directory
+	Integer AddPeerDirectory(String directoryURI, String cssId, Integer synchMode);
+	
+	/*
+	 * Ping method for checking whether this Directory is alive.
 	 */
-	void updateCss(Object css, Object update);
-
-	/**
-	 * Description : Queries list of CSS available in the CSS directory
-	 * @return collection of CSS objects from CSS directory
+	Boolean ping();
+	/*
+	 * A method that will return the current URI for this Directory. This URI might be fetched
+	 * from XMPP name-space or be a web service.
 	 */
-	Collection<Object> findForAllCss();
-
-	/**
-	 * Description : Queries list of CSS object with CIS group filter 
-	 * @param cisgroup for which list of CSS will retrieved from directory  
-	 * @return collection of CSS object
-	 */
-	Collection<Object> findForAllCss(Object cisgroup);
-
-	/**
-	 * Descripption : Search for specific CSS in the directory
-	 * @param searchinfo searching object or criteria
-	 * @return a CSS object if available or null
-	 */
-	Object findCss(Object searchinfo);
+	
+	public String getURI();
 
 }

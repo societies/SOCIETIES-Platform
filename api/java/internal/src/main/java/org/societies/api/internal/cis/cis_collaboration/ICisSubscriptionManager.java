@@ -23,29 +23,23 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.feedback;
+/**
+ * This interface has the following responsibilities:
+ * - Allow for management of CIS Subscription Records
+ * 
+ * @author Babak Farshchian
+ * @version 0
+ * 
+ */
 
-import org.societies.api.internal.useragent.feedback.IUserFeedback;
-import org.societies.api.internal.useragent.model.IProposal;
+package org.societies.api.internal.cis.cis_collaboration;
 
-public class UserFeedback implements IUserFeedback{
 
-	@Override
-	public boolean getExplicitFB(IProposal proposal) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+public interface ICisSubscriptionManager {
+	Boolean addSubscriptionRecord(CisSubscriptionRecord record);
+	Boolean updateSubscriptionRecord(CisSubscriptionRecord record);
+	Boolean deleteSubscriptionRecord(CisSubscriptionRecord record);
+	CisSubscriptionRecord getSubscriptionRecord(String cssId, String cisId);
+	CisSubscriptionRecord[] getSubscriptionRecords(String cssId);
 
-	@Override
-	public boolean getImplicitFB(IProposal proposal) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean notify(IProposal proposal) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
 }

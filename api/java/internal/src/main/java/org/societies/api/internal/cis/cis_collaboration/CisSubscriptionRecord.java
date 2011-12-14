@@ -31,7 +31,7 @@
  * 
  */
 
-package org.societies.api.internal.cis-modules.cis-collaboration;
+package org.societies.api.internal.cis.cis_collaboration;
 
 public class CisSubscriptionRecord {
 	private String cssId, cisId, subscriptionMode;
