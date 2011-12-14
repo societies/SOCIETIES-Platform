@@ -39,6 +39,7 @@
 			<groupId>org.societies.context-management</groupId>
 			<artifactId>css_contextBroker_impl</artifactId>
 			<version>${version.cm}</version>
+			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>
