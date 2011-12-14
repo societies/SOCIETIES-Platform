@@ -28,15 +28,10 @@ package org.societies.useragent.decisionmaking;
 import java.util.List;
 
 import org.societies.api.internal.personalisation.model.IOutcome;
+import org.societies.api.internal.useragent.conflict.IConflictResolutionManager;
 import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
+import org.societies.api.personalisation.model.IAction;
 
-/**
- * 
- * Describe your class here...
- *
- * @author Haoyi
- *
- */
 public class DecisionMaker implements IDecisionMaker{
 
 	@Override
@@ -44,5 +39,8 @@ public class DecisionMaker implements IDecisionMaker{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
+
 	
 }
