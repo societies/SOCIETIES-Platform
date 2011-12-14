@@ -36,11 +36,13 @@
 	<groupId>org.societies.api.external</groupId>
 	<artifactId>societies-api</artifactId>
 	<version>${release.version}</version>
+	<scope>provided</scope>
 	</dependency>
 	<dependency>
 	<groupId>org.societies.api.internal</groupId>
 	<artifactId>societies-api-internal</artifactId>
 	<version>${release.version}</version>
+	<scope>provided</scope>
 	</dependency>
 	</dependencies>
 
@@ -55,7 +57,7 @@
 				<configuration>
 					<instructions>						
 						<!-- the API will export all interfaces packages for the rest of modules -->
-
+						<Export-Package>org.societies.personalisation.**</Export-Package>
 					</instructions>
 				</configuration>
 		
