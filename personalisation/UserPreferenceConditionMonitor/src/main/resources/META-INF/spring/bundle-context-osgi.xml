@@ -12,21 +12,16 @@
        testing of the bundle outside of an OSGi container -->
        
         
-        <osgi:service ref="PersonalisationManager">
+        <osgi:service ref="UserPreferenceConditionMonitor">
         <osgi:interfaces>
-        <value>org.societies.api.personalisation.mgmt.IPersonalisationManager</value>
-        <value>org.societies.personalisation.common.api.management.IInternalPersonalisationManager</value>
+        <value>org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor</value>
         </osgi:interfaces>
         </osgi:service>
         
-		
-		
-		<osgi:reference id="UserPrefMgr" interface="org.societies.personalisation.preference.api.UserPreferenceManagement.IUserPreferenceManagement"/>
-		
-		
-		
-		
-		
-		<!--  <osgi:reference id="upcm" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/> -->
-		
+
+        <osgi:reference id="UserPreferenceManagement">
+        <osgi:interfaces>
+        <value>org.societies.personalisation.preference.api.UserPreferenceManagement.IUserPreferenceManagement</value>
+        </osgi:interfaces>
+        </osgi:reference>
 </beans>

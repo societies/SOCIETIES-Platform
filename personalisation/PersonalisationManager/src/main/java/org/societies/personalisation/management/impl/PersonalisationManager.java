@@ -21,6 +21,7 @@ package org.societies.personalisation.management.impl;
 
 import javax.swing.JOptionPane;
 
+
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxModelObject;
@@ -34,42 +35,65 @@ import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+import org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor;
 import org.societies.personalisation.preference.api.UserPreferenceManagement.IUserPreferenceManagement;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
-
 
 
 public class PersonalisationManager implements IPersonalisationManager, IInternalPersonalisationManager{
 
 	//IUserCtxBroker broker;
 
-	private IUserPreferenceManagement upm;
+	private IUserPreferenceManagement prefMgr;
+	//private IUserPreferenceConditionMonitor upcm;
+	
 	
 	public PersonalisationManager(){
 		System.out.println("HELLO! I'm a brand new service and my interface is: "+this.getClass().getName());
 
 	}
 	
-	
-	public PersonalisationManager(/*IUserCtxBroker broker, */IUserPreferenceManagement upm){
-		this.upm = upm;
+	public PersonalisationManager(/*IUserCtxBroker broker, IUserPreferenceConditionMonitor upcm, */ IUserPreferenceManagement upm){
+		this.prefMgr = upm;
 		//this.setUserPreferenceManagement(upm);
+		//this.upcm = upcm;
+		
+		/*if (this.upcm==null){
+			System.out.println("PCM is null");
+		}else{
+			System.out.println("PCM is NOT null");
+		}*/
+		if (this.prefMgr==null){
+			System.out.println("UPM is null");
+		}else{
+			System.out.println("UPM is NOT null");
+		}
+		
 		
 		System.out.println("HELLO! I'm a brand new service and my interface is: "+this.getClass().getName());
 		IAction a = upm.getPreference(null, null, null, null);
-		JOptionPane.showMessageDialog(null, "Got preference outcome! : "+a.getparameterName()+" "+a.getvalue());
+		if (a==null){
+			System.out.println("Didn't get a preference outcome");
+		}else{
+			System.out.println("Got preference outcome! : "+a.getparameterName()+" "+a.getvalue());
+		}
+		
 		
 		//this.broker = broker;
 		
-	}
-/*	public IUserPreferenceManagement getUserPreferenceManagement() {
-		return upm;
+	} 
+	
+	
+	public IUserPreferenceManagement getPrefMgr() {
+		System.out.println("GOT UPM");
+		return prefMgr;
 	}
 
 
-	public void setUserPreferenceManagement(IUserPreferenceManagement upm) {
-		this.upm = upm;
-	}*/
+	public void setPrefMgr(IUserPreferenceManagement upm) {
+		System.out.println("GOT PCM");
+		this.prefMgr = upm;
+	}
 
 
 	@Override
