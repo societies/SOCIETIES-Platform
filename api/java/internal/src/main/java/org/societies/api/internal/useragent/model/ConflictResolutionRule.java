@@ -25,13 +25,13 @@
 
 package org.societies.api.internal.useragent.model;
 
-import org.societies.api.personalisation.model.IAction;
+import org.societies.api.internal.personalisation.model.IOutcome;
 
 public interface ConflictResolutionRule {
 /*data type of conflict resolution rule
  * not yet understand the structure of such type*/
-	public boolean match(IAction intention,
-				IAction preference);
-	public IAction tradeoff(IAction intention,
-			IAction preference);
+	public boolean match(IOutcome intention,
+				IOutcome preference);
+	public IOutcome tradeoff(IOutcome intention,
+			IOutcome preference);
 }
