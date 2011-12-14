@@ -2,7 +2,7 @@ package org.societies.personalisation.CRIST.api.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,10 +24,10 @@ public class CRISTCommunityTask implements ICRISTCommunityTask {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	LinkedHashMap<ICRISTCommunityAction, Double> communityActions;
+	HashMap<ICRISTCommunityAction, Double> communityActions;
 	Map<String, Serializable> communityTaskContext;
 	String communityTaskID;
-	LinkedHashMap<ICRISTCommunitySituation, Double> communityTaskSituations;
+	HashMap<ICRISTCommunitySituation, Double> communityTaskSituations;
 
 	public void finalize() throws Throwable {
 
@@ -57,8 +57,8 @@ public class CRISTCommunityTask implements ICRISTCommunityTask {
 	 * @param taskSituations
 	 */
 	public CRISTCommunityTask(String taskID,
-			LinkedHashMap<ICRISTCommunityAction, Double> communityActions,
-			LinkedHashMap<ICRISTCommunitySituation, Double> taskSituations) {
+			HashMap<ICRISTCommunityAction, Double> communityActions,
+			HashMap<ICRISTCommunitySituation, Double> taskSituations) {
 
 	}
 
@@ -69,7 +69,7 @@ public class CRISTCommunityTask implements ICRISTCommunityTask {
 	 * @param communityActions
 	 */
 	public void addActions(
-			LinkedHashMap<ICRISTCommunityAction, Double> communityActions) {
+			HashMap<ICRISTCommunityAction, Double> communityActions) {
 
 	}
 
@@ -81,7 +81,7 @@ public class CRISTCommunityTask implements ICRISTCommunityTask {
 	 * @param taskSituations
 	 */
 	public void addSituations(
-			LinkedHashMap<ICRISTCommunitySituation, Double> taskSituations) {
+			HashMap<ICRISTCommunitySituation, Double> taskSituations) {
 
 	}
 
@@ -90,7 +90,7 @@ public class CRISTCommunityTask implements ICRISTCommunityTask {
 	 * 
 	 * @return
 	 */
-	public LinkedHashMap<ICRISTCommunityAction, Double> getActions() {
+	public HashMap<ICRISTCommunityAction, Double> getActions() {
 		return this.communityActions;
 	}
 
@@ -119,7 +119,7 @@ public class CRISTCommunityTask implements ICRISTCommunityTask {
 	 * 
 	 * @return
 	 */
-	public LinkedHashMap<ICRISTCommunitySituation, Double> getTaskSituations() {
+	public HashMap<ICRISTCommunitySituation, Double> getTaskSituations() {
 		return this.communityTaskSituations;
 	}
 

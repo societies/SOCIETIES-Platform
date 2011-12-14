@@ -1,7 +1,7 @@
 package org.societies.personalisation.CRIST.api.model;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.societies.api.internal.personalisation.model.IOutcome;
@@ -13,7 +13,7 @@ public interface ICRISTUserSituation extends IOutcome{
 	 * 
 	 * @param userActions
 	 */
-	public void addActions(LinkedHashMap<ICRISTUserAction,Double> userActions);
+	public void addActions(HashMap<ICRISTUserAction,Double> userActions);
 
 	/**
 	 * This method will link the given ICRISTUserTask list to the current situation
@@ -21,14 +21,14 @@ public interface ICRISTUserSituation extends IOutcome{
 	 * 
 	 * @param userTasks
 	 */
-	public void addTasks(LinkedHashMap<ICRISTUserTask,Double> userTasks);
+	public void addTasks(HashMap<ICRISTUserTask,Double> userTasks);
 
 	/**
 	 * This method will return the related actions of the current situation
 	 * 
 	 * @return
 	 */
-	public LinkedHashMap<ICRISTUserAction,Double> getSituatioinActions();
+	public HashMap<ICRISTUserAction,Double> getSituatioinActions();
 
 	/**
 	 * This method will return the related context information of the current
@@ -50,7 +50,7 @@ public interface ICRISTUserSituation extends IOutcome{
 	 * 
 	 * @return
 	 */
-	public LinkedHashMap<ICRISTUserTask,Double> getSituationTasks();
+	public HashMap<ICRISTUserTask,Double> getSituationTasks();
 
 	/**
 	 * This method will assign the current situation context with the given situationContext  

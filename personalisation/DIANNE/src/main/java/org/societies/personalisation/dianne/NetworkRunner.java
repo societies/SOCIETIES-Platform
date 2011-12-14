@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -17,20 +22,21 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.DIANNE.impl;
+
+package org.societies.personalisation.dianne;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.societies.personalisation.DIANNE.impl.model.ContextNode;
-import org.societies.personalisation.DIANNE.impl.model.Network;
-import org.societies.personalisation.DIANNE.impl.model.ContextGroup;
-import org.societies.personalisation.DIANNE.impl.model.Node;
-import org.societies.personalisation.DIANNE.impl.model.OutcomeGroup;
-import org.societies.personalisation.DIANNE.impl.model.OutcomeNode;
-import org.societies.personalisation.DIANNE.impl.model.Synapse;
-import org.societies.personalisation.common.api.model.IAction;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import org.societies.personalisation.dianne.model.ContextNode;
+import org.societies.personalisation.dianne.model.Network;
+import org.societies.personalisation.dianne.model.ContextGroup;
+import org.societies.personalisation.dianne.model.Node;
+import org.societies.personalisation.dianne.model.OutcomeGroup;
+import org.societies.personalisation.dianne.model.OutcomeNode;
+import org.societies.personalisation.dianne.model.Synapse;
+import org.societies.api.personalisation.model.IAction;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
 public class NetworkRunner implements Runnable{
 
