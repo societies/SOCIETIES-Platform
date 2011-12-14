@@ -19,8 +19,12 @@
  */
 package org.societies.personalisation.management.impl;
 
+import javax.swing.JOptionPane;
+
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxModelObject;
+//import org.societies.api.internal.context.broker.IUserCtxBroker;
 import org.societies.api.internal.personalisation.model.IFeedbackEvent;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
@@ -30,17 +34,44 @@ import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+import org.societies.personalisation.preference.api.UserPreferenceManagement.IUserPreferenceManagement;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
+
+
 public class PersonalisationManager implements IPersonalisationManager, IInternalPersonalisationManager{
 
-	@Autowired
+	//IUserCtxBroker broker;
+
+	private IUserPreferenceManagement upm;
+	
 	public PersonalisationManager(){
 		System.out.println("HELLO! I'm a brand new service and my interface is: "+this.getClass().getName());
+
 	}
+	
+	
+	public PersonalisationManager(/*IUserCtxBroker broker, */IUserPreferenceManagement upm){
+		this.upm = upm;
+		//this.setUserPreferenceManagement(upm);
+		
+		System.out.println("HELLO! I'm a brand new service and my interface is: "+this.getClass().getName());
+		IAction a = upm.getPreference(null, null, null, null);
+		JOptionPane.showMessageDialog(null, "Got preference outcome! : "+a.getparameterName()+" "+a.getvalue());
+		
+		//this.broker = broker;
+		
+	}
+/*	public IUserPreferenceManagement getUserPreferenceManagement() {
+		return upm;
+	}
+
+
+	public void setUserPreferenceManagement(IUserPreferenceManagement upm) {
+		this.upm = upm;
+	}*/
+
+
 	@Override
 	public IAction getIntentAction(EntityIdentifier arg0,
 			EntityIdentifier arg1, ServiceResourceIdentifier arg2, String arg3) {
@@ -77,10 +108,10 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 	}
 
 	@Override
-	public void registerForContextUpdate(String arg0,
-			CtxAttributeIdentifier arg1) {
-		// TODO Auto-generated method stub
+	public void registerForContextUpdate(EntityIdentifier identifier, String className,
+			CtxAttributeIdentifier attrId) {
 		
+		//this.broker.registerForUpdates(attrId.getScope(), attrId.getType(), new ContextEventCallback(this));
 	}
 
 	@Override
@@ -118,9 +149,14 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 	}
 
 	@Override
-	public void updateReceived(CtxModelObject arg0) {
-		// TODO Auto-generated method stub
+	public void updateReceived(CtxModelObject obj) {
+		//check who to send it to
+		CtxAttribute attribute = (CtxAttribute) obj;
+		System.out.println("Received context event\n");
+		System.out.println("Attribute type: "+attribute.getType());
+		System.out.println("Attribute value: "+attribute.getStringValue());
 		
 	}
+
 
 }

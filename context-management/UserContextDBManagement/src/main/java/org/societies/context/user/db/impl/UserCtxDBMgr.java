@@ -40,17 +40,17 @@ import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
 import org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback;
 import org.societies.api.mock.EntityIdentifier;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class UserCtxDBMgr implements IUserCtxDBMgr{
 
 	private final Map<CtxIdentifier, CtxModelObject> modelObjects;
 
 	private final EntityIdentifier privateId;
 
-	@Autowired
+//	@Autowired
 	public UserCtxDBMgr() {
 		this.modelObjects =  new HashMap<CtxIdentifier, CtxModelObject>();
 		this.privateId = new EntityIdentifier();
