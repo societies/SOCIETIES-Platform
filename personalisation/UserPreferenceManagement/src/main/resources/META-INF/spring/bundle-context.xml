@@ -8,7 +8,7 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-  <bean id="PersonalisationManager" class="org.societies.personalisation.management.impl.PersonalisationManager" >
-  </bean>
+  <bean name="UserPreferenceManager" class="org.societies.personalisation.UserPreferenceManagement.impl.UserPreferenceManagement" />
+
 
 </beans>

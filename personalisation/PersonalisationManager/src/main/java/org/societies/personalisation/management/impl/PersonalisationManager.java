@@ -19,6 +19,8 @@
  */
 package org.societies.personalisation.management.impl;
 
+import javax.swing.JOptionPane;
+
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxModelObject;
@@ -32,6 +34,7 @@ import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+import org.societies.personalisation.preference.api.UserPreferenceManagement.IUserPreferenceManagement;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 
 
@@ -40,11 +43,35 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 
 	//IUserCtxBroker broker;
 
-	public PersonalisationManager(/*IUserCtxBroker broker*/){
+	private IUserPreferenceManagement upm;
+	
+	public PersonalisationManager(){
 		System.out.println("HELLO! I'm a brand new service and my interface is: "+this.getClass().getName());
+
+	}
+	
+	
+	public PersonalisationManager(/*IUserCtxBroker broker, */IUserPreferenceManagement upm){
+		this.upm = upm;
+		//this.setUserPreferenceManagement(upm);
+		
+		System.out.println("HELLO! I'm a brand new service and my interface is: "+this.getClass().getName());
+		IAction a = upm.getPreference(null, null, null, null);
+		JOptionPane.showMessageDialog(null, "Got preference outcome! : "+a.getparameterName()+" "+a.getvalue());
+		
 		//this.broker = broker;
 		
 	}
+/*	public IUserPreferenceManagement getUserPreferenceManagement() {
+		return upm;
+	}
+
+
+	public void setUserPreferenceManagement(IUserPreferenceManagement upm) {
+		this.upm = upm;
+	}*/
+
+
 	@Override
 	public IAction getIntentAction(EntityIdentifier arg0,
 			EntityIdentifier arg1, ServiceResourceIdentifier arg2, String arg3) {

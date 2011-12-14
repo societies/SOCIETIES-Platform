@@ -12,17 +12,12 @@
        testing of the bundle outside of an OSGi container -->
        
         
-        <osgi:service ref="PersonalisationManager">
-        <osgi:interfaces>
-        <value>org.societies.api.personalisation.mgmt.IPersonalisationManager</value>
-        <value>org.societies.personalisation.common.api.management.IInternalPersonalisationManager</value>
-        </osgi:interfaces>
-        </osgi:service>
-        
-        <osgi:reference id="UserPreferenceManagement">
+        <osgi:service ref="UserPreferenceManager">
         <osgi:interfaces>
         <value>org.societies.personalisation.preference.api.UserPreferenceManagement.IUserPreferenceManagement</value>
         </osgi:interfaces>
-        </osgi:reference>
+        </osgi:service>
+        
+
 
 </beans>
