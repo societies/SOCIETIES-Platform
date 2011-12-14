@@ -25,14 +25,14 @@
 
 package org.societies.api.internal.useragent.conflict;
 
-import org.societies.api.personalisation.model.*;
+import org.societies.api.internal.personalisation.model.IOutcome;
 
 public interface IConflictResolutionManager{
 	/*conflict resolved between two IAction 
 	 * instances
 	 * @author haoyi.xiong@it-sudparis.eu*/
-	IAction resolveConflict(IAction intentaction
-			,IAction preferaction);
+	IOutcome resolveConflict(IOutcome intentaction
+			,IOutcome preferaction);
 	/*resolve conflict between intent and preference
 	 * @param intentaction, the action by intent
 	 * @param preferaction, the action by preference*/

@@ -1,5 +1,10 @@
 package org.societies.personalisation.SNDataExtractor.api.extractor;
 
+import org.societies.api.internal.personalisation.model.IOutcome;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.personalisation.SNDataExtractor.api.extractor.mock.SNConnector;
+
 
 
 public interface ISNDataExtractor  {
@@ -41,7 +46,7 @@ public interface ISNDataExtractor  {
 	 * @param ownerId the DigitalIdentity of the user (entity)
 	 * @parem connector the Social Network connector
 	 */
-	public void resetPreferences(EntityIdentifier entityId, SNConncetor connector);
+	public void resetPreferences(EntityIdentifier entityId, SNConnector connector);
 	
 		
 }

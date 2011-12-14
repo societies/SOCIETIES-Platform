@@ -27,6 +27,7 @@ package org.societies.api.internal.useragent.model;
 
 import java.util.List;
 
+import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.useragent.conflict.IConflictResolutionManager;
 import org.societies.api.personalisation.model.IAction;
 
@@ -46,16 +47,16 @@ public class AbstractConflictResolutionManager implements IConflictResolutionMan
 		this.united=EnsembleConflictResolutionRule.fold(this.rules);
 	}
 
-	public void detectRule(ConflictResolutionRule rule) {
+	public void deleteRule(ConflictResolutionRule rule) {
 		rules.remove(rule);
 		this.united=EnsembleConflictResolutionRule.fold(this.rules);
 	}
 	@Override
-	public IAction resolveConflict(final IAction intentaction, 
-				final IAction preferaction) {
+	public IOutcome resolveConflict(final IOutcome intentaction, 
+				final IOutcome preferaction) {
 		// TODO Auto-generated method stub
 		if(united.match(intentaction, preferaction)){
-			IAction result=united.tradeoff(intentaction, preferaction);
+			IOutcome result=united.tradeoff(intentaction, preferaction);
 			return result;
 		}
 		/*nothing matches*/

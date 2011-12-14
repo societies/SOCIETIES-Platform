@@ -82,7 +82,7 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 	public void makeDecision(List<IOutcome> intents, List<IOutcome> preferences) {
 		// TODO Auto-generated method stub
 		for (IOutcome intent : intents) {
-			IAction action=intent;
+			IOutcome action=intent;
 			for (IOutcome preference : preferences) {
 				ConflictType conflict = detectConflict(intent, preference);
 				if (conflict == ConflictType.PREFERNCE_INTENT_NOT_MATCH) {

@@ -27,6 +27,7 @@ package org.societies.api.internal.useragent.model;
 
 import java.util.List;
 
+import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.personalisation.model.IAction;
 
 public class EnsembleConflictResolutionRule implements ConflictResolutionRule{
@@ -97,10 +98,10 @@ public class EnsembleConflictResolutionRule implements ConflictResolutionRule{
 	}
 
 	@Override
-	public boolean match(IAction intention, IAction preference) {
+	public boolean match(IOutcome intention, IOutcome preference) {
 		// TODO Auto-generated method stub
 		if(this.leftHandSide==null)
-			return true;
+			return false;
 		else if(this.rightHandSide==null)
 			return this.leftHandSide.match(intention, preference);
 		/*empty rule*/
@@ -115,9 +116,23 @@ public class EnsembleConflictResolutionRule implements ConflictResolutionRule{
 	}
 
 	@Override
-	public IAction tradeoff(IAction intention, IAction preference) {
+	public IOutcome tradeoff(IOutcome intention, IOutcome preference) {
 		// TODO Auto-generated method stub
-		return null;
+		IOutcome lres=this.leftHandSide.
+				tradeoff(intention, preference);
+		IOutcome rres=this.rightHandSide.
+				tradeoff(intention, preference);
+		if(lres==null)
+			return rres;
+		if(rres!=null&&!lres.equals(rres)){
+			if(this.operator==Operator.AND){
+				return null;
+			}else{
+				return lres;
+			}
+		}else{
+			return rres;
+		}
 	}
 
 }
