@@ -31,12 +31,12 @@
  * 
  */
 
-package org.societies.cis.collaboration.api;
+package org.societies.api.internal.cis-modules.cis-collaboration;
 
-public class CISSubscriptionRecord {
+public class CisSubscriptionRecord {
 	private String cssId, cisId, subscriptionMode;
 
-	public CISSubscriptionRecord(String cssId, String cisId, String subscriptionMode) {
+	public CisSubscriptionRecord(String cssId, String cisId, String subscriptionMode) {
 		super();
 		this.cisId = cisId;
 		this.subscriptionMode = subscriptionMode;

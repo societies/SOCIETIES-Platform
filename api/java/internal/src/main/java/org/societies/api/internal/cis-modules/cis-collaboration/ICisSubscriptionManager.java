@@ -32,15 +32,14 @@
  * 
  */
 
-package org.societies.cis.collaboration.api;
+package org.societies.api.internal.cis-modules.cis-collaboration;
 
 
-
-public interface ICISSubscriptionManager {
-	Boolean addSubscriptionRecord(CISSubscriptionRecord record);
-	Boolean updateSubscriptionRecord(CISSubscriptionRecord record);
-	Boolean deleteSubscriptionRecord(CISSubscriptionRecord record);
-	CISSubscriptionRecord getSubscriptionRecord(String cssId, String cisId);
-	CISSubscriptionRecord[] getSubscriptionRecords(String cssId);
+public interface ICisSubscriptionManager {
+	Boolean addSubscriptionRecord(CisSubscriptionRecord record);
+	Boolean updateSubscriptionRecord(CisSubscriptionRecord record);
+	Boolean deleteSubscriptionRecord(CisSubscriptionRecord record);
+	CisSubscriptionRecord getSubscriptionRecord(String cssId, String cisId);
+	CisSubscriptionRecord[] getSubscriptionRecords(String cssId);
 
 }

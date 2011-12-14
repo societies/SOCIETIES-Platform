@@ -24,19 +24,24 @@
  */
 
 /**
- * Allow a CSS to create service sharing records that describe how a service is shared in a CIS.
- * These records are then added to a CISRecord which is managed by the CISManager.
- * TODO: Need to pass the pointer to the CISManager. 
+ * Stores meta data relevant for a CIS.
  * 
  * @author Babak Farshchian
  * @version 0
  */
-package org.societies.api.internal.cis-modules.cis-collaboration;
+package org.societies.api.internal.cis-modules.cis-management;
 
+public class CisRecord {
+	public CisActivityFeed feed;
+	public String ownerCss;
+	public String membershipCriteria;
+	/**
+	 * permaLink is a permanent URL to this CIS. A type of CIS homepage.
+	 */
+	public String permaLink;
+	public String[] membersCss;
+	private String password = "none";
+	public ServiceSharingRecord[] sharedServices;
+	
 
-import org.societies.api.internal.cis-modules.cis-management.ServiceSharingRecord;
-
-
-public interface IServiceSharingManager {
-	boolean addServiceSharingRecord(String CisId, ServiceSharingRecord sharingRecord);
 }

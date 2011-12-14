@@ -34,19 +34,19 @@
  * 
  */
 
-package org.societies.cis.discovery.api;
+package org.societies.api.internal.cis-modules.cis-directory;
 
 
-public interface ICISDirectory {
+public interface ICisDirectory {
 	/*
 	 * Various search methods that return an array of CISAdvertisementRecords.
 	 */
-	CISAdvertisementRecord[] searchByName(String cisName);
-	CISAdvertisementRecord[] searchByOwner(String ownerId);
-	CISAdvertisementRecord[] searchByUri(String uri);
+	CisAdvertisementRecord[] searchByName(String cisName);
+	CisAdvertisementRecord[] searchByOwner(String ownerId);
+	CisAdvertisementRecord[] searchByUri(String uri);
 	
-	Boolean RegisterCIS(CISAdvertisementRecord cis);
-	Boolean UnregisterCIS(CISAdvertisementRecord cis);
+	Boolean RegisterCis (CisAdvertisementRecord cis);
+	Boolean UnregisterCis (CisAdvertisementRecord cis);
 	/*
 	 * This method is used to add CIS Directories that reside on other nodes.
 	 * 

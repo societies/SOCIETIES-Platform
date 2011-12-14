@@ -3,21 +3,14 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<!-- change the artifactid to your project artifactid -->
-	<groupId>org.societies.context-management</groupId>
-	<artifactId>UserCtxDBMgmt</artifactId>
+	<groupId>org.societies.useragent</groupId>
+	<artifactId>feedback</artifactId>
 	<packaging>bundle</packaging>
-	<version>${version.cm}</version>
-	
+	<version>${version.ua}</version>
 	<developers>
 		<developer>
-			<name>Nikos Kalatzis</name>
-			<email>nikosk@cn.ntua.gr</email>
-			<organization>ICCS</organization>
-			<organizationUrl>http://www.iccs.gr/</organizationUrl>
-			<roles>
-				<role>Senior Developer</role>
-			</roles>
-			<timezone>+2</timezone>
+			<name>Sarah Gallacher</name>
+			<email>s.gallacher@hw.ac.uk</email>
 		</developer>
 	</developers>
 	
@@ -29,19 +22,19 @@
 	</parent>
 
 	<dependencies>
-	<!-- add your dependencies here -->
 	<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
+	<groupId>org.societies.api.external</groupId>
+	<artifactId>societies-api</artifactId>
+	<version>${release.version}</version>
+	<scope>provided</scope>
+	</dependency>
+	<dependency>
+	<groupId>org.societies.api.internal</groupId>
+	<artifactId>societies-api-internal</artifactId>
+	<version>${release.version}</version>
+	<scope>provided</scope>
+	</dependency>
+
 
 	</dependencies>
 
@@ -56,7 +49,6 @@
 						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						
 					</instructions>
 				</configuration>
 			</plugin>
@@ -72,7 +64,7 @@
 						<artifactItem>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>${project.artifactId}</artifactId>
-							<version>${version.cm}</version>
+							<version>${version.ua}</version>
 							<type>bundle</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
@@ -81,5 +73,5 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>	
+	</build>
 </project>

@@ -29,9 +29,9 @@
  * @author Babak Farshchian
  * @version 0
  */
-package org.societies.cis.management.api;
+package org.societies.api.internal.cis-modules.cis-management;
 
-public interface ICISManager {
+public interface ICisManager {
 	//
 	//
 	/**
@@ -41,7 +41,7 @@ public interface ICISManager {
 	 * @param cssId
 	 * @return
 	 */
-	CISRecord createCis(String cssId);
+	CisRecord createCis(String cssId);
 	/**
 	 * Delete a specific CIS represented by cisId
 	 * TODO: Need to give a more meaningful return.
@@ -60,7 +60,7 @@ public interface ICISManager {
 	 * @param oldCisId The ID of the CIS that needs to be updated.
 	 * @return true if update was successful, 
 	 */
-	Boolean updateCis(String cssId, CISRecord newCis, String oldCisId);
+	Boolean updateCis(String cssId, CisRecord newCis, String oldCisId);
 	
 	/**
 	 * Get a CIS Record with the ID cisId.
@@ -70,7 +70,7 @@ public interface ICISManager {
 	 * @param cisId The ID of the CIS to get.
 	 * @return the CISRecord with the ID cisID, or null if no such CIS exists.
 	 */
-	CISRecord getCis(String cssId, String cisId);
+	CisRecord getCis(String cssId, String cisId);
 	
 	/**
 	 * Return an array of all the CISs that match the query. 
@@ -81,7 +81,7 @@ public interface ICISManager {
 	 * @param query Defines what to search for.
 	 * @return Array of CIS Records that match the query.
 	 */
-	CISRecord[] getCisList(CISRecord query);
+	CisRecord[] getCisList(CisRecord query);
 	
 	/**
 	 * Returns the CISActivityFeed for a specific CIS.
@@ -90,6 +90,6 @@ public interface ICISManager {
 	 * @param cisId The ID of the CIS.
 	 * @return The CISActivityFeed of the CIS.
 	 */
-	CISActivityFeed getActivityFeed(String cssId, String cisId);
+	CisActivityFeed getActivityFeed(String cssId, String cisId);
 
 }

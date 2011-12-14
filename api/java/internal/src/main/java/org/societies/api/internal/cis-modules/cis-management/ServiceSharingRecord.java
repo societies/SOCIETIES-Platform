@@ -29,7 +29,7 @@
  * @author Babak Farshchian
  * @version 0
  */
-package org.societies.cis.management.api;
+package org.societies.api.internal.cis-modules.cis-management;
 
 public class ServiceSharingRecord {
 

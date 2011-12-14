@@ -23,20 +23,29 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * Allow a CSS to create service sharing records that describe how a service is shared in a CIS.
- * These records are then added to a CISRecord which is managed by the CISManager.
- * TODO: Need to pass the pointer to the CISManager. 
- * 
- * @author Babak Farshchian
- * @version 0
- */
-package org.societies.api.internal.cis-modules.cis-collaboration;
+package org.societies.useragent.feedback;
 
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.model.IProposal;
 
-import org.societies.api.internal.cis-modules.cis-management.ServiceSharingRecord;
+public class UserFeedback implements IUserFeedback{
 
+	@Override
+	public boolean getExplicitFB(IProposal proposal) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
-public interface IServiceSharingManager {
-	boolean addServiceSharingRecord(String CisId, ServiceSharingRecord sharingRecord);
+	@Override
+	public boolean getImplicitFB(IProposal proposal) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean notify(IProposal proposal) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
 }

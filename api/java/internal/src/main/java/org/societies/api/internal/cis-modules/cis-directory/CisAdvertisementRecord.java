@@ -31,12 +31,12 @@
  * 
  */
 
-package org.societies.cis.discovery.api;
+package org.societies.api.internal.cis-modules.cis-directory;
 
-public class CISAdvertisementRecord {
+public class CisAdvertisementRecord {
 	private String name, id, uri;
 	
-	public CISAdvertisementRecord(String name, String id, String uri) {
+	public CisAdvertisementRecord(String name, String id, String uri) {
 		super();
 		this.name = name;
 		this.id = id;

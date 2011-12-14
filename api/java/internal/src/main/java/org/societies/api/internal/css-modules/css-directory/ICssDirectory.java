@@ -23,25 +23,58 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * Stores meta data relevant for a CIS.
- * 
- * @author Babak Farshchian
- * @version 0
- */
-package org.societies.cis.management.api;
+package org.societies.api.internal.css-modules.css-directory;
 
-public class CISRecord {
-	public CISActivityFeed feed;
-	public String ownerCss;
-	public String membershipCriteria;
+import java.util.Collection;
+
+/**
+ * @author Perumal Kuppuudaiyar
+ */
+public interface ICssDirectory {
+
 	/**
-	 * permaLink is a permanent URL to this CIS. A type of CIS homepage.
+	 * Description: This method provide interface to add new CSS object to CSS
+	 * directory
+	 * 
+	 * @param css object to be added to directory
 	 */
-	public String permaLink;
-	public String[] membersCss;
-	private String password = "none";
-	public ServiceSharingRecord[] sharedServices;
-	
+	void addCss(Object css);
+
+	/**
+	 * Description: This method allows to delete specific CSS entry from CSS
+	 * Directory
+	 * 
+	 * @param css object to be deleted from directory
+	 */
+	void deleteCss(Object css);
+
+	/**
+	 * Description : This method can be used to update the changes in the CSS
+	 * which is already exists in the CSS directory
+	 * 
+	 * @param css to be updated or replaced
+	 * @param update new css object to be placed in the directory
+	 */
+	void updateCss(Object css, Object update);
+
+	/**
+	 * Description : Queries list of CSS available in the CSS directory
+	 * @return collection of CSS objects from CSS directory
+	 */
+	Collection<Object> findForAllCss();
+
+	/**
+	 * Description : Queries list of CSS object with CIS group filter 
+	 * @param cisgroup for which list of CSS will retrieved from directory  
+	 * @return collection of CSS object
+	 */
+	Collection<Object> findForAllCss(Object cisgroup);
+
+	/**
+	 * Descripption : Search for specific CSS in the directory
+	 * @param searchinfo searching object or criteria
+	 * @return a CSS object if available or null
+	 */
+	Object findCss(Object searchinfo);
 
 }
