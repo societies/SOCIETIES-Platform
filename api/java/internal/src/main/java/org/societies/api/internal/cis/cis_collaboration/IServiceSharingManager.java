@@ -24,43 +24,19 @@
  */
 
 /**
- * This class defines a data type that is used stored in and managed by a CIS Directory.
+ * Allow a CSS to create service sharing records that describe how a service is shared in a CIS.
+ * These records are then added to a CISRecord which is managed by the CISManager.
+ * TODO: Need to pass the pointer to the CISManager. 
  * 
  * @author Babak Farshchian
  * @version 0
- * 
  */
-
-package org.societies.api.internal.cis-modules.cis-directory;
-
-public class CisAdvertisementRecord {
-	private String name, id, uri;
-	
-	public CisAdvertisementRecord(String name, String id, String uri) {
-		super();
-		this.name = name;
-		this.id = id;
-		this.uri = uri;
-	}
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public String getUri() {
-		return uri;
-	}
-
-	public void setUri(String uri) {
-		this.uri = uri;
-	}
+package org.societies.api.internal.cis.cis_collaboration;
 
 
+import org.societies.api.internal.cis.cis_management.ServiceSharingRecord;
+
+
+public interface IServiceSharingManager {
+	boolean addServiceSharingRecord(String CisId, ServiceSharingRecord sharingRecord);
 }

@@ -23,20 +23,58 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+package org.societies.api.internal.css_modules.css_directory;
+
+import java.util.Collection;
+
 /**
- * Allow a CSS to create service sharing records that describe how a service is shared in a CIS.
- * These records are then added to a CISRecord which is managed by the CISManager.
- * TODO: Need to pass the pointer to the CISManager. 
- * 
- * @author Babak Farshchian
- * @version 0
+ * @author Perumal Kuppuudaiyar
  */
-package org.societies.api.internal.cis-modules.cis-collaboration;
+public interface ICssDirectory {
 
+	/**
+	 * Description: This method provide interface to add new CSS object to CSS
+	 * directory
+	 * 
+	 * @param css object to be added to directory
+	 */
+	void addCss(Object css);
 
-import org.societies.api.internal.cis-modules.cis-management.ServiceSharingRecord;
+	/**
+	 * Description: This method allows to delete specific CSS entry from CSS
+	 * Directory
+	 * 
+	 * @param css object to be deleted from directory
+	 */
+	void deleteCss(Object css);
 
+	/**
+	 * Description : This method can be used to update the changes in the CSS
+	 * which is already exists in the CSS directory
+	 * 
+	 * @param css to be updated or replaced
+	 * @param update new css object to be placed in the directory
+	 */
+	void updateCss(Object css, Object update);
 
-public interface IServiceSharingManager {
-	boolean addServiceSharingRecord(String CisId, ServiceSharingRecord sharingRecord);
+	/**
+	 * Description : Queries list of CSS available in the CSS directory
+	 * @return collection of CSS objects from CSS directory
+	 */
+	Collection<Object> findForAllCss();
+
+	/**
+	 * Description : Queries list of CSS object with CIS group filter 
+	 * @param cisgroup for which list of CSS will retrieved from directory  
+	 * @return collection of CSS object
+	 */
+	Collection<Object> findForAllCss(Object cisgroup);
+
+	/**
+	 * Descripption : Search for specific CSS in the directory
+	 * @param searchinfo searching object or criteria
+	 * @return a CSS object if available or null
+	 */
+	Object findCss(Object searchinfo);
+
 }

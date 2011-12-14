@@ -24,19 +24,43 @@
  */
 
 /**
- * Is a feed of activities that are collected from CIS members and their shared services.
+ * This class defines a data type that is used stored in and managed by a CIS Directory.
  * 
- * @link CISActivity
- * @author Babak.Farshchian@sintef.no
+ * @author Babak Farshchian
  * @version 0
+ * 
  */
-package org.societies.api.internal.cis-modules.cis-management;
 
-public class CisActivityFeed {
-	public CisActivity[] activities;
-	public void getActivities(String CssId, String timePeriod){};
-	public void getActivities(String CssId, String query, String timePeriod){};
-	public void addCisActivity(CisActivity activity){};
-	public void cleanupFeed(String criteria){};
+package org.societies.api.internal.cis.cis_directory;
+
+public class CisAdvertisementRecord {
+	private String name, id, uri;
+	
+	public CisAdvertisementRecord(String name, String id, String uri) {
+		super();
+		this.name = name;
+		this.id = id;
+		this.uri = uri;
+	}
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public String getUri() {
+		return uri;
+	}
+
+	public void setUri(String uri) {
+		this.uri = uri;
+	}
+
 
 }
