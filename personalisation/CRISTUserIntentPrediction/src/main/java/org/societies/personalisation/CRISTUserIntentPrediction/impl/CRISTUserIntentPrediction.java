@@ -48,7 +48,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction{
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#enableCRISTPrediction(boolean)
 	 */
 	@Override
-	public void enableCRISTPrediction(boolean arg0) {
+	public void enableCRISTPrediction(boolean bool) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -57,7 +57,8 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction{
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCRISTPrediction(org.societies.api.context.model.CtxAttribute)
 	 */
 	@Override
-	public ArrayList<ICRISTUserAction> getCRISTPrediction(CtxAttribute arg0) {
+	public ArrayList<ICRISTUserAction> getCRISTPrediction(
+			CtxAttribute ctxAttribute) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -66,8 +67,9 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction{
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCurrentUserIntentAction(org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.ServiceResourceIdentifier)
 	 */
 	@Override
-	public ICRISTUserAction getCurrentUserIntentAction(EntityIdentifier arg0,
-			EntityIdentifier arg1, ServiceResourceIdentifier arg2) {
+	public ICRISTUserAction getCurrentUserIntentAction(
+			EntityIdentifier requestor, EntityIdentifier ownerID,
+			ServiceResourceIdentifier serviceID) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -76,7 +78,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction{
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#sendFeedback(org.societies.api.internal.personalisation.model.FeedbackEvent)
 	 */
 	@Override
-	public void sendFeedback(FeedbackEvent arg0) {
+	public void sendFeedback(FeedbackEvent feedbackEvent) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -85,7 +87,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction{
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#updateReceived(org.societies.api.context.model.CtxModelObject)
 	 */
 	@Override
-	public void updateReceived(CtxModelObject arg0) {
+	public void updateReceived(CtxModelObject ctxModelObj) {
 		// TODO Auto-generated method stub
 		
 	}
