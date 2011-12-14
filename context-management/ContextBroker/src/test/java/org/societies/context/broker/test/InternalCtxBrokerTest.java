@@ -24,6 +24,7 @@
  */
 package org.societies.context.broker.test;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.societies.api.context.model.CtxAssociation;
@@ -34,6 +35,7 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
 import org.societies.context.broker.impl.InternalCtxBroker;
 import org.societies.context.user.db.impl.UserCtxDBMgr;
@@ -44,7 +46,7 @@ public class InternalCtxBrokerTest {
 	BrokerCallbackImpl callback ;
 
 	//Constructor
-	InternalCtxBrokerTest(){
+	InternalCtxBrokerTest() {
 
 		callback = new  BrokerCallbackImpl();
 
@@ -56,12 +58,15 @@ public class InternalCtxBrokerTest {
 		testCreateCtxAttribute();
 		testRetrieveAttribute();
 		testUpdateAttribute();
+		testUpdateAttributeBlob();
+
 	}
 
 	/**
 	 * @param args
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args)  {
 		// TODO Auto-generated method stub
 		new InternalCtxBrokerTest();
 	}
@@ -74,7 +79,7 @@ public class InternalCtxBrokerTest {
 
 	private void testCreateCtxAttribute(){
 		System.out.println("---- test testCreateCtxAttribute");
-		internalCtxBroker.createAttribute(callback.getCtxEntity().getId(), CtxAttributeValueType.INDIVIDUAL, "name", callback);
+		internalCtxBroker.createAttribute(callback.getCtxEntity().getId(), CtxAttributeValueType.INDIVIDUAL, "size", callback);
 	}
 
 	private void testRetrieveAttribute(){
@@ -95,9 +100,50 @@ public class InternalCtxBrokerTest {
 		internalCtxBroker.retrieve(ctxAttribute.getId(), callback);
 		ctxAttribute = (CtxAttribute) callback.getCtxModelObject();
 		System.out.println("attribute value should be 100 and it is:"+ctxAttribute.getIntegerValue());
+
+		ctxAttribute.setIntegerValue(200);
+		internalCtxBroker.update(ctxAttribute, callback);
+		//verify update
+		internalCtxBroker.retrieve(ctxAttribute.getId(), callback);
+		ctxAttribute = (CtxAttribute) callback.getCtxModelObject();
+		System.out.println("attribute value should be 200 and it is:"+ctxAttribute.getIntegerValue());
+
+
 	}
-	
-	
+
+	private void testUpdateAttributeBlob() {
+		System.out.println("---- testUpdateAttributeBlob");
+		CtxAttribute ctxAttribute = (CtxAttribute) callback.getCtxModelObject();
+
+		MockBlobClass valueMockClass = new MockBlobClass();
+		
+		System.out.println("Attribute value contained in serialised class i ="+valueMockClass.i);
+		
+		byte[] blobValue;
+		try {
+			blobValue = SerialisationHelper.serialise(valueMockClass);
+			ctxAttribute.setBinaryValue(blobValue);
+			internalCtxBroker.update(ctxAttribute, callback);
+			internalCtxBroker.retrieve(ctxAttribute.getId(), callback);
+			ctxAttribute = (CtxAttribute) callback.getCtxModelObject();
+			System.out.println("attribute containing blob retrieved:"+ctxAttribute.getBinaryValue());
+		
+			MockBlobClass valueMockClassDeserialised = (MockBlobClass) SerialisationHelper.deserialise(ctxAttribute.getBinaryValue(), this.getClass().getClassLoader());
+			
+			System.out.println("attribute value contained in deserialised class retrieved:"+valueMockClassDeserialised.i);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+		
+
+
+	}
 
 
 	private class BrokerCallbackImpl implements IUserCtxBrokerCallback{
@@ -105,8 +151,8 @@ public class InternalCtxBrokerTest {
 		CtxEntity ctxEntity = null;
 		CtxAttribute ctxAttribute = null;
 		CtxModelObject ctxModelObject = null;
-		
-		
+
+
 		public CtxEntity getCtxEntity(){
 			return ctxEntity;
 		}
@@ -176,8 +222,7 @@ public class InternalCtxBrokerTest {
 
 		@Override
 		public void ctxModelObjectUpdated(CtxModelObject ctxModelObject) {
-			// TODO Auto-generated method stub
-
+			System.out.println("ctxModelObject Updated "+ ctxModelObject.getId());
 		}
 
 		@Override
