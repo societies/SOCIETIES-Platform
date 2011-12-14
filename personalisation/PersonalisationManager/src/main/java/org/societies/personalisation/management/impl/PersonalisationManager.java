@@ -19,13 +19,12 @@
  */
 package org.societies.personalisation.management.impl;
 
-import javax.swing.JOptionPane;
 
 
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxModelObject;
-//import org.societies.api.internal.context.broker.IUserCtxBroker;
+import org.societies.api.internal.context.broker.IUserCtxBroker;
 import org.societies.api.internal.personalisation.model.IFeedbackEvent;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
@@ -42,18 +41,18 @@ import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 
 public class PersonalisationManager implements IPersonalisationManager, IInternalPersonalisationManager{
 
-	//IUserCtxBroker broker;
+	private IUserCtxBroker ctxBroker;
 
 	private IUserPreferenceManagement prefMgr;
 	//private IUserPreferenceConditionMonitor upcm;
 	
 	
 	public PersonalisationManager(){
-		System.out.println("HELLO! I'm a brand new service and my interface is: "+this.getClass().getName());
+		System.out.println(this.getClass().getName()+"HELLO! I'm a brand new service and my interface is: "+this.getClass().getName());
 
 	}
 	
-	public PersonalisationManager(/*IUserCtxBroker broker, IUserPreferenceConditionMonitor upcm, */ IUserPreferenceManagement upm){
+	public PersonalisationManager(IUserCtxBroker broker, IUserPreferenceManagement upm){
 		this.prefMgr = upm;
 		//this.setUserPreferenceManagement(upm);
 		//this.upcm = upcm;
@@ -63,39 +62,63 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 		}else{
 			System.out.println("PCM is NOT null");
 		}*/
-		if (this.prefMgr==null){
-			System.out.println("UPM is null");
-		}else{
-			System.out.println("UPM is NOT null");
-		}
 		
 		
-		System.out.println("HELLO! I'm a brand new service and my interface is: "+this.getClass().getName());
-		IAction a = upm.getPreference(null, null, null, null);
-		if (a==null){
-			System.out.println("Didn't get a preference outcome");
-		}else{
-			System.out.println("Got preference outcome! : "+a.getparameterName()+" "+a.getvalue());
-		}
+		this.ctxBroker = broker;
+		
+
+
 		
 		
 		//this.broker = broker;
 		
 	} 
 	
+	public void initialisePersonalisationManager(){
+		if (this.ctxBroker==null){
+			System.out.println(this.getClass().getName()+"CtxBroker is null");
+		}else{
+			System.out.println(this.getClass().getName()+"CtxBroker is NOT null");
+		}
+		
+		
+		if (this.prefMgr==null){
+			System.out.println(this.getClass().getName()+"UPM is null");
+		}else{
+			System.out.println(this.getClass().getName()+"UPM is NOT null");
+		}
+		
+		
+		System.out.println("Yo!! I'm a brand new service and my interface is: "+this.getClass().getName());
+		IAction a = this.prefMgr.getPreference(null, null, null, null);
+		if (a==null){
+			System.out.println(this.getClass().getName()+"Didn't get a preference outcome");
+		}else{
+			System.out.println(this.getClass().getName()+"Got preference outcome! : "+a.getparameterName()+" "+a.getvalue());
+		}
+	}
 	
 	public IUserPreferenceManagement getPrefMgr() {
-		System.out.println("GOT UPM");
+		System.out.println(this.getClass().getName()+"Return UPM");
 		return prefMgr;
 	}
 
 
 	public void setPrefMgr(IUserPreferenceManagement upm) {
-		System.out.println("GOT PCM");
+		System.out.println(this.getClass().getName()+"GOT UPM");
 		this.prefMgr = upm;
 	}
 
+	public IUserCtxBroker getCtxBroker(){
+		System.out.println(this.getClass().getName()+"Return CtxBroker");
+		return this.ctxBroker;
+	}
 
+	public void setCtxBroker(IUserCtxBroker broker){
+		this.ctxBroker = broker;
+	}
+	
+	
 	@Override
 	public IAction getIntentAction(EntityIdentifier arg0,
 			EntityIdentifier arg1, ServiceResourceIdentifier arg2, String arg3) {
