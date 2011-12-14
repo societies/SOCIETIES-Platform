@@ -25,6 +25,25 @@
 
 package org.societies.personalisation.UserPreferenceLearning.impl;
 
-public class UserPreferenceLearning {
+import java.util.Date;
+
+import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Consumer;
+import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Learning;
+
+public class UserPreferenceLearning implements IC45Learning{
+
+	@Override
+	public void runC45Learning(IC45Consumer consumer, Date startDate) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void runC45Learning(IC45Consumer consumer, Date startDate,
+			ServiceResourceIdentifier serviceId, String prefName) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
