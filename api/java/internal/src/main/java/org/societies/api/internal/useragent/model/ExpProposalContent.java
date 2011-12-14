@@ -25,9 +25,24 @@
 
 package org.societies.api.internal.useragent.model;
 
-public interface IProposal
-{
-	public String getText();
+import java.util.List;
+
+public class ExpProposalContent {
 	
-	public String getOptions();
+	private String proposalText;
+	private List<String> options;
+	
+	public ExpProposalContent(String proposalText, List<String> options){
+		this.proposalText = proposalText;
+		this.options = options;
+	}
+	
+	public String getProposalText(){
+		return this.proposalText;
+	}
+	
+	public List<String> getOptions(){
+		return this.options;
+	}
+
 }
