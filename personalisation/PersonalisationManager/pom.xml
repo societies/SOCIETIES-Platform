@@ -48,6 +48,7 @@
 			<artifactId>societies-api-internal</artifactId>
 			<version>${release.version}</version>
 		</dependency>
+		
 		<!-- <dependency> <groupId>org.societies.context-management</groupId> <artifactId>css_contextBroker_impl</artifactId> 
 			<version>${version.cm}</version> </dependency> <dependency> <groupId>org.societies.context-management</groupId> 
 			<artifactId>UserCtxDBMgmt</artifactId> <version>${version.cm}</version> </dependency> -->
