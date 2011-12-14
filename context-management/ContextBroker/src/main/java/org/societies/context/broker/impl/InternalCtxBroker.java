@@ -55,10 +55,11 @@ public class InternalCtxBroker extends CtxBroker implements IUserCtxBroker, ICom
 
 	public InternalCtxBroker(IUserCtxDBMgr userDB) {
 		this.userDB=userDB;
+		System.out.println(this.getClass().getName()+" full");
 	}
 
 	public InternalCtxBroker() {
-
+		System.out.println(this.getClass().getName()+ " empty");
 	}
 
 	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) {
