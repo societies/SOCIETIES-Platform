@@ -29,12 +29,6 @@
 		</developer>
 	</developers>
 
-    <properties>
-        <slf4j.version>1.5.0</slf4j.version>
-        <spring.maven.artifact.version>2.5.6.SEC01</spring.maven.artifact.version>
-        <spring.osgi.version>1.2.1</spring.osgi.version>
-        <equinox.ver>3.2.2</equinox.ver>
-    </properties>
 	<!-- List dependencies here -->
 	<dependencies>
 
@@ -54,43 +48,45 @@
 			<artifactId>societies-api-internal</artifactId>
 			<version>${release.version}</version>
 		</dependency>
-		<dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>org.springframework.core</artifactId>
-            <version>${spring.maven.artifact.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-              <exclusion>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>com.springsource.org.apache.commons.logging</artifactId>
-              </exclusion>
-            </exclusions>
-        </dependency>
+		
+		<!-- <dependency> <groupId>org.societies.context-management</groupId> <artifactId>css_contextBroker_impl</artifactId> 
+			<version>${version.cm}</version> </dependency> <dependency> <groupId>org.societies.context-management</groupId> 
+			<artifactId>UserCtxDBMgmt</artifactId> <version>${version.cm}</version> </dependency> -->
+
+<!-- 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.core</artifactId>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>com.springsource.org.apache.commons.logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
 		<dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>org.springframework.beans</artifactId>
-            <version>${spring.maven.artifact.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-              <exclusion>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>com.springsource.org.apache.commons.logging</artifactId>
-              </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>org.springframework.context</artifactId>
-            <version>${spring.maven.artifact.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-              <exclusion>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>com.springsource.org.apache.commons.logging</artifactId>
-              </exclusion>
-            </exclusions>
-        </dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.context</artifactId>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>com.springsource.org.apache.commons.logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.beans</artifactId>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>com.springsource.org.apache.commons.logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency> -->
 	</dependencies>
 
 
@@ -109,7 +105,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-					<!--  <Import-Package>org.springframework.beans.factory.annotation;version="0",org.springframework.stereotype;version="0"</Import-Package>  -->
+						<!-- <Import-Package>org.springframework.beans.factory.annotation;version="0",org.springframework.stereotype;version="0"</Import-Package> -->
 						<Embed-Dependency>scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<_nouses>true</_nouses>

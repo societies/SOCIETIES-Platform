@@ -3,8 +3,7 @@ package org.societies.personalisation.CAUI.api.CAUIPrediction;
 
 import java.util.List;
 
-
-import org.societies.api.mock.ContextAttribute;
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.model.UserIntentAction;
@@ -49,7 +48,7 @@ public interface ICAUIPrediction {
 	 * 
 	 * @param ctxAttribute
 	 */
-	public UserIntentAction getPrediction(ContextAttribute ctxAttribute);
+	public UserIntentAction getPrediction(CtxAttribute ctxAttribute);
 
 	/**
 	 * Returns a list with the performed predictions.

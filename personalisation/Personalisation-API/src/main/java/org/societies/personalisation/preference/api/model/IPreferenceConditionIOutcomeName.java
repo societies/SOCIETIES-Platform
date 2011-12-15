@@ -19,7 +19,8 @@
  */
 package org.societies.personalisation.preference.api.model;
 
-import org.societies.api.mock.ICtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+
 
 /**
  * Class that links a context condition that affects a specific PreferenceName
@@ -29,7 +30,7 @@ import org.societies.api.mock.ICtxAttributeIdentifier;
  */
 public class IPreferenceConditionIOutcomeName {
 
-	private ICtxAttributeIdentifier ctxIdentifier;
+	private CtxAttributeIdentifier ctxIdentifier;
 	private String prefName;
 
 	public IPreferenceConditionIOutcomeName(){
@@ -45,7 +46,7 @@ public class IPreferenceConditionIOutcomeName {
 	 * @param id
 	 * @param preferenceName
 	 */
-	public IPreferenceConditionIOutcomeName(ICtxAttributeIdentifier id, String preferenceName){
+	public IPreferenceConditionIOutcomeName(CtxAttributeIdentifier id, String preferenceName){
 
 	}
 
@@ -54,7 +55,7 @@ public class IPreferenceConditionIOutcomeName {
 	 * preference
 	 * @return 	the context identifier
 	 */
-	public ICtxAttributeIdentifier getICtxIdentifier(){
+	public CtxAttributeIdentifier getICtxIdentifier(){
 		return null;
 	}
 
