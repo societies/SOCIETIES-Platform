@@ -30,14 +30,6 @@ import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 
-/**
- * 
- * Describe your class here...
- *
- * @author Zhu WANG
- *
- */
-
 public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction{
 	
 	public CRISTUserIntentPrediction(){
