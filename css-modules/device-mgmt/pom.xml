@@ -36,6 +36,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 			<email>rafik-saidmansour@trialog.com</email>
 			<organization>Trialog</organization>
 			<timezone>+1</timezone>
+			<roles>
+			 	<role>Developer</role>
+			</roles>
 		</developer>
 	</developers>
 
