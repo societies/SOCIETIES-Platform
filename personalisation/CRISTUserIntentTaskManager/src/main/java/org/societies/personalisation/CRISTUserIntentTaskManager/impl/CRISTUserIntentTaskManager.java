@@ -39,22 +39,43 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager{
 	private ICRISTUserIntentPrediction cristPredictor;
 	private CtxAttribute myCtx;
 		
+	public CRISTUserIntentTaskManager(){
+		System.out.println("Hello! I'm the CRIST User Intent Manager!");
+	}
+	
 	public CRISTUserIntentTaskManager(ICRISTUserIntentPrediction CRISTPredictor){
+		System.out.println("This is the testing class for CRIST Model!");
 		this.cristPredictor = CRISTPredictor;
 	}
 	
 	public void initialiseCRISTUserIntentManager(){
-		System.out.println("This is the testing class for CRIST UI Predictioin");
-		cristPredictor.getCRISTPrediction(myCtx);
+				
+		if (this.cristPredictor == null) {
+			System.out
+					.println(this.getClass().getName() + "CRIST UI Predictor is null");
+		} else {
+			System.out.println(this.getClass().getName()
+					+ "CRIST UI Predictor is NOT null");
+		}
+
+		System.out.println("Yo!! I'm a brand new service and my interface is: "
+				+ this.getClass().getName());
+		try{
+			this.cristPredictor.getCRISTPrediction(myCtx);
+			System.out.println("CRIST Tester got the CRIST Prediction Result");
+		}catch(Exception e){
+			System.err.println("Exception when trying to get the CRIST Prediction Result");
+			System.err.println(e.toString());
+		}
 	}
 	
 	public ICRISTUserIntentPrediction getCristPredictor() {
-		System.out.println(this.getClass().getName()+"Return CRISTPredictor");
+		System.out.println(this.getClass().getName()+" Return CRISTPredictor");
 		return cristPredictor;
 	}
 
-	public void setPreManager(ICRISTUserIntentPrediction CRISTPredictor) {
-		System.out.println(this.getClass().getName()+"GOT CRISTPredictor");
+	public void setCristPredictor(ICRISTUserIntentPrediction CRISTPredictor) {
+		System.out.println(this.getClass().getName()+" GOT CRISTPredictor");
 		this.cristPredictor = CRISTPredictor;
 	}
 	

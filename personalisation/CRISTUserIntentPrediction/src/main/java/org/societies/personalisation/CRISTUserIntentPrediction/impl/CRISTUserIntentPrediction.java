@@ -74,12 +74,12 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	}
 	
 	public IInternalPersonalisationManager getPreManager() {
-		System.out.println(this.getClass().getName()+"Return InternalPreManager");
+		System.out.println(this.getClass().getName()+" Return InternalPreManager");
 		return preManager;
 	}
 
 	public void setPreManager(IInternalPersonalisationManager internalPreManager) {
-		System.out.println(this.getClass().getName()+"GOT InternalPreManager");
+		System.out.println(this.getClass().getName()+" GOT InternalPreManager");
 		this.preManager = internalPreManager;
 	}
 
@@ -106,6 +106,8 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	public ArrayList<ICRISTUserAction> getCRISTPrediction(
 			CtxAttribute ctxAttribute) {
 		// TODO Auto-generated method stub
+		System.out.println("CRISTUIPredictor has been invoked...");
+		
 		return null;
 	}
 

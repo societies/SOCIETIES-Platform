@@ -10,10 +10,11 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-	<bean name="CRISTUserIntentTaskManager"
+	<bean name="CRISTUserIntentTaskHandler"
 		class="org.societies.personalisation.CRISTUserIntentTaskManager.impl.CRISTUserIntentTaskManager"
 		depends-on="CRISTUserIntentPredictor" init-method="initialiseCRISTUserIntentManager">
 		<property name="cristPredictor" ref="CRISTUserIntentPredictor"></property>
+		
 	</bean>
 	<!-- <context:component-scan base-package="org.societies.personalisation.management.impl"></context:component-scan> -->
 	

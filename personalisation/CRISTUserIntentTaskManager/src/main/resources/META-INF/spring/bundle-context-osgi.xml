@@ -10,14 +10,14 @@
 		is to facilitate integration testing of the bundle outside of an OSGi container -->
 
 
-	<osgi:service ref="CRISTUserIntentTaskManager">
+	<osgi:service ref="CRISTUserIntentTaskHandler">
 		<osgi:interfaces>
 			<value>org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager</value>
 		</osgi:interfaces>
 	</osgi:service>
 	
 	<osgi:reference id="CRISTUserIntentPredictor"
-		interface="org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction" /> 
+		interface="org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction" /> 	
 		
 	<!-- 
 	<osgi:service ref="PersonalisationManager">
