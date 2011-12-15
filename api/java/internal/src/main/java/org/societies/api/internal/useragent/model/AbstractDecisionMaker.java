@@ -67,7 +67,7 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 					action = manager.resolveConflict(action,preference);
 					if(action ==null){
 						List<String> options=new ArrayList<String>();
-						options.add(action.toString());
+						options.add(intent.toString());
 						options.add(preference.toString());
 						ExpProposalContent epc=new ExpProposalContent("Conflict Detected!",
 								options);
