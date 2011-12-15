@@ -25,9 +25,13 @@
 
 package org.societies.useragent.feedback;
 
+import java.util.List;
+
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
+import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
+import org.societies.api.internal.useragent.model.ImpProposalType;
 
 public class UserFeedback implements IUserFeedback{
 	
@@ -36,17 +40,37 @@ public class UserFeedback implements IUserFeedback{
 	}
 
 	@Override
-	public boolean getExplicitFB(int type, ExpProposalContent content) {
-		// TODO Auto-generated method stub
+	public String getExplicitFB(int type, ExpProposalContent content) {
 		System.out.println("Returning explicit feedback");
-		return true;
+		String feedback = null;
+		String proposalText = content.getProposalText();
+		List<String> options = content.getOptions();
+		if(type == ExpProposalType.RADIOLIST){
+			System.out.println("Radio list GUI");
+			feedback = options.get(0);  
+		}else if(type == ExpProposalType.CHECKBOXLIST){
+			System.out.println("Check box list GUI");
+			feedback = options.get(0);
+		}else{ //ACK-NACK
+			System.out.println("ACK/NACK GUI");
+			feedback = options.get(0);
+		}
+		return feedback;
 	}
 
 	@Override
 	public boolean getImplicitFB(int type, ImpProposalContent content) {
-		// TODO Auto-generated method stub
 		System.out.println("Returning implicit feedback");
-		return true;
+		boolean feedback = false;
+		String proposalText = content.getProposalText();
+		if(type == ImpProposalType.NOTIFICATION){
+			System.out.println("Notification GUI");
+			feedback = true;
+		}else{ //Timed Abort
+			System.out.println("Timed abort GUI");
+			feedback = true;
+		}
+		return feedback;
 	}
 	
 }
