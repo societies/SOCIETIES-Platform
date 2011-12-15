@@ -8,7 +8,7 @@
 		this file can easily be used for integration testing outside of an OSGi environment -->
 
 	<bean name="CRISTTester"
-		class="org.societies.personalisation.CRISTTesting.impl.CRISTTester"
+		class="org.societies.personalisation.CRISTTesting.impl.CRISTTesting"
 		depends-on="CRISTUserIntentPredictor" init-method="initialiseCRISTTesting">
 		<property name="cristPredictor" ref="CRISTUserIntentPredictor"></property>
 	</bean>
