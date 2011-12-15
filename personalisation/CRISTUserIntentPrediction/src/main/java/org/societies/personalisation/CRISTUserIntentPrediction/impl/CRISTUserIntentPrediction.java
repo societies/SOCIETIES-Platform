@@ -21,10 +21,14 @@
 package org.societies.personalisation.CRISTUserIntentPrediction.impl;
 
 import java.util.ArrayList;
+// import javax.annotation.PostConstruct;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.stereotype.Component;
 
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxModelObject;
+// import org.societies.api.personalisation.model.IAction;
 import org.societies.api.internal.personalisation.model.FeedbackEvent;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
@@ -32,6 +36,7 @@ import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTU
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 
+// @Component
 public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 
 	private IInternalPersonalisationManager preManager;
@@ -42,10 +47,11 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		System.out.println("Hello! I'm the CRIST User Intent Prediction!");
 	}
 	
+	// @Autowired
 	public CRISTUserIntentPrediction(IInternalPersonalisationManager internalPreManager) {
 		this.preManager = internalPreManager;
 	}
-
+	
 	public void initialiseCRISTPrediction() {
 
 		if (this.preManager == null) {
@@ -65,6 +71,16 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 			System.err.println("Exception when trying to register the Context Update Event");
 			System.err.println(e.toString());
 		}
+	}
+	
+	public IInternalPersonalisationManager getPreManager() {
+		System.out.println(this.getClass().getName()+"Return InternalPreManager");
+		return preManager;
+	}
+
+	public void setPreManager(IInternalPersonalisationManager internalPreManager) {
+		System.out.println(this.getClass().getName()+"GOT InternalPreManager");
+		this.preManager = internalPreManager;
 	}
 
 	/*

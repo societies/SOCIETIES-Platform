@@ -16,8 +16,8 @@
 		</osgi:interfaces>
 	</osgi:service>
 	
-	<osgi:reference id="UserPrefMgr"
-		interface="org.societies.personalisation.common.api.management.IInternalPersonalisationManager" />
+	<osgi:reference id="PersonalisationManager"
+		interface="org.societies.personalisation.common.api.management.IInternalPersonalisationManager" /> 
 		
 	<!-- 
 	<osgi:service ref="PersonalisationManager">
