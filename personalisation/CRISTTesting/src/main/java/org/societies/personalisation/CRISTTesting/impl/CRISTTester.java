@@ -28,7 +28,7 @@ public class CRISTTester {
 	private ICRISTUserIntentPrediction cristPredictor;
 	private CtxAttribute myCtx;
 		
-	public CRISTUserIntentPredictionTest(ICRISTUserIntentPrediction CRISTPredictor){
+	public CRISTTester(ICRISTUserIntentPrediction CRISTPredictor){
 		this.cristPredictor = CRISTPredictor;
 	}
 	
