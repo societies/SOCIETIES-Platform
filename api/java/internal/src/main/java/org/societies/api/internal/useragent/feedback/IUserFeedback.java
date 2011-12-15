@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+++++ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
  * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
  * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
@@ -37,7 +37,7 @@ import org.societies.api.internal.useragent.model.ImpProposalType;
  */
 public interface IUserFeedback
 {
-	public boolean getExplicitFB(ExpProposalType type, ExpProposalContent content);
+	public boolean getExplicitFB(int type, ExpProposalContent content);
 	
-	public boolean getImplicitFB(ImpProposalType type, ImpProposalContent content);
+	public boolean getImplicitFB(int type, ImpProposalContent content);
 }
