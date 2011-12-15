@@ -20,24 +20,34 @@
 
 package org.societies.personalisation.CRISTUserIntentPrediction.test;
 
-import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.context.model.CtxAttributeIdentifier;
 
 public class CRISTUserIntentPredictionTest {
 	
 	private ICRISTUserIntentPrediction cristPredictor;
-	private IInternalPersonalisationManager preManager;
-	private EntityIdentifier myId;
-	private CtxAttributeIdentifier myCtxId;
+	private CtxAttribute myCtx;
 	
 	public static void main(){
-		System.out.println("This is testing class for CRIST UI Predictioin");
-
+		System.out.println("Hello Kitty");
 	}
 	
-	public void test(){
-		preManager.registerForContextUpdate(myId, this.getClass().getName(), myCtxId);
+	public CRISTUserIntentPredictionTest(ICRISTUserIntentPrediction CRISTPredictor){
+		this.cristPredictor = CRISTPredictor;
+	}
+	
+	public void initialiseTesting(){
+		System.out.println("This is the testing class for CRIST UI Predictioin");
+		cristPredictor.getCRISTPrediction(myCtx);
+	}
+	
+	public ICRISTUserIntentPrediction getCristPredictor() {
+		System.out.println(this.getClass().getName()+"Return CRISTPredictor");
+		return cristPredictor;
+	}
+
+	public void setPreManager(ICRISTUserIntentPrediction CRISTPredictor) {
+		System.out.println(this.getClass().getName()+"GOT CRISTPredictor");
+		this.cristPredictor = CRISTPredictor;
 	}
 }

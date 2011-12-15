@@ -2,44 +2,48 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.security.sign</groupId>
-	<artifactId>sign</artifactId>
-	<!-- the version is the same as the release -->
-	<version>${release.version}</version>
-	<!-- the packaging tag enables the creation of the correct manifest using the maven-bundle-plugin -->
-	<packaging>bundle</packaging>
+	<!-- change the artifactid to your project artifactid -->
 	
-	<description>
-    	This bundle provides the ability to digitally sign XML contents and verify signatures.
-    </description>
-    
+	<groupId>org.societies.personalisation</groupId>
+	<artifactId>sn_data_extractor</artifactId>
+	<packaging>bundle</packaging>
+	<version>${version.pm}</version>
+
+	
 	<developers>
 		<developer>
-	        <id>mvardjan</id>
-			<name>Mitja Vardjan</name>
-            <email>mitja.vardjan@setcce.si</email>
-			<organization>SETCCE</organization>
-      		<organizationUrl>http://www.setcce.si</organizationUrl>
-            <roles>
-                <role>owner</role>
-	            <role>developer</role>
-            </roles>
+			<name>Luca Lamorte</name>
+			<email>luca.lamorte@telecomitalia.it</email>
 		</developer>
 	</developers>
 	
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../../parent/spring-osgi.xml</relativePath>
+		<relativePath>../../parent/spring-osgi.xml</relativePath>
 		<version>0.1</version>
 	</parent>
 
 	<dependencies>
-
+	<!-- add your dependencies here -->
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.societies.personalisation</groupId>
+			<artifactId>personalisation_api</artifactId>
+			<version>${version.pm}</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -52,34 +56,16 @@
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>
-					<instructions>						
-						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
+					<instructions>
+						<Embed-Dependency>scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<Import-Package>*;resolution:=optional</Import-Package>
-						<Export-Package>
-							org.societies.api.security.sign.*
-						</Export-Package>
-						<!-- Private-Package>
-							org.societies.security.sign.*,
-							org.societies.security.something.*
-						</Private-Package -->
-						<_nouses>true</_nouses>						
 					</instructions>
 				</configuration>
-		
 			</plugin>
-						<!--  used to exclude  some certain files -->
-			<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-             </plugin>
-
-			
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
 			</plugin>
-			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -88,14 +74,14 @@
 						<artifactItem>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>${project.artifactId}</artifactId>
-							<version>${release.version}</version>
-							<type>bundle</type>
+							<version>${version.pm}</version>
+							<type>jar</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>
 			</plugin>
-		</plugins> 	
+		</plugins>
 	</build>
 </project>
