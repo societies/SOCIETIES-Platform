@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske druzbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVACAO, SA (PTIN), IBM Corp., 
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -23,43 +23,29 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.useragent.model;
+package org.societies.useragent.conflict;
 
+import java.util.ArrayList;
 import java.util.List;
+import org.societies.api.internal.useragent.model.ConflictResolutionRule;
 
-import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.internal.useragent.conflict.IConflictResolutionManager;
-import org.societies.api.personalisation.model.IAction;
 
-public class AbstractConflictResolutionManager implements IConflictResolutionManager{
-	private List<ConflictResolutionRule> rules;
-	private ConflictResolutionRule united;
-	public List<ConflictResolutionRule> getRules() {
-		return rules;
-	}
-	public void setRules(List<ConflictResolutionRule> rules) {
-		this.rules = rules;
-		this.united=EnsembleConflictResolutionRule.fold(this.rules);
-	}
+//public class ConflictResolution implements IConflictResolutionManager{
+//
+//	@Override
+//	public IAction resolveConflict(IAction arg0, IAction arg1) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//
+//}
 
-	public void addRule(ConflictResolutionRule rule) {
-		rules.add(rule);
-		this.united=EnsembleConflictResolutionRule.fold(this.rules);
-	}
-
-	public void deleteRule(ConflictResolutionRule rule) {
-		rules.remove(rule);
-		this.united=EnsembleConflictResolutionRule.fold(this.rules);
-	}
-	@Override
-	public IOutcome resolveConflict(final IOutcome intentaction, 
-				final IOutcome preferaction) {
-		// TODO Auto-generated method stub
-		if(united.match(intentaction, preferaction)){
-			IOutcome result=united.tradeoff(intentaction, preferaction);
-			return result;
-		}
-		/*nothing matches*/
-		return null;
-	}
+public class ConflictResolutionManager extends AbstractConflictResolutionManager{
+	
+public ConflictResolutionManager(){
+	/*depends on GUI for user preference editor*/
+	super();
+	List<ConflictResolutionRule> rules =new ArrayList<ConflictResolutionRule>();
+	super.setRules(rules);
+}
 }
