@@ -23,30 +23,70 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.feedback;
+package org.societies.orchestration.common;
 
-import org.societies.api.internal.useragent.feedback.IUserFeedback;
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
+import org.societies.cis.management.api.CisRecord;
 
-public class UserFeedback implements IUserFeedback{
+/**
+ * This class represents a CIS orchestration task
+ * 
+ * @author Fraser Blackmun
+ * @version 0
+ * 
+ */
+
+public class CisOrchestrationTask {
 	
-	public void initialiseUserFeedback(){
-		System.out.println("User Feedback initialised!!");
-	}
-
-	@Override
-	public boolean getExplicitFB(int type, ExpProposalContent content) {
-		// TODO Auto-generated method stub
-		System.out.println("Returning explicit feedback");
-		return true;
-	}
-
-	@Override
-	public boolean getImplicitFB(int type, ImpProposalContent content) {
-		// TODO Auto-generated method stub
-		System.out.println("Returning implicit feedback");
-		return true;
-	}
+	String orchestrationType;
+	CisRecord cisToOrchestrate;
+	
+	//ArrayList<Cis> otherCissInvolved;
+	
+	/*
+     * Constructor for CISOrchestrationTask.
+     * 
+	 * Description: The constructor creates a new CISOrchestrationTask with the details
+	 *              passed to it.
+	 */
+	
+	public CisOrchestrationTask();
+	
+	/*
+	 * Description: The orchestrateCIS method carries out orchestration
+	 *              on the CIS by creating the relevant lower-level task.
+	 * Parameters: 
+	 * 				cisToOrchestrate - The CIS that will be orchestrated.
+	 * Returns:
+	 * 				True if successful in orchestrating the CIS, false otherwise.
+	 */
+	
+	public boolean orchestrateCis(CisRecord cisToOrchestrate);
+	
+	public boolean orchestrateCis(HashMap cisToOrchestrate);
+	
+    public CisOrchestrationTask(String orchestrationType, CisRecord cisToOrchestrate);
+	
+	/*
+	 * Description: The orchestrateCIS method carries out orchestration
+	 *              on the CIS by creating the relevant lower-level task.
+	 * Parameters: 
+	 * 				cisToOrchestrate - The CIS that will be orchestrated.
+	 *              otherCissInvolved - Any other relevant CISs to the orchestration process.
+	 * Returns:
+	 * 				True if successful in orchestrating the CIS, false otherwise.
+	 */
+	
+	public boolean orchestrateCis(CisRecord cisToOrchestrate, ArrayList<CisRecord> otherCissInvolved);
+	
+	/*
+	 * Description: The getTask method returns the task.
+	 * 
+	 * Returns:
+	 * 				The task represented by the object implementing this interface.
+	 */
+	
+	public CisOrchestrationTask getTask();
+	
+	//public CisOrchestrationTask(String orchestrationType, Cis cisToOrchestrate, ArrayList<Cis> otherCissInvolved) {}
 	
 }

@@ -8,16 +8,8 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-  <bean id="ConflictResolutionManager" class="org.societies.useragent.conflict.ConflictResolutionManager">
-  <property name="rules">
-  <list>
-  <bean class="org.societies.useragent.conflict.ConfidenceTradeoffRule"></bean>
-  <bean class="org.societies.useragent.conflict.IntentPriorRule"></bean>
-  </list>
-  </property>
-  
-  </bean>
-   
-   
+  <bean id="UserFeedback" class="org.societies.useragent.feedback.UserFeedback" init-method="initialiseUserFeedback">
+   </bean>
+
 </beans>
 

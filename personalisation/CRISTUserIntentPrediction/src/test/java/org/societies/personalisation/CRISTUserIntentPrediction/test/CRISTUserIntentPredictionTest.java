@@ -1,10 +1,5 @@
 /**
-++++ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
- * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
- * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
- * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
+ * Copyright (c) 2011, SOCIETIES Consortium
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -23,21 +18,26 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.useragent.feedback;
+package org.societies.personalisation.CRISTUserIntentPrediction.test;
 
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ExpProposalType;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalType;
+import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 
-/**
- * 
- * @author S.Gallacher@hw.ac.uk
- *
- */
-public interface IUserFeedback
-{
-	public boolean getExplicitFB(int type, ExpProposalContent content);
+public class CRISTUserIntentPredictionTest {
 	
-	public boolean getImplicitFB(int type, ImpProposalContent content);
+	private ICRISTUserIntentPrediction cristPredictor;
+	private IInternalPersonalisationManager preManager;
+	private EntityIdentifier myId;
+	private CtxAttributeIdentifier myCtxId;
+	
+	public static void main(){
+		System.out.println("This is testing class for CRIST UI Predictioin");
+
+	}
+	
+	public void test(){
+		preManager.registerForContextUpdate(myId, this.getClass().getName(), myCtxId);
+	}
 }

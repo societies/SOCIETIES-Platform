@@ -1,8 +1,7 @@
-/**
- * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+/* Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske druzbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVACAO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -23,24 +22,51 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* @Author: Haoyi XIONG, haoyi.xiong@it-sudparis.eu
+ * @Dependency:
+ * org.societies.api.internal.personalisation.model.IOutcome;
+ * org.societies.api.internal.useragent.model.AbstractDecisionMaker;
+ * org.societies.api.internal.useragent.model.ConflictType;
+ * org.societies.api.personalisation.model.IAction;
+ */
 package org.societies.useragent.decisionmaking;
 
-import java.util.List;
-
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.internal.useragent.conflict.IConflictResolutionManager;
-import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
+import org.societies.api.internal.useragent.model.ConflictType;
 import org.societies.api.personalisation.model.IAction;
 
-public class DecisionMaker implements IDecisionMaker{
+public class DecisionMaker extends AbstractDecisionMaker {
 
 	@Override
-	public void makeDecision(List<IOutcome> arg0, List<IOutcome> arg1) {
+	protected ConflictType detectConflict(IOutcome intent, IOutcome prefernce) {
 		// TODO Auto-generated method stub
-		
+		try {
+			if (intent.getServiceID().equals(prefernce.getServiceID())) {
+				if (intent.getparameterName().equals(
+						prefernce.getparameterName())) {
+					if (!intent.getvalue().
+							equalsIgnoreCase(prefernce.getvalue())) {
+						return ConflictType.PREFERNCE_INTENT_NOT_MATCH;
+					}
+				}
+			}
+			return ConflictType.NO_CONFLICT;
+		} catch (Exception e) {
+			return ConflictType.UNKNOWN_CONFLICT;
+		}
 	}
-	
-	
 
-	
+	@Override
+	protected void implementIAction(IAction action) {
+		// TODO Auto-generated method stub
+		//@temporal solution depends on the 3rd party-services
+		System.out.println("****************************************");
+		System.out.println("implement the Action:\t"+action);
+		System.out.println("of Type:\t"+action.getServiceType());
+		System.out.println("with Parameter:\t"+action.getparameterName());
+		System.out.println("with Parameter:\t"+action.getvalue());
+		System.out.println("****************************************");
+
+	}
+
 }

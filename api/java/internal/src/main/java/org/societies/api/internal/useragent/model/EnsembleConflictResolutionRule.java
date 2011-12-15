@@ -28,7 +28,6 @@ package org.societies.api.internal.useragent.model;
 import java.util.List;
 
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.personalisation.model.IAction;
 
 public class EnsembleConflictResolutionRule implements ConflictResolutionRule{
 	private ConflictResolutionRule rightHandSide;
@@ -81,11 +80,17 @@ public class EnsembleConflictResolutionRule implements ConflictResolutionRule{
 			fold(List<ConflictResolutionRule> rules){
 		if(rules.size()<1)
 			return new EmptyRule();
+		if(rules.size()<2)
+			return rules.get(0);
+		if(rules.size()<3)
+			return new EnsembleConflictResolutionRule(rules.get(0),
+					rules.get(1),Operator.OR);
 		EnsembleConflictResolutionRule rule
-			= new EnsembleConflictResolutionRule(rules.get(0));
-		for(int i=1;i<rules.size();i++){
+			= new EnsembleConflictResolutionRule(rules.get(0),
+					rules.get(1),Operator.OR);
+		for(int i=2;i<rules.size();i++){
 			rule=rule.shiftToLeft();
-			rule.addANDRule(rule);
+			rule.addORRule(rule);
 		}
 		return rule;
 	}
@@ -118,6 +123,9 @@ public class EnsembleConflictResolutionRule implements ConflictResolutionRule{
 	@Override
 	public IOutcome tradeoff(IOutcome intention, IOutcome preference) {
 		// TODO Auto-generated method stub
+		if(this.rightHandSide==null)
+			return this.leftHandSide.
+					tradeoff(intention, preference);
 		IOutcome lres=this.leftHandSide.
 				tradeoff(intention, preference);
 		IOutcome rres=this.rightHandSide.

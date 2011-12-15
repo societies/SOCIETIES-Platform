@@ -10,15 +10,11 @@
        in a separate file if you do not want to. The rationale for 
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
-       
-        
-        <osgi:service ref="ConflictResolutionManager">
+              
+        <osgi:service ref="UserFeedback">
         <osgi:interfaces>
-        <value>org.societies.api.internal.useragent.conflict.IConflictResolutionManager</value>
+        <value>org.societies.api.internal.useragent.feedback.IUserFeedback</value>
         </osgi:interfaces>
         </osgi:service>
-        
-		<osgi:reference id="ConfManager" interface="org.societies.api.internal.useragent.conflict.IConflictResolutionManager"/>
-		
 
 </beans>
