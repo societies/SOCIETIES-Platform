@@ -23,38 +23,70 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.comorch.common.cisorch;
+package org.societies.orchestration.common;
+
+import org.societies.cis.management.api.CisRecord;
 
 /**
- * This class represents a CIS deletion task
+ * This class represents a CIS orchestration task
  * 
  * @author Fraser Blackmun
  * @version 0
  * 
  */
 
-public class CisDeletionTask extends CisOrchestrationTask {
+public class CisOrchestrationTask {
 	
-	private Cis cisToDelete;
+	String orchestrationType;
+	CisRecord cisToOrchestrate;
+	
+	//ArrayList<Cis> otherCissInvolved;
 	
 	/*
-     * Constructor for CISDeletionTask.
+     * Constructor for CISOrchestrationTask.
      * 
-	 * Description: The constructor creates a new CISDeletionTask with the details
+	 * Description: The constructor creates a new CISOrchestrationTask with the details
 	 *              passed to it.
 	 */
 	
-	public CisDeletionTask() {}
+	public CisOrchestrationTask();
 	
 	/*
-	 * Description: The deleteCIS method deletes the given CIS.
-	 *          
+	 * Description: The orchestrateCIS method carries out orchestration
+	 *              on the CIS by creating the relevant lower-level task.
 	 * Parameters: 
-	 * 				cisToDelete - The CIS that will be deleted.
+	 * 				cisToOrchestrate - The CIS that will be orchestrated.
 	 * Returns:
-	 * 				True if successful in deleting the CIS; false otherwise.
+	 * 				True if successful in orchestrating the CIS, false otherwise.
 	 */
 	
-	public boolean deleteCis(Cis cisToDelete) {}
+	public boolean orchestrateCis(CisRecord cisToOrchestrate);
+	
+	public boolean orchestrateCis(HashMap cisToOrchestrate);
+	
+    public CisOrchestrationTask(String orchestrationType, CisRecord cisToOrchestrate);
+	
+	/*
+	 * Description: The orchestrateCIS method carries out orchestration
+	 *              on the CIS by creating the relevant lower-level task.
+	 * Parameters: 
+	 * 				cisToOrchestrate - The CIS that will be orchestrated.
+	 *              otherCissInvolved - Any other relevant CISs to the orchestration process.
+	 * Returns:
+	 * 				True if successful in orchestrating the CIS, false otherwise.
+	 */
+	
+	public boolean orchestrateCis(CisRecord cisToOrchestrate, ArrayList<CisRecord> otherCissInvolved);
+	
+	/*
+	 * Description: The getTask method returns the task.
+	 * 
+	 * Returns:
+	 * 				The task represented by the object implementing this interface.
+	 */
+	
+	public CisOrchestrationTask getTask();
+	
+	//public CisOrchestrationTask(String orchestrationType, Cis cisToOrchestrate, ArrayList<Cis> otherCissInvolved) {}
 	
 }
