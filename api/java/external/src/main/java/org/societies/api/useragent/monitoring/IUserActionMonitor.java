@@ -1,6 +1,7 @@
 package org.societies.api.useragent.monitoring;
 
-//import org.societies.personalisation.common.api.model.IAction;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.api.personalisation.model.IAction;
 
 /**
@@ -10,5 +11,5 @@ import org.societies.api.personalisation.model.IAction;
  */
 public interface IUserActionMonitor
 {
-	public void monitor(String userId, IAction action);
+	public void monitor(ServiceResourceIdentifier serviceId, EntityIdentifier owner, IAction action);
 }

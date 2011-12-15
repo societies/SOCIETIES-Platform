@@ -17,14 +17,26 @@
    <!-- still being discussed -->
    <name>MODIFY ME</name>
    <packaging>apk</packaging>
-   <developers>
-      <developer>
-		 <name>MODIFY ME</name>
-		<!-- Name of component author-->
-		 <email>MODIFY ME</email>
-		<!-- Component author e-mail-->
-	  </developer>
-   </developers>
+	<developers>
+	    <developer>
+	      <id>github ID</id>
+	      <name>Eric</name>
+	      <email>eredmond@codehaus.org</email>
+	      <organization>Codehaus</organization>
+	      <roles>
+	        <role>owner</role>
+	      </roles>
+	    </developer>
+	    <developer>
+	      <id>github ID</id>
+	      <name>Eric</name>
+	      <email>eredmond@codehaus.org</email>
+	      <organization>Codehaus</organization>
+	      <roles>
+	        <role>developer</role>
+	      </roles>
+	    </developer>
+	</developers>	
 
     <dependencies>
       <!-- Android target version 2 assumes that Android JAR is retrieved from remote repository -->

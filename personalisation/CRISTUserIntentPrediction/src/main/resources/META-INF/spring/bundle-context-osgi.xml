@@ -15,4 +15,22 @@
 			<value>org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction</value>
 		</osgi:interfaces>
 	</osgi:service>
+	
+	<osgi:reference id="PersonalisationManager"
+		interface="org.societies.personalisation.common.api.management.IInternalPersonalisationManager" /> 
+		
+	<!-- 
+	<osgi:service ref="PersonalisationManager">
+		<osgi:interfaces>
+			<value>org.societies.api.personalisation.mgmt.IPersonalisationManager</value>
+			<value>org.societies.personalisation.common.api.management.IInternalPersonalisationManager</value>
+		</osgi:interfaces>
+	</osgi:service>
+
+	<osgi:reference id="UserPrefMgr"
+		interface="org.societies.personalisation.preference.api.UserPreferenceManagement.IUserPreferenceManagement" />
+	<osgi:reference id="UserCtxBroker"
+		interface="org.societies.api.internal.context.broker.IUserCtxBroker" />
+	 -->
+	
 </beans>
