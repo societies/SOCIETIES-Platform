@@ -7,8 +7,6 @@
        bundle. We've kept the osgi definitions in a separate 
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
-
-  <bean id="UserActionMonitor" class="org.societies.useragent.monitoring.UserActionMonitor" />
 	
 	<bean id="UserActionMonitor" class="org.societies.useragent.monitoring.UserActionMonitor" 
    depends-on="UserCtxBroker" init-method="initialiseUserActionMonitor">
