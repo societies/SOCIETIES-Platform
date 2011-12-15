@@ -27,40 +27,66 @@ package org.societies.personalisation.UserPreferenceLearning.impl;
 
 import java.util.Date;
 
+import org.societies.api.internal.context.broker.IUserCtxBroker;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.personalisation.UserPreferenceLearning.impl.threads.AA_AI;
+import org.societies.personalisation.UserPreferenceLearning.impl.threads.AA_SI;
+import org.societies.personalisation.UserPreferenceLearning.impl.threads.SA_AI;
+import org.societies.personalisation.UserPreferenceLearning.impl.threads.SA_SI;
 import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Consumer;
 import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Learning;
 
 public class UserPreferenceLearning implements IC45Learning{
+	
+	private AA_AI aa_ai;
+	private AA_SI aa_si;
+	private SA_AI sa_ai;
+	private SA_SI sa_si;
+	private HistoryRetriever historyRetriever;
+	private IUserCtxBroker ctxBroker;
 
 	@Override
 	//run preference learning on all actions for all identities
 	public void runC45Learning(IC45Consumer requestor, Date startDate) {
-		//allDPIsAllActions = new AllDPIsAllActions(requestor, date, bc);
-        //allDPIsAllActions.start();
+		aa_ai = new AA_AI(requestor, startDate, historyRetriever);
+        aa_ai.start();
 	}
 
 	@Override
 	//run preference learning on specific service action parameterName for all identities
 	public void runC45Learning(IC45Consumer requestor, Date startDate,
 			ServiceResourceIdentifier serviceId, String parameterName) {
-		//allDPIsSpecificAction = new AllDPIsSpecificAction(requestor, date, serviceId, parameterName, bc);
-        //allDPIsSpecificAction.start();
+		sa_ai = new SA_AI(requestor, startDate, serviceId, parameterName, historyRetriever);
+        sa_ai.start();
 	}
 	
 	@Override
     //run C45 on all actions for specific identity
-    public void runC45Learning(IC45Consumer requestor, EntityIdentifier historyOwner, Date date){
-        //specificDPIAllActions = new SpecificDPIAllActions(requestor, dpi, date, bc);
-        //specificDPIAllActions.start();
+    public void runC45Learning(IC45Consumer requestor, Date startDate, EntityIdentifier historyOwner){
+        aa_si = new AA_SI(requestor, startDate, historyOwner, historyRetriever);
+        aa_si.start();
     }
 
 	@Override
     //run C45 learning on specific service action for specific identity
-    public void runC45Learning(IC45Consumer requestor, EntityIdentifier historyOwner, Date date, 
+    public void runC45Learning(IC45Consumer requestor, Date startDate, EntityIdentifier historyOwner,
     		ServiceResourceIdentifier serviceId, String parameterName){
-        //specificDPISpecificAction = new SpecificDPISpecificAction(requestor, dpi, date, serviceId, parameterName, bc);
-        //specificDPISpecificAction.start();
+        sa_si = new SA_SI(requestor, startDate, historyOwner, serviceId, parameterName, historyRetriever);
+        sa_si.start();
     }
+	
+	public void initialiseUserPreferenceLearning(){
+		if(this.ctxBroker == null){
+			System.out.println("ctxBroker is null :(");
+		}else{
+			System.out.println("ctxBroker is not null :)");
+			historyRetriever = new HistoryRetriever(ctxBroker);
+		}
+	}
+	
+	public void setCtxBroker(IUserCtxBroker broker){
+		this.ctxBroker = broker;
+	}
+	
 }

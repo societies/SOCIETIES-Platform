@@ -90,7 +90,7 @@ public interface IC45Learning
 	 * @param serviceId
 	 * @param parameterName
 	 */
-	public void runC45Learning(IC45Consumer requestor, EntityIdentifier historyOwner, Date date, 
+	public void runC45Learning(IC45Consumer requestor, Date date, EntityIdentifier historyOwner,
     		ServiceResourceIdentifier serviceId, String parameterName);
 
 }
