@@ -25,12 +25,12 @@
 
 package org.societies.api.internal.useragent.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.api.internal.useragent.conflict.IConflictResolutionManager;
 import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
-import org.societies.api.internal.useragent.model.IProposal;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.internal.personalisation.model.IOutcome;
 
@@ -54,29 +54,7 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 		this.feedbackHandler = feedbackHandler;
 	}
 
-	public static class IntentVsPreferenceProposal implements IProposal{
-		IOutcome preference;
-		IOutcome intent;
-		
-		public IntentVsPreferenceProposal(IOutcome preference,
-		IOutcome intent){
-			this.preference=preference;
-			this.intent=intent;
-		}
-		@Override
-		public String getText() {
-			// TODO Auto-generated method stub
-			return "Your intent is:"+intent.toString()+
-					" BUT Your preference is"+preference.toString();
-		}
 
-		@Override
-		public String getOptions() {
-			// TODO Auto-generated method stub
-			return "Intent or Prefernce";
-		}
-		
-	}
 
 	@Override
 	public void makeDecision(List<IOutcome> intents, List<IOutcome> preferences) {
@@ -88,8 +66,13 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 				if (conflict == ConflictType.PREFERNCE_INTENT_NOT_MATCH) {
 					action = manager.resolveConflict(action,preference);
 					if(action ==null){
+						List<String> options=new ArrayList<String>();
+						options.add(intent.toString());
+						options.add(preference.toString());
+						ExpProposalContent epc=new ExpProposalContent("Conflict Detected!",
+								options);
 						if(feedbackHandler.getExplicitFB(
-								new IntentVsPreferenceProposal(intent,preference))){
+								ExpProposalType.RADIOLIST,epc)){
 							action=intent;
 							/*return true for intent false for preference*/
 						}else{
