@@ -25,18 +25,19 @@
 
 package org.societies.api.internal.useragent.model;
 
-import org.societies.api.personalisation.model.IAction;
+import org.societies.api.internal.personalisation.model.IOutcome;
+
 
 public class EmptyRule implements ConflictResolutionRule{
 
 	@Override
-	public boolean match(IAction intention, IAction preference) {
+	public boolean match(IOutcome intention, IOutcome preference) {
 		// TODO Auto-generated method stub
 		return true;
 	}
 
 	@Override
-	public IAction tradeoff(IAction intention, IAction preference) {
+	public IOutcome tradeoff(IOutcome intention, IOutcome preference) {
 		// TODO Auto-generated method stub
 		return intention;
 	}

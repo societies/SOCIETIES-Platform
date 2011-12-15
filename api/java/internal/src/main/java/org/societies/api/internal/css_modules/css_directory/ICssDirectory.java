@@ -38,7 +38,7 @@ public interface ICssDirectory {
 	 * 
 	 * @param css object to be added to directory
 	 */
-	void addCSS(Object css);
+	void addCss(Object css);
 
 	/**
 	 * Description: This method allows to delete specific CSS entry from CSS
@@ -46,7 +46,7 @@ public interface ICssDirectory {
 	 * 
 	 * @param css object to be deleted from directory
 	 */
-	void deleteCSS(Object css);
+	void deleteCss(Object css);
 
 	/**
 	 * Description : This method can be used to update the changes in the CSS
@@ -55,26 +55,26 @@ public interface ICssDirectory {
 	 * @param css to be updated or replaced
 	 * @param update new css object to be placed in the directory
 	 */
-	void updateCSS(Object css, Object update);
+	void updateCss(Object css, Object update);
 
 	/**
 	 * Description : Queries list of CSS available in the CSS directory
 	 * @return collection of CSS objects from CSS directory
 	 */
-	Collection<Object> findForAllCSS();
+	Collection<Object> findForAllCss();
 
 	/**
 	 * Description : Queries list of CSS object with CIS group filter 
 	 * @param cisgroup for which list of CSS will retrieved from directory  
 	 * @return collection of CSS object
 	 */
-	Collection<Object> findForAllCSS(Object cisgroup);
+	Collection<Object> findForAllCss(Object cisgroup);
 
 	/**
 	 * Descripption : Search for specific CSS in the directory
 	 * @param searchinfo searching object or criteria
 	 * @return a CSS object if available or null
 	 */
-	Object findCSS(Object searchinfo);
+	Object findCss(Object searchinfo);
 
 }

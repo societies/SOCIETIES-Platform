@@ -27,7 +27,7 @@ package org.societies.api.internal.useragent.model;
 
 import java.util.List;
 
-import org.societies.api.personalisation.model.IAction;
+import org.societies.api.internal.personalisation.model.IOutcome;
 
 public class EnsembleConflictResolutionRule implements ConflictResolutionRule{
 	private ConflictResolutionRule rightHandSide;
@@ -80,11 +80,17 @@ public class EnsembleConflictResolutionRule implements ConflictResolutionRule{
 			fold(List<ConflictResolutionRule> rules){
 		if(rules.size()<1)
 			return new EmptyRule();
+		if(rules.size()<2)
+			return rules.get(0);
+		if(rules.size()<3)
+			return new EnsembleConflictResolutionRule(rules.get(0),
+					rules.get(1),Operator.OR);
 		EnsembleConflictResolutionRule rule
-			= new EnsembleConflictResolutionRule(rules.get(0));
-		for(int i=1;i<rules.size();i++){
+			= new EnsembleConflictResolutionRule(rules.get(0),
+					rules.get(1),Operator.OR);
+		for(int i=2;i<rules.size();i++){
 			rule=rule.shiftToLeft();
-			rule.addANDRule(rule);
+			rule.addORRule(rule);
 		}
 		return rule;
 	}
@@ -97,10 +103,10 @@ public class EnsembleConflictResolutionRule implements ConflictResolutionRule{
 	}
 
 	@Override
-	public boolean match(IAction intention, IAction preference) {
+	public boolean match(IOutcome intention, IOutcome preference) {
 		// TODO Auto-generated method stub
 		if(this.leftHandSide==null)
-			return true;
+			return false;
 		else if(this.rightHandSide==null)
 			return this.leftHandSide.match(intention, preference);
 		/*empty rule*/
@@ -115,9 +121,26 @@ public class EnsembleConflictResolutionRule implements ConflictResolutionRule{
 	}
 
 	@Override
-	public IAction tradeoff(IAction intention, IAction preference) {
+	public IOutcome tradeoff(IOutcome intention, IOutcome preference) {
 		// TODO Auto-generated method stub
-		return null;
+		if(this.rightHandSide==null)
+			return this.leftHandSide.
+					tradeoff(intention, preference);
+		IOutcome lres=this.leftHandSide.
+				tradeoff(intention, preference);
+		IOutcome rres=this.rightHandSide.
+				tradeoff(intention, preference);
+		if(lres==null)
+			return rres;
+		if(rres!=null&&!lres.equals(rres)){
+			if(this.operator==Operator.AND){
+				return null;
+			}else{
+				return lres;
+			}
+		}else{
+			return rres;
+		}
 	}
 
 }

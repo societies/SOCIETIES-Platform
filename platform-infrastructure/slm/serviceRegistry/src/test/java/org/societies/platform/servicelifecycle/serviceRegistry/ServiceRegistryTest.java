@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.model.RegistryEntry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.model.ServiceResourceIdentifier;
 
 public class ServiceRegistryTest {
-	static private Logger log = LoggerFactory.getLogger(ServiceRegistry.class);
+	//static private Logger log = LoggerFactory.getLogger(ServiceRegistry.class);
 	
 	public ServiceRegistryTest() {}
 	
@@ -51,7 +51,7 @@ public class ServiceRegistryTest {
 			
 			sr.registerServiceList(temp);
 			
-			log.info("Entry added to Service Registry");
+	//		log.info("Entry added to Service Registry");
 			
 			assertTrue(true);
 		}

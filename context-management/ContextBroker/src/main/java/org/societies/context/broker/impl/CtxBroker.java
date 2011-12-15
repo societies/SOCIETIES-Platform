@@ -44,6 +44,8 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.mock.EntityIdentifier;
 
+import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
+
 /**
  * 3p Context Broker Implementation
  * This class implements the community and user broker api methods along with the callback methods 
@@ -53,6 +55,18 @@ public class CtxBroker implements org.societies.api.internal.context.broker.IUse
 										org.societies.api.internal.context.broker.ICommunityCtxBrokerCallback,
 										IUserCtxBroker, ICommunityCtxBroker {
 
+	
+	private IUserCtxDBMgr userDB;
+	
+	
+	public CtxBroker() {
+		
+		}
+	
+	public CtxBroker(IUserCtxDBMgr userDB) {
+		this.userDB=userDB;
+		}
+		
 	
 	//ICommunityCtxBroker methods
 	@Override

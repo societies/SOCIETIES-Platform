@@ -12,8 +12,8 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<version>1.0.0</version>
-		<relativePath>../../../parent</relativePath>
+		<version>0.1</version>
+		<relativePath>../../../parent/spring-osgi.xml/</relativePath>
 	</parent>
 
 	<properties>
@@ -26,147 +26,25 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.beans</artifactId>
-			<version>${spring.maven.artifact.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>com.springsource.org.apache.commons.logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.core</artifactId>
-			<version>${spring.maven.artifact.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>com.springsource.org.apache.commons.logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.context</artifactId>
-			<version>${spring.maven.artifact.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>com.springsource.org.apache.commons.logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>com.springsource.slf4j.api</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>com.springsource.slf4j.log4j</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>log4j</groupId>
-					<artifactId>log4j</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.log4j</groupId>
-					<artifactId>com.springsource.org.apache.log4j</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<!-- test scoped dependencies -->
-		<dependency>
-			<groupId>org.junit</groupId>
-			<artifactId>com.springsource.junit</artifactId>
-			<version>3.8.2</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.test</artifactId>
-			<version>${spring.maven.artifact.version}</version>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>com.springsource.org.apache.commons.logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.osgi</groupId>
-			<artifactId>spring-osgi-test</artifactId>
-			<version>${spring.osgi.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.osgi</groupId>
-			<artifactId>spring-osgi-annotation</artifactId>
-			<version>${spring.osgi.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.osgi</groupId>
-			<artifactId>spring-osgi-extender</artifactId>
-			<version>${spring.osgi.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.aopalliance</groupId>
-			<artifactId>com.springsource.org.aopalliance</artifactId>
-			<version>1.0.0</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- Equinox OSGi platform -->
-		<dependency>
-			<groupId>org.eclipse.osgi</groupId>
-			<artifactId>org.eclipse.osgi</artifactId>
-			<version>${equinox.ver}</version>
-			<type>jar</type>
-			<!-- Uncomment the following line if you want it to be available only 
-				in test -->
-			<!-- <scope>test</scope> -->
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.osgi</groupId>
-			<artifactId>log4j.osgi</artifactId>
-			<version>1.2.15-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<version>4.0.0.CR7</version>
-		
+			<artifactId>com.springsource.org.hibernate</artifactId>
+			<version>4.0.0.CR4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.derby</groupId>
-			<artifactId>derby</artifactId>
-			<version>10.8.2.2</version>
+			<artifactId>com.springsource.org.apache.derby</artifactId>
+			<version>10.5.1000001.764942</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>com.springsource.javax.persistence</artifactId>
+			<version>2.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -178,20 +56,17 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Export-Package>
-							org.societies.api.internal.servicelifecycle.serviceRegistry.*,
-							javax.persistence.*,
-							org.hibernate.*,
-							org.hibernate.cfg.*,!*
-						</Export-Package>
-						<Bundle-Activator></Bundle-Activator>
-						<Import-Package>
-							javax.persistence.*,
-							org.hibernate.*,
-							org.hibernate.cfg.*,!*
-						</Import-Package>
-						<Embed-Dependency>;scope=compile|runtime</Embed-Dependency>
-							<Embed-Transitive>true</Embed-Transitive> 
+						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
+						<Export-Package>org.societies.api.internal.servicelifecycle.serviceRegistry.*</Export-Package>
+						<Import-Package>*;resolution:=optional</Import-Package>
+						<Private-Package>
+							org.societies.internal.servicelifecycle.serviceRegistry.model.*,
+							org.societies.comm.xmpp.*,
+							org.societies.platform.servicelifecycle.serviceRegistry.*,
+							org.societies.comm.identity.*
+						</Private-Package>
+						<_nouses>true</_nouses>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -201,6 +76,14 @@
 					<descriptors>
 						<descriptor></descriptor>
 					</descriptors>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.11</version>
+				<configuration>
+					<skipTests>true</skipTests>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -218,19 +101,12 @@
 							<version>${project.version}</version>
 							<type>jar</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${virgo.rich.deploy.dir}</outputDirectory>
+							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-<repositories>
-  <!-- For hibernate support -->
-  <repository>
-   <id>jboss</id>
-   <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-  </repository>
-</repositories>
 
 </project>

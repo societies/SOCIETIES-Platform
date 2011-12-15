@@ -2,7 +2,7 @@ package org.societies.personalisation.CRIST.api.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,10 +25,10 @@ public class CRISTCommunitySituation implements ICRISTCommunitySituation {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	LinkedHashMap<ICRISTCommunityAction, Double> communitySituationActions;
+	HashMap<ICRISTCommunityAction, Double> communitySituationActions;
 	Map<String, Serializable> communitySituationContext;
 	String communitySituationID;
-	LinkedHashMap<ICRISTCommunityTask, Double> communitySituationTasks;
+	HashMap<ICRISTCommunityTask, Double> communitySituationTasks;
 	public CRISTCommunityTask m_CRISTCommunityTask;
 
 	public void finalize() throws Throwable {
@@ -58,7 +58,7 @@ public class CRISTCommunitySituation implements ICRISTCommunitySituation {
 	 * @param communityActions
 	 */
 	public void addActions(
-			LinkedHashMap<ICRISTCommunityAction, Double> communityActions) {
+			HashMap<ICRISTCommunityAction, Double> communityActions) {
 
 	}
 
@@ -69,7 +69,7 @@ public class CRISTCommunitySituation implements ICRISTCommunitySituation {
 	 * @param communityTasks
 	 */
 	public void addTasks(
-			LinkedHashMap<ICRISTCommunityTask, Double> communityTasks) {
+			HashMap<ICRISTCommunityTask, Double> communityTasks) {
 
 	}
 
@@ -78,7 +78,7 @@ public class CRISTCommunitySituation implements ICRISTCommunitySituation {
 	 * 
 	 * @return
 	 */
-	public LinkedHashMap<ICRISTCommunityAction, Double> getSituatioinActions() {
+	public HashMap<ICRISTCommunityAction, Double> getSituatioinActions() {
 		return this.communitySituationActions;
 	}
 
@@ -106,7 +106,7 @@ public class CRISTCommunitySituation implements ICRISTCommunitySituation {
 	 * 
 	 * @return
 	 */
-	public LinkedHashMap<ICRISTCommunityTask, Double> getSituationTasks() {
+	public HashMap<ICRISTCommunityTask, Double> getSituationTasks() {
 		return this.communitySituationTasks;
 	}
 
