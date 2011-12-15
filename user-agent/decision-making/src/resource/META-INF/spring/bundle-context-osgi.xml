@@ -12,13 +12,13 @@
        testing of the bundle outside of an OSGi container -->
        
         
-        <osgi:service ref="ConflictResolution">
+        <osgi:service ref="DecisionMaker">
         <osgi:interfaces>
-        <value>org.societies.api.internal.useragent.conflict.IConflictResolutionManager</value>
+        <value>org.societies.api.internal.useragent.decisionmaking.IDecisionMaker</value>
         </osgi:interfaces>
         </osgi:service>
         
-        <bean name="ConflictResolution" class="org.societies.useragent.conflict.ConflictResolution" />
+        <bean name="decisionmaking" class="org.societies.useragent.decisionmaking.DecisionMaker" />
 
 
 </beans>

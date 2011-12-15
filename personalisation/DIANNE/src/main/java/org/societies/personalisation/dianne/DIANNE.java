@@ -23,24 +23,58 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.decisionmaking;
+package org.societies.personalisation.dianne;
 
-import java.util.List;
+import java.util.HashMap;
 
+import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.internal.useragent.conflict.IConflictResolutionManager;
-import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
-import org.societies.api.personalisation.model.IAction;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
-public class DecisionMaker implements IDecisionMaker{
+public class DIANNE implements IDIANNE{
+
+	private HashMap<EntityIdentifier, NetworkRunner> networks;
+
+	public DIANNE(){
+		networks = new HashMap<EntityIdentifier, NetworkRunner>();
+	}
 
 	@Override
-	public void makeDecision(List<IOutcome> arg0, List<IOutcome> arg1) {
+	public IOutcome getOutcome(EntityIdentifier ownerId,
+			ServiceResourceIdentifier serviceId, String preferenceName) {
 		// TODO Auto-generated method stub
-		
+		return null;
 	}
-	
-	
 
-	
+	@Override
+	public IOutcome getOutcome(EntityIdentifier ownerId,
+			ServiceResourceIdentifier serviceId, String preferenceName,
+			CtxAttribute attribute) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void enableDIANNELearning(EntityIdentifier ownerId) {
+		System.out.println("Enabling incremental learning for identity: "+ ownerId);
+		if(networks.containsKey(ownerId)){
+			NetworkRunner network = networks.get(ownerId);
+			network.play();
+		}else{
+			System.out.println("No networks exist for this identity");
+		}
+	}
+
+	@Override
+	public void disableDIANNELearning(EntityIdentifier ownerId) {
+		System.out.println("Disabling incremental learning for identity: "+ ownerId);	
+		if(networks.containsKey(ownerId)){
+			NetworkRunner network = networks.get(ownerId);
+			network.pause();
+		}else{
+			System.out.println("No networks exist for this identity");
+		}
+	}
 }

@@ -23,24 +23,12 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.decisionmaking;
+package org.societies.personalisation.dianne.model;
 
-import java.util.List;
-
-import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.internal.useragent.conflict.IConflictResolutionManager;
-import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
-import org.societies.api.personalisation.model.IAction;
-
-public class DecisionMaker implements IDecisionMaker{
-
-	@Override
-	public void makeDecision(List<IOutcome> arg0, List<IOutcome> arg1) {
-		// TODO Auto-generated method stub
-		
+public class ContextNode extends Node
+{
+	public ContextNode(int ID, String groupName, String nodeName)
+	{
+		super(ID, groupName, nodeName);
 	}
-	
-	
-
-	
 }

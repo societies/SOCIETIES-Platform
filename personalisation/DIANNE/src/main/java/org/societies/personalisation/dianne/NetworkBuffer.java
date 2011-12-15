@@ -23,24 +23,43 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.decisionmaking;
+package org.societies.personalisation.dianne;
 
-import java.util.List;
+import java.util.ArrayList;
 
-import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.internal.useragent.conflict.IConflictResolutionManager;
-import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
 import org.societies.api.personalisation.model.IAction;
 
-public class DecisionMaker implements IDecisionMaker{
-
-	@Override
-	public void makeDecision(List<IOutcome> arg0, List<IOutcome> arg1) {
-		// TODO Auto-generated method stub
-		
+public class NetworkBuffer 
+{
+	ArrayList<IAction> outcomeUpdates;
+	ArrayList<IAction> contextUpdates;
+	
+	public NetworkBuffer()
+	{
+		outcomeUpdates = new ArrayList<IAction>();
+		contextUpdates = new ArrayList<IAction>();
 	}
 	
+	public synchronized void addContextUpdate(IAction update)
+	{
+		contextUpdates.add(update);
+	}
 	
-
+	public synchronized void addOutcomeUpdate(IAction update)
+	{
+		outcomeUpdates.add(update);
+	}
 	
+	public synchronized ArrayList<IAction>[] getSnapshot()
+	{
+		ArrayList<IAction> context_ss = contextUpdates;
+		ArrayList<IAction> outcome_ss = outcomeUpdates;
+		
+		contextUpdates = new ArrayList<IAction>();
+		outcomeUpdates = new ArrayList<IAction>();
+		
+		ArrayList[] snapshot = new ArrayList[]{context_ss, outcome_ss};
+		
+		return snapshot;
+	}
 }

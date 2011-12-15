@@ -8,7 +8,7 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-  <bean name="ConflictResolution" class="org.societies.useragent.conflict.ConflictResolution" />
+  <bean name="DecisionMaker" class="org.societies.useragent.decisionmaking.DecisionMaker" />
 
 </beans>
 

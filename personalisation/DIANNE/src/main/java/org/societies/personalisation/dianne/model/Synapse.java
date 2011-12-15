@@ -23,24 +23,62 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.decisionmaking;
+package org.societies.personalisation.dianne.model;
 
-import java.util.List;
+public class Synapse 
+{
+	String id;
+	ContextNode preNode;
+	OutcomeNode postNode;
+	double weight;
 
-import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.internal.useragent.conflict.IConflictResolutionManager;
-import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
-import org.societies.api.personalisation.model.IAction;
-
-public class DecisionMaker implements IDecisionMaker{
-
-	@Override
-	public void makeDecision(List<IOutcome> arg0, List<IOutcome> arg1) {
-		// TODO Auto-generated method stub
-		
+	public Synapse(String id, ContextNode preNode, OutcomeNode postNode)
+	{
+		this.id = id;
+		this.preNode = preNode;
+		this.postNode = postNode;
+		weight = 0.0;
 	}
-	
-	
 
-	
+	public void updateWeight()
+	{
+		if(preNode.getActive() && postNode.getActive()) //both on - increment
+		{
+			weight = weight+1.0;
+		}else if(preNode.getActive() && !postNode.getActive()) //context on, outcome off - decrement
+		{
+			weight = weight-1.0;
+		}
+	}
+
+	/*
+	 * Getter methods
+	 */
+	public String getId()
+	{
+		return id;
+	}
+
+	public ContextNode getPreNode()
+	{
+		return preNode;
+	}
+
+	public OutcomeNode getPostNode()
+	{
+		return postNode;
+	}
+
+	public double getWeight()
+	{
+		return weight;
+	}
+
+	/*
+	 * Setter methods
+	 */
+	public void setWeight(double weight)
+	{
+		this.weight = weight;
+	}
 }

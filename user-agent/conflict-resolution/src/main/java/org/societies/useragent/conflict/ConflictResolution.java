@@ -23,24 +23,17 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.decisionmaking;
+package org.societies.useragent.conflict;
 
-import java.util.List;
-
-import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.useragent.conflict.IConflictResolutionManager;
-import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
 import org.societies.api.personalisation.model.IAction;
 
-public class DecisionMaker implements IDecisionMaker{
+public class ConflictResolution implements IConflictResolutionManager{
 
 	@Override
-	public void makeDecision(List<IOutcome> arg0, List<IOutcome> arg1) {
+	public IAction resolveConflict(IAction arg0, IAction arg1) {
 		// TODO Auto-generated method stub
-		
+		return null;
 	}
-	
-	
-
 	
 }

@@ -23,24 +23,63 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.decisionmaking;
+package org.societies.personalisation.dianne.model;
 
-import java.util.List;
+import java.util.ArrayList;
 
-import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.internal.useragent.conflict.IConflictResolutionManager;
-import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
-import org.societies.api.personalisation.model.IAction;
-
-public class DecisionMaker implements IDecisionMaker{
-
-	@Override
-	public void makeDecision(List<IOutcome> arg0, List<IOutcome> arg1) {
-		// TODO Auto-generated method stub
-		
+public class Node 
+{
+	int ID;
+	String nodeName;
+	String groupName;
+	ArrayList<Synapse> synapses;
+	Boolean active;
+	
+	public Node(int ID, String groupName, String nodeName)
+	{
+		this.ID = ID;
+		this.groupName = groupName;
+		this.nodeName = nodeName;
+		synapses = new ArrayList<Synapse>();
+		active = false;
 	}
 	
+	public void addSynapse(Synapse synapse)
+	{
+		synapses.add(synapse);
+	}
 	
-
+	public int getID(){
+		return this.ID;
+	}
 	
+	public String getNodeName()
+	{
+		return nodeName;
+	}
+	
+	public String getGroupName()
+	{
+		return groupName;
+	}
+	
+	public ArrayList<Synapse> getSynapses()
+	{
+		return synapses;
+	}
+	
+	public boolean getActive()
+	{
+		return active;
+	}
+	
+	public void activate()
+	{
+		active = true;
+	}
+	
+	public void deactivate()
+	{
+		active = false;
+	}
 }

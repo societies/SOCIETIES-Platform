@@ -23,24 +23,80 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.decisionmaking;
+package org.societies.personalisation.dianne.model;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
 
-import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.internal.useragent.conflict.IConflictResolutionManager;
-import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
-import org.societies.api.personalisation.model.IAction;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
-public class DecisionMaker implements IDecisionMaker{
+public class Network 
+{
+	private ArrayList<ContextGroup> contextGroups;
+	private ArrayList<OutcomeGroup> outcomeGroups;
+	private ArrayList<Synapse> synapses;
 
-	@Override
-	public void makeDecision(List<IOutcome> arg0, List<IOutcome> arg1) {
-		// TODO Auto-generated method stub
-		
+	public Network()
+	{
+		contextGroups = new ArrayList<ContextGroup>();
+		outcomeGroups = new ArrayList<OutcomeGroup>();
+		synapses = new ArrayList<Synapse>();
 	}
 	
+	public ArrayList<ContextGroup> getContextGroups(){
+		return contextGroups;
+	}
 	
+	public ArrayList<OutcomeGroup> getOutcomeGroups(){
+		return outcomeGroups;
+	}
+	
+	public ArrayList<Synapse> getSynapses(){
+		return synapses;
+	}
+	
+	public ContextGroup getContextGroup(String groupName){
+		ContextGroup requestedGroup = null;
+		Iterator<ContextGroup> list_it = contextGroups.iterator();
+		while(list_it.hasNext())
+		{
+			ContextGroup group = (ContextGroup)list_it.next();
+			if(group.getGroupName().equals(groupName))
+			{
+				requestedGroup = group;
+				break;
+			}
+		}
+		return requestedGroup;
+	}
+	
+	public OutcomeGroup getOutcomeGroup(ServiceResourceIdentifier serviceId, String groupName){
+		OutcomeGroup requestedGroup = null;
 
+		Iterator <OutcomeGroup>list_it = outcomeGroups.iterator();
+		while(list_it.hasNext())
+		{
+			OutcomeGroup group = (OutcomeGroup)list_it.next();
+			if(group.getServiceId().equals(serviceId)){
+				if(group.getGroupName().equals(groupName))
+				{
+					requestedGroup = group;
+					break;
+				}
+			}
+		}
+		return requestedGroup;
+	}
 	
+	public void addContextGroup(ContextGroup newContextGroup){
+		contextGroups.add(newContextGroup);
+	}
+	
+	public void addOutcomeGroup(OutcomeGroup newOutcomeGroup){
+		outcomeGroups.add(newOutcomeGroup);
+	}
+	
+	public void addSynapse(Synapse newSynapse){
+		synapses.add(newSynapse);
+	}
 }
