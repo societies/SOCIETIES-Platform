@@ -27,16 +27,12 @@ public class CRISTTester {
 	
 	private ICRISTUserIntentPrediction cristPredictor;
 	private CtxAttribute myCtx;
-	
-	public static void main(){
-		System.out.println("Hello Kitty");
-	}
-	
+		
 	public CRISTUserIntentPredictionTest(ICRISTUserIntentPrediction CRISTPredictor){
 		this.cristPredictor = CRISTPredictor;
 	}
 	
-	public void initialiseTesting(){
+	public void initialiseCRISTTesting(){
 		System.out.println("This is the testing class for CRIST UI Predictioin");
 		cristPredictor.getCRISTPrediction(myCtx);
 	}
