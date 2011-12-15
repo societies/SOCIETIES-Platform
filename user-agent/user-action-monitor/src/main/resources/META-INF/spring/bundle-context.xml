@@ -9,6 +9,11 @@
        for integration testing outside of an OSGi environment -->
 
   <bean id="UserActionMonitor" class="org.societies.useragent.monitoring.UserActionMonitor" />
+	
+	<bean id="UserActionMonitor" class="org.societies.useragent.monitoring.UserActionMonitor" 
+   depends-on="UserCtxBroker" init-method="initialiseUserActionMonitor">
+   <property name="ctxBroker" ref="UserCtxBroker"></property>
+   </bean>
 
 </beans>
 

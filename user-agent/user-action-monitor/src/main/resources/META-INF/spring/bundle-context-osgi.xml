@@ -11,11 +11,12 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
        
-        
-        <osgi:service ref="UserActionMonitor">
+       <osgi:service ref="UserActionMonitor">
         <osgi:interfaces>
         <value>org.societies.api.useragent.monitoring.IUserActionMonitor</value>
         </osgi:interfaces>
         </osgi:service>
+
+		<osgi:reference id="UserCtxBroker" interface="org.societies.api.internal.context.broker.IUserCtxBroker"/>
 
 </beans>
