@@ -28,9 +28,9 @@ import java.io.Serializable;
 
 import javax.swing.tree.DefaultTreeModel;
 
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ICtxAttributeIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
 
 
@@ -43,7 +43,7 @@ import org.societies.api.mock.ServiceResourceIdentifier;
  * @created 11-Nov-2011 17:06:54
  */
 public class DObfPreferenceTreeModel extends DefaultTreeModel implements IPrivacyPreferenceTreeModel, Serializable{
-	private ICtxAttributeIdentifier affectedCtxId;
+	private CtxAttributeIdentifier affectedCtxId;
 	private String myContextType;
 	private EntityIdentifier providerDPI;
 	private ServiceResourceIdentifier serviceID;
@@ -57,7 +57,7 @@ public class DObfPreferenceTreeModel extends DefaultTreeModel implements IPrivac
 		this.pref = preference;
 	}
 	
-	public ICtxAttributeIdentifier getAffectedContextIdentifier() {
+	public CtxAttributeIdentifier getAffectedContextIdentifier() {
 		return this.getAffectedCtxId();
 	}
 
@@ -78,11 +78,11 @@ public class DObfPreferenceTreeModel extends DefaultTreeModel implements IPrivac
 		return this.pref;
 	}
 
-	public void setAffectedCtxId(ICtxAttributeIdentifier affectedCtxId) {
+	public void setAffectedCtxId(CtxAttributeIdentifier affectedCtxId) {
 		this.affectedCtxId = affectedCtxId;
 	}
 
-	public ICtxAttributeIdentifier getAffectedCtxId() {
+	public CtxAttributeIdentifier getAffectedCtxId() {
 		return affectedCtxId;
 	}
 

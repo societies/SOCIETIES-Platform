@@ -24,6 +24,9 @@
 			profile* - and not in here (to prevent an accidential check in) - - The following 
 			variables are assumed to be declared: - virgo.home - Where the virgo/equinox 
 			is deployed - virgo.deploy - Deployment folder to deploy artifacts to - -->
+		<!-- Spring dependency version -->
+		<spring.version>3.0.5.RELEASE</spring.version>
+		<slf4j.version>1.6.1</slf4j.version>
 	</properties>
 
 	<!-- Defines from where toolkits and libraries are fetched -->
@@ -169,18 +172,115 @@
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring</artifactId>
-				<version>2.5.6</version>
+				<version>${spring.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>org.springframework.core</artifactId>
+				<version>${spring.version}</version>
+				<scope>provided</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>org.apache.commons</groupId>
+						<artifactId>com.springsource.org.apache.commons.logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>org.springframework.aop</artifactId>
+				<version>${spring.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>org.springframework.asm</artifactId>
+				<version>${spring.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>org.springframework.beans</artifactId>
+				<version>${spring.version}</version>
+				<scope>provided</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>org.apache.commons</groupId>
+						<artifactId>com.springsource.org.apache.commons.logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>org.springframework.context</artifactId>
+				<version>${spring.version}</version>
+				<scope>provided</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>org.apache.commons</groupId>
+						<artifactId>com.springsource.org.apache.commons.logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>org.springframework.expression</artifactId>
+				<version>${spring.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>org.springframework.jdbc</artifactId>
+				<version>${spring.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>org.springframework.orm</artifactId>
+				<version>${spring.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>org.springframework.oxm</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>org.springframework.transaction</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+				<version>${slf4j.version}</version>
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-simple</artifactId>
-				<version>1.5.8</version>
-				<scope>compile</scope>
+				<artifactId>com.springsource.slf4j.api</artifactId>
+				<version>${slf4j.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>com.springsource.slf4j.log4j</artifactId>
+				<version>${slf4j.version}</version>
+				<scope>provided</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>log4j</groupId>
+						<artifactId>log4j</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.log4j</groupId>
+						<artifactId>com.springsource.org.apache.log4j</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
 
 	<!-- Configure the build environment -->
 	<build>
@@ -281,7 +381,7 @@
 							<configuration>
 								<rules>
 									<requireProperty>
-										<property>virgo.rich.deploy.dir</property>
+										<property>spring.osgi.deploy.dir</property>
 										<message>You must specify the location of the Virgo
 											installation with the property VIRGO_HOME.
 											Hints: use your

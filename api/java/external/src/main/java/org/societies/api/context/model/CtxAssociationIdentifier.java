@@ -24,22 +24,58 @@
  */
 package org.societies.api.context.model;
 
+import org.societies.api.mock.EntityIdentifier;
+
 /**
- * This class is used in order to identify the CtxAssociation object.
+ * This class is used to identify context associations. It provides methods that
+ * return information about the identified association including:
+ * <ul>
+ * <li><tt>OperatorId</tt>: A unique identifier of the CSS or CIS where the 
+ * identified context association is stored.</li>
+ * <li><tt>ModelType</tt>: Describes the type of the identified context model
+ * object, i.e. {@link CtxModelType#ASSOCIATION ASSOCIATION}.</li>
+ * <li><tt>Type</tt>: A semantic tag that characterises the identified context
+ * association, e.g. "isFriendWith".</li>
+ * <li><tt>ObjectNumber</tt>: A unique number within the CSS/CIS where the
+ * respective context information was initially sensed/collected and stored.</li>
+ * </ul>
+ * <p>
+ * A context association identifier can be represented as a URI formatted
+ * String as follows:
+ * <pre>
+ * &lt;OperatorId&gt;/ASSOCIATION/&lt;Type&gt;/&lt;ObjectNumber&gt;
+ * </pre>
  * 
- * @author nikosk
- * @version 0.0.1
+ * @see CtxIdentifier
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
  */
 public class CtxAssociationIdentifier extends CtxIdentifier {
 
 	private static final long serialVersionUID = -7991875953413583564L;
 
-	private CtxAssociationIdentifier() {}
+	/**
+	 * Creates a context association identifier by specifying the CSS/CIS ID
+	 * where the identified context model object is stored, as well as,
+	 * the association type and the unique numeric model object identifier.
+	 * 
+	 * @param operatorId
+	 *            the identifier of the CSS/CIS where the identified context
+	 *            model object is stored
+	 * @param type
+	 *            the association type, e.g. "device"
+	 * @param objectNumber
+	 *            the unique numeric model object identifier
+	 */
+	public CtxAssociationIdentifier(EntityIdentifier operatorId, String type,
+			Long objectNumber) {
+		super(operatorId, type, objectNumber);
+	}
 
 	/**
-	 * Returns the model type of the object 
-	 * 
-	 * @return CtxModelType
+	 * Returns the type of the identified context model object, i.e. CtxModelType.ASSOCIATION
+	 *   
+	 *  @return CtxModelType#ASSOCIATION
 	 */
 	@Override
 	public CtxModelType getModelType() {

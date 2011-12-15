@@ -28,9 +28,9 @@ import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyOutcomeConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
-import org.societies.api.mock.ICtxAttributeIdentifier;
 
 
 /**
@@ -38,7 +38,7 @@ import org.societies.api.mock.ICtxAttributeIdentifier;
  * Effect : PrivacyOutcomeConstants (ALLOW, BLOCK)
  * RuleTarget: A target specifies:
  * 		the Subject: by IDigitalPersonalIdentifier and if applicable an IServiceIdentifier
- * 		the Resource: by ICtxAttributeIdentifier
+ * 		the Resource: by CtxAttributeIdentifier
  * 		the Action: READ,WRITE,CREATE,DELETE
  * Conditions: a list of conditions that have to be satisfied by the other party. These are processed during the negotiation phase 
  * and not during the PPN preference evaluation phase.
@@ -49,7 +49,7 @@ import org.societies.api.mock.ICtxAttributeIdentifier;
 public class PPNPOutcome implements IPrivacyOutcome, Serializable {
 
 
-	private ICtxAttributeIdentifier ctxID;
+	private CtxAttributeIdentifier ctxID;
 	private PrivacyOutcomeConstants effect;
 	private RuleTarget rule;
 	private List<Condition> conditions;

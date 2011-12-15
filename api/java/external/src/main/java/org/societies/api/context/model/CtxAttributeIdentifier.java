@@ -24,33 +24,77 @@
  */
 package org.societies.api.context.model;
 
+import org.societies.api.mock.EntityIdentifier;
+
 /**
- * This class is used in order to identify the CtxAttribute object.
+ * This class is used to identify context attributes. It provides methods
+ * that return information about the identified attribute including:
+ * <ul>
+ * <li><tt>OperatorId</tt>: A unique identifier of the CSS or CIS where the 
+ * entity containing the identified context attribute was first stored.</li>
+ * <li><tt>ModelType</tt>: Describes the type of the identified context model
+ * object, i.e. {@link CtxModelType#ATTRIBUTE ATTRIBUTE}.</li>
+ * <li><tt>Type</tt>: A semantic tag that characterises the identified context
+ * attribute. e.g. "name".</li>
+ * <li><tt>ObjectNumber</tt>: A unique number within the CSS/CIS where the
+ * respective context information was initially sensed/collected and stored.</li>
+ * </ul>
+ * <p>
+ * Compared to context entity or association identifiers, attribute identifiers
+ * additionally contain their <tt>Scope</tt>, i.e. the Entity identifier they
+ * are associated with. The format of the resulting identifier is as follows:
+ * <pre>
+ * &lt;Scope&gt;/ATTRIBUTE/&lt;Type&gt;/&lt;ObjectNumber&gt;
+ * </pre>
+ * <p>
+ * Use the {@link #getScope()} method to retrieve the {@link CtxEntityIdentifier}
+ * representing the attribute's <tt>Scope</tt>
+ * as a <code>CtxEntityIdentifier</code> object.
  * 
- * @author nikosk
- * @version 0.0.1
- *
+ * @see CtxEntityIdentifier
+ * @see CtxIdentifier
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
  */
 public class CtxAttributeIdentifier extends CtxIdentifier {
 	
 	private static final long serialVersionUID = -282171829285239788L;
 	
-	private CtxEntityIdentifier scope;
+	/** The scope of this context attribute identifier. */
+	private final CtxEntityIdentifier scope;
 
-	private CtxAttributeIdentifier() {}
+	/**
+	 * Creates a context attribute identifier by specifying the containing
+	 * entity, the attribute type and the unique numeric model object identifier
+	 * 
+	 * @param scope
+	 *            the {@link CtxEntityIdentifier} of the context entity containing
+	 *            the identified attribute
+	 * @param type
+	 *            the attribute type, e.g. "name"
+	 * @param objectNumber
+	 *            the unique numeric model object identifier
+	 */
+	public CtxAttributeIdentifier(CtxEntityIdentifier scope, String type, Long objectNumber) {
+		super(scope.getOperatorId(), type, objectNumber);
+		this.scope = scope;
+	}
 	
 	/**
-	 * Returns the entity identifier which defines teh owner CtxEntity.
+	 * Returns the {@link CtxEntityIdentifier} of the context entity containing
+	 * the identified attribute.
 	 * 
-	 *  @return CtxEntityIdentifier
+	 * @return the {@link CtxEntityIdentifier} of the context entity containing
+	 *         the identified attribute.
 	 */
 	public CtxEntityIdentifier getScope() {
 		return this.scope;
 	}
 
 	/**
-	 *  Returns the model type of the object 
-	 *  @return CtxModelType
+	 *  Returns the type of the identified context model object, i.e. CtxModelType.ATTRIBUTE
+	 *   
+	 *  @return CtxModelType#ATTRIBUTE
 	 */
 	@Override
 	public CtxModelType getModelType() {

@@ -9,6 +9,7 @@
 bin/
 gen/
 target/
+build/
 *.apk
 *.jar
 R.java

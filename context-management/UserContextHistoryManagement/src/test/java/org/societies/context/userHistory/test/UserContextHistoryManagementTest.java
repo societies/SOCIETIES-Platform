@@ -24,6 +24,6 @@
  */
 package org.societies.context.userHistory.impl;
 
-public class UserContextHistoryManagement {
+public class UserContextHistoryManagementTest {
 
 }

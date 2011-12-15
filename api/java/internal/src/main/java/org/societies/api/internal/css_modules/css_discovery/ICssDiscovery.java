@@ -38,25 +38,25 @@ public interface ICssDiscovery {
 	 * @param CSSDomain object
 	 * @return if success return true otherwise false
 	 */
-	public boolean setCSSDiscoveryDomain(Object[] CSSDomain);
+	public boolean setCssDiscoveryDomain(Object[] CSSDomain);
 	/**
 	 * Description : Search all the CSS which are online from central CSS registry
 	 * @return collection of CSS objects
 	 */
-	public Collection<Object> searchAllCSS();
+	public Collection<Object> searchAllCss();
 	/**
 	 * Description : Search all the CSS which are online from central CSS registry using CIS group filter
 	 * @param cisGroup filter the CSS for this CIS Group
 	 * @return collection CSS objects
 	 */
-	public Collection<Object> searchAllCSS(Object[] cisGroup);
+	public Collection<Object> searchAllCss(Object[] cisGroup);
 	/**
 	 * Description : This methods registers for CSS join alert notification for one or more list of CIS group
 	 * @param handler notification response handler
 	 * @param cisGroupFilter list of CIS group registered for CSS join notification
 	 * @return return true if registration message processed successfully, false otherwise
 	 */
-	public boolean registerForJoinCSSAlert(Object handler,
+	public boolean registerForJoinCssAlert(Object handler,
 			Object[] cisGroupFilter);
 	/**
 	 * Description : This methods registers for CSS left alert notification for one or more list of CIS group
@@ -64,7 +64,7 @@ public interface ICssDiscovery {
 	 * @param cisGroupFilter list of CIS group registered for CSS left notification
 	 * @return return true if registration message processed successfully, false otherwise
 	 */
-	public boolean registerForLeftCSSAlert(Object handler,
+	public boolean registerForLeftCssAlert(Object handler,
 			Object[] cisGroupFilter);
 	/**
 	 * Description: This methods unregisters for CSS join alert notification for one or more list of CIS group
@@ -72,7 +72,7 @@ public interface ICssDiscovery {
 	 * @param cisGroupFilter list of CIS group unregistered for CSS join notification
 	 * @return return true if registration message processed successfully, false otherwise
 	 */
-	public boolean unregisterJoinCSSAlert(Object handler,
+	public boolean unregisterJoinCssAlert(Object handler,
 			Object[] cisGroupFilter);
 	/**
 	 * Description: This methods unregisters for CSS left alert notification for one or more list of CIS group
@@ -80,26 +80,26 @@ public interface ICssDiscovery {
 	 * @param cisGroupFilter list of CIS group unregistered for CSS left notification
 	 * @return return true if registration message processed successfully, false otherwise
 	 */
-	public boolean unregisterLeftCSSAlert(Object handler,
+	public boolean unregisterLeftCssAlert(Object handler,
 			Object[] cisGroupFilter);
 	/**
 	 * Description : This method search the server for specific CSS using CSS id
 	 * @param CSSID of queried CSS
 	 * @return CSS object or null based on search result  
 	 */
-	public Object findCSS(Object CSSID);
+	public Object findCss(Object cssId);
 	/**
 	 * Description: This method check whether a particular CSS Exists
 	 *  @param CSSID of queried CSS
 	 * @return true or false based on search result  
 	 */
-	public boolean isCSSExists(Object CSSID);
+	public boolean isCssExists(Object CssId);
 	
 	/**
 	 * Description : This method returns list of CIS associated with a CSS Id
 	 * @param CSSID of CSS to query for CIS membership list
 	 * @return list of CIS identification object.
 	 */
-	public List<Object> getCISMembership(Object CSSID);
+	public List<Object> getCISMembership(Object CssId);
 
 }
