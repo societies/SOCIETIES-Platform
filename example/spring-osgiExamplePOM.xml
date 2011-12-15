@@ -7,12 +7,25 @@
 	<packaging>bundle</packaging>
 	<version>${release.version}</version>
 	<developers>
-		<developer>
-			<name>John Smith</name>
-			<email>jsmith@github.com</email>
-		</developer>
-	</developers>
-	
+	    <developer>
+	      <id>github ID</id>
+	      <name>Eric</name>
+	      <email>eredmond@codehaus.org</email>
+	      <organization>Codehaus</organization>
+	      <roles>
+	        <role>owner</role>
+	      </roles>
+	    </developer>
+	    <developer>
+	      <id>github ID</id>
+	      <name>Eric</name>
+	      <email>eredmond@codehaus.org</email>
+	      <organization>Codehaus</organization>
+	      <roles>
+	        <role>developer</role>
+	      </roles>
+	    </developer>
+	</developers>		
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>

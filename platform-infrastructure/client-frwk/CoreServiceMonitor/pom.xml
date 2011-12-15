@@ -7,36 +7,13 @@
         <artifactId>android-parent</artifactId>
         <version>0.1</version>
         <relativePath>../../../parent/android.xml</relativePath>
-	<!-- modify if project root directory different to other projects-->
    </parent>
 
    <groupId>org.societies.android.platform</groupId>
-   <artifactId>MODIFY ME</artifactId>
-   <!-- see Redmine wiki for componentname from project structure -->
-   <version>0.1</version> 
-   <!-- still being discussed -->
-   <name>MODIFY ME</name>
+   <artifactId>CoreServiceMonitor</artifactId>
+   <name>ServiceMonitor</name>
    <packaging>apk</packaging>
-	<developers>
-	    <developer>
-	      <id>github ID</id>
-	      <name>Eric</name>
-	      <email>eredmond@codehaus.org</email>
-	      <organization>Codehaus</organization>
-	      <roles>
-	        <role>owner</role>
-	      </roles>
-	    </developer>
-	    <developer>
-	      <id>github ID</id>
-	      <name>Eric</name>
-	      <email>eredmond@codehaus.org</email>
-	      <organization>Codehaus</organization>
-	      <roles>
-	        <role>developer</role>
-	      </roles>
-	    </developer>
-	</developers>	
+
 
     <dependencies>
       <!-- Android target version 2 assumes that Android JAR is retrieved from remote repository -->
@@ -54,6 +31,13 @@
             <groupId>com.phonegap</groupId>
             <artifactId>phonegap</artifactId>
         </dependency>
+        <dependency>
+          	<groupId>org.societies.android.platform</groupId>
+  			<artifactId>CoreInterfaces</artifactId>
+  			<version>0.1</version>
+  			<scope>compile</scope>
+        </dependency>
+        
     </dependencies>
 
     <build>
