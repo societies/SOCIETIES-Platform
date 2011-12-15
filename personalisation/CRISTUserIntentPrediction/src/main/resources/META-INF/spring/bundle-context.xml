@@ -12,9 +12,8 @@
 
 	<bean id="CRISTUserIntentPredictor"
 		class="org.societies.personalisation.CRISTUserIntentPrediction.impl.CRISTUserIntentPrediction"
-		depends-on="UserPrefMgr, UserCtxBroker" init-method="initialiseCRISTPrediction">
+		depends-on="UserPrefMgr" init-method="initialiseCRISTPrediction">
 		<property name="preManager" ref="UserPrefMgr"></property>
-		<property name="ctxBroker" ref="UserCtxBroker"></property>
 	</bean>
 
 	<!-- <bean id="PersonalisationManager"
