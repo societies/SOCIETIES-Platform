@@ -1,7 +1,6 @@
 package org.societies.personalisation.CRIST.api.model;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
@@ -67,8 +66,8 @@ public class CRISTUserTaskModelData {
 	 */
 	public ICRISTUserTask addSituationsAndActionsToTask(
 			ICRISTUserTask userTask,
-			LinkedHashMap<ICRISTUserAction, Double> userActions,
-			LinkedHashMap<ICRISTUserSituation, Double> userSituations) {
+			HashMap<ICRISTUserAction, Double> userActions,
+			HashMap<ICRISTUserSituation, Double> userSituations) {
 		// TODO
 
 		return userTask;

@@ -19,10 +19,14 @@
         </osgi:interfaces>
         </osgi:service>
         
-        <osgi:reference id="UserPreferenceManagement">
-        <osgi:interfaces>
-        <value>org.societies.personalisation.preference.api.UserPreferenceManagement.IUserPreferenceManagement</value>
-        </osgi:interfaces>
-        </osgi:reference>
-
+		
+		
+		<osgi:reference id="UserPrefMgr" interface="org.societies.personalisation.preference.api.UserPreferenceManagement.IUserPreferenceManagement"/>
+		<osgi:reference id="UserCtxBroker" interface="org.societies.api.internal.context.broker.IUserCtxBroker"/>
+		
+		
+		
+		
+		<!--  <osgi:reference id="upcm" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/> -->
+		
 </beans>

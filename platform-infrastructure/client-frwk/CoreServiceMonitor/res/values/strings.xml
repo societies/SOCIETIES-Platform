@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, CoreServiceMonitorActivity!</string>
+    <string name="app_name">CoreServiceMonitor</string>
+    <string name="btnCallInProcessService">Call InProcessService</string>
+    <string name="btnCallOutProcessService">Call Out of Process Service</string>
+
+</resources>

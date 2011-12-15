@@ -15,9 +15,15 @@
     
 	<developers>
 		<developer>
+	        <id>mvardjan</id>
 			<name>Mitja Vardjan</name>
+            <email>mitja.vardjan@setcce.si</email>
 			<organization>SETCCE</organization>
       		<organizationUrl>http://www.setcce.si</organizationUrl>
+            <roles>
+                <role>owner</role>
+	            <role>developer</role>
+            </roles>
 		</developer>
 	</developers>
 	
@@ -51,7 +57,7 @@
 						<Embed-Transitive>true</Embed-Transitive>
 						<Import-Package>*;resolution:=optional</Import-Package>
 						<Export-Package>
-							org.societies.api.security.sign.**
+							org.societies.api.security.sign.*
 						</Export-Package>
 						<!-- Private-Package>
 							org.societies.security.sign.*,

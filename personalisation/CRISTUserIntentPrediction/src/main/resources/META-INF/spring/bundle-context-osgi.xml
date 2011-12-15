@@ -10,13 +10,27 @@
 		is to facilitate integration testing of the bundle outside of an OSGi container -->
 
 
-	<osgi:service ref="CRISTUserIntentPrediction">
+	<osgi:service ref="CRISTUserIntentPredictor">
 		<osgi:interfaces>
-			<value>org.societies.personalisation.preference.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction</value>
+			<value>org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction</value>
+		</osgi:interfaces>
+	</osgi:service>
+	
+	<osgi:reference id="PersonalisationManager"
+		interface="org.societies.personalisation.common.api.management.IInternalPersonalisationManager" /> 
+		
+	<!-- 
+	<osgi:service ref="PersonalisationManager">
+		<osgi:interfaces>
+			<value>org.societies.api.personalisation.mgmt.IPersonalisationManager</value>
+			<value>org.societies.personalisation.common.api.management.IInternalPersonalisationManager</value>
 		</osgi:interfaces>
 	</osgi:service>
 
-	<bean name="CRISTUserIntentPrediction"
-		class="org.societies.personalisation.CRISTUserIntentPrediction.impl.CRISTUserIntentPrediction" />
-
+	<osgi:reference id="UserPrefMgr"
+		interface="org.societies.personalisation.preference.api.UserPreferenceManagement.IUserPreferenceManagement" />
+	<osgi:reference id="UserCtxBroker"
+		interface="org.societies.api.internal.context.broker.IUserCtxBroker" />
+	 -->
+	
 </beans>

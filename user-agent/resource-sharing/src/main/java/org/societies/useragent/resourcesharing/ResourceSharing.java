@@ -1,5 +1,19 @@
 package org.societies.useragent.resourcesharing;
 
-public class ResourceSharing{
+import org.societies.api.useragent.resourcesharing.IResourceSharing;
+
+public class ResourceSharing implements IResourceSharing{
+
+	@Override
+	public void addSharableResource() {
+		// TODO Auto-generated method stub
+		//blah
+	}
+
+	@Override
+	public void newSharingRequest() {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

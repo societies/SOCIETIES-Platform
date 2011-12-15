@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+++++ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
  * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
  * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
@@ -25,7 +25,8 @@
 
 package org.societies.api.internal.useragent.feedback;
 
-import org.societies.api.internal.useragent.model.IProposal;
+import org.societies.api.internal.useragent.model.ExpProposalContent;
+import org.societies.api.internal.useragent.model.ImpProposalContent;
 
 /**
  * 
@@ -34,9 +35,7 @@ import org.societies.api.internal.useragent.model.IProposal;
  */
 public interface IUserFeedback
 {
-	public boolean getExplicitFB(IProposal proposal);
+	public String getExplicitFB(int type, ExpProposalContent content);
 	
-	public boolean getImplicitFB(IProposal proposal);
-	
-	public boolean notify(IProposal proposal);
+	public boolean getImplicitFB(int type, ImpProposalContent content);
 }

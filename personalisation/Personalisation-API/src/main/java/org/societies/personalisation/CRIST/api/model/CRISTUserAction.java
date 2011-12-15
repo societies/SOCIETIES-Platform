@@ -3,7 +3,6 @@ package org.societies.personalisation.CRIST.api.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +30,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 * A list of situations and the corresponding probability related to the
 	 * IntentAction
 	 */
-	LinkedHashMap<ICRISTUserSituation, Double> actionSituations;
+	HashMap<ICRISTUserSituation, Double> actionSituations;
 	/**
 	 * The confidence level of the IntentAction
 	 */
@@ -83,7 +82,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 * 
 	 * @return
 	 */
-	public LinkedHashMap<ICRISTUserSituation, Double> getActionSituations() {
+	public HashMap<ICRISTUserSituation, Double> getActionSituations() {
 		return this.actionSituations;
 	}
 
@@ -118,8 +117,8 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 * 
 	 * @param actionSituations
 	 */
-	public void setActionSituations(
-			LinkedHashMap<ICRISTUserSituation, Double> actionSituations) {
+	public void setActionSituations1(
+			HashMap<ICRISTUserSituation, Double> actionSituations) {
 		this.actionSituations = actionSituations;
 	}
 

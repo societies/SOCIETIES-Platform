@@ -12,7 +12,8 @@
 	</parent>
 
 	<!-- groupId is set in parent pom -->
-	<artifactId>css_contextBroker_impl</artifactId>
+	<groupId>org.societies.context-management</groupId>
+	<artifactId>ContextBroker</artifactId>
 	<version>${version.cm}</version>
 	<packaging>bundle</packaging>
 
@@ -37,14 +38,14 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-	
+
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-	
+
 		<dependency>
 			<groupId>org.societies.context-management</groupId>
 			<artifactId>UserCtxDBMgmt</artifactId>
@@ -52,7 +53,7 @@
 			<scope>provided</scope>
 			<type>bundle</type>
 		</dependency>
-	
+
 	</dependencies>
 
 	<build>
@@ -74,7 +75,8 @@
 					</instructions>
 				</configuration>
 			</plugin>
-			<plugin>
+	
+		<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<configuration>
@@ -85,17 +87,12 @@
 							<version>${version.cm}</version>
 							<type>jar</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${virgo.home}/pickup/</outputDirectory>
+							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>
 			</plugin>
-
+	
 		</plugins>
-	</build>
-
-
-	<name>Context Broker</name>
-
-	<groupId>org.societies.context-management</groupId>
+	</build>	
 </project>
