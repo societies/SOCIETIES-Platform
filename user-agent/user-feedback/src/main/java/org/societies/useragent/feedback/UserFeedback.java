@@ -26,27 +26,27 @@
 package org.societies.useragent.feedback;
 
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
-import org.societies.api.internal.useragent.model.IProposal;
+import org.societies.api.internal.useragent.model.ExpProposalContent;
+import org.societies.api.internal.useragent.model.ImpProposalContent;
 
 public class UserFeedback implements IUserFeedback{
-
-	@Override
-	public boolean getExplicitFB(IProposal proposal) {
-		// TODO Auto-generated method stub
-		//blah
-		return false;
+	
+	public void initialiseUserFeedback(){
+		System.out.println("User Feedback initialised!!");
 	}
 
 	@Override
-	public boolean getImplicitFB(IProposal proposal) {
+	public boolean getExplicitFB(int type, ExpProposalContent content) {
 		// TODO Auto-generated method stub
-		return false;
+		System.out.println("Returning explicit feedback");
+		return true;
 	}
 
 	@Override
-	public boolean notify(IProposal proposal) {
+	public boolean getImplicitFB(int type, ImpProposalContent content) {
 		// TODO Auto-generated method stub
-		return false;
+		System.out.println("Returning implicit feedback");
+		return true;
 	}
 	
 }
