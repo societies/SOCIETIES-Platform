@@ -23,12 +23,12 @@ package org.societies.personalisation.CRISTTesting.impl;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
 
-public class CRISTTester {
+public class CRISTTesting {
 	
 	private ICRISTUserIntentPrediction cristPredictor;
 	private CtxAttribute myCtx;
 		
-	public CRISTUserIntentPredictionTest(ICRISTUserIntentPrediction CRISTPredictor){
+	public CRISTTesting(ICRISTUserIntentPrediction CRISTPredictor){
 		this.cristPredictor = CRISTPredictor;
 	}
 	
