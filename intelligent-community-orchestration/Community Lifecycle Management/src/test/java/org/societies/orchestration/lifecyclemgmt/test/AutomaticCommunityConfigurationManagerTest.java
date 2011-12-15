@@ -1,15 +1,15 @@
-package org.societies.comorch.lifecyclemgmt.test;
+package org.societies.orchestration.lifecyclemgmt.test;
 
-import org.societies.css.cssdirectory.api.ICSSDirectoryCloud;
-import org.societies.css.cssdirectory.api.ICSSDirectoryRich;
-import org.societies.css.cssdirectory.api.ICSSDirectoryLight;
+import org.societies.css.cssdirectory.api.ICssDirectoryCloud;
+import org.societies.css.cssdirectory.api.ICssDirectoryRich;
+import org.societies.css.cssdirectory.api.ICssDirectoryLight;
 
-import org.societies.cssmgmt.cssdiscovery.api.ICSSDiscovery;
+import org.societies.cssmgmt.cssdiscovery.api.ICssDiscovery;
 
-import org.societies.cis.management.api.CISAcitivityFeed;
+import org.societies.cis.management.api.CisAcitivityFeed;
 import org.societies.cis.management.api.ServiceSharingRecord;
-import org.societies.cis.management.api.CISActivity;
-import org.societies.cis.management.api.CISRecord;
+import org.societies.cis.management.api.CisActivity;
+import org.societies.cis.management.api.CisRecord;
 
 import org.societies.context.user.similarity.api.platform.IUserCtxSimilarityEvaluator;
 
