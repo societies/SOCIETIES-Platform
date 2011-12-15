@@ -1,4 +1,4 @@
-package org.societies.comorch.lifecyclemgmt.test;
+package org.societies.orchestration.lifecyclemgmt.test;
 
 import org.societies.context.broker.api.IUserCtxBroker;
 import org.societies.context.broker.api.ICommunityCtxBroker;
