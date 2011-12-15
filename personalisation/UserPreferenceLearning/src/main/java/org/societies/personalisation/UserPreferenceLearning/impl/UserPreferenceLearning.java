@@ -27,6 +27,7 @@ package org.societies.personalisation.UserPreferenceLearning.impl;
 
 import java.util.Date;
 
+import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Consumer;
 import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Learning;
@@ -34,16 +35,32 @@ import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45L
 public class UserPreferenceLearning implements IC45Learning{
 
 	@Override
-	public void runC45Learning(IC45Consumer consumer, Date startDate) {
-		// TODO Auto-generated method stub
-		
+	//run preference learning on all actions for all identities
+	public void runC45Learning(IC45Consumer requestor, Date startDate) {
+		//allDPIsAllActions = new AllDPIsAllActions(requestor, date, bc);
+        //allDPIsAllActions.start();
 	}
 
 	@Override
-	public void runC45Learning(IC45Consumer consumer, Date startDate,
-			ServiceResourceIdentifier serviceId, String prefName) {
-		// TODO Auto-generated method stub
-		
+	//run preference learning on specific service action parameterName for all identities
+	public void runC45Learning(IC45Consumer requestor, Date startDate,
+			ServiceResourceIdentifier serviceId, String parameterName) {
+		//allDPIsSpecificAction = new AllDPIsSpecificAction(requestor, date, serviceId, parameterName, bc);
+        //allDPIsSpecificAction.start();
 	}
+	
+	@Override
+    //run C45 on all actions for specific identity
+    public void runC45Learning(IC45Consumer requestor, EntityIdentifier historyOwner, Date date){
+        //specificDPIAllActions = new SpecificDPIAllActions(requestor, dpi, date, bc);
+        //specificDPIAllActions.start();
+    }
 
+	@Override
+    //run C45 learning on specific service action for specific identity
+    public void runC45Learning(IC45Consumer requestor, EntityIdentifier historyOwner, Date date, 
+    		ServiceResourceIdentifier serviceId, String parameterName){
+        //specificDPISpecificAction = new SpecificDPISpecificAction(requestor, dpi, date, serviceId, parameterName, bc);
+        //specificDPISpecificAction.start();
+    }
 }
