@@ -42,6 +42,8 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	private IInternalPersonalisationManager preManager;
 	private EntityIdentifier myId;
 	private CtxAttributeIdentifier myCtxId;
+	private ServiceResourceIdentifier serviceId;
+	private ICRISTUserAction cristOutcome = null; 
 
 	public CRISTUserIntentPrediction() {
 		System.out.println("Hello! I'm the CRIST User Intent Prediction!");
@@ -109,9 +111,8 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		System.out.println("CRISTUIPredictor has been invoked...");
 		
 		// TODO
-		// Produce a CRIST UI Prediction based on the given context
-		// this.preManager
-		
+		// Produce a CRIST UI Prediction based on the given context		
+		this.preManager.sendCRISTUserIntentOutcome(myId, serviceId, cristOutcome);
 		
 		return null;
 	}
