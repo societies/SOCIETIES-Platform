@@ -29,6 +29,7 @@ import java.util.Date;
 
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.personalisation.preference.api.model.IC45Consumer;
 
 /**
  * 
