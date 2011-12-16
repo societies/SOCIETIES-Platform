@@ -179,6 +179,7 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 			ServiceResourceIdentifier serviceId, ICRISTUserAction cristOutcome) {
 		// TODO Auto-generated method stub
 		
+		System.out.println("Personalisation Manager received the CRIST Outcome.");
 	}
 	
 	@Override
