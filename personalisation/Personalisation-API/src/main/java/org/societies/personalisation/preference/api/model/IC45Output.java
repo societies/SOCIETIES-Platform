@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -17,7 +22,8 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.preference.api.UserPreferenceLearning;
+
+package org.societies.personalisation.preference.api.model;
  
 
 import java.util.List;
@@ -26,10 +32,8 @@ import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 
-
-
 /**
- * @author Eliza
+ * @author S.GALLACHER@hw.ac.uk
  * @version 1.0
  * @created 11-Nov-2011 15:06:05
  */
@@ -44,15 +48,15 @@ public interface IC45Output {
 	public void addTree(IPreferenceTreeModel tree);
 
 	/**
-	 * This method returns the IDigitalPersonalIdentifier related to this object
-	 * @return IDigitalPersonalIdentifier - the dpi under which the info in this
+	 * This method returns the EntityIdentifier related to this object
+	 * @return EntityIdentifier - the identity under which the info in this
 	 * IC45Output object corresponds
 	 */
-	public EntityIdentifier getDPI();
+	public EntityIdentifier getOwner();
 
 	/**
 	 * This method returns the IServiceIdentifier related to this object
-	 * @return IServiceIdentifier - the service ID
+	 * @return ServiceResourceIdentifier - the service ID
 	 */
 	public ServiceResourceIdentifier getServiceId();
 
@@ -64,7 +68,7 @@ public interface IC45Output {
 
 	/**
 	 * This method returns a list of DefaultTreeModel objects that have been learned
-	 * under this objects associated IDigitalPersonalIdentifier and IServiceIdentifier
+	 * under this objects associated EntityIdentifier and ServiceResourceIdentifier
 	 * 
 	 * @return a list of IDecisionTree objects
 	 */
