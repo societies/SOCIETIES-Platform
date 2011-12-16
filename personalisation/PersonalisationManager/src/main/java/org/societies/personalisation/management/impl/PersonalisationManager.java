@@ -175,15 +175,15 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 	}
 
 	@Override
-	public void sendDianneOutcome(EntityIdentifier arg0,
-			ServiceResourceIdentifier arg1, IDIANNEOutcome arg2) {
+	public void sendCRISTUserIntentOutcome(EntityIdentifier owner,
+			ServiceResourceIdentifier serviceId, ICRISTUserAction cristOutcome) {
 		// TODO Auto-generated method stub
 		
 	}
-
+	
 	@Override
-	public void sendITSUDUserIntentOutcome(EntityIdentifier arg0,
-			ServiceResourceIdentifier arg1, ICRISTUserAction arg2) {
+	public void sendDianneOutcome(EntityIdentifier arg0,
+			ServiceResourceIdentifier arg1, IDIANNEOutcome arg2) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -204,6 +204,4 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 		System.out.println("Attribute value: "+attribute.getStringValue());
 		
 	}
-
-
 }

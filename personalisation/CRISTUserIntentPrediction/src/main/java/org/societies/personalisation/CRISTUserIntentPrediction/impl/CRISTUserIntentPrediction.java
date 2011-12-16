@@ -108,6 +108,11 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		// TODO Auto-generated method stub
 		System.out.println("CRISTUIPredictor has been invoked...");
 		
+		// TODO
+		// Produce a CRIST UI Prediction based on the given context
+		// this.preManager
+		
+		
 		return null;
 	}
 
