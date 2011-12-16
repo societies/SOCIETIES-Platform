@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.societies.api.internal.useragent.model.ConflictResolutionRule;
 
-
 //public class ConflictResolution implements IConflictResolutionManager{
 //
 //	@Override
@@ -39,13 +38,13 @@ import org.societies.api.internal.useragent.model.ConflictResolutionRule;
 //	}
 //
 //}
+public class ConflictResolutionManager extends
+		AbstractConflictResolutionManager {
 
-public class ConflictResolutionManager extends AbstractConflictResolutionManager{
-	
-public ConflictResolutionManager(){
-	/*depends on GUI for user preference editor*/
-	super();
-	List<ConflictResolutionRule> rules =new ArrayList<ConflictResolutionRule>();
-	super.setRules(rules);
-}
+	public ConflictResolutionManager() {
+		/* depends on GUI for user preference editor */
+		super();
+		List<ConflictResolutionRule> rules = new ArrayList<ConflictResolutionRule>();
+		super.setRules(rules);
+	}
 }
