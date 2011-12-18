@@ -12,12 +12,6 @@
 
 	<dependencies>
 		<!-- Interface -->
-    	<dependency>
-	    	<groupId>org.societies.comm.xmpp</groupId>
-		    <artifactId>CommunicationFrameworkInterface</artifactId>
-		    <type>jar</type>
-    		<version>0.0.1</version>
-    	</dependency>
 	
 		<!-- XMPP -->
 		<dependency>
@@ -26,6 +20,11 @@
 			<version>1.2.2</version>
 			<type>jar</type>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.comm.xmpp</groupId>
+			<artifactId>CommunicationFrameworkCommons</artifactId>
+			<version>0.0.1</version>
 		</dependency>
 	</dependencies>
 
