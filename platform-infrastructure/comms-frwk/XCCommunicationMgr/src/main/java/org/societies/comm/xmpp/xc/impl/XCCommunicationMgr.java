@@ -68,7 +68,7 @@ public class XCCommunicationMgr extends AbstractComponent implements
 	@Override
 	protected IQ handleIQGet(IQ iq) {
 		log.debug("IQ Received");
-		IQ response = helper.forwardIQ(iq);
+		IQ response = helper.dispatchIQ(iq);
 		return response;
 	}
 
@@ -80,17 +80,17 @@ public class XCCommunicationMgr extends AbstractComponent implements
 	@Override
 	protected void handleIQResult(IQ iq) {
 		log.debug("IQ Result received");
-		helper.forwardIQResult(iq);
+		helper.dispatchIQResult(iq);
 	}
 
 	@Override
 	protected void handleIQError(IQ iq) {
-		helper.forwardIQError(iq);
+		helper.dispatchIQError(iq);
 	}
 
 	@Override
 	protected void handleMessage(Message message) {
-		helper.forwardMessage(message);
+		helper.dispatchMessage(message);
 	}
 
 	/*

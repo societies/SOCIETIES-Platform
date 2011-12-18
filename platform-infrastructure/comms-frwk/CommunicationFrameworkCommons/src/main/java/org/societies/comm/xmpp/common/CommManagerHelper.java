@@ -92,7 +92,7 @@ public class CommManagerHelper {
 				clazz.getName());
 	}
 
-	public void forwardIQResult(IQ iq) {
+	public void dispatchIQResult(IQ iq) {
 		Element element = getElementAny(iq);
 		try {
 			CommCallback callback = getCommCallback(iq.getID());
@@ -107,7 +107,7 @@ public class CommManagerHelper {
 		}
 	}
 
-	public void forwardIQError(IQ iq) {
+	public void dispatchIQError(IQ iq) {
 		try {
 			CommCallback callback = getCommCallback(iq.getID());
 			callback.receiveError(Stanza.fromPacket(iq));
@@ -116,7 +116,7 @@ public class CommManagerHelper {
 		}
 	}
 
-	public IQ forwardIQ(IQ iq) {
+	public IQ dispatchIQ(IQ iq) {
 		Element element = getElementAny(iq);
 		String namespace = element.getNamespace().getURI();
 		JID originalFrom = iq.getFrom();
@@ -140,7 +140,7 @@ public class CommManagerHelper {
 		}
 	}
 
-	public void forwardMessage(Message message) {
+	public void dispatchMessage(Message message) {
 		Element element = getElementAny(message);
 		try {
 			FeatureServer fs = getFeatureServer(element.getNamespace()
