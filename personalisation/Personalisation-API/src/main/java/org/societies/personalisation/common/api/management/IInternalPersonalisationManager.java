@@ -97,7 +97,7 @@ public interface IInternalPersonalisationManager extends IPersonalisationManager
 	 * @param className
 	 * @param ctxAttributeId
 	 */
-	public void registerForContextUpdate(String className, CtxAttributeIdentifier ctxAttributeId);
+	public void registerForContextUpdate(EntityIdentifier id, String className, CtxAttributeIdentifier ctxAttributeId);
 
 	/**
 	 * 
@@ -127,7 +127,7 @@ public interface IInternalPersonalisationManager extends IPersonalisationManager
 	 * @param serviceId
 	 * @param dianneOutcome
 	 */
-	public void sendITSUDUserIntentOutcome(EntityIdentifier owner, ServiceResourceIdentifier serviceId, ICRISTUserAction dianneOutcome);
+	public void sendCRISTUserIntentOutcome(EntityIdentifier owner, ServiceResourceIdentifier serviceId, ICRISTUserAction dianneOutcome);
 
 	/**
 	 * 

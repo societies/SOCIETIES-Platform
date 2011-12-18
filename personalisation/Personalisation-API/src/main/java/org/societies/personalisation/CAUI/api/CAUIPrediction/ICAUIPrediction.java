@@ -3,8 +3,6 @@ package org.societies.personalisation.CAUI.api.CAUIPrediction;
 
 import java.util.List;
 
-
-
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;

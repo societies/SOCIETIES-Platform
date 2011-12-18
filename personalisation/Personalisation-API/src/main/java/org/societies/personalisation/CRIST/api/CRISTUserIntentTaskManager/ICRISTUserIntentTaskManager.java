@@ -3,7 +3,6 @@ package org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
@@ -25,7 +24,7 @@ public interface ICRISTUserIntentTaskManager {
 	 * @param userActions		- a linked hashmap with the action objects and the transition probabilities
 	 * @param userSituations	- a linked hashmap with the situation objects and the transition probabilities 
 	 */
-	public ICRISTUserTask addSituationsAndActionsToTask(ICRISTUserTask userTask, LinkedHashMap<ICRISTUserAction,Double> userActions, LinkedHashMap<ICRISTUserSituation,Double> userSituations);
+	public ICRISTUserTask addSituationsAndActionsToTask(ICRISTUserTask userTask, HashMap<ICRISTUserAction,Double> userActions, HashMap<ICRISTUserSituation,Double> userSituations);
 
 	/**
 	 * This method will retrieve the user action based on the given action ID
