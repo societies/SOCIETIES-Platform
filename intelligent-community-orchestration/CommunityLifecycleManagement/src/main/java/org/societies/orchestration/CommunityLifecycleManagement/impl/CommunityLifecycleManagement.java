@@ -25,8 +25,8 @@
 
 package org.societies.orchestration.CommunityLifecycleManagement.impl;
 
-import org.societies.context.broker.api.IUserCtxBroker;
-import org.societies.context.broker.api.ICommunityCtxBroker;
+import org.societies.api.internal.context.broker.IUserCtxBroker;
+import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 
 import org.societies.api.mock.EntityIdentifier;
 
