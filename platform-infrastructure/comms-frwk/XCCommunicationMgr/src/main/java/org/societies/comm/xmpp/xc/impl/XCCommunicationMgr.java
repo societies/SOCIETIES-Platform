@@ -1,5 +1,6 @@
 package org.societies.comm.xmpp.xc.impl;
 
+
 import org.jivesoftware.whack.ExternalComponentManager;
 import org.societies.comm.xmpp.common.CommManagerHelper;
 import org.societies.comm.xmpp.datatypes.Stanza;

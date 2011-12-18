@@ -15,7 +15,7 @@
     <artifactId>XCCommunicationFrameworkBundle</artifactId>
     <packaging>bundle</packaging>
     <name>XC Communication Framework Bundle</name>
-    <version>0.0.1</version>
+    <version>0.0.1-SNAPSHOT</version>
 
     <properties>
         <slf4j.version>1.5.8</slf4j.version>
@@ -58,6 +58,7 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -69,7 +70,7 @@
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
     </dependencies>
 
