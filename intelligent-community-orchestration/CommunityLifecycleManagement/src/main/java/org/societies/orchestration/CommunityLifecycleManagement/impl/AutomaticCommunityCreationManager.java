@@ -25,24 +25,22 @@
 
 package org.societies.orchestration.CommunityLifecycleManagement.impl;
 
-import org.societies.css.cssdirectory.api.ICssDirectoryCloud;
-import org.societies.css.cssdirectory.api.ICssDirectoryRich;
-import org.societies.css.cssdirectory.api.ICssDirectoryLight;
+import org.societies.api.internal.css_modules.css_directory.ICssDirectory;
 
-import org.societies.cssmgmt.cssdiscovery.api.ICssDiscovery;
+import org.societies.api.internal.css_modules.css_discovery.ICssDiscovery;
 
-import org.societies.cis.management.api.CisAcitivityFeed;
-import org.societies.cis.management.api.ServiceSharingRecord;
-import org.societies.cis.management.api.CisActivity;
-import org.societies.cis.management.api.CisRecord;
+import org.societies.api.internal.cis.management.CisActivityFeed;
+import org.societies.api.internal.cis.management.ServiceSharingRecord;
+import org.societies.api.internal.cis.management.CisActivity;
+import org.societies.api.internal.cis.management.CisRecord;
 
-import org.societies.context.user.similarity.api.platform.IUserCtxSimilarityEvaluator;
+import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
 
-import org.societies.context.user.prediction.api.platform.IUserCtxPredictionMgr;
+import org.societies.api.internal.context.user.prediction.IUserCtxPredictionMgr;
 
-import org.societies.context.user.db.api.platform.IUserCtxDBMgr;
+import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
 
-import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
+import org.societies.api.internal.context.user.history.IUserCtxHistoryMgr;
 
 import org.societies.api.mock.EntityIdentifier;
 
