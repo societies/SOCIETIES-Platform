@@ -13,7 +13,7 @@
 			<email>s.gallacher@hw.ac.uk</email>
 		</developer>
 	</developers>
-	
+
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
@@ -22,25 +22,36 @@
 	</parent>
 
 	<dependencies>
-	<!-- add your dependencies here -->
-	<dependency>
-	<groupId>org.societies.api.external</groupId>
-	<artifactId>societies-api</artifactId>
-	<version>${release.version}</version>
-	<scope>provided</scope>
-	</dependency>
-	<dependency>
-	<groupId>org.societies.api.internal</groupId>
-	<artifactId>societies-api-internal</artifactId>
-	<version>${release.version}</version>
-	<scope>provided</scope>
-	</dependency>
-	<dependency>
-	<groupId>org.societies.personalisation</groupId>
-	<artifactId>personalisation_api</artifactId>
-	<version>${version.pm}</version>
-	<scope>provided</scope>
-	</dependency>
+		<!-- add your dependencies here -->
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.personalisation</groupId>
+			<artifactId>personalisation_api</artifactId>
+			<version>${version.pm}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>weka</groupId>
+			<artifactId>weka</artifactId>
+			<version>3.6.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.junit</groupId>
+			<artifactId>com.springsource.junit</artifactId>
+			<version>3.8.2</version>
+		</dependency>
+
 
 	</dependencies>
 

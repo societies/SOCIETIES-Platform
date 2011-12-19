@@ -33,12 +33,21 @@ import java.util.Map;
 
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.personalisation.UserPreferenceLearning.impl.C45Output;
+import org.societies.personalisation.UserPreferenceLearning.impl.CtxIdentifierCache;
 import org.societies.personalisation.UserPreferenceLearning.impl.HistoryRetriever;
-import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Consumer;
+import org.societies.personalisation.UserPreferenceLearning.impl.PostProcessor;
+import org.societies.personalisation.UserPreferenceLearning.impl.PreProcessor;
+import org.societies.personalisation.preference.api.model.ActionSubset;
+import org.societies.personalisation.preference.api.model.IC45Consumer;
+import org.societies.personalisation.preference.api.model.IC45Output;
+import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
+import org.societies.personalisation.preference.api.model.ServiceSubset;
 
-//import weka.classifiers.trees.Id3;
-//import weka.core.Instances;
-//import weka.core.UnsupportedAttributeTypeException;
+import weka.classifiers.trees.Id3;
+import weka.core.Instances;
+import weka.core.UnsupportedAttributeTypeException;
 
 public class AA_SI extends Thread{
 
@@ -46,43 +55,37 @@ public class AA_SI extends Thread{
 	private Date startDate;
 	private EntityIdentifier historyOwner;
 	private HistoryRetriever historyRetriever;
-	//private OutputResponse responder;
-	//private PreProcessor preProcessor;
-	//private PostProcessor postProcessor;
+	private PreProcessor preProcessor;
+	private PostProcessor postProcessor;
 
 	public AA_SI(IC45Consumer requestor, Date startDate, EntityIdentifier historyOwner, HistoryRetriever historyRetriever){
 		this.requestor = requestor;
 		this.startDate = startDate;
 		this.historyOwner = historyOwner;
 		this.historyRetriever = historyRetriever;
-
-		//historyRetriever = new HistoryRetriever(bc);
-		//responder = new OutputResponse();
-
-		//preProcessor = new PreProcessor();
-		//postProcessor = new PostProcessor();
+		preProcessor = new PreProcessor();
+		postProcessor = new PostProcessor();
 	}
 
 	@Override
 	public void run(){
-		/*System.out.println("C45 REQUEST FROM: "+requestor.getClass().getName());
-		logging.info("Starting C45Learning process on all actions for DPI: "+dpi.toString());
+		System.out.println("C45 REQUEST FROM: "+requestor.getClass().getName());
+		System.out.println("Starting C45 learning process on all actions for history owner: "+historyOwner.toString());
 
 		//create new Cache for cycle
 		CtxIdentifierCache cache = new CtxIdentifierCache();
 
 		List<IC45Output> output = new ArrayList<IC45Output>();
-*/
 
 		//get history
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history = 
-			historyRetriever.getHistory();
-/*
+				historyRetriever.getHistory();
+
 		if(history != null && history.size()>0){
 			//store context attribute identifiers with types
-			cache.cacheCtxIdentifiers(dpi, history);
+			cache.cacheCtxIdentifiers(historyOwner, history);
 
-			logging.info("Splitting history depending on serviceId and action");
+			//System.out.println("Splitting history depending on serviceId and action");
 			List<ServiceSubset>splitHistory = preProcessor.splitHistory(history);
 
 			//for each service Identifier
@@ -95,7 +98,7 @@ public class AA_SI extends Thread{
 				ServiceSubset trimmedHistory = preProcessor.trimServiceSubset(nextServiceSubset);
 
 				//create new IC45Output object
-				IC45Output nextOutput = new C45Output(dpi, 
+				IC45Output nextOutput = new C45Output(historyOwner, 
 						trimmedHistory.getServiceId(), 
 						trimmedHistory.getServiceType());
 
@@ -106,7 +109,7 @@ public class AA_SI extends Thread{
 					ActionSubset nextActionSubset = (ActionSubset)actionSubsetList_it.next();
 
 					//add subset tree to IC45Output object
-					IPreferenceTreeModel treeModel = runCycle(dpi, nextActionSubset, cache, trimmedHistory.getServiceId(), trimmedHistory.getServiceType());
+					IPreferenceTreeModel treeModel = runCycle(nextActionSubset, cache, trimmedHistory.getServiceId(), trimmedHistory.getServiceType());
 					//translate tree branches into ICtxIdentifiers
 					if(treeModel!=null){
 						nextOutput.addTree(treeModel);
@@ -115,27 +118,30 @@ public class AA_SI extends Thread{
 				output.add(nextOutput);
 			}
 		}else{
-			logging.warn("No History found DPI: "+dpi.toString());
+			System.out.println("No History found for historyOwner: "+historyOwner.toString());
 		}
 		//send DPI based output to requestor
 		System.out.println("RETURNING C45 OUTPUT TO: "+requestor.getClass().getName());
-		responder.sendC45Output(requestor, output);*/
+		try{
+			requestor.handleC45Output(output);
+        }catch(Exception e){
+            System.out.println("The C45 requestor service is not available to handle response");
+        }
 	}
 
 	/*
 	 * Algorithm methods
-	     
-	private IPreferenceTreeModel runCycle(
-			IDigitalPersonalIdentifier dpi, 
+	 */  
+	private IPreferenceTreeModel runCycle( 
 			ActionSubset input, 
 			CtxIdentifierCache cache,
-			IServiceIdentifier serviceId,
+			ServiceResourceIdentifier serviceId,
 			String serviceType){
 
 		//convert to Instances for each serviceId
 		Instances instances = preProcessor.toInstances(input);
 
-		logging.info("C45 executing...");
+		//System.out.println("C45 executing...");
 		String outputString = null;
 		try{
 			outputString = executeAlgorithm(instances);
@@ -146,7 +152,7 @@ public class AA_SI extends Thread{
 
 		//convert tree strings into JTrees for output
 		String paramName = input.getParameterName();
-		return (IPreferenceTreeModel)postProcessor.process(dpi, paramName, outputString, cache, serviceId, serviceType);
+		return (IPreferenceTreeModel)postProcessor.process(historyOwner, paramName, outputString, cache, serviceId, serviceType);
 	}
 
 	private String executeAlgorithm(Instances input)throws Exception
@@ -160,8 +166,8 @@ public class AA_SI extends Thread{
 		//c45.buildClassifier(input);
 		id3.buildClassifier(input);
 
-		System.out.println("ID3 output: "+id3.toString());
+		//System.out.println("ID3 output: "+id3.toString());
 
 		return id3.toString();
-	}*/
+	}
 }

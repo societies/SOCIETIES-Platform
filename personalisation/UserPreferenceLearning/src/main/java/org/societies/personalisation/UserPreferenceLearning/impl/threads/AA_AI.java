@@ -32,84 +32,90 @@ import java.util.List;
 import java.util.Map;
 
 import org.societies.api.context.model.CtxHistoryAttribute;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.personalisation.UserPreferenceLearning.impl.C45Output;
+import org.societies.personalisation.UserPreferenceLearning.impl.CtxIdentifierCache;
 import org.societies.personalisation.UserPreferenceLearning.impl.HistoryRetriever;
-import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Consumer;
+import org.societies.personalisation.UserPreferenceLearning.impl.PostProcessor;
+import org.societies.personalisation.UserPreferenceLearning.impl.PreProcessor;
+import org.societies.personalisation.preference.api.model.ActionSubset;
+import org.societies.personalisation.preference.api.model.IC45Consumer;
+import org.societies.personalisation.preference.api.model.IC45Output;
+import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
+import org.societies.personalisation.preference.api.model.ServiceSubset;
 
-//import weka.classifiers.trees.Id3;
-//import weka.core.Instances;
-//import weka.core.UnsupportedAttributeTypeException;
+import weka.classifiers.trees.Id3;
+import weka.core.Instances;
+import weka.core.UnsupportedAttributeTypeException;
 
 public class AA_AI extends Thread{
 
 	private IC45Consumer requestor;
 	private Date startDate;
 	private HistoryRetriever historyRetriever;
-	//private OutputResponse responder;
-	//private PreProcessor preProcessor;
-	//private PostProcessor postProcessor;
+	private PreProcessor preProcessor;
+	private PostProcessor postProcessor;
 
 	public AA_AI(IC45Consumer requestor, Date startDate, HistoryRetriever historyRetriever){
 		this.requestor = requestor;
 		this.startDate = startDate;
 		this.historyRetriever = historyRetriever;
-
-		//responder = new OutputResponse();
 		//dpiRetriever = new DPIRetriever(bc);
-
-		//preProcessor = new PreProcessor();
-		//postProcessor = new PostProcessor(); 
+		preProcessor = new PreProcessor();
+		postProcessor = new PostProcessor(); 
 	}
 
 	@Override
 	public void run() {
-		/*
+		
 		System.out.println("C45 REQUEST FROM: "+requestor.getClass().getName());
-		logging.info("Starting C45Learning process on all actions for all DPIs");
-
+		System.out.println("Starting C45 learning process on all actions for all history owners");
+		
 		//create new Cache for cycle
 		CtxIdentifierCache cache = new CtxIdentifierCache();
 
 		//logging.info("Retrieving all DPIs");
-		IDigitalPersonalIdentifier[] dpis = dpiRetriever.getDPIs();
+		EntityIdentifier[] historyOwners = null; //dpiRetriever.getDPIs();
 
 		List<IC45Output> output = new ArrayList<IC45Output>();
 
 		//For each DPI
-		for(int i=0; i<dpis.length; i++){
+		for(int i=0; i<historyOwners.length; i++){
 
-			IDigitalPersonalIdentifier nextDPI = (IDigitalPersonalIdentifier)dpis[i];
-*/
+			EntityIdentifier nextHistoryOwner = (EntityIdentifier)historyOwners[i];
+
 			//get history
 			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history = 
 				historyRetriever.getHistory();
-/*
+
 			//split history into subsets depending on serviceId and action
 			if(history!=null && history.size()>0){          	
 
 				//store context attribute identifiers with types
-				cache.cacheCtxIdentifiers(nextDPI, history);
+				cache.cacheCtxIdentifiers(nextHistoryOwner, history);
 
-				logging.info("Splitting history depending on serviceId and action");
+				//System.out.println("Splitting history depending on serviceId and action");
 				List<ServiceSubset> splitHistory = preProcessor.splitHistory(history);
 				
-				System.out.println("History is split!");
+				//System.out.println("History is split!");
 
 				//for each service Identifier
 				Iterator<ServiceSubset> splitHistory_it = splitHistory.iterator();
 				while(splitHistory_it.hasNext()){
 
-					System.out.println("Getting next split subset...");
+					//System.out.println("Getting next split subset...");
 					ServiceSubset nextServiceSubset = (ServiceSubset)splitHistory_it.next();
 
 					//remove consistent context attributes from history
 					ServiceSubset trimmedHistory = preProcessor.trimServiceSubset(nextServiceSubset);
 					System.out.println("Split subset has been trimmed!");
 
-					IServiceIdentifier nextServiceId = trimmedHistory.getServiceId();
+					ServiceResourceIdentifier nextServiceId = trimmedHistory.getServiceId();
 					String nextServiceType = trimmedHistory.getServiceType();
 
 					//create new IC45Output object
-					IC45Output nextOutput = new C45Output(nextDPI, nextServiceId, nextServiceType);
+					IC45Output nextOutput = new C45Output(nextHistoryOwner, nextServiceId, nextServiceType);
 
 					//run cycle for each action subset
 					List<ActionSubset> actionSubsetList = trimmedHistory.getActionSubsets();
@@ -117,37 +123,43 @@ public class AA_AI extends Thread{
 					while(actionSubsetList_it.hasNext()){
 						ActionSubset nextActionSubset = (ActionSubset)actionSubsetList_it.next();
 						if(nextActionSubset.size()>0){
-							IPreferenceTreeModel treeModel = runCycle(nextDPI, nextActionSubset, cache, nextServiceId, nextServiceType);
+							IPreferenceTreeModel treeModel = runCycle(nextHistoryOwner, nextActionSubset, cache, nextServiceId, nextServiceType);
 							if(treeModel!=null){
 								nextOutput.addTree(treeModel);
 							}
 						}
 					}
-					output.add(nextOutput);
+					//output.add(nextOutput);
 				}
 			}else{
-				logging.warn("No History found DPI: "+nextDPI.toString());
+				System.out.println("No History found history owner: "+nextHistoryOwner.toString());
 			}
 		}
 		//send DPI based output to requestor
 		System.out.println("RETURNING C45 OUTPUT TO: "+requestor.getClass().getName());
-		responder.sendC45Output(requestor, output);*/
+		try{
+			requestor.handleC45Output(output);
+        }catch(Exception e){
+            System.out.println("The C45 requestor service is not available to handle response");
+        }
 	}
 
 	
-	 /* Algorithm methods
+	 /*
+	  * Algorithm methods
+	  */
 	     
 	private IPreferenceTreeModel runCycle(
-			IDigitalPersonalIdentifier dpi, 
+			EntityIdentifier historyOwner, 
 			ActionSubset input, 
 			CtxIdentifierCache cache,
-			IServiceIdentifier serviceId,
+			ServiceResourceIdentifier serviceId,
 			String serviceType){
 
 		//convert to Instances for each serviceId
 		Instances instances = preProcessor.toInstances(input);
 
-		logging.info("C45 executing...");
+		//System.out.println("C45 executing...");
 		String outputString = null;
 		try{
 			outputString = executeAlgorithm(instances);
@@ -158,7 +170,7 @@ public class AA_AI extends Thread{
 
 		//convert tree strings into JTrees for pref
 		String paramName = input.getParameterName();
-		return (IPreferenceTreeModel)postProcessor.process(dpi, paramName, outputString, cache, serviceId, serviceType);
+		return (IPreferenceTreeModel)postProcessor.process(historyOwner, paramName, outputString, cache, serviceId, serviceType);
 	}
 
 	private String executeAlgorithm(Instances input)throws Exception
@@ -172,8 +184,8 @@ public class AA_AI extends Thread{
 		//c45.buildClassifier(input);
 		id3.buildClassifier(input);
 
-		System.out.println("ID3 output: "+id3.toString());
+		//System.out.println("ID3 output: "+id3.toString());
 
 		return id3.toString();
-	}*/
+	}
 }
