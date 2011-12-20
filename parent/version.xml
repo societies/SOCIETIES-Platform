@@ -28,5 +28,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 	<version.ua>${release.version}.1</version.ua>
 	<!-- FRBlackmun: added version.ico property (Intelligent Community Orchestration) -->
 	<version.ico>${release.version}.1</version.ico>
+	<!-- aleckey: added version.comm property (Communication Framework) -->
+	<version.comm>${release.version}.1</version.comm>
     </properties>
 </project>
