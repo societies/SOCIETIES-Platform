@@ -12,10 +12,10 @@
     
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.societies.comm.xmpp</groupId>
-    <artifactId>XCCommunicationFrameworkBundle</artifactId>
+    <artifactId>XCCommunicationMgr</artifactId>
     <packaging>bundle</packaging>
-    <name>XC Communication Framework Bundle</name>
-    <version>0.0.1-SNAPSHOT</version>
+    <name>XC Communication Manager</name>
+    <version>${release.version}</version>
 
     <properties>
         <slf4j.version>1.5.8</slf4j.version>
@@ -70,7 +70,7 @@
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${release.version}</version>
 		</dependency>
     </dependencies>
 
@@ -106,6 +106,22 @@
 						<Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment> 
 		         	</instructions>
 	       		</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
+							<version>${release.version}</version>
+							<type>bundle</type>
+							<overWrite>true</overWrite>
+							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+						</artifactItem>
+					</artifactItems>
+				</configuration>
 			</plugin>
         </plugins>
     </build>
