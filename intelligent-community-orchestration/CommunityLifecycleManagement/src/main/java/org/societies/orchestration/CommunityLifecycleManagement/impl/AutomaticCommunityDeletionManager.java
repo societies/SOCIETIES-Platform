@@ -29,10 +29,11 @@ import org.societies.api.internal.css_modules.css_directory.ICssDirectory;
 
 import org.societies.api.internal.css_modules.css_discovery.ICssDiscovery;
 
-import org.societies.api.internal.cis.management.CisActivityFeed;
-import org.societies.api.internal.cis.management.ServiceSharingRecord;
-import org.societies.api.internal.cis.management.CisActivity;
-import org.societies.api.internal.cis.management.CisRecord;
+import org.societies.api.internal.cis.cis_management.CisActivityFeed;
+import org.societies.api.internal.cis.cis_management.ServiceSharingRecord;
+import org.societies.api.internal.cis.cis_management.CisActivity;
+import org.societies.api.internal.cis.cis_management.CisRecord;
+import org.societies.api.internal.cis.cis_management.ICisManager;
 
 import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
 
@@ -63,38 +64,28 @@ import org.societies.api.mock.EntityIdentifier;
 
 public class AutomaticCommunityDeletionManager {
 
-	private Css linkedCss; // No datatype yet defined for CSS
-	private EntityIdentifier dpi;
+	private EntityIdentifier linkedCss; // No datatype yet defined for CSS
 	
     private CisRecord linkedCis;
     
-    private Domain linkedDomain;  // No datatype yet representing a domain
+    //private Domain linkedDomain;  // No datatype yet representing a domain
+	private EntityIdentifier linkedDomain;
 	
 	/*
-     * Constructor for AutomaticCommunityDeletionManager
+     * Constructor for AutomaticCommunityConfigurationManager
      * 
-	 * Description: The constructor creates the AutomaticCommunityDeletionManager
+	 * Description: The constructor creates the AutomaticCommunityConfigurationManager
 	 *              component on a given CSS.
 	 * Parameters: 
-	 * 				linkedCSS - the CSS that this object will operate on behalf of.
+	 * 				linkedEntity - the non-CIS entity, either a user CSS or a domain deployment,
+	 *              that this object will operate on behalf of.
 	 */
 	
-	public AutomaticCommunityDeletionManager(Css linkedCss, EntityIdentifier dpi) {
-		this.linkedCss = linkedCss;
-		this.dpi = dpi;
-	}
-	
-	/*
-     * Constructor for AutomaticCommunityDeletionManager
-     * 
-	 * Description: The constructor creates the AutomaticCommunityDeletionManager
-	 *              component abstractly at a domain/cloud-level.
-	 * Parameters: 
-	 * 				linkedDomain - the domain on behalf of which this object is to operate.
-	 */
-	
-	public AutomaticCommunityDeletionManager(Domain linkedDomain) {
-		this.linkedDomain = linkedDomain;
+	public AutomaticCommunityDeletionManager(EntityIdentifier linkedEntity, String linkType) {
+		if (linkType.equals("CSS"))
+			this.linkedCss = linkedEntity;
+		else
+			this.linkedDomain = linkedEntity;
 	}
 	
 	/*
@@ -119,15 +110,16 @@ public class AutomaticCommunityDeletionManager {
 	 *              a domain, the check is done on all CISs in that domain.
 	 */
 	
-	public void determineCissToDelete() {
+	public void identifyCissToDelete() {
 		if (linkedCss != null) {
-			CISRecord[] records = ICISManager.getCisList(/** CISs administrated by the CSS */);
+			//CisRecord[] records = ICisManager.getCisList(/** CISs administrated by the CSS */);
 		}
 		if (linkedCis != null) {
-			CISRecord[] records = ICISManager.getCisList(/** This CIS */);
+			//CisRecord james = new CisRecord();
+			//CisRecord[] records = ICisManager.getCisList(/** This CIS */new CisRecord());
 		}
 		if (linkedDomain != null) {
-			CISRecord[] records = ICISManager.getCisList(/** CISs in the domain */);
+			//CisRecord[] records = ICisManager.getCisList(/** CISs in the domain */);
 		}
 		
 		//process
@@ -137,5 +129,9 @@ public class AutomaticCommunityDeletionManager {
 		//automatically call CIS management functions to delete CISs
 		
 	}
+	
+    public void intialiseAutomaticCommunityDeletionManager() {
+    	
+    }
 
 }

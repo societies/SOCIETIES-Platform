@@ -25,6 +25,7 @@
 
 package org.societies.orchestration.CommunityLifecycleManagement.impl;
 
+import org.societies.api.internal.cis.cis_management.CisRecord;
 import org.societies.api.internal.context.broker.IUserCtxBroker;
 import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 
@@ -47,38 +48,29 @@ public class CommunityLifecycleManagement {
 	private AutomaticCommunityConfigurationManager autoConfigurationManager;
 	private AutomaticCommunityDeletionManager autoDeletionManager;
 	
-	private Css linkedCss; // No datatype yet defined for CSS
-	private EntityIdentifier dpi;
+	//private Css linkedCss; // No datatype yet defined for CSS
+	private EntityIdentifier linkedCss;
 	
     private CisRecord linkedCis;
     
-    private Domain linkedDomain;  // No datatype yet representing a domain
+    //private Domain linkedDomain;  // No datatype yet representing a domain
+	private EntityIdentifier linkedDomain;
 	
 	/*
      * Constructor for CommunityLifecycleManagement
      * 
 	 * Description: The constructor creates the CommunityLifecycleManagement
-	 *              component either on a given CSS, or abstractly at a domain/cloud-level.
+	 *              component on a given CSS.
 	 * Parameters: 
-	 * 				
+	 * 				linkedEntity - the non-CIS entity, either a user CSS or a domain deployment,
+	 *              that this object will operate on behalf of.
 	 */
 	
-	public CommunityLifecycleManagement(Css linkedCss, EntityIdentifier dpi) {
-		this.linkedCss = linkedCss;
-		this.dpi = dpi;
-	}
-	
-	/*
-     * Constructor for CommunityLifecycleManagement
-     * 
-	 * Description: The constructor creates the CommunityLifecycleManagement
-	 *              component either on a given CSS, or abstractly at a domain/cloud-level.
-	 * Parameters: 
-	 * 				
-	 */
-	
-	public CommunityLifecycleManagement(Domain linkedDomain) {
-		this.linkedDomain = linkedDomain;
+	public CommunityLifecycleManagement(EntityIdentifier linkedEntity, String linkType) {
+		if (linkType.equals("CSS"))
+			this.linkedCss = linkedEntity;
+		else
+			this.linkedDomain = linkedEntity;
 	}
 	
 	/*
@@ -120,39 +112,63 @@ public class CommunityLifecycleManagement {
 	
 	public void processPreviousLongTimeCycle() {
 		autoCreationManager.identifyCissToCreate("extensive");
-		autoConfigurationManager.identifyCissToConfigure("extensive");
-		autoDeletionManager.identifyCissToDelete("extensive");
+		autoConfigurationManager.identifyCissToConfigure();
+		autoDeletionManager.identifyCissToDelete();
 	}
 	
 	public void processPreviousShortTimeCycle() {
 		autoCreationManager.identifyCissToCreate("not extensive");
-		autoConfigurationManager.identifyCissToConfigure("not extensive");
+		autoConfigurationManager.identifyCissToConfigure();
 	}
 	
 	public void loop() {
 		
-		new Thread.start() {
-			while (true) {
-				Thread.sleep(10000);
-				processPreviousShortTimeCycle;
-		    }
-		};
-		
-		new Thread.start() {
-			while (true) {
-				Thread.sleep(220000000);
-				processPreviousLongTimeCycle;
-		    }
-		};
+		new ShortSleepThread().start();
+        new LongSleepThread().start();
 		
 	}
 	
-	public void stimulusForCommunityCreationDetected() {
-		autoCreationManager.determineCissToCreate();
+	//public void stimulusForCommunityCreationDetected() {
+		//autoCreationManager.determineCissToCreate();
+	//}
+	
+	//public void stimulusForCommunityDeletionDetected() {
+	//	autoDeletionManager.determineCissToDelete();
+	//}
+	
+	class ShortSleepThread extends Thread {
+		
+		public void run() {
+			while (true) {
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				processPreviousShortTimeCycle();
+		    }
+		}
 	}
 	
-	public void stimulusForCommunityDeletionDetected() {
-		autoDeletionManager.determineCissToDelete();
+    class LongSleepThread extends Thread {
 		
+		public void run() {
+			while (true) {
+				try {
+					Thread.sleep(220000000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				processPreviousShortTimeCycle();
+		    }
+		}
 	}
+    
+    public void intialiseCommunityLifecycleManagement() {
+    	
+    }
+    
+	
 }

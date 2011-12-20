@@ -1,6 +1,6 @@
 package org.societies.orchestration.CommunityLifecycleManagement.test;
 
-import org.societies.css.cssdirectory.api.ICssDirectoryCloud;
+/**import org.societies.css.cssdirectory.api.ICssDirectoryCloud;
 import org.societies.css.cssdirectory.api.ICssDirectoryRich;
 import org.societies.css.cssdirectory.api.ICssDirectoryLight;
 
@@ -18,6 +18,7 @@ import org.societies.context.user.prediction.api.platform.IUserCtxPredictionMgr;
 import org.societies.context.user.db.api.platform.IUserCtxDBMgr;
 
 import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
+*/
 
 /**
  * This is the class for the Automatic Community Configuration Manager component

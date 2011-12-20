@@ -2,9 +2,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<!-- change the artifactid to your project artifactid -->
-	<groupId>org.societies.intelligentcommunityorchestration</groupId>
-	<artifactId>lifecyclemanagement</artifactId>
+	<groupId>org.societies.orchestration</groupId>
+	<artifactId>CommunityLifecycleManagement</artifactId>
 	<packaging>bundle</packaging>
 	<version>${version.ico}</version>
 	<developers>
@@ -22,13 +21,7 @@
 	</parent>
 
 	<dependencies>
-	<!-- add your dependencies here -->
-	<dependency>
-	<groupId>org.societies.api.external</groupId>
-	<artifactId>societies-api</artifactId>
-	<version>${release.version}</version>
-	<scope>provided</scope>
-	</dependency>
+	
 	<dependency>
 	<groupId>org.societies.api.internal</groupId>
 	<artifactId>societies-api-internal</artifactId>
@@ -36,6 +29,13 @@
 	<scope>provided</scope>
 	</dependency>
 
+	<dependency>
+	<groupId>org.societies.api.external</groupId>
+	<artifactId>societies-api</artifactId>
+	<version>${release.version}</version>
+	<scope>provided</scope>
+	</dependency>
+	
 
 	</dependencies>
 
@@ -65,7 +65,7 @@
 						<artifactItem>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>${project.artifactId}</artifactId>
-							<version>${version.ua}</version>
+							<version>${version.ico}</version>
 							<type>bundle</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
