@@ -29,7 +29,9 @@
 	<!-- localRepository | The path to the local repository maven will use to 
 		store artifacts. | | Default: ~/.m2/repository -->
 	<localRepository>C:\Users\pkuppuud\.m2\repository</localRepository>
-
+	<servers>
+	
+	</servers>
 
 	<!-- interactiveMode | This will determine whether maven prompts you when 
 		it needs input. If set to false, | maven will use a sensible default value, 
@@ -58,29 +60,12 @@
 		as active will be used. | -->
 	<proxies>
 		<!-- proxy | Specification for one proxy, to be used in connecting to the 
-			network. | 
-		<proxy>
-			<id>optional</id>
-			<active>true</active>
-			<protocol>http</protocol>
-			<username></username>
-			<password></password>
-			<host>yourproxy.com</host>
-			<port>911</port>
-			<nonProxyHosts>local.net|some.host.com</nonProxyHosts>
-		</proxy>
-
-		<proxy>
-			<id>optional</id>
-			<active>true</active>
-			<protocol>https</protocol>
-			<username></username>
-			<password></password>
-			<host>yourproxy.com</host>
-			<port>911</port>
-			<nonProxyHosts>local.net|some.host.com</nonProxyHosts>
-		</proxy>
--->
+			network. | <proxy> <id>optional</id> <active>true</active> <protocol>http</protocol> 
+			<username></username> <password></password> <host>yourproxy.com</host> <port>911</port> 
+			<nonProxyHosts>local.net|some.host.com</nonProxyHosts> </proxy> <proxy> <id>optional</id> 
+			<active>true</active> <protocol>https</protocol> <username></username> <password></password> 
+			<host>yourproxy.com</host> <port>911</port> <nonProxyHosts>local.net|some.host.com</nonProxyHosts> 
+			</proxy> -->
 	</proxies>
 
 	<!-- servers | This is a list of authentication profiles, keyed by the server-id 
@@ -161,18 +146,28 @@
 			whenever someone set 'target-env' to | anything, you could just leave off 
 			the <value/> inside the activation-property. | -->
 		<profile>
-			<id>Inject_Virgo_Deploy_dir</id>			
-			<properties>				
+			<id>Inject_Virgo_Deploy_dir</id>
+			<properties>
 				<!-- <spring.osgi.deploy.dir>${env.VIRGO_HOME}${file.separator}pickup</spring.osgi.deploy.dir> -->
 				<spring.osgi.deploy.dir>
 					C:\Users\yourusername\Documents\Development\Servers\virgo-tomcat-server-3.0.2.RELEASE\pickup
 				</spring.osgi.deploy.dir>
 			</properties>
+		<repositories>
+		<!-- Societies repository -->
+		<repository>
+			<id>societies</id>
+			<name>Societies Maven Repository</name>
+			<url>http://maven.ict-societies.eu/nexus/content/repositories/thirdparty/</url>
+		</repository>
+	</repositories>
 		</profile>
+		
 	</profiles>
 	<!-- activeProfiles | List of profiles that are active for all builds. | -->
 	<activeProfiles>
 		<activeProfile>Inject_Virgo_Deploy_dir</activeProfile>
 		<!-- <activeProfile>anotherAlwaysActiveProfile</activeProfile> -->
-	</activeProfiles>
+	</activeProfiles>	
+	
 </settings>
