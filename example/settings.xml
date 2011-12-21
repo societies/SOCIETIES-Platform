@@ -165,7 +165,7 @@
 			<properties>				
 				<!-- <spring.osgi.deploy.dir>${env.VIRGO_HOME}${file.separator}pickup</spring.osgi.deploy.dir> -->
 				<spring.osgi.deploy.dir>
-					C:\Users\pkuppuud\Documents\Development\Servers\virgo-tomcat-server-3.0.2.RELEASE\pickup
+					C:\Users\yourusername\Documents\Development\Servers\virgo-tomcat-server-3.0.2.RELEASE\pickup
 				</spring.osgi.deploy.dir>
 			</properties>
 		</profile>
