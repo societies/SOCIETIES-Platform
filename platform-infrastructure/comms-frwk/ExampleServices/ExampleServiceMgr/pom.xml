@@ -39,7 +39,19 @@
 		</dependency>
 		<dependency>
 			<groupId>org.societies.comm.examples</groupId>
+			<artifactId>CalculatorBean</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.comm.examples</groupId>
 			<artifactId>FortuneCookie</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.comm.examples</groupId>
+			<artifactId>FortuneCookieBean</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
