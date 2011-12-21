@@ -48,41 +48,42 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>../parent/spring-osgi.xml</module>
 		<module>../api/java/external</module>
 		<module>../api/java/internal</module>
+		 
+		<!-- Personalisation -->
 		<module>../personalisation/Personalisation-API</module>
 		<module>../context-management/UserContextDBManagement</module>
 		<module>../context-management/ContextBroker</module>
 		
 		 
-		 <module>../personalisation/UserPreferenceManagement</module>
-		 <module>../personalisation/UserPreferenceConditionMonitor</module>
-		 <module>../personalisation/UserPreferenceLearning</module>
-		 <module>../personalisation/PersonalisationManager</module>
-
-		<!-- Communications Infrastructure -->
-		<!-- <module>../platform-infrastructure/comms-frwk/CommunicationFrameworkInterface
+		<module>../personalisation/UserPreferenceManagement</module>
+		<module>../personalisation/UserPreferenceConditionMonitor</module>
+		<module>../personalisation/UserPreferenceLearning</module>
+		<module>../personalisation/PersonalisationManager</module>
+		
+		<!-- Communications Infrastructure
+		<module>../platform-infrastructure/comms-frwk/CommunicationFrameworkCommons
 		</module>
-		<module>../platform-infrastructure/comms-frwk/CommunicationFrameworkXmppUtils
+		<module>../platform-infrastructure/comms-frwk/ClientCommunicationMgr
 		</module>
-		<module>../platform-infrastructure/comms-frwk/XCCommunicationFrameworkBundle
+		<module>../platform-infrastructure/comms-frwk/XCCommunicationMgr
 		</module>
+		-->
+		<!-- Security and Dependability Mgmt -->
 
-		Security and Dependability Mgmt
-
-		CSS Mgmt
+		<!-- CSS Mgmt -->
 		<module>../css-modules/css-ser-registry</module>
 
-		CIS Mgmt
+		<!--  CIS Mgmt 
 		<module>../cis-modules/cis-management/CommunityXEP</module>
 		<module>../cis-modules/cis-management/CommunityServiceBundle</module>
- -->
+		-->
+
 		<!-- Intelligent community orchestration -->
 		<!-- Context Management -->
 		<!-- Privacy Mgmt -->
 		<!-- User Agent -->
 		<module>../user-agent/user-action-monitor</module>
 		<module>../user-agent/user-feedback</module>
-		<!-- Personalisation Mgmt -->
-		<!-- <module>../personalisation/Personalisation-API</module> -->
 
 	</modules>
 </project>
