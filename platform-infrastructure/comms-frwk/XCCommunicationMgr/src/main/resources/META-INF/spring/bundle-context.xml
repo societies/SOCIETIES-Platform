@@ -13,7 +13,7 @@
        bundle. The configuration of OSGi definitions is kept in a separate 
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
-       <bean id="xcCommunication" class="org.societies.comm.xmpp.impl.ExternalComponentCommunication">
+       <bean id="xcCommunication" class="org.societies.comm.xmpp.xc.impl.XCCommunicationMgr">
                 <constructor-arg value="${host}"/>
                 <constructor-arg value="${subDomain}"/>
                 <constructor-arg value="${secretKey}"/>

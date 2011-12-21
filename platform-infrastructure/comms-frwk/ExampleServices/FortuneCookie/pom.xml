@@ -44,7 +44,7 @@
 						<!-- <Import-Package></Import-Package>  -->
 						<Export-Package>
 							org.societies.comm.examples.fortunecookie.api,
-							org.societies.comm.examples.fortunecookiebean
+							org.societies.comm.examples.fortunecookie.datatypes
 						</Export-Package>
 					</instructions>
 				</configuration>

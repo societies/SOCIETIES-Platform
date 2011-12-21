@@ -34,7 +34,7 @@
 			<groupId>org.igniterealtime</groupId>
 			<artifactId>whack</artifactId>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		
 		<!-- JAXB -->
@@ -42,14 +42,14 @@
         	<groupId>javax.xml.bind</groupId>
         	<artifactId>jaxb-api</artifactId>
         	<version>2.2.5</version>
-        	<scope>compile</scope>
+        	<scope>provided</scope>
         </dependency>
 		<dependency>
 	  		<groupId>com.sun.xml.bind</groupId>
 	  		<artifactId>jaxb-impl</artifactId>
 	  		<version>2.2.5-b01</version>
 	  		<type>jar</type>
-	  		<scope>compile</scope>
+	  		<scope>provided</scope>
 	  	</dependency>
 	  	
 	  	<!-- Datatypes -->
@@ -71,6 +71,7 @@
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>CommunicationFrameworkCommons</artifactId>
 			<version>${release.version}</version>
+			<scope>provided</scope>
 		</dependency>
     </dependencies>
 
@@ -83,8 +84,9 @@
 				<extensions>true</extensions>
 				<configuration>
     				<instructions>
-    					<Import-Package>
-    						org.osgi.framework,
+    					<!--  
+    						<Import-Package>
+    					org.osgi.framework,
     						!org.gjt.*,
     						!org.jaxen.*,
     						!org.mortbay.*,
@@ -95,14 +97,19 @@
     						!com.sun.msv.*,
     						org.slf4j*;version="1.5.8",
     						*
+    				
+    					*;resolution:=optional
     					</Import-Package>
     					<Export-Package>
-    						org.societies.community,
-    						org.societies.comm.xmpp,
-    						org.societies.comm.identity
+    						  org.societies.community, 
+    						org.societies.comm.identity,
+    							org.societies.comm.xmpp,
+    						 					
+    						
 		           		</Export-Package>
-		           		<Embed-Dependency>*;scope=compile</Embed-Dependency>
+		           		<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
+    					 -->
 						<Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment> 
 		         	</instructions>
 	       		</configuration>
