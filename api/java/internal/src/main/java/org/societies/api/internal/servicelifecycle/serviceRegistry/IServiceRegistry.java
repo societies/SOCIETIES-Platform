@@ -48,15 +48,14 @@ public interface IServiceRegistry {
 	 * @param servicesList
 	 * @return the list of services registered correctly
 	 */
-	public List<ServiceResourceIdentifier> registerServiceList (List<RegistryEntry> servicesList);
-
+	public List<Service> registerServiceList (List<Service> servicesList);
 	
 	/**
 	 * Description: This method permits you to unregister a services list
 	 * @param servicesList
 	 * @return the list of services removed correctly
 	 */
-	public List<ServiceResourceIdentifier> unregisterServiceList (List<ServiceResourceIdentifier> servicesList);
+	public List<Service> unregisterServiceList (List<Service> servicesList);
 
 
 	/**
@@ -73,21 +72,21 @@ public interface IServiceRegistry {
 	 * 		  type declare if the return list contains services shared to CIS or to CSS
 	 * @return a List of services retrieved
 	 */
-	public List<RegistryEntryOut> retrieveServicesSharedByCSS (Identity CSS, QuerySubjectType type);
+	public List<Service> retrieveServicesSharedByCSS (Identity CSS, QuerySubjectType type);
 	
 	/**
 	 * Description: Based on a CSS identifier this method returns all services that are available within the specified CSS 
 	 * @param CSS that represents the identifier for CSS
 	 * @return a List of services retrieved
 	 */
-	public List<RegistryEntryOut> retrieveServicesInCSS (Identity CSS);
+	public List<Service> retrieveServicesInCSS (Identity CSS);
 	
 	/**
 	 * Description: Based on a CSS identifier this method returns all services that are available within the specified CIS 
 	 * @param CIS that represents the identifier for CIS
 	 * @return a List of services retrieved
 	 */
-	public List<RegistryEntryOut> retrieveServicesInCIS (Identity CIS);
+	public List<Service> retrieveServicesInCIS (Identity CIS);
 	
 	/**
 	 * Description: Based on a CSS identifier this method returns all services shared to CSS by other CSS or CIS 
@@ -95,7 +94,7 @@ public interface IServiceRegistry {
 	 * 		  type declare if the return list contains services shared by CIS or by CSS
 	 * @return a List of services retrieved
 	 */
-	public List<RegistryEntryOut> retrieveServicesSharedToCSS (Identity CSS, QuerySubjectType type);
+	public List<Service> retrieveServicesSharedToCSS (Identity CSS, QuerySubjectType type);
 	
 	
 	
