@@ -127,7 +127,7 @@ public interface IInternalPersonalisationManager extends IPersonalisationManager
 	 * @param serviceId
 	 * @param dianneOutcome
 	 */
-	public void sendITSUDUserIntentOutcome(EntityIdentifier owner, ServiceResourceIdentifier serviceId, ICRISTUserAction dianneOutcome);
+	public void sendCRISTUserIntentOutcome(EntityIdentifier owner, ServiceResourceIdentifier serviceId, ICRISTUserAction dianneOutcome);
 
 	/**
 	 * 

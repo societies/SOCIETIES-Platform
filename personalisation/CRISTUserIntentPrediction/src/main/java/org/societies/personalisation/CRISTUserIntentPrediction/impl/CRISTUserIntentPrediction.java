@@ -21,42 +21,110 @@
 package org.societies.personalisation.CRISTUserIntentPrediction.impl;
 
 import java.util.ArrayList;
+// import javax.annotation.PostConstruct;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.stereotype.Component;
 
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxModelObject;
+// import org.societies.api.personalisation.model.IAction;
 import org.societies.api.internal.personalisation.model.FeedbackEvent;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
+import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 
-public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction{
-	
-	public CRISTUserIntentPrediction(){
+// @Component
+public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
+
+	private IInternalPersonalisationManager preManager;
+	private EntityIdentifier myId;
+	private CtxAttributeIdentifier myCtxId;
+	private ServiceResourceIdentifier serviceId;
+	private ICRISTUserAction cristOutcome = null; 
+
+	public CRISTUserIntentPrediction() {
 		System.out.println("Hello! I'm the CRIST User Intent Prediction!");
 	}
+	
+	// @Autowired
+	public CRISTUserIntentPrediction(IInternalPersonalisationManager internalPreManager) {
+		this.preManager = internalPreManager;
+	}
+	
+	public void initialiseCRISTPrediction() {
 
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#enableCRISTPrediction(boolean)
+		if (this.preManager == null) {
+			System.out
+					.println(this.getClass().getName() + "PreManager is null");
+		} else {
+			System.out.println(this.getClass().getName()
+					+ "PreManager is NOT null");
+		}
+
+		System.out.println("Yo!! I'm a brand new service and my interface is: "
+				+ this.getClass().getName());
+		try{
+			this.preManager.registerForContextUpdate(myId, this.getClass().getName(), myCtxId);
+			System.out.println("CRIST Predictor registered the Context Update Event");
+		}catch(Exception e){
+			System.err.println("Exception when trying to register the Context Update Event");
+			System.err.println(e.toString());
+		}
+	}
+	
+	public IInternalPersonalisationManager getPreManager() {
+		System.out.println(this.getClass().getName()+" Return InternalPreManager");
+		return preManager;
+	}
+
+	public void setPreManager(IInternalPersonalisationManager internalPreManager) {
+		System.out.println(this.getClass().getName()+" GOT InternalPreManager");
+		this.preManager = internalPreManager;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.
+	 * ICRISTUserIntentPrediction#enableCRISTPrediction(boolean)
 	 */
 	@Override
 	public void enableCRISTPrediction(boolean bool) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCRISTPrediction(org.societies.api.context.model.CtxAttribute)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.
+	 * ICRISTUserIntentPrediction
+	 * #getCRISTPrediction(org.societies.api.context.model.CtxAttribute)
 	 */
 	@Override
 	public ArrayList<ICRISTUserAction> getCRISTPrediction(
 			CtxAttribute ctxAttribute) {
 		// TODO Auto-generated method stub
+		System.out.println("CRISTUIPredictor has been invoked...");
+		
+		// TODO
+		// Produce a CRIST UI Prediction based on the given context		
+		this.preManager.sendCRISTUserIntentOutcome(myId, serviceId, cristOutcome);
+		
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCurrentUserIntentAction(org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.ServiceResourceIdentifier)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.
+	 * ICRISTUserIntentPrediction
+	 * #getCurrentUserIntentAction(org.societies.api.mock.EntityIdentifier,
+	 * org.societies.api.mock.EntityIdentifier,
+	 * org.societies.api.mock.ServiceResourceIdentifier)
 	 */
 	@Override
 	public ICRISTUserAction getCurrentUserIntentAction(
@@ -66,21 +134,30 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction{
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#sendFeedback(org.societies.api.internal.personalisation.model.FeedbackEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.
+	 * ICRISTUserIntentPrediction
+	 * #sendFeedback(org.societies.api.internal.personalisation
+	 * .model.FeedbackEvent)
 	 */
 	@Override
 	public void sendFeedback(FeedbackEvent feedbackEvent) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#updateReceived(org.societies.api.context.model.CtxModelObject)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.
+	 * ICRISTUserIntentPrediction
+	 * #updateReceived(org.societies.api.context.model.CtxModelObject)
 	 */
 	@Override
 	public void updateReceived(CtxModelObject ctxModelObj) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

@@ -24,6 +24,11 @@ import org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.ICRISTUs
 
 public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery{
 
+	public void initialiseCRISTDiscovery(){
+		System.out.println("Yo!! I'm a brand new service and my interface is: "
+				+ this.getClass().getName());
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.ICRISTUserIntentDiscovery#enableCRISTUIDiscovery(boolean)
 	 */

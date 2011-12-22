@@ -16,10 +16,8 @@
 		</osgi:interfaces>
 	</osgi:service>
 	
-	<osgi:reference id="UserPrefMgr"
-		interface="org.societies.personalisation.preference.api.UserPreferenceManagement.IUserPreferenceManagement" />
-	<osgi:reference id="UserCtxBroker"
-		interface="org.societies.api.internal.context.broker.IUserCtxBroker" />
+	<osgi:reference id="PersonalisationManager"
+		interface="org.societies.personalisation.common.api.management.IInternalPersonalisationManager" /> 
 		
 	<!-- 
 	<osgi:service ref="PersonalisationManager">

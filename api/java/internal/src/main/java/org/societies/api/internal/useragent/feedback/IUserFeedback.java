@@ -26,9 +26,7 @@
 package org.societies.api.internal.useragent.feedback;
 
 import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalType;
 
 /**
  * 
@@ -37,7 +35,7 @@ import org.societies.api.internal.useragent.model.ImpProposalType;
  */
 public interface IUserFeedback
 {
-	public boolean getExplicitFB(int type, ExpProposalContent content);
+	public String getExplicitFB(int type, ExpProposalContent content);
 	
 	public boolean getImplicitFB(int type, ImpProposalContent content);
 }

@@ -8,7 +8,9 @@
 		this file can easily be used for integration testing outside of an OSGi environment -->
 
 	<bean name="CRISTUserIntentDiscoverer"
-		class="org.societies.personalisation.CRISTUserIntentDiscovery.impl.CRISTUserIntentDiscovery" />
+		class="org.societies.personalisation.CRISTUserIntentDiscovery.impl.CRISTUserIntentDiscovery"
+		init-method="initialiseCRISTDiscovery">
+	</bean>
 
 
 </beans>

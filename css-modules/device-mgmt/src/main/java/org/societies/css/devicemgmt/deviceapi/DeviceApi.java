@@ -26,6 +26,7 @@
 package org.societies.css.devicemgmt.deviceapi;
 
 import javax.swing.event.EventListenerList;
+import org.societies.api.internal.*;
 
 /**
  * Describe your class here...

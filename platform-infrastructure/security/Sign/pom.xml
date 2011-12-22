@@ -15,9 +15,15 @@
     
 	<developers>
 		<developer>
+	        <id>mvardjan</id>
 			<name>Mitja Vardjan</name>
+            <email>mitja.vardjan@setcce.si</email>
 			<organization>SETCCE</organization>
       		<organizationUrl>http://www.setcce.si</organizationUrl>
+            <roles>
+                <role>owner</role>
+	            <role>developer</role>
+            </roles>
 		</developer>
 	</developers>
 	
