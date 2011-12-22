@@ -11,8 +11,17 @@
 
   <groupId>org.societies.utilities</groupId>
   <artifactId>DBC</artifactId>
-  <version>0.1</version>
+  <version>${release.version}</version>
   <packaging>jar</packaging>
+
+   <developers>
+      <developer>
+		 <name>WP4 Client Framework Team</name>
+		<!-- Name of component author-->
+		 <email>http://www.ict-societies.eu</email>
+		<!-- Component author e-mail-->
+	  </developer>
+   </developers>
 
   <name>DBC</name>
   <url>http://maven.apache.org</url>

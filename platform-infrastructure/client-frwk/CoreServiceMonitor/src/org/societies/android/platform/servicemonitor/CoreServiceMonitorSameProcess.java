@@ -38,4 +38,14 @@ public class CoreServiceMonitorSameProcess extends Service implements ICoreServi
 		return "Bah humbug";
 	}
 
+	@Override
+	public String getGreeting(String appendToMessage) {
+		return ("Bah humbug " + appendToMessage);
+	}
+
+	@Override
+	public String getNumberGreeting(String appendToMessage, int index) {
+		return ("Bah humbug " + appendToMessage + " index: " + index);
+	}
+
 }
