@@ -25,24 +25,24 @@
 
 package org.societies.orchestration.CommunityLifecycleManagement.impl;
 
-import org.societies.css.cssdirectory.api.ICssDirectoryCloud;
-import org.societies.css.cssdirectory.api.ICssDirectoryRich;
-import org.societies.css.cssdirectory.api.ICssDirectoryLight;
+import java.util.ArrayList;
 
-import org.societies.cssmgmt.cssdiscovery.api.ICssDiscovery;
+import org.societies.api.internal.css_modules.css_directory.ICssDirectory;
 
-import org.societies.cis.management.api.CisAcitivityFeed;
-import org.societies.cis.management.api.ServiceSharingRecord;
-import org.societies.cis.management.api.CisActivity;
-import org.societies.cis.management.api.CisRecord;
+import org.societies.api.internal.css_modules.css_discovery.ICssDiscovery;
 
-import org.societies.context.user.similarity.api.platform.IUserCtxSimilarityEvaluator;
+import org.societies.api.internal.cis.cis_management.CisActivityFeed;
+import org.societies.api.internal.cis.cis_management.ServiceSharingRecord;
+import org.societies.api.internal.cis.cis_management.CisActivity;
+import org.societies.api.internal.cis.cis_management.CisRecord;
 
-import org.societies.context.user.prediction.api.platform.IUserCtxPredictionMgr;
+import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
 
-import org.societies.context.user.db.api.platform.IUserCtxDBMgr;
+import org.societies.api.internal.context.user.prediction.IUserCtxPredictionMgr;
 
-import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
+import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
+
+import org.societies.api.internal.context.user.history.IUserCtxHistoryMgr;
 
 import org.societies.api.mock.EntityIdentifier;
 
@@ -66,38 +66,28 @@ import org.societies.api.mock.EntityIdentifier;
 
 public class AutomaticCommunityCreationManager {
 	
-	private Css linkedCss; // No datatype yet defined for CSS
-	private EntityIdentifier dpi;
+	private EntityIdentifier linkedCss; // No datatype yet defined for CSS
 	
     private CisRecord linkedSuperCis;
     
-    private Domain linkedDomain; // No datatype yet representing a domain
-	
+    //private Domain linkedDomain; // No datatype yet representing a domain
+	private EntityIdentifier linkedDomain;
+    
 	/*
-     * Constructor for AutomaticCommunityCreationManager
+     * Constructor for AutomaticCommunityConfigurationManager
      * 
-	 * Description: The constructor creates the AutomaticCommunityCreationManager
+	 * Description: The constructor creates the AutomaticCommunityConfigurationManager
 	 *              component on a given CSS.
 	 * Parameters: 
-	 * 				linkedCSS - the CSS that this object will operate on behalf of.
+	 * 				linkedEntity - the non-CIS entity, either a user CSS or a domain deployment,
+	 *              that this object will operate on behalf of.
 	 */
 	
-	public AutomaticCommunityCreationManager(Css linkedCss, EntityIdentifier dpi) {
-		this.linkedCss = linkedCss;
-		this.dpi = dpi;
-	}
-	
-	/*
-     * Constructor for AutomaticCommunityCreationManager
-     * 
-	 * Description: The constructor creates the AutomaticCommunityCreationManager
-	 *              component abstractly at a domain/cloud-level.
-	 * Parameters: 
-	 * 				linkedDomain - the domain on behalf of which this object is to operate.
-	 */
-	
-	public AutomaticCommunityCreationManager(Domain linkedDomain) {
-		this.linkedDomain = linkedDomain;
+	public AutomaticCommunityCreationManager(EntityIdentifier linkedEntity, String linkType) {
+		if (linkType.equals("CSS"))
+			this.linkedCss = linkedEntity;
+		else
+			this.linkedDomain = linkedEntity;
 	}
 	
 	/*
@@ -110,12 +100,12 @@ public class AutomaticCommunityCreationManager {
 	 *                               suggesting sub-CISs on it.
 	 */
 	
-	public AutomaticCommunityCreationManager(CisRecord linkedCis) {
-		this.linkedCis = linkedCis;
+	public AutomaticCommunityCreationManager(CisRecord linkedSuperCis) {
+		this.linkedSuperCis = linkedSuperCis;
 	}
 	
-	public return ArrayList<EntityIdentifier> getIDsOfInteractingCsss() {
-		
+	public ArrayList<EntityIdentifier> getIDsOfInteractingCsss() {
+		return null;
 	}
 	
 	/*
@@ -173,4 +163,8 @@ public class AutomaticCommunityCreationManager {
 		boolean tempCisPossibility = true;
 		return tempCisPossibility;
 	}
+	
+    public void intialiseAutomaticCommunityCreationManager() {
+    	
+    }
 }

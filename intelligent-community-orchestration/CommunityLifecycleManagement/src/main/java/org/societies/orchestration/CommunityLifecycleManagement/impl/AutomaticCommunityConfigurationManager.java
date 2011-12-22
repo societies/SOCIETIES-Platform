@@ -25,24 +25,23 @@
 
 package org.societies.orchestration.CommunityLifecycleManagement.impl;
 
-import org.societies.css.cssdirectory.api.ICssDirectoryCloud;
-import org.societies.css.cssdirectory.api.ICssDirectoryRich;
-import org.societies.css.cssdirectory.api.ICssDirectoryLight;
+import org.societies.api.internal.css_modules.css_directory.ICssDirectory;
 
-import org.societies.cssmgmt.cssdiscovery.api.ICssDiscovery;
+import org.societies.api.internal.css_modules.css_discovery.ICssDiscovery;
 
-import org.societies.cis.management.api.CisAcitivityFeed;
-import org.societies.cis.management.api.ServiceSharingRecord;
-import org.societies.cis.management.api.CisActivity;
-import org.societies.cis.management.api.CisRecord;
+import org.societies.api.internal.cis.cis_management.CisActivityFeed;
+import org.societies.api.internal.cis.cis_management.ICisManager;
+import org.societies.api.internal.cis.cis_management.ServiceSharingRecord;
+import org.societies.api.internal.cis.cis_management.CisActivity;
+import org.societies.api.internal.cis.cis_management.CisRecord;
 
-import org.societies.context.user.similarity.api.platform.IUserCtxSimilarityEvaluator;
+import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
 
-import org.societies.context.user.prediction.api.platform.IUserCtxPredictionMgr;
+import org.societies.api.internal.context.user.prediction.IUserCtxPredictionMgr;
 
-import org.societies.context.user.db.api.platform.IUserCtxDBMgr;
+import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
 
-import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
+import org.societies.api.internal.context.user.history.IUserCtxHistoryMgr;
 
 import org.societies.api.mock.EntityIdentifier;
 
@@ -74,39 +73,30 @@ import org.societies.api.mock.EntityIdentifier;
 
 public class AutomaticCommunityConfigurationManager {
 	
-	private Css linkedCss; // No datatype yet defined for CSS
-	private EntityIdentifier dpi;
+	private EntityIdentifier linkedCss; // No datatype yet defined for CSS
 	
     private CisRecord linkedCis;
     
-    private Domain linkedDomain;  // No datatype yet representing a domain
-	
+    //private Domain linkedDomain;  // No datatype yet representing a domain
+	private EntityIdentifier linkedDomain;
+    
 	/*
      * Constructor for AutomaticCommunityConfigurationManager
      * 
 	 * Description: The constructor creates the AutomaticCommunityConfigurationManager
 	 *              component on a given CSS.
 	 * Parameters: 
-	 * 				linkedCSS - the CSS that this object will operate on behalf of.
+	 * 				linkedEntity - the non-CIS entity, either a user CSS or a domain deployment,
+	 *              that this object will operate on behalf of.
 	 */
 	
-	public AutomaticCommunityConfigurationManager(Css linkedCss, EntityIdentifier dpi) {
-		this.linkedCss = linkedCss;
-		this.dpi = dpi;
+	public AutomaticCommunityConfigurationManager(EntityIdentifier linkedEntity, String linkType) {
+		if (linkType.equals("CSS"))
+			this.linkedCss = linkedEntity;
+		else
+			this.linkedDomain = linkedEntity;
 	}
 	
-	/*
-     * Constructor for AutomaticCommunityConfigurationManager
-     * 
-	 * Description: The constructor creates the AutomaticCommunityConfigurationManager
-	 *              component abstractly at a domain/cloud-level.
-	 * Parameters: 
-	 * 				linkedDomain - the domain on behalf of which this object is to operate.
-	 */
-	
-	public AutomaticCommunityConfigurationManager(Domain linkedDomain) {
-	    this.linkedDomain = linkedDomain;
-	}
 	/*
      * Constructor for IAutomaticCommunityConfigurationManager
      * 
@@ -116,7 +106,7 @@ public class AutomaticCommunityConfigurationManager {
 	 * 				linkedCis - the Cis that this object will be used to check for configuration on.
 	 */
 	
-	public IAutomaticCommunityConfigurationManager(CisRecord linkedCis) {
+	public AutomaticCommunityConfigurationManager(CisRecord linkedCis) {
 		this.linkedCis = linkedCis;
 	}
 	
@@ -128,15 +118,15 @@ public class AutomaticCommunityConfigurationManager {
 	 *              a domain, the check is done on all CISs in that domain.
 	 */
 	
-	public void determineCissToConfigure() {
+	public void identifyCissToConfigure() {
 		if (linkedCss != null) {
-			CISRecord[] records = ICISManager.getCisList(/** CISs administrated by the CSS */);
+			//CisRecord[] records = ICisManager.getCisList(/** CISs administrated by the CSS */);
 		}
 		if (linkedCis != null) {
-			CISRecord[] records = ICISManager.getCisList(/** This CIS */);
+			//CisRecord[] records = ICisManager.getCisList(/** This CIS */);
 		}
 		if (linkedDomain != null) {
-			CISRecord[] records = ICISManager.getCisList(/** CISs in the domain */);
+			//CisRecord[] records = ICisManager.getCisList(/** CISs in the domain */);
 		}
 		
 		//process
@@ -146,4 +136,8 @@ public class AutomaticCommunityConfigurationManager {
 		//automatically call CIS management functions to configure CISs
 		
 	}
+	
+    public void intialiseAutomaticCommunityConfigurationManager() {
+    	
+    }
 }

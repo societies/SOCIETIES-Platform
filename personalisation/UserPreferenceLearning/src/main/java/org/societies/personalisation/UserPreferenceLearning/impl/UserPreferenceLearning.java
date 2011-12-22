@@ -34,8 +34,8 @@ import org.societies.personalisation.UserPreferenceLearning.impl.threads.AA_AI;
 import org.societies.personalisation.UserPreferenceLearning.impl.threads.AA_SI;
 import org.societies.personalisation.UserPreferenceLearning.impl.threads.SA_AI;
 import org.societies.personalisation.UserPreferenceLearning.impl.threads.SA_SI;
-import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Consumer;
 import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Learning;
+import org.societies.personalisation.preference.api.model.IC45Consumer;
 
 public class UserPreferenceLearning implements IC45Learning{
 	

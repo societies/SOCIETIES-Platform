@@ -31,138 +31,143 @@ import java.util.List;
 import java.util.Map;
 
 import org.societies.api.context.model.CtxHistoryAttribute;
+import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.personalisation.UserPreferenceLearning.impl.C45Output;
+import org.societies.personalisation.UserPreferenceLearning.impl.CtxIdentifierCache;
 import org.societies.personalisation.UserPreferenceLearning.impl.HistoryRetriever;
-import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Consumer;
+import org.societies.personalisation.UserPreferenceLearning.impl.PostProcessor;
+import org.societies.personalisation.UserPreferenceLearning.impl.PreProcessor;
+import org.societies.personalisation.preference.api.model.ActionSubset;
+import org.societies.personalisation.preference.api.model.IC45Consumer;
+import org.societies.personalisation.preference.api.model.IC45Output;
+import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
+import org.societies.personalisation.preference.api.model.ServiceSubset;
 
-//import weka.classifiers.trees.Id3;
-//import weka.core.Instances;
-//import weka.core.UnsupportedAttributeTypeException;
+import weka.classifiers.trees.Id3;
+import weka.core.Instances;
+import weka.core.UnsupportedAttributeTypeException;
 
 public class SA_AI extends Thread{
 
 	private IC45Consumer requestor;
-    private Date startDate;
-    private ServiceResourceIdentifier serviceId;
-    private String parameterName;
-    private HistoryRetriever historyRetriever;
-    //private OutputResponse responder;
-    //private DPIRetriever dpiRetriever;
-    //private PreProcessor preProcessor;
-    //private PostProcessor postProcessor;
+	private Date startDate;
+	private ServiceResourceIdentifier serviceId;
+	private String parameterName;
+	private HistoryRetriever historyRetriever;
+	//private DPIRetriever dpiRetriever;
+	private PreProcessor preProcessor;
+	private PostProcessor postProcessor;
 
-    public SA_AI(IC45Consumer requestor, Date startDate, ServiceResourceIdentifier serviceId, String parameterName, HistoryRetriever historyRetriever){
-        this.requestor = requestor;
-        this.startDate = startDate;
-        this.serviceId = serviceId;
-        this.parameterName = parameterName;
-        this.historyRetriever = historyRetriever;
+	public SA_AI(IC45Consumer requestor, Date startDate, ServiceResourceIdentifier serviceId, String parameterName, HistoryRetriever historyRetriever){
+		this.requestor = requestor;
+		this.startDate = startDate;
+		this.serviceId = serviceId;
+		this.parameterName = parameterName;
+		this.historyRetriever = historyRetriever;
+		preProcessor = new PreProcessor();
+		postProcessor = new PostProcessor();
+	}
 
-        //historyRetriever = new HistoryRetriever();
-        //responder = new OutputResponse();
+	@Override
+	public void run(){
+		System.out.println("C45 REQUEST FROM: "+requestor.getClass().getName());
+		System.out.println("Starting C45 learning process for all history owners on action: "+parameterName+" for serviceId: "+serviceId.toString());
 
-        //preProcessor = new PreProcessor();
-        //postProcessor = new PostProcessor();
-    }
+		//create new Cache for cycle
+		CtxIdentifierCache cache = new CtxIdentifierCache();
 
-    @Override
-    public void run(){
-        /*System.out.println("C45 REQUEST FROM: "+requestor.getClass().getName());
-        logging.info("Starting C45Learning process for all DPIs on action: "+parameterName+" for serviceId: "+serviceId.toString());
+		//logging.info("Retrieving all DPIs");
+		EntityIdentifier[] historyOwners = null; //dpiRetriever.getDPIs();
 
-        //create new Cache for cycle
-        CtxIdentifierCache cache = new CtxIdentifierCache();
+		List<IC45Output> output = new ArrayList<IC45Output>();
 
-        //logging.info("Retrieving all DPIs");
-        IDigitalPersonalIdentifier[] dpis = dpiRetriever.getDPIs();
+		//For each DPI
+		for(int i=0; i<historyOwners.length; i++){
+			EntityIdentifier nextHistoryOwner = (EntityIdentifier)historyOwners[i];
 
-        List<IC45Output> output = new ArrayList<IC45Output>();
+			//get history
+			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history = 
+					historyRetriever.getHistory();
 
-        //For each DPI
-        for(int i=0; i<dpis.length; i++){
-            IDigitalPersonalIdentifier nextDPI = (IDigitalPersonalIdentifier)dpis[i];
-*/
-    	
-            //get history
-            Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history = 
-                historyRetriever.getHistory();
-/*
+			if(history != null && history.size()>0){
 
-            if(history != null && history.size()>0){
+				//store context attribute identifiers with types
+				cache.cacheCtxIdentifiers(nextHistoryOwner, history);
 
-                //store context attribute identifiers with types
-                cache.cacheCtxIdentifiers(nextDPI, history);
+				//extract instances with serviceId and action
+				//System.out.println("Extracting "+parameterName+" actions for service "+serviceId.toString()+" from history");
+				ServiceSubset serviceSubset = 
+						preProcessor.extractServiceActions(history, serviceId, parameterName);
 
-                //extract instances with serviceId and action
-                logging.info("Extracting "+parameterName+" actions for service "+serviceId.toString()+" from history");
-                ServiceSubset serviceSubset = 
-                    preProcessor.extractServiceActions(history, serviceId, parameterName);
-                
-                //remove consistent context attributes from history
+				//remove consistent context attributes from history
 				ServiceSubset trimmedHistory = preProcessor.trimServiceSubset(serviceSubset);
-                
-                List<ActionSubset> actionSubsetList = trimmedHistory.getActionSubsets();
-                ActionSubset actionSubset = (ActionSubset)actionSubsetList.get(0);
 
-                IC45Output nextOutput = new C45Output(nextDPI, serviceId, trimmedHistory.getServiceType());
+				List<ActionSubset> actionSubsetList = trimmedHistory.getActionSubsets();
+				ActionSubset actionSubset = (ActionSubset)actionSubsetList.get(0);
 
-                if(actionSubset.size()>0){
-                	IPreferenceTreeModel treeModel = runCycle(nextDPI, actionSubset, cache, serviceId, trimmedHistory.getServiceType());
-                    if(treeModel!=null){
-                        nextOutput.addTree(treeModel);
-                    }
-                    output.add(nextOutput);
-                }
-            }else{
-                logging.warn("No History found DPI: "+nextDPI.toString());
-            }
-        }
-        //send DPI based output to requestor
-        System.out.println("RETURNING C45 OUTPUT TO: "+requestor.getClass().getName());
-        responder.sendC45Output(requestor, output);*/
-    }
+				IC45Output nextOutput = new C45Output(nextHistoryOwner, serviceId, trimmedHistory.getServiceType());
 
-    /*
-     * Algorithm methods
-         
-    private IPreferenceTreeModel runCycle(
-    		IDigitalPersonalIdentifier dpi, 
-    		ActionSubset input, 
-    		CtxIdentifierCache cache,
-    		IServiceIdentifier serviceId,
-    		String serviceType){
+				if(actionSubset.size()>0){
+					IPreferenceTreeModel treeModel = runCycle(nextHistoryOwner, actionSubset, cache, trimmedHistory.getServiceType());
+					if(treeModel!=null){
+						nextOutput.addTree(treeModel);
+					}
+					output.add(nextOutput);
+				}
+			}else{
+				System.out.println("No History found for history owner: "+nextHistoryOwner.toString());
+			}
+		}
+		//send DPI based output to requestor
+		System.out.println("RETURNING C45 OUTPUT TO: "+requestor.getClass().getName());
+		try{
+			requestor.handleC45Output(output);
+		}catch(Exception e){
+			System.out.println("The C45 requestor service is not available to handle response");
+		}
+	}
 
-        //convert to Instances for each serviceId
-        Instances instances = preProcessor.toInstances(input);
+	/*
+	 * Algorithm methods
+	 */  
+	private IPreferenceTreeModel runCycle(
+			EntityIdentifier dataOwner, 
+			ActionSubset input, 
+			CtxIdentifierCache cache,
+			String serviceType){
 
-        logging.info("C45 executing...");
-        String outputString = null;
-        try{
-            outputString = executeAlgorithm(instances);
-        } catch (Exception e) {
-            System.out.println("No rules could be learned from the current history set");
-            return null;
-        }
+		//convert to Instances for each serviceId
+		Instances instances = preProcessor.toInstances(input);
 
-        //convert tree strings into JTrees for output
-        String paramName = input.getParameterName();
-        return (IPreferenceTreeModel)postProcessor.process(dpi, paramName, outputString, cache, serviceId, serviceType);
-    }
+		//System.out.println("C45 executing...");
+		String outputString = null;
+		try{
+			outputString = executeAlgorithm(instances);
+		} catch (Exception e) {
+			System.out.println("No rules could be learned from the current history set");
+			return null;
+		}
 
-    private String executeAlgorithm(Instances input)throws Exception
-    {
-        Id3 id3 = new Id3();
-        //c45 = new C45PruneableClassifierTree
-        //(model, false, 0, false, false);
+		//convert tree strings into JTrees for output
+		String paramName = input.getParameterName();
+		return (IPreferenceTreeModel)postProcessor.process(dataOwner, paramName, outputString, cache, serviceId, serviceType);
+	}
 
-        input.setClassIndex(input.numAttributes()-1);
+	private String executeAlgorithm(Instances input)throws Exception
+	{
+		Id3 id3 = new Id3();
+		//c45 = new C45PruneableClassifierTree
+		//(model, false, 0, false, false);
 
-        //c45.buildClassifier(input);
-        id3.buildClassifier(input);
+		input.setClassIndex(input.numAttributes()-1);
 
-        System.out.println("ID3 output: "+id3.toString());
+		//c45.buildClassifier(input);
+		id3.buildClassifier(input);
 
-        return id3.toString();
-    }*/
+		//System.out.println("ID3 output: "+id3.toString());
+
+		return id3.toString();
+	}
 
 }
