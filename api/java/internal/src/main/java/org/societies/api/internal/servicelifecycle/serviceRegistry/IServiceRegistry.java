@@ -33,10 +33,9 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.model.Service
 
 //TODO : temporary mock package import to solve missing package "org.societies.comm.identity" in API folder
 import org.societies.api.internal.mock.Identity;
-/*
-import org.societies.comm.identity.Identity;
-*/
-import com.sun.servicetag.Registry;
+
+import org.societies.api.internal.servicelifecycle.model.Service;
+
 /**
  * @author Antonio Panazzolo, Massimo Mazzariol (SN)
  */
