@@ -1,8 +1,7 @@
 package org.societies.security.policynegotiator;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
-import org.societies.api.internal.security.policynegotiator.INegotiationRequesterCallback;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
 import org.societies.api.security.sign.ISign;
 
 public class NegotiationProvider implements INegotiationProvider {
@@ -24,32 +23,20 @@ public class NegotiationProvider implements INegotiationProvider {
 		System.out.println(TAG + ", " + "getSign()");
 		return sign;
 	}
-	
-	@Override
-	public void getPolicyOptions(INegotiationRequesterCallback callback) {
-		// TODO Auto-generated method stub
 
+	@Override
+	public void getPolicyOptions(INegotiationProviderCallback callback) {
+		// TODO Auto-generated method stub
 	}
 
 	@Override
-	public void acceptPolicy(String signedPolicyOption,
-			INegotiationRequesterCallback callback) {
+	public void acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
+			boolean modified, INegotiationProviderCallback callback) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void negotiatePolicy(int policyOptionId,
-			ResponsePolicy modifiedPolicy,
-			INegotiationRequesterCallback callback) {
+	public void reject(int sessionId) {
 		// TODO Auto-generated method stub
-
 	}
-
-	@Override
-	public void reject() {
-		// TODO Auto-generated method stub
-
-	}
-
 }

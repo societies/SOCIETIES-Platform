@@ -22,43 +22,23 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.societies.api.internal.security.policynegotiator;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
+import java.net.URI;
 
 /**
- * Interface for invoking the requester side (either the policy negotiator or
- * some other component).
- * To be used by policy negotiator from the provider side (from some other node).
  * 
+ *
  * @author Mitja Vardjan
  *
  */
-public interface INegotiationRequesterCallback {
-
-	/**
-	 * Async return for
-	 * {@link INegotiationRequester#getPolicyOptions(INegotiationRequesterCallback)}.
-	 * 
-	 * @param sops All available options for policy, embedded in a single XML document.
-	 */
-	public void onGetPolicyOptions(String sops);
+public interface INegotiationCallback {
 	
 	/**
 	 * Async return for
-	 * {@link INegotiationRequester#negotiatePolicy(int, ResponsePolicy, INegotiationRequesterCallback)}.
+	 * {@link INegotiation#startNegotiation(INegotiationCallback)}
 	 * 
-	 * @param modifiedPolicy Policy possibly modified by provider side.
-	 * Based on the policy sent before by the requester side.
+	 * TODO: fix datatype for the agreement
 	 */
-	public void onNegotiatePolicy(ResponsePolicy modifiedPolicy);
-	
-	/**
-	 * Async return for
-	 * {@link INegotiationRequester#acceptPolicy(int, ResponsePolicy, INegotiationRequesterCallback)}.
-	 * 
-	 * @param policy XML-based final policy signed by both parties.
-	 */
-	public void onAcceptPolicy(String policy);
+	public void onNegotiationComplete(boolean success, URI agreement);
 }
