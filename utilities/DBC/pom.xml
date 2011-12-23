@@ -4,13 +4,13 @@
 
    <parent>
         <groupId>org.societies</groupId>
-        <artifactId>android-parent</artifactId>
+        <artifactId>spring-osgi-parent</artifactId>
         <version>0.1</version>
-        <relativePath>../../../parent/android.xml</relativePath>
+        <relativePath>../../parent/spring-osgi.xml</relativePath>
    </parent>
 
-  <groupId>org.societies.android.platform</groupId>
-  <artifactId>CoreInterfaces</artifactId>
+  <groupId>org.societies.utilities</groupId>
+  <artifactId>DBC</artifactId>
   <version>${release.version}</version>
   <packaging>jar</packaging>
 
@@ -23,21 +23,19 @@
 	  </developer>
    </developers>
 
-  <name>CoreInterfaces</name>
+  <name>DBC</name>
+  <url>http://maven.apache.org</url>
 
-    <dependencies>
-        <dependency>
-  			<groupId>org.societies.utilities</groupId>
-  			<artifactId>DBC</artifactId>
-  			<version>${release.version}</version>
-            <scope>compile</scope>
-        </dependency>
-    	<dependency>
-      		<groupId>junit</groupId>
-      		<artifactId>junit</artifactId>
-      		<version>4.8.2</version>
-      		<scope>test</scope>
-    	</dependency>
-    </dependencies>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
 
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.2</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>

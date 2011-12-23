@@ -6,13 +6,13 @@ public class Sign implements ISign {
 
 	@Override
 	public String signXml(String xml, String id) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO
+		return "signature";
 	}
 
 	@Override
 	public boolean verify(String xml) {
-		// TODO Auto-generated method stub
+		// TODO
 		return false;
 	}
 

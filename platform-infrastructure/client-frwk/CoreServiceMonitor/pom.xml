@@ -12,6 +12,7 @@
    <groupId>org.societies.android.platform</groupId>
    <artifactId>CoreServiceMonitor</artifactId>
    <name>ServiceMonitor</name>
+   <version>${release.version}</version>
    <packaging>apk</packaging>
 
 
@@ -34,7 +35,7 @@
         <dependency>
           	<groupId>org.societies.android.platform</groupId>
   			<artifactId>CoreInterfaces</artifactId>
-  			<version>0.1</version>
+  			<version>${release.version}</version>
   			<scope>compile</scope>
         </dependency>
         

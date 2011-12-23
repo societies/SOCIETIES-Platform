@@ -22,46 +22,26 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.societies.api.internal.security.policynegotiator;
 
+import java.net.URI;
+
 /**
- * Interface for invoking the provider.
- * To be used by generic secure policy negotiator on the requester side.
- * 
+ * High-level interface for invoking the policy negotiator.
+ * Includes high-level interactions with the requester side of policy negotiator.
+ * To be used by other components (Service Marketplace ?) from same node.
+ *
  * @author Mitja Vardjan
  *
  */
-public interface INegotiationProvider {
+public interface INegotiation {
 
 	/**
-	 * Get all available options for the policy.
+	 * Start policy negotiation procedure.
 	 * 
 	 * @param callback The callback to be invoked to return the result.
 	 * 
-	 * @return All available options embedded in a single XML document.
+	 * TODO: fix parameters 
 	 */
-	public void getPolicyOptions(INegotiationProviderCallback callback);
-
-	/**
-	 * Accept given policy option and get the final legal agreement signed by
-	 * both parties.
-	 * 
-	 * @param sessionId ID of this session
-	 * 
-	 * @param signedPolicyOption The selected policy alternative, accepted and
-	 * signed by the requester side. Includes requester identity and signature.
-	 * 
-	 * @param modified True if policy option has been changed during the
-	 * negotiation process. False if policy is as provided by the provider side.
-	 */
-	public void acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
-			boolean modified, INegotiationProviderCallback callback);
-	
-	/**
-	 * Reject all options and terminate negotiation.
-	 * 
-	 * @param sessionId ID of this session
-	 */
-	public void reject(int sessionId);
+	public void startNegotiation(INegotiationCallback callback, URI sopOptions);
 }
