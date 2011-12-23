@@ -11,11 +11,33 @@
 
   <groupId>org.societies.android.platform</groupId>
   <artifactId>CoreInterfaces</artifactId>
-  <version>0.1</version>
+  <version>${release.version}</version>
   <packaging>jar</packaging>
 
-  <name>CoreInterfaces</name>
-  <url>http://maven.apache.org</url>
+   <developers>
+      <developer>
+		 <name>WP4 Client Framework Team</name>
+		<!-- Name of component author-->
+		 <email>http://www.ict-societies.eu</email>
+		<!-- Component author e-mail-->
+	  </developer>
+   </developers>
 
+  <name>CoreInterfaces</name>
+
+    <dependencies>
+        <dependency>
+  			<groupId>org.societies.utilities</groupId>
+  			<artifactId>DBC</artifactId>
+  			<version>${release.version}</version>
+            <scope>compile</scope>
+        </dependency>
+    	<dependency>
+      		<groupId>junit</groupId>
+      		<artifactId>junit</artifactId>
+      		<version>4.8.2</version>
+      		<scope>test</scope>
+    	</dependency>
+    </dependencies>
 
 </project>

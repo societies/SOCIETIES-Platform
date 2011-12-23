@@ -26,6 +26,21 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 package org.societies.utilities.DBC;
 
+/**
+ * 
+ * Class provides a Design by Contract (poor man's version) type mechanism for an implementing class. The contract is not visible
+ * outside of the implementing class but JavaDoc comments on parameters can convey the contract to consumers. There are three types of checking:
+ * 1. Preconditions: conditions that the passed parameters must comply with
+ * 2. Invariants: conditions that are considered to be invariant by the class
+ * 3. Postconditions: conditions that the returned parameter must comply with
+ * 
+ * Exceptions will be thrown if the conditions are not met resulting in a hard and fast code failure. This allows class consumers and the class
+ * itself to detect erroneous parameters and states quickly and at the point of initial detection. Exceptions can optionally have user defined
+ * messages which is another channel by which the contract is exposed to consumers.
+ * 
+ * The main rationale behind this implementation is to avoid the Java assertion mechanism which would achieve the same effect but can be 
+ * turned off and so its effects are negated.
+ */
 public final class Dbc {
     /**
      * disallow construction
