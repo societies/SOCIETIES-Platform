@@ -13,7 +13,7 @@
 	<artifactId>CommunicationFrameworkCommons</artifactId>
 	<packaging>bundle</packaging>
 	<name>Communication Framework Interface</name>
-	<version>${release.version}</version>
+	<version>0.0.1-SNAPSHOT</version>
 	
 	<dependencies>
 		<dependency>

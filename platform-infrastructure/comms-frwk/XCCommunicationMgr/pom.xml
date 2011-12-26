@@ -15,7 +15,7 @@
     <artifactId>XCCommunicationMgr</artifactId>
     <packaging>bundle</packaging>
     <name>XC Communication Manager</name>
-    <version>${release.version}</version>
+    <version>0.0.1-SNAPSHOT</version>
 
     <properties>
         <slf4j.version>1.5.8</slf4j.version>
@@ -70,7 +70,7 @@
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>${release.version}</version>
+			<version>0.0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
     </dependencies>

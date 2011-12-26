@@ -62,4 +62,6 @@ public interface FeatureServer {
 
 	Object receiveQuery(Stanza stanza, Object payload); // TODO receiveQuery and
 	// forget (asynch)
+	
+	// TODO assess need for "receiveResult" and "receiveError" (i.e. for feature servers sending IQs)
 }

@@ -38,6 +38,10 @@ public class Identity {
 	private String identifier;
 	private String domainIdentifier;
 	
+	public static Identity getIdentityFromJid(String jid) {
+		return null; // TODO
+	}
+	
 	public Identity(IdentityType type, String identifier, String domainIdentifier) {
 		this.type = type;
 		this.identifier = identifier;
@@ -49,18 +53,6 @@ public class Identity {
 			return true;
 		else
 			return false;
-	}
-
-	public IdentityType getType() {
-		return type;
-	}
-
-	public String getIdentifier() {
-		return identifier;
-	}
-
-	public String getDomainIdentifier() {
-		return domainIdentifier;
 	}
 	
 	// TODO there is an implicit CSS -> XMPP Client & CIS -> XMPP XC decision here
@@ -74,5 +66,21 @@ public class Identity {
 	public enum IdentityType {
 		CSS,
 		CIS;
+	}
+	
+	public IdentityType getType() {
+		return type;
+	}
+
+	public String getIdentifier() {
+		return identifier;
+	}
+
+	public String getDomainIdentifier() {
+		return domainIdentifier;
+	}
+	
+	public String getJid(){
+		return null; // TODO
 	}
 }
