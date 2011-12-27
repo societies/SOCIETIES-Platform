@@ -24,43 +24,43 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * @author Joao M. Goncalves (PTIN)
- * 
- * This is the implementation of both the {@link CommunityManagement} service and of the {@link NamespaceExtension} interface.
- * It handles XEP-SOC1 related logic. Registers on XCCommunicationFrameworkBundle to receive staza elements of namespace
- * http://societies.org/community, and handles those requests. 
- * 
- */
-
 package org.societies.cis.mgmt.impl;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.societies.cis.mgmt.CommunityManagement;
-import org.societies.comm.xmpp.CommunicationException;
-import org.societies.comm.xmpp.CommunicationManager;
-import org.societies.comm.xmpp.NamespaceExtension;
-import org.societies.comm.xmpp.Stanza;
+import org.societies.comm.xmpp.datatypes.Stanza;
+import org.societies.comm.xmpp.exceptions.CommunicationException;
+import org.societies.comm.xmpp.interfaces.CommManager;
+import org.societies.comm.xmpp.interfaces.FeatureServer;
 import org.societies.community.Community;
 import org.societies.community.Participant;
 import org.societies.community.Who;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Joao M. Goncalves (PTIN)
+ * 
+ * This is the implementation of both the {@link CommunityManagement} service and of the {@link FeatureServer} interface.
+ * It handles XEP-SOC1 related logic. Registers on XCCommunicationMgr to receive stanza elements of namespace
+ * http://societies.org/community, and handles those requests. 
+ * 
+ */
+
 // TODO
 // no distinction between get and set... join and leave should be set and who should be get
-// 
+// log exceptions
 @Component
-public class CommunityManagementImpl implements CommunityManagement, NamespaceExtension {
+public class CommunityManagementImpl implements CommunityManagement, FeatureServer {
 
-	private CommunicationManager endpoint;
+	private CommManager endpoint;
 	private Set<String> participants;
 	private Set<String> leaders;
 	
 	@Autowired
-	public CommunityManagementImpl(CommunicationManager endpoint) {
+	public CommunityManagementImpl(CommManager endpoint) {
 		participants = new HashSet<String>();
 		leaders = new HashSet<String>();
 		this.endpoint = endpoint;
@@ -76,12 +76,12 @@ public class CommunityManagementImpl implements CommunityManagement, NamespaceEx
 	}
 	
 	@Override
-	public String getNamespace() {
+	public String getXMLNamespace() {
 		return "http://societies.org/community";
 	}
 
 	@Override
-	public String getPackage() {
+	public String getJavaPackage() {
 		return "org.societies.community";
 	}
 
@@ -138,17 +138,18 @@ public class CommunityManagementImpl implements CommunityManagement, NamespaceEx
 		return null;
 	}
 
-	@Override
-	public void receiveResult(Stanza stanza, Object payload) {
-		// do nothing
-		// no use-case so far for community-sent iqs, so it doesn't need to handle results
-	}
-
-	@Override
-	public void receiveError(Stanza stanza) {
-		// do nothing
-		// no use-case so far for community-sent iqs, so it doesn't need to handle results
-	}
+// TODO Removed from FeatureServer by Miquel
+//	@Override
+//	public void receiveResult(Stanza stanza, Object payload) {
+//		// do nothing
+//		// no use-case so far for community-sent iqs, so it doesn't need to handle results
+//	}
+//
+//	@Override
+//	public void receiveError(Stanza stanza) {
+//		// do nothing
+//		// no use-case so far for community-sent iqs, so it doesn't need to handle results
+//	}
 	
 	@Override
 	public Set<String> getParticipants() {

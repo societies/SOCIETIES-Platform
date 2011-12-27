@@ -25,11 +25,9 @@
 
 package org.societies.api.internal.security.policynegotiator;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
-
 /**
  * Interface for invoking the requester.
- * To be used by other components on same node.
+ * To be used by privacy policy components on the same node.
  * 
  * @author Mitja Vardjan
  *
@@ -37,45 +35,33 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 public interface INegotiationRequester {
 
 	/**
-	 * Get all available options for the policy.
-	 * 
-	 * @param callback The callback to be invoked to return the result.
-	 * 
-	 * @return All available options embedded in a single XML document.
-	 */
-	public void getPolicyOptions(INegotiationRequesterCallback callback);
-
-	/**
 	 * Accept given policy option unchanged, as provided by the provider side.
-	 * Alternatively, {@link negotiatePolicy(ResponsePolicy)} can be used
-	 * to try to negotiate a different policy if none of the options are
-	 * acceptable.
+	 * If policy has been modified during negotiation process, then
+	 * {@link #acceptModifiedPolicy(int, Object)}
+	 * should be used instead.
 	 * 
-	 * @param signedPolicyOption The selected policy alternative, accepted and
-	 * signed by the requester side. Includes requester identity and signature.
+	 * @param sessionId ID of this session
+	 * @param signedPolicyOption The selected policy alternative
 	 */
-	public void acceptPolicy(String signedPolicyOption,
-			INegotiationRequesterCallback callback);
-	
-	/**
-	 * Further negotiate given policy option. If any of the policy options
-	 * given by the provider suits the requester, then {@link acceptPolicy(String)}
-	 * should be used instead in order to save bandwidth and increase chances
-	 * of successful negotiation.
-	 * 
-	 * @param policyOptionId ID of the option the requester side chose as a
-	 * basis for further negotiation.
-	 * 
-	 * @param modifiedPolicy Policy modified by requester side. The policy is
-	 * to be offered to the provider. It does not include the requester
-	 * identity nor signature (TBC). 
-	 */
-	public void negotiatePolicy(int policyOptionId, ResponsePolicy modifiedPolicy,
-			INegotiationRequesterCallback callback);
+	public void acceptUnmodifiedPolicy(int sessionId, String selectedPolicyOptionId);
 	
 	/**
 	 * Reject all options and terminate negotiation.
+	 * 
+	 * @param sessionId ID of this session
 	 */
-	public void reject();
+	public void reject(int sessionId);
 
+	/**
+	 * Accept agreement after privacy policy has been negotiated.
+	 * If agreement has not been negotiated and an original policy has been
+	 * chosen, then
+	 * {@link #acceptUnmodifiedPolicy(int, String)}
+	 * should be used instead.
+	 * 
+	 * @param sessionId ID of this session
+	 * @param agreement The final terms. Apart from missing final signatures,
+	 * this is the final version of document.
+	 */
+	public void acceptModifiedPolicy(int sessionId, Object agreement);
 }

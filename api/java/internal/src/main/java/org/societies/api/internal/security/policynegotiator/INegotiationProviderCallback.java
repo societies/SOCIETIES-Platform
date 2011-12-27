@@ -22,46 +22,33 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.societies.api.internal.security.policynegotiator;
 
 /**
- * Interface for invoking the provider.
- * To be used by generic secure policy negotiator on the requester side.
+ * Interface for invoking the requester side (either the policy negotiator or
+ * some other component).
+ * To be used by policy negotiator from the provider side (from some other node).
  * 
  * @author Mitja Vardjan
  *
  */
-public interface INegotiationProvider {
+public interface INegotiationProviderCallback {
 
 	/**
-	 * Get all available options for the policy.
-	 * 
-	 * @param callback The callback to be invoked to return the result.
-	 * 
-	 * @return All available options embedded in a single XML document.
-	 */
-	public void getPolicyOptions(INegotiationProviderCallback callback);
-
-	/**
-	 * Accept given policy option and get the final legal agreement signed by
-	 * both parties.
+	 * Async return for
+	 * {@link INegotiationProvider#getPolicyOptions(INegotiationProviderCallback)}.
 	 * 
 	 * @param sessionId ID of this session
-	 * 
-	 * @param signedPolicyOption The selected policy alternative, accepted and
-	 * signed by the requester side. Includes requester identity and signature.
-	 * 
-	 * @param modified True if policy option has been changed during the
-	 * negotiation process. False if policy is as provided by the provider side.
+	 * @param sops All available options for policy, embedded in a single XML document.
 	 */
-	public void acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
-			boolean modified, INegotiationProviderCallback callback);
+	public void onGetPolicyOptions(int sessionId, String sops);
 	
 	/**
-	 * Reject all options and terminate negotiation.
+	 * Async return for
+	 * {@link INegotiationProvider#acceptPolicyAndGetSla }.
 	 * 
 	 * @param sessionId ID of this session
+	 * @param policy XML-based final policy signed by both parties.
 	 */
-	public void reject(int sessionId);
+	public void onAcceptPolicyAndGetSla(int sessionId, String policy);
 }
