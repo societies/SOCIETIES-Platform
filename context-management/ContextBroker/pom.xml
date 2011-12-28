@@ -8,7 +8,7 @@
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>0.1</version>
-		<relativePath>../../../parent/spring-osgi.xml</relativePath>
+		<relativePath>../../parent/spring-osgi.xml</relativePath>
 	</parent>
 
 	<!-- groupId is set in parent pom -->
