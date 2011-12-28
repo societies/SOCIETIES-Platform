@@ -6,7 +6,7 @@ import org.societies.api.security.sign.ISign;
 
 public class NegotiationRequester implements INegotiationRequester, INegotiationProviderCallback {
 
-	private final String TAG = NegotiationProvider.class.getName();
+	private final String TAG = NegotiationRequester.class.getName();
 	
 	private ISign sign;
 	
