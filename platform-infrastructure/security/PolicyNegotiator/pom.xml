@@ -57,7 +57,7 @@
 
 		<dependency>
 			<groupId>org.societies.security</groupId>
-			<artifactId>signatureMgr</artifactId>
+			<artifactId>signature-mgr</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>

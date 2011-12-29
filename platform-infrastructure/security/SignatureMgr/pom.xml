@@ -4,7 +4,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.security</groupId>
-	<artifactId>signatureMgr</artifactId>
+	<artifactId>signature-mgr</artifactId>
 	<version>${release.version}</version>
 	<packaging>bundle</packaging>
 	<name>Digital Signature Service Bundle</name>
