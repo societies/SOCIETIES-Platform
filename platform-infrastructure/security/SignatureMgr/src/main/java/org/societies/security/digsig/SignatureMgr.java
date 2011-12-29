@@ -1,21 +1,22 @@
 package org.societies.security.digsig;
 
 import org.societies.api.security.digsig.ISignatureMgr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SignatureMgr implements ISignatureMgr {
 
-	private final String TAG = SignatureMgr.class.getName();
+	private static Logger LOG = LoggerFactory.getLogger(SignatureMgr.class);
 
 	@Override
 	public String signXml(String xml, String id) {
-		System.out.println(TAG + ", " + "signXml(" + xml + ", " + id + ")");
+		LOG.debug("signXml({}, {})", xml, id);
 		return "signature";  // FIXME
 	}
 
 	@Override
 	public boolean verify(String xml) {
-		System.out.println(TAG + ", " + "verify(" + xml + ")");
+		LOG.debug("verify({})", xml);
 		return false;  // FIXME
 	}
-
 }

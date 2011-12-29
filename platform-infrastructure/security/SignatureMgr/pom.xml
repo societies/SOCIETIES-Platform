@@ -24,12 +24,6 @@
 			</roles>
 		</developer>
 	</developers>
-	
-	
-	
-	
-	
-	
 
 	<parent>
 		<groupId>org.societies</groupId>
@@ -44,6 +38,13 @@
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
