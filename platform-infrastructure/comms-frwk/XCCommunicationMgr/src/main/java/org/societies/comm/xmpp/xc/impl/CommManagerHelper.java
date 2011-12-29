@@ -24,7 +24,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.comm.xmpp.common;
+package org.societies.comm.xmpp.xc.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -128,8 +128,11 @@ public class CommManagerHelper {
 	}
 
 	private Marshaller getMarshaller(Package pkg) throws UnavailableException {
-		return (Marshaller) ifNotNull(pkgToMarshaller.get(pkg.toString()),
-				"package", pkg.toString());
+		LOG.info("-----------------getMarshaller--------------------");
+		LOG.info(pkgToMarshaller.keySet().toArray().toString());
+		LOG.info("<"+pkg.getName()+">");
+		return (Marshaller) ifNotNull(pkgToMarshaller.get(pkg.getName()),
+				"package", pkg.getName());
 	}
 
 	public void dispatchIQResult(IQ iq) {
@@ -237,10 +240,8 @@ public class CommManagerHelper {
 
 	public void register(FeatureServer fs) throws CommunicationException,
 			ClassNotFoundException {
-		// TODO latest namespace register sticks! no multiple namespace support
-		// atm
-		StringBuilder contextPath = new StringBuilder(fs.getJavaPackages().get(
-				0));
+		// TODO latest namespace register sticks! no multiple namespace support atm
+		StringBuilder contextPath = new StringBuilder(fs.getJavaPackages().get(0));
 		for (int i = 1; i < fs.getJavaPackages().size(); i++)
 			contextPath.append(":" + fs.getJavaPackages().get(i));
 
@@ -253,7 +254,7 @@ public class CommManagerHelper {
 			for (int i = 0; i < fs.getXMLNamespaces().size(); i++) {
 				String namespace = fs.getXMLNamespaces().get(i);
 				String packageStr = fs.getJavaPackages().get(i);
-				LOG.info("registering " + namespace);
+				LOG.info("registering " + namespace +" to package "+packageStr);
 
 				featureServers.put(namespace, fs);
 				nsToUnmarshaller.put(namespace, u);

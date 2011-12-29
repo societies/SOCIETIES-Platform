@@ -11,7 +11,7 @@
 	<groupId>org.societies.comm</groupId>
 	<artifactId>CommonLibraries</artifactId>
 	<packaging>bundle</packaging>
-	<version>${release.version}</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<description>XMPP Virgo Dependency Bundle</description>
 	<name>Common Libraries for Communication Framework</name>
 
