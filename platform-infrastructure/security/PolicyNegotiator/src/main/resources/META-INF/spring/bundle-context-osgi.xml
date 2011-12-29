@@ -8,10 +8,22 @@
 		this file. There is no requirement to keep these definitions in a separate 
 		file if you do not want to. The rationale for keeping these definitions separate 
 		is to facilitate integration testing of the bundle outside of an OSGi container -->
-	<osgi:service ref="NegotionProvider"
-		interface="org.societies.api.internal.security.policynegotiator.INegotiationProvider" />
-	<osgi:service ref="NegotionRequester"
-		interface="org.societies.api.internal.security.policynegotiator.INegotiationRequester" />
-	<osgi:reference id="Sign" interface="org.societies.api.security.sign.ISign" >
-	</osgi:reference>
+	<!--osgi:service ref="NegotiationProvider">
+		<osgi:interfaces>
+			<value>org.societies.api.internal.security.policynegotiator.INegotiationProvider</value>
+		</osgi:interfaces>
+	</osgi:service-->
+	<!--osgi:service ref="NegotiationRequester">
+		<osgi:interfaces>
+			<value>org.societies.api.internal.security.policynegotiator.INegotiationRequester</value>
+		</osgi:interfaces>
+	</osgi:service>
+	<osgi:reference id="sign" interface="org.societies.api.security.sign.ISign" >
+	</osgi:reference-->
+	
+	<osgi:reference id="signatureMgr" interface="org.societies.api.security.digsig.ISignatureMgr" />
+	
+	<!--osgi:service ref="NegotiationProvider"  interface="org.societies.api.internal.security.policynegotiator.INegotiationProvider" />
+	<osgi:service ref="NegotiationRequester" interface="org.societies.api.internal.security.policynegotiator.INegotiationRequester" /-->
+
 </beans>
