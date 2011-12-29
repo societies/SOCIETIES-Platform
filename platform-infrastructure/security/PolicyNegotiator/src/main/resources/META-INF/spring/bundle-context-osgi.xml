@@ -21,7 +21,7 @@
 	<osgi:reference id="sign" interface="org.societies.api.security.sign.ISign" >
 	</osgi:reference-->
 	
-	<osgi:reference id="sign" interface="org.societies.api.security.sign.ISign" />
+	<osgi:reference id="signatureMgr" interface="org.societies.api.security.digsig.ISignatureMgr" />
 	
 	<!--osgi:service ref="NegotiationProvider"  interface="org.societies.api.internal.security.policynegotiator.INegotiationProvider" />
 	<osgi:service ref="NegotiationRequester" interface="org.societies.api.internal.security.policynegotiator.INegotiationRequester" /-->

@@ -7,46 +7,35 @@ import org.springframework.stereotype.Component;
 
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
-import org.societies.api.security.sign.ISign;
+import org.societies.api.security.digsig.ISignatureMgr;
 
 @Component
 public class NegotiationProvider implements INegotiationProvider {
 
 	private final String TAG = NegotiationProvider.class.getName();
 	
-//	@Autowired
-	private ISign sign;
+	private ISignatureMgr signatureMgr;
 	
-//	public NegotiationProvider() {
-//		System.out.println(TAG + ", " + "NegotiationProvider()");
-//	}
-
 	@Autowired
-	public NegotiationProvider(ISign sign) {
-		this.sign = sign;
-		System.out.println(TAG + ", " + "NegotiationProvider(sign");
+	public NegotiationProvider(ISignatureMgr signatureMgr) {
+		this.signatureMgr = signatureMgr;
+		System.out.println(TAG + ", " + "NegotiationProvider(signatureMgr)");
 	}
 	
-//	public void init(ISign sign) {
-//		this.sign = sign;
-//		System.out.println(TAG + ", " + "init()");
-//	}
-
 	@PostConstruct
-	public void init2() {
-		System.out.println(TAG + ", " + "init2(): sign = " + sign);
+	public void init() {
+		System.out.println(TAG + ", " + "init(): signatureMgr = " + signatureMgr);
 	}
 	
-//	@Autowired
-	public void setSign(ISign sign) {
-		System.out.println(TAG + ", " + "setSign()");
-		this.sign = sign;
-	}
-	
-	public ISign getSign() {
-		System.out.println(TAG + ", " + "getSign()");
-		return sign;
-	}
+//	public void setSignatureMgr(ISignatureMgr signatureMgr) {
+//		System.out.println(TAG + ", " + "setSign()");
+//		this.signatureMgr = signatureMgr;
+//	}
+//	
+//	public ISignatureMgr getSignatureMgr() {
+//		System.out.println(TAG + ", " + "getSignatureMgr()");
+//		return signatureMgr;
+//	}
 
 	@Override
 	public void getPolicyOptions(INegotiationProviderCallback callback) {

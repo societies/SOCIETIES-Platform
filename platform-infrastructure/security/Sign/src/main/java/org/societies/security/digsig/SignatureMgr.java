@@ -1,8 +1,8 @@
-package org.societies.security.sign;
+package org.societies.security.digsig;
 
-import org.societies.api.security.sign.ISign;
+import org.societies.api.security.digsig.ISignatureMgr;
 
-public class Sign implements ISign {
+public class SignatureMgr implements ISignatureMgr {
 
 	@Override
 	public String signXml(String xml, String id) {

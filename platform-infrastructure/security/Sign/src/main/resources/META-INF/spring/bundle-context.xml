@@ -16,6 +16,6 @@
   
   <context:annotation-config />
 
-  <bean id="sign" class="org.societies.security.sign.Sign" />
+  <bean id="signatureMgr" class="org.societies.security.digsig.SignatureMgr" />
   
 </beans>
