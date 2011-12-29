@@ -123,7 +123,7 @@ public class AutomaticCommunityCreationManager {
 		
 		ArrayList<EntityIdentifier> interactedCssIDs = null;
 		ArrayList<EntityIdentifier> friendCssIDs = null;
-		
+		ArrayList<EntityIdentifier> localCsss = null;
 		// ...
 		
 		ArrayList<CisRecord> cissToCreate = null;
@@ -146,6 +146,31 @@ public class AutomaticCommunityCreationManager {
 				//amongst their immediate connection neighbourhood as possible.
 				
 				// processing - here or delegated to local method
+				
+				for (int i = 0; i < localCsss.size(); i++) {
+					//if part of shared super-CIS
+					    //then if shared context - context_local_sharedCIS counter+1
+					           //potentially suggest sub-CIS if none exist or ignore completely as CIS already exists for it
+					//if shared context - context_local counter+1
+					
+				}
+				
+				ArrayList<EntityIdentifier> recentlyInteractedCsss = null; //interaction timestamps are last 24 hours(?)
+				ArrayList<EntityIdentifier> recentlyReferencingCsss = null;
+				
+				
+				for (int i = 0; i < recentlyInteractedCsss.size(); i++) {
+					
+					
+				}
+				
+				for (int i = 0; i < recentlyReferencingCsss.size(); i++) {
+					
+					
+				}
+				
+				//boolean flag doneLocalVicinityCheckRecently = false;
+				
 			}
 		}
 		
@@ -167,4 +192,29 @@ public class AutomaticCommunityCreationManager {
     public void intialiseAutomaticCommunityCreationManager() {
     	
     }
+    
+    public void getLinkedCss() {
+    	return linkedCss;
+    }
+    
+    public void setLinkedCss(EntityIdentifier linkedCss) {
+    	this.linkedCss = linkedCss;
+    }
+    
+    public void getLinkedSuperCis() {
+    	return linkedSuperCis;
+    }
+    
+    public void setLinkedCis(CisRecord linkedSuperCis) {
+    	this.linkedSuperCis = linkedSuperCis;
+    }
+    
+    public void getLinkedDomain() {
+    	return linkedDomain;
+    }
+    
+    public void setLinkedDomain(EntityIdentifier linkedDomain) {
+    	this.linkedDomain = linkedDomain;
+    }
+    
 }
