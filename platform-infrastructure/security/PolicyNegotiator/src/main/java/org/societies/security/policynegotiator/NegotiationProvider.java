@@ -24,7 +24,8 @@ public class NegotiationProvider implements INegotiationProvider {
 	
 	@PostConstruct
 	public void init() {
-		System.out.println(TAG + ", " + "init(): signatureMgr = " + signatureMgr);
+		System.out.println(TAG + ", " + "init(): signature = " + signatureMgr.signXml("xml", "id"));
+		System.out.println(TAG + ", " + "init(): signature = " + signatureMgr.verify("xml"));
 	}
 	
 //	public void setSignatureMgr(ISignatureMgr signatureMgr) {
