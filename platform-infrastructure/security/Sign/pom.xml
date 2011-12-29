@@ -24,6 +24,12 @@
 			</roles>
 		</developer>
 	</developers>
+	
+	
+	
+	
+	
+	
 
 	<parent>
 		<groupId>org.societies</groupId>
@@ -54,16 +60,14 @@
 						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Import-Package>*;resolution:=optional</Import-Package>
-						<Export-Package>
-							org.societies.api.security.sign.*
-						</Export-Package>
+						<Export-Package>org.societies.api.security.sign.*</Export-Package>
 						<!-- Private-Package> org.societies.security.sign.*, org.societies.security.something.* 
 							</Private-Package -->
 						<_nouses>true</_nouses>
 					</instructions>
 				</configuration>
-
 			</plugin>
+			
 			<!-- used to exclude some certain files -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
