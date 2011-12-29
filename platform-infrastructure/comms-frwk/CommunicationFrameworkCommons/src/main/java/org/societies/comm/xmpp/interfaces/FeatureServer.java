@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske dru�be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
  * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVA��O, SA (PTIN), IBM ISRAEL
  * SCIENCE AND TECHNOLOGY LTD (IBM), INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA
  * PERIORISMENIS EFTHINIS (AMITEC), TELECOM ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD
@@ -24,19 +24,18 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * @author Joao M. Goncalves (PTIN)
- * 
- * This is the interface that the bundles that deal with a specific XMPP namespace or feature (in XEP-0030 terminology) need to
- * implement. It defines methods for getting information and delivering messages. 
- * 
- */
-
 package org.societies.comm.xmpp.interfaces;
+
+import java.util.List;
 
 import org.societies.comm.xmpp.datatypes.Stanza;
 
 /**
+ * 
+ * @author Joao M. Goncalves (PTIN), Miquel Martin (NEC)
+ * 
+ * This is the interface that the bundles that deal with a specific XMPP namespace or feature (in XEP-0030 terminology) need to
+ * implement. It defines methods for getting information and delivering messages. 
  * A FeatureServer is able to receive and process messages that refer to the
  * namespace it registered using {@link CommManager#register(FeatureServer)}
  * 
@@ -48,15 +47,15 @@ import org.societies.comm.xmpp.datatypes.Stanza;
  */
 public interface FeatureServer {
 	/**
-	 * Get the xml namespace for this FeatureServer. This will be used in the
+	 * Get the xml namespaces for this FeatureServer. This will be used in the
 	 * XMPP payloads.
 	 */
-	String getXMLNamespace();
+	List<String> getXMLNamespaces();
 
 	/**
 	 * Get the java package to which the objects this feature deals with belong.
 	 */
-	String getJavaPackage();
+	List<String> getJavaPackages();
 
 	void receiveMessage(Stanza stanza, Object payload);
 

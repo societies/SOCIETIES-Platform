@@ -26,8 +26,12 @@
 
     <dependencies>
     	<!-- Interface -->
-    	
-    	<!-- Utils -->
+    	<dependency>
+			<groupId>org.societies.comm.xmpp</groupId>
+			<artifactId>CommunicationFrameworkCommons</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
     
 		<!-- XMPP -->
 		<dependency>
@@ -53,6 +57,12 @@
 	  	</dependency>
 	  	
 	  	<!-- Datatypes -->
+	  	<dependency>
+			<groupId>org.societies.community</groupId>
+			<artifactId>CommunityXep</artifactId>
+			<version>0.0.1</version>
+			<scope>provided</scope>
+		</dependency>
 		
 		<!-- Virgo -->
 		<dependency>
@@ -67,12 +77,6 @@
 			<version>${slf4j.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.societies.comm.xmpp</groupId>
-			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
     </dependencies>
 
     
@@ -84,9 +88,8 @@
 				<extensions>true</extensions>
 				<configuration>
     				<instructions>
-    					<!--  
     						<Import-Package>
-    					org.osgi.framework,
+    						org.osgi.framework,
     						!org.gjt.*,
     						!org.jaxen.*,
     						!org.mortbay.*,
@@ -96,20 +99,13 @@
     						!com.sun.xml.fastinfoset.*,
     						!com.sun.msv.*,
     						org.slf4j*;version="1.5.8",
-    						*
-    				
-    					*;resolution:=optional
+    						*;resolution:=optional
     					</Import-Package>
     					<Export-Package>
-    						  org.societies.community, 
-    						org.societies.comm.identity,
-    							org.societies.comm.xmpp,
-    						 					
-    						
+    						  org.societies.community				
 		           		</Export-Package>
 		           		<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-    					 -->
+						<Embed-Transitive>false</Embed-Transitive>
 						<Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment> 
 		         	</instructions>
 	       		</configuration>
@@ -125,7 +121,7 @@
 							<version>${release.version}</version>
 							<type>bundle</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+							<!-- <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory> -->
 						</artifactItem>
 					</artifactItems>
 				</configuration>

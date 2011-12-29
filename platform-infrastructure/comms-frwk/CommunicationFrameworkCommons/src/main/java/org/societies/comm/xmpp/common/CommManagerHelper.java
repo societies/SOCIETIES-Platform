@@ -1,3 +1,29 @@
+/**
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVA��O, SA (PTIN), IBM ISRAEL
+ * SCIENCE AND TECHNOLOGY LTD (IBM), INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA
+ * PERIORISMENIS EFTHINIS (AMITEC), TELECOM ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD
+ * (NEC))
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
+ * conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.societies.comm.xmpp.common;
 
 import java.io.ByteArrayInputStream;
@@ -34,12 +60,27 @@ import org.xmpp.packet.Packet;
 import org.xmpp.packet.PacketError;
 
 /**
- * TODO this jaxb-dom4j conversion code is VERY BAD // but i have to rush this;
- * the propper solution would be to // rewrite whack
+ * @author Joao M. Goncalves (PTIN), Miquel Martin (NEC)
  * 
- * @author miquel
+ *         TODO list 
+ *         
+ *         - this jaxb-dom4j conversion code is VERY BAD but i have to
+ *         rush this; the propper solution would be to rewrite whack
+ * 
+ *         - it is single threaded and can be stuck by the synchronous calls to
+ *         the extensions - should support "send and forget"
+ * 
+ *         - only supports one extension per namespace - the last to register
+ *         sticks
+ * 
+ *         - dom4j parsing just sucks to use with jaxb - should cut dom4j out of
+ *         it and have the packed handled in a lighter way
+ * 
+ *         - only supports one pojo per stanza - according to rfc6120: ok for IQ
+ *         request/result processing; not ok for errors, messages and presence
  * 
  */
+
 public class CommManagerHelper {
 	private static final String JABBER_CLIENT = "jabber:client";
 	private static final String JABBER_SERVER = "jabber:server";
@@ -50,8 +91,8 @@ public class CommManagerHelper {
 
 	private final Map<String, FeatureServer> featureServers = new HashMap<String, FeatureServer>();
 	private final Map<String, CommCallback> commCallbacks = new HashMap<String, CommCallback>();
-	private final Map<String, Unmarshaller> unmarshallers = new HashMap<String, Unmarshaller>();
-	private final Map<Class<?>, Marshaller> marshallers = new HashMap<Class<?>, Marshaller>();
+	private final Map<String, Unmarshaller> nsToUnmarshaller = new HashMap<String, Unmarshaller>();
+	private final Map<String, Marshaller> pkgToMarshaller = new HashMap<String, Marshaller>();
 
 	public String[] getSupportedNamespaces() {
 		String[] returnArray = new String[featureServers.size()];
@@ -82,14 +123,13 @@ public class CommManagerHelper {
 
 	private Unmarshaller getUnmarshaller(String namespace)
 			throws UnavailableException {
-		return (Unmarshaller) ifNotNull(unmarshallers.get(namespace),
+		return (Unmarshaller) ifNotNull(nsToUnmarshaller.get(namespace),
 				"namespace", namespace);
 	}
 
-	private Marshaller getMarshaller(Class<?> clazz)
-			throws UnavailableException {
-		return (Marshaller) ifNotNull(marshallers.get(clazz), "class",
-				clazz.getName());
+	private Marshaller getMarshaller(Package pkg) throws UnavailableException {
+		return (Marshaller) ifNotNull(pkgToMarshaller.get(pkg.toString()),
+				"package", pkg.toString());
 	}
 
 	public void dispatchIQResult(IQ iq) {
@@ -163,7 +203,7 @@ public class CommManagerHelper {
 		// Usual disclaimer about how this needs to be optimized ;)
 		try {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			Marshaller m = getMarshaller(payload.getClass());
+			Marshaller m = getMarshaller(payload.getClass().getPackage());
 			m.marshal(payload, os);
 
 			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
@@ -183,7 +223,7 @@ public class CommManagerHelper {
 		}
 		try {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			Marshaller m = getMarshaller(payload.getClass());
+			Marshaller m = getMarshaller(payload.getClass().getPackage());
 			m.marshal(payload, os);
 
 			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
@@ -197,39 +237,43 @@ public class CommManagerHelper {
 
 	public void register(FeatureServer fs) throws CommunicationException,
 			ClassNotFoundException {
-		LOG.info("Registering " + fs.getXMLNamespace());
-		try {
-			featureServers.put(fs.getXMLNamespace(), fs);
-			JAXBContext jc = JAXBContext.newInstance(fs.getJavaPackage(), this
-					.getClass().getClassLoader());
-			unmarshallers.put(fs.getXMLNamespace(), jc.createUnmarshaller());
+		// TODO latest namespace register sticks! no multiple namespace support
+		// atm
+		StringBuilder contextPath = new StringBuilder(fs.getJavaPackages().get(
+				0));
+		for (int i = 1; i < fs.getJavaPackages().size(); i++)
+			contextPath.append(":" + fs.getJavaPackages().get(i));
 
-			Marshaller marshaller = jc.createMarshaller();
-			Class<?> objFactory = Class.forName(fs.getJavaPackage()
-					+ ".ObjectFactory");
-			for (Method m : objFactory.getMethods()) {
-				if (m.getName().startsWith("create")) {
-					XmlRootElement re = m.getReturnType().getAnnotation(
-							XmlRootElement.class);
-					if (re != null) {
-						marshallers.put(m.getReturnType(), marshaller);
-					}
-				}
+		try {
+			JAXBContext jc = JAXBContext.newInstance(contextPath.toString(),
+					this.getClass().getClassLoader());
+			Unmarshaller u = jc.createUnmarshaller();
+			Marshaller m = jc.createMarshaller();
+
+			for (int i = 0; i < fs.getXMLNamespaces().size(); i++) {
+				String namespace = fs.getXMLNamespaces().get(i);
+				String packageStr = fs.getJavaPackages().get(i);
+				LOG.info("registering " + namespace);
+
+				featureServers.put(namespace, fs);
+				nsToUnmarshaller.put(namespace, u);
+				pkgToMarshaller.put(packageStr, m);
 			}
 		} catch (JAXBException e) {
 			throw new CommunicationException(
-					"Could not register FeatureServer", e);
+					"Could not register NamespaceExtension... caused by JAXBException: ",
+					e);
 		}
 	}
 
 	/** Get the element with the payload out of the XMPP packet. */
 	private Element getElementAny(Packet p) {
 		if (p instanceof IQ) {
-			// According to the schema in RCF3921 IQs only have one
+			// According to the schema in RCF6121 IQs only have one
 			// element, unless they have an error
 			return (Element) p.getElement().elements().get(0);
 		} else if (p instanceof Message) {
-			// according to the schema in RCF3921 messages have an unbounded
+			// according to the schema in RCF6121 messages have an unbounded
 			// number
 			// of "subject", "body" or "thread" elements before the any element
 			// part
@@ -265,7 +309,8 @@ public class CommManagerHelper {
 		IQ responseIq = new IQ(Type.result, id);
 		responseIq.setTo(originalFrom);
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		getMarshaller(responseBean.getClass()).marshal(responseBean, os);
+		getMarshaller(responseBean.getClass().getPackage()).marshal(
+				responseBean, os);
 		ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
 		Document document = reader.read(is);
 		responseIq.getElement().add(document.getRootElement());
