@@ -128,9 +128,6 @@ public class CommManagerHelper {
 	}
 
 	private Marshaller getMarshaller(Package pkg) throws UnavailableException {
-		LOG.info("-----------------getMarshaller--------------------");
-		LOG.info(pkgToMarshaller.keySet().toArray().toString());
-		LOG.info("<"+pkg.getName()+">");
 		return (Marshaller) ifNotNull(pkgToMarshaller.get(pkg.getName()),
 				"package", pkg.getName());
 	}
@@ -250,16 +247,14 @@ public class CommManagerHelper {
 					this.getClass().getClassLoader());
 			Unmarshaller u = jc.createUnmarshaller();
 			Marshaller m = jc.createMarshaller();
+			
+			LOG.info("registering " + fs.getXMLNamespace());
+			featureServers.put(fs.getXMLNamespace(), fs);
+			nsToUnmarshaller.put(fs.getXMLNamespace(), u);
 
-			for (int i = 0; i < fs.getXMLNamespaces().size(); i++) {
-				String namespace = fs.getXMLNamespaces().get(i);
-				String packageStr = fs.getJavaPackages().get(i);
-				LOG.info("registering " + namespace +" to package "+packageStr);
-
-				featureServers.put(namespace, fs);
-				nsToUnmarshaller.put(namespace, u);
+			for (String packageStr : fs.getJavaPackages())
 				pkgToMarshaller.put(packageStr, m);
-			}
+			
 		} catch (JAXBException e) {
 			throw new CommunicationException(
 					"Could not register NamespaceExtension... caused by JAXBException: ",

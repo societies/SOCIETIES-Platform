@@ -60,8 +60,7 @@ import org.springframework.stereotype.Component;
 public class CommunityManagementImpl implements CommunityManagement,
 		FeatureServer {
 
-	private final static List<String> NAMESPACES = Collections
-			.singletonList("http://societies.org/community");
+	private final static String NAMESPACE = "http://societies.org/community";
 	private final static List<String> PACKAGES = Collections
 			.singletonList("org.societies.community");
 
@@ -86,8 +85,8 @@ public class CommunityManagementImpl implements CommunityManagement,
 	}
 
 	@Override
-	public List<String> getXMLNamespaces() {
-		return NAMESPACES;
+	public String getXMLNamespace() {
+		return NAMESPACE;
 	}
 
 	@Override

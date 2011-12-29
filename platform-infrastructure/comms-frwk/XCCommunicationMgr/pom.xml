@@ -63,6 +63,18 @@
 			<version>0.0.1</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>jabber.x.data</groupId>
+			<artifactId>DataFormsXep</artifactId>
+			<version>0.0.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jabber.protocol.pubsub</groupId>
+			<artifactId>PubsubXep</artifactId>
+			<version>0.0.1</version>
+			<scope>compile</scope>
+		</dependency>
 		
 		<!-- Virgo -->
 		<dependency>
@@ -103,7 +115,12 @@
     					</Import-Package>
     					<Export-Package>
     						org.societies.comm.xmpp.*,
-							org.societies.community			
+							org.societies.community,
+							jabber.x.data,
+							org.jabber.protocol.pubsub,
+							org.jabber.protocol.pubsub.errors,
+							org.jabber.protocol.pubsub.owner,
+							org.jabber.protocol.pubsub.event	
 		           		</Export-Package>
 		           		<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
