@@ -309,11 +309,11 @@
 								<requireProperty>
 									<property>spring.osgi.deploy.dir</property>
 									<message>You must specify the location of the Virgo
-										installation with the property VIRGO_HOME.
+										installation with the property spring.osgi.deploy.dir
 										Hints: use your
 										profile ~/.m3/settings.xml or set via the command
 										line
-										-Dvirgo.home=location.</message>
+										-Dspring.osgi.deploy.dir=location.</message>
 								</requireProperty>
 							</rules>
 							<fail>true</fail>
