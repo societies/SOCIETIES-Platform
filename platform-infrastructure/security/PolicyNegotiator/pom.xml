@@ -1,18 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.security.policynegotiator</groupId>
 	<artifactId>policynegotiator</artifactId>
-	<!-- the version is the same as the release -->
 	<version>${release.version}</version>
-	<!-- the packaging tag enables the creation of the correct manifest using 
-		the maven-bundle-plugin -->
 	<packaging>bundle</packaging>
+	<name>Secure Policy Negotiator Bundle</name>
 
-	<description>
-    	This bundle provides a secure and generic policy negotiation between two parties: requester and provider.
-    </description>
+	<description>This bundle provides a secure and generic policy negotiation between two parties: requester and provider.</description>
 
 	<developers>
 		<developer>
@@ -34,6 +31,7 @@
 		<relativePath>../../../parent/spring-osgi.xml</relativePath>
 		<version>0.1</version>
 	</parent>
+
 	<properties>
 		<slf4j.version>1.5.0</slf4j.version>
 		<spring.maven.artifact.version>2.5.6.SEC01</spring.maven.artifact.version>
@@ -58,18 +56,12 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.societies.security.sign</groupId>
-			<artifactId>sign</artifactId>
+			<groupId>org.societies.security</groupId>
+			<artifactId>signature</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.beans</artifactId>
@@ -94,11 +86,18 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
 
 	</dependencies>
 
 	<build>
 		<plugins>
+
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
@@ -111,19 +110,18 @@
 						<Export-Package>
 							org.societies.api.internal.security.policynegotiator.*
 						</Export-Package>
-						<!-- Private-Package> org.societies.security.sign.*, org.societies.security.something.* 
+						<!-- Private-Package> org.societies.security.signature.*, org.societies.security.something.* 
 							</Private-Package -->
 						<_nouses>true</_nouses>
 					</instructions>
 				</configuration>
-
 			</plugin>
+			
 			<!-- used to exclude some certain files -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 			</plugin>
-
 
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -148,4 +146,5 @@
 			</plugin>
 		</plugins>
 	</build>
+	
 </project>
