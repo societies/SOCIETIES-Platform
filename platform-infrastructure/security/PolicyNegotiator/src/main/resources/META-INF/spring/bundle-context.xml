@@ -1,23 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/osgi 
+    http://www.springframework.org/schema/osgi/spring-osgi-1.2.xsd
+    http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context 
+    http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
 	<!-- regular spring configuration file defining the beans for this bundle. 
 		We've kept the osgi definitions in a separate configuration file so that 
 		this file can easily be used for integration testing outside of an OSGi environment -->
 
-	<bean name="NegotionProvider"
+	<!--bean id="NegotiationProvider"
 		class="org.societies.security.policynegotiator.NegotiationProvider"
 		depends-on="Sign"
 		>
 		<property name="sign" ref="Sign" >
 		</property>
 	</bean>
-	<bean name="NegotionRequester"
+	<bean id="NegotiationRequester"
 		class="org.societies.security.policynegotiator.NegotiationRequester"
 		depends-on="Sign"
 		>
+		<property name="sign" ref="Sign" >
+		</property>
+	</bean-->
+	
+	<!--context:annotation-config /-->
+	
+	<!--context:component-scan base-package="org.societies.security.policynegotiator" /-->
+	<!--context:component-scan base-package="org.societies.security.sign" /-->
+
+	<!--bean id="NegotiationProvider"
+		class="org.societies.security.policynegotiator.NegotiationProvider"
+		>
 	</bean>
+	<bean id="NegotiationRequester"
+		class="org.societies.security.policynegotiator.NegotiationRequester"
+		>
+	</bean-->
 
 </beans>

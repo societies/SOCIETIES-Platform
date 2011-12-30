@@ -15,7 +15,7 @@
     <artifactId>XCCommunicationMgr</artifactId>
     <packaging>bundle</packaging>
     <name>XC Communication Manager</name>
-    <version>${release.version}</version>
+    <version>0.0.1-SNAPSHOT</version>
 
     <properties>
         <slf4j.version>1.5.8</slf4j.version>
@@ -26,8 +26,12 @@
 
     <dependencies>
     	<!-- Interface -->
-    	
-    	<!-- Utils -->
+    	<dependency>
+			<groupId>org.societies.comm.xmpp</groupId>
+			<artifactId>CommunicationFrameworkCommons</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
     
 		<!-- XMPP -->
 		<dependency>
@@ -42,17 +46,35 @@
         	<groupId>javax.xml.bind</groupId>
         	<artifactId>jaxb-api</artifactId>
         	<version>2.2.5</version>
-        	<scope>provided</scope>
+        	<scope>compile</scope>
         </dependency>
 		<dependency>
 	  		<groupId>com.sun.xml.bind</groupId>
 	  		<artifactId>jaxb-impl</artifactId>
 	  		<version>2.2.5-b01</version>
 	  		<type>jar</type>
-	  		<scope>provided</scope>
+	  		<scope>compile</scope>
 	  	</dependency>
 	  	
 	  	<!-- Datatypes -->
+	  	<dependency>
+			<groupId>org.societies.community</groupId>
+			<artifactId>CommunityXep</artifactId>
+			<version>0.0.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>jabber.x.data</groupId>
+			<artifactId>DataFormsXep</artifactId>
+			<version>0.0.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jabber.protocol.pubsub</groupId>
+			<artifactId>PubsubXep</artifactId>
+			<version>0.0.1</version>
+			<scope>compile</scope>
+		</dependency>
 		
 		<!-- Virgo -->
 		<dependency>
@@ -67,12 +89,6 @@
 			<version>${slf4j.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.societies.comm.xmpp</groupId>
-			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
     </dependencies>
 
     
@@ -84,9 +100,8 @@
 				<extensions>true</extensions>
 				<configuration>
     				<instructions>
-    					<!--  
-    						<Import-Package>
-    					org.osgi.framework,
+    					<Import-Package>
+    						org.osgi.framework,
     						!org.gjt.*,
     						!org.jaxen.*,
     						!org.mortbay.*,
@@ -96,20 +111,19 @@
     						!com.sun.xml.fastinfoset.*,
     						!com.sun.msv.*,
     						org.slf4j*;version="1.5.8",
-    						*
-    				
-    					*;resolution:=optional
+    						*;resolution:=optional
     					</Import-Package>
     					<Export-Package>
-    						  org.societies.community, 
-    						org.societies.comm.identity,
-    							org.societies.comm.xmpp,
-    						 					
-    						
+    						org.societies.comm.xmpp.*,
+							org.societies.community,
+							jabber.x.data,
+							org.jabber.protocol.pubsub,
+							org.jabber.protocol.pubsub.errors,
+							org.jabber.protocol.pubsub.owner,
+							org.jabber.protocol.pubsub.event	
 		           		</Export-Package>
 		           		<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-    					 -->
+						<Embed-Transitive>false</Embed-Transitive>
 						<Bundle-RequiredExecutionEnvironment>JavaSE-1.6</Bundle-RequiredExecutionEnvironment> 
 		         	</instructions>
 	       		</configuration>
@@ -125,7 +139,7 @@
 							<version>${release.version}</version>
 							<type>bundle</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+							<!-- <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory> -->
 						</artifactItem>
 					</artifactItems>
 				</configuration>

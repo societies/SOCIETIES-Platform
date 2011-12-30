@@ -124,6 +124,13 @@ public class AutomaticCommunityDeletionManager {
 		
 		//process
 		
+		CISRecord record;
+		
+		// SIMPLISTIC v0.1 ALGORITHM
+		//if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - 5)
+		//    delete CIS
+		
+		
 		//invoke UserAgent suggestion GUI for deletions
 		//OR
 		//automatically call CIS management functions to delete CISs
@@ -134,4 +141,28 @@ public class AutomaticCommunityDeletionManager {
     	
     }
 
+    public void getLinkedCss() {
+    	return linkedCss;
+    }
+    
+    public void setLinkedCss(EntityIdentifier linkedCss) {
+    	this.linkedCss = linkedCss;
+    }
+    
+    public void getLinkedCis() {
+    	return linkedCis;
+    }
+    
+    public void setLinkedCis(CisRecord linkedCis) {
+    	this.linkedCis = linkedCis;
+    }
+    
+    public void getLinkedDomain() {
+    	return linkedDomain;
+    }
+    
+    public void setLinkedDomain(EntityIdentifier linkedDomain) {
+    	this.linkedDomain = linkedDomain;
+    }
+    
 }
