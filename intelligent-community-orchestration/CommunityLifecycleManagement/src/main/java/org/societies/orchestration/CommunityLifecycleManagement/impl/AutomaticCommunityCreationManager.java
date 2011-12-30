@@ -193,7 +193,7 @@ public class AutomaticCommunityCreationManager {
     	
     }
     
-    public void getLinkedCss() {
+    public EntityIdentifier getLinkedCss() {
     	return linkedCss;
     }
     
@@ -201,7 +201,7 @@ public class AutomaticCommunityCreationManager {
     	this.linkedCss = linkedCss;
     }
     
-    public void getLinkedSuperCis() {
+    public CisRecord getLinkedSuperCis() {
     	return linkedSuperCis;
     }
     
@@ -209,7 +209,7 @@ public class AutomaticCommunityCreationManager {
     	this.linkedSuperCis = linkedSuperCis;
     }
     
-    public void getLinkedDomain() {
+    public EntityIdentifier getLinkedDomain() {
     	return linkedDomain;
     }
     

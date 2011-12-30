@@ -124,7 +124,7 @@ public class AutomaticCommunityDeletionManager {
 		
 		//process
 		
-		CISRecord record;
+		CisRecord record;
 		
 		// SIMPLISTIC v0.1 ALGORITHM
 		//if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - 5)
@@ -141,7 +141,7 @@ public class AutomaticCommunityDeletionManager {
     	
     }
 
-    public void getLinkedCss() {
+    public EntityIdentifier getLinkedCss() {
     	return linkedCss;
     }
     
@@ -149,7 +149,7 @@ public class AutomaticCommunityDeletionManager {
     	this.linkedCss = linkedCss;
     }
     
-    public void getLinkedCis() {
+    public CisRecord getLinkedCis() {
     	return linkedCis;
     }
     
@@ -157,7 +157,7 @@ public class AutomaticCommunityDeletionManager {
     	this.linkedCis = linkedCis;
     }
     
-    public void getLinkedDomain() {
+    public EntityIdentifier getLinkedDomain() {
     	return linkedDomain;
     }
     

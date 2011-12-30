@@ -141,7 +141,7 @@ public class AutomaticCommunityConfigurationManager {
     	
     }
     
-    public void getLinkedCss() {
+    public EntityIdentifier getLinkedCss() {
     	return linkedCss;
     }
     
@@ -149,7 +149,7 @@ public class AutomaticCommunityConfigurationManager {
     	this.linkedCss = linkedCss;
     }
     
-    public void getLinkedCis() {
+    public CisRecord getLinkedCis() {
     	return linkedCis;
     }
     
@@ -157,7 +157,7 @@ public class AutomaticCommunityConfigurationManager {
     	this.linkedCis = linkedCis;
     }
     
-    public void getLinkedDomain() {
+    public EntityIdentifier getLinkedDomain() {
     	return linkedDomain;
     }
     
