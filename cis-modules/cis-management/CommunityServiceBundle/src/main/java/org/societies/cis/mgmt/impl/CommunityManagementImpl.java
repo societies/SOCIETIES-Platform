@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske druÅ¾be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
  * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÃ‡ÃƒO, SA (PTIN), IBM ISRAEL
  * SCIENCE AND TECHNOLOGY LTD (IBM), INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA
  * PERIORISMENIS EFTHINIS (AMITEC), TELECOM ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD
@@ -26,7 +26,9 @@
 
 package org.societies.cis.mgmt.impl;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.societies.cis.mgmt.CommunityManagement;
@@ -43,22 +45,29 @@ import org.springframework.stereotype.Component;
 /**
  * @author Joao M. Goncalves (PTIN)
  * 
- * This is the implementation of both the {@link CommunityManagement} service and of the {@link FeatureServer} interface.
- * It handles XEP-SOC1 related logic. Registers on XCCommunicationMgr to receive stanza elements of namespace
- * http://societies.org/community, and handles those requests. 
+ *         This is the implementation of both the {@link CommunityManagement}
+ *         service and of the {@link FeatureServer} interface. It handles
+ *         XEP-SOC1 related logic. Registers on XCCommunicationMgr to receive
+ *         stanza elements of namespace http://societies.org/community, and
+ *         handles those requests.
+ * 
+ *         TODO no distinction between get and set... join and leave should be
+ *         set and who should be get log exceptions
  * 
  */
 
-// TODO
-// no distinction between get and set... join and leave should be set and who should be get
-// log exceptions
 @Component
-public class CommunityManagementImpl implements CommunityManagement, FeatureServer {
+public class CommunityManagementImpl implements CommunityManagement,
+		FeatureServer {
+
+	private final static String NAMESPACE = "http://societies.org/community";
+	private final static List<String> PACKAGES = Collections
+			.singletonList("org.societies.community");
 
 	private CommManager endpoint;
 	private Set<String> participants;
 	private Set<String> leaders;
-	
+
 	@Autowired
 	public CommunityManagementImpl(CommManager endpoint) {
 		participants = new HashSet<String>();
@@ -74,15 +83,15 @@ public class CommunityManagementImpl implements CommunityManagement, FeatureServ
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public String getXMLNamespace() {
-		return "http://societies.org/community";
+		return NAMESPACE;
 	}
 
 	@Override
-	public String getJavaPackage() {
-		return "org.societies.community";
+	public List<String> getJavaPackages() {
+		return PACKAGES;
 	}
 
 	@Override
@@ -96,29 +105,29 @@ public class CommunityManagementImpl implements CommunityManagement, FeatureServ
 		// all received IQs contain a community element
 		if (payload.getClass().equals(Community.class)) {
 			Community c = (Community) payload;
-			if (c.getJoin()!=null) {
-//				String jid = iq.getFrom().toBareJID();
+			if (c.getJoin() != null) {
 				String jid = stanza.getFrom().getIdentity().toString();
 				if (!participants.contains(jid)) {
 					participants.add(jid);
 				}
 				// TODO add error cases to schema
 				Community result = new Community();
-				result.setJoin(""); // TODO check if jaxb behaves - no element should mean null and empty element should mean empty string
+				result.setJoin(""); // null means no element and empty string
+									// means empty element
 				return result;
 			}
-			if (c.getLeave()!=null) {
-//				String jid = iq.getFrom().toBareJID();
+			if (c.getLeave() != null) {
 				String jid = stanza.getFrom().getIdentity().toString();
 				if (participants.contains(jid)) {
 					participants.remove(jid);
 				}
 				// TODO add error cases to schema
 				Community result = new Community();
-				result.setLeave(""); // TODO check if jaxb behaves - no element should mean null and empty element should mean empty string
+				result.setLeave(""); // null means no element and empty string
+										// means empty element
 				return result;
 			}
-			if (c.getWho()!=null) {
+			if (c.getWho() != null) {
 				// TODO add error cases to schema
 				Community result = new Community();
 				Who who = new Who();
@@ -138,19 +147,6 @@ public class CommunityManagementImpl implements CommunityManagement, FeatureServ
 		return null;
 	}
 
-// TODO Removed from FeatureServer by Miquel
-//	@Override
-//	public void receiveResult(Stanza stanza, Object payload) {
-//		// do nothing
-//		// no use-case so far for community-sent iqs, so it doesn't need to handle results
-//	}
-//
-//	@Override
-//	public void receiveError(Stanza stanza) {
-//		// do nothing
-//		// no use-case so far for community-sent iqs, so it doesn't need to handle results
-//	}
-	
 	@Override
 	public Set<String> getParticipants() {
 		return new HashSet<String>(participants);

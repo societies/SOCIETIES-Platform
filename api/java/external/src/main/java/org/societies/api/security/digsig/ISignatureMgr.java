@@ -23,7 +23,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.security.sign;
+package org.societies.api.security.digsig;
 
 /**
  * Methods to digitally sign given data and methods to verify given signatures.
@@ -31,7 +31,7 @@ package org.societies.api.security.sign;
  * @author Mitja Vardjan
  *
  */
-public interface ISign {
+public interface ISignatureMgr {
 
 	/**
 	 * Digitally sign given XML data and embed the signature in the given XML.
