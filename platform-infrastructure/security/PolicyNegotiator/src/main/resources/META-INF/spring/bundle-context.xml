@@ -28,18 +28,18 @@
 		</property>
 	</bean-->
 	
-	<!--context:annotation-config /-->
+	<context:annotation-config />
 	
 	<!--context:component-scan base-package="org.societies.security.policynegotiator" /-->
 	<!--context:component-scan base-package="org.societies.security.sign" /-->
 
-	<!--bean id="NegotiationProvider"
+	<bean id="NegotiationProvider"
 		class="org.societies.security.policynegotiator.NegotiationProvider"
 		>
 	</bean>
 	<bean id="NegotiationRequester"
 		class="org.societies.security.policynegotiator.NegotiationRequester"
 		>
-	</bean-->
+	</bean>
 
 </beans>
