@@ -2,16 +2,17 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
 	<bean
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
-		<property name="searchContextAttributes" value="true" />
-		<property name="contextOverride" value="true" />
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />		
 		<property name="ignoreResourceNotFound" value="true" />
 		<property name="locations">
 			<list>
+				<!-- local testing -->
+				<value>classpath:META-INF/spring/mysql_database.properties</value>
+				<!-- final deployment into server --> 
 				<value>file:${VIRGO_HOME}\config\org.societies.platform.properties</value>
-				<value>classpath:META-INF/spring/mysql_database.properties</value>				
 			</list>
 		</property>
 	</bean>
