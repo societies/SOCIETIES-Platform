@@ -24,13 +24,13 @@
 	STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN 
 	ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
 	OF SUCH DAMAGE. -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>data-source</artifactId>
-  <description>common data source bundle</description>
-  <packaging>bundle</packaging>
-  
-  <developers>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>hibernate_classes</artifactId>
+	<packaging>bundle</packaging>
+
+	<developers>
 		<developer>
 			<id>pkudaiyar</id>
 			<name>Perumal K</name>
@@ -41,70 +41,80 @@
 			</roles>			
 		</developer>
 	</developers>
-	  
-  <parent>
+	
+	<description>
+		This Generates OSGI bundle which exports following libraries in the runtime container:
+		org.hibernate,javax.persistence,org.dom4j,avax.annotation.*,
+		javax.persistence.*,net.sf.cglib.*,org.apcahe.commons.dbcp.*
+	</description>
+	
+	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>0.1</version>
-  </parent>
-	
-  <dependencies>
-  	<dependency>
+	</parent>
+
+	<dependencies>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
-			<type>libd</type>			
+			<type>libd</type>
 			<scope>provided</scope>
-	</dependency>
-	<!-- logging -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>compile</scope>
-		</dependency>
-		
-		<!-- databases -->
-		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>com.springsource.org.apache.derby</artifactId>
-			<version>10.5.1000001.764942</version>
+			<groupId>javax.persistence</groupId>
+			<artifactId>com.springsource.javax.persistence</artifactId>
+			<version>2.0.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.hsqldb</groupId>
-			<artifactId>com.springsource.org.hsqldb</artifactId>
-			<version>1.8.0.10</version>
+			<groupId>javax.persistence</groupId>
+			<artifactId>persistence-api</artifactId>
+			<version>1.0</version>
 		</dependency>
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.9</version>
+			<groupId>javax.annotation</groupId>
+			<artifactId>jsr250-api</artifactId>
+			<version>1.0</version>
 		</dependency>
-
-		<!-- apache commons -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>com.springsource.org.apache.commons.dbcp</artifactId>
-			<version>1.2.2.osgi</version>			
+			<version>1.2.2.osgi</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>com.springsource.org.apache.commons.pool</artifactId>
-			<version>1.5.3</version>			
+			<groupId>org.hibernate</groupId>
+			<artifactId>com.springsource.org.hibernate</artifactId>
+			<version>3.3.2.GA</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>com.springsource.org.apache.commons.collections</artifactId>
-			<version>3.2.1</version>			
+			<groupId>org.hibernate</groupId>
+			<artifactId>com.springsource.org.hibernate.annotations</artifactId>
+			<version>3.4.0.GA-A</version>
+			<scope>compile</scope>
 		</dependency>
-  </dependencies>
-  <build>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>com.springsource.org.hibernate.annotations.common</artifactId>
+			<version>3.3.0.ga</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.dom4j</groupId>
+			<artifactId>com.springsource.org.dom4j</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+	</dependencies>
+	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.11</version>
+				<configuration>
+					<skipTests>true</skipTests>				
+				</configuration>				
+			</plugin>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
@@ -113,11 +123,30 @@
 					<instructions>
 						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<Import-Package>*;resolution:=optional</Import-Package>						
+						<Export-Package>
+							org.hibernate,
+							org.hibernate.*,
+							org.hibernate.annotations,
+							org.hibernate.annotations.*,
+							org.hibernate.annotations.common,
+							org.hibernate.annotations.common.*,
+							org.hibernate.cfg,
+							org.hibernate.cfg.*,
+							javax.persistence,
+							org.dom4j,
+							org.dom4j.*,
+							javax.annotation.*,
+							javax.annotation.security.*,
+							javax.persistence.*,
+							javax.persistence.spi.*,
+							net.sf.cglib.*,
+							org.apcahe.commons.dbcp.*
+						</Export-Package>
+						<Import-Package>*;resolution:=optional</Import-Package>
+						<_nouses>true</_nouses>						
 					</instructions>
 				</configuration>
 			</plugin>
-			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -135,5 +164,5 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>	
+	</build>
 </project>
