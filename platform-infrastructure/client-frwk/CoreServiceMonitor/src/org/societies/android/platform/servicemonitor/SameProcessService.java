@@ -24,58 +24,55 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.android.platform.interfaces;
+package org.societies.android.platform.servicemonitor;
 
-import java.util.List;
+import org.societies.android.platform.interfaces.ICoreServiceExample;
+import org.societies.utilities.DBC.Dbc;
 
-public interface ICoreServiceMonitor {
-	String methodsArray [] = {"activeTasks(String client)", 
-								"activeTasks(String client, String taskFilter)",
-								"activeServices(String client)",
-								"activeServices(String client, String serviceFilter)",
-								"startService(String client, String service)",
-								"startActivity(String client, String activity)",
-								"stopService(String client, String service)",
-								"stopActivity(String client, String activity)"};
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
 
+public class SameProcessService extends Service implements ICoreServiceExample {
+
+
+	private final IBinder binder;
+	
+	public SameProcessService() {
+		super();
+		binder = new LocalBinder();
+	}
+	
+	public class LocalBinder extends Binder {
+		SameProcessService getService() {
+			return SameProcessService.this;
+		}
+	}
+	
+	@Override
 	/**
-	 * Generate a list of tasks currently "running" on the Android device
-	 * 
-	 * @param client package name of service caller 
-	 * 
-	 * @return List (ActivityManager.RunningTaskInfo)
+	 * Return binder object to allow calling component access to service's
+	 * public methods
 	 */
-	List<?> activeTasks(String client);
-	/**
-	 * Generate a list of tasks currently "running" on the Android device
-	 * which are filtered by their Component name
-	 * 
-	 * 
-	 * @param client package name of service caller 
-	 * @param taskFilter filters running tasks according to filter value
-	 * @return List (ActivityManager.RunningTaskInfo)
-	 */
-	List<?> activeTasks(String client, String taskFilter);
-	/**
-	 * Generate a list of services currently "running" on the Android device
-	 * 
-	 * @param client package name of service caller 
-	 * @return List (ActivityManager.RunningServiceInfo)
-	 */
-	List<?> activeServices(String client);
-	/**
-	 * Generate a list of services currently "running" on the Android device
-	 * which are filtered by their Component name
-	 * 
-	 * @param client package name of service caller 
-	 * @param serviceFilter filters running services according to filter value
+	public IBinder onBind(Intent intent) {
+		// TODO Auto-generated method stub
+		return this.binder;
+	}
 
-	 * @return List (ActivityManager.RunningServiceInfo)
-	 */
+	public String getGreeting() {
+		return "Bah humbug";
+	}
 
-	List<?> activeServices(String client, String serviceFilter);
-	boolean startService(String client, String service);
-	boolean startActivity(String client, String activity);
-	boolean stopService(String client, String service);
-	boolean stopActivity(String client, String activity);
+	public String getGreeting(String appendToMessage) {
+		Dbc.require("Message string required", appendToMessage != null && appendToMessage.length() > 0);
+		return ("Bah humbug " + appendToMessage);
+	}
+
+	public String getNumberGreeting(String appendToMessage, int index) {
+		Dbc.require("Message string required", appendToMessage != null && appendToMessage.length() > 0);
+		Dbc.require("Index number required", index > 0);
+		return ("Bah humbug " + appendToMessage + " index: " + index);
+	}
+
 }

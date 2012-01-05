@@ -38,6 +38,12 @@
   			<version>${release.version}</version>
   			<scope>compile</scope>
         </dependency>
+        <dependency>
+			<groupId>org.societies.utilities</groupId>
+			<artifactId>DBC</artifactId>
+  			<version>${release.version}</version>
+  			<scope>compile</scope>
+        </dependency>
         
     </dependencies>
 
