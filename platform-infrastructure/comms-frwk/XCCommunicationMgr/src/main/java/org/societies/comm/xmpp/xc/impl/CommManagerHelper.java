@@ -39,6 +39,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.stream.XMLStreamException;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -174,7 +175,7 @@ public class CommManagerHelper {
 			return buildErrorResponse(originalFrom, id, e.getMessage());
 		} catch (Exception e) {
 			String message = e.getClass().getName()
-					+ "Error unmarshalling the message:" + e.getMessage();
+					+ "Error (un)marshalling the message:" + e.getMessage();
 			LOG.info(message);
 			return buildErrorResponse(originalFrom, id, message);
 		}
@@ -247,6 +248,7 @@ public class CommManagerHelper {
 					this.getClass().getClassLoader());
 			Unmarshaller u = jc.createUnmarshaller();
 			Marshaller m = jc.createMarshaller();
+			//m.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 			
 			LOG.info("registering " + fs.getXMLNamespace());
 			featureServers.put(fs.getXMLNamespace(), fs);
@@ -301,12 +303,13 @@ public class CommManagerHelper {
 	}
 
 	private IQ buildResponseIQ(JID originalFrom, String id, Object responseBean)
-			throws JAXBException, DocumentException, UnavailableException {
+			throws JAXBException, DocumentException, UnavailableException, XMLStreamException {
 		IQ responseIq = new IQ(Type.result, id);
 		responseIq.setTo(originalFrom);
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		InlineNamespaceXMLStreamWriter inxsw = new InlineNamespaceXMLStreamWriter(os);
 		getMarshaller(responseBean.getClass().getPackage()).marshal(
-				responseBean, os);
+				responseBean, inxsw);
 		ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
 		Document document = reader.read(is);
 		responseIq.getElement().add(document.getRootElement());
