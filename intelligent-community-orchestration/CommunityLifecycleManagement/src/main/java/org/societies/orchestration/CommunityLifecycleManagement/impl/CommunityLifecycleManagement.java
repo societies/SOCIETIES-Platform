@@ -170,5 +170,52 @@ public class CommunityLifecycleManagement {
     	
     }
     
-	
+    public EntityIdentifier getLinkedCss() {
+    	return linkedCss;
+    }
+    
+    public void setLinkedCss(EntityIdentifier linkedCss) {
+    	this.linkedCss = linkedCss;
+    }
+    
+    public CisRecord getLinkedCis() {
+    	return linkedCis;
+    }
+    
+    public void setLinkedCis(CisRecord linkedCis) {
+    	this.linkedCis = linkedCis;
+    }
+    
+    public EntityIdentifier getLinkedDomain() {
+    	return linkedDomain;
+    }
+    
+    public void setLinkedDomain(EntityIdentifier linkedDomain) {
+    	this.linkedDomain = linkedDomain;
+    }
+    
+    public AutomaticCommunityCreationManager getAutoCreationManager() {
+    	return autoCreationManager;
+    }
+    
+    public void setAutoCreationManager(AutomaticCommunityCreationManager autoCreationManager) {
+    	this.autoCreationManager = autoCreationManager;
+    }
+    
+    public AutomaticCommunityConfigurationManager getAutoConfigurationManager() {
+    	return autoConfigurationManager;
+    }
+    
+    public void setAutoConfigurationManager(AutomaticCommunityConfigurationManager autoConfigurationManager) {
+    	this.autoConfigurationManager = autoConfigurationManager;
+    }
+    
+    public AutomaticCommunityDeletionManager getAutoDeletionManager() {
+    	return autoDeletionManager;
+    }
+    
+    public void setAutoDeletionManager(AutomaticCommunityDeletionManager autoDeletionManager) {
+    	this.autoDeletionManager = autoDeletionManager;
+    }
+    
 }

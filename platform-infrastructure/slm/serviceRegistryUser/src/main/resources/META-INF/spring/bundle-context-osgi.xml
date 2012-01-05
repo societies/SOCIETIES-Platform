@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:osgi="http://www.springframework.org/schema/osgi"
@@ -10,22 +10,7 @@
        in a separate file if you do not want to. The rationale for 
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
-       
-       
-       
-       
-       
-        
-        <osgi:service ref="ContextBroker">
-        <osgi:interfaces>
-        <value>org.societies.api.context.broker.IUserCtxBroker</value>
-        <value>org.societies.api.internal.context.broker.IUserCtxBroker</value>
-           <value>org.societies.api.internal.context.broker.IUserCtxBrokerCallback</value>
-        </osgi:interfaces>
-        </osgi:service>
 
-<osgi:reference id="UserCtxDBMgmt" interface="org.societies.api.internal.context.user.db.IUserCtxDBMgr"/>
-
-
+<osgi:reference id="serRegistry" interface="org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry" />
 
 </beans>

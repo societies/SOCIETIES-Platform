@@ -8,11 +8,12 @@
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>0.1</version>
-		<relativePath>../../../parent/spring-osgi.xml</relativePath>
+		<relativePath>../../parent/spring-osgi.xml</relativePath>
 	</parent>
 
 	<!-- groupId is set in parent pom -->
-	<artifactId>css_userHistory_impl</artifactId>
+	<groupId>org.societies.context-management</groupId>
+	<artifactId>ContextBrokerTest</artifactId>
 	<version>${version.cm}</version>
 	<packaging>bundle</packaging>
 
@@ -45,15 +46,9 @@
 			<scope>provided</scope>
 		</dependency>
 
-
-
-
+		
 
 	</dependencies>
-
-
-
-
 
 	<build>
 		<plugins>
@@ -74,7 +69,8 @@
 					</instructions>
 				</configuration>
 			</plugin>
-			<plugin>
+	
+		<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<configuration>
@@ -85,16 +81,12 @@
 							<version>${version.cm}</version>
 							<type>jar</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${virgo.home}/pickup/</outputDirectory>
+							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>
 			</plugin>
-
+	
 		</plugins>
-	</build>
-
-
-	<name>User History Management</name>
-
+	</build>	
 </project>

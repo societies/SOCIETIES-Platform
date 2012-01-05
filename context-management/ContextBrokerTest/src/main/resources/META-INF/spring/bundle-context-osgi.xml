@@ -16,15 +16,8 @@
        
        
         
-        <osgi:service ref="ContextBroker">
-        <osgi:interfaces>
-        <value>org.societies.api.context.broker.IUserCtxBroker</value>
-        <value>org.societies.api.internal.context.broker.IUserCtxBroker</value>
-           <value>org.societies.api.internal.context.broker.IUserCtxBrokerCallback</value>
-        </osgi:interfaces>
-        </osgi:service>
-
-<osgi:reference id="UserCtxDBMgmt" interface="org.societies.api.internal.context.user.db.IUserCtxDBMgr"/>
+       
+	<osgi:reference id="UserCtxBroker" interface="org.societies.api.internal.context.broker.IUserCtxBroker"/>
 
 
 

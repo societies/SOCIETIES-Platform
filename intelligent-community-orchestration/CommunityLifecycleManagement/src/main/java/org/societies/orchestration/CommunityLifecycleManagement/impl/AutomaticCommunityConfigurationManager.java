@@ -140,4 +140,29 @@ public class AutomaticCommunityConfigurationManager {
     public void intialiseAutomaticCommunityConfigurationManager() {
     	
     }
+    
+    public EntityIdentifier getLinkedCss() {
+    	return linkedCss;
+    }
+    
+    public void setLinkedCss(EntityIdentifier linkedCss) {
+    	this.linkedCss = linkedCss;
+    }
+    
+    public CisRecord getLinkedCis() {
+    	return linkedCis;
+    }
+    
+    public void setLinkedCis(CisRecord linkedCis) {
+    	this.linkedCis = linkedCis;
+    }
+    
+    public EntityIdentifier getLinkedDomain() {
+    	return linkedDomain;
+    }
+    
+    public void setLinkedDomain(EntityIdentifier linkedDomain) {
+    	this.linkedDomain = linkedDomain;
+    }
+    
 }
