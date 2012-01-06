@@ -26,6 +26,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 package org.societies.android.platform.servicemonitor;
 
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import org.societies.android.platform.interfaces.ICoreServiceExample;
 import org.societies.android.platform.interfaces.ICoreServiceMonitor;
 import org.societies.android.platform.interfaces.ServiceMethodTranslator;
@@ -54,9 +57,13 @@ public class ExampleServiceActivity extends Activity {
 	private boolean ipBoundToService = false;
 	private boolean opBoundToService = false;
 	private boolean realBoundToService = false;
-	private ICoreServiceExample targetIPService = null;
+	private ICoreServiceMonitor targetIPService = null;
 	private Messenger targetOPService = null;
 	private Messenger targetRealService = null;
+	
+	private long serviceBinding;
+	private long serviceInvoke;
+	private static final int NUM_SERVICE_INVOKES = 10;
 	
     /** Called when the activity is first created. */
     @Override
@@ -70,9 +77,17 @@ public class ExampleServiceActivity extends Activity {
     	Intent ipIntent = new Intent(this, SameProcessService.class);
     	Intent opIntent = new Intent(this, DifferentProcessService.class);
     	Intent realIntent = new Intent(this, CoreMonitor.class);
+    	
+    	serviceBinding = System.currentTimeMillis();
+    	
+    	Log.i(this.getClass().getName(), "Start in process service: " + Long.toString(serviceBinding));
     	bindService(ipIntent, inProcessServiceConnection, Context.BIND_AUTO_CREATE);
+    	Log.i(this.getClass().getName(), "Start out of process service: " + Long.toString(serviceBinding - System.currentTimeMillis()));
     	bindService(opIntent, outProcessServiceConnection, Context.BIND_AUTO_CREATE);
+    	Log.i(this.getClass().getName(), "Start out of process real service: " + Long.toString(serviceBinding - System.currentTimeMillis()));
     	bindService(realIntent, realProcessServiceConnection, Context.BIND_AUTO_CREATE);
+
+    	Log.i(this.getClass().getName(), "All services started: " + Long.toString(serviceBinding - System.currentTimeMillis()));
     	
         IntentFilter intentFilter = new IntentFilter() ;
         intentFilter.addAction(CoreMonitor.ACTIVE_TASKS);
@@ -102,7 +117,20 @@ public class ExampleServiceActivity extends Activity {
     public void onButtonInprocessClick(View view) {
     	if (ipBoundToService) {
     		EditText text = (EditText) findViewById(R.id.editTxtServiceResult);
-    		text.setText(targetIPService.getGreeting("to me"));
+    		serviceInvoke = System.currentTimeMillis();
+        	Log.i(this.getClass().getName(), "Call in process service: " + Long.toString(serviceInvoke));
+        	Log.i(this.getClass().getName(), "Number of invocations: " + NUM_SERVICE_INVOKES);
+
+			for (int i = 0; i < NUM_SERVICE_INVOKES; i++) {
+//	    		text.setText(targetIPService.getGreeting("to me"));
+				List services = targetIPService.activeServices(null);
+//				for (Object service : services) {
+//					ActivityManager.RunningServiceInfo serviceInfo = (ActivityManager.RunningServiceInfo) service;
+//					Log.i(this.getClass().getName(), "In process Active Services: " + serviceInfo.service.flattenToString());
+//				}
+			}
+        	Log.i(this.getClass().getName(), "End call in process service: " + Long.toString(serviceInvoke - System.currentTimeMillis()));
+        	Log.i(this.getClass().getName(), "Average in process service call: " + Long.toString((serviceInvoke - System.currentTimeMillis())/NUM_SERVICE_INVOKES));
     	}
     }
     /**
@@ -127,8 +155,17 @@ public class ExampleServiceActivity extends Activity {
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), "to Midge");
     		outBundle.putInt(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), 2);
     		outMessage.setData(outBundle);
+    		serviceInvoke = System.currentTimeMillis();
+        	Log.i(this.getClass().getName(), "Call out of process service: " + Long.toString(serviceInvoke));
+        	Log.i(this.getClass().getName(), "Number of invocations: " + NUM_SERVICE_INVOKES);
+
     		try {
-				targetOPService.send(outMessage);
+    			for (int i = 0; i < NUM_SERVICE_INVOKES; i++) {
+    				targetOPService.send(outMessage);
+    			}
+	        	Log.i(this.getClass().getName(), "End call out of process service: " + Long.toString(serviceInvoke - System.currentTimeMillis()));
+	        	Log.i(this.getClass().getName(), "Average out of process service call: " + Long.toString((serviceInvoke - System.currentTimeMillis())/NUM_SERVICE_INVOKES));
+
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
@@ -161,8 +198,16 @@ public class ExampleServiceActivity extends Activity {
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.getPackageName());
     		Log.d(this.getClass().getName(), "Client Package Name: " + this.getPackageName());
     		outMessage.setData(outBundle);
+    		serviceInvoke = System.currentTimeMillis();
+        	Log.i(this.getClass().getName(), "Call out of process real service: " + Long.toString(serviceInvoke));
+        	Log.i(this.getClass().getName(), "Number of invocations: " + NUM_SERVICE_INVOKES);
+
     		try {
-				targetRealService.send(outMessage);
+    			for (int i = 0; i < NUM_SERVICE_INVOKES; i++) {
+    				targetRealService.send(outMessage);
+    			}
+	        	Log.i(this.getClass().getName(), "End call out of process real service: " + Long.toString(serviceInvoke - System.currentTimeMillis()));
+	        	Log.i(this.getClass().getName(), "Average out of process real service call: " + Long.toString((serviceInvoke - System.currentTimeMillis())/NUM_SERVICE_INVOKES));
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
@@ -180,7 +225,9 @@ public class ExampleServiceActivity extends Activity {
 		
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			LocalBinder binder = (LocalBinder) service;
-			targetIPService = (ICoreServiceExample) binder.getService();
+			targetIPService = (ICoreServiceMonitor) binder.getService();
+	    	Log.i(this.getClass().getName(), "In process service connected: " + Long.toString(serviceBinding - System.currentTimeMillis()));
+
 			ipBoundToService = true;
 			
 		}
@@ -196,6 +243,7 @@ public class ExampleServiceActivity extends Activity {
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			opBoundToService = true;
 			targetOPService = new Messenger(service);
+	    	Log.i(this.getClass().getName(), "Out of process service connected: " + Long.toString(serviceBinding - System.currentTimeMillis()));
 			
 			
 		}
@@ -211,6 +259,7 @@ public class ExampleServiceActivity extends Activity {
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			realBoundToService = true;
 			targetRealService = new Messenger(service);
+	    	Log.i(this.getClass().getName(), "Out of process real service connected: " + Long.toString(serviceBinding - System.currentTimeMillis()));
 			
 			
 		}
@@ -229,14 +278,20 @@ public class ExampleServiceActivity extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			Log.i("ServiceReceiver", intent.getAction());
 			
+			
 			if (intent.getAction().equals(CoreMonitor.ACTIVE_TASKS)) {
+		    	Log.i(this.getClass().getName(), "Out of process real service received intent - active tasks: " + Long.toString(serviceInvoke - System.currentTimeMillis()));
+
 				Parcelable parcels [] =  intent.getParcelableArrayExtra(CoreMonitor.INTENT_RETURN_KEY);
 				
 				for (Parcelable parcel : parcels) {
 					Log.i(this.getClass().getName(), "Tasks: " + ((ActivityManager.RunningTaskInfo) parcel).baseActivity.flattenToString() + 
 														"ID: " + ((ActivityManager.RunningTaskInfo) parcel).id);
+		        	Log.i(this.getClass().getName(), "Average out of process real service call -  - active tasks: " + Long.toString((serviceInvoke - System.currentTimeMillis())/NUM_SERVICE_INVOKES));
 				}
 			} else if (intent.getAction().equals(CoreMonitor.ACTIVE_SERVICES)) {
+		    	Log.i(this.getClass().getName(), "Out of process real service received intent - active services: " + Long.toString(serviceInvoke - System.currentTimeMillis()));
+	        	Log.i(this.getClass().getName(), "Average out of process real service call -  - active services: " + Long.toString((serviceInvoke - System.currentTimeMillis())/NUM_SERVICE_INVOKES));
 				Parcelable parcels [] =  intent.getParcelableArrayExtra(CoreMonitor.INTENT_RETURN_KEY);
 				
 				for (Parcelable parcel : parcels) {

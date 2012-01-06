@@ -10,8 +10,8 @@
    </parent>
 
    <groupId>org.societies.android.platform</groupId>
-   <artifactId>CoreServiceMonitor</artifactId>
-   <name>ServiceMonitor</name>
+   <artifactId>IPCServiceExample</artifactId>
+   <name>IPCServiceExample</name>
    <version>${release.version}</version>
    <packaging>apk</packaging>
 
