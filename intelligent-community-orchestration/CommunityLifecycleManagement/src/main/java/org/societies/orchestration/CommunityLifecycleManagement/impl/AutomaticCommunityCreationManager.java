@@ -72,6 +72,8 @@ public class AutomaticCommunityCreationManager {
     
     //private Domain linkedDomain; // No datatype yet representing a domain
 	private EntityIdentifier linkedDomain;
+	
+	private IUserCtxDBMgr userContextDatabaseManager;
     
 	/*
      * Constructor for AutomaticCommunityConfigurationManager
@@ -215,6 +217,15 @@ public class AutomaticCommunityCreationManager {
     
     public void setLinkedDomain(EntityIdentifier linkedDomain) {
     	this.linkedDomain = linkedDomain;
+    }
+    
+    public IUserCtxDBMgr getUserContextDatabaseManager() {
+    	return userContextDatabaseManager;
+    }
+    
+    public void setUserContextDatabaseManager(IUserCtxDBMgr userContextDatabaseManager) {
+    	System.out.println("GOT database" + userContextDatabaseManager);
+    	this.userContextDatabaseManager = userContextDatabaseManager;
     }
     
 }
