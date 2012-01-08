@@ -24,7 +24,11 @@
  */
 package org.societies.api.context.model;
 
+
+
 import java.io.Serializable;
+import java.security.acl.LastOwnerException;
+import java.util.Date;
 
 /**
  * This class is used in order tp represent context history attributes maintained in the context history database.
@@ -42,11 +46,21 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	private Double doubleValue;
 	private byte[] blobValue;
 
-
+	private Date lastModified;
+	
+	
+	/*
 	public CtxHistoryAttribute(CtxAttributeIdentifier id) {
 		super(id);
 	}
-	
+	 */
+
+	public CtxHistoryAttribute(CtxAttribute ctxAttribute) {
+		super(ctxAttribute.getId());
+		this.setValues(ctxAttribute);
+		this.lastModified = ctxAttribute.getQuality().getLastUpdated();
+	}
+
 	/**
 	 * Returns the identifier of this historic context attribute.
 	 * 
@@ -89,10 +103,13 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	 * 
 	 * @return blob value
 	 */
-	
+
 	public Serializable getBlobValue(ClassLoader classLoader) {
 
 		this.blobValue = null;
+
+		//	MockBlobClass valueMockClassDeserialised = (MockBlobClass) SerialisationHelper.deserialise(ctxAttribute.getBinaryValue(), this.getClass().getClassLoader());
+
 		/*
 		if (classLoader == null)
 			throw new NullPointerException("classLoader can't be null");
@@ -108,7 +125,7 @@ public class CtxHistoryAttribute extends CtxModelObject {
 		} catch (ClassNotFoundException cnfe) {
 			throw new ContextModelException(cnfe.getMessage(), cnfe);
 		}
-		*/
+		 */
 		return blobValue;
 	}
 
@@ -121,6 +138,18 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	@Override
 	public String toString() {
 		return getId().toString(); 
+	}
+
+
+	private void setValues(CtxAttribute ctxAttribute) {
+		this.stringValue = ctxAttribute.getStringValue();
+		this.integerValue = ctxAttribute.getIntegerValue();
+		this.doubleValue = ctxAttribute.getDoubleValue();
+		this.blobValue = ctxAttribute.getBinaryValue();
+	}
+
+	public Date getLastModified(){
+		return this.lastModified;
 	}
 
 }

@@ -8,11 +8,11 @@
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>0.1</version>
-		<relativePath>../../../parent/spring-osgi.xml</relativePath>
+		<relativePath>../../parent/spring-osgi.xml</relativePath>
 	</parent>
 
 	<!-- groupId is set in parent pom -->
-	<artifactId>css_userHistory_impl</artifactId>
+	<artifactId>UserContextHistory</artifactId>
 	<version>${version.cm}</version>
 	<packaging>bundle</packaging>
 
@@ -58,21 +58,21 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
-			</plugin>
-
-			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
+						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<_nouses>true</_nouses>
+						
 					</instructions>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -80,21 +80,21 @@
 				<configuration>
 					<artifactItems>
 						<artifactItem>
-							<groupId>${groupId}</groupId>
-							<artifactId>${artifactId}</artifactId>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
 							<version>${version.cm}</version>
-							<type>jar</type>
+							<type>bundle</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${virgo.home}/pickup/</outputDirectory>
+							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>
 			</plugin>
-
 		</plugins>
-	</build>
+	</build>	
 
 
 	<name>User History Management</name>
 
+	<groupId>org.societies.context-management</groupId>
 </project>
