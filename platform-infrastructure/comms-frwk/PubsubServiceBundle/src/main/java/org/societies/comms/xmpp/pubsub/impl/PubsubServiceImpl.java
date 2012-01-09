@@ -47,6 +47,9 @@ import org.jabber.protocol.pubsub.Subscription;
 import org.jabber.protocol.pubsub.Unsubscribe;
 import org.societies.comm.xmpp.datatypes.Identity;
 import org.societies.comm.xmpp.datatypes.Stanza;
+import org.societies.comm.xmpp.datatypes.XMPPError;
+import org.societies.comm.xmpp.datatypes.XMPPError.ErrorType;
+import org.societies.comm.xmpp.datatypes.XMPPError.StanzaError;
 import org.societies.comms.xmpp.pubsub.PubsubService;
 
 // TODO
@@ -54,19 +57,20 @@ import org.societies.comms.xmpp.pubsub.PubsubService;
 
 public class PubsubServiceImpl implements PubsubService {
 	
-	// TODO XMPP Constants Move this to Comm Framework!
-	private static final Object ERROR_CONFLICT = null;
-	private static final Object ERROR_ITEM_NOT_FOUND = null;
-	private static final Object ERROR_FEATURE_NOT_IMPLEMENTED = null;
-	private static final Object ERROR_GONE = null;
-	private static final Object ERROR_FORBIDDEN = null;
-	
-	// TODO mixed XMPP and PubSub Constants
-	private static final Object ERROR_SUBID_REQUIRED = null;
-	private static final Object ERROR_NOT_SUBSCRIBED = null;
-	private static final Object ERROR_INVALID_SUBID = null;
-	private static final Object ERROR_NODEID_REQUIRED = null;
-	private static final Object ERROR_ITEM_REQUIRED = null;
+	// PubSub Errors
+	private static final Object ERROR_SUBID_REQUIRED;
+	private static final Object ERROR_NOT_SUBSCRIBED;
+	private static final Object ERROR_INVALID_SUBID;
+	private static final Object ERROR_NODEID_REQUIRED;
+	private static final Object ERROR_ITEM_REQUIRED;
+	static {
+		org.jabber.protocol.pubsub.errors.ObjectFactory errorFactory = new org.jabber.protocol.pubsub.errors.ObjectFactory();
+		ERROR_SUBID_REQUIRED = errorFactory.createSubidRequired(null);
+		ERROR_NOT_SUBSCRIBED = errorFactory.createNotSubscribed(null);
+		ERROR_INVALID_SUBID = errorFactory.createInvalidSubid(null);
+		ERROR_NODEID_REQUIRED = errorFactory.createNodeidRequired(null);
+		ERROR_ITEM_REQUIRED = errorFactory.createItemRequired(null);
+	}
 	
 	// PubSub Constants
 	private static final String SUBSCRIPTION_SUBSCRIBED = "subscribed";
@@ -105,10 +109,10 @@ public class PubsubServiceImpl implements PubsubService {
 			String redirectUri = redirectedNodes.get(nodeId);
 			// 6.1.3.12 Node Does Not Exist
 			if (redirectUri==null)
-				return ERROR_ITEM_NOT_FOUND;
+				return new XMPPError(StanzaError.item_not_found);
 			// 6.1.3.11 Node Has Moved
 			else
-				return ERROR_GONE;
+				return new XMPPError(StanzaError.gone,redirectUri,null);
 		}
 		
 		// New Subscription
@@ -137,23 +141,23 @@ public class PubsubServiceImpl implements PubsubService {
 		
 		// 6.2.3.4 Node Does Not Exist
 		if (node==null)
-			return ERROR_ITEM_NOT_FOUND;
+			return new XMPPError(StanzaError.item_not_found);
 		
 		List<String> subIdList = node.getSubscriptions(subscriber);
 		
 		// 6.2.3.2 No Such Subscriber
 		if (subIdList==null)
-			return ERROR_NOT_SUBSCRIBED;
+			return new XMPPError(StanzaError.unexpected_request, null, ERROR_NOT_SUBSCRIBED);
 		
 		// 6.2.3.1 No Subscription ID
 		if (subIdList.size()>1 && subId==null)
-			return ERROR_SUBID_REQUIRED; 
+			return new XMPPError(StanzaError.bad_request, null, ERROR_SUBID_REQUIRED); 
 
 		
 		if (subId!=null) {
 			// 6.2.3.5 Bad Subscription ID
 			if (!subIdList.contains(subId))
-				return ERROR_INVALID_SUBID; 
+				return new XMPPError(StanzaError.unexpected_request, null, ERROR_INVALID_SUBID); 
 			
 			// Unsubscribe
 			node.unsubscribe(subId);
@@ -201,22 +205,22 @@ public class PubsubServiceImpl implements PubsubService {
 		
 		// 6.5.9.11 Node Does Not Exist
 		if (node==null)
-			return ERROR_ITEM_NOT_FOUND;
+			return new XMPPError(StanzaError.item_not_found);
 		
 		List<String> subIdList = node.getSubscriptions(sender);
 		
 		// 6.5.9.3 Entity Not Subscribed
 		if (subIdList==null)
-			return ERROR_NOT_SUBSCRIBED;
+			return new XMPPError(StanzaError.unexpected_request, null, ERROR_NOT_SUBSCRIBED);
 		
 		// 6.5.9.1 Subscription ID Required
 		if (subIdList.size()>1 && subId==null)
-			return ERROR_SUBID_REQUIRED;
+			return new XMPPError(StanzaError.bad_request, null, ERROR_SUBID_REQUIRED);
 		
 		if (subId!=null) {
 			// 6.5.9.2 Invalid Subscription ID
 			if (!subIdList.contains(subId))
-				return ERROR_INVALID_SUBID;
+				return new XMPPError(StanzaError.unexpected_request, null, ERROR_INVALID_SUBID);
 		}
 		else
 			subId = subIdList.get(0);
@@ -262,10 +266,10 @@ public class PubsubServiceImpl implements PubsubService {
 		
 		// 7.1.3.3 Node Does Not Exist or http://jabber.org/protocol/pubsub#auto-create
 		if (node==null)
-			return ERROR_ITEM_NOT_FOUND; // TODO http://jabber.org/protocol/pubsub#auto-create
+			return new XMPPError(StanzaError.item_not_found); // TODO http://jabber.org/protocol/pubsub#auto-create
 		
 		if (item==null) {
-			return ERROR_FEATURE_NOT_IMPLEMENTED; // TODO support for transient nodes (and itemless notifications)
+			return new XMPPError(StanzaError.feature_not_implemented); // TODO support for transient nodes (and itemless notifications)
 		}
 		else {
 			// 7.1.3.5 Bad Payload
@@ -304,17 +308,17 @@ public class PubsubServiceImpl implements PubsubService {
 		
 		// 7.2.3.3 NodeID Required
 		if (nodeId==null)
-			return ERROR_NODEID_REQUIRED;
+			return new XMPPError(StanzaError.bad_request, null, ERROR_NODEID_REQUIRED);
 		
 		PubsubNode node = nodes.get(nodeId);
 		
 		// 7.2.3.2 Node Does Not Exist
 		if (node==null)
-			return ERROR_ITEM_NOT_FOUND;
+			return new XMPPError(StanzaError.item_not_found);
 		
 		// 7.2.3.4 Item or ItemID Required
 		if (item==null || item.size()!=1 || item.get(0).getId()==null)
-			return ERROR_ITEM_REQUIRED;
+			return new XMPPError(StanzaError.bad_request, null, ERROR_ITEM_REQUIRED);
 		
 		// TODO Access model
 		
@@ -355,7 +359,7 @@ public class PubsubServiceImpl implements PubsubService {
 		else {
 			// Example 128. NodeID already exists
 			if (nodes.keySet().contains(nodeId))
-				return ERROR_CONFLICT;
+				return new XMPPError(StanzaError.conflict);
 		}
 		
 		// Create Node
@@ -405,12 +409,12 @@ public class PubsubServiceImpl implements PubsubService {
 		
 		// 8.4.3.2 Node Does Not Exist
 		if (node==null)
-			return ERROR_ITEM_NOT_FOUND;
+			return new XMPPError(StanzaError.item_not_found);
 		
 		// 8.4.3.1 Insufficient Privileges
 		Identity sender = stanza.getFrom().getIdentity();
 		if (!node.getOwner().equals(sender))
-			return ERROR_FORBIDDEN;
+			return new XMPPError(StanzaError.forbidden);
 		
 		// Remove Node
 		nodes.remove(nodeId);
@@ -445,12 +449,12 @@ public class PubsubServiceImpl implements PubsubService {
 		
 		// 8.5.3.4 Node Does Not Exist
 		if (node==null)
-			return ERROR_ITEM_NOT_FOUND;
+			return new XMPPError(StanzaError.item_not_found);
 		
 		// 8.5.3.2 Insufficient Privileges
 		Identity sender = stanza.getFrom().getIdentity();
 		if (!node.getOwner().equals(sender))
-			return ERROR_FORBIDDEN;
+			return new XMPPError(StanzaError.forbidden);
 		
 		// Purge Items
 		node.purge();
@@ -473,12 +477,12 @@ public class PubsubServiceImpl implements PubsubService {
 		
 		// Example 186. Node does not exist
 		if (node==null)
-			return ERROR_ITEM_NOT_FOUND;
+			return new XMPPError(StanzaError.item_not_found);
 		
 		// Example 185. Entity is not an owner
 		Identity sender = stanza.getFrom().getIdentity();
 		if (!node.getOwner().equals(sender))
-			return ERROR_FORBIDDEN;
+			return new XMPPError(StanzaError.forbidden);
 		
 		if (payload.getSubscriptions().getSubscription().size()>0) {
 			// 8.8.2 Modify Subscriptions
@@ -547,12 +551,12 @@ public class PubsubServiceImpl implements PubsubService {
 		
 		// Example 205. Node does not exist
 		if (node==null)
-			return ERROR_ITEM_NOT_FOUND;
+			return new XMPPError(StanzaError.item_not_found);
 		
 		// Example 204. Entity is not an owner
 		Identity sender = stanza.getFrom().getIdentity();
 		if (!node.getOwner().equals(sender))
-			return ERROR_FORBIDDEN;
+			return new XMPPError(StanzaError.forbidden);
 		
 		
 		if (payload.getAffiliations().getAffiliation().size()>0) {
