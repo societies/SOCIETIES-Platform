@@ -35,9 +35,12 @@
 
 package org.societies.cis.mgmt.impl;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.societies.cis.management.api.CISActivityFeed;
+import org.societies.cis.management.api.ServiceSharingRecord;
 import org.societies.cis.mgmt.CommunityManagement;
 import org.societies.comm.xmpp.CommunicationException;
 import org.societies.comm.xmpp.CommunicationManager;
@@ -59,11 +62,13 @@ public class CommunityManagementImpl implements CommunityManagement, NamespaceEx
 	private Set<String> participants;
 	private Set<String> leaders;
 	
+	
 	@Autowired
 	public CommunityManagementImpl(CommunicationManager endpoint) {
 		participants = new HashSet<String>();
 		leaders = new HashSet<String>();
 		this.endpoint = endpoint;
+	
 		try {
 			endpoint.register(this); // TODO unregister??
 		} catch (ClassNotFoundException e) {

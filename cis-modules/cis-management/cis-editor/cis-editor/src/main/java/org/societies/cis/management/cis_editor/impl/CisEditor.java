@@ -28,7 +28,7 @@ package org.societies.cis.management.cis_editor.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-
+//import org.societies.cis.mgmt;
 import org.societies.cis.management.api.CISActivityFeed;
 import org.societies.cis.management.api.CISRecord;
 import org.societies.cis.management.api.ServiceSharingRecord;
@@ -39,9 +39,10 @@ public class CisEditor implements ICisEditor {
 	public CISRecord cisRecord;
 	public CISActivityFeed cisActivityFeed;
 	public List<ServiceSharingRecord> sharedServices; 
+//	public CommunityManagement commMgmt;
 	
 
-		
+	// constructor for creating a CIS from scratch	
 	public CisEditor(String ownerCss,
 			String membershipCriteria, String permaLink, String[] membersCss,
 			String password) {
@@ -57,7 +58,20 @@ public class CisEditor implements ICisEditor {
 
 	}
 
-    
+	// constructor for creating a CIS from a CIS record, maybe the case when we are retrieving data from a database
+	// TODO: double check if we should clone the related objects or just copy the reference (as it is now)
+	public CisEditor(CISRecord cisRecord) {
+		
+		this.cisRecord = cisRecord; 
+		
+		this.cisActivityFeed = this.cisRecord.feed;
+		this.sharedServices = this.cisRecord.sharedServices;
+		
+		
+		// TODO: broadcast its creation to other nodes?
+
+	}
+
     
     
 }
