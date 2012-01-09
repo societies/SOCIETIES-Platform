@@ -45,6 +45,9 @@ import org.societies.api.internal.context.user.history.IUserCtxHistoryMgr;
 
 import org.societies.api.mock.EntityIdentifier;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
 /**
  * This is the class for the Automatic Community Deletion Manager component
  * 
@@ -70,6 +73,8 @@ public class AutomaticCommunityDeletionManager {
     
     //private Domain linkedDomain;  // No datatype yet representing a domain
 	private EntityIdentifier linkedDomain;
+	
+	private int longestTimeWithoutActivity; //measured in minutes
 	
 	/*
      * Constructor for AutomaticCommunityConfigurationManager
@@ -126,14 +131,31 @@ public class AutomaticCommunityDeletionManager {
 		
 		CisRecord record;
 		
-		// SIMPLISTIC v0.1 ALGORITHM
-		//if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - 5)
-		//    delete CIS
+		// VERY SIMPLISTIC v0.1 ALGORITHM
+		//if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - 5) {
+		//    if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - (longestTimeWithoutActivity/1440)) {
+		//
+		//        If the CIS has never gone such a long period without activity before, 
+		//        suggest deletion via User Agent to CIS owner/administrators, i.e. whoever
+		//        this deployment runs on behalf of.
+		//  
+		//        Date date= new java.util.Date();
+		//        System.out.println(new Timestamp(date.getTime()));
+		//
+		//        Future directions here can include - being able to identify CISs to delete very soon,
+		//        or at more flexible time than just the 5 days as above,
+		//        after lack of activity or other key event e.g. purpose fulfillment or location change.
 		
-		
+		//    }
+		//}
 		//invoke UserAgent suggestion GUI for deletions
-		//OR
-		//automatically call CIS management functions to delete CISs
+				//OR
+				//automatically call CIS management functions to delete CISs
+
+		//    
+		
+		
+		
 		
 	}
 	
