@@ -54,6 +54,9 @@ public interface CommManager {
 
 	void sendMessage(Stanza stanza, Type type, Object payload)
 			throws CommunicationException;
+	
+	void sendMessage(Stanza stanza, Object payload)
+			throws CommunicationException;
 
 	// void sendResult(? originalPayload, Object resultPayload); //TODO only
 	// needed for asynch IQ handling
