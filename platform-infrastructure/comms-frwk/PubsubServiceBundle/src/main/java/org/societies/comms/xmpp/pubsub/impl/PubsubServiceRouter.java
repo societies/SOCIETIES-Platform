@@ -194,8 +194,7 @@ public class PubsubServiceRouter implements FeatureServer {
 				return impl.ownerAffiliations(stanza, ops);
 			}
 		}
-		return null; // Communication Framework should see this is null and
-						// return appropriate generic XMPP error
+		return null; // TODO send error!!!
 	}
 
 }

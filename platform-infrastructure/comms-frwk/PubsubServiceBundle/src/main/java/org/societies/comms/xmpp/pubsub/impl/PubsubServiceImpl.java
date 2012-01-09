@@ -44,11 +44,11 @@ import org.jabber.protocol.pubsub.Item;
 import org.jabber.protocol.pubsub.Items;
 import org.jabber.protocol.pubsub.Pubsub;
 import org.jabber.protocol.pubsub.Subscription;
-import org.jabber.protocol.pubsub.Unsubscribe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.comm.xmpp.datatypes.Identity;
 import org.societies.comm.xmpp.datatypes.Stanza;
 import org.societies.comm.xmpp.datatypes.XMPPError;
-import org.societies.comm.xmpp.datatypes.XMPPError.ErrorType;
 import org.societies.comm.xmpp.datatypes.XMPPError.StanzaError;
 import org.societies.comms.xmpp.pubsub.PubsubService;
 
@@ -56,6 +56,9 @@ import org.societies.comms.xmpp.pubsub.PubsubService;
 // Change errors to exceptions
 
 public class PubsubServiceImpl implements PubsubService {
+	
+	private static Logger LOG = LoggerFactory
+			.getLogger(PubsubServiceImpl.class);
 	
 	// PubSub Errors
 	private static final Object ERROR_SUBID_REQUIRED;
@@ -117,6 +120,7 @@ public class PubsubServiceImpl implements PubsubService {
 		
 		// New Subscription
 		String subId = node.newSubscription(subscriber);
+		LOG.info("subId:"+subId);
 		
 		// Build success response
 		Pubsub response = new Pubsub();
@@ -125,6 +129,7 @@ public class PubsubServiceImpl implements PubsubService {
 		subs.setNode(nodeId);
 		subs.setSubid(subId);
 		subs.setSubscription(SUBSCRIPTION_SUBSCRIBED);
+		response.setSubscription(subs);
 		return response;
 	}
 

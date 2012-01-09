@@ -171,14 +171,24 @@ public class CommManagerHelper {
 			Object bean = u.unmarshal(new InputSource(new StringReader(element
 					.asXML())));
 			Object responseBean = fs.receiveQuery(Stanza.fromPacket(iq), bean);
-			if (responseBean instanceof XMPPError)
+			if (responseBean!=null && responseBean instanceof XMPPError)
 				return buildApplicationErrorResponse(originalFrom, id, (XMPPError)responseBean);
 			else
 				return buildResponseIQ(originalFrom, id, responseBean);
 		} catch (UnavailableException e) {
 			LOG.info(e.getMessage());
 			return buildErrorResponse(originalFrom, id, e.getMessage());
-		} catch (Exception e) {
+		} catch (JAXBException e) {
+			String message = e.getClass().getName()
+					+ "Error (un)marshalling the message:" + e.getMessage();
+			LOG.info(message);
+			return buildErrorResponse(originalFrom, id, message);
+		} catch (XMLStreamException e) {
+			String message = e.getClass().getName()
+					+ "Error (un)marshalling the message:" + e.getMessage();
+			LOG.info(message);
+			return buildErrorResponse(originalFrom, id, message);
+		} catch (DocumentException e) {
 			String message = e.getClass().getName()
 					+ "Error (un)marshalling the message:" + e.getMessage();
 			LOG.info(message);
