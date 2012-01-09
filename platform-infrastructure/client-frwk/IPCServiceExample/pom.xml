@@ -10,8 +10,8 @@
    </parent>
 
    <groupId>org.societies.android.platform</groupId>
-   <artifactId>CoreServiceMonitor</artifactId>
-   <name>ServiceMonitor</name>
+   <artifactId>IPCServiceExample</artifactId>
+   <name>IPCServiceExample</name>
    <version>${release.version}</version>
    <packaging>apk</packaging>
 
@@ -35,6 +35,12 @@
         <dependency>
           	<groupId>org.societies.android.platform</groupId>
   			<artifactId>CoreInterfaces</artifactId>
+  			<version>${release.version}</version>
+  			<scope>compile</scope>
+        </dependency>
+        <dependency>
+			<groupId>org.societies.utilities</groupId>
+			<artifactId>DBC</artifactId>
   			<version>${release.version}</version>
   			<scope>compile</scope>
         </dependency>

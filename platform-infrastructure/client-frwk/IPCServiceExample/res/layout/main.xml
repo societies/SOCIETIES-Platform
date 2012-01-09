@@ -23,6 +23,13 @@
         android:onClick="onButtonOutprocessClick"
         android:text="@string/btnCallOutProcessService" />
 
+    <Button
+        android:id="@+id/btnRealProcess"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onButtonRealProcessClick"
+        android:text="@string/btnCallRealService" />
+
     <EditText
         android:id="@+id/editTxtServiceResult"
         android:layout_width="match_parent"

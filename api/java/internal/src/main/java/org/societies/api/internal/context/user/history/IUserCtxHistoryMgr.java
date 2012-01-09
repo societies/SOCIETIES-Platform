@@ -43,14 +43,14 @@ public interface IUserCtxHistoryMgr {
 	 * 
 	 * @since 0.0.1
 	 */
-	public void disableCtxRecording();
+	public void disableCtxRecording(IUserCtxHistoryCallback callback);
 
 	/**
 	 * Enables Context Recording.
 	 * 
 	 * @since 0.0.1
 	 */
-	public void enableCtxRecording();
+	public void enableCtxRecording(IUserCtxHistoryCallback callback);
 
 	/**
 	 * This method returns a list of CtxAttributeIdentifiers corresponding 
@@ -60,7 +60,7 @@ public interface IUserCtxHistoryMgr {
 	 * @return list of historic Attributes
 	 * @since 0.0.1
 	 */
-	public List<List <CtxAttributeIdentifier>> getHistoryTuplesID(CtxAttributeIdentifier primaryAttrIdentifier);
+	public void getHistoryTuplesID(CtxAttributeIdentifier primaryAttrIdentifier, IUserCtxHistoryCallback callback);
 
 	/**
 	 * Registers to Context History a list of escording attribute Ids 
@@ -70,18 +70,9 @@ public interface IUserCtxHistoryMgr {
 	 * @param listOfEscortingAttributeIds
 	 * @since 0.0.1
 	 */
-	public void registerHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier, List<CtxAttributeIdentifier> listOfEscortingAttributeIds);
+	public void registerHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier, List<CtxAttributeIdentifier> listOfEscortingAttributeIds,IUserCtxHistoryCallback callback);
 
-	/**
-	 * Registers to Context History a list of escording attribute types 
-	 * corresponding to a Context Attribute.
-	 * 
-	 * @param primaryAttrIdentifier
-	 * @param listOfEscortingAttributeTypes
-	 * @since 0.0.1
-	 */
-	public void registerHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier, CtxAttributeIdentifier listOfEscortingAttributeTypes);
-
+	
 	/**
 	 * Removes recorded history for the indicated Context Attribute from the 
 	 * start of the recorded history until the end. 
@@ -92,7 +83,7 @@ public interface IUserCtxHistoryMgr {
 	 * @return number of removed records
 	 * @since 0.0.1
 	 */
-	public int removeHistory(CtxAttribute ctxAttribute, Date startDate, Date endDate);
+	public void removeHistory(CtxAttribute ctxAttribute, Date startDate, Date endDate, IUserCtxHistoryCallback callback);
 
 	/**
 	 * Removes recorded history for the indicated type from the start of the 
@@ -104,31 +95,43 @@ public interface IUserCtxHistoryMgr {
 	 * @return number of removed records
 	 * @since 0.0.1
 	 */
-	public int removeHistory(String type, Date startDate, Date endDate);
+	public void removeHistory(String type, Date startDate, Date endDate, IUserCtxHistoryCallback callback);
 
 	/**
 	 * Returns a list of <code>CtxHistoryAttribute</code> objects recorded for 
 	 * the specified context attribute.
 	 * 
-	 * @param ctxAttribute
+	 * @param CtxAttributeIdentifier
 	 * @return list of historic Attributes
 	 * @since 0.0.1
-	 */
-	public List<CtxHistoryAttribute> retrieveHistory(CtxAttribute ctxAttribute);
-
+	
+	public List<CtxHistoryAttribute> retrieveHistory(CtxAttributeIdentifier attrId, IUserCtxHistoryCallback callback);
+ */
+	
 	/**
 	 * Returns a list of <code>CtxHistoryAttribute</code> objects recorded for
 	 * the specified context attribute for a time period that starts at the indicated 
 	 * startDate and ends at the indicated endDate.
 	 * 
-	 * @param ctxAttribute
+	 * @param attrId
 	 * @param startDate
 	 * @param endDate
 	 * @return list of historic Attributes
 	 * @since 0.0.1
 	 */
-	public List<CtxHistoryAttribute> retrieveHistory(CtxAttribute ctxAttribute, Date startDate, Date endDate);
+	public void retrieveHistory(CtxAttributeIdentifier attrId, Date startDate, Date endDate, IUserCtxHistoryCallback callback);
 
+	/**
+	 * Returns a list of <code>CtxHistoryAttribute</code> objects recorded for
+	 * the specified context attribute.
+	 * 
+	 * @param attrId
+	 * @param modificationIndex
+	 * @since 0.0.1
+	 */
+	public void retrieveHistory(CtxAttributeIdentifier attrId,int modificationIndex, IUserCtxHistoryCallback callback);
+	
+	
 	/**
 	 * This method returns a linked map with key the CtxAttribute and value 
 	 * a list of CtxAttributes recorded on the same time.
@@ -140,6 +143,13 @@ public interface IUserCtxHistoryMgr {
 	 * @return map
 	 * @since 0.0.1
 	 */
-	public Map<CtxAttribute, List<CtxAttribute>> retrieveHistoryTuples(CtxAttributeIdentifier primaryAttrID, List<CtxAttributeIdentifier> listOfEscortingAttributeIds, Date startDate, Date endDate);
+	public void retrieveHistoryTuples(CtxAttributeIdentifier primaryAttrID, List<CtxAttributeIdentifier> listOfEscortingAttributeIds, Date startDate, Date endDate, IUserCtxHistoryCallback callback);
 
+	/**
+	 * Stores the historic Attribute to HoC Database.
+	 * 
+	 * @param hocAttribute
+	 * @param date
+	 */
+	public void storeHoCAttribute(CtxAttribute hocAttribute,Date date);
 }

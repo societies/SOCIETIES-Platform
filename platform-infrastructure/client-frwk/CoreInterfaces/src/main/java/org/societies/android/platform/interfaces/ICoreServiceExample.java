@@ -26,56 +26,10 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 package org.societies.android.platform.interfaces;
 
-import java.util.List;
+public interface ICoreServiceExample {
+	String methodsArray [] = {"getGreeting()", "getGreeting(String appendToMessage)", "getNumberGreeting(String appendToMessage, int number)"};
 
-public interface ICoreServiceMonitor {
-	String methodsArray [] = {"activeTasks(String client)", 
-								"activeTasks(String client, String taskFilter)",
-								"activeServices(String client)",
-								"activeServices(String client, String serviceFilter)",
-								"startService(String client, String service)",
-								"startActivity(String client, String activity)",
-								"stopService(String client, String service)",
-								"stopActivity(String client, String activity)"};
-
-	/**
-	 * Generate a list of tasks currently "running" on the Android device
-	 * 
-	 * @param client package name of service caller 
-	 * 
-	 * @return List (ActivityManager.RunningTaskInfo)
-	 */
-	List<?> activeTasks(String client);
-	/**
-	 * Generate a list of tasks currently "running" on the Android device
-	 * which are filtered by their Component name
-	 * 
-	 * 
-	 * @param client package name of service caller 
-	 * @param taskFilter filters running tasks according to filter value
-	 * @return List (ActivityManager.RunningTaskInfo)
-	 */
-	List<?> activeTasks(String client, String taskFilter);
-	/**
-	 * Generate a list of services currently "running" on the Android device
-	 * 
-	 * @param client package name of service caller 
-	 * @return List (ActivityManager.RunningServiceInfo)
-	 */
-	List<?> activeServices(String client);
-	/**
-	 * Generate a list of services currently "running" on the Android device
-	 * which are filtered by their Component name
-	 * 
-	 * @param client package name of service caller 
-	 * @param serviceFilter filters running services according to filter value
-
-	 * @return List (ActivityManager.RunningServiceInfo)
-	 */
-
-	List<?> activeServices(String client, String serviceFilter);
-	boolean startService(String client, String service);
-	boolean startActivity(String client, String activity);
-	boolean stopService(String client, String service);
-	boolean stopActivity(String client, String activity);
+	String getGreeting();
+	String getGreeting(String appendToMessage);
+	String getNumberGreeting(String appendToMessage, int number);
 }
