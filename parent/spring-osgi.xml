@@ -76,6 +76,19 @@
       </url>
 		</repository>
 
+		<!-- spring library -->
+		<repository>
+			<id>com.springsource.repository.libraries.release</id>
+			<name>SpringSource Enterprise Bundle Repository - SpringSource Library Releases</name>
+			<url>http://repository.springsource.com/maven/libraries/release</url>
+		</repository>
+		<repository>
+			<id>com.springsource.repository.libraries.external</id>
+			<name>SpringSource 
+		Enterprise Bundle Repository - External Library Releases</name>
+			<url>http://repository.springsource.com/maven/libraries/external</url>
+		</repository>
+
 		<!-- General Eclipse repository -->
 		<repository>
 			<id>eclipse-repository</id>
@@ -168,7 +181,15 @@
 				<type>jar</type>
 				<scope>compile</scope>
 			</dependency>
-			<!-- Spring framework -->
+			<!-- spring library -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>org.springframework.spring-library</artifactId>
+				<type>libd</type>
+				<version>${spring.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<!-- Spring framework bundles -->
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring</artifactId>
@@ -309,15 +330,14 @@
 								<requireProperty>
 									<property>spring.osgi.deploy.dir</property>
 									<message>You must specify the location of the Virgo
-										installation with the property spring.osgi.deploy.dir
+										installation with the property VIRGO_HOME.
 										Hints: use your
 										profile ~/.m3/settings.xml or set via the command
 										line
-										-Dspring.osgi.deploy.dir=location.</message>
+										-Dvirgo.home=location.</message>
 								</requireProperty>
 							</rules>
-							<!--<fail>true</fail> -->
-							<fail>false</fail>
+							<fail>true</fail>
 						</configuration>
 					</execution>
 				</executions>
@@ -398,5 +418,4 @@
 		</pluginManagement>
 	</build>
 
-</project>
- 
+</project> 

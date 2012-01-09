@@ -45,6 +45,8 @@ import org.societies.api.internal.context.user.history.IUserCtxHistoryMgr;
 
 import org.societies.api.mock.EntityIdentifier;
 
+import java.util.ArrayList;
+
 /**
  * This is the class for the Automatic Community Configuration Manager component
  * 
@@ -119,6 +121,9 @@ public class AutomaticCommunityConfigurationManager {
 	 */
 	
 	public void identifyCissToConfigure() {
+		ArrayList<CisRecord> cisRecords = new ArrayList();
+		
+		
 		if (linkedCss != null) {
 			//CisRecord[] records = ICisManager.getCisList(/** CISs administrated by the CSS */);
 		}
@@ -129,7 +134,27 @@ public class AutomaticCommunityConfigurationManager {
 			//CisRecord[] records = ICisManager.getCisList(/** CISs in the domain */);
 		}
 		
+		//for (int i = 0; i < records.size(); i++)
+		    //cisRecords.add(records[i]);
+		
 		//process
+		
+		//SIMPLISTIC v0.1 algorithm
+		    //For each CIS member, If CIS member has been inactive for 1 month, suggest them to leave
+		    //If suggestion refused, suggest again in 2 * time before last suggestion to do so (or time inactive if this is first time)
+		    //If no response to suggestion after 1 month, issue warning. If no response to warning after another month, remove CSS from CIS
+		// ^ Above would be tailored to the nature of the CIS, e.g. one where members join and leave rapidly might lower these
+		//timeframes to 1 hour, etc.
+		
+		//for (int i = 0; i < cisRecords.size(); i++) {
+		//    CisRecord cisUnderAnalysis = cisRecords.get(i);
+		//    ArrayList<EntityIdentifier> cisMembers = cisUnderAnalysis.getMembers();
+		//    for (int i = 0; i < cisMembers.size(); i++) {
+		//        if (cisUnderAnalysis.getActivityFeed().getLastActivityForMember(cisMembers.get(i)).getTimestamp() < Time.current() - 240000000)
+		//            //make the suggestion to User Agent based on calcluation
+		
+		//    }
+	    //}
 		
 		//invoke UserAgent suggestion GUI for configurations
 		//OR
@@ -141,7 +166,7 @@ public class AutomaticCommunityConfigurationManager {
     	
     }
     
-    public void getLinkedCss() {
+    public EntityIdentifier getLinkedCss() {
     	return linkedCss;
     }
     
@@ -149,15 +174,16 @@ public class AutomaticCommunityConfigurationManager {
     	this.linkedCss = linkedCss;
     }
     
-    public void getLinkedCis() {
+    public CisRecord getLinkedCis() {
     	return linkedCis;
     }
     
     public void setLinkedCis(CisRecord linkedCis) {
+    	System.out.println("GOT CISRECORD" + linkedCis.toString());
     	this.linkedCis = linkedCis;
     }
     
-    public void getLinkedDomain() {
+    public EntityIdentifier getLinkedDomain() {
     	return linkedDomain;
     }
     

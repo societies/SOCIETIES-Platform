@@ -72,6 +72,8 @@ public class AutomaticCommunityCreationManager {
     
     //private Domain linkedDomain; // No datatype yet representing a domain
 	private EntityIdentifier linkedDomain;
+	
+	private IUserCtxDBMgr userContextDatabaseManager;
     
 	/*
      * Constructor for AutomaticCommunityConfigurationManager
@@ -193,7 +195,7 @@ public class AutomaticCommunityCreationManager {
     	
     }
     
-    public void getLinkedCss() {
+    public EntityIdentifier getLinkedCss() {
     	return linkedCss;
     }
     
@@ -201,7 +203,7 @@ public class AutomaticCommunityCreationManager {
     	this.linkedCss = linkedCss;
     }
     
-    public void getLinkedSuperCis() {
+    public CisRecord getLinkedSuperCis() {
     	return linkedSuperCis;
     }
     
@@ -209,12 +211,21 @@ public class AutomaticCommunityCreationManager {
     	this.linkedSuperCis = linkedSuperCis;
     }
     
-    public void getLinkedDomain() {
+    public EntityIdentifier getLinkedDomain() {
     	return linkedDomain;
     }
     
     public void setLinkedDomain(EntityIdentifier linkedDomain) {
     	this.linkedDomain = linkedDomain;
+    }
+    
+    public IUserCtxDBMgr getUserContextDatabaseManager() {
+    	return userContextDatabaseManager;
+    }
+    
+    public void setUserContextDatabaseManager(IUserCtxDBMgr userContextDatabaseManager) {
+    	System.out.println("GOT database" + userContextDatabaseManager);
+    	this.userContextDatabaseManager = userContextDatabaseManager;
     }
     
 }

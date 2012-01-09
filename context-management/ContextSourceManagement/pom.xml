@@ -1,0 +1,92 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- All projects should inherit from persist-parent -->
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>spring-osgi-parent</artifactId>
+		<version>0.1</version>
+		<relativePath>../../../parent/spring-osgi.xml</relativePath>
+	</parent>
+
+	<!-- groupId is set in parent pom -->
+	<artifactId>ContextSourceMgmt</artifactId>
+	<version>${version.cm}</version>
+	<packaging>bundle</packaging>
+
+	<developers>
+		<developer>
+			<name>Nikos Kalatzis</name>
+			<email>nikosk@cn.ntua.gr</email>
+			<organization>ICCS</organization>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
+				<role>Senior Developer</role>
+			</roles>
+			<timezone>+2</timezone>
+		</developer>
+	</developers>
+
+	<!-- List dependencies here -->
+	<dependencies>
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+	
+		
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
+						<_nouses>true</_nouses>
+					</instructions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+							<groupId>${groupId}</groupId>
+							<artifactId>${artifactId}</artifactId>
+							<version>${version.cm}</version>
+							<type>jar</type>
+							<overWrite>true</overWrite>
+							<outputDirectory>${virgo.home}/pickup/</outputDirectory>
+						</artifactItem>
+					</artifactItems>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+
+
+	<name>Context Source Management</name>
+
+</project>

@@ -32,6 +32,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityLifecycleManagement;
+
 /**
  * This is the test class for the Community Lifecycle Management component
  * 
@@ -48,13 +50,13 @@ public class CommunityLifecycleManagementTest {
 	//}
 	
 	@Test
-	public void testProcessPreviousShortTimecycle() {
-		CommunityLifecycleManagement.processPreviousShortTimecycle();
+	public void testProcessPreviousShortTimeCycle() {
+		//new CommunityLifecycleManagement(new EntityIdentifier("Constructor inputs"), "Test").processPreviousShortTimeCycle();
 	}
 	
 	@Test
-	public void testProcessPreviousLongTimecycle() {
-		CommunityLifecycleManagement.processPreviousLongTimecycle();
+	public void testProcessPreviousLongTimeCycle() {
+		//new CommunityLifecycleManagement(new EntityIdentifier("Constructor inputs"), "Test").processPreviousLongTimeCycle();
 	}
 	
 }

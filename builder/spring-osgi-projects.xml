@@ -52,6 +52,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<!-- Personalisation -->
 		<module>../personalisation/Personalisation-API</module>
 		<module>../context-management/UserContextDBManagement</module>
+		<module>../context-management/UserContextHistoryManagement</module>
 		<module>../context-management/ContextBroker</module>
 		
 		 
