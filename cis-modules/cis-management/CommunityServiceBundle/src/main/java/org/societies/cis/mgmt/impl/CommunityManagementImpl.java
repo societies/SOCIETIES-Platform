@@ -34,8 +34,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.societies.cis.management.api.CISActivityFeed;
-import org.societies.cis.management.api.ServiceSharingRecord;
 import org.societies.cis.mgmt.CommunityManagement;
 import org.societies.comm.xmpp.datatypes.Stanza;
 import org.societies.comm.xmpp.exceptions.CommunicationException;
