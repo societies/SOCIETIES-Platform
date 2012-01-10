@@ -32,5 +32,7 @@
 package org.societies.api.internal.cis.cis_management;
 
 public class ServiceSharingRecord {
+	
+	public ServiceSharingRecord (){}
 
 }

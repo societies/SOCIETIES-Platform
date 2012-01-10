@@ -25,12 +25,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	<repositories>
-		<repository>
-			<id>Internal Maven Central Proxy</id>
-			<url>http://sloth.av.it.pt:8081/nexus/content/repositories/central/</url>
-		</repository>
-	</repositories>
+	
 	<build>
 		<resources>
 			<resource>

@@ -25,42 +25,43 @@
 
 package org.societies.cis.management.cis_editor.impl;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+
+import java.util.Set;
 
 //import org.societies.cis.mgmt;
-import org.societies.cis.management.api.CISActivityFeed;
-import org.societies.cis.management.api.CISRecord;
-import org.societies.cis.management.api.ServiceSharingRecord;
+import org.societies.api.internal.cis.cis_management.CisActivityFeed;
+import org.societies.api.internal.cis.cis_management.CisRecord;
+import org.societies.api.internal.cis.cis_management.ServiceSharingRecord;
 import org.societies.cis.management.cis_editor.ICisEditor;
 
 public class CisEditor implements ICisEditor {
 
-	public CISRecord cisRecord;
-	public CISActivityFeed cisActivityFeed;
-	public List<ServiceSharingRecord> sharedServices; 
+	public CisRecord cisRecord;
+	public CisActivityFeed cisActivityFeed;
+	public Set<ServiceSharingRecord> sharedServices; 
 //	public CommunityManagement commMgmt;
 	
 
 	// constructor for creating a CIS from scratch	
-	public CisEditor(String ownerCss,
+	public CisEditor(String ownerCss, String cisName,
 			String membershipCriteria, String permaLink, String[] membersCss,
 			String password) {
 		
-		cisActivityFeed = new CISActivityFeed();
-		sharedServices = new ArrayList<ServiceSharingRecord>();
+		cisActivityFeed = new CisActivityFeed();
+		sharedServices = new HashSet<ServiceSharingRecord>();
 		
-		cisRecord = new CISRecord(cisActivityFeed,ownerCss, membershipCriteria, permaLink, membersCss,
+		cisRecord = new CisRecord(cisActivityFeed,ownerCss, membershipCriteria, cisName, permaLink, membersCss,
 				password, sharedServices);
 		
-		
+
 		// TODO: broadcast its creation to other nodes?
 
 	}
 
 	// constructor for creating a CIS from a CIS record, maybe the case when we are retrieving data from a database
 	// TODO: double check if we should clone the related objects or just copy the reference (as it is now)
-	public CisEditor(CISRecord cisRecord) {
+	public CisEditor(CisRecord cisRecord) {
 		
 		this.cisRecord = cisRecord; 
 		

@@ -23,11 +23,15 @@
 	<dependencies>
 	<!-- add your dependencies here -->
 
-<dependency>
-  <groupId>org.societies.cis.management</groupId>
-  <version>0.0.1-SNAPSHOT</version>
-  <artifactId>cis-management</artifactId>
-</dependency>
+  
+  <dependency>
+  	<groupId>org.societies.api.internal</groupId>
+	<version>${release.version}</version>
+	<artifactId>societies-api-internal</artifactId>
+</dependency>	
+	
+  
+
 
 	</dependencies>
 
