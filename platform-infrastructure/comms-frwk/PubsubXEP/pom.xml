@@ -14,8 +14,8 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>org.socialblend.dataforms</groupId>
-			<artifactId>dataforms-xep</artifactId>
+			<groupId>jabber.x.data</groupId>
+			<artifactId>DataFormsXep</artifactId>
 			<version>0.0.1</version>
 		</dependency>
 		<dependency>

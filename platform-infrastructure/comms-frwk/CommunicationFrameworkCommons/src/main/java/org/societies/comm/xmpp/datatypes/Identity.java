@@ -39,7 +39,13 @@ public class Identity {
 	private String domainIdentifier;
 	
 	public static Identity getIdentityFromJid(String jid) {
-		return null; // TODO
+		String[] parts = jid.split("@");
+		if (parts.length>1)
+			return new Identity(IdentityType.CSS, parts[0], parts[1]);
+		else {
+			int firstDot = jid.indexOf(".");
+			return new Identity(IdentityType.CIS, jid.substring(0,firstDot), jid.substring(firstDot+1));
+		}
 	}
 	
 	public Identity(IdentityType type, String identifier, String domainIdentifier) {
@@ -81,6 +87,6 @@ public class Identity {
 	}
 	
 	public String getJid(){
-		return null; // TODO
+		return toString();
 	}
 }
