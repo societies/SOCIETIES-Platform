@@ -37,22 +37,44 @@ import org.societies.cis.management.cis_editor.ICisEditor;
 
 public class CisEditor implements ICisEditor {
 
+
 	public CisRecord cisRecord;
 	public CisActivityFeed cisActivityFeed;
 	public Set<ServiceSharingRecord> sharedServices; 
 //	public CommunityManagement commMgmt;
+
+	public String[] membersCss; // TODO: this may be implemented in the CommunityManagement bundle. we need to define how they work together
 	
+	public static final int MAX_NB_MEMBERS = 100;// TODO: this is temporary, we have to set the memberCss to something more suitable
 
 	// constructor for creating a CIS from scratch	
-	public CisEditor(String ownerCss, String cisName,
-			String membershipCriteria, String permaLink, String[] membersCss,
-			String password) {
+	public CisEditor(String ownerCss, String cisId,
+			String membershipCriteria, String permaLink, String password) {
 		
 		cisActivityFeed = new CisActivityFeed();
 		sharedServices = new HashSet<ServiceSharingRecord>();
+		membersCss = new String[MAX_NB_MEMBERS];
 		
-		cisRecord = new CisRecord(cisActivityFeed,ownerCss, membershipCriteria, cisName, permaLink, membersCss,
+		cisRecord = new CisRecord(cisActivityFeed,ownerCss, membershipCriteria, cisId, permaLink, membersCss,
 				password, sharedServices);
+		
+
+		// TODO: broadcast its creation to other nodes?
+
+	}
+	
+	// if just ownerCss and cisId are passed,
+	// password will be set to ""
+	// membership to "default"
+	// permalink to ""
+	public CisEditor(String ownerCss, String cisId) {
+		
+		membersCss = new String[MAX_NB_MEMBERS];
+		cisActivityFeed = new CisActivityFeed();
+		sharedServices = new HashSet<ServiceSharingRecord>();
+		
+		cisRecord = new CisRecord(cisActivityFeed,ownerCss, "default", cisId, "", membersCss,
+				"", sharedServices);
 		
 
 		// TODO: broadcast its creation to other nodes?
@@ -71,6 +93,33 @@ public class CisEditor implements ICisEditor {
 		
 		// TODO: broadcast its creation to other nodes?
 
+	}
+
+	// index for hash and equals was only the cisRecord
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((cisRecord == null) ? 0 : cisRecord.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CisEditor other = (CisEditor) obj;
+		if (cisRecord == null) {
+			if (other.cisRecord != null)
+				return false;
+		} else if (!cisRecord.equals(other.cisRecord))
+			return false;
+		return true;
 	}
 
     

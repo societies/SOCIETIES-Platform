@@ -39,7 +39,7 @@ public class CisRecord {
 	public CisActivityFeed feed;
 	public String ownerCss;
 	public String membershipCriteria;
-	public String cisName;
+	public String cisId;
 	/**
 	 * permaLink is a permanent URL to this CIS. A type of CIS homepage.
 	 */
@@ -51,20 +51,56 @@ public class CisRecord {
 	
 	
 	public CisRecord(CisActivityFeed feed, String ownerCss,
-			String membershipCriteria, String cisName, String permaLink,
+			String membershipCriteria, String cisId, String permaLink,
 			String[] membersCss, String password,
 			Set<ServiceSharingRecord> sharedServices) {
 		super();
 		this.feed = feed;
 		this.ownerCss = ownerCss;
 		this.membershipCriteria = membershipCriteria;
-		this.cisName = cisName;
+		this.cisId = cisId;
 		this.permaLink = permaLink;
 		this.membersCss = membersCss;
 		this.password = password;
 		this.sharedServices = sharedServices;
 	}
-	
+
+
+ // hash code and equals using cisName and ownerCss
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((cisId == null) ? 0 : cisId.hashCode());
+		result = prime * result
+				+ ((ownerCss == null) ? 0 : ownerCss.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CisRecord other = (CisRecord) obj;
+		if (cisId == null) {
+			if (other.cisId != null)
+				return false;
+		} else if (!cisId.equals(other.cisId))
+			return false;
+		if (ownerCss == null) {
+			if (other.ownerCss != null)
+				return false;
+		} else if (!ownerCss.equals(other.ownerCss))
+			return false;
+		return true;
+	}
+
+
+
 	
 
 	
