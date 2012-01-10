@@ -68,8 +68,8 @@ public class PubsubServiceRouter implements FeatureServer {
 
 	@Autowired
 	public PubsubServiceRouter(CommManager endpoint) {
-		impl = new PubsubServiceImpl();
 		this.endpoint = endpoint;
+		impl = new PubsubServiceImpl(endpoint);
 		try {
 			endpoint.register(this); // TODO unregister??
 		} catch (ClassNotFoundException e) {

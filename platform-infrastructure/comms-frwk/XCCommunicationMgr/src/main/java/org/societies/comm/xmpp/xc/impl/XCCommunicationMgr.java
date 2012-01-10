@@ -114,4 +114,10 @@ public class XCCommunicationMgr extends AbstractComponent implements
 			throws CommunicationException {
 		helper.sendMessage(stanza, type, payload);
 	}
+
+	@Override
+	public void sendMessage(Stanza stanza, Object payload)
+			throws CommunicationException {
+		helper.sendMessage(stanza, null, payload);
+	}
 }

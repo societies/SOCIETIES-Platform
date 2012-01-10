@@ -1,30 +1,27 @@
 package org.societies.comm.xmpp.datatypes;
 
 import org.societies.comm.xmpp.datatypes.Identity.IdentityType;
-import org.xmpp.packet.JID;
 
 
-public class Endpoint {
-	private Identity identity;
-	private String nodeIdentifier; //TODO if CIS, this is null?
-
-	public static Endpoint fromJID(JID jid) {
-		Identity i = new Identity(IdentityType.CSS, jid.getNode(),
-				jid.getDomain()); // TODO hardcoded for now
-		Endpoint e = new Endpoint(i, jid.getResource());
-		return e;
-	}
+public class Endpoint extends Identity {
 	
-	public Endpoint(Identity identity, String nodeIdentifier) {
-		this.identity = identity;
+	private String nodeIdentifier;
+	
+	public Endpoint(IdentityType type, String identifier,
+			String domainIdentifier, String nodeIdentifier) {
+		super(type, identifier, domainIdentifier);
 		this.nodeIdentifier = nodeIdentifier;
-	}
-
-	public Identity getIdentity() {
-		return identity;
 	}
 
 	public String getNodeIdentifier() {
 		return nodeIdentifier;
+	}
+	
+	@Override
+	public String getJid() {
+		if (type.equals(IdentityType.CSS))
+			return identifier+"@"+domainIdentifier+nodeIdentifier;
+		else
+			return identifier+"."+domainIdentifier;
 	}
 }

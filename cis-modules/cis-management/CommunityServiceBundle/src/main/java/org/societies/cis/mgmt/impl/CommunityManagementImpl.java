@@ -112,7 +112,7 @@ public class CommunityManagementImpl implements CommunityManagement,
 		if (payload.getClass().equals(Community.class)) {
 			Community c = (Community) payload;
 			if (c.getJoin() != null) {
-				String jid = stanza.getFrom().getIdentity().toString();
+				String jid = stanza.getFrom().getJid();
 				if (!participants.contains(jid)) {
 					participants.add(jid);
 				}
@@ -123,7 +123,7 @@ public class CommunityManagementImpl implements CommunityManagement,
 				return result;
 			}
 			if (c.getLeave() != null) {
-				String jid = stanza.getFrom().getIdentity().toString();
+				String jid = stanza.getFrom().getJid();
 				if (participants.contains(jid)) {
 					participants.remove(jid);
 				}

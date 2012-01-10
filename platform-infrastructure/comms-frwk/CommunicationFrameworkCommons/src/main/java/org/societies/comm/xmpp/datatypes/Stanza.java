@@ -1,27 +1,36 @@
 package org.societies.comm.xmpp.datatypes;
 
+import java.util.UUID;
+
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Packet;
 
 public class Stanza {
+	
 	private final String id;
-	private final Endpoint from;
-	private final Endpoint to;
+	private final Identity from;
+	private final Identity to;
 
 	public static Stanza fromPacket(Packet packet) {
-		Endpoint to = Endpoint.fromJID(packet.getTo());
-		Endpoint from = Endpoint.fromJID(packet.getFrom());
+		Identity to = Identity.fromJid(packet.getTo().toString());
+		Identity from = Identity.fromJid(packet.getFrom().toString());
 		Stanza returnStanza = new Stanza(packet.getID(), from, to);
 		return returnStanza;
 	}
 	
-	public Stanza(String id, Endpoint from, Endpoint to) {
+	public Stanza(String id, Identity from, Identity to) {
 		this.id = id;
 		this.from = from;
 		this.to = to;
 		// Note: Whack won't let us get the Nature out of a packet (IQ, Presence
 		// or Message)
+	}
+	
+	public Stanza(Identity to) {
+		this.id = UUID.randomUUID().toString();
+		this.from = null;
+		this.to = to;
 	}
 
 	public IQ createIQ(IQ.Type type){
@@ -40,11 +49,11 @@ public class Stanza {
 		return id;
 	}
 
-	public Endpoint getFrom() {
+	public Identity getFrom() {
 		return from;
 	}
 
-	public Endpoint getTo() {
+	public Identity getTo() {
 		return to;
 	}
 }
