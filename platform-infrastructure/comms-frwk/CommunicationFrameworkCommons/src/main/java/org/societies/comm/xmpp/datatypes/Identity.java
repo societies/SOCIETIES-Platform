@@ -34,17 +34,22 @@
 package org.societies.comm.xmpp.datatypes;
 
 public class Identity {
-	private IdentityType type;
-	private String identifier;
-	private String domainIdentifier;
+	protected IdentityType type;
+	protected String identifier;
+	protected String domainIdentifier;
 	
-	public static Identity getIdentityFromJid(String jid) {
-		String[] parts = jid.split("@");
-		if (parts.length>1)
-			return new Identity(IdentityType.CSS, parts[0], parts[1]);
-		else {
-			int firstDot = jid.indexOf(".");
-			return new Identity(IdentityType.CIS, jid.substring(0,firstDot), jid.substring(firstDot+1));
+	public static Identity fromJid(String jid) {
+		String[] parts = jid.split("@|/");
+		switch (parts.length) {
+			case 1:
+				int firstDot = jid.indexOf(".");
+				return new Identity(IdentityType.CIS, jid.substring(0,firstDot), jid.substring(firstDot+1));
+			case 2:
+				return new Identity(IdentityType.CSS, parts[0], parts[1]);
+			case 3:
+				return new Endpoint(IdentityType.CSS, parts[0], parts[1], parts[2]);
+			default:
+				return null;
 		}
 	}
 	
@@ -59,14 +64,6 @@ public class Identity {
 			return true;
 		else
 			return false;
-	}
-	
-	// TODO there is an implicit CSS -> XMPP Client & CIS -> XMPP XC decision here
-	public String toString() {
-		if (type.equals(IdentityType.CSS))
-			return identifier+"@"+domainIdentifier;
-		else
-			return identifier+"."+domainIdentifier;
 	}
 	
 	public enum IdentityType {
@@ -87,6 +84,9 @@ public class Identity {
 	}
 	
 	public String getJid(){
-		return toString();
+		if (type.equals(IdentityType.CSS))
+			return identifier+"@"+domainIdentifier;
+		else
+			return identifier+"."+domainIdentifier;
 	}
 }

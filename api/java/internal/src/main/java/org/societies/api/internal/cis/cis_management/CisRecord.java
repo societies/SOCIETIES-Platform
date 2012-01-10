@@ -31,17 +31,42 @@
  */
 package org.societies.api.internal.cis.cis_management;
 
+import java.util.HashSet;
+import java.util.Set;
+
+
 public class CisRecord {
 	public CisActivityFeed feed;
 	public String ownerCss;
 	public String membershipCriteria;
+	public String cisName;
 	/**
 	 * permaLink is a permanent URL to this CIS. A type of CIS homepage.
 	 */
 	public String permaLink;
 	public String[] membersCss;
 	private String password = "none";
-	public ServiceSharingRecord[] sharedServices;
+	public Set<ServiceSharingRecord> sharedServices;
+	
+	
+	
+	public CisRecord(CisActivityFeed feed, String ownerCss,
+			String membershipCriteria, String cisName, String permaLink,
+			String[] membersCss, String password,
+			Set<ServiceSharingRecord> sharedServices) {
+		super();
+		this.feed = feed;
+		this.ownerCss = ownerCss;
+		this.membershipCriteria = membershipCriteria;
+		this.cisName = cisName;
+		this.permaLink = permaLink;
+		this.membersCss = membersCss;
+		this.password = password;
+		this.sharedServices = sharedServices;
+	}
+	
+	
+
 	
 
 }

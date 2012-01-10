@@ -50,6 +50,7 @@ import org.societies.comm.xmpp.datatypes.Identity;
 import org.societies.comm.xmpp.datatypes.Stanza;
 import org.societies.comm.xmpp.datatypes.XMPPError;
 import org.societies.comm.xmpp.datatypes.XMPPError.StanzaError;
+import org.societies.comm.xmpp.interfaces.CommManager;
 import org.societies.comms.xmpp.pubsub.PubsubService;
 
 // TODO
@@ -90,16 +91,16 @@ public class PubsubServiceImpl implements PubsubService {
 	private Map<String, String> redirectedNodes;
 	private PubsubEventSender pes;
 	
-	public PubsubServiceImpl() {
+	public PubsubServiceImpl(CommManager endpoint) {
 		nodes = new HashMap<String, PubsubNode>();
 		redirectedNodes = new HashMap<String, String>();
-		pes = new PubsubEventSender();
+		pes = new PubsubEventSender(endpoint);
 	}
 
 	@Override
 	public Object subscriberSubscribe(Stanza stanza, Pubsub payload) {
-		Identity sender = stanza.getFrom().getIdentity();
-		Identity subscriber = Identity.getIdentityFromJid(payload.getSubscribe().getJid());
+		Identity sender = stanza.getFrom();
+		Identity subscriber = Identity.fromJid(payload.getSubscribe().getJid());
 		String nodeId = payload.getSubscribe().getNode();
 		
 		// TODO "The <subscribe/> element SHOULD possess a 'node' attribute"... what happens when it doesn't?
@@ -135,8 +136,8 @@ public class PubsubServiceImpl implements PubsubService {
 
 	@Override
 	public Object subscriberUnsubscribe(Stanza stanza, Pubsub payload) {
-		Identity sender = stanza.getFrom().getIdentity();
-		Identity subscriber = Identity.getIdentityFromJid(payload.getUnsubscribe().getJid());
+		Identity sender = stanza.getFrom();
+		Identity subscriber = Identity.fromJid(payload.getUnsubscribe().getJid());
 		String nodeId = payload.getUnsubscribe().getNode();
 		String subId = payload.getUnsubscribe().getSubid();
 		
@@ -200,7 +201,7 @@ public class PubsubServiceImpl implements PubsubService {
 
 	@Override
 	public Object subscriberRetrieve(Stanza stanza, Pubsub payload) {
-		Identity sender = stanza.getFrom().getIdentity();
+		Identity sender = stanza.getFrom();
 		String nodeId = payload.getItems().getNode();
 		String subId = payload.getItems().getSubid();
 		List<Item> itemList = payload.getItems().getItem();
@@ -265,7 +266,7 @@ public class PubsubServiceImpl implements PubsubService {
 	public Object publisherPublish(Stanza stanza, Pubsub payload) {
 		String nodeId = payload.getPublish().getNode();
 		Item item = payload.getPublish().getItem();
-		String sender = stanza.getFrom().getIdentity().getJid();
+		String sender = stanza.getFrom().getJid();
 		
 		PubsubNode node = nodes.get(nodeId);
 		
@@ -349,7 +350,7 @@ public class PubsubServiceImpl implements PubsubService {
 	@Override
 	public Object ownerCreate(Stanza stanza, Pubsub payload) {
 		// Support for Support for http://jabber.org/protocol/pubsub#create-nodes
-		Identity owner = stanza.getFrom().getIdentity();
+		Identity owner = stanza.getFrom();
 		String nodeId = payload.getCreate().getNode();
 		
 		// TODO access model
@@ -417,7 +418,7 @@ public class PubsubServiceImpl implements PubsubService {
 			return new XMPPError(StanzaError.item_not_found);
 		
 		// 8.4.3.1 Insufficient Privileges
-		Identity sender = stanza.getFrom().getIdentity();
+		Identity sender = stanza.getFrom();
 		if (!node.getOwner().equals(sender))
 			return new XMPPError(StanzaError.forbidden);
 		
@@ -457,7 +458,7 @@ public class PubsubServiceImpl implements PubsubService {
 			return new XMPPError(StanzaError.item_not_found);
 		
 		// 8.5.3.2 Insufficient Privileges
-		Identity sender = stanza.getFrom().getIdentity();
+		Identity sender = stanza.getFrom();
 		if (!node.getOwner().equals(sender))
 			return new XMPPError(StanzaError.forbidden);
 		
@@ -485,7 +486,7 @@ public class PubsubServiceImpl implements PubsubService {
 			return new XMPPError(StanzaError.item_not_found);
 		
 		// Example 185. Entity is not an owner
-		Identity sender = stanza.getFrom().getIdentity();
+		Identity sender = stanza.getFrom();
 		if (!node.getOwner().equals(sender))
 			return new XMPPError(StanzaError.forbidden);
 		
@@ -493,7 +494,7 @@ public class PubsubServiceImpl implements PubsubService {
 			// 8.8.2 Modify Subscriptions
 			List<org.jabber.protocol.pubsub.owner.Subscription> subscriptions = new ArrayList<org.jabber.protocol.pubsub.owner.Subscription>(payload.getSubscriptions().getSubscription());
 			for (org.jabber.protocol.pubsub.owner.Subscription s : payload.getSubscriptions().getSubscription()) {
-				List<String> subs = node.getSubscriptions(Identity.getIdentityFromJid(s.getJid()));
+				List<String> subs = node.getSubscriptions(Identity.fromJid(s.getJid()));
 				if (s.getSubscription().equals(SUBSCRIPTION_SUBSCRIBED)) {
 					if (subs==null) {
 						node.newSubscription(sender);
@@ -559,7 +560,7 @@ public class PubsubServiceImpl implements PubsubService {
 			return new XMPPError(StanzaError.item_not_found);
 		
 		// Example 204. Entity is not an owner
-		Identity sender = stanza.getFrom().getIdentity();
+		Identity sender = stanza.getFrom();
 		if (!node.getOwner().equals(sender))
 			return new XMPPError(StanzaError.forbidden);
 		

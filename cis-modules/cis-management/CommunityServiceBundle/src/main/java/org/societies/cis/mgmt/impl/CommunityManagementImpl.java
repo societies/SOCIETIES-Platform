@@ -34,8 +34,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.societies.cis.management.api.CISActivityFeed;
-import org.societies.cis.management.api.ServiceSharingRecord;
 import org.societies.cis.mgmt.CommunityManagement;
 import org.societies.comm.xmpp.datatypes.Stanza;
 import org.societies.comm.xmpp.exceptions.CommunicationException;
@@ -112,7 +110,7 @@ public class CommunityManagementImpl implements CommunityManagement,
 		if (payload.getClass().equals(Community.class)) {
 			Community c = (Community) payload;
 			if (c.getJoin() != null) {
-				String jid = stanza.getFrom().getIdentity().toString();
+				String jid = stanza.getFrom().getJid();
 				if (!participants.contains(jid)) {
 					participants.add(jid);
 				}
@@ -123,7 +121,7 @@ public class CommunityManagementImpl implements CommunityManagement,
 				return result;
 			}
 			if (c.getLeave() != null) {
-				String jid = stanza.getFrom().getIdentity().toString();
+				String jid = stanza.getFrom().getJid();
 				if (participants.contains(jid)) {
 					participants.remove(jid);
 				}
