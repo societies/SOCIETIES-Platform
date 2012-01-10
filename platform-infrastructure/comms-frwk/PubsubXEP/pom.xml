@@ -88,8 +88,8 @@
 							</schemaIncludes>
 							<episodes>
 								<episode>
-									<groupId>org.socialblend.dataforms</groupId>
-									<artifactId>dataforms-xep</artifactId>
+									<groupId>jabber.x.data</groupId>
+									<artifactId>DataFormsXep</artifactId>
 									<version>0.0.1</version>
 								</episode>
 							</episodes>
@@ -108,8 +108,8 @@
 							</schemaIncludes>
 							<episodes>
 								<episode>
-									<groupId>org.socialblend.dataforms</groupId>
-									<artifactId>dataforms-xep</artifactId>
+									<groupId>jabber.x.data</groupId>
+									<artifactId>DataFormsXep</artifactId>
 									<version>0.0.1</version>
 								</episode>
 							</episodes>
