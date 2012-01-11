@@ -38,10 +38,10 @@ public interface ICisManager {
 	 * Create a new CIS for the CSS represented by cssId.
 	 * TODO: change the type from String to proper type when CSS ID datatype is defined.
 	 *  
-	 * @param cssId
+	 * @param cssId, cisId
 	 * @return
 	 */
-	CisRecord createCis(String cssId);
+	CisRecord createCis(String cssId, String cisId);
 	/**
 	 * Delete a specific CIS represented by cisId
 	 * TODO: Need to give a more meaningful return.

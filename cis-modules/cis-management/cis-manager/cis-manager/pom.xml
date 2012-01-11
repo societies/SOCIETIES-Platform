@@ -3,14 +3,22 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.societies.cis.management</groupId>
-  <artifactId>cis-editor</artifactId>
+  <artifactId>cis-manager</artifactId>
   <packaging>bundle</packaging>
-	<version>${release.version}</version>
+  <name>Spring OSGi Bundle</name>
+  <version>${release.version}</version>
+  <url>http://www.springframework.org/osgi</url>
+  
 	<developers>
-		<developer>
-			<name>Thomas Vilarinho</name>
-			<email>thomas.vilarinho@sintef.com</email>
-		</developer>
+	    <developer>
+	      <id>tcarlyle</id>
+	      <name>Thomas Vilarinho</name>
+	      <email>thomas.vilarinho@sintef.no</email>
+	      <organization>Sintef</organization>
+	      <roles>
+	        <role>owner</role>
+	      </roles>
+	    </developer>
 	</developers>
 	
 	<parent>
@@ -22,14 +30,20 @@
 
 	<dependencies>
 	<!-- add your dependencies here -->
-
-  
   <dependency>
   	<groupId>org.societies.api.internal</groupId>
 	<version>${release.version}</version>
 	<artifactId>societies-api-internal</artifactId>
 </dependency>	
-
+		
+  <dependency>  
+  <groupId>org.societies.cis.management</groupId>
+  <version>${release.version}</version>
+  <artifactId>cis-editor</artifactId>
+</dependency>	
+	
+	
+	
 
 	</dependencies>
 

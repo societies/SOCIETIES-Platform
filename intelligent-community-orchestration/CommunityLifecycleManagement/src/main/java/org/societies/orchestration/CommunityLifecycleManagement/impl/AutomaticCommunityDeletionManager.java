@@ -43,6 +43,13 @@ import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
 
 import org.societies.api.internal.context.user.history.IUserCtxHistoryMgr;
 
+import org.societies.api.internal.context.broker.IUserCtxBroker;
+import org.societies.api.internal.context.broker.ICommunityCtxBroker;
+import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
+
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.CtxIdentifier;
+
 import org.societies.api.mock.EntityIdentifier;
 
 import java.sql.Timestamp;

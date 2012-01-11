@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.societies.cis.management</groupId>
-  <artifactId>cis-editor</artifactId>
+  <groupId>org.societies.cssmgmt.couldnode</groupId>
+  <artifactId>css-manager-cloud</artifactId>
   <packaging>bundle</packaging>
 	<version>${release.version}</version>
 	<developers>
@@ -23,13 +23,11 @@
 	<dependencies>
 	<!-- add your dependencies here -->
 
-  
-  <dependency>
-  	<groupId>org.societies.api.internal</groupId>
-	<version>${release.version}</version>
-	<artifactId>societies-api-internal</artifactId>
-</dependency>	
-
+	<dependency>
+	  <groupId>org.societies.cis.management</groupId>
+	  <version>${release.version}</version>
+  	  <artifactId>cis-manager</artifactId>
+	</dependency>
 
 	</dependencies>
 
