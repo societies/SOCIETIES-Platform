@@ -9,7 +9,7 @@
 		<version>0.1</version>
 	</parent>
 	<groupId>org.societies.comm.examples</groupId>
-	<artifactId>ExampleServiceManager</artifactId>
+	<artifactId>ServiceManager</artifactId>
 	<packaging>bundle</packaging>
 	<version>${release.version}</version>
 	<developers>
