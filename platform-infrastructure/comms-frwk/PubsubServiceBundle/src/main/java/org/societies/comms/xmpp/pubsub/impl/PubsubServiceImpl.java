@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.xml.bind.JAXBElement;
+
 import org.jabber.protocol.pubsub.Create;
 import org.jabber.protocol.pubsub.Item;
 import org.jabber.protocol.pubsub.Items;
@@ -249,7 +251,9 @@ public class PubsubServiceImpl implements PubsubService {
 			for (String itemId : node.getItemIds()) {
 				Item i = new Item();
 				i.setId(itemId);
-				i.setAny(node.getItemPayload(itemId));
+				Object itemPayload = node.getItemPayload(itemId);
+				LOG.info("itemPayload.getClass()="+itemPayload.getClass());
+				i.setAny(itemPayload);
 				responseItemList.add(i);
 				if (maxItems!=null && responseItemList.size()==maxItems.intValue())
 					break;
@@ -282,14 +286,24 @@ public class PubsubServiceImpl implements PubsubService {
 			//TODO If the <item/> element contains more than one payload element or the namespace of the root payload element does not match the configured namespace for the node
 			
 			// Publish and Update Item ID for Response
-			String itemId = node.publishItem(item.getId(),item.getAny(),sender);
+			Object itemPayload = null;
+			LOG.info("item.getAny().getClass()="+item.getAny().getClass());
+			if (item.getAny() instanceof JAXBElement) {
+				LOG.info("((JAXBElement)item.getAny()).getDeclaredType().toString()="+((JAXBElement)item.getAny()).getDeclaredType().toString());
+				itemPayload = ((JAXBElement)item.getAny()).getValue();
+			}
+			if (item.getAny() instanceof org.w3c.dom.Element) {
+				LOG.info("((org.w3c.dom.Element)item.getAny()).toString()="+((org.w3c.dom.Element)item.getAny()).toString());
+				itemPayload = ((org.w3c.dom.Element)item.getAny());
+			}
+			String itemId = node.publishItem(item.getId(),itemPayload,sender);
 			item.setId(itemId);
 			
 			// Build Notifications
 			org.jabber.protocol.pubsub.event.Items eventItems = new org.jabber.protocol.pubsub.event.Items();
 			org.jabber.protocol.pubsub.event.Item eventItem = new org.jabber.protocol.pubsub.event.Item();
 			eventItem.setId(itemId);
-			eventItem.setAny(item.getAny());
+			eventItem.setAny((org.w3c.dom.Element)item.getAny());
 			eventItems.setNode(nodeId);
 			eventItems.getItem().add(eventItem);
 			pes.sendEvent(node.getSubscribers(), eventItems); // TODO 7.1.2.2 Notification Without Payload

@@ -33,36 +33,36 @@ public class PubsubEventSender extends Thread {
 	public void sendEvent(Collection<Identity> recipients, Object eventPayload) {
 		synchronized (notificationQueue) {
 			notificationQueue.add(new Notification(recipients, eventPayload));
+			notificationQueue.notifyAll();
 		}
-		this.notifyAll();
 	}
 	
-	public void dispose() {
+	public synchronized void dispose() {
 		live = false;
 	}
 	
 	@Override
 	public void run() {
 		while (live) {
-			if (notificationQueue.size()>0) {
-				Notification n = null;
-				synchronized (notificationQueue) {
-					n = notificationQueue.remove(0);
-				}
-				for (Identity i : n.recipients) {
-					Stanza stanza = new Stanza(i);
+			Notification n = null;
+			
+			synchronized (notificationQueue) {
+				while (notificationQueue.size()==0) {
 					try {
-						endpoint.sendMessage(stanza, n.eventPayload);
-					} catch (CommunicationException e) {
-						LOG.warn(e.getMessage());
+						wait(TIMEOUT);
+					} catch (InterruptedException e) {
+						LOG.info("InterruptedException!!!!!!!!");
 					}
 				}
+				n = notificationQueue.remove(0);
 			}
-			else {
+
+			for (Identity i : n.recipients) {
+				Stanza stanza = new Stanza(i);
 				try {
-					Thread.sleep(TIMEOUT);
-				} catch (InterruptedException e) {
-					// TODO
+					endpoint.sendMessage(stanza, n.eventPayload);
+				} catch (CommunicationException e) {
+					LOG.warn(e.getMessage());
 				}
 			}
 		}
