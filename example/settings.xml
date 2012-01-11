@@ -56,7 +56,7 @@
 			<id>Virgo_Deploy_dir</id>
 			<properties>
 				<spring.osgi.deploy.dir>
-					CHANGE_TO_YOUR_VIRGO_HOME_DIRECTORY/pickup
+					CHANGE_TO_YOUR_VIRGO_HOME_DIRECTORY/repository/usr
 				</spring.osgi.deploy.dir>
 			</properties>
 		</profile>
