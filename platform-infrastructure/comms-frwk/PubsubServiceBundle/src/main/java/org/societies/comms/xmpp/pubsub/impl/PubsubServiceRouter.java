@@ -68,8 +68,8 @@ public class PubsubServiceRouter implements FeatureServer {
 
 	@Autowired
 	public PubsubServiceRouter(CommManager endpoint) {
-		impl = new PubsubServiceImpl();
 		this.endpoint = endpoint;
+		impl = new PubsubServiceImpl(endpoint);
 		try {
 			endpoint.register(this); // TODO unregister??
 		} catch (ClassNotFoundException e) {
@@ -194,8 +194,7 @@ public class PubsubServiceRouter implements FeatureServer {
 				return impl.ownerAffiliations(stanza, ops);
 			}
 		}
-		return null; // Communication Framework should see this is null and
-						// return appropriate generic XMPP error
+		return null; // TODO send error!!!
 	}
 
 }

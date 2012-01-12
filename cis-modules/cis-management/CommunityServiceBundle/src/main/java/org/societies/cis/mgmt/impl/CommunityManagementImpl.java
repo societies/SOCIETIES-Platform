@@ -26,7 +26,10 @@
 
 package org.societies.cis.mgmt.impl;
 
+
 import java.util.Collections;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -73,6 +76,7 @@ public class CommunityManagementImpl implements CommunityManagement,
 		participants = new HashSet<String>();
 		leaders = new HashSet<String>();
 		this.endpoint = endpoint;
+	
 		try {
 			endpoint.register(this); // TODO unregister??
 		} catch (ClassNotFoundException e) {
@@ -106,7 +110,7 @@ public class CommunityManagementImpl implements CommunityManagement,
 		if (payload.getClass().equals(Community.class)) {
 			Community c = (Community) payload;
 			if (c.getJoin() != null) {
-				String jid = stanza.getFrom().getIdentity().toString();
+				String jid = stanza.getFrom().getJid();
 				if (!participants.contains(jid)) {
 					participants.add(jid);
 				}
@@ -117,7 +121,7 @@ public class CommunityManagementImpl implements CommunityManagement,
 				return result;
 			}
 			if (c.getLeave() != null) {
-				String jid = stanza.getFrom().getIdentity().toString();
+				String jid = stanza.getFrom().getJid();
 				if (participants.contains(jid)) {
 					participants.remove(jid);
 				}

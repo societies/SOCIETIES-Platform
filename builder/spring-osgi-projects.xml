@@ -61,14 +61,20 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>../personalisation/UserPreferenceLearning</module>
 		<module>../personalisation/PersonalisationManager</module>
 		
-		<!-- Communications Infrastructure
-		<module>../platform-infrastructure/comms-frwk/CommunicationFrameworkCommons
-		</module>
-		<module>../platform-infrastructure/comms-frwk/ClientCommunicationMgr
-		</module>
-		<module>../platform-infrastructure/comms-frwk/XCCommunicationMgr
-		</module>
-		-->
+		<!-- Communications Infrastructure -->
+		<!--
+		<module>../platform-infrastructure/comms-frwk/CommonLibraries</module>
+		<module>../platform-infrastructure/comms-frwk/CommunicationFrameworkCommons</module>
+		<module>../platform-infrastructure/comms-frwk/XCCommunicationMgr</module>
+		<module>../platform-infrastructure/comms-frwk/ExampleServices/Calculator</module>
+		<module>../platform-infrastructure/comms-frwk/ExampleServices/CalculatorBean</module>
+		<module>../platform-infrastructure/comms-frwk/ExampleServices/FortuneCookie</module>
+		<module>../platform-infrastructure/comms-frwk/ExampleServices/FortuneCookieBean</module>
+		<module>../platform-infrastructure/comms-frwk/ExampleServices/ExampleServiceMgr</module>
+		 -->
+		
+		<!-- <module>../platform-infrastructure/comms-frwk/ClientCommunicationMgr</module> -->
+		
 		<!-- Security and Dependability Mgmt -->
 
 		<!-- CSS Mgmt -->

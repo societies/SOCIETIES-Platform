@@ -29,12 +29,18 @@
 			<groupId>jabber.x.data</groupId>
 			<artifactId>DataFormsXep</artifactId>
 			<version>0.0.1</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jabber.protocol.pubsub</groupId>
 			<artifactId>PubsubXep</artifactId>
 			<version>0.0.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.igniterealtime</groupId>
+			<artifactId>whack</artifactId>
+			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -94,13 +100,27 @@
     					<Import-Package>
     						org.springframework.beans.factory.annotation*;version="0",
     						org.springframework.stereotype*;version="0",
-							*
+    						org.xmpp.packet*,
+    						!org.gjt.*,
+    						!org.jaxen.*,
+    						!org.mortbay.*,
+    						!org.relaxng.*,
+    						!org.jvnet.staxex,
+    						!org.jvnet.fastinfoset,
+    						!com.sun.xml.fastinfoset.*,
+    						!com.sun.msv.*,
+							*;resolution:=optional
     					</Import-Package>
     					<Export-Package>
-		           			
+    						org.societies.comms.xmpp.pubsub,
+		           			jabber.x.data,
+							org.jabber.protocol.pubsub,
+							org.jabber.protocol.pubsub.errors,
+							org.jabber.protocol.pubsub.owner,
+							org.jabber.protocol.pubsub.event
 		           		</Export-Package>
 		           		<Embed-Dependency>*;scope=compile</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
+						<Embed-Transitive>false</Embed-Transitive>
 		         	</instructions>
 	       		</configuration>
 			</plugin>		

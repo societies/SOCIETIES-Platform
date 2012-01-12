@@ -14,9 +14,9 @@ public class Service {
 	 */
 	private String serviceEndpointURI;
 	/**
-	 * It represents the CSS endpoint where the service is physically installed.
+	 * It represents the CSS Id where the service is physically installed.
 	 */
-	// private org.societies.comm.xmpp.Endpoint CSSInstalled;
+	 private String CSSIDInstalled;
 	/**
 	 * The version of the service, it must be updated by developer
 	 */
@@ -28,7 +28,7 @@ public class Service {
 	/**
 	 * <No description from WP3>
 	 */
-	private int lifetime;
+	private long lifetime;
 	/**
 	 * An alias name for the service
 	 */
@@ -99,14 +99,10 @@ public class Service {
 		this.authorSignature = authorSignature;
 	}
 
-	/**
-	 * Constructor for a new Service object
-	 * 
-	 * @param version
-	 * @param CSSInstalled
-	 * @param name
-	 */
-	/* public void Service(String version, org.societies.comm.xmpp.Endpoint CSSInstalled, String name){
-
-	} */
+	public String getCSSIDInstalled(){
+		return CSSIDInstalled;
+	}
+	public void setCSSIDInstalled(String CSSIDInstalled){
+		this.CSSIDInstalled=CSSIDInstalled;
+	}
 }
