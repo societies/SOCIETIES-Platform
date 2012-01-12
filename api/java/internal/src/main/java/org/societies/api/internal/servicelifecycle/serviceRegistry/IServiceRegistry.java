@@ -81,7 +81,7 @@ public interface IServiceRegistry {
 	public List<Service> retrieveServicesInCSS (Identity CSS);
 	
 	/**
-	 * Description: Based on a CSS identifier this method returns all services that are available within the specified CIS 
+	 * Description: Based on a CIS identifier this method returns all services that are available within the specified CIS 
 	 * @param CIS that represents the identifier for CIS
 	 * @return a List of services retrieved
 	 */
