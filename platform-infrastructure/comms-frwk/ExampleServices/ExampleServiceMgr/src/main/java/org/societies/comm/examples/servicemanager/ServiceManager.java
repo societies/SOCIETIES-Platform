@@ -33,6 +33,7 @@ package org.societies.comm.examples.servicemanager;
 
 //COMMUNICATION MANAGER IMPORTS
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -56,7 +57,12 @@ import org.societies.comm.examples.fortunecookiebean.FortuneCookieBeanResult;
 public class ServiceManager implements FeatureServer {
 
 	private final static String NAMESPACE = "http://societies.org/ExampleServiceManager";
-	private static List<String> ManagedPackages = new ArrayList<String>();
+	private static final List<String> PACKAGES = Collections.unmodifiableList(
+							  Arrays.asList("org.societies.comm.examples.ServiceManager",
+											"org.societies.comm.examples.CalculatorBean",
+											"org.societies.comm.examples.FortuneCookieBean"));
+
+	//private static List<String> ManagedPackages = new ArrayList<String>();
 	
 	//PRIVATE VARIABLES
 	private CommManager commManager;
@@ -91,11 +97,9 @@ public class ServiceManager implements FeatureServer {
 	//METHODS
 	public ServiceManager() {
 		//ADD THE PROJECTS THAT THIS SERVICE MANAGER MANAGES INCLUDING THEIR INTERFACE BEANS
-		ManagedPackages.add("org.societies.comm.examples.servicemanager");
-		ManagedPackages.add("org.societies.comm.examples.Calculator");
-		ManagedPackages.add("org.societies.comm.examples.CalculatorBean");
-		ManagedPackages.add("org.societies.comm.examples.FortuneCookie");
-		ManagedPackages.add("org.societies.comm.examples.FortuneCookieBean");
+		//ManagedPackages.add("org.societies.comm.examples.ServiceManager");
+		//ManagedPackages.add("org.societies.comm.examples.CalculatorBean");
+		//ManagedPackages.add("org.societies.comm.examples.FortuneCookieBean");
 	}
 	
 	public void InitService() {
@@ -114,7 +118,7 @@ public class ServiceManager implements FeatureServer {
 	 */
 	@Override
 	public List<String> getJavaPackages() {
-		return ManagedPackages;
+		return PACKAGES;
 	}
 	
 	/* Add your namespace here. It is used when registering your component.

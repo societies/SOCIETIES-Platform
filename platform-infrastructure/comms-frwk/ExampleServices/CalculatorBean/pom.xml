@@ -10,7 +10,7 @@
 	<groupId>org.societies.comm.examples</groupId>
 	<artifactId>CalculatorBean</artifactId>
 	<version>${release.version}</version>
-	<packaging>bundle</packaging>
+	<packaging>jar</packaging>
 
 	<dependencies>
 		<dependency>
@@ -27,6 +27,7 @@
 		</dependency>
 	</dependencies>
 
+	<!--
 	<build>
 		<plugins>
 			<plugin>
@@ -38,7 +39,6 @@
 					<include>**/*.java</include></includes>
 				</configuration>
 			</plugin>
-			<!-- Don't forget Java 5!! -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -56,7 +56,6 @@
 						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<!-- <Import-Package></Import-Package>  -->
 						<Export-Package>org.societies.comm.examples.calculatorbean</Export-Package>
 					</instructions>
 				</configuration>
@@ -79,4 +78,5 @@
 			</plugin>
 		</plugins>
 	</build>
+	 -->
 </project>
