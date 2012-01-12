@@ -148,6 +148,8 @@ public class AutomaticCommunityDeletionManager {
 		//  
 		//        Date date= new java.util.Date();
 		//        System.out.println(new Timestamp(date.getTime()));
+        //        ^Above 2 lines would produce something of this format: 
+		//           2010-03-08 14:59:30.252
 		//
 		//        Future directions here can include - being able to identify CISs to delete very soon,
 		//        or at more flexible time than just the 5 days as above,
