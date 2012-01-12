@@ -62,6 +62,10 @@ public class IntelligentCommunityMembershipEngine {
 		
 	}
 	
+    public EntityIdentifier[] identifyPotentialCissToJoin() {
+		
+	}
+	
 	/**
 	 * This method returns the recommended potential CIS members who should be encouraged to join
 	 * or automatically entered. 
@@ -76,6 +80,22 @@ public class IntelligentCommunityMembershipEngine {
 	public EntityIdentifier[] getRecommendedCsss(CisRecord cisId, String[] compatibilityStrengths) {
 		
 	}
+	
+	/**
+	 * This method returns the recommended potential CISs that the CSS user should be encouraged to join
+	 * or automatically entered into. 
+	 * 
+	 * @param cssId ID of the CSS asking for recommendations.
+	 * @return list of recommended CISs in form of CISRecord data type.
+	 */
+	public EntityIdentifier[] getRecommendedCiss() {
+		
+	}
+	
+	public EntityIdentifier[] getRecommendedCiss(String[] compatibilityStrengths) {
+		
+	}
+	
 	public void setCompatibilityStrengths(String[] compatibilityStrengths) {
 		
 	}
