@@ -27,6 +27,10 @@ package org.societies.orchestration.IntelligentCommunityMembershipEngine.impl;
 
 import org.societies.cis.management.api.*;
 
+import org.societies.api.internal.cis.cis_management.CisRecord;
+
+import org.societies.api.mock.EntityIdentifier;
+
 /**
  * The class for the Intelligent Community Membership Engine
  *
@@ -35,7 +39,28 @@ import org.societies.cis.management.api.*;
  */
 public class IntelligentCommunityMembershipEngine {
 	
-	public EntityIdentifier[] identifyPotentialCisMembers(EntityIdentifier cisId);
+	public String[] compatibilityStrengths;
+	
+	public EntityIdentifier linkedCss; //The user this component runs on behalf of - null otherwise
+	public EntityIdentifier linkedCis; //The single CIS this component runs on behalf of - null otherwise
+	public EntityIdentifier linkedCiss; //The group of CISs this component runs on behalf of - null otherwise
+	
+		
+	public IntelligentCommunityMembershipEngine (EntityIdentifier linkedCss) {
+		
+	}
+	
+    public IntelligentCommunityMembershipEngine (CisRecord linkedCis) {
+		
+	}
+    
+    public IntelligentCommunityMembershipEngine (CisRecord[] linkedCiss) {
+		
+	}
+	
+	public EntityIdentifier[] identifyPotentialCisMembers(EntityIdentifier cisId) {
+		
+	}
 	
 	/**
 	 * This method returns the recommended potential CIS members who should be encouraged to join
