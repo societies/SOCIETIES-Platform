@@ -37,6 +37,12 @@ public class CisActivityFeed {
 	public void getActivities(String CssId, String timePeriod){};
 	public void getActivities(String CssId, String query, String timePeriod){};
 	public void addCisActivity(CisActivity activity){};
-	public void cleanupFeed(String criteria){};
+	public void cleanupFeed(String criteria){}
+	
+	public CisActivityFeed() {
+	
+	};
+	
+	
 
 }

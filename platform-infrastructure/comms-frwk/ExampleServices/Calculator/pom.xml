@@ -43,8 +43,7 @@
 						<Embed-Transitive>true</Embed-Transitive>
 						<!-- <Import-Package></Import-Package>  -->
 						<Export-Package>
-							org.societies.comm.examples.calculator,
-							org.societies.comm.examples.calculatorbean
+							org.societies.comm.examples.calculator
 						</Export-Package>
 					</instructions>
 				</configuration>

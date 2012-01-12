@@ -39,6 +39,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.stream.XMLStreamException;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -48,6 +49,8 @@ import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.comm.xmpp.datatypes.Stanza;
+import org.societies.comm.xmpp.datatypes.XMPPError;
+import org.societies.comm.xmpp.datatypes.XMPPError.StanzaError;
 import org.societies.comm.xmpp.exceptions.CommunicationException;
 import org.societies.comm.xmpp.interfaces.CommCallback;
 import org.societies.comm.xmpp.interfaces.FeatureServer;
@@ -168,13 +171,26 @@ public class CommManagerHelper {
 			Object bean = u.unmarshal(new InputSource(new StringReader(element
 					.asXML())));
 			Object responseBean = fs.receiveQuery(Stanza.fromPacket(iq), bean);
-			return buildResponseIQ(originalFrom, id, responseBean);
+			if (responseBean!=null && responseBean instanceof XMPPError)
+				return buildApplicationErrorResponse(originalFrom, id, (XMPPError)responseBean);
+			else
+				return buildResponseIQ(originalFrom, id, responseBean);
 		} catch (UnavailableException e) {
 			LOG.info(e.getMessage());
 			return buildErrorResponse(originalFrom, id, e.getMessage());
-		} catch (Exception e) {
+		} catch (JAXBException e) {
 			String message = e.getClass().getName()
-					+ "Error unmarshalling the message:" + e.getMessage();
+					+ "Error (un)marshalling the message:" + e.getMessage();
+			LOG.info(message);
+			return buildErrorResponse(originalFrom, id, message);
+		} catch (XMLStreamException e) {
+			String message = e.getClass().getName()
+					+ "Error (un)marshalling the message:" + e.getMessage();
+			LOG.info(message);
+			return buildErrorResponse(originalFrom, id, message);
+		} catch (DocumentException e) {
+			String message = e.getClass().getName()
+					+ "Error (un)marshalling the message:" + e.getMessage();
 			LOG.info(message);
 			return buildErrorResponse(originalFrom, id, message);
 		}
@@ -247,6 +263,7 @@ public class CommManagerHelper {
 					this.getClass().getClassLoader());
 			Unmarshaller u = jc.createUnmarshaller();
 			Marshaller m = jc.createMarshaller();
+			//m.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 			
 			LOG.info("registering " + fs.getXMLNamespace());
 			featureServers.put(fs.getXMLNamespace(), fs);
@@ -288,28 +305,46 @@ public class CommManagerHelper {
 			return null;
 		}
 	}
+	
+	private IQ buildApplicationErrorResponse(JID originalFrom, String id, XMPPError error) throws XMLStreamException, JAXBException, UnavailableException, DocumentException {
+		IQ errorResponse = new IQ(Type.error, id);
+		errorResponse.setTo(originalFrom);
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		os.write(error.getStanzaErrorBytes(), 0, error.getStanzaErrorBytes().length);
+		if (error.getApplicationError()!=null) {
+			InlineNamespaceXMLStreamWriter inxsw = new InlineNamespaceXMLStreamWriter(os);
+			getMarshaller(error.getApplicationError().getClass().getPackage()).marshal(error.getApplicationError(), inxsw);
+		}
+		os.write(XMPPError.CLOSE_ERROR_BYTES,0,XMPPError.CLOSE_ERROR_BYTES.length);
+		ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+		Document dom4jError = reader.read(is);
+		errorResponse.getElement().add(dom4jError.getRootElement());
+		return errorResponse;
+	}
 
 	private IQ buildErrorResponse(JID originalFrom, String id, String message) {
 		LOG.info("Error occurred:" + message);
 		IQ errorResponse = new IQ(Type.error, id);
 		errorResponse.setTo(originalFrom);
 		PacketError error = new PacketError(
-				PacketError.Condition.service_unavailable,
+				PacketError.Condition.internal_server_error,
 				PacketError.Type.cancel, message);
 		errorResponse.getElement().add(error.getElement());
 		return errorResponse;
 	}
 
 	private IQ buildResponseIQ(JID originalFrom, String id, Object responseBean)
-			throws JAXBException, DocumentException, UnavailableException {
+			throws JAXBException, DocumentException, UnavailableException, XMLStreamException {
 		IQ responseIq = new IQ(Type.result, id);
 		responseIq.setTo(originalFrom);
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		getMarshaller(responseBean.getClass().getPackage()).marshal(
-				responseBean, os);
-		ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-		Document document = reader.read(is);
-		responseIq.getElement().add(document.getRootElement());
+		InlineNamespaceXMLStreamWriter inxsw = new InlineNamespaceXMLStreamWriter(os);
+		if (responseBean!=null) {
+			getMarshaller(responseBean.getClass().getPackage()).marshal(responseBean, inxsw);
+			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+			Document document = reader.read(is);
+			responseIq.getElement().add(document.getRootElement());
+		}
 		return responseIq;
 	}
 

@@ -32,6 +32,10 @@
 package org.societies.comm.examples.servicemanager;
 
 //COMMUNICATION MANAGER IMPORTS
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.societies.comm.xmpp.datatypes.Stanza;
 import org.societies.comm.xmpp.interfaces.CommManager;
 import org.societies.comm.xmpp.interfaces.FeatureServer;
@@ -51,6 +55,9 @@ import org.societies.comm.examples.fortunecookiebean.FortuneCookieBeanResult;
 
 public class ServiceManager implements FeatureServer {
 
+	private final static String NAMESPACE = "http://societies.org/ExampleServiceManager";
+	private static List<String> ManagedPackages = new ArrayList<String>();
+	
 	//PRIVATE VARIABLES
 	private CommManager commManager;
 	private ICalc calcService;
@@ -82,7 +89,14 @@ public class ServiceManager implements FeatureServer {
 	}
 
 	//METHODS
-	public ServiceManager() { }
+	public ServiceManager() {
+		//ADD THE PROJECTS THAT THIS SERVICE MANAGER MANAGES INCLUDING THEIR INTERFACE BEANS
+		ManagedPackages.add("org.societies.comm.examples.servicemanager");
+		ManagedPackages.add("org.societies.comm.examples.Calculator");
+		ManagedPackages.add("org.societies.comm.examples.CalculatorBean");
+		ManagedPackages.add("org.societies.comm.examples.FortuneCookie");
+		ManagedPackages.add("org.societies.comm.examples.FortuneCookieBean");
+	}
 	
 	public void InitService() {
 		//REGISTER OUR ServiceManager WITH THE XMPP Communication Manager
@@ -95,19 +109,19 @@ public class ServiceManager implements FeatureServer {
 		}
 	}
 	
-	
-	/* Add your package name here. It is used when registering your component.
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.FeatureServer#getJavaPackages()
 	 */
 	@Override
-	public String getJavaPackage() {
-		return "org.societies.comm.examples.servicemanager";
+	public List<String> getJavaPackages() {
+		return ManagedPackages;
 	}
-
+	
 	/* Add your namespace here. It is used when registering your component.
 	 */
 	@Override
 	public String getXMLNamespace() {
-		return "http://societies.org/ExampleServiceManager";
+		return NAMESPACE;
 	}
 
 	/* Put your functionality here if there is NO return object, ie, VOID 
@@ -174,5 +188,4 @@ public class ServiceManager implements FeatureServer {
 		
 		return null;
 	}
-
 }

@@ -44,7 +44,16 @@ import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
 
 import org.societies.api.internal.context.user.history.IUserCtxHistoryMgr;
 
+import org.societies.api.internal.context.broker.IUserCtxBroker;
+import org.societies.api.internal.context.broker.ICommunityCtxBroker;
+import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
+
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.CtxIdentifier;
+
 import org.societies.api.mock.EntityIdentifier;
+
+import java.util.List;
 
 /**
  * This is the class for the Automatic Community Creation Manager component.
@@ -72,6 +81,11 @@ public class AutomaticCommunityCreationManager {
     
     //private Domain linkedDomain; // No datatype yet representing a domain
 	private EntityIdentifier linkedDomain;
+	
+	private IUserCtxDBMgr userContextDatabaseManager;
+	private IUserCtxBroker userContextBroker;
+	private ICommunityCtxBroker communityContextBroker;
+	private IUserCtxBrokerCallback userContextBrokerCallback;
     
 	/*
      * Constructor for AutomaticCommunityConfigurationManager
@@ -128,18 +142,58 @@ public class AutomaticCommunityCreationManager {
 		
 		ArrayList<CisRecord> cissToCreate = null;
 		
+		//v0.1 algorithms
 		
-		if (evaluationType.equals("extensive")) {
+		if (evaluationType.equals("extensive")) { //every day or so
 			if (linkedCss != null) {
 				interactedCssIDs = getIDsOfInteractingCsss();
-				//retrieve as much context data on CSS user and inter-CSS connections 
+				
+				//first step: look for more obvious CISs on high-priority kinds of context,
+				//e.g. friends in contact list, family in contact list (from SNS extractor or SOCIETIES)
+				
+				//If CISs are appropriate for friends' lists in Google+ circle fashion, then that counts
+				
+				
+				
+				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "close friends", userContextBrokerCallback);
+				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+				
+				List<CtxIdentifier> contextList; //the list retrieved from above callback
+				
+				//look up user joined CISs. Does a CIS already exist with very similar membership
+				//structure to friends list, e.g. of total CIS members, at least 80% are from friends list,
+				//or at least 80% of CIS members are from friends list. Although such a CIS could evolve,
+				//eventually failing to meet that, it's a first approximation for now at least.
+				
+				//if no pre-existing CIS for this purpose, add to list of CISs that will be suggested
+				//to create or automatically create
+				
+				
+				
+				//second step: some obvious CISs that might benefit a user.
+				
+				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "family relations", userContextBrokerCallback);
+				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+				
+				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "nationality", userContextBrokerCallback);
+				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+				
+				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "first language", userContextBrokerCallback);
+				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+				
+				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "interests", userContextBrokerCallback);
+				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+				
+				
+				
+				//final step: retrieve as much context data on CSS user and inter-CSS connections 
 				//amongst their immediate connection neighbourhood as possible.
 				
 				// processing - here or delegated to local method
 			}
 		}
 			
-		else {
+		else { //non-extensive check, every minute or so.
 			if (linkedCss != null) {
 				interactedCssIDs = getIDsOfInteractingCsss();
 				//retrieve recent history of certain kinds of context data on CSS user and inter-CSS connections 
@@ -215,6 +269,15 @@ public class AutomaticCommunityCreationManager {
     
     public void setLinkedDomain(EntityIdentifier linkedDomain) {
     	this.linkedDomain = linkedDomain;
+    }
+    
+    public IUserCtxDBMgr getUserContextDatabaseManager() {
+    	return userContextDatabaseManager;
+    }
+    
+    public void setUserContextDatabaseManager(IUserCtxDBMgr userContextDatabaseManager) {
+    	System.out.println("GOT database" + userContextDatabaseManager);
+    	this.userContextDatabaseManager = userContextDatabaseManager;
     }
     
 }

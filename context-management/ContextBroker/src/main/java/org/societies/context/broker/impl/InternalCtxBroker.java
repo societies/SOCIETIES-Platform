@@ -27,12 +27,14 @@ package org.societies.context.broker.impl;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
@@ -44,6 +46,9 @@ import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
 import org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback;
 import org.societies.api.internal.context.user.prediction.PredictionMethod;
 
+import org.societies.api.internal.context.user.history.IUserCtxHistoryCallback;
+import org.societies.api.internal.context.user.history.IUserCtxHistoryMgr;
+
 /**
  * Platform Context Broker Implementation
  * This class implements the internal context broker interfaces and the callback interface of the community context db 
@@ -53,8 +58,11 @@ public class InternalCtxBroker extends CtxBroker implements IUserCtxBroker, ICom
 
 	private IUserCtxDBMgr userDB;
 
-	public InternalCtxBroker(IUserCtxDBMgr userDB) {
+	private IUserCtxHistoryMgr userHocDB;
+
+	public InternalCtxBroker(IUserCtxDBMgr userDB,IUserCtxHistoryMgr userHocDB) {
 		this.userDB=userDB;
+		this.userHocDB = userHocDB;
 		System.out.println(this.getClass().getName()+" full");
 	}
 
@@ -66,12 +74,17 @@ public class InternalCtxBroker extends CtxBroker implements IUserCtxBroker, ICom
 		this.userDB = userDB;
 	}
 
+
+	public void setUserCtxHistoryMgr (IUserCtxHistoryMgr userHocDB) {
+		this.userHocDB = userHocDB;
+	}
+
+
 	@Override
 	public void createAttribute(CtxEntityIdentifier scope,CtxAttributeValueType enumerate, String type,
 			IUserCtxBrokerCallback brokerCallback) {
 		UserDBCallback callback = new UserDBCallback(brokerCallback);
 		userDB.createAttribute(scope, enumerate, type, callback);
-
 	}
 
 	@Override
@@ -244,8 +257,9 @@ public class InternalCtxBroker extends CtxBroker implements IUserCtxBroker, ICom
 
 	@Override
 	public void retrievePast(CtxAttributeIdentifier attrId, Date startDate,
-			Date endDate, IUserCtxBrokerCallback callback) {
-		// TODO Auto-generated method stub
+			Date endDate, IUserCtxBrokerCallback brokerCallback) {
+		UserHoCDBCallback callback = new UserHoCDBCallback(brokerCallback);
+		userHocDB.retrieveHistory(attrId, startDate, endDate, callback);
 
 	}
 
@@ -277,12 +291,92 @@ public class InternalCtxBroker extends CtxBroker implements IUserCtxBroker, ICom
 	}
 
 	@Override
-	public void update(CtxModelObject identifier,
+	public void update(CtxModelObject modelObject,
 			IUserCtxBrokerCallback brokerCallback) {
 		UserDBCallback callback = new UserDBCallback(brokerCallback);
-		userDB.update(identifier, callback);
+
+		userDB.update(modelObject, callback);
+
+		// this part allows the storage of attribute updates to context history
+		if(modelObject.getModelType().equals(CtxModelType.ATTRIBUTE)){
+			CtxAttribute ctxAttr = (CtxAttribute)modelObject; 
+			if (ctxAttr.isHistoryRecorded() && userHocDB != null){
+				Date date = new Date();
+				//	System.out.println("storing hoc attribute");
+				userHocDB.storeHoCAttribute(ctxAttr, date);
+			}
+		}
+	}
+
+
+	private class UserHoCDBCallback implements IUserCtxHistoryCallback {
+
+
+		private IUserCtxBrokerCallback brokerCallback;
+
+		UserHoCDBCallback(IUserCtxBrokerCallback brokerCallback) {
+			this.brokerCallback = brokerCallback;
+		} 
+
+		@Override
+		public void ctxRecordingDisable() {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void ctxRecordingEnabled() {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void historyTupleIdsRetrieved(
+				List<List<CtxAttributeIdentifier>> tupleIds) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void historyTuplesRegistered() {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void historyRemovedByDate(int i) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void historyRemovedByType(int i) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void historyRetrievedIndex(List<CtxHistoryAttribute> history) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void historyRetrievedDate(List<CtxHistoryAttribute> history) {
+
+			this.brokerCallback.historyCtxRetrieved(history);
+			//System.out.println("history retrieved "+history);
+		}
+
+		@Override
+		public void historyTuplesRetrieved(
+				Map<CtxAttribute, List<CtxAttribute>> tuples) {
+			// TODO Auto-generated method stub
+
+		}
 
 	}
+
 
 
 	private class UserDBCallback implements IUserCtxDBMgrCallback {
