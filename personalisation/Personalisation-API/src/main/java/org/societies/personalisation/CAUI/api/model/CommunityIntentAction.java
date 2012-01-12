@@ -141,5 +141,13 @@ public class CommunityIntentAction implements ICommunityIntentAction{
 		
 	}
 
+	@Override
+	public double getTransProb() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	
+
 }
 
