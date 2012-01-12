@@ -10,9 +10,7 @@
     <artifact type="bundle" name="org.societies.cis.mgmt.CommunityServiceBundle"/>
     <artifact type="bundle" name="org.societies.comms.xmpp.pubsub.PubsubServiceBundle"/>
     <artifact type="bundle" name="org.societies.comm.examples.Calculator"/>
-    <artifact type="bundle" name="org.societies.comm.examples.CalculatorBean"/>
     <artifact type="bundle" name="org.societies.comm.examples.FortuneCookie"/>
-    <artifact type="bundle" name="org.societies.comm.examples.FortuneCookieBean"/>
     <artifact type="bundle" name="org.societies.comm.examples.ServiceManager"/>
 
 </plan>
