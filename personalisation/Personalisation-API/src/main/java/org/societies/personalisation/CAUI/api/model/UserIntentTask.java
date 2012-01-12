@@ -24,16 +24,46 @@
  */
 package org.societies.personalisation.CAUI.api.model;
 
+
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class UserIntentTask implements IUserIntentTask{
 
+	String taskID;
+
+	int confidenceLevel;
+
+	private double transProb;
+
+	//A map that contains the context type and the context values assigned to this UserTask;
+	Map<String, Serializable> taskContext;
+
+	// A set with the action object belonging to this task and their probabilities
+	LinkedHashMap<IUserIntentAction,Double > userActions ;
+
+	UserIntentTask(){
+
+	}
+
+
+	public UserIntentTask (String taskName, Long uniqueNumber,double transProb){
+		this.taskID = taskName+"/"+uniqueNumber;
+		this.confidenceLevel = 51;
+		this.transProb = transProb;
+	}
+	/*
+    public UserIntentTask (String taskID, LinkedHashMap<IUserIntentAction,Double> userActions){
+        this.taskID = taskID;
+        this.userActions = userActions;
+    }
+	 */
+
 	@Override
 	public String getTaskID() {
 		// TODO Auto-generated method stub
-		return null;
+		return taskID;
 	}
 
 	@Override
@@ -45,19 +75,43 @@ public class UserIntentTask implements IUserIntentTask{
 	@Override
 	public void addActions(LinkedHashMap<IUserIntentAction, Double> userActions) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public Map<String, Serializable> getTaskContext() {
-		// TODO Auto-generated method stub
-		return null;
+		return taskContext;
 	}
 
 	@Override
 	public void setTaskContext(Map<String, Serializable> taskContext) {
-		// TODO Auto-generated method stub
-		
+		this.taskContext = taskContext;
+
+	}
+
+	public String toString(){
+		String string = this.taskID+" "+transProb;
+		return string;
+	}
+
+
+	@Override
+	public void setConfidenceLevel(int confidenceLevel) {
+		this.confidenceLevel = confidenceLevel;
+
+	}
+
+
+	@Override
+	public int getConfidenceLevel() {
+		return this.confidenceLevel;
+	}
+
+
+	@Override
+	public double getTransProb() {
+
+		return transProb;
 	}
 
 }

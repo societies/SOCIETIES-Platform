@@ -25,109 +25,73 @@
 package org.societies.personalisation.CAUI.api.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.personalisation.model.Action;
 
 
 /**
- * This class represents an action performed by a user.
+ * This class represents an action performed by a user and modeled in user intent model.
  * 
  * @author <a href="mailto:nikoskal@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
  *
  */
 
-public class UserIntentAction implements IUserIntentAction{
+public class UserIntentAction extends Action implements IUserIntentAction, Serializable {
+
+	String actionID ;
+	HashMap<String,Serializable> actionContext = new HashMap<String,Serializable>(); 
+	private int confidenceLevel;
 	
-	/**
-	 * 
-	 */
+	private double transProb;
+
+
+	public UserIntentAction(String par, String val,Long id, double transProb){
+		super(par,val);
+		this.actionID = par +"="+val+"/"+id; 
+		this.transProb = transProb;
+		this.confidenceLevel = 51;
+	}
+
+
 	private static final long serialVersionUID = 1L;
-
-	@Override
-	public String getvalue() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getparameterName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<String> getparameterNames() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ServiceResourceIdentifier getServiceID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getServiceType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<String> getServiceTypes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setServiceID(ServiceResourceIdentifier id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setServiceType(String type) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setServiceTypes(List<String> types) {
-		// TODO Auto-generated method stub
-		
-	}
+	
 
 	@Override
 	public String getActionID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
+		return this.actionID;
+	}
+	
+	@Override
+	public String toString() {
+		String string = this.actionID+" "+transProb;
+		return string;
+	}
+	
 	@Override
 	public HashMap<String, Serializable> getActionContext() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.actionContext;
 	}
 
 	@Override
 	public void setActionContext(HashMap<String, Serializable> context) {
-		// TODO Auto-generated method stub
-		
+		this.actionContext = context;
 	}
 
 	@Override
 	public void setConfidenceLevel(int confidenceLevel) {
-		// TODO Auto-generated method stub
-		
+		this.confidenceLevel = confidenceLevel;
+
 	}
 
 	@Override
 	public int getConfidenceLevel() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.confidenceLevel;
+	}
+
+	public double getTransProb() {
+		return transProb;
 	}
 
 	
