@@ -184,7 +184,9 @@ public class AutomaticCommunityCreationManager {
 				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "interests", userContextBrokerCallback);
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				
-				
+				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "local CSSs", userContextBrokerCallback);
+				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+				//historyOfLocalCsss.add(thisResult);
 				
 				//final step: retrieve as much context data on CSS user and inter-CSS connections 
 				//amongst their immediate connection neighbourhood as possible.

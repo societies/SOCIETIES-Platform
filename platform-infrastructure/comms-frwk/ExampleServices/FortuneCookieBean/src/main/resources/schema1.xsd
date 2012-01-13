@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:complexType name="fortuneCookieBeanResult">
+    <xs:sequence>
+      <xs:element name="id" type="xs:int"/>
+      <xs:element name="value" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="fortuneCookieBean">
+    <xs:sequence>
+      <xs:element name="method" type="methodName" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="methodName">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="getCookie"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+

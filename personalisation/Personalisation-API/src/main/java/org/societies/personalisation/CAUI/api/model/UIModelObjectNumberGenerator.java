@@ -22,62 +22,14 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.personalisation.CAUI.api.model;
 
-/**
- * Describe your class here...
- *
- * @author aleckey
- *
- */
-package org.societies.comm.examples.calculatorbean;
+public class UIModelObjectNumberGenerator {
 
-/*
-  Based on the below interface, the task is to generate a Bean that will allow you to
-  query which method was called and what parameters were passed. Do not add the return type here.
-  This is added in the Result bean.
- 
-  public interface ICalc 
-  {
-      public int Add(int a, int b);
-      public int Subtract(int a, int b);
-  }
-   
-1) generate XSD, run the maven command:
-> mvn jaxb2:schemagen
-The schema.xsd file will be in /target/generated-resources/schemagen directory
+    private static Long nextValue = 0L;
 
-2) Build the JAR using this new schema.xsd as the source (not the .java files).
-This will add the required XML notations and Object Factory
-> mvn install
+    public static Long getNextValue() {
 
- */
-
-public class CalcBean {
-	
-	public enum operationType {Add, Subtract};
-	private operationType operation;
-	private int a;
-	private int b;
-	
-	public int getA() {
-		return a;
-	}
-	public void setA(int a) {
-		this.a = a;
-	}
-
-	public int getB() {
-		return b;
-	}
-	public void setB(int b) {
-		this.b = b;
-	}
-
-	public operationType getOperation() {
-		return operation;
-	}
-	
-	public void setOperation(operationType operation) {
-		this.operation = operation;
-	}
+        return nextValue++;
+    }
 }

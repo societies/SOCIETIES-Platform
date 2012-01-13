@@ -9,9 +9,10 @@
 		<version>0.1</version>
 	</parent>
 	<groupId>org.societies.comm.examples</groupId>
-	<artifactId>ServiceManager</artifactId>
+	<artifactId>ExampleServiceManager</artifactId>
 	<packaging>bundle</packaging>
 	<version>${release.version}</version>
+	
 	<developers>
 	    <developer>
 	      <name>Alec</name>
@@ -21,7 +22,7 @@
 	      </roles>
 	    </developer>
 	</developers>
-
+    
 	<dependencies>
 		<!-- Communication Manager  -->
 		<dependency>
@@ -40,8 +41,8 @@
 		<dependency>
 			<groupId>org.societies.comm.examples</groupId>
 			<artifactId>CalculatorBean</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
+			<version>0.0.1</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.comm.examples</groupId>
@@ -52,8 +53,8 @@
 		<dependency>
 			<groupId>org.societies.comm.examples</groupId>
 			<artifactId>FortuneCookieBean</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
+			<version>0.0.1</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 
@@ -65,17 +66,20 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Bundle-Activator></Bundle-Activator>
+						<Import-Package>
+    						org.springframework.beans.factory.annotation*;version="0",
+    						org.springframework.stereotype*;version="0",
+							*
+						</Import-Package>
+						<Export-Package>
+							org.societies.comm.examples.ExampleServiceManager,
+							org.societies.comm.examples.FortuneCookieBean,
+							org.societies.comm.examples.CalculatorBean
+						</Export-Package>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<!-- <Import-Package></Import-Package> -->
-						<!-- <Export-Package></Export-Package> -->
 					</instructions>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
