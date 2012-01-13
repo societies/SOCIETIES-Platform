@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
 
 import org.societies.android.platform.interfaces.ICoreServiceExample;
 import org.societies.android.platform.interfaces.ServiceMethodTranslator;
+import org.societies.android.platform.servicemonitor.CoreMonitor.IncomingHandler;
 
 import android.app.Service;
 import android.content.Intent;
@@ -46,9 +47,10 @@ public class DifferentProcessService extends Service implements ICoreServiceExam
 
 	private Messenger inMessenger;
 	
-	public DifferentProcessService() {
-		super();
-		this.inMessenger = new Messenger(new IncomingHandler());
+	@Override
+	public void onCreate () {
+		this.inMessenger = new Messenger(new IncomingHandler());	
+		Log.i(this.getClass().getName(), "Service starting");
 	}
 	
 	class IncomingHandler extends Handler {
@@ -106,6 +108,11 @@ public class DifferentProcessService extends Service implements ICoreServiceExam
 		}
 	}
 	
+	@Override
+	public void onDestroy() {
+		Log.i(this.getClass().getName(), "Service terminating");
+	}
+
 	@Override
 	public IBinder onBind(Intent arg0) {
 		return inMessenger.getBinder();
