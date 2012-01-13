@@ -72,9 +72,9 @@
 							*
 						</Import-Package>
 						<Export-Package>
-							org.societies.comm.examples.ExampleServiceManager,
-							org.societies.comm.examples.FortuneCookieBean,
-							org.societies.comm.examples.CalculatorBean
+							org.societies.comm.examples.servicemanager,
+							org.societies.comm.examples.fortunecookiebean,
+							org.societies.comm.examples.calculatorbean
 						</Export-Package>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>

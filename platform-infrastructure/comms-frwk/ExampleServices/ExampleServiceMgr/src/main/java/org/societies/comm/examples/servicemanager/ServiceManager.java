@@ -51,14 +51,15 @@ import org.societies.comm.examples.fortunecookie.api.IWisdom;
 import org.societies.comm.examples.fortunecookie.datatypes.Cookie;
 import org.societies.comm.examples.fortunecookiebean.FortuneCookieBean;
 import org.societies.comm.examples.fortunecookiebean.FortuneCookieBeanResult;
+import org.societies.comm.examples.fortunecookiebean.MethodName;
 
 
 public class ServiceManager implements FeatureServer {
 
 	private final static String NAMESPACE = "http://societies.org/CalculatorService";
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
-							  Arrays.asList("org.societies.comm.examples.CalculatorBean",
-											"org.societies.comm.examples.FortuneCookieBean"));
+							  Arrays.asList("org.societies.comm.examples.calculatorbean",
+											"org.societies.comm.examples.fortunecookiebean"));
 
 	//private static List<String> ManagedPackages = new ArrayList<String>();
 	
@@ -146,11 +147,11 @@ public class ServiceManager implements FeatureServer {
 			CalcBean calc = (CalcBean) payload;
 			
 			int result=0; int a = 0; int b = 0;
-			String text = "";
+			String text = ""; 
 			switch (calc.getOperation()) {
 			
 			//Add() METHOD
-			case Add:
+			case ADD:
 				a = calc.getA();
 				b = calc.getB();
 				result = calcService.Add(a, b);
@@ -158,7 +159,7 @@ public class ServiceManager implements FeatureServer {
 				break;
 
 			//Subtract() method
-			case Subtract:
+			case SUBTRACT:
 				a = calc.getA();
 				b = calc.getB();
 				result = calcService.Subtract(a, b);
@@ -176,7 +177,7 @@ public class ServiceManager implements FeatureServer {
 		else if (payload.getClass().equals(FortuneCookieBean.class)) {
 			FortuneCookieBean fcBean = (FortuneCookieBean) payload;
 			
-			if (fcBean.getMethod().equals(FortuneCookieBean.methodName.getCookie)) {
+			if (fcBean.getMethod().equals(MethodName.GET_COOKIE)) {
 				//NO PARAMETERS FOR THIS METHOD
 				Cookie fortune = fcGenerator.getCookie();
 				

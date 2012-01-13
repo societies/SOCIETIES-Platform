@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema  targetNamespace='http://societies.org/comm/examples/calculatorbean'
+			elementFormDefault='qualified' 
+			xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+			xmlns="http://societies.org/comm/examples/calculatorbean">
 
   <xs:complexType name="calcBean">
     <xs:sequence>
