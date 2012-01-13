@@ -12,6 +12,6 @@
     <artifact type="bundle" name="org.societies.cis.mgmt.CommunityServiceBundle"/>
     <artifact type="bundle" name="org.societies.comm.examples.Calculator"/>
     <artifact type="bundle" name="org.societies.comm.examples.FortuneCookie"/>
-    <artifact type="bundle" name="org.societies.comm.examples.ServiceManager"/>
+    <artifact type="bundle" name="org.societies.comm.examples.ExampleServiceManager"/>
 
 </plan>
