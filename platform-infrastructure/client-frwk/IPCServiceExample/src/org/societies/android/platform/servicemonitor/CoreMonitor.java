@@ -27,11 +27,13 @@ public class CoreMonitor extends Service implements ICoreServiceMonitor {
 	public static final String ACTIVE_TASKS = "org.societies.android.platform.servicemonitor.ACTIVE_TASKS";
 	public static final String INTENT_RETURN_KEY = "org.societies.android.platform.servicemonitor.ReturnValue";
 	
-	public CoreMonitor() {
-		super();
+	@Override
+	public void onCreate () {
 		this.inMessenger = new Messenger(new IncomingHandler());
+		Log.i(this.getClass().getName(), "Service starting");
+
 	}
-	
+
 	class IncomingHandler extends Handler {
 		
 		@Override
@@ -91,7 +93,10 @@ public class CoreMonitor extends Service implements ICoreServiceMonitor {
 	public IBinder onBind(Intent arg0) {
 		return inMessenger.getBinder();
 	}
-
+	@Override
+	public void onDestroy() {
+		Log.i(this.getClass().getName(), "Service terminating");
+	}
 	/**
 	 * {@link ICoreServiceMonitor}
 	 * 

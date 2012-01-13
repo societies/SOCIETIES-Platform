@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.societies.android.platform.interfaces.ICoreServiceExample;
 import org.societies.android.platform.interfaces.ICoreServiceMonitor;
+import org.societies.android.platform.servicemonitor.CoreMonitor.IncomingHandler;
 import org.societies.utilities.DBC.Dbc;
 
 import android.app.ActivityManager;
@@ -38,6 +39,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.Messenger;
 import android.util.Log;
 
 public class SameProcessService extends Service implements ICoreServiceExample, ICoreServiceMonitor {
@@ -45,12 +47,16 @@ public class SameProcessService extends Service implements ICoreServiceExample, 
 	private static final int MAX_TASKS = 30;
 
 
-	private final IBinder binder;
+	private IBinder binder = null;
 	
-	public SameProcessService() {
-		super();
-		binder = new LocalBinder();
+	
+	@Override
+	public void onCreate () {
+		this.binder = new LocalBinder();
+		Log.i(this.getClass().getName(), "Service starting");
+
 	}
+
 	
 	public class LocalBinder extends Binder {
 		SameProcessService getService() {
@@ -66,6 +72,11 @@ public class SameProcessService extends Service implements ICoreServiceExample, 
 	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
 		return this.binder;
+	}
+
+	@Override
+	public void onDestroy() {
+		Log.i(this.getClass().getName(), "Service terminating");
 	}
 
 	public String getGreeting() {
