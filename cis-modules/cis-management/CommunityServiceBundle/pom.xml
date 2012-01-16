@@ -29,12 +29,12 @@
 			<groupId>org.societies.community</groupId>
 			<artifactId>CommunityXep</artifactId>
 			<version>0.0.1</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
-			<artifactId>CommunicationFrameworkInterface</artifactId>
-			<version>0.0.1</version>
+	  		<artifactId>CommunicationFrameworkCommons</artifactId>
+	  		<version>0.0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		
@@ -85,7 +85,8 @@
 							*
     					</Import-Package>
     					<Export-Package>
-		           			org.societies.cis.mgmt
+		           			org.societies.cis.mgmt,
+		           			org.societies.community
 		           		</Export-Package>
 		           		<Embed-Dependency>*;scope=compile</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>

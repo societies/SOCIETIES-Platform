@@ -32,6 +32,36 @@ package org.societies.api.internal.security.policynegotiator;
  * @author Mitja Vardjan
  *
  */
-public interface INegotiationProvider extends INegotiationRequester {
+public interface INegotiationProvider {
 
+	/**
+	 * Get all available options for the policy.
+	 * 
+	 * @param callback The callback to be invoked to return the result.
+	 * 
+	 * @return All available options embedded in a single XML document.
+	 */
+	public void getPolicyOptions(INegotiationProviderCallback callback);
+
+	/**
+	 * Accept given policy option and get the final legal agreement signed by
+	 * both parties.
+	 * 
+	 * @param sessionId ID of this session
+	 * 
+	 * @param signedPolicyOption The selected policy alternative, accepted and
+	 * signed by the requester side. Includes requester identity and signature.
+	 * 
+	 * @param modified True if policy option has been changed during the
+	 * negotiation process. False if policy is as provided by the provider side.
+	 */
+	public void acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
+			boolean modified, INegotiationProviderCallback callback);
+	
+	/**
+	 * Reject all options and terminate negotiation.
+	 * 
+	 * @param sessionId ID of this session
+	 */
+	public void reject(int sessionId);
 }

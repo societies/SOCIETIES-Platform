@@ -1,38 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.security.policynegotiator</groupId>
+	<groupId>org.societies.security</groupId>
 	<artifactId>policynegotiator</artifactId>
-	<!-- the version is the same as the release -->
 	<version>${release.version}</version>
-	<!-- the packaging tag enables the creation of the correct manifest using the maven-bundle-plugin -->
 	<packaging>bundle</packaging>
-	
-	<description>
-    	This bundle provides a secure and generic policy negotiation between two parties: requester and provider.
-    </description>
-    
+	<name>Secure Policy Negotiator Bundle</name>
+
+	<description>This bundle provides a secure and generic policy negotiation between two parties: requester and provider.</description>
+
 	<developers>
 		<developer>
-	        <id>mvardjan</id>
+			<id>mvardjan</id>
 			<name>Mitja Vardjan</name>
-            <email>mitja.vardjan@setcce.si</email>
+			<email>mitja.vardjan@setcce.si</email>
 			<organization>SETCCE</organization>
-      		<organizationUrl>http://www.setcce.si</organizationUrl>
-            <roles>
-                <role>owner</role>
-	            <role>developer</role>
-            </roles>
+			<organizationUrl>http://www.setcce.si</organizationUrl>
+			<roles>
+				<role>owner</role>
+				<role>developer</role>
+			</roles>
 		</developer>
 	</developers>
-	
+
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<relativePath>../../../parent/spring-osgi.xml</relativePath>
 		<version>0.1</version>
 	</parent>
+
+	<properties>
+		<spring.maven.artifact.version>2.5.6.SEC01</spring.maven.artifact.version>
+		<spring.osgi.version>1.2.1</spring.osgi.version>
+		<equinox.ver>3.2.2</equinox.ver>
+	</properties>
 
 	<dependencies>
 
@@ -51,9 +55,42 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.societies.security.sign</groupId>
-			<artifactId>sign</artifactId>
+			<groupId>org.societies.security</groupId>
+			<artifactId>signature-mgr</artifactId>
 			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.beans</artifactId>
+			<version>${spring.maven.artifact.version}</version>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>com.springsource.org.apache.commons.logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.context</artifactId>
+			<version>${spring.maven.artifact.version}</version>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>com.springsource.org.apache.commons.logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -61,39 +98,41 @@
 
 	<build>
 		<plugins>
+
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>
-					<instructions>						
+					<instructions>
 						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<Import-Package>*;resolution:=optional</Import-Package>
-						<Export-Package>
-							org.societies.api.internal.security.policynegotiator.*
-						</Export-Package>
-						<!-- Private-Package>
-							org.societies.security.sign.*,
-							org.societies.security.something.*
-						</Private-Package -->
-						<_nouses>true</_nouses>						
+						<!--Import-Package>*;resolution:=optional</Import-Package-->
+						<Import-Package>
+							org.societies.api.security.digsig;version="0",
+							org.springframework.beans.factory.annotation;version="0",
+							org.springframework.stereotype;version="0",
+							javax.annotation;version="0",**;resolution:=optional
+						</Import-Package>
+						<Export-Package>org.societies.api.internal.security.policynegotiator.*</Export-Package>
+						<!-- Private-Package> org.societies.security.digsig.*, org.societies.security.something.* 
+							</Private-Package -->
+						<_nouses>true</_nouses>
 					</instructions>
 				</configuration>
-		
 			</plugin>
-						<!--  used to exclude  some certain files -->
-			<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-             </plugin>
-
 			
+			<!-- used to exclude some certain files -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -110,6 +149,7 @@
 					</artifactItems>
 				</configuration>
 			</plugin>
-		</plugins> 	
+		</plugins>
 	</build>
+	
 </project>

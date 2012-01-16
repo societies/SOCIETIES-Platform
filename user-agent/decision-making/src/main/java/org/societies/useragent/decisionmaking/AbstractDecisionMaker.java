@@ -75,7 +75,7 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 						ExpProposalContent epc=new ExpProposalContent("Conflict Detected!",
 								options);
 						if(feedbackHandler.getExplicitFB(
-								ExpProposalType.RADIOLIST,epc)){
+								ExpProposalType.RADIOLIST,epc).equals(intent.toString())){
 							action=intent;
 							/*return true for intent false for preference*/
 						}else{

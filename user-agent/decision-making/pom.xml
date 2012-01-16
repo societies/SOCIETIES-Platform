@@ -13,7 +13,7 @@
 			<email>haoyi.xiong@it-sudparis.eu</email>
 		</developer>
 	</developers>
-	
+
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
@@ -22,20 +22,24 @@
 	</parent>
 
 	<dependencies>
-	<!-- add your dependencies here -->
-	<dependency>
-	<groupId>org.societies.api.external</groupId>
-	<artifactId>societies-api</artifactId>
-	<version>${release.version}</version>
-	<scope>provided</scope>
-	</dependency>
-	<dependency>
-	<groupId>org.societies.api.internal</groupId>
-	<artifactId>societies-api-internal</artifactId>
-	<version>${release.version}</version>
-	<scope>provided</scope>
-	</dependency>
-
+		<!-- add your dependencies here -->
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.useragent</groupId>
+			<artifactId>conflict</artifactId>
+			<version>${version.ua}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -49,6 +53,7 @@
 						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
+						<Import-Package>*;org.societies.useragent.conflict</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -65,7 +70,7 @@
 							<groupId>${project.groupId}</groupId>
 							<artifactId>${project.artifactId}</artifactId>
 							<version>${version.ua}</version>
-							<type>bundle</type>
+							<type>jar</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</artifactItem>

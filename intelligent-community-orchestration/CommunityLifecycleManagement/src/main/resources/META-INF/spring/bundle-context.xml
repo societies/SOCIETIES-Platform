@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+	xmlns:context="http://www.springframework.org/schema/context">
+	
+  <!-- regular spring configuration file defining the beans for this
+       bundle. We've kept the osgi definitions in a separate 
+       configuration file so that this file can easily be used
+       for integration testing outside of an OSGi environment -->
+
+   <bean id="CommunityLifecycleManagement" class="org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityLifecycleManagement" 
+   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, UserCtxHistoryManager, EntityIdentifier" init-method="initialiseCommunityLifecycleManagement">
+   <property name="linkedCss" ref="EntityIdentifier"></property>
+   <property name="linkedCis" ref="CisRecord"></property>
+   <property name="linkedDomain" ref="EntityIdentifier"></property>
+   <property name="autoCreationManager" ref="AutomaticCommunityCreationManager"></property>
+   <property name="autoConfigurationManager" ref="AutomaticCommunityConfigurationManager"></property>
+   <property name="autoDeletionManager" ref="AutomaticCommunityDeletionManager"></property>
+   </bean>
+   
+   <bean id="AutomaticCommunityCreationManager" class="org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityCreationManager" 
+   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, UserCtxHistoryManager, EntityIdentifier" init-method="initialiseAutomaticCommunityCreationManager">
+   <property name="linkedCss" ref="EntityIdentifier"></property>
+   <property name="linkedDomain" ref="EntityIdentifier"></property>
+   <property name="linkedSuperCis" ref="CisRecord"></property>
+   <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>
+   </bean>
+   
+   <bean id="AutomaticCommunityConfigurationManager" class="org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityConfigurationManager" 
+   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, UserCtxHistoryManager, EntityIdentifier" init-method="initialiseAutomaticCommunityConfigurationManager">
+   <property name="linkedCss" ref="EntityIdentifier"></property>
+   <property name="linkedCis" ref="CisRecord"></property>
+   <property name="linkedDomain" ref="EntityIdentifier"></property>
+   </bean>
+   
+   <bean id="AutomaticCommunityDeletionManager" class="org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityDeletionManager" 
+   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, UserCtxHistoryManager, EntityIdentifier" init-method="initialiseAutomaticCommunityDeletionManager">
+   <property name="linkedCss" ref="EntityIdentifier"></property>
+   <property name="linkedCis" ref="CisRecord"></property>
+   <property name="linkedDomain" ref="EntityIdentifier"></property>
+   </bean>
+<!--   <context:component-scan base-package="org.societies.orchestration.CommunityLifecycleManagement.impl"></context:component-scan> -->
+</beans>

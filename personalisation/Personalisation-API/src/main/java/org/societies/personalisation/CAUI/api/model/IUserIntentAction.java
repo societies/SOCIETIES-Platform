@@ -84,5 +84,12 @@ public interface IUserIntentAction  extends IOutcome, Serializable{
      * 
      */
     public int getConfidenceLevel();
+    
+    /**
+     * Returns the transition probability from previous UserAction to this UserAction.
+     * @return
+     */
+    public double getTransProb(); 
+    
 }
 

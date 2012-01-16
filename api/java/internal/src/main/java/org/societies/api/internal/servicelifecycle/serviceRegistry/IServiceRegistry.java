@@ -26,17 +26,10 @@ package org.societies.api.internal.servicelifecycle.serviceRegistry;
 
 import java.util.List;
 
-import org.societies.api.internal.servicelifecycle.serviceRegistry.model.QuerySubjectType;
-import org.societies.api.internal.servicelifecycle.serviceRegistry.model.RegistryEntry;
-import org.societies.api.internal.servicelifecycle.serviceRegistry.model.RegistryEntryOut;
-import org.societies.api.internal.servicelifecycle.serviceRegistry.model.ServiceResourceIdentifier;
+import org.societies.api.internal.servicelifecycle.model.Service;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
 
-//TODO : temporary mock package import to solve missing package "org.societies.comm.identity" in API folder
-import org.societies.api.internal.mock.Identity;
-/*
-import org.societies.comm.identity.Identity;
-*/
-import com.sun.servicetag.Registry;
 /**
  * @author Antonio Panazzolo, Massimo Mazzariol (SN)
  */
@@ -46,57 +39,63 @@ public interface IServiceRegistry {
 	 * Description: This method provides the interface to add a new list of services.
 	 * 				List services can be composed at least by only service at time
 	 * @param servicesList
-	 * @return the list of services registered correctly
+	 * @throws ServiceRegistrationException
 	 */
-	public List<ServiceResourceIdentifier> registerServiceList (List<RegistryEntry> servicesList);
-
+	public void registerServiceList (List<Service> servicesList) throws ServiceRegistrationException;
 	
 	/**
 	 * Description: This method permits you to unregister a services list
 	 * @param servicesList
-	 * @return the list of services removed correctly
+	 * @throws ServiceRegistrationException
 	 */
-	public List<ServiceResourceIdentifier> unregisterServiceList (List<ServiceResourceIdentifier> servicesList);
-
-
-	/**
-	 * Description: This method syncs a remote registry with societies
-	 * @param CSSID
-	 * @return true if the remote registry was successfully synced
-	 */
-	public boolean syncRemoteCSSRegistry (Identity CSSID);
-
+	public void unregisterServiceList (List<Service> servicesList) throws ServiceRegistrationException;
 
 	/**
 	 * Description: Based on a CSS identifier this method returns all services shared by CSS to other CSS or CIS 
-	 * @param CSS that represents the identifier for CSS, 
-	 * 		  type declare if the return list contains services shared to CIS or to CSS
+	 * @param CSSID that represents the identifier for CSS, 		  
 	 * @return a List of services retrieved
 	 */
-	public List<RegistryEntryOut> retrieveServicesSharedByCSS (Identity CSS, QuerySubjectType type);
+	public List<Service> retrieveServicesSharedByCSS (String CSSID);
+	
 	
 	/**
-	 * Description: Based on a CSS identifier this method returns all services that are available within the specified CSS 
-	 * @param CSS that represents the identifier for CSS
+	 * Description: Based on a CIS identifier this method returns all services that are shared by a CIS 
+	 * @param CISID that represents the identifier for CIS
 	 * @return a List of services retrieved
 	 */
-	public List<RegistryEntryOut> retrieveServicesInCSS (Identity CSS);
+	public List<Service> retrieveServicesSharedByCIS (String CISID);
+	
+    /**
+     * Description: Based on a CIS identifier this method is used to notify to the Service Registry that a Service is shared in a CIS
+	 * @param CISID that represents the identifier for CIS that shares the Service
+	 * @param serviceEndpointURI the unique identifier for the shared service
+	 * @throws ServiceSharingNotificationException
+     */
+	public void notifyServiceIsSharedInCIS(String serviceEndpointURI, String CISID) throws ServiceSharingNotificationException;
 	
 	/**
-	 * Description: Based on a CSS identifier this method returns all services that are available within the specified CIS 
-	 * @param CIS that represents the identifier for CIS
-	 * @return a List of services retrieved
-	 */
-	public List<RegistryEntryOut> retrieveServicesInCIS (Identity CIS);
+     * Description: Based on a CIS identifier this method is used to notify to the Service Registry that a Service is removed from a CIS
+	 * @param CISID that represents the identifier for the CIS 
+	 * @param serviceEndpointURI the unique identifier for the service
+	 * @throws ServiceSharingNotificationException
+     */
+
+	 
+	public void removeServiceSharingInCIS(String serviceEndpointURI, String CISID) throws ServiceSharingNotificationException;
+	
 	
 	/**
-	 * Description: Based on a CSS identifier this method returns all services shared to CSS by other CSS or CIS 
-	 * @param CSS that represents the identifier for CSS, 
-	 * 		  type declare if the return list contains services shared by CIS or by CSS
-	 * @return a List of services retrieved
-	 */
-	public List<RegistryEntryOut> retrieveServicesSharedToCSS (Identity CSS, QuerySubjectType type);
+	* Description: Based on a Filter this method returns the services list
+	* matching that particular filter
+	* @param the object used as filter for the query
+	* @return the list of services that match the filter
+	*/
+	public List<Service> findServices (Object filter);
 	
-	
-	
+	/**
+	* Description: Based on a service unique identifier this method returns the associated Service
+	* @param the unique identifier for the Service
+	* @return the corresponding Service
+	*/
+	public Service retrieveService(String serviceEnpointURI);
 }

@@ -18,8 +18,7 @@
         </osgi:interfaces>
         </osgi:service>
         
-        <osgi:reference id="DecisionMaker" interface="org.societies.api.internal.useragent.decisionmaking.IDecisionMaker"/>
+        <bean name="DecisionMaker" class="org.societies.useragent.decisionmaking.DecisionMaker" />
 
 
-		
 </beans>
