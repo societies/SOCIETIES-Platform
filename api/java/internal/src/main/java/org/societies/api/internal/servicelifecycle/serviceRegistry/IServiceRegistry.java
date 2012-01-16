@@ -27,6 +27,7 @@ package org.societies.api.internal.servicelifecycle.serviceRegistry;
 import java.util.List;
 
 import org.societies.api.internal.servicelifecycle.model.Service;
+import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
 
@@ -68,20 +69,20 @@ public interface IServiceRegistry {
     /**
      * Description: Based on a CIS identifier this method is used to notify to the Service Registry that a Service is shared in a CIS
 	 * @param CISID that represents the identifier for CIS that shares the Service
-	 * @param serviceEndpointURI the unique identifier for the shared service
+	 * @param serviceIdentifier the unique identifier for the shared service
 	 * @throws ServiceSharingNotificationException
      */
-	public void notifyServiceIsSharedInCIS(String serviceEndpointURI, String CISID) throws ServiceSharingNotificationException;
+	public void notifyServiceIsSharedInCIS(ServiceResourceIdentifier serviceIdentifier, String CISID) throws ServiceSharingNotificationException;
 	
 	/**
      * Description: Based on a CIS identifier this method is used to notify to the Service Registry that a Service is removed from a CIS
 	 * @param CISID that represents the identifier for the CIS 
-	 * @param serviceEndpointURI the unique identifier for the service
+	 * @param serviceIdentifier the unique identifier for the service
 	 * @throws ServiceSharingNotificationException
      */
 
 	 
-	public void removeServiceSharingInCIS(String serviceEndpointURI, String CISID) throws ServiceSharingNotificationException;
+	public void removeServiceSharingInCIS(ServiceResourceIdentifier serviceIdentifier, String CISID) throws ServiceSharingNotificationException;
 	
 	
 	/**
@@ -94,8 +95,8 @@ public interface IServiceRegistry {
 	
 	/**
 	* Description: Based on a service unique identifier this method returns the associated Service
-	* @param the unique identifier for the Service
+	* @param serviceIdentifier the unique identifier for the Service
 	* @return the corresponding Service
 	*/
-	public Service retrieveService(String serviceEnpointURI);
+	public Service retrieveService(ServiceResourceIdentifier serviceIdentifier);
 }
