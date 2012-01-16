@@ -12,7 +12,8 @@ public class Service {
 	/**
 	 * Unique identifier for a single instance of a service.
 	 */
-	private String serviceEndpointURI;
+	ServiceResourceIdentifier serviceIdentifier;
+	
 	/**
 	 * It represents the CSS Id where the service is physically installed.
 	 */
@@ -25,10 +26,6 @@ public class Service {
 	 * <No description from WP3>
 	 */
 	private String hash;
-	/**
-	 * <No description from WP3>
-	 */
-	private long lifetime;
 	/**
 	 * An alias name for the service
 	 */
@@ -43,13 +40,7 @@ public class Service {
 	private String authorSignature;
 	
 	
-	public String getServiceEndpointURI() {
-		return serviceEndpointURI;
-	}
 	
-	public void setServiceEndpointURI(String serviceEndpointURI) {
-		this.serviceEndpointURI = serviceEndpointURI;
-	}
 	
 	public String getVersion() {
 		return version;
@@ -67,13 +58,6 @@ public class Service {
 		this.hash = hash;
 	}
 	
-	public long getLifetime() {
-		return lifetime;
-	}
-	
-	public void setLifetime(long lifetime) {
-		this.lifetime = lifetime;
-	}
 	
 	public String getServiceName() {
 		return serviceName;
@@ -104,5 +88,13 @@ public class Service {
 	}
 	public void setCSSIDInstalled(String CSSIDInstalled){
 		this.CSSIDInstalled=CSSIDInstalled;
+	}
+
+	public ServiceResourceIdentifier getServiceIdentifier() {
+		return serviceIdentifier;
+	}
+
+	public void setServiceIdentifier(ServiceResourceIdentifier serviceIdentifier) {
+		this.serviceIdentifier = serviceIdentifier;
 	}
 }
