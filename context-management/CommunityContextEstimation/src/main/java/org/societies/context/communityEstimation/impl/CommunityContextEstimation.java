@@ -26,11 +26,11 @@ package org.societies.context.communityEstimation.impl;
 
 import java.util.List;
 
-import org.societies.context.community.estimation.api.platform.EstimationModels;
-import org.societies.context.community.estimation.api.platform.ICommunityCtxEstimationMgr;
-import org.societies.context.mock.spm.identity.EntityIdentifier;
-import org.societies.context.model.api.CtxAttribute;
-import org.societies.context.model.api.CtxEntity;
+import org.societies.api.internal.context.community.estimation.EstimationModels;
+import org.societies.api.internal.context.community.estimation.ICommunityCtxEstimationMgr;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxEntity;
 
 /**
  * @author yboul 07-Dec-2011 4:15:14 PM
