@@ -161,7 +161,7 @@ public class CommunityLifecycleManagement {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				processPreviousShortTimeCycle();
+				processPreviousLongTimeCycle();
 		    }
 		}
 	}

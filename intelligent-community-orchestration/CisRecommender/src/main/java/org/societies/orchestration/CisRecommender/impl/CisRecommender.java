@@ -48,6 +48,8 @@ import org.societies.api.mock.EntityIdentifier;
 
 import org.societies.api.mock.ServiceResourceIdentifier;
 
+import org.societies.orchestration.api.ICommunityLifecycleManagement;
+
 /**
  * The generic CIS Recommender, which acts as a 'gateway' to components for
  * specific recommendation types, and triggers them to act. It performs initial checks 
@@ -63,6 +65,11 @@ public class CisRecommender {
 	private EntityIdentifier linkedCssId;
 	
 	private ServiceResourceIdentifier linkedServiceId;
+	
+	private ICommunityLifecycleManagement communityLifecycleManagement;
+	//intelligent community membership engine
+	//collaboration pattern analyser
+	//etc
 	
 	/*
      * Constructor for CisRecommender
@@ -86,34 +93,76 @@ public class CisRecommender {
 	 * 				linkedServiceId - the service on behalf of which this object is to operate.
 	 */
 	
-	public AutomaticCommunityCreationManager(ServiceResourceIdentifier linkedServiceId) {
+	public CisRecommender(ServiceResourceIdentifier linkedServiceId) {
 		this.linkedServidId = linkedServiceId;
 	}
 	
-	public void recommenderCalling() {
-		/**
-		 * ??
-		 */
+	/**
+	 * COMMUNITY LIFECYCLE MANAGEMENT
+	 * At both short and long regular time intervals, call Community Lifecycle Management 
+	 * with non-extensive or extensive check request, optionally forwarding some input
+	 * as a base.
+	 */
+	
+	public void communityLifecycleManagementCaller() {
 		
-		/**
-		 * COMMUNITY LIFECYCLE MANAGEMENT
-		 * At both short and long regular time intervals, call Community Lifecycle Management 
-		 * with non-extensive or extensive check request, optionally forwarding some input
-		 * as a base.
-		 */
+		new ShortSleepThread().start();
+        new LongSleepThread().start();
 		
-		/**
-		 * COLLABORATION PATTERN ANALYZER
-		 * ??
-		 */
-		
-		/**
-		 * INTELLIGENT COMMUNITY MEMBERSHIP ENGINE
-		 * ??
-		 */
-		
-		/**
-		 * ...
-		 */
 	}
+	
+	class ShortSleepThread extends Thread {
+		
+		public void run() {
+			while (true) {
+				try {
+					Thread.sleep(30000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				communityLifecycleManagement.processPreviousShortTimeCycle();
+		    }
+		}
+	}
+	
+    class LongSleepThread extends Thread {
+		
+		public void run() {
+			while (true) {
+				try {
+					Thread.sleep(86400000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				communityLifecycleManagement.processPreviousLongTimeCycle();
+		    }
+		}
+	}
+		
+	/**
+	 * COLLABORATION PATTERN ANALYZER
+	 * ??
+	 */
+    
+     public void collaborationPatternAnalyserCaller() {
+		
+		new ShortSleepThread().start();
+        new LongSleepThread().start();
+		
+	}
+		
+	/**
+	 * INTELLIGENT COMMUNITY MEMBERSHIP ENGINE
+	 * ??
+	 */
+
+    public void intelligentCommunityMembershipEngineCaller() {
+	
+    }
+		
+	/**
+	 * ...
+	 */
 }
