@@ -49,6 +49,7 @@
 					<extension>true</extension>
 					<readOnly>yes</readOnly>
 					<removeOldOutput>true</removeOldOutput>
+					<generatePackage>org.societies.comm.examples.calculatorbean</generatePackage> 
 				</configuration>
 			</plugin>
 			<plugin>

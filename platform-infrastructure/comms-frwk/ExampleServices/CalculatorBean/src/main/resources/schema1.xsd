@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xs:schema  targetNamespace='http://societies.org/comm/examples/calculatorbean'
-			elementFormDefault='qualified' 
-			xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-			xmlns="http://societies.org/comm/examples/calculatorbean">
+<xs:schema elementFormDefault="qualified" version="1.0" targetNamespace="http://societies.org/comm/examples/calculatorbean" xmlns:tns="http://societies.org/comm/examples/calculatorbean" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-  <xs:complexType name="calcBean">
-    <xs:sequence>
-      <xs:element name="a" type="xs:int"/>
-      <xs:element name="b" type="xs:int"/>
-      <xs:element name="operation" type="operationType" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
+	<xs:element name="calcBean">
+	  <xs:complexType >
+	    <xs:sequence>
+	      <xs:element name="a" type="xs:int"/>
+	      <xs:element name="b" type="xs:int"/>
+	      <xs:element name="operation" type="tns:operationType" minOccurs="0"/>
+	    </xs:sequence>
+	  </xs:complexType>
+	</xs:element>
 
-  <xs:complexType name="calcBeanResult">
-    <xs:sequence>
-      <xs:element name="result" type="xs:int"/>
-      <xs:element name="text" type="xs:string" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
+	<xs:element name="calcBeanResult">
+	  <xs:complexType >
+	    <xs:sequence>
+	      <xs:element name="result" type="xs:int"/>
+	      <xs:element name="text" type="xs:string" minOccurs="0"/>
+	    </xs:sequence>
+	  </xs:complexType>
+	</xs:element>
 
-  <xs:simpleType name="operationType">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Add"/>
-      <xs:enumeration value="Subtract"/>
-    </xs:restriction>
-  </xs:simpleType>
+	<xs:simpleType name="operationType">
+	  <xs:restriction base="xs:string">
+	    <xs:enumeration value="Add"/>
+	    <xs:enumeration value="Subtract"/>
+	  </xs:restriction>
+	</xs:simpleType>
 </xs:schema>
-
