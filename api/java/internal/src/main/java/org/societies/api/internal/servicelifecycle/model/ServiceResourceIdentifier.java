@@ -3,6 +3,8 @@ package org.societies.api.internal.servicelifecycle.model;
 import java.io.Serializable;
 import java.net.URI;
 
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+
 /**
  * @author apanazzolo
  * @version 1.0
@@ -10,7 +12,7 @@ import java.net.URI;
  */
 
 
-public class ServiceResourceIdentifier implements Serializable {
+public class ServiceResourceIdentifier implements IServiceResourceIdentifier, Serializable {
 
 	/**
 	 * @param identifier
