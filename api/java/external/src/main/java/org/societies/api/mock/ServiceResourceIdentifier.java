@@ -1,5 +1,5 @@
 package org.societies.api.mock;
-//See the updated class in org.societies.api.internal.servicelifecycle.model
+/**Use org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier*/
 @Deprecated 
 public class ServiceResourceIdentifier {
 	public String toUriString() {
