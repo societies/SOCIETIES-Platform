@@ -26,15 +26,9 @@ package org.societies.api.internal.servicelifecycle.serviceRegistry;
 
 import java.util.List;
 
+import org.societies.api.internal.servicelifecycle.model.Service;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
-import org.societies.api.internal.servicelifecycle.serviceRegistry.model.QuerySubjectType;
-import org.societies.api.internal.servicelifecycle.serviceRegistry.model.RegistryEntry;
-import org.societies.api.internal.servicelifecycle.serviceRegistry.model.RegistryEntryOut;
-import org.societies.api.internal.servicelifecycle.serviceRegistry.model.ServiceResourceIdentifier;
-
-
-import org.societies.api.internal.servicelifecycle.model.Service;
 
 /**
  * @author Antonio Panazzolo, Massimo Mazzariol (SN)
