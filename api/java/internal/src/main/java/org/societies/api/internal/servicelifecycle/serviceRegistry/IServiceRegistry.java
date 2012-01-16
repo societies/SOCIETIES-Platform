@@ -26,6 +26,8 @@ package org.societies.api.internal.servicelifecycle.serviceRegistry;
 
 import java.util.List;
 
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.model.QuerySubjectType;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.model.RegistryEntry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.model.RegistryEntryOut;
@@ -43,14 +45,16 @@ public interface IServiceRegistry {
 	 * Description: This method provides the interface to add a new list of services.
 	 * 				List services can be composed at least by only service at time
 	 * @param servicesList
+	 * @throws ServiceRegistrationException
 	 */
-	public void registerServiceList (List<Service> servicesList);
+	public void registerServiceList (List<Service> servicesList) throws ServiceRegistrationException;
 	
 	/**
 	 * Description: This method permits you to unregister a services list
 	 * @param servicesList
+	 * @throws ServiceRegistrationException
 	 */
-	public void unregisterServiceList (List<Service> servicesList);
+	public void unregisterServiceList (List<Service> servicesList) throws ServiceRegistrationException;
 
 	/**
 	 * Description: Based on a CSS identifier this method returns all services shared by CSS to other CSS or CIS 
@@ -71,15 +75,19 @@ public interface IServiceRegistry {
      * Description: Based on a CIS identifier this method is used to notify to the Service Registry that a Service is shared in a CIS
 	 * @param CISID that represents the identifier for CIS that shares the Service
 	 * @param serviceEndpointURI the unique identifier for the shared service
+	 * @throws ServiceSharingNotificationException
      */
-	public void notifyServiceIsSharedInCIS(String serviceEndpointURI, String CISID);
+	public void notifyServiceIsSharedInCIS(String serviceEndpointURI, String CISID) throws ServiceSharingNotificationException;
 	
 	/**
      * Description: Based on a CIS identifier this method is used to notify to the Service Registry that a Service is removed from a CIS
 	 * @param CISID that represents the identifier for the CIS 
 	 * @param serviceEndpointURI the unique identifier for the service
+	 * @throws ServiceSharingNotificationException
      */
-	public void removeServiceSharingInCIS(String serviceEndpointURI, String CISID);
+
+	 
+	public void removeServiceSharingInCIS(String serviceEndpointURI, String CISID) throws ServiceSharingNotificationException;
 	
 	
 	/**
