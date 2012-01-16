@@ -22,44 +22,19 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.communityEstimation.impl;
+package org.societies.api.personalisation.mgmt;
 
-import java.util.List;
-
-import org.societies.api.internal.context.community.estimation.EstimationModels;
-import org.societies.api.internal.context.community.estimation.ICommunityCtxEstimationMgr;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxEntity;
+import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.personalisation.model.IAction;
 
 /**
- * @author yboul 07-Dec-2011 4:15:14 PM
+ * Describe your class here...
+ *
+ * @author Eliza
+ *
  */
+public interface IPersonalisationCallback {
 
-public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
-
-	@Override
-	public void estimateContext(EstimationModels estimationModel, List<CtxAttribute> list) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void retrieveCurrentCisContext(boolean Current, EntityIdentifier communityID, List<CtxAttribute> list) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void retrieveHistoryCisContext(boolean Current, EntityIdentifier communityID, List<CtxAttribute> list) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void updateContextModelObject(CtxEntity estimatedContext) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	public void receiveIAction(EntityIdentifier providerId, EntityIdentifier userId, ServiceResourceIdentifier serviceId, IAction action);
 }

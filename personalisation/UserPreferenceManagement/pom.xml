@@ -50,6 +50,16 @@
 	<version>${version.pm}</version>
 	<scope>provided</scope>
 	</dependency>
+	
+	
+		<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-simple</artifactId>
+    <version>${slf4j.version}</version>
+    <scope>provided</scope>
+	</dependency>
+	
+	
 	</dependencies>
 	
 
@@ -68,6 +78,21 @@
 					</instructions>
 				</configuration>
 			</plugin>
+			
+			
+			
+					<!--  used to exclude  some certain files -->	
+			 <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/impl/dataLoading/**</exclude>
+                    </excludes>
+                </configuration>
+             </plugin> 
+             
+			
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>

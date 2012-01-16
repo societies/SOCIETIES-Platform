@@ -29,7 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.Serializable;
 
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+
+
 
 
 public class Action implements IAction, Serializable{
@@ -37,7 +39,7 @@ public class Action implements IAction, Serializable{
 	private String value;
 	private String parameterName;
 	private ArrayList<String> parameterNames;
-	private ServiceResourceIdentifier serviceID;
+	private IServiceResourceIdentifier serviceID;
 	private String serviceType;
 	private ArrayList<String> types;
 	
@@ -110,7 +112,7 @@ public class Action implements IAction, Serializable{
 	}
 
 	@Override
-	public ServiceResourceIdentifier getServiceID() {
+	public IServiceResourceIdentifier getServiceID() {
 		return this.serviceID;
 	}
 
@@ -126,7 +128,7 @@ public class Action implements IAction, Serializable{
 
 
 	@Override
-	public void setServiceID(ServiceResourceIdentifier id) {
+	public void setServiceID(IServiceResourceIdentifier id) {
 		this.serviceID = id;
 		
 	}
