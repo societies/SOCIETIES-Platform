@@ -24,10 +24,10 @@
  */
 package org.societies.context.communityInheritance.impl;
 
-import org.societies.context.community.inheritance.api.platform.ICommunityCtxInheritanceMgr;
-import org.societies.context.mock.spm.identity.EntityIdentifier;
-import org.societies.context.model.api.CtxAttributeIdentifier;
-import org.societies.context.model.api.CtxAttributeValueType;
+import org.societies.api.internal.context.community.inheritance.ICommunityCtxInheritanceMgr;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeValueType;
 
 public class CommunityContextInheritance implements ICommunityCtxInheritanceMgr {
 
