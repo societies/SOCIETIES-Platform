@@ -10,6 +10,26 @@ package org.societies.api.internal.servicelifecycle.model;
 public class Service {
 
 	/**
+	 * @param serviceIdentifier
+	 * @param cSSIDInstalled
+	 * @param version
+	 * @param serviceName
+	 * @param serviceDescription
+	 * @param authorSignature
+	 */
+	public Service(ServiceResourceIdentifier serviceIdentifier,
+			String cSSIDInstalled, String version, String serviceName,
+			String serviceDescription, String authorSignature) {
+		super();
+		this.serviceIdentifier = serviceIdentifier;
+		CSSIDInstalled = cSSIDInstalled;
+		this.version = version;
+		this.serviceName = serviceName;
+		this.serviceDescription = serviceDescription;
+		this.authorSignature = authorSignature;
+	}
+
+	/**
 	 * Unique identifier for a single instance of a service.
 	 */
 	ServiceResourceIdentifier serviceIdentifier;
@@ -22,10 +42,7 @@ public class Service {
 	 * The version of the service, it must be updated by developer
 	 */
 	private String version;
-	/**
-	 * <No description from WP3>
-	 */
-	private String hash;
+	
 	/**
 	 * An alias name for the service
 	 */
@@ -48,14 +65,6 @@ public class Service {
 	
 	public void setVersion(String version) {
 		this.version = version;
-	}
-	
-	public String getHash() {
-		return hash;
-	}
-	
-	public void setHash(String hash) {
-		this.hash = hash;
 	}
 	
 	
