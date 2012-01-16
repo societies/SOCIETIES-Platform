@@ -26,7 +26,9 @@ package org.societies.api.internal.personalisation.model;
 
 import java.io.Serializable;
 
-import org.societies.api.internal.servicelifecycle.serviceRegistry.model.ServiceResourceIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
+
+//import org.societies.api.internal.servicelifecycle.serviceRegistry.model.ServiceResourceIdentifier;
 
 /**
  * @author Eliza
