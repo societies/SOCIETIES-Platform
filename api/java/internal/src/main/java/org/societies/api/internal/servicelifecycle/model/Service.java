@@ -67,11 +67,11 @@ public class Service {
 		this.hash = hash;
 	}
 	
-	public int getLifetime() {
+	public long getLifetime() {
 		return lifetime;
 	}
 	
-	public void setLifetime(int lifetime) {
+	public void setLifetime(long lifetime) {
 		this.lifetime = lifetime;
 	}
 	
