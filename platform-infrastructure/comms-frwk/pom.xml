@@ -60,6 +60,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>ExampleServices/CalculatorBean</module>
 		<module>ExampleServices/FortuneCookie</module>
 		<module>ExampleServices/FortuneCookieBean</module>
-		<module>ExampleServices/ExampleServiceMgr</module>
+		<module>ExampleServices/ExampleCommsMgr</module>
 	</modules>
 </project>

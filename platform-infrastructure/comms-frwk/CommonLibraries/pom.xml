@@ -65,7 +65,7 @@
 							<version>${release.version}</version>
 		           			<type>bundle</type>
 		           			<overWrite>true</overWrite>
-		           			<!--outputDirectory>${spring.osgi.deploy.dir}</outputDirectory-->
+		           			<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 		         		</artifactItem>
 	      			</artifactItems> 			              			        			
 	    		</configuration>
