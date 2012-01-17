@@ -30,7 +30,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 import java.lang.reflect.Method;
+import java.nio.charset.Charset;
 import java.security.InvalidParameterException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -85,6 +87,7 @@ import org.xmpp.packet.PacketError;
  */
 
 // TODO review this class
+// TODO had to place synchronous because marshallers are not threadsafe
 public class CommManagerHelper {
 	private static final String JABBER_CLIENT = "jabber:client";
 	private static final String JABBER_SERVER = "jabber:server";
@@ -216,7 +219,7 @@ public class CommManagerHelper {
 		}
 	}
 
-	public IQ sendIQ(Stanza stanza, IQ.Type type, Object payload,
+	public synchronized IQ sendIQ(Stanza stanza, IQ.Type type, Object payload,
 			CommCallback callback) throws CommunicationException {
 		// Usual disclaimer about how this needs to be optimized ;)
 		try {
@@ -235,7 +238,7 @@ public class CommManagerHelper {
 		}
 	}
 
-	public Message sendMessage(Stanza stanza, Message.Type type, Object payload)
+	public synchronized Message sendMessage(Stanza stanza, Message.Type type, Object payload)
 			throws CommunicationException {
 		if (payload == null) {
 			throw new InvalidParameterException("Payload can not be null");
@@ -317,11 +320,17 @@ public class CommManagerHelper {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		os.write(error.getStanzaErrorBytes(), 0, error.getStanzaErrorBytes().length);
 		if (error.getApplicationError()!=null) {
+			LOG.info("error.getApplicationError()!=null");
 			InlineNamespaceXMLStreamWriter inxsw = new InlineNamespaceXMLStreamWriter(os);
 			getMarshaller(error.getApplicationError().getClass().getPackage()).marshal(error.getApplicationError(), inxsw);
 		}
 		os.write(XMPPError.CLOSE_ERROR_BYTES,0,XMPPError.CLOSE_ERROR_BYTES.length);
 		ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+		
+		LOG.info("Going to parse error... Charset.defaultCharset().toString()="+Charset.defaultCharset().toString());
+		LOG.info("Charset.availableCharsets().keySet().toArray().toString()="+Arrays.toString(Charset.availableCharsets().keySet().toArray()));
+		LOG.info(new String(os.toByteArray()));
+		
 		Document dom4jError = reader.read(is);
 		errorResponse.getElement().add(dom4jError.getRootElement());
 		return errorResponse;
@@ -338,7 +347,7 @@ public class CommManagerHelper {
 		return errorResponse;
 	}
 
-	private IQ buildResponseIQ(JID originalFrom, String id, Object responseBean)
+	private synchronized IQ buildResponseIQ(JID originalFrom, String id, Object responseBean)
 			throws JAXBException, DocumentException, UnavailableException, XMLStreamException {
 		IQ responseIq = new IQ(Type.result, id);
 		responseIq.setTo(originalFrom);
