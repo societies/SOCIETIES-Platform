@@ -115,7 +115,7 @@ public class XMPPError {
 				errorString = "<error type='"+type.typeString+"'>\n<"+error+" xmlns='"+STANZA_ERROR_NAMESPACE_DECL+"'>\n";
 			else
 				errorString = "<error type='"+type.typeString+"'>\n<"+error+" xmlns='"+STANZA_ERROR_NAMESPACE_DECL+"'/>\n";
-			errorBytes = error.getBytes();
+			errorBytes = errorString.getBytes();
 			this.hasText = hasText;
 		}
 	}
