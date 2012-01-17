@@ -26,6 +26,8 @@ package org.societies.api.internal.personalisation.model;
 
 import java.util.List;
 
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+
 
 
 /**
@@ -38,10 +40,10 @@ public interface IActionFeedback {
 	public void getResult();
 
 	/**
-	 * 	// replace with ServiceResourceIdentifier 
+	 * 	
 	 * @return 		The service identifier
 	 */
-	public Object getServiceIdentifier();
+	public IServiceResourceIdentifier getServiceIdentifier();
 
 	/**
 	 * If the service has registered itself with a service type, it should return this

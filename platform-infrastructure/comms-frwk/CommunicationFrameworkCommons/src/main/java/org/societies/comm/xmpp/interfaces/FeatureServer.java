@@ -50,7 +50,7 @@ public interface FeatureServer {
 	 * Get the xml namespaces for this FeatureServer. This will be used in the
 	 * XMPP payloads.
 	 */
-	String getXMLNamespace();
+	List<String> getXMLNamespaces();
 
 	/**
 	 * Get the java package to which the objects this feature deals with belong.

@@ -25,8 +25,8 @@
 package org.societies.api.personalisation.mgmt;
 
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.api.personalisation.model.IAction;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 /**
  * Describe your class here...
@@ -36,5 +36,5 @@ import org.societies.api.personalisation.model.IAction;
  */
 public interface IPersonalisationCallback {
 
-	public void receiveIAction(EntityIdentifier providerId, EntityIdentifier userId, ServiceResourceIdentifier serviceId, IAction action);
+	public void receiveIAction(EntityIdentifier providerId, EntityIdentifier userId, IServiceResourceIdentifier serviceId, IAction action);
 }
