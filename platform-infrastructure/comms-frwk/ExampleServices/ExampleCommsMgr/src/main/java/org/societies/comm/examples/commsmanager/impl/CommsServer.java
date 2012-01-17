@@ -29,7 +29,7 @@
  * @author aleckey
  *
  */
-package org.societies.comm.examples.commsmanager;
+package org.societies.comm.examples.commsmanager.impl;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -56,7 +56,7 @@ import org.societies.comm.examples.fortunecookiebean.FortuneCookieBean;
 import org.societies.comm.examples.fortunecookiebean.FortuneCookieBeanResult;
 import org.societies.comm.examples.fortunecookiebean.MethodName;
 
-public class ServiceManager implements FeatureServer {
+public class CommsServer implements FeatureServer {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 							  Arrays.asList("http://societies.org/comm/examples/calculatorbean",
@@ -69,7 +69,7 @@ public class ServiceManager implements FeatureServer {
 	private CommManager commManager;
 	private ICalc calcService;
 	private IWisdom fcGenerator;
-	private static Logger LOG = LoggerFactory.getLogger(ServiceManager.class);
+	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
 	
 	//PROPERTIES
 	public CommManager getCommManager() {
@@ -97,7 +97,7 @@ public class ServiceManager implements FeatureServer {
 	}
 
 	//METHODS
-	public ServiceManager() {
+	public CommsServer() {
 	}
 	
 	public void InitService() {

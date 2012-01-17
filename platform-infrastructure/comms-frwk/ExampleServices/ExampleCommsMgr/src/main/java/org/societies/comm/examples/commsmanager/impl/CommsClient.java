@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.comm.examples.commsmanager;
+package org.societies.comm.examples.commsmanager.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,10 +46,10 @@ import org.societies.comm.xmpp.interfaces.CommManager;
  * @author aleckey
  *
  */
-public class CommClient implements CommCallback{
+public class CommsClient implements CommCallback{
 	//PRIVATE VARIABLES
 	private CommManager commManager;
-	private static Logger LOG = LoggerFactory.getLogger(ServiceManager.class);
+	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
 	
 	//PROPERTIES
 	public CommManager getCommManager() {
@@ -60,7 +60,7 @@ public class CommClient implements CommCallback{
 		this.commManager = commManager;
 	}
 
-	public CommClient() {}
+	public CommsClient() {}
 	
 	/* (non-Javadoc)
 	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveResult(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
