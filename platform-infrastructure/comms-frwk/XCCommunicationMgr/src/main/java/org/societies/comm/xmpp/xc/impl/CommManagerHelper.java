@@ -84,6 +84,7 @@ import org.xmpp.packet.PacketError;
  * 
  */
 
+// TODO review this class
 public class CommManagerHelper {
 	private static final String JABBER_CLIENT = "jabber:client";
 	private static final String JABBER_SERVER = "jabber:server";
@@ -142,7 +143,7 @@ public class CommManagerHelper {
 			Unmarshaller u = getUnmarshaller(element.getNamespace().toString());
 			Object bean = u.unmarshal(new InputSource(new StringReader(element
 					.asXML())));
-			callback.receiveResult(Stanza.fromPacket(iq), bean);
+			callback.receiveResult(TinderUtils.stanzaFromPacket(iq), bean);
 		} catch (JAXBException e) {
 			LOG.info("JAXB error unmarshalling an IQ result", e);
 		} catch (UnavailableException e) {
@@ -153,7 +154,8 @@ public class CommManagerHelper {
 	public void dispatchIQError(IQ iq) {
 		try {
 			CommCallback callback = getCommCallback(iq.getID());
-			callback.receiveError(Stanza.fromPacket(iq));
+			LOG.warn("dispatchIQError: XMPP ERROR!");
+			callback.receiveError(TinderUtils.stanzaFromPacket(iq),null); // TODO parse error
 		} catch (UnavailableException e) {
 			LOG.info(e.getMessage());
 		}
@@ -170,7 +172,7 @@ public class CommManagerHelper {
 			Unmarshaller u = getUnmarshaller(namespace);
 			Object bean = u.unmarshal(new InputSource(new StringReader(element
 					.asXML())));
-			Object responseBean = fs.receiveQuery(Stanza.fromPacket(iq), bean);
+			Object responseBean = fs.receiveQuery(TinderUtils.stanzaFromPacket(iq), bean);
 			if (responseBean!=null && responseBean instanceof XMPPError)
 				return buildApplicationErrorResponse(originalFrom, id, (XMPPError)responseBean);
 			else
@@ -204,7 +206,7 @@ public class CommManagerHelper {
 			Unmarshaller u = getUnmarshaller(element.getNamespace().toString());
 			Object bean = u.unmarshal(new InputSource(new StringReader(element
 					.asXML())));
-			fs.receiveMessage(Stanza.fromPacket(message), bean);
+			fs.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
 		} catch (JAXBException e) {
 			String m = e.getClass().getName()
 					+ "Error unmarshalling the message:" + e.getMessage();
@@ -214,38 +216,40 @@ public class CommManagerHelper {
 		}
 	}
 
-	public void sendIQ(Stanza stanza, IQ.Type type, Object payload,
+	public IQ sendIQ(Stanza stanza, IQ.Type type, Object payload,
 			CommCallback callback) throws CommunicationException {
 		// Usual disclaimer about how this needs to be optimized ;)
 		try {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			Marshaller m = getMarshaller(payload.getClass().getPackage());
-			m.marshal(payload, os);
+			InlineNamespaceXMLStreamWriter inxsw = new InlineNamespaceXMLStreamWriter(os);
+			getMarshaller(payload.getClass().getPackage()).marshal(payload, inxsw);
 
 			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
 			Document document = reader.read(is);
-			IQ iq = stanza.createIQ(type);
+			IQ iq = TinderUtils.createIQ(stanza, type); // ???
 			iq.getElement().add(document.getRootElement());
 			commCallbacks.put(iq.getID(), callback);
+			return iq;
 		} catch (Exception e) {
 			throw new CommunicationException("Error sending IQ message", e);
 		}
 	}
 
-	public void sendMessage(Stanza stanza, Message.Type type, Object payload)
+	public Message sendMessage(Stanza stanza, Message.Type type, Object payload)
 			throws CommunicationException {
 		if (payload == null) {
 			throw new InvalidParameterException("Payload can not be null");
 		}
 		try {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			Marshaller m = getMarshaller(payload.getClass().getPackage());
-			m.marshal(payload, os);
-
+			InlineNamespaceXMLStreamWriter inxsw = new InlineNamespaceXMLStreamWriter(os);
+			getMarshaller(payload.getClass().getPackage()).marshal(payload, inxsw);
+			
 			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-			Message message = stanza.createMessage(type);
 			Document document = reader.read(is);
+			Message message = TinderUtils.createMessage(stanza, type);
 			message.getElement().add(document.getRootElement());
+			return message;
 		} catch (Exception e) {
 			throw new CommunicationException("Error sending Message message", e);
 		}

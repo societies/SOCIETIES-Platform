@@ -306,13 +306,15 @@ public class PubsubServiceImpl implements PubsubService {
 			item.setId(itemId);
 			
 			// Build Notifications
+			org.jabber.protocol.pubsub.event.Event event = new org.jabber.protocol.pubsub.event.Event();
 			org.jabber.protocol.pubsub.event.Items eventItems = new org.jabber.protocol.pubsub.event.Items();
 			org.jabber.protocol.pubsub.event.Item eventItem = new org.jabber.protocol.pubsub.event.Item();
 			eventItem.setId(itemId);
 			eventItem.setAny((org.w3c.dom.Element)item.getAny());
 			eventItems.setNode(nodeId);
 			eventItems.getItem().add(eventItem);
-			pes.sendEvent(node.getSubscribers(), eventItems); // TODO 7.1.2.2 Notification Without Payload
+			event.setItems(eventItems);
+			pes.sendEvent(node.getSubscribers(), event); // TODO 7.1.2.2 Notification Without Payload
 		}
 
 		// Build Response
