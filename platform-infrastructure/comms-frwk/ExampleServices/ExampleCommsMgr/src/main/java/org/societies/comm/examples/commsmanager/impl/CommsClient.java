@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.comm.examples.calculatorbean.CalcBean;
 import org.societies.comm.examples.calculatorbean.CalcBeanResult;
 import org.societies.comm.examples.calculatorbean.OperationType;
+import org.societies.comm.examples.commsmanager.IExampleCommsManager;
 import org.societies.comm.examples.fortunecookie.datatypes.Cookie;
 import org.societies.comm.examples.fortunecookiebean.FortuneCookieBean;
 import org.societies.comm.examples.fortunecookiebean.FortuneCookieBeanResult;
@@ -41,12 +42,12 @@ import org.societies.comm.xmpp.interfaces.CommCallback;
 import org.societies.comm.xmpp.interfaces.CommManager;
 
 /**
- * Describe your class here...
+ * Comms Client that initiates the remote communication
  *
  * @author aleckey
  *
  */
-public class CommsClient implements CommCallback{
+public class CommsClient implements CommCallback, IExampleCommsManager{
 	//PRIVATE VARIABLES
 	private CommManager commManager;
 	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
@@ -70,7 +71,6 @@ public class CommsClient implements CommCallback{
 		Identity endUser = returnStanza.getTo();
 		
 		//CHECK WHICH END SERVICE IS SENDING US A MESSAGE
-		
 		// --------- CALCULATOR BUNDLE ---------
 		if (msgBean.getClass().equals(CalcBeanResult.class)) {
 			CalcBeanResult calcResult = (CalcBeanResult) msgBean;
@@ -107,12 +107,21 @@ public class CommsClient implements CommCallback{
 		};
 	}
 
-	public void Subtract(int arg0, int arg1) {
+	public void Subtract(int valA, int valB) {
+		Identity id = new Identity(IdentityType.CSS, "alec", "red.local"); 
+		Stanza stanza = new Stanza(id);
+
+		CalcBean calc = new CalcBean();
+		calc.setA(valA); calc.setB(valB);
+		calc.setOperation(OperationType.SUBTRACT);
+		try {
+			commManager.sendIQGet(stanza, calc, this);
+		} catch (CommunicationException e) {
+			LOG.warn(e.getMessage());
+		};
 		
 	}
 
-	public Cookie getCookie() {
-		// TODO Auto-generated method stub
-		return null;
+	public void getCookie() {
 	}
 }

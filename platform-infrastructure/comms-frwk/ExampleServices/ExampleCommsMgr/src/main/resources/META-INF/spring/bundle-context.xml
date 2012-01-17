@@ -8,8 +8,8 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-  <bean id="ServiceManager" 
-  		class="org.societies.comm.examples.servicemanager.ServiceManager"
+  <bean id="CommsServerManager" 
+  		class="org.societies.comm.examples.commsmanager.impl.CommsServer"
   		depends-on="CommManagerBundle, FortuneCookieBundle, CalculatorBundle" 
   		init-method="InitService">
   		<property name="commManager" ref="CommManagerBundle"/>
@@ -17,4 +17,9 @@
   		<property name="calcService" ref="CalculatorBundle"/>
   </bean>
 
+  <bean name="CommsClientManager" 
+  		class="org.societies.comm.examples.commsmanager.impl.CommsClient" 
+  		depends-on="CommManagerBundle" >
+  		<property name="commManager" ref="CommManagerBundle"/>
+  </bean>
 </beans>
