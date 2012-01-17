@@ -29,7 +29,7 @@
  * @author aleckey
  *
  */
-package org.societies.comm.examples.servicemanager;
+package org.societies.comm.examples.commsmanager;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -58,22 +58,18 @@ import org.societies.comm.examples.fortunecookiebean.MethodName;
 
 public class ServiceManager implements FeatureServer {
 
-	//private final static String NAMESPACE = "http://societies.org/calculator";
-	private final static String NAMESPACE = "http://societies.org/comm/examples/calculatorbean";
-	/*private static final List<String> PACKAGES = Collections.unmodifiableList(
+	private static final List<String> NAMESPACES = Collections.unmodifiableList(
+							  Arrays.asList("http://societies.org/comm/examples/calculatorbean",
+									  		"http://societies.org/comm/examples/fortunecookiebean"));
+	private static final List<String> PACKAGES = Collections.unmodifiableList(
 							  Arrays.asList("org.societies.comm.examples.calculatorbean",
 											"org.societies.comm.examples.fortunecookiebean"));
-	*/
-	private final static List<String> PACKAGES = Collections.singletonList("org.societies.comm.examples.calculatorbean");
-	
-	//private static List<String> ManagedPackages = new ArrayList<String>();
 	
 	//PRIVATE VARIABLES
 	private CommManager commManager;
 	private ICalc calcService;
 	private IWisdom fcGenerator;
-	private static Logger LOG = LoggerFactory
-			.getLogger(ServiceManager.class);
+	private static Logger LOG = LoggerFactory.getLogger(ServiceManager.class);
 	
 	//PROPERTIES
 	public CommManager getCommManager() {
@@ -102,10 +98,6 @@ public class ServiceManager implements FeatureServer {
 
 	//METHODS
 	public ServiceManager() {
-		//ADD THE PROJECTS THAT THIS SERVICE MANAGER MANAGES INCLUDING THEIR INTERFACE BEANS
-		//ManagedPackages.add("org.societies.comm.examples.ServiceManager");
-		//ManagedPackages.add("org.societies.comm.examples.CalculatorBean");
-		//ManagedPackages.add("org.societies.comm.examples.FortuneCookieBean");
 	}
 	
 	public void InitService() {
@@ -127,13 +119,14 @@ public class ServiceManager implements FeatureServer {
 		return PACKAGES;
 	}
 	
-	/* Add your namespace here. It is used when registering your component.
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.FeatureServer#getXMLNamespaces()
 	 */
 	@Override
-	public String getXMLNamespace() {
-		return NAMESPACE;
+	public List<String> getXMLNamespaces() {
+		return NAMESPACES;
 	}
-
+	
 	/* Put your functionality here if there is NO return object, ie, VOID 
 	 */
 	@Override
@@ -196,6 +189,7 @@ public class ServiceManager implements FeatureServer {
 			}
 		}
 		
+		//TODO: Better error handling, ie, if there is no match on the Message Bean
 		return null;
 	}
 }
