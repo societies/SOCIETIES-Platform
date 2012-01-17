@@ -44,10 +44,17 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 	<!-- All Android projects to be included in nightly builds -->
 	<modules>
-		<!-- API -->
+		<!-- Utilities -->
+		<module>../utilities/DBC</module>
 		
-		<!-- Client Framework -->
+		<!-- API -->
+		<module>../platform-infrastructure/client-frwk/CoreInterfaces</module>
+		
+		<!-- Client Framework Examples-->
 		<module>../platform-infrastructure/client-frwk/PhoneGapReference</module>
+		<module>../platform-infrastructure/client-frwk/IPCServiceExample</module>
+
+		<!-- Client Framework -->
 		<module>../platform-infrastructure/client-frwk/MasterGUI</module>
 
 	</modules>
