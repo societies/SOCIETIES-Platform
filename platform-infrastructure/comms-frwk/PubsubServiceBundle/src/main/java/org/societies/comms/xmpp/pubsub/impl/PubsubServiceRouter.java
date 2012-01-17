@@ -55,7 +55,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class PubsubServiceRouter implements FeatureServer {
 
-	private static final String NAMESPACE = "http://jabber.org/protocol/pubsub";
+	private final static List<String> NAMESPACES = Collections
+			.singletonList("http://jabber.org/protocol/pubsub");
 	private static final List<String> PACKAGES = Collections
 			.unmodifiableList(Arrays.asList("jabber.x.data",
 					"org.jabber.protocol.pubsub",
@@ -82,8 +83,8 @@ public class PubsubServiceRouter implements FeatureServer {
 	}
 
 	@Override
-	public String getXMLNamespace() {
-		return NAMESPACE;
+	public List<String> getXMLNamespaces() {
+		return NAMESPACES;
 	}
 
 	@Override
