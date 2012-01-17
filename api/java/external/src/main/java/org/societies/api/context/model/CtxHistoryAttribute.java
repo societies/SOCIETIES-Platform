@@ -44,7 +44,7 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	private String stringValue;
 	private Integer integerValue;
 	private Double doubleValue;
-	private byte[] blobValue;
+	private byte[] binaryValue;
 
 	private Date lastModified;
 	
@@ -103,32 +103,10 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	 * 
 	 * @return blob value
 	 */
-
-	public Serializable getBlobValue(ClassLoader classLoader) {
-
-		this.blobValue = null;
-
-		//	MockBlobClass valueMockClassDeserialised = (MockBlobClass) SerialisationHelper.deserialise(ctxAttribute.getBinaryValue(), this.getClass().getClassLoader());
-
-		/*
-		if (classLoader == null)
-			throw new NullPointerException("classLoader can't be null");
-		if (this.blobValue == null)
-			return null;
-
-		Serializable result = null;
-		try {
-			result = SerializationHelper.deserialize(this.blobValue,
-					classLoader);
-		} catch (IOException ioe) {
-			throw new ContextModelException(ioe.getMessage(), ioe);
-		} catch (ClassNotFoundException cnfe) {
-			throw new ContextModelException(cnfe.getMessage(), cnfe);
-		}
-		 */
-		return blobValue;
+	public byte[] getBinaryValue() {
+		return this.binaryValue;
 	}
-
+	
 	/**
 	 * TODO
 	 * Returns a String representation of this historic context attribute.
@@ -145,7 +123,7 @@ public class CtxHistoryAttribute extends CtxModelObject {
 		this.stringValue = ctxAttribute.getStringValue();
 		this.integerValue = ctxAttribute.getIntegerValue();
 		this.doubleValue = ctxAttribute.getDoubleValue();
-		this.blobValue = ctxAttribute.getBinaryValue();
+		this.binaryValue = ctxAttribute.getBinaryValue();
 	}
 
 	public Date getLastModified(){

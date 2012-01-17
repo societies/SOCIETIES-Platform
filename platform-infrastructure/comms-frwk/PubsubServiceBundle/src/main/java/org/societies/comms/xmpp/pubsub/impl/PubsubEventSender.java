@@ -34,7 +34,6 @@ public class PubsubEventSender extends Thread {
 		synchronized (notificationQueue) {
 			notificationQueue.add(new Notification(recipients, eventPayload));
 			notificationQueue.notifyAll();
-			LOG.info("notifyAll!!!!!");
 		}
 	}
 	
@@ -52,16 +51,13 @@ public class PubsubEventSender extends Thread {
 					try {
 						notificationQueue.wait(TIMEOUT);
 					} catch (InterruptedException e) {
-						LOG.info("InterruptedException!!!!!!!!");
+						LOG.info(e.getMessage());
 					}
 				}
-				LOG.info("notificationQueue.remove(0)");
 				n = notificationQueue.remove(0);
 			}
 
-			LOG.info("sending notification to "+n.recipients.size()+" recipients");
 			for (Identity i : n.recipients) {
-				LOG.info(">"+i.getJid());
 				Stanza stanza = new Stanza(i);
 				try {
 					endpoint.sendMessage(stanza, n.eventPayload);

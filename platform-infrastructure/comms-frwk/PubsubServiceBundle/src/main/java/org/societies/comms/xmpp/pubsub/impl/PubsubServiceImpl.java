@@ -214,6 +214,7 @@ public class PubsubServiceImpl implements PubsubService {
 		if (node==null)
 			return new XMPPError(StanzaError.item_not_found);
 		
+		LOG.info("sender="+sender.getJid()+";sender.getDomainIdentifier()="+sender.getDomainIdentifier());
 		List<String> subIdList = node.getSubscriptions(sender);
 		
 		// 6.5.9.3 Entity Not Subscribed
@@ -225,6 +226,7 @@ public class PubsubServiceImpl implements PubsubService {
 			return new XMPPError(StanzaError.bad_request, null, ERROR_SUBID_REQUIRED);
 		
 		if (subId!=null) {
+			LOG.info("subId="+subId+"!");
 			// 6.5.9.2 Invalid Subscription ID
 			if (!subIdList.contains(subId))
 				return new XMPPError(StanzaError.unexpected_request, null, ERROR_INVALID_SUBID);
@@ -287,22 +289,8 @@ public class PubsubServiceImpl implements PubsubService {
 			// 7.1.3.5 Bad Payload
 			//TODO If the <item/> element contains more than one payload element or the namespace of the root payload element does not match the configured namespace for the node
 			
-			// Publish and Update Item ID for Response
-			Object itemPayload = null;
-			LOG.info("item.getAny().getClass()="+item.getAny().getClass());
-			LOG.info("item.getAny().toString()="+item.getAny().toString());
-			
-			if (item.getAny() instanceof JAXBElement) {
-				LOG.info("((JAXBElement)item.getAny()).getDeclaredType().toString()="+((JAXBElement)item.getAny()).getDeclaredType().toString());
-				itemPayload = ((JAXBElement)item.getAny()).getValue();
-			}
-			if (item.getAny() instanceof org.w3c.dom.Element) {
-				LOG.info("((org.w3c.dom.Element)item.getAny()).getLocalName()="+((org.w3c.dom.Element)item.getAny()).getLocalName());
-				LOG.info("((org.w3c.dom.Element)item.getAny()).getNamespaceURI()="+((org.w3c.dom.Element)item.getAny()).getNamespaceURI());
-				itemPayload = ((org.w3c.dom.Element)item.getAny());
-			}
-			
-			String itemId = node.publishItem(item.getId(),itemPayload,sender);
+			// Publish and Update Item ID for Response			
+			String itemId = node.publishItem(item.getId(),(org.w3c.dom.Element)item.getAny(),sender);
 			item.setId(itemId);
 			
 			// Build Notifications
