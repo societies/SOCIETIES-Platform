@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 
 /**
@@ -93,12 +93,7 @@ public class CommunityIntentAction implements ICommunityIntentAction{
 		return null;
 	}
 
-	@Override
-	public ServiceResourceIdentifier getServiceID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 	@Override
 	public String getServiceType() {
 		// TODO Auto-generated method stub
@@ -111,17 +106,8 @@ public class CommunityIntentAction implements ICommunityIntentAction{
 		return null;
 	}
 
-	@Override
-	public void setServiceID(ServiceResourceIdentifier id) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void setServiceType(String type) {
-		// TODO Auto-generated method stub
-		
-	}
+	
 
 	@Override
 	public void setServiceTypes(List<String> types) {
@@ -147,7 +133,22 @@ public class CommunityIntentAction implements ICommunityIntentAction{
 		return 0;
 	}
 
-	
 
+	@Override
+	public void setServiceType(String arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public IServiceResourceIdentifier getServiceID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setServiceID(IServiceResourceIdentifier arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 }
-
