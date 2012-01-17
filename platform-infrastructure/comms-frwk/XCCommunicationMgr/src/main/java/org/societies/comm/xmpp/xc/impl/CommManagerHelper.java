@@ -263,11 +263,12 @@ public class CommManagerHelper {
 					this.getClass().getClassLoader());
 			Unmarshaller u = jc.createUnmarshaller();
 			Marshaller m = jc.createMarshaller();
-			//m.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 			
-			LOG.info("registering " + fs.getXMLNamespace());
-			featureServers.put(fs.getXMLNamespace(), fs);
-			nsToUnmarshaller.put(fs.getXMLNamespace(), u);
+			for (String ns : fs.getXMLNamespaces()) {
+				LOG.info("registering " + ns);
+				featureServers.put(ns, fs);
+				nsToUnmarshaller.put(ns, u);
+			}
 
 			for (String packageStr : fs.getJavaPackages())
 				pkgToMarshaller.put(packageStr, m);

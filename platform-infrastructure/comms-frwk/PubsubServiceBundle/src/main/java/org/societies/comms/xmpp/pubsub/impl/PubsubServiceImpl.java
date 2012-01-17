@@ -71,11 +71,11 @@ public class PubsubServiceImpl implements PubsubService {
 	private static final Object ERROR_ITEM_REQUIRED;
 	static {
 		org.jabber.protocol.pubsub.errors.ObjectFactory errorFactory = new org.jabber.protocol.pubsub.errors.ObjectFactory();
-		ERROR_SUBID_REQUIRED = errorFactory.createSubidRequired(null);
-		ERROR_NOT_SUBSCRIBED = errorFactory.createNotSubscribed(null);
-		ERROR_INVALID_SUBID = errorFactory.createInvalidSubid(null);
-		ERROR_NODEID_REQUIRED = errorFactory.createNodeidRequired(null);
-		ERROR_ITEM_REQUIRED = errorFactory.createItemRequired(null);
+		ERROR_SUBID_REQUIRED = errorFactory.createSubidRequired(null).getValue();
+		ERROR_NOT_SUBSCRIBED = errorFactory.createNotSubscribed(null).getValue();
+		ERROR_INVALID_SUBID = errorFactory.createInvalidSubid(null).getValue();
+		ERROR_NODEID_REQUIRED = errorFactory.createNodeidRequired(null).getValue();
+		ERROR_ITEM_REQUIRED = errorFactory.createItemRequired(null).getValue();
 	}
 	
 	// PubSub Constants
@@ -123,7 +123,6 @@ public class PubsubServiceImpl implements PubsubService {
 		
 		// New Subscription
 		String subId = node.newSubscription(subscriber);
-		LOG.info("subId:"+subId);
 		
 		// Build success response
 		Pubsub response = new Pubsub();
@@ -160,7 +159,6 @@ public class PubsubServiceImpl implements PubsubService {
 		// 6.2.3.1 No Subscription ID
 		if (subIdList.size()>1 && subId==null)
 			return new XMPPError(StanzaError.bad_request, null, ERROR_SUBID_REQUIRED); 
-
 		
 		if (subId!=null) {
 			// 6.2.3.5 Bad Subscription ID
@@ -174,7 +172,7 @@ public class PubsubServiceImpl implements PubsubService {
 			node.unsubscribe(subIdList.get(0));
 		
 		// Build success response
-		return null; // TODO this is a success case!!
+		return null; // this is a success case!!
 	}
 
 	@Override
@@ -203,6 +201,7 @@ public class PubsubServiceImpl implements PubsubService {
 
 	@Override
 	public Object subscriberRetrieve(Stanza stanza, Pubsub payload) {
+		LOG.info("subscriberRetrieve");
 		Identity sender = stanza.getFrom();
 		String nodeId = payload.getItems().getNode();
 		String subId = payload.getItems().getSubid();
@@ -235,11 +234,13 @@ public class PubsubServiceImpl implements PubsubService {
 		
 		// TODO Access Control
 		
-		// Retract
+		// Retrieve
+		LOG.info("Retrieve");
 		Items responseItems = new Items();
 		List<Item> responseItemList = responseItems.getItem();
 		if (itemList==null || itemList.size()==0) {
 			// Get specific items
+			LOG.info("Get specific items");
 			for (Item i : itemList) {
 				i.setAny(node.getItemPayload(i.getId()));
 				responseItemList.add(i);
@@ -247,6 +248,7 @@ public class PubsubServiceImpl implements PubsubService {
 		}
 		else {
 			// Get newest items
+			LOG.info("Get newest items");
 			// TODO 6.5.4 Returning Some Items
 			for (String itemId : node.getItemIds()) {
 				Item i = new Item();
@@ -288,14 +290,18 @@ public class PubsubServiceImpl implements PubsubService {
 			// Publish and Update Item ID for Response
 			Object itemPayload = null;
 			LOG.info("item.getAny().getClass()="+item.getAny().getClass());
+			LOG.info("item.getAny().toString()="+item.getAny().toString());
+			
 			if (item.getAny() instanceof JAXBElement) {
 				LOG.info("((JAXBElement)item.getAny()).getDeclaredType().toString()="+((JAXBElement)item.getAny()).getDeclaredType().toString());
 				itemPayload = ((JAXBElement)item.getAny()).getValue();
 			}
 			if (item.getAny() instanceof org.w3c.dom.Element) {
-				LOG.info("((org.w3c.dom.Element)item.getAny()).toString()="+((org.w3c.dom.Element)item.getAny()).toString());
+				LOG.info("((org.w3c.dom.Element)item.getAny()).getLocalName()="+((org.w3c.dom.Element)item.getAny()).getLocalName());
+				LOG.info("((org.w3c.dom.Element)item.getAny()).getNamespaceURI()="+((org.w3c.dom.Element)item.getAny()).getNamespaceURI());
 				itemPayload = ((org.w3c.dom.Element)item.getAny());
 			}
+			
 			String itemId = node.publishItem(item.getId(),itemPayload,sender);
 			item.setId(itemId);
 			

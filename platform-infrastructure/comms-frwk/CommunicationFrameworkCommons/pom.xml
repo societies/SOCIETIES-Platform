@@ -18,7 +18,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.igniterealtime</groupId>
-			<artifactId>whack</artifactId>
+			<artifactId>tinder</artifactId>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
