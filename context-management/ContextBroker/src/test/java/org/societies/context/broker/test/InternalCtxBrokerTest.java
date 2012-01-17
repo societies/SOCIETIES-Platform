@@ -64,7 +64,8 @@ public class InternalCtxBrokerTest {
 		testRetrieveAttribute();
 		testUpdateAttribute();
 		testUpdateAttributeBlob();
-		testHistoryAttribute();
+		testHistoryAttributeInteger();
+		testHistoryAttributeString();
 	}
 
 	/**
@@ -117,8 +118,10 @@ public class InternalCtxBrokerTest {
 	}
 
 
-	private void testHistoryAttribute(){
+	private void testHistoryAttributeInteger(){
 		System.out.println("---- test testHistoryAttribute");
+
+
 		CtxAttribute ctxAttribute = callback.getCtxAttribute();
 		Date date = new Date();
 		System.out.println("date="+ date.getTime());
@@ -147,6 +150,9 @@ public class InternalCtxBrokerTest {
 		System.out.println("---- Retrieve History");
 		internalCtxBroker.retrievePast(ctxAttribute.getId(), null, null, callback);
 
+		System.out.println("----  History Retrieved");
+
+
 
 		/*
 		internalCtxBroker.update(ctxAttribute,  callback);
@@ -159,6 +165,49 @@ public class InternalCtxBrokerTest {
 
 
 	}
+
+
+
+	private void  testHistoryAttributeString(){
+		System.out.println("---- test testHistoryAttributeString");
+
+		internalCtxBroker.createAttribute(callback.getCtxEntity().getId(), CtxAttributeValueType.INDIVIDUAL, "name", callback);
+		CtxAttribute ctxAttributeString = (CtxAttribute) callback.getCtxAttribute();
+
+
+
+		ctxAttributeString.setStringValue("Aris");
+		ctxAttributeString.setHistoryRecorded(true);
+		internalCtxBroker.update(ctxAttributeString, callback);
+		CtxAttribute ctxAttributeStringRtrvd = (CtxAttribute) callback.getCtxAttribute();
+
+		//System.out.println("ctxAttributeString"+ ctxAttributeStringRtrvd.getId());
+		System.out.println("ctxAttributeString id "+ ctxAttributeString.getId());
+		System.out.println("ctxAttributeString value: "+ ctxAttributeStringRtrvd.getStringValue());
+
+
+
+		ctxAttributeString.setStringValue("Zeus");
+		ctxAttributeString = internalUpdateRetrieve(ctxAttributeString);
+		System.out.println("ctxAttributeString value: "+ ctxAttributeStringRtrvd.getStringValue());
+
+		ctxAttributeString.setStringValue("Jupiter");
+		ctxAttributeString = internalUpdateRetrieve(ctxAttributeString);
+		System.out.println("ctxAttributeString value: "+ ctxAttributeStringRtrvd.getStringValue());
+
+		internalCtxBroker.retrievePast(ctxAttributeString.getId(), null, null, callback);
+	}
+
+
+
+
+
+
+
+
+
+
+
 
 	private CtxAttribute internalUpdateRetrieve(CtxAttribute ctxAttribute){
 
@@ -307,7 +356,10 @@ public class InternalCtxBrokerTest {
 			System.out.println("history size retrieved  "+ hoc.size());
 			for(int i=0 ; i<hoc.size(); i++){
 				CtxHistoryAttribute hocAttr = hoc.get(i);
-				System.out.println("HoC AttrID:"+hocAttr.getId() +" time recorded:"+hocAttr.getLastModified()+" value: "+hocAttr.getIntegerValue() );
+				System.out.println("HoC AttrID:"+hocAttr.getId() +" time recorded:"+hocAttr.getLastModified()+" value: ");
+				if(hocAttr.getStringValue() != null) System.out.println(hocAttr.getStringValue());
+				if(hocAttr.getIntegerValue() != null) System.out.println(hocAttr.getIntegerValue());
+				if(hocAttr.getDoubleValue() != null) System.out.println(hocAttr.getDoubleValue());
 			}
 
 			//	ctxAttribute.getQuality().getLastUpdated();

@@ -35,7 +35,6 @@ import java.util.Map;
  * @version 0.0.1
  */
 public interface IUserIntentTask {
-
 	
 	/**
      * Returns a string with the UserTask ID. The task ID should be set upon creation of task.
@@ -43,8 +42,6 @@ public interface IUserIntentTask {
      * @return string id
      */
     public String getTaskID();
-
-
 
     /**
      * Returns a map with the userActions contained in the UserTask and the respective transition 
@@ -92,5 +89,23 @@ public interface IUserIntentTask {
      * @return string
      */
     public String toString ();
-	
+
+    /**
+     * Sets the confidence level
+     * 
+     * @param confidenceLevel
+     */
+    public void setConfidenceLevel(int confidenceLevel);
+    
+    /**
+     * Retrieves the confidence level
+     * 
+     */
+    public int getConfidenceLevel();
+    
+    /**
+     * Returns the transition probability from previous UserTask to this UserTask.
+     * @return
+     */
+    public double getTransProb(); 
 }

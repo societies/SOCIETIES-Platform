@@ -10,25 +10,39 @@ package org.societies.api.internal.servicelifecycle.model;
 public class Service {
 
 	/**
+	 * @param serviceIdentifier
+	 * @param cSSIDInstalled
+	 * @param version
+	 * @param serviceName
+	 * @param serviceDescription
+	 * @param authorSignature
+	 */
+	public Service(ServiceResourceIdentifier serviceIdentifier,
+			String cSSIDInstalled, String version, String serviceName,
+			String serviceDescription, String authorSignature) {
+		super();
+		this.serviceIdentifier = serviceIdentifier;
+		CSSIDInstalled = cSSIDInstalled;
+		this.version = version;
+		this.serviceName = serviceName;
+		this.serviceDescription = serviceDescription;
+		this.authorSignature = authorSignature;
+	}
+
+	/**
 	 * Unique identifier for a single instance of a service.
 	 */
-	private String serviceEndpointURI;
+	ServiceResourceIdentifier serviceIdentifier;
+	
 	/**
-	 * It represents the CSS endpoint where the service is physically installed.
+	 * It represents the CSS Id where the service is physically installed.
 	 */
-	// private org.societies.comm.xmpp.Endpoint CSSInstalled;
+	 private String CSSIDInstalled;
 	/**
 	 * The version of the service, it must be updated by developer
 	 */
 	private String version;
-	/**
-	 * <No description from WP3>
-	 */
-	private String hash;
-	/**
-	 * <No description from WP3>
-	 */
-	private int lifetime;
+	
 	/**
 	 * An alias name for the service
 	 */
@@ -43,13 +57,7 @@ public class Service {
 	private String authorSignature;
 	
 	
-	public String getServiceEndpointURI() {
-		return serviceEndpointURI;
-	}
 	
-	public void setServiceEndpointURI(String serviceEndpointURI) {
-		this.serviceEndpointURI = serviceEndpointURI;
-	}
 	
 	public String getVersion() {
 		return version;
@@ -59,21 +67,6 @@ public class Service {
 		this.version = version;
 	}
 	
-	public String getHash() {
-		return hash;
-	}
-	
-	public void setHash(String hash) {
-		this.hash = hash;
-	}
-	
-	public int getLifetime() {
-		return lifetime;
-	}
-	
-	public void setLifetime(int lifetime) {
-		this.lifetime = lifetime;
-	}
 	
 	public String getServiceName() {
 		return serviceName;
@@ -99,14 +92,18 @@ public class Service {
 		this.authorSignature = authorSignature;
 	}
 
-	/**
-	 * Constructor for a new Service object
-	 * 
-	 * @param version
-	 * @param CSSInstalled
-	 * @param name
-	 */
-	/* public void Service(String version, org.societies.comm.xmpp.Endpoint CSSInstalled, String name){
+	public String getCSSIDInstalled(){
+		return CSSIDInstalled;
+	}
+	public void setCSSIDInstalled(String CSSIDInstalled){
+		this.CSSIDInstalled=CSSIDInstalled;
+	}
 
-	} */
+	public ServiceResourceIdentifier getServiceIdentifier() {
+		return serviceIdentifier;
+	}
+
+	public void setServiceIdentifier(ServiceResourceIdentifier serviceIdentifier) {
+		this.serviceIdentifier = serviceIdentifier;
+	}
 }

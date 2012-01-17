@@ -78,4 +78,22 @@ public class CommunityIntentTask implements ICommunityIntentTask{
 		
 	}
 
+	@Override
+	public void setConfidenceLevel(int confidenceLevel) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getConfidenceLevel() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getTransProb() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

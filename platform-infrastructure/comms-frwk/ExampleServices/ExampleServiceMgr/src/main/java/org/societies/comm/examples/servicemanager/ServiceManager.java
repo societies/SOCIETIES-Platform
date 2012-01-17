@@ -31,11 +31,13 @@
  */
 package org.societies.comm.examples.servicemanager;
 
-//COMMUNICATION MANAGER IMPORTS
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+//COMMUNICATION MANAGER IMPORTS
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.comm.xmpp.datatypes.Stanza;
 import org.societies.comm.xmpp.interfaces.CommManager;
 import org.societies.comm.xmpp.interfaces.FeatureServer;
@@ -45,23 +47,33 @@ import org.societies.comm.xmpp.exceptions.CommunicationException;
 import org.societies.comm.examples.calculator.ICalc;
 import org.societies.comm.examples.calculatorbean.CalcBean;
 import org.societies.comm.examples.calculatorbean.CalcBeanResult;
+import org.societies.comm.examples.calculatorbean.OperationType;
 
 //FORTUNE COOKIE SERVICE IMPORTS
 import org.societies.comm.examples.fortunecookie.api.IWisdom;
 import org.societies.comm.examples.fortunecookie.datatypes.Cookie;
 import org.societies.comm.examples.fortunecookiebean.FortuneCookieBean;
 import org.societies.comm.examples.fortunecookiebean.FortuneCookieBeanResult;
-
+import org.societies.comm.examples.fortunecookiebean.MethodName;
 
 public class ServiceManager implements FeatureServer {
 
-	private final static String NAMESPACE = "http://societies.org/ExampleServiceManager";
-	private static List<String> ManagedPackages = new ArrayList<String>();
+	//private final static String NAMESPACE = "http://societies.org/calculator";
+	private final static String NAMESPACE = "http://societies.org/comm/examples/calculatorbean";
+	/*private static final List<String> PACKAGES = Collections.unmodifiableList(
+							  Arrays.asList("org.societies.comm.examples.calculatorbean",
+											"org.societies.comm.examples.fortunecookiebean"));
+	*/
+	private final static List<String> PACKAGES = Collections.singletonList("org.societies.comm.examples.calculatorbean");
+	
+	//private static List<String> ManagedPackages = new ArrayList<String>();
 	
 	//PRIVATE VARIABLES
 	private CommManager commManager;
 	private ICalc calcService;
 	private IWisdom fcGenerator;
+	private static Logger LOG = LoggerFactory
+			.getLogger(ServiceManager.class);
 	
 	//PROPERTIES
 	public CommManager getCommManager() {
@@ -91,11 +103,9 @@ public class ServiceManager implements FeatureServer {
 	//METHODS
 	public ServiceManager() {
 		//ADD THE PROJECTS THAT THIS SERVICE MANAGER MANAGES INCLUDING THEIR INTERFACE BEANS
-		ManagedPackages.add("org.societies.comm.examples.servicemanager");
-		ManagedPackages.add("org.societies.comm.examples.Calculator");
-		ManagedPackages.add("org.societies.comm.examples.CalculatorBean");
-		ManagedPackages.add("org.societies.comm.examples.FortuneCookie");
-		ManagedPackages.add("org.societies.comm.examples.FortuneCookieBean");
+		//ManagedPackages.add("org.societies.comm.examples.ServiceManager");
+		//ManagedPackages.add("org.societies.comm.examples.CalculatorBean");
+		//ManagedPackages.add("org.societies.comm.examples.FortuneCookieBean");
 	}
 	
 	public void InitService() {
@@ -114,7 +124,7 @@ public class ServiceManager implements FeatureServer {
 	 */
 	@Override
 	public List<String> getJavaPackages() {
-		return ManagedPackages;
+		return PACKAGES;
 	}
 	
 	/* Add your namespace here. It is used when registering your component.
@@ -144,11 +154,11 @@ public class ServiceManager implements FeatureServer {
 			CalcBean calc = (CalcBean) payload;
 			
 			int result=0; int a = 0; int b = 0;
-			String text = "";
+			String text = ""; 
 			switch (calc.getOperation()) {
 			
 			//Add() METHOD
-			case Add:
+			case ADD:
 				a = calc.getA();
 				b = calc.getB();
 				result = calcService.Add(a, b);
@@ -156,7 +166,7 @@ public class ServiceManager implements FeatureServer {
 				break;
 
 			//Subtract() method
-			case Subtract:
+			case SUBTRACT:
 				a = calc.getA();
 				b = calc.getB();
 				result = calcService.Subtract(a, b);
@@ -174,7 +184,7 @@ public class ServiceManager implements FeatureServer {
 		else if (payload.getClass().equals(FortuneCookieBean.class)) {
 			FortuneCookieBean fcBean = (FortuneCookieBean) payload;
 			
-			if (fcBean.getMethod().equals(FortuneCookieBean.methodName.getCookie)) {
+			if (fcBean.getMethod().equals(MethodName.GET_COOKIE)) {
 				//NO PARAMETERS FOR THIS METHOD
 				Cookie fortune = fcGenerator.getCookie();
 				

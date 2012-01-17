@@ -52,7 +52,15 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-
+import android.widget.ProgressBar;
+/**
+ * TODO: Work required for activity instance changes such as rotations
+ * 1. Use the getApplicationContext() rather than the activity's context
+ * 2. Pass the ServiceConnection object representing the service binding from the old to the 
+ * new instance of the activity.
+ * 
+ *  
+ */
 public class ExampleServiceActivity extends Activity {
 	private boolean ipBoundToService = false;
 	private boolean opBoundToService = false;
@@ -63,13 +71,15 @@ public class ExampleServiceActivity extends Activity {
 	
 	private long serviceBinding;
 	private long serviceInvoke;
-	private static final int NUM_SERVICE_INVOKES = 10;
+	private static final int NUM_SERVICE_INVOKES = 1;
+	private ProgressBar serviceProgress;
 	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        serviceProgress = (ProgressBar) findViewById(R.id.pbarStartedService);
     }
     @Override
     protected void onStart() {
@@ -92,6 +102,7 @@ public class ExampleServiceActivity extends Activity {
         IntentFilter intentFilter = new IntentFilter() ;
         intentFilter.addAction(CoreMonitor.ACTIVE_TASKS);
         intentFilter.addAction(CoreMonitor.ACTIVE_SERVICES);
+        intentFilter.addAction(AnotherStartedService.PROGRESS_STATUS_INTENT);
         this.registerReceiver(new ServiceReceiver(), intentFilter);
 
     }
@@ -213,8 +224,33 @@ public class ExampleServiceActivity extends Activity {
 			}
     	}
     }
+    /**
+     * Start a "started" service
+     * 
+     * @param view
+     */
+    public void onButtonStartStartedClick(View view) {
+    	
+    	serviceProgress.setProgress(0);
+    			
+    	Intent intent = new Intent(this, AnotherStartedService.class);
+    	try {
+        	startService(intent);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
     
-    
+    /**
+     * Stop a "started" service
+     * 
+     * @param view
+     */
+    public void onButtonStopStartedClick(View view) {
+    	Intent intent = new Intent(this, AnotherStartedService.class);
+    	stopService(intent);
+    }
     
 	private ServiceConnection inProcessServiceConnection = new ServiceConnection() {
 		
@@ -300,6 +336,8 @@ public class ExampleServiceActivity extends Activity {
 													"Process: " + ((ActivityManager.RunningServiceInfo) parcel).process);
 				}
 				
+			} else if (intent.getAction().equals(AnotherStartedService.PROGRESS_STATUS_INTENT)) {
+				serviceProgress.setProgress(intent.getIntExtra(AnotherStartedService.PROGRESS_STATUS_VALUE, serviceProgress.getProgress()));
 			}
 		}
 		

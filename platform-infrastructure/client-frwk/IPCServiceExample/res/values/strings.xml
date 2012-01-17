@@ -6,5 +6,7 @@
     <string name="btnCallInProcessService">Call InProcessService</string>
     <string name="btnCallOutProcessService">Call Out of Process Service</string>
     <string name="btnCallRealService">Call Real Service</string>
+    <string name="startStartedService">Start Started service</string>
+    <string name="stopStartedService">Stop Started service</string>
 
 </resources>

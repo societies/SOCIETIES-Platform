@@ -26,11 +26,11 @@ package org.societies.context.communityPrediction.impl;
 
 import java.util.Date;
 
-import org.societies.context.community.prediction.api.platform.ICommunityCtxPredictionMgr;
-import org.societies.context.mock.spm.identity.EntityIdentifier;
-import org.societies.context.model.api.CtxAttributeIdentifier;
-import org.societies.context.model.api.CtxIdentifier;
-import org.societies.context.user.prediction.api.platform.PredictionMethod;
+import org.societies.api.internal.context.community.prediction.ICommunityCtxPredictionMgr;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.internal.context.user.prediction.PredictionMethod;
 
 public class CommunityContextPrediction implements ICommunityCtxPredictionMgr{
 

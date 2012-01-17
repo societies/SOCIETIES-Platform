@@ -42,11 +42,14 @@ package org.societies.comm.examples.calculatorbean;
       public int Subtract(int a, int b);
   }
    
-to generate XSD, run the maven command:
+1) generate XSD, run the maven command:
 > mvn jaxb2:schemagen
-
 The schema.xsd file will be in /target/generated-resources/schemagen directory
- *
+
+2) Build the JAR using this new schema.xsd as the source (not the .java files).
+This will add the required XML notations and Object Factory
+> mvn install
+
  */
 
 public class CalcBean {

@@ -8,8 +8,9 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-  <bean id="SNDataExtractor" class="org.societies.personalisation.SNDataExtractor.impl" depends-on="UserCtxBroker">
-  	<property name="ctxBroker" ref="UserCtxBroker"  init-method="initializationSNDataExtractor"/>
+  <bean id="SNDataExtractor" class="org.societies.personalisation.SNDataExtractor.impl.SNDataExtractor" depends-on="UserCtxBroker"
+  init-method="initializationSNDataExtractor">
+  	<property name="ctxBroker" ref="UserCtxBroker"></property>
   </bean>
 
 </beans>

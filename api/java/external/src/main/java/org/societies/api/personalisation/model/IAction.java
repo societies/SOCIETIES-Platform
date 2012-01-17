@@ -29,7 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.Serializable;
 
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+
 
 /**
  * @author Elizabeth
@@ -57,7 +58,7 @@ public interface IAction extends Serializable{
 	/**
 	 * @return the identifier of the service to which this action is applied to
 	 */
-	public ServiceResourceIdentifier getServiceID();
+	public IServiceResourceIdentifier getServiceID();
 	
 	/**
 	 * 
@@ -74,7 +75,7 @@ public interface IAction extends Serializable{
 	/**
 	 * @param id	the identifier of the service this action is applied to
 	 */
-	public void setServiceID(ServiceResourceIdentifier id);
+	public void setServiceID(IServiceResourceIdentifier id);
 	
 	/**
 	 * 

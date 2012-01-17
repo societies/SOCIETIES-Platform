@@ -26,7 +26,10 @@ package org.societies.api.internal.personalisation.model;
 
 import java.io.Serializable;
 
-import org.societies.api.internal.servicelifecycle.serviceRegistry.model.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+
+
+//import org.societies.api.internal.servicelifecycle.serviceRegistry.model.ServiceResourceIdentifier;
 
 /**
  * @author Eliza
@@ -37,7 +40,7 @@ public class PreferenceDetails implements Serializable {
 
 	private String preferenceName;
 	private static final long serialVersionUID = 1L;
-	private ServiceResourceIdentifier serviceID = null;
+	private IServiceResourceIdentifier serviceID = null;
 	private String serviceType;
 
 	public PreferenceDetails(){
@@ -54,7 +57,7 @@ public class PreferenceDetails implements Serializable {
 	 * @param serviceID
 	 * @param preferenceName
 	 */
-	public PreferenceDetails(String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
+	public PreferenceDetails(String serviceType, IServiceResourceIdentifier serviceID, String preferenceName){
 
 	}
 
@@ -87,7 +90,7 @@ public class PreferenceDetails implements Serializable {
 	 * 
 	 * @param sID
 	 */
-	private boolean compareServiceID(ServiceResourceIdentifier sID){
+	private boolean compareServiceID(IServiceResourceIdentifier sID){
 		return false;
 	}
 
@@ -121,7 +124,7 @@ public class PreferenceDetails implements Serializable {
 	 * @param serviceType
 	 * @param serviceID
 	 */
-	public boolean equalsServiceOnlyDetails(String serviceType, ServiceResourceIdentifier serviceID){
+	public boolean equalsServiceOnlyDetails(String serviceType, IServiceResourceIdentifier serviceID){
 		return false;
 	}
 
@@ -129,7 +132,7 @@ public class PreferenceDetails implements Serializable {
 		return "";
 	}
 
-	public ServiceResourceIdentifier getServiceID(){
+	public IServiceResourceIdentifier getServiceID(){
 		return null;
 	}
 
@@ -149,7 +152,7 @@ public class PreferenceDetails implements Serializable {
 	 * 
 	 * @param serviceID
 	 */
-	public void setServiceID(ServiceResourceIdentifier serviceID){
+	public void setServiceID(IServiceResourceIdentifier serviceID){
 
 	}
 

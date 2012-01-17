@@ -27,6 +27,10 @@ package org.societies.orchestration.IntelligentCommunityMembershipEngine.impl;
 
 import org.societies.cis.management.api.*;
 
+import org.societies.api.internal.cis.cis_management.CisRecord;
+
+import org.societies.api.mock.EntityIdentifier;
+
 /**
  * The class for the Intelligent Community Membership Engine
  *
@@ -35,7 +39,32 @@ import org.societies.cis.management.api.*;
  */
 public class IntelligentCommunityMembershipEngine {
 	
-	public EntityIdentifier[] identifyPotentialCisMembers(EntityIdentifier cisId);
+	public String[] compatibilityStrengths;
+	
+	public EntityIdentifier linkedCss; //The user this component runs on behalf of - null otherwise
+	public EntityIdentifier linkedCis; //The single CIS this component runs on behalf of - null otherwise
+	public EntityIdentifier linkedCiss; //The group of CISs this component runs on behalf of - null otherwise
+	
+		
+	public IntelligentCommunityMembershipEngine (EntityIdentifier linkedCss) {
+		
+	}
+	
+    public IntelligentCommunityMembershipEngine (CisRecord linkedCis) {
+		
+	}
+    
+    public IntelligentCommunityMembershipEngine (CisRecord[] linkedCiss) {
+		
+	}
+	
+	public EntityIdentifier[] identifyPotentialCisMembers(EntityIdentifier cisId) {
+		
+	}
+	
+    public EntityIdentifier[] identifyPotentialCissToJoin() {
+		
+	}
 	
 	/**
 	 * This method returns the recommended potential CIS members who should be encouraged to join
@@ -51,6 +80,22 @@ public class IntelligentCommunityMembershipEngine {
 	public EntityIdentifier[] getRecommendedCsss(CisRecord cisId, String[] compatibilityStrengths) {
 		
 	}
+	
+	/**
+	 * This method returns the recommended potential CISs that the CSS user should be encouraged to join
+	 * or automatically entered into. 
+	 * 
+	 * @param cssId ID of the CSS asking for recommendations.
+	 * @return list of recommended CISs in form of CISRecord data type.
+	 */
+	public EntityIdentifier[] getRecommendedCiss() {
+		
+	}
+	
+	public EntityIdentifier[] getRecommendedCiss(String[] compatibilityStrengths) {
+		
+	}
+	
 	public void setCompatibilityStrengths(String[] compatibilityStrengths) {
 		
 	}
