@@ -25,9 +25,12 @@
 package org.societies.context.broker.test;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.Time;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
@@ -64,17 +67,18 @@ public class InternalCtxBrokerTest {
 		testRetrieveAttribute();
 		testUpdateAttribute();
 		testUpdateAttributeBlob();
-		testHistoryAttributeInteger();
-		testHistoryAttributeString();
+		//testHistoryAttributeInteger();
+		//testHistoryAttributeString();
+		testHistoryAttributeBlob();
 	}
 
 	/**
 	 * @param args
-	 * @throws IOException 
 	 */
 	public static void main(String[] args)  {
-		// TODO Auto-generated method stub
-		new InternalCtxBrokerTest();
+
+		InternalCtxBrokerTest testing = new InternalCtxBrokerTest();
+
 	}
 
 
@@ -119,7 +123,7 @@ public class InternalCtxBrokerTest {
 
 
 	private void testHistoryAttributeInteger(){
-		System.out.println("---- test testHistoryAttribute");
+		System.out.println("---- test testHistoryAttributeInteger");
 
 
 		CtxAttribute ctxAttribute = callback.getCtxAttribute();
@@ -167,14 +171,11 @@ public class InternalCtxBrokerTest {
 	}
 
 
-
 	private void  testHistoryAttributeString(){
 		System.out.println("---- test testHistoryAttributeString");
 
 		internalCtxBroker.createAttribute(callback.getCtxEntity().getId(), CtxAttributeValueType.INDIVIDUAL, "name", callback);
 		CtxAttribute ctxAttributeString = (CtxAttribute) callback.getCtxAttribute();
-
-
 
 		ctxAttributeString.setStringValue("Aris");
 		ctxAttributeString.setHistoryRecorded(true);
@@ -184,8 +185,6 @@ public class InternalCtxBrokerTest {
 		//System.out.println("ctxAttributeString"+ ctxAttributeStringRtrvd.getId());
 		System.out.println("ctxAttributeString id "+ ctxAttributeString.getId());
 		System.out.println("ctxAttributeString value: "+ ctxAttributeStringRtrvd.getStringValue());
-
-
 
 		ctxAttributeString.setStringValue("Zeus");
 		ctxAttributeString = internalUpdateRetrieve(ctxAttributeString);
@@ -200,35 +199,13 @@ public class InternalCtxBrokerTest {
 
 
 
-
-
-
-
-
-
-
-
-
-	private CtxAttribute internalUpdateRetrieve(CtxAttribute ctxAttribute){
-
-		internalCtxBroker.update(ctxAttribute,  callback);
-
-		internalCtxBroker.retrieve(ctxAttribute.getId(), callback);
-		ctxAttribute = (CtxAttribute) callback.getCtxModelObject();
-
-
-		return ctxAttribute;
-	}
-
-
 	private void testUpdateAttributeBlob() {
 		System.out.println("---- testUpdateAttributeBlob");
 		CtxAttribute ctxAttribute = (CtxAttribute) callback.getCtxModelObject();
 
-
 		MockBlobClass valueMockClass = new MockBlobClass();
 
-		System.out.println("Attribute value contained in serialised class i ="+valueMockClass.i);
+		System.out.println("Attribute value contained in serialised class ="+valueMockClass.i);
 
 		byte[] blobValue;
 		try {
@@ -250,6 +227,46 @@ public class InternalCtxBrokerTest {
 			e.printStackTrace();
 		}
 
+	}
+
+
+
+
+	private void  testHistoryAttributeBlob(){
+		System.out.println("---- test testHistoryAttributeBlob");
+
+		internalCtxBroker.createAttribute(callback.getCtxEntity().getId(), CtxAttributeValueType.INDIVIDUAL, "blobAttrValue", callback);
+		CtxAttribute ctxAttributeBlob = (CtxAttribute) callback.getCtxAttribute();
+
+		Map<String,String> blobClass = new HashMap<String,String>();
+		blobClass.put("key1","value1");
+
+		byte[] blobValue;
+		try {
+			blobValue = SerialisationHelper.serialise((Serializable) blobClass);
+			ctxAttributeBlob.setHistoryRecorded(true);
+			ctxAttributeBlob.setBinaryValue(blobValue);
+			ctxAttributeBlob = internalUpdateRetrieve(ctxAttributeBlob);
+
+			blobClass.put("key2", "value2");
+			blobValue = SerialisationHelper.serialise((Serializable) blobClass);
+			ctxAttributeBlob.setBinaryValue(blobValue);
+			ctxAttributeBlob = internalUpdateRetrieve(ctxAttributeBlob);
+			internalCtxBroker.retrievePast(ctxAttributeBlob.getId(), null, null, callback);
+
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} 
+	}
+
+
+	private CtxAttribute internalUpdateRetrieve(CtxAttribute ctxAttribute){
+
+		internalCtxBroker.update(ctxAttribute,  callback);
+		internalCtxBroker.retrieve(ctxAttribute.getId(), callback);
+		ctxAttribute = (CtxAttribute) callback.getCtxModelObject();
+		return ctxAttribute;
 	}
 
 
@@ -360,6 +377,22 @@ public class InternalCtxBrokerTest {
 				if(hocAttr.getStringValue() != null) System.out.println(hocAttr.getStringValue());
 				if(hocAttr.getIntegerValue() != null) System.out.println(hocAttr.getIntegerValue());
 				if(hocAttr.getDoubleValue() != null) System.out.println(hocAttr.getDoubleValue());
+				if(hocAttr.getBinaryValue() != null) {
+					try {
+						HashMap<String,String> blobValue = (HashMap<String,String>) SerialisationHelper.deserialise(hocAttr.getBinaryValue(), this.getClass().getClassLoader());
+						System.out.println(blobValue);
+					
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ClassNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					
+					System.out.println(hocAttr.getBinaryValue());
+				}
 			}
 
 			//	ctxAttribute.getQuality().getLastUpdated();

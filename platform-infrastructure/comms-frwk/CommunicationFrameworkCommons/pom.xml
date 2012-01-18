@@ -15,15 +15,6 @@
 	<name>Communication Framework Commons</name>
 	<version>0.0.1-SNAPSHOT</version>
 	
-	<dependencies>
-		<dependency>
-			<groupId>org.igniterealtime</groupId>
-			<artifactId>tinder</artifactId>
-			<type>jar</type>
-			<scope>provided</scope>
-		</dependency>
-	</dependencies>
-	
 	<!--
 	<build>
 		<plugins>

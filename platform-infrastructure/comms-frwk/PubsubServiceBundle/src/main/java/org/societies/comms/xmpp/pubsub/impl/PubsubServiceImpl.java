@@ -39,8 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.xml.bind.JAXBElement;
-
 import org.jabber.protocol.pubsub.Create;
 import org.jabber.protocol.pubsub.Item;
 import org.jabber.protocol.pubsub.Items;
@@ -71,11 +69,11 @@ public class PubsubServiceImpl implements PubsubService {
 	private static final Object ERROR_ITEM_REQUIRED;
 	static {
 		org.jabber.protocol.pubsub.errors.ObjectFactory errorFactory = new org.jabber.protocol.pubsub.errors.ObjectFactory();
-		ERROR_SUBID_REQUIRED = errorFactory.createSubidRequired(null).getValue();
-		ERROR_NOT_SUBSCRIBED = errorFactory.createNotSubscribed(null).getValue();
-		ERROR_INVALID_SUBID = errorFactory.createInvalidSubid(null).getValue();
-		ERROR_NODEID_REQUIRED = errorFactory.createNodeidRequired(null).getValue();
-		ERROR_ITEM_REQUIRED = errorFactory.createItemRequired(null).getValue();
+		ERROR_SUBID_REQUIRED = errorFactory.createSubidRequired("");
+		ERROR_NOT_SUBSCRIBED = errorFactory.createNotSubscribed("");
+		ERROR_INVALID_SUBID = errorFactory.createInvalidSubid("");
+		ERROR_NODEID_REQUIRED = errorFactory.createNodeidRequired("");
+		ERROR_ITEM_REQUIRED = errorFactory.createItemRequired("");
 	}
 	
 	// PubSub Constants
@@ -201,7 +199,6 @@ public class PubsubServiceImpl implements PubsubService {
 
 	@Override
 	public Object subscriberRetrieve(Stanza stanza, Pubsub payload) {
-		LOG.info("subscriberRetrieve");
 		Identity sender = stanza.getFrom();
 		String nodeId = payload.getItems().getNode();
 		String subId = payload.getItems().getSubid();
@@ -234,13 +231,13 @@ public class PubsubServiceImpl implements PubsubService {
 		
 		// TODO Access Control
 		
+		
+		
 		// Retrieve
-		LOG.info("Retrieve");
 		Items responseItems = new Items();
 		List<Item> responseItemList = responseItems.getItem();
-		if (itemList==null || itemList.size()==0) {
+		if (itemList!=null && itemList.size()>0) {
 			// Get specific items
-			LOG.info("Get specific items");
 			for (Item i : itemList) {
 				i.setAny(node.getItemPayload(i.getId()));
 				responseItemList.add(i);
@@ -248,13 +245,11 @@ public class PubsubServiceImpl implements PubsubService {
 		}
 		else {
 			// Get newest items
-			LOG.info("Get newest items");
 			// TODO 6.5.4 Returning Some Items
 			for (String itemId : node.getItemIds()) {
 				Item i = new Item();
 				i.setId(itemId);
 				Object itemPayload = node.getItemPayload(itemId);
-				LOG.info("itemPayload.getClass()="+itemPayload.getClass());
 				i.setAny(itemPayload);
 				responseItemList.add(i);
 				if (maxItems!=null && responseItemList.size()==maxItems.intValue())
@@ -287,32 +282,20 @@ public class PubsubServiceImpl implements PubsubService {
 			// 7.1.3.5 Bad Payload
 			//TODO If the <item/> element contains more than one payload element or the namespace of the root payload element does not match the configured namespace for the node
 			
-			// Publish and Update Item ID for Response
-			Object itemPayload = null;
-			LOG.info("item.getAny().getClass()="+item.getAny().getClass());
-			LOG.info("item.getAny().toString()="+item.getAny().toString());
-			
-			if (item.getAny() instanceof JAXBElement) {
-				LOG.info("((JAXBElement)item.getAny()).getDeclaredType().toString()="+((JAXBElement)item.getAny()).getDeclaredType().toString());
-				itemPayload = ((JAXBElement)item.getAny()).getValue();
-			}
-			if (item.getAny() instanceof org.w3c.dom.Element) {
-				LOG.info("((org.w3c.dom.Element)item.getAny()).getLocalName()="+((org.w3c.dom.Element)item.getAny()).getLocalName());
-				LOG.info("((org.w3c.dom.Element)item.getAny()).getNamespaceURI()="+((org.w3c.dom.Element)item.getAny()).getNamespaceURI());
-				itemPayload = ((org.w3c.dom.Element)item.getAny());
-			}
-			
-			String itemId = node.publishItem(item.getId(),itemPayload,sender);
+			// Publish and Update Item ID for Response			
+			String itemId = node.publishItem(item.getId(),(org.w3c.dom.Element)item.getAny(),sender);
 			item.setId(itemId);
 			
 			// Build Notifications
+			org.jabber.protocol.pubsub.event.Event event = new org.jabber.protocol.pubsub.event.Event();
 			org.jabber.protocol.pubsub.event.Items eventItems = new org.jabber.protocol.pubsub.event.Items();
 			org.jabber.protocol.pubsub.event.Item eventItem = new org.jabber.protocol.pubsub.event.Item();
 			eventItem.setId(itemId);
 			eventItem.setAny((org.w3c.dom.Element)item.getAny());
 			eventItems.setNode(nodeId);
 			eventItems.getItem().add(eventItem);
-			pes.sendEvent(node.getSubscribers(), eventItems); // TODO 7.1.2.2 Notification Without Payload
+			event.setItems(eventItems);
+			pes.sendEvent(node.getSubscribers(), event); // TODO 7.1.2.2 Notification Without Payload
 		}
 
 		// Build Response

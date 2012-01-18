@@ -32,74 +32,10 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.internal.context.community.history.ICommunityCtxHistoryMgr;
+import org.societies.api.internal.context.user.history.IUserCtxHistoryCallback;
 
 public class CommunityContextHistoryManagement  implements ICommunityCtxHistoryMgr{
 
-	@Override
-	public void disableCtxRecording() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void enableCtxRecording() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public List<List<CtxAttributeIdentifier>> getHistoryTuplesID(
-			CtxAttributeIdentifier arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void registerHistoryTuples(CtxAttributeIdentifier arg0,
-			List<CtxAttributeIdentifier> arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void registerHistoryTuples(CtxAttributeIdentifier arg0,
-			CtxAttributeIdentifier arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int removeHistory(CtxAttribute arg0, Date arg1, Date arg2) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int removeHistory(String arg0, Date arg1, Date arg2) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public List<CtxHistoryAttribute> retrieveHistory(CtxAttribute arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<CtxHistoryAttribute> retrieveHistory(CtxAttribute arg0,
-			Date arg1, Date arg2) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Map<CtxAttribute, List<CtxAttribute>> retrieveHistoryTuples(
-			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1,
-			Date arg2, Date arg3) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public void disableCommCtxRecording() {
@@ -109,6 +45,74 @@ public class CommunityContextHistoryManagement  implements ICommunityCtxHistoryM
 
 	@Override
 	public void enableCommCtxRecording() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void disableCtxRecording(IUserCtxHistoryCallback arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void enableCtxRecording(IUserCtxHistoryCallback arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getHistoryTuplesID(CtxAttributeIdentifier arg0,
+			IUserCtxHistoryCallback arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void registerHistoryTuples(CtxAttributeIdentifier arg0,
+			List<CtxAttributeIdentifier> arg1, IUserCtxHistoryCallback arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void removeHistory(CtxAttribute arg0, Date arg1, Date arg2,
+			IUserCtxHistoryCallback arg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void removeHistory(String arg0, Date arg1, Date arg2,
+			IUserCtxHistoryCallback arg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void retrieveHistory(CtxAttributeIdentifier arg0, int arg1,
+			IUserCtxHistoryCallback arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void retrieveHistory(CtxAttributeIdentifier arg0, Date arg1,
+			Date arg2, IUserCtxHistoryCallback arg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void retrieveHistoryTuples(CtxAttributeIdentifier arg0,
+			List<CtxAttributeIdentifier> arg1, Date arg2, Date arg3,
+			IUserCtxHistoryCallback arg4) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void storeHoCAttribute(CtxAttribute arg0, Date arg1) {
 		// TODO Auto-generated method stub
 		
 	}

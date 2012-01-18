@@ -28,8 +28,6 @@ package org.societies.comm.xmpp.interfaces;
 
 import org.societies.comm.xmpp.datatypes.Stanza;
 import org.societies.comm.xmpp.exceptions.CommunicationException;
-import org.xmpp.packet.IQ;
-import org.xmpp.packet.Message.Type;
 
 /**
  * @author Joao M. Goncalves (PTIN)
@@ -49,10 +47,13 @@ public interface CommManager {
 	void register(FeatureServer featureServer) throws CommunicationException,
 			ClassNotFoundException;
 
-	public void sendIQ(Stanza stanza, IQ.Type type, Object payload,
+	public void sendIQGet(Stanza stanza, Object payload,
+			CommCallback callback) throws CommunicationException;
+	
+	public void sendIQSet(Stanza stanza, Object payload,
 			CommCallback callback) throws CommunicationException;
 
-	void sendMessage(Stanza stanza, Type type, Object payload)
+	void sendMessage(Stanza stanza, String type, Object payload)
 			throws CommunicationException;
 	
 	void sendMessage(Stanza stanza, Object payload)
@@ -60,5 +61,4 @@ public interface CommManager {
 
 	// void sendResult(? originalPayload, Object resultPayload); //TODO only
 	// needed for asynch IQ handling
-
 }

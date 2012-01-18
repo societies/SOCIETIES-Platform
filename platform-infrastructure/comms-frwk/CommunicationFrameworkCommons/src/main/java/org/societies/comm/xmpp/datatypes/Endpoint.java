@@ -50,7 +50,7 @@ public class Endpoint extends Identity {
 	@Override
 	public String getJid() {
 		if (type.equals(IdentityType.CSS))
-			return identifier+"@"+domainIdentifier+nodeIdentifier;
+			return identifier+"@"+domainIdentifier+"/"+nodeIdentifier;
 		else
 			return identifier+"."+domainIdentifier;
 	}

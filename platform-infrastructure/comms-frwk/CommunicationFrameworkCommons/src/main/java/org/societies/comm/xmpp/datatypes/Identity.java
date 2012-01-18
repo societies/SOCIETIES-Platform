@@ -59,11 +59,47 @@ public class Identity {
 		this.domainIdentifier = domainIdentifier;
 	}
 
-	public boolean equals(Identity otherIdentity) {
-		if (identifier.equals(otherIdentity.getIdentifier()) && domainIdentifier.equals(otherIdentity.getDomainIdentifier()))
+
+	@Override
+	public String toString() {
+		return getJid();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((domainIdentifier == null) ? 0 : domainIdentifier.hashCode());
+		result = prime * result
+				+ ((identifier == null) ? 0 : identifier.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
 			return true;
-		else
+		if (obj == null)
 			return false;
+		if (!(obj instanceof Identity))
+			return false;
+		Identity other = (Identity) obj;
+		if (domainIdentifier == null) {
+			if (other.domainIdentifier != null)
+				return false;
+		} else if (!domainIdentifier.equals(other.domainIdentifier))
+			return false;
+		if (identifier == null) {
+			if (other.identifier != null)
+				return false;
+		} else if (!identifier.equals(other.identifier))
+			return false;
+		if (type != other.type)
+			return false;
+		return true;
 	}
 	
 	public enum IdentityType {
@@ -89,4 +125,5 @@ public class Identity {
 		else
 			return identifier+"."+domainIdentifier;
 	}
+	
 }

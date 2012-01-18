@@ -54,7 +54,6 @@ public interface CommCallback {
 	 * @param stanza
 	 *            information regarding the error stanza (e.g. To/From IDs)
 	 */
-	void receiveError(Stanza stanza); // TODO error MAY have payload?? for
-										// namespace-specific errors?
+	void receiveError(Stanza stanza, Object payload);
 
 }

@@ -34,6 +34,7 @@ package org.societies.comm.xmpp.datatypes;
  */
 
 // TODO force UTF-8
+// TODO parse error (CommManagerHelper)
 public class XMPPError {
 	
 	public static final String STANZA_ERROR_NAMESPACE_DECL = "urn:ietf:params:xml:ns:xmpp-stanzas";
@@ -114,7 +115,7 @@ public class XMPPError {
 				errorString = "<error type='"+type.typeString+"'>\n<"+error+" xmlns='"+STANZA_ERROR_NAMESPACE_DECL+"'>\n";
 			else
 				errorString = "<error type='"+type.typeString+"'>\n<"+error+" xmlns='"+STANZA_ERROR_NAMESPACE_DECL+"'/>\n";
-			errorBytes = error.getBytes();
+			errorBytes = errorString.getBytes();
 			this.hasText = hasText;
 		}
 	}
