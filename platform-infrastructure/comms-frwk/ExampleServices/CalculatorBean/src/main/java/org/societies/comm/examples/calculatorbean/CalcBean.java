@@ -54,8 +54,8 @@ This will add the required XML notations and Object Factory
 
 public class CalcBean {
 	
-	public enum operationType {Add, Subtract};
-	private operationType operation;
+	public enum methodType {Add, Subtract, AddAsync};
+	private methodType method;
 	private int a;
 	private int b;
 	
@@ -73,11 +73,11 @@ public class CalcBean {
 		this.b = b;
 	}
 
-	public operationType getOperation() {
-		return operation;
+	public methodType getMethod() {
+		return method;
 	}
 	
-	public void setOperation(operationType operation) {
-		this.operation = operation;
+	public void setMethod(methodType method) {
+		this.method = method;
 	}
 }
