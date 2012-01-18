@@ -22,24 +22,36 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform;
+package org.societies.android.platform.devicestatus;
 
 import java.util.List;
 import java.util.Set;
+
+import org.societies.android.platform.R;
+import org.societies.android.platform.devicestatus.DeviceStatusServiceSameProcess.LocalBinder;
+import org.societies.android.platform.interfaces.IDeviceStatus;
+import org.societies.android.platform.interfaces.ServiceMethodTranslator;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 /**
@@ -53,6 +65,14 @@ public class DeviceStatusActivity extends Activity {
 	private TextView txtBattery;
 	private TextView txtLocation;
 
+	private boolean ipBoundToService = false;
+	private IDeviceStatus targetIPService = null;
+	private boolean opBoundToService = false;
+	private Messenger targetOPService = null;
+	
+	private long serviceInvoke;
+	private static final int NUM_SERVICE_INVOKES = 1;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -62,10 +82,136 @@ public class DeviceStatusActivity extends Activity {
 		txtBattery = (TextView) findViewById(R.id.txtBattery);
 		txtLocation = (TextView) findViewById(R.id.txtLocation);
 
-		updateConnectivity();
-		updateBattery();
-		updateLocation();
+		//		updateConnectivity();
+		//		updateBattery();
+		//		updateLocation();
+
+		Intent ipIntent = new Intent(this, DeviceStatusServiceSameProcess.class);
+		Intent opIntent = new Intent(this, DeviceStatusServiceDifferentProcess.class);
+		bindService(ipIntent, inProcessServiceConnection, Context.BIND_AUTO_CREATE);
+		bindService(opIntent, outProcessServiceConnection, Context.BIND_AUTO_CREATE);
+		
+		IntentFilter intentFilter = new IntentFilter() ;
+        intentFilter.addAction(DeviceStatusServiceDifferentProcess.CONNECTIVITY);
+        this.registerReceiver(new ServiceReceiver(), intentFilter);
 	}
+
+	protected void onStop() {
+		super.onStop();
+		if (ipBoundToService) {
+			unbindService(inProcessServiceConnection);
+		}
+		if (opBoundToService) {
+			unbindService(outProcessServiceConnection);
+		}
+	}
+
+	private ServiceConnection inProcessServiceConnection = new ServiceConnection() {
+		public void onServiceDisconnected(ComponentName name) {
+			ipBoundToService = false;
+		}
+
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			LocalBinder binder = (LocalBinder) service;
+			targetIPService = (IDeviceStatus) binder.getService();
+			ipBoundToService = true;
+		}
+	};
+
+	private ServiceConnection outProcessServiceConnection = new ServiceConnection() {
+
+		public void onServiceDisconnected(ComponentName name) {
+			opBoundToService = false;
+		}
+
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			opBoundToService = true;
+			targetOPService = new Messenger(service);
+		}
+	};
+	
+	/**
+     * Call an out-of-process service. Process involves:
+     * 1. Select valid method signature
+     * 2. Create message with corresponding index number
+     * 3. Create a bundle (cf. http://developer.android.com/reference/android/os/Bundle.html) for restrictions on data types 
+     * 4. Add parameter values. The values are held in key-value pairs with the parameter name being the key
+     * 5. Send message
+     * 
+     * Currently no return value is returned. To do so would require a reverse binding process from the service, 
+     * i.e a callback interface and handler/messenger code in the consumer. The use of intents or even selective intents (define
+     * an intent that can only be intercepted by a stated application) will achieve the same result with less binding.
+     * @param view
+     */
+    public void onButtonRefreshUsingDifferentProcessClick(View view) {
+    	if (opBoundToService) {
+    		String targetMethod = "isInternetConnectivityOn()";
+    		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IDeviceStatus.methodsArray, targetMethod), 0, 0);
+    		Bundle outBundle = new Bundle();
+//    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), "nothing here");
+    		outMessage.setData(outBundle);
+    		try {
+				targetOPService.send(outMessage);
+			} catch (RemoteException e) {
+				txtConnectivity.setText("No such method in this service.\n");
+				e.printStackTrace();
+			}
+    	}
+    	else {
+			txtConnectivity.setText("No service connected.\n");
+		}
+    }
+
+	/**
+	 * Call an in-process service. Service consumer simply calls service API and can use 
+	 * return value
+	 *  
+	 * @param view
+	 */
+	public void onButtonRefreshUsingSameProcessClick(View view) {
+		StringBuffer sb = new StringBuffer();
+		if (ipBoundToService) {
+			sb.append("** Internet is enabled? "+(targetIPService.isInternetConnectivityOn() ? "yes" : "no")+"\n");
+		}
+		else {
+			sb.append("No service connected.\n");
+		}
+		txtConnectivity.setText(sb.toString());
+	}
+	
+	public void onButtonResetClick(View view) {
+		txtConnectivity.setText("Nothing yet");
+		txtBattery.setText("Nothing yet");
+		txtLocation.setText("Nothing yet");
+    }
+	
+	/**
+	 * Broadcast receiver to receive intents from Service methods
+	 * 
+	 * TODO: Intent Categories could be used to discriminate between 
+	 * returned method intents rather than an intent per method 
+	 *
+	 */
+	private class ServiceReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Log.i(TAG, intent.getAction());
+			
+			if (intent.getAction().equals(DeviceStatusServiceDifferentProcess.CONNECTIVITY)) {
+				Log.i(TAG, "Out of process real service received intent - CONNECTIVITY");
+
+				boolean isInternetOn =  intent.getBooleanExtra(DeviceStatusServiceDifferentProcess.INTENT_RETURN_KEY, false);
+				
+				// -- Internet enabled?
+				StringBuffer sb = new StringBuffer();
+				sb.append("** Internet is enabled? "+(isInternetOn ? "yes" : "no")+"\n");
+				txtConnectivity.setText(sb.toString());
+			}
+		}
+		
+	}
+	
 
 	public void updateConnectivity() {
 		StringBuffer sb = new StringBuffer();
@@ -161,7 +307,7 @@ public class DeviceStatusActivity extends Activity {
 						"Temperature: "+temperature+"°C\n" +
 						"Voltage: "+voltage+"V\n"+
 						"Status: ");
-				
+
 				switch(status) {
 				case BatteryManager.BATTERY_STATUS_CHARGING:
 					sb.append("charging");
@@ -179,7 +325,7 @@ public class DeviceStatusActivity extends Activity {
 				}
 				sb.append(pluggedOn(plugged));
 				sb.append("\n");
-				
+
 				txtBattery.setText(sb.toString());
 			}
 		};

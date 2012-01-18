@@ -9,7 +9,7 @@
         <relativePath>../../../parent/android.xml</relativePath>
    </parent>
 
-   <groupId>org.societies.android.platform</groupId>
+   <groupId>org.societies.android.platform.devicestatus</groupId>
    <artifactId>devicestatusgui</artifactId>
    <name>DeviceStatusGUI</name>
    <packaging>apk</packaging>
@@ -21,6 +21,12 @@
             <groupId>android</groupId>
             <artifactId>android</artifactId>
         </dependency>
+		<dependency>
+			<groupId>org.societies.android.platform</groupId>
+			<artifactId>CoreInterfaces</artifactId>
+			<version>${release.version}</version>
+			<scope>compile</scope>
+		</dependency>
     </dependencies>
 
     <build>
