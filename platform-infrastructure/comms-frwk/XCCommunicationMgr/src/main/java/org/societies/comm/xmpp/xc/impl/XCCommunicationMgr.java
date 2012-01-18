@@ -11,6 +11,7 @@ import org.xmpp.component.AbstractComponent;
 import org.xmpp.component.ComponentException;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.Message;
+import org.xmpp.packet.Message.Type;
 
 public class XCCommunicationMgr extends AbstractComponent implements
 		CommManager {
@@ -104,20 +105,31 @@ public class XCCommunicationMgr extends AbstractComponent implements
 	}
 
 	@Override
-	public void sendIQ(Stanza stanza, IQ.Type type, Object payload,
-			CommCallback callback) throws CommunicationException {
-		helper.sendIQ(stanza, type, payload, callback);
-	}
-
-	@Override
-	public void sendMessage(Stanza stanza, Message.Type type, Object payload)
+	public void sendMessage(Stanza stanza, String type, Object payload)
 			throws CommunicationException {
-		helper.sendMessage(stanza, type, payload);
+		Type mType = Message.Type.valueOf(type);
+		Message m = helper.sendMessage(stanza, mType, payload);
+		this.send(m);
 	}
 
 	@Override
 	public void sendMessage(Stanza stanza, Object payload)
 			throws CommunicationException {
-		helper.sendMessage(stanza, null, payload);
+		Message m = helper.sendMessage(stanza, null, payload);
+		this.send(m);
+	}
+
+	@Override
+	public void sendIQGet(Stanza stanza, Object payload, CommCallback callback)
+			throws CommunicationException {
+		IQ iq = helper.sendIQ(stanza, IQ.Type.get, payload, callback);
+		this.send(iq);
+	}
+
+	@Override
+	public void sendIQSet(Stanza stanza, Object payload, CommCallback callback)
+			throws CommunicationException {
+		IQ iq = helper.sendIQ(stanza, IQ.Type.set, payload, callback);
+		this.send(iq);
 	}
 }

@@ -123,13 +123,12 @@ public class SerialisationHelper {
 			String className = clazz.getName();
 			Class<?> resolvedClass = null;
 
-			System.out.println("[DEBUG]" + "Attempting to resolve class " + className);
+			//System.out.println("[DEBUG]" + "Attempting to resolve class " + className);
 			try {
 				resolvedClass = this.classLoader.loadClass(className);
-				System.out.println("[DEBUG]" + className
-						+ " resolved through specified class loader");
+				//System.out.println("[DEBUG]" + className	+ " resolved through specified class loader");
 			} catch (ClassNotFoundException e) {
-				System.out.println("[DEBUG]" + "Asking parent class to resolve " + className);
+				//System.out.println("[DEBUG]" + "Asking parent class to resolve " + className);
 				resolvedClass = super.resolveClass(clazz);
 			}
 

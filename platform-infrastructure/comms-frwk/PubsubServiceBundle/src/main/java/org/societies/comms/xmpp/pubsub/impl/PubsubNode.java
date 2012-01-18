@@ -1,6 +1,7 @@
 package org.societies.comms.xmpp.pubsub.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,10 +10,15 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.comm.xmpp.datatypes.Identity;
 
 // TODO collection node support
-public class PubsubNode { 
+public class PubsubNode {
+	
+	private static Logger LOG = LoggerFactory
+			.getLogger(PubsubNode.class);
 	
 	private String id;
 	private Identity owner;

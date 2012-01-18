@@ -49,9 +49,9 @@ public class PubsubEventSender extends Thread {
 			synchronized (notificationQueue) {
 				while (notificationQueue.size()==0) {
 					try {
-						wait(TIMEOUT);
+						notificationQueue.wait(TIMEOUT);
 					} catch (InterruptedException e) {
-						LOG.info("InterruptedException!!!!!!!!");
+						LOG.info(e.getMessage());
 					}
 				}
 				n = notificationQueue.remove(0);
