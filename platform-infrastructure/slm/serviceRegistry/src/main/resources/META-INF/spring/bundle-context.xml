@@ -42,7 +42,7 @@
 
 		<property name="annotatedClasses">
 			<list>
-				<value>org.societies.api.internal.servicelifecycle.serviceRegistry.model.RegistryEntry
+				<value>org.societies.platform.servicelifecycle.serviceRegistry.model.RegistryEntry
 				</value>
 				
 			</list>
@@ -51,7 +51,7 @@
 		<property name="annotatedPackages">
 			<list>
 				
-				<value>org.societies.api.internal.servicelifecycle.serviceRegistry.model
+				<value>org.societies.platform.servicelifecycle.serviceRegistry.model
 				</value>
 			</list>
 		</property>
