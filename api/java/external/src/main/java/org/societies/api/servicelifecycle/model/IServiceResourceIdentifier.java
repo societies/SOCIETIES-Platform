@@ -45,4 +45,10 @@ public interface IServiceResourceIdentifier {
 	 * @param identifier for a Service Instance
 	 */
 	public void setIdentifier(URI identifier);
+	
+	/**
+	 * 
+	 * @return a string representation of the object.
+	 */
+	public String toString();
 }
