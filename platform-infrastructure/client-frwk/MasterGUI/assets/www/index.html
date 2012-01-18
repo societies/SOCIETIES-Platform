@@ -61,6 +61,7 @@
 
 	<div data-role="content" data-theme="a">	
     	<a href="#deviceManager" data-theme="a" data-transition="pop" data-role="button" >Device Manager</a>
+    	<a href="#cssRegistration" data-theme="a" data-transition="pop" data-role="button" >CSS Registration</a>
 	
 	</div><!-- /content -->
 
@@ -118,6 +119,106 @@
 	</div><!-- /header -->
 
 	<div data-role="content" data-theme="a">	
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" data-position="fixed">
+		<a href="#menu" data-role="button" data-icon="back" data-inline="true">menu</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Device Manager example page -->
+<div data-role="page" id="cssRegistration">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Device Manager</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">
+			<div data-role="fieldcontain" >
+			<!-- CSS Organisation Type-->
+				<label for="cssorgtype">CSS Entity Type:</label>
+				<select name="cssOrgType" id="cssorgtype" data-role="slider">
+					<option value="off">Individual</option>
+					<option value="on">Entity</option>
+				</select>
+			</div>
+
+			<!-- CSS Owner Forename (optional)-->
+			<div data-role="fieldcontain">
+		    	<label for="cssforename">Forename: </label>
+		    	<input type="text" name="cssForeName" id="cssforename" value="" disabled="true"/>
+			</div>
+
+			<!-- CSS Owner Name 
+				Can be an individual, organisation or some other entity -->
+			<div data-role="fieldcontain">
+		    	<label for="cssname">Name: </label>
+		    	<input type="text" name="cssName" id="cssname" value=""/>
+			</div>
+
+			<!-- CSS Identity-->
+			<div data-role="fieldcontain" >
+		    	<label for="cssidentity">Identity: </label>
+		    	<input type="text" name="cssIdentity" id="cssidentity" value=""/>
+			</div>
+
+			<!-- CSS Password-->
+			<div data-role="fieldcontain" >
+		    	<label for="cssuserpass">Password: </label>
+		    	<input type="text" name="cssUserPass" id="cssuserpass" value=""/>
+			</div>
+			
+			<!-- CSS Password-->
+			<div data-role="fieldcontain" >
+		    	<label for="cssuserpassagain">Password (confirm): </label>
+		    	<input type="text" name="cssUserPassAgain" id="cssuserpassagain" value=""/>
+			</div>
+			<div data-role="collapsible-set">
+			
+				<div data-role="collapsible">
+					<h3>Contact Details</h3>
+					
+					<!-- CSS e-mail Details-->
+					<div data-role="fieldcontain" >
+				    	<label for="cssemaildetails">e-Mail: </label>
+				    	<input type="text" name="cssEmailDetails" id="cssemaildetails" value=""/>
+					</div>
+					
+					<!-- CSS IM Details-->
+					<div data-role="fieldcontain" >
+				    	<label for="cssimdetails">IM: </label>
+				    	<input type="text" name="cssImDetails" id="cssimdetails" value=""/>
+					</div>
+					<!-- CSS SNS Details-->
+					<div data-role="fieldcontain" >
+				    	<label for="csssnsdetails">Social: </label>
+				    	<input type="text" name="cssSNSDetails" id="csssnsdetails" value=""/>
+					</div>
+				</div>
+				
+				<div data-role="collapsible">
+					<h3>Personal Details</h3>
+					
+					<div data-role="fieldcontain" >
+						<!-- Sex -->
+						<label for="csssextype">CSS Entity Type:</label>
+						<select name="cssSexType" id="csssextype" data-role="slider">
+							<option value="off">Male</option>
+							<option value="on">Female</option>
+						</select>
+					</div>
+					
+					<!-- CSS Location -->
+					<div data-role="fieldcontain" >
+				    	<label for="cssuserlocation">Home Location: </label>
+				    	<input type="text" name="cssUserLocation" id="cssuserlocation" value=""/>
+					</div>
+					
+				</div>
+			</div>
+			
+			<input id="createCSS" type="button" value="Register CSS" data-icon="gear" data-inline="true"/> 
+			
 	</div><!-- /content -->
 
 	<div data-role="footer" data-theme="a" data-position="fixed">
