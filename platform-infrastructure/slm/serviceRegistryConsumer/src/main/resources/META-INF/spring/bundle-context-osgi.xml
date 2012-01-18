@@ -5,7 +5,9 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
-	<osgi:service ref="serReg" interface="org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry" />
 	
+	<osgi:reference id="serReg" interface="org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry" />
 </beans>
+
+
+

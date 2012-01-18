@@ -13,7 +13,9 @@ import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 
 public class ServiceResourceIdentifier implements IServiceResourceIdentifier, Serializable {
-
+	
+	private URI identifier;
+	
 	/**
 	 * @param identifier
 	 */
@@ -22,7 +24,6 @@ public class ServiceResourceIdentifier implements IServiceResourceIdentifier, Se
 		this.identifier = identifier;
 	}
 
-	URI identifier;
 	
 	public URI getIdentifier() {
 		return identifier;
@@ -30,5 +31,10 @@ public class ServiceResourceIdentifier implements IServiceResourceIdentifier, Se
 
 	public void setIdentifier(URI identifier) {
 		this.identifier = identifier;
+	}
+	
+	@Override
+	public String toString() {
+		return identifier.toString();
 	}
 }
