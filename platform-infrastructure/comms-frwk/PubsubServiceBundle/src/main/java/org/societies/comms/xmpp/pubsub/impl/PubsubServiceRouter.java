@@ -57,7 +57,8 @@ public class PubsubServiceRouter implements FeatureServer {
 
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList(Arrays.asList("http://jabber.org/protocol/pubsub",
-					"http://jabber.org/protocol/pubsub#owner"));
+					"http://jabber.org/protocol/pubsub#owner",
+					"http://jabber.org/protocol/pubsub#errors"));
 	private static final List<String> PACKAGES = Collections
 			.unmodifiableList(Arrays.asList("jabber.x.data",
 					"org.jabber.protocol.pubsub",

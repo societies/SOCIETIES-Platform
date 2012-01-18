@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -100,6 +101,7 @@ public class CommManagerHelper {
 	private final Map<String, CommCallback> commCallbacks = new HashMap<String, CommCallback>();
 	private final Map<String, Unmarshaller> nsToUnmarshaller = new HashMap<String, Unmarshaller>();
 	private final Map<String, Marshaller> pkgToMarshaller = new HashMap<String, Marshaller>();
+	private final Map<String, Marshaller> nsToMarshaller = new HashMap<String, Marshaller>();
 
 	public String[] getSupportedNamespaces() {
 		String[] returnArray = new String[featureServers.size()];
@@ -137,6 +139,11 @@ public class CommManagerHelper {
 	private Marshaller getMarshaller(Package pkg) throws UnavailableException {
 		return (Marshaller) ifNotNull(pkgToMarshaller.get(pkg.getName()),
 				"package", pkg.getName());
+	}
+	
+	private Marshaller getMarshaller(String namespace) throws UnavailableException {
+		return (Marshaller) ifNotNull(nsToMarshaller.get(namespace),
+				"namespace", namespace);
 	}
 
 	public void dispatchIQResult(IQ iq) {
@@ -275,6 +282,7 @@ public class CommManagerHelper {
 				LOG.info("registering " + ns);
 				featureServers.put(ns, fs);
 				nsToUnmarshaller.put(ns, u);
+				nsToMarshaller.put(ns, m);
 			}
 
 			for (String packageStr : fs.getJavaPackages())
@@ -320,9 +328,15 @@ public class CommManagerHelper {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		os.write(error.getStanzaErrorBytes(), 0, error.getStanzaErrorBytes().length);
 		if (error.getApplicationError()!=null) {
-			LOG.info("error.getApplicationError()!=null");
 			InlineNamespaceXMLStreamWriter inxsw = new InlineNamespaceXMLStreamWriter(os);
-			getMarshaller(error.getApplicationError().getClass().getPackage()).marshal(error.getApplicationError(), inxsw);
+			inxsw.setXmlDeclaration(false);
+			// TODO solve this ugly hack! Dom4j needs XML declaration at the top of the file, but it cannot be repeated (here it would be also in the middle of the file)
+			if (error.getApplicationError() instanceof JAXBElement) {
+				JAXBElement appErrorElement = (JAXBElement)error.getApplicationError();
+				getMarshaller(appErrorElement.getName().getNamespaceURI()).marshal(appErrorElement, inxsw);
+			}
+			else
+				getMarshaller(error.getApplicationError().getClass().getPackage()).marshal(error.getApplicationError(), inxsw);
 		}
 		os.write(XMPPError.CLOSE_ERROR_BYTES,0,XMPPError.CLOSE_ERROR_BYTES.length);
 		ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());

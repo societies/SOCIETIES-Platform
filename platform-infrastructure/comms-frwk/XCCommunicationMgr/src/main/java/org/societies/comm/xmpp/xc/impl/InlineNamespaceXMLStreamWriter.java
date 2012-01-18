@@ -18,6 +18,7 @@ public class InlineNamespaceXMLStreamWriter implements XMLStreamWriter {
 	private Stack<String> namespaceStack = new Stack<String>();
 	private Stack<Integer> namespaceChangeHeight = new Stack<Integer>();
 	private Integer currentHeight = 0;
+	private boolean xmlDeclaration = true;
 
 	public InlineNamespaceXMLStreamWriter(OutputStream out) throws XMLStreamException {
 		xsw = xof.createXMLStreamWriter(out);
@@ -31,6 +32,14 @@ public class InlineNamespaceXMLStreamWriter implements XMLStreamWriter {
 		xsw = xof.createXMLStreamWriter(result);
 	}
 	
+	public boolean getXmlDeclaration() {
+		return xmlDeclaration;
+	}
+
+	public void setXmlDeclaration(boolean xmlDeclaration) {
+		this.xmlDeclaration = xmlDeclaration;
+	}
+
 	@Override
 	public void close() throws XMLStreamException {
         xsw.close();
@@ -143,17 +152,20 @@ public class InlineNamespaceXMLStreamWriter implements XMLStreamWriter {
 
 	@Override
     public void writeStartDocument() throws XMLStreamException {
-        xsw.writeStartDocument();
+		if (xmlDeclaration)
+			xsw.writeStartDocument();
     }
 
 	@Override
     public void writeStartDocument(String arg0) throws XMLStreamException {
-        xsw.writeStartDocument(arg0);
+		if (xmlDeclaration)
+			xsw.writeStartDocument(arg0);
     }
 
 	@Override
     public void writeStartDocument(String arg0, String arg1) throws XMLStreamException {
-        xsw.writeStartDocument(arg0, arg1);
+		if (xmlDeclaration)
+			xsw.writeStartDocument(arg0, arg1);
     }
 
 	@Override

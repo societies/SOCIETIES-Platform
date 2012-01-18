@@ -39,8 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.xml.bind.JAXBElement;
-
 import org.jabber.protocol.pubsub.Create;
 import org.jabber.protocol.pubsub.Item;
 import org.jabber.protocol.pubsub.Items;
@@ -71,11 +69,11 @@ public class PubsubServiceImpl implements PubsubService {
 	private static final Object ERROR_ITEM_REQUIRED;
 	static {
 		org.jabber.protocol.pubsub.errors.ObjectFactory errorFactory = new org.jabber.protocol.pubsub.errors.ObjectFactory();
-		ERROR_SUBID_REQUIRED = errorFactory.createSubidRequired(null).getValue();
-		ERROR_NOT_SUBSCRIBED = errorFactory.createNotSubscribed(null).getValue();
-		ERROR_INVALID_SUBID = errorFactory.createInvalidSubid(null).getValue();
-		ERROR_NODEID_REQUIRED = errorFactory.createNodeidRequired(null).getValue();
-		ERROR_ITEM_REQUIRED = errorFactory.createItemRequired(null).getValue();
+		ERROR_SUBID_REQUIRED = errorFactory.createSubidRequired("");
+		ERROR_NOT_SUBSCRIBED = errorFactory.createNotSubscribed("");
+		ERROR_INVALID_SUBID = errorFactory.createInvalidSubid("");
+		ERROR_NODEID_REQUIRED = errorFactory.createNodeidRequired("");
+		ERROR_ITEM_REQUIRED = errorFactory.createItemRequired("");
 	}
 	
 	// PubSub Constants
@@ -201,7 +199,6 @@ public class PubsubServiceImpl implements PubsubService {
 
 	@Override
 	public Object subscriberRetrieve(Stanza stanza, Pubsub payload) {
-		LOG.info("subscriberRetrieve");
 		Identity sender = stanza.getFrom();
 		String nodeId = payload.getItems().getNode();
 		String subId = payload.getItems().getSubid();
@@ -214,7 +211,6 @@ public class PubsubServiceImpl implements PubsubService {
 		if (node==null)
 			return new XMPPError(StanzaError.item_not_found);
 		
-		LOG.info("sender="+sender.getJid()+";sender.getDomainIdentifier()="+sender.getDomainIdentifier());
 		List<String> subIdList = node.getSubscriptions(sender);
 		
 		// 6.5.9.3 Entity Not Subscribed
@@ -226,7 +222,6 @@ public class PubsubServiceImpl implements PubsubService {
 			return new XMPPError(StanzaError.bad_request, null, ERROR_SUBID_REQUIRED);
 		
 		if (subId!=null) {
-			LOG.info("subId="+subId+"!");
 			// 6.5.9.2 Invalid Subscription ID
 			if (!subIdList.contains(subId))
 				return new XMPPError(StanzaError.unexpected_request, null, ERROR_INVALID_SUBID);
@@ -236,13 +231,13 @@ public class PubsubServiceImpl implements PubsubService {
 		
 		// TODO Access Control
 		
+		
+		
 		// Retrieve
-		LOG.info("Retrieve");
 		Items responseItems = new Items();
 		List<Item> responseItemList = responseItems.getItem();
-		if (itemList==null || itemList.size()==0) {
+		if (itemList!=null && itemList.size()>0) {
 			// Get specific items
-			LOG.info("Get specific items");
 			for (Item i : itemList) {
 				i.setAny(node.getItemPayload(i.getId()));
 				responseItemList.add(i);
@@ -250,13 +245,11 @@ public class PubsubServiceImpl implements PubsubService {
 		}
 		else {
 			// Get newest items
-			LOG.info("Get newest items");
 			// TODO 6.5.4 Returning Some Items
 			for (String itemId : node.getItemIds()) {
 				Item i = new Item();
 				i.setId(itemId);
 				Object itemPayload = node.getItemPayload(itemId);
-				LOG.info("itemPayload.getClass()="+itemPayload.getClass());
 				i.setAny(itemPayload);
 				responseItemList.add(i);
 				if (maxItems!=null && responseItemList.size()==maxItems.intValue())
