@@ -34,41 +34,45 @@ package org.societies.comm.examples.commsmanager.impl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
-//COMMUNICATION MANAGER IMPORTS
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.comm.xmpp.datatypes.Stanza;
-import org.societies.comm.xmpp.interfaces.CommManager;
-import org.societies.comm.xmpp.interfaces.FeatureServer;
-import org.societies.comm.xmpp.exceptions.CommunicationException;
-
-//CALCULATOR SERVICE IMPORTS
 import org.societies.comm.examples.calculator.ICalc;
 import org.societies.comm.examples.calculatorbean.CalcBean;
 import org.societies.comm.examples.calculatorbean.CalcBeanResult;
-import org.societies.comm.examples.calculatorbean.OperationType;
-
-//FORTUNE COOKIE SERVICE IMPORTS
 import org.societies.comm.examples.fortunecookie.api.IWisdom;
 import org.societies.comm.examples.fortunecookie.datatypes.Cookie;
 import org.societies.comm.examples.fortunecookiebean.FortuneCookieBean;
 import org.societies.comm.examples.fortunecookiebean.FortuneCookieBeanResult;
 import org.societies.comm.examples.fortunecookiebean.MethodName;
+import org.societies.comm.xmpp.datatypes.Stanza;
+import org.societies.comm.xmpp.exceptions.CommunicationException;
+import org.societies.comm.xmpp.interfaces.CommManager;
+import org.societies.comm.xmpp.interfaces.FeatureServer;
+import org.societies.example.complexservice.IComplexService;
+import org.societies.example.complexservice.schema.MyComplexBean;
+import org.societies.example.complexservice.schema.ServiceAMsgBean;
+import org.societies.example.complexservice.schema.ServiceAMsgBeanResult;
 
 public class CommsServer implements FeatureServer {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 							  Arrays.asList("http://societies.org/comm/examples/calculatorbean",
-									  		"http://societies.org/comm/examples/fortunecookiebean"));
+									  		"http://societies.org/comm/examples/fortunecookiebean",
+									  		"http://societies.org/example/complexservice/schema"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 							  Arrays.asList("org.societies.comm.examples.calculatorbean",
-											"org.societies.comm.examples.fortunecookiebean"));
+											"org.societies.comm.examples.fortunecookiebean",
+											"org.societies.example.complexservice.schema"));
 	
 	//PRIVATE VARIABLES
 	private CommManager commManager;
 	private ICalc calcService;
 	private IWisdom fcGenerator;
+	private IComplexService complexSvc;
+	
 	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
 	
 	//PROPERTIES
@@ -96,6 +100,14 @@ public class CommsServer implements FeatureServer {
 		this.fcGenerator = fcGenerator;
 	}
 
+	public IComplexService getComplexSvc() {
+		return complexSvc;
+	}
+
+	public void setComplexSvc(IComplexService complexSvc) {
+		this.complexSvc = complexSvc;
+	}
+	
 	//METHODS
 	public CommsServer() {
 	}
@@ -148,14 +160,14 @@ public class CommsServer implements FeatureServer {
 			
 			int result=0; int a = 0; int b = 0;
 			String text = ""; 
-			switch (calc.getOperation()) {
+			switch (calc.getMethod()) {
 			
 			//Add() METHOD
 			case ADD:
 				a = calc.getA();
 				b = calc.getB();
 				result = calcService.Add(a, b);
-				text = a + calc.getOperation().toString() + b + " = " + result;
+				text = a + " + " + b + " = " + result;
 				break;
 
 			//Subtract() method
@@ -163,7 +175,23 @@ public class CommsServer implements FeatureServer {
 				a = calc.getA();
 				b = calc.getB();
 				result = calcService.Subtract(a, b);
-				text = a + calc.getOperation().toString() + b + " = " + result;
+				text = a + " - " + b + " = " + result;
+				break;
+				
+			//AddAsync() METHOD
+			case ADD_ASYNC:
+				a = calc.getA();
+				b = calc.getB();
+				Future<Integer> asyncResult = calcService.AddAsync(a, b);
+				
+				try {
+					result = asyncResult.get();		//WAIT HERE TILL RESULT IS RETURNED. PROCESSOR IS RELEASED!
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				}				
+				text = a + " + " + b + " = " + result;
 				break;
 			}
 			//GENERATE BEAN CONTAINING RETURN OBJECT 
@@ -189,7 +217,52 @@ public class CommsServer implements FeatureServer {
 			}
 		}
 		
-		//TODO: Better error handling, ie, if there is no match on the Message Bean
+		// -------- COMPLEX SERVICE BUNDLE ---------
+		else if (payload.getClass().equals(ServiceAMsgBean.class)) {
+			ServiceAMsgBean complexBean = (ServiceAMsgBean) payload;
+			
+			MyComplexBean paramBean = (MyComplexBean) complexBean.getComplexBean();
+			Future<MyComplexBean> returnBean = null;
+			ServiceAMsgBeanResult complexRes = new ServiceAMsgBeanResult(); //GENERATE BEAN CONTAINING RETURN OBJECT 
+			
+			switch (complexBean.getMethod()) {
+			
+			//DO_SOMETHING() METHOD
+			case DO_SOMETHING:
+				//CALL ACTUAL SERVICE
+				returnBean = complexSvc.doSomething(paramBean);
+				
+				try {
+					complexRes.setComplexBean(returnBean.get());
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return complexRes;
+
+			//DO_SOMETHING_ELSE() METHOD
+			case DO_SOMETHING_ELSE:
+				//CALL ACTUAL SERVICE
+				returnBean = complexSvc.doSomethingElse(paramBean);
+				
+				try {
+					complexRes.setComplexBean(returnBean.get());
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return complexRes;
+			}
+		}
+		//TODO: Better error handling, ie, if there is no match on the received Message Bean
 		return null;
 	}
+	
+	
 }

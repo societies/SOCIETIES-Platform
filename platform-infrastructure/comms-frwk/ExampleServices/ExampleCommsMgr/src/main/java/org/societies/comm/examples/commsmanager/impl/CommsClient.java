@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.comm.examples.calculatorbean.CalcBean;
 import org.societies.comm.examples.calculatorbean.CalcBeanResult;
-import org.societies.comm.examples.calculatorbean.OperationType;
+import org.societies.comm.examples.calculatorbean.MethodType;
 import org.societies.comm.examples.commsmanager.IExampleCommsManager;
 import org.societies.comm.examples.fortunecookie.datatypes.Cookie;
 import org.societies.comm.examples.fortunecookiebean.FortuneCookieBean;
@@ -99,7 +99,7 @@ public class CommsClient implements CommCallback, IExampleCommsManager{
 
 		CalcBean calc = new CalcBean();
 		calc.setA(valA); calc.setB(valB);
-		calc.setOperation(OperationType.ADD);
+		calc.setMethod(MethodType.ADD);
 		try {
 			commManager.sendIQGet(stanza, calc, this);
 		} catch (CommunicationException e) {
@@ -113,7 +113,7 @@ public class CommsClient implements CommCallback, IExampleCommsManager{
 
 		CalcBean calc = new CalcBean();
 		calc.setA(valA); calc.setB(valB);
-		calc.setOperation(OperationType.SUBTRACT);
+		calc.setMethod(MethodType.SUBTRACT);
 		try {
 			commManager.sendIQGet(stanza, calc, this);
 		} catch (CommunicationException e) {
