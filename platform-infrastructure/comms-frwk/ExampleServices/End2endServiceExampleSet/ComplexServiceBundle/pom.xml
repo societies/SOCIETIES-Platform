@@ -46,7 +46,7 @@
 						<Embed-Transitive>true</Embed-Transitive>
 						<!-- <Import-Package></Import-Package>  -->
 						<Export-Package>
-							org.societies.example.complexservice
+							org.societies.example.complexservice.*
 						</Export-Package>
 					</instructions>
 				</configuration>
