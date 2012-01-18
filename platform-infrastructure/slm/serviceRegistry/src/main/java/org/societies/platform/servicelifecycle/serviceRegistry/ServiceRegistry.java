@@ -13,7 +13,7 @@ import org.societies.api.internal.servicelifecycle.model.Service;
 import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
-import org.societies.api.internal.servicelifecycle.serviceRegistry.model.RegistryEntry;
+import org.societies.platform.servicelifecycle.serviceRegistry.model.RegistryEntry;
 
 public class ServiceRegistry implements IServiceRegistry {
 	//static private Logger log = LoggerFactory.getLogger(ServiceRegistry.class);
