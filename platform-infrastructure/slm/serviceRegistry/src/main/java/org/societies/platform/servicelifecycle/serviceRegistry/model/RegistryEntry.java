@@ -92,10 +92,6 @@ public class RegistryEntry implements Serializable {
 
 	}
 
-	public void finalize() throws Throwable {
-
-	}
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "RegistryEntryId")

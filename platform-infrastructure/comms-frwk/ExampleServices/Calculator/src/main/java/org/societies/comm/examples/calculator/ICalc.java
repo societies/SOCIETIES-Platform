@@ -31,6 +31,8 @@
  */
 package org.societies.comm.examples.calculator;
 
+import java.util.concurrent.Future;
+
 public interface ICalc {
 
 	/**Adds 2 numbers together and returns total
@@ -41,4 +43,6 @@ public interface ICalc {
      */
     public int Subtract(int a, int b);
 
+    /**Adds 2 numbers together and returns total */
+    public Future<Integer> AddAsync(int a, int b);
 }

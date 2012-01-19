@@ -122,6 +122,13 @@
 			<version>${release.version}</version>
 			
 		</dependency>
+		
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -132,13 +139,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-						<Import-Package>*;resolution:=optional</Import-Package>
-						<Export-Package>
-							org.societies.api.internal.servicelifecycle.serviceRegistry.*
-							
-						</Export-Package>
+
 					</instructions>
 				</configuration>
 			</plugin>
