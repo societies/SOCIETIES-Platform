@@ -33,7 +33,7 @@ import java.util.Map;
 
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceLearning.impl.C45Output;
 import org.societies.personalisation.UserPreferenceLearning.impl.CtxIdentifierCache;
 import org.societies.personalisation.UserPreferenceLearning.impl.HistoryRetriever;
@@ -135,7 +135,7 @@ public class AA_SI extends Thread{
 	private IPreferenceTreeModel runCycle( 
 			ActionSubset input, 
 			CtxIdentifierCache cache,
-			ServiceResourceIdentifier serviceId,
+			IServiceResourceIdentifier serviceId,
 			String serviceType){
 
 		//convert to Instances for each serviceId
