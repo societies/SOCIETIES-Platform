@@ -28,7 +28,12 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.societies.example</groupId>
-			<artifactId>complexservice.schema</artifactId>
+			<artifactId>schema</artifactId>
+			<version>0.1</version>			
+		</dependency>
+		<dependency>
+			<groupId>org.societies.example</groupId>
+			<artifactId>internalAPI</artifactId>
 			<version>0.1</version>			
 		</dependency>
 	</dependencies>
@@ -44,10 +49,6 @@
 						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<!-- <Import-Package></Import-Package>  -->
-						<Export-Package>
-							org.societies.example.complexservice.*
-						</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>
