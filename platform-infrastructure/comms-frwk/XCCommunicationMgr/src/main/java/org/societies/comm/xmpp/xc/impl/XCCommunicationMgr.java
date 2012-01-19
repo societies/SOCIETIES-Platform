@@ -3,6 +3,7 @@ package org.societies.comm.xmpp.xc.impl;
 
 import org.jivesoftware.whack.ExternalComponentManager;
 import org.societies.comm.xmpp.datatypes.Stanza;
+import org.societies.comm.xmpp.datatypes.XMPPNode;
 import org.societies.comm.xmpp.exceptions.CommunicationException;
 import org.societies.comm.xmpp.interfaces.CommCallback;
 import org.societies.comm.xmpp.interfaces.CommManager;
@@ -63,6 +64,11 @@ public class XCCommunicationMgr extends AbstractComponent implements
 	@Override
 	protected String[] discoInfoFeatureNamespaces() {
 		return helper.getSupportedNamespaces();
+	}
+	
+	@Override
+	protected IQ handleDiscoItems(IQ iq) {
+		return helper.handleDiscoItems(iq);
 	}
 
 	@Override
@@ -131,5 +137,15 @@ public class XCCommunicationMgr extends AbstractComponent implements
 			throws CommunicationException {
 		IQ iq = helper.sendIQ(stanza, IQ.Type.set, payload, callback);
 		this.send(iq);
+	}
+
+	@Override
+	public void addRootNode(XMPPNode newNode) {
+		helper.addRootNode(newNode);
+	}
+
+	@Override
+	public void removeRootNode(XMPPNode node) {
+		helper.removeRootNode(node);
 	}
 }

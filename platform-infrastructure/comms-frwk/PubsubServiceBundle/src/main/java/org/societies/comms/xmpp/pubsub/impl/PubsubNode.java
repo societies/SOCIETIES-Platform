@@ -13,14 +13,14 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.comm.xmpp.datatypes.Identity;
+import org.societies.comm.xmpp.datatypes.LocalXMPPNode;
 
 // TODO collection node support
-public class PubsubNode {
+public class PubsubNode extends LocalXMPPNode {
 	
 	private static Logger LOG = LoggerFactory
 			.getLogger(PubsubNode.class);
 	
-	private String id;
 	private Identity owner;
 	// configurations
 	private Map<String, Identity> subscriptionsById;
@@ -32,7 +32,7 @@ public class PubsubNode {
 	// itempublishoptions??? these suck!
 	
 	public PubsubNode(Identity owner, String nodeId) {
-		id = nodeId;
+		super(nodeId, null); // TODO collection nodes
 		this.owner = owner;
 		subscriptionsById = new HashMap<String, Identity>();
 		subscriptionsByUser = new HashMap<Identity, List<String>>();
@@ -117,6 +117,4 @@ public class PubsubNode {
 	public Identity getOwner() {
 		return owner;
 	}
-
-	
 }

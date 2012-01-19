@@ -44,6 +44,7 @@ import org.jabber.protocol.pubsub.Item;
 import org.jabber.protocol.pubsub.Items;
 import org.jabber.protocol.pubsub.Pubsub;
 import org.jabber.protocol.pubsub.Subscription;
+import org.jabber.protocol.pubsub.errors.Unsupported;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.comm.xmpp.datatypes.Identity;
@@ -67,6 +68,7 @@ public class PubsubServiceImpl implements PubsubService {
 	private static final Object ERROR_INVALID_SUBID;
 	private static final Object ERROR_NODEID_REQUIRED;
 	private static final Object ERROR_ITEM_REQUIRED;
+	private static final Object ERROR_INVALID_JID;
 	static {
 		org.jabber.protocol.pubsub.errors.ObjectFactory errorFactory = new org.jabber.protocol.pubsub.errors.ObjectFactory();
 		ERROR_SUBID_REQUIRED = errorFactory.createSubidRequired("");
@@ -74,6 +76,7 @@ public class PubsubServiceImpl implements PubsubService {
 		ERROR_INVALID_SUBID = errorFactory.createInvalidSubid("");
 		ERROR_NODEID_REQUIRED = errorFactory.createNodeidRequired("");
 		ERROR_ITEM_REQUIRED = errorFactory.createItemRequired("");
+		ERROR_INVALID_JID = errorFactory.createInvalidJid("");
 	}
 	
 	// PubSub Constants
@@ -90,11 +93,14 @@ public class PubsubServiceImpl implements PubsubService {
 	private Map<String, PubsubNode> nodes;
 	private Map<String, String> redirectedNodes;
 	private PubsubEventSender pes;
+	private List<Identity> admins;
+	private CommManager endpoint;
 	
 	public PubsubServiceImpl(CommManager endpoint) {
 		nodes = new HashMap<String, PubsubNode>();
 		redirectedNodes = new HashMap<String, String>();
 		pes = new PubsubEventSender(endpoint);
+		this.endpoint = endpoint;
 	}
 
 	@Override
@@ -102,9 +108,12 @@ public class PubsubServiceImpl implements PubsubService {
 		Identity sender = stanza.getFrom();
 		Identity subscriber = Identity.fromJid(payload.getSubscribe().getJid());
 		String nodeId = payload.getSubscribe().getNode();
-		
 		// TODO "The <subscribe/> element SHOULD possess a 'node' attribute"... what happens when it doesn't?
-		// TODO 6.1.3.1 JIDs Do Not Match (match sender and subscriber)
+		
+		// 6.1.3.1 JIDs Do Not Match (match sender and subscriber)
+		if (!sender.equals(subscriber) && !admins.contains(sender))
+			return new XMPPError(StanzaError.bad_request, null, ERROR_INVALID_JID);
+		
 		// TODO Access Control
 		
 		PubsubNode node = nodes.get(nodeId);
@@ -140,7 +149,9 @@ public class PubsubServiceImpl implements PubsubService {
 		String nodeId = payload.getUnsubscribe().getNode();
 		String subId = payload.getUnsubscribe().getSubid();
 		
-		// TODO 6.2.3.3 Insufficient Privileges (match sender and subscriber)
+		// 6.2.3.3 Insufficient Privileges (match sender and subscriber)
+		if (!sender.equals(subscriber) && !admins.contains(sender))
+			return new XMPPError(StanzaError.forbidden);
 		
 		PubsubNode node = nodes.get(nodeId);
 		
@@ -175,26 +186,34 @@ public class PubsubServiceImpl implements PubsubService {
 
 	@Override
 	public Object subscriberOptionsRequest(Stanza stanza, Pubsub payload) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO 6.3
+		Unsupported u = new Unsupported();
+		u.setFeature("subscription-options");
+		return new XMPPError(StanzaError.feature_not_implemented, null, u);
 	}
 
 	@Override
 	public Object subscriberOptionsSubmission(Stanza stanza, Pubsub payload) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO 6.3
+		Unsupported u = new Unsupported();
+		u.setFeature("subscription-options");
+		return new XMPPError(StanzaError.feature_not_implemented, null, u);
 	}
 
 	@Override
 	public Object subscriberSubscribeConfigure(Stanza stanza, Pubsub payload) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO 6.3
+		Unsupported u = new Unsupported();
+		u.setFeature("subscription-options");
+		return new XMPPError(StanzaError.feature_not_implemented, null, u);
 	}
 
 	@Override
 	public Object subscriberDefaultOptions(Stanza stanza, Pubsub payload) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO 6.4
+		Unsupported u = new Unsupported();
+		u.setFeature("subscription-options");
+		return new XMPPError(StanzaError.feature_not_implemented, null, u);
 	}
 
 	@Override
@@ -231,8 +250,6 @@ public class PubsubServiceImpl implements PubsubService {
 		
 		// TODO Access Control
 		
-		
-		
 		// Retrieve
 		Items responseItems = new Items();
 		List<Item> responseItemList = responseItems.getItem();
@@ -257,6 +274,7 @@ public class PubsubServiceImpl implements PubsubService {
 			}
 		}
 		
+		// Build response
 		Pubsub response = new Pubsub();
 		responseItems.setNode(nodeId);
 		response.setItems(responseItems);
@@ -305,8 +323,10 @@ public class PubsubServiceImpl implements PubsubService {
 
 	@Override
 	public Object publisherPublishOptions(Stanza stanza, Pubsub payload) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO 7.1.5
+		Unsupported u = new Unsupported();
+		u.setFeature("publish-options");
+		return new XMPPError(StanzaError.feature_not_implemented, null, u);
 	}
 
 	@Override
@@ -372,7 +392,9 @@ public class PubsubServiceImpl implements PubsubService {
 		}
 		
 		// Create Node
-		nodes.put(nodeId, new PubsubNode(owner, nodeId));
+		PubsubNode newNode = new PubsubNode(owner, nodeId);
+		nodes.put(nodeId, newNode);
+		endpoint.addRootNode(newNode);
 		
 		// Build success response
 		Pubsub response = new Pubsub();
@@ -384,29 +406,37 @@ public class PubsubServiceImpl implements PubsubService {
 
 	@Override
 	public Object ownerCreateConfigure(Stanza stanza, Pubsub payload) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO 8.2
+		Unsupported u = new Unsupported();
+		u.setFeature("config-node");
+		return new XMPPError(StanzaError.feature_not_implemented, null, u);
 	}
 
 	@Override
 	public Object ownerConfigureRequest(Stanza stanza,
 			org.jabber.protocol.pubsub.owner.Pubsub payload) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO 8.2
+		Unsupported u = new Unsupported();
+		u.setFeature("config-node");
+		return new XMPPError(StanzaError.feature_not_implemented, null, u);
 	}
 
 	@Override
 	public Object ownerConfigureSubmission(Stanza stanza,
 			org.jabber.protocol.pubsub.owner.Pubsub payload) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO 8.2
+		Unsupported u = new Unsupported();
+		u.setFeature("config-node");
+		return new XMPPError(StanzaError.feature_not_implemented, null, u);
 	}
 
 	@Override
 	public Object ownerDefaultConfiguration(Stanza stanza,
 			org.jabber.protocol.pubsub.owner.Pubsub payload) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO 8.2
+		Unsupported u = new Unsupported();
+		u.setFeature("config-node");
+		return new XMPPError(StanzaError.feature_not_implemented, null, u);
 	}
 
 	// 8.4 Delete a Node
@@ -427,6 +457,7 @@ public class PubsubServiceImpl implements PubsubService {
 		
 		// Remove Node
 		nodes.remove(nodeId);
+		endpoint.removeRootNode(node);
 		
 		// Example 156. Owner deletes a node with redirection
 		String redirectUri = null;
