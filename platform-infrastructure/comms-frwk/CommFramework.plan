@@ -7,11 +7,12 @@
                 http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
     <artifact type="bundle" name="org.societies.comm.CommonLibraries"/>
-    <artifact type="bundle" name="org.societies.comms.xmpp.pubsub.PubsubServiceBundle"/>
     <artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
+    <artifact type="bundle" name="org.societies.comms.xmpp.pubsub.PubsubServiceBundle"/>
     <artifact type="bundle" name="org.societies.cis.mgmt.CommunityServiceBundle"/>
     <artifact type="bundle" name="org.societies.comm.examples.Calculator"/>
     <artifact type="bundle" name="org.societies.comm.examples.FortuneCookie"/>
-    <artifact type="bundle" name="org.societies.comm.examples.ExampleServiceManager"/>
+    <artifact type="bundle" name="org.societies.example.complexservice"/>
+    <artifact type="bundle" name="org.societies.comm.examples.ExampleCommsManager"/>
 
 </plan>
