@@ -1,0 +1,14 @@
+don't play,sunny,>75,>75,false
+don't play,sunny,>75,>75,true
+play,overcast,>75,>75,false
+play,rain,<=75,>75,false
+play,rain,<=75,>75,false
+don't play,rain,<=75,<=75,true
+play,overcast,<=75,<=75,true
+don't play,sunny,<=75,>75,false
+play,sunny,<=75,<=75,false
+play,rain,<=75,>75,false
+play,sunny,<=75,<=75,true
+play,overcast,<=75,>75,true
+play,overcast,>75,<=75,false
+don't play,rain,<=75,>75,true

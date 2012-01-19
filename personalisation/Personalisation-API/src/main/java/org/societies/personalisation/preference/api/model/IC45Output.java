@@ -29,7 +29,7 @@ package org.societies.personalisation.preference.api.model;
 import java.util.List;
 
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 
 /**
@@ -58,7 +58,7 @@ public interface IC45Output {
 	 * This method returns the IServiceIdentifier related to this object
 	 * @return ServiceResourceIdentifier - the service ID
 	 */
-	public ServiceResourceIdentifier getServiceId();
+	public IServiceResourceIdentifier getServiceId();
 
 	/**
 	 * This method returns the type of the service e.g. "multi-media"

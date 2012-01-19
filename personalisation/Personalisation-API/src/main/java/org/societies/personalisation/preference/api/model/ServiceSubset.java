@@ -27,21 +27,21 @@ package org.societies.personalisation.preference.api.model;
 
 import java.util.List;
 
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 public class ServiceSubset {
     
-    ServiceResourceIdentifier serviceId;
+    IServiceResourceIdentifier serviceId;
     String serviceType;
     List<ActionSubset> actionSubsets;
     
-    public ServiceSubset(ServiceResourceIdentifier serviceId, String serviceType, List<ActionSubset> actionSubsets){
+    public ServiceSubset(IServiceResourceIdentifier serviceId, String serviceType, List<ActionSubset> actionSubsets){
         this.serviceId = serviceId;
         this.serviceType = serviceType;
         this.actionSubsets = actionSubsets;
     }
     
-    public ServiceResourceIdentifier getServiceId(){
+    public IServiceResourceIdentifier getServiceId(){
         return this.serviceId;
     }
     
