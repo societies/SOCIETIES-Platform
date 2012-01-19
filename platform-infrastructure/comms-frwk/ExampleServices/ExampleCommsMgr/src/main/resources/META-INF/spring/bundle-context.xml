@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <!-- regular spring configuration file defining the beans for this
+       bundle. We've kept the osgi definitions in a separate 
+       configuration file so that this file can easily be used
+       for integration testing outside of an OSGi environment -->
+
+  <bean id="CommsServerManager" 
+  		class="org.societies.comm.examples.commsmanager.impl.CommsServer"
+  		depends-on="CommManagerBundle, FortuneCookieBundle, CalculatorBundle, ComplexBundle" 
+  		init-method="InitService">
+  		<property name="commManager" ref="CommManagerBundle"/>
+  		<property name="fcGenerator" ref="FortuneCookieBundle"/>
+  		<property name="calcService" ref="CalculatorBundle"/>
+  		<property name="complexSvc" ref="ComplexBundle"/>
+  </bean>
+
+  <bean name="CommsClientManager" 
+  		class="org.societies.comm.examples.commsmanager.impl.CommsClient" 
+  		depends-on="CommManagerBundle" >
+  		<property name="commManager" ref="CommManagerBundle"/>
+  </bean>
+</beans>

@@ -43,7 +43,7 @@ package org.societies.comm.examples.calculatorbean;
   }
    
 1) generate XSD, run the maven command:
-> mvn jaxb2:schemagen
+> mvn jaxb2:schemagen  -f createXSDpom.xml
 The schema.xsd file will be in /target/generated-resources/schemagen directory
 
 2) Build the JAR using this new schema.xsd as the source (not the .java files).
@@ -54,8 +54,8 @@ This will add the required XML notations and Object Factory
 
 public class CalcBean {
 	
-	public enum operationType {Add, Subtract};
-	private operationType operation;
+	public enum methodType {Add, Subtract, AddAsync};
+	private methodType method;
 	private int a;
 	private int b;
 	
@@ -73,11 +73,11 @@ public class CalcBean {
 		this.b = b;
 	}
 
-	public operationType getOperation() {
-		return operation;
+	public methodType getMethod() {
+		return method;
 	}
 	
-	public void setOperation(operationType operation) {
-		this.operation = operation;
+	public void setMethod(methodType method) {
+		this.method = method;
 	}
 }

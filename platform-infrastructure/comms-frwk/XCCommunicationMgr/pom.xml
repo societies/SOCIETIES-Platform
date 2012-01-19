@@ -15,7 +15,7 @@
     <artifactId>XCCommunicationMgr</artifactId>
     <packaging>bundle</packaging>
     <name>XC Communication Manager</name>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>${release.version}</version>
 
     <properties>
         <slf4j.version>1.5.8</slf4j.version>
@@ -114,7 +114,7 @@
 							<version>${release.version}</version>
 							<type>bundle</type>
 							<overWrite>true</overWrite>
-							<!-- <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory> -->
+							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>

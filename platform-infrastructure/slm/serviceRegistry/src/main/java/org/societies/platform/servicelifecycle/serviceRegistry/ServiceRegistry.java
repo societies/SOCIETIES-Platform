@@ -1,83 +1,177 @@
 package org.societies.platform.servicelifecycle.serviceRegistry;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+import org.societies.api.internal.servicelifecycle.model.Service;
+import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
-import org.societies.api.internal.servicelifecycle.serviceRegistry.model.QuerySubjectType;
-import org.societies.api.internal.servicelifecycle.serviceRegistry.model.RegistryEntry;
-import org.societies.api.internal.servicelifecycle.serviceRegistry.model.RegistryEntryOut;
-import org.societies.api.internal.servicelifecycle.serviceRegistry.model.ServiceResourceIdentifier;
-import org.societies.comm.identity.Identity;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
+import org.societies.platform.servicelifecycle.serviceRegistry.model.RegistryEntry;
 
 public class ServiceRegistry implements IServiceRegistry {
-	// static private Logger log = LoggerFactory.getLogger(ServiceRegistry.class);
 	private SessionFactory sessionFactory;
-	
-	public ServiceRegistry() {
-		sessionFactory = HibernateUtil.getSessionFactory();
 
-		// log.info("Service Registry created");
+	public ServiceRegistry() {
 	}
 
 	@Override
-	public List<ServiceResourceIdentifier> registerServiceList(
-			List<RegistryEntry> servicesList) {
-
+	public void registerServiceList(List<Service> servicesList) {
 		Session session = sessionFactory.openSession();
+		RegistryEntry tmpRegistryEntry = null;
+		
+		for (Service service : servicesList) {
+			try {
+				tmpRegistryEntry = new RegistryEntry(
+						new ServiceResourceIdentifier(new URI(service
+								.getServiceIdentifier().toString())),
+						service.getCSSIDInstalled(), service.getVersion(),
 
-		for (RegistryEntry registryEntry : servicesList) {
+						service.getServiceName(),
+						service.getServiceDescription(),
+						service.getAuthorSignature());
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
 			Transaction t = session.beginTransaction();
-			session.save(registryEntry);
+			session.save(tmpRegistryEntry);
+			t.commit();
+		}
+
+		session.close();
+	}
+
+	@Override
+	public void unregisterServiceList(List<Service> servicesList) {
+		Session session = sessionFactory.openSession();
+		RegistryEntry tmpRegistryEntry = null;
+		
+		for (Service service : servicesList) {
+			try {
+				tmpRegistryEntry = new RegistryEntry(
+						new ServiceResourceIdentifier(new URI(service
+								.getServiceIdentifier().toString())),
+						service.getCSSIDInstalled(), service.getVersion(),
+
+						service.getServiceName(),
+						service.getServiceDescription(),
+						service.getAuthorSignature());
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+			Transaction t = session.beginTransaction();
+			session.delete(tmpRegistryEntry);
 			t.commit();
 		}
 
 		session.close();
 
-		return null;
 	}
 
 	@Override
-	public List<ServiceResourceIdentifier> unregisterServiceList(
-			List<ServiceResourceIdentifier> servicesList) {
+	public List<Service> retrieveServicesSharedByCSS(String CSSID) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry
+	 * #retrieveServicesSharedByCIS(java.lang.String)
+	 */
 	@Override
-	public boolean syncRemoteCSSRegistry(Identity CSSID) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public List<RegistryEntryOut> retrieveServicesSharedByCSS(Identity CSS,
-			QuerySubjectType type) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<RegistryEntryOut> retrieveServicesInCSS(Identity CSS) {
+	public List<Service> retrieveServicesSharedByCIS(String CISID) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry
+	 * #notifyServiceIsSharedInCIS(java.lang.String, java.lang.String)
+	 */
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry
+	 * #findServices(java.lang.Object)
+	 */
 	@Override
-	public List<RegistryEntryOut> retrieveServicesInCIS(Identity CIS) {
+	public List<Service> findServices(Object filter) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry
+	 * #
+	 * notifyServiceIsSharedInCIS(org.societies.api.internal.servicelifecycle.model
+	 * .ServiceResourceIdentifier, java.lang.String)
+	 */
 	@Override
-	public List<RegistryEntryOut> retrieveServicesSharedToCSS(Identity CSS,
-			QuerySubjectType type) {
+	public void notifyServiceIsSharedInCIS(
+			ServiceResourceIdentifier serviceIdentifier, String CISID)
+			throws ServiceSharingNotificationException {
 		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry
+	 * #
+	 * removeServiceSharingInCIS(org.societies.api.internal.servicelifecycle.model
+	 * .ServiceResourceIdentifier, java.lang.String)
+	 */
+	@Override
+	public void removeServiceSharingInCIS(
+			ServiceResourceIdentifier serviceIdentifier, String CISID)
+			throws ServiceSharingNotificationException {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry
+	 * #retrieveService(org.societies.api.internal.servicelifecycle.model.
+	 * ServiceResourceIdentifier)
+	 */
+	@Override
+	public Service retrieveService(ServiceResourceIdentifier serviceIdentifier) {
+		/* Session session = sessionFactory.openSession();
+		
+		Service tmpService = (Service) session.get(ServiceResourceIdentifier.class, serviceIdentifier);
+		session.close();
+		
+		return tmpService; */
+		
 		return null;
+	}
+
+	public SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
+
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
 	}
 
 }
