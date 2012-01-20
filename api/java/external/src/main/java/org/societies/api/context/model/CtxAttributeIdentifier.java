@@ -24,8 +24,6 @@
  */
 package org.societies.api.context.model;
 
-import org.societies.api.mock.EntityIdentifier;
-
 /**
  * This class is used to identify context attributes. It provides methods
  * that return information about the identified attribute including:

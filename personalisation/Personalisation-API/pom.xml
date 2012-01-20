@@ -43,7 +43,7 @@
 	<artifactId>societies-api-internal</artifactId>
 	<version>${release.version}</version>
 	<scope>provided</scope>
-	</dependency>
+	</dependency>	
 	</dependencies>
 
 

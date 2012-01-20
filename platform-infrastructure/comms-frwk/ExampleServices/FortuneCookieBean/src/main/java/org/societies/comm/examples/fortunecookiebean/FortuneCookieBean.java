@@ -42,7 +42,7 @@ package org.societies.comm.examples.fortunecookiebean;
   }
    
 to generate XSD, run the maven command:
-> mvn jaxb2:schemagen
+> mvn jaxb2:schemagen -f createXSDpom.xml
 
 The schema.xsd file will be in /target/generated-resources/schemagen directory
  *

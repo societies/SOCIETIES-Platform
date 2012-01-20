@@ -32,7 +32,7 @@ import java.util.Map;
 
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceLearning.impl.C45Output;
 import org.societies.personalisation.UserPreferenceLearning.impl.CtxIdentifierCache;
 import org.societies.personalisation.UserPreferenceLearning.impl.HistoryRetriever;
@@ -53,14 +53,14 @@ public class SA_SI extends Thread{
 	private IC45Consumer requestor;
 	private Date startDate;
 	private EntityIdentifier historyOwner;
-	private ServiceResourceIdentifier serviceId;
+	private IServiceResourceIdentifier serviceId;
 	private String parameterName;
 	private HistoryRetriever historyRetriever;
 	private PreProcessor preProcessor;
 	private PostProcessor postProcessor;
 
 	public SA_SI(IC45Consumer requestor, Date startDate, EntityIdentifier historyOwner, 
-			ServiceResourceIdentifier serviceId, String parameterName, HistoryRetriever historyRetriever){
+			IServiceResourceIdentifier serviceId, String parameterName, HistoryRetriever historyRetriever){
 		this.requestor = requestor;
 		this.startDate = startDate;
 		this.historyOwner = historyOwner;

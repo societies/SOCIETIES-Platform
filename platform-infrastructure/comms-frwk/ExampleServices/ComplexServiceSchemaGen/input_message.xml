@@ -1,0 +1,14 @@
+<iq type='get' from='green@red.local/laptop' to='XCManager.red.local'
+	id='add1'>
+	<serviceAMsgBean xmlns='http://societies.org/example/complexservice/schema'>
+		<complexBean>
+			<name>someName</name>
+			<value>someValue</value>
+			<subType>
+				<name>someOtherName</name>
+				<value>someOtherValue</value>
+			</subType>
+		</complexBean>
+		<method>doSomething</method>
+	</serviceAMsgBean>
+</iq>

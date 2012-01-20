@@ -11,7 +11,7 @@
 	<groupId>org.societies.comm</groupId>
 	<artifactId>CommonLibraries</artifactId>
 	<packaging>bundle</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${release.version}</version>
 	<description>XMPP Virgo Dependency Bundle</description>
 	<name>Common Libraries for Communication Framework</name>
 
@@ -47,7 +47,7 @@
 		           			org.xmpp.util,		           			
 		           			org.jivesoftware.whack.*,
 		           			org.jivesoftware.smack.*,
-		           			org.dom4j*
+		           			org.dom4j.*
 		           		</Export-Package>
 		           		<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
@@ -65,7 +65,7 @@
 							<version>${release.version}</version>
 		           			<type>bundle</type>
 		           			<overWrite>true</overWrite>
-		           			<!--outputDirectory>${spring.osgi.deploy.dir}</outputDirectory-->
+		           			<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 		         		</artifactItem>
 	      			</artifactItems> 			              			        			
 	    		</configuration>

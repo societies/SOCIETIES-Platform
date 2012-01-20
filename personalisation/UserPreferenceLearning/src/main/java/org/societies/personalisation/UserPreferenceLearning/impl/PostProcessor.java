@@ -27,9 +27,9 @@ package org.societies.personalisation.UserPreferenceLearning.impl;
 
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceCondition;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
@@ -44,7 +44,7 @@ public class PostProcessor
 			String paramName, 
 			String treeString, 
 			CtxIdentifierCache cache,
-			ServiceResourceIdentifier serviceId,
+			IServiceResourceIdentifier serviceId,
 			String serviceType){
 
 		System.out.println("Converting String to tree: "+treeString);
@@ -185,14 +185,6 @@ public class PostProcessor
 		return newTree;
 	}
 
-	/* public IPreferenceTreeModel processSingletonContext(IDigitalPersonalIdentifier dpi, 
-    		ActionSubset actionSubset,
-    		IServiceIdentifier serviceId,
-    		String serviceType){
-    	IPreference root = new PreferenceTreeNode();
-
-    	Iterator
-    }*/
 
 	private boolean containsLeaf(String nextLine){
 
@@ -214,7 +206,7 @@ public class PostProcessor
 		return condition;
 	}
 
-	private IOutcome createOutcome(String paramName, String temp, ServiceResourceIdentifier serviceId, String serviceType){
+	private IOutcome createOutcome(String paramName, String temp, IServiceResourceIdentifier serviceId, String serviceType){
 
 		System.out.println("Creating outcome from String: "+temp);
 		IOutcome action = new PreferenceOutcome(paramName, temp);

@@ -33,8 +33,9 @@ import java.util.Map;
 
 //import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxHistoryAttribute;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.personalisation.model.Action;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.ActionSubset;
 import org.societies.personalisation.preference.api.model.ServiceSubset;
 
@@ -48,7 +49,7 @@ public class PreProcessor {
 	Map<String, ArrayList<String>> ruleVariables; //paramName, list of values
 
 	public ServiceSubset extractServiceActions
-	(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> data, ServiceResourceIdentifier serviceId, String parameterName){
+	(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> data, IServiceResourceIdentifier serviceId, String parameterName){
 
 		ActionSubset actionSubset = new ActionSubset(parameterName);
 		String serviceType = null;
@@ -57,8 +58,8 @@ public class PreProcessor {
 		while(data_it.hasNext()){
 			try {
 				CtxHistoryAttribute nextActionAttr = (CtxHistoryAttribute)data_it.next();
-				Action nextAction = (Action)nextActionAttr.getBlobValue(this.getClass().getClassLoader());
-				if(nextAction.getServiceID().equals(serviceId)){
+				Action nextAction = (Action) SerialisationHelper.deserialise(nextActionAttr.getBinaryValue(), this.getClass().getClassLoader());
+				if(nextAction.getServiceID().getIdentifier().equals(serviceId.getIdentifier())){
 					if(nextAction.getparameterName().equals(parameterName)){
 						//add action and snapshot to extracted list
 						actionSubset.put(nextActionAttr, data.get(nextActionAttr));
@@ -80,8 +81,8 @@ public class PreProcessor {
 
 	public List<ServiceSubset> splitHistory (Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> data)
 	{
-		System.out.println("Splitting history!! *****");
-		System.out.println("History size = "+data.size());
+		//System.out.println("Splitting history!! *****");
+		//System.out.println("History size = "+data.size());
 		List<ServiceSubset> serviceSubsets = new ArrayList<ServiceSubset>();
 
 		Iterator<CtxHistoryAttribute> data_it = data.keySet().iterator();
@@ -92,8 +93,8 @@ public class PreProcessor {
 				CtxHistoryAttribute nextActionAttr = (CtxHistoryAttribute)data_it.next();
 
 				//extract action from nextActionAttr
-				Action nextAction = (Action)nextActionAttr.getBlobValue(this.getClass().getClassLoader());
-				ServiceResourceIdentifier serviceId = nextAction.getServiceID();
+				Action nextAction = (Action) SerialisationHelper.deserialise(nextActionAttr.getBinaryValue(), this.getClass().getClassLoader());
+				IServiceResourceIdentifier serviceId = nextAction.getServiceID();
 				String serviceType = nextAction.getServiceType();
 
 				//check if service id exists in subsets
@@ -136,7 +137,7 @@ public class PreProcessor {
 	}
 
 
-	public List<ActionSubset> splitPrivacyHistory
+	/*public List<ActionSubset> splitPrivacyHistory
 	(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> data){
 
 		List<ActionSubset> actionSubsetList = new ArrayList<ActionSubset>();
@@ -160,7 +161,7 @@ public class PreProcessor {
 			}
 		}
 		return actionSubsetList;
-	}
+	}*/
 
 
 	public ServiceSubset trimServiceSubset(ServiceSubset history){
@@ -278,7 +279,7 @@ public class PreProcessor {
 
 			try {
 				CtxHistoryAttribute nextActionAttr = (CtxHistoryAttribute)actionSubset_it.next();
-				Action outcome = (Action)nextActionAttr.getBlobValue(this.getClass().getClassLoader());
+				Action outcome = (Action) SerialisationHelper.deserialise(nextActionAttr.getBinaryValue(), this.getClass().getClassLoader());
 
 				List<CtxHistoryAttribute> context = 
 					(ArrayList<CtxHistoryAttribute>)actionSubset.get(nextActionAttr);
@@ -400,7 +401,7 @@ public class PreProcessor {
 			try {
 				//get information from subset to populate Instance
 				CtxHistoryAttribute actionAttr = (CtxHistoryAttribute)subset_it.next();
-				Action outcome = (Action)actionAttr.getBlobValue(this.getClass().getClassLoader());
+				Action outcome = (Action) SerialisationHelper.deserialise(actionAttr.getBinaryValue(), this.getClass().getClassLoader());
 
 				ArrayList<CtxHistoryAttribute> context = 
 					(ArrayList<CtxHistoryAttribute>)subset.get(actionAttr);
@@ -436,13 +437,13 @@ public class PreProcessor {
 	}
 
 
-	private ServiceSubset getServiceSubset(List<ServiceSubset> subsets, ServiceResourceIdentifier serviceId){
+	private ServiceSubset getServiceSubset(List<ServiceSubset> subsets, IServiceResourceIdentifier serviceId){
 		ServiceSubset serviceSubset = null;
 
 		Iterator<ServiceSubset> subsets_it = subsets.iterator();
 		while(subsets_it.hasNext()){
 			ServiceSubset nextSubset = (ServiceSubset)subsets_it.next();
-			if(nextSubset.getServiceId().toString().equals(serviceId.toString())){
+			if(nextSubset.getServiceId().getIdentifier().equals(serviceId.getIdentifier())){
 				serviceSubset = nextSubset;
 				break;
 			}

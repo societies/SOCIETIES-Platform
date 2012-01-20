@@ -28,12 +28,14 @@ package org.societies.comm.xmpp.xc.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.StringReader;
-import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
@@ -41,9 +43,9 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.stream.XMLStreamException;
 
+import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -51,9 +53,10 @@ import org.dom4j.Namespace;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.comm.xmpp.datatypes.LocalXMPPNode;
 import org.societies.comm.xmpp.datatypes.Stanza;
 import org.societies.comm.xmpp.datatypes.XMPPError;
-import org.societies.comm.xmpp.datatypes.XMPPError.StanzaError;
+import org.societies.comm.xmpp.datatypes.XMPPNode;
 import org.societies.comm.xmpp.exceptions.CommunicationException;
 import org.societies.comm.xmpp.interfaces.CommCallback;
 import org.societies.comm.xmpp.interfaces.FeatureServer;
@@ -102,10 +105,95 @@ public class CommManagerHelper {
 	private final Map<String, Unmarshaller> nsToUnmarshaller = new HashMap<String, Unmarshaller>();
 	private final Map<String, Marshaller> pkgToMarshaller = new HashMap<String, Marshaller>();
 	private final Map<String, Marshaller> nsToMarshaller = new HashMap<String, Marshaller>();
+	
+	private final Map<String, LocalXMPPNode> localToplevelNodes = new HashMap<String, LocalXMPPNode>();
+	private final List<XMPPNode> allToplevelNodes = new ArrayList<XMPPNode>();
 
 	public String[] getSupportedNamespaces() {
 		String[] returnArray = new String[featureServers.size()];
 		return featureServers.keySet().toArray(returnArray);
+	}
+	
+	public IQ handleDiscoItems(IQ iq) {
+		String node = null;
+		Attribute nodeAttr = iq.getElement().attribute("node");
+		if (nodeAttr!=null)
+			node = nodeAttr.getText();
+		
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		try {
+			if (node==null) {
+				// return top level nodes
+				os.write(XMPPNode.ITEM_QUERY_OPEN_BYTES);
+				for (XMPPNode n : allToplevelNodes)
+					os.write(n.getItemXmlBytes());
+				os.write(XMPPNode.ITEM_QUERY_CLOSE_BYTES);
+			}
+			else {
+				// return specific nodes
+				// check if some root-level node matches specified node
+				LocalXMPPNode localNode = localToplevelNodes.get(node);
+				// if not try to use node hierarchy to find speficied node
+				if (localNode==null) {
+					String[] nodePath = node.split("/");
+					for (int i=0; i<nodePath.length; i++) {
+						if (i==0)
+							localNode = localToplevelNodes.get(nodePath[i]);
+						else
+							localNode = localNode.getLocalChild(nodePath[i]);
+						if (localNode==null)
+							break;
+					}
+				}
+				
+				os.write(localNode.getQueryXmlBytes());
+				if (localNode!=null) {
+					for (XMPPNode n : localNode.getChildren())
+						os.write(n.getItemXmlBytes());
+				}
+				os.write(XMPPNode.ITEM_QUERY_CLOSE_BYTES);
+			}
+		} catch (IOException e) {
+			LOG.error(e.getMessage());
+		}
+		
+		LOG.info("Going to parse error... Charset.defaultCharset().toString()="+Charset.defaultCharset().toString());
+		LOG.info("Charset.availableCharsets().keySet().toArray().toString()="+Arrays.toString(Charset.availableCharsets().keySet().toArray()));
+		LOG.info(new String(os.toByteArray()));
+		
+		try {
+			if (os.size()>0) {
+				ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+				Document dom4jItems = reader.read(is);
+				
+				// return items
+				IQ response = new IQ(Type.result, iq.getID());
+				response.setTo(iq.getFrom());
+				response.getElement().add(dom4jItems.getRootElement());
+				return response;
+			}
+		} catch (DocumentException e) {
+			LOG.error(e.getMessage());
+			return buildErrorResponse(iq.getFrom(), iq.getID(), e.getMessage());
+		}
+		
+		// return empty answer
+		iq.setTo(iq.getFrom());
+		iq.setType(Type.result);
+		iq.setFrom("");
+		return iq;
+	}
+	
+	public void addRootNode(XMPPNode newNode) {
+		if (newNode instanceof LocalXMPPNode)
+			localToplevelNodes.put(newNode.getNode(), (LocalXMPPNode)newNode);
+		allToplevelNodes.add(newNode);
+	}
+	
+	public void removeRootNode(XMPPNode node) {
+		if (node instanceof LocalXMPPNode)
+			localToplevelNodes.remove(((LocalXMPPNode)node).getNode());
+		allToplevelNodes.remove(node);
 	}
 
 	private Object ifNotNull(Object o, String type, String which)
@@ -117,22 +205,30 @@ public class CommManagerHelper {
 			return o;
 		}
 	}
+	
+	private String removeFragment(String namespace) {
+		int cardinalIndex = namespace.indexOf("#");
+		if (cardinalIndex>0)
+			return namespace.substring(0,cardinalIndex);
+		else
+			return namespace;
+	}
 
 	private FeatureServer getFeatureServer(String namespace)
 			throws UnavailableException {
-		return (FeatureServer) ifNotNull(featureServers.get(namespace),
+		return (FeatureServer) ifNotNull(featureServers.get(removeFragment(namespace)),
 				"namespace", namespace);
 	}
 
 	private CommCallback getCommCallback(String namespace)
 			throws UnavailableException {
-		return (CommCallback) ifNotNull(commCallbacks.get(namespace),
+		return (CommCallback) ifNotNull(commCallbacks.get(removeFragment(namespace)),
 				"namespace", namespace);
 	}
 
 	private Unmarshaller getUnmarshaller(String namespace)
 			throws UnavailableException {
-		return (Unmarshaller) ifNotNull(nsToUnmarshaller.get(namespace),
+		return (Unmarshaller) ifNotNull(nsToUnmarshaller.get(removeFragment(namespace)),
 				"namespace", namespace);
 	}
 
@@ -142,7 +238,7 @@ public class CommManagerHelper {
 	}
 	
 	private Marshaller getMarshaller(String namespace) throws UnavailableException {
-		return (Marshaller) ifNotNull(nsToMarshaller.get(namespace),
+		return (Marshaller) ifNotNull(nsToMarshaller.get(removeFragment(namespace)),
 				"namespace", namespace);
 	}
 
@@ -340,10 +436,6 @@ public class CommManagerHelper {
 		}
 		os.write(XMPPError.CLOSE_ERROR_BYTES,0,XMPPError.CLOSE_ERROR_BYTES.length);
 		ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-		
-		LOG.info("Going to parse error... Charset.defaultCharset().toString()="+Charset.defaultCharset().toString());
-		LOG.info("Charset.availableCharsets().keySet().toArray().toString()="+Arrays.toString(Charset.availableCharsets().keySet().toArray()));
-		LOG.info(new String(os.toByteArray()));
 		
 		Document dom4jError = reader.read(is);
 		errorResponse.getElement().add(dom4jError.getRootElement());

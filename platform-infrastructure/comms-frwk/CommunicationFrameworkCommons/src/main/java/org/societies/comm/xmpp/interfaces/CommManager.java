@@ -27,6 +27,7 @@
 package org.societies.comm.xmpp.interfaces;
 
 import org.societies.comm.xmpp.datatypes.Stanza;
+import org.societies.comm.xmpp.datatypes.XMPPNode;
 import org.societies.comm.xmpp.exceptions.CommunicationException;
 
 /**
@@ -58,6 +59,10 @@ public interface CommManager {
 	
 	void sendMessage(Stanza stanza, Object payload)
 			throws CommunicationException;
+
+	void addRootNode(XMPPNode newNode);
+
+	void removeRootNode(XMPPNode node);
 
 	// void sendResult(? originalPayload, Object resultPayload); //TODO only
 	// needed for asynch IQ handling
