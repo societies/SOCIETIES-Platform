@@ -58,4 +58,7 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
  */
 
 public class AutomaticCommunityConfigurationManagerTest {
+	
+	
+	
 }

@@ -49,6 +49,8 @@ import org.societies.context.user.db.api.platform.IUserCtxDBMgr;
 import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
 */
 
+import org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityCreationManager;
+
 
 /**
  * This is the test class for the Automatic Community Creation Manager component
@@ -59,4 +61,19 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
  */
 
 public class AutomaticCommunityCreationManagerTest {
+	
+	public AutomaticCommunityCreationManager autoCommunityCreationManager;
+	
+	public void testNonExtensiveCreationCheck() {
+		//check user joined CISs before
+		autoCommunityCreationManager.identifyCissToCreate("not extensive");
+		//check and compare user joined CISs after
+	}
+	
+    public void testExtensiveCreationCheck() {
+    	//check user joined CISs before
+		autoCommunityCreationManager.identifyCissToCreate("extensive");
+		//check and compare user joined CISs after
+	}
+	
 }
