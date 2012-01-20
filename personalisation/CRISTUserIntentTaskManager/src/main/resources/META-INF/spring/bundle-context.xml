@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+	xmlns:context="http://www.springframework.org/schema/context">
+	
+  <!-- regular spring configuration file defining the beans for this
+       bundle. We've kept the osgi definitions in a separate 
+       configuration file so that this file can easily be used
+       for integration testing outside of an OSGi environment -->
+
+	<bean name="CRISTUserIntentTaskHandler"
+		class="org.societies.personalisation.CRISTUserIntentTaskManager.impl.CRISTUserIntentTaskManager"
+		depends-on="CRISTUserIntentPredictor" init-method="initialiseCRISTUserIntentManager">
+		<property name="cristPredictor" ref="CRISTUserIntentPredictor"></property>
+		
+	</bean>
+	<!-- <context:component-scan base-package="org.societies.personalisation.management.impl"></context:component-scan> -->
+	
+	<!-- <bean id="PersonalisationManager"
+		class="org.societies.personalisation.management.impl.PersonalisationManager"
+		depends-on="UserPrefMgr, UserCtxBroker" init-method="initialisePersonalisationManager">
+		<property name="prefMgr" ref="UserPrefMgr"></property>
+		<property name="ctxBroker" ref="UserCtxBroker"></property>
+	</bean> -->
+</beans>

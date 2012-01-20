@@ -4,12 +4,13 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<!-- All projects should inherit from societies-parent -->
-	<parent>
-		<groupId>org.societies</groupId>
-		<artifactId>virgo-parent</artifactId>
-		<version>0.1</version>
-                <relativePath>../../parent/virgo.xml</relativePath>
-	</parent>
+	
+ <parent>
+  <groupId>org.societies</groupId>
+  <artifactId>spring-osgi-parent</artifactId>
+  <relativePath>../../../parent/spring-osgi.xml</relativePath>
+  <version>0.1</version>
+ </parent>
 
 	<!-- groupId is set in parent pom -->
 	<artifactId>css_cm_api</artifactId>

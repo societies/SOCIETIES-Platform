@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                      http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+	<!-- definitions using elements of the osgi namespace can be included in 
+		this file. There is no requirement to keep these definitions in a separate 
+		file if you do not want to. The rationale for keeping these definitions separate 
+		is to facilitate integration testing of the bundle outside of an OSGi container -->
+	<!--osgi:service ref="NegotiationProvider">
+		<osgi:interfaces>
+			<value>org.societies.api.internal.security.policynegotiator.INegotiationProvider</value>
+		</osgi:interfaces>
+	</osgi:service-->
+	<!--osgi:service ref="NegotiationRequester">
+		<osgi:interfaces>
+			<value>org.societies.api.internal.security.policynegotiator.INegotiationRequester</value>
+		</osgi:interfaces>
+	</osgi:service>
+	<osgi:reference id="sign" interface="org.societies.api.security.sign.ISign" >
+	</osgi:reference-->
+	
+	<osgi:reference id="signatureMgr" interface="org.societies.api.security.digsig.ISignatureMgr" />
+	
+	<osgi:service ref="NegotiationProvider"  interface="org.societies.api.internal.security.policynegotiator.INegotiationProvider" />
+	<osgi:service ref="NegotiationRequester" interface="org.societies.api.internal.security.policynegotiator.INegotiationRequester" />
+
+</beans>

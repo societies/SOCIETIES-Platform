@@ -22,9 +22,9 @@ package org.societies.personalisation.preference.api.CommunityPreferenceLearning
 import java.util.Date;
 import java.util.List;
 
-import org.societies.personalisation.common.api.model.IAction;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
-import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Output;
+import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.personalisation.model.IAction;
+import org.societies.personalisation.preference.api.model.IC45Output;
 
 
 

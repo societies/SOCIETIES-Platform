@@ -21,8 +21,8 @@ package org.societies.personalisation.preference.api.CommunityPreferenceLearning
 
 import java.util.Date;
 
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
-import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Consumer;
+import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.personalisation.preference.api.model.IC45Consumer;
 
 /**
  * @author Eliza

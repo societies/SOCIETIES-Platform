@@ -19,11 +19,11 @@
  */
 package org.societies.personalisation.preference.api.UserPreferenceConditionMonitor;
 
-import org.societies.personalisation.common.api.model.ContextAttribute;
-import org.societies.personalisation.common.api.model.ContextModelObject;
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.IFeedbackEvent;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.internal.personalisation.model.IFeedbackEvent;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 
 
@@ -55,7 +55,7 @@ public interface IUserPreferenceConditionMonitor {
 	 * @param contextAttribute
 	 * @param user_id
 	 */
-	public IPreferenceOutcome getOutcome(ContextAttribute contextAttribute, EntityIdentifier user_id);
+	public IPreferenceOutcome getOutcome(CtxAttribute contextAttribute, EntityIdentifier user_id);
 
 	/**
 	 * 
@@ -85,6 +85,6 @@ public interface IUserPreferenceConditionMonitor {
 	 * 
 	 * @param ctxModelObj
 	 */
-	public void updateReceived(ContextModelObject ctxModelObj);
+	public void updateReceived(CtxModelObject ctxModelObj);
 
 }

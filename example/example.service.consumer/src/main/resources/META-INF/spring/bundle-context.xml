@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+		http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
+	xmlns:tx="http://www.springframework.org/schema/tx">
+
+	<!--
+	<context:annotation-config />
+	 <tx:annotation-driven />  
+	
+	<context:component-scan base-package="org.societies.service.consumer" />
+-->
+	<bean id="exampleServiceProperties"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreResourceNotFound" value="true"></property>
+		<property name="locations">
+			<list>
+				<value>classpath:META-INF/spring/org.societies.local.properties</value>
+				<value>file:${VIRGO_HOME}\config\org.societies.platform.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="mathConsumer" class="org.societies.service.consumer.MathServiceConsumer" init-method="initMethod">
+		<constructor-arg name="a" type="int" value="${num_a}" />
+		<constructor-arg name="b" type="int" value="${num_b}" />
+		<property name="mathService" ref="mathService" />
+	</bean>
+
+</beans>

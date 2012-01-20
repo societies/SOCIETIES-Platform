@@ -1,28 +1,39 @@
 package org.societies.css.serregistry.db.impl;
 
 import java.util.List;
+import javax.annotation.PostConstruct;
 
 import org.societies.css.serregistry.api.IServiceRegistry;
+import org.societies.css_serregistry.db.model.DBServerMgmt;
 import org.societies.css_serregistry.db.model.Service;
 
 public class ServiceRegistryImpl implements IServiceRegistry {
 
-	private IServiceRegistryDao cssRegistryDao; 
+	private ServiceRegistryDaoImpl cssRegistryDao;
+	private DBServerMgmt dbServiceMgmt;
+	
+	public ServiceRegistryImpl(){
+		System.out.println("Service Registry bean Created");
+//		dbServiceMgmt=new DBServerMgmt();
+//		cssRegistryDao=new ServiceRegistryDaoImpl(); 
+	}
 	
 	
-	public IServiceRegistryDao getCssRegistryDao() {
-		return cssRegistryDao;
-	}
-
-	public void setCssRegistryDao(IServiceRegistryDao cssRegistryDao) {
-		this.cssRegistryDao = cssRegistryDao;
-	}
 
 	public void processServices(List<Service> service) {
 		cssRegistryDao.create(service);
-		@SuppressWarnings("unchecked")
-		List<Service> list =getCssRegistryDao().findAll();
+		List<Service> list =cssRegistryDao.findAll();
 		System.out.println("The saved courses are --> " + list);
 	}
+
+	public DBServerMgmt getDbServiceMgmt() {
+		return dbServiceMgmt;
+	}	
+	
+	@PostConstruct
+	public void init(){
+		this.getDbServiceMgmt().startServer();
+		System.out.println("Starting Server..");
+	}	
 
 }

@@ -3,14 +3,13 @@ package org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
-import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
-import org.societies.personalisation.CRIST.api.model.ICRISTUserTask;
-import org.societies.personalisation.CRIST.api.model.ICRISTUserSituation;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.personalisation.CRIST.api.model.CRISTUserTaskModelData;
+import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
+import org.societies.personalisation.CRIST.api.model.ICRISTUserSituation;
+import org.societies.personalisation.CRIST.api.model.ICRISTUserTask;
 
 /**
 * @author Zhu WANG
@@ -25,7 +24,7 @@ public interface ICRISTUserIntentTaskManager {
 	 * @param userActions		- a linked hashmap with the action objects and the transition probabilities
 	 * @param userSituations	- a linked hashmap with the situation objects and the transition probabilities 
 	 */
-	public ICRISTUserTask addSituationsAndActionsToTask(ICRISTUserTask userTask, LinkedHashMap<ICRISTUserAction,Double> userActions, LinkedHashMap<ICRISTUserSituation,Double> userSituations);
+	public ICRISTUserTask addSituationsAndActionsToTask(ICRISTUserTask userTask, HashMap<ICRISTUserAction,Double> userActions, HashMap<ICRISTUserSituation,Double> userSituations);
 
 	/**
 	 * This method will retrieve the user action based on the given action ID
@@ -43,7 +42,7 @@ public interface ICRISTUserIntentTaskManager {
 	public ArrayList<ICRISTUserAction> getActionsByType(String actionType, String actionValue);
 
 	/**
-	 * This method will retrive the user's current intent action
+	 * This method will retrieve the user's current intent action
 	 * 
 	 * @param requestor		- the ID of the requestor of the current user intent action
 	 * @param ownerID		- the ID of the owner of the current user intent action

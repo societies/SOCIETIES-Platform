@@ -19,6 +19,85 @@
  */
 package org.societies.personalisation.UserPreferenceConditionMonitor.impl;
 
-public class UserPreferenceConditionMonitor {
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.internal.personalisation.model.IFeedbackEvent;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor;
+import org.societies.personalisation.preference.api.UserPreferenceManagement.IUserPreferenceManagement;
+import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
+
+public class UserPreferenceConditionMonitor implements IUserPreferenceConditionMonitor{
+
+	private IUserPreferenceManagement upm;
+
+	public UserPreferenceConditionMonitor(){
+		
+	}
+	public UserPreferenceConditionMonitor(IUserPreferenceManagement upm){
+		this.upm = upm;
+		
+	}
+	
+	
+	@Override
+	public void disableAllPCM() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void disablePCM(EntityIdentifier dpi) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void enableAllPCM() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void enablePCM(EntityIdentifier dpi) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public IPreferenceOutcome getOutcome(CtxAttribute contextAttribute,
+			EntityIdentifier user_id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IPreferenceOutcome requestOutcomeWithCurrentContext(
+			EntityIdentifier user_id, String serviceType,
+			ServiceResourceIdentifier serviceID, String preferenceName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IPreferenceOutcome requestOutcomeWithFutureContext(
+			EntityIdentifier user_id, String serviceType,
+			ServiceResourceIdentifier serviceID, String preferenceName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void sendFeedback(IFeedbackEvent FeedbackEvent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateReceived(CtxModelObject ctxModelObj) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske druÅ¾be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
  * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÃ‡ÃƒO, SA (PTIN), IBM ISRAEL
  * SCIENCE AND TECHNOLOGY LTD (IBM), INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA
  * PERIORISMENIS EFTHINIS (AMITEC), TELECOM ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD
@@ -24,46 +24,60 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * @author Joao M. Goncalves (PTIN)
- * 
- * This is the implementation of both the {@link CommunityManagement} service and of the {@link NamespaceExtension} interface.
- * It handles XEP-SOC1 related logic. Registers on XCCommunicationFrameworkBundle to receive staza elements of namespace
- * http://societies.org/community, and handles those requests. 
- * 
- */
-
 package org.societies.cis.mgmt.impl;
 
+
+import java.util.Collections;
+
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.societies.cis.mgmt.CommunityManagement;
-import org.societies.comm.xmpp.CommunicationException;
-import org.societies.comm.xmpp.CommunicationManager;
-import org.societies.comm.xmpp.NamespaceExtension;
-import org.societies.comm.xmpp.Stanza;
+import org.societies.comm.xmpp.datatypes.Stanza;
+import org.societies.comm.xmpp.exceptions.CommunicationException;
+import org.societies.comm.xmpp.interfaces.CommManager;
+import org.societies.comm.xmpp.interfaces.FeatureServer;
 import org.societies.community.Community;
 import org.societies.community.Participant;
 import org.societies.community.Who;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-// TODO
-// no distinction between get and set... join and leave should be set and who should be get
-// 
-@Component
-public class CommunityManagementImpl implements CommunityManagement, NamespaceExtension {
+/**
+ * @author Joao M. Goncalves (PTIN)
+ * 
+ *         This is the implementation of both the {@link CommunityManagement}
+ *         service and of the {@link FeatureServer} interface. It handles
+ *         XEP-SOC1 related logic. Registers on XCCommunicationMgr to receive
+ *         stanza elements of namespace http://societies.org/community, and
+ *         handles those requests.
+ * 
+ *         TODO no distinction between get and set... join and leave should be
+ *         set and who should be get log exceptions
+ * 
+ */
 
-	private CommunicationManager endpoint;
+@Component
+public class CommunityManagementImpl implements CommunityManagement,
+		FeatureServer {
+
+	private final static List<String> NAMESPACES = Collections
+			.singletonList("http://societies.org/community");
+	private final static List<String> PACKAGES = Collections
+			.singletonList("org.societies.community");
+
+	private CommManager endpoint;
 	private Set<String> participants;
 	private Set<String> leaders;
-	
+
 	@Autowired
-	public CommunityManagementImpl(CommunicationManager endpoint) {
+	public CommunityManagementImpl(CommManager endpoint) {
 		participants = new HashSet<String>();
 		leaders = new HashSet<String>();
 		this.endpoint = endpoint;
+	
 		try {
 			endpoint.register(this); // TODO unregister??
 		} catch (ClassNotFoundException e) {
@@ -74,15 +88,15 @@ public class CommunityManagementImpl implements CommunityManagement, NamespaceEx
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
-	public String getNamespace() {
-		return "http://societies.org/community";
+	public List<String> getXMLNamespaces() {
+		return NAMESPACES;
 	}
 
 	@Override
-	public String getPackage() {
-		return "org.societies.community";
+	public List<String> getJavaPackages() {
+		return PACKAGES;
 	}
 
 	@Override
@@ -96,29 +110,29 @@ public class CommunityManagementImpl implements CommunityManagement, NamespaceEx
 		// all received IQs contain a community element
 		if (payload.getClass().equals(Community.class)) {
 			Community c = (Community) payload;
-			if (c.getJoin()!=null) {
-//				String jid = iq.getFrom().toBareJID();
-				String jid = stanza.getFrom().getIdentity().toString();
+			if (c.getJoin() != null) {
+				String jid = stanza.getFrom().getJid();
 				if (!participants.contains(jid)) {
 					participants.add(jid);
 				}
 				// TODO add error cases to schema
 				Community result = new Community();
-				result.setJoin(""); // TODO check if jaxb behaves - no element should mean null and empty element should mean empty string
+				result.setJoin(""); // null means no element and empty string
+									// means empty element
 				return result;
 			}
-			if (c.getLeave()!=null) {
-//				String jid = iq.getFrom().toBareJID();
-				String jid = stanza.getFrom().getIdentity().toString();
+			if (c.getLeave() != null) {
+				String jid = stanza.getFrom().getJid();
 				if (participants.contains(jid)) {
 					participants.remove(jid);
 				}
 				// TODO add error cases to schema
 				Community result = new Community();
-				result.setLeave(""); // TODO check if jaxb behaves - no element should mean null and empty element should mean empty string
+				result.setLeave(""); // null means no element and empty string
+										// means empty element
 				return result;
 			}
-			if (c.getWho()!=null) {
+			if (c.getWho() != null) {
 				// TODO add error cases to schema
 				Community result = new Community();
 				Who who = new Who();
@@ -138,18 +152,6 @@ public class CommunityManagementImpl implements CommunityManagement, NamespaceEx
 		return null;
 	}
 
-	@Override
-	public void receiveResult(Stanza stanza, Object payload) {
-		// do nothing
-		// no use-case so far for community-sent iqs, so it doesn't need to handle results
-	}
-
-	@Override
-	public void receiveError(Stanza stanza) {
-		// do nothing
-		// no use-case so far for community-sent iqs, so it doesn't need to handle results
-	}
-	
 	@Override
 	public Set<String> getParticipants() {
 		return new HashSet<String>(participants);

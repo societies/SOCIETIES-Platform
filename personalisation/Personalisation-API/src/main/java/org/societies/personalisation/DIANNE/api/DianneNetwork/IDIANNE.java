@@ -19,11 +19,10 @@
  */
 package org.societies.personalisation.DIANNE.api.DianneNetwork;
 
-import org.societies.personalisation.common.api.model.IOutcome;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.ContextAttribute;
-//import org.societies.context.model.api.CtxAttribute;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.internal.personalisation.model.IOutcome;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
 /**
  * 
@@ -48,7 +47,7 @@ public interface IDIANNE {
 	 * @param preferenceName	the name of the preference being requested
 	 * @param attribute		the context attribute update to implement in the DIANNE before retrieval
 	 */
-	public IOutcome getOutcome(EntityIdentifier ownerId, ServiceResourceIdentifier serviceId, String preferenceName, ContextAttribute attribute);
+	public IOutcome getOutcome(EntityIdentifier ownerId, ServiceResourceIdentifier serviceId, String preferenceName, CtxAttribute attribute);
 	
 	/**
 	 * This method will start DIANNE learning

@@ -19,7 +19,7 @@
  */
 package org.societies.personalisation.DIANNE.api.model;
 
-import org.societies.personalisation.common.api.model.IOutcome;
+import org.societies.api.internal.personalisation.model.IOutcome;
 
 /**
  * @author sarah

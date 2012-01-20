@@ -1,11 +1,10 @@
 package org.societies.personalisation.CRIST.api.model;
 
-import java.awt.List;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Map;
 
-import org.societies.personalisation.common.api.model.IOutcome;
+import org.societies.api.internal.personalisation.model.IOutcome;
 
 /**
  * This interface consists of the public methods to manage the CRISTUserAction
@@ -16,14 +15,14 @@ import org.societies.personalisation.common.api.model.IOutcome;
  */
 public interface ICRISTUserAction extends IOutcome {
 
-	public HashMap<String, Serializable> getActionContext();
+	public Map<String, Serializable> getActionContext();
 
 	/**
 	 * @return the identifier of the service to which this action is applied to
 	 */
 	public String getActionID();
 
-	public LinkedHashMap<ICRISTUserSituation, Double> getActionSituations();
+	public HashMap<ICRISTUserSituation, Double> getActionSituations();
 
 	public int getConfidenceLevel();
 
@@ -43,7 +42,7 @@ public interface ICRISTUserAction extends IOutcome {
 	 * 
 	 * @param confidenceLevel
 	 */
-	public int setConfidenceLevel(int confidenceLevel);
+	public void setConfidenceLevel(int confidenceLevel);
 
 	public String toString();
 

@@ -19,15 +19,16 @@
  */
 package org.societies.personalisation.common.api.management;
 
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.internal.personalisation.model.IFeedbackEvent;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.personalisation.mgmt.IPersonalisationManager;
+import org.societies.api.personalisation.model.IAction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
-import org.societies.personalisation.common.api.model.ICtxAttributeIdentifier;
-import org.societies.personalisation.common.api.model.ContextModelObject;
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.IAction;
-import org.societies.personalisation.common.api.model.IFeedbackEvent;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 
 
@@ -37,7 +38,7 @@ import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
  * @version 1.0
  * @created 11-Nov-2011 14:43:37
  */
-public interface IInternalPersonalisationManager {
+public interface IInternalPersonalisationManager extends IPersonalisationManager{
 
 	/**
 	 * Allows any service to request an context-based evaluated preference outcome.
@@ -96,7 +97,7 @@ public interface IInternalPersonalisationManager {
 	 * @param className
 	 * @param ctxAttributeId
 	 */
-	public void registerForContextUpdate(String className, ICtxAttributeIdentifier ctxAttributeId);
+	public void registerForContextUpdate(EntityIdentifier id, String className, CtxAttributeIdentifier ctxAttributeId);
 
 	/**
 	 * 
@@ -126,7 +127,7 @@ public interface IInternalPersonalisationManager {
 	 * @param serviceId
 	 * @param dianneOutcome
 	 */
-	public void sendITSUDUserIntentOutcome(EntityIdentifier owner, ServiceResourceIdentifier serviceId, ICRISTUserAction dianneOutcome);
+	public void sendCRISTUserIntentOutcome(EntityIdentifier owner, ServiceResourceIdentifier serviceId, ICRISTUserAction dianneOutcome);
 
 	/**
 	 * 
@@ -141,6 +142,6 @@ public interface IInternalPersonalisationManager {
 	 * 
 	 * @param ctxModelObj
 	 */
-	public void updateReceived(ContextModelObject ctxModelObj);
+	public void updateReceived(CtxModelObject ctxModelObj);
 
 }

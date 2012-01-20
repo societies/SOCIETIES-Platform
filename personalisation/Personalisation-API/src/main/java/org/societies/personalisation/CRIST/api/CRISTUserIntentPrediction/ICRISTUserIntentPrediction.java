@@ -2,12 +2,13 @@ package org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction;
 
 import java.util.ArrayList;
 
-import org.societies.personalisation.common.api.model.ContextAttribute;
-import org.societies.personalisation.common.api.model.ContextModelObject;
-import org.societies.personalisation.common.api.model.EntityIdentifier;
-import org.societies.personalisation.common.api.model.FeedbackEvent;
-import org.societies.personalisation.common.api.model.ServiceResourceIdentifier;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.internal.personalisation.model.FeedbackEvent;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
+
 
 /**
  * 
@@ -28,7 +29,7 @@ public interface ICRISTUserIntentPrediction {
 	 * 
 	 * @param ctxAttribute		- a set of context
 	 */
-	public ArrayList<ICRISTUserAction> getCRISTPrediction(ContextAttribute ctxAttribute);
+	public ArrayList<ICRISTUserAction> getCRISTPrediction(CtxAttribute ctxAttribute);
 	
 	/**
 	 * This method will return the user's current intent
@@ -52,5 +53,5 @@ public interface ICRISTUserIntentPrediction {
 	 * 
 	 * @param ctxModelObj	- the new CRIST Model
 	 */
-	public void updateReceived(ContextModelObject ctxModelObj);
+	public void updateReceived(CtxModelObject ctxModelObj);
 }
