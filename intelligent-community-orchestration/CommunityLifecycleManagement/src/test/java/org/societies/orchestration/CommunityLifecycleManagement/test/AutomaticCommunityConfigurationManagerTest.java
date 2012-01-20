@@ -49,6 +49,12 @@ import org.societies.context.user.db.api.platform.IUserCtxDBMgr;
 import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
 */
 
+import org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityConfigurationManager;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.internal.servicelifecycle.model.Service;
+//import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.mock.EntityIdentifier;
+
 /**
  * This is the test class for the Automatic Community Configuration Manager component
  * 
@@ -59,6 +65,16 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
 
 public class AutomaticCommunityConfigurationManagerTest {
 	
+	public AutomaticCommunityConfigurationManager autoCommunityConfigurationManager;
 	
+    public void testIdentifyCissToDelete() {
+		
+    	EntityIdentifier ownerId = new EntityIdentifier(); //James Jents CIS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+    	
+    	autoCommunityConfigurationManager = new AutomaticCommunityConfigurationManager(ownerId, "CSS");
+		
+		autoCommunityConfigurationManager.identifyCissToConfigure();
+	}
 	
 }
