@@ -28,7 +28,7 @@ package org.societies.personalisation.preference.api.UserPreferenceLearning;
 import java.util.Date;
 
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IC45Consumer;
 
 /**
@@ -65,7 +65,7 @@ public interface IC45Learning
 	 * @param parameterName    - specifies the parameterName (of an IAction) to focus
 	 * C4.5 learning on.
 	 */
-	public void runC45Learning(IC45Consumer requestor, Date date, ServiceResourceIdentifier serviceId, String parameterName);
+	public void runC45Learning(IC45Consumer requestor, Date date, IServiceResourceIdentifier serviceId, String parameterName);
 	
 	/**
 	 * This method starts the C4.5 learning process on context history from the date
@@ -92,6 +92,6 @@ public interface IC45Learning
 	 * @param parameterName
 	 */
 	public void runC45Learning(IC45Consumer requestor, Date date, EntityIdentifier historyOwner,
-    		ServiceResourceIdentifier serviceId, String parameterName);
+    		IServiceResourceIdentifier serviceId, String parameterName);
 
 }

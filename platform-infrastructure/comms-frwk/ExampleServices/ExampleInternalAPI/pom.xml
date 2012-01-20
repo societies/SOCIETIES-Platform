@@ -5,13 +5,12 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../../../parent/spring-osgi.xml</relativePath>
 		<version>0.1</version>
 	</parent>
 	
 	<!-- change the artifactid to your project artifactid -->
 	<groupId>org.societies.example</groupId>
-	<artifactId>complexservice</artifactId>
+	<artifactId>internalAPI</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.1</version>
 	<developers>
@@ -28,7 +27,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.societies.example</groupId>
-			<artifactId>complexservice.schema</artifactId>
+			<artifactId>schema</artifactId>
 			<version>0.1</version>			
 		</dependency>
 	</dependencies>
@@ -46,7 +45,7 @@
 						<Embed-Transitive>true</Embed-Transitive>
 						<!-- <Import-Package></Import-Package>  -->
 						<Export-Package>
-							org.societies.example.complexservice.*
+							org.societies.example.*
 						</Export-Package>
 					</instructions>
 				</configuration>
