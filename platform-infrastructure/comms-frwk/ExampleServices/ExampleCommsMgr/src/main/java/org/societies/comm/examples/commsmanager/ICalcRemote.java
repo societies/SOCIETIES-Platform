@@ -24,6 +24,8 @@
  */
 package org.societies.comm.examples.commsmanager;
 
+import java.util.concurrent.Future;
+
 /**
  * Calculator Client interface. Each method requires a callback to receive the result
  * to showcase asynchronous calls.
@@ -31,13 +33,15 @@ package org.societies.comm.examples.commsmanager;
  * @author aleckey
  *
  */
-public interface IExampleCommsManager {
+public interface ICalcRemote {
 	/**Adds 2 numbers together and returns total
 	 */
-    public void Add(int a, int b);
+    public int Add(int a, int b);
     
     /**Subtracts 2 numbers and returns total
      */
-    public void Subtract(int a, int b);
+    public int Subtract(int a, int b);
 
+    /**Adds 2 numbers together and returns total */
+    public Future<Integer> AddAsync(int a, int b);
 }

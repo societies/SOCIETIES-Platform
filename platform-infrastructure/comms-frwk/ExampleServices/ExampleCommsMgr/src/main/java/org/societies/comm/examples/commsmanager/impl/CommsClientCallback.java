@@ -26,88 +26,68 @@ package org.societies.comm.examples.commsmanager.impl;
 
 import java.util.concurrent.Future;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.comm.examples.calculatorbean.CalcBean;
-import org.societies.comm.examples.calculatorbean.MethodType;
-import org.societies.comm.examples.commsmanager.ICalcRemote;
+import org.societies.comm.examples.calculatorbean.CalcBeanResult;
+import org.societies.comm.examples.fortunecookiebean.FortuneCookieBeanResult;
 import org.societies.comm.xmpp.datatypes.Identity;
-import org.societies.comm.xmpp.datatypes.Identity.IdentityType;
 import org.societies.comm.xmpp.datatypes.Stanza;
-import org.societies.comm.xmpp.exceptions.CommunicationException;
-import org.societies.comm.xmpp.interfaces.CommManager;
-import org.springframework.scheduling.annotation.Async;
+import org.societies.comm.xmpp.interfaces.CommCallback;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
- * Comms Client that initiates the remote communication
+ * Describe your class here...
  *
  * @author aleckey
  *
  */
-public class CommsClient implements ICalcRemote{
-	//PRIVATE VARIABLES
-	private CommManager commManager;
-	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
+public class CommsClientCallback implements CommCallback{
+
+	private Future<?>returnObj;
+	private int returnInt=0;
 	
-	//PROPERTIES
-	public CommManager getCommManager() {
-		return commManager;
+	/** @return the returnInt  */
+	public int getReturnInt() {
+		return returnInt;
 	}
 
-	public void setCommManager(CommManager commManager) {
-		this.commManager = commManager;
+	/** @param returnInt the returnInt to set */
+	public void setReturnInt(int returnInt) {
+		this.returnInt = returnInt;
 	}
 
-	public CommsClient() {}
-
+	public CommsClientCallback(Future<?> returnObj) {
+		this.returnObj = returnObj;
+	}
+	
 	/* (non-Javadoc)
-	 * @see org.societies.comm.examples.commsmanager.ICalcRemote#AddAsync(int, int)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveError(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
 	 */
 	@Override
-	@Async
-	public Future<Integer> AddAsync(int valA, int valB) {
-		Identity id = new Identity(IdentityType.CSS, "XCManager", "red.local"); 
-		Stanza stanza = new Stanza(id);
+	public void receiveError(Stanza arg0, Object arg1) {
+		
+	}
 
-		//SETUP RETURN STUFF
-		Future<Integer> returnObj = null;
-		CommsClientCallback callback = new CommsClientCallback(returnObj);
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveResult(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	 */
+	@Override
+	public void receiveResult(Stanza returnStanza, Object msgBean) {
+		Identity endUser = returnStanza.getTo();
 		
-		CalcBean calc = new CalcBean();
-		calc.setA(valA); 
-		calc.setB(valB);
-		calc.setMethod(MethodType.ADD_ASYNC);
-		try {
-			commManager.sendIQGet(stanza, calc, callback);
-		} catch (CommunicationException e) {
-			LOG.warn(e.getMessage());
-		};
+		//CHECK WHICH END SERVICE IS SENDING US A MESSAGE
+		// --------- CALCULATOR BUNDLE ---------
+		if (msgBean.getClass().equals(CalcBeanResult.class)) {
+			CalcBeanResult calcResult = (CalcBeanResult) msgBean;
+			//return the calcResult to the calling client
+			//this.returnObj = new AsyncResult<Integer>(calcResult.getResult());
+			this.setReturnInt(calcResult.getResult() );
+		}
 		
-		return returnObj;
+		// -------- FORTUNE COOKIE BUNDLE ---------
+		else if (msgBean.getClass().equals(FortuneCookieBeanResult.class)) {
+			FortuneCookieBeanResult fcBeanResult = (FortuneCookieBeanResult) msgBean;
+			//return the fcBeanResult to the calling client
+		}
 	}
 	
-	public int Add(int valA, int valB) {
-		Identity id = new Identity(IdentityType.CSS, "XCManager", "red.local"); 
-		Stanza stanza = new Stanza(id);
-
-		//SETUP RETURN STUFF
-		CommsClientCallback callback = new CommsClientCallback(null);
-		
-		CalcBean calc = new CalcBean();
-		calc.setA(valA); 
-		calc.setB(valB);
-		calc.setMethod(MethodType.ADD_ASYNC);
-		try {
-			commManager.sendIQGet(stanza, calc, callback);
-		} catch (CommunicationException e) {
-			LOG.warn(e.getMessage());
-		};
-		
-		return callback.getReturnInt();
-	}
-
-	public int Subtract(int valA, int valB) {
-		return 0;
-	}
 
 }

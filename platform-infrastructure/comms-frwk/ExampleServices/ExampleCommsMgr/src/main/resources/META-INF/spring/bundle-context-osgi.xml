@@ -11,7 +11,7 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
 	
-	<osgi:service ref="CommsClientManager" interface="org.societies.comm.examples.commsmanager.IExampleCommsManager" />
+	<osgi:service ref="CalcServiceRemote" interface="org.societies.comm.examples.commsmanager.ICalcRemote" />
 	
 	<osgi:reference id="CommManagerBundle" interface="org.societies.comm.xmpp.interfaces.CommManager"/>
 	<osgi:reference id="FortuneCookieBundle" interface="org.societies.comm.examples.fortunecookie.api.IWisdom"/>
