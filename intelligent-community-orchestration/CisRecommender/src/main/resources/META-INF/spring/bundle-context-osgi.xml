@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:osgi="http://www.springframework.org/schema/osgi"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                      http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+  <!-- definitions using elements of the osgi namespace can be included
+       in this file. There is no requirement to keep these definitions
+       in a separate file if you do not want to. The rationale for 
+       keeping these definitions separate is to facilitate integration
+       testing of the bundle outside of an OSGi container -->
+       
+        
+        <osgi:service ref="CisRecommender">
+        <osgi:interfaces>
+        <value></value>
+        </osgi:interfaces>
+        </osgi:service>
+        
+		
+	    <osgi:reference id="CssDirectory" interface="org.societies.api.internal.css_modules.css_directory.ICssDirectory"/>
+		<osgi:reference id="CssDiscovery" interface="org.societies.api.internal.css_modules.css_discovery.ICssDiscovery"/>
+		<osgi:reference id="CisActivityFeed" interface="org.societies.api.internal.cis.cis_management.CisActivityFeed"/>
+		<osgi:reference id="ServiceSharingRecord" interface="org.societies.api.internal.cis.cis_management.ServiceSharingRecord"/>
+		<osgi:reference id="CisActivityRecord" interface="org.societies.api.internal.cis.cis_management.CisActivity"/>
+		<osgi:reference id="CisRecord" interface="org.societies.api.internal.cis.cis_management.CisRecord"/>
+		<osgi:reference id="UserCtxSimilarityEvaluator" interface="org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator"/>
+		<osgi:reference id="UserCtxPredictionMgr" interface="org.societies.api.internal.context.user.prediction.IUserCtxPredictionMgr"/>
+		<osgi:reference id="UserCtxDBMgr" interface="org.societies.api.internal.context.user.db.IUserCtxDBMgr"/>
+		<osgi:reference id="UserCtxHistoryMgr" interface="org.societies.api.internal.context.user.history.IUserCtxHistoryMgr"/>
+		<osgi:reference id="EntityIdentifier" interface="org.societies.api.mock.EntityIdentifier"/>
+		<osgi:reference id="UserCtxBroker" interface="org.societies.api.internal.context.broker.IUserCtxBroker"/>
+		<osgi:reference id="CommunityCtxBroker" interface="org.societies.api.internal.context.broker.ICommunityCtxBroker"/>
+		<osgi:reference id="CommunityLifecycleManagement" interface="org.societies.orchestration.api.ICommunityLifecycleManagement"/>
+		
+		<!--  <osgi:reference id="upcm" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/> -->
+		
+</beans>

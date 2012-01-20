@@ -83,6 +83,11 @@ public class AutomaticCommunityDeletionManager {
 	
 	private int longestTimeWithoutActivity; //measured in minutes
 	
+	private IUserCtxDBMgr userContextDatabaseManager;
+	private IUserCtxBroker userContextBroker;
+	private ICommunityCtxBroker communityContextBroker;
+	private IUserCtxBrokerCallback userContextBrokerCallback;
+	
 	/*
      * Constructor for AutomaticCommunityConfigurationManager
      * 
@@ -194,6 +199,21 @@ public class AutomaticCommunityDeletionManager {
     
     public void setLinkedDomain(EntityIdentifier linkedDomain) {
     	this.linkedDomain = linkedDomain;
+    }
+    
+    public void setUserContextDatabaseManager(IUserCtxDBMgr userContextDatabaseManager) {
+    	System.out.println("GOT database" + userContextDatabaseManager);
+    	this.userContextDatabaseManager = userContextDatabaseManager;
+    }
+    
+    public void setUserContextBroker(IUserCtxBroker userContextBroker) {
+    	System.out.println("GOT user context broker" + userContextBroker);
+    	this.userContextBroker = userContextBroker;
+    }
+    
+    public void setUserContextBrokerCallback(IUserCtxBrokerCallback userContextBrokerCallback) {
+    	System.out.println("GOT user context broker callback" + userContextBrokerCallback);
+    	this.userContextBrokerCallback = userContextBrokerCallback;
     }
     
 }

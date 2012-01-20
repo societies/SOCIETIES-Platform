@@ -25,30 +25,31 @@
 
 package org.societies.orchestration.CisRecommender.impl;
 
-import org.societies.css.cssdirectory.api.ICssDirectoryCloud;
-import org.societies.css.cssdirectory.api.ICssDirectoryRich;
-import org.societies.css.cssdirectory.api.ICssDirectoryLight;
+import org.societies.api.internal.css_modules.css_directory.ICssDirectory;
 
-import org.societies.cssmgmt.cssdiscovery.api.ICssDiscovery;
+import org.societies.api.internal.css_modules.css_discovery.ICssDiscovery;
 
-import org.societies.cis.management.api.CisAcitivityFeed;
-import org.societies.cis.management.api.ServiceSharingRecord;
-import org.societies.cis.management.api.CisActivity;
-import org.societies.cis.management.api.CisRecord;
+import org.societies.api.internal.cis.cis_management.CisActivityFeed;
+import org.societies.api.internal.cis.cis_management.ServiceSharingRecord;
+import org.societies.api.internal.cis.cis_management.CisActivity;
+import org.societies.api.internal.cis.cis_management.CisRecord;
 
-import org.societies.context.user.similarity.api.platform.IUserCtxSimilarityEvaluator;
+import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
 
-import org.societies.context.user.prediction.api.platform.IUserCtxPredictionMgr;
+import org.societies.api.internal.context.user.prediction.IUserCtxPredictionMgr;
 
-import org.societies.context.user.db.api.platform.IUserCtxDBMgr;
 
-import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
+import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
+
+import org.societies.api.internal.context.user.history.IUserCtxHistoryMgr;
 
 import org.societies.api.mock.EntityIdentifier;
 
 import org.societies.api.mock.ServiceResourceIdentifier;
 
-import org.societies.orchestration.api.ICommunityLifecycleManagement;
+//import org.societies.orchestration.api.ICommunityLifecycleManagement;
+//import org.societies.orchestration.api.ICollaborationPatternAnalyser;
+//import org.societies.orchestration.api.IIntelligentCommunityMembershipEngine;
 
 /**
  * The generic CIS Recommender, which acts as a 'gateway' to components for
@@ -66,36 +67,10 @@ public class CisRecommenderTest {
 	
 	private ServiceResourceIdentifier linkedServiceId;
 	
-	private ICommunityLifecycleManagement communityLifecycleManagement;
+	//private ICommunityLifecycleManagement communityLifecycleManagement;
 	//intelligent community membership engine
 	//collaboration pattern analyser
 	//etc
-	
-	/*
-     * Constructor for CisRecommender
-     * 
-	 * Description: The constructor creates the CisRecommender
-	 *              component on a given CSS or on behalf of a service.
-	 * Parameters: 
-	 * 				linkedCssId - the CSS that this object will operate on behalf of.
-	 */
-	
-	public CisRecommender(EntityIdentifier linkedCssId) {
-		this.linkedCssId = linkedCssId;
-	}
-	
-	/*
-     * Constructor for CisRecommender 
-     * 
-	 * Description: The constructor creates the CisRecommender
-	 *              component on behalf of a service.
-	 * Parameters: 
-	 * 				linkedServiceId - the service on behalf of which this object is to operate.
-	 */
-	
-	public CisRecommender(ServiceResourceIdentifier linkedServiceId) {
-		this.linkedServidId = linkedServiceId;
-	}
 	
 	/**
 	 * COMMUNITY LIFECYCLE MANAGEMENT
@@ -121,7 +96,7 @@ public class CisRecommenderTest {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				communityLifecycleManagement.processPreviousShortTimeCycle();
+				//communityLifecycleManagement.processPreviousShortTimeCycle();
 		    }
 		}
 	}
@@ -136,7 +111,7 @@ public class CisRecommenderTest {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				communityLifecycleManagement.processPreviousLongTimeCycle();
+				//communityLifecycleManagement.processPreviousLongTimeCycle();
 		    }
 		}
 	}
