@@ -60,16 +60,17 @@ public class ServiceRegistry implements IServiceRegistry {
 						service.getServiceName(),
 						service.getServiceDescription(),
 						service.getAuthorSignature());
+				
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}
+			
 			Transaction t = session.beginTransaction();
 			session.delete(tmpRegistryEntry);
 			t.commit();
 		}
 
 		session.close();
-
 	}
 
 	@Override

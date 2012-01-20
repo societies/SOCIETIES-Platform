@@ -29,18 +29,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IC45Output;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 
 public class C45Output implements IC45Output{
 
     EntityIdentifier dataOwner;
-    ServiceResourceIdentifier serviceId;
+    IServiceResourceIdentifier serviceId;
     String serviceType;
     List<IPreferenceTreeModel> treeList;
     
-    public C45Output(EntityIdentifier dataOwner, ServiceResourceIdentifier serviceId, String serviceType){
+    public C45Output(EntityIdentifier dataOwner, IServiceResourceIdentifier serviceId, String serviceType){
         
         this.dataOwner = dataOwner;
         this.serviceId = serviceId;
@@ -56,7 +56,7 @@ public class C45Output implements IC45Output{
         return this.dataOwner;
     }
     
-    public ServiceResourceIdentifier getServiceId(){
+    public IServiceResourceIdentifier getServiceId(){
         return this.serviceId;
     }
     
