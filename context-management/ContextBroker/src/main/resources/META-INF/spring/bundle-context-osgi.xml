@@ -24,7 +24,7 @@
         </osgi:interfaces>
         </osgi:service>
 
-<osgi:reference id="UserCtxDBMgmt" interface="org.societies.api.internal.context.user.db.IUserCtxDBMgr"/>
+<osgi:reference id="UserCtxDBMgmt" interface="org.societies.context.api.user.db.IUserCtxDBMgr"/>
 
 
 

@@ -61,6 +61,14 @@
 
 		<dependency>
 			<groupId>org.societies.context-management</groupId>
+			<artifactId>context-mgmt-api</artifactId>
+			<version>${version.cm}</version>
+			<scope>provided</scope>
+			<type>bundle</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
 			<artifactId>UserCtxDBMgmt</artifactId>
 			<version>${version.cm}</version>
 			<scope>provided</scope>
