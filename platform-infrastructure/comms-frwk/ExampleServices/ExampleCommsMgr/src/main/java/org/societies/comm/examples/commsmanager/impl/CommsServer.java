@@ -52,9 +52,9 @@ import org.societies.comm.xmpp.exceptions.CommunicationException;
 import org.societies.comm.xmpp.interfaces.CommManager;
 import org.societies.comm.xmpp.interfaces.FeatureServer;
 import org.societies.example.complexservice.IComplexService;
+import org.societies.example.complexservice.schema.ComplexServiceMsgBean;
+import org.societies.example.complexservice.schema.ComplexServiceMsgBeanResult;
 import org.societies.example.complexservice.schema.MyComplexBean;
-import org.societies.example.complexservice.schema.ServiceAMsgBean;
-import org.societies.example.complexservice.schema.ServiceAMsgBeanResult;
 
 public class CommsServer implements FeatureServer {
 
@@ -218,12 +218,12 @@ public class CommsServer implements FeatureServer {
 		}
 		
 		// -------- COMPLEX SERVICE BUNDLE ---------
-		else if (payload.getClass().equals(ServiceAMsgBean.class)) {
-			ServiceAMsgBean complexBean = (ServiceAMsgBean) payload;
+		else if (payload.getClass().equals(ComplexServiceMsgBean.class)) {
+			ComplexServiceMsgBean complexBean = (ComplexServiceMsgBean) payload;
 			
 			MyComplexBean paramBean = (MyComplexBean) complexBean.getComplexBean();
 			Future<MyComplexBean> returnBean = null;
-			ServiceAMsgBeanResult complexRes = new ServiceAMsgBeanResult(); //GENERATE BEAN CONTAINING RETURN OBJECT 
+			ComplexServiceMsgBeanResult complexRes = new ComplexServiceMsgBeanResult(); //GENERATE BEAN CONTAINING RETURN OBJECT 
 			
 			switch (complexBean.getMethod()) {
 			
