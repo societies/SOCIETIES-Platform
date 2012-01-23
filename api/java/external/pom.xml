@@ -5,23 +5,24 @@
 	<groupId>org.societies.api.external</groupId>
 	<!-- change the artifactid to your project artifactid -->
 	<artifactId>societies-api</artifactId>
-		<!-- the api version is the same as the release -->
+	<!-- the api version is the same as the release -->
 	<version>${release.version}</version>
-	<!-- the packaging tag enables the creation of the correct manifest using the maven-bundle-plugin -->
+	<!-- the packaging tag enables the creation of the correct manifest using 
+		the maven-bundle-plugin -->
 	<packaging>bundle</packaging>
-	
+
 	<description>
     	This bundle provides the external interfaces of the SOCIETIES platform version XX.
     </description>
-  
+
 	<developers>
 		<developer>
 			<name>Bruno Jean-Bart </name>
 			<organization>Trialog</organization>
-      		<organizationUrl>http://www.trialog.com/</organizationUrl>
+			<organizationUrl>http://www.trialog.com/</organizationUrl>
 		</developer>
 	</developers>
-	
+
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
@@ -30,8 +31,12 @@
 	</parent>
 
 	<dependencies>
-	<!-- add your dependencies here -->
-
+		<!-- add your dependencies here -->
+		<dependency>
+			<groupId>org.societies.api.schema</groupId>
+			<artifactId>societies-api-schema</artifactId>
+			<version>${release.version}</version>
+		</dependency>
 
 	</dependencies>
 
@@ -42,16 +47,19 @@
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>
-					<instructions>						
+					<instructions>
 						<!-- the API will export all interfaces packages for the rest of modules. 
-						The exclusion of internal package can be avoided as the plugin excludes automatically 'internal' and 'impl' package names-->
-						<Export-Package>
-						!org.societies.api.internal,
-						org.societies.api.**
-						</Export-Package>
+							The exclusion of internal package can be avoided as the plugin excludes automatically 
+							'internal' and 'impl' package names -->
+						<_exportcontents>
+							!org.societies.api.internal,
+							org.societies.api.**
+						</_exportcontents>
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
 				</configuration>
-		
+
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
