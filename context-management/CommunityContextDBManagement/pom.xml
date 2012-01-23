@@ -3,7 +3,6 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<!-- All projects should inherit from persist-parent -->
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
@@ -13,7 +12,8 @@
 
 	<!-- groupId is set in parent pom -->
 	<groupId>org.societies.context-management</groupId>
-	<artifactId>CommunityContextDBManagement</artifactId>
+	<artifactId>community-context-db-mgmt</artifactId>
+	<name>Community Context DB Mgmt</name>
 	<version>${version.cm}</version>
 	<packaging>bundle</packaging>
 
@@ -44,6 +44,21 @@
 	</developers>
 
 	<!-- List dependencies here -->
+	<dependencies>
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>context-mgmt-api</artifactId>
+			<version>${version.cm}</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>
