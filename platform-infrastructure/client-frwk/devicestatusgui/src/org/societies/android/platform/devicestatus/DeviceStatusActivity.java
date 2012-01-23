@@ -31,6 +31,7 @@ import org.societies.android.platform.R;
 import org.societies.android.platform.devicestatus.DeviceStatusServiceSameProcess.LocalBinder;
 import org.societies.android.platform.interfaces.IDeviceStatus;
 import org.societies.android.platform.interfaces.ServiceMethodTranslator;
+import org.societies.android.platform.interfaces.model.LocationProviderStatus;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -54,13 +55,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+
 /**
  * @author Olivier Maridat
  * @date 28 nov. 2011
  */
 public class DeviceStatusActivity extends Activity {
-	private String TAG = "DeviceSatusActivity";
-
 	private TextView txtConnectivity;
 	private TextView txtBattery;
 	private TextView txtLocation;
@@ -73,31 +73,37 @@ public class DeviceStatusActivity extends Activity {
 	private long serviceInvoke;
 	private static final int NUM_SERVICE_INVOKES = 1;
 
+	
+	/* **************
+	 * Activity Lifecycle
+	 * ************** */
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+		// -- Create a link with editable area
 		txtConnectivity = (TextView) findViewById(R.id.txtConnectivity);
 		txtBattery = (TextView) findViewById(R.id.txtBattery);
 		txtLocation = (TextView) findViewById(R.id.txtLocation);
-
-		//		updateConnectivity();
-		//		updateBattery();
-		//		updateLocation();
-
+		
+		// -- Create a link with services
 		Intent ipIntent = new Intent(this, DeviceStatusServiceSameProcess.class);
 		Intent opIntent = new Intent(this, DeviceStatusServiceDifferentProcess.class);
 		bindService(ipIntent, inProcessServiceConnection, Context.BIND_AUTO_CREATE);
 		bindService(opIntent, outProcessServiceConnection, Context.BIND_AUTO_CREATE);
 		
+		// Register the broadcast receiver to retrieve results of an out process service call
 		IntentFilter intentFilter = new IntentFilter() ;
-        intentFilter.addAction(DeviceStatusServiceDifferentProcess.CONNECTIVITY);
+        intentFilter.addAction(IDeviceStatus.CONNECTIVITY);
+        intentFilter.addAction(IDeviceStatus.LOCATION_STATUS);
         this.registerReceiver(new ServiceReceiver(), intentFilter);
 	}
 
 	protected void onStop() {
 		super.onStop();
+		// -- Unlink with services
 		if (ipBoundToService) {
 			unbindService(inProcessServiceConnection);
 		}
@@ -110,7 +116,6 @@ public class DeviceStatusActivity extends Activity {
 		public void onServiceDisconnected(ComponentName name) {
 			ipBoundToService = false;
 		}
-
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			LocalBinder binder = (LocalBinder) service;
 			targetIPService = (IDeviceStatus) binder.getService();
@@ -119,16 +124,44 @@ public class DeviceStatusActivity extends Activity {
 	};
 
 	private ServiceConnection outProcessServiceConnection = new ServiceConnection() {
-
 		public void onServiceDisconnected(ComponentName name) {
 			opBoundToService = false;
 		}
-
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			opBoundToService = true;
 			targetOPService = new Messenger(service);
 		}
 	};
+	
+	
+	/* **************
+	 * Button Listeners
+	 * ************** */
+	
+	/**
+	 * Call an in-process service. Service consumer simply calls service API and can use 
+	 * return value
+	 *  
+	 * @param view
+	 */
+	public void onButtonRefreshUsingSameProcessClick(View view) {
+		// If this service is available
+		if (ipBoundToService) {
+			StringBuffer sbConnectivity = new StringBuffer();
+			sbConnectivity.append("** Internet is enabled? "+(targetIPService.isInternetConnectivityOn(this.getClass().getPackage().getName()) ? "yes" : "no")+"\n");
+			txtConnectivity.setText(sbConnectivity.toString());
+			
+			StringBuffer sbLocation = new StringBuffer();
+			List<LocationProviderStatus> locationProviderStatus = (List<LocationProviderStatus>) targetIPService.getLocationProvidersStatus(this.getClass().getPackage().getName());
+			sbLocation.append(updateLocation(locationProviderStatus));
+			txtLocation.setText(sbLocation.toString());
+		}
+		else {
+			StringBuffer sb = new StringBuffer();
+			sb.append("No service connected.\n");
+			txtConnectivity.setText(sb.toString());
+		}
+	}
 	
 	/**
      * Call an out-of-process service. Process involves:
@@ -144,46 +177,59 @@ public class DeviceStatusActivity extends Activity {
      * @param view
      */
     public void onButtonRefreshUsingDifferentProcessClick(View view) {
+    	// If this service is available
     	if (opBoundToService) {
-    		String targetMethod = "isInternetConnectivityOn()";
+    		// -- isInternetConnectivityOn
+    		// Name the out process method
+    		String targetMethod = "isInternetConnectivityOn(String callerPackageName)";
     		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IDeviceStatus.methodsArray, targetMethod), 0, 0);
+    		// Fill parameters
     		Bundle outBundle = new Bundle();
-//    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), "nothing here");
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.getClass().getPackage().getName());
     		outMessage.setData(outBundle);
+    		// Call the out process method
     		try {
 				targetOPService.send(outMessage);
 			} catch (RemoteException e) {
 				txtConnectivity.setText("No such method in this service.\n");
 				e.printStackTrace();
 			}
+    		
+    		// -- getLocationProvidersStatus
+    		// Name the out process method
+    		String nameGetLocationProvidersStatus = "getLocationProvidersStatus(String callerPackageName)";
+    		Message getLocationProvidersStatus = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IDeviceStatus.methodsArray, nameGetLocationProvidersStatus), 0, 0);
+    		// Fill parameters
+    		Bundle getLocationProvidersStatusParams = new Bundle();
+    		getLocationProvidersStatusParams.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.getClass().getPackage().getName());
+    		getLocationProvidersStatus.setData(getLocationProvidersStatusParams);
+    		// Call the out process method
+    		try {
+    			targetOPService.send(getLocationProvidersStatus);
+    		} catch (RemoteException e) {
+    			txtConnectivity.setText("No such method in this service.\n");
+    			e.printStackTrace();
+    		}
     	}
     	else {
 			txtConnectivity.setText("No service connected.\n");
 		}
     }
 
-	/**
-	 * Call an in-process service. Service consumer simply calls service API and can use 
-	 * return value
-	 *  
-	 * @param view
-	 */
-	public void onButtonRefreshUsingSameProcessClick(View view) {
-		StringBuffer sb = new StringBuffer();
-		if (ipBoundToService) {
-			sb.append("** Internet is enabled? "+(targetIPService.isInternetConnectivityOn() ? "yes" : "no")+"\n");
-		}
-		else {
-			sb.append("No service connected.\n");
-		}
-		txtConnectivity.setText(sb.toString());
-	}
-	
+    /**
+     * Utilities button to reset all values of this activity
+     * @param view
+     */
 	public void onButtonResetClick(View view) {
 		txtConnectivity.setText("Nothing yet");
 		txtBattery.setText("Nothing yet");
 		txtLocation.setText("Nothing yet");
     }
+	
+	
+	/* **************
+	 * Broadcast receiver
+	 * ************** */
 	
 	/**
 	 * Broadcast receiver to receive intents from Service methods
@@ -196,17 +242,28 @@ public class DeviceStatusActivity extends Activity {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.i(TAG, intent.getAction());
+			Log.i(this.getClass().getSimpleName(), intent.getAction());
 			
-			if (intent.getAction().equals(DeviceStatusServiceDifferentProcess.CONNECTIVITY)) {
-				Log.i(TAG, "Out of process real service received intent - CONNECTIVITY");
+			if (intent.getAction().equals(IDeviceStatus.CONNECTIVITY)) {
+				Log.i(this.getClass().getSimpleName(), "Out of process real service received intent - CONNECTIVITY");
 
-				boolean isInternetOn =  intent.getBooleanExtra(DeviceStatusServiceDifferentProcess.INTENT_RETURN_KEY, false);
+				boolean isInternetOn =  intent.getBooleanExtra(IDeviceStatus.INTENT_RETURN_KEY, false);
 				
 				// -- Internet enabled?
 				StringBuffer sb = new StringBuffer();
 				sb.append("** Internet is enabled? "+(isInternetOn ? "yes" : "no")+"\n");
 				txtConnectivity.setText(sb.toString());
+			}
+			else if (intent.getAction().equals(IDeviceStatus.LOCATION_STATUS)) {
+				Log.i(this.getClass().getSimpleName(), "Out of process real service received intent - LOCATION_STATUS");
+				
+				
+				String returnType =  intent.getStringExtra(IDeviceStatus.INTENT_RETURN_TYPE);
+				List<LocationProviderStatus> locationProvidersStatus =  intent.getParcelableArrayListExtra(IDeviceStatus.INTENT_RETURN_KEY);
+				
+				StringBuffer sbLocation = new StringBuffer();
+				sbLocation.append(updateLocation(locationProvidersStatus));
+				txtLocation.setText(sbLocation.toString());
 			}
 		}
 		
@@ -301,7 +358,7 @@ public class DeviceStatusActivity extends Activity {
 				if (rawVoltage >= 0) {
 					voltage = rawVoltage/1000;
 				}
-				Log.e(TAG, "Battery status > level: "+level+"% (="+rawLevel+"/"+scale+"), temperature: "+temperature+"°C (="+rawTemperature+"), voltage: "+voltage+"V (="+rawVoltage+"mV)");
+				Log.e(this.getClass().getSimpleName(), "Battery status > level: "+level+"% (="+rawLevel+"/"+scale+"), temperature: "+temperature+"°C (="+rawTemperature+"), voltage: "+voltage+"V (="+rawVoltage+"mV)");
 				StringBuffer sb = new StringBuffer();
 				sb.append("Remaining level: "+level+"%\n" +
 						"Temperature: "+temperature+"°C\n" +
@@ -343,16 +400,13 @@ public class DeviceStatusActivity extends Activity {
 			return ", not plugged";
 		}
 	}
-	public void updateLocation() {
+	public String updateLocation(List<LocationProviderStatus> locationProviderStatus) {
 		StringBuffer sb = new StringBuffer();
-
-		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		List<String> providers = locationManager.getAllProviders();
 		sb.append("Providers:\n");
-		for (String provider : providers) {
-			sb.append("* "+provider+" ["+(locationManager.isProviderEnabled(provider) ? "enabled" : "disabled")+"]\n");
+		for (LocationProviderStatus providerStatus : locationProviderStatus) {
+			sb.append("* "+providerStatus.getName()+" ["+(providerStatus.isEnabled() ? "enabled" : "disabled")+"]\n");
 		}
 		// -- Add these data to the text
-		txtLocation.setText(sb.toString());
+		return sb.toString();
 	}
 }

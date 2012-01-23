@@ -46,13 +46,6 @@ public class LocationProviderStatus implements Parcelable {
 		this.name = name;
 		this.enabled = enabled;
 	}
-	
-	
-	
-	public LocationProviderStatus(Parcel in) {
-		readFromParcel(in);
-	}
-
 
 
 	/* (non-Javadoc)
@@ -62,7 +55,6 @@ public class LocationProviderStatus implements Parcelable {
 	public String toString() {
 		return "LocationProvider [name=" + name + ", enabled=" + enabled + "]";
 	}
-
 
 
 	/**
@@ -96,11 +88,25 @@ public class LocationProviderStatus implements Parcelable {
 	}
 
 
-
+	/* ************************
+	 * Parcelable Management
+	 * ************************ */
+	
+	public LocationProviderStatus(Parcel in) {
+		readFromParcel(in);
+	}
+	
+	/*
+	 * @see android.os.Parcelable#describeContents()
+	 */
 	public int describeContents() {
 		return 0;
 	}
 
+	/*
+	 * 
+	 * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)
+	 */
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeString(name);
 		dest.writeInt(enabled ? 1 : 0);

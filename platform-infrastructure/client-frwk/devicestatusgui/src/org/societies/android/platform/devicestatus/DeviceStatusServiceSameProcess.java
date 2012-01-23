@@ -14,6 +14,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 public class DeviceStatusServiceSameProcess extends Service implements IDeviceStatus {
 	private final IBinder binder;
@@ -39,7 +40,8 @@ public class DeviceStatusServiceSameProcess extends Service implements IDeviceSt
 		return this.binder;
 	}
 
-	public boolean isInternetConnectivityOn() {
+	public boolean isInternetConnectivityOn(String client) {
+		Log.i(this.getClass().getSimpleName(), "["+client+"] has called 'isInternetConnectivityOn'");
 		ConnectivityManager connectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		return (connectivity.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTED ||
 				connectivity.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTING ||
@@ -47,13 +49,13 @@ public class DeviceStatusServiceSameProcess extends Service implements IDeviceSt
 				connectivity.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTED);
 	}
 
-//	public List<?> LocationProviderStatus() {
-//		List<LocationProviderStatus> locationProviders = new ArrayList<LocationProviderStatus>();
-//		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//		List<String> providers = locationManager.getAllProviders();
-//		for (String provider : providers) {
-//			locationProviders.add(new LocationProviderStatus(provider, locationManager.isProviderEnabled(provider)));
-//		}
-//		return locationProviders;
-//	}
+	public List<?> getLocationProvidersStatus(String callerPackageName) {
+		List<LocationProviderStatus> locationProviders = new ArrayList<LocationProviderStatus>();
+		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		List<String> providers = locationManager.getAllProviders();
+		for (String provider : providers) {
+			locationProviders.add(new LocationProviderStatus(provider, locationManager.isProviderEnabled(provider)));
+		}
+		return locationProviders;
+	}
 }
