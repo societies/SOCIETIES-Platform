@@ -25,34 +25,24 @@
 package org.societies.api.internal.servicelifecycle.serviceRegistry.exception;
 
 /**
- * This is the exception returned when an error occurred during a notification/removal of service sharing inside a CIS.
+ * Describe your class here...
  *
  * @author solutanet
  *
  */
-public class ServiceSharingNotificationException extends Exception {
+public class ServiceRetrieveException extends Exception {
 
 	/**
 	 * 
 	 */
-	public ServiceSharingNotificationException() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public ServiceSharingNotificationException(String message, Throwable cause) {
-		super(message, cause);
+	public ServiceRetrieveException() {
 		// TODO Auto-generated constructor stub
 	}
 
 	/**
 	 * @param message
 	 */
-	public ServiceSharingNotificationException(String message) {
+	public ServiceRetrieveException(String message) {
 		super(message);
 		// TODO Auto-generated constructor stub
 	}
@@ -60,8 +50,17 @@ public class ServiceSharingNotificationException extends Exception {
 	/**
 	 * @param cause
 	 */
-	public ServiceSharingNotificationException(Throwable cause) {
+	public ServiceRetrieveException(Throwable cause) {
 		super(cause);
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @param message
+	 * @param cause
+	 */
+	public ServiceRetrieveException(String message, Throwable cause) {
+		super(message, cause);
 		// TODO Auto-generated constructor stub
 	}
 

@@ -1,6 +1,8 @@
 package org.societies.platform.servicelifecycle.serviceRegistry.model;
 
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -9,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Table;
 
+import org.societies.api.internal.servicelifecycle.model.Service;
 import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
@@ -30,7 +33,7 @@ public class RegistryEntry implements Serializable {
 	 */
 	private static final long serialVersionUID = 9064750069927104572L;
 	
-	private long id;
+	
 
 	// private String serviceIdentifier; 
 	// private ServiceResourceIdentifier serviceIdentifier;
@@ -38,18 +41,16 @@ public class RegistryEntry implements Serializable {
 	private ServiceResourceIdentiferDAO serviceIdentifier;
 	
 	/**
-	 * Unique identifier for a single instance of a service.
+	 * CSS where the service is installed.
 	 */
-	private String serviceEndpointURI;
+	private String CSSIDInstalled;
+	
 
 	/**
 	 * The version of the service, it must be updated by developer
 	 */
 	private String version;
-	/**
-	 * <No description from WP3>
-	 */
-	private String hash;
+	
 
 	/**
 	 * An alias name for the service
@@ -90,18 +91,11 @@ public class RegistryEntry implements Serializable {
 		this.serviceName = serviceName;
 		this.serviceDescription = serviceDescription;
 		this.authorSignature = authorSignature;
+		this.CSSIDInstalled=cSSIDInstalled;
+		
 	}
 
-	// @Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "RegistryEntryId")
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
+	
 
 	@Column(name = "ServiceName")
 	public String getServiceName() {
@@ -139,23 +133,15 @@ public class RegistryEntry implements Serializable {
 		this.authorSignature = authorSignature;
 	}
 
-	@Column(name = "ServiceEndPoint")
-	public String getServiceEndpointURI() {
-		return serviceEndpointURI;
+	@Column(name = "CSSIDInstalled")
+	public String getCSSIDInstalled() {
+		return CSSIDInstalled;
 	}
 
-	public void setServiceEndpointURI(String serviceEndpointURI) {
-		this.serviceEndpointURI = serviceEndpointURI;
+	public void setCSSIDInstalled(String cSSIDInstalled) {
+		CSSIDInstalled = cSSIDInstalled;
 	}
-
-	@Column(name = "Hash")
-	public String getHash() {
-		return hash;
-	}
-
-	public void setHash(String hash) {
-		this.hash = hash;
-	}
+	
 
 	@EmbeddedId
 	// @Column(name = "ServiceIdentifier")
@@ -167,4 +153,16 @@ public class RegistryEntry implements Serializable {
 		this.serviceIdentifier = serviceIdentifier;
 	}
 
+	public Service createServiceFromRegistryEntry(){
+		Service returnedService=null;
+		try {
+			returnedService = new Service(new ServiceResourceIdentifier(new URI(this.serviceIdentifier.getIdentifier())),
+					this.CSSIDInstalled, this.version, this.serviceName, this.serviceDescription, this.authorSignature);
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	return returnedService ;}
+
+	
 }

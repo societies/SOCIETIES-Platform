@@ -80,5 +80,10 @@ public class ServiceRegistryConsumer {
 		services = new ArrayList<Service>();
 		services.add(newlocalservice);		
 		this.serReg.unregisterServiceList(services);
+		
+		/* Retrieve a Service using ServiceResourceIdentifier*/
+		ServiceResourceIdentifier tmpServiceResourceIdentifier= new ServiceResourceIdentifier(new URI("xmpp://test10"));
+		Service tmpRetrievedService= serReg.retrieveService(tmpServiceResourceIdentifier);
+		System.out.println("Service Retrieved: "+tmpRetrievedService.getServiceName());
 	}
 }

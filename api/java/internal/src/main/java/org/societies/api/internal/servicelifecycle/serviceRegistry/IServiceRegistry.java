@@ -29,6 +29,7 @@ import java.util.List;
 import org.societies.api.internal.servicelifecycle.model.Service;
 import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
 
 /**
@@ -55,16 +56,18 @@ public interface IServiceRegistry {
 	 * Description: Based on a CSS identifier this method returns all services shared by CSS to other CSS or CIS 
 	 * @param CSSID that represents the identifier for CSS, 		  
 	 * @return a List of services retrieved
+	 * @throws ServiceRetrieveException
 	 */
-	public List<Service> retrieveServicesSharedByCSS (String CSSID);
+	public List<Service> retrieveServicesSharedByCSS (String CSSID) throws ServiceRetrieveException;
 	
 	
 	/**
 	 * Description: Based on a CIS identifier this method returns all services that are shared by a CIS 
 	 * @param CISID that represents the identifier for CIS
 	 * @return a List of services retrieved
+	 * @throws ServiceRetrieveException
 	 */
-	public List<Service> retrieveServicesSharedByCIS (String CISID);
+	public List<Service> retrieveServicesSharedByCIS (String CISID) throws ServiceRetrieveException;
 	
     /**
      * Description: Based on a CIS identifier this method is used to notify to the Service Registry that a Service is shared in a CIS
@@ -90,13 +93,15 @@ public interface IServiceRegistry {
 	* matching that particular filter
 	* @param the object used as filter for the query
 	* @return the list of services that match the filter
+	* @throws ServiceRetrieveException
 	*/
-	public List<Service> findServices (Object filter);
+	public List<Service> findServices (Object filter) throws ServiceRetrieveException;
 	
 	/**
 	* Description: Based on a service unique identifier this method returns the associated Service
 	* @param serviceIdentifier the unique identifier for the Service
 	* @return the corresponding Service
+	* @throws ServiceRetrieveException
 	*/
-	public Service retrieveService(ServiceResourceIdentifier serviceIdentifier);
+	public Service retrieveService(ServiceResourceIdentifier serviceIdentifier) throws ServiceRetrieveException;
 }
