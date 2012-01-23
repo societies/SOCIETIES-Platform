@@ -7,32 +7,34 @@
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>0.1</version>
 	</parent>
-	
+
 	<!-- change the artifactid to your project artifactid -->
 	<groupId>org.societies.example</groupId>
 	<artifactId>internalAPI</artifactId>
+	<name>Example Service Internal API</name>
 	<packaging>bundle</packaging>
 	<version>0.1</version>
 	<developers>
-	    <developer>
-	      <id>Github ID</id>
-	      <name>David McKitterick</name>
-	      <email>dmckitterick@github.com</email>
-	      <roles>
-	        <role>developer</role>
-	      </roles>
-	    </developer>
+		<developer>
+			<id>Github ID</id>
+			<name>David McKitterick</name>
+			<email>dmckitterick@github.com</email>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
 	</developers>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.societies.example</groupId>
 			<artifactId>schema</artifactId>
-			<version>0.1</version>			
+			<version>0.1</version>
 		</dependency>
 	</dependencies>
 
 	<build>
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
@@ -40,19 +42,14 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<!-- <Import-Package></Import-Package>  -->
-						<Export-Package>
+						<!-- <Import-Package></Import-Package> -->
+						<_exportcontents>
 							org.societies.example.*
-						</Export-Package>
+						</_exportcontents>
 					</instructions>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

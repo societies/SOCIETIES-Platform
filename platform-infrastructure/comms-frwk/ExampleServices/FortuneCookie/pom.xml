@@ -27,7 +27,12 @@
 
 	<dependencies>
 	<!-- add your dependencies here -->
-
+		<dependency>
+			<groupId>org.societies.example</groupId>
+			<artifactId>internalAPI</artifactId>
+			<version>0.1</version>	
+			<scope>provided</scope>			
+		</dependency>
 	</dependencies>
 
 	<build>

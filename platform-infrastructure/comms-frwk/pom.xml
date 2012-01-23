@@ -56,12 +56,11 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>PubsubServiceBundle</module>
 		<module>XCCommunicationMgr</module>
 		<!-- <module>ClientCommunicationMgr</module> -->
+		<module>ExampleServices/api/java/schema</module>
+		<module>ExampleServices/api/java/internal</module>
 		<module>ExampleServices/Calculator</module>
-		<module>ExampleServices/CalculatorBean</module>
 		<module>ExampleServices/FortuneCookie</module>
-		<module>ExampleServices/FortuneCookieBean</module>
-		<module>ExampleServices/End2endServiceExampleSet/ComplexServiceSchema</module>
-		<module>ExampleServices/End2endServiceExampleSet/ComplexServiceBundle</module>
+		<module>ExampleServices/ComplexServiceBundle</module>
 		<module>ExampleServices/ExampleCommsMgr</module>
 		<module>ExampleServices/ExampleClientGui</module>
 	</modules>
