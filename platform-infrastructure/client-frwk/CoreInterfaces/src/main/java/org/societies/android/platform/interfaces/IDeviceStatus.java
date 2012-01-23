@@ -32,19 +32,28 @@ import java.util.List;
  * @author Olivier (Trialog)
  */
 public interface IDeviceStatus {
-	String methodsArray [] = {"isInternetConnectivityOn()"};
+	String methodsArray [] = {"isInternetConnectivityOn(String callerPackageName)", "getLocationProvidersStatus(String callerPackageName)"};
+	
+	public static final String CONNECTIVITY = "org.societies.android.platform.devicestatus.CONNECTIVITY";
+	public static final String LOCATION_STATUS = "org.societies.android.platform.devicestatus.LOCATIONSTATUS";
+	public static final String INTENT_RETURN_TYPE = "org.societies.android.platform.ReturnType";
+	public static final String INTENT_RETURN_KEY = "org.societies.android.platform.ReturnValue";
 	
 	/**
-	 * To know if internet is available
-	 * @return
+	 * To know if Internet connectivity is available
+	 * @param client Package name of service caller
+	 * @return true if this connectivity is available
+	 * @return otherwise false
 	 */
-	public boolean isInternetConnectivityOn();
+	public boolean isInternetConnectivityOn(String callerPackageName);
 	
-//	/**
-//	 * Retrieve the current connectivity status
-//	 * @return list of connectivity status
-//	 */
-//	public List<ConnectivityStatus> getConnectivityStatus();
+	/**
+	 * Retrieve the current status of location providers
+	 * @param client Package name of service caller
+	 * @return List of location providers and their status
+	 */
+	public List<?> getLocationProvidersStatus(String callerPackageName);
+	
 //	/**
 //	 * Register to connectivity status
 //	 * @param listener
