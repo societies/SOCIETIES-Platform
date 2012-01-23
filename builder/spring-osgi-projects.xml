@@ -50,6 +50,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>../api/java/internal</module>
 		
 		<!-- Context -->
+		<module>../context-management/api</module>
 		<module>../context-management/UserContextDBManagement</module>
 		<module>../context-management/UserContextHistoryManagement</module>
 		<module>../context-management/ContextBroker</module>
