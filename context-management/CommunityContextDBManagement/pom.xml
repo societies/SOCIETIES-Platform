@@ -68,6 +68,9 @@
 	
 	<!-- More Project Information -->
 	<name>Community Context DB Mgmt</name>
+	<description>
+		This project provides an implementation of the ICommunityCtxDBMgr service.
+	</description>
 	<developers>
 	    <developer>
 			<id>pkosmides</id>
