@@ -24,22 +24,19 @@
  */
 package org.societies.comm.examples.commsmanager.impl;
 
+import java.util.concurrent.Future;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.comm.examples.calculatorbean.CalcBean;
-import org.societies.comm.examples.calculatorbean.CalcBeanResult;
 import org.societies.comm.examples.calculatorbean.MethodType;
-import org.societies.comm.examples.commsmanager.IExampleCommsManager;
-import org.societies.comm.examples.fortunecookie.datatypes.Cookie;
-import org.societies.comm.examples.fortunecookiebean.FortuneCookieBean;
-import org.societies.comm.examples.fortunecookiebean.FortuneCookieBeanResult;
-import org.societies.comm.examples.fortunecookiebean.MethodName;
+import org.societies.comm.examples.commsmanager.ICalcRemote;
 import org.societies.comm.xmpp.datatypes.Identity;
 import org.societies.comm.xmpp.datatypes.Identity.IdentityType;
 import org.societies.comm.xmpp.datatypes.Stanza;
 import org.societies.comm.xmpp.exceptions.CommunicationException;
-import org.societies.comm.xmpp.interfaces.CommCallback;
 import org.societies.comm.xmpp.interfaces.CommManager;
+import org.springframework.scheduling.annotation.Async;
 
 /**
  * Comms Client that initiates the remote communication
@@ -47,7 +44,7 @@ import org.societies.comm.xmpp.interfaces.CommManager;
  * @author aleckey
  *
  */
-public class CommsClient implements CommCallback, IExampleCommsManager{
+public class CommsClient implements ICalcRemote{
 	//PRIVATE VARIABLES
 	private CommManager commManager;
 	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
@@ -62,66 +59,55 @@ public class CommsClient implements CommCallback, IExampleCommsManager{
 	}
 
 	public CommsClient() {}
+
+	/* (non-Javadoc)
+	 * @see org.societies.comm.examples.commsmanager.ICalcRemote#AddAsync(int, int)
+	 */
+	@Override
+	@Async
+	public Future<Integer> AddAsync(int valA, int valB) {
+		Identity id = new Identity(IdentityType.CSS, "XCManager", "red.local"); 
+		Stanza stanza = new Stanza(id);
+
+		//SETUP RETURN STUFF
+		Future<Integer> returnObj = null;
+		CommsClientCallback callback = new CommsClientCallback(returnObj);
+		
+		CalcBean calc = new CalcBean();
+		calc.setA(valA); 
+		calc.setB(valB);
+		calc.setMethod(MethodType.ADD_ASYNC);
+		try {
+			commManager.sendIQGet(stanza, calc, callback);
+		} catch (CommunicationException e) {
+			LOG.warn(e.getMessage());
+		};
+		
+		return returnObj;
+	}
 	
-	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveResult(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
-	 */
-	@Override
-	public void receiveResult(Stanza returnStanza, Object msgBean) {
-		Identity endUser = returnStanza.getTo();
-		
-		//CHECK WHICH END SERVICE IS SENDING US A MESSAGE
-		// --------- CALCULATOR BUNDLE ---------
-		if (msgBean.getClass().equals(CalcBeanResult.class)) {
-			CalcBeanResult calcResult = (CalcBeanResult) msgBean;
-			//return the calcResult to the calling client
-		}
-		
-		// -------- FORTUNE COOKIE BUNDLE ---------
-		else if (msgBean.getClass().equals(FortuneCookieBeanResult.class)) {
-			FortuneCookieBeanResult fcBeanResult = (FortuneCookieBeanResult) msgBean;
-			//return the fcBeanResult to the calling client
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveError(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
-	 */
-	@Override
-	public void receiveError(Stanza arg0, Object arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void Add(int valA, int valB) {
-		Identity id = new Identity(IdentityType.CSS, "alec", "red.local"); 
+	public int Add(int valA, int valB) {
+		Identity id = new Identity(IdentityType.CSS, "XCManager", "red.local"); 
 		Stanza stanza = new Stanza(id);
 
+		//SETUP RETURN STUFF
+		CommsClientCallback callback = new CommsClientCallback(null);
+		
 		CalcBean calc = new CalcBean();
-		calc.setA(valA); calc.setB(valB);
-		calc.setMethod(MethodType.ADD);
+		calc.setA(valA); 
+		calc.setB(valB);
+		calc.setMethod(MethodType.ADD_ASYNC);
 		try {
-			commManager.sendIQGet(stanza, calc, this);
-		} catch (CommunicationException e) {
-			LOG.warn(e.getMessage());
-		};
-	}
-
-	public void Subtract(int valA, int valB) {
-		Identity id = new Identity(IdentityType.CSS, "alec", "red.local"); 
-		Stanza stanza = new Stanza(id);
-
-		CalcBean calc = new CalcBean();
-		calc.setA(valA); calc.setB(valB);
-		calc.setMethod(MethodType.SUBTRACT);
-		try {
-			commManager.sendIQGet(stanza, calc, this);
+			commManager.sendIQGet(stanza, calc, callback);
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
 		};
 		
+		return callback.getReturnInt();
 	}
 
-	public void getCookie() {
+	public int Subtract(int valA, int valB) {
+		return 0;
 	}
+
 }

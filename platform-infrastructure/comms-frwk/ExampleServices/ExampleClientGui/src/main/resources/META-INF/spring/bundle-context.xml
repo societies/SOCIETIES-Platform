@@ -7,11 +7,18 @@
        bundle. We've kept the osgi definitions in a separate 
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
-
+<!-- 
   <bean id="ExampleClientGui" 
   		class="org.societies.comm.examples.clientgui.ExampleClientView"
-  		depends-on="CommsClientManager">
-  		<property name="commManager" ref="CommsClientManager"/>
+  		depends-on="RemoteCalculator">
+  		<property name="remoteCalculator" ref="RemoteCalculator"/>
   </bean>
-
+ 
+ <bean id="ExampleClientGui" 
+  		class="org.societies.comm.examples.clientgui.StartupBean"
+  		init-method="Start" />
+ -->
+ <bean id="ExampleClientGui" 
+  		class="org.societies.comm.examples.clientgui.ExampleClientApp"
+    	init-method="startup" />
 </beans>

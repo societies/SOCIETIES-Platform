@@ -25,6 +25,8 @@
 
 package org.societies.orchestration.CommunityLifecycleManagement.test;
 
+import java.net.URI;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,6 +51,23 @@ import org.societies.context.user.db.api.platform.IUserCtxDBMgr;
 import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
 */
 
+import org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityCreationManager;
+
+import org.societies.api.context.model.CtxEntityIdentifier;
+
+//import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
+
+import org.societies.api.internal.context.broker.IUserCtxBroker;
+//import org.societies.api.internal.context.broker.IUserCtxDBMgr;
+import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
+import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.model.ServiceResourceIdentifier;
+import org.societies.api.mock.EntityIdentifier;
+//import org.societies.api.internal.context.broker.IUserCtxDBMgrCallback;
+
+import org.societies.api.context.model.CtxAttributeValueType;
+
+
 
 /**
  * This is the test class for the Automatic Community Creation Manager component
@@ -59,4 +78,71 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
  */
 
 public class AutomaticCommunityCreationManagerTest {
+	
+	public AutomaticCommunityCreationManager autoCommunityCreationManager;
+	public IUserCtxBroker userCtxBroker;
+	public IUserCtxDBMgr userCtxDBMgr;
+	public CtxEntityIdentifier entityId;
+	public IUserCtxBrokerCallback userCtxBrokerCallback;
+	
+	public void testNonExtensiveCreationCheck() {
+		
+		EntityIdentifier ownerId = new EntityIdentifier(); //James Jents CSS
+		entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+    	
+		
+		
+    	autoCommunityCreationManager = new AutomaticCommunityCreationManager(ownerId, "CSS");
+		
+    	
+    	
+    	//create some test context data for the CSS?
+    	ServiceResourceIdentifier userInterfacedService = new ServiceResourceIdentifier(/**new URI("Chat system")*/);
+    	
+    	//userCtxBroker = new userCtxBroker();
+    	//userCtxBroker.createEntity("CSS User", IUserCtxBrokerCallback);
+    	//userCtxBroker.addAttribute(ownerIdContextEntity, CtxAttributeValueType.INDIVIDUAL, "CSS proximity", IUserCtxBrokerCallback);
+    	
+		//check user joined CISs before
+		autoCommunityCreationManager.identifyCissToCreate("not extensive");
+		//check and compare user joined CISs after
+		
+		//Assert.assertNotNull(/**User's joined CISs*/);
+	}
+	
+    public void testExtensiveCreationCheck() {
+    	
+    	EntityIdentifier ownerId = new EntityIdentifier(); //James Jents CSS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+    	
+    	autoCommunityCreationManager = new AutomaticCommunityCreationManager(ownerId, "CSS");
+    	
+    	//create some test context data for the CSS?	
+    	ServiceResourceIdentifier userInterfacedService = new ServiceResourceIdentifier(/**new URI("Chat system")*/);
+    	
+    	//userCtxBroker = new userCtxBroker();
+    	//userCtxBroker.createEntity("CSS User", IUserCtxBrokerCallback);
+    	//userCtxBroker.addAttribute(ownerIdContextEntity, CtxAttributeValueType.INDIVIDUAL, "CSS proximity", IUserCtxBrokerCallback);
+    	
+    	//check user joined CISs before
+		autoCommunityCreationManager.identifyCissToCreate("extensive");
+		//check and compare user joined CISs after
+		
+		//Assert.assertNotNull(/**User's joined CISs*/);
+		
+	}
+    
+    public void setCtxBroker(IUserCtxBroker userCtxBroker){
+		this.userCtxBroker = userCtxBroker;
+	}
+    
+    public void setUserCtxBrokerCallback(IUserCtxBrokerCallback userCtxBrokerCallback) {
+    	this.userCtxBrokerCallback = userCtxBrokerCallback;
+    }
+    
+    public void callbackForUserCtxEntity(CtxEntityIdentifier contextEntityIdentifier) {
+    	entityId = contextEntityIdentifier;
+    }
+    
+	
 }

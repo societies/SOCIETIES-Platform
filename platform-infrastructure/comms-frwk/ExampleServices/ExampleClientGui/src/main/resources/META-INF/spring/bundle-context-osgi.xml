@@ -11,6 +11,6 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
 	
-	<osgi:reference id="CommsClientManager" interface="org.societies.comm.examples.commsmanager.IExampleCommsManager"/>
+	<osgi:reference id="RemoteCalculator" interface="org.societies.comm.examples.commsmanager.ICalcRemote"/>
 
 </beans>

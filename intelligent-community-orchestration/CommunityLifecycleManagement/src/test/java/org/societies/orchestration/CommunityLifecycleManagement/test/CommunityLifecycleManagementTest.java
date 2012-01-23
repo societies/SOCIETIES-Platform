@@ -33,6 +33,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityLifecycleManagement;
+import org.societies.api.context.model.CtxEntityIdentifier;
+//import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.mock.EntityIdentifier;
 
 /**
  * This is the test class for the Community Lifecycle Management component
@@ -51,12 +54,12 @@ public class CommunityLifecycleManagementTest {
 	
 	@Test
 	public void testProcessPreviousShortTimeCycle() {
-		//new CommunityLifecycleManagement(new EntityIdentifier("Constructor inputs"), "Test").processPreviousShortTimeCycle();
+		//new CommunityLifecycleManagement(new EntityIdentifier(), "Test").processPreviousShortTimeCycle();
 	}
 	
 	@Test
 	public void testProcessPreviousLongTimeCycle() {
-		//new CommunityLifecycleManagement(new EntityIdentifier("Constructor inputs"), "Test").processPreviousLongTimeCycle();
+		//new CommunityLifecycleManagement(new EntityIdentifier(), "Test").processPreviousLongTimeCycle();
 	}
 	
 }

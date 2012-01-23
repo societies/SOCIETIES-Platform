@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>XMPP with StropheJs</title>
+	<meta name="author" content="Olivier Maridat (Trialog)" />
+	<!--[if IE]><script src="js/plugin/html5-ie.js"></script><![endif]-->
+	<link rel="stylesheet" type="text/css" title="XMPP" href="style.css" />
+</head>
+<body>
+
+	<header>
+		<h1>XMPP Examples With StropheJS</h1>
+	</header>
+
+	<section id="page_connection">
+		<header>
+			<h1>Login</h1>
+		</header>
+		<form id="connection">
+			<fieldset>
+				<label for="jid">JID</label>
+					<input type="text" name="jid" id="jid" value="red@socialblend.local" tabindex="10" />
+				<label for="password">Password</label>
+					<input type="password" name="password" id="password" value="red" tabindex="20" />
+				<input type="button" id="login" value="Log-in" tabindex="30" />
+			</fieldset>
+		</form>
+	</section>
+	
+	<aside id="configuration">
+		<header>
+			<h1>Config</h1>
+		</header>
+		<p>
+			To work, this page needs:
+			to know the BOSH URL of an XMPP server (see <a href="README">README</a> file to configure your XMPP server and edit the BOSH_SERVICE value in shared.js),
+			and an account on this server.<br />
+			Please, contact Olivier Maridat (from Trialog) if you have questions.
+		</p>
+		<form id="tools">
+			<ul>
+				<li><strong>Connection:</strong> XMPP Connection / Disconnection (enabled)</li>
+				<li><strong>Contact list:</strong> Roster & Roster presence updates (enabled)</li>
+				<li><strong>Contact list:</strong> Send / Receive messages to / from my roster (enabled)</li>
+				<li><strong>Send Costum IQ:</strong> see <a href="https://github.com/societies/Societies-Seed/tree/master/CameraApp">Camera App</a> from Seed Team. The "Coliseum Scenario" show the interaction between the client and a community (discovering, joining ...).</li>
+				<li><input type="checkbox" name="enableEchobot" id="enableEchobot" value="1" tabindex="50" /> Enable Echobot mode (you will repeat every message you received)</li>
+			</ul>
+		</form>
+	</aside>
+		
+	<section id="feedback">
+		<header>
+			<h1>Feedback</h1>
+		</header>
+		<input type="button" id="logout" value="Log-out" tabindex="40" />
+		<article id="status"></article>
+		<aside id="roster">
+			<header>
+				<h1>Contacts</h1>
+			</header>
+			<div></div>
+		</aside>
+		<article id="message">
+			<div class="reply">
+				<form>
+					<textarea name="message2send" id="message2send" class="4" rows="5"></textarea>
+					<input type="button" name="sendMessage" id="sendMessage" value="Send" />
+				</form>
+			</div>
+		</article>
+	</section>
+
+	<script type="text/javascript" src="js/lib/jquery.js"></script>
+	<script type="text/javascript" src="js/lib/strophe.js"></script>
+	<script type="text/javascript" src="js/shared.js"></script>
+	<!-- <script type="text/javascript" src="js/communityManager.js"></script> -->
+	<script type="text/javascript" src="js/controler.js"></script>
+	<script type="text/javascript" src="js/test-presence.js"></script>
+	<script type="text/javascript" src="js/xmpp-connection.js"></script>
+	<script type="text/javascript" src="js/test-echobot.js"></script>
+	<script type="text/javascript" src="js/plugin/strophe.roster.js"></script>
+	<script type="text/javascript" src="js/test-roster.js"></script>
+	<script type="text/javascript" src="js/test-tiny-messenger.js"></script>
+	
+</body>
+</html>

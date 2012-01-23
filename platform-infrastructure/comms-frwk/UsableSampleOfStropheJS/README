@@ -1,0 +1,45 @@
+Usable Examples Of Strophe JS
+=============
+This project show short and usable example of XMPP communications using StropheJS, a XMPP Javascript framework.
+Open index.html in a browser to show these examples.
+This project may need some configurations.
+
+Required Configurations
+-------
+To use XMPP connection, you need:
+* to enable "BOSH Clients With Limited Access to Connect to the Server" in the Openfire Administration page
+(Server > Server Parameters > HTTP Binding)
+The HTTP-BINDING address is by default: http://localhost:7070/http-bind.
+
+* to configure your Apache to use http://localhost/bosh (or whatever you wanted) instead of http://localhost:7070/http-bind.
+Example of Apache configuration :
+** First, enable proxy module. Delete the # before the following lines in httpd.conf, or add these lines
+
+    LoadModule proxy_module modules/mod_proxy.so
+    LoadModule proxy_connect_module modules/mod_proxy_connect.so
+    LoadModule proxy_http_module modules/mod_proxy_http.so
+    Include conf/extra/httpd-vhosts.conf
+
+** Then, add the virtual host somewhere in Apache httpd.conf for example:
+
+    <VirtualHost *:80>
+        ProxyPass /bosh http://localhost:7070/http-bind/
+        ProxyPassReverse /bosh http://localhost:7070/http-bind/
+    </VirtualHost>
+    
+** If everything is ok, when you go on http://localhost/bosh or http://localhost:7070/http-bind/, you should see something like:
+
+    HTTP ERROR 400
+
+    Problem accessing /http-bind/. Reason:
+
+        Bad Request
+    
+* to edit the js/shared.js file 
+The `BOSH_SERVICE` variable must contain your XMPP server HTPP-BIND URL.
+In the example above, it was "http://localhost/bosh" on your computer, and "http://<IP of your computer>/bosh" on an Android emulator.
+
+How Can I Found My IP Address?
+-------
+* On Windows, open a console and tip "ipconfig"
+

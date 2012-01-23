@@ -77,6 +77,12 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
