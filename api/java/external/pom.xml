@@ -5,6 +5,7 @@
 	<groupId>org.societies.api.external</groupId>
 	<!-- change the artifactid to your project artifactid -->
 	<artifactId>societies-api</artifactId>
+	<name>SOCIETIES Java API (External/3rd Party)</name>
 	<!-- the api version is the same as the release -->
 	<version>${release.version}</version>
 	<!-- the packaging tag enables the creation of the correct manifest using 
