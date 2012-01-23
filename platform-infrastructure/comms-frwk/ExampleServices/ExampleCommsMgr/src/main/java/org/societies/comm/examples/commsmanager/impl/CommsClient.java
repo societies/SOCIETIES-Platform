@@ -28,14 +28,14 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.comm.examples.calculatorbean.CalcBean;
-import org.societies.comm.examples.calculatorbean.MethodType;
 import org.societies.comm.examples.commsmanager.ICalcRemote;
 import org.societies.comm.xmpp.datatypes.Identity;
 import org.societies.comm.xmpp.datatypes.Identity.IdentityType;
 import org.societies.comm.xmpp.datatypes.Stanza;
 import org.societies.comm.xmpp.exceptions.CommunicationException;
 import org.societies.comm.xmpp.interfaces.CommManager;
+import org.societies.example.calculatorservice.schema.CalcBean;
+import org.societies.example.calculatorservice.schema.MethodType;
 import org.springframework.scheduling.annotation.Async;
 
 /**

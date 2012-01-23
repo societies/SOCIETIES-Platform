@@ -26,12 +26,11 @@ package org.societies.comm.examples.commsmanager.impl;
 
 import java.util.concurrent.Future;
 
-import org.societies.comm.examples.calculatorbean.CalcBeanResult;
-import org.societies.comm.examples.fortunecookiebean.FortuneCookieBeanResult;
 import org.societies.comm.xmpp.datatypes.Identity;
 import org.societies.comm.xmpp.datatypes.Stanza;
 import org.societies.comm.xmpp.interfaces.CommCallback;
-import org.springframework.scheduling.annotation.AsyncResult;
+import org.societies.example.calculatorservice.schema.CalcBeanResult;
+import org.societies.example.fortunecookieservice.schema.FortuneCookieBeanResult;
 
 /**
  * Describe your class here...
