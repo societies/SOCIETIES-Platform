@@ -13,7 +13,7 @@
 
 	<!-- groupId is set in parent pom -->
 	<groupId>org.societies.context-management</groupId>
-	<artifactId>UserContextInferenceManagement</artifactId>
+	<artifactId>user-context-inference-mgmt</artifactId>
 	<version>${version.cm}</version>
 	<packaging>bundle</packaging>
 
