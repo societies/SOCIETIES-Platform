@@ -13,7 +13,7 @@
 
 	<!-- groupId is set in parent pom -->
 	<groupId>org.societies.context-management</groupId>
-	<artifactId>ContextBroker</artifactId>
+	<artifactId>context-broker</artifactId>
 	<version>${version.cm}</version>
 	<packaging>bundle</packaging>
 
