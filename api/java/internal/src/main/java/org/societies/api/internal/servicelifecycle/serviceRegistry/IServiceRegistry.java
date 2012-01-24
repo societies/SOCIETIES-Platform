@@ -54,7 +54,7 @@ public interface IServiceRegistry {
 
 	/**
 	 * Description: Based on a CSS identifier this method returns all services shared by CSS to other CSS or CIS 
-	 * @param CSSID that represents the identifier for CSS, 		  
+	 * @param CSSID that represents the identifier for CSS (this is the String returned by method getJid() of class org.societies.comm.xmpp.datatypes.Identity), 		  
 	 * @return a List of services retrieved
 	 * @throws ServiceRetrieveException
 	 */
@@ -63,7 +63,7 @@ public interface IServiceRegistry {
 	
 	/**
 	 * Description: Based on a CIS identifier this method returns all services that are shared by a CIS 
-	 * @param CISID that represents the identifier for CIS
+	 * @param CISID that represents the identifier for CIS (this is the String returned by method getJid() of class org.societies.comm.xmpp.datatypes.Identity)
 	 * @return a List of services retrieved
 	 * @throws ServiceRetrieveException
 	 */
@@ -71,7 +71,7 @@ public interface IServiceRegistry {
 	
     /**
      * Description: Based on a CIS identifier this method is used to notify to the Service Registry that a Service is shared in a CIS
-	 * @param CISID that represents the identifier for CIS that shares the Service
+	 * @param CISID that represents the identifier for CIS that shares the Service (this is the String returned by method getJid() of class org.societies.comm.xmpp.datatypes.Identity)
 	 * @param serviceIdentifier the unique identifier for the shared service
 	 * @throws ServiceSharingNotificationException
      */
@@ -79,7 +79,7 @@ public interface IServiceRegistry {
 	
 	/**
      * Description: Based on a CIS identifier this method is used to notify to the Service Registry that a Service is removed from a CIS
-	 * @param CISID that represents the identifier for the CIS 
+	 * @param CISID that represents the identifier for the CIS (this is the String returned by method getJid() of class org.societies.comm.xmpp.datatypes.Identity)
 	 * @param serviceIdentifier the unique identifier for the service
 	 * @throws ServiceSharingNotificationException
      */
