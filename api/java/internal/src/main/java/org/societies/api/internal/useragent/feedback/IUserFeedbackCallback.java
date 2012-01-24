@@ -25,23 +25,12 @@
 
 package org.societies.api.internal.useragent.feedback;
 
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
+import java.util.List;
 
-/**
- * 
- * @author S.Gallacher@hw.ac.uk
- *
- */
-public interface IUserFeedback
-{
-	public void getExplicitFB(int type, ExpProposalContent content, IUserFeedbackCallback callback);
+public interface IUserFeedbackCallback {
 	
-	public void getImplicitFB(int type, ImpProposalContent content, IUserFeedbackCallback callback);
+	public void handleExpFeedback(List<String> feedback);
 	
-	@Deprecated
-	public String getExplicitFB(int type, ExpProposalContent content);
-	
-	@Deprecated
-	public boolean getImplicitFB(int type, ImpProposalContent content);
+	public void handleImpFeedback(Boolean feedback);
+
 }
