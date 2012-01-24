@@ -31,15 +31,15 @@ import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE;
 import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNECallback;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.api.internal.context.broker.IUserCtxBroker;
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.internal.useragent.monitoring.IUserActionMonitor;
+import org.societies.api.internal.useragent.monitoring.IInternalUserActionMonitor;
 
 public class DIANNE implements IDIANNE{
 
 	private HashMap<EntityIdentifier, NetworkRunner> networks;
-	IUserActionMonitor uaMonitor;
+	IInternalUserActionMonitor uaMonitor;
 	IUserCtxBroker ctxBroker;
 
 	public DIANNE(){
@@ -48,7 +48,7 @@ public class DIANNE implements IDIANNE{
 
 	@Override
 	public void getOutcome(EntityIdentifier ownerId,
-			ServiceResourceIdentifier serviceId, 
+			IServiceResourceIdentifier serviceId, 
 			String preferenceName, 
 			IDIANNECallback callback) {
 		// TODO Auto-generated method stub
@@ -56,7 +56,7 @@ public class DIANNE implements IDIANNE{
 
 	@Override
 	public void getOutcome(EntityIdentifier ownerId,
-			ServiceResourceIdentifier serviceId, 
+			IServiceResourceIdentifier serviceId, 
 			String preferenceName,
 			CtxAttribute attribute, 
 			IDIANNECallback callback) {
@@ -105,7 +105,7 @@ public class DIANNE implements IDIANNE{
 		this.ctxBroker = broker;
 	}
 	
-	public void setUAMonitor(IUserActionMonitor monitor){
+	public void setUaMonitor(IInternalUserActionMonitor monitor){
 		this.uaMonitor = monitor;
 	}
 
@@ -117,7 +117,7 @@ public class DIANNE implements IDIANNE{
 	 */
 	@Override
 	public IOutcome getOutcome(EntityIdentifier arg0,
-			ServiceResourceIdentifier arg1, String arg2) {
+			IServiceResourceIdentifier arg1, String arg2) {
 		return null;
 	}
 
@@ -128,7 +128,7 @@ public class DIANNE implements IDIANNE{
 	 */
 	@Override
 	public IOutcome getOutcome(EntityIdentifier arg0,
-			ServiceResourceIdentifier arg1, String arg2, CtxAttribute arg3) {
+			IServiceResourceIdentifier arg1, String arg2, CtxAttribute arg3) {
 		return null;
 	}
 }

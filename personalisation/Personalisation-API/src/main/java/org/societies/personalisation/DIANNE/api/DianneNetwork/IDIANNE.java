@@ -21,8 +21,8 @@ package org.societies.personalisation.DIANNE.api.DianneNetwork;
 
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 /**
  * 
@@ -40,7 +40,7 @@ public interface IDIANNE {
 	 * @param callback  the callback to which the IDIANNEOutcome is sent
 	 */
 	public void getOutcome(EntityIdentifier ownerId, 
-			ServiceResourceIdentifier serviceId, 
+			IServiceResourceIdentifier serviceId, 
 			String preferenceName, 
 			IDIANNECallback callback);
 	
@@ -53,7 +53,7 @@ public interface IDIANNE {
 	 * @param callback  the callback to which the IDIANNEOutcome is sent
 	 */
 	public void getOutcome(EntityIdentifier ownerId, 
-			ServiceResourceIdentifier serviceId, 
+			IServiceResourceIdentifier serviceId, 
 			String preferenceName, 
 			CtxAttribute attribute, 
 			IDIANNECallback callback);
@@ -75,11 +75,11 @@ public interface IDIANNE {
 	
 	
 	@Deprecated
-	public IOutcome getOutcome(EntityIdentifier ownerId, ServiceResourceIdentifier serviceId, String preferenceName);
+	public IOutcome getOutcome(EntityIdentifier ownerId, IServiceResourceIdentifier serviceId, String preferenceName);
 	
 	
 	@Deprecated
-	public IOutcome getOutcome(EntityIdentifier ownerId, ServiceResourceIdentifier serviceId, String preferenceName, CtxAttribute attribute);
+	public IOutcome getOutcome(EntityIdentifier ownerId, IServiceResourceIdentifier serviceId, String preferenceName, CtxAttribute attribute);
 	
 	
 	

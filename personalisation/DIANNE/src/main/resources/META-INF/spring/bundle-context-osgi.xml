@@ -19,7 +19,7 @@
         </osgi:service>        
 		
 		
-		<osgi:reference id="UserActionMonitor" interface="org.societies.api.internal.useragent.monitoring.IUserActionMonitor"/>
+		<osgi:reference id="UserActionMonitor" interface="org.societies.api.internal.useragent.monitoring.IInternalUserActionMonitor"/>
 		<osgi:reference id="UserCtxBroker" interface="org.societies.api.internal.context.broker.IUserCtxBroker"/>
 		
 		

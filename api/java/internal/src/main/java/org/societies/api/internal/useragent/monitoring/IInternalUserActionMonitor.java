@@ -25,7 +25,7 @@
 
 package org.societies.api.internal.useragent.monitoring;
 
-public interface IUserActionMonitor {
+public interface IInternalUserActionMonitor {
 	
 	/**
 	 * This method allows platform components to register for events that occur when actions are received
