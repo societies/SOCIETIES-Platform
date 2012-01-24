@@ -53,7 +53,7 @@ public class TestUserFeedback extends TestCase implements IUserFeedbackCallback{
 		//null
 	}
 
-	public void testAckNackGUI() {
+	/*public void testAckNackGUI() {
 		String proposalText = "Press: YES";
 		String[] options = {"YES", "NO"};
 		userFeedback.getExplicitFB(ExpProposalType.ACKNACK, new ExpProposalContent(proposalText, options), this);
@@ -148,7 +148,7 @@ public class TestUserFeedback extends TestCase implements IUserFeedbackCallback{
 		//analyse results
 		Assert.assertNotNull(impFeedback);
 		Assert.assertEquals(true, impFeedback.booleanValue());
-	}
+	}*/
 
 	
 	
