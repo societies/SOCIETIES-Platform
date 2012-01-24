@@ -98,7 +98,7 @@
 	</build>	
 
 
-	<name>User History Management</name>
+	<name>User Context History Management</name>
 
 	<groupId>org.societies.context-management</groupId>
 </project>
