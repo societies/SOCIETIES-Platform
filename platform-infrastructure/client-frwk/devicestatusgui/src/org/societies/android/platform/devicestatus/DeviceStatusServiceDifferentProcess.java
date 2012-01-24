@@ -1,15 +1,38 @@
+/**
+ * Copyright (c) 2011, SOCIETIES Consortium
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
+ * conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.societies.android.platform.devicestatus;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.android.platform.interfaces.IDeviceStatus;
+import org.societies.android.platform.devicestatus.DeviceStatus;
 import org.societies.android.platform.interfaces.ServiceMethodTranslator;
+import org.societies.api.android.internal.IDeviceStatus;
+import org.societies.api.android.internal.model.ProviderStatus;
 
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
@@ -21,18 +44,34 @@ import android.os.Messenger;
 import android.os.MessageQueue.IdleHandler;
 import android.util.Log;
 
+/**
+ * Android Service running in a different process of its activity
+ * This service uses DeviceStatus and wraps it into an Android service
+ * @see org.societies.android.platform.devicestatus.DeviceStatus
+ * @author olivierm
+ */
 public class DeviceStatusServiceDifferentProcess extends Service implements IDeviceStatus {
 	private Messenger inMessenger;
+	private IDeviceStatus deviceStatusAccessor;
 	
-	public static final String CONNECTIVITY = "org.societies.android.platform.devicestatus.CONNECTIVITY";
-	public static final String INTENT_RETURN_KEY = "org.societies.android.platform.devicestatus.ReturnValue";
+	
+	/* ***
+	 * Constructor
+	 **** */
 	
 	public DeviceStatusServiceDifferentProcess() {
 		super();
 		this.inMessenger = new Messenger(new IncomingHandler());
+		// Creation of an instance of the Java implementation of IDeviceStatus
+		deviceStatusAccessor = new DeviceStatus(this);
 	}
+
 	
-	public class LocalBinder extends Binder {
+	/* ***
+	 * Android Service Management
+	 **** */
+	
+	public class ExternalBinder extends Binder {
 		DeviceStatusServiceDifferentProcess getService() {
 			return DeviceStatusServiceDifferentProcess.this;
 		}
@@ -50,19 +89,19 @@ public class DeviceStatusServiceDifferentProcess extends Service implements IDev
 			
 			if (targetMethod != null) {
 				try {
-					Log.d(this.getClass().getName(), "Target method: " + targetMethod);
+					Log.i(this.getClass().getSimpleName(), "Target method: " + targetMethod);
 					
 					Class parameters [] = ServiceMethodTranslator.getParameterClasses(targetMethod);
 					for (Class element : parameters) {
-						Log.d(this.getClass().getName(), "Target method param types: " + element.getName());
+						Log.i(this.getClass().getSimpleName(), "Target method param types: " + element.getName());
 			
 					}
 								
 					Method method = DeviceStatusServiceDifferentProcess.this.getClass().getMethod(ServiceMethodTranslator.getMethodName(IDeviceStatus.methodsArray, message.what), parameters);
-					Log.d(this.getClass().getName(), "Found method: " + method.getName());
+					Log.i(this.getClass().getSimpleName(), "Found method: " + method.getName());
 					try {
 						Object params [] = new Object [ServiceMethodTranslator.getParameterNumber(targetMethod)];
-						Log.d(this.getClass().getName(),"Number of parameters: " + params.length); 
+						Log.i(this.getClass().getSimpleName(),"Number of parameters: " + params.length); 
 
 						String paramTypeList [] = ServiceMethodTranslator.getMethodParameterTypesCapitalised(targetMethod);
 
@@ -73,7 +112,7 @@ public class DeviceStatusServiceDifferentProcess extends Service implements IDev
 							Method bundleMethod = Bundle.class.getMethod("get" + paramTypeList[i], bundleParam);
 							
 							params[i] = bundleMethod.invoke(message.getData(), bundleValue);
-							Log.d(this.getClass().getName(), "parameter i = " + i + " value: " + params[i]);
+							Log.i(this.getClass().getSimpleName(), "parameter i = " + i + " value: " + params[i]);
 						}
 						method.invoke(DeviceStatusServiceDifferentProcess.this, params);
 					} catch (IllegalArgumentException e) {
@@ -96,30 +135,67 @@ public class DeviceStatusServiceDifferentProcess extends Service implements IDev
 			}
 		}
 	}
+
 	
-	public boolean isInternetConnectivityOn() {
-		// Create Data		
-		ConnectivityManager connectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-		boolean isInternetConnectivityOn = (connectivity.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTED ||
-				connectivity.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTING ||
-				connectivity.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTING ||
-				connectivity.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTED);
+	/* ***
+	 * IDeviceStatus implementation
+	 **** */
+
+	/*
+	 * @see org.api.android.internal.IDeviceStatus#isInternetConnectivityOn(java.lang.String)
+	 */
+	public boolean isInternetConnectivityOn(String callerPackageName) {
+		Log.i(this.getClass().getSimpleName(), "isInternetConnectivityOn called");
+		// -- Create Data		
+		boolean isInternetConnectivityOn = deviceStatusAccessor.isInternetConnectivityOn(callerPackageName);
 		
-		// Create intent to broadcast results to interested receivers
-		Intent intent = new Intent(CONNECTIVITY);
-		intent.putExtra(INTENT_RETURN_KEY, isInternetConnectivityOn);
-//		/**
-//		 * Intentionally restricting potential intent receiver to client 
-//		 */
-//		intent.setPackage(client);
-//		Log.d(this.getClass().getName(), "Intent package name: " + client);
+		// -- Create intent to broadcast results to interested receivers
+		Intent intent = new Intent(CONNECTIVITY_STATUS);
+		intent.putExtra(CONNECTIVITY_INTERNET_ON, isInternetConnectivityOn);
+		// Intentionally restricting potential intent receiver to client 
+		intent.setPackage(callerPackageName);
 		this.sendBroadcast(intent);
 		
 		return isInternetConnectivityOn;
 	}
+	
+	/*
+	 * @see org.api.android.internal.IDeviceStatus#getConnectivityProvidersStatus(java.lang.String)
+	 */
+	public List<?> getConnectivityProvidersStatus(String callerPackageName) {
+		Log.i(this.getClass().getSimpleName(), "getConnectivityProvidersStatus called");
+		// -- Create Data
+		boolean isInternetEnabled = deviceStatusAccessor.isInternetConnectivityOn(callerPackageName);
+		ArrayList<ProviderStatus> connectivityProviders = (ArrayList<ProviderStatus>) deviceStatusAccessor.getConnectivityProvidersStatus(callerPackageName);
+		
+		// -- Create intent to broadcast results to interested receivers
+		Intent intent = new Intent(CONNECTIVITY_STATUS);
+		intent.putExtra(CONNECTIVITY_INTERNET_ON, isInternetEnabled);
+		intent.putParcelableArrayListExtra(CONNECTIVITY_PROVIDER_LIST, connectivityProviders);
+		// Intentionally restricting potential intent receiver to client 
+		intent.setPackage(callerPackageName);
+		// Send
+		this.sendBroadcast(intent);
+		
+		return connectivityProviders;
+	}
 
-	public List<?> getLocationProvidersStatus() {
-		// TODO Auto-generated method stub
-		return null;
+	/*
+	 * @see org.api.android.internal.IDeviceStatus#getLocationProvidersStatus(java.lang.String)
+	 */
+	public List<?> getLocationProvidersStatus(String callerPackageName) {
+		Log.i(this.getClass().getSimpleName(), "getLocationProvidersStatus called");
+		// -- Create Data
+		ArrayList<ProviderStatus> locationProviders = (ArrayList<ProviderStatus>) deviceStatusAccessor.getLocationProvidersStatus(callerPackageName);
+		
+		// -- Create intent to broadcast results to interested receivers
+		Intent intent = new Intent(LOCATION_STATUS);
+		intent.putParcelableArrayListExtra(LOCATION_PROVIDER_LIST, locationProviders);
+		// Intentionally restricting potential intent receiver to client 
+		intent.setPackage(callerPackageName);
+		// Send
+		this.sendBroadcast(intent);
+		
+		return locationProviders;
 	}
 }

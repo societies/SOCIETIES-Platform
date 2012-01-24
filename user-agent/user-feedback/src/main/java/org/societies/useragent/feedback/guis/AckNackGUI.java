@@ -23,25 +23,35 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.useragent.feedback;
+package org.societies.useragent.feedback.guis;
 
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
 
-/**
- * 
- * @author S.Gallacher@hw.ac.uk
- *
- */
-public interface IUserFeedback
-{
-	public void getExplicitFB(int type, ExpProposalContent content, IUserFeedbackCallback callback);
-	
-	public void getImplicitFB(int type, ImpProposalContent content, IUserFeedbackCallback callback);
-	
-	@Deprecated
-	public String getExplicitFB(int type, ExpProposalContent content);
-	
-	@Deprecated
-	public boolean getImplicitFB(int type, ImpProposalContent content);
+import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
+
+public class AckNackGUI{
+
+	public AckNackGUI(String proposalText, String[] options, IUserFeedbackCallback callback){
+		List<String> feedback = new ArrayList<String>();
+		int n = JOptionPane.showOptionDialog(null,
+			    proposalText,
+			    "TEST - Ack/Nack Feedback GUI",
+			    JOptionPane.YES_NO_CANCEL_OPTION,
+			    JOptionPane.QUESTION_MESSAGE,
+			    null,
+			    options,
+			    options[0]);
+		feedback.add(options[n]);
+		for(String output: feedback){
+			System.out.println("Feedback = "+output);
+		}
+		callback.handleExpFeedback(feedback);
+	}
+
+	public static void main(String[] args){
+		String[] options = {"yes", "no"};
+		new AckNackGUI("Are you OK??", options, null);
+	}
 }

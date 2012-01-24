@@ -24,13 +24,16 @@
  */
 package org.societies.android.platform.devicestatus;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import org.societies.android.platform.R;
 import org.societies.android.platform.devicestatus.DeviceStatusServiceSameProcess.LocalBinder;
-import org.societies.android.platform.interfaces.IDeviceStatus;
 import org.societies.android.platform.interfaces.ServiceMethodTranslator;
+import org.societies.api.android.internal.IDeviceStatus;
+import org.societies.api.android.internal.model.BatteryStatus;
+import org.societies.api.android.internal.model.ProviderStatus;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -53,14 +56,14 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
+
 
 /**
  * @author Olivier Maridat
  * @date 28 nov. 2011
  */
 public class DeviceStatusActivity extends Activity {
-	private String TAG = "DeviceSatusActivity";
-
 	private TextView txtConnectivity;
 	private TextView txtBattery;
 	private TextView txtLocation;
@@ -73,31 +76,37 @@ public class DeviceStatusActivity extends Activity {
 	private long serviceInvoke;
 	private static final int NUM_SERVICE_INVOKES = 1;
 
+	
+	/* **************
+	 * Activity Lifecycle
+	 * ************** */
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+		// -- Create a link with editable area
 		txtConnectivity = (TextView) findViewById(R.id.txtConnectivity);
 		txtBattery = (TextView) findViewById(R.id.txtBattery);
 		txtLocation = (TextView) findViewById(R.id.txtLocation);
-
-		//		updateConnectivity();
-		//		updateBattery();
-		//		updateLocation();
-
+		
+		// -- Create a link with services
 		Intent ipIntent = new Intent(this, DeviceStatusServiceSameProcess.class);
 		Intent opIntent = new Intent(this, DeviceStatusServiceDifferentProcess.class);
 		bindService(ipIntent, inProcessServiceConnection, Context.BIND_AUTO_CREATE);
 		bindService(opIntent, outProcessServiceConnection, Context.BIND_AUTO_CREATE);
 		
+		// Register the broadcast receiver to retrieve results of an out process service call
 		IntentFilter intentFilter = new IntentFilter() ;
-        intentFilter.addAction(DeviceStatusServiceDifferentProcess.CONNECTIVITY);
+        intentFilter.addAction(IDeviceStatus.CONNECTIVITY_STATUS);
+        intentFilter.addAction(IDeviceStatus.LOCATION_STATUS);
         this.registerReceiver(new ServiceReceiver(), intentFilter);
 	}
 
 	protected void onStop() {
 		super.onStop();
+		// -- Unlink with services
 		if (ipBoundToService) {
 			unbindService(inProcessServiceConnection);
 		}
@@ -110,7 +119,6 @@ public class DeviceStatusActivity extends Activity {
 		public void onServiceDisconnected(ComponentName name) {
 			ipBoundToService = false;
 		}
-
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			LocalBinder binder = (LocalBinder) service;
 			targetIPService = (IDeviceStatus) binder.getService();
@@ -119,16 +127,50 @@ public class DeviceStatusActivity extends Activity {
 	};
 
 	private ServiceConnection outProcessServiceConnection = new ServiceConnection() {
-
 		public void onServiceDisconnected(ComponentName name) {
 			opBoundToService = false;
 		}
-
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			opBoundToService = true;
 			targetOPService = new Messenger(service);
 		}
 	};
+	
+	
+	/* **************
+	 * Button Listeners
+	 * ************** */
+	
+	/**
+	 * Call an in-process service. Service consumer simply calls service API and can use 
+	 * return value
+	 *  
+	 * @param view
+	 */
+	public void onButtonRefreshUsingSameProcessClick(View view) {
+		// If this service is available
+		if (ipBoundToService) {
+			// Connectivity
+			List<ProviderStatus> connectivityProviderStatus = (List<ProviderStatus>) targetIPService.getConnectivityProvidersStatus(this.getClass().getPackage().getName());
+			boolean isInternetEnabled = targetIPService.isInternetConnectivityOn(this.getClass().getPackage().getName());
+			StringBuffer sbConnectivity = new StringBuffer();
+			sbConnectivity.append(updateConnectivity(isInternetEnabled, connectivityProviderStatus));
+			txtConnectivity.setText(sbConnectivity.toString());
+			
+			// Battery
+			IntentFilter batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+			registerReceiver(new ServiceReceiver(), batteryLevelFilter);
+			
+			// Location
+			List<ProviderStatus> locationProvidersStatus = (List<ProviderStatus>) targetIPService.getLocationProvidersStatus(this.getClass().getPackage().getName());
+			StringBuffer sbLocation = new StringBuffer();
+			sbLocation.append(updateLocation(locationProvidersStatus));
+			txtLocation.setText(sbLocation.toString());
+		}
+		else {
+			Toast.makeText(this, "No service connected.", Toast.LENGTH_SHORT);
+		}
+	}
 	
 	/**
      * Call an out-of-process service. Process involves:
@@ -144,46 +186,81 @@ public class DeviceStatusActivity extends Activity {
      * @param view
      */
     public void onButtonRefreshUsingDifferentProcessClick(View view) {
+    	// If this service is available
     	if (opBoundToService) {
-    		String targetMethod = "isInternetConnectivityOn()";
+    		// -- Connectivity
+    		//isInternetConnectivityOn
+    		// Name the out process method
+    		String targetMethod = "isInternetConnectivityOn(String callerPackageName)";
     		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IDeviceStatus.methodsArray, targetMethod), 0, 0);
+    		// Fill parameters
     		Bundle outBundle = new Bundle();
-//    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), "nothing here");
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.getClass().getPackage().getName());
     		outMessage.setData(outBundle);
+    		// Call the out process method
     		try {
 				targetOPService.send(outMessage);
 			} catch (RemoteException e) {
-				txtConnectivity.setText("No such method in this service.\n");
+				Toast.makeText(this, "No such method in this service.", Toast.LENGTH_SHORT);
 				e.printStackTrace();
 			}
+    		
+    		// getConnectivityProvidersStatus
+    		// Name the out process method
+    		String nameGetConnectivityProvidersStatus = "getConnectivityProvidersStatus(String callerPackageName)";
+    		Message getConnectivityProvidersStatus = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IDeviceStatus.methodsArray, nameGetConnectivityProvidersStatus), 0, 0);
+    		// Fill parameters
+    		Bundle getConnectivityProvidersStatusParams = new Bundle();
+    		getConnectivityProvidersStatusParams.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.getClass().getPackage().getName());
+    		getConnectivityProvidersStatus.setData(getConnectivityProvidersStatusParams);
+    		// Call the out process method
+    		try {
+    			targetOPService.send(getConnectivityProvidersStatus);
+    		} catch (RemoteException e) {
+    			Toast.makeText(this, "No such method in this service.", Toast.LENGTH_SHORT);
+    			e.printStackTrace();
+    		}
+    		
+    		// -- Battery
+			IntentFilter batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+			registerReceiver(new ServiceReceiver(), batteryLevelFilter);
+    		
+			// -- Location
+    		// getLocationProvidersStatus
+    		// Name the out process method
+    		String nameGetLocationProvidersStatus = "getLocationProvidersStatus(String callerPackageName)";
+    		Message getLocationProvidersStatus = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IDeviceStatus.methodsArray, nameGetLocationProvidersStatus), 0, 0);
+    		// Fill parameters
+    		Bundle getLocationProvidersStatusParams = new Bundle();
+    		getLocationProvidersStatusParams.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.getClass().getPackage().getName());
+    		getLocationProvidersStatus.setData(getLocationProvidersStatusParams);
+    		// Call the out process method
+    		try {
+    			targetOPService.send(getLocationProvidersStatus);
+    		} catch (RemoteException e) {
+    			Toast.makeText(this, "No such method in this service.", Toast.LENGTH_SHORT);
+    			e.printStackTrace();
+    		}
     	}
     	else {
-			txtConnectivity.setText("No service connected.\n");
+    		Toast.makeText(this, "No service connected.", Toast.LENGTH_SHORT);
 		}
     }
 
-	/**
-	 * Call an in-process service. Service consumer simply calls service API and can use 
-	 * return value
-	 *  
-	 * @param view
-	 */
-	public void onButtonRefreshUsingSameProcessClick(View view) {
-		StringBuffer sb = new StringBuffer();
-		if (ipBoundToService) {
-			sb.append("** Internet is enabled? "+(targetIPService.isInternetConnectivityOn() ? "yes" : "no")+"\n");
-		}
-		else {
-			sb.append("No service connected.\n");
-		}
-		txtConnectivity.setText(sb.toString());
-	}
-	
+    /**
+     * Utilities button to reset all values of this activity
+     * @param view
+     */
 	public void onButtonResetClick(View view) {
 		txtConnectivity.setText("Nothing yet");
 		txtBattery.setText("Nothing yet");
 		txtLocation.setText("Nothing yet");
     }
+	
+	
+	/* **************
+	 * Broadcast receiver
+	 * ************** */
 	
 	/**
 	 * Broadcast receiver to receive intents from Service methods
@@ -196,101 +273,47 @@ public class DeviceStatusActivity extends Activity {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.i(TAG, intent.getAction());
+			Log.i(this.getClass().getSimpleName(), intent.getAction());
 			
-			if (intent.getAction().equals(DeviceStatusServiceDifferentProcess.CONNECTIVITY)) {
-				Log.i(TAG, "Out of process real service received intent - CONNECTIVITY");
+			// Connectivity
+			if (intent.getAction().equals(IDeviceStatus.CONNECTIVITY_STATUS)) {
+				Log.i(this.getClass().getSimpleName(), "Out of process real service received intent - CONNECTIVITY");
 
-				boolean isInternetOn =  intent.getBooleanExtra(DeviceStatusServiceDifferentProcess.INTENT_RETURN_KEY, false);
+				boolean isInternetEnabled = false;
+				List<ProviderStatus> connectivityProviders = new ArrayList<ProviderStatus>();
+				if(intent.hasExtra(IDeviceStatus.CONNECTIVITY_INTERNET_ON)) {
+					isInternetEnabled = intent.getBooleanExtra(IDeviceStatus.CONNECTIVITY_INTERNET_ON, false);
+				}
+				if(intent.hasExtra(IDeviceStatus.CONNECTIVITY_PROVIDER_LIST)) {
+					connectivityProviders = intent.getParcelableArrayListExtra(IDeviceStatus.CONNECTIVITY_PROVIDER_LIST);
+				}
 				
-				// -- Internet enabled?
 				StringBuffer sb = new StringBuffer();
-				sb.append("** Internet is enabled? "+(isInternetOn ? "yes" : "no")+"\n");
+				sb.append(updateConnectivity(isInternetEnabled, connectivityProviders));
 				txtConnectivity.setText(sb.toString());
 			}
-		}
-		
-	}
-	
-
-	public void updateConnectivity() {
-		StringBuffer sb = new StringBuffer();
-		ConnectivityManager connectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
-		// -- Internet enabled?
-		sb.append("** Internet is enabled? "+(isInternetEnabled(connectivity) ? "yes" : "no")+"\n");
-
-		// --- Mobile, Wifi, Wimax, ...
-		NetworkInfo[] networkInfos = connectivity.getAllNetworkInfo();
-		int length = networkInfos.length;
-		for (int i=0; i<length; i++) {
-			NetworkInfo networkInfo = networkInfos[i];
-			sb.append("** "+networkInfo.getTypeName()+" ["+networkInfo.getSubtypeName()+"]\n");
-			if (networkInfo.getState().equals(NetworkInfo.State.UNKNOWN)) {
-				sb.append("Not available\n");
+			// Location
+			else if (intent.getAction().equals(IDeviceStatus.LOCATION_STATUS)) {
+				Log.i(this.getClass().getSimpleName(), "Out of process real service received intent - LOCATION_STATUS");
+				
+				List<ProviderStatus> locationProvidersStatus =  intent.getParcelableArrayListExtra(IDeviceStatus.LOCATION_PROVIDER_LIST);
+				
+				StringBuffer sb = new StringBuffer();
+				sb.append(updateLocation(locationProvidersStatus));
+				txtLocation.setText(sb.toString());
 			}
-			else {
-				sb.append("State: "+networkInfo.getState()+" ["+networkInfo.getDetailedState()+"]\n");
-				sb.append("Reason: "+networkInfo.getReason()+"\n");
-				sb.append("Extra info: "+networkInfo.getExtraInfo()+"\n");
-			}
-		}
-
-		// --- BLUETOUTH
-		sb.append("** Blutouth\n");
-		BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-		if (bluetoothAdapter == null) {
-			sb.append("Not available\n");
-		}
-		else if(!bluetoothAdapter.isEnabled()) {
-			sb.append("Disabled\n");
-		}
-		else {
-			sb.append("Enabled\n");
-			Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-			// If there are paired devices
-			if (pairedDevices.size() > 0) {
-				sb.append("Device available: "+pairedDevices.size()+"\n");
-				// Loop through paired devices
-				for (BluetoothDevice device : pairedDevices) {
-					// Add the name and address to an array adapter to show in a ListView
-					sb.append(device.getName()+": "+device.getAddress()+"\n");
-				}
-			}
-			else {
-				sb.append("0 device available\n");
-			}
-		}
-
-		// -- Add these data to the text
-		txtConnectivity.setText(sb.toString());
-	}
-
-	public boolean isInternetEnabled(ConnectivityManager connectivity) {
-		return (connectivity.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTED ||
-				connectivity.getNetworkInfo(0).getState() == NetworkInfo.State.CONNECTING ||
-				connectivity.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTING ||
-				connectivity.getNetworkInfo(1).getState() == NetworkInfo.State.CONNECTED);
-	}
-
-
-	public void updateBattery() {
-		// launch a broadcast receiver to be inform of battery status
-		BroadcastReceiver batteryLevelReceiver = new BroadcastReceiver() {
-			double level = -1;
-			int scale = -1;
-			double voltage = -1;
-			double temperature = -1;
-			int status = -1;
-			int plugged = -1;
-			public void onReceive(Context context, Intent intent) {
+			// Battery
+			else if (intent.getAction().equals(Intent.ACTION_BATTERY_CHANGED)) {
 				context.unregisterReceiver(this);
+				double level = -1;
+				double temperature = -1;
+				double voltage = -1;
 				int rawLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-				scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+				int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 				int rawTemperature = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
 				int rawVoltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1);
-				status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-				plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+				int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+				int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
 
 				if (rawLevel >= 0 && scale > 0) {
 					level = (rawLevel * 100) / scale;
@@ -301,58 +324,72 @@ public class DeviceStatusActivity extends Activity {
 				if (rawVoltage >= 0) {
 					voltage = rawVoltage/1000;
 				}
-				Log.e(TAG, "Battery status > level: "+level+"% (="+rawLevel+"/"+scale+"), temperature: "+temperature+"°C (="+rawTemperature+"), voltage: "+voltage+"V (="+rawVoltage+"mV)");
-				StringBuffer sb = new StringBuffer();
-				sb.append("Remaining level: "+level+"%\n" +
-						"Temperature: "+temperature+"°C\n" +
-						"Voltage: "+voltage+"V\n"+
-						"Status: ");
-
-				switch(status) {
-				case BatteryManager.BATTERY_STATUS_CHARGING:
-					sb.append("charging");
-					break;
-				case BatteryManager.BATTERY_STATUS_DISCHARGING:
-					sb.append("discharging");
-					break;
-				case BatteryManager.BATTERY_STATUS_NOT_CHARGING:
-					sb.append("not charging");
-					break;
-				case BatteryManager.BATTERY_STATUS_FULL:
-					sb.append("full");
-					break;
-				default: sb.append("unknown");
-				}
-				sb.append(pluggedOn(plugged));
-				sb.append("\n");
-
-				txtBattery.setText(sb.toString());
+				BatteryStatus batteryStatus = new BatteryStatus(level, scale, voltage, temperature, status, plugged);
+				Log.e(this.getClass().getSimpleName(), "Battery status > level: "+level+"% (="+rawLevel+"/"+scale+"), temperature: "+temperature+"°C (="+rawTemperature+"), voltage: "+voltage+"V (="+rawVoltage+"mV)");
+				txtBattery.setText(updateBattery(batteryStatus));
 			}
-		};
-		IntentFilter batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-		registerReceiver(batteryLevelReceiver, batteryLevelFilter);
-	}
-
-	public String pluggedOn(int plugged) {
-		switch(plugged) {
-		case BatteryManager.BATTERY_PLUGGED_AC:
-			return ", plugged on AC";
-		case BatteryManager.BATTERY_PLUGGED_USB:
-			return ", plugged on USB";
-		default:
-			return ", not plugged";
 		}
+		
 	}
-	public void updateLocation() {
+	
+
+	public String updateConnectivity(boolean isInternetEnabled, List<ProviderStatus> connectivityProviders) {
 		StringBuffer sb = new StringBuffer();
 
-		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		List<String> providers = locationManager.getAllProviders();
+		// -- Internet enabled?
+		sb.append("** Internet is enabled? "+(isInternetEnabled ? "yes" : "no")+"\n");
+
+		// --- Providers
+		for(ProviderStatus connectivityProvider : connectivityProviders) {
+			sb.append("** "+connectivityProvider.getName()+": "+(connectivityProvider.isEnabled() ? "enabled" : "disabled")+"\n");
+		}
+
+		return sb.toString();
+	}
+
+	public String updateBattery(BatteryStatus batteryStatus) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("Remaining level: "+batteryStatus.getLevel()+"%\n" +
+				"Temperature: "+batteryStatus.getTemperature()+"°C\n" +
+				"Voltage: "+batteryStatus.getVoltage()+"V\n"+
+				"Status: ");
+		
+		switch(batteryStatus.getStatus()) {
+		case BatteryManager.BATTERY_STATUS_CHARGING:
+			sb.append("charging");
+			break;
+		case BatteryManager.BATTERY_STATUS_DISCHARGING:
+			sb.append("discharging");
+			break;
+		case BatteryManager.BATTERY_STATUS_NOT_CHARGING:
+			sb.append("not charging");
+			break;
+		case BatteryManager.BATTERY_STATUS_FULL:
+			sb.append("full");
+			break;
+		default: sb.append("unknown");
+		}
+		
+		switch(batteryStatus.getPlugged()) {
+		case BatteryManager.BATTERY_PLUGGED_AC:
+			sb.append(", plugged on AC");
+		case BatteryManager.BATTERY_PLUGGED_USB:
+			sb.append(", plugged on USB");
+		default:
+			sb.append(", not plugged");
+		}
+		sb.append("\n");
+
+		return sb.toString();
+	}
+
+	public String updateLocation(List<ProviderStatus> locationProviderStatus) {
+		StringBuffer sb = new StringBuffer();
 		sb.append("Providers:\n");
-		for (String provider : providers) {
-			sb.append("* "+provider+" ["+(locationManager.isProviderEnabled(provider) ? "enabled" : "disabled")+"]\n");
+		for (ProviderStatus providerStatus : locationProviderStatus) {
+			sb.append("* "+providerStatus.getName()+" ["+(providerStatus.isEnabled() ? "enabled" : "disabled")+"]\n");
 		}
 		// -- Add these data to the text
-		txtLocation.setText(sb.toString());
+		return sb.toString();
 	}
 }

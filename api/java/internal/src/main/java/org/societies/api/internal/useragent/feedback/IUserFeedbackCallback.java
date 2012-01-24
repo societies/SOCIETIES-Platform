@@ -22,102 +22,15 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.interfaces.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+package org.societies.api.internal.useragent.feedback;
 
-/**
- * Describe a location provider
- * @author Olivier (Trialog)
- *
- */
-public class LocationProviderStatus implements Parcelable {
-	private String name;
-	private boolean enabled;
+import java.util.List;
+
+public interface IUserFeedbackCallback {
 	
-	/**
-	 * Constructor
-	 * @param name
-	 * @param enabled
-	 */
-	public LocationProviderStatus(String name, boolean enabled) {
-		super();
-		this.name = name;
-		this.enabled = enabled;
-	}
+	public void handleExpFeedback(List<String> feedback);
 	
-	
-	
-	public LocationProviderStatus(Parcel in) {
-		readFromParcel(in);
-	}
+	public void handleImpFeedback(Boolean feedback);
 
-
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "LocationProvider [name=" + name + ", enabled=" + enabled + "]";
-	}
-
-
-
-	/**
-	 * Getter name
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-	/**
-	 * Setter name
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	/**
-	 * Is this provider enabled?
-	 * @return the enabled
-	 */
-	public boolean isEnabled() {
-		return enabled;
-	}
-	/**
-	 * Setter enabled
-	 * @param enabled the enabled to set
-	 */
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
-
-
-
-	public int describeContents() {
-		return 0;
-	}
-
-	public void writeToParcel(Parcel dest, int flag) {
-		dest.writeString(name);
-		dest.writeInt(enabled ? 1 : 0);
-	}
-	
-	private void readFromParcel(Parcel in) {
-		name = in.readString();
-		enabled = (1 == in.readInt());
-	}
-	
-	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-		public LocationProviderStatus createFromParcel(Parcel in) {
-			return new LocationProviderStatus(in);
-		}
-
-		public LocationProviderStatus[] newArray(int size) {
-			return new LocationProviderStatus[size];
-		}
-	};
 }
