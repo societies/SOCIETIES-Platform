@@ -1,0 +1,18 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.societies.api.schema</groupId>
+	<artifactId>societies-api-schema</artifactId>
+	<version>${release.version}</version>
+	<name>SOCIETIES Schema API</name>
+	<packaging>jar</packaging>
+
+	<developers>
+		<developer>
+			<name>Bruno Jean-Bart </name>
+			<organization>Trialog</organization>
+      		<organizationUrl>http://www.trialog.com/</organizationUrl>
+		</developer>
+	</developers>
+
+</project>

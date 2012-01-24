@@ -59,7 +59,7 @@ public class InternalCtxBrokerTest {
 
 		internalCtxBroker = new InternalCtxBroker();
 		internalCtxBroker.setUserCtxDBMgr(new UserCtxDBMgr());
-		internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
+		//internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
 
 		System.out.println("-- start of testing --");
 		testCreateCtxEntity();

@@ -37,10 +37,39 @@ public class ServiceRegistryConsumer {
 	}
 
 	public void init() throws Exception {
+		int i = 0;
+		List<Service> services = new ArrayList<Service>();
+		
 		/* Store a mock service */
+		for (i = 0; i < 20; i++) {
+			ServiceResourceIdentifier sri = null;
+			try {
+				sri = new ServiceResourceIdentifier(new URI("xmpp://test"
+						+ i));
+			} catch (URISyntaxException e1) {
+				e1.printStackTrace();
+			}
+			String cSSIDInstalled = "cSSIDInstalled";
+			Service newlocalservice = new Service(sri, cSSIDInstalled, "0.0.1",
+					"serviceName1", "serviceDescription1", "authorSignature1");
+
+			services.add(newlocalservice);
+		}
+		
+		try {
+			this.serReg.registerServiceList(services);
+		} catch (ServiceRegistrationException e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+		
+		/* Delete a mock service */
+		services = null;
 		ServiceResourceIdentifier sri = null;
 		try {
-			sri = new ServiceResourceIdentifier(new URI("xmpp://test1"));
+			sri = new ServiceResourceIdentifier(new URI("xmpp://test5"));
 		} catch (URISyntaxException e1) {
 			e1.printStackTrace();
 		}
@@ -48,19 +77,13 @@ public class ServiceRegistryConsumer {
 		Service newlocalservice = new Service(sri, cSSIDInstalled, "0.0.1",
 				"serviceName1", "serviceDescription1", "authorSignature1");
 
-		List<Service> services = new ArrayList<Service>();
-		services.add(newlocalservice);
-		try {
-			this.serReg.registerServiceList(services);
-		} catch (ServiceRegistrationException e) {
-			e.printStackTrace();
-		}
-
-		/* Retrieve a mock service
-		Service newTestingService = this.serReg.retrieveService(sri);
-		newTestingService.getServiceName(); */
-
-		/* Delete a mock service */
+		services = new ArrayList<Service>();
+		services.add(newlocalservice);		
 		this.serReg.unregisterServiceList(services);
+		
+		/* Retrieve a Service using ServiceResourceIdentifier*/
+		ServiceResourceIdentifier tmpServiceResourceIdentifier= new ServiceResourceIdentifier(new URI("xmpp://test10"));
+		Service tmpRetrievedService= serReg.retrieveService(tmpServiceResourceIdentifier);
+		System.out.println("Service Retrieved: "+tmpRetrievedService.getServiceName());
 	}
 }

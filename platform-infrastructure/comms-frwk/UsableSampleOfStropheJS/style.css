@@ -1,0 +1,91 @@
+﻿@charset "utf-8";
+/* Author: Olivier Maridat (Trialog) */
+/* Creation Date: 02/12/2011 */
+
+body {
+margin: 0;
+padding: 0;
+text-align: center;
+font-size: 0.9em;
+color: black;
+font-family: Tahoma, Verdanna, Arial, Serif;
+}
+header,footer,article,section,aside,nav{display: block;}
+
+/* --- Titres --- */
+h1, h2, h3, h4, h5, h6 {
+margin: 1em 0 .5em 0;
+}
+h1, h2 {
+font-family: Georgia, "Bitstream Vera Serif", Norasi, serif;
+font-weight: normal;
+}
+h1 {
+font-size: 3em;
+font-style: italic;
+}
+h2 {font-size: 1.8em;}
+h3 {font-size: 1.2em;}
+h4 {font-size: 1em;}
+/* -- Fin titres -- */
+
+/* --- Liste --- */
+ul{
+margin: 5px auto;
+}
+ul, ul li{
+text-align: left;
+}
+/* -- Fin listes -- */
+
+
+section header h1{
+margin-top: 0px;
+font-size: 1.3em;
+border-bottom: 1px dashed black;
+}
+
+#feedback{
+float: left;
+margin: 10px;
+}
+#configuration, #roster{
+width: 250px;
+float: left;
+margin: 10px;
+padding: 10px;
+border: 1px solid black;
+border-radius: 5px;
+}
+#configuration ul, #roster ul{
+margin: 0;
+padding: 0;
+}
+#configuration li, #roster li{
+margin: 0 0 0 10px;
+padding: 0;
+}
+
+#message{
+float: left;
+margin: 10px;
+padding: 10px;
+border: 1px solid black;
+border-radius: 5px;
+text-align: left;
+}
+#message form {
+with: 100%;
+padding: 0;
+margin: 0;
+text-align: center;
+}
+#message input{
+margin: 2px auto;
+}
+#message textarea{
+padding: 0;
+margin: 0 auto;
+width: 98%;
+}
+	

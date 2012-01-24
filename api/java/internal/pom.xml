@@ -4,6 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.api.internal</groupId>
 	<artifactId>societies-api-internal</artifactId>
+	<name>SOCIETIES Java Internal API</name>
 	<!-- the api version is the same as the release -->
 	<version>${release.version}</version>
 	<!-- the packaging tag enables the creation of the correct manifest using the maven-bundle-plugin -->

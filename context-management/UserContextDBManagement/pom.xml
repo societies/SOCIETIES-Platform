@@ -1,50 +1,34 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
 	<modelVersion>4.0.0</modelVersion>
-	<!-- change the artifactid to your project artifactid -->
+	
+	<!-- The Basics -->
 	<groupId>org.societies.context-management</groupId>
-	<artifactId>UserCtxDBMgmt</artifactId>
-	<packaging>bundle</packaging>
+	<artifactId>user-context-db-mgmt</artifactId>
 	<version>${version.cm}</version>
-	
-	<developers>
-		<developer>
-			<name>Nikos Kalatzis</name>
-			<email>nikosk@cn.ntua.gr</email>
-			<organization>ICCS</organization>
-			<organizationUrl>http://www.iccs.gr/</organizationUrl>
-			<roles>
-				<role>Senior Developer</role>
-			</roles>
-			<timezone>+2</timezone>
-		</developer>
-	</developers>
-	
-	<parent>
-		<groupId>org.societies</groupId>
-		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../parent/spring-osgi.xml</relativePath>
-		<version>0.1</version>
-	</parent>
-
+	<packaging>bundle</packaging>
 	<dependencies>
-	<!-- add your dependencies here -->
-	<dependency>
+		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>context-mgmt-api</artifactId>
+			<version>${version.cm}</version>
 			<scope>provided</scope>
 		</dependency>
-
 	</dependencies>
-
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>spring-osgi-parent</artifactId>
+		<relativePath>../../parent/spring-osgi.xml</relativePath>
+		<version>0.1</version>
+	</parent>
+	
+	<!-- Build Settings -->
 	<build>
 		<plugins>
 			<plugin>
@@ -55,8 +39,7 @@
 					<instructions>
 						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-						
+						<Embed-Transitive>true</Embed-Transitive>	
 					</instructions>
 				</configuration>
 			</plugin>
@@ -81,5 +64,33 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>	
+	</build>
+	
+	<!-- More Project Information -->
+	<name>User Context DB Mgmt</name>
+	<developers>
+	    <developer>
+			<id>pkosmides</id>
+			<name>Pavlos Kosmides</name>
+			<email>pkosmidi@central.ntua.gr</email>
+			<organization>ICCS</organization>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
+				<role>owner</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+2</timezone>
+		</developer>
+		<developer>
+			<id>NicolasLiampotis</id>
+			<name>Nicolas Liampotis</name>
+			<email>nicolas.liampotis@cn.ntua.gr</email>
+			<organization>ICCS</organization>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>+2</timezone>
+		</developer>
+	</developers>	
 </project>

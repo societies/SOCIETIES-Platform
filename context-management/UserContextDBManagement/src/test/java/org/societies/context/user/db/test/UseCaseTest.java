@@ -31,7 +31,7 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxModelObject;
-import org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback;
+import org.societies.context.api.user.db.IUserCtxDBMgrCallback;
 import org.societies.context.user.db.impl.UserCtxDBMgr;
 
 public class UseCaseTest {

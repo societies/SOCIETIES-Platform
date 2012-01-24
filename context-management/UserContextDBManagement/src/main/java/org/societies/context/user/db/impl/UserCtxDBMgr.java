@@ -37,9 +37,9 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.IndividualCtxEntity;
-import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
-import org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback;
 import org.societies.api.mock.EntityIdentifier;
+import org.societies.context.api.user.db.IUserCtxDBMgr;
+import org.societies.context.api.user.db.IUserCtxDBMgrCallback;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.stereotype.Component;
 

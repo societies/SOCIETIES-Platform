@@ -38,44 +38,18 @@
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
-		<!--  THE SERVICE BUNDLES I MANAGE -->
-		<dependency>
-			<groupId>org.societies.comm.examples</groupId>
-			<artifactId>Calculator</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.comm.examples</groupId>
-			<artifactId>CalculatorBean</artifactId>
-			<version>0.0.1</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.comm.examples</groupId>
-			<artifactId>FortuneCookie</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.comm.examples</groupId>
-			<artifactId>FortuneCookieBean</artifactId>
-			<version>0.0.1</version>
-			<scope>compile</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.societies.example</groupId>
-			<artifactId>complexservice</artifactId>
+			<artifactId>internalAPI</artifactId>
 			<version>0.1</version>
-			<scope>provided</scope>
+			<scope>provided</scope>			
 		</dependency>
 		<dependency>
-			<groupId>org.societies.example</groupId>
-			<artifactId>complexservice.schema</artifactId>
-			<version>0.1</version>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
