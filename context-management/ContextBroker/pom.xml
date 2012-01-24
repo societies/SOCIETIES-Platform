@@ -77,7 +77,7 @@
 
 		<dependency>
 			<groupId>org.societies.context-management</groupId>
-			<artifactId>UserContextHistory</artifactId>
+			<artifactId>user-context-history-mgmt</artifactId>
 			<version>${version.cm}</version>
 			<scope>provided</scope>
 			<type>bundle</type>
