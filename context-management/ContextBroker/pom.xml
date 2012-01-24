@@ -13,18 +13,31 @@
 
 	<!-- groupId is set in parent pom -->
 	<groupId>org.societies.context-management</groupId>
-	<artifactId>ContextBroker</artifactId>
+	<artifactId>context-broker</artifactId>
 	<version>${version.cm}</version>
 	<packaging>bundle</packaging>
 
 	<developers>
+	    <developer>
+			<id>jpapai</id>
+			<name>Ioannis Papaioannou</name>
+			<email>jpapai@cn.ntua.gr</email>
+			<organization>ICCS</organization>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
+				<role>owner</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+2</timezone>
+		</developer>
 		<developer>
+			<id>nikoskal</id>
 			<name>Nikos Kalatzis</name>
 			<email>nikosk@cn.ntua.gr</email>
 			<organization>ICCS</organization>
 			<organizationUrl>http://www.iccs.gr/</organizationUrl>
 			<roles>
-				<role>Senior Developer</role>
+				<role>developer</role>
 			</roles>
 			<timezone>+2</timezone>
 		</developer>
@@ -48,7 +61,7 @@
 
 		<dependency>
 			<groupId>org.societies.context-management</groupId>
-			<artifactId>UserCtxDBMgmt</artifactId>
+			<artifactId>context-mgmt-api</artifactId>
 			<version>${version.cm}</version>
 			<scope>provided</scope>
 			<type>bundle</type>
@@ -56,7 +69,15 @@
 
 		<dependency>
 			<groupId>org.societies.context-management</groupId>
-			<artifactId>UserContextHistory</artifactId>
+			<artifactId>user-context-db-mgmt</artifactId>
+			<version>${version.cm}</version>
+			<scope>provided</scope>
+			<type>bundle</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>user-context-history-mgmt</artifactId>
 			<version>${version.cm}</version>
 			<scope>provided</scope>
 			<type>bundle</type>
@@ -90,8 +111,8 @@
 				<configuration>
 					<artifactItems>
 						<artifactItem>
-							<groupId>${groupId}</groupId>
-							<artifactId>${artifactId}</artifactId>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
 							<version>${version.cm}</version>
 							<type>jar</type>
 							<overWrite>true</overWrite>
@@ -102,5 +123,7 @@
 			</plugin>
 	
 		</plugins>
-	</build>	
+	</build>
+	
+	<name>Context Broker</name>	
 </project>

@@ -14,7 +14,7 @@
         
         <osgi:service ref="UserCtxDBMgmt">
         <osgi:interfaces>
-        <value>org.societies.api.internal.context.user.db.IUserCtxDBMgr</value>
+        <value>org.societies.context.api.user.db.IUserCtxDBMgr</value>
         </osgi:interfaces>
         </osgi:service>
 

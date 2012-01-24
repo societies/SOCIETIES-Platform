@@ -45,11 +45,12 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 	<!-- All Spring-OSGi Java projects to be included in nightly builds -->
 	<modules>
 		<!-- API -->
-		<module>../parent/spring-osgi.xml</module>
+		<module>../api/java/schema</module>
 		<module>../api/java/external</module>
 		<module>../api/java/internal</module>
 		
 		<!-- Context -->
+		<module>../context-management/api</module>
 		<module>../context-management/UserContextDBManagement</module>
 		<module>../context-management/UserContextHistoryManagement</module>
 		<module>../context-management/ContextBroker</module>

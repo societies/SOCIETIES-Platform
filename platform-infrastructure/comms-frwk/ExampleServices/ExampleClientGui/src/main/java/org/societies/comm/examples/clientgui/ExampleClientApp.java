@@ -12,13 +12,27 @@ import org.jdesktop.application.SingleFrameApplication;
  */
 public class ExampleClientApp extends SingleFrameApplication {
 
-    /**
+	private ExampleClientView exampleClientView;
+	
+    public ExampleClientView getExampleClientView() {
+		return exampleClientView;
+	}
+
+	public void setExampleClientView(ExampleClientView exampleClientView) {
+		this.exampleClientView = exampleClientView;
+	}
+
+	/**
      * At startup create and show the main frame of the application.
      */
-    @Override protected void startup() {
-        show(new ExampleClientView(this));
-    }
+//    @Override protected void startup() {
+//        show(new ExampleClientView(this));
+//    }
 
+	 @Override protected void startup() {
+	        show(this.getExampleClientView());
+	    }
+	
     /**
      * This method is to initialize the specified window by injecting resources.
      * Windows shown in our application come fully initialized from the GUI

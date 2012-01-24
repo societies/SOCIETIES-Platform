@@ -13,24 +13,52 @@
 
 	<!-- groupId is set in parent pom -->
 	<groupId>org.societies.context-management</groupId>
-	<artifactId>UserContextInferenceManagement</artifactId>
+	<artifactId>user-context-inference-mgmt</artifactId>
 	<version>${version.cm}</version>
 	<packaging>bundle</packaging>
 
 	<developers>
+	    <developer>
+			<id>pkosmides</id>
+			<name>Pavlos Kosmides</name>
+			<email>pkosmidi@central.ntua.gr</email>
+			<organization>ICCS</organization>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
+				<role>owner</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+2</timezone>
+		</developer>
 		<developer>
+			<id>nikoskal</id>
 			<name>Nikos Kalatzis</name>
 			<email>nikosk@cn.ntua.gr</email>
 			<organization>ICCS</organization>
 			<organizationUrl>http://www.iccs.gr/</organizationUrl>
 			<roles>
-				<role>Senior Developer</role>
+				<role>developer</role>
 			</roles>
 			<timezone>+2</timezone>
 		</developer>
 	</developers>
 
 	<!-- List dependencies here -->
+	<dependencies>
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>context-mgmt-api</artifactId>
+			<version>${version.cm}</version>
+			<scope>provided</scope>
+			<type>bundle</type>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>
@@ -58,8 +86,8 @@
 				<configuration>
 					<artifactItems>
 						<artifactItem>
-							<groupId>${groupId}</groupId>
-							<artifactId>${artifactId}</artifactId>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
 							<version>${version.cm}</version>
 							<type>jar</type>
 							<overWrite>true</overWrite>
@@ -70,5 +98,7 @@
 			</plugin>
 	
 		</plugins>
-	</build>	
+	</build>
+	
+	<name>User Context Inference Mgmt</name>	
 </project>

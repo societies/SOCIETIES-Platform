@@ -44,8 +44,8 @@ public class ExampleClientView extends FrameView {
 
         initComponents();
 
-        ApplicationContext ctx = new ClassPathXmlApplicationContext("/META-INF/spring/bundle-context.xml");
-        remoteCalculator =(ICalcRemote) ctx.getBean("RemoteCalculator");
+//        ApplicationContext ctx = new ClassPathXmlApplicationContext("/META-INF/spring/bundle-context.xml");
+//        remoteCalculator =(ICalcRemote) ctx.getBean("RemoteCalculator");
         
         
         // status bar initialization - message timeout, idle icon and busy animation, etc

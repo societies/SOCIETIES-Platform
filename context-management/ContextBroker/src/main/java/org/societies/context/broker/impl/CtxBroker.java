@@ -44,7 +44,7 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.mock.EntityIdentifier;
 
-import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
+import org.societies.context.api.user.db.IUserCtxDBMgr;
 
 /**
  * 3p Context Broker Implementation
