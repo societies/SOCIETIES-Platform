@@ -23,80 +23,12 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.personalisation.dianne.model;
+package org.societies.personalisation.DIANNE.api.DianneNetwork;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
 
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+public interface IDIANNECallback {
+	
+	public void handleDIANNEOutput(IDIANNEOutcome outcome);
 
-public class Network 
-{
-	private ArrayList<ContextGroup> contextGroups;
-	private ArrayList<OutcomeGroup> outcomeGroups;
-	private ArrayList<Synapse> synapses;
-
-	public Network()
-	{
-		contextGroups = new ArrayList<ContextGroup>();
-		outcomeGroups = new ArrayList<OutcomeGroup>();
-		synapses = new ArrayList<Synapse>();
-	}
-	
-	public ArrayList<ContextGroup> getContextGroups(){
-		return contextGroups;
-	}
-	
-	public ArrayList<OutcomeGroup> getOutcomeGroups(){
-		return outcomeGroups;
-	}
-	
-	public ArrayList<Synapse> getSynapses(){
-		return synapses;
-	}
-	
-	public ContextGroup getContextGroup(String groupName){
-		ContextGroup requestedGroup = null;
-		Iterator<ContextGroup> list_it = contextGroups.iterator();
-		while(list_it.hasNext())
-		{
-			ContextGroup group = (ContextGroup)list_it.next();
-			if(group.getGroupName().equals(groupName))
-			{
-				requestedGroup = group;
-				break;
-			}
-		}
-		return requestedGroup;
-	}
-	
-	public OutcomeGroup getOutcomeGroup(IServiceResourceIdentifier serviceId, String groupName){
-		OutcomeGroup requestedGroup = null;
-
-		Iterator <OutcomeGroup>list_it = outcomeGroups.iterator();
-		while(list_it.hasNext())
-		{
-			OutcomeGroup group = (OutcomeGroup)list_it.next();
-			if(group.getServiceId().equals(serviceId)){
-				if(group.getGroupName().equals(groupName))
-				{
-					requestedGroup = group;
-					break;
-				}
-			}
-		}
-		return requestedGroup;
-	}
-	
-	public void addContextGroup(ContextGroup newContextGroup){
-		contextGroups.add(newContextGroup);
-	}
-	
-	public void addOutcomeGroup(OutcomeGroup newOutcomeGroup){
-		outcomeGroups.add(newOutcomeGroup);
-	}
-	
-	public void addSynapse(Synapse newSynapse){
-		synapses.add(newSynapse);
-	}
 }

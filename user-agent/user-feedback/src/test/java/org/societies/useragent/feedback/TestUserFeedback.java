@@ -52,6 +52,10 @@ public class TestUserFeedback extends TestCase implements IUserFeedbackCallback{
 	public void tearDown() throws Exception{
 		//null
 	}
+	
+	public void testTmp(){
+		Assert.assertTrue(true);
+	}
 
 	/*public void testAckNackGUI() {
 		String proposalText = "Press: YES";
