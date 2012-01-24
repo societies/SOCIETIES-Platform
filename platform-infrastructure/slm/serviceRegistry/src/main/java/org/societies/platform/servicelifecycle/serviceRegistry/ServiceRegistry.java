@@ -185,6 +185,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		tmpService=tmpRegistryEntry.createServiceFromRegistryEntry(); 
 		}catch (Exception e) {
 			e.printStackTrace();
+			throw new ServiceRetrieveException(e);
 		}finally{
 			if (session!=null){
 				session.close();
