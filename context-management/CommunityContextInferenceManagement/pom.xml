@@ -11,8 +11,8 @@
 		<relativePath>../../parent/spring-osgi.xml</relativePath>
 	</parent>
 
-	<!-- groupId is set in parent pom -->
 	<groupId>org.societies.context-management</groupId>
+	<artifactId>community-context-inference-mgmt</artifactId>
 	<version>${version.cm}</version>
 	<packaging>bundle</packaging>
 
@@ -98,6 +98,7 @@
 			</plugin>
 	
 		</plugins>
-	</build>	
-	<artifactId>CommunityContextInferenceManagement</artifactId>
+	</build>
+	
+	<name>Community Context Inference Mgmt</name>
 </project>
