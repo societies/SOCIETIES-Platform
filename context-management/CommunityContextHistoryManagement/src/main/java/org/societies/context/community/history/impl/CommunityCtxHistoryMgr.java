@@ -31,8 +31,8 @@ import java.util.Map;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
-import org.societies.api.internal.context.community.history.ICommunityCtxHistoryMgr;
-import org.societies.api.internal.context.user.history.IUserCtxHistoryCallback;
+import org.societies.context.api.community.history.ICommunityCtxHistoryMgr;
+import org.societies.context.api.user.history.IUserCtxHistoryCallback;
 
 public class CommunityCtxHistoryMgr implements ICommunityCtxHistoryMgr {
 
