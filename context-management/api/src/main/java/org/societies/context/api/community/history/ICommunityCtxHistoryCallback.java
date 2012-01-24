@@ -24,29 +24,27 @@
  */
 package org.societies.context.api.community.history;
 
-import org.societies.context.api.user.history.IUserCtxHistoryMgr; 
+
 
 /**
- * ICommunityCtxHistory platform interface allows the management of community context history.
- * 
- * @author nikosk
- * @created 12-Nov-2011 7:15:15 PM
+ * @author <a href="mailto:nikosk@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
  */
-public interface ICommunityCtxHistoryMgr extends IUserCtxHistoryMgr {
+public interface ICommunityCtxHistoryCallback {
 
+	
 	/**
-	 * Disables recording of community context data to history database.
-	 *   
-	 * @since 0.0.1
-	 */
-	public void disableCommCtxRecording(ICommunityCtxHistoryCallback callback);
-
-	/**
-	 * Enables recording of community context data to history database.
+	 * The callback of ICommunityCtxHistoryMgr method
+	 * disableCommCtxRecording(ICommunityCtxHistoryCallback callback)
 	 * 
 	 * @since 0.0.1
 	 */
-	public void enableCommCtxRecording(ICommunityCtxHistoryCallback callback);
-
+	public void CommCtxRecordingDisabled();
 	
+	/**
+	 * The callback of ICommunityCtxHistoryMgr method
+	 * enableCommCtxRecording(ICommunityCtxHistoryCallback callback)
+	 * 
+	 * @since 0.0.1
+	 */
+	public void CommCtxRecordingEnabled();
 }

@@ -39,6 +39,8 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.context.api.user.history.IUserCtxHistoryCallback;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
 
+
+
 public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
 	private final LinkedHashMap<CtxHistoryAttribute,Date> hocObjects;
