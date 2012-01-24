@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.interfaces.model;
+package org.societies.api.android.internal.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -32,7 +32,7 @@ import android.os.Parcelable;
  * @author Olivier (Trialog)
  *
  */
-public class LocationProviderStatus implements Parcelable {
+public class ProviderStatus implements Parcelable {
 	private String name;
 	private boolean enabled;
 	
@@ -41,7 +41,7 @@ public class LocationProviderStatus implements Parcelable {
 	 * @param name
 	 * @param enabled
 	 */
-	public LocationProviderStatus(String name, boolean enabled) {
+	public ProviderStatus(String name, boolean enabled) {
 		super();
 		this.name = name;
 		this.enabled = enabled;
@@ -92,7 +92,7 @@ public class LocationProviderStatus implements Parcelable {
 	 * Parcelable Management
 	 * ************************ */
 	
-	public LocationProviderStatus(Parcel in) {
+	public ProviderStatus(Parcel in) {
 		readFromParcel(in);
 	}
 	
@@ -118,12 +118,12 @@ public class LocationProviderStatus implements Parcelable {
 	}
 	
 	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-		public LocationProviderStatus createFromParcel(Parcel in) {
-			return new LocationProviderStatus(in);
+		public ProviderStatus createFromParcel(Parcel in) {
+			return new ProviderStatus(in);
 		}
 
-		public LocationProviderStatus[] newArray(int size) {
-			return new LocationProviderStatus[size];
+		public ProviderStatus[] newArray(int size) {
+			return new ProviderStatus[size];
 		}
 	};
 }

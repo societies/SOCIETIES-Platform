@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.interfaces;
+package org.societies.api.android.internal;
 
 import java.util.List;
 
@@ -32,15 +32,17 @@ import java.util.List;
  * @author Olivier (Trialog)
  */
 public interface IDeviceStatus {
-	String methodsArray [] = {"isInternetConnectivityOn(String callerPackageName)", "getLocationProvidersStatus(String callerPackageName)"};
+	String methodsArray [] = {"isInternetConnectivityOn(String callerPackageName)", "getConnectivityProvidersStatus(String callerPackageName)", "getLocationProvidersStatus(String callerPackageName)"};
 	
-	public static final String CONNECTIVITY = "org.societies.android.platform.devicestatus.CONNECTIVITY";
+	public static final String CONNECTIVITY_STATUS = "org.societies.android.platform.devicestatus.CONNECTIVITY_STATUS";
+	public static final String CONNECTIVITY_INTERNET_ON = "org.societies.android.platform.devicestatus.CONNECTIVITYINTERNETON";
+	public static final String CONNECTIVITY_PROVIDER_LIST = "org.societies.android.platform.devicestatus.CONNECTIVITYPROVIDERLIST";
 	public static final String LOCATION_STATUS = "org.societies.android.platform.devicestatus.LOCATIONSTATUS";
-	public static final String INTENT_RETURN_TYPE = "org.societies.android.platform.ReturnType";
-	public static final String INTENT_RETURN_KEY = "org.societies.android.platform.ReturnValue";
+	public static final String LOCATION_PROVIDER_LIST = "org.societies.android.platform.devicestatus.LOCATIONPROVIDERLIST";
 	
 	/**
 	 * To know if Internet connectivity is available
+	 * Send intent on CONNECTIVITY_STATUS value CONNECTIVITY_INTERNET_ON
 	 * @param client Package name of service caller
 	 * @return true if this connectivity is available
 	 * @return otherwise false
@@ -48,40 +50,18 @@ public interface IDeviceStatus {
 	public boolean isInternetConnectivityOn(String callerPackageName);
 	
 	/**
+	 * Retrieve the current status of connectivity providers
+	 * Send intent on CONNECTIVITY_STATUS values CONNECTIVITY_INTERNET_ON, CONNECTIVITY_PROVIDER_LIST (List<org.societies.android.api.internal.ProviderStatus>)
+	 * @param client Package name of service caller
+	 * @return List of connectivity providers and their status
+	 */
+	public List<?> getConnectivityProvidersStatus(String callerPackageName);
+	
+	/**
 	 * Retrieve the current status of location providers
+	 * Send intent on LOCATION_STATUS value LOCATION_PROVIDER_LIST (List<org.societies.android.api.internal.ProviderStatus>)
 	 * @param client Package name of service caller
 	 * @return List of location providers and their status
 	 */
 	public List<?> getLocationProvidersStatus(String callerPackageName);
-	
-//	/**
-//	 * Register to connectivity status
-//	 * @param listener
-//	 */
-//	public void registerToConnectivityStatus(IConnectivityStatusListener listener);
-//	public void unregisterToConnectivityStatus();
-//	
-//	/**
-//	 * Retrieve battery status
-//	 * @return battery status
-//	 */
-//	public BatteryStatus getBatteryStatus();
-//	/**
-//	 * Retrieve to battery status
-//	 * @param listener
-//	 */
-//	public void registerToBatteryStatus(IBatteryStatusListener listener);
-//	public void unregisterToBatteryStatus();
-//	
-//	/**
-//	 * Retrieve location providers status
-//	 * @return location providers list
-//	 */
-//	public List<?> getLocationProvidersStatus();
-//	/**
-//	 * Register to location provider
-//	 * @param listener
-//	 */
-//	public void registerToLocationProvidersStatus(ILocationProviderStatusListener listener);
-//	public void unregisterToLocationProvidersStatus();
 }
