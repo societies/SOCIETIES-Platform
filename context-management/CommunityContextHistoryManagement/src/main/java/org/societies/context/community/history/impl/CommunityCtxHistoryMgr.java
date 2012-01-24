@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.communityHistory.impl;
+package org.societies.context.community.history.impl;
 
 import java.util.Date;
 import java.util.List;
@@ -34,8 +34,7 @@ import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.internal.context.community.history.ICommunityCtxHistoryMgr;
 import org.societies.api.internal.context.user.history.IUserCtxHistoryCallback;
 
-public class CommunityContextHistoryManagement  implements ICommunityCtxHistoryMgr{
-
+public class CommunityCtxHistoryMgr implements ICommunityCtxHistoryMgr {
 
 	@Override
 	public void disableCommCtxRecording() {
