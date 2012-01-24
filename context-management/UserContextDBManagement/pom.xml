@@ -4,7 +4,7 @@
 	
 	<!-- The Basics -->
 	<groupId>org.societies.context-management</groupId>
-	<artifactId>UserCtxDBMgmt</artifactId>
+	<artifactId>user-context-db-mgmt</artifactId>
 	<version>${version.cm}</version>
 	<packaging>bundle</packaging>
 	<dependencies>
