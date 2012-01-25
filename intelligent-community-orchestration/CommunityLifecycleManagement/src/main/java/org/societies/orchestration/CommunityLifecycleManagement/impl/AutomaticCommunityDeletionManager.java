@@ -53,7 +53,18 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.mock.EntityIdentifier;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+
+
+//import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
+
+
+import org.societies.api.internal.useragent.model.ExpProposalContent;
 
 /**
  * This is the class for the Automatic Community Deletion Manager component
@@ -87,6 +98,12 @@ public class AutomaticCommunityDeletionManager {
 	private IUserCtxBroker userContextBroker;
 	private ICommunityCtxBroker communityContextBroker;
 	private IUserCtxBrokerCallback userContextBrokerCallback;
+	private ICisManager cisManager;
+	private IUserFeedback userFeedback;
+	//private IUserFeedbackCallback userFeedbackCallback;
+	private String userResponse;
+	
+	private ArrayList<CisRecord> recentRefusals;
 	
 	/*
      * Constructor for AutomaticCommunityConfigurationManager
@@ -128,20 +145,25 @@ public class AutomaticCommunityDeletionManager {
 	 */
 	
 	public void identifyCissToDelete() {
+		CisRecord[] records;
 		if (linkedCss != null) {
-			//CisRecord[] records = ICisManager.getCisList(/** CISs administrated by the CSS */);
+			records = cisManager.getCisList(new CisRecord(null, linkedCss.toString(), null, null, null, null, null, null)/** CISs administrated by the CSS */);
 		}
 		if (linkedCis != null) {
 			//CisRecord james = new CisRecord();
+			records = new CisRecord[1];
+			records[0] = linkedCis;
 			//CisRecord[] records = ICisManager.getCisList(/** This CIS */new CisRecord());
 		}
 		if (linkedDomain != null) {
+			records = cisManager.getCisList(new CisRecord(null, linkedDomain.toString(), null, null, null, null, null, null));
 			//CisRecord[] records = ICisManager.getCisList(/** CISs in the domain */);
 		}
 		
 		//process
 		
 		CisRecord record;
+		ArrayList<CisRecord> cissToDelete = new ArrayList<CisRecord>();
 		
 		// VERY SIMPLISTIC v0.1 ALGORITHM
 		//if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - 5) {
@@ -170,7 +192,40 @@ public class AutomaticCommunityDeletionManager {
 		
 		
 		
+		List<String> options = new ArrayList<String>();
+		options.add("options");
+		userResponse = null;
+		boolean responded = false;
+		//userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects these CISs may be obsolete. If you would like to delete one or more of these CISs, please check them.", options), userFeedbackCallback);
+		for (int i = 0; i < 300; i++) {
+		    if (userResponse == null)
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			else
+			    responded = true;
+		}
 		
+		if (responded == false) {
+		    //User obviously isn't paying attention to CSS, so put the message in the background/list of messages for them to see at their leisure.
+		    String background = "This message is in your inbox or something, waiting for you to read it";
+		}
+		else {
+		   	Iterator<CisRecord> iterator = cissToDelete.iterator();
+			while (iterator.hasNext()) {
+			    CisRecord potentiallyDeletableCis = iterator.next();
+		        if (userResponse.equals("Yes")) {
+				    
+			       // cisManager.deleteCis(linkedCss, potentiallyDeletableCis.getCisId());
+		        }
+		        else {
+		    	    recentRefusals.add(potentiallyDeletableCis);
+		        }
+		   }
+		}
 	}
 	
     public void intialiseAutomaticCommunityDeletionManager() {
@@ -214,6 +269,22 @@ public class AutomaticCommunityDeletionManager {
     public void setUserContextBrokerCallback(IUserCtxBrokerCallback userContextBrokerCallback) {
     	System.out.println("GOT user context broker callback" + userContextBrokerCallback);
     	this.userContextBrokerCallback = userContextBrokerCallback;
+    }
+    
+    public void setCisManager(ICisManager cisManager){
+		this.cisManager = cisManager;
+	}
+    
+    public void setUserFeedback(IUserFeedback userFeedback) {
+    	this.userFeedback = userFeedback;
+    }
+    
+    //public void setUserFeedbackCallback(IUserFeedbackCallback userFeedbackCallback) {
+    //	this.userFeedbackCallback = userFeedbackCallback;
+    //}
+    
+    public void getUserResponse(String userResponse) {
+    	this.userResponse = userResponse;
     }
     
 }
