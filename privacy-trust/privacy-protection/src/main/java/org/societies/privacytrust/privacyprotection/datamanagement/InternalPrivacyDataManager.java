@@ -22,26 +22,24 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.privacytrust.privacyprotection.datamanagement;
 
-package org.societies.api.internal.useragent.feedback;
-
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
+import org.societies.privacytrust.privacyprotection.api.IInternalPrivacyDataManager;
+import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
+import org.societies.privacytrust.privacyprotection.mock.EntityIdentifier;
 
 /**
- * 
- * @author S.Gallacher@hw.ac.uk
- *
+ * @state skeleton 
+ * @author olivierm
  */
-public interface IUserFeedback
-{
-	public void getExplicitFB(int type, ExpProposalContent content, IUserFeedbackCallback callback);
-	
-	public void getImplicitFB(int type, ImpProposalContent content, IUserFeedbackCallback callback);
-	
-	@Deprecated
-	public String getExplicitFB(int type, ExpProposalContent content);
-	
-	@Deprecated
-	public boolean getImplicitFB(int type, ImpProposalContent content);
+public class InternalPrivacyDataManager implements IInternalPrivacyDataManager {
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.internal.IPrivacyDataManagerInternal#updatePermissions(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void updatePermissions(DataIdentifier dataId, String agreementId,
+			EntityIdentifier ownerId, EntityIdentifier requestorId) {
+		// TODO Auto-generated method stub
+
+	}
 }

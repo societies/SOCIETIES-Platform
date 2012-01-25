@@ -55,16 +55,20 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>../context-management/UserContextHistoryManagement</module>
 		<module>../context-management/ContextBroker</module>
 		
+		 <!-- User Agent -->
+		<module>../user-agent/user-action-monitor</module>
+		<module>../user-agent/user-feedback</module>
 		 
 		<!-- Personalisation -->
-		<!-- 
+		
 		<module>../personalisation/Personalisation-API</module>
 		<module>../personalisation/UserPreferenceManagement</module>
 		<module>../personalisation/UserPreferenceConditionMonitor</module>
 		<module>../personalisation/UserPreferenceLearning</module>
+		<module>../personalisation/DIANNE</module>
+		<!--  
 		<module>../personalisation/PersonalisationManager</module>
-		 -->
-		 
+		-->		 
 		 
 		<!-- Communications Infrastructure -->
 		<!--
@@ -93,9 +97,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<!-- Intelligent community orchestration -->
 		<!-- Context Management -->
 		<!-- Privacy Mgmt -->
-		<!-- User Agent -->
-		<module>../user-agent/user-action-monitor</module>
-		<module>../user-agent/user-feedback</module>
+		
 
 	</modules>
 </project>

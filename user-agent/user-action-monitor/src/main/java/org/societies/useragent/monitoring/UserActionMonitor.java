@@ -26,19 +26,27 @@
 package org.societies.useragent.monitoring;
 
 import org.societies.api.internal.context.broker.IUserCtxBroker;
+import org.societies.api.internal.useragent.monitoring.IInternalUserActionMonitor;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.api.personalisation.model.IAction;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 
-public class UserActionMonitor implements IUserActionMonitor{
+public class UserActionMonitor implements IUserActionMonitor, IInternalUserActionMonitor{
 	
 	private IUserCtxBroker ctxBroker;
 
 	@Override
-	public void monitor(ServiceResourceIdentifier serviceId, EntityIdentifier owner, IAction action) {
+	public void monitor(IServiceResourceIdentifier serviceId, EntityIdentifier owner, IAction action) {
 		System.out.println("Received user action!");
 	}
+	
+	@Override
+	public void registerForActionUpdates() {
+		// TODO Auto-generated method stub	
+	}
+	
+	
 	
 	public void initialiseUserActionMonitor(){
 		System.out.println("Initialising user action monitor!");
@@ -52,5 +60,4 @@ public class UserActionMonitor implements IUserActionMonitor{
 	public void setCtxBroker(IUserCtxBroker broker){
 		this.ctxBroker = broker;
 	}
-
 }

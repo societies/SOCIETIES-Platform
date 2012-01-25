@@ -22,37 +22,8 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.context.user.inference.test;
 
-package org.societies.api.internal.context.user.inference;
+public class UserCtxInferenceMgrTest {
 
-import org.societies.api.context.model.CtxAttribute;
-
-/**
- * This exception is thrown whenever a CtxRefinement algorithm
- * is not able to infer a value for a Ctx Attribute.
- * 
- * @author <a href="mailto:pkosmidi@central.ntua.gr">Pavlos Kosmides</a> (ICCS)
- */
-public class NotInferredException extends Exception {
-    
-    private static final long serialVersionUID = 1L;
-
-    public NotInferredException(CtxAttribute unrefinedAttr) {
-        super();
-        this.unrefinedAttr = unrefinedAttr;
-    }
-    
-    private CtxAttribute unrefinedAttr = null;
-    
-    /** 
-     * Returns the Ctx Attribute whose value has not been set
-     * through CtxInference
-     * 
-     * @return unrefined Context Attribute
-     * @since 0.0.1
-     */
-    public synchronized CtxAttribute getUnrefinedAttr() {
-        return unrefinedAttr;
-    }
-    
 }

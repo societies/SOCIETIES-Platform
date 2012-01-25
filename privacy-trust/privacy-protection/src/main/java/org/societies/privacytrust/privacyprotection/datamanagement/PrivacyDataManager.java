@@ -32,7 +32,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.mock.DataIdentifier;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 /**
  * @state skeleton 
@@ -40,8 +40,9 @@ import org.societies.api.mock.ServiceResourceIdentifier;
  */
 public class PrivacyDataManager implements IPrivacyDataManager {
 
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.internal.IDataObfuscationManager#obfuscateData(org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.listener.IDataObfuscationListener)
+	/*
+	 * 
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#obfuscateData(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)
 	 */
 	@Override
 	public IDataWrapper obfuscateData(IDataWrapper dataWrapper,
@@ -51,8 +52,9 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.internal.IDataObfuscationManager#hasObfuscatedVersion(org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.privacytrust.privacyprotection.api.model.dataobfuscation.listener.IDataObfuscationListener)
+	/*
+	 * 
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)
 	 */
 	@Override
 	public DataIdentifier hasObfuscatedVersion(IDataWrapper dataWrapper,
@@ -62,18 +64,20 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.external.IPrivacyDataManager#checkPermission(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)
+	/*
+	 * 
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.internal.mock.DataIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)
 	 */
 	@Override
 	public ResponseItem checkPermission(DataIdentifier dataId, EntityIdentifier ownerId,
-			EntityIdentifier requestorId, ServiceResourceIdentifier serviceId) {
+			EntityIdentifier requestorId, IServiceResourceIdentifier serviceId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.external.IPrivacyDataManager#checkPermission(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.String)
+	/*
+	 * 
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.internal.mock.DataIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier)
 	 */
 	@Override
 	public ResponseItem checkPermission(DataIdentifier dataId, EntityIdentifier ownerId,
@@ -82,8 +86,8 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.external.IPrivacyDataManager#checkPermission(java.lang.Object, java.lang.Object, java.lang.String, org.societies.privacytrust.privacyprotection.api.model.privacyPolicy.RequestPolicy)
+	/*
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.internal.mock.DataIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
 	 */
 	@Override
 	public ResponseItem checkPermission(DataIdentifier dataId, EntityIdentifier ownerId,

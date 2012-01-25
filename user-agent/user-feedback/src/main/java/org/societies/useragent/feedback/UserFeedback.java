@@ -25,52 +25,60 @@
 
 package org.societies.useragent.feedback;
 
-import java.util.List;
-
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalType;
+import org.societies.useragent.feedback.guis.AckNackGUI;
+import org.societies.useragent.feedback.guis.CheckBoxGUI;
+import org.societies.useragent.feedback.guis.RadioGUI;
+import org.societies.useragent.feedback.guis.TimedGUI;
 
 public class UserFeedback implements IUserFeedback{
 	
 	public void initialiseUserFeedback(){
 		System.out.println("User Feedback initialised!!");
 	}
-
+	
 	@Override
-	public String getExplicitFB(int type, ExpProposalContent content) {
+	public void getExplicitFB(int type, ExpProposalContent content, IUserFeedbackCallback callback) {
 		System.out.println("Returning explicit feedback");
-		String feedback = null;
 		String proposalText = content.getProposalText();
-		List<String> options = content.getOptions();
+		String[] options = content.getOptions();
 		if(type == ExpProposalType.RADIOLIST){
 			System.out.println("Radio list GUI");
-			feedback = options.get(0);  
+			new RadioGUI(proposalText, options, callback);
 		}else if(type == ExpProposalType.CHECKBOXLIST){
 			System.out.println("Check box list GUI");
-			feedback = options.get(0);
+			new CheckBoxGUI(proposalText, options, callback);
 		}else{ //ACK-NACK
 			System.out.println("ACK/NACK GUI");
-			feedback = options.get(0);
+			new AckNackGUI(proposalText, options, callback);
 		}
-		return feedback;
 	}
 
 	@Override
-	public boolean getImplicitFB(int type, ImpProposalContent content) {
+	public void getImplicitFB(int type, ImpProposalContent content, IUserFeedbackCallback callback) {
 		System.out.println("Returning implicit feedback");
-		boolean feedback = false;
 		String proposalText = content.getProposalText();
-		if(type == ImpProposalType.NOTIFICATION){
-			System.out.println("Notification GUI");
-			feedback = true;
-		}else{ //Timed Abort
-			System.out.println("Timed abort GUI");
-			feedback = true;
+		int timeout = content.getTimeout();
+		if(type == ImpProposalType.TIMED_ABORT){
+			System.out.println("Timed Abort GUI");
+			new TimedGUI(proposalText, timeout, callback);
 		}
-		return feedback;
+	}
+	
+	
+	@Override
+	public String getExplicitFB(int arg0, ExpProposalContent arg1) {
+		return "";
+	}
+
+	@Override
+	public boolean getImplicitFB(int arg0, ImpProposalContent arg1) {
+		return false;
 	}
 	
 }

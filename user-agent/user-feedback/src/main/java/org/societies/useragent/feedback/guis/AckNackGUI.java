@@ -22,8 +22,36 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.communityInference.test;
 
-public class CommunityContextInferenceManagementTest {
+package org.societies.useragent.feedback.guis;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
+
+import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
+
+public class AckNackGUI{
+
+	public AckNackGUI(String proposalText, String[] options, IUserFeedbackCallback callback){
+		List<String> feedback = new ArrayList<String>();
+		int n = JOptionPane.showOptionDialog(null,
+			    proposalText,
+			    "TEST - Ack/Nack Feedback GUI",
+			    JOptionPane.YES_NO_CANCEL_OPTION,
+			    JOptionPane.QUESTION_MESSAGE,
+			    null,
+			    options,
+			    options[0]);
+		feedback.add(options[n]);
+		for(String output: feedback){
+			System.out.println("Feedback = "+output);
+		}
+		callback.handleExpFeedback(feedback);
+	}
+
+	public static void main(String[] args){
+		String[] options = {"yes", "no"};
+		new AckNackGUI("Are you OK??", options, null);
+	}
 }

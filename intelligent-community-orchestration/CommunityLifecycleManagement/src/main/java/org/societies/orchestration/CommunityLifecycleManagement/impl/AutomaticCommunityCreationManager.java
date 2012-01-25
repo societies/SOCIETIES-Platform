@@ -26,6 +26,7 @@
 package org.societies.orchestration.CommunityLifecycleManagement.impl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.societies.api.internal.css_modules.css_directory.ICssDirectory;
 
@@ -47,6 +48,7 @@ import org.societies.api.internal.context.user.history.IUserCtxHistoryMgr;
 import org.societies.api.internal.context.broker.IUserCtxBroker;
 import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
 
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
@@ -75,17 +77,19 @@ import java.util.List;
 
 public class AutomaticCommunityCreationManager {
 	
-	private EntityIdentifier linkedCss; // No datatype yet defined for CSS
+	private EntityIdentifier linkedCss;
 	
     private CisRecord linkedSuperCis;
     
-    //private Domain linkedDomain; // No datatype yet representing a domain
 	private EntityIdentifier linkedDomain;
 	
 	private IUserCtxDBMgr userContextDatabaseManager;
 	private IUserCtxBroker userContextBroker;
 	private ICommunityCtxBroker communityContextBroker;
 	private IUserCtxBrokerCallback userContextBrokerCallback;
+	private ArrayList<CisRecord> recentRefusals;
+	private IUserFeedback userFeedback;
+	//private IUserFeedbackCallback userFeedbackCallback;
     
 	/*
      * Constructor for AutomaticCommunityConfigurationManager
@@ -238,6 +242,41 @@ public class AutomaticCommunityCreationManager {
 		//OR
 		//automatically call CIS management functions to create CISs
 		
+		List<String> options = new ArrayList<String>();
+		options.add("options");
+		String userResponse = null;
+		boolean responded = false;
+		//userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs may benefit you. If you would like to create one or more of these CISs, please check them.", options), userFeedbackCallback);
+		for (int i = 0; i < 300; i++) {
+		    if (userResponse == null)
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			else
+			    responded = true;
+		}
+		
+		if (responded == false) {
+		    //User obviously isn't paying attention to CSS, so put the message in the background/list of messages for them to see at their leisure.
+		    String background = "This message is in your inbox or something, waiting for you to read it";
+		}
+		else {
+		   	Iterator<CisRecord> iterator = cissToCreate.iterator();
+			while (iterator.hasNext()) {
+			    CisRecord potentiallyCreatableCis = iterator.next();
+		        if (userResponse.equals("Yes")) {
+				    
+			       // cisManager.createCis(linkedCss, potentiallyCreatableCis.getCisId());
+		        }
+		        else {
+		    	    recentRefusals.add(potentiallyCreatableCis);
+		        }
+		   }
+		}
+		
 	}
 	
 	public boolean isSituationSuggestiveOfTemporaryCISCreation() {
@@ -290,6 +329,10 @@ public class AutomaticCommunityCreationManager {
     public void setUserContextBrokerCallback(IUserCtxBrokerCallback userContextBrokerCallback) {
     	System.out.println("GOT user context broker callback" + userContextBrokerCallback);
     	this.userContextBrokerCallback = userContextBrokerCallback;
+    }
+    
+    public void retrieveUserContextBrokerCallback() {
+    	
     }
     
 }

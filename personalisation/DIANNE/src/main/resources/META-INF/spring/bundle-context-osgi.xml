@@ -12,10 +12,17 @@
        testing of the bundle outside of an OSGi container -->
        
         
-        <osgi:service ref="UserActionMonitor">
+        <osgi:service ref="DIANNE">
         <osgi:interfaces>
-        <value>org.societies.api.useragent.monitoring.IUserActionMonitor</value>
+        <value>org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE</value>
         </osgi:interfaces>
-        </osgi:service>
+        </osgi:service>        
+		
+		
+		<osgi:reference id="UserActionMonitor" interface="org.societies.api.internal.useragent.monitoring.IInternalUserActionMonitor"/>
+		<osgi:reference id="UserCtxBroker" interface="org.societies.api.internal.context.broker.IUserCtxBroker"/>
+		
+		
+		
 
 </beans>

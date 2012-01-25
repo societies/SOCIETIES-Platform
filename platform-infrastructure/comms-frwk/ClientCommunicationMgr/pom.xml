@@ -46,6 +46,11 @@
 			<artifactId>AndroidAgentApi</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<!--dependency> <!- TODO: remove this dependency by extracting TinderUtils from artifact ->
+			<groupId>org.societies.comm.xmpp</groupId>
+			<artifactId>XCCommunicationMgr</artifactId>
+			<version>0.1</version>
+		</dependency-->
 		<!--dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>

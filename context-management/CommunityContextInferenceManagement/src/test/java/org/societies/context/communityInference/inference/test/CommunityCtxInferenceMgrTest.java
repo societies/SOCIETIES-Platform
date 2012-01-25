@@ -22,26 +22,8 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.context.communityInference.test;
 
-package org.societies.api.internal.useragent.feedback;
+public class CommunityCtxInferenceMgrTest {
 
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
-
-/**
- * 
- * @author S.Gallacher@hw.ac.uk
- *
- */
-public interface IUserFeedback
-{
-	public void getExplicitFB(int type, ExpProposalContent content, IUserFeedbackCallback callback);
-	
-	public void getImplicitFB(int type, ImpProposalContent content, IUserFeedbackCallback callback);
-	
-	@Deprecated
-	public String getExplicitFB(int type, ExpProposalContent content);
-	
-	@Deprecated
-	public boolean getImplicitFB(int type, ImpProposalContent content);
 }

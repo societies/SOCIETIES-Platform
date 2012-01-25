@@ -22,24 +22,15 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.datamanagement;
 
-import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
-import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
-import org.societies.privacytrust.privacyprotection.mock.EntityIdentifier;
+package org.societies.api.internal.useragent.feedback;
 
-/**
- * @state skeleton 
- * @author olivierm
- */
-public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.internal.IPrivacyDataManagerInternal#updatePermissions(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public void updatePermissions(DataIdentifier dataId, String agreementId,
-			EntityIdentifier ownerId, EntityIdentifier requestorId) {
-		// TODO Auto-generated method stub
+import java.util.List;
 
-	}
+public interface IUserFeedbackCallback {
+	
+	public void handleExpFeedback(List<String> feedback);
+	
+	public void handleImpFeedback(Boolean feedback);
+
 }

@@ -22,8 +22,14 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.communityInference.impl;
 
-public class CommunityContextInferenceManagement {
+package org.societies.api.internal.useragent.monitoring;
+
+public interface IInternalUserActionMonitor {
+	
+	/**
+	 * This method allows platform components to register for events that occur when actions are received
+	 */
+	public void registerForActionUpdates();
 
 }

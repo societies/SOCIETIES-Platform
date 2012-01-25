@@ -25,14 +25,12 @@
 
 package org.societies.api.internal.useragent.model;
 
-import java.util.List;
-
 public class ExpProposalContent {
 	
 	private String proposalText;
-	private List<String> options;
+	private String[] options;
 	
-	public ExpProposalContent(String proposalText, List<String> options){
+	public ExpProposalContent(String proposalText, String[] options){
 		this.proposalText = proposalText;
 		this.options = options;
 	}
@@ -41,7 +39,7 @@ public class ExpProposalContent {
 		return this.proposalText;
 	}
 	
-	public List<String> getOptions(){
+	public String[] getOptions(){
 		return this.options;
 	}
 
