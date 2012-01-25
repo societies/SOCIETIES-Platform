@@ -28,6 +28,12 @@
 	<dependencies>
 	<!-- add your dependencies here -->
 		<dependency>
+			<groupId>org.societies.example</groupId>
+			<artifactId>internalAPI</artifactId>
+			<version>0.1</version>	
+			<scope>provided</scope>			
+		</dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>

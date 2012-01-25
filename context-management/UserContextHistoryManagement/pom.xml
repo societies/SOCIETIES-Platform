@@ -12,18 +12,31 @@
 	</parent>
 
 	<!-- groupId is set in parent pom -->
-	<artifactId>UserContextHistory</artifactId>
+	<artifactId>user-context-history-mgmt</artifactId>
 	<version>${version.cm}</version>
 	<packaging>bundle</packaging>
 
 	<developers>
-		<developer>
+	    <developer>
+			<id>nikoskal</id>
 			<name>Nikos Kalatzis</name>
 			<email>nikosk@cn.ntua.gr</email>
 			<organization>ICCS</organization>
 			<organizationUrl>http://www.iccs.gr/</organizationUrl>
 			<roles>
-				<role>Senior Developer</role>
+				<role>owner</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+2</timezone>
+		</developer>
+	    <developer>
+			<id>pkosmides</id>
+			<name>Pavlos Kosmides</name>
+			<email>pkosmidi@central.ntua.gr</email>
+			<organization>ICCS</organization>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
+				<role>developer</role>
 			</roles>
 			<timezone>+2</timezone>
 		</developer>
@@ -32,28 +45,19 @@
 	<!-- List dependencies here -->
 	<dependencies>
 		<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
-
-
-
-
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>context-mgmt-api</artifactId>
+			<version>${version.cm}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
-
-
-
-
 
 	<build>
 		<plugins>
@@ -83,7 +87,7 @@
 							<groupId>${project.groupId}</groupId>
 							<artifactId>${project.artifactId}</artifactId>
 							<version>${version.cm}</version>
-							<type>bundle</type>
+							<type>jar</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</artifactItem>
@@ -94,7 +98,7 @@
 	</build>	
 
 
-	<name>User History Management</name>
+	<name>User Context History Management</name>
 
 	<groupId>org.societies.context-management</groupId>
 </project>

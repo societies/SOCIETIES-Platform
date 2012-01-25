@@ -27,6 +27,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>android</groupId>
+            <artifactId>android</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
   			<groupId>org.societies.utilities</groupId>
   			<artifactId>DBC</artifactId>
   			<version>${release.version}</version>

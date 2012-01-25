@@ -26,6 +26,8 @@
    <property name="linkedDomain" ref="EntityIdentifier"></property>
    <property name="linkedSuperCis" ref="CisRecord"></property>
    <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>
+   <property name="userContextBroker" ref="UserCtxBroker"></property>
+   <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>
    </bean>
    
    <bean id="AutomaticCommunityConfigurationManager" class="org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityConfigurationManager" 
@@ -33,6 +35,9 @@
    <property name="linkedCss" ref="EntityIdentifier"></property>
    <property name="linkedCis" ref="CisRecord"></property>
    <property name="linkedDomain" ref="EntityIdentifier"></property>
+   <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>
+   <property name="userContextBroker" ref="UserCtxBroker"></property>
+   <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>
    </bean>
    
    <bean id="AutomaticCommunityDeletionManager" class="org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityDeletionManager" 
@@ -40,6 +45,9 @@
    <property name="linkedCss" ref="EntityIdentifier"></property>
    <property name="linkedCis" ref="CisRecord"></property>
    <property name="linkedDomain" ref="EntityIdentifier"></property>
+   <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>
+   <property name="userContextBroker" ref="UserCtxBroker"></property>
+   <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>
    </bean>
 <!--   <context:component-scan base-package="org.societies.orchestration.CommunityLifecycleManagement.impl"></context:component-scan> -->
 </beans>

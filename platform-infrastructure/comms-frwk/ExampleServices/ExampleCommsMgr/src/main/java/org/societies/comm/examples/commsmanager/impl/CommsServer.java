@@ -40,31 +40,31 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.comm.examples.calculator.ICalc;
-import org.societies.comm.examples.calculatorbean.CalcBean;
-import org.societies.comm.examples.calculatorbean.CalcBeanResult;
 import org.societies.comm.examples.fortunecookie.api.IWisdom;
 import org.societies.comm.examples.fortunecookie.datatypes.Cookie;
-import org.societies.comm.examples.fortunecookiebean.FortuneCookieBean;
-import org.societies.comm.examples.fortunecookiebean.FortuneCookieBeanResult;
-import org.societies.comm.examples.fortunecookiebean.MethodName;
 import org.societies.comm.xmpp.datatypes.Stanza;
 import org.societies.comm.xmpp.exceptions.CommunicationException;
 import org.societies.comm.xmpp.interfaces.CommManager;
 import org.societies.comm.xmpp.interfaces.FeatureServer;
+import org.societies.example.calculatorservice.schema.CalcBean;
+import org.societies.example.calculatorservice.schema.CalcBeanResult;
 import org.societies.example.complexservice.IComplexService;
+import org.societies.example.complexservice.schema.ComplexServiceMsgBean;
+import org.societies.example.complexservice.schema.ComplexServiceMsgBeanResult;
 import org.societies.example.complexservice.schema.MyComplexBean;
-import org.societies.example.complexservice.schema.ServiceAMsgBean;
-import org.societies.example.complexservice.schema.ServiceAMsgBeanResult;
+import org.societies.example.fortunecookieservice.schema.FortuneCookieBean;
+import org.societies.example.fortunecookieservice.schema.FortuneCookieBeanResult;
+import org.societies.example.fortunecookieservice.schema.MethodName;
 
 public class CommsServer implements FeatureServer {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-							  Arrays.asList("http://societies.org/comm/examples/calculatorbean",
-									  		"http://societies.org/comm/examples/fortunecookiebean",
+							  Arrays.asList("http://societies.org/example/calculatorservice/schema",
+									  		"http://societies.org/example/fortunecookieservice/schema",
 									  		"http://societies.org/example/complexservice/schema"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
-							  Arrays.asList("org.societies.comm.examples.calculatorbean",
-											"org.societies.comm.examples.fortunecookiebean",
+							  Arrays.asList("org.societies.example.calculatorbean.schema",
+											"org.societies.example.fortunecookiebean.schema",
 											"org.societies.example.complexservice.schema"));
 	
 	//PRIVATE VARIABLES
@@ -218,12 +218,12 @@ public class CommsServer implements FeatureServer {
 		}
 		
 		// -------- COMPLEX SERVICE BUNDLE ---------
-		else if (payload.getClass().equals(ServiceAMsgBean.class)) {
-			ServiceAMsgBean complexBean = (ServiceAMsgBean) payload;
+		else if (payload.getClass().equals(ComplexServiceMsgBean.class)) {
+			ComplexServiceMsgBean complexBean = (ComplexServiceMsgBean) payload;
 			
 			MyComplexBean paramBean = (MyComplexBean) complexBean.getComplexBean();
 			Future<MyComplexBean> returnBean = null;
-			ServiceAMsgBeanResult complexRes = new ServiceAMsgBeanResult(); //GENERATE BEAN CONTAINING RETURN OBJECT 
+			ComplexServiceMsgBeanResult complexRes = new ComplexServiceMsgBeanResult(); //GENERATE BEAN CONTAINING RETURN OBJECT 
 			
 			switch (complexBean.getMethod()) {
 			

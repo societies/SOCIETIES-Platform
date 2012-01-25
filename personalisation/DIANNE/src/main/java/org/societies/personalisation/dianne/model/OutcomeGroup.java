@@ -27,13 +27,14 @@ package org.societies.personalisation.dianne.model;
 
 import java.util.Iterator;
 
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+
 
 public class OutcomeGroup extends Group
 {
 	private OutcomeNode winnerNode;
 	private OutcomeNode previousWinner;
-	private ServiceResourceIdentifier serviceId;
+	private IServiceResourceIdentifier serviceId;
 	private String serviceType;
 
 	//gradient variables
@@ -57,7 +58,7 @@ public class OutcomeGroup extends Group
 		winnerNode = null;
 	}
 	
-	public OutcomeGroup(ServiceResourceIdentifier serviceId, String serviceType, String groupName){
+	public OutcomeGroup(IServiceResourceIdentifier serviceId, String serviceType, String groupName){
 		super(groupName);
 		this.serviceId = serviceId;
 		this.serviceType = serviceType;
@@ -308,7 +309,7 @@ public class OutcomeGroup extends Group
 		return winnerNode;
 	}
 	
-	public ServiceResourceIdentifier getServiceId(){
+	public IServiceResourceIdentifier getServiceId(){
 		return serviceId;
 	}
 	

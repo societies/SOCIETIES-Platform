@@ -42,12 +42,13 @@ import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 import org.societies.api.internal.context.broker.ICommunityCtxBrokerCallback;
 import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
 import org.societies.api.internal.context.broker.IUserCtxBroker;
-import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
-import org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback;
+import org.societies.context.api.user.db.IUserCtxDBMgr;
+import org.societies.context.api.user.db.IUserCtxDBMgrCallback;
+import org.societies.context.api.user.history.IUserCtxHistoryCallback;
+import org.societies.context.api.user.history.IUserCtxHistoryMgr;
 import org.societies.api.internal.context.user.prediction.PredictionMethod;
 
-import org.societies.api.internal.context.user.history.IUserCtxHistoryCallback;
-import org.societies.api.internal.context.user.history.IUserCtxHistoryMgr;
+
 
 /**
  * Platform Context Broker Implementation

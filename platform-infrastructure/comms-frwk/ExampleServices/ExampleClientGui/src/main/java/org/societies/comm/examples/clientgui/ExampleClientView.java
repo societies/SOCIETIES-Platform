@@ -11,37 +11,43 @@ import org.jdesktop.application.FrameView;
 import org.jdesktop.application.TaskMonitor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
 import javax.swing.Timer;
 import javax.swing.Icon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import org.societies.comm.examples.commsmanager.IExampleCommsManager;
+import org.societies.comm.examples.commsmanager.ICalcRemote;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * The application's main frame.
  */
 public class ExampleClientView extends FrameView {
 
-	private IExampleCommsManager commManager;
+	private ICalcRemote remoteCalculator;
 	
-    /** @return the commManager
-	 */
-	public IExampleCommsManager getCommManager() {
-		return commManager;
+	/** @return the remoteCalculator	 */
+	public ICalcRemote getRemoteCalculator() {
+		return remoteCalculator;
 	}
 
-	/** @param commManager the commManager to set
-	 */
-	public void setCommManager(IExampleCommsManager commManager) {
-		this.commManager = commManager;
+	/** @param remoteCalculator the remoteCalculator to set */
+	public void setRemoteCalculator(ICalcRemote remoteCalculator) {
+		this.remoteCalculator = remoteCalculator;
 	}
-
 	
 	public ExampleClientView(SingleFrameApplication app) {
         super(app);
 
         initComponents();
 
+//        ApplicationContext ctx = new ClassPathXmlApplicationContext("/META-INF/spring/bundle-context.xml");
+//        remoteCalculator =(ICalcRemote) ctx.getBean("RemoteCalculator");
+        
+        
         // status bar initialization - message timeout, idle icon and busy animation, etc
         ResourceMap resourceMap = getResourceMap();
         int messageTimeout = resourceMap.getInteger("StatusBar.messageTimeout");
@@ -343,8 +349,21 @@ public class ExampleClientView extends FrameView {
     }// </editor-fold>//GEN-END:initComponents
 
 private void btnExecuteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExecuteActionPerformed
-	getCommManager().Add(1, 2);
+	lblResult.setText("Connecting...");
+	int valA = Integer.parseInt(txtA.getText());
+	int valB = Integer.parseInt(txtB.getText());
 	
+	Future<Integer> result = getRemoteCalculator().AddAsync(valA, valB);
+	String sResult;
+	try {
+		sResult = String.valueOf(result.get());
+		lblResult.setText(sResult);
+	} catch (InterruptedException e) {
+		e.printStackTrace();
+	} catch (ExecutionException e) {
+		lblResult.setText("ERROR: " + e.getMessage());
+		e.printStackTrace();
+	}
 }//GEN-LAST:event_btnExecuteActionPerformed
 
 private void btnGetCookieActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGetCookieActionPerformed

@@ -28,32 +28,39 @@ package org.societies.personalisation.dianne;
 import java.util.HashMap;
 
 import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE;
+import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNECallback;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.internal.context.broker.IUserCtxBroker;
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.internal.useragent.monitoring.IInternalUserActionMonitor;
 
 public class DIANNE implements IDIANNE{
 
 	private HashMap<EntityIdentifier, NetworkRunner> networks;
+	IInternalUserActionMonitor uaMonitor;
+	IUserCtxBroker ctxBroker;
 
 	public DIANNE(){
 		networks = new HashMap<EntityIdentifier, NetworkRunner>();
 	}
 
 	@Override
-	public IOutcome getOutcome(EntityIdentifier ownerId,
-			ServiceResourceIdentifier serviceId, String preferenceName) {
+	public void getOutcome(EntityIdentifier ownerId,
+			IServiceResourceIdentifier serviceId, 
+			String preferenceName, 
+			IDIANNECallback callback) {
 		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
-	public IOutcome getOutcome(EntityIdentifier ownerId,
-			ServiceResourceIdentifier serviceId, String preferenceName,
-			CtxAttribute attribute) {
+	public void getOutcome(EntityIdentifier ownerId,
+			IServiceResourceIdentifier serviceId, 
+			String preferenceName,
+			CtxAttribute attribute, 
+			IDIANNECallback callback) {
 		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
@@ -76,5 +83,52 @@ public class DIANNE implements IDIANNE{
 		}else{
 			System.out.println("No networks exist for this identity");
 		}
+	}
+	
+	
+	public void initialiseDIANNELearning(){
+		System.out.println("Initialising DIANNE!");
+		if(this.ctxBroker == null){
+			System.out.println("ctxBroker is null :(");
+		}else{
+			System.out.println("ctxBroker is not null :)");
+		}
+		
+		if(this.uaMonitor == null){
+			System.out.println("uaMonitor is null :(");
+		}else{
+			System.out.println("uaMonitor is not null :)");
+		}
+	}
+	
+	public void setCtxBroker(IUserCtxBroker broker){
+		this.ctxBroker = broker;
+	}
+	
+	public void setUaMonitor(IInternalUserActionMonitor monitor){
+		this.uaMonitor = monitor;
+	}
+
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE#getOutcome(org.societies.api.mock.EntityIdentifier, org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)
+	 * DEPRECATED
+	 */
+	@Override
+	public IOutcome getOutcome(EntityIdentifier arg0,
+			IServiceResourceIdentifier arg1, String arg2) {
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE#getOutcome(org.societies.api.mock.EntityIdentifier, org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String, org.societies.api.context.model.CtxAttribute)
+	 * DEPRECATED
+	 */
+	@Override
+	public IOutcome getOutcome(EntityIdentifier arg0,
+			IServiceResourceIdentifier arg1, String arg2, CtxAttribute arg3) {
+		return null;
 	}
 }

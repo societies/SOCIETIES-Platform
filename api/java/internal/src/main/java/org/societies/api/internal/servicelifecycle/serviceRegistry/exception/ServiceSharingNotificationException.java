@@ -32,4 +32,37 @@ package org.societies.api.internal.servicelifecycle.serviceRegistry.exception;
  */
 public class ServiceSharingNotificationException extends Exception {
 
+	/**
+	 * 
+	 */
+	public ServiceSharingNotificationException() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @param message
+	 * @param cause
+	 */
+	public ServiceSharingNotificationException(String message, Throwable cause) {
+		super(message, cause);
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @param message
+	 */
+	public ServiceSharingNotificationException(String message) {
+		super(message);
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @param cause
+	 */
+	public ServiceSharingNotificationException(Throwable cause) {
+		super(cause);
+		// TODO Auto-generated constructor stub
+	}
+
 }

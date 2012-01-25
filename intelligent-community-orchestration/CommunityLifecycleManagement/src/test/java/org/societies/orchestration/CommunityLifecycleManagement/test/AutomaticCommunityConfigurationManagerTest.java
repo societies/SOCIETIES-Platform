@@ -25,6 +25,8 @@
 
 package org.societies.orchestration.CommunityLifecycleManagement.test;
 
+import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,6 +51,14 @@ import org.societies.context.user.db.api.platform.IUserCtxDBMgr;
 import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
 */
 
+import org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityConfigurationManager;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.internal.servicelifecycle.model.Service;
+//import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.internal.cis.cis_management.ICisManager;
+import org.societies.api.internal.cis.cis_management.CisRecord;
+
 /**
  * This is the test class for the Automatic Community Configuration Manager component
  * 
@@ -58,4 +68,31 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
  */
 
 public class AutomaticCommunityConfigurationManagerTest {
+	
+	private AutomaticCommunityConfigurationManager autoCommunityConfigurationManager;
+	private ICisManager cisManager;
+	
+    public void testIdentifyCissToConfigure() {
+		
+    	EntityIdentifier ownerId = new EntityIdentifier(); //James Jents CSS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+    	
+		//create CIS for James where James himself has been inactive for 1 year.
+	    
+		CisRecord jamesCisRecord = cisManager.createCis("James", "James CIS");
+		
+    	autoCommunityConfigurationManager = new AutomaticCommunityConfigurationManager(ownerId, "CSS");
+		
+		autoCommunityConfigurationManager.identifyCissToConfigure();
+		
+		//James should have been suggested to leave the CIS.
+		// (No members list function in CisRecord API yet)
+		//Assert.assertNull(cisManager.getCis("James", "James CIS").getMembersList().get("James"));
+		
+	}
+    
+    public void setCisManager(ICisManager cisManager){
+		this.cisManager = cisManager;
+	}
+	
 }
