@@ -53,9 +53,11 @@ import org.dom4j.Namespace;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.comm.xmpp.datatypes.LocalXMPPNode;
+import org.societies.comm.xmpp.datatypes.Identity;
+import org.societies.comm.xmpp.datatypes.HostedNode;
 import org.societies.comm.xmpp.datatypes.Stanza;
 import org.societies.comm.xmpp.datatypes.XMPPError;
+import org.societies.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.comm.xmpp.datatypes.XMPPNode;
 import org.societies.comm.xmpp.exceptions.CommunicationException;
 import org.societies.comm.xmpp.interfaces.CommCallback;
@@ -106,7 +108,7 @@ public class CommManagerHelper {
 	private final Map<String, Marshaller> pkgToMarshaller = new HashMap<String, Marshaller>();
 	private final Map<String, Marshaller> nsToMarshaller = new HashMap<String, Marshaller>();
 	
-	private final Map<String, LocalXMPPNode> localToplevelNodes = new HashMap<String, LocalXMPPNode>();
+	private final Map<String, HostedNode> localToplevelNodes = new HashMap<String, HostedNode>();
 	private final List<XMPPNode> allToplevelNodes = new ArrayList<XMPPNode>();
 
 	public String[] getSupportedNamespaces() {
@@ -124,15 +126,15 @@ public class CommManagerHelper {
 		try {
 			if (node==null) {
 				// return top level nodes
-				os.write(XMPPNode.ITEM_QUERY_OPEN_BYTES);
+				os.write(XMPPNode.ITEM_QUERY_RESPONSE_OPEN_BYTES);
 				for (XMPPNode n : allToplevelNodes)
 					os.write(n.getItemXmlBytes());
-				os.write(XMPPNode.ITEM_QUERY_CLOSE_BYTES);
+				os.write(XMPPNode.ITEM_QUERY_RESPONSE_CLOSE_BYTES);
 			}
 			else {
 				// return specific nodes
 				// check if some root-level node matches specified node
-				LocalXMPPNode localNode = localToplevelNodes.get(node);
+				HostedNode localNode = localToplevelNodes.get(node);
 				// if not try to use node hierarchy to find speficied node
 				if (localNode==null) {
 					String[] nodePath = node.split("/");
@@ -151,7 +153,7 @@ public class CommManagerHelper {
 					for (XMPPNode n : localNode.getChildren())
 						os.write(n.getItemXmlBytes());
 				}
-				os.write(XMPPNode.ITEM_QUERY_CLOSE_BYTES);
+				os.write(XMPPNode.ITEM_QUERY_RESPONSE_CLOSE_BYTES);
 			}
 		} catch (IOException e) {
 			LOG.error(e.getMessage());
@@ -185,14 +187,14 @@ public class CommManagerHelper {
 	}
 	
 	public void addRootNode(XMPPNode newNode) {
-		if (newNode instanceof LocalXMPPNode)
-			localToplevelNodes.put(newNode.getNode(), (LocalXMPPNode)newNode);
+		if (newNode instanceof HostedNode)
+			localToplevelNodes.put(newNode.getNode(), (HostedNode)newNode);
 		allToplevelNodes.add(newNode);
 	}
 	
 	public void removeRootNode(XMPPNode node) {
-		if (node instanceof LocalXMPPNode)
-			localToplevelNodes.remove(((LocalXMPPNode)node).getNode());
+		if (node instanceof HostedNode)
+			localToplevelNodes.remove(((HostedNode)node).getNode());
 		allToplevelNodes.remove(node);
 	}
 
@@ -246,7 +248,22 @@ public class CommManagerHelper {
 		Element element = getElementAny(iq);
 		try {
 			CommCallback callback = getCommCallback(iq.getID());
-			Unmarshaller u = getUnmarshaller(element.getNamespace().toString());
+			String ns = element.getNamespace().toString();
+			if (ns.equals(XMPPInfo.INFO_NAMESPACE)) {
+				Map<String, XMPPInfo> infoMap = ParsingUtils.parseInfoResult(new InputSource(new StringReader(element
+						.asXML())));
+				String node = infoMap.keySet().iterator().next();
+				callback.receiveInfo(TinderUtils.stanzaFromPacket(iq), node, infoMap.get(node));
+				return;
+			}
+			if (ns.equals(XMPPNode.ITEM_NAMESPACE)) {
+				Map<String, List<XMPPNode>> nodeMap = ParsingUtils.parseItemsResult(new InputSource(new StringReader(element
+						.asXML())));
+				String node = nodeMap.keySet().iterator().next();
+				callback.receiveItems(TinderUtils.stanzaFromPacket(iq), node, nodeMap.get(node));
+				return;
+			}
+			Unmarshaller u = getUnmarshaller(ns);
 			Object bean = u.unmarshal(new InputSource(new StringReader(element
 					.asXML())));
 			callback.receiveResult(TinderUtils.stanzaFromPacket(iq), bean);
@@ -278,11 +295,14 @@ public class CommManagerHelper {
 			Unmarshaller u = getUnmarshaller(namespace);
 			Object bean = u.unmarshal(new InputSource(new StringReader(element
 					.asXML())));
-			Object responseBean = fs.receiveQuery(TinderUtils.stanzaFromPacket(iq), bean);
-			if (responseBean!=null && responseBean instanceof XMPPError)
-				return buildApplicationErrorResponse(originalFrom, id, (XMPPError)responseBean);
-			else
+			Object responseBean = null;
+			if (iq.getType().equals(IQ.Type.get))
+				responseBean = fs.getQuery(TinderUtils.stanzaFromPacket(iq), bean);
+			if (iq.getType().equals(IQ.Type.set))
+				responseBean = fs.setQuery(TinderUtils.stanzaFromPacket(iq), bean);
 				return buildResponseIQ(originalFrom, id, responseBean);
+		} catch (XMPPError e) {
+			return buildApplicationErrorResponse(originalFrom, id, e);
 		} catch (UnavailableException e) {
 			LOG.info(e.getMessage());
 			return buildErrorResponse(originalFrom, id, e.getMessage());
@@ -307,12 +327,12 @@ public class CommManagerHelper {
 	public void dispatchMessage(Message message) {
 		Element element = getElementAny(message);
 		try {
-			FeatureServer fs = getFeatureServer(element.getNamespace()
+			CommCallback cb = getCommCallback(element.getNamespace()
 					.toString());
 			Unmarshaller u = getUnmarshaller(element.getNamespace().toString());
 			Object bean = u.unmarshal(new InputSource(new StringReader(element
 					.asXML())));
-			fs.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
+			cb.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
 		} catch (JAXBException e) {
 			String m = e.getClass().getName()
 					+ "Error unmarshalling the message:" + e.getMessage();
@@ -361,12 +381,27 @@ public class CommManagerHelper {
 		}
 	}
 
-	public void register(FeatureServer fs) throws CommunicationException,
-			ClassNotFoundException {
+	public void register(FeatureServer fs) throws CommunicationException {
+		jaxbMapping(fs.getXMLNamespaces(),fs.getJavaPackages());
+		for (String ns : fs.getXMLNamespaces()) {
+			LOG.info("registering FeatureServer for namespace " + ns);
+			featureServers.put(ns, fs);
+		}
+	}
+	
+	public void register(CommCallback messageCallback) throws CommunicationException {
+		jaxbMapping(messageCallback.getXMLNamespaces(), messageCallback.getJavaPackages());
+		for (String ns : messageCallback.getXMLNamespaces()) {
+			LOG.info("registering CommCallback for namespace" + ns);
+			commCallbacks.put(ns, messageCallback);
+		}
+	}
+	
+	private void jaxbMapping(List<String> namespaces, List<String> packages) throws CommunicationException {
 		// TODO latest namespace register sticks! no multiple namespace support atm
-		StringBuilder contextPath = new StringBuilder(fs.getJavaPackages().get(0));
-		for (int i = 1; i < fs.getJavaPackages().size(); i++)
-			contextPath.append(":" + fs.getJavaPackages().get(i));
+		StringBuilder contextPath = new StringBuilder(packages.get(0));
+		for (int i = 1; i < packages.size(); i++)
+			contextPath.append(":" + packages.get(i));
 
 		try {
 			JAXBContext jc = JAXBContext.newInstance(contextPath.toString(),
@@ -374,15 +409,15 @@ public class CommManagerHelper {
 			Unmarshaller u = jc.createUnmarshaller();
 			Marshaller m = jc.createMarshaller();
 			
-			for (String ns : fs.getXMLNamespaces()) {
-				LOG.info("registering " + ns);
-				featureServers.put(ns, fs);
+			for (String ns : namespaces) {
 				nsToUnmarshaller.put(ns, u);
 				nsToMarshaller.put(ns, m);
 			}
 
-			for (String packageStr : fs.getJavaPackages())
+			for (String packageStr : packages) {
 				pkgToMarshaller.put(packageStr, m);
+			}
+				
 			
 		} catch (JAXBException e) {
 			throw new CommunicationException(
@@ -418,28 +453,38 @@ public class CommManagerHelper {
 		}
 	}
 	
-	private IQ buildApplicationErrorResponse(JID originalFrom, String id, XMPPError error) throws XMLStreamException, JAXBException, UnavailableException, DocumentException {
-		IQ errorResponse = new IQ(Type.error, id);
-		errorResponse.setTo(originalFrom);
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		os.write(error.getStanzaErrorBytes(), 0, error.getStanzaErrorBytes().length);
-		if (error.getApplicationError()!=null) {
-			InlineNamespaceXMLStreamWriter inxsw = new InlineNamespaceXMLStreamWriter(os);
-			inxsw.setXmlDeclaration(false);
-			// TODO solve this ugly hack! Dom4j needs XML declaration at the top of the file, but it cannot be repeated (here it would be also in the middle of the file)
-			if (error.getApplicationError() instanceof JAXBElement) {
-				JAXBElement appErrorElement = (JAXBElement)error.getApplicationError();
-				getMarshaller(appErrorElement.getName().getNamespaceURI()).marshal(appErrorElement, inxsw);
+	private IQ buildApplicationErrorResponse(JID originalFrom, String id, XMPPError error) {
+		try {
+			IQ errorResponse = new IQ(Type.error, id);
+			errorResponse.setTo(originalFrom);
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			os.write(error.getStanzaErrorBytes(), 0, error.getStanzaErrorBytes().length);
+			if (error.getApplicationError()!=null) {
+				InlineNamespaceXMLStreamWriter inxsw = new InlineNamespaceXMLStreamWriter(os);
+				inxsw.setXmlDeclaration(false);
+				// TODO solve this ugly hack! Dom4j needs XML declaration at the top of the file, but it cannot be repeated (here it would be also in the middle of the file)
+				if (error.getApplicationError() instanceof JAXBElement) {
+					JAXBElement appErrorElement = (JAXBElement)error.getApplicationError();
+					getMarshaller(appErrorElement.getName().getNamespaceURI()).marshal(appErrorElement, inxsw);
+				}
+				else
+					getMarshaller(error.getApplicationError().getClass().getPackage()).marshal(error.getApplicationError(), inxsw);
 			}
-			else
-				getMarshaller(error.getApplicationError().getClass().getPackage()).marshal(error.getApplicationError(), inxsw);
+			os.write(XMPPError.CLOSE_ERROR_BYTES,0,XMPPError.CLOSE_ERROR_BYTES.length);
+			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+			
+			Document dom4jError = reader.read(is);
+			errorResponse.getElement().add(dom4jError.getRootElement());
+			return errorResponse;
+		} catch (JAXBException e) {
+			return buildErrorResponse(originalFrom, id, "JAXBException while building application error");
+		} catch (XMLStreamException e) {
+			return buildErrorResponse(originalFrom, id, "XMLStreamException while building application error");
+		} catch (DocumentException e) {
+			return buildErrorResponse(originalFrom, id, "DocumentException while building application error");
+		} catch (UnavailableException e) {
+			return buildErrorResponse(originalFrom, id, "UnavailableException while building application error");
 		}
-		os.write(XMPPError.CLOSE_ERROR_BYTES,0,XMPPError.CLOSE_ERROR_BYTES.length);
-		ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-		
-		Document dom4jError = reader.read(is);
-		errorResponse.getElement().add(dom4jError.getRootElement());
-		return errorResponse;
 	}
 
 	private IQ buildErrorResponse(JID originalFrom, String id, String message) {
@@ -475,4 +520,42 @@ public class CommManagerHelper {
 			super(message);
 		}
 	}
+
+	public IQ buildInfoIq(Identity entity, String node, CommCallback callback) throws CommunicationException {
+		IQ infoIq = new IQ(Type.get);
+		infoIq.setTo(entity.getJid());
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		try {
+			os.write(ParsingUtils.getInfoQueryRequestBytes(node));
+			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+			Document document = reader.read(is);
+			infoIq.getElement().add(document.getRootElement());
+		} catch (IOException e) {
+			throw new CommunicationException("Error building disco#info request", e);
+		} catch (DocumentException e) {
+			throw new CommunicationException("Error building disco#info request", e);
+		}
+		commCallbacks.put(infoIq.getID(), callback);
+		return infoIq;
+	}
+
+	public IQ buildItemsIq(Identity entity, String node, CommCallback callback) throws CommunicationException {
+		IQ itemsIq = new IQ(Type.get);
+		itemsIq.setTo(entity.getJid());
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		try {
+			os.write(ParsingUtils.getItemsQueryRequestBytes(node));
+			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+			Document document = reader.read(is);
+			itemsIq.getElement().add(document.getRootElement());
+		} catch (IOException e) {
+			throw new CommunicationException("Error building disco#items request", e);
+		} catch (DocumentException e) {
+			throw new CommunicationException("Error building disco#items request", e);
+		}
+		commCallbacks.put(itemsIq.getID(), callback);
+		return itemsIq;
+	}
+
+	
 }

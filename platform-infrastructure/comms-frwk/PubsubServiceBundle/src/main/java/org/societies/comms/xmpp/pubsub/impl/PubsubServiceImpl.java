@@ -55,8 +55,6 @@ import org.societies.comm.xmpp.interfaces.CommManager;
 import org.societies.comms.xmpp.pubsub.PubsubService;
 
 // TODO
-// Change errors to exceptions
-
 public class PubsubServiceImpl implements PubsubService {
 	
 	private static Logger LOG = LoggerFactory
@@ -104,7 +102,7 @@ public class PubsubServiceImpl implements PubsubService {
 	}
 
 	@Override
-	public Object subscriberSubscribe(Stanza stanza, Pubsub payload) {
+	public Pubsub subscriberSubscribe(Stanza stanza, Pubsub payload) throws XMPPError {
 		Identity sender = stanza.getFrom();
 		Identity subscriber = Identity.fromJid(payload.getSubscribe().getJid());
 		String nodeId = payload.getSubscribe().getNode();
@@ -112,7 +110,7 @@ public class PubsubServiceImpl implements PubsubService {
 		
 		// 6.1.3.1 JIDs Do Not Match (match sender and subscriber)
 		if (!sender.equals(subscriber) && !admins.contains(sender))
-			return new XMPPError(StanzaError.bad_request, null, ERROR_INVALID_JID);
+			throw new XMPPError(StanzaError.bad_request, null, ERROR_INVALID_JID);
 		
 		// TODO Access Control
 		
@@ -122,10 +120,10 @@ public class PubsubServiceImpl implements PubsubService {
 			String redirectUri = redirectedNodes.get(nodeId);
 			// 6.1.3.12 Node Does Not Exist
 			if (redirectUri==null)
-				return new XMPPError(StanzaError.item_not_found);
+				throw new XMPPError(StanzaError.item_not_found);
 			// 6.1.3.11 Node Has Moved
 			else
-				return new XMPPError(StanzaError.gone,redirectUri,null);
+				throw new XMPPError(StanzaError.gone,redirectUri,null);
 		}
 		
 		// New Subscription
@@ -143,7 +141,7 @@ public class PubsubServiceImpl implements PubsubService {
 	}
 
 	@Override
-	public Object subscriberUnsubscribe(Stanza stanza, Pubsub payload) {
+	public void subscriberUnsubscribe(Stanza stanza, Pubsub payload) throws XMPPError {
 		Identity sender = stanza.getFrom();
 		Identity subscriber = Identity.fromJid(payload.getUnsubscribe().getJid());
 		String nodeId = payload.getUnsubscribe().getNode();
@@ -151,73 +149,70 @@ public class PubsubServiceImpl implements PubsubService {
 		
 		// 6.2.3.3 Insufficient Privileges (match sender and subscriber)
 		if (!sender.equals(subscriber) && !admins.contains(sender))
-			return new XMPPError(StanzaError.forbidden);
+			throw new XMPPError(StanzaError.forbidden);
 		
 		PubsubNode node = nodes.get(nodeId);
 		
 		// 6.2.3.4 Node Does Not Exist
 		if (node==null)
-			return new XMPPError(StanzaError.item_not_found);
+			throw new XMPPError(StanzaError.item_not_found);
 		
 		List<String> subIdList = node.getSubscriptions(subscriber);
 		
 		// 6.2.3.2 No Such Subscriber
 		if (subIdList==null)
-			return new XMPPError(StanzaError.unexpected_request, null, ERROR_NOT_SUBSCRIBED);
+			throw new XMPPError(StanzaError.unexpected_request, null, ERROR_NOT_SUBSCRIBED);
 		
 		// 6.2.3.1 No Subscription ID
 		if (subIdList.size()>1 && subId==null)
-			return new XMPPError(StanzaError.bad_request, null, ERROR_SUBID_REQUIRED); 
+			throw new XMPPError(StanzaError.bad_request, null, ERROR_SUBID_REQUIRED); 
 		
 		if (subId!=null) {
 			// 6.2.3.5 Bad Subscription ID
 			if (!subIdList.contains(subId))
-				return new XMPPError(StanzaError.unexpected_request, null, ERROR_INVALID_SUBID); 
+				throw new XMPPError(StanzaError.unexpected_request, null, ERROR_INVALID_SUBID); 
 			
 			// Unsubscribe
 			node.unsubscribe(subId);
 		}
 		else
 			node.unsubscribe(subIdList.get(0));
-		
-		// Build success response
-		return null; // this is a success case!!
 	}
 
 	@Override
-	public Object subscriberOptionsRequest(Stanza stanza, Pubsub payload) {
+	public Pubsub subscriberOptionsRequest(Stanza stanza, Pubsub payload) throws XMPPError {
 		// TODO 6.3
 		Unsupported u = new Unsupported();
 		u.setFeature("subscription-options");
-		return new XMPPError(StanzaError.feature_not_implemented, null, u);
+		throw new XMPPError(StanzaError.feature_not_implemented, null, u);
 	}
 
 	@Override
-	public Object subscriberOptionsSubmission(Stanza stanza, Pubsub payload) {
+	public Pubsub subscriberOptionsSubmission(Stanza stanza, Pubsub payload) throws XMPPError {
 		// TODO 6.3
 		Unsupported u = new Unsupported();
 		u.setFeature("subscription-options");
-		return new XMPPError(StanzaError.feature_not_implemented, null, u);
+		throw new XMPPError(StanzaError.feature_not_implemented, null, u);
 	}
 
 	@Override
-	public Object subscriberSubscribeConfigure(Stanza stanza, Pubsub payload) {
+	public Pubsub subscriberSubscribeConfigure(Stanza stanza, Pubsub payload) throws XMPPError {
 		// TODO 6.3
 		Unsupported u = new Unsupported();
 		u.setFeature("subscription-options");
-		return new XMPPError(StanzaError.feature_not_implemented, null, u);
+		throw new XMPPError(StanzaError.feature_not_implemented, null, u);
 	}
 
 	@Override
-	public Object subscriberDefaultOptions(Stanza stanza, Pubsub payload) {
+	public Pubsub subscriberDefaultOptions(Stanza stanza, Pubsub payload) throws XMPPError {
 		// TODO 6.4
 		Unsupported u = new Unsupported();
 		u.setFeature("subscription-options");
-		return new XMPPError(StanzaError.feature_not_implemented, null, u);
+		throw new XMPPError(StanzaError.feature_not_implemented, null, u);
 	}
 
 	@Override
-	public Object subscriberRetrieve(Stanza stanza, Pubsub payload) {
+	public Pubsub subscriberRetrieve(Stanza stanza, Pubsub payload) throws XMPPError {
 		Identity sender = stanza.getFrom();
 		String nodeId = payload.getItems().getNode();
 		String subId = payload.getItems().getSubid();
@@ -228,22 +223,22 @@ public class PubsubServiceImpl implements PubsubService {
 		
 		// 6.5.9.11 Node Does Not Exist
 		if (node==null)
-			return new XMPPError(StanzaError.item_not_found);
+			throw new XMPPError(StanzaError.item_not_found);
 		
 		List<String> subIdList = node.getSubscriptions(sender);
 		
 		// 6.5.9.3 Entity Not Subscribed
 		if (subIdList==null)
-			return new XMPPError(StanzaError.unexpected_request, null, ERROR_NOT_SUBSCRIBED);
+			throw new XMPPError(StanzaError.unexpected_request, null, ERROR_NOT_SUBSCRIBED);
 		
 		// 6.5.9.1 Subscription ID Required
 		if (subIdList.size()>1 && subId==null)
-			return new XMPPError(StanzaError.bad_request, null, ERROR_SUBID_REQUIRED);
+			throw new XMPPError(StanzaError.bad_request, null, ERROR_SUBID_REQUIRED);
 		
 		if (subId!=null) {
 			// 6.5.9.2 Invalid Subscription ID
 			if (!subIdList.contains(subId))
-				return new XMPPError(StanzaError.unexpected_request, null, ERROR_INVALID_SUBID);
+				throw new XMPPError(StanzaError.unexpected_request, null, ERROR_INVALID_SUBID);
 		}
 		else
 			subId = subIdList.get(0);
@@ -282,7 +277,7 @@ public class PubsubServiceImpl implements PubsubService {
 	}
 
 	@Override
-	public Object publisherPublish(Stanza stanza, Pubsub payload) {
+	public Pubsub publisherPublish(Stanza stanza, Pubsub payload) throws XMPPError {
 		String nodeId = payload.getPublish().getNode();
 		Item item = payload.getPublish().getItem();
 		String sender = stanza.getFrom().getJid();
@@ -291,10 +286,10 @@ public class PubsubServiceImpl implements PubsubService {
 		
 		// 7.1.3.3 Node Does Not Exist or http://jabber.org/protocol/pubsub#auto-create
 		if (node==null)
-			return new XMPPError(StanzaError.item_not_found); // TODO http://jabber.org/protocol/pubsub#auto-create
+			throw new XMPPError(StanzaError.item_not_found); // TODO http://jabber.org/protocol/pubsub#auto-create
 		
 		if (item==null) {
-			return new XMPPError(StanzaError.feature_not_implemented); // TODO support for transient nodes (and itemless notifications)
+			throw new XMPPError(StanzaError.feature_not_implemented); // TODO support for transient nodes (and itemless notifications)
 		}
 		else {
 			// 7.1.3.5 Bad Payload
@@ -322,32 +317,32 @@ public class PubsubServiceImpl implements PubsubService {
 	}
 
 	@Override
-	public Object publisherPublishOptions(Stanza stanza, Pubsub payload) {
+	public Pubsub publisherPublishOptions(Stanza stanza, Pubsub payload) throws XMPPError {
 		// TODO 7.1.5
 		Unsupported u = new Unsupported();
 		u.setFeature("publish-options");
-		return new XMPPError(StanzaError.feature_not_implemented, null, u);
+		throw new XMPPError(StanzaError.feature_not_implemented, null, u);
 	}
 
 	@Override
-	public Object publisherDelete(Stanza stanza, Pubsub payload) {
+	public void publisherDelete(Stanza stanza, Pubsub payload) throws XMPPError {
 		String nodeId = payload.getRetract().getNode();
 		List<Item> item = payload.getRetract().getItem();
 		Boolean notify = payload.getRetract().isNotify();
 		
 		// 7.2.3.3 NodeID Required
 		if (nodeId==null)
-			return new XMPPError(StanzaError.bad_request, null, ERROR_NODEID_REQUIRED);
+			throw new XMPPError(StanzaError.bad_request, null, ERROR_NODEID_REQUIRED);
 		
 		PubsubNode node = nodes.get(nodeId);
 		
 		// 7.2.3.2 Node Does Not Exist
 		if (node==null)
-			return new XMPPError(StanzaError.item_not_found);
+			throw new XMPPError(StanzaError.item_not_found);
 		
 		// 7.2.3.4 Item or ItemID Required
 		if (item==null || item.size()!=1 || item.get(0).getId()==null)
-			return new XMPPError(StanzaError.bad_request, null, ERROR_ITEM_REQUIRED);
+			throw new XMPPError(StanzaError.bad_request, null, ERROR_ITEM_REQUIRED);
 		
 		// TODO Access model
 		
@@ -365,13 +360,10 @@ public class PubsubServiceImpl implements PubsubService {
 			pes.sendEvent(node.getSubscribers(), eventItems);
 			// TODO 7.2.2.2 Inclusion of Subscription ID
 		}
-		
-		// Empty success response
-		return null;
 	}
 
 	@Override
-	public Object ownerCreate(Stanza stanza, Pubsub payload) {
+	public Pubsub ownerCreate(Stanza stanza, Pubsub payload) throws XMPPError {
 		// Support for Support for http://jabber.org/protocol/pubsub#create-nodes
 		Identity owner = stanza.getFrom();
 		String nodeId = payload.getCreate().getNode();
@@ -388,7 +380,7 @@ public class PubsubServiceImpl implements PubsubService {
 		else {
 			// Example 128. NodeID already exists
 			if (nodes.keySet().contains(nodeId))
-				return new XMPPError(StanzaError.conflict);
+				throw new XMPPError(StanzaError.conflict);
 		}
 		
 		// Create Node
@@ -405,55 +397,55 @@ public class PubsubServiceImpl implements PubsubService {
 	}
 
 	@Override
-	public Object ownerCreateConfigure(Stanza stanza, Pubsub payload) {
+	public Pubsub ownerCreateConfigure(Stanza stanza, Pubsub payload) throws XMPPError {
 		// TODO 8.2
 		Unsupported u = new Unsupported();
 		u.setFeature("config-node");
-		return new XMPPError(StanzaError.feature_not_implemented, null, u);
+		throw new XMPPError(StanzaError.feature_not_implemented, null, u);
 	}
 
 	@Override
-	public Object ownerConfigureRequest(Stanza stanza,
-			org.jabber.protocol.pubsub.owner.Pubsub payload) {
+	public org.jabber.protocol.pubsub.owner.Pubsub ownerConfigureRequest(Stanza stanza,
+			org.jabber.protocol.pubsub.owner.Pubsub payload) throws XMPPError {
 		// TODO 8.2
 		Unsupported u = new Unsupported();
 		u.setFeature("config-node");
-		return new XMPPError(StanzaError.feature_not_implemented, null, u);
+		throw new XMPPError(StanzaError.feature_not_implemented, null, u);
 	}
 
 	@Override
-	public Object ownerConfigureSubmission(Stanza stanza,
-			org.jabber.protocol.pubsub.owner.Pubsub payload) {
+	public org.jabber.protocol.pubsub.owner.Pubsub ownerConfigureSubmission(Stanza stanza,
+			org.jabber.protocol.pubsub.owner.Pubsub payload) throws XMPPError {
 		// TODO 8.2
 		Unsupported u = new Unsupported();
 		u.setFeature("config-node");
-		return new XMPPError(StanzaError.feature_not_implemented, null, u);
+		throw new XMPPError(StanzaError.feature_not_implemented, null, u);
 	}
 
 	@Override
-	public Object ownerDefaultConfiguration(Stanza stanza,
-			org.jabber.protocol.pubsub.owner.Pubsub payload) {
+	public org.jabber.protocol.pubsub.owner.Pubsub ownerDefaultConfiguration(Stanza stanza,
+			org.jabber.protocol.pubsub.owner.Pubsub payload) throws XMPPError {
 		// TODO 8.2
 		Unsupported u = new Unsupported();
 		u.setFeature("config-node");
-		return new XMPPError(StanzaError.feature_not_implemented, null, u);
+		throw new XMPPError(StanzaError.feature_not_implemented, null, u);
 	}
 
 	// 8.4 Delete a Node
 	@Override
-	public Object ownerDelete(Stanza stanza,
-			org.jabber.protocol.pubsub.owner.Pubsub payload) {
+	public void ownerDelete(Stanza stanza,
+			org.jabber.protocol.pubsub.owner.Pubsub payload) throws XMPPError {
 		String nodeId = payload.getDelete().getNode();
 		PubsubNode node = nodes.get(nodeId);
 		
 		// 8.4.3.2 Node Does Not Exist
 		if (node==null)
-			return new XMPPError(StanzaError.item_not_found);
+			throw new XMPPError(StanzaError.item_not_found);
 		
 		// 8.4.3.1 Insufficient Privileges
 		Identity sender = stanza.getFrom();
 		if (!node.getOwner().equals(sender))
-			return new XMPPError(StanzaError.forbidden);
+			throw new XMPPError(StanzaError.forbidden);
 		
 		// Remove Node
 		nodes.remove(nodeId);
@@ -475,26 +467,23 @@ public class PubsubServiceImpl implements PubsubService {
 			deleteEvent.setRedirect(redirectEvent);
 		}
 		pes.sendEvent(node.getSubscribers(), deleteEvent);
-		
-		// Empty success response
-		return null;
 	}
 
 	// 8.5 Purge All Node Items
 	@Override
-	public Object ownerPurgeItems(Stanza stanza,
-			org.jabber.protocol.pubsub.owner.Pubsub payload) {
+	public void ownerPurgeItems(Stanza stanza,
+			org.jabber.protocol.pubsub.owner.Pubsub payload) throws XMPPError {
 		String nodeId = payload.getPurge().getNode();
 		PubsubNode node = nodes.get(nodeId);
 		
 		// 8.5.3.4 Node Does Not Exist
 		if (node==null)
-			return new XMPPError(StanzaError.item_not_found);
+			throw new XMPPError(StanzaError.item_not_found);
 		
 		// 8.5.3.2 Insufficient Privileges
 		Identity sender = stanza.getFrom();
 		if (!node.getOwner().equals(sender))
-			return new XMPPError(StanzaError.forbidden);
+			throw new XMPPError(StanzaError.forbidden);
 		
 		// Purge Items
 		node.purge();
@@ -503,26 +492,23 @@ public class PubsubServiceImpl implements PubsubService {
 		org.jabber.protocol.pubsub.event.Purge purgeEvent = new org.jabber.protocol.pubsub.event.Purge();
 		purgeEvent.setNode(nodeId);
 		pes.sendEvent(node.getSubscribers(), purgeEvent);
-		
-		// Empty success response
-		return null;
 	}
 
 	// 8.8 Manage Subscriptions
 	@Override
-	public Object ownerSubscriptions(Stanza stanza,
-			org.jabber.protocol.pubsub.owner.Pubsub payload) {
+	public org.jabber.protocol.pubsub.owner.Pubsub ownerSubscriptions(Stanza stanza,
+			org.jabber.protocol.pubsub.owner.Pubsub payload) throws XMPPError {
 		String nodeId = payload.getSubscriptions().getNode();
 		PubsubNode node = nodes.get(nodeId);
 		
 		// Example 186. Node does not exist
 		if (node==null)
-			return new XMPPError(StanzaError.item_not_found);
+			throw new XMPPError(StanzaError.item_not_found);
 		
 		// Example 185. Entity is not an owner
 		Identity sender = stanza.getFrom();
 		if (!node.getOwner().equals(sender))
-			return new XMPPError(StanzaError.forbidden);
+			throw new XMPPError(StanzaError.forbidden);
 		
 		if (payload.getSubscriptions().getSubscription().size()>0) {
 			// 8.8.2 Modify Subscriptions
@@ -584,19 +570,19 @@ public class PubsubServiceImpl implements PubsubService {
 
 	// 8.9 Manage Affiliations
 	@Override
-	public Object ownerAffiliations(Stanza stanza,
-			org.jabber.protocol.pubsub.owner.Pubsub payload) {
+	public org.jabber.protocol.pubsub.owner.Pubsub ownerAffiliations(Stanza stanza,
+			org.jabber.protocol.pubsub.owner.Pubsub payload) throws XMPPError {
 		String nodeId = payload.getAffiliations().getNode();
 		PubsubNode node = nodes.get(nodeId);
 		
 		// Example 205. Node does not exist
 		if (node==null)
-			return new XMPPError(StanzaError.item_not_found);
+			throw new XMPPError(StanzaError.item_not_found);
 		
 		// Example 204. Entity is not an owner
 		Identity sender = stanza.getFrom();
 		if (!node.getOwner().equals(sender))
-			return new XMPPError(StanzaError.forbidden);
+			throw new XMPPError(StanzaError.forbidden);
 		
 		
 		if (payload.getAffiliations().getAffiliation().size()>0) {

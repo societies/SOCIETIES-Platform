@@ -37,9 +37,9 @@ import java.util.UUID;
 
 public class Stanza {
 	
-	private final String id;
-	private final Identity from;
-	private final Identity to;
+	private String id;
+	private Identity from;
+	private Identity to;
 	
 	public Stanza(String id, Identity from, Identity to) {
 		this.id = id;
@@ -49,7 +49,6 @@ public class Stanza {
 	
 	public Stanza(Identity to) {
 		this.id = UUID.randomUUID().toString();
-		this.from = null;
 		this.to = to;
 	}
 	
@@ -63,5 +62,17 @@ public class Stanza {
 
 	public Identity getTo() {
 		return to;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public void setFrom(Identity from) {
+		this.from = from;
+	}
+
+	public void setTo(Identity to) {
+		this.to = to;
 	}
 }

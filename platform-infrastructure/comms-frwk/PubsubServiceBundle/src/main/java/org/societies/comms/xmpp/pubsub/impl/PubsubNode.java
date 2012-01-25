@@ -13,10 +13,10 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.comm.xmpp.datatypes.Identity;
-import org.societies.comm.xmpp.datatypes.LocalXMPPNode;
+import org.societies.comm.xmpp.datatypes.HostedNode;
 
 // TODO collection node support
-public class PubsubNode extends LocalXMPPNode {
+public class PubsubNode extends HostedNode {
 	
 	private static Logger LOG = LoggerFactory
 			.getLogger(PubsubNode.class);

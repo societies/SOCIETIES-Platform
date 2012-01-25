@@ -38,12 +38,6 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.igniterealtime</groupId>
-			<artifactId>whack</artifactId>
-			<type>jar</type>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 	  		<artifactId>CommunicationFrameworkCommons</artifactId>
 	  		<version>0.0.1-SNAPSHOT</version>

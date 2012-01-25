@@ -33,9 +33,8 @@ package org.societies.comm.xmpp.datatypes;
  * 
  */
 
-// TODO force UTF-8
-// TODO parse error (CommManagerHelper)
-public class XMPPError {
+// TODO parse error (client side)
+public class XMPPError extends Exception {
 	
 	public static final String STANZA_ERROR_NAMESPACE_DECL = "urn:ietf:params:xml:ns:xmpp-stanzas";
 	public static final String CLOSE_ERROR = "</error>";
