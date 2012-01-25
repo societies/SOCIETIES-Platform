@@ -35,10 +35,9 @@ public class PubsubClientActivity extends Activity {
         super.onCreate(savedInstanceState);
 		log.debug("onCreate");
         setContentView(R.layout.main);
-        
-        Identity from = Identity.fromJid("android@c3s.av.it.pt");        
-        Identity to = Identity.fromJid("psi@c3s.av.it.pt");
-		Stanza stanza = new Stanza(from, to);
+             
+        Identity to = Identity.fromJid("user@host");
+		Stanza stanza = new Stanza(to);		
         try {
 			Object payload = createPayload();
 			ClientCommunicationMgr ccm = new ClientCommunicationMgr(this);
@@ -51,6 +50,7 @@ public class PubsubClientActivity extends Activity {
     
     @Override
     public void onDestroy() {
+    	super.onDestroy();
     	// TODO unbound service?
     }
     
@@ -60,7 +60,7 @@ public class PubsubClientActivity extends Activity {
 		Item item = new Item();
 		item.setAny(content);
 		Publish publish = new Publish();
-		publish.setNode("gps:android@c3s.av.it.pt/default");
+		publish.setNode("testNode");
 		publish.setItem(item);
 		Pubsub pubsub = new Pubsub();
 		pubsub.setPublish(publish);
@@ -72,7 +72,7 @@ public class PubsubClientActivity extends Activity {
     	return new CommCallback() {
 			
 			@Override
-			public void receiveError(Stanza stanza) {
+			public void receiveError(Stanza stanza, Object payload) {
 				log.debug("receiveError");
 			}
 
