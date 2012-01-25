@@ -22,22 +22,60 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.broker.test;
+package org.societies.context.broker.test.util;
 
-public class CtxBrokerTest {
+import java.io.Serializable;
 
-	//Constructor
-	CtxBrokerTest(){
-		//TODO
-		
+public class MockBlobClass implements Serializable {
+
+	private static final long serialVersionUID = 1490587976482520647L;
+	
+	private int seed;
+	
+	public MockBlobClass(int seed) {
+		this.seed = seed;
 	}
+
 	/**
-	 * @param args
+	 * @return the seed
 	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		new CtxBrokerTest();
+	public int getSeed() {
+		return seed;
 	}
-	
-	
+
+	/**
+	 * @param seed the seed to set
+	 */
+	public void setSeed(int seed) {
+		this.seed = seed;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + this.seed;
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (this.getClass() != obj.getClass())
+			return false;
+		
+		MockBlobClass that = (MockBlobClass) obj;
+		if (this.seed != that.seed)
+			return false;
+		return true;
+	}
 }
