@@ -43,7 +43,7 @@ import org.springframework.test.context.junit4.AbstractTransactionalJUnit4Spring
  * @author solutanet
  *
  */
-@ContextConfiguration
+@ContextConfiguration(locations={"../../../../../META-INF/ServiceRegistryTest-context.xml"})
 public class ServiceRegistryTest  extends AbstractTransactionalJUnit4SpringContextTests   {
 @Autowired
 ServiceRegistry serReg;
