@@ -34,7 +34,8 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
-import org.societies.api.internal.context.user.prediction.PredictionMethod;
+
+
 
 /**
  * IUserCtxBroker interface allows to manage user context data. 
@@ -79,7 +80,7 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @since 0.0.1
 	 */
 	public void disableCtxMonitoring(CtxAttributeValueType type);
-	
+
 	/**
 	 * Disables context recording to Context History Database
 	 * 
@@ -94,7 +95,7 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @since 0.0.1
 	 */
 	public void  enableCtxMonitoring(CtxAttributeValueType type);
-	
+
 	/**
 	 * Enables context recording to Context History Database
 	 * 
@@ -113,22 +114,6 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @since 0.0.1
 	 */
 	public void evaluateSimilarity(Serializable objectUnderComparison, List<Serializable> referenceObjects, IUserCtxBrokerCallback callback);
-
-	/**
-	 * Returns the default prediction method used by context prediction component. 
-	 * 
-	 * @param predMethod
-	 * @since 0.0.1
-	 */
-	public PredictionMethod getDefaultPredictionMethod(PredictionMethod predMethod);
-
-	/**
-	 * Returns the prediction method used by context prediction component. 
-	 * 
-	 * @param predMethod
-	 * @since 0.0.1
-	 */
-	public PredictionMethod  getPredictionMethod(PredictionMethod predMethod);
 
 	/**
 	 * Looks up for a list of CtxModelObjects defined by the CtxModelType (CtxEntity,
@@ -195,14 +180,6 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	public int removeHistory(String type, Date startDate, Date endDate);
 
 	/**
-	 * Removes the specified prediction method.
-	 * 
-	 * @param predMethod
-	 * @since 0.0.1
-	 */
-	public void removePredictionMethod(PredictionMethod predMethod);
-
-	/**
 	 * Retrieves the specified context model object.
 	 * 
 	 * @param identifier
@@ -254,23 +231,7 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 */
 	public void retrievePast(CtxAttributeIdentifier attrId, Date startDate, Date endDate, IUserCtxBrokerCallback callback);
 
-	/**
-	 * Sets the specified prediction method as default.  
-	 * 
-	 * @param predMethod
-	 * @since 0.0.1
-	 */
-	public void setDefaultPredictionMethod(PredictionMethod predMethod);
-
-	/**
-	 * Sets the specified prediction method in order to be used by the context prediction component.
-	 * 
-	 * @param predMethod
-	 * @param callback
-	 * @since 0.0.1
-	 */
-	public void setPredictionMethod(PredictionMethod predMethod, IUserCtxBrokerCallback callback);
-
+	
 	/**
 	 * Registers the specified EventListener for value modification events of the
 	 * specified context attribute.
@@ -301,4 +262,49 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 */
 	public void update(CtxModelObject identifier, IUserCtxBrokerCallback callback);
 
+	/**
+	 * This method allows to set a primary context attribute that will be stored in context History Database
+	 * upon value update along with a list of other context attributes. 
+	 * 
+	 * @param primaryAttrIdentifier
+	 * @param listOfEscortingAttributeIds
+	 * @param callback
+	 */
+	public void setCtxHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds,IUserCtxBrokerCallback callback);
+
+	/**
+	 * This method allows to get the list of the context attribute identifiers that consist the snapshot that is stored
+	 * in context history database along with the a primary context attribute.  
+	 * 
+	 * @param primaryAttrIdentifier
+	 * @param listOfEscortingAttributeIds
+	 * @param callback
+	 */
+	public void getCtxHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds,IUserCtxBrokerCallback callback);
+
+	/**
+	 * This method allows to update the list of the context attribute identifiers that consist the snapshot that is stored
+	 * in context history database along with the a primary context attribute.  
+	 *  
+	 * @param primaryAttrIdentifier
+	 * @param listOfEscortingAttributeIds
+	 * @param callback
+	 */
+	public void updateCtxHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds,IUserCtxBrokerCallback callback);
+
+	/**
+	 * This method allows to remove the list of the context attribute identifiers that consist the snapshot that is stored
+	 * in context history database along with the a primary context attribute.  
+	 * 
+	 * @param primaryAttrIdentifier
+	 * @param listOfEscortingAttributeIds
+	 * @param callback
+	 */
+	public void removeCtxHistoryTuples(
+			CtxAttributeIdentifier primaryAttrIdentifier,
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds,
+			IUserCtxBrokerCallback callback);
 }

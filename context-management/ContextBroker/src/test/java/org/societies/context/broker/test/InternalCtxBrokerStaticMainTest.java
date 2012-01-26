@@ -33,6 +33,7 @@ import java.util.Map;
 
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -57,7 +58,7 @@ public class InternalCtxBrokerStaticMainTest {
 
 		internalCtxBroker = new InternalCtxBroker();
 		internalCtxBroker.setUserCtxDBMgr(new UserCtxDBMgr());
-		//internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
+		internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
 
 		System.out.println("-- start of testing --");
 		//testHistoryAttributeInteger();
@@ -342,6 +343,32 @@ public class InternalCtxBrokerStaticMainTest {
 		public void updateReceived(CtxModelObject ctxModelObj) {
 			// TODO Auto-generated method stub
 
+		}
+
+		@Override
+		public void ctxHistoryTuplesSet(Boolean flag) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void ctxHistoryTuplesRetrieved(
+				List<CtxAttributeIdentifier> listOfEscortingAttributeIds) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void ctxHistoryTuplesUpdated(
+				List<CtxAttributeIdentifier> listOfEscortingAttributeIds) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void ctxHistoryTuplesRemoved(Boolean flag) {
+			// TODO Auto-generated method stub
+			
 		}
 
 	}
