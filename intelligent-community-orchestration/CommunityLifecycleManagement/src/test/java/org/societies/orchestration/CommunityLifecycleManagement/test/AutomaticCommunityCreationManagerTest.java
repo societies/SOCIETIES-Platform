@@ -115,7 +115,8 @@ public class AutomaticCommunityCreationManagerTest {
 		String[] members = new String[1];
 		members[0] = "James";
 		
-		Assert.assertNotNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null)));
+		Assert.assertNull(cisManager.getCisList(new CisRecord()));
+		//Assert.assertNotNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null)));
 	}
 	
     public void testExtensiveCreationCheck() {

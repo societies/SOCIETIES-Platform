@@ -189,16 +189,36 @@ public class AutomaticCommunityCreationManager {
 				
 				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "nationality", userContextBrokerCallback);
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+				//ArrayList<EntityIdentifier> people = userCssDirectory.getContextMatchingCsss(list);
+				//if (people.size() >= 2)
+				//    for (int i = 0; i < cisManager.getCiss(); i++)
+				//        if (!cisManager.getCiss().get(i).getMembers() == people)
+				//            cissToCreate.add(new CisRecord(null, linkedCss, "Nationals", null, null, null, null, null));
 				
 				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "first language", userContextBrokerCallback);
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+				//ArrayList<EntityIdentifier> people = userCssDirectory.getContextMatchingCsss(list);
+				//if (people.size() >= 2)
+				//    for (int i = 0; i < cisManager.getCiss(); i++)
+				//        if (!cisManager.getCiss().get(i).getMembers() == people)
+				//            cissToCreate.add(new CisRecord(null, linkedCss, "Native language speakers", null, null, null, null, null));
 				
 				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "interests", userContextBrokerCallback);
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+				//ArrayList<EntityIdentifier> people = userCssDirectory.getContextMatchingCsss(list);
+				//if (people.size() >= 2)
+				//    for (int i = 0; i < cisManager.getCiss(); i++)
+				//        if (!cisManager.getCiss().get(i).getMembers() == people)
+				//            cissToCreate.add(new CisRecord(null, linkedCss, "Interests", null, null, null, null, null));
 				
 				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "local CSSs", userContextBrokerCallback);
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				//historyOfLocalCsss.add(thisResult);
+				//ArrayList<EntityIdentifier> people = userCssDirectory.getContextMatchingCsss(list);
+				//if (people.size() >= 2)
+				//    for (int i = 0; i < cisManager.getCiss(); i++)
+				//        if (!cisManager.getCiss().get(i).getMembers() == people)
+				//            cissToCreate.add(new CisRecord(null, linkedCss, "Local proximity", null, null, null, null, null));
 				
 				//final step: retrieve as much context data on CSS user and inter-CSS connections 
 				//amongst their immediate connection neighbourhood as possible.
@@ -207,22 +227,22 @@ public class AutomaticCommunityCreationManager {
 			}
 		}
 			
-		else { //non-extensive check, every minute or so.
+		else { //non-extensive check, every few minutes or so.
 			if (linkedCss != null) {
 				interactedCssIDs = getIDsOfInteractingCsss();
 				//retrieve recent history of certain kinds of context data on CSS user and inter-CSS connections 
 				//amongst their immediate connection neighbourhood as possible.
 				
 				// processing - here or delegated to local method
-				
-				for (int i = 0; i < localCsss.size(); i++) {
-					//if part of shared super-CIS
-					    //then if shared context - context_local_sharedCIS counter+1
-					           //potentially suggest sub-CIS if none exist or ignore completely as CIS already exists for it
-					//if shared context - context_local counter+1
+				if (localCsss != null) {
+				    for (int i = 0; i < localCsss.size(); i++) {
+					    //if part of shared super-CIS
+					        //then if shared context - context_local_sharedCIS counter+1
+					               //potentially suggest sub-CIS if none exist or ignore completely as CIS already exists for it
+					    //if shared context - context_local counter+1
 					
+				    }
 				}
-				
 				ArrayList<EntityIdentifier> recentlyInteractedCsss = null; //interaction timestamps are last 24 hours(?)
 				ArrayList<EntityIdentifier> recentlyReferencingCsss = null;
 				

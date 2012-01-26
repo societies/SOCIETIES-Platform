@@ -79,7 +79,7 @@ public class AutomaticCommunityConfigurationManagerTest {
     	
 		//create CIS for James where James himself has been inactive for 1 year.
 	    
-		CisRecord jamesCisRecord = cisManager.createCis("James", "James CIS");
+		//CisRecord jamesCisRecord = cisManager.createCis("James", "James CIS");
 		
     	autoCommunityConfigurationManager = new AutomaticCommunityConfigurationManager(ownerId, "CSS");
 		
