@@ -1,11 +1,13 @@
 package org.societies.comm.xmpp.datatypes;
 
+// TODO improve distinction between nodes that are returned by this endpoint and nodes that were returned by other endpoints? 
 public class XMPPNode {
 	
-	public static final String ITEM_QUERY_OPEN = "<query xmlns='http://jabber.org/protocol/disco#items'>";
-	public static final String ITEM_QUERY_CLOSE = "</query>";
-	public static final byte[] ITEM_QUERY_OPEN_BYTES = ITEM_QUERY_OPEN.getBytes();
-	public static final byte[] ITEM_QUERY_CLOSE_BYTES = ITEM_QUERY_CLOSE.getBytes();
+	public static final String ITEM_NAMESPACE = "http://jabber.org/protocol/disco#items";
+	public static final String ITEM_QUERY_RESPONSE_OPEN = "<query xmlns='"+ITEM_NAMESPACE+"'>";
+	public static final String ITEM_QUERY_RESPONSE_CLOSE = "</query>";
+	public static final byte[] ITEM_QUERY_RESPONSE_OPEN_BYTES = ITEM_QUERY_RESPONSE_OPEN.getBytes();
+	public static final byte[] ITEM_QUERY_RESPONSE_CLOSE_BYTES = ITEM_QUERY_RESPONSE_CLOSE.getBytes();
  
 	private String jid;
 	private String node;
@@ -15,7 +17,7 @@ public class XMPPNode {
 	private String queryXml;
 	private byte[] queryXmlBytes;
 	private XMPPNode parentNode;
-	// TODO disco#info on nodes
+	// TODO disco#info on nodes?
 	// TODO verify that remote node is not created with local jid
 	
 	public XMPPNode newRootRemoteNode(String jid) {
@@ -35,7 +37,7 @@ public class XMPPNode {
 	}
 	
 	private void updateQueryXml() {
-		queryXml = "<query xmlns='http://jabber.org/protocol/disco#items' node='"+node+"' >";
+		queryXml = "<query xmlns='"+ITEM_NAMESPACE+"' node='"+node+"' >";
 		queryXmlBytes = queryXml.getBytes();
 	}
 

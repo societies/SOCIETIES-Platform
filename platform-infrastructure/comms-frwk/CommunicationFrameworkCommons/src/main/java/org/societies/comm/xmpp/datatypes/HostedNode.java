@@ -7,16 +7,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LocalXMPPNode extends XMPPNode {
+public class HostedNode extends XMPPNode {
  
-	private final Map<String,LocalXMPPNode> localChildNodes = new HashMap<String, LocalXMPPNode>();
+	private final Map<String,HostedNode> localChildNodes = new HashMap<String, HostedNode>();
 	private final List<XMPPNode> allRemoteChildNodes = new ArrayList<XMPPNode>();
 	
-	public LocalXMPPNode(String node, LocalXMPPNode parentNode) {
+	public HostedNode(String node, HostedNode parentNode) {
 		super(node, null, parentNode); // TODO put local jid?
 	}
 	
-	public void addChildLocalNode(LocalXMPPNode newNode) {
+	public void addChildLocalNode(HostedNode newNode) {
 		localChildNodes.put(newNode.getNode(), newNode);
 		allRemoteChildNodes.add(newNode);
 	}
@@ -31,7 +31,7 @@ public class LocalXMPPNode extends XMPPNode {
 		return Collections.unmodifiableCollection(allRemoteChildNodes);
 	}
 	
-	public LocalXMPPNode getLocalChild(String node) {
+	public HostedNode getLocalChild(String node) {
 		return localChildNodes.get(node);
 	}
 }

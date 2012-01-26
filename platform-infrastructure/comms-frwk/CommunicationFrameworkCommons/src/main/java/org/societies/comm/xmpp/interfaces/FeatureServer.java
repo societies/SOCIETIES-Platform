@@ -29,6 +29,7 @@ package org.societies.comm.xmpp.interfaces;
 import java.util.List;
 
 import org.societies.comm.xmpp.datatypes.Stanza;
+import org.societies.comm.xmpp.datatypes.XMPPError;
 
 /**
  * 
@@ -59,8 +60,7 @@ public interface FeatureServer {
 
 	void receiveMessage(Stanza stanza, Object payload);
 
-	Object receiveQuery(Stanza stanza, Object payload); // TODO receiveQuery and
-	// forget (asynch)
+	Object getQuery(Stanza stanza, Object payload) throws XMPPError;
 	
-	// TODO assess need for "receiveResult" and "receiveError" (i.e. for feature servers sending IQs)
+	Object setQuery(Stanza stanza, Object payload) throws XMPPError;
 }

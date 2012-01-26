@@ -38,25 +38,26 @@ package org.societies.comms.xmpp.pubsub;
 
 import org.jabber.protocol.pubsub.Pubsub;
 import org.societies.comm.xmpp.datatypes.Stanza;
+import org.societies.comm.xmpp.datatypes.XMPPError;
 
 public interface PubsubService {
-	public Object subscriberSubscribe(Stanza stanza, Pubsub payload);
-	public Object subscriberUnsubscribe(Stanza stanza, Pubsub payload);
-	public Object subscriberOptionsRequest(Stanza stanza, Pubsub payload);
-	public Object subscriberOptionsSubmission(Stanza stanza, Pubsub payload);
-	public Object subscriberSubscribeConfigure(Stanza stanza, Pubsub payload);
-	public Object subscriberDefaultOptions(Stanza stanza, Pubsub payload);
-	public Object subscriberRetrieve(Stanza stanza, Pubsub payload);
-	public Object publisherPublish(Stanza stanza, Pubsub payload);
-	public Object publisherPublishOptions(Stanza stanza, Pubsub payload);
-	public Object publisherDelete(Stanza stanza, Pubsub payload);
-	public Object ownerCreate(Stanza stanza, Pubsub payload);
-	public Object ownerCreateConfigure(Stanza stanza, Pubsub payload);
-	public Object ownerConfigureRequest(Stanza stanza, org.jabber.protocol.pubsub.owner.Pubsub payload);
-	public Object ownerConfigureSubmission(Stanza stanza, org.jabber.protocol.pubsub.owner.Pubsub payload);
-	public Object ownerDefaultConfiguration(Stanza stanza, org.jabber.protocol.pubsub.owner.Pubsub payload);
-	public Object ownerDelete(Stanza stanza, org.jabber.protocol.pubsub.owner.Pubsub payload);
-	public Object ownerPurgeItems(Stanza stanza, org.jabber.protocol.pubsub.owner.Pubsub payload);
-	public Object ownerSubscriptions(Stanza stanza, org.jabber.protocol.pubsub.owner.Pubsub payload);
-	public Object ownerAffiliations(Stanza stanza, org.jabber.protocol.pubsub.owner.Pubsub payload);
+	public Pubsub subscriberSubscribe(Stanza stanza, Pubsub payload) throws XMPPError;
+	public void subscriberUnsubscribe(Stanza stanza, Pubsub payload) throws XMPPError;
+	public Pubsub subscriberOptionsRequest(Stanza stanza, Pubsub payload) throws XMPPError;
+	public Pubsub subscriberOptionsSubmission(Stanza stanza, Pubsub payload) throws XMPPError;
+	public Pubsub subscriberSubscribeConfigure(Stanza stanza, Pubsub payload) throws XMPPError;
+	public Pubsub subscriberDefaultOptions(Stanza stanza, Pubsub payload) throws XMPPError;
+	public Pubsub subscriberRetrieve(Stanza stanza, Pubsub payload) throws XMPPError;
+	public Pubsub publisherPublish(Stanza stanza, Pubsub payload) throws XMPPError;
+	public Pubsub publisherPublishOptions(Stanza stanza, Pubsub payload) throws XMPPError;
+	public void publisherDelete(Stanza stanza, Pubsub payload) throws XMPPError;
+	public Pubsub ownerCreate(Stanza stanza, Pubsub payload) throws XMPPError;
+	public Pubsub ownerCreateConfigure(Stanza stanza, Pubsub payload) throws XMPPError;
+	public org.jabber.protocol.pubsub.owner.Pubsub ownerConfigureRequest(Stanza stanza, org.jabber.protocol.pubsub.owner.Pubsub payload) throws XMPPError;
+	public org.jabber.protocol.pubsub.owner.Pubsub ownerConfigureSubmission(Stanza stanza, org.jabber.protocol.pubsub.owner.Pubsub payload) throws XMPPError;
+	public org.jabber.protocol.pubsub.owner.Pubsub ownerDefaultConfiguration(Stanza stanza, org.jabber.protocol.pubsub.owner.Pubsub payload) throws XMPPError;
+	public void ownerDelete(Stanza stanza, org.jabber.protocol.pubsub.owner.Pubsub payload) throws XMPPError;
+	public void ownerPurgeItems(Stanza stanza, org.jabber.protocol.pubsub.owner.Pubsub payload) throws XMPPError;
+	public org.jabber.protocol.pubsub.owner.Pubsub ownerSubscriptions(Stanza stanza, org.jabber.protocol.pubsub.owner.Pubsub payload) throws XMPPError;
+	public org.jabber.protocol.pubsub.owner.Pubsub ownerAffiliations(Stanza stanza, org.jabber.protocol.pubsub.owner.Pubsub payload) throws XMPPError;
 }

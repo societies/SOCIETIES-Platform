@@ -41,7 +41,11 @@ import java.util.List;
 import org.jabber.protocol.pubsub.Options;
 import org.jabber.protocol.pubsub.Pubsub;
 import org.jabber.protocol.pubsub.owner.Configure;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.comm.xmpp.datatypes.Stanza;
+import org.societies.comm.xmpp.datatypes.XMPPError;
+import org.societies.comm.xmpp.datatypes.XMPPError.StanzaError;
 import org.societies.comm.xmpp.exceptions.CommunicationException;
 import org.societies.comm.xmpp.interfaces.CommManager;
 import org.societies.comm.xmpp.interfaces.FeatureServer;
@@ -54,6 +58,9 @@ import org.springframework.stereotype.Component;
 // 
 @Component
 public class PubsubServiceRouter implements FeatureServer {
+	
+	private static Logger LOG = LoggerFactory
+			.getLogger(PubsubServiceRouter.class);
 
 	private final static List<String> NAMESPACES = Collections
 			.singletonList("http://jabber.org/protocol/pubsub");
@@ -73,12 +80,8 @@ public class PubsubServiceRouter implements FeatureServer {
 		impl = new PubsubServiceImpl(endpoint);
 		try {
 			endpoint.register(this); // TODO unregister??
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error(e.getMessage());
 		}
 	}
 
@@ -97,9 +100,19 @@ public class PubsubServiceRouter implements FeatureServer {
 		// do nothing
 		// no use-case so far for community-received messages
 	}
+	
+	// TODO sort out between get and set stanzas
+	@Override
+	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
+		return receiveQuery(stanza, payload);
+	}
 
 	@Override
-	public Object receiveQuery(Stanza stanza, Object payload) {
+	public Object setQuery(Stanza stanza, Object payload) throws XMPPError {
+		return receiveQuery(stanza, payload);
+	}
+
+	public Object receiveQuery(Stanza stanza, Object payload) throws XMPPError {
 		// all received IQs contain a either a normal or owner pubsub element
 		if (payload.getClass().equals(Pubsub.class)) {
 			// Subscriber and Publisher use cases; Owner Create use case
@@ -116,7 +129,8 @@ public class PubsubServiceRouter implements FeatureServer {
 			}
 			if (ps.getUnsubscribe() != null) {
 				// Unsubscribe
-				return impl.subscriberUnsubscribe(stanza, ps);
+				impl.subscriberUnsubscribe(stanza, ps);
+				return null;
 			}
 			Options options = ps.getOptions();
 			if (options != null) {
@@ -147,7 +161,8 @@ public class PubsubServiceRouter implements FeatureServer {
 			}
 			if (ps.getRetract() != null) {
 				// Delete Published Item
-				return impl.publisherDelete(stanza, ps);
+				impl.publisherDelete(stanza, ps);
+				return null;
 			}
 			if (ps.getCreate() != null) {
 				if (ps.getConfigure() != null) {
@@ -180,11 +195,13 @@ public class PubsubServiceRouter implements FeatureServer {
 			}
 			if (ops.getDelete() != null) {
 				// Delete Node or Delete and Redirect
-				return impl.ownerDelete(stanza, ops);
+				impl.ownerDelete(stanza, ops);
+				return null;
 			}
 			if (ops.getPurge() != null) {
 				// Purge Node Items
-				return impl.ownerPurgeItems(stanza, ops);
+				impl.ownerPurgeItems(stanza, ops);
+				return null;
 			}
 			if (ops.getSubscriptions() != null) {
 				// List or Manage Subscriptions
@@ -195,7 +212,6 @@ public class PubsubServiceRouter implements FeatureServer {
 				return impl.ownerAffiliations(stanza, ops);
 			}
 		}
-		return null; // TODO send error!!!
+		throw new XMPPError(StanzaError.service_unavailable);
 	}
-
 }

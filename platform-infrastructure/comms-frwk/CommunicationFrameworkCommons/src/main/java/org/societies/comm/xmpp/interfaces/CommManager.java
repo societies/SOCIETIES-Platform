@@ -26,7 +26,11 @@
 
 package org.societies.comm.xmpp.interfaces;
 
+import java.util.List;
+
+import org.societies.comm.xmpp.datatypes.Identity;
 import org.societies.comm.xmpp.datatypes.Stanza;
+import org.societies.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.comm.xmpp.datatypes.XMPPNode;
 import org.societies.comm.xmpp.exceptions.CommunicationException;
 
@@ -45,8 +49,9 @@ import org.societies.comm.xmpp.exceptions.CommunicationException;
  * 
  */
 public interface CommManager {
-	void register(FeatureServer featureServer) throws CommunicationException,
-			ClassNotFoundException;
+	public void register(FeatureServer featureServer) throws CommunicationException;
+	
+	public void register(CommCallback messageCallback) throws CommunicationException;
 
 	public void sendIQGet(Stanza stanza, Object payload,
 			CommCallback callback) throws CommunicationException;
@@ -54,15 +59,21 @@ public interface CommManager {
 	public void sendIQSet(Stanza stanza, Object payload,
 			CommCallback callback) throws CommunicationException;
 
-	void sendMessage(Stanza stanza, String type, Object payload)
+	public void sendMessage(Stanza stanza, String type, Object payload)
 			throws CommunicationException;
 	
-	void sendMessage(Stanza stanza, Object payload)
+	public void sendMessage(Stanza stanza, Object payload)
 			throws CommunicationException;
 
-	void addRootNode(XMPPNode newNode);
+	public void addRootNode(XMPPNode newNode);
 
-	void removeRootNode(XMPPNode node);
+	public void removeRootNode(XMPPNode node);
+	
+	public void getInfo(Identity entity, String node, CommCallback callback) throws CommunicationException;
+	
+	public void getItems(Identity entity, String node, CommCallback callback) throws CommunicationException;
+	
+	public Identity getIdentity(); // Main identity... pseudonyms for future work
 
 	// void sendResult(? originalPayload, Object resultPayload); //TODO only
 	// needed for asynch IQ handling

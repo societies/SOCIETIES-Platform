@@ -2,6 +2,8 @@ package org.societies.comm.xmpp.xc.impl;
 
 
 import org.jivesoftware.whack.ExternalComponentManager;
+import org.societies.comm.xmpp.datatypes.Identity;
+import org.societies.comm.xmpp.datatypes.Identity.IdentityType;
 import org.societies.comm.xmpp.datatypes.Stanza;
 import org.societies.comm.xmpp.datatypes.XMPPNode;
 import org.societies.comm.xmpp.exceptions.CommunicationException;
@@ -23,6 +25,7 @@ public class XCCommunicationMgr extends AbstractComponent implements
 	private String subDomain;
 	private String secretKey;
 	private ExternalComponentManager manager;
+	private Identity thisIdentity;
 
 	public XCCommunicationMgr(String host, String subDomain,
 			String secretKey) {
@@ -44,6 +47,8 @@ public class XCCommunicationMgr extends AbstractComponent implements
 		} catch (ComponentException e) {
 			e.printStackTrace();
 		}
+		
+		thisIdentity = new Identity(IdentityType.CSS,subDomain,host); // TODO CIS
 	}
 
 	/*
@@ -105,14 +110,19 @@ public class XCCommunicationMgr extends AbstractComponent implements
 
 	// TODO test thread.getclassloader and Async
 	@Override
-	public void register(FeatureServer fs) throws CommunicationException,
-			ClassNotFoundException {
+	public void register(FeatureServer fs) throws CommunicationException {
 		helper.register(fs);
+	}
+	
+	@Override
+	public void register(CommCallback messageCallback) throws CommunicationException {
+		helper.register(messageCallback);
 	}
 
 	@Override
 	public void sendMessage(Stanza stanza, String type, Object payload)
 			throws CommunicationException {
+		stanza.setFrom(thisIdentity);
 		Type mType = Message.Type.valueOf(type);
 		Message m = helper.sendMessage(stanza, mType, payload);
 		this.send(m);
@@ -121,6 +131,7 @@ public class XCCommunicationMgr extends AbstractComponent implements
 	@Override
 	public void sendMessage(Stanza stanza, Object payload)
 			throws CommunicationException {
+		stanza.setFrom(thisIdentity);
 		Message m = helper.sendMessage(stanza, null, payload);
 		this.send(m);
 	}
@@ -128,6 +139,7 @@ public class XCCommunicationMgr extends AbstractComponent implements
 	@Override
 	public void sendIQGet(Stanza stanza, Object payload, CommCallback callback)
 			throws CommunicationException {
+		stanza.setFrom(thisIdentity);
 		IQ iq = helper.sendIQ(stanza, IQ.Type.get, payload, callback);
 		this.send(iq);
 	}
@@ -135,6 +147,7 @@ public class XCCommunicationMgr extends AbstractComponent implements
 	@Override
 	public void sendIQSet(Stanza stanza, Object payload, CommCallback callback)
 			throws CommunicationException {
+		stanza.setFrom(thisIdentity);
 		IQ iq = helper.sendIQ(stanza, IQ.Type.set, payload, callback);
 		this.send(iq);
 	}
@@ -148,4 +161,23 @@ public class XCCommunicationMgr extends AbstractComponent implements
 	public void removeRootNode(XMPPNode node) {
 		helper.removeRootNode(node);
 	}
+
+	@Override
+	public void getInfo(Identity entity, String node, CommCallback callback)  throws CommunicationException {
+		IQ iq = helper.buildInfoIq(entity, node, callback);
+		this.send(iq);
+	}
+
+	@Override
+	public void getItems(Identity entity, String node, CommCallback callback)  throws CommunicationException {
+		IQ iq = helper.buildItemsIq(entity, node, callback);
+		this.send(iq);
+	}
+
+	@Override
+	public Identity getIdentity() {
+		return thisIdentity;
+	}
+
+
 }
