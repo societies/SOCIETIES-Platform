@@ -42,13 +42,10 @@ package org.societies.example.calculatorservice.schema;
       public int Subtract(int a, int b);
   }
    
-1) generate XSD, run the maven command:
-> mvn jaxb2:schemagen  -f createXSDpom.xml
-The schema.xsd file will be in /target/generated-resources/schemagen directory
+generate XSD, run the maven command:
+> mvn jaxb2:schemagen
 
-2) Build the JAR using this new schema.xsd as the source (not the .java files).
-This will add the required XML notations and Object Factory
-> mvn install
+The schema.xsd file will be in /target/generated-resources/schemagen directory
 
  */
 
