@@ -22,45 +22,20 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.personalisation.preference.api.callback;
+
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.personalisation.model.IAction;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 /**
- * Describe your class here...
+ * This class must be implemented by a component that requests a preference outcome from the UserPreferenceManager and the instance of the class that
+ * implements this will be passed as a parameter in the methods of the UserPreferenceManager. 
  *
- * @author aleckey
+ * @author Eliza
  *
  */
-package org.societies.comm.examples.calculatorbean;
+public interface IPreferenceOutcomeCallback {
 
-/*
-If any method of your Bean returns a value, you will need to add a property for that
-value below. You can double up your return values if they are the same object type 
-eg, 
-The CalculatorBean returns an int for both the Add() and Subtract() method. We use the generic 
-int getResult() 
-
-We don't need to add a method for each
-int getAddResult() 
-int getSubtractResult()
-*/
-
-public class CalcBeanResult {
-
-	private int result;
-	private String text;
-
-	public int getResult() {
-		return result;
-	}
-	
-	public void setResult(int result) {
-		this.result = result;
-	}
-	
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
-	}
+	public void receivePreferenceOutcome(EntityIdentifier providerId, EntityIdentifier userId, IServiceResourceIdentifier serviceId, IAction action);
 }

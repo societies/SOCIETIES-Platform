@@ -29,30 +29,52 @@
  * @author aleckey
  *
  */
-package org.societies.comm.examples.fortunecookiebean;
+package org.societies.example.calculatorservice.schema;
 
 /*
-If any method of your Bean returns a value, you will need to add a method for it 
-below. You can double up your return values if they are the same object type 
+  Based on the below interface, the task is to generate a Bean that will allow you to
+  query which method was called and what parameters were passed. Do not add the return type here.
+  This is added in the Result bean.
+ 
+  public interface ICalc 
+  {
+      public int Add(int a, int b);
+      public int Subtract(int a, int b);
+  }
+   
+generate XSD, run the maven command:
+> mvn jaxb2:schemagen
 
-In this case we will return a Bean version of the Cookie object
-*/
+The schema.xsd file will be in /target/generated-resources/schemagen directory
 
-public class FortuneCookieBeanResult {
+ */
 
-	private int id;
-	private String value;
+public class CalcBean {
 	
-	public int getId() {
-		return id;
+	public enum methodType {Add, Subtract, AddAsync};
+	private methodType method;
+	private int a;
+	private int b;
+	
+	public int getA() {
+		return a;
 	}
-	public void setId(int id) {
-		this.id = id;
+	public void setA(int a) {
+		this.a = a;
 	}
-	public String getValue() {
-		return value;
+
+	public int getB() {
+		return b;
 	}
-	public void setValue(String value) {
-		this.value = value;
-	}	
+	public void setB(int b) {
+		this.b = b;
+	}
+
+	public methodType getMethod() {
+		return method;
+	}
+	
+	public void setMethod(methodType method) {
+		this.method = method;
+	}
 }

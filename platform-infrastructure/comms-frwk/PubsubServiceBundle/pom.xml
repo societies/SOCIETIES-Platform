@@ -15,7 +15,7 @@
     <artifactId>PubsubServiceBundle</artifactId>
     <packaging>bundle</packaging>
     <name>Pubsub Service Bundle</name>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>${release.version}</version>
 
     <properties>
         <slf4j.version>1.5.0</slf4j.version>
@@ -117,7 +117,23 @@
 						<Embed-Transitive>false</Embed-Transitive>
 		         	</instructions>
 	       		</configuration>
-			</plugin>		
+			</plugin>	
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
+							<version>${release.version}</version>
+							<type>bundle</type>
+							<overWrite>true</overWrite>
+							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+						</artifactItem>
+					</artifactItems>
+				</configuration>
+			</plugin>	
 		</plugins>
 	</build>
 </project>
