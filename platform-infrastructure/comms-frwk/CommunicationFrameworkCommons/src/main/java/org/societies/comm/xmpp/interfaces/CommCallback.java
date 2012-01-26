@@ -26,7 +26,12 @@
 
 package org.societies.comm.xmpp.interfaces;
 
+import java.util.List;
+
 import org.societies.comm.xmpp.datatypes.Stanza;
+import org.societies.comm.xmpp.datatypes.XMPPError;
+import org.societies.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.comm.xmpp.datatypes.XMPPNode;
 
 /**
  * @author Miquel Martin (NEC)
@@ -37,6 +42,14 @@ import org.societies.comm.xmpp.datatypes.Stanza;
  */
 
 public interface CommCallback {
+	
+	List<String> getXMLNamespaces();
+
+	/**
+	 * Get the java package to which the objects this feature deals with belong.
+	 */
+	List<String> getJavaPackages();
+	
 	/**
 	 * Receive a result
 	 * 
@@ -54,6 +67,11 @@ public interface CommCallback {
 	 * @param stanza
 	 *            information regarding the error stanza (e.g. To/From IDs)
 	 */
-	void receiveError(Stanza stanza, Object payload);
-
+	void receiveError(Stanza stanza, XMPPError error);
+	
+	void receiveInfo(Stanza stanza, String node, XMPPInfo info);
+	
+	void receiveItems(Stanza stanza, String node, List<XMPPNode> items);
+	
+	void receiveMessage(Stanza stanza, Object payload);
 }

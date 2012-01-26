@@ -26,6 +26,11 @@
 
 package org.societies.comm.xmpp.datatypes;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author Joao M. Goncalves (PTIN)
  * 
@@ -37,28 +42,16 @@ public class Identity {
 	protected IdentityType type;
 	protected String identifier;
 	protected String domainIdentifier;
-	
-	public static Identity fromJid(String jid) {
-		String[] parts = jid.split("@|/");
-		switch (parts.length) {
-			case 1:
-				int firstDot = jid.indexOf(".");
-				return new Identity(IdentityType.CIS, jid.substring(0,firstDot), jid.substring(firstDot+1));
-			case 2:
-				return new Identity(IdentityType.CSS, parts[0], parts[1]);
-			case 3:
-				return new Endpoint(IdentityType.CSS, parts[0], parts[1], parts[2]);
-			default:
-				return null;
-		}
-	}
+	protected List<XMPPNode> rootPointerNodes;
+	protected Map<String,HostedNode> rootHostedNodes;
 	
 	public Identity(IdentityType type, String identifier, String domainIdentifier) {
 		this.type = type;
 		this.identifier = identifier;
 		this.domainIdentifier = domainIdentifier;
+		rootPointerNodes = new ArrayList<XMPPNode>();
+		rootHostedNodes = new HashMap<String, HostedNode>();
 	}
-
 
 	@Override
 	public String toString() {
@@ -126,4 +119,18 @@ public class Identity {
 			return identifier+"."+domainIdentifier;
 	}
 	
+	public static Identity fromJid(String jid) {
+		String[] parts = jid.split("@|/");
+		switch (parts.length) {
+			case 1:
+				int firstDot = jid.indexOf(".");
+				return new Identity(IdentityType.CIS, jid.substring(0,firstDot), jid.substring(firstDot+1));
+			case 2:
+				return new Identity(IdentityType.CSS, parts[0], parts[1]);
+			case 3:
+				return new Endpoint(IdentityType.CSS, parts[0], parts[1], parts[2]);
+			default:
+				return null;
+		}
+	}
 }

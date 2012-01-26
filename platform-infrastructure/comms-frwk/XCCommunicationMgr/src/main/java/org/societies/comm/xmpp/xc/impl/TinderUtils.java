@@ -17,8 +17,10 @@ public class TinderUtils {
 	}
 
 	public static IQ createIQ(Stanza stanza, Type type) {
-		IQ retIq = new IQ(type);
+		IQ retIq = new IQ(type); // discarding ID generation from stanza
 		retIq.setTo(stanza.getTo().getJid());
+		retIq.setFrom(stanza.getFrom().getJid());
+		retIq.setID(stanza.getId());
 		return retIq;
 	}
 
@@ -27,6 +29,8 @@ public class TinderUtils {
 		if (type!=null)
 			retMessage.setType(type);
 		retMessage.setTo(stanza.getTo().getJid());
+		retMessage.setFrom(stanza.getFrom().getJid());
+		retMessage.setID(stanza.getId());
 		return retMessage;
 	}
 
