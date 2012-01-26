@@ -23,9 +23,10 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.internal.personalisation.model.IFeedbackEvent;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.personalisation.model.IAction;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
@@ -51,7 +52,7 @@ public interface IInternalPersonalisationManager extends IPersonalisationManager
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
 	 */
-	public IAction getIntentTask(EntityIdentifier requestor, EntityIdentifier ownerID, ServiceResourceIdentifier serviceID, String preferenceName);
+	public void getIntentTask(EntityIdentifier requestor, EntityIdentifier ownerID, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
 
 	/**
 	 * Allows any service to request an context-based evaluated preference outcome.
@@ -63,7 +64,7 @@ public interface IInternalPersonalisationManager extends IPersonalisationManager
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
 	 */
-	public IAction getIntentTask(EntityIdentifier ownerID, ServiceResourceIdentifier serviceID, String preferenceName);
+	public void getIntentTask(EntityIdentifier ownerID, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
 
 	/**
 	 * Allows any service to request an context-based evaluated preference outcome.
@@ -77,7 +78,7 @@ public interface IInternalPersonalisationManager extends IPersonalisationManager
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
 	 */
-	public IAction getPreference(EntityIdentifier requestor, EntityIdentifier ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName);
+	public void getPreference(EntityIdentifier requestor, EntityIdentifier ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
 
 	/**
 	 * Allows any service to request an context-based evaluated preference outcome.
@@ -90,7 +91,7 @@ public interface IInternalPersonalisationManager extends IPersonalisationManager
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
 	 */
-	public IAction getPreference(EntityIdentifier ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName);
+	public void getPreference(EntityIdentifier ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
 
 	/**
 	 * 
@@ -105,38 +106,7 @@ public interface IInternalPersonalisationManager extends IPersonalisationManager
 	 */
 	public void returnFeedback(IFeedbackEvent feedback);
 
-	/**
-	 * 
-	 * @param owner
-	 * @param serviceId
-	 * @param dianneOutcome
-	 */
-	public void sendCAUIOutcome(EntityIdentifier owner, ServiceResourceIdentifier serviceId, IUserIntentAction dianneOutcome);
 
-	/**
-	 * 
-	 * @param owner
-	 * @param serviceId
-	 * @param dianneOutcome
-	 */
-	public void sendDianneOutcome(EntityIdentifier owner, ServiceResourceIdentifier serviceId, IDIANNEOutcome dianneOutcome);
-
-	/**
-	 * 
-	 * @param owner
-	 * @param serviceId
-	 * @param dianneOutcome
-	 */
-	public void sendCRISTUserIntentOutcome(EntityIdentifier owner, ServiceResourceIdentifier serviceId, ICRISTUserAction dianneOutcome);
-
-	/**
-	 * 
-	 * @param owner
-	 * @param serviceType
-	 * @param serviceId
-	 * @param dianneOutcome
-	 */
-	public void sendPreferenceOutcome(EntityIdentifier owner, String serviceType, ServiceResourceIdentifier serviceId, IPreferenceOutcome dianneOutcome);
 
 	/**
 	 * 
