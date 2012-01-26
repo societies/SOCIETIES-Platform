@@ -29,7 +29,7 @@
  * @author aleckey
  *
  */
-package org.societies.comm.examples.fortunecookiebean;
+package org.societies.example.fortunecookieservice.schema;
 
 /*
 If any method of your Bean returns a value, you will need to add a method for it 

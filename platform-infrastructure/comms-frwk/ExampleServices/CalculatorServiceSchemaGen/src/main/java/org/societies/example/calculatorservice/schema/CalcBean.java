@@ -29,35 +29,55 @@
  * @author aleckey
  *
  */
-package org.societies.comm.examples.fortunecookiebean;
+package org.societies.example.calculatorservice.schema;
 
 /*
   Based on the below interface, the task is to generate a Bean that will allow you to
   query which method was called and what parameters were passed. Do not add the return type here.
   This is added in the Result bean.
  
-  public interface IWisdom {
-
-	 public Cookie getCookie();
+  public interface ICalc 
+  {
+      public int Add(int a, int b);
+      public int Subtract(int a, int b);
   }
    
-to generate XSD, run the maven command:
-> mvn jaxb2:schemagen -f createXSDpom.xml
-
+1) generate XSD, run the maven command:
+> mvn jaxb2:schemagen  -f createXSDpom.xml
 The schema.xsd file will be in /target/generated-resources/schemagen directory
- *
+
+2) Build the JAR using this new schema.xsd as the source (not the .java files).
+This will add the required XML notations and Object Factory
+> mvn install
+
  */
 
-public class FortuneCookieBean {
+public class CalcBean {
 	
-	public enum methodName {getCookie};
-	private methodName method;
+	public enum methodType {Add, Subtract, AddAsync};
+	private methodType method;
+	private int a;
+	private int b;
+	
+	public int getA() {
+		return a;
+	}
+	public void setA(int a) {
+		this.a = a;
+	}
 
-	public methodName getMethod() {
-		return this.method;
+	public int getB() {
+		return b;
+	}
+	public void setB(int b) {
+		this.b = b;
+	}
+
+	public methodType getMethod() {
+		return method;
 	}
 	
-	public void setMethod(methodName method) {
+	public void setMethod(methodType method) {
 		this.method = method;
 	}
 }
