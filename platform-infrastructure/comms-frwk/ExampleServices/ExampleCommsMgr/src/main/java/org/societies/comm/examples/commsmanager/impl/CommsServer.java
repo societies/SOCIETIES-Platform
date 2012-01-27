@@ -42,11 +42,11 @@ import org.slf4j.LoggerFactory;
 import org.societies.comm.examples.calculator.ICalc;
 import org.societies.comm.examples.fortunecookie.api.IWisdom;
 import org.societies.comm.examples.fortunecookie.datatypes.Cookie;
-import org.societies.comm.xmpp.datatypes.Stanza;
-import org.societies.comm.xmpp.datatypes.XMPPError;
-import org.societies.comm.xmpp.exceptions.CommunicationException;
-import org.societies.comm.xmpp.interfaces.CommManager;
-import org.societies.comm.xmpp.interfaces.FeatureServer;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.example.calculatorservice.schema.CalcBean;
 import org.societies.example.calculatorservice.schema.CalcBeanResult;
 import org.societies.example.complexservice.IComplexService;
@@ -57,7 +57,7 @@ import org.societies.example.fortunecookieservice.schema.FortuneCookieBean;
 import org.societies.example.fortunecookieservice.schema.FortuneCookieBeanResult;
 import org.societies.example.fortunecookieservice.schema.MethodName;
 
-public class CommsServer implements FeatureServer {
+public class CommsServer implements IFeatureServer {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 							  Arrays.asList("http://societies.org/example/calculatorservice/schema",
@@ -69,7 +69,7 @@ public class CommsServer implements FeatureServer {
 											"org.societies.example.complexservice.schema"));
 	
 	//PRIVATE VARIABLES
-	private CommManager commManager;
+	private ICommManager commManager;
 	private ICalc calcService;
 	private IWisdom fcGenerator;
 	private IComplexService complexSvc;
@@ -77,11 +77,11 @@ public class CommsServer implements FeatureServer {
 	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
 	
 	//PROPERTIES
-	public CommManager getCommManager() {
+	public ICommManager getCommManager() {
 		return commManager;
 	}
 
-	public void setCommManager(CommManager commManager) {
+	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
 	}
 

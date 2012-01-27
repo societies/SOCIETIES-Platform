@@ -44,8 +44,9 @@ public class UserIntentAction extends Action implements IUserIntentAction, Seria
 	private int confidenceLevel;
 	
 	private double transProb;
-
-
+	
+	private long duration;
+	
 	public UserIntentAction(String par, String val,Long id, double transProb){
 		super(par,val);
 		this.actionID = par +"="+val+"/"+id; 
@@ -94,5 +95,11 @@ public class UserIntentAction extends Action implements IUserIntentAction, Seria
 		return transProb;
 	}
 
-	
+	public long getDuration() {
+		return duration;
+	}
+
+	public void setDuration(long duration) {
+		this.duration = duration;
+	}
 }

@@ -24,17 +24,20 @@
  */
 package org.societies.comm.examples.commsmanager.impl;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
 
-import org.societies.comm.xmpp.datatypes.Identity;
-import org.societies.comm.xmpp.datatypes.Stanza;
-import org.societies.comm.xmpp.datatypes.XMPPError;
-import org.societies.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.comm.xmpp.datatypes.XMPPNode;
-import org.societies.comm.xmpp.interfaces.CommCallback;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.api.comm.xmpp.datatypes.XMPPNode;
 import org.societies.example.calculatorservice.schema.CalcBeanResult;
 import org.societies.example.fortunecookieservice.schema.FortuneCookieBeanResult;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
  * Describe your class here...
@@ -42,7 +45,16 @@ import org.societies.example.fortunecookieservice.schema.FortuneCookieBeanResult
  * @author aleckey
  *
  */
-public class CommsClientCallback implements CommCallback{
+public class CommsClientCallback implements ICommCallback {
+
+	private static final List<String> NAMESPACES = Collections.unmodifiableList(
+			  Arrays.asList("http://societies.org/example/calculatorservice/schema",
+					  		"http://societies.org/example/fortunecookieservice/schema",
+					  		"http://societies.org/example/complexservice/schema"));
+	private static final List<String> PACKAGES = Collections.unmodifiableList(
+			  Arrays.asList("org.societies.example.calculatorservice.schema",
+							"org.societies.example.fortunecookieservice.schema",
+							"org.societies.example.complexservice.schema"));
 
 	private Future<?>returnObj;
 	private int returnInt=0;
@@ -73,7 +85,7 @@ public class CommsClientCallback implements CommCallback{
 		if (msgBean.getClass().equals(CalcBeanResult.class)) {
 			CalcBeanResult calcResult = (CalcBeanResult) msgBean;
 			//return the calcResult to the calling client
-			//this.returnObj = new AsyncResult<Integer>(calcResult.getResult());
+			this.returnObj = new AsyncResult<Integer>(calcResult.getResult());
 			this.setReturnInt(calcResult.getResult() );
 		}
 		
@@ -85,21 +97,17 @@ public class CommsClientCallback implements CommCallback{
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.interfaces.CommCallback#getJavaPackages()
-	 */
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#getJavaPackages() */
 	@Override
 	public List<String> getJavaPackages() {
-		// TODO Auto-generated method stub
-		return null;
+		return PACKAGES;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.interfaces.CommCallback#getXMLNamespaces()
-	 */
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#getXMLNamespaces() */
 	@Override
 	public List<String> getXMLNamespaces() {
-		// TODO Auto-generated method stub
-		return null;
+		return NAMESPACES;
 	}
 
 	/* (non-Javadoc)
@@ -107,7 +115,7 @@ public class CommsClientCallback implements CommCallback{
 	 */
 	@Override
 	public void receiveError(Stanza returnStanza, XMPPError info) {
-		// TODO Auto-generated method stub
+		System.out.println(info.getMessage());
 		
 	}
 
@@ -116,7 +124,7 @@ public class CommsClientCallback implements CommCallback{
 	 */
 	@Override
 	public void receiveInfo(Stanza returnStanza, String node, XMPPInfo info) {
-		// TODO Auto-generated method stub
+		System.out.println(info.getIdentityName());
 		
 	}
 
@@ -125,7 +133,7 @@ public class CommsClientCallback implements CommCallback{
 	 */
 	@Override
 	public void receiveItems(Stanza returnStanza, String node, List<XMPPNode> info) {
-		// TODO Auto-generated method stub
+		System.out.println(returnStanza.getTo());
 		
 	}
 
@@ -134,8 +142,7 @@ public class CommsClientCallback implements CommCallback{
 	 */
 	@Override
 	public void receiveMessage(Stanza returnStanza, Object messageBean) {
-		// TODO Auto-generated method stub
-		
+		System.out.println(messageBean.getClass().toString());		
 	}
 	
 

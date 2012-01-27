@@ -24,7 +24,8 @@ import java.util.List;
 
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.personalisation.model.IAction;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.model.UserIntentAction;
 
 
@@ -44,36 +45,40 @@ public interface ICAUIPrediction {
 	public void enablePrediction(Boolean bool);
 
 	/**
-	 * Allows any service to request an context-based evaluated preference outcome.
-	 * @return					the outcome in the form of an IAction object
-	 * 
+	 * Allows any service to request a context-based evaluated preference outcome.
+	 *  
 	 * @param requestor    the DigitalIdentity of the service requesting the outcome
 	 * @param ownerID    the DigitalIdentity of the owner of the preferences (i.e. the
 	 * user of this service)
 	 * @param serviceID    the service identifier of the service requesting the
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
+	 * @return					the outcome in the form of an IAction object
 	 */
-	public UserIntentAction getCurrentIntentAction(EntityIdentifier requestor, EntityIdentifier ownerID, ServiceResourceIdentifier serviceID, String preferenceName);
+	public UserIntentAction getCurrentIntentAction(EntityIdentifier requestor, EntityIdentifier ownerID, IServiceResourceIdentifier serviceID, String preferenceName);
 
 	
-	/**
-	 * Predicts next action based on the last performed action
-	 */
-	public UserIntentAction getPrediction();
-
 	/**
 	 * Predicts next action based on the last performed action
 	 * 
 	 * @param ctxAttribute
 	 */
-	public UserIntentAction getPrediction(CtxAttribute ctxAttribute);
+	public UserIntentAction getPrediction(EntityIdentifier requestor, CtxAttribute ctxAttribute);
 
+	/**
+	 * Predicts next action based on the last performed action
+	 * 
+	 * @param requestor
+	 * @param action
+	 * @return predicted action 
+	 */
+	public UserIntentAction getPrediction(EntityIdentifier requestor, IAction action); 
+		
 	/**
 	 * Returns a list with the performed predictions.
 	 * 
 	 */
 	
 	public List<List<String>> getPredictionHistory();
-
+	
 }
