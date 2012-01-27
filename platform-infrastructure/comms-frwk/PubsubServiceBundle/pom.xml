@@ -7,15 +7,14 @@
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>0.1</version>
-		<relativePath>../../../parent/spring-osgi.xml</relativePath>
 	 </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.societies.comms.xmpp.pubsub</groupId>
+    <groupId>org.societies.comm.xmpp.pubsub</groupId>
     <artifactId>PubsubServiceBundle</artifactId>
     <packaging>bundle</packaging>
     <name>Pubsub Service Bundle</name>
-    <version>${release.version}</version>
+    <version>${version.comm}</version>
 
     <properties>
         <slf4j.version>1.5.0</slf4j.version>
@@ -36,13 +35,13 @@
     	<dependency>
 			<groupId>jabber.x.data</groupId>
 			<artifactId>DataFormsXep</artifactId>
-			<version>0.0.1</version>
+			<version>${release.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jabber.protocol.pubsub</groupId>
 			<artifactId>PubsubXep</artifactId>
-			<version>0.0.1</version>
+			<version>${release.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		
@@ -97,15 +96,6 @@
     					<Import-Package>
     						org.springframework.beans.factory.annotation*;version="0",
     						org.springframework.stereotype*;version="0",
-    						org.xmpp.packet*,
-    						!org.gjt.*,
-    						!org.jaxen.*,
-    						!org.mortbay.*,
-    						!org.relaxng.*,
-    						!org.jvnet.staxex,
-    						!org.jvnet.fastinfoset,
-    						!com.sun.xml.fastinfoset.*,
-    						!com.sun.msv.*,
 							*;resolution:=optional
     					</Import-Package>
     					<Export-Package>
@@ -129,7 +119,7 @@
 						<artifactItem>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>${project.artifactId}</artifactId>
-							<version>${release.version}</version>
+							<version>${version.comm}</version>
 							<type>bundle</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
