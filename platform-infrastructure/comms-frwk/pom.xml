@@ -45,9 +45,10 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 	<!-- All Spring-OSGi Java projects to be included in nightly builds -->
 	<modules>
 		<!--  CIS Mgmt --> 
+		<!-- 
 		<module>../../cis-modules/cis-management/CommunityXEP</module>
 		<module>../../cis-modules/cis-management/CommunityServiceBundle</module>
-	
+	 	-->
 		<!-- Communications Infrastructure -->
 		<module>CommonLibraries</module>
 		<module>CommunicationFrameworkCommons</module>

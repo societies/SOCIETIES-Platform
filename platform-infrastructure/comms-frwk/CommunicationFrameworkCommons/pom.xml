@@ -15,6 +15,16 @@
 	<name>Communication Framework Commons</name>
 	<version>0.0.1-SNAPSHOT</version>
 	
+	<dependencies>
+		<!-- Interface -->
+    	<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+	
 	<!--
 	<build>
 		<plugins>

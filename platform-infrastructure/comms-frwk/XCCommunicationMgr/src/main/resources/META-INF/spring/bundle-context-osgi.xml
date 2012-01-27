@@ -13,8 +13,6 @@
        in a separate file if you do not want to. The rationale for 
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
-	<!--  <osgi:service ref="xcCommunication" interface="org.societies.comm.xmpp.CommunicationManager"/> -->
-	<osgi:service ref="xcCommunication" interface="org.societies.comm.xmpp.interfaces.CommManager"/>
-    
+	<osgi:service ref="xcCommunication" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
     <osgi-compendium:cm-properties id="componentConfig" persistent-id="xc"/>
 </beans>

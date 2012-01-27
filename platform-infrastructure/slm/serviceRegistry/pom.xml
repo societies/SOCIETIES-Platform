@@ -26,31 +26,29 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
-			<type>libd</type>			
+			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
 		<!-- databases -->
-		<!-- 
+
 		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>com.springsource.org.apache.derby</artifactId>
 			<version>10.5.1000001.764942</version>
 		</dependency>
-		<dependency>
-			<groupId>org.hsqldb</groupId>
-			<artifactId>com.springsource.org.hsqldb</artifactId>
-			<version>1.8.0.10</version>
-		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.9</version>
-		</dependency>
-		 -->
+		<!-- <dependency> <groupId>org.hsqldb</groupId> <artifactId>com.springsource.org.hsqldb</artifactId> 
+			<version>1.8.0.10</version> </dependency> <dependency> <groupId>mysql</groupId> 
+			<artifactId>mysql-connector-java</artifactId> <version>5.1.9</version> </dependency> -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.test</artifactId>
+			<version>3.0.5.RELEASE</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -98,36 +96,36 @@
 		</dependency>
 
 		<!-- apache commons -->
-		<!-- 
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>com.springsource.org.apache.commons.dbcp</artifactId>
-			<version>1.2.2.osgi</version>			
+			<version>1.2.2.osgi</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>com.springsource.org.apache.commons.pool</artifactId>
-			<version>1.5.3</version>			
+			<version>1.5.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>com.springsource.org.apache.commons.collections</artifactId>
-			<version>3.2.1</version>			
+			<version>3.2.1</version>
 		</dependency>
-		 -->
-		 
-		 <dependency>
+
+
+		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
 			<version>${release.version}</version>
-			
+
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
-			
+
 		</dependency>
 	</dependencies>
 
@@ -156,7 +154,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.11</version>
 				<configuration>
-					<skipTests>true</skipTests>
+					<skipTests>false</skipTests>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -180,6 +178,8 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>	
+
+		
+	</build>
 
 </project>

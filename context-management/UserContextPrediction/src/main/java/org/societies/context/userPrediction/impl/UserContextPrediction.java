@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske druÅ¾be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÃ‡ÃƒO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -28,28 +28,30 @@ import java.util.Date;
 
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.internal.context.user.prediction.IUserCtxPredictionMgr;
-import org.societies.api.internal.context.user.prediction.PredictionMethod;
+import org.societies.context.api.user.prediction.IUserCtxPredictionMgr;
+import org.societies.context.api.user.prediction.PredictionMethod;
 
 
 
 public class UserContextPrediction implements IUserCtxPredictionMgr {
 
 	@Override
-	public PredictionMethod getDefaultPredictionMethod(
-			PredictionMethod predMethod) {
+	public org.societies.context.api.user.prediction.PredictionMethod getDefaultPredictionMethod(
+			org.societies.context.api.user.prediction.PredictionMethod predMethod) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public PredictionMethod getPredictionMethod(PredictionMethod predMethod) {
+	public org.societies.context.api.user.prediction.PredictionMethod getPredictionMethod(
+			org.societies.context.api.user.prediction.PredictionMethod predMethod) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CtxAttribute predictContext(PredictionMethod predictionModel,
+	public CtxAttribute predictContext(
+			org.societies.context.api.user.prediction.PredictionMethod predictionModel,
 			CtxAttributeIdentifier ctxAttrID, Date date) {
 		// TODO Auto-generated method stub
 		return null;
@@ -70,28 +72,34 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 	}
 
 	@Override
-	public CtxAttribute predictContext(PredictionMethod predictionModel,
+	public CtxAttribute predictContext(
+			org.societies.context.api.user.prediction.PredictionMethod predictionModel,
 			CtxAttributeIdentifier ctxAttrID, int index) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void removePredictionMethod(PredictionMethod predMethod) {
+	public void removePredictionMethod(
+			org.societies.context.api.user.prediction.PredictionMethod predMethod) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void setDefaultPredictionMethod(PredictionMethod predMethod) {
+	public void setDefaultPredictionMethod(
+			org.societies.context.api.user.prediction.PredictionMethod predMethod) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void setPredictionMethod(PredictionMethod predMethod) {
+	public void setPredictionMethod(
+			org.societies.context.api.user.prediction.PredictionMethod predMethod) {
 		// TODO Auto-generated method stub
 		
 	}
+
+	
 
 }

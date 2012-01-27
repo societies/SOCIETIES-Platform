@@ -70,23 +70,6 @@ public interface IUserCtxInferenceMgr {
 	 */
 	public Map<CtxAttributeIdentifier,Double> evaluateSimilarity(List<CtxAttributeIdentifier> listCtxID, List<CtxAttributeIdentifier> listCtxID2);
 
-	/**
-	 * Gets the default prediction method. 
-	 * 
-	 * @param predictionMethod
-	 * @return prediction method
-	 * @since 0.0.1
-	 */
-	public PredictionMethod getDefaultPredictionMethod(PredictionMethod predictionMethod);
-
-	/**
-	 * Gets a prediction method.
-	 * 
-	 * @param predictionMethodl
-	 * @return prediction method
-	 * @since 0.0.1
-	 */
-	public PredictionMethod getPredictionMethod(PredictionMethod predictionMethod);
 
 	/**
 	 * Inherits the Context Attribute belonging to a CIS.
@@ -97,28 +80,6 @@ public interface IUserCtxInferenceMgr {
 	 * @since 0.0.1
 	 */
 	public void inheritContext(CtxAttributeIdentifier ctxAttrId, CtxAttributeValueType type, EntityIdentifier cisid);
-
-	/**
-	 * Predicts context using indicated prediction method and date.
-	 *  
-	 * @param ctxAttrID
-	 * @param predictionMethod
-	 * @param date
-	 * @returns context attribute with predicted context
-	 * @since 0.0.1
-	 */
-	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, PredictionMethod predictionMethod, Date date);
-
-	/**
-	 * Predicts context using indicated prediction method and index. 
-	 * 
-	 * @param ctxAttrID
-	 * @param predictionMethodl
-	 * @param index
-	 * @returns context attribute with predicted context
-	 * @since 0.0.1
-	 */
-	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, PredictionMethod predictionMethodl, int index);
 
 	/**
 	 * Predicts context using indicated date. 
@@ -147,29 +108,5 @@ public interface IUserCtxInferenceMgr {
 	 * @since 0.0.1
 	 */
 	public void refineContext(CtxAttributeIdentifier ctxAttrId);
-
-	/**
-	 * Removes a specified prediction method.
-	 * 
-	 * @param predictionMethod
-	 * @since 0.0.1
-	 */
-	public void removePredictionMethod(PredictionMethod predictionMethod);
-
-	/**
-	 * Sets an indicated prediction method as default.
-	 * 
-	 * @param predMethod
-	 * @since 0.0.1
-	 */
-	public void setDefaultPredictionMethod(PredictionMethod predMethod);
-
-	/**
-	 * Sets a prediction method.
-	 * 
-	 * @param predMethod
-	 * @since 0.0.1
-	 */
-	public void setPredictionMethod(PredictionMethod predMethod);
 
 }

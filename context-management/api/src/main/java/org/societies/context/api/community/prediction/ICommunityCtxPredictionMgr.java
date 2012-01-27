@@ -29,7 +29,7 @@ import java.util.Date;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.internal.context.user.prediction.PredictionMethod;
+
 
 
 /**
@@ -50,6 +50,6 @@ public interface ICommunityCtxPredictionMgr {
 	 * @param ctxObjModel
 	 * @param date
 	 */
-	public CtxIdentifier predictContext(PredictionMethod predictionModel, CtxAttributeIdentifier ctxObjModel, Date date);
+	public CtxIdentifier predictContext(CtxAttributeIdentifier ctxObjModel, Date date);
 
 }
