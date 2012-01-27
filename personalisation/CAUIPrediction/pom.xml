@@ -11,9 +11,9 @@
 	</parent>
 	<!-- groupId is set in parent pom -->
 	<groupId>org.societies.personalisation</groupId>
-	<artifactId>CAUITaskManager</artifactId>
+	<artifactId>CAUIPrediction</artifactId>
 	<version>${version.pm}</version>
-	<name>Ctx Aware User Intent Task Manager</name>
+	<name>Ctx Aware User Intent Prediction</name>
 	<packaging>bundle</packaging>
 
 	<developers>
@@ -132,5 +132,4 @@
 	</build>
 
 
-	<description>This component allows to manage the discovered user model.</description>
 </project>

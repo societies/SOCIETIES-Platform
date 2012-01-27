@@ -11,9 +11,9 @@
 	</parent>
 	<!-- groupId is set in parent pom -->
 	<groupId>org.societies.personalisation</groupId>
-	<artifactId>CAUITaskManager</artifactId>
+	<artifactId>CACIDiscovery</artifactId>
 	<version>${version.pm}</version>
-	<name>Ctx Aware User Intent Task Manager</name>
+	<name>Ctx Aware Community Intent Discovery</name>
 	<packaging>bundle</packaging>
 
 	<developers>
@@ -23,14 +23,16 @@
 			<organization>ICCS</organization>
 			<organizationUrl>http://www.iccs.gr/</organizationUrl>
 			<roles>
-				<role>Senior Developer</role>
+				<role>Developer</role>
+				<role>Owner</role>
 			</roles>
-			<timezone>+0</timezone>
+			<timezone>+2</timezone>
 		</developer>
 	</developers>
 
 	<!-- List dependencies here -->
 	<dependencies>
+
 
 		<dependency>
 			<groupId>org.societies.personalisation</groupId>
@@ -132,5 +134,5 @@
 	</build>
 
 
-	<description>This component allows to manage the discovered user model.</description>
+	<description>This component performs learning algorithms on community histories in order to extract a community intent model.</description>
 </project>
