@@ -1,0 +1,60 @@
+#YOU WILL NEED TO EDIT THE "TO" IN EACH OF THE <iq> CALLS BELOW. THE TO SHOULD ALWAYS BE THE
+#EXTERNAL COMPONENT IE, XCManager.societies.local
+#THE FROM SHOULD BE
+
+# SEND A QUERY ON LIST OF SERVICES - YOU SHOULD SEE YOUR NAMESPACE IN THE RESULT LIST
+# TO KNOW YOU HAVE SUCCESSFULLY REGISTERED
+<iq type='get'
+    from='green@societies.local/laptop'
+    to='XCManager.societies.local'
+    id='info1'>
+  <query xmlns='http://jabber.org/protocol/disco#info'/>
+</iq>
+
+#CALCULATOR SERVICE methods are: Add, Subtract, AddAsync
+<iq type='get'
+    from='green@red.local/laptop'
+    to='XCManager.societies.local'
+    id='add1'>
+   <calcBean xmlns='http://societies.org/example/calculatorservice/schema'>
+	<a>2</a>
+	<b>3</b>
+	<method>Add</method>
+    </calcBean>
+</iq>
+
+#FORTUNE COOKIE 
+<iq type='get'
+    from='green@red.local/laptop'
+    to='XCManager.societies.local'
+    id='add1'>
+   <fortuneCookieBean xmlns='http://societies.org/example/fortunecookieservice/schema' >
+	<method>getCookie</method>
+   </fortuneCookieBean>
+</iq>
+
+#COMPLEX SERVICE CALL
+<iq type='get' from='green@red.local/laptop' to='XCManager.red.local'
+	id='add1'>
+	<complexServiceMsgBean xmlns='http://societies.org/example/complexservice/schema'>
+		<complexBean>
+			<name>someName</name>
+			<value>someValue</value>
+			<subType>
+				<name>someOtherName</name>
+				<value>someOtherValue</value>
+			</subType>
+		</complexBean>
+		<method>doSomething</method>
+	</complexServiceMsgBean>
+</iq>
+
+#COMMUNITY MANAGEMENT SERVICE
+<iq type='get'
+    from='green@red.local/laptop'
+    to='XCManager.red.local'
+    id='who1'>
+    <community xmlns='http://societies.org/community'>
+	<who />
+    </community>
+</iq>

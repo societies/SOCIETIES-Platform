@@ -27,7 +27,7 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.UserPreferenceManagement.IUserPreferenceManagement;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceConditionIOutcomeName;
@@ -49,7 +49,7 @@ public class UserPreferenceManagement implements IUserPreferenceManagement{
 
 	@Override
 	public void deletePreference(EntityIdentifier ownerID, String serviceType,
-			ServiceResourceIdentifier serviceID, String preferenceName) {
+			IServiceResourceIdentifier serviceID, String preferenceName) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -63,7 +63,7 @@ public class UserPreferenceManagement implements IUserPreferenceManagement{
 
 	@Override
 	public IPreferenceTreeModel getModel(EntityIdentifier ownerID,
-			String serviceType, ServiceResourceIdentifier serviceID,
+			String serviceType, IServiceResourceIdentifier serviceID,
 			String preferenceName) {
 		// TODO Auto-generated method stub
 		return null;
@@ -78,7 +78,7 @@ public class UserPreferenceManagement implements IUserPreferenceManagement{
 
 	@Override
 	public IPreferenceOutcome getPreference(EntityIdentifier ownerID,
-			String serviceType, ServiceResourceIdentifier serviceID,
+			String serviceType, IServiceResourceIdentifier serviceID,
 			String preferenceName) {
 		// TODO Auto-generated method stub
 		return new PreferenceOutcome("volume", "0");
@@ -88,7 +88,7 @@ public class UserPreferenceManagement implements IUserPreferenceManagement{
 	@Override
 	public List<IPreferenceConditionIOutcomeName> getPreferenceConditions(
 			EntityIdentifier ownerID, String serviceType,
-			ServiceResourceIdentifier serviceID) {
+			IServiceResourceIdentifier serviceID) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -96,7 +96,7 @@ public class UserPreferenceManagement implements IUserPreferenceManagement{
 	@Override
 	public List<CtxAttributeIdentifier> getPreferenceConditions(
 			EntityIdentifier ownerID, String serviceType,
-			ServiceResourceIdentifier serviceID, String preferenceName) {
+			IServiceResourceIdentifier serviceID, String preferenceName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -111,14 +111,14 @@ public class UserPreferenceManagement implements IUserPreferenceManagement{
 	@Override
 	public IOutcome reEvaluatePreferences(EntityIdentifier ownerID,
 			CtxAttribute attr, String serviceType,
-			ServiceResourceIdentifier serviceID, String preferenceName) {
+			IServiceResourceIdentifier serviceID, String preferenceName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void updatePreference(EntityIdentifier ownerID, String serviceType,
-			ServiceResourceIdentifier serviceID, String preferenceName,
+			IServiceResourceIdentifier serviceID, String preferenceName,
 			IPreference preference) {
 		// TODO Auto-generated method stub
 		

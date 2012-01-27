@@ -13,20 +13,21 @@
 
 	<!-- groupId is set in parent pom -->
 	<groupId>org.societies.context-management</groupId>
-	<artifactId>CommunityContextSimilarityEvaluation</artifactId>
+	<artifactId>community-context-similarity</artifactId>
 	<version>${version.cm}</version>
 	<packaging>bundle</packaging>
 
 	<developers>
 		<developer>
-			<name>Nikos Kalatzis</name>
-			<email>nikosk@cn.ntua.gr</email>
-			<organization>ICCS</organization>
-			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<name>John McGovern</name>
+			<email>jmcgovern@tssg.org</email>
+			<organization>TSSG</organization>
+			<organizationUrl>http://www.tssg.org/</organizationUrl>
 			<roles>
-				<role>Senior Developer</role>
+				<role>owner</role>
+				<role>developer</role>
 			</roles>
-			<timezone>+2</timezone>
+			<timezone>+0</timezone>
 		</developer>
 	</developers>
 
@@ -71,4 +72,5 @@
 	
 		</plugins>
 	</build>	
+	<name>Community Context Similarity</name>
 </project>

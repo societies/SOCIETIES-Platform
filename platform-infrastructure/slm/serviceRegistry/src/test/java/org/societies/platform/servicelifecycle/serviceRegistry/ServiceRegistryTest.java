@@ -22,37 +22,51 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.platform.servicelifecycle.serviceRegistry;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Test;
+import org.societies.api.internal.servicelifecycle.model.Service;
+import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 
 /**
- * Describe your class here...
+ * 
  *
- * @author aleckey
+ * @author solutanet
  *
  */
-package org.societies.comm.examples.fortunecookiebean;
-
-/*
-If any method of your Bean returns a value, you will need to add a method for it 
-below. You can double up your return values if they are the same object type 
-
-In this case we will return a Bean version of the Cookie object
-*/
-
-public class FortuneCookieBeanResult {
-
-	private int id;
-	private String value;
-	
-	public int getId() {
-		return id;
+@ContextConfiguration(locations={"../../../../../META-INF/ServiceRegistryTest-context.xml"})
+public class ServiceRegistryTest  extends AbstractTransactionalJUnit4SpringContextTests   {
+@Autowired
+ServiceRegistry serReg;
+	@Test
+	public void testRegisterService(){
+		
+		List<Service> servicesList= new ArrayList<Service>();
+		Service tmpService;
+		try {
+			tmpService = new Service(new ServiceResourceIdentifier(new URI("testURI")), "cSSIDInstalled", "1.0", "serviceName", "serviceDescription", "authorSignature");
+		
+		servicesList.add(tmpService);
+		serReg.registerServiceList(servicesList);
+			
+		} catch (ServiceRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (URISyntaxException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		System.out.println("ok");
 	}
-	public void setId(int id) {
-		this.id = id;
-	}
-	public String getValue() {
-		return value;
-	}
-	public void setValue(String value) {
-		this.value = value;
-	}	
 }

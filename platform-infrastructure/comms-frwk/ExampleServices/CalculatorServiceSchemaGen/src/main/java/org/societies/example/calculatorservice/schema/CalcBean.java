@@ -23,13 +23,58 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.context.user.prediction;
-
 /**
- * This class is used to define a prediction method.
- * 
- * @author <a href="mailto:pkosmidi@central.ntua.gr">Pavlos Kosmides</a> (ICCS)
+ * Describe your class here...
+ *
+ * @author aleckey
+ *
  */
-public class PredictionMethod {
+package org.societies.example.calculatorservice.schema;
 
+/*
+  Based on the below interface, the task is to generate a Bean that will allow you to
+  query which method was called and what parameters were passed. Do not add the return type here.
+  This is added in the Result bean.
+ 
+  public interface ICalc 
+  {
+      public int Add(int a, int b);
+      public int Subtract(int a, int b);
+  }
+   
+generate XSD, run the maven command:
+> mvn jaxb2:schemagen
+
+The schema.xsd file will be in /target/generated-resources/schemagen directory
+
+ */
+
+public class CalcBean {
+	
+	public enum methodType {Add, Subtract, AddAsync};
+	private methodType method;
+	private int a;
+	private int b;
+	
+	public int getA() {
+		return a;
+	}
+	public void setA(int a) {
+		this.a = a;
+	}
+
+	public int getB() {
+		return b;
+	}
+	public void setB(int b) {
+		this.b = b;
+	}
+
+	public methodType getMethod() {
+		return method;
+	}
+	
+	public void setMethod(methodType method) {
+		this.method = method;
+	}
 }

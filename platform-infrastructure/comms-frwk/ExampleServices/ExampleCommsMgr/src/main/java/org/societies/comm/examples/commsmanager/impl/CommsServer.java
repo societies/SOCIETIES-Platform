@@ -43,6 +43,7 @@ import org.societies.comm.examples.calculator.ICalc;
 import org.societies.comm.examples.fortunecookie.api.IWisdom;
 import org.societies.comm.examples.fortunecookie.datatypes.Cookie;
 import org.societies.comm.xmpp.datatypes.Stanza;
+import org.societies.comm.xmpp.datatypes.XMPPError;
 import org.societies.comm.xmpp.exceptions.CommunicationException;
 import org.societies.comm.xmpp.interfaces.CommManager;
 import org.societies.comm.xmpp.interfaces.FeatureServer;
@@ -63,8 +64,8 @@ public class CommsServer implements FeatureServer {
 									  		"http://societies.org/example/fortunecookieservice/schema",
 									  		"http://societies.org/example/complexservice/schema"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
-							  Arrays.asList("org.societies.example.calculatorbean.schema",
-											"org.societies.example.fortunecookiebean.schema",
+							  Arrays.asList("org.societies.example.calculatorservice.schema",
+											"org.societies.example.fortunecookieservice.schema",
 											"org.societies.example.complexservice.schema"));
 	
 	//PRIVATE VARIABLES
@@ -116,8 +117,6 @@ public class CommsServer implements FeatureServer {
 		//REGISTER OUR ServiceManager WITH THE XMPP Communication Manager
 		try {
 			getCommManager().register(this); 
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
@@ -150,7 +149,7 @@ public class CommsServer implements FeatureServer {
 	/* Put your functionality here if there IS a return object
 	 */
 	@Override
-	public Object receiveQuery(Stanza stanza, Object payload) {
+	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
 		//CHECK WHICH END BUNDLE TO BE CALLED THAT I MANAGE
 		
 		// --------- CALCULATOR BUNDLE ---------
@@ -261,6 +260,15 @@ public class CommsServer implements FeatureServer {
 			}
 		}
 		//TODO: Better error handling, ie, if there is no match on the received Message Bean
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.FeatureServer#setQuery(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	 */
+	@Override
+	public Object setQuery(Stanza arg0, Object arg1) throws XMPPError {
+		// TODO Auto-generated method stub
 		return null;
 	}
 	

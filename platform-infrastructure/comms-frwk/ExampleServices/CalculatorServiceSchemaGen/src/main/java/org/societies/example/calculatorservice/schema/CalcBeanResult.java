@@ -29,55 +29,38 @@
  * @author aleckey
  *
  */
-package org.societies.comm.examples.calculatorbean;
+package org.societies.example.calculatorservice.schema;
 
 /*
-  Based on the below interface, the task is to generate a Bean that will allow you to
-  query which method was called and what parameters were passed. Do not add the return type here.
-  This is added in the Result bean.
- 
-  public interface ICalc 
-  {
-      public int Add(int a, int b);
-      public int Subtract(int a, int b);
-  }
-   
-1) generate XSD, run the maven command:
-> mvn jaxb2:schemagen  -f createXSDpom.xml
-The schema.xsd file will be in /target/generated-resources/schemagen directory
+If any method of your Bean returns a value, you will need to add a property for that
+value below. You can double up your return values if they are the same object type 
+eg, 
+The CalculatorBean returns an int for both the Add() and Subtract() method. We use the generic 
+int getResult() 
 
-2) Build the JAR using this new schema.xsd as the source (not the .java files).
-This will add the required XML notations and Object Factory
-> mvn install
+We don't need to add a method for each
+int getAddResult() 
+int getSubtractResult()
+*/
 
- */
+public class CalcBeanResult {
 
-public class CalcBean {
-	
-	public enum methodType {Add, Subtract, AddAsync};
-	private methodType method;
-	private int a;
-	private int b;
-	
-	public int getA() {
-		return a;
-	}
-	public void setA(int a) {
-		this.a = a;
-	}
+	private int result;
+	private String text;
 
-	public int getB() {
-		return b;
-	}
-	public void setB(int b) {
-		this.b = b;
-	}
-
-	public methodType getMethod() {
-		return method;
+	public int getResult() {
+		return result;
 	}
 	
-	public void setMethod(methodType method) {
-		this.method = method;
+	public void setResult(int result) {
+		this.result = result;
+	}
+	
+	public String getText() {
+		return text;
+	}
+
+	public void setText(String text) {
+		this.text = text;
 	}
 }

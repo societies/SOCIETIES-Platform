@@ -13,18 +13,19 @@
 
 	<!-- groupId is set in parent pom -->
 	<groupId>org.societies.context-management</groupId>
-	<artifactId>CommunityContextInheritance</artifactId>
+	<artifactId>community-context-iheritance</artifactId>
 	<version>${version.cm}</version>
 	<packaging>bundle</packaging>
 
 	<developers>
 		<developer>
-			<name>Nikos Kalatzis</name>
-			<email>nikosk@cn.ntua.gr</email>
-			<organization>ICCS</organization>
-			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<name>Giorgos Bouloudis</name>
+			<email>ybouloudis@amitec.gr</email>
+			<organization>Amitec</organization>
+			<organizationUrl>http://www.amitec.gr/</organizationUrl>
 			<roles>
-				<role>Senior Developer</role>
+				<role>owner</role>
+				<role>developer</role>
 			</roles>
 			<timezone>+2</timezone>
 		</developer>
@@ -87,4 +88,5 @@
 	
 		</plugins>
 	</build>	
+	<name>Community Context Iheritance</name>
 </project>
