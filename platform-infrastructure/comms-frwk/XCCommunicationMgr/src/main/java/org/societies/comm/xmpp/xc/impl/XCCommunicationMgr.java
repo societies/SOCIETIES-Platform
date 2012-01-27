@@ -2,14 +2,18 @@ package org.societies.comm.xmpp.xc.impl;
 
 
 import org.jivesoftware.whack.ExternalComponentManager;
-import org.societies.comm.xmpp.datatypes.Identity;
-import org.societies.comm.xmpp.datatypes.Identity.IdentityType;
-import org.societies.comm.xmpp.datatypes.Stanza;
-import org.societies.comm.xmpp.datatypes.XMPPNode;
-import org.societies.comm.xmpp.exceptions.CommunicationException;
-import org.societies.comm.xmpp.interfaces.CommCallback;
-import org.societies.comm.xmpp.interfaces.CommManager;
-import org.societies.comm.xmpp.interfaces.FeatureServer;
+import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.comm.xmpp.datatypes.IdentityType;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.datatypes.XMPPNode;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
+import org.societies.api.comm.xmpp.interfaces.IIdentityManager;
+import org.societies.comm.xmpp.datatypes.EndpointImpl;
+import org.societies.comm.xmpp.datatypes.IdentityImpl;
+import org.societies.comm.xmpp.interfaces.IdentityManager;
 import org.xmpp.component.AbstractComponent;
 import org.xmpp.component.ComponentException;
 import org.xmpp.packet.IQ;
@@ -17,7 +21,7 @@ import org.xmpp.packet.Message;
 import org.xmpp.packet.Message.Type;
 
 public class XCCommunicationMgr extends AbstractComponent implements
-		CommManager {
+		ICommManager {
 
 	private final CommManagerHelper helper;
 
@@ -26,6 +30,7 @@ public class XCCommunicationMgr extends AbstractComponent implements
 	private String secretKey;
 	private ExternalComponentManager manager;
 	private Identity thisIdentity;
+	private IdentityManager idm;
 
 	public XCCommunicationMgr(String host, String subDomain,
 			String secretKey) {
@@ -48,7 +53,8 @@ public class XCCommunicationMgr extends AbstractComponent implements
 			e.printStackTrace();
 		}
 		
-		thisIdentity = new Identity(IdentityType.CSS,subDomain,host); // TODO CIS
+		idm = new IdentityManager();
+		thisIdentity = idm.fromJid(subDomain);
 	}
 
 	/*
@@ -73,19 +79,23 @@ public class XCCommunicationMgr extends AbstractComponent implements
 	
 	@Override
 	protected IQ handleDiscoItems(IQ iq) {
-		return helper.handleDiscoItems(iq);
+		IQ response = helper.handleDiscoItems(iq);
+		response.setFrom(thisIdentity.getJid());
+		return response;
 	}
 
 	@Override
 	protected IQ handleIQGet(IQ iq) {
-		log.debug("IQ Received");
+		log.info("IQ Received: "+iq.toXML());
 		IQ response = helper.dispatchIQ(iq);
+		response.setFrom(thisIdentity.getJid());
+		log.info("sending iq response: "+response.toXML());
 		return response;
 	}
 
 	@Override
 	protected IQ handleIQSet(IQ iq) throws Exception {
-		return handleIQGet(iq);
+		return handleIQGet(iq); // TODO
 	}
 
 	@Override
@@ -110,12 +120,12 @@ public class XCCommunicationMgr extends AbstractComponent implements
 
 	// TODO test thread.getclassloader and Async
 	@Override
-	public void register(FeatureServer fs) throws CommunicationException {
+	public void register(IFeatureServer fs) throws CommunicationException {
 		helper.register(fs);
 	}
 	
 	@Override
-	public void register(CommCallback messageCallback) throws CommunicationException {
+	public void register(ICommCallback messageCallback) throws CommunicationException {
 		helper.register(messageCallback);
 	}
 
@@ -137,7 +147,7 @@ public class XCCommunicationMgr extends AbstractComponent implements
 	}
 
 	@Override
-	public void sendIQGet(Stanza stanza, Object payload, CommCallback callback)
+	public void sendIQGet(Stanza stanza, Object payload, ICommCallback callback)
 			throws CommunicationException {
 		stanza.setFrom(thisIdentity);
 		IQ iq = helper.sendIQ(stanza, IQ.Type.get, payload, callback);
@@ -145,7 +155,7 @@ public class XCCommunicationMgr extends AbstractComponent implements
 	}
 
 	@Override
-	public void sendIQSet(Stanza stanza, Object payload, CommCallback callback)
+	public void sendIQSet(Stanza stanza, Object payload, ICommCallback callback)
 			throws CommunicationException {
 		stanza.setFrom(thisIdentity);
 		IQ iq = helper.sendIQ(stanza, IQ.Type.set, payload, callback);
@@ -163,13 +173,13 @@ public class XCCommunicationMgr extends AbstractComponent implements
 	}
 
 	@Override
-	public void getInfo(Identity entity, String node, CommCallback callback)  throws CommunicationException {
+	public void getInfo(Identity entity, String node, ICommCallback callback)  throws CommunicationException {
 		IQ iq = helper.buildInfoIq(entity, node, callback);
 		this.send(iq);
 	}
 
 	@Override
-	public void getItems(Identity entity, String node, CommCallback callback)  throws CommunicationException {
+	public void getItems(Identity entity, String node, ICommCallback callback)  throws CommunicationException {
 		IQ iq = helper.buildItemsIq(entity, node, callback);
 		this.send(iq);
 	}
@@ -177,6 +187,11 @@ public class XCCommunicationMgr extends AbstractComponent implements
 	@Override
 	public Identity getIdentity() {
 		return thisIdentity;
+	}
+
+	@Override
+	public IIdentityManager getIdManager() {
+		return idm;
 	}
 
 

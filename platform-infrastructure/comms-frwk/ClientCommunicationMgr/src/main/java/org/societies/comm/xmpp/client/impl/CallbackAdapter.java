@@ -1,6 +1,6 @@
 package org.societies.comm.xmpp.client.impl;
 
-import org.societies.comm.xmpp.interfaces.CommCallback;
+import org.societies.comm.xmpp.interfaces.ICommCallback;
 import org.societies.interfaces.Callback;
 
 import android.content.Context;
@@ -8,11 +8,11 @@ import android.content.ServiceConnection;
 
 public class CallbackAdapter implements Callback {
 	
-	private CommCallback callback;
+	private ICommCallback callback;
 	private Context context;
 	private ServiceConnection service;
 	
-	public CallbackAdapter(CommCallback callback, Context context, ServiceConnection service) {
+	public CallbackAdapter(ICommCallback callback, Context context, ServiceConnection service) {
 		this.callback = callback;
 		this.context = context;
 		this.service = service;

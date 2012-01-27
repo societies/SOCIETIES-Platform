@@ -27,6 +27,14 @@
     <dependencies>
     	<!-- Interface -->
     	<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+    	
+    	<!-- Commons -->
+    	<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>CommunicationFrameworkCommons</artifactId>
 			<version>0.0.1-SNAPSHOT</version>

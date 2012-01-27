@@ -12,9 +12,9 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.societies.comms.xmpp.pubsub</groupId>
-    <artifactId>PubsubServiceBundle</artifactId>
+    <artifactId>PubsubClientBundle</artifactId>
     <packaging>bundle</packaging>
-    <name>Pubsub Service Bundle</name>
+    <name>Pubsub Client Bundle</name>
     <version>0.0.1-SNAPSHOT</version>
 
     <properties>
@@ -32,7 +32,6 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
     	<dependency>
 			<groupId>jabber.x.data</groupId>
 			<artifactId>DataFormsXep</artifactId>
@@ -45,7 +44,6 @@
 			<version>0.0.1</version>
 			<scope>compile</scope>
 		</dependency>
-		
 		
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -109,7 +107,7 @@
 							*;resolution:=optional
     					</Import-Package>
     					<Export-Package>
-    						org.societies.comms.xmpp.pubsub,
+    						org.societies.comm.xmpp.pubsub,
 		           			jabber.x.data,
 							org.jabber.protocol.pubsub,
 							org.jabber.protocol.pubsub.errors,

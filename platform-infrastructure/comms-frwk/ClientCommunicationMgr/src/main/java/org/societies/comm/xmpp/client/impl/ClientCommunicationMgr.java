@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.comm.xmpp.datatypes.Stanza;
 import org.societies.comm.xmpp.exceptions.CommunicationException;
-import org.societies.comm.xmpp.interfaces.CommCallback;
+import org.societies.comm.xmpp.interfaces.ICommCallback;
 import org.societies.interfaces.XMPPAgent;
 import org.societies.ipc.Stub;
 import org.xmpp.packet.IQ;
@@ -40,7 +40,7 @@ public class ClientCommunicationMgr {
 	
 	private SAXReader reader = new SAXReader();
 	private Context androidContext;
-	private Map<String, CommCallback> callbacks = new HashMap<String, CommCallback>();
+	private Map<String, ICommCallback> callbacks = new HashMap<String, ICommCallback>();
 	
 	public ClientCommunicationMgr(Context androidContext) {
 		this.androidContext = androidContext;
@@ -80,7 +80,7 @@ public class ClientCommunicationMgr {
 	}	
 	
 	public void sendIQ(Stanza stanza, IQ.Type type, Object payload,
-			CommCallback callback) throws CommunicationException {
+			ICommCallback callback) throws CommunicationException {
 		try {
 			JAXBContext jc = JAXBContext.newInstance(payload.getClass().getPackage().getName()); // TODO Need to register all packages?		
 			Marshaller m = jc.createMarshaller();	
@@ -122,7 +122,7 @@ public class ClientCommunicationMgr {
 		bindService(connection);
 	}
 	
-	private void sendIQ(final String id, final String xml, final CommCallback callback) {
+	private void sendIQ(final String id, final String xml, final ICommCallback callback) {
 		ServiceConnection connection = new ServiceConnection() {
 
 			@Override
