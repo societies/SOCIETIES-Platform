@@ -29,7 +29,7 @@ import java.util.Date;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.context.api.user.prediction.IUserCtxPredictionMgr;
-import org.societies.api.internal.context.user.prediction.PredictionMethod;
+import org.societies.context.api.user.prediction.PredictionMethod;
 
 
 
