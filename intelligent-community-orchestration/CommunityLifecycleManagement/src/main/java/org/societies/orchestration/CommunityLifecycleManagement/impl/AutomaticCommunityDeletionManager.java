@@ -147,7 +147,7 @@ public class AutomaticCommunityDeletionManager {
 	public void identifyCissToDelete() {
 		CisRecord[] records;
 		if (linkedCss != null) {
-			records = cisManager.getCisList(new CisRecord(null, linkedCss.toString(), null, null, null, null, null, null)/** CISs administrated by the CSS */);
+			//records = cisManager.getCisList(new CisRecord(null, linkedCss.toString(), null, null, null, null, null, null)/** CISs administrated by the CSS */);
 		}
 		if (linkedCis != null) {
 			//CisRecord james = new CisRecord();
@@ -156,7 +156,7 @@ public class AutomaticCommunityDeletionManager {
 			//CisRecord[] records = ICisManager.getCisList(/** This CIS */new CisRecord());
 		}
 		if (linkedDomain != null) {
-			records = cisManager.getCisList(new CisRecord(null, linkedDomain.toString(), null, null, null, null, null, null));
+			//records = cisManager.getCisList(new CisRecord(null, linkedDomain.toString(), null, null, null, null, null, null));
 			//CisRecord[] records = ICisManager.getCisList(/** CISs in the domain */);
 		}
 		

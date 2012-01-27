@@ -24,10 +24,14 @@
  */
 package org.societies.comm.examples.commsmanager.impl;
 
+import java.util.List;
 import java.util.concurrent.Future;
 
 import org.societies.comm.xmpp.datatypes.Identity;
 import org.societies.comm.xmpp.datatypes.Stanza;
+import org.societies.comm.xmpp.datatypes.XMPPError;
+import org.societies.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.comm.xmpp.datatypes.XMPPNode;
 import org.societies.comm.xmpp.interfaces.CommCallback;
 import org.societies.example.calculatorservice.schema.CalcBeanResult;
 import org.societies.example.fortunecookieservice.schema.FortuneCookieBeanResult;
@@ -56,14 +60,6 @@ public class CommsClientCallback implements CommCallback{
 	public CommsClientCallback(Future<?> returnObj) {
 		this.returnObj = returnObj;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveError(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
-	 */
-	@Override
-	public void receiveError(Stanza arg0, Object arg1) {
-		
-	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveResult(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
@@ -86,6 +82,60 @@ public class CommsClientCallback implements CommCallback{
 			FortuneCookieBeanResult fcBeanResult = (FortuneCookieBeanResult) msgBean;
 			//return the fcBeanResult to the calling client
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#getJavaPackages()
+	 */
+	@Override
+	public List<String> getJavaPackages() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#getXMLNamespaces()
+	 */
+	@Override
+	public List<String> getXMLNamespaces() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveError(org.societies.comm.xmpp.datatypes.Stanza, org.societies.comm.xmpp.datatypes.XMPPError)
+	 */
+	@Override
+	public void receiveError(Stanza returnStanza, XMPPError info) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveInfo(org.societies.comm.xmpp.datatypes.Stanza, java.lang.String, org.societies.comm.xmpp.datatypes.XMPPInfo)
+	 */
+	@Override
+	public void receiveInfo(Stanza returnStanza, String node, XMPPInfo info) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveItems(org.societies.comm.xmpp.datatypes.Stanza, java.lang.String, java.util.List)
+	 */
+	@Override
+	public void receiveItems(Stanza returnStanza, String node, List<XMPPNode> info) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveMessage(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	 */
+	@Override
+	public void receiveMessage(Stanza returnStanza, Object messageBean) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 

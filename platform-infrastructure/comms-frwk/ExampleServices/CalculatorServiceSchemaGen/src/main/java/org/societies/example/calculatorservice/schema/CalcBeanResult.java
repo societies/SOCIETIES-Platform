@@ -29,7 +29,7 @@
  * @author aleckey
  *
  */
-package org.societies.comm.examples.calculatorbean;
+package org.societies.example.calculatorservice.schema;
 
 /*
 If any method of your Bean returns a value, you will need to add a property for that

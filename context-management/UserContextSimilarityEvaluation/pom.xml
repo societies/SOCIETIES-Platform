@@ -13,7 +13,7 @@
 
 	<!-- groupId is set in parent pom -->
 	<groupId>org.societies.context-management</groupId>
-	<artifactId>UserContextSimilarityEvaluation</artifactId>
+	<artifactId>user-context-similarity</artifactId>
 	<version>${version.cm}</version>
 	<packaging>bundle</packaging>
 

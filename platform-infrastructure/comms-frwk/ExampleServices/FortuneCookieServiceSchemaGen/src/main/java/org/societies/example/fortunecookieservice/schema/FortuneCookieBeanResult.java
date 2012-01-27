@@ -23,52 +23,36 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.orchestration.CommunityLifecycleManagement.test;
-
-//import org.societies.context.broker.api.IUserCtxBroker;
-//import org.societies.context.broker.api.ICommunityCtxBroker;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityLifecycleManagement;
-import org.societies.api.context.model.CtxEntityIdentifier;
-//import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.internal.cis.cis_management.CisRecord;
-import org.societies.api.mock.EntityIdentifier;
-
 /**
- * This is the test class for the Community Lifecycle Management component
- * 
- * @author Fraser Blackmun
- * @version 0
- * 
+ * Describe your class here...
+ *
+ * @author aleckey
+ *
  */
+package org.societies.example.fortunecookieservice.schema;
 
-public class CommunityLifecycleManagementTest {
+/*
+If any method of your Bean returns a value, you will need to add a method for it 
+below. You can double up your return values if they are the same object type 
+
+In this case we will return a Bean version of the Cookie object
+*/
+
+public class FortuneCookieBeanResult {
+
+	private int id;
+	private String value;
 	
-	private CommunityLifecycleManagement communityLifecycleManagement;
-	//@Test
-	//public void testLoop() {
-	//	CommunityLifecycleManagement.loop();
-	//}
-	
-	@Test
-	public void testSetup() {
-		communityLifecycleManagement = new CommunityLifecycleManagement(new EntityIdentifier(), "CSS");
-		communityLifecycleManagement = new CommunityLifecycleManagement(new EntityIdentifier(), "Domain");
-		//communityLifecycleManagement = new CommunityLifecycleManagement(new CisRecord(null, null, null, null, null, null, null, null));
+	public int getId() {
+		return id;
 	}
-	
-	@Test
-	public void testProcessPreviousShortTimeCycle() {
-		//new CommunityLifecycleManagement(new EntityIdentifier(), "Test").processPreviousShortTimeCycle();
+	public void setId(int id) {
+		this.id = id;
 	}
-	
-	@Test
-	public void testProcessPreviousLongTimeCycle() {
-		//new CommunityLifecycleManagement(new EntityIdentifier(), "Test").processPreviousLongTimeCycle();
+	public String getValue() {
+		return value;
 	}
-	
+	public void setValue(String value) {
+		this.value = value;
+	}	
 }

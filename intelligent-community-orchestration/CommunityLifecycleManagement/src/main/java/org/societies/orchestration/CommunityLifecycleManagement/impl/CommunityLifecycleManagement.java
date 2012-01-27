@@ -90,25 +90,25 @@ public class CommunityLifecycleManagement {
 	 * User Interface method - trigger creation of CIS following UI request
 	 */
 	
-	public void createCiss() {
+	//public void createCiss() {
 		
-	}
+	//}
 	
 	/**
 	 * User Interface method - trigger configuration of CIS following UI request.
 	 */
 	
-	public void configureCiss() {
+	//public void configureCiss() {
 		
-	}
+	//}
 	
 	/**
 	 * User Interface method - trigger deletion of CIS following UI request.
 	 */
 	
-	public void deleteCiss() {
+	//public void deleteCiss() {
 		
-	}
+	//}
 	
 	public void processPreviousLongTimeCycle() {
 		autoCreationManager.identifyCissToCreate("extensive");
@@ -167,7 +167,18 @@ public class CommunityLifecycleManagement {
 	}
     
     public void intialiseCommunityLifecycleManagement() {
-    	
+    	if (linkedCss != null) {
+    		new CommunityLifecycleManagement(linkedCss, "CSS");
+    		loop();
+    	}
+    	else if (linkedCis != null) {
+    		new CommunityLifecycleManagement(linkedCis);
+    		loop();
+    	}
+    	else if (linkedDomain != null) {
+    		new CommunityLifecycleManagement(linkedCss, "Domain");
+    		loop();
+    	}
     }
     
     public EntityIdentifier getLinkedCss() {

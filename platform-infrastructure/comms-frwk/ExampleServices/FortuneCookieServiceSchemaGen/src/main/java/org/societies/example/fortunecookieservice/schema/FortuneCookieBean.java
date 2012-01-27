@@ -29,7 +29,7 @@
  * @author aleckey
  *
  */
-package org.societies.comm.examples.fortunecookiebean;
+package org.societies.example.fortunecookieservice.schema;
 
 /*
   Based on the below interface, the task is to generate a Bean that will allow you to
@@ -42,7 +42,7 @@ package org.societies.comm.examples.fortunecookiebean;
   }
    
 to generate XSD, run the maven command:
-> mvn jaxb2:schemagen -f createXSDpom.xml
+> mvn jaxb2:schemagen
 
 The schema.xsd file will be in /target/generated-resources/schemagen directory
  *

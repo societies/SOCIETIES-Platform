@@ -77,7 +77,7 @@ public class AutomaticCommunityDeletionManagerTest {
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
     	
 		//create CIS for James, with last activity being 1 year ago
-		CisRecord jamesCis = cisManager.createCis("James", "James CIS");
+		//CisRecord jamesCis = cisManager.createCis("James", "James CIS");
 		
     	autoCommunityDeletionManager = new AutomaticCommunityDeletionManager(ownerId, "CSS");
 		
