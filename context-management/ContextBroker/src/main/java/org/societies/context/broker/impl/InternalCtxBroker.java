@@ -49,7 +49,7 @@ import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgrCallback;
 import org.societies.context.api.user.history.IUserCtxHistoryCallback;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
-import org.societies.api.internal.context.user.prediction.PredictionMethod;
+
 
 
 /**

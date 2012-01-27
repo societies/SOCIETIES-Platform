@@ -53,15 +53,15 @@ import org.dom4j.Namespace;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.comm.xmpp.datatypes.Identity;
-import org.societies.comm.xmpp.datatypes.HostedNode;
-import org.societies.comm.xmpp.datatypes.Stanza;
-import org.societies.comm.xmpp.datatypes.XMPPError;
-import org.societies.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.comm.xmpp.datatypes.XMPPNode;
-import org.societies.comm.xmpp.exceptions.CommunicationException;
-import org.societies.comm.xmpp.interfaces.CommCallback;
-import org.societies.comm.xmpp.interfaces.FeatureServer;
+import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.comm.xmpp.datatypes.HostedNode;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.api.comm.xmpp.datatypes.XMPPNode;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.xml.sax.InputSource;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.IQ.Type;
@@ -102,8 +102,8 @@ public class CommManagerHelper {
 			.getLogger(CommManagerHelper.class);
 	private SAXReader reader = new SAXReader();
 
-	private final Map<String, FeatureServer> featureServers = new HashMap<String, FeatureServer>();
-	private final Map<String, CommCallback> commCallbacks = new HashMap<String, CommCallback>();
+	private final Map<String, IFeatureServer> featureServers = new HashMap<String, IFeatureServer>();
+	private final Map<String, ICommCallback> commCallbacks = new HashMap<String, ICommCallback>();
 	private final Map<String, Unmarshaller> nsToUnmarshaller = new HashMap<String, Unmarshaller>();
 	private final Map<String, Marshaller> pkgToMarshaller = new HashMap<String, Marshaller>();
 	private final Map<String, Marshaller> nsToMarshaller = new HashMap<String, Marshaller>();
@@ -216,15 +216,15 @@ public class CommManagerHelper {
 			return namespace;
 	}
 
-	private FeatureServer getFeatureServer(String namespace)
+	private IFeatureServer getFeatureServer(String namespace)
 			throws UnavailableException {
-		return (FeatureServer) ifNotNull(featureServers.get(removeFragment(namespace)),
+		return (IFeatureServer) ifNotNull(featureServers.get(removeFragment(namespace)),
 				"namespace", namespace);
 	}
 
-	private CommCallback getCommCallback(String namespace)
+	private ICommCallback getCommCallback(String namespace)
 			throws UnavailableException {
-		return (CommCallback) ifNotNull(commCallbacks.get(removeFragment(namespace)),
+		return (ICommCallback) ifNotNull(commCallbacks.get(removeFragment(namespace)),
 				"namespace", namespace);
 	}
 
@@ -245,10 +245,11 @@ public class CommManagerHelper {
 	}
 
 	public void dispatchIQResult(IQ iq) {
+		LOG.info("result got with id "+iq.getID());
 		Element element = getElementAny(iq);
 		try {
-			CommCallback callback = getCommCallback(iq.getID());
-			String ns = element.getNamespace().toString();
+			ICommCallback callback = getCommCallback(iq.getID());
+			String ns = element.getNamespace().getURI();
 			if (ns.equals(XMPPInfo.INFO_NAMESPACE)) {
 				Map<String, XMPPInfo> infoMap = ParsingUtils.parseInfoResult(new InputSource(new StringReader(element
 						.asXML())));
@@ -263,6 +264,8 @@ public class CommManagerHelper {
 				callback.receiveItems(TinderUtils.stanzaFromPacket(iq), node, nodeMap.get(node));
 				return;
 			}
+			LOG.info("not disco... callback is "+callback);
+			LOG.info("ns="+ns+" nsToUnmarshaller.keySet()="+Arrays.toString(nsToUnmarshaller.keySet().toArray()));
 			Unmarshaller u = getUnmarshaller(ns);
 			Object bean = u.unmarshal(new InputSource(new StringReader(element
 					.asXML())));
@@ -276,7 +279,7 @@ public class CommManagerHelper {
 
 	public void dispatchIQError(IQ iq) {
 		try {
-			CommCallback callback = getCommCallback(iq.getID());
+			ICommCallback callback = getCommCallback(iq.getID());
 			LOG.warn("dispatchIQError: XMPP ERROR!");
 			callback.receiveError(TinderUtils.stanzaFromPacket(iq),null); // TODO parse error
 		} catch (UnavailableException e) {
@@ -288,10 +291,11 @@ public class CommManagerHelper {
 		Element element = getElementAny(iq);
 		String namespace = element.getNamespace().getURI();
 		JID originalFrom = iq.getFrom();
+		LOG.info("iq.getFrom().toString()="+iq.getFrom().toString());
 		String id = iq.getID();
 
 		try {
-			FeatureServer fs = getFeatureServer(namespace);
+			IFeatureServer fs = getFeatureServer(namespace);
 			Unmarshaller u = getUnmarshaller(namespace);
 			Object bean = u.unmarshal(new InputSource(new StringReader(element
 					.asXML())));
@@ -327,9 +331,9 @@ public class CommManagerHelper {
 	public void dispatchMessage(Message message) {
 		Element element = getElementAny(message);
 		try {
-			CommCallback cb = getCommCallback(element.getNamespace()
-					.toString());
-			Unmarshaller u = getUnmarshaller(element.getNamespace().toString());
+			ICommCallback cb = getCommCallback(element.getNamespace()
+					.getURI());
+			Unmarshaller u = getUnmarshaller(element.getNamespace().getURI());
 			Object bean = u.unmarshal(new InputSource(new StringReader(element
 					.asXML())));
 			cb.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
@@ -343,7 +347,7 @@ public class CommManagerHelper {
 	}
 
 	public synchronized IQ sendIQ(Stanza stanza, IQ.Type type, Object payload,
-			CommCallback callback) throws CommunicationException {
+			ICommCallback callback) throws CommunicationException {
 		// Usual disclaimer about how this needs to be optimized ;)
 		try {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -381,7 +385,7 @@ public class CommManagerHelper {
 		}
 	}
 
-	public void register(FeatureServer fs) throws CommunicationException {
+	public void register(IFeatureServer fs) throws CommunicationException {
 		jaxbMapping(fs.getXMLNamespaces(),fs.getJavaPackages());
 		for (String ns : fs.getXMLNamespaces()) {
 			LOG.info("registering FeatureServer for namespace " + ns);
@@ -389,7 +393,7 @@ public class CommManagerHelper {
 		}
 	}
 	
-	public void register(CommCallback messageCallback) throws CommunicationException {
+	public void register(ICommCallback messageCallback) throws CommunicationException {
 		jaxbMapping(messageCallback.getXMLNamespaces(), messageCallback.getJavaPackages());
 		for (String ns : messageCallback.getXMLNamespaces()) {
 			LOG.info("registering CommCallback for namespace" + ns);
@@ -439,7 +443,7 @@ public class CommManagerHelper {
 			// part
 			Message message = (Message) p;
 			for (Object o : message.getElement().elements()) {
-				Namespace ns = ((Element) o).getNamespace();
+				String ns = ((Element)o).getNamespace().getURI();
 				if (!(ns.equals(JABBER_CLIENT) || ns.equals(JABBER_SERVER))) {
 					return (Element) o;
 				}
@@ -521,7 +525,7 @@ public class CommManagerHelper {
 		}
 	}
 
-	public IQ buildInfoIq(Identity entity, String node, CommCallback callback) throws CommunicationException {
+	public IQ buildInfoIq(Identity entity, String node, ICommCallback callback) throws CommunicationException {
 		IQ infoIq = new IQ(Type.get);
 		infoIq.setTo(entity.getJid());
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -539,7 +543,7 @@ public class CommManagerHelper {
 		return infoIq;
 	}
 
-	public IQ buildItemsIq(Identity entity, String node, CommCallback callback) throws CommunicationException {
+	public IQ buildItemsIq(Identity entity, String node, ICommCallback callback) throws CommunicationException {
 		IQ itemsIq = new IQ(Type.get);
 		itemsIq.setTo(entity.getJid());
 		ByteArrayOutputStream os = new ByteArrayOutputStream();

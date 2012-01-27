@@ -3,8 +3,8 @@ package org.societies.comm.xmpp.xc.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.societies.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.comm.xmpp.datatypes.XMPPNode;
+import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.api.comm.xmpp.datatypes.XMPPNode;
 import org.xml.sax.InputSource;
 
 public class ParsingUtils {
