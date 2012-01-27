@@ -23,7 +23,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.cis.management.cis_editor.impl;
+package org.societies.cis.editor;
 
 import java.util.HashSet;
 
@@ -33,7 +33,6 @@ import java.util.Set;
 import org.societies.api.internal.cis.cis_management.CisActivityFeed;
 import org.societies.api.internal.cis.cis_management.CisRecord;
 import org.societies.api.internal.cis.cis_management.ServiceSharingRecord;
-import org.societies.cis.management.cis_editor.ICisEditor;
 
 public class CisEditor implements ICisEditor {
 

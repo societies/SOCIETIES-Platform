@@ -23,48 +23,9 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.cssmgmt.couldnode.css_manager_cloud.impl;
+package org.societies.cis.editor;
 
+public interface ICisEditor {
 
-
-
-import org.societies.api.internal.cis.cis_management.CisRecord;
-import org.societies.cssmgmt.couldnode.css_manager_cloud.ICssManagerCloud;
-import org.societies.cis.management.cis_manager.impl.CisManager;
-
-
-public class CssManagerCloud implements ICssManagerCloud {
-
-	private CisManager cisManager; //all of its CISs
-	private String username;
-	private String domainAuthority;
-
-	public CssManagerCloud(String username, String domainAuthority) {
-		
-		// TODO? do we register the user here with the domain authority?
-		this.domainAuthority = domainAuthority;
-		this.username = username;
-		cisManager = new CisManager();
-	}
-	
-	public CisRecord createCIS(String cisName) {	
-		
-		return cisManager.createCis(this.username, cisName);
-		 
-	}
-
-
-	
-
-	/*public CisRecord cisRecord;
-	public CisActivityFeed cisActivityFeed;
-	public List<ServiceSharingRecord> sharedServices; 
-//	public CommunityManagement commMgmt;
-	
-
-	// constructor for creating a CIS from scratch	
-	public CisEditor(String ownerCss,
-			String membershipCriteria, String permaLink, String[] membersCss,
-			String password) */
 
 }

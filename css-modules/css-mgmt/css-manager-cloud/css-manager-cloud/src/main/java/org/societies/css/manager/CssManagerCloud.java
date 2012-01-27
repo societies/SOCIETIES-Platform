@@ -23,14 +23,48 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+package org.societies.css.manager;
 
-package org.societies.cssmgmt.couldnode.css_manager_cloud;
+
+
 
 import org.societies.api.internal.cis.cis_management.CisRecord;
+import org.societies.api.internal.css.ICssManagerCloud;
+import org.societies.cis.manager.CisManager;
 
-public interface ICssManagerCloud {
+
+public class CssManagerCloud implements ICssManagerCloud {
+
+	private CisManager cisManager; //all of its CISs
+	private String username;
+	private String domainAuthority;
+
+	public CssManagerCloud(String username, String domainAuthority) {
+		
+		// TODO? do we register the user here with the domain authority?
+		this.domainAuthority = domainAuthority;
+		this.username = username;
+		cisManager = new CisManager();
+	}
+	
+	public CisRecord createCIS(String cisName) {	
+		
+		return cisManager.createCis(this.username, cisName);
+		 
+	}
+
 
 	
-	public CisRecord createCIS(String cisName);
+
+	/*public CisRecord cisRecord;
+	public CisActivityFeed cisActivityFeed;
+	public List<ServiceSharingRecord> sharedServices; 
+//	public CommunityManagement commMgmt;
+	
+
+	// constructor for creating a CIS from scratch	
+	public CisEditor(String ownerCss,
+			String membershipCriteria, String permaLink, String[] membersCss,
+			String password) */
 
 }

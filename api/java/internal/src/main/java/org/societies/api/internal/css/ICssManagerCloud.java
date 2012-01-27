@@ -24,71 +24,13 @@
  */
 
 
-package org.societies.cis.management.cis_manager.impl;
+package org.societies.api.internal.css;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.societies.api.internal.cis.cis_management.CisActivityFeed;
 import org.societies.api.internal.cis.cis_management.CisRecord;
-import org.societies.api.internal.cis.cis_management.ICisManager;
-import org.societies.cis.management.cis_editor.impl.CisEditor;
 
-// this is the class which manages all the CIS from a CSS
-// for the class responsible for editing and managing each CIS instance, consult the CISEditor
-
-
-public class CisManager implements ICisManager {
-
-	public Set<CisEditor> CISs; 
-	
-
-	public CisManager() {
-		CISs = new HashSet<CisEditor>();
-	}
+public interface ICssManagerCloud {
 
 	
-	// TODO: review this constructor in the future
-	@Override
-	public CisRecord createCis(String cssId, String cisId) {
-		// check if ccs already exist
-		CisEditor cis = new CisEditor(cssId, cisId);
-		if (CISs.add(cis))
-			return cis.cisRecord;
-		else
-			return null;
-	}
-
-	@Override
-	public Boolean deleteCis(String cssId, String cisId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Boolean updateCis(String cssId, CisRecord newCis, String oldCisId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CisRecord getCis(String cssId, String cisId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CisRecord[] getCisList(CisRecord query) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CisActivityFeed getActivityFeed(String cssId, String cisId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
+	public CisRecord createCIS(String cisName);
 
 }
