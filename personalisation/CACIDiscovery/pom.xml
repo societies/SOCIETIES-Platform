@@ -11,9 +11,9 @@
 	</parent>
 	<!-- groupId is set in parent pom -->
 	<groupId>org.societies.personalisation</groupId>
-	<artifactId>CAUIDiscovery</artifactId>
+	<artifactId>CACIDiscovery</artifactId>
 	<version>${version.pm}</version>
-	<name>Ctx Aware User Intent Discovery</name>
+	<name>Ctx Aware Community Intent Discovery</name>
 	<packaging>bundle</packaging>
 
 	<developers>
@@ -134,5 +134,5 @@
 	</build>
 
 
-	<description>This component performs learning algorithms on user histories in order to extract a community intent model.</description>
+	<description>This component performs learning algorithms on community histories in order to extract a community intent model.</description>
 </project>

@@ -17,8 +17,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.CAUI.api.CAUIPrediction;
-
+package org.societies.personalisation.CAUIPrediction.impl;
 
 import java.util.List;
 
@@ -26,59 +25,52 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.model.UserIntentAction;
 
-
 /**
- * @since 0.0.1
- * @author nikosk(ICCS)
- * @version 1.0
- * @created 15-Nov-2011 1:42:10 PM
+ * CAUIPrediction
+ * 
+ * @author nikosk
+ * @created 12-Jan-2012 7:15:15 PM
  */
+public class CAUIPrediction implements ICAUIPrediction{
 
-public interface ICAUIPrediction {
-
-	/**
-	 * 
-	 * @param bool
-	 */
-	public void enablePrediction(Boolean bool);
-
-	/**
-	 * Allows any service to request a context-based evaluated preference outcome.
-	 *  
-	 * @param requestor    the DigitalIdentity of the service requesting the outcome
-	 * @param ownerID    the DigitalIdentity of the owner of the preferences (i.e. the
-	 * user of this service)
-	 * @param serviceID    the service identifier of the service requesting the
-	 * outcome
-	 * @param preferenceName    the name of the preference requested
-	 * @return					the outcome in the form of an IAction object
-	 */
-	public UserIntentAction getCurrentIntentAction(EntityIdentifier requestor, EntityIdentifier ownerID, IServiceResourceIdentifier serviceID, String preferenceName);
-
-	
-	/**
-	 * Predicts next action based on the last performed action
-	 * 
-	 * @param ctxAttribute
-	 */
-	public UserIntentAction getPrediction(EntityIdentifier requestor, CtxAttribute ctxAttribute);
-
-	/**
-	 * Predicts next action based on the last performed action
-	 * 
-	 * @param requestor
-	 * @param action
-	 * @return predicted action 
-	 */
-	public UserIntentAction getPrediction(EntityIdentifier requestor, IAction action); 
+	@Override
+	public void enablePrediction(Boolean bool) {
+		// TODO Auto-generated method stub
 		
-	/**
-	 * Returns a list with the performed predictions.
-	 * 
-	 */
+	}
+
+	@Override
+	public UserIntentAction getCurrentIntentAction(EntityIdentifier requestor,
+			EntityIdentifier ownerID, IServiceResourceIdentifier serviceID,
+			String preferenceName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public UserIntentAction getPrediction(EntityIdentifier requestor,
+			CtxAttribute ctxAttribute) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public UserIntentAction getPrediction(EntityIdentifier requestor,
+			IAction action) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<List<String>> getPredictionHistory() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
-	public List<List<String>> getPredictionHistory();
-	
+
+
 }

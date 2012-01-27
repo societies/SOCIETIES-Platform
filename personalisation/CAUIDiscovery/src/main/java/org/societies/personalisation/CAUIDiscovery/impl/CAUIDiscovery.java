@@ -6,7 +6,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 	@Override
 	public void generateNewUserModel() {
-		// TODO Auto-generated method stub
+	
 		
 	}
 

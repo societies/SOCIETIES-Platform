@@ -30,7 +30,8 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.TaskModelData;
 import org.societies.personalisation.CAUI.api.model.UIModelObjectNumberGenerator;
@@ -93,7 +94,7 @@ public class CAUITaskManager  implements ICAUITaskManager{
 
 	@Override
 	public UserIntentAction getCurrentIntentAction(EntityIdentifier arg0,
-			EntityIdentifier arg1, ServiceResourceIdentifier arg2, String arg3) {
+			EntityIdentifier arg1, IServiceResourceIdentifier arg2, String arg3) {
 		// TODO Auto-generated method stub
 		return null;
 	}
