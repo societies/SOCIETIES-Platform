@@ -31,6 +31,12 @@
     </properties>
     
 	<dependencies>
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
 		<!-- Communication Manager  -->
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>

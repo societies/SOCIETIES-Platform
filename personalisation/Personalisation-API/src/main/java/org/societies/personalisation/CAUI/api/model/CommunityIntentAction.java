@@ -151,4 +151,16 @@ public class CommunityIntentAction implements ICommunityIntentAction{
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public long getDuration() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setDuration(long duration) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -4,14 +4,13 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../../parent/spring-osgi.xml</relativePath>
 		<version>0.1</version>
 	</parent>
   
 	<groupId>org.societies.comm</groupId>
 	<artifactId>CommonLibraries</artifactId>
 	<packaging>bundle</packaging>
-	<version>${release.version}</version>
+	<version>${version.comm}</version>
 	<description>XMPP Virgo Dependency Bundle</description>
 	<name>Common Libraries for Communication Framework</name>
 
@@ -36,8 +35,6 @@
     						!com.sun.*,	
     						!org.gjt.*,!org.jaxen.*,!org.mortbay.*,
     						!org.relaxng.*,
-    						!org.jvnet.staxex,
-    						!org.jvnet.fastinfoset,
     						org.slf4j*;version="1.5.8",
     						*
     					</Import-Package>
@@ -62,7 +59,7 @@
 		         		<artifactItem>
 		         			<groupId>${project.groupId}</groupId>
 		         			<artifactId>${project.artifactId}</artifactId>
-							<version>${release.version}</version>
+							<version>${version.comm}</version>
 		           			<type>bundle</type>
 		           			<overWrite>true</overWrite>
 		           			<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
@@ -74,10 +71,6 @@
 	</build>
   
   <dependencies>
-  	<!-- dependency>
-		<groupId>org.igniterealtime</groupId>
-		<artifactId>tinder</artifactId>
-	</dependency -->
 	<dependency>
 		<groupId>org.igniterealtime</groupId>
 		<artifactId>whack</artifactId>

@@ -31,7 +31,8 @@
 
   <bean id="CalcServiceRemote" 
   		class="org.societies.comm.examples.commsmanager.impl.CommsClient" 
-  		depends-on="CommManagerBundle" >
+  		depends-on="CommManagerBundle" 
+  		init-method="InitService" >
   		<property name="commManager" ref="CommManagerBundle"/>
   </bean>
 </beans>

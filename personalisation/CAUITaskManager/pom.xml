@@ -32,7 +32,6 @@
 	<!-- List dependencies here -->
 	<dependencies>
 
-
 		<dependency>
 			<groupId>org.societies.personalisation</groupId>
 			<artifactId>personalisation_api</artifactId>
@@ -133,4 +132,5 @@
 	</build>
 
 
+	<description>This component allows to manage the discovered user model.</description>
 </project>

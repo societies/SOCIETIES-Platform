@@ -1,8 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.societies</groupId>
+		<version>0.1</version>
+		<artifactId>version-parent</artifactId>
+	</parent>
 	<groupId>jabber.x.data</groupId>
 	<artifactId>DataFormsXep</artifactId>
-	<version>0.0.1</version>
+	<version>${release.version}</version>
 	<name>DataFormsXep</name>
 	<packaging>jar</packaging>
 	<dependencies>
@@ -12,12 +17,6 @@
 			<version>2.1.8</version>
 			<scope>compile</scope>
 			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.0</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>
@@ -37,7 +36,7 @@
 			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
-				<version>0.7.5</version>
+				<version>0.8.0</version>
 				<executions>
 					<execution>
 						<goals>
@@ -63,14 +62,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.8</version>
-				<configuration>
-					<skip>${maven.test.skip}</skip>
-				</configuration>
-			</plugin>
-			<plugin>
 		        <groupId>org.apache.maven.plugins</groupId>
 		        <artifactId>maven-resources-plugin</artifactId>
 		        <version>2.5</version>
@@ -80,8 +71,4 @@
 	      	</plugin>
 		</plugins>
 	</build>
-	
-	<properties>
-		<maven.test.skip>true</maven.test.skip>
-	</properties>
 </project>
