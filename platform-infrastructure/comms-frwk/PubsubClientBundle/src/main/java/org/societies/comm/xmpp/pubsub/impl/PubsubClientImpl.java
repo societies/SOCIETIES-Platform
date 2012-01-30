@@ -1,5 +1,6 @@
 package org.societies.comm.xmpp.pubsub.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,12 +9,16 @@ import java.util.Map;
 
 import org.jabber.protocol.pubsub.Create;
 import org.jabber.protocol.pubsub.Item;
+import org.jabber.protocol.pubsub.Items;
 import org.jabber.protocol.pubsub.Publish;
 import org.jabber.protocol.pubsub.Pubsub;
+import org.jabber.protocol.pubsub.Retract;
 import org.jabber.protocol.pubsub.Subscribe;
 import org.jabber.protocol.pubsub.Unsubscribe;
-import org.jabber.protocol.pubsub.event.Event;
-import org.jabber.protocol.pubsub.event.Items;
+import org.jabber.protocol.pubsub.owner.Affiliations;
+import org.jabber.protocol.pubsub.owner.Delete;
+import org.jabber.protocol.pubsub.owner.Purge;
+import org.jabber.protocol.pubsub.owner.Subscriptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Identity;
@@ -24,6 +29,7 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.interfaces.IIdentityManager;
 import org.societies.comm.xmpp.pubsub.Affiliation;
 import org.societies.comm.xmpp.pubsub.PubsubClient;
 import org.societies.comm.xmpp.pubsub.Subscriber;
@@ -53,12 +59,14 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	private ICommManager endpoint;
 	private Map<String,Object> responses;
 	private Map<Subscription,Subscriber> subscribers;
+	private IIdentityManager idm;
 	
 	@Autowired
 	public PubsubClientImpl(ICommManager endpoint) {
 		responses = new HashMap<String, Object>();
 		subscribers = new HashMap<Subscription, Subscriber>();
 		this.endpoint = endpoint;
+		idm = endpoint.getIdManager();
 		try {
 			endpoint.register(this);
 		} catch (CommunicationException e) {
@@ -82,8 +90,8 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
-		if (payload instanceof Event) {
-			Items items = ((Event)payload).getItems();
+		if (payload instanceof org.jabber.protocol.pubsub.event.Event) {
+			org.jabber.protocol.pubsub.event.Items items = ((org.jabber.protocol.pubsub.event.Event)payload).getItems();
 			String node = items.getNode();
 			Subscription sub = new Subscription(stanza.getFrom(), stanza.getTo(), node, null); // TODO may break due to mismatch between "to" and local identity
 			Subscriber subscriber = subscribers.get(sub);
@@ -207,16 +215,52 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	@Override
 	public List<Element> subscriberRetrieveLast(Identity pubsubService,
 			String node, String subId) throws XMPPError, CommunicationException {
-		// TODO Auto-generated method stub
-		return null;
+		Stanza stanza = new Stanza(pubsubService);
+		Pubsub payload = new Pubsub();
+		Items items = new Items();
+		items.setNode(node);
+		if (subId!=null)
+			items.setSubid(subId);
+		// TODO max items... in the server also!
+		payload.setItems(items);
+		
+		Object response = blockingIQ(stanza, payload);
+		
+		List<Item> itemList = ((Pubsub)response).getItems().getItem();
+		List<Element> returnList = new ArrayList<Element>();
+		for (Item i : itemList)
+			returnList.add((Element) i.getAny());
+		
+		return returnList;
 	}
 
 	@Override
 	public List<Element> subscriberRetrieveSpecific(Identity pubsubService,
 			String node, String subId, List<String> itemIdList)
 			throws XMPPError, CommunicationException {
-		// TODO Auto-generated method stub
-		return null;
+		Stanza stanza = new Stanza(pubsubService);
+		Pubsub payload = new Pubsub();
+		Items items = new Items();
+		items.setNode(node);
+		if (subId!=null)
+			items.setSubid(subId);
+		
+		for(String itemId : itemIdList) {
+			Item item = new Item();
+			item.setId(itemId);
+			items.getItem().add(item);
+		}
+		
+		payload.setItems(items);
+		
+		Object response = blockingIQ(stanza, payload);
+		
+		List<Item> itemList = ((Pubsub)response).getItems().getItem();
+		List<Element> returnList = new ArrayList<Element>();
+		for (Item i : itemList)
+			returnList.add((Element) i.getAny());
+		
+		return returnList;
 	}
 
 	@Override
@@ -242,8 +286,17 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	@Override
 	public void publisherDelete(Identity pubsubService, String node,
 			String itemId) throws XMPPError, CommunicationException {
-		// TODO Auto-generated method stub
+		Stanza stanza = new Stanza(pubsubService);
+		Pubsub payload = new Pubsub();
 		
+		Retract retract = new Retract();
+		retract.setNode(node);
+		Item i = new Item();
+		i.setId(itemId);
+		retract.getItem().add(i);
+		payload.setRetract(retract);
+		
+		Object response = blockingIQ(stanza, payload);
 	}
 
 	@Override
@@ -261,46 +314,109 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	@Override
 	public void ownerDelete(Identity pubsubService, String node)
 			throws XMPPError, CommunicationException {
-		// TODO Auto-generated method stub
+		Stanza stanza = new Stanza(pubsubService);
+		org.jabber.protocol.pubsub.owner.Pubsub payload = new org.jabber.protocol.pubsub.owner.Pubsub();
+		Delete delete = new Delete();
+		delete.setNode(node);
+		payload.setDelete(delete);
 		
+		blockingIQ(stanza, payload);
 	}
 
 	@Override
 	public void ownerPurgeItems(Identity pubsubService, String node)
 			throws XMPPError, CommunicationException {
-		// TODO Auto-generated method stub
+		Stanza stanza = new Stanza(pubsubService);
+		org.jabber.protocol.pubsub.owner.Pubsub payload = new org.jabber.protocol.pubsub.owner.Pubsub();
+		Purge purge = new Purge();
+		purge.setNode(node);
+		payload.setPurge(purge);
 		
+		blockingIQ(stanza, payload);
 	}
 
 	@Override
 	public Map<Identity, SubscriptionState> ownerGetSubscriptions(
 			Identity pubsubService, String node) throws XMPPError,
 			CommunicationException {
-		// TODO Auto-generated method stub
-		return null;
+		Stanza stanza = new Stanza(pubsubService);
+		org.jabber.protocol.pubsub.owner.Pubsub payload = new org.jabber.protocol.pubsub.owner.Pubsub();
+		Subscriptions subs = new Subscriptions();
+		subs.setNode(node);
+		payload.setSubscriptions(subs);
+		
+		blockingIQ(stanza, payload);
+		
+		List<org.jabber.protocol.pubsub.owner.Subscription> subList = ((org.jabber.protocol.pubsub.owner.Pubsub)payload).getSubscriptions().getSubscription();
+		Map<Identity, SubscriptionState> returnMap = new HashMap<Identity, SubscriptionState>();
+		for (org.jabber.protocol.pubsub.owner.Subscription s : subList)
+			returnMap.put(idm.fromJid(s.getJid()), SubscriptionState.valueOf(s.getSubscription()));
+		
+		return returnMap;
 	}
 
 	@Override
 	public Map<Identity, Affiliation> ownerGetAffiliations(
 			Identity pubsubService, String node) throws XMPPError,
 			CommunicationException {
-		// TODO Auto-generated method stub
-		return null;
+		Stanza stanza = new Stanza(pubsubService);
+		org.jabber.protocol.pubsub.owner.Pubsub payload = new org.jabber.protocol.pubsub.owner.Pubsub();
+		Affiliations affs = new Affiliations();
+		affs.setNode(node);
+		payload.setAffiliations(affs);
+		
+		blockingIQ(stanza, payload);
+		
+		List<org.jabber.protocol.pubsub.owner.Affiliation> affList = ((org.jabber.protocol.pubsub.owner.Pubsub)payload).getAffiliations().getAffiliation();
+		Map<Identity, Affiliation> returnMap = new HashMap<Identity, Affiliation>();
+		for (org.jabber.protocol.pubsub.owner.Affiliation a : affList)
+			returnMap.put(idm.fromJid(a.getJid()), Affiliation.valueOf(a.getAffiliation()));
+		
+		return returnMap;
 	}
 
 	@Override
 	public void ownerSetSubscriptions(Identity pubsubService, String node,
 			Map<Identity, SubscriptionState> subscriptions) throws XMPPError,
 			CommunicationException {
-		// TODO Auto-generated method stub
+		Stanza stanza = new Stanza(pubsubService);
+		org.jabber.protocol.pubsub.owner.Pubsub payload = new org.jabber.protocol.pubsub.owner.Pubsub();
+		Subscriptions subs = new Subscriptions();
+		subs.setNode(node);
+		payload.setSubscriptions(subs);
 		
+		for (Identity subscriber : subscriptions.keySet()) {
+			org.jabber.protocol.pubsub.owner.Subscription s = new org.jabber.protocol.pubsub.owner.Subscription();
+			s.setJid(subscriber.getJid());
+			s.setSubscription(subscriptions.get(subscriber).toString());
+			subs.getSubscription().add(s);
+		}
+		
+		blockingIQ(stanza, payload);
+		
+		// TODO error handling on multiple subscription changes
 	}
 
 	@Override
 	public void ownerSetAffiliations(Identity pubsubService, String node,
 			Map<Identity, Affiliation> affiliations) throws XMPPError,
 			CommunicationException {
-		// TODO Auto-generated method stub
+		Stanza stanza = new Stanza(pubsubService);
+		org.jabber.protocol.pubsub.owner.Pubsub payload = new org.jabber.protocol.pubsub.owner.Pubsub();
+		Affiliations affs = new Affiliations();
+		affs.setNode(node);
+		payload.setAffiliations(affs);
+		
+		for (Identity subscriber : affiliations.keySet()) {
+			org.jabber.protocol.pubsub.owner.Affiliation a = new org.jabber.protocol.pubsub.owner.Affiliation();
+			a.setJid(subscriber.getJid());
+			a.setAffiliation(affiliations.get(subscriber).toString());
+			affs.getAffiliation().add(a);
+		}
+		
+		blockingIQ(stanza, payload);
+		
+		// TODO error handling on multiple affiliation changes
 		
 	}
 	
