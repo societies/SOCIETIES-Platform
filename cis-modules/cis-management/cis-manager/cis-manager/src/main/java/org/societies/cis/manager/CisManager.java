@@ -29,9 +29,9 @@ package org.societies.cis.manager;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.societies.api.internal.cis.cis_management.CisActivityFeed;
-import org.societies.api.internal.cis.cis_management.CisRecord;
-import org.societies.api.internal.cis.cis_management.ICisManager;
+import org.societies.api.internal.cis.management.CisActivityFeed;
+import org.societies.api.internal.cis.management.CisRecord;
+import org.societies.api.internal.cis.management.ICisManager;
 import org.societies.cis.editor.CisEditor;
 
 // this is the class which manages all the CIS from a CSS

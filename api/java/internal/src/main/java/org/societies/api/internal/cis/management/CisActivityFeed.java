@@ -30,7 +30,7 @@
  * @author Babak.Farshchian@sintef.no
  * @version 0
  */
-package org.societies.api.internal.cis.cis_management;
+package org.societies.api.internal.cis.management;
 
 public class CisActivityFeed {
 	public CisActivity[] activities;

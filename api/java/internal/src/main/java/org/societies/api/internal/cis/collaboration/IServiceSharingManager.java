@@ -24,48 +24,19 @@
  */
 
 /**
- * Main responsibilities of this interface:
- * - Register and unregister CISs in form of CISAdvertisementRecords. (Note that CIS metadata
- * is not stored here. this is only yellow pages).
- * 
+ * Allow a CSS to create service sharing records that describe how a service is shared in a CIS.
+ * These records are then added to a CISRecord which is managed by the CISManager.
+ * TODO: Need to pass the pointer to the CISManager. 
  * 
  * @author Babak Farshchian
  * @version 0
- * 
  */
+package org.societies.api.internal.cis.collaboration;
 
-package org.societies.api.internal.cis.cis_directory;
+
+import org.societies.api.internal.cis.management.ServiceSharingRecord;
 
 
-public interface ICisDirectory {
-	/*
-	 * Various search methods that return an array of CISAdvertisementRecords.
-	 */
-	CisAdvertisementRecord[] searchByName(String cisName);
-	CisAdvertisementRecord[] searchByOwner(String ownerId);
-	CisAdvertisementRecord[] searchByUri(String uri);
-	
-	Boolean RegisterCis (CisAdvertisementRecord cis);
-	Boolean UnregisterCis (CisAdvertisementRecord cis);
-	/*
-	 * This method is used to add CIS Directories that reside on other nodes.
-	 * 
-	 * @param directoryURI URI for the directory to be added.
-	 * @param cssId ID for the CSS where the new directory resides.
-	 * @param synchMode One of several modes for synchronizing with the new directory. E.g. pull or push.
-	 * 
-	 */
-	Integer AddPeerDirectory(String directoryURI, String cssId, Integer synchMode);
-	
-	/*
-	 * Ping method for checking whether this Directory is alive.
-	 */
-	Boolean ping();
-	/*
-	 * A method that will return the current URI for this Directory. This URI might be fetched
-	 * from XMPP name-space or be a web service.
-	 */
-	
-	public String getURI();
-
+public interface IServiceSharingManager {
+	boolean addServiceSharingRecord(String CisId, ServiceSharingRecord sharingRecord);
 }

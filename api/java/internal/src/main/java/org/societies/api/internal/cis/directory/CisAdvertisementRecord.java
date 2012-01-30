@@ -24,39 +24,43 @@
  */
 
 /**
- * This class represents a CIS subscription record.
+ * This class defines a data type that is used stored in and managed by a CIS Directory.
  * 
  * @author Babak Farshchian
  * @version 0
  * 
  */
 
-package org.societies.api.internal.cis.cis_collaboration;
+package org.societies.api.internal.cis.directory;
 
-public class CisSubscriptionRecord {
-	private String cssId, cisId, subscriptionMode;
-
-	public CisSubscriptionRecord(String cssId, String cisId, String subscriptionMode) {
+public class CisAdvertisementRecord {
+	private String name, id, uri;
+	
+	public CisAdvertisementRecord(String name, String id, String uri) {
 		super();
-		this.cisId = cisId;
-		this.subscriptionMode = subscriptionMode;
-		this.cssId = cssId;
+		this.name = name;
+		this.id = id;
+		this.uri = uri;
+	}
+	public String getName() {
+		return name;
 	}
 
-	public String getSubscriptionMode() {
-		return subscriptionMode;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public void setSubscriptionMode(String subscriptionMode) {
-		this.subscriptionMode = subscriptionMode;
+	public String getId() {
+		return id;
 	}
 
-	public String getCssId() {
-		return cssId;
+	public String getUri() {
+		return uri;
 	}
 
-	public String getCisId() {
-		return cisId;
+	public void setUri(String uri) {
+		this.uri = uri;
 	}
+
 
 }

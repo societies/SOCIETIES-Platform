@@ -28,7 +28,7 @@ package org.societies.css.manager;
 
 
 
-import org.societies.api.internal.cis.cis_management.CisRecord;
+import org.societies.api.internal.cis.management.CisRecord;
 import org.societies.api.internal.css.ICssManagerCloud;
 import org.societies.cis.manager.CisManager;
 

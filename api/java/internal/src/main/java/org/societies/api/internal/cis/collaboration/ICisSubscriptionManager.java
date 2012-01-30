@@ -24,19 +24,22 @@
  */
 
 /**
- * Allow a CSS to create service sharing records that describe how a service is shared in a CIS.
- * These records are then added to a CISRecord which is managed by the CISManager.
- * TODO: Need to pass the pointer to the CISManager. 
+ * This interface has the following responsibilities:
+ * - Allow for management of CIS Subscription Records
  * 
  * @author Babak Farshchian
  * @version 0
+ * 
  */
-package org.societies.api.internal.cis.cis_collaboration;
+
+package org.societies.api.internal.cis.collaboration;
 
 
-import org.societies.api.internal.cis.cis_management.ServiceSharingRecord;
+public interface ICisSubscriptionManager {
+	Boolean addSubscriptionRecord(CisSubscriptionRecord record);
+	Boolean updateSubscriptionRecord(CisSubscriptionRecord record);
+	Boolean deleteSubscriptionRecord(CisSubscriptionRecord record);
+	CisSubscriptionRecord getSubscriptionRecord(String cssId, String cisId);
+	CisSubscriptionRecord[] getSubscriptionRecords(String cssId);
 
-
-public interface IServiceSharingManager {
-	boolean addServiceSharingRecord(String CisId, ServiceSharingRecord sharingRecord);
 }

@@ -24,43 +24,15 @@
  */
 
 /**
- * This class defines a data type that is used stored in and managed by a CIS Directory.
+ * Describes how a service is shared in a CIS.
  * 
  * @author Babak Farshchian
  * @version 0
- * 
  */
+package org.societies.api.internal.cis.management;
 
-package org.societies.api.internal.cis.cis_directory;
-
-public class CisAdvertisementRecord {
-	private String name, id, uri;
+public class ServiceSharingRecord {
 	
-	public CisAdvertisementRecord(String name, String id, String uri) {
-		super();
-		this.name = name;
-		this.id = id;
-		this.uri = uri;
-	}
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public String getUri() {
-		return uri;
-	}
-
-	public void setUri(String uri) {
-		this.uri = uri;
-	}
-
+	public ServiceSharingRecord (){}
 
 }

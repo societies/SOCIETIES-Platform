@@ -30,9 +30,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 //import org.societies.cis.mgmt;
-import org.societies.api.internal.cis.cis_management.CisActivityFeed;
-import org.societies.api.internal.cis.cis_management.CisRecord;
-import org.societies.api.internal.cis.cis_management.ServiceSharingRecord;
+import org.societies.api.internal.cis.management.CisActivityFeed;
+import org.societies.api.internal.cis.management.CisRecord;
+import org.societies.api.internal.cis.management.ServiceSharingRecord;
 
 public class CisEditor implements ICisEditor {
 

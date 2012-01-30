@@ -24,85 +24,48 @@
  */
 
 /**
- * Stores meta data relevant for a CIS.
+ * Main responsibilities of this interface:
+ * - Register and unregister CISs in form of CISAdvertisementRecords. (Note that CIS metadata
+ * is not stored here. this is only yellow pages).
+ * 
  * 
  * @author Babak Farshchian
  * @version 0
+ * 
  */
-package org.societies.api.internal.cis.cis_management;
 
-import java.util.HashSet;
-import java.util.Set;
+package org.societies.api.internal.cis.directory;
 
 
-public class CisRecord {
-	public CisActivityFeed feed;
-	public String ownerCss;
-	public String membershipCriteria;
-	public String cisId;
-	/**
-	 * permaLink is a permanent URL to this CIS. A type of CIS homepage.
+public interface ICisDirectory {
+	/*
+	 * Various search methods that return an array of CISAdvertisementRecords.
 	 */
-	public String permaLink;
-	public String[] membersCss;
-	private String password = "none";
-	public Set<ServiceSharingRecord> sharedServices;
+	CisAdvertisementRecord[] searchByName(String cisName);
+	CisAdvertisementRecord[] searchByOwner(String ownerId);
+	CisAdvertisementRecord[] searchByUri(String uri);
 	
+	Boolean RegisterCis (CisAdvertisementRecord cis);
+	Boolean UnregisterCis (CisAdvertisementRecord cis);
+	/*
+	 * This method is used to add CIS Directories that reside on other nodes.
+	 * 
+	 * @param directoryURI URI for the directory to be added.
+	 * @param cssId ID for the CSS where the new directory resides.
+	 * @param synchMode One of several modes for synchronizing with the new directory. E.g. pull or push.
+	 * 
+	 */
+	Integer AddPeerDirectory(String directoryURI, String cssId, Integer synchMode);
 	
+	/*
+	 * Ping method for checking whether this Directory is alive.
+	 */
+	Boolean ping();
+	/*
+	 * A method that will return the current URI for this Directory. This URI might be fetched
+	 * from XMPP name-space or be a web service.
+	 */
 	
-	public CisRecord(CisActivityFeed feed, String ownerCss,
-			String membershipCriteria, String cisId, String permaLink,
-			String[] membersCss, String password,
-			Set<ServiceSharingRecord> sharedServices) {
-		super();
-		this.feed = feed;
-		this.ownerCss = ownerCss;
-		this.membershipCriteria = membershipCriteria;
-		this.cisId = cisId;
-		this.permaLink = permaLink;
-		this.membersCss = membersCss;
-		this.password = password;
-		this.sharedServices = sharedServices;
-	}
-
-
- // hash code and equals using cisName and ownerCss
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((cisId == null) ? 0 : cisId.hashCode());
-		result = prime * result
-				+ ((ownerCss == null) ? 0 : ownerCss.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		CisRecord other = (CisRecord) obj;
-		if (cisId == null) {
-			if (other.cisId != null)
-				return false;
-		} else if (!cisId.equals(other.cisId))
-			return false;
-		if (ownerCss == null) {
-			if (other.ownerCss != null)
-				return false;
-		} else if (!ownerCss.equals(other.ownerCss))
-			return false;
-		return true;
-	}
-
-
-
-	
-
-	
+	public String getURI();
 
 }
