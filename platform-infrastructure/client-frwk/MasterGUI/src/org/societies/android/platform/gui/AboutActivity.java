@@ -23,60 +23,31 @@ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVI
 INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.android.platform.gui;
 
-package org.societies.cft;
 
-import com.phonegap.DroidGap;
 
-import android.content.Intent;
+import android.app.Activity;
 import android.os.Bundle;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.text.util.Linkify;
+import android.widget.TextView;
 
-public class MasterGUIActivity extends DroidGap {
-/** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
+public class AboutActivity extends Activity {
+    
+	@Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//          setContentView(R.layout.main);
-      super.loadUrl("file:///android_asset/www/index.html");
+        setContentView(R.layout.about);
+        this.setTitle("About");
+        TextView aboutText = (TextView) findViewById(R.id.editText1);
+        aboutText.setText("   Version 0.1 \n\n" + 
+    					  "   SOCIETIES 2011 \n\n" + 
+    					  "   Legal Stuff \n\n" +
+    					  "\n\n" + 
+    					  "   SOCIETIES FP7 Project: http://www.ict-societies.eu/ \n" +
+    					  "   Bug Reports: http://www.ict-societies.eu/issues/"
+    			);
+        Linkify.addLinks(aboutText, Linkify.WEB_URLS);
     }
-    
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-        return true;
-    }
-    
-    @Override 
-    /**
-     * Workaround required since PhoneGap 1.0.0
-     */
-    public boolean onKeyDown(int keyCode,KeyEvent event){ 
-            if (keyCode == KeyEvent.KEYCODE_MENU) { 
-                 return false; 
-           }else{ 
-               return super.onKeyDown(keyCode, event); 
-           } 
-    }
-    
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-        case R.id.about:
-        	Intent aboutIntent = new Intent(this, AboutActivity.class);
-        	this.startActivity(aboutIntent);
-            return true;
-        case R.id.preference:
-        	Intent prefIntent = new Intent(this, MasterPreferences.class);
-        	this.startActivity(prefIntent);
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
-        }
-    }
+
 }

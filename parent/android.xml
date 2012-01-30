@@ -144,23 +144,71 @@ Hints use your profile ~/.m2/settings.xml or set via the command line -Dandroid.
     <!-- Defines versions of the plugin tools ie. tools used during the build -->
     <pluginManagement>
       <plugins>
-            <plugin>
-                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-    		<artifactId>android-maven-plugin</artifactId>
-    		<version>3.0.0-alpha-14</version><configuration>
-                    <sdk>
-                        <!-- platform or api level (api level 4 = platform 1.6)-->
-                        <platform>8</platform>
+	<plugin>
+		<groupId>org.codehaus.mojo</groupId>
+		<artifactId>cobertura-maven-plugin</artifactId>
+		<version>2.3</version>
+	</plugin>
+        <plugin>
+		<groupId>org.codehaus.mojo</groupId>
+		<artifactId>cobertura-maven-plugin</artifactId>
+		<version>2.3</version>
+		<executions>
+			<execution>
+				<id>cobertura</id>
+				<phase>test</phase>
+				<inherited>true</inherited>
+				<goals>
+					<goal>cobertura</goal>
+				</goals>
+				<configuration>
+					<instrumentation>
+						<ignores>
+							<ignore>org.societies.*.*Exception</ignore>
+						</ignores>
+			
+						<excludes>
+							<!--Insert any classes that should not be tested for coverage-->
+							<!--Note: Exclusions here are case sensitive-->
+							<exclude>org/societies/**/*Exception.class </exclude>
+							<exclude>org/societies/**/R.class </exclude>
+						</excludes>								            
+					</instrumentation>
+					<formats>
+						<format>xml</format>
+						<format>html</format>
+					</formats>
+			</configuration>
+			</execution>
+			<execution>
+				<id>cobertura-clean</id>
+				<phase>clean</phase>
+				<inherited>true</inherited>
+				<goals>
+					<goal>clean</goal>
+				</goals>
+			</execution>
+		</executions>
+	</plugin>
+
+
+	    <plugin>
+		<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+		<artifactId>android-maven-plugin</artifactId>
+		<version>3.0.0-alpha-14</version><configuration>
+		    <sdk>
+		        <!-- platform or api level (api level 4 = platform 1.6)-->
+		        <platform>8</platform>
 			<path>${android.home}</path>
-                    </sdk>
-                    <emulator>
-                        <!-- the name of the avd device to use for starting the emulator -->
-                        <avd>Test22Device</avd>
-                    </emulator>
-                    <undeployBeforeDeploy>true</undeployBeforeDeploy>
-                </configuration>
-                <extensions>true</extensions>
-            </plugin>
+		    </sdk>
+		    <emulator>
+		        <!-- the name of the avd device to use for starting the emulator -->
+		        <avd>Test22Device</avd>
+		    </emulator>
+		    <undeployBeforeDeploy>true</undeployBeforeDeploy>
+		</configuration>
+		<extensions>true</extensions>
+	    </plugin>
       </plugins>
     </pluginManagement>
   </build>

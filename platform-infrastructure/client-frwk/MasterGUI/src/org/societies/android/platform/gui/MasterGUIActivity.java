@@ -24,17 +24,61 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.cft;
+package org.societies.android.platform.gui;
 
+
+
+import com.phonegap.DroidGap;
+
+import android.content.Intent;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
-public class MasterPreferences extends PreferenceActivity{
+public class MasterGUIActivity extends DroidGap {
+/** Called when the activity is first created. */
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        addPreferencesFromResource(R.xml.preferences);
+//          setContentView(R.layout.main);
+      super.loadUrl("file:///android_asset/www/index.html");
     }
-
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+    
+    @Override 
+    /**
+     * Workaround required since PhoneGap 1.0.0
+     */
+    public boolean onKeyDown(int keyCode,KeyEvent event){ 
+            if (keyCode == KeyEvent.KEYCODE_MENU) { 
+                 return false; 
+           }else{ 
+               return super.onKeyDown(keyCode, event); 
+           } 
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+        case R.id.about:
+        	Intent aboutIntent = new Intent(this, AboutActivity.class);
+        	this.startActivity(aboutIntent);
+            return true;
+        case R.id.preference:
+        	Intent prefIntent = new Intent(this, MasterPreferences.class);
+        	this.startActivity(prefIntent);
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
 }

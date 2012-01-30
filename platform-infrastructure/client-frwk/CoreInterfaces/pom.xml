@@ -45,4 +45,21 @@
     	</dependency>
     </dependencies>
 
+	<build>
+		<plugins>
+      		<plugin>
+        		<groupId>org.codehaus.mojo</groupId>
+        		<artifactId>cobertura-maven-plugin</artifactId>
+        		<configuration>
+          			<instrumentation>
+            			<excludes>
+                			<!--Insert any classes that should not be tested for coverage, i.e. Interfaces,Enums -->
+              				<exclude>org/societies/android/platform/interfaces/ICoreServiceExample.class</exclude>
+              				<exclude>org/societies/android/platform/interfaces/ICoreServiceMonitor.class</exclude>
+            			</excludes>
+          			</instrumentation>
+        		</configuration>
+      		</plugin>
+		</plugins>
+	</build>
 </project>
