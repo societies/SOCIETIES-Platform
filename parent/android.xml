@@ -195,7 +195,7 @@ Hints use your profile ~/.m2/settings.xml or set via the command line -Dandroid.
 	    <plugin>
 		<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 		<artifactId>android-maven-plugin</artifactId>
-		<version>3.0.0-alpha-14</version><configuration>
+		<version>3.0.0</version><configuration>
 		    <sdk>
 		        <!-- platform or api level (api level 4 = platform 1.6)-->
 		        <platform>8</platform>
