@@ -35,12 +35,11 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 
-
-
 /**
- * IUserCtxBroker interface allows to manage user context data. 
- * @author nikosk
- * @created 12-Nov-2011 7:15:15 PM
+ * IUserCtxBroker interface allows to manage user context data.
+ *  
+ * @author <a href="mailto:nikosk@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
+ * @since 0.0.0
  */
 public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCtxBroker {
 
@@ -261,6 +260,82 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @since 0.0.1
 	 */
 	public void update(CtxModelObject identifier, IUserCtxBrokerCallback callback);
+
+	/**
+	 * Updates the {@link CtxAttribute} identified by the specified {@link CtxAttributeIdentifier}
+	 * using the supplied value.
+	 * <p>
+	 * The following value types are supported:
+	 * <dl>
+	 * <dt><code>String</code></dt>
+	 * <dd>Text value.</dd>
+	 * <dt><code>Integer</code></dt>
+	 * <dd>Integer value.</dd>
+	 * <dt><code>Double</code></dt>
+	 * <dd>Double-precision floating point numeric value.</dd>
+	 * <dt><code>byte[]</code></dt>
+	 * <dd>Binary value.</dd>
+	 * </dl>
+	 * Note that the updated <code>CtxAttribute</code> is returned through the
+	 * {@link IUserCtxBrokerCallback#ctxModelObjectUpdated} method. If the
+	 * update operation is not successfull then the callback method returns
+	 * <code>null</code>.
+	 * <p>
+	 * This method is equivalent to calling {@link #updateAttribute(CtxAttributeIdentifier,
+	 * Serializable, String, IUserCtxBrokerCallback)} specifying a <code>null</code>
+	 * valueMetric parameter. 
+	 * 
+	 * @param attributeId
+	 *            the identifier of the attribute to be updated
+	 * @param value
+	 *            the value to be set for the identified context attribute
+	 * @param callback
+	 *            the callback to return the updated context attribute
+	 * @throws NullPointerException if the specified context attribute identifier
+	 *            is <code>null</code>
+	 * @throws IllegalArgumentException if the type of the specified context
+	 *            attribute value is not valid (supported value types are defined
+	 *            in {@link org.societies.api.context.model.CtxAttributeValueType})
+	 */
+	public void updateAttribute(CtxAttributeIdentifier attributeId, Serializable value,
+			IUserCtxBrokerCallback callback);
+
+	/**
+	 * Updates the {@link CtxAttribute} identified by the specified {@link CtxAttributeIdentifier}
+	 * using the supplied value. The value metric can also be specified.
+	 * <p>
+	 * The following value types are supported:
+	 * <dl>
+	 * <dt><code>String</code></dt>
+	 * <dd>Text value.</dd>
+	 * <dt><code>Integer</code></dt>
+	 * <dd>Integer value.</dd>
+	 * <dt><code>Double</code></dt>
+	 * <dd>Double-precision floating point numeric value.</dd>
+	 * <dt><code>byte[]</code></dt>
+	 * <dd>Binary value.</dd>
+	 * </dl>
+	 * Note that the updated <code>CtxAttribute</code> is returned through the
+	 * {@link IUserCtxBrokerCallback#ctxModelObjectUpdated} method. If the
+	 * update operation is not successfull then the callback method returns
+	 * <code>null</code>.
+	 * 
+	 * @param attributeId
+	 *            the identifier of the attribute to be updated
+	 * @param value
+	 *            the value to be set for the identified context attribute
+	 * @param valueMetric
+	 *            the value metric to be set for the identified context attribute
+	 * @param callback
+	 *            the callback to return the updated context attribute
+	 * @throws NullPointerException if the specified context attribute identifier
+	 *            is <code>null</code>
+	 * @throws IllegalArgumentException if the type of the specified context
+	 *            attribute value is not valid (supported value types are defined
+	 *            in {@link org.societies.api.context.model.CtxAttributeValueType})
+	 */
+	public void updateAttribute(CtxAttributeIdentifier attributeId, Serializable value,
+			String valueMetric, IUserCtxBrokerCallback callback);
 
 	/**
 	 * This method allows to set a primary context attribute that will be stored in context History Database
