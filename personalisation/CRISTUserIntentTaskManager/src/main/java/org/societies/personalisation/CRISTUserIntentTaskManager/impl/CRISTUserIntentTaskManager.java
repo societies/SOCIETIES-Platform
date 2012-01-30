@@ -33,11 +33,14 @@ import org.societies.personalisation.CRIST.api.model.CRISTUserTaskModelData;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserSituation;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserTask;
+import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 
 public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager{
 
 	private ICRISTUserIntentPrediction cristPredictor;
 	private CtxAttribute myCtx;
+	private EntityIdentifier myID;
+	private IPersonalisationInternalCallback myCallback;
 		
 	public CRISTUserIntentTaskManager(){
 		System.out.println("Hello! I'm the CRIST User Intent Manager!");
@@ -61,7 +64,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager{
 		System.out.println("Yo!! I'm a brand new service and my interface is: "
 				+ this.getClass().getName());
 		try{
-			this.cristPredictor.getCRISTPrediction(myCtx);
+			this.cristPredictor.getCRISTPrediction(myID, myCtx, myCallback);
 			System.out.println("CRIST Tester got the CRIST Prediction Result");
 		}catch(Exception e){
 			System.err.println("Exception when trying to get the CRIST Prediction Result");
