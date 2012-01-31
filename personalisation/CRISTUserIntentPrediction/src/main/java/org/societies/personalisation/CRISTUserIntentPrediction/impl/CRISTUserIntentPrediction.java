@@ -31,7 +31,7 @@ import org.societies.api.context.model.CtxModelObject;
 // import org.societies.api.personalisation.model.IAction;
 import org.societies.api.internal.personalisation.model.FeedbackEvent;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
 import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
@@ -126,7 +126,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	public CRISTUserAction getCurrentUserIntentAction(
 			EntityIdentifier requestor,
 			EntityIdentifier ownerID,
-			org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ServiceResourceIdentifier serviceID) {
+			ServiceResourceIdentifier serviceID) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -147,5 +147,17 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	public void updateReceived(CtxModelObject ctxModelObj) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCurrentUserIntentAction(org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ServiceResourceIdentifier)
+	 */
+	@Override
+	public CRISTUserAction getCurrentUserIntentAction(
+			EntityIdentifier requestor,
+			EntityIdentifier ownerID,
+			ServiceResourceIdentifier serviceID) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
