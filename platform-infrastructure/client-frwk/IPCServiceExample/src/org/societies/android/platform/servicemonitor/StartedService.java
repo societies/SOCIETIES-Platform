@@ -25,14 +25,12 @@ public class StartedService extends IntentService {
 		Log.i(this.getClass().getName(), "Service being created");
 		Log.i(this.getClass().getName(), "Current Thread" + Thread.currentThread().getName());
 		Log.i(this.getClass().getName(), "Current Thread" + Thread.activeCount());
-        super.onCreate();
-        
+        super.onCreate();   
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.i(this.getClass().getName(), "Service being started");
-    	
+		Log.i(this.getClass().getName(), "Service being started");	
     	return super.onStartCommand(intent, flags, startId);
     }
 	@Override
@@ -53,7 +51,6 @@ public class StartedService extends IntentService {
     public long fib(int n) {
 //		Log.i(this.getClass().getName(), "Current Thread " + Thread.currentThread().getName());
 //		Log.i(this.getClass().getName(), "Current Thread " + Thread.activeCount());
-		
         if (n <= 1) return n;
         else return fib(n-1) + fib(n-2);
     }

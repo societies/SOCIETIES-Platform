@@ -131,7 +131,7 @@ public class ExampleServiceActivity extends Activity {
     		serviceInvoke = System.currentTimeMillis();
         	Log.i(this.getClass().getName(), "Call in process service: " + Long.toString(serviceInvoke));
         	Log.i(this.getClass().getName(), "Number of invocations: " + NUM_SERVICE_INVOKES);
-
+        	
 			for (int i = 0; i < NUM_SERVICE_INVOKES; i++) {
 //	    		text.setText(targetIPService.getGreeting("to me"));
 				List services = targetIPService.activeServices(null);
@@ -280,7 +280,7 @@ public class ExampleServiceActivity extends Activity {
 			opBoundToService = true;
 			targetOPService = new Messenger(service);
 	    	Log.i(this.getClass().getName(), "Out of process service connected: " + Long.toString(serviceBinding - System.currentTimeMillis()));
-			
+	    	
 			
 		}
 	};

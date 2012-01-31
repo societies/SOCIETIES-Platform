@@ -4,5 +4,6 @@
 	<string name="db_creation">
 			CREATE TABLE simple_storage (_id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT, value TEXT);
 			CREATE TABLE integer_storage (_id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT, value INTEGER);
+			CREATE TABLE table_1 (_id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT, value TEXT, service TEXT, type TEXT);
 	</string>
 </resources>
