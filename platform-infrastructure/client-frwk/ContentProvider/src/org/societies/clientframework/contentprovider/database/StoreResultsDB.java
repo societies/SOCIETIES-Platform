@@ -1,5 +1,10 @@
 package org.societies.clientframework.contentprovider.database;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.societies.android.platform.interfaces.IContentProvider;
 import org.societies.clientframework.contentprovider.Constants;
 import org.societies.clientframework.contentprovider.R;
 import org.societies.clientframework.contentprovider.Settings;
@@ -99,6 +104,58 @@ public class StoreResultsDB extends SQLiteOpenHelper {
 	}
 	
 	
+	public void storeData(Map<String, ?>data, String serviceName){
+		Iterator <String> it = data.keySet().iterator();
+		
+		while (it.hasNext()){
+			String key = it.next();
+			ContentValues map  = new ContentValues();
+			map.put(Constants.TABLE_KEY, 		IContentProvider.CREDENTIAL_USERNAME);
+			map.put(Constants.TABLE_SERVICE, 	IContentProvider.SERVICE_COMM_FWK);
+			map.put(Constants.TABLE_TYPE, 	    data.get(key).getClass().toString());
+			map.put(Constants.TABLE_VALUE, 		data.get(key).toString());
+			addElementInTable(map);
+		}
+		
+	}
+	
+	public Map<String, ?> getData(String serviceName){
+		Map<String,Object> data = new HashMap();
+		String sql = "select * from "+selected_table+" where service '"+serviceName+"'";
+		SQLiteDatabase d = getReadableDatabase(); 
+		ContentProviderCursor cur = (ContentProviderCursor) d.rawQueryWithFactory(new ContentProviderCursor.Factory(), sql, null, null);
+		if (cur!=null){
+			if (cur.getCount()>0){
+				 cur.moveToFirst();
+				 do{
+					 data.put(cur.getKey(),translate(cur.getType(), cur.getValue()));
+				 }while(!cur.moveToNext());
+			}
+		}
+		return data;
+	}
+	
+	
+	Object translate(String type, String value){
+		if (type.equals(int.class.toString())){
+			return Integer.parseInt(value);
+		}
+		else if (type.equals(float.class.toString()))
+			return Float.parseFloat(value);
+		
+		if (type.equals(double.class.toString()))
+			return Double.parseDouble(value);
+		
+		if (type.equals(boolean.class.toString()))
+			return Boolean.parseBoolean(value);
+		
+		if (type.equals(short.class.toString()))
+			return Short.parseShort(value);
+		
+		return value;
+	}
+	
+	
 	public boolean addElementInTable(ContentValues map){
 		
 		try{ 
@@ -129,7 +186,7 @@ public class StoreResultsDB extends SQLiteOpenHelper {
 		String[] services = null;
 		String sql = "select DISTINCT service from " + Constants.TABLE_ONE + "";
 		SQLiteDatabase d = getReadableDatabase(); 
-		TableOneCursor toc = (TableOneCursor)d.rawQueryWithFactory(new ResultsCursor.Factory(), sql, null, null);
+		ContentProviderCursor toc = (ContentProviderCursor)d.rawQueryWithFactory(new ResultsCursor.Factory(), sql, null, null);
 		
 		if(toc.getCount()>0){
 			services = new String[toc.getCount()];

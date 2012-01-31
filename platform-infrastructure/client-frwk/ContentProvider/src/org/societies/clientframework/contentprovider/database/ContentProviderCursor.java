@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteCursorDriver;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQuery;
 
-public class TableOneCursor extends SQLiteCursor {
+public class ContentProviderCursor extends SQLiteCursor {
 	
 	public static enum SortBy{
 		lastAccess,
@@ -23,7 +23,7 @@ public class TableOneCursor extends SQLiteCursor {
 	 * @param editTable
 	 * @param query
 	 */
-	private TableOneCursor(SQLiteDatabase db, 
+	private ContentProviderCursor(SQLiteDatabase db, 
 					   	  SQLiteCursorDriver driver, 
 					   	  String editTable, 
 					   	  SQLiteQuery query) 
@@ -42,7 +42,7 @@ public class TableOneCursor extends SQLiteCursor {
 								String editTable,
 								SQLiteQuery query) {
 			
-			return new TableOneCursor(db, driver, editTable, query);
+			return new ContentProviderCursor(db, driver, editTable, query);
 		}
 	}
 	

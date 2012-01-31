@@ -28,12 +28,19 @@ package org.societies.clientframework.contentprovider.services;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.societies.android.platform.interfaces.IContentProvider;
-import org.societies.android.platform.interfaces.ICoreServiceExample;
 import org.societies.android.platform.interfaces.ServiceMethodTranslator;
+import org.societies.clientframework.contentprovider.Constants;
+import org.societies.clientframework.contentprovider.Settings;
+import org.societies.clientframework.contentprovider.database.StoreResultsDB;
 
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,16 +48,21 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.util.Log;
-import android.widget.Toast;
 
 public class DifferentProcessService extends Service implements IContentProvider {
 
 	private Messenger inMessenger;
+	StoreResultsDB  storeDB;
+	
 	
 	@Override
 	public void onCreate () {
 		this.inMessenger = new Messenger(new IncomingHandler());	
 		Log.i(this.getClass().getName(), "CONTENT PROVIDER Service starting");
+		 
+		storeDB = new StoreResultsDB(this);
+	    Log.v(Constants.TAG, "DB initialized to store societies data");
+		
 	}
 	
 	class IncomingHandler extends Handler {
@@ -110,6 +122,8 @@ public class DifferentProcessService extends Service implements IContentProvider
 	
 	@Override
 	public void onDestroy() {
+		
+		storeDB.close();
 		Log.i(this.getClass().getName(), "Service terminating");
 	}
 
@@ -118,47 +132,66 @@ public class DifferentProcessService extends Service implements IContentProvider
 		return inMessenger.getBinder();
 	}
 
-	
-
-	public void setServiceCredential(String username, String password, String serviceName) {
-		Toast.makeText(getApplicationContext(), "SET SERVICE CREDENTIAL", Toast.LENGTH_LONG).show();
+	public void setCredential(String username, String password, String serviceName) {
+		ContentValues map  = new ContentValues();
+		map.put(Constants.TABLE_KEY, 		IContentProvider.CREDENTIAL_USERNAME);
+		map.put(Constants.TABLE_SERVICE, 	IContentProvider.SERVICE_COMM_FWK);
+		map.put(Constants.TABLE_TYPE, 		username.getClass().toString());
+		map.put(Constants.TABLE_VALUE, 		username);
+		storeDB.addElementInTable(map);
+		
+		map  = new ContentValues();
+		map.put(Constants.TABLE_KEY, 		IContentProvider.CREDENTIAL_PASSWORD);
+		map.put(Constants.TABLE_SERVICE, 	IContentProvider.SERVICE_COMM_FWK);
+		map.put(Constants.TABLE_TYPE, 		password.getClass().toString());
+		map.put(Constants.TABLE_VALUE, 		password);
+		storeDB.addElementInTable(map);
 		
 	}
 
-	public String[] getUsernameAndPassword(String serviceName) {
-		Toast.makeText(getApplicationContext(), "get Credential....", Toast.LENGTH_LONG).show();
-		return new String[]{"USERNAME", "PASSWORD"};
+	public List<?> getCredential(String serviceName) {
+		Map<String, ?> data = storeDB.getData(serviceName);
+		ArrayList <Object> credential = new ArrayList<Object>();
+		credential.add(data.get(IContentProvider.CREDENTIAL_USERNAME));
+		credential.add(data.get(IContentProvider.CREDENTIAL_PASSWORD));
+		return credential;
 	}
 
 	public void setCommFwkEndpoint(String hostname, int port) {
-		Toast.makeText(getApplicationContext(), "SET COMM FWK DATA", Toast.LENGTH_LONG).show();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put(IContentProvider.COMM_FWK_HOSTNAME, hostname);
+		map.put(IContentProvider.COMM_FWK_PORT, port);
+		storeDB.storeData(map, IContentProvider.SERVICE_COMM_FWK);
+	}
+
+	public List<?> getCommFwkEndpoint() {
+		Map<String, ?> data = storeDB.getData(IContentProvider.SERVICE_COMM_FWK);
+		ArrayList <Object> endpoint = new ArrayList<Object>();
+		endpoint.add( data.get(IContentProvider.COMM_FWK_HOSTNAME));
+		endpoint.add( data.get(IContentProvider.COMM_FWK_PORT));
+		return endpoint;
+	}
+
+	public void storeData(Map<String, ?> data, String serviceName) {
+		storeDB.storeData(data, serviceName);
 		
 	}
 
-	public String getCommFwkEndoint() {
-		Toast.makeText(getApplicationContext(), "GET Endpoint", Toast.LENGTH_LONG).show();
-		return null;
-	}
-
-	public int getCommFwkPort() {
-		Toast.makeText(getApplicationContext(), "GET PORT", Toast.LENGTH_LONG).show();
-		return 0;
-	}
-
-	public void storeData(String key, Object data, String serviceName) {
-		Toast.makeText(getApplicationContext(), "Store data", Toast.LENGTH_LONG).show();
-		
-	}
-
-	public Object getData(String key, String serviceName) {
-		Toast.makeText(getApplicationContext(), "Get Data", Toast.LENGTH_LONG).show();
-		return null;
+	public Map<String, ?> getData(String serviceName) {
+		return storeDB.getData(serviceName);
 	}
 
 	public String[] getServices() {
-		Toast.makeText(getApplicationContext(), "Get Services", Toast.LENGTH_LONG).show();
-		return new String[]{"null"};
+		return storeDB.getServices();
 	}
+
+	public void resetDB(){
+		storeDB.resetDB(Settings.DATABASE_NAME);
+	}
+
+	
+
+	
 
 
 }
