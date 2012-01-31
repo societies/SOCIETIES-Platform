@@ -22,65 +22,10 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.context.model;
 
-/**
- * The constants of this enumerated type specify the data type of the {@link CtxAttribute}
- * value. To this end, the following value types have been identified:
- * <dl>
- * <dt>{@link #EMPTY}</dt>
- * <dd>No value set.</dd>
- * <dt>{@link #STRING}</dt>
- * <dd>Text value.</dd>
- * <dt>{@link #INTEGER}</dt>
- * <dd>Integer value.</dd>
- * <dt>{@link #DOUBLE}</dt>
- * <dd>Double-precision floating point numeric value.</dd>
- * <dt>{@link #BINARY}</dt>
- * <dd>Binary value, i.e. a byte[].</dd>
- * </dl>
- * 
- * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.1
- */
-public enum CtxAttributeValueType {
+package org.societies.cis.editor;
 
-	/**
-	 * Denotes a {@link CtxAttribute} with no value set
-	 */
-	EMPTY,
-	
-	/**
-	 * Denotes a {@link CtxAttribute} value of type <code>String</code>
-	 */
-	STRING,
-	
-	/**
-	 * Denotes a {@link CtxAttribute} value is of type <code>Integer</code>
-	 */
-	INTEGER,
-	
-	/**
-	 * Denotes that the {@link CtxAttribute} value is of type <code>Double</code>
-	 */
-	DOUBLE,
-	
-	/**
-	 * Denotes that the {@link CtxAttribute} value is of type <code>byte[]</code>
-	 */
-	BINARY,
-	
-	/**
-	 * Denotes that the {@link CtxAttribute} belongs to a {@link IndividualCtxEntity}
-	 * @deprecated Should denote the CtxAttribute value type, e.g. {@link #STRING}
-	 */
-	@Deprecated
-	INDIVIDUAL,
-	
-	/**
-	 * Denotes that the {@link CtxAttribute} belongs to a {@link CommunityCtxEntity}
-	 * @deprecated Should denote the CtxAttribute value type, e.g. {@link #STRING}
-	 */
-	@Deprecated
-	COMMUNITY,
+public interface ICisEditor {
+
+
 }
