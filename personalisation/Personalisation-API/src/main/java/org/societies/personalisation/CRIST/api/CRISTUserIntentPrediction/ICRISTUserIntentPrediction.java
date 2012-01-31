@@ -7,7 +7,9 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.internal.personalisation.model.FeedbackEvent;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.personalisation.model.IAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
+import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 
 
 /**
@@ -29,7 +31,9 @@ public interface ICRISTUserIntentPrediction {
 	 * 
 	 * @param ctxAttribute		- a set of context
 	 */
-	public ArrayList<ICRISTUserAction> getCRISTPrediction(CtxAttribute ctxAttribute);
+	public ArrayList<ICRISTUserAction> getCRISTPrediction(EntityIdentifier entityID, CtxAttribute ctxAttribute, IPersonalisationInternalCallback callback);
+	
+	public ArrayList<ICRISTUserAction> getCRISTPrediction(EntityIdentifier entityID, IAction action, IPersonalisationInternalCallback callback);
 	
 	/**
 	 * This method will return the user's current intent
