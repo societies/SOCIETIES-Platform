@@ -136,7 +136,7 @@ public interface ICtxBroker {
 	 * @param minAttribValue
 	 * @param maxAttribValue
 	 */
-	public Future<List<CtxEntities>> lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue);
+	public Future<List<CtxEntity>> lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue);
 
 	/**
 	 * Registers the specified EventListener for value modification events of context
@@ -153,7 +153,7 @@ public interface ICtxBroker {
 	 * 
 	 * @param attrId
 	 */
-	public Future<List<Object>> registerForUpdates(CtxAttributeIdentifier attrId);
+	public Future<List<CtxEntity>> registerForUpdates(CtxAttributeIdentifier attrId);
 
 	/**
 	 * Removes the specified context model object.
