@@ -22,35 +22,8 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.context.community.prediction.test;
 
-package org.societies.api.internal.context.community.prediction;
-
-import java.util.Date;
-
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxIdentifier;
-
-
-
-/**
- * @author yboul
- * @created 12-Nov-2011 7:15:15 PM
- */
-public interface ICommunityCtxPredictionMgr {
-
-	/**
-	 * 
-	 * @param cisID
-	 */
-	public void getCommunity(EntityIdentifier cisID);
-
-	/**
-	 * 
-	 * @param predictionModel
-	 * @param ctxObjModel
-	 * @param date
-	 */
-	public CtxIdentifier predictContext(CtxAttributeIdentifier ctxObjModel, Date date);
+public class CommunityContextPredictionTest {
 
 }

@@ -22,15 +22,14 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.communityPrediction.impl;
+package org.societies.context.community.prediction.impl;
 
 import java.util.Date;
 
-import org.societies.api.internal.context.community.prediction.ICommunityCtxPredictionMgr;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.internal.context.user.prediction.PredictionMethod;
+import org.societies.context.api.community.prediction.ICommunityCtxPredictionMgr;
 
 public class CommunityContextPrediction implements ICommunityCtxPredictionMgr{
 
@@ -40,11 +39,12 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr{
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see org.societies.context.api.community.prediction.ICommunityCtxPredictionMgr#predictContext(org.societies.api.context.model.CtxAttributeIdentifier, java.util.Date)
+	 */
 	@Override
-	public CtxIdentifier predictContext(PredictionMethod predictionModel,
-			CtxAttributeIdentifier ctxObjModel, Date date) {
+	public CtxIdentifier predictContext(CtxAttributeIdentifier arg0, Date arg1) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }
