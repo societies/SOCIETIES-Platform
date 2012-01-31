@@ -22,15 +22,15 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.communityEstimation.test;
+package org.societies.context.community.estimation.test;
 
 import java.util.List;
 
-import org.societies.api.internal.context.community.estimation.EstimationModels;
-import org.societies.api.internal.context.community.estimation.ICommunityCtxEstimationMgr;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.context.api.community.estimation.EstimationModels;
+import org.societies.context.api.community.estimation.ICommunityCtxEstimationMgr;
 
 public class CommunityContextEstimationTest implements ICommunityCtxEstimationMgr{
 

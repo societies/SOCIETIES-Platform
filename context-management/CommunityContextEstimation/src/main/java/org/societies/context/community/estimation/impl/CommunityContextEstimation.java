@@ -22,20 +22,19 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.communityEstimation.impl;
+package org.societies.context.community.estimation.impl;
 
 import java.util.List;
 
-import org.societies.api.internal.context.community.estimation.EstimationModels;
-import org.societies.api.internal.context.community.estimation.ICommunityCtxEstimationMgr;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.context.api.community.estimation.EstimationModels;
+import org.societies.context.api.community.estimation.ICommunityCtxEstimationMgr;
 
 /**
  * @author yboul 07-Dec-2011 4:15:14 PM
  */
-
 public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 	@Override
