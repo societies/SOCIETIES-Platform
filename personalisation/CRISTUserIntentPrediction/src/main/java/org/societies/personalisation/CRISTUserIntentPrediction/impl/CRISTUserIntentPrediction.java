@@ -34,6 +34,7 @@ import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.mock.ServiceResourceIdentifier;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
+import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
@@ -87,90 +88,64 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		this.preManager = (IPersonalisationInternalCallback) internalPreManager;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.
-	 * ICRISTUserIntentPrediction#enableCRISTPrediction(boolean)
+	/* (non-Javadoc)
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#enableCRISTPrediction(boolean)
 	 */
 	@Override
 	public void enableCRISTPrediction(boolean bool) {
 		// TODO Auto-generated method stub
-
+		
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.
-	 * ICRISTUserIntentPrediction
-	 * #getCRISTPrediction(org.societies.api.context.model.CtxAttribute)
+	/* (non-Javadoc)
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCRISTPrediction(org.societies.api.mock.EntityIdentifier, org.societies.api.context.model.CtxAttribute, org.societies.personalisation.common.api.management.IPersonalisationInternalCallback)
 	 */
 	@Override
-	public ArrayList<ICRISTUserAction> getCRISTPrediction(
-			EntityIdentifier entityID, CtxAttribute ctxAttribute, IPersonalisationInternalCallback callback) {
-		// TODO Auto-generated method stub
-		System.out.println("CRISTUIPredictor has been invoked...");
-		
-		// TODO
-		// Produce a CRIST UI Prediction based on the given context		
-		this.preManager.sendCRISTOutcome(myId, cristOutcome);
-		
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.
-	 * ICRISTUserIntentPrediction
-	 * #getCurrentUserIntentAction(org.societies.api.mock.EntityIdentifier,
-	 * org.societies.api.mock.EntityIdentifier,
-	 * org.societies.api.mock.ServiceResourceIdentifier)
-	 */
-	@Override
-	public ICRISTUserAction getCurrentUserIntentAction(
-			EntityIdentifier requestor, EntityIdentifier ownerID,
-			ServiceResourceIdentifier serviceID) {
+	public ArrayList<CRISTUserAction> getCRISTPrediction(
+			EntityIdentifier entityID, CtxAttribute ctxAttribute,
+			IPersonalisationInternalCallback callback) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.
-	 * ICRISTUserIntentPrediction
-	 * #sendFeedback(org.societies.api.internal.personalisation
-	 * .model.FeedbackEvent)
-	 */
-	@Override
-	public void sendFeedback(FeedbackEvent feedbackEvent) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.
-	 * ICRISTUserIntentPrediction
-	 * #updateReceived(org.societies.api.context.model.CtxModelObject)
-	 */
-	@Override
-	public void updateReceived(CtxModelObject ctxModelObj) {
-		// TODO Auto-generated method stub
-
 	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCRISTPrediction(org.societies.api.mock.EntityIdentifier, org.societies.api.personalisation.model.IAction, org.societies.personalisation.common.api.management.IPersonalisationInternalCallback)
 	 */
 	@Override
-	public ArrayList<ICRISTUserAction> getCRISTPrediction(
+	public ArrayList<CRISTUserAction> getCRISTPrediction(
 			EntityIdentifier entityID, IAction action,
 			IPersonalisationInternalCallback callback) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCurrentUserIntentAction(org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ServiceResourceIdentifier)
+	 */
+	@Override
+	public CRISTUserAction getCurrentUserIntentAction(
+			EntityIdentifier requestor,
+			EntityIdentifier ownerID,
+			org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ServiceResourceIdentifier serviceID) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#sendFeedback(org.societies.api.internal.personalisation.model.FeedbackEvent)
+	 */
+	@Override
+	public void sendFeedback(FeedbackEvent feedbackEvent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#updateReceived(org.societies.api.context.model.CtxModelObject)
+	 */
+	@Override
+	public void updateReceived(CtxModelObject ctxModelObj) {
+		// TODO Auto-generated method stub
+		
 	}
 }

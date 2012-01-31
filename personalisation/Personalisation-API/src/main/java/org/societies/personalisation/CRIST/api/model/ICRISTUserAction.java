@@ -22,7 +22,7 @@ public interface ICRISTUserAction extends IOutcome {
 	 */
 	public String getActionID();
 
-	public HashMap<ICRISTUserSituation, Double> getActionSituations();
+	public HashMap<CRISTUserSituation, Double> getActionSituations();
 
 	public int getConfidenceLevel();
 
@@ -36,7 +36,7 @@ public interface ICRISTUserAction extends IOutcome {
 	 * 
 	 * @param actionSituations
 	 */
-	public void setActionSituations(HashMap<ICRISTUserSituation,Double> actionSituations);
+	public void setActionSituations(HashMap<CRISTUserSituation,Double> actionSituations);
 
 	/**
 	 * 

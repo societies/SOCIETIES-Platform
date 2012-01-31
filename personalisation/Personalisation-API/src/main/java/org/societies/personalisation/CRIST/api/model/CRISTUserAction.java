@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.api.personalisation.model.Action;
 
 /**
@@ -30,7 +30,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 * A list of situations and the corresponding probability related to the
 	 * IntentAction
 	 */
-	HashMap<ICRISTUserSituation, Double> actionSituations;
+	HashMap<CRISTUserSituation, Double> actionSituations;
 	/**
 	 * The confidence level of the IntentAction
 	 */
