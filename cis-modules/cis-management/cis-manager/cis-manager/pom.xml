@@ -58,7 +58,7 @@
 						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<Import-Package></Import-Package>
+						<Import-Package>*;resolution:=optional</Import-Package>
 						<Export-Package></Export-Package>
 					</instructions>
 				</configuration>
