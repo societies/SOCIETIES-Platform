@@ -36,9 +36,15 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 
 /**
- * IUserCtxBroker interface allows to manage user context data.
+ * This interface provides access to current, past and future context data. The
+ * past context refers to the data stored in the context history database. The
+ * future context information is provided on the fly based on context
+ * prediction methods. The Context Broker also supports distributed context
+ * queries; it is a gateway to context data and decides whether the local DB, a
+ * remote DB or the Context Inference Management need to be contacted to
+ * retrieve the requested context data.
  *  
- * @author <a href="mailto:nikosk@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.0
  */
 public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCtxBroker {
@@ -48,7 +54,6 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * 
 	 * @param type
 	 * @param callback
-	 * @since 0.0.1
 	 */
 	public void createAssociation(String type, IUserCtxBrokerCallback callback);
 
@@ -59,16 +64,32 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @param enum
 	 * @param type
 	 * @param callback
+	 * @deprecated As of release 0.0.1, replaced by {@link #createAttribute(CtxEntityIdentifier, String, IUserCtxBrokerCallback)}
+	 */
+	@Deprecated
+	public void createAttribute(CtxEntityIdentifier scope, CtxAttributeValueType enumerate, String type, IUserCtxBrokerCallback callback);
+	
+	/**
+	 * Creates a {@link CtxAttribute} of the specified type which is associated to
+	 * the identified context entity (scope). The generated attribute is returned
+	 * through the {@link IUserCtxBrokerCallback#ctxAttributeCreated} method.
+	 * 
+	 * @param scope
+	 *            the identifier of the context entity to associate with the new
+	 *            attribute
+	 * @param type
+	 *            the type of the context attribute to create
+	 * @param callback
+	 *            the callback to return the created context attribute
 	 * @since 0.0.1
 	 */
-	public void createAttribute(CtxEntityIdentifier scope, CtxAttributeValueType enumerate, String type, IUserCtxBrokerCallback callback);
+	public void createAttribute(CtxEntityIdentifier scope, String type, IUserCtxBrokerCallback callback);
 
 	/**
 	 * Creates a CtxEntity
 	 * 
 	 * @param type
 	 * @param callback
-	 * @since 0.0.1
 	 */
 	public void createEntity(String type, IUserCtxBrokerCallback callback);
 
@@ -76,14 +97,11 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * Disables context monitoring to Context Database
 	 * 
 	 * @param type
-	 * @since 0.0.1
 	 */
 	public void disableCtxMonitoring(CtxAttributeValueType type);
 
 	/**
 	 * Disables context recording to Context History Database
-	 * 
-	 * @since 0.0.1
 	 */
 	public void disableCtxRecording();
 
@@ -91,14 +109,12 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * Enables context monitoring to Context Database
 	 * 
 	 * @param type
-	 * @since 0.0.1
 	 */
 	public void  enableCtxMonitoring(CtxAttributeValueType type);
 
 	/**
 	 * Enables context recording to Context History Database
 	 * 
-	 * @since 0.0.1
 	 */
 	public void enableCtxRecording();
 
@@ -121,7 +137,6 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @param modelType
 	 * @param type
 	 * @param callback
-	 * @since 0.0.1
 	 */
 	public void lookup(CtxModelType modelType, String type, IUserCtxBrokerCallback callback);
 
@@ -134,7 +149,6 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @param minAttribValue
 	 * @param maxAttribValue
 	 * @param callback
-	 * @since 0.0.1
 	 */
 	public void lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue, IUserCtxBrokerCallback callback);
 
@@ -145,7 +159,6 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @param scope
 	 * @param attrType
 	 * @param callback
-	 * @since 0.0.1
 	 */
 	public void registerForUpdates(CtxEntityIdentifier scope, String attrType, IUserCtxBrokerCallback callback);
 
@@ -155,7 +168,6 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * 
 	 * @param attrId
 	 * @param callback
-	 * @since 0.0.1
 	 */
 	public void registerForUpdates(CtxAttributeIdentifier attrId, IUserCtxBrokerCallback callback);
 
@@ -164,7 +176,6 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * 
 	 * @param identifier
 	 * @param callback
-	 * @since 0.0.1
 	 */
 	public void remove(CtxIdentifier identifier, IUserCtxBrokerCallback callback);
 
@@ -174,7 +185,6 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @param type
 	 * @param startDate
 	 * @param endDate
-	 * @since 0.0.1
 	 */
 	public int removeHistory(String type, Date startDate, Date endDate);
 
@@ -183,7 +193,6 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * 
 	 * @param identifier
 	 * @param callback
-	 * @since 0.0.1
 	 */
 	public void retrieve(CtxIdentifier identifier, IUserCtxBrokerCallback callback);
 
@@ -193,7 +202,6 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @param attrId
 	 * @param date
 	 * @param callback
-	 * @since 0.0.1
 	 */
 	public void retrieveFuture(CtxAttributeIdentifier attrId, Date date, IUserCtxBrokerCallback callback);
 
@@ -203,7 +211,6 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @param attrId
 	 * @param modificationIndex
 	 * @param callback
-	 * @since 0.0.1
 	 */
 	public void retrieveFuture(CtxAttributeIdentifier attrId, int modificationIndex, IUserCtxBrokerCallback callback);
 
@@ -214,7 +221,6 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @param attrId
 	 * @param modificationIndex
 	 * @param callback
-	 * @since 0.0.1
 	 */
 	public void retrievePast(CtxAttributeIdentifier attrId, int modificationIndex, IUserCtxBrokerCallback callback);
 
@@ -226,7 +232,6 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @param startDate
 	 * @param endDate
 	 * @param callback
-	 * @since 0.0.1
 	 */
 	public void retrievePast(CtxAttributeIdentifier attrId, Date startDate, Date endDate, IUserCtxBrokerCallback callback);
 
@@ -237,7 +242,6 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * 
 	 * @param attrId
 	 * @param callback
-	 * @since 0.0.1
 	 */
 	public void unregisterForUpdates(CtxAttributeIdentifier attrId, IUserCtxBrokerCallback callback);
 
@@ -248,7 +252,6 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @param scope
 	 * @param attributeType
 	 * @param callback
-	 * @since 0.0.1
 	 */
 	public void unregisterForUpdates(CtxEntityIdentifier scope, String attributeType, IUserCtxBrokerCallback callback);
 
@@ -257,7 +260,6 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * 
 	 * @param identifier
 	 * @param callback
-	 * @since 0.0.1
 	 */
 	public void update(CtxModelObject identifier, IUserCtxBrokerCallback callback);
 
@@ -296,6 +298,7 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @throws IllegalArgumentException if the type of the specified context
 	 *            attribute value is not valid (supported value types are defined
 	 *            in {@link org.societies.api.context.model.CtxAttributeValueType})
+	 * @since 0.0.1
 	 */
 	public void updateAttribute(CtxAttributeIdentifier attributeId, Serializable value,
 			IUserCtxBrokerCallback callback);
@@ -333,6 +336,7 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @throws IllegalArgumentException if the type of the specified context
 	 *            attribute value is not valid (supported value types are defined
 	 *            in {@link org.societies.api.context.model.CtxAttributeValueType})
+	 * @since 0.0.1
 	 */
 	public void updateAttribute(CtxAttributeIdentifier attributeId, Serializable value,
 			String valueMetric, IUserCtxBrokerCallback callback);
@@ -344,6 +348,7 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @param primaryAttrIdentifier
 	 * @param listOfEscortingAttributeIds
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void setCtxHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
 			List<CtxAttributeIdentifier> listOfEscortingAttributeIds,IUserCtxBrokerCallback callback);
@@ -355,6 +360,7 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @param primaryAttrIdentifier
 	 * @param listOfEscortingAttributeIds
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void getCtxHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
 			List<CtxAttributeIdentifier> listOfEscortingAttributeIds,IUserCtxBrokerCallback callback);
@@ -366,6 +372,7 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @param primaryAttrIdentifier
 	 * @param listOfEscortingAttributeIds
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void updateCtxHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
 			List<CtxAttributeIdentifier> listOfEscortingAttributeIds,IUserCtxBrokerCallback callback);
@@ -377,6 +384,7 @@ public interface IUserCtxBroker extends org.societies.api.context.broker.IUserCt
 	 * @param primaryAttrIdentifier
 	 * @param listOfEscortingAttributeIds
 	 * @param callback
+	 * @since 0.0.1
 	 */
 	public void removeCtxHistoryTuples(
 			CtxAttributeIdentifier primaryAttrIdentifier,
