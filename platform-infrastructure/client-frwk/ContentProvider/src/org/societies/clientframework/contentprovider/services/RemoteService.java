@@ -1,9 +1,12 @@
 package org.societies.clientframework.contentprovider.services;
 
 import org.societies.clientframework.contentprovider.Constants;
+import org.societies.clientframework.contentprovider.database.ResultsCursor;
 import org.societies.clientframework.contentprovider.database.StoreResultsDB;
+import org.societies.clientframework.contentprovider.database.TableOneCursor;
 
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
@@ -26,78 +29,61 @@ import android.widget.Toast;
  * simpler way to interact with it.
  */
 public class RemoteService extends Service {
-    /**
-     * This is a list of callbacks that have been registered with the
-     * service.  Note that this is package scoped (instead of private) so
-     * that it can be accessed more efficiently from inner classes.
-     */
-    final RemoteCallbackList<IRemoteServiceCallback> mCallbacks = new RemoteCallbackList<IRemoteServiceCallback>();
-
-    int mValue = 0;
-    StoreResultsDB  storeDB;
+    
+	
+	StoreResultsDB  storeDB;
     
 
     @Override
     public void onCreate() {
         
     	
-    	Log.v(Constants.TAG, "Service INITIALIZATION....");
+    	Log.v(Constants.TAG, "Content Provider Service is started ....");
     	
-        // While this service is running, it will continually increment a
-        // number.  Send the first message that is used to perform the
-        // increment.
-        mHandler.sendEmptyMessage(REPORT_MSG);
+    	// Init DB Connector...
+        storeDB = new StoreResultsDB(this);
+        Log.v(Constants.TAG, "DB initialized to store societies data");
+        
+        
     }
 
     @Override
     public void onDestroy() {
-        Toast.makeText(this, "Remote Stopped", Toast.LENGTH_SHORT).show();
-
-        // Unregister all callbacks.
-        mCallbacks.kill();
+        
+    	Log.v(Constants.TAG, "Content Provider Service is going to be destroied ....");
+    	Toast.makeText(this, "Remote Stopped", Toast.LENGTH_SHORT).show();
 
         storeDB.close();
-        // Remove the next pending message to increment the counter, stopping
-        // the increment loop.
-        mHandler.removeMessages(REPORT_MSG);
+        Log.v(Constants.TAG, "DB closed");
+        Log.v(Constants.TAG, "Content Provider ends");
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         
-    	Log.v(Constants.TAG, "onBind Remote Service Action:"+intent.getAction());
+    	Log.v(Constants.TAG, "Binding Content Provider [Action:"+intent.getAction()+"]");
     	
-    	// Init DB Connector...
-        storeDB = new StoreResultsDB(this);
+    	Log.v(Constants.TAG, "It is possibile to do different action based on the action selected!");
     	
-    	// Select the interface to return.  If your service only implements
-        // a single interface, you can just return it here without checking
-        // the Intent.
-        if (IRemoteService.class.getName().equals(intent.getAction())) {
-            return mBinder;
-        }
         if (IConsumer.class.getName().equals(intent.getAction())) {
+        	Log.v(Constants.TAG, "Return IConsumer BINDER");
+        	storeDB.setTable(Constants.TABLE_RESULTS);
             return mConsumerBinder;
         }
+        else if (ISocietiesConsumer.class.getName().equals(intent.getAction())){
+        	Log.v(Constants.TAG, "Return ISocietiesConsumer BINDER");
+        	storeDB.setTable(Constants.TABLE_ONE);
+        	return mConsumer2Binder;
+        }
+        
+        
+        Log.v(Constants.TAG, "No STUB for this action ==> RETURN NULL");
         
         
         return null;
     }
 
-    /**
-     * The IRemoteInterface is defined through IDL
-     */
-    private final IRemoteService.Stub mBinder = new IRemoteService.Stub() {
-       
-    	public void registerCallback(IRemoteServiceCallback cb) {
-            if (cb != null) mCallbacks.register(cb);
-        }
-        public void unregisterCallback(IRemoteServiceCallback cb) {
-            if (cb != null) mCallbacks.unregister(cb);
-        }
-        
-        
-    };
+//    
 
     /**
      * Consumer Interface.
@@ -105,10 +91,17 @@ public class RemoteService extends Service {
     private final IConsumer.Stub mConsumerBinder = new IConsumer.Stub() {
 
     	public boolean store(String key, String value){
-        	return storeDB.addValue(key, value);
+    		ContentValues map = new ContentValues();
+    		map.put(Constants.TABLE_VALUE, value);
+    		return storeDB.addElementInTable(map);
         }
 		public String getValue(String key) throws RemoteException {
-			return storeDB.getValue(key);
+			ResultsCursor cursor = (ResultsCursor) storeDB.getElement(key);
+			if (cursor.getCount()>0){
+				cursor.moveToFirst();
+				return cursor.getKey();
+			}
+			return null;
 		}
 		public boolean removeKey(String key) throws RemoteException {
 			return storeDB.removeKey(key);
@@ -117,11 +110,74 @@ public class RemoteService extends Service {
 			return storeDB.getKeys();
 		}
 		public void resetDB() throws RemoteException {
-			storeDB.resetDB();
+			storeDB.resetDB(Constants.TABLE_RESULTS);
 		}
         
     };
 
+    
+    private final ISocietiesConsumer.Stub mConsumer2Binder = new ISocietiesConsumer.Stub() {
+		
+		public void storeCredential(String username, String password,String serviceName) throws RemoteException {
+			
+		}
+		
+		public String[] getServices() throws RemoteException {
+			return storeDB.getServices();
+		}
+		
+		public String getCredentialUsename(String serviceName) throws RemoteException {
+			TableOneCursor cursor = (TableOneCursor) storeDB.getElement(Constants.USERNAME, serviceName);
+			if (cursor==null) 			return null;
+			if (cursor.getCount()==0) 	return null;
+			return cursor.getValue();
+		}
+		
+		public String getCredentialPassword(String serviceName) throws RemoteException {
+			TableOneCursor cursor = (TableOneCursor) storeDB.getElement(Constants.PASSWORD, serviceName);
+			if (cursor==null) 			return null;
+			if (cursor.getCount()==0) 	return null;
+			return cursor.getValue();
+		}
+
+		public void storeCommFwk(String server, String port) throws RemoteException {
+			ContentValues map  = new ContentValues();
+			map.put(Constants.TABLE_KEY, Constants.SERVERNAME);
+			map.put(Constants.TABLE_SERVICE, Constants.CLIENT_FWK_SERVICE);
+			map.put(Constants.TABLE_TYPE, String.class.toString());
+			map.put(Constants.TABLE_VALUE, server);
+			storeDB.addElementInTable(map);
+			
+			map  = new ContentValues();
+			map.put(Constants.TABLE_KEY, Constants.SERVERPORT);
+			map.put(Constants.TABLE_SERVICE, Constants.CLIENT_FWK_SERVICE);
+			map.put(Constants.TABLE_TYPE, Integer.class.toString());
+			map.put(Constants.TABLE_VALUE, port);
+			storeDB.addElementInTable(map);
+			
+			
+		}
+
+		public String[] getCommFwkEndpoint() throws RemoteException {
+			
+			String[] endpoint = new String[2];
+			endpoint[0] = "";
+			endpoint[1] = "";
+			
+			TableOneCursor cursor = (TableOneCursor) storeDB.getElement(Constants.SERVERNAME, Constants.CLIENT_FWK_SERVICE);
+			if (cursor!=null){
+				if (cursor.getCount()==1){
+					endpoint[0] =  cursor.getKey();
+					cursor = (TableOneCursor) storeDB.getElement(Constants.SERVERPORT, Constants.CLIENT_FWK_SERVICE);
+					endpoint[1] =  cursor.getKey();
+				}
+			}
+			
+			
+			return endpoint;
+		}
+	};
+    
    
     public void onTaskRemoved(Intent rootIntent) {
         Toast.makeText(this, "Task removed: " + rootIntent, Toast.LENGTH_LONG).show();
@@ -129,39 +185,7 @@ public class RemoteService extends Service {
 
     private static final int REPORT_MSG = 1;
 
-    /**
-     * Our Handler used to execute operations on the main thread.  This is used
-     * to schedule increments of our value.
-     */
-    private final Handler mHandler = new Handler() {
-        @Override public void handleMessage(Message msg) {
-            switch (msg.what) {
-
-                // It is time to bump the value!
-                case REPORT_MSG: {
-                    // Up it goes.
-                    int value = ++mValue;
-
-                    // Broadcast to all clients the new value.
-                    final int N = mCallbacks.beginBroadcast();
-                    for (int i=0; i<N; i++) {
-                        try {
-                            mCallbacks.getBroadcastItem(i).valueChanged(value);
-                        } catch (RemoteException e) {
-                            // The RemoteCallbackList will take care of removing
-                            // the dead object for us.
-                        }
-                    }
-                    mCallbacks.finishBroadcast();
-
-                    // Repeat every 1 second.
-                    sendMessageDelayed(obtainMessage(REPORT_MSG), 1*1000);
-                } break;
-                default:
-                    super.handleMessage(msg);
-            }
-        }
-    };
+   
 
    
 }

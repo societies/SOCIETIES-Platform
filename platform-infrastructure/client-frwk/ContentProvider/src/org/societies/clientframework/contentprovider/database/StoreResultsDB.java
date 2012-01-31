@@ -1,13 +1,12 @@
 package org.societies.clientframework.contentprovider.database;
 
-import java.util.ArrayList;
-
 import org.societies.clientframework.contentprovider.Constants;
 import org.societies.clientframework.contentprovider.R;
 import org.societies.clientframework.contentprovider.Settings;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -17,12 +16,19 @@ public class StoreResultsDB extends SQLiteOpenHelper {
 	
 	
 	private final  Context mContext;
+	private String selected_table = Constants.TABLE_RESULTS;
+	
 	
 	public StoreResultsDB(Context context){
 		super(context, Settings.DATABASE_NAME, null, Settings.DATABASE_VERSION);
 		this.mContext = context;
 	}
 
+	public void setTable(String table){
+		Log.i(Constants.TAG, "DATABASE: Set Table "+ table);
+		this.selected_table = table;
+	}
+	
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		
@@ -82,10 +88,10 @@ public class StoreResultsDB extends SQLiteOpenHelper {
 	}
 	
 	
-	public void resetDB(){
+	public void resetDB(String dbName){
 		String[] whereArgs = new String[]{};
 		try{ 	
-			getWritableDatabase().delete(Constants.TABLE_RESULTS,   "", whereArgs);
+			getWritableDatabase().delete(dbName,   "", whereArgs);
 		}	
 		catch (SQLException e) {
 			Log.e(Constants.TAG, e.toString());
@@ -93,13 +99,10 @@ public class StoreResultsDB extends SQLiteOpenHelper {
 	}
 	
 	
-	public boolean addValue(String key, String value){
-		ContentValues map = new ContentValues();
-		map.put(Constants.TABLE_KEY, 	 key );
-		map.put(Constants.TABLE_VALUE, 	 value);
+	public boolean addElementInTable(ContentValues map){
+		
 		try{ 
-			getWritableDatabase().insert(Constants.TABLE_RESULTS, null, map);
-			Log.v(Constants.TAG, "add pair "+key + " value:" +value+ " into DB");
+			getWritableDatabase().insert(selected_table, null, map);
 			return true;
 		}
 		catch (SQLException e) {
@@ -108,20 +111,56 @@ public class StoreResultsDB extends SQLiteOpenHelper {
 		return false;
 	}
 	
-	public String getValue(String key){
-		String sql = "select * from "+Constants.TABLE_RESULTS+" where key = '"+key+"'";
-		SQLiteDatabase d = getReadableDatabase(); 
-		ResultsCursor rc = (ResultsCursor) d.rawQueryWithFactory(new ResultsCursor.Factory(), sql, null, null);
-		if (rc.getCount()>0){
-			rc.moveToFirst();
-			return rc.getValue();
+	public Cursor getElement(String key, String service){
+		
+		String serviceQuery="";
+		if (service!=null){
+			serviceQuery = " and service = '"+service+"'";
 		}
-		return null;
+		String sql = "select * from "+selected_table+" where key = '"+key+"'" + serviceQuery;
+		SQLiteDatabase d = getReadableDatabase(); 
+		return d.rawQueryWithFactory(new ResultsCursor.Factory(), sql, null, null);
+		
 	}
 	
-	public String[] getKeys(){
+	
+	
+	public String[] getServices(){
+		String[] services = null;
+		String sql = "select DISTINCT service from " + Constants.TABLE_ONE + "";
+		SQLiteDatabase d = getReadableDatabase(); 
+		TableOneCursor toc = (TableOneCursor)d.rawQueryWithFactory(new ResultsCursor.Factory(), sql, null, null);
+		
+		if(toc.getCount()>0){
+			services = new String[toc.getCount()];
+			toc.moveToFirst();
+			services[0] = toc.getService();
+			int index=1;
+			while (toc.moveToNext()){
+				services[index]=toc.getService();
+				index++;
+			}
 			
-			String sql = "select * from "+ Constants.TABLE_RESULTS;
+		}
+		return services;
+	}
+	
+	public Cursor getElement(String key){
+		return getElement(key, null);
+	}
+	
+	
+	public String[] getKeys(){
+		return getKeys(null);
+	}
+	
+	public String[] getKeys(String service){
+			
+			String serviceQuery="";
+			if (service!=null){
+				serviceQuery = " where service = '"+service+"'";
+			}
+			String sql = "select * from "+ selected_table + serviceQuery;
 			SQLiteDatabase d = getReadableDatabase(); 
 	
 			ResultsCursor rc = (ResultsCursor)d.rawQueryWithFactory(new ResultsCursor.Factory(), sql, null, null);
@@ -140,11 +179,24 @@ public class StoreResultsDB extends SQLiteOpenHelper {
 		
 	}
 	
-	
 	public boolean removeKey(String key){
+		return removeKey(null);	
+	}
+	
+	public boolean removeKey(String key, String service){
+		
+		
+		String where="key=?";
 		String[] whereArgs = new String[]{key};
+		if (service!=null){
+			where = " and service=?";
+			whereArgs = new String[]{key, service};
+		}
+		
+		
 		try{ 	
-			getWritableDatabase().delete(Constants.TABLE_RESULTS,  "key=?", whereArgs);
+			getWritableDatabase().delete(selected_table,  where, whereArgs);
+			
 		}
 		catch (SQLException e) {
 			Log.e(Constants.TAG, e.toString());
