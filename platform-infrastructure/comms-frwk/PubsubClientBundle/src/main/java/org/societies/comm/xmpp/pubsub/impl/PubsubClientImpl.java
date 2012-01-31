@@ -1,5 +1,7 @@
 package org.societies.comm.xmpp.pubsub.impl;
 
+import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -58,13 +60,13 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	
 	private ICommManager endpoint;
 	private Map<String,Object> responses;
-	private Map<Subscription,Subscriber> subscribers;
+	private Map<Subscription,List<Subscriber>> subscribers;
 	private IIdentityManager idm;
 	
 	@Autowired
 	public PubsubClientImpl(ICommManager endpoint) {
 		responses = new HashMap<String, Object>();
-		subscribers = new HashMap<Subscription, Subscriber>();
+		subscribers = new HashMap<Subscription, List<Subscriber>>();
 		this.endpoint = endpoint;
 		idm = endpoint.getIdManager();
 		try {
@@ -72,6 +74,10 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		} catch (CommunicationException e) {
 			LOG.error(e.getMessage());
 		}
+	}
+	
+	public ICommManager getICommManager() {
+		return endpoint;
 	}
 	
 	/*
@@ -94,9 +100,10 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			org.jabber.protocol.pubsub.event.Items items = ((org.jabber.protocol.pubsub.event.Event)payload).getItems();
 			String node = items.getNode();
 			Subscription sub = new Subscription(stanza.getFrom(), stanza.getTo(), node, null); // TODO may break due to mismatch between "to" and local identity
-			Subscriber subscriber = subscribers.get(sub);
-			for (org.jabber.protocol.pubsub.event.Item i : items.getItem())
-				subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), (Element) i.getAny());
+			List<Subscriber> subscriberList = subscribers.get(sub);
+			for (Subscriber subscriber : subscriberList)
+				for (org.jabber.protocol.pubsub.event.Item i : items.getItem())
+					subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), (Element) i.getAny());
 		}
 	}
 	// TODO subId
@@ -139,8 +146,12 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 
 	@Override
 	public void receiveItems(Stanza stanza, String node, List<XMPPNode> items) {
-		// TODO Auto-generated method stub
-		
+		SimpleEntry<String, List<XMPPNode>> mapSimpleEntry = new AbstractMap.SimpleEntry<String, List<XMPPNode>>(node, items);
+		synchronized (responses) {
+			LOG.info("receiveItems 4 id "+stanza.getId());
+			responses.put(stanza.getId(), mapSimpleEntry);
+			responses.notifyAll();
+		}
 	}
 
 	/*
@@ -148,66 +159,96 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	 */
 	
 	private Object blockingIQ(Stanza stanza, Object payload) throws CommunicationException, XMPPError  {
-		Object response = null;
 		endpoint.sendIQSet(stanza, payload, this);
+		return waitForResponse(stanza.getId());
+	}
+	
+	private Object waitForResponse(String id) throws XMPPError {
+		Object response = null;
 		synchronized (responses) {
-			response = responses.remove(stanza.getId());
+			response = responses.remove(id);
 			while (response==null) {
 				try {
-					LOG.info("waiting response 4 id "+stanza.getId());
+					LOG.info("waiting response 4 id "+id);
 					responses.wait(TIMEOUT);
 				} catch (InterruptedException e) {
 					LOG.info(e.getMessage());
 				}
-				LOG.info("checking response 4 id "+stanza.getId());
-				response = responses.remove(stanza.getId());
+				LOG.info("checking response 4 id "+id);
+				response = responses.remove(id);
 			}
-			LOG.info("got response 4 id "+stanza.getId());
+			LOG.info("got response 4 id "+id);
 		}
 		if (response instanceof XMPPError)
 			throw (XMPPError)response;
 		return response;
 	}
-	
+
 	@Override
 	public List<String> discoItems(Identity pubsubService, String node)
 			throws XMPPError, CommunicationException {
-		// TODO
-		return null;
+		String id = endpoint.getItems(pubsubService, node, this);
+		Object response = waitForResponse(id);
+		
+		// TODO node check
+//		String returnedNode = ((SimpleEntry<String, List<XMPPNode>>)response).getKey();
+//		if (returnedNode != node)
+//			throw new CommunicationException("");
+		List<XMPPNode> nodeList = ((SimpleEntry<String, List<XMPPNode>>)response).getValue();
+		List<String> returnList = new ArrayList<String>();
+		for(XMPPNode n : nodeList) 
+			returnList.add(n.getNode());
+		
+		return returnList;
 	}
 
 	@Override
-	public String subscriberSubscribe(Identity pubsubService, String node,
+	public Subscription subscriberSubscribe(Identity pubsubService, String node,
 			Subscriber subscriber) throws XMPPError, CommunicationException {
-		Stanza stanza = new Stanza(pubsubService);
-		Pubsub payload = new Pubsub();
-		Subscribe sub = new Subscribe();
-		sub.setJid(endpoint.getIdentity().getJid());
-		sub.setNode(node);
-		payload.setSubscribe(sub);
-
-		Object response = blockingIQ(stanza, payload);
+		Subscription subscription = new Subscription(pubsubService, endpoint.getIdentity(), node, null);
+		List<Subscriber> subscriberList = subscribers.get(subscription);
 		
-		String subId = ((Pubsub)response).getSubscription().getSubid();
-		subscribers.put(new Subscription(pubsubService, endpoint.getIdentity(), node, subId), subscriber);
+		if (subscriberList==null) {
+			subscriberList = new ArrayList<Subscriber>();
+			
+			Stanza stanza = new Stanza(pubsubService);
+			Pubsub payload = new Pubsub();
+			Subscribe sub = new Subscribe();
+			sub.setJid(endpoint.getIdentity().getJid());
+			sub.setNode(node);
+			payload.setSubscribe(sub);
+	
+			Object response = blockingIQ(stanza, payload);
+			
+			String subId = ((Pubsub)response).getSubscription().getSubid();
+			subscription = new Subscription(pubsubService, endpoint.getIdentity(), node, subId);
+			subscribers.put(subscription, subscriberList);
+		}
 		
-		return subId;
+		subscriberList.add(subscriber);
+		
+		return subscription;
 	}
 
 	@Override
 	public void subscriberUnsubscribe(Identity pubsubService, String node,
-			Identity subscriber, String subId) throws XMPPError,
+			Subscriber subscriber) throws XMPPError,
 			CommunicationException {
-		Stanza stanza = new Stanza(pubsubService);
-		Pubsub payload = new Pubsub();
-		Unsubscribe unsub = new Unsubscribe();
-		unsub.setJid(endpoint.getIdentity().getJid());
-		unsub.setNode(node);
-		payload.setUnsubscribe(unsub);
-
-		Object response = blockingIQ(stanza, payload);		
 		
-		subscribers.remove(new Subscription(pubsubService, endpoint.getIdentity(), node, subId));
+		Subscription subscription = new Subscription(pubsubService, endpoint.getIdentity(), node, null);
+		List<Subscriber> subscriberList = subscribers.get(subscription);
+		subscriberList.remove(subscriber);
+		
+		if (subscriberList.size()==0) {
+			Stanza stanza = new Stanza(pubsubService);
+			Pubsub payload = new Pubsub();
+			Unsubscribe unsub = new Unsubscribe();
+			unsub.setJid(endpoint.getIdentity().getJid());
+			unsub.setNode(node);
+			payload.setUnsubscribe(unsub);
+	
+			Object response = blockingIQ(stanza, payload);
+		}
 	}
 
 	

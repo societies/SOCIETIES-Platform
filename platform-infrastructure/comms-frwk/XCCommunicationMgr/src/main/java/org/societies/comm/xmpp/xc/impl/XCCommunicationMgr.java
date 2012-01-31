@@ -173,15 +173,17 @@ public class XCCommunicationMgr extends AbstractComponent implements
 	}
 
 	@Override
-	public void getInfo(Identity entity, String node, ICommCallback callback)  throws CommunicationException {
+	public String getInfo(Identity entity, String node, ICommCallback callback)  throws CommunicationException {
 		IQ iq = helper.buildInfoIq(entity, node, callback);
 		this.send(iq);
+		return iq.getID();
 	}
 
 	@Override
-	public void getItems(Identity entity, String node, ICommCallback callback)  throws CommunicationException {
+	public String getItems(Identity entity, String node, ICommCallback callback)  throws CommunicationException {
 		IQ iq = helper.buildItemsIq(entity, node, callback);
 		this.send(iq);
+		return iq.getID();
 	}
 
 	@Override
