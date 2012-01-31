@@ -22,33 +22,29 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.communityInheritance.impl;
+package org.societies.context.community.inheritance.impl;
 
-import org.societies.api.internal.context.community.inheritance.ICommunityCtxInheritanceMgr;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.context.api.community.inheritance.ICommunityCtxInheritanceMgr;
 
 public class CommunityContextInheritance implements ICommunityCtxInheritanceMgr {
 
 	@Override
 	public void getParentCis(EntityIdentifier cidIdentifier) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub		
 	}
 
 	@Override
 	public void inheritContext(CtxAttributeIdentifier ctxAttributeIdentifier,
 			CtxAttributeValueType type, EntityIdentifier cisId) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void retrieveCtx(CtxAttributeIdentifier ctxAttributeIdentifier,
 			CtxAttributeValueType type, EntityIdentifier cisId) {
 		// TODO Auto-generated method stub
-		
 	}
-
 }
