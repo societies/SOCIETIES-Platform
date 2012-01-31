@@ -32,7 +32,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfus
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 /**
  * External interface to do actions when using a data.
@@ -54,7 +54,7 @@ public interface IPrivacyDataManager {
 	 * @param serviceId The service_Id the service
 	 * @return A ResponseItem with permission information in it
 	 */
-	public ResponseItem checkPermission(DataIdentifier dataId, EntityIdentifier ownerId, EntityIdentifier requestorId, ServiceResourceIdentifier serviceId);
+	public ResponseItem checkPermission(DataIdentifier dataId, EntityIdentifier ownerId, EntityIdentifier requestorId, IServiceResourceIdentifier serviceId);
 
 	/**
 	 * Check permission to access/use/disclose a data for a CIS usage

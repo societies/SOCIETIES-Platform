@@ -39,7 +39,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".devicestatus.DeviceStatusServiceDifferentProcess"></service>
-        <service android:name=".devicestatus.DeviceStatusServiceSameProcess"></service>
+        <service
+            android:name=".devicestatus.DeviceStatusServiceDifferentProcess"
+            android:process=":remote2"></service>
+        <service 
+            android:name=".devicestatus.DeviceStatusServiceSameProcess"
+        ></service>
     </application>
 </manifest>

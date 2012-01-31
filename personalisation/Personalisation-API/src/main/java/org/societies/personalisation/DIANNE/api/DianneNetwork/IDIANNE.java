@@ -22,7 +22,7 @@ package org.societies.personalisation.DIANNE.api.DianneNetwork;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 /**
  * 
@@ -33,25 +33,35 @@ import org.societies.api.mock.ServiceResourceIdentifier;
 public interface IDIANNE {
 	
 	/**
-	 * This method will return the current value of the DIANNE preference
+	 * This method will return the current value of the DIANNE preference as an IDIANNEOutcome through the callback
 	 * @param ownerId	the DigitalIdentity of the owner of the preferences
 	 * @param serviceId	the service identifier of the service requesting the outcome
 	 * @param preferenceName	the name of the preference being requested
+	 * @param callback  the callback to which the IDIANNEOutcome is sent
 	 */
-	public IOutcome getOutcome(EntityIdentifier ownerId, ServiceResourceIdentifier serviceId, String preferenceName);
+	public void getOutcome(EntityIdentifier ownerId, 
+			IServiceResourceIdentifier serviceId, 
+			String preferenceName, 
+			IDIANNECallback callback);
 	
 	/**
-	 * This method will return the current value of the DIANNE preference given the new context update
+	 * This method will return the current value of the DIANNE preference, as an IDIANNEOutcome through the callback, given the new context update
 	 * @param ownerId	the DigitalIdentity of the owner of the preference
 	 * @param serviceId	the service identifier of the service requesting the outcome
 	 * @param preferenceName	the name of the preference being requested
 	 * @param attribute		the context attribute update to implement in the DIANNE before retrieval
+	 * @param callback  the callback to which the IDIANNEOutcome is sent
 	 */
-	public IOutcome getOutcome(EntityIdentifier ownerId, ServiceResourceIdentifier serviceId, String preferenceName, CtxAttribute attribute);
+	public void getOutcome(EntityIdentifier ownerId, 
+			IServiceResourceIdentifier serviceId, 
+			String preferenceName, 
+			CtxAttribute attribute, 
+			IDIANNECallback callback);
 	
 	/**
 	 * This method will start DIANNE learning
 	 * @param ownerId  the DigitalIdentity for which DIANNE learning should be enabled
+	 * @param callback  the callback to which the IDIANNEOutcome is sent
 	 */
 	public void enableDIANNELearning(EntityIdentifier ownerId);
 	
@@ -60,5 +70,19 @@ public interface IDIANNE {
 	 * @param ownerId  the DigitalIdentity for which DIANNE learning should be disabled
 	 */
 	public void disableDIANNELearning(EntityIdentifier ownerId);
+	
+	
+	
+	
+	@Deprecated
+	public IOutcome getOutcome(EntityIdentifier ownerId, IServiceResourceIdentifier serviceId, String preferenceName);
+	
+	
+	@Deprecated
+	public IOutcome getOutcome(EntityIdentifier ownerId, IServiceResourceIdentifier serviceId, String preferenceName, CtxAttribute attribute);
+	
+	
+	
+	
 
 }

@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityLifecycleManagement;
 import org.societies.api.context.model.CtxEntityIdentifier;
 //import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.internal.cis.cis_management.CisRecord;
 import org.societies.api.mock.EntityIdentifier;
 
 /**
@@ -47,10 +48,18 @@ import org.societies.api.mock.EntityIdentifier;
 
 public class CommunityLifecycleManagementTest {
 	
+	private CommunityLifecycleManagement communityLifecycleManagement;
 	//@Test
 	//public void testLoop() {
 	//	CommunityLifecycleManagement.loop();
 	//}
+	
+	@Test
+	public void testSetup() {
+		communityLifecycleManagement = new CommunityLifecycleManagement(new EntityIdentifier(), "CSS");
+		communityLifecycleManagement = new CommunityLifecycleManagement(new EntityIdentifier(), "Domain");
+		//communityLifecycleManagement = new CommunityLifecycleManagement(new CisRecord(null, null, null, null, null, null, null, null));
+	}
 	
 	@Test
 	public void testProcessPreviousShortTimeCycle() {

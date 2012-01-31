@@ -7,7 +7,6 @@
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>0.1</version>
-		<relativePath>../../../parent/spring-osgi.xml</relativePath>
 	 </parent>
     
     <modelVersion>4.0.0</modelVersion>
@@ -15,7 +14,7 @@
     <artifactId>XCCommunicationMgr</artifactId>
     <packaging>bundle</packaging>
     <name>XC Communication Manager</name>
-    <version>${release.version}</version>
+    <version>${version.comm}</version>
 
     <properties>
         <slf4j.version>1.5.8</slf4j.version>
@@ -27,11 +26,28 @@
     <dependencies>
     	<!-- Interface -->
     	<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+    	
+    	<!-- Commons -->
+    	<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${version.comm}</version>
 			<scope>compile</scope>
 		</dependency>
+    	<!-- SCHEMA'S REQUIRED FOR EXAMPLE SERVICES - TO BE REMOVED LATER -->
+    	<!--
+    	<dependency>
+			<groupId>org.societies.example</groupId>
+			<artifactId>internalAPI</artifactId>
+			<version>0.1</version>
+			<scope>provided</scope>
+		</dependency>
+		-->
     
 		<!-- XMPP -->
 		<dependency>
@@ -82,14 +98,9 @@
     				<instructions>
     					<Import-Package>
     						org.osgi.framework,
-    						!org.gjt.*,
-    						!org.jaxen.*,
-    						!org.mortbay.*,
-    						!org.relaxng.*,
     						!org.jvnet.staxex,
     						!org.jvnet.fastinfoset,
     						!com.sun.xml.fastinfoset.*,
-    						!com.sun.msv.*,
     						org.slf4j*;version="1.5.8",
     						*;resolution:=optional
     					</Import-Package>
@@ -111,7 +122,7 @@
 						<artifactItem>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>${project.artifactId}</artifactId>
-							<version>${release.version}</version>
+							<version>${version.comm}</version>
 							<type>bundle</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>

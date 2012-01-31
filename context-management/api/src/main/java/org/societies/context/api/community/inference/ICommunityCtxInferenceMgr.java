@@ -32,8 +32,6 @@ import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
-import org.societies.api.internal.context.user.prediction.PredictionMethod;
-
 
 
 /**
@@ -41,12 +39,6 @@ import org.societies.api.internal.context.user.prediction.PredictionMethod;
  * @created 12-Nov-2011 7:15:15 PM
  */
 public interface ICommunityCtxInferenceMgr {
-
-	/**
-	 * 
-	 * @param predictionMethodl
-	 */
-	public void addPredictionMethod(PredictionMethod  predictionMethod );
 
 	/**
 	 * 
@@ -62,11 +54,6 @@ public interface ICommunityCtxInferenceMgr {
 	 */
 	public Map<CtxAttributeIdentifier,Double> evaluateSimilarity(List<CtxAttributeIdentifier> listCtxID, List<CtxAttributeIdentifier> listCtxID2);
 
-	/**
-	 * 
-	 * @param predictionMethod
-	 */
-	public PredictionMethod getDefaultPredictionMethod(PredictionMethod predictionMethod);
 
 	/**
 	 * 
@@ -82,7 +69,7 @@ public interface ICommunityCtxInferenceMgr {
 	 * @param predictionMethod
 	 * @param date
 	 */
-	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, PredictionMethod predictionMethod, Date date);
+	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, Date date);
 
 	/**
 	 * 
@@ -90,21 +77,8 @@ public interface ICommunityCtxInferenceMgr {
 	 * @param predictionMethodl
 	 * @param int
 	 */
-	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, PredictionMethod predictionMethodl, int index );
+	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, int index );
 
-	/**
-	 * 
-	 * @param ctxAttrID
-	 * @param date
-	 */
-	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, Date date);
-
-	/**
-	 * 
-	 * @param ctxAttrID
-	 * @param index
-	 */
-	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID, int index);
 
 	/**
 	 * 
@@ -112,16 +86,5 @@ public interface ICommunityCtxInferenceMgr {
 	 */
 	public void refineContext(CtxAttributeIdentifier ctxAttrId);
 
-	/**
-	 * 
-	 * @param predictionMethod
-	 */
-	public void removePredictionMethod(PredictionMethod predictionMethod);
-
-	/**
-	 * 
-	 * @param predMethod
-	 */
-	public void setDefaultPredictionMethod(PredictionMethod predMethod);
 
 }

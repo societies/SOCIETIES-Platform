@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
@@ -215,5 +216,46 @@ public interface IUserCtxBrokerCallback {
 	 * @since 0.0.1
 	 */
 	public void updateReceived(CtxModelObject ctxModelObj);
+	
+	
+	/**
+	 * The callback of IUserCtxBroker method
+	 * setCtxHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+	 *		List<CtxAttributeIdentifier> listOfEscortingAttributeIds,IUserCtxBrokerCallback callback)
+	 * 
+	 * @param flag 
+	 * @since 0.0.1
+	 */
+	public void ctxHistoryTuplesSet(Boolean flag);
+
+	/**
+	 * The callback of IUserCtxBroker method
+	 * getCtxHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+	 *		List<CtxAttributeIdentifier> listOfEscortingAttributeIds,IUserCtxBrokerCallback callback)
+	 * 
+	 * @param listOfEscortingAttributeIds 
+	 * @since 0.0.1
+	 */
+	public void ctxHistoryTuplesRetrieved(List<CtxAttributeIdentifier> listOfEscortingAttributeIds);
+
+	/**
+	 * The callback of IUserCtxBroker method
+	 * updateCtxHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+	 *		List<CtxAttributeIdentifier> listOfEscortingAttributeIds,IUserCtxBrokerCallback callback)
+	 *  
+	 * @param listOfEscortingAttributeIds
+	 * @since 0.0.1
+	 */
+	public void ctxHistoryTuplesUpdated (List<CtxAttributeIdentifier> listOfEscortingAttributeIds);
+
+	/**
+	 * The callback of IUserCtxBroker method
+	 * removeCtxHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+	 *		List<CtxAttributeIdentifier> listOfEscortingAttributeIds,IUserCtxBrokerCallback callback)
+	 * 
+	 * @param flag 
+	 * @since 0.0.1
+	 */
+	public void ctxHistoryTuplesRemoved(Boolean flag);
 
 }

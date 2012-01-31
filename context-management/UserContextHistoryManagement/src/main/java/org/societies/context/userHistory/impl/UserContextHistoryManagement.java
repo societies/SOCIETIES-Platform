@@ -24,6 +24,7 @@
  */
 package org.societies.context.userHistory.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,19 +40,26 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.context.api.user.history.IUserCtxHistoryCallback;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
 
+
+
 public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
-	private final LinkedHashMap<CtxHistoryAttribute,Date> hocObjects;
+	private final LinkedHashMap<Long,List> hocObjects;
 
 	public UserContextHistoryManagement(){
-		this.hocObjects =  new LinkedHashMap<CtxHistoryAttribute,Date>();
+		this.hocObjects =  new LinkedHashMap<Long,List>();
 	}
 
 
 
 	public void storeHoCAttribute(CtxAttribute ctxAttribute,Date date){
 		CtxHistoryAttribute hocAttr = new CtxHistoryAttribute(ctxAttribute);
-		this.hocObjects.put(hocAttr, date);	
+		Long i = HistoryCtxModelObjectNumberGenerator.getNextValue();
+		List<Serializable> hocObject = new ArrayList();
+		hocObject.add(0,hocAttr.getId());
+		hocObject.add(1,hocAttr);
+		hocObject.add(2,date);
+		this.hocObjects.put(i,hocObject);	
 	}
 
 
@@ -71,7 +79,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 	public void getHistoryTuplesID(
 			CtxAttributeIdentifier primaryAttrIdentifier,IUserCtxHistoryCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -81,29 +89,39 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 		// TODO Auto-generated method stub
 
 	}
-/*
-	@Override
-	public void registerHistoryTuples(
-			CtxAttributeIdentifier primaryAttrIdentifier,
-			CtxAttributeIdentifier listOfEscortingAttributeTypes) {
-		// TODO Auto-generated method stub
-
-	}
-*/
+	
 	@Override
 	public void removeHistory(CtxAttribute ctxAttribute, Date startDate,
 			Date endDate,IUserCtxHistoryCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void removeHistory(String type, Date startDate, Date endDate,IUserCtxHistoryCallback callback) {
 		// TODO Auto-generated method stub
+
+	}
+
+	public List<CtxHistoryAttribute> retrieveHistory(CtxAttributeIdentifier attrId) {
+
 		
+		List<CtxHistoryAttribute> results = new ArrayList<CtxHistoryAttribute>();
+		for(Long l : this.hocObjects.keySet()){
+			
+			List tempRes = this.hocObjects.get(l);
+			CtxAttributeIdentifier ctxAttrid = (CtxAttributeIdentifier) tempRes.get(0);
+			if (ctxAttrid.equals(attrId)){
+				
+				results.add((CtxHistoryAttribute) tempRes.get(1));
+			}
+		}
+
+		return results;
 	}
 
 
+	/*
 	public List<CtxHistoryAttribute> retrieveHistory(CtxAttributeIdentifier attrId) {
 
 		List<CtxHistoryAttribute> results = new ArrayList<CtxHistoryAttribute>();
@@ -115,14 +133,14 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
 		return results;
 	}
-
+	 */
 	@Override
 	public void retrieveHistory(CtxAttributeIdentifier attrId,
 			Date startDate, Date endDate,IUserCtxHistoryCallback callback) {
-		
+
 		List<CtxHistoryAttribute> results = new ArrayList<CtxHistoryAttribute>();
 		results = retrieveHistory(attrId);
-	 
+
 		callback.historyRetrievedDate(results);
 	}
 
@@ -132,7 +150,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 			List<CtxAttributeIdentifier> listOfEscortingAttributeIds,
 			Date startDate, Date endDate,IUserCtxHistoryCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 
@@ -140,7 +158,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 	@Override
 	public void retrieveHistory(CtxAttributeIdentifier attrId, int modificationIndex,IUserCtxHistoryCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

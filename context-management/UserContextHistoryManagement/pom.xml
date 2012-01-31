@@ -12,7 +12,7 @@
 	</parent>
 
 	<!-- groupId is set in parent pom -->
-	<artifactId>UserContextHistory</artifactId>
+	<artifactId>user-context-history-mgmt</artifactId>
 	<version>${version.cm}</version>
 	<packaging>bundle</packaging>
 
@@ -44,13 +44,6 @@
 
 	<!-- List dependencies here -->
 	<dependencies>
-		<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
@@ -94,7 +87,7 @@
 							<groupId>${project.groupId}</groupId>
 							<artifactId>${project.artifactId}</artifactId>
 							<version>${version.cm}</version>
-							<type>bundle</type>
+							<type>jar</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</artifactItem>
@@ -105,7 +98,7 @@
 	</build>	
 
 
-	<name>User History Management</name>
+	<name>User Context History Management</name>
 
 	<groupId>org.societies.context-management</groupId>
 </project>

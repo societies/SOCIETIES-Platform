@@ -18,11 +18,10 @@
 
 	<developers>
 		<developer>
-			<id>nikoskal</id>
-			<name>Nikos Kalatzis</name>
-			<email>nikosk@cn.ntua.gr</email>
-			<organization>ICCS</organization>
-			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<name>Giorgos Bouloudis</name>
+			<email>ybouloudis@amitec.gr</email>
+			<organization>Amitec</organization>
+			<organizationUrl>http://www.amitec.gr/</organizationUrl>
 			<roles>
 				<role>owner</role>
 				<role>developer</role>
@@ -30,9 +29,9 @@
 			<timezone>+2</timezone>
 		</developer>
 	    <developer>
-			<id>pkosmides</id>
-			<name>Pavlos Kosmides</name>
-			<email>pkosmidi@central.ntua.gr</email>
+			<id>nikoskal</id>
+			<name>Nikos Kalatzis</name>
+			<email>nikosk@cn.ntua.gr</email>
 			<organization>ICCS</organization>
 			<organizationUrl>http://www.iccs.gr/</organizationUrl>
 			<roles>
@@ -99,5 +98,6 @@
 	
 		</plugins>
 	</build>	
-	<artifactId>CommunityContextPrediction</artifactId>
+	<artifactId>community-context-prediction</artifactId>
+	<name>Community Context Prediction</name>
 </project>

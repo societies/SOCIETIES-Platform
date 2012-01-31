@@ -168,6 +168,9 @@ public class AutomaticCommunityConfigurationManager {
 		//    }
 	    //}
 		
+		//If two unrelated CISs are similar, suggest merge
+		//If one CIS seems split into two or more, suggest split
+		
 		//invoke UserAgent suggestion GUI for configurations
 		//OR
 		//automatically call CIS management functions to configure CISs

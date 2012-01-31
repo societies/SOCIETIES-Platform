@@ -42,10 +42,11 @@ import org.slf4j.LoggerFactory;
 import org.societies.comm.examples.calculator.ICalc;
 import org.societies.comm.examples.fortunecookie.api.IWisdom;
 import org.societies.comm.examples.fortunecookie.datatypes.Cookie;
-import org.societies.comm.xmpp.datatypes.Stanza;
-import org.societies.comm.xmpp.exceptions.CommunicationException;
-import org.societies.comm.xmpp.interfaces.CommManager;
-import org.societies.comm.xmpp.interfaces.FeatureServer;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.example.calculatorservice.schema.CalcBean;
 import org.societies.example.calculatorservice.schema.CalcBeanResult;
 import org.societies.example.complexservice.IComplexService;
@@ -56,19 +57,19 @@ import org.societies.example.fortunecookieservice.schema.FortuneCookieBean;
 import org.societies.example.fortunecookieservice.schema.FortuneCookieBeanResult;
 import org.societies.example.fortunecookieservice.schema.MethodName;
 
-public class CommsServer implements FeatureServer {
+public class CommsServer implements IFeatureServer {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 							  Arrays.asList("http://societies.org/example/calculatorservice/schema",
 									  		"http://societies.org/example/fortunecookieservice/schema",
 									  		"http://societies.org/example/complexservice/schema"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
-							  Arrays.asList("org.societies.example.calculatorbean.schema",
-											"org.societies.example.fortunecookiebean.schema",
+							  Arrays.asList("org.societies.example.calculatorservice.schema",
+											"org.societies.example.fortunecookieservice.schema",
 											"org.societies.example.complexservice.schema"));
 	
 	//PRIVATE VARIABLES
-	private CommManager commManager;
+	private ICommManager commManager;
 	private ICalc calcService;
 	private IWisdom fcGenerator;
 	private IComplexService complexSvc;
@@ -76,11 +77,11 @@ public class CommsServer implements FeatureServer {
 	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
 	
 	//PROPERTIES
-	public CommManager getCommManager() {
+	public ICommManager getCommManager() {
 		return commManager;
 	}
 
-	public void setCommManager(CommManager commManager) {
+	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
 	}
 
@@ -116,8 +117,6 @@ public class CommsServer implements FeatureServer {
 		//REGISTER OUR ServiceManager WITH THE XMPP Communication Manager
 		try {
 			getCommManager().register(this); 
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
@@ -150,7 +149,7 @@ public class CommsServer implements FeatureServer {
 	/* Put your functionality here if there IS a return object
 	 */
 	@Override
-	public Object receiveQuery(Stanza stanza, Object payload) {
+	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
 		//CHECK WHICH END BUNDLE TO BE CALLED THAT I MANAGE
 		
 		// --------- CALCULATOR BUNDLE ---------
@@ -261,6 +260,15 @@ public class CommsServer implements FeatureServer {
 			}
 		}
 		//TODO: Better error handling, ie, if there is no match on the received Message Bean
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.FeatureServer#setQuery(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	 */
+	@Override
+	public Object setQuery(Stanza arg0, Object arg1) throws XMPPError {
+		// TODO Auto-generated method stub
 		return null;
 	}
 	

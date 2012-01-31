@@ -24,13 +24,20 @@
  */
 package org.societies.comm.examples.commsmanager.impl;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Future;
 
-import org.societies.comm.xmpp.datatypes.Identity;
-import org.societies.comm.xmpp.datatypes.Stanza;
-import org.societies.comm.xmpp.interfaces.CommCallback;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.api.comm.xmpp.datatypes.XMPPNode;
 import org.societies.example.calculatorservice.schema.CalcBeanResult;
 import org.societies.example.fortunecookieservice.schema.FortuneCookieBeanResult;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
  * Describe your class here...
@@ -38,7 +45,16 @@ import org.societies.example.fortunecookieservice.schema.FortuneCookieBeanResult
  * @author aleckey
  *
  */
-public class CommsClientCallback implements CommCallback{
+public class CommsClientCallback implements ICommCallback {
+
+	private static final List<String> NAMESPACES = Collections.unmodifiableList(
+			  Arrays.asList("http://societies.org/example/calculatorservice/schema",
+					  		"http://societies.org/example/fortunecookieservice/schema",
+					  		"http://societies.org/example/complexservice/schema"));
+	private static final List<String> PACKAGES = Collections.unmodifiableList(
+			  Arrays.asList("org.societies.example.calculatorservice.schema",
+							"org.societies.example.fortunecookieservice.schema",
+							"org.societies.example.complexservice.schema"));
 
 	private Future<?>returnObj;
 	private int returnInt=0;
@@ -56,14 +72,6 @@ public class CommsClientCallback implements CommCallback{
 	public CommsClientCallback(Future<?> returnObj) {
 		this.returnObj = returnObj;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveError(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
-	 */
-	@Override
-	public void receiveError(Stanza arg0, Object arg1) {
-		
-	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveResult(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
@@ -77,7 +85,7 @@ public class CommsClientCallback implements CommCallback{
 		if (msgBean.getClass().equals(CalcBeanResult.class)) {
 			CalcBeanResult calcResult = (CalcBeanResult) msgBean;
 			//return the calcResult to the calling client
-			//this.returnObj = new AsyncResult<Integer>(calcResult.getResult());
+			this.returnObj = new AsyncResult<Integer>(calcResult.getResult());
 			this.setReturnInt(calcResult.getResult() );
 		}
 		
@@ -86,6 +94,55 @@ public class CommsClientCallback implements CommCallback{
 			FortuneCookieBeanResult fcBeanResult = (FortuneCookieBeanResult) msgBean;
 			//return the fcBeanResult to the calling client
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#getJavaPackages() */
+	@Override
+	public List<String> getJavaPackages() {
+		return PACKAGES;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#getXMLNamespaces() */
+	@Override
+	public List<String> getXMLNamespaces() {
+		return NAMESPACES;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveError(org.societies.comm.xmpp.datatypes.Stanza, org.societies.comm.xmpp.datatypes.XMPPError)
+	 */
+	@Override
+	public void receiveError(Stanza returnStanza, XMPPError info) {
+		System.out.println(info.getMessage());
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveInfo(org.societies.comm.xmpp.datatypes.Stanza, java.lang.String, org.societies.comm.xmpp.datatypes.XMPPInfo)
+	 */
+	@Override
+	public void receiveInfo(Stanza returnStanza, String node, XMPPInfo info) {
+		System.out.println(info.getIdentityName());
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveItems(org.societies.comm.xmpp.datatypes.Stanza, java.lang.String, java.util.List)
+	 */
+	@Override
+	public void receiveItems(Stanza returnStanza, String node, List<XMPPNode> info) {
+		System.out.println(returnStanza.getTo());
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveMessage(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	 */
+	@Override
+	public void receiveMessage(Stanza returnStanza, Object messageBean) {
+		System.out.println(messageBean.getClass().toString());		
 	}
 	
 

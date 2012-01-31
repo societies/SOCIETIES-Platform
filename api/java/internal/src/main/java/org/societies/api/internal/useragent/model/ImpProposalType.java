@@ -27,7 +27,6 @@ package org.societies.api.internal.useragent.model;
 
 public class ImpProposalType {
 	
-	public static int NOTIFICATION = 0;
-	public static int TIMED_ABORT = 1;
+	public static int TIMED_ABORT = 0;
 
 }

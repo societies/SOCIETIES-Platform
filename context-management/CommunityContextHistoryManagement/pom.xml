@@ -8,11 +8,11 @@
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>0.1</version>
-		<relativePath>../../../parent/spring-osgi.xml</relativePath>
+		<relativePath>../../parent/spring-osgi.xml</relativePath>
 	</parent>
 
 	<!-- groupId is set in parent pom -->
-	<artifactId>css_communityHistory_impl</artifactId>
+	<artifactId>community-context-history-mgmt</artifactId>
 	<version>${version.cm}</version>
 	<packaging>bundle</packaging>
 
@@ -45,19 +45,23 @@
 	<!-- List dependencies here -->
 	<dependencies>
 		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-	
-	<dependency>
-		<groupId>org.societies.api.external</groupId>
-		<artifactId>societies-api</artifactId>
-		<version>${release.version}</version>
-		<scope>provided</scope>
-	</dependency>
-	
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>context-mgmt-api</artifactId>
+			<version>${version.cm}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	
@@ -88,12 +92,12 @@
 				<configuration>
 					<artifactItems>
 						<artifactItem>
-							<groupId>${groupId}</groupId>
-							<artifactId>${artifactId}</artifactId>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
 							<version>${version.cm}</version>
 							<type>jar</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${virgo.home}/pickup/</outputDirectory>
+							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>
@@ -103,6 +107,5 @@
 	</build>
 
 
-	<name>Community History Management</name>
-
+	<name>Community Context History Mgmt</name>
 </project>

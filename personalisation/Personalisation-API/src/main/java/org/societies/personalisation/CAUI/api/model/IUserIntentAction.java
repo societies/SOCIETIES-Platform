@@ -91,5 +91,16 @@ public interface IUserIntentAction  extends IOutcome, Serializable{
      */
     public double getTransProb(); 
     
+    /**
+     * This method returns the durations in milliseconds that an action is expected to last.
+     * @return
+     */
+    public long getDuration(); 
+
+    /**
+     * This method sets the durations in milliseconds that an action is expected to last.
+     * @param duration
+     */
+	public void setDuration(long duration); 
 }
 

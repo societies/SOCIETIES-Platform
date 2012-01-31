@@ -25,6 +25,8 @@
 
 package org.societies.orchestration.CommunityLifecycleManagement.test;
 
+import org.junit.Assert;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +55,8 @@ import org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCo
 import org.societies.api.context.model.CtxEntityIdentifier;
 //import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.internal.cis.cis_management.ICisManager;
+import org.societies.api.internal.cis.cis_management.CisRecord;
 
 /**
  * This is the test class for the Automatic Community Deletion Manager component
@@ -64,16 +68,30 @@ import org.societies.api.mock.EntityIdentifier;
 
 public class AutomaticCommunityDeletionManagerTest {
 	
-	public AutomaticCommunityDeletionManager autoCommunityDeletionManager;
+	private AutomaticCommunityDeletionManager autoCommunityDeletionManager;
+	private ICisManager cisManager;
 	
 	public void testIdentifyCissToDelete() {
 		
 		EntityIdentifier ownerId = new EntityIdentifier(); //James Jents CSS or CIS
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
     	
+		//create CIS for James, with last activity being 1 year ago
+		//CisRecord jamesCis = cisManager.createCis("James", "James CIS");
+		
     	autoCommunityDeletionManager = new AutomaticCommunityDeletionManager(ownerId, "CSS");
 		
 		autoCommunityDeletionManager.identifyCissToDelete();
+		
+		//the CIS should have been deleted
+		Assert.assertNull(cisManager.getCis("James", "James CIS"));
+		
+		
+		
+	}
+	
+	public void setCisManager(ICisManager cisManager){
+		this.cisManager = cisManager;
 	}
 	
 }

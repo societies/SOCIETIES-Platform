@@ -28,8 +28,8 @@ package org.societies.api.internal.privacytrust.privacyprotection;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
+import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
 /**
  * This interface defines the methods that should be implemented by the CSS that
  * acts as a client in the Negotiation process. This means that this CSS is the

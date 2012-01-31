@@ -37,8 +37,8 @@ import java.util.Set;
 import org.societies.cis.mgmt.CommunityManagement;
 import org.societies.comm.xmpp.datatypes.Stanza;
 import org.societies.comm.xmpp.exceptions.CommunicationException;
-import org.societies.comm.xmpp.interfaces.CommManager;
-import org.societies.comm.xmpp.interfaces.FeatureServer;
+import org.societies.comm.xmpp.interfaces.ICommManager;
+import org.societies.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.community.Community;
 import org.societies.community.Participant;
 import org.societies.community.Who;
@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
  * @author Joao M. Goncalves (PTIN)
  * 
  *         This is the implementation of both the {@link CommunityManagement}
- *         service and of the {@link FeatureServer} interface. It handles
+ *         service and of the {@link IFeatureServer} interface. It handles
  *         XEP-SOC1 related logic. Registers on XCCommunicationMgr to receive
  *         stanza elements of namespace http://societies.org/community, and
  *         handles those requests.
@@ -61,19 +61,19 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CommunityManagementImpl implements CommunityManagement,
-		FeatureServer {
+		IFeatureServer {
 
 	private final static List<String> NAMESPACES = Collections
 			.singletonList("http://societies.org/community");
 	private final static List<String> PACKAGES = Collections
 			.singletonList("org.societies.community");
 
-	private CommManager endpoint;
+	private ICommManager endpoint;
 	private Set<String> participants;
 	private Set<String> leaders;
 
 	@Autowired
-	public CommunityManagementImpl(CommManager endpoint) {
+	public CommunityManagementImpl(ICommManager endpoint) {
 		participants = new HashSet<String>();
 		leaders = new HashSet<String>();
 		this.endpoint = endpoint;

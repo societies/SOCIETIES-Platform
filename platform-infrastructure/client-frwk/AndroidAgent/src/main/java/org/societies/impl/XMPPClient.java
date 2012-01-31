@@ -4,6 +4,7 @@ import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.filter.PacketIDFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
@@ -62,16 +63,45 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	private void connect() throws XMPPException {
-		// TODO
-		String server = "c3s.av.it.pt";
+		// TODO configurations
+		String server = "server";
 		int port = 5222;
-		String username = "android@c3s.av.it.pt";
-		String password = "android";
+		String username = "user@" + server; 
+		String password = "pass";
 		String resource = "default";
 
 		ConnectionConfiguration config = new ConnectionConfiguration(server, port, server);
 
 		connection = new XMPPConnection(config);
+		
+		// TODO remove debug
+		connection.addPacketListener(new PacketListener() {
+
+			public void processPacket(Packet packet) {
+				log.debug("Packet received: " + packet.toXML());
+			}
+			
+		}, new PacketFilter() {
+
+			public boolean accept(Packet packet) {
+				return true;
+			}
+			
+		});
+		connection.addPacketSendingListener(new PacketListener() {
+
+			public void processPacket(Packet packet) {
+				log.debug("Packet sent: " + packet.toXML());
+			}
+			
+		}, new PacketFilter() {
+
+			public boolean accept(Packet packet) {
+				return true;
+			}
+			
+		});
+		
 		connection.connect();
 		connection.login(username, password, resource);
 		
