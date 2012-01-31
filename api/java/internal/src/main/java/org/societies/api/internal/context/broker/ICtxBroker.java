@@ -40,7 +40,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.context.broker.IUserCtxBrokerCallback;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -59,33 +58,54 @@ public interface ICtxBroker {
 	/**
 	 * Creates a CtxAssociation
 	 * 
-	 * @param requester
 	 * @param type
 	 */
-	public Future<CtxAssociation> createAssociation(EntityIdentifier requester, String type);
+	public Future<CtxAssociation> createAssociation(String type);
 
 	/**
 	 * Creates a {@link CtxAttribute} of the specified type which is associated to
-	 * the identified context entity (scope). The generated attribute is returned
-	 * through the {@link IUserCtxBrokerCallback#ctxAttributeCreated} method.
+	 * the identified context entity (scope). 
 	 * 
-	 * @param requester
-	 *            the identifier of the requester
 	 * @param scope
 	 *            the identifier of the context entity to associate with the new
 	 *            attribute
 	 * @param type
 	 *            the type of the context attribute to create
+	 * @since 0.0.1
 	 */
-	public Future<CtxAttribute> createAttribute(EntityIdentifier requester, CtxEntityIdentifier scope, String type);
+	public Future<CtxAttribute> createAttribute(CtxEntityIdentifier scope, String type);
 
 	/**
 	 * Creates a CtxEntity
 	 * 
-	 * @param requester
 	 * @param type
 	 */
-	public Future<CtxEntity> createEntity(EntityIdentifier requester, String type);
+	public Future<CtxEntity> createEntity(String type);
+
+	/**
+	 * Disables context monitoring to Context Database
+	 * 
+	 * @param type
+	 */
+	public void disableCtxMonitoring(CtxAttributeValueType type);
+
+	/**
+	 * Disables context recording to Context History Database
+	 */
+	public void disableCtxRecording();
+
+	/**
+	 * Enables context monitoring to Context Database
+	 * 
+	 * @param type
+	 */
+	public void enableCtxMonitoring(CtxAttributeValueType type);
+
+	/**
+	 * Enables context recording to Context History Database
+	 * 
+	 */
+	public void enableCtxRecording();
 
 	/**
 	 * There are several methods missing that would express the similarity of context
@@ -94,6 +114,7 @@ public interface ICtxBroker {
 	 * 
 	 * @param objectUnderComparison
 	 * @param referenceObjects
+	 * @since 0.0.1
 	 */
 	public Future<List<Object>> evaluateSimilarity(Serializable objectUnderComparison, List<Serializable> referenceObjects);
 
@@ -101,124 +122,225 @@ public interface ICtxBroker {
 	 * Looks up for a list of CtxModelObjects defined by the CtxModelType (CtxEntity,
 	 * CtxAttribute, CtxAssociation) of  the specified type.
 	 * 
-	 * @param requester
 	 * @param modelType
 	 * @param type
 	 */
-	public Future<List<CtxEntityIdentifier>> lookup(EntityIdentifier requester, CtxModelType modelType, String type);
+	public Future<List<CtxModelObject>> lookup(CtxModelType modelType, String type);
 
 	/**
 	 * Looks up for a list of CtxEntities of  the specified type, containing the
 	 * specified attributes
 	 * 
-	 * @param requester
 	 * @param entityType
 	 * @param attribType
 	 * @param minAttribValue
 	 * @param maxAttribValue
 	 */
-	public Future<List<CtxEntity>> lookupEntities(EntityIdentifier requester, String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue);
+	public Future<List<CtxEntities>> lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue);
 
 	/**
 	 * Registers the specified EventListener for value modification events of context
 	 * attribute(s) with the supplied scope and type.
 	 * 
-	 * @param requester
 	 * @param scope
 	 * @param attrType
 	 */
-	public Future<List<Object>> registerForUpdates(EntityIdentifier requester, CtxEntityIdentifier scope, String attrType);
+	public Future<List<Object>> registerForUpdates(CtxEntityIdentifier scope, String attrType);
 
 	/**
 	 * Registers the specified EventListener for value modification events of the
 	 * specified context attribute.
 	 * 
-	 * @param requester
 	 * @param attrId
 	 */
-	public Future<List<Object>> registerForUpdates(EntityIdentifier requester, CtxAttributeIdentifier attrId);
+	public Future<List<Object>> registerForUpdates(CtxAttributeIdentifier attrId);
 
 	/**
 	 * Removes the specified context model object.
 	 * 
-	 * @param requester
 	 * @param identifier
 	 */
-	public Future<CtxModelObject> remove(EntityIdentifier requester, CtxIdentifier identifier);
+	public Future<CtxModelObject> remove(CtxIdentifier identifier);
+
+	/**
+	 * Removes context history records defined by type for the specified time period. 
+	 * 
+	 * @param type
+	 * @param startDate
+	 * @param endDate
+	 */
+	public int removeHistory(String type, Date startDate, Date endDate);
 
 	/**
 	 * Retrieves the specified context model object.
 	 * 
-	 * @param requester
 	 * @param identifier
 	 */
-	public Future<CtxModelObject> retrieve(EntityIdentifier requester, CtxIdentifier identifier);
+	public Future<CtxModelObject> retrieve(CtxIdentifier identifier);
 
 	/**
 	 * Predicts a future context attribute for the specified time.
 	 * 
-	 * @param requester
 	 * @param attrId
 	 * @param date
 	 */
-	public Future<List<CtxAttribute>> retrieveFuture(EntityIdentifier requester, CtxAttributeIdentifier attrId, Date date);
+	public Future<List<CtxAttribute>> retrieveFuture(CtxAttributeIdentifier attrId, Date date);
 
 	/**
-	 * Predicts the identified by the modification index  future context attribute.
+	 * Predicts the identified by the modification index future context attribute.
 	 * 
-	 * @param requester
 	 * @param attrId
 	 * @param modificationIndex
 	 */
-	public Future<List<CtxAttribute>> retrieveFuture(EntityIdentifier requester, CtxAttributeIdentifier attrId, int modificationIndex);
+	public Future<List<CtxAttribute>> retrieveFuture(CtxAttributeIdentifier attrId, int modificationIndex);
 
 	/**
 	 * Retrieves context attributes stored in the Context History Log based on the
 	 * specified modificationIndex.
 	 * 
-	 * @param requester
 	 * @param attrId
 	 * @param modificationIndex
 	 */
-	public Future<List<CtxHistoryAttribute>> retrievePast(EntityIdentifier requester, CtxAttributeIdentifier attrId, int modificationIndex);
+	public Future<List<CtxHistoryAttribute>> retrievePast(CtxAttributeIdentifier attrId, int modificationIndex);
 
 	/**
 	 * Retrieves context attributes stored in the Context History Log based on the
 	 * specified date and time information.
 	 * 
-	 * @param requester
 	 * @param attrId
 	 * @param startDate
 	 * @param endDate
 	 */
-	public Future<List<CtxHistoryAttribute>> retrievePast(EntityIdentifier requester, CtxAttributeIdentifier attrId, Date startDate, Date endDate);
+	public Future<List<CtxHistoryAttribute>> retrievePast(CtxAttributeIdentifier attrId, Date startDate, Date endDate);
 
+	
 	/**
 	 * Registers the specified EventListener for value modification events of the
 	 * specified context attribute.
 	 * 
-	 * @param requester
 	 * @param attrId
 	 */
-	public Future<List<Object>> unregisterForUpdates(EntityIdentifier requester, CtxAttributeIdentifier attrId);
+	public void unregisterForUpdates(CtxAttributeIdentifier attrId);
 
 	/**
 	 * Unregisters the specified EventListener for value modification events of
 	 * context attribute(s) with the supplied scope and type.
 	 * 
-	 * @param requester
 	 * @param scope
 	 * @param attributeType
 	 */
-	public Future<List<Object>> unregisterForUpdates(EntityIdentifier requester, CtxEntityIdentifier scope, String attributeType, IUserCtxBrokerCallback callback);
+	public Future<List<Object>> unregisterForUpdates(CtxEntityIdentifier scope, String attributeType);
 
 	/**
 	 * Updates a single context model object.
 	 * 
-	 * @param requester
-	 * @param object
+	 * @param identifier
 	 */
-	public Future<CtxModelObject> update(EntityIdentifier requester, CtxModelObject object);
+	public Future<CtxModelObject> update(CtxModelObject identifier);
+
+	/**
+	 * Updates the {@link CtxAttribute} identified by the specified {@link CtxAttributeIdentifier}
+	 * using the supplied value.
+	 * <p>
+	 * The following value types are supported:
+	 * <dl>
+	 * <dt><code>String</code></dt>
+	 * <dd>Text value.</dd>
+	 * <dt><code>Integer</code></dt>
+	 * <dd>Integer value.</dd>
+	 * <dt><code>Double</code></dt>
+	 * <dd>Double-precision floating point numeric value.</dd>
+	 * <dt><code>byte[]</code></dt>
+	 * <dd>Binary value.</dd>
+	 * </dl>
+	 * @param attributeId
+	 *            the identifier of the attribute to be updated
+	 * @param value
+	 *            the value to be set for the identified context attribute
+	 * @throws NullPointerException if the specified context attribute identifier
+	 *            is <code>null</code>
+	 * @throws IllegalArgumentException if the type of the specified context
+	 *            attribute value is not valid (supported value types are defined
+	 *            in {@link org.societies.api.context.model.CtxAttributeValueType})
+	 * @since 0.0.1
+	 */
+	public Future<CtxAttribute> updateAttribute(CtxAttributeIdentifier attributeId, Serializable value);
+
+	/**
+	 * Updates the {@link CtxAttribute} identified by the specified {@link CtxAttributeIdentifier}
+	 * using the supplied value. The value metric can also be specified.
+	 * <p>
+	 * The following value types are supported:
+	 * <dl>
+	 * <dt><code>String</code></dt>
+	 * <dd>Text value.</dd>
+	 * <dt><code>Integer</code></dt>
+	 * <dd>Integer value.</dd>
+	 * <dt><code>Double</code></dt>
+	 * <dd>Double-precision floating point numeric value.</dd>
+	 * <dt><code>byte[]</code></dt>
+	 * <dd>Binary value.</dd>
+	 * </dl>
+	 * @param attributeId
+	 *            the identifier of the attribute to be updated
+	 * @param value
+	 *            the value to be set for the identified context attribute
+	 * @param valueMetric
+	 *            the value metric to be set for the identified context attribute
+	 * @throws NullPointerException if the specified context attribute identifier
+	 *            is <code>null</code>
+	 * @throws IllegalArgumentException if the type of the specified context
+	 *            attribute value is not valid (supported value types are defined
+	 *            in {@link org.societies.api.context.model.CtxAttributeValueType})
+	 * @since 0.0.1
+	 */
+	public Future<CtxAttribute> updateAttribute(CtxAttributeIdentifier attributeId, Serializable value,
+			String valueMetric);
+
+	/**
+	 * This method allows to set a primary context attribute that will be stored in context History Database
+	 * upon value update along with a list of other context attributes. 
+	 * 
+	 * @param primaryAttrIdentifier
+	 * @param listOfEscortingAttributeIds
+	 * @since 0.0.1
+	 */
+	public Future<Boolean> setCtxHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds);
+
+	/**
+	 * This method allows to get the list of the context attribute identifiers that consist the snapshot that is stored
+	 * in context history database along with the a primary context attribute.  
+	 * 
+	 * @param primaryAttrIdentifier
+	 * @param listOfEscortingAttributeIds
+	 * @since 0.0.1
+	 */
+	public Future<List<CtxAttributeIdentifier>> getCtxHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds);
+
+	/**
+	 * This method allows to update the list of the context attribute identifiers that consist the snapshot that is stored
+	 * in context history database along with the a primary context attribute.  
+	 *  
+	 * @param primaryAttrIdentifier
+	 * @param listOfEscortingAttributeIds
+	 * @since 0.0.1
+	 */
+	public Future<List<CtxAttributeIdentifier>> updateCtxHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds);
+
+	/**
+	 * This method allows to remove the list of the context attribute identifiers that consist the snapshot that is stored
+	 * in context history database along with the a primary context attribute.  
+	 * 
+	 * @param primaryAttrIdentifier
+	 * @param listOfEscortingAttributeIds
+	 * @since 0.0.1
+	 */
+	public Future<Boolean> removeCtxHistoryTuples(
+			CtxAttributeIdentifier primaryAttrIdentifier,
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds);
 	
 	
 	/**

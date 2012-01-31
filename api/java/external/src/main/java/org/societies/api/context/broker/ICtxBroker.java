@@ -63,8 +63,7 @@ public interface ICtxBroker {
 
 	/**
 	 * Creates a {@link CtxAttribute} of the specified type which is associated to
-	 * the identified context entity (scope). The generated attribute is returned
-	 * through the {@link IUserCtxBrokerCallback#ctxAttributeCreated} method.
+	 * the identified context entity (scope).
 	 * 
 	 * @param requester
 	 *            the identifier of the requester
@@ -241,7 +240,6 @@ public interface ICtxBroker {
 	 * 
 	 * @param requester
 	 * @param community
-	 * @param callback
 	 */
 	public Future<List<CtxEntityIdentifier>> retrieveChildCommunities(EntityIdentifier requester, CtxEntityIdentifier community);
 
@@ -251,7 +249,6 @@ public interface ICtxBroker {
 	 * 
 	 * @param requester
 	 * @param community
-	 * @param callback
 	 */
 	public Future<List<CtxEntityIdentifier>> retrieveCommunityMembers(EntityIdentifier requester, CtxEntityIdentifier community);
 
@@ -259,7 +256,6 @@ public interface ICtxBroker {
 	 * 
 	 * @param requester
 	 * @param community
-	 * @param callback
 	 */
 	public Future<List<CtxEntityIdentifier>> retrieveParentCommunities(EntityIdentifier requester, CtxEntityIdentifier community);
 	
