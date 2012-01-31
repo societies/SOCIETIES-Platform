@@ -24,9 +24,7 @@
  */
 package org.societies.context.broker.impl;
 
-
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -49,8 +47,6 @@ import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgrCallback;
 import org.societies.context.api.user.history.IUserCtxHistoryCallback;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
-import org.societies.api.internal.context.user.prediction.PredictionMethod;
-
 
 /**
  * Platform Context Broker Implementation
@@ -253,7 +249,118 @@ public class InternalCtxBroker extends CtxBroker implements IUserCtxBroker, ICom
 		}
 
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.context.broker.IUserCtxBroker#updateAttribute(org.societies.api.context.model.CtxAttributeIdentifier, java.io.Serializable, IUserCtxBrokerCallback)
+	 */
+	@Override
+	public void updateAttribute(CtxAttributeIdentifier attributeId, final Serializable value, final IUserCtxBrokerCallback callback) {
+		this.updateAttribute(attributeId, value, null, callback);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.context.broker.IUserCtxBroker#updateAttribute(org.societies.api.context.model.CtxAttributeIdentifier, java.io.Serializable, String, IUserCtxBrokerCallback)
+	 */
+	@Override
+	public void updateAttribute(CtxAttributeIdentifier attributeId, final Serializable value, final String valueMetric, final IUserCtxBrokerCallback callback) {
+		if (attributeId == null)
+			throw new NullPointerException("attributeId can't be null");
+		// Will throw IllegalArgumentException if value type is not supported
+		this.findAttributeValueType(value);
+		this.retrieve(attributeId, new IUserCtxBrokerCallback() {
 
+			@Override
+			public void cancel(CtxIdentifier arg0, String arg1) {}
+
+			@Override
+			public void ctxAssociationCreated(CtxAssociation arg0) {}
+
+			@Override
+			public void ctxAttributeCreated(CtxAttribute arg0) {}
+
+			@Override
+			public void ctxEntitiesLookedup(List<CtxEntityIdentifier> arg0) {}
+
+			@Override
+			public void ctxEntityCreated(CtxEntity arg0) {}
+
+			@Override
+			public void ctxHistoryTuplesRemoved(Boolean arg0) {}
+
+			@Override
+			public void ctxHistoryTuplesRetrieved(
+					List<CtxAttributeIdentifier> arg0) {}
+
+			@Override
+			public void ctxHistoryTuplesSet(Boolean arg0) {}
+
+			@Override
+			public void ctxHistoryTuplesUpdated(
+					List<CtxAttributeIdentifier> arg0) {}
+
+			@Override
+			public void ctxIndividualCtxEntityCreated(CtxEntity arg0) {}
+
+			@Override
+			public void ctxModelObjectRemoved(CtxModelObject arg0) {}
+
+			@Override
+			public void ctxModelObjectRetrieved(CtxModelObject modelObject) {
+				if (modelObject == null) { // Requested attribute not found
+					callback.ctxModelObjectUpdated(null);
+				} else {
+					final CtxAttribute attribute = (CtxAttribute) modelObject;
+					final CtxAttributeValueType valueType = findAttributeValueType(value);
+					if (CtxAttributeValueType.EMPTY.equals(valueType))
+						attribute.setStringValue(null);
+					else if (CtxAttributeValueType.STRING.equals(valueType))
+						attribute.setStringValue((String) value);
+					else if (CtxAttributeValueType.INTEGER.equals(valueType))
+						attribute.setIntegerValue((Integer) value);
+					else if (CtxAttributeValueType.DOUBLE.equals(valueType))
+						attribute.setDoubleValue((Double) value);
+					else if (CtxAttributeValueType.BINARY.equals(valueType))
+						attribute.setBinaryValue((byte[]) value);
+		
+					attribute.setValueType(valueType);
+					update(attribute, callback);
+				}
+			}
+
+			@Override
+			public void ctxModelObjectUpdated(CtxModelObject arg0) {}
+
+			@Override
+			public void ctxModelObjectsLookedup(List<CtxIdentifier> arg0) {}
+
+			@Override
+			public void futureCtxRetrieved(List<CtxAttribute> arg0) {}
+
+			@Override
+			public void futureCtxRetrieved(CtxAttribute arg0) {}
+
+			@Override
+			public void historyCtxRetrieved(CtxHistoryAttribute arg0) {}
+
+			@Override
+			public void historyCtxRetrieved(List<CtxHistoryAttribute> arg0) {}
+
+			@Override
+			public void ok(CtxIdentifier arg0) {}
+
+			@Override
+			public void ok_list(List<CtxIdentifier> arg0) {}
+
+			@Override
+			public void ok_values(List<Object> arg0) {}
+
+			@Override
+			public void similartyResults(List<Object> arg0) {}
+
+			@Override
+			public void updateReceived(CtxModelObject arg0) {}
+		});
+	}
 
 	//***********************************************************************
 	//  
@@ -334,7 +441,6 @@ public class InternalCtxBroker extends CtxBroker implements IUserCtxBroker, ICom
 		
 	}
 
-
 	private class UserHoCDBCallback implements IUserCtxHistoryCallback {
 
 
@@ -403,8 +509,6 @@ public class InternalCtxBroker extends CtxBroker implements IUserCtxBroker, ICom
 
 	}
 
-
-
 	private class UserDBCallback implements IUserCtxDBMgrCallback {
 
 		private IUserCtxBrokerCallback brokerCallback;
@@ -440,8 +544,6 @@ public class InternalCtxBroker extends CtxBroker implements IUserCtxBroker, ICom
 
 	}
 
-
-	
 	private class InternalCtxBrokerCallback implements IUserCtxBrokerCallback{
 
 		@Override
@@ -582,6 +684,20 @@ public class InternalCtxBroker extends CtxBroker implements IUserCtxBroker, ICom
 			// TODO Auto-generated method stub
 			
 		}
-
+	}
+	
+	private CtxAttributeValueType findAttributeValueType(Serializable value) {
+		if (value == null)
+			return CtxAttributeValueType.EMPTY;
+		else if (value instanceof String)
+			return CtxAttributeValueType.STRING;
+		else if (value instanceof Integer)
+			return CtxAttributeValueType.INTEGER;
+		else if (value instanceof Double)
+			return CtxAttributeValueType.DOUBLE;
+		else if (value instanceof byte[])
+			return CtxAttributeValueType.BINARY;
+		else
+			throw new IllegalArgumentException(value + ": Invalid value type");
 	}
 }
