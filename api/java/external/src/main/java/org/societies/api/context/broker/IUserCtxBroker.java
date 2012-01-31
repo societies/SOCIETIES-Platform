@@ -36,6 +36,18 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 
+/**
+ * This interface provides access to current, past and future context data. The
+ * past context refers to the data stored in the context history database. The
+ * future context information is provided on the fly based on context
+ * prediction methods. The Context Broker also supports distributed context
+ * queries; it is a gateway to context data and decides whether the local DB, a
+ * remote DB or the Context Inference Management need to be contacted to
+ * retrieve the requested context data.
+ *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.0
+ */
 public interface IUserCtxBroker {
 	
 	/**
@@ -55,8 +67,28 @@ public interface IUserCtxBroker {
 	 * @param enum
 	 * @param type
 	 * @param callback
+	 * @deprecated As of release 0.0.1, replaced by {@link #createAttribute(EntityIdentifier, CtxEntityIdentifier, String, IUserCtxBrokerCallback)} 
 	 */
+	@Deprecated
 	public void createAttribute(EntityIdentifier requester, CtxEntityIdentifier scope, CtxAttributeValueType valueType, String type, IUserCtxBrokerCallback callback);
+	
+	/**
+	 * Creates a {@link CtxAttribute} of the specified type which is associated to
+	 * the identified context entity (scope). The generated attribute is returned
+	 * through the {@link IUserCtxBrokerCallback#ctxAttributeCreated} method.
+	 * 
+	 * @param requester
+	 *            the identifier of the requester
+	 * @param scope
+	 *            the identifier of the context entity to associate with the new
+	 *            attribute
+	 * @param type
+	 *            the type of the context attribute to create
+	 * @param callback
+	 *            the callback to return the created context attribute
+	 * @since 0.0.1
+	 */
+	public void createAttribute(EntityIdentifier requester, CtxEntityIdentifier scope, String type, IUserCtxBrokerCallback callback);
 
 	/**
 	 * Creates a CtxEntity
