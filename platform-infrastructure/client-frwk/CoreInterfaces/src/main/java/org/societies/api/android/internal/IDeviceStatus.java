@@ -34,11 +34,11 @@ import java.util.List;
 public interface IDeviceStatus {
 	String methodsArray [] = {"isInternetConnectivityOn(String callerPackageName)", "getConnectivityProvidersStatus(String callerPackageName)", "getLocationProvidersStatus(String callerPackageName)"};
 	
-	public static final String CONNECTIVITY_STATUS = "org.societies.android.platform.devicestatus.CONNECTIVITY_STATUS";
-	public static final String CONNECTIVITY_INTERNET_ON = "org.societies.android.platform.devicestatus.CONNECTIVITYINTERNETON";
-	public static final String CONNECTIVITY_PROVIDER_LIST = "org.societies.android.platform.devicestatus.CONNECTIVITYPROVIDERLIST";
-	public static final String LOCATION_STATUS = "org.societies.android.platform.devicestatus.LOCATIONSTATUS";
-	public static final String LOCATION_PROVIDER_LIST = "org.societies.android.platform.devicestatus.LOCATIONPROVIDERLIST";
+	public static final String CONNECTIVITY_STATUS 			= "org.societies.android.platform.devicestatus.CONNECTIVITY_STATUS";
+	public static final String CONNECTIVITY_INTERNET_ON 	= "org.societies.android.platform.devicestatus.CONNECTIVITYINTERNETON";
+	public static final String CONNECTIVITY_PROVIDER_LIST 	= "org.societies.android.platform.devicestatus.CONNECTIVITYPROVIDERLIST";
+	public static final String LOCATION_STATUS 				= "org.societies.android.platform.devicestatus.LOCATIONSTATUS";
+	public static final String LOCATION_PROVIDER_LIST 		= "org.societies.android.platform.devicestatus.LOCATIONPROVIDERLIST";
 	
 	/**
 	 * To know if Internet connectivity is available

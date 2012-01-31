@@ -29,7 +29,7 @@ package org.societies.android.platform.interfaces;
 import java.util.List;
 
 public interface ICoreServiceMonitor {
-	String methodsArray [] = {"activeTasks(String client)", 
+	String methodsArray [] = {  "activeTasks(String client)", 
 								"activeTasks(String client, String taskFilter)",
 								"activeServices(String client)",
 								"activeServices(String client, String serviceFilter)",

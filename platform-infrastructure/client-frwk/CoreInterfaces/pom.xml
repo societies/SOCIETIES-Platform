@@ -66,6 +66,21 @@
           			</instrumentation>
         		</configuration>
       		</plugin>
+      		<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<configuration>
+				<instrumentation>
+				<excludes>
+				<!--Insert any classes that should not be tested for coverage, i.e. 
+				Interfaces,Enums -->
+				<exclude>org/societies/android/platform/gui/R.class</exclude>
+				</excludes>
+				</instrumentation>
+				</configuration>
+			</plugin>
+      		
+      		
 		</plugins>
 	</build>
 </project>
