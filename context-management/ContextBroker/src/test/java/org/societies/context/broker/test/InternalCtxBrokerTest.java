@@ -117,7 +117,7 @@ public class InternalCtxBrokerTest {
 		entity = (CtxEntity) callback.getModelObject();
 		
 		// Create the attribute to be tested
-		internalCtxBroker.createAttribute(entity.getId(), CtxAttributeValueType.INDIVIDUAL, "attrType", callback);
+		internalCtxBroker.createAttribute(entity.getId(), "attrType", callback);
 		assertNotNull(callback.getModelObject());
 		assertTrue(callback.getModelObject() instanceof CtxAttribute);
 		attribute = (CtxAttribute) callback.getModelObject();
@@ -424,7 +424,7 @@ public class InternalCtxBrokerTest {
 		entity = (CtxEntity) callback.getModelObject();
 		
 		// Create the attribute to be tested
-		internalCtxBroker.createAttribute(entity.getId(), CtxAttributeValueType.INDIVIDUAL, "attrType", callback);
+		internalCtxBroker.createAttribute(entity.getId(), "attrType", callback);
 		emptyAttribute = (CtxAttribute) callback.getModelObject();
 		
 		// Set the attribute's initial value
@@ -487,7 +487,7 @@ public class InternalCtxBrokerTest {
 		entity = (CtxEntity) callback.getModelObject();
 		
 		// Create the attribute to be tested
-		internalCtxBroker.createAttribute(entity.getId(), CtxAttributeValueType.INDIVIDUAL, "attrType", callback);
+		internalCtxBroker.createAttribute(entity.getId(), "attrType", callback);
 		emptyAttribute = (CtxAttribute) callback.getModelObject();
 		
 		// Set the attribute's initial value
