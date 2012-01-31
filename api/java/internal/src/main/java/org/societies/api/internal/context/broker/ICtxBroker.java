@@ -153,7 +153,7 @@ public interface ICtxBroker {
 	 * 
 	 * @param attrId
 	 */
-	public Future<List<CtxEntity>> registerForUpdates(CtxAttributeIdentifier attrId);
+	public Future<List<Object>> registerForUpdates(CtxAttributeIdentifier attrId);
 
 	/**
 	 * Removes the specified context model object.
