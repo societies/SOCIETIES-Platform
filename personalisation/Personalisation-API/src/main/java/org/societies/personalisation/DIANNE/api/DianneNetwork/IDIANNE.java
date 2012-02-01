@@ -24,6 +24,7 @@ import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 
 /**
  * 
@@ -43,7 +44,7 @@ public interface IDIANNE {
 	public void getOutcome(EntityIdentifier ownerId, 
 			IServiceResourceIdentifier serviceId, 
 			String preferenceName, 
-			IDIANNECallback callback);
+			IPersonalisationInternalCallback callback);
 	
 	/**
 	 * This method will return any updated values of the DIANNE preferences, as an IDIANNEOutcome through the callback, given the new context update
@@ -55,7 +56,7 @@ public interface IDIANNE {
 	 */
 	public void getOutcome(EntityIdentifier ownerId, 
 			CtxAttribute attribute, 
-			IDIANNECallback callback);
+			IPersonalisationInternalCallback callback);
 	
 	/**
 	 * This method will return any updated values of the DIANNE preferences, as an IDIANNEOutcome through the callback, given the new action update.
@@ -66,7 +67,7 @@ public interface IDIANNE {
 	 */
 	public void getOutcome(EntityIdentifier ownerId, 
 			IAction action, 
-			IDIANNECallback callback);
+			IPersonalisationInternalCallback callback);
 	
 	/**
 	 * This method will start DIANNE learning
