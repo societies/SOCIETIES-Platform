@@ -102,5 +102,18 @@ public interface IUserIntentAction  extends IOutcome, Serializable{
      * @param duration
      */
 	public void setDuration(long duration); 
+	
+	/**
+	 * This method sets the ID of the task that this action belongs to. 
+	 * @param taskID
+	 */
+	public void setTaskID(String taskID);
+	
+	/**
+	 * This method returns the ID of the task that this action belongs to. 
+	 * @return taskID
+	 */
+	public String getTaskID();
+	
 }
 
