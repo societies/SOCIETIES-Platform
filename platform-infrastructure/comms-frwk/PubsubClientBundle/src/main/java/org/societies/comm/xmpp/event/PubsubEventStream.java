@@ -52,5 +52,16 @@ public abstract class PubsubEventStream implements ApplicationEventMulticaster {
 	public void removeApplicationListener(ApplicationListener arg0) {
 		multicaster.removeApplicationListener(arg0);
 	}
+	
+	@Override
+	public void addApplicationListenerBean(String arg0) {
+		multicaster.addApplicationListenerBean(arg0);
+		
+	}
+
+	@Override
+	public void removeApplicationListenerBean(String arg0) {
+		multicaster.removeApplicationListenerBean(arg0);
+	}
 
 }
