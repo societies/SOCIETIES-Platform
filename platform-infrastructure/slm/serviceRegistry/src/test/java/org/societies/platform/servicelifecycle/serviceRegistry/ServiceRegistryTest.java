@@ -33,40 +33,101 @@ import org.junit.Test;
 import org.societies.api.internal.servicelifecycle.model.Service;
 import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.ExpectedException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import static org.junit.Assert.*;
 
 /**
  * 
- *
+ * 
  * @author solutanet
- *
+ * 
  */
-@ContextConfiguration(locations={"../../../../../META-INF/ServiceRegistryTest-context.xml"})
-public class ServiceRegistryTest  extends AbstractTransactionalJUnit4SpringContextTests   {
-@Autowired
-ServiceRegistry serReg;
+@ContextConfiguration(locations = { "../../../../../META-INF/ServiceRegistryTest-context.xml" })
+public class ServiceRegistryTest extends
+		AbstractTransactionalJUnit4SpringContextTests {
+	@Autowired
+	private ServiceRegistry serReg;
+	private String serviceUri = "testURI";
+	private List<Service> servicesList = generateServiceList(5);
+
 	@Test
-	public void testRegisterService(){
-		
-		List<Service> servicesList= new ArrayList<Service>();
-		Service tmpService;
+	public void testRegisterService() {
+
 		try {
-			tmpService = new Service(new ServiceResourceIdentifier(new URI("testURI")), "cSSIDInstalled", "1.0", "serviceName", "serviceDescription", "authorSignature");
-		
-		servicesList.add(tmpService);
-		serReg.registerServiceList(servicesList);
-			
+			serReg.registerServiceList(servicesList);
+
 		} catch (ServiceRegistrationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		catch (URISyntaxException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		System.out.println("ok");
+
 	}
+
+	@Test
+	@ExpectedException(ServiceRegistrationException.class)
+	public void testDuplicateServiceRegistration()
+			throws ServiceRegistrationException {
+
+		serReg.registerServiceList(servicesList);
+
+	}
+
+	@Test
+	public void retrieveService() {
+		Service retrievedService = null;
+		try {
+			retrievedService = serReg
+					.retrieveService(new ServiceResourceIdentifier(new URI(
+							serviceUri + "0")));
+		} catch (ServiceRetrieveException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		assertTrue(retrievedService.getServiceName().equals(
+				servicesList.get(0).getServiceName()));
+	}
+
+	@Test
+	@ExpectedException(ServiceRetrieveException.class)
+	public void unregisterService() throws ServiceRetrieveException {
+		try {
+			serReg.unregisterServiceList(servicesList);
+
+			serReg.retrieveService(new ServiceResourceIdentifier(new URI(
+					serviceUri + "0")));
+
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		} catch (ServiceRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	/* Utilities methods */
+	private List<Service> generateServiceList(int numberOfService) {
+		List<Service> returnedServiceList = new ArrayList<Service>();
+		for (int i = 0; i < numberOfService; i++) {
+			try {
+				returnedServiceList.add(new Service(
+						new ServiceResourceIdentifier(new URI(serviceUri + i)),
+						"cSSIDInstalled", "1.0", "serviceName" + i,
+						"serviceDescription" + i, "authorSignature"));
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return returnedServiceList;
+	}
+
 }
