@@ -22,7 +22,10 @@ package org.societies.personalisation.CAUITaskManager.test;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JEditorPane;
@@ -78,6 +81,9 @@ public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener
 		modelManager = new CAUITaskManager();
 		createModel();
 		
+		
+		
+		//visualise model
 		this.tree = modelManager.getTree();
 		
 		
@@ -115,11 +121,63 @@ public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener
 		add(splitPane);
 		
 		
+		
+		//start retrieving tests
+		retrieveTests();
 		System.out.println("CAUITaskManagerTest end");
 	}
 
 	
 	
+	
+	public DefaultMutableTreeNode searchNode() {
+		String actionID = "task1Actions=start/0";
+		
+		UserIntentAction userAction = null;
+		
+		DefaultMutableTreeNode node = null;
+	    Enumeration e = modelManager.getRoot().breadthFirstEnumeration();
+	    while (e.hasMoreElements()) {
+	      node = (DefaultMutableTreeNode) e.nextElement();
+	      
+	      if (node.getUserObject() instanceof UserIntentAction && node.getUserObject() != null){
+	    	  userAction =  (UserIntentAction)node.getUserObject();
+	    	  System.out.println("node casted to userAction: "+ userAction.getActionID());
+	    	  if (actionID.equals(userAction.getActionID())) {
+		    	  System.out.println("FOUND "+actionID);
+		    	  return node;
+		      }
+	      
+	      }
+	     
+	      
+	    }
+	    return null;
+	  }
+	
+	
+	private void  retrieveTests(){
+		
+		//type based retrieval
+		List<UserIntentAction> typeBasedListActions = new ArrayList<UserIntentAction>();
+		//typeBasedListActions = modelManager.getActionsByType("A-homePc", "off");
+		
+		DefaultMutableTreeNode root = modelManager.getRoot();
+		/*
+		System.out.println("The root has " + root.getChildCount() + " children");
+	    System.out.println("The tree's depth is " + root.getDepth());
+	    System.out.println("The tree has " + root.getLeafCount() + " leaves");
+	    System.out.println("'Root' is really a root? " + root.isRoot());
+	    System.out.println("Root's userObject: " + root.toString());
+	    */
+	    //System.out.println("getActionsByType(A-homePc, off)"+typeBasedListActions);
+		UserIntentAction retrievedAction = modelManager.retrieveAction("task1Actions=start/0");
+		System.out.println("retrievedAction "+ retrievedAction.getparameterName()+" "+retrievedAction.getvalue());
+		//id based retrieval
+		//String actionAid = 
+		//modelManager.getAction(arg0);
+		
+	}
 	
 
 	private void createModel(){
@@ -185,7 +243,9 @@ public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener
 		task1ActionStart.add(task1ActionB2);
 		task1ActionB2.add(task1ActionA2);
 		task1ActionA2.add(task1ActionC2);
-		
+
+		//model created
+		modelManager.setRoot(rootTreeNode);
 	}
 	
 	
