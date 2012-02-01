@@ -89,6 +89,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		 -->
 		 <!-- Service Registry -->
 		 <module>../css-modules/serviceRegistry</module>
+		 <module>../platform-infrastructure/servicelifcycle/serviceManagement/</module>
+		 <module>../platform-infrastructure/servicelifcycle/platformWebapp/</module>
 		
 		<!-- <module>../platform-infrastructure/comms-frwk/ClientCommunicationMgr</module> -->
 		
