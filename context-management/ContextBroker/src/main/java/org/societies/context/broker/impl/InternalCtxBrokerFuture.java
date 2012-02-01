@@ -89,11 +89,11 @@ public class InternalCtxBrokerFuture implements ICtxBroker {
 	@Override
 	@Async
 	public Future<CtxAssociation> createAssociation(String type) throws CtxException {
-		// TODO Auto-generated method stub
+		
 		UserDBCallback callback = new UserDBCallback(broker);
 		
 		userDB.createAssociation(type, callback);
-		CtxAssociation association = (CtxAssociation) callback.getCtxModelObject();
+		CtxAssociation association = (CtxAssociation) callback.getCreatedCtxAssociation();
 		if (association!=null)
 			return new AsyncResult<CtxAssociation>(association);
 		else 
@@ -108,7 +108,7 @@ public class InternalCtxBrokerFuture implements ICtxBroker {
 		UserDBCallback callback = new UserDBCallback(broker);
 		
 		userDB.createAttribute(scope, null, type, callback);
-		CtxAttribute attribute = (CtxAttribute) callback.getCtxModelObject();
+		CtxAttribute attribute = (CtxAttribute) callback.getCreatedCtxAttribute();
 		if (attribute!=null)
 			return new AsyncResult<CtxAttribute>(attribute);
 		else 
@@ -122,7 +122,7 @@ public class InternalCtxBrokerFuture implements ICtxBroker {
 		UserDBCallback callback = new UserDBCallback(broker);
 		
 		userDB.createEntity(type, callback);
-		CtxEntity entity = (CtxEntity) callback.getCtxModelObject();
+		CtxEntity entity = (CtxEntity) callback.getCreatedCtxEntity();
 		if (entity!=null)
 			return new AsyncResult<CtxEntity>(entity);
 		else 
@@ -200,7 +200,7 @@ public class InternalCtxBrokerFuture implements ICtxBroker {
 		UserDBCallback callback = new UserDBCallback(broker);
 				
 		userDB.retrieve(identifier, callback);
-		CtxModelObject modelObj = (CtxModelObject) callback.getCtxModelObject();
+		CtxModelObject modelObj = (CtxModelObject) callback.getCtxModelObjectRetrieved();
 		if (modelObj!=null)
 			return new AsyncResult<CtxModelObject>(modelObj);
 		else 
@@ -232,12 +232,14 @@ public class InternalCtxBrokerFuture implements ICtxBroker {
 	@Async
 	public Future<List<CtxHistoryAttribute>> retrievePast(
 			CtxAttributeIdentifier attrId, Date startDate, Date endDate) throws CtxException {
-		// TODO Auto-generated method stub
+		
 		UserHoCDBCallback callback = new UserHoCDBCallback(broker);
 		userHocDB.retrieveHistory(attrId, startDate, endDate, callback);
+	
 		CtxHistoryAttribute modelObj = (CtxHistoryAttribute) callback.getCtxModelObject();
 		List<CtxHistoryAttribute> listAttrs = new ArrayList<CtxHistoryAttribute>();
 		listAttrs.add(modelObj);
+		
 		if (modelObj!=null)
 			return new AsyncResult<List<CtxHistoryAttribute>>(listAttrs);
 		else 
@@ -260,11 +262,11 @@ public class InternalCtxBrokerFuture implements ICtxBroker {
 	@Override
 	@Async
 	public Future<CtxModelObject> update(CtxModelObject identifier) throws CtxException {
-		// TODO Auto-generated method stub
+		
 		UserDBCallback callback = new UserDBCallback(broker);
 		
 		userDB.update(identifier, callback);
-		CtxModelObject modelObject = (CtxModelObject) callback.getCtxModelObject();
+		CtxModelObject modelObject = (CtxModelObject) callback.getUpdatedCtxModelObject();
 		
 
 		// this part allows the storage of attribute updates to context history
@@ -393,34 +395,89 @@ public class InternalCtxBrokerFuture implements ICtxBroker {
 	
 	private class UserDBCallback implements IUserCtxDBMgrCallback {
 
+				
 		private ICtxBroker brokerCallback;
-		private CtxModelObject ctxModelObject = null;
-		
+				
 		UserDBCallback(ICtxBroker brokerCallback) {
 			this.brokerCallback = brokerCallback;
 		} 
 				
-		public CtxModelObject getCtxModelObject() {
-			return ctxModelObject;
-		}
+		private CtxModelObject updatedCtxModelObject = null;
+		
+		private CtxEntity createdCtxEntity = null;
+		
+		private CtxAttribute createdCtxAttribute = null;
+		
+		private List<CtxEntityIdentifier> lookedUpCtxEntities = null;
+			
+		private CtxModelObject ctxModelObjectRetrieved = null;
 
-		private void setCtxModelObject(CtxModelObject ctxModelObject) {
-			this.ctxModelObject = ctxModelObject;
-		}
+		private CtxAssociation ctxAssociationCreated = null;
 		
 
-		public void ctxEntityCreated(CtxEntity ctxEntity) {}
+		public void ctxEntityCreated(CtxEntity ctxEntity) {
+			this.createdCtxEntity = ctxEntity;
+		}
 
-		public void ctxIndividualCtxEntityCreated(CtxEntity ctxEntity) {}
+		public void ctxIndividualCtxEntityCreated(CtxEntity ctxEntity) {
+			this.createdCtxEntity = ctxEntity;
+		}
 
-		public void ctxAttributeCreated(CtxAttribute ctxAttribute) {}
+		public void ctxAttributeCreated(CtxAttribute ctxAttribute) {
+			this.createdCtxAttribute = ctxAttribute;
+		}
+		
+		// it is not in DB callback ifc
+		public void ctxAssociationCreated(CtxAssociation ctxAssociation) {
+			this.ctxAssociationCreated = ctxAssociation;
+		}
+		
+		
+		public void ctxModelObjectUpdated(CtxModelObject ctxModelObject) {
+			this.updatedCtxModelObject = ctxModelObject;
+		}
 
-		public void ctxModelObjectUpdated(CtxModelObject ctxModelObject) {}
+		public void ctxEntitiesLookedup(List<CtxEntityIdentifier> list) {
+			this.lookedUpCtxEntities = list;
+		}
 
-		public void ctxEntitiesLookedup(List<CtxEntityIdentifier> list) {}
+		public void ctxModelObjectRetrieved(CtxModelObject ctxModelObject) {
+			this.ctxModelObjectRetrieved = ctxModelObject;
+		}
+	
+	
+	
+	//********************************************
+	// Getters and Setters for callback variables
+	//********************************************
+				
+		public CtxModelObject getUpdatedCtxModelObject() {
+			return this.updatedCtxModelObject;
+		}
 
-		public void ctxModelObjectRetrieved(CtxModelObject ctxModelObject) {}
+		public CtxEntity getCreatedCtxEntity() {
+			return this.createdCtxEntity;
+		}
+
+		public CtxAttribute getCreatedCtxAttribute() {
+			return this.createdCtxAttribute;
+		}
+
+		public CtxAssociation getCreatedCtxAssociation() {
+			return this.ctxAssociationCreated;
+		}
+			
+		public List<CtxEntityIdentifier> getLookedUpCtxEntities(){
+			return this.lookedUpCtxEntities;
+		}
+	
+		public CtxModelObject getCtxModelObjectRetrieved(){
+			return this.ctxModelObjectRetrieved;
+		}
 	}
+	
+	
+	
 	
 	private class UserHoCDBCallback implements IUserCtxHistoryCallback {
 
