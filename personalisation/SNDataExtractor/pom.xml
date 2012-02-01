@@ -1,6 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
 	<modelVersion>4.0.0</modelVersion>
 	<!-- change the artifactid to your project artifactid -->
 	
@@ -46,8 +45,28 @@
 			<version>${version.pm}</version>
 			<scope>provided</scope>
 		</dependency>
-
+		
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-enterprise</artifactId>
+			<version>1.5</version>
+		</dependency>
+		
 	</dependencies>
+
+<repositories>
+  <repository>
+    <id>neo4j-release-repository</id>
+    <name>Neo4j Maven 2 release repository</name>
+    <url>http://m2.neo4j.org/releases</url>
+    <releases>
+      <enabled>true</enabled>
+    </releases>
+    <snapshots>
+      <enabled>false</enabled>
+    </snapshots>
+  </repository>
+</repositories>
 
 	<build>
 		<plugins>

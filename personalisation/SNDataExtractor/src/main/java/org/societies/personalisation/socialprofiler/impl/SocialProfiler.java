@@ -1,16 +1,16 @@
-package org.societies.personalisation.SNDataExtractor.impl;
+package org.societies.personalisation.socialprofiler.impl;
 
 import org.societies.api.internal.context.broker.IUserCtxBroker;
 
-public class SNDataExtractor  {
+public class SocialProfiler  {
 	
 	private IUserCtxBroker ctxBroker;
 
-	public SNDataExtractor(){
+	public SocialProfiler(){
 	}
 	
-	public void initializationSNDataExtractor(){
-		System.out.println("SNData initialized");
+	public void initializationSocialProfiler(){
+		System.out.println("Social Profiler Intialized");
 	}
 
 	
