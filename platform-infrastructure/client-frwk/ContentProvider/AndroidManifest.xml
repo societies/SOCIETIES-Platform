@@ -10,12 +10,11 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" android:name=".ContentProviderApp">
         
-        <service android:name=".services.RemoteService">
+        <service android:name=".services.DifferentProcessService">
                 <intent-filter>
                 <!-- These are the interfaces supported by the service, which
                      you can bind to. -->
-                <action android:name="IRemoteService" />
-                <action android:name="IConsumer" />
+                <action android:name="org.societies.clientframework.contentprovider.service"/>
                 <!-- This is an action code you can use to select the service
                      without explicitly supplying the implementation class. -->
             </intent-filter>
