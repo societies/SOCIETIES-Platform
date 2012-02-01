@@ -21,6 +21,8 @@ package org.societies.personalisation.CAUITaskManager.impl;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,7 +51,7 @@ public class CAUITaskManager  implements ICAUITaskManager{
 	private JTree tree;
 	DefaultMutableTreeNode top; 
 
-		
+
 	public CAUITaskManager(){
 		top = new DefaultMutableTreeNode("User Intent Task model");	
 	}
@@ -57,6 +59,10 @@ public class CAUITaskManager  implements ICAUITaskManager{
 
 	public DefaultMutableTreeNode getRoot(){
 		return top;
+	}
+
+	public void setRoot(DefaultMutableTreeNode top){
+		this.top = top;
 	}
 
 	//call this after the top variable is filled with uiModel objects
@@ -78,20 +84,114 @@ public class CAUITaskManager  implements ICAUITaskManager{
 
 		return task;
 	}
-	
 
+
+	/*
+	 * 
+	 */
+	public UserIntentTask retrieveTask (String taskID) {
+
+		UserIntentTask userTask = null;
+
+		DefaultMutableTreeNode node = null;
+		Enumeration e =this.getRoot().breadthFirstEnumeration();
+		while (e.hasMoreElements()) {
+			node = (DefaultMutableTreeNode) e.nextElement();
+			if (node.getUserObject() instanceof UserIntentAction && node.getUserObject() != null){
+				userTask =  (UserIntentTask)node.getUserObject();
+				System.out.println("node casted to userTask "+ userTask.getTaskID());
+				if (taskID.equals(userTask.getTaskID())) {
+					System.out.println("FOUND "+taskID);
+					return userTask;
+				}
+			}
+		}
+		return null;
+	}
+
+	/*
+	 * 
+	 */
+	public UserIntentAction retrieveAction(String actionID) {
+
+		UserIntentAction userAction = null;
+
+		DefaultMutableTreeNode node = null;
+		Enumeration e =this.getRoot().breadthFirstEnumeration();
+		while (e.hasMoreElements()) {
+			node = (DefaultMutableTreeNode) e.nextElement();
+			if (node.getUserObject() instanceof UserIntentAction && node.getUserObject() != null){
+				userAction =  (UserIntentAction)node.getUserObject();
+				System.out.println("node casted to userAction: "+ userAction.getActionID());
+				if (actionID.equals(userAction.getActionID())) {
+					System.out.println("FOUND "+actionID);
+					return userAction;
+				}
+			}
+		}
+		return null;
+	}
+
+	/*
+	 * rename to retrieve 
+	 */
+
+	@Override
+	public List<UserIntentAction> getActionsByType(String par, String value) {
+
+		List<UserIntentAction> results = new ArrayList<UserIntentAction>();
+		UserIntentAction userAction = null;
+
+		DefaultMutableTreeNode node = null;
+		Enumeration e =this.getRoot().breadthFirstEnumeration();
+		while (e.hasMoreElements()) {
+			node = (DefaultMutableTreeNode) e.nextElement();
+			if (node.getUserObject() instanceof UserIntentAction && node.getUserObject() != null){
+				userAction =  (UserIntentAction)node.getUserObject();
+				System.out.println("node casted to userAction: "+ userAction.getActionID());
+				if (userAction.getparameterName().equals(par) && userAction.getvalue().equals(value)) {
+					System.out.println("FOUND "+userAction);
+					results.add(userAction);
+				}
+			}
+		}
+		return results;
+	}
+
+	/*
+	 * add this method to interface 
+	 * @param par
+	 * @return
+	 */
+
+	public List<UserIntentAction> getActionsByType(String par) {
+
+		List<UserIntentAction> results = new ArrayList<UserIntentAction>();
+		UserIntentAction userAction = null;
+
+		DefaultMutableTreeNode node = null;
+		Enumeration e =this.getRoot().breadthFirstEnumeration();
+		while (e.hasMoreElements()) {
+			node = (DefaultMutableTreeNode) e.nextElement();
+			if (node.getUserObject() instanceof UserIntentAction && node.getUserObject() != null){
+				userAction =  (UserIntentAction)node.getUserObject();
+				System.out.println("node casted to userAction: "+ userAction.getActionID());
+				if (userAction.getparameterName().equals(par)) {
+					System.out.println("FOUND "+userAction);
+					results.add(userAction);
+				}
+			}
+		}
+		return results;
+	}
+	
+	
 	@Override
 	public UserIntentAction getAction(String arg0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	@Override
-	public List<UserIntentAction> getActionsByType(String arg0, String arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 	@Override
 	public UserIntentAction getCurrentIntentAction(EntityIdentifier arg0,
 			EntityIdentifier arg1, IServiceResourceIdentifier arg2, String arg3) {
@@ -169,5 +269,5 @@ public class CAUITaskManager  implements ICAUITaskManager{
 		// TODO Auto-generated method stub
 
 	}
-	
+
 }
