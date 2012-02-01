@@ -22,22 +22,20 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.api.user.refiner;
+package org.societies.context.user.refinement.impl;
 
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.context.api.user.refinement.IUserCtxRefiner;
 
+public class UserCtxRefiner implements IUserCtxRefiner {
 
-/**
- * @author fran_ko
- */
-public interface IUserCtxRefiner {
-
-	/**
-	 * Refines context for an indicate Context Attribute. 
-	 * 
-	 * @param attrId
-	 * @since 0.0.1
+	/* (non-Javadoc)
+	 * @see org.societies.context.api.user.refinement.IUserCtxRefiner#refineContext(org.societies.api.context.model.CtxAttributeIdentifier)
 	 */
-	public void refineContext(CtxAttributeIdentifier attrId);
+	@Override
+	public void refineContext(CtxAttributeIdentifier arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
