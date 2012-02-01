@@ -117,7 +117,7 @@ public class InternalCtxBrokerTest {
 		entity = (CtxEntity) callback.getModelObject();
 		
 		// Create the attribute to be tested
-		internalCtxBroker.createAttribute(entity.getId(), CtxAttributeValueType.INDIVIDUAL, "attrType", callback);
+		internalCtxBroker.createAttribute(entity.getId(), "attrType", callback);
 		assertNotNull(callback.getModelObject());
 		assertTrue(callback.getModelObject() instanceof CtxAttribute);
 		attribute = (CtxAttribute) callback.getModelObject();
@@ -424,7 +424,7 @@ public class InternalCtxBrokerTest {
 		entity = (CtxEntity) callback.getModelObject();
 		
 		// Create the attribute to be tested
-		internalCtxBroker.createAttribute(entity.getId(), CtxAttributeValueType.INDIVIDUAL, "attrType", callback);
+		internalCtxBroker.createAttribute(entity.getId(), "attrType", callback);
 		emptyAttribute = (CtxAttribute) callback.getModelObject();
 		
 		// Set the attribute's initial value
@@ -468,6 +468,59 @@ public class InternalCtxBrokerTest {
 	@Test
 	public void testUpdateByCtxAssociationIUserCtxBrokerCallback() {
 		fail("Not yet implemented");
+	}
+	
+	/**
+	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#updateAttribute(CtxAttributeIdentifier, java.io.Serializable, String, IUserCtxBrokerCallback)}.
+	 */
+	@Test
+	public void testUpdateAttributeByCtxAttributeIdSerializableStringUserCtxBrokerCallback() {
+		
+		final CtxAttribute emptyAttribute;
+		final CtxAttribute initialisedAttribute;
+		final CtxAttribute updatedAttribute;
+		final CtxEntity entity;
+		final BrokerCallback callback = new BrokerCallback();
+		
+		// Create the attribute's scope
+		internalCtxBroker.createEntity("entType", callback);
+		entity = (CtxEntity) callback.getModelObject();
+		
+		// Create the attribute to be tested
+		internalCtxBroker.createAttribute(entity.getId(), "attrType", callback);
+		emptyAttribute = (CtxAttribute) callback.getModelObject();
+		
+		// Set the attribute's initial value
+		internalCtxBroker.updateAttribute(emptyAttribute.getId(), new Integer(100), "valueMetric", callback);
+		
+		// Verify the initial attribute value
+		initialisedAttribute = (CtxAttribute) callback.getModelObject();
+		assertEquals(new Integer(100), initialisedAttribute.getIntegerValue());
+
+		// Update the attribute value
+		internalCtxBroker.updateAttribute(initialisedAttribute.getId(), new Integer(200), "valueMetric", callback);
+		
+		// Verify updated attribute value
+		updatedAttribute = (CtxAttribute) callback.getModelObject();
+		assertEquals(new Integer(200), updatedAttribute.getIntegerValue());
+		/* TODO
+		// Test update with a binary value
+		final CtxAttribute binaryAttribute;
+		final MockBlobClass blob = new MockBlobClass(666);
+		final byte[] blobBytes;
+
+		blobBytes = SerialisationHelper.serialise(blob);
+		updatedAttribute.setBinaryValue(blobBytes);
+		internalCtxBroker.update(updatedAttribute, callback);
+
+		// Verify binary attribute value
+		binaryAttribute = (CtxAttribute) callback.getModelObject();
+		assertNull(binaryAttribute.getIntegerValue());
+		assertNotNull(binaryAttribute.getBinaryValue());
+		final MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.
+				deserialise(binaryAttribute.getBinaryValue(), this.getClass().getClassLoader());
+		assertEquals(blob, retrievedBlob);
+		*/
 	}
 	
 	private class BrokerCallback implements IUserCtxBrokerCallback{
