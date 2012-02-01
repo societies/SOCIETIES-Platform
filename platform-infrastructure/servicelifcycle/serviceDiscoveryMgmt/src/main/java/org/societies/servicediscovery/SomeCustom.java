@@ -1,21 +1,18 @@
 package org.societies.servicediscovery;
 
-
 public class SomeCustom {
 	
-	private String userId;
+	private String someid; 
 	
 	public SomeCustom(){
 		
 	}
 
 	public String getUserId() {
-		return userId;
+		return someid;
 	}
 
 	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-	
-	
+		this.someid = userId;
+	}	
 }

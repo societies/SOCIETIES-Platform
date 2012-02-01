@@ -12,13 +12,9 @@ public class ServiceDiscoveryListener implements ApplicationListener<ServiceDisc
 	public void onApplicationEvent(ServiceDiscoveryEvent event) {
 
 		String eventId = event.getEventId();
-		SomeCustom user = (SomeCustom) event.getContextParams("user");
-		String tempPassword = (String) event.getContextParams("tPassword");
-		logger.info(user.getUserId());
-		System.out.println("from UserEventListener eventId " + eventId);
-		System.out.println("from UserEventListener tempPassword " + tempPassword);
-		System.out.println("from UserEventListener user id " + user.getUserId());
-	}
-	
-	
+		SomeCustom someObj = (SomeCustom) event.getContextParams("objectname");
+		String tempPassword = (String) event.getContextParams("objectName1");
+		logger.info(someObj.getUserId());
+		logger.info("event received");
+	}	
 }

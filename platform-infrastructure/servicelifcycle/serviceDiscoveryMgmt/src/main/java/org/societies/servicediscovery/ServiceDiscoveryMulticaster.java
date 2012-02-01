@@ -27,7 +27,7 @@ private ApplicationEventMulticaster multicaster;
 	}
 
 	public void multicastEvent(ApplicationEvent event) {
-		getMulticaster().multicastEvent(event);
+		getMulticaster().multicastEvent(event);		
 	}
 
 	public void removeAllListeners() {

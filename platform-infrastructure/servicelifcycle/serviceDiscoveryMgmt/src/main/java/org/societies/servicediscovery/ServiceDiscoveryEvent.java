@@ -15,11 +15,10 @@ public class ServiceDiscoveryEvent extends ServiceDiscoveryAbstractEvent {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public ServiceDiscoveryEvent(String eventId, SomeCustom user, String tPassword) {
+	public ServiceDiscoveryEvent(String eventId, SomeCustom object, String someMoreObj) {
 		super(eventId, new HashMap());
 		Map<String, Object> params = (Map<String, Object>) this.getEventContext();
-		params.put("user", user);
-		params.put("tPassword", tPassword);
+		params.put("objectname", object);
+		params.put("objectName1", someMoreObj);	
 	}
-
 }

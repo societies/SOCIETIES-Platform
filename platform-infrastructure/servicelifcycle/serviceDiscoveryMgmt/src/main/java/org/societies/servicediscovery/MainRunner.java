@@ -20,7 +20,7 @@ public class MainRunner {
 		
 		ApplicationContext ctx = new ClassPathXmlApplicationContext("/META-INF/spring/bundle-context.xml");
 		
-		ServiceDiscoveryMulticaster eventMulticast= (ServiceDiscoveryMulticaster) ctx.getBean("applicationEventMulticaster");
+		ServiceDiscoveryMulticaster eventMulticast= (ServiceDiscoveryMulticaster) ctx.getBean("serviceDiscMulticast");
 		
 		SomeCustom customObject=new SomeCustom();
 		

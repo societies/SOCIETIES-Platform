@@ -88,7 +88,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>../platform-infrastructure/comms-frwk/ExampleServices/ExampleServiceMgr</module>
 		 -->
 		 <!-- Service Registry -->
-		 <module>../platform-infrastructure/slm/serviceRegistry</module>
+		 <module>../css-modules/serviceRegistry</module>
 		
 		<!-- <module>../platform-infrastructure/comms-frwk/ClientCommunicationMgr</module> -->
 		

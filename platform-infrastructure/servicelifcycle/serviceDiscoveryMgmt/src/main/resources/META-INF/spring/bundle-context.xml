@@ -27,10 +27,17 @@
 	OF SUCH DAMAGE. -->
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:osgi="http://www.springframework.org/schema/osgi"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-                      http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd"
+	xmlns:context="http://www.springframework.org/schema/context">
 
+	<bean id="serviceDiscMulticast"
+		class="org.societies.servicediscovery.ServiceDiscoveryMulticaster">
+		<property name="multicaster">
+			<bean id="asyncEventMulticaster"
+				class="org.springframework.context.event.SimpleApplicationEventMulticaster">
+			</bean>
+		</property>
+	</bean>
 
-	
 </beans>
