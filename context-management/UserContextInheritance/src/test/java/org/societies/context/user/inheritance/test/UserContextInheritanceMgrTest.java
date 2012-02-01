@@ -22,43 +22,8 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.userInheritance.impl;
+package org.societies.context.inheritance.test;
 
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxAttributeValueType;
-import org.societies.api.internal.context.user.inheritance.ConflictResolutionAlgorithm;
-import org.societies.api.internal.context.user.inheritance.IUserCtxInheritanceMgr;
-
-public class UserContextInheritance implements IUserCtxInheritanceMgr{
-
-	@Override
-	public void getCIS(EntityIdentifier cisId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void getContextAttribute(
-			CtxAttributeIdentifier contextAttributeIdentifier,
-			CtxAttributeValueType type, EntityIdentifier cisId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void inheritContextAttribute(
-			CtxAttributeIdentifier contextAttributeIdentifier,
-			CtxAttributeValueType type) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void resolveConflicts(
-			ConflictResolutionAlgorithm conflictResolutionsAlgorithms) {
-		// TODO Auto-generated method stub
-		
-	}
+public class UserContextInheritanceMgrTest {
 
 }
