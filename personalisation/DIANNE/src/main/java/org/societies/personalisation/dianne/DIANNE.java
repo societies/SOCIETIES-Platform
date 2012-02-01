@@ -31,6 +31,7 @@ import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE;
 import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNECallback;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.api.internal.context.broker.IUserCtxBroker;
 import org.societies.api.internal.personalisation.model.IOutcome;
@@ -56,11 +57,16 @@ public class DIANNE implements IDIANNE{
 
 	@Override
 	public void getOutcome(EntityIdentifier ownerId,
-			IServiceResourceIdentifier serviceId, 
-			String preferenceName,
 			CtxAttribute attribute, 
 			IDIANNECallback callback) {
 		// TODO Auto-generated method stub
+	}
+	
+	@Override
+	public void getOutcome(EntityIdentifier ownerId,
+			IAction action,
+			IDIANNECallback callback){
+		// TODO complete
 	}
 
 	@Override
