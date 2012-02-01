@@ -25,12 +25,68 @@
 
 package org.societies.css.devicemgmt.devicemanager;
 
-public interface ControllerWs {
-	
-	
-	
-	public void regiterNewService (String serviceId);
-	
-	public void removeDevice (String deviceId);
+/**
+ * 
+ * Describe your class here...
+ *
+ * @author rafik
+ *
+ */
+public interface IDeviceStateVariable {
 
+	/**
+	 * 
+	 * @return a table of allowed value of the this variable
+	 */
+	public String[] getAllowedValues();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Object getDefaultValue();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Class<?> getDataJavaType();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Number getMaximumValue();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Number getMinimumValue();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getName();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Number getStep();
+	
+	/**
+	 * We use this method if we define a device management specific data types (as Constants)
+	 * @return
+	 */
+	public String getDeviceMgmtDataType();
+	
+	/**
+	 * 
+	 * @return true if this variable sends events when a change occurs
+	 */
+	public boolean isEnventable();
+	
+	
 }

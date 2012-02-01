@@ -22,15 +22,42 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.context.user.inheritance.impl;
 
-package org.societies.css.devicemgmt.devicemanager;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.context.api.user.inheritance.ConflictResolutionAlgorithm;
+import org.societies.context.api.user.inheritance.IUserCtxInheritanceMgr;
 
-public interface ControllerWs {
-	
-	
-	
-	public void regiterNewService (String serviceId);
-	
-	public void removeDevice (String deviceId);
+public class UserContextInheritanceMgr implements IUserCtxInheritanceMgr {
 
+	@Override
+	public void getCIS(EntityIdentifier cisId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getContextAttribute(
+			CtxAttributeIdentifier contextAttributeIdentifier,
+			CtxAttributeValueType type, EntityIdentifier cisId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void inheritContextAttribute(
+			CtxAttributeIdentifier contextAttributeIdentifier,
+			CtxAttributeValueType type) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void resolveConflicts(
+			ConflictResolutionAlgorithm conflictResolutionsAlgorithms) {
+		// TODO Auto-generated method stub
+		
+	}
 }

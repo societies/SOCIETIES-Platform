@@ -22,15 +22,22 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.context.api.community.refinement;
 
-package org.societies.css.devicemgmt.devicemanager;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 
-public interface ControllerWs {
-	
-	
-	
-	public void regiterNewService (String serviceId);
-	
-	public void removeDevice (String deviceId);
+
+/**
+ * @author fran_ko
+ * @created 12-Nov-2011 7:15:15 PM
+ */
+public interface ICommunityCtxRefiner {
+
+	/**
+	 * 
+	 * @param attrId
+	 * @return 
+	 */
+	public  void refineContext(CtxAttributeIdentifier attrId);
 
 }
