@@ -86,8 +86,8 @@ public class CtxAttribute extends CtxModelObject {
 	/** The binary value of this context attribute. */
 	private byte[] binaryValue;
 	
-	/** The value type of this context attribute, i.e. INDIVIDUAL or COMMUNITY */
-	private CtxAttributeValueType valueType;
+	/** The value type of this context attribute */
+	private CtxAttributeValueType valueType = CtxAttributeValueType.EMPTY;
 	
 	/** The metric for the current context attribute value */
 	private String valueMetric;
@@ -264,8 +264,19 @@ public class CtxAttribute extends CtxModelObject {
 	 * 
 	 * @return the value type of this context attribute
 	 */
-	public CtxAttributeValueType getValueType(){
+	public CtxAttributeValueType getValueType() {
 		return this.valueType;
+	}
+	
+	/**
+	 * Sets the value type of this context attribute
+	 * 
+	 * @param valueType 
+	 *            the value type to set for this context attribute
+	 * @see CtxAttributeValueType
+	 */
+	public void setValueType(CtxAttributeValueType valueType) {
+		this.valueType = valueType;
 	}
 	
 	/**

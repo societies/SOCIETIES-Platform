@@ -7,6 +7,8 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.servicelifecycle.model.Service;
 import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
@@ -18,17 +20,20 @@ import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceReso
 
 public class ServiceRegistry implements IServiceRegistry {
 	private SessionFactory sessionFactory;
+	private static Logger log = LoggerFactory.getLogger(ServiceRegistry.class);
 
 	public ServiceRegistry() {
+		log.info("Service registry bundle instantiated.");
 	}
 
 	@Override
-	public void registerServiceList(List<Service> servicesList) throws ServiceRegistrationException{
+	public void registerServiceList(List<Service> servicesList)
+			throws ServiceRegistrationException {
 		Session session = sessionFactory.openSession();
 		RegistryEntry tmpRegistryEntry = null;
 		try {
-		for (Service service : servicesList) {
-			
+			for (Service service : servicesList) {
+
 				tmpRegistryEntry = new RegistryEntry(
 						new ServiceResourceIdentifier(new URI(service
 								.getServiceIdentifier().toString())),
@@ -37,32 +42,34 @@ public class ServiceRegistry implements IServiceRegistry {
 						service.getServiceName(),
 						service.getServiceDescription(),
 						service.getAuthorSignature());
-			} 
-			Transaction t = session.beginTransaction();
-			session.save(tmpRegistryEntry);
-			t.commit();
-		}catch (URISyntaxException e) {
+
+				Transaction t = session.beginTransaction();
+				session.save(tmpRegistryEntry);
+				t.commit();
+			}
+			log.debug("Service list saved.");
+		} catch (URISyntaxException e) {
 			e.printStackTrace();
 			throw new ServiceRegistrationException(e);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ServiceRegistrationException(e);
-		}finally{
-			if (session!=null){
+		} finally {
+			if (session != null) {
 				session.close();
 			}
 		}
 
-		
 	}
 
 	@Override
-	public void unregisterServiceList(List<Service> servicesList) throws ServiceRegistrationException{
+	public void unregisterServiceList(List<Service> servicesList)
+			throws ServiceRegistrationException {
 		Session session = sessionFactory.openSession();
 		RegistryEntry tmpRegistryEntry = null;
 		try {
-		for (Service service : servicesList) {
-			
+			for (Service service : servicesList) {
+
 				tmpRegistryEntry = new RegistryEntry(
 						new ServiceResourceIdentifier(new URI(service
 								.getServiceIdentifier().toString())),
@@ -71,29 +78,30 @@ public class ServiceRegistry implements IServiceRegistry {
 						service.getServiceName(),
 						service.getServiceDescription(),
 						service.getAuthorSignature());
-				
-		}
 			
+
 			Transaction t = session.beginTransaction();
 			session.delete(tmpRegistryEntry);
 			t.commit();
+			}
+
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 			throw new ServiceRegistrationException(e);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ServiceRegistrationException(e);
-		}
-		finally{
-			if (session!=null){
-			session.close();}
+		} finally {
+			if (session != null) {
+				session.close();
+			}
 		}
 
-		
 	}
 
 	@Override
-	public List<Service> retrieveServicesSharedByCSS(String CSSID) throws ServiceRetrieveException{
+	public List<Service> retrieveServicesSharedByCSS(String CSSID)
+			throws ServiceRetrieveException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -106,7 +114,8 @@ public class ServiceRegistry implements IServiceRegistry {
 	 * #retrieveServicesSharedByCIS(java.lang.String)
 	 */
 	@Override
-	public List<Service> retrieveServicesSharedByCIS(String CISID) throws ServiceRetrieveException{
+	public List<Service> retrieveServicesSharedByCIS(String CISID)
+			throws ServiceRetrieveException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -127,7 +136,8 @@ public class ServiceRegistry implements IServiceRegistry {
 	 * #findServices(java.lang.Object)
 	 */
 	@Override
-	public List<Service> findServices(Object filter) throws ServiceRetrieveException{
+	public List<Service> findServices(Object filter)
+			throws ServiceRetrieveException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -175,25 +185,26 @@ public class ServiceRegistry implements IServiceRegistry {
 	 * ServiceResourceIdentifier)
 	 */
 	@Override
-	public Service retrieveService(ServiceResourceIdentifier serviceIdentifier) throws ServiceRetrieveException{
+	public Service retrieveService(ServiceResourceIdentifier serviceIdentifier)
+			throws ServiceRetrieveException {
 		Session session = sessionFactory.openSession();
-		Service tmpService=null;
-		RegistryEntry tmpRegistryEntry=null;
-		try{
-		 tmpRegistryEntry = (RegistryEntry) session.get(RegistryEntry.class,
-				 new ServiceResourceIdentiferDAO(serviceIdentifier.getIdentifier().toString()));
-		tmpService=tmpRegistryEntry.createServiceFromRegistryEntry(); 
-		}catch (Exception e) {
+		Service tmpService = null;
+		RegistryEntry tmpRegistryEntry = null;
+		try {
+			tmpRegistryEntry = (RegistryEntry) session.get(RegistryEntry.class,
+					new ServiceResourceIdentiferDAO(serviceIdentifier
+							.getIdentifier().toString()));
+			tmpService = tmpRegistryEntry.createServiceFromRegistryEntry();
+		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ServiceRetrieveException(e);
-		}finally{
-			if (session!=null){
+		} finally {
+			if (session != null) {
 				session.close();
 			}
 		}
-		return tmpService; 
-		
-		
+		return tmpService;
+
 	}
 
 	public SessionFactory getSessionFactory() {

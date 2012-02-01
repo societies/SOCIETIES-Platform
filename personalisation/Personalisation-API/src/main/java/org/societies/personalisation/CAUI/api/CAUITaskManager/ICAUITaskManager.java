@@ -27,12 +27,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+
 
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.TaskModelData;
 import org.societies.personalisation.CAUI.api.model.UserIntentAction;
-import org.societies.personalisation.CAUI.api.model.UserIntentTask;
+import org.societies.personalisation.CAUI.api.model.IUserIntentTask;
 
 /**
  * @since 0.0.1
@@ -45,6 +49,30 @@ public interface ICAUITaskManager {
 
 	
 	
+	public boolean actionBelongsToModel(IUserIntentAction userAction);
+	
+	public boolean taskBelongsToModel(IUserIntentTask userTask);
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public DefaultMutableTreeNode retrieveModel();
+	
+	/**
+	 * 
+	 * @param top
+	 */
+	public void updateModel(DefaultMutableTreeNode top);
+	
+	/**
+	 * This method returns the model in a tree form. Useful for visualisation with java swing.
+	 * 
+	 * @return model in a tree form
+	 */
+	public JTree getModelTree();
+	
+	
 	/**
 	 * Creates an UserAction object based on the specified string ID.
 	 * 
@@ -53,7 +81,16 @@ public interface ICAUITaskManager {
 	 * @param transProb
 	 * @return the UserAction object
 	 */
-	public UserIntentAction createAction(String par, String val, double transProb);
+	public IUserIntentAction createAction(String par, String val, double transProb);
+
+	/**
+	 * Creates a task and assigns a task id to it.
+	 * @return the UserTask
+	 * 
+	 * @param taskID
+	 * @param trans Prob
+	 */
+	public IUserIntentTask createTask(String taskName, double transProb);
 
 	/**
 	 * Creates a task and assigns a task id to it.
@@ -61,8 +98,7 @@ public interface ICAUITaskManager {
 	 * 
 	 * @param taskID
 	 */
-	public UserIntentTask createTask(String taskName, double transProb);
-
+	public IUserIntentTask createTask(String taskName);
 
 	/**
 	 * Returns the UserAction object of the specified id.
@@ -70,7 +106,7 @@ public interface ICAUITaskManager {
 	 * 
 	 * @param actionID
 	 */
-	public UserIntentAction getAction(String actionID);
+	public UserIntentAction retrieveAction(String actionID);
 
 	/**
 	 * Returns a list of Actions from the model of the same type and value with these
@@ -80,8 +116,18 @@ public interface ICAUITaskManager {
 	 * @param par    the parameter name
 	 * @param val    the value
 	 */
-	public List<UserIntentAction> getActionsByType(String par, String val);
+	public List<UserIntentAction> retrieveActionsByTypeValue(String par, String val);
 
+	
+	/**
+	 * Returns a list of Actions from the model of the same type with this
+	 * defined in the parameter.
+	 * @return list of actions
+	 * 
+	 * @param par    the parameter name
+	 */
+	public List<UserIntentAction> retrieveActionsByType(String par);
+	
 	/**
 	 * Allows any service to request an context-based evaluated preference outcome.
 	 * @return					the outcome in the form of an IAction object
@@ -93,7 +139,7 @@ public interface ICAUITaskManager {
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
 	 */
-	public UserIntentAction getCurrentIntentAction(EntityIdentifier requestor, EntityIdentifier ownerID, IServiceResourceIdentifier serviceID, String preferenceName);
+	public UserIntentAction retrieveCurrentIntentAction(EntityIdentifier requestor, EntityIdentifier ownerID, IServiceResourceIdentifier serviceID, String preferenceName);
 
 	/**
 	 * Returns a map of next userActions and the relevant probabilities given the
@@ -102,7 +148,7 @@ public interface ICAUITaskManager {
 	 * 
 	 * @param userAction
 	 */
-	public HashMap<UserIntentAction, Double> getNextAction(UserIntentAction userAction);
+	public HashMap<UserIntentAction, Double> retrieveNextAction(UserIntentAction userAction);
 
 	/**
 	 * Returns a map of next userTasks and the relevant probabilities given the
@@ -111,7 +157,7 @@ public interface ICAUITaskManager {
 	 * 
 	 * @param userTask
 	 */
-	public HashMap<String, Double> getNextTask(UserIntentTask userTask);
+	public HashMap<String, Double> retrieveNextTask(IUserIntentTask userTask);
 
 	/**
 	 * Returns the UserTask specified by the taskID
@@ -119,13 +165,8 @@ public interface ICAUITaskManager {
 	 * 
 	 * @param taskID
 	 */
-	public UserIntentAction getTask(String taskID);
+	public IUserIntentTask retrieveTask(String taskID);
 
-	/**
-	 * Returns the TaskModelData java object that contains the user intent model.
-	 * @return the TaskModelData object
-	 */
-	public TaskModelData getTaskModelData();
 
 	/**
 	 * Returns a list of Tasks containing the specified action.
@@ -133,7 +174,7 @@ public interface ICAUITaskManager {
 	 * 
 	 * @param userAction
 	 */
-	public List<UserIntentTask> getTasks(UserIntentAction userAction);
+	public List<IUserIntentTask> retrieveTasks(UserIntentAction userAction);
 
 	/**
 	 * Identifies a IUserAction and the corresponding IUserTask that has the same
@@ -145,7 +186,7 @@ public interface ICAUITaskManager {
 	 * @param currentContext
 	 * @param lastAction
 	 */
-	public Map<UserIntentAction, UserIntentTask> identifyActionTaskInModel(String par, String val, HashMap<String, Serializable> currentContext, String[] lastAction);
+	public Map<UserIntentAction, IUserIntentTask> identifyActionTaskInModel(String par, String val, HashMap<String, Serializable> currentContext, String[] lastAction);
 
 	/**
 	 * Given the current actions in model determine the next action based on
@@ -159,12 +200,8 @@ public interface ICAUITaskManager {
 	 * @param previousPredictionsTaskID
 	 * @param userCurrentContext
 	 */
-	public UserIntentAction identifyNextAction(Map<UserIntentAction,UserIntentTask> identifiedActionTaskMap, String previousPredictionsTaskID, Map<String,Serializable> userCurrentContext);
+	public UserIntentAction identifyNextAction(Map<UserIntentAction,IUserIntentTask> identifiedActionTaskMap, String previousPredictionsTaskID, Map<String,Serializable> userCurrentContext);
 
-	/**
-	 * Resets the task model.
-	 */
-	public void resetTaskModelData();
 
 	/**
 	 * Creates a weighted link between two Actions.
@@ -178,18 +215,13 @@ public interface ICAUITaskManager {
 
 	/**
 	 * Creates a weighted link between two Tasks.
+	 * If sourceTask is null, then the task is added to root level.
 	 * 
 	 * @param sourceTask
-	 * @param targetTaskID
-	 * @param weigth    weigth
+	 * @param targetTask
+	 * @param weigth    
 	 */
-	public void setNextTaskLink(UserIntentTask sourceTask, String targetTaskID, Double weigth);
+	public void setNextTaskLink(IUserIntentTask sourceTask, IUserIntentTask targetTask, Double weigth);
 
-	/**
-	 * Sets the task model. The task model has been previously retrieved from the
-	 * context data base.
-	 * 
-	 * @param taskModelData    taskModelData
-	 */
-	public void setTaskModel(TaskModelData taskModelData);
+	
 }

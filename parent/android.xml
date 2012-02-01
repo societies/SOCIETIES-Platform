@@ -84,6 +84,13 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
             <version>2.2.1</version>
             <scope>provided</scope>
         </dependency-->
+	<!-- Android test dependency -->
+        <dependency>
+            <groupId>com.google.android</groupId>
+            <artifactId>android-test</artifactId>
+            <version>2.2.1</version>
+            <scope>provided</scope>
+        </dependency>
 
       <!-- Smack versions used in the communication framework (not currently used)
       <dependency>
@@ -195,7 +202,7 @@ Hints use your profile ~/.m2/settings.xml or set via the command line -Dandroid.
 	    <plugin>
 		<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 		<artifactId>android-maven-plugin</artifactId>
-		<version>3.0.0-alpha-14</version><configuration>
+		<version>3.0.0</version><configuration>
 		    <sdk>
 		        <!-- platform or api level (api level 4 = platform 1.6)-->
 		        <platform>8</platform>
