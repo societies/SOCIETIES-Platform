@@ -25,12 +25,42 @@
 
 package org.societies.css.devicemgmt.devicemanager;
 
-public interface ControllerWs {
+import java.util.Dictionary;
+import java.util.List;
+
+public interface IAction {
 	
+	/**
+	 * 
+	 * @return
+	 */
+	public List<String> getInputArgumentNames();
 	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getName();
 	
-	public void regiterNewService (String serviceId);
+	/**
+	 * 
+	 * @return
+	 */
+	public List <String> getOutputArgumentNames();
 	
-	public void removeDevice (String deviceId);
+	/**
+	 * 
+	 * @param argumentName
+	 * @return
+	 */
+	public IDeviceStateVariable getStateVariable (String argumentName);
+	
+	/**
+	 * 
+	 * @param arguments
+	 * @return
+	 */
+	public Dictionary<String, String> invokeAction(Dictionary<String, String> arguments); 
+	
 
 }
