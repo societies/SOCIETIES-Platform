@@ -25,6 +25,7 @@
 package org.societies.context.broker.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,10 @@ import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgrCallback;
 import org.societies.context.api.user.history.IUserCtxHistoryCallback;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
+//import org.societies.context.broker.impl.InternalCtxBroker.UserHoCDBCallback;
+//import org.societies.context.broker.impl.InternalCtxBroker.UserDBCallback;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
  * Internal Context Broker Implementation
@@ -54,12 +59,13 @@ import org.societies.context.api.user.history.IUserCtxHistoryMgr;
 public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBroker {
 
 	private IUserCtxDBMgr userDB;
-
+	private ICtxBroker broker;
 	private IUserCtxHistoryMgr userHocDB;
 
-	public InternalCtxBrokerFuture(IUserCtxDBMgr userDB,IUserCtxHistoryMgr userHocDB) {
+	public InternalCtxBrokerFuture(IUserCtxDBMgr userDB,IUserCtxHistoryMgr userHocDB,ICtxBroker broker) {
 		this.userDB=userDB;
 		this.userHocDB = userHocDB;
+		this.broker = broker;
 		// TODO Use logging.debug
 		//System.out.println(this.getClass().getName()+" full");
 	}
@@ -79,22 +85,46 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 
 
 	@Override
+	@Async
 	public Future<CtxAssociation> createAssociation(String type) {
 		// TODO Auto-generated method stub
-		return null;
+		UserDBCallback callback = new UserDBCallback(broker);
+		
+		userDB.createAssociation(type, callback);
+		CtxAssociation association = (CtxAssociation) callback.getCtxModelObject();
+		if (association!=null)
+			return new AsyncResult<CtxAssociation>(association);
+		else 
+			return new AsyncResult<CtxAssociation>(null);
 	}
 
 	@Override
+	@Async
 	public Future<CtxAttribute> createAttribute(CtxEntityIdentifier scope,
 			String type) {
 		// TODO Auto-generated method stub		
-		return null;
+		UserDBCallback callback = new UserDBCallback(broker);
+		
+		userDB.createAttribute(scope, null, type, callback);
+		CtxAttribute attribute = (CtxAttribute) callback.getCtxModelObject();
+		if (attribute!=null)
+			return new AsyncResult<CtxAttribute>(attribute);
+		else 
+			return new AsyncResult<CtxAttribute>(null);
 	}
 
 	@Override
+	@Async
 	public Future<CtxEntity> createEntity(String type) {
 		// TODO Auto-generated method stub
-		return null;
+		UserDBCallback callback = new UserDBCallback(broker);
+		
+		userDB.createEntity(type, callback);
+		CtxEntity entity = (CtxEntity) callback.getCtxModelObject();
+		if (entity!=null)
+			return new AsyncResult<CtxEntity>(entity);
+		else 
+			return new AsyncResult<CtxEntity>(null);
 	}
 
 	@Override
@@ -162,9 +192,17 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 	}
 
 	@Override
+	@Async
 	public Future<CtxModelObject> retrieve(CtxIdentifier identifier) {
 		// TODO Auto-generated method stub
-		return null;
+		UserDBCallback callback = new UserDBCallback(broker);
+				
+		userDB.retrieve(identifier, callback);
+		CtxModelObject modelObj = (CtxModelObject) callback.getCtxModelObject();
+		if (modelObj!=null)
+			return new AsyncResult<CtxModelObject>(modelObj);
+		else 
+			return new AsyncResult<CtxModelObject>(null);
 	}
 
 	@Override
@@ -189,10 +227,19 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 	}
 
 	@Override
+	@Async
 	public Future<List<CtxHistoryAttribute>> retrievePast(
 			CtxAttributeIdentifier attrId, Date startDate, Date endDate) {
 		// TODO Auto-generated method stub
-		return null;
+		UserHoCDBCallback callback = new UserHoCDBCallback(broker);
+		userHocDB.retrieveHistory(attrId, startDate, endDate, callback);
+		CtxHistoryAttribute modelObj = (CtxHistoryAttribute) callback.getCtxModelObject();
+		List<CtxHistoryAttribute> listAttrs = new ArrayList<CtxHistoryAttribute>();
+		listAttrs.add(modelObj);
+		if (modelObj!=null)
+			return new AsyncResult<List<CtxHistoryAttribute>>(listAttrs);
+		else 
+			return new AsyncResult<List<CtxHistoryAttribute>>(null);
 	}
 
 	@Override
@@ -209,16 +256,63 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 	}
 
 	@Override
+	@Async
 	public Future<CtxModelObject> update(CtxModelObject identifier) {
 		// TODO Auto-generated method stub
-		return null;
+		UserDBCallback callback = new UserDBCallback(broker);
+		
+		userDB.update(identifier, callback);
+		CtxModelObject modelObject = (CtxModelObject) callback.getCtxModelObject();
+		
+
+		// this part allows the storage of attribute updates to context history
+		if(modelObject.getModelType().equals(CtxModelType.ATTRIBUTE)){
+			CtxAttribute ctxAttr = (CtxAttribute) modelObject; 
+			if (ctxAttr.isHistoryRecorded() && userHocDB != null){
+				Date date = new Date();
+				//	System.out.println("storing hoc attribute");
+				userHocDB.storeHoCAttribute(ctxAttr, date);
+			}
+			return new AsyncResult<CtxModelObject>(modelObject);
+		}
+		else 
+			return new AsyncResult<CtxModelObject>(null);
+		
 	}
 
 	@Override
+	@Async
 	public Future<CtxAttribute> updateAttribute(
 			CtxAttributeIdentifier attributeId, Serializable value) {
 		// TODO Auto-generated method stub
-		return null;
+		UserDBCallback callback = new UserDBCallback(broker);
+		if (attributeId == null)
+			throw new NullPointerException("attributeId can't be null");
+		// Will throw IllegalArgumentException if value type is not supported
+		this.findAttributeValueType(value);
+		CtxModelObject modelObj = (CtxModelObject) this.retrieve(attributeId);
+		
+		if (modelObj == null) { // Requested attribute not found
+			callback.ctxModelObjectUpdated(null);
+			return null;
+		} else {
+			final CtxAttribute attribute = (CtxAttribute) modelObj;
+			final CtxAttributeValueType valueType = findAttributeValueType(value);
+			if (CtxAttributeValueType.EMPTY.equals(valueType))
+				attribute.setStringValue(null);
+			else if (CtxAttributeValueType.STRING.equals(valueType))
+				attribute.setStringValue((String) value);
+			else if (CtxAttributeValueType.INTEGER.equals(valueType))
+				attribute.setIntegerValue((Integer) value);
+			else if (CtxAttributeValueType.DOUBLE.equals(valueType))
+				attribute.setDoubleValue((Double) value);
+			else if (CtxAttributeValueType.BINARY.equals(valueType))
+				attribute.setBinaryValue((byte[]) value);
+
+			attribute.setValueType(valueType);
+			update(attribute);
+			return new AsyncResult<CtxAttribute>(attribute);
+		}
 	}
 
 	@Override
@@ -298,10 +392,20 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 	private class UserDBCallback implements IUserCtxDBMgrCallback {
 
 		private ICtxBroker brokerCallback;
-
+		private CtxModelObject ctxModelObject = null;
+		
 		UserDBCallback(ICtxBroker brokerCallback) {
 			this.brokerCallback = brokerCallback;
 		} 
+				
+		public CtxModelObject getCtxModelObject() {
+			return ctxModelObject;
+		}
+
+		private void setCtxModelObject(CtxModelObject ctxModelObject) {
+			this.ctxModelObject = ctxModelObject;
+		}
+		
 
 		public void ctxEntityCreated(CtxEntity ctxEntity) {}
 
@@ -314,6 +418,81 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 		public void ctxEntitiesLookedup(List<CtxEntityIdentifier> list) {}
 
 		public void ctxModelObjectRetrieved(CtxModelObject ctxModelObject) {}
+	}
+	
+	private class UserHoCDBCallback implements IUserCtxHistoryCallback {
+
+		private ICtxBroker brokerCallback;
+		private CtxModelObject ctxModelObject = null;
+		
+		UserHoCDBCallback(ICtxBroker brokerCallback) {
+			this.brokerCallback = brokerCallback;
+		} 
+				
+		public CtxModelObject getCtxModelObject() {
+			return ctxModelObject;
+		}
+
+		private void setCtxModelObject(CtxModelObject ctxModelObject) {
+			this.ctxModelObject = ctxModelObject;
+		}
+		
+		@Override
+		public void ctxRecordingDisable() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void ctxRecordingEnabled() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void historyRemovedByDate(int arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void historyRemovedByType(int arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void historyRetrievedDate(List<CtxHistoryAttribute> arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void historyRetrievedIndex(List<CtxHistoryAttribute> arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void historyTupleIdsRetrieved(
+				List<List<CtxAttributeIdentifier>> arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void historyTuplesRegistered() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void historyTuplesRetrieved(
+				Map<CtxAttribute, List<CtxAttribute>> arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		
 	}
 	
 	private CtxAttributeValueType findAttributeValueType(Serializable value) {
