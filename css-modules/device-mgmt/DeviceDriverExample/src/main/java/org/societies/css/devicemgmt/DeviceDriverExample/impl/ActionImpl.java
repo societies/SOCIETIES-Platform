@@ -22,8 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package org.societies.css.devicemgmt.devicemanager.impl;
+package org.societies.css.devicemgmt.DeviceDriverExample.impl;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -31,45 +30,48 @@ import java.util.List;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.societies.css.devicemgmt.devicemanager.IAction;
 import org.societies.css.devicemgmt.devicemanager.IDeviceStateVariable;
-import org.societies.css.devicemgmt.devicemanager.IDevice;
 
-
-
-public class DeviceImpl implements IDevice{
+/**
+ * This Class will be implemented in a device deriver bundle and exposed as an OSGi Service by this bundle
+ *
+ * @author rafik
+ *
+ */
+public class ActionImpl implements IAction {
 	
-	private static Logger LOG = LoggerFactory.getLogger(DeviceImpl.class);
-	private String deviceId;
-	private DeviceManager deviceManager;
-	private ServiceRegistration registration;
+	private static Logger LOG = LoggerFactory.getLogger(ActionImpl.class);
 	private BundleContext bundleContext;
+	private ServiceRegistration registration;
 	private Dictionary<String, String> properties;
-
-	public DeviceImpl(BundleContext bc, DeviceManager deviceMgr, String deviceId) {
+	private DeviceDriverExample deviceDriverExample;
+	private String actionName;
+	
+	
+	
+	
+	public ActionImpl(BundleContext bc, DeviceDriverExample deviceDriverExample, String actionName) {
 		
+		this.actionName = actionName;
 		this.bundleContext = bc;
-		this.deviceManager = deviceMgr;
-		this.deviceId = deviceId;
-		//this.properties = properties;
+		this.deviceDriverExample = deviceDriverExample;
 		
 		properties = new Hashtable<String, String>();
 		
-		properties.put("deviceId", deviceId);
+		properties.put("actionName", actionName);
 		
 		Object lock = new Object();
 
 		synchronized(lock)
 		{
-			registration = bundleContext.registerService(IDevice.class.getName(), this, properties);
+			registration = bundleContext.registerService(IAction.class.getName(), this, properties);
 			
-			LOG.info("-- A device service with the deviceId: " + properties.get("deviceId") + " has been registred"); 
+			LOG.info("-- An action service with the action: " + properties.get("actionName") + " has been registred"); 
 		}
-		
+
 	}
 	
 	public void removeDevice()
@@ -77,83 +79,48 @@ public class DeviceImpl implements IDevice{
 		if (registration != null)
 		{
 			registration.unregister();
-			deviceManager.removeDeviceFromContainer(deviceId);
+			deviceDriverExample.removeActionFromContainer(actionName);
 			
-			LOG.info("-- The device " + properties.get("deviceId") + " has been removed");
+			LOG.info("-- The action " + properties.get("actionName") + " has been removed");
 		}
 	}
-
-	public String getDeviceName() {
+	
+	/* (non-Javadoc)
+	 * @see org.societies.css.devicemgmt.devicemanager.IAction#getInputArgumentNames()
+	 */
+	public List<String> getInputArgumentNames() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public String getDeviceId() {
-		// TODO Auto-generated method stub
-		return deviceId;
+	/* (non-Javadoc)
+	 * @see org.societies.css.devicemgmt.devicemanager.IAction#getName()
+	 */
+	public String getName() {
+		return this.actionName;
 	}
 
-	public String getDeviceType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public String getDeviceDescription() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public String getDeviceConnetionType() {
+	/* (non-Javadoc)
+	 * @see org.societies.css.devicemgmt.devicemanager.IAction#getOutputArgumentNames()
+	 */
+	public List<String> getOutputArgumentNames() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public void enable() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void disable() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public boolean isEnable() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public String getDeviceLocation() {
+	/* (non-Javadoc)
+	 * @see org.societies.css.devicemgmt.devicemanager.IAction#getStateVariable(java.lang.String)
+	 */
+	public IDeviceStateVariable getStateVariable(String argumentName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public String getDeviceProvider() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public boolean isContextCompliant() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public IAction getAction(String actionName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<IAction> getActions() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public IDeviceStateVariable getStateVariable(String stateVariableName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<IDeviceStateVariable> getStateVariables() {
+	/* (non-Javadoc)
+	 * @see org.societies.css.devicemgmt.devicemanager.IAction#invokeAction(java.util.Dictionary)
+	 */
+	public Dictionary<String, String> invokeAction(
+			Dictionary<String, String> arguments) {
 		// TODO Auto-generated method stub
 		return null;
 	}

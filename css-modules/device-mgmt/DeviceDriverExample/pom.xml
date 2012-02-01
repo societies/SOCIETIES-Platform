@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.societies.css.devicemgmt</groupId>
-  <artifactId>devicemanager</artifactId>
+  <artifactId>DeviceDriverExample</artifactId>
   <packaging>bundle</packaging>
   <name>Spring OSGi Bundle</name>
   <version>0.0.1-SNAPSHOT</version>
@@ -42,6 +42,12 @@
 			<artifactId>spring-osgi-core</artifactId>
 			<version>1.1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.css.devicemgmt</groupId>
+			<artifactId>devicemanager</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<type>bundle</type>
+		</dependency>
 	</dependencies>
 	
 	<build>
@@ -63,11 +69,11 @@
               				org.springframework.beans.propertyeditors,
               				org.springframework.osgi.service.exporter.support,
               				org.springframework.osgi.context,
-              				org.springframework.osgi.service.exporter,
-              				org.slf4j.*
+              				org.springframework.osgi.service.exporter,org.slf4j.*,
+              				org.societies.css.devicemgmt.devicemanager
               			</Import-Package> 
               			<Export-Package>
-							org.societies.css.devicemgmt.devicemanager
+							org.societies.css.devicemgmt.DeviceDriverExample
               			</Export-Package>
           </instructions>
       </configuration>

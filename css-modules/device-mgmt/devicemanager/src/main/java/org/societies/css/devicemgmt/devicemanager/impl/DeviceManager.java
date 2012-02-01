@@ -32,13 +32,13 @@ import java.util.Map;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.css.devicemgmt.devicemanager.ControllerWs;
+import org.societies.css.devicemgmt.devicemanager.IDeviceManager;
 
 import org.springframework.osgi.context.BundleContextAware;
 
 
 
-public class DeviceManager implements ControllerWs, BundleContextAware{
+public class DeviceManager implements IDeviceManager, BundleContextAware{
 
 	private static Logger LOG = LoggerFactory.getLogger(DeviceManager.class);
 
@@ -70,7 +70,7 @@ public class DeviceManager implements ControllerWs, BundleContextAware{
 		this.deviceInstanceContainer.put(deviceId, deviceInstance);
 	}
 
-	public void removeDeviceFromTable (String deviceId)
+	public void removeDeviceFromContainer (String deviceId)
 	{
 		if (getDeviceInstanceContainer().get(deviceId) != null)
 		{
@@ -79,24 +79,48 @@ public class DeviceManager implements ControllerWs, BundleContextAware{
 	}
 	
 	
-	public void regiterNewService(String deviceId) {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+//////Interfaces exposed to the device drivers
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/**
+	 * 
+	 */
+	public void fireNewDeviceConnected(String deviceId) {
 		
-		LOG.info("DeviceMgmt: " + "****************************************************** Hi, I'm a web service : " + deviceId);
 		
-		
-		deviceImpl = new DeviceImpl(bundleContext, this, deviceId);
-		
+		// check if the device already exists in the container
+		if (getDeviceInstanceContainer().get(deviceId) != null)
+		{
+			LOG.info("DeviceMgmt: " + "****************************************************** Hi, I'm a web service : " + deviceId);
+			
+			//create new instance of the DeviceImpl and expose the instance as the OSGi service by using IDevice interface
+			deviceImpl = new DeviceImpl(bundleContext, this, deviceId);		
+			
+			//add device instance to the container
+			setDeviceInstanceContainer(deviceId, deviceImpl);
+		}
 	}
-	
-	
-	
-	public void removeDevice(String deviceId) 
+
+	/**
+	 * 
+	 */
+	public void fireDeviceDisconnected(String deviceId) 
 	{	
 		if (getDeviceInstanceContainer().get(deviceId) != null)
 		{
 			getDeviceInstanceContainer().get(deviceId).removeDevice();
 		}
 	}
+
+	/**
+	 * 
+	 */
+	public void fireNewDataReceived(String deviceId, String data) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 }
 
 

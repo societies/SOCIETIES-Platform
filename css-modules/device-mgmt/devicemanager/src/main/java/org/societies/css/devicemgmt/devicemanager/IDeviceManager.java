@@ -22,15 +22,20 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.societies.css.devicemgmt.devicemanager;
 
-public interface ControllerWs {
+/**
+ * Describe your class here...
+ *
+ * @author rafik
+ *
+ */
+public interface IDeviceManager {
 	
+	public void fireNewDeviceConnected (String serviceId);
 	
+	public void fireDeviceDisconnected (String deviceId);
 	
-	public void regiterNewService (String serviceId);
-	
-	public void removeDevice (String deviceId);
+	public void fireNewDataReceived (String deviceId, String data);
 
 }
