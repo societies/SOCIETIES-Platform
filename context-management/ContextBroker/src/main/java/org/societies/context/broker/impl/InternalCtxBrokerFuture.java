@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -42,6 +43,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.internal.context.broker.ICtxBroker;
+//import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgrCallback;
 import org.societies.context.api.user.history.IUserCtxHistoryCallback;
@@ -56,13 +58,13 @@ import org.springframework.scheduling.annotation.AsyncResult;
  * This class implements the internal context broker interfaces and orchestrates the db 
  * management 
  */
-public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBroker {
+public class InternalCtxBrokerFuture implements ICtxBroker {
 
 	private IUserCtxDBMgr userDB;
 	private ICtxBroker broker;
 	private IUserCtxHistoryMgr userHocDB;
 
-	public InternalCtxBrokerFuture(IUserCtxDBMgr userDB,IUserCtxHistoryMgr userHocDB,ICtxBroker broker) {
+	public InternalCtxBrokerFuture(IUserCtxDBMgr userDB,IUserCtxHistoryMgr userHocDB,ICtxBroker broker) throws CtxException {
 		this.userDB=userDB;
 		this.userHocDB = userHocDB;
 		this.broker = broker;
@@ -70,23 +72,23 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 		//System.out.println(this.getClass().getName()+" full");
 	}
 
-	public InternalCtxBrokerFuture() {
+	public InternalCtxBrokerFuture() throws CtxException {
 		// TODO Use logging.debug
 		//System.out.println(this.getClass().getName()+ " empty");
 	}
 
-	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) {
+	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) throws CtxException {
 		this.userDB = userDB;
 	}
 
-	public void setUserCtxHistoryMgr (IUserCtxHistoryMgr userHocDB) {
+	public void setUserCtxHistoryMgr (IUserCtxHistoryMgr userHocDB) throws CtxException {
 		this.userHocDB = userHocDB;
 	}
 
 
 	@Override
 	@Async
-	public Future<CtxAssociation> createAssociation(String type) {
+	public Future<CtxAssociation> createAssociation(String type) throws CtxException {
 		// TODO Auto-generated method stub
 		UserDBCallback callback = new UserDBCallback(broker);
 		
@@ -101,7 +103,7 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 	@Override
 	@Async
 	public Future<CtxAttribute> createAttribute(CtxEntityIdentifier scope,
-			String type) {
+			String type) throws CtxException {
 		// TODO Auto-generated method stub		
 		UserDBCallback callback = new UserDBCallback(broker);
 		
@@ -115,7 +117,7 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 
 	@Override
 	@Async
-	public Future<CtxEntity> createEntity(String type) {
+	public Future<CtxEntity> createEntity(String type) throws CtxException {
 		// TODO Auto-generated method stub
 		UserDBCallback callback = new UserDBCallback(broker);
 		
@@ -128,32 +130,32 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 	}
 
 	@Override
-	public void disableCtxMonitoring(CtxAttributeValueType type) {
+	public void disableCtxMonitoring(CtxAttributeValueType type) throws CtxException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void disableCtxRecording() {
+	public void disableCtxRecording() throws CtxException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void enableCtxMonitoring(CtxAttributeValueType type) {
+	public void enableCtxMonitoring(CtxAttributeValueType type) throws CtxException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void enableCtxRecording() {
+	public void enableCtxRecording() throws CtxException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public Future<List<CtxModelObject>> lookup(CtxModelType modelType,
-			String type) {
+			String type) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -161,39 +163,39 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 	@Override
 	public Future<List<CtxEntity>> lookupEntities(String entityType,
 			String attribType, Serializable minAttribValue,
-			Serializable maxAttribValue) {
+			Serializable maxAttribValue) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Future<List<Object>> registerForUpdates(CtxEntityIdentifier scope,
-			String attrType) {
+			String attrType) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Future<List<Object>> registerForUpdates(CtxAttributeIdentifier attrId) {
+	public Future<List<Object>> registerForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Future<CtxModelObject> remove(CtxIdentifier identifier) {
+	public Future<CtxModelObject> remove(CtxIdentifier identifier) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public int removeHistory(String type, Date startDate, Date endDate) {
+	public int removeHistory(String type, Date startDate, Date endDate) throws CtxException {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	@Async
-	public Future<CtxModelObject> retrieve(CtxIdentifier identifier) {
+	public Future<CtxModelObject> retrieve(CtxIdentifier identifier) throws CtxException {
 		// TODO Auto-generated method stub
 		UserDBCallback callback = new UserDBCallback(broker);
 				
@@ -207,21 +209,21 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 
 	@Override
 	public Future<List<CtxAttribute>> retrieveFuture(
-			CtxAttributeIdentifier attrId, Date date) {
+			CtxAttributeIdentifier attrId, Date date) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Future<List<CtxAttribute>> retrieveFuture(
-			CtxAttributeIdentifier attrId, int modificationIndex) {
+			CtxAttributeIdentifier attrId, int modificationIndex) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Future<List<CtxHistoryAttribute>> retrievePast(
-			CtxAttributeIdentifier attrId, int modificationIndex) {
+			CtxAttributeIdentifier attrId, int modificationIndex) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -229,7 +231,7 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 	@Override
 	@Async
 	public Future<List<CtxHistoryAttribute>> retrievePast(
-			CtxAttributeIdentifier attrId, Date startDate, Date endDate) {
+			CtxAttributeIdentifier attrId, Date startDate, Date endDate) throws CtxException {
 		// TODO Auto-generated method stub
 		UserHoCDBCallback callback = new UserHoCDBCallback(broker);
 		userHocDB.retrieveHistory(attrId, startDate, endDate, callback);
@@ -243,21 +245,21 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 	}
 
 	@Override
-	public void unregisterForUpdates(CtxAttributeIdentifier attrId) {
+	public void unregisterForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public Future<List<Object>> unregisterForUpdates(CtxEntityIdentifier scope,
-			String attributeType) {
+			String attributeType) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	@Async
-	public Future<CtxModelObject> update(CtxModelObject identifier) {
+	public Future<CtxModelObject> update(CtxModelObject identifier) throws CtxException {
 		// TODO Auto-generated method stub
 		UserDBCallback callback = new UserDBCallback(broker);
 		
@@ -283,7 +285,7 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 	@Override
 	@Async
 	public Future<CtxAttribute> updateAttribute(
-			CtxAttributeIdentifier attributeId, Serializable value) {
+			CtxAttributeIdentifier attributeId, Serializable value) throws CtxException {
 		// TODO Auto-generated method stub
 		UserDBCallback callback = new UserDBCallback(broker);
 		if (attributeId == null)
@@ -318,7 +320,7 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 	@Override
 	public Future<CtxAttribute> updateAttribute(
 			CtxAttributeIdentifier attributeId, Serializable value,
-			String valueMetric) {
+			String valueMetric) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -326,7 +328,7 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 	@Override
 	public Future<Boolean> setCtxHistoryTuples(
 			CtxAttributeIdentifier primaryAttrIdentifier,
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) {
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -334,7 +336,7 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 	@Override
 	public Future<List<CtxAttributeIdentifier>> getCtxHistoryTuples(
 			CtxAttributeIdentifier primaryAttrIdentifier,
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) {
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -342,7 +344,7 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 	@Override
 	public Future<List<CtxAttributeIdentifier>> updateCtxHistoryTuples(
 			CtxAttributeIdentifier primaryAttrIdentifier,
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) {
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -350,41 +352,41 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 	@Override
 	public Future<Boolean> removeCtxHistoryTuples(
 			CtxAttributeIdentifier primaryAttrIdentifier,
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) {
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Future<CtxEntity> retrieveAdministratingCSS(
-			CtxEntityIdentifier community) {
+			CtxEntityIdentifier community) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Future<CtxAttribute> retrieveBonds(CtxEntityIdentifier community) {
+	public Future<CtxAttribute> retrieveBonds(CtxEntityIdentifier community) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Future<List<CtxEntityIdentifier>> retrieveChildCommunities(
-			CtxEntityIdentifier community) {
+			CtxEntityIdentifier community) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Future<List<CtxEntityIdentifier>> retrieveCommunityMembers(
-			CtxEntityIdentifier community) {
+			CtxEntityIdentifier community) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Future<List<CtxEntityIdentifier>> retrieveParentCommunities(
-			CtxEntityIdentifier community) {
+			CtxEntityIdentifier community) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -508,5 +510,13 @@ public class InternalCtxBrokerFuture extends CtxBrokerFuture implements ICtxBrok
 			return CtxAttributeValueType.BINARY;
 		else
 			throw new IllegalArgumentException(value + ": Invalid value type");
+	}
+
+	@Override
+	public Future<List<Object>> evaluateSimilarity(
+			Serializable objectUnderComparison,
+			List<Serializable> referenceObjects) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
