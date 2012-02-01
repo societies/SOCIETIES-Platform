@@ -28,7 +28,7 @@ package org.societies.personalisation.dianne;
 import java.util.HashMap;
 
 import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE;
-import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNECallback;
+import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.personalisation.model.IAction;
@@ -51,21 +51,21 @@ public class DIANNE implements IDIANNE{
 	public void getOutcome(EntityIdentifier ownerId,
 			IServiceResourceIdentifier serviceId, 
 			String preferenceName, 
-			IDIANNECallback callback) {
+			IPersonalisationInternalCallback callback) {
 		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void getOutcome(EntityIdentifier ownerId,
 			CtxAttribute attribute, 
-			IDIANNECallback callback) {
+			IPersonalisationInternalCallback callback) {
 		// TODO Auto-generated method stub
 	}
 	
 	@Override
 	public void getOutcome(EntityIdentifier ownerId,
 			IAction action,
-			IDIANNECallback callback){
+			IPersonalisationInternalCallback callback){
 		// TODO complete
 	}
 
