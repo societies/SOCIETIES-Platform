@@ -40,6 +40,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentTask;
 import org.societies.personalisation.CAUI.api.model.UserIntentAction;
@@ -71,7 +72,7 @@ public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener
 	
 	
 	
-	CAUITaskManager modelManager;
+	ICAUITaskManager modelManager;
 	
 	
 	CAUITaskManagerTest(){
@@ -79,12 +80,13 @@ public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener
 		
 		System.out.println("CAUITaskManagerTest start");
 		modelManager = new CAUITaskManager();
+		
 		createModel();
 		
 		
 		
 		//visualise model
-		this.tree = modelManager.getTree();
+		this.tree = modelManager.getModelTree();
 		
 		
 		this.tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -119,74 +121,53 @@ public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener
 
 		//Add the split pane to this panel.
 		add(splitPane);
+		//visualise model end
 		
 		
 		
-		//start retrieving tests
+		//start testing
 		retrieveTests();
+		
 		System.out.println("CAUITaskManagerTest end");
 	}
 
 	
 	
-	
-	public DefaultMutableTreeNode searchNode() {
-		String actionID = "task1Actions=start/0";
-		
-		UserIntentAction userAction = null;
-		
-		DefaultMutableTreeNode node = null;
-	    Enumeration e = modelManager.getRoot().breadthFirstEnumeration();
-	    while (e.hasMoreElements()) {
-	      node = (DefaultMutableTreeNode) e.nextElement();
-	      
-	      if (node.getUserObject() instanceof UserIntentAction && node.getUserObject() != null){
-	    	  userAction =  (UserIntentAction)node.getUserObject();
-	    	  System.out.println("node casted to userAction: "+ userAction.getActionID());
-	    	  if (actionID.equals(userAction.getActionID())) {
-		    	  System.out.println("FOUND "+actionID);
-		    	  return node;
-		      }
-	      
-	      }
-	     
-	      
-	    }
-	    return null;
-	  }
-	
-	
 	private void  retrieveTests(){
 		
 		//type based retrieval
-		List<UserIntentAction> typeBasedListActions = new ArrayList<UserIntentAction>();
-		//typeBasedListActions = modelManager.getActionsByType("A-homePc", "off");
 		
-		DefaultMutableTreeNode root = modelManager.getRoot();
 		/*
+		DefaultMutableTreeNode root = modelManager.getRoot();
 		System.out.println("The root has " + root.getChildCount() + " children");
 	    System.out.println("The tree's depth is " + root.getDepth());
 	    System.out.println("The tree has " + root.getLeafCount() + " leaves");
 	    System.out.println("'Root' is really a root? " + root.isRoot());
 	    System.out.println("Root's userObject: " + root.toString());
 	    */
-	    //System.out.println("getActionsByType(A-homePc, off)"+typeBasedListActions);
-		UserIntentAction retrievedAction = modelManager.retrieveAction("task1Actions=start/0");
+	
+		UserIntentAction retrievedAction = modelManager.retrieveAction("Actions=start/0");
 		System.out.println("retrievedAction "+ retrievedAction.getparameterName()+" "+retrievedAction.getvalue());
-		//id based retrieval
-		//String actionAid = 
-		//modelManager.getAction(arg0);
+		
+		List<UserIntentAction> resultsType = modelManager.retrieveActionsByType("A-homePc");
+		System.out.println("getActionsByType(homePC) " + resultsType);
+
+		List<UserIntentAction> resultsTypeValue = modelManager.retrieveActionsByTypeValue("A-homePc","off");
+		System.out.println("getActionsByType(homePC,off) " + resultsTypeValue);
+	
+		IUserIntentAction actionsResult = resultsTypeValue.get(0);
+		System.out.println ("action:"+actionsResult.toString()+" "+this.modelManager.actionBelongsToModel(actionsResult));
 		
 	}
 	
 
 	private void createModel(){
 		
-		DefaultMutableTreeNode rootTreeNode = modelManager.getRoot();
+		DefaultMutableTreeNode model = modelManager.retrieveModel();
 		
 		//each node belongs to one task only
 		//start Action
-		DefaultMutableTreeNode task1ActionStart = new DefaultMutableTreeNode(modelManager.createAction("task1Actions","start",100));
+		DefaultMutableTreeNode task1ActionStart = new DefaultMutableTreeNode(modelManager.createAction("Actions","start",100));
 		
 		IUserIntentAction actionA1 =modelManager.createAction("A-homePc","off",50);
 		HashMap<String, Serializable> actCtxA1 = new HashMap<String,Serializable>();
@@ -200,26 +181,26 @@ public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener
 		actionA2.setActionContext(actCtxA2);
 		DefaultMutableTreeNode task1ActionA2 = new DefaultMutableTreeNode(actionA2);
 			
-		UserIntentAction actionB1 = modelManager.createAction("B-tv","off", 100);
+		IUserIntentAction actionB1 = modelManager.createAction("B-tv","off", 100);
 		HashMap<String, Serializable> actCtxB1 = new HashMap<String,Serializable>();
 		actCtxB1.put("ToD", "morning");
 		actionB1.setActionContext(actCtxB1);
 		DefaultMutableTreeNode task1ActionB1 = new DefaultMutableTreeNode(actionB1);
 		
-		UserIntentAction actionB2 = modelManager.createAction("B-tv","off", 50);
+		IUserIntentAction actionB2 = modelManager.createAction("B-tv","off", 50);
 		HashMap<String, Serializable> actCtxB2 = new HashMap<String,Serializable>();
 		actCtxB2.put("ToD", "night");
 		actionB2.setActionContext(actCtxB2);
 		DefaultMutableTreeNode task1ActionB2 = new DefaultMutableTreeNode(actionB2);
 		
 		
-		UserIntentAction actionC1 = modelManager.createAction("C-roomLights","off",100);
+		IUserIntentAction actionC1 = modelManager.createAction("C-roomLights","off",100);
 		HashMap<String, Serializable> actCtxC1 = new HashMap<String,Serializable>();
 		actCtxC1.put("ToD", "morning");
 		actionC1.setActionContext(actCtxC1);
 		DefaultMutableTreeNode task1ActionC1 = new DefaultMutableTreeNode(actionC1);		
 		
-		UserIntentAction actionC2 = modelManager.createAction("C-roomLights","off",100);
+		IUserIntentAction actionC2 = modelManager.createAction("C-roomLights","off",100);
 		HashMap<String, Serializable> actCtxC2 = new HashMap<String,Serializable>();
 		actCtxC2.put("ToD", "night");
 		actionC2.setActionContext(actCtxC2);
@@ -232,9 +213,12 @@ public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener
 		uiTask1.setTaskContext(task1Context);
 		DefaultMutableTreeNode task1node= new DefaultMutableTreeNode(uiTask1);
 		
-		rootTreeNode.add(task1node);
+		modelManager.setNextTaskLink(null, uiTask1, new Double(100.0));
+		model.add(task1node);
+		
 		task1node.add(task1ActionStart);
-	
+		
+		// taskA branch1
 		task1ActionStart.add(task1ActionA1);
 		task1ActionA1.add(task1ActionB1);
 		task1ActionB1.add(task1ActionC1);
@@ -244,8 +228,35 @@ public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener
 		task1ActionB2.add(task1ActionA2);
 		task1ActionA2.add(task1ActionC2);
 
+		// task B
+		IUserIntentTask uiTask2 = modelManager.createTask("task2", 100);
+		Map<String, Serializable> task2Context = new HashMap<String, Serializable>();
+		task1Context.put("timeOfDay", "morning");
+		uiTask2.setTaskContext(task2Context);
+		DefaultMutableTreeNode task2node= new DefaultMutableTreeNode(uiTask2);
+		
+		DefaultMutableTreeNode task2ActionStart = new DefaultMutableTreeNode(modelManager.createAction("Actions","start",100));
+		
+		
+		IUserIntentAction actionD1 = modelManager.createAction("D-setVolume","low",100);
+		HashMap<String, Serializable> actCtxD1 = new HashMap<String,Serializable>();
+		actCtxD1.put("timeOfDay", "morning");
+		actionD1.setActionContext(actCtxD1);
+		DefaultMutableTreeNode task1ActionD1 = new DefaultMutableTreeNode(actionD1);		
+		
+		IUserIntentAction actionD2 = modelManager.createAction("D-setRadio","on",100);
+		HashMap<String, Serializable> actCtxD2 = new HashMap<String,Serializable>();
+		actCtxD2.put("ToD", "night");
+		actionD2.setActionContext(actCtxD2);
+		DefaultMutableTreeNode task1ActionD2 = new DefaultMutableTreeNode(actionD2);
+		
+		task1node.add(task2node);
+		task2node.add(task2ActionStart);
+		task2ActionStart.add(task1ActionD1);
+		task1ActionD1.add(task1ActionD2);
+
 		//model created
-		modelManager.setRoot(rootTreeNode);
+		modelManager.updateModel(model);
 	}
 	
 	

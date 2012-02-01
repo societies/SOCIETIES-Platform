@@ -57,5 +57,10 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<!-- Client Framework -->
 		<module>../platform-infrastructure/client-frwk/MasterGUI</module>
 
+                <!-- Test applications
+		N.B. Requires that emulator is started
+		 -->
+                <!--module>../platform-infrastructure/client-frwk/TestIPCServices</module-->
+
 	</modules>
 </project>
