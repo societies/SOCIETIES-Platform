@@ -22,21 +22,71 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.context.broker.api;
+
+import org.societies.api.context.CtxException;
 
 /**
- * Describe your class here...
+ * Thrown when the Context Broker fails to handle a request. 
  *
- * @author aleckey
- *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.2
  */
-package org.societies.comm.examples.fortunecookie.api;
+public class CtxBrokerException extends CtxException {
 
-import org.societies.example.fortunecookieservice.schema.Cookie;
-
-public interface IWisdom {
+	private static final long serialVersionUID = -8342428992338901479L;
 
 	/**
-	 * Returns a cookie object containing your fortune
-	 */
-	public Cookie getCookie();
+     * Constructs a <code>CtxBrokerException</code> with no detail message.
+     */
+    public CtxBrokerException() {
+    	
+        super();
+    }
+
+    /**
+     * Constructs a <code>CtxBrokerException</code> with the specified detail
+     * message.
+     * 
+     * @param message
+     *            the detail message.
+     */
+    public CtxBrokerException(String message) {
+
+        super(message);
+    }
+
+    /**
+     * Creates a <code>CtxBrokerException</code> with the specified detail
+     * message and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public CtxBrokerException(String message, Throwable cause) {
+
+        super(message, cause);
+    }
+
+    /**
+     * Creates a <code>CtxBrokerException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public CtxBrokerException(Throwable cause) {
+
+        super(cause);
+    }
 }

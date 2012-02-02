@@ -33,15 +33,13 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-import org.societies.api.internal.context.broker.IUserCtxBroker;
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.internal.useragent.monitoring.IInternalUserActionMonitor;
 
 public class DIANNE implements IDIANNE{
 
 	private HashMap<EntityIdentifier, NetworkRunner> networks;
-	IInternalUserActionMonitor uaMonitor;
-	IUserCtxBroker ctxBroker;
+	//IInternalUserActionMonitor uaMonitor;
+	//IUserCtxBroker ctxBroker;
 
 	public DIANNE(){
 		networks = new HashMap<EntityIdentifier, NetworkRunner>();
@@ -59,14 +57,19 @@ public class DIANNE implements IDIANNE{
 	public void getOutcome(EntityIdentifier ownerId,
 			CtxAttribute attribute, 
 			IPersonalisationInternalCallback callback) {
-		// TODO Auto-generated method stub
+		// Context update received!!!
+		if(networks.containsKey(ownerId)){
+			
+		}else{
+			NetworkRunner newNetwork = new NetworkRunner();
+		}
 	}
 	
 	@Override
 	public void getOutcome(EntityIdentifier ownerId,
 			IAction action,
 			IPersonalisationInternalCallback callback){
-		// TODO complete
+		// Action update received!!!
 	}
 
 	@Override
@@ -93,28 +96,11 @@ public class DIANNE implements IDIANNE{
 	
 	
 	public void initialiseDIANNELearning(){
-		System.out.println("Initialising DIANNE!");
-		if(this.ctxBroker == null){
-			System.out.println("ctxBroker is null :(");
-		}else{
-			System.out.println("ctxBroker is not null :)");
-		}
+		System.out.println("DIANNE initialised!!");
+		//register for action updates from PersonalisationMgr
 		
-		if(this.uaMonitor == null){
-			System.out.println("uaMonitor is null :(");
-		}else{
-			System.out.println("uaMonitor is not null :)");
-		}
+		//register for context updates from PersonalisationMgr
 	}
-	
-	public void setCtxBroker(IUserCtxBroker broker){
-		this.ctxBroker = broker;
-	}
-	
-	public void setUaMonitor(IInternalUserActionMonitor monitor){
-		this.uaMonitor = monitor;
-	}
-
 	
 	/*
 	 * (non-Javadoc)

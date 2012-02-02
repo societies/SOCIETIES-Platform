@@ -1,3 +1,14 @@
+package org.societies.comm.examples.clientcommand;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.comm.examples.calculator.ICalc;
+import org.societies.comm.examples.commsmanager.ICalcRemote;
+import org.societies.comm.examples.commsmanager.IExamplesCallback;
+
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
@@ -22,26 +33,58 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.comm.examples.commsmanager;
-
-import java.util.concurrent.Future;
 
 /**
- * Calculator Client interface. Each method requires a callback to receive the result
- * to showcase asynchronous calls.
+ * Describe your class here...
  *
  * @author aleckey
  *
  */
-public interface ICalcRemote {
-	/**Adds 2 numbers together and returns total
-	 */
-    public int Add(int a, int b);
-    
-    /**Subtracts 2 numbers and returns total
-     */
-    public int Subtract(int a, int b);
+public class ClientTester implements IExamplesCallback {
 
-    /**Adds 2 numbers together and returns total */
-    public void AddAsync(int a, int b, IExamplesCallback callback);
+	private ICalcRemote remoteCalculator;
+	private ICalc calcService;
+	private static Logger LOG = LoggerFactory.getLogger(ClientTester.class);
+	
+	/** @return the remoteCalculator	 */
+	public ICalcRemote getRemoteCalculator() {
+		return remoteCalculator;
+	}
+
+	/** @param remoteCalculator the remoteCalculator to set */
+	public void setRemoteCalculator(ICalcRemote remoteCalculator) {
+		this.remoteCalculator = remoteCalculator;
+	}
+	
+	public ICalc getCalcService() {
+		return calcService;
+	}
+
+	public void setCalcService(ICalc calcService) {
+		this.calcService = calcService;
+	}
+
+	public void StartTest() {
+		System.out.println("Starting Client Test");
+		
+		getRemoteCalculator().AddAsync(2, 3, this);
+		
+		System.out.println("Waiting...");
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.comm.examples.commsmanager.ICalcRemoteCallback#receiveCalcResult(java.lang.Object) */
+	@Override
+	public void receiveExamplesResult(Object calcResult) {
+		int result = (Integer)calcResult;
+		System.out.println(result);
+	}
+	
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+
+		System.out.println("I am doing other stuffs while waiting for asynch reply");
+	}
 }

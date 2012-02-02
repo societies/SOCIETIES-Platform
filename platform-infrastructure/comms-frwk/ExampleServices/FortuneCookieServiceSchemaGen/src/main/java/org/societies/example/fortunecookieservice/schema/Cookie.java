@@ -22,26 +22,41 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.comm.examples.commsmanager;
-
-import java.util.concurrent.Future;
 
 /**
- * Calculator Client interface. Each method requires a callback to receive the result
- * to showcase asynchronous calls.
+ * Describe your class here...
  *
  * @author aleckey
  *
  */
-public interface ICalcRemote {
-	/**Adds 2 numbers together and returns total
-	 */
-    public int Add(int a, int b);
-    
-    /**Subtracts 2 numbers and returns total
-     */
-    public int Subtract(int a, int b);
+package org.societies.example.fortunecookieservice.schema;
 
-    /**Adds 2 numbers together and returns total */
-    public void AddAsync(int a, int b, IExamplesCallback callback);
+/**
+ * Simple class to show a non-complex return type for the Communication framework example
+ * Contains 2 properties id, value
+ *
+ */
+public class Cookie {
+	private int id;
+	private String value;
+	
+	public Cookie() {}
+	
+	public Cookie(int id, String value) {
+		this.id = id;
+		this.value = value;
+	}
+	
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getValue() {
+		return value;
+	}
+	public void setValue(String value) {
+		this.value = value;
+	}	
 }

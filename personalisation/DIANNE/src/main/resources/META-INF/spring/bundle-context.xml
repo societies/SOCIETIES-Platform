@@ -8,10 +8,7 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
   
-  <bean id="DIANNE" class="org.societies.personalisation.dianne.DIANNE" 
-   depends-on="UserCtxBroker, UserActionMonitor" init-method="initialiseDIANNELearning">
-   <property name="ctxBroker" ref="UserCtxBroker"></property>
-   <property name="uaMonitor" ref="UserActionMonitor"></property>
+  <bean id="DIANNE" class="org.societies.personalisation.dianne.DIANNE" init-method="initialiseDIANNELearning">
    </bean>
 
 </beans>

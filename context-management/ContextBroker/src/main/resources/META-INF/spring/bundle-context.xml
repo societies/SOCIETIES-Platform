@@ -8,7 +8,7 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-  <bean name="ContextBroker" class="org.societies.context.broker.impl.InternalCtxBroker"
+  <bean name="CtxBroker" class="org.societies.context.broker.impl.InternalCtxBroker"
   depends-on="UserCtxDBMgmt">
  <property name="userCtxDBMgr" ref="UserCtxDBMgmt"></property>
 </bean>

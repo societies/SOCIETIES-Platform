@@ -5,25 +5,29 @@
 
     <groupId>org.societies</groupId>
     <artifactId>AndroidPubsubClient</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>${version.comm}</version>
     <packaging>apk</packaging>
 
+    <parent>
+	    <groupId>org.societies</groupId>
+	    <artifactId>android-parent</artifactId>
+	    <version>0.1</version>
+    </parent>
+
     <dependencies>
-        <dependency>
-            <groupId>com.google.android</groupId>
+	<dependency>
+            <groupId>android</groupId>
             <artifactId>android</artifactId>
-            <version>2.2.1</version>
-            <scope>provided</scope>
         </dependency>
 	<dependency>
 	    <groupId>org.jabber.protocol.pubsub</groupId>
 	    <artifactId>PubsubXep</artifactId>
-	    <version>0.0.1</version>
+	    <version>${release.version}</version>
 	</dependency>
 	<dependency>
 	    <groupId>org.societies.comm.xmpp</groupId>
 	    <artifactId>ClientCommunicationMgr</artifactId>
-	    <version>0.1</version>
+	    <version>${version.comm}</version>
 	    <exclusions>
 		<exclusion>
 		    <groupId>xml-apis</groupId> 
@@ -34,7 +38,12 @@
 	<dependency>
 	    <groupId>org.societies.comm.xmpp</groupId>
 	    <artifactId>CommunicationFrameworkCommons</artifactId>
-	    <version>0.0.1-SNAPSHOT</version>
+	    <version>${version.comm}</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.societies.api.external</groupId>
+	    <artifactId>societies-api</artifactId>
+	    <version>${release.version}</version>
 	</dependency>
 	<dependency> <!-- todo: remove this dep -->
 		<groupId>pt.ptin.iex.ctx.android.jaxb</groupId>
@@ -63,7 +72,7 @@
 
     <build>
 <finalName>${project.artifactId}</finalName>
-	    <sourceDirectory>src</sourceDirectory>
+<sourceDirectory>src/main/java</sourceDirectory>
 	    <pluginManagement>
 		    <plugins>
 			    <plugin>

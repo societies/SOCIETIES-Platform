@@ -27,11 +27,15 @@ package org.societies.comm.examples.commsmanager.impl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.comm.examples.commsmanager.ICalcRemote;
+import org.societies.comm.examples.commsmanager.IExamplesCallback;
 import org.societies.comm.xmpp.datatypes.IdentityImpl;
 import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.IdentityType;
@@ -91,31 +95,30 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 	 */
 	@Override
 	@Async
-	public Future<Integer> AddAsync(int valA, int valB) {
+	public void AddAsync(int valA, int valB, IExamplesCallback calcCallback) {
 		//Identity id = new IdentityImpl(IdentityType.CSS, "XCManager", "red.local");
-		Identity id = new Identity(IdentityType.CSS, "XCManager", "red.local") {
+		Identity toIdentity = new Identity(IdentityType.CSS, "XCManager", "red.local") {
 			@Override
 			public String getJid() {
 				return getIdentifier() + "." + getDomainIdentifier();
 			}
 		};
-		Stanza stanza = new Stanza(id);
+		Stanza stanza = new Stanza(toIdentity);
 
-		//SETUP RETURN STUFF
-		Future<Integer> returnObj = null;
-		CommsClientCallback callback = new CommsClientCallback(returnObj);
-		
+		//SETUP CALC CLIENT RETURN STUFF
+		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), calcCallback);
+
+		//CREATE MESSAGE BEAN
 		CalcBean calc = new CalcBean();
 		calc.setA(valA); 
 		calc.setB(valB);
 		calc.setMethod(MethodType.ADD_ASYNC);
 		try {
+			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
 			commManager.sendIQGet(stanza, calc, callback);
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
 		};
-		
-		return returnObj;
 	}
 	
 	@Override
@@ -132,12 +135,13 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 
 		//SETUP RETURN STUFF
 		Future<Integer> returnObj = null;
-		CommsClientCallback callback = new CommsClientCallback(returnObj);
+		//CommsClientCallback callback = new CommsClientCallback(returnObj);
 				
 		CalcBean calc = new CalcBean();
 		calc.setA(valA); 
 		calc.setB(valB);
 		calc.setMethod(MethodType.ADD);
+		/*
 		try {
 			commManager.sendIQGet(stanza, calc, callback);
 		} catch (CommunicationException e) {
@@ -145,6 +149,8 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 		};
 		
 		return callback.getReturnInt();
+		*/
+		return 0;
 	}
 
 	@Override
