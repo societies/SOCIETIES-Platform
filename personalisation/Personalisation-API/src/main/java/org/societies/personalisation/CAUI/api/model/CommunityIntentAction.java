@@ -163,4 +163,16 @@ public class CommunityIntentAction implements ICommunityIntentAction{
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void setTaskID(String taskID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getTaskID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

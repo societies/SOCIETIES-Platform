@@ -13,7 +13,7 @@ public class AgentService extends Service {
 	
 	private static final Logger log = LoggerFactory.getLogger(AgentService.class);
 	
-	private Skeleton skeleton;
+	private static Skeleton skeleton = new Skeleton(new XMPPClient());   
 	
 	@Override
     public IBinder onBind(Intent intent) {  
@@ -24,8 +24,7 @@ public class AgentService extends Service {
     @Override
     public void onCreate()
     {
-    	log.debug("onCreate");      
-    	skeleton = new Skeleton(new XMPPClient());    	
+    	log.debug("onCreate");   
     }
     
     @Override
