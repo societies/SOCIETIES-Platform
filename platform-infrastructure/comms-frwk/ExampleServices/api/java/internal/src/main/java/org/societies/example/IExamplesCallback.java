@@ -22,26 +22,15 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.comm.examples.commsmanager;
-
-import java.util.concurrent.Future;
+package org.societies.example;
 
 /**
- * Calculator Client interface. Each method requires a callback to receive the result
- * to showcase asynchronous calls.
+ * Used as a generic callback class to handle asynch messaging
  *
  * @author aleckey
  *
  */
-public interface ICalcRemote {
-	/**Adds 2 numbers together and returns total
-	 */
-    public int Add(int a, int b);
-    
-    /**Subtracts 2 numbers and returns total
-     */
-    public int Subtract(int a, int b);
-
-    /**Adds 2 numbers together and returns total */
-    public void AddAsync(int a, int b, IExamplesCallback callback);
+public interface IExamplesCallback {
+	
+	public void receiveExamplesResult(Object returnValue);
 }
