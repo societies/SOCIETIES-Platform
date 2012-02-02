@@ -24,24 +24,14 @@
  */
 package org.societies.comm.examples.commsmanager;
 
-import java.util.concurrent.Future;
+import org.societies.comm.examples.fortunecookie.datatypes.Cookie;
 
 /**
- * Calculator Client interface. Each method requires a callback to receive the result
- * to showcase asynchronous calls.
+ * Describe your class here...
  *
  * @author aleckey
  *
  */
-public interface ICalcRemote {
-	/**Adds 2 numbers together and returns total
-	 */
-    public int Add(int a, int b);
-    
-    /**Subtracts 2 numbers and returns total
-     */
-    public int Subtract(int a, int b);
-
-    /**Adds 2 numbers together and returns total */
-    public void AddAsync(int a, int b, IExamplesCallback callback);
+public interface IWisdomRemote {
+	public Cookie getCookie();
 }
