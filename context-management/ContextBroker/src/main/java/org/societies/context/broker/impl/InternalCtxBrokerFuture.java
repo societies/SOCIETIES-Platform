@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 import org.societies.api.context.CtxException;
@@ -36,12 +37,14 @@ import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 //import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
@@ -118,7 +121,7 @@ public class InternalCtxBrokerFuture implements ICtxBroker {
 	@Override
 	@Async
 	public Future<CtxEntity> createEntity(String type) throws CtxException {
-		// TODO Auto-generated method stub
+		
 		UserDBCallback callback = new UserDBCallback(broker);
 		
 		userDB.createEntity(type, callback);
@@ -153,32 +156,31 @@ public class InternalCtxBrokerFuture implements ICtxBroker {
 		
 	}
 
-	@Override
-	public Future<List<CtxModelObject>> lookup(CtxModelType modelType,
-			String type) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
-	public Future<List<CtxEntity>> lookupEntities(String entityType,
+	public Future<List<CtxEntityIdentifier>> lookupEntities(String entityType,
 			String attribType, Serializable minAttribValue,
 			Serializable maxAttribValue) throws CtxException {
-		// TODO Auto-generated method stub
+		
+		UserDBCallback callback = new UserDBCallback(broker);
+		userDB.lookupEntities(entityType, attribType, minAttribValue, maxAttribValue, callback);
+		List<CtxEntityIdentifier> results = callback.getLookedUpCtxEntities();
+		// add fix
+				
 		return null;
 	}
 
 	@Override
-	public Future<List<Object>> registerForUpdates(CtxEntityIdentifier scope,
+	public void registerForUpdates(CtxEntityIdentifier scope,
 			String attrType) throws CtxException {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public Future<List<Object>> registerForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
+	public void registerForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
 		// TODO Auto-generated method stub
-		return null;
+	
 	}
 
 	@Override
@@ -188,9 +190,9 @@ public class InternalCtxBrokerFuture implements ICtxBroker {
 	}
 
 	@Override
-	public int removeHistory(String type, Date startDate, Date endDate) throws CtxException {
+	public Future<Integer> removeHistory(String type, Date startDate, Date endDate) throws CtxException {
 		// TODO Auto-generated method stub
-		return 0;
+		return null;
 	}
 
 	@Override
@@ -253,10 +255,10 @@ public class InternalCtxBrokerFuture implements ICtxBroker {
 	}
 
 	@Override
-	public Future<List<Object>> unregisterForUpdates(CtxEntityIdentifier scope,
+	public void unregisterForUpdates(CtxEntityIdentifier scope,
 			String attributeType) throws CtxException {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
@@ -360,24 +362,18 @@ public class InternalCtxBrokerFuture implements ICtxBroker {
 	}
 
 	@Override
-	public Future<CtxEntity> retrieveAdministratingCSS(
+	public Future<IndividualCtxEntity> retrieveAdministratingCSS(
 			CtxEntityIdentifier community) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Future<CtxAttribute> retrieveBonds(CtxEntityIdentifier community) throws CtxException {
+	public Future<Set<CtxBond>> retrieveBonds(CtxEntityIdentifier community) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
-	public Future<List<CtxEntityIdentifier>> retrieveChildCommunities(
-			CtxEntityIdentifier community) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public Future<List<CtxEntityIdentifier>> retrieveCommunityMembers(
@@ -392,6 +388,31 @@ public class InternalCtxBrokerFuture implements ICtxBroker {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	
+	@Override
+	public Future<List<Object>> evaluateSimilarity(
+			Serializable objectUnderComparison,
+			List<Serializable> referenceObjects) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<List<CtxIdentifier>> lookup(CtxModelType modelType,
+			String type) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<List<CtxEntityIdentifier>> retrieveSubCommunities(
+			CtxEntityIdentifier community) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	
 	
 	private class UserDBCallback implements IUserCtxDBMgrCallback {
 
@@ -474,6 +495,7 @@ public class InternalCtxBrokerFuture implements ICtxBroker {
 		public CtxModelObject getCtxModelObjectRetrieved(){
 			return this.ctxModelObjectRetrieved;
 		}
+		
 	}
 	
 	
@@ -569,11 +591,5 @@ public class InternalCtxBrokerFuture implements ICtxBroker {
 			throw new IllegalArgumentException(value + ": Invalid value type");
 	}
 
-	@Override
-	public Future<List<Object>> evaluateSimilarity(
-			Serializable objectUnderComparison,
-			List<Serializable> referenceObjects) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 }
