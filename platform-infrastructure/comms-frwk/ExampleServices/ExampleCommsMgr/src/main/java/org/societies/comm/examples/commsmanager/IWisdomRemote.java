@@ -24,7 +24,7 @@
  */
 package org.societies.comm.examples.commsmanager;
 
-import org.societies.comm.examples.fortunecookie.datatypes.Cookie;
+import org.societies.example.fortunecookieservice.schema.Cookie;
 
 /**
  * Describe your class here...

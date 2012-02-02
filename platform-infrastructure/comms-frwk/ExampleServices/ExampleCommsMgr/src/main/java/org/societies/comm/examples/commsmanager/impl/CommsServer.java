@@ -41,7 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.comm.examples.calculator.ICalc;
 import org.societies.comm.examples.fortunecookie.api.IWisdom;
-import org.societies.comm.examples.fortunecookie.datatypes.Cookie;
+import org.societies.example.fortunecookieservice.schema.Cookie;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -210,8 +210,7 @@ public class CommsServer implements IFeatureServer {
 				
 				//GENERATE BEAN CONTAINING RETURN OBJECT 
 				FortuneCookieBeanResult fcRes = new FortuneCookieBeanResult();
-				fcRes.setId(fortune.getId());
-				fcRes.setValue(fortune.getValue());
+				fcRes.setCookie(fortune);
 				return fcRes;
 			}
 		}

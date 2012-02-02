@@ -32,7 +32,7 @@
 package org.societies.comm.examples.fortunecookie.impl;
 
 import java.util.Random;
-import org.societies.comm.examples.fortunecookie.datatypes.Cookie;
+import org.societies.example.fortunecookieservice.schema.Cookie;
 import org.societies.comm.examples.fortunecookie.api.IWisdom;
 
 public class Wisdom implements IWisdom{
@@ -44,7 +44,10 @@ public class Wisdom implements IWisdom{
 		int id = rand.nextInt(cookies.length);
 		String fortune = cookies[id];
 		
-		return new Cookie(id, fortune);
+		Cookie returnCookie = new Cookie();
+		returnCookie.setId(id);
+		returnCookie.setValue(fortune);
+		return returnCookie;
 	}
 	
 	private String[] cookies = new String[] {
