@@ -1,70 +1,64 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
+		<relativePath>../../../../parent/spring-osgi.xml</relativePath>
 		<version>0.1</version>
 	</parent>
-
-	<!-- change the artifactid to your project artifactid -->
 	<groupId>org.societies.comm.examples</groupId>
-	<artifactId>ExampleClientGui</artifactId>
+	<artifactId>ClientCommand</artifactId>
 	<packaging>bundle</packaging>
 	<version>${release.version}</version>
-	<developers>
-		<developer>
-			<id>Github ID</id>
-			<name>Alec</name>
-			<email>aleckey@github.com</email>
-			<roles>
-				<role>developer</role>
-			</roles>
-		</developer>
-	</developers>
-
-	<repositories>
-		<repository>
-			<id>External Maven Central</id>
-			<!-- <url>http://snapshots.maven.codehaus.org/maven2</url> -->
-			<!-- <url>http://sloth.av.it.pt:8081/nexus/content/repositories/central/</url> -->
-			<url>http://repository.aduna-software.org/maven2/</url>
-		</repository>
-	</repositories>
-
+	
 	<dependencies>
-		<!-- add your dependencies here -->
-
+ 		<!--
 		<dependency>
-			<groupId>org.societies.comm.examples</groupId>
-			<artifactId>ExampleCommsManager</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.jdesktop</groupId>
-			<artifactId>appframework</artifactId>
-			<version>1.0.3</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.jdesktop</groupId>
-			<artifactId>swing-worker</artifactId>
-			<version>1.1</version>
-			<scope>compile</scope>
-		</dependency>
-
+  		     <groupId>org.springframework</groupId>
+  		     <artifactId>spring-core</artifactId>     
+  		     <version>3.0.6.RELEASE</version>
+  		     <scope>provided</scope>
+ 		</dependency>   
+ 		<dependency>
+ 		     <groupId>org.springframework</groupId>
+ 		     <artifactId>spring-beans</artifactId>     
+ 		     <version>3.0.6.RELEASE</version>
+ 		     <scope>provided</scope>
+ 		</dependency>   
+ 		<dependency>
+ 		     <groupId>org.springframework</groupId>     
+ 		     <artifactId>spring-context</artifactId>     
+ 		     <version>3.0.6.RELEASE</version>
+ 		     <scope>provided</scope>
+ 		</dependency>
+ 		<dependency>
+ 			<groupId>org.springframework</groupId>
+ 			<artifactId>spring-context-support</artifactId>
+ 			<version>3.0.6.RELEASE</version>
+ 			<scope>provided</scope>
+ 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
 			<scope>provided</scope>
+			<version>2.5.6.SEC01</version>
 		</dependency>
-		
-		<!-- logging -->
-				<dependency>
+		--> 
+		<dependency>
+	 		<groupId>org.societies.comm.examples</groupId>
+	 		<artifactId>ExampleCommsManager</artifactId>
+	 		<version>${release.version}</version>
+	 		<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.comm.examples</groupId>
+			<artifactId>Calculator</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
@@ -76,11 +70,6 @@
 			<version>${slf4j.version}</version>
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
-		</dependency>
-
 	</dependencies>
 
 	<build>
@@ -94,13 +83,7 @@
 						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<Import-Package>
-							*;resolution:=optional
-							<!-- org.societies.comm.examples.commsmanager, org.springframework.context.*, 
-								javax.swing, !javax.jnlp, !javax.swing.border, !javax.swing.event, !javax.swing.plaf, 
-								!javax.swing.table, !javax.swing.text -->
-						</Import-Package>
-						<!-- <Export-Package></Export-Package> -->
+						<!-- <Export-Package></Export-Package>  -->
 					</instructions>
 				</configuration>
 			</plugin>
@@ -126,4 +109,5 @@
 			</plugin>
 		</plugins>
 	</build>
+
 </project>
