@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.internal.personalisation.model.FeedbackEvent;
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.personalisation.CRIST.api.model.CRISTUserAction;

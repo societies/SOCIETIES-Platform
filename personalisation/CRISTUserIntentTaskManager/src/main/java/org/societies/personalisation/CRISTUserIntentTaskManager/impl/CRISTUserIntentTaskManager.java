@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager;
 import org.societies.personalisation.CRIST.api.model.CRISTUserAction;

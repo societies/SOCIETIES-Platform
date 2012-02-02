@@ -21,7 +21,7 @@
 package org.societies.personalisation.CRISTUserIntentPrediction.test;
 
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
 import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 

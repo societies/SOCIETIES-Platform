@@ -2,7 +2,7 @@ package org.societies.personalisation.CRIST.api.model;
 
 import java.util.HashMap;
 
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 /**

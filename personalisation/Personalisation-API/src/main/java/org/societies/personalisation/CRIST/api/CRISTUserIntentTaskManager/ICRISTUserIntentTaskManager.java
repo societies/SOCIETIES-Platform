@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.CRIST.api.model.CRISTUserTaskModelData;
 import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
