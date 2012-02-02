@@ -27,12 +27,14 @@ package org.societies.api.context.broker;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
@@ -108,7 +110,7 @@ public interface ICtxBroker {
 	 * @param type
 	 * @throws CtxException 
 	 */
-	public Future<List<CtxModelObject>> lookup(EntityIdentifier requester, CtxModelType modelType, String type) throws CtxException;
+	public Future<List<CtxIdentifier>> lookup(EntityIdentifier requester, CtxModelType modelType, String type) throws CtxException;
 
 	/**
 	 * Looks up for a list of CtxEntities of  the specified type, containing the
@@ -121,7 +123,7 @@ public interface ICtxBroker {
 	 * @param maxAttribValue
 	 * @throws CtxException 
 	 */
-	public Future<List<CtxEntity>> lookupEntities(EntityIdentifier requester, String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue) throws CtxException;
+	public Future<List<CtxEntityIdentifier>> lookupEntities(EntityIdentifier requester, String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue) throws CtxException;
 
 	/**
 	 * Registers the specified EventListener for value modification events of context
@@ -132,7 +134,7 @@ public interface ICtxBroker {
 	 * @param attrType
 	 * @throws CtxException 
 	 */
-	public Future<List<Object>> registerForUpdates(EntityIdentifier requester, CtxEntityIdentifier scope, String attrType) throws CtxException;
+	public void registerForUpdates(EntityIdentifier requester, CtxEntityIdentifier scope, String attrType) throws CtxException;
 
 	/**
 	 * Registers the specified EventListener for value modification events of the
@@ -142,7 +144,7 @@ public interface ICtxBroker {
 	 * @param attrId
 	 * @throws CtxException 
 	 */
-	public Future<List<Object>> registerForUpdates(EntityIdentifier requester, CtxAttributeIdentifier attrId) throws CtxException;
+	public void registerForUpdates(EntityIdentifier requester, CtxAttributeIdentifier attrId) throws CtxException;
 
 	/**
 	 * Removes the specified context model object.
@@ -213,7 +215,7 @@ public interface ICtxBroker {
 	 * @param attrId
 	 * @throws CtxException 
 	 */
-	public Future<List<Object>> unregisterForUpdates(EntityIdentifier requester, CtxAttributeIdentifier attrId) throws CtxException;
+	public void unregisterForUpdates(EntityIdentifier requester, CtxAttributeIdentifier attrId) throws CtxException;
 
 	/**
 	 * Unregisters the specified EventListener for value modification events of
@@ -224,7 +226,7 @@ public interface ICtxBroker {
 	 * @param attributeType
 	 * @throws CtxException 
 	 */
-	public Future<List<Object>> unregisterForUpdates(EntityIdentifier requester, CtxEntityIdentifier scope, String attributeType) throws CtxException;
+	public void unregisterForUpdates(EntityIdentifier requester, CtxEntityIdentifier scope, String attributeType) throws CtxException;
 
 	/**
 	 * Updates a single context model object.
@@ -252,21 +254,20 @@ public interface ICtxBroker {
 	 * @param community
 	 * @throws CtxException 
 	 */
-	public Future<List<CtxAttribute>> retrieveBonds(EntityIdentifier requester, CtxEntityIdentifier community) throws CtxException;
+	public Future<Set<CtxBond>> retrieveBonds(EntityIdentifier requester, CtxEntityIdentifier community) throws CtxException;
 
 	/**
-	 * This applies for Community hierarchies. Retrieves the child communities
-	 * (sub-communities of CtxEntities) of the specified parent CtxEntity
+	 * Retrieves the sub-communities of the specified community Entity.
 	 * 
 	 * @param requester
 	 * @param community
 	 * @throws CtxException 
 	 */
-	public Future<List<CtxEntityIdentifier>> retrieveChildCommunities(EntityIdentifier requester, CtxEntityIdentifier community) throws CtxException;
+	public Future<List<CtxEntityIdentifier>> retrieveSubCommunities(EntityIdentifier requester, CtxEntityIdentifier community) throws CtxException;
 
 	/**
-	 * Retrieves a list of Individual Context Entities that are members of the
-	 * specified community Entity.
+     * Retrieves a list of Individual Context Entities that are members of the specified community Entity 
+	 * (individuals or subcommunities).
 	 * 
 	 * @param requester
 	 * @param community
@@ -275,6 +276,8 @@ public interface ICtxBroker {
 	public Future<List<CtxEntityIdentifier>> retrieveCommunityMembers(EntityIdentifier requester, CtxEntityIdentifier community) throws CtxException;
 
 	/**
+	 * This applies for Community hierarchies. Retrieves the parent communities
+	 * of the specified CtxEntity.
 	 * 
 	 * @param requester
 	 * @param community
