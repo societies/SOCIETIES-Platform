@@ -43,5 +43,5 @@ public interface ICalcRemote {
     public int Subtract(int a, int b);
 
     /**Adds 2 numbers together and returns total */
-    public Future<Integer> AddAsync(int a, int b);
+    public void AddAsync(int a, int b, IExamplesCallback callback);
 }

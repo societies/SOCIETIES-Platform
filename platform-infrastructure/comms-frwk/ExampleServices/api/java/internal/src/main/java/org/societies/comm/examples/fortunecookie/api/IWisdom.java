@@ -31,7 +31,7 @@
  */
 package org.societies.comm.examples.fortunecookie.api;
 
-import org.societies.comm.examples.fortunecookie.datatypes.Cookie;
+import org.societies.example.fortunecookieservice.schema.Cookie;
 
 public interface IWisdom {
 

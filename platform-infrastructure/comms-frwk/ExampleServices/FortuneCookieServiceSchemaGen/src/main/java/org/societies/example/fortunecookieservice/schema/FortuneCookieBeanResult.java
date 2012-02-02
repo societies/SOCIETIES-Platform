@@ -40,19 +40,12 @@ In this case we will return a Bean version of the Cookie object
 
 public class FortuneCookieBeanResult {
 
-	private int id;
-	private String value;
+	private Cookie cookie;
 	
-	public int getId() {
-		return id;
+	public Cookie getCookie() {
+		return this.cookie;
 	}
-	public void setId(int id) {
-		this.id = id;
-	}
-	public String getValue() {
-		return value;
-	}
-	public void setValue(String value) {
-		this.value = value;
+	public void setCookie(Cookie cookie) {
+		this.cookie = cookie;
 	}	
 }
