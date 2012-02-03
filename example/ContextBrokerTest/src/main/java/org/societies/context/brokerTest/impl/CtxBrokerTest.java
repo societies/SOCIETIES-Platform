@@ -27,10 +27,13 @@ package org.societies.context.brokerTest.impl;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
-import org.societies.api.internal.context.broker.IUserCtxBroker;
-import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
+import org.societies.api.internal.context.broker.ICtxBroker;
 
+
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -55,40 +58,29 @@ public class CtxBrokerTest 	{
 
 	
 	
-	private IUserCtxBroker ctxBroker;
-	//private IUserCtxBrokerCallback userCtxBrokerCallback;
+	private ICtxBroker ctxBroker;
 	
-
-
 	public CtxBrokerTest() {
 		System.out.println(this.getClass().getName()+" empty");
 	
 	}
 	
-
-	
-	public CtxBrokerTest(IUserCtxBroker ctxBroker) {
-	
+	public CtxBrokerTest(ICtxBroker ctxBroker) {
 		this.ctxBroker = ctxBroker;
 		System.out.println(this.getClass().getName()+" full constructor");
 		
 	}
-	
 		
-	
-	public IUserCtxBroker getCtxBroker(){
+	public ICtxBroker getCtxBroker(){
 		System.out.println(this.getClass().getName()+" getCtxBroker");
 		return this.ctxBroker;
 	}
 
-	public void setCtxBroker(IUserCtxBroker ctxBroker){
+	public void setCtxBroker(ICtxBroker ctxBroker){
 		System.out.println(this.getClass().getName()+" setCtxBroker");
 		this.ctxBroker = ctxBroker;
 		
 	}
-	
-	
-	
 	
 	public void initialiseCtxBrokerTest(){
 		if (this.ctxBroker==null){
@@ -104,26 +96,40 @@ public class CtxBrokerTest 	{
 	private void startTesting(){
 		System.out.println(this.getClass().getName()+" startTesting");
 		System.out.println("broker service: "+this.ctxBroker);
-		BrokerCallbackTest callback = new BrokerCallbackTest(this);
+		
 		
 		//create ctxEntity
-		this.ctxBroker.createEntity("person", callback);
-		CtxEntity ctxEntity = (CtxEntity) callback.getCtxModelObject();
-	
-		//create ctxAttribute
-		this.ctxBroker.createAttribute(ctxEntity.getId(), CtxAttributeValueType.INDIVIDUAL, "name", callback);
-		CtxAttribute ctxAttribute = (CtxAttribute) callback.getCtxModelObject();
-		ctxAttribute.setHistoryRecorded(true);
-		ctxAttribute.setStringValue("Aris");
+		Future<CtxEntity> futureEnt;
+		try {
+			futureEnt = this.ctxBroker.createEntity("person");
+			CtxEntity ctxEntity = (CtxEntity) futureEnt.get();
+			
+			//create ctxAttribute
+			Future<CtxAttribute> futureAttr = this.ctxBroker.createAttribute(ctxEntity.getId(), "name");
+			CtxAttribute ctxAttribute = (CtxAttribute) futureAttr.get();
+			
+			ctxAttribute.setHistoryRecorded(true);
+			ctxAttribute.setStringValue("Aris");
+			
+			// update ctxAttribute
+			Future<CtxModelObject> futureAttrUpdated =  this.ctxBroker.update(ctxAttribute);
+			
+			//retrieve ctxAttribute
+			
+			ctxAttribute = (CtxAttribute) futureAttrUpdated.get();
+			
+			System.out.println("Retrieved ctxAttribute id " +ctxAttribute.getId()+ " and value: "+ctxAttribute.getStringValue() );
 		
-		// update ctxAttribute
-		this.ctxBroker.update(ctxAttribute, callback);
-		
-		//retrieve ctxAttribute
-		this.ctxBroker.retrieve(ctxAttribute.getId(), callback);
-		ctxAttribute = (CtxAttribute) callback.getCtxModelObject();
-		
-		System.out.println("Retrieved ctxAttribute id " +ctxAttribute.getId()+ " and value: "+ctxAttribute.getStringValue() );
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	
 	}
 		
