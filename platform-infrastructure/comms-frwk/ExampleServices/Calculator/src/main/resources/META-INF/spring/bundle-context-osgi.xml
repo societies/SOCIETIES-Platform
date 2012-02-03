@@ -11,5 +11,5 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
 
-	<osgi:service ref="CalcService" interface="org.societies.comm.examples.calculator.ICalc" />
+	<osgi:service ref="CalcService" interface="org.societies.example.calculator.ICalc" />
 </beans>

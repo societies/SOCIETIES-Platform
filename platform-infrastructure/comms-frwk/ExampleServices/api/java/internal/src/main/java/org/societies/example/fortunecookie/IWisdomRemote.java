@@ -22,7 +22,9 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.comm.examples.commsmanager;
+package org.societies.example.fortunecookie;
+
+import org.societies.example.IExamplesCallback;
 
 /**
  * Describe your class here...
@@ -30,7 +32,9 @@ package org.societies.comm.examples.commsmanager;
  * @author aleckey
  *
  */
-public interface IExamplesCallback {
-	
-	public void receiveExamplesResult(Object returnValue);
+public interface IWisdomRemote {
+	/** Returns some wisdom in a Cookie object via the callback
+	 * @param callback Convert to Cookie object
+	 */
+	public void getCookie(IExamplesCallback callback);
 }

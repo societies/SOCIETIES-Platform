@@ -29,7 +29,9 @@
  * @author aleckey
  *
  */
-package org.societies.comm.examples.fortunecookie.api;
+package org.societies.example.fortunecookie;
+
+import java.util.concurrent.Future;
 
 import org.societies.example.fortunecookieservice.schema.Cookie;
 
@@ -38,5 +40,5 @@ public interface IWisdom {
 	/**
 	 * Returns a cookie object containing your fortune
 	 */
-	public Cookie getCookie();
+	public Future<Cookie> getCookie();
 }

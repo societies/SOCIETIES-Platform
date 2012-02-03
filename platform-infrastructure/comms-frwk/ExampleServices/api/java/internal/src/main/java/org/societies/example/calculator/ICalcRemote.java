@@ -22,16 +22,21 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.comm.examples.commsmanager;
+package org.societies.example.calculator;
 
-import org.societies.example.fortunecookieservice.schema.Cookie;
+import org.societies.example.IExamplesCallback;
 
 /**
- * Describe your class here...
+ * Calculator Client interface. Each method requires a callback to receive the result
+ * to showcase asynchronous calls.
  *
  * @author aleckey
  *
  */
-public interface IWisdomRemote {
-	public Cookie getCookie();
+public interface ICalcRemote {
+    /**Adds 2 numbers together and returns total */
+    public void Add(int a, int b, IExamplesCallback callback);
+    
+    /**Subtracts 2 numbers and returns total */
+    public void Subtract(int a, int b, IExamplesCallback callback);
 }
