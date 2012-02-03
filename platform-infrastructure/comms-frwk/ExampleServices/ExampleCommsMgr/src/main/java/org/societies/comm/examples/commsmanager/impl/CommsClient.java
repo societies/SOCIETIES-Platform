@@ -34,8 +34,6 @@ import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.comm.examples.commsmanager.ICalcRemote;
-import org.societies.comm.examples.commsmanager.IExamplesCallback;
 import org.societies.comm.xmpp.datatypes.IdentityImpl;
 import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.IdentityType;
@@ -46,6 +44,8 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.example.calculator.ICalcRemote;
+import org.societies.example.IExamplesCallback;
 import org.societies.example.calculatorservice.schema.CalcBean;
 import org.societies.example.calculatorservice.schema.MethodType;
 import org.springframework.scheduling.annotation.Async;
@@ -95,7 +95,7 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 	 */
 	@Override
 	@Async
-	public void AddAsync(int valA, int valB, IExamplesCallback calcCallback) {
+	public void Add(int valA, int valB, IExamplesCallback calcCallback) {
 		//Identity id = new IdentityImpl(IdentityType.CSS, "XCManager", "red.local");
 		Identity toIdentity = new Identity(IdentityType.CSS, "XCManager", "red.local") {
 			@Override
@@ -112,7 +112,7 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 		CalcBean calc = new CalcBean();
 		calc.setA(valA); 
 		calc.setB(valB);
-		calc.setMethod(MethodType.ADD_ASYNC);
+		calc.setMethod(MethodType.ADD);
 		try {
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
 			commManager.sendIQGet(stanza, calc, callback);
@@ -121,59 +121,46 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 		};
 	}
 	
+
 	@Override
-	public int Add(int valA, int valB) {
-		Identity id = new Identity(IdentityType.CSS, "XCManager", "red.local") {
+	public void Subtract(int valA, int valB, IExamplesCallback calcCallback) {
+		Identity toIdentity = new Identity(IdentityType.CSS, "XCManager", "red.local") {
 			@Override
 			public String getJid() {
 				return getIdentifier() + "." + getDomainIdentifier();
 			}
 		};
-		
-		//Identity id = new IdentityImpl(IdentityType.CSS, "XCManager", "red.local"); 
-		Stanza stanza = new Stanza(id);
+		Stanza stanza = new Stanza(toIdentity);
 
-		//SETUP RETURN STUFF
-		Future<Integer> returnObj = null;
-		//CommsClientCallback callback = new CommsClientCallback(returnObj);
-				
+		//SETUP CALC CLIENT RETURN STUFF
+		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), calcCallback);
+
+		//CREATE MESSAGE BEAN
 		CalcBean calc = new CalcBean();
 		calc.setA(valA); 
 		calc.setB(valB);
-		calc.setMethod(MethodType.ADD);
-		/*
+		calc.setMethod(MethodType.SUBTRACT);
 		try {
+			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
 			commManager.sendIQGet(stanza, calc, callback);
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
 		};
-		
-		return callback.getReturnInt();
-		*/
-		return 0;
-	}
-
-	@Override
-	public int Subtract(int valA, int valB) {
-		return 0;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#getJavaPackages()
-	 */
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#getJavaPackages() */
 	@Override
 	public List<String> getJavaPackages() {
 		return PACKAGES;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#getXMLNamespaces()
-	 */
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#getXMLNamespaces() */
 	@Override
 	public List<String> getXMLNamespaces() {
 		return NAMESPACES;
 	}
-
 
 	@Override
 	public void receiveError(Stanza arg0, XMPPError arg1) { }

@@ -35,21 +35,11 @@ import java.util.concurrent.Future;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 
-import org.societies.comm.examples.calculator.ICalc;
+import org.societies.example.calculator.ICalc;
 
 public class CalcImpl implements ICalc {
 
 	public CalcImpl() {
-	}
-
-	@Override
-	public int Add(int a, int b) {
-		return (a + b);
-	}
-
-	@Override
-	public int Subtract(int a, int b) {
-		return (a-b);
 	}
 
 	/* (non-Javadoc)
@@ -57,7 +47,7 @@ public class CalcImpl implements ICalc {
 	 */
 	@Override
 	@Async
-	public Future<Integer> AddAsync(int a, int b) {
+	public Future<Integer> Add(int a, int b) {
 		// SIMULATE DELAY TO SHOW ASYNC STUFF
 		try {
 			Thread.sleep(10000); 
@@ -65,6 +55,18 @@ public class CalcImpl implements ICalc {
 			e.printStackTrace();
 		}
 		Integer retVal = a + b;
+		return new AsyncResult<Integer>(retVal);
+	}
+	
+	@Override
+	public Future<Integer> Subtract(int a, int b) {
+		// SIMULATE DELAY TO SHOW ASYNC STUFF
+		try {
+			Thread.sleep(10000); 
+		} catch (InterruptedException e) { 
+			e.printStackTrace();
+		}
+		Integer retVal = a - b;
 		return new AsyncResult<Integer>(retVal);
 	}
 }

@@ -1,14 +1,3 @@
-package org.societies.comm.examples.clientcommand;
-
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.comm.examples.calculator.ICalc;
-import org.societies.comm.examples.commsmanager.ICalcRemote;
-import org.societies.comm.examples.commsmanager.IExamplesCallback;
-
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
@@ -33,6 +22,17 @@ import org.societies.comm.examples.commsmanager.IExamplesCallback;
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+package org.societies.comm.examples.clientcommand;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.example.calculator.ICalc;
+import org.societies.example.calculator.ICalcRemote;
+import org.societies.example.IExamplesCallback;
 
 /**
  * Describe your class here...
@@ -67,7 +67,7 @@ public class ClientTester implements IExamplesCallback {
 	public void StartTest() {
 		System.out.println("Starting Client Test");
 		
-		getRemoteCalculator().AddAsync(2, 3, this);
+		getRemoteCalculator().Add(2, 3, this);
 		
 		System.out.println("Waiting...");
 	}

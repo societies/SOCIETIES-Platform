@@ -29,20 +29,15 @@
  * @author aleckey
  *
  */
-package org.societies.comm.examples.calculator;
+package org.societies.example.calculator;
 
 import java.util.concurrent.Future;
 
 public interface ICalc {
 
-	/**Adds 2 numbers together and returns total
-	 */
-    public int Add(int a, int b);
+	/**Adds 2 numbers together and returns total */
+    public Future<Integer> Add(int a, int b);
     
-    /**Subtracts 2 numbers and returns total
-     */
-    public int Subtract(int a, int b);
-
-    /**Adds 2 numbers together and returns total */
-    public Future<Integer> AddAsync(int a, int b);
+    /**Subtracts 2 numbers and returns total */
+    public Future<Integer> Subtract(int a, int b);
 }

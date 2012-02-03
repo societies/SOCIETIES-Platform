@@ -13,39 +13,12 @@
 	<version>${release.version}</version>
 	
 	<dependencies>
- 		<!--
-		<dependency>
-  		     <groupId>org.springframework</groupId>
-  		     <artifactId>spring-core</artifactId>     
-  		     <version>3.0.6.RELEASE</version>
-  		     <scope>provided</scope>
- 		</dependency>   
- 		<dependency>
- 		     <groupId>org.springframework</groupId>
- 		     <artifactId>spring-beans</artifactId>     
- 		     <version>3.0.6.RELEASE</version>
- 		     <scope>provided</scope>
- 		</dependency>   
- 		<dependency>
- 		     <groupId>org.springframework</groupId>     
- 		     <artifactId>spring-context</artifactId>     
- 		     <version>3.0.6.RELEASE</version>
- 		     <scope>provided</scope>
- 		</dependency>
- 		<dependency>
- 			<groupId>org.springframework</groupId>
- 			<artifactId>spring-context-support</artifactId>
- 			<version>3.0.6.RELEASE</version>
- 			<scope>provided</scope>
- 		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.spring-library</artifactId>
-			<type>libd</type>
-			<scope>provided</scope>
-			<version>2.5.6.SEC01</version>
-		</dependency>
-		--> 
+<dependency>
+		<groupId>org.societies.example</groupId>
+			<artifactId>internalAPI</artifactId>
+			<version>0.1</version>
+			<scope>provided</scope>			
+		</dependency> 
 		<dependency>
 	 		<groupId>org.societies.comm.examples</groupId>
 	 		<artifactId>ExampleCommsManager</artifactId>

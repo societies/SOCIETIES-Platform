@@ -32,14 +32,19 @@
 package org.societies.comm.examples.fortunecookie.impl;
 
 import java.util.Random;
+import java.util.concurrent.Future;
+
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.societies.example.fortunecookieservice.schema.Cookie;
-import org.societies.comm.examples.fortunecookie.api.IWisdom;
+import org.societies.example.fortunecookie.IWisdom;
 
 public class Wisdom implements IWisdom{
 
 	public Wisdom() { }
 	
-	public Cookie getCookie(){
+	@Async
+	public Future<Cookie> getCookie(){
 		Random rand = new Random();
 		int id = rand.nextInt(cookies.length);
 		String fortune = cookies[id];
@@ -47,7 +52,7 @@ public class Wisdom implements IWisdom{
 		Cookie returnCookie = new Cookie();
 		returnCookie.setId(id);
 		returnCookie.setValue(fortune);
-		return returnCookie;
+		return new AsyncResult<Cookie>(returnCookie);
 	}
 	
 	private String[] cookies = new String[] {

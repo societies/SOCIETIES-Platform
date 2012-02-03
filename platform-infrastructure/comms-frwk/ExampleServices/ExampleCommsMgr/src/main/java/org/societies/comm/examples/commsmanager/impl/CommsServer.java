@@ -39,14 +39,14 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.comm.examples.calculator.ICalc;
-import org.societies.comm.examples.fortunecookie.api.IWisdom;
+import org.societies.example.fortunecookie.IWisdom;
 import org.societies.example.fortunecookieservice.schema.Cookie;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
+import org.societies.example.calculator.ICalc;
 import org.societies.example.calculatorservice.schema.CalcBean;
 import org.societies.example.calculatorservice.schema.CalcBeanResult;
 import org.societies.example.complexservice.IComplexService;
@@ -159,40 +159,32 @@ public class CommsServer implements IFeatureServer {
 			
 			int result=0; int a = 0; int b = 0;
 			String text = ""; 
-			switch (calc.getMethod()) {
+			Future<Integer> asyncResult = null;
 			
-			//Add() METHOD
+			switch (calc.getMethod()) {
+			//AddAsync() METHOD
 			case ADD:
 				a = calc.getA();
 				b = calc.getB();
-				result = calcService.Add(a, b);
-				text = a + " + " + b + " = " + result;
+				asyncResult = calcService.Add(a, b);
 				break;
-
+				
 			//Subtract() method
 			case SUBTRACT:
 				a = calc.getA();
 				b = calc.getB();
-				result = calcService.Subtract(a, b);
-				text = a + " - " + b + " = " + result;
-				break;
-				
-			//AddAsync() METHOD
-			case ADD_ASYNC:
-				a = calc.getA();
-				b = calc.getB();
-				Future<Integer> asyncResult = calcService.AddAsync(a, b);
-				
-				try {
-					result = asyncResult.get();		//WAIT HERE TILL RESULT IS RETURNED. PROCESSOR IS RELEASED!
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} catch (ExecutionException e) {
-					e.printStackTrace();
-				}				
-				text = a + " + " + b + " = " + result;
+				asyncResult = calcService.Subtract(a, b);
 				break;
 			}
+			try {
+				result = asyncResult.get();		//WAIT HERE TILL RESULT IS RETURNED. PROCESSOR IS RELEASED!
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}				
+			text = a + "  " + calc.getMethod().toString() + " " + b + " = " + result;
+			
 			//GENERATE BEAN CONTAINING RETURN OBJECT 
 			CalcBeanResult calcRes = new CalcBeanResult();
 			calcRes.setResult(result);
@@ -206,11 +198,19 @@ public class CommsServer implements IFeatureServer {
 			
 			if (fcBean.getMethod().equals(MethodName.GET_COOKIE)) {
 				//NO PARAMETERS FOR THIS METHOD
-				Cookie fortune = fcGenerator.getCookie();
+				Future<Cookie> fortune = fcGenerator.getCookie();
+				Cookie cookie = null;
+				try {
+					cookie = fortune.get();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				}
 				
 				//GENERATE BEAN CONTAINING RETURN OBJECT 
 				FortuneCookieBeanResult fcRes = new FortuneCookieBeanResult();
-				fcRes.setCookie(fortune);
+				fcRes.setCookie(cookie);
 				return fcRes;
 			}
 		}
