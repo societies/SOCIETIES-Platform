@@ -27,7 +27,8 @@ package org.societies.api.context.model;
 import java.util.Date;
 
 /**
- * This class is used in order to represent context history attributes maintained in the context history database.
+ * This class is used in order to represent context history attributes
+ * maintained in the context history database.
  * 
  * @author <a href="mailto:nikosk@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
  * @since 0.0.1
@@ -36,7 +37,6 @@ public class CtxHistoryAttribute extends CtxModelObject {
 
 	private static final long serialVersionUID = -1908778456166623132L;
 
-	@SuppressWarnings("unused")
 	private Long historyRecordId;
 	
 	private String stringValue;
@@ -126,4 +126,42 @@ public class CtxHistoryAttribute extends CtxModelObject {
 		return this.lastModified;
 	}
 
+	/**
+	 * @see java.lang.Object#hashCode()
+	 * @since 0.0.2
+	 */
+	@Override
+	public int hashCode() {
+		
+		final int prime = 31;
+		int result = super.hashCode();
+		
+		result = prime * result
+				+ ((this.historyRecordId == null) ? 0 : this.historyRecordId.hashCode());
+		
+		return result;
+	}
+
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 * @since 0.0.2
+	 */
+	@Override
+	public boolean equals(Object that) {
+		
+		if (this == that)
+			return true;
+		if (!super.equals(that))
+			return false;
+		if (this.getClass() != that.getClass())
+			return false;
+		
+		CtxHistoryAttribute other = (CtxHistoryAttribute) that;
+		if (this.historyRecordId == null) {
+			if (other.historyRecordId != null)
+				return false;
+		} else if (!this.historyRecordId.equals(other.historyRecordId))
+			return false;
+		return true;
+	}
 }
