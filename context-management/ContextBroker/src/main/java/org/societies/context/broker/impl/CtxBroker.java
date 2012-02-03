@@ -35,7 +35,6 @@ import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -50,14 +49,14 @@ import org.societies.context.api.user.db.IUserCtxDBMgr;
 /**
  * 3p Context Broker Implementation
  */
-public class CtxBrokerFuture implements ICtxBroker {
+public class CtxBroker implements ICtxBroker {
 
 	private IUserCtxDBMgr userDB;
 	
-	public CtxBrokerFuture() throws CtxException { 
+	public CtxBroker() throws CtxException { 
 	}
 	
-	public CtxBrokerFuture(IUserCtxDBMgr userDB) throws CtxException {
+	public CtxBroker(IUserCtxDBMgr userDB) throws CtxException {
 		this.userDB = userDB;
 	}
 
