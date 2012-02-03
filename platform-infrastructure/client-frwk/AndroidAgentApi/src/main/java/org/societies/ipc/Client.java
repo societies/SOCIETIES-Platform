@@ -26,7 +26,7 @@ class Client {
             switch (msg.what) {
             	case MessageMethodInvocation.WHAT:
             		MessageMethodInvocation msgMethod = new MessageMethodInvocation(msg);
-            		Object callback = callbacks.remove(msgMethod.callerId());
+            		Object callback = callbacks.get(msgMethod.callerId());
 					try {
 						Method method = callback.getClass().getMethod(msgMethod.name(), msgMethod.parameterTypes());
 	            		method.invoke(callback, msgMethod.params());

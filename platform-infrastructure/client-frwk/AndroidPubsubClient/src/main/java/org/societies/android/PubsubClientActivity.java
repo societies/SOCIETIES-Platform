@@ -34,8 +34,12 @@ public class PubsubClientActivity extends Activity {
 	private static final Logger log = LoggerFactory.getLogger(PubsubClientActivity.class);
 	
     private final List<String> elementNames = Arrays.asList("pubsub");
-    private final List<String> namespaces = Arrays.asList("http://jabber.org/protocol/pubsub");
-    private final List<String> packages = Arrays.asList("jabber.x.data",
+    private final List<String> namespaces = Arrays.asList(
+					"http://jabber.org/protocol/pubsub",
+			        "http://jabber.org/protocol/pubsub#errors",
+			        "http://jabber.org/protocol/pubsub#event",
+			        "http://jabber.org/protocol/pubsub#owner");
+    private final List<String> packages = Arrays.asList(
 					"org.jabber.protocol.pubsub",
 					"org.jabber.protocol.pubsub.errors",
 					"org.jabber.protocol.pubsub.owner",
@@ -54,13 +58,14 @@ public class PubsubClientActivity extends Activity {
 		log.debug("onCreate");
         setContentView(R.layout.main);
                   
-		Stanza stanza = new Stanza((new IdentityManager()).fromJid("user@host"));	// TODO 	
+        ICommCallback callback = createCallback();
+		Stanza stanza = new Stanza((new IdentityManager()).fromJid("user@host"));		
 		Stanza stanza2 = new Stanza((new IdentityManager()).fromJid("pubsub.host"));
         try {
 			Object payload = createPayload();			
-			ccm.register(elementNames, namespaces, packages);
+			ccm.register(elementNames, callback);
 			ccm.sendMessage(stanza, payload);
-			ccm.sendIQ(stanza2, IQ.Type.get, payload, createCallback());
+			ccm.sendIQ(stanza2, IQ.Type.get, payload, callback);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -84,20 +89,16 @@ public class PubsubClientActivity extends Activity {
     	return new ICommCallback() {
 
 			public List<String> getXMLNamespaces() {
-				log.debug("getXMLNamespaces");
-				return null;
+				return namespaces;
 			}
 
 			public List<String> getJavaPackages() {
-				log.debug("getJavaPackages");
-				return null;
+				return packages;
 			}
 
 			public void receiveResult(Stanza stanza, Object payload) {
 				log.debug("receiveResult");
-				log.debug("id="+stanza.getId());
-				log.debug("from="+stanza.getFrom());
-				log.debug("to="+stanza.getTo());
+				debugStanza(stanza);
 				if(payload.getClass().equals(Pubsub.class)) {
 					Pubsub pubsub = (Pubsub)payload;
 					if(pubsub.getSubscriptions() != null) {
@@ -114,7 +115,7 @@ public class PubsubClientActivity extends Activity {
 						log.debug("getSubscriptions == null");
 				}
 				else
-					log.debug("pubsub == null");
+					log.debug("not pubsub");
 			}
 
 			public void receiveError(Stanza stanza, XMPPError error) {
@@ -132,6 +133,30 @@ public class PubsubClientActivity extends Activity {
 
 			public void receiveMessage(Stanza stanza, Object payload) {
 				log.debug("receiveMessage");
+				debugStanza(stanza);
+				if(payload.getClass().equals(Pubsub.class)) {
+					Pubsub pubsub = (Pubsub)payload;
+					if(pubsub.getSubscriptions() != null) {
+						List<Subscription> subscriptions = pubsub.getSubscriptions().getSubscription();
+						log.debug("subcriptions=" + Arrays.toString(subscriptions.toArray()));
+						for(Subscription sub:subscriptions) {
+							log.debug("jid=" + sub.getJid());
+							log.debug("node=" + sub.getNode());
+							log.debug("subid=" + sub.getSubid());
+							log.debug("subscription=" + sub.getSubscription());							
+						}
+					}
+					else
+						log.debug("getSubscriptions == null");
+				}
+				else
+					log.debug("not pubsub");
+			}
+			
+			private void debugStanza(Stanza stanza) {
+				log.debug("id="+stanza.getId());
+				log.debug("from="+stanza.getFrom());
+				log.debug("to="+stanza.getTo());
 			}
 		};
     }
