@@ -27,7 +27,7 @@ package org.societies.api.context.model;
 import java.util.Date;
 
 /**
- * This class is used in order tp represent context history attributes maintained in the context history database.
+ * This class is used in order to represent context history attributes maintained in the context history database.
  * 
  * @author <a href="mailto:nikosk@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
  * @since 0.0.1
@@ -36,25 +36,25 @@ public class CtxHistoryAttribute extends CtxModelObject {
 
 	private static final long serialVersionUID = -1908778456166623132L;
 
-
+	@SuppressWarnings("unused")
+	private Long historyRecordId;
+	
 	private String stringValue;
 	private Integer integerValue;
 	private Double doubleValue;
 	private byte[] binaryValue;
 
 	private Date lastModified;
-	
-	
-	/*
-	public CtxHistoryAttribute(CtxAttributeIdentifier id) {
-		super(id);
-	}
-	 */
 
 	public CtxHistoryAttribute(CtxAttribute ctxAttribute) {
 		super(ctxAttribute.getId());
 		this.setValues(ctxAttribute);
 		this.lastModified = ctxAttribute.getQuality().getLastUpdated();
+	}
+	
+	public CtxHistoryAttribute(CtxAttribute ctxAttribute, Long historyRecordId) {
+		this(ctxAttribute);
+		this.historyRecordId = historyRecordId;
 	}
 
 	/**
