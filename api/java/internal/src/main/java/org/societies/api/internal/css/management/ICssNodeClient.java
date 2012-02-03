@@ -1,8 +1,8 @@
-package org.societies.css.api.nodeclient;
+package org.societies.api.internal.css.management;
 
 import java.util.List;
 
-public interface ICSSNodeClient {
+public interface ICssNodeClient {
 
 	/**
          *@return boolean true if CSS successfully logged in
