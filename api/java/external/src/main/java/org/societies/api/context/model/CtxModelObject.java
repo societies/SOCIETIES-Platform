@@ -117,9 +117,9 @@ public abstract class CtxModelObject implements Serializable {
 	public String toString() {
 	}*/
 	
-	/*
-	 * (non-Javadoc)
+	/**
 	 * @see java.lang.Object#hashCode()
+	 * @since 0.0.2
 	 */
 	@Override
     public int hashCode() {
@@ -128,14 +128,14 @@ public abstract class CtxModelObject implements Serializable {
         int result = 1;
         
         result = prime * result
-                + ((this.getId() == null) ? 0 : this.getId().hashCode());
+                + ((this.id == null) ? 0 : this.id.hashCode());
         
         return result;
     }
 
-    /* 
-     * (non-Javadoc)
+    /**
      * @see java.lang.Object#equals(java.lang.Object)
+     * @since 0.0.2
      */
     @Override
     public boolean equals(Object that) {
@@ -148,10 +148,10 @@ public abstract class CtxModelObject implements Serializable {
             return false;
         
         CtxModelObject other = (CtxModelObject) that;
-        if (this.getId() == null) {
-            if (other.getId() != null)
+        if (this.id == null) {
+            if (other.id != null)
                 return false;
-        } else if (!this.getId().equals(other.getId()))
+        } else if (!this.id.equals(other.id))
             return false;
         
         return true;

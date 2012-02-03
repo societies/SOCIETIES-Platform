@@ -99,8 +99,9 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 		return CtxModelType.ATTRIBUTE;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see java.lang.Object#hashCode()
+	 * @since 0.0.2
 	 */
 	@Override
 	public int hashCode() {
@@ -113,8 +114,9 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 		return result;
 	}
 
-	/* (non-Javadoc)
+	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
+	 * @since 0.0.2
 	 */
 	@Override
 	public boolean equals(Object that) {
