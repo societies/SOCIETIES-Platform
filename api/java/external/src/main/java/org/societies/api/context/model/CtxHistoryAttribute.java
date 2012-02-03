@@ -24,10 +24,6 @@
  */
 package org.societies.api.context.model;
 
-
-
-import java.io.Serializable;
-import java.security.acl.LastOwnerException;
 import java.util.Date;
 
 /**
