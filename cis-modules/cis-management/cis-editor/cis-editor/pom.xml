@@ -24,10 +24,10 @@
 	<!-- add your dependencies here -->
 
   
-  <dependency>
-  	<groupId>org.societies.api.internal</groupId>
+  <dependency>  	
+	<groupId>org.societies.api.external</groupId>
+	<artifactId>societies-api</artifactId>
 	<version>${release.version}</version>
-	<artifactId>societies-api-internal</artifactId>
 </dependency>	
 
 

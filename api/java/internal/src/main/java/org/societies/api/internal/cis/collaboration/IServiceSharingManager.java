@@ -34,7 +34,7 @@
 package org.societies.api.internal.cis.collaboration;
 
 
-import org.societies.api.internal.cis.management.ServiceSharingRecord;
+import org.societies.api.cis.management.ServiceSharingRecord;
 
 
 public interface IServiceSharingManager {
