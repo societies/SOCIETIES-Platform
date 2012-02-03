@@ -1,8 +1,6 @@
 package org.societies.ipc;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,24 +17,16 @@ class Client {
 	private static final Logger log = LoggerFactory.getLogger(Client.class);
 	
 	private Messenger outMessenger, inMessenger;
-	private Object methodReturn;
-	private boolean hasThrowable = false;
-	private Throwable throwable;
 	private String id;
 	private Map<String, Object> callbacks = new HashMap<String, Object>();
 	
 	private class IncomingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-        	log.debug("Message received: " + msg.toString());
             switch (msg.what) {
             	case MessageMethodInvocation.WHAT:
             		MessageMethodInvocation msgMethod = new MessageMethodInvocation(msg);
-            		log.debug("*************************");
-            		log.debug("message received");
-            		log.debug("keys: "+Arrays.toString(callbacks.keySet().toArray()));
-            		log.debug("callerId: "+msgMethod.callerId());
-            		Object callback = callbacks.remove(msgMethod.callerId());
+            		Object callback = callbacks.get(msgMethod.callerId());
 					try {
 						Method method = callback.getClass().getMethod(msgMethod.name(), msgMethod.parameterTypes());
 	            		method.invoke(callback, msgMethod.params());
@@ -64,11 +54,7 @@ class Client {
 
 	}
 	
-	public void invoke(String name, Object[] params, Object callback) throws Throwable{
-		
-		log.debug("invoke with callback. callback.getClass: "+callback.getClass());
-		log.debug("callback.getClass().getInterfaces(): "+Arrays.toString(callback.getClass().getInterfaces()));
-		
+	public void invoke(String name, Object[] params, Object callback) throws Throwable{		
 		MessageMethodInvocation msg = new MessageMethodInvocation(id, name, params, Callback.class, inMessenger);					
 
 		callbacks.put(msg.id(), callback);

@@ -2,27 +2,15 @@ package org.societies.comm.xmpp.client.impl;
 
 import static android.content.Context.BIND_AUTO_CREATE;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.security.InvalidParameterException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.List;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-
-import org.dom4j.Document;
-import org.dom4j.io.SAXReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.comm.xmpp.datatypes.Stanza;
-import org.societies.comm.xmpp.exceptions.CommunicationException;
-import org.societies.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.interfaces.XMPPAgent;
 import org.societies.ipc.Stub;
 import org.xmpp.packet.IQ;
-import org.xmpp.packet.Message;
 import org.xmpp.packet.Message.Type;
 
 import android.content.ComponentName;
@@ -34,16 +22,50 @@ import android.os.Messenger;
 
 public class ClientCommunicationMgr {
 	
-	private static final Logger log = LoggerFactory.getLogger(ClientCommunicationMgr.class);
-	
 	private static final ComponentName serviceCN = new ComponentName("org.societies", "org.societies.AgentService"); // TODO
-	
-	private SAXReader reader = new SAXReader();
+
 	private Context androidContext;
-	private Map<String, ICommCallback> callbacks = new HashMap<String, ICommCallback>();
+	private PacketMarshaller marshaller = new PacketMarshaller();
+	private ServiceConnection registerConnection;
 	
 	public ClientCommunicationMgr(Context androidContext) {
 		this.androidContext = androidContext;
+	}
+	
+	public void register(final List<String> elementNames, final ICommCallback callback) {	
+		final List<String> namespaces = callback.getXMLNamespaces();
+		marshaller.register(callback.getXMLNamespaces(), callback.getJavaPackages());
+		registerConnection = new ServiceConnection() {
+			@Override
+			public void onServiceConnected(ComponentName cn, IBinder binder) {
+				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, new Messenger(binder));
+				agent.register(elementNames.toArray(new String[0]), namespaces.toArray(new String[0]), new CallbackAdapter(callback, androidContext, this, marshaller));	
+			}
+
+			@Override
+			public void onServiceDisconnected(ComponentName cn) {				
+			}			
+		};
+		
+		bindService(registerConnection);
+	}
+	
+	public void unregister(final List<String> elementNames, final List<String> namespaces, List<String> packages) {
+		ServiceConnection connection = new ServiceConnection() {
+			@Override
+			public void onServiceConnected(ComponentName cn, IBinder binder) {
+				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class},  new Messenger(binder));
+				agent.unregister(elementNames.toArray(new String[0]), namespaces.toArray(new String[0]));	
+				androidContext.unbindService(this);
+				androidContext.unbindService(registerConnection);
+			}
+
+			@Override
+			public void onServiceDisconnected(ComponentName cn) {				
+			}			
+		};
+		
+		bindService(connection);
 	}
 	
 	public void sendMessage(Stanza stanza, Type type, Object payload)
@@ -53,19 +75,8 @@ public class ClientCommunicationMgr {
 			throw new InvalidParameterException("Payload cannot be null");
 		}
 		try {
-			JAXBContext jc = JAXBContext.newInstance(payload.getClass().getPackage().getName()); // TODO Need to register all packages?		
-			Marshaller m = jc.createMarshaller();			
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			m.marshal(payload, os);					
-			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());		
-			Document document = reader.read(is);
-			Message message = new Message();
-//			if(type != null) TODO throws CloneNotSupportedException when uncommented
-//				message.setType(type);
-			message.setTo(stanza.getTo().getJid());
-			message.getElement().add(document.getRootElement());
-			String xml = message.toXML();
-			log.debug(xml); // TODO remove debug
+			
+			String xml = marshaller.marshallMessage(stanza, type, payload);
 			
 			sendMessage(xml);
 			
@@ -82,21 +93,9 @@ public class ClientCommunicationMgr {
 	public void sendIQ(Stanza stanza, IQ.Type type, Object payload,
 			ICommCallback callback) throws CommunicationException {
 		try {
-			JAXBContext jc = JAXBContext.newInstance(payload.getClass().getPackage().getName()); // TODO Need to register all packages?		
-			Marshaller m = jc.createMarshaller();	
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			m.marshal(payload, os);
-			ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());			
-			Document document = reader.read(is);
-			IQ iq = new IQ();
-			iq.setTo(stanza.getTo().getJid());
-			iq.setType(type);
-			iq.getElement().add(document.getRootElement());
-			String xml = iq.toXML();
-			
-//			callbacks.put(iq.getID(), callback); TODO
-			
-			sendIQ(iq.getID(), xml, callback);
+			String xml = marshaller.marshallIQ(stanza, type, payload);
+
+			sendIQ(xml, callback);
 			
 		} catch (Exception e) {
 			throw new CommunicationException("Error sending IQ message", e);
@@ -108,7 +107,7 @@ public class ClientCommunicationMgr {
 
 			@Override
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
-				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, "0", new Messenger(binder));
+				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, new Messenger(binder));
 				agent.sendMessage(xml);		
 				androidContext.unbindService(this);
 			}
@@ -122,13 +121,13 @@ public class ClientCommunicationMgr {
 		bindService(connection);
 	}
 	
-	private void sendIQ(final String id, final String xml, final ICommCallback callback) {
+	private void sendIQ(final String xml, final ICommCallback callback) {
 		ServiceConnection connection = new ServiceConnection() {
 
 			@Override
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
-				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, "0", new Messenger(binder));
-				agent.sendIQ(id, xml, new CallbackAdapter(callback, androidContext, this));				
+				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, new Messenger(binder));
+				agent.sendIQ(xml, new CallbackAdapter(callback, androidContext, this, marshaller));				
 			}
 
 			@Override

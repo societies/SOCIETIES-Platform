@@ -21,6 +21,8 @@ package org.societies.personalisation.CAUITaskManager.impl;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,6 +35,8 @@ import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
+import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
+import org.societies.personalisation.CAUI.api.model.IUserIntentTask;
 import org.societies.personalisation.CAUI.api.model.TaskModelData;
 import org.societies.personalisation.CAUI.api.model.UIModelObjectNumberGenerator;
 import org.societies.personalisation.CAUI.api.model.UserIntentAction;
@@ -47,21 +51,25 @@ import org.societies.personalisation.CAUI.api.model.UserIntentTask;
 public class CAUITaskManager  implements ICAUITaskManager{
 
 	private JTree tree;
-	DefaultMutableTreeNode top; 
+	DefaultMutableTreeNode model; 
 
-		
+
 	public CAUITaskManager(){
-		top = new DefaultMutableTreeNode("User Intent Task model");	
+		model = new DefaultMutableTreeNode("User Intent Task model");	
 	}
 
 
-	public DefaultMutableTreeNode getRoot(){
-		return top;
+	public DefaultMutableTreeNode retrieveModel(){
+		return model;
+	}
+
+	public void updateModel(DefaultMutableTreeNode top){
+		this.model = top;
 	}
 
 	//call this after the top variable is filled with uiModel objects
-	public JTree getTree(){
-		tree = new JTree(this.top);
+	public JTree getModelTree(){
+		tree = new JTree(this.model);
 		return tree;
 	}
 
@@ -78,59 +86,216 @@ public class CAUITaskManager  implements ICAUITaskManager{
 
 		return task;
 	}
-	
 
-	@Override
-	public UserIntentAction getAction(String arg0) {
-		// TODO Auto-generated method stub
+
+	/*
+	 * 
+	 */
+	public UserIntentTask retrieveTask (String taskID) {
+
+		UserIntentTask userTask = null;
+
+		DefaultMutableTreeNode node = null;
+		Enumeration e =this.retrieveModel().breadthFirstEnumeration();
+		while (e.hasMoreElements()) {
+			node = (DefaultMutableTreeNode) e.nextElement();
+			if (node.getUserObject() instanceof UserIntentAction && node.getUserObject() != null){
+				userTask =  (UserIntentTask)node.getUserObject();
+				System.out.println("node casted to userTask "+ userTask.getTaskID());
+				if (taskID.equals(userTask.getTaskID())) {
+					System.out.println("FOUND "+taskID);
+					return userTask;
+				}
+			}
+		}
 		return null;
 	}
 
-	@Override
-	public List<UserIntentAction> getActionsByType(String arg0, String arg1) {
-		// TODO Auto-generated method stub
+	/*
+	 * 
+	 */
+	public UserIntentAction retrieveAction(String actionID) {
+
+		UserIntentAction userAction = null;
+
+		DefaultMutableTreeNode node = null;
+		Enumeration e =this.retrieveModel().breadthFirstEnumeration();
+		while (e.hasMoreElements()) {
+			node = (DefaultMutableTreeNode) e.nextElement();
+			if (node.getUserObject() instanceof UserIntentAction && node.getUserObject() != null){
+				userAction =  (UserIntentAction)node.getUserObject();
+				System.out.println("node casted to userAction: "+ userAction.getActionID());
+				if (actionID.equals(userAction.getActionID())) {
+					System.out.println("FOUND "+actionID);
+					return userAction;
+				}
+			}
+		}
 		return null;
 	}
 
+	/*
+	 * rename to retrieve 
+	 */
+
 	@Override
-	public UserIntentAction getCurrentIntentAction(EntityIdentifier arg0,
+	public List<UserIntentAction> retrieveActionsByTypeValue(String par, String value) {
+
+		List<UserIntentAction> results = new ArrayList<UserIntentAction>();
+		UserIntentAction userAction = null;
+
+		DefaultMutableTreeNode node = null;
+		Enumeration e =this.retrieveModel().breadthFirstEnumeration();
+		while (e.hasMoreElements()) {
+			node = (DefaultMutableTreeNode) e.nextElement();
+			if (node.getUserObject() instanceof UserIntentAction && node.getUserObject() != null){
+				userAction =  (UserIntentAction)node.getUserObject();
+				System.out.println("node casted to userAction: "+ userAction.getActionID());
+				if (userAction.getparameterName().equals(par) && userAction.getvalue().equals(value)) {
+					System.out.println("FOUND "+userAction);
+					results.add(userAction);
+				}
+			}
+		}
+		return results;
+	}
+
+	/*
+	 * add this method to interface 
+	 * @param par
+	 * @return
+	 */
+
+	public List<UserIntentAction> retrieveActionsByType(String par) {
+
+		List<UserIntentAction> results = new ArrayList<UserIntentAction>();
+		UserIntentAction userAction = null;
+
+		DefaultMutableTreeNode node = null;
+		Enumeration e =this.retrieveModel().breadthFirstEnumeration();
+		while (e.hasMoreElements()) {
+			node = (DefaultMutableTreeNode) e.nextElement();
+			if (node.getUserObject() instanceof UserIntentAction && node.getUserObject() != null){
+				userAction =  (UserIntentAction)node.getUserObject();
+				System.out.println("node casted to userAction: "+ userAction.getActionID());
+				if (userAction.getparameterName().equals(par)) {
+					System.out.println("FOUND "+userAction);
+					results.add(userAction);
+				}
+			}
+		}
+		return results;
+	}
+
+
+
+
+
+	@Override
+	public void setNextActionLink(UserIntentAction arg0, UserIntentAction arg1,
+			Double arg2) {
+
+
+	}
+
+	@Override
+	public void setNextTaskLink(IUserIntentTask sourceTask, IUserIntentTask targetTask, Double weight) {
+
+
+
+		DefaultMutableTreeNode targetNode= new DefaultMutableTreeNode(targetTask);
+		DefaultMutableTreeNode sourceNode= new DefaultMutableTreeNode(sourceTask);
+
+		if(sourceTask == null) this.model.add(targetNode);
+
+		if(sourceTask != null) {
+
+			if (this.retrieveTask(sourceTask.getTaskID()) != null){
+				this.retrieveNodeTask(targetTask);
+			}
+
+			this.model.add(sourceNode);
+		}
+
+	}
+
+	/*
+	 * If userTask has previously be added to the model it should exist as a DefaultMutableTreeNode
+	 * This method returns a reference to this node.
+	 */
+	public DefaultMutableTreeNode retrieveNodeTask(IUserIntentTask userTask){
+
+
+		DefaultMutableTreeNode node = null;
+		IUserIntentTask tempTask = null;
+
+		Enumeration e =this.retrieveModel().breadthFirstEnumeration();
+		while (e.hasMoreElements()) {
+			node = (DefaultMutableTreeNode) e.nextElement();
+			if (node.getUserObject() instanceof IUserIntentTask && node.getUserObject() != null){
+				tempTask =  (IUserIntentTask)node.getUserObject();
+				//System.out.println("node casted to userAction: "+ userTask.getTaskID());
+				if ((userTask.getTaskID()).equals(tempTask.getTaskID())) {
+					System.out.println("node FOUND "+node);
+					return node;
+				}
+			}
+		}
+		return null;
+	}
+
+
+	public DefaultMutableTreeNode retrieveNodeAction(IUserIntentAction userAction){
+		DefaultMutableTreeNode treeNode = null;
+
+		DefaultMutableTreeNode node = null;
+		IUserIntentTask tempAction = null;
+
+		Enumeration e =this.retrieveModel().breadthFirstEnumeration();
+		while (e.hasMoreElements()) {
+			node = (DefaultMutableTreeNode) e.nextElement();
+			if (node.getUserObject() instanceof IUserIntentTask && node.getUserObject() != null){
+				tempAction =  (IUserIntentTask)node.getUserObject();
+				//System.out.println("node casted to userAction: "+ userTask.getTaskID());
+				if ((userAction.getTaskID()).equals(tempAction.getTaskID())) {
+					System.out.println("node FOUND "+node);
+					return node;
+				}
+			}
+		}
+		return null;
+	}
+
+
+
+	@Override
+	public UserIntentAction retrieveCurrentIntentAction(EntityIdentifier arg0,
 			EntityIdentifier arg1, IServiceResourceIdentifier arg2, String arg3) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public HashMap<UserIntentAction, Double> getNextAction(UserIntentAction arg0) {
+	public HashMap<UserIntentAction, Double> retrieveNextAction(UserIntentAction arg0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public HashMap<String, Double> getNextTask(UserIntentTask arg0) {
+	public HashMap<String, Double> retrieveNextTask(IUserIntentTask arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public List<IUserIntentTask> retrieveTasks(UserIntentAction arg0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public UserIntentAction getTask(String arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public TaskModelData getTaskModelData() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<UserIntentTask> getTasks(UserIntentAction arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Map<UserIntentAction, UserIntentTask> identifyActionTaskInModel(
+	public Map<UserIntentAction, IUserIntentTask> identifyActionTaskInModel(
 			String arg0, String arg1, HashMap<String, Serializable> arg2,
 			String[] arg3) {
 		// TODO Auto-generated method stub
@@ -139,35 +304,39 @@ public class CAUITaskManager  implements ICAUITaskManager{
 
 	@Override
 	public UserIntentAction identifyNextAction(
-			Map<UserIntentAction, UserIntentTask> arg0, String arg1,
+			Map<UserIntentAction, IUserIntentTask> arg0, String arg1,
 			Map<String, Serializable> arg2) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
-	public void resetTaskModelData() {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
-	public void setNextActionLink(UserIntentAction arg0, UserIntentAction arg1,
-			Double arg2) {
+	public IUserIntentTask createTask(String taskName) {
 		// TODO Auto-generated method stub
-
+		return null;
 	}
+
 
 	@Override
-	public void setNextTaskLink(UserIntentTask arg0, String arg1, Double arg2) {
-		// TODO Auto-generated method stub
+	public boolean actionBelongsToModel(IUserIntentAction userAction) {
 
+		if( this.retrieveNodeAction(userAction) != null && this.retrieveNodeAction(userAction) instanceof IUserIntentAction) {
+			return true; 
+			
+		}else return false;
+		
+		
 	}
+
 
 	@Override
-	public void setTaskModel(TaskModelData arg0) {
-		// TODO Auto-generated method stub
-
+	public boolean taskBelongsToModel(IUserIntentTask userTask) {
+		
+		
+		if( this.retrieveNodeTask(userTask) != null && this.retrieveNodeTask(userTask) instanceof IUserIntentTask) return true; 
+		
+		else return false;
+			
 	}
-	
 }

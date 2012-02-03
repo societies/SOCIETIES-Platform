@@ -16,6 +16,10 @@ public class Stub implements InvocationHandler {
 		return Proxy.newProxyInstance(Stub.class.getClassLoader(), 
 				interfaces, new Stub(id, messenger));
 	}
+	
+	public static Object newInstance(Class<?>[] interfaces, Messenger messenger) {
+		return Stub.newInstance(interfaces, "0", messenger);
+	}
 
 	private Stub(String id, Messenger messenger) {
 		client = new Client(id, messenger);

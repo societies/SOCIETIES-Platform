@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.societies.personalisation.CRIST.api.model.CRISTCommunityTaskModelData;
-import org.societies.personalisation.CRIST.api.model.ICRISTCommunityAction;
-import org.societies.personalisation.CRIST.api.model.ICRISTCommunitySituation;
-import org.societies.personalisation.CRIST.api.model.ICRISTCommunityTask;
+import org.societies.personalisation.CRIST.api.model.CRISTCommunityAction;
+import org.societies.personalisation.CRIST.api.model.CRISTCommunitySituation;
+import org.societies.personalisation.CRIST.api.model.CRISTCommunityTask;
 
 /**
  * @author Zhu WANG
@@ -20,7 +20,7 @@ public interface ICRISTCommunityIntentTaskManager {
 	 * 
 	 * @param actionID		- the ID of the given community action
 	 */
-	public ICRISTCommunityAction getCommunityAction(String actionID);
+	public CRISTCommunityAction getCommunityAction(String actionID);
 	
 	/**
 	 * This method will retrieve a list of community actions based on the given action type and value
@@ -28,21 +28,21 @@ public interface ICRISTCommunityIntentTaskManager {
 	 * @param actionType	- the type of user action
 	 * @param actionValue	- the value of user action
 	 */
-	public ArrayList<ICRISTCommunityAction> getCommunityActionsByType(String actionType, String actionValue);
+	public ArrayList<CRISTCommunityAction> getCommunityActionsByType(String actionType, String actionValue);
 	
 	/**
 	 * This method will retrieve the community situation based on the given situation ID
 	 * 
 	 * @param situationID		- the ID of the given community situation
 	 */
-	public ICRISTCommunitySituation getCommunitySituation(String situationID);
+	public CRISTCommunitySituation getCommunitySituation(String situationID);
 	
 	/**
 	 * This method returns the community task according to the given task ID
 	 * 
 	 * @param taskID		- the ID of the given community task
 	 */
-	public ICRISTCommunityTask getCommunityTask(String taskID);
+	public CRISTCommunityTask getCommunityTask(String taskID);
 	
 	/**
 	 * This method returns a map of next communityActions and the relevant probabilities given the
@@ -50,7 +50,7 @@ public interface ICRISTCommunityIntentTaskManager {
 	 *  
 	 * @param communityAction	- the given community action
 	 */
-	public HashMap<ICRISTCommunityAction, Double> getNextCommunityActions(ICRISTCommunityAction communityAction);
+	public HashMap<CRISTCommunityAction, Double> getNextCommunityActions(CRISTCommunityAction communityAction);
 	
 	/**
 	 * This method returns a map of next community tasks and the relevant probabilities given the
@@ -58,22 +58,22 @@ public interface ICRISTCommunityIntentTaskManager {
 	 * 
 	 * @param communityTask		- the given community task
 	 */
-	public HashMap<ICRISTCommunityTask, Double> getNextCommunityTasks(ICRISTCommunityTask communityTask);
+	public HashMap<CRISTCommunityTask, Double> getNextCommunityTasks(CRISTCommunityTask communityTask);
 	
 	/**
 	 * This method will identify all the community actions based on historical recordings 
 	 */
-	public ArrayList<ICRISTCommunityAction> identifyCommunityActions();
+	public ArrayList<CRISTCommunityAction> identifyCommunityActions();
 	
 	/**
 	 * This method will identify all the community situations based on historical recordings 
 	 */
-	public ArrayList<ICRISTCommunitySituation> identifyCommunitySituations();
+	public ArrayList<CRISTCommunitySituation> identifyCommunitySituations();
 	
 	/**
 	 * This method will identify all the community tasks 
 	 */
-	public ArrayList<ICRISTCommunityTask> identifyCommunityTasks();
+	public ArrayList<CRISTCommunityTask> identifyCommunityTasks();
 	
 	/**
 	 * This method resets the task model.

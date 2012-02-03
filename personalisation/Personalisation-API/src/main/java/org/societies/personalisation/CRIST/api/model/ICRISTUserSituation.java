@@ -13,7 +13,7 @@ public interface ICRISTUserSituation extends IOutcome{
 	 * 
 	 * @param userActions
 	 */
-	public void addActions(HashMap<ICRISTUserAction,Double> userActions);
+	public void addActions(HashMap<CRISTUserAction,Double> userActions);
 
 	/**
 	 * This method will link the given ICRISTUserTask list to the current situation
@@ -21,14 +21,14 @@ public interface ICRISTUserSituation extends IOutcome{
 	 * 
 	 * @param userTasks
 	 */
-	public void addTasks(HashMap<ICRISTUserTask,Double> userTasks);
+	public void addTasks(HashMap<CRISTUserTask,Double> userTasks);
 
 	/**
 	 * This method will return the related actions of the current situation
 	 * 
 	 * @return
 	 */
-	public HashMap<ICRISTUserAction,Double> getSituatioinActions();
+	public HashMap<CRISTUserAction,Double> getSituatioinActions();
 
 	/**
 	 * This method will return the related context information of the current
@@ -50,7 +50,7 @@ public interface ICRISTUserSituation extends IOutcome{
 	 * 
 	 * @return
 	 */
-	public HashMap<ICRISTUserTask,Double> getSituationTasks();
+	public HashMap<CRISTUserTask,Double> getSituationTasks();
 
 	/**
 	 * This method will assign the current situation context with the given situationContext  

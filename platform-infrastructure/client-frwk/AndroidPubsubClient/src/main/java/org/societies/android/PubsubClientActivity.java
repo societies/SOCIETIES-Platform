@@ -6,12 +6,18 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jabber.protocol.pubsub.Item;
 import org.jabber.protocol.pubsub.Publish;
 import org.jabber.protocol.pubsub.Pubsub;
+import org.jabber.protocol.pubsub.Subscription;
+import org.jabber.protocol.pubsub.Subscriptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-import org.societies.comm.xmpp.datatypes.Identity;
-import org.societies.comm.xmpp.datatypes.Stanza;
-import org.societies.comm.xmpp.interfaces.CommCallback;
+import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.datatypes.XMPPNode;
+import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.comm.xmpp.interfaces.IdentityManager;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 import org.xmpp.packet.IQ;
@@ -19,10 +25,26 @@ import org.xmpp.packet.IQ;
 import android.app.Activity;
 import android.os.Bundle;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class PubsubClientActivity extends Activity {
 
 	private static final Logger log = LoggerFactory.getLogger(PubsubClientActivity.class);
+	
+    private final List<String> elementNames = Arrays.asList("pubsub");
+    private final List<String> namespaces = Arrays.asList(
+					"http://jabber.org/protocol/pubsub",
+			        "http://jabber.org/protocol/pubsub#errors",
+			        "http://jabber.org/protocol/pubsub#event",
+			        "http://jabber.org/protocol/pubsub#owner");
+    private final List<String> packages = Arrays.asList(
+					"org.jabber.protocol.pubsub",
+					"org.jabber.protocol.pubsub.errors",
+					"org.jabber.protocol.pubsub.owner",
+					"org.jabber.protocol.pubsub.event");
+    private ClientCommunicationMgr ccm = new ClientCommunicationMgr(this);
 
     /**
      * Called when the activity is first created.
@@ -35,14 +57,15 @@ public class PubsubClientActivity extends Activity {
         super.onCreate(savedInstanceState);
 		log.debug("onCreate");
         setContentView(R.layout.main);
-             
-        Identity to = Identity.fromJid("user@host");
-		Stanza stanza = new Stanza(to);		
+                  
+        ICommCallback callback = createCallback();
+		Stanza stanza = new Stanza((new IdentityManager()).fromJid("user@host"));		
+		Stanza stanza2 = new Stanza((new IdentityManager()).fromJid("pubsub.host"));
         try {
-			Object payload = createPayload();
-			ClientCommunicationMgr ccm = new ClientCommunicationMgr(this);
+			Object payload = createPayload();			
+			ccm.register(elementNames, callback);
 			ccm.sendMessage(stanza, payload);
-			ccm.sendIQ(stanza, IQ.Type.set, payload, createCallback());
+			ccm.sendIQ(stanza2, IQ.Type.get, payload, callback);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -51,34 +74,89 @@ public class PubsubClientActivity extends Activity {
     @Override
     public void onDestroy() {
     	super.onDestroy();
-    	// TODO unbound service?
+    	ccm.unregister(elementNames, namespaces, packages);
     }
     
     private Object createPayload() throws DOMException, ParserConfigurationException {
-    	Element content = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument().createElement("test");   	
-		
-		Item item = new Item();
-		item.setAny(content);
-		Publish publish = new Publish();
-		publish.setNode("testNode");
-		publish.setItem(item);
+    	Subscriptions subscriptions = new Subscriptions();
 		Pubsub pubsub = new Pubsub();
-		pubsub.setPublish(publish);
+		pubsub.setSubscriptions(subscriptions);
 		
 		return pubsub;
     }
     
-    private CommCallback createCallback() {
-    	return new CommCallback() {
-			
-			@Override
-			public void receiveError(Stanza stanza, Object payload) {
+    private ICommCallback createCallback() {
+    	return new ICommCallback() {
+
+			public List<String> getXMLNamespaces() {
+				return namespaces;
+			}
+
+			public List<String> getJavaPackages() {
+				return packages;
+			}
+
+			public void receiveResult(Stanza stanza, Object payload) {
+				log.debug("receiveResult");
+				debugStanza(stanza);
+				if(payload.getClass().equals(Pubsub.class)) {
+					Pubsub pubsub = (Pubsub)payload;
+					if(pubsub.getSubscriptions() != null) {
+						List<Subscription> subscriptions = pubsub.getSubscriptions().getSubscription();
+						log.debug("subcriptions=" + Arrays.toString(subscriptions.toArray()));
+						for(Subscription sub:subscriptions) {
+							log.debug("jid=" + sub.getJid());
+							log.debug("node=" + sub.getNode());
+							log.debug("subid=" + sub.getSubid());
+							log.debug("subscription=" + sub.getSubscription());							
+						}
+					}
+					else
+						log.debug("getSubscriptions == null");
+				}
+				else
+					log.debug("not pubsub");
+			}
+
+			public void receiveError(Stanza stanza, XMPPError error) {
 				log.debug("receiveError");
 			}
 
-			@Override
-			public void receiveResult(Stanza stanza, Object payload) {
-				log.debug("receiveResult");
+			public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
+				log.debug("receiveInfo");
+			}
+
+			public void receiveItems(Stanza stanza, String node,
+					List<XMPPNode> items) {
+				log.debug("receiveItems");
+			}
+
+			public void receiveMessage(Stanza stanza, Object payload) {
+				log.debug("receiveMessage");
+				debugStanza(stanza);
+				if(payload.getClass().equals(Pubsub.class)) {
+					Pubsub pubsub = (Pubsub)payload;
+					if(pubsub.getSubscriptions() != null) {
+						List<Subscription> subscriptions = pubsub.getSubscriptions().getSubscription();
+						log.debug("subcriptions=" + Arrays.toString(subscriptions.toArray()));
+						for(Subscription sub:subscriptions) {
+							log.debug("jid=" + sub.getJid());
+							log.debug("node=" + sub.getNode());
+							log.debug("subid=" + sub.getSubid());
+							log.debug("subscription=" + sub.getSubscription());							
+						}
+					}
+					else
+						log.debug("getSubscriptions == null");
+				}
+				else
+					log.debug("not pubsub");
+			}
+			
+			private void debugStanza(Stanza stanza) {
+				log.debug("id="+stanza.getId());
+				log.debug("from="+stanza.getFrom());
+				log.debug("to="+stanza.getTo());
 			}
 		};
     }
