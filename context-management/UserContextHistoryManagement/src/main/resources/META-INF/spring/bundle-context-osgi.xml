@@ -11,9 +11,12 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
        
-       
-	<osgi:reference id="CtxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker"/>
-
+        
+        <osgi:service ref="UserCtxHistoryMgmt">
+        <osgi:interfaces>
+        <value>org.societies.context.api.user.history.IUserCtxHistoryMgr</value>
+        </osgi:interfaces>
+        </osgi:service>
 
 
 </beans>
