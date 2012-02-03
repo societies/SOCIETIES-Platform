@@ -38,7 +38,7 @@ public abstract class CRISTUserIntentTaskManager implements ICRISTUserIntentTask
 
 	private ICRISTUserIntentPrediction cristPredictor;
 	private CtxAttribute myCtx;
-	private EntityIdentifier myID;
+	private Identity myID;
 	private IPersonalisationInternalCallback myCallback;
 		
 	public CRISTUserIntentTaskManager(){

@@ -156,7 +156,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	/**
 	 * @return the identifier of the service to which this action is applied to
 	 */
-	public ServiceResourceIdentifier getServiceID() {
+	public IServiceResourceIdentifier getServiceID() {
 		return null;
 	}
 
@@ -188,7 +188,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 * @param id
 	 *            the identifier of the service this action is applied to
 	 */
-	public void setServiceID(ServiceResourceIdentifier id) {
+	public void setServiceID(IServiceResourceIdentifier id) {
 
 	}
 

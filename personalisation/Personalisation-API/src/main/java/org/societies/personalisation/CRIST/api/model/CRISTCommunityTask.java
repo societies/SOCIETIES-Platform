@@ -165,7 +165,7 @@ public class CRISTCommunityTask implements ICRISTCommunityTask {
 	}
 
 	@Override
-	public ServiceResourceIdentifier getServiceID() {
+	public IServiceResourceIdentifier getServiceID() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -183,7 +183,7 @@ public class CRISTCommunityTask implements ICRISTCommunityTask {
 	}
 
 	@Override
-	public void setServiceID(ServiceResourceIdentifier id) {
+	public void setServiceID(IServiceResourceIdentifier id) {
 		// TODO Auto-generated method stub
 
 	}

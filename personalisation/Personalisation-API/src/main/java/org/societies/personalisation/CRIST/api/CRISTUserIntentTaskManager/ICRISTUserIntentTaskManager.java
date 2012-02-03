@@ -48,7 +48,7 @@ public interface ICRISTUserIntentTaskManager {
 	 * @param ownerID		- the ID of the owner of the current user intent action
 	 * @param serviceID		- the ID of the related service 
 	 */
-	public CRISTUserAction getCurrentIntentAction(EntityIdentifier requestor, EntityIdentifier ownerID, ServiceResourceIdentifier serviceID);
+	public CRISTUserAction getCurrentIntentAction(Identity requestor, Identity ownerID, IServiceResourceIdentifier serviceID);
 
 	/**
 	 * This method will retrieve the user's current action

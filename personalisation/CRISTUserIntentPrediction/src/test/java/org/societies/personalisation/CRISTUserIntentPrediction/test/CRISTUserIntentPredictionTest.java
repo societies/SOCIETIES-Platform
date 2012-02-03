@@ -28,7 +28,7 @@ import org.societies.personalisation.common.api.management.IPersonalisationInter
 public class CRISTUserIntentPredictionTest {
 	
 	private ICRISTUserIntentPrediction cristPredictor;
-	EntityIdentifier myID;
+	Identity myID;
 	private CtxAttribute myCtx;
 	IPersonalisationInternalCallback myCallback;
 	
