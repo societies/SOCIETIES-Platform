@@ -161,7 +161,7 @@ public class CRISTUserSituation implements ICRISTUserSituation {
 	}
 
 	@Override
-	public ServiceResourceIdentifier getServiceID() {
+	public IServiceResourceIdentifier getServiceID() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -179,7 +179,7 @@ public class CRISTUserSituation implements ICRISTUserSituation {
 	}
 
 	@Override
-	public void setServiceID(ServiceResourceIdentifier id) {
+	public void setServiceID(IServiceResourceIdentifier id) {
 		// TODO Auto-generated method stub
 		
 	}

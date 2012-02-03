@@ -43,9 +43,9 @@ import org.societies.personalisation.common.api.management.IPersonalisationInter
 public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 
 	private IPersonalisationInternalCallback preManager;
-	private EntityIdentifier myId;
+	private Identity myId;
 	private CtxAttributeIdentifier myCtxId;
-	private ServiceResourceIdentifier serviceId;
+	private IServiceResourceIdentifier serviceId;
 	private ICRISTUserAction cristOutcome = null; 
 
 	public CRISTUserIntentPrediction() {
@@ -98,35 +98,35 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCRISTPrediction(org.societies.api.mock.EntityIdentifier, org.societies.api.context.model.CtxAttribute, org.societies.personalisation.common.api.management.IPersonalisationInternalCallback)
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCRISTPrediction(org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.Identity, org.societies.api.context.model.CtxAttribute, org.societies.personalisation.common.api.management.IPersonalisationInternalCallback)
 	 */
 	@Override
 	public ArrayList<CRISTUserAction> getCRISTPrediction(
-			EntityIdentifier entityID, CtxAttribute ctxAttribute,
-			IPersonalisationInternalCallback callback) {
+			Identity entityID,
+			CtxAttribute ctxAttribute, IPersonalisationInternalCallback callback) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCRISTPrediction(org.societies.api.mock.EntityIdentifier, org.societies.api.personalisation.model.IAction, org.societies.personalisation.common.api.management.IPersonalisationInternalCallback)
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCRISTPrediction(org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.Identity, org.societies.api.personalisation.model.IAction, org.societies.personalisation.common.api.management.IPersonalisationInternalCallback)
 	 */
 	@Override
 	public ArrayList<CRISTUserAction> getCRISTPrediction(
-			EntityIdentifier entityID, IAction action,
-			IPersonalisationInternalCallback callback) {
+			Identity entityID,
+			IAction action, IPersonalisationInternalCallback callback) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCurrentUserIntentAction(org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ServiceResourceIdentifier)
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCurrentUserIntentAction(org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.Identity, org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.Identity, org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.IServiceResourceIdentifier)
 	 */
 	@Override
 	public CRISTUserAction getCurrentUserIntentAction(
-			EntityIdentifier requestor,
-			EntityIdentifier ownerID,
-			ServiceResourceIdentifier serviceID) {
+			Identity requestor,
+			Identity ownerID,
+			IServiceResourceIdentifier serviceID) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -147,17 +147,5 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	public void updateReceived(CtxModelObject ctxModelObj) {
 		// TODO Auto-generated method stub
 		
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCurrentUserIntentAction(org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ServiceResourceIdentifier)
-	 */
-	@Override
-	public CRISTUserAction getCurrentUserIntentAction(
-			EntityIdentifier requestor,
-			EntityIdentifier ownerID,
-			ServiceResourceIdentifier serviceID) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

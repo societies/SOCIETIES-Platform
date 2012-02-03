@@ -99,8 +99,8 @@ public class CRISTUserTaskModelData {
 	 * 
 	 * @return currentUserAction
 	 */
-	public CRISTUserAction getCurrentIntentAction(EntityIdentifier requestor,
-			EntityIdentifier ownerID, ServiceResourceIdentifier serviceID) {
+	public CRISTUserAction getCurrentIntentAction(Identity requestor,
+			Identity ownerID, IServiceResourceIdentifier serviceID) {
 		CRISTUserAction currentUserAction = new CRISTUserAction();
 		// TODO
 
@@ -120,8 +120,8 @@ public class CRISTUserTaskModelData {
 	 * @return currentUserSituation
 	 */
 	public CRISTUserSituation getCurrentUserSituation(
-			EntityIdentifier requestor, EntityIdentifier ownerID,
-			ServiceResourceIdentifier serviceID) {
+			Identity requestor, Identity ownerID,
+			IServiceResourceIdentifier serviceID) {
 		CRISTUserSituation currentUserSituation = new CRISTUserSituation();
 		// TODO
 

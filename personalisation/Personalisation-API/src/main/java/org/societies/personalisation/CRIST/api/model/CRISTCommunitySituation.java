@@ -152,7 +152,7 @@ public class CRISTCommunitySituation implements ICRISTCommunitySituation {
 	}
 
 	@Override
-	public ServiceResourceIdentifier getServiceID() {
+	public IServiceResourceIdentifier getServiceID() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -170,7 +170,7 @@ public class CRISTCommunitySituation implements ICRISTCommunitySituation {
 	}
 
 	@Override
-	public void setServiceID(ServiceResourceIdentifier id) {
+	public void setServiceID(IServiceResourceIdentifier id) {
 		// TODO Auto-generated method stub
 
 	}
