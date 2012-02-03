@@ -98,4 +98,41 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 	public CtxModelType getModelType() {
 		return CtxModelType.ATTRIBUTE;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		
+		final int prime = 31;
+		int result = super.hashCode();
+		
+		result = prime * result + ((this.scope == null) ? 0 : this.scope.hashCode());
+		
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object that) {
+		
+		if (this == that)
+			return true;
+		if (!super.equals(that))
+			return false;
+		if (this.getClass() != that.getClass())
+			return false;
+		
+		CtxAttributeIdentifier other = (CtxAttributeIdentifier) that;
+		if (this.scope == null) {
+			if (other.scope != null)
+				return false;
+		} else if (!this.scope.equals(other.scope))
+			return false;
+		
+		return true;
+	}
 }

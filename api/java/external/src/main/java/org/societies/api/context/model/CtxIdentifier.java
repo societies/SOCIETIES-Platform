@@ -142,4 +142,71 @@ public abstract class CtxIdentifier implements Serializable {
 		result.append(this.getObjectNumber());
 		return result.toString();
 	}
+	
+	/*
+     * (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+    	
+        final int prime = 31;
+        int result = 1;
+        
+        result = prime
+                * result
+                + ((this.getOperatorId() == null) ? 0 : this.getOperatorId()
+                        .hashCode());
+        result = prime
+                * result
+                + ((this.getModelType() == null) ? 0 : this.getModelType()
+                        .hashCode());
+        result = prime * result
+                + ((this.getType() == null) ? 0 : this.getType().hashCode());
+        result = prime
+                * result
+                + ((this.getObjectNumber() == null) ? 0 : this
+                        .getObjectNumber().hashCode());
+        
+        return result;
+    }
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+    public boolean equals(Object that) {
+		
+        if (this == that)
+            return true;
+        if (that == null)
+            return false;
+        if (this.getClass() != that.getClass())
+            return false;
+        
+        CtxIdentifier other = (CtxIdentifier) that;
+        if (this.getOperatorId() == null) {
+            if (other.getOperatorId() != null)
+                return false;
+        } else if (!this.getOperatorId().equals(other.getOperatorId()))
+            return false;
+        if (this.getModelType() == null) {
+            if (other.getModelType() != null)
+                return false;
+        } else if (!this.getModelType().equals(other.getModelType()))
+            return false;
+        if (this.getType() == null) {
+            if (other.getType() != null)
+                return false;
+        } else if (!this.getType().equals(other.getType()))
+            return false;
+        if (this.getObjectNumber() == null) {
+            if (other.getObjectNumber() != null)
+                return false;
+        } else if (!this.getObjectNumber().equals(other.getObjectNumber()))
+            return false;
+        
+        return true;
+    }
 }
