@@ -2,8 +2,6 @@
 	$ANDROID_HOME/tools is included on the $PATH.
 	Alternatively, create property to determine path 
 	to Android emulator command
-	TODO: Coverage report is not being generated but can be if 
-	individual ant build scripts are run in their own directories
 -->
 <project name="android-coverage-build" default="build" basedir=".">
     <description>
@@ -12,16 +10,18 @@
   <!-- set global properties for this build -->
   <property name="android-root" location="../platform-infrastructure/client-frwk"/>
   <property name="test-avd" value="Test22Device"/>
+  <property name="societies-main-build-root" location="." ></property>
+  <property name="societies-coverage-report" value="true" ></property>
 
   <target name="build">
 	<antcall target="start-emulator-wait"></antcall>  
 	<antcall target="TestIPCServiceExample"></antcall>  
-	<antcall target="stop-emulator-wait"></antcall>  
   </target>
 
 	<!-- This task will build the test app, install and run tests and generate the coverage report -->
   <target name="IPCServiceExample"  description="build IPCServiceExample">
 	 <ant antfile="build.xml" dir="${android-root}/IPCServiceExample" useNativeBasedir="true">
+		<target name="all"/>
 		<target name="clean"/>
 		<target name="emma"/>
 		<target name="debug"/>
@@ -31,6 +31,7 @@
 	<!-- This task will build the test app, install and run tests and generate the coverage report -->
   <target name="TestIPCServiceExample"  description="test IPCServiceExample" depends="IPCServiceExample" >
 	 <ant antfile="build.xml" dir="${android-root}/TestIPCServices" useNativeBasedir="true">
+		<target name="all"/>
 		<target name="clean"/>
 		<target name="emma"/>
 		<target name="debug"/>
@@ -38,11 +39,14 @@
 		<target name="test"/>
 	 </ant>
   </target>
-	<!-- Start Android emulator AVD as daemon. Emulator will cease when ant script terminates-->
+	<!-- Start Android emulator AVD as daemon. Emulator will cease when ant script terminates
+		N.B. loads emulator as a headless or non GUI application. Required for 
+		build server environments where OS is a server version -->
   <target name="start-test-emulator">
 	<parallel>
 		<daemons>
 			<exec executable="emulator">
+                                        <arg value="-no-window"/>
 					<arg value="-avd"/>
 					<arg value="${test-avd}"/>
 			 </exec>
@@ -54,10 +58,6 @@
    <target name="start-emulator-wait" depends="start-test-emulator">
 	<sleep seconds="60"/>
    </target>
-	<!-- Delay ant to allow Android emulator AVD to start and configure itself.
-		Adjust sleep duration if default value is too short-->
-   <target name="stop-emulator-wait" >
-	<sleep seconds="5"/>
-   </target>
+
 </project>
 

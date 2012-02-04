@@ -1,0 +1,21 @@
+<project name="android-coverage-build" >
+	<!-- Ugly hack required to allow Android Ant scripts in target apps
+		to be instrumented and later generate Emma coverage reports
+		The coverage.em file is generated in the build of the 
+		instrumented classes but ends up in the directory of the
+		master build script-->	
+   <target name="move-coverage-em" >
+	<if>
+	   <condition>
+	      <istrue value="${societies-coverage-report}"/>
+           </condition>
+	   <then>
+		<echo>Moving coverage.em file to target test app directory root</echo>
+		<echo>Copy from ${societies-main-build-root}</echo>
+		<echo>To ${basedir}</echo>
+		<move file="${societies-main-build-root}/coverage.em" tofile="${basedir}/coverage.em"/>
+	   </then>
+	</if> 
+   </target>
+</project>
+
