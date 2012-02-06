@@ -28,7 +28,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -49,7 +48,6 @@ import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgrCallback;
-import org.societies.context.api.user.history.IUserCtxHistoryCallback;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
 import org.societies.context.broker.api.CtxBrokerException;
 import org.springframework.scheduling.annotation.Async;
@@ -232,17 +230,11 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<List<CtxHistoryAttribute>> retrievePast(
 			CtxAttributeIdentifier attrId, Date startDate, Date endDate) throws CtxException {
 		
-		UserHoCDBCallback callback = new UserHoCDBCallback();
-		userCtxHistoryMgr.retrieveHistory(attrId, startDate, endDate, callback);
-	
-		CtxHistoryAttribute modelObj = (CtxHistoryAttribute) callback.getCtxModelObject();
-		List<CtxHistoryAttribute> listAttrs = new ArrayList<CtxHistoryAttribute>();
-		listAttrs.add(modelObj);
+		final List<CtxHistoryAttribute> result = new ArrayList<CtxHistoryAttribute>();
 		
-		if (modelObj!=null)
-			return new AsyncResult<List<CtxHistoryAttribute>>(listAttrs);
-		else 
-			return new AsyncResult<List<CtxHistoryAttribute>>(null);
+		result.addAll(this.userCtxHistoryMgr.retrieveHistory(attrId, startDate, endDate));
+	
+		return new AsyncResult<List<CtxHistoryAttribute>>(result);
 	}
 
 	@Override
@@ -529,62 +521,6 @@ public class InternalCtxBroker implements ICtxBroker {
 	
 		public CtxModelObject getCtxModelObjectRetrieved(){
 			return this.ctxModelObjectRetrieved;
-		}
-	}
-	
-	private class UserHoCDBCallback implements IUserCtxHistoryCallback {
-
-		private CtxModelObject ctxModelObject = null; 
-				
-		public CtxModelObject getCtxModelObject() {
-			return ctxModelObject;
-		}
-		
-		@Override
-		public void ctxRecordingDisable() {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void ctxRecordingEnabled() {
-			// TODO Auto-generated method stub	
-		}
-
-		@Override
-		public void historyRemovedByDate(int arg0) {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void historyRemovedByType(int arg0) {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void historyRetrievedDate(List<CtxHistoryAttribute> arg0) {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void historyRetrievedIndex(List<CtxHistoryAttribute> arg0) {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void historyTupleIdsRetrieved(
-				List<List<CtxAttributeIdentifier>> arg0) {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void historyTuplesRegistered() {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void historyTuplesRetrieved(
-				Map<CtxAttribute, List<CtxAttribute>> arg0) {
-			// TODO Auto-generated method stub	
 		}
 	}
 	
