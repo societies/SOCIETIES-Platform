@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -218,16 +219,11 @@ public class InternalCtxBroker implements ICtxBroker {
 		return null;
 	}
 
-	@Override
-	public Future<List<CtxHistoryAttribute>> retrievePast(
-			CtxAttributeIdentifier attrId, int modificationIndex) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 
 	@Override
 	@Async
-	public Future<List<CtxHistoryAttribute>> retrievePast(
+	public Future<List<CtxHistoryAttribute>> retrieveHistory(
 			CtxAttributeIdentifier attrId, Date startDate, Date endDate) throws CtxException {
 		
 		final List<CtxHistoryAttribute> result = new ArrayList<CtxHistoryAttribute>();
@@ -537,5 +533,20 @@ public class InternalCtxBroker implements ICtxBroker {
 			return CtxAttributeValueType.BINARY;
 		else
 			throw new IllegalArgumentException(value + ": Invalid value type");
+	}
+
+	@Override
+	public Future<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>> retrieveHistoryTuples(
+			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1,
+			Date arg2, Date arg3) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<List<CtxHistoryAttribute>> retrieveHistory(
+			CtxAttributeIdentifier arg0, int arg1) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

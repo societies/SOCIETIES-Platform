@@ -39,6 +39,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
@@ -98,12 +99,6 @@ public interface ICtxBroker {
 	public void disableCtxMonitoring(CtxAttributeValueType type) throws CtxException;
 
 	/**
-	 * Disables context recording to Context History Database
-	 * @throws CtxException 
-	 */
-	public void disableCtxRecording() throws CtxException;
-
-	/**
 	 * Enables context monitoring to Context Database
 	 * 
 	 * @param type
@@ -111,24 +106,6 @@ public interface ICtxBroker {
 	 */
 	public void enableCtxMonitoring(CtxAttributeValueType type) throws CtxException;
 
-	/**
-	 * Enables context recording to Context History Database
-	 * @throws CtxException 
-	 * 
-	 */
-	public void enableCtxRecording() throws CtxException;
-
-	/**
-	 * There are several methods missing that would express the similarity of context
-	 * values or objects in a quantifiable form (and not via a sorted list of
-	 * most/least similar reference objects/values).
-	 * 
-	 * @param objectUnderComparison
-	 * @param referenceObjects
-	 * @throws CtxException 
-	 * @since 0.0.1
-	 */
-	public Future<List<Object>> evaluateSimilarity(Serializable objectUnderComparison, List<Serializable> referenceObjects) throws CtxException;
 
 	/**
 	 * Looks up for a list of CtxModelObjects defined by the CtxModelType (CtxEntity,
@@ -180,16 +157,7 @@ public interface ICtxBroker {
 	 */
 	public Future<CtxModelObject> remove(CtxIdentifier identifier) throws CtxException;
 
-	/**
-	 * Removes context history records defined by type for the specified time period. 
-	 * 
-	 * @param type
-	 * @param startDate
-	 * @param endDate
-	 * @throws CtxException 
-	 */
-	public Future<Integer> removeHistory(String type, Date startDate, Date endDate) throws CtxException;
-
+	
 	/**
 	 * Retrieves the specified context model object.
 	 * 
@@ -198,44 +166,6 @@ public interface ICtxBroker {
 	 */
 	public Future<CtxModelObject> retrieve(CtxIdentifier identifier) throws CtxException;
 
-	/**
-	 * Predicts a future context attribute for the specified time.
-	 * 
-	 * @param attrId
-	 * @param date
-	 * @throws CtxException 
-	 */
-	public Future<List<CtxAttribute>> retrieveFuture(CtxAttributeIdentifier attrId, Date date) throws CtxException;
-
-	/**
-	 * Predicts the identified by the modification index future context attribute.
-	 * 
-	 * @param attrId
-	 * @param modificationIndex
-	 * @throws CtxException 
-	 */
-	public Future<List<CtxAttribute>> retrieveFuture(CtxAttributeIdentifier attrId, int modificationIndex) throws CtxException;
-
-	/**
-	 * Retrieves context attributes stored in the Context History Log based on the
-	 * specified modificationIndex.
-	 * 
-	 * @param attrId
-	 * @param modificationIndex
-	 * @throws CtxException 
-	 */
-	public Future<List<CtxHistoryAttribute>> retrievePast(CtxAttributeIdentifier attrId, int modificationIndex) throws CtxException;
-
-	/**
-	 * Retrieves context attributes stored in the Context History Log based on the
-	 * specified date and time information.
-	 * 
-	 * @param attrId
-	 * @param startDate
-	 * @param endDate
-	 * @throws CtxException 
-	 */
-	public Future<List<CtxHistoryAttribute>> retrievePast(CtxAttributeIdentifier attrId, Date startDate, Date endDate) throws CtxException;
 
 	
 	/**
@@ -326,6 +256,121 @@ public interface ICtxBroker {
 	public Future<CtxAttribute> updateAttribute(CtxAttributeIdentifier attributeId, Serializable value,
 			String valueMetric) throws CtxException;
 
+	
+	//***********************************************
+	//     Community Context Specific Methods  
+	//***********************************************	
+
+	/**
+	 * This method retrieves the CSS that is assigned with the community administration role.
+	 * @param community
+	 * @throws CtxException 
+	 * @since 0.0.1
+	 */
+	public Future<IndividualCtxEntity> retrieveAdministratingCSS(CtxEntityIdentifier community) throws CtxException;
+
+	/**
+	 * Retrieves the context attribute(s) that act as a bond for the community of
+	 * entities. The community is specified by the CtxEntityIdentifier.
+	 * 
+	 * @param community
+	 * @throws CtxException 
+	 * @since 0.0.1
+	 */
+	public Future<Set<CtxBond>> retrieveBonds(CtxEntityIdentifier community) throws CtxException;
+
+	/**
+	 * Retrieves the sub-communities of the specified community Entity.
+	 *  
+	 * @param community
+	 * @throws CtxException 
+	 * @since 0.0.1
+	 */
+	public Future<List<CtxEntityIdentifier>> retrieveSubCommunities(CtxEntityIdentifier community) throws CtxException;
+
+	/**
+	 * Retrieves a list of Individual Context Entities that are members of the specified community Entity 
+	 * (individuals or subcommunities).
+	 * 
+	 * @param community
+	 * @throws CtxException 
+	 * @since 0.0.1
+	 */
+	public Future<List<CtxEntityIdentifier>> retrieveCommunityMembers(CtxEntityIdentifier community) throws CtxException;
+
+	/**
+	 * This applies for Community hierarchies. Retrieves the parent communities
+	 * of the specified CtxEntity.
+	 * 
+	 * @param community
+	 * @throws CtxException 
+	 * @since 0.0.1
+	 */
+	public Future<List<CtxEntityIdentifier>> retrieveParentCommunities(CtxEntityIdentifier community) throws CtxException;
+	
+	
+	//***********************************************
+	//     Context Inference Methods  
+	//***********************************************	
+	
+	/**
+	 * Predicts a future context attribute for the specified time.
+	 * 
+	 * @param attrId
+	 * @param date
+	 * @throws CtxException 
+	 */
+	public Future<List<CtxAttribute>> retrieveFuture(CtxAttributeIdentifier attrId, Date date) throws CtxException;
+
+	/**
+	 * Predicts the identified by the modification index future context attribute.
+	 * 
+	 * @param attrId
+	 * @param modificationIndex
+	 * @throws CtxException 
+	 */
+	public Future<List<CtxAttribute>> retrieveFuture(CtxAttributeIdentifier attrId, int modificationIndex) throws CtxException;
+
+	
+	/**
+	 * There are several methods missing that would express the similarity of context
+	 * values or objects in a quantifiable form (and not via a sorted list of
+	 * most/least similar reference objects/values).
+	 * 
+	 * @param objectUnderComparison
+	 * @param referenceObjects
+	 * @throws CtxException 
+	 * @since 0.0.1
+	 */
+	public Future<List<Object>> evaluateSimilarity(Serializable objectUnderComparison, List<Serializable> referenceObjects) throws CtxException;
+
+		
+	//***********************************************
+	//     Context History Management Methods  
+	//***********************************************
+	
+	/**
+	 * Retrieves context attributes stored in the Context History Log based on the
+	 * specified modificationIndex.
+	 * 
+	 * @param attrId
+	 * @param modificationIndex
+	 * @throws CtxException 
+	 */
+	public Future<List<CtxHistoryAttribute>> retrieveHistory(CtxAttributeIdentifier attrId, int modificationIndex) throws CtxException;
+
+	/**
+	 * Retrieves context attributes stored in the Context History Log based on the
+	 * specified date and time information.
+	 * 
+	 * @param attrId
+	 * @param startDate
+	 * @param endDate
+	 * @throws CtxException 
+	 */
+	public Future<List<CtxHistoryAttribute>> retrieveHistory(CtxAttributeIdentifier attrId, Date startDate, Date endDate) throws CtxException;
+
+	
 	/**
 	 * This method allows to set a primary context attribute that will be stored in context History Database
 	 * upon value update along with a list of other context attributes. 
@@ -375,53 +420,40 @@ public interface ICtxBroker {
 			CtxAttributeIdentifier primaryAttrIdentifier,
 			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException;
 	
+	/**
+	 * This method returns a linked map with key the CtxAttribute and value 
+	 * a list of CtxAttributes recorded on the same time.
+     * 
+	 * @param primaryAttrID
+	 * @param listOfEscortingAttributeIds
+	 * @param startDate
+	 * @param endDate
+	 * @return map
+	 * @since 0.0.1
+	 */
+	public Future<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>> retrieveHistoryTuples(CtxAttributeIdentifier primaryAttrID, List<CtxAttributeIdentifier> listOfEscortingAttributeIds, Date startDate, Date endDate) throws CtxException;
+
+	/**
+	 * Removes context history records defined by type for the specified time period. 
+	 * 
+	 * @param type
+	 * @param startDate
+	 * @param endDate
+	 * @throws CtxException 
+	 */
+	public Future<Integer> removeHistory(String type, Date startDate, Date endDate) throws CtxException;
+
 	
 	/**
-	 * This method retrieves the CSS that is assigned with the community administration role.
-	 * @param community
+	 * Enables context recording to Context History Database
 	 * @throws CtxException 
-	 * @since 0.0.1
-	 */
-	public Future<IndividualCtxEntity> retrieveAdministratingCSS(CtxEntityIdentifier community) throws CtxException;
-
-	/**
-	 * Retrieves the context attribute(s) that act as a bond for the community of
-	 * entities. The community is specified by the CtxEntityIdentifier.
 	 * 
-	 * @param community
-	 * @throws CtxException 
-	 * @since 0.0.1
 	 */
-	public Future<Set<CtxBond>> retrieveBonds(CtxEntityIdentifier community) throws CtxException;
-
-	/**
-	 * Retrieves the sub-communities of the specified community Entity.
-	 *  
-	 * @param community
-	 * @throws CtxException 
-	 * @since 0.0.1
-	 */
-	public Future<List<CtxEntityIdentifier>> retrieveSubCommunities(CtxEntityIdentifier community) throws CtxException;
-
-	/**
-	 * Retrieves a list of Individual Context Entities that are members of the specified community Entity 
-	 * (individuals or subcommunities).
-	 * 
-	 * @param community
-	 * @throws CtxException 
-	 * @since 0.0.1
-	 */
-	public Future<List<CtxEntityIdentifier>> retrieveCommunityMembers(CtxEntityIdentifier community) throws CtxException;
-
-	/**
-	 * This applies for Community hierarchies. Retrieves the parent communities
-	 * of the specified CtxEntity.
-	 * 
-	 * @param community
-	 * @throws CtxException 
-	 * @since 0.0.1
-	 */
-	public Future<List<CtxEntityIdentifier>> retrieveParentCommunities(CtxEntityIdentifier community) throws CtxException;
+	public void enableCtxRecording() throws CtxException;
 	
-
+	/**
+	 * Disables context recording to Context History Database
+	 * @throws CtxException 
+	 */
+	public void disableCtxRecording() throws CtxException;
 }
