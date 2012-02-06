@@ -39,7 +39,7 @@ public class UseCaseTest {
 	static UserCtxDBMgr userDB ;
 	static CtxEntity entity;
 	static CtxAttribute attribute;
-	
+
 	// not using the IUserCtxDBMgrCallback because getEntity() is missing
 	CallbackImpl callback ;
 
@@ -47,7 +47,7 @@ public class UseCaseTest {
 		userDB = new UserCtxDBMgr();
 		//callback = new CallbackImpl(userDB);
 		callback = new CallbackImpl();
-	
+
 		System.out.println("start testing");
 		testCreateIndividualCtxEntity();
 		testCreateAttribute();
@@ -66,44 +66,44 @@ public class UseCaseTest {
 
 	private void testCreateIndividualCtxEntity(){
 		System.out.println("---- testCreateIndividualCtxEntity");
-		userDB.createIndividualCtxEntity("person", callback);
-		entity = callback.getCtxEntity();
+		entity = userDB.createIndividualCtxEntity("person");
+//		entity = callback.getCtxEntity();
 	}
 
 	private void testCreateAttribute(){
 		System.out.println("---- testCreateAttribute");
-		userDB.createAttribute(entity.getId(), CtxAttributeValueType.INDIVIDUAL, "name", callback);
-		attribute = callback.getCtxAttribute();
+		attribute = userDB.createAttribute(entity.getId(), CtxAttributeValueType.INDIVIDUAL, "name");
+//		attribute = callback.getCtxAttribute();
 	}
 
 	private void testRetrieveAttribute(){
 		System.out.println("---- testRetrieveAttribute");
-		userDB.retrieve(attribute.getId(), callback);
-		attribute = (CtxAttribute) callback.getCtxModelObject();
+		attribute = userDB.retrieve(attribute.getId());
+//		attribute = (CtxAttribute) callback.getCtxModelObject();
 	}
-	
+
 	private void testUpdateAttribute(){
 		System.out.println("---- testUpdateAttribute");
-		userDB.retrieve(attribute.getId(), callback);
-		attribute = (CtxAttribute) callback.getCtxModelObject();
+		attribute = userDB.retrieve(attribute.getId());
+//		attribute = (CtxAttribute) callback.getCtxModelObject();
 		attribute.setIntegerValue(5);
-		userDB.update(attribute, callback);
+		userDB.update(attribute);
 		//verify update
-		userDB.retrieve(attribute.getId(), callback);
-		attribute = (CtxAttribute) callback.getCtxModelObject();
+		attribute = userDB.retrieve(attribute.getId());
+//		attribute = (CtxAttribute) callback.getCtxModelObject();
 		System.out.println("attribute value should be 5 and it is:"+attribute.getIntegerValue());
 	}
-	
+
 	private class CallbackImpl implements IUserCtxDBMgrCallback {
 
 		CtxEntity callbackEntity = null;
 		CtxAttribute callbackAttribute = null;
 		CtxModelObject ctxModelObject = null;
-	
+
 		CallbackImpl(){
 		}
 
-		
+
 		/* (non-Javadoc)
 		 * @see org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback#ctxAttributeCreated(org.societies.api.context.model.CtxAttribute)
 		 */
@@ -156,11 +156,11 @@ public class UseCaseTest {
 		public void ctxModelObjectUpdated(CtxModelObject modelObject) {
 			System.out.println("callback : Test model object updated: " + modelObject.getId());
 		}
-	
+
 		public CtxAttribute getCtxAttribute(){
 			return this.callbackAttribute;
 		}
-		
+
 		public CtxEntity getCtxEntity(){
 			return  this.callbackEntity;
 		}
@@ -168,6 +168,6 @@ public class UseCaseTest {
 		public CtxModelObject getCtxModelObject(){
 			return  this.ctxModelObject;
 		}
-			
+
 	}
 }

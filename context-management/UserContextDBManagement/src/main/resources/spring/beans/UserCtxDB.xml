@@ -1,0 +1,21 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+ 
+ 	<!-- UserCtxDB business object -->
+ 	<bean id="attributeBo" class="org.societies.context.user.db.impl.bo.impl.UserCtxAttributeMgrBoImpl" >
+   		<property name="attributeDao" ref="attributeDao" />
+   </bean>
+    	<bean id="entityBo" class="org.societies.context.user.db.impl.bo.impl.UserCtxEntityMgrBoImpl" >
+   		<property name="entityDao" ref="entityDao" />
+   </bean>
+    
+   <!-- UserCtxDB Data Access Object -->
+   <bean id="attributeDao" class="org.societies.context.user.db.impl.dao.impl.UserCtxAttributeMgrDaoImpl" >
+	   <property name="sessionFactory" ref="sessionFactory"></property>
+   </bean>
+   <bean id="entityDao" class="org.societies.context.user.db.impl.dao.impl.UserCtxEntityMgrDaoImpl" >
+	   <property name="sessionFactory" ref="sessionFactory"></property>
+   </bean> 
+</beans>

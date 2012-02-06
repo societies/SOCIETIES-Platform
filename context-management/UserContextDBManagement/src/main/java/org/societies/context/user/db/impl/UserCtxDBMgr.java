@@ -25,8 +25,17 @@
 package org.societies.context.user.db.impl;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import org.societies.context.user.db.impl.bo.UserCtxEntityMgrBo;
+import org.societies.context.user.db.impl.bo.UserCtxAttributeMgrBo;
+import org.societies.context.user.db.impl.model.UserCtxEntityMgr;
+import org.societies.context.user.db.impl.model.UserCtxAttributeMgr;
 
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -43,8 +52,15 @@ import org.societies.context.api.user.db.IUserCtxDBMgrCallback;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.stereotype.Component;
 
+
 //@Component
 public class UserCtxDBMgr implements IUserCtxDBMgr{
+
+	ApplicationContext appContext = 
+	    	  new ClassPathXmlApplicationContext("spring/config/BeanLocations.xml");
+	 
+   	UserCtxEntityMgrBo entityBo = (UserCtxEntityMgrBo)appContext.getBean("entityBo");
+   	UserCtxAttributeMgrBo attributeBo = (UserCtxAttributeMgrBo)appContext.getBean("attributeBo");
 
 	private final Map<CtxIdentifier, CtxModelObject> modelObjects;
 
@@ -57,24 +73,24 @@ public class UserCtxDBMgr implements IUserCtxDBMgr{
 	}
 
 	@Override
-	public void createAssociation(String arg0, IUserCtxDBMgrCallback arg1) {
+	public String createAssociation(String arg0) {
 		// TODO Auto-generated method stub
-
+		return arg0;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.societies.api.internal.context.user.db.IUserCtxDBMgr#createAttribute(org.societies.api.context.model.CtxEntityIdentifier, org.societies.api.context.model.CtxAttributeValueType, java.lang.String, org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback)
 	 */
 	@Override
-	public void createAttribute(CtxEntityIdentifier scope,
-			CtxAttributeValueType valueType, String type, IUserCtxDBMgrCallback callback) {
-		
+	public CtxAttribute createAttribute(CtxEntityIdentifier scope,
+			CtxAttributeValueType valueType, String type) {
+
 		if (scope == null)
 			throw new NullPointerException("scope can't be null");
 
 		final CtxEntity entity = (CtxEntity) modelObjects.get(scope);
-		
+
 		/**************************/
 		if (entity == null)
 			// F A I L (callback should throw an exception!!)
@@ -87,55 +103,73 @@ public class UserCtxDBMgr implements IUserCtxDBMgr{
 		this.modelObjects.put(attribute.getId(), attribute);
 		entity.addAttribute(attribute);
 		// AGAIN?? modelObjects.put(entity.getId(), entity);
-		callback.ctxAttributeCreated(attribute);
+		
+		Date date = new Date();
+    	/** insert **/
+    	UserCtxAttributeMgr attributeDB = new UserCtxAttributeMgr();
+    	attributeDB.setOperatorId(attribute.getScope().toString());
+    	attributeDB.setType(attribute.getType());
+    	attributeDB.setObjectNumber(attribute.getObjectNumber());
+    	attributeDB.setLastModified(date);
+    	attributeBo.save(attributeDB);
+    	
+//		callback.ctxAttributeCreated(attribute);
+    	return attribute;
 	}
 
-	
+
 	@Override
-	public void createEntity(String type, IUserCtxDBMgrCallback callback) {
+	public CtxEntity createEntity(String type) {
 
 		final CtxEntityIdentifier identifier = new CtxEntityIdentifier(this.privateId, 
 				type, CtxModelObjectNumberGenerator.getNextValue());
 		final CtxEntity entity = new  CtxEntity(identifier);
 		this.modelObjects.put(entity.getId(), entity);
-		
-		callback.ctxEntityCreated(entity);
+
+		Date date = new Date();
+    	/** insert **/
+    	UserCtxEntityMgr entityDB = new UserCtxEntityMgr();
+    	entityDB.setOperatorId(entity.toString());
+    	entityDB.setType(entity.getType());
+    	entityDB.setObjectNumber(entity.getObjectNumber());
+    	entityDB.setLastModified(date);
+    	entityBo.save(entityDB);
+
+//		callback.ctxEntityCreated(entity);
+    	return entity;
 	}
 
 
 	@Override
-	public void lookup(CtxModelType arg0, String arg1,
-			IUserCtxDBMgrCallback arg2) {
+	public CtxEntity lookup(CtxModelType arg0, String arg1) {
 		// TODO Auto-generated method stub
-
+		return null;
 	}
 
 	@Override
-	public void lookupEntities(String arg0, String arg1, Serializable arg2,
-			Serializable arg3, IUserCtxDBMgrCallback arg4) {
+	public CtxEntity lookupEntities(String arg0, String arg1, Serializable arg2,
+			Serializable arg3) {
 		// TODO Auto-generated method stub
-
+		return null;
 	}
 
 	@Override
-	public void registerForUpdates(CtxAttributeIdentifier arg0,
-			IUserCtxDBMgrCallback arg1) {
+	public CtxAttribute registerForUpdates(CtxAttributeIdentifier arg0) {
 		// TODO Auto-generated method stub
-
+		return null;
 	}
 
-	
-	@Override
-	public void registerForUpdates(CtxEntityIdentifier scope, String attributeType,
-			IUserCtxDBMgrCallback callback) {
-		// TODO Auto-generated method stub
 
+	@Override
+	public CtxAttribute registerForUpdates(CtxEntityIdentifier scope, String attributeType) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
-	public void remove(CtxIdentifier arg0, IUserCtxDBMgrCallback arg1) {
+	public CtxIdentifier remove(CtxIdentifier arg0) {
 		// TODO Auto-generated method stub
-
+		return null;
 	}
 
 	/*
@@ -143,8 +177,9 @@ public class UserCtxDBMgr implements IUserCtxDBMgr{
 	 * @see org.societies.api.internal.context.user.db.IUserCtxDBMgr#retrieve(org.societies.api.context.model.CtxIdentifier, org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback)
 	 */
 	@Override
-	public void retrieve(CtxIdentifier id, IUserCtxDBMgrCallback callback) {
-		callback.ctxModelObjectRetrieved(this.modelObjects.get(id));
+	public CtxAttribute retrieve(CtxIdentifier id) {
+//		callback.ctxModelObjectRetrieved(this.modelObjects.get(id));
+	return (CtxAttribute) this.modelObjects.get(id);
 	}
 
 	public CtxModelObject retrieveSynch(CtxIdentifier id) {
@@ -152,27 +187,39 @@ public class UserCtxDBMgr implements IUserCtxDBMgr{
 	}
 
 	@Override
-	public void unregisterForUpdates(CtxAttributeIdentifier arg0,
-			IUserCtxDBMgrCallback arg1) {
+	public CtxAttribute unregisterForUpdates(CtxAttributeIdentifier arg0) {
 		// TODO Auto-generated method stub
-
+		return null;
 	}
 
 	@Override
-	public void unregisterForUpdates(CtxEntityIdentifier arg0, String arg1,
-			IUserCtxDBMgrCallback arg2) {
+	public CtxEntity unregisterForUpdates(CtxEntityIdentifier arg0, String arg1) {
 		// TODO Auto-generated method stub
-
+		return null;
 	}
 
 	@Override
-	public void update(CtxModelObject modelObject, IUserCtxDBMgrCallback callback) {
+	public CtxModelObject update(CtxModelObject modelObject) {
 
 		if (this.modelObjects.containsValue(modelObject)) {
 			this.modelObjects.put(modelObject.getId(), modelObject);
-			
-			callback.ctxModelObjectUpdated(modelObject);
+
+//			callback.ctxModelObjectUpdated(modelObject);
 		}
+
+		UserCtxAttributeMgr attrDBupdate = attributeBo.findByCode(modelObject.getType());
+    	
+    	System.out.println(attrDBupdate);
+
+		Date date = new Date();
+    	/** insert **/
+//    	userDBupdate.setOperatorId(modelObject.getId().getObjectNumber());
+    	attrDBupdate.setType(modelObject.getType());
+    	attrDBupdate.setObjectNumber(modelObject.getObjectNumber());
+    	attrDBupdate.setLastModified(date);
+    	attributeBo.update(attrDBupdate);
+
+    	return modelObject;
 	}
 
 	/*
@@ -180,14 +227,22 @@ public class UserCtxDBMgr implements IUserCtxDBMgr{
 	 * @see org.societies.api.internal.context.user.db.IUserCtxDBMgr#createIndividualCtxEntity(java.lang.String, org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback)
 	 */
 	@Override
-	public void createIndividualCtxEntity(String type,
-			IUserCtxDBMgrCallback callback)  {
+	public IndividualCtxEntity createIndividualCtxEntity(String type)  {
 
 		CtxEntityIdentifier identifier = new CtxEntityIdentifier(this.privateId,
 				type, CtxModelObjectNumberGenerator.getNextValue());
 		IndividualCtxEntity entity = new IndividualCtxEntity(identifier);
 		this.modelObjects.put(entity.getId(), entity);
 
-		callback.ctxIndividualCtxEntityCreated(entity);
+		Date date = new Date();
+    	/** insert **/
+    	UserCtxEntityMgr entityDB = new UserCtxEntityMgr();
+    	entityDB.setOperatorId(entity.toString());
+    	entityDB.setType(entity.getType());
+    	entityDB.setObjectNumber(entity.getObjectNumber());
+    	entityDB.setLastModified(date);
+    	entityBo.save(entityDB);
+//		callback.ctxIndividualCtxEntityCreated(entity);
+    	return entity;
 	}
 }
