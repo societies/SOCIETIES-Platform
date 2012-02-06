@@ -24,7 +24,65 @@
  */
 package org.societies.privacytrust.trust.api;
 
-public class TrustEventListener {
+import java.util.EventObject;
 
-	void postTrustEvent() {}
+/**
+ * This event is fired whenever a trust value is updated. A 
+ * <code>TrustUpdateEvent</code> object is sent as an argument to the
+ * {@link TrustUpdateListener} methods.
+ * <p>
+ * Normally, TrustUpdateEvents are accompanied by the source, i.e. the identifier
+ * of the entity whose trust value was updated, as well as, the old and new value. 
+ *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.2
+ */
+public class TrustUpdateEvent extends EventObject {
+
+	private static final long serialVersionUID = -4292086499526921194L;
+
+	/** The old trust value */
+	private final Double oldValue;
+	
+	/** The new trust value */
+	private final Double newValue;
+	
+	/**
+	 * Constructs a <code>TrustUpdateEvent</code> object with the specified
+	 * source, old and new trust value.
+	 *  
+	 * @param source
+	 *            the identifier of the entity whose trust value was updated
+	 * @param oldValue
+	 *            the old trust value
+	 * @param newValue
+	 *            the new trust value
+	 */
+	public TrustUpdateEvent(Object source, Double oldValue, Double newValue) {
+		
+		super(source);
+		
+		this.oldValue = oldValue;
+		this.newValue = newValue;
+	}
+	
+	/**
+	 * Returns the old trust value.
+	 * 
+	 * @return the old trust value.
+	 */
+	public Double getOldValue() {
+		
+		return this.oldValue;
+	}
+	
+	/**
+	 * Returns the new trust value.
+	 * 
+	 * @return the new trust value.
+	 */
+	public Double getNewValue() {
+		
+		return this.newValue;
+	}
 }
