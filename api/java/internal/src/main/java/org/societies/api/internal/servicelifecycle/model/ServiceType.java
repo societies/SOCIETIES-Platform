@@ -23,44 +23,13 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+package org.societies.api.internal.servicelifecycle.model;
+
 /**
- * This class defines a data type that is used stored in and managed by a CIS Directory.
- * 
- * @author Babak Farshchian
- * @version 0
- * 
+ * @author Antonio Panazzolo, Massimo Mazzariol (SN)
  */
 
-package org.societies.api.internal.cis.discovery;
-
-public class CisAdvertisementRecord {
-	private String name, id, uri;
-	
-	public CisAdvertisementRecord(String name, String id, String uri) {
-		super();
-		this.name = name;
-		this.id = id;
-		this.uri = uri;
-	}
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public String getUri() {
-		return uri;
-	}
-
-	public void setUri(String uri) {
-		this.uri = uri;
-	}
-
-
+public enum ServiceType {
+	ThirdPartyService,
+	CoreService
 }

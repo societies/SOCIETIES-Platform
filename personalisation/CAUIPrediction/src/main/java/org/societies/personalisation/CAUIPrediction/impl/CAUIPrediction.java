@@ -21,8 +21,10 @@ package org.societies.personalisation.CAUIPrediction.impl;
 
 import java.util.List;
 
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
@@ -42,30 +44,31 @@ public class CAUIPrediction implements ICAUIPrediction{
 		
 	}
 
+
 	@Override
-	public UserIntentAction getCurrentIntentAction(EntityIdentifier requestor,
-			EntityIdentifier ownerID, IServiceResourceIdentifier serviceID,
+	public List<List<String>> getPredictionHistory() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public UserIntentAction getCurrentIntentAction(Identity requestor,
+			Identity ownerID, IServiceResourceIdentifier serviceID,
 			String preferenceName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public UserIntentAction getPrediction(EntityIdentifier requestor,
+	public UserIntentAction getPrediction(Identity requestor,
 			CtxAttribute ctxAttribute) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public UserIntentAction getPrediction(EntityIdentifier requestor,
-			IAction action) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<List<String>> getPredictionHistory() {
+	public UserIntentAction getPrediction(Identity requestor, IAction action,
+			IPersonalisationCallback persCallback) {
 		// TODO Auto-generated method stub
 		return null;
 	}

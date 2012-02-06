@@ -12,12 +12,7 @@
        testing of the bundle outside of an OSGi container -->
        
        
-       
-       
-       
-        
-       
-	<osgi:reference id="UserCtxBroker" interface="org.societies.api.internal.context.broker.IUserCtxBroker"/>
+	<osgi:reference id="CtxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker"/>
 
 
 

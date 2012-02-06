@@ -47,14 +47,11 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.internal.context.broker.ICtxBroker;
-//import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgrCallback;
 import org.societies.context.api.user.history.IUserCtxHistoryCallback;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
 import org.societies.context.broker.api.CtxBrokerException;
-//import org.societies.context.broker.impl.InternalCtxBroker.UserHoCDBCallback;
-//import org.societies.context.broker.impl.InternalCtxBroker.UserDBCallback;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 
@@ -65,12 +62,12 @@ import org.springframework.scheduling.annotation.AsyncResult;
  */
 public class InternalCtxBroker implements ICtxBroker {
 
-	private IUserCtxDBMgr userDB;
-	private IUserCtxHistoryMgr userHocDB;
+	private IUserCtxDBMgr userCtxDBMgr;
+	private IUserCtxHistoryMgr userCtxHistoryMgr;
 
 	public InternalCtxBroker(IUserCtxDBMgr userDB,IUserCtxHistoryMgr userHocDB) throws CtxException {
-		this.userDB=userDB;
-		this.userHocDB = userHocDB;
+		this.userCtxDBMgr=userDB;
+		this.userCtxHistoryMgr = userHocDB;
 		// TODO Use logging.debug
 		//System.out.println(this.getClass().getName()+" full");
 	}
@@ -81,11 +78,11 @@ public class InternalCtxBroker implements ICtxBroker {
 	}
 
 	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) throws CtxException {
-		this.userDB = userDB;
+		this.userCtxDBMgr = userDB;
 	}
 
 	public void setUserCtxHistoryMgr (IUserCtxHistoryMgr userHocDB) throws CtxException {
-		this.userHocDB = userHocDB;
+		this.userCtxHistoryMgr = userHocDB;
 	}
 
 
@@ -95,7 +92,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		
 		UserDBCallback callback = new UserDBCallback();
 		
-		userDB.createAssociation(type, callback);
+		userCtxDBMgr.createAssociation(type, callback);
 		CtxAssociation association = (CtxAssociation) callback.getCreatedCtxAssociation();
 		if (association!=null)
 			return new AsyncResult<CtxAssociation>(association);
@@ -110,7 +107,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		// TODO Auto-generated method stub		
 		UserDBCallback callback = new UserDBCallback();
 		
-		userDB.createAttribute(scope, null, type, callback);
+		userCtxDBMgr.createAttribute(scope, null, type, callback);
 		CtxAttribute attribute = (CtxAttribute) callback.getCreatedCtxAttribute();
 		if (attribute!=null)
 			return new AsyncResult<CtxAttribute>(attribute);
@@ -124,7 +121,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		
 		UserDBCallback callback = new UserDBCallback();
 		
-		userDB.createEntity(type, callback);
+		userCtxDBMgr.createEntity(type, callback);
 		CtxEntity entity = (CtxEntity) callback.getCreatedCtxEntity();
 		if (entity!=null)
 			return new AsyncResult<CtxEntity>(entity);
@@ -163,7 +160,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			Serializable maxAttribValue) throws CtxException {
 		
 		UserDBCallback callback = new UserDBCallback();
-		userDB.lookupEntities(entityType, attribType, minAttribValue, maxAttribValue, callback);
+		userCtxDBMgr.lookupEntities(entityType, attribType, minAttribValue, maxAttribValue, callback);
 		List<CtxEntityIdentifier> results = callback.getLookedUpCtxEntities();
 		// add fix
 				
@@ -201,7 +198,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		// TODO Auto-generated method stub
 		UserDBCallback callback = new UserDBCallback();
 				
-		userDB.retrieve(identifier, callback);
+		userCtxDBMgr.retrieve(identifier, callback);
 		CtxModelObject modelObj = (CtxModelObject) callback.getCtxModelObjectRetrieved();
 		if (modelObj!=null)
 			return new AsyncResult<CtxModelObject>(modelObj);
@@ -236,7 +233,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			CtxAttributeIdentifier attrId, Date startDate, Date endDate) throws CtxException {
 		
 		UserHoCDBCallback callback = new UserHoCDBCallback();
-		userHocDB.retrieveHistory(attrId, startDate, endDate, callback);
+		userCtxHistoryMgr.retrieveHistory(attrId, startDate, endDate, callback);
 	
 		CtxHistoryAttribute modelObj = (CtxHistoryAttribute) callback.getCtxModelObject();
 		List<CtxHistoryAttribute> listAttrs = new ArrayList<CtxHistoryAttribute>();
@@ -267,17 +264,17 @@ public class InternalCtxBroker implements ICtxBroker {
 		
 		UserDBCallback callback = new UserDBCallback();
 		
-		userDB.update(identifier, callback);
+		userCtxDBMgr.update(identifier, callback);
 		CtxModelObject modelObject = (CtxModelObject) callback.getUpdatedCtxModelObject();
 		
 
 		// this part allows the storage of attribute updates to context history
 		if(modelObject.getModelType().equals(CtxModelType.ATTRIBUTE)){
 			CtxAttribute ctxAttr = (CtxAttribute) modelObject; 
-			if (ctxAttr.isHistoryRecorded() && userHocDB != null){
+			if (ctxAttr.isHistoryRecorded() && userCtxHistoryMgr != null){
 				Date date = new Date();
 				//	System.out.println("storing hoc attribute");
-				userHocDB.storeHoCAttribute(ctxAttr, date);
+				userCtxHistoryMgr.storeHoCAttribute(ctxAttr, date);
 			}
 			return new AsyncResult<CtxModelObject>(modelObject);
 		}

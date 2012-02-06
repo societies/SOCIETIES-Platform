@@ -21,12 +21,16 @@
 package org.societies.personalisation.CRISTUserIntentPrediction.test;
 
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
+import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 
 public class CRISTUserIntentPredictionTest {
 	
 	private ICRISTUserIntentPrediction cristPredictor;
+	Identity myID;
 	private CtxAttribute myCtx;
+	IPersonalisationInternalCallback myCallback;
 	
 	public static void main(){
 		System.out.println("Hello Kitty");
@@ -38,7 +42,7 @@ public class CRISTUserIntentPredictionTest {
 	
 	public void initialiseTesting(){
 		System.out.println("This is the testing class for CRIST UI Predictioin");
-		cristPredictor.getCRISTPrediction(myCtx);
+		cristPredictor.getCRISTPrediction(myID, myCtx, myCallback);
 	}
 	
 	public ICRISTUserIntentPrediction getCristPredictor() {

@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.comm.xmpp.interfaces.IdentityManager;
 import org.societies.interfaces.Callback;
@@ -49,6 +48,17 @@ public class CallbackAdapter implements Callback {
 		try {
 			Packet packet = marshaller.unmarshallIq(xml);
 			callback.receiveError(stanzaFromPacket(packet), null); // TODO parse error
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		} 
+	}
+	
+	public void receiveMessage(String xml) {	
+		
+		try {
+			Packet packet = marshaller.unmarshallMessage(xml);
+			Object payload = marshaller.unmarshallPayload(packet);
+			callback.receiveMessage(stanzaFromPacket(packet), payload);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		} 

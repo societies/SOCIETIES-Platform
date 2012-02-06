@@ -116,4 +116,44 @@ public abstract class CtxModelObject implements Serializable {
 	@Override
 	public String toString() {
 	}*/
+	
+	/**
+	 * @see java.lang.Object#hashCode()
+	 * @since 0.0.2
+	 */
+	@Override
+    public int hashCode() {
+		
+        final int prime = 31;
+        int result = 1;
+        
+        result = prime * result
+                + ((this.id == null) ? 0 : this.id.hashCode());
+        
+        return result;
+    }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     * @since 0.0.2
+     */
+    @Override
+    public boolean equals(Object that) {
+    	
+        if (this == that)
+            return true;
+        if (that == null)
+            return false;
+        if (this.getClass() != that.getClass())
+            return false;
+        
+        CtxModelObject other = (CtxModelObject) that;
+        if (this.id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!this.id.equals(other.id))
+            return false;
+        
+        return true;
+    }
 }

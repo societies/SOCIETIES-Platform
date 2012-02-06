@@ -204,7 +204,7 @@ public class CtxQuality implements Serializable {
 	public void setUpdateFrequency(Double updateFrequency) {
 		this.updateFrequency = (updateFrequency != null) ? new Double(updateFrequency) : null;
 	}
-	
+
 	/**
 	 * TODO
 	 * Returns a String representation of this QoC information.
@@ -213,4 +213,44 @@ public class CtxQuality implements Serializable {
 	 *
 	public String toString() {
 	}*/
+	
+	/**
+	 * @see java.lang.Object#hashCode()
+	 * @since 0.0.2
+	 */
+	@Override
+	public int hashCode() {
+		
+		final int prime = 31;
+		int result = 1;
+		
+		result = prime * result
+				+ ((this.attribute == null) ? 0 : this.attribute.hashCode());
+		
+		return result;
+	}
+
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 * @since 0.0.2
+	 */
+	@Override
+	public boolean equals(Object that) {
+		
+		if (this == that)
+			return true;
+		if (that == null)
+			return false;
+		if (this.getClass() != that.getClass())
+			return false;
+		
+		CtxQuality other = (CtxQuality) that;
+		if (this.attribute == null) {
+			if (other.attribute != null)
+				return false;
+		} else if (!this.attribute.equals(other.attribute))
+			return false;
+		
+		return true;
+	}
 }

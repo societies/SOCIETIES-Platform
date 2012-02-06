@@ -1,6 +1,6 @@
 package org.societies.css;
 
-import org.societies.api.internal.cis.management.CisRecord;
+import org.societies.api.cis.management.CisRecord;
 
 public class CssManagerBeanResult {
 	

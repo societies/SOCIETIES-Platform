@@ -3,7 +3,6 @@ package org.societies.ipc;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
 
 import org.societies.interfaces.Callback;
 
@@ -16,6 +15,10 @@ public class Stub implements InvocationHandler {
 	public static Object newInstance(Class<?>[] interfaces, String id, Messenger messenger) {
 		return Proxy.newProxyInstance(Stub.class.getClassLoader(), 
 				interfaces, new Stub(id, messenger));
+	}
+	
+	public static Object newInstance(Class<?>[] interfaces, Messenger messenger) {
+		return Stub.newInstance(interfaces, "0", messenger);
 	}
 
 	private Stub(String id, Messenger messenger) {

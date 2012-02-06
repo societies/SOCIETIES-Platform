@@ -84,6 +84,10 @@ public class PacketMarshaller {
 		return new IQ(DocumentHelper.parseText(xml).getRootElement());
 	}
 	
+	public Message unmarshallMessage(String xml) throws Exception {	
+		return new Message(DocumentHelper.parseText(xml).getRootElement());
+	}
+	
 	public Object unmarshallPayload(Packet packet) throws Exception {
 		Element element = getElementAny(packet);
 		String namespace = element.getNamespace().getURI();

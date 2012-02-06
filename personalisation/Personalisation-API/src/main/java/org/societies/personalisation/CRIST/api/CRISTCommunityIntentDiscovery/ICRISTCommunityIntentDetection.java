@@ -1,6 +1,6 @@
 package org.societies.personalisation.CRIST.api.CRISTCommunityIntentDiscovery;
 
-import org.societies.personalisation.CRIST.api.model.ICRISTCommunityAction;
+import org.societies.personalisation.CRIST.api.model.CRISTCommunityAction;
 /**
  * 
  * @author Zhu WANG
@@ -19,5 +19,5 @@ public interface ICRISTCommunityIntentDetection {
 	/**
 	 * This method will retrieve the current community intent
 	 */
-	public ICRISTCommunityAction detectCRISTCommunityIntent();
+	public CRISTCommunityAction detectCRISTCommunityIntent();
 }
