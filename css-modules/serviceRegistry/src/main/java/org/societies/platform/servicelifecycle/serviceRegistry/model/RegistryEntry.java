@@ -7,12 +7,12 @@ import java.net.URISyntaxException;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Table;
 
 import org.societies.api.internal.servicelifecycle.model.Service;
+import org.societies.api.internal.servicelifecycle.model.ServiceLocation;
 import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.internal.servicelifecycle.model.ServiceType;
 
 /**
  * This is the Class accepted by the ServiceRegistry when a service wants to
@@ -32,25 +32,21 @@ public class RegistryEntry implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 9064750069927104572L;
-	
-	
 
-	// private String serviceIdentifier; 
+	// private String serviceIdentifier;
 	// private ServiceResourceIdentifier serviceIdentifier;
-	
+
 	private ServiceResourceIdentiferDAO serviceIdentifier;
-	
+
 	/**
 	 * CSS where the service is installed.
 	 */
 	private String CSSIDInstalled;
-	
 
 	/**
 	 * The version of the service, it must be updated by developer
 	 */
 	private String version;
-	
 
 	/**
 	 * An alias name for the service
@@ -65,6 +61,10 @@ public class RegistryEntry implements Serializable {
 	 */
 	private String authorSignature;
 
+	private String serviceType;
+	
+	private String serviceLocation;
+	
 	public RegistryEntry() {
 
 	}
@@ -81,21 +81,23 @@ public class RegistryEntry implements Serializable {
 	 */
 	public RegistryEntry(ServiceResourceIdentifier serviceIdentifier,
 			String cSSIDInstalled, String version, String serviceName,
-			String serviceDescription, String authorSignature) {
+			String serviceDescription, String authorSignature, ServiceType type, ServiceLocation location) {
+
 		super();
-		// this.setServiceIdentifier(serviceIdentifier);
-		this.serviceIdentifier = new ServiceResourceIdentiferDAO(serviceIdentifier.getIdentifier().toString());
+
+		this.serviceIdentifier = new ServiceResourceIdentiferDAO(
+				serviceIdentifier.getIdentifier().toString());
 
 		this.version = version;
 
 		this.serviceName = serviceName;
 		this.serviceDescription = serviceDescription;
 		this.authorSignature = authorSignature;
-		this.CSSIDInstalled=cSSIDInstalled;
+		this.CSSIDInstalled = cSSIDInstalled;
 		
+		this.serviceType = type.toString();
+		this.serviceLocation = location.toString();
 	}
-
-	
 
 	@Column(name = "ServiceName")
 	public String getServiceName() {
@@ -141,7 +143,6 @@ public class RegistryEntry implements Serializable {
 	public void setCSSIDInstalled(String cSSIDInstalled) {
 		CSSIDInstalled = cSSIDInstalled;
 	}
-	
 
 	@EmbeddedId
 	// @Column(name = "ServiceIdentifier")
@@ -149,20 +150,63 @@ public class RegistryEntry implements Serializable {
 		return this.serviceIdentifier;
 	}
 
-	public void setServiceIdentifier(ServiceResourceIdentiferDAO serviceIdentifier) {
+	public void setServiceIdentifier(
+			ServiceResourceIdentiferDAO serviceIdentifier) {
 		this.serviceIdentifier = serviceIdentifier;
 	}
 
-	public Service createServiceFromRegistryEntry(){
-		Service returnedService=null;
+	public Service createServiceFromRegistryEntry() {
+		Service returnedService = null;
 		try {
-			returnedService = new Service(new ServiceResourceIdentifier(new URI(this.serviceIdentifier.getIdentifier())),
-					this.CSSIDInstalled, this.version, this.serviceName, this.serviceDescription, this.authorSignature);
+			ServiceType tmpServiceType = null;
+			ServiceLocation tmpServiceLocation = null;
+			
+			
+			/* Retrieve the service type from the service and
+			 * create the appropriate enumeration type
+			 */
+			if (serviceType == "ThirdPartyService") {
+				tmpServiceType = ServiceType.ThirdPartyService;
+			} else {
+				if (serviceType == "CoreService") {
+					tmpServiceType = ServiceType.CoreService;
+				}
+			}
+			
+			/* Same as before but for service location */
+			if (serviceLocation == "Local") {
+				tmpServiceLocation = ServiceLocation.Local;
+			} else {
+				if (serviceLocation == "Remote" ) {
+					tmpServiceLocation = ServiceLocation.Remote;
+				}
+			}
+
+			returnedService = new Service(new ServiceResourceIdentifier(
+					new URI(this.serviceIdentifier.getIdentifier())),
+					this.CSSIDInstalled, this.version, this.serviceName,
+					this.serviceDescription, this.authorSignature,
+					tmpServiceType, tmpServiceLocation);
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	return returnedService ;}
+		return returnedService;
+	}
 
-	
+	public String getServiceType() {
+		return serviceType;
+	}
+
+	public void setServiceType(String serviceType) {
+		this.serviceType = serviceType;
+	}
+
+	public String getServiceLocation() {
+		return serviceLocation;
+	}
+
+	public void setServiceLocation(String serviceLocation) {
+		this.serviceLocation = serviceLocation;
+	}
+
 }

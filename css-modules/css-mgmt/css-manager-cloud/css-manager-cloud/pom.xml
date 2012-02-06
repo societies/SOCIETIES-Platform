@@ -24,11 +24,10 @@
 	<!-- add your dependencies here -->
 
 	<dependency>
-	  <groupId>org.societies.cis.management</groupId>
+	  <groupId>org.societies.cis</groupId>
 	  <version>${release.version}</version>
   	  <artifactId>cis-manager</artifactId>
 	</dependency>
-
 
 
 <dependency>

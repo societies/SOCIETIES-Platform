@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.api.personalisation.model.Action;
 
 /**
@@ -156,7 +156,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	/**
 	 * @return the identifier of the service to which this action is applied to
 	 */
-	public ServiceResourceIdentifier getServiceID() {
+	public IServiceResourceIdentifier getServiceID() {
 		return null;
 	}
 
@@ -188,7 +188,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 * @param id
 	 *            the identifier of the service this action is applied to
 	 */
-	public void setServiceID(ServiceResourceIdentifier id) {
+	public void setServiceID(IServiceResourceIdentifier id) {
 
 	}
 
@@ -210,11 +210,13 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 
 	}
 
+
+
 	@Override
 	public void setActionSituations(
 			HashMap<ICRISTUserSituation, Double> actionSituations) {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 }

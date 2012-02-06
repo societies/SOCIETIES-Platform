@@ -54,7 +54,7 @@ public class CisManager implements ICisManager {
 		// check if ccs already exist
 		CisEditor cis = new CisEditor(cssId, cisId);
 		if (CISs.add(cis))
-			return cis.cisRecord;
+			return cis.getCisRecord();
 		else
 			return null;
 	}

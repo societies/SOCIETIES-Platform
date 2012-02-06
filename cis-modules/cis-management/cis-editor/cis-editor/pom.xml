@@ -23,13 +23,11 @@
 	<dependencies>
 	<!-- add your dependencies here -->
 
-  
-  <dependency>
-  	<groupId>org.societies.api.internal</groupId>
-	<version>${release.version}</version>
+<dependency>
+	<groupId>org.societies.api.internal</groupId>
 	<artifactId>societies-api-internal</artifactId>
-</dependency>	
-
+	<version>${release.version}</version>
+</dependency>
 
 	</dependencies>
 

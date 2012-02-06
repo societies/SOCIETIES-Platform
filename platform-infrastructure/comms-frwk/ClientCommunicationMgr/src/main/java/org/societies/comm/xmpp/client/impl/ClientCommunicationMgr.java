@@ -3,8 +3,6 @@ package org.societies.comm.xmpp.client.impl;
 import static android.content.Context.BIND_AUTO_CREATE;
 
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -28,20 +26,20 @@ public class ClientCommunicationMgr {
 
 	private Context androidContext;
 	private PacketMarshaller marshaller = new PacketMarshaller();
+	private ServiceConnection registerConnection;
 	
 	public ClientCommunicationMgr(Context androidContext) {
 		this.androidContext = androidContext;
 	}
 	
-	public void register(final List<String> elementNames, final List<String> namespaces, List<String> packages) {		
-		List<String> uniqueNamespaces = new ArrayList<String>(new HashSet<String>(namespaces)); 
-		marshaller.register(uniqueNamespaces, packages);
-		ServiceConnection connection = new ServiceConnection() {
+	public void register(final List<String> elementNames, final ICommCallback callback) {	
+		final List<String> namespaces = callback.getXMLNamespaces();
+		marshaller.register(callback.getXMLNamespaces(), callback.getJavaPackages());
+		registerConnection = new ServiceConnection() {
 			@Override
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
-				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, "0", new Messenger(binder));
-				agent.register(elementNames.toArray(new String[0]), namespaces.toArray(new String[0]));	
-				androidContext.unbindService(this);
+				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, new Messenger(binder));
+				agent.register(elementNames.toArray(new String[0]), namespaces.toArray(new String[0]), new CallbackAdapter(callback, androidContext, this, marshaller));	
 			}
 
 			@Override
@@ -49,16 +47,17 @@ public class ClientCommunicationMgr {
 			}			
 		};
 		
-		bindService(connection);
+		bindService(registerConnection);
 	}
 	
 	public void unregister(final List<String> elementNames, final List<String> namespaces, List<String> packages) {
 		ServiceConnection connection = new ServiceConnection() {
 			@Override
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
-				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, "0", new Messenger(binder));
+				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class},  new Messenger(binder));
 				agent.unregister(elementNames.toArray(new String[0]), namespaces.toArray(new String[0]));	
 				androidContext.unbindService(this);
+				androidContext.unbindService(registerConnection);
 			}
 
 			@Override
@@ -108,7 +107,7 @@ public class ClientCommunicationMgr {
 
 			@Override
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
-				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, "0", new Messenger(binder));
+				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, new Messenger(binder));
 				agent.sendMessage(xml);		
 				androidContext.unbindService(this);
 			}
@@ -127,7 +126,7 @@ public class ClientCommunicationMgr {
 
 			@Override
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
-				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, "0", new Messenger(binder));
+				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, new Messenger(binder));
 				agent.sendIQ(xml, new CallbackAdapter(callback, androidContext, this, marshaller));				
 			}
 
