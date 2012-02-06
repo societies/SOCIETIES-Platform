@@ -55,6 +55,12 @@
   			<version>${release.version}</version>
   			<scope>compile</scope>
         </dependency>
+        <dependency>
+      		<groupId>junit</groupId>
+      		<artifactId>junit</artifactId>
+      		<version>4.8.2</version>
+      		<scope>test</scope>
+    	</dependency>
         </dependencies>
 
     <build>
@@ -65,6 +71,68 @@
                 <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                 <artifactId>android-maven-plugin</artifactId>
             </plugin>
+            
+            <plugin>
+        		<groupId>org.codehaus.mojo</groupId>
+        		<artifactId>cobertura-maven-plugin</artifactId>
+        		<configuration>
+          			<instrumentation>
+            			<excludes>
+                			<!--Insert any classes that should not be tested for coverage, i.e. Interfaces,Enums -->
+              				
+            			</excludes>
+          			</instrumentation>
+        		</configuration>
+      		</plugin>
+      		<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<configuration>
+				<instrumentation>
+				<excludes>
+				<!--Insert any classes that should not be tested for coverage, i.e. 
+				Interfaces,Enums -->
+				<exclude>org/societies/android/platform/gui/R.class</exclude>
+				</excludes>
+				</instrumentation>
+				</configuration>
+			</plugin>
         </plugins>
+        <pluginManagement>
+        	<plugins>
+        		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+        		
+        		<plugin>
+        			<groupId>org.eclipse.m2e</groupId>
+        			<artifactId>lifecycle-mapping</artifactId>
+        			<version>1.0.0</version>
+        			<configuration>
+        				<lifecycleMappingMetadata>
+        					<pluginExecutions>
+        						<pluginExecution>
+        							<pluginExecutionFilter>
+        								<groupId>
+        									com.jayway.maven.plugins.android.generation2
+        								</groupId>
+        								<artifactId>
+        									android-maven-plugin
+        								</artifactId>
+        								<versionRange>
+        									[3.0.0,)
+        								</versionRange>
+        								<goals>
+        									<goal>proguard</goal>
+        								</goals>
+        							</pluginExecutionFilter>
+        							<action>
+        								<ignore></ignore>
+        							</action>
+        						</pluginExecution>
+        					</pluginExecutions>
+        				</lifecycleMappingMetadata>
+        			</configuration>
+        		</plugin>
+        	</plugins>
+        </pluginManagement>
     </build>
 </project>

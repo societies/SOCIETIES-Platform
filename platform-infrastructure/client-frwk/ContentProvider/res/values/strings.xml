@@ -6,4 +6,5 @@
 			CREATE TABLE integer_storage (_id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT, value INTEGER);
 			CREATE TABLE table_1 (_id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT, value TEXT, service TEXT, type TEXT);
 	</string>
+	<string name="autority">org.societies.android.platform.contentprovider</string>
 </resources>
