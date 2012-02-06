@@ -41,7 +41,8 @@ public class ServiceRegistry implements IServiceRegistry {
 
 						service.getServiceName(),
 						service.getServiceDescription(),
-						service.getAuthorSignature());
+						service.getAuthorSignature(), service.getServiceType(),
+						service.getServiceLocation());
 
 				Transaction t = session.beginTransaction();
 				session.save(tmpRegistryEntry);
@@ -74,15 +75,14 @@ public class ServiceRegistry implements IServiceRegistry {
 						new ServiceResourceIdentifier(new URI(service
 								.getServiceIdentifier().toString())),
 						service.getCSSIDInstalled(), service.getVersion(),
-
 						service.getServiceName(),
 						service.getServiceDescription(),
-						service.getAuthorSignature());
-			
+						service.getAuthorSignature(), service.getServiceType(),
+						service.getServiceLocation());
 
-			Transaction t = session.beginTransaction();
-			session.delete(tmpRegistryEntry);
-			t.commit();
+				Transaction t = session.beginTransaction();
+				session.delete(tmpRegistryEntry);
+				t.commit();
 			}
 
 		} catch (URISyntaxException e) {
