@@ -49,7 +49,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.util.Log;
 
-public class DifferentProcessService extends Service implements IContentProvider {
+public class ContentProviderService extends Service implements IContentProvider {
 
 	private Messenger inMessenger;
 	StoreResultsDB  storeDB;
@@ -81,7 +81,7 @@ public class DifferentProcessService extends Service implements IContentProvider
 			
 					}
 								
-					Method method = DifferentProcessService.this.getClass().getMethod(ServiceMethodTranslator.getMethodName(IContentProvider.methodsArray, message.what), parameters);
+					Method method = ContentProviderService.this.getClass().getMethod(ServiceMethodTranslator.getMethodName(IContentProvider.methodsArray, message.what), parameters);
 					Log.d(this.getClass().getName(), "Found method: " + method.getName());
 					try {
 						Object params [] = new Object [ServiceMethodTranslator.getParameterNumber(targetMethod)];
@@ -98,7 +98,7 @@ public class DifferentProcessService extends Service implements IContentProvider
 							params[i] = bundleMethod.invoke(message.getData(), bundleValue);
 							Log.d(this.getClass().getName(), "parameter i = " + i + " value: " + params[i]);
 						}
-						method.invoke(DifferentProcessService.this, params);
+						method.invoke(ContentProviderService.this, params);
 					} catch (IllegalArgumentException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -190,8 +190,5 @@ public class DifferentProcessService extends Service implements IContentProvider
 	}
 
 	
-
-	
-
 
 }
