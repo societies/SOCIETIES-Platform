@@ -30,7 +30,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 * A list of situations and the corresponding probability related to the
 	 * IntentAction
 	 */
-	HashMap<CRISTUserSituation, Double> actionSituations;
+	HashMap<ICRISTUserSituation, Double> actionSituations;
 	/**
 	 * The confidence level of the IntentAction
 	 */
@@ -210,11 +210,13 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 
 	}
 
+
+
 	@Override
 	public void setActionSituations(
 			HashMap<ICRISTUserSituation, Double> actionSituations) {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 }

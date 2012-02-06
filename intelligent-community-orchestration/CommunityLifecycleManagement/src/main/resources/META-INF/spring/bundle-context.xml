@@ -21,33 +21,36 @@
    </bean>
    
    <bean id="AutomaticCommunityCreationManager" class="org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityCreationManager" 
-   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, UserCtxHistoryManager, EntityIdentifier" init-method="initialiseAutomaticCommunityCreationManager">
+   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, CommunityCtxBroker, UserCtxBroker, UserCtxHistoryManager, EntityIdentifier" init-method="initialiseAutomaticCommunityCreationManager">
    <property name="linkedCss" ref="EntityIdentifier"></property>
    <property name="linkedDomain" ref="EntityIdentifier"></property>
    <property name="linkedSuperCis" ref="CisRecord"></property>
    <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>
    <property name="userContextBroker" ref="UserCtxBroker"></property>
    <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>
+   <property name="communityContextBroker" ref="CommunityCtxBroker"></property>
    </bean>
    
    <bean id="AutomaticCommunityConfigurationManager" class="org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityConfigurationManager" 
-   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, UserCtxHistoryManager, EntityIdentifier" init-method="initialiseAutomaticCommunityConfigurationManager">
+   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, CommunityCtxBroker, UserCtxBroker, UserCtxHistoryManager, EntityIdentifier" init-method="initialiseAutomaticCommunityConfigurationManager">
    <property name="linkedCss" ref="EntityIdentifier"></property>
    <property name="linkedCis" ref="CisRecord"></property>
    <property name="linkedDomain" ref="EntityIdentifier"></property>
    <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>
    <property name="userContextBroker" ref="UserCtxBroker"></property>
    <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>
+   <property name="communityContextBroker" ref="CommunityCtxBroker"></property>
    </bean>
    
    <bean id="AutomaticCommunityDeletionManager" class="org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityDeletionManager" 
-   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, UserCtxHistoryManager, EntityIdentifier" init-method="initialiseAutomaticCommunityDeletionManager">
+   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, CommunityCtxBroker, UserCtxBroker, UserCtxHistoryManager, EntityIdentifier" init-method="initialiseAutomaticCommunityDeletionManager">
    <property name="linkedCss" ref="EntityIdentifier"></property>
    <property name="linkedCis" ref="CisRecord"></property>
    <property name="linkedDomain" ref="EntityIdentifier"></property>
    <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>
    <property name="userContextBroker" ref="UserCtxBroker"></property>
    <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>
+   <property name="communityContextBroker" ref="CommunityCtxBroker"></property>
    </bean>
 <!--   <context:component-scan base-package="org.societies.orchestration.CommunityLifecycleManagement.impl"></context:component-scan> -->
 </beans>
