@@ -14,8 +14,8 @@
 	<osgi:service ref="CalcServiceRemote" interface="org.societies.comm.examples.commsmanager.ICalcRemote" />
 	
 	<osgi:reference id="CommManagerBundle" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
-	<osgi:reference id="FortuneCookieBundle" interface="org.societies.comm.examples.fortunecookie.api.IWisdom"/>
-	<osgi:reference id="CalculatorBundle" interface="org.societies.comm.examples.calculator.ICalc"/>
+	<osgi:reference id="FortuneCookieBundle" interface="org.societies.example.fortunecookie.IWisdom"/>
+	<osgi:reference id="CalculatorBundle" interface="org.societies.example.calculator.ICalc"/>
 	<osgi:reference id="ComplexBundle" interface="org.societies.example.complexservice.IComplexService"/>
 
 </beans>

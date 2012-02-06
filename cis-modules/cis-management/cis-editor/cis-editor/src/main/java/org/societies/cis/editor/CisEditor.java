@@ -32,6 +32,7 @@ import java.util.Set;
 //import org.societies.cis.mgmt;
 import org.societies.api.internal.cis.management.CisActivityFeed;
 import org.societies.api.internal.cis.management.CisRecord;
+import org.societies.api.internal.cis.management.ICisEditor;
 import org.societies.api.internal.cis.management.ServiceSharingRecord;
 
 public class CisEditor implements ICisEditor {
@@ -120,6 +121,16 @@ public class CisEditor implements ICisEditor {
 			return false;
 		return true;
 	}
+
+	public CisRecord getCisRecord() {
+		return cisRecord;
+	}
+
+	public void setCisRecord(CisRecord cisRecord) {
+		this.cisRecord = cisRecord;
+	}
+	
+	
 
     
     

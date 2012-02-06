@@ -25,7 +25,7 @@
 
 package org.societies.useragent.monitoring;
 
-import org.societies.api.internal.context.broker.IUserCtxBroker;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.useragent.monitoring.IInternalUserActionMonitor;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.personalisation.model.IAction;
@@ -34,7 +34,7 @@ import org.societies.api.useragent.monitoring.IUserActionMonitor;
 
 public class UserActionMonitor implements IUserActionMonitor, IInternalUserActionMonitor{
 	
-	private IUserCtxBroker ctxBroker;
+	private ICtxBroker ctxBroker;
 
 	@Override
 	public void monitor(IServiceResourceIdentifier serviceId, EntityIdentifier owner, IAction action) {
@@ -57,7 +57,7 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 		}
 	}
 
-	public void setCtxBroker(IUserCtxBroker broker){
+	public void setCtxBroker(ICtxBroker broker){
 		this.ctxBroker = broker;
 	}
 }

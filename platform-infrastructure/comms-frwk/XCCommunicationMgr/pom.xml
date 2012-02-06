@@ -33,15 +33,14 @@
 			<scope>compile</scope>
 		</dependency>
     	<!-- SCHEMA'S REQUIRED FOR EXAMPLE SERVICES - TO BE REMOVED LATER -->
-    	<!--
+    	<!-- 
     	<dependency>
 			<groupId>org.societies.example</groupId>
 			<artifactId>internalAPI</artifactId>
 			<version>0.1</version>
 			<scope>provided</scope>
 		</dependency>
-		-->
-    
+    	 -->
 		<!-- XMPP -->
 		<dependency>
 			<groupId>org.igniterealtime</groupId>

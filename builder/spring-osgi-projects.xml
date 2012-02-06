@@ -32,7 +32,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<groupId>org.societies</groupId>
 		<artifactId>version-parent</artifactId>
 		<version>0.1</version>
-		<relativePath>../parent/version.xml</relativePath>
 	</parent>
 
 	<!-- Setup the identity of this builder -->
@@ -71,7 +70,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		
 		<!-- Platform Infrastructure -->
 		<!-- Communications Infrastructure -->
-		
 		<module>../platform-infrastructure/comms-frwk/CommonLibraries</module>
 		<module>../platform-infrastructure/comms-frwk/CommunicationFrameworkCommons</module>
 		<module>../platform-infrastructure/comms-frwk/XCCommunicationMgr</module>
@@ -79,7 +77,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>../platform-infrastructure/comms-frwk/PubsubXEP</module>
 		<module>../platform-infrastructure/comms-frwk/PubsubServiceBundle</module>
 		<module>../platform-infrastructure/comms-frwk/PubsubClientBundle</module>
-		
+
 		<!--
 		<module>../platform-infrastructure/comms-frwk/ExampleServices/Calculator</module>
 		<module>../platform-infrastructure/comms-frwk/ExampleServices/CalculatorBean</module>
@@ -88,7 +86,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>../platform-infrastructure/comms-frwk/ExampleServices/ExampleServiceMgr</module>
 		 -->
 		 <!-- Service Registry -->
-		 <module>../platform-infrastructure/slm/serviceRegistry</module>
+		 <module>../css-modules/serviceRegistry</module>
+		 <module>../platform-infrastructure/servicelifcycle/serviceManagement/</module>
+		 <module>../platform-infrastructure/servicelifcycle/platformWebapp/</module>
 		
 		<!-- <module>../platform-infrastructure/comms-frwk/ClientCommunicationMgr</module> -->
 		

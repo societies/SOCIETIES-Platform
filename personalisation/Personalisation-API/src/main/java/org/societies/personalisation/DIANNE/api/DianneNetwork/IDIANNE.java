@@ -22,7 +22,9 @@ package org.societies.personalisation.DIANNE.api.DianneNetwork;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 
 /**
  * 
@@ -42,10 +44,10 @@ public interface IDIANNE {
 	public void getOutcome(EntityIdentifier ownerId, 
 			IServiceResourceIdentifier serviceId, 
 			String preferenceName, 
-			IDIANNECallback callback);
+			IPersonalisationInternalCallback callback);
 	
 	/**
-	 * This method will return the current value of the DIANNE preference, as an IDIANNEOutcome through the callback, given the new context update
+	 * This method will return any updated values of the DIANNE preferences, as an IDIANNEOutcome through the callback, given the new context update
 	 * @param ownerId	the DigitalIdentity of the owner of the preference
 	 * @param serviceId	the service identifier of the service requesting the outcome
 	 * @param preferenceName	the name of the preference being requested
@@ -53,10 +55,19 @@ public interface IDIANNE {
 	 * @param callback  the callback to which the IDIANNEOutcome is sent
 	 */
 	public void getOutcome(EntityIdentifier ownerId, 
-			IServiceResourceIdentifier serviceId, 
-			String preferenceName, 
 			CtxAttribute attribute, 
-			IDIANNECallback callback);
+			IPersonalisationInternalCallback callback);
+	
+	/**
+	 * This method will return any updated values of the DIANNE preferences, as an IDIANNEOutcome through the callback, given the new action update.
+	 * NOTE: This will always return null
+	 * @param ownerId  the DigitalIdentity of the owner of the DIANNE
+	 * @param action  the action update to implement in the DIANNE
+	 * @param callback  the callback to which the IDIANNEOutcome is sent
+	 */
+	public void getOutcome(EntityIdentifier ownerId, 
+			IAction action, 
+			IPersonalisationInternalCallback callback);
 	
 	/**
 	 * This method will start DIANNE learning

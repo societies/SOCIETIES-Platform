@@ -26,8 +26,9 @@ package org.societies.comm.examples.commsmanager.impl;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.Map;
 
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.datatypes.Identity;
@@ -35,9 +36,9 @@ import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.datatypes.XMPPNode;
+import org.societies.example.IExamplesCallback;
 import org.societies.example.calculatorservice.schema.CalcBeanResult;
 import org.societies.example.fortunecookieservice.schema.FortuneCookieBeanResult;
-import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
  * Describe your class here...
@@ -56,37 +57,40 @@ public class CommsClientCallback implements ICommCallback {
 							"org.societies.example.fortunecookieservice.schema",
 							"org.societies.example.complexservice.schema"));
 
-	private Future<?>returnObj;
-	private int returnInt=0;
+	//MAP TO STORE THE ALL THE CLIENT CONNECTIONS
+	private final Map<String, IExamplesCallback> calcClients = new HashMap<String, IExamplesCallback>();
 	
-	/** @return the returnInt  */
-	public int getReturnInt() {
-		return returnInt;
-	}
-
-	/** @param returnInt the returnInt to set */
-	public void setReturnInt(int returnInt) {
-		this.returnInt = returnInt;
-	}
-
-	public CommsClientCallback(Future<?> returnObj) {
-		this.returnObj = returnObj;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveResult(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	/** Constructor for callback
+	 * @param clientID unique ID of send request to comms framework
+	 * @param calcClient callback from originating client
 	 */
+	public CommsClientCallback(String clientID, IExamplesCallback calcClient) {
+		//STORE THIS CALLBACK WITH THIS REQUEST ID
+		calcClients.put(clientID, calcClient);
+	}
+
+	/**Returns the correct calculator client callback for this request 
+	 * @param requestID the id of the initiating request
+	 * @return
+	 * @throws UnavailableException
+	 */
+	private IExamplesCallback getRequestingClient(String requestID) {
+		IExamplesCallback requestingClient = (IExamplesCallback) calcClients.get(requestID);
+		calcClients.remove(requestID);
+		return requestingClient;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveResult(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object) */
 	@Override
 	public void receiveResult(Stanza returnStanza, Object msgBean) {
-		Identity endUser = returnStanza.getTo();
-		
 		//CHECK WHICH END SERVICE IS SENDING US A MESSAGE
 		// --------- CALCULATOR BUNDLE ---------
 		if (msgBean.getClass().equals(CalcBeanResult.class)) {
 			CalcBeanResult calcResult = (CalcBeanResult) msgBean;
-			//return the calcResult to the calling client
-			this.returnObj = new AsyncResult<Integer>(calcResult.getResult());
-			this.setReturnInt(calcResult.getResult() );
+			
+			IExamplesCallback calcClient = getRequestingClient(returnStanza.getId());
+			calcClient.receiveExamplesResult(calcResult.getResult());	
 		}
 		
 		// -------- FORTUNE COOKIE BUNDLE ---------

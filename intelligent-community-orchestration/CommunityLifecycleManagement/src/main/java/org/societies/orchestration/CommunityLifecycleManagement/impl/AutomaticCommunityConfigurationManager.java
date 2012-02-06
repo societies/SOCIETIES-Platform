@@ -53,6 +53,8 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.mock.EntityIdentifier;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This is the class for the Automatic Community Configuration Manager component
@@ -93,6 +95,8 @@ public class AutomaticCommunityConfigurationManager {
 	private IUserCtxBroker userContextBroker;
 	private ICommunityCtxBroker communityContextBroker;
 	private IUserCtxBrokerCallback userContextBrokerCallback;
+
+	private ArrayList<CisRecord> recentRefusals;
     
 	/*
      * Constructor for AutomaticCommunityConfigurationManager
@@ -134,7 +138,7 @@ public class AutomaticCommunityConfigurationManager {
 	
 	public void identifyCissToConfigure() {
 		ArrayList<CisRecord> cisRecords = new ArrayList();
-		
+		ArrayList<CisRecord> cissToConfigure = new ArrayList();
 		
 		if (linkedCss != null) {
 			//CisRecord[] records = ICisManager.getCisList(/** CISs administrated by the CSS */);
@@ -174,6 +178,52 @@ public class AutomaticCommunityConfigurationManager {
 		//invoke UserAgent suggestion GUI for configurations
 		//OR
 		//automatically call CIS management functions to configure CISs
+		
+		List<String> options = new ArrayList<String>();
+		options.add("options");
+		String userResponse = null;
+		boolean responded = false;
+		//userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs should be configured in certain ways. If you approve of any of the suggested reconfigurations, please check them.", options), userFeedbackCallback);
+		for (int i = 0; i < 300; i++) {
+		    if (userResponse == null)
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			else
+			    responded = true;
+		}
+		
+		if (responded == false) {
+		    //User obviously isn't paying attention to CSS, so put the message in the background/list of messages for them to see at their leisure.
+		    String background = "This message is in your inbox or something, waiting for you to read it";
+		}
+		else {
+		   	Iterator<CisRecord> iterator = cissToConfigure.iterator();
+			while (iterator.hasNext()) {
+			    CisRecord potentiallyConfigurableCis = iterator.next();
+		        if (userResponse.equals("Yes")) {
+				    //if "remove members"
+		        	//    attempt to remove members - perhaps SOCIETIES platform itself should have mechanism
+		        	//    where if a user deletion from CIS attempt is made, 
+		        	//    that user will be informed by the system and given a chance to respond?
+		        	//    The admin/owner could have an override option in case e.g. offensive person is being deleted.
+		        	//if "merge with other CIS"
+		        	//
+		        	//if "split into distinct CISs"
+		        	//
+		        	//if "switch sub-CIS and CIS"
+		        	//
+		        	//
+			       // cisManager.configureCis(linkedCss, potentiallyConfigurableCis.getCisId());
+		        }
+		        else {
+		    	    recentRefusals.add(potentiallyConfigurableCis);
+		        }
+		   }
+		}
 		
 	}
 	
