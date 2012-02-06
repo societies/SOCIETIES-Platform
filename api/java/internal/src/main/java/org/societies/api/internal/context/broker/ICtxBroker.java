@@ -380,7 +380,7 @@ public interface ICtxBroker {
 	 * @throws CtxException 
 	 * @since 0.0.1
 	 */
-	public Future<Boolean> setCtxHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+	public Future<Boolean> setHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
 			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException;
 
 	/**
@@ -392,7 +392,7 @@ public interface ICtxBroker {
 	 * @throws CtxException 
 	 * @since 0.0.1
 	 */
-	public Future<List<CtxAttributeIdentifier>> getCtxHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+	public Future<List<CtxAttributeIdentifier>> getHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
 			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException;
 
 	/**
@@ -404,7 +404,7 @@ public interface ICtxBroker {
 	 * @throws CtxException 
 	 * @since 0.0.1
 	 */
-	public Future<List<CtxAttributeIdentifier>> updateCtxHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+	public Future<List<CtxAttributeIdentifier>> updateHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
 			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException;
 
 	/**
@@ -416,7 +416,7 @@ public interface ICtxBroker {
 	 * @throws CtxException 
 	 * @since 0.0.1
 	 */
-	public Future<Boolean> removeCtxHistoryTuples(
+	public Future<Boolean> removeHistoryTuples(
 			CtxAttributeIdentifier primaryAttrIdentifier,
 			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException;
 	

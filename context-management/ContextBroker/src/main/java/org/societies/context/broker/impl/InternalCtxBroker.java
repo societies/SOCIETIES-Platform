@@ -185,12 +185,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		return null;
 	}
 
-	@Override
-	public Future<Integer> removeHistory(String type, Date startDate, Date endDate) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 	@Override
 	@Async
 	public Future<CtxModelObject> retrieve(CtxIdentifier identifier) throws CtxException {
@@ -219,19 +214,6 @@ public class InternalCtxBroker implements ICtxBroker {
 		return null;
 	}
 
-
-
-	@Override
-	@Async
-	public Future<List<CtxHistoryAttribute>> retrieveHistory(
-			CtxAttributeIdentifier attrId, Date startDate, Date endDate) throws CtxException {
-		
-		final List<CtxHistoryAttribute> result = new ArrayList<CtxHistoryAttribute>();
-		
-		result.addAll(this.userCtxHistoryMgr.retrieveHistory(attrId, startDate, endDate));
-	
-		return new AsyncResult<List<CtxHistoryAttribute>>(result);
-	}
 
 	@Override
 	public void unregisterForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
@@ -334,37 +316,8 @@ public class InternalCtxBroker implements ICtxBroker {
 		}
 	}
 
-	@Override
-	public Future<Boolean> setCtxHistoryTuples(
-			CtxAttributeIdentifier primaryAttrIdentifier,
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public Future<List<CtxAttributeIdentifier>> getCtxHistoryTuples(
-			CtxAttributeIdentifier primaryAttrIdentifier,
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Future<List<CtxAttributeIdentifier>> updateCtxHistoryTuples(
-			CtxAttributeIdentifier primaryAttrIdentifier,
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Future<Boolean> removeCtxHistoryTuples(
-			CtxAttributeIdentifier primaryAttrIdentifier,
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 	@Override
 	public Future<IndividualCtxEntity> retrieveAdministratingCSS(
@@ -535,6 +488,26 @@ public class InternalCtxBroker implements ICtxBroker {
 			throw new IllegalArgumentException(value + ": Invalid value type");
 	}
 
+	
+	
+	
+	//***********************************************
+	//     Context History Management Methods  
+	//***********************************************
+	
+	
+	@Override
+	@Async
+	public Future<List<CtxHistoryAttribute>> retrieveHistory(
+			CtxAttributeIdentifier attrId, Date startDate, Date endDate) throws CtxException {
+		
+		final List<CtxHistoryAttribute> result = new ArrayList<CtxHistoryAttribute>();
+		
+		result.addAll(this.userCtxHistoryMgr.retrieveHistory(attrId, startDate, endDate));
+	
+		return new AsyncResult<List<CtxHistoryAttribute>>(result);
+	}
+	
 	@Override
 	public Future<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>> retrieveHistoryTuples(
 			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1,
@@ -549,4 +522,40 @@ public class InternalCtxBroker implements ICtxBroker {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public Future<List<CtxAttributeIdentifier>> getHistoryTuples(
+			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1)
+			throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<Boolean> removeHistoryTuples(CtxAttributeIdentifier arg0,
+			List<CtxAttributeIdentifier> arg1) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<Boolean> setHistoryTuples(CtxAttributeIdentifier arg0,
+			List<CtxAttributeIdentifier> arg1) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<List<CtxAttributeIdentifier>> updateHistoryTuples(
+			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1)
+			throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public Future<Integer> removeHistory(String type, Date startDate, Date endDate) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
