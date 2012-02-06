@@ -31,7 +31,9 @@ import java.util.List;
 
 import org.junit.Test;
 import org.societies.api.internal.servicelifecycle.model.Service;
+import org.societies.api.internal.servicelifecycle.model.ServiceLocation;
 import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.internal.servicelifecycle.model.ServiceType;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,7 +123,8 @@ public class ServiceRegistryTest extends
 				returnedServiceList.add(new Service(
 						new ServiceResourceIdentifier(new URI(serviceUri + i)),
 						"cSSIDInstalled", "1.0", "serviceName" + i,
-						"serviceDescription" + i, "authorSignature"));
+						"serviceDescription" + i, "authorSignature",
+						ServiceType.CoreService, ServiceLocation.Local));
 			} catch (URISyntaxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
