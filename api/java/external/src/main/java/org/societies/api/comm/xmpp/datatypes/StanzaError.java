@@ -35,9 +35,9 @@ public enum StanzaError {
 	private StanzaError(String error, ErrorType type, boolean hasText) {
 		this.errorName = error;
 		if (hasText)
-			errorString = "<error type='"+type.toString()+"'>\n<"+error+" xmlns='"+XMPPError.STANZA_ERROR_NAMESPACE_DECL+"'>\n";
+			errorString = "<error type='"+type.toString()+"'><"+error+" xmlns='"+XMPPError.STANZA_ERROR_NAMESPACE_DECL+"'>"; // TODO removed line breaks for debug
 		else
-			errorString = "<error type='"+type.toString()+"'>\n<"+error+" xmlns='"+XMPPError.STANZA_ERROR_NAMESPACE_DECL+"'/>\n";
+			errorString = "<error type='"+type.toString()+"'><"+error+" xmlns='"+XMPPError.STANZA_ERROR_NAMESPACE_DECL+"'/>";
 		errorBytes = errorString.getBytes();
 		this.hasText = hasText;
 	}

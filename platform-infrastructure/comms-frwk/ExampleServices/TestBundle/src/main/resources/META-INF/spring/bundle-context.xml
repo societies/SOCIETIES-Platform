@@ -13,10 +13,5 @@
        bundle. The configuration of OSGi definitions is kept in a separate 
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
-	<bean id="pubsubClient" class="org.societies.comm.xmpp.pubsub.impl.PubsubClientImpl">
-            <constructor-arg ref="xcCommunication"/>
-    </bean>
-    <bean id="pubsubEventFactory" class="org.societies.comm.xmpp.event.impl.PubsubEventFactoryImpl">
-            <constructor-arg ref="pubsubClient"/>
-    </bean>
+	<context:component-scan base-package="org.societies.comm.test"></context:component-scan>
 </beans>
