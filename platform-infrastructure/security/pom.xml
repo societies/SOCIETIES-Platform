@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+			http://maven.apache.org/maven-v4_0_0.x">
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- All builder projects should inherit from version-parent -->
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>version-parent</artifactId>
+		<version>0.1</version>
+		<relativePath>../../parent/version.xml</relativePath>
+	</parent>
+
+	<!-- Identity of this builder -->
+	<groupId>org.societies</groupId>
+	<artifactId>security-builder</artifactId>
+	<packaging>pom</packaging>
+	<version>0.1</version>
+	<name>Security Components Builder</name>
+
+   <!-- Modules to build -->
+	<modules>
+		<module>SecureStorage</module>
+		<module>SignatureMgr</module>
+		<module>PolicyNegotiator</module>
+	</modules>
+
+</project>
