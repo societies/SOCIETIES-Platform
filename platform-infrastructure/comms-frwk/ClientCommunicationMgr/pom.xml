@@ -15,14 +15,20 @@
     <artifactId>ClientCommunicationMgr</artifactId>
     <packaging>jar</packaging>
     <name>Client Communication Manager</name>
-    <version>${release.version}</version>
+    <version>${version.comm}</version>
 	
 	
 	<dependencies>
 		<dependency>
   			<groupId>org.societies.comm.xmpp</groupId>
   			<artifactId>CommunicationFrameworkCommons</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
+			<version>${version.comm}</version>
+  			<scope>provided</scope>
+  		</dependency>
+		<dependency>
+  			<groupId>org.societies.api.external</groupId>
+  			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
   			<scope>provided</scope>
   		</dependency>
 		<dependency>
@@ -44,17 +50,25 @@
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>AndroidAgentApi</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${version.comm}</version>
 		</dependency>
-		<!--dependency> <!- TODO: remove this dependency by extracting TinderUtils from artifact ->
-			<groupId>org.societies.comm.xmpp</groupId>
-			<artifactId>XCCommunicationMgr</artifactId>
-			<version>0.1</version>
-		</dependency-->
-		<!--dependency>
-			<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId>
-			<version>2.10.0</version>
-		</dependency-->
+		<dependency> <!-- http://code.google.com/p/asmack/ -->
+			<groupId>asmack</groupId>
+			<artifactId>asmack</artifactId>
+			<version>2010.12.11</version>
+		</dependency>
   	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.5</source> <!-- TODO version 1.6 throws verify error -->
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

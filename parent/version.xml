@@ -20,15 +20,15 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 	<!-- master properties for component blocks -->
 	<release.groupId>org.societies</release.groupId>
 	<!-- EPapadopoulou: added version.pm property -->
-	<version.pm>${release.version}.1</version.pm>
-	<version.spm>${release.version}.1</version.spm>
+	<version.pm>${release.version}-SNAPSHOT</version.pm>
+	<version.spm>${release.version}-SNAPSHOT</version.spm>
 	<!-- SGallacher: added version.cm property (Context Management) -->
-	<version.cm>${release.version}.1</version.cm>
+	<version.cm>${release.version}-SNAPSHOT</version.cm>
 	<!-- SGallacher: added version.ua property (User Agent) -->
-	<version.ua>${release.version}.1</version.ua>
+	<version.ua>${release.version}-SNAPSHOT</version.ua>
 	<!-- FRBlackmun: added version.ico property (Intelligent Community Orchestration) -->
-	<version.ico>${release.version}.1</version.ico>
+	<version.ico>${release.version}-SNAPSHOT</version.ico>
 	<!-- aleckey: added version.comm property (Communication Framework) -->
-	<version.comm>${release.version}.1</version.comm>
+	<version.comm>${release.version}-SNAPSHOT</version.comm>
     </properties>
 </project>

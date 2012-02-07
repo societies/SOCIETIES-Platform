@@ -39,14 +39,15 @@ import org.societies.api.personalisation.model.Action;
 
 public class UserIntentAction extends Action implements IUserIntentAction, Serializable {
 
+	String taskID = "none";
 	String actionID ;
 	HashMap<String,Serializable> actionContext = new HashMap<String,Serializable>(); 
 	private int confidenceLevel;
-	
+
 	private double transProb;
-	
+
 	private long duration;
-	
+
 	public UserIntentAction(String par, String val,Long id, double transProb){
 		super(par,val);
 		this.actionID = par +"="+val+"/"+id; 
@@ -56,20 +57,20 @@ public class UserIntentAction extends Action implements IUserIntentAction, Seria
 
 
 	private static final long serialVersionUID = 1L;
-	
+
 
 	@Override
 	public String getActionID() {
 
 		return this.actionID;
 	}
-	
+
 	@Override
 	public String toString() {
 		String string = this.actionID+" "+transProb;
 		return string;
 	}
-	
+
 	@Override
 	public HashMap<String, Serializable> getActionContext() {
 		return this.actionContext;
@@ -101,5 +102,15 @@ public class UserIntentAction extends Action implements IUserIntentAction, Seria
 
 	public void setDuration(long duration) {
 		this.duration = duration;
+	}
+
+	@Override
+	public void setTaskID(String taskID) {
+		this.taskID = taskID;
+	}
+
+	@Override
+	public String getTaskID() {
+		return this.taskID ;
 	}
 }

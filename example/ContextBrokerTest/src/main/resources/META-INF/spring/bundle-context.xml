@@ -8,8 +8,8 @@
 		this file can easily be used for integration testing outside of an OSGi environment -->
 
 	<bean name="CtxBrokerTest" class="org.societies.context.brokerTest.impl.CtxBrokerTest"
-		depends-on="UserCtxBroker" init-method="initialiseCtxBrokerTest">
-		<property name="ctxBroker" ref="UserCtxBroker"></property>
+		depends-on="CtxBroker" init-method="initialiseCtxBrokerTest">
+		<property name="ctxBroker" ref="CtxBroker"></property>
 
 	</bean>
 </beans>

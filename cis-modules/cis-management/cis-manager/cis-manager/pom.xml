@@ -2,12 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.societies.cis.management</groupId>
+  <groupId>org.societies.cis</groupId>
   <artifactId>cis-manager</artifactId>
   <packaging>bundle</packaging>
   <name>Spring OSGi Bundle</name>
   <version>${release.version}</version>
-  <url>http://www.springframework.org/osgi</url>
   
 	<developers>
 	    <developer>
@@ -30,16 +29,16 @@
 
 	<dependencies>
 	<!-- add your dependencies here -->
-  <dependency>
-  	<groupId>org.societies.api.internal</groupId>
-	<version>${release.version}</version>
+<dependency>
+	<groupId>org.societies.api.internal</groupId>
 	<artifactId>societies-api-internal</artifactId>
-</dependency>	
+	<version>${release.version}</version>
+</dependency>
 		
   <dependency>  
-  <groupId>org.societies.cis.management</groupId>
-  <version>${release.version}</version>
+  <groupId>org.societies.cis</groupId>
   <artifactId>cis-editor</artifactId>
+   <version>${release.version}</version>
 </dependency>	
 	
 	
@@ -58,7 +57,7 @@
 						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<Import-Package></Import-Package>
+						<Import-Package>*;resolution:=optional</Import-Package>
 						<Export-Package></Export-Package>
 					</instructions>
 				</configuration>

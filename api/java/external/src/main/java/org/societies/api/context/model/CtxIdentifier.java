@@ -142,4 +142,65 @@ public abstract class CtxIdentifier implements Serializable {
 		result.append(this.getObjectNumber());
 		return result.toString();
 	}
+	
+	/**
+     * @see java.lang.Object#hashCode()
+     * @since 0.0.2
+     */
+    @Override
+    public int hashCode() {
+    	
+        final int prime = 31;
+        int result = 1;
+        
+        result = prime * result
+                + ((this.operatorId == null) ? 0 : this.operatorId.hashCode());
+        result = prime * result
+                + ((this.getModelType() == null) ? 0 : this.getModelType().hashCode());
+        result = prime * result
+                + ((this.type == null) ? 0 : this.type.hashCode());
+        result = prime * result
+                + ((this.objectNumber == null) ? 0 : this.objectNumber.hashCode());
+        
+        return result;
+    }
+	
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 * @since 0.0.2
+	 */
+	@Override
+    public boolean equals(Object that) {
+		
+        if (this == that)
+            return true;
+        if (that == null)
+            return false;
+        if (this.getClass() != that.getClass())
+            return false;
+        
+        CtxIdentifier other = (CtxIdentifier) that;
+        if (this.operatorId == null) {
+            if (other.operatorId != null)
+                return false;
+        } else if (!this.operatorId.equals(other.operatorId))
+            return false;
+        if (this.getModelType() == null) {
+            if (other.getModelType() != null)
+                return false;
+        } else if (!this.getModelType().equals(other.getModelType()))
+            return false;
+        if (this.type == null) {
+            if (other.type != null)
+                return false;
+        } else if (!this.type.equals(other.type))
+            return false;
+        if (this.objectNumber == null) {
+            if (other.objectNumber != null)
+                return false;
+        } else if (!this.objectNumber.equals(other.objectNumber))
+            return false;
+        
+        return true;
+    }
 }

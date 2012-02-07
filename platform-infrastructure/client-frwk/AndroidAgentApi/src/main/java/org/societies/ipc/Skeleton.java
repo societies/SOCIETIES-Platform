@@ -1,7 +1,6 @@
 package org.societies.ipc;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 import android.os.Handler;
 import android.os.Message;

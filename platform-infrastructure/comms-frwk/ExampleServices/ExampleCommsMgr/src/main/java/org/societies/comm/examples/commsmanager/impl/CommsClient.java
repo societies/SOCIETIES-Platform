@@ -24,16 +24,28 @@
  */
 package org.societies.comm.examples.commsmanager.impl;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.comm.examples.commsmanager.ICalcRemote;
-import org.societies.comm.xmpp.datatypes.Identity;
-import org.societies.comm.xmpp.datatypes.Identity.IdentityType;
-import org.societies.comm.xmpp.datatypes.Stanza;
-import org.societies.comm.xmpp.exceptions.CommunicationException;
-import org.societies.comm.xmpp.interfaces.CommManager;
+import org.societies.comm.xmpp.datatypes.IdentityImpl;
+import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.comm.xmpp.datatypes.IdentityType;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.api.comm.xmpp.datatypes.XMPPNode;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.example.calculator.ICalcRemote;
+import org.societies.example.IExamplesCallback;
 import org.societies.example.calculatorservice.schema.CalcBean;
 import org.societies.example.calculatorservice.schema.MethodType;
 import org.springframework.scheduling.annotation.Async;
@@ -44,70 +56,124 @@ import org.springframework.scheduling.annotation.Async;
  * @author aleckey
  *
  */
-public class CommsClient implements ICalcRemote{
+public class CommsClient implements ICalcRemote, ICommCallback{
+	private static final List<String> NAMESPACES = Collections.unmodifiableList(
+			  Arrays.asList("http://societies.org/example/calculatorservice/schema",
+					  		"http://societies.org/example/fortunecookieservice/schema",
+					  		"http://societies.org/example/complexservice/schema"));
+	private static final List<String> PACKAGES = Collections.unmodifiableList(
+			  Arrays.asList("org.societies.example.calculatorservice.schema",
+							"org.societies.example.fortunecookieservice.schema",
+							"org.societies.example.complexservice.schema"));
+
 	//PRIVATE VARIABLES
-	private CommManager commManager;
-	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
+	private ICommManager commManager;
+	private static Logger LOG = LoggerFactory.getLogger(CommsClient.class);
 	
 	//PROPERTIES
-	public CommManager getCommManager() {
+	public ICommManager getCommManager() {
 		return commManager;
 	}
 
-	public void setCommManager(CommManager commManager) {
+	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
 	}
 
 	public CommsClient() {}
 
+	public void InitService() {
+		//REGISTER OUR ServiceManager WITH THE XMPP Communication Manager
+		try {
+			getCommManager().register(this); 
+		} catch (CommunicationException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.societies.comm.examples.commsmanager.ICalcRemote#AddAsync(int, int)
 	 */
 	@Override
 	@Async
-	public Future<Integer> AddAsync(int valA, int valB) {
-		Identity id = new Identity(IdentityType.CSS, "XCManager", "red.local"); 
-		Stanza stanza = new Stanza(id);
+	public void Add(int valA, int valB, IExamplesCallback calcCallback) {
+		//Identity id = new IdentityImpl(IdentityType.CSS, "XCManager", "red.local");
+		Identity toIdentity = new Identity(IdentityType.CSS, "XCManager", "red.local") {
+			@Override
+			public String getJid() {
+				return getIdentifier() + "." + getDomainIdentifier();
+			}
+		};
+		Stanza stanza = new Stanza(toIdentity);
 
-		//SETUP RETURN STUFF
-		Future<Integer> returnObj = null;
-		CommsClientCallback callback = new CommsClientCallback(returnObj);
-		
+		//SETUP CALC CLIENT RETURN STUFF
+		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), calcCallback);
+
+		//CREATE MESSAGE BEAN
 		CalcBean calc = new CalcBean();
 		calc.setA(valA); 
 		calc.setB(valB);
-		calc.setMethod(MethodType.ADD_ASYNC);
+		calc.setMethod(MethodType.ADD);
 		try {
+			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
 			commManager.sendIQGet(stanza, calc, callback);
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
 		};
-		
-		return returnObj;
 	}
 	
-	public int Add(int valA, int valB) {
-		Identity id = new Identity(IdentityType.CSS, "XCManager", "red.local"); 
-		Stanza stanza = new Stanza(id);
 
-		//SETUP RETURN STUFF
-		CommsClientCallback callback = new CommsClientCallback(null);
-		
+	@Override
+	public void Subtract(int valA, int valB, IExamplesCallback calcCallback) {
+		Identity toIdentity = new Identity(IdentityType.CSS, "XCManager", "red.local") {
+			@Override
+			public String getJid() {
+				return getIdentifier() + "." + getDomainIdentifier();
+			}
+		};
+		Stanza stanza = new Stanza(toIdentity);
+
+		//SETUP CALC CLIENT RETURN STUFF
+		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), calcCallback);
+
+		//CREATE MESSAGE BEAN
 		CalcBean calc = new CalcBean();
 		calc.setA(valA); 
 		calc.setB(valB);
-		calc.setMethod(MethodType.ADD_ASYNC);
+		calc.setMethod(MethodType.SUBTRACT);
 		try {
+			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
 			commManager.sendIQGet(stanza, calc, callback);
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
 		};
-		
-		return callback.getReturnInt();
 	}
 
-	public int Subtract(int valA, int valB) {
-		return 0;
+	/* (non-Javadoc)
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#getJavaPackages() */
+	@Override
+	public List<String> getJavaPackages() {
+		return PACKAGES;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#getXMLNamespaces() */
+	@Override
+	public List<String> getXMLNamespaces() {
+		return NAMESPACES;
+	}
+
+	@Override
+	public void receiveError(Stanza arg0, XMPPError arg1) { }
+
+	@Override
+	public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) { }
+
+	@Override
+	public void receiveItems(Stanza arg0, String arg1, List<XMPPNode> arg2) { }
+
+	@Override
+	public void receiveMessage(Stanza arg0, Object arg1) { }
+
+	@Override
+	public void receiveResult(Stanza arg0, Object arg1) { }
 }

@@ -5,20 +5,29 @@
 
     <groupId>org.societies</groupId>
     <artifactId>AndroidAgent</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>${version.comm}</version>
     <packaging>apk</packaging>
+
+    <parent>
+	    <groupId>org.societies</groupId>
+	    <artifactId>android-parent</artifactId>
+	    <version>0.1</version>
+    </parent>
 
     <dependencies>
 	<dependency>
 	    <groupId>org.societies.comm.xmpp</groupId>
 	    <artifactId>CommunicationFrameworkCommons</artifactId>
-	    <version>0.0.1-SNAPSHOT</version>
+	    <version>${version.comm}</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.societies.utilities</groupId>
+	    <artifactId>DBC</artifactId>
+	    <version>${release.version}</version>
 	</dependency>
         <dependency>
-            <groupId>com.google.android</groupId>
+            <groupId>android</groupId>
             <artifactId>android</artifactId>
-            <version>2.2.1</version>
-            <scope>provided</scope>
         </dependency>
 	<dependency>
 	    <groupId>org.slf4j</groupId>
@@ -28,28 +37,17 @@
 	<dependency>
 		<groupId>org.societies</groupId>
 		<artifactId>AndroidAgentApi</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>${version.comm}</version>
 	</dependency>
-	<!--dependency>
-		<groupId>org.igniterealtime.smack</groupId>
-		<artifactId>smack</artifactId>
-		<version>3.2.1</version>
-	</dependency>
-	<dependency>
-		<groupId>org.igniterealtime.smack</groupId>
-		<artifactId>smackx</artifactId>
-		<version>3.2.1</version>
-	</dependency-->
-	<dependency>
-		<groupId>pt.ptin.iex.ctx.android.smack</groupId>
-		<artifactId>asmack-ptin</artifactId>
-		<version>1.0-SNAPSHOT</version>
+	<dependency> <!-- http://code.google.com/p/asmack/ -->
+		<groupId>asmack</groupId>
+		<artifactId>asmack</artifactId>
+		<version>2010.12.11</version>
 	</dependency>
     </dependencies>
 
     <build>
 <finalName>${project.artifactId}</finalName>
-	    <sourceDirectory>src</sourceDirectory>
 	    <pluginManagement>
 		    <plugins>
 			    <plugin>

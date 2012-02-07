@@ -16,13 +16,6 @@
         <osgi:interfaces>
         <value>org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE</value>
         </osgi:interfaces>
-        </osgi:service>        
-		
-		
-		<osgi:reference id="UserActionMonitor" interface="org.societies.api.internal.useragent.monitoring.IInternalUserActionMonitor"/>
-		<osgi:reference id="UserCtxBroker" interface="org.societies.api.internal.context.broker.IUserCtxBroker"/>
-		
-		
-		
+        </osgi:service>        		
 
 </beans>

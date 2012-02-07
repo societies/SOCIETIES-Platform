@@ -24,15 +24,19 @@
  */
 package org.societies.comm.examples.commsmanager.impl;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Future;
+import java.util.Map;
 
-import org.societies.comm.xmpp.datatypes.Identity;
-import org.societies.comm.xmpp.datatypes.Stanza;
-import org.societies.comm.xmpp.datatypes.XMPPError;
-import org.societies.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.comm.xmpp.datatypes.XMPPNode;
-import org.societies.comm.xmpp.interfaces.CommCallback;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.api.comm.xmpp.datatypes.XMPPNode;
+import org.societies.example.IExamplesCallback;
 import org.societies.example.calculatorservice.schema.CalcBeanResult;
 import org.societies.example.fortunecookieservice.schema.FortuneCookieBeanResult;
 
@@ -42,39 +46,51 @@ import org.societies.example.fortunecookieservice.schema.FortuneCookieBeanResult
  * @author aleckey
  *
  */
-public class CommsClientCallback implements CommCallback{
+public class CommsClientCallback implements ICommCallback {
 
-	private Future<?>returnObj;
-	private int returnInt=0;
+	private static final List<String> NAMESPACES = Collections.unmodifiableList(
+			  Arrays.asList("http://societies.org/example/calculatorservice/schema",
+					  		"http://societies.org/example/fortunecookieservice/schema",
+					  		"http://societies.org/example/complexservice/schema"));
+	private static final List<String> PACKAGES = Collections.unmodifiableList(
+			  Arrays.asList("org.societies.example.calculatorservice.schema",
+							"org.societies.example.fortunecookieservice.schema",
+							"org.societies.example.complexservice.schema"));
+
+	//MAP TO STORE THE ALL THE CLIENT CONNECTIONS
+	private final Map<String, IExamplesCallback> calcClients = new HashMap<String, IExamplesCallback>();
 	
-	/** @return the returnInt  */
-	public int getReturnInt() {
-		return returnInt;
-	}
-
-	/** @param returnInt the returnInt to set */
-	public void setReturnInt(int returnInt) {
-		this.returnInt = returnInt;
-	}
-
-	public CommsClientCallback(Future<?> returnObj) {
-		this.returnObj = returnObj;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveResult(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	/** Constructor for callback
+	 * @param clientID unique ID of send request to comms framework
+	 * @param calcClient callback from originating client
 	 */
+	public CommsClientCallback(String clientID, IExamplesCallback calcClient) {
+		//STORE THIS CALLBACK WITH THIS REQUEST ID
+		calcClients.put(clientID, calcClient);
+	}
+
+	/**Returns the correct calculator client callback for this request 
+	 * @param requestID the id of the initiating request
+	 * @return
+	 * @throws UnavailableException
+	 */
+	private IExamplesCallback getRequestingClient(String requestID) {
+		IExamplesCallback requestingClient = (IExamplesCallback) calcClients.get(requestID);
+		calcClients.remove(requestID);
+		return requestingClient;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveResult(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object) */
 	@Override
 	public void receiveResult(Stanza returnStanza, Object msgBean) {
-		Identity endUser = returnStanza.getTo();
-		
 		//CHECK WHICH END SERVICE IS SENDING US A MESSAGE
 		// --------- CALCULATOR BUNDLE ---------
 		if (msgBean.getClass().equals(CalcBeanResult.class)) {
 			CalcBeanResult calcResult = (CalcBeanResult) msgBean;
-			//return the calcResult to the calling client
-			//this.returnObj = new AsyncResult<Integer>(calcResult.getResult());
-			this.setReturnInt(calcResult.getResult() );
+			
+			IExamplesCallback calcClient = getRequestingClient(returnStanza.getId());
+			calcClient.receiveExamplesResult(calcResult.getResult());	
 		}
 		
 		// -------- FORTUNE COOKIE BUNDLE ---------
@@ -85,21 +101,17 @@ public class CommsClientCallback implements CommCallback{
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.interfaces.CommCallback#getJavaPackages()
-	 */
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#getJavaPackages() */
 	@Override
 	public List<String> getJavaPackages() {
-		// TODO Auto-generated method stub
-		return null;
+		return PACKAGES;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.interfaces.CommCallback#getXMLNamespaces()
-	 */
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#getXMLNamespaces() */
 	@Override
 	public List<String> getXMLNamespaces() {
-		// TODO Auto-generated method stub
-		return null;
+		return NAMESPACES;
 	}
 
 	/* (non-Javadoc)
@@ -107,7 +119,7 @@ public class CommsClientCallback implements CommCallback{
 	 */
 	@Override
 	public void receiveError(Stanza returnStanza, XMPPError info) {
-		// TODO Auto-generated method stub
+		System.out.println(info.getMessage());
 		
 	}
 
@@ -116,7 +128,7 @@ public class CommsClientCallback implements CommCallback{
 	 */
 	@Override
 	public void receiveInfo(Stanza returnStanza, String node, XMPPInfo info) {
-		// TODO Auto-generated method stub
+		System.out.println(info.getIdentityName());
 		
 	}
 
@@ -125,7 +137,7 @@ public class CommsClientCallback implements CommCallback{
 	 */
 	@Override
 	public void receiveItems(Stanza returnStanza, String node, List<XMPPNode> info) {
-		// TODO Auto-generated method stub
+		System.out.println(returnStanza.getTo());
 		
 	}
 
@@ -134,8 +146,7 @@ public class CommsClientCallback implements CommCallback{
 	 */
 	@Override
 	public void receiveMessage(Stanza returnStanza, Object messageBean) {
-		// TODO Auto-generated method stub
-		
+		System.out.println(messageBean.getClass().toString());		
 	}
 	
 

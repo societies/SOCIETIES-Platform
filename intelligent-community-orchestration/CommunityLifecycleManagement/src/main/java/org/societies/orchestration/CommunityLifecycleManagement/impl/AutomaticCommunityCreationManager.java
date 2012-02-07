@@ -126,7 +126,31 @@ public class AutomaticCommunityCreationManager {
 	}
 	
 	public ArrayList<EntityIdentifier> getIDsOfInteractingCsss() {
-		return null;
+		//What CSSs is this one currently interacting with?
+		//Found by: For each service, shared service, and resource the user is using (in the last ~5 minutes), is there an end-CSS they're interacting with?
+		//Is there a CSS they're indirectly interacting with over the service?
+		
+		
+		//Needs a framework for capturing this in the platform.
+		//It needs a timestamp for this, so either the context is stored with timestamps or 
+		//we get it from the CSS activity feed (which isn't implemented yet)
+		ArrayList<EntityIdentifier> interactingCsss = null;
+		
+		userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services", userContextBrokerCallback);
+		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
+        //
+		//    Get the lists from the callbacks
+		//
+		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
+		//}
+//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
+
+		
+		
+		return interactingCsss;
 	}
 	
 	/*
@@ -232,6 +256,16 @@ public class AutomaticCommunityCreationManager {
 				interactedCssIDs = getIDsOfInteractingCsss();
 				//retrieve recent history of certain kinds of context data on CSS user and inter-CSS connections 
 				//amongst their immediate connection neighbourhood as possible.
+				
+				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "local CSSs", userContextBrokerCallback);
+				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+				//historyOfLocalCsss.add(thisResult);
+				//ArrayList<EntityIdentifier> people = userCssDirectory.getContextMatchingCsss(list);
+				//if (people.size() >= 2)
+				//    for (int i = 0; i < cisManager.getCiss(); i++)
+				//        if (!cisManager.getCiss().get(i).getMembers() == people)
+				//            cissToCreate.add(new CisRecord(null, linkedCss, "Local proximity", null, null, null, null, null));
+				
 				
 				// processing - here or delegated to local method
 				if (localCsss != null) {
