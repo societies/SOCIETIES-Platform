@@ -1,15 +1,16 @@
 package org.societies.comm.xmpp.xc.impl;
 
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import org.dom4j.Element;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.datatypes.XMPPNode;
-import org.xml.sax.InputSource;
 
 public class ParsingUtils {
 	
-	public static Map<String, XMPPInfo> parseInfoResult(InputSource inputSource) {
+	public static SimpleEntry<String, XMPPInfo> parseInfoResult(Element element) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -21,9 +22,14 @@ public class ParsingUtils {
 		return ("<query xmlns='"+XMPPInfo.INFO_NAMESPACE+"' "+nodePart+"/>\n").getBytes();
 	}
 	
-	public static Map<String, List<XMPPNode>> parseItemsResult(InputSource inputSource) {
-		// TODO Auto-generated method stub
-		return null;
+	public static SimpleEntry<String, List<String>> parseItemsResult(Element element) {
+		String node = element.attributeValue("node");
+		List<String> list = new ArrayList<String>();
+		for (Object o : element.elements()) {
+			Element e = (Element) o; 
+			list.add(e.attributeValue("node"));
+		}
+		return new SimpleEntry<String, List<String>>(node, list);
 	}
 	
 	public static byte[] getItemsQueryRequestBytes(String node) {

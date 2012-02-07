@@ -68,9 +68,9 @@ public interface ICommManager {
 
 	public void removeRootNode(XMPPNode node);
 	
-	public void getInfo(Identity entity, String node, ICommCallback callback) throws CommunicationException;
+	public String getInfo(Identity entity, String node, ICommCallback callback) throws CommunicationException;
 	
-	public void getItems(Identity entity, String node, ICommCallback callback) throws CommunicationException;
+	public String getItems(Identity entity, String node, ICommCallback callback) throws CommunicationException;
 	
 	public Identity getIdentity();
 	

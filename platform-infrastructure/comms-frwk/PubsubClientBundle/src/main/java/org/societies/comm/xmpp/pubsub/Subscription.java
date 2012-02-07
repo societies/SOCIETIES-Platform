@@ -9,6 +9,7 @@ public class Subscription {
 	private Identity subscriber;
 	private String node;
 	private String subId;
+	
 	public Subscription(Identity pubsubService, Identity subscriber,
 			String node, String subId) {
 		super();

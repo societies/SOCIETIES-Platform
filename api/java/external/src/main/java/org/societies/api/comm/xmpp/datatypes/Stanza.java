@@ -75,4 +75,11 @@ public class Stanza {
 	public void setTo(Identity to) {
 		this.to = to;
 	}
+
+	@Override
+	public String toString() {
+		return "Stanza: from='"+from+"' to='"+to+"' id='"+id+"'";
+	}
+	
+	
 }
