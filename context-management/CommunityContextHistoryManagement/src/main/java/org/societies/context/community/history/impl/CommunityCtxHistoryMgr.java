@@ -32,9 +32,8 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
-import org.societies.context.api.community.history.ICommunityCtxHistoryCallback;
 import org.societies.context.api.community.history.ICommunityCtxHistoryMgr;
-import org.societies.context.api.user.history.IUserCtxHistoryCallback;
+
 
 public class CommunityCtxHistoryMgr implements ICommunityCtxHistoryMgr {
 
@@ -132,13 +131,13 @@ public class CommunityCtxHistoryMgr implements ICommunityCtxHistoryMgr {
 	}
 
 	@Override
-	public void disableCommCtxRecording(ICommunityCtxHistoryCallback arg0) {
+	public void disableCommCtxRecording() {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void enableCommCtxRecording(ICommunityCtxHistoryCallback arg0) {
+	public void enableCommCtxRecording() {
 		// TODO Auto-generated method stub
 		
 	}
