@@ -38,5 +38,5 @@ import org.societies.api.internal.cis.management.ServiceSharingRecord;
 
 
 public interface IServiceSharingManager {
-	boolean addServiceSharingRecord(String CisId, ServiceSharingRecord sharingRecord);
+	boolean addServiceSharingRecord(String cisId, ServiceSharingRecord sharingRecord);
 }
