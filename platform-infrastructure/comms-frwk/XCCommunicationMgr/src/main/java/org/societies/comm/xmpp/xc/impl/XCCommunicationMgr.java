@@ -81,6 +81,7 @@ public class XCCommunicationMgr extends AbstractComponent implements
 	protected IQ handleDiscoItems(IQ iq) {
 		IQ response = helper.handleDiscoItems(iq);
 		response.setFrom(thisIdentity.getJid());
+		log.info("disco#items response: "+response.toXML());
 		return response;
 	}
 
@@ -175,6 +176,7 @@ public class XCCommunicationMgr extends AbstractComponent implements
 	@Override
 	public String getInfo(Identity entity, String node, ICommCallback callback)  throws CommunicationException {
 		IQ iq = helper.buildInfoIq(entity, node, callback);
+		iq.setFrom(thisIdentity.getJid());
 		this.send(iq);
 		return iq.getID();
 	}
@@ -182,6 +184,7 @@ public class XCCommunicationMgr extends AbstractComponent implements
 	@Override
 	public String getItems(Identity entity, String node, ICommCallback callback)  throws CommunicationException {
 		IQ iq = helper.buildItemsIq(entity, node, callback);
+		iq.setFrom(thisIdentity.getJid());
 		this.send(iq);
 		return iq.getID();
 	}

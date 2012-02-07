@@ -145,8 +145,8 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	}
 
 	@Override
-	public void receiveItems(Stanza stanza, String node, List<XMPPNode> items) {
-		SimpleEntry<String, List<XMPPNode>> mapSimpleEntry = new AbstractMap.SimpleEntry<String, List<XMPPNode>>(node, items);
+	public void receiveItems(Stanza stanza, String node, List<String> items) {
+		SimpleEntry<String, List<String>> mapSimpleEntry = new AbstractMap.SimpleEntry<String, List<String>>(node, items);
 		synchronized (responses) {
 			LOG.info("receiveItems 4 id "+stanza.getId());
 			responses.put(stanza.getId(), mapSimpleEntry);
@@ -174,7 +174,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 				} catch (InterruptedException e) {
 					LOG.info(e.getMessage());
 				}
-				LOG.info("checking response 4 id "+id);
+				LOG.info("checking response 4 id "+id+" in "+Arrays.toString(responses.keySet().toArray()));
 				response = responses.remove(id);
 			}
 			LOG.info("got response 4 id "+id);
@@ -194,12 +194,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 //		String returnedNode = ((SimpleEntry<String, List<XMPPNode>>)response).getKey();
 //		if (returnedNode != node)
 //			throw new CommunicationException("");
-		List<XMPPNode> nodeList = ((SimpleEntry<String, List<XMPPNode>>)response).getValue();
-		List<String> returnList = new ArrayList<String>();
-		for(XMPPNode n : nodeList) 
-			returnList.add(n.getNode());
-		
-		return returnList;
+		return ((SimpleEntry<String, List<String>>)response).getValue();
 	}
 
 	@Override

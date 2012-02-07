@@ -1,6 +1,7 @@
 package org.societies.comm.xmpp.event.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -40,6 +41,9 @@ public class PubsubEventFactoryImpl extends PubsubEventFactory implements Subscr
 		PubsubEventStreamImpl pesi = psStreamMap.get(s);
 		if (pesi==null) {
 			try {
+				List<String> nodeList = ps.discoItems(pubsubService, null); // TODO only root nodes
+				if (!nodeList.contains(node))
+					ps.ownerCreate(pubsubService, node);
 				ps.subscriberSubscribe(pubsubService, node, this);
 				pesi = new PubsubEventStreamImpl(pubsubService, node, new SimpleApplicationEventMulticaster(), ps);
 				psStreamMap.put(s, pesi);
