@@ -88,11 +88,11 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Override
 	@Async
 	public Future<CtxAssociation> createAssociation(String type) throws CtxException {
-		
-		UserDBCallback callback = new UserDBCallback();
-		
-		userCtxDBMgr.createAssociation(type, callback);
-		CtxAssociation association = (CtxAssociation) callback.getCreatedCtxAssociation();
+
+		//UserDBCallback callback = new UserDBCallback();
+
+		CtxAssociation association = userCtxDBMgr.createAssociation(type);
+		//CtxAssociation association = (CtxAssociation) callback.getCreatedCtxAssociation();
 		if (association!=null)
 			return new AsyncResult<CtxAssociation>(association);
 		else 
@@ -103,11 +103,13 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Async
 	public Future<CtxAttribute> createAttribute(CtxEntityIdentifier scope,
 			String type) throws CtxException {
-		// TODO Auto-generated method stub		
-		UserDBCallback callback = new UserDBCallback();
-		
-		userCtxDBMgr.createAttribute(scope, null, type, callback);
-		CtxAttribute attribute = (CtxAttribute) callback.getCreatedCtxAttribute();
+
+		//UserDBCallback callback = new UserDBCallback();
+
+		//userCtxDBMgr.createAttribute(scope, null, type, callback);
+		//	CtxAttribute attribute = (CtxAttribute) callback.getCreatedCtxAttribute();
+		CtxAttribute attribute = userCtxDBMgr.createAttribute(scope, null, type);
+
 		if (attribute!=null)
 			return new AsyncResult<CtxAttribute>(attribute);
 		else 
@@ -117,11 +119,13 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Override
 	@Async
 	public Future<CtxEntity> createEntity(String type) throws CtxException {
-		
-		UserDBCallback callback = new UserDBCallback();
-		
-		userCtxDBMgr.createEntity(type, callback);
-		CtxEntity entity = (CtxEntity) callback.getCreatedCtxEntity();
+
+		//	UserDBCallback callback = new UserDBCallback();
+
+		//	userCtxDBMgr.createEntity(type, callback);
+		//	CtxEntity entity = (CtxEntity) callback.getCreatedCtxEntity();
+		CtxEntity entity = userCtxDBMgr.createEntity(type);
+
 		if (entity!=null)
 			return new AsyncResult<CtxEntity>(entity);
 		else 
@@ -131,25 +135,25 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Override
 	public void disableCtxMonitoring(CtxAttributeValueType type) throws CtxException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void disableCtxRecording() throws CtxException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void enableCtxMonitoring(CtxAttributeValueType type) throws CtxException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void enableCtxRecording() throws CtxException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 
@@ -157,12 +161,14 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<List<CtxEntityIdentifier>> lookupEntities(String entityType,
 			String attribType, Serializable minAttribValue,
 			Serializable maxAttribValue) throws CtxException {
-		
-		UserDBCallback callback = new UserDBCallback();
-		userCtxDBMgr.lookupEntities(entityType, attribType, minAttribValue, maxAttribValue, callback);
-		List<CtxEntityIdentifier> results = callback.getLookedUpCtxEntities();
+
+		//UserDBCallback callback = new UserDBCallback();
+		//userCtxDBMgr.lookupEntities(entityType, attribType, minAttribValue, maxAttribValue, callback);
+		//	List<CtxEntityIdentifier> results = callback.getLookedUpCtxEntities();
+		List<CtxEntityIdentifier> results = userCtxDBMgr.lookupEntities(entityType, attribType, minAttribValue, maxAttribValue);
+
 		// add fix
-				
+
 		return null;
 	}
 
@@ -170,13 +176,13 @@ public class InternalCtxBroker implements ICtxBroker {
 	public void registerForUpdates(CtxEntityIdentifier scope,
 			String attrType) throws CtxException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void registerForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
 		// TODO Auto-generated method stub
-	
+
 	}
 
 	@Override
@@ -185,15 +191,17 @@ public class InternalCtxBroker implements ICtxBroker {
 		return null;
 	}
 
-	
+
 	@Override
 	@Async
 	public Future<CtxModelObject> retrieve(CtxIdentifier identifier) throws CtxException {
 		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback();
-				
-		userCtxDBMgr.retrieve(identifier, callback);
-		CtxModelObject modelObj = (CtxModelObject) callback.getCtxModelObjectRetrieved();
+		//UserDBCallback callback = new UserDBCallback();
+
+		//userCtxDBMgr.retrieve(identifier, callback);
+		//	CtxModelObject modelObj = (CtxModelObject) callback.getCtxModelObjectRetrieved();
+		CtxModelObject modelObj = userCtxDBMgr.retrieve(identifier);
+
 		if (modelObj!=null)
 			return new AsyncResult<CtxModelObject>(modelObj);
 		else 
@@ -218,25 +226,25 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Override
 	public void unregisterForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void unregisterForUpdates(CtxEntityIdentifier scope,
 			String attributeType) throws CtxException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	@Async
 	public Future<CtxModelObject> update(CtxModelObject identifier) throws CtxException {
-		
-		UserDBCallback callback = new UserDBCallback();
-		
-		userCtxDBMgr.update(identifier, callback);
-		CtxModelObject modelObject = (CtxModelObject) callback.getUpdatedCtxModelObject();
-		
+
+		//UserDBCallback callback = new UserDBCallback();
+
+		//userCtxDBMgr.update(identifier, callback);
+		//CtxModelObject modelObject = (CtxModelObject) callback.getUpdatedCtxModelObject();
+		CtxModelObject modelObject = userCtxDBMgr.update(identifier);
 
 		// this part allows the storage of attribute updates to context history
 		if(modelObject.getModelType().equals(CtxModelType.ATTRIBUTE)){
@@ -250,7 +258,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		}
 		else 
 			return new AsyncResult<CtxModelObject>(null);
-		
+
 	}
 
 	/*
@@ -261,7 +269,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Async
 	public Future<CtxAttribute> updateAttribute(
 			CtxAttributeIdentifier attributeId, Serializable value) throws CtxException {
-		
+
 		// Implies <code>null</code> valueMetric param
 		return this.updateAttribute(attributeId, value, null);
 	}
@@ -275,17 +283,17 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<CtxAttribute> updateAttribute(
 			CtxAttributeIdentifier attributeId, Serializable value,
 			String valueMetric) throws CtxException {
-	
+
 		if (attributeId == null)
 			throw new NullPointerException("attributeId can't be null");
 		// Ugly but will throw IllegalArgumentException if value type is not supported
 		this.findAttributeValueType(value);
-		
+
 		Future<CtxModelObject> futureModelObj = this.retrieve(attributeId);
 		CtxAttribute attribute;
 		try {
 			attribute = (CtxAttribute) futureModelObj.get();
-				
+
 			if (attribute == null) {
 				// Requested attribute not found
 				return new AsyncResult<CtxAttribute>(null);
@@ -317,7 +325,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	}
 
 
-	
+
 
 	@Override
 	public Future<IndividualCtxEntity> retrieveAdministratingCSS(
@@ -346,8 +354,8 @@ public class InternalCtxBroker implements ICtxBroker {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
+
+
 	@Override
 	public Future<List<Object>> evaluateSimilarity(
 			Serializable objectUnderComparison,
@@ -369,21 +377,21 @@ public class InternalCtxBroker implements ICtxBroker {
 		// TODO Auto-generated method stub
 		return null;
 	}
-		
+
 	private class UserDBCallback implements IUserCtxDBMgrCallback { 
-				
+
 		private CtxModelObject updatedCtxModelObject = null;
-		
+
 		private CtxEntity createdCtxEntity = null;
-		
+
 		private CtxAttribute createdCtxAttribute = null;
-		
+
 		private List<CtxEntityIdentifier> lookedUpCtxEntities = null;
-			
+
 		private CtxModelObject ctxModelObjectRetrieved = null;
 
 		private CtxAssociation ctxAssociationCreated = null;
-		
+
 		/*
 		 * (non-Javadoc)
 		 * @see org.societies.context.api.user.db.IUserCtxDBMgrCallback#ctxEntityCreated(org.societies.api.context.model.CtxEntity)
@@ -410,12 +418,12 @@ public class InternalCtxBroker implements ICtxBroker {
 		public void ctxAttributeCreated(CtxAttribute ctxAttribute) {
 			this.createdCtxAttribute = ctxAttribute;
 		}
-		
+
 		// @Override TODO it is not in DB callback ifc
 		public void ctxAssociationCreated(CtxAssociation ctxAssociation) {
 			this.ctxAssociationCreated = ctxAssociation;
 		}
-		
+
 		/*
 		 * (non-Javadoc)
 		 * @see org.societies.context.api.user.db.IUserCtxDBMgrCallback#ctxModelObjectUpdated(org.societies.api.context.model.CtxModelObject)
@@ -443,11 +451,11 @@ public class InternalCtxBroker implements ICtxBroker {
 			this.ctxModelObjectRetrieved = ctxModelObject;
 		}
 
-	
-	//********************************************
-	// Getters and Setters for callback variables
-	//********************************************
-				
+
+		//********************************************
+		// Getters and Setters for callback variables
+		//********************************************
+
 		public CtxModelObject getUpdatedCtxModelObject() {
 			return this.updatedCtxModelObject;
 		}
@@ -463,16 +471,16 @@ public class InternalCtxBroker implements ICtxBroker {
 		public CtxAssociation getCreatedCtxAssociation() {
 			return this.ctxAssociationCreated;
 		}
-			
+
 		public List<CtxEntityIdentifier> getLookedUpCtxEntities(){
 			return this.lookedUpCtxEntities;
 		}
-	
+
 		public CtxModelObject getCtxModelObjectRetrieved(){
 			return this.ctxModelObjectRetrieved;
 		}
 	}
-	
+
 	private CtxAttributeValueType findAttributeValueType(Serializable value) {
 		if (value == null)
 			return CtxAttributeValueType.EMPTY;
@@ -488,26 +496,26 @@ public class InternalCtxBroker implements ICtxBroker {
 			throw new IllegalArgumentException(value + ": Invalid value type");
 	}
 
-	
-	
-	
+
+
+
 	//***********************************************
 	//     Context History Management Methods  
 	//***********************************************
-	
-	
+
+
 	@Override
 	@Async
 	public Future<List<CtxHistoryAttribute>> retrieveHistory(
 			CtxAttributeIdentifier attrId, Date startDate, Date endDate) throws CtxException {
-		
+
 		final List<CtxHistoryAttribute> result = new ArrayList<CtxHistoryAttribute>();
-		
+
 		result.addAll(this.userCtxHistoryMgr.retrieveHistory(attrId, startDate, endDate));
-	
+
 		return new AsyncResult<List<CtxHistoryAttribute>>(result);
 	}
-	
+
 	@Override
 	public Future<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>> retrieveHistoryTuples(
 			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1,
@@ -526,7 +534,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Override
 	public Future<List<CtxAttributeIdentifier>> getHistoryTuples(
 			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1)
-			throws CtxException {
+					throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -548,7 +556,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Override
 	public Future<List<CtxAttributeIdentifier>> updateHistoryTuples(
 			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1)
-			throws CtxException {
+					throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}

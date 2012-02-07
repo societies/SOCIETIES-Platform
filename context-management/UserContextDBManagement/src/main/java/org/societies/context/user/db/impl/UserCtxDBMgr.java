@@ -27,6 +27,7 @@ package org.societies.context.user.db.impl;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.context.ApplicationContext;
@@ -37,6 +38,7 @@ import org.societies.context.user.db.impl.bo.UserCtxAttributeMgrBo;
 import org.societies.context.user.db.impl.model.UserCtxEntityMgr;
 import org.societies.context.user.db.impl.model.UserCtxAttributeMgr;
 
+import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
@@ -73,9 +75,9 @@ public class UserCtxDBMgr implements IUserCtxDBMgr{
 	}
 
 	@Override
-	public String createAssociation(String arg0) {
-		// TODO Auto-generated method stub
-		return arg0;
+	public CtxAssociation createAssociation(String arg0) {
+		
+		return null;
 	}
 
 	/*
@@ -141,33 +143,33 @@ public class UserCtxDBMgr implements IUserCtxDBMgr{
 
 
 	@Override
-	public CtxEntity lookup(CtxModelType arg0, String arg1) {
+	public List<CtxIdentifier> lookup(CtxModelType arg0, String arg1) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CtxEntity lookupEntities(String arg0, String arg1, Serializable arg2,
+	public List<CtxEntityIdentifier> lookupEntities(String arg0, String arg1, Serializable arg2,
 			Serializable arg3) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CtxAttribute registerForUpdates(CtxAttributeIdentifier arg0) {
+	public void registerForUpdates(CtxAttributeIdentifier arg0) {
 		// TODO Auto-generated method stub
-		return null;
+	
 	}
 
 
 	@Override
-	public CtxAttribute registerForUpdates(CtxEntityIdentifier scope, String attributeType) {
+	public void registerForUpdates(CtxEntityIdentifier scope, String attributeType) {
 		// TODO Auto-generated method stub
-		return null;
+	
 	}
 
 	@Override
-	public CtxIdentifier remove(CtxIdentifier arg0) {
+	public CtxModelObject remove(CtxIdentifier arg0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -187,15 +189,15 @@ public class UserCtxDBMgr implements IUserCtxDBMgr{
 	}
 
 	@Override
-	public CtxAttribute unregisterForUpdates(CtxAttributeIdentifier arg0) {
+	public void unregisterForUpdates(CtxAttributeIdentifier arg0) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public CtxEntity unregisterForUpdates(CtxEntityIdentifier arg0, String arg1) {
+	public void unregisterForUpdates(CtxEntityIdentifier arg0, String arg1) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override

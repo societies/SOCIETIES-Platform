@@ -25,7 +25,9 @@
 package org.societies.context.api.user.db;
 
 import java.io.Serializable;
+import java.util.List;
 
+import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.IndividualCtxEntity;
@@ -49,7 +51,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public String createAssociation(String type);
+	public CtxAssociation createAssociation(String type);
 
 	/**
 	 * Creates a Context Attribute
@@ -90,7 +92,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public IndividualCtxEntity createIndividualCtxEntity(String type);
+	public CtxEntity createIndividualCtxEntity(String type);
 	
 	
 	/**
@@ -102,7 +104,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public CtxEntity lookup(CtxModelType modelType, String type);
+	public List<CtxIdentifier> lookup(CtxModelType modelType, String type);
 
 	/**
 	 * Looks up for a list of CtxEntities of  the specified type, containing the
@@ -115,7 +117,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public CtxEntity lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue);
+	public List<CtxEntityIdentifier> lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue);
 
 	/**
 	 * Registers the specified EventListener for value modification events of context
@@ -126,7 +128,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public CtxAttribute registerForUpdates(CtxEntityIdentifier scope, String attrType);
+	public void registerForUpdates(CtxEntityIdentifier scope, String attrType);
 
 	/**
 	 * Registers the specified EventListener for value modification events of the
@@ -136,7 +138,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public CtxAttribute registerForUpdates(CtxAttributeIdentifier attrId);
+	public void registerForUpdates(CtxAttributeIdentifier attrId);
 
 	/**
 	 * Removes the specified context model object.
@@ -145,7 +147,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public CtxIdentifier remove(CtxIdentifier identifier);
+	public CtxModelObject remove(CtxIdentifier identifier);
 
 	/**
 	 * Retrieves the specified context model object.
@@ -154,7 +156,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public CtxAttribute retrieve(CtxIdentifier identifier);
+	public CtxModelObject retrieve(CtxIdentifier identifier);
 
 	/**
 	 * Registers the specified EventListener for value modification events of the
@@ -164,7 +166,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public CtxAttribute unregisterForUpdates(CtxAttributeIdentifier attrId);
+	public void unregisterForUpdates(CtxAttributeIdentifier attrId);
 
 	/**
 	 * Unregisters the specified EventListener for value modification events of
@@ -175,7 +177,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public CtxEntity unregisterForUpdates(CtxEntityIdentifier scope, String attributeType);
+	public void unregisterForUpdates(CtxEntityIdentifier scope, String attributeType);
 
 	/**
 	 * Updates a single context model object.
