@@ -24,11 +24,11 @@
  */
 package org.societies.privacytrust.privacyprotection.dataobfuscation;
 
-import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.mock.DataIdentifier;
+import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
 
 /**
  * Implementation of IDataObfuscationManager
@@ -82,7 +82,7 @@ public class DataObfuscationManager implements IDataObfuscationManager {
 	}
 
 	@Override
-	public DataIdentifier hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel, IDataObfuscationListener listener) throws PrivacyException {
+	public CtxIdentifier hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel, IDataObfuscationListener listener) throws PrivacyException {
 		// TODO : populate this stub function
 		
 		// -- Verify params

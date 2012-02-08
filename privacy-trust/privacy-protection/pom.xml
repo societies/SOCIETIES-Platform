@@ -30,6 +30,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.privacytrust</groupId>
 	<artifactId>privacyprotection</artifactId>
+	<name>Privacy Protection</name>
 	<packaging>bundle</packaging>
 	<version>0.1</version>
 	<developers>
@@ -87,6 +88,20 @@
 			<version>4.0</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- logging -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- spring -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -97,13 +112,30 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Bundle-Activator></Bundle-Activator>
-						<!-- <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency> -->
-						<!-- <Embed-Transitive>true</Embed-Transitive> -->
-						<!-- <Import-Package>!javax.swing.*</Import-Package> -->
-						<Import-Package>org.societies.api.*</Import-Package>
+						<!-- <Bundle-Activator></Bundle-Activator> <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency> 
+							<Embed-Transitive>true</Embed-Transitive> <Import-Package>!javax.swing.*</Import-Package> 
+							<Import-Package>org.societies.api.*</Import-Package> <Export-Package></Export-Package> -->
+						<Bundle-SymbolicName>${pom.groupId}.${pom.artifactId}</Bundle-SymbolicName>
+						<Bundle-Name>${pom.name}</Bundle-Name>
+						<Bundle-Version>${pom.version}</Bundle-Version>
+						<Import-Package>
+							org.societies.api.context.*,
+							org.societies.api.internal.privacytrust.privacyprotection.*,
+							org.societies.api.servicelifecycle.*,
+							org.societies.api.comm.*,
+							org.apache.commons.lang3.*, 
+							org.slf4j.*
+						</Import-Package>
 						<Export-Package></Export-Package>
 					</instructions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptors>
+						<descriptor></descriptor>
+					</descriptors>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -118,10 +150,10 @@
 						<artifactItem>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>${project.artifactId}</artifactId>
-							<version>${release.version}</version>
-							<type>bundle</type>
+							<version>${project.version}</version>
+							<type>jar</type>
 							<overWrite>true</overWrite>
-							<outputDirectory>${virgo.home}/pickup/</outputDirectory>
+							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</artifactItem>
 					</artifactItems>
 				</configuration>

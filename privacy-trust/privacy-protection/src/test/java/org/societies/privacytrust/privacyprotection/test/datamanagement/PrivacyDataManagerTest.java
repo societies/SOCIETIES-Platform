@@ -25,6 +25,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.mock.DataIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
@@ -80,7 +84,7 @@ public class PrivacyDataManagerTest {
 	 */
 	@Test
 	public void testHasObfuscatedVersion() {
-		DataIdentifier actual = new DataIdentifier();
+		CtxIdentifier actual = new CtxAttributeIdentifier(new CtxEntityIdentifier(null, null, null), null, null);
 		boolean expection = false;
 		try {
 			actual = privacyDataManager.hasObfuscatedVersion(null, 0, null);

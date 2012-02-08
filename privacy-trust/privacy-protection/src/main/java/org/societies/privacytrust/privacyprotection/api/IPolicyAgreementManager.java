@@ -28,10 +28,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
 
 /**
  * @author olivierm
@@ -73,7 +73,7 @@ public interface IPolicyAgreementManager {
 	 * @param requestorId
 	 * @param serviceId
 	 */
-	public ResponseItem getPermissionConditionsInAgreement(DataIdentifier dataId, Identity ownerId, Identity requestorId, IServiceResourceIdentifier serviceId);
+	public ResponseItem getPermissionConditionsInAgreement(CtxIdentifier dataId, Identity ownerId, Identity requestorId, IServiceResourceIdentifier serviceId);
 
 	/**
 	 * The objective here is to retrieve the part of the CIS negotiation agreement
@@ -85,7 +85,7 @@ public interface IPolicyAgreementManager {
 	 * @param requestorId
 	 * @param cisId
 	 */
-	public ResponseItem getPermissionConditionsInAgreement(DataIdentifier dataId, Identity ownerId, Identity requestorId, Identity cisId);
+	public ResponseItem getPermissionConditionsInAgreement(CtxIdentifier dataId, Identity ownerId, Identity requestorId, Identity cisId);
 
 	/**
 	 * Update Negotiation Agreement (with a Service)

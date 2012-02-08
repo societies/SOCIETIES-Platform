@@ -19,28 +19,26 @@
  */
 package org.societies.privacytrust.privacyprotection.test.datamanagement;
 
-import static org.junit.Assert.*;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.societies.privacytrust.privacyprotection.api.IInternalPrivacyDataManager;
-import org.societies.privacytrust.privacyprotection.datamanagement.InternalPrivacyDataManager;
+import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
+import org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal;
 
 /**
  * @author olivierm
  *
  */
-public class InternalPrivacyDataManagerTest {
+public class PrivacyDataManagerInternalTest {
 
-	IInternalPrivacyDataManager privacyDataManagerInternal;
+	IPrivacyDataManagerInternal privacyDataManagerInternal;
 	
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
-		privacyDataManagerInternal = new InternalPrivacyDataManager();
+		privacyDataManagerInternal = new PrivacyDataManagerInternal();
 	}
 
 	/**
@@ -52,7 +50,7 @@ public class InternalPrivacyDataManagerTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.InternalPrivacyDataManager#updatePermissions(org.societies.privacytrust.privacyprotection.mock.DataIdentifier, java.lang.String, org.societies.api.comm.xmpp.datatypes.Identity, org.societies.api.comm.xmpp.datatypes.Identity)}.
+	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal#updatePermissions(org.societies.privacytrust.privacyprotection.mock.DataIdentifier, java.lang.String, org.societies.api.comm.xmpp.datatypes.Identity, org.societies.api.comm.xmpp.datatypes.Identity)}.
 	 */
 	@Test
 	public void testUpdatePermissions() {

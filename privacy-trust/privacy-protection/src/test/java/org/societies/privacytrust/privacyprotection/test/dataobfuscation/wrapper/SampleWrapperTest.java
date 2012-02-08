@@ -24,6 +24,8 @@ import static org.junit.Assert.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.internal.mock.DataIdentifier;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.DataWrapper;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper.SampleWrapper;
@@ -81,7 +83,7 @@ public class SampleWrapperTest {
 	public void testEqualsDifferentDataWrapper() {
 		SampleWrapper obj1 = new SampleWrapper(3);
 		SampleWrapper obj2 = new SampleWrapper(3);
-		obj2.setDataId(new DataIdentifier());
+		obj2.setDataId(new CtxAttributeIdentifier(new CtxEntityIdentifier(null, null, null), null, null));
 		assertFalse(obj1.equals(obj2));
 	}
 	/**
@@ -91,7 +93,7 @@ public class SampleWrapperTest {
 	public void testEqualsDifferentObject() {
 		SampleWrapper obj1 = new SampleWrapper(3);
 		SampleWrapper obj2 = new SampleWrapper(4);
-		obj2.setDataId(new DataIdentifier());
+		obj2.setDataId(new CtxAttributeIdentifier(new CtxEntityIdentifier(null, null, null), null, null));
 		assertFalse(obj1.equals(obj2));
 	}
 

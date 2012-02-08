@@ -29,7 +29,6 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfus
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper.SampleWrapper;
-import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
 
 /**
  * @state skeleton 
@@ -75,7 +74,7 @@ public class SampleObfuscator implements IDataObfuscator {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		return (obj==this && obj instanceof SampleObfuscator);
+		return (obj==this || obj instanceof SampleObfuscator);
 	}
 	
 	

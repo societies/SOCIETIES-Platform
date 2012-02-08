@@ -25,13 +25,13 @@
 package org.societies.privacytrust.privacyprotection.datamanagement;
 
 import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.internal.mock.DataIdentifier;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.DataObfuscationManager;
@@ -62,7 +62,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)
 	 */
 	@Override
-	public DataIdentifier hasObfuscatedVersion(IDataWrapper dataWrapper,
+	public CtxIdentifier hasObfuscatedVersion(IDataWrapper dataWrapper,
 			double obfuscationLevel, IDataObfuscationListener listener)
 			throws PrivacyException {
 		return dataObfuscationManager.hasObfuscatedVersion(dataWrapper, obfuscationLevel, listener);
@@ -70,10 +70,10 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 	/*
 	 * 
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.internal.mock.DataIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.internal.mock.CtxIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)
 	 */
 	@Override
-	public ResponseItem checkPermission(DataIdentifier dataId, Identity ownerId,
+	public ResponseItem checkPermission(CtxIdentifier dataId, Identity ownerId,
 			Identity requestorId, IServiceResourceIdentifier serviceId) {
 		// TODO Auto-generated method stub
 		return null;
@@ -81,20 +81,20 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 	/*
 	 * 
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.internal.mock.DataIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.internal.mock.CtxIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier)
 	 */
 	@Override
-	public ResponseItem checkPermission(DataIdentifier dataId, Identity ownerId,
+	public ResponseItem checkPermission(CtxIdentifier dataId, Identity ownerId,
 			Identity requestorId, Identity cisId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	/*
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.internal.mock.DataIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.internal.mock.CtxIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
 	 */
 	@Override
-	public ResponseItem checkPermission(DataIdentifier dataId, Identity ownerId,
+	public ResponseItem checkPermission(CtxIdentifier dataId, Identity ownerId,
 			Identity requestorId, RequestPolicy usage) {
 		// TODO Auto-generated method stub
 		return null;

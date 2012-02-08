@@ -25,19 +25,19 @@
 package org.societies.privacytrust.privacyprotection.datamanagement;
 
 import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.privacytrust.privacyprotection.api.IInternalPrivacyDataManager;
-import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 
 /**
  * @state skeleton 
  * @author olivierm
  */
-public class InternalPrivacyDataManager implements IInternalPrivacyDataManager {
+public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	/* (non-Javadoc)
 	 * @see org.societies.privacytrust.privacyprotection.api.internal.IPrivacyDataManagerInternal#updatePermissions(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void updatePermissions(DataIdentifier dataId, String agreementId,
+	public void updatePermissions(CtxIdentifier dataId, String agreementId,
 			Identity ownerId, Identity requestorId) {
 		// TODO Auto-generated method stub
 

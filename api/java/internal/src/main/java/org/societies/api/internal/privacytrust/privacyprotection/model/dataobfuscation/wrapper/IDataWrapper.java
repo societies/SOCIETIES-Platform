@@ -24,7 +24,8 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
-import org.societies.api.internal.mock.DataIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+
 
 
 /**
@@ -49,7 +50,7 @@ public interface IDataWrapper {
 	 * 
 	 * @param dataId A unique ID of the data to obfuscate is needed to enable persistence
 	 */
-	public void enabledPersistence(DataIdentifier dataId);
+	public void enabledPersistence(CtxIdentifier dataId);
 	/**
 	 * To disabled storage of obfuscated data
 	 */
@@ -72,9 +73,9 @@ public interface IDataWrapper {
 	/**
 	 * @return the dataId
 	 */
-	public DataIdentifier getDataId();
+	public CtxIdentifier getDataId();
 	/**
 	 * @param dataId the dataId to set
 	 */
-	public void setDataId(DataIdentifier dataId);
+	public void setDataId(CtxIdentifier dataId);
 }

@@ -28,11 +28,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager;
-import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
 
 /**
  * @author olivierm
@@ -72,7 +72,7 @@ public class PolicyAgreementManager implements IPolicyAgreementManager {
 
 	@Override
 	public ResponseItem getPermissionConditionsInAgreement(
-			DataIdentifier dataId, Identity ownerId,
+			CtxIdentifier dataId, Identity ownerId,
 			Identity requestorId, IServiceResourceIdentifier serviceId) {
 		// TODO Auto-generated method stub
 		return null;
@@ -80,7 +80,7 @@ public class PolicyAgreementManager implements IPolicyAgreementManager {
 
 	@Override
 	public ResponseItem getPermissionConditionsInAgreement(
-			DataIdentifier dataId, Identity ownerId,
+			CtxIdentifier dataId, Identity ownerId,
 			Identity requestorId, Identity cisId) {
 		// TODO Auto-generated method stub
 		return null;
