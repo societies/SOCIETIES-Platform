@@ -252,9 +252,9 @@ public class InternalCtxBroker implements ICtxBroker {
 		if(modelObject.getModelType().equals(CtxModelType.ATTRIBUTE)){
 			CtxAttribute ctxAttr = (CtxAttribute) modelObject; 
 			if (ctxAttr.isHistoryRecorded() && userCtxHistoryMgr != null){
-				Date date = new Date();
+				//Date date = new Date();
 				//	System.out.println("storing hoc attribute");
-				userCtxHistoryMgr.storeHoCAttribute(ctxAttr, date);
+				userCtxHistoryMgr.storeHoCAttribute(ctxAttr);
 			}
 			return new AsyncResult<CtxModelObject>(modelObject);
 		}

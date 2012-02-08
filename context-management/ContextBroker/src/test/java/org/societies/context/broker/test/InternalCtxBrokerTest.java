@@ -42,6 +42,7 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.util.SerialisationHelper;
 
@@ -330,10 +331,74 @@ public class InternalCtxBrokerTest {
 	/**
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#retrievePast(org.societies.api.context.model.CtxAttributeIdentifier, java.util.Date, java.util.Date)}.
 	 */
-	@Ignore
 	@Test
 	public void testRetrieveHistoryCtxAttributeIdentifierDateDate() {
-		fail("Not yet implemented");
+
+		final CtxAttribute emptyAttribute;
+		CtxAttribute initialisedAttribute;
+		final CtxEntity scope;
+
+		// Create the attribute's scope
+		Future<CtxEntity> futureEntity;
+		try {
+			futureEntity = internalCtxBroker.createEntity("entType");
+			scope = futureEntity.get();
+
+			// Create the attribute to be tested
+			Future<CtxAttribute> futureCtxAttribute = internalCtxBroker.createAttribute(scope.getId(), "attrType");
+			emptyAttribute = futureCtxAttribute.get();
+
+			// Set the attribute's initial value
+			emptyAttribute.setIntegerValue(100);
+			emptyAttribute.setHistoryRecorded(true);
+			
+			Future<CtxModelObject> futureCtxModelObject = internalCtxBroker.update(emptyAttribute);
+			initialisedAttribute = (CtxAttribute) futureCtxModelObject.get();
+			// Verify the initial attribute value
+			assertEquals(new Integer(100), initialisedAttribute.getIntegerValue());
+		
+			emptyAttribute.setIntegerValue(200);
+			futureCtxModelObject = internalCtxBroker.update(emptyAttribute);
+			initialisedAttribute = (CtxAttribute) futureCtxModelObject.get();
+			// Verify the initial attribute value
+			assertEquals(new Integer(200), initialisedAttribute.getIntegerValue());
+			
+			emptyAttribute.setIntegerValue(300);
+			futureCtxModelObject = internalCtxBroker.update(emptyAttribute);
+			initialisedAttribute = (CtxAttribute) futureCtxModelObject.get();
+			// Verify the initial attribute value
+			assertEquals(new Integer(300), initialisedAttribute.getIntegerValue());
+			
+			Future<List<CtxHistoryAttribute>> historyFuture = internalCtxBroker.retrieveHistory(initialisedAttribute.getId(), null, null);
+			
+			List<CtxHistoryAttribute> history = historyFuture.get();
+			
+			CtxHistoryAttribute hocAttr1 = history.get(0);
+			CtxHistoryAttribute hocAttr2 = history.get(1);
+			CtxHistoryAttribute hocAttr3 = history.get(2);
+					
+			System.out.println(hocAttr1.getLastModified());
+		
+			assertEquals(hocAttr1.getIntegerValue(), 100);
+			assertEquals(hocAttr2.getIntegerValue(), 200);
+			assertEquals(hocAttr3.getIntegerValue(), 300);
+			assertEquals(history.size(),3);
+			
+			assertNotNull(hocAttr1.getLastModified());
+			assertNotNull(hocAttr2.getLastModified());
+			assertNotNull(hocAttr3.getLastModified());
+			
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 
@@ -503,7 +568,6 @@ public class InternalCtxBrokerTest {
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
 	 */
-	@Ignore
 	@Test
 	public void testSetHistoryTuples() throws CtxException, InterruptedException, ExecutionException {
 		

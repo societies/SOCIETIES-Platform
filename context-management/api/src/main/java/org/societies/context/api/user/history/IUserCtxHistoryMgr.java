@@ -183,5 +183,5 @@ public interface IUserCtxHistoryMgr {
 	 * @param hocAttribute
 	 * @param date
 	 */
-	public void storeHoCAttribute(CtxAttribute hocAttribute,Date date) throws CtxException;
+	public void storeHoCAttribute(CtxAttribute hocAttribute) throws CtxException;
 }

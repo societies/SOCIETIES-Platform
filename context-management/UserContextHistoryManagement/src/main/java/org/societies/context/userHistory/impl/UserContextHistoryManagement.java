@@ -52,13 +52,15 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
 
 
-	public void storeHoCAttribute(CtxAttribute ctxAttribute,Date date){
-		CtxHistoryAttribute hocAttr = new CtxHistoryAttribute(ctxAttribute);
-		Long i = HistoryCtxModelObjectNumberGenerator.getNextValue();
+	public void storeHoCAttribute(CtxAttribute ctxAttribute){
+	
 		List<Serializable> hocObject = new ArrayList();
+		Long i = HistoryCtxModelObjectNumberGenerator.getNextValue();
+		CtxHistoryAttribute hocAttr = new CtxHistoryAttribute(ctxAttribute,i);
+				
 		hocObject.add(0,hocAttr.getId());
 		hocObject.add(1,hocAttr);
-		hocObject.add(2,date);
+		hocObject.add(2,hocAttr.getLastModified());
 		this.hocObjects.put(i,hocObject);	
 	}
 

@@ -115,13 +115,7 @@ public class CommunityCtxHistoryMgr implements ICommunityCtxHistoryMgr {
 		return null;
 	}
 
-	@Override
-	public void storeHoCAttribute(CtxAttribute arg0, Date arg1)
-			throws CtxException {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	@Override
 	public List<CtxAttributeIdentifier> updateCtxHistoryTuples(
 			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1)
@@ -138,6 +132,12 @@ public class CommunityCtxHistoryMgr implements ICommunityCtxHistoryMgr {
 
 	@Override
 	public void enableCommCtxRecording() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void storeHoCAttribute(CtxAttribute arg0) throws CtxException {
 		// TODO Auto-generated method stub
 		
 	}
