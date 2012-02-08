@@ -22,75 +22,42 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.api.user.db;
+package org.societies.personalisation.management.impl;
 
-import java.util.List;
-
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxEntity;
-import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxModelObject;
-
-
+import org.societies.api.internal.personalisation.model.IOutcome;
+import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
+import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
+import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
+import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 
 /**
- * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * Describe your class here...
+ *
+ * @author Eliza
+ *
  */
-public interface IUserCtxDBMgrCallback {
+public class ConflictResolution {
 
-	
-	/**
-	 * The callback of IUserCtxDBMgr method
-	 * createEntity(String type, IUserCtxBrokerCallback callback) 
-	 * 
-	 * @param ctxEntity
-	 * @since 0.0.1
-	 */
-	public void ctxEntityCreated(CtxEntity ctxEntity);
+	public ConflictResolution(){
+		
+	}
 	
 	
-	/**
-	 * The callback of IUserCtxDBMgr method
-	 * createEntity(String type, IUserCtxBrokerCallback callback) 
-	 * 
-	 * @param ctxEntity
-	 * @since 0.0.1
-	 */
-	public void ctxIndividualCtxEntityCreated(CtxEntity ctxEntity);
+	public IOutcome resolvePreferenceConflicts(IDIANNEOutcome dOutcome, IPreferenceOutcome pOutcome){
+		if (dOutcome.getConfidenceLevel()<pOutcome.getConfidenceLevel()){
+			return pOutcome;
+		}
+		
+		
+			return dOutcome;
+		
+	}
 	
-	/**
-	 * The callback of IUserCtxDBMgr method
-	 * createAttribute(CtxEntityIdentifier scope, CtxAttributeValueType enumerate, String type, IUserCtxDBMgr callback)
-	 * 
-	 * @param ctxAttribute
-	 * @since 0.0.1
-	 */
-	public void ctxAttributeCreated(CtxAttribute ctxAttribute);
-	
-	/**
-	 * The callback of IUserCtxDBMgr method
-	 * update(CtxModelObject identifier, IUserCtxDBMgr callback)
-	 * 
-	 * @param ctxModelObject
-	 * @since 0.0.1
-	 */
-	public void ctxModelObjectUpdated(CtxModelObject ctxModelObject);
-	
-	/**
-	 * The callback of IUserCtxDBMgr method
-	 * lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue, IUserCtxDBMgrCallback callback);
-	 *
-	 * @param list
-	 * @since 0.0.1
-	 */
-	public void ctxEntitiesLookedup(List<CtxEntityIdentifier> list);
-	
-	/**
-	 * The callback of IUserCtxDBMgr method
-	 * retrieve(CtxIdentifier identifier, IUserCtxDBMgrCallback callback);
-	 * 
-	 * @param ctxModelObject
-	 * @since 0.0.1
-	 */
-	public void ctxModelObjectRetrieved(CtxModelObject ctxModelObject);
+	public IOutcome resolveIntentConflicts(IUserIntentAction cauiOutcome, CRISTUserAction cristOutcome){
+		if (cauiOutcome.getConfidenceLevel()<cristOutcome.getConfidenceLevel()){
+			return cristOutcome;
+		}
+		
+		return cauiOutcome;
+	}
 }

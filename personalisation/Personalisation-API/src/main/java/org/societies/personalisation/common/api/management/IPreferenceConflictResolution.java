@@ -20,8 +20,8 @@
 
 package org.societies.personalisation.common.api.management;
 
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.mock.EntityIdentifier;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
@@ -42,7 +42,7 @@ public interface IPreferenceConflictResolution {
 	 * @param dianneAction
 	 * @param preferenceAction
 	 */
-	public IOutcome resolveConflict(EntityIdentifier user_id, IDIANNEOutcome dianneAction, IPreferenceOutcome preferenceAction);
+	public IOutcome resolveConflict(Identity user_id, IDIANNEOutcome dianneAction, IPreferenceOutcome preferenceAction);
 
 	/**
 	 * 
@@ -50,6 +50,6 @@ public interface IPreferenceConflictResolution {
 	 * @param intentActionICCS
 	 * @param intentActionITSUD
 	 */
-	public IOutcome resolveConflict(EntityIdentifier user_id, IUserIntentAction intentActionICCS, ICRISTUserAction intentActionITSUD);
+	public IOutcome resolveConflict(Identity user_id, IUserIntentAction intentActionICCS, ICRISTUserAction intentActionITSUD);
 
 }

@@ -26,9 +26,12 @@ package org.societies.context.api.user.history;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxHistoryAttribute;
 
 /**
  * @author <a href="mailto:nikosk@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
@@ -40,35 +43,65 @@ public interface IUserCtxHistoryMgr {
 	 * 
 	 * @since 0.0.1
 	 */
-	public void disableCtxRecording(IUserCtxHistoryCallback callback);
+	public void disableCtxRecording();
 
 	/**
 	 * Enables Context Recording.
 	 * 
 	 * @since 0.0.1
 	 */
-	public void enableCtxRecording(IUserCtxHistoryCallback callback);
+	public void enableCtxRecording();
 
+	
 	/**
-	 * This method returns a list of CtxAttributeIdentifiers corresponding 
-	 * to the Context Attributed recorced in the Context History.
-	 * 
-	 * @param primaryAttrIdentifier
-	 * @return list of historic Attributes
-	 * @since 0.0.1
-	 */
-	public void getHistoryTuplesID(CtxAttributeIdentifier primaryAttrIdentifier, IUserCtxHistoryCallback callback);
-
-	/**
-	 * Registers to Context History a list of escording attribute Ids 
-	 * corresponding to a Context Attribute. 
+	 * This method allows to set a primary context attribute that will be stored in context History Database
+	 * upon value update along with a list of other context attributes. 
 	 * 
 	 * @param primaryAttrIdentifier
 	 * @param listOfEscortingAttributeIds
+	 * @throws CtxException 
 	 * @since 0.0.1
 	 */
-	public void registerHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier, List<CtxAttributeIdentifier> listOfEscortingAttributeIds,IUserCtxHistoryCallback callback);
+	public Boolean setCtxHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException;
 
+	/**
+	 * This method allows to get the list of the context attribute identifiers that consist the snapshot that is stored
+	 * in context history database along with the a primary context attribute.  
+	 * 
+	 * @param primaryAttrIdentifier
+	 * @param listOfEscortingAttributeIds
+	 * @throws CtxException 
+	 * @since 0.0.1
+	 */
+	public List<CtxAttributeIdentifier> getCtxHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException;
+
+	/**
+	 * This method allows to update the list of the context attribute identifiers that consist the snapshot that is stored
+	 * in context history database along with the a primary context attribute.  
+	 *  
+	 * @param primaryAttrIdentifier
+	 * @param listOfEscortingAttributeIds
+	 * @throws CtxException 
+	 * @since 0.0.1
+	 */
+	public List<CtxAttributeIdentifier> updateCtxHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException;
+
+	/**
+	 * This method allows to remove the list of the context attribute identifiers that consist the snapshot that is stored
+	 * in context history database along with the a primary context attribute.  
+	 * 
+	 * @param primaryAttrIdentifier
+	 * @param listOfEscortingAttributeIds
+	 * @throws CtxException 
+	 * @since 0.0.1
+	 */
+	public Boolean removeCtxHistoryTuples(
+			CtxAttributeIdentifier primaryAttrIdentifier,
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException;
+	
 	
 	/**
 	 * Removes recorded history for the indicated Context Attribute from the 
@@ -80,7 +113,7 @@ public interface IUserCtxHistoryMgr {
 	 * @return number of removed records
 	 * @since 0.0.1
 	 */
-	public void removeHistory(CtxAttribute ctxAttribute, Date startDate, Date endDate, IUserCtxHistoryCallback callback);
+	public int removeCtxHistory(CtxAttribute ctxAttribute, Date startDate, Date endDate) throws CtxException;
 
 	/**
 	 * Removes recorded history for the indicated type from the start of the 
@@ -92,7 +125,7 @@ public interface IUserCtxHistoryMgr {
 	 * @return number of removed records
 	 * @since 0.0.1
 	 */
-	public void removeHistory(String type, Date startDate, Date endDate, IUserCtxHistoryCallback callback);
+	public int removeHistory(String type, Date startDate, Date endDate) throws CtxException;
 
 	/**
 	 * Returns a list of <code>CtxHistoryAttribute</code> objects recorded for 
@@ -101,9 +134,9 @@ public interface IUserCtxHistoryMgr {
 	 * @param CtxAttributeIdentifier
 	 * @return list of historic Attributes
 	 * @since 0.0.1
-	
-	public List<CtxHistoryAttribute> retrieveHistory(CtxAttributeIdentifier attrId, IUserCtxHistoryCallback callback);
- */
+	 */
+	public List<CtxHistoryAttribute> retrieveHistory(CtxAttributeIdentifier attrId) throws CtxException;
+
 	
 	/**
 	 * Returns a list of <code>CtxHistoryAttribute</code> objects recorded for
@@ -116,7 +149,7 @@ public interface IUserCtxHistoryMgr {
 	 * @return list of historic Attributes
 	 * @since 0.0.1
 	 */
-	public void retrieveHistory(CtxAttributeIdentifier attrId, Date startDate, Date endDate, IUserCtxHistoryCallback callback);
+	public List<CtxHistoryAttribute> retrieveHistory(CtxAttributeIdentifier attrId, Date startDate, Date endDate) throws CtxException;
 
 	/**
 	 * Returns a list of <code>CtxHistoryAttribute</code> objects recorded for
@@ -126,7 +159,7 @@ public interface IUserCtxHistoryMgr {
 	 * @param modificationIndex
 	 * @since 0.0.1
 	 */
-	public void retrieveHistory(CtxAttributeIdentifier attrId,int modificationIndex, IUserCtxHistoryCallback callback);
+	public List<CtxHistoryAttribute> retrieveHistory(CtxAttributeIdentifier attrId,int modificationIndex) throws CtxException;
 	
 	
 	/**
@@ -140,13 +173,15 @@ public interface IUserCtxHistoryMgr {
 	 * @return map
 	 * @since 0.0.1
 	 */
-	public void retrieveHistoryTuples(CtxAttributeIdentifier primaryAttrID, List<CtxAttributeIdentifier> listOfEscortingAttributeIds, Date startDate, Date endDate, IUserCtxHistoryCallback callback);
+	public Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>  retrieveHistoryTuples(CtxAttributeIdentifier primaryAttrID, List<CtxAttributeIdentifier> listOfEscortingAttributeIds, Date startDate, Date endDate) throws CtxException;
 
+	
+	
 	/**
 	 * Stores the historic Attribute to HoC Database.
 	 * 
 	 * @param hocAttribute
 	 * @param date
 	 */
-	public void storeHoCAttribute(CtxAttribute hocAttribute,Date date);
+	public void storeHoCAttribute(CtxAttribute hocAttribute) throws CtxException;
 }

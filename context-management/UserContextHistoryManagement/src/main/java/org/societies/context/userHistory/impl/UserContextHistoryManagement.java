@@ -32,12 +32,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
-import org.societies.context.api.user.history.IUserCtxHistoryCallback;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
 
 
@@ -52,53 +52,27 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
 
 
-	public void storeHoCAttribute(CtxAttribute ctxAttribute,Date date){
-		CtxHistoryAttribute hocAttr = new CtxHistoryAttribute(ctxAttribute);
-		Long i = HistoryCtxModelObjectNumberGenerator.getNextValue();
+	public void storeHoCAttribute(CtxAttribute ctxAttribute){
+	
 		List<Serializable> hocObject = new ArrayList();
+		Long i = HistoryCtxModelObjectNumberGenerator.getNextValue();
+		CtxHistoryAttribute hocAttr = new CtxHistoryAttribute(ctxAttribute,i);
+				
 		hocObject.add(0,hocAttr.getId());
 		hocObject.add(1,hocAttr);
-		hocObject.add(2,date);
+		hocObject.add(2,hocAttr.getLastModified());
 		this.hocObjects.put(i,hocObject);	
 	}
 
 
 	@Override
-	public void disableCtxRecording(IUserCtxHistoryCallback callback) {
+	public void disableCtxRecording() {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void enableCtxRecording(IUserCtxHistoryCallback callback) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void getHistoryTuplesID(
-			CtxAttributeIdentifier primaryAttrIdentifier,IUserCtxHistoryCallback callback) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void registerHistoryTuples(
-			CtxAttributeIdentifier primaryAttrIdentifier,
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds,IUserCtxHistoryCallback callback) {
-		// TODO Auto-generated method stub
-
-	}
-	
-	@Override
-	public void removeHistory(CtxAttribute ctxAttribute, Date startDate,
-			Date endDate,IUserCtxHistoryCallback callback) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void removeHistory(String type, Date startDate, Date endDate,IUserCtxHistoryCallback callback) {
+	public void enableCtxRecording() {
 		// TODO Auto-generated method stub
 
 	}
@@ -135,30 +109,78 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 	}
 	 */
 	@Override
-	public void retrieveHistory(CtxAttributeIdentifier attrId,
-			Date startDate, Date endDate,IUserCtxHistoryCallback callback) {
+	public List<CtxHistoryAttribute> retrieveHistory(CtxAttributeIdentifier attrId,
+			Date startDate, Date endDate) {
 
 		List<CtxHistoryAttribute> results = new ArrayList<CtxHistoryAttribute>();
 		results = retrieveHistory(attrId);
 
-		callback.historyRetrievedDate(results);
+		//callback.historyRetrievedDate(results);
+		return results;
 	}
 
 	@Override
-	public void retrieveHistoryTuples(
-			CtxAttributeIdentifier primaryAttrID,
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds,
-			Date startDate, Date endDate,IUserCtxHistoryCallback callback) {
+	public int removeCtxHistory(CtxAttribute arg0, Date arg1, Date arg2)
+			throws CtxException {
 		// TODO Auto-generated method stub
-
+		return 0;
 	}
 
-
+	@Override
+	public int removeHistory(String arg0, Date arg1, Date arg2)
+			throws CtxException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
 	@Override
-	public void retrieveHistory(CtxAttributeIdentifier attrId, int modificationIndex,IUserCtxHistoryCallback callback) {
+	public List<CtxHistoryAttribute> retrieveHistory(
+			CtxAttributeIdentifier arg0, int arg1) throws CtxException {
 		// TODO Auto-generated method stub
+		return null;
+	}
 
+	
+	//*************************************
+	//  Tuple management
+	//*************************************
+	
+	@Override
+	public List<CtxAttributeIdentifier> getCtxHistoryTuples(
+			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1)
+			throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public Boolean removeCtxHistoryTuples(CtxAttributeIdentifier arg0,
+			List<CtxAttributeIdentifier> arg1) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> retrieveHistoryTuples(
+			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1,
+			Date arg2, Date arg3) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Boolean setCtxHistoryTuples(CtxAttributeIdentifier arg0,
+			List<CtxAttributeIdentifier> arg1) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<CtxAttributeIdentifier> updateCtxHistoryTuples(
+			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1)
+			throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

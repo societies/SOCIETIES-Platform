@@ -22,29 +22,15 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.api.community.history;
-
-
+package org.societies.personalisation.common.api.model;
 
 /**
- * @author <a href="mailto:nikosk@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
+ * Describe your class here...
+ *
+ * @author Eliza
+ *
  */
-public interface ICommunityCtxHistoryCallback {
+public enum PersonalisationTypes {
 
-	
-	/**
-	 * The callback of ICommunityCtxHistoryMgr method
-	 * disableCommCtxRecording(ICommunityCtxHistoryCallback callback)
-	 * 
-	 * @since 0.0.1
-	 */
-	public void CommCtxRecordingDisabled();
-	
-	/**
-	 * The callback of ICommunityCtxHistoryMgr method
-	 * enableCommCtxRecording(ICommunityCtxHistoryCallback callback)
-	 * 
-	 * @since 0.0.1
-	 */
-	public void CommCtxRecordingEnabled();
+	DIANNE, UserPreference,CRISTIntent, CAUIIntent;
 }
