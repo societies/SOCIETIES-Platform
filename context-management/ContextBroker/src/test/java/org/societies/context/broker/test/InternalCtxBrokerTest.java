@@ -501,9 +501,11 @@ public class InternalCtxBrokerTest {
 	 * @throws CtxException 
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
 	 */
 	@Test
-	public void testUpdateAttributeByCtxAttributeIdSerializableString() throws CtxException, InterruptedException, ExecutionException {
+	public void testUpdateAttributeByCtxAttributeIdSerializableString() throws CtxException, InterruptedException, ExecutionException, IOException, ClassNotFoundException {
 
 		final CtxAttribute emptyAttribute;
 		final CtxAttribute initialisedAttribute;
@@ -535,28 +537,15 @@ public class InternalCtxBrokerTest {
 		// Test update with a binary value
 		final CtxAttribute binaryAttribute;
 		final MockBlobClass blob = new MockBlobClass(666);
-		final byte[] blobBytes;
+		final byte[] blobBytes = SerialisationHelper.serialise(blob);
 
-		try {
-
-			blobBytes = SerialisationHelper.serialise(blob);
-			updatedAttribute.setBinaryValue(blobBytes);
-			Future<CtxModelObject>binaryAttributeFuture = internalCtxBroker.update(updatedAttribute);
-			// Verify binary attribute value
-			CtxAttribute binaryAttributeRetrieved = (CtxAttribute) binaryAttributeFuture.get();
-			assertNotNull(binaryAttributeRetrieved.getBinaryValue());
-			MockBlobClass retrievedBlob;
-			retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(binaryAttributeRetrieved.getBinaryValue(), this.getClass().getClassLoader());
-			assertEquals(blob, retrievedBlob);
-			assertEquals(blob.getSeed(),retrievedBlob.getSeed());
-
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		futureAttribute = internalCtxBroker.updateAttribute(updatedAttribute.getId(), blobBytes);
+		// Verify binary attribute value
+		binaryAttribute = (CtxAttribute) futureAttribute.get();
+		assertNotNull(binaryAttribute.getBinaryValue());
+		final MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(
+						binaryAttribute.getBinaryValue(), this.getClass().getClassLoader());
+		assertEquals(blob, retrievedBlob);
 	}
 
 
@@ -568,6 +557,7 @@ public class InternalCtxBrokerTest {
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
 	 */
+	@Ignore
 	@Test
 	public void testSetHistoryTuples() throws CtxException, InterruptedException, ExecutionException {
 		
@@ -599,21 +589,6 @@ public class InternalCtxBrokerTest {
 		listOfEscortingAttributeIds.add(escortingAttribute2.getId());
 		System.out.println("primary "+ primaryAttribute.getId());
 		System.out.println("escorting tuple list "+ listOfEscortingAttributeIds);
-		internalCtxBroker.setHistoryTuples(primaryAttribute.getId(), listOfEscortingAttributeIds);
-		 		
-		
+		internalCtxBroker.setHistoryTuples(primaryAttribute.getId(), listOfEscortingAttributeIds);	
 	}
-	
-
-
-
-
-
-
-
-
-
-
-
-
 }
