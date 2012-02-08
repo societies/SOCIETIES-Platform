@@ -92,14 +92,15 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
             <scope>provided</scope>
         </dependency>
 
-      <!-- Smack versions used in the communication framework (not currently used)
+      <!-- aSmack version 
+	0.3 designates 2010.05.07 (http://code.google.com/p/asmack/)-->
       <dependency>
-        <groupId>org.igniterealtime</groupId>
-        <artifactId>tinder</artifactId>
-        <version>1.2.2</version>
-        <type>jar</type>
+        <groupId>org.asmack</groupId>
+        <artifactId>asmack</artifactId>
+        <version>0.3</version>
         <scope>compile</scope>
-      </dependency>-->
+      </dependency>
+
         <dependency>
             <groupId>com.phonegap</groupId>
             <artifactId>phonegap</artifactId>
