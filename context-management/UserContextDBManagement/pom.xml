@@ -26,42 +26,46 @@
             <version>4.0</version>
             <scope>test</scope>
         </dependency>
-		
-		
+		 	
         <!-- Spring framework -->
+<!-- TODO Comment out when library in use
         <dependency>
 	        <groupId>org.springframework</groupId>
 	        <artifactId>spring</artifactId>
 	        <version>2.5.6</version>
         </dependency>
-
+-->
         <!-- MySQL database driver -->
+<!-- TODO Comment out when library in use
 	<dependency>
 		<groupId>mysql</groupId>
 		<artifactId>mysql-connector-java</artifactId>
 		<version>5.1.9</version>
 	</dependency>
- 
-	<!-- Hibernate library dependecy end --> 
+-->
+	<!-- Hibernate library dependecy end -->
+<!-- TODO Comment out when library in use 
 	<dependency>
 		<groupId>org.slf4j</groupId>
 		<artifactId>slf4j-log4j12</artifactId>
 		<version>1.6.2</version>
-	</dependency> 
-
+	</dependency>
+-->
+<!-- TODO Comment out when library in use
 	<dependency>
 		<groupId>javassist</groupId>
 		<artifactId>javassist</artifactId>
 		<version>3.4.GA</version>
 		<optional>true</optional>
 	</dependency>
-
+-->
+<!-- TODO Comment out when library in use
 	<dependency>
 		<groupId>org.hibernate</groupId>
 		<artifactId>hibernate-core</artifactId>
 		<version>3.6.0.Final</version>
 	</dependency>
-		
+-->
 	</dependencies>
 	
 	<parent>
