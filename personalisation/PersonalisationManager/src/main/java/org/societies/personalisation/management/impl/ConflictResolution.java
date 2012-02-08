@@ -22,11 +22,13 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.personalisation.mgmt;
+package org.societies.personalisation.management.impl;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.personalisation.model.IAction;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.internal.personalisation.model.IOutcome;
+import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
+import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
+import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
+import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 
 /**
  * Describe your class here...
@@ -34,7 +36,28 @@ import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
  * @author Eliza
  *
  */
-public interface IPersonalisationCallback {
+public class ConflictResolution {
 
-	public void receiveIAction(Identity providerId, Identity userId, IServiceResourceIdentifier serviceId, IAction action);
+	public ConflictResolution(){
+		
+	}
+	
+	
+	public IOutcome resolvePreferenceConflicts(IDIANNEOutcome dOutcome, IPreferenceOutcome pOutcome){
+		if (dOutcome.getConfidenceLevel()<pOutcome.getConfidenceLevel()){
+			return pOutcome;
+		}
+		
+		
+			return dOutcome;
+		
+	}
+	
+	public IOutcome resolveIntentConflicts(IUserIntentAction cauiOutcome, CRISTUserAction cristOutcome){
+		if (cauiOutcome.getConfidenceLevel()<cristOutcome.getConfidenceLevel()){
+			return cristOutcome;
+		}
+		
+		return cauiOutcome;
+	}
 }

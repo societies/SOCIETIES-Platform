@@ -70,7 +70,7 @@
                 <configuration>
                     <excludes>
                         <exclude>**/SNDataExtractor/**</exclude>
-                        <exclude>**/CRIST/**</exclude>
+                        
                     </excludes>
                 </configuration>
              </plugin> 

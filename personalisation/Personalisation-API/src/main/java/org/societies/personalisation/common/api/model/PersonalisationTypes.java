@@ -22,11 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.personalisation.mgmt;
-
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.personalisation.model.IAction;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+package org.societies.personalisation.common.api.model;
 
 /**
  * Describe your class here...
@@ -34,7 +30,7 @@ import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
  * @author Eliza
  *
  */
-public interface IPersonalisationCallback {
+public enum PersonalisationTypes {
 
-	public void receiveIAction(Identity providerId, Identity userId, IServiceResourceIdentifier serviceId, IAction action);
+	DIANNE, UserPreference,CRISTIntent, CAUIIntent;
 }
