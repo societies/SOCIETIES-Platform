@@ -24,6 +24,7 @@
  */
 package org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.DataWrapper;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.SampleObfuscator;
 
@@ -59,5 +60,27 @@ public class SampleWrapper extends DataWrapper {
 		if (-1 != obfuscator.getParam1()) {
 			setAsReadyForObfuscation();
 		}
+	}
+
+
+	/*
+	 * @see org.societies.privacytrust.privacyprotection.dataobfuscation.DataWrapper#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		// -- Verify reference equality
+        if (obj == this) {
+            return true;
+        }
+        
+        // -- Verify obj type
+        if (obj instanceof SampleWrapper) {
+        	SampleWrapper other = (SampleWrapper) obj;
+        	return (new EqualsBuilder()
+	            .append(this.getParam1(), other.getParam1())
+	            .isEquals()) && (super.equals(obj));
+        }
+        
+        return false;
 	}
 }

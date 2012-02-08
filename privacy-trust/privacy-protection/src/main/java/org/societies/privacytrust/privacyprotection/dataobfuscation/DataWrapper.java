@@ -24,6 +24,9 @@
  */
 package org.societies.privacytrust.privacyprotection.dataobfuscation;
 
+import java.lang.reflect.TypeVariable;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.mock.DataIdentifier;
@@ -142,5 +145,44 @@ public class DataWrapper implements IDataWrapper {
 	 */
 	protected void setObfuscator(IDataObfuscator obfuscator) {
 		this.obfuscator = obfuscator;
+	}
+	/*
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		// -- Verify reference equality
+        if (obj == this) {
+            return true;
+        }
+        
+        // -- Verify obj type
+        if (obj instanceof DataWrapper) {
+        	DataWrapper other = (DataWrapper) obj;
+        	return new EqualsBuilder()
+	            .append(this.getDataId(), other.getDataId())
+	            .append(this.getObfuscator(), other.getObfuscator())
+	            .isEquals();
+            
+//        	// - Verify attributes
+//            // - Simple type attributes
+//            // Verify value
+//            if (this.atribute1 != other.atribute1) {
+//                return false; // attributes are different
+//            }
+//            // - Object type attributes
+//            // Verify references
+//            if (this.getDataId() != other.getDataId()) {
+//                // Verify equality
+//                if (this.getDataId() == null || !this.getDataId().equals(other.getDataId())) {
+//                    return false; // attributes are different
+//                }
+//            }
+//            
+//            // - Every attributes are equal
+//            return true;
+        }
+        
+        return false;
 	}
 }

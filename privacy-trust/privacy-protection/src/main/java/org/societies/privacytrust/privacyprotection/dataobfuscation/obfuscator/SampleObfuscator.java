@@ -29,6 +29,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfus
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper.SampleWrapper;
+import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
 
 /**
  * @state skeleton 
@@ -67,4 +68,15 @@ public class SampleObfuscator implements IDataObfuscator {
 	public void setParam1(int param1) {
 		this.param1 = param1;
 	}
+
+
+	/*
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		return (obj==this && obj instanceof SampleObfuscator);
+	}
+	
+	
 }
