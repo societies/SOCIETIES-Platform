@@ -99,9 +99,9 @@ public class DataObfuscationManager implements IDataObfuscationManager {
 		if (dataWrapper.isPersistenceEnabled()) {
 			// TODO: retrieve obfsucated data ID using data broker
 			// An obfuscated version exist
-			if (false) {
+//			if (false) {
 //				System.out.println("Retrieve the persisted data id of data id "+dataWrapper.getDataId());
-			}
+//			}
 		}
 		// There is no obfuscated version
 		listener.onObfuscatedVersionRetrieved(dataWrapper.getDataId(), false);

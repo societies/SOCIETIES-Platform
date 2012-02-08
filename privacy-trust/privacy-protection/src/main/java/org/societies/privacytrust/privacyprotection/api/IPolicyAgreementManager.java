@@ -27,11 +27,11 @@ package org.societies.privacytrust.privacyprotection.api;
 import java.util.List;
 import java.util.Map;
 
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
-import org.societies.privacytrust.privacyprotection.mock.EntityIdentifier;
-import org.societies.privacytrust.privacyprotection.mock.ServiceResourceIdentifier;
 
 /**
  * @author olivierm
@@ -73,7 +73,7 @@ public interface IPolicyAgreementManager {
 	 * @param requestorId
 	 * @param serviceId
 	 */
-	public ResponseItem getPermissionConditionsInAgreement(DataIdentifier dataId, EntityIdentifier ownerId, EntityIdentifier requestorId, ServiceResourceIdentifier serviceId);
+	public ResponseItem getPermissionConditionsInAgreement(DataIdentifier dataId, Identity ownerId, Identity requestorId, IServiceResourceIdentifier serviceId);
 
 	/**
 	 * The objective here is to retrieve the part of the CIS negotiation agreement
@@ -85,7 +85,7 @@ public interface IPolicyAgreementManager {
 	 * @param requestorId
 	 * @param cisId
 	 */
-	public ResponseItem getPermissionConditionsInAgreement(DataIdentifier dataId, EntityIdentifier ownerId, EntityIdentifier requestorId, EntityIdentifier cisId);
+	public ResponseItem getPermissionConditionsInAgreement(DataIdentifier dataId, Identity ownerId, Identity requestorId, Identity cisId);
 
 	/**
 	 * Update Negotiation Agreement (with a Service)
@@ -94,7 +94,7 @@ public interface IPolicyAgreementManager {
 	 * @param myId
 	 * @param serviceId
 	 */
-	public NegotiationAgreement updateAgreement(NegotiationAgreement agreement, EntityIdentifier myId, ServiceResourceIdentifier serviceId);
+	public NegotiationAgreement updateAgreement(NegotiationAgreement agreement, Identity myId, IServiceResourceIdentifier serviceId);
 
 	/**
 	 * Update Negotiation Agreement (with a CIS)
@@ -103,6 +103,6 @@ public interface IPolicyAgreementManager {
 	 * @param myId
 	 * @param cisId
 	 */
-	public NegotiationAgreement updateAgreement(NegotiationAgreement agreement, EntityIdentifier myId, EntityIdentifier cisId);
+	public NegotiationAgreement updateAgreement(NegotiationAgreement agreement, Identity myId, Identity cisId);
 
 }

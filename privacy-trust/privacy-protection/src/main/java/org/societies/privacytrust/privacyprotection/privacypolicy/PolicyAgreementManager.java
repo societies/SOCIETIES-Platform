@@ -27,12 +27,12 @@ package org.societies.privacytrust.privacyprotection.privacypolicy;
 import java.util.List;
 import java.util.Map;
 
-import org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager;
 import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
-import org.societies.privacytrust.privacyprotection.mock.EntityIdentifier;
-import org.societies.privacytrust.privacyprotection.mock.ServiceResourceIdentifier;
 
 /**
  * @author olivierm
@@ -72,30 +72,30 @@ public class PolicyAgreementManager implements IPolicyAgreementManager {
 
 	@Override
 	public ResponseItem getPermissionConditionsInAgreement(
-			DataIdentifier dataId, EntityIdentifier ownerId,
-			EntityIdentifier requestorId, ServiceResourceIdentifier serviceId) {
+			DataIdentifier dataId, Identity ownerId,
+			Identity requestorId, IServiceResourceIdentifier serviceId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public ResponseItem getPermissionConditionsInAgreement(
-			DataIdentifier dataId, EntityIdentifier ownerId,
-			EntityIdentifier requestorId, EntityIdentifier cisId) {
+			DataIdentifier dataId, Identity ownerId,
+			Identity requestorId, Identity cisId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public NegotiationAgreement updateAgreement(NegotiationAgreement agreement,
-			EntityIdentifier myId, ServiceResourceIdentifier serviceId) {
+			Identity myId, IServiceResourceIdentifier serviceId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public NegotiationAgreement updateAgreement(NegotiationAgreement agreement,
-			EntityIdentifier myId, EntityIdentifier cisId) {
+			Identity myId, Identity cisId) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -24,9 +24,9 @@
  */
 package org.societies.privacytrust.privacyprotection.datamanagement;
 
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.privacytrust.privacyprotection.api.IInternalPrivacyDataManager;
 import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
-import org.societies.privacytrust.privacyprotection.mock.EntityIdentifier;
 
 /**
  * @state skeleton 
@@ -38,7 +38,7 @@ public class InternalPrivacyDataManager implements IInternalPrivacyDataManager {
 	 */
 	@Override
 	public void updatePermissions(DataIdentifier dataId, String agreementId,
-			EntityIdentifier ownerId, EntityIdentifier requestorId) {
+			Identity ownerId, Identity requestorId) {
 		// TODO Auto-generated method stub
 
 	}

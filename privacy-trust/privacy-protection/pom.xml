@@ -27,7 +27,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.privacytrust</groupId>
-	<artifactId>privacy-protection</artifactId>
+	<artifactId>privacyprotection</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.1</version>
 	<developers>
