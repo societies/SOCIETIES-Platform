@@ -21,30 +21,46 @@ package org.societies.personalisation.management.impl;
 
 
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxModelObject;
-import org.societies.api.internal.context.broker.IUserCtxBroker;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.IFeedbackEvent;
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
-import org.societies.api.personalisation.model.IAction;
-import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
-import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
-import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
+import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
+import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
-import org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor;
+import org.societies.personalisation.common.api.model.PersonalisationTypes;
 import org.societies.personalisation.preference.api.UserPreferenceManagement.IUserPreferenceManagement;
-import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 
 
 public class PersonalisationManager implements IPersonalisationManager, IInternalPersonalisationManager{
 
-	private IUserCtxBroker ctxBroker;
-
+	
+	//services
+	private ICtxBroker ctxBroker;
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private IUserPreferenceManagement prefMgr;
-	//private IUserPreferenceConditionMonitor upcm;
+	private IDIANNE dianneNetwork;
+	private ICAUIPrediction cauiPrediction;
+	private ICRISTUserIntentPrediction cristPrediction;
+	
+	//data structures
+	ArrayList<CtxAttributeIdentifier> dianneList;
+	ArrayList<CtxAttributeIdentifier> prefMgrList;
+	ArrayList<CtxAttributeIdentifier> cauiList;
+	ArrayList<CtxAttributeIdentifier> cristList;
+	
 	
 	
 	public PersonalisationManager(){
@@ -52,28 +68,24 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 
 	}
 	
-	public PersonalisationManager(IUserCtxBroker broker, IUserPreferenceManagement upm){
-		this.prefMgr = upm;
-		//this.setUserPreferenceManagement(upm);
-		//this.upcm = upcm;
-		
-		/*if (this.upcm==null){
-			System.out.println("PCM is null");
-		}else{
-			System.out.println("PCM is NOT null");
-		}*/
-		
-		
+	public PersonalisationManager(ICtxBroker broker, IUserPreferenceManagement upm, IDIANNE dianneNetwork, ICAUIPrediction cauiPrediction, ICRISTUserIntentPrediction cristPrediction){
 		this.ctxBroker = broker;
+		this.prefMgr = upm;
+		this.dianneNetwork = dianneNetwork;
+		this.cauiPrediction = cauiPrediction;
+		this.cristPrediction = cristPrediction;
 		
-
-
+		this.dianneList = new ArrayList<CtxAttributeIdentifier>();
+		this.prefMgrList = new ArrayList<CtxAttributeIdentifier>();
+		this.cauiList = new ArrayList<CtxAttributeIdentifier>();
+		this.cristList = new ArrayList<CtxAttributeIdentifier>();
 		
-		
-		//this.broker = broker;
 		
 	} 
-	
+
+	/*
+	 * INITIALISE SERVICES
+	 */
 	public void initialisePersonalisationManager(){
 		if (this.ctxBroker==null){
 			System.out.println(this.getClass().getName()+"CtxBroker is null");
@@ -90,12 +102,7 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 		
 		
 		System.out.println("Yo!! I'm a brand new service and my interface is: "+this.getClass().getName());
-		IAction a = this.prefMgr.getPreference(null, null, null, null);
-		if (a==null){
-			System.out.println(this.getClass().getName()+"Didn't get a preference outcome");
-		}else{
-			System.out.println(this.getClass().getName()+"Got preference outcome! : "+a.getparameterName()+" "+a.getvalue());
-		}
+		
 	}
 	
 	public IUserPreferenceManagement getPrefMgr() {
@@ -109,100 +116,179 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 		this.prefMgr = upm;
 	}
 
-	public IUserCtxBroker getCtxBroker(){
+	public IDIANNE getDianneNetwork() {
+		return dianneNetwork;
+	}
+
+	public void setDianneNetwork(IDIANNE dianneNetwork) {
+		this.dianneNetwork = dianneNetwork;
+	}
+
+	public ICAUIPrediction getCauiPrediction() {
+		return cauiPrediction;
+	}
+
+	public void setCauiPrediction(ICAUIPrediction cauiPrediction) {
+		this.cauiPrediction = cauiPrediction;
+	}
+
+	public ICRISTUserIntentPrediction getCristPrediction() {
+		return cristPrediction;
+	}
+
+	public void setCristPrediction(ICRISTUserIntentPrediction cristPrediction) {
+		this.cristPrediction = cristPrediction;
+	}
+
+	public ICtxBroker getCtxBroker(){
 		System.out.println(this.getClass().getName()+"Return CtxBroker");
 		return this.ctxBroker;
 	}
 
-	public void setCtxBroker(IUserCtxBroker broker){
+	public void setCtxBroker(ICtxBroker broker){
 		this.ctxBroker = broker;
 	}
 	
 	
-	@Override
-	public IAction getIntentAction(EntityIdentifier arg0,
-			EntityIdentifier arg1, ServiceResourceIdentifier arg2, String arg3) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
+	
+	/*
+	 * IMPLEMENT INTERFACE METHODS
+	 */
 
-	@Override
-	public IAction getPreference(EntityIdentifier arg0, EntityIdentifier arg1,
-			String arg2, ServiceResourceIdentifier arg3, String arg4) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public IAction getIntentTask(EntityIdentifier arg0,
-			ServiceResourceIdentifier arg1, String arg2) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public IAction getIntentTask(EntityIdentifier arg0, EntityIdentifier arg1,
-			ServiceResourceIdentifier arg2, String arg3) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public IAction getPreference(EntityIdentifier arg0, String arg1,
-			ServiceResourceIdentifier arg2, String arg3) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void registerForContextUpdate(EntityIdentifier identifier, String className,
-			CtxAttributeIdentifier attrId) {
-		
-		//this.broker.registerForUpdates(attrId.getScope(), attrId.getType(), new ContextEventCallback(this));
-	}
-
+	
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.personalisation.common.api.management.IInternalPersonalisationManager#returnFeedback(org.societies.api.internal.personalisation.model.IFeedbackEvent)
+	 */
 	@Override
 	public void returnFeedback(IFeedbackEvent arg0) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
-	public void sendCAUIOutcome(EntityIdentifier arg0,
-			ServiceResourceIdentifier arg1, IUserIntentAction arg2) {
-		// TODO Auto-generated method stub
-		
-	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.personalisation.common.api.management.IInternalPersonalisationManager#registerForContextUpdate(org.societies.api.comm.xmpp.datatypes.Identity, org.societies.personalisation.common.api.model.PersonalisationTypes, org.societies.api.context.model.CtxAttributeIdentifier)
+	 */
 	@Override
-	public void sendCRISTUserIntentOutcome(EntityIdentifier owner,
-			ServiceResourceIdentifier serviceId, ICRISTUserAction cristOutcome) {
-		// TODO Auto-generated method stub
+	public void registerForContextUpdate(Identity id, PersonalisationTypes type, CtxAttributeIdentifier ctxAttributeId) {
+		try {
+			this.ctxBroker.registerForUpdates(ctxAttributeId);
+			
+		} catch (CtxException e) {
+			logging.error(e.getMessage());
+			e.printStackTrace();
+		}
 		
-		System.out.println("Personalisation Manager received the CRIST Outcome.");
+		switch (type){
+		case UserPreference:
+			this.addtoList(ctxAttributeId, prefMgrList);
+		case DIANNE: 
+			this.addtoList(ctxAttributeId, dianneList);
+			break;
+		case CAUIIntent: 
+			this.addtoList(ctxAttributeId, cauiList);
+			break;
+		case CRISTIntent:
+			this.addtoList(ctxAttributeId, cristList);
+			break;
+		default: return;
+		}
+		
 	}
 	
+	private void addtoList(CtxAttributeIdentifier ctxId, List<CtxAttributeIdentifier> list){
+		for (CtxAttributeIdentifier Id :list){
+			if (ctxId.equals(Id)){
+				return;
+			}
+		}
+		
+		list.add(ctxId);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.personalisation.common.api.management.IInternalPersonalisationManager#getPreference(org.societies.api.comm.xmpp.datatypes.Identity, java.lang.String, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier, java.lang.String, org.societies.api.personalisation.mgmt.IPersonalisationCallback)
+	 */
 	@Override
-	public void sendDianneOutcome(EntityIdentifier arg0,
-			ServiceResourceIdentifier arg1, IDIANNEOutcome arg2) {
+	public void getPreference(Identity ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 
+
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.personalisation.mgmt.IPersonalisationManager#getIntentAction(org.societies.api.comm.xmpp.datatypes.Identity, org.societies.api.comm.xmpp.datatypes.Identity, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier, java.lang.String, org.societies.api.personalisation.mgmt.IPersonalisationCallback)
+	 */
 	@Override
-	public void sendPreferenceOutcome(EntityIdentifier arg0, String arg1,
-			ServiceResourceIdentifier arg2, IPreferenceOutcome arg3) {
-		// TODO Auto-generated method stub
+	public void getIntentAction(Identity requestor, Identity ownerID, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback){
 		
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.personalisation.mgmt.IPersonalisationManager#getPreference(org.societies.api.comm.xmpp.datatypes.Identity, org.societies.api.comm.xmpp.datatypes.Identity, java.lang.String, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier, java.lang.String, org.societies.api.personalisation.mgmt.IPersonalisationCallback)
+	 */
 	@Override
-	public void updateReceived(CtxModelObject obj) {
-		//check who to send it to
-		CtxAttribute attribute = (CtxAttribute) obj;
-		System.out.println("Received context event\n");
-		System.out.println("Attribute type: "+attribute.getType());
-		System.out.println("Attribute value: "+attribute.getStringValue());
+	public void getPreference(Identity requestor, Identity ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback){
+		// TODO Auto-generated method stub
 		
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.personalisation.common.api.management.IInternalPersonalisationManager#getIntentAction(org.societies.api.comm.xmpp.datatypes.Identity, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier, java.lang.String, org.societies.api.personalisation.mgmt.IPersonalisationCallback)
+	 */
+	@Override
+	public void getIntentAction(Identity ownerID, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback){
+		
+	}
+	
+	
+	public void updateReceived(CtxModelObject ctxAttribute){
+		if (ctxAttribute instanceof CtxAttribute){
+			InternalPersonalisationCallback callback = new InternalPersonalisationCallback(this);
+			CtxAttributeIdentifier ctxId = (CtxAttributeIdentifier) ctxAttribute.getId();
+			
+			if (this.containsCtxId(ctxId, dianneList)){
+				this.dianneNetwork.getOutcome(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
+				if (this.containsCtxId(ctxId, prefMgrList)){	
+					this.prefMgr.getPreferenceOutcome(ctxId.getOperatorId(), ctxAttribute, callback);
+					callback.setAskDianne(false);
+					callback.setAskPreference(false);
+				}else{
+					callback.setAskPreference(true);
+				}
+				
+			}else if(this.containsCtxId(ctxId, prefMgrList)){
+				this.prefMgr.getPreferenceOutcome(ctxId.getOperatorId(), ctxAttribute, callback);
+				if (this.containsCtxId(ctxId, dianneList)){
+					this.dianneNetwork.getOutcome(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
+					callback.setAskDianne(false);
+					callback.setAskPreference(false);
+				}else{
+					callback.setAskDianne(true);
+				}
+			}else if (this.containsCtxId(ctxId, cauiList)){
+				this.cauiPrediction.getPrediction(ctxId.getOperatorId(), ctxAttribute, callback);
+			}
+			
+		}
+	}
+	
+	private boolean containsCtxId(CtxAttributeIdentifier ctxId, List<CtxAttributeIdentifier> list){
+		for (CtxAttributeIdentifier id:list){
+			if (ctxId.equals(id)){
+				return true;
+			}
+		}
+		return false;
+	}
+
 }
