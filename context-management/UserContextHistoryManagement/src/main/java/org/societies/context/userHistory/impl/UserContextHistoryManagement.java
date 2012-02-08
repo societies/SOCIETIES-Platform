@@ -75,11 +75,6 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
 	}
 
-	
-
-
-
-
 	public List<CtxHistoryAttribute> retrieveHistory(CtxAttributeIdentifier attrId) {
 
 		
@@ -122,35 +117,12 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 		return results;
 	}
 
-
-
-	@Override
-	public List<CtxAttributeIdentifier> getCtxHistoryTuples(
-			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1)
-			throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-
 	@Override
 	public int removeCtxHistory(CtxAttribute arg0, Date arg1, Date arg2)
 			throws CtxException {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-
-
-
-	@Override
-	public Boolean removeCtxHistoryTuples(CtxAttributeIdentifier arg0,
-			List<CtxAttributeIdentifier> arg1) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
 
 	@Override
 	public int removeHistory(String arg0, Date arg1, Date arg2)
@@ -159,8 +131,6 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 		return 0;
 	}
 
-
-
 	@Override
 	public List<CtxHistoryAttribute> retrieveHistory(
 			CtxAttributeIdentifier arg0, int arg1) throws CtxException {
@@ -168,7 +138,25 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 		return null;
 	}
 
-
+	
+	//*************************************
+	//  Tuple management
+	//*************************************
+	
+	@Override
+	public List<CtxAttributeIdentifier> getCtxHistoryTuples(
+			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1)
+			throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public Boolean removeCtxHistoryTuples(CtxAttributeIdentifier arg0,
+			List<CtxAttributeIdentifier> arg1) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	@Override
 	public Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> retrieveHistoryTuples(
@@ -178,16 +166,12 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 		return null;
 	}
 
-
-
 	@Override
 	public Boolean setCtxHistoryTuples(CtxAttributeIdentifier arg0,
 			List<CtxAttributeIdentifier> arg1) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-
 
 	@Override
 	public List<CtxAttributeIdentifier> updateCtxHistoryTuples(
@@ -196,8 +180,5 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-
-
 
 }

@@ -24,6 +24,7 @@
  */
 package org.societies.context.broker.impl;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,6 +47,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgrCallback;
@@ -517,9 +519,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	}
 
 	@Override
-	public Future<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>> retrieveHistoryTuples(
-			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1,
-			Date arg2, Date arg3) throws CtxException {
+	public Future<Integer> removeHistory(String type, Date startDate, Date endDate) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -530,6 +530,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 
 	@Override
 	public Future<List<CtxAttributeIdentifier>> getHistoryTuples(
@@ -547,10 +548,60 @@ public class InternalCtxBroker implements ICtxBroker {
 	}
 
 	@Override
-	public Future<Boolean> setHistoryTuples(CtxAttributeIdentifier arg0,
-			List<CtxAttributeIdentifier> arg1) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+	public Future<Boolean> setHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException {
+
+
+		// set hoc recording flug for the attributes contained in tuple list
+		final List<String> attrIds = new ArrayList<String>();
+		// add the current attr id
+		attrIds.add(primaryAttrIdentifier.toString());
+
+		for (CtxAttributeIdentifier escortingAttrID : listOfEscortingAttributeIds) {
+			// add the escorting attr ids
+			attrIds.add(escortingAttrID.toString());
+			// store each escorting attribute in hoc
+			Future<CtxModelObject> attrFuture = this.retrieve(escortingAttrID);
+			CtxAttribute attr;
+			
+			try {
+				attr = (CtxAttribute) attrFuture.get();
+				attr.setHistoryRecorded(true);
+				this.update(attr);
+				
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		final String tupleAttrType = "tupleIds_" + primaryAttrIdentifier.getType();
+		final CtxAttribute tupleAttr = (CtxAttribute) this.createAttribute(primaryAttrIdentifier.getScope(), tupleAttrType);
+
+		byte[] attrIdsBlob;
+		Future<CtxModelObject> tupleAttrFuture;
+
+		try {
+			attrIdsBlob = SerialisationHelper.serialise((Serializable) attrIds);
+			tupleAttr.setBinaryValue(attrIdsBlob);
+
+			tupleAttrFuture= this.update(tupleAttr);
+		
+			// use this for test only
+			CtxAttribute  tupleAttrRetrieved = (CtxAttribute) tupleAttrFuture.get();
+			System.out.println("tupleAttr "+tupleAttrRetrieved.getId() );
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		return new AsyncResult<Boolean>(true);
 	}
 
 	@Override
@@ -560,10 +611,17 @@ public class InternalCtxBroker implements ICtxBroker {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	@Override
-	public Future<Integer> removeHistory(String type, Date startDate, Date endDate) throws CtxException {
+	public Future<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>> retrieveHistoryTuples(
+			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1,
+			Date arg2, Date arg3) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
+
+
 
 }
