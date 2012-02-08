@@ -60,8 +60,8 @@ public class PacketMarshaller {
 		ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());		
 		Document document = reader.read(is);
 		Message message = new Message();
-//		if(type != null) TODO throws CloneNotSupportedException when uncommented
-//			message.setType(type);
+		if(type != null)                        
+			message.setType(type);
 		message.setTo(stanza.getTo().getJid());
 		message.getElement().add(document.getRootElement());
 		return message.toXML();
