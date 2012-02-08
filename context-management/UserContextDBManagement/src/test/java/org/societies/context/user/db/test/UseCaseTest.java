@@ -24,14 +24,9 @@
  */
 package org.societies.context.user.db.test;
 
-import java.util.List;
-
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
-import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxModelObject;
-import org.societies.context.api.user.db.IUserCtxDBMgrCallback;
 import org.societies.context.user.db.impl.UserCtxDBMgr;
 
 public class UseCaseTest {
@@ -40,21 +35,15 @@ public class UseCaseTest {
 	static CtxEntity entity;
 	static CtxAttribute attribute;
 
-	// not using the IUserCtxDBMgrCallback because getEntity() is missing
-	CallbackImpl callback ;
-
 	UseCaseTest(){
 		userDB = new UserCtxDBMgr();
-		//callback = new CallbackImpl(userDB);
-		callback = new CallbackImpl();
 
 		System.out.println("start testing");
 		testCreateIndividualCtxEntity();
 		testCreateAttribute();
 		testRetrieveAttribute();
 		testUpdateAttribute();
-		}
-
+	}
 
 	/**
 	 * @param args
@@ -92,82 +81,5 @@ public class UseCaseTest {
 		attribute = userDB.retrieve(attribute.getId());
 //		attribute = (CtxAttribute) callback.getCtxModelObject();
 		System.out.println("attribute value should be 5 and it is:"+attribute.getIntegerValue());
-	}
-
-	private class CallbackImpl implements IUserCtxDBMgrCallback {
-
-		CtxEntity callbackEntity = null;
-		CtxAttribute callbackAttribute = null;
-		CtxModelObject ctxModelObject = null;
-
-		CallbackImpl(){
-		}
-
-
-		/* (non-Javadoc)
-		 * @see org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback#ctxAttributeCreated(org.societies.api.context.model.CtxAttribute)
-		 */
-		@Override
-		public void ctxAttributeCreated(CtxAttribute attribute) {
-			System.out.println("Test attribute created: " + attribute.getId());
-			this.callbackAttribute = attribute;
-		}
-
-		/* (non-Javadoc)
-		 * @see org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback#ctxEntitiesLookedup(java.util.List)
-		 */
-		@Override
-		public void ctxEntitiesLookedup(List<CtxEntityIdentifier> arg0) {
-			// TODO Auto-generated method stub
-		}
-
-		/* (non-Javadoc)
-		 * @see org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback#ctxEntityCreated(org.societies.api.context.model.CtxEntity)
-		 */
-		@Override
-		public void ctxEntityCreated(CtxEntity entity) {
-			System.out.println("callback : Test entity created: " + entity.getId());
-
-			this.callbackEntity = entity;
-		}
-
-		/* (non-Javadoc)
-		 * @see org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback#ctxIndividualCtxEntityCreated(org.societies.api.context.model.CtxEntity)
-		 */
-		@Override
-		public void ctxIndividualCtxEntityCreated(CtxEntity entity) {
-			System.out.println("callback : Test individual entity created: " + entity.getId());
-			this.callbackEntity = entity;
-		}
-
-		/* (non-Javadoc)
-		 * @see org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback#ctxModelObjectRetrieved(org.societies.api.context.model.CtxModelObject)
-		 */
-		@Override
-		public void ctxModelObjectRetrieved(CtxModelObject modelObject) {
-			System.out.println("callback : Test model object retrieved: " + modelObject.getId());
-			this.ctxModelObject =  modelObject;
-		}
-
-		/* (non-Javadoc)
-		 * @see org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback#ctxModelObjectUpdated(org.societies.api.context.model.CtxModelObject)
-		 */
-		@Override
-		public void ctxModelObjectUpdated(CtxModelObject modelObject) {
-			System.out.println("callback : Test model object updated: " + modelObject.getId());
-		}
-
-		public CtxAttribute getCtxAttribute(){
-			return this.callbackAttribute;
-		}
-
-		public CtxEntity getCtxEntity(){
-			return  this.callbackEntity;
-		}
-
-		public CtxModelObject getCtxModelObject(){
-			return  this.ctxModelObject;
-		}
-
 	}
 }
