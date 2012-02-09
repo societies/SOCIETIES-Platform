@@ -24,9 +24,10 @@
  */
 package org.societies.privacytrust.privacyprotection.dataobfuscation;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.mock.DataIdentifier;
 
 
 /**
@@ -57,7 +58,7 @@ public class DataWrapper implements IDataWrapper {
 	/**
 	 * ID of the data, useful for persistence
 	 */
-	private DataIdentifier dataId;
+	private CtxIdentifier dataId;
 	
 	
 	// -- CONSTRUCTOR
@@ -74,7 +75,7 @@ public class DataWrapper implements IDataWrapper {
 	 * and the unique ID of the data to obfuscate will be used to retrieve obfuscated version of the data.  
 	 * @param dataId A unique ID of the data to obfuscate is needed to enable persistence
 	 */
-	protected DataWrapper(DataIdentifier dataId) {
+	protected DataWrapper(CtxIdentifier dataId) {
 		this.dataId = dataId;
 		persistence = true;
 	}
@@ -93,7 +94,7 @@ public class DataWrapper implements IDataWrapper {
 	 * @param dataId A unique ID of the data to obfuscate is needed to enable persistence
 	 */
 	@Override
-	public void enabledPersistence(DataIdentifier dataId) {
+	public void enabledPersistence(CtxIdentifier dataId) {
 		this.dataId = dataId;
 		persistence = true;
 	}
@@ -120,14 +121,14 @@ public class DataWrapper implements IDataWrapper {
 	 * @return the dataId
 	 */
 	@Override
-	public DataIdentifier getDataId() {
+	public CtxIdentifier getDataId() {
 		return dataId;
 	}
 	/**
 	 * @param dataId the dataId to set
 	 */
 	@Override
-	public void setDataId(DataIdentifier dataId) {
+	public void setDataId(CtxIdentifier dataId) {
 		this.dataId = dataId;
 	}
 	
@@ -142,5 +143,50 @@ public class DataWrapper implements IDataWrapper {
 	 */
 	protected void setObfuscator(IDataObfuscator obfuscator) {
 		this.obfuscator = obfuscator;
+	}
+	/*
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		// -- Verify reference equality
+        if (obj == this) {
+            return true;
+        }
+        
+        // -- Verify obj type
+        if (obj instanceof DataWrapper) {
+        	DataWrapper other = (DataWrapper) obj;
+        	return new EqualsBuilder()
+	            .append(this.getDataId(), other.getDataId())
+	            .append(this.getObfuscator(), other.getObfuscator())
+	            .isEquals();
+            
+//        	// - Verify attributes
+//            // - Simple type attributes
+//            // Verify value
+//            if (this.atribute1 != other.atribute1) {
+//                return false; // attributes are different
+//            }
+//            // - Object type attributes
+//            // Verify references
+//            if (this.getDataId() != other.getDataId()) {
+//                // Verify equality
+//                if (this.getDataId() == null || !this.getDataId().equals(other.getDataId())) {
+//                    return false; // attributes are different
+//                }
+//            }
+//            if (this.getObfuscator() != other.getObfuscator()) {
+//            	// Verify equality
+//            	if (this.getObfuscator() == null || !this.getObfuscator().equals(other.getObfuscator())) {
+//            		return false; // attributes are different
+//            	}
+//            }
+//            
+//            // - Every attributes are equal
+//            return true;
+        }
+        
+        return false;
 	}
 }

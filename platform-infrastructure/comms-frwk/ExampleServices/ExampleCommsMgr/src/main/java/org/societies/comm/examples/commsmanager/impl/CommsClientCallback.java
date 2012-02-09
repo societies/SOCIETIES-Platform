@@ -133,21 +133,18 @@ public class CommsClientCallback implements ICommCallback {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveItems(org.societies.comm.xmpp.datatypes.Stanza, java.lang.String, java.util.List)
-	 */
-	@Override
-	public void receiveItems(Stanza returnStanza, String node, List<XMPPNode> info) {
-		System.out.println(returnStanza.getTo());
-		
-	}
-
-	/* (non-Javadoc)
 	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveMessage(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object)
 	 */
 	@Override
 	public void receiveMessage(Stanza returnStanza, Object messageBean) {
 		System.out.println(messageBean.getClass().toString());		
 	}
-	
 
+	/* (non-Javadoc)
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveItems(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.String, java.util.List)
+	 */
+	@Override
+	public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
+		// TODO Auto-generated method stub	
+	}
 }

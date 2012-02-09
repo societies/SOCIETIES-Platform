@@ -22,27 +22,17 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api;
-
-import org.societies.privacytrust.privacyprotection.mock.DataIdentifier;
-import org.societies.privacytrust.privacyprotection.mock.EntityIdentifier;
+package org.societies.personalisation.UserPreferenceManagement.impl.management;
 
 /**
- * Internal interface to manage data access control and data access conditions.
- * @author olivierm
- * @version 1.0
- * @created 09-nov.-2011 16:45:57
+ * Describe your class here...
+ *
+ * @author Eliza
+ *
  */
-public interface IInternalPrivacyDataManager {
+public class CtxModelTypes {
 
-	/**
-	 * Update access control permissions over a data
-	 * 
-	 * @param dataId
-	 * @param agreementId
-	 * @param ownerId
-	 * @param requestorId
-	 */
-	public void updatePermissions(DataIdentifier dataId, String agreementId, EntityIdentifier ownerId, EntityIdentifier requestorId);
-
+	public static final String PREFERENCE_REGISTRY = "PREFERENCE_REGISTRY";
+	public static final String HAS_PREFERENCES = "HAS_PREFERENCES";
+	public static final String PREFERENCE = "PREFERENCE";
 }

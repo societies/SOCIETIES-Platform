@@ -24,9 +24,9 @@
  */
 package org.societies.privacytrust.privacyprotection.dataobfuscation.listener;
 
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.mock.DataIdentifier;
 
 /**
  * @state skeleton 
@@ -50,7 +50,7 @@ public class SampleDataObfuscationListener implements IDataObfuscationListener {
 	}
 
 	@Override
-	public void onObfuscatedVersionRetrieved(DataIdentifier dataId, boolean retrieved) {
+	public void onObfuscatedVersionRetrieved(CtxIdentifier dataId, boolean retrieved) {
 		if (retrieved) {
 			System.out.println("Obfuscated version retrieved: "+dataId);
 		}

@@ -42,7 +42,7 @@ import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 
@@ -61,21 +61,21 @@ public class CtxBroker implements ICtxBroker {
 	}
 
 	@Override
-	public Future<CtxAssociation> createAssociation(EntityIdentifier requester,
+	public Future<CtxAssociation> createAssociation(Identity requester,
 			String type) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Future<CtxAttribute> createAttribute(EntityIdentifier requester,
+	public Future<CtxAttribute> createAttribute(Identity requester,
 			CtxEntityIdentifier scope, String type) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Future<CtxEntity> createEntity(EntityIdentifier requester,
+	public Future<CtxEntity> createEntity(Identity requester,
 			String type) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
@@ -91,14 +91,14 @@ public class CtxBroker implements ICtxBroker {
 
 
 	@Override
-	public Future<CtxModelObject> remove(EntityIdentifier requester,
+	public Future<CtxModelObject> remove(Identity requester,
 			CtxIdentifier identifier) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Future<CtxModelObject> retrieve(EntityIdentifier requester,
+	public Future<CtxModelObject> retrieve(Identity requester,
 			CtxIdentifier identifier) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
@@ -106,30 +106,30 @@ public class CtxBroker implements ICtxBroker {
 
 	@Override
 	public Future<List<CtxAttribute>> retrieveFuture(
-			EntityIdentifier requester, CtxAttributeIdentifier attrId, Date date) throws CtxException {
+			Identity requester, CtxAttributeIdentifier attrId, Date date) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Future<List<CtxAttribute>> retrieveFuture(
-			EntityIdentifier requester, CtxAttributeIdentifier attrId,
+			Identity requester, CtxAttributeIdentifier attrId,
 			int modificationIndex) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Future<List<CtxHistoryAttribute>> retrievePast(
-			EntityIdentifier requester, CtxAttributeIdentifier attrId,
+	public Future<List<CtxHistoryAttribute>> retrieveHistory(
+			Identity requester, CtxAttributeIdentifier attrId,
 			int modificationIndex) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Future<List<CtxHistoryAttribute>> retrievePast(
-			EntityIdentifier requester, CtxAttributeIdentifier attrId,
+	public Future<List<CtxHistoryAttribute>> retrieveHistory(
+			Identity requester, CtxAttributeIdentifier attrId,
 			Date startDate, Date endDate) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
@@ -137,7 +137,7 @@ public class CtxBroker implements ICtxBroker {
 
 
 	@Override
-	public Future<CtxModelObject> update(EntityIdentifier requester,
+	public Future<CtxModelObject> update(Identity requester,
 			CtxModelObject object) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
@@ -145,7 +145,7 @@ public class CtxBroker implements ICtxBroker {
 
 	@Override
 	public Future<CtxEntity> retrieveAdministratingCSS(
-			EntityIdentifier requester, CtxEntityIdentifier communityEntId) throws CtxException {
+			Identity requester, CtxEntityIdentifier communityEntId) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -154,20 +154,20 @@ public class CtxBroker implements ICtxBroker {
 
 	@Override
 	public Future<List<CtxEntityIdentifier>> retrieveCommunityMembers(
-			EntityIdentifier requester, CtxEntityIdentifier community) throws CtxException {
+			Identity requester, CtxEntityIdentifier community) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Future<List<CtxEntityIdentifier>> retrieveParentCommunities(
-			EntityIdentifier requester, CtxEntityIdentifier community) throws CtxException {
+			Identity requester, CtxEntityIdentifier community) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Future<List<CtxIdentifier>> lookup(EntityIdentifier requester,
+	public Future<List<CtxIdentifier>> lookup(Identity requester,
 			CtxModelType modelType, String type) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
@@ -175,7 +175,7 @@ public class CtxBroker implements ICtxBroker {
 
 	@Override
 	public Future<List<CtxEntityIdentifier>> lookupEntities(
-			EntityIdentifier requester, String entityType, String attribType,
+			Identity requester, String entityType, String attribType,
 			Serializable minAttribValue, Serializable maxAttribValue)
 			throws CtxException {
 		// TODO Auto-generated method stub
@@ -183,28 +183,28 @@ public class CtxBroker implements ICtxBroker {
 	}
 
 	@Override
-	public void registerForUpdates(EntityIdentifier requester,
+	public void registerForUpdates(Identity requester,
 			CtxEntityIdentifier scope, String attrType) throws CtxException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void registerForUpdates(EntityIdentifier requester,
+	public void registerForUpdates(Identity requester,
 			CtxAttributeIdentifier attrId) throws CtxException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void unregisterForUpdates(EntityIdentifier requester,
+	public void unregisterForUpdates(Identity requester,
 			CtxAttributeIdentifier attrId) throws CtxException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void unregisterForUpdates(EntityIdentifier requester,
+	public void unregisterForUpdates(Identity requester,
 			CtxEntityIdentifier scope, String attributeType)
 			throws CtxException {
 		// TODO Auto-generated method stub
@@ -212,7 +212,7 @@ public class CtxBroker implements ICtxBroker {
 	}
 
 	@Override
-	public Future<Set<CtxBond>> retrieveBonds(EntityIdentifier requester,
+	public Future<Set<CtxBond>> retrieveBonds(Identity requester,
 			CtxEntityIdentifier community) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
@@ -220,7 +220,7 @@ public class CtxBroker implements ICtxBroker {
 
 	@Override
 	public Future<List<CtxEntityIdentifier>> retrieveSubCommunities(
-			EntityIdentifier requester, CtxEntityIdentifier community)
+			Identity requester, CtxEntityIdentifier community)
 			throws CtxException {
 		// TODO Auto-generated method stub
 		return null;

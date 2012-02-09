@@ -24,7 +24,7 @@
  */
 package org.societies.privacytrust.privacyprotection.api;
 
-import org.societies.privacytrust.privacyprotection.mock.EntityIdentifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.privacytrust.privacyprotection.mock.ICtxAttributeIdentifier;
 
 /**
@@ -39,6 +39,6 @@ public interface IPrivacyPreferenceConditionMonitor {
 	 * @param contextId
 	 * @param userIdentity
 	 */
-	public void contextEventReceived(ICtxAttributeIdentifier contextId, EntityIdentifier userIdentity);
+	public void contextEventReceived(ICtxAttributeIdentifier contextId, Identity userIdentity);
 
 }
