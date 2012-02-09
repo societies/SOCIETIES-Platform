@@ -71,22 +71,13 @@
     </dependencies>
 
     <build>
-<finalName>${project.artifactId}</finalName>
-<sourceDirectory>src/main/java</sourceDirectory>
-	    <pluginManagement>
-		    <plugins>
-			    <plugin>
-				    <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-                    <artifactId>maven-android-plugin</artifactId>
-                    <version>2.9.0-SNAPSHOT</version>
-                    <extensions>true</extensions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+	<finalName>${project.artifactId}</finalName>
+	<sourceDirectory>src/main/java</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                 <artifactId>maven-android-plugin</artifactId>
+                <version>2.9.0-SNAPSHOT</version>
                 <configuration>
                     <sdk>
 			<platform>8</platform>
@@ -118,33 +109,17 @@
 			    </relocations>
 		    </configuration>
 	    </plugin>
-	    <!--
-            <plugin>
-                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-                <artifactId>android-maven-plugin</artifactId>
-                <version>3.0.0</version>
-                <configuration>
-                    <androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
-                    <assetsDirectory>${project.basedir}/assets</assetsDirectory>
-                    <resourceDirectory>${project.basedir}/res</resourceDirectory>
-                    <nativeLibrariesDirectory>${project.basedir}/src/main/native</nativeLibrariesDirectory>
-                    <sdk>
-                        <platform>8</platform>
-                    </sdk>
-                                        <deleteConflictingFiles>true</deleteConflictingFiles>
-                    <undeployBeforeDeploy>true</undeployBeforeDeploy>
-                </configuration>
-                <extensions>true</extensions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-	    -->
         </plugins>
     </build>
+    
+    <pluginRepositories>
+        <pluginRepository>
+            <id>oss.sonatype.org-jayway-snapshots</id>
+            <name>Jayway OpenSource SNAPSHOTs on Sonatype.org</name>
+            <url>http://oss.sonatype.org/content/repositories/jayway-snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 </project>

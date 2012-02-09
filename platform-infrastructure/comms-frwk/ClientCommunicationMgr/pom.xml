@@ -51,11 +51,6 @@
 			<artifactId>AndroidAgentApi</artifactId>
 			<version>${version.comm}</version>
 		</dependency>
-		<dependency> <!-- http://code.google.com/p/asmack/ -->
-			<groupId>asmack</groupId>
-			<artifactId>asmack</artifactId>
-			<version>2010.12.11</version>
-		</dependency>
   	</dependencies>
 	<build>
 		<plugins>
