@@ -24,7 +24,8 @@ import java.util.Date;
 
 import javax.swing.tree.DefaultTreeModel;
 
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+
 
 /**
  * @author Elizabeth
@@ -33,7 +34,7 @@ import org.societies.api.mock.ServiceResourceIdentifier;
  */
 public class PreferenceTreeModel extends DefaultTreeModel implements IPreferenceTreeModel, Serializable {
 
-	private ServiceResourceIdentifier serviceID;
+	private IServiceResourceIdentifier serviceID;
 	private String serviceType;
 	private String preferenceName;
 	private IPreference preference;
@@ -51,7 +52,7 @@ public class PreferenceTreeModel extends DefaultTreeModel implements IPreference
 		return this.preferenceName;
 	}
 
-	public ServiceResourceIdentifier getServiceID() {
+	public IServiceResourceIdentifier getServiceID() {
 		return this.serviceID;
 	}
 
@@ -63,7 +64,7 @@ public class PreferenceTreeModel extends DefaultTreeModel implements IPreference
 		this.preferenceName = prefname;
 	}
 
-	public void setServiceID(ServiceResourceIdentifier id) {
+	public void setServiceID(IServiceResourceIdentifier id) {
 		this.serviceID = id;
 		
 	}
