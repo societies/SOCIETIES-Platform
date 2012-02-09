@@ -24,8 +24,9 @@
  */
 package org.societies.privacytrust.privacyprotection.api;
 
-import org.societies.privacytrust.privacyprotection.mock.EntityIdentifier;
-import org.societies.privacytrust.privacyprotection.mock.ServiceResourceIdentifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+
 
 /**
  * @author Eliza
@@ -39,13 +40,13 @@ public interface IPrivacyPolicyNegotiationManager {
 	 * @param css_id
 	 * @param cis_id    CIS admin
 	 */
-	public void negotiateCISPolicy(EntityIdentifier css_id, EntityIdentifier cis_id);
+	public void negotiateCISPolicy(Identity css_id, Identity cis_id);
 
 	/**
 	 * 
 	 * @param transient_id    temp id
 	 * @param service_id
 	 */
-	public void negotiateServicePolicy(EntityIdentifier transient_id, ServiceResourceIdentifier service_id);
+	public void negotiateServicePolicy(Identity transient_id, IServiceResourceIdentifier service_id);
 
 }

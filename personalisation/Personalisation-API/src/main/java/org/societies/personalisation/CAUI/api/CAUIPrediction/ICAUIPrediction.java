@@ -61,18 +61,11 @@ public interface ICAUIPrediction {
 	/**
 	 * Predicts next action based on the last performed action
 	 * 
-	 * @param ctxAttribute
-	 */
-	public UserIntentAction getPrediction(Identity requestor, CtxAttribute ctxAttribute);
-
-	/**
-	 * Predicts next action based on the last performed action
-	 * 
 	 * @param requestor
 	 * @param action
 	 * @return predicted action 
 	 */
-	public UserIntentAction getPrediction(Identity requestor, IAction action, IPersonalisationCallback persCallback); 
+	public void getPrediction(Identity requestor, IAction action, IPersonalisationCallback persCallback); 
 		
 	/**
 	 * Returns a list with the performed predictions.

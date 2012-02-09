@@ -25,7 +25,6 @@
 package org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper;
 
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.DataWrapper;
 
 /**
  * Utilities to instantiate DataWrapper for data obfuscation

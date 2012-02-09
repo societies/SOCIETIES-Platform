@@ -169,11 +169,16 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 	public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) { }
 
 	@Override
-	public void receiveItems(Stanza arg0, String arg1, List<XMPPNode> arg2) { }
-
-	@Override
 	public void receiveMessage(Stanza arg0, Object arg1) { }
 
 	@Override
 	public void receiveResult(Stanza arg0, Object arg1) { }
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveItems(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.String, java.util.List)
+	 */
+	@Override
+	public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
+		// TODO Auto-generated method stub
+	}
 }

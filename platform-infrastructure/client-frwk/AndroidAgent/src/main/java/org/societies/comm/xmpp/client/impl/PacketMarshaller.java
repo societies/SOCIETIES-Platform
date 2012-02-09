@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import jaxb.JAXBContext;
+import jaxb.JAXBException;
+import jaxb.Marshaller;
+import jaxb.Unmarshaller;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;

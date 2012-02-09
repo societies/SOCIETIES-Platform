@@ -67,4 +67,15 @@ public class SampleObfuscator implements IDataObfuscator {
 	public void setParam1(int param1) {
 		this.param1 = param1;
 	}
+
+
+	/*
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		return (obj==this || obj instanceof SampleObfuscator);
+	}
+	
+	
 }
