@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
