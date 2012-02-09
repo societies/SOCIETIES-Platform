@@ -26,7 +26,8 @@ package org.societies.api.context.model;
 
 import java.io.Serializable;
 
-import org.societies.api.mock.EntityIdentifier;
+//import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 
 /**
  * This abstract class is used to identify context model objects. It provides
@@ -52,7 +53,7 @@ public abstract class CtxIdentifier implements Serializable {
 
 	private static final long serialVersionUID = 3552976823045895472L;
 	
-	private final EntityIdentifier operatorId;
+	private final Identity operatorId;
 	private final String type;
 	private final Long objectNumber;
 
@@ -70,7 +71,7 @@ public abstract class CtxIdentifier implements Serializable {
 	 * @param objectNumber
 	 *            the unique numeric model object identifier
 	 */
-	CtxIdentifier(EntityIdentifier operatorId, String type, Long objectNumber) {
+	CtxIdentifier(Identity operatorId, String type, Long objectNumber) {
 		this.operatorId = operatorId;
 		this.type = type;
 		this.objectNumber = objectNumber;
@@ -83,7 +84,7 @@ public abstract class CtxIdentifier implements Serializable {
 	 * @return a unique identifier of the CSS or CIS where the identified 
 	 * context model object is stored
 	 */
-	public EntityIdentifier getOperatorId() {
+	public Identity getOperatorId() {
 		return this.operatorId;
 	}
 	

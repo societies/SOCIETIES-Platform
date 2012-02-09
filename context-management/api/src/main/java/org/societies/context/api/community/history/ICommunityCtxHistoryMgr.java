@@ -39,14 +39,14 @@ public interface ICommunityCtxHistoryMgr extends IUserCtxHistoryMgr {
 	 *   
 	 * @since 0.0.1
 	 */
-	public void disableCommCtxRecording(ICommunityCtxHistoryCallback callback);
+	public void disableCommCtxRecording();
 
 	/**
 	 * Enables recording of community context data to history database.
 	 * 
 	 * @since 0.0.1
 	 */
-	public void enableCommCtxRecording(ICommunityCtxHistoryCallback callback);
+	public void enableCommCtxRecording();
 
 	
 }

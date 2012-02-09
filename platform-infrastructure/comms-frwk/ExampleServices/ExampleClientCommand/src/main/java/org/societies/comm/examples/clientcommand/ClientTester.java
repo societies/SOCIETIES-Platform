@@ -25,13 +25,12 @@
 
 package org.societies.comm.examples.clientcommand;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.comm.xmpp.pubsub.PubsubClient;
 import org.societies.example.calculator.ICalc;
 import org.societies.example.calculator.ICalcRemote;
+import org.societies.example.fortunecookie.IWisdom;
 import org.societies.example.IExamplesCallback;
 
 /**
@@ -43,33 +42,33 @@ import org.societies.example.IExamplesCallback;
 public class ClientTester implements IExamplesCallback {
 
 	private ICalcRemote remoteCalculator;
-	private ICalc calcService;
+	private PubsubClient pubSubManager;
+	private IWisdom fcGenerator;
 	private static Logger LOG = LoggerFactory.getLogger(ClientTester.class);
 	
-	/** @return the remoteCalculator	 */
-	public ICalcRemote getRemoteCalculator() {
-		return remoteCalculator;
-	}
-
-	/** @param remoteCalculator the remoteCalculator to set */
-	public void setRemoteCalculator(ICalcRemote remoteCalculator) {
-		this.remoteCalculator = remoteCalculator;
-	}
+	public ICalcRemote getRemoteCalculator() { return remoteCalculator; }
+	public void setRemoteCalculator(ICalcRemote remoteCalculator) { this.remoteCalculator = remoteCalculator; }
 	
-	public ICalc getCalcService() {
-		return calcService;
-	}
+	public PubsubClient getPubSubManager() { return this.pubSubManager; }
+	public void setPubSubManager(PubsubClient pubSubManager) { this.pubSubManager = pubSubManager; 	}
 
-	public void setCalcService(ICalc calcService) {
-		this.calcService = calcService;
-	}
+	public IWisdom getFcGenerator() { return fcGenerator; }
+	public void setFcGenerator(IWisdom fcGenerator) { this.fcGenerator = fcGenerator; }
 
+	//ENTRY POINT
 	public void StartTest() {
+		//TEST MESSAGING
 		System.out.println("Starting Client Test");
-		
-		getRemoteCalculator().Add(2, 3, this);
-		
+		//getRemoteCalculator().Add(2, 3, this);
 		System.out.println("Waiting...");
+		
+		//TEST PUBSUB
+		PubsubTest testPubSub = new PubsubTest();
+		testPubSub.setFcGenerator(this.fcGenerator);
+		testPubSub.setPubSubManager(this.pubSubManager);
+		
+		Thread pubsubThread = new Thread(testPubSub);
+		pubsubThread.start();
 	}
 	
 	/* (non-Javadoc)
