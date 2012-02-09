@@ -35,17 +35,11 @@
 	 
 	<bean id="ClientTest" 
   		class="org.societies.comm.examples.clientcommand.ClientTester"
-  		depends-on="RemoteCalculator"
+  		depends-on="RemoteCalculator, PubsubClient, FortuneCookieBundle"
   		init-method="StartTest">
   		<property name="remoteCalculator" ref="RemoteCalculator"/>
+  		<property name="pubSubManager" ref="PubsubClient"/>
+  		<property name="fcGenerator" ref="FortuneCookieBundle"/>
 	</bean>
 	
-	<!-- 
-	<bean id="ClientTest" 
-		class="org.societies.comm.examples.clientcommand.ClientTester"
-		depends-on="CalculatorBundle" 
-		init-method="StartTest">
-		<property name="calcService" ref="CalculatorBundle"/>
-	</bean>
-	-->
 </beans>
