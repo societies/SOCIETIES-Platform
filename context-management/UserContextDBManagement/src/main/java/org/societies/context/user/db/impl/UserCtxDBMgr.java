@@ -39,7 +39,9 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.IndividualCtxEntity;
-import org.societies.api.mock.EntityIdentifier;
+
+import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.comm.xmpp.datatypes.IdentityType;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.stereotype.Component;
@@ -49,12 +51,15 @@ public class UserCtxDBMgr implements IUserCtxDBMgr{
 
 	private final Map<CtxIdentifier, CtxModelObject> modelObjects;
 
-	private final EntityIdentifier privateId;
-
-//	@Autowired
+	private final Identity privateId;
+	
+	
+	//	@Autowired
 	public UserCtxDBMgr() {
 		this.modelObjects =  new HashMap<CtxIdentifier, CtxModelObject>();
-		this.privateId = new EntityIdentifier();
+		
+		// !!!!!! Identity should be instantiated properly
+		this.privateId = null;
 	}
 
 	@Override
