@@ -39,11 +39,24 @@ import org.societies.personalisation.CAUI.api.model.UserIntentAction;
 public class CAUIPrediction implements ICAUIPrediction{
 
 	@Override
-	public void enablePrediction(Boolean bool) {
+	public void enablePrediction(Boolean arg0) {
 		// TODO Auto-generated method stub
 		
 	}
 
+	@Override
+	public UserIntentAction getCurrentIntentAction(Identity arg0,
+			Identity arg1, IServiceResourceIdentifier arg2, String arg3) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void getPrediction(Identity arg0, IAction arg1,
+			IPersonalisationCallback arg2) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	@Override
 	public List<List<String>> getPredictionHistory() {
@@ -51,27 +64,6 @@ public class CAUIPrediction implements ICAUIPrediction{
 		return null;
 	}
 
-	@Override
-	public UserIntentAction getCurrentIntentAction(Identity requestor,
-			Identity ownerID, IServiceResourceIdentifier serviceID,
-			String preferenceName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public UserIntentAction getPrediction(Identity requestor,
-			CtxAttribute ctxAttribute) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public UserIntentAction getPrediction(Identity requestor, IAction action,
-			IPersonalisationCallback persCallback) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	
 
