@@ -29,7 +29,7 @@ import org.societies.personalisation.preference.api.model.IPreference;
 public class UserPreferenceManagement implements IUserPreferenceManagement{
 
 	public UserPreferenceManagement(){
-		PreferenceManager prefMgr = new PreferenceManager();
+		//PreferenceManager prefMgr = new PreferenceManager();
 		System.out.println("Hello! I'm the User Preference Manager!");
 	}
 	/**
