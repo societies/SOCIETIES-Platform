@@ -18,6 +18,8 @@
 
   
   
-  	<bean name="DeviceDriver" class="org.societies.css.devicemgmt.DeviceDriverExample.impl.DeviceDriverExample" />
+  	<bean name="DeviceDriver" class="org.societies.css.devicemgmt.DeviceDriverExample.impl.DeviceDriverExample">
+  		<property name="deviceManager" ref ="deviceManager" />	
+  	</bean>
 
 </beans>

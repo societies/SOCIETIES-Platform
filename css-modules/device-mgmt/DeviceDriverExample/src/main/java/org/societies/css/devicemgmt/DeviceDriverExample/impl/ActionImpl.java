@@ -69,7 +69,7 @@ public class ActionImpl implements IAction {
 		{
 			registration = bundleContext.registerService(IAction.class.getName(), this, properties);
 			
-			LOG.info("-- An action service with the action: " + properties.get("actionName") + " has been registred"); 
+			LOG.info("-- An action service with the action name: " + properties.get("actionName") + " has been registred"); 
 		}
 
 	}

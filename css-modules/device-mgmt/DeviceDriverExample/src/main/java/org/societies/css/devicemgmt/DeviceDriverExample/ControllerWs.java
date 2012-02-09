@@ -29,7 +29,7 @@ public interface ControllerWs {
 	
 	
 	
-	public void createNewDevice (String deviceId, String actionName);
+	public String createNewDevice (String deviceId, String actionName);
 	
 	public void removeDevice (String deviceId);
 	

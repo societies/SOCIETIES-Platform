@@ -85,20 +85,23 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 	/**
 	 * 
 	 */
-	public void fireNewDeviceConnected(String deviceId) {
+	public String fireNewDeviceConnected(String deviceId) {
 		
 		
 		// check if the device already exists in the container
-		if (getDeviceInstanceContainer().get(deviceId) != null)
+		if (getDeviceInstanceContainer().get(deviceId) == null)
 		{
-			LOG.info("DeviceMgmt: " + "****************************************************** Hi, I'm a web service : " + deviceId);
+			LOG.info("DeviceMgr: " + "****************************************************** fireNewDeviceConnected");
 			
 			//create new instance of the DeviceImpl and expose the instance as the OSGi service by using IDevice interface
 			deviceImpl = new DeviceImpl(bundleContext, this, deviceId);		
 			
 			//add device instance to the container
 			setDeviceInstanceContainer(deviceId, deviceImpl);
+			
+			return "The Device with device id: "+ deviceId +" has been created"; 
 		}
+		return "The device with device id: "+ deviceId + " already exists";
 	}
 
 	/**

@@ -32,7 +32,7 @@ package org.societies.css.devicemgmt.devicemanager;
  */
 public interface IDeviceManager {
 	
-	public void fireNewDeviceConnected (String serviceId);
+	public String fireNewDeviceConnected (String serviceId);
 	
 	public void fireDeviceDisconnected (String deviceId);
 	

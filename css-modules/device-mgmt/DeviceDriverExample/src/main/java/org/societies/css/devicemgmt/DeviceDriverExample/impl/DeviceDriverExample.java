@@ -45,9 +45,11 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 	
 	private BundleContext bundleContext;
 	
-	private IDeviceManager iDeviceManager;
+	private IDeviceManager deviceManager;
 	
 	private ActionImpl actionImpl;
+	
+	private String createNewDevice = "";
 	
 	private static Logger LOG = LoggerFactory.getLogger(DeviceDriverExample.class);
 
@@ -61,11 +63,11 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 		LOG.info("DeviceDriverExample: " + "=========++++++++++------ DeviceDriverExample constructor");
 	}
 	
-	public void setIDeviceManager (IDeviceManager iDeviceManager)
+	public void setDeviceManager (IDeviceManager deviceManager)
 	{
-		this.iDeviceManager = iDeviceManager;
+		this.deviceManager = deviceManager;
 		
-		LOG.info("DeviceDriverExample: " + "============== IDeviceManager dependency injection");
+		LOG.info("DeviceDriverExample: " + "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% IDeviceManager dependency injection");
 	}
 	
 	
@@ -99,23 +101,29 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 	/** (non-Javadoc)
 	 * @see org.societies.css.devicemgmt.DeviceDriverExample.ControllerWs#createNewDevice(java.lang.String)
 	 */
-	public void createNewDevice(String deviceId, String actionName) {
-		// TODO Auto-generated method stub	
+	public String createNewDevice(String deviceId, String actionName) {
+		// TODO Auto-generated method stub
 		
-		iDeviceManager.fireNewDeviceConnected(deviceId);
+		LOG.info("DeviceDriverExample: " + "*********************************** createNewDevice : " + deviceId +" "+actionName);
 		
 		// check if the device already exists in the container
-		if (getActionInstanceContainer().get(actionName) != null)
+		if (getActionInstanceContainer().get(actionName) == null)
 		{
-	
+			createNewDevice = deviceManager.fireNewDeviceConnected(deviceId);
+			
+			LOG.info("DeviceDriverExample: " + "*********************************** deviceManager.fireNewDeviceConnected");
+			
 			//create new instance of the DeviceImpl and expose the instance as the OSGi service by using IDevice interface
 			actionImpl = new ActionImpl(bundleContext, this, actionName);		
-					
+				
 			//add device instance to the container
 			setActionInstanceContainer(actionName, actionImpl);
-			
 			LOG.info("DeviceDriverExample: " + "*********************************** Hi, I'm a new IAction : " + actionName);
+
+			return "The Action "+ actionName +" has been created";
 		}
+		return "The action "+ actionName + " already exists";
+		
 	}
 
 
