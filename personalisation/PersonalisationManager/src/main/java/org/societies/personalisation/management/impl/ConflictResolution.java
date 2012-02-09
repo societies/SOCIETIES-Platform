@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -17,39 +22,42 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.personalisation.management.impl;
 
-package org.societies.personalisation.common.api.management;
-
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
-import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
+import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 
-
-
 /**
+ * Describe your class here...
+ *
  * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 14:43:38
+ *
  */
-public interface IPreferenceConflictResolution {
+public class ConflictResolution {
 
-	/**
-	 * 
-	 * @param user_id
-	 * @param dianneAction
-	 * @param preferenceAction
-	 */
-	public IOutcome resolveConflict(Identity user_id, IDIANNEOutcome dianneAction, IPreferenceOutcome preferenceAction);
-
-	/**
-	 * 
-	 * @param user_id
-	 * @param intentActionICCS
-	 * @param intentActionITSUD
-	 */
-	public IOutcome resolveConflict(Identity user_id, IUserIntentAction intentActionICCS, ICRISTUserAction intentActionITSUD);
-
+	public ConflictResolution(){
+		
+	}
+	
+	
+	public IOutcome resolvePreferenceConflicts(IDIANNEOutcome dOutcome, IPreferenceOutcome pOutcome){
+		if (dOutcome.getConfidenceLevel()<pOutcome.getConfidenceLevel()){
+			return pOutcome;
+		}
+		
+		
+			return dOutcome;
+		
+	}
+	
+	public IOutcome resolveIntentConflicts(IUserIntentAction cauiOutcome, CRISTUserAction cristOutcome){
+		if (cauiOutcome.getConfidenceLevel()<cristOutcome.getConfidenceLevel()){
+			return cristOutcome;
+		}
+		
+		return cauiOutcome;
+	}
 }

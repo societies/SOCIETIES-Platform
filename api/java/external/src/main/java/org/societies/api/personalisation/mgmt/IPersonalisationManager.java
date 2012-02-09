@@ -25,7 +25,7 @@
 
 package org.societies.api.personalisation.mgmt;
 
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
@@ -51,7 +51,7 @@ public interface IPersonalisationManager {
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
 	 */
-	public IAction getIntentAction(EntityIdentifier requestor, EntityIdentifier ownerID, IServiceResourceIdentifier serviceID, String preferenceName);
+	public void getIntentAction(Identity requestor, Identity ownerID, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
 
 	/**
 	 * Allows any service to request an context-based evaluated preference outcome.
@@ -65,6 +65,6 @@ public interface IPersonalisationManager {
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
 	 */
-	public IAction getPreference(EntityIdentifier requestor, EntityIdentifier ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName);
+	public void getPreference(Identity requestor, Identity ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
 
 }
