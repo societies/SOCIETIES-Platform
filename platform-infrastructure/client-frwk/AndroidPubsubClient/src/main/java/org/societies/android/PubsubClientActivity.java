@@ -8,6 +8,7 @@ import org.jabber.protocol.pubsub.Publish;
 import org.jabber.protocol.pubsub.Pubsub;
 import org.jabber.protocol.pubsub.Subscription;
 import org.jabber.protocol.pubsub.Subscriptions;
+import org.jivesoftware.smack.packet.IQ;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
@@ -20,7 +21,6 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.comm.xmpp.interfaces.IdentityManager;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
-import org.xmpp.packet.IQ;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -65,7 +65,7 @@ public class PubsubClientActivity extends Activity {
 			Object payload = createPayload();			
 			ccm.register(elementNames, callback);
 			ccm.sendMessage(stanza, payload);
-			ccm.sendIQ(stanza2, IQ.Type.get, payload, callback);
+			ccm.sendIQ(stanza2, IQ.Type.GET, payload, callback);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -126,11 +126,6 @@ public class PubsubClientActivity extends Activity {
 				log.debug("receiveInfo");
 			}
 
-			public void receiveItems(Stanza stanza, String node,
-					List<XMPPNode> items) {
-				log.debug("receiveItems");
-			}
-
 			public void receiveMessage(Stanza stanza, Object payload) {
 				log.debug("receiveMessage");
 				debugStanza(stanza);
@@ -157,6 +152,10 @@ public class PubsubClientActivity extends Activity {
 				log.debug("id="+stanza.getId());
 				log.debug("from="+stanza.getFrom());
 				log.debug("to="+stanza.getTo());
+			}
+
+			public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
+				log.debug("receiveItems");
 			}
 		};
     }

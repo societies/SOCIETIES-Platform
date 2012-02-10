@@ -25,32 +25,14 @@
 	    <version>${release.version}</version>
 	</dependency>
 	<dependency>
-	    <groupId>org.societies.comm.xmpp</groupId>
-	    <artifactId>ClientCommunicationMgr</artifactId>
-	    <version>${version.comm}</version>
-	    <exclusions>
-		<exclusion>
-		    <groupId>xml-apis</groupId> 
-		    <artifactId>xml-apis</artifactId>
-		</exclusion>
-	    </exclusions>
-	</dependency>
-	<dependency>
-	    <groupId>org.societies.comm.xmpp</groupId>
-	    <artifactId>CommunicationFrameworkCommons</artifactId>
-	    <version>${version.comm}</version>
+		<groupId>org.societies.comm.android</groupId>
+		<artifactId>AndroidAgent</artifactId>
+		<version>${version.comm}</version>
 	</dependency>
 	<dependency>
 	    <groupId>org.societies.api.external</groupId>
 	    <artifactId>societies-api</artifactId>
 	    <version>${release.version}</version>
-	</dependency>
-	<dependency> <!-- todo: remove this dep -->
-		<groupId>pt.ptin.iex.ctx.android.jaxb</groupId>
-		<artifactId>jaxb-android</artifactId>
-		<version>1.0-SNAPSHOT</version>
-		<type>jar</type>
-		<scope>compile</scope>
 	</dependency>
 	<dependency>
 	    <groupId>xerces</groupId>
@@ -78,6 +60,7 @@
                 <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                 <artifactId>maven-android-plugin</artifactId>
                 <version>2.9.0-SNAPSHOT</version>
+		<extensions>true</extensions>
                 <configuration>
                     <sdk>
 			<platform>8</platform>
