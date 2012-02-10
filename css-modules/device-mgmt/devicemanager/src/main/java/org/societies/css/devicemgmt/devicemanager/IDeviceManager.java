@@ -25,17 +25,45 @@
 package org.societies.css.devicemgmt.devicemanager;
 
 /**
- * Describe your class here...
+ * Interface used by the device deriver bundles to inform the device manager about a state of devices
  *
- * @author rafik
+ * @author Rafik
  *
  */
 public interface IDeviceManager {
 	
-	public String fireNewDeviceConnected (String serviceId);
+
+	/**
+	 * Method used to inform the Device Manager about a connection of a new device
+	 * 
+	 * @param deviceFamily
+	 * @param deviceMacAddress
+	 * @param deviceName
+	 * @param deviceType
+	 * @param deviceDescription
+	 * @param deviceConnectionType
+	 * @param deviceLocation
+	 * @param deviceProvider
+	 * @param contextCompliant
+	 * @return
+	 */
+	public String fireNewDeviceConnected (String deviceMacAddress, DeviceCommonInfo deviceCommonInfo);
 	
-	public void fireDeviceDisconnected (String deviceId);
+	/**
+	 * Method used to inform the Device Manager about disconnection of a device
+	 * 
+	 * @param deviceFamily
+	 * @param deviceMacAddress
+	 */
+	public void fireDeviceDisconnected (String deviceFamily, String deviceMacAddress);
 	
-	public void fireNewDataReceived (String deviceId, String data);
+	/**
+	 * 
+	 * 
+	 * @param deviceFamily
+	 * @param deviceMacAddress
+	 * @param data TODO to define
+	 */
+	public void fireNewDataReceived (String deviceFamily, String deviceMacAddress, String data);
 
 }

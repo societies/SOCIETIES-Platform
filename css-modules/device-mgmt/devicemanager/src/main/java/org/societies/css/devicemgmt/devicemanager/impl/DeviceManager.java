@@ -32,6 +32,8 @@ import java.util.Map;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.css.devicemgmt.devicemanager.DeviceCommonInfo;
+import org.societies.css.devicemgmt.devicemanager.IAction;
 import org.societies.css.devicemgmt.devicemanager.IDeviceManager;
 
 import org.springframework.osgi.context.BundleContextAware;
@@ -42,16 +44,27 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 
 	private static Logger LOG = LoggerFactory.getLogger(DeviceManager.class);
 
-	private final Map<String, DeviceImpl> deviceInstanceContainer;
+	private Map<String, DeviceImpl> deviceInstanceContainer;
+	
+	private final Map<String, Map<String, DeviceImpl>> deviceFamilyContainer; 
 	
 	private DeviceImpl deviceImpl;
 	
 	private BundleContext bundleContext;
 	
+	private Map<String, String> deviceBindingMap;
+	
+	private long idIncrement= 0;
+	
+	private String deviceId;
+	
+	
 	public DeviceManager() {
-		
-		deviceInstanceContainer = new HashMap<String, DeviceImpl>();
 
+		deviceFamilyContainer = new HashMap<String, Map<String,DeviceImpl>>();
+		
+		deviceBindingMap = new HashMap<String, String>();
+		
 		LOG.info("DeviceMgmt: " + "=========++++++++++------ DeviceManager constructor");
 	}
 	
@@ -59,22 +72,12 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 		
 		this.bundleContext = bundleContext;	
 	}
-	
-	
-	protected Map<String, DeviceImpl> getDeviceInstanceContainer() 
-	{	
-		return deviceInstanceContainer;
-	}
-	protected void setDeviceInstanceContainer(String deviceId, DeviceImpl deviceInstance) 
-	{
-		this.deviceInstanceContainer.put(deviceId, deviceInstance);
-	}
 
 	public void removeDeviceFromContainer (String deviceId)
 	{
-		if (getDeviceInstanceContainer().get(deviceId) != null)
+		if (deviceInstanceContainer.get(deviceId) != null)
 		{
-			getDeviceInstanceContainer().remove(deviceId);
+			deviceInstanceContainer.remove(deviceId);
 		}
 	}
 	
@@ -83,47 +86,64 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 //////Interfaces exposed to the device drivers
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/**
-	 * 
+	 * TODO Add in this method a call to a device binding table class to generate an Id to each new device connected
 	 */
-	public String fireNewDeviceConnected(String deviceId) {
-		
-		
-		// check if the device already exists in the container
-		if (getDeviceInstanceContainer().get(deviceId) == null)
+	public String fireNewDeviceConnected(String deviceMacAddress, DeviceCommonInfo deviceCommonInfo) 
+	{
+		// Check if the device Family container contains device Instance container for this family of devices
+		if (deviceFamilyContainer.get(deviceCommonInfo.getDeviceFamilyIdentity()) == null) 
 		{
-			LOG.info("DeviceMgr: " + "****************************************************** fireNewDeviceConnected");
+			//Create a new device instance container
+			deviceInstanceContainer = new HashMap<String, DeviceImpl>();
 			
-			//create new instance of the DeviceImpl and expose the instance as the OSGi service by using IDevice interface
-			deviceImpl = new DeviceImpl(bundleContext, this, deviceId);		
+			//TODO here generate the deviceId
 			
-			//add device instance to the container
-			setDeviceInstanceContainer(deviceId, deviceImpl);
+			//create a new IDevice implementation
+			deviceImpl = new DeviceImpl(bundleContext, this, /*TODO here set the id*/deviceMacAddress, deviceCommonInfo);
 			
-			return "The Device with device id: "+ deviceId +" has been created"; 
+			deviceInstanceContainer.put(/*TODO here set the id*/deviceMacAddress, deviceImpl);
+			
+			deviceFamilyContainer.put(deviceCommonInfo.getDeviceFamilyIdentity(), deviceInstanceContainer);
+			
+			return "A new device family bundle. A new device instance containers created and stored to the device family container";
 		}
-		return "The device with device id: "+ deviceId + " already exists";
+		else
+		{
+			//The bundle is Known, so get the device instance container
+			deviceInstanceContainer = deviceFamilyContainer.get(deviceCommonInfo.getDeviceFamilyIdentity());
+			
+			if (deviceInstanceContainer.get(deviceMacAddress) == null)
+			{
+				deviceImpl = new DeviceImpl(bundleContext, this, deviceMacAddress, deviceCommonInfo);
+				deviceInstanceContainer.put(/*TODO here set the id*/deviceMacAddress, deviceImpl);
+				
+				deviceFamilyContainer.put(deviceCommonInfo.getDeviceFamilyIdentity(), deviceInstanceContainer);
+				
+				return "A new device instance stored to the existing device instance container";
+			}
+			return"The device already exist in the container";
+		}
 	}
 
 	/**
 	 * 
 	 */
-	public void fireDeviceDisconnected(String deviceId) 
+	public void fireDeviceDisconnected(String deviceFamily, String deviceMacAddress) 
 	{	
-		if (getDeviceInstanceContainer().get(deviceId) != null)
+		if (deviceFamilyContainer.get(deviceFamily) != null)
 		{
-			getDeviceInstanceContainer().get(deviceId).removeDevice();
+			deviceFamilyContainer.get(deviceFamily).get(deviceMacAddress).removeDevice();
 		}
 	}
+	
+	
 
 	/**
 	 * 
 	 */
-	public void fireNewDataReceived(String deviceId, String data) {
-		// TODO Auto-generated method stub
+	public void fireNewDataReceived(String deviceFamily, String deviceMacAddress, String data) {
 		
 	}
-	
-	
 }
 
 

@@ -22,19 +22,77 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.css.devicemgmt.devicemanager;
 
-package org.societies.css.devicemgmt.DeviceDriverExample;
-
-import org.societies.css.devicemgmt.devicemanager.DeviceCommonInfo;
-
-public interface ControllerWs {
+/**
+ * Describe your class here...
+ *
+ * @author rafik
+ *
+ */
+public class DeviceMgmtConstants {
 	
 	
+	/**
+	 * Constant to be used to get or set device service id property
+	 * @value "deviceId"
+	 */
+	public static final String DEVICE_ID = "deviceId";
 	
-	public String createNewDevice (String deviceMacAddress, DeviceCommonInfo deviceCommonInfo, String actionName);
+	/**
+	 * Constant to be used to get or set device service name property
+	 * @value "deviceName"
+	 */
+	public static final String DEVICE_NAME = "deviceName";
 	
-	public void removeDevice (String deviceId);
 	
-	public void sendNewData (String deviceId, String data);
+	/**
+	 * Constant to be used to get or set device service type property
+	 * @value "deviceType"
+	 */
+	public static final String DEVICE_TYPE = "deviceType";
+	
+	
+	/**
+	 * Constant to be used to get or set device service family property
+	 * @value "deviceFamily"
+	 */
+	public static final String DEVICE_FAMILY = "deviceFamily";
+	
+	
+	/**
+	 * Constant to be used to get or set device service description property
+	 * @value "deviceDescription"
+	 */
+	public static final String DEVICE_DESCRIPTION = "deviceDescription";
+	
+	
+	/**
+	 * Constant to be used to get or set device service location property
+	 * @value "deviceLocation"
+	 */
+	public static final String DEVICE_LOCATION = "deviceLocation";
+	
+	
+	/**
+	 * Constant to be used to get or set device service provider property
+	 * @value "deviceProvider"
+	 */
+	public static final String DEVICE_PROVIDER = "deviceProvider";
+	
+	
+	/**
+	 * Constant to be used to get or set device service connection type property
+	 * @value "deviceConnectionType"
+	 */
+	public static final String DEVICE_CONNECTION_TYPE = "deviceConnectionType";
+	
+	
+	/**
+	 * Constant to be used to get or set device service context compliant property
+	 * @value "contextCompliant"
+	 */
+	public static final String DEVICE_CONTEXT_SOURCE = "contextSource";
+	
 
 }

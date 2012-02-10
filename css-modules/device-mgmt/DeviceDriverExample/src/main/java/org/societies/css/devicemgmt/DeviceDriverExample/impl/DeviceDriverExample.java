@@ -31,6 +31,7 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.css.devicemgmt.DeviceDriverExample.ControllerWs;
+import org.societies.css.devicemgmt.devicemanager.DeviceCommonInfo;
 import org.societies.css.devicemgmt.devicemanager.IDeviceManager;
 import org.springframework.osgi.context.BundleContextAware;
 
@@ -99,35 +100,6 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 
 
 	/** (non-Javadoc)
-	 * @see org.societies.css.devicemgmt.DeviceDriverExample.ControllerWs#createNewDevice(java.lang.String)
-	 */
-	public String createNewDevice(String deviceId, String actionName) {
-		// TODO Auto-generated method stub
-		
-		LOG.info("DeviceDriverExample: " + "*********************************** createNewDevice : " + deviceId +" "+actionName);
-		
-		// check if the device already exists in the container
-		if (getActionInstanceContainer().get(actionName) == null)
-		{
-			createNewDevice = deviceManager.fireNewDeviceConnected(deviceId);
-			
-			LOG.info("DeviceDriverExample: " + "*********************************** deviceManager.fireNewDeviceConnected");
-			
-			//create new instance of the DeviceImpl and expose the instance as the OSGi service by using IDevice interface
-			actionImpl = new ActionImpl(bundleContext, this, actionName);		
-				
-			//add device instance to the container
-			setActionInstanceContainer(actionName, actionImpl);
-			LOG.info("DeviceDriverExample: " + "*********************************** Hi, I'm a new IAction : " + actionName);
-
-			return "The Action "+ actionName +" has been created";
-		}
-		return "The action "+ actionName + " already exists";
-		
-	}
-
-
-	/** (non-Javadoc)
 	 * @see org.societies.css.devicemgmt.DeviceDriverExample.ControllerWs#removeDevice(java.lang.String)
 	 */
 	public void removeDevice(String deviceId) {
@@ -141,6 +113,35 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 	 */
 	public void sendNewData(String deviceId, String data) {
 		// TODO Auto-generated method stub
+		
+	}
+
+	
+	/** (non-Javadoc)
+	 * @see org.societies.css.devicemgmt.DeviceDriverExample.ControllerWs#createNewDevice(java.lang.String)
+	 */
+	public String createNewDevice(String deviceMacAddress, DeviceCommonInfo deviceCommonInfo, String actionName) {
+		// TODO Auto-generated method stub
+		
+		LOG.info("DeviceDriverExample: " + "*********************************** createNewDevice : " + deviceMacAddress +" "+actionName);
+		
+		// check if the device already exists in the container
+		if (getActionInstanceContainer().get(actionName) == null)
+		{
+			createNewDevice = deviceManager.fireNewDeviceConnected(deviceMacAddress, deviceCommonInfo);
+			
+			LOG.info("DeviceDriverExample: " + "*********************************** deviceManager.fireNewDeviceConnected");
+			
+			//create new instance of the DeviceImpl and expose the instance as the OSGi service by using IDevice interface
+			actionImpl = new ActionImpl(bundleContext, this, actionName);		
+				
+			//add device instance to the container
+			setActionInstanceContainer(actionName, actionImpl);
+			LOG.info("DeviceDriverExample: " + "*********************************** Hi, I'm a new IAction : " + actionName);
+
+			return "The Action "+ actionName +" has been created";
+		}
+		return "The action "+ actionName + " already exists";
 		
 	}
 

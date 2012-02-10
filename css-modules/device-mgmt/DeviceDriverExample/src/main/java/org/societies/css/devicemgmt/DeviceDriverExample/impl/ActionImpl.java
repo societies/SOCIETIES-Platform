@@ -27,6 +27,7 @@ package org.societies.css.devicemgmt.DeviceDriverExample.impl;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Properties;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -119,10 +120,13 @@ public class ActionImpl implements IAction {
 	/* (non-Javadoc)
 	 * @see org.societies.css.devicemgmt.devicemanager.IAction#invokeAction(java.util.Dictionary)
 	 */
-	public Dictionary<String, String> invokeAction(
-			Dictionary<String, String> arguments) {
-		// TODO Auto-generated method stub
-		return null;
+	public Dictionary<String, String> invokeAction(Dictionary<String, String> arguments) {
+		
+		Dictionary<String, String> dic = new Hashtable<String, String>() ;
+		
+		dic.put("lightLevel", "100");
+		
+		return arguments;
 	}
 
 }
