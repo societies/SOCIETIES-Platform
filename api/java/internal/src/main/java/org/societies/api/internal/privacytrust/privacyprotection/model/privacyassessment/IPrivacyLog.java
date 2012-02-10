@@ -27,4 +27,18 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacya
  */
 public interface IPrivacyLog {
 
+	/**
+	 * Get logs with some constraints.
+	 * 
+	 * @param filter The filter to select log entries.
+	 * @return Log entries that match given filter.
+	 */
+	public LogEntry[] search(PrivacyLogFilter filter);
+	
+	/**
+	 * Get all logs.
+	 * 
+	 * @return All entries in the log in no particular order.
+	 */
+	public LogEntry[] getAll();
 }
