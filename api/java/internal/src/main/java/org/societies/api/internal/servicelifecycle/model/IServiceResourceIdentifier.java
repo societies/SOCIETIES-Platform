@@ -24,6 +24,8 @@
  */
 package org.societies.api.internal.servicelifecycle.model;
 
+import java.net.URI;
+
 /**
  * Describe your class here...
  *
@@ -32,4 +34,21 @@ package org.societies.api.internal.servicelifecycle.model;
  */
 public interface IServiceResourceIdentifier {
 
+	/**
+	 * 
+	 * @return the identifier for Service Instance
+	 */
+	public URI getIdentifier();
+	
+	/**
+	 * 
+	 * @param identifier for a Service Instance
+	 */
+	public void setIdentifier(URI identifier);
+	
+	/**
+	 * 
+	 * @return a string representation of the object.
+	 */
+	public String toString();
 }
