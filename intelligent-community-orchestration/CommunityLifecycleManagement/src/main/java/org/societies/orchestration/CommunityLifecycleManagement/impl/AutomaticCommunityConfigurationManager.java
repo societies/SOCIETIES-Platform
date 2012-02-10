@@ -167,7 +167,7 @@ public class AutomaticCommunityConfigurationManager {
 		//    ArrayList<EntityIdentifier> cisMembers = cisUnderAnalysis.getMembers();
 		//    for (int i = 0; i < cisMembers.size(); i++) {
 		//        if (cisUnderAnalysis.getActivityFeed().getLastActivityForMember(cisMembers.get(i)).getTimestamp() < Time.current() - 240000000)
-		//            //make the suggestion to User Agent based on calcluation
+		//            //make the suggestion to User Agent based on calcluation - see later
 		
 		//    }
 	    //}
