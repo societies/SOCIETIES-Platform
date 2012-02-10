@@ -23,8 +23,9 @@ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVI
 INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.css.management;
+package org.societies.android.platform.interfaces;
 
+import org.societies.api.android.internal.model.CSSProfile;
 
 /**
  * 
@@ -39,110 +40,130 @@ package org.societies.api.internal.css.management;
  * 6. Synchronise profile data
  * 7. Modify the CSS profile 
  * 
- * This interface will be implemented for rich and cloud nodes. It is assumed that methods
- * that modify the CSS profile will actually be implemented on the cloud node. As a result, 
- * there will be two implementations of this interface.
+ * This interface will be implemented for android nodes. 
  *
  */
 public interface ICSSManager {
+	String methodsArray [] = {"loginCSS(String client, CSSProfile profile)", 
+			"logoutCSS(String client, CSSProfile profile)",
+			"registerCSS(String client, CSSProfile profile)",
+			"unregisterCSS(String client, CSSProfile profile)",
+			"registerCSSDevice(String client, CSSProfile profile)",
+			"unregisterCSSDevice(String client, CSSProfile profile)",
+			"getCSSProfile(String client)",
+			"modifyCSSProfile(String client, CSSProfile profile)",
+			"changeCSSNodeStatus(String client, CSSProfile profile)",
+			"synchProfile(String client, CSSProfile profile)",
+			"setPresenceStatus(String client, CSSProfile profile)"};
 
 	/**
 	 * Login a user to a CSS. The registration of devices included in the profile
 	 * is implied.
 	 * 
+	 * @param client component package calling method
 	 * @param profile
 	 * @param callback
 	 * @return boolean operation successful
 	 */
-	boolean loginCSS(CSSProfile profile, ICSSManagerCallback callback);	
+	boolean loginCSS(String client, CSSProfile profile);	
 
 	/**
 	 * Logout the user from a CSS
 	 * 
+	 * @param client component package calling method
 	 * @param profile
 	 * @param callback
 	 * @return boolean operation successful
 	 */
-	boolean logoutCSS(CSSProfile profile, ICSSManagerCallback callback);	
+	boolean logoutCSS(String client, CSSProfile profile);	
 	
 	/**
 	 * Register a CSS
 	 * 
+	 * @param client component package calling method
 	 * @param profile
 	 * @param callback
 	 * @return boolean operation successful
 	 */
-	boolean registerCSS(CSSProfile profile, ICSSManagerCallback callback);
+	boolean registerCSS(String client, CSSProfile profile);
 
 	/**
 	 * Unregister the CSS
 	 * TODO Is a CSS deleted or made inactive
 	 * 
+	 * @param client component package calling method
 	 * @param profile
 	 * @param callback
 	 * @return boolean operation successful
 	 */
-	boolean unregisterCSS(CSSProfile profile, ICSSManagerCallback callback);
+	boolean unregisterCSS(String client, CSSProfile profile);
 
 	/**
 	 * Register a device(s) with a CSS
 	 * 
+	 * @param client component package calling method
 	 * @param profile containing device(s) to register with CSS
 	 * @param callback
 	 * @return boolean operation successful
 	 */
-	boolean registerCSSDevice(CSSProfile profile, ICSSManagerCallback callback);
+	boolean registerCSSDevice(String client, CSSProfile profile);
 	/**
 	 * Unregister a device(s) from a CSS
 	 * 
+	 * @param client component package calling method
 	 * @param profile containing device(s) to unregister with CSS
 	 * @param callback
 	 * @return boolean operation successful
 	 */
-	boolean unregisterCSSDevice(CSSProfile profile, ICSSManagerCallback callback);
+	boolean unregisterCSSDevice(String client, CSSProfile profile);
 	
 	/**
 	 * Get the CSS Profile. This operation will retrieve the local CSS Profile. 
 	 * If none exists or the local cache is deemed to have expired this will 
 	 * result in a synchronisation with the cloud node. 
 	 * 
+	 * @param client component package calling method
 	 * @param callback
 	 * @return CSSProfile current CSS profile
 	 */
-	CSSProfile getCSSProfile(ICSSManagerCallback callback);
+	CSSProfile getCSSProfile(String client);
 
 	/**
 	 * Modify the CSS Profile
 	 * 
+	 * @param client component package calling method
 	 * @param profile
 	 * @return boolean operation successful
 	 */
-	boolean modifyCSSProfile(CSSProfile profile);
+	boolean modifyCSSProfile(String client, CSSProfile profile);
 	/**
 	 * Change the status a CSS device
 	 * 
+	 * @param client component package calling method
 	 * @param profile
 	 * @param callback
 	 * @return boolean operation successful
 	 */
-	boolean changeCSSNodeStatus(CSSProfile profile, ICSSManagerCallback callback);
+	boolean changeCSSNodeStatus(String client, CSSProfile profile);
 	
 	/**
 	 * Synchronise the CSS profile. The CSS cloud node's current profile is synchronised
 	 * with the local device's cached version
 	 * 
+	 * @param client component package calling method
 	 * @param profile
 	 * @param callback
 	 * @return boolean operation successful
 	 */
-	boolean synchProfile(CSSProfile profile, ICSSManagerCallback callback);
+	boolean synchProfile(String client, CSSProfile profile);
 	
 	/**
 	 * Set the presence status of the user
 	 * 
+	 * @param client component package calling method
 	 * @param profile
 	 * @param callback
 	 * @return boolean operation successful
 	 */
-	boolean setPresenceStatus(CSSProfile profile, ICSSManagerCallback callback);
+	boolean setPresenceStatus(String client, CSSProfile profile);
 }

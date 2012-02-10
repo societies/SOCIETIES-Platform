@@ -26,17 +26,63 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 package org.societies.api.internal.css.management;
 
 /**
- * ICSSManager callback class as used in {@link ICSSManager}
- * 
- *
+ * Defines a CSS node or device
  */
-public interface ICSSManagerCallback {
+
+public class CSSDevice {
+	/**
+	 * Enum for device status types
+	 */
+	enum deviceStatus {Available, Unavailable, Hibernating};
+	/**
+	 * Enum for device node types
+	 */
+	enum nodeType {Android, Cloud, Rich};
+
+	/**
+	 * unique within context of CSS
+	 */
+	String identity = null;
 	
 	/**
-	 * Defines what happens when a method is called 
-	 * @param message
-	 * @param profile
+	 * status of device
 	 */
-	public void onMethodInvocation(String message, CSSProfile profile);
+	String status = null;
+	/**
+	 * node type of device
+	 */
+	String nodeType = null;
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param identity
+	 * @param status
+	 * @param nodeType
+	 */
+	public CSSDevice(String identity, String status, String nodeType) {
+		this.identity = identity;
+		this.status = status;
+		this.nodeType = nodeType;
+	}
+	
+	public String getIdentity() {
+		return identity;
+	}
+	public void setIdentity(String identity) {
+		this.identity = identity;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public String getNodeType() {
+		return nodeType;
+	}
+	public void setNodeType(String nodeType) {
+		this.nodeType = nodeType;
+	}
 
 }
