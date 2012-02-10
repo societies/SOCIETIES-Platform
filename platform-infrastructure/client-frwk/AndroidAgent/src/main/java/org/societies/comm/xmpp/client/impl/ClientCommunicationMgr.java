@@ -10,8 +10,8 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.interfaces.XMPPAgent;
 import org.societies.ipc.Stub;
-import org.xmpp.packet.IQ;
-import org.xmpp.packet.Message.Type;
+import org.jivesoftware.smack.packet.IQ;
+import org.jivesoftware.smack.packet.Message;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -68,7 +68,7 @@ public class ClientCommunicationMgr {
 		bindService(connection);
 	}
 	
-	public void sendMessage(Stanza stanza, Type type, Object payload)
+	public void sendMessage(Stanza stanza, Message.Type type, Object payload)
 			throws CommunicationException {
 		
 		if (payload == null) {

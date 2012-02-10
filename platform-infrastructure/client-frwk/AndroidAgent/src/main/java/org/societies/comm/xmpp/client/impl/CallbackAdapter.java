@@ -7,7 +7,7 @@ import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.comm.xmpp.interfaces.IdentityManager;
 import org.societies.interfaces.Callback;
-import org.xmpp.packet.Packet;
+import org.jivesoftware.smack.packet.Packet;
 
 import android.content.Context;
 import android.content.ServiceConnection;
@@ -72,7 +72,7 @@ public class CallbackAdapter implements Callback {
 		IdentityManager idm = new IdentityManager();
 		Identity to = idm.fromJid(packet.getTo().toString());
 		Identity from = idm.fromJid(packet.getFrom().toString());
-		Stanza returnStanza = new Stanza(packet.getID(), from, to);
+		Stanza returnStanza = new Stanza(packet.getPacketID(), from, to);
 		return returnStanza;
 	}
 }

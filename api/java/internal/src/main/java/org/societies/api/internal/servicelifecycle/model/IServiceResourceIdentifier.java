@@ -22,19 +22,16 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.servicelifecycle.model;
+package org.societies.api.internal.servicelifecycle.model;
 
 import java.net.URI;
 
 /**
- * @deprecated Massimo: this interface will be deprecated as soon as 
- * 						the service lifecycle management will run
- * 						and it will expose the interfaces for the
- * 						service registry
+ * Describe your class here...
+ *
  * @author Eliza
- * 
+ *
  */
-
 public interface IServiceResourceIdentifier {
 
 	/**
