@@ -107,6 +107,12 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
             <version>1.2.0</version>
         </dependency>
 
+        <dependency>
+		<groupId>org.societies.api.internal</groupId>
+		<artifactId>societies-api-internal</artifactId>
+		<version>${release.version}</version>
+        </dependency>
+
     </dependencies>
   </dependencyManagement>
 

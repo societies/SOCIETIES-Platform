@@ -25,7 +25,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.android.platform.interfaces;
 
-import org.societies.api.android.internal.model.CSSProfile;
+import org.societies.api.android.internal.model.AndroidCSSProfile;
+
 
 /**
  * 
@@ -43,18 +44,18 @@ import org.societies.api.android.internal.model.CSSProfile;
  * This interface will be implemented for android nodes. 
  *
  */
-public interface ICSSManager {
-	String methodsArray [] = {"loginCSS(String client, CSSProfile profile)", 
-			"logoutCSS(String client, CSSProfile profile)",
-			"registerCSS(String client, CSSProfile profile)",
-			"unregisterCSS(String client, CSSProfile profile)",
-			"registerCSSDevice(String client, CSSProfile profile)",
-			"unregisterCSSDevice(String client, CSSProfile profile)",
-			"getCSSProfile(String client)",
-			"modifyCSSProfile(String client, CSSProfile profile)",
-			"changeCSSNodeStatus(String client, CSSProfile profile)",
-			"synchProfile(String client, CSSProfile profile)",
-			"setPresenceStatus(String client, CSSProfile profile)"};
+public interface IAndroidCSSManager {
+	String methodsArray [] = {"loginCSS(String client, AndroidCSSProfile profile)", 
+			"logoutCSS(String client, AndroidCSSProfile profile)",
+			"registerCSS(String client, AndroidCSSProfile profile)",
+			"unregisterCSS(String client, AndroidCSSProfile profile)",
+			"registerCSSDevice(String client, AndroidCSSProfile profile)",
+			"unregisterCSSDevice(String client, AndroidCSSProfile profile)",
+			"getAndroidCSSProfile(String client)",
+			"modifyAndroidCSSProfile(String client, AndroidCSSProfile profile)",
+			"changeCSSNodeStatus(String client, AndroidCSSProfile profile)",
+			"synchProfile(String client, AndroidCSSProfile profile)",
+			"setPresenceStatus(String client, AndroidCSSProfile profile)"};
 
 	/**
 	 * Login a user to a CSS. The registration of devices included in the profile
@@ -65,7 +66,7 @@ public interface ICSSManager {
 	 * @param callback
 	 * @return boolean operation successful
 	 */
-	boolean loginCSS(String client, CSSProfile profile);	
+	boolean loginCSS(String client, AndroidCSSProfile profile);	
 
 	/**
 	 * Logout the user from a CSS
@@ -75,7 +76,7 @@ public interface ICSSManager {
 	 * @param callback
 	 * @return boolean operation successful
 	 */
-	boolean logoutCSS(String client, CSSProfile profile);	
+	boolean logoutCSS(String client, AndroidCSSProfile profile);	
 	
 	/**
 	 * Register a CSS
@@ -85,7 +86,7 @@ public interface ICSSManager {
 	 * @param callback
 	 * @return boolean operation successful
 	 */
-	boolean registerCSS(String client, CSSProfile profile);
+	boolean registerCSS(String client, AndroidCSSProfile profile);
 
 	/**
 	 * Unregister the CSS
@@ -96,7 +97,7 @@ public interface ICSSManager {
 	 * @param callback
 	 * @return boolean operation successful
 	 */
-	boolean unregisterCSS(String client, CSSProfile profile);
+	boolean unregisterCSS(String client, AndroidCSSProfile profile);
 
 	/**
 	 * Register a device(s) with a CSS
@@ -106,7 +107,7 @@ public interface ICSSManager {
 	 * @param callback
 	 * @return boolean operation successful
 	 */
-	boolean registerCSSDevice(String client, CSSProfile profile);
+	boolean registerCSSDevice(String client, AndroidCSSProfile profile);
 	/**
 	 * Unregister a device(s) from a CSS
 	 * 
@@ -115,7 +116,7 @@ public interface ICSSManager {
 	 * @param callback
 	 * @return boolean operation successful
 	 */
-	boolean unregisterCSSDevice(String client, CSSProfile profile);
+	boolean unregisterCSSDevice(String client, AndroidCSSProfile profile);
 	
 	/**
 	 * Get the CSS Profile. This operation will retrieve the local CSS Profile. 
@@ -124,9 +125,9 @@ public interface ICSSManager {
 	 * 
 	 * @param client component package calling method
 	 * @param callback
-	 * @return CSSProfile current CSS profile
+	 * @return AndroidCSSProfile current CSS profile
 	 */
-	CSSProfile getCSSProfile(String client);
+	AndroidCSSProfile getAndroidCSSProfile(String client);
 
 	/**
 	 * Modify the CSS Profile
@@ -135,7 +136,7 @@ public interface ICSSManager {
 	 * @param profile
 	 * @return boolean operation successful
 	 */
-	boolean modifyCSSProfile(String client, CSSProfile profile);
+	boolean modifyAndroidCSSProfile(String client, AndroidCSSProfile profile);
 	/**
 	 * Change the status a CSS device
 	 * 
@@ -144,7 +145,7 @@ public interface ICSSManager {
 	 * @param callback
 	 * @return boolean operation successful
 	 */
-	boolean changeCSSNodeStatus(String client, CSSProfile profile);
+	boolean changeCSSNodeStatus(String client, AndroidCSSProfile profile);
 	
 	/**
 	 * Synchronise the CSS profile. The CSS cloud node's current profile is synchronised
@@ -155,7 +156,7 @@ public interface ICSSManager {
 	 * @param callback
 	 * @return boolean operation successful
 	 */
-	boolean synchProfile(String client, CSSProfile profile);
+	boolean synchProfile(String client, AndroidCSSProfile profile);
 	
 	/**
 	 * Set the presence status of the user
@@ -165,5 +166,5 @@ public interface ICSSManager {
 	 * @param callback
 	 * @return boolean operation successful
 	 */
-	boolean setPresenceStatus(String client, CSSProfile profile);
+	boolean setPresenceStatus(String client, AndroidCSSProfile profile);
 }

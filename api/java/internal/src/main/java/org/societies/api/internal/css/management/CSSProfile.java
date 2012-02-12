@@ -28,31 +28,93 @@ package org.societies.api.internal.css.management;
 /**
  * Defines a CSS profile
  * 
- *
+ * In order to allow for Android compatibility, the natural Enum types 
+ * are int types. 
  */
 public class CSSProfile {
 	/**
 	 * Enum for CSS status
 	 */
-	enum cssStatus {Active, Inactive};
+	public enum cssStatus {
+		Active("Active"), 
+		Inactive("Inactive");
+	
+	    private String name;
+
+	    cssStatus(String name) {
+	        this.name = name;
+	    }
+
+	    public String getName() {
+	        return this.name;
+	    }
+
+	};
 	/**
 	 * Enum for entity types
 	 */
-	enum entityType {Person, Organisation};
+	public enum entityType {
+		Person("Personal CSS"), 
+		Organisation("Organisational CSS");
+		
+		
+	    private String name;
+
+	    entityType(String name) {
+	        this.name = name;
+	    }
+
+	    public String getName() {
+	        return this.name;
+	    }
+
+	};
 	/**
 	 * Enum for gender types
 	 */
-	enum genderType {Male, Female, Unspecified};
+	public enum genderType {
+		Male("Male"), 
+		Female("Female"), 
+		Unspecified("Unspecified");
+		
+	    private String name;
+
+	    genderType(String name) {
+	        this.name = name;
+	    }
+
+	    public String getName() {
+	        return this.name;
+	    }
+	
+	};
 	/**
 	 * Enum for presence types
 	 */
-	enum presenceType {Available, DoNotDisturb, Offline, Away, ExtendedAway };
+	public enum presenceType {
+		Available("Available"), 
+		DoNotDisturb("Do not disturb"), 
+		Offline("Offline"), 
+		Away("Away"), 
+		ExtendedAway("Extended Away");
+		
+	    private String name;
+
+	    presenceType(String name) {
+	        this.name = name;
+	    }
+
+	    public String getName() {
+	        return this.name;
+	    }
+	
+	};
 	
 	
 	/**
 	 * is the CSS a person or organisation ?
 	 */
-	String entityType = null;
+	int entity = 0;
 	/**
 	 * used for personal CSS
 	 */
@@ -86,7 +148,7 @@ public class CSSProfile {
 	/**
 	 * Gender of person
 	 */
-	String sex = null;
+	int sex = 0;
 	/**
 	 * Home or default location
 	 */
@@ -97,13 +159,13 @@ public class CSSProfile {
 	 */
 	String cssIdentity = null;
 	/**
-	 * Current list of device IDs that constitute a CSS
+	 * Current list of node IDs that constitute a CSS
 	 */
-	CSSDevice cssDevices[] = null;
+	CSSNode cssNodes[] = null;
 	/**
 	 * Status of CSS
 	 */
-	String cssStatus = null;
+	int status = 0;
 	/**
 	 * Date of CSS registration
 	 */
@@ -123,127 +185,165 @@ public class CSSProfile {
 //	 */
 //	List encounteredCIS = null;
 	/**
-	 * Array of devices that have participated in the CSS
+	 * Array of nodes that have participated in the CSS
 	 */
-	CSSDevice archiveCSSDevices[] = null;
+	CSSNode archiveCSSNodes[] = null;
 	/**
 	 * Presence status user
 	 */
-	String presenceStatus = null;
+	int presence = 0;
 	
 	/**
-	 * Constructor
+	 * Default Contructor
 	 */
 	public CSSProfile() {
+		
 	}
 
-	public String getEntityType() {
-		return entityType;
+	public int getEntity() {
+		return entity;
 	}
-	public void setEntityType(String entityType) {
-		this.entityType = entityType;
+
+	public void setEntity(int entity) {
+		this.entity = entity;
 	}
+
 	public String getForeName() {
 		return foreName;
 	}
+
 	public void setForeName(String foreName) {
 		this.foreName = foreName;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String getIdentityName() {
 		return identityName;
 	}
+
 	public void setIdentityName(String identityName) {
 		this.identityName = identityName;
 	}
+
 	public String getPassword() {
 		return password;
 	}
+
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
 	public String getEmailID() {
 		return emailID;
 	}
+
 	public void setEmailID(String emailID) {
 		this.emailID = emailID;
 	}
+
 	public String getImID() {
 		return imID;
 	}
+
 	public void setImID(String imID) {
 		this.imID = imID;
 	}
+
 	public String getSocialURI() {
 		return socialURI;
 	}
+
 	public void setSocialURI(String socialURI) {
 		this.socialURI = socialURI;
 	}
-	public String getSex() {
+
+	public int getSex() {
 		return sex;
 	}
-	public void setSex(String sex) {
+
+	public void setSex(int sex) {
 		this.sex = sex;
 	}
+
 	public String getHomeLocation() {
 		return homeLocation;
 	}
+
 	public void setHomeLocation(String homeLocation) {
 		this.homeLocation = homeLocation;
 	}
+
 	public String getCssIdentity() {
 		return cssIdentity;
 	}
+
 	public void setCssIdentity(String cssIdentity) {
 		this.cssIdentity = cssIdentity;
 	}
-	public CSSDevice[] getCssDevices() {
-		return cssDevices;
+
+	public CSSNode[] getCssNodes() {
+		return cssNodes;
 	}
-	public void setCssDevices(CSSDevice[] cssDevices) {
-		this.cssDevices = cssDevices;
+
+	public void setCssNodes(CSSNode[] cssNodes) {
+		this.cssNodes = cssNodes;
 	}
-	public String getCssStatus() {
-		return cssStatus;
+
+	public int getStatus() {
+		return status;
 	}
-	public void setCssStatus(String cssStatus) {
-		this.cssStatus = cssStatus;
+
+	public void setStatus(int status) {
+		this.status = status;
 	}
+
 	public String getCssRegistration() {
 		return cssRegistration;
 	}
+
 	public void setCssRegistration(String cssRegistration) {
 		this.cssRegistration = cssRegistration;
 	}
+
 	public String getCssInactivation() {
 		return cssInactivation;
 	}
+
 	public void setCssInactivation(String cssInactivation) {
 		this.cssInactivation = cssInactivation;
 	}
+
 	public int getCssUpTime() {
 		return cssUpTime;
 	}
+
 	public void setCssUpTime(int cssUpTime) {
 		this.cssUpTime = cssUpTime;
 	}
-	public CSSDevice[] getArchiveCSSDevices() {
-		return archiveCSSDevices;
+
+	public CSSNode[] getArchiveCSSNodes() {
+		return archiveCSSNodes;
 	}
-	public void setArchiveCSSDevices(CSSDevice[] archiveCSSDevices) {
-		this.archiveCSSDevices = archiveCSSDevices;
+
+	public void setArchiveCSSNodes(CSSNode[] archiveCSSNodes) {
+		this.archiveCSSNodes = archiveCSSNodes;
 	}
-	public String getPresenceStatus() {
-		return presenceStatus;
+
+	public int getPresence() {
+		return presence;
 	}
-	public void setPresenceStatus(String presenceStatus) {
-		this.presenceStatus = presenceStatus;
+
+	public void setPresence(int presence) {
+		this.presence = presence;
 	}
+
+
 
 }

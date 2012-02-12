@@ -23,66 +23,72 @@ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVI
 INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.css.management;
+package org.societies.api.android.internal.model;
+
+import org.societies.api.internal.css.management.CSSNode;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
 
 /**
- * Defines a CSS node or device
+ * Android version of {@link CSSNode}. Implements Parcelable interface for
+ * Android IPC.
+ *
  */
-
-public class CSSDevice {
-	/**
-	 * Enum for device status types
-	 */
-	enum deviceStatus {Available, Unavailable, Hibernating};
-	/**
-	 * Enum for device node types
-	 */
-	enum nodeType {Android, Cloud, Rich};
-
-	/**
-	 * unique within context of CSS
-	 */
-	String identity = null;
+public class AndroidCSSNode extends CSSNode implements Parcelable {
 	
 	/**
-	 * status of device
+	 * Default Constructor
 	 */
-	String status = null;
+	public AndroidCSSNode() {
+		super();
+	}
 	/**
-	 * node type of device
-	 */
-	String nodeType = null;
-	
-	/**
-	 * Constructor
+	 * Alternative constructor
 	 * 
 	 * @param identity
 	 * @param status
 	 * @param nodeType
 	 */
-	public CSSDevice(String identity, String status, String nodeType) {
-		this.identity = identity;
-		this.status = status;
-		this.nodeType = nodeType;
-	}
-	
-	public String getIdentity() {
-		return identity;
-	}
-	public void setIdentity(String identity) {
-		this.identity = identity;
-	}
-	public String getStatus() {
-		return status;
-	}
-	public void setStatus(String status) {
-		this.status = status;
-	}
-	public String getNodeType() {
-		return nodeType;
-	}
-	public void setNodeType(String nodeType) {
-		this.nodeType = nodeType;
+	public AndroidCSSNode(String identity, int status, int nodeType) {
+		super(identity, status, nodeType);
 	}
 
+
+	
+	/**
+	 * Parcelable implementation
+	 */
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+	@Override
+	public void writeToParcel(Parcel out, int flags) {
+			out.writeString(getIdentity());
+			out.writeInt(getType());
+			out.writeInt(getStatus());
+	}
+	
+	public static final Parcelable.Creator<AndroidCSSNode> CREATOR = new Parcelable.Creator<AndroidCSSNode>() {
+
+		@Override
+		public AndroidCSSNode createFromParcel(Parcel in) {
+			return new AndroidCSSNode(in);
+		}
+
+		@Override
+		public AndroidCSSNode[] newArray(int size) {
+			return new AndroidCSSNode[size];
+		}
+		
+	};
+	
+	private AndroidCSSNode(Parcel in) {
+		super();
+		setIdentity(in.readString());
+		setType(in.readInt());
+		setStatus(in.readInt());
+	}
 }
