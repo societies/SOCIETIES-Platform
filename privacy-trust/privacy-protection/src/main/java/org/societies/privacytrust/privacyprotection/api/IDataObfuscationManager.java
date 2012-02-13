@@ -24,10 +24,10 @@
  */
 package org.societies.privacytrust.privacyprotection.api;
 
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.mock.DataIdentifier;
 
 /**
  * Internal interface to protect a data by obfuscating it
@@ -71,5 +71,5 @@ public interface IDataObfuscationManager {
 	 * @return otherwise ID of the non-obfuscated data
 	 * @throws Exception
 	 */
-	public DataIdentifier hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel, IDataObfuscationListener listener) throws PrivacyException;
+	public CtxIdentifier hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel, IDataObfuscationListener listener) throws PrivacyException;
 }

@@ -25,8 +25,8 @@
 
 package org.societies.personalisation.UserPreferenceLearning.impl;
 
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
@@ -40,7 +40,7 @@ import org.societies.personalisation.preference.api.model.PreferenceTreeNode;
 public class PostProcessor 
 {
 	public IPreferenceTreeModel process(
-			EntityIdentifier dataOwner, 
+			Identity dataOwner, 
 			String paramName, 
 			String treeString, 
 			CtxIdentifierCache cache,
@@ -194,7 +194,7 @@ public class PostProcessor
 		return false;
 	}
 
-	private IPreferenceCondition createCondition(EntityIdentifier dataOwner, String temp, CtxIdentifierCache cache){
+	private IPreferenceCondition createCondition(Identity dataOwner, String temp, CtxIdentifierCache cache){
 
 		System.out.println("Creating condition from String: "+temp);
 		String noBars = removeChar(temp, '|');

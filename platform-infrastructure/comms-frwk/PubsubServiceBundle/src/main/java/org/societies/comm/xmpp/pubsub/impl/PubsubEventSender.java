@@ -62,7 +62,7 @@ public class PubsubEventSender extends Thread {
 				try {
 					endpoint.sendMessage(stanza, n.eventPayload);
 				} catch (CommunicationException e) {
-					LOG.warn(e.getMessage());
+					LOG.warn("Error sending "+stanza.toString(),e);
 				}
 			}
 		}

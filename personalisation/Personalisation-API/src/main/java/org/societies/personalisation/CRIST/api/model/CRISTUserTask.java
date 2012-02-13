@@ -184,7 +184,7 @@ public class CRISTUserTask implements ICRISTUserTask {
 	}
 
 	@Override
-	public ServiceResourceIdentifier getServiceID() {
+	public IServiceResourceIdentifier getServiceID() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -202,7 +202,7 @@ public class CRISTUserTask implements ICRISTUserTask {
 	}
 
 	@Override
-	public void setServiceID(ServiceResourceIdentifier id) {
+	public void setServiceID(IServiceResourceIdentifier id) {
 		// TODO Auto-generated method stub
 
 	}

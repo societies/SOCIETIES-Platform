@@ -16,13 +16,6 @@
     <name>Pubsub Service Bundle</name>
     <version>${version.comm}</version>
 
-    <properties>
-        <slf4j.version>1.5.0</slf4j.version>
-        <spring.maven.artifact.version>2.5.6.SEC01</spring.maven.artifact.version>
-        <spring.osgi.version>1.2.1</spring.osgi.version>
-        <equinox.ver>3.2.2</equinox.ver>
-    </properties>
-
     <dependencies>
     	<!-- Interface -->
     	<dependency>
@@ -45,7 +38,12 @@
 			<scope>compile</scope>
 		</dependency>
 		
-		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
@@ -55,7 +53,6 @@
 		<dependency>
             <groupId>org.springframework</groupId>
             <artifactId>org.springframework.beans</artifactId>
-            <version>${spring.maven.artifact.version}</version>
             <scope>provided</scope>
             <exclusions>
               <exclusion>
@@ -67,7 +64,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>org.springframework.context</artifactId>
-            <version>${spring.maven.artifact.version}</version>
             <scope>provided</scope>
             <exclusions>
               <exclusion>
@@ -75,12 +71,6 @@
                 <artifactId>com.springsource.org.apache.commons.logging</artifactId>
               </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-        	<groupId>org.osgi</groupId>
-        	<artifactId>org.osgi.compendium</artifactId>
-        	<version>4.2.0</version>
-        	<scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -99,7 +89,6 @@
 							*;resolution:=optional
     					</Import-Package>
     					<Export-Package>
-    						org.societies.comms.xmpp.pubsub,
 		           			jabber.x.data,
 							org.jabber.protocol.pubsub,
 							org.jabber.protocol.pubsub.errors,

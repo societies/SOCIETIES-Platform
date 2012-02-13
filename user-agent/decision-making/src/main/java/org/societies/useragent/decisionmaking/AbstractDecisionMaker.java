@@ -26,6 +26,7 @@
 package org.societies.useragent.decisionmaking;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.societies.api.internal.useragent.conflict.IConflictResolutionManager;
@@ -62,31 +63,34 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 	@Override
 	public void makeDecision(List<IOutcome> intents, List<IOutcome> preferences) {
 		// TODO Auto-generated method stub
+		HashSet<IOutcome> conflicts=new HashSet<IOutcome>();
 		for (IOutcome intent : intents) {
 			IOutcome action=intent;
+			//unresolved preference ioutcomes
 			for (IOutcome preference : preferences) {
 				ConflictType conflict = detectConflict(intent, preference);
 				if (conflict == ConflictType.PREFERNCE_INTENT_NOT_MATCH) {
 					action = manager.resolveConflict(action,preference);
 					if(action ==null){
-						List<String> options=new ArrayList<String>();
-						options.add(intent.toString());
-						options.add(preference.toString());
-						ExpProposalContent epc=new ExpProposalContent("Conflict Detected!",
-								options);
-						if(feedbackHandler.getExplicitFB(
-								ExpProposalType.RADIOLIST,epc).equals(intent.toString())){
-							action=intent;
-							/*return true for intent false for preference*/
-						}else{
-							action=preference;
-						}
+						conflicts.add(preference);
 					}
 				}else if (conflict==ConflictType.UNKNOWN_CONFLICT){
 					/*handler the unknown work*/
 				}
 			}
-			this.implementIAction(action);
+			if(conflicts.size()==0)//no unresolved conflicts
+				this.implementIAction(action);
+			else{
+				List<String> options=new ArrayList<String>();
+				options.add(intent.toString());
+				for(IOutcome conf:conflicts)
+				options.add(conf.toString());
+				ExpProposalContent epc=new ExpProposalContent("Conflict Detected!",
+						options.toArray(new String[options.size()]));
+				feedbackHandler.getExplicitFB(ExpProposalType.RADIOLIST, epc, 
+						new DecisionMakingCallback(this,intent,conflicts));
+			}
+			conflicts.clear();
 		}
 	}
 

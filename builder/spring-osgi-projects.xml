@@ -69,16 +69,15 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		-->		 
 		
 		<!-- Platform Infrastructure -->
-		<!-- Communications Infrastructure -->		
+		<!-- Communications Infrastructure -->
 		<module>../platform-infrastructure/comms-frwk/CommonLibraries</module>
 		<module>../platform-infrastructure/comms-frwk/CommunicationFrameworkCommons</module>
 		<module>../platform-infrastructure/comms-frwk/XCCommunicationMgr</module>
 		<module>../platform-infrastructure/comms-frwk/DataFormsXEP</module>
-		<!-- 
 		<module>../platform-infrastructure/comms-frwk/PubsubXEP</module>
 		<module>../platform-infrastructure/comms-frwk/PubsubServiceBundle</module>
-		<module>../platform-infrastructure/comms-frwk/PubsubClientBundle</module>	
-		-->
+		<module>../platform-infrastructure/comms-frwk/PubsubClientBundle</module>
+
 		<!--
 		<module>../platform-infrastructure/comms-frwk/ExampleServices/Calculator</module>
 		<module>../platform-infrastructure/comms-frwk/ExampleServices/CalculatorBean</module>
@@ -109,6 +108,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<!-- Intelligent community orchestration -->
 		<!-- Context Management -->
 		<!-- Privacy Mgmt -->
+		<module>../privacy-trust/privacy-protection</module>
 		
 	</modules>
 </project>

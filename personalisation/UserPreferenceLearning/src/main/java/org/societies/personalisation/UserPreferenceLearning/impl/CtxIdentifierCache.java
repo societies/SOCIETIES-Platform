@@ -30,10 +30,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.personalisation.preference.api.model.IPreferenceCondition;
 import org.societies.personalisation.preference.api.model.ContextPreferenceCondition;
@@ -41,13 +41,13 @@ import org.societies.personalisation.preference.api.model.OperatorConstants;
 
 public class CtxIdentifierCache {
 
-    Hashtable<EntityIdentifier, Hashtable<String, CtxIdentifier>> dataOwner_cache;
+    Hashtable<Identity, Hashtable<String, CtxIdentifier>> dataOwner_cache;
 
     public CtxIdentifierCache(){
-        dataOwner_cache = new Hashtable<EntityIdentifier, Hashtable<String, CtxIdentifier>>();
+        dataOwner_cache = new Hashtable<Identity, Hashtable<String, CtxIdentifier>>();
     }
     
-    public void cacheCtxIdentifiers(EntityIdentifier dataOwner, Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history){
+    public void cacheCtxIdentifiers(Identity dataOwner, Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history){
         Iterator<CtxHistoryAttribute> history_it = history.keySet().iterator();
         while(history_it.hasNext()){
             CtxHistoryAttribute nextPrimary = (CtxHistoryAttribute)history_it.next();
@@ -60,7 +60,7 @@ public class CtxIdentifierCache {
         }
     }
     
-    public IPreferenceCondition getPreferenceCondition(EntityIdentifier dpi, IAction action){
+    public IPreferenceCondition getPreferenceCondition(Identity dpi, IAction action){
         String parameter = action.getparameterName();
         CtxAttributeIdentifier id = retrieveCtxIdentifier(dpi, parameter);
         IPreferenceCondition translated = new ContextPreferenceCondition(
@@ -105,7 +105,7 @@ public class CtxIdentifierCache {
     /*
      * Helper methods
      */
-    private void storeCtxIdentifier(EntityIdentifier dataOwner, String type, CtxIdentifier id){    
+    private void storeCtxIdentifier(Identity dataOwner, String type, CtxIdentifier id){    
         Hashtable<String, CtxIdentifier> type_cache = null;
         if(dataOwner_cache.containsKey(dataOwner)){
             //System.out.println("dpi_cache already contains dpi: "+dpi.toString());
@@ -123,7 +123,7 @@ public class CtxIdentifierCache {
         }
     }
 
-    private CtxAttributeIdentifier retrieveCtxIdentifier(EntityIdentifier dataOwner, String type){
+    private CtxAttributeIdentifier retrieveCtxIdentifier(Identity dataOwner, String type){
         CtxAttributeIdentifier id = null;
         Hashtable<String, CtxIdentifier> type_cache = dataOwner_cache.get(dataOwner);
         if(type_cache != null){

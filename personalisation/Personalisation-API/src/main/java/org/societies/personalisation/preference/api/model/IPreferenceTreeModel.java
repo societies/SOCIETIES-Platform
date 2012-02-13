@@ -24,7 +24,8 @@ import java.util.Date;
 
 import javax.swing.tree.TreeModel;
 
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+
 
 /**
  * @author Elizabeth
@@ -59,7 +60,7 @@ public interface IPreferenceTreeModel extends TreeModel, Serializable {
 	 * model
 	 * @return	the serviceID as String
 	 */
-	public ServiceResourceIdentifier getServiceID();
+	public IServiceResourceIdentifier getServiceID();
 
 	/**
 	 * Method to retrieve the service type of the service affected by this preference
@@ -89,7 +90,7 @@ public interface IPreferenceTreeModel extends TreeModel, Serializable {
 	 * 
 	 * @param id    the serviceID
 	 */
-	public void setServiceID(ServiceResourceIdentifier id);
+	public void setServiceID(IServiceResourceIdentifier id);
 
 	/**
 	 * Method to set the serviceType of the service affected by this preference model

@@ -166,7 +166,7 @@ public class CommunityLifecycleManagement {
 		}
 	}
     
-    public void intialiseCommunityLifecycleManagement() {
+    public void initialiseCommunityLifecycleManagement() {
     	if (linkedCss != null) {
     		new CommunityLifecycleManagement(linkedCss, "CSS");
     		loop();

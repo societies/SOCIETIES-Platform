@@ -31,9 +31,9 @@ public interface ICRISTUserIntentPrediction {
 	 * 
 	 * @param ctxAttribute		- a set of context
 	 */
-	public ArrayList<CRISTUserAction> getCRISTPrediction(EntityIdentifier entityID, CtxAttribute ctxAttribute, IPersonalisationInternalCallback callback);
+	public ArrayList<CRISTUserAction> getCRISTPrediction(Identity entityID, CtxAttribute ctxAttribute, IPersonalisationInternalCallback callback);
 	
-	public ArrayList<CRISTUserAction> getCRISTPrediction(EntityIdentifier entityID, IAction action, IPersonalisationInternalCallback callback);
+	public ArrayList<CRISTUserAction> getCRISTPrediction(Identity entityID, IAction action, IPersonalisationInternalCallback callback);
 	
 	/**
 	 * This method will return the user's current intent
@@ -43,7 +43,7 @@ public interface ICRISTUserIntentPrediction {
 	 *  @param serviceID	- the ID of the service related to the actions upon 
 	 *  which prediction should perform
 	 */
-	public CRISTUserAction getCurrentUserIntentAction(EntityIdentifier requestor, EntityIdentifier ownerID, ServiceResourceIdentifier serviceID);
+	public CRISTUserAction getCurrentUserIntentAction(Identity requestor, Identity ownerID, IServiceResourceIdentifier serviceID);
 	
 	/**
 	 * This method will send user's feedback about the predicted user intent

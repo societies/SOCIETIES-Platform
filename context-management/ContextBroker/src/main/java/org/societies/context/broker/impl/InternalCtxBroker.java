@@ -24,6 +24,7 @@
  */
 package org.societies.context.broker.impl;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,15 +47,11 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.internal.context.broker.ICtxBroker;
-//import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
-import org.societies.context.api.user.db.IUserCtxDBMgrCallback;
-import org.societies.context.api.user.history.IUserCtxHistoryCallback;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
 import org.societies.context.broker.api.CtxBrokerException;
-//import org.societies.context.broker.impl.InternalCtxBroker.UserHoCDBCallback;
-//import org.societies.context.broker.impl.InternalCtxBroker.UserDBCallback;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 
@@ -65,12 +62,12 @@ import org.springframework.scheduling.annotation.AsyncResult;
  */
 public class InternalCtxBroker implements ICtxBroker {
 
-	private IUserCtxDBMgr userDB;
-	private IUserCtxHistoryMgr userHocDB;
+	private IUserCtxDBMgr userCtxDBMgr;
+	private IUserCtxHistoryMgr userCtxHistoryMgr;
 
 	public InternalCtxBroker(IUserCtxDBMgr userDB,IUserCtxHistoryMgr userHocDB) throws CtxException {
-		this.userDB=userDB;
-		this.userHocDB = userHocDB;
+		this.userCtxDBMgr=userDB;
+		this.userCtxHistoryMgr = userHocDB;
 		// TODO Use logging.debug
 		//System.out.println(this.getClass().getName()+" full");
 	}
@@ -81,106 +78,114 @@ public class InternalCtxBroker implements ICtxBroker {
 	}
 
 	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) throws CtxException {
-		this.userDB = userDB;
+		this.userCtxDBMgr = userDB;
 	}
 
 	public void setUserCtxHistoryMgr (IUserCtxHistoryMgr userHocDB) throws CtxException {
-		this.userHocDB = userHocDB;
+		this.userCtxHistoryMgr = userHocDB;
 	}
 
-
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#createAssociation(java.lang.String)
+	 */
 	@Override
 	@Async
 	public Future<CtxAssociation> createAssociation(String type) throws CtxException {
-		
-		UserDBCallback callback = new UserDBCallback();
-		
-		userDB.createAssociation(type, callback);
-		CtxAssociation association = (CtxAssociation) callback.getCreatedCtxAssociation();
+
+		//UserDBCallback callback = new UserDBCallback();
+
+		CtxAssociation association = userCtxDBMgr.createAssociation(type);
+		//CtxAssociation association = (CtxAssociation) callback.getCreatedCtxAssociation();
 		if (association!=null)
 			return new AsyncResult<CtxAssociation>(association);
 		else 
 			return new AsyncResult<CtxAssociation>(null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#createAttribute(org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
+	 */
 	@Override
 	@Async
 	public Future<CtxAttribute> createAttribute(CtxEntityIdentifier scope,
 			String type) throws CtxException {
-		// TODO Auto-generated method stub		
-		UserDBCallback callback = new UserDBCallback();
-		
-		userDB.createAttribute(scope, null, type, callback);
-		CtxAttribute attribute = (CtxAttribute) callback.getCreatedCtxAttribute();
-		if (attribute!=null)
-			return new AsyncResult<CtxAttribute>(attribute);
-		else 
-			return new AsyncResult<CtxAttribute>(null);
+
+		// TODO IUserCtxDBMgr should provide createAttribute(CtxEntityIdentifier scope, String type) 
+		final CtxAttribute attribute = 
+				this.userCtxDBMgr.createAttribute(scope, null, type);
+
+		return new AsyncResult<CtxAttribute>(attribute);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#createEntity(java.lang.String)
+	 */
 	@Override
 	@Async
 	public Future<CtxEntity> createEntity(String type) throws CtxException {
-		
-		UserDBCallback callback = new UserDBCallback();
-		
-		userDB.createEntity(type, callback);
-		CtxEntity entity = (CtxEntity) callback.getCreatedCtxEntity();
-		if (entity!=null)
-			return new AsyncResult<CtxEntity>(entity);
-		else 
-			return new AsyncResult<CtxEntity>(null);
+
+		final CtxEntity entity = 
+				this.userCtxDBMgr.createEntity(type);
+
+		return new AsyncResult<CtxEntity>(entity);
 	}
 
 	@Override
 	public void disableCtxMonitoring(CtxAttributeValueType type) throws CtxException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void disableCtxRecording() throws CtxException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void enableCtxMonitoring(CtxAttributeValueType type) throws CtxException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void enableCtxRecording() throws CtxException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#lookupEntities(java.lang.String, java.lang.String, java.io.Serializable, java.io.Serializable)
+	 */
 	@Override
+	@Async
 	public Future<List<CtxEntityIdentifier>> lookupEntities(String entityType,
 			String attribType, Serializable minAttribValue,
 			Serializable maxAttribValue) throws CtxException {
+
+		final List<CtxEntityIdentifier> results = new ArrayList<CtxEntityIdentifier>(); 
 		
-		UserDBCallback callback = new UserDBCallback();
-		userDB.lookupEntities(entityType, attribType, minAttribValue, maxAttribValue, callback);
-		List<CtxEntityIdentifier> results = callback.getLookedUpCtxEntities();
-		// add fix
-				
-		return null;
+		results.addAll(
+				this.userCtxDBMgr.lookupEntities(entityType, attribType, minAttribValue, maxAttribValue));
+
+		return new AsyncResult<List<CtxEntityIdentifier>>(results);
 	}
 
 	@Override
 	public void registerForUpdates(CtxEntityIdentifier scope,
 			String attrType) throws CtxException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void registerForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
 		// TODO Auto-generated method stub
-	
+
 	}
 
 	@Override
@@ -189,24 +194,17 @@ public class InternalCtxBroker implements ICtxBroker {
 		return null;
 	}
 
-	@Override
-	public Future<Integer> removeHistory(String type, Date startDate, Date endDate) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#retrieve(org.societies.api.context.model.CtxIdentifier)
+	 */
 	@Override
 	@Async
 	public Future<CtxModelObject> retrieve(CtxIdentifier identifier) throws CtxException {
-		// TODO Auto-generated method stub
-		UserDBCallback callback = new UserDBCallback();
-				
-		userDB.retrieve(identifier, callback);
-		CtxModelObject modelObj = (CtxModelObject) callback.getCtxModelObjectRetrieved();
-		if (modelObj!=null)
-			return new AsyncResult<CtxModelObject>(modelObj);
-		else 
-			return new AsyncResult<CtxModelObject>(null);
+		
+		final CtxModelObject modelObj = this.userCtxDBMgr.retrieve(identifier);
+
+		return new AsyncResult<CtxModelObject>(modelObj);
 	}
 
 	@Override
@@ -223,67 +221,38 @@ public class InternalCtxBroker implements ICtxBroker {
 		return null;
 	}
 
-	@Override
-	public Future<List<CtxHistoryAttribute>> retrievePast(
-			CtxAttributeIdentifier attrId, int modificationIndex) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	@Async
-	public Future<List<CtxHistoryAttribute>> retrievePast(
-			CtxAttributeIdentifier attrId, Date startDate, Date endDate) throws CtxException {
-		
-		UserHoCDBCallback callback = new UserHoCDBCallback();
-		userHocDB.retrieveHistory(attrId, startDate, endDate, callback);
-	
-		CtxHistoryAttribute modelObj = (CtxHistoryAttribute) callback.getCtxModelObject();
-		List<CtxHistoryAttribute> listAttrs = new ArrayList<CtxHistoryAttribute>();
-		listAttrs.add(modelObj);
-		
-		if (modelObj!=null)
-			return new AsyncResult<List<CtxHistoryAttribute>>(listAttrs);
-		else 
-			return new AsyncResult<List<CtxHistoryAttribute>>(null);
-	}
 
 	@Override
 	public void unregisterForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void unregisterForUpdates(CtxEntityIdentifier scope,
 			String attributeType) throws CtxException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#update(org.societies.api.context.model.CtxModelObject)
+	 */
 	@Override
 	@Async
 	public Future<CtxModelObject> update(CtxModelObject identifier) throws CtxException {
-		
-		UserDBCallback callback = new UserDBCallback();
-		
-		userDB.update(identifier, callback);
-		CtxModelObject modelObject = (CtxModelObject) callback.getUpdatedCtxModelObject();
-		
+
+		final CtxModelObject modelObject = this.userCtxDBMgr.update(identifier);
 
 		// this part allows the storage of attribute updates to context history
-		if(modelObject.getModelType().equals(CtxModelType.ATTRIBUTE)){
-			CtxAttribute ctxAttr = (CtxAttribute) modelObject; 
-			if (ctxAttr.isHistoryRecorded() && userHocDB != null){
-				Date date = new Date();
-				//	System.out.println("storing hoc attribute");
-				userHocDB.storeHoCAttribute(ctxAttr, date);
-			}
-			return new AsyncResult<CtxModelObject>(modelObject);
+		if (CtxModelType.ATTRIBUTE.equals(modelObject.getModelType())) {
+			final CtxAttribute ctxAttr = (CtxAttribute) modelObject; 
+			if (ctxAttr.isHistoryRecorded() && this.userCtxHistoryMgr != null)
+				this.userCtxHistoryMgr.storeHoCAttribute(ctxAttr);
 		}
-		else 
-			return new AsyncResult<CtxModelObject>(null);
-		
+		 
+		return new AsyncResult<CtxModelObject>(modelObject);
 	}
 
 	/*
@@ -294,7 +263,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Async
 	public Future<CtxAttribute> updateAttribute(
 			CtxAttributeIdentifier attributeId, Serializable value) throws CtxException {
-		
+
 		// Implies <code>null</code> valueMetric param
 		return this.updateAttribute(attributeId, value, null);
 	}
@@ -308,22 +277,21 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<CtxAttribute> updateAttribute(
 			CtxAttributeIdentifier attributeId, Serializable value,
 			String valueMetric) throws CtxException {
-	
+
 		if (attributeId == null)
 			throw new NullPointerException("attributeId can't be null");
-		// Ugly but will throw IllegalArgumentException if value type is not supported
-		this.findAttributeValueType(value);
-		
+		// Will throw IllegalArgumentException if value type is not supported
+		final CtxAttributeValueType valueType = this.findAttributeValueType(value);
+
 		Future<CtxModelObject> futureModelObj = this.retrieve(attributeId);
 		CtxAttribute attribute;
 		try {
 			attribute = (CtxAttribute) futureModelObj.get();
-				
+
 			if (attribute == null) {
 				// Requested attribute not found
 				return new AsyncResult<CtxAttribute>(null);
 			} else {
-				final CtxAttributeValueType valueType = this.findAttributeValueType(value);
 				if (CtxAttributeValueType.EMPTY.equals(valueType))
 					attribute.setStringValue(null);
 				else if (CtxAttributeValueType.STRING.equals(valueType))
@@ -347,38 +315,6 @@ public class InternalCtxBroker implements ICtxBroker {
 			throw new CtxBrokerException("Could not update attribute " 
 					+ attributeId + ": " + ee.getMessage(), ee);
 		}
-	}
-
-	@Override
-	public Future<Boolean> setCtxHistoryTuples(
-			CtxAttributeIdentifier primaryAttrIdentifier,
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Future<List<CtxAttributeIdentifier>> getCtxHistoryTuples(
-			CtxAttributeIdentifier primaryAttrIdentifier,
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Future<List<CtxAttributeIdentifier>> updateCtxHistoryTuples(
-			CtxAttributeIdentifier primaryAttrIdentifier,
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Future<Boolean> removeCtxHistoryTuples(
-			CtxAttributeIdentifier primaryAttrIdentifier,
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
@@ -408,8 +344,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
+
 	@Override
 	public Future<List<Object>> evaluateSimilarity(
 			Serializable objectUnderComparison,
@@ -431,166 +366,131 @@ public class InternalCtxBroker implements ICtxBroker {
 		// TODO Auto-generated method stub
 		return null;
 	}
-		
-	private class UserDBCallback implements IUserCtxDBMgrCallback { 
-				
-		private CtxModelObject updatedCtxModelObject = null;
-		
-		private CtxEntity createdCtxEntity = null;
-		
-		private CtxAttribute createdCtxAttribute = null;
-		
-		private List<CtxEntityIdentifier> lookedUpCtxEntities = null;
-			
-		private CtxModelObject ctxModelObjectRetrieved = null;
 
-		private CtxAssociation ctxAssociationCreated = null;
-		
-		/*
-		 * (non-Javadoc)
-		 * @see org.societies.context.api.user.db.IUserCtxDBMgrCallback#ctxEntityCreated(org.societies.api.context.model.CtxEntity)
-		 */
-		@Override
-		public void ctxEntityCreated(CtxEntity ctxEntity) {
-			this.createdCtxEntity = ctxEntity;
-		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see org.societies.context.api.user.db.IUserCtxDBMgrCallback#ctxIndividualCtxEntityCreated(org.societies.api.context.model.CtxEntity)
-		 */
-		@Override
-		public void ctxIndividualCtxEntityCreated(CtxEntity ctxEntity) {
-			this.createdCtxEntity = ctxEntity;
-		}
+	//***********************************************
+	//     Context History Management Methods  
+	//***********************************************
 
-		/*
-		 * (non-Javadoc)
-		 * @see org.societies.context.api.user.db.IUserCtxDBMgrCallback#ctxAttributeCreated(org.societies.api.context.model.CtxAttribute)
-		 */
-		@Override
-		public void ctxAttributeCreated(CtxAttribute ctxAttribute) {
-			this.createdCtxAttribute = ctxAttribute;
-		}
-		
-		// @Override TODO it is not in DB callback ifc
-		public void ctxAssociationCreated(CtxAssociation ctxAssociation) {
-			this.ctxAssociationCreated = ctxAssociation;
-		}
-		
-		/*
-		 * (non-Javadoc)
-		 * @see org.societies.context.api.user.db.IUserCtxDBMgrCallback#ctxModelObjectUpdated(org.societies.api.context.model.CtxModelObject)
-		 */
-		@Override
-		public void ctxModelObjectUpdated(CtxModelObject ctxModelObject) {
-			this.updatedCtxModelObject = ctxModelObject;
-		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see org.societies.context.api.user.db.IUserCtxDBMgrCallback#ctxEntitiesLookedup(java.util.List)
-		 */
-		@Override
-		public void ctxEntitiesLookedup(List<CtxEntityIdentifier> list) {
-			this.lookedUpCtxEntities = list;
-		}
+	@Override
+	@Async
+	public Future<List<CtxHistoryAttribute>> retrieveHistory(
+			CtxAttributeIdentifier attrId, Date startDate, Date endDate) throws CtxException {
 
-		/*
-		 * (non-Javadoc)
-		 * @see org.societies.context.api.user.db.IUserCtxDBMgrCallback#ctxModelObjectRetrieved(org.societies.api.context.model.CtxModelObject)
-		 */
-		@Override
-		public void ctxModelObjectRetrieved(CtxModelObject ctxModelObject) {
-			this.ctxModelObjectRetrieved = ctxModelObject;
-		}
+		final List<CtxHistoryAttribute> result = new ArrayList<CtxHistoryAttribute>();
 
-	
-	//********************************************
-	// Getters and Setters for callback variables
-	//********************************************
-				
-		public CtxModelObject getUpdatedCtxModelObject() {
-			return this.updatedCtxModelObject;
-		}
+		result.addAll(this.userCtxHistoryMgr.retrieveHistory(attrId, startDate, endDate));
 
-		public CtxEntity getCreatedCtxEntity() {
-			return this.createdCtxEntity;
-		}
-
-		public CtxAttribute getCreatedCtxAttribute() {
-			return this.createdCtxAttribute;
-		}
-
-		public CtxAssociation getCreatedCtxAssociation() {
-			return this.ctxAssociationCreated;
-		}
-			
-		public List<CtxEntityIdentifier> getLookedUpCtxEntities(){
-			return this.lookedUpCtxEntities;
-		}
-	
-		public CtxModelObject getCtxModelObjectRetrieved(){
-			return this.ctxModelObjectRetrieved;
-		}
+		return new AsyncResult<List<CtxHistoryAttribute>>(result);
 	}
-	
-	private class UserHoCDBCallback implements IUserCtxHistoryCallback {
 
-		private CtxModelObject ctxModelObject = null; 
-				
-		public CtxModelObject getCtxModelObject() {
-			return ctxModelObject;
-		}
-		
-		@Override
-		public void ctxRecordingDisable() {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void ctxRecordingEnabled() {
-			// TODO Auto-generated method stub	
-		}
-
-		@Override
-		public void historyRemovedByDate(int arg0) {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void historyRemovedByType(int arg0) {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void historyRetrievedDate(List<CtxHistoryAttribute> arg0) {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void historyRetrievedIndex(List<CtxHistoryAttribute> arg0) {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void historyTupleIdsRetrieved(
-				List<List<CtxAttributeIdentifier>> arg0) {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void historyTuplesRegistered() {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void historyTuplesRetrieved(
-				Map<CtxAttribute, List<CtxAttribute>> arg0) {
-			// TODO Auto-generated method stub	
-		}
+	@Override
+	public Future<Integer> removeHistory(String type, Date startDate, Date endDate) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
+
+	@Override
+	public Future<List<CtxHistoryAttribute>> retrieveHistory(
+			CtxAttributeIdentifier arg0, int arg1) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public Future<List<CtxAttributeIdentifier>> getHistoryTuples(
+			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1)
+					throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<Boolean> removeHistoryTuples(CtxAttributeIdentifier arg0,
+			List<CtxAttributeIdentifier> arg1) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#setHistoryTuples(org.societies.api.context.model.CtxAttributeIdentifier, java.util.List)
+	 */
+	@Override
+	@Async
+	public Future<Boolean> setHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier,
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds) throws CtxException {
+
+		// set hoc recording flug for the attributes contained in tuple list
+		final List<String> attrIds = new ArrayList<String>();
+		// add the current attr id
+		attrIds.add(primaryAttrIdentifier.toString());
+
+		for (CtxAttributeIdentifier escortingAttrID : listOfEscortingAttributeIds) {
+			// add the escorting attr ids
+			attrIds.add(escortingAttrID.toString());
+			// store each escorting attribute in hoc
+			Future<CtxModelObject> attrFuture = this.retrieve(escortingAttrID);
+			CtxAttribute attr;
+			
+			try {
+				attr = (CtxAttribute) attrFuture.get();
+				attr.setHistoryRecorded(true);
+				this.update(attr);
+				
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		final String tupleAttrType = "tupleIds_" + primaryAttrIdentifier.getType();
+		final CtxAttribute tupleAttr = (CtxAttribute) this.createAttribute(primaryAttrIdentifier.getScope(), tupleAttrType);
+
+		byte[] attrIdsBlob;
+		Future<CtxModelObject> tupleAttrFuture;
+
+		try {
+			attrIdsBlob = SerialisationHelper.serialise((Serializable) attrIds);
+			tupleAttr.setBinaryValue(attrIdsBlob);
+
+			tupleAttrFuture= this.update(tupleAttr);
+		
+			// use this for test only
+			CtxAttribute  tupleAttrRetrieved = (CtxAttribute) tupleAttrFuture.get();
+			System.out.println("tupleAttr "+tupleAttrRetrieved.getId() );
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		return new AsyncResult<Boolean>(true);
+	}
+
+	@Override
+	public Future<List<CtxAttributeIdentifier>> updateHistoryTuples(
+			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1)
+					throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>> retrieveHistoryTuples(
+			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1,
+			Date arg2, Date arg3) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	private CtxAttributeValueType findAttributeValueType(Serializable value) {
 		if (value == null)
 			return CtxAttributeValueType.EMPTY;

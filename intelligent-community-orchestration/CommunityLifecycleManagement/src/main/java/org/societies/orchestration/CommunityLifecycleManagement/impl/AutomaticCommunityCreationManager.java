@@ -36,6 +36,7 @@ import org.societies.api.internal.cis.cis_management.CisActivityFeed;
 import org.societies.api.internal.cis.cis_management.ServiceSharingRecord;
 import org.societies.api.internal.cis.cis_management.CisActivity;
 import org.societies.api.internal.cis.cis_management.CisRecord;
+import org.societies.api.internal.cis.cis_management.ICisManager;
 
 import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
 
@@ -55,6 +56,8 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
 import org.societies.api.mock.EntityIdentifier;
+
+
 
 import java.util.List;
 
@@ -91,6 +94,8 @@ public class AutomaticCommunityCreationManager {
 	private ArrayList<CisRecord> recentRefusals;
 	private IUserFeedback userFeedback;
 	//private IUserFeedbackCallback userFeedbackCallback;
+	
+	private ICisManager cisManager;
 	
 	private ArrayList<CtxEntity> availableContextData;
     
@@ -183,8 +188,11 @@ public class AutomaticCommunityCreationManager {
 				//e.g. friends in contact list, family in contact list (from SNS extractor or SOCIETIES)
 				
 				//If CISs are appropriate for friends' lists in Google+ circle fashion, then that counts
-				
-				
+				//CisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new CisRecord(null, null, null, null, null, null, null, null));
+				//ArrayList<CisRecord> userJoinedCiss = new ArrayList<CisRecord>();
+				//for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
+				//    userJoinedCiss.add(listOfUserJoinedCiss[i]);
+				//}
 				
 				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "close friends", userContextBrokerCallback);
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
@@ -346,8 +354,8 @@ public class AutomaticCommunityCreationManager {
 		return tempCisPossibility;
 	}
 	
-    public void intialiseAutomaticCommunityCreationManager() {
-    	
+    public void initialiseAutomaticCommunityCreationManager() {
+    	new AutomaticCommunityCreationManager(linkedCss, "CSS");
     }
     
     public EntityIdentifier getLinkedCss() {
@@ -395,6 +403,14 @@ public class AutomaticCommunityCreationManager {
     
     public void retrieveUserContextBrokerCallback(CtxEntity theContext) {
     	availableContextData.add(theContext);
+    }
+    
+    public ICisManager getCisManager() {
+    	return cisManager;
+    }
+    
+    public void setCisManager(ICisManager cisManager) {
+    	this.cisManager = cisManager;
     }
     
 }

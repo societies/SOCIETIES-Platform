@@ -32,12 +32,6 @@
 		<version>0.1</version>
 	</parent>
 
-	<properties>
-		<spring.maven.artifact.version>2.5.6.SEC01</spring.maven.artifact.version>
-		<spring.osgi.version>1.2.1</spring.osgi.version>
-		<equinox.ver>3.2.2</equinox.ver>
-	</properties>
-
 	<dependencies>
 
 		<dependency>
@@ -63,30 +57,11 @@
 
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.beans</artifactId>
-			<version>${spring.maven.artifact.version}</version>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
 			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>com.springsource.org.apache.commons.logging</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
-		
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.context</artifactId>
-			<version>${spring.maven.artifact.version}</version>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>com.springsource.org.apache.commons.logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>

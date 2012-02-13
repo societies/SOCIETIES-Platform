@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
@@ -14,9 +15,9 @@ import org.societies.personalisation.common.api.management.IInternalPersonalisat
 
 public class ContextEventCallback implements IUserCtxBrokerCallback{
 
-	private final IInternalPersonalisationManager pm;
+	private final PersonalisationManager pm;
 
-	public ContextEventCallback(IInternalPersonalisationManager pm){
+	public ContextEventCallback(PersonalisationManager pm){
 		this.pm = pm;
 		
 	}
@@ -72,6 +73,7 @@ public class ContextEventCallback implements IUserCtxBrokerCallback{
 	@Override
 	public void ctxModelObjectUpdated(CtxModelObject attribute) {
 		this.pm.updateReceived(attribute);
+		
 	}
 
 	@Override
@@ -130,6 +132,30 @@ public class ContextEventCallback implements IUserCtxBrokerCallback{
 
 	@Override
 	public void updateReceived(CtxModelObject arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ctxHistoryTuplesRemoved(Boolean arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ctxHistoryTuplesRetrieved(List<CtxAttributeIdentifier> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ctxHistoryTuplesSet(Boolean arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ctxHistoryTuplesUpdated(List<CtxAttributeIdentifier> arg0) {
 		// TODO Auto-generated method stub
 		
 	}

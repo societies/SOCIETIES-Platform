@@ -12,6 +12,6 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-<context:annotation-config />
+<bean id="serviceMgmt" class="org.societies.slm.servicemgmt.osgi.ServiceManagement" /> 
 
 </beans>

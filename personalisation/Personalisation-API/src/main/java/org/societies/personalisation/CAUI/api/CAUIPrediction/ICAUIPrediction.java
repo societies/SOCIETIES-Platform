@@ -23,11 +23,11 @@ package org.societies.personalisation.CAUI.api.CAUIPrediction;
 import java.util.List;
 
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.model.UserIntentAction;
-
+import org.societies.api.comm.xmpp.datatypes.Identity;
 
 /**
  * @since 0.0.1
@@ -55,16 +55,9 @@ public interface ICAUIPrediction {
 	 * @param preferenceName    the name of the preference requested
 	 * @return					the outcome in the form of an IAction object
 	 */
-	public UserIntentAction getCurrentIntentAction(EntityIdentifier requestor, EntityIdentifier ownerID, IServiceResourceIdentifier serviceID, String preferenceName);
+	public UserIntentAction getCurrentIntentAction(Identity requestor, Identity ownerID, IServiceResourceIdentifier serviceID, String preferenceName);
 
 	
-	/**
-	 * Predicts next action based on the last performed action
-	 * 
-	 * @param ctxAttribute
-	 */
-	public UserIntentAction getPrediction(EntityIdentifier requestor, CtxAttribute ctxAttribute);
-
 	/**
 	 * Predicts next action based on the last performed action
 	 * 
@@ -72,7 +65,7 @@ public interface ICAUIPrediction {
 	 * @param action
 	 * @return predicted action 
 	 */
-	public UserIntentAction getPrediction(EntityIdentifier requestor, IAction action); 
+	public void getPrediction(Identity requestor, IAction action, IPersonalisationCallback persCallback); 
 		
 	/**
 	 * Returns a list with the performed predictions.

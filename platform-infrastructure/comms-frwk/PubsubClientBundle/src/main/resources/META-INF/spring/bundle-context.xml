@@ -16,4 +16,7 @@
 	<bean id="pubsubClient" class="org.societies.comm.xmpp.pubsub.impl.PubsubClientImpl">
             <constructor-arg ref="xcCommunication"/>
     </bean>
+    <bean id="pubsubEventFactory" class="org.societies.comm.xmpp.event.impl.PubsubEventFactoryImpl">
+            <constructor-arg ref="pubsubClient"/>
+    </bean>
 </beans>

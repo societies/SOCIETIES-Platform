@@ -148,7 +148,7 @@ public class CRISTCommunityAction extends Action implements
 	/**
 	 * @return the identifier of the service to which this action is applied to
 	 */
-	public ServiceResourceIdentifier getServiceID() {
+	public IServiceResourceIdentifier getServiceID() {
 		return null;
 	}
 
@@ -180,7 +180,7 @@ public class CRISTCommunityAction extends Action implements
 	 * @param id
 	 *            the identifier of the service this action is applied to
 	 */
-	public void setServiceID(ServiceResourceIdentifier id) {
+	public void setServiceID(IServiceResourceIdentifier id) {
 
 	}
 

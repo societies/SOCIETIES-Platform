@@ -223,6 +223,9 @@ public class AutomaticCommunityDeletionManager {
 		        }
 		        else {
 		    	    recentRefusals.add(potentiallyDeletableCis);
+		    	    //store as context the CIS is marked as one level up on the Ongoing/Temporary chain
+		    	    //(short-term temporary becomes medium-term, becomes long-term, becomes ongoing.
+		    	    //Purely a mechanic for use by this service.
 		        }
 		   }
 		}
@@ -269,6 +272,11 @@ public class AutomaticCommunityDeletionManager {
     public void setUserContextBrokerCallback(IUserCtxBrokerCallback userContextBrokerCallback) {
     	System.out.println("GOT user context broker callback" + userContextBrokerCallback);
     	this.userContextBrokerCallback = userContextBrokerCallback;
+    }
+    
+    public void setCommunityContextBroker(ICommunityCtxBroker communityContextBroker) {
+    	System.out.println("GOT community context broker" + communityContextBroker);
+    	this.communityContextBroker = communityContextBroker;
     }
     
     public void setCisManager(ICisManager cisManager){

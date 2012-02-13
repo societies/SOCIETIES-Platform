@@ -20,7 +20,7 @@
 package org.societies.personalisation.preference.api.CommunityPreferenceManagement;
 
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 
@@ -45,7 +45,7 @@ public interface ICommunityPreferenceManager {
 	 * @param serviceID
 	 * @param preferenceName
 	 */
-	public void deletePreference(String serviceType, ServiceResourceIdentifier serviceID, String preferenceName);
+	public void deletePreference(String serviceType, IServiceResourceIdentifier serviceID, String preferenceName);
 
 	/**
 	 * 
@@ -53,7 +53,7 @@ public interface ICommunityPreferenceManager {
 	 * @param serviceID
 	 * @param preferenceName
 	 */
-	public IPreferenceTreeModel getModel(String serviceType, ServiceResourceIdentifier serviceID, String preferenceName);
+	public IPreferenceTreeModel getModel(String serviceType, IServiceResourceIdentifier serviceID, String preferenceName);
 
 	/**
 	 * 
@@ -68,7 +68,7 @@ public interface ICommunityPreferenceManager {
 	 * @param preferenceName
 	 * @param preference
 	 */
-	public void updatePreference(String serviceType, ServiceResourceIdentifier serviceID, String preferenceName, IPreference preference);
+	public void updatePreference(String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, IPreference preference);
 
 	/**
 	 * 

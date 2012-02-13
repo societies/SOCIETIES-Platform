@@ -19,20 +19,11 @@
  */
 package org.societies.personalisation.preference.api.UserPreferenceManagement;
 
-import java.util.List;
-
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxModelObject;
-import org.societies.api.internal.personalisation.model.IOutcome;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
-import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.callback.IPreferenceOutcomeCallback;
 import org.societies.personalisation.preference.api.model.IPreference;
-import org.societies.personalisation.preference.api.model.IPreferenceConditionIOutcomeName;
-import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
-import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 
 
 /**
@@ -47,7 +38,7 @@ public interface IUserPreferenceManagement {
 	 * @param ownerID
 	 * @param details
 	 */
-	public void deletePreference(EntityIdentifier ownerID, PreferenceDetails details);
+	public void deletePreference(Identity ownerID, PreferenceDetails details);
 
 	/**
 	 * 
@@ -56,7 +47,7 @@ public interface IUserPreferenceManagement {
 	 * @param serviceID
 	 * @param preferenceName
 	 */
-	public void deletePreference(EntityIdentifier ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName);
+	public void deletePreference(Identity ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName);
 
 	/**
 	 * 
@@ -65,7 +56,7 @@ public interface IUserPreferenceManagement {
 	 * @param serviceID
 	 * @param preferenceName
 	 */
-	public void getPreference(EntityIdentifier ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, IPreferenceOutcomeCallback callback);
+	public void getPreference(Identity ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, IPreferenceOutcomeCallback callback);
 
 	/**
 	 * 
@@ -75,7 +66,7 @@ public interface IUserPreferenceManagement {
 	 * @param preferenceName
 	 * @param preference
 	 */
-	public void updatePreference(EntityIdentifier ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, IPreference preference);
+	public void updatePreference(Identity ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, IPreference preference);
 
 	/**
 	 * 
@@ -83,7 +74,7 @@ public interface IUserPreferenceManagement {
 	 * @param details
 	 * @param preference
 	 */
-	public void updatePreference(EntityIdentifier ownerID, PreferenceDetails details, IPreference preference);
+	public void updatePreference(Identity ownerID, PreferenceDetails details, IPreference preference);
 
 	
 	
@@ -98,7 +89,7 @@ public interface IUserPreferenceManagement {
 	 * @param ownerID
 	 * @param outcome
 	 *//*
-	public List<CtxAttributeIdentifier> getConditions(EntityIdentifier ownerID, IOutcome outcome);*/
+	public List<CtxAttributeIdentifier> getConditions(Identity ownerID, IOutcome outcome);*/
 
 
 	/**
@@ -108,14 +99,14 @@ public interface IUserPreferenceManagement {
 	 * @param serviceID
 	 * @param preferenceName
 	 *//*
-	public IPreferenceTreeModel getModel(EntityIdentifier ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName);
+	public IPreferenceTreeModel getModel(Identity ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName);
 
 	*//**
 	 * 
 	 * @param ownerID
 	 * @param details
 	 *//*
-	public IPreferenceTreeModel getModel(EntityIdentifier ownerID, PreferenceDetails details);*/
+	public IPreferenceTreeModel getModel(Identity ownerID, PreferenceDetails details);*/
 	
 	
 	/*	*//**
@@ -124,7 +115,7 @@ public interface IUserPreferenceManagement {
 	 * @param serviceType
 	 * @param serviceID
 	 *//*
-	public List<IPreferenceConditionIOutcomeName> getPreferenceConditions(EntityIdentifier ownerID, String serviceType, IServiceResourceIdentifier serviceID);
+	public List<IPreferenceConditionIOutcomeName> getPreferenceConditions(Identity ownerID, String serviceType, IServiceResourceIdentifier serviceID);
 
 	*//**
 	 * 
@@ -133,7 +124,7 @@ public interface IUserPreferenceManagement {
 	 * @param serviceID
 	 * @param preferenceName
 	 *//*
-	public List<CtxAttributeIdentifier> getPreferenceConditions(EntityIdentifier ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName);*/
+	public List<CtxAttributeIdentifier> getPreferenceConditions(Identity ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName);*/
 
 	/**
 	 * 
@@ -141,7 +132,7 @@ public interface IUserPreferenceManagement {
 	 * @param attr
 	 * @param preferenceIdentifier
 	 *//*
-	public List<IOutcome> reEvaluatePreferences(EntityIdentifier userId, CtxAttribute attr, List<PreferenceDetails> preferenceIdentifier);
+	public List<IOutcome> reEvaluatePreferences(Identity userId, CtxAttribute attr, List<PreferenceDetails> preferenceIdentifier);
 
 	*/
 	
@@ -153,5 +144,5 @@ public interface IUserPreferenceManagement {
 	 * @param serviceID
 	 * @param preferenceName
 	 *//*
-	public IOutcome reEvaluatePreferences(EntityIdentifier ownerID, CtxAttribute attr, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName);*/
+	public IOutcome reEvaluatePreferences(Identity ownerID, CtxAttribute attr, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName);*/
 }
