@@ -41,7 +41,14 @@
     	<dependency>
       		<groupId>junit</groupId>
       		<artifactId>junit</artifactId>
-      		<scope>test</scope>
+      		<!-- 
+      			The next 'version' element should be inherited,
+      			but the only way to make the Spring/OSGi build run was to 
+      			explicitly set it here.
+      			Remove when this issue will be solved. 
+      		 -->
+      		<version>4.8.2</version>
+		    <scope>test</scope>
     	</dependency>
 
 	</dependencies>
