@@ -34,7 +34,8 @@ import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 import org.societies.api.mock.EntityIdentifier;
  
 //import org.societies.api.comm.xmpp.datatypes.Identity;
-//import org.societies.comm.examples.commsmanager.impl.CommsServer; 
+//import org.societies.comm.examples.commsmanager.impl.CommsServer;
+//import org.societies.comm.xmpp.interfaces.ICommCallback;
 
 /**
  * This is the class for the Community Lifecycle Management component
@@ -47,7 +48,8 @@ import org.societies.api.mock.EntityIdentifier;
  * 
  */
 
-public class CommunityLifecycleManagement {
+public class CommunityLifecycleManagement //implements ICommCallback
+{
 	
 	private AutomaticCommunityCreationManager autoCreationManager;
 	private AutomaticCommunityConfigurationManager autoConfigurationManager;
