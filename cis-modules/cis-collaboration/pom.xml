@@ -30,8 +30,8 @@
 	<dependencies>
 	<!-- add your dependencies here -->
   	<dependency>
-  		<groupId>org.societies.cis.management</groupId>
-  		<artifactId>cis-management</artifactId>
+  		<groupId>org.societies.cis</groupId>
+  		<artifactId>cis-manager</artifactId>
   		<version>${version.cis}</version>
   	</dependency>
   
