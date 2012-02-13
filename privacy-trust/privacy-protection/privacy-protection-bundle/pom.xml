@@ -57,7 +57,7 @@
 	</developers>
 
 	<parent>
-		<groupId>org.societies.privacytrust</groupId>
+		<groupId>org.societies</groupId>
 		<artifactId>privacytrust</artifactId>
 		<relativePath>../../project.xml</relativePath>
 		<version>1</version>
