@@ -19,9 +19,8 @@
  */
 package org.societies.personalisation.DIANNE.api.DianneNetwork;
 
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
@@ -41,7 +40,7 @@ public interface IDIANNE {
 	 * @param preferenceName	the name of the preference being requested
 	 * @param callback  the callback to which the IDIANNEOutcome is sent
 	 */
-	public void getOutcome(EntityIdentifier ownerId, 
+	public void getOutcome(Identity ownerId, 
 			IServiceResourceIdentifier serviceId, 
 			String preferenceName, 
 			IPersonalisationInternalCallback callback);
@@ -54,7 +53,7 @@ public interface IDIANNE {
 	 * @param attribute		the context attribute update to implement in the DIANNE before retrieval
 	 * @param callback  the callback to which the IDIANNEOutcome is sent
 	 */
-	public void getOutcome(EntityIdentifier ownerId, 
+	public void getOutcome(Identity ownerId, 
 			CtxAttribute attribute, 
 			IPersonalisationInternalCallback callback);
 	
@@ -65,7 +64,7 @@ public interface IDIANNE {
 	 * @param action  the action update to implement in the DIANNE
 	 * @param callback  the callback to which the IDIANNEOutcome is sent
 	 */
-	public void getOutcome(EntityIdentifier ownerId, 
+	public void getOutcome(Identity ownerId, 
 			IAction action, 
 			IPersonalisationInternalCallback callback);
 	
@@ -74,23 +73,13 @@ public interface IDIANNE {
 	 * @param ownerId  the DigitalIdentity for which DIANNE learning should be enabled
 	 * @param callback  the callback to which the IDIANNEOutcome is sent
 	 */
-	public void enableDIANNELearning(EntityIdentifier ownerId);
+	public void enableDIANNELearning(Identity ownerId);
 	
 	/**
 	 * This method will stop DIANNE learning
 	 * @param ownerId  the DigitalIdentity for which DIANNE learning should be disabled
 	 */
-	public void disableDIANNELearning(EntityIdentifier ownerId);
-	
-	
-	
-	
-	@Deprecated
-	public IOutcome getOutcome(EntityIdentifier ownerId, IServiceResourceIdentifier serviceId, String preferenceName);
-	
-	
-	@Deprecated
-	public IOutcome getOutcome(EntityIdentifier ownerId, IServiceResourceIdentifier serviceId, String preferenceName, CtxAttribute attribute);
+	public void disableDIANNELearning(Identity ownerId);
 	
 	
 	

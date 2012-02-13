@@ -28,7 +28,7 @@ package org.societies.personalisation.preference.api.model;
 
 import java.util.List;
 
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 
@@ -52,7 +52,7 @@ public interface IC45Output {
 	 * @return EntityIdentifier - the identity under which the info in this
 	 * IC45Output object corresponds
 	 */
-	public EntityIdentifier getOwner();
+	public Identity getOwner();
 
 	/**
 	 * This method returns the IServiceIdentifier related to this object
