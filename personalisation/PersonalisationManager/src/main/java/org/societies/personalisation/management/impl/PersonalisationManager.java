@@ -61,6 +61,9 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 	ArrayList<CtxAttributeIdentifier> cauiList;
 	ArrayList<CtxAttributeIdentifier> cristList;
 	
+	/* 
+	 * test test test!
+	 */
 	
 	
 	public PersonalisationManager(){
