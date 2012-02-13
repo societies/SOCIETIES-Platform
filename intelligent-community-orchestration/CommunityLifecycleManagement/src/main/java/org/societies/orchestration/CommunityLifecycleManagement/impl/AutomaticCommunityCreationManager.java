@@ -194,7 +194,16 @@ public class AutomaticCommunityCreationManager {
 				//    userJoinedCiss.add(listOfUserJoinedCiss[i]);
 				//}
 				
-				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "close friends", userContextBrokerCallback);
+				//friends?
+				//userContextBroker.lookup(CtxModelType.ENTITY, "SNGroup", userContextBrokerCallback);
+				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+				
+				//fanpage informs interests-based CISs
+				//userContextBroker.lookup(CtxModelType.ENTITY, "FanPage", userContextBrokerCallback);
+				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+				
+				
+				//userContextBroker.lookup(CtxModelType.ATTRIBUTE, "close friends", userContextBrokerCallback);
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				
 				List<CtxIdentifier> contextList; //the list retrieved from above callback

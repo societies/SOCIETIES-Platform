@@ -51,6 +51,7 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
 import org.societies.api.mock.EntityIdentifier;
+//import org.societies.api.comm.xmpp.datatypes.Identity;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -231,8 +232,8 @@ public class AutomaticCommunityDeletionManager {
 		}
 	}
 	
-    public void intialiseAutomaticCommunityDeletionManager() {
-    	
+    public void initialiseAutomaticCommunityDeletionManager() {
+    	new AutomaticCommunityDeletionManager(linkedCss, "CSS");
     }
 
     public EntityIdentifier getLinkedCss() {

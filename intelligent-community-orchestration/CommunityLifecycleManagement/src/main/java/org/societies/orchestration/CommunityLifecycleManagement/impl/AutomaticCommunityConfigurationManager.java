@@ -227,8 +227,8 @@ public class AutomaticCommunityConfigurationManager {
 		
 	}
 	
-    public void intialiseAutomaticCommunityConfigurationManager() {
-    	
+    public void initialiseAutomaticCommunityConfigurationManager() {
+    	new AutomaticCommunityConfigurationManager(linkedCss, "CSS");
     }
     
     public EntityIdentifier getLinkedCss() {
