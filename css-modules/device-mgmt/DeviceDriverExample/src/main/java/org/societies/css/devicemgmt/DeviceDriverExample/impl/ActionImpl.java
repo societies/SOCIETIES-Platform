@@ -126,7 +126,8 @@ public class ActionImpl implements IAction {
 		
 		dic.put("lightLevel", "100");
 		
-		return arguments;
+		
+		return dic;
 	}
 
 }

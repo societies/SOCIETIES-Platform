@@ -147,7 +147,7 @@ public class DeviceImpl implements IDevice{
 
 	public String getDeviceLocation() {
 		
-		return null;
+		return deviceCommonInfo.getDeviceLocation();
 	}
 
 	public String getDeviceProvider() {
@@ -169,10 +169,13 @@ public class DeviceImpl implements IDevice{
 		
 		
 		ServiceReference[] sr = null;
-		try {
+		try 
+		{
+			
 			sr = bundleContext.getServiceReferences(IAction.class.getName(), "(actionName=getLightLevel)");
+		
 		} catch (InvalidSyntaxException e) {
-			// TODO Auto-generated catch block
+			//TODO in case of exception 
 			e.printStackTrace();
 		}
 		
@@ -182,7 +185,6 @@ public class DeviceImpl implements IDevice{
 			IAction ia = (IAction)bundleContext.getService(sr[0]);
 			return ia;
 		}
-		
 		return null;
 	}
 

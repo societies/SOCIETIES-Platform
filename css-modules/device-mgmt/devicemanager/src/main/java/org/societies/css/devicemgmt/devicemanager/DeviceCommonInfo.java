@@ -130,7 +130,7 @@ public class DeviceCommonInfo {
 		return contextSource;
 	}
 	
-	public void setContextCompliant(boolean contextSource) {
+	public void setContextSource(boolean contextSource) {
 		this.contextSource = contextSource;
 	}
 	
