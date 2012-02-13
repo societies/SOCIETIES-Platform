@@ -29,9 +29,9 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.privacytrust.privacyprotection</groupId>
-	<artifactId>builder</artifactId>
-	<name>Privacy Protection Builder</name>
-	<packaging>pom</packaging>
+	<artifactId>api</artifactId>
+	<name>Privacy Protection Internal Bundle API</name>
+	<packaging>jar</packaging>
 	<version>${version.pt}</version>
 	<developers>
 		<developer>
@@ -44,20 +44,39 @@
 				<role>Developer</role>
 			</roles>
 		</developer>
+		<developer>
+			<name>Elizabeth Papadopoulou</name>
+			<email>E.Papadopoulou@hw.ac.uk</email>
+			<organization>HWU</organization>
+			<organizationUrl>http://www.hw.ac.uk/</organizationUrl>
+			<roles>
+				<role>Senior Developer</role>
+			</roles>
+			<timezone>+0</timezone>
+		</developer>
 	</developers>
 
-	<!-- All builder projects should inherit from version-parent -->
 	<parent>
-		<groupId>org.societies</groupId>
-		<artifactId>version-parent</artifactId>
-		<version>0.1</version>
+		<groupId>org.societies.privacytrust</groupId>
+		<artifactId>privacytrust</artifactId>
+		<relativePath>../../pom.xml</relativePath>
+		<version>1</version>
 	</parent>
-	
-	<modules>
-		<module>api</module>
-		<module>privacy-data-management</module>
-		<module>privacy-policy-management</module>
-		<module>privacy-protection-bundle</module>
-		<module>privacy-protection-bundle-test</module>
-	</modules>
+
+	<dependencies>
+		<!-- add your dependencies here -->
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
 </project>

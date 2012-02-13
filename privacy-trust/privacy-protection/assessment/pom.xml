@@ -29,35 +29,72 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.privacytrust.privacyprotection</groupId>
-	<artifactId>builder</artifactId>
-	<name>Privacy Protection Builder</name>
-	<packaging>pom</packaging>
-	<version>${version.pt}</version>
+	<artifactId>assessment</artifactId>
+	<name>Assessment</name>
+	<packaging>jar</packaging>
+	<version>0.1-SNAPSHOT</version>
 	<developers>
-		<developer>
-			<name>Olivier Maridat</name>
-			<email>olivier.maridat@trialog.com</email>
-			<organization>Trialog</organization>
-			<timezone>+1</timezone>
-			<roles>
-				<role>Owner</role>
-				<role>Developer</role>
-			</roles>
-		</developer>
+		<!--  To be defined -->
 	</developers>
 
-	<!-- All builder projects should inherit from version-parent -->
 	<parent>
-		<groupId>org.societies</groupId>
-		<artifactId>version-parent</artifactId>
-		<version>0.1</version>
+		<groupId>org.societies.privacytrust</groupId>
+		<artifactId>privacytrust</artifactId>
+		<relativePath>../../pom.xml</relativePath>
+		<version>1</version>
 	</parent>
-	
-	<modules>
-		<module>api</module>
-		<module>privacy-data-management</module>
-		<module>privacy-policy-management</module>
-		<module>privacy-protection-bundle</module>
-		<module>privacy-protection-bundle-test</module>
-	</modules>
+
+	<dependencies>
+		<!-- add your dependencies here -->
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.privacytrust.privacyprotection</groupId>
+			<artifactId>api</artifactId>
+			<version>${version.pt}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.0</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- logging -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- spring -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 </project>
