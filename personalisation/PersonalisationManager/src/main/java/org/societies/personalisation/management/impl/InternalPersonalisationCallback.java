@@ -24,7 +24,7 @@
  */
 package org.societies.personalisation.management.impl;
 
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
@@ -93,40 +93,40 @@ public class InternalPersonalisationCallback implements IPersonalisationInternal
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.societies.personalisation.common.api.management.IPersonalisationInternalCallback#sendCAUIOutcome(org.societies.api.mock.EntityIdentifier, org.societies.personalisation.CAUI.api.model.IUserIntentAction)
+	 * @see org.societies.personalisation.common.api.management.IPersonalisationInternalCallback#sendCAUIOutcome(org.societies.api.mock.Identity, org.societies.personalisation.CAUI.api.model.IUserIntentAction)
 	 */
 	@Override
-	public void sendCAUIOutcome(EntityIdentifier arg0, IUserIntentAction arg1) {
+	public void sendCAUIOutcome(Identity arg0, IUserIntentAction arg1) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.societies.personalisation.common.api.management.IPersonalisationInternalCallback#sendCRISTOutcome(org.societies.api.mock.EntityIdentifier, org.societies.personalisation.CRIST.api.model.ICRISTUserAction)
+	 * @see org.societies.personalisation.common.api.management.IPersonalisationInternalCallback#sendCRISTOutcome(org.societies.api.mock.Identity, org.societies.personalisation.CRIST.api.model.ICRISTUserAction)
 	 */
 	@Override
-	public void sendCRISTOutcome(EntityIdentifier arg0, ICRISTUserAction arg1) {
+	public void sendCRISTOutcome(Identity arg0, ICRISTUserAction arg1) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.societies.personalisation.common.api.management.IPersonalisationInternalCallback#sendDIANNEOutcome(org.societies.api.mock.EntityIdentifier, org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome)
+	 * @see org.societies.personalisation.common.api.management.IPersonalisationInternalCallback#sendDIANNEOutcome(org.societies.api.mock.Identity, org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome)
 	 */
 	@Override
-	public void sendDIANNEOutcome(EntityIdentifier arg0, IDIANNEOutcome arg1) {
+	public void sendDIANNEOutcome(Identity arg0, IDIANNEOutcome arg1) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.societies.personalisation.common.api.management.IPersonalisationInternalCallback#sendPrefOutcome(org.societies.api.mock.EntityIdentifier, org.societies.personalisation.preference.api.model.IPreferenceOutcome)
+	 * @see org.societies.personalisation.common.api.management.IPersonalisationInternalCallback#sendPrefOutcome(org.societies.api.mock.Identity, org.societies.personalisation.preference.api.model.IPreferenceOutcome)
 	 */
 	@Override
-	public void sendPrefOutcome(EntityIdentifier arg0, IPreferenceOutcome arg1) {
+	public void sendPrefOutcome(Identity arg0, IPreferenceOutcome arg1) {
 		// TODO Auto-generated method stub
 		
 	}
