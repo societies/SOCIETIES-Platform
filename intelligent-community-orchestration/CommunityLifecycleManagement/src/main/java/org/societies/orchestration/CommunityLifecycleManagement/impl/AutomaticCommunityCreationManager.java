@@ -58,7 +58,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.mock.EntityIdentifier;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
-
+//import org.societies.comm.xmpp.interfaces.ICommCallback;
 
 
 import java.util.List;
@@ -81,7 +81,8 @@ import java.util.List;
  * 
  */
 
-public class AutomaticCommunityCreationManager {
+public class AutomaticCommunityCreationManager //implements ICommCallback
+{
 	
 	private EntityIdentifier linkedCss;
 	

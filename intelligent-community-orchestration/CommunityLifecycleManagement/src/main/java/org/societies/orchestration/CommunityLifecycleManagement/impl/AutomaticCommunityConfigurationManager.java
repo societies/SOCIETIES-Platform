@@ -53,6 +53,8 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.mock.EntityIdentifier;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
+//import org.societies.comm.xmpp.interfaces.ICommCallback;
+//import org.societies.comm.xmpp.interfaces.FeatureServer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -84,7 +86,8 @@ import java.util.List;
  * 
  */
 
-public class AutomaticCommunityConfigurationManager {
+public class AutomaticCommunityConfigurationManager //implements ICommCallback
+{
 	
 	private EntityIdentifier linkedCss; // No datatype yet defined for CSS
 	
@@ -308,5 +311,14 @@ public class AutomaticCommunityConfigurationManager {
     //public Object setQuery(Stanza arg0, Object arg1) {
     //	return null;
     //}
+    
+    /**For calling methods that have return types */
+    //public void sendIQGet(Stanza stanza, Object messageBean, ICommCallback callback) 
+    //           throws CommunicationException;
+     
+    /**For calling methods that have void types */
+    //void sendMessage(Stanza stanza, String type, Object messageBean)
+    //            throws CommunicationException;
+
     
 }

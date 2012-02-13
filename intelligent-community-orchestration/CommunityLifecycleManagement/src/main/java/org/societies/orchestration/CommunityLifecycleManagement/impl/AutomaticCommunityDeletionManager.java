@@ -53,6 +53,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.mock.EntityIdentifier;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
+//import org.societies.comm.xmpp.interfaces.ICommCallback;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -85,7 +86,8 @@ import org.societies.api.internal.useragent.model.ExpProposalContent;
  * 
  */
 
-public class AutomaticCommunityDeletionManager {
+public class AutomaticCommunityDeletionManager //implements ICommCallback
+{
 
 	private EntityIdentifier linkedCss; // No datatype yet defined for CSS
 	
