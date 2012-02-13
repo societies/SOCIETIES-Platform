@@ -91,7 +91,7 @@ public interface IDevice {
      * 
      * @return
      */
-    public boolean isContextCompliant();
+    public boolean isContextSource();
     
     /**
      * 

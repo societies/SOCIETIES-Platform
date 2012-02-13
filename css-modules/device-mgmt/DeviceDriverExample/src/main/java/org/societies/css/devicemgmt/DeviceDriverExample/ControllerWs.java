@@ -23,14 +23,18 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.css.devicemgmt.devicemanager;
+package org.societies.css.devicemgmt.DeviceDriverExample;
+
+import org.societies.css.devicemgmt.devicemanager.DeviceCommonInfo;
 
 public interface ControllerWs {
 	
 	
 	
-	public void regiterNewService (String serviceId);
+	public String createNewDevice (String deviceMacAddress, DeviceCommonInfo deviceCommonInfo, String actionName);
 	
 	public void removeDevice (String deviceId);
+	
+	public void sendNewData (String deviceId, String data);
 
 }
