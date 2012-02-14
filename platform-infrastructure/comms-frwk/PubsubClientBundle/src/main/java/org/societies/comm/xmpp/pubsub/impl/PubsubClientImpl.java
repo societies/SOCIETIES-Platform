@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+
 import org.jabber.protocol.pubsub.Create;
 import org.jabber.protocol.pubsub.Item;
 import org.jabber.protocol.pubsub.Items;
@@ -32,11 +35,11 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IIdentityManager;
-import org.societies.comm.xmpp.pubsub.Affiliation;
-import org.societies.comm.xmpp.pubsub.PubsubClient;
-import org.societies.comm.xmpp.pubsub.Subscriber;
-import org.societies.comm.xmpp.pubsub.Subscription;
-import org.societies.comm.xmpp.pubsub.SubscriptionState;
+import org.societies.api.comm.xmpp.pubsub.Affiliation;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.api.comm.xmpp.pubsub.Subscription;
+import org.societies.api.comm.xmpp.pubsub.SubscriptionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
@@ -62,6 +65,8 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	private Map<String,Object> responses;
 	private Map<Subscription,List<Subscriber>> subscribers;
 	private IIdentityManager idm;
+	private Marshaller contentMarshaller;
+	private Unmarshaller contentUnmarshaller;
 	
 	@Autowired
 	public PubsubClientImpl(ICommManager endpoint) {
@@ -301,7 +306,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 
 	@Override
 	public String publisherPublish(Identity pubsubService, String node,
-			String itemId, Element item) throws XMPPError,
+			String itemId, Object item) throws XMPPError,
 			CommunicationException {
 		Stanza stanza = new Stanza(pubsubService);
 		Pubsub payload = new Pubsub();
@@ -453,6 +458,12 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		blockingIQ(stanza, payload);
 		
 		// TODO error handling on multiple affiliation changes
+		
+	}
+
+	@Override
+	public void addJaxbPackages(List<String> packageList) {
+		// TODO Auto-generated method stub
 		
 	}
 	

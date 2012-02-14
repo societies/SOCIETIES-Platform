@@ -1,6 +1,7 @@
-package org.societies.comm.xmpp.pubsub;
+package org.societies.api.comm.xmpp.pubsub;
 
 import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.comm.xmpp.pubsub.Subscription;
 
 public class Subscription {
 

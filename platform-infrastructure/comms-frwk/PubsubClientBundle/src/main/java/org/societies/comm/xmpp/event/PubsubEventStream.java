@@ -1,6 +1,7 @@
 package org.societies.comm.xmpp.event;
 
 import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.comm.xmpp.event.PubsubEvent;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
@@ -18,7 +19,7 @@ public abstract class PubsubEventStream implements ApplicationEventMulticaster {
 		this.multicaster = multicaster;
 	}
 	
-	public abstract String publishLocalEvent(Element payload);
+	public abstract String publishLocalEvent(Object payload);
 	
 	protected void multicastRemoteEvent(PubsubEvent pe, String itemId) {
 		pe.setPublished(pubsubService, node, itemId);

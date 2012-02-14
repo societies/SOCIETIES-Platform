@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.comm.xmpp.event.PubsubEventFactory;
+import org.societies.comm.xmpp.event.PubsubEventStream;
 
 public abstract class PubsubEventFactory {
 	
