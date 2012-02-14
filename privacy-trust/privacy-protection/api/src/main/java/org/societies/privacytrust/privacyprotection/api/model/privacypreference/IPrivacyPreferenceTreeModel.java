@@ -29,7 +29,7 @@ import java.io.Serializable;
 
 import javax.swing.tree.TreeModel;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
 /**
  * This interface defines the methods required from a class that encapsulates the tree model for a privacy preference.

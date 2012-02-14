@@ -24,7 +24,7 @@
  */
 package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyConditionConstants;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyConditionConstants;
 
 /**
  * This interface defines the methods that should be implemented by a class representing a condition in an IF-THEN-ELSE preference object.
