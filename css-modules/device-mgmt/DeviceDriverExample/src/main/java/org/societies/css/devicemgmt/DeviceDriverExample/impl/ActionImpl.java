@@ -33,8 +33,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.css.devicemgmt.devicemanager.IAction;
-import org.societies.css.devicemgmt.devicemanager.IDeviceStateVariable;
+import org.societies.api.css.devicemgmt.IAction;
+import org.societies.api.css.devicemgmt.IDeviceStateVariable;
+
 
 /**
  * This Class will be implemented in a device deriver bundle and exposed as an OSGi Service by this bundle

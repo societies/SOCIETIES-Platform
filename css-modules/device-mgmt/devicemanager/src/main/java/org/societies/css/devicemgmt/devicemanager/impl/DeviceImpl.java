@@ -36,12 +36,12 @@ import org.osgi.framework.ServiceRegistration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.css.devicemgmt.IAction;
+import org.societies.api.css.devicemgmt.IDevice;
+import org.societies.api.css.devicemgmt.IDeviceStateVariable;
+import org.societies.api.css.devicemgmt.model.DeviceMgmtConstants;
+import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 
-import org.societies.css.devicemgmt.devicemanager.DeviceCommonInfo;
-import org.societies.css.devicemgmt.devicemanager.DeviceMgmtConstants;
-import org.societies.css.devicemgmt.devicemanager.IAction;
-import org.societies.css.devicemgmt.devicemanager.IDeviceStateVariable;
-import org.societies.css.devicemgmt.devicemanager.IDevice;
 
 
 

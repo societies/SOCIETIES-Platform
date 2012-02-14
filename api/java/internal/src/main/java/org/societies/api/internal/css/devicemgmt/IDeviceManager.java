@@ -25,7 +25,6 @@
 package org.societies.api.internal.css.devicemgmt;
 
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
-
 /**
  * Interface used by the device deriver bundles to inform the device manager about a state of devices
  *
