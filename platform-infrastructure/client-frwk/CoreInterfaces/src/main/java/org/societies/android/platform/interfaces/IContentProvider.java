@@ -8,7 +8,7 @@ package org.societies.android.platform.interfaces;
 public interface IContentProvider {
 
 	// Content Provider Authority
-	String AUTORITY = "org.societies.android.platform.contentprovider";
+	String AUTHORITY = "org.societies.android.platform.contentprovider";
 	
 	String[] tables = {"credential", "service_data"};
 	
