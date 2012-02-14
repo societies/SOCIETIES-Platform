@@ -4,8 +4,9 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.societies.cis</groupId>
   <artifactId>cis-editor</artifactId>
+    <name>CIS Editor</name>
   <packaging>bundle</packaging>
-	<version>${release.version}</version>
+	<version>${version.cis}</version>
 	<developers>
 		<developer>
 			<name>Thomas Vilarinho</name>
@@ -59,7 +60,7 @@
 						<artifactItem>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>${project.artifactId}</artifactId>
-							<version>${release.version}</version>
+							<version>${version.cis}</version>
 							<type>bundle</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>

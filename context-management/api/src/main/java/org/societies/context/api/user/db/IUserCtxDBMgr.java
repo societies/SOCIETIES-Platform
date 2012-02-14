@@ -25,7 +25,12 @@
 package org.societies.context.api.user.db;
 
 import java.io.Serializable;
+import java.util.List;
 
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -46,7 +51,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void createAssociation(String type, IUserCtxDBMgrCallback callback);
+	public CtxAssociation createAssociation(String type);
 
 	/**
 	 * Creates a Context Attribute
@@ -57,7 +62,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void createAttribute(CtxEntityIdentifier source, CtxAttributeValueType enumeration, String type, IUserCtxDBMgrCallback callback);
+	public CtxAttribute createAttribute(CtxEntityIdentifier source, CtxAttributeValueType enumeration, String type);
 
 	/**
 	 * Creates a Context Entity of a generic type. The created <code>CtxEntity</code> 
@@ -73,7 +78,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void createEntity(String type, IUserCtxDBMgrCallback callback);
+	public CtxEntity createEntity(String type);
 
 	/**
 	 * Creates an individual Context Entity that is possible to join or to form a community. 
@@ -87,7 +92,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void createIndividualCtxEntity(String type, IUserCtxDBMgrCallback callback);
+	public CtxEntity createIndividualCtxEntity(String type);
 	
 	
 	/**
@@ -99,7 +104,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void lookup(CtxModelType modelType, String type, IUserCtxDBMgrCallback callback);
+	public List<CtxIdentifier> lookup(CtxModelType modelType, String type);
 
 	/**
 	 * Looks up for a list of CtxEntities of  the specified type, containing the
@@ -112,7 +117,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue, IUserCtxDBMgrCallback callback);
+	public List<CtxEntityIdentifier> lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue);
 
 	/**
 	 * Registers the specified EventListener for value modification events of context
@@ -123,7 +128,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void registerForUpdates(CtxEntityIdentifier scope, String attrType, IUserCtxDBMgrCallback callback);
+	public void registerForUpdates(CtxEntityIdentifier scope, String attrType);
 
 	/**
 	 * Registers the specified EventListener for value modification events of the
@@ -133,7 +138,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void registerForUpdates(CtxAttributeIdentifier attrId, IUserCtxDBMgrCallback callback);
+	public void registerForUpdates(CtxAttributeIdentifier attrId);
 
 	/**
 	 * Removes the specified context model object.
@@ -142,7 +147,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void remove(CtxIdentifier identifier, IUserCtxDBMgrCallback callback);
+	public CtxModelObject remove(CtxIdentifier identifier);
 
 	/**
 	 * Retrieves the specified context model object.
@@ -151,7 +156,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void retrieve(CtxIdentifier identifier, IUserCtxDBMgrCallback callback);
+	public CtxModelObject retrieve(CtxIdentifier identifier);
 
 	/**
 	 * Registers the specified EventListener for value modification events of the
@@ -161,7 +166,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void unregisterForUpdates(CtxAttributeIdentifier attrId, IUserCtxDBMgrCallback callback);
+	public void unregisterForUpdates(CtxAttributeIdentifier attrId);
 
 	/**
 	 * Unregisters the specified EventListener for value modification events of
@@ -172,7 +177,7 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void unregisterForUpdates(CtxEntityIdentifier scope, String attributeType, IUserCtxDBMgrCallback callback);
+	public void unregisterForUpdates(CtxEntityIdentifier scope, String attributeType);
 
 	/**
 	 * Updates a single context model object.
@@ -181,6 +186,6 @@ public interface IUserCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void update(CtxModelObject identifier, IUserCtxDBMgrCallback callback);
-
+	public CtxModelObject update(CtxModelObject identifier);
+	
 }

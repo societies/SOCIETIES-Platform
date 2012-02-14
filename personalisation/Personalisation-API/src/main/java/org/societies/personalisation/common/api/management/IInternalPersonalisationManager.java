@@ -19,6 +19,7 @@
  */
 package org.societies.personalisation.common.api.management;
 
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.internal.personalisation.model.IFeedbackEvent;
@@ -30,6 +31,7 @@ import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
+import org.societies.personalisation.common.api.model.PersonalisationTypes;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 
 
@@ -41,44 +43,6 @@ import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
  */
 public interface IInternalPersonalisationManager extends IPersonalisationManager{
 
-	/**
-	 * Allows any service to request an context-based evaluated preference outcome.
-	 * @return					the outcome in the form of an IAction object
-	 * 
-	 * @param requestor    the DigitalIdentity of the service requesting the outcome
-	 * @param ownerID    the DigitalIdentity of the owner of the preferences (i.e. the
-	 * user of this service)
-	 * @param serviceID    the service identifier of the service requesting the
-	 * outcome
-	 * @param preferenceName    the name of the preference requested
-	 */
-	public void getIntentTask(EntityIdentifier requestor, EntityIdentifier ownerID, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
-
-	/**
-	 * Allows any service to request an context-based evaluated preference outcome.
-	 * @return					the outcome in the form of an IAction object
-	 * 
-	 * @param ownerID    the DigitalIdentity of the owner of the preferences (i.e. the
-	 * user of this service)
-	 * @param serviceID    the service identifier of the service requesting the
-	 * outcome
-	 * @param preferenceName    the name of the preference requested
-	 */
-	public void getIntentTask(EntityIdentifier ownerID, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
-
-	/**
-	 * Allows any service to request an context-based evaluated preference outcome.
-	 * @return					the outcome in the form of an IAction object
-	 * 
-	 * @param requestor    the DigitalIdentity of the service requesting the outcome
-	 * @param ownerID    the DigitalIdentity of the owner of the preferences (i.e. the
-	 * user of this service)
-	 * @param serviceType    the type of the service requesting the outcome
-	 * @param serviceID    the service identifier of the service requesting the
-	 * outcome
-	 * @param preferenceName    the name of the preference requested
-	 */
-	public void getPreference(EntityIdentifier requestor, EntityIdentifier ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
 
 	/**
 	 * Allows any service to request an context-based evaluated preference outcome.
@@ -91,27 +55,27 @@ public interface IInternalPersonalisationManager extends IPersonalisationManager
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
 	 */
-	public void getPreference(EntityIdentifier ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
+	public void getPreference(Identity ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
 
 	/**
 	 * 
 	 * @param className
 	 * @param ctxAttributeId
 	 */
-	public void registerForContextUpdate(EntityIdentifier id, String className, CtxAttributeIdentifier ctxAttributeId);
+	public void registerForContextUpdate(Identity id, PersonalisationTypes type, CtxAttributeIdentifier ctxAttributeId);
 
 	/**
 	 * 
 	 * @param feedback
 	 */
 	public void returnFeedback(IFeedbackEvent feedback);
-
-
-
+	
 	/**
 	 * 
-	 * @param ctxModelObj
+	 * @param ownerID
+	 * @param serviceID
+	 * @param preferenceName
+	 * @param callback
 	 */
-	public void updateReceived(CtxModelObject ctxModelObj);
-
+	public void getIntentAction(Identity ownerID, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
 }

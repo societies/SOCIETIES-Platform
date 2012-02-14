@@ -1,9 +1,21 @@
-Privacy & Trust : Privacy protection
-The Privacy Protection is the global privacy component.
+Privacy & Trust: Privacy protection
+The Privacy Protection is the global privacy bundle.
+
 It is composed of several sub-components and provides
-several functions through three external interfaces:
-- PrivacyDataManager: to manage data access control and
+several functions through three external interfaces
+exposed only to Societies components:
+- Privacy Data Manager: to manage data access control and
 access conditions
-- PrivacyPolicyManager: to manage privacy policy
-- PrivacyPolicyNegotiationManager: to manage privacy
+- Privacy Policy Manager: to manage privacy policy
+- Privacy Policy Negotiation Manager: to manage privacy
 policy negotiations with CIS or services
+
+And three other interfaces exposed only internaly of the
+bundle "Privacy Protection":
+- Assessment
+- Privacy Preference Manager: to manage privacy preference
+- Identity Selection: to select relevant identity
+
+The version of the "Privacy Protection" bundle follow: ${version.pt}
+The Internal Bundle API follow also: ${version.pt}
+Other components follow their own version number.

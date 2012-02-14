@@ -46,14 +46,21 @@ public class XMPPError extends Exception {
 	private Object applicationError;
 	private String stanzaErrorText;
 	private byte[] stanzaErrorBytesWithText;
+	private String genericText; // TODO support output of this
 	
 	public XMPPError(StanzaError stanzaError) {
 		this.stanzaError = stanzaError;
 	}
 	
+	public XMPPError(StanzaError stanzaError, String genericText) {
+		this.stanzaError = stanzaError;
+		this.genericText = genericText;
+	}
+	
 	public XMPPError(StanzaError stanzaError, String stanzaErrorText, Object applicationError) {
 		this.applicationError = applicationError;
 		this.stanzaError = stanzaError;
+		this.genericText = genericText;
 		if (stanzaError.hasText() && stanzaErrorText!=null) {
 			this.stanzaErrorText = stanzaErrorText+"\n</"+stanzaError.toString()+">\n";
 			byte[] b1 = this.stanzaErrorText.getBytes();
@@ -61,6 +68,10 @@ public class XMPPError extends Exception {
 			System.arraycopy(stanzaError.getBytes(), 0, stanzaErrorBytesWithText, 0, stanzaError.getBytes().length);
 			System.arraycopy(b1, 0, stanzaErrorBytesWithText, stanzaError.getBytes().length, b1.length);
 		}
+	}
+	
+	public String getGenericText() {
+		return genericText;
 	}
 	
 	public Object getApplicationError() {

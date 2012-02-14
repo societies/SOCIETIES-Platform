@@ -28,41 +28,61 @@ package org.societies.css.devicemgmt.devicemanager.impl;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
 
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceFactory;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.css.devicemgmt.IAction;
+import org.societies.api.css.devicemgmt.IDevice;
+import org.societies.api.css.devicemgmt.IDeviceStateVariable;
+import org.societies.api.css.devicemgmt.model.DeviceMgmtConstants;
+import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 
-import org.societies.css.devicemgmt.devicemanager.IAction;
-import org.societies.css.devicemgmt.devicemanager.IDeviceStateVariable;
-import org.societies.css.devicemgmt.devicemanager.IDevice;
 
 
 
 public class DeviceImpl implements IDevice{
 	
-	private static Logger LOG = LoggerFactory.getLogger(DeviceManager.class);
-	private String deviceId;
+	private static Logger LOG = LoggerFactory.getLogger(DeviceImpl.class);
 	private DeviceManager deviceManager;
 	private ServiceRegistration registration;
 	private BundleContext bundleContext;
 	private Dictionary<String, String> properties;
+	private DeviceCommonInfo deviceCommonInfo;
+	private String deviceId;
+	private boolean status;
 
-	public DeviceImpl(BundleContext bc, DeviceManager deviceMgr, String deviceId) {
+	public DeviceImpl(BundleContext bc, DeviceManager deviceMgr, String deviceId, DeviceCommonInfo deviceCommonInfo) {
 		
 		this.bundleContext = bc;
 		this.deviceManager = deviceMgr;
+		this.deviceCommonInfo = deviceCommonInfo;
 		this.deviceId = deviceId;
-		//this.properties = properties;
+		
 		
 		properties = new Hashtable<String, String>();
 		
-		properties.put("deviceId", deviceId);
+		properties.put(DeviceMgmtConstants.DEVICE_NAME, deviceCommonInfo.getDeviceName());
+		properties.put(DeviceMgmtConstants.DEVICE_TYPE, deviceCommonInfo.getDeviceType());
+		properties.put(DeviceMgmtConstants.DEVICE_ID, deviceId);
+		properties.put(DeviceMgmtConstants.DEVICE_FAMILY, deviceCommonInfo.getDeviceFamilyIdentity());
+		properties.put(DeviceMgmtConstants.DEVICE_LOCATION, deviceCommonInfo.getDeviceLocation());
+		properties.put(DeviceMgmtConstants.DEVICE_PROVIDER, deviceCommonInfo.getDeviceProvider());
+		properties.put(DeviceMgmtConstants.DEVICE_CONNECTION_TYPE, deviceCommonInfo.getDeviceConnectionType());
+		if (deviceCommonInfo.getContextSource())
+		{
+			properties.put(DeviceMgmtConstants.DEVICE_CONTEXT_SOURCE, "isContextSource");
+		}
+		else
+		{
+			properties.put(DeviceMgmtConstants.DEVICE_CONTEXT_SOURCE, "isNotContextSource");
+		}
+		
+		
 		
 		Object lock = new Object();
 
@@ -70,7 +90,7 @@ public class DeviceImpl implements IDevice{
 		{
 			registration = bundleContext.registerService(IDevice.class.getName(), this, properties);
 			
-			LOG.info("-- A device service" + properties.get("deviceId") + " has been registred"); 
+			LOG.info("-- A device service with the deviceId: " + properties.get("deviceId") + " has been registred"); 
 		}
 		
 	}
@@ -80,69 +100,91 @@ public class DeviceImpl implements IDevice{
 		if (registration != null)
 		{
 			registration.unregister();
-			deviceManager.removeDeviceFromTable(deviceId);
+			deviceManager.removeDeviceFromContainer(deviceId);
 			
 			LOG.info("-- The device " + properties.get("deviceId") + " has been removed");
 		}
 	}
 
 	public String getDeviceName() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return deviceCommonInfo.getDeviceName();
 	}
 
 	public String getDeviceId() {
-		// TODO Auto-generated method stub
-		return deviceId;
+		
+		return this.deviceId;
 	}
 
 	public String getDeviceType() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return deviceCommonInfo.getDeviceType();
 	}
 
 	public String getDeviceDescription() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return deviceCommonInfo.getDeviceDescription();
 	}
 
 	public String getDeviceConnetionType() {
-		// TODO Auto-generated method stub
-		return null;
+		return deviceCommonInfo.getDeviceConnectionType();
 	}
 
 	public void enable() {
-		// TODO Auto-generated method stub
 		
+		this.status = true;
 	}
 
 	public void disable() {
-		// TODO Auto-generated method stub
 		
+		this.status = false;
 	}
 
 	public boolean isEnable() {
-		// TODO Auto-generated method stub
-		return false;
+		
+		return this.status;
 	}
 
 	public String getDeviceLocation() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return deviceCommonInfo.getDeviceLocation();
 	}
 
 	public String getDeviceProvider() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return deviceCommonInfo.getDeviceProvider();
 	}
 
-	public boolean isContextCompliant() {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isContextSource() {
+		
+		return deviceCommonInfo.getContextSource();
 	}
 
+	
+	/**
+	 *  TODO we will use the actionName + deviceId to get Action service, 
+	 *  so firstly we have to create binding table to get the MAC address of the device by using the device Id
+	 */
 	public IAction getAction(String actionName) {
-		// TODO Auto-generated method stub
+		
+		
+		ServiceReference[] sr = null;
+		try 
+		{
+			
+			sr = bundleContext.getServiceReferences(IAction.class.getName(), "(actionName=getLightLevel)");
+		
+		} catch (InvalidSyntaxException e) {
+			//TODO in case of exception 
+			e.printStackTrace();
+		}
+		
+		if (sr != null)
+		{
+			
+			IAction ia = (IAction)bundleContext.getService(sr[0]);
+			return ia;
+		}
 		return null;
 	}
 

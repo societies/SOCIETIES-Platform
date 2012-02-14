@@ -51,6 +51,10 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
 import org.societies.api.mock.EntityIdentifier;
+//import org.societies.api.comm.xmpp.datatypes.Identity;
+//import org.societies.comm.examples.commsmanager.impl.CommsServer; 
+//import org.societies.comm.xmpp.interfaces.ICommCallback;
+//import org.societies.comm.xmpp.interfaces.FeatureServer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -82,7 +86,8 @@ import java.util.List;
  * 
  */
 
-public class AutomaticCommunityConfigurationManager {
+public class AutomaticCommunityConfigurationManager //implements ICommCallback
+{
 	
 	private EntityIdentifier linkedCss; // No datatype yet defined for CSS
 	
@@ -167,7 +172,7 @@ public class AutomaticCommunityConfigurationManager {
 		//    ArrayList<EntityIdentifier> cisMembers = cisUnderAnalysis.getMembers();
 		//    for (int i = 0; i < cisMembers.size(); i++) {
 		//        if (cisUnderAnalysis.getActivityFeed().getLastActivityForMember(cisMembers.get(i)).getTimestamp() < Time.current() - 240000000)
-		//            //make the suggestion to User Agent based on calcluation
+		//            //make the suggestion to User Agent based on calcluation - see later
 		
 		//    }
 	    //}
@@ -227,8 +232,10 @@ public class AutomaticCommunityConfigurationManager {
 		
 	}
 	
-    public void intialiseAutomaticCommunityConfigurationManager() {
+    public void initialiseAutomaticCommunityConfigurationManager() {
+    	//getCommManager().register(this);
     	
+    	new AutomaticCommunityConfigurationManager(linkedCss, "CSS");
     }
     
     public EntityIdentifier getLinkedCss() {
@@ -270,5 +277,48 @@ public class AutomaticCommunityConfigurationManager {
     	System.out.println("GOT user context broker callback" + userContextBrokerCallback);
     	this.userContextBrokerCallback = userContextBrokerCallback;
     }
+    
+  //public CommManagerBundle getCommManager() {
+    //	return commManager;
+    //}
+    
+    //public void setCommManager(CommManagerBundle commManager) {
+    //	this.commManager = commManager;
+    //}
+    
+    /**Returns the list of package names of the message beans you'll be passing*/
+    public List<String> getJavaPackages() {
+		return null;
+    	
+    }
+    
+    /**Returns the list of namespaces for the message beans you'll be passing*/
+    public List<String> getXMLNamespaces() {
+    	return null;
+    }
+    
+    /** Put your functionality here if there is NO return object, ie, VOID */
+    //public void receiveMessage(Stanza stanza, Object messageBean) {
+    //	return null;
+    //}
+    
+    /** Put your functionality here if there IS a return object */
+    //public Object getQuery(Stanza stanza, Object messageBean) {
+    //	return null;
+    //}
+    
+    /** Put your functionality here if there IS a return object and you are updating also */
+    //public Object setQuery(Stanza arg0, Object arg1) {
+    //	return null;
+    //}
+    
+    /**For calling methods that have return types */
+    //public void sendIQGet(Stanza stanza, Object messageBean, ICommCallback callback) 
+    //           throws CommunicationException;
+     
+    /**For calling methods that have void types */
+    //void sendMessage(Stanza stanza, String type, Object messageBean)
+    //            throws CommunicationException;
+
     
 }

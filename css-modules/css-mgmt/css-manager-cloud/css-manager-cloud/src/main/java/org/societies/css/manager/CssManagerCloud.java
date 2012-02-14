@@ -39,6 +39,7 @@ public class CssManagerCloud implements ICssManagerCloud {
 	private CisManager cisManager; //all of its CISs
 	private String username;
 	private String domainAuthority;
+	private int delMe;
 
 	public CssManagerCloud(String username, String domainAuthority) {
 		

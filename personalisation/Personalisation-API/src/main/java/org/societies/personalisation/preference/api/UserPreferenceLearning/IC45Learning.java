@@ -27,7 +27,7 @@ package org.societies.personalisation.preference.api.UserPreferenceLearning;
 
 import java.util.Date;
 
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IC45Consumer;
 
@@ -77,7 +77,7 @@ public interface IC45Learning
 	 * @param date - defines the start date of history to use as input.
 	 * @param historyOwner - the identity under which learning should run
 	 */
-	public void runC45Learning(IC45Consumer requestor, Date date, EntityIdentifier historyOwner);
+	public void runC45Learning(IC45Consumer requestor, Date date, Identity historyOwner);
 	
 	/**
 	 * This method starts the C4.5 learning process on context history from the date
@@ -91,7 +91,7 @@ public interface IC45Learning
 	 * @param serviceId
 	 * @param parameterName
 	 */
-	public void runC45Learning(IC45Consumer requestor, Date date, EntityIdentifier historyOwner,
+	public void runC45Learning(IC45Consumer requestor, Date date, Identity historyOwner,
     		IServiceResourceIdentifier serviceId, String parameterName);
 
 }

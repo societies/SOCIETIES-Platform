@@ -51,6 +51,9 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
 import org.societies.api.mock.EntityIdentifier;
+//import org.societies.api.comm.xmpp.datatypes.Identity;
+//import org.societies.comm.examples.commsmanager.impl.CommsServer; 
+//import org.societies.comm.xmpp.interfaces.ICommCallback;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -83,7 +86,8 @@ import org.societies.api.internal.useragent.model.ExpProposalContent;
  * 
  */
 
-public class AutomaticCommunityDeletionManager {
+public class AutomaticCommunityDeletionManager //implements ICommCallback
+{
 
 	private EntityIdentifier linkedCss; // No datatype yet defined for CSS
 	
@@ -231,8 +235,10 @@ public class AutomaticCommunityDeletionManager {
 		}
 	}
 	
-    public void intialiseAutomaticCommunityDeletionManager() {
-    	
+    public void initialiseAutomaticCommunityDeletionManager() {
+    	//getCommManager().register(this);
+
+    	new AutomaticCommunityDeletionManager(linkedCss, "CSS");
     }
 
     public EntityIdentifier getLinkedCss() {
@@ -294,5 +300,39 @@ public class AutomaticCommunityDeletionManager {
     public void getUserResponse(String userResponse) {
     	this.userResponse = userResponse;
     }
+    
+  //public CommManagerBundle getCommManager() {
+    //	return commManager;
+    //}
+    
+    //public void setCommManager(CommManagerBundle commManager) {
+    //	this.commManager = commManager;
+    //}
+    
+    /**Returns the list of package names of the message beans you'll be passing*/
+    public List<String> getJavaPackages() {
+		return null;
+    	
+    }
+    
+    /**Returns the list of namespaces for the message beans you'll be passing*/
+    public List<String> getXMLNamespaces() {
+    	return null;
+    }
+    
+    /** Put your functionality here if there is NO return object, ie, VOID */
+    //public void receiveMessage(Stanza stanza, Object messageBean) {
+    //	return null;
+    //}
+    
+    /** Put your functionality here if there IS a return object */
+    //public Object getQuery(Stanza stanza, Object messageBean) {
+    //	return null;
+    //}
+    
+    /** Put your functionality here if there IS a return object and you are updating also */
+    //public Object setQuery(Stanza arg0, Object arg1) {
+    //	return null;
+    //}
     
 }

@@ -23,12 +23,11 @@ import java.util.List;
 
 import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
-import org.societies.personalisation.CAUI.api.model.UserIntentAction;
+import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 
 /**
  * CAUIPrediction
@@ -39,11 +38,15 @@ import org.societies.personalisation.CAUI.api.model.UserIntentAction;
 public class CAUIPrediction implements ICAUIPrediction{
 
 	@Override
-	public void enablePrediction(Boolean bool) {
+	public void enablePrediction(Boolean arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
+	@Override
+	public void getPrediction(Identity arg0, IAction arg1,
+			IPersonalisationCallback arg2) {
+		// TODO Auto-generated method stub
+	}
 
 	@Override
 	public List<List<String>> getPredictionHistory() {
@@ -52,28 +55,16 @@ public class CAUIPrediction implements ICAUIPrediction{
 	}
 
 	@Override
-	public UserIntentAction getCurrentIntentAction(Identity requestor,
-			Identity ownerID, IServiceResourceIdentifier serviceID,
-			String preferenceName) {
+	public IUserIntentAction getCurrentIntentAction(Identity arg0,
+			IServiceResourceIdentifier arg1, String arg2) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public UserIntentAction getPrediction(Identity requestor,
-			CtxAttribute ctxAttribute) {
+	public void getPrediction(Identity arg0, CtxAttribute arg1,
+			IPersonalisationCallback arg2) {
 		// TODO Auto-generated method stub
-		return null;
 	}
-
-	@Override
-	public UserIntentAction getPrediction(Identity requestor, IAction action,
-			IPersonalisationCallback persCallback) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
-
 
 }

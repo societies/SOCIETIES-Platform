@@ -32,11 +32,13 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.security.InvalidParameterException;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -56,6 +58,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.HostedNode;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.datatypes.StanzaError;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.datatypes.XMPPNode;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -93,7 +96,7 @@ import org.xmpp.packet.PacketError;
  */
 
 // TODO review this class
-// TODO had to place synchronous because marshallers are not threadsafe
+// TODO had to place synchronous blocks because marshallers are not threadsafe
 public class CommManagerHelper {
 	private static final String JABBER_CLIENT = "jabber:client";
 	private static final String JABBER_SERVER = "jabber:server";
@@ -158,10 +161,6 @@ public class CommManagerHelper {
 		} catch (IOException e) {
 			LOG.error(e.getMessage());
 		}
-		
-		LOG.info("Going to parse error... Charset.defaultCharset().toString()="+Charset.defaultCharset().toString());
-		LOG.info("Charset.availableCharsets().keySet().toArray().toString()="+Arrays.toString(Charset.availableCharsets().keySet().toArray()));
-		LOG.info(new String(os.toByteArray()));
 		
 		try {
 			if (os.size()>0) {
@@ -251,17 +250,13 @@ public class CommManagerHelper {
 			ICommCallback callback = getCommCallback(iq.getID());
 			String ns = element.getNamespace().getURI();
 			if (ns.equals(XMPPInfo.INFO_NAMESPACE)) {
-				Map<String, XMPPInfo> infoMap = ParsingUtils.parseInfoResult(new InputSource(new StringReader(element
-						.asXML())));
-				String node = infoMap.keySet().iterator().next();
-				callback.receiveInfo(TinderUtils.stanzaFromPacket(iq), node, infoMap.get(node));
+				SimpleEntry<String, XMPPInfo> infoMap = ParsingUtils.parseInfoResult(element);
+				callback.receiveInfo(TinderUtils.stanzaFromPacket(iq), infoMap.getKey(), infoMap.getValue());
 				return;
 			}
 			if (ns.equals(XMPPNode.ITEM_NAMESPACE)) {
-				Map<String, List<XMPPNode>> nodeMap = ParsingUtils.parseItemsResult(new InputSource(new StringReader(element
-						.asXML())));
-				String node = nodeMap.keySet().iterator().next();
-				callback.receiveItems(TinderUtils.stanzaFromPacket(iq), node, nodeMap.get(node));
+				SimpleEntry<String, List<String>> nodeMap = ParsingUtils.parseItemsResult(element);
+				callback.receiveItems(TinderUtils.stanzaFromPacket(iq), nodeMap.getKey(), nodeMap.getValue());
 				return;
 			}
 			LOG.info("not disco... callback is "+callback);
@@ -281,10 +276,32 @@ public class CommManagerHelper {
 		try {
 			ICommCallback callback = getCommCallback(iq.getID());
 			LOG.warn("dispatchIQError: XMPP ERROR!");
-			callback.receiveError(TinderUtils.stanzaFromPacket(iq),null); // TODO parse error
+			Element errorElement = iq.getChildElement();
+			LOG.info("errorElement.getName()="+errorElement.getName()+";errorElement.elements().size()="+errorElement.elements().size());
+			StanzaError se = StanzaError.valueOf(((Element)errorElement.elements().get(0)).getName()); // TODO assumes the stanza error comes first
+			XMPPError error = new XMPPError(se, null);
+			if (errorElement.elements().size()>1)
+				error = parseApplicationError(se, (Element)errorElement.elements());
+			LOG.info("XMPPError:"+error.getStanzaErrorString());
+			callback.receiveError(TinderUtils.stanzaFromPacket(iq),error);
 		} catch (UnavailableException e) {
 			LOG.info(e.getMessage());
+		} catch (JAXBException e) {
+			LOG.info(e.getMessage());
 		}
+	}
+
+	private XMPPError parseApplicationError(StanzaError error, Element errorElement) throws UnavailableException, JAXBException {
+		Element e = (Element) errorElement.elements().get(1); // TODO assume that has text OR application error (not both)
+		if (e.getNamespaceURI().equals(XMPPError.STANZA_ERROR_NAMESPACE_DECL) && e.getName().equals("text")) { // TODO this better
+			return new XMPPError(error, e.getText());
+		} else {
+			Unmarshaller u = getUnmarshaller(e.getNamespaceURI());
+			Object appError = u.unmarshal(new InputSource(new StringReader(e.asXML())));
+			return new XMPPError(error, "", appError);
+		}
+		
+		
 	}
 
 	public IQ dispatchIQ(IQ iq) {

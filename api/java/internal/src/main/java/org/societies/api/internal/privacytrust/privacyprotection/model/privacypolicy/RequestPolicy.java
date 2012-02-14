@@ -29,8 +29,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.Subject;
-
 /**
  * This class represents the Request Policy of the Provider and lists the context types it is requesting access to, the Actions it is going to perform 
  * to these items and its own terms and conditions that define what happens to the data after disclosure

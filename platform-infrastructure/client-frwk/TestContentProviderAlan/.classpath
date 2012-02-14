@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry kind="var" path="M2_REPO/org/societies/android/platform/CoreInterfaces/0.1/CoreInterfaces-0.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/societies/android/platform/contentprovider/0.1/contentprovider-0.1.jar"/>
+	<classpathentry kind="output" path="bin/classes"/>
+</classpath>

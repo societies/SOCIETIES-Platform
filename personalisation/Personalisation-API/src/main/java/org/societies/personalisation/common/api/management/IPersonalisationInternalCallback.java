@@ -24,7 +24,7 @@
  */
 package org.societies.personalisation.common.api.management;
 
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
@@ -38,8 +38,8 @@ import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
  */
 public interface IPersonalisationInternalCallback {
 	
-	public void sendDIANNEOutcome(EntityIdentifier entityId, IDIANNEOutcome outcome);
-	public void sendCRISTOutcome(EntityIdentifier entityId, ICRISTUserAction outcome);
-	public void sendCAUIOutcome(EntityIdentifier entityId, IUserIntentAction outcome);
-	public void sendPrefOutcome(EntityIdentifier entityId, IPreferenceOutcome outcome);
+	public void sendDIANNEOutcome(Identity entityId, IDIANNEOutcome outcome);
+	public void sendCRISTOutcome(Identity entityId, ICRISTUserAction outcome);
+	public void sendCAUIOutcome(Identity entityId, IUserIntentAction outcome);
+	public void sendPrefOutcome(Identity entityId, IPreferenceOutcome outcome);
 }

@@ -17,7 +17,8 @@
         <value></value>
         </osgi:interfaces>
         </osgi:service>
-        
+       
+        <osgi:reference id="CommManagerBundle" interface="org.societies.comm.xmpp.interfaces.CommManager" />
 		
 	    <osgi:reference id="CssDirectory" interface="org.societies.api.internal.css_modules.css_directory.ICssDirectory"/>
 		<osgi:reference id="CssDiscovery" interface="org.societies.api.internal.css_modules.css_discovery.ICssDiscovery"/>
@@ -25,6 +26,7 @@
 		<osgi:reference id="ServiceSharingRecord" interface="org.societies.api.internal.cis.cis_management.ServiceSharingRecord"/>
 		<osgi:reference id="CisActivityRecord" interface="org.societies.api.internal.cis.cis_management.CisActivity"/>
 		<osgi:reference id="CisRecord" interface="org.societies.api.internal.cis.cis_management.CisRecord"/>
+		<osgi:reference id="ICisManager" interface="org.societies.api.internal.cis.cis_management.ICisManager"/>
 		<osgi:reference id="UserCtxSimilarityEvaluator" interface="org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator"/>
 		<osgi:reference id="UserCtxPredictionMgr" interface="org.societies.api.internal.context.user.prediction.IUserCtxPredictionMgr"/>
 		<osgi:reference id="UserCtxDBMgr" interface="org.societies.api.internal.context.user.db.IUserCtxDBMgr"/>

@@ -37,7 +37,7 @@ public class MathServiceConsumerMockTest {
 		 * the use of expect method of the EasyMock is mandatory as the method returns an int
 		 * If the mock method returns void, just define the behaviour using mock.methodA 
 		 */
-		expect(mock.add(1,15)).andReturn((int) 16);
+		expect(mock.add(1,15)).andReturn((int) 11);
 		/* "replay" means that you reset the mock... Remind that the easymock is just regsiter the call you are doing */ 
 		replay(mock);
 		/* call the method of your class under test */

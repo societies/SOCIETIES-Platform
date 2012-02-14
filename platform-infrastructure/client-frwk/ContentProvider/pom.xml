@@ -7,13 +7,13 @@
         <artifactId>android-parent</artifactId>
         <version>0.1</version>
         <relativePath>../../../parent/android.xml</relativePath>
-	<!-- modify if project root directory different to other projects-->
+		<!-- modify if project root directory different to other projects-->
    </parent>
 
    <groupId>org.societies.android.platform</groupId>
    <artifactId>contentprovider</artifactId>
    <!-- see Redmine wiki for componentname from project structure -->
-   <version>0.1</version> 
+   <version>${release.version}</version> 
    <!-- still being discussed -->
    <name>Content Provider</name>
    <packaging>apk</packaging>
@@ -38,11 +38,19 @@
             <groupId>android</groupId>
             <artifactId>android</artifactId>
         </dependency>
-        <!-- <dependency>
-            <groupId>com.phonegap</groupId>
-            <artifactId>phonegap</artifactId>
+        
+        <dependency>
+          	<groupId>org.societies.android.platform</groupId>
+  			<artifactId>CoreInterfaces</artifactId>
+  			<version>${release.version}</version>
+  			<scope>compile</scope>
         </dependency>
-        --> 
+        <dependency>
+			<groupId>org.societies.utilities</groupId>
+			<artifactId>DBC</artifactId>
+  			<version>${release.version}</version>
+  			<scope>compile</scope>
+        </dependency>
         </dependencies>
 
     <build>
@@ -50,8 +58,8 @@
         <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
-                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-                <artifactId>android-maven-plugin</artifactId>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

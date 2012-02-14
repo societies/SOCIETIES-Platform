@@ -47,11 +47,12 @@ import org.w3c.dom.Element;
 public interface PubsubClient {
 	
 	public List<String> discoItems(Identity pubsubService, String node) throws XMPPError, CommunicationException;
+	// TODO remove subId from interface - it's not interesting for the API users, only for the client implementation
 	// TODO disco info nodes
 	// TODO reception of notifications from a 3rd party subscription
-	public String subscriberSubscribe(Identity pubsubService, String node, Subscriber subscriber) throws XMPPError, CommunicationException;
+	public Subscription subscriberSubscribe(Identity pubsubService, String node, Subscriber subscriber) throws XMPPError, CommunicationException;
 //	public String subscriberSubscribe(Identity pubsubService, String node, Identity subscriber) throws XMPPError, CommunicationException;
-	public void subscriberUnsubscribe(Identity pubsubService, String node, Identity subscriber, String subId) throws XMPPError, CommunicationException;
+	public void subscriberUnsubscribe(Identity pubsubService, String node, Subscriber subscriber) throws XMPPError, CommunicationException;
 //	public Pubsub subscriberOptionsRequest(Identity pubsubService) throws XMPPError, CommunicationException;
 //	public Pubsub subscriberOptionsSubmission(Identity pubsubService) throws XMPPError, CommunicationException;
 //	public Pubsub subscriberSubscribeConfigure(Identity pubsubService) throws XMPPError, CommunicationException;

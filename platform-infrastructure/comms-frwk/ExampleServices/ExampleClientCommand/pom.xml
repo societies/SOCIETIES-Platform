@@ -20,15 +20,33 @@
 			<scope>provided</scope>			
 		</dependency> 
 		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 	 		<groupId>org.societies.comm.examples</groupId>
 	 		<artifactId>ExampleCommsManager</artifactId>
 	 		<version>${release.version}</version>
 	 		<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.comm.examples</groupId>
-			<artifactId>Calculator</artifactId>
-			<version>${release.version}</version>
+			<groupId>org.societies.comm.xmpp.pubsub</groupId>
+			<artifactId>PubsubClientBundle</artifactId>
+			<version>${version.comm}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.comm.xmpp</groupId>
+			<artifactId>CommunicationFrameworkCommons</artifactId>
+			<version>${version.comm}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

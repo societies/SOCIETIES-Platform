@@ -25,13 +25,13 @@
 package org.societies.api.internal.privacytrust.privacyprotection;
 
 
-import org.societies.api.internal.mock.DataIdentifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 /**
@@ -54,7 +54,7 @@ public interface IPrivacyDataManager {
 	 * @param serviceId The service_Id the service
 	 * @return A ResponseItem with permission information in it
 	 */
-	public ResponseItem checkPermission(DataIdentifier dataId, EntityIdentifier ownerId, EntityIdentifier requestorId, IServiceResourceIdentifier serviceId);
+	public ResponseItem checkPermission(CtxIdentifier dataId, Identity ownerId, Identity requestorId, IServiceResourceIdentifier serviceId);
 
 	/**
 	 * Check permission to access/use/disclose a data for a CIS usage
@@ -69,7 +69,7 @@ public interface IPrivacyDataManager {
 	 * @param cisId the ID of the CIS which wants to access the data
 	 * @return A ResponseItem with permission information in it
 	 */
-	public ResponseItem checkPermission(DataIdentifier dataId, EntityIdentifier ownerId, EntityIdentifier requestorId, EntityIdentifier cisId);
+	public ResponseItem checkPermission(CtxIdentifier dataId, Identity ownerId, Identity requestorId, Identity cisId);
 
 	/**
 	 * Check permission to access/use/disclose a data in a case that no negotiation have been done.
@@ -84,7 +84,7 @@ public interface IPrivacyDataManager {
 	 * @param usage Information about the use of the data: purpose, retention-time, people who will access this data... Need to be formalised!
 	 * @return A ResponseItem with permission information in it
 	 */
-	public ResponseItem checkPermission(DataIdentifier dataId, EntityIdentifier ownerId, EntityIdentifier requestorId, RequestPolicy usage);
+	public ResponseItem checkPermission(CtxIdentifier dataId, Identity ownerId, Identity requestorId, RequestPolicy usage);
 	/**
 	 * Protect a data following the user preferences by obfuscating it to a correct
 	 * obfuscation level. The data information are wrapped into a relevant data
@@ -120,5 +120,5 @@ public interface IPrivacyDataManager {
 	 * @return otherwise ID of the non-obfuscated data
 	 * @throws Exception
 	 */
-	public DataIdentifier hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel, IDataObfuscationListener listener) throws PrivacyException;
+	public CtxIdentifier hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel, IDataObfuscationListener listener) throws PrivacyException;
 }

@@ -71,7 +71,7 @@ public interface ICommCallback {
 	
 	void receiveInfo(Stanza stanza, String node, XMPPInfo info);
 	
-	void receiveItems(Stanza stanza, String node, List<XMPPNode> items);
+	void receiveItems(Stanza stanza, String node, List<String> items);
 	
 	void receiveMessage(Stanza stanza, Object payload);
 }

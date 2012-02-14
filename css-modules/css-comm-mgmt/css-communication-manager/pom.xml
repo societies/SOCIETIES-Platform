@@ -6,7 +6,7 @@
   <artifactId>css-communication-manager</artifactId>
   <packaging>bundle</packaging>
   <name>Spring OSGi Bundle</name>
-	<version>${release.version}</version>
+	<version>${version.css}</version>
 
 	<developers>
 	    <developer>
@@ -74,7 +74,7 @@
 						<artifactItem>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>${project.artifactId}</artifactId>
-							<version>${release.version}</version>
+							<version>${version.cis}</version>
 							<type>bundle</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>

@@ -26,8 +26,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.privacytrust</groupId>
+	<groupId>org.societies</groupId>
 	<artifactId>privacytrust</artifactId>
+	<name>Privacy and Trust</name>
 	<packaging>pom</packaging>
 	<version>1</version>
 	<developers>

@@ -24,8 +24,8 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener;
 
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.mock.DataIdentifier;
 
 
 /**
@@ -37,5 +37,5 @@ public interface IDataObfuscationListener {
 	public void onObfuscationDone(IDataWrapper data);
 	public void onObfuscationCancelled(String msg);
 	public void onObfuscationAborted(String msg, Exception e);
-	public void onObfuscatedVersionRetrieved(DataIdentifier dataId, boolean retrieved);
+	public void onObfuscatedVersionRetrieved(CtxIdentifier dataId, boolean retrieved);
 }
