@@ -58,9 +58,9 @@
 
 	<parent>
 		<groupId>org.societies</groupId>
-		<artifactId>privacytrust</artifactId>
-		<relativePath>../../pom.xml</relativePath>
-		<version>1</version>
+		<artifactId>spring-osgi-parent</artifactId>
+		<relativePath>../../parent/spring-osgi.xml</relativePath>
+		<version>0.1</version>
 	</parent>
 
 	<dependencies>
@@ -122,9 +122,9 @@
 						<!-- <Bundle-Activator></Bundle-Activator> <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency> 
 							<Embed-Transitive>true</Embed-Transitive> <Import-Package>!javax.swing.*</Import-Package> 
 							<Import-Package>org.societies.api.*</Import-Package> <Export-Package></Export-Package> -->
-						<Bundle-SymbolicName>${pom.groupId}.${pom.artifactId}</Bundle-SymbolicName>
-						<Bundle-Name>${pom.name}</Bundle-Name>
-						<Bundle-Version>${pom.version}</Bundle-Version>
+						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+						<Bundle-Name>${project.name}</Bundle-Name>
+						<Bundle-Version>${project.version}</Bundle-Version>
 						<Import-Package>
 							org.societies.api.context.*,
 							org.societies.api.internal.privacytrust.privacyprotection.*,
