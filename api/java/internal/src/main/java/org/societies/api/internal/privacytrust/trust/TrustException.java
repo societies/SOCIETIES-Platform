@@ -22,25 +22,70 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api;
-
-import java.util.EventListener;
+package org.societies.api.internal.privacytrust.trust;
 
 /**
- * An interface that must be implemented by a component that wants to be notified
- * when a trust value is updated.  
- *
+ * This is the abstract class of exceptions produced by failed or interrupted
+ * trust-related operations.
+ * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.2
  */
-public interface TrustUpdateListener extends EventListener {
-	
+public abstract class TrustException extends Exception {
+
+	private static final long serialVersionUID = 3912914184420507677L;
+
 	/**
-	 * Notifies registered listeners that a trust value is updated.
-	 * 
-	 * @param evt
-	 *            the <code>TrustUpdateEvent</code> object describing the
-	 *            event source, as well as, the old and new trust value.
-	 */
-	public void trustValueUpdated(TrustUpdateEvent evt);
+     * Constructs a <code>TrustException</code> with no detail message.
+     */
+    public TrustException() {
+    	
+        super();
+    }
+
+    /**
+     * Constructs a <code>TrustException</code> with the specified detail
+     * message.
+     * 
+     * @param message
+     *            the detail message.
+     */
+    public TrustException(String message) {
+    	
+        super(message);
+    }
+
+    /**
+     * Creates a <code>TrustException</code> with the specified detail message
+     * and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustException(String message, Throwable cause) {
+    	
+        super(message, cause);
+    }
+
+    /**
+     * Creates a <code>TrustException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustException(Throwable cause) {
+    	
+        super(cause);
+    }
 }

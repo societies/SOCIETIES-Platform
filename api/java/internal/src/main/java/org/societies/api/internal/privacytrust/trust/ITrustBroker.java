@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api;
+package org.societies.api.internal.privacytrust.trust;
 
 import java.util.concurrent.Future;
 
@@ -46,7 +46,7 @@ public interface ITrustBroker {
 	 * @throws NullPointerException if the specified entity identifier is
 	 *         <code>null</code>
 	 */
-	public Future<Double> retrieveUserTrust(final Object entityId) throws TrustException;
+	public Future<Double> retrieveTrust(final Object entityId) throws TrustException;
 	
 	/**
 	 * Registers the specified listener for trust value update events associated
