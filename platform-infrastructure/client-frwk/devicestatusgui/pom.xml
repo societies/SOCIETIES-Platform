@@ -39,19 +39,19 @@
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
+				<!-- <extensions>true</extensions>
 				<configuration>
-					<!-- emma start -->
+					emma start
 					<emma>
 						<enable>true</enable>
 						<classFolders>${project.build.outputDirectory}</classFolders>
 						<outputMetaFile>${project.build.directory}/emma/coverage.em</outputMetaFile>
 					</emma>
-					<!-- emma stop -->
+					emma stop
 					<dex>
-						<noLocals>true</noLocals> <!-- must be set for emma -->
+						<noLocals>true</noLocals> must be set for emma
 					</dex>
-				</configuration>
-				<extensions>true</extensions>
+				</configuration> -->
 			</plugin>
 		</plugins>
 	</build>

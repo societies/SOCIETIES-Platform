@@ -46,9 +46,9 @@ public class DeviceStatusTest extends AndroidTestCase {
 
 	@Override
 	protected void tearDown() throws Exception {
+		deviceStatus = null;
 		// Must be last statement in method
 		super.tearDown();
-		deviceStatus = null;
 	}
 
 	/**
