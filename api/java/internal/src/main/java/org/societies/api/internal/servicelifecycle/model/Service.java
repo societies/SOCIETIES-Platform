@@ -31,38 +31,50 @@ package org.societies.api.internal.servicelifecycle.model;
  * @version 1.0
  * @created 21-dic-2011 17.18.32
  */
-
+@XmlRootElement(
+        name="ServiceMetadata",
+        namespace="http://societies.org/service/model")
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType
 public class Service {
 
 	/**
 	 * Unique identifier for a single instance of a service.
 	 */
+	@XmlElement(namespace="http://societies.org/service/model")
 	private ServiceResourceIdentifier serviceIdentifier;
 
 	/**
 	 * It represents the CSS Id where the service is physically installed.
 	 */
+	@XmlElement(namespace="http://societies.org/service/model")
 	private String CSSIDInstalled;
 	/**
 	 * The version of the service, it must be updated by developer
 	 */
+	@XmlElement(namespace="http://societies.org/service/model")
 	private String version;
 
 	/**
 	 * An alias name for the service
 	 */
+	@XmlElement(namespace="http://societies.org/service/model")
 	private String serviceName;
 	/**
 	 * A "long" description of the service
 	 */
+	@XmlElement(namespace="http://societies.org/service/model")
 	private String serviceDescription;
 	/**
 	 * The signature of the author
 	 */
+	@XmlElement(namespace="http://societies.org/service/model")
 	private String authorSignature;
 
+	@XmlElement(namespace="http://societies.org/service/model")
 	private ServiceType serviceType;
 	
+	@XmlElement(namespace="http://societies.org/service/model")
 	private ServiceLocation serviceLocation;
 	
 	/**
