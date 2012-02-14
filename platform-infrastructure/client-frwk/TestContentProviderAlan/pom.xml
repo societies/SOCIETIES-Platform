@@ -10,8 +10,8 @@
    </parent>
 
    <groupId>org.societies.android.platform</groupId>
-   <artifactId>TestContentProvider1</artifactId>
-   <name>TestContentProvider1</name>
+   <artifactId>TestContentProviderAlan</artifactId>
+   <name>TestContentProviderAlan</name>
    <version>${release.version}</version>
    <packaging>apk</packaging>
 
@@ -32,19 +32,11 @@
             <groupId>android</groupId>
             <artifactId>android</artifactId>
         </dependency>
-         <dependency>
-          	<groupId>org.societies.android.platform</groupId>
-  			<artifactId>CoreInterfaces</artifactId>
-  			<version>${release.version}</version>
-  			<scope>compile</scope>
+        <dependency>
+   			<groupId>org.societies.android.platform</groupId>
+   			<artifactId>contentprovider</artifactId>
+   			<version>${release.version}</version>
         </dependency>
-          <dependency>
-          	<groupId>org.societies.android.platform</groupId>
-  			<artifactId>contentprovider</artifactId>
-  			<version>${release.version}</version>
- 
-        </dependency>
-        
         
     </dependencies>
 
