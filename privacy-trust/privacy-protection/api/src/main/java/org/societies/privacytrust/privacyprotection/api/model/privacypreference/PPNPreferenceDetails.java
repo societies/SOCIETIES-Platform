@@ -26,16 +26,17 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 
 import java.io.Serializable;
 
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+
 
 public class PPNPreferenceDetails implements Serializable{
 
 	private String contextType;
 	private CtxAttributeIdentifier affectedCtxID;
-	private EntityIdentifier requestorDPI;
-	private ServiceResourceIdentifier serviceID;
+	private Identity requestorDPI;
+	private IServiceResourceIdentifier serviceID;
 	public PPNPreferenceDetails(String contextType){
 		this.setContextType(contextType);
 	}
@@ -48,11 +49,11 @@ public class PPNPreferenceDetails implements Serializable{
 		return affectedCtxID;
 	}
 
-	public void setRequestorDPI(EntityIdentifier requestorDPI) {
+	public void setRequestorDPI(Identity requestorDPI) {
 		this.requestorDPI = requestorDPI;
 	}
 
-	public EntityIdentifier getRequestorDPI() {
+	public Identity getRequestorDPI() {
 		return requestorDPI;
 	}
 
@@ -64,7 +65,7 @@ public class PPNPreferenceDetails implements Serializable{
 		return contextType;
 	}
 	
-	private boolean compareRequestorDPIs(EntityIdentifier dpi){
+	private boolean compareRequestorDPIs(Identity dpi){
 		if (dpi==null){
 			if (this.requestorDPI==null){
 				return true;
@@ -75,7 +76,7 @@ public class PPNPreferenceDetails implements Serializable{
 			if (this.requestorDPI==null){
 				return false;
 			}else{
-				if (dpi.toUriString().equals(requestorDPI.toUriString())){
+				if (dpi.toString().equals(requestorDPI.toString())){
 					return true;
 				}else{
 					return false;
@@ -84,7 +85,7 @@ public class PPNPreferenceDetails implements Serializable{
 		}
 	}
 	
-	private boolean compareServiceID(ServiceResourceIdentifier serviceID2){
+	private boolean compareServiceID(IServiceResourceIdentifier serviceID2){
 		if (serviceID2==null){
 			if (this.serviceID == null){
 				return true;
@@ -95,7 +96,7 @@ public class PPNPreferenceDetails implements Serializable{
 			if (serviceID2==null){
 				return false;
 			}else{
-				if (serviceID2.toUriString().equalsIgnoreCase(this.serviceID.toUriString())){
+				if (serviceID2.toString().equalsIgnoreCase(this.serviceID.toString())){
 					return true;
 				}else{
 					return false;
@@ -114,7 +115,7 @@ public class PPNPreferenceDetails implements Serializable{
 			if (this.affectedCtxID==null){
 				return false;
 			}else{
-				if (ctxID.toUriString().equals(this.affectedCtxID.toUriString())){
+				if (ctxID.toString().equals(this.affectedCtxID.toString())){
 					return true;
 				}else{
 					return false;
@@ -148,21 +149,21 @@ public class PPNPreferenceDetails implements Serializable{
 		String str = "\n";
 		str = str.concat("Context Type: "+this.contextType);
 		if (this.affectedCtxID!=null){
-			str = str.concat("\nAffected CtxID: "+this.affectedCtxID.toUriString());
+			str = str.concat("\nAffected CtxID: "+this.affectedCtxID.toString());
 		}
 		
 		if (this.requestorDPI!=null){
-			str = str.concat("\nRequestor DPI: "+this.requestorDPI.toUriString());
+			str = str.concat("\nRequestor DPI: "+this.requestorDPI.toString());
 		}
 		str = str.concat("\n");
 		return str;
 	}
 
-	public void setServiceID(ServiceResourceIdentifier serviceID) {
+	public void setServiceID(IServiceResourceIdentifier serviceID) {
 		this.serviceID = serviceID;
 	}
 
-	public ServiceResourceIdentifier getServiceID() {
+	public IServiceResourceIdentifier getServiceID() {
 		return serviceID;
 	}
 	
