@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>ContentProvider</name>
+	<name>TestContentProvider1</name>
 	<comment></comment>
 	<projects>
+		<project>ContentProvider</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

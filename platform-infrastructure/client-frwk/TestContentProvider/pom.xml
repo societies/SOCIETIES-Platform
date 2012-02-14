@@ -7,24 +7,14 @@
         <artifactId>android-parent</artifactId>
         <version>0.1</version>
         <relativePath>../../../parent/android.xml</relativePath>
-		<!-- modify if project root directory different to other projects-->
    </parent>
 
    <groupId>org.societies.android.platform</groupId>
-   <artifactId>contentprovider</artifactId>
-   <!-- see Redmine wiki for componentname from project structure -->
-   <version>${release.version}</version> 
-   <!-- still being discussed -->
-   <name>Content Provider</name>
+   <artifactId>TestContentProvider</artifactId>
+   <name>TestContentProvider</name>
+   <version>${release.version}</version>
    <packaging>apk</packaging>
-   <developers>
-      <developer>
-		 <name>Luca</name>
-		<!-- Name of component author-->
-		 <email>luca.lamorte@telecomitalia.it</email>
-		<!-- Component author e-mail-->
-	  </developer>
-   </developers>
+
 
     <dependencies>
       <!-- Android target version 2 assumes that Android JAR is retrieved from remote repository -->
@@ -35,25 +25,65 @@
             <scope>provided</scope>
         </dependency-->
         <dependency>
+            <groupId>com.google.android</groupId>
+            <artifactId>android-test</artifactId>
+        </dependency>
+        <dependency>
             <groupId>android</groupId>
             <artifactId>android</artifactId>
         </dependency>
-        
         <dependency>
-        	<groupId>org.societies.android.platform</groupId>
-        	<artifactId>CoreInterfaces</artifactId>
-        	<version>${release.version}</version>
+			<groupId>org.societies.utilities</groupId>
+			<artifactId>DBC</artifactId>
+  			<version>${release.version}</version>
+  			<scope>compile</scope>
         </dependency>
-    
-        </dependencies>
+        <dependency>
+   			<groupId>org.societies.android.platform</groupId>
+   			<artifactId>contentprovider</artifactId>
+   			<version>${release.version}</version>
+        </dependency>
+         <dependency>
+          	<groupId>org.societies.android.platform</groupId>
+  			<artifactId>CoreInterfaces</artifactId>
+  			<version>${release.version}</version>
+  			<scope>compile</scope>
+        </dependency>
+          <dependency>
+          	<groupId>org.societies.android.platform</groupId>
+  			<artifactId>contentprovider</artifactId>
+  			<version>0.1</version>
+  			<scope>compile</scope>
+        </dependency>
+        
+        
+    </dependencies>
 
-    <build>
-        <finalName>${project.artifactId}</finalName>
-        <sourceDirectory>src</sourceDirectory>
+   <build>
+    <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                 <artifactId>android-maven-plugin</artifactId>
+                <configuration>
+                    <test>
+                        <!--<skip>true|false|auto</skip>-->
+                        <!--<instrumentationPackage>packageName</instrumentationPackage>-->
+                        <!--<instrumentationRunner>className</instrumentationRunner>-->
+                        <!--<debug>true|false</debug>-->
+                        <!--coverage>true</coverage-->
+                        <!--<logonly>true|false</logonly>  avd-->
+                        <!--<testsize>small|medium|large</testsize>-->
+                        <!--testSize>small</testSize-->
+                        <createReport>true</createReport>
+                       <!--classes>
+                            <class>org.societies.android.platform.servicemonitor.test.TestStartedService</class>
+                        </classes-->
+                        <!--<packages>-->
+                            <!--<package>your.package.name</package>-->
+                        <!--</packages>-->
+                    </test>
+                </configuration>
             </plugin>
         </plugins>
         <pluginManagement>
@@ -91,5 +121,5 @@
         		</plugin>
         	</plugins>
         </pluginManagement>
-    </build>
+   </build>
 </project>
