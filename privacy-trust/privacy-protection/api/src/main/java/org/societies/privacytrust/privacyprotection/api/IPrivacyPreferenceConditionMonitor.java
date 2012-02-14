@@ -25,7 +25,7 @@
 package org.societies.privacytrust.privacyprotection.api;
 
 import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.privacytrust.privacyprotection.mock.ICtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 
 /**
  * @author Eliza
@@ -39,6 +39,6 @@ public interface IPrivacyPreferenceConditionMonitor {
 	 * @param contextId
 	 * @param userIdentity
 	 */
-	public void contextEventReceived(ICtxAttributeIdentifier contextId, Identity userIdentity);
+	public void contextEventReceived(CtxAttributeIdentifier contextId, Identity userIdentity);
 
 }

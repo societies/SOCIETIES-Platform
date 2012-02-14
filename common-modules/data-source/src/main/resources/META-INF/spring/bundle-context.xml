@@ -36,7 +36,7 @@
 		<property name="locations">
 			<list>
 				<!-- local testing -->
-				<value>classpath:META-INF/spring/mysql_database.properties</value>
+				<value>classpath:META-INF/spring/derby_database.properties</value>
 				<!-- final deployment into server --> 
 				<value>file:${VIRGO_HOME}\config\org.societies.platform.properties</value>
 			</list>
