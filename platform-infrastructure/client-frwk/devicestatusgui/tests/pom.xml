@@ -46,16 +46,21 @@
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
+				<extensions>true</extensions>
+			</plugin>
+		<!-- 	<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
 				<configuration>
 					<test>
-						<!-- Run test with flag "-w coverage true" this is need for generate 
-							coverage.ec file, result file -->
+						Run test with flag "-w coverage true" this is need for generate 
+							coverage.ec file, result file
 						<coverage>true</coverage>
 						<createReport>true</createReport>
 					</test>
 				</configuration>
 				<extensions>true</extensions>
-				<!-- need for pull coverage.ec file and move to tested project -->
+				need for pull coverage.ec file and move to tested project
 				<executions>
 					<execution>
 						<id>pull-coverage</id>
@@ -82,21 +87,21 @@
 						</goals>
 						<configuration>
 							<files>
-								<!-- read project properties ( can be build.properties or default.properties 
+								read project properties ( can be build.properties or default.properties 
 									Most important property is tested.project.dir - should be path to project 
-									which we want measure coverage -->
+									which we want measure coverage
 								<file>project.properties</file>
 							</files>
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin> -->
 		</plugins>
 	</build>
-	<reporting>
+	<!-- <reporting>
 		<plugins>
 			<plugin>
-				<!-- Plugin for generate report -->
+				Plugin for generate report
 				<groupId>org.sonatype.maven.plugin</groupId>
 				<artifactId>emma4it-maven-plugin</artifactId>
 				<version>1.3</version>
@@ -109,5 +114,5 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</reporting>
+	</reporting> -->
 </project>
