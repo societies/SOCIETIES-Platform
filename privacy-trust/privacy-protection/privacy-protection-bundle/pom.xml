@@ -55,12 +55,12 @@
 			<timezone>+0</timezone>
 		</developer>
 	</developers>
-
+	
 	<parent>
 		<groupId>org.societies</groupId>
-		<artifactId>privacytrust</artifactId>
-		<relativePath>../../project.xml</relativePath>
-		<version>1</version>
+		<artifactId>spring-osgi-parent</artifactId>
+		<relativePath>../../parent/spring-osgi.xml</relativePath>
+		<version>0.1</version>
 	</parent>
 
 	<dependencies>
