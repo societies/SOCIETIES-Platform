@@ -5,7 +5,7 @@
 	<!-- The Basics -->
 	<groupId>org.societies.privacytrust</groupId>
 	<artifactId>trust</artifactId>
-	<version>${release.version}.1-SNAPSHOT</version>
+	<version>${version.pt}</version>
 	<packaging>bundle</packaging>
 	<dependencies>
 		<dependency>
@@ -23,7 +23,8 @@
 	</dependencies>
 	<parent>
 		<groupId>org.societies</groupId>
-		<artifactId>version-parent</artifactId>
+		<artifactId>spring-osgi-parent</artifactId>
+		<relativePath>../../parent/spring-osgi.xml</relativePath>
 		<version>0.1</version>
 	</parent>
 	
@@ -34,10 +35,10 @@
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
-				<configuration>
+				<!-- <configuration>
 					<instructions>									
-					</instructions>
-				</configuration>
+					</instructions> 
+				</configuration> -->
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -51,8 +52,8 @@
 						<artifactItem>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>${project.artifactId}</artifactId>
-							<version>${release.version}.1-SNAPSHOT</version>
-							<type>bundle</type>
+							<version>${version.pt}</version>
+							<type>jar</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</artifactItem>
