@@ -28,10 +28,10 @@ import java.io.Serializable;
 
 import javax.swing.tree.DefaultTreeModel;
 
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
 /**
  * This class represents a tree model for Privacy Policy Negotiation Preferences and encapsulates a tree of IPrivacyPreference objects.
@@ -43,8 +43,8 @@ public class PPNPrivacyPreferenceTreeModel extends DefaultTreeModel implements I
 	
 	private CtxAttributeIdentifier affectedCtxId;
 	private String myContextType;
-	private EntityIdentifier providerDPI;
-	private ServiceResourceIdentifier serviceID;
+	private Identity providerDPI;
+	private IServiceResourceIdentifier serviceID;
 	private PrivacyPreferenceTypeConstants myPrivacyType;
 	private IPrivacyPreference pref;
 	
@@ -84,19 +84,19 @@ public class PPNPrivacyPreferenceTreeModel extends DefaultTreeModel implements I
 		return affectedCtxId;
 	}
 
-	public void setProviderDPI(EntityIdentifier providerDPI) {
+	public void setProviderDPI(Identity providerDPI) {
 		this.providerDPI = providerDPI;
 	}
 
-	public EntityIdentifier getProviderDPI() {
+	public Identity getProviderDPI() {
 		return providerDPI;
 	}
 
-	public void setServiceID(ServiceResourceIdentifier serviceID) {
+	public void setServiceID(IServiceResourceIdentifier serviceID) {
 		this.serviceID = serviceID;
 	}
 
-	public ServiceResourceIdentifier getServiceID() {
+	public IServiceResourceIdentifier getServiceID() {
 		return serviceID;
 	}
 
