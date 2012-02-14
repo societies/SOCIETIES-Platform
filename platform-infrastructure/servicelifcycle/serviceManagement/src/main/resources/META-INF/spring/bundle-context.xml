@@ -22,10 +22,10 @@
 	</bean>
 		
 	<bean id="jaxbMarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
-		 <property name="classesToBeBound">
+		 <property name="classesToBeBound" >
             <list>
                 <value>org.societies.api.internal.servicelifecycle.model.Service</value>
-                <value>org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier</value>                
+                <value>org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier</value>                            
             </list>
         </property>
         <property name="schema" value="classpath:schema1.xsd"/>  
