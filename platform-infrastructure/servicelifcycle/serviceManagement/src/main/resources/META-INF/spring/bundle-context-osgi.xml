@@ -12,7 +12,6 @@
        testing of the bundle outside of an OSGi container -->
  
 <osgi:service ref="serviceMgmt" interface="org.societies.api.internal.servicelifecycle.serviceMgmt.IServiceManagement"/>
-<!-- 
 <osgi:reference id="serviceReg" interface="org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry"/>
- -->
+
 </beans>
