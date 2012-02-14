@@ -22,32 +22,30 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
+package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
+import java.io.Serializable;
+import java.util.Enumeration;
 
-import java.util.List;
-
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-
-public interface IAgreement {
-	
-	
-	public List<RequestItem> getRequestedItems();
-	
-	public IServiceResourceIdentifier getServiceIdentifier();
-	
-	public void setServiceIdentifier(IServiceResourceIdentifier serviceId);
-	
-	public EntityIdentifier getServiceDPI();
-	
-	public void setServiceDPI(EntityIdentifier serviceDPI);
-	
-	public EntityIdentifier getUserDPI();
-	
-	public void setUserDPI(EntityIdentifier userDPI);
-	
-	public EntityIdentifier getUserPublicDPI();
-	
-	public void setUserPublicDPI(EntityIdentifier userPublicDPI);
+import javax.swing.tree.MutableTreeNode;
+/**
+ * @author Elizabeth
+ *
+ */
+public interface IPrivacyPreference extends MutableTreeNode, Serializable{
+	public IPrivacyPreferenceCondition getCondition();
+	public IPrivacyOutcome getOutcome();
+	public boolean isLeaf();
+	public boolean isBranch();
+	public Object[] getUserObjectPath();
+	public Object getUserObject();
+	public void add(IPrivacyPreference p);
+	public void remove(IPrivacyPreference p);
+	public Enumeration<IPrivacyPreference> depthFirstEnumeration();
+	public Enumeration<IPrivacyPreference> breadthFirstEnumeration();
+	public Enumeration<IPrivacyPreference> postorderEnumeration();
+	public Enumeration<IPrivacyPreference> preorderEnumeration();
+	public IPrivacyPreference getRoot();
+	public int getLevel();
+	public int getDepth();
 }

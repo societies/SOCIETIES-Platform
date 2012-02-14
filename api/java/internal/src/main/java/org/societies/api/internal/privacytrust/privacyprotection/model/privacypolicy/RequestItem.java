@@ -25,13 +25,10 @@
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
 
 
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.Action;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.Condition;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.Resource;
 
 /**
  * The RequestItem class is used to represent a request to access a specific piece of personal data. 

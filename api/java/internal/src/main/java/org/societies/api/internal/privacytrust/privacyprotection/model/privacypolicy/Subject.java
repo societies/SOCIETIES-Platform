@@ -22,81 +22,90 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference;
+package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
+
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.TargetMatchConstants;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 
 /**
- * The RuleTarget is an XACML defined tag and encapsulates a Resource, a list of Actions and a list of Conditions. 
- * The RuleTarget defines the type of resource the rule applies to using the Resource class, the list of operations 
- * that can be performed on the Resource using the Action class and the list of conditions that should be met if 
- * access to the resources is to be allowed using the Condition class.  
+ * The Subject class embeds the identity of the provider CSS. 
  * @author Elizabeth
  *
  */
-public class RuleTarget implements Serializable{
-	private List<Subject> subjects;
-	private Resource resource;
-	private List<Action> actions;
-	
-	private RuleTarget(){
-		this.subjects = new ArrayList<Subject>();
-		this.actions = new ArrayList<Action>();
-	}
-	public RuleTarget(List<Subject> subjects, Resource resource, List<Action> actions){
-		this.subjects = subjects;
-		this.resource = resource;
-		this.actions = actions;
-	}
-	
-	public Resource getResource(){
-		return this.resource;
+public class Subject implements Serializable{
+
+	private EntityIdentifier dpi;
+	private IServiceResourceIdentifier serviceID;
+
+	public Subject(){
 		
 	}
-	
-	public List<Subject> getSubjects(){
-		return this.subjects;
+	public Subject(EntityIdentifier dpi){
+		this.dpi = dpi;
+	}
+
+	public Subject(EntityIdentifier dpi, IServiceResourceIdentifier serviceID){
+		this.dpi = dpi;
+		this.serviceID = serviceID;
+	}
+
+
+	public TargetMatchConstants getType(){
+		return TargetMatchConstants.SUBJECT;
+	}
+
+	public String toXMLString(){
+		String str = "\n<Subject>";
+		if (this.dpi!=null){
+			str = str.concat(this.dpiToXMLString());
+		}
+		if (this.serviceID!=null){
+			str = str.concat(this.serviceIDToXMLString());
+		}
+		str = str.concat("\n</Subject>");
+		return str;
+	}
+
+	private String dpiToXMLString(){
+		String str = "";
+		str = str.concat("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:subject-id\"" +
+		"\n \t\t\tDataType=\"org.personalsmartspace.sre.api.pss3p.EntityIdentifier\">");
+
+		str = str.concat("\n\t\t<AttributeValue>");
+		str = str.concat(this.dpi.toUriString());
+		str = str.concat("</AttributeValue>");
+
+		str = str.concat("\n\t</Attribute>");
+		return str;
 	}
 	
-	public List<Action> getActions(){
-		return this.actions;
+	private String serviceIDToXMLString(){
+		String str = "";
+		str = str.concat("\n\t<Attribute AttributeId=\"serviceID\"" +
+				"\n\t\t\tDataType=\"org.personalsmartspace.sre.api.pss3p.IServiceResourceIdentifier\">");
+		str = str.concat("\n\t\t<AttributeValue>");
+		str = str.concat(this.serviceID.toString());
+		str = str.concat("</AttributeValue>");
+		str = str.concat("\n\t</Attribute>");
+		return str;
+		
 	}
-	
-	public void addSubject(Subject subject){
-		if (null==this.subjects){
-			this.subjects = new ArrayList<Subject>();
-		}
-		if (!this.subjects.contains(subject)){
-			this.subjects.add(subject);
-		}
-	
-	}
-	
-	public void addAction(Action a){
-		if (null==this.actions){
-			this.actions = new ArrayList<Action>();
-		}
-		if (!this.actions.contains(a)){
-			this.actions.add(a);
-		}
-	}
-	
 	public String toString(){
-		String print = "RuleTarget:\n";
-		print = print.concat("\tSubjects\n");
-		for (Subject s : subjects){
-			print = print.concat("\t\t"+s.toString()+"\n");
-		}
-		
-		print = print.concat("Resource:\n");
-		print = print.concat(this.resource.toString());
-		print = print.concat("Actions:\n");
-		for (Action a : actions){
-			print = print.concat("\t\t"+a.toString()+"\n");
-		}
-		return print;
+		return this.toXMLString();
 	}
+	
+	public EntityIdentifier getDPI(){
+		return this.dpi;
+	}
+	
+	public IServiceResourceIdentifier getServiceID(){
+		return this.serviceID;
+	}
+	
+
 }

@@ -22,32 +22,29 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
-
+package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
 import java.util.List;
 
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
-public interface IAgreement {
-	
-	
-	public List<RequestItem> getRequestedItems();
-	
-	public IServiceResourceIdentifier getServiceIdentifier();
-	
-	public void setServiceIdentifier(IServiceResourceIdentifier serviceId);
-	
-	public EntityIdentifier getServiceDPI();
-	
-	public void setServiceDPI(EntityIdentifier serviceDPI);
-	
-	public EntityIdentifier getUserDPI();
-	
-	public void setUserDPI(EntityIdentifier userDPI);
-	
-	public EntityIdentifier getUserPublicDPI();
-	
-	public void setUserPublicDPI(EntityIdentifier userPublicDPI);
+/**
+ * This interface is used to represent an identity selection decision made by the
+ * user and is used by the Privacy PreferenceLearning component.
+ * @author Eliza
+ * @version 1.0
+ * @created 11-Nov-2011 17:06:55
+ */
+public interface IIDSAction {
+
+	public List<CtxAttribute> getContext();
+
+	public EntityIdentifier getSelectedIdentity();
+
+	public ServiceResourceIdentifier getServiceIdentifier();
+
+	public EntityIdentifier getServiceIdentity();
+
 }

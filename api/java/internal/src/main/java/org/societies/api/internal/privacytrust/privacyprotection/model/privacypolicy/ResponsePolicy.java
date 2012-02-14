@@ -29,8 +29,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.Subject;
-
 
 /**
  * The ResponsePolicy class represents the response of the user to a requestPolicy of a service provider. 

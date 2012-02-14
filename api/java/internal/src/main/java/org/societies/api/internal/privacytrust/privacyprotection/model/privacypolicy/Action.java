@@ -22,92 +22,74 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference;
+package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
 
+
+
+import java.io.IOException;
 import java.io.Serializable;
 
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.TargetMatchConstants;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.TargetMatchConstants;
+
+
 /**
- * the Resource class is used to represent  a piece of data type belonging to the user 
- * (i.e context data, preference data, profile data). It contains the id of the data and the type of data. 
+ * The Action class represents an operation that can be performed on a Resource. 
+ * The Action can be "READ", "WRITE", "CREATE", "DELETE" as listed in the ActionConstants enumeration. 
  * @author Elizabeth
  *
  */
-public class Resource implements Serializable{
+public class Action implements Serializable{
 
-	private CtxAttributeIdentifier ctxIdentifier;
-	private String contextType;
+	private ActionConstants action;
+	private boolean optional;
 	
-	private Resource(){
+	private Action(){
 		
 	}
-	public Resource(CtxAttributeIdentifier ctxId){
-		this.ctxIdentifier = ctxId;
-		this.contextType = ctxId.getType();
+	public Action(ActionConstants action){
+		this.action = action;
+		this.optional = false;
 	}
 	
-	public Resource(String type){
-		this.contextType = type;
+	public Action(ActionConstants action, boolean isOptional){
+		this.action = action;
+		this.optional = isOptional;
+	}
+	
+	public void setOptional(boolean isOptional){
+		this.optional = isOptional;
+	}
+	public boolean isOptional(){
+		return this.optional;
+	}
+	public ActionConstants getActionType(){
+		return this.action;
 	}
 	public TargetMatchConstants getType(){
-		return TargetMatchConstants.RESOURCE;
-	}
-	
-	public String getContextType(){
-		return this.contextType;
-	}
-	
-	public CtxAttributeIdentifier getCtxIdentifier(){
-		return this.ctxIdentifier;
-	}
-	
-	public void stripIdentifier(){
-		this.ctxIdentifier = null;
-	}
-	
-	public void setPublicCtxIdentifier(CtxAttributeIdentifier ctxId){
-		this.ctxIdentifier = ctxId;
+		return TargetMatchConstants.ACTION;
 	}
 	
 	public String toXMLString(){
-		String str = "\n<Resource>";
-		if (this.ctxIdentifier!=null){
-			str = str.concat(this.ctxIDToXMLString());
-		}
-		if (this.contextType!=null){
-			str = str.concat(this.ctxTypeToXMLString());
-		}
-		str = str.concat("\n</Resource>");
-		return str;
-	}
-	
-	private String ctxIDToXMLString(){
-		String str = "";
-		str = str.concat("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:resource-id\"" +
-		"\n \t\t\tDataType=\"org.personalsmartspace.cm.model.api.pss3p.ICtxAttributeIdentifier\">");
-
+		String str = "\n<Action>";
+		str = str.concat("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" " +
+				"\n\t\t\tDataType=\"org.personalsmartspace.spm.preference.api.platform.constants.ActionConstants\">");
 		str = str.concat("\n\t\t<AttributeValue>");
-		str = str.concat(this.ctxIdentifier.toUriString());
-		str = str.concat("</AttributeValue>");
-
-		str = str.concat("\n\t</Attribute>");
-		return str;
-	}
-	
-	private String ctxTypeToXMLString(){
-		String str = "";
-		str = str.concat("\n\t<Attribute AttributeId=\"contextType\"" +
-				"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
-		str = str.concat("\n\t\t<AttributeValue>");
-		str = str.concat(this.contextType);
+		str = str.concat(this.action.toString());
 		str = str.concat("</AttributeValue>");
 		str = str.concat("\n\t</Attribute>");
-		return str;	
-		}
-	
+		str = str.concat(this.printOptional());
+		str = str.concat("\n</Action>");
+		return str;
+	}
+	private String printOptional(){
+		return "\n<optional>"+this.optional+"</optional>";
+	}
 	public String toString(){
 		return this.toXMLString();
 	}
+	public static void main(String[] args) throws IOException{
+		Action action = new Action(ActionConstants.READ);
+		System.out.println(action.toXMLString());
+	}
 }
-

@@ -24,62 +24,90 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
 
-
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.TargetMatchConstants;
 /**
- * This class represents the Request Policy of the Provider and lists the context types it is requesting access to, the Actions it is going to perform 
- * to these items and its own terms and conditions that define what happens to the data after disclosure
- * . 
+ * the Resource class is used to represent  a piece of data type belonging to the user 
+ * (i.e context data, preference data, profile data). It contains the id of the data and the type of data. 
  * @author Elizabeth
  *
  */
-public class RequestPolicy implements Serializable{
+public class Resource implements Serializable{
 
-	private Subject requestor;
-	private List<RequestItem> requests;
-
-	private RequestPolicy(){
-		this.requests = new ArrayList<RequestItem>();
+	private CtxAttributeIdentifier ctxIdentifier;
+	private String contextType;
+	
+	private Resource(){
+		
 	}
-
-	public RequestPolicy(List<RequestItem> requests){
-		this.requests = requests;
+	public Resource(CtxAttributeIdentifier ctxId){
+		this.ctxIdentifier = ctxId;
+		this.contextType = ctxId.getType();
 	}
-	public RequestPolicy(Subject sub, List<RequestItem> requests) {
-		this.requestor = sub;
-		this.requests = requests;
+	
+	public Resource(String type){
+		this.contextType = type;
 	}
-
-	public List<RequestItem> getRequests(){
-		return this.requests;
+	public TargetMatchConstants getType(){
+		return TargetMatchConstants.RESOURCE;
 	}
-
-	public Subject getRequestor(){
-		return this.requestor;
+	
+	public String getContextType(){
+		return this.contextType;
 	}
-
-	public void setRequestor(Subject subject){
-		this.requestor = subject;
+	
+	public CtxAttributeIdentifier getCtxIdentifier(){
+		return this.ctxIdentifier;
 	}
+	
+	public void stripIdentifier(){
+		this.ctxIdentifier = null;
+	}
+	
+	public void setPublicCtxIdentifier(CtxAttributeIdentifier ctxId){
+		this.ctxIdentifier = ctxId;
+	}
+	
 	public String toXMLString(){
-		String str = "<RequestPolicy>";
-		if (this.hasRequestor()){
-			str = str.concat(this.requestor.toXMLString());
+		String str = "\n<Resource>";
+		if (this.ctxIdentifier!=null){
+			str = str.concat(this.ctxIDToXMLString());
 		}
-		for (RequestItem item : requests){
-			str = str.concat(item.toXMLString());
+		if (this.contextType!=null){
+			str = str.concat(this.ctxTypeToXMLString());
 		}
-		str = str.concat("</RequestPolicy>");
+		str = str.concat("\n</Resource>");
 		return str;
 	}
+	
+	private String ctxIDToXMLString(){
+		String str = "";
+		str = str.concat("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:resource-id\"" +
+		"\n \t\t\tDataType=\"org.personalsmartspace.cm.model.api.pss3p.ICtxAttributeIdentifier\">");
 
-	public boolean hasRequestor(){
-		return (this.requestor!=null);
+		str = str.concat("\n\t\t<AttributeValue>");
+		str = str.concat(this.ctxIdentifier.toUriString());
+		str = str.concat("</AttributeValue>");
+
+		str = str.concat("\n\t</Attribute>");
+		return str;
 	}
+	
+	private String ctxTypeToXMLString(){
+		String str = "";
+		str = str.concat("\n\t<Attribute AttributeId=\"contextType\"" +
+				"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
+		str = str.concat("\n\t\t<AttributeValue>");
+		str = str.concat(this.contextType);
+		str = str.concat("</AttributeValue>");
+		str = str.concat("\n\t</Attribute>");
+		return str;	
+		}
+	
 	public String toString(){
 		return this.toXMLString();
 	}
 }
+
