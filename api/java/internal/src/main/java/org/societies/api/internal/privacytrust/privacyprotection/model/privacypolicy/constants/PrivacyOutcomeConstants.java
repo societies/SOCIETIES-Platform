@@ -22,32 +22,23 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
+package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants;
+
+/**
+ * @author Elizabeth
+ *
+ */
+public enum PrivacyOutcomeConstants {
+	
+	ALLOW(1), BLOCK(0);
+	
+	private int decision;
+	PrivacyOutcomeConstants(int i){
+		this.decision = i;
+	}
 
 
-import java.util.List;
-
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-
-public interface IAgreement {
-	
-	
-	public List<RequestItem> getRequestedItems();
-	
-	public IServiceResourceIdentifier getServiceIdentifier();
-	
-	public void setServiceIdentifier(IServiceResourceIdentifier serviceId);
-	
-	public EntityIdentifier getServiceDPI();
-	
-	public void setServiceDPI(EntityIdentifier serviceDPI);
-	
-	public EntityIdentifier getUserDPI();
-	
-	public void setUserDPI(EntityIdentifier userDPI);
-	
-	public EntityIdentifier getUserPublicDPI();
-	
-	public void setUserPublicDPI(EntityIdentifier userPublicDPI);
+	public int getInt(){
+		return this.decision;
+	}
 }

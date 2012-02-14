@@ -22,64 +22,84 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
-
+package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+
+import javax.swing.tree.DefaultTreeModel;
+
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
+
+
 
 /**
- * This class represents the Request Policy of the Provider and lists the context types it is requesting access to, the Actions it is going to perform 
- * to these items and its own terms and conditions that define what happens to the data after disclosure
- * . 
- * @author Elizabeth
- *
+ * This class represents a tree model for Data Obfuscation Preferences and
+ * encapsulates a tree of DObfPreference objects.
+ * @author Eliza
+ * @version 1.0
+ * @created 11-Nov-2011 17:06:54
  */
-public class RequestPolicy implements Serializable{
-
-	private Subject requestor;
-	private List<RequestItem> requests;
-
-	private RequestPolicy(){
-		this.requests = new ArrayList<RequestItem>();
+public class DObfPreferenceTreeModel extends DefaultTreeModel implements IPrivacyPreferenceTreeModel, Serializable{
+	private CtxAttributeIdentifier affectedCtxId;
+	private String myContextType;
+	private EntityIdentifier providerDPI;
+	private ServiceResourceIdentifier serviceID;
+	private PrivacyPreferenceTypeConstants myPrivacyType;
+	private IPrivacyPreference pref;
+	
+	public DObfPreferenceTreeModel(String myCtxType, IPrivacyPreference preference){
+		super(preference);
+		this.myContextType = myCtxType;
+		this.myPrivacyType = PrivacyPreferenceTypeConstants.DOBF;
+		this.pref = preference;
+	}
+	
+	public CtxAttributeIdentifier getAffectedContextIdentifier() {
+		return this.getAffectedCtxId();
 	}
 
-	public RequestPolicy(List<RequestItem> requests){
-		this.requests = requests;
-	}
-	public RequestPolicy(Subject sub, List<RequestItem> requests) {
-		this.requestor = sub;
-		this.requests = requests;
+	
+	public String getContextType() {
+		return this.myContextType;
 	}
 
-	public List<RequestItem> getRequests(){
-		return this.requests;
+
+	@Override
+	public PrivacyPreferenceTypeConstants getPrivacyType() {
+		return this.myPrivacyType;
 	}
 
-	public Subject getRequestor(){
-		return this.requestor;
+
+	@Override
+	public IPrivacyPreference getRootPreference() {
+		return this.pref;
 	}
 
-	public void setRequestor(Subject subject){
-		this.requestor = subject;
-	}
-	public String toXMLString(){
-		String str = "<RequestPolicy>";
-		if (this.hasRequestor()){
-			str = str.concat(this.requestor.toXMLString());
-		}
-		for (RequestItem item : requests){
-			str = str.concat(item.toXMLString());
-		}
-		str = str.concat("</RequestPolicy>");
-		return str;
+	public void setAffectedCtxId(CtxAttributeIdentifier affectedCtxId) {
+		this.affectedCtxId = affectedCtxId;
 	}
 
-	public boolean hasRequestor(){
-		return (this.requestor!=null);
+	public CtxAttributeIdentifier getAffectedCtxId() {
+		return affectedCtxId;
 	}
-	public String toString(){
-		return this.toXMLString();
+
+	public void setProviderDPI(EntityIdentifier providerDPI) {
+		this.providerDPI = providerDPI;
 	}
+
+	public EntityIdentifier getProviderDPI() {
+		return providerDPI;
+	}
+
+	public void setServiceID(ServiceResourceIdentifier serviceID) {
+		this.serviceID = serviceID;
+	}
+
+	public ServiceResourceIdentifier getServiceID() {
+		return serviceID;
+	}
+
 }

@@ -22,70 +22,85 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference;
+package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
+import java.io.Serializable;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Subject;
+import javax.swing.tree.DefaultTreeModel;
+
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-
-
+import org.societies.api.mock.ServiceResourceIdentifier;
 
 /**
- * This class is used to define that a CSS identity should be used in a specific transaction if the preceding IPrivacyPreferenceConditions are true. 
- * The format of the identity will be defined by the Identity Management component
+ * This class is used to represent a privacy preference for identity selection. This class represents a node in a tree. 
+ * If the node is a branch, then the embedded object of the node is a condition (IPrivacyPreferenceCondition), otherwise, 
+ * if it's a leaf, the embedded object is an IdentitySelectionPreferenceOutcome.
  * @author Elizabeth
  *
  */
-public class IdentitySelectionPreferenceOutcome implements IPrivacyOutcome{
+public class IDSPrivacyPreferenceTreeModel extends DefaultTreeModel implements IPrivacyPreferenceTreeModel, Serializable {
 
-	private int confidenceLevel;
-	private EntityIdentifier dpi;
-	private IServiceResourceIdentifier serviceID;
-	private Subject requestor;
+	
+	private EntityIdentifier affectedDPI;
+	private EntityIdentifier serviceDPI;
+	private ServiceResourceIdentifier serviceID;
+	private PrivacyPreferenceTypeConstants myPrivacyType;
+	private IPrivacyPreference pref;
+	
+	public IDSPrivacyPreferenceTreeModel(EntityIdentifier affectedDPI,  IPrivacyPreference preference){
+		super(preference);
+		this.setAffectedDPI(affectedDPI);
+		this.myPrivacyType = PrivacyPreferenceTypeConstants.IDS;
+		this.pref = preference;
+	}
+
+
 	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.preference.api.platform.IPrivacyOutcome#getOutcomeType()
+	 * @see org.personalsmartspace.spm.preference.api.platform.IPrivacyPreferenceTreeModel#getPrivacyType()
 	 */
 	@Override
-	public PrivacyPreferenceTypeConstants getOutcomeType() {
-		return PrivacyPreferenceTypeConstants.IDS;
+	public PrivacyPreferenceTypeConstants getPrivacyType() {
+		return this.getPrivacyType();
 	}
+
 	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.preference.api.platform.IPrivacyOutcome#getConfidenceLevel()
+	 * @see org.personalsmartspace.spm.preference.api.platform.IPrivacyPreferenceTreeModel#getRootPreference()
 	 */
 	@Override
-	public int getConfidenceLevel() {
-		return this.confidenceLevel;
+	public IPrivacyPreference getRootPreference() {
+		return this.pref;
 	}
-	
-	public void setConfidenceLevel(int c){
-		this.confidenceLevel = c;
+
+
+	public void setAffectedDPI(EntityIdentifier affectedDPI) {
+		this.affectedDPI = affectedDPI;
 	}
-	
-	public void setIdentity(EntityIdentifier dpi){
-		this.dpi = dpi;
+
+
+	public EntityIdentifier getAffectedDPI() {
+		return affectedDPI;
 	}
-	
-	public EntityIdentifier getIdentity(){
-		return this.dpi;
-	}
-	public void setServiceID(IServiceResourceIdentifier serviceID) {
+
+
+	public void setServiceID(ServiceResourceIdentifier serviceID) {
 		this.serviceID = serviceID;
 	}
-	public IServiceResourceIdentifier getServiceID() {
+
+
+	public ServiceResourceIdentifier getServiceID() {
 		return serviceID;
 	}
-	public void setRequestor(Subject requestor) {
-		this.requestor = requestor;
+
+
+	public void setServiceDPI(EntityIdentifier serviceDPI) {
+		this.serviceDPI = serviceDPI;
 	}
-	public Subject getRequestor() {
-		return requestor;
+
+
+	public EntityIdentifier getServiceDPI() {
+		return serviceDPI;
 	}
-	
-	public String toString(){
-		return "Select: "+this.dpi.toString();
-	}
-	
+
 }
 
