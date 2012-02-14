@@ -59,7 +59,7 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>privacytrust</artifactId>
-		<relativePath>../../project.xml</relativePath>
+		<relativePath>../../pom.xml</relativePath>
 		<version>1</version>
 	</parent>
 
