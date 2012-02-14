@@ -7,13 +7,13 @@
         <artifactId>android-parent</artifactId>
         <version>0.1</version>
         <relativePath>../../../parent/android.xml</relativePath>
-	<!-- modify if project root directory different to other projects-->
+		<!-- modify if project root directory different to other projects-->
    </parent>
 
    <groupId>org.societies.android.platform</groupId>
    <artifactId>contentprovider</artifactId>
    <!-- see Redmine wiki for componentname from project structure -->
-   <version>0.1</version> 
+   <version>${release.version}</version> 
    <!-- still being discussed -->
    <name>Content Provider</name>
    <packaging>apk</packaging>
@@ -44,11 +44,7 @@
         	<artifactId>CoreInterfaces</artifactId>
         	<version>${release.version}</version>
         </dependency>
-        <!-- <dependency>
-            <groupId>com.phonegap</groupId>
-            <artifactId>phonegap</artifactId>
-        </dependency>
-        --> 
+    
         </dependencies>
 
     <build>
@@ -60,5 +56,40 @@
                 <artifactId>android-maven-plugin</artifactId>
             </plugin>
         </plugins>
+        <pluginManagement>
+        	<plugins>
+        		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+        		<plugin>
+        			<groupId>org.eclipse.m2e</groupId>
+        			<artifactId>lifecycle-mapping</artifactId>
+        			<version>1.0.0</version>
+        			<configuration>
+        				<lifecycleMappingMetadata>
+        					<pluginExecutions>
+        						<pluginExecution>
+        							<pluginExecutionFilter>
+        								<groupId>
+        									com.jayway.maven.plugins.android.generation2
+        								</groupId>
+        								<artifactId>
+        									android-maven-plugin
+        								</artifactId>
+        								<versionRange>
+        									[3.0.0,)
+        								</versionRange>
+        								<goals>
+        									<goal>proguard</goal>
+        								</goals>
+        							</pluginExecutionFilter>
+        							<action>
+        								<ignore></ignore>
+        							</action>
+        						</pluginExecution>
+        					</pluginExecutions>
+        				</lifecycleMappingMetadata>
+        			</configuration>
+        		</plugin>
+        	</plugins>
+        </pluginManagement>
     </build>
 </project>

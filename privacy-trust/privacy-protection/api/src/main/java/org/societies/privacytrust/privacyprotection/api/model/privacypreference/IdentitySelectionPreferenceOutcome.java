@@ -25,10 +25,10 @@
 package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
 
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Subject;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
-import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
 
 
@@ -41,7 +41,7 @@ import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 public class IdentitySelectionPreferenceOutcome implements IPrivacyOutcome{
 
 	private int confidenceLevel;
-	private EntityIdentifier dpi;
+	private Identity dpi;
 	private IServiceResourceIdentifier serviceID;
 	private Subject requestor;
 	/* (non-Javadoc)
@@ -63,11 +63,11 @@ public class IdentitySelectionPreferenceOutcome implements IPrivacyOutcome{
 		this.confidenceLevel = c;
 	}
 	
-	public void setIdentity(EntityIdentifier dpi){
+	public void setIdentity(Identity dpi){
 		this.dpi = dpi;
 	}
 	
-	public EntityIdentifier getIdentity(){
+	public Identity getIdentity(){
 		return this.dpi;
 	}
 	public void setServiceID(IServiceResourceIdentifier serviceID) {

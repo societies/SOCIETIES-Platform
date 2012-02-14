@@ -4,8 +4,8 @@ import java.util.Dictionary;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.css.devicemgmt.devicemanager.IAction;
-import org.societies.css.devicemgmt.devicemanager.IDevice;
+import org.societies.api.css.devicemgmt.IAction;
+import org.societies.api.css.devicemgmt.IDevice;
 
 
 

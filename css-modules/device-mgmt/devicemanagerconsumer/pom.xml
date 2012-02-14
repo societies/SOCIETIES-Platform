@@ -21,16 +21,16 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.css.devicemgmt</groupId>
-			<artifactId>devicemanager</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<type>bundle</type>
-		</dependency>
-		<dependency>
    			<groupId>org.slf4j</groupId>
     		<artifactId>slf4j-simple</artifactId>
     		<version>${slf4j.version}</version>
     		<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	<build>
@@ -52,8 +52,8 @@
               				org.springframework.beans.propertyeditors,
               				org.springframework.osgi.service.importer,
               				org.springframework.osgi.service.exporter.support,
-              				org.societies.css.devicemgmt.devicemanager,
-							org.slf4j.*
+              				org.slf4j.*,
+              				org.societies.api.css.devicemgmt
               			</Import-Package>
               			<!-- <DynamicImport-Package>
               				org.societies.css.devicemgmt.devicemanager

@@ -30,9 +30,12 @@ import java.util.Map;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.societies.api.internal.css.devicemgmt.IDeviceManager;
+import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.societies.css.devicemgmt.DeviceDriverExample.ControllerWs;
-import org.societies.css.devicemgmt.devicemanager.DeviceCommonInfo;
-import org.societies.css.devicemgmt.devicemanager.IDeviceManager;
+
+
 import org.springframework.osgi.context.BundleContextAware;
 
 /**
@@ -128,7 +131,7 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 		// check if the device already exists in the container
 		if (getActionInstanceContainer().get(actionName) == null)
 		{
-			createNewDevice = deviceManager.fireNewDeviceConnected(deviceMacAddress, deviceCommonInfo);
+			createNewDevice =  deviceManager.fireNewDeviceConnected(deviceMacAddress, deviceCommonInfo);
 			
 			LOG.info("DeviceDriverExample: " + "*********************************** deviceManager.fireNewDeviceConnected");
 			
@@ -144,5 +147,4 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 		return "The action "+ actionName + " already exists";
 		
 	}
-
 }

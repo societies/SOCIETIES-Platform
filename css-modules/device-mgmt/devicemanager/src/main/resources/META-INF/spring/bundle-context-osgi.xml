@@ -13,7 +13,7 @@
        testing of the bundle outside of an OSGi container -->
        
        
-       <osgi:service ref="DeviceManager" interface="org.societies.css.devicemgmt.devicemanager.IDeviceManager" />	 
+       <osgi:service ref="DeviceManager" interface="org.societies.api.internal.css.devicemgmt.IDeviceManager" />	 
 
        
        
