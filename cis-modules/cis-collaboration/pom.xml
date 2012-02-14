@@ -1,13 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <!-- the CIS Collaboration needs still to be further developed -->
 
 
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.societies.cis</groupId>
   <artifactId>cis-collaboration</artifactId>
-	<version>${release.version}</version>
+	<version>${version.cis}</version>
 	<developers>
 			<developer>
 			<name>Babak Farshchian</name>
@@ -29,9 +30,9 @@
 	<dependencies>
 	<!-- add your dependencies here -->
   	<dependency>
-  		<groupId>org.societies.cis.management</groupId>
-  		<artifactId>cis-management</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<groupId>org.societies.cis</groupId>
+  		<artifactId>cis-manager</artifactId>
+  		<version>${version.cis}</version>
   	</dependency>
   
   <dependency>
@@ -71,7 +72,7 @@
 						<artifactItem>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>${project.artifactId}</artifactId>
-							<version>${release.version}</version>
+							<version>${version.cis}</version>
 							<type>bundle</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>

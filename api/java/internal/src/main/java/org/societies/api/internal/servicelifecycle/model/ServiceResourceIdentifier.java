@@ -15,7 +15,12 @@ import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 public class ServiceResourceIdentifier implements IServiceResourceIdentifier, Serializable {
 	
 	private URI identifier;
-	
+	/**
+	 * no- arg constructor is needed for xml to object mapping
+	 */
+	public ServiceResourceIdentifier() {
+		super();		
+	}
 	/**
 	 * @param identifier
 	 */

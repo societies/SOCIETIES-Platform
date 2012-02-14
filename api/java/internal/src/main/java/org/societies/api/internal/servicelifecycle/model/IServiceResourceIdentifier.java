@@ -22,7 +22,9 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.servicelifecycle.model;
+package org.societies.api.internal.servicelifecycle.model;
+
+import java.net.URI;
 
 /**
  * Describe your class here...
@@ -32,4 +34,21 @@ package org.societies.api.servicelifecycle.model;
  */
 public interface IServiceResourceIdentifier {
 
+	/**
+	 * 
+	 * @return the identifier for Service Instance
+	 */
+	public URI getIdentifier();
+	
+	/**
+	 * 
+	 * @param identifier for a Service Instance
+	 */
+	public void setIdentifier(URI identifier);
+	
+	/**
+	 * 
+	 * @return a string representation of the object.
+	 */
+	public String toString();
 }

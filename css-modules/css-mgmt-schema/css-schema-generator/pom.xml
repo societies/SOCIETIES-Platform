@@ -6,7 +6,7 @@
     <groupId>org.societies.css</groupId>
     <artifactId>CssManagerBean</artifactId>
     <packaging>jar</packaging>
-	<version>${release.version}</version>
+	<version>${version.css}</version>
 
   	<developers>
 	    <developer>
@@ -30,7 +30,7 @@
 	
 	<dependency>
 	  <groupId>org.societies.cis.management</groupId>
-	  <version>${release.version}</version>
+	  <version>${version.cis}</version>
   	  <artifactId>cis-manager</artifactId>
 	</dependency>
 	
@@ -90,7 +90,7 @@
 						<artifactItem>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>${project.artifactId}</artifactId>
-							<version>${release.version}</version>
+							<version>${version.css}</version>
 							<type>bundle</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>

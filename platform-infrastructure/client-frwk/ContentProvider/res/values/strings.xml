@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ContentProvider</string>
-	<string name="db_creation">
-			CREATE TABLE simple_storage (_id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT, value TEXT);
-			CREATE TABLE integer_storage (_id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT, value INTEGER);
-	</string>
+	<string name="autority">org.societies.android.platform.contentprovider</string>
 </resources>

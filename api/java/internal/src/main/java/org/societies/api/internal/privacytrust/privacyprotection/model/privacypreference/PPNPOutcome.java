@@ -29,15 +29,18 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyOutcomeConstants;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RuleTarget;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Subject;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
-
 
 /**
  * This class represents a Rule in XACML format. The PPNPOutcome class contains the following:
  * Effect : PrivacyOutcomeConstants (ALLOW, BLOCK)
  * RuleTarget: A target specifies:
- * 		the Subject: by IDigitalPersonalIdentifier and if applicable an IServiceIdentifier
+ * 		the Subject: by Identity and if applicable an IServiceResourceIdentifier
  * 		the Resource: by CtxAttributeIdentifier
  * 		the Action: READ,WRITE,CREATE,DELETE
  * Conditions: a list of conditions that have to be satisfied by the other party. These are processed during the negotiation phase 

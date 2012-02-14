@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:ns1="http://societies.org/service/model" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://societies.org/service/model" schemaLocation="schema1.xsd"/>
+
+  <xs:complexType name="serviceResourceIdentifier">
+    <xs:sequence>
+      <xs:element name="identifier" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="service">
+    <xs:sequence>
+      <xs:element ref="ns1:serviceIdentifier" minOccurs="0"/>
+      <xs:element ref="ns1:CSSIDInstalled" minOccurs="0"/>
+      <xs:element ref="ns1:version" minOccurs="0"/>
+      <xs:element ref="ns1:serviceName" minOccurs="0"/>
+      <xs:element ref="ns1:serviceDescription" minOccurs="0"/>
+      <xs:element ref="ns1:authorSignature" minOccurs="0"/>
+      <xs:element ref="ns1:serviceType" minOccurs="0"/>
+      <xs:element ref="ns1:serviceLocation" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="serviceLocation">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Local"/>
+      <xs:enumeration value="Remote"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="serviceType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ThirdPartyService"/>
+      <xs:enumeration value="CoreService"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+

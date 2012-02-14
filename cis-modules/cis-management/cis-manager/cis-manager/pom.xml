@@ -5,8 +5,8 @@
   <groupId>org.societies.cis</groupId>
   <artifactId>cis-manager</artifactId>
   <packaging>bundle</packaging>
-  <name>Spring OSGi Bundle</name>
-  <version>${release.version}</version>
+  <name>CIS Manager</name>
+  <version>${version.cis}</version>
   
 	<developers>
 	    <developer>
@@ -38,7 +38,7 @@
   <dependency>  
   <groupId>org.societies.cis</groupId>
   <artifactId>cis-editor</artifactId>
-   <version>${release.version}</version>
+   <version>${version.cis}</version>
 </dependency>	
 	
 	
@@ -74,7 +74,7 @@
 						<artifactItem>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>${project.artifactId}</artifactId>
-							<version>${release.version}</version>
+							<version>${version.cis}</version>
 							<type>bundle</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>

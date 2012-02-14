@@ -27,7 +27,7 @@ import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
-import org.societies.personalisation.CAUI.api.model.UserIntentAction;
+import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 
 /**
  * CAUIPrediction
@@ -40,21 +40,12 @@ public class CAUIPrediction implements ICAUIPrediction{
 	@Override
 	public void enablePrediction(Boolean arg0) {
 		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public UserIntentAction getCurrentIntentAction(Identity arg0,
-			Identity arg1, IServiceResourceIdentifier arg2, String arg3) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
 	public void getPrediction(Identity arg0, IAction arg1,
 			IPersonalisationCallback arg2) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -63,8 +54,17 @@ public class CAUIPrediction implements ICAUIPrediction{
 		return null;
 	}
 
+	@Override
+	public IUserIntentAction getCurrentIntentAction(Identity arg0,
+			IServiceResourceIdentifier arg1, String arg2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-	
-
+	@Override
+	public void getPrediction(Identity arg0, CtxAttribute arg1,
+			IPersonalisationCallback arg2) {
+		// TODO Auto-generated method stub
+	}
 
 }

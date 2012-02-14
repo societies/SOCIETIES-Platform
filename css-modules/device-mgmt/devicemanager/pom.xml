@@ -63,7 +63,8 @@
               				org.springframework.beans.propertyeditors,
               				org.springframework.osgi.service.exporter.support,
               				org.springframework.osgi.context,
-              				org.springframework.osgi.service.exporter,org.slf4j.*
+              				org.springframework.osgi.service.exporter,
+              				org.slf4j.*
               			</Import-Package> 
               			<Export-Package>
 							org.societies.css.devicemgmt.devicemanager

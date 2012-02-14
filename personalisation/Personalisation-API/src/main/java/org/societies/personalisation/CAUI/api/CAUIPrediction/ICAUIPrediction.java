@@ -26,7 +26,7 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-import org.societies.personalisation.CAUI.api.model.UserIntentAction;
+import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.api.comm.xmpp.datatypes.Identity;
 
 /**
@@ -39,39 +39,40 @@ import org.societies.api.comm.xmpp.datatypes.Identity;
 public interface ICAUIPrediction {
 
 	/**
+	 * This method allows the system to provide predictions 
 	 * 
 	 * @param bool
 	 */
 	public void enablePrediction(Boolean bool);
 
 	/**
-	 * Allows any service to request a context-based evaluated preference outcome.
+	 * Allows any service to request a context-based user intent prediction.
 	 *  
-	 * @param requestor    the DigitalIdentity of the service requesting the outcome
-	 * @param ownerID    the DigitalIdentity of the owner of the preferences (i.e. the
-	 * user of this service)
-	 * @param serviceID    the service identifier of the service requesting the
-	 * outcome
-	 * @param preferenceName    the name of the preference requested
-	 * @return					the outcome in the form of an IAction object
+	 * @param ownerID    the DigitalIdentity of the owner of the user intent model 
+	 * @param serviceID  the service identifier of the service requesting the action prediction
+	 * @param userActionName    the type of the user action requested
+	 * @return					the outcome in the form of an UserIntentAction object
 	 */
-	public UserIntentAction getCurrentIntentAction(Identity requestor, Identity ownerID, IServiceResourceIdentifier serviceID, String preferenceName);
-
+	public IUserIntentAction getCurrentIntentAction(Identity ownerID, IServiceResourceIdentifier serviceID, String userActionType);
 	
 	/**
-	 * Predicts next action based on the last performed action
-	 * 
+	 * Predicts next user action based on an action update. 
+	 *   
 	 * @param requestor
 	 * @param action
 	 * @return predicted action 
 	 */
 	public void getPrediction(Identity requestor, IAction action, IPersonalisationCallback persCallback); 
-		
+	
+	/**
+	 * Predicts next user action based on a context attribute update. 
+	 */	   
+	public void getPrediction(Identity requestor, CtxAttribute contextAttribute, IPersonalisationCallback persCallback);
+	
 	/**
 	 * Returns a list with the performed predictions.
-	 * 
+	 * @return List
 	 */
-	
 	public List<List<String>> getPredictionHistory();
 	
 }

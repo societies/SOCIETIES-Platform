@@ -42,7 +42,7 @@ import org.societies.personalisation.common.api.management.IPersonalisationInter
 // @Component
 public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 
-	private IPersonalisationInternalCallback preManager;
+	private IInternalPersonalisationManager preManager;
 	private Identity myId;
 	private CtxAttributeIdentifier myCtxId;
 	private IServiceResourceIdentifier serviceId;
@@ -54,7 +54,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	
 	// @Autowired
 	public CRISTUserIntentPrediction(IInternalPersonalisationManager internalPreManager) {
-		this.preManager = (IPersonalisationInternalCallback) internalPreManager;
+		this.preManager = internalPreManager;
 	}
 	
 	public void initialiseCRISTPrediction() {
@@ -70,7 +70,8 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		System.out.println("Yo!! I'm a brand new service and my interface is: "
 				+ this.getClass().getName());
 		try{
-			((IInternalPersonalisationManager) this.preManager).registerForContextUpdate(myId, this.getClass().getName(), myCtxId);
+			// TODO
+			// this.preManager.registerForContextUpdate(myId, myCtxId);
 			System.out.println("CRIST Predictor registered the Context Update Event");
 		}catch(Exception e){
 			System.err.println("Exception when trying to register the Context Update Event");
@@ -85,7 +86,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 
 	public void setPreManager(IInternalPersonalisationManager internalPreManager) {
 		System.out.println(this.getClass().getName()+" GOT InternalPreManager");
-		this.preManager = (IPersonalisationInternalCallback) internalPreManager;
+		this.preManager = internalPreManager;
 	}
 
 	/* (non-Javadoc)

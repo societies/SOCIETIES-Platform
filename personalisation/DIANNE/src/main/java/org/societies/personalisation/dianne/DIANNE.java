@@ -29,24 +29,21 @@ import java.util.HashMap;
 
 import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE;
 import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-import org.societies.api.internal.personalisation.model.IOutcome;
 
 public class DIANNE implements IDIANNE{
 
-	private HashMap<EntityIdentifier, NetworkRunner> networks;
-	//IInternalUserActionMonitor uaMonitor;
-	//IUserCtxBroker ctxBroker;
+	private HashMap<Identity, NetworkRunner> networks;
 
 	public DIANNE(){
-		networks = new HashMap<EntityIdentifier, NetworkRunner>();
+		networks = new HashMap<Identity, NetworkRunner>();
 	}
 
 	@Override
-	public void getOutcome(EntityIdentifier ownerId,
+	public void getOutcome(Identity ownerId,
 			IServiceResourceIdentifier serviceId, 
 			String preferenceName, 
 			IPersonalisationInternalCallback callback) {
@@ -54,7 +51,7 @@ public class DIANNE implements IDIANNE{
 	}
 
 	@Override
-	public void getOutcome(EntityIdentifier ownerId,
+	public void getOutcome(Identity ownerId,
 			CtxAttribute attribute, 
 			IPersonalisationInternalCallback callback) {
 		// Context update received!!!
@@ -66,14 +63,14 @@ public class DIANNE implements IDIANNE{
 	}
 	
 	@Override
-	public void getOutcome(EntityIdentifier ownerId,
+	public void getOutcome(Identity ownerId,
 			IAction action,
 			IPersonalisationInternalCallback callback){
 		// Action update received!!!
 	}
 
 	@Override
-	public void enableDIANNELearning(EntityIdentifier ownerId) {
+	public void enableDIANNELearning(Identity ownerId) {
 		System.out.println("Enabling incremental learning for identity: "+ ownerId);
 		if(networks.containsKey(ownerId)){
 			NetworkRunner network = networks.get(ownerId);
@@ -84,7 +81,7 @@ public class DIANNE implements IDIANNE{
 	}
 
 	@Override
-	public void disableDIANNELearning(EntityIdentifier ownerId) {
+	public void disableDIANNELearning(Identity ownerId) {
 		System.out.println("Disabling incremental learning for identity: "+ ownerId);	
 		if(networks.containsKey(ownerId)){
 			NetworkRunner network = networks.get(ownerId);
@@ -100,27 +97,5 @@ public class DIANNE implements IDIANNE{
 		//register for action updates from PersonalisationMgr
 		
 		//register for context updates from PersonalisationMgr
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE#getOutcome(org.societies.api.mock.EntityIdentifier, org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)
-	 * DEPRECATED
-	 */
-	@Override
-	public IOutcome getOutcome(EntityIdentifier arg0,
-			IServiceResourceIdentifier arg1, String arg2) {
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE#getOutcome(org.societies.api.mock.EntityIdentifier, org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String, org.societies.api.context.model.CtxAttribute)
-	 * DEPRECATED
-	 */
-	@Override
-	public IOutcome getOutcome(EntityIdentifier arg0,
-			IServiceResourceIdentifier arg1, String arg2, CtxAttribute arg3) {
-		return null;
 	}
 }

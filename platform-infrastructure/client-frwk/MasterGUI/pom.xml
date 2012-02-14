@@ -41,6 +41,7 @@
             <groupId>com.phonegap</groupId>
             <artifactId>phonegap</artifactId>
         </dependency>
+        
     </dependencies>
 
     <build>

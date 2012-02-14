@@ -1,5 +1,5 @@
 var Config = {
-		XMPP_SERVER: 'socialblend.local',
+		XMPP_SERVER: 'societies.local',
 		// BOSH URL for HTTp Binding
 		// For an Android emulator, use your IP address
 //		BOSH_SERVICE: 'http://localhost:5280/http-bind',
