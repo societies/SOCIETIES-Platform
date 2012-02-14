@@ -24,6 +24,12 @@
  */
 package org.societies.api.internal.servicelifecycle.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * The Service class represents a generic Service with appropriate attributes
  * 
