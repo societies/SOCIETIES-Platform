@@ -22,73 +22,82 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference;
+package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
-
-import java.io.IOException;
 import java.io.Serializable;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.ActionConstants;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.TargetMatchConstants;
+import javax.swing.tree.DefaultTreeModel;
 
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.mock.ServiceResourceIdentifier;
 
 /**
- * The Action class represents an operation that can be performed on a Resource. 
- * The Action can be "READ", "WRITE", "CREATE", "DELETE" as listed in the ActionConstants enumeration. 
+ * This class represents a tree model for Privacy Policy Negotiation Preferences and encapsulates a tree of IPrivacyPreference objects.
  * @author Elizabeth
  *
  */
-public class Action implements Serializable{
+public class PPNPrivacyPreferenceTreeModel extends DefaultTreeModel implements IPrivacyPreferenceTreeModel, Serializable {
 
-	private ActionConstants action;
-	private boolean optional;
 	
-	private Action(){
-		
-	}
-	public Action(ActionConstants action){
-		this.action = action;
-		this.optional = false;
-	}
+	private CtxAttributeIdentifier affectedCtxId;
+	private String myContextType;
+	private EntityIdentifier providerDPI;
+	private ServiceResourceIdentifier serviceID;
+	private PrivacyPreferenceTypeConstants myPrivacyType;
+	private IPrivacyPreference pref;
 	
-	public Action(ActionConstants action, boolean isOptional){
-		this.action = action;
-		this.optional = isOptional;
-	}
-	
-	public void setOptional(boolean isOptional){
-		this.optional = isOptional;
-	}
-	public boolean isOptional(){
-		return this.optional;
-	}
-	public ActionConstants getActionType(){
-		return this.action;
-	}
-	public TargetMatchConstants getType(){
-		return TargetMatchConstants.ACTION;
+	public PPNPrivacyPreferenceTreeModel(String myCtxType, IPrivacyPreference preference){
+		super(preference);
+		this.myContextType = myCtxType;
+		this.myPrivacyType = PrivacyPreferenceTypeConstants.PPNP;
+		this.pref = preference;
 	}
 	
-	public String toXMLString(){
-		String str = "\n<Action>";
-		str = str.concat("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" " +
-				"\n\t\t\tDataType=\"org.personalsmartspace.spm.preference.api.platform.constants.ActionConstants\">");
-		str = str.concat("\n\t\t<AttributeValue>");
-		str = str.concat(this.action.toString());
-		str = str.concat("</AttributeValue>");
-		str = str.concat("\n\t</Attribute>");
-		str = str.concat(this.printOptional());
-		str = str.concat("\n</Action>");
-		return str;
+	public CtxAttributeIdentifier getAffectedContextIdentifier() {
+		return this.getAffectedCtxId();
 	}
-	private String printOptional(){
-		return "\n<optional>"+this.optional+"</optional>";
+
+	
+	public String getContextType() {
+		return this.myContextType;
 	}
-	public String toString(){
-		return this.toXMLString();
+
+
+	@Override
+	public PrivacyPreferenceTypeConstants getPrivacyType() {
+		return this.myPrivacyType;
 	}
-	public static void main(String[] args) throws IOException{
-		Action action = new Action(ActionConstants.READ);
-		System.out.println(action.toXMLString());
+
+
+	@Override
+	public IPrivacyPreference getRootPreference() {
+		return this.pref;
 	}
+
+	public void setAffectedCtxId(CtxAttributeIdentifier affectedCtxId) {
+		this.affectedCtxId = affectedCtxId;
+	}
+
+	public CtxAttributeIdentifier getAffectedCtxId() {
+		return affectedCtxId;
+	}
+
+	public void setProviderDPI(EntityIdentifier providerDPI) {
+		this.providerDPI = providerDPI;
+	}
+
+	public EntityIdentifier getProviderDPI() {
+		return providerDPI;
+	}
+
+	public void setServiceID(ServiceResourceIdentifier serviceID) {
+		this.serviceID = serviceID;
+	}
+
+	public ServiceResourceIdentifier getServiceID() {
+		return serviceID;
+	}
+
 }

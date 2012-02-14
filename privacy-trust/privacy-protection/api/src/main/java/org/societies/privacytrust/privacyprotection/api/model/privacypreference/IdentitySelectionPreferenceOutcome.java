@@ -22,32 +22,70 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
+package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
 
-import java.util.List;
-
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Subject;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
-public interface IAgreement {
+
+
+/**
+ * This class is used to define that a CSS identity should be used in a specific transaction if the preceding IPrivacyPreferenceConditions are true. 
+ * The format of the identity will be defined by the Identity Management component
+ * @author Elizabeth
+ *
+ */
+public class IdentitySelectionPreferenceOutcome implements IPrivacyOutcome{
+
+	private int confidenceLevel;
+	private EntityIdentifier dpi;
+	private IServiceResourceIdentifier serviceID;
+	private Subject requestor;
+	/* (non-Javadoc)
+	 * @see org.personalsmartspace.spm.preference.api.platform.IPrivacyOutcome#getOutcomeType()
+	 */
+	@Override
+	public PrivacyPreferenceTypeConstants getOutcomeType() {
+		return PrivacyPreferenceTypeConstants.IDS;
+	}
+	/* (non-Javadoc)
+	 * @see org.personalsmartspace.spm.preference.api.platform.IPrivacyOutcome#getConfidenceLevel()
+	 */
+	@Override
+	public int getConfidenceLevel() {
+		return this.confidenceLevel;
+	}
 	
+	public void setConfidenceLevel(int c){
+		this.confidenceLevel = c;
+	}
 	
-	public List<RequestItem> getRequestedItems();
+	public void setIdentity(EntityIdentifier dpi){
+		this.dpi = dpi;
+	}
 	
-	public IServiceResourceIdentifier getServiceIdentifier();
+	public EntityIdentifier getIdentity(){
+		return this.dpi;
+	}
+	public void setServiceID(IServiceResourceIdentifier serviceID) {
+		this.serviceID = serviceID;
+	}
+	public IServiceResourceIdentifier getServiceID() {
+		return serviceID;
+	}
+	public void setRequestor(Subject requestor) {
+		this.requestor = requestor;
+	}
+	public Subject getRequestor() {
+		return requestor;
+	}
 	
-	public void setServiceIdentifier(IServiceResourceIdentifier serviceId);
+	public String toString(){
+		return "Select: "+this.dpi.toString();
+	}
 	
-	public EntityIdentifier getServiceDPI();
-	
-	public void setServiceDPI(EntityIdentifier serviceDPI);
-	
-	public EntityIdentifier getUserDPI();
-	
-	public void setUserDPI(EntityIdentifier userDPI);
-	
-	public EntityIdentifier getUserPublicDPI();
-	
-	public void setUserPublicDPI(EntityIdentifier userPublicDPI);
 }
+

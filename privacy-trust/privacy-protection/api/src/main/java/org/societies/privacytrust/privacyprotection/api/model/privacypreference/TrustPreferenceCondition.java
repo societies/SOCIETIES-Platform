@@ -22,23 +22,52 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants;
+package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
+
+import java.io.Serializable;
+
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyConditionConstants;
 
 /**
  * @author Elizabeth
- *
+ * @version 1.0
+ * @updated 14-Mar-2009 21:06:49
  */
-public enum PrivacyOutcomeConstants {
+public class TrustPreferenceCondition implements IPrivacyPreferenceCondition, Serializable {
+
+	/*
+	private ITrustValue trustValue;
+	private PrivacyConditionConstants myType;
 	
-	ALLOW(1), BLOCK(0);
+	public TrustPreferenceCondition(ITrustValue trustVal){
+		this.trustValue = trustVal;
+		this.myType = PrivacyConditionConstants.TRUST;
+	}
+
+	public ITrustValue getTrustValue(){
+		return this.trustValue;
+	}
 	
-	private int decision;
-	PrivacyOutcomeConstants(int i){
-		this.decision = i;
+
+	public boolean equals(IPrivacyPreferenceCondition pc){
+
+		if (!(pc instanceof TrustPreferenceCondition)){
+			return false;
+		}
+		TrustPreferenceCondition tpc = (TrustPreferenceCondition) pc;
+		if (tpc.getTrustValue().compareTo(this.getTrustValue())!=0){
+			return false;
+		}
+
+		
+		return true;
+	}
+
+*/
+	@Override
+	public PrivacyConditionConstants getType() {
+		return PrivacyConditionConstants.TRUST; 
 	}
 
 
-	public int getInt(){
-		return this.decision;
-	}
 }

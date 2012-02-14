@@ -22,22 +22,19 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants;
+package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
+
+
 
 /**
- * @author Elizabeth
- *
+ * This interface is used to represent a data obfuscation decision made by the
+ * user and is used by the Privacy PreferenceLearning component.
+ * @author Eliza
+ * @version 1.0
+ * @created 11-Nov-2011 17:06:54
  */
-public enum ConditionConstants {
+public interface IDObfAction {
 
-	SHARE_WITH_3RD_PARTIES, 
-	DATA_RETENTION_IN_SECONDS,
-	DATA_RETENTION_IN_MINUTES,
-	DATA_RETENTION_IN_HOURS,
-	RIGHT_TO_OPTOUT,
-	STORE_IN_SECURE_STORAGE,
-	RIGHT_TO_ACCESS_HELD_DATA,
-	RIGHT_TO_CORRECT_INCORRECT_DATA;
-
+	public int getObfuscationLevel();
 
 }

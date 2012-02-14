@@ -22,32 +22,22 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
+package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants;
+
+/**
+ * @author Elizabeth
+ *
+ */
+public enum ConditionConstants {
+
+	SHARE_WITH_3RD_PARTIES, 
+	DATA_RETENTION_IN_SECONDS,
+	DATA_RETENTION_IN_MINUTES,
+	DATA_RETENTION_IN_HOURS,
+	RIGHT_TO_OPTOUT,
+	STORE_IN_SECURE_STORAGE,
+	RIGHT_TO_ACCESS_HELD_DATA,
+	RIGHT_TO_CORRECT_INCORRECT_DATA;
 
 
-import java.util.List;
-
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-
-public interface IAgreement {
-	
-	
-	public List<RequestItem> getRequestedItems();
-	
-	public IServiceResourceIdentifier getServiceIdentifier();
-	
-	public void setServiceIdentifier(IServiceResourceIdentifier serviceId);
-	
-	public EntityIdentifier getServiceDPI();
-	
-	public void setServiceDPI(EntityIdentifier serviceDPI);
-	
-	public EntityIdentifier getUserDPI();
-	
-	public void setUserDPI(EntityIdentifier userDPI);
-	
-	public EntityIdentifier getUserPublicDPI();
-	
-	public void setUserPublicDPI(EntityIdentifier userPublicDPI);
 }

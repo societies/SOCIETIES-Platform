@@ -22,32 +22,17 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
+package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyConditionConstants;
 
-import java.util.List;
+/**
+ * This interface defines the methods that should be implemented by a class representing a condition in an IF-THEN-ELSE preference object.
+ * @author Elizabeth
+ *
+ */
+public interface IPrivacyPreferenceCondition {
+	
+	public PrivacyConditionConstants getType(); 
 
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-
-public interface IAgreement {
-	
-	
-	public List<RequestItem> getRequestedItems();
-	
-	public IServiceResourceIdentifier getServiceIdentifier();
-	
-	public void setServiceIdentifier(IServiceResourceIdentifier serviceId);
-	
-	public EntityIdentifier getServiceDPI();
-	
-	public void setServiceDPI(EntityIdentifier serviceDPI);
-	
-	public EntityIdentifier getUserDPI();
-	
-	public void setUserDPI(EntityIdentifier userDPI);
-	
-	public EntityIdentifier getUserPublicDPI();
-	
-	public void setUserPublicDPI(EntityIdentifier userPublicDPI);
 }

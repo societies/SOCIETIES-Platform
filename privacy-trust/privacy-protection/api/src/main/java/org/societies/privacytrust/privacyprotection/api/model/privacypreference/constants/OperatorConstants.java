@@ -1,10 +1,5 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
- * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
- * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
- * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
+ * Copyright (c) 2011, SOCIETIES Consortium
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -22,23 +17,47 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api;
+package org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.context.model.CtxAttributeIdentifier;
 
 /**
- * @author Eliza
+ * Enum class used to define the operators used in the {@link
+ * IPreferenceCondition}
+ * @author Elizabeth
  * @version 1.0
- * @created 11-Nov-2011 19:17:12
+ * @created 08-Nov-2011 14:02:57
  */
-public interface IPrivacyPreferenceConditionMonitor {
+public enum OperatorConstants {
 
-	/**
-	 * 
-	 * @param contextId
-	 * @param userIdentity
-	 */
-	public void contextEventReceived(CtxAttributeIdentifier contextId, Identity userIdentity);
-
+	EQUALS("="), GREATER_THAN(">"), GREATER_OR_EQUAL_THAN(">="),LESS_THAN("<"),LESS_OR_EQUAL_THAN("<=");
+	
+	private String op;
+	OperatorConstants(String op){
+		this.op = op;
+	}
+	
+	public OperatorConstants fromString(String str){
+		if (str.equalsIgnoreCase("=")){
+			return EQUALS;
+		}
+		
+		if (str.equals(">")){
+			return GREATER_THAN;
+		}
+		
+		if (str.equals(">=")){
+			return GREATER_OR_EQUAL_THAN;
+		}
+		
+		if (str.equals("<")){
+			return LESS_THAN;
+		}
+		
+		if (str.equals("<="))
+		{
+			return LESS_OR_EQUAL_THAN;
+		}
+		
+		return EQUALS;
+	}
 }
