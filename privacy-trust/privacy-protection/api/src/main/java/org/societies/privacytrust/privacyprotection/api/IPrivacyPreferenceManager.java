@@ -24,19 +24,20 @@
  */
 package org.societies.privacytrust.privacyprotection.api;
 
+
 import java.util.List;
 
-import org.societies.privacytrust.privacyprotection.mock.ICtxAttributeIdentifier;
 import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.Action;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.IPrivacyOutcome;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.IPrivacyPreferenceTreeModel;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyOutcomeConstants;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceTreeModel;
 
 
 /**
@@ -55,7 +56,7 @@ public interface IPrivacyPreferenceManager {
 	 * @param requestorIdentity    the identity of requestor
 	 * @exception PrivacyPreferenceException PrivacyPreferenceException
 	 */
-	public PrivacyOutcomeConstants checkPermission(ICtxAttributeIdentifier ctxId, Action action, Identity requestorIdentity)
+	public PrivacyOutcomeConstants checkPermission(CtxAttributeIdentifier ctxId, Action action, Identity requestorIdentity)
 	  throws PrivacyException;
 
 	/**
@@ -116,7 +117,7 @@ public interface IPrivacyPreferenceManager {
 	 * @param affectedCtxID
 	 * @param requestorIdentity    the DPI of a requestor
 	 */
-	public void deletePPNPreference(String contextType, ICtxAttributeIdentifier affectedCtxID, Identity requestorIdentity);
+	public void deletePPNPreference(String contextType, CtxAttributeIdentifier affectedCtxID, Identity requestorIdentity);
 
 	/**
 	 * Method to delete an existing PPN preference model
@@ -128,7 +129,7 @@ public interface IPrivacyPreferenceManager {
 	 * @param contextType    the affected contextType
 	 * @param id
 	 */
-	public void deletePPNPreference(String contextType, ICtxAttributeIdentifier id);
+	public void deletePPNPreference(String contextType, CtxAttributeIdentifier id);
 
 	/**
 	 * Method to request evaluation of identity selection preferences for a specific
@@ -195,7 +196,7 @@ public interface IPrivacyPreferenceManager {
 	 * @param contextType    the context type affected
 	 * @param ctxID    the ctxID affected
 	 */
-	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, ICtxAttributeIdentifier ctxID);
+	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, CtxAttributeIdentifier ctxID);
 
 	/**
 	 * Method to retrieve the list of ppn preferences based on the given parameters
@@ -205,7 +206,7 @@ public interface IPrivacyPreferenceManager {
 	 * @param ctxID    the ctxID affected
 	 * @param requestorIdentity    the DPI of the requestor
 	 */
-	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, ICtxAttributeIdentifier ctxID, Identity requestorIdentity);
+	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, CtxAttributeIdentifier ctxID, Identity requestorIdentity);
 
 	/**
 	 * Method to retrieve the list of ppn preferences based on the given parameters

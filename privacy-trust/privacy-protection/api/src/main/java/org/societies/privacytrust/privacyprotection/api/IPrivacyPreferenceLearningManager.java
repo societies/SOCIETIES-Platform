@@ -24,9 +24,9 @@
  */
 package org.societies.privacytrust.privacyprotection.api;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.IDObfAction;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.IIDSAction;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.IPPNPAction;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDObfAction;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IIDSAction;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPPNPAction;
 
 /**
  * @author Eliza
