@@ -25,7 +25,8 @@
 
 package org.societies.css.devicemgmt.DeviceDriverExample;
 
-import org.societies.css.devicemgmt.devicemanager.DeviceCommonInfo;
+import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
+
 
 public interface ControllerWs {
 	
