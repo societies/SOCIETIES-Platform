@@ -31,6 +31,7 @@ import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.TrustUpdateListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
+import org.springframework.stereotype.Component;
 
 /**
  * Implementation of the {@link ITrustBroker} interface.
@@ -38,6 +39,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.3
  */
+@Component
 public class TrustBroker implements ITrustBroker {
 	
 	/* (non-Javadoc)
