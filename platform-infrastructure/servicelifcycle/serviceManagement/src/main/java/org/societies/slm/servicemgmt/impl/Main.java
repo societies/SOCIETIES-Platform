@@ -20,7 +20,7 @@ public class Main {
 		ApplicationContext ctx = new ClassPathXmlApplicationContext("/META-INF/spring/bundle-context.xml");
 		XMLServiceMetaDataToObjectConverter xmlConv = (XMLServiceMetaDataToObjectConverter) ctx.getBean("XMLtoServiceObjectConverter");
 		//xmlConv.convertFromXMLToObject("serviceData.xml");
-		/*System.out.println("Convert XML back to Object!");
+		System.out.println("Convert XML back to Object!");
 		//from XML to object
 		try {
 			Service service = (Service)xmlConv.convertFromXMLToObject("Service123.xml");
@@ -30,11 +30,11 @@ public class Main {
 		} catch (IOException e1) { 
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}*/
+		}
 		//System.out.println(customer);
 		//System.out.println("Done");
 	
-		Service ser=new Service();
+/*		Service ser=new Service();
 		ser.setAuthorSignature("serviceid1111");
 		ser.setCSSIDInstalled("cssinstalled");
 		ser.setServiceDescription("service description");		
@@ -54,7 +54,7 @@ public class Main {
 		} catch (URISyntaxException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}		
+		}*/		
 		
 //			Customer customer = (Customer)xmlConv.convertFromXMLFileToObject(file);
 //			System.out.println(customer);
