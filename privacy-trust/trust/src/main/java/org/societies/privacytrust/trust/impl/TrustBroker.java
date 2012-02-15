@@ -22,67 +22,62 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api;
+package org.societies.privacytrust.trust.impl;
 
-import java.util.EventObject;
+import java.util.concurrent.Future;
+
+import org.societies.api.internal.privacytrust.trust.ITrustBroker;
+import org.societies.api.internal.privacytrust.trust.TrustException;
+import org.societies.api.internal.privacytrust.trust.TrustUpdateListener;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
+import org.springframework.stereotype.Component;
 
 /**
- * This event is fired whenever a trust value is updated. A 
- * <code>TrustUpdateEvent</code> object is sent as an argument to the
- * {@link TrustUpdateListener} methods.
- * <p>
- * Normally, TrustUpdateEvents are accompanied by the source, i.e. the identifier
- * of the entity whose trust value was updated, as well as, the old and new value. 
+ * Implementation of the {@link ITrustBroker} interface.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.2
+ * @since 0.0.3
  */
-public class TrustUpdateEvent extends EventObject {
-
-	private static final long serialVersionUID = -4292086499526921194L;
-
-	/** The old trust value */
-	private final Double oldValue;
+@Component
+public class TrustBroker implements ITrustBroker {
 	
-	/** The new trust value */
-	private final Double newValue;
-	
-	/**
-	 * Constructs a <code>TrustUpdateEvent</code> object with the specified
-	 * source, old and new trust value.
-	 *  
-	 * @param source
-	 *            the identifier of the entity whose trust value was updated
-	 * @param oldValue
-	 *            the old trust value
-	 * @param newValue
-	 *            the new trust value
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrust(java.lang.Object)
 	 */
-	public TrustUpdateEvent(Object source, Double oldValue, Double newValue) {
+	@Async
+	@Override
+	public Future<Double> retrieveTrust(Object entityId) throws TrustException {
+		// TODO Auto-generated method stub
+		if (entityId == null)
+			throw new NullPointerException("entityId can't be null");
 		
-		super(source);
-		
-		this.oldValue = oldValue;
-		this.newValue = newValue;
+		return new AsyncResult<Double>(null);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateEventListener(org.societies.api.internal.privacytrust.trust.TrustUpdateListener, java.lang.Object)
+	 */
+	@Override
+	public void registerTrustUpdateEventListener(TrustUpdateListener listener,
+			Object entityId) throws TrustException {
+		// TODO Auto-generated method stub
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (entityId == null)
+			throw new NullPointerException("entityId can't be null");
 	}
 	
-	/**
-	 * Returns the old trust value.
-	 * 
-	 * @return the old trust value.
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateEventListener(org.societies.api.internal.privacytrust.trust.TrustUpdateListener, java.lang.Object)
 	 */
-	public Double getOldValue() {
-		
-		return this.oldValue;
-	}
-	
-	/**
-	 * Returns the new trust value.
-	 * 
-	 * @return the new trust value.
-	 */
-	public Double getNewValue() {
-		
-		return this.newValue;
+	@Override
+	public void unregisterTrustUpdateEventListener(TrustUpdateListener listener,
+			Object entityId) throws TrustException {
+		// TODO Auto-generated method stub
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (entityId == null)
+			throw new NullPointerException("entityId can't be null");
 	}
 }
