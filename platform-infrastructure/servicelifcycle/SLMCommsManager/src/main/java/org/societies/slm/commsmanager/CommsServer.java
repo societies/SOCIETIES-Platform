@@ -116,7 +116,26 @@ public class CommsServer implements IFeatureServer {
 		//CHECK WHICH END BUNDLE TO BE CALLED THAT I MANAGE
 		// --------- Service Management BUNDLE ---------
 		if (payload.getClass().equals(ServiceMgmtMsgBean.class)) {
+			ServiceMgmtMsgBean serviceMessage = (ServiceMgmtMsgBean) payload;
 			
+			switch (serviceMessage.getMethod()) {
+			case CLEAN_SERVICE_REGISTRY:
+				serviceManagement.cleanServiceRegistry();
+				break;
+				
+			case START_SERVICE: //startService(ServiceResourceIdentifier serviceId)
+				org.societies.slm.servicemanagement.schema.ServiceResourceIdentifier serviceId = serviceMessage.getServiceID();
+				serviceManagement.startService(serviceId);
+				break;
+				
+			case STOP_SERVICE : //startService(ServiceResourceIdentifier serviceId)
+				org.societies.slm.servicemanagement.schema.ServiceResourceIdentifier serviceId = serviceMessage.getServiceID();
+				serviceManagement.stopService(serviceId);
+				break;
+				
+			default :
+				throw new Exception("No such method found");
+			}
 		}
 	}
 
