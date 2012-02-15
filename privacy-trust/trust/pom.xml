@@ -5,7 +5,7 @@
 	<!-- The Basics -->
 	<groupId>org.societies.privacytrust</groupId>
 	<artifactId>trust</artifactId>
-	<version>${release.version}.1-SNAPSHOT</version>
+	<version>${version.pt}</version>
 	<packaging>bundle</packaging>
 	<dependencies>
 		<dependency>
@@ -15,17 +15,26 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.context</artifactId>
+		</dependency>
+		<dependency>
         	<groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.0</version>
             <scope>test</scope>
         </dependency>
 	</dependencies>
 	<parent>
-		<groupId>org.societies.privacytrust</groupId>
-		<artifactId>privacytrust</artifactId>
-		<relativePath>../pom.xml</relativePath>
-		<version>1</version>
+		<groupId>org.societies</groupId>
+		<artifactId>spring-osgi-parent</artifactId>
+		<relativePath>../../parent/spring-osgi.xml</relativePath>
+		<version>0.1</version>
 	</parent>
 	
 	<!-- Build Settings -->
@@ -36,8 +45,9 @@
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>
-					<instructions>									
-					</instructions>
+					<instructions>
+						<Export-Package/>						
+					</instructions> 
 				</configuration>
 			</plugin>
 			<plugin>
@@ -52,8 +62,8 @@
 						<artifactItem>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>${project.artifactId}</artifactId>
-							<version>${release.version}.1-SNAPSHOT</version>
-							<type>bundle</type>
+							<version>${version.pt}</version>
+							<type>jar</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</artifactItem>

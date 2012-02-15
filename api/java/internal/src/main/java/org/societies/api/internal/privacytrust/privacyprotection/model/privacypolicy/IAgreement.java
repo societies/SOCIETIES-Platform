@@ -27,7 +27,7 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.util.List;
 
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 public interface IAgreement {
@@ -39,15 +39,15 @@ public interface IAgreement {
 	
 	public void setServiceIdentifier(IServiceResourceIdentifier serviceId);
 	
-	public EntityIdentifier getServiceDPI();
+	public Identity getServiceDPI();
 	
-	public void setServiceDPI(EntityIdentifier serviceDPI);
+	public void setServiceDPI(Identity serviceDPI);
 	
-	public EntityIdentifier getUserDPI();
+	public Identity getUserDPI();
 	
-	public void setUserDPI(EntityIdentifier userDPI);
+	public void setUserDPI(Identity userDPI);
 	
-	public EntityIdentifier getUserPublicDPI();
+	public Identity getUserPublicDPI();
 	
-	public void setUserPublicDPI(EntityIdentifier userPublicDPI);
+	public void setUserPublicDPI(Identity userPublicDPI);
 }

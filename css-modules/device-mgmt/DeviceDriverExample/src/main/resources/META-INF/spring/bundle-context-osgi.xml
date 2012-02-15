@@ -22,7 +22,7 @@
 			</osgi:service-properties>
        </osgi:service>
        
-       <osgi:reference id="deviceManager" interface="org.societies.css.devicemgmt.devicemanager.IDeviceManager"/>
+       <osgi:reference id="deviceManager" interface="org.societies.api.internal.css.devicemgmt.IDeviceManager"/>
        
        
        

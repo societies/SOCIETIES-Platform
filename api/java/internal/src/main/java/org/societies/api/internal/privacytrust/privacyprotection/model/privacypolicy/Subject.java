@@ -27,8 +27,8 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.io.Serializable;
 
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.TargetMatchConstants;
-import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 
@@ -39,17 +39,17 @@ import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
  */
 public class Subject implements Serializable{
 
-	private EntityIdentifier dpi;
+	private Identity dpi;
 	private IServiceResourceIdentifier serviceID;
 
 	public Subject(){
 		
 	}
-	public Subject(EntityIdentifier dpi){
+	public Subject(Identity dpi){
 		this.dpi = dpi;
 	}
 
-	public Subject(EntityIdentifier dpi, IServiceResourceIdentifier serviceID){
+	public Subject(Identity dpi, IServiceResourceIdentifier serviceID){
 		this.dpi = dpi;
 		this.serviceID = serviceID;
 	}
@@ -74,10 +74,10 @@ public class Subject implements Serializable{
 	private String dpiToXMLString(){
 		String str = "";
 		str = str.concat("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:subject-id\"" +
-		"\n \t\t\tDataType=\"org.personalsmartspace.sre.api.pss3p.EntityIdentifier\">");
+		"\n \t\t\tDataType=\"org.personalsmartspace.sre.api.pss3p.Identity\">");
 
 		str = str.concat("\n\t\t<AttributeValue>");
-		str = str.concat(this.dpi.toUriString());
+		str = str.concat(this.dpi.toString());
 		str = str.concat("</AttributeValue>");
 
 		str = str.concat("\n\t</Attribute>");
@@ -99,7 +99,7 @@ public class Subject implements Serializable{
 		return this.toXMLString();
 	}
 	
-	public EntityIdentifier getDPI(){
+	public Identity getDPI(){
 		return this.dpi;
 	}
 	

@@ -33,6 +33,7 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 
@@ -92,6 +93,17 @@ public class PreferenceRetriever {
 	
 	private Object convertToObject(byte[] byteArray){
 		try {
+			return SerialisationHelper.deserialise(byteArray, this.getClass().getClassLoader());
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		/*
+		try {
 			ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(byteArray));
 			Object obj = ois.readObject();
 			return obj;
@@ -102,6 +114,10 @@ public class PreferenceRetriever {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return null;
+		*/
+		
+		
 		return null;
 	}
 	
