@@ -22,6 +22,7 @@ package org.societies.personalisation.UserPreferenceManagement.impl.management;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -38,6 +39,7 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
@@ -99,6 +101,14 @@ public class PreferenceStorer {
 
 	
 	private byte[] toByteArray(Object obj){
+		try {
+			return SerialisationHelper.serialise((Serializable) obj);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		/*
 		ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
 		ObjectOutputStream oos;
 		try {
@@ -113,7 +123,7 @@ public class PreferenceStorer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-		
+		*/
 		return null;
 	}
 
