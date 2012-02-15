@@ -37,7 +37,7 @@ import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
  */
 public interface IActionFeedback {
 
-	public void getResult();
+	public boolean getResult();
 
 	/**
 	 * 	
