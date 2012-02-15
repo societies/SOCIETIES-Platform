@@ -35,13 +35,19 @@ public class ServiceMgmtMetadataBroker {
 
 	public void registerData() {
 		List<File> fileList = new ArrayList<File>();
+		System.out.println("Reading service meta data files...");
+		System.out.println("Quantity of meta file urls : "+ getServiceMetafileLocation().size());
 		try {
 			Iterator<String> iterator = getServiceMetafileLocation().iterator();
 			while (iterator.hasNext()) {
 				fileList.add(new File(iterator.next()));
 			}
-			//TODO: Make this call Asychronous
-			getServiceMgmt().processServiceMetaData(fileList);
+			
+			System.out.println("Quantity of meta file to be processed : "+ getServiceMetafileLocation().size());
+			if (fileList.size() > 0 ) {
+				// TODO: Make this call Asychronous
+				getServiceMgmt().processServiceMetaData(fileList);				
+			}
 		} catch (ServiceMgmtException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
