@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema	elementFormDefault="qualified" version="1.0" 
+			targetNamespace="http://societies.org/slm/servicemanagement/schema" 
+			xmlns:tns="http://societies.org/slm/servicemanagement/schema" 
+			xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	
+	<xs:annotation>
+	   <xs:documentation>
+	     Schema doc to generate the objects required to interface with the ServiceManagement service
+	   </xs:documentation>
+	</xs:annotation>
+	
+	<xs:element name="serviceMgmtMsgBean">
+	  <xs:complexType >
+	    <xs:sequence>
+	      <xs:element name="method" type="tns:methodName" minOccurs="0"/>
+	      <xs:element name="serviceID" type="tns:serviceResourceIdentifier" minOccurs="0"/>
+	      <xs:element name="serviceMetaFiles" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+	    </xs:sequence>
+	  </xs:complexType>
+	</xs:element>
+	
+	<xs:element name="serviceMgmtResultBean">
+	  <xs:complexType>
+	    <xs:sequence>
+	      <xs:element name="findAllServicesResult" type="tns:service" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+	      <xs:element name="findServiceResult" type="tns:service" minOccurs="0"/>
+	      <xs:element name="serviceRegistryActiveResult" type="xs:boolean"/>
+	      <xs:element name="serviceStatusResult" type="tns:serviceStatus" minOccurs="0"/>
+	    </xs:sequence>
+	  </xs:complexType>
+	</xs:element>
+	
+	<xs:element name="serviceMgmtExceptionBean">
+	  <xs:complexType>
+	    <xs:sequence>
+	      <xs:element name="message" type="xs:string" minOccurs="0"/>
+	    </xs:sequence>
+	  </xs:complexType>
+	</xs:element>
+
+
+  <xs:simpleType name="methodName">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="IsServiceRegistryActive"/>
+      <xs:enumeration value="cleanServiceRegistry"/>
+      <xs:enumeration value="startService"/>
+      <xs:enumeration value="stopService"/>
+      <xs:enumeration value="getServiceStatus"/>
+      <xs:enumeration value="addServices"/>
+      <xs:enumeration value="removeServices"/>
+      <xs:enumeration value="updateServices"/>
+      <xs:enumeration value="findAllServices"/>
+      <xs:enumeration value="processServiceMetaData"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  
+  <xs:complexType name="service">
+    <xs:sequence>
+      <xs:element name="authorSignature" type="xs:string" minOccurs="0"/>
+      <xs:element name="CSSIDInstalled" type="xs:string" minOccurs="0"/>
+      <xs:element name="serviceDescription" type="xs:string" minOccurs="0"/>
+      <xs:element name="serviceIdentifier" type="tns:serviceResourceIdentifier" minOccurs="0"/>
+      <xs:element name="serviceLocation" type="tns:serviceLocation" minOccurs="0"/>
+      <xs:element name="serviceName" type="xs:string" minOccurs="0"/>
+      <xs:element name="serviceType" type="tns:serviceType" minOccurs="0"/>
+      <xs:element name="version" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="serviceResourceIdentifier">
+    <xs:sequence>
+      <xs:element name="identifier" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="serviceLocation">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Local"/>
+      <xs:enumeration value="Remote"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="serviceType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ThirdPartyService"/>
+      <xs:enumeration value="CoreService"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="serviceStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="STARTED"/>
+      <xs:enumeration value="STOPPED"/>
+      <xs:enumeration value="UNAVAILABLE"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+</xs:schema>
+
