@@ -65,7 +65,7 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 		
 		deviceBindingMap = new HashMap<String, String>();
 		
-		LOG.info("DeviceMgmt: " + "=========++++++++++------ DeviceManager constructor");
+		//LOG.info("DeviceMgmt: " + "=========++++++++++------ DeviceManager constructor");
 	}
 	
 	public void setBundleContext(BundleContext bundleContext) {

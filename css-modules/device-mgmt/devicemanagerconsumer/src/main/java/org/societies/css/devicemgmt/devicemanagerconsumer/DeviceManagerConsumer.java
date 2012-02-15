@@ -23,6 +23,7 @@ public class DeviceManagerConsumer {
 	
 	public void setDeviceService(IDevice deviceService)
 	{
+		
 		this.deviceService=deviceService;
 		
 		IAction ia = deviceService.getAction("getLightLevel");

@@ -172,7 +172,7 @@ public class DeviceImpl implements IDevice{
 		try 
 		{
 			
-			sr = bundleContext.getServiceReferences(IAction.class.getName(), "(actionName=getLightLevel)");
+			sr = bundleContext.getServiceReferences(IAction.class.getName(), "(actionName="+actionName+")");
 		
 		} catch (InvalidSyntaxException e) {
 			//TODO in case of exception 

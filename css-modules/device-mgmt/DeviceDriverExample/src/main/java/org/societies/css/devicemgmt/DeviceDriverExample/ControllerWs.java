@@ -32,7 +32,7 @@ public interface ControllerWs {
 	
 	
 	
-	public String createNewDevice (String deviceMacAddress, DeviceCommonInfo deviceCommonInfo, String actionName);
+	public String createNewDevice (String deviceMacAddress, DeviceCommonInfo deviceCommonInfo, String [] actionName);
 	
 	public void removeDevice (String deviceId);
 	
