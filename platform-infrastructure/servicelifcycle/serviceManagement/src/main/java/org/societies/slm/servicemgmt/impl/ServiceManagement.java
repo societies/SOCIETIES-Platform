@@ -87,11 +87,16 @@ public class ServiceManagement implements IServiceManagement{
 		return null;
 	}
 
+	@Override
 	public void processServiceMetaData(List<File> serviceMetaFileList) throws ServiceMgmtException {
-		
+	
 		if(serviceMetaFileList.isEmpty()){
 			throw (new ServiceMgmtException("Service Metadata File list is empty"));			
 		}
+		Iterator<File> itr = serviceMetaFileList.iterator();
+		while (itr.hasNext()) {
+		System.out.println("***file Url****" + itr.next().getAbsolutePath());	
+		}			
 		
 		List<Service> serviceList=new ArrayList<Service>();	
 		try {		
@@ -101,7 +106,9 @@ public class ServiceManagement implements IServiceManagement{
 				serviceList.add(service);}			
 			
 		} catch (IOException e) {
-			throw (new ServiceMgmtException("Service Metadata file error", e));
+			System.out.println("IOException...while calling convertFromXMLFileToObject method");
+			e.printStackTrace();
+			throw (new ServiceMgmtException("Service Metadata file error", e));			
 		}
 		
 		try {

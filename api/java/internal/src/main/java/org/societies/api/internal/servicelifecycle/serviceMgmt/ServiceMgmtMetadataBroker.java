@@ -49,6 +49,7 @@ public class ServiceMgmtMetadataBroker {
 				getServiceMgmt().processServiceMetaData(fileList);				
 			}
 		} catch (ServiceMgmtException e) {
+			System.out.println("error from registerData...");
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
