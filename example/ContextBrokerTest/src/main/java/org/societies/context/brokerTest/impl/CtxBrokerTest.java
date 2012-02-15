@@ -24,102 +24,125 @@
  */
 package org.societies.context.brokerTest.impl;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
+
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.context.broker.ICtxBroker;
-
-
 import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
-import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
-import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.util.SerialisationHelper;
 
-import org.societies.api.mock.EntityIdentifier;
 
-//import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
 
 /**
- * 3p Context Broker Implementation
- * This class implements the community and user broker api methods along with the callback methods 
- * of the internal context broker api
+ * Context Broker Implementation
+ * This class provides tests for internal Context Broker in Osgi environment 
+ * 
  */
 public class CtxBrokerTest 	{
 
-	
-	
 	private ICtxBroker ctxBroker;
+
+	CtxIdentifier ctxEntityIdentifier = null;
+	CtxIdentifier ctxAttributeStringIdentifier = null;
+	CtxIdentifier ctxAttributeBinaryIdentifier = null;
+
+	Logger log;
 	
 	public CtxBrokerTest() {
-		System.out.println(this.getClass().getName()+" empty");
-	
 	}
-	
+
 	public CtxBrokerTest(ICtxBroker ctxBroker) {
 		this.ctxBroker = ctxBroker;
-		System.out.println(this.getClass().getName()+" full constructor");
-		
+
 	}
-		
+
 	public ICtxBroker getCtxBroker(){
-		System.out.println(this.getClass().getName()+" getCtxBroker");
+		//System.out.println(this.getClass().getName()+" getCtxBroker");
+
 		return this.ctxBroker;
 	}
 
 	public void setCtxBroker(ICtxBroker ctxBroker){
-		System.out.println(this.getClass().getName()+" setCtxBroker");
+		//System.out.println(this.getClass().getName()+" setCtxBroker");
 		this.ctxBroker = ctxBroker;
-		
+
 	}
-	
+
 	public void initialiseCtxBrokerTest(){
+		this.log = LoggerFactory.getLogger(CtxBrokerTest.class);
 		if (this.ctxBroker==null){
-			System.out.println(this.getClass().getName()+"CtxBroker is null");
+			//System.out.println(this.getClass().getName()+"CtxBroker is null");
+			log.info(this.getClass().getName()+"CtxBroker is null");
 		}else{
-			System.out.println(this.getClass().getName()+"CtxBroker is NOT null");
-			startTesting();
+			//System.out.println(this.getClass().getName()+"CtxBroker is NOT null");
+			log.info("Start Testing");
+			log.info(this.getClass().getName()+"CtxBroker is NOT null");
+			createContext();
+			retrieveContext();
 		}
 	}
-	
-	
-	
-	private void startTesting(){
-		System.out.println(this.getClass().getName()+" startTesting");
-		System.out.println("broker service: "+this.ctxBroker);
-		
-		
+
+
+	// At this point a CtxEntity of type "Device" is created with an attribute of type "DeviceID" with value "device1234"
+	private void createContext(){
+		//	System.out.println(this.getClass().getName()+" startTesting");
+		//	System.out.println("broker service: "+this.ctxBroker);
+
 		//create ctxEntity
 		Future<CtxEntity> futureEnt;
 		try {
-			futureEnt = this.ctxBroker.createEntity("person");
+			futureEnt = this.ctxBroker.createEntity("Device");
 			CtxEntity ctxEntity = (CtxEntity) futureEnt.get();
-			
-			//create ctxAttribute
-			Future<CtxAttribute> futureAttr = this.ctxBroker.createAttribute(ctxEntity.getId(), "name");
-			CtxAttribute ctxAttribute = (CtxAttribute) futureAttr.get();
-			
-			ctxAttribute.setHistoryRecorded(true);
-			ctxAttribute.setStringValue("Aris");
-			
-			// update ctxAttribute
-			Future<CtxModelObject> futureAttrUpdated =  this.ctxBroker.update(ctxAttribute);
-			
-			//retrieve ctxAttribute
-			
-			ctxAttribute = (CtxAttribute) futureAttrUpdated.get();
-			
-			System.out.println("Retrieved ctxAttribute id " +ctxAttribute.getId()+ " and value: "+ctxAttribute.getStringValue() );
-		
+
+			ctxEntityIdentifier = ctxEntity.getId();
+
+			//create ctxAttribute with a String value
+			Future<CtxAttribute> futureCtxAttrString = this.ctxBroker.createAttribute(ctxEntity.getId(), "DeviceID");
+			CtxAttribute ctxAttributeString = (CtxAttribute) futureCtxAttrString.get();
+
+			// by setting this flag to true the CtxAttribute values will be stored to Context History Database upon update 
+			ctxAttributeString.setHistoryRecorded(true);
+
+			// set a string value to CtxAttribute
+			ctxAttributeString.setStringValue("device1234");
+			Future<CtxModelObject> futureAttrUpdated =  this.ctxBroker.update(ctxAttributeString);
+
+			// get the updated CtxAttribute object and identifier
+			ctxAttributeString = (CtxAttribute) futureAttrUpdated.get();
+			ctxAttributeStringIdentifier = ctxAttributeString.getId();
+
+
+			//create ctxAttribute with a Binary value
+			Future<CtxAttribute> futureCtxAttrBinary = this.ctxBroker.createAttribute(ctxEntity.getId(), "CustomData");
+			CtxAttribute ctxAttrBinary = (CtxAttribute) futureCtxAttrBinary.get();
+
+			MockBlobClass blob = new MockBlobClass(999);
+			byte[] blobBytes;
+			try {
+				blobBytes = SerialisationHelper.serialise(blob);
+				ctxAttrBinary.setBinaryValue(blobBytes);
+				Future<CtxModelObject> futureCtxAttrBinaryUpdated =  this.ctxBroker.update(ctxAttrBinary);
+				ctxAttrBinary = (CtxAttribute) futureCtxAttrBinaryUpdated.get();
+
+				ctxAttributeBinaryIdentifier = ctxAttrBinary.getId();
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			// at this point the ctxEntity of type "device" that is assigned with 
+			// a ctxAttribute of type "deviceID" with a string value
+			// and a ctxAttribute of type "CustomData" with a binary value
+
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -129,8 +152,55 @@ public class CtxBrokerTest 	{
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-	
+		}	
 	}
-		
+
+
+
+	// This test demonstrates how to retrieve context data from context database
+	private void retrieveContext() {	
+
+		// if the CtxEntityID or CtxAttributeID is known the retrieval is performed by using the ctxBroker.retrieve(CtxIdentifier) method
+		try {
+			// retrieve ctxEntity
+			Future<CtxModelObject> ctxEntityRetrievedFuture = this.ctxBroker.retrieve(ctxEntityIdentifier);
+			CtxEntity retrievedCtxEntity = (CtxEntity) ctxEntityRetrievedFuture.get();
+			this.log.info("Retrieved ctxEntity id " +retrievedCtxEntity.getId()+ " and type: "+retrievedCtxEntity.getType());
+			//System.out.println("Retrieved ctxEntity id " +retrievedCtxEntity.getId()+ " and type: "+retrievedCtxEntity.getType());
+
+			// retrieve ctxAttribute with the string value
+			Future<CtxModelObject> ctxAttributeRetrievedStringFuture = this.ctxBroker.retrieve(ctxAttributeStringIdentifier);
+			CtxAttribute retrievedCtxAttribute = (CtxAttribute) ctxAttributeRetrievedStringFuture.get();
+			this.log.info("Retrieved ctxAttribute id " +retrievedCtxAttribute.getId()+ " and value: "+retrievedCtxAttribute.getStringValue());
+			//System.out.println("Retrieved ctxAttribute id " +retrievedCtxAttribute.getId()+ " and value: "+retrievedCtxAttribute.getStringValue() );
+
+
+			// retrieve ctxAttribute with the binary value 
+			Future<CtxModelObject> ctxAttributeRetrievedBinaryFuture = this.ctxBroker.retrieve(ctxAttributeStringIdentifier);
+			CtxAttribute ctxAttributeRetrievedBinary = (CtxAttribute) ctxAttributeRetrievedBinaryFuture.get();
+			MockBlobClass retrievedBlob;
+
+			retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(ctxAttributeRetrievedBinary.getBinaryValue(), this.getClass().getClassLoader());
+			//System.out.println("Retrieved ctxAttribute id " +ctxAttributeRetrievedBinary.getId()+ "and value: "+ retrievedBlob.toString());
+			this.log.info("Retrieved ctxAttribute id " +ctxAttributeRetrievedBinary.getId()+ "and value: "+ retrievedBlob.toString());
+			
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
 }
