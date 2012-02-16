@@ -23,28 +23,13 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.conflict;
+package org.societies.useragent.api.model;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.societies.useragent.api.model.ConflictResolutionRule;
+//import java.util.List;
 
-//public class ConflictResolution implements IConflictResolutionManager{
-//
-//	@Override
-//	public IAction resolveConflict(IAction arg0, IAction arg1) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//
-//}
-public class ConflictResolutionManager extends
-		AbstractConflictResolutionManager {
+public interface ITask{
+	/* data type for user control
+	 * unkown structure
+	 *  @author haoyi.xiong@it-sudparis.eu*/
 
-	public ConflictResolutionManager() {
-		/* depends on GUI for user preference editor */
-		super();
-		List<ConflictResolutionRule> rules = new ArrayList<ConflictResolutionRule>();
-		super.setRules(rules);
-	}
 }

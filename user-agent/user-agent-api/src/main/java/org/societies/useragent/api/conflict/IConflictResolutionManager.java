@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske druzbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVACAO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -23,28 +23,17 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.conflict;
+package org.societies.useragent.api.conflict;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.societies.useragent.api.model.ConflictResolutionRule;
+import org.societies.api.internal.personalisation.model.IOutcome;
 
-//public class ConflictResolution implements IConflictResolutionManager{
-//
-//	@Override
-//	public IAction resolveConflict(IAction arg0, IAction arg1) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//
-//}
-public class ConflictResolutionManager extends
-		AbstractConflictResolutionManager {
-
-	public ConflictResolutionManager() {
-		/* depends on GUI for user preference editor */
-		super();
-		List<ConflictResolutionRule> rules = new ArrayList<ConflictResolutionRule>();
-		super.setRules(rules);
-	}
+public interface IConflictResolutionManager{
+	/*conflict resolved between two IAction 
+	 * instances
+	 * @author haoyi.xiong@it-sudparis.eu*/
+	IOutcome resolveConflict(IOutcome intentaction
+			,IOutcome preferaction);
+	/*resolve conflict between intent and preference
+	 * @param intentaction, the action by intent
+	 * @param preferaction, the action by preference*/
 }

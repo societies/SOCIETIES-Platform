@@ -161,7 +161,7 @@ public interface IPrivacyPreferenceManager {
 	 * 
 	 * @param service_id
 	 */
-	public Identity getIdSPreference(IServiceResourceIdentifier service_id);
+	public Identity evaluateIdSPreference(IServiceResourceIdentifier service_id);
 
 	/**
 	 * Method to retrieve the list of IDSPreferences that affect the given DPI and

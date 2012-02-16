@@ -165,9 +165,8 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	
 	private Object waitForResponse(String id) throws XMPPError {
 		Object response = null;
-		synchronized (responses) {
-			response = responses.remove(id);
-			while (response==null) {
+		synchronized (responses) {				
+			while (!responses.containsKey(id)) {
 				try {
 					LOG.info("waiting response 4 id "+id);
 					responses.wait(TIMEOUT);
@@ -175,8 +174,8 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 					LOG.info(e.getMessage());
 				}
 				LOG.info("checking response 4 id "+id+" in "+Arrays.toString(responses.keySet().toArray()));
-				response = responses.remove(id);
 			}
+			response = responses.remove(id);
 			LOG.info("got response 4 id "+id);
 		}
 		if (response instanceof XMPPError)

@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske druzbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVACAO, SA (PTIN), IBM Corp., 
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -22,18 +22,21 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.privacytrust.privacyprotection.privacypreferencemanager;
 
-package org.societies.api.internal.useragent.conflict;
-
-import org.societies.api.internal.personalisation.model.IOutcome;
-
-public interface IConflictResolutionManager{
-	/*conflict resolved between two IAction 
-	 * instances
-	 * @author haoyi.xiong@it-sudparis.eu*/
-	IOutcome resolveConflict(IOutcome intentaction
-			,IOutcome preferaction);
-	/*resolve conflict between intent and preference
-	 * @param intentaction, the action by intent
-	 * @param preferaction, the action by preference*/
+/**
+ * Describe your class here...
+ *
+ * @author Eliza
+ *
+ */
+public class CtxTypes {
+	
+	public static final String PRIVACY_PREFERENCE_REGISTRY = "PRIVACY_PREFERENCE_REGISTRY";
+	public static final String PRIVACY_PREFERENCE = "PRIVACY_PREFERENCE";
+	public static final String HAS_PRIVACY_PREFERENCES = "HAS_PRIVACY_PREFERENCES";
+	public static final String SYMBOLIC_LOCATION = "SYMBOLIC_LOCATION";
+	public static final String STATUS = "STATUS";
+	public static final String ACTIVITY = "ACTIVITY";
+	
 }

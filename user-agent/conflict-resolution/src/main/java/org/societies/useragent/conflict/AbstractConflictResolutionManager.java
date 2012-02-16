@@ -28,9 +28,9 @@ package org.societies.useragent.conflict;
 import java.util.List;
 
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.internal.useragent.conflict.IConflictResolutionManager;
-import org.societies.api.internal.useragent.model.ConflictResolutionRule;
-import org.societies.api.internal.useragent.model.EnsembleConflictResolutionRule;
+import org.societies.useragent.api.conflict.IConflictResolutionManager;
+import org.societies.useragent.api.model.ConflictResolutionRule;
+import org.societies.useragent.api.model.EnsembleConflictResolutionRule;
 
 public class AbstractConflictResolutionManager implements IConflictResolutionManager{
 	private List<ConflictResolutionRule> rules;

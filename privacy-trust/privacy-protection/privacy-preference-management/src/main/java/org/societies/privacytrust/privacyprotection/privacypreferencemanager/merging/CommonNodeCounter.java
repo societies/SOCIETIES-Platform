@@ -23,28 +23,65 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.conflict;
+
+package org.societies.privacytrust.privacyprotection.privacypreferencemanager.merging;
 
 import java.util.ArrayList;
-import java.util.List;
-import org.societies.useragent.api.model.ConflictResolutionRule;
 
-//public class ConflictResolution implements IConflictResolutionManager{
-//
-//	@Override
-//	public IAction resolveConflict(IAction arg0, IAction arg1) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//
-//}
-public class ConflictResolutionManager extends
-		AbstractConflictResolutionManager {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
 
-	public ConflictResolutionManager() {
-		/* depends on GUI for user preference editor */
-		super();
-		List<ConflictResolutionRule> rules = new ArrayList<ConflictResolutionRule>();
-		super.setRules(rules);
+/**
+ * @author Elizabeth
+ *
+ */
+public class CommonNodeCounter {
+
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
+	private class NodeCounter{
+		IPrivacyPreference node;
+		int counter;
+		
+		NodeCounter(IPrivacyPreference ptn, int c){
+			this.node = ptn;
+			this.counter = c;
+			
+		}
+		
+		public int getCounter(){
+			return this.counter;
+		}
+		
+		public IPrivacyPreference getNode(){
+			return this.node;
+		}
 	}
+	
+	ArrayList<NodeCounter> nc;
+	public CommonNodeCounter(){
+		nc = new ArrayList<NodeCounter>();
+	}
+	
+	public void add(IPrivacyPreference ptn, int counter){
+		this.nc.add(new NodeCounter(ptn,counter));
+	}
+	
+	public IPrivacyPreference getMostCommonNode(){
+		int counter = 0;
+		IPrivacyPreference ptn = null;
+		logging.debug("nc size:"+this.nc.size());
+		for (int i = 0; i< this.nc.size(); i++){
+			int c = this.nc.get(i).getCounter();
+			if (counter < c){
+				counter = c;
+				ptn = this.nc.get(i).getNode();
+			}
+		}
+		
+		return ptn;
+	}
+	
+
 }
+

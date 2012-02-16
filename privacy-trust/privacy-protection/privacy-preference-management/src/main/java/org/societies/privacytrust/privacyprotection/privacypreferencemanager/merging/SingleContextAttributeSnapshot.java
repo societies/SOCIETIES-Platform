@@ -23,28 +23,40 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.conflict;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.societies.useragent.api.model.ConflictResolutionRule;
+package org.societies.privacytrust.privacyprotection.privacypreferencemanager.merging;
 
-//public class ConflictResolution implements IConflictResolutionManager{
-//
-//	@Override
-//	public IAction resolveConflict(IAction arg0, IAction arg1) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//
-//}
-public class ConflictResolutionManager extends
-		AbstractConflictResolutionManager {
+import org.societies.api.context.model.CtxAttributeIdentifier;
 
-	public ConflictResolutionManager() {
-		/* depends on GUI for user preference editor */
-		super();
-		List<ConflictResolutionRule> rules = new ArrayList<ConflictResolutionRule>();
-		super.setRules(rules);
+public class SingleContextAttributeSnapshot {
+
+	private final CtxAttributeIdentifier id;
+	private final String value;
+
+	public SingleContextAttributeSnapshot(CtxAttributeIdentifier id, String value){
+		this.value = value;
+		this.id = id;
+		
 	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public CtxAttributeIdentifier getId() {
+		return id;
+	}
+	
+	
+	public boolean equalsIgnoreValue(SingleContextAttributeSnapshot s){
+		return s.getId().toUriString().equalsIgnoreCase(getId().toUriString());
+	}
+	
+	public boolean equals(SingleContextAttributeSnapshot s){
+		if (equalsIgnoreValue(s)){
+			return s.getValue().equalsIgnoreCase(getValue());
+		}
+		return false;
+	}
+	
 }

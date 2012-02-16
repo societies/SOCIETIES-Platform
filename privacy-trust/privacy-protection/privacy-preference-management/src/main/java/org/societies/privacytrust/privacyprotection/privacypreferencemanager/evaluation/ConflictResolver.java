@@ -22,14 +22,43 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation;
 
-package org.societies.api.internal.useragent.model;
+import java.util.ArrayList;
 
-//import java.util.List;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
 
-public interface ITask{
-	/* data type for user control
-	 * unkown structure
-	 *  @author haoyi.xiong@it-sudparis.eu*/
+
+
+
+
+
+/**
+ * @author Elizabeth
+ *
+ */
+public class ConflictResolver {
+	
+	public ConflictResolver(){
+		
+	}
+	
+	public  IPrivacyPreference resolveConflicts(ArrayList<IPrivacyPreference> outcomes){
+		int confLevel = outcomes.get(0).getOutcome().getConfidenceLevel();
+		int index = -1; 
+		for (int i = 1; i < outcomes.size(); i++){
+			if (confLevel<=outcomes.get(i).getOutcome().getConfidenceLevel()){
+				confLevel = outcomes.get(i).getOutcome().getConfidenceLevel();
+				index = i;
+			}
+		}
+		if (index == -1){
+			return null;
+		}else{
+			return outcomes.get(index);
+		}
+		
+	}
 
 }
+

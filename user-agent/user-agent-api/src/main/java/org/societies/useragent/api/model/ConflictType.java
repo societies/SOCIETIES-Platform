@@ -23,23 +23,13 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.useragent.model;
+package org.societies.useragent.api.model;
 
-import org.societies.api.internal.personalisation.model.IOutcome;
-
-
-public class EmptyRule implements ConflictResolutionRule{
-
-	@Override
-	public boolean match(IOutcome intention, IOutcome preference) {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-	@Override
-	public IOutcome tradeoff(IOutcome intention, IOutcome preference) {
-		// TODO Auto-generated method stub
-		return intention;
-	}
-
+public enum ConflictType {
+/*data type to identify the type of conflict
+ * not yet know the structural properties 
+ * of such types*/
+	NO_CONFLICT,
+	PREFERNCE_INTENT_NOT_MATCH,
+	UNKNOWN_CONFLICT;
 }
