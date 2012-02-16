@@ -15,7 +15,7 @@
     <artifactId>CommunityServiceBundle</artifactId>
     <packaging>bundle</packaging>
     <name>Community Service Bundle</name>
-    <version>0.0.1</version>
+    <version>${version.comm}</version>
 
     <properties>
         <slf4j.version>1.5.0</slf4j.version>
@@ -25,6 +25,12 @@
     </properties>
 
     <dependencies>
+    	<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.societies.community</groupId>
 			<artifactId>CommunityXep</artifactId>
@@ -92,6 +98,22 @@
 						<Embed-Transitive>true</Embed-Transitive>
 		         	</instructions>
 	       		</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
+							<version>${version.comm}</version>
+							<type>bundle</type>
+							<overWrite>true</overWrite>
+							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+						</artifactItem>
+					</artifactItems>
+				</configuration>
 			</plugin>		
 		</plugins>
 	</build>

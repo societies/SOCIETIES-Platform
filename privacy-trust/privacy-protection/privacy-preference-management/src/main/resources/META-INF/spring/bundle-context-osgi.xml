@@ -11,5 +11,18 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
        
-       
+      
+        <osgi:service ref="PrivacyPreferenceManager">
+        <osgi:interfaces>
+        <value>org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager</value>
+        </osgi:interfaces>
+        </osgi:service>
+        
+		
+		
+		<osgi:reference id="UserPrefMgr" interface="org.societies.personalisation.preference.api.UserPreferenceManagement.IUserPreferenceManagement"/>
+		<osgi:reference id="UserCtxBroker" interface="org.societies.api.internal.context.broker.IUserCtxBroker"/>
+		
+		
+		       
 </beans>
