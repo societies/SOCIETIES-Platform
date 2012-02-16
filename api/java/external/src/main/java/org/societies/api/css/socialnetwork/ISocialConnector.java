@@ -35,27 +35,50 @@ import java.sql.Time;
 public interface ISocialConnector {
 
 	/**
-	 * 
-	 * @return a table of allowed value of the this variable
+	 * Connect the Connector to the Social Network
+	 * @return true if the operation goes well, false otherwise
 	 */
-	
-	private String snName;
-	private StatusType snStatus;
-	private int updateRate;
-	private Time lastUpdateTime;
-	
 	boolean connect();
 
+	/**
+	 * Disconnect and remove the social token to access Social data
+	 * @return the status of the opartion
+	 */
 	boolean disconnect();
 	
-	Status getStatus();
+	/**
+	 * Provide the status of the connecto
+	 * CONNECTED if the token is set and the component is active
+	 * DISCONNECTED if the component is not active and no token is provided
+	 * ERROR in case of general error
+	 * @return STATUS type
+	 */
+	StatusType getStatus();
 	
-	boolean getUpdateRate();
 	
-	boolean setUpdateRate();
+	/**
+	 * Get the frequency of how often social data is fetched
+	 * @return
+	 */
+	int getUpdateRate();
 	
+	/**
+	 * Set the frequency to update the RATE
+	 * @return
+	 */
+	void setUpdateRate(int value);
+	
+	/**
+	 * Get the name of the component (TWITTER, FACEBOOK, ...)
+	 * @return the name of the provider
+	 */
 	String getSocialName();
 	
+	
+	/**
+	 * Get last update time 
+	 * @return time 
+	 */
 	Time getLastUpdateTime();
 	
 	

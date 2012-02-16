@@ -26,10 +26,14 @@
 package org.societies.api.css.socialnetwork;
 
 
-
-
-private enum StatusType{
-		CONNECTED;
-		DISCONNECTED;
-		ERROR;
+ /**
+  * Status of the connecto component
+  * @author lucasimone
+  *
+  */
+ enum StatusType{
+		
+	 	CONNECTED,
+		DISCONNECTED,
+		ERROR
 	}
