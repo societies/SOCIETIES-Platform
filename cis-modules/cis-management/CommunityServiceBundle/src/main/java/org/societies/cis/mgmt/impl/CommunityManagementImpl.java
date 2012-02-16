@@ -35,10 +35,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.societies.cis.mgmt.CommunityManagement;
-import org.societies.comm.xmpp.datatypes.Stanza;
-import org.societies.comm.xmpp.exceptions.CommunicationException;
-import org.societies.comm.xmpp.interfaces.ICommManager;
-import org.societies.comm.xmpp.interfaces.IFeatureServer;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.community.Community;
 import org.societies.community.Participant;
 import org.societies.community.Who;
@@ -79,14 +80,11 @@ public class CommunityManagementImpl implements CommunityManagement,
 		this.endpoint = endpoint;
 	
 		try {
-			endpoint.register(this); // TODO unregister??
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			endpoint.register(this);
 		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		} // TODO unregister??
+		
 	}
 
 	@Override
@@ -106,7 +104,7 @@ public class CommunityManagementImpl implements CommunityManagement,
 	}
 
 	@Override
-	public Object receiveQuery(Stanza stanza, Object payload) {
+	public Object getQuery(Stanza stanza, Object payload) {
 		// all received IQs contain a community element
 		if (payload.getClass().equals(Community.class)) {
 			Community c = (Community) payload;
@@ -164,6 +162,15 @@ public class CommunityManagementImpl implements CommunityManagement,
 
 	@Override
 	public String getOwner() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.comm.xmpp.interfaces.IFeatureServer#setQuery(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	 */
+	@Override
+	public Object setQuery(Stanza stanza, Object payload) throws XMPPError {
 		// TODO Auto-generated method stub
 		return null;
 	}
