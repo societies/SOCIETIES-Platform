@@ -31,15 +31,19 @@ public abstract class PubsubEventStream implements ApplicationEventMulticaster {
 	}
 
 	@Override
-	public void multicastEvent(ApplicationEvent arg0) {
-		if (arg0 instanceof PubsubEvent) {
-			PubsubEvent pe = (PubsubEvent)arg0;
+	public void multicastEvent(ApplicationEvent event) {
+		if (event instanceof PubsubEvent) {
+			PubsubEvent pe = (PubsubEvent)event;
 			if (!pe.isPublished()) {
 				// publish to XMPP node
 				String itemId = publishLocalEvent(pe.getPayload());
 				pe.setPublished(pubsubService, node, itemId);
 			}
 			multicaster.multicastEvent(pe);
+		}
+		else
+		{	//REGULAR SPRING EVENT ONLY
+			multicaster.multicastEvent(event);
 		}
 	}
 
