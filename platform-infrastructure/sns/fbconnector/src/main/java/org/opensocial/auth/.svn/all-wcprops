@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/auth
+END
+FCAuthScheme.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/auth/FCAuthScheme.java
+END
+OAuth2LeggedScheme.java
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/auth/OAuth2LeggedScheme.java
+END
+OAuth3LeggedScheme.java
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/auth/OAuth3LeggedScheme.java
+END
+OAuthScheme.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/auth/OAuthScheme.java
+END
+AuthScheme.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/auth/AuthScheme.java
+END
+SecurityTokenScheme.java
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/auth/SecurityTokenScheme.java
+END

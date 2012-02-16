@@ -27,7 +27,7 @@ package org.societies.api.servicelifecycle.model;
 import java.net.URI;
 
 /**
- * @deprecated Massimo: this interface will be deprecated as soon as 
+ *  Massimo: this interface will be deprecated as soon as 
  * 						the service lifecycle management will run
  * 						and it will expose the interfaces for the
  * 						service registry

@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/ca/!svn/ver/10748/applications/socialtim/trunk/src/org/opensocial
+END
+RequestException.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/RequestException.java
+END
+Request.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/Request.java
+END
+Client.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/Client.java
+END
+Response.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/Response.java
+END

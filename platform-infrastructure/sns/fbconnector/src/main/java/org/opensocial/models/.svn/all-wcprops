@@ -1,0 +1,83 @@
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/ca/!svn/ver/10748/applications/socialtim/trunk/src/org/opensocial/models
+END
+Album.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/models/Album.java
+END
+Model.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/models/Model.java
+END
+Author.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/ca/!svn/ver/10705/applications/socialtim/trunk/src/org/opensocial/models/Author.java
+END
+Image.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/ca/!svn/ver/10699/applications/socialtim/trunk/src/org/opensocial/models/Image.java
+END
+ObjectOpenSocial.java
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/ca/!svn/ver/10748/applications/socialtim/trunk/src/org/opensocial/models/ObjectOpenSocial.java
+END
+Person.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/models/Person.java
+END
+Actor.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/ca/!svn/ver/10704/applications/socialtim/trunk/src/org/opensocial/models/Actor.java
+END
+Location.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/models/Location.java
+END
+AppData.java
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/models/AppData.java
+END
+Activity.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/ca/!svn/ver/10699/applications/socialtim/trunk/src/org/opensocial/models/Activity.java
+END
+Group.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/models/Group.java
+END
+MediaItem.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/models/MediaItem.java
+END
+Tags.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/ca/!svn/ver/10741/applications/socialtim/trunk/src/org/opensocial/models/Tags.java
+END
