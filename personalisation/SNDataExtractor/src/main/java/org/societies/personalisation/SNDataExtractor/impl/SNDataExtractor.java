@@ -13,7 +13,6 @@ public class SNDataExtractor  {
 		System.out.println("SNData initialized");
 	}
 
-	
 	public ICtxBroker getCtxBroker() {
 		return ctxBroker;
 	}
@@ -21,7 +20,5 @@ public class SNDataExtractor  {
 	public void setCtxBroker(ICtxBroker ctxBroker) {
 		this.ctxBroker = ctxBroker;
 	}
-	
-	
 	
 }
