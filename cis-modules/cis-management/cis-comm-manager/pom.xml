@@ -7,14 +7,14 @@
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>0.1</version>
-		<relativePath>../../../parent/spring-osgi.xml</relativePath>
+
 	 </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.societies.cis.mgmt</groupId>
-    <artifactId>CommunityServiceBundle</artifactId>
+    <groupId>org.societies.cis</groupId>
+    <artifactId>cis-comm-manager</artifactId>
     <packaging>bundle</packaging>
-    <name>Community Service Bundle</name>
+    <name>CIS Communication Manager</name>
     <version>${version.comm}</version>
 
     <properties>
@@ -40,7 +40,7 @@
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 	  		<artifactId>CommunicationFrameworkCommons</artifactId>
-	  		<version>0.0.1-SNAPSHOT</version>
+	  		<version>${version.comm}</version>
 			<scope>provided</scope>
 		</dependency>
 		

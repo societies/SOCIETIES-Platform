@@ -24,7 +24,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.cis.mgmt.impl;
+package org.societies.cis.manager;
 
 
 import java.util.Collections;
@@ -34,7 +34,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.societies.cis.mgmt.CommunityManagement;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -46,10 +45,13 @@ import org.societies.community.Who;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Joao M. Goncalves (PTIN)
  * 
- *         This is the implementation of both the {@link CommunityManagement}
+ *         This is the implementation of both the {@link CisCommunicationManagerInterface}
  *         service and of the {@link IFeatureServer} interface. It handles
  *         XEP-SOC1 related logic. Registers on XCCommunicationMgr to receive
  *         stanza elements of namespace http://societies.org/community, and
@@ -61,20 +63,24 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-public class CommunityManagementImpl implements CommunityManagement,
+public class CisCommunicationManager implements CisCommunicationManagerInterface,
 		IFeatureServer {
 
 	private final static List<String> NAMESPACES = Collections
 			.singletonList("http://societies.org/community");
 	private final static List<String> PACKAGES = Collections
 			.singletonList("org.societies.community");
+	
+	private static Logger LOG = LoggerFactory.getLogger(CisCommunicationManager.class);
+
 
 	private ICommManager endpoint;
 	private Set<String> participants;
 	private Set<String> leaders;
 
 	@Autowired
-	public CommunityManagementImpl(ICommManager endpoint) {
+	public CisCommunicationManager(ICommManager endpoint) {
+		LOG.info("CIS Comm Started");
 		participants = new HashSet<String>();
 		leaders = new HashSet<String>();
 		this.endpoint = endpoint;
@@ -106,9 +112,11 @@ public class CommunityManagementImpl implements CommunityManagement,
 	@Override
 	public Object getQuery(Stanza stanza, Object payload) {
 		// all received IQs contain a community element
+		LOG.info("get Query received");
 		if (payload.getClass().equals(Community.class)) {
 			Community c = (Community) payload;
 			if (c.getJoin() != null) {
+				LOG.info("join received");
 				String jid = stanza.getFrom().getJid();
 				if (!participants.contains(jid)) {
 					participants.add(jid);

@@ -34,11 +34,11 @@
  * 
  */
 
-package org.societies.cis.mgmt;
+package org.societies.cis.manager;
 
 import java.util.Set;
 
-public interface CommunityManagement {
+public interface CisCommunicationManagerInterface {
 	Set<String> getParticipants();
 	Set<String> getLeaders();
 	String getOwner();
