@@ -22,36 +22,60 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.servicelifecycle.model;
+package org.societies.context.brokerTest.impl;
 
-import java.net.URI;
+import java.io.Serializable;
 
-/**
- *  Massimo: this interface will be deprecated as soon as 
- * 						the service lifecycle management will run
- * 						and it will expose the interfaces for the
- * 						service registry
- * @author Eliza
- * 
- */
+public class MockBlobClass implements Serializable {
 
-public interface IServiceResourceIdentifier {
-
-	/**
-	 * 
-	 * @return the identifier for Service Instance
-	 */
-	public URI getIdentifier();
+	private static final long serialVersionUID = 1490587976482520647L;
 	
-	/**
-	 * 
-	 * @param identifier for a Service Instance
-	 */
-	public void setIdentifier(URI identifier);
+	private int seed;
 	
+	public MockBlobClass(int seed) {
+		this.seed = seed;
+	}
+
 	/**
-	 * 
-	 * @return a string representation of the object.
+	 * @return the seed
 	 */
-	public String toString();
+	public int getSeed() {
+		return seed;
+	}
+
+	/**
+	 * @param seed the seed to set
+	 */
+	public void setSeed(int seed) {
+		this.seed = seed;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + this.seed;
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (this.getClass() != obj.getClass())
+			return false;
+		
+		MockBlobClass that = (MockBlobClass) obj;
+		if (this.seed != that.seed)
+			return false;
+		return true;
+	}
 }

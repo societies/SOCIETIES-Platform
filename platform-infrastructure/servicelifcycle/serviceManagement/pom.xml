@@ -56,6 +56,7 @@
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
 			<version>${release.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -79,6 +80,7 @@
 			<groupId>org.eclipse.osgi</groupId>
 			<artifactId>org.eclipse.equinox.event</artifactId>
 			<version>1.2.100.v20110110</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>

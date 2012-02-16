@@ -12,8 +12,12 @@ import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
  */
 
 
-public class ServiceResourceIdentifier implements Serializable {
+public class ServiceResourceIdentifier implements IServiceResourceIdentifier, Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private URI identifier;
 	/**
 	 * no- arg constructor is needed for xml to object mapping
