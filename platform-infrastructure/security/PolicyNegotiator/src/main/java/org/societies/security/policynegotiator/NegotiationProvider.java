@@ -45,5 +45,6 @@ public class NegotiationProvider implements INegotiationProvider {
 	@Override
 	public void reject(int sessionId) {
 		// TODO Auto-generated method stub
+		LOG.debug("reject({})", sessionId);
 	}
 }
