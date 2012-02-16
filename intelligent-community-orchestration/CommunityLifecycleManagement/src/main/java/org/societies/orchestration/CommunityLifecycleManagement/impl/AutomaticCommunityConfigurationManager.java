@@ -25,33 +25,36 @@
 
 package org.societies.orchestration.CommunityLifecycleManagement.impl;
 
-import org.societies.api.internal.css_modules.css_directory.ICssDirectory;
+import org.societies.api.internal.css.directory.ICssDirectory;
 
-import org.societies.api.internal.css_modules.css_discovery.ICssDiscovery;
+import org.societies.api.internal.css.discovery.ICssDiscovery;
 
-import org.societies.api.internal.cis.cis_management.CisActivityFeed;
-import org.societies.api.internal.cis.cis_management.ICisManager;
-import org.societies.api.internal.cis.cis_management.ServiceSharingRecord;
-import org.societies.api.internal.cis.cis_management.CisActivity;
-import org.societies.api.internal.cis.cis_management.CisRecord;
+import org.societies.api.internal.cis.management.CisActivityFeed;
+import org.societies.api.internal.cis.management.ICisManager;
+import org.societies.api.internal.cis.management.ServiceSharingRecord;
+import org.societies.api.internal.cis.management.CisActivity;
+import org.societies.api.internal.cis.management.CisRecord;
 
-import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
+import java.util.concurrent.Future;
 
-import org.societies.api.internal.context.user.prediction.IUserCtxPredictionMgr;
+//import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
 
-import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
+//import org.societies.api.internal.context.user.prediction.IUserCtxPredictionMgr;
 
-import org.societies.api.internal.context.user.history.IUserCtxHistoryMgr;
+//import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
 
-import org.societies.api.internal.context.broker.IUserCtxBroker;
-import org.societies.api.internal.context.broker.ICommunityCtxBroker;
-import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
+//import org.societies.api.internal.context.user.history.IUserCtxHistoryMgr;
 
+//import org.societies.api.internal.context.broker.IUserCtxBroker;
+//import org.societies.api.internal.context.broker.ICommunityCtxBroker;
+//import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
+
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
-import org.societies.api.mock.EntityIdentifier;
-//import org.societies.api.comm.xmpp.datatypes.Identity;
+//import org.societies.api.mock.Identity;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
 //import org.societies.comm.xmpp.interfaces.FeatureServer;
@@ -89,17 +92,17 @@ import java.util.List;
 public class AutomaticCommunityConfigurationManager //implements ICommCallback
 {
 	
-	private EntityIdentifier linkedCss; // No datatype yet defined for CSS
+	private Identity linkedCss; // No datatype yet defined for CSS
 	
     private CisRecord linkedCis;
     
-    //private Domain linkedDomain;  // No datatype yet representing a domain
-	private EntityIdentifier linkedDomain;
+	private Identity linkedDomain;
 	
-	private IUserCtxDBMgr userContextDatabaseManager;
-	private IUserCtxBroker userContextBroker;
-	private ICommunityCtxBroker communityContextBroker;
-	private IUserCtxBrokerCallback userContextBrokerCallback;
+	private ICtxBroker userContextBroker;
+	//private IUserCtxDBMgr userContextDatabaseManager;
+	//private IUserCtxBroker userContextBroker;
+	//private ICommunityCtxBroker communityContextBroker;
+	//private IUserCtxBrokerCallback userContextBrokerCallback;
 
 	private ArrayList<CisRecord> recentRefusals;
     
@@ -113,7 +116,7 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
 	 *              that this object will operate on behalf of.
 	 */
 	
-	public AutomaticCommunityConfigurationManager(EntityIdentifier linkedEntity, String linkType) {
+	public AutomaticCommunityConfigurationManager(Identity linkedEntity, String linkType) {
 		if (linkType.equals("CSS"))
 			this.linkedCss = linkedEntity;
 		else
@@ -169,7 +172,7 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
 		
 		//for (int i = 0; i < cisRecords.size(); i++) {
 		//    CisRecord cisUnderAnalysis = cisRecords.get(i);
-		//    ArrayList<EntityIdentifier> cisMembers = cisUnderAnalysis.getMembers();
+		//    ArrayList<Identity> cisMembers = cisUnderAnalysis.getMembers();
 		//    for (int i = 0; i < cisMembers.size(); i++) {
 		//        if (cisUnderAnalysis.getActivityFeed().getLastActivityForMember(cisMembers.get(i)).getTimestamp() < Time.current() - 240000000)
 		//            //make the suggestion to User Agent based on calcluation - see later
@@ -238,11 +241,11 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
     	new AutomaticCommunityConfigurationManager(linkedCss, "CSS");
     }
     
-    public EntityIdentifier getLinkedCss() {
+    public Identity getLinkedCss() {
     	return linkedCss;
     }
     
-    public void setLinkedCss(EntityIdentifier linkedCss) {
+    public void setLinkedCss(Identity linkedCss) {
     	this.linkedCss = linkedCss;
     }
     
@@ -255,15 +258,15 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
     	this.linkedCis = linkedCis;
     }
     
-    public EntityIdentifier getLinkedDomain() {
+    public Identity getLinkedDomain() {
     	return linkedDomain;
     }
     
-    public void setLinkedDomain(EntityIdentifier linkedDomain) {
+    public void setLinkedDomain(Identity linkedDomain) {
     	this.linkedDomain = linkedDomain;
     }
     
-    public void setUserContextDatabaseManager(IUserCtxDBMgr userContextDatabaseManager) {
+    /**public void setUserContextDatabaseManager(IUserCtxDBMgr userContextDatabaseManager) {
     	System.out.println("GOT database" + userContextDatabaseManager);
     	this.userContextDatabaseManager = userContextDatabaseManager;
     }
@@ -276,7 +279,7 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
     public void setUserContextBrokerCallback(IUserCtxBrokerCallback userContextBrokerCallback) {
     	System.out.println("GOT user context broker callback" + userContextBrokerCallback);
     	this.userContextBrokerCallback = userContextBrokerCallback;
-    }
+    }*/
     
   //public CommManagerBundle getCommManager() {
     //	return commManager;

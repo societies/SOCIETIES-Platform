@@ -56,7 +56,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		
 		 <!-- User Agent -->
 		<module>../user-agent/user-action-monitor</module>
-		<module>../user-agent/user-feedback</module>
+		<!--<module>../user-agent/user-feedback</module>-->
 		 
 		<!-- Personalisation -->
 		<!-- 
@@ -99,7 +99,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>../cis-modules/cis-management/cis-manager/cis-manager/</module>
 		<module>../cis-modules/cis-discovery/</module>
 		<module>../cis-modules/cis-collaboration/</module>
-		
+		<module>../cis-modules/cis-management/cis-comm-manager/</module>
+			
 		<!-- <module>../cis-modules/cis-management/CommunityXEP</module>
 		<module>../cis-modules/cis-management/CommunityServiceBundle</module>
 		-->

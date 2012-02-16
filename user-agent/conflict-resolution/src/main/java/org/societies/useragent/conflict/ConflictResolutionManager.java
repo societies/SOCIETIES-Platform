@@ -27,7 +27,7 @@ package org.societies.useragent.conflict;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.societies.api.internal.useragent.model.ConflictResolutionRule;
+import org.societies.useragent.api.model.ConflictResolutionRule;
 
 //public class ConflictResolution implements IConflictResolutionManager{
 //

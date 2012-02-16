@@ -57,7 +57,7 @@ public class PreferenceRetriever {
 			if (null!=attrList){
 				if (attrList.size()>0){
 					CtxIdentifier identifier = attrList.get(0);
-					CtxAttribute attr = (CtxAttribute) broker.retrieve(identifier);
+					CtxAttribute attr = (CtxAttribute) broker.retrieve(identifier).get();
 					Object obj = this.convertToObject(attr.getBinaryValue());
 					
 					if (obj==null){
@@ -68,6 +68,7 @@ public class PreferenceRetriever {
 							this.logging.debug("PreferenceRegistry found in DB for dpi:"+dpi.toString());
 							return (Registry) obj;
 						}else{
+							this.logging.debug("PreferenceRegistry not found in DB for dpi:"+dpi.toString()+". Creating new registry");
 							return new Registry();
 						}
 					}
@@ -130,7 +131,7 @@ public class PreferenceRetriever {
 	public IPreferenceTreeModel retrievePreference(CtxIdentifier id){
 		try{
 			//retrieve directly the attribute in context that holds the preference as a blob value
-			CtxAttribute attrPref = (CtxAttribute) broker.retrieve(id);
+			CtxAttribute attrPref = (CtxAttribute) broker.retrieve(id).get();
 			//cast the blob value to type IPreference and return it
 			Object obj = this.convertToObject(attrPref.getBinaryValue());
 			if (null!=obj){
@@ -140,6 +141,12 @@ public class PreferenceRetriever {
 			}
 		}
 		catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
