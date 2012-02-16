@@ -52,38 +52,34 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
 import org.societies.context.broker.api.CtxBrokerException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
+import org.springframework.stereotype.Service;
 
 /**
  * Internal Context Broker Implementation
  * This class implements the internal context broker interfaces and orchestrates the db 
  * management 
  */
+@Service
 public class InternalCtxBroker implements ICtxBroker {
+	
+	/**
+	 * The User Context DB Mgmt service reference.
+	 * 
+	 * @see {@link #setUserCtxDBMgr(IUserCtxDBMgr)}
+	 */
+	@Autowired(required=true)
+	private IUserCtxDBMgr userCtxDBMgr = null;
 
-	private IUserCtxDBMgr userCtxDBMgr;
-	private IUserCtxHistoryMgr userCtxHistoryMgr;
-
-	public InternalCtxBroker(IUserCtxDBMgr userDB,IUserCtxHistoryMgr userHocDB) throws CtxException {
-		this.userCtxDBMgr=userDB;
-		this.userCtxHistoryMgr = userHocDB;
-		// TODO Use logging.debug
-		//System.out.println(this.getClass().getName()+" full");
-	}
-
-	public InternalCtxBroker() throws CtxException {
-		// TODO Use logging.debug
-		//System.out.println(this.getClass().getName()+ " empty");
-	}
-
-	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) throws CtxException {
-		this.userCtxDBMgr = userDB;
-	}
-
-	public void setUserCtxHistoryMgr (IUserCtxHistoryMgr userHocDB) throws CtxException {
-		this.userCtxHistoryMgr = userHocDB;
-	}
+	/**
+	 * The User Context History Mgmt service reference. 
+	 * 
+	 * @see {@link #setUserCtxHistoryMgr(IUserCtxHistoryMgr)}
+	 */
+	@Autowired(required=true)
+	private IUserCtxHistoryMgr userCtxHistoryMgr = null;
 
 	/*
 	 * (non-Javadoc)
@@ -247,7 +243,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		// this part allows the storage of attribute updates to context history
 		if (CtxModelType.ATTRIBUTE.equals(modelObject.getModelType())) {
-			final CtxAttribute ctxAttr = (CtxAttribute) modelObject; 
+			final CtxAttribute ctxAttr = (CtxAttribute) modelObject;
 			if (ctxAttr.isHistoryRecorded() && this.userCtxHistoryMgr != null)
 				this.userCtxHistoryMgr.storeHoCAttribute(ctxAttr);
 		}
@@ -463,7 +459,8 @@ public class InternalCtxBroker implements ICtxBroker {
 		
 			// use this for test only
 			CtxAttribute  tupleAttrRetrieved = (CtxAttribute) tupleAttrFuture.get();
-			System.out.println("tupleAttr "+tupleAttrRetrieved.getId() );
+			// TODO use LOGGING
+			//System.out.println("tupleAttr "+tupleAttrRetrieved.getId() );
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -491,6 +488,26 @@ public class InternalCtxBroker implements ICtxBroker {
 		return null;
 	}
 
+	/**
+	 * Sets the User Context DB Mgmt service reference.
+	 * 
+	 * @param userDB
+	 *            the User Context DB Mgmt service reference to set.
+	 */
+	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) {
+		this.userCtxDBMgr = userDB;
+	}
+
+	/**
+	 * Sets the User Context History Mgmt service reference.
+	 * 
+	 * @param userCtxHistoryMgr
+	 *            the User Context History Mgmt service reference to set
+	 */
+	public void setUserCtxHistoryMgr(IUserCtxHistoryMgr userCtxHistoryMgr) {
+		this.userCtxHistoryMgr = userCtxHistoryMgr;
+	}
+	
 	private CtxAttributeValueType findAttributeValueType(Serializable value) {
 		if (value == null)
 			return CtxAttributeValueType.EMPTY;

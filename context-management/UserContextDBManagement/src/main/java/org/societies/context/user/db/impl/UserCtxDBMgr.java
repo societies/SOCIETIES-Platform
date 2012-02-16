@@ -41,24 +41,26 @@ import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.IndividualCtxEntity;
 
 import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.comm.xmpp.datatypes.IdentityType;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-//@Component
-public class UserCtxDBMgr implements IUserCtxDBMgr{
+/**
+ * Implementation of the {@link IUserCtxDBMgr} interface.
+ * 
+ * @author 
+ * @since 0.0.1
+ */
+@Service("userCtxDBMgr")
+public class UserCtxDBMgr implements IUserCtxDBMgr {
 
 	private final Map<CtxIdentifier, CtxModelObject> modelObjects;
 
 	private final Identity privateId;
 	
-	
-	//	@Autowired
 	public UserCtxDBMgr() {
 		this.modelObjects =  new HashMap<CtxIdentifier, CtxModelObject>();
 		
-		// !!!!!! Identity should be instantiated properly
+		// TODO !!!!!! Identity should be instantiated properly
 		this.privateId = null;
 	}
 
