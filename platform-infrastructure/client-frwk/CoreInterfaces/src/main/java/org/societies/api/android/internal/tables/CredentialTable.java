@@ -1,4 +1,4 @@
-package org.societies.api.android.internal.model;
+package org.societies.api.android.internal.tables;
 
 import org.societies.android.platform.interfaces.IContentProvider;
 
