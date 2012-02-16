@@ -16,4 +16,9 @@
 		this file can easily be used for integration testing outside of an OSGi environment -->
 
 
+   <bean id="PrivacyPreferenceManager" class="org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager" 
+   depends-on="UserCtxBroker" init-method="initialisePrivacyPreferenceManager">
+   <property name="ctxBroker" ref="UserCtxBroker"></property>
+   </bean>
+
 </beans>

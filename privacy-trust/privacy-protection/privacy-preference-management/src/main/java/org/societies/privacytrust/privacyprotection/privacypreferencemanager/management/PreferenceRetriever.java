@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -17,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.UserPreferenceManagement.impl.management;
+package org.societies.privacytrust.privacyprotection.privacypreferencemanager.management;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -28,13 +33,13 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceTreeModel;
+import org.societies.privacytrust.privacyprotection.privacypreferencemanager.CtxTypes;
 
 /**
  * @author Elizabeth
@@ -49,9 +54,9 @@ public class PreferenceRetriever {
 		this.broker = broker;
 	}
 	
-	public Registry retrieveRegistry(Identity dpi){
+	public Registry retrieveRegistry(){
 		try {
-			Future<List<CtxIdentifier>> futureAttrList = broker.lookup(CtxModelType.ATTRIBUTE, "PREFERENCE_REGISTRY");
+			Future<List<CtxIdentifier>> futureAttrList = broker.lookup(CtxModelType.ATTRIBUTE, CtxTypes.PRIVACY_PREFERENCE_REGISTRY); 
 			List<CtxIdentifier> attrList = futureAttrList.get();
 			if (null!=attrList){
 				if (attrList.size()>0){
@@ -60,36 +65,37 @@ public class PreferenceRetriever {
 					Object obj = this.convertToObject(attr.getBinaryValue());
 					
 					if (obj==null){
-						this.logging.debug("PreferenceRegistry not found in DB for dpi:"+dpi.toString()+". Creating new registry");
+						this.logging.debug("PreferenceRegistry not found in DB for private DPI. Creating new registry");
 						return new Registry();
+					}
+					
+					if (obj instanceof Registry){
+						this.logging.debug("PreferenceRegistry found in DB ");
+						return (Registry) obj;
 					}else{
-						if (obj instanceof Registry){
-							this.logging.debug("PreferenceRegistry found in DB for dpi:"+dpi.toString());
-							return (Registry) obj;
-						}else{
-							this.logging.debug("PreferenceRegistry not found in DB for dpi:"+dpi.toString()+". Creating new registry");
-							return new Registry();
-						}
+						this.logging.debug("PreferenceRegistry not found in DB for private DPI. Creating new registry");
+						return new Registry();
 					}
 				}
-				this.logging.debug("PreferenceRegistry not found in DB for dpi:"+dpi.toString()+". Creating new registry");
+				this.logging.debug("PreferenceRegistry not found in DB for private DPI. Creating new registry");
 				return new Registry();
 			}
-			this.logging.debug("PreferenceRegistry not found in DB for dpi:"+dpi.toString()+". Creating new registry");
+			this.logging.debug("PreferenceRegistry not found in DB for private DPI. Creating new registry");
 			return new Registry();
 		} catch (CtxException e) {
-			this.logging.debug("Exception while loading PreferenceRegistry from DB for dpi:"+dpi.toString());
+			this.logging.debug("Exception while loading PreferenceRegistry from DB ");
 			e.printStackTrace();
+			return new Registry();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			this.logging.debug("Exception while loading PreferenceRegistry from DB ");
 			e.printStackTrace();
+			return new Registry();
 		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
+			this.logging.debug("Exception while loading PreferenceRegistry from DB ");
 			e.printStackTrace();
+			return new Registry();
 		}
-		return new Registry();
 	}
-
 	
 	private Object convertToObject(byte[] byteArray){
 		try {
@@ -106,21 +112,20 @@ public class PreferenceRetriever {
 		return null;
 	}
 	
-
 	/*
 	 * retrieves a preference object using that preference object's context identifier to find it
 	 * @param id
 	 * @return
 	 */
-	public IPreferenceTreeModel retrievePreference(CtxIdentifier id){
+	public IPrivacyPreferenceTreeModel retrievePreference(CtxIdentifier id){
 		try{
 			//retrieve directly the attribute in context that holds the preference as a blob value
 			CtxAttribute attrPref = (CtxAttribute) broker.retrieve(id).get();
 			//cast the blob value to type IPreference and return it
 			Object obj = this.convertToObject(attrPref.getBinaryValue());
 			if (null!=obj){
-				if (obj instanceof IPreferenceTreeModel){
-					return (IPreferenceTreeModel) obj;
+				if (obj instanceof IPrivacyPreferenceTreeModel){
+					return (IPrivacyPreferenceTreeModel) obj;
 				}
 			}
 		}
