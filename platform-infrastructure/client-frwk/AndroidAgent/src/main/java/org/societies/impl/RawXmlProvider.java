@@ -19,14 +19,20 @@ public class RawXmlProvider implements IQProvider {
 			parser.next();
 			text = getText(parser,prefixes);
 			sb.append(text);			
-		} while (!parser.getName().equals(rootElementName));
-		
+		} while (!atRootEndTag(parser, rootElementName));
+				
 		return new IQ() {
 			@Override
 			public String getChildElementXML() {
 				return sb.toString();
 			}			
 		};
+	}
+
+	private boolean atRootEndTag(XmlPullParser parser,String rootElementName) throws XmlPullParserException {		
+		return parser.getEventType() == XmlPullParser.END_TAG && 
+				parser.getName() != null &&
+				parser.getName().equals(rootElementName);
 	}	
 
 	private String getText(XmlPullParser parser, List<String> prefixes) throws XmlPullParserException {
