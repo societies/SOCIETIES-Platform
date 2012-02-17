@@ -41,10 +41,6 @@ public abstract class PubsubEventStream implements ApplicationEventMulticaster {
 			}
 			multicaster.multicastEvent(pe);
 		}
-		else
-		{	//REGULAR SPRING EVENT ONLY
-			multicaster.multicastEvent(event);
-		}
 	}
 
 	@Override
