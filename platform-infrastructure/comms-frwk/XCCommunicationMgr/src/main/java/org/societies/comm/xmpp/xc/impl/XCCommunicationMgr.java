@@ -57,6 +57,18 @@ public class XCCommunicationMgr extends AbstractComponent implements
 		thisIdentity = idm.fromJid(subDomain);
 	}
 
+	/**
+	 * Unregisters the XC Manager as an external component from the XMPP Server
+	 */
+	public void UnRegisterCommManager() {
+		try {
+			manager.removeComponent(subDomain);
+		} catch (ComponentException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
 	/*
 	 * Implementation of AbstractComponent methods
 	 */
