@@ -22,16 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.societies.comm.examples.clientcommand;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.comm.xmpp.pubsub.PubsubClient;
-import org.societies.example.calculator.ICalc;
-import org.societies.example.calculator.ICalcRemote;
-import org.societies.example.fortunecookie.IWisdom;
-import org.societies.example.IExamplesCallback;
 
 /**
  * Describe your class here...
@@ -39,57 +30,26 @@ import org.societies.example.IExamplesCallback;
  * @author aleckey
  *
  */
-public class ClientTester implements IExamplesCallback {
+public class TestObject {
 
-	private ICalcRemote remoteCalculator;
-	private PubsubClient pubSubManager;
-	private IWisdom fcGenerator;
-	private static Logger LOG = LoggerFactory.getLogger(ClientTester.class);
+	private String name;
+	private String desc;
 	
-	public ICalcRemote getRemoteCalculator() { return remoteCalculator; }
-	public void setRemoteCalculator(ICalcRemote remoteCalculator) { this.remoteCalculator = remoteCalculator; }
-	
-	public PubsubClient getPubSubManager() { return this.pubSubManager; }
-	public void setPubSubManager(PubsubClient pubSubManager) { this.pubSubManager = pubSubManager; 	}
-
-	public IWisdom getFcGenerator() { return fcGenerator; }
-	public void setFcGenerator(IWisdom fcGenerator) { this.fcGenerator = fcGenerator; }
-
-	//ENTRY POINT
-	public void StartTest() {
-		//TEST SPRING EVENTING
-		System.out.println("Starting Spring Eventing Test");
-		SpringEventTest springTest = new SpringEventTest();
-		Thread springThread = new Thread(springTest);
-		springThread.start();
-		
-		//TEST MESSAGING
-		System.out.println("Starting Client Test");
-		//getRemoteCalculator().Add(2, 3, this);
-		System.out.println("Waiting...");
-		
-		//TEST PUBSUB
-		PubsubTest testPubSub = new PubsubTest();
-		testPubSub.setFcGenerator(this.fcGenerator);
-		testPubSub.setPubSubManager(this.pubSubManager);
-		
-		Thread pubsubThread = new Thread(testPubSub);
-		pubsubThread.start();
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getDesc() {
+		return desc;
+	}
+	public void setDesc(String desc) {
+		this.desc = desc;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.societies.comm.examples.commsmanager.ICalcRemoteCallback#receiveCalcResult(java.lang.Object) */
-	@Override
-	public void receiveExamplesResult(Object calcResult) {
-		int result = (Integer)calcResult;
-		System.out.println(result);
-	}
-	
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-
-		System.out.println("I am doing other stuffs while waiting for asynch reply");
+	public TestObject(String name, String desc) {
+		this.name = name;
+		this.desc = desc;
 	}
 }
