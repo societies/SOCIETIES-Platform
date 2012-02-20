@@ -28,33 +28,40 @@ package org.societies.orchestration.CommunityLifecycleManagement.impl;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.societies.api.internal.css_modules.css_directory.ICssDirectory;
+import org.societies.api.internal.css.directory.ICssDirectory;
 
-import org.societies.api.internal.css_modules.css_discovery.ICssDiscovery;
+import org.societies.api.internal.css.discovery.ICssDiscovery;
 
-import org.societies.api.internal.cis.cis_management.CisActivityFeed;
-import org.societies.api.internal.cis.cis_management.ServiceSharingRecord;
-import org.societies.api.internal.cis.cis_management.CisActivity;
-import org.societies.api.internal.cis.cis_management.CisRecord;
+import org.societies.api.internal.cis.management.CisActivityFeed;
+import org.societies.api.internal.cis.management.ServiceSharingRecord;
+import org.societies.api.internal.cis.management.CisActivity;
+import org.societies.api.internal.cis.management.CisRecord;
+import org.societies.api.internal.cis.management.ICisManager;
 
-import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
+//import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
 
-import org.societies.api.internal.context.user.prediction.IUserCtxPredictionMgr;
+//import org.societies.api.internal.context.user.prediction.IUserCtxPredictionMgr;
 
-import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
+//import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
 
-import org.societies.api.internal.context.user.history.IUserCtxHistoryMgr;
+//import org.societies.api.internal.context.user.history.IUserCtxHistoryMgr;
 
-import org.societies.api.internal.context.broker.IUserCtxBroker;
-import org.societies.api.internal.context.broker.ICommunityCtxBroker;
-import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
+//import org.societies.api.internal.context.broker.IUserCtxBroker;
+import org.societies.api.internal.context.broker.ICtxBroker;
+//import org.societies.api.internal.context.broker.ICommunityCtxBroker;
+//import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
-import org.societies.api.mock.EntityIdentifier;
+//import org.societies.api.mock.Identity;
+import org.societies.api.comm.xmpp.datatypes.Identity;
+//import org.societies.comm.examples.commsmanager.impl.CommsServer; 
+//import org.societies.comm.xmpp.interfaces.ICommCallback;
+
 
 import java.util.List;
 
@@ -76,21 +83,25 @@ import java.util.List;
  * 
  */
 
-public class AutomaticCommunityCreationManager {
+public class AutomaticCommunityCreationManager //implements ICommCallback
+{
 	
-	private EntityIdentifier linkedCss;
+	private Identity linkedCss;
 	
     private CisRecord linkedSuperCis;
     
-	private EntityIdentifier linkedDomain;
+	private Identity linkedDomain;
 	
-	private IUserCtxDBMgr userContextDatabaseManager;
-	private IUserCtxBroker userContextBroker;
-	private ICommunityCtxBroker communityContextBroker;
-	private IUserCtxBrokerCallback userContextBrokerCallback;
+	private ICtxBroker userContextBroker;
+	//private IUserCtxDBMgr userContextDatabaseManager;
+	//private IUserCtxBroker userContextBroker;
+	//private ICommunityCtxBroker communityContextBroker;
+	//private IUserCtxBrokerCallback userContextBrokerCallback;
 	private ArrayList<CisRecord> recentRefusals;
 	private IUserFeedback userFeedback;
 	//private IUserFeedbackCallback userFeedbackCallback;
+	
+	private ICisManager cisManager;
 	
 	private ArrayList<CtxEntity> availableContextData;
     
@@ -104,7 +115,7 @@ public class AutomaticCommunityCreationManager {
 	 *              that this object will operate on behalf of.
 	 */
 	
-	public AutomaticCommunityCreationManager(EntityIdentifier linkedEntity, String linkType) {
+	public AutomaticCommunityCreationManager(Identity linkedEntity, String linkType) {
 		if (linkType.equals("CSS"))
 			this.linkedCss = linkedEntity;
 		else
@@ -125,7 +136,7 @@ public class AutomaticCommunityCreationManager {
 		this.linkedSuperCis = linkedSuperCis;
 	}
 	
-	public ArrayList<EntityIdentifier> getIDsOfInteractingCsss() {
+	public ArrayList<Identity> getIDsOfInteractingCsss() {
 		//What CSSs is this one currently interacting with?
 		//Found by: For each service, shared service, and resource the user is using (in the last ~5 minutes), is there an end-CSS they're interacting with?
 		//Is there a CSS they're indirectly interacting with over the service?
@@ -134,9 +145,14 @@ public class AutomaticCommunityCreationManager {
 		//Needs a framework for capturing this in the platform.
 		//It needs a timestamp for this, so either the context is stored with timestamps or 
 		//we get it from the CSS activity feed (which isn't implemented yet)
-		ArrayList<EntityIdentifier> interactingCsss = null;
+		ArrayList<Identity> interactingCsss = null;
 		
-		userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services", userContextBrokerCallback);
+		try {
+			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
 		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
@@ -166,9 +182,9 @@ public class AutomaticCommunityCreationManager {
 	
 	public void identifyCissToCreate(String evaluationType) {
 		
-		ArrayList<EntityIdentifier> interactedCssIDs = null;
-		ArrayList<EntityIdentifier> friendCssIDs = null;
-		ArrayList<EntityIdentifier> localCsss = null;
+		ArrayList<Identity> interactedCssIDs = null;
+		ArrayList<Identity> friendCssIDs = null;
+		ArrayList<Identity> localCsss = null;
 		// ...
 		
 		ArrayList<CisRecord> cissToCreate = null;
@@ -183,10 +199,22 @@ public class AutomaticCommunityCreationManager {
 				//e.g. friends in contact list, family in contact list (from SNS extractor or SOCIETIES)
 				
 				//If CISs are appropriate for friends' lists in Google+ circle fashion, then that counts
+				//CisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new CisRecord(null, null, null, null, null, null, null, null));
+				//ArrayList<CisRecord> userJoinedCiss = new ArrayList<CisRecord>();
+				//for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
+				//    userJoinedCiss.add(listOfUserJoinedCiss[i]);
+				//}
+				
+				//friends?
+				//userContextBroker.lookup(CtxModelType.ENTITY, "SNGroup", userContextBrokerCallback);
+				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+				
+				//fanpage informs interests-based CISs
+				//userContextBroker.lookup(CtxModelType.ENTITY, "FanPage", userContextBrokerCallback);
+				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				
 				
-				
-				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "close friends", userContextBrokerCallback);
+				//userContextBroker.lookup(CtxModelType.ATTRIBUTE, "close friends", userContextBrokerCallback);
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				
 				List<CtxIdentifier> contextList; //the list retrieved from above callback
@@ -203,42 +231,67 @@ public class AutomaticCommunityCreationManager {
 				
 				//second step: some obvious CISs that might benefit a user.
 				
-				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "family relations", userContextBrokerCallback);
+				try {
+					userContextBroker.lookup(CtxModelType.ATTRIBUTE, "family relations");
+				} catch (CtxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
-				//ArrayList<EntityIdentifier> people = userCssDirectory.getContextMatchingCsss(list);
+				//ArrayList<Identity> people = userCssDirectory.getContextMatchingCsss(list);
 				//if (people.size() >= 2)
 				//    for (int i = 0; i < cisManager.getCiss(); i++)
 				//        if (!cisManager.getCiss().get(i).getMembers() == people)
 				//            cissToCreate.add(new CisRecord(null, linkedCss, "family relation to all members", null, null, null, null, null));
 				
-				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "nationality", userContextBrokerCallback);
+				try {
+					userContextBroker.lookup(CtxModelType.ATTRIBUTE, "nationality");
+				} catch (CtxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
-				//ArrayList<EntityIdentifier> people = userCssDirectory.getContextMatchingCsss(list);
+				//ArrayList<Identity> people = userCssDirectory.getContextMatchingCsss(list);
 				//if (people.size() >= 2)
 				//    for (int i = 0; i < cisManager.getCiss(); i++)
 				//        if (!cisManager.getCiss().get(i).getMembers() == people)
 				//            cissToCreate.add(new CisRecord(null, linkedCss, "Nationals", null, null, null, null, null));
 				
-				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "first language", userContextBrokerCallback);
+				try {
+					userContextBroker.lookup(CtxModelType.ATTRIBUTE, "first language");
+				} catch (CtxException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
-				//ArrayList<EntityIdentifier> people = userCssDirectory.getContextMatchingCsss(list);
+				//ArrayList<Identity> people = userCssDirectory.getContextMatchingCsss(list);
 				//if (people.size() >= 2)
 				//    for (int i = 0; i < cisManager.getCiss(); i++)
 				//        if (!cisManager.getCiss().get(i).getMembers() == people)
 				//            cissToCreate.add(new CisRecord(null, linkedCss, "Native language speakers", null, null, null, null, null));
 				
-				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "interests", userContextBrokerCallback);
+				try {
+					userContextBroker.lookup(CtxModelType.ATTRIBUTE, "interests");
+				} catch (CtxException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
-				//ArrayList<EntityIdentifier> people = userCssDirectory.getContextMatchingCsss(list);
+				//ArrayList<Identity> people = userCssDirectory.getContextMatchingCsss(list);
 				//if (people.size() >= 2)
 				//    for (int i = 0; i < cisManager.getCiss(); i++)
 				//        if (!cisManager.getCiss().get(i).getMembers() == people)
 				//            cissToCreate.add(new CisRecord(null, linkedCss, "Interests", null, null, null, null, null));
 				
-				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "local CSSs", userContextBrokerCallback);
+				try {
+					userContextBroker.lookup(CtxModelType.ATTRIBUTE, "local CSSs");
+				} catch (CtxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				//historyOfLocalCsss.add(thisResult);
-				//ArrayList<EntityIdentifier> people = userCssDirectory.getContextMatchingCsss(list);
+				//ArrayList<Identity> people = userCssDirectory.getContextMatchingCsss(list);
 				//if (people.size() >= 2)
 				//    for (int i = 0; i < cisManager.getCiss(); i++)
 				//        if (!cisManager.getCiss().get(i).getMembers() == people)
@@ -257,10 +310,15 @@ public class AutomaticCommunityCreationManager {
 				//retrieve recent history of certain kinds of context data on CSS user and inter-CSS connections 
 				//amongst their immediate connection neighbourhood as possible.
 				
-				userContextBroker.lookup(CtxModelType.ATTRIBUTE, "local CSSs", userContextBrokerCallback);
+				try {
+					userContextBroker.lookup(CtxModelType.ATTRIBUTE, "local CSSs");
+				} catch (CtxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				//historyOfLocalCsss.add(thisResult);
-				//ArrayList<EntityIdentifier> people = userCssDirectory.getContextMatchingCsss(list);
+				//ArrayList<Identity> people = userCssDirectory.getContextMatchingCsss(list);
 				//if (people.size() >= 2)
 				//    for (int i = 0; i < cisManager.getCiss(); i++)
 				//        if (!cisManager.getCiss().get(i).getMembers() == people)
@@ -277,8 +335,8 @@ public class AutomaticCommunityCreationManager {
 					
 				    }
 				}
-				ArrayList<EntityIdentifier> recentlyInteractedCsss = null; //interaction timestamps are last 24 hours(?)
-				ArrayList<EntityIdentifier> recentlyReferencingCsss = null;
+				ArrayList<Identity> recentlyInteractedCsss = null; //interaction timestamps are last 24 hours(?)
+				ArrayList<Identity> recentlyReferencingCsss = null;
 				
 				
 				for (int i = 0; i < recentlyInteractedCsss.size(); i++) {
@@ -346,15 +404,17 @@ public class AutomaticCommunityCreationManager {
 		return tempCisPossibility;
 	}
 	
-    public void intialiseAutomaticCommunityCreationManager() {
+    public void initialiseAutomaticCommunityCreationManager() {
+    	//getCommManager().register(this);
     	
+    	new AutomaticCommunityCreationManager(linkedCss, "CSS");
     }
     
-    public EntityIdentifier getLinkedCss() {
+    public Identity getLinkedCss() {
     	return linkedCss;
     }
     
-    public void setLinkedCss(EntityIdentifier linkedCss) {
+    public void setLinkedCss(Identity linkedCss) {
     	this.linkedCss = linkedCss;
     }
     
@@ -366,15 +426,15 @@ public class AutomaticCommunityCreationManager {
     	this.linkedSuperCis = linkedSuperCis;
     }
     
-    public EntityIdentifier getLinkedDomain() {
+    public Identity getLinkedDomain() {
     	return linkedDomain;
     }
     
-    public void setLinkedDomain(EntityIdentifier linkedDomain) {
+    public void setLinkedDomain(Identity linkedDomain) {
     	this.linkedDomain = linkedDomain;
     }
     
-    public IUserCtxDBMgr getUserContextDatabaseManager() {
+    /**public IUserCtxDBMgr getUserContextDatabaseManager() {
     	return userContextDatabaseManager;
     }
     
@@ -382,19 +442,61 @@ public class AutomaticCommunityCreationManager {
     	System.out.println("GOT database" + userContextDatabaseManager);
     	this.userContextDatabaseManager = userContextDatabaseManager;
     }
-    
-    public void setUserContextBroker(IUserCtxBroker userContextBroker) {
+    */
+    public void setUserContextBroker(ICtxBroker userContextBroker) {
     	System.out.println("GOT user context broker" + userContextBroker);
     	this.userContextBroker = userContextBroker;
     }
     
-    public void setUserContextBrokerCallback(IUserCtxBrokerCallback userContextBrokerCallback) {
+    /**public void setUserContextBrokerCallback(ICtxBrokerCallback userContextBrokerCallback) {
     	System.out.println("GOT user context broker callback" + userContextBrokerCallback);
     	this.userContextBrokerCallback = userContextBrokerCallback;
-    }
+    }*/
     
     public void retrieveUserContextBrokerCallback(CtxEntity theContext) {
     	availableContextData.add(theContext);
     }
+    
+    public ICisManager getCisManager() {
+    	return cisManager;
+    }
+    
+    public void setCisManager(ICisManager cisManager) {
+    	this.cisManager = cisManager;
+    }
+    
+  //public CommManagerBundle getCommManager() {
+    //	return commManager;
+    //}
+    
+    //public void setCommManager(CommManagerBundle commManager) {
+    //	this.commManager = commManager;
+    //}
+    
+    /**Returns the list of package names of the message beans you'll be passing*/
+    public List<String> getJavaPackages() {
+		return null;
+    	
+    }
+    
+    /**Returns the list of namespaces for the message beans you'll be passing*/
+    public List<String> getXMLNamespaces() {
+    	return null;
+    }
+    
+    /** Put your functionality here if there is NO return object, ie, VOID */
+    //public void receiveMessage(Stanza stanza, Object messageBean) {
+    //	return null;
+    //}
+    
+    /** Put your functionality here if there IS a return object */
+    //public Object getQuery(Stanza stanza, Object messageBean) {
+    //	return null;
+    //}
+    
+    /** Put your functionality here if there IS a return object and you are updating also */
+    //public Object setQuery(Stanza arg0, Object arg1) {
+    //	return null;
+    //}
     
 }

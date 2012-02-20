@@ -42,6 +42,18 @@
 			<artifactId>spring-osgi-core</artifactId>
 			<version>1.1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 	
 	<build>
@@ -63,11 +75,13 @@
               				org.springframework.beans.propertyeditors,
               				org.springframework.osgi.service.exporter.support,
               				org.springframework.osgi.context,
-              				org.springframework.osgi.service.exporter,org.slf4j.*
+              				org.springframework.osgi.service.exporter,
+              				org.slf4j.*,
+              				org.societies.api.css.devicemgmt,
+              				org.societies.api.internal.css.devicemgmt,
+              				org.societies.api.internal.css.devicemgmt.model
               			</Import-Package> 
-              			<Export-Package>
-							org.societies.css.devicemgmt.devicemanager
-              			</Export-Package>
+              			
           </instructions>
       </configuration>
 			</plugin>

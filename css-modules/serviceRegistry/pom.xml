@@ -118,7 +118,7 @@
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
 			<version>${release.version}</version>
-
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>

@@ -24,6 +24,7 @@
  */
 package org.societies.api.internal.personalisation.model;
 
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.personalisation.model.IAction;
 
 
@@ -42,7 +43,7 @@ public interface IFeedbackEvent {
 
 	public boolean getResult();
 
-	//REPLACE WITH EntityIdentifier 
-	public Object getUserIdentity();
+	// 
+	public Identity getUserIdentity();
 
 }

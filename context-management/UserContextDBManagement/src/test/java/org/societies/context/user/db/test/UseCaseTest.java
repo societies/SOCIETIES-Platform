@@ -27,6 +27,7 @@ package org.societies.context.user.db.test;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.context.user.db.impl.UserCtxDBMgr;
 
 public class UseCaseTest {
@@ -34,6 +35,7 @@ public class UseCaseTest {
 	static UserCtxDBMgr userDB ;
 	static CtxEntity entity;
 	static CtxAttribute attribute;
+	static CtxModelObject modObj;
 
 	UseCaseTest(){
 		userDB = new UserCtxDBMgr();
@@ -61,25 +63,29 @@ public class UseCaseTest {
 
 	private void testCreateAttribute(){
 		System.out.println("---- testCreateAttribute");
-		attribute = userDB.createAttribute(entity.getId(), CtxAttributeValueType.INDIVIDUAL, "name");
+		modObj = userDB.createAttribute(entity.getId(), CtxAttributeValueType.INDIVIDUAL, "name");
+		attribute = (CtxAttribute) modObj;
 //		attribute = callback.getCtxAttribute();
 	}
 
 	private void testRetrieveAttribute(){
 		System.out.println("---- testRetrieveAttribute");
-		attribute = userDB.retrieve(attribute.getId());
+		modObj = userDB.retrieve(attribute.getId());
+		attribute = (CtxAttribute) modObj;
 //		attribute = (CtxAttribute) callback.getCtxModelObject();
 	}
 
 	private void testUpdateAttribute(){
 		System.out.println("---- testUpdateAttribute");
-		attribute = userDB.retrieve(attribute.getId());
+		modObj = userDB.retrieve(attribute.getId());
+		attribute = (CtxAttribute) modObj;
 //		attribute = (CtxAttribute) callback.getCtxModelObject();
 		attribute.setIntegerValue(5);
 		userDB.update(attribute);
 		//verify update
-		attribute = userDB.retrieve(attribute.getId());
-//		attribute = (CtxAttribute) callback.getCtxModelObject();
+		modObj = userDB.retrieve(attribute.getId());
+		attribute = (CtxAttribute) modObj;
+		//		attribute = (CtxAttribute) callback.getCtxModelObject();
 		System.out.println("attribute value should be 5 and it is:"+attribute.getIntegerValue());
 	}
 }

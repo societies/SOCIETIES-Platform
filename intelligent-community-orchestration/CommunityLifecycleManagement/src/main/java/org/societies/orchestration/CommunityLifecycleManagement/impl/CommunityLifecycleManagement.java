@@ -25,16 +25,23 @@
 
 package org.societies.orchestration.CommunityLifecycleManagement.impl;
 
-import org.societies.api.internal.cis.cis_management.CisRecord;
-import org.societies.api.internal.context.broker.IUserCtxBroker;
-import org.societies.api.internal.context.broker.ICommunityCtxBroker;
+import java.util.List;
 
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.internal.cis.management.CisRecord;
+import org.societies.api.internal.context.broker.ICtxBroker;
+//import org.societies.api.internal.context.broker.ICommunityCtxBroker;
+
+//import org.societies.api.mock.Identifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
+
+//import org.societies.api.comm.xmpp.datatypes.Identity;
+//import org.societies.comm.examples.commsmanager.impl.CommsServer;
+//import org.societies.comm.xmpp.interfaces.ICommCallback;
 
 /**
  * This is the class for the Community Lifecycle Management component
  * 
- * Superclass of the three community lifecycle manager components, delegates CIS
+ * Manager of the three community lifecycle manager components, delegates CIS
  * lifecycle orchestration work to them.
  * 
  * @author Fraser Blackmun
@@ -42,19 +49,20 @@ import org.societies.api.mock.EntityIdentifier;
  * 
  */
 
-public class CommunityLifecycleManagement {
+public class CommunityLifecycleManagement //implements ICommCallback
+{
 	
 	private AutomaticCommunityCreationManager autoCreationManager;
 	private AutomaticCommunityConfigurationManager autoConfigurationManager;
 	private AutomaticCommunityDeletionManager autoDeletionManager;
 	
 	//private Css linkedCss; // No datatype yet defined for CSS
-	private EntityIdentifier linkedCss;
+	private Identity linkedCss;
 	
     private CisRecord linkedCis;
     
     //private Domain linkedDomain;  // No datatype yet representing a domain
-	private EntityIdentifier linkedDomain;
+	private Identity linkedDomain;
 	
 	/*
      * Constructor for CommunityLifecycleManagement
@@ -66,7 +74,7 @@ public class CommunityLifecycleManagement {
 	 *              that this object will operate on behalf of.
 	 */
 	
-	public CommunityLifecycleManagement(EntityIdentifier linkedEntity, String linkType) {
+	public CommunityLifecycleManagement(Identity linkedEntity, String linkType) {
 		if (linkType.equals("CSS"))
 			this.linkedCss = linkedEntity;
 		else
@@ -166,7 +174,9 @@ public class CommunityLifecycleManagement {
 		}
 	}
     
-    public void intialiseCommunityLifecycleManagement() {
+    public void initialiseCommunityLifecycleManagement() {
+    	//getCommManager().register(this);
+
     	if (linkedCss != null) {
     		new CommunityLifecycleManagement(linkedCss, "CSS");
     		loop();
@@ -181,11 +191,11 @@ public class CommunityLifecycleManagement {
     	}
     }
     
-    public EntityIdentifier getLinkedCss() {
+    public Identity getLinkedCss() {
     	return linkedCss;
     }
     
-    public void setLinkedCss(EntityIdentifier linkedCss) {
+    public void setLinkedCss(Identity linkedCss) {
     	this.linkedCss = linkedCss;
     }
     
@@ -197,11 +207,11 @@ public class CommunityLifecycleManagement {
     	this.linkedCis = linkedCis;
     }
     
-    public EntityIdentifier getLinkedDomain() {
+    public Identity getLinkedDomain() {
     	return linkedDomain;
     }
     
-    public void setLinkedDomain(EntityIdentifier linkedDomain) {
+    public void setLinkedDomain(Identity linkedDomain) {
     	this.linkedDomain = linkedDomain;
     }
     
@@ -228,5 +238,40 @@ public class CommunityLifecycleManagement {
     public void setAutoDeletionManager(AutomaticCommunityDeletionManager autoDeletionManager) {
     	this.autoDeletionManager = autoDeletionManager;
     }
+    
+    //public CommManagerBundle getCommManager() {
+    //	return commManager;
+    //}
+    
+    //public void setCommManager(CommManagerBundle commManager) {
+    //	this.commManager = commManager;
+    //}
+    
+    /**Returns the list of package names of the message beans you'll be passing*/
+    public List<String> getJavaPackages() {
+		return null;
+    	
+    }
+    
+    /**Returns the list of namespaces for the message beans you'll be passing*/
+    public List<String> getXMLNamespaces() {
+    	return null;
+    }
+    
+    /** Put your functionality here if there is NO return object, ie, VOID */
+    //public void receiveMessage(Stanza stanza, Object messageBean) {
+    //	return null;
+    //}
+    
+    /** Put your functionality here if there IS a return object */
+    //public Object getQuery(Stanza stanza, Object messageBean) {
+    //	return null;
+    //}
+    
+    /** Put your functionality here if there IS a return object and you are updating also */
+    //public Object setQuery(Stanza arg0, Object arg1) {
+    //	return null;
+    //}
+
     
 }

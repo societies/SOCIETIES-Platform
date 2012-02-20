@@ -61,6 +61,9 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 	ArrayList<CtxAttributeIdentifier> cauiList;
 	ArrayList<CtxAttributeIdentifier> cristList;
 	
+	/* 
+	 * test test test!
+	 */
 	
 	
 	public PersonalisationManager(){
@@ -277,6 +280,18 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 				}
 			}else if (this.containsCtxId(ctxId, cauiList)){
 				this.cauiPrediction.getPrediction(ctxId.getOperatorId(), ctxAttribute, callback);
+				if (this.containsCtxId(ctxId, cristList)){
+					this.cristPrediction.getCRISTPrediction(ctxId.getOperatorId(), ctxAttribute, callback);
+					callback.setAskCAUI(false);
+					callback.setAskCRIST(false);
+				}else{
+					callback.setAskCRIST(true);
+				}
+			}else if (this.containsCtxId(ctxId, cristList)){
+				this.cristPrediction.getCRISTPrediction(ctxId.getOperatorId(), ctxAttribute, callback);
+				if (this.containsCtxId(ctxId, cauiList)){
+					this.cauiPrediction.getPrediction(ctxId.getOperatorId(), ctxAttribute, callback);
+				}
 			}
 			
 		}

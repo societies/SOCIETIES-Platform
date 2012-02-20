@@ -32,5 +32,10 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 	<version.comm>${release.version}-SNAPSHOT</version.comm>
 	<!-- EPapadopoulou: added version.pt property -->
 	<version.pt>${release.version}-SNAPSHOT</version.pt>
+	<!-- tcarlyle: added version.css and version.cis property (CSS and CIS) -->
+	<version.cis>${release.version}-SNAPSHOT</version.cis>
+	<version.css>${release.version}-SNAPSHOT</version.css>	
+	
+	
     </properties>
 </project>

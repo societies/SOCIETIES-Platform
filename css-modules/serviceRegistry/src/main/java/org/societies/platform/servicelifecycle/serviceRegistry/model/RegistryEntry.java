@@ -65,7 +65,7 @@ public class RegistryEntry implements Serializable {
 	
 	private String serviceLocation;
 	
-	public RegistryEntry() {
+	protected RegistryEntry() {
 
 	}
 

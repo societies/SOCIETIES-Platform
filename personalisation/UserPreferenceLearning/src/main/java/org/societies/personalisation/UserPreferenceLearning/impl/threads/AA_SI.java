@@ -31,8 +31,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxHistoryAttribute;
-import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceLearning.impl.C45Output;
 import org.societies.personalisation.UserPreferenceLearning.impl.CtxIdentifierCache;
@@ -47,18 +47,17 @@ import org.societies.personalisation.preference.api.model.ServiceSubset;
 
 import weka.classifiers.trees.Id3;
 import weka.core.Instances;
-import weka.core.UnsupportedAttributeTypeException;
 
 public class AA_SI extends Thread{
 
 	private IC45Consumer requestor;
 	private Date startDate;
-	private EntityIdentifier historyOwner;
+	private Identity historyOwner;
 	private HistoryRetriever historyRetriever;
 	private PreProcessor preProcessor;
 	private PostProcessor postProcessor;
 
-	public AA_SI(IC45Consumer requestor, Date startDate, EntityIdentifier historyOwner, HistoryRetriever historyRetriever){
+	public AA_SI(IC45Consumer requestor, Date startDate, Identity historyOwner, HistoryRetriever historyRetriever){
 		this.requestor = requestor;
 		this.startDate = startDate;
 		this.historyOwner = historyOwner;

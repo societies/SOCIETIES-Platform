@@ -28,11 +28,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.privacytrust</groupId>
-	<artifactId>privacyprotection</artifactId>
-	<name>Privacy Protection</name>
-	<packaging>bundle</packaging>
-	<version>0.1</version>
+	<groupId>org.societies.privacytrust.privacyprotection</groupId>
+	<artifactId>builder</artifactId>
+	<name>Privacy Protection Builder</name>
+	<packaging>pom</packaging>
+	<version>${version.pt}</version>
 	<developers>
 		<developer>
 			<name>Olivier Maridat</name>
@@ -44,121 +44,20 @@
 				<role>Developer</role>
 			</roles>
 		</developer>
-		<developer>
-			<name>Elizabeth Papadopoulou</name>
-			<email>E.Papadopoulou@hw.ac.uk</email>
-			<organization>HWU</organization>
-			<organizationUrl>http://www.hw.ac.uk/</organizationUrl>
-			<roles>
-				<role>Senior Developer</role>
-			</roles>
-			<timezone>+0</timezone>
-		</developer>
 	</developers>
 
+	<!-- All builder projects should inherit from version-parent -->
 	<parent>
-		<groupId>org.societies.privacytrust</groupId>
-		<artifactId>privacytrust</artifactId>
-		<relativePath>../pom.xml</relativePath>
-		<version>1</version>
+		<groupId>org.societies</groupId>
+		<artifactId>version-parent</artifactId>
+		<version>0.1</version>
 	</parent>
-
-	<dependencies>
-		<!-- add your dependencies here -->
-		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.1</version>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.0</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- logging -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<!-- spring -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.spring-library</artifactId>
-			<type>libd</type>
-			<scope>provided</scope>
-		</dependency>
-	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<!-- <Bundle-Activator></Bundle-Activator> <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency> 
-							<Embed-Transitive>true</Embed-Transitive> <Import-Package>!javax.swing.*</Import-Package> 
-							<Import-Package>org.societies.api.*</Import-Package> <Export-Package></Export-Package> -->
-						<Bundle-SymbolicName>${pom.groupId}.${pom.artifactId}</Bundle-SymbolicName>
-						<Bundle-Name>${pom.name}</Bundle-Name>
-						<Bundle-Version>${pom.version}</Bundle-Version>
-						<Embed-Dependency>commons-lang3;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>false</Embed-Transitive>
-						<Import-Package>
-							org.societies.api.context.*,
-							org.societies.api.internal.privacytrust.privacyprotection.*,
-							org.societies.api.servicelifecycle.*,
-							org.societies.api.comm.*,
-							org.slf4j.*
-						</Import-Package>
-						<Export-Package></Export-Package>
-					</instructions>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptors>
-						<descriptor></descriptor>
-					</descriptors>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<configuration>
-					<artifactItems>
-						<artifactItem>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>${project.artifactId}</artifactId>
-							<version>${project.version}</version>
-							<type>jar</type>
-							<overWrite>true</overWrite>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
-						</artifactItem>
-					</artifactItems>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+	
+	<modules>
+		<module>api</module>
+		<module>privacy-data-management</module>
+		<module>privacy-policy-management</module>
+		<module>privacy-protection-bundle</module>
+		<module>privacy-protection-bundle-test</module>
+	</modules>
 </project>

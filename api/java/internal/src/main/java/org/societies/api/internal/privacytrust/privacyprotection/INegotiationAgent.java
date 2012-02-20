@@ -25,11 +25,11 @@
 package org.societies.api.internal.privacytrust.privacyprotection;
 
 //TODO : temporary mock package import to solve missing package in API folder
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
-import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 /**
  * @author Eliza
  * @version 1.0
@@ -54,7 +54,7 @@ public interface INegotiationAgent {
 	 * @param serviceID    the service identifier of the service for which the
 	 * negotiation will be performed
 	 */
-	public RequestPolicy getPolicy(ServiceResourceIdentifier serviceID);
+	public RequestPolicy getPolicy(IServiceResourceIdentifier serviceID);
 
 	/**
 	 * This method is called by any PSS to get the Identity of the service provider.
@@ -62,7 +62,7 @@ public interface INegotiationAgent {
 	 * where applicable
 	 * @return				the identity of the service provider
 	 */
-	public EntityIdentifier getProviderIdentity();
+	public Identity getProviderIdentity();
 
 	/**
 	 * this method is called by the client and informs the provider that it wants to
@@ -76,6 +76,6 @@ public interface INegotiationAgent {
 	 * to be performed
 	 * @param policy    the ResponsePolicy to the provider's privacy policy
 	 */
-	public ResponsePolicy negotiate(ServiceResourceIdentifier serviceID, ResponsePolicy policy);
+	public ResponsePolicy negotiate(IServiceResourceIdentifier serviceID, ResponsePolicy policy);
 
 }

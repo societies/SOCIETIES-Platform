@@ -55,21 +55,22 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
 
 import org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityCreationManager;
 
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 
 //import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 
-import org.societies.api.internal.context.broker.IUserCtxBroker;
+import org.societies.api.internal.context.broker.ICtxBroker;
 //import org.societies.api.internal.context.broker.IUserCtxDBMgr;
-import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
-import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
+//import org.societies.api.internal.context.broker.ICtxBrokerCallback;
+//import org.societies.api.internal.context.user.db.IUserCtxDBMgr;
 //import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-import org.societies.api.mock.EntityIdentifier;
+//import org.societies.api.mock.EntityIdentifier;
 //import org.societies.api.internal.context.broker.IUserCtxDBMgrCallback;
 
 import org.societies.api.context.model.CtxAttributeValueType;
-import org.societies.api.internal.cis.cis_management.ICisManager;
-import org.societies.api.internal.cis.cis_management.CisRecord;
+import org.societies.api.internal.cis.management.ICisManager;
+import org.societies.api.internal.cis.management.CisRecord;
 
 
 
@@ -84,15 +85,15 @@ import org.societies.api.internal.cis.cis_management.CisRecord;
 public class AutomaticCommunityCreationManagerTest {
 	
 	private AutomaticCommunityCreationManager autoCommunityCreationManager;
-	private IUserCtxBroker userCtxBroker;
-	private IUserCtxDBMgr userCtxDBMgr;
+	private ICtxBroker userCtxBroker;
+	//private IUserCtxDBMgr userCtxDBMgr;
 	private CtxEntityIdentifier entityId;
-	private IUserCtxBrokerCallback userCtxBrokerCallback;
+	//private IUserCtxBrokerCallback userCtxBrokerCallback;
 	private ICisManager cisManager;
 	
 	public void testNonExtensiveCreationCheck() {
 		
-		EntityIdentifier ownerId = new EntityIdentifier(); //James Jents CSS
+		Identity ownerId = null; //James Jents CSS
 		entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
     	
 		
@@ -115,13 +116,13 @@ public class AutomaticCommunityCreationManagerTest {
 		String[] members = new String[1];
 		members[0] = "James";
 		
-		Assert.assertNull(cisManager.getCisList(new CisRecord()));
-		//Assert.assertNotNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null)));
+		//Assert.assertNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null)));
+		Assert.assertNotNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null)));
 	}
 	
     public void testExtensiveCreationCheck() {
     	
-    	EntityIdentifier ownerId = new EntityIdentifier(); //James Jents CSS
+    	Identity ownerId = null; //James Jents CSS
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
     	
     	autoCommunityCreationManager = new AutomaticCommunityCreationManager(ownerId, "CSS");
@@ -141,13 +142,13 @@ public class AutomaticCommunityCreationManagerTest {
 		
 	}
     
-    public void setCtxBroker(IUserCtxBroker userCtxBroker){
+    public void setCtxBroker(ICtxBroker userCtxBroker){
 		this.userCtxBroker = userCtxBroker;
 	}
     
-    public void setUserCtxBrokerCallback(IUserCtxBrokerCallback userCtxBrokerCallback) {
+    /**public void setUserCtxBrokerCallback(IUserCtxBrokerCallback userCtxBrokerCallback) {
     	this.userCtxBrokerCallback = userCtxBrokerCallback;
-    }
+    }*/
     
     public void callbackForUserCtxEntity(CtxEntityIdentifier contextEntityIdentifier) {
     	entityId = contextEntityIdentifier;
