@@ -148,9 +148,9 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	 * @see org.societies.api.internal.context.user.db.IUserCtxDBMgr#retrieve(org.societies.api.context.model.CtxIdentifier, org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback)
 	 */
 	@Override
-	public CtxAttribute retrieve(CtxIdentifier id) {
+	public CtxModelObject retrieve(CtxIdentifier id) {
 //		callback.ctxModelObjectRetrieved(this.modelObjects.get(id));
-		return (CtxAttribute) this.modelObjects.get(id);
+		return this.modelObjects.get(id);
 	}
 
 	public CtxModelObject retrieveSynch(CtxIdentifier id) {
