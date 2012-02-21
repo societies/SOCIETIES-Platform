@@ -338,10 +338,34 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				String[] yesterdayHyphens = yesterday.split("-");
 				String lastPartOfYesterdayHyphens = yesterdayHyphens[2].split(" ")[1];
 				yesterday = yesterdayHyphens[0] + "-" + yesterdayHyphens[1] + "-" + (Integer.valueOf(yesterdayHyphens[2].split(" ")[0]) - 1) + " " + lastPartOfYesterdayHyphens; 
-				
+				String lastWeek = "";
+				String lastMonth = "";
 				interactedCssIDs = getIDsOfInteractingCsss(yesterday, new Timestamp(new Date().getTime()).toString());
+				interactedCssIDs = getIDsOfInteractingCsss(lastWeek, new Timestamp(new Date().getTime()).toString());
+				interactedCssIDs = getIDsOfInteractingCsss(lastMonth, new Timestamp(new Date().getTime()).toString());
+				
+				//CssActivityFeed theFeed = cssManager.getCssActivityFeed();
+				////CssActivityFeed todayFeed = theFeed.searchQuery("contains: " + yesterdayHyphens[2].split(" ")[0]);
+				//ArrayList<String> interactionRecordsLastDay = todayFeed.searchQuery("interaction").toString();
 				
 				
+				//CssActivityFeed theFeed = cssManager.getCssActivityFeed();
+				////CssActivityFeed todayFeed = theFeed.searchQuery("contains: " + lastWeekHyphens[2].split(" ")[0]);
+				//ArrayList<String> interactionRecordsLastWeek = todayFeed.searchQuery("interaction").toString();
+				
+				//CssActivityFeed theFeed = cssManager.getCssActivityFeed();
+				////CssActivityFeed todayFeed = theFeed.searchQuery("contains: " + lastMonthHyphens[2].split(" ")[0]);
+				//ArrayList<String> interactionRecordsLastMonth = todayFeed.searchQuery("interaction").toString();
+				
+				//ArrayList<String> potentialCisMembers = new ArrayList<String>;
+				
+				//for (int i = 0; i < interactedCssIDs.size(); i++) {
+				//    if (interactionRecordsLastWeek.contains(interactedCssIDs.get(i)) && interactionRecordsLastMonth.contains(i))
+				//        potentialCisMembers.add(interactedCssIDs.get(i);
+				//}
+				//if (potentialCisMembers.size >= 2)
+				//    if (!joinedCiss.getMemberList().contains(thisone))
+				//        cissToCreate.add(new CisRecord(null, linkedCss, "Interactors on Service " + "serviceName", null, null, null, null, null);
 			}
 		}
 			
