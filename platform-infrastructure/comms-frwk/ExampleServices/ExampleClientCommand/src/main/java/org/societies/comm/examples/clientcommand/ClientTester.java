@@ -57,6 +57,12 @@ public class ClientTester implements IExamplesCallback {
 
 	//ENTRY POINT
 	public void StartTest() {
+		//TEST SPRING EVENTING
+		System.out.println("Starting Spring Eventing Test");
+		SpringEventTest springTest = new SpringEventTest();
+		Thread springThread = new Thread(springTest);
+		springThread.start();
+		
 		//TEST MESSAGING
 		System.out.println("Starting Client Test");
 		//getRemoteCalculator().Add(2, 3, this);

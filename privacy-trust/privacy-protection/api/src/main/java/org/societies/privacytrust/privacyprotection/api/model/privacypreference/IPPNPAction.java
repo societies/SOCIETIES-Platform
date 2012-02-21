@@ -26,11 +26,12 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 
 import java.util.List;
 
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+
 
 /**
  * This interface is used to represent an access permission decision made by the
@@ -47,8 +48,8 @@ public interface IPPNPAction {
 
 	public Decision getDecision();
 
-	public ServiceResourceIdentifier getServiceIdentifier();
+	public IServiceResourceIdentifier getServiceIdentifier();
 
-	public EntityIdentifier getServiceIdentity();
+	public Identity getServiceIdentity();
 
 }

@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/services
+END
+GroupsService.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/services/GroupsService.java
+END
+Service.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/services/Service.java
+END
+MediaItemsService.java
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/services/MediaItemsService.java
+END
+AlbumsService.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/services/AlbumsService.java
+END
+ActivitiesService.java
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/services/ActivitiesService.java
+END
+PeopleService.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/services/PeopleService.java
+END
+AppDataService.java
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/ca/!svn/ver/10689/applications/socialtim/trunk/src/org/opensocial/services/AppDataService.java
+END

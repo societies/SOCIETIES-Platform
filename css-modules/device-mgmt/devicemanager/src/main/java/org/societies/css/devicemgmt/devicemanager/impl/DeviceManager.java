@@ -32,10 +32,10 @@ import java.util.Map;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.css.devicemgmt.devicemanager.DeviceCommonInfo;
-import org.societies.css.devicemgmt.devicemanager.IAction;
-import org.societies.css.devicemgmt.devicemanager.IDeviceManager;
 
+
+import org.societies.api.internal.css.devicemgmt.IDeviceManager;
+import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.springframework.osgi.context.BundleContextAware;
 
 

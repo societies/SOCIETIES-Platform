@@ -35,9 +35,9 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.IPrivacyOutcome;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.IPrivacyPreferenceTreeModel;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceTreeModel;
 
 
 /**
@@ -161,7 +161,7 @@ public interface IPrivacyPreferenceManager {
 	 * 
 	 * @param service_id
 	 */
-	public Identity getIdSPreference(IServiceResourceIdentifier service_id);
+	public Identity evaluateIdSPreference(IServiceResourceIdentifier service_id);
 
 	/**
 	 * Method to retrieve the list of IDSPreferences that affect the given DPI and

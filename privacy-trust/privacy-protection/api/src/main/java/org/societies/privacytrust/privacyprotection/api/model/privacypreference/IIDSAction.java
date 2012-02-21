@@ -26,9 +26,10 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 
 import java.util.List;
 
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+
 
 /**
  * This interface is used to represent an identity selection decision made by the
@@ -41,10 +42,10 @@ public interface IIDSAction {
 
 	public List<CtxAttribute> getContext();
 
-	public EntityIdentifier getSelectedIdentity();
+	public Identity getSelectedIdentity();
 
-	public ServiceResourceIdentifier getServiceIdentifier();
+	public IServiceResourceIdentifier getServiceIdentifier();
 
-	public EntityIdentifier getServiceIdentity();
+	public Identity getServiceIdentity();
 
 }

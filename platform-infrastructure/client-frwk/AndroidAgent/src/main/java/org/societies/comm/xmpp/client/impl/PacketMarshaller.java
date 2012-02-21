@@ -70,6 +70,10 @@ public class PacketMarshaller {
 	public String marshallMessage(Stanza stanza, Message.Type type, Object payload) throws Exception {
 		final String xml = marshallPayload(payload);
 		Message message = new Message();
+		if(stanza.getId() != null)
+			message.setPacketID(stanza.getId());
+		if(stanza.getFrom() != null)
+			message.setFrom(stanza.getFrom().getJid());
 		if(type != null)                        
 			message.setType(type);
 		message.setTo(stanza.getTo().getJid());
@@ -95,12 +99,16 @@ public class PacketMarshaller {
 				return xml;
 			}			
 		};
+		if(stanza.getId() != null)
+			iq.setPacketID(stanza.getId());
+		if(stanza.getFrom() != null)
+			iq.setFrom(stanza.getFrom().getJid());
 		iq.setTo(stanza.getTo().getJid());
 		iq.setType(type);	
 		return iq.toXML();
 	}
 	
-	public IQ unmarshallIq(String xml) throws Exception {	
+	public IQ unmarshallIq(String xml) throws Exception {
 		return parseIq(createXmlPullParser(xml));
 	}
 	
@@ -109,7 +117,11 @@ public class PacketMarshaller {
 	}
 	
 	public Object unmarshallPayload(Packet packet) throws Exception {
-		Element element = getElementAny(packet);		
+		Element element = getElementAny(packet);
+		
+		if(element == null) // Empty stanza
+			return null;
+		
 		String namespace = element.lookupNamespaceURI(element.getPrefix());
 		Unmarshaller u = getUnmarshaller(namespace);
 
@@ -216,8 +228,13 @@ public class PacketMarshaller {
 			}
 		}
 		
-		if(iqPacket == null)
-			throw new RuntimeException("Invalid IQ Packet");
+		if(iqPacket == null) {
+			iqPacket = new IQ() {
+				public String getChildElementXML() {
+					return "";
+				}
+			};
+		}
 
         // Set basic values on the iq packet.
         iqPacket.setPacketID(id);

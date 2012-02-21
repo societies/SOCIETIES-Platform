@@ -1,10 +1,10 @@
 package org.societies.personalisation.SNDataExtractor.impl;
 
-import org.societies.api.internal.context.broker.IUserCtxBroker;
+import org.societies.api.internal.context.broker.ICtxBroker;
 
 public class SNDataExtractor  {
 	
-	private IUserCtxBroker ctxBroker;
+	private ICtxBroker ctxBroker;
 
 	public SNDataExtractor(){
 	}
@@ -13,15 +13,12 @@ public class SNDataExtractor  {
 		System.out.println("SNData initialized");
 	}
 
-	
-	public IUserCtxBroker getCtxBroker() {
+	public ICtxBroker getCtxBroker() {
 		return ctxBroker;
 	}
 
-	public void setCtxBroker(IUserCtxBroker ctxBroker) {
+	public void setCtxBroker(ICtxBroker ctxBroker) {
 		this.ctxBroker = ctxBroker;
 	}
-	
-	
 	
 }

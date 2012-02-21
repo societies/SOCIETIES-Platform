@@ -28,10 +28,10 @@ import java.io.Serializable;
 
 import javax.swing.tree.DefaultTreeModel;
 
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
 
 
@@ -45,8 +45,8 @@ import org.societies.api.mock.ServiceResourceIdentifier;
 public class DObfPreferenceTreeModel extends DefaultTreeModel implements IPrivacyPreferenceTreeModel, Serializable{
 	private CtxAttributeIdentifier affectedCtxId;
 	private String myContextType;
-	private EntityIdentifier providerDPI;
-	private ServiceResourceIdentifier serviceID;
+	private Identity providerDPI;
+	private IServiceResourceIdentifier serviceID;
 	private PrivacyPreferenceTypeConstants myPrivacyType;
 	private IPrivacyPreference pref;
 	
@@ -86,19 +86,19 @@ public class DObfPreferenceTreeModel extends DefaultTreeModel implements IPrivac
 		return affectedCtxId;
 	}
 
-	public void setProviderDPI(EntityIdentifier providerDPI) {
+	public void setProviderDPI(Identity providerDPI) {
 		this.providerDPI = providerDPI;
 	}
 
-	public EntityIdentifier getProviderDPI() {
+	public Identity getProviderDPI() {
 		return providerDPI;
 	}
 
-	public void setServiceID(ServiceResourceIdentifier serviceID) {
+	public void setServiceID(IServiceResourceIdentifier serviceID) {
 		this.serviceID = serviceID;
 	}
 
-	public ServiceResourceIdentifier getServiceID() {
+	public IServiceResourceIdentifier getServiceID() {
 		return serviceID;
 	}
 

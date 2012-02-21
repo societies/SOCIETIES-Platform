@@ -26,8 +26,10 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 
 import java.io.Serializable;
 
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+
+
 
 public class IDSPreferenceDetails implements Serializable{
 
@@ -35,39 +37,39 @@ public class IDSPreferenceDetails implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private EntityIdentifier affectedDPI;
-	private EntityIdentifier providerDPI;
-	private ServiceResourceIdentifier serviceID;
+	private Identity affectedDPI;
+	private Identity providerDPI;
+	private IServiceResourceIdentifier serviceID;
 	
-	public IDSPreferenceDetails(EntityIdentifier affectedDPI){
+	public IDSPreferenceDetails(Identity affectedDPI){
 		this.affectedDPI = affectedDPI;
 	}
 	
-	public void setAffectedDPI(EntityIdentifier affectedDPI) {
+	public void setAffectedDPI(Identity affectedDPI) {
 		this.affectedDPI = affectedDPI;
 	}
 
-	public EntityIdentifier getAffectedDPI() {
+	public Identity getAffectedDPI() {
 		return affectedDPI;
 	}
 
-	public void setServiceID(ServiceResourceIdentifier serviceID) {
+	public void setServiceID(IServiceResourceIdentifier serviceID) {
 		this.serviceID = serviceID;
 	}
 
-	public ServiceResourceIdentifier getServiceID() {
+	public IServiceResourceIdentifier getServiceID() {
 		return serviceID;
 	}
 
-	public void setProviderDPI(EntityIdentifier providerDPI) {
+	public void setProviderDPI(Identity providerDPI) {
 		this.providerDPI = providerDPI;
 	}
 
-	public EntityIdentifier getProviderDPI() {
+	public Identity getProviderDPI() {
 		return providerDPI;
 	}
 	
-	private boolean compareProviderDPI(EntityIdentifier requestorDPI){
+	private boolean compareProviderDPI(Identity requestorDPI){
 		if (requestorDPI==null){
 			if (this.providerDPI==null){
 				return true;
@@ -78,7 +80,7 @@ public class IDSPreferenceDetails implements Serializable{
 			if (requestorDPI==null){
 				return false;
 			}else{
-				if (requestorDPI.toUriString().equalsIgnoreCase(this.providerDPI.toUriString())){
+				if (requestorDPI.toString().equalsIgnoreCase(this.providerDPI.toString())){
 					return true;
 				}else{
 					return false;
@@ -87,7 +89,7 @@ public class IDSPreferenceDetails implements Serializable{
 		}
 	}
 	
-	private boolean compareServiceID(ServiceResourceIdentifier serviceID2){
+	private boolean compareServiceID(IServiceResourceIdentifier serviceID2){
 		if (serviceID2==null){
 			if (this.serviceID == null){
 				return true;
@@ -98,7 +100,7 @@ public class IDSPreferenceDetails implements Serializable{
 			if (serviceID2==null){
 				return false;
 			}else{
-				if (serviceID2.toUriString().equalsIgnoreCase(this.serviceID.toUriString())){
+				if (serviceID2.toString().equalsIgnoreCase(this.serviceID.toString())){
 					return true;
 				}else{
 					return false;
@@ -110,7 +112,7 @@ public class IDSPreferenceDetails implements Serializable{
 	public boolean equals(Object obj){
 		if (obj instanceof IDSPreferenceDetails){
 			IDSPreferenceDetails details = (IDSPreferenceDetails) obj;
-			if (getAffectedDPI().toUriString().equalsIgnoreCase(details.getAffectedDPI().toUriString())){
+			if (getAffectedDPI().toString().equalsIgnoreCase(details.getAffectedDPI().toString())){
 				if (this.compareProviderDPI(details.getProviderDPI())){
 					return this.compareServiceID(details.getServiceID());
 				}else{
@@ -126,13 +128,13 @@ public class IDSPreferenceDetails implements Serializable{
 	@Override
 	public String toString(){
 		String str = "\n";
-		str = str.concat("AffectedDPI: "+this.getAffectedDPI().toUriString());
+		str = str.concat("AffectedDPI: "+this.getAffectedDPI().toString());
 		
 		if (this.providerDPI!=null){
-			str = str.concat("\nProvider DPI: "+this.providerDPI.toUriString());
+			str = str.concat("\nProvider DPI: "+this.providerDPI.toString());
 		}
 		if (this.serviceID!=null){
-			str = str.concat("\nServiceID :"+this.serviceID.toUriString());
+			str = str.concat("\nServiceID :"+this.serviceID.toString());
 		}
 		str = str.concat("\n");
 		return str;

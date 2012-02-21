@@ -27,7 +27,6 @@ package org.societies.context.userHistory.impl;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,12 +35,10 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelObject;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
+import org.springframework.stereotype.Service;
 
-
-
+@Service
 public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
 	private final LinkedHashMap<Long,List> hocObjects;
@@ -49,8 +46,6 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 	public UserContextHistoryManagement(){
 		this.hocObjects =  new LinkedHashMap<Long,List>();
 	}
-
-
 
 	public void storeHoCAttribute(CtxAttribute ctxAttribute){
 	

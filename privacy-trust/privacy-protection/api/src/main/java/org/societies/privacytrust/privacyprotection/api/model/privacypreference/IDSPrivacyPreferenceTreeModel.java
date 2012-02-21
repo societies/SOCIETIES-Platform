@@ -28,9 +28,10 @@ import java.io.Serializable;
 
 import javax.swing.tree.DefaultTreeModel;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
+
 
 /**
  * This class is used to represent a privacy preference for identity selection. This class represents a node in a tree. 
@@ -42,13 +43,13 @@ import org.societies.api.mock.ServiceResourceIdentifier;
 public class IDSPrivacyPreferenceTreeModel extends DefaultTreeModel implements IPrivacyPreferenceTreeModel, Serializable {
 
 	
-	private EntityIdentifier affectedDPI;
-	private EntityIdentifier serviceDPI;
-	private ServiceResourceIdentifier serviceID;
+	private Identity affectedDPI;
+	private Identity serviceDPI;
+	private IServiceResourceIdentifier serviceID;
 	private PrivacyPreferenceTypeConstants myPrivacyType;
 	private IPrivacyPreference pref;
 	
-	public IDSPrivacyPreferenceTreeModel(EntityIdentifier affectedDPI,  IPrivacyPreference preference){
+	public IDSPrivacyPreferenceTreeModel(Identity affectedDPI,  IPrivacyPreference preference){
 		super(preference);
 		this.setAffectedDPI(affectedDPI);
 		this.myPrivacyType = PrivacyPreferenceTypeConstants.IDS;
@@ -73,32 +74,32 @@ public class IDSPrivacyPreferenceTreeModel extends DefaultTreeModel implements I
 	}
 
 
-	public void setAffectedDPI(EntityIdentifier affectedDPI) {
+	public void setAffectedDPI(Identity affectedDPI) {
 		this.affectedDPI = affectedDPI;
 	}
 
 
-	public EntityIdentifier getAffectedDPI() {
+	public Identity getAffectedDPI() {
 		return affectedDPI;
 	}
 
 
-	public void setServiceID(ServiceResourceIdentifier serviceID) {
+	public void setServiceID(IServiceResourceIdentifier serviceID) {
 		this.serviceID = serviceID;
 	}
 
 
-	public ServiceResourceIdentifier getServiceID() {
+	public IServiceResourceIdentifier getServiceID() {
 		return serviceID;
 	}
 
 
-	public void setServiceDPI(EntityIdentifier serviceDPI) {
+	public void setServiceDPI(Identity serviceDPI) {
 		this.serviceDPI = serviceDPI;
 	}
 
 
-	public EntityIdentifier getServiceDPI() {
+	public Identity getServiceDPI() {
 		return serviceDPI;
 	}
 

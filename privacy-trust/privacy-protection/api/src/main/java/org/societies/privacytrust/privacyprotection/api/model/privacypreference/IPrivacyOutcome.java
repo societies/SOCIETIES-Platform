@@ -24,7 +24,7 @@
  */
 package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
 
 

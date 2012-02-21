@@ -29,7 +29,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 /**
@@ -46,9 +46,9 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 
 	private List<RequestItem> items;
 	private IServiceResourceIdentifier serviceID;
-	private EntityIdentifier serviceDPI;
-	private EntityIdentifier userDPI;
-	private EntityIdentifier userPublicDPI;
+	private Identity serviceDPI;
+	private Identity userDPI;
+	private Identity userPublicDPI;
 
 	private NegotiationAgreement(){
 		this.items = new ArrayList<RequestItem>();
@@ -84,7 +84,7 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#getServiceDPI()
 	 */
 	@Override
-	public EntityIdentifier getServiceDPI() {
+	public Identity getServiceDPI() {
 		return this.serviceDPI;
 	}
 
@@ -92,24 +92,24 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#getUserDPI()
 	 */
 	@Override
-	public EntityIdentifier getUserDPI() {
+	public Identity getUserDPI() {
 		return this.userDPI;
 	}
 
-	public EntityIdentifier getUserPublicDPI(){
+	public Identity getUserPublicDPI(){
 		return this.userPublicDPI;
 	}
 
-	public void setUserPublicDPI(EntityIdentifier userPublicDPI){
+	public void setUserPublicDPI(Identity userPublicDPI){
 		this.userPublicDPI = userPublicDPI;
 	}
 
 
 	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#setServiceDPI(org.personalsmartspace.sre.api.pss3p.EntityIdentifier)
+	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#setServiceDPI(org.personalsmartspace.sre.api.pss3p.Identity)
 	 */
 	@Override
-	public void setServiceDPI(EntityIdentifier serviceDPI) {
+	public void setServiceDPI(Identity serviceDPI) {
 		this.serviceDPI = serviceDPI;
 		
 	}
@@ -124,10 +124,10 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#setUserDPI(org.personalsmartspace.sre.api.pss3p.EntityIdentifier)
+	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#setUserDPI(org.personalsmartspace.sre.api.pss3p.Identity)
 	 */
 	@Override
-	public void setUserDPI(EntityIdentifier userDPI) {
+	public void setUserDPI(Identity userDPI) {
 		this.userDPI = userDPI;
 		
 	}

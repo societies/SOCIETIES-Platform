@@ -26,18 +26,19 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 
 import java.io.Serializable;
 
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+
 
 public class FailedNegotiationEvent implements Serializable{
 
-	private ServiceResourceIdentifier serviceID;
-	public FailedNegotiationEvent(ServiceResourceIdentifier serviceID){
+	private IServiceResourceIdentifier serviceID;
+	public FailedNegotiationEvent(IServiceResourceIdentifier serviceID){
 		this.setServiceID(serviceID);
 	}
-	public void setServiceID(ServiceResourceIdentifier serviceID) {
+	public void setServiceID(IServiceResourceIdentifier serviceID) {
 		this.serviceID = serviceID;
 	}
-	public ServiceResourceIdentifier getServiceID() {
+	public IServiceResourceIdentifier getServiceID() {
 		return serviceID;
 	}
 }
