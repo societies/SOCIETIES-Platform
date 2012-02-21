@@ -25,7 +25,9 @@
 
 package org.societies.orchestration.CommunityLifecycleManagement.impl;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 
 import org.societies.api.internal.css.directory.ICssDirectory;
@@ -136,7 +138,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 		this.linkedSuperCis = linkedSuperCis;
 	}
 	
-	public ArrayList<Identity> getIDsOfInteractingCsss() {
+	public ArrayList<Identity> getIDsOfInteractingCsss(String startingDate, String endingDate) {
 		//What CSSs is this one currently interacting with?
 		//Found by: For each service, shared service, and resource the user is using (in the last ~5 minutes), is there an end-CSS they're interacting with?
 		//Is there a CSS they're indirectly interacting with over the service?
@@ -193,13 +195,13 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 		
 		if (evaluationType.equals("extensive")) { //every day or so
 			if (linkedCss != null) {
-				interactedCssIDs = getIDsOfInteractingCsss();
+				//interactedCssIDs = getIDsOfInteractingCsss();
 				
 				//first step: look for more obvious CISs on high-priority kinds of context,
 				//e.g. friends in contact list, family in contact list (from SNS extractor or SOCIETIES)
 				
 				//If CISs are appropriate for friends' lists in Google+ circle fashion, then that counts
-				//CisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new CisRecord(null, null, null, null, null, null, null, null));
+				CisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new CisRecord(null, null, null, null, null, null, null, null));
 				//ArrayList<CisRecord> userJoinedCiss = new ArrayList<CisRecord>();
 				//for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
 				//    userJoinedCiss.add(listOfUserJoinedCiss[i]);
@@ -332,14 +334,20 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				
 				//final step: retrieve as much context data on CSS user and inter-CSS connections 
 				//amongst their immediate connection neighbourhood as possible.
+				String yesterday = new Timestamp(new Date().getTime()).toString();
+				String[] yesterdayHyphens = yesterday.split("-");
+				String lastPartOfYesterdayHyphens = yesterdayHyphens[2].split(" ")[1];
+				yesterday = yesterdayHyphens[0] + "-" + yesterdayHyphens[1] + "-" + (Integer.valueOf(yesterdayHyphens[2].split(" ")[0]) - 1) + " " + lastPartOfYesterdayHyphens; 
 				
-				// processing - here or delegated to local method
+				interactedCssIDs = getIDsOfInteractingCsss(yesterday, new Timestamp(new Date().getTime()).toString());
+				
+				
 			}
 		}
 			
 		else { //non-extensive check, every few minutes or so.
 			if (linkedCss != null) {
-				interactedCssIDs = getIDsOfInteractingCsss();
+				interactedCssIDs = getIDsOfInteractingCsss(new Timestamp(new Date().getTime() - 300000).toString(), new Timestamp(new Date().getTime()).toString());
 				//retrieve recent history of certain kinds of context data on CSS user and inter-CSS connections 
 				//amongst their immediate connection neighbourhood as possible.
 				
