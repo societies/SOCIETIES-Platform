@@ -32,7 +32,7 @@
 package org.societies.useragent.decisionmaking;
 
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.useragent.api.model.ConflictType;
+import org.societies.useragent.conflict.*;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.useragent.conflict.ConfidenceTradeoffRule;
 import org.societies.useragent.conflict.ConflictResolutionManager;
