@@ -27,25 +27,19 @@ package org.societies.comm.examples.commsmanager.impl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.comm.xmpp.datatypes.IdentityImpl;
 import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.IdentityType;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.datatypes.XMPPNode;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.example.calculator.ICalcRemote;
 import org.societies.example.IExamplesCallback;
+import org.societies.example.calculator.ICalcRemote;
 import org.societies.example.calculatorservice.schema.CalcBean;
 import org.societies.example.calculatorservice.schema.MethodType;
 import org.springframework.scheduling.annotation.Async;
@@ -96,8 +90,8 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 	@Override
 	@Async
 	public void Add(int valA, int valB, IExamplesCallback calcCallback) {
-		//Identity id = new IdentityImpl(IdentityType.CSS, "XCManager", "red.local");
-		Identity toIdentity = new Identity(IdentityType.CSS, "XCManager", "red.local") {
+		//Identity id = new IdentityImpl(IdentityType.CSS, "XCManager", "societies.local");
+		Identity toIdentity = new Identity(IdentityType.CSS, "XCManager", "societies.local") {
 			@Override
 			public String getJid() {
 				return getIdentifier() + "." + getDomainIdentifier();
@@ -124,7 +118,7 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 
 	@Override
 	public void Subtract(int valA, int valB, IExamplesCallback calcCallback) {
-		Identity toIdentity = new Identity(IdentityType.CSS, "XCManager", "red.local") {
+		Identity toIdentity = new Identity(IdentityType.CSS, "XCManager", "societies.local") {
 			@Override
 			public String getJid() {
 				return getIdentifier() + "." + getDomainIdentifier();

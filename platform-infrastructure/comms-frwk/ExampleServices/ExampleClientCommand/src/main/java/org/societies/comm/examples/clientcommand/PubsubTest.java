@@ -87,7 +87,7 @@ public class PubsubTest implements Runnable, Subscriber {
 	@Override
 	public void run() {
 		//CREATE A PUB-SUB NODE
-		Identity pubsubID = idManager.fromJid("XCManager.red.local");
+		Identity pubsubID = idManager.fromJid("XCManager.societies.local");
 		try {
 			pubSubManager.ownerCreate(pubsubID, PUBSUB_NODE_NAME);
 		} catch (XMPPError e) {
