@@ -22,18 +22,36 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.personalisation.UserPreferenceManagement.impl.monitoring;
 
-package org.societies.personalisation.management.impl;
-
-
-public class ContextEventCallback /* implements CtxEventCallback interface? */ {
-
-	private final PersonalisationManager pm;
-
-	public ContextEventCallback(PersonalisationManager pm){
-		this.pm = pm;
-		
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.framework.BundleContext;
+/**
+ * @author Elizabeth
+ *
+ */
+public class ServiceRetriever {
+	
+	BundleContext myContext;
+	
+	public ServiceRetriever(BundleContext cont){
+		this.myContext = cont;
+	}
+	
+	public Object getService(String serviceClassName){
+		ServiceTracker servTracker = new ServiceTracker(myContext, serviceClassName, null);
+		servTracker.open();
+		Object[] services = servTracker.getServices();
+		if (null!=services){
+			if (services.length >0){
+				return services[0];
+			}else{
+				return null;
+			}
+		}else{
+			return null;
+		}
 	}
 
-
 }
+

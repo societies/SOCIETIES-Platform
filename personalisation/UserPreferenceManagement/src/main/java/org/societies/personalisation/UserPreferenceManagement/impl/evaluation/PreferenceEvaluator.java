@@ -36,6 +36,7 @@ import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.personalisation.preference.api.model.ContextPreferenceCondition;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceCondition;
+import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 import org.societies.personalisation.preference.api.model.OperatorConstants;
 
 
@@ -50,8 +51,8 @@ public class PreferenceEvaluator {
 		this.contextCache = cache;
 	}
 	
-	public Hashtable<IOutcome,List<CtxIdentifier>> evaluatePreference(IPreference ptn){
-		Hashtable<IOutcome,List<CtxIdentifier>> temp = new Hashtable<IOutcome,List<CtxIdentifier>>();
+	public Hashtable<IPreferenceOutcome,List<CtxIdentifier>> evaluatePreference(IPreference ptn){
+		Hashtable<IPreferenceOutcome,List<CtxIdentifier>> temp = new Hashtable<IPreferenceOutcome,List<CtxIdentifier>>();
 		IPreference p = this.evaluatePreferenceInternal(ptn);
 		if (p!=null){
 			ArrayList<CtxIdentifier> ctxIds = new ArrayList<CtxIdentifier>();
@@ -77,7 +78,7 @@ public class PreferenceEvaluator {
 			temp.put(p.getOutcome(), ctxIds);
 			return temp;
 		}else{
-			return new Hashtable<IOutcome,List<CtxIdentifier>>();
+			return new Hashtable<IPreferenceOutcome,List<CtxIdentifier>>();
 		}
 	}
 	private IPreference evaluatePreferenceInternal(IPreference ptn){

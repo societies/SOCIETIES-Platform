@@ -48,7 +48,6 @@ import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
 import org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor;
-import org.societies.personalisation.preference.api.UserPreferenceManagement.IUserPreferenceManagement;
 
 
 public class PersonalisationManager implements IPersonalisationManager, IInternalPersonalisationManager{
@@ -269,7 +268,7 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 			if (this.containsCtxId(ctxId, dianneList)){
 				this.dianneNetwork.getOutcome(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
 				if (this.containsCtxId(ctxId, prefMgrList)){	
-					this.pcm.getOutcome(ctxId.getOperatorId(), ctxAttribute, callback);
+					this.pcm.getOutcome(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
 					callback.setAskDianne(false);
 					callback.setAskPreference(false);
 				}else{
@@ -277,7 +276,7 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 				}
 				
 			}else if(this.containsCtxId(ctxId, prefMgrList)){
-				this.pcm.getOutcome(ctxId.getOperatorId(), ctxAttribute, callback);
+				this.pcm.getOutcome(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
 				if (this.containsCtxId(ctxId, dianneList)){
 					this.dianneNetwork.getOutcome(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
 					callback.setAskDianne(false);
@@ -286,7 +285,8 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 					callback.setAskDianne(true);
 				}
 			}else if (this.containsCtxId(ctxId, cauiList)){
-				this.cauiPrediction.getPrediction(ctxId.getOperatorId(), (IAction) ctxAttribute, callback);
+				this.cauiPrediction.getPrediction(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
+				
 				if (this.containsCtxId(ctxId, cristList)){
 					this.cristPrediction.getCRISTPrediction(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
 					callback.setAskCAUI(false);

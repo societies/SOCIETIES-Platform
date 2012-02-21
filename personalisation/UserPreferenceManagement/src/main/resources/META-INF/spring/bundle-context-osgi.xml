@@ -14,7 +14,7 @@
         
         <osgi:service ref="UserPreferenceManager">
         <osgi:interfaces>
-        <value>org.societies.personalisation.preference.api.UserPreferenceManagement.IUserPreferenceManagement</value>
+        <value>org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor</value>
         </osgi:interfaces>
         </osgi:service>
         

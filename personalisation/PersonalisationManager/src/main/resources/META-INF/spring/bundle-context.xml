@@ -11,8 +11,8 @@
        for integration testing outside of an OSGi environment -->
 
    <bean id="PersonalisationManager" class="org.societies.personalisation.management.impl.PersonalisationManager" 
-   depends-on="UserPrefMgr, UserCtxBroker" init-method="initialisePersonalisationManager">
-   <property name="prefMgr" ref="UserPrefMgr"></property>
+   depends-on="UserPCM, UserCtxBroker" init-method="initialisePersonalisationManager">
+   <property name="pcm" ref="UserPCM"></property>
    <property name="ctxBroker" ref="UserCtxBroker"></property>
    </bean>
 <!--   <context:component-scan base-package="org.societies.personalisation.management.impl"></context:component-scan> -->

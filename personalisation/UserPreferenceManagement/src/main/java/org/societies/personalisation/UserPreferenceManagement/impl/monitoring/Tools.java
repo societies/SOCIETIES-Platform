@@ -22,18 +22,47 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.personalisation.UserPreferenceManagement.impl.monitoring;
 
-package org.societies.personalisation.management.impl;
+/**
+ * @author Elizabeth
+ *
+ */
+public class Tools {
 
-
-public class ContextEventCallback /* implements CtxEventCallback interface? */ {
-
-	private final PersonalisationManager pm;
-
-	public ContextEventCallback(PersonalisationManager pm){
-		this.pm = pm;
+	public Tools(){
 		
 	}
-
-
+	public String convertToKey(String serviceType, String serviceID, String preferenceName){
+		return serviceType+":"+serviceID+":"+preferenceName;
+	}
+	public String convertToKey(String serviceType, String serviceID){
+		return serviceType+":"+serviceID;
+	}
+	
+	public String[] convertKeyToParts(String servInfo){
+		String[] parts = servInfo.split(":");
+		if (parts.length == 2){
+			return parts;
+		}
+		return null;
+	}
+	
+	public String getServiceIDFromKey(String servInfo){
+		String[] parts = this.convertKeyToParts(servInfo);
+		if (null!=parts){
+			return parts[1];
+		}
+		return "";
+	}
+	
+	public String getServiceTypeFromKey(String servInfo){
+		String[] parts = this.convertKeyToParts(servInfo);
+		if (null!=parts){
+			return parts[0];
+		}
+		return "";
+	}
+		
 }
+
