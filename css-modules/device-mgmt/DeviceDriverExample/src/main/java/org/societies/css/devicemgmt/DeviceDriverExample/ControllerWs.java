@@ -32,10 +32,12 @@ public interface ControllerWs {
 	
 	
 	
-	public String createNewDevice (String deviceMacAddress, DeviceCommonInfo deviceCommonInfo, String [] actionName);
+	public String createNewDevice (String deviceMacAddress, DeviceCommonInfo deviceCommonInfo);
 	
 	public void removeDevice (String deviceId);
 	
 	public void sendNewData (String deviceId, String data);
+	
+	public void setLightLevel (String deviceMacAdress, Long lightLevel);
 
 }

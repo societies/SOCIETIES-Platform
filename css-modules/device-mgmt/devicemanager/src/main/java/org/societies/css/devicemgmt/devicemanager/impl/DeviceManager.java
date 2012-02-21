@@ -90,9 +90,15 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 	 */
 	public String fireNewDeviceConnected(String deviceMacAddress, DeviceCommonInfo deviceCommonInfo) 
 	{
+		
+		LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceManager info: fireNewDeviceConnected ");
+		
 		// Check if the device Family container contains device Instance container for this family of devices
 		if (deviceFamilyContainer.get(deviceCommonInfo.getDeviceFamilyIdentity()) == null) 
 		{
+			
+			//LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceManager info: deviceFamilyContainer == null ");
+			
 			//Create a new device instance container
 			deviceInstanceContainer = new HashMap<String, DeviceImpl>();
 			
@@ -100,7 +106,7 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 			
 			//create a new IDevice implementation
 			deviceImpl = new DeviceImpl(bundleContext, this, /*TODO here set the id*/deviceMacAddress, deviceCommonInfo);
-			
+			//LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceManager info: post deviceImpl ");
 			deviceInstanceContainer.put(/*TODO here set the id*/deviceMacAddress, deviceImpl);
 			
 			deviceFamilyContainer.put(deviceCommonInfo.getDeviceFamilyIdentity(), deviceInstanceContainer);

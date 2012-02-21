@@ -33,9 +33,12 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.societies.api.css.devicemgmt.IDeviceStateVariable;
 import org.societies.api.internal.css.devicemgmt.IDeviceManager;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.societies.css.devicemgmt.DeviceDriverExample.ControllerWs;
+import org.societies.css.devicemgmt.DeviceDriverExample.actions.GetLightLevelAction;
+import org.societies.css.devicemgmt.DeviceDriverExample.statevariables.LightLevelStateVariable;
 
 
 import org.springframework.osgi.context.BundleContextAware;
@@ -53,19 +56,20 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 	
 	private IDeviceManager deviceManager;
 	
-	private ActionImpl actionImpl;
 	
 	private String createNewDevice = "";
 	
 	private static Logger LOG = LoggerFactory.getLogger(DeviceDriverExample.class);
 
-	private final Map<String, ActionImpl> actionInstanceContainer;
 	private final List<String> deviceMacAddressList;
+	
+	private Long lightLevel = new Long (0);
+	
+	private LightSensor lightSensor;
 	
 	
 	public DeviceDriverExample() {
 		
-		actionInstanceContainer = new HashMap<String, ActionImpl>();
 		deviceMacAddressList =  new ArrayList<String>();
 
 		//LOG.info("DeviceDriverExample: " + "=========++++++++++------ DeviceDriverExample constructor");
@@ -82,27 +86,9 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 	/** (non-Javadoc)
 	 * @see org.springframework.osgi.context.BundleContextAware#setBundleContext(org.osgi.framework.BundleContext)
 	 */
-	public void setBundleContext(BundleContext arg0) {
+	public void setBundleContext(BundleContext bc) {
 		// TODO Auto-generated method stub
-		bundleContext = arg0;
-	}
-	
-	
-	protected Map<String, ActionImpl> getActionInstanceContainer() 
-	{	
-		return actionInstanceContainer;
-	}
-	protected void setActionInstanceContainer(String actionName, ActionImpl actionInstance) 
-	{
-		this.actionInstanceContainer.put(actionName, actionInstance);
-	}
-
-	public void removeActionFromContainer (String actionName)
-	{
-		if (getActionInstanceContainer().get(actionName) != null)
-		{
-			getActionInstanceContainer().remove(actionName);
-		}
+		bundleContext = bc;
 	}
 
 
@@ -127,31 +113,46 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 	/** (non-Javadoc)
 	 * @see org.societies.css.devicemgmt.DeviceDriverExample.ControllerWs#createNewDevice(java.lang.String)
 	 */
-	public String createNewDevice(String deviceMacAddress, DeviceCommonInfo deviceCommonInfo, String [] actionName) {
-		// TODO Auto-generated method stub
+	public String createNewDevice(String deviceMacAddress, DeviceCommonInfo deviceCommonInfo) 
+	{
 
 		if (!deviceMacAddressList.contains(deviceMacAddress))
-		{ 
+		{
 			
-			createNewDevice =  deviceManager.fireNewDeviceConnected(deviceMacAddress, deviceCommonInfo);
-			deviceMacAddressList.add(deviceMacAddress);
+			if (deviceCommonInfo.getDeviceType().equals("lightSensor")) 
+			{	
+				LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceDriverExample info: createNewDevice type LightSensor");
+				createNewDevice =  deviceManager.fireNewDeviceConnected(deviceMacAddress, deviceCommonInfo);
+				deviceMacAddressList.add(deviceMacAddress);
 				
-			LOG.info("DeviceDriverExample: " + "*********************************** deviceManager.fireNewDeviceConnected");
+				lightSensor = new LightSensor(bundleContext, this, "lightSensor1", deviceMacAddress);
 				
-			for (String an: actionName)
-			{
-				if (getActionInstanceContainer().get(actionName) == null)
-				{
-					actionImpl = new ActionImpl(bundleContext, this, an);
-					
-					setActionInstanceContainer(an, actionImpl);
-					
-					//LOG.info("DeviceDriverExample: " + "*********************************** Hi, I'm a new IAction : " + actionName);
-				}
+				LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceDriverExample info: new light sensor device created with a MAC Address: " + deviceMacAddress);
+				return "Device created";
 			}
-			
-			return "The Action "+ actionName +" has been created";	
+			else
+			{
+				return "other device type to deal with";
+			}
 		}
-		return "The action "+ actionName + " already exists";
+		else
+		{
+			LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceDriverExample info: a device with mac address: " + deviceMacAddress + " already registred");
+			return "Device already existes";
+		}
+	}
+	
+	
+	public Long getLightLevel (String deviceMacAdress){
+		
+		return lightLevel;
+	}
+
+	
+	@Override
+	public void setLightLevel(String deviceMacAddress, Long lightLevel) {
+		
+		this.lightLevel = lightLevel;
+		
 	}
 }
