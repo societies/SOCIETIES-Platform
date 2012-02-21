@@ -205,6 +205,17 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				//    userJoinedCiss.add(listOfUserJoinedCiss[i]);
 				//}
 				
+				//CSS directory
+				//ArrayList<CssRecord> cssDirectoryMembers = userCssDirectory.getCssEntries();
+				boolean cisExistsAlready = false;
+				//if (cssDirectoryMembers.size() >= 2)
+				//for (int i = 0; i < userJoinedCiss.size(); i++) {
+				//     if ((userJoinedCiss[i].getMembers() == cssDirectoryMembers) && (userJoinedCiss[i].getMembershipCriteria().isEmpty()))
+				//         cisExistsAlready = true;
+				/**    if (!cisManager.getCiss().get(i).getMembers() == people)*/
+				//        cissToCreate.add(new CisRecord(null, linkedCss, "PERSONAL CIS for your CSS directory members", null, null, null, null, null));
+				//}
+				
 				//friends?
 				//userContextBroker.lookup(CtxModelType.ENTITY, "SNGroup", userContextBrokerCallback);
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
@@ -216,6 +227,14 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				
 				//userContextBroker.lookup(CtxModelType.ATTRIBUTE, "close friends", userContextBrokerCallback);
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+				
+				
+				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+				//ArrayList<Identity> people = userCssDirectory.getContextMatchingCsss(list);
+				//if (people.size() >= 2)
+				//    for (int i = 0; i < cisManager.getCiss(); i++)
+				//        if (!cisManager.getCiss().get(i).getMembers() == people)
+				//            cissToCreate.add(new CisRecord(null, linkedCss, "family relation to all members", null, null, null, null, null));
 				
 				List<CtxIdentifier> contextList; //the list retrieved from above callback
 				
