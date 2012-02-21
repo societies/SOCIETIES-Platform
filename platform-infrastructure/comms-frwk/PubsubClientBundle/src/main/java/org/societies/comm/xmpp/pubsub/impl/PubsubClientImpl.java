@@ -9,8 +9,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabber.protocol.pubsub.Create;
 import org.jabber.protocol.pubsub.Item;
@@ -42,6 +47,7 @@ import org.societies.api.comm.xmpp.pubsub.Subscription;
 import org.societies.api.comm.xmpp.pubsub.SubscriptionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 @Component
@@ -67,6 +73,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	private IIdentityManager idm;
 	private Marshaller contentMarshaller;
 	private Unmarshaller contentUnmarshaller;
+	private String packagesContextPath;
 	
 	@Autowired
 	public PubsubClientImpl(ICommManager endpoint) {
@@ -74,9 +81,15 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		subscribers = new HashMap<Subscription, List<Subscriber>>();
 		this.endpoint = endpoint;
 		idm = endpoint.getIdManager();
+		packagesContextPath = "";
 		try {
+			JAXBContext jc = JAXBContext.newInstance();
+			contentUnmarshaller = jc.createUnmarshaller();
+			contentMarshaller = jc.createMarshaller();
 			endpoint.register(this);
 		} catch (CommunicationException e) {
+			LOG.error(e.getMessage());
+		} catch (JAXBException e) {
 			LOG.error(e.getMessage());
 		}
 	}
@@ -105,10 +118,18 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			org.jabber.protocol.pubsub.event.Items items = ((org.jabber.protocol.pubsub.event.Event)payload).getItems();
 			String node = items.getNode();
 			Subscription sub = new Subscription(stanza.getFrom(), stanza.getTo(), node, null); // TODO may break due to mismatch between "to" and local identity
-			List<Subscriber> subscriberList = subscribers.get(sub);
-			for (Subscriber subscriber : subscriberList)
-				for (org.jabber.protocol.pubsub.event.Item i : items.getItem())
-					subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), (Element) i.getAny());
+			org.jabber.protocol.pubsub.event.Item i = items.getItem().get(0); // TODO assume only one item per notification
+			try {
+				Object bean = null;
+				synchronized (contentUnmarshaller) {
+					bean = contentUnmarshaller.unmarshal((Element)i.getAny());
+				}
+				List<Subscriber> subscriberList = subscribers.get(sub);
+				for (Subscriber subscriber : subscriberList)
+					subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), bean);
+			} catch (JAXBException e) {
+				LOG.warn("JAXBException while unmarshalling pubsub payload",e);
+			}
 		}
 	}
 	// TODO subId
@@ -315,13 +336,27 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		Item i = new Item();
 		if (itemId!=null)
 			i.setId(itemId);
-		i.setAny(item);
-		p.setItem(i);
-		payload.setPublish(p);
-		
-		Object response = blockingIQ(stanza, payload);
-		
-		return ((Pubsub)response).getPublish().getItem().getId();
+
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		try {
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document doc = db.newDocument();
+			synchronized (contentMarshaller) {
+				contentMarshaller.marshal(item, doc);
+			}
+			i.setAny(doc.getDocumentElement());
+			
+			p.setItem(i);
+			payload.setPublish(p);
+			
+			Object response = blockingIQ(stanza, payload);
+			
+			return ((Pubsub)response).getPublish().getItem().getId();
+		} catch (ParserConfigurationException e) {
+			throw new CommunicationException("ParserConfigurationException while marshalling item to publish", e);
+		} catch (JAXBException e) {
+			throw new CommunicationException("JAXBException while marshalling item to publish", e);
+		}
 	}
 
 	@Override
@@ -462,9 +497,21 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	}
 
 	@Override
-	public void addJaxbPackages(List<String> packageList) {
-		// TODO Auto-generated method stub
+	public synchronized void addJaxbPackages(List<String> packageList) throws JAXBException {
+		if (packagesContextPath.length()==0) {
+			// TODO first run!
+		}
 		
+		StringBuilder contextPath = new StringBuilder(packagesContextPath);
+		for (String pack : packageList)
+			contextPath.append(":" + pack);
+
+		JAXBContext jc = JAXBContext.newInstance(contextPath.toString(),
+				this.getClass().getClassLoader());
+		contentUnmarshaller = jc.createUnmarshaller();
+		contentMarshaller = jc.createMarshaller();
+		
+		packagesContextPath = contextPath.toString();
 	}
 	
 }

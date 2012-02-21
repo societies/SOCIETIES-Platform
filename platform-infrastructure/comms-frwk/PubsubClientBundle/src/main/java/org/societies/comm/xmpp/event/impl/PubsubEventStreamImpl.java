@@ -1,5 +1,9 @@
 package org.societies.comm.xmpp.event.impl;
 
+import java.util.List;
+
+import javax.xml.bind.JAXBException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Identity;
@@ -37,8 +41,12 @@ public class PubsubEventStreamImpl extends PubsubEventStream {
 		return itemId;
 	}
 	
+	@Override
+	public void addJaxbPackages(List<String> packageList) throws JAXBException {
+		psc.addJaxbPackages(packageList);
+	}
+	
 	public void newRemoteEvent(PubsubEvent pe, String itemId) {
 		multicastRemoteEvent(pe,itemId);
 	}
-
 }

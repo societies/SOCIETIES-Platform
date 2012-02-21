@@ -1,5 +1,9 @@
 package org.societies.comm.xmpp.event;
 
+import java.util.List;
+
+import javax.xml.bind.JAXBException;
+
 import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.comm.xmpp.event.PubsubEvent;
 import org.springframework.context.ApplicationEvent;
@@ -20,6 +24,8 @@ public abstract class PubsubEventStream implements ApplicationEventMulticaster {
 	}
 	
 	public abstract String publishLocalEvent(Object payload);
+	
+	public abstract void addJaxbPackages(List<String> packageList) throws JAXBException;
 	
 	protected void multicastRemoteEvent(PubsubEvent pe, String itemId) {
 		pe.setPublished(pubsubService, node, itemId);

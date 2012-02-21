@@ -39,6 +39,8 @@ package org.societies.api.comm.xmpp.pubsub;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.JAXBException;
+
 import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -50,7 +52,7 @@ import org.w3c.dom.Element;
 
 public interface PubsubClient {
 	
-	public void addJaxbPackages(List<String> packageList);
+	public void addJaxbPackages(List<String> packageList) throws JAXBException;
 	public List<String> discoItems(Identity pubsubService, String node) throws XMPPError, CommunicationException;
 	// TODO remove subId from interface - it's not interesting for the API users, only for the client implementation
 	// TODO disco info nodes
