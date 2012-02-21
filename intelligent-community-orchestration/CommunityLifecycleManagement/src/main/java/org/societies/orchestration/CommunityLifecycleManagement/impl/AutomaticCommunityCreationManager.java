@@ -212,9 +212,23 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				//for (int i = 0; i < userJoinedCiss.size(); i++) {
 				//     if ((userJoinedCiss[i].getMembers() == cssDirectoryMembers) && (userJoinedCiss[i].getMembershipCriteria().isEmpty()))
 				//         cisExistsAlready = true;
+				//     else if ((cssDirectoryMembers.contains(userJoinedCiss[i].getMembers() && (userJoinedCiss[i].getMembershipCriteria().isEmpty()))) {
+				//         thisCisActivityHistory = userJoinedCiss[i].getActivityHistory();
+				//         thisCssActivityHistory = userCssManager.getActivityHistory();
+				//         Date cisCreationDate = thisCisActivityHistory.getEarliestDate();
+				//         thisCssActivityHistory = thisCssActivityHistory.split(cisCreationDate)[0];
+				//         if (!thisCssActivityHistory.contains(userJoinedCiss[i].getMembers())
+				//             cisExistsAlready = true;
+				//     }
+				//     else if ((userJoinedCiss[i].getActivityHistory().contains("personal css directory cis")))
+				//         cisExistsAlready = true;
+				//     else if ((userJoinedCiss[i].getOrchestrationMetadata().contains("personal css directory cis")))
+				//         cisExistsAlready = true;
 				/**    if (!cisManager.getCiss().get(i).getMembers() == people)*/
-				//        cissToCreate.add(new CisRecord(null, linkedCss, "PERSONAL CIS for your CSS directory members", null, null, null, null, null));
 				//}
+				//if (cisExistsAlready == false)
+				//    cissToCreate.add(new CisRecord(null, linkedCss, "PERSONAL CIS for your CSS directory members", null, null, null, null, null));
+				//
 				
 				//friends?
 				//userContextBroker.lookup(CtxModelType.ENTITY, "SNGroup", userContextBrokerCallback);
