@@ -5,11 +5,9 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 
 import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.comm.xmpp.event.PubsubEvent;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
-import org.w3c.dom.Element;
 
 public abstract class PubsubEventStream implements ApplicationEventMulticaster {
 

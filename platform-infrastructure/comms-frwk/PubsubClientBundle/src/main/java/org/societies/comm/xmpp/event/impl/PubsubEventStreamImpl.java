@@ -7,13 +7,12 @@ import javax.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.comm.xmpp.event.PubsubEvent;
-import org.societies.comm.xmpp.event.PubsubEventStream;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.comm.xmpp.event.PubsubEvent;
+import org.societies.comm.xmpp.event.PubsubEventStream;
 import org.springframework.context.event.ApplicationEventMulticaster;
-import org.w3c.dom.Element;
 
 public class PubsubEventStreamImpl extends PubsubEventStream {
 	
