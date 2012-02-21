@@ -68,7 +68,7 @@ public class EventClient implements Runnable, ApplicationListener<PubsubEvent> {
 	
 	public void run() {
 		//FIRST, CREATE THE EVENTING NODE
-		Identity pubsubID = idManager.fromJid("XCManager.red.local");
+		Identity pubsubID = idManager.fromJid("XCManager.societies.local");
 		PubsubEventFactory eventFactory = PubsubEventFactory.getInstance(pubsubID);
 		PubsubEventStream eventStream = eventFactory.getStream(pubsubID, EVENTING_NODE_NAME);
 		
