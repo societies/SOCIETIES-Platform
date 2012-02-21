@@ -102,7 +102,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 	//private IUserFeedbackCallback userFeedbackCallback;
 	
 	private ICisManager cisManager;
-	
+    
 	private ArrayList<CtxEntity> availableContextData;
     
 	/*
@@ -324,12 +324,18 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				//        if (!cisManager.getCiss().get(i).getMembers() == people)
 				//            cissToCreate.add(new CisRecord(null, linkedCss, "Local proximity", null, null, null, null, null));
 				
-				
+				int sharingCis = 0;
 				// processing - here or delegated to local method
 				if (localCsss != null) {
-				    for (int i = 0; i < localCsss.size(); i++) {
+					//for (int m = 0; m < cisManager.getCisList(linkedCss); m++)
+				    for (int n = 0; n < localCsss.size(); n++) {
 					    //if part of shared super-CIS
-					        //then if shared context - context_local_sharedCIS counter+1
+				    	//if (cisManager.getCisList(linkedCss).get(m).getMembersList().contains(localCsss.get(n)))
+				    	    //sharingCis + 1;
+				    	//if (sharingCis/(localCsss-1) >= 0.8)
+				    	    //if activity isn't restricted to just before 5 mins ago, or looking back 1 hour shows spikes of activity
+					            //potential to suggest location-based sub-CIS
+				    	    //then if shared context - context_local_sharedCIS counter+1
 					               //potentially suggest sub-CIS if none exist or ignore completely as CIS already exists for it
 					    //if shared context - context_local counter+1
 					
