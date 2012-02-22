@@ -57,8 +57,8 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 	private ICtxBroker ctxBroker;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private IUserPreferenceConditionMonitor pcm;
-/*	private IDIANNE dianneNetwork;
-	private ICAUIPrediction cauiPrediction;
+	private IDIANNE dianne;
+	/*	private ICAUIPrediction cauiPrediction;
 	private ICRISTUserIntentPrediction cristPrediction;*/
 	
 	//data structures
@@ -77,7 +77,7 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 
 	}
 	
-	/*public PersonalisationManager( ICtxBroker ctxBroker, IUserPreferenceConditionMonitor pcm, IDIANNE dianneNetwork, ICAUIPrediction cauiPrediction, ICRISTUserIntentPrediction cristPrediction ){
+	/*public PersonalisationManager( ICtxBroker ctxBroker, IUserPreferenceConditionMonitor pcm, IDIANNE dianne, ICAUIPrediction cauiPrediction, ICRISTUserIntentPrediction cristPrediction ){
 
 		
 		this.dianneList = new ArrayList<CtxAttributeIdentifier>();
@@ -94,7 +94,7 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 	public void initialisePersonalisationManager(ICtxBroker ctxBroker, IUserPreferenceConditionMonitor pcm){
 		this.ctxBroker = ctxBroker;
 		this.pcm = pcm;
-/*		this.dianneNetwork = dianneNetwork;
+/*		this.dianne = dianne;
 		this.cauiPrediction = cauiPrediction;
 		this.cristPrediction = cristPrediction;*/
 		
@@ -116,14 +116,14 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 		}
 		
 		
-		System.out.println("Yo!! I'm a brand new service and my interface is: "+this.getClass().getName());
+		System.out.println("Full init. Yo!! I'm a brand new service and my interface is: "+this.getClass().getName());
 		
 	}
 	
 	public void initialisePersonalisationManager(ICtxBroker ctxBroker){
 		this.ctxBroker = ctxBroker;
 		
-/*		this.dianneNetwork = dianneNetwork;
+/*		this.dianne = dianne;
 		this.cauiPrediction = cauiPrediction;
 		this.cristPrediction = cristPrediction;*/
 		
@@ -145,7 +145,7 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 		}*/
 		
 		
-		System.out.println("Yo!! I'm a brand new service and my interface is: "+this.getClass().getName());
+		System.out.println("Ctx init. Yo!! I'm a brand new service and my interface is: "+this.getClass().getName());
 		
 	}
 	
@@ -156,16 +156,16 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 		this.prefMgrList = new ArrayList<CtxAttributeIdentifier>();
 		this.cauiList = new ArrayList<CtxAttributeIdentifier>();
 		this.cristList = new ArrayList<CtxAttributeIdentifier>();
-		System.out.println("Yo!! I'm a brand new service and my interface is: "+this.getClass().getName());
+		System.out.println("Empty init. Yo!! I'm a brand new service and my interface is: "+this.getClass().getName());
 
 	}
 
-/*	public IDIANNE getDianneNetwork() {
-		return dianneNetwork;
+/*	public IDIANNE getdianne() {
+		return dianne;
 	}
 
-	public void setDianneNetwork(IDIANNE dianneNetwork) {
-		this.dianneNetwork = dianneNetwork;
+	public void setdianne(IDIANNE dianne) {
+		this.dianne = dianne;
 	}
 
 	public ICAUIPrediction getCauiPrediction() {
@@ -194,12 +194,23 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 		this.pcm = pcm;
 	}
 
+	public IDIANNE getDianne() {
+		System.out.println(this.getClass().getName()+"Return DIANNE");
+		return dianne;
+	}
+
+	public void setDianne(IDIANNE dianne) {
+		System.out.println(this.getClass().getName()+"GOT DIANNE");
+		this.dianne = dianne;
+	}
+
 	public ICtxBroker getCtxBroker(){
 		System.out.println(this.getClass().getName()+"Return CtxBroker");
 		return this.ctxBroker;
 	}
 
 	public void setCtxBroker(ICtxBroker broker){
+		System.out.println(this.getClass().getName()+"GOT CtxBroker");		
 		this.ctxBroker = broker;
 	}
 	
@@ -311,7 +322,7 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 			CtxAttributeIdentifier ctxId = (CtxAttributeIdentifier) ctxAttribute.getId();
 			
 			if (this.containsCtxId(ctxId, dianneList)){
-				this.dianneNetwork.getOutcome(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
+				this.dianne.getOutcome(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
 				if (this.containsCtxId(ctxId, prefMgrList)){	
 					this.pcm.getOutcome(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
 					callback.setAskDianne(false);
@@ -323,7 +334,7 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 			}else if(this.containsCtxId(ctxId, prefMgrList)){
 				this.pcm.getOutcome(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
 				if (this.containsCtxId(ctxId, dianneList)){
-					this.dianneNetwork.getOutcome(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
+					this.dianne.getOutcome(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
 					callback.setAskDianne(false);
 					callback.setAskPreference(false);
 				}else{

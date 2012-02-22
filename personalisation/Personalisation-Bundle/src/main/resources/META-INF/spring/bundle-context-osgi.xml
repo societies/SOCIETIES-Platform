@@ -25,16 +25,41 @@
         <value>org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor</value>
         </osgi:interfaces>
         </osgi:service>
-
-
-		<osgi:reference id="pcm" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor" cardinality="0..1">
-		<osgi:listener bind-method="setPcm" ref="persoMgr"></osgi:listener>
-		
-		</osgi:reference>
-		<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker"/>        
-        <osgi:reference id="persoMgr" interface="org.societies.personalisation.common.api.management.IInternalPersonalisationManager">
-        <osgi:listener bind-method="setPersoMgr" ref="pcm"></osgi:listener>
+        
+        <osgi:service ref="dianne">
+        <osgi:interfaces>
+        <value>org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE</value>
+        </osgi:interfaces>
+        </osgi:service>        		
+        
+        
+        <!-- PersonalisationManager is needed by pcm, dianne, cristPrediction, cauiPrediction -->
+        <osgi:reference id="persoMgr" interface="org.societies.personalisation.common.api.management.IInternalPersonalisationManager" >
+	        <osgi:listener bind-method="setPersoMgr" ref="pcm"></osgi:listener>
+	        <osgi:listener bind-method="setPersoMgr" ref="dianne"></osgi:listener>
         </osgi:reference>
+
+<!-- start importing internal services. cardinality is set to 0..1 because we have a cyclic dependency and the PersonalisationManager has lazy-init -->
+		<!-- PCM is needed by personalisationManager -->
+		<osgi:reference id="pcm" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor" cardinality="0..1">
+			<osgi:listener bind-method="setPcm" ref="persoMgr"></osgi:listener>
+		</osgi:reference>
+		
+		<!-- dianne is needed by personalisationManager -->
+		<osgi:reference id="dianne" interface="org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE" cardinality="0..1"> 
+			<osgi:listener bind-method="setDianne" ref="persoMgr"></osgi:listener>
+		</osgi:reference>
+		
+<!-- end importing internal services -->
+
+
+	
+		<!-- context Broker is needed by personalisationManager (at least) -->
+		<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker">
+		</osgi:reference>        
+		
+		
+
         
 		
 		

@@ -69,7 +69,11 @@
 			<artifactId>UserPreferenceManagement</artifactId>
 			<version>${version.pm}</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.societies.personalisation</groupId>
+			<artifactId>dianne</artifactId>
+			<version>${version.pm}</version>
+		</dependency>
 	</dependencies>
 
 
@@ -88,6 +92,7 @@
 						<Embed-Dependency>
 							personalisation_api;scope=compile|runtime,
 							UserPreferenceManagement;scope=compile|runtime,
+							dianne;scope=compile|runtime,
 							personalisation_Manager;scope=compile|runtime
 							</Embed-Dependency> 
 						<Embed-Transitive>false</Embed-Transitive>

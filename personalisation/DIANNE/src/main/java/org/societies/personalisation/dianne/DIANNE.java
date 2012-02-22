@@ -28,6 +28,7 @@ package org.societies.personalisation.dianne;
 import java.util.HashMap;
 
 import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE;
+import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttribute;
@@ -38,6 +39,11 @@ public class DIANNE implements IDIANNE{
 
 	private HashMap<Identity, NetworkRunner> networks;
 
+	/*
+	 * Do not rename this variable. The name is referenced in the spring osgi files. 
+	 */
+	private IInternalPersonalisationManager persoMgr;
+	
 	public DIANNE(){
 		networks = new HashMap<Identity, NetworkRunner>();
 	}
@@ -97,5 +103,21 @@ public class DIANNE implements IDIANNE{
 		//register for action updates from PersonalisationMgr
 		
 		//register for context updates from PersonalisationMgr
+	}
+
+	/*
+	 * getter method for PersonalisationManager. Do not rename. The name of the method is referenced in the spring osgi files
+	 */
+	public IInternalPersonalisationManager getPersoMgr() {
+		System.out.println(this.getClass().getName()+"Return PersoManager");
+		return persoMgr;
+	}
+
+	/*
+	 * setter method for PersonalisationManager. Do not rename. The name of the method is referenced in the spring osgi files
+	 */
+	public void setPersoMgr(IInternalPersonalisationManager persoMgr) {
+		System.out.println(this.getClass().getName()+"GOT PersoManager");		
+		this.persoMgr = persoMgr;
 	}
 }
