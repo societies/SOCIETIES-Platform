@@ -201,6 +201,8 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 			if (linkedCss != null) {
 				//interactedCssIDs = getIDsOfInteractingCsss();
 				
+				
+				
 				//first step: look for more obvious CISs on high-priority kinds of context,
 				//e.g. friends in contact list, family in contact list (from SNS extractor or SOCIETIES)
 				
@@ -209,7 +211,9 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				//ArrayList<CisRecord> userJoinedCiss = new ArrayList<CisRecord>();
 				//for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
 				//    userJoinedCiss.add(listOfUserJoinedCiss[i]);
+				//    
 				//}
+				
 				
 				//CSS directory
 				//ArrayList<CssRecord> cssDirectoryMembers = userCssDirectory.getCssEntries();
@@ -268,7 +272,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 					// TODO Auto-generated catch block
 					e3.printStackTrace();
 				}
-				
+				boolean similarCis = false;
 				for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
 					String[] members = ((CisRecord)listOfUserJoinedCiss[i]).membersCss;
 					int number = 0;
@@ -276,7 +280,9 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 						if (theFriends.contains(members[i]))
 							number++;
 					}
-					if (((number/theFriends.size()) > 0.8) && ((theFriends.size()/number) > 0.8)) {
+					if (((number/theFriends.size()) >= 0.8) && (((number/members.length) >= 0.8))) {
+						similarCis = true;
+						//if no CIS exists with 100% friend members, suggest sub-CIS of that one
 						
 						//number = 0;
 						//for (int m = 0; m < theFriends.size(); m++) {
@@ -288,6 +294,13 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 						
 					}
 				}
+				if (similarCis == false) {
+		            //cissToCreate.add(new CisRecord(null, linkedCss, "Mutual friends", null, null, null, null, null));
+				    
+				}
+				
+				
+				
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				//ArrayList<Identity> people = userCssDirectory.getContextMatchingCsss(list);
 				//if (people.size() >= 2)
