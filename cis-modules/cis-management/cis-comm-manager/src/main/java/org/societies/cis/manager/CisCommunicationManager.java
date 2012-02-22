@@ -45,6 +45,8 @@ import org.societies.community.Who;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +80,7 @@ public class CisCommunicationManager implements CisCommunicationManagerInterface
 	private Set<String> participants;
 	private Set<String> leaders;
 
-	@Autowired
+	
 	public CisCommunicationManager(ICommManager endpoint) {
 		LOG.info("CIS Comm Started");
 		participants = new HashSet<String>();

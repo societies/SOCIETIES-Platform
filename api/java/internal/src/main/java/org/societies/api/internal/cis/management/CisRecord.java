@@ -46,10 +46,32 @@ public class CisRecord {
 	public String permaLink;
 	public String[] membersCss;
 	private String password = "none";
+	private String host = "none";
 	public Set<ServiceSharingRecord> sharedServices;
 	
 	
+	public CisRecord(CisActivityFeed feed, String ownerCss,
+			String membershipCriteria, String cisId, String permaLink,
+			String[] membersCss, String password, String host,
+			Set<ServiceSharingRecord> sharedServices) {
+		super();
+		this.feed = feed;
+		this.ownerCss = ownerCss;
+		this.membershipCriteria = membershipCriteria;
+		this.cisId = cisId;
+		this.permaLink = permaLink;
+		this.membersCss = membersCss;
+		this.password = password;
+		this.host = host;
+		this.sharedServices = sharedServices;
+	}
 	
+	
+	/**
+	 * @deprecated  Replaced by constructor which has the new host field
+	 */
+	
+	@Deprecated
 	public CisRecord(CisActivityFeed feed, String ownerCss,
 			String membershipCriteria, String cisId, String permaLink,
 			String[] membersCss, String password,
@@ -65,17 +87,17 @@ public class CisRecord {
 		this.sharedServices = sharedServices;
 	}
 
+	 // hash code and equals using cisId and host
 
- // hash code and equals using cisName and ownerCss
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((cisId == null) ? 0 : cisId.hashCode());
-		result = prime * result
-				+ ((ownerCss == null) ? 0 : ownerCss.hashCode());
+		result = prime * result + ((host == null) ? 0 : host.hashCode());
 		return result;
 	}
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -91,13 +113,54 @@ public class CisRecord {
 				return false;
 		} else if (!cisId.equals(other.cisId))
 			return false;
-		if (ownerCss == null) {
-			if (other.ownerCss != null)
+		if (host == null) {
+			if (other.host != null)
 				return false;
-		} else if (!ownerCss.equals(other.ownerCss))
+		} else if (!host.equals(other.host))
 			return false;
 		return true;
 	}
+
+
+	public String getOwnerCss() {
+		return ownerCss;
+	}
+
+
+	public void setOwnerCss(String ownerCss) {
+		this.ownerCss = ownerCss;
+	}
+
+
+	public String getCisId() {
+		return cisId;
+	}
+
+
+	public void setCisId(String cisId) {
+		this.cisId = cisId;
+	}
+
+
+	public String getPassword() {
+		return password;
+	}
+
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+
+	public String getHost() {
+		return host;
+	}
+
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
 
 
 

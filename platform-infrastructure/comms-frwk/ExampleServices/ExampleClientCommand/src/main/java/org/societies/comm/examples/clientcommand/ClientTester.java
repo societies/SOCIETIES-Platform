@@ -27,11 +27,10 @@ package org.societies.comm.examples.clientcommand;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.comm.xmpp.pubsub.PubsubClient;
-import org.societies.example.calculator.ICalc;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.example.IExamplesCallback;
 import org.societies.example.calculator.ICalcRemote;
 import org.societies.example.fortunecookie.IWisdom;
-import org.societies.example.IExamplesCallback;
 
 /**
  * Describe your class here...

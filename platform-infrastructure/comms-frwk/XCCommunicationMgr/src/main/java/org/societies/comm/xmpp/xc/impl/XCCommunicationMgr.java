@@ -3,7 +3,6 @@ package org.societies.comm.xmpp.xc.impl;
 
 import org.jivesoftware.whack.ExternalComponentManager;
 import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.comm.xmpp.datatypes.IdentityType;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPNode;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -11,8 +10,6 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.comm.xmpp.interfaces.IIdentityManager;
-import org.societies.comm.xmpp.datatypes.EndpointImpl;
-import org.societies.comm.xmpp.datatypes.IdentityImpl;
 import org.societies.comm.xmpp.interfaces.IdentityManager;
 import org.xmpp.component.AbstractComponent;
 import org.xmpp.component.ComponentException;
@@ -55,6 +52,7 @@ public class XCCommunicationMgr extends AbstractComponent implements
 		log.info("Added the component!");
 		
 		idm = new IdentityManager();
+		//log.info("JID="+this.jid.toString());
 		thisIdentity = idm.fromJid(subDomain);
 	}
 

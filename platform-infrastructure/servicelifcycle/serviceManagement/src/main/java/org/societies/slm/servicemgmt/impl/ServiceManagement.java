@@ -129,4 +129,8 @@ public class ServiceManagement implements IServiceManagement, BundleContextAware
 	public BundleContext setBundleContext(){
 		return this.bctx;
 	}
+	
+	public void registerListener(){
+		
+	}
 }
