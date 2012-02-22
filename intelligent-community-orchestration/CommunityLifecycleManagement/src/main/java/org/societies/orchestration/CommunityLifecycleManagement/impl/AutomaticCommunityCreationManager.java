@@ -66,6 +66,7 @@ import org.societies.api.comm.xmpp.datatypes.Identity;
 
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * This is the class for the Automatic Community Creation Manager component.
@@ -240,8 +241,17 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				//userContextBroker.lookup(CtxModelType.ENTITY, "FanPage", userContextBrokerCallback);
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				
+				Future<List<CtxIdentifier>> friendsFuture = null;
+				try {
+				    friendsFuture = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "close friends");
+			    } catch (CtxException e) {
+				    // TODO Auto-generated catch block
+				    e.printStackTrace();
+			    }
 				
-				//userContextBroker.lookup(CtxModelType.ATTRIBUTE, "close friends", userContextBrokerCallback);
+				while (friendsFuture == null) {
+					continue;
+				}
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				
 				
@@ -265,9 +275,10 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				
 				
 				//second step: some obvious CISs that might benefit a user.
+				Future<List<CtxIdentifier>> familyFuture = null;
 				
 				try {
-					userContextBroker.lookup(CtxModelType.ATTRIBUTE, "family relations");
+					familyFuture = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "family relations");
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -279,8 +290,9 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				//        if (!cisManager.getCiss().get(i).getMembers() == people)
 				//            cissToCreate.add(new CisRecord(null, linkedCss, "family relation to all members", null, null, null, null, null));
 				
+				Future<List<CtxIdentifier>> nationalityFuture = null;
 				try {
-					userContextBroker.lookup(CtxModelType.ATTRIBUTE, "nationality");
+					nationalityFuture = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "nationality");
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -292,8 +304,10 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				//        if (!cisManager.getCiss().get(i).getMembers() == people)
 				//            cissToCreate.add(new CisRecord(null, linkedCss, "Nationals", null, null, null, null, null));
 				
+				Future<List<CtxIdentifier>> languageFuture = null;
+				
 				try {
-					userContextBroker.lookup(CtxModelType.ATTRIBUTE, "first language");
+					languageFuture = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "first language");
 				} catch (CtxException e2) {
 					// TODO Auto-generated catch block
 					e2.printStackTrace();
@@ -305,8 +319,9 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				//        if (!cisManager.getCiss().get(i).getMembers() == people)
 				//            cissToCreate.add(new CisRecord(null, linkedCss, "Native language speakers", null, null, null, null, null));
 				
+				Future<List<CtxIdentifier>> interestFuture = null;
 				try {
-					userContextBroker.lookup(CtxModelType.ATTRIBUTE, "interests");
+					interestFuture = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "interests");
 				} catch (CtxException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
