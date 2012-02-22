@@ -1,6 +1,6 @@
 package org.societies.service.provider.impl;
 
-import org.societies.service.api.IMathService;
+import org.societies.service.api.*;
 
 public class MathService implements IMathService {
 
@@ -30,4 +30,13 @@ public class MathService implements IMathService {
 		return a*b;
 	}
 
+	public boolean divise(int a, int b, IMathServiceCallBack callback) {
+		if (b!=0) {
+			callback.resultDivision(a/b);
+			return true;
+		} else {
+			callback.error("division with 0 is not allowed in mathematics");
+			return false;
+		}
+	}
 }
