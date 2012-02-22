@@ -54,7 +54,6 @@
 	</parent>
 	
 	<modules>
-		<module>api</module>
 		<module>Personalisation-API</module>
 		<module>PersonalisationManager</module>
 		<module>UserPreferenceManagement</module>

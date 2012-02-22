@@ -5,9 +5,8 @@
 	<groupId>org.societies.personalisation</groupId>
 	<artifactId>personalisation_api</artifactId>
 	<version>${version.pm}</version>
-	<name>Personalisation API</name>
-	<packaging>bundle</packaging> 
-
+	<name>Personalisation API</name> 
+	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>org.societies</groupId>
@@ -90,7 +89,7 @@
 							<groupId>${groupId}</groupId>
 							<artifactId>${artifactId}</artifactId>
 							<version>${version.pm}</version>
-							<type>bundle</type>
+							<type>jar</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</artifactItem>
@@ -101,4 +100,5 @@
 	</build>
 
 
+	
 </project>

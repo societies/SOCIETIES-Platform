@@ -15,5 +15,12 @@
    <property name="pcm" ref="UserPCM"></property>
    <property name="ctxBroker" ref="UserCtxBroker"></property>
    </bean>
+   
+     <bean name="UserPCM" class="org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor" 
+  depends-on="InternalPersonalisationManager, UserCtxBroker" init-method="initialisePreferenceManagement">
+  <property name="persoMgr" ref="InternalPersonalisationManager"></property>
+  <property name="ctxBroker" ref="UserCtxBroker"></property>
+  </bean>
+   
 <!--   <context:component-scan base-package="org.societies.personalisation.management.impl"></context:component-scan> -->
 </beans>
