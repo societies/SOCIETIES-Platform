@@ -151,115 +151,124 @@ public class CommsServer implements IFeatureServer {
 	@Override
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
 		//CHECK WHICH END BUNDLE TO BE CALLED THAT I MANAGE
-		
-		// --------- CALCULATOR BUNDLE ---------
-		if (payload.getClass().equals(CalcBean.class)) {
-			
-			CalcBean calc = (CalcBean) payload;
-			
-			int result=0; int a = 0; int b = 0;
-			String text = ""; 
-			Future<Integer> asyncResult = null;
-			
-			switch (calc.getMethod()) {
-			//AddAsync() METHOD
-			case ADD:
-				a = calc.getA();
-				b = calc.getB();
-				asyncResult = calcService.Add(a, b);
-				break;
-				
-			//Subtract() method
-			case SUBTRACT:
-				a = calc.getA();
-				b = calc.getB();
-				asyncResult = calcService.Subtract(a, b);
-				break;
-			}
+		System.out.println("Generic query handler, doing nothing");
+		if (payload instanceof ComplexServiceMsgBean){ return this.getQuery(stanza, (ComplexServiceMsgBean)payload);}
+		if (payload instanceof FortuneCookieBean){ return this.getQuery(stanza, (FortuneCookieBean)payload);}
+		if (payload instanceof CalcBean){ return this.getQuery(stanza, (CalcBean)payload);}		
+		return null;
+	}
+	
+	public Object getQuery(Stanza stanza, ComplexServiceMsgBean payload)
+			throws XMPPError {
+
+		ComplexServiceMsgBean complexBean = (ComplexServiceMsgBean) payload;
+
+		MyComplexBean paramBean = (MyComplexBean) complexBean.getComplexBean();
+		Future<MyComplexBean> returnBean = null;
+		ComplexServiceMsgBeanResult complexRes = new ComplexServiceMsgBeanResult(); // GENERATE
+																					// BEAN
+																					// CONTAINING
+																					// RETURN
+																					// OBJECT
+
+		switch (complexBean.getMethod()) {
+
+		// DO_SOMETHING() METHOD
+		case DO_SOMETHING:
+			// CALL ACTUAL SERVICE
+			returnBean = complexSvc.doSomething(paramBean);
+
 			try {
-				result = asyncResult.get();		//WAIT HERE TILL RESULT IS RETURNED. PROCESSOR IS RELEASED!
+				complexRes.setComplexBean(returnBean.get());
 			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}				
-			text = a + "  " + calc.getMethod().toString() + " " + b + " = " + result;
-			
-			//GENERATE BEAN CONTAINING RETURN OBJECT 
-			CalcBeanResult calcRes = new CalcBeanResult();
-			calcRes.setResult(result);
-			calcRes.setText(text);
-			return calcRes;
-		}
-		
-		// -------- FORTUNE COOKIE BUNDLE ---------
-		else if (payload.getClass().equals(FortuneCookieBean.class)) {
-			FortuneCookieBean fcBean = (FortuneCookieBean) payload;
-			
-			if (fcBean.getMethod().equals(MethodName.GET_COOKIE)) {
-				//NO PARAMETERS FOR THIS METHOD
-				Future<Cookie> fortune = fcGenerator.getCookie();
-				Cookie cookie = null;
-				try {
-					cookie = fortune.get();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} catch (ExecutionException e) {
-					e.printStackTrace();
-				}
-				
-				//GENERATE BEAN CONTAINING RETURN OBJECT 
-				FortuneCookieBeanResult fcRes = new FortuneCookieBeanResult();
-				fcRes.setCookie(cookie);
-				return fcRes;
 			}
-		}
-		
-		// -------- COMPLEX SERVICE BUNDLE ---------
-		else if (payload.getClass().equals(ComplexServiceMsgBean.class)) {
-			ComplexServiceMsgBean complexBean = (ComplexServiceMsgBean) payload;
-			
-			MyComplexBean paramBean = (MyComplexBean) complexBean.getComplexBean();
-			Future<MyComplexBean> returnBean = null;
-			ComplexServiceMsgBeanResult complexRes = new ComplexServiceMsgBeanResult(); //GENERATE BEAN CONTAINING RETURN OBJECT 
-			
-			switch (complexBean.getMethod()) {
-			
-			//DO_SOMETHING() METHOD
-			case DO_SOMETHING:
-				//CALL ACTUAL SERVICE
-				returnBean = complexSvc.doSomething(paramBean);
-				
-				try {
-					complexRes.setComplexBean(returnBean.get());
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ExecutionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				return complexRes;
 
-			//DO_SOMETHING_ELSE() METHOD
-			case DO_SOMETHING_ELSE:
-				//CALL ACTUAL SERVICE
-				returnBean = complexSvc.doSomethingElse(paramBean);
-				
-				try {
-					complexRes.setComplexBean(returnBean.get());
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ExecutionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				return complexRes;
+			// DO_SOMETHING_ELSE() METHOD
+		case DO_SOMETHING_ELSE:
+			// CALL ACTUAL SERVICE
+			returnBean = complexSvc.doSomethingElse(paramBean);
+
+			try {
+				complexRes.setComplexBean(returnBean.get());
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+
 		}
-		//TODO: Better error handling, ie, if there is no match on the received Message Bean
-		return null;
+		return complexRes;
+	}
+	
+	public Object getQuery(Stanza stanza, FortuneCookieBean payload)
+			throws XMPPError {
+		FortuneCookieBean fcBean = (FortuneCookieBean) payload;
+		// NO PARAMETERS FOR THIS METHOD
+		Future<Cookie> fortune = fcGenerator.getCookie();
+		Cookie cookie = null;
+		try {
+			cookie = fortune.get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+
+		// GENERATE BEAN CONTAINING RETURN OBJECT
+		FortuneCookieBeanResult fcRes = new FortuneCookieBeanResult();
+		fcRes.setCookie(cookie);
+		return fcRes;
+	}
+	
+	public Object getQuery(Stanza stanza, CalcBean payload) throws XMPPError {
+		// --------- CALCULATOR BUNDLE ---------
+		CalcBean calc = (CalcBean) payload;
+
+		int result = 0;
+		int a = 0;
+		int b = 0;
+		String text = "";
+		Future<Integer> asyncResult = null;
+
+		switch (calc.getMethod()) {
+		// AddAsync() METHOD
+		case ADD:
+			a = calc.getA();
+			b = calc.getB();
+			asyncResult = calcService.Add(a, b);
+			break;
+
+		// Subtract() method
+		case SUBTRACT:
+			a = calc.getA();
+			b = calc.getB();
+			asyncResult = calcService.Subtract(a, b);
+			break;
+		}
+		try {
+			result = asyncResult.get(); // WAIT HERE TILL RESULT IS RETURNED.
+										// PROCESSOR IS RELEASED!
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		text = a + "  " + calc.getMethod().toString() + " " + b + " = "
+				+ result;
+
+		// GENERATE BEAN CONTAINING RETURN OBJECT
+		CalcBeanResult calcRes = new CalcBeanResult();
+		calcRes.setResult(result);
+		calcRes.setText(text);
+		return calcRes;
+
 	}
 
 	/* (non-Javadoc)
@@ -270,6 +279,5 @@ public class CommsServer implements IFeatureServer {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
 	
 }

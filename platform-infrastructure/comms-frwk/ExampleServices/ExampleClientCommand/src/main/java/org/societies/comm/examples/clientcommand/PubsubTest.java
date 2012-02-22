@@ -28,18 +28,16 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.comm.xmpp.datatypes.IdentityType;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.IIdentityManager;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.comm.xmpp.interfaces.IdentityManager;
-import org.societies.comm.xmpp.pubsub.PubsubClient;
-import org.societies.comm.xmpp.pubsub.Subscriber;
 import org.societies.example.fortunecookie.IWisdom;
 import org.societies.example.fortunecookieservice.schema.Cookie;
 import org.w3c.dom.Document;
@@ -171,10 +169,10 @@ public class PubsubTest implements Runnable, Subscriber {
 	/* (non-Javadoc)
 	 * @see org.societies.comm.xmpp.pubsub.Subscriber#pubsubEvent(org.societies.api.comm.xmpp.datatypes.Identity, java.lang.String, java.lang.String, org.w3c.dom.Element)*/
 	@Override
-	public void pubsubEvent(Identity pubsubService, String node, String itemId, Element item) {
+	public void pubsubEvent(Identity pubsubService, String node, String itemId, Object item) {
 		System.out.println("New info published on topic" + node);
 		System.out.println("ID: " + itemId);
-		System.out.println("Title: " + item.getFirstChild().getTextContent());
-		System.out.println("Wisdom: " + item.getLastChild().getTextContent());
-	}	
+		System.out.println("Detail: " + item);
+	}
+
 }

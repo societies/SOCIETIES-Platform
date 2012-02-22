@@ -131,9 +131,7 @@ public class EventClient implements Runnable, ApplicationListener<PubsubEvent> {
 		System.out.println("Source service: " + eventDetails.getSource());
 		System.out.println("Event Datetime: " + eventDetails.getTimestamp());
 		
-		Element payload = eventDetails.getPayload();
-		String title = payload.getFirstChild().getTextContent();
-		String wisdom = payload.getLastChild().getTextContent();
-		System.out.println("Details: " + wisdom);
+		Object payload = eventDetails.getPayload();
+		System.out.println("Details: " + payload);
 	}	
 }

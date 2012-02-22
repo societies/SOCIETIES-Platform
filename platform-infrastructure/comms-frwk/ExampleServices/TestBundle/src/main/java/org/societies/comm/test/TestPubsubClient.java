@@ -4,28 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.comm.xmpp.event.PubsubEvent;
-import org.societies.comm.xmpp.event.PubsubEventFactory;
-import org.societies.comm.xmpp.event.PubsubEventStream;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IIdentityManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.comm.xmpp.event.PubsubEvent;
+import org.societies.comm.xmpp.event.PubsubEventFactory;
+import org.societies.comm.xmpp.event.PubsubEventStream;
 import org.societies.comm.xmpp.interfaces.IdentityManager;
-import org.societies.test.Testnode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 @Component
 public class TestPubsubClient extends Thread implements Subscriber, ApplicationListener<PubsubEvent> {
@@ -45,11 +40,11 @@ public class TestPubsubClient extends Thread implements Subscriber, ApplicationL
 		start();
 	}
 
-	private Testnode createTestItem()  {
-		Testnode tn = new Testnode();
-		tn.setTestattribute("testValue");
-		return tn;
-	}
+//	private Testnode createTestItem()  {
+//		Testnode tn = new Testnode();
+//		tn.setTestattribute("testValue");
+//		return tn;
+//	}
 
 	@Override
 	public void pubsubEvent(Identity pubsubService, String node, String itemId,
@@ -73,7 +68,7 @@ public class TestPubsubClient extends Thread implements Subscriber, ApplicationL
 			LOG.info("### created testNode! going to subscribe testNode...");
 			psc.subscriberSubscribe(psService, node, this);
 			LOG.info("### subscribed testNode! going to publish in testNode...");
-			Object item = createTestItem();
+			Object item = null; // <-- Create a meaningful object instance -- createTestItem();
 			psc.publisherPublish(psService, node, null, item);
 			LOG.info("### published in testNode! finishing Pubsub tests...");
 			
