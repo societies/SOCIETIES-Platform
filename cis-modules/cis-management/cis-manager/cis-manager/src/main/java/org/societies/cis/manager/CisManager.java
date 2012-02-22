@@ -32,7 +32,7 @@ import java.util.Set;
 import org.societies.api.internal.cis.management.CisActivityFeed;
 import org.societies.api.internal.cis.management.CisRecord;
 import org.societies.api.internal.cis.management.ICisManager;
-import org.societies.cis.editor.CisEditor;
+import org.societies.cis.manager.CisEditor;
 
 // this is the class which manages all the CIS from a CSS
 // for the class responsible for editing and managing each CIS instance, consult the CISEditor

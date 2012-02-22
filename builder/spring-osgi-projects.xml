@@ -95,7 +95,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<!-- Security and Dependability Mgmt -->
 
 		<!--  CIS Mgmt -->
-		<module>../cis-modules/cis-management/cis-editor/cis-editor/</module>
 		<module>../cis-modules/cis-management/cis-manager/cis-manager/</module>
 		<module>../cis-modules/cis-discovery/</module>
 		<module>../cis-modules/cis-collaboration/</module>

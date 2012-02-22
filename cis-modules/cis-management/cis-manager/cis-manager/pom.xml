@@ -35,14 +35,32 @@
 	<version>${release.version}</version>
 </dependency>
 		
-  <dependency>  
-  <groupId>org.societies.cis</groupId>
-  <artifactId>cis-editor</artifactId>
-   <version>${version.cis}</version>
+    	<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>		
+
+  <dependency>
+   <groupId>org.igniterealtime</groupId>
+   <artifactId>whack</artifactId>
+   <type>jar</type>
+   <scope>provided</scope>
+  </dependency>
+
+		<dependency>
+		    <groupId>org.societies.comm.xmpp</groupId>
+		    <artifactId>XCCommunicationMgr</artifactId>
+		    <version>${version.comm}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+<dependency>
+    <groupId>org.societies.cis</groupId>
+    <artifactId>cis-comm-manager</artifactId>
+    <version>${version.comm}</version>	
 </dependency>	
-	
-	
-	
 
 	</dependencies>
 
@@ -57,7 +75,12 @@
 						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<Import-Package>*;resolution:=optional</Import-Package>
+						<Import-Package>   						org.osgi.framework,
+    						!org.jvnet.staxex,
+    						!org.jvnet.fastinfoset,
+    						!com.sun.xml.fastinfoset.*,
+    						org.slf4j*;version="1.5.8",
+    						*;resolution:=optional</Import-Package>
 						<Export-Package></Export-Package>
 					</instructions>
 				</configuration>
