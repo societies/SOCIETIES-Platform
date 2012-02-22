@@ -51,7 +51,7 @@ public class MathServiceConsumerMockTest {
 	@Test
 	public void divisionCallTest() {
 
-		MathServiceCallBack divCallBack = new MathServiceCallBack();
+		IMathServiceCallBack divCallBack = new MathServiceCallBack();
 		/* we need this injector for the Call Back */
 		classUnderTest.setMathServiceCallBack(divCallBack);
 
