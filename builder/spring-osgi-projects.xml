@@ -60,10 +60,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		 
 		<!-- Personalisation -->
 		
-		<module>../personalisation/Personalisation-API</module>
-		<module>../personalisation/UserPreferenceManagement</module>		
-		<module>../personalisation/DIANNE</module>
-		<module>../personalisation/PersonalisationManager</module>
+		<module>../personalisation</module>
 			 
 		
 		<!-- Platform Infrastructure -->
