@@ -23,17 +23,21 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.cis.editor;
+package org.societies.cis.manager;
 
 import java.util.HashSet;
 
 import java.util.Set;
 
 //import org.societies.cis.mgmt;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.cis.management.CisActivityFeed;
 import org.societies.api.internal.cis.management.CisRecord;
 import org.societies.api.internal.cis.management.ICisEditor;
 import org.societies.api.internal.cis.management.ServiceSharingRecord;
+import org.societies.comm.xmpp.xc.impl.XCCommunicationMgr;
+
+
 
 public class CisEditor implements ICisEditor {
 
@@ -42,12 +46,21 @@ public class CisEditor implements ICisEditor {
 	public CisActivityFeed cisActivityFeed;
 	public Set<ServiceSharingRecord> sharedServices; 
 //	public CommunityManagement commMgmt;
+	
+	private ICommManager endpoint;
 
 	public String[] membersCss; // TODO: this may be implemented in the CommunityManagement bundle. we need to define how they work together
 	
 	public static final int MAX_NB_MEMBERS = 100;// TODO: this is temporary, we have to set the memberCss to something more suitable
 
-	// constructor for creating a CIS from scratch	
+
+	
+	
+	/**
+	 * @deprecated  Replaced by constructor which has the new host field
+	 */
+	
+	@Deprecated
 	public CisEditor(String ownerCss, String cisId,
 			String membershipCriteria, String permaLink, String password) {
 		
@@ -55,8 +68,23 @@ public class CisEditor implements ICisEditor {
 		sharedServices = new HashSet<ServiceSharingRecord>();
 		membersCss = new String[MAX_NB_MEMBERS];
 		
+
+		// TODO: broadcast its creation to other nodes?
+
+	}
+	
+	
+	// constructor for creating a CIS from scratch
+	public CisEditor(String ownerCss, String cisId,String host,
+			String membershipCriteria, String permaLink, String password) {
+		
+		cisActivityFeed = new CisActivityFeed();
+		sharedServices = new HashSet<ServiceSharingRecord>();
+		membersCss = new String[MAX_NB_MEMBERS];
+		endpoint = 	new XCCommunicationMgr(host, cisId,password);
+		
 		cisRecord = new CisRecord(cisActivityFeed,ownerCss, membershipCriteria, cisId, permaLink, membersCss,
-				password, sharedServices);
+				password, host, sharedServices);
 		
 
 		// TODO: broadcast its creation to other nodes?
@@ -67,6 +95,11 @@ public class CisEditor implements ICisEditor {
 	// password will be set to ""
 	// membership to "default"
 	// permalink to ""
+	/**
+	 * @deprecated  See if there is really a need for this constructor
+	 */
+	
+	@Deprecated
 	public CisEditor(String ownerCss, String cisId) {
 		
 		membersCss = new String[MAX_NB_MEMBERS];
@@ -74,7 +107,7 @@ public class CisEditor implements ICisEditor {
 		sharedServices = new HashSet<ServiceSharingRecord>();
 		
 		cisRecord = new CisRecord(cisActivityFeed,ownerCss, "default", cisId, "", membersCss,
-				"", sharedServices);
+				"","", sharedServices);
 		
 
 		// TODO: broadcast its creation to other nodes?
@@ -89,6 +122,7 @@ public class CisEditor implements ICisEditor {
 		
 		this.cisActivityFeed = this.cisRecord.feed;
 		this.sharedServices = this.cisRecord.sharedServices;
+		endpoint = 	new XCCommunicationMgr(cisRecord.getHost(), cisRecord.getCisId(),cisRecord.getPassword());
 		
 		
 		// TODO: broadcast its creation to other nodes?
