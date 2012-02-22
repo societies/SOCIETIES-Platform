@@ -58,6 +58,9 @@ public class PreferenceRetriever {
 	public Registry retrieveRegistry(Identity dpi){
 		try {
 			Future<List<CtxIdentifier>> futureAttrList = broker.lookup(CtxModelType.ATTRIBUTE, "PREFERENCE_REGISTRY");
+			if (futureAttrList==null){
+				return new Registry();
+			}
 			List<CtxIdentifier> attrList = futureAttrList.get();
 			if (null!=attrList){
 				if (attrList.size()>0){

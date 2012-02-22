@@ -67,13 +67,64 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	}
 	
 	
-	public void initialisePreferenceManagement(ICtxBroker broker, IInternalPersonalisationManager persoManager, UserPreferenceManagement prefMgr){
-		persoMgr = persoManager;
-		this.ctxBroker = broker;
-		this.prefMgr = prefMgr;
+	public ICtxBroker getCtxBroker() {
+		System.out.println(this.getClass().getName()+": Return ctxBroker");
+
+		return ctxBroker;
+	}
+
+
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		System.out.println(this.getClass().getName()+": Got ctxBroker");
+		
+		this.ctxBroker = ctxBroker;
+	}
+
+
+	public IInternalPersonalisationManager getPersoMgr() {
+		System.out.println(this.getClass().getName()+": Return persoMgr");
+		return persoMgr;
+	}
+
+
+	public void setPersoMgr(IInternalPersonalisationManager persoMgr) {
+		System.out.println(this.getClass().getName()+": Got persoMgr");
+		this.persoMgr = persoMgr;
+	}
+
+	
+	
+	public void initialisePreferenceManagement(){
+		this.prefMgr = new UserPreferenceManagement(null, this.getCtxBroker());
 		mt = new MonitoringTable();
 		registered = new ArrayList<CtxAttributeIdentifier>();
+		System.out.println(this.getClass().toString()+": INITIALISED");
+	}
+	public void initialisePreferenceManagement(ICtxBroker broker, IInternalPersonalisationManager persoMgr/*, UserPreferenceManagement prefMgr*/){
+		if (getPersoMgr()==null){
+			System.out.println(this.getClass().toString()+": found PersonalisationManager");
+		}else{
+			System.out.println(this.getClass().toString()+": PersonalisationManager NOT FOUND");
+		}
+		setPersoMgr(persoMgr);
 		
+		if (getCtxBroker() == null){
+			System.out.println(this.getClass().toString()+": found ctxBroker");
+		}else{
+			System.out.println(this.getClass().toString()+": CtxBroker NOT FOUND");
+		}
+		this.setCtxBroker(broker);
+		
+		
+		if (prefMgr == null){
+			System.out.println(this.getClass().toString()+" found PreferenceManager");
+		}else{
+			System.out.println(this.getClass().toString()+" PreferenceManager NOT FOUND");
+		}
+		this.prefMgr = new UserPreferenceManagement(null, this.getCtxBroker());
+		mt = new MonitoringTable();
+		registered = new ArrayList<CtxAttributeIdentifier>();
+		System.out.println(this.getClass().toString()+": INITIALISED");
 	}
 	/**
 	 * 
@@ -148,7 +199,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 			if (this.registered.contains(info.getICtxIdentifier())){
 				this.logging.debug("Already subscribed for: "+info.getICtxIdentifier().toUriString());
 			}else{
-				this.persoMgr.registerForContextUpdate(userId, PersonalisationTypes.UserPreference, info.getICtxIdentifier());
+				this.getPersoMgr().registerForContextUpdate(userId, PersonalisationTypes.UserPreference, info.getICtxIdentifier());
 				//this.registerForContextEvent((CtxAttributeIdentifier) info.getICtxIdentifier());
 				this.registered.add((CtxAttributeIdentifier) info.getICtxIdentifier());
 				this.logging.info(userId.toString()+" Registered for :"+info.getICtxIdentifier().toUriString());

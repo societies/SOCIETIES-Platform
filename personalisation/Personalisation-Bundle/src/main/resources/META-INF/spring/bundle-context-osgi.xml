@@ -12,7 +12,7 @@
        testing of the bundle outside of an OSGi container -->
        
         
-        <osgi:service ref="PersonalisationManager">
+        <osgi:service ref="persoMgr">
         <osgi:interfaces>
         <value>org.societies.api.personalisation.mgmt.IPersonalisationManager</value>
         <value>org.societies.personalisation.common.api.management.IInternalPersonalisationManager</value>
@@ -20,23 +20,21 @@
         </osgi:service>
         
 		
-		
-
-		
-		
-		
-		
-		<osgi:service ref="UserPCM">
+		<osgi:service ref="pcm">
         <osgi:interfaces>
         <value>org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor</value>
         </osgi:interfaces>
         </osgi:service>
 
 
-
-		<osgi:reference id="UserPCM" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/>
-		<osgi:reference id="UserCtxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker"/>        
-        <osgi:reference id="InternalPersonalisationManager" interface="org.societies.personalisation.common.api.management.IInternalPersonalisationManager"/>
+		<osgi:reference id="pcm" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor" cardinality="0..1">
+		<osgi:listener bind-method="setPcm" ref="persoMgr"></osgi:listener>
+		
+		</osgi:reference>
+		<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker"/>        
+        <osgi:reference id="persoMgr" interface="org.societies.personalisation.common.api.management.IInternalPersonalisationManager">
+        <osgi:listener bind-method="setPersoMgr" ref="pcm"></osgi:listener>
+        </osgi:reference>
         
 		
 		

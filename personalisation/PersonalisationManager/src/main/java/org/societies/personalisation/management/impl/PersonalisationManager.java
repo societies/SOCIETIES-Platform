@@ -57,9 +57,9 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 	private ICtxBroker ctxBroker;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private IUserPreferenceConditionMonitor pcm;
-	private IDIANNE dianneNetwork;
+/*	private IDIANNE dianneNetwork;
 	private ICAUIPrediction cauiPrediction;
-	private ICRISTUserIntentPrediction cristPrediction;
+	private ICRISTUserIntentPrediction cristPrediction;*/
 	
 	//data structures
 	ArrayList<CtxAttributeIdentifier> dianneList;
@@ -77,12 +77,8 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 
 	}
 	
-	public PersonalisationManager(ICtxBroker broker, IUserPreferenceConditionMonitor upcm, IDIANNE dianneNetwork, ICAUIPrediction cauiPrediction, ICRISTUserIntentPrediction cristPrediction){
-		this.ctxBroker = broker;
-		this.pcm = upcm;
-		this.dianneNetwork = dianneNetwork;
-		this.cauiPrediction = cauiPrediction;
-		this.cristPrediction = cristPrediction;
+	/*public PersonalisationManager( ICtxBroker ctxBroker, IUserPreferenceConditionMonitor pcm, IDIANNE dianneNetwork, ICAUIPrediction cauiPrediction, ICRISTUserIntentPrediction cristPrediction ){
+
 		
 		this.dianneList = new ArrayList<CtxAttributeIdentifier>();
 		this.prefMgrList = new ArrayList<CtxAttributeIdentifier>();
@@ -90,12 +86,22 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 		this.cristList = new ArrayList<CtxAttributeIdentifier>();
 		
 		
-	} 
+	} */
 
 	/*
 	 * INITIALISE SERVICES
 	 */
-	public void initialisePersonalisationManager(){
+	public void initialisePersonalisationManager(ICtxBroker ctxBroker, IUserPreferenceConditionMonitor pcm){
+		this.ctxBroker = ctxBroker;
+		this.pcm = pcm;
+/*		this.dianneNetwork = dianneNetwork;
+		this.cauiPrediction = cauiPrediction;
+		this.cristPrediction = cristPrediction;*/
+		
+		this.dianneList = new ArrayList<CtxAttributeIdentifier>();
+		this.prefMgrList = new ArrayList<CtxAttributeIdentifier>();
+		this.cauiList = new ArrayList<CtxAttributeIdentifier>();
+		this.cristList = new ArrayList<CtxAttributeIdentifier>();
 		if (this.ctxBroker==null){
 			System.out.println(this.getClass().getName()+"CtxBroker is null");
 		}else{
@@ -104,9 +110,9 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 		
 		
 		if (this.pcm==null){
-			System.out.println(this.getClass().getName()+"UPM is null");
+			System.out.println(this.getClass().getName()+"PCM is null");
 		}else{
-			System.out.println(this.getClass().getName()+"UPM is NOT null");
+			System.out.println(this.getClass().getName()+"PCM is NOT null");
 		}
 		
 		
@@ -114,18 +120,47 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 		
 	}
 	
-	public IUserPreferenceConditionMonitor getPrefMgr() {
-		System.out.println(this.getClass().getName()+"Return UPM");
-		return pcm;
+	public void initialisePersonalisationManager(ICtxBroker ctxBroker){
+		this.ctxBroker = ctxBroker;
+		
+/*		this.dianneNetwork = dianneNetwork;
+		this.cauiPrediction = cauiPrediction;
+		this.cristPrediction = cristPrediction;*/
+		
+		this.dianneList = new ArrayList<CtxAttributeIdentifier>();
+		this.prefMgrList = new ArrayList<CtxAttributeIdentifier>();
+		this.cauiList = new ArrayList<CtxAttributeIdentifier>();
+		this.cristList = new ArrayList<CtxAttributeIdentifier>();
+		if (this.ctxBroker==null){
+			System.out.println(this.getClass().getName()+"CtxBroker is null");
+		}else{
+			System.out.println(this.getClass().getName()+"CtxBroker is NOT null");
+		}
+		
+		
+		/*if (this.pcm==null){
+			System.out.println(this.getClass().getName()+"PCM is null");
+		}else{
+			System.out.println(this.getClass().getName()+"PCM is NOT null");
+		}*/
+		
+		
+		System.out.println("Yo!! I'm a brand new service and my interface is: "+this.getClass().getName());
+		
+	}
+	
+	
+	public void initialisePersonalisationManager(){
+
+		this.dianneList = new ArrayList<CtxAttributeIdentifier>();
+		this.prefMgrList = new ArrayList<CtxAttributeIdentifier>();
+		this.cauiList = new ArrayList<CtxAttributeIdentifier>();
+		this.cristList = new ArrayList<CtxAttributeIdentifier>();
+		System.out.println("Yo!! I'm a brand new service and my interface is: "+this.getClass().getName());
+
 	}
 
-
-	public void setPrefMgr(IUserPreferenceConditionMonitor upm) {
-		System.out.println(this.getClass().getName()+"GOT UPM");
-		this.pcm = upm;
-	}
-
-	public IDIANNE getDianneNetwork() {
+/*	public IDIANNE getDianneNetwork() {
 		return dianneNetwork;
 	}
 
@@ -147,6 +182,16 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 
 	public void setCristPrediction(ICRISTUserIntentPrediction cristPrediction) {
 		this.cristPrediction = cristPrediction;
+	}*/
+
+	public IUserPreferenceConditionMonitor getPcm() {
+		System.out.println(this.getClass().getName()+"Return PCM");		
+		return pcm;
+	}
+
+	public void setPcm(IUserPreferenceConditionMonitor pcm) {
+		System.out.println(this.getClass().getName()+"GOT PCM");
+		this.pcm = pcm;
 	}
 
 	public ICtxBroker getCtxBroker(){
@@ -260,7 +305,7 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 	}
 	
 	
-	public void updateReceived(CtxModelObject ctxAttribute){
+/*	public void updateReceived(CtxModelObject ctxAttribute){
 		if (ctxAttribute instanceof CtxAttribute){
 			InternalPersonalisationCallback callback = new InternalPersonalisationCallback(this);
 			CtxAttributeIdentifier ctxId = (CtxAttributeIdentifier) ctxAttribute.getId();
@@ -302,7 +347,7 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 			}
 			
 		}
-	}
+	}*/
 	
 	private boolean containsCtxId(CtxAttributeIdentifier ctxId, List<CtxAttributeIdentifier> list){
 		for (CtxAttributeIdentifier id:list){
