@@ -32,7 +32,9 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
@@ -112,6 +114,9 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		 * an action describes a personalisable parameter that the user (manually) or the User Agent (proactively) changed.
 		 * An action does not describe a change in the state of the service. i.e. starting or stopping a service. Therefore,
 		 * PCM returns the value of the personalisable parameter that was last applied or is currently applicable. 
+		 * 
+		 * The PCM is notified of changes in the personalisable parameters of a service using context. the User Action Monitor 
+		 * populates the context database with this information as soon as it receives an action from a service. 
 		 */
 		List<IPreferenceOutcome> outcomes = new ArrayList<IPreferenceOutcome>();
 		IPreferenceOutcome outcome = new PreferenceOutcome(action.getparameterName(), action.getvalue());
@@ -147,4 +152,33 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	}
 
 
+	public void processServiceStopped(Identity userId, String serviceType, IServiceResourceIdentifier serviceID){
+		if (this.mt.isServiceRunning(serviceType, serviceID)){
+			mt.removeServiceInfo(serviceType, serviceID);
+		}else{
+			logging.info("The details of this service were not properly loaded. Nothing to do!");
+		}
+	}
+	
+	public void processPreferenceChangedEvent(Identity userID, IServiceResourceIdentifier serviceId, String serviceType, String preferenceName){
+		List<CtxIdentifier> ctxIDs = this.prefMgr.getPreferenceConditions(userID, serviceType, serviceId, preferenceName);
+		for (CtxIdentifier id : ctxIDs){
+			this.mt.addInfo(id, serviceId, serviceType, preferenceName);
+			if (this.registered.contains(id)){
+				this.logging.debug("Already subscribed for: "+id.toUriString());
+			}else{
+				//this.registerForContextEvent((CtxAttributeIdentifier) id);
+				this.registered.add((CtxAttributeIdentifier) id);
+			}
+		}
+		/*IOutcome out = this.prefMgr.getPreference(this.getMyUSERDPI(), serviceType, serviceId, prefName);
+		if (out==null){
+			this.logging.debug("Preference Manager returned no new outcomes for serviceType:"+serviceType+" and serviceID: "+serviceId);
+		}else{
+			this.sendToDM(serviceType, serviceId, prefName, out);
+			
+		}*/
+	
+
+	}
 }
