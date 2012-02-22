@@ -58,14 +58,19 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	private MonitoringTable mt;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private List<CtxAttributeIdentifier> registered; 
-	private ICtxBroker broker;
+	private ICtxBroker ctxBroker;
 	private UserPreferenceManagement prefMgr;
 	private IInternalPersonalisationManager persoMgr;
 
-	public UserPreferenceConditionMonitor(ICtxBroker broker, UserPreferenceManagement prefMgr, IInternalPersonalisationManager persoMgr){
-		this.broker = broker;
+	public UserPreferenceConditionMonitor(){
+		
+	}
+	
+	
+	public void initialisePreferenceManagement(ICtxBroker broker, IInternalPersonalisationManager persoManager, UserPreferenceManagement prefMgr){
+		persoMgr = persoManager;
+		this.ctxBroker = broker;
 		this.prefMgr = prefMgr;
-		this.persoMgr = persoMgr;
 		mt = new MonitoringTable();
 		registered = new ArrayList<CtxAttributeIdentifier>();
 		

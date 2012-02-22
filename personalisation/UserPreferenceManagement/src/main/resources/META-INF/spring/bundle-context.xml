@@ -8,7 +8,11 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-  <bean name="UserPreferenceConditionMonitor" class="org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor" />
-
+  <bean name="UserPreferenceConditionMonitor" class="org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor" 
+  depends-on="InternalPersonalisationManager" init-method="initialisePreferenceManagement">
+  <property name="persoMgr" ref="InternalPersonalisationManager"></property>
+  <property name="ctxBroker" ref="UserCtxBroker"></property>
+  <property name="prefMgr" ref="UserPreferenceManagement"></property>
+  </bean>
 
 </beans>

@@ -11,7 +11,7 @@
        for integration testing outside of an OSGi environment -->
 
    <bean id="PersonalisationManager" class="org.societies.personalisation.management.impl.PersonalisationManager" 
-   depends-on="UserPCM, UserCtxBroker" init-method="initialisePersonalisationManager">
+   depends-on="UserPCM, UserCtxBroker" lazy-init="true" "initialisePersonalisationManager">
    <property name="pcm" ref="UserPCM"></property>
    <property name="ctxBroker" ref="UserCtxBroker"></property>
    </bean>
