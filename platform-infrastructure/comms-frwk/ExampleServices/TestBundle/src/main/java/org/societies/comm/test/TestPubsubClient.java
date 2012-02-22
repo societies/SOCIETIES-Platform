@@ -1,21 +1,26 @@
 package org.societies.comm.test;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.comm.xmpp.event.PubsubEvent;
+import org.societies.comm.xmpp.event.PubsubEventFactory;
+import org.societies.comm.xmpp.event.PubsubEventStream;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IIdentityManager;
-import org.societies.comm.xmpp.event.PubsubEvent;
-import org.societies.comm.xmpp.event.PubsubEventFactory;
-import org.societies.comm.xmpp.event.PubsubEventStream;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.comm.xmpp.interfaces.IdentityManager;
-import org.societies.comm.xmpp.pubsub.PubsubClient;
-import org.societies.comm.xmpp.pubsub.Subscriber;
+import org.societies.test.Testnode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -40,19 +45,16 @@ public class TestPubsubClient extends Thread implements Subscriber, ApplicationL
 		start();
 	}
 
-	private Element createTestItem() throws ParserConfigurationException {
-		Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-		Element root = document.createElementNS("http://societies.org/comms/test", "test");
-		Element child = document.createElementNS("http://societies.org/comms/test", "child");
-		child.setAttribute("attr", "val");
-		root.appendChild(child);
-		return root;
+	private Testnode createTestItem()  {
+		Testnode tn = new Testnode();
+		tn.setTestattribute("testValue");
+		return tn;
 	}
 
 	@Override
 	public void pubsubEvent(Identity pubsubService, String node, String itemId,
-			Element item) {
-		LOG.info("### pubsubEvent from "+pubsubService+" referring to node "+node+": <"+item.getLocalName()+" xmlns='"+item.getNamespaceURI()+"'...");
+			Object item) {
+		LOG.info("### pubsubEvent from "+pubsubService+" referring to node "+node+": "+item.getClass().getName());
 	}
 
 	@Override
@@ -60,14 +62,18 @@ public class TestPubsubClient extends Thread implements Subscriber, ApplicationL
 		try {
 			Identity psService = idm.fromJid("societiespubsub.red.local");
 			String node = "testNode";
+			List<String> packageList = new ArrayList<String>();
+			packageList.add("org.societies.test");
 			
 			Thread.sleep(1000);
+			LOG.info("### going to add JAXB package...");
+			psc.addJaxbPackages(packageList);
 			LOG.info("### going to create testNode...");
 			psc.ownerCreate(psService, node);
 			LOG.info("### created testNode! going to subscribe testNode...");
 			psc.subscriberSubscribe(psService, node, this);
 			LOG.info("### subscribed testNode! going to publish in testNode...");
-			Element item = createTestItem();
+			Object item = createTestItem();
 			psc.publisherPublish(psService, node, null, item);
 			LOG.info("### published in testNode! finishing Pubsub tests...");
 			
@@ -75,6 +81,7 @@ public class TestPubsubClient extends Thread implements Subscriber, ApplicationL
 			String node2 = "testNode2";
 			PubsubEventFactory pef = PubsubEventFactory.getInstance(endpoint.getIdentity());
 			PubsubEventStream stream = pef.getStream(psService, node2);
+			stream.addJaxbPackages(packageList);
 			LOG.info("### got stream");
 			stream.addApplicationListener(this);
 			LOG.info("### added listener");
@@ -86,15 +93,15 @@ public class TestPubsubClient extends Thread implements Subscriber, ApplicationL
 			LOG.error(e.getMessage());
 		} catch (CommunicationException e) {
 			LOG.error(e.getMessage());
-		} catch (ParserConfigurationException e) {
-			LOG.error(e.getMessage());
 		} catch (InterruptedException e) {
+			LOG.error(e.getMessage());
+		} catch (JAXBException e) {
 			LOG.error(e.getMessage());
 		}
 	}
 
 	@Override
 	public void onApplicationEvent(PubsubEvent arg0) {
-		LOG.info("### applicationEvent from "+arg0.getPubsubService()+" referring to node "+arg0.getNode()+": <"+arg0.getPayload().getLocalName()+" xmlns='"+arg0.getPayload().getNamespaceURI()+"'...");
+		LOG.info("### applicationEvent from "+arg0.getPubsubService()+" referring to node "+arg0.getNode()+": "+arg0.getPayload().toString());
 	}
 }

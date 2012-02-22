@@ -29,6 +29,7 @@
 		<module>SecureStorage</module>
 		<module>SignatureMgr</module>
 		<module>PolicyNegotiator</module>
+		<module>SecurityCommsMgr</module>
 	</modules>
 
 </project>

@@ -40,5 +40,8 @@ public interface IPrivacyLogAppend {
 		 * @param channelId    ID of the channel. Examples: facebook, facebook wall post,
 		 * twitter, XMPP
 		 */
-		public void log(String dataType, Date time, boolean sentToGroup, String receiverId, String senderId, ChannelType channelId);
+		public void log(String dataType, Date time, boolean sentToGroup, String receiverId,
+				String senderId, ChannelType channelId);
+		
+		public void log(LogEntry entry);
 }

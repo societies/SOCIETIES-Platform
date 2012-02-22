@@ -9,10 +9,10 @@ public class PubsubEvent extends ApplicationEvent {
 	private Identity pubsubService;
 	private String node;
 	private String itemId;
-	private Element payload;
+	private Object payload;
 	private boolean isPublished;
 	
-	public PubsubEvent(Object source, Element payload) {
+	public PubsubEvent(Object source, Object payload) {
 		super(source);
 		this.payload = payload;
 		this.isPublished = false;
@@ -30,7 +30,7 @@ public class PubsubEvent extends ApplicationEvent {
 		return itemId;
 	}
 
-	public Element getPayload() {
+	public Object getPayload() {
 		return payload;
 	}
 

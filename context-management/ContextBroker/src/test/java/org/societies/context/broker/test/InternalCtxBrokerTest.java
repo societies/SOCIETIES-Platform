@@ -379,9 +379,9 @@ public class InternalCtxBrokerTest {
 					
 			System.out.println(hocAttr1.getLastModified());
 		
-			assertEquals(hocAttr1.getIntegerValue(), 100);
-			assertEquals(hocAttr2.getIntegerValue(), 200);
-			assertEquals(hocAttr3.getIntegerValue(), 300);
+			assertEquals(new Integer(100), hocAttr1.getIntegerValue());
+			assertEquals(new Integer(200), hocAttr2.getIntegerValue());
+			assertEquals(new Integer(300), hocAttr3.getIntegerValue());
 			assertEquals(history.size(),3);
 			
 			assertNotNull(hocAttr1.getLastModified());

@@ -1,7 +1,7 @@
 package org.societies.useragent.conflict;
 
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.internal.useragent.model.ConflictResolutionRule;
+import org.societies.api.internal.useragent.conflict.ConflictResolutionRule;
 
 public class PreferencePriorRule implements ConflictResolutionRule{
 

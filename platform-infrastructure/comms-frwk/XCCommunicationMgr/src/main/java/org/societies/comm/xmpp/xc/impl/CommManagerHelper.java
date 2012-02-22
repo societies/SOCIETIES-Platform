@@ -103,7 +103,7 @@ public class CommManagerHelper {
 
 	private static Logger LOG = LoggerFactory
 			.getLogger(CommManagerHelper.class);
-	private SAXReader reader = new SAXReader();
+	private SAXReader reader = new SAXReader(); // TODO the sax reader is not threadsafe either so I turned every method where it is used to synchronized :(
 
 	private final Map<String, IFeatureServer> featureServers = new HashMap<String, IFeatureServer>();
 	private final Map<String, ICommCallback> commCallbacks = new HashMap<String, ICommCallback>();
@@ -119,7 +119,7 @@ public class CommManagerHelper {
 		return featureServers.keySet().toArray(returnArray);
 	}
 	
-	public IQ handleDiscoItems(IQ iq) {
+	public synchronized IQ handleDiscoItems(IQ iq) {
 		String node = null;
 		Attribute nodeAttr = iq.getElement().attribute("node");
 		if (nodeAttr!=null)
@@ -165,11 +165,12 @@ public class CommManagerHelper {
 		try {
 			if (os.size()>0) {
 				ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-				Document dom4jItems = reader.read(is);
 				
 				// return items
 				IQ response = new IQ(Type.result, iq.getID());
 				response.setTo(iq.getFrom());
+
+				Document dom4jItems = reader.read(is);
 				response.getElement().add(dom4jItems.getRootElement());
 				return response;
 			}
@@ -474,7 +475,7 @@ public class CommManagerHelper {
 		}
 	}
 	
-	private IQ buildApplicationErrorResponse(JID originalFrom, String id, XMPPError error) {
+	private synchronized IQ buildApplicationErrorResponse(JID originalFrom, String id, XMPPError error) {
 		try {
 			IQ errorResponse = new IQ(Type.error, id);
 			errorResponse.setTo(originalFrom);
@@ -496,6 +497,7 @@ public class CommManagerHelper {
 			
 			Document dom4jError = reader.read(is);
 			errorResponse.getElement().add(dom4jError.getRootElement());
+			
 			return errorResponse;
 		} catch (JAXBException e) {
 			return buildErrorResponse(originalFrom, id, "JAXBException while building application error");
@@ -542,7 +544,7 @@ public class CommManagerHelper {
 		}
 	}
 
-	public IQ buildInfoIq(Identity entity, String node, ICommCallback callback) throws CommunicationException {
+	public synchronized IQ buildInfoIq(Identity entity, String node, ICommCallback callback) throws CommunicationException {
 		IQ infoIq = new IQ(Type.get);
 		infoIq.setTo(entity.getJid());
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -560,7 +562,7 @@ public class CommManagerHelper {
 		return infoIq;
 	}
 
-	public IQ buildItemsIq(Identity entity, String node, ICommCallback callback) throws CommunicationException {
+	public synchronized IQ buildItemsIq(Identity entity, String node, ICommCallback callback) throws CommunicationException {
 		IQ itemsIq = new IQ(Type.get);
 		itemsIq.setTo(entity.getJid());
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
