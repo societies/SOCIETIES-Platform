@@ -1,4 +1,4 @@
-package org.societies.comm.xmpp.pubsub;
+package org.societies.api.comm.xmpp.pubsub;
 
 public enum SubscriptionState {
 	SUBSCRIBED("subscribed"),

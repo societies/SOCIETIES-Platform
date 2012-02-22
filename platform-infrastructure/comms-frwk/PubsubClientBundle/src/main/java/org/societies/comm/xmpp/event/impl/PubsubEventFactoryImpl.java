@@ -7,14 +7,14 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.comm.xmpp.event.PubsubEvent;
 import org.societies.comm.xmpp.event.PubsubEventFactory;
 import org.societies.comm.xmpp.event.PubsubEventStream;
-import org.societies.comm.xmpp.pubsub.PubsubClient;
-import org.societies.comm.xmpp.pubsub.Subscriber;
-import org.societies.comm.xmpp.pubsub.Subscription;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.api.comm.xmpp.pubsub.Subscription;
 import org.societies.comm.xmpp.pubsub.impl.PubsubClientImpl;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.w3c.dom.Element;
@@ -58,7 +58,7 @@ public class PubsubEventFactoryImpl extends PubsubEventFactory implements Subscr
 
 	@Override
 	public void pubsubEvent(Identity pubsubService, String node, String itemId,
-			Element item) {
+			Object item) {
 		Subscription s = new Subscription(pubsubService, localIdentity, node, null);
 		PubsubEventStreamImpl pesi = psStreamMap.get(s);
 		if (pesi==null) {

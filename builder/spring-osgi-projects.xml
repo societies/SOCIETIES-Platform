@@ -115,6 +115,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 	 	-->
 
 		<!-- Intelligent community orchestration -->
+		<module>../intelligent-community-orchestration/CommunityLifecycleManagement</module>
 		<!-- Context Management -->
 		<!-- Privacy Mgmt -->
 		<module>../privacy-trust/privacy-protection</module>

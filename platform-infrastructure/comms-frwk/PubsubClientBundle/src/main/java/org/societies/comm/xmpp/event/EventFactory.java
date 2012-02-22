@@ -27,10 +27,6 @@ package org.societies.comm.xmpp.event;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.comm.xmpp.event.impl.PubsubEventStreamImpl;
-import org.societies.comm.xmpp.pubsub.Subscription;
-import org.societies.comm.xmpp.pubsub.impl.PubsubClientImpl;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
 
 /**

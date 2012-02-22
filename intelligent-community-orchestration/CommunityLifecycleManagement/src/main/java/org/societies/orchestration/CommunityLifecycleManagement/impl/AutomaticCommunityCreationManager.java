@@ -25,7 +25,9 @@
 
 package org.societies.orchestration.CommunityLifecycleManagement.impl;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 
 import org.societies.api.internal.css.directory.ICssDirectory;
@@ -64,6 +66,7 @@ import org.societies.api.comm.xmpp.datatypes.Identity;
 
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * This is the class for the Automatic Community Creation Manager component.
@@ -136,7 +139,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 		this.linkedSuperCis = linkedSuperCis;
 	}
 	
-	public ArrayList<Identity> getIDsOfInteractingCsss() {
+	public ArrayList<Identity> getIDsOfInteractingCsss(String startingDate, String endingDate) {
 		//What CSSs is this one currently interacting with?
 		//Found by: For each service, shared service, and resource the user is using (in the last ~5 minutes), is there an end-CSS they're interacting with?
 		//Is there a CSS they're indirectly interacting with over the service?
@@ -193,13 +196,13 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 		
 		if (evaluationType.equals("extensive")) { //every day or so
 			if (linkedCss != null) {
-				interactedCssIDs = getIDsOfInteractingCsss();
+				//interactedCssIDs = getIDsOfInteractingCsss();
 				
 				//first step: look for more obvious CISs on high-priority kinds of context,
 				//e.g. friends in contact list, family in contact list (from SNS extractor or SOCIETIES)
 				
 				//If CISs are appropriate for friends' lists in Google+ circle fashion, then that counts
-				//CisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new CisRecord(null, null, null, null, null, null, null, null));
+				CisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new CisRecord(null, null, null, null, null, null, null, null));
 				//ArrayList<CisRecord> userJoinedCiss = new ArrayList<CisRecord>();
 				//for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
 				//    userJoinedCiss.add(listOfUserJoinedCiss[i]);
@@ -238,8 +241,17 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				//userContextBroker.lookup(CtxModelType.ENTITY, "FanPage", userContextBrokerCallback);
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				
+				Future<List<CtxIdentifier>> friendsFuture = null;
+				try {
+				    friendsFuture = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "close friends");
+			    } catch (CtxException e) {
+				    // TODO Auto-generated catch block
+				    e.printStackTrace();
+			    }
 				
-				//userContextBroker.lookup(CtxModelType.ATTRIBUTE, "close friends", userContextBrokerCallback);
+				while (friendsFuture == null) {
+					continue;
+				}
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				
 				
@@ -263,9 +275,10 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				
 				
 				//second step: some obvious CISs that might benefit a user.
+				Future<List<CtxIdentifier>> familyFuture = null;
 				
 				try {
-					userContextBroker.lookup(CtxModelType.ATTRIBUTE, "family relations");
+					familyFuture = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "family relations");
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -277,8 +290,9 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				//        if (!cisManager.getCiss().get(i).getMembers() == people)
 				//            cissToCreate.add(new CisRecord(null, linkedCss, "family relation to all members", null, null, null, null, null));
 				
+				Future<List<CtxIdentifier>> nationalityFuture = null;
 				try {
-					userContextBroker.lookup(CtxModelType.ATTRIBUTE, "nationality");
+					nationalityFuture = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "nationality");
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -290,8 +304,10 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				//        if (!cisManager.getCiss().get(i).getMembers() == people)
 				//            cissToCreate.add(new CisRecord(null, linkedCss, "Nationals", null, null, null, null, null));
 				
+				Future<List<CtxIdentifier>> languageFuture = null;
+				
 				try {
-					userContextBroker.lookup(CtxModelType.ATTRIBUTE, "first language");
+					languageFuture = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "first language");
 				} catch (CtxException e2) {
 					// TODO Auto-generated catch block
 					e2.printStackTrace();
@@ -303,8 +319,9 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				//        if (!cisManager.getCiss().get(i).getMembers() == people)
 				//            cissToCreate.add(new CisRecord(null, linkedCss, "Native language speakers", null, null, null, null, null));
 				
+				Future<List<CtxIdentifier>> interestFuture = null;
 				try {
-					userContextBroker.lookup(CtxModelType.ATTRIBUTE, "interests");
+					interestFuture = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "interests");
 				} catch (CtxException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -332,14 +349,44 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				
 				//final step: retrieve as much context data on CSS user and inter-CSS connections 
 				//amongst their immediate connection neighbourhood as possible.
+				String yesterday = new Timestamp(new Date().getTime()).toString();
+				String[] yesterdayHyphens = yesterday.split("-");
+				String lastPartOfYesterdayHyphens = yesterdayHyphens[2].split(" ")[1];
+				yesterday = yesterdayHyphens[0] + "-" + yesterdayHyphens[1] + "-" + (Integer.valueOf(yesterdayHyphens[2].split(" ")[0]) - 1) + " " + lastPartOfYesterdayHyphens; 
+				String lastWeek = "";
+				String lastMonth = "";
+				interactedCssIDs = getIDsOfInteractingCsss(yesterday, new Timestamp(new Date().getTime()).toString());
+				interactedCssIDs = getIDsOfInteractingCsss(lastWeek, new Timestamp(new Date().getTime()).toString());
+				interactedCssIDs = getIDsOfInteractingCsss(lastMonth, new Timestamp(new Date().getTime()).toString());
 				
-				// processing - here or delegated to local method
+				//CssActivityFeed theFeed = cssManager.getCssActivityFeed();
+				////CssActivityFeed todayFeed = theFeed.searchQuery("contains: " + yesterdayHyphens[2].split(" ")[0]);
+				//ArrayList<String> interactionRecordsLastDay = todayFeed.searchQuery("interaction").toString();
+				
+				
+				//CssActivityFeed theFeed = cssManager.getCssActivityFeed();
+				////CssActivityFeed todayFeed = theFeed.searchQuery("contains: " + lastWeekHyphens[2].split(" ")[0]);
+				//ArrayList<String> interactionRecordsLastWeek = todayFeed.searchQuery("interaction").toString();
+				
+				//CssActivityFeed theFeed = cssManager.getCssActivityFeed();
+				////CssActivityFeed todayFeed = theFeed.searchQuery("contains: " + lastMonthHyphens[2].split(" ")[0]);
+				//ArrayList<String> interactionRecordsLastMonth = todayFeed.searchQuery("interaction").toString();
+				
+				//ArrayList<String> potentialCisMembers = new ArrayList<String>;
+				
+				//for (int i = 0; i < interactedCssIDs.size(); i++) {
+				//    if (interactionRecordsLastWeek.contains(interactedCssIDs.get(i)) && interactionRecordsLastMonth.contains(i))
+				//        potentialCisMembers.add(interactedCssIDs.get(i);
+				//}
+				//if (potentialCisMembers.size >= 2)
+				//    if (!joinedCiss.getMemberList().contains(thisone))
+				//        cissToCreate.add(new CisRecord(null, linkedCss, "Interactors on Service " + "serviceName", null, null, null, null, null);
 			}
 		}
 			
 		else { //non-extensive check, every few minutes or so.
 			if (linkedCss != null) {
-				interactedCssIDs = getIDsOfInteractingCsss();
+				interactedCssIDs = getIDsOfInteractingCsss(new Timestamp(new Date().getTime() - 300000).toString(), new Timestamp(new Date().getTime()).toString());
 				//retrieve recent history of certain kinds of context data on CSS user and inter-CSS connections 
 				//amongst their immediate connection neighbourhood as possible.
 				

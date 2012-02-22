@@ -1,7 +1,7 @@
 package org.societies.useragent.conflict;
 
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.useragent.api.model.ConflictResolutionRule;
+import org.societies.api.internal.useragent.conflict.ConflictResolutionRule;
 
 public class ConfidenceTradeoffRule implements ConflictResolutionRule {
 

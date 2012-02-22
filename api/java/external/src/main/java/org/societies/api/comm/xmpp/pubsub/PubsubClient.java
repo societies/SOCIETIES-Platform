@@ -34,18 +34,25 @@
  * 
  */
 
-package org.societies.comm.xmpp.pubsub;
+package org.societies.api.comm.xmpp.pubsub;
 
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.JAXBException;
+
 import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.pubsub.Affiliation;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.api.comm.xmpp.pubsub.Subscription;
+import org.societies.api.comm.xmpp.pubsub.SubscriptionState;
 import org.w3c.dom.Element;
 
 public interface PubsubClient {
 	
+	public void addJaxbPackages(List<String> packageList) throws JAXBException;
 	public List<String> discoItems(Identity pubsubService, String node) throws XMPPError, CommunicationException;
 	// TODO remove subId from interface - it's not interesting for the API users, only for the client implementation
 	// TODO disco info nodes
@@ -59,7 +66,7 @@ public interface PubsubClient {
 //	public Pubsub subscriberDefaultOptions(Identity pubsubService) throws XMPPError, CommunicationException;
 	public List<Element> subscriberRetrieveLast(Identity pubsubService, String node, String subId) throws XMPPError, CommunicationException;
 	public List<Element> subscriberRetrieveSpecific(Identity pubsubService, String node, String subId, List<String> itemIdList) throws XMPPError, CommunicationException;
-	public String publisherPublish(Identity pubsubService, String node, String itemId, Element item) throws XMPPError, CommunicationException;
+	public String publisherPublish(Identity pubsubService, String node, String itemId, Object item) throws XMPPError, CommunicationException;
 //	public Pubsub publisherPublishOptions(Stanza stanza, Pubsub payload) throws XMPPError, CommunicationException;
 	public void publisherDelete(Identity pubsubService, String node, String itemId) throws XMPPError, CommunicationException;
 	public void ownerCreate(Identity pubsubService, String node) throws XMPPError, CommunicationException;
