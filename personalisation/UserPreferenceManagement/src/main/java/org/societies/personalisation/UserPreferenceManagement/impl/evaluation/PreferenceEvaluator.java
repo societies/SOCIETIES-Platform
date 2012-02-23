@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -31,6 +36,7 @@ import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.personalisation.preference.api.model.ContextPreferenceCondition;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceCondition;
+import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 import org.societies.personalisation.preference.api.model.OperatorConstants;
 
 
@@ -45,8 +51,8 @@ public class PreferenceEvaluator {
 		this.contextCache = cache;
 	}
 	
-	public Hashtable<IOutcome,List<CtxIdentifier>> evaluatePreference(IPreference ptn){
-		Hashtable<IOutcome,List<CtxIdentifier>> temp = new Hashtable<IOutcome,List<CtxIdentifier>>();
+	public Hashtable<IPreferenceOutcome,List<CtxIdentifier>> evaluatePreference(IPreference ptn){
+		Hashtable<IPreferenceOutcome,List<CtxIdentifier>> temp = new Hashtable<IPreferenceOutcome,List<CtxIdentifier>>();
 		IPreference p = this.evaluatePreferenceInternal(ptn);
 		if (p!=null){
 			ArrayList<CtxIdentifier> ctxIds = new ArrayList<CtxIdentifier>();
@@ -72,7 +78,7 @@ public class PreferenceEvaluator {
 			temp.put(p.getOutcome(), ctxIds);
 			return temp;
 		}else{
-			return new Hashtable<IOutcome,List<CtxIdentifier>>();
+			return new Hashtable<IPreferenceOutcome,List<CtxIdentifier>>();
 		}
 	}
 	private IPreference evaluatePreferenceInternal(IPreference ptn){
