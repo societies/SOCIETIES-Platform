@@ -24,7 +24,6 @@
  */
 package org.societies.slm.servicemgmt.impl;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,7 +34,6 @@ import java.net.URLConnection;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.societies.api.internal.servicelifecycle.model.Service;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.Unmarshaller;
 

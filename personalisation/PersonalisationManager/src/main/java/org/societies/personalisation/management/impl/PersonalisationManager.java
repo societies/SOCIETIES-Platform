@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -35,13 +40,14 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.IFeedbackEvent;
 import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
+import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
 import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
-import org.societies.personalisation.preference.api.UserPreferenceManagement.IUserPreferenceManagement;
+import org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor;
 
 
 public class PersonalisationManager implements IPersonalisationManager, IInternalPersonalisationManager{
@@ -50,10 +56,10 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 	//services
 	private ICtxBroker ctxBroker;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
-	private IUserPreferenceManagement prefMgr;
-	private IDIANNE dianneNetwork;
-	private ICAUIPrediction cauiPrediction;
-	private ICRISTUserIntentPrediction cristPrediction;
+	private IUserPreferenceConditionMonitor pcm;
+	private IDIANNE dianne;
+	/*	private ICAUIPrediction cauiPrediction;
+	private ICRISTUserIntentPrediction cristPrediction;*/
 	
 	//data structures
 	ArrayList<CtxAttributeIdentifier> dianneList;
@@ -71,12 +77,8 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 
 	}
 	
-	public PersonalisationManager(ICtxBroker broker, IUserPreferenceManagement upm, IDIANNE dianneNetwork, ICAUIPrediction cauiPrediction, ICRISTUserIntentPrediction cristPrediction){
-		this.ctxBroker = broker;
-		this.prefMgr = upm;
-		this.dianneNetwork = dianneNetwork;
-		this.cauiPrediction = cauiPrediction;
-		this.cristPrediction = cristPrediction;
+	/*public PersonalisationManager( ICtxBroker ctxBroker, IUserPreferenceConditionMonitor pcm, IDIANNE dianne, ICAUIPrediction cauiPrediction, ICRISTUserIntentPrediction cristPrediction ){
+
 		
 		this.dianneList = new ArrayList<CtxAttributeIdentifier>();
 		this.prefMgrList = new ArrayList<CtxAttributeIdentifier>();
@@ -84,12 +86,22 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 		this.cristList = new ArrayList<CtxAttributeIdentifier>();
 		
 		
-	} 
+	} */
 
 	/*
 	 * INITIALISE SERVICES
 	 */
-	public void initialisePersonalisationManager(){
+	public void initialisePersonalisationManager(ICtxBroker ctxBroker, IUserPreferenceConditionMonitor pcm){
+		this.ctxBroker = ctxBroker;
+		this.pcm = pcm;
+/*		this.dianne = dianne;
+		this.cauiPrediction = cauiPrediction;
+		this.cristPrediction = cristPrediction;*/
+		
+		this.dianneList = new ArrayList<CtxAttributeIdentifier>();
+		this.prefMgrList = new ArrayList<CtxAttributeIdentifier>();
+		this.cauiList = new ArrayList<CtxAttributeIdentifier>();
+		this.cristList = new ArrayList<CtxAttributeIdentifier>();
 		if (this.ctxBroker==null){
 			System.out.println(this.getClass().getName()+"CtxBroker is null");
 		}else{
@@ -97,34 +109,63 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 		}
 		
 		
-		if (this.prefMgr==null){
-			System.out.println(this.getClass().getName()+"UPM is null");
+		if (this.pcm==null){
+			System.out.println(this.getClass().getName()+"PCM is null");
 		}else{
-			System.out.println(this.getClass().getName()+"UPM is NOT null");
+			System.out.println(this.getClass().getName()+"PCM is NOT null");
 		}
 		
 		
-		System.out.println("Yo!! I'm a brand new service and my interface is: "+this.getClass().getName());
+		System.out.println("Full init. Yo!! I'm a brand new service and my interface is: "+this.getClass().getName());
 		
 	}
 	
-	public IUserPreferenceManagement getPrefMgr() {
-		System.out.println(this.getClass().getName()+"Return UPM");
-		return prefMgr;
+	public void initialisePersonalisationManager(ICtxBroker ctxBroker){
+		this.ctxBroker = ctxBroker;
+		
+/*		this.dianne = dianne;
+		this.cauiPrediction = cauiPrediction;
+		this.cristPrediction = cristPrediction;*/
+		
+		this.dianneList = new ArrayList<CtxAttributeIdentifier>();
+		this.prefMgrList = new ArrayList<CtxAttributeIdentifier>();
+		this.cauiList = new ArrayList<CtxAttributeIdentifier>();
+		this.cristList = new ArrayList<CtxAttributeIdentifier>();
+		if (this.ctxBroker==null){
+			System.out.println(this.getClass().getName()+"CtxBroker is null");
+		}else{
+			System.out.println(this.getClass().getName()+"CtxBroker is NOT null");
+		}
+		
+		
+		/*if (this.pcm==null){
+			System.out.println(this.getClass().getName()+"PCM is null");
+		}else{
+			System.out.println(this.getClass().getName()+"PCM is NOT null");
+		}*/
+		
+		
+		System.out.println("Ctx init. Yo!! I'm a brand new service and my interface is: "+this.getClass().getName());
+		
+	}
+	
+	
+	public void initialisePersonalisationManager(){
+
+		this.dianneList = new ArrayList<CtxAttributeIdentifier>();
+		this.prefMgrList = new ArrayList<CtxAttributeIdentifier>();
+		this.cauiList = new ArrayList<CtxAttributeIdentifier>();
+		this.cristList = new ArrayList<CtxAttributeIdentifier>();
+		System.out.println("Empty init. Yo!! I'm a brand new service and my interface is: "+this.getClass().getName());
+
 	}
 
-
-	public void setPrefMgr(IUserPreferenceManagement upm) {
-		System.out.println(this.getClass().getName()+"GOT UPM");
-		this.prefMgr = upm;
+/*	public IDIANNE getdianne() {
+		return dianne;
 	}
 
-	public IDIANNE getDianneNetwork() {
-		return dianneNetwork;
-	}
-
-	public void setDianneNetwork(IDIANNE dianneNetwork) {
-		this.dianneNetwork = dianneNetwork;
+	public void setdianne(IDIANNE dianne) {
+		this.dianne = dianne;
 	}
 
 	public ICAUIPrediction getCauiPrediction() {
@@ -141,6 +182,26 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 
 	public void setCristPrediction(ICRISTUserIntentPrediction cristPrediction) {
 		this.cristPrediction = cristPrediction;
+	}*/
+
+	public IUserPreferenceConditionMonitor getPcm() {
+		System.out.println(this.getClass().getName()+"Return PCM");		
+		return pcm;
+	}
+
+	public void setPcm(IUserPreferenceConditionMonitor pcm) {
+		System.out.println(this.getClass().getName()+"GOT PCM");
+		this.pcm = pcm;
+	}
+
+	public IDIANNE getDianne() {
+		System.out.println(this.getClass().getName()+"Return DIANNE");
+		return dianne;
+	}
+
+	public void setDianne(IDIANNE dianne) {
+		System.out.println(this.getClass().getName()+"GOT DIANNE");
+		this.dianne = dianne;
 	}
 
 	public ICtxBroker getCtxBroker(){
@@ -149,6 +210,7 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 	}
 
 	public void setCtxBroker(ICtxBroker broker){
+		System.out.println(this.getClass().getName()+"GOT CtxBroker");		
 		this.ctxBroker = broker;
 	}
 	
@@ -254,15 +316,15 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 	}
 	
 	
-	public void updateReceived(CtxModelObject ctxAttribute){
+/*	public void updateReceived(CtxModelObject ctxAttribute){
 		if (ctxAttribute instanceof CtxAttribute){
 			InternalPersonalisationCallback callback = new InternalPersonalisationCallback(this);
 			CtxAttributeIdentifier ctxId = (CtxAttributeIdentifier) ctxAttribute.getId();
 			
 			if (this.containsCtxId(ctxId, dianneList)){
-				this.dianneNetwork.getOutcome(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
+				this.dianne.getOutcome(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
 				if (this.containsCtxId(ctxId, prefMgrList)){	
-					this.prefMgr.getPreferenceOutcome(ctxId.getOperatorId(), ctxAttribute, callback);
+					this.pcm.getOutcome(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
 					callback.setAskDianne(false);
 					callback.setAskPreference(false);
 				}else{
@@ -270,32 +332,33 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 				}
 				
 			}else if(this.containsCtxId(ctxId, prefMgrList)){
-				this.prefMgr.getPreferenceOutcome(ctxId.getOperatorId(), ctxAttribute, callback);
+				this.pcm.getOutcome(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
 				if (this.containsCtxId(ctxId, dianneList)){
-					this.dianneNetwork.getOutcome(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
+					this.dianne.getOutcome(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
 					callback.setAskDianne(false);
 					callback.setAskPreference(false);
 				}else{
 					callback.setAskDianne(true);
 				}
 			}else if (this.containsCtxId(ctxId, cauiList)){
-				this.cauiPrediction.getPrediction(ctxId.getOperatorId(), ctxAttribute, callback);
+				this.cauiPrediction.getPrediction(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
+				
 				if (this.containsCtxId(ctxId, cristList)){
-					this.cristPrediction.getCRISTPrediction(ctxId.getOperatorId(), ctxAttribute, callback);
+					this.cristPrediction.getCRISTPrediction(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
 					callback.setAskCAUI(false);
 					callback.setAskCRIST(false);
 				}else{
 					callback.setAskCRIST(true);
 				}
 			}else if (this.containsCtxId(ctxId, cristList)){
-				this.cristPrediction.getCRISTPrediction(ctxId.getOperatorId(), ctxAttribute, callback);
+				this.cristPrediction.getCRISTPrediction(ctxId.getOperatorId(), (CtxAttribute) ctxAttribute, callback);
 				if (this.containsCtxId(ctxId, cauiList)){
-					this.cauiPrediction.getPrediction(ctxId.getOperatorId(), ctxAttribute, callback);
+					this.cauiPrediction.getPrediction(ctxId.getOperatorId(), (IAction) ctxAttribute, callback);
 				}
 			}
 			
 		}
-	}
+	}*/
 	
 	private boolean containsCtxId(CtxAttributeIdentifier ctxId, List<CtxAttributeIdentifier> list){
 		for (CtxAttributeIdentifier id:list){

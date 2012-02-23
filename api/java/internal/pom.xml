@@ -77,18 +77,17 @@
 					</instructions>
 				</configuration>
 			</plugin>
-			<!-- used to exclude some certain files -->
+			<!-- used to exclude some certain files 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<excludes>
 						<exclude>
-							**/IServiceSharingManager.java
 						</exclude>
 					</excludes>
 				</configuration>
-			</plugin>
+			</plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>

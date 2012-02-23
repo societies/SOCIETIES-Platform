@@ -174,7 +174,9 @@ public class AutomaticCommunityDeletionManager //implements ICommCallback
 		// VERY SIMPLISTIC v0.1 ALGORITHM
 		//if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - 5) {
 		//    if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - (longestTimeWithoutActivity/1440)) {
-		//
+		//        if (theCisRecord.getActivityFeed().search("CommunityLifecycleManagement metadata: temporary short-term)) {
+	    //            cissToDelete.add(theCisRecord);
+		//        }
 		//        If the CIS has never gone such a long period without activity before, 
 		//        suggest deletion via User Agent to CIS owner/administrators, i.e. whoever
 		//        this deployment runs on behalf of.

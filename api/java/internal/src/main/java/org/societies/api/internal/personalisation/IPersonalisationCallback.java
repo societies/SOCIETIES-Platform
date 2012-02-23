@@ -22,57 +22,19 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.comm.examples.clientcommand;
+package org.societies.api.internal.personalisation;
 
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.comm.xmpp.event.EventFactory;
-import org.societies.comm.xmpp.event.EventStream;
-import org.societies.comm.xmpp.event.InternalEvent;
+import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.personalisation.model.IAction;
+import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 /**
  * Describe your class here...
  *
- * @author aleckey
+ * @author Eliza
  *
  */
-public class SpringEventTest implements Runnable, ApplicationListener<InternalEvent> {
+public interface IPersonalisationCallback {
 
-	private static Logger LOG = LoggerFactory.getLogger(SpringEventTest.class);
-	
-	/* (non-Javadoc)
-	 * @see org.springframework.context.ApplicationListener#onApplicationEvent(org.springframework.context.ApplicationEvent)  */
-	@Override
-	public void onApplicationEvent(InternalEvent event) {
-		LOG.info(event.getEventNode());
-		TestObject obj = (TestObject)event.getEventInfo();
-		LOG.info(obj.getName());
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Runnable#run()  */
-	@Override
-	public void run() {
-		//CREATE EVENT NODE
-		EventStream stream1 = EventFactory.getStream("societies.test1");
-		EventStream stream2 = EventFactory.getStream("societies.test2");
-		
-		//SUBSCRIBE
-		stream1.addApplicationListener(this);
-		stream2.addApplicationListener(this);
-		
-		//GENERATE PAYLOAD
-		TestObject payload1 = new TestObject("John1", "Smith1");
-		TestObject payload2 = new TestObject("John2", "Smith2");
-		
-		//GENERATE EVENT
-		InternalEvent event1 = new InternalEvent(this, payload1);
-		InternalEvent event2 = new InternalEvent(this, payload2);
-		
-		stream1.multicastEvent(event1);
-		stream2.multicastEvent(event2);
-	}
-
+	public void receiveIAction(Identity userId, IServiceResourceIdentifier serviceId, IAction action);
 }

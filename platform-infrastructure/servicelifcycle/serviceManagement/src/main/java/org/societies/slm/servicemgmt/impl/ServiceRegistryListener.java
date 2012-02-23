@@ -24,26 +24,44 @@
  */
 package org.societies.slm.servicemgmt.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.internal.servicelifecycle.model.Service;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.util.OsgiListenerUtils;
+
 /**
  * 
  * @author pkuppuud
- *
+ * 
  */
 public class ServiceRegistryListener implements BundleContextAware,
 		ServiceListener {
 
 	private BundleContext bctx;
+	private static Logger log = LoggerFactory.getLogger(ServiceRegistryListener.class);
+	private IServiceRegistry serviceReg;
+
+	public IServiceRegistry getServiceReg() {
+		return serviceReg;
+	}
+
+	public void setServiceReg(IServiceRegistry serviceReg) {
+		this.serviceReg = serviceReg;
+	}
 
 	public ServiceRegistryListener() {
-
+		log.info("Service RegistryListener Bean Instantiated");
 	}
 
 	public void registerListener() {
@@ -51,14 +69,14 @@ public class ServiceRegistryListener implements BundleContextAware,
 		try {
 			fltr = this.bctx.createFilter("(TargetPlatform=SOCIETIES)");
 		} catch (InvalidSyntaxException e) {
-			System.out.println("Error creating Service Listener Filter");
+			log.error("Error creating Service Listener Filter");
 			e.printStackTrace();
 		}
 		OsgiListenerUtils.addServiceListener(this.bctx, this, fltr);
 	}
-	
+
 	public void unRegisterListener() {
-		
+		log.info("Service Management unregistering service listener");
 		OsgiListenerUtils.removeServiceListener(this.bctx, this);
 	}
 
@@ -69,28 +87,61 @@ public class ServiceRegistryListener implements BundleContextAware,
 
 	@Override
 	public void serviceChanged(ServiceEvent event) {
-		
-		System.out.println("Service Listener event received");
-		Bundle serBndl=event.getServiceReference().getBundle();
-		String propKeys[]=event.getServiceReference().getPropertyKeys();
-		
-		for (String key:  propKeys){
-			System.out.println("Property Key"+key);
-			System.out.println("Property value"+event.getServiceReference().getProperty(key));			
-		}
-		System.out.println("Bundle Id"+serBndl.getBundleId()+
-				"Bundle State"+serBndl.getState()+
-				"Bundle Symbolic Name"+serBndl.getSymbolicName());
 
-		if (event.getType() == ServiceEvent.MODIFIED) {
-			System.out.println("Service Modification");
-			// do something here
-		} else if (event.getType() == ServiceEvent.REGISTERED) {
-			System.out.println("Service Registered");
-			// do something here
-		} else if (event.getType() == ServiceEvent.UNREGISTERING) {
-			System.out.println("Service Unregistered");
-			// do something here
+		// Map<String, Object> serviceMeteData = new HashMap<String, Object>();
+
+		log.info("Service Listener event received");
+		Bundle serBndl = event.getServiceReference().getBundle();
+		String propKeys[] = event.getServiceReference().getPropertyKeys();
+
+		for (String key : propKeys) {
+			log.debug("Property Key" + key);
+			Object value = event.getServiceReference().getProperty(key);
+			log.debug("Property value" + value);
+			// serviceMeteData.put(key, value);
+		}
+		log.info("Bundle Id" + serBndl.getBundleId() + "Bundle State"
+				+ serBndl.getState() + "Bundle Symbolic Name"
+				+ serBndl.getSymbolicName());
+
+		Service service = (Service) event.getServiceReference().getProperty(
+				"ServiceMetaModel");		
+		List<Service> serviceList = new ArrayList<Service>();
+		switch (event.getType()) {
+
+		case ServiceEvent.MODIFIED:
+			log.info("Service Modification");
+			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service));
+			serviceList.add(service);
+			try {
+				serviceList.add(service);
+				this.getServiceReg().registerServiceList(serviceList);
+			} catch (ServiceRegistrationException e) {
+				log.debug("Error while modifying service meta data");
+				e.printStackTrace();
+			}
+			break;
+		case ServiceEvent.REGISTERED:
+			log.info("Service Registered");			
+			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service));
+			serviceList.add(service);			
+			try {
+				this.getServiceReg().registerServiceList(serviceList);
+			} catch (ServiceRegistrationException e) {
+				log.debug("Error while persisting service meta data");
+				e.printStackTrace();
+			}
+			break;
+		case ServiceEvent.UNREGISTERING:
+			log.info("Service Unregistered");			
+			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service));
+			serviceList.add(service);
+			try {
+				this.getServiceReg().unregisterServiceList(serviceList);
+			} catch (ServiceRegistrationException e) {
+				log.debug("Error while removing service meta data");
+				e.printStackTrace();
+			}
 		}
 	}
 }
