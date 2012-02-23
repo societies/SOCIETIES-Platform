@@ -432,16 +432,50 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 			
 		else { //non-extensive check, every few minutes or so.
 			if (linkedCss != null) {
-				interactedCssIDs = getIDsOfInteractingCsss(new Timestamp(new Date().getTime() - 300000).toString(), new Timestamp(new Date().getTime()).toString());
+				interactedCssIDs = getIDsOfInteractingCsss(new Timestamp(new Date().getTime() - 200000).toString(), new Timestamp(new Date().getTime()).toString());
 				//retrieve recent history of certain kinds of context data on CSS user and inter-CSS connections 
 				//amongst their immediate connection neighbourhood as possible.
 				
+				Future<List<CtxIdentifier>> localCssFuture = null;
 				try {
-					userContextBroker.lookup(CtxModelType.ATTRIBUTE, "local CSSs");
+					localCssFuture = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "local CSSs");
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
+				while (localCssFuture == null) {
+					continue;
+				}
+				
+				List<CtxIdentifier> temporaryLocalCsss = null;
+				
+				try {
+					temporaryLocalCsss = localCssFuture.get();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				/**for (int i = 0; i < temporaryLocalCsss.size(); i++) {
+					if (userCssDirectory.findForAllCss().contains(temporaryLocalCsss.get(i))) {
+						if (userCiss.contains(CisRecord(null, null, "friends", null, null, null, null, null, null))) {
+							if (it has a sub-CIS defined on this location) {
+								not create
+							}
+							else {
+								create
+							}
+							}
+						}
+					}
+					do for all other attributes: family, workers, interest?, CSS directory (personal and mutual if there is one)
+					then do this for service interaction, same process
+				}*/
+				
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				//historyOfLocalCsss.add(thisResult);
 				//ArrayList<Identity> people = userCssDirectory.getContextMatchingCsss(list);
@@ -482,6 +516,17 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				}
 				
 				//boolean flag doneLocalVicinityCheckRecently = false;
+				
+				//now we compare all the suggested CISs to see if they should sub-CIS etc.
+				//each-other, using layering principles:
+				
+				//If location was suggested and same people interact with service there also suggested,
+				//then if one has existed before the other, make that the CIS and the other the super-CIS,
+				//else make one CIS on both relations if always tied together, else keep them separate
+				
+				//APIs not yet available to achieve ...
+				//Need APIs: get CISs that match *only* certain members of member criteria,
+				//get CISs that contain at least the specified query, etc.
 				
 			}
 		}
@@ -530,6 +575,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 		}
 		
 	}
+	
 	
 	public boolean isSituationSuggestiveOfTemporaryCISCreation() {
 		boolean tempCisPossibility = true;
