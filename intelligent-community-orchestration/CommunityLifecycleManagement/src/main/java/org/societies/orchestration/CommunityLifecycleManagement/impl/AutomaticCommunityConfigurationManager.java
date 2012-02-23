@@ -92,7 +92,7 @@ import java.util.List;
 public class AutomaticCommunityConfigurationManager //implements ICommCallback
 {
 	
-	private Identity linkedCss; // No datatype yet defined for CSS
+	private Identity linkedCss;
 	
     private CisRecord linkedCis;
     
