@@ -32,6 +32,13 @@
  */
 
 package org.societies.api.internal.cis.collaboration;
+/**
+ * Added here to save information about CIS subscriptions, e.g. how often to inform,
+ * how to inform, etc.
+ * 
+ * @author Babak Farshchian
+ * @version 0
+ */
 
 public class CisSubscriptionRecord {
 	private String cssId, cisId, subscriptionMode;

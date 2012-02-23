@@ -23,6 +23,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+package org.societies.api.internal.cis.management;
 /**
  * We use the definition of an Activity from www.activitystrea.ms. "The Activity
  * in ActivityStreams is a description of an action that was performed (the verb)
@@ -33,7 +34,6 @@
  * @author Babak Farshchian
  * @version 0
  */
-package org.societies.api.internal.cis.management;
 
 public class CisActivity {
 	public String verb;
