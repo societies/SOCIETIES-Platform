@@ -24,22 +24,28 @@
  */
 package org.societies.comm.examples.clientcommand;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.comm.xmpp.datatypes.IdentityType;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.IIdentityManager;
+import org.societies.comm.xmpp.event.PubsubEvent;
+import org.societies.comm.xmpp.interfaces.IdentityManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
-import org.societies.comm.xmpp.interfaces.IdentityManager;
 import org.societies.example.fortunecookie.IWisdom;
 import org.societies.example.fortunecookieservice.schema.Cookie;
+import org.societies.example.fortunecookieservice.schema.FortuneCookieBean;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -50,11 +56,11 @@ import org.w3c.dom.Node;
  * @author aleckey
  *
  */
-public class PubsubTest implements Runnable, Subscriber {
+public class TestExternalEventing implements Runnable, org.societies.api.comm.xmpp.pubsub.Subscriber {
 	private static final String PUBSUB_NODE_NAME = "Fortune_Cookies";
 	private static final String PUBSUB_NODE_DESC = "SOCIETIES Fortune Cookie Publishing Service";
 	
-	private PubsubClient pubSubManager;
+	private org.societies.api.comm.xmpp.pubsub.PubsubClient pubSubManager;
 	private IIdentityManager idManager;
 	private IWisdom fcGenerator;
 	
@@ -76,7 +82,7 @@ public class PubsubTest implements Runnable, Subscriber {
 	}
 	
 	//CONSTRUCTOR
-	public PubsubTest() {
+	public TestExternalEventing() {
 		idManager = new IdentityManager();
 	}
 
@@ -92,6 +98,17 @@ public class PubsubTest implements Runnable, Subscriber {
 			e.printStackTrace();
 		} catch (CommunicationException e) {
 			e.printStackTrace();
+		}
+		
+		//ADD LIST OF PACKAGES TO ADD SCHEMA OBJECTS
+		List<String> packageList = new ArrayList<String>();
+		packageList.add("org.societies.api.schema.calculator");
+		packageList.add("org.societies.api.schema.fortunecookie");
+		try {
+			pubSubManager.addJaxbPackages(packageList);
+		} catch (JAXBException e1) {
+			//ERROR RESOLVING PACKAGE NAMES - CHECK PATH IS CORRECT
+			e1.printStackTrace();
 		}
 		
 		//GET A LIST OF PUBSUB TOPICS (at root level)
@@ -131,32 +148,12 @@ public class PubsubTest implements Runnable, Subscriber {
 			} catch (ExecutionException e) {
 				e.printStackTrace();
 			}
-			String itemId = String.valueOf(cookie.getId());
-			String text = cookie.getValue();
 			
-			//BUILD THE PUB-SUB ELEMENT
-			/*<FortuneCookie>
-			 *    <wisdom>some text</wisdom
-			 *</FortuneCookie>
-			 */ 
-			Document doc; Element entry = null;
-			try {
-				doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-				entry = doc.getDocumentElement();
-				
-				Node title = doc.createElementNS("http://societies.org/example/schema/fortunecookie", "FortuneCookie");
-				Node wisdom = doc.createElement("wisdom"); 
-				wisdom.setNodeValue(text);
-				entry.appendChild(title);
-				entry.appendChild(wisdom);
-			} catch (ParserConfigurationException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
+			PubsubEvent payload = new PubsubEvent(this, cookie);
+			String itemID = String.valueOf(cookie.getId());
 			//PUBLISH
 			try {
-				String published = pubSubManager.publisherPublish(pubsubID, PUBSUB_NODE_NAME, itemId, entry);
+				String published = pubSubManager.publisherPublish(pubsubID, PUBSUB_NODE_NAME, itemID, payload);
 				System.out.println(published);
 			} catch (XMPPError e) {
 				e.printStackTrace();
@@ -167,12 +164,15 @@ public class PubsubTest implements Runnable, Subscriber {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.pubsub.Subscriber#pubsubEvent(org.societies.api.comm.xmpp.datatypes.Identity, java.lang.String, java.lang.String, org.w3c.dom.Element)*/
+	 * @see org.societies.api.comm.xmpp.pubsub.Subscriber#pubsubEvent(org.societies.api.comm.xmpp.datatypes.Identity, java.lang.String, java.lang.String, java.lang.Object) */
 	@Override
 	public void pubsubEvent(Identity pubsubService, String node, String itemId, Object item) {
 		System.out.println("New info published on topic" + node);
 		System.out.println("ID: " + itemId);
-		System.out.println("Detail: " + item);
-	}
-
+		//CHECK WHAT PAYLOAD IS
+		if (item.getClass().equals(Cookie.class)) {
+			Cookie cookie = (Cookie)item;
+			System.out.println("Wisdom: " + cookie.getValue());
+		}		
+	}	
 }

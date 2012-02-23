@@ -28,6 +28,7 @@ package org.societies.comm.examples.clientcommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.example.calculator.ICalc;
 import org.societies.example.IExamplesCallback;
 import org.societies.example.calculator.ICalcRemote;
 import org.societies.example.fortunecookie.IWisdom;
@@ -58,7 +59,7 @@ public class ClientTester implements IExamplesCallback {
 	public void StartTest() {
 		//TEST SPRING EVENTING
 		System.out.println("Starting Spring Eventing Test");
-		SpringEventTest springTest = new SpringEventTest();
+		TestInternalEventing springTest = new TestInternalEventing();
 		Thread springThread = new Thread(springTest);
 		springThread.start();
 		
@@ -68,7 +69,7 @@ public class ClientTester implements IExamplesCallback {
 		System.out.println("Waiting...");
 		
 		//TEST PUBSUB
-		PubsubTest testPubSub = new PubsubTest();
+		TestExternalEventing testPubSub = new TestExternalEventing();
 		testPubSub.setFcGenerator(this.fcGenerator);
 		testPubSub.setPubSubManager(this.pubSubManager);
 		

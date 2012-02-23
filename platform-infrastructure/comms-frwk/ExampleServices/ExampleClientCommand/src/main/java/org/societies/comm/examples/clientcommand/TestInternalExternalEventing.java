@@ -24,9 +24,12 @@
  */
 package org.societies.comm.examples.clientcommand;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -48,7 +51,7 @@ import org.w3c.dom.Node;
  * @author aleckey
  *
  */
-public class EventClient implements Runnable, ApplicationListener<PubsubEvent> {
+public class TestInternalExternalEventing implements Runnable, ApplicationListener<PubsubEvent> {
 
 	private static final String EVENTING_NODE_NAME = "Fortune_Cookies";
 	private IIdentityManager idManager;
@@ -62,7 +65,7 @@ public class EventClient implements Runnable, ApplicationListener<PubsubEvent> {
 		this.fcGenerator = fcGenerator;
 	}
 	
-	public EventClient() {
+	public TestInternalExternalEventing() {
 		idManager = new IdentityManager();
 	}
 	
@@ -74,6 +77,17 @@ public class EventClient implements Runnable, ApplicationListener<PubsubEvent> {
 		
 		//SUBSCRIBE TO EVENTS - IMPLEMENT THE ApplicationListerner<PubsubEvent> interface
 		eventStream.addApplicationListener(this);
+		
+		//ADD LIST OF PACKAGES TO SUPPORT SCHEMA OBJECTS
+		List<String> packageList = new ArrayList<String>();
+		packageList.add("org.societies.api.schema.calculator");
+		packageList.add("org.societies.api.schema.fortunecookie");
+		try {
+			eventStream.addJaxbPackages(packageList);
+		} catch (JAXBException e1) {
+			//ERROR RESOLVING PACKAGE NAMES - CHECK PATH IS CORRECT
+			e1.printStackTrace();
+		}
 		
 		//EVERY 60 SEC, PUBLISH A NEW PIECE OF WISDOM
 		do {
@@ -91,32 +105,10 @@ public class EventClient implements Runnable, ApplicationListener<PubsubEvent> {
 				e.printStackTrace();
 			} catch (ExecutionException e) {
 				e.printStackTrace();
-			}
-			String itemId = String.valueOf(cookie.getId());
-			String text = cookie.getValue();
-			
-			//BUILD THE PUB-SUB ELEMENT
-			/*<FortuneCookie>
-			 *    <wisdom>some text</wisdom
-			 *</FortuneCookie>
-			 */ 
-			Document doc; Element entry = null;
-			try {
-				doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-				entry = doc.getDocumentElement();
-				
-				Node title = doc.createElementNS("http://societies.org/example/schema/fortunecookie", "FortuneCookie");
-				Node wisdom = doc.createElement("wisdom"); 
-				wisdom.setNodeValue(text);
-				entry.appendChild(title);
-				entry.appendChild(wisdom);
-			} catch (ParserConfigurationException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		
+			}			
+					
 			//GENERATE EVENT
-			PubsubEvent event = new PubsubEvent(this, entry);
+			PubsubEvent event = new PubsubEvent(this, cookie);
 			eventStream.multicastEvent(event);
 		} while (true);
 		
@@ -131,7 +123,8 @@ public class EventClient implements Runnable, ApplicationListener<PubsubEvent> {
 		System.out.println("Source service: " + eventDetails.getSource());
 		System.out.println("Event Datetime: " + eventDetails.getTimestamp());
 		
-		Object payload = eventDetails.getPayload();
-		System.out.println("Details: " + payload);
+		Cookie cookie = (Cookie)eventDetails.getPayload();
+		String wisdom = cookie.getValue();
+		System.out.println("Details: " + wisdom);
 	}	
 }

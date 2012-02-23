@@ -5,11 +5,11 @@ import java.util.Map;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-//import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
+/*import org.springframework.beans.factory.InitializingBean;
+import org.springframework.osgi.service.importer.OsgiServiceLifecycleListener;
 import org.springframework.osgi.bundle.BundleFactoryBean;
 import org.springframework.osgi.bundle.BundleAction;
-import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;
+import org.springframework.osgi.service.importer.support.OsgiServiceCollectionProxyFactoryBean;*/
 import org.springframework.osgi.context.*;
 
 
@@ -28,13 +28,13 @@ public class ServiceManagement implements BundleContextAware  {
 	
 	public void bind(Object arg0, @SuppressWarnings("rawtypes") Map arg1) throws Exception {
 		// TODO Auto-generated method stub		
-		BundleFactoryBean bndlfb;
+	//	BundleFactoryBean bndlfb;
 	//	bndlfb.getBundle();
-		BundleAction bndlac;
+	//	BundleAction bndlac;
 	//	bndlac.START
-		OsgiServiceCollectionProxyFactoryBean bb;
+	//	OsgiServiceCollectionProxyFactoryBean bb;
 		//bb.
-		BundleContext bc;
+	//	BundleContext bc;
 	//	bc.get
 		logger.info("bind method is called");
 	}
