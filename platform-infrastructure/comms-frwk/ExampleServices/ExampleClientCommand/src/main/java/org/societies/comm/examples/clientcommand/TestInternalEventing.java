@@ -38,9 +38,9 @@ import org.societies.comm.xmpp.event.InternalEvent;
  * @author aleckey
  *
  */
-public class SpringEventTest implements Runnable, ApplicationListener<InternalEvent> {
+public class TestInternalEventing implements Runnable, ApplicationListener<InternalEvent> {
 
-	private static Logger LOG = LoggerFactory.getLogger(SpringEventTest.class);
+	private static Logger LOG = LoggerFactory.getLogger(TestInternalEventing.class);
 	
 	/* (non-Javadoc)
 	 * @see org.springframework.context.ApplicationListener#onApplicationEvent(org.springframework.context.ApplicationEvent)  */
