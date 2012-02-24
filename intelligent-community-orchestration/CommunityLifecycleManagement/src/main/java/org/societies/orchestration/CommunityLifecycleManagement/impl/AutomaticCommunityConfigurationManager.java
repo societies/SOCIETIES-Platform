@@ -181,7 +181,27 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
 	    //}
 		
 		//If two unrelated CISs are similar, suggest merge
+		//for (int i = 0; i < cisRecords.size(); i++) {
+				//    CisRecord cisUnderAnalysis = cisRecords.get(i);
+				//    ArrayList<Identity> cisMembers = cisUnderAnalysis.getMembers();
+		        //    for (int m = i + 1; m < cisRecords.size(); m++) {
+				//        for (int n = 0; n < cisMembers.size(); n++) {
+				//            if (cisMembers.contains(cisRecords.get(i).getMembers())) {}
+				//                //make the suggestion to User Agent based on calcluation - see later
+				
+				//        }
+		        //    }
+			    //}
 		//If one CIS seems split into two or more, suggest split
+		//for (int i = 0; i < cisRecords.size(); i++) {
+				//    CisRecord cisUnderAnalysis = cisRecords.get(i);
+				//    ArrayList<Identity> cisMembers = cisUnderAnalysis.getMembers();
+				//    for (int i = 0; i < cisMembers.size(); i++) {
+				//        if (cisUnderAnalysis.getActivityFeed().getLastActivityForMember(cisMembers.get(i)).getTimestamp() < Time.current() - 240000000)
+				//            //make the suggestion to User Agent based on calcluation - see later
+				
+				//    }
+			    //}
 		
 		//invoke UserAgent suggestion GUI for configurations
 		//OR
