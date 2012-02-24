@@ -49,6 +49,14 @@
 					<id>societies</id>
 					<name>Societies Maven Repository</name>
 					<url>http://maven.ict-societies.eu/nexus/content/repositories/thirdparty/</url>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>daily</updatePolicy>
+					</releases>
+					<snapshots>
+						<enabled>true</enabled>
+						<updatePolicy>daily</updatePolicy>
+					</snapshots>
 				</repository>
 			</repositories>
 		</profile>
