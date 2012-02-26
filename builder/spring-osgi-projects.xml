@@ -41,8 +41,12 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 	<version>0.1</version>
 	<name>Spring OSGi Builder</name>
 
+
 	<!-- All Spring-OSGi Java projects to be included in nightly builds -->
 	<modules>
+        	<!-- Utilities -->
+        	<module>../utilities/DBC</module>
+
 		<!-- API -->
 		<module>../api/java/schema</module>
 		<module>../api/java/external</module>

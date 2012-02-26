@@ -23,13 +23,10 @@ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVI
 INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.interfaces;
+package org.societies.api.internal.css.management;
 
-import java.util.concurrent.Future;
+import org.societies.api.schema.cssmanagement.CssProfile;
 
-import org.societies.api.android.internal.model.AndroidCSSProfile;
-import org.societies.api.internal.css.management.CSSInterfaceResult;
-import org.societies.api.internal.css.management.CSSProfile;
 
 
 /**
@@ -45,154 +42,128 @@ import org.societies.api.internal.css.management.CSSProfile;
  * 6. Synchronise profile data
  * 7. Modify the CSS profile 
  * 
- * This interface will be implemented for android nodes. 
- *
+ * This interface will be implemented for rich and cloud nodes. This interface is used when calling the CSSManager
+ * on a different node.
  */
-public interface IAndroidCSSManager {
-	String methodsArray [] = {"registerXMPPServer(CSSProfile profile)",
-			"unregisterXMPPServer(CSSProfile profile)",
-			"loginXMPPServer(CSSProfile profile)",
-			"logoutXMPPServer(CSSProfile profile)",
-			"loginCSS(String client, AndroidCSSProfile profile)", 
-			"logoutCSS(String client, AndroidCSSProfile profile)",
-			"registerCSS(String client, AndroidCSSProfile profile)",
-			"unregisterCSS(String client, AndroidCSSProfile profile)",
-			"registerCSSDevice(String client, AndroidCSSProfile profile)",
-			"unregisterCSSDevice(String client, AndroidCSSProfile profile)",
-			"getAndroidCSSProfile(String client)",
-			"modifyAndroidCSSProfile(String client, AndroidCSSProfile profile)",
-			"changeCSSNodeStatus(String client, AndroidCSSProfile profile)",
-			"synchProfile(String client, AndroidCSSProfile profile)",
-			"setPresenceStatus(String client, AndroidCSSProfile profile)"};
-	/**
-	 * Register with chosen Domain Server
-	 * 
-	 * @param profile
-	 * @return AndroidCSSProfile
-	 */
-	AndroidCSSProfile registerXMPPServer(CSSProfile profile);
+public interface ICSSRemoteManager {
+
+	
+	 /**
+	  * Register with chosen Domain Server
+	  * 
+	  * @param profile
+	  * @param callback
+	  */
+	 void registerXMPPServer(CssProfile profile, ICSSManagerCallback callback);
 	/**
 	 * Unregister with chosen Domain Server
 	 * 
 	 * @param profile
-	 * @return AndroidCSSProfile
+	 * @param callback
 	 */
-	AndroidCSSProfile unregisterXMPPServer(CSSProfile profile);
+	void unregisterXMPPServer(CssProfile profile, ICSSManagerCallback callback);
 	/**
 	 * Login with chosen Domain server
 	 * 
 	 * @param profile
-	 * @return AndroidCSSProfile
+	 * @param callback
 	 */
-	AndroidCSSProfile loginXMPPServer(CSSProfile profile);
+	void loginXMPPServer(CssProfile profile, ICSSManagerCallback callback);
 	/**
 	 * Logout from chosen Domain server
 	 * 
 	 * @param profile
-	 * @return AndroidCSSProfile
+	 * @param callback
 	 */
-	AndroidCSSProfile logoutXMPPServer(CSSProfile profile);
+	void logoutXMPPServer(CssProfile profile, ICSSManagerCallback callback);
 
-	
-	/**
+	 /**
 	 * Login a user to a CSS. The registration of devices included in the profile
 	 * is implied.
 	 * 
-	 * @param client component package calling method
 	 * @param profile
-	 * @return AndroidCSSProfile
+	 * @param callback
 	 */
-	AndroidCSSProfile loginCSS(String client, AndroidCSSProfile profile);	
+	 void loginCSS(CssProfile profile, ICSSManagerCallback callback);	
 
 	/**
 	 * Logout the user from a CSS
 	 * 
-	 * @param client component package calling method
 	 * @param profile
-	 * @return AndroidCSSProfile
+	 * @param callback
 	 */
-	AndroidCSSProfile logoutCSS(String client, AndroidCSSProfile profile);	
+	 void logoutCSS(CssProfile profile, ICSSManagerCallback callback);	
 	
 	/**
 	 * Register a CSS
 	 * 
-	 * @param client component package calling method
 	 * @param profile
-	 * @return AndroidCSSProfile
+	 * @param callback
 	 */
-	AndroidCSSProfile registerCSS(String client, AndroidCSSProfile profile);
+	 void registerCSS(CssProfile profile, ICSSManagerCallback callback);
 
 	/**
 	 * Unregister the CSS
 	 * TODO Is a CSS deleted or made inactive
 	 * 
-	 * @param client component package calling method
 	 * @param profile
-	 * @return AndroidCSSProfile
+	 * @param callback
 	 */
-	AndroidCSSProfile unregisterCSS(String client, AndroidCSSProfile profile);
+	 void unregisterCSS(CssProfile profile, ICSSManagerCallback callback);
 
 	/**
 	 * Register a device(s) with a CSS
 	 * 
-	 * @param client component package calling method
 	 * @param profile
-	 * @return AndroidCSSProfile
+	 * @param callback
 	 */
-	AndroidCSSProfile registerCSSDevice(String client, AndroidCSSProfile profile);
+	 void registerCSSNode(CssProfile profile, ICSSManagerCallback callback);
 	/**
 	 * Unregister a device(s) from a CSS
 	 * 
-	 * @param client component package calling method
 	 * @param profile
-	 * @return AndroidCSSProfile
+	 * @param callback
 	 */
-	AndroidCSSProfile unregisterCSSDevice(String client, AndroidCSSProfile profile);
+	 void unregisterCSSNode(CssProfile profile, ICSSManagerCallback callback);
 	
 	/**
 	 * Get the CSS Profile. This operation will retrieve the local CSS Profile. 
 	 * If none exists or the local cache is deemed to have expired this will 
 	 * result in a synchronisation with the cloud node. 
 	 * 
-	 * @param client component package calling method
-	 * @param profile
-	 * @return AndroidCSSProfile
+	 * @param callback
 	 */
-	AndroidCSSProfile getAndroidCSSProfile(String client);
+	 void getCssProfile(ICSSManagerCallback callback);
 
 	/**
 	 * Modify the CSS Profile
 	 * 
-	 * @param client component package calling method
 	 * @param profile
-	 * @return AndroidCSSProfile
+	 * @param callback
 	 */
-	AndroidCSSProfile modifyAndroidCSSProfile(String client, AndroidCSSProfile profile);
+	 void modifyCssProfile(CssProfile profile, ICSSManagerCallback callback);
 	/**
 	 * Change the status a CSS device
 	 * 
-	 * @param client component package calling method
 	 * @param profile
-	 * @return AndroidCSSProfile
+	 * @param callback
 	 */
-	AndroidCSSProfile changeCSSNodeStatus(String client, AndroidCSSProfile profile);
+	 void changeCSSNodeStatus(CssProfile profile, ICSSManagerCallback callback);
 	
 	/**
 	 * Synchronise the CSS profile. The CSS cloud node's current profile is synchronised
 	 * with the local device's cached version
 	 * 
-	 * @param client component package calling method
 	 * @param profile
-	 * @return AndroidCSSProfile
+	 * @param callback
 	 */
-	AndroidCSSProfile synchProfile(String client, AndroidCSSProfile profile);
+	 void synchProfile(CssProfile profile, ICSSManagerCallback callback);
 	
 	/**
 	 * Set the presence status of the user
 	 * 
-	 * @param client component package calling method
 	 * @param profile
-	 * @return AndroidCSSProfile
+	 * @param callback
 	 */
-	AndroidCSSProfile setPresenceStatus(String client, AndroidCSSProfile profile);
+	 void setPresenceStatus(CssProfile profile, ICSSManagerCallback callback);
 }

@@ -25,12 +25,33 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.api.internal.css.management;
 
-import org.societies.api.schema.cssmanagement.CssInterfaceResult;
+import org.societies.api.schema.cssmanagement.CssProfile;
+
 
 /**
- * Callback interface for CSS Manager
+ * Result class that is supplied by implementations of {@link ICSSRemoteManager}
  *
  */
-public interface ICSSManagerCallback {
-	void receiveResult(CssInterfaceResult result); 
+public class CSSInterfaceResult {
+	private boolean resultStatus;
+	
+	private CssProfile profile;
+
+	public boolean isResultStatus() {
+		return resultStatus;
+	}
+
+	public void setResultStatus(boolean resultStatus) {
+		this.resultStatus = resultStatus;
+	}
+
+	public CssProfile getProfile() {
+		return profile;
+	}
+
+	public void setProfile(CssProfile profile) {
+		this.profile = profile;
+	}
+	
+	
 }
