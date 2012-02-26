@@ -93,6 +93,12 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		
 		<!-- Security and Dependability Mgmt -->
 
+		<!-- CSS Mgmt -->
+
+		<module>../css-modules/css-mgmt/cssCommsMgmt</module>
+		<module>../css-modules/css-mgmt/cssmgmt</module>
+		<module>../css-modules/css-mgmt/TestccsCommsMgmt</module>
+
 		<!--  CIS Mgmt -->
 		<module>../cis-modules/cis-management/cis-manager/cis-manager/</module>
 		<module>../cis-modules/cis-discovery/</module>
