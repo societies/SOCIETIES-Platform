@@ -54,6 +54,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 //import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 //import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.model.ExpProposalContent;
 
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxEntity;
@@ -560,11 +561,11 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 	
 	public ArrayList<CisRecord> getUserFeedbackOnCreation(ArrayList<CisRecord> cissToCreate) {
 		ArrayList<CisRecord> finalisedCiss = null;
-		List<String> options = new ArrayList<String>();
-		options.add("options");
+		String[] options = new String[1];
+		options[0] = "options";
 		String userResponse = null;
 		boolean responded = false;
-		//userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs may benefit you. If you would like to create one or more of these CISs, please check them.", options), userFeedbackCallback);
+		userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs may benefit you. If you would like to create one or more of these CISs, please check them.", options));
 		for (int i = 0; i < 300; i++) {
 		    if (userResponse == null)
 				try {
