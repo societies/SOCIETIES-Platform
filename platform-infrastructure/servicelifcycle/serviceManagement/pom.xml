@@ -43,6 +43,15 @@
 				<role>owner, developer</role>
 			</roles>
 		</developer>
+		<developer>
+			<id>sanchocsa</id>
+			<name>Sancho</name>
+			<email>sanchocsa@gmail.com</email>
+			<organization>PTIN</organization>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>		
 	</developers>
 
 	<parent>
@@ -100,13 +109,7 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>

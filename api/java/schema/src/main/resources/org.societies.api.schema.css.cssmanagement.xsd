@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema	elementFormDefault="qualified" version="1.0" 
+			targetNamespace="http://societies.org/api/schema/cssmanagement" 
+			xmlns:tns="http://societies.org/api/schema/cssmanagement" 
+			xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:complexType name="cssNode">
+    <xs:sequence>
+      <xs:element name="identity" type="xs:string" minOccurs="0"/>
+      <xs:element name="status" type="xs:int"/>
+      <xs:element name="type" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="cssManagerMessageBean">
+   <xs:complexType>
+    <xs:sequence>
+      <xs:element name="method" type="tns:methodType" minOccurs="0"/>
+      <xs:element name="profile" type="tns:cssProfile" minOccurs="0"/>
+    </xs:sequence>
+   </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="cssProfile">
+    <xs:sequence>
+      <xs:element name="archiveCSSNodes" type="tns:cssNode" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="cssHostingLocation" type="xs:string" minOccurs="0"/>
+      <xs:element name="cssIdentity" type="xs:string" minOccurs="0"/>
+      <xs:element name="cssInactivation" type="xs:string" minOccurs="0"/>
+      <xs:element name="cssNodes" type="tns:cssNode" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="cssRegistration" type="xs:string" minOccurs="0"/>
+      <xs:element name="cssUpTime" type="xs:int"/>
+      <xs:element name="domainServer" type="xs:string" minOccurs="0"/>
+      <xs:element name="emailID" type="xs:string" minOccurs="0"/>
+      <xs:element name="entity" type="xs:int"/>
+      <xs:element name="foreName" type="xs:string" minOccurs="0"/>
+      <xs:element name="homeLocation" type="xs:string" minOccurs="0"/>
+      <xs:element name="identityName" type="xs:string" minOccurs="0"/>
+      <xs:element name="imID" type="xs:string" minOccurs="0"/>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+      <xs:element name="password" type="xs:string" minOccurs="0"/>
+      <xs:element name="presence" type="xs:int"/>
+      <xs:element name="sex" type="xs:int"/>
+      <xs:element name="socialURI" type="xs:string" minOccurs="0"/>
+      <xs:element name="status" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="cssInterfaceResult">
+    <xs:sequence>
+      <xs:element name="profile" type="tns:cssProfile" minOccurs="0"/>
+      <xs:element name="resultStatus" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="cssManagerResultBean">
+   <xs:complexType>
+    <xs:sequence>
+      <xs:element name="result" type="tns:cssInterfaceResult" minOccurs="0"/>
+    </xs:sequence>
+   </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="nodeStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Available"/>
+      <xs:enumeration value="Unavailable"/>
+      <xs:enumeration value="Hibernating"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="nodeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Android"/>
+      <xs:enumeration value="Cloud"/>
+      <xs:enumeration value="Rich"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="methodType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="registerXMPPServer"/>
+      <xs:enumeration value="unregisterXMPPServer"/>
+      <xs:enumeration value="loginXMPPServer"/>
+      <xs:enumeration value="logoutXMPPServer"/>
+      <xs:enumeration value="loginCSS"/>
+      <xs:enumeration value="logoutCSS"/>
+      <xs:enumeration value="registerCSS"/>
+      <xs:enumeration value="unregisterCSS"/>
+      <xs:enumeration value="registerCSSNode"/>
+      <xs:enumeration value="unregisterCSSNode"/>
+      <xs:enumeration value="getCSSProfile"/>
+      <xs:enumeration value="modifyCSSProfile"/>
+      <xs:enumeration value="changeCSSNodeStatus"/>
+      <xs:enumeration value="synchProfile"/>
+      <xs:enumeration value="setPresenceStatus"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="cssStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Active"/>
+      <xs:enumeration value="Inactive"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="entityType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Person"/>
+      <xs:enumeration value="Organisation"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="genderType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Male"/>
+      <xs:enumeration value="Female"/>
+      <xs:enumeration value="Unspecified"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="presenceType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Available"/>
+      <xs:enumeration value="DoNotDisturb"/>
+      <xs:enumeration value="Offline"/>
+      <xs:enumeration value="Away"/>
+      <xs:enumeration value="ExtendedAway"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+
