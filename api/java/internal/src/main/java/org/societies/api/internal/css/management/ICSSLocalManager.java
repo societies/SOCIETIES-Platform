@@ -25,6 +25,11 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.api.internal.css.management;
 
+import java.util.concurrent.Future;
+
+import org.societies.api.schema.cssmanagement.CssInterfaceResult;
+import org.societies.api.schema.cssmanagement.CssProfile;
+
 
 /**
  * 
@@ -39,110 +44,127 @@ package org.societies.api.internal.css.management;
  * 6. Synchronise profile data
  * 7. Modify the CSS profile 
  * 
- * This interface will be implemented for rich and cloud nodes. It is assumed that methods
- * that modify the CSS profile will actually be implemented on the cloud node. As a result, 
- * there will be two implementations of this interface.
- *
+ * This interface will be implemented for rich and cloud nodes. This interface is used when calling the CSSManager
+ * on a different node.
  */
-public interface ICSSManager {
+public interface ICSSLocalManager {
 
+	
+	 /**
+	  * Register with chosen Domain Server
+	  * 
+	  * @param profile
+	 * @return Future<CssInterfaceResult>
+	  */
+	 Future<CssInterfaceResult> registerXMPPServer(CssProfile profile);
 	/**
-	 * Login a user to a CSS. The registration of devices included in the profile
-	 * is implied.
+	 * Unregister with chosen Domain Server
 	 * 
 	 * @param profile
-	 * @param callback
-	 * @return boolean operation successful
+	 * @return Future<CssInterfaceResult>
 	 */
-	boolean loginCSS(CSSProfile profile, ICSSManagerCallback callback);	
+	 Future<CssInterfaceResult> unregisterXMPPServer(CssProfile profile);
+	/**
+	 * Login with chosen Domain server
+	 * 
+	 * @param profile
+	 * @return Future<CssInterfaceResult>
+	 */
+	 Future<CssInterfaceResult> loginXMPPServer(CssProfile profile);
+	/**
+	 * Logout from chosen Domain server
+	 * 
+	 * @param profile
+	 * @return Future<CssInterfaceResult>
+	 */
+	 Future<CssInterfaceResult> logoutXMPPServer(CssProfile profile);
+
+	 /**
+	 * Login a user to a CSS. 
+	 * 
+	 * @param profile
+	 * @return Future<CssInterfaceResult>
+	 */
+	 Future<CssInterfaceResult> loginCSS(CssProfile profile);	
 
 	/**
 	 * Logout the user from a CSS
 	 * 
 	 * @param profile
-	 * @param callback
-	 * @return boolean operation successful
+	 * @return Future<CssInterfaceResult>
 	 */
-	boolean logoutCSS(CSSProfile profile, ICSSManagerCallback callback);	
+	 Future<CssInterfaceResult> logoutCSS(CssProfile profile);	
 	
 	/**
 	 * Register a CSS
 	 * 
 	 * @param profile
-	 * @param callback
-	 * @return boolean operation successful
+	 * @return Future<CssInterfaceResult>
 	 */
-	boolean registerCSS(CSSProfile profile, ICSSManagerCallback callback);
+	 Future<CssInterfaceResult> registerCSS(CssProfile profile);
 
 	/**
 	 * Unregister the CSS
 	 * TODO Is a CSS deleted or made inactive
 	 * 
 	 * @param profile
-	 * @param callback
-	 * @return boolean operation successful
+	 * @return Future<CssInterfaceResult>
 	 */
-	boolean unregisterCSS(CSSProfile profile, ICSSManagerCallback callback);
+	 Future<CssInterfaceResult> unregisterCSS(CssProfile profile);
 
 	/**
 	 * Register a device(s) with a CSS
 	 * 
-	 * @param profile containing device(s) to register with CSS
-	 * @param callback
-	 * @return boolean operation successful
+	 * @param profile
+	 * @return Future<CssInterfaceResult>
 	 */
-	boolean registerCSSDevice(CSSProfile profile, ICSSManagerCallback callback);
+	 Future<CssInterfaceResult> registerCSSNode(CssProfile profile);
 	/**
 	 * Unregister a device(s) from a CSS
 	 * 
-	 * @param profile containing device(s) to unregister with CSS
-	 * @param callback
-	 * @return boolean operation successful
+	 * @param profile
+	 * @return Future<CssInterfaceResult>
 	 */
-	boolean unregisterCSSDevice(CSSProfile profile, ICSSManagerCallback callback);
+	 Future<CssInterfaceResult> unregisterCSSNode(CssProfile profile);
 	
 	/**
 	 * Get the CSS Profile. This operation will retrieve the local CSS Profile. 
 	 * If none exists or the local cache is deemed to have expired this will 
 	 * result in a synchronisation with the cloud node. 
 	 * 
-	 * @param callback
-	 * @return CSSProfile current CSS profile
+	 * @return Future<CssInterfaceResult>
 	 */
-	CSSProfile getCSSProfile(ICSSManagerCallback callback);
+	 Future<CssInterfaceResult> getCssProfile();
 
 	/**
 	 * Modify the CSS Profile
 	 * 
 	 * @param profile
-	 * @return boolean operation successful
+	 * @return Future<CssInterfaceResult>
 	 */
-	boolean modifyCSSProfile(CSSProfile profile);
+	 Future<CssInterfaceResult> modifyCssProfile(CssProfile profile);
 	/**
 	 * Change the status a CSS device
 	 * 
 	 * @param profile
-	 * @param callback
-	 * @return boolean operation successful
+	 * @return Future<CssInterfaceResult>
 	 */
-	boolean changeCSSNodeStatus(CSSProfile profile, ICSSManagerCallback callback);
+	 Future<CssInterfaceResult> changeCSSNodeStatus(CssProfile profile);
 	
 	/**
 	 * Synchronise the CSS profile. The CSS cloud node's current profile is synchronised
 	 * with the local device's cached version
 	 * 
 	 * @param profile
-	 * @param callback
-	 * @return boolean operation successful
+	 * @return Future<CssInterfaceResult>
 	 */
-	boolean synchProfile(CSSProfile profile, ICSSManagerCallback callback);
+	 Future<CssInterfaceResult> synchProfile(CssProfile profile);
 	
-	/**
-	 * Set the presence status of the user
-	 * 
-	 * @param profile
-	 * @param callback
-	 * @return boolean operation successful
-	 */
-	boolean setPresenceStatus(CSSProfile profile, ICSSManagerCallback callback);
+	 /**
+	  * Set the presence status of the user
+	  * 
+	  * @param profile
+	  * @return Future<CssInterfaceResult>
+	  */
+	 Future<CssInterfaceResult> setPresenceStatus(CssProfile profile);
 }
