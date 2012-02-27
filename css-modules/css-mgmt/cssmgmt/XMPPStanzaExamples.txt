@@ -1,0 +1,48 @@
+<iq type="result" id="86bfe550-ef3d-4d1e-a121-a4d0b687dfe3" to="xcmanager.societies.local" from="xcmanager.societies.local">
+	<cssManagerResultBean xmlns="http://societies.org/api/schema/cssmanagement">
+	<result>
+		<profile>
+			<cssRegistration>2012-02-23</cssRegistration>
+			<cssUpTime>0</cssUpTime>
+			<entity>0</entity>
+			<name>TestCSS</name>
+			<presence>0</presence>
+			<sex>0</sex>
+			<status>0</status>
+		</profile>
+		<resultStatus>true</resultStatus>
+	</result>
+	</cssManagerResultBean>
+</iq>
+
+<iq type="result" id="86bfe550-ef3d-4d1e-a121-a4d0b687dfe3" to="xcmanager.societies.local" from="xcmanager.societies.local">
+	<cssManagerResultBean xmlns="http://societies.org/api/schema/cssmanagement">
+		<result>
+		<profile>
+			<cssRegistration>2012-02-23</cssRegistration>
+			<cssUpTime>0</cssUpTime>
+			<entity>0</entity>
+			<name>TestCSS</name>	
+			<presence>0</presence>
+			<sex>0</sex>
+			<status>0</status>
+		</profile>
+		<resultStatus>true</resultStatus>
+		</result>
+	</cssManagerResultBean>
+</iq>
+
+
+<iq type="get" id="86bfe550-ef3d-4d1e-a121-a4d0b687dfe3" to="xcmanager.societies.local" from="xcmanager.societies.local">
+	<cssManagerMessageBean xmlns="http://societies.org/api/schema/cssmanagement">
+		<method>registerXMPPServer</method>	
+		<profile>
+			<cssUpTime>0</cssUpTime>	
+			<entity>0</entity>
+			<presence>0</presence>
+			<sex>0</sex>
+			<status>0</status>	
+		</profile>
+	</cssManagerMessageBean>
+</iq>
+

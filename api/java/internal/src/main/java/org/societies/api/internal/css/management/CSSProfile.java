@@ -110,7 +110,15 @@ public class CSSProfile {
 	
 	};
 	
+	/**
+	 * User's chosen domain server
+	 */
+	String domainServer = null;
 	
+	/**
+	 * User's CSS hosting location
+	 */
+	String cssHostingLocation = null;
 	/**
 	 * is the CSS a person or organisation ?
 	 */
@@ -198,6 +206,22 @@ public class CSSProfile {
 	 */
 	public CSSProfile() {
 		
+	}
+
+	public String getDomainServer() {
+		return domainServer;
+	}
+
+	public void setDomainServer(String domainServer) {
+		this.domainServer = domainServer;
+	}
+
+	public String getCssHostingLocation() {
+		return cssHostingLocation;
+	}
+
+	public void setCssHostingLocation(String cssHostingLocation) {
+		this.cssHostingLocation = cssHostingLocation;
 	}
 
 	public int getEntity() {
@@ -343,7 +367,6 @@ public class CSSProfile {
 	public void setPresence(int presence) {
 		this.presence = presence;
 	}
-
 
 
 }

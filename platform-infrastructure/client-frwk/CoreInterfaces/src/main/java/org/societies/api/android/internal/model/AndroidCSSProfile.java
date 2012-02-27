@@ -50,6 +50,8 @@ public class AndroidCSSProfile extends CSSProfile implements Parcelable {
 	 * @param in parcel
 	 */
 	private AndroidCSSProfile(Parcel in) {
+		setDomainServer(in.readString());
+		setCssHostingLocation(in.readString());
 		setEntity(in.readInt());
 		setForeName(in.readString());
 		setName(in.readString());
@@ -80,6 +82,8 @@ public class AndroidCSSProfile extends CSSProfile implements Parcelable {
 	 * properties must be written in exact sequence as private constructor
 	 */
 	public void writeToParcel(Parcel out, int flags) {
+		out.writeString(getDomainServer());
+		out.writeString(getCssHostingLocation());
 		out.writeInt(getEntity());
 		out.writeString(getForeName());
 		out.writeString(getName());
