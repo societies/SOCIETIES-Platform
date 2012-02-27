@@ -67,6 +67,7 @@ public class GetLightLevelAction implements IAction {
 	public Dictionary<String, String> invokeAction(Dictionary<String, String> arguments) {
 	
 		Long lightLevel = deviceDriverExample.getLightLevel(macAddress);
+		
 		Hashtable result = new Hashtable();
 		result.put(OUTPUT_LIGHT_LEVEL, lightLevel);
 		return result;

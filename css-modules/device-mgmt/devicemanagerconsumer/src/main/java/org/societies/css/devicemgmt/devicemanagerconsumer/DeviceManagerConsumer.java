@@ -22,30 +22,48 @@ public class DeviceManagerConsumer {
 		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device manager consumer constructor");
 	}
 	
+	public IDevice getDeviceService()
+	{
+		return deviceService;
+	}
+	
 	public void setDeviceService(IDevice deviceService)
 	{
 		//LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% deviceService pre injection ");
 		
 		this.deviceService=deviceService;
-		
-		
-		//LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% deviceService post injection ");
-		
-		
-		IDeviceService ds = deviceService.getService("lightSensor1");
-		
-		//LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% post deviceService.getService ");
-		
+
+	}
+	
+	public void initConsumer()
+	{
+		IDeviceService ds = getDeviceService().getService("lightSensor1");
+				
+				
 		IAction ia = ds.getAction("getLightLevel");
 		
 		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% post ds.getAction ");
-		
-		Dictionary<String, String> dic = ia.invokeAction(null);
-		
+				
 		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% post ia.invokeAction ");
-
 		LOG.info("DeviceMgmtConsumer: " + "================++++++++++------ Action Name is: "+ ia.getName());
-		LOG.info("DeviceMgmtConsumer: " + "================++++++++++------ Action Return is: "+ dic.get("lightLevel")); 
+				
+		int a = 1, b=2;
+		while (a<2) 
+		{
+			try 
+			{
+
+				Dictionary dic = ia.invokeAction(null);
+				LOG.info("DeviceMgmtConsumer: " + "================++++++++++------ Action Return is: "+ dic.get("outputLightLevel")); 
+				Thread.sleep(4000);
+			} 
+			catch (InterruptedException e) 
+			{
+						
+				e.printStackTrace();
+			}
+				
+		}
 	}
 
 }

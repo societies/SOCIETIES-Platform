@@ -145,6 +145,8 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 	
 	public Long getLightLevel (String deviceMacAdress){
 		
+		LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceDriverExample info: getLightLevel " + lightLevel);
+		
 		return lightLevel;
 	}
 
