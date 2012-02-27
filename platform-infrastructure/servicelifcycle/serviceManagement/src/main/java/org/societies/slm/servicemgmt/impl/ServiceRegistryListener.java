@@ -105,7 +105,13 @@ public class ServiceRegistryListener implements BundleContextAware,
 				+ serBndl.getSymbolicName());
 
 		Service service = (Service) event.getServiceReference().getProperty(
-				"ServiceMetaModel");		
+				"ServiceMetaModel");
+		
+		if(service==null || (!(service instanceof Service) )){
+			log.info("**Service MetadataModel object is null**");
+			return;
+		}
+		
 		List<Service> serviceList = new ArrayList<Service>();
 		switch (event.getType()) {
 
@@ -113,35 +119,35 @@ public class ServiceRegistryListener implements BundleContextAware,
 			log.info("Service Modification");
 			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service));
 			serviceList.add(service);
-			try {
+			/*try {
 				serviceList.add(service);
 				this.getServiceReg().registerServiceList(serviceList);
 			} catch (ServiceRegistrationException e) {
 				log.debug("Error while modifying service meta data");
 				e.printStackTrace();
-			}
+			}*/
 			break;
 		case ServiceEvent.REGISTERED:
 			log.info("Service Registered");			
 			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service));
 			serviceList.add(service);			
-			try {
+			/*try {
 				this.getServiceReg().registerServiceList(serviceList);
 			} catch (ServiceRegistrationException e) {
 				log.debug("Error while persisting service meta data");
 				e.printStackTrace();
-			}
+			}*/
 			break;
 		case ServiceEvent.UNREGISTERING:
 			log.info("Service Unregistered");			
 			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service));
 			serviceList.add(service);
-			try {
+			/*try {
 				this.getServiceReg().unregisterServiceList(serviceList);
 			} catch (ServiceRegistrationException e) {
 				log.debug("Error while removing service meta data");
 				e.printStackTrace();
-			}
+			}*/
 		}
 	}
 }

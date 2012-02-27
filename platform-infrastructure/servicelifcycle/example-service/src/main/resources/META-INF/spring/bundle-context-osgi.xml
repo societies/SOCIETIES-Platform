@@ -11,21 +11,7 @@
 -->
 	<osgi:reference id="serviceMgmtRef"
 		interface="org.societies.api.internal.servicelifecycle.serviceMgmt.IServiceManagement" />
-<!-- 
-	<osgi:service ref="addService"
-		interface="org.societies.example.service.api.IAddService">
-		<osgi:service-properties>
-			<entry key="TargetPlatform" value="SOCIETIES" />
-			<entry key="serviceName" value="Add Service"/>
-			<entry key="version" value="v1.10a"/>
-			<entry key="serviceDescription" value="Adds two numbers"/>
-			<entry key="CSSIDInstalled" value="MyCSSIDequalJID@mydomain.org"/>
-			<entry key="authorSignature" value="mySignature"/>
-			<entry key="serviceType" value="ThirdPartyService"/>
-			<entry key="serviceLocation" value="Local"/>						
-		</osgi:service-properties>		
-	</osgi:service>
--->
+
 	<osgi:service ref="addService"
 		interface="org.societies.api.internal.servicelifecycle.IAddService">
 		<osgi:service-properties>
