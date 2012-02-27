@@ -93,38 +93,20 @@ public interface IDevice {
      */
     public boolean isContextSource();
     
+    
     /**
      * 
-     * @param actionName
-     * @return null if no action matches the argument actionName.
+     * @param serviceId
+     * @return
      */
-    public IAction getAction (String actionName);
+    public IDeviceService getService (String serviceId);
+    
     
     /**
      * 
      * @return
-     */
-    public List<IAction> getActions();
-    
-    /**
      * 
-     * @param stateVariableName
-     * @return null if no state variable matches the agrument stateVariableName
      */
-    public IDeviceStateVariable getStateVariable (String stateVariableName);
-    
-    /**
-     * 
-     * @return
-     */
-    public List<IDeviceStateVariable> getStateVariables ();
-    
-    
-    
-    
-    
-    
-    
-    
+    public IDeviceService[] getServices ();
 
 }
