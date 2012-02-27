@@ -25,6 +25,7 @@
 
 package org.societies.css.devicemgmt.devicemanager.impl;
 
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
@@ -36,9 +37,9 @@ import org.osgi.framework.ServiceRegistration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.css.devicemgmt.IAction;
+
 import org.societies.api.css.devicemgmt.IDevice;
-import org.societies.api.css.devicemgmt.IDeviceStateVariable;
+import org.societies.api.css.devicemgmt.IDeviceService;
 import org.societies.api.css.devicemgmt.model.DeviceMgmtConstants;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 
@@ -56,12 +57,14 @@ public class DeviceImpl implements IDevice{
 	private String deviceId;
 	private boolean status;
 
+
 	public DeviceImpl(BundleContext bc, DeviceManager deviceMgr, String deviceId, DeviceCommonInfo deviceCommonInfo) {
 		
 		this.bundleContext = bc;
 		this.deviceManager = deviceMgr;
 		this.deviceCommonInfo = deviceCommonInfo;
 		this.deviceId = deviceId;
+		
 		
 		
 		properties = new Hashtable<String, String>();
@@ -160,46 +163,61 @@ public class DeviceImpl implements IDevice{
 		return deviceCommonInfo.getContextSource();
 	}
 
+	@Override
+	public IDeviceService getService(String serviceId) {
 	
-	/**
-	 *  TODO we will use the actionName + deviceId to get Action service, 
-	 *  so firstly we have to create binding table to get the MAC address of the device by using the device Id
-	 */
-	public IAction getAction(String actionName) {
-		
-		
 		ServiceReference[] sr = null;
 		try 
 		{
+			LOG.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceImpl:  pre getServiceReferences ");
 			
-			sr = bundleContext.getServiceReferences(IAction.class.getName(), "(actionName=getLightLevel)");
+			sr = bundleContext.getServiceReferences(IDeviceService.class.getName(), "(serviceId="+serviceId+")");
+			LOG.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceImpl:  post getServiceReferences ");
 		
 		} catch (InvalidSyntaxException e) {
 			//TODO in case of exception 
+			LOG.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceImpl:  InvalidSyntaxException ");
 			e.printStackTrace();
 		}
 		
 		if (sr != null)
 		{
+			LOG.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceImpl:  pre bundleContext.getService ");
 			
-			IAction ia = (IAction)bundleContext.getService(sr[0]);
-			return ia;
+			IDeviceService iDeviceService = (IDeviceService)bundleContext.getService(sr[0]);
+			
+			LOG.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceImpl:  post bundleContext.getService ");
+			return iDeviceService;
 		}
+		LOG.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceImpl:  pre return null ");
 		return null;
 	}
 
-	public List<IAction> getActions() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	@Override
+	public IDeviceService [] getServices() {
 
-	public IDeviceStateVariable getStateVariable(String stateVariableName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<IDeviceStateVariable> getStateVariables() {
-		// TODO Auto-generated method stub
+		
+		ServiceReference[] sr = null;
+		try 
+		{
+			
+			sr = bundleContext.getServiceReferences(IDeviceService.class.getName(), null);
+		
+		} catch (InvalidSyntaxException e) {
+			//TODO in case of exception 
+			e.printStackTrace();
+		}
+		if (sr != null)
+		{
+			List<IDeviceService> deviceServiceList = new ArrayList<IDeviceService>();
+			for (ServiceReference sevicereference: sr)
+			{
+				deviceServiceList.add((IDeviceService)bundleContext.getService(sevicereference));
+			}
+			
+			
+			return (IDeviceService [])deviceServiceList.toArray(new IDeviceService []{});
+		}
 		return null;
 	}
 
