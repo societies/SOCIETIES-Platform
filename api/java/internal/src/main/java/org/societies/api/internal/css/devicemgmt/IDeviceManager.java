@@ -48,7 +48,7 @@ public interface IDeviceManager {
 	 * @param contextCompliant
 	 * @return
 	 */
-	public String fireNewDeviceConnected (String deviceMacAddress, DeviceCommonInfo deviceCommonInfo);
+	public String fireNewDeviceConnected (String deviceMacAddress, DeviceCommonInfo deviceCommonInfo, String [] serviceIds);
 	
 	/**
 	 * Method used to inform the Device Manager about disconnection of a device
