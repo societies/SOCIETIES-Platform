@@ -22,6 +22,12 @@
 	</parent>
   
   <dependencies>
+  		<dependency>
+       		<groupId>org.mockito</groupId>
+       		<artifactId>mockito-core</artifactId>
+       		<version>1.6</version>
+       		<scope>test</scope>
+   		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
@@ -43,7 +49,22 @@
 			<artifactId>spring-osgi-core</artifactId>
 			<version>1.1.0</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>3.0.3.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.osgi</groupId>
+			<artifactId>spring-osgi-test</artifactId>
+			<version>1.2.1</version>
+		</dependency>
 		<dependency>
 			<groupId>org.societies.css.devicemgmt</groupId>
 			<artifactId>deviceregistry</artifactId>
@@ -74,7 +95,6 @@
               				org.springframework.osgi.context,
               				org.springframework.osgi.service.exporter,
               				org.slf4j.*,
-              				org.societies.api.css.devicemgmt,
               				org.societies.css.devicemgmt.deviceregistry
               			</Import-Package> 
               			
@@ -94,7 +114,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.11</version>
 				<configuration>
-					<skipTests>true</skipTests>
+					<skipTests>false</skipTests>
 				</configuration>
 			</plugin>
 			<plugin>

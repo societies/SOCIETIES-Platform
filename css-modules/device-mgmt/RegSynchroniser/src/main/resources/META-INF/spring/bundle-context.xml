@@ -8,6 +8,6 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-  <bean name="RegSynchroniser" class="org.societies.css.devicemgmt.RegSynchroniser.impl.RegManager" />
+  <bean name="RegManager" class="org.societies.css.devicemgmt.RegSynchroniser.impl.RegManager" />
 
 </beans>

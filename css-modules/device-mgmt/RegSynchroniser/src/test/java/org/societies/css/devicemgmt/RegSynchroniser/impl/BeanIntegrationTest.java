@@ -1,6 +1,6 @@
 package org.societies.css.devicemgmt.RegSynchroniser.impl;
 
-/*import org.societies.css.devicemgmt.RegSynchroniser.Bean;
+import org.societies.css.devicemgmt.RegSynchroniser.Bean;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
@@ -8,6 +8,7 @@ import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
  * @see BeanOsgiIntegrationTest for integration test inside OSGi.
  */
 /*
+@SuppressWarnings("deprecation")
 public class BeanIntegrationTest extends AbstractDependencyInjectionSpringContextTests {
 
 	private Bean myBean;
@@ -16,13 +17,12 @@ public class BeanIntegrationTest extends AbstractDependencyInjectionSpringContex
 	  return new String[] {"META-INF/spring/bundle-context.xml"};
 	}
 	
-	public void setBean(Bean bean) {
-	  this.myBean = bean;
+	public void setBean(Bean RegManager) {
+	  this.myBean = RegManager;
 	}
 	
 	public void testBeanIsABean() {
-	  assertTrue(this.myBean.isABean());
+	  //assertTrue(this.myBean.isABean());
 	}
 
-}
-*/
+}*/
