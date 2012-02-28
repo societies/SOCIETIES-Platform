@@ -23,23 +23,13 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.personalisation.UserPreferenceLearning.impl;
+package org.societies.personalisation.UserPreferenceLearning.test;
 
-import java.util.List;
-import java.util.Map;
+public class NumberGenerator {
 
-import org.societies.api.context.model.CtxHistoryAttribute;
-import org.societies.api.internal.context.broker.ICtxBroker;
-
-public class HistoryRetriever {
+	private Long nextValue = 0L;
 	
-	private ICtxBroker ctxBroker;
-	
-	public HistoryRetriever(ICtxBroker ctxBroker){
-		this.ctxBroker = ctxBroker;
-	}
-	
-	public Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> getHistory(){
-		return null;
+	public Long getNextValue() {
+		return nextValue++;
 	}
 }

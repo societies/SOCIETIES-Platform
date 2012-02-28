@@ -23,23 +23,21 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.personalisation.UserPreferenceLearning.impl;
+package org.societies.personalisation.UserPreferenceLearning.test;
 
-import java.util.List;
-import java.util.Map;
+import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.comm.xmpp.datatypes.IdentityType;
 
-import org.societies.api.context.model.CtxHistoryAttribute;
-import org.societies.api.internal.context.broker.ICtxBroker;
+public class MockIdentity extends Identity{
 
-public class HistoryRetriever {
-	
-	private ICtxBroker ctxBroker;
-	
-	public HistoryRetriever(ICtxBroker ctxBroker){
-		this.ctxBroker = ctxBroker;
+	public MockIdentity(IdentityType type, String identifier,
+			String domainIdentifier) {
+		super(type, identifier, domainIdentifier);
 	}
-	
-	public Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> getHistory(){
+
+	@Override
+	public String getJid() {
 		return null;
 	}
+
 }

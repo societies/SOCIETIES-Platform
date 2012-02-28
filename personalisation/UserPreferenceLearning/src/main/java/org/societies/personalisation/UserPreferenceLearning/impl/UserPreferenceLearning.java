@@ -28,8 +28,8 @@ package org.societies.personalisation.UserPreferenceLearning.impl;
 import java.util.Date;
 
 import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.internal.context.broker.IUserCtxBroker;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.personalisation.UserPreferenceLearning.impl.threads.AA_AI;
 import org.societies.personalisation.UserPreferenceLearning.impl.threads.AA_SI;
 import org.societies.personalisation.UserPreferenceLearning.impl.threads.SA_AI;
@@ -44,7 +44,7 @@ public class UserPreferenceLearning implements IC45Learning{
 	private SA_AI sa_ai;
 	private SA_SI sa_si;
 	private HistoryRetriever historyRetriever;
-	private IUserCtxBroker ctxBroker;
+	private ICtxBroker ctxBroker;
 
 	@Override
 	//run preference learning on all actions for all identities
@@ -85,7 +85,7 @@ public class UserPreferenceLearning implements IC45Learning{
 		}
 	}
 	
-	public void setCtxBroker(IUserCtxBroker broker){
+	public void setCtxBroker(ICtxBroker broker){
 		this.ctxBroker = broker;
 	}
 	
