@@ -38,10 +38,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.util.SerialisationHelper;
@@ -74,6 +77,7 @@ public class TE_ST {
 
 	private InternalCtxBroker internalCtxBroker;
 	private CommunityContextEstimation ccet; 
+	private CommunityCtxEntity communityContextEntity;
 	
 
 	@BeforeClass
@@ -96,6 +100,17 @@ public class TE_ST {
 		internalCtxBroker.setUserCtxDBMgr(new UserCtxDBMgr());
 		internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
 		ccet = new CommunityContextEstimation();
+		
+		
+		Identity operatorId = null;
+		Long objectNumber = null;
+		String type = null;
+		CtxEntityIdentifier ctxEntityId = new CtxEntityIdentifier(operatorId, type, objectNumber);
+		
+		
+		communityContextEntity = new CommunityCtxEntity(ctxEntityId);
+		
+		
 	}
 
 	/**
@@ -123,14 +138,23 @@ public class TE_ST {
 		assertTrue(ctxAttribute.getType().equalsIgnoreCase("attrType"));
 		
 	}
-	public List<CtxAttribute> getListOfCtxAttributes(List lst, CtxEntity ctxId) {
+	@Test
+	//public List<CtxAttribute> getListOfCtxAttributes(List<CommunityCtxEntity> lst, CtxEntity ctxId) {
+		public void getListOfCtxAttributes() {
 		/*
 		 * This method will return a list of attributes. As input it will have to have the attributes of a given (common CIS)
+		 * (we will have to use communityCtxEntity)
+		 */
+		
+		/*Step0: use the getMembers() of the communityContextEntity class to retrieve communityCtxEntitys
+		 * 
 		 */
 		
 		/*
 		 * Step1: Use CtxBroker to access the Attributes
 		 */
+		System.out.println("Hallo");
+		System.out.println(communityContextEntity.getMembers());
 		
 		
 		/*
@@ -141,7 +165,7 @@ public class TE_ST {
 		/*
 		 * Return the list
 		 */
-		return null;
+		//return null;
 		
 	}
 	
