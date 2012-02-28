@@ -1,17 +1,17 @@
 package org.societies.api.comm.xmpp.pubsub;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.pubsub.Subscription;
+import org.societies.api.identity.IIdentity;
 
 public class Subscription {
 
 	// TODO subId is ignored for equals and hash
-	private Identity pubsubService;
-	private Identity subscriber;
+	private IIdentity pubsubService;
+	private IIdentity subscriber;
 	private String node;
 	private String subId;
 	
-	public Subscription(Identity pubsubService, Identity subscriber,
+	public Subscription(IIdentity pubsubService, IIdentity subscriber,
 			String node, String subId) {
 		super();
 		this.pubsubService = pubsubService;
@@ -19,16 +19,16 @@ public class Subscription {
 		this.node = node;
 		this.subId = subId;
 	}
-	public Identity getPubsubService() {
+	public IIdentity getPubsubService() {
 		return pubsubService;
 	}
-	public void setPubsubService(Identity pubsubService) {
+	public void setPubsubService(IIdentity pubsubService) {
 		this.pubsubService = pubsubService;
 	}
-	public Identity getSubscriber() {
+	public IIdentity getSubscriber() {
 		return subscriber;
 	}
-	public void setSubscriber(Identity subscriber) {
+	public void setSubscriber(IIdentity subscriber) {
 		this.subscriber = subscriber;
 	}
 	public String getNode() {

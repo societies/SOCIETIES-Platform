@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
-import org.societies.comm.xmpp.interfaces.IdentityManager;
+import org.societies.identity.IdentityManagerImpl;
 import org.societies.interfaces.Callback;
 import org.jivesoftware.smack.packet.Packet;
 
@@ -69,7 +69,7 @@ public class CallbackAdapter implements Callback {
 	}
 	
 	private Stanza stanzaFromPacket(Packet packet) {
-		IdentityManager idm = new IdentityManager();
+		IdentityManagerImpl idm = new IdentityManagerImpl();
 		Identity to = idm.fromJid(packet.getTo().toString());
 		Identity from = idm.fromJid(packet.getFrom().toString());
 		Stanza returnStanza = new Stanza(packet.getPacketID(), from, to);

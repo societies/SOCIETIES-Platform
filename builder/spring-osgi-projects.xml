@@ -47,22 +47,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>../api/java/schema</module>
 		<module>../api/java/external</module>
 		<module>../api/java/internal</module>
-		
-		<!-- Context -->
-		<module>../context-management/api</module>
-		<module>../context-management/UserContextDBManagement</module>
-		<module>../context-management/UserContextHistoryManagement</module>
-		<module>../context-management/ContextBroker</module>
-		
-		 <!-- User Agent -->
-		<module>../user-agent/user-action-monitor</module>
-		<!--<module>../user-agent/user-feedback</module>-->
-		 
-		<!-- Personalisation -->
-		
-		<module>../personalisation</module>
-			 
-		
+
 		<!-- Platform Infrastructure -->
 		<!-- Communications Infrastructure -->
 		<module>../platform-infrastructure/comms-frwk/CommonLibraries</module>
@@ -80,6 +65,23 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>../platform-infrastructure/comms-frwk/ExampleServices/FortuneCookieBean</module>
 		<module>../platform-infrastructure/comms-frwk/ExampleServices/ExampleServiceMgr</module>
 		 -->
+
+		
+		<!-- Context -->
+		<module>../context-management/api</module>
+		<module>../context-management/UserContextDBManagement</module>
+		<module>../context-management/UserContextHistoryManagement</module>
+		<module>../context-management/ContextBroker</module>
+		
+		 <!-- User Agent -->
+		<module>../user-agent/user-action-monitor</module>
+		<!--<module>../user-agent/user-feedback</module>-->
+		 
+		<!-- Personalisation -->
+		
+		<module>../personalisation</module>
+			 
+		
 		 <!-- Service Registry -->
 		 <module>../css-modules/serviceRegistry</module>
 		 <module>../platform-infrastructure/servicelifcycle/serviceManagement/</module>

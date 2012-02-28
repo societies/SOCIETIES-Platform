@@ -1,9 +1,10 @@
 package org.societies.comm.xmpp.xc.impl;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.interfaces.IIdentityManager;
-import org.societies.comm.xmpp.interfaces.IdentityManager;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.identity.IdentityManagerImpl;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.IQ.Type;
 import org.xmpp.packet.Message;
@@ -11,11 +12,9 @@ import org.xmpp.packet.Packet;
 
 public class TinderUtils {
 	
-	private static IIdentityManager idm = new IdentityManager();
-	
-	public static Stanza stanzaFromPacket(Packet packet) {
-		Identity to = idm.fromJid(packet.getTo().toString());
-		Identity from = idm.fromJid(packet.getFrom().toString());
+	public static Stanza stanzaFromPacket(Packet packet) throws InvalidFormatException {
+		IIdentity to = IdentityManagerImpl.staticfromJid(packet.getTo().toString());
+		IIdentity from = IdentityManagerImpl.staticfromJid(packet.getFrom().toString());
 		Stanza returnStanza = new Stanza(packet.getID(), from, to);
 		return returnStanza;
 	}

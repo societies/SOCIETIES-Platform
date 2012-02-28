@@ -25,8 +25,9 @@
 package org.societies.api.internal.privacytrust.privacyprotection;
 
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
@@ -54,7 +55,7 @@ public interface IPrivacyDataManager {
 	 * @param serviceId The service_Id the service
 	 * @return A ResponseItem with permission information in it
 	 */
-	public ResponseItem checkPermission(CtxIdentifier dataId, Identity ownerId, Identity requestorId, IServiceResourceIdentifier serviceId);
+	public ResponseItem checkPermission(CtxIdentifier dataId, IIdentity ownerId, IIdentity requestorId, IServiceResourceIdentifier serviceId);
 
 	/**
 	 * Check permission to access/use/disclose a data for a CIS usage
@@ -69,7 +70,7 @@ public interface IPrivacyDataManager {
 	 * @param cisId the ID of the CIS which wants to access the data
 	 * @return A ResponseItem with permission information in it
 	 */
-	public ResponseItem checkPermission(CtxIdentifier dataId, Identity ownerId, Identity requestorId, Identity cisId);
+	public ResponseItem checkPermission(CtxIdentifier dataId, IIdentity ownerId, IIdentity requestorId, IIdentity cisId);
 
 	/**
 	 * Check permission to access/use/disclose a data in a case that no negotiation have been done.
@@ -84,7 +85,7 @@ public interface IPrivacyDataManager {
 	 * @param usage Information about the use of the data: purpose, retention-time, people who will access this data... Need to be formalised!
 	 * @return A ResponseItem with permission information in it
 	 */
-	public ResponseItem checkPermission(CtxIdentifier dataId, Identity ownerId, Identity requestorId, RequestPolicy usage);
+	public ResponseItem checkPermission(CtxIdentifier dataId, IIdentity ownerId, IIdentity requestorId, RequestPolicy usage);
 	/**
 	 * Protect a data following the user preferences by obfuscating it to a correct
 	 * obfuscation level. The data information are wrapped into a relevant data
