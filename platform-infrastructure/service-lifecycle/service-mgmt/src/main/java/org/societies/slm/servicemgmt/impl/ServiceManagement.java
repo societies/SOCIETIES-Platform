@@ -22,6 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.societies.slm.servicemgmt.impl;
 
 import java.net.URL;
@@ -174,21 +175,21 @@ public class ServiceManagement implements IServiceManagement, BundleContextAware
 				logger.info("Service " + serviceId.getIdentifier() + " not found!");
 				return ServiceStatus.UNAVAILABLE;
 			} else
-				//return service.getServiceStatus();
-				return ServiceStatus.STOPPED; // TODO fix this.
-
+				return service.getServiceStatus();
 			
 		} catch(Exception ex){
 			logger.error("Exception occured while getting Service Status: " + ex.getMessage());
 			//throw new ServiceMgmtException(ex.getMessage());
+			return ServiceStatus.UNAVAILABLE; //TODO fix this.
 		}
 		
-		return ServiceStatus.UNAVAILABLE;
 		
 	}
 
 	public void addServices() {
-		// TODO Auto-generated method stub
+
+		if(logger.isDebugEnabled()) logger.debug("Service Management: addServices method");
+
 		
 	}
 
@@ -196,12 +197,25 @@ public class ServiceManagement implements IServiceManagement, BundleContextAware
 		
 		if(logger.isDebugEnabled()) logger.debug("Service Management: removeServices method");
 
+		List<Service> servicesToRemove = new ArrayList<Service>(); // Temporary, while we fix this.
+		
 		try{
-			// Get the service from the repository
-			if(logger.isDebugEnabled()) logger.debug("Attempting to remove a list of services from the registry");
-
-			//getServiceReg().unregisterServiceList();
+			logger.info("Removing Services from Repository");
 			
+			if(logger.isDebugEnabled()){
+				String debugMessage = "Attempting to remove a list of " + servicesToRemove.size() + " services from the registry:\n ";
+				
+				for(Service service : servicesToRemove ){
+					debugMessage += service.getServiceName() + "_" + service.getVersion() + '\n';
+				}
+				
+				logger.debug(debugMessage);
+			}
+
+			// We remove them from the service repository
+			getServiceReg().unregisterServiceList(servicesToRemove);
+			
+						
 		} catch(Exception ex){
 			logger.error("Exception occured while removing services: " + ex.getMessage());
 			//throw new ServiceMgmtException(ex.getMessage());
