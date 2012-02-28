@@ -9,8 +9,8 @@
        for integration testing outside of an OSGi environment -->
 	
 	<bean id="UserPreferenceLearning" class="org.societies.personalisation.UserPreferenceLearning.impl.UserPreferenceLearning" 
-   depends-on="UserCtxBroker" init-method="initialiseUserPreferenceLearning">
-   <property name="ctxBroker" ref="UserCtxBroker"></property>
+   depends-on="CtxBroker" init-method="initialiseUserPreferenceLearning">
+   <property name="ctxBroker" ref="CtxBroker"></property>
    </bean>
 
 </beans>
