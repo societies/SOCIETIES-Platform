@@ -1,4 +1,4 @@
-package org.societies.api.internal.servicelifecycle.serviceMgmt;
+package org.societies.api.internal.servicelifecycle.model;
 
 public enum ServiceStatus {
 	STARTED,
