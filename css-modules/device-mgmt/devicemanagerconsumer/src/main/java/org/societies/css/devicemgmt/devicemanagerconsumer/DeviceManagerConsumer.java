@@ -29,9 +29,12 @@ public class DeviceManagerConsumer {
 	
 	public void setDeviceService(IDevice deviceService)
 	{
-		//LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% deviceService pre injection ");
+		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% deviceService pre injection ");
 		
 		this.deviceService=deviceService;
+		
+		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% deviceService post injection "+ deviceService.getDeviceId());
+		
 
 	}
 	
@@ -39,6 +42,7 @@ public class DeviceManagerConsumer {
 	{
 		IDeviceService ds = getDeviceService().getService("lightSensor1");
 				
+		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% pre ds.getAction ");
 				
 		IAction ia = ds.getAction("getLightLevel");
 		

@@ -117,6 +117,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>../css-modules/css-ser-registry</module>
 	 	-->
 
+		<!-- Device Mgmt -->
+		<module>../css-modules/device-mgmt/devicemanager/</module>
+	
 		<!-- Intelligent community orchestration -->
 		<module>../intelligent-community-orchestration/CommunityLifecycleManagement</module>
 		<!-- Context Management -->
