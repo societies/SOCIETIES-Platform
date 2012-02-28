@@ -2,8 +2,6 @@ package org.societies.api.internal.css.management;
 
 import static org.junit.Assert.*;
 
-import javax.swing.text.html.CSS;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,20 +25,23 @@ public class TestCSSNode {
 		assertNotNull(cssNode);
 		
 		cssNode.setIdentity(TEST_IDENTITY_1);
-		cssNode.setStatus(CSSNode.nodeStatus.Available.ordinal());
-		cssNode.setType(CSSNode.nodeType.Cloud.ordinal());
+		cssNode.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
+		cssNode.setType(CSSManagerEnums.nodeType.Cloud.ordinal());
 		
 		assertEquals(TEST_IDENTITY_1, cssNode.getIdentity());
-		assertEquals(CSSNode.nodeStatus.Available.ordinal(), cssNode.getStatus());
-		assertEquals(CSSNode.nodeType.Cloud.ordinal(), cssNode.getType());
+		assertEquals(CSSManagerEnums.nodeStatus.Available.ordinal(), cssNode.getStatus());
+		assertEquals(CSSManagerEnums.nodeType.Cloud.ordinal(), cssNode.getType());
 	}
 	
 	@Test
 	public void testAlternativeConstructor() {
-		CSSNode cssNode = new CSSNode(TEST_IDENTITY_1, CSSNode.nodeStatus.Hibernating.ordinal(), CSSNode.nodeType.Rich.ordinal());
+		CSSNode cssNode = new CSSNode();
+		cssNode.setIdentity(TEST_IDENTITY_1);
+		cssNode.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
+		cssNode.setType(CSSManagerEnums.nodeType.Rich.ordinal());
 		assertEquals(TEST_IDENTITY_1, cssNode.getIdentity());
-		assertEquals(CSSNode.nodeType.Rich.ordinal(), cssNode.getType());
-		assertEquals(CSSNode.nodeStatus.Hibernating.ordinal(), cssNode.getStatus());
+		assertEquals(CSSManagerEnums.nodeType.Rich.ordinal(), cssNode.getType());
+		assertEquals(CSSManagerEnums.nodeStatus.Hibernating.ordinal(), cssNode.getStatus());
 
 		
 	}

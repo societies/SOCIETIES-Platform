@@ -28,7 +28,6 @@ package org.societies.android.platform.interfaces;
 import java.util.concurrent.Future;
 
 import org.societies.api.android.internal.model.AndroidCSSProfile;
-import org.societies.api.internal.css.management.CSSInterfaceResult;
 import org.societies.api.internal.css.management.CSSProfile;
 
 

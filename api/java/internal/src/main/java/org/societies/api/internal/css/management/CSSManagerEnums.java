@@ -22,60 +22,132 @@ SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, I
 DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
 INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-package org.societies.api.internal.css.management;
+ */package org.societies.api.internal.css.management;
 
 /**
- * Defines a CSS node or device
+ * Contains CSS Manager Enum classes
  * 
- * In order to allow for Android compatibility, the natural Enum types 
- * are int types. 
-
+ *
  */
-
-public class CSSNode {
+public class CSSManagerEnums {
 
 	/**
-	 * unique within context of CSS
+	 * Enum for device status types
 	 */
-	String identity = null;
+	public enum nodeStatus {
+		
+		Available("Available for Use"), 
+		Unavailable("Unavailable"), 
+		Hibernating("Not active but on alert");
+		
+	    private String name;
+
+		nodeStatus(String name) {
+	        this.name = name;
+	    }
+
+	    public String getName() {
+	        return this.name;
+	    }
 	
+	};
 	/**
-	 * status of device
+	 * Enum for device node types
 	 */
-	int status = 0;
+	public enum nodeType {
+		Android("Android based client"), 
+		Cloud("Cloud Node"), 
+		Rich("JVM based client");
+		
+		
+	    private String name;
+
+		nodeType(String name) {
+	        this.name = name;
+	    }
+
+	    public String getName() {
+	        return this.name;
+	    }
+	};
+
 	/**
-	 * node type of device
+	 * Enum for CSS status
 	 */
-	int type = 0;
+	public enum cssStatus {
+		Active("Active"), 
+		Inactive("Inactive");
 	
+	    private String name;
+
+	    cssStatus(String name) {
+	        this.name = name;
+	    }
+
+	    public String getName() {
+	        return this.name;
+	    }
+
+	};
 	/**
-	 * Default Constructor
+	 * Enum for entity types
 	 */
-	public CSSNode() {
-	}
+	public enum entityType {
+		Person("Personal CSS"), 
+		Organisation("Organisational CSS");
+		
+		
+	    private String name;
+
+	    entityType(String name) {
+	        this.name = name;
+	    }
+
+	    public String getName() {
+	        return this.name;
+	    }
+
+	};
+	/**
+	 * Enum for gender types
+	 */
+	public enum genderType {
+		Male("Male"), 
+		Female("Female"), 
+		Unspecified("Unspecified");
+		
+	    private String name;
+
+	    genderType(String name) {
+	        this.name = name;
+	    }
+
+	    public String getName() {
+	        return this.name;
+	    }
 	
-	public String getIdentity() {
-		return identity;
-	}
+	};
+	/**
+	 * Enum for presence types
+	 */
+	public enum presenceType {
+		Available("Available"), 
+		DoNotDisturb("Do not disturb"), 
+		Offline("Offline"), 
+		Away("Away"), 
+		ExtendedAway("Extended Away");
+		
+	    private String name;
 
-	public void setIdentity(String identity) {
-		this.identity = identity;
-	}
+	    presenceType(String name) {
+	        this.name = name;
+	    }
 
-	public int getStatus() {
-		return status;
-	}
+	    public String getName() {
+	        return this.name;
+	    }
+	
+	};
 
-	public void setStatus(int status) {
-		this.status = status;
-	}
-
-	public int getType() {
-		return type;
-	}
-
-	public void setType(int type) {
-		this.type = type;
-	}
+	
 }

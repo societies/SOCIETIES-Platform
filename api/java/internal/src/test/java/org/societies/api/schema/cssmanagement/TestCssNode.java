@@ -1,4 +1,4 @@
-package org.societies.api.android.internal.model;
+package org.societies.api.schema.cssmanagement;
 
 import static org.junit.Assert.*;
 
@@ -7,9 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.internal.css.management.CSSManagerEnums;
 
-import android.os.Parcel;
-
-public class TestAndroidCSSNode {
+public class TestCssNode {
 
 	public static final String TEST_IDENTITY_1 = "node11";
 	public static final String TEST_IDENTITY_2 = "node22";
@@ -24,7 +22,7 @@ public class TestAndroidCSSNode {
 
 	@Test
 	public void testConstructor() throws Exception {
-		AndroidCSSNode cssNode = new AndroidCSSNode();
+		CssNode cssNode = new CssNode();
 		assertNotNull(cssNode);
 		
 		cssNode.setIdentity(TEST_IDENTITY_1);
@@ -38,24 +36,15 @@ public class TestAndroidCSSNode {
 	
 	@Test
 	public void testAlternativeConstructor() {
-		AndroidCSSNode cssNode = new AndroidCSSNode();
+		CssNode cssNode = new CssNode();
 		cssNode.setIdentity(TEST_IDENTITY_1);
 		cssNode.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
 		cssNode.setType(CSSManagerEnums.nodeType.Rich.ordinal());
 		assertEquals(TEST_IDENTITY_1, cssNode.getIdentity());
 		assertEquals(CSSManagerEnums.nodeType.Rich.ordinal(), cssNode.getType());
 		assertEquals(CSSManagerEnums.nodeStatus.Hibernating.ordinal(), cssNode.getStatus());
-	}
-	
-//	@Test
-//	public void testParcelable() {
-//		AndroidCSSNode cssNode = new AndroidCSSNode(TEST_IDENTITY_1, CSSNode.nodeStatus.Hibernating.ordinal(), CSSNode.nodeType.Rich.ordinal());
-//		
-//		Parcel parcelOut = new Parcel();
-//		
-//		cssNode.writeToParcel(out, flags)
-//		
-//	}
 
+		
+	}
 
 }

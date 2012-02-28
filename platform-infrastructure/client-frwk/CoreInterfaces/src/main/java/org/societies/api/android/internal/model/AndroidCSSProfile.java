@@ -25,7 +25,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.api.android.internal.model;
 
-import org.societies.api.internal.css.management.CSSProfile;
+
+import org.societies.api.schema.cssmanagement.CssProfile;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -35,7 +36,7 @@ import android.os.Parcelable;
  *
  */
 
-public class AndroidCSSProfile extends CSSProfile implements Parcelable {
+public class AndroidCSSProfile extends CssProfile implements Parcelable {
 	
 	/**
 	 * Default contructor
@@ -62,14 +63,14 @@ public class AndroidCSSProfile extends CSSProfile implements Parcelable {
 		setSex(in.readInt());
 		setHomeLocation(in.readString());
 		setCssIdentity(in.readString());
-		setCssNodes((AndroidCSSNode[]) in.readParcelableArray(AndroidCSSNode.class.getClassLoader()));
+//		setCssNodes((AndroidCSSNode[]) in.readParcelableArray(AndroidCSSNode.class.getClassLoader()));
 		setStatus(in.readInt());
 		setCssRegistration(in.readString());
 		setCssInactivation(in.readString());
 		setCssUpTime(in.readInt());
 		
 //		CSSDevice encounteredCIS[] = null;
-		setArchiveCSSNodes((AndroidCSSNode[]) in.readParcelableArray(AndroidCSSNode.class.getClassLoader()));
+//		setArchiveCSSNodes((AndroidCSSNode[]) in.readParcelableArray(AndroidCSSNode.class.getClassLoader()));
 		setPresence(in.readInt());
 
 	}
@@ -94,14 +95,14 @@ public class AndroidCSSProfile extends CSSProfile implements Parcelable {
 		out.writeInt(getSex());
 		out.writeString(getHomeLocation());
 		out.writeString(getCssIdentity());
-		out.writeParcelableArray((AndroidCSSNode[])getCssNodes(), 0);
+//		out.writeParcelableArray((AndroidCSSNode[])getCssNodes(), 0);
 		out.writeInt(getStatus());
 		out.writeString(getCssRegistration());
 		out.writeString(getCssInactivation());
 		out.writeInt(getCssUpTime());
 		
 //		CSSDevice encounteredCIS[] = null;
-		out.writeParcelableArray((AndroidCSSNode[]) getArchiveCSSNodes(), 0);
+//		out.writeParcelableArray((AndroidCSSNode[]) getArchiveCSSNodes(), 0);
 		out.writeInt(getPresence());
 
 	}
