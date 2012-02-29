@@ -13,6 +13,13 @@
         <module>HereIAm-it</module>
     </modules>
 
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>android-parent</artifactId>
+		<relativePath>../../parent/spring-osgi.xml</relativePath>
+		<version>0.1</version>
+	</parent>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -31,6 +38,11 @@
                                 </version>
                 <scope>provided</scope>
             </dependency>
+	<dependency>
+		<groupId>org.societies.api.internal</groupId>
+		<artifactId>societies-api-internal</artifactId>
+		<version>${release.version}</version>
+	</dependency>
 
             <!-- Androlog is a logging and reporting library for Android -->
             <dependency>
