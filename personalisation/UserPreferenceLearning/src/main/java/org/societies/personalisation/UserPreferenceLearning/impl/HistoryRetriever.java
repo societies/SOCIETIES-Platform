@@ -29,13 +29,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.societies.api.context.model.CtxHistoryAttribute;
-import org.societies.api.internal.context.broker.IUserCtxBroker;
+import org.societies.api.internal.context.broker.ICtxBroker;
 
 public class HistoryRetriever {
 	
-	private IUserCtxBroker ctxBroker;
+	private ICtxBroker ctxBroker;
 	
-	public HistoryRetriever(IUserCtxBroker ctxBroker){
+	public HistoryRetriever(ICtxBroker ctxBroker){
 		this.ctxBroker = ctxBroker;
 	}
 	

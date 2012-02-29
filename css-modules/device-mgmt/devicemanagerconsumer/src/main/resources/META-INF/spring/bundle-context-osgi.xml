@@ -12,6 +12,4 @@
        testing of the bundle outside of an OSGi container -->
 
 		<osgi:reference id="deviceService" interface="org.societies.api.css.devicemgmt.IDevice"/>
-	
-
 </beans>

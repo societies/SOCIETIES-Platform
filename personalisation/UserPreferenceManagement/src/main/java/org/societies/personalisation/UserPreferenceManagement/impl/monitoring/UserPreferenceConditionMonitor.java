@@ -99,6 +99,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		registered = new ArrayList<CtxAttributeIdentifier>();
 		System.out.println(this.getClass().toString()+": INITIALISED");
 	}
+	
 	public void initialisePreferenceManagement(ICtxBroker broker, IInternalPersonalisationManager persoMgr/*, UserPreferenceManagement prefMgr*/){
 		if (getPersoMgr()==null){
 			System.out.println(this.getClass().toString()+": found PersonalisationManager");
@@ -141,18 +142,26 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		List<PreferenceDetails> affectedPreferences = this.mt.getAffectedPreferences(attribute.getId());
 		if (affectedPreferences.size()==0){
 			//JOptionPane.showMessageDialog(null, "no affected preferences found for ctxID: "+ctxAttr.getCtxIdentifier().toUriString()+",\n ignoring event");
+			System.out.println("no affected preferences found for ctxID: "+attribute.getId().toString()+", ignoring event");
 			this.logging.debug("no affected preferences found for ctxID: "+attribute.getId().toString()+", ignoring event");
+			callback.sendPrefOutcome(ownerId, new ArrayList<IPreferenceOutcome>());
 		}else{
+			System.out.println("found affected preferences");
 			this.logging.debug("found affected preferences");
 			if (null == this.prefMgr){
+				
 				this.logging.debug(UserPreferenceManagement.class.getName()+" not found");
 				return;
 			}else{
 				this.logging.debug(UserPreferenceManagement.class.getName()+" Found");
 			}
+			
 			List<IPreferenceOutcome> outcomes = prefMgr.reEvaluatePreferences(ownerId,attribute, affectedPreferences);
+			System.out.println("requested re-evaluation of preferences");
 			logging.info("requested re-evaluation of preferences");
+			System.out.println("Returning outcome");
 			callback.sendPrefOutcome(ownerId, outcomes);
+			System.out.println("Returned outcome");
 		}
 	}
 	

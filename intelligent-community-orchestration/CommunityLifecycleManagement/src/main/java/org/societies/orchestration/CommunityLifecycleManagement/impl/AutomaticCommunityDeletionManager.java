@@ -172,11 +172,21 @@ public class AutomaticCommunityDeletionManager //implements ICommCallback
 		ArrayList<CisRecord> cissToDelete = new ArrayList<CisRecord>();
 		
 		// VERY SIMPLISTIC v0.1 ALGORITHM
-		//if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - 5) {
+		//if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - 1 hour) {
 		//    if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - (longestTimeWithoutActivity/1440)) {
 		//        if (theCisRecord.getActivityFeed().search("CommunityLifecycleManagement metadata: temporary short-term)) {
 	    //            cissToDelete.add(theCisRecord);
 		//        }
+		//if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - 1 week) {
+				//    if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - (longestTimeWithoutActivity/1440)) {
+				//        if (theCisRecord.getActivityFeed().search("CommunityLifecycleManagement metadata: temporary medium-term)) {
+			    //            cissToDelete.add(theCisRecord);
+				//        }
+		//if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - 18 months) {
+				//    if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - (longestTimeWithoutActivity/1440)) {
+				//        if (theCisRecord.getActivityFeed().search("CommunityLifecycleManagement metadata: temporary long-term)) {
+			    //            cissToDelete.add(theCisRecord);
+				//        }
 		//        If the CIS has never gone such a long period without activity before, 
 		//        suggest deletion via User Agent to CIS owner/administrators, i.e. whoever
 		//        this deployment runs on behalf of.

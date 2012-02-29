@@ -25,18 +25,12 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.api.internal.css.management;
 
+import org.societies.api.schema.cssmanagement.CssInterfaceResult;
+
 /**
- * ICSSManager callback class as used in {@link ICSSManager}
- * 
+ * Callback interface for CSS Manager
  *
  */
 public interface ICSSManagerCallback {
-	
-	/**
-	 * Defines what happens when a method is called 
-	 * @param message
-	 * @param profile
-	 */
-	public void onMethodInvocation(String message, CSSProfile profile);
-
+	void receiveResult(CssInterfaceResult result); 
 }

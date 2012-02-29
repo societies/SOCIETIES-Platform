@@ -32,85 +32,16 @@ package org.societies.api.internal.css.management;
  * are int types. 
  */
 public class CSSProfile {
+	
 	/**
-	 * Enum for CSS status
+	 * User's chosen domain server
 	 */
-	public enum cssStatus {
-		Active("Active"), 
-		Inactive("Inactive");
+	String domainServer = null;
 	
-	    private String name;
-
-	    cssStatus(String name) {
-	        this.name = name;
-	    }
-
-	    public String getName() {
-	        return this.name;
-	    }
-
-	};
 	/**
-	 * Enum for entity types
+	 * User's CSS hosting location
 	 */
-	public enum entityType {
-		Person("Personal CSS"), 
-		Organisation("Organisational CSS");
-		
-		
-	    private String name;
-
-	    entityType(String name) {
-	        this.name = name;
-	    }
-
-	    public String getName() {
-	        return this.name;
-	    }
-
-	};
-	/**
-	 * Enum for gender types
-	 */
-	public enum genderType {
-		Male("Male"), 
-		Female("Female"), 
-		Unspecified("Unspecified");
-		
-	    private String name;
-
-	    genderType(String name) {
-	        this.name = name;
-	    }
-
-	    public String getName() {
-	        return this.name;
-	    }
-	
-	};
-	/**
-	 * Enum for presence types
-	 */
-	public enum presenceType {
-		Available("Available"), 
-		DoNotDisturb("Do not disturb"), 
-		Offline("Offline"), 
-		Away("Away"), 
-		ExtendedAway("Extended Away");
-		
-	    private String name;
-
-	    presenceType(String name) {
-	        this.name = name;
-	    }
-
-	    public String getName() {
-	        return this.name;
-	    }
-	
-	};
-	
-	
+	String cssHostingLocation = null;
 	/**
 	 * is the CSS a person or organisation ?
 	 */
@@ -198,6 +129,22 @@ public class CSSProfile {
 	 */
 	public CSSProfile() {
 		
+	}
+
+	public String getDomainServer() {
+		return domainServer;
+	}
+
+	public void setDomainServer(String domainServer) {
+		this.domainServer = domainServer;
+	}
+
+	public String getCssHostingLocation() {
+		return cssHostingLocation;
+	}
+
+	public void setCssHostingLocation(String cssHostingLocation) {
+		this.cssHostingLocation = cssHostingLocation;
 	}
 
 	public int getEntity() {
@@ -343,7 +290,6 @@ public class CSSProfile {
 	public void setPresence(int presence) {
 		this.presence = presence;
 	}
-
 
 
 }
