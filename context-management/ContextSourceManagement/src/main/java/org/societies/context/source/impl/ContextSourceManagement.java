@@ -24,6 +24,113 @@
  */
 package org.societies.context.source.impl;
 
-public class ContextSourceManagement {
+import java.io.Serializable;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.context.broker.ICtxBroker;
+import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.source.ICtxSourceMgr;
+import org.societies.api.context.source.ICtxSourceMgrCallback;
+import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+import org.societies.context.api.user.db.IUserCtxDBMgr;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ContextSourceManagement implements ICtxSourceMgr{
+
+	private static Logger LOG = LoggerFactory.getLogger(ContextSourceManagement.class);
+	/**
+	 * The User Context DB Mgmt service reference.
+	 * 
+	 * @see {@link #setUserCtxDBMgr(IUserCtxDBMgr)}
+	 */
+	@Autowired(required=true)
+	private IUserCtxDBMgr userCtxDBMgr = null;
+
+	/**
+	 * The Context Broker service reference.
+	 * 
+	 * @see {@link #setCtxBroker(ICtxBroker)}
+	 */
+	@Autowired(required=true)
+	private ICtxBroker ctxBroker = null;
+	
+	/**
+	 * The Device Manager service reference
+	 * 
+	 * @see {@link #setDeviceManager(IDeviceManager)}
+	 */
+	@Autowired(required=true)
+	private IDeviceManager deviceManager;
+	
+	/**
+	 * Sets the Device Manager service reference.
+	 * 
+	 * @param deviceManager
+	 *            the Device Manager service reference to set.
+	 */
+	public void setDeviceManager(IDeviceManager deviceManager) {
+		this.deviceManager = deviceManager;
+	}
+
+	private NewDeviceListener newDeviceListener;
+
+	/**
+	 * Sets the User Context DB Mgmt service reference.
+	 * 
+	 * @param userDB
+	 *            the User Context DB Mgmt service reference to set.
+	 */
+	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) {
+		this.userCtxDBMgr = userDB;
+	}
+
+	/**
+	 * Sets the Context Broker service reference
+	 * 
+	 * @param ctxBroker the ctxBroker to set
+	 */
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		this.ctxBroker = ctxBroker;
+	}
+	
+	public ContextSourceManagement(){
+		this.newDeviceListener = new NewDeviceListener(deviceManager);
+		newDeviceListener.run();
+		LOG.info("{}", "CSM started");
+		
+	}
+	
+	@Override
+	public void register(String arg0, String arg1, ICtxSourceMgrCallback arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public Future<String> registerFuture(String arg0, String arg1, ICtxSourceMgrCallback arg2) {
+		return null;
+		
+	}
+
+	@Override
+	public void sendUpdate(String arg0, Serializable arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void sendUpdate(String arg0, Serializable arg1, CtxEntity arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void unregister(String arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

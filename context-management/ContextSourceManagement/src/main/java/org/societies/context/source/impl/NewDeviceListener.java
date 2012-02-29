@@ -1,5 +1,37 @@
 package org.societies.context.source.impl;
 
-public class NewDeviceListener {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+
+public class NewDeviceListener implements Runnable{
+	private static Logger LOG = LoggerFactory.getLogger(ContextSourceManagement.class);
+
+	private IDeviceManager deviceManager;
+
+	public NewDeviceListener(IDeviceManager deviceManager) {
+		this.deviceManager = deviceManager;
+		LOG.debug("DewDeviceListener created");
+	}
+
+	/**
+	 * @return the deviceManager
+	 */
+	public IDeviceManager getDeviceManager() {
+		return deviceManager;
+	}
+
+	/**
+	 * @param deviceManager the deviceManager to set
+	 */
+	public void setDeviceManager(IDeviceManager deviceManager) {
+		this.deviceManager = deviceManager;
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
