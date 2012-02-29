@@ -31,12 +31,17 @@ import java.util.List;
 
 import org.societies.api.internal.servicelifecycle.model.Service;
 import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.internal.servicelifecycle.model.ServiceStatus;
 import org.societies.api.internal.servicelifecycle.serviceMgmt.ServiceMgmtException;
 /**
  * 
  * @author pkuppuud
  *
  */
+/**
+ * @deprecated  Will be replaced by IServiceControl and IServiceDiscovery
+ */
+@Deprecated
 public interface IServiceManagement {
 	/**
 	 * This method checks virgo-osgi container whether the service registry

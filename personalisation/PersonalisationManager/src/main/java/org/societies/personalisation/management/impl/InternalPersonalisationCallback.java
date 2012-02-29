@@ -26,7 +26,8 @@ package org.societies.personalisation.management.impl;
 
 import java.util.List;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+
+import org.societies.api.identity.IIdentity;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
@@ -93,25 +94,25 @@ public class InternalPersonalisationCallback implements IPersonalisationInternal
 	}
 
 	@Override
-	public void sendCAUIOutcome(Identity arg0, List<IUserIntentAction> arg1) {
+	public void sendCAUIOutcome(IIdentity arg0, List<IUserIntentAction> arg1) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void sendCRISTOutcome(Identity arg0, List<ICRISTUserAction> arg1) {
+	public void sendCRISTOutcome(IIdentity arg0, List<ICRISTUserAction> arg1) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void sendDIANNEOutcome(Identity arg0, List<IDIANNEOutcome> arg1) {
+	public void sendDIANNEOutcome(IIdentity arg0, List<IDIANNEOutcome> arg1) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void sendPrefOutcome(Identity arg0, List<IPreferenceOutcome> arg1) {
+	public void sendPrefOutcome(IIdentity arg0, List<IPreferenceOutcome> arg1) {
 		// TODO Auto-generated method stub
 		
 	}

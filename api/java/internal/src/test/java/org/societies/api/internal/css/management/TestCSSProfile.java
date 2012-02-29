@@ -31,8 +31,15 @@ public class TestCSSProfile {
 	
 	@Before
 	public void setUp() throws Exception {
-		cssNode_1 = new CSSNode(TEST_IDENTITY_1, CSSNode.nodeStatus.Available.ordinal(), CSSNode.nodeType.Rich.ordinal());
-		cssNode_2 = new CSSNode(TEST_IDENTITY_2, CSSNode.nodeStatus.Hibernating.ordinal(), CSSNode.nodeType.Android.ordinal());
+		cssNode_1 = new CSSNode();
+		cssNode_1.setIdentity(TEST_IDENTITY_1);
+		cssNode_1.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
+		cssNode_1.setType(CSSManagerEnums.nodeType.Rich.ordinal());
+
+		cssNode_2 = new CSSNode();
+		cssNode_2.setIdentity(TEST_IDENTITY_2);
+		cssNode_2.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
+		cssNode_2.setType(CSSManagerEnums.nodeType.Android.ordinal());
 		
 		cssArrayNodes = new CSSNode[2];
 		cssArrayNodes[0] = cssNode_1;
@@ -60,18 +67,18 @@ public class TestCSSProfile {
 		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
 		cssProfile.setCssNodes(cssArrayNodes);
 		cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
-		cssProfile.setStatus(CSSProfile.cssStatus.Active.ordinal());
+		cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
 		cssProfile.setCssUpTime(TEST_UPTIME);
 		cssProfile.setEmailID(TEST_EMAIL);
-		cssProfile.setEntity(CSSProfile.entityType.Organisation.ordinal());
+		cssProfile.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
 		cssProfile.setForeName(TEST_FORENAME);
 		cssProfile.setHomeLocation(TEST_HOME_LOCATION);
 		cssProfile.setIdentityName(TEST_IDENTITY_NAME);
 		cssProfile.setImID(TEST_IM_ID);
 		cssProfile.setName(TEST_NAME);
 		cssProfile.setPassword(TEST_PASSWORD);
-		cssProfile.setPresence(CSSProfile.presenceType.Available.ordinal());
-		cssProfile.setSex(CSSProfile.genderType.Unspecified.ordinal());
+		cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
+		cssProfile.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
 		cssProfile.setSocialURI(TEST_SOCIAL_URI);
 		
 		
@@ -80,18 +87,18 @@ public class TestCSSProfile {
 		assertEquals(TEST_INACTIVE_DATE, cssProfile.getCssInactivation());
 		assertEquals(cssArrayNodes.length, cssProfile.getCssNodes().length);
 		assertEquals(TEST_REGISTERED_DATE, cssProfile.getCssRegistration());
-		assertEquals(CSSProfile.cssStatus.Active.ordinal(), cssProfile.getStatus());
+		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), cssProfile.getStatus());
 		assertEquals(TEST_UPTIME, cssProfile.getCssUpTime());
 		assertEquals(TEST_EMAIL, cssProfile.getEmailID());
-		assertEquals(CSSProfile.entityType.Organisation.ordinal(), cssProfile.getEntity());
+		assertEquals(CSSManagerEnums.entityType.Organisation.ordinal(), cssProfile.getEntity());
 		assertEquals(TEST_FORENAME, cssProfile.getForeName());
 		assertEquals(TEST_HOME_LOCATION, cssProfile.getHomeLocation());
 		assertEquals(TEST_IDENTITY_NAME, cssProfile.getIdentityName());
 		assertEquals(TEST_IM_ID, cssProfile.getImID());
 		assertEquals(TEST_NAME, cssProfile.getName());
 		assertEquals(TEST_PASSWORD, cssProfile.password);
-		assertEquals(CSSProfile.presenceType.Available.ordinal(), cssProfile.getPresence());
-		assertEquals(CSSProfile.genderType.Unspecified.ordinal(), cssProfile.getSex());
+		assertEquals(CSSManagerEnums.presenceType.Available.ordinal(), cssProfile.getPresence());
+		assertEquals(CSSManagerEnums.genderType.Unspecified.ordinal(), cssProfile.getSex());
 		assertEquals(TEST_SOCIAL_URI, cssProfile.getSocialURI());
 	}
 

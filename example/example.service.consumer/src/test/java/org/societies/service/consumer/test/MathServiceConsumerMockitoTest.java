@@ -1,13 +1,11 @@
 package org.societies.service.consumer.test;
 
-import static org.junit.Assert.*;
-
-import java.util.List;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.service.api.IMathService;
+import org.societies.service.api.IMathServiceCallBack;
+import org.societies.service.consumer.MathServiceCallBack;
 import org.societies.service.consumer.MathServiceConsumer;
 
 import static org.mockito.Mockito.*;
@@ -19,13 +17,13 @@ public class MathServiceConsumerMockitoTest {
     
     @Before  
     public void setUp() {  
-//    	creat mocked class
+//    	create mocked class
         mock = mock(IMathService.class); 
         
-//      creat an instance of your tested class
+//      create an instance of your tested class
         classUnderTest = new MathServiceConsumer(1,1);
         
-//      set mock class to the test class
+//      Initialize the set method (normally called by spring */
         classUnderTest.setMathService(mock);   
     }  
     
@@ -38,9 +36,25 @@ public class MathServiceConsumerMockitoTest {
     	classUnderTest.collaborationCall(1, 15);
     	
 //    	then check whether the mock call has been as expected
-    	verify(mock).add(1, 15);
+    	verify(mock).add(1, 15) ; 
     }  
-    
+
+	@Test
+	public void divisionCallTest() {
+
+		IMathServiceCallBack divCallBack = new MathServiceCallBack();
+		/* we need this injector for the Call Back */
+		classUnderTest.setMathServiceCallBack(divCallBack);
+		when(mock.divise(1, 1, divCallBack)).thenReturn((boolean) true);
+
+		System.out.println("there");
+		/* call the method of your class under test */
+		classUnderTest.callDivisionWithCallBack(1, 1);
+		/* then check whether the call has been as expected */
+		divCallBack.resultDivision(1);
+		verify(mock).divise(1, 1, divCallBack);
+	}
+
     @After  
     public void tearDown(){  
     	mock = null;

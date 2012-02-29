@@ -24,15 +24,10 @@
  */
 package org.societies.personalisation.preference.api.UserPreferenceConditionMonitor;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxModelObject;
-import org.societies.api.internal.personalisation.model.IFeedbackEvent;
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
-import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 
 
 /**
@@ -48,7 +43,7 @@ public interface IUserPreferenceConditionMonitor {
 	 * @param attribute
 	 * @param callback
 	 */
-	public void getOutcome(Identity ownerId, CtxAttribute attribute, IPersonalisationInternalCallback callback);
+	public void getOutcome(IIdentity ownerId, CtxAttribute attribute, IPersonalisationInternalCallback callback);
 	
 
 	/**
@@ -57,5 +52,5 @@ public interface IUserPreferenceConditionMonitor {
 	 * @param action
 	 * @param callback
 	 */
-	public void getOutcome(Identity ownerId, IAction action, IPersonalisationInternalCallback callback);
+	public void getOutcome(IIdentity ownerId, IAction action, IPersonalisationInternalCallback callback);
 }

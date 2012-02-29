@@ -28,9 +28,10 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
+import java.util.concurrent.Future;
 
 import org.societies.api.context.CtxException;
+import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -43,8 +44,6 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 
-import java.util.concurrent.Future;
-
 /**
  * This interface provides access to current, past and future context data. The
  * past context refers to the data stored in the context history database. The
@@ -54,8 +53,9 @@ import java.util.concurrent.Future;
  * remote DB or the Context Inference Management need to be contacted to
  * retrieve the requested context data.
  *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.2
  */
-
 public interface ICtxBroker {
 
 	/**
@@ -128,15 +128,16 @@ public interface ICtxBroker {
 	public Future<List<CtxEntityIdentifier>> lookupEntities(IIdentity requester, String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue) throws CtxException;
 
 	/**
-	 * Registers the specified EventListener for value modification events of context
-	 * attribute(s) with the supplied scope and type.
+	 * Registers the specified EventListener for value modification events of the
+	 * specified context attribute.
 	 * 
 	 * @param requester
-	 * @param scope
-	 * @param attrType
-	 * @throws CtxException 
+	 * @param attrId
+	 * @throws CtxException
+	 * @deprecated As of 0.0.3, use {@link #registerForChanges(IIdentity, CtxChangeEventListener, CtxIdentifier)}
 	 */
-	public void registerForUpdates(IIdentity requester, CtxEntityIdentifier scope, String attrType) throws CtxException;
+	@Deprecated
+	public void registerForUpdates(IIdentity requester, CtxAttributeIdentifier attrId) throws CtxException;
 
 	/**
 	 * Registers the specified EventListener for value modification events of the
@@ -144,9 +145,115 @@ public interface ICtxBroker {
 	 * 
 	 * @param requester
 	 * @param attrId
-	 * @throws CtxException 
+	 * @throws CtxException
+	 * @deprecated As of 0.0.3, use {@link #unregisterFromChanges(IIdentity, CtxChangeEventListener, CtxIdentifier)} 
 	 */
-	public void registerForUpdates(IIdentity requester, CtxAttributeIdentifier attrId) throws CtxException;
+	@Deprecated
+	public void unregisterForUpdates(IIdentity requester, CtxAttributeIdentifier attrId) throws CtxException;
+	
+	/**
+	 * Registers the specified EventListener for value modification events of context
+	 * attribute(s) with the supplied scope and type.
+	 * 
+	 * @param requester
+	 * @param scope
+	 * @param attrType
+	 * @throws CtxException
+	 * @deprecated As of 0.0.3, use {@link #registerForChanges(IIdentity, CtxChangeEventListener, CtxEntityIdentifier, String)}  
+	 */
+	@Deprecated
+	public void registerForUpdates(IIdentity requester, CtxEntityIdentifier scope, String attrType) throws CtxException;
+	
+	/**
+	 * Unregisters the specified EventListener for value modification events of
+	 * context attribute(s) with the supplied scope and type.
+	 * 
+	 * @param requester
+	 * @param scope
+	 * @param attributeType
+	 * @throws CtxException 
+	 * @deprecated As of 0.0.3, use {@link #unregisterFromChanges(IIdentity, CtxChangeEventListener, CtxEntityIdentifier, String)}
+	 */
+	@Deprecated
+	public void unregisterForUpdates(IIdentity requester, CtxEntityIdentifier scope, String attributeType) throws CtxException;
+	
+	/**
+	 * Registers the specified {@link CtxChangeEventListener} for changes
+	 * related to the context model object referenced by the specified identifier.
+	 * 
+	 * @param requester
+	 *            the IIdentity of the requester
+	 * @param listener
+	 *            the listener to register for context changes 
+	 * @param ctxId
+	 *            the identifier of the context model object whose change
+	 *            events to register for
+	 * @throws CtxException if the registration process fails
+	 * @throws NullPointerException if any of the specified parameters is <code>null</code>
+	 * @since 0.0.3
+	 */
+	public void registerForChanges(final IIdentity requester, final CtxChangeEventListener listener, 
+			final CtxIdentifier ctxId) throws CtxException;
+	
+	/**
+	 * Unregisters the specified {@link CtxChangeEventListener} from changes
+	 * related to the context model object referenced by the specified identifier.
+	 * 
+	 * @param requester
+	 *            the IIdentity of the requester
+	 * @param listener
+	 *            the listener to unregister from context changes 
+	 * @param ctxId
+	 *            the identifier of the context model object whose change
+	 *            events to unregister from
+	 * @throws CtxException if the unregistration process fails
+	 * @throws NullPointerException if any of the specified parameters is <code>null</code>
+	 * @since 0.0.3
+	 */
+	public void unregisterFromChanges(final IIdentity requester, final CtxChangeEventListener listener, 
+			final CtxIdentifier ctxId) throws CtxException;
+
+	/**
+	 * Registers the specified {@link CtxChangeEventListener} for changes
+	 * related to the context attribute(s) with the supplied scope and type.
+	 * 
+	 * @param requester
+	 *            the IIdentity of the requester
+	 * @param listener
+	 *            the listener to register for context changes
+	 * @param scope
+	 *            the scope of the context attribute(s) whose change events to
+	 *            register for 
+	 * @param attrType
+	 *            the type of the context attribute(s) whose change events to
+	 *            register for
+	 * @throws CtxException if the registration process fails
+	 * @throws NullPointerException if any of the specified parameters is <code>null</code>
+	 * @since 0.0.3
+	 */
+	public void registerForChanges(final IIdentity requester, final CtxChangeEventListener listener,
+			final CtxEntityIdentifier scope, String attrType) throws CtxException;
+	
+	/**
+	 * Unregisters the specified {@link CtxChangeEventListener} from changes
+	 * related to the context attribute(s) with the supplied scope and type.
+	 * 
+	 * @param requester
+	 *            the IIdentity of the requester
+	 * @param listener
+	 *            the listener to unregister from context changes
+	 * @param scope
+	 *            the scope of the context attribute(s) whose change events to
+	 *            unregister from 
+	 * @param attrType
+	 *            the type of the context attribute(s) whose change events to
+	 *            unregister from
+	 * @throws CtxException if the unregistration process fails
+	 * @throws NullPointerException if any of the specified parameters is <code>null</code>
+	 * @since 0.0.3
+	 */
+	public void unregisterFromChanges(final IIdentity requester, final CtxChangeEventListener listener,
+			final CtxEntityIdentifier scope, String attrType) throws CtxException;
 
 	/**
 	 * Removes the specified context model object.
@@ -208,28 +315,7 @@ public interface ICtxBroker {
 	 * @throws CtxException 
 	 */
 	public Future<List<CtxHistoryAttribute>> retrieveHistory(IIdentity requester, CtxAttributeIdentifier attrId, Date startDate, Date endDate) throws CtxException;
-
-	/**
-	 * Registers the specified EventListener for value modification events of the
-	 * specified context attribute.
-	 * 
-	 * @param requester
-	 * @param attrId
-	 * @throws CtxException 
-	 */
-	public void unregisterForUpdates(IIdentity requester, CtxAttributeIdentifier attrId) throws CtxException;
-
-	/**
-	 * Unregisters the specified EventListener for value modification events of
-	 * context attribute(s) with the supplied scope and type.
-	 * 
-	 * @param requester
-	 * @param scope
-	 * @param attributeType
-	 * @throws CtxException 
-	 */
-	public void unregisterForUpdates(IIdentity requester, CtxEntityIdentifier scope, String attributeType) throws CtxException;
-
+		
 	/**
 	 * Updates a single context model object.
 	 * 
