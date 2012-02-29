@@ -182,6 +182,10 @@ public class XMPPClient implements XMPPAgent {
 		}
 	}
 	
+	public String getIdentity() {
+		return connection.getUser();
+	}
+	
 	private void connect() throws XMPPException {		
 		if(!connection.isConnected()) {
 			connection.connect();

@@ -32,6 +32,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.societies.utilities.DBC.Dbc;
+
 public class TesterActivity extends Activity {
 
 	private static final Logger log = LoggerFactory.getLogger(TesterActivity.class);
@@ -61,30 +63,40 @@ public class TesterActivity extends Activity {
 		log.debug("onCreate");
         setContentView(R.layout.main);
                  
-        Identity toXCManager = (new IdentityManager()).fromJid("xcmanager.societies.local");     // TODO
-        final ICommCallback callback = createCallback();
-        final Stanza stanza = new Stanza((new IdentityManager()).fromJid("psi@societies.local"));	 // TODO	
-        final Stanza stanza2 = new Stanza(toXCManager); 
-        final Stanza stanza3 = new Stanza(toXCManager); 
-        final Stanza stanza4 = new Stanza(toXCManager);
-        try {
-			Object payload = createPayload();			
-			ccm.register(elementNames, callback);
-			ccm.sendMessage(stanza, payload);
-//			ccm.sendIQ(stanza2, IQ.Type.GET, payload, callback);
-			String nodeName = "test3";
-			ccm.sendIQ(stanza2, IQ.Type.SET, createNodePayload(nodeName), callback);
-			ccm.sendIQ(stanza3, IQ.Type.SET, deleteNodePayload(nodeName), callback);
-			ccm.sendIQ(stanza4, IQ.Type.SET, deleteNodePayload(nodeName), callback);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
+        ExampleTask task = new ExampleTask(); 
+        task.execute();
     }
     
     @Override
     public void onDestroy() {
     	super.onDestroy();
     	ccm.unregister(elementNames, namespaces, packages);
+    }
+    
+    private class ExampleTask extends AsyncTask<Void, Void, Void> {
+    	
+    	protected Void doInBackground(Void... args) {
+    		Identity toXCManager = (new IdentityManager()).fromJid("xcmanager.societies.local");     // TODO
+            final ICommCallback callback = createCallback();
+            final Stanza stanza = new Stanza((new IdentityManager()).fromJid("psi@societies.local"));	 // TODO	
+            final Stanza stanza2 = new Stanza(toXCManager); 
+            final Stanza stanza3 = new Stanza(toXCManager); 
+            final Stanza stanza4 = new Stanza(toXCManager);
+            try {
+    			Object payload = createPayload();			
+    			ccm.register(elementNames, callback);
+    			ccm.sendMessage(stanza, payload);
+//    			ccm.sendIQ(stanza2, IQ.Type.GET, payload, callback);
+    			String nodeName = "test3";
+    			ccm.sendIQ(stanza2, IQ.Type.SET, createNodePayload(nodeName), callback);
+    			ccm.sendIQ(stanza3, IQ.Type.SET, deleteNodePayload(nodeName), callback);
+    			ccm.sendIQ(stanza4, IQ.Type.SET, deleteNodePayload(nodeName), callback);
+    			Dbc.assertion("android@societies.local/default".equals(ccm.getIdentity().getJid()));
+    		} catch (Exception e) {
+    			log.error(e.getMessage(), e);
+    		}
+            return null;
+    	}
     }
     
     private Object createPayload() throws DOMException, ParserConfigurationException {

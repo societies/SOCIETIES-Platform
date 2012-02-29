@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.impl.XMPPClient;
+import org.societies.utilities.DBC.Dbc;
 import org.societies.comm.android.ipc.Skeleton;
 
 import android.app.Service;
@@ -21,6 +22,7 @@ public class AgentService extends Service {
 	
 	@Override
     public IBinder onBind(Intent intent) {  
+		Dbc.assertion(true);
     	log.debug("onBind"); 
     	if(skeleton != null)
     		return skeleton.messenger().getBinder();    

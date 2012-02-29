@@ -46,7 +46,7 @@ public class PubsubService extends Service {
     		try {
     			ClientCommunicationMgr ccm = new ClientCommunicationMgr(this);
     			IdentityManager idm = new IdentityManager();    	        
-    	        ICommManager endpoint = new CommManagerAdapter(ccm, idm.fromJid("android@societies.local/default")); // TODO
+    	        ICommManager endpoint = new CommManagerAdapter(ccm);
     	        PubsubClient pubsubClient = new PubsubClientImpl(endpoint);
     	        Pubsub pubsub = new PubsubSkeleton(pubsubClient);
         		skeleton = new Skeleton(pubsub);	
@@ -65,12 +65,9 @@ public class PubsubService extends Service {
     private static class CommManagerAdapter implements ICommManager {
     	
     	private ClientCommunicationMgr clientCommunicationMgr;
-    	private Identity identity;
-    	private IdentityManager identityManager = new IdentityManager();
     	
-    	public CommManagerAdapter(ClientCommunicationMgr clientCommunicationMgr, Identity identity) {
+    	public CommManagerAdapter(ClientCommunicationMgr clientCommunicationMgr) {
     		this.clientCommunicationMgr = clientCommunicationMgr;
-    		this.identity = identity;
     	}
 
 		public void register(IFeatureServer featureServer)
@@ -90,7 +87,6 @@ public class PubsubService extends Service {
 
 		public void sendIQSet(Stanza stanza, Object payload,
 				ICommCallback callback) throws CommunicationException {
-			log.debug("sendIQSet");
 			clientCommunicationMgr.sendIQ(stanza, IQ.Type.SET, payload, callback); // TODO remove dep with smack by changing interface
 		}
 
@@ -123,12 +119,12 @@ public class PubsubService extends Service {
 			throw new UnsupportedOperationException("Not implemented!");
 		}
 
-		public Identity getIdentity() { // TODO get from AndroidAgent
-			return identity;
+		public Identity getIdentity() { 
+			return clientCommunicationMgr.getIdentity();
 		}
 
 		public IIdentityManager getIdManager() {
-			return identityManager;
+			return clientCommunicationMgr.getIdManager();
 		}
     }
 }
