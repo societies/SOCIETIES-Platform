@@ -93,7 +93,8 @@
 							org.jabber.protocol.pubsub,
 							org.jabber.protocol.pubsub.errors,
 							org.jabber.protocol.pubsub.owner,
-							org.jabber.protocol.pubsub.event
+							org.jabber.protocol.pubsub.event,
+							org.societies.comm.xmpp.pubsub.impl
 		           		</Export-Package>
 		           		<Embed-Dependency>*;scope=compile</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>

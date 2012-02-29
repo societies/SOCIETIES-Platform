@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class TestPubsubClient extends Thread implements Subscriber, ApplicationListener<PubsubEvent> {
 	
 	private static Logger LOG = LoggerFactory
@@ -33,7 +33,7 @@ public class TestPubsubClient extends Thread implements Subscriber, ApplicationL
 	private IIdentityManager idm;
 	private ICommManager endpoint;
 	
-	@Autowired
+//	@Autowired
 	public TestPubsubClient(PubsubClient psc, ICommManager endpoint) {
 		this.psc = psc;
 		this.endpoint = endpoint;
