@@ -28,6 +28,7 @@ package org.societies.css.devicemgmt.devicemanager.impl;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 
 import org.osgi.framework.BundleContext;
@@ -103,7 +104,7 @@ public class DeviceImpl implements IDevice{
 		if (registration != null)
 		{
 			registration.unregister();
-			deviceManager.removeDeviceFromContainer(deviceId);
+			deviceManager.removeDeviceFromContainer(deviceCommonInfo.getDeviceFamilyIdentity(), deviceId);
 			
 			LOG.info("-- The device " + properties.get("deviceId") + " has been removed");
 		}
@@ -166,56 +167,61 @@ public class DeviceImpl implements IDevice{
 	@Override
 	public IDeviceService getService(String serviceId) {
 	
-		ServiceReference[] sr = null;
-		try 
+		String deviceMacAddress = deviceManager.getDeviceMacAddress(this.deviceId);
+		List <String> serviceList = deviceManager.getDeviceServiceIds(this.deviceId);
+		if (serviceList != null && deviceMacAddress != null) 
 		{
-			LOG.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceImpl:  pre getServiceReferences ");
-			
-			sr = bundleContext.getServiceReferences(IDeviceService.class.getName(), "(serviceId="+serviceId+")");
-			LOG.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceImpl:  post getServiceReferences ");
-		
-		} catch (InvalidSyntaxException e) {
-			//TODO in case of exception 
-			LOG.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceImpl:  InvalidSyntaxException ");
-			e.printStackTrace();
+			if (serviceList.contains(serviceId))
+			{
+				ServiceReference[] sr = null;
+				try 
+				{
+					sr = bundleContext.getServiceReferences(IDeviceService.class.getName(), "(&(serviceId="+serviceId+")(deviceMacAddress="+deviceMacAddress+"))");
+				} 
+				catch (InvalidSyntaxException e) 
+				{
+					e.printStackTrace();
+				}
+				if (sr != null)
+				{
+					IDeviceService iDeviceService = (IDeviceService)bundleContext.getService(sr[0]);
+
+					return iDeviceService;
+				}
+				return null;
+			}
+			return null;
 		}
-		
-		if (sr != null)
-		{
-			LOG.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceImpl:  pre bundleContext.getService ");
-			
-			IDeviceService iDeviceService = (IDeviceService)bundleContext.getService(sr[0]);
-			
-			LOG.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceImpl:  post bundleContext.getService ");
-			return iDeviceService;
-		}
-		LOG.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceImpl:  pre return null ");
 		return null;
 	}
 
 	@Override
 	public IDeviceService [] getServices() {
 
+		String deviceMacAddress = deviceManager.getDeviceMacAddress(this.deviceId);
+		List <String> serviceList = deviceManager.getDeviceServiceIds(this.deviceId);
 		
-		ServiceReference[] sr = null;
-		try 
-		{
-			
-			sr = bundleContext.getServiceReferences(IDeviceService.class.getName(), null);
+		List<IDeviceService> deviceServiceList = new ArrayList<IDeviceService>();
 		
-		} catch (InvalidSyntaxException e) {
-			//TODO in case of exception 
-			e.printStackTrace();
-		}
-		if (sr != null)
+		if (serviceList != null && deviceMacAddress != null) 
 		{
-			List<IDeviceService> deviceServiceList = new ArrayList<IDeviceService>();
-			for (ServiceReference sevicereference: sr)
+			ServiceReference[] sr = null;
+			for(String serviceId : serviceList)
 			{
-				deviceServiceList.add((IDeviceService)bundleContext.getService(sevicereference));
+				try 
+				{
+					sr = bundleContext.getServiceReferences(IDeviceService.class.getName(), "(&(serviceId="+serviceId+")(deviceMacAddress="+deviceMacAddress+"))");
+				
+				} catch (InvalidSyntaxException e) {
+					e.printStackTrace();
+				}
+				if (sr != null)
+				{
+					IDeviceService iDeviceService = (IDeviceService)bundleContext.getService(sr[0]);
+
+					deviceServiceList.add(iDeviceService);
+				}
 			}
-			
-			
 			return (IDeviceService [])deviceServiceList.toArray(new IDeviceService []{});
 		}
 		return null;

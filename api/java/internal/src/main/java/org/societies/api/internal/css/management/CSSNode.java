@@ -34,45 +34,6 @@ package org.societies.api.internal.css.management;
  */
 
 public class CSSNode {
-	/**
-	 * Enum for device status types
-	 */
-	public enum nodeStatus {
-		
-		Available("Available for Use"), 
-		Unavailable("Unavailable"), 
-		Hibernating("Not active but on alert");
-		
-	    private String name;
-
-		nodeStatus(String name) {
-	        this.name = name;
-	    }
-
-	    public String getName() {
-	        return this.name;
-	    }
-	
-	};
-	/**
-	 * Enum for device node types
-	 */
-	public enum nodeType {
-		Android("Android based client"), 
-		Cloud("Cloud Node"), 
-		Rich("JVM based client");
-		
-		
-	    private String name;
-
-		nodeType(String name) {
-	        this.name = name;
-	    }
-
-	    public String getName() {
-	        return this.name;
-	    }
-	};
 
 	/**
 	 * unique within context of CSS
@@ -94,20 +55,6 @@ public class CSSNode {
 	public CSSNode() {
 	}
 	
-	/**
-	 * Alternative Constructor
-	 * 
-	 * @param identity
-	 * @param status
-	 * @param nodeType
-	 */
-	public CSSNode(String identity, int status, int type) {
-		this.identity = identity;
-		this.status = status;
-		this.type = type;
-		
-	}
-
 	public String getIdentity() {
 		return identity;
 	}
@@ -131,6 +78,4 @@ public class CSSNode {
 	public void setType(int type) {
 		this.type = type;
 	}
-	
-
 }
