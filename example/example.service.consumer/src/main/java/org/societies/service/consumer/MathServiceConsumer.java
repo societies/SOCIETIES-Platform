@@ -44,10 +44,8 @@ public class MathServiceConsumer{
 	
 	//use to demonstrate how to test a method which uses a callback */
 		public void callDivisionWithCallBack(int num_a, int num_b) {
-			System.out.println("step1");
 			boolean r = getMathService().divise(num_a, num_b, divisionCallBack);
 			
-			System.out.println("step2");
 			if (r) {
 				System.out.println("have a look on the callback");
 			} else {
