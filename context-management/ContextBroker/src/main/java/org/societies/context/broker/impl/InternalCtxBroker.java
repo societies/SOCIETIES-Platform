@@ -35,6 +35,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.societies.api.context.CtxException;
+import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -337,7 +338,69 @@ public class InternalCtxBroker implements ICtxBroker {
 
 	}
 
-
+	/* (non-Javadoc)
+	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
+	 */
+	@Override
+	public void registerForChanges(final CtxChangeEventListener listener,
+			final CtxIdentifier ctxId) throws CtxException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (ctxId == null)
+			throw new NullPointerException("ctxId can't be null");
+		
+		// TODO Auto-generated method stub
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.api.context.broker.ICtxBroker#unregisterFromChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
+	 */
+	@Override
+	public void unregisterFromChanges(final CtxChangeEventListener listener,
+			final CtxIdentifier ctxId) throws CtxException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (ctxId == null)
+			throw new NullPointerException("ctxId can't be null");
+		
+		// TODO Auto-generated method stub
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
+	 */
+	@Override
+	public void registerForChanges(final CtxChangeEventListener listener,
+			final CtxEntityIdentifier scope, final String attrType) throws CtxException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (scope == null)
+			throw new NullPointerException("scope can't be null");
+		if (attrType == null)
+			throw new NullPointerException("attrType can't be null");
+		
+		// TODO Auto-generated method stub
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.api.context.broker.ICtxBroker#unregisterFromChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
+	 */
+	@Override
+	public void unregisterFromChanges(final CtxChangeEventListener listener,
+			final CtxEntityIdentifier scope, final String attrType) throws CtxException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (scope == null)
+			throw new NullPointerException("scope can't be null");
+		if (attrType == null)
+			throw new NullPointerException("attrType can't be null");
+		
+		// TODO Auto-generated method stub
+	}
 
 
 	//***********************************************
