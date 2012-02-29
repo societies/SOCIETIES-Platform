@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<color name="azureStart">#58f3fe</color>
+	<color name="azureMid">#0aefff</color>
+	<color name="azureEnd">#05d7e6</color>
+	<color name="blueStart">#5364fd</color>
+	<color name="blueMid">#4254ff</color>
+	<color name="blueEnd">#2c40fc</color>
+	<color name="yellowStart">#fce654</color>
+	<color name="yellowMid">#fce02c</color>
+	<color name="yellowEnd">#f1d204</color>
+	<color name="redStart">#fd5355</color>
+	<color name="redMid">#ff2e30</color>
+	<color name="redEnd">#c80406</color>
+	<color name="greenStart">#58f3fe</color>
+	<color name="greenMid">#0aefff</color>
+	<color name="greenEnd">#05d7e6</color>
+	<color name="violetStart">#d75cff</color>
+	<color name="violetMid">#c105ff</color>
+	<color name="violetEnd">#a500db</color>
+	<color name="roseStart">#f1d0d0</color>
+	<color name="roseMid">#efc3c3</color>
+	<color name="roseEnd">#e5a4a4</color>
+	<color name="brownStart">#fdc163</color>
+	<color name="brownMid">#ffa414</color>
+	<color name="brownEnd">#c57902</color>
+</resources>
+
