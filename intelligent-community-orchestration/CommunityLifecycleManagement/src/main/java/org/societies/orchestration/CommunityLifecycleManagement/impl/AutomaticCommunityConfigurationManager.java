@@ -50,6 +50,9 @@ import java.util.concurrent.Future;
 //import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
 
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
+import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
@@ -105,6 +108,10 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
 	//private IUserCtxBrokerCallback userContextBrokerCallback;
 
 	private ArrayList<CisRecord> recentRefusals;
+
+	private IUserFeedback userFeedback;
+
+	private IUserFeedbackCallback userFeedbackCallback;
     
 	/*
      * Constructor for AutomaticCommunityConfigurationManager
@@ -207,11 +214,11 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
 		//OR
 		//automatically call CIS management functions to configure CISs
 		
-		List<String> options = new ArrayList<String>();
-		options.add("options");
+		String[] options = new String[1];
+		options[0] = "options";
 		String userResponse = null;
 		boolean responded = false;
-		//userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs should be configured in certain ways. If you approve of any of the suggested reconfigurations, please check them.", options), userFeedbackCallback);
+		userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs should be configured in certain ways. If you approve of any of the suggested reconfigurations, please check them.", options), userFeedbackCallback);
 		for (int i = 0; i < 300; i++) {
 		    if (userResponse == null)
 				try {
@@ -289,17 +296,33 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
     /**public void setUserContextDatabaseManager(IUserCtxDBMgr userContextDatabaseManager) {
     	System.out.println("GOT database" + userContextDatabaseManager);
     	this.userContextDatabaseManager = userContextDatabaseManager;
-    }
+    }*/
     
-    public void setUserContextBroker(IUserCtxBroker userContextBroker) {
+    public void setUserContextBroker(ICtxBroker userContextBroker) {
     	System.out.println("GOT user context broker" + userContextBroker);
     	this.userContextBroker = userContextBroker;
     }
     
-    public void setUserContextBrokerCallback(IUserCtxBrokerCallback userContextBrokerCallback) {
+    /**public void setUserContextBrokerCallback(ICtxBrokerCallback userContextBrokerCallback) {
     	System.out.println("GOT user context broker callback" + userContextBrokerCallback);
     	this.userContextBrokerCallback = userContextBrokerCallback;
     }*/
+    
+    public IUserFeedback getUserFeedback() {
+    	return userFeedback;
+    }
+    
+    public void setUserFeedback(IUserFeedback userFeedback) {
+    	this.userFeedback = userFeedback;
+    }
+    
+    public IUserFeedbackCallback getUserFeedbackCallback() {
+    	return userFeedbackCallback;
+    }
+    
+    public void setUserFeedbackCallback(IUserFeedbackCallback userFeedbackCallback) {
+    	this.userFeedbackCallback = userFeedbackCallback;
+    }
     
   //public CommManagerBundle getCommManager() {
     //	return commManager;

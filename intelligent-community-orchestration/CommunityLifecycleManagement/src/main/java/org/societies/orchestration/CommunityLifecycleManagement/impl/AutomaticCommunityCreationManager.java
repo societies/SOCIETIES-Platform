@@ -54,6 +54,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 //import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 //import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 
 import org.societies.api.context.CtxException;
@@ -105,7 +106,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 	//private IUserCtxBrokerCallback userContextBrokerCallback;
 	private ArrayList<CisRecord> recentRefusals;
 	private IUserFeedback userFeedback;
-	//private IUserFeedbackCallback userFeedbackCallback;
+	private IUserFeedbackCallback userFeedbackCallback;
 	
 	private ICisManager cisManager;
     
@@ -197,7 +198,16 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 		
 		ArrayList<CisRecord> cissToCreate = null;
 		ArrayList<CisRecord> cissToAutomaticallyCreate = null;
-		//v0.1 algorithms
+		
+		//v1.0 algorithms
+		
+		String[] it = new String[1];
+		it[0] = linkedCss.getIdentifier();
+		CisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new CisRecord(null, null, null, null, null, it, null, null, null));
+		ArrayList<CisRecord> userJoinedCiss = new ArrayList<CisRecord>();
+		for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
+		    userJoinedCiss.add(listOfUserJoinedCiss[i]);   
+		}
 		
 		if (evaluationType.equals("extensive")) { //every day or so
 			if (linkedCss != null) {
@@ -215,13 +225,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				//e.g. friends in contact list, family in contact list (from SNS extractor or SOCIETIES)
 				
 				//If CISs are appropriate for friends' lists in Google+ circle fashion, then that counts
-				String[] it = new String[1];
-				it[0] = linkedCss.getIdentifier();
-				CisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new CisRecord(null, null, null, null, null, it, null, null, null));
-				ArrayList<CisRecord> userJoinedCiss = new ArrayList<CisRecord>();
-				for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
-				    userJoinedCiss.add(listOfUserJoinedCiss[i]);   
-				}
+				
 				
 				
 				//CSS directory
@@ -474,21 +478,21 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 					e.printStackTrace();
 				}
 				
-				/**for (int i = 0; i < temporaryLocalCsss.size(); i++) {
+				for (int i = 0; i < temporaryLocalCsss.size(); i++) {
 					if (userCssDirectory.findForAllCss().contains(temporaryLocalCsss.get(i))) {
-						if (userCiss.contains(CisRecord(null, null, "friends", null, null, null, null, null, null))) {
-							if (it has a sub-CIS defined on this location) {
-								not create
+						if (userJoinedCiss.contains(new CisRecord(null, null, "friends", null, null, null, null, null, null))) {
+							
+							if (userJoinedCiss.get(i).membershipCriteria.equals("friends") /**&& userJoinedCiss.getSubCiss("proximity") != null*/ /**it has a sub-CIS defined on this location*/) {
+								//not create
 							}
 							else {
-								create
-							}
+								cissToCreate.add(new CisRecord(null, linkedCss.toString(), "Local proximity", null, null, null, null, null, null));
 							}
 						}
 					}
-					do for all other attributes: family, workers, interest?, CSS directory (personal and mutual if there is one)
-					then do this for service interaction, same process
-				}*/
+					//do for all other attributes: family, workers, interest?, CSS directory (personal and mutual if there is one)
+					//then do this for service interaction, same process
+				}
 				
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				//historyOfLocalCsss.add(thisResult);
@@ -565,7 +569,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 		options[0] = "options";
 		String userResponse = null;
 		boolean responded = false;
-		userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs may benefit you. If you would like to create one or more of these CISs, please check them.", options));
+		userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs may benefit you. If you would like to create one or more of these CISs, please check them.", options), userFeedbackCallback);
 		for (int i = 0; i < 300; i++) {
 		    if (userResponse == null)
 				try {
@@ -663,6 +667,22 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
     
     public void setCisManager(ICisManager cisManager) {
     	this.cisManager = cisManager;
+    }
+    
+    public IUserFeedback getUserFeedback() {
+    	return userFeedback;
+    }
+    
+    public void setUserFeedback(IUserFeedback userFeedback) {
+    	this.userFeedback = userFeedback;
+    }
+    
+    public IUserFeedbackCallback getUserFeedbackCallback() {
+    	return userFeedbackCallback;
+    }
+    
+    public void setUserFeedbackCallback(IUserFeedbackCallback userFeedbackCallback) {
+    	this.userFeedbackCallback = userFeedbackCallback;
     }
     
   //public CommManagerBundle getCommManager() {
