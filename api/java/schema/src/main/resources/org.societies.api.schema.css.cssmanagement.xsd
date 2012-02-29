@@ -12,14 +12,12 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:element name="cssManagerMessageBean">
-   <xs:complexType>
+  <xs:complexType name="cssManagerMessageBean">
     <xs:sequence>
       <xs:element name="method" type="tns:methodType" minOccurs="0"/>
       <xs:element name="profile" type="tns:cssProfile" minOccurs="0"/>
     </xs:sequence>
-   </xs:complexType>
-  </xs:element>
+  </xs:complexType>
 
   <xs:complexType name="cssProfile">
     <xs:sequence>
@@ -53,29 +51,11 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:element name="cssManagerResultBean">
-   <xs:complexType>
+  <xs:complexType name="cssManagerResultBean">
     <xs:sequence>
       <xs:element name="result" type="tns:cssInterfaceResult" minOccurs="0"/>
     </xs:sequence>
-   </xs:complexType>
-  </xs:element>
-
-  <xs:simpleType name="nodeStatus">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Available"/>
-      <xs:enumeration value="Unavailable"/>
-      <xs:enumeration value="Hibernating"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="nodeType">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Android"/>
-      <xs:enumeration value="Cloud"/>
-      <xs:enumeration value="Rich"/>
-    </xs:restriction>
-  </xs:simpleType>
+  </xs:complexType>
 
   <xs:simpleType name="methodType">
     <xs:restriction base="xs:string">
@@ -94,38 +74,6 @@
       <xs:enumeration value="changeCSSNodeStatus"/>
       <xs:enumeration value="synchProfile"/>
       <xs:enumeration value="setPresenceStatus"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="cssStatus">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Active"/>
-      <xs:enumeration value="Inactive"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="entityType">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Person"/>
-      <xs:enumeration value="Organisation"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="genderType">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Male"/>
-      <xs:enumeration value="Female"/>
-      <xs:enumeration value="Unspecified"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="presenceType">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Available"/>
-      <xs:enumeration value="DoNotDisturb"/>
-      <xs:enumeration value="Offline"/>
-      <xs:enumeration value="Away"/>
-      <xs:enumeration value="ExtendedAway"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

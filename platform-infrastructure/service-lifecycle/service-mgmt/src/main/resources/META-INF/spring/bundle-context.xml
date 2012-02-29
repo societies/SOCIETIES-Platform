@@ -23,6 +23,10 @@
 		<property name="serviceReg" ref="serviceRegRef" />				
 	</bean>
 	
+	<bean id="serviceDiscovery" class="org.societies.slm.servicediscovery.ServiceDiscovery" >
+		<!-- <property name="converter" ref="XMLtoServiceObjectConverter" /> -->
+		<property name="serviceReg" ref="serviceRegRef" />				
+	</bean>
 	<!-- 
 	<bean id="XMLtoServiceObjectConverter" class="org.societies.slm.servicemgmt.impl.XMLServiceMetaDataToObjectConverter">
 		<property name="marshaller" ref="jaxbMarshaller" />
