@@ -9,9 +9,14 @@
        for integration testing outside of an OSGi environment -->
 
 	<bean id="test" 
+  		class="org.societies.css.devicemgmt.DeviceCommsMgr.impl.CommAdapterTestImpl">
+  		 
+  	</bean>
+  	<!--
+  		<bean id="test" 
   		class="org.societies.css.devicemgmt.DeviceCommsMgr.impl.CommAdapterTestImpl"
   		 depends-on="PubsubClient">
      <property name="pubsubClient" ref="PubsubClient"/>
   	</bean>
-  		
+  	-->
 </beans>
