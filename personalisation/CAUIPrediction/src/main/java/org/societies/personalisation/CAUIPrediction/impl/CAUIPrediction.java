@@ -21,13 +21,16 @@ package org.societies.personalisation.CAUIPrediction.impl;
 
 import java.util.List;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+//import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
+import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
+
 
 /**
  * CAUIPrediction
@@ -40,12 +43,28 @@ public class CAUIPrediction implements ICAUIPrediction{
 	@Override
 	public void enablePrediction(Boolean arg0) {
 		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
-	public void getPrediction(Identity arg0, IAction arg1,
-			IPersonalisationCallback arg2) {
+	public IUserIntentAction getCurrentIntentAction(IIdentity arg0,
+			IServiceResourceIdentifier arg1, String arg2) {
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void getPrediction(IIdentity arg0, IAction arg1,
+			IPersonalisationInternalCallback arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getPrediction(IIdentity arg0, CtxAttribute arg1,
+			IPersonalisationInternalCallback arg2) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
@@ -54,17 +73,5 @@ public class CAUIPrediction implements ICAUIPrediction{
 		return null;
 	}
 
-	@Override
-	public IUserIntentAction getCurrentIntentAction(Identity arg0,
-			IServiceResourceIdentifier arg1, String arg2) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void getPrediction(Identity arg0, CtxAttribute arg1,
-			IPersonalisationCallback arg2) {
-		// TODO Auto-generated method stub
-	}
-
+	
 }
