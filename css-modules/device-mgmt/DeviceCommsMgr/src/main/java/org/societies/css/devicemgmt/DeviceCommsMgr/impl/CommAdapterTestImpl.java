@@ -1,6 +1,5 @@
 package org.societies.css.devicemgmt.DeviceCommsMgr.impl;
 
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -51,7 +50,7 @@ public class CommAdapterTestImpl implements CommAdapter,ApplicationListener<Appl
 	}
 
 	
-	public void fireDeviceDataChanged(String deviceID,Map<String,String> values){
+	public void fireDeviceDataChanged(String deviceId,DeviceCommonInfo deviceCommonInfo, String key,String value){
 		
 	}
 
