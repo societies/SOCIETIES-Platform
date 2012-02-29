@@ -115,10 +115,13 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	}
 
 	public ContextSourceManagement() {
+		initialise();
+	}
+		
+	public void initialise(){
 		this.newDeviceListener = new NewDeviceListener(deviceManager);
 		newDeviceListener.run();
 		LOG.info("{}", "CSM started");
-
 	}
 
 	// TODO replace with new interface
