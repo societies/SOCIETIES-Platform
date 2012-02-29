@@ -11,7 +11,8 @@ public class NewDeviceListener implements Runnable{
 
 	public NewDeviceListener(IDeviceManager deviceManager) {
 		this.deviceManager = deviceManager;
-		LOG.debug("DewDeviceListener created");
+		if (LOG.isDebugEnabled()) LOG.debug(this+" created");
+		
 	}
 
 	/**
