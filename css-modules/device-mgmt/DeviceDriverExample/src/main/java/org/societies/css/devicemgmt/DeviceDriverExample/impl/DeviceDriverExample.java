@@ -87,7 +87,6 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 	 * @see org.springframework.osgi.context.BundleContextAware#setBundleContext(org.osgi.framework.BundleContext)
 	 */
 	public void setBundleContext(BundleContext bc) {
-		// TODO Auto-generated method stub
 		bundleContext = bc;
 	}
 
@@ -121,8 +120,9 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 			
 			if (deviceCommonInfo.getDeviceType().equals("lightSensor")) 
 			{	
-				LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceDriverExample info: createNewDevice type LightSensor");
-				createNewDevice =  deviceManager.fireNewDeviceConnected(deviceMacAddress, deviceCommonInfo);
+				String [] serviceIds = {"lightSensor1"};
+				
+				createNewDevice =  deviceManager.fireNewDeviceConnected(deviceMacAddress, deviceCommonInfo, serviceIds);
 				deviceMacAddressList.add(deviceMacAddress);
 				
 				lightSensor = new LightSensor(bundleContext, this, "lightSensor1", deviceMacAddress);

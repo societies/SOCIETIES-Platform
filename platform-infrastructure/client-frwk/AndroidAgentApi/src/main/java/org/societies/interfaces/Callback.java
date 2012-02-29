@@ -1,6 +1,8 @@
 package org.societies.interfaces;
 
-public interface Callback {
+import org.societies.comm.android.ipc.ICallback;
+
+public interface Callback extends ICallback {
 	void receiveResult(String xml);
 
 	void receiveError(String xml); 

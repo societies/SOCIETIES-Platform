@@ -61,9 +61,7 @@ public class LightSensor implements IDeviceService{
 			registration = bundleContext.registerService(IDeviceService.class.getName(), this, properties);
 			
 			LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LightSensor info: lightSensor service registred ");
-		}
-		
-		
+		}	
 	}
 
 	@Override

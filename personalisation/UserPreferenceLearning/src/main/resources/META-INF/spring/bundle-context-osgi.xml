@@ -17,6 +17,6 @@
         </osgi:interfaces>
         </osgi:service>
         
-		<osgi:reference id="UserCtxBroker" interface="org.societies.api.internal.context.broker.IUserCtxBroker"/>
+		<osgi:reference id="CtxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker"/>
 		
 </beans>

@@ -23,15 +23,16 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
+package org.societies.api.internal.cis.management;
+
 /**
  * Stores meta data relevant for a CIS.
  * 
  * @author Babak Farshchian
  * @version 0
  */
-package org.societies.api.internal.cis.management;
 
-import java.util.HashSet;
 import java.util.Set;
 
 
