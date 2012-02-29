@@ -2,11 +2,14 @@ package org.societies.api.android.internal.model;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.societies.api.internal.css.management.CSSNode;
-import org.societies.api.internal.css.management.CSSProfile;
+import org.societies.api.internal.css.management.CSSManagerEnums;
+import org.societies.api.schema.cssmanagement.CssNode;
+import org.societies.api.schema.cssmanagement.CssProfile;
 
 public class TestAndroidCSSProfile {
 
@@ -26,85 +29,80 @@ public class TestAndroidCSSProfile {
 	public static final String TEST_PASSWORD = "P455W0RD";
 	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
 
-	private AndroidCSSNode cssNode_1, cssNode_2;
-	private AndroidCSSNode cssArrayNodes[];
-	private AndroidCSSNode cssArrayArchivedNodes[];
+	private CssNode cssNode_1, cssNode_2;
+	private ArrayList<CssNode> cssNodes;
+	private ArrayList<CssNode> cssArchivedNodes;
 	
 	
 	@Before
 	public void setUp() throws Exception {
-		cssNode_1 = new AndroidCSSNode(TEST_IDENTITY_1, CSSNode.nodeStatus.Available.ordinal(), CSSNode.nodeType.Rich.ordinal());
-		cssNode_2 = new AndroidCSSNode(TEST_IDENTITY_2, CSSNode.nodeStatus.Hibernating.ordinal(), CSSNode.nodeType.Android.ordinal());
+		cssNode_1 = new CssNode();
+		cssNode_1.setIdentity(TEST_IDENTITY_1);
+		cssNode_1.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
+		cssNode_1.setType(CSSManagerEnums.nodeType.Rich.ordinal());
+
+		cssNode_2 = new CssNode();
+		cssNode_2.setIdentity(TEST_IDENTITY_2);
+		cssNode_2.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
+		cssNode_2.setType(CSSManagerEnums.nodeType.Android.ordinal());
 		
-		cssArrayNodes = new AndroidCSSNode[2];
-		cssArrayNodes[0] = cssNode_1;
-		cssArrayNodes[1] = cssNode_2;
+		cssNodes = new ArrayList<CssNode>();
+		cssNodes.add(cssNode_1);
+		cssNodes.add(cssNode_2);
 		
-		cssArrayArchivedNodes = new AndroidCSSNode[2];
-		cssArrayArchivedNodes[0] = cssNode_1;
-		cssArrayArchivedNodes[1] = cssNode_2;
+		cssArchivedNodes = new ArrayList<CssNode>();
+		cssArchivedNodes.add(cssNode_1);
+		cssArchivedNodes.add(cssNode_2);
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		cssNode_1 = null;
 		cssNode_2 = null;
-		cssArrayNodes = null;
-		cssArrayArchivedNodes = null;
+		cssNodes = null;
+		cssArchivedNodes = null;
 	}
 
 	@Test
 	public void testConstructor() {
-		AndroidCSSProfile cssProfile = new AndroidCSSProfile();
+		CssProfile cssProfile = new CssProfile();
 		
-		cssProfile.setArchiveCSSNodes(cssArrayArchivedNodes);
 		cssProfile.setCssIdentity(TEST_IDENTITY);
 		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
-		cssProfile.setCssNodes(cssArrayNodes);
 		cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
-		cssProfile.setStatus(CSSProfile.cssStatus.Active.ordinal());
+		cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
 		cssProfile.setCssUpTime(TEST_UPTIME);
 		cssProfile.setEmailID(TEST_EMAIL);
-		cssProfile.setEntity(CSSProfile.entityType.Organisation.ordinal());
+		cssProfile.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
 		cssProfile.setForeName(TEST_FORENAME);
 		cssProfile.setHomeLocation(TEST_HOME_LOCATION);
 		cssProfile.setIdentityName(TEST_IDENTITY_NAME);
 		cssProfile.setImID(TEST_IM_ID);
 		cssProfile.setName(TEST_NAME);
 		cssProfile.setPassword(TEST_PASSWORD);
-		cssProfile.setPresence(CSSProfile.presenceType.Available.ordinal());
-		cssProfile.setSex(CSSProfile.genderType.Unspecified.ordinal());
+		cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
+		cssProfile.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
 		cssProfile.setSocialURI(TEST_SOCIAL_URI);
 		
 		
-		assertEquals(cssArrayArchivedNodes.length, cssProfile.getArchiveCSSNodes().length);
+//		assertEquals(cssArchivedNodes.size(), cssProfile.getArchiveCSSNodes().size());
 		assertEquals(TEST_IDENTITY, cssProfile.getCssIdentity());
 		assertEquals(TEST_INACTIVE_DATE, cssProfile.getCssInactivation());
-		assertEquals(cssArrayNodes.length, cssProfile.getCssNodes().length);
+//		assertEquals(cssNodes.size(), cssProfile.getCssNodes().size());
 		assertEquals(TEST_REGISTERED_DATE, cssProfile.getCssRegistration());
-		assertEquals(CSSProfile.cssStatus.Active.ordinal(), cssProfile.getStatus());
+		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), cssProfile.getStatus());
 		assertEquals(TEST_UPTIME, cssProfile.getCssUpTime());
 		assertEquals(TEST_EMAIL, cssProfile.getEmailID());
-		assertEquals(CSSProfile.entityType.Organisation.ordinal(), cssProfile.getEntity());
+		assertEquals(CSSManagerEnums.entityType.Organisation.ordinal(), cssProfile.getEntity());
 		assertEquals(TEST_FORENAME, cssProfile.getForeName());
 		assertEquals(TEST_HOME_LOCATION, cssProfile.getHomeLocation());
 		assertEquals(TEST_IDENTITY_NAME, cssProfile.getIdentityName());
 		assertEquals(TEST_IM_ID, cssProfile.getImID());
 		assertEquals(TEST_NAME, cssProfile.getName());
 		assertEquals(TEST_PASSWORD, cssProfile.getPassword());
-		assertEquals(CSSProfile.presenceType.Available.ordinal(), cssProfile.getPresence());
-		assertEquals(CSSProfile.genderType.Unspecified.ordinal(), cssProfile.getSex());
+		assertEquals(CSSManagerEnums.presenceType.Available.ordinal(), cssProfile.getPresence());
+		assertEquals(CSSManagerEnums.genderType.Unspecified.ordinal(), cssProfile.getSex());
 		assertEquals(TEST_SOCIAL_URI, cssProfile.getSocialURI());
-	}
-	@Test
-	public void testSubClassing() {
-		AndroidCSSProfile cssProfile = new AndroidCSSProfile();
-
-		cssProfile.setArchiveCSSNodes(cssArrayArchivedNodes);
-		cssProfile.setCssNodes(cssArrayNodes);
-
-		assertTrue(cssProfile.getCssNodes()[0] instanceof AndroidCSSNode);
-		assertTrue(cssProfile.getArchiveCSSNodes()[0] instanceof AndroidCSSNode);
 	}
 
 	public void testParcelable() {
