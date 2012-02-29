@@ -90,7 +90,6 @@ public class PubsubService extends Service {
 
 		public void sendIQSet(Stanza stanza, Object payload,
 				ICommCallback callback) throws CommunicationException {
-			log.debug("sendIQSet");
 			clientCommunicationMgr.sendIQ(stanza, IQ.Type.SET, payload, callback); // TODO remove dep with smack by changing interface
 		}
 

@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.societies.comm.xmpp.pubsub</groupId>
-	<artifactId>Pubsub</artifactId>
+	<artifactId>PubsubClient</artifactId>
 	<version>${version.comm}</version>
 
 	<parent>
