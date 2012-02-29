@@ -29,12 +29,11 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
@@ -133,7 +132,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	 * @param callback
 	 */
 	@Override
-	public void getOutcome(Identity ownerId, CtxAttribute attribute, IPersonalisationInternalCallback callback){
+	public void getOutcome(IIdentity ownerId, CtxAttribute attribute, IPersonalisationInternalCallback callback){
 		/*
 		 * in this method, we need to check what preferences are affected, request re-evaluation of them, compare last ioutcome with new and send it to 
 		 * the proactivity decision maker component
@@ -165,7 +164,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	 * @param callback
 	 */
 	@Override
-	public void getOutcome(Identity ownerId, IAction action, IPersonalisationInternalCallback callback){
+	public void getOutcome(IIdentity ownerId, IAction action, IPersonalisationInternalCallback callback){
 		/*
 		 * an action describes a personalisable parameter that the user (manually) or the User Agent (proactively) changed.
 		 * An action does not describe a change in the state of the service. i.e. starting or stopping a service. Therefore,
@@ -185,7 +184,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	}
 
 	
-	public void processServiceStarted(Identity userId, String serviceType, IServiceResourceIdentifier serviceID){
+	public void processServiceStarted(IIdentity userId, String serviceType, IServiceResourceIdentifier serviceID){
 
 		
 		//JOptionPaneshowMessageDialog(null, "Processing service started event: "+serviceID.toUriString());
@@ -208,7 +207,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	}
 
 
-	public void processServiceStopped(Identity userId, String serviceType, IServiceResourceIdentifier serviceID){
+	public void processServiceStopped(IIdentity userId, String serviceType, IServiceResourceIdentifier serviceID){
 		if (this.mt.isServiceRunning(serviceType, serviceID)){
 			mt.removeServiceInfo(serviceType, serviceID);
 		}else{
@@ -216,7 +215,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		}
 	}
 	
-	public void processPreferenceChangedEvent(Identity userID, IServiceResourceIdentifier serviceId, String serviceType, String preferenceName){
+	public void processPreferenceChangedEvent(IIdentity userID, IServiceResourceIdentifier serviceId, String serviceType, String preferenceName){
 		List<CtxIdentifier> ctxIDs = this.prefMgr.getPreferenceConditions(userID, serviceType, serviceId, preferenceName);
 		for (CtxIdentifier id : ctxIDs){
 			this.mt.addInfo(id, serviceId, serviceType, preferenceName);
