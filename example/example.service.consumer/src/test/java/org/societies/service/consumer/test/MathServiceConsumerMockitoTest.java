@@ -48,7 +48,6 @@ public class MathServiceConsumerMockitoTest {
 		when(mock.divise(1, 1, divCallBack)).thenReturn((boolean) true);
 		when(mock.add(1, 1)).thenReturn(2);
 		when(mock.multiply(1, 1)).thenReturn(1);
-		System.out.println("there");
 		/* call the method of your class under test */
 		classUnderTest.callDivisionWithCallBack(1, 1);
 		/* then check whether the call has been as expected */
@@ -62,6 +61,22 @@ public class MathServiceConsumerMockitoTest {
 		classUnderTest.callStatefulMethod();
 		verify(mock).add(1, 1);
 	}
+	
+	@Test
+	public void statefulCallTest() {
+		when(mock.add(1, 1)).thenReturn(2);
+		when(mock.multiply(1, 1)).thenReturn(1);
+		/* call the method of your class under test */
+		/* then check whether the call has been as expected states*/
+		//set hidden state <10
+		classUnderTest.setHiddenState(8);
+		classUnderTest.callStatefulMethod();
+		verify(mock).multiply(1, 1);
+		classUnderTest.setHiddenState(20);
+		classUnderTest.callStatefulMethod();
+		verify(mock).add(1, 1);
+	}
+
 
     @After  
     public void tearDown(){  
