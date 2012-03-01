@@ -27,6 +27,7 @@ package org.societies.comm.examples.clientcommand;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.example.calculator.ICalc;
 import org.societies.example.IExamplesCallback;
@@ -41,11 +42,15 @@ import org.societies.example.fortunecookie.IWisdom;
  */
 public class ClientTester implements IExamplesCallback {
 
+	private ICommManager commManager;
 	private ICalcRemote remoteCalculator;
 	private PubsubClient pubSubManager;
 	private IWisdom fcGenerator;
 	private static Logger LOG = LoggerFactory.getLogger(ClientTester.class);
 	
+	public ICommManager getCommManager() { return commManager;	}
+	public void setCommManager(ICommManager commManager) { this.commManager = commManager; }
+
 	public ICalcRemote getRemoteCalculator() { return remoteCalculator; }
 	public void setRemoteCalculator(ICalcRemote remoteCalculator) { this.remoteCalculator = remoteCalculator; }
 	
@@ -58,21 +63,21 @@ public class ClientTester implements IExamplesCallback {
 	//ENTRY POINT
 	public void StartTest() {
 		//TEST SPRING EVENTING
-		System.out.println("Starting Spring Eventing Test");
-		TestInternalEventing springTest = new TestInternalEventing();
-		Thread springThread = new Thread(springTest);
-		springThread.start();
+		//System.out.println("Starting Spring Eventing Test");
+		//TestInternalEventing springTest = new TestInternalEventing();
+		//Thread springThread = new Thread(springTest);
+		//springThread.start();
 		
 		//TEST MESSAGING
-		System.out.println("Starting Client Test");
+		//System.out.println("Starting Client Test");
 		//getRemoteCalculator().Add(2, 3, this);
-		System.out.println("Waiting...");
+		//System.out.println("Waiting...");
 		
 		//TEST PUBSUB
 		TestExternalEventing testPubSub = new TestExternalEventing();
 		testPubSub.setFcGenerator(this.fcGenerator);
 		testPubSub.setPubSubManager(this.pubSubManager);
-		
+		testPubSub.setCommManager(this.commManager);
 		Thread pubsubThread = new Thread(testPubSub);
 		pubsubThread.start();
 	}
