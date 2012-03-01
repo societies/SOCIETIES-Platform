@@ -25,6 +25,7 @@
 package org.societies.api.context.source;
 
 import java.io.Serializable;
+import java.util.concurrent.Future;
 
 import org.societies.api.context.model.CtxEntity;
 
