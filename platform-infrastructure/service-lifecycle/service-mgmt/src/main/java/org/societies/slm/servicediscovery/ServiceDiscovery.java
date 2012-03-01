@@ -35,7 +35,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.internal.servicelifecycle.model.Service;
@@ -64,7 +64,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 	public Future<List<Service>> getServices() throws ServiceDiscoveryException {
 		
 		//TODO : Fix this up! 
-		Identity currentNode = null; // TODO : Get this!
+		IIdentity currentNode = null; // TODO : Get this!
 		
 		Future<List<Service>> asyncResult = null;
 		List<Service> result = null;
@@ -91,7 +91,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 	 */
 	@Override
 	@Async
-	public Future<List<Service>> getServices(Identity node)
+	public Future<List<Service>> getServices(IIdentity node)
 			throws ServiceDiscoveryException {
 		//TODO : Figure out if node is current node or remote node
 		// IF current, get the details from the service registry and pass back to calling object
