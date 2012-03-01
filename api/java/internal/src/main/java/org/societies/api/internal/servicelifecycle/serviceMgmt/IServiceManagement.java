@@ -35,7 +35,7 @@ import org.societies.api.internal.servicelifecycle.serviceMgmt.ServiceMgmtExcept
 /**
  * 
  * @author pkuppuud
- * @ Deprecated
+ *
  */
 public interface IServiceManagement {
 	/**
