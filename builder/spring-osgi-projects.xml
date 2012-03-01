@@ -72,8 +72,8 @@
 		</module>
 		<module>../platform-infrastructure/comms-frwk/XCCommunicationMgr
 		</module>
-		<module>../platform-infrastructure/comms-frwk/DataFormsXEP</module>
-		<module>../platform-infrastructure/comms-frwk/PubsubXEP</module>
+		<!-- <module>../platform-infrastructure/comms-frwk/DataFormsXEP</module>  -->
+		<!-- <module>../platform-infrastructure/comms-frwk/PubsubXEP</module> -->
 		<module>../platform-infrastructure/comms-frwk/PubsubServiceBundle
 		</module>
 		<module>../platform-infrastructure/comms-frwk/PubsubClientBundle
