@@ -38,7 +38,6 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.model.CtxQuality;
 import org.societies.api.context.source.ICtxSourceMgr;
-import org.societies.api.context.source.ICtxSourceMgrCallback;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
@@ -124,14 +123,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 		LOG.info("{}", "CSM started");
 	}
 
-	// TODO replace with new interface
 	@Override
-	public void register(String name, String contextType,
-			ICtxSourceMgrCallback source) {
-		register(name, contextType);
-
-	}
-
 	@Async
 	public Future<String> register(String name, String contextType) {
 		if (ctxBroker == null) {
@@ -200,16 +192,12 @@ public class ContextSourceManagement implements ICtxSourceMgr {
 	}
 
 	@Override
-	public void sendUpdate(String arg0, Serializable arg1) {
-		sendUpdate(arg0, arg1, null);
-	}
-
-	@Override
-	public void sendUpdate(String identifier, Serializable data, CtxEntity owner) {
+	@Async
+	public Future<Boolean> sendUpdate(String identifier, Serializable data, CtxEntity owner) {
         if (this.ctxBroker == null) {
         	LOG.error("Could not handle update from " + identifier
                     + ": Context Broker is not available");
-            return;// new AsyncResult<Boolean>(false);
+            return new AsyncResult<Boolean>(false);
         }
         if (LOG.isTraceEnabled())
         	LOG.debug("Sending update: id=" + identifier+ ", data=" + data + ", ownerEntity=" + owner);
@@ -231,13 +219,13 @@ public class ContextSourceManagement implements ICtxSourceMgr {
             if (shadowEntities.size() > 1) {
                 if (LOG.isDebugEnabled())
                 	LOG.debug("Sensor-ID " + identifier + " is not unique. No information stored.");
-                return;
+                return new AsyncResult<Boolean>(false);
                 // throw new
                 // Exception("Ambiguity: more than one context source with this identifier exists.");
             } else if (shadowEntities.isEmpty()) {
                 if (LOG.isDebugEnabled())
                 	LOG.debug("Sensor-ID " + identifier + " is not available. No information stored.");
-                return;
+                return new AsyncResult<Boolean>(false);
                 // throw new
                 // Exception("Sending failure due to missing Registration.");
             } else {
@@ -282,7 +270,7 @@ public class ContextSourceManagement implements ICtxSourceMgr {
                 	LOG.error("Could not handle update from " + identifier
                             + ": Could not retrieve device entity: "
                             + e.getLocalizedMessage(), e);
-                    return;
+                    return new AsyncResult<Boolean>(false);
                 }
             }
             
@@ -306,15 +294,20 @@ public class ContextSourceManagement implements ICtxSourceMgr {
         } catch (CtxException e) {
         	LOG.error("Could not handle update from " + identifier
                     + ": " + e.getLocalizedMessage(), e);
+            return new AsyncResult<Boolean>(false);
         } catch (InterruptedException e) {
         	LOG.error(e.getMessage());
-            //return new AsyncResult<Boolean>(false);
+            return new AsyncResult<Boolean>(false);
 		} catch (ExecutionException e) {
         	LOG.error(e.getMessage());
-            //return new AsyncResult<Boolean>(false);
+            return new AsyncResult<Boolean>(false);
 		}
+
+        return new AsyncResult<Boolean>(true);
     }
-	
+
+	@Override
+	@Async
     public Future<Boolean> sendUpdate(String identifier, Serializable data, CtxEntity owner, 
             boolean inferred, double precision, double frequency) {
         if (this.ctxBroker == null) {
@@ -470,13 +463,8 @@ public class ContextSourceManagement implements ICtxSourceMgr {
     }
 
 	@Override
-	public void unregister(String arg0) {
-		unregisterFuture(arg0);
-	}
-		
-	//TODO change according to revised API
 	@Async
-	public Future<Boolean> unregisterFuture(String identifier){
+	public Future<Boolean> unregister(String identifier){
 		if (ctxBroker == null) {
 			LOG.error("Could not unregister " + identifier
 					+ ": Context Broker cannot be found");
@@ -515,6 +503,12 @@ public class ContextSourceManagement implements ICtxSourceMgr {
     		return new AsyncResult<Boolean>(false);
 		}
         return new AsyncResult<Boolean>(true);
+	}
+
+	@Override
+	@Async
+	public Future<Boolean> sendUpdate(String identifier, Serializable data) {
+		return sendUpdate(identifier, data, null);
 	}
 
 }
