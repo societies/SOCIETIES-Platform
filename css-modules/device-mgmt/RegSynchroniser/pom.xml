@@ -71,7 +71,12 @@
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>		
 	</dependencies>
 	
 	<build>
@@ -95,6 +100,8 @@
               				org.springframework.osgi.context,
               				org.springframework.osgi.service.exporter,
               				org.slf4j.*,
+              				org.societies.api.internal.css.devicemgmt,
+              				org.societies.api.internal.css.devicemgmt.model,
               				org.societies.css.devicemgmt.deviceregistry
               			</Import-Package> 
               			

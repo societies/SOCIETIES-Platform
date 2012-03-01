@@ -25,14 +25,18 @@
 
 package org.societies.css.devicemgmt.RegSynchroniser.impl;
 
+import java.util.Collection;
+
 import org.societies.css.devicemgmt.deviceregistry.CSSDevice;
 import org.societies.css.devicemgmt.deviceregistry.DeviceRegistry;
 import org.societies.css.devicemgmt.deviceregistry.IDeviceRegistry;
-import org.societies.css.devicemgmt.deviceregistry.RegistryUtility;
+import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
+//import org.societies.css.devicemgmt.deviceregistry.RegistryUtility;
+//import org.societies.api.internal.css.devicemgmt.ILocalDevice;
 
 public class LocalDevices {
 
-	static boolean addDevice(CSSDevice device, String CSSID) throws Exception {
+	static boolean addDevice(DeviceCommonInfo device, String CSSID) throws Exception {
 		boolean retValue = false;
 
 
@@ -54,7 +58,7 @@ public class LocalDevices {
 		
 	}
 
-	static boolean removeDevice(CSSDevice device, String CSSID) throws Exception{
+	static boolean removeDevice(DeviceCommonInfo device, String CSSID) throws Exception{
 		
 		boolean retValue = false;
 		
@@ -75,5 +79,6 @@ public class LocalDevices {
 		return retValue; 
 		
 	}
-
+	
+	
 }

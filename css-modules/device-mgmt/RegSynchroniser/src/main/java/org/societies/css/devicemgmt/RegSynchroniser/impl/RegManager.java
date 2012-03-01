@@ -40,15 +40,14 @@ import org.springframework.osgi.context.BundleContextAware;
 import org.societies.css.devicemgmt.deviceregistry.DeviceRegistry;
 import org.societies.css.devicemgmt.deviceregistry.CSSDevice;
 import org.societies.css.devicemgmt.deviceregistry.IDeviceRegistry;
+import org.societies.api.internal.css.devicemgmt.ILocalDevice;
+//import org.societies.css.devicemgmt.RegSynchroniser.impl.LocalDevices;
+import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 
-
-//import sun.rmi.runtime.Log;
-
-public class RegManager implements BundleContextAware{
+public class RegManager implements ILocalDevice, BundleContextAware{
 
 	//private static org.apache.commons.logging.Log LOG = LogFactory.getLog(RegManager.class);
     private IDeviceRegistry deviceRegistry;
-    //public static String EVENT_INFO = "event_info";
     private BundleContext bundleContext;
     
     
@@ -67,11 +66,11 @@ public class RegManager implements BundleContextAware{
      * @param context
      */
     
-    public RegManager(BundleContext context) {
+    public RegManager(BundleContext bundlecontext) {
                 
         //Log("Synchroniser Manager created", this.LOG);
         
-    	this.bundleContext = context;
+    	this.bundleContext = bundlecontext;
         
         this.deviceRegistry = DeviceRegistry.getInstance();
 
@@ -86,33 +85,11 @@ public class RegManager implements BundleContextAware{
      * @param listener
      * @param filterOption
      */
-/*
-    public boolean registerEventListener() {
-        boolean retValue = false;
-        
-        String eventTypes[] = { EventTypes.REMOVED_SERVICE_EVENT,
-                EventTypes.NEW_SERVICE_EVENT, EventTypes.PSS_ADV_EVENT, EventTypes.SERVICE_LIFECYCLE_EVENT };
 
-        IEventMgr eventsManager = null;
-        try {
-            eventsManager = this.serviceFinder.getEventsManager();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-
-        }
-
-        if (null != eventsManager) {
-            eventsManager.registerListener(
-                    new RegistrySynchroniserEventListener(this.bundleContext),
-                    eventTypes, null);
-            retValue = true;
-            
-        }
-
-        return retValue;
-    }
-*/
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+// need to register event listeners and call commsMgr eventing system to fire new events
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
 
     /**
      * Add a device to the device Registry, determine the status of the
@@ -123,9 +100,9 @@ public class RegManager implements BundleContextAware{
      * 
      * @param device
      */
-    public boolean addDevice(CSSDevice device, String CSSID) throws Exception {
+    public boolean addDevice(DeviceCommonInfo device, String CSSID) throws Exception {
 
-        boolean retValue = false;
+        boolean retValue = true;
         
         retValue = LocalDevices.addDevice(device, CSSID);
         
@@ -135,11 +112,12 @@ public class RegManager implements BundleContextAware{
     /**
      * Convenience method to add a collection of devices
      */
-    public boolean addDevices(Collection<CSSDevice> deviceCollection, String CSSID)
+
+    public boolean addDevices(Collection<DeviceCommonInfo> deviceCollection, String CSSID)
             throws Exception {
         boolean retValue = true;
 
-        for (CSSDevice device : deviceCollection) {
+        for (DeviceCommonInfo device : deviceCollection) {
             if (!this.addDevice(device, CSSID)) {
                 retValue = false;
                 break;
@@ -153,7 +131,7 @@ public class RegManager implements BundleContextAware{
      * 
      * @param device
      */
-    public boolean removeDevice(CSSDevice device, String CSSID)
+    public boolean removeDevice(DeviceCommonInfo device, String CSSID)
             throws Exception {
         
 
@@ -164,12 +142,12 @@ public class RegManager implements BundleContextAware{
      * Convenience method to remove a collection of devices
      */
     public boolean removeDevices(
-            Collection<CSSDevice> deviceCollection, String CSSID)
+            Collection<DeviceCommonInfo> deviceCollection, String CSSID)
             throws Exception {
 
         boolean retValue = true;
 
-        for (CSSDevice device : deviceCollection) {
+        for (DeviceCommonInfo device : deviceCollection) {
             if (!this.removeDevice(device, CSSID)) {
                 retValue = false;
                 break;
@@ -198,4 +176,21 @@ public class RegManager implements BundleContextAware{
 		// TODO Auto-generated method stub
 		
 	}
+
+	public boolean removedevice(String deviceID, String CSSID) throws Exception {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+//	public boolean removedevices(Collection<String> deviceCollection)
+	//		throws Exception {
+		// TODO Auto-generated method stub
+		//return false;
+	//}
+
+	//@Override
+//	public boolean removeDevice(String deviceID, String CSSID) throws Exception {
+		// TODO Auto-generated method stub
+	//	return false;
+	//}
 }
