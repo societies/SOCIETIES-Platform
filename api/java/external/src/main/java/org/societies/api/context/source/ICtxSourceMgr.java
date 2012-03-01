@@ -36,7 +36,7 @@ public interface ICtxSourceMgr {
 	 * @param contextType
 	 * @param ctxSourceCallback
 	 */
-	public void register(String name, String contextType, ICtxSourceMgrCallback ctxSourceCallback);
+	public Future<String> register(String name, String contextType);
 
 	/**
 	 * 
@@ -44,18 +44,30 @@ public interface ICtxSourceMgr {
 	 * @param data
 	 * @param owner
 	 */
-	public void sendUpdate(String identifier, Serializable data, CtxEntity owner);
+	public Future<Boolean> sendUpdate(String identifier, Serializable data, CtxEntity owner);
+
+	/**
+	 * 
+	 * @param identifier
+	 * @param data
+	 * @param owner
+	 * @param inferred
+	 * @param precision
+	 * @param frequency in Hz
+	 */ 
+	public Future<Boolean> sendUpdate(String identifier, Serializable data, CtxEntity owner,
+            boolean inferred, double precision, double frequency);
 
 	/**
 	 * 
 	 * @param identifier
 	 * @param data
 	 */
-	public void sendUpdate(String identifier, Serializable data);
+	public Future<Boolean> sendUpdate(String identifier, Serializable data);
 
 	/**
 	 * 
 	 * @param identifier
 	 */
-	public void unregister(String identifier);
+	public Future<Boolean> unregister(String identifier);
 }
