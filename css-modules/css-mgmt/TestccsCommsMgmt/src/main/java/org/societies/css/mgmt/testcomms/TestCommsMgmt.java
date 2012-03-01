@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.internal.css.management.ICSSManagerCallback;
 import org.societies.api.internal.css.management.ICSSRemoteManager;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
-import org.societies.api.schema.cssmanagement.CssProfile;
+import org.societies.api.schema.cssmanagement.CssRecord;
 
 public class TestCommsMgmt {
 
@@ -18,7 +18,14 @@ public class TestCommsMgmt {
 		
 		for (int i = 0; i < 20; i++) {
 			
-			this.remoteCSSManager.registerXMPPServer(new CssProfile(), new ICSSManagerCallback() {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			this.remoteCSSManager.registerXMPPServer(new CssRecord(), new ICSSManagerCallback() {
 				
 				@Override
 				public void receiveResult(CssInterfaceResult result) {

@@ -26,7 +26,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 package org.societies.api.android.internal.model;
 
 
-import org.societies.api.schema.cssmanagement.CssProfile;
+import org.societies.api.schema.cssmanagement.CssRecord;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -36,12 +36,12 @@ import android.os.Parcelable;
  *
  */
 
-public class AndroidCSSProfile extends CssProfile implements Parcelable {
+public class AndroidCSSRecord extends CssRecord implements Parcelable {
 	
 	/**
 	 * Default contructor
 	 */
-	public AndroidCSSProfile() {
+	public AndroidCSSRecord() {
 		super();
 	}
 	/**
@@ -50,7 +50,7 @@ public class AndroidCSSProfile extends CssProfile implements Parcelable {
 	 * 
 	 * @param in parcel
 	 */
-	private AndroidCSSProfile(Parcel in) {
+	private AndroidCSSRecord(Parcel in) {
 		setDomainServer(in.readString());
 		setCssHostingLocation(in.readString());
 		setEntity(in.readInt());
@@ -106,16 +106,16 @@ public class AndroidCSSProfile extends CssProfile implements Parcelable {
 		out.writeInt(getPresence());
 
 	}
-	public static final Parcelable.Creator<AndroidCSSProfile> CREATOR = new Parcelable.Creator<AndroidCSSProfile>() {
+	public static final Parcelable.Creator<AndroidCSSRecord> CREATOR = new Parcelable.Creator<AndroidCSSRecord>() {
 
 		@Override
-		public AndroidCSSProfile createFromParcel(Parcel in) {
-			return new AndroidCSSProfile(in);
+		public AndroidCSSRecord createFromParcel(Parcel in) {
+			return new AndroidCSSRecord(in);
 		}
 
 		@Override
-		public AndroidCSSProfile[] newArray(int size) {
-			return new AndroidCSSProfile [size];
+		public AndroidCSSRecord[] newArray(int size) {
+			return new AndroidCSSRecord [size];
 		}
 		
 	};

@@ -38,9 +38,14 @@
 
 	<!-- All Android projects to be included in nightly builds -->
 	<modules>
+		<!-- patent poms-->
 		<module>../parent/version.xml</module>
 		<module>../parent/android.xml</module>
-		
+
+		<!-- Android Societies Comms -->
+		<module>../platform-infrastructure/client-frwk/AndroidAgentApi</module>
+		<module>../platform-infrastructure/client-frwk/AndroidIPC</module>
+		<module>../platform-infrastructure/client-frwk/AndroidAgent</module>
 		<!-- Utilities -->
 		<module>../utilities/DBC</module>
 
