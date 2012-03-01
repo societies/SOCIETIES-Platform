@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 public class TestPubsubClient extends Thread implements Subscriber, ApplicationListener<PubsubEvent> {
 	
 	private static Logger LOG = LoggerFactory
@@ -33,7 +33,7 @@ public class TestPubsubClient extends Thread implements Subscriber, ApplicationL
 	private IIdentityManager idm;
 	private ICommManager endpoint;
 	
-//	@Autowired
+	@Autowired
 	public TestPubsubClient(PubsubClient psc, ICommManager endpoint) {
 		this.psc = psc;
 		this.endpoint = endpoint;
@@ -87,15 +87,15 @@ public class TestPubsubClient extends Thread implements Subscriber, ApplicationL
 			LOG.info("### posted event");
 
 		} catch (XMPPError e) {
-			LOG.error(e.getMessage());
+			LOG.error(e.getMessage(), e);
 		} catch (CommunicationException e) {
-			LOG.error(e.getMessage());
+			LOG.error(e.getMessage(), e);
 		} catch (InterruptedException e) {
-			LOG.error(e.getMessage());
+			LOG.error(e.getMessage(), e);
 		} catch (JAXBException e) {
-			LOG.error(e.getMessage());
+			LOG.error(e.getMessage(), e);
 		} catch (InvalidFormatException e) {
-			LOG.error(e.getMessage());
+			LOG.error(e.getMessage(), e);
 		}
 	}
 
