@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xs:schema	elementFormDefault="qualified" version="1.0" 
+<xs:schema elementFormDefault="qualified" version="1.0" 
 			targetNamespace="http://societies.org/api/schema/cssmanagement" 
 			xmlns:tns="http://societies.org/api/schema/cssmanagement" 
 			xmlns:xs="http://www.w3.org/2001/XMLSchema">
-
   <xs:complexType name="cssNode">
     <xs:sequence>
       <xs:element name="identity" type="xs:string" minOccurs="0"/>
@@ -12,14 +11,16 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="cssManagerMessageBean">
+  <xs:element name="cssManagerMessageBean">
+   <xs:complexType>
     <xs:sequence>
       <xs:element name="method" type="tns:methodType" minOccurs="0"/>
-      <xs:element name="profile" type="tns:cssProfile" minOccurs="0"/>
+      <xs:element name="profile" type="tns:cssRecord" minOccurs="0"/>
     </xs:sequence>
-  </xs:complexType>
+   </xs:complexType>
+  </xs:element>
 
-  <xs:complexType name="cssProfile">
+  <xs:complexType name="cssRecord">
     <xs:sequence>
       <xs:element name="archiveCSSNodes" type="tns:cssNode" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="cssHostingLocation" type="xs:string" minOccurs="0"/>
@@ -46,16 +47,18 @@
 
   <xs:complexType name="cssInterfaceResult">
     <xs:sequence>
-      <xs:element name="profile" type="tns:cssProfile" minOccurs="0"/>
+      <xs:element name="profile" type="tns:cssRecord" minOccurs="0"/>
       <xs:element name="resultStatus" type="xs:boolean"/>
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="cssManagerResultBean">
+  <xs:element name="cssManagerResultBean">
+   <xs:complexType>
     <xs:sequence>
       <xs:element name="result" type="tns:cssInterfaceResult" minOccurs="0"/>
     </xs:sequence>
-  </xs:complexType>
+   </xs:complexType>
+  </xs:element>
 
   <xs:simpleType name="methodType">
     <xs:restriction base="xs:string">
@@ -69,8 +72,8 @@
       <xs:enumeration value="unregisterCSS"/>
       <xs:enumeration value="registerCSSNode"/>
       <xs:enumeration value="unregisterCSSNode"/>
-      <xs:enumeration value="getCSSProfile"/>
-      <xs:enumeration value="modifyCSSProfile"/>
+      <xs:enumeration value="getCSSRecord"/>
+      <xs:enumeration value="modifyCSSRecord"/>
       <xs:enumeration value="changeCSSNodeStatus"/>
       <xs:enumeration value="synchProfile"/>
       <xs:enumeration value="setPresenceStatus"/>

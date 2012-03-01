@@ -8,6 +8,7 @@ import org.societies.service.api.IMathServiceCallBack;
 import org.societies.service.consumer.MathServiceCallBack;
 import org.societies.service.consumer.MathServiceConsumer;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class MathServiceConsumerMockitoTest {
@@ -46,14 +47,39 @@ public class MathServiceConsumerMockitoTest {
 		/* we need this injector for the Call Back */
 		classUnderTest.setMathServiceCallBack(divCallBack);
 		when(mock.divise(1, 1, divCallBack)).thenReturn((boolean) true);
-
-		System.out.println("there");
+		when(mock.add(1, 1)).thenReturn(2);
+		when(mock.multiply(1, 1)).thenReturn(1);
 		/* call the method of your class under test */
 		classUnderTest.callDivisionWithCallBack(1, 1);
 		/* then check whether the call has been as expected */
 		divCallBack.resultDivision(1);
 		verify(mock).divise(1, 1, divCallBack);
+		//set hidden state <10
+		classUnderTest.setHiddenState(8);
+		classUnderTest.callStatefulMethod();
+		verify(mock).multiply(1, 1);
+		classUnderTest.setHiddenState(20);
+		classUnderTest.callStatefulMethod();
+		verify(mock).add(1, 1);
 	}
+	
+	@Test
+	public void statefulCallTest() {
+		when(mock.add(1, 1)).thenReturn(2);
+		when(mock.multiply(1, 1)).thenReturn(1);
+		/* call the method of your class under test */
+		/* then check whether the call has been as expected states*/
+		//set hidden state <10
+		classUnderTest.setHiddenState(8);
+		classUnderTest.callStatefulMethod();
+		assertTrue(classUnderTest.getHiddenState()<10);
+		verify(mock).multiply(1, 1);
+		classUnderTest.setHiddenState(20);
+		assertTrue(classUnderTest.getHiddenState()>=10);
+		classUnderTest.callStatefulMethod();
+		verify(mock).add(1, 1);
+	}
+
 
     @After  
     public void tearDown(){  

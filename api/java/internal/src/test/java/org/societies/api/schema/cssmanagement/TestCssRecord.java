@@ -1,12 +1,15 @@
-package org.societies.api.internal.css.management;
+package org.societies.api.schema.cssmanagement;
 
 import static org.junit.Assert.*;
+
+import java.util.ArrayList;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.societies.api.internal.css.management.CSSManagerEnums;
 
-public class TestCSSProfile {
+public class TestCssRecord {
 
 	public static final String TEST_IDENTITY_1 = "node11";
 	public static final String TEST_IDENTITY_2 = "node22";
@@ -24,48 +27,53 @@ public class TestCSSProfile {
 	public static final String TEST_PASSWORD = "P455W0RD";
 	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
 
-	private CSSNode cssNode_1, cssNode_2;
-	private CSSNode cssArrayNodes[];
-	private CSSNode cssArrayArchivedNodes[];
+	private CssNode cssNode_1, cssNode_2;
+	private ArrayList<CssNode> cssNodes;
+	private ArrayList<CssNode> cssArchivedNodes;
 	
 	
 	@Before
 	public void setUp() throws Exception {
-		cssNode_1 = new CSSNode();
+		cssNode_1 = new CssNode();
 		cssNode_1.setIdentity(TEST_IDENTITY_1);
 		cssNode_1.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
 		cssNode_1.setType(CSSManagerEnums.nodeType.Rich.ordinal());
 
-		cssNode_2 = new CSSNode();
+		cssNode_2 = new CssNode();
 		cssNode_2.setIdentity(TEST_IDENTITY_2);
 		cssNode_2.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
 		cssNode_2.setType(CSSManagerEnums.nodeType.Android.ordinal());
 		
-		cssArrayNodes = new CSSNode[2];
-		cssArrayNodes[0] = cssNode_1;
-		cssArrayNodes[1] = cssNode_2;
+		cssNodes = new ArrayList<CssNode>();
+		cssNodes.add(cssNode_1);
+		cssNodes.add(cssNode_2);
 		
-		cssArrayArchivedNodes = new CSSNode[2];
-		cssArrayArchivedNodes[0] = cssNode_1;
-		cssArrayArchivedNodes[1] = cssNode_2;
+		cssArchivedNodes = new ArrayList<CssNode>();
+		cssArchivedNodes.add(cssNode_1);
+		cssArchivedNodes.add(cssNode_2);
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		cssNode_1 = null;
 		cssNode_2 = null;
-		cssArrayNodes = null;
-		cssArrayArchivedNodes = null;
+		cssNodes = null;
+		cssArchivedNodes = null;
 	}
 
 	@Test
 	public void testConstructor() {
-		CSSProfile cssProfile = new CSSProfile();
+		CssRecord cssProfile = new CssRecord();
 		
-		cssProfile.setArchiveCSSNodes(cssArrayArchivedNodes);
 		cssProfile.setCssIdentity(TEST_IDENTITY);
+		
+		cssProfile.getCssNodes().add(cssNode_1);
+		cssProfile.getCssNodes().add(cssNode_2);
+		
+		cssProfile.getArchiveCSSNodes().add(cssNode_1);
+		cssProfile.getArchiveCSSNodes().add(cssNode_2);
+		
 		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
-		cssProfile.setCssNodes(cssArrayNodes);
 		cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
 		cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
 		cssProfile.setCssUpTime(TEST_UPTIME);
@@ -82,10 +90,10 @@ public class TestCSSProfile {
 		cssProfile.setSocialURI(TEST_SOCIAL_URI);
 		
 		
-		assertEquals(cssArrayArchivedNodes.length, cssProfile.getArchiveCSSNodes().length);
+		assertEquals(cssArchivedNodes.size(), cssProfile.getArchiveCSSNodes().size());
 		assertEquals(TEST_IDENTITY, cssProfile.getCssIdentity());
 		assertEquals(TEST_INACTIVE_DATE, cssProfile.getCssInactivation());
-		assertEquals(cssArrayNodes.length, cssProfile.getCssNodes().length);
+		assertEquals(cssNodes.size(), cssProfile.getCssNodes().size());
 		assertEquals(TEST_REGISTERED_DATE, cssProfile.getCssRegistration());
 		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), cssProfile.getStatus());
 		assertEquals(TEST_UPTIME, cssProfile.getCssUpTime());
