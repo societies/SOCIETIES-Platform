@@ -8,6 +8,7 @@ import org.societies.service.api.IMathServiceCallBack;
 import org.societies.service.consumer.MathServiceCallBack;
 import org.societies.service.consumer.MathServiceConsumer;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class MathServiceConsumerMockitoTest {
@@ -71,8 +72,10 @@ public class MathServiceConsumerMockitoTest {
 		//set hidden state <10
 		classUnderTest.setHiddenState(8);
 		classUnderTest.callStatefulMethod();
+		assertTrue(classUnderTest.getHiddenState()<10);
 		verify(mock).multiply(1, 1);
 		classUnderTest.setHiddenState(20);
+		assertTrue(classUnderTest.getHiddenState()>=10);
 		classUnderTest.callStatefulMethod();
 		verify(mock).add(1, 1);
 	}
