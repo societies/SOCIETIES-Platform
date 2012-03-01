@@ -23,6 +23,7 @@ import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.provider.IQProvider;
+import org.jivesoftware.smack.provider.PacketExtensionProvider;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +44,7 @@ public class XMPPClient implements XMPPAgent {
 	private String username, password, resource;
 	private int usingConnectionCounter = 0;
 	private ProviderElementNamespaceRegistrar providerRegistrar = new ProviderElementNamespaceRegistrar();
-	private IQProvider iqProvider = new RawXmlProvider();
+	private RawXmlProvider rawXmlProvider = new RawXmlProvider();
 	
 	public XMPPClient(ResourceBundle configutationBundle) {
 		
@@ -98,7 +99,8 @@ public class XMPPClient implements XMPPAgent {
 		for(int i=0; i<elementNames.length; i++) {
 			for(int j=0; j<namespaces.length; j++) {
 				providerRegistrar.register(new ProviderElementNamespaceRegistrar.ElementNamespaceTuple(elementNames[i], namespaces[j]));				
-				ProviderManager.getInstance().addIQProvider(elementNames[i], namespaces[j], iqProvider);
+				ProviderManager.getInstance().addIQProvider(elementNames[i], namespaces[j], rawXmlProvider);
+				ProviderManager.getInstance().addExtensionProvider(elementNames[i], namespaces[j], rawXmlProvider);
 			}
 		}
 		
@@ -123,8 +125,10 @@ public class XMPPClient implements XMPPAgent {
 			for(int j=0; j<namespaces.length; j++) {
 				ProviderElementNamespaceRegistrar.ElementNamespaceTuple tuple = new ProviderElementNamespaceRegistrar.ElementNamespaceTuple(elementNames[i], namespaces[j]);		
 				providerRegistrar.unregister(tuple);
-				if(!providerRegistrar.isRegistered(tuple)) 
+				if(!providerRegistrar.isRegistered(tuple)) { 
 					ProviderManager.getInstance().removeIQProvider(tuple.elementName, tuple.namespace);
+					ProviderManager.getInstance().removeExtensionProvider(tuple.elementName, tuple.namespace);
+				}
 			}
 		}
 		
@@ -176,6 +180,10 @@ public class XMPPClient implements XMPPAgent {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public String getIdentity() {
+		return connection.getUser();
 	}
 	
 	private void connect() throws XMPPException {		

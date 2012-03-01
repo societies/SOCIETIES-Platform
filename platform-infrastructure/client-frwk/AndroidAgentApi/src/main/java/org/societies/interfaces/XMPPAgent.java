@@ -9,4 +9,6 @@ public interface XMPPAgent {
 	public void sendMessage(String messageXml);
 
 	public void sendIQ(String xml, Callback callback);
+	
+	public String getIdentity();
 }

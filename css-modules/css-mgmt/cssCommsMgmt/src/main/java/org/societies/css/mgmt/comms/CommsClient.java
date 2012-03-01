@@ -30,23 +30,24 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.comm.xmpp.datatypes.IdentityType;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.interfaces.IIdentityManager;
 import org.societies.api.internal.css.management.ICSSManagerCallback;
 import org.societies.api.internal.css.management.ICSSRemoteManager;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
-import org.societies.api.schema.cssmanagement.CssProfile;
+import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.MethodType;
+import org.societies.comm.xmpp.interfaces.IdentityManager;
 import org.societies.utilities.DBC.Dbc;
 
 
 public class CommsClient implements ICommCallback, ICSSRemoteManager {
-	private final static String EXTERNAL_COMMUNICATION_MANAGER = "XCManager";
+	private final static String EXTERNAL_COMMUNICATION_MANAGER = "XCManager.societies.local";
 	private final static String XMPP_SERVER = "societies.local";
 	
 	private static Logger LOG = LoggerFactory.getLogger(CommsClient.class);
@@ -124,61 +125,64 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 	
 	//Remote interface methods
 	@Override
-	public void changeCSSNodeStatus(CssProfile profile, ICSSManagerCallback callback) {
+	public void changeCSSNodeStatus(CssRecord profile, ICSSManagerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public void getCssProfile(ICSSManagerCallback profile) {
+	public void getCssRecord(ICSSManagerCallback profile) {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public void loginCSS(CssProfile profile, ICSSManagerCallback callback) {
+	public void loginCSS(CssRecord profile, ICSSManagerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public void loginXMPPServer(CssProfile profile, ICSSManagerCallback callback) {
+	public void loginXMPPServer(CssRecord profile, ICSSManagerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public void logoutCSS(CssProfile profile, ICSSManagerCallback callback) {
+	public void logoutCSS(CssRecord profile, ICSSManagerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public void logoutXMPPServer(CssProfile profile, ICSSManagerCallback callback) {
+	public void logoutXMPPServer(CssRecord profile, ICSSManagerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public void modifyCssProfile(CssProfile profile, ICSSManagerCallback callback) {
+	public void modifyCssRecord(CssRecord profile, ICSSManagerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public void registerCSS(CssProfile profile, ICSSManagerCallback callback) {
+	public void registerCSS(CssRecord profile, ICSSManagerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public void registerCSSNode(CssProfile profile, ICSSManagerCallback callback) {
+	public void registerCSSNode(CssRecord profile, ICSSManagerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public void registerXMPPServer(CssProfile profile, ICSSManagerCallback callback) {
+	public void registerXMPPServer(CssRecord profile, ICSSManagerCallback callback) {
 		LOG.debug("Remote call on registerXMPPServer");
 
-		Identity toIdentity = new Identity(IdentityType.CSS, EXTERNAL_COMMUNICATION_MANAGER, XMPP_SERVER) {
-			@Override
-			public String getJid() {
-				return getIdentifier() + "." + getDomainIdentifier();
-			}
-		};
-		Stanza stanza = new Stanza(toIdentity);
+		 IIdentityManager idManager = new IdentityManager();
+		 Identity pubsubID = idManager.fromJid(EXTERNAL_COMMUNICATION_MANAGER);
+		
+//		Identity toIdentity = new Identity(IdentityType.CSS, EXTERNAL_COMMUNICATION_MANAGER, XMPP_SERVER) {
+//			@Override
+//			public String getJid() {
+//				return getIdentifier() + "." + getDomainIdentifier();
+//			}
+//		};
+		Stanza stanza = new Stanza(pubsubID);
 		CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
 		
 		CssManagerMessageBean messageBean = new CssManagerMessageBean();
@@ -194,27 +198,27 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 		
 	}
 	@Override
-	public void setPresenceStatus(CssProfile profile, ICSSManagerCallback callback) {
+	public void setPresenceStatus(CssRecord profile, ICSSManagerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public void synchProfile(CssProfile profile, ICSSManagerCallback callback) {
+	public void synchProfile(CssRecord profile, ICSSManagerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public void unregisterCSS(CssProfile profile, ICSSManagerCallback callback) {
+	public void unregisterCSS(CssRecord profile, ICSSManagerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public void unregisterCSSNode(CssProfile profile, ICSSManagerCallback callback) {
+	public void unregisterCSSNode(CssRecord profile, ICSSManagerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public void unregisterXMPPServer(CssProfile profile, ICSSManagerCallback callback) {
+	public void unregisterXMPPServer(CssRecord profile, ICSSManagerCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}

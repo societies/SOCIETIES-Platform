@@ -24,6 +24,7 @@
  */
 package org.societies.api.internal.servicelifecycle.model;
 
+
 /**
  * The Service class represents a generic Service with appropriate attributes
  * 
@@ -31,7 +32,8 @@ package org.societies.api.internal.servicelifecycle.model;
  * @version 1.0
  * @created 21-dic-2011 17.18.32
  */
-public class Service {
+
+public class Service{
 
 	/**
 	 * Unique identifier for a single instance of a service.
@@ -63,6 +65,8 @@ public class Service {
 	private ServiceType serviceType;
 	
 	private ServiceLocation serviceLocation;
+	
+	private ServiceStatus serviceStatus;
 	
 	/**
 	 * @param serviceIdentifier
@@ -155,4 +159,13 @@ public class Service {
 	public ServiceLocation getServiceLocation () {
 		return this.serviceLocation;
 	}
+	
+	public void setServiceStatus(ServiceStatus serviceStatus){
+		this.serviceStatus = serviceStatus;
+	}
+	
+	public ServiceStatus getServiceStatus(){
+		return this.serviceStatus;
+	}
+	
 }
