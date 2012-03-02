@@ -24,7 +24,14 @@
        
        <osgi:reference id="deviceManager" interface="org.societies.api.internal.css.devicemgmt.IDeviceManager"/>
        
+       <osgi:reference id="eventAdmin" interface="org.osgi.service.event.EventAdmin"/>
        
+       <!-- <osgi:reference id="importedOsgiService">
+  			<osgi:interfaces>
+    			 <value>org.societies.api.internal.css.devicemgmt.IDeviceManager</value>
+    			 <value>org.osgi.service.event.EventAdmin</value>
+  			</osgi:interfaces>
+		</osgi:reference> -->
        
 
 </beans>
