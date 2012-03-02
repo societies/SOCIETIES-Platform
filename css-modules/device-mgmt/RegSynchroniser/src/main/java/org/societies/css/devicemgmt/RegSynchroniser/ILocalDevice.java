@@ -34,8 +34,7 @@ import org.societies.css.devicemgmt.deviceregistry.CSSDevice;
 public interface ILocalDevice {
 
     /**
-     * A local device has been added and depending on its visibility will need
-     * to be advertised to other peers and PSSs
+     * A local device has been added 
      * @param <CSSDevice>
      * 
      * @param device
@@ -53,8 +52,7 @@ public interface ILocalDevice {
             throws Exception;
 
     /**
-     * A local device has been removed and depending on its visibility its
-     * removal will need to be advertised to other peers and PSSs
+     * A local device has been removed a
      * 
      * @param device
      */

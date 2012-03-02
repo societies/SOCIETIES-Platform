@@ -92,11 +92,7 @@ public class RegManager implements ILocalDevice, BundleContextAware{
     
 
     /**
-     * Add a device to the device Registry, determine the status of the
-     * device (device Locator) and publish an event to notify the peer(s) that
-     * a new device has been added. If the device is public inform the ONM of
-     * the new device, if the current device is the controller node, to add to
-     * the Peer Group advertisement
+     * Add a device to the device Registry
      * 
      * @param device
      */
