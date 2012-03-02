@@ -8,7 +8,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.internal.css.management.CSSManagerEnums;
-import org.societies.api.internal.css.management.CSSRecord;
 
 public class TestCssInterfaceResult {
 	public static final String TEST_IDENTITY_1 = "node11";
@@ -27,7 +26,7 @@ public class TestCssInterfaceResult {
 	public static final String TEST_PASSWORD = "P455W0RD";
 	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
 
-	private CSSRecord record;
+	private CssRecord record;
 	private CssNode cssNode_1, cssNode_2;
 	private ArrayList<CssNode> cssNodes;
 	private ArrayList<CssNode> cssArchivedNodes;
@@ -54,14 +53,14 @@ public class TestCssInterfaceResult {
 		cssArchivedNodes.add(cssNode_2);
 
 		
-		this.record = new CSSRecord();
+		this.record = new CssRecord();
 		this.record.setCssIdentity(TEST_IDENTITY);
 		
-//		this.record.getCssNodes().add(cssNode_1);
-//		this.record.getCssNodes().add(cssNode_2);
-//		
-//		this.record.getArchiveCSSNodes().add(cssNode_1);
-//		this.record.getArchiveCSSNodes().add(cssNode_2);
+		this.record.getCssNodes().add(cssNode_1);
+		this.record.getCssNodes().add(cssNode_2);
+		
+		this.record.getArchiveCSSNodes().add(cssNode_1);
+		this.record.getArchiveCSSNodes().add(cssNode_2);
 		
 		this.record.setCssInactivation(TEST_INACTIVE_DATE);
 		this.record.setCssRegistration(TEST_REGISTERED_DATE);
@@ -80,10 +79,10 @@ public class TestCssInterfaceResult {
 		this.record.setSocialURI(TEST_SOCIAL_URI);
 		
 		
-//		assertEquals(cssArchivedNodes.size(), this.record.getArchiveCSSNodes().size());
+		assertEquals(cssArchivedNodes.size(), this.record.getArchiveCSSNodes().size());
 		assertEquals(TEST_IDENTITY, this.record.getCssIdentity());
 		assertEquals(TEST_INACTIVE_DATE, this.record.getCssInactivation());
-//		assertEquals(cssNodes.size(), this.record.getCssNodes().size());
+		assertEquals(cssNodes.size(), this.record.getCssNodes().size());
 		assertEquals(TEST_REGISTERED_DATE, this.record.getCssRegistration());
 		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), this.record.getStatus());
 		assertEquals(TEST_UPTIME, this.record.getCssUpTime());
@@ -114,7 +113,7 @@ public class TestCssInterfaceResult {
 	public void testClass() {
 		CssInterfaceResult result = new CssInterfaceResult();
 		result.setResultStatus(true);
-//		result.setProfile(this.record);
+		result.setProfile(this.record);
 		
 		assertNotNull(result);
 		assertEquals(true, result.isResultStatus());

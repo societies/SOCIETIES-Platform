@@ -8,8 +8,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.internal.css.management.CSSManagerEnums;
-import org.societies.api.internal.css.management.CSSNode;
-import org.societies.api.internal.css.management.CSSRecord;
 
 public class TestCssRecord {
 
@@ -29,31 +27,31 @@ public class TestCssRecord {
 	public static final String TEST_PASSWORD = "P455W0RD";
 	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
 
-	CSSNode cssNode_1;
-	private CSSNode cssNode_2;
+	CssNode cssNode_1;
+	private CssNode cssNode_2;
 	private ArrayList<CssNode> cssNodes;
 	private ArrayList<CssNode> cssArchivedNodes;
 	
 	
 	@Before
 	public void setUp() throws Exception {
-		cssNode_1 = new CSSNode();
+		cssNode_1 = new CssNode();
 		cssNode_1.setIdentity(TEST_IDENTITY_1);
 		cssNode_1.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
 		cssNode_1.setType(CSSManagerEnums.nodeType.Rich.ordinal());
 
-		cssNode_2 = new CSSNode();
+		cssNode_2 = new CssNode();
 		cssNode_2.setIdentity(TEST_IDENTITY_2);
 		cssNode_2.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
 		cssNode_2.setType(CSSManagerEnums.nodeType.Android.ordinal());
 		
 		cssNodes = new ArrayList<CssNode>();
-//		cssNodes.add(cssNode_1);
-//		cssNodes.add(cssNode_2);
+		cssNodes.add(cssNode_1);
+		cssNodes.add(cssNode_2);
 		
 		cssArchivedNodes = new ArrayList<CssNode>();
-//		cssArchivedNodes.add(cssNode_1);
-//		cssArchivedNodes.add(cssNode_2);
+		cssArchivedNodes.add(cssNode_1);
+		cssArchivedNodes.add(cssNode_2);
 	}
 
 	@After
@@ -66,15 +64,15 @@ public class TestCssRecord {
 
 	@Test
 	public void testConstructor() {
-		CSSRecord cssProfile = new CSSRecord();
+		CssRecord cssProfile = new CssRecord();
 		
 		cssProfile.setCssIdentity(TEST_IDENTITY);
 		
-//		cssProfile.getCssNodes().add(cssNode_1);
-//		cssProfile.getCssNodes().add(cssNode_2);
+		cssProfile.getCssNodes().add(cssNode_1);
+		cssProfile.getCssNodes().add(cssNode_2);
 		
-//		cssProfile.getArchiveCSSNodes().add(cssNode_1);
-//		cssProfile.getArchiveCSSNodes().add(cssNode_2);
+		cssProfile.getArchiveCSSNodes().add(cssNode_1);
+		cssProfile.getArchiveCSSNodes().add(cssNode_2);
 		
 		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
 		cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
@@ -93,10 +91,10 @@ public class TestCssRecord {
 		cssProfile.setSocialURI(TEST_SOCIAL_URI);
 		
 		
-//		assertEquals(cssArchivedNodes.size(), cssProfile.getArchiveCSSNodes().size());
+		assertEquals(cssArchivedNodes.size(), cssProfile.getArchiveCSSNodes().size());
 		assertEquals(TEST_IDENTITY, cssProfile.getCssIdentity());
 		assertEquals(TEST_INACTIVE_DATE, cssProfile.getCssInactivation());
-//		assertEquals(cssNodes.size(), cssProfile.getCssNodes().size());
+		assertEquals(cssNodes.size(), cssProfile.getCssNodes().size());
 		assertEquals(TEST_REGISTERED_DATE, cssProfile.getCssRegistration());
 		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), cssProfile.getStatus());
 		assertEquals(TEST_UPTIME, cssProfile.getCssUpTime());
@@ -107,7 +105,7 @@ public class TestCssRecord {
 		assertEquals(TEST_IDENTITY_NAME, cssProfile.getIdentityName());
 		assertEquals(TEST_IM_ID, cssProfile.getImID());
 		assertEquals(TEST_NAME, cssProfile.getName());
-//		assertEquals(TEST_PASSWORD, cssProfile.password);
+		assertEquals(TEST_PASSWORD, cssProfile.getPassword());
 		assertEquals(CSSManagerEnums.presenceType.Available.ordinal(), cssProfile.getPresence());
 		assertEquals(CSSManagerEnums.genderType.Unspecified.ordinal(), cssProfile.getSex());
 		assertEquals(TEST_SOCIAL_URI, cssProfile.getSocialURI());
