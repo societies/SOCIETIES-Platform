@@ -6,7 +6,7 @@ public class MathServiceConsumer{
 
 	private int num_a;
 	private int num_b;
-	
+		
 	private IMathService mathService;
 	private IMathServiceCallBack divisionCallBack;
 	
