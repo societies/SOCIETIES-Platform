@@ -25,20 +25,26 @@
 package org.societies.css.devicemgmt.DeviceDriverExample.impl;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.societies.api.css.devicemgmt.IDeviceStateVariable;
 import org.societies.api.internal.css.devicemgmt.IDeviceManager;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
+import org.societies.comm.xmpp.event.EventFactory;
+import org.societies.comm.xmpp.event.EventStream;
+import org.societies.comm.xmpp.event.InternalEvent;
 import org.societies.css.devicemgmt.DeviceDriverExample.ControllerWs;
-import org.societies.css.devicemgmt.DeviceDriverExample.actions.GetLightLevelAction;
-import org.societies.css.devicemgmt.DeviceDriverExample.statevariables.LightLevelStateVariable;
+
 
 
 import org.springframework.osgi.context.BundleContextAware;
@@ -56,7 +62,6 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 	
 	private IDeviceManager deviceManager;
 	
-	
 	private String createNewDevice = "";
 	
 	private static Logger LOG = LoggerFactory.getLogger(DeviceDriverExample.class);
@@ -67,13 +72,26 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 	
 	private LightSensor lightSensor;
 	
+	private EventStream myStream;
+	
+	private EventAdmin eventAdmin;
 	
 	public DeviceDriverExample() {
 		
 		deviceMacAddressList =  new ArrayList<String>();
-
-		//LOG.info("DeviceDriverExample: " + "=========++++++++++------ DeviceDriverExample constructor");
+		
 	}
+	
+	public void setEventAdmin(EventAdmin eventAdmin)
+	{
+		
+		LOG.info("DeviceDriverExample: " + "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% setEventAdmin injection");
+		this.eventAdmin = eventAdmin;
+		
+		LOG.info("DeviceDriverExample: " + "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% post setEventAdmin injection" + eventAdmin.toString());
+	}
+	
+	
 	
 	public void setDeviceManager (IDeviceManager deviceManager)
 	{
@@ -155,6 +173,32 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 	public void setLightLevel(String deviceMacAddress, Long lightLevel) {
 		
 		this.lightLevel = lightLevel;
+
+		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% sending event by eventAdmin");
+		Dictionary<String, Long> eventAdminDic = new Hashtable<String, Long>();
+		
+		eventAdminDic.put("lightLevel", lightLevel);
+
+		eventAdmin.sendEvent(new Event("LightSensorEvent", eventAdminDic));
+
+		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% event sent by eventAdmin");
+		
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% sending event by Alec's eventing mecanism");
+		myStream = EventFactory.getStream("lightLevel");
+
+		Map<String, Long> dic = new HashMap<String, Long>();
+		
+		dic.put("lightLevel", lightLevel);
+		
+		InternalEvent myEvent = new InternalEvent(this, dic);
+		
+		LOG.info("DeviceDriverExample info:  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% myEvent.toString()" + myEvent.toString());
+
+		myStream.multicastEvent(myEvent);
+		
+		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% event sent by Alec's eventing mecanism");
 		
 	}
 }
