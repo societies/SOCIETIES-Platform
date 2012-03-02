@@ -29,7 +29,7 @@ import java.net.URL;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.servicelifecycle.model.Service;
+import org.societies.api.servicelifecycle.model.Service;
 import org.societies.api.servicelifecycle.IServiceControl;
 import org.societies.api.servicelifecycle.ServiceControlException;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;

@@ -34,7 +34,7 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.servicelifecycle.model.Service;
+import org.societies.api.servicelifecycle.model.Service;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.springframework.osgi.context.BundleContextAware;
