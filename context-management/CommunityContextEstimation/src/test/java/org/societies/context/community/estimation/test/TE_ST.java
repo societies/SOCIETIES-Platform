@@ -125,10 +125,7 @@ public class TE_ST {
 	public void testComCtxEst() throws CtxException, InterruptedException, ExecutionException{
 	
 		CommunityContextEstimation cce = new CommunityContextEstimation();
-		
-	
-		
-		
+			
 		final CtxAttribute ctxAttribute;
 		final CtxEntity ctxEntity;
 		
