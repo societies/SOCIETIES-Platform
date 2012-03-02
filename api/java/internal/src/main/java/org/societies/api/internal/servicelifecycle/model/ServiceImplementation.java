@@ -24,44 +24,56 @@
  */
 package org.societies.api.internal.servicelifecycle.model;
 
-import java.net.URI;
-
 /**
  * Describe your class here...
- *
- * @author Eliza
- *
+ * 
+ * @author solutanet
+ * 
  */
-public interface IServiceResourceIdentifier {
+public class ServiceImplementation {
 
 	/**
-	 * 
-	 * @return the identifier for Service Implementation
+	 * @param serviceNameSpace
+	 * @param serviceProvider
+	 * @param serviceVersion
 	 */
-	public URI getIdentifier();
-	
-	/**
-	 * 
-	 * @param identifier for a Service Implementation
-	 */
-	public void setIdentifier(URI identifier);
-	
-	/**
-	 * 
-	 * @return the identifier for a Service Instance
-	 */
-	public String getServiceInstanceIdentifier();
-	
-	/**
-	 * 
-	 * @param identifier for a Service Instance
-	 */
-	public void setServiceInstanceIdentifier(String serviceInstanceIdentifier);
-	
-	/**
-	 * 
-	 * @return a string representation of the object.
-	 */
-	public String toString();
-	
+	public ServiceImplementation(String serviceNameSpace,
+			String serviceProvider, String serviceVersion) {
+		super();
+		this.serviceNameSpace = serviceNameSpace;
+		this.serviceProvider = serviceProvider;
+		this.serviceVersion = serviceVersion;
+	}
+
+	private String serviceNameSpace;
+	private String serviceProvider;
+	private String serviceVersion;
+
+	public String getServiceNameSpace() {
+		return serviceNameSpace;
+	}
+
+	public void setServiceNameSpace(String serviceNameSpace) {
+		this.serviceNameSpace = serviceNameSpace;
+	}
+
+	public String getServiceProvider() {
+		return serviceProvider;
+	}
+
+	public void setServiceProvider(String serviceProvider) {
+		this.serviceProvider = serviceProvider;
+	}
+
+	public String getServiceVersion() {
+		return serviceVersion;
+	}
+
+	public void setServiceVersion(String serviceVersion) {
+		this.serviceVersion = serviceVersion;
+	}
+
+	public String getServiceImplementationId() {
+		return serviceProvider + serviceNameSpace + serviceVersion;
+	}
 }

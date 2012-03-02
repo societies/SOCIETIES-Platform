@@ -22,46 +22,95 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.servicelifecycle.model;
+package org.societies.platform.servicelifecycle.serviceRegistry.model;
 
-import java.net.URI;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Cascade;
+import org.societies.api.internal.servicelifecycle.model.ServiceImplementation;
 
 /**
  * Describe your class here...
  *
- * @author Eliza
+ * @author solutanet
  *
  */
-public interface IServiceResourceIdentifier {
+@Entity
+@Table(name = "ServiceInstanceEntry")
+public class ServiceInstanceDAO {
+	
+	private long id;
+	private String fullJid;
+	private String XMPPNode;
+	private ServiceImplementationDAO serviceImpl;
+	
+	/**
+	 
+	 * @param fullJid
+	 * @param xMPPNode
+	 * @param serviceImpl
+	 */
+	public ServiceInstanceDAO(String fullJid, String xMPPNode,
+			ServiceImplementationDAO serviceImpl) {
+		super();
+		
+		this.fullJid = fullJid;
+		XMPPNode = xMPPNode;
+		this.serviceImpl = serviceImpl;
+	}
+	
+	/**
+	 * 
+	 */
+	public ServiceInstanceDAO() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
-	/**
-	 * 
-	 * @return the identifier for Service Implementation
-	 */
-	public URI getIdentifier();
+	@Column(name = "FullJid")
+	public String getFullJid() {
+		return fullJid;
+	}
+	public void setFullJid(String fullJid) {
+		this.fullJid = fullJid;
+	}
+	@Column(name = "XMPPNode")
+	public String getXMPPNode() {
+		return XMPPNode;
+	}
+	public void setXMPPNode(String xMPPNode) {
+		XMPPNode = xMPPNode;
+	}
+	@OneToOne(cascade=CascadeType.ALL)
 	
-	/**
-	 * 
-	 * @param identifier for a Service Implementation
-	 */
-	public void setIdentifier(URI identifier);
+	public ServiceImplementationDAO getServiceImpl() {
+		return serviceImpl;
+	}
+	public void setServiceImpl(ServiceImplementationDAO serviceImpl) {
+		this.serviceImpl = serviceImpl;
+	}
+	@Id
+	@GeneratedValue
+	@Column(name="id")
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
 	
-	/**
-	 * 
-	 * @return the identifier for a Service Instance
-	 */
-	public String getServiceInstanceIdentifier();
+
 	
-	/**
-	 * 
-	 * @param identifier for a Service Instance
-	 */
-	public void setServiceInstanceIdentifier(String serviceInstanceIdentifier);
-	
-	/**
-	 * 
-	 * @return a string representation of the object.
-	 */
-	public String toString();
 	
 }

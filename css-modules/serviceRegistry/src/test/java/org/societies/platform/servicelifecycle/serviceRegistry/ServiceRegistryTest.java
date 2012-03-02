@@ -31,13 +31,18 @@ import java.util.List;
 
 import org.junit.Test;
 import org.societies.api.internal.servicelifecycle.model.Service;
+import org.societies.api.internal.servicelifecycle.model.ServiceImplementation;
+import org.societies.api.internal.servicelifecycle.model.ServiceInstance;
 import org.societies.api.internal.servicelifecycle.model.ServiceLocation;
 import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.internal.servicelifecycle.model.ServiceStatus;
 import org.societies.api.internal.servicelifecycle.model.ServiceType;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.serviceloader.ServiceListFactoryBean;
 import org.springframework.test.annotation.ExpectedException;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import static org.junit.Assert.*;
@@ -57,6 +62,7 @@ public class ServiceRegistryTest extends
 	private List<Service> servicesList = generateServiceList(5);
 
 	@Test
+	@Rollback(false)
 	public void testRegisterService() {
 
 		try {
@@ -71,6 +77,7 @@ public class ServiceRegistryTest extends
 
 	@Test
 	@ExpectedException(ServiceRegistrationException.class)
+	@Rollback(false)
 	public void testDuplicateServiceRegistration()
 			throws ServiceRegistrationException {
 
@@ -79,18 +86,16 @@ public class ServiceRegistryTest extends
 	}
 
 	@Test
+	@Rollback(false)
 	public void retrieveService() {
 		Service retrievedService = null;
 		try {
 			retrievedService = serReg
-					.retrieveService(new ServiceResourceIdentifier(new URI(
-							serviceUri + "0")));
+					.retrieveService(servicesList.get(0).getServiceIdentifier());
 		} catch (ServiceRetrieveException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		
 		}
 		assertTrue(retrievedService.getServiceName().equals(
 				servicesList.get(0).getServiceName()));
@@ -98,12 +103,13 @@ public class ServiceRegistryTest extends
 
 	@Test
 	@ExpectedException(ServiceRetrieveException.class)
+	@Rollback(false)
 	public void unregisterService() throws ServiceRetrieveException {
 		try {
 			serReg.unregisterServiceList(servicesList);
 
 			serReg.retrieveService(new ServiceResourceIdentifier(new URI(
-					serviceUri + "0")));
+					serviceUri + "0"),"0"));
 
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
@@ -121,11 +127,13 @@ public class ServiceRegistryTest extends
 		for (int i = 0; i < numberOfService; i++) {
 			try {
 				returnedServiceList.add(new Service(
-						new ServiceResourceIdentifier(new URI(serviceUri + i)),
-						"cSSIDInstalled", "1.0", "serviceName" + i,
-						"serviceDescription" + i, "authorSignature",
-						ServiceType.CoreService, ServiceLocation.Local));
-			} catch (URISyntaxException e) {
+						
+						"serviceEndPoint", "serviceName" + i,
+						"serviceDescription" + i, "authorSignaturexx",
+						ServiceType.CoreService, ServiceLocation.Local,
+						new ServiceInstance("fullJid"+i, "XMPPNode"+i, new ServiceImplementation("net.calendar", "net.soluta", "1.0")),
+						ServiceStatus.STARTED));
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

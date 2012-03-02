@@ -22,46 +22,84 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.servicelifecycle.model;
+package org.societies.platform.servicelifecycle.serviceRegistry.model;
 
-import java.net.URI;
+import javax.annotation.Generated;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 /**
  * Describe your class here...
  *
- * @author Eliza
+ * @author solutanet
  *
  */
-public interface IServiceResourceIdentifier {
-
-	/**
-	 * 
-	 * @return the identifier for Service Implementation
-	 */
-	public URI getIdentifier();
+@Entity
+@Table(name = "ServiceImplementation")
+public class ServiceImplementationDAO {
+	
+	private long id;
+	private String serviceNameSpace;
+	private String serviceProvider;
+	private String serviceVersion;
 	
 	/**
-	 * 
-	 * @param identifier for a Service Implementation
+	 
+	 * @param serviceNameSpace
+	 * @param serviceProvider
+	 * @param serviceVersion
 	 */
-	public void setIdentifier(URI identifier);
-	
+	public ServiceImplementationDAO( String serviceNameSpace,
+			String serviceProvider, String serviceVersion) {
+		super();
+		
+		this.serviceNameSpace = serviceNameSpace;
+		this.serviceProvider = serviceProvider;
+		this.serviceVersion = serviceVersion;
+	}
 	/**
 	 * 
-	 * @return the identifier for a Service Instance
 	 */
-	public String getServiceInstanceIdentifier();
+	public ServiceImplementationDAO() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	@Column(name = "ServiceNameSpace")
+	public String getServiceNameSpace() {
+		return serviceNameSpace;
+	}
+	public void setServiceNameSpace(String serviceNameSpace) {
+		this.serviceNameSpace = serviceNameSpace;
+	}
+	@Column(name = "ServiceProvider")
+	public String getServiceProvider() {
+		return serviceProvider;
+	}
+	public void setServiceProvider(String serviceProvider) {
+		this.serviceProvider = serviceProvider;
+	}
+	@Column(name = "ServiceVersion")
+	public String getServiceVersion() {
+		return serviceVersion;
+	}
+	public void setServiceVersion(String serviceVersion) {
+		this.serviceVersion = serviceVersion;
+	}
+	@Id
+	@GeneratedValue
+	@Column(name="id")
+	public long getId() {
+		return id;
+	}
+	public void setId(long id) {
+		this.id = id;
+	}
 	
-	/**
-	 * 
-	 * @param identifier for a Service Instance
-	 */
-	public void setServiceInstanceIdentifier(String serviceInstanceIdentifier);
-	
-	/**
-	 * 
-	 * @return a string representation of the object.
-	 */
-	public String toString();
 	
 }

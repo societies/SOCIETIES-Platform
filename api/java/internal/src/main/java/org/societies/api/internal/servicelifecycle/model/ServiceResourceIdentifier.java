@@ -3,7 +3,7 @@ package org.societies.api.internal.servicelifecycle.model;
 import java.io.Serializable;
 import java.net.URI;
 
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+
 
 /**
  * @author apanazzolo
@@ -14,11 +14,19 @@ import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 public class ServiceResourceIdentifier implements IServiceResourceIdentifier, Serializable {
 	
+	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	/**
+	 * This attribute represents the id for the service implementation. This attribute must be set using the ServiceImplementation getServiceImplementationId method.
+	 */
 	private URI identifier;
+	/**
+	 * This attribute represents the id for a service instance. This attribute must be set using the ServiceInstance getServiceInstanceId method.
+	 */
+	private String serviceInstanceIdentifier;
 	/**
 	 * no- arg constructor is needed for xml to object mapping
 	 */
@@ -27,10 +35,13 @@ public class ServiceResourceIdentifier implements IServiceResourceIdentifier, Se
 	}
 	/**
 	 * @param identifier
+	 * @param serviceInstanceIdentifier
 	 */
-	public ServiceResourceIdentifier(URI identifier) {
+	public ServiceResourceIdentifier(URI identifier,
+			String serviceInstanceIdentifier) {
 		super();
 		this.identifier = identifier;
+		this.serviceInstanceIdentifier = serviceInstanceIdentifier;
 	}
 
 	
@@ -45,5 +56,11 @@ public class ServiceResourceIdentifier implements IServiceResourceIdentifier, Se
 	@Override
 	public String toString() {
 		return identifier.toString();
+	}
+	public String getServiceInstanceIdentifier() {
+		return serviceInstanceIdentifier;
+	}
+	public void setServiceInstanceIdentifier(String serviceInstanceIdentifier) {
+		this.serviceInstanceIdentifier = serviceInstanceIdentifier;
 	}
 }

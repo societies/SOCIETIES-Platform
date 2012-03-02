@@ -34,24 +34,14 @@ public class ServiceRegistry implements IServiceRegistry {
 		try {
 			for (Service service : servicesList) {
 
-				tmpRegistryEntry = new RegistryEntry(
-						new ServiceResourceIdentifier(new URI(service
-								.getServiceIdentifier().toString())),
-						service.getCSSIDInstalled(), service.getVersion(),
-
-						service.getServiceName(),
-						service.getServiceDescription(),
-						service.getAuthorSignature(), service.getServiceType(),
-						service.getServiceLocation());
+				tmpRegistryEntry = new RegistryEntry(service.getServiceIdentifier(), service.getServiceEndpoint(), service.getServiceName(), service.getServiceDescription(), service.getAuthorSignature(), service.getServiceType(), service.getServiceLocation(), service.getServiceInstance(),service.getServiceStatus());
 
 				Transaction t = session.beginTransaction();
 				session.save(tmpRegistryEntry);
 				t.commit();
 			}
 			log.debug("Service list saved.");
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			throw new ServiceRegistrationException(e);
+		
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ServiceRegistrationException(e);
@@ -71,23 +61,17 @@ public class ServiceRegistry implements IServiceRegistry {
 		try {
 			for (Service service : servicesList) {
 
-				tmpRegistryEntry = new RegistryEntry(
-						new ServiceResourceIdentifier(new URI(service
-								.getServiceIdentifier().toString())),
-						service.getCSSIDInstalled(), service.getVersion(),
-						service.getServiceName(),
-						service.getServiceDescription(),
-						service.getAuthorSignature(), service.getServiceType(),
-						service.getServiceLocation());
-
+				tmpRegistryEntry = new RegistryEntry(service.getServiceIdentifier(), service.getServiceEndpoint(), service.getServiceName(), service.getServiceDescription(), service.getAuthorSignature(), service.getServiceType(), service.getServiceLocation(), service.getServiceInstance(),service.getServiceStatus());
+			//tmpRegistryEntry = (RegistryEntry) session.get(RegistryEntry.class,tmpRegistryEntry.getServiceIdentifier());
+				Object obj=	session.load(RegistryEntry.class, tmpRegistryEntry.getServiceIdentifier());	
 				Transaction t = session.beginTransaction();
-				session.delete(tmpRegistryEntry);
+				
+				session.delete(obj);
+				
 				t.commit();
 			}
 
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			throw new ServiceRegistrationException(e);
+		
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ServiceRegistrationException(e);
@@ -193,7 +177,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		try {
 			tmpRegistryEntry = (RegistryEntry) session.get(RegistryEntry.class,
 					new ServiceResourceIdentiferDAO(serviceIdentifier
-							.getIdentifier().toString()));
+							.getIdentifier().toString(),serviceIdentifier.getServiceInstanceIdentifier()));
 			tmpService = tmpRegistryEntry.createServiceFromRegistryEntry();
 		} catch (Exception e) {
 			e.printStackTrace();

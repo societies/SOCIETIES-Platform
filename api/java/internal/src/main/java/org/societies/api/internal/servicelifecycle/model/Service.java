@@ -24,6 +24,8 @@
  */
 package org.societies.api.internal.servicelifecycle.model;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * The Service class represents a generic Service with appropriate attributes
@@ -32,8 +34,7 @@ package org.societies.api.internal.servicelifecycle.model;
  * @version 1.0
  * @created 21-dic-2011 17.18.32
  */
-
-public class Service{
+public class Service {
 
 	/**
 	 * Unique identifier for a single instance of a service.
@@ -41,13 +42,9 @@ public class Service{
 	private ServiceResourceIdentifier serviceIdentifier;
 
 	/**
-	 * It represents the CSS Id where the service is physically installed.
+	 * It represents the service endpoint for its invocation.
 	 */
-	private String CSSIDInstalled;
-	/**
-	 * The version of the service, it must be updated by developer
-	 */
-	private String version;
+	private String serviceEndpoint;
 
 	/**
 	 * An alias name for the service
@@ -66,44 +63,59 @@ public class Service{
 	
 	private ServiceLocation serviceLocation;
 	
+	/**
+	 * The class that contains information about the service instance
+	 */
+	private ServiceInstance serviceInstance;
+	
 	private ServiceStatus serviceStatus;
 	
 	/**
 	 * @param serviceIdentifier
-	 * @param cSSIDInstalled
-	 * @param version
+	 * @param serviceEndpoint
 	 * @param serviceName
 	 * @param serviceDescription
 	 * @param authorSignature
-	 */	
-	public Service(ServiceResourceIdentifier serviceIdentifier,
-			String cSSIDInstalled, String version, String serviceName,
-			String serviceDescription, String authorSignature, ServiceType type, ServiceLocation location) {
-
+	 * @param serviceType
+	 * @param serviceLocation
+	 * @param serviceInstance
+	 */
+	public Service(
+			String serviceEndpoint, String serviceName,
+			String serviceDescription, String authorSignature,
+			ServiceType serviceType, ServiceLocation serviceLocation,
+			ServiceInstance serviceInstance, ServiceStatus serviceStatus) {
 		super();
-		this.serviceIdentifier = serviceIdentifier;
-		this.CSSIDInstalled = cSSIDInstalled;
-		this.version = version;
+		
+		this.serviceEndpoint = serviceEndpoint;
 		this.serviceName = serviceName;
 		this.serviceDescription = serviceDescription;
 		this.authorSignature = authorSignature;
-		
-		this.serviceType = type;
-		this.serviceLocation = location;
+		this.serviceType = serviceType;
+		this.serviceLocation = serviceLocation;
+		this.serviceInstance = serviceInstance;
+		try {
+			this.serviceIdentifier = new ServiceResourceIdentifier(new URI(serviceInstance.getServiceImpl().getServiceImplementationId()), serviceInstance.getServiceInstanceId());
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		this.serviceStatus=serviceStatus;
 	}
-	
+
+
+
 	public Service() {
 		
 	}
 
+	
+
 	public String getVersion() {
-		return version;
+		return serviceInstance.getServiceImpl().getServiceVersion();
 	}
 
-	public void setVersion(String version) {
-		this.version = version;
-	}
-
+	
 	public String getServiceName() {
 		return serviceName;
 	}
@@ -128,13 +140,7 @@ public class Service{
 		this.authorSignature = authorSignature;
 	}
 
-	public String getCSSIDInstalled() {
-		return CSSIDInstalled;
-	}
-
-	public void setCSSIDInstalled(String CSSIDInstalled) {
-		this.CSSIDInstalled = CSSIDInstalled;
-	}
+	
 
 	public ServiceResourceIdentifier getServiceIdentifier() {
 		return serviceIdentifier;
@@ -159,13 +165,46 @@ public class Service{
 	public ServiceLocation getServiceLocation () {
 		return this.serviceLocation;
 	}
+
+	public ServiceInstance getServiceInstance() {
+		return serviceInstance;
+	}
+
+	public void setServiceInstance(ServiceInstance serviceInstance) {
+		this.serviceInstance = serviceInstance;
+	}
 	
-	public void setServiceStatus(ServiceStatus serviceStatus){
+	public IServiceResourceIdentifier createServiceResourceIdentifier(){
+		ServiceResourceIdentifier returnedServiceResourceIdentifier=null;
+		try {
+			returnedServiceResourceIdentifier= new ServiceResourceIdentifier(new URI(serviceInstance.getServiceImpl().getServiceImplementationId()),serviceInstance.getServiceInstanceId());
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}return returnedServiceResourceIdentifier;
+	}
+
+
+
+	public String getServiceEndpoint() {
+		return serviceEndpoint;
+	}
+
+
+
+	public void setServiceEndpoint(String serviceEndpoint) {
+		this.serviceEndpoint = serviceEndpoint;
+	}
+
+
+
+	public ServiceStatus getServiceStatus() {
+		return serviceStatus;
+	}
+
+
+
+	public void setServiceStatus(ServiceStatus serviceStatus) {
 		this.serviceStatus = serviceStatus;
 	}
-	
-	public ServiceStatus getServiceStatus(){
-		return this.serviceStatus;
-	}
-	
 }
