@@ -1,27 +1,21 @@
 package org.societies.platform.servicelifecycle.serviceRegistry.model;
 
 import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.Target;
-import org.societies.api.internal.servicelifecycle.model.Service;
-import org.societies.api.internal.servicelifecycle.model.ServiceImplementation;
-import org.societies.api.internal.servicelifecycle.model.ServiceInstance;
-import org.societies.api.internal.servicelifecycle.model.ServiceLocation;
-import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.internal.servicelifecycle.model.ServiceStatus;
-import org.societies.api.internal.servicelifecycle.model.ServiceType;
+import org.societies.api.servicelifecycle.model.Service;
+import org.societies.api.servicelifecycle.model.ServiceImplementation;
+import org.societies.api.servicelifecycle.model.ServiceInstance;
+import org.societies.api.servicelifecycle.model.ServiceLocation;
+import org.societies.api.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.ServiceStatus;
+import org.societies.api.servicelifecycle.model.ServiceType;
 
 /**
  * This is the Class accepted by the ServiceRegistry when a service wants to

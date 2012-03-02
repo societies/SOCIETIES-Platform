@@ -1,4 +1,4 @@
-package org.societies.api.internal.servicelifecycle.model;
+package org.societies.api.servicelifecycle.model;
 
 import java.io.Serializable;
 import java.net.URI;

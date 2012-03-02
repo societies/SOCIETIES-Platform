@@ -22,14 +22,58 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package org.societies.api.internal.servicelifecycle.model;
+package org.societies.api.servicelifecycle.model;
 
 /**
- * @author Antonio Panazzolo, Massimo Mazzariol (SN)
+ * Describe your class here...
+ * 
+ * @author solutanet
+ * 
  */
+public class ServiceImplementation {
 
-public enum ServiceLocation {
-	Local,
-	Remote
+	/**
+	 * @param serviceNameSpace
+	 * @param serviceProvider
+	 * @param serviceVersion
+	 */
+	public ServiceImplementation(String serviceNameSpace,
+			String serviceProvider, String serviceVersion) {
+		super();
+		this.serviceNameSpace = serviceNameSpace;
+		this.serviceProvider = serviceProvider;
+		this.serviceVersion = serviceVersion;
+	}
+
+	private String serviceNameSpace;
+	private String serviceProvider;
+	private String serviceVersion;
+
+	public String getServiceNameSpace() {
+		return serviceNameSpace;
+	}
+
+	public void setServiceNameSpace(String serviceNameSpace) {
+		this.serviceNameSpace = serviceNameSpace;
+	}
+
+	public String getServiceProvider() {
+		return serviceProvider;
+	}
+
+	public void setServiceProvider(String serviceProvider) {
+		this.serviceProvider = serviceProvider;
+	}
+
+	public String getServiceVersion() {
+		return serviceVersion;
+	}
+
+	public void setServiceVersion(String serviceVersion) {
+		this.serviceVersion = serviceVersion;
+	}
+
+	public String getServiceImplementationId() {
+		return serviceProvider + serviceNameSpace + serviceVersion;
+	}
 }

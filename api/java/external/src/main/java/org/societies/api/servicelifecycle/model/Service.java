@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.servicelifecycle.model;
+package org.societies.api.servicelifecycle.model;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -34,7 +34,7 @@ import java.net.URISyntaxException;
  * @version 1.0
  * @created 21-dic-2011 17.18.32
  */
-public class Service {
+public class Service implements IService{
 
 	/**
 	 * Unique identifier for a single instance of a service.

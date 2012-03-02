@@ -1,7 +1,5 @@
 package org.societies.platform.servicelifecycle.serviceRegistry;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -9,12 +7,12 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.servicelifecycle.model.Service;
-import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
+import org.societies.api.servicelifecycle.model.Service;
+import org.societies.api.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.RegistryEntry;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceResourceIdentiferDAO;
 
