@@ -36,10 +36,10 @@ import org.osgi.framework.BundleContext;
 //import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.osgi.context.BundleContextAware;
-
+import org.societies.api.internal.css.devicemgmt.IDeviceRegistry;
 import org.societies.css.devicemgmt.deviceregistry.DeviceRegistry;
-import org.societies.css.devicemgmt.deviceregistry.CSSDevice;
-import org.societies.css.devicemgmt.deviceregistry.IDeviceRegistry;
+//import org.societies.css.devicemgmt.deviceregistry.CSSDevice;
+//import org.societies.css.devicemgmt.deviceregistry.IDeviceRegistry;
 import org.societies.api.internal.css.devicemgmt.ILocalDevice;
 //import org.societies.css.devicemgmt.RegSynchroniser.impl.LocalDevices;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;

@@ -23,63 +23,69 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.css.devicemgmt.RegSynchroniser.impl;
+package org.societies.api.internal.css.devicemgmt;
 
 import java.util.Collection;
+import java.util.List;
 
-//import org.societies.css.devicemgmt.deviceregistry.CSSDevice;
-import org.societies.css.devicemgmt.deviceregistry.DeviceRegistry;
-//import org.societies.css.devicemgmt.deviceregistry.IDeviceRegistry;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
-//import org.societies.css.devicemgmt.deviceregistry.RegistryUtility;
-//import org.societies.api.internal.css.devicemgmt.ILocalDevice;
-import org.societies.api.internal.css.devicemgmt.IDeviceRegistry;
-
-public class LocalDevices {
-
-	static boolean addDevice(DeviceCommonInfo device, String CSSID) throws Exception {
-		boolean retValue = false;
+//import org.societies.css.devicemgmt.deviceregistry.CSSDevice;
 
 
-        IDeviceRegistry deviceRegistry = DeviceRegistry.getInstance();
-        
-        if (null != deviceRegistry) {
+public interface IDeviceRegistry {
+	
+	/*
+	 * Description:		Add new device to the device registry
+	 * 				
+	 * @return 			IDeviceidentifier
+	 */
+	public String addDevice (DeviceCommonInfo device, String CSSID);
 
-            if (null != deviceRegistry.addDevice(device, CSSID)) 
-            {
-            	
-                retValue = true;
-            }
+	/* 
+	 * Description: 	Remove device from the device registry
+	 * 				
+	 * @return 			boolean
+	 */
 
-        } else {
-				throw new Exception("No Device Registry available");
-        }
-        
-		return retValue;
-		
-	}
+	public boolean deleteDevice (DeviceCommonInfo device, String CSSID);
+	
+	/* 
+	 * Description:		Search the device registry for a particular device given the deviceID 
+	 * @return 			CSSDevice
+	 */
 
-	static boolean removeDevice(DeviceCommonInfo device, String CSSID) throws Exception{
-		
-		boolean retValue = false;
-		
-		IDeviceRegistry deviceRegistry = DeviceRegistry.getInstance();
-        
-        if (null != deviceRegistry) {
-
-            if (!deviceRegistry.deleteDevice(device, CSSID)); 
-            {
-            	
-                retValue = true;
-            }
-
-        } else {
-				throw new Exception("No Device Registry available");
-        }
-        
-		return retValue; 
-		
-	}
+	public DeviceCommonInfo findDevice(String deviceID);
+	
+	/* 
+	 * Description: 	Given a particular deviceID get all the services associated with that device 
+	 * @return 			collection
+	 */
+	//public Collection<DeviceCommonInfo> getDeviceList (String deviceID);
+	
+	/* 
+	 * Description: 	Search the device registry for all devices registered 
+	 * @return 			collection
+	 */
+	
+	public Collection<DeviceCommonInfo> findAllDevices();
 	
 	
+	/* 
+	 * Description:		Search the device registry for a particular device type 
+	 * @return 			collection of device types
+	 */
+	public Collection<DeviceCommonInfo> findByDeviceType(String deviceType);
+	
+	
+	/* 
+	 * Description:		Clear the device registry of all entries
+	 * @return 			
+	 */
+    public void clearRegistry();
+
+    /* 
+	 * Description:		Determine the number of devices registered in the device registry
+	 * @return 			int
+	 */
+    public int registrySize();
 }

@@ -23,63 +23,29 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.css.devicemgmt.RegSynchroniser.impl;
+package org.societies.css.devicemgmt.deviceregistry;
 
-import java.util.Collection;
+//import IDeviceIdentifier;
 
-//import org.societies.css.devicemgmt.deviceregistry.CSSDevice;
-import org.societies.css.devicemgmt.deviceregistry.DeviceRegistry;
-//import org.societies.css.devicemgmt.deviceregistry.IDeviceRegistry;
-import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
-//import org.societies.css.devicemgmt.deviceregistry.RegistryUtility;
-//import org.societies.api.internal.css.devicemgmt.ILocalDevice;
-import org.societies.api.internal.css.devicemgmt.IDeviceRegistry;
-
-public class LocalDevices {
-
-	static boolean addDevice(DeviceCommonInfo device, String CSSID) throws Exception {
-		boolean retValue = false;
-
-
-        IDeviceRegistry deviceRegistry = DeviceRegistry.getInstance();
-        
-        if (null != deviceRegistry) {
-
-            if (null != deviceRegistry.addDevice(device, CSSID)) 
-            {
-            	
-                retValue = true;
-            }
-
-        } else {
-				throw new Exception("No Device Registry available");
-        }
-        
-		return retValue;
-		
-	}
-
-	static boolean removeDevice(DeviceCommonInfo device, String CSSID) throws Exception{
-		
-		boolean retValue = false;
-		
-		IDeviceRegistry deviceRegistry = DeviceRegistry.getInstance();
-        
-        if (null != deviceRegistry) {
-
-            if (!deviceRegistry.deleteDevice(device, CSSID)); 
-            {
-            	
-                retValue = true;
-            }
-
-        } else {
-				throw new Exception("No Device Registry available");
-        }
-        
-		return retValue; 
-		
-	}
+public class RegistryUtility {
 	
-	
+	/**
+     * 
+     */
+    private RegistryUtility() {
+    }
+
+
+    /**
+     * Create a key string for storing a device
+     *
+     * @param key
+     * @param value
+     * @return
+     */
+    public static String createKeyString(String deviceId) {
+
+        return deviceId;
+    }
+
 }

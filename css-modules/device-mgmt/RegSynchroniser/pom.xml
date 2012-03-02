@@ -76,7 +76,8 @@
 			<artifactId>societies-api-internal</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
-		</dependency>		
+		</dependency>
+				
 	</dependencies>
 	
 	<build>
@@ -100,10 +101,13 @@
               				org.springframework.osgi.context,
               				org.springframework.osgi.service.exporter,
               				org.slf4j.*,
-              				org.societies.api.internal.css.devicemgmt,
+              				<!--org.societies.api.internal.css.devicemgmt,-->
               				org.societies.api.internal.css.devicemgmt.model,
               				org.societies.css.devicemgmt.deviceregistry
               			</Import-Package> 
+              			<Export-Package>
+							org.societies.css.devicemgmt.RegSynchroniser
+              			</Export-Package>
               			
           </instructions>
       </configuration>
