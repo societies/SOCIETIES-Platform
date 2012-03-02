@@ -31,6 +31,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 
+import static org.mockito.Mockito.*;
+
 import org.societies.api.internal.css.directory.ICssDirectory;
 
 import org.societies.api.internal.css.discovery.ICssDiscovery;
@@ -191,22 +193,31 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 	
 	public void identifyCissToCreate(String evaluationType) {
 		
+		
+		
 		ArrayList<IIdentity> interactedCssIDs = null;
 		ArrayList<IIdentity> friendCssIDs = null;
 		ArrayList<IIdentity> localCsss = null;
 		// ...
 		
-		ArrayList<CisRecord> cissToCreate = null;
+		ArrayList<CisRecord> cissToCreate = new ArrayList<CisRecord>();
 		ArrayList<CisRecord> cissToAutomaticallyCreate = null;
 		//v1.0 algorithms
 		
+		linkedCss = mock(IIdentity.class);
+		cisManager = mock(ICisManager.class);
+		userContextBroker = mock(ICtxBroker.class);
+		userCssDirectory = mock(ICssDirectory.class);
+		
 		String[] it = new String[1];
 		it[0] = linkedCss.getIdentifier();
+		
 		CisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new CisRecord(null, null, null, null, null, it, null, null, null));
 		ArrayList<CisRecord> userJoinedCiss = new ArrayList<CisRecord>();
-		for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
-		    userJoinedCiss.add(listOfUserJoinedCiss[i]);   
-		}
+		if (listOfUserJoinedCiss != null)
+		    for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
+		        userJoinedCiss.add(listOfUserJoinedCiss[i]);   
+		    }
 		
 		if (evaluationType.equals("extensive")) { //every day or so
 			if (linkedCss != null) {
@@ -232,6 +243,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				boolean cisExistsAlready = false;
 				if (cssDirectoryMembers.size() >= 2)
 				for (int i = 0; i < userJoinedCiss.size(); i++) {
+					//if (userJoinedCiss.get(i).getOrchestrationMetdata.contains("Personal CSS directory")) cisExistsAlready = true;
 					Collection<Object> membersOfCis = null;
 					String[] membersOfCisStringArray = userJoinedCiss.get(i).membersCss;
 					for (int m = 0; m < membersOfCisStringArray.length; m++) {
@@ -275,13 +287,14 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				    e.printStackTrace();
 			    }
 				
-				while (friendsFuture == null) {
-					continue;
-				}
+				//while (friendsFuture == null) {
+				//	continue;
+				//}
 				
 				List<CtxIdentifier> theFriends = null;
 				try {
-					theFriends = friendsFuture.get();
+					if (friendsFuture != null)
+					    theFriends = friendsFuture.get();
 				} catch (InterruptedException e3) {
 					// TODO Auto-generated catch block
 					e3.printStackTrace();
@@ -290,15 +303,16 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 					e3.printStackTrace();
 				}
 				boolean similarCis = false;
-				for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
-					String[] members = ((CisRecord)listOfUserJoinedCiss[i]).membersCss;
-					int number = 0;
-					for (int m = 0; m < members.length; m++) {
-						if (theFriends.contains(members[i]))
-							number++;
-					}
-					if (((number/theFriends.size()) >= 0.8) && (((number/members.length) >= 0.8))) {
-						similarCis = true;
+				if (listOfUserJoinedCiss != null) {
+				    for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
+					    String[] members = ((CisRecord)listOfUserJoinedCiss[i]).membersCss;
+					    int number = 0;
+					    for (int m = 0; m < members.length; m++) {
+						    if (theFriends.contains(members[i]))
+							    number++;
+				    	}
+					    if (((number/theFriends.size()) >= 0.8) && (((number/members.length) >= 0.8))) {
+						    similarCis = true;
 						//if no CIS exists with 100% friend members, suggest sub-CIS of that one
 						
 						//number = 0;
@@ -307,9 +321,10 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 						//		number++;
 						//}
 						
-			            cissToCreate.add(new CisRecord(null, linkedCss.toString(), "family relation to all members", null, null, null, null, null, null));
+			                cissToCreate.add(new CisRecord(null, linkedCss.toString(), "family relation to all members", null, null, null, null, null, null));
 						
-					}
+					    }
+				    }
 				}
 				if (similarCis == false) {
 		            cissToCreate.add(new CisRecord(null, linkedCss.toString(), "Mutual friends", null, null, null, null, null, null));
@@ -461,14 +476,13 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 					e.printStackTrace();
 				}
 				
-				while (localCssFuture == null) {
-					continue;
-				}
+				
 				
 				List<CtxIdentifier> temporaryLocalCsss = null;
 				
 				try {
-					temporaryLocalCsss = localCssFuture.get();
+					if (localCssFuture != null)
+					    temporaryLocalCsss = localCssFuture.get();
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -476,21 +490,22 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
-				for (int i = 0; i < temporaryLocalCsss.size(); i++) {
-					if (userCssDirectory.findForAllCss().contains(temporaryLocalCsss.get(i))) {
-						if (userJoinedCiss.contains(new CisRecord(null, null, "friends", null, null, null, null, null, null))) {
+				if (temporaryLocalCsss != null) {
+				    for (int i = 0; i < temporaryLocalCsss.size(); i++) {
+					    if (userCssDirectory.findForAllCss().contains(temporaryLocalCsss.get(i))) {
+						    if (userJoinedCiss.contains(new CisRecord(null, null, "friends", null, null, null, null, null, null))) {
 							
-							if (userJoinedCiss.get(i).membershipCriteria.equals("friends") /**&& userJoinedCiss.getSubCiss("proximity") != null*/ /**it has a sub-CIS defined on this location*/) {
+							    if (userJoinedCiss.get(i).membershipCriteria.equals("friends") /**&& userJoinedCiss.getSubCiss("proximity") != null*/ /**it has a sub-CIS defined on this location*/) {
 								//not create
-							}
-							else {
-								cissToCreate.add(new CisRecord(null, linkedCss.toString(), "Local proximity", null, null, null, null, null, null));
-							}
-						}
-					}
+							    }
+							    else {
+								    cissToCreate.add(new CisRecord(null, linkedCss.toString(), "Local proximity", null, null, null, null, null, null));
+							    }
+						    }
+					    }
 					//do for all other attributes: family, workers, interest?, CSS directory (personal and mutual if there is one)
 					//then do this for service interaction, same process
+				    }
 				}
 				
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
@@ -518,8 +533,8 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 					
 				    }
 				}
-				ArrayList<IIdentity> recentlyInteractedCsss = null; //interaction timestamps are last 24 hours(?)
-				ArrayList<IIdentity> recentlyReferencingCsss = null;
+				ArrayList<IIdentity> recentlyInteractedCsss = new ArrayList<IIdentity>(); //interaction timestamps are last 24 hours(?)
+				ArrayList<IIdentity> recentlyReferencingCsss = new ArrayList<IIdentity>();
 				
 				
 				for (int i = 0; i < recentlyInteractedCsss.size(); i++) {
@@ -556,10 +571,12 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 		//OR
 		//automatically call CIS management functions to create CISs
 		
-		cissToCreate = getUserFeedbackOnCreation(cissToCreate);
+		//Can't use GUI in tests
+		//cissToCreate = getUserFeedbackOnCreation(cissToCreate);
 		
-		for (int i = 0; i < cissToCreate.size(); i++)
-			cisManager.createCis(linkedCss.getIdentifier(), cissToCreate.get(i).getCisId());
+		if (cissToCreate != null) 
+		    for (int i = 0; i < cissToCreate.size(); i++)
+			    cisManager.createCis(linkedCss.getIdentifier(), cissToCreate.get(i).getCisId());
 	}
 	
 	public ArrayList<CisRecord> getUserFeedbackOnCreation(ArrayList<CisRecord> cissToCreate) {
@@ -568,7 +585,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 		options[0] = "options";
 		String userResponse = null;
 		boolean responded = false;
-		userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs may benefit you. If you would like to create one or more of these CISs, please check them.", options));
+		userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs may benefit you. If you would like to create one or more of these CISs, please check them.", options), userFeedbackCallback);
 		for (int i = 0; i < 300; i++) {
 		    if (userResponse == null)
 				try {

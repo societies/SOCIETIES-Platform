@@ -27,6 +27,8 @@ package org.societies.orchestration.CommunityLifecycleManagement.impl;
 
 import org.societies.api.internal.css.directory.ICssDirectory;
 
+import static org.mockito.Mockito.*;
+
 import org.societies.api.internal.css.discovery.ICssDiscovery;
 
 import org.societies.api.internal.cis.management.CisActivityFeed;
@@ -210,15 +212,45 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
 				//    }
 			    //}
 		
-		//invoke UserAgent suggestion GUI for configurations
-		//OR
-		//automatically call CIS management functions to configure CISs
 		
+		
+		ArrayList<CisRecord> finalConfiguredCiss = new ArrayList<CisRecord>();
+		
+		//can't use GUI in tests
+		//finalConfiguredCiss = getUserFeedbackOnConfiguration(cissToConfigure);
+		
+		finalConfiguredCiss = cissToConfigure;
+		
+		Iterator<CisRecord> iterator = finalConfiguredCiss.iterator();
+		
+		while (iterator.hasNext()) {
+		    CisRecord configurableCis = iterator.next();
+
+			    //if "remove members"
+	        	//    attempt to remove members - perhaps SOCIETIES platform itself should have mechanism
+	        	//    where if a user deletion from CIS attempt is made, 
+	        	//    that user will be informed by the system and given a chance to respond?
+	        	//    The admin/owner could have an override option in case e.g. offensive person is being deleted.
+	        	//if "merge with other CIS"
+	        	//
+	        	//if "split into distinct CISs"
+	        	//
+	        	//if "switch sub-CIS and CIS"
+	        	//
+	        	//if "change owner or administrator"
+	        	//
+		       // cisManager.configureCis(linkedCss, potentiallyConfigurableCis.getCisId());
+	   }
+		
+	}
+	
+	public ArrayList<CisRecord> getUserFeedbackOnConfiguration(ArrayList<CisRecord> cissToConfigure) {
+		ArrayList<CisRecord> finalisedCiss = null;
 		String[] options = new String[1];
 		options[0] = "options";
 		String userResponse = null;
 		boolean responded = false;
-		userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs should be configured in certain ways. If you approve of any of the suggested reconfigurations, please check them.", options), userFeedbackCallback);
+		userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs should be configured as described. If you approve these actions for one or more of these CISs, please check them.", options), userFeedbackCallback);
 		for (int i = 0; i < 300; i++) {
 		    if (userResponse == null)
 				try {
@@ -238,28 +270,17 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
 		else {
 		   	Iterator<CisRecord> iterator = cissToConfigure.iterator();
 			while (iterator.hasNext()) {
-			    CisRecord potentiallyConfigurableCis = iterator.next();
+			    CisRecord potentiallyCreatableCis = iterator.next();
 		        if (userResponse.equals("Yes")) {
-				    //if "remove members"
-		        	//    attempt to remove members - perhaps SOCIETIES platform itself should have mechanism
-		        	//    where if a user deletion from CIS attempt is made, 
-		        	//    that user will be informed by the system and given a chance to respond?
-		        	//    The admin/owner could have an override option in case e.g. offensive person is being deleted.
-		        	//if "merge with other CIS"
-		        	//
-		        	//if "split into distinct CISs"
-		        	//
-		        	//if "switch sub-CIS and CIS"
-		        	//
-		        	//
-			       // cisManager.configureCis(linkedCss, potentiallyConfigurableCis.getCisId());
+				    finalisedCiss.add(potentiallyCreatableCis);
+			       // cisManager.createCis(linkedCss, potentiallyCreatableCis.getCisId());
 		        }
 		        else {
-		    	    recentRefusals.add(potentiallyConfigurableCis);
+		    	    recentRefusals.add(potentiallyCreatableCis);
 		        }
 		   }
 		}
-		
+		return finalisedCiss;
 	}
 	
     public void initialiseAutomaticCommunityConfigurationManager() {

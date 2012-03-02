@@ -31,6 +31,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.mockito.Mockito.*;
+
 /**import org.societies.css.cssdirectory.api.ICssDirectoryCloud;
 import org.societies.css.cssdirectory.api.ICssDirectoryRich;
 import org.societies.css.cssdirectory.api.ICssDirectoryLight;
@@ -74,6 +76,7 @@ public class AutomaticCommunityConfigurationManagerTest {
 	private AutomaticCommunityConfigurationManager autoCommunityConfigurationManager;
 	private ICisManager cisManager;
 	
+	@Test
     public void testIdentifyCissToConfigure() {
 		
     	IIdentity ownerId = null; //James Jents CSS
@@ -89,7 +92,8 @@ public class AutomaticCommunityConfigurationManagerTest {
 		
 		//James should have been suggested to leave the CIS.
 		// (No members list function in CisRecord API yet)
-		//Assert.assertNull(cisManager.getCis("James", "James CIS").getMembersList().get("James"));
+		
+		//Assert.assertNull(cisManager.getCis("James", "James CIS").membersCss[0].equals("James"));
 		
 	}
     

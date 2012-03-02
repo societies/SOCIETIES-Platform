@@ -27,6 +27,8 @@ package org.societies.orchestration.CommunityLifecycleManagement.impl;
 
 import java.util.List;
 
+import static org.mockito.Mockito.*;
+
 import org.societies.api.internal.cis.management.CisRecord;
 import org.societies.api.internal.context.broker.ICtxBroker;
 //import org.societies.api.internal.context.broker.ICommunityCtxBroker;

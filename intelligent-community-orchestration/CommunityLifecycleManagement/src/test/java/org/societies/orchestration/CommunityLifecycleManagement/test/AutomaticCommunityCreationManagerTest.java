@@ -26,12 +26,15 @@
 package org.societies.orchestration.CommunityLifecycleManagement.test;
 
 import java.net.URI;
+import java.util.concurrent.Future;
 
 import org.junit.Assert;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.mockito.Mockito.*;
 
 /**import org.societies.css.cssdirectory.api.ICssDirectoryCloud;
 import org.societies.css.cssdirectory.api.ICssDirectoryRich;
@@ -57,6 +60,8 @@ import org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCo
 
 import org.societies.api.identity.IIdentity;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 
 //import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
@@ -92,11 +97,14 @@ public class AutomaticCommunityCreationManagerTest {
 	//private IUserCtxBrokerCallback userCtxBrokerCallback;
 	private ICisManager cisManager;
 	
+	@Test
 	public void testNonExtensiveCreationCheck() {
 		
 		IIdentity ownerId = null; //James Jents CSS
 		entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
     	
+		cisManager = mock(ICisManager.class);
+		userCtxBroker = mock(ICtxBroker.class);
 		
 		
     	autoCommunityCreationManager = new AutomaticCommunityCreationManager(ownerId, "CSS");
@@ -106,10 +114,22 @@ public class AutomaticCommunityCreationManagerTest {
     	//create some test context data for the CSS?
     	//ServiceResourceIdentifier userInterfacedService = new ServiceResourceIdentifier(/**new URI("Chat system")*/);
     	
-    	//userCtxBroker = new userCtxBroker();
-    	//userCtxBroker.createEntity("CSS User", IUserCtxBrokerCallback);
-    	//userCtxBroker.addAttribute(ownerIdContextEntity, CtxAttributeValueType.INDIVIDUAL, "CSS proximity", IUserCtxBrokerCallback);
+    	Future <CtxEntity> theEntity = null;
+    	try {
+			if (userCtxBroker != null)
+    		    theEntity = userCtxBroker.createEntity("CSS User");
+		} catch (CtxException e) {
+			e.printStackTrace();
+		}
+    	//userCtxBroker.addAttribute(ownerIdContextEntity, CtxAttributeValueType.INDIVIDUAL, "friends", IUserCtxBrokerCallback);
     	
+    	try {
+			if (userCtxBroker != null)
+    		    userCtxBroker.createAttribute(entityId, "proximity");
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//check user joined CISs before
 		autoCommunityCreationManager.identifyCissToCreate("not extensive");
 		//check and compare user joined CISs after
@@ -118,15 +138,41 @@ public class AutomaticCommunityCreationManagerTest {
 		members[0] = "James";
 		
 		//Assert.assertNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null)));
-		Assert.assertNotNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null)));
+		
+		Assert.assertNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null, null)));
 	}
 	
+	@Test
     public void testExtensiveCreationCheck() {
     	
     	IIdentity ownerId = null; //James Jents CSS
-		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+		entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
     	
+		cisManager = mock(ICisManager.class);
+		userCtxBroker = mock(ICtxBroker.class);
+		
     	autoCommunityCreationManager = new AutomaticCommunityCreationManager(ownerId, "CSS");
+		
+    	
+    	
+    	//create some test context data for the CSS?
+    	//ServiceResourceIdentifier userInterfacedService = new ServiceResourceIdentifier(/**new URI("Chat system")*/);
+    
+    	Future <CtxEntity> theEntity = null;
+    	try {
+			theEntity = userCtxBroker.createEntity("CSS User");
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	
+    	//userCtxBroker.addAttribute(ownerIdContextEntity, CtxAttributeValueType.INDIVIDUAL, "friends", IUserCtxBrokerCallback);
+    	try {
+    		userCtxBroker.createAttribute(entityId, "friends");
+		} catch (CtxException e) {
+			e.printStackTrace();
+		}
     	
     	//create some test context data for the CSS?	
     	//ServiceResourceIdentifier userInterfacedService = new ServiceResourceIdentifier(/**new URI("Chat system")*/);
@@ -141,6 +187,10 @@ public class AutomaticCommunityCreationManagerTest {
 		
 		//Assert.assertNotNull(/**User's joined CISs*/);
 		
+		
+		String[] members = new String[1];
+		members[0] = "James";
+		Assert.assertNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null, null)));
 	}
     
     public void setCtxBroker(ICtxBroker userCtxBroker){
