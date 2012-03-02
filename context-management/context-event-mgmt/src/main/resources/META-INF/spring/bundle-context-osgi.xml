@@ -13,5 +13,5 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
 
-	<osgi:service ref="userCtxDBMgr" interface="org.societies.context.api.event.ICtxEventMgr" />
+	<osgi:service ref="ctxEventMgr" interface="org.societies.context.api.event.ICtxEventMgr" />
 </beans>
