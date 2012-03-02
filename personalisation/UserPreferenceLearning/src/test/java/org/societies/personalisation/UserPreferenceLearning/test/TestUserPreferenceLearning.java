@@ -36,8 +36,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.comm.xmpp.datatypes.IdentityType;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
