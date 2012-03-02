@@ -2,9 +2,10 @@ package org.societies.example.hereiam;
 
 import android.app.Activity;
 import android.os.Bundle;
-import de.akquinet.android.androlog.Log;
+//import de.akquinet.android.androlog.Log;
+import org.societies.api.internal.css.management.SocietiesApp;
 
-public class HelloAndroidActivity extends Activity {
+public class HereIAm extends Activity {
 
     /**
      * Called when the activity is first created.
@@ -17,10 +18,10 @@ public class HelloAndroidActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         // Initializes the logging
-        Log.init();
+        //Log.init();
 
         // Log a message (only on dev platform)
-        Log.i(this, "onCreate");
+        //Log.i(this, "onCreate");
 
         setContentView(R.layout.main);
     }
