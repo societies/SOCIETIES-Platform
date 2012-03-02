@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
-import org.societies.api.internal.servicelifecycle.model.Service;
+import org.societies.api.servicelifecycle.model.Service;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 
 

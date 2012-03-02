@@ -39,7 +39,7 @@ import org.junit.Test;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
-import org.societies.api.internal.servicelifecycle.model.Service;
+import org.societies.api.servicelifecycle.model.Service;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.identity.IdentityImpl;
 
