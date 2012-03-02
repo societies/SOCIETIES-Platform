@@ -8,7 +8,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.internal.css.management.CSSManagerEnums;
-import org.societies.api.internal.css.management.CSSRecord;
 
 public class TestXMPPBeans {
 	public static final String TEST_IDENTITY_1 = "node11";
@@ -27,7 +26,7 @@ public class TestXMPPBeans {
 	public static final String TEST_PASSWORD = "P455W0RD";
 	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
 
-	private CSSRecord record;
+	private CssRecord record;
 	private CssNode cssNode_1, cssNode_2;
 	private ArrayList<CssNode> cssNodes;
 	private ArrayList<CssNode> cssArchivedNodes;
@@ -53,7 +52,7 @@ public class TestXMPPBeans {
 		cssArchivedNodes.add(cssNode_2);
 
 		
-		this.record = new CSSRecord();
+		this.record = new CssRecord();
 		this.record.setCssIdentity(TEST_IDENTITY);
 		
 //		this.record.getCssNodes().add(cssNode_1);
