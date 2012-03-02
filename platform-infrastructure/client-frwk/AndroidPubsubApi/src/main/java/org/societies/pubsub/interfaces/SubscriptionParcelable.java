@@ -26,7 +26,7 @@ package org.societies.pubsub.interfaces;
 
 import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.comm.xmpp.interfaces.IdentityManager;
-import org.societies.comm.xmpp.pubsub.Subscription;
+import org.societies.api.comm.xmpp.pubsub.Subscription;
 
 import android.os.Parcel;
 import android.os.Parcelable;

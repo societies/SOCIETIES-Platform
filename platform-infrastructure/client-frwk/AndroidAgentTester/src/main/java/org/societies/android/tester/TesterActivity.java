@@ -18,6 +18,7 @@ import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPNode;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.comm.xmpp.interfaces.IdentityManager;
@@ -38,18 +39,21 @@ public class TesterActivity extends Activity {
 
 	private static final Logger log = LoggerFactory.getLogger(TesterActivity.class);
 	
-    private final List<String> elementNames = Arrays.asList("pubsub");
+    private final List<String> elementNames = Arrays.asList("pubsub", "event", "query");
     private final List<String> namespaces = Arrays.asList(
 					"http://jabber.org/protocol/pubsub",
 			        "http://jabber.org/protocol/pubsub#errors",
 			        "http://jabber.org/protocol/pubsub#event",
-			        "http://jabber.org/protocol/pubsub#owner");
+			        "http://jabber.org/protocol/pubsub#owner",
+			        "http://jabber.org/protocol/disco#items");
     private final List<String> packages = Arrays.asList(
 					"org.jabber.protocol.pubsub",
 					"org.jabber.protocol.pubsub.errors",
 					"org.jabber.protocol.pubsub.owner",
 					"org.jabber.protocol.pubsub.event");
     private ClientCommunicationMgr ccm = new ClientCommunicationMgr(this);
+    private final Identity toXCManager = (new IdentityManager()).fromJid("xcmanager.societies.local");     // TODO
+    private final ICommCallback callback = createCallback();
 
     /**
      * Called when the activity is first created.
@@ -76,8 +80,8 @@ public class TesterActivity extends Activity {
     private class ExampleTask extends AsyncTask<Void, Void, Void> {
     	
     	protected Void doInBackground(Void... args) {
-    		Identity toXCManager = (new IdentityManager()).fromJid("xcmanager.societies.local");     // TODO
-            final ICommCallback callback = createCallback();
+    		
+            
             final Stanza stanza = new Stanza((new IdentityManager()).fromJid("psi@societies.local"));	 // TODO	
             final Stanza stanza2 = new Stanza(toXCManager); 
             final Stanza stanza3 = new Stanza(toXCManager); 
@@ -92,6 +96,7 @@ public class TesterActivity extends Activity {
     			ccm.sendIQ(stanza3, IQ.Type.SET, deleteNodePayload(nodeName), callback);
     			ccm.sendIQ(stanza4, IQ.Type.SET, deleteNodePayload(nodeName), callback);
     			Dbc.assertion("android@societies.local/default".equals(ccm.getIdentity().getJid()));
+    			testGetItems();
     		} catch (Exception e) {
     			log.error(e.getMessage(), e);
     		}
@@ -192,10 +197,21 @@ public class TesterActivity extends Activity {
 				log.debug("to="+stanza.getTo());
 			}
 
-			public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
+			public void receiveItems(Stanza stanza, String node, List<String> items) {
 				log.debug("receiveItems");
+				debugStanza(stanza);
+				log.debug("node: "+node);
+				log.debug("items:");
+				for(String  item:items)
+					log.debug(item);
 			}
 		};
+    }
+    
+    private void testGetItems() throws Exception {
+    	log.debug("getItems");
+    	String id = ccm.getItems(toXCManager, "", callback);
+    	log.debug("id: "+id);    	    	
     }
 }
 

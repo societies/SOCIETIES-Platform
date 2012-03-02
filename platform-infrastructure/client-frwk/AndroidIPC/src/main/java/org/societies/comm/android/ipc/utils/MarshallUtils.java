@@ -57,8 +57,10 @@ public class MarshallUtils {
 	}
 	
 	public static Element stringToElement(String xml) throws SAXException, IOException, ParserConfigurationException {
-		return DocumentBuilderFactory.newInstance()
-				.newDocumentBuilder()
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
+		
+		return dbf.newDocumentBuilder()				
 				.parse(new ByteArrayInputStream(xml.getBytes()))
 				.getDocumentElement();
 	}

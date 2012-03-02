@@ -13,9 +13,6 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.comm.xmpp.interfaces.IIdentityManager;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-import org.societies.comm.xmpp.interfaces.IdentityManager;
-import org.societies.comm.xmpp.pubsub.PubsubClient;
-import org.societies.comm.xmpp.pubsub.impl.PubsubClientImpl;
 import org.societies.pubsub.interfaces.Pubsub;
 import org.societies.comm.android.ipc.Skeleton;
 
@@ -44,10 +41,9 @@ public class PubsubService extends Service {
     	log.debug("onCreate");   
     	if(skeleton == null) {
     		try {
-    			ClientCommunicationMgr ccm = new ClientCommunicationMgr(this);
-    			IdentityManager idm = new IdentityManager();    	        
+    			ClientCommunicationMgr ccm = new ClientCommunicationMgr(this);   	        
     	        ICommManager endpoint = new CommManagerAdapter(ccm);
-    	        PubsubClient pubsubClient = new PubsubClientImpl(endpoint);
+    	        PubsubClientImpl pubsubClient = new PubsubClientImpl(endpoint);
     	        Pubsub pubsub = new PubsubSkeleton(pubsubClient);
         		skeleton = new Skeleton(pubsub);	
     		} catch (Exception e) {
@@ -116,7 +112,7 @@ public class PubsubService extends Service {
 
 		public String getItems(Identity entity, String node,
 				ICommCallback callback) throws CommunicationException {
-			throw new UnsupportedOperationException("Not implemented!");
+			return clientCommunicationMgr.getItems(entity, node, callback);
 		}
 
 		public Identity getIdentity() { 

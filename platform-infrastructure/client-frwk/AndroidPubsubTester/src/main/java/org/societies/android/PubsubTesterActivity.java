@@ -1,7 +1,10 @@
 package org.societies.android;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.slf4j.Logger;
@@ -10,8 +13,9 @@ import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.comm.android.ipc.utils.MarshallUtils;
 import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
 import org.societies.comm.xmpp.interfaces.IdentityManager;
-import org.societies.comm.xmpp.pubsub.Subscriber;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.w3c.dom.Element;
+import org.societies.api.schema.examples.calculatorbean.CalcBean;
 
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -20,7 +24,10 @@ import android.os.Bundle;
 public class PubsubTesterActivity extends Activity {
 
 	private static final Logger log = LoggerFactory.getLogger(PubsubTesterActivity.class);
-    ExampleTask task;
+    
+	private static final List<String> packageList = Collections.singletonList("org.societies.api.schema.examples.calculatorbean");
+	
+	private ExampleTask task;
 
     /**
      * Called when the activity is first created.
@@ -35,9 +42,15 @@ public class PubsubTesterActivity extends Activity {
         setContentView(R.layout.main);
         
         PubsubClientAndroid pubsubClient = new PubsubClientAndroid(this);
-        
-        task = new ExampleTask(); 
-        task.execute(pubsubClient);
+        try {
+			pubsubClient.addJaxbPackages(packageList);
+			
+			task = new ExampleTask(); 
+			task.execute(pubsubClient);
+			
+		} catch (JAXBException e) {
+			log.error(e.getMessage(), e);
+		}
     }
     
     @Override
@@ -48,9 +61,12 @@ public class PubsubTesterActivity extends Activity {
      
     private static Subscriber subscriber = new Subscriber() {
 		public void pubsubEvent(Identity pubsubService, String node,
-				String itemId, Element item) {
+				String itemId, Object item) {
 			try {
-				log.debug("**************pubsubEvent: "+pubsubService.getJid()+" "+node+" "+itemId+" "+MarshallUtils.nodeToString(item));
+				log.debug("**************pubsubEvent: "+pubsubService.getJid()+" "+node+" "+itemId+" "+item.getClass().getCanonicalName());
+				CalcBean calcBean = (CalcBean)item;
+				log.debug("A: "+calcBean.getA());
+				log.debug("B: "+calcBean.getB());
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
@@ -63,12 +79,24 @@ public class PubsubTesterActivity extends Activity {
     		PubsubClientAndroid pubsubClient = args[0];
 	    	Identity pubsubService = (new IdentityManager()).fromJid("xcmanager.societies.local");
 	        try {
-				Element item = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument().createElement("test");				
+	        	CalcBean item = new CalcBean();
+	        	item.setA(1);
+	        	item.setB(2);
+	        	
 	        	final String nodeName = "test3"; 
 				pubsubClient.ownerCreate(pubsubService, nodeName);
+				List<String> items = pubsubClient.discoItems(pubsubService, nodeName);
+				for(String i:items)
+					log.debug("DiscoItem: "+i);
 				pubsubClient.subscriberSubscribe(pubsubService, nodeName, subscriber);
 	        	String id = pubsubClient.publisherPublish(pubsubService, nodeName, UUID.randomUUID().toString(), item);
 	        	log.debug("ID: "+id);
+	        	try {
+	        		log.debug("Sleeping");
+	        		Thread.sleep(1000);
+	        		log.debug("Waked");
+	        	} catch(InterruptedException e) {}
+	        	pubsubClient.subscriberUnsubscribe(pubsubService, nodeName, subscriber);
 				pubsubClient.ownerDelete(pubsubService, nodeName);
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);

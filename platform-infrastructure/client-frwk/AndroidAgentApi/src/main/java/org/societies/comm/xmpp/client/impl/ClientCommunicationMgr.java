@@ -118,8 +118,7 @@ public class ClientCommunicationMgr {
 		try {
 			identityJid = (String)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
 				public Object invoke(XMPPAgent agent) throws Throwable {
-					String rv = agent.getIdentity();
-					return rv;
+					return agent.getIdentity();
 				}
 			});
 		} catch (Throwable e) {
@@ -130,6 +129,21 @@ public class ClientCommunicationMgr {
 	
 	public IIdentityManager getIdManager() {
 		return idm;
+	}
+	
+	public String getItems(final Identity entity, final String node, final ICommCallback callback) throws CommunicationException {
+		try {
+			return (String)miServiceConnection.invokeAndKeepBound(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					return agent.getItems(entity.getJid(), node, new CallbackAdapter(callback, androidContext, miServiceConnection, marshaller));
+				}
+			});
+		} catch (Throwable e) {
+			if(e instanceof CommunicationException)
+				throw (CommunicationException)e;
+			else
+				throw new CommunicationException(e.getMessage(), e);
+		}
 	}
 	
 	private void sendMessage(final String xml) {
