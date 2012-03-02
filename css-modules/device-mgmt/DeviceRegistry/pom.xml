@@ -7,6 +7,14 @@
   <packaging>jar</packaging>
   <name>Device Registry</name>
   <version>0.0.1-SNAPSHOT</version>
+  
+  <developers>
+		<developer>
+			<name>Liam Marshall </name>
+			<organization>TSSG</organization>
+			<organizationUrl>http://www.tssg.org/</organizationUrl>
+		</developer>
+	</developers>
   <parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
