@@ -1,6 +1,8 @@
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    
   <modelVersion>4.0.0</modelVersion>
    <parent>
 		<groupId>org.societies</groupId>
@@ -15,42 +17,18 @@
   <version>${release.version}</version>
  
 	<dependencies>
-	
 		<dependency>
 			<groupId>org.societies.comm.xmpp.pubsub</groupId>
 			<artifactId>PubsubClientBundle</artifactId>
 			<version>${version.comm}</version>
 			<scope>provided</scope>
 		</dependency>
-		
-		<dependency>
-			<groupId>org.societies.api.schema</groupId>
-			<artifactId>societies-api-schema</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-	<!--	
-		<dependency>
-			<groupId>org.societies.css.devicemgmt</groupId>
-  			<artifactId>DeviceEventingSchemaGen</artifactId>
-			<scope>provided</scope>
-  			<version>${release.version}</version>
-		</dependency>
-	
-		<dependency>
-			<groupId>org.societies.comm.xmpp.pubsub</groupId>
-			<artifactId>PubsubServiceBundle</artifactId>
-			<version>${version.comm}</version>
-			<scope>provided</scope>
-		</dependency>
-    -->
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>CommunicationFrameworkCommons</artifactId>
 			<version>${version.comm}</version>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
@@ -63,24 +41,6 @@
     		<version>${slf4j.version}</version>
     		<scope>provided</scope>
 		</dependency>
-
-<!--
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.core</artifactId>
-			<version>4.1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.compendium</artifactId>
-			<version>4.0.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.osgi</groupId>
-			<artifactId>spring-osgi-core</artifactId>
-			<version>1.1.0</version>
-		</dependency>
-		-->
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
@@ -90,6 +50,12 @@
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.schema</groupId>
+			<artifactId>societies-api-schema</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>

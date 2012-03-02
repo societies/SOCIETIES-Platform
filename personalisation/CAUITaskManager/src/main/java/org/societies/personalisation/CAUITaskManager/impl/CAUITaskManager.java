@@ -31,6 +31,8 @@ import java.util.Map;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+//import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
@@ -268,12 +270,7 @@ public class CAUITaskManager  implements ICAUITaskManager{
 
 
 
-	@Override
-	public UserIntentAction retrieveCurrentIntentAction(EntityIdentifier arg0,
-			EntityIdentifier arg1, IServiceResourceIdentifier arg2, String arg3) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 	@Override
 	public HashMap<UserIntentAction, Double> retrieveNextAction(UserIntentAction arg0) {
@@ -338,5 +335,13 @@ public class CAUITaskManager  implements ICAUITaskManager{
 		
 		else return false;
 			
+	}
+
+
+	@Override
+	public UserIntentAction retrieveCurrentIntentAction(EntityIdentifier arg0,
+			EntityIdentifier arg1, IServiceResourceIdentifier arg2, String arg3) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

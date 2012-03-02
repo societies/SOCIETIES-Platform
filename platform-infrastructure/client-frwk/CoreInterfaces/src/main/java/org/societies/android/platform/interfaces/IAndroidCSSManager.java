@@ -157,7 +157,7 @@ public interface IAndroidCSSManager {
 	 * @param profile
 	 * @return AndroidCSSProfile
 	 */
-	AndroidCSSProfile getAndroidCSSProfile(String client);
+	AndroidCSSRecord getAndroidAndroidCSSRecord(String client);
 
 	/**
 	 * Modify the CSS Profile

@@ -6,10 +6,10 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.identity.IIdentity;
 
 public class PubsubEventSender extends Thread {
 	
@@ -30,7 +30,7 @@ public class PubsubEventSender extends Thread {
 	}
 	
 	// Asynch, non-blocking method!
-	public void sendEvent(Collection<Identity> recipients, Object eventPayload) {
+	public void sendEvent(Collection<IIdentity> recipients, Object eventPayload) {
 		synchronized (notificationQueue) {
 			notificationQueue.add(new Notification(recipients, eventPayload));
 			notificationQueue.notifyAll();
@@ -57,7 +57,7 @@ public class PubsubEventSender extends Thread {
 				n = notificationQueue.remove(0);
 			}
 
-			for (Identity i : n.recipients) {
+			for (IIdentity i : n.recipients) {
 				Stanza stanza = new Stanza(i);
 				try {
 					endpoint.sendMessage(stanza, n.eventPayload);
@@ -69,10 +69,10 @@ public class PubsubEventSender extends Thread {
 	}
 	
 	private class Notification {
-		private Collection<Identity> recipients;
+		private Collection<IIdentity> recipients;
 		private Object eventPayload;
 		
-		private Notification(Collection<Identity> recipients, Object eventPayload) {
+		private Notification(Collection<IIdentity> recipients, Object eventPayload) {
 			this.recipients = recipients;
 			this.eventPayload = eventPayload;
 		}

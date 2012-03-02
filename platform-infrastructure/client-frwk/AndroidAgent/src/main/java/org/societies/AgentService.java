@@ -21,6 +21,7 @@ public class AgentService extends Service {
 	
 	@Override
     public IBinder onBind(Intent intent) {  
+		Dbc.assertion(true);
     	log.debug("onBind"); 
     	if(skeleton != null)
     		return skeleton.messenger().getBinder();    

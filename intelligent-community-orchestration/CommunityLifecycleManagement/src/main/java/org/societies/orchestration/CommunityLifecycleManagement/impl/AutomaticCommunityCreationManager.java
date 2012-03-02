@@ -105,7 +105,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 	//private IUserCtxBrokerCallback userContextBrokerCallback;
 	private ArrayList<CisRecord> recentRefusals;
 	private IUserFeedback userFeedback;
-	//private IUserFeedbackCallback userFeedbackCallback;
+	private IUserFeedbackCallback userFeedbackCallback;
 	
 	private ICisManager cisManager;
     
@@ -474,21 +474,21 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 					e.printStackTrace();
 				}
 				
-				/**for (int i = 0; i < temporaryLocalCsss.size(); i++) {
+				for (int i = 0; i < temporaryLocalCsss.size(); i++) {
 					if (userCssDirectory.findForAllCss().contains(temporaryLocalCsss.get(i))) {
-						if (userCiss.contains(CisRecord(null, null, "friends", null, null, null, null, null, null))) {
-							if (it has a sub-CIS defined on this location) {
-								not create
+						if (userJoinedCiss.contains(new CisRecord(null, null, "friends", null, null, null, null, null, null))) {
+							
+							if (userJoinedCiss.get(i).membershipCriteria.equals("friends") /**&& userJoinedCiss.getSubCiss("proximity") != null*/ /**it has a sub-CIS defined on this location*/) {
+								//not create
 							}
 							else {
-								create
-							}
+								cissToCreate.add(new CisRecord(null, linkedCss.toString(), "Local proximity", null, null, null, null, null, null));
 							}
 						}
 					}
-					do for all other attributes: family, workers, interest?, CSS directory (personal and mutual if there is one)
-					then do this for service interaction, same process
-				}*/
+					//do for all other attributes: family, workers, interest?, CSS directory (personal and mutual if there is one)
+					//then do this for service interaction, same process
+				}
 				
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				//historyOfLocalCsss.add(thisResult);
@@ -663,6 +663,22 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
     
     public void setCisManager(ICisManager cisManager) {
     	this.cisManager = cisManager;
+    }
+    
+    public IUserFeedback getUserFeedback() {
+    	return userFeedback;
+    }
+    
+    public void setUserFeedback(IUserFeedback userFeedback) {
+    	this.userFeedback = userFeedback;
+    }
+    
+    public IUserFeedbackCallback getUserFeedbackCallback() {
+    	return userFeedbackCallback;
+    }
+    
+    public void setUserFeedbackCallback(IUserFeedbackCallback userFeedbackCallback) {
+    	this.userFeedbackCallback = userFeedbackCallback;
     }
     
   //public CommManagerBundle getCommManager() {

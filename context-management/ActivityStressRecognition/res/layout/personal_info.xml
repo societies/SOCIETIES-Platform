@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" android:orientation="vertical">
+	<LinearLayout android:id="@+id/linearLayout1" android:layout_height="wrap_content" android:layout_width="match_parent" android:orientation="vertical">
+		<LinearLayout android:id="@+id/linearLayout3" android:layout_height="wrap_content" android:layout_width="match_parent" android:layout_weight="1" android:layout_marginTop="20dip">
+			<TextView android:text="@string/name" android:id="@+id/textView1" android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_marginLeft="10dip" android:layout_width="80dip"></TextView>
+			<EditText android:layout_height="wrap_content" android:layout_weight="1" android:inputType="textPersonName" android:id="@+id/textName" android:layout_width="match_parent">
+				<requestFocus></requestFocus>
+			</EditText>
+		</LinearLayout>
+		<LinearLayout android:id="@+id/linearLayout2" android:layout_height="wrap_content" android:layout_width="match_parent" android:layout_weight="1" android:layout_marginTop="10dip">
+			<TextView android:text="@string/age" android:id="@+id/textView2" android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_marginLeft="10dip" android:layout_width="80dip"></TextView>
+			<EditText android:layout_height="wrap_content" android:layout_weight="1" android:inputType="number" android:id="@+id/textAge" android:layout_width="match_parent"></EditText>
+		</LinearLayout>
+		<LinearLayout android:id="@+id/linearLayout3" android:layout_height="wrap_content" android:layout_width="match_parent" android:layout_weight="1" android:layout_marginTop="10dip">
+			<TextView android:text="@string/gender" android:id="@+id/textView3" android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_marginLeft="10dip" android:layout_width="80dip"></TextView>
+			<RadioGroup android:id="@+id/radioGender" android:layout_height="wrap_content" android:layout_width="match_parent">
+					<RadioButton android:id="@+id/radioMale" android:layout_height="wrap_content" android:text="@string/male" android:layout_width="wrap_content" android:layout_alignParentTop="true" android:layout_alignParentLeft="true"></RadioButton>
+					<RadioButton android:id="@+id/radioFemale" android:layout_height="wrap_content" android:text="@string/female" android:layout_width="wrap_content" android:layout_alignParentTop="true" android:layout_alignParentRight="true"></RadioButton>
+			</RadioGroup>
+		</LinearLayout>
+	</LinearLayout>
+	<RelativeLayout android:layout_width="match_parent" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom" android:layout_marginTop="10dip" android:layout_gravity="bottom" android:id="@+id/relativeLayout1">
+		<Button android:layout_height="wrap_content" android:text="@string/ContinueBtn_label" android:id="@+id/btnContinue" android:layout_alignParentBottom="true" android:layout_centerHorizontal="true" android:layout_marginBottom="46dp" android:layout_width="200dip"></Button>
+	</RelativeLayout>
+</LinearLayout>

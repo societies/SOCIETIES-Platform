@@ -25,7 +25,8 @@
 package org.societies.api.internal.privacytrust.privacyprotection;
 
 //TODO : temporary mock package import to solve missing package in API folder
-import org.societies.api.comm.xmpp.datatypes.Identity;
+
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
@@ -62,7 +63,7 @@ public interface INegotiationAgent {
 	 * where applicable
 	 * @return				the identity of the service provider
 	 */
-	public Identity getProviderIdentity();
+	public IIdentity getProviderIdentity();
 
 	/**
 	 * this method is called by the client and informs the provider that it wants to

@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.concurrent.Future;
 
 import org.societies.api.context.CtxException;
+import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -292,6 +293,34 @@ public class MockContextBroker implements ICtxBroker {
 			throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void registerForChanges(CtxChangeEventListener arg0,
+			CtxIdentifier arg1) throws CtxException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void registerForChanges(CtxChangeEventListener arg0,
+			CtxEntityIdentifier arg1, String arg2) throws CtxException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void unregisterFromChanges(CtxChangeEventListener arg0,
+			CtxIdentifier arg1) throws CtxException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void unregisterFromChanges(CtxChangeEventListener arg0,
+			CtxEntityIdentifier arg1, String arg2) throws CtxException {
+		// TODO Auto-generated method stub
+		
 	}
 
 	

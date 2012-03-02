@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+	<LinearLayout android:id="@+id/linearLayout2" android:baselineAligned="true" android:layout_width="match_parent" android:layout_marginTop="20dip" android:layout_gravity="bottom|fill_vertical" android:layout_height="match_parent">
+		<Button android:id="@+id/btnStart" android:layout_height="wrap_content" android:layout_gravity="bottom" android:text="@string/StartBtn_label" android:layout_width="100dip" android:layout_weight="1"></Button>
+		<TextView android:layout_width="wrap_content" android:id="@+id/textViewStatus" android:layout_weight="1" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:textSize="30dip"></TextView>
+		<Button android:layout_gravity="bottom" android:id="@+id/btnStop" android:layout_height="wrap_content" android:layout_marginRight="0dip" android:text="@string/StopBtn_label" android:layout_width="100dip" android:layout_weight="1"></Button>
+	</LinearLayout>
+</LinearLayout>

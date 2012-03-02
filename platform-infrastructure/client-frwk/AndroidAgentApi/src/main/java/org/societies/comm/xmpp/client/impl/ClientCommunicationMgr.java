@@ -5,9 +5,12 @@ import static android.content.Context.BIND_AUTO_CREATE;
 import java.security.InvalidParameterException;
 import java.util.List;
 
+import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.comm.xmpp.interfaces.IIdentityManager;
 import org.societies.interfaces.XMPPAgent;
 import org.societies.comm.android.ipc.Stub;
 import org.jivesoftware.smack.packet.IQ;
@@ -27,9 +30,14 @@ public class ClientCommunicationMgr {
 	private Context androidContext;
 	private PacketMarshaller marshaller = new PacketMarshaller();
 	private ServiceConnection registerConnection;
+	private IdentityManager idm = new IdentityManager();
+	private MethodInvocationServiceConnection<XMPPAgent> miServiceConnection;
 	
 	public ClientCommunicationMgr(Context androidContext) {
 		this.androidContext = androidContext;
+		Intent intent = new Intent();
+        intent.setComponent(serviceCN);
+		miServiceConnection = new MethodInvocationServiceConnection<XMPPAgent>(intent, androidContext, BIND_AUTO_CREATE, XMPPAgent.class);
 	}
 	
 	public void register(final List<String> elementNames, final ICommCallback callback) {	
@@ -100,6 +108,25 @@ public class ClientCommunicationMgr {
 		} catch (Exception e) {
 			throw new CommunicationException("Error sending IQ message", e);
 		}
+	}
+	
+	public Identity getIdentity() {
+		String identityJid;
+		try {
+			identityJid = (String)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					String rv = agent.getIdentity();
+					return rv;
+				}
+			});
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+		return idm.fromJid(identityJid);
+	}
+	
+	public IIdentityManager getIdManager() {
+		return idm;
 	}
 	
 	private void sendMessage(final String xml) {

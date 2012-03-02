@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="dlr.stressrecognition"
+      android:versionCode="1"
+      android:versionName="1.0">
+    <uses-sdk android:minSdkVersion="10" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true" android:theme="@style/DLRTheme">
+        <activity android:name=".MainActivity"
+        	 	  android:label="@string/app_name"
+        	 	  android:screenOrientation="portrait"
+       			  android:configChanges="orientation|keyboardHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".PslActivity"
+        	 	  android:label="@string/app_name" 
+        	 	  android:screenOrientation="portrait"
+       			  android:configChanges="orientation|keyboardHidden" />
+       	<activity android:name="dlr.stressrecognition.classifier.SRSActivity"
+        	 	  android:label="@string/app_name" 
+        	 	  android:screenOrientation="portrait"
+       			  android:configChanges="orientation|keyboardHidden" />
+       	<activity android:name="dlr.stressrecognition.classifier.SRSEvaluationActivity"
+        	 	  android:label="@string/app_name" 
+        	 	  android:screenOrientation="portrait"
+       			  android:configChanges="orientation|keyboardHidden" />
+        <activity android:name="dlr.stressrecognition.classifier.SRSMslActivity"
+        	 	  android:label="@string/app_name" 
+        	 	  android:screenOrientation="portrait"
+       			  android:configChanges="orientation|keyboardHidden" />
+        <activity android:name=".MslActivity"
+        	 	  android:label="@string/app_name"
+        	 	  android:screenOrientation="portrait"
+       			  android:configChanges="orientation|keyboardHidden" />
+       	<activity android:name=".CslActivity"
+        	 	  android:label="@string/app_name"
+        	 	  android:screenOrientation="portrait"
+       			  android:configChanges="orientation|keyboardHidden" />
+        <activity android:name=".DemonstratorActivity"
+        	 	  android:label="@string/app_name"
+        	 	  android:screenOrientation="portrait"
+       			  android:configChanges="orientation|keyboardHidden" />  
+      	<activity android:name=".ShowRulesActivity"
+        	 	  android:label="@string/app_name"
+        	 	  android:screenOrientation="portrait"
+       			  android:configChanges="orientation|keyboardHidden" />
+       	<activity android:name="dlr.stressrecognition.HighScoreActivity"
+        	 	  android:label="@string/app_name"
+        	 	  android:screenOrientation="portrait"
+       			  android:configChanges="orientation|keyboardHidden" />
+		<activity android:name=".EnterInfoActivity"
+        	 	  android:label="@string/app_name"
+        	 	  android:screenOrientation="portrait"
+       			  android:configChanges="orientation|keyboardHidden" />
+        <activity android:name="dlr.stressrecognition.BioSensorActivity"
+                  android:label="@string/app_name"
+                  android:screenOrientation="portrait"
+                  android:configChanges="orientation|keyboardHidden" />
+        <activity android:name="dlr.stressrecognition.SetDifficultyActivity"
+                  android:label="@string/set_difficulty"
+                  android:theme="@android:style/Theme.Dialog"
+                  android:configChanges="orientation|keyboardHidden" />
+	 	<activity android:name="dlr.stressrecognition.SetPreferencesActivity"
+                  android:label="@string/settings"
+                  android:theme="@android:style/Theme.Dialog"
+                  android:configChanges="orientation|keyboardHidden" />
+	</application>
+</manifest> 

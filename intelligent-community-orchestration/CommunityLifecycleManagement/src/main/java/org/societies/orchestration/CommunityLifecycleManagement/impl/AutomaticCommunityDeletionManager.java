@@ -66,6 +66,7 @@ import java.util.List;
 
 //import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 
 
 import org.societies.api.internal.useragent.model.ExpProposalContent;
@@ -110,6 +111,8 @@ public class AutomaticCommunityDeletionManager //implements ICommCallback
 	private String userResponse;
 	
 	private ArrayList<CisRecord> recentRefusals;
+
+	private IUserFeedbackCallback userFeedbackCallback;
 	
 	/*
      * Constructor for AutomaticCommunityConfigurationManager
@@ -304,13 +307,21 @@ public class AutomaticCommunityDeletionManager //implements ICommCallback
 		this.cisManager = cisManager;
 	}
     
+    public IUserFeedback getUserFeedback() {
+    	return userFeedback;
+    }
+    
     public void setUserFeedback(IUserFeedback userFeedback) {
     	this.userFeedback = userFeedback;
     }
     
-    //public void setUserFeedbackCallback(IUserFeedbackCallback userFeedbackCallback) {
-    //	this.userFeedbackCallback = userFeedbackCallback;
-    //}
+    public IUserFeedbackCallback getUserFeedbackCallback() {
+    	return userFeedbackCallback;
+    }
+    
+    public void setUserFeedbackCallback(IUserFeedbackCallback userFeedbackCallback) {
+    	this.userFeedbackCallback = userFeedbackCallback;
+    }
     
     public void getUserResponse(String userResponse) {
     	this.userResponse = userResponse;

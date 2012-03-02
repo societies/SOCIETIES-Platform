@@ -20,6 +20,8 @@
                 <constructor-arg value="${subDomain}"/>
                 <constructor-arg value="${secretKey}"/>
         </bean>
+        
+        <bean id="cisCommMgrFactory" class="org.societies.comm.xmpp.xc.impl.CISCommunicationMgrFactoryImpl" />
 
         <context:property-placeholder properties-ref="componentConfig"/>
 </beans>

@@ -24,11 +24,12 @@ import java.net.URISyntaxException;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.comm.xmpp.datatypes.IdentityType;
+
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.personalisation.model.Action;
@@ -45,7 +46,7 @@ public class UserPreferenceManagementTest  {
 	UserPreferenceConditionMonitor pcm ;
 	IInternalPersonalisationManager persoMgr ;
 	ICtxBroker broker = new MockContextBroker();
-	private Identity mockId;
+	private IIdentity mockId;
 	@Before
 	public void Setup(){
 		pcm = new UserPreferenceConditionMonitor();

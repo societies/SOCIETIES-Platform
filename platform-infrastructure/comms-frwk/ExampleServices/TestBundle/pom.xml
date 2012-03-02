@@ -26,6 +26,12 @@
     <dependencies>
     	<!-- Interface -->
     	<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+    	<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
@@ -35,6 +41,12 @@
 		<dependency>
 			<groupId>org.societies.comm.xmpp.pubsub</groupId>
     		<artifactId>PubsubClientBundle</artifactId>
+	  		<version>${version.comm}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.comm.xmpp.pubsub</groupId>
+    		<artifactId>PubsubServiceBundle</artifactId>
 	  		<version>${version.comm}</version>
 			<scope>provided</scope>
 		</dependency>

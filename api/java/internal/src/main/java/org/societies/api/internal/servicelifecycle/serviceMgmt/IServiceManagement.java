@@ -38,6 +38,10 @@ import org.societies.api.internal.servicelifecycle.serviceMgmt.ServiceMgmtExcept
  * @author pkuppuud
  *
  */
+/**
+ * @deprecated  Will be replaced by IServiceControl and IServiceDiscovery
+ */
+@Deprecated
 public interface IServiceManagement {
 	/**
 	 * This method checks virgo-osgi container whether the service registry

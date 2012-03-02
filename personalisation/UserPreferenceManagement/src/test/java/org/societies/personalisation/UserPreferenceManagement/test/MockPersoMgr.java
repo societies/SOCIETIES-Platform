@@ -24,8 +24,8 @@
  */
 package org.societies.personalisation.UserPreferenceManagement.test;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IFeedbackEvent;
 import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
@@ -42,7 +42,7 @@ import org.societies.personalisation.common.api.model.PersonalisationTypes;
 public class MockPersoMgr implements IInternalPersonalisationManager{
 
 	@Override
-	public void getIntentAction(Identity arg0, Identity arg1,
+	public void getIntentAction(IIdentity arg0, IIdentity arg1,
 			IServiceResourceIdentifier arg2, String arg3,
 			IPersonalisationCallback arg4) {
 		// TODO Auto-generated method stub
@@ -50,7 +50,7 @@ public class MockPersoMgr implements IInternalPersonalisationManager{
 	}
 
 	@Override
-	public void getPreference(Identity arg0, Identity arg1, String arg2,
+	public void getPreference(IIdentity arg0, IIdentity arg1, String arg2,
 			IServiceResourceIdentifier arg3, String arg4,
 			IPersonalisationCallback arg5) {
 		// TODO Auto-generated method stub
@@ -58,14 +58,14 @@ public class MockPersoMgr implements IInternalPersonalisationManager{
 	}
 
 	@Override
-	public void getIntentAction(Identity arg0, IServiceResourceIdentifier arg1,
+	public void getIntentAction(IIdentity arg0, IServiceResourceIdentifier arg1,
 			String arg2, IPersonalisationCallback arg3) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void getPreference(Identity arg0, String arg1,
+	public void getPreference(IIdentity arg0, String arg1,
 			IServiceResourceIdentifier arg2, String arg3,
 			IPersonalisationCallback arg4) {
 		// TODO Auto-generated method stub
@@ -73,7 +73,7 @@ public class MockPersoMgr implements IInternalPersonalisationManager{
 	}
 
 	@Override
-	public void registerForContextUpdate(Identity arg0,
+	public void registerForContextUpdate(IIdentity arg0,
 			PersonalisationTypes arg1, CtxAttributeIdentifier arg2) {
 		// TODO Auto-generated method stub
 		
