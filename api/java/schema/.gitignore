@@ -1,0 +1,2 @@
+#Ignore Schema files that might have been put in src/main/resources
+*.xsd
