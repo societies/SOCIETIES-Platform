@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.css.devicemgmt.IAction;
 import org.societies.api.css.devicemgmt.IDeviceService;
 import org.societies.api.css.devicemgmt.IDeviceStateVariable;
+import org.societies.comm.xmpp.event.EventStream;
 import org.societies.css.devicemgmt.DeviceDriverExample.actions.GetLightLevelAction;
 import org.societies.css.devicemgmt.DeviceDriverExample.statevariables.LightLevelStateVariable;
 
@@ -32,6 +33,8 @@ public class LightSensor implements IDeviceService{
 	private static Logger LOG = LoggerFactory.getLogger(LightSensor.class);
 	
 	private String serviceId;
+	
+	
 	
 	public LightSensor(BundleContext bc, DeviceDriverExample deviceDriverExample, String serviceId, String deviceMacAddress) {
 		
@@ -61,7 +64,9 @@ public class LightSensor implements IDeviceService{
 			registration = bundleContext.registerService(IDeviceService.class.getName(), this, properties);
 			
 			LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LightSensor info: lightSensor service registred ");
-		}	
+		}
+		
+		
 	}
 
 	@Override
