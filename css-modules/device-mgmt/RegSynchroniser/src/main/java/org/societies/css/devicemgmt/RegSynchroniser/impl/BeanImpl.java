@@ -1,11 +1,11 @@
-package org.societies.css.devicemgmt.RegSynchroniser.impl;
+//package org.societies.css.devicemgmt.RegSynchroniser.impl;
 
-import org.societies.css.devicemgmt.RegSynchroniser.Bean;
+//import org.societies.css.devicemgmt.RegSynchroniser.Bean;
 
-public class BeanImpl implements Bean {
+//public class BeanImpl implements Bean {
 
-    public boolean isABean() {
-	return true;
-    }
+  //  public boolean isABean() {
+	//return true;
+//    }
 
-}
+//}
