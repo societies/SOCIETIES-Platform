@@ -35,6 +35,9 @@ package org.societies.api.internal.cis.management;
 
 import java.util.Set;
 
+import org.societies.cis.android.client.CisActivityFeed;
+import org.societies.cis.android.client.ServiceSharingRecord;
+
 
 public class CisRecord {
 	public CisActivityFeed feed;

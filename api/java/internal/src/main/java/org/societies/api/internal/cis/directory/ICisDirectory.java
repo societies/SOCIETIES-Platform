@@ -36,6 +36,8 @@
 
 package org.societies.api.internal.cis.directory;
 
+import org.societies.cis.android.client.CisAdvertisementRecord;
+
 
 public interface ICisDirectory {
 	/*

@@ -31,6 +31,8 @@
  */
 package org.societies.api.internal.cis.management;
 
+import org.societies.cis.android.client.CisActivityFeed;
+
 public interface ICisManager {
 	//
 	//
