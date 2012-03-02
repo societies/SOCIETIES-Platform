@@ -100,7 +100,7 @@ public class TE_ST {
 		internalCtxBroker.setUserCtxDBMgr(new UserCtxDBMgr());
 		internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
 		ccet = new CommunityContextEstimation();
-		
+
 		
 		Identity operatorId = null;
 		Long objectNumber = null;
@@ -124,6 +124,11 @@ public class TE_ST {
 	@Test
 	public void testComCtxEst() throws CtxException, InterruptedException, ExecutionException{
 	
+		CommunityContextEstimation cce = new CommunityContextEstimation();
+		
+	
+		
+		
 		final CtxAttribute ctxAttribute;
 		final CtxEntity ctxEntity;
 		
@@ -138,35 +143,61 @@ public class TE_ST {
 		assertTrue(ctxAttribute.getType().equalsIgnoreCase("attrType"));
 		
 	}
-	@Test
+//	@Test
 	//public List<CtxAttribute> getListOfCtxAttributes(List<CommunityCtxEntity> lst, CtxEntity ctxId) {
-		public void getListOfCtxAttributes() {
-		/*
-		 * This method will return a list of attributes. As input it will have to have the attributes of a given (common CIS)
-		 * (we will have to use communityCtxEntity)
-		 */
+//		public void getListOfCtxAttributes() {
+//		/*
+//		 * This method will return a list of attributes. As input it will have to have the attributes of a given (common CIS)
+//		 * (we will have to use communityCtxEntity)
+//		 */
+//		
+//		/*Step0: use the getMembers() of the communityContextEntity class to retrieve communityCtxEntitys
+//		 * 
+//		 */
+//		
+//		/*
+//		 * Step1: Use CtxBroker to access the Attributes
+//		 */
+//		System.out.println("Hallo");
+//		System.out.println(communityContextEntity.getMembers());
+//		
+//		
+//		/*
+//		 *Step2: Populate the list
+//		 * 
+//		 */
+//		
+//		/*
+//		 * Return the list
+//		 */
+//		//return null;
 		
-		/*Step0: use the getMembers() of the communityContextEntity class to retrieve communityCtxEntitys
-		 * 
-		 */
+//	}
+	
+	@Test
+	public void TestCalculation(){
+		CommunityContextEstimation cce = new CommunityContextEstimation();
 		
-		/*
-		 * Step1: Use CtxBroker to access the Attributes
-		 */
-		System.out.println("Hallo");
-		System.out.println(communityContextEntity.getMembers());
+		cce.setB(null);
+		// me Mokito tha eixa 
+		//cce.retrieveCisMembersWitPredefinedAttr.addresult("objects pou tha epistrefei" (checkare pos orizetai))
+		//cce.retrieveMembersAttribute.addresult ....
 		
+		//ftiaxno tis input parameters pou xreiazontai pio kato...
 		
-		/*
-		 *Step2: Populate the list
-		 * 
-		 */
+		try {
+			cce.estimateContext(null, null, true);
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Integer actual = 5;
 		
-		/*
-		 * Return the list
-		 */
-		//return null;
+		Integer expectedResult =5; 
 		
+		assertEquals(expectedResult, actual);
+		
+		//prepei na vgalo to estimation model
 	}
 	
 	public double calculateMeanOfIntegerValues(){
