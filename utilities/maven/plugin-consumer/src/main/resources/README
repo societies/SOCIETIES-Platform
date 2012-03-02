@@ -1,0 +1,7 @@
+If you are using "mvn clean generate-sources": your XSD file
+will be created in this "resources" folder, and copied in the
+SOCIETIES Schema API "resources" folder too.
+
+
+For your information : "mvn clean install" will also launch
+"mvn clean generate-sources".
