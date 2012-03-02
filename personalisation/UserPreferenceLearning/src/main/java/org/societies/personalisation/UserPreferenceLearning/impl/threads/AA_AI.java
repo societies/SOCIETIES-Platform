@@ -31,8 +31,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxHistoryAttribute;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceLearning.impl.C45Output;
 import org.societies.personalisation.UserPreferenceLearning.impl.CtxIdentifierCache;
@@ -75,14 +75,14 @@ public class AA_AI extends Thread{
 		CtxIdentifierCache cache = new CtxIdentifierCache();
 
 		//logging.info("Retrieving all DPIs");
-		Identity[] historyOwners = null; //dpiRetriever.getDPIs();
+		IIdentity[] historyOwners = null; //dpiRetriever.getDPIs();
 
 		List<IC45Output> output = new ArrayList<IC45Output>();
 
 		//For each DPI
 		for(int i=0; i<historyOwners.length; i++){
 
-			Identity nextHistoryOwner = (Identity)historyOwners[i];
+			IIdentity nextHistoryOwner = (IIdentity)historyOwners[i];
 
 			//get history
 			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history = 
@@ -149,7 +149,7 @@ public class AA_AI extends Thread{
 	  */
 	     
 	private IPreferenceTreeModel runCycle(
-			Identity historyOwner, 
+			IIdentity historyOwner, 
 			ActionSubset input, 
 			CtxIdentifierCache cache,
 			IServiceResourceIdentifier serviceId,

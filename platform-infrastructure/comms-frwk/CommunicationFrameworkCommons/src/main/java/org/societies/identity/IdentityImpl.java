@@ -24,7 +24,15 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.comm.xmpp.datatypes;
+package org.societies.identity;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
 
 /**
  * @author Joao M. Goncalves (PTIN)
@@ -33,19 +41,77 @@ package org.societies.api.comm.xmpp.datatypes;
  * 
  */
 
-public abstract class Endpoint extends Identity {
+public class IdentityImpl implements IIdentity {
 	
-	protected String nodeIdentifier;
+	protected IdentityType type;
+	protected String identifier;
+	protected String domainIdentifier;
 	
-	public Endpoint(IdentityType type, String identifier,
-			String domainIdentifier, String nodeIdentifier) {
-		super(type, identifier, domainIdentifier);
-		this.nodeIdentifier = nodeIdentifier;
+	public IdentityImpl(IdentityType type, String identifier, String domainIdentifier) {
+		this.type = type;
+		this.identifier = identifier;
+		this.domainIdentifier = domainIdentifier;
 	}
 
-	public String getNodeIdentifier() {
-		return nodeIdentifier;
+	@Override
+	public String toString() {
+		return getJid();
 	}
 	
-	// TODO equals
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((domainIdentifier == null) ? 0 : domainIdentifier.hashCode());
+		result = prime * result
+				+ ((identifier == null) ? 0 : identifier.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof IIdentity))
+			return false;
+		IIdentity other = (IIdentity) obj;
+		if (domainIdentifier == null) {
+			if (other.getDomain() != null)
+				return false;
+		} else if (!domainIdentifier.equals(other.getDomain()))
+			return false;
+		if (identifier == null) {
+			if (other.getIdentifier() != null)
+				return false;
+		} else if (!identifier.equals(other.getIdentifier()))
+			return false;
+		return true;
+	}
+
+	public IdentityType getType() {
+		return type;
+	}
+
+	public String getIdentifier() {
+		return identifier;
+	}
+
+	public String getDomain() {
+		return domainIdentifier;
+	}
+	
+	public String getJid(){
+		if (type.equals(IdentityType.CSS))
+			return identifier+"@"+domainIdentifier;
+		else
+			return identifier+"."+domainIdentifier;
+	}
+
+	public String getBareJid() {
+		return ((IIdentity)this).getJid();
+	}
 }

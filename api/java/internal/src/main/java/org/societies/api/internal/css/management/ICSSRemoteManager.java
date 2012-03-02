@@ -25,7 +25,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.api.internal.css.management;
 
-import org.societies.api.schema.cssmanagement.CssRecord;
+import org.societies.api.schema.cssmanagement.CssProfile;
+
+
 
 /**
  * 
@@ -52,28 +54,28 @@ public interface ICSSRemoteManager {
 	  * @param profile
 	  * @param callback
 	  */
-	 void registerXMPPServer(CssRecord profile, ICSSManagerCallback callback);
+	 void registerXMPPServer(CssProfile profile, ICSSManagerCallback callback);
 	/**
 	 * Unregister with chosen Domain Server
 	 * 
 	 * @param profile
 	 * @param callback
 	 */
-	void unregisterXMPPServer(CssRecord profile, ICSSManagerCallback callback);
+	void unregisterXMPPServer(CssProfile profile, ICSSManagerCallback callback);
 	/**
 	 * Login with chosen Domain server
 	 * 
 	 * @param profile
 	 * @param callback
 	 */
-	void loginXMPPServer(CssRecord profile, ICSSManagerCallback callback);
+	void loginXMPPServer(CssProfile profile, ICSSManagerCallback callback);
 	/**
 	 * Logout from chosen Domain server
 	 * 
 	 * @param profile
 	 * @param callback
 	 */
-	void logoutXMPPServer(CssRecord profile, ICSSManagerCallback callback);
+	void logoutXMPPServer(CssProfile profile, ICSSManagerCallback callback);
 
 	 /**
 	 * Login a user to a CSS. The registration of devices included in the profile
@@ -82,7 +84,7 @@ public interface ICSSRemoteManager {
 	 * @param profile
 	 * @param callback
 	 */
-	 void loginCSS(CssRecord profile, ICSSManagerCallback callback);	
+	 void loginCSS(CssProfile profile, ICSSManagerCallback callback);	
 
 	/**
 	 * Logout the user from a CSS
@@ -90,7 +92,7 @@ public interface ICSSRemoteManager {
 	 * @param profile
 	 * @param callback
 	 */
-	 void logoutCSS(CssRecord profile, ICSSManagerCallback callback);	
+	 void logoutCSS(CssProfile profile, ICSSManagerCallback callback);	
 	
 	/**
 	 * Register a CSS
@@ -98,7 +100,7 @@ public interface ICSSRemoteManager {
 	 * @param profile
 	 * @param callback
 	 */
-	 void registerCSS(CssRecord profile, ICSSManagerCallback callback);
+	 void registerCSS(CssProfile profile, ICSSManagerCallback callback);
 
 	/**
 	 * Unregister the CSS
@@ -107,7 +109,7 @@ public interface ICSSRemoteManager {
 	 * @param profile
 	 * @param callback
 	 */
-	 void unregisterCSS(CssRecord profile, ICSSManagerCallback callback);
+	 void unregisterCSS(CssProfile profile, ICSSManagerCallback callback);
 
 	/**
 	 * Register a device(s) with a CSS
@@ -115,14 +117,14 @@ public interface ICSSRemoteManager {
 	 * @param profile
 	 * @param callback
 	 */
-	 void registerCSSNode(CssRecord profile, ICSSManagerCallback callback);
+	 void registerCSSNode(CssProfile profile, ICSSManagerCallback callback);
 	/**
 	 * Unregister a device(s) from a CSS
 	 * 
 	 * @param profile
 	 * @param callback
 	 */
-	 void unregisterCSSNode(CssRecord profile, ICSSManagerCallback callback);
+	 void unregisterCSSNode(CssProfile profile, ICSSManagerCallback callback);
 	
 	/**
 	 * Get the CSS Profile. This operation will retrieve the local CSS Profile. 
@@ -131,7 +133,7 @@ public interface ICSSRemoteManager {
 	 * 
 	 * @param callback
 	 */
-	 void getCssRecord(ICSSManagerCallback callback);
+	 void getCssProfile(ICSSManagerCallback callback);
 
 	/**
 	 * Modify the CSS Profile
@@ -139,14 +141,14 @@ public interface ICSSRemoteManager {
 	 * @param profile
 	 * @param callback
 	 */
-	 void modifyCssRecord(CssRecord profile, ICSSManagerCallback callback);
+	 void modifyCssProfile(CssProfile profile, ICSSManagerCallback callback);
 	/**
 	 * Change the status a CSS device
 	 * 
 	 * @param profile
 	 * @param callback
 	 */
-	 void changeCSSNodeStatus(CssRecord profile, ICSSManagerCallback callback);
+	 void changeCSSNodeStatus(CssProfile profile, ICSSManagerCallback callback);
 	
 	/**
 	 * Synchronise the CSS profile. The CSS cloud node's current profile is synchronised
@@ -155,7 +157,7 @@ public interface ICSSRemoteManager {
 	 * @param profile
 	 * @param callback
 	 */
-	 void synchProfile(CssRecord profile, ICSSManagerCallback callback);
+	 void synchProfile(CssProfile profile, ICSSManagerCallback callback);
 	
 	/**
 	 * Set the presence status of the user
@@ -163,5 +165,5 @@ public interface ICSSRemoteManager {
 	 * @param profile
 	 * @param callback
 	 */
-	 void setPresenceStatus(CssRecord profile, ICSSManagerCallback callback);
+	 void setPresenceStatus(CssProfile profile, ICSSManagerCallback callback);
 }

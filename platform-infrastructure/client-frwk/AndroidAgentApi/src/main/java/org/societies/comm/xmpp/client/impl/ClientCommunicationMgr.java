@@ -12,10 +12,7 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.IIdentityManager;
 import org.societies.interfaces.XMPPAgent;
-import org.societies.comm.android.ipc.IMethodInvocation;
-import org.societies.comm.android.ipc.MethodInvocationServiceConnection;
 import org.societies.comm.android.ipc.Stub;
-import org.societies.comm.xmpp.interfaces.IdentityManager;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 

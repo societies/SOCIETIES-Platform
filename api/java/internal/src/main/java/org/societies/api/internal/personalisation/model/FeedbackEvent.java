@@ -26,7 +26,7 @@ package org.societies.api.internal.personalisation.model;
 
 import java.io.Serializable;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
 
 
@@ -42,7 +42,7 @@ public class FeedbackEvent implements IFeedbackEvent, Serializable {
 	private FeedbackTypes errorType;
 	private boolean result;
 	
-	private Identity user;
+	private IIdentity user;
 	private IAction action;
 
 	public FeedbackEvent(){
@@ -60,7 +60,7 @@ public class FeedbackEvent implements IFeedbackEvent, Serializable {
 	 * @param result
 	 * @param errorType
 	 */
-	public FeedbackEvent(Identity userDPI, IAction action, boolean result, FeedbackTypes errorType){
+	public FeedbackEvent(IIdentity userDPI, IAction action, boolean result, FeedbackTypes errorType){
 		user = userDPI;
 		this.action = action;
 		this.result = result;
@@ -84,7 +84,7 @@ public class FeedbackEvent implements IFeedbackEvent, Serializable {
 	 * //REPLACE WITH EntityIdentifier 
 	 * @see org.societies.personalisation.common.api.IFeedbackEvent#getUser()
 	 */
-	public Identity getUserIdentity(){
+	public IIdentity getUserIdentity(){
 		return this.user;
 	}
 

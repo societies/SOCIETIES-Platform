@@ -22,11 +22,14 @@ package org.societies.personalisation.CACIPrediction.impl;
 import java.util.List;
 
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.mock.EntityIdentifier;
+//import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
+import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentAction;
+import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 
 
 
@@ -40,31 +43,30 @@ import org.societies.personalisation.CAUI.api.model.UserIntentAction;
 public class CACIPrediction implements ICAUIPrediction{
 
 	@Override
-	public void enablePrediction(Boolean bool) {
+	public void enablePrediction(Boolean arg0) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public UserIntentAction getCurrentIntentAction(EntityIdentifier requestor,
-			EntityIdentifier ownerID, IServiceResourceIdentifier serviceID,
-			String preferenceName) {
+	public IUserIntentAction getCurrentIntentAction(IIdentity arg0,
+			IServiceResourceIdentifier arg1, String arg2) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public UserIntentAction getPrediction(EntityIdentifier requestor,
-			CtxAttribute ctxAttribute) {
+	public void getPrediction(IIdentity arg0, IAction arg1,
+			IPersonalisationInternalCallback arg2) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
-	public UserIntentAction getPrediction(EntityIdentifier requestor,
-			IAction action) {
+	public void getPrediction(IIdentity arg0, CtxAttribute arg1,
+			IPersonalisationInternalCallback arg2) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 
 	@Override
@@ -72,8 +74,5 @@ public class CACIPrediction implements ICAUIPrediction{
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	
-
 
 }

@@ -29,8 +29,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
@@ -59,7 +59,7 @@ public class PrivatePreferenceCache {
 	private final ICtxBroker broker;
 	private PreferenceRetriever retriever;
 	
-	public PrivatePreferenceCache(Identity dpi, ICtxBroker broker){
+	public PrivatePreferenceCache(IIdentity dpi, ICtxBroker broker){
 		
 		this.broker = broker;
 		this.idToIPreferenceTreeModel = new Hashtable<CtxIdentifier, IPreferenceTreeModel>();
@@ -117,7 +117,7 @@ public class PrivatePreferenceCache {
 	}
 
 	
-	public void storePreference(Identity dpi, PreferenceDetails details, IPreferenceTreeModel model){
+	public void storePreference(IIdentity dpi, PreferenceDetails details, IPreferenceTreeModel model){
 		this.logging.debug("Request to store preference for:"+details.toString());
 
 		
@@ -150,7 +150,7 @@ public class PrivatePreferenceCache {
 		}
 	}
 
-	public void deletePreference(Identity dpi, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName){
+	public void deletePreference(IIdentity dpi, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName){
 		PreferenceDetails details = new PreferenceDetails(serviceType, serviceID, preferenceName);
 		CtxIdentifier id = this.registry.getCtxID(details);
 		if (id==null){
@@ -164,7 +164,7 @@ public class PrivatePreferenceCache {
 		}
 	}
 	
-	public void deletePreference(Identity dpi, PreferenceDetails details){
+	public void deletePreference(IIdentity dpi, PreferenceDetails details){
 		CtxIdentifier id = this.registry.getCtxID(details);
 		if (id==null){
 			//preference doesn't exist. can't delete it

@@ -13,5 +13,6 @@
     <artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubServiceBundle"/>
     <artifact type="bundle" name="org.societies.css.mgmt.cssmgmt"/>
     <artifact type="bundle" name="org.societies.css.mgmt.comms.cssmgmt-comms"/>
+    <artifact type="bundle" name="org.societies.css.mgmt.testcomms.cssmgmt-testcomms"/>
 
 </plan>

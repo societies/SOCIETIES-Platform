@@ -31,7 +31,7 @@ package org.societies.api.internal.css.management;
  * In order to allow for Android compatibility, the natural Enum types 
  * are int types. 
  */
-public class CSSRecord {
+public class CSSProfile {
 	
 	/**
 	 * User's chosen domain server

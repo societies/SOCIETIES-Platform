@@ -72,8 +72,8 @@
 		</module>
 		<module>../platform-infrastructure/comms-frwk/XCCommunicationMgr
 		</module>
-		<module>../platform-infrastructure/comms-frwk/DataFormsXEP</module>
-		<module>../platform-infrastructure/comms-frwk/PubsubXEP</module>
+		<!-- <module>../platform-infrastructure/comms-frwk/DataFormsXEP</module>  -->
+		<!-- <module>../platform-infrastructure/comms-frwk/PubsubXEP</module> -->
 		<module>../platform-infrastructure/comms-frwk/PubsubServiceBundle
 		</module>
 		<module>../platform-infrastructure/comms-frwk/PubsubClientBundle
@@ -121,13 +121,12 @@
 		<!-- Device Mgmt -->
 		<module>../css-modules/device-mgmt/devicemanager/</module>
 	
-		
-		<!-- Context Management -->
-		<!-- Privacy Mgmt -->
-		<module>../privacy-trust/privacy-protection</module>
-		
 		<!-- Intelligent community orchestration -->
 		<module>../intelligent-community-orchestration/CommunityLifecycleManagement
 		</module>
+		<!-- Context Management -->
+		<!-- Privacy Mgmt -->
+		<module>../privacy-trust/privacy-protection</module>
+
 	</modules>
 </project>

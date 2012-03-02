@@ -30,8 +30,9 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.comm.xmpp.datatypes.IdentityType;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -63,6 +64,7 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 	//PRIVATE VARIABLES
 	private ICommManager commManager;
 	private static Logger LOG = LoggerFactory.getLogger(CommsClient.class);
+	private IIdentityManager idMgr;
 	
 	//PROPERTIES
 	public ICommManager getCommManager() {
@@ -73,7 +75,7 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 		this.commManager = commManager;
 	}
 
-	public CommsClient() {}
+	public CommsClient() {	}
 
 	public void InitService() {
 		//REGISTER OUR ServiceManager WITH THE XMPP Communication Manager
@@ -82,6 +84,7 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
+		idMgr = commManager.getIdManager();
 	}
 	
 	/* (non-Javadoc)
@@ -90,13 +93,12 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 	@Override
 	@Async
 	public void Add(int valA, int valB, IExamplesCallback calcCallback) {
-		//Identity id = new IdentityImpl(IdentityType.CSS, "XCManager", "societies.local");
-		Identity toIdentity = new Identity(IdentityType.CSS, "XCManager", "societies.local") {
-			@Override
-			public String getJid() {
-				return getIdentifier() + "." + getDomainIdentifier();
-			}
-		};
+		IIdentity toIdentity = null;
+		try {
+			toIdentity = idMgr.fromJid("XCManager.societies.local");
+		} catch (InvalidFormatException e1) {
+			e1.printStackTrace();
+		}
 		Stanza stanza = new Stanza(toIdentity);
 
 		//SETUP CALC CLIENT RETURN STUFF
@@ -118,12 +120,12 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 
 	@Override
 	public void Subtract(int valA, int valB, IExamplesCallback calcCallback) {
-		Identity toIdentity = new Identity(IdentityType.CSS, "XCManager", "societies.local") {
-			@Override
-			public String getJid() {
-				return getIdentifier() + "." + getDomainIdentifier();
-			}
-		};
+		IIdentity toIdentity = null;
+		try {
+			toIdentity = idMgr.fromJid("XCManager.societies.local");
+		} catch (InvalidFormatException e1) {
+			e1.printStackTrace();
+		}
 		Stanza stanza = new Stanza(toIdentity);
 
 		//SETUP CALC CLIENT RETURN STUFF

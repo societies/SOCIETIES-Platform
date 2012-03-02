@@ -1,4 +1,4 @@
-package org.societies.api.comm.xmpp.datatypes;
+package org.societies.api.identity;
 
 public enum IdentityType {
 	CSS,

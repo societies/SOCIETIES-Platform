@@ -43,6 +43,8 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.util.SerialisationHelper;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
@@ -63,7 +65,7 @@ public class TestUserPreferenceLearning extends TestCase{
 	PostProcessor post;
 	IServiceResourceIdentifier serviceId1;
 	IServiceResourceIdentifier serviceId2;
-	Identity ownerId;
+	IIdentity ownerId;
 	NumberGenerator ng;
 
 	public void setUp() throws Exception {

@@ -28,6 +28,8 @@ package org.societies.api.comm.xmpp.datatypes;
 
 import java.util.UUID;
 
+import org.societies.api.identity.IIdentity;
+
 /**
  * @author Joao M. Goncalves (PTIN)
  * 
@@ -38,16 +40,16 @@ import java.util.UUID;
 public class Stanza {
 	
 	private String id;
-	private Identity from;
-	private Identity to;
+	private IIdentity from;
+	private IIdentity to;
 	
-	public Stanza(String id, Identity from, Identity to) {
+	public Stanza(String id, IIdentity from, IIdentity to) {
 		this.id = id;
 		this.from = from;
 		this.to = to;
 	}
 	
-	public Stanza(Identity to) {
+	public Stanza(IIdentity to) {
 		this.id = UUID.randomUUID().toString();
 		this.to = to;
 	}
@@ -56,11 +58,11 @@ public class Stanza {
 		return id;
 	}
 
-	public Identity getFrom() {
+	public IIdentity getFrom() {
 		return from;
 	}
 
-	public Identity getTo() {
+	public IIdentity getTo() {
 		return to;
 	}
 
@@ -68,11 +70,11 @@ public class Stanza {
 		this.id = id;
 	}
 
-	public void setFrom(Identity from) {
+	public void setFrom(IIdentity from) {
 		this.from = from;
 	}
 
-	public void setTo(Identity to) {
+	public void setTo(IIdentity to) {
 		this.to = to;
 	}
 
@@ -80,6 +82,4 @@ public class Stanza {
 	public String toString() {
 		return "Stanza: from='"+from+"' to='"+to+"' id='"+id+"'";
 	}
-	
-	
 }

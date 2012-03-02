@@ -75,6 +75,11 @@ public class Skeleton {
 				return new IncomingHandler();
 			}			
 		}.createMessengerThread();
+//    	messenger = new Messenger(new MessengerThreadFactory().createThread(new IHandlerFactory() {
+//			public Handler createHandler() {
+//				return new IncomingHandler();
+//			}	    		
+//    	}));
     }
     
     public Messenger messenger() {

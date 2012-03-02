@@ -47,12 +47,13 @@ import org.jabber.protocol.pubsub.Subscription;
 import org.jabber.protocol.pubsub.errors.Unsupported;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.datatypes.StanzaError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.comm.xmpp.interfaces.IIdentityManager;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.comm.xmpp.pubsub.PubsubService;
 
 // TODO
@@ -92,7 +93,7 @@ public class PubsubServiceImpl implements PubsubService {
 	private Map<String, PubsubNode> nodes;
 	private Map<String, String> redirectedNodes;
 	private PubsubEventSender pes;
-	private List<Identity> admins;
+	private List<IIdentity> admins;
 	private ICommManager endpoint;
 	private IIdentityManager idm;
 	
@@ -101,14 +102,19 @@ public class PubsubServiceImpl implements PubsubService {
 		redirectedNodes = new HashMap<String, String>();
 		pes = new PubsubEventSender(endpoint);
 		this.endpoint = endpoint;
-		admins = new ArrayList<Identity>();
+		admins = new ArrayList<IIdentity>();
 		idm = endpoint.getIdManager();
 	}
 
 	@Override
 	public Pubsub subscriberSubscribe(Stanza stanza, Pubsub payload) throws XMPPError {
-		Identity sender = stanza.getFrom();
-		Identity subscriber = idm.fromJid(payload.getSubscribe().getJid());
+		IIdentity sender = stanza.getFrom();
+		IIdentity subscriber;
+		try {
+			subscriber = idm.fromJid(payload.getSubscribe().getJid());
+		} catch (InvalidFormatException e) {
+			throw new XMPPError(StanzaError.bad_request, null, ERROR_INVALID_JID);
+		}
 		String nodeId = payload.getSubscribe().getNode();
 		// TODO "The <subscribe/> element SHOULD possess a 'node' attribute"... what happens when it doesn't?
 		
@@ -146,8 +152,13 @@ public class PubsubServiceImpl implements PubsubService {
 
 	@Override
 	public void subscriberUnsubscribe(Stanza stanza, Pubsub payload) throws XMPPError {
-		Identity sender = stanza.getFrom();
-		Identity subscriber = idm.fromJid(payload.getUnsubscribe().getJid());
+		IIdentity sender = stanza.getFrom();
+		IIdentity subscriber;
+		try {
+			subscriber = idm.fromJid(payload.getUnsubscribe().getJid());
+		} catch (InvalidFormatException e) {
+			throw new XMPPError(StanzaError.bad_request, null, ERROR_INVALID_JID);
+		}
 		String nodeId = payload.getUnsubscribe().getNode();
 		String subId = payload.getUnsubscribe().getSubid();
 		
@@ -217,7 +228,7 @@ public class PubsubServiceImpl implements PubsubService {
 
 	@Override
 	public Pubsub subscriberRetrieve(Stanza stanza, Pubsub payload) throws XMPPError {
-		Identity sender = stanza.getFrom();
+		IIdentity sender = stanza.getFrom();
 		String nodeId = payload.getItems().getNode();
 		String subId = payload.getItems().getSubid();
 		List<Item> itemList = payload.getItems().getItem();
@@ -369,7 +380,7 @@ public class PubsubServiceImpl implements PubsubService {
 	@Override
 	public Pubsub ownerCreate(Stanza stanza, Pubsub payload) throws XMPPError {
 		// Support for Support for http://jabber.org/protocol/pubsub#create-nodes
-		Identity owner = stanza.getFrom();
+		IIdentity owner = stanza.getFrom();
 		String nodeId = payload.getCreate().getNode();
 		
 		// TODO access model
@@ -447,7 +458,7 @@ public class PubsubServiceImpl implements PubsubService {
 			throw new XMPPError(StanzaError.item_not_found);
 		
 		// 8.4.3.1 Insufficient Privileges
-		Identity sender = stanza.getFrom();
+		IIdentity sender = stanza.getFrom();
 		if (!node.getOwner().equals(sender))
 			throw new XMPPError(StanzaError.forbidden);
 		
@@ -485,7 +496,7 @@ public class PubsubServiceImpl implements PubsubService {
 			throw new XMPPError(StanzaError.item_not_found);
 		
 		// 8.5.3.2 Insufficient Privileges
-		Identity sender = stanza.getFrom();
+		IIdentity sender = stanza.getFrom();
 		if (!node.getOwner().equals(sender))
 			throw new XMPPError(StanzaError.forbidden);
 		
@@ -510,7 +521,7 @@ public class PubsubServiceImpl implements PubsubService {
 			throw new XMPPError(StanzaError.item_not_found);
 		
 		// Example 185. Entity is not an owner
-		Identity sender = stanza.getFrom();
+		IIdentity sender = stanza.getFrom();
 		if (!node.getOwner().equals(sender))
 			throw new XMPPError(StanzaError.forbidden);
 		
@@ -518,7 +529,12 @@ public class PubsubServiceImpl implements PubsubService {
 			// 8.8.2 Modify Subscriptions
 			List<org.jabber.protocol.pubsub.owner.Subscription> subscriptions = new ArrayList<org.jabber.protocol.pubsub.owner.Subscription>(payload.getSubscriptions().getSubscription());
 			for (org.jabber.protocol.pubsub.owner.Subscription s : payload.getSubscriptions().getSubscription()) {
-				List<String> subs = node.getSubscriptions(idm.fromJid(s.getJid()));
+				List<String> subs;
+				try {
+					subs = node.getSubscriptions(idm.fromJid(s.getJid()));
+				} catch (InvalidFormatException e) {
+					throw new XMPPError(StanzaError.bad_request, null, ERROR_INVALID_JID);
+				}
 				if (s.getSubscription().equals(SUBSCRIPTION_SUBSCRIBED)) {
 					if (subs==null) {
 						node.newSubscription(sender);
@@ -550,7 +566,7 @@ public class PubsubServiceImpl implements PubsubService {
 		}
 		else {
 			// 8.8.1 Retrieve Subscriptions List
-			for (Identity subscriber : node.getSubscribers()) {
+			for (IIdentity subscriber : node.getSubscribers()) {
 				List<String> subscriberSubscriptions = node.getSubscriptions(subscriber);
 				if (subscriberSubscriptions.size()==1) {
 					org.jabber.protocol.pubsub.owner.Subscription sub = new org.jabber.protocol.pubsub.owner.Subscription();
@@ -584,7 +600,7 @@ public class PubsubServiceImpl implements PubsubService {
 			throw new XMPPError(StanzaError.item_not_found);
 		
 		// Example 204. Entity is not an owner
-		Identity sender = stanza.getFrom();
+		IIdentity sender = stanza.getFrom();
 		if (!node.getOwner().equals(sender))
 			throw new XMPPError(StanzaError.forbidden);
 		

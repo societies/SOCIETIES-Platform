@@ -26,7 +26,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 package org.societies.api.android.internal.model;
 
 
-import org.societies.api.schema.cssmanagement.CssRecord;
+import org.societies.api.schema.cssmanagement.CssProfile;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -36,7 +36,7 @@ import android.os.Parcelable;
  *
  */
 
-public class AndroidCSSRecord extends CssRecord implements Parcelable {
+public class AndroidCSSProfile extends CssProfile implements Parcelable {
 	
 	/**
 	 * Default contructor
@@ -50,7 +50,7 @@ public class AndroidCSSRecord extends CssRecord implements Parcelable {
 	 * 
 	 * @param in parcel
 	 */
-	private AndroidCSSRecord(Parcel in) {
+	private AndroidCSSProfile(Parcel in) {
 		setDomainServer(in.readString());
 		setCssHostingLocation(in.readString());
 		setEntity(in.readInt());

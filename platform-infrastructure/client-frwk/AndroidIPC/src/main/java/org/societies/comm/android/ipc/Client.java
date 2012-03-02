@@ -55,7 +55,7 @@ class Client {
                 			hasThrowable = false;
                 			methodReturn = result.returnValue();
                 		}               			
-
+                		
                 		mutex.notify();
                 	}
                     break;
@@ -73,14 +73,21 @@ class Client {
 				return new IncomingHandler();
 			}			
 		}.createMessengerThread();
+//		inMessenger = new Messenger(new MessengerThreadFactory().create(new IHandlerFactory() {
+//			public Handler createHandler() {
+//				return new IncomingHandler();
+//			}	    		
+//    	}));
 		this.id = id;
 	}
 	
 	public Object invoke(String name, Object[] params) throws Throwable{
 		
 		Message msg = (new MessageMethodInvocation(id, name, params, inMessenger)).message();			
+
+		outMessenger.send(msg);
 	
-		waitMethodReturn(msg);
+		waitMethodReturn();
 		
 		return methodReturn;
 	}
@@ -88,16 +95,17 @@ class Client {
 	public Object invoke(String name, Object[] params, Object callback) throws Throwable{	
 		MessageMethodInvocation msg = new MessageMethodInvocation(id, name, params, callback.getClass(), inMessenger);					
 
-		callbacks.put(msg.id(), callback);		
+		callbacks.put(msg.id(), callback);
 		
-		waitMethodReturn(msg.message());		
+		outMessenger.send(msg.message());
+		
+		waitMethodReturn();
 		
 		return methodReturn;
 	}
 	
-	private void waitMethodReturn(Message msg) throws Throwable {
+	private void waitMethodReturn() throws Throwable {
 		synchronized(mutex){
-			outMessenger.send(msg);
 			mutex.wait(); 
 		}
 		if(hasThrowable)

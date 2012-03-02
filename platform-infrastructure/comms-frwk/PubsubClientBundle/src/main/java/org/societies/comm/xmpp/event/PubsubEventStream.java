@@ -4,18 +4,18 @@ import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
 
 public abstract class PubsubEventStream implements ApplicationEventMulticaster {
 
-	protected Identity pubsubService;
+	protected IIdentity pubsubService;
 	protected String node;
 	protected ApplicationEventMulticaster multicaster;
 	
-	public PubsubEventStream(Identity pubsubService, String node, ApplicationEventMulticaster multicaster) {
+	public PubsubEventStream(IIdentity pubsubService, String node, ApplicationEventMulticaster multicaster) {
 		this.pubsubService = pubsubService;
 		this.node = node;
 		this.multicaster = multicaster;

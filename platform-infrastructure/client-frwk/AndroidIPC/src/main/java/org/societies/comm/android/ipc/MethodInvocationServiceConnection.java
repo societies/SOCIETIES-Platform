@@ -68,10 +68,8 @@ public class MethodInvocationServiceConnection<T> implements ServiceConnection {
 	public void unbind() {
 		if(binds > 0) {
 			binds--;
-			if(binds == 0 && remote != null) {
+			if(binds == 0 && remote != null)
 				context.unbindService(this);
-				remote = null;
-			}
 		}
 	}
 	
@@ -82,7 +80,6 @@ public class MethodInvocationServiceConnection<T> implements ServiceConnection {
 				mutex.wait();
 			}
 		}
-		
 		binds++;
 	}
 	

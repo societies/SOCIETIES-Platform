@@ -27,7 +27,7 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 
 import java.io.Serializable;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.TargetMatchConstants;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
@@ -39,17 +39,17 @@ import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
  */
 public class Subject implements Serializable{
 
-	private Identity dpi;
+	private IIdentity dpi;
 	private IServiceResourceIdentifier serviceID;
 
 	public Subject(){
 		
 	}
-	public Subject(Identity dpi){
+	public Subject(IIdentity dpi){
 		this.dpi = dpi;
 	}
 
-	public Subject(Identity dpi, IServiceResourceIdentifier serviceID){
+	public Subject(IIdentity dpi, IServiceResourceIdentifier serviceID){
 		this.dpi = dpi;
 		this.serviceID = serviceID;
 	}
@@ -99,7 +99,7 @@ public class Subject implements Serializable{
 		return this.toXMLString();
 	}
 	
-	public Identity getDPI(){
+	public IIdentity getDPI(){
 		return this.dpi;
 	}
 	

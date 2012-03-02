@@ -27,8 +27,7 @@ package org.societies.api.internal.servicelifecycle;
 import java.util.List;
 import java.util.concurrent.Future;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.servicelifecycle.model.Service;
 
 
@@ -42,11 +41,11 @@ public interface IServiceDiscovery {
 	/**
 	 * Description: Based on a identify this method returns all services shared by 
 	 * the specified CSS/CIS to other CSS's or CIS;s 
-	 * @param node identity 		  
+	 * @param node IIdentity 		  
 	 * @return a List of services retrieved
 	 * @throws ServiceDiscoveryException
 	 */
-	public Future<List<Service>> getServices(Identity node) throws ServiceDiscoveryException;
+	public Future<List<Service>> getServices(IIdentity node) throws ServiceDiscoveryException;
 
 	
 	/**

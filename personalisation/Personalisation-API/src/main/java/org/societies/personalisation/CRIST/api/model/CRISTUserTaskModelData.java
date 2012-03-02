@@ -26,7 +26,7 @@ package org.societies.personalisation.CRIST.api.model;
 
 import java.util.HashMap;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 /**
@@ -123,8 +123,8 @@ public class CRISTUserTaskModelData {
 	 * 
 	 * @return currentUserAction
 	 */
-	public CRISTUserAction getCurrentIntentAction(Identity requestor,
-			Identity ownerID, IServiceResourceIdentifier serviceID) {
+	public CRISTUserAction getCurrentIntentAction(IIdentity requestor,
+			IIdentity ownerID, IServiceResourceIdentifier serviceID) {
 		CRISTUserAction currentUserAction = new CRISTUserAction();
 		// TODO
 
@@ -144,7 +144,7 @@ public class CRISTUserTaskModelData {
 	 * @return currentUserSituation
 	 */
 	public CRISTUserSituation getCurrentUserSituation(
-			Identity requestor, Identity ownerID,
+			IIdentity requestor, IIdentity ownerID,
 			IServiceResourceIdentifier serviceID) {
 		CRISTUserSituation currentUserSituation = new CRISTUserSituation();
 		// TODO

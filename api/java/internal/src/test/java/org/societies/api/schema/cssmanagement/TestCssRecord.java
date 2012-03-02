@@ -34,12 +34,12 @@ public class TestCssRecord {
 	
 	@Before
 	public void setUp() throws Exception {
-		cssNode_1 = new CssNode();
+		cssNode_1 = new CSSNode();
 		cssNode_1.setIdentity(TEST_IDENTITY_1);
 		cssNode_1.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
 		cssNode_1.setType(CSSManagerEnums.nodeType.Rich.ordinal());
 
-		cssNode_2 = new CssNode();
+		cssNode_2 = new CSSNode();
 		cssNode_2.setIdentity(TEST_IDENTITY_2);
 		cssNode_2.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
 		cssNode_2.setType(CSSManagerEnums.nodeType.Android.ordinal());

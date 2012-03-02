@@ -25,6 +25,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.api.internal.css.management;
 
+import org.societies.api.schema.cssmanagement.CssProfile;
+
+
 /**
  * Result class that is supplied by implementations of {@link ICSSRemoteManager}
  *
@@ -32,7 +35,7 @@ package org.societies.api.internal.css.management;
 public class CSSInterfaceResult {
 	private boolean resultStatus;
 	
-	private CSSRecord profile;
+	private CssProfile profile;
 
 	public boolean isResultStatus() {
 		return resultStatus;
@@ -42,11 +45,11 @@ public class CSSInterfaceResult {
 		this.resultStatus = resultStatus;
 	}
 
-	public CSSRecord getProfile() {
+	public CssProfile getProfile() {
 		return profile;
 	}
 
-	public void setProfile(CSSRecord profile) {
+	public void setProfile(CssProfile profile) {
 		this.profile = profile;
 	}
 	
