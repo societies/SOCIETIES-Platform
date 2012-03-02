@@ -66,6 +66,7 @@ in <folderOutputDirectory><packageName>.xsd
 ! To do list
 A lot of improvement are still possible for this Maven plugin. Please, feel free
 to participate by creating a new version. Here are some ideas of improvements:
+* Find a way to launch this task in a Maven goal not in the Maven "install" goal, to avoid regenerating everytime XSD schemas.
 * Find a way to use this plugin directly with the jaxb2:schemagen plugin
 * Add configuration possibilities
 * Use the packageName and httpNamespace define in the Bean
