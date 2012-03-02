@@ -52,7 +52,8 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
 */
 
 import org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityDeletionManager;
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
+//import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 //import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.mock.EntityIdentifier;
@@ -74,7 +75,7 @@ public class AutomaticCommunityDeletionManagerTest {
 	
 	public void testIdentifyCissToDelete() {
 		
-		Identity ownerId = null; //James Jents CSS or CIS
+		IIdentity ownerId = null; //James Jents CSS or CIS
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
     	
 		//create CIS for James, with last activity being 1 year ago

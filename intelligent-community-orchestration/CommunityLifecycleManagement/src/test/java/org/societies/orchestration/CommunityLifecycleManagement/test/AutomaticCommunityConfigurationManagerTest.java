@@ -52,9 +52,10 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
 */
 
 import org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityConfigurationManager;
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
+//import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.internal.servicelifecycle.model.Service;
+//import org.societies.api.internal.servicelifecycle.model.Service;
 //import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.internal.cis.management.ICisManager;
@@ -75,7 +76,7 @@ public class AutomaticCommunityConfigurationManagerTest {
 	
     public void testIdentifyCissToConfigure() {
 		
-    	Identity ownerId = null; //James Jents CSS
+    	IIdentity ownerId = null; //James Jents CSS
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
     	
 		//create CIS for James where James himself has been inactive for 1 year.

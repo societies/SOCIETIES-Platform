@@ -56,8 +56,8 @@ import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
-//import org.societies.api.mock.Identity;
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
+//import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
 //import org.societies.comm.xmpp.interfaces.FeatureServer;
@@ -95,11 +95,11 @@ import java.util.List;
 public class AutomaticCommunityConfigurationManager //implements ICommCallback
 {
 	
-	private Identity linkedCss;
+	private IIdentity linkedCss;
 	
     private CisRecord linkedCis;
     
-	private Identity linkedDomain;
+	//private IIdentity linkedDomain;
 	
 	private ICtxBroker userContextBroker;
 	//private IUserCtxDBMgr userContextDatabaseManager;
@@ -123,11 +123,11 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
 	 *              that this object will operate on behalf of.
 	 */
 	
-	public AutomaticCommunityConfigurationManager(Identity linkedEntity, String linkType) {
+	public AutomaticCommunityConfigurationManager(IIdentity linkedEntity, String linkType) {
 		if (linkType.equals("CSS"))
 			this.linkedCss = linkedEntity;
-		else
-			this.linkedDomain = linkedEntity;
+		//else
+			//this.linkedDomain = linkedEntity;
 	}
 	
 	/*
@@ -161,9 +161,9 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
 		if (linkedCis != null) {
 			//CisRecord[] records = ICisManager.getCisList(/** This CIS */);
 		}
-		if (linkedDomain != null) {
+		//if (linkedDomain != null) {
 			//CisRecord[] records = ICisManager.getCisList(/** CISs in the domain */);
-		}
+		//}
 		
 		//for (int i = 0; i < records.size(); i++)
 		    //cisRecords.add(records[i]);
@@ -268,11 +268,11 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
     	new AutomaticCommunityConfigurationManager(linkedCss, "CSS");
     }
     
-    public Identity getLinkedCss() {
+    public IIdentity getLinkedCss() {
     	return linkedCss;
     }
     
-    public void setLinkedCss(Identity linkedCss) {
+    public void setLinkedCss(IIdentity linkedCss) {
     	this.linkedCss = linkedCss;
     }
     
@@ -285,13 +285,13 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
     	this.linkedCis = linkedCis;
     }
     
-    public Identity getLinkedDomain() {
+    /**public IIdentity getLinkedDomain() {
     	return linkedDomain;
     }
     
-    public void setLinkedDomain(Identity linkedDomain) {
+    public void setLinkedDomain(IIdentity linkedDomain) {
     	this.linkedDomain = linkedDomain;
-    }
+    }*/
     
     /**public void setUserContextDatabaseManager(IUserCtxDBMgr userContextDatabaseManager) {
     	System.out.println("GOT database" + userContextDatabaseManager);

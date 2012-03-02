@@ -54,6 +54,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 //import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 //import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 
 import org.societies.api.context.CtxException;
@@ -61,8 +62,8 @@ import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
-//import org.societies.api.mock.Identity;
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
+//import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
 
@@ -92,11 +93,11 @@ import java.util.concurrent.Future;
 public class AutomaticCommunityCreationManager //implements ICommCallback
 {
 	
-	private Identity linkedCss;
+	private IIdentity linkedCss;
 	
     private CisRecord linkedSuperCis;
     
-	private Identity linkedDomain;
+	private IIdentity linkedDomain;
 	
 	private ICtxBroker userContextBroker;
 	//private IUserCtxDBMgr userContextDatabaseManager;
@@ -123,7 +124,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 	 *              that this object will operate on behalf of.
 	 */
 	
-	public AutomaticCommunityCreationManager(Identity linkedEntity, String linkType) {
+	public AutomaticCommunityCreationManager(IIdentity linkedEntity, String linkType) {
 		if (linkType.equals("CSS"))
 			this.linkedCss = linkedEntity;
 		else
@@ -144,7 +145,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 		this.linkedSuperCis = linkedSuperCis;
 	}
 	
-	public ArrayList<Identity> getIDsOfInteractingCsss(String startingDate, String endingDate) {
+	public ArrayList<IIdentity> getIDsOfInteractingCsss(String startingDate, String endingDate) {
 		//What CSSs is this one currently interacting with?
 		//Found by: For each service, shared service, and resource the user is using (in the last ~5 minutes), is there an end-CSS they're interacting with?
 		//Is there a CSS they're indirectly interacting with over the service?
@@ -153,7 +154,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 		//Needs a framework for capturing this in the platform.
 		//It needs a timestamp for this, so either the context is stored with timestamps or 
 		//we get it from the CSS activity feed (which isn't implemented yet)
-		ArrayList<Identity> interactingCsss = null;
+		ArrayList<IIdentity> interactingCsss = null;
 		
 		try {
 			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
@@ -190,14 +191,22 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 	
 	public void identifyCissToCreate(String evaluationType) {
 		
-		ArrayList<Identity> interactedCssIDs = null;
-		ArrayList<Identity> friendCssIDs = null;
-		ArrayList<Identity> localCsss = null;
+		ArrayList<IIdentity> interactedCssIDs = null;
+		ArrayList<IIdentity> friendCssIDs = null;
+		ArrayList<IIdentity> localCsss = null;
 		// ...
 		
 		ArrayList<CisRecord> cissToCreate = null;
 		ArrayList<CisRecord> cissToAutomaticallyCreate = null;
-		//v0.1 algorithms
+		//v1.0 algorithms
+		
+		String[] it = new String[1];
+		it[0] = linkedCss.getIdentifier();
+		CisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new CisRecord(null, null, null, null, null, it, null, null, null));
+		ArrayList<CisRecord> userJoinedCiss = new ArrayList<CisRecord>();
+		for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
+		    userJoinedCiss.add(listOfUserJoinedCiss[i]);   
+		}
 		
 		if (evaluationType.equals("extensive")) { //every day or so
 			if (linkedCss != null) {
@@ -215,13 +224,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				//e.g. friends in contact list, family in contact list (from SNS extractor or SOCIETIES)
 				
 				//If CISs are appropriate for friends' lists in Google+ circle fashion, then that counts
-				String[] it = new String[1];
-				it[0] = linkedCss.getIdentifier();
-				CisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new CisRecord(null, null, null, null, null, it, null, null, null));
-				ArrayList<CisRecord> userJoinedCiss = new ArrayList<CisRecord>();
-				for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
-				    userJoinedCiss.add(listOfUserJoinedCiss[i]);   
-				}
+				
 				
 				
 				//CSS directory
@@ -515,8 +518,8 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 					
 				    }
 				}
-				ArrayList<Identity> recentlyInteractedCsss = null; //interaction timestamps are last 24 hours(?)
-				ArrayList<Identity> recentlyReferencingCsss = null;
+				ArrayList<IIdentity> recentlyInteractedCsss = null; //interaction timestamps are last 24 hours(?)
+				ArrayList<IIdentity> recentlyReferencingCsss = null;
 				
 				
 				for (int i = 0; i < recentlyInteractedCsss.size(); i++) {
@@ -610,11 +613,11 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
     	new AutomaticCommunityCreationManager(linkedCss, "CSS");
     }
     
-    public Identity getLinkedCss() {
+    public IIdentity getLinkedCss() {
     	return linkedCss;
     }
     
-    public void setLinkedCss(Identity linkedCss) {
+    public void setLinkedCss(IIdentity linkedCss) {
     	this.linkedCss = linkedCss;
     }
     
@@ -626,11 +629,11 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
     	this.linkedSuperCis = linkedSuperCis;
     }
     
-    public Identity getLinkedDomain() {
+    public IIdentity getLinkedDomain() {
     	return linkedDomain;
     }
     
-    public void setLinkedDomain(Identity linkedDomain) {
+    public void setLinkedDomain(IIdentity linkedDomain) {
     	this.linkedDomain = linkedDomain;
     }
     

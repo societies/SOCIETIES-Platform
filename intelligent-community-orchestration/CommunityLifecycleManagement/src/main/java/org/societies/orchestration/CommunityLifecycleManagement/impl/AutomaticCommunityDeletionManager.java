@@ -51,8 +51,8 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
-//import org.societies.api.mock.Identity;
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
+//import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
 
@@ -91,12 +91,12 @@ import org.societies.api.internal.useragent.model.ExpProposalContent;
 public class AutomaticCommunityDeletionManager //implements ICommCallback
 {
 
-	private Identity linkedCss; // No datatype yet defined for CSS
+	private IIdentity linkedCss;
 	
     private CisRecord linkedCis;
     
     //private Domain linkedDomain;  // No datatype yet representing a domain
-	private Identity linkedDomain;
+	//private IIdentity linkedDomain;
 	
 	private int longestTimeWithoutActivity; //measured in minutes
 	
@@ -124,11 +124,11 @@ public class AutomaticCommunityDeletionManager //implements ICommCallback
 	 *              that this object will operate on behalf of.
 	 */
 	
-	public AutomaticCommunityDeletionManager(Identity linkedEntity, String linkType) {
+	public AutomaticCommunityDeletionManager(IIdentity linkedEntity, String linkType) {
 		if (linkType.equals("CSS"))
 			this.linkedCss = linkedEntity;
-		else
-			this.linkedDomain = linkedEntity;
+		//else
+		//	this.linkedDomain = linkedEntity;
 	}
 	
 	/*
@@ -164,10 +164,10 @@ public class AutomaticCommunityDeletionManager //implements ICommCallback
 			records[0] = linkedCis;
 			//CisRecord[] records = ICisManager.getCisList(/** This CIS */new CisRecord());
 		}
-		if (linkedDomain != null) {
+		//if (linkedDomain != null) {
 			//records = cisManager.getCisList(new CisRecord(null, linkedDomain.toString(), null, null, null, null, null, null));
 			//CisRecord[] records = ICisManager.getCisList(/** CISs in the domain */);
-		}
+		//}
 		
 		//process
 		
@@ -258,11 +258,11 @@ public class AutomaticCommunityDeletionManager //implements ICommCallback
     	new AutomaticCommunityDeletionManager(linkedCss, "CSS");
     }
 
-    public Identity getLinkedCss() {
+    public IIdentity getLinkedCss() {
     	return linkedCss;
     }
     
-    public void setLinkedCss(Identity linkedCss) {
+    public void setLinkedCss(IIdentity linkedCss) {
     	this.linkedCss = linkedCss;
     }
     
@@ -274,13 +274,13 @@ public class AutomaticCommunityDeletionManager //implements ICommCallback
     	this.linkedCis = linkedCis;
     }
     
-    public Identity getLinkedDomain() {
+   /** public IIdentity getLinkedDomain() {
     	return linkedDomain;
     }
     
-    public void setLinkedDomain(Identity linkedDomain) {
+    public void setLinkedDomain(IIdentity linkedDomain) {
     	this.linkedDomain = linkedDomain;
-    }
+    }*/
     
     /**
     public void setUserContextDatabaseManager(IUserCtxDBMgr userContextDatabaseManager) {

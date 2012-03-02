@@ -55,7 +55,8 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
 
 import org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityCreationManager;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
+//import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 
 //import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
@@ -93,7 +94,7 @@ public class AutomaticCommunityCreationManagerTest {
 	
 	public void testNonExtensiveCreationCheck() {
 		
-		Identity ownerId = null; //James Jents CSS
+		IIdentity ownerId = null; //James Jents CSS
 		entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
     	
 		
@@ -122,7 +123,7 @@ public class AutomaticCommunityCreationManagerTest {
 	
     public void testExtensiveCreationCheck() {
     	
-    	Identity ownerId = null; //James Jents CSS
+    	IIdentity ownerId = null; //James Jents CSS
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
     	
     	autoCommunityCreationManager = new AutomaticCommunityCreationManager(ownerId, "CSS");

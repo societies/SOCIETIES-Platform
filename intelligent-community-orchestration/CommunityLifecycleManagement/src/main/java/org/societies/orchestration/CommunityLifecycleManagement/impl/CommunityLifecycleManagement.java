@@ -31,8 +31,8 @@ import org.societies.api.internal.cis.management.CisRecord;
 import org.societies.api.internal.context.broker.ICtxBroker;
 //import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 
-//import org.societies.api.mock.Identifier;
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
+//import org.societies.api.comm.xmpp.datatypes.Identity;
 
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer;
@@ -56,13 +56,13 @@ public class CommunityLifecycleManagement //implements ICommCallback
 	private AutomaticCommunityConfigurationManager autoConfigurationManager;
 	private AutomaticCommunityDeletionManager autoDeletionManager;
 	
-	//private Css linkedCss; // No datatype yet defined for CSS
-	private Identity linkedCss;
+	//private Css linkedCss;
+	private IIdentity linkedCss;
 	
     private CisRecord linkedCis;
     
     //private Domain linkedDomain;  // No datatype yet representing a domain
-	private Identity linkedDomain;
+	//private IIdentity linkedDomain;
 	
 	/*
      * Constructor for CommunityLifecycleManagement
@@ -74,11 +74,11 @@ public class CommunityLifecycleManagement //implements ICommCallback
 	 *              that this object will operate on behalf of.
 	 */
 	
-	public CommunityLifecycleManagement(Identity linkedEntity, String linkType) {
+	public CommunityLifecycleManagement(IIdentity linkedEntity, String linkType) {
 		if (linkType.equals("CSS"))
 			this.linkedCss = linkedEntity;
-		else
-			this.linkedDomain = linkedEntity;
+		//else
+		//	this.linkedDomain = linkedEntity;
 	}
 	
 	/*
@@ -185,17 +185,17 @@ public class CommunityLifecycleManagement //implements ICommCallback
     		new CommunityLifecycleManagement(linkedCis);
     		loop();
     	}
-    	else if (linkedDomain != null) {
+    	/**else if (linkedDomain != null) {
     		new CommunityLifecycleManagement(linkedCss, "Domain");
     		loop();
-    	}
+    	}*/
     }
     
-    public Identity getLinkedCss() {
+    public IIdentity getLinkedCss() {
     	return linkedCss;
     }
     
-    public void setLinkedCss(Identity linkedCss) {
+    public void setLinkedCss(IIdentity linkedCss) {
     	this.linkedCss = linkedCss;
     }
     
@@ -207,13 +207,13 @@ public class CommunityLifecycleManagement //implements ICommCallback
     	this.linkedCis = linkedCis;
     }
     
-    public Identity getLinkedDomain() {
+    /**public IIdentity getLinkedDomain() {
     	return linkedDomain;
     }
     
-    public void setLinkedDomain(Identity linkedDomain) {
+    public void setLinkedDomain(IIdentity linkedDomain) {
     	this.linkedDomain = linkedDomain;
-    }
+    }*/
     
     public AutomaticCommunityCreationManager getAutoCreationManager() {
     	return autoCreationManager;
