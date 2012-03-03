@@ -24,21 +24,21 @@
  */
 package org.societies.context.community.estimation.impl;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import org.junit.Test;
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CommunityCtxEntity;
+import org.societies.api.context.model.CommunityMemberCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.mock.EntityIdentifier;
 import org.societies.context.api.community.estimation.EstimationModels;
 import org.societies.context.api.community.estimation.ICommunityCtxEstimationMgr;
-import org.societies.context.broker.impl.CtxBroker;
+import org.societies.context.broker.impl.InternalCtxBroker;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -46,16 +46,21 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	
+	
+	//Constructor
+	
 	public CommunityContextEstimation() {
 		// TODO Auto-generated constructor stub
 			
 	}
 	
+	//Fields declaretion
+	
 	@Autowired
-	private CtxBroker b;
+	private InternalCtxBroker b;
 	private CtxEntityIdentifier comId;
-	private CtxEntity ctxEntType;
-	private CtxAttribute attributeUnderEstimation;
+	private String entityType;
+	private String attributeType;
 	
 
 	@Override
@@ -83,42 +88,42 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		
 	}
 	
-	public void estimateContext_John(EntityIdentifier communityID, List<CtxAttribute> list, Boolean currentDB) throws CtxException{
-		// TODO Auto-generated method stub
-		
-	//	CtxAttribute a = new CtxAttribute(null);
-//		a.getId().getType();
-//		a.getIntegerValue();
-		
-		ArrayList<CtxAttribute> allAttributes = new ArrayList<CtxAttribute>();
-		
-		ArrayList<CtxEntity> m = retrieveCisMembersWitPredefinedAttr_John(communityID, list);
-		// elegxos gia null h oxi (ta members)
-		for (CtxEntity e:m){
-			allAttributes.addAll((retrieveMembersAttribute_John(e, list)));
-		}
-		
-		CalculateAlgorithm(allAttributes);
-		CtxEntityIdentifier community = null;
-		Identity requester = null;
-		b.retrieveCommunityMembers(requester, community);
-		
-	}
-	
-	private ArrayList<CtxEntity> retrieveCisMembersWitPredefinedAttr_John(EntityIdentifier communityID, List<CtxAttribute> hasTheseAttributes) throws CtxException {
-		// TODO Auto-generated method stub
-		//b
-		//return (ArrayList<CtxEntity>) b.retrieveAdministratingCSS(null, null); na vro tin kanoniki methodo tou broker...
-		return null;
-	}
-
-	
-	private ArrayList<CtxAttribute> retrieveMembersAttribute_John(CtxEntity member, List<CtxAttribute> hasTheseAttributes) {
-		// TODO Auto-generated method stub
-		//b
-		//return (ArrayList<CtxEntity>) b.retrieveAdministratingCSS(null, null); na vro tin kanoniki methodo tou broker...
-		return null;
-	}
+//	public void estimateContext_John(EntityIdentifier communityID, List<CtxAttribute> list, Boolean currentDB) throws CtxException{
+//		// TODO Auto-generated method stub
+//		
+//	//	CtxAttribute a = new CtxAttribute(null);
+////		a.getId().getType();
+////		a.getIntegerValue();
+//		
+//		ArrayList<CtxAttribute> allAttributes = new ArrayList<CtxAttribute>();
+//		
+//		ArrayList<CtxEntity> m = retrieveCisMembersWitPredefinedAttr_John(communityID, list);
+//		// elegxos gia null h oxi (ta members)
+//		for (CtxEntity e:m){
+//			allAttributes.addAll((retrieveMembersAttribute_John(e, list)));
+//		}
+//		
+//		CalculateAlgorithm(allAttributes);
+//		CtxEntityIdentifier community = null;
+//		Identity requester = null;
+//		b.retrieveCommunityMembers(requester, community);
+//		
+//	}
+//	
+//	private ArrayList<CtxEntity> retrieveCisMembersWitPredefinedAttr_John(EntityIdentifier communityID, List<CtxAttribute> hasTheseAttributes) throws CtxException {
+//		// TODO Auto-generated method stub
+//		//b
+//		//return (ArrayList<CtxEntity>) b.retrieveAdministratingCSS(null, null); na vro tin kanoniki methodo tou broker...
+//		return null;
+//	}
+//
+//	
+//	private ArrayList<CtxAttribute> retrieveMembersAttribute_John(CtxEntity member, List<CtxAttribute> hasTheseAttributes) {
+//		// TODO Auto-generated method stub
+//		//b
+//		//return (ArrayList<CtxEntity>) b.retrieveAdministratingCSS(null, null); na vro tin kanoniki methodo tou broker...
+//		return null;
+//	}
 
 	
 	//******************************************NEW***************************************************************************
@@ -129,86 +134,67 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	
 	// This method will take as inputs
 	//@param communityID the id of the community we want to estimate the context
-	//@param ctxEntityType the type of the entity (e.g. person)
-	//@param desiredCtxAttribute the attribute we want to make the estimation for (e.g. age)
+	//@param entityType the type of the entity (e.g. person)
+	//@param attributeType the attribute we want to make the estimation for (e.g. age)
 	
-	public void estimateContext(CtxEntityIdentifier communityID, CtxEntity ctxEntityType, CtxAttribute desiredCtxAttribute) 
-																						throws CtxException{
-		
-		
-	//Initialization what CIS, what type, which Attribute
-		
-		setComId(communityID);
-		setCtxEntType(ctxEntityType);
-		setAttributeUnderEstimation(desiredCtxAttribute);
-		
-   //********************************************************************
-		
-	//requester initialization	
-		
-		Identity requester = null;
+	public void estimateContext(CtxEntityIdentifier communityID, String entityType, String attributeType) 
+			throws CtxException, InterruptedException, ExecutionException {
 	
-	//*****************************	
-		
-	Serializable minAttribValue = null;
-	Serializable maxAttribValue = null;
-		//For the given input parameters we want to collect the attributes (e.g. age) by using the broker
-	
-		Future<List<CtxEntityIdentifier>> l = b.lookupEntities(requester, ctxEntityType.getType(), desiredCtxAttribute.getType(), minAttribValue , maxAttribValue );
-		List<CtxEntityIdentifier> finalList = l.get();
-		
-		
-		
-	//	Future<List<CtxEntityIdentifier>> l = (Future<List<CtxEntityIdentifier>>) new ArrayList();
-	//	l = b.retrieveCommunityMembers(requester, communityID);
+		Future<List<CtxEntityIdentifier>> allMembersList = getAllCommunityMembers(communityID);
+		Future<List<CtxEntityIdentifier>> membersOfSpecificType = getMembersOfSpecificType(allMembersList, entityType);
+		getValuesFromMembersAttribute(membersOfSpecificType, attributeType);
 	
 	}
-	
-//	private void getTheListOfAttributeUnderQuestion(ArrayList<CtxEntity> members) {
-//		// TODO Auto-generated method stub
-//		
-//		ArrayList<CtxAttribute> listWithDesiredAttributes = new ArrayList<CtxAttribute>();
-//		
-//		for (int i=0; i<members.size(); i++)
-//		{
-//			
-//		}
-//		
-//		
-//	}
 
+	private Future<List<CtxEntityIdentifier>> getAllCommunityMembers(CtxEntityIdentifier communityID) throws CtxException {
+		// TODO Auto-generated method stub
+		//Θέλω μια λίστα με όλα τα CommunityMembers	
+		
+		return b.retrieveCommunityMembers(communityID);
+	}
+	
+	
+	private Future<List<CtxEntityIdentifier>> getMembersOfSpecificType(Future<List<CtxEntityIdentifier>> allMembersList, String entityType) throws CtxException {
+		// TODO Auto-generated method stub
+		//Εφόσον την πάρω, με κάποιο τρόπο, θα κάνω ένα iterration για να βάλω σε μια νέα λίστα τα μέλη που έχουν το συγκεκριμένο entityType (π.χ. "person)"
+		//TODO
+		//... και έστω ότι καταλήγουμε στην ListWithMembers
+	 return b.lookupEntities(entityType, attributeType, null, null);
+	}
+	
+	
+	
+	private List<Integer> getValuesFromMembersAttribute(Future<List<CtxEntityIdentifier>> membersOfSpecificType, String attributeType) {
+		// TODO Auto-generated method stub
+		
+		//Από την καινούρια λίστα (με persons) πέρνω την τελική λίστα με τα values του συγκεκριμένου attribute
+		//TODO
+		List<Integer> listWithAttributesValues = new ArrayList<Integer>();
+		return listWithAttributesValues;
+	}
 
 	private void CalculateAlgorithm(ArrayList<CtxAttribute> allAttributes){
+		
 		// ti epistrefo san apotelesma kai kat'epektasi ti update kano ston broker????
+		
+		
 	}
 
 	
-	
-	// Setters and Getters for the private fields
+// Setters and Getters for the private fields ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^//^
 
-	public CtxBroker getB() {
-		return b;
-	}
+	public InternalCtxBroker getB() {                                                                                                  
+		return b;																												 
+	}																															  
 
-
-	public void setB(CtxBroker b) {
-		this.b = b;
-	}
+	public void setB(InternalCtxBroker b) {																								
+		this.b = b;																												
+	}																															
 
 
-	public CtxAttribute getAttributeUnderEstimation() {
-		return attributeUnderEstimation;
-	}
-
-
-	public void setAttributeUnderEstimation(CtxAttribute attributeUnderEstimation) {
-		this.attributeUnderEstimation = attributeUnderEstimation;
-	}
-
-
-	public CtxEntityIdentifier getComId() {
-		return comId;
-	}
+	public CtxEntityIdentifier getComId() {																						
+		return comId;																											
+	}																															
 
 
 	public void setComId(CtxEntityIdentifier comId) {
@@ -216,14 +202,27 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	}
 
 
-	public CtxEntity getCtxEntType() {
-		return ctxEntType;
+	public String getEntityType() {
+		return entityType;
 	}
 
 
-	public void setCtxEntType(CtxEntity ctxEntType) {
-		this.ctxEntType = ctxEntType;
+	public void setEntityType(String entityType) {
+		this.entityType = entityType;
 	}
+
+
+	public String getAttributeType() {
+		return attributeType;
+	}
+
+
+	public void setAttributeType(String attributeType) {
+		this.attributeType = attributeType;
+	}
+
+
+
 
 
 }
