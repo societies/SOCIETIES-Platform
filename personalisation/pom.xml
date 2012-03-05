@@ -57,6 +57,7 @@
 		<module>Personalisation-API</module>
 		<module>PersonalisationManager</module>
 		<module>UserPreferenceManagement</module>
+		<module>UserPreferenceLearning</module>
 		<module>DIANNE</module>
 		<module>Personalisation-Bundle</module>
 	</modules>

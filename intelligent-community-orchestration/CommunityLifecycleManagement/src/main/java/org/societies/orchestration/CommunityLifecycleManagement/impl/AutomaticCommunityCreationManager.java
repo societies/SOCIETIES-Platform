@@ -27,8 +27,11 @@ package org.societies.orchestration.CommunityLifecycleManagement.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+
+import static org.mockito.Mockito.*;
 
 import org.societies.api.internal.css.directory.ICssDirectory;
 
@@ -53,14 +56,16 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 //import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 //import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
+import org.societies.api.internal.useragent.model.ExpProposalContent;
 
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
-//import org.societies.api.mock.Identity;
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
+//import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
 
@@ -90,11 +95,11 @@ import java.util.concurrent.Future;
 public class AutomaticCommunityCreationManager //implements ICommCallback
 {
 	
-	private Identity linkedCss;
+	private IIdentity linkedCss;
 	
     private CisRecord linkedSuperCis;
     
-	private Identity linkedDomain;
+	private IIdentity linkedDomain;
 	
 	private ICtxBroker userContextBroker;
 	//private IUserCtxDBMgr userContextDatabaseManager;
@@ -103,7 +108,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 	//private IUserCtxBrokerCallback userContextBrokerCallback;
 	private ArrayList<CisRecord> recentRefusals;
 	private IUserFeedback userFeedback;
-	//private IUserFeedbackCallback userFeedbackCallback;
+	private IUserFeedbackCallback userFeedbackCallback;
 	
 	private ICisManager cisManager;
     
@@ -121,7 +126,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 	 *              that this object will operate on behalf of.
 	 */
 	
-	public AutomaticCommunityCreationManager(Identity linkedEntity, String linkType) {
+	public AutomaticCommunityCreationManager(IIdentity linkedEntity, String linkType) {
 		if (linkType.equals("CSS"))
 			this.linkedCss = linkedEntity;
 		else
@@ -142,7 +147,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 		this.linkedSuperCis = linkedSuperCis;
 	}
 	
-	public ArrayList<Identity> getIDsOfInteractingCsss(String startingDate, String endingDate) {
+	public ArrayList<IIdentity> getIDsOfInteractingCsss(String startingDate, String endingDate) {
 		//What CSSs is this one currently interacting with?
 		//Found by: For each service, shared service, and resource the user is using (in the last ~5 minutes), is there an end-CSS they're interacting with?
 		//Is there a CSS they're indirectly interacting with over the service?
@@ -151,7 +156,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 		//Needs a framework for capturing this in the platform.
 		//It needs a timestamp for this, so either the context is stored with timestamps or 
 		//we get it from the CSS activity feed (which isn't implemented yet)
-		ArrayList<Identity> interactingCsss = null;
+		ArrayList<IIdentity> interactingCsss = null;
 		
 		try {
 			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
@@ -188,57 +193,81 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 	
 	public void identifyCissToCreate(String evaluationType) {
 		
-		ArrayList<Identity> interactedCssIDs = null;
-		ArrayList<Identity> friendCssIDs = null;
-		ArrayList<Identity> localCsss = null;
+		
+		
+		ArrayList<IIdentity> interactedCssIDs = null;
+		ArrayList<IIdentity> friendCssIDs = null;
+		ArrayList<IIdentity> localCsss = null;
 		// ...
 		
-		ArrayList<CisRecord> cissToCreate = null;
+		ArrayList<CisRecord> cissToCreate = new ArrayList<CisRecord>();
+		ArrayList<CisRecord> cissToAutomaticallyCreate = null;
+		//v1.0 algorithms
 		
-		//v0.1 algorithms
+		linkedCss = mock(IIdentity.class);
+		cisManager = mock(ICisManager.class);
+		userContextBroker = mock(ICtxBroker.class);
+		userCssDirectory = mock(ICssDirectory.class);
+		
+		String[] it = new String[1];
+		it[0] = linkedCss.getIdentifier();
+		
+		CisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new CisRecord(null, null, null, null, null, it, null, null, null));
+		ArrayList<CisRecord> userJoinedCiss = new ArrayList<CisRecord>();
+		if (listOfUserJoinedCiss != null)
+		    for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
+		        userJoinedCiss.add(listOfUserJoinedCiss[i]);   
+		    }
 		
 		if (evaluationType.equals("extensive")) { //every day or so
 			if (linkedCss != null) {
 				//interactedCssIDs = getIDsOfInteractingCsss();
 				
-				
+				/**
+				 * public CisRecord(CisActivityFeed feed, String ownerCss,
+			String membershipCriteria, String cisId, String permaLink,
+			String[] membersCss, String password, String host,
+			Set<ServiceSharingRecord> sharedServices) {
+				 * 
+				 */
 				
 				//first step: look for more obvious CISs on high-priority kinds of context,
 				//e.g. friends in contact list, family in contact list (from SNS extractor or SOCIETIES)
 				
 				//If CISs are appropriate for friends' lists in Google+ circle fashion, then that counts
-				CisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new CisRecord(null, null, null, null, null, null, null, null));
-				//ArrayList<CisRecord> userJoinedCiss = new ArrayList<CisRecord>();
-				//for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
-				//    userJoinedCiss.add(listOfUserJoinedCiss[i]);
-				//    
-				//}
+				
 				
 				
 				//CSS directory
-				//ArrayList<CssRecord> cssDirectoryMembers = userCssDirectory.getCssEntries();
+				Collection<Object/**CssAdvertisementRecord*/> cssDirectoryMembers = userCssDirectory.findForAllCss();
 				boolean cisExistsAlready = false;
-				//if (cssDirectoryMembers.size() >= 2)
-				//for (int i = 0; i < userJoinedCiss.size(); i++) {
-				//     if ((userJoinedCiss[i].getMembers() == cssDirectoryMembers) && (userJoinedCiss[i].getMembershipCriteria().isEmpty()))
-				//         cisExistsAlready = true;
-				//     else if ((cssDirectoryMembers.contains(userJoinedCiss[i].getMembers() && (userJoinedCiss[i].getMembershipCriteria().isEmpty()))) {
-				//         thisCisActivityHistory = userJoinedCiss[i].getActivityHistory();
-				//         thisCssActivityHistory = userCssManager.getActivityHistory();
-				//         Date cisCreationDate = thisCisActivityHistory.getEarliestDate();
-				//         thisCssActivityHistory = thisCssActivityHistory.split(cisCreationDate)[0];
-				//         if (!thisCssActivityHistory.contains(userJoinedCiss[i].getMembers())
-				//             cisExistsAlready = true;
-				//     }
-				//     else if ((userJoinedCiss[i].getActivityHistory().contains("personal css directory cis")))
-				//         cisExistsAlready = true;
-				//     else if ((userJoinedCiss[i].getOrchestrationMetadata().contains("personal css directory cis")))
-				//         cisExistsAlready = true;
+				if (cssDirectoryMembers.size() >= 2)
+				for (int i = 0; i < userJoinedCiss.size(); i++) {
+					//if (userJoinedCiss.get(i).getOrchestrationMetdata.contains("Personal CSS directory")) cisExistsAlready = true;
+					Collection<Object> membersOfCis = null;
+					String[] membersOfCisStringArray = userJoinedCiss.get(i).membersCss;
+					for (int m = 0; m < membersOfCisStringArray.length; m++) {
+					    membersOfCis.add(membersOfCisStringArray[m]);
+					}
+				    if ((membersOfCis == cssDirectoryMembers) && (userJoinedCiss.get(i).membershipCriteria.equals("null")))
+				         cisExistsAlready = true;
+				     else if ((cssDirectoryMembers.contains(userJoinedCiss.get(i).membersCss) && (userJoinedCiss.get(i).membershipCriteria.equals("")))) {
+				         /**ArrayList<CisActivity> thisCisActivityHistory = */userJoinedCiss.get(i).feed.getActivities(linkedCss.toString(), "time");
+				         ///**ArrayList<CssActivity> thisCssActivityHistory = */userCssManager.feed.getActivities("time");
+				         //Date cisCreationDate = thisCisActivityHistory.getEarliestDate();
+				         //thisCssActivityHistory = thisCssActivityHistory.split(cisCreationDate)[0];
+				         //if (!thisCssActivityHistory.contains(userJoinedCiss[i].getMembers())
+				         //    cisExistsAlready = true;
+				     }
+				     //else if ((userJoinedCiss.get(i).getActivityHistory().contains("personal css directory cis")))
+				     //    cisExistsAlready = true;
+				     //else if ((userJoinedCiss.get(i).getOrchestrationMetadata().contains("personal css directory cis")))
+				     //    cisExistsAlready = true;
 				/**    if (!cisManager.getCiss().get(i).getMembers() == people)*/
-				//}
-				//if (cisExistsAlready == false)
-				//    cissToCreate.add(new CisRecord(null, linkedCss, "PERSONAL CIS for your CSS directory members", null, null, null, null, null));
-				//
+				}
+				if (cisExistsAlready == false)
+				    cissToCreate.add(new CisRecord(null, linkedCss.toString(), "PERSONAL CIS for your CSS directory members", null, null, null, null, null, null));
+				
 				
 				//friends?
 				//userContextBroker.lookup(CtxModelType.ENTITY, "SNGroup", userContextBrokerCallback);
@@ -258,13 +287,14 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				    e.printStackTrace();
 			    }
 				
-				while (friendsFuture == null) {
-					continue;
-				}
+				//while (friendsFuture == null) {
+				//	continue;
+				//}
 				
 				List<CtxIdentifier> theFriends = null;
 				try {
-					theFriends = friendsFuture.get();
+					if (friendsFuture != null)
+					    theFriends = friendsFuture.get();
 				} catch (InterruptedException e3) {
 					// TODO Auto-generated catch block
 					e3.printStackTrace();
@@ -273,15 +303,16 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 					e3.printStackTrace();
 				}
 				boolean similarCis = false;
-				for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
-					String[] members = ((CisRecord)listOfUserJoinedCiss[i]).membersCss;
-					int number = 0;
-					for (int m = 0; m < members.length; m++) {
-						if (theFriends.contains(members[i]))
-							number++;
-					}
-					if (((number/theFriends.size()) >= 0.8) && (((number/members.length) >= 0.8))) {
-						similarCis = true;
+				if (listOfUserJoinedCiss != null) {
+				    for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
+					    String[] members = ((CisRecord)listOfUserJoinedCiss[i]).membersCss;
+					    int number = 0;
+					    for (int m = 0; m < members.length; m++) {
+						    if (theFriends.contains(members[i]))
+							    number++;
+				    	}
+					    if (((number/theFriends.size()) >= 0.8) && (((number/members.length) >= 0.8))) {
+						    similarCis = true;
 						//if no CIS exists with 100% friend members, suggest sub-CIS of that one
 						
 						//number = 0;
@@ -290,12 +321,13 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 						//		number++;
 						//}
 						
-//			            cissToCreate.add(new CisRecord(null, linkedCss, "family relation to all members", null, null, null, null, null));
+			                cissToCreate.add(new CisRecord(null, linkedCss.toString(), "family relation to all members", null, null, null, null, null, null));
 						
-					}
+					    }
+				    }
 				}
 				if (similarCis == false) {
-		            //cissToCreate.add(new CisRecord(null, linkedCss, "Mutual friends", null, null, null, null, null));
+		            cissToCreate.add(new CisRecord(null, linkedCss.toString(), "Mutual friends", null, null, null, null, null, null));
 				    
 				}
 				
@@ -432,16 +464,50 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 			
 		else { //non-extensive check, every few minutes or so.
 			if (linkedCss != null) {
-				interactedCssIDs = getIDsOfInteractingCsss(new Timestamp(new Date().getTime() - 300000).toString(), new Timestamp(new Date().getTime()).toString());
+				interactedCssIDs = getIDsOfInteractingCsss(new Timestamp(new Date().getTime() - 200000).toString(), new Timestamp(new Date().getTime()).toString());
 				//retrieve recent history of certain kinds of context data on CSS user and inter-CSS connections 
 				//amongst their immediate connection neighbourhood as possible.
 				
+				Future<List<CtxIdentifier>> localCssFuture = null;
 				try {
-					userContextBroker.lookup(CtxModelType.ATTRIBUTE, "local CSSs");
+					localCssFuture = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "local CSSs");
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
+				
+				
+				List<CtxIdentifier> temporaryLocalCsss = null;
+				
+				try {
+					if (localCssFuture != null)
+					    temporaryLocalCsss = localCssFuture.get();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if (temporaryLocalCsss != null) {
+				    for (int i = 0; i < temporaryLocalCsss.size(); i++) {
+					    if (userCssDirectory.findForAllCss().contains(temporaryLocalCsss.get(i))) {
+						    if (userJoinedCiss.contains(new CisRecord(null, null, "friends", null, null, null, null, null, null))) {
+							
+							    if (userJoinedCiss.get(i).membershipCriteria.equals("friends") /**&& userJoinedCiss.getSubCiss("proximity") != null*/ /**it has a sub-CIS defined on this location*/) {
+								//not create
+							    }
+							    else {
+								    cissToCreate.add(new CisRecord(null, linkedCss.toString(), "Local proximity", null, null, null, null, null, null));
+							    }
+						    }
+					    }
+					//do for all other attributes: family, workers, interest?, CSS directory (personal and mutual if there is one)
+					//then do this for service interaction, same process
+				    }
+				}
+				
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				//historyOfLocalCsss.add(thisResult);
 				//ArrayList<Identity> people = userCssDirectory.getContextMatchingCsss(list);
@@ -467,8 +533,8 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 					
 				    }
 				}
-				ArrayList<Identity> recentlyInteractedCsss = null; //interaction timestamps are last 24 hours(?)
-				ArrayList<Identity> recentlyReferencingCsss = null;
+				ArrayList<IIdentity> recentlyInteractedCsss = new ArrayList<IIdentity>(); //interaction timestamps are last 24 hours(?)
+				ArrayList<IIdentity> recentlyReferencingCsss = new ArrayList<IIdentity>();
 				
 				
 				for (int i = 0; i < recentlyInteractedCsss.size(); i++) {
@@ -483,6 +549,17 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				
 				//boolean flag doneLocalVicinityCheckRecently = false;
 				
+				//now we compare all the suggested CISs to see if they should sub-CIS etc.
+				//each-other, using layering principles:
+				
+				//If location was suggested and same people interact with service there also suggested,
+				//then if one has existed before the other, make that the CIS and the other the super-CIS,
+				//else make one CIS on both relations if always tied together, else keep them separate
+				
+				//APIs not yet available to achieve ...
+				//Need APIs: get CISs that match *only* certain members of member criteria,
+				//get CISs that contain at least the specified query, etc.
+				
 			}
 		}
 		
@@ -494,11 +571,21 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 		//OR
 		//automatically call CIS management functions to create CISs
 		
-		List<String> options = new ArrayList<String>();
-		options.add("options");
+		//Can't use GUI in tests
+		//cissToCreate = getUserFeedbackOnCreation(cissToCreate);
+		
+		if (cissToCreate != null) 
+		    for (int i = 0; i < cissToCreate.size(); i++)
+			    cisManager.createCis(linkedCss.getIdentifier(), cissToCreate.get(i).getCisId());
+	}
+	
+	public ArrayList<CisRecord> getUserFeedbackOnCreation(ArrayList<CisRecord> cissToCreate) {
+		ArrayList<CisRecord> finalisedCiss = null;
+		String[] options = new String[1];
+		options[0] = "options";
 		String userResponse = null;
 		boolean responded = false;
-		//userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs may benefit you. If you would like to create one or more of these CISs, please check them.", options), userFeedbackCallback);
+		userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects the follwing CISs may benefit you. If you would like to create one or more of these CISs, please check them.", options), userFeedbackCallback);
 		for (int i = 0; i < 300; i++) {
 		    if (userResponse == null)
 				try {
@@ -520,7 +607,7 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 			while (iterator.hasNext()) {
 			    CisRecord potentiallyCreatableCis = iterator.next();
 		        if (userResponse.equals("Yes")) {
-				    
+				    finalisedCiss.add(potentiallyCreatableCis);
 			       // cisManager.createCis(linkedCss, potentiallyCreatableCis.getCisId());
 		        }
 		        else {
@@ -528,8 +615,9 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 		        }
 		   }
 		}
-		
+		return finalisedCiss;
 	}
+	
 	
 	public boolean isSituationSuggestiveOfTemporaryCISCreation() {
 		boolean tempCisPossibility = true;
@@ -542,11 +630,11 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
     	new AutomaticCommunityCreationManager(linkedCss, "CSS");
     }
     
-    public Identity getLinkedCss() {
+    public IIdentity getLinkedCss() {
     	return linkedCss;
     }
     
-    public void setLinkedCss(Identity linkedCss) {
+    public void setLinkedCss(IIdentity linkedCss) {
     	this.linkedCss = linkedCss;
     }
     
@@ -558,11 +646,11 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
     	this.linkedSuperCis = linkedSuperCis;
     }
     
-    public Identity getLinkedDomain() {
+    public IIdentity getLinkedDomain() {
     	return linkedDomain;
     }
     
-    public void setLinkedDomain(Identity linkedDomain) {
+    public void setLinkedDomain(IIdentity linkedDomain) {
     	this.linkedDomain = linkedDomain;
     }
     
@@ -595,6 +683,22 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
     
     public void setCisManager(ICisManager cisManager) {
     	this.cisManager = cisManager;
+    }
+    
+    public IUserFeedback getUserFeedback() {
+    	return userFeedback;
+    }
+    
+    public void setUserFeedback(IUserFeedback userFeedback) {
+    	this.userFeedback = userFeedback;
+    }
+    
+    public IUserFeedbackCallback getUserFeedbackCallback() {
+    	return userFeedbackCallback;
+    }
+    
+    public void setUserFeedbackCallback(IUserFeedbackCallback userFeedbackCallback) {
+    	this.userFeedbackCallback = userFeedbackCallback;
     }
     
   //public CommManagerBundle getCommManager() {

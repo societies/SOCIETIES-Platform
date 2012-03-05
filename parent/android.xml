@@ -52,13 +52,12 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
       <url>http://repo1.maven.org/maven2/</url>
     </pluginRepository>
 
-    <!-- Android tools 
-    <pluginRepository>
-      <id></id>
-      <name></name>
-      <url>http://</url>
-    </pluginRepository>
-      -->
+    <!-- Android tools -->
+	<pluginRepository>
+		<id>societies</id>
+		<name>Societies Maven Repository</name>
+		<url>http://maven.ict-societies.eu/nexus/content/repositories/thirdparty/</url>
+	</pluginRepository>
   </pluginRepositories>
 
 
@@ -205,24 +204,42 @@ Hints use your profile ~/.m2/settings.xml or set via the command line -Dandroid.
 		</executions>
 	</plugin>
 
-
+	    <!-- Preferable version of Maven Android plugin-->
 	    <plugin>
 		<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 		<artifactId>android-maven-plugin</artifactId>
-		<version>3.0.0</version><configuration>
+		<version>3.0.0</version>
+		<configuration>
 		    <sdk>
-		        <!-- platform or api level (api level 4 = platform 1.6)-->
 		        <platform>8</platform>
 			<path>${android.home}</path>
 		    </sdk>
 		    <emulator>
-		        <!-- the name of the avd device to use for starting the emulator -->
 		        <avd>Test22Device</avd>
 		    </emulator>
 		    <undeployBeforeDeploy>true</undeployBeforeDeploy>
 		</configuration>
 		<extensions>true</extensions>
 	    </plugin>
+
+	    <!-- Being used to allow the Android Communication gateway to build
+	    <plugin>
+
+		<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+		<artifactId>maven-android-plugin</artifactId>
+		<version>2.9.0-issue170</version>
+		<configuration>
+		    <sdk>
+		        <platform>8</platform>
+			<path>${android.home}</path>
+		    </sdk>
+		    <emulator>
+		        <avd>Test22Device</avd>
+		    </emulator>
+		    <undeployBeforeDeploy>true</undeployBeforeDeploy>
+		</configuration>
+		<extensions>true</extensions>
+	    </plugin>-->
       </plugins>
     </pluginManagement>
   </build>

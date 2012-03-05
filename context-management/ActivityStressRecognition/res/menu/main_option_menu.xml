@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- <item android:id="@+id/enter_personal_info"
+          android:icon="@android:drawable/ic_menu_search"
+          android:title="@string/enter_personal_info"/>
+     -->
+	<item android:id="@+id/set_preferences"
+          android:icon="@android:drawable/ic_menu_preferences"
+          android:title="@string/settings"/>
+</menu>

@@ -12,12 +12,12 @@ public class MathServiceUnitTest {
 	private MathService myMathService;
 	
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		myMathService = new MathService(1,1,"Test");
 	}
 
 	@After
-	public void tearDown() throws Exception {
+	public void tearDown()  {
 		myMathService = null;
 	}
 

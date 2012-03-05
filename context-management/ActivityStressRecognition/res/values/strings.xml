@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<resources>
+    <string name="hello">Testing android serial port...</string>
+    <string name="app_name">DLR Stress Recognition</string>
+    <string name="StartBtn_label">Start</string>
+    <string name="StopBtn_label">Stop</string>
+    <string name="ContinueBtn_label">Continue</string>
+    <string name="title_paired_devices">Connected Devices</string>
+    <string name="title_other_devices">Available Devices</string>
+    <string name="title_difficulties">Available Levels</string>
+    <string name="set_difficulties">choose difficulty for Stroop-Test</string>
+    <string name="button_scan">Scan</string>
+    <string name="scanning">Scanning</string>
+    <string name="select_device">Select device</string>
+    <string name="none_found">No device found</string>
+    <string name="none_paired">No device connected</string>
+    <string name="connect_bt_sensor">Connect BT Sensor</string>
+    <string name="disconnect_bt_sensor">Disconnect BT Sensor</string>
+    <string name="enter_personal_info">Enter Personal Info</string>
+    <string name="set_difficulty">Set Stroop-Test difficulty</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="name">Name</string>
+    <string name="age">Age</string>
+    <string name="gender">Gender</string>
+    <string name="pi_set">Personal Information set</string>
+    <string name="pi_not_set">Personal Information not set</string>
+    <string name="difficulty_set">Difficulty choosen:</string>
+    <string name="difficulty_not_set">No difficulty choosen</string>
+    <string name="no_highscore">No highscores so far</string>
+    <string name="settings">Settings</string>
+    <string name="get_classifier">Show used classifier</string>
+
+    <!-- ############################## Preferences ############################## -->
+    <string name="prefTimerKey">task_timer</string>
+    <string name="prefTimerTitle">Choose timer value</string>
+    <string name="prefTimerDesc">Choose the interval for a single task between 1 and 5 minutes </string>
+    <string name="prefTimerDialog">Timer</string>
+    
+    <string name="prefDifficultyKey">stroop_difficulty</string>
+    <string name="prefDifficultyTitle">Choose difficulty</string>
+    <string name="prefDifficultyDesc">Choose a difficulty for the Stroop test between 1 and 5</string>
+    <string name="prefDifficultyDialog">Difficulty</string>
+   
+    <string name="prefActivityTraceKey">activity_trace</string>
+    <string name="prefActivityTraceTitle">Choose activity trace</string>
+    <string name="prefActivityTraceDesc">Choose an activity trace for the physical or combined stress elicitation</string>
+    <string name="prefActivityTraceDialog">Activity Trace:</string>
+   
+    <string name="prefNameKey">pi_name</string>
+    <string name="prefNameTitle">Enter your name</string>
+    <string name="prefNameDesc">Please enter your name</string>
+    <string name="prefNameDialog">Name</string>
+    
+    <string name="prefAgeKey">pi_age</string>
+    <string name="prefAgeTitle">Enter your age</string>
+    <string name="prefAgeDesc">Please enter your age</string>
+    <string name="prefAgeDialog">Age</string>
+    
+    <string name="prefGenderKey">pi_gender</string>
+    <string name="prefGenderTitle">Enter your gender</string>
+    <string name="prefGenderDesc">Please enter your gender</string>
+    <string name="prefGenderDialog">Gender</string>
+      
+    <!-- ################################## Rules ################################# -->
+    <string name="rules_stroop">
+    ===== Mental Stress Logging ===== \n
+    The goal of the task is to correctly naming the color in which the word is written. With increasing
+    difficulty the task switches between naming the written word and the color the word is written in. \n
+    </string>
+    <string name="rules_activity">
+    ===== Activity Test Logging ===== \n
+    In this task a sequence of activities has to be executed. 10s after pressing the "Start" button the first 
+    activity starts and an acoustic signal is played. Whenever the activity changes an acoustic signal is given 
+    and the new activity to be executed is displayed on the screen. \n
+    </string>
+    <string name="rules_combined">===== Combined Stress Logging ===== \n</string> 
+    
+     <!-- ################################## Demonstrator ################################# -->
+     <string name="actBarLabelLying">Lying</string>
+     <string name="actBarLabelSitting">Sitting</string>
+     <string name="actBarLabelStanding">Standing</string>
+     <string name="actBarLabelWalking">Walking</string>
+     <string name="actBarLabelRunning">Running</string>
+     <string name="actBarLabelJumping">Jumping</string>
+     <string name="actBarLabelFalling">Falling</string>
+     <string name="actBarLabelUpdown">Up/Down</string>
+     <string name="bioHeartRate">Heart rate:</string>
+     <string name="bioRespRate">Breathing rate:</string>
+     <string name="bioMetric">BPM</string>
+     <string name="waiting">Waiting</string>
+     
+     <!-- ################################## Stress Demonstrator ################################# -->
+     <string name="stressBarLabelResting">Resting</string>
+     <string name="stressBarLabelOne">Stress 1</string>
+     <string name="stressBarLabelTwo">Stress 2</string>
+     <string name="stressBarLabelThree">Stress 3</string>
+     <string name="stressBarLabelFour">Stress 4</string>
+     <string name="stressBarLabelFive">Stress 5</string>
+     <string name="stress_level">Stress Level:</string>
+       
+</resources>

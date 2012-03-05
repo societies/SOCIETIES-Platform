@@ -24,16 +24,27 @@
  */
 package org.societies.css.devicemgmt.DeviceDriverExample.impl;
 
+import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.societies.api.internal.css.devicemgmt.IDeviceManager;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
+import org.societies.comm.xmpp.event.EventFactory;
+import org.societies.comm.xmpp.event.EventStream;
+import org.societies.comm.xmpp.event.InternalEvent;
 import org.societies.css.devicemgmt.DeviceDriverExample.ControllerWs;
+
 
 
 import org.springframework.osgi.context.BundleContextAware;
@@ -51,54 +62,50 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 	
 	private IDeviceManager deviceManager;
 	
-	private ActionImpl actionImpl;
-	
 	private String createNewDevice = "";
 	
 	private static Logger LOG = LoggerFactory.getLogger(DeviceDriverExample.class);
 
-	private final Map<String, ActionImpl> actionInstanceContainer;
+	private final List<String> deviceMacAddressList;
 	
+	private Long lightLevel = new Long (0);
+	
+	private LightSensor lightSensor;
+	
+	private EventStream myStream;
+	
+	private EventAdmin eventAdmin;
 	
 	public DeviceDriverExample() {
 		
-		actionInstanceContainer = new HashMap<String, ActionImpl>();
-
-		LOG.info("DeviceDriverExample: " + "=========++++++++++------ DeviceDriverExample constructor");
+		deviceMacAddressList =  new ArrayList<String>();
+		
 	}
+	
+	public void setEventAdmin(EventAdmin eventAdmin)
+	{
+		
+		LOG.info("DeviceDriverExample: " + "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% setEventAdmin injection");
+		this.eventAdmin = eventAdmin;
+		
+		LOG.info("DeviceDriverExample: " + "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% post setEventAdmin injection" + eventAdmin.toString());
+	}
+	
+	
 	
 	public void setDeviceManager (IDeviceManager deviceManager)
 	{
 		this.deviceManager = deviceManager;
 		
-		LOG.info("DeviceDriverExample: " + "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% IDeviceManager dependency injection");
+		//LOG.info("DeviceDriverExample: " + "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% IDeviceManager dependency injection");
 	}
 	
 	
 	/** (non-Javadoc)
 	 * @see org.springframework.osgi.context.BundleContextAware#setBundleContext(org.osgi.framework.BundleContext)
 	 */
-	public void setBundleContext(BundleContext arg0) {
-		// TODO Auto-generated method stub
-		bundleContext = arg0;
-	}
-	
-	
-	protected Map<String, ActionImpl> getActionInstanceContainer() 
-	{	
-		return actionInstanceContainer;
-	}
-	protected void setActionInstanceContainer(String actionName, ActionImpl actionInstance) 
-	{
-		this.actionInstanceContainer.put(actionName, actionInstance);
-	}
-
-	public void removeActionFromContainer (String actionName)
-	{
-		if (getActionInstanceContainer().get(actionName) != null)
-		{
-			getActionInstanceContainer().remove(actionName);
-		}
+	public void setBundleContext(BundleContext bc) {
+		bundleContext = bc;
 	}
 
 
@@ -123,28 +130,75 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 	/** (non-Javadoc)
 	 * @see org.societies.css.devicemgmt.DeviceDriverExample.ControllerWs#createNewDevice(java.lang.String)
 	 */
-	public String createNewDevice(String deviceMacAddress, DeviceCommonInfo deviceCommonInfo, String actionName) {
-		// TODO Auto-generated method stub
-		
-		LOG.info("DeviceDriverExample: " + "*********************************** createNewDevice : " + deviceMacAddress +" "+actionName);
-		
-		// check if the device already exists in the container
-		if (getActionInstanceContainer().get(actionName) == null)
-		{
-			createNewDevice =  deviceManager.fireNewDeviceConnected(deviceMacAddress, deviceCommonInfo);
-			
-			LOG.info("DeviceDriverExample: " + "*********************************** deviceManager.fireNewDeviceConnected");
-			
-			//create new instance of the DeviceImpl and expose the instance as the OSGi service by using IDevice interface
-			actionImpl = new ActionImpl(bundleContext, this, actionName);		
-				
-			//add device instance to the container
-			setActionInstanceContainer(actionName, actionImpl);
-			LOG.info("DeviceDriverExample: " + "*********************************** Hi, I'm a new IAction : " + actionName);
+	public String createNewDevice(String deviceMacAddress, DeviceCommonInfo deviceCommonInfo) 
+	{
 
-			return "The Action "+ actionName +" has been created";
+		if (!deviceMacAddressList.contains(deviceMacAddress))
+		{
+			
+			if (deviceCommonInfo.getDeviceType().equals("lightSensor")) 
+			{	
+				String [] serviceIds = {"lightSensor1"};
+				
+				createNewDevice =  deviceManager.fireNewDeviceConnected(deviceMacAddress, deviceCommonInfo, serviceIds);
+				deviceMacAddressList.add(deviceMacAddress);
+				
+				lightSensor = new LightSensor(bundleContext, this, "lightSensor1", deviceMacAddress);
+				
+				LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceDriverExample info: new light sensor device created with a MAC Address: " + deviceMacAddress);
+				return "Device created";
+			}
+			else
+			{
+				return "other device type to deal with";
+			}
 		}
-		return "The action "+ actionName + " already exists";
+		else
+		{
+			LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceDriverExample info: a device with mac address: " + deviceMacAddress + " already registred");
+			return "Device already existes";
+		}
+	}
+	
+	
+	public Long getLightLevel (String deviceMacAdress){
+		
+		LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceDriverExample info: getLightLevel " + lightLevel);
+		
+		return lightLevel;
+	}
+
+	
+	@Override
+	public void setLightLevel(String deviceMacAddress, Long lightLevel) {
+		
+		this.lightLevel = lightLevel;
+
+		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% sending event by eventAdmin");
+		Dictionary<String, Long> eventAdminDic = new Hashtable<String, Long>();
+		
+		eventAdminDic.put("lightLevel", lightLevel);
+
+		eventAdmin.sendEvent(new Event("LightSensorEvent", eventAdminDic));
+
+		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% event sent by eventAdmin");
+		
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% sending event by Alec's eventing mecanism");
+		myStream = EventFactory.getStream("lightLevel");
+
+		Map<String, Long> dic = new HashMap<String, Long>();
+		
+		dic.put("lightLevel", lightLevel);
+		
+		InternalEvent myEvent = new InternalEvent(this, dic);
+		
+		LOG.info("DeviceDriverExample info:  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% myEvent.toString()" + myEvent.toString());
+
+		myStream.multicastEvent(myEvent);
+		
+		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% event sent by Alec's eventing mecanism");
 		
 	}
 }

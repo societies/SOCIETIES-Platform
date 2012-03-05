@@ -28,10 +28,11 @@ package org.societies.api.comm.xmpp.interfaces;
 
 import java.util.List;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPNode;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 
 /**
  * @author Joao M. Goncalves (PTIN)
@@ -68,11 +69,9 @@ public interface ICommManager {
 
 	public void removeRootNode(XMPPNode node);
 	
-	public String getInfo(Identity entity, String node, ICommCallback callback) throws CommunicationException;
+	public String getInfo(IIdentity entity, String node, ICommCallback callback) throws CommunicationException;
 	
-	public String getItems(Identity entity, String node, ICommCallback callback) throws CommunicationException;
-	
-	public Identity getIdentity();
+	public String getItems(IIdentity entity, String node, ICommCallback callback) throws CommunicationException;
 	
 	public IIdentityManager getIdManager();
 

@@ -32,6 +32,7 @@ import java.util.concurrent.Future;
 
 import org.societies.api.context.CtxException;
 import org.societies.api.context.broker.ICtxBroker;
+import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -42,7 +43,7 @@ import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
 
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 
@@ -61,21 +62,21 @@ public class CtxBroker implements ICtxBroker {
 	}
 
 	@Override
-	public Future<CtxAssociation> createAssociation(Identity requester,
+	public Future<CtxAssociation> createAssociation(IIdentity requester,
 			String type) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Future<CtxAttribute> createAttribute(Identity requester,
+	public Future<CtxAttribute> createAttribute(IIdentity requester,
 			CtxEntityIdentifier scope, String type) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Future<CtxEntity> createEntity(Identity requester,
+	public Future<CtxEntity> createEntity(IIdentity requester,
 			String type) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
@@ -91,14 +92,14 @@ public class CtxBroker implements ICtxBroker {
 
 
 	@Override
-	public Future<CtxModelObject> remove(Identity requester,
+	public Future<CtxModelObject> remove(IIdentity requester,
 			CtxIdentifier identifier) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Future<CtxModelObject> retrieve(Identity requester,
+	public Future<CtxModelObject> retrieve(IIdentity requester,
 			CtxIdentifier identifier) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
@@ -106,14 +107,14 @@ public class CtxBroker implements ICtxBroker {
 
 	@Override
 	public Future<List<CtxAttribute>> retrieveFuture(
-			Identity requester, CtxAttributeIdentifier attrId, Date date) throws CtxException {
+			IIdentity requester, CtxAttributeIdentifier attrId, Date date) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Future<List<CtxAttribute>> retrieveFuture(
-			Identity requester, CtxAttributeIdentifier attrId,
+			IIdentity requester, CtxAttributeIdentifier attrId,
 			int modificationIndex) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
@@ -121,7 +122,7 @@ public class CtxBroker implements ICtxBroker {
 
 	@Override
 	public Future<List<CtxHistoryAttribute>> retrieveHistory(
-			Identity requester, CtxAttributeIdentifier attrId,
+			IIdentity requester, CtxAttributeIdentifier attrId,
 			int modificationIndex) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
@@ -129,7 +130,7 @@ public class CtxBroker implements ICtxBroker {
 
 	@Override
 	public Future<List<CtxHistoryAttribute>> retrieveHistory(
-			Identity requester, CtxAttributeIdentifier attrId,
+			IIdentity requester, CtxAttributeIdentifier attrId,
 			Date startDate, Date endDate) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
@@ -137,7 +138,7 @@ public class CtxBroker implements ICtxBroker {
 
 
 	@Override
-	public Future<CtxModelObject> update(Identity requester,
+	public Future<CtxModelObject> update(IIdentity requester,
 			CtxModelObject object) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
@@ -145,7 +146,7 @@ public class CtxBroker implements ICtxBroker {
 
 	@Override
 	public Future<CtxEntity> retrieveAdministratingCSS(
-			Identity requester, CtxEntityIdentifier communityEntId) throws CtxException {
+			IIdentity requester, CtxEntityIdentifier communityEntId) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -154,20 +155,20 @@ public class CtxBroker implements ICtxBroker {
 
 	@Override
 	public Future<List<CtxEntityIdentifier>> retrieveCommunityMembers(
-			Identity requester, CtxEntityIdentifier community) throws CtxException {
+			IIdentity requester, CtxEntityIdentifier community) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Future<List<CtxEntityIdentifier>> retrieveParentCommunities(
-			Identity requester, CtxEntityIdentifier community) throws CtxException {
+			IIdentity requester, CtxEntityIdentifier community) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Future<List<CtxIdentifier>> lookup(Identity requester,
+	public Future<List<CtxIdentifier>> lookup(IIdentity requester,
 			CtxModelType modelType, String type) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
@@ -175,7 +176,7 @@ public class CtxBroker implements ICtxBroker {
 
 	@Override
 	public Future<List<CtxEntityIdentifier>> lookupEntities(
-			Identity requester, String entityType, String attribType,
+			IIdentity requester, String entityType, String attribType,
 			Serializable minAttribValue, Serializable maxAttribValue)
 			throws CtxException {
 		// TODO Auto-generated method stub
@@ -183,36 +184,112 @@ public class CtxBroker implements ICtxBroker {
 	}
 
 	@Override
-	public void registerForUpdates(Identity requester,
+	public void registerForUpdates(IIdentity requester,
+			CtxAttributeIdentifier attrId) throws CtxException {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void unregisterForUpdates(IIdentity requester,
+			CtxAttributeIdentifier attrId) throws CtxException {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void registerForUpdates(IIdentity requester,
 			CtxEntityIdentifier scope, String attrType) throws CtxException {
 		// TODO Auto-generated method stub
 		
 	}
-
+	
 	@Override
-	public void registerForUpdates(Identity requester,
-			CtxAttributeIdentifier attrId) throws CtxException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void unregisterForUpdates(Identity requester,
-			CtxAttributeIdentifier attrId) throws CtxException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void unregisterForUpdates(Identity requester,
+	public void unregisterForUpdates(IIdentity requester,
 			CtxEntityIdentifier scope, String attributeType)
 			throws CtxException {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.identity.IIdentity, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
+	 */
+	@Override
+	public void registerForChanges(final IIdentity requester,
+			final CtxChangeEventListener listener, final CtxIdentifier ctxId)
+			throws CtxException {
+		
+		if (requester == null)
+			throw new NullPointerException("requester can't be null");
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (ctxId == null)
+			throw new NullPointerException("ctxId can't be null");
+		
+		// TODO Auto-generated method stub
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.api.context.broker.ICtxBroker#unregisterFromChanges(org.societies.api.identity.IIdentity, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
+	 */
+	@Override
+	public void unregisterFromChanges(final IIdentity requester,
+			final CtxChangeEventListener listener, final CtxIdentifier ctxId)
+			throws CtxException {
+		
+		if (requester == null)
+			throw new NullPointerException("requester can't be null");
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (ctxId == null)
+			throw new NullPointerException("ctxId can't be null");
+		
+		// TODO Auto-generated method stub
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.identity.IIdentity, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
+	 */
+	@Override
+	public void registerForChanges(final IIdentity requester,
+			final CtxChangeEventListener listener, final CtxEntityIdentifier scope,
+			final String attrType) throws CtxException {
+		
+		if (requester == null)
+			throw new NullPointerException("requester can't be null");
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (scope == null)
+			throw new NullPointerException("scope can't be null");
+		if (attrType == null)
+			throw new NullPointerException("attrType can't be null");
+		
+		// TODO Auto-generated method stub
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.api.context.broker.ICtxBroker#unregisterFromChanges(org.societies.api.identity.datatypes.IIdentity, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
+	 */
+	@Override
+	public void unregisterFromChanges(final IIdentity requester,
+			final CtxChangeEventListener listener, final CtxEntityIdentifier scope,
+			final String attrType) throws CtxException {
+		
+		if (requester == null)
+			throw new NullPointerException("requester can't be null");
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (scope == null)
+			throw new NullPointerException("scope can't be null");
+		if (attrType == null)
+			throw new NullPointerException("attrType can't be null");
+		
+		// TODO Auto-generated method stub
+	}
 
 	@Override
-	public Future<Set<CtxBond>> retrieveBonds(Identity requester,
+	public Future<Set<CtxBond>> retrieveBonds(IIdentity requester,
 			CtxEntityIdentifier community) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
@@ -220,11 +297,9 @@ public class CtxBroker implements ICtxBroker {
 
 	@Override
 	public Future<List<CtxEntityIdentifier>> retrieveSubCommunities(
-			Identity requester, CtxEntityIdentifier community)
+			IIdentity requester, CtxEntityIdentifier community)
 			throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
-		
-	
 }

@@ -32,14 +32,19 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.mockito.Mockito.*;
+
+
 import org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityLifecycleManagement;
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
+//import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxModelType;
 //import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.internal.cis.management.CisRecord;
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.comm.xmpp.datatypes.IdentityType;
+//import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.identity.IdentityType;
+//import org.societies.api.comm.xmpp.datatypes.IdentityType;
 
 /**
  * This is the test class for the Community Lifecycle Management component
@@ -57,20 +62,31 @@ public class CommunityLifecycleManagementTest {
 	//	CommunityLifecycleManagement.loop();
 	//}
 	
+	@Test  
+	  public void setUp() {  
+	          IIdentity linkedCss = mock(IIdentity.class); 
+	          //classUnderTest = new MathServiceConsumer(1,1);
+	          //classUnderTest.setLinkedCss(linkedCss);   
+	      }  
+
+	
 	@Test
 	public void testSetup() {
-		//communityLifecycleManagement = new CommunityLifecycleManagement(new Identity(IdentityType.CSS, "Test", "TestDomain"), "CSS");
+		IIdentity linkedCss = mock(IIdentity.class); 
+		CommunityLifecycleManagement communityLifecycleManagement = new CommunityLifecycleManagement(linkedCss, "CSS");
 		//communityLifecycleManagement = new CommunityLifecycleManagement(new Identity(IdentityType.CSS, "Test", "TestDomain"), "Domain");
 		//communityLifecycleManagement = new CommunityLifecycleManagement(new CisRecord(null, null, null, null, null, null, null, null));
 	}
 	
 	@Test
 	public void testProcessPreviousShortTimeCycle() {
+		IIdentity linkedCss = mock(IIdentity.class); 
 		//new CommunityLifecycleManagement(new Identity(IdentityType.CSS, "Test", "TestDomain").processPreviousShortTimeCycle();
 	}
 	
 	@Test
 	public void testProcessPreviousLongTimeCycle() {
+		IIdentity linkedCss = mock(IIdentity.class); 
 		//new CommunityLifecycleManagement(new Identity(), "Test").processPreviousLongTimeCycle();
 	}
 	

@@ -5,14 +5,29 @@
   <groupId>org.societies.css.devicemgmt</groupId>
   <artifactId>devicemanager</artifactId>
   <packaging>bundle</packaging>
-  <name>Spring OSGi Bundle</name>
+  <name>Device management bundle</name>
   <version>0.0.1-SNAPSHOT</version>
+  
+  <developers>
+		<developer>
+			<name>Rafik Said Mansour</name>
+			<email>rafik.saidmansour@trialog.com</email>
+			<organization>Trialog</organization>
+			<timezone>+1</timezone>
+			<roles>
+				<role>Owner</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+	</developers>
+  
   <parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
+		<relativePath>../../parent/spring-osgi.xml</relativePath>
 		<version>0.1</version>
 	</parent>
-
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -54,6 +69,11 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+        	<groupId>commons-collections</groupId>
+        	<artifactId>commons-collections</artifactId>
+        	<version>3.0</version>
+      	</dependency>
 	</dependencies>
 	
 	<build>
@@ -67,19 +87,17 @@
             			<Bundle-SymbolicName>${pom.groupId}.${pom.artifactId}</Bundle-SymbolicName>
               			<Bundle-Name>${pom.artifactId}</Bundle-Name>
               			<Bundle-Version>${pom.version}</Bundle-Version>
+              			<Embed-Dependency>
+							commons-collections;scope=compile|runtime,
+							</Embed-Dependency>
+						<Embed-Transitive>false</Embed-Transitive>
               			<Import-Package>
-              				org.springframework.beans.factory.xml,
-              				org.springframework.aop, org.springframework.aop.framework,
-              				org.aopalliance.aop, org.xml.sax, org.osgi.framework,
-              				org.springframework.osgi.service.importer.support,
-              				org.springframework.beans.propertyeditors,
-              				org.springframework.osgi.service.exporter.support,
+              				org.osgi.framework,
               				org.springframework.osgi.context,
-              				org.springframework.osgi.service.exporter,
               				org.slf4j.*,
               				org.societies.api.css.devicemgmt,
               				org.societies.api.internal.css.devicemgmt,
-              				org.societies.api.internal.css.devicemgmt.model
+              				org.societies.api.internal.css.devicemgmt.model,
               			</Import-Package> 
               			
           </instructions>

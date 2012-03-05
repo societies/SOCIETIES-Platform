@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+		<RelativeLayout android:id="@+id/stroop_test"
+			android:layout_width="fill_parent" android:layout_height="wrap_content"
+			xmlns:android="http://schemas.android.com/apk/res/android">
+			<TextView android:layout_width="wrap_content"
+				android:background="@drawable/box" android:id="@+id/answer3"
+				android:layout_height="wrap_content" android:layout_alignBaseline="@+id/answer1"
+				android:layout_alignBottom="@+id/answer1"
+				android:layout_alignParentRight="true" android:layout_marginRight="42dp" android:textStyle="bold" android:clickable="true" android:gravity="center"></TextView>
+			<TextView android:layout_width="wrap_content"
+				android:background="@drawable/box" android:id="@+id/answer2"
+				android:layout_height="wrap_content" android:layout_alignBaseline="@+id/answer4"
+				android:layout_alignBottom="@+id/answer4" android:layout_alignLeft="@+id/answer3" android:textStyle="bold" android:clickable="true" android:gravity="center"></TextView>
+			<ProgressBar android:id="@+id/progressBar" android:layout_height="wrap_content" android:layout_width="wrap_content" style="?android:attr/progressBarStyleHorizontal" android:layout_below="@+id/question" android:layout_marginTop="28dp" android:layout_alignParentLeft="true" android:layout_alignParentRight="true"></ProgressBar>
+			<TextView android:layout_height="wrap_content" android:text="TextView" android:layout_width="wrap_content" android:id="@+id/Timer" android:layout_below="@+id/progressBar" android:layout_centerHorizontal="true" android:layout_marginTop="22dp"></TextView>
+			<TextView android:textStyle="bold" android:layout_height="wrap_content" android:background="@drawable/box" android:clickable="true" android:gravity="center" android:layout_width="wrap_content" android:id="@+id/answer1" android:layout_below="@+id/answer4" android:layout_toLeftOf="@+id/Timer" android:layout_marginTop="27dp"></TextView>
+			<TextView android:textStyle="bold" android:layout_height="wrap_content" android:background="@drawable/box" android:clickable="true" android:gravity="center" android:layout_width="wrap_content" android:id="@+id/answer4" android:layout_below="@+id/Timer" android:layout_toLeftOf="@+id/Timer" android:layout_marginTop="22dp"></TextView>
+			<TextView android:layout_height="wrap_content" android:text="TextView" android:layout_width="wrap_content" android:id="@+id/AnswerType" android:layout_alignParentTop="true" android:layout_alignParentLeft="true"></TextView>
+			<TextView android:textStyle="bold" android:layout_height="wrap_content" android:background="@drawable/box_answer" android:gravity="center" android:layout_width="wrap_content" android:id="@+id/question" android:layout_below="@+id/AnswerType" android:layout_centerHorizontal="true"></TextView>
+		</RelativeLayout>
+		<RelativeLayout android:id="@+id/activity_test"
+			android:layout_width="fill_parent" android:layout_height="wrap_content"
+			xmlns:android="http://schemas.android.com/apk/res/android" android:layout_weight="1.75">
+			<Button android:id="@+id/btnStart" android:text="@string/StartBtn_label" android:layout_height="wrap_content" android:layout_width="100dip" android:layout_alignParentBottom="true" android:layout_toLeftOf="@+id/Timer"></Button>
+			<TextView android:textSize="20dip" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/textViewStatus" android:layout_above="@+id/btnStop" android:layout_centerHorizontal="true" android:layout_marginBottom="17dp"></TextView>
+			<Button android:id="@+id/btnStop" android:text="@string/StopBtn_label" android:layout_height="wrap_content" android:layout_width="100dip" android:layout_alignParentBottom="true" android:layout_alignParentRight="true"></Button>
+		</RelativeLayout>
+</LinearLayout>

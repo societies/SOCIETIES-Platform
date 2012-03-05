@@ -19,6 +19,87 @@
  */
 package org.societies.personalisation.UserPreferenceManagement.test;
 
-public class UserPreferenceManagementTest {
+import java.net.URI;
+import java.net.URISyntaxException;
 
+import junit.framework.TestCase;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.personalisation.model.Action;
+import org.societies.api.personalisation.model.IAction;
+import org.societies.api.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor;
+import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+
+public class UserPreferenceManagementTest  {
+
+	UserPreferenceConditionMonitor pcm ;
+	IInternalPersonalisationManager persoMgr ;
+	ICtxBroker broker = new MockContextBroker();
+	private IIdentity mockId;
+	@Before
+	public void Setup(){
+		pcm = new UserPreferenceConditionMonitor();
+		persoMgr = new MockPersoMgr();
+		pcm.initialisePreferenceManagement(broker, persoMgr);
+		mockId = new MyIdentity(IdentityType.CSS, "myId", "domain");
+	}
+
+	
+	@Test
+	public void TestgetOutcomeWithCtxEvent() {
+		
+		CtxEntityIdentifier ctxEntityId = new CtxEntityIdentifier(mockId, "Person", new Long(1));
+		CtxAttributeIdentifier ctxAttrId = new CtxAttributeIdentifier(ctxEntityId, "location", new Long(1));
+		CtxAttribute attr = new CtxAttribute(ctxAttrId);
+		
+		attr.setStringValue("home");
+		Callback callback = new Callback();
+		pcm.getOutcome(mockId, attr, callback);
+		
+		
+		if (callback.getReturnedOutcome()==null){
+			TestCase.fail("Test Failed: getOutcome(Identity arg0, CtxAttribute arg1, IPersonalisationInternalCallback arg2)");
+		}else{
+			System.out.println("Successful test: getOutcome(Identity arg0, CtxAttribute arg1, IPersonalisationInternalCallback arg2)");
+		}
+		
+		
+	}
+
+	@Test
+	public void TestgetOutcomeWithActionEvent() {
+		
+		try {
+			IAction action = new Action("volume","10");
+			action.setServiceID(new ServiceResourceIdentifier(new URI("css://mycss.com/"), "MediaPlayer"));
+			action.setServiceType("media");
+			
+			Callback callback = new Callback();
+			
+			
+			pcm.getOutcome(mockId, action, callback);
+			
+			if (callback.getReturnedOutcome()==null){
+				TestCase.fail("Test Failed: getOutcome(Identity arg0, IAction arg1, IPersonalisationInternalCallback arg2)");
+			}else{
+				System.out.println("Successful test: getOutcome(Identity arg0, IAction arg1, IPersonalisationInternalCallback arg2)");
+			}
+			
+		} catch (URISyntaxException e) {
+			TestCase.fail("Test Failed: getOutcome(Identity arg0, IAction arg1, IPersonalisationInternalCallback arg2)");
+			e.printStackTrace();
+		}
+		
+		
+	}
+
+	
 }

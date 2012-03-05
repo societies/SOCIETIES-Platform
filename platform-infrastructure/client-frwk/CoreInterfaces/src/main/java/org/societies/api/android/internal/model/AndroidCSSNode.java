@@ -25,7 +25,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.api.android.internal.model;
 
-import org.societies.api.internal.css.management.CSSNode;
+
+
+import org.societies.api.schema.cssmanagement.CssNode;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -36,23 +38,13 @@ import android.os.Parcelable;
  * Android IPC.
  *
  */
-public class AndroidCSSNode extends CSSNode implements Parcelable {
+public class AndroidCSSNode extends CssNode implements Parcelable {
 	
 	/**
 	 * Default Constructor
 	 */
 	public AndroidCSSNode() {
 		super();
-	}
-	/**
-	 * Alternative constructor
-	 * 
-	 * @param identity
-	 * @param status
-	 * @param nodeType
-	 */
-	public AndroidCSSNode(String identity, int status, int nodeType) {
-		super(identity, status, nodeType);
 	}
 
 
