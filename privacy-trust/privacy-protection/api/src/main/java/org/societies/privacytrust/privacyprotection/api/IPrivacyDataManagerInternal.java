@@ -24,8 +24,8 @@
  */
 package org.societies.privacytrust.privacyprotection.api;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.identity.IIdentity;
 
 /**
  * Internal interface to manage data access control and data access conditions.
@@ -43,6 +43,6 @@ public interface IPrivacyDataManagerInternal {
 	 * @param ownerId
 	 * @param requestorId
 	 */
-	public void updatePermissions(CtxIdentifier dataId, String agreementId, Identity ownerId, Identity requestorId);
+	public void updatePermissions(CtxIdentifier dataId, String agreementId, IIdentity ownerId, IIdentity requestorId);
 
 }
