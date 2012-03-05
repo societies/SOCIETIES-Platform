@@ -25,9 +25,10 @@
 
 package org.societies.slm.servicemanagement.schema;
 
-import org.societies.slm.servicemanagment.schema.model.ServiceResourceIdentifier;
 import java.io.File;
 import java.util.List;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
 /**
  * @author aleckey
  *
