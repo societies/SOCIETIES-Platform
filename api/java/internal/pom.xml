@@ -33,6 +33,11 @@
 	<dependencies>
 		<!-- add your dependencies here -->
 		<dependency>
+			<groupId>org.societies.api.schema.internal</groupId>
+			<artifactId>societies-api-schema-internal</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
