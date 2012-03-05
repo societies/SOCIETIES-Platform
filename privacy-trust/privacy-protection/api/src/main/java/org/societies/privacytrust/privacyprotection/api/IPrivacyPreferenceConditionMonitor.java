@@ -24,8 +24,8 @@
  */
 package org.societies.privacytrust.privacyprotection.api;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.identity.IIdentity;
 
 /**
  * @author Eliza
@@ -37,8 +37,8 @@ public interface IPrivacyPreferenceConditionMonitor {
 	/**
 	 * 
 	 * @param contextId
-	 * @param userIdentity
+	 * @param userIIdentity
 	 */
-	public void contextEventReceived(CtxAttributeIdentifier contextId, Identity userIdentity);
+	public void contextEventReceived(CtxAttributeIdentifier contextId, IIdentity userIIdentity);
 
 }

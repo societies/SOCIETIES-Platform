@@ -9,7 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
-import org.societies.api.schema.cssmanagement.CssProfile;
+import org.societies.api.schema.cssmanagement.CssRecord;
 
 public class TestCSSManager {
 	public static final String TEST_IDENTITY_1 = "node11";
@@ -45,7 +45,7 @@ public class TestCSSManager {
 
 	@Test
 	public void testXMPPRegistration() {
-		CssProfile profile = new CssProfile();
+		CssRecord profile = new CssRecord();
 		
 		profile.setCssIdentity(TEST_IDENTITY);
 		profile.setEmailID(TEST_EMAIL);

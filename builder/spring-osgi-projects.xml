@@ -46,8 +46,9 @@
 		<module>../utilities/DBC</module>
 
 		<!-- API -->
-		<module>../api/java/schema</module>
+		<module>../api/schema/external</module>
 		<module>../api/java/external</module>
+		<module>../api/schema/internal</module>
 		<module>../api/java/internal</module>
 
 		<!-- Context -->
@@ -126,7 +127,7 @@
 		</module>
 		<!-- Context Management -->
 		<!-- Privacy Mgmt -->
-		<module>../privacy-trust/privacy-protection</module>
+		<!--module>../privacy-trust/privacy-protection</module-->
 
 	</modules>
 </project>
