@@ -22,24 +22,21 @@ package org.societies.personalisation.UserPreferenceManagement.test;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import junit.framework.TestCase;
+
 import org.junit.Before;
 import org.junit.Test;
-
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
+import org.societies.api.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor;
-
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
-import org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor;
-
-import junit.framework.TestCase;
 
 public class UserPreferenceManagementTest  {
 
@@ -82,7 +79,7 @@ public class UserPreferenceManagementTest  {
 		
 		try {
 			IAction action = new Action("volume","10");
-			action.setServiceID(new ServiceResourceIdentifier(new URI("css://mycss.com/MediaPlayer")));
+			action.setServiceID(new ServiceResourceIdentifier(new URI("css://mycss.com/"), "MediaPlayer"));
 			action.setServiceType("media");
 			
 			Callback callback = new Callback();
