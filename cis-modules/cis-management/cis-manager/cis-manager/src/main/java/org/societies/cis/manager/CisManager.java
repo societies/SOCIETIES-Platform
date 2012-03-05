@@ -29,24 +29,70 @@ package org.societies.cis.manager;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.cis.management.CisActivityFeed;
 import org.societies.api.internal.cis.management.CisRecord;
 import org.societies.api.internal.cis.management.ICisManager;
+import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.cis.manager.CisEditor;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import org.societies.identity.IdentityImpl;
 
 // this is the class which manages all the CIS from a CSS
 // for the class responsible for editing and managing each CIS instance, consult the CISEditor
 
+/**
+ * @author Thomas Vilarinho (Sintef)
+*/
 
 public class CisManager implements ICisManager {
 
 	public Set<CisEditor> CISs; 
-	
+	private ICISCommunicationMgrFactory ccmFactory;
+	private IIdentity cisManagerId;
+	private ICommManager CSSendpoint;
+	private ICommManager CISendpoint;
 
-	public CisManager() {
+	private static Logger LOG = LoggerFactory
+			.getLogger(CisManager.class);
+
+	@Autowired
+	public CisManager(ICISCommunicationMgrFactory ccmFactory,ICommManager CSSendpoint) {
+		this.ccmFactory = ccmFactory;
+		this.CSSendpoint = CSSendpoint;
+		this.ccmFactory = ccmFactory;
+		String host= "thomas.local";
+		String subDomain= "CISCommManager";
+		String secretKey= "password.thomas.local";
+		
+		LOG.info("factory bundled");
+		
+		cisManagerId = new IdentityImpl(IdentityType.CIS, subDomain, host); 
+		
+		CISendpoint = ccmFactory.getNewCommManager(cisManagerId, secretKey);
+		
+		LOG.info("endpoint created");
+		
+		
+		
+		
+		
 		CISs = new HashSet<CisEditor>();
 	}
 
+	/**
+	 * @deprecated  Replaced by constructor which inherits the ComManager Factory and the IcommManager of the CSS
+	 */
+	
+	@Deprecated
+	public CisManager() {
+		CISs = new HashSet<CisEditor>();
+	}
 	
 	// TODO: review this constructor in the future
 	@Override
