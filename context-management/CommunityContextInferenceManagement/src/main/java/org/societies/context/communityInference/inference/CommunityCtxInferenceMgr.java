@@ -22,54 +22,57 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.api.community.db;
+package org.societies.context.communityInference.inference;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
-import org.societies.api.context.model.CtxBond;
-import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.context.api.community.inference.ICommunityCtxInferenceMgr;
 
-/**
- * @author nlia
- * @created 12-Nov-2011 7:15:14 PM
- */
-public interface ICommunityCtxDBMgrCallback {
+public class CommunityCtxInferenceMgr implements ICommunityCtxInferenceMgr{
 
-	/**
-	 * The callback of ICommunityCtxDBMgr method 
-	 * retrieveBonds(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback)
-	 * 
-	 * @param bond
-	 * @param community
-	 * @since 0.0.1
-	 */
-	public void bondsRetrieved(CtxBond bond, CtxEntityIdentifier community);
+	@Override
+	public Double evaluateSimilarity(CtxAttributeIdentifier arg0,
+			CtxAttributeIdentifier arg1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-	/**
-	 * The callback of ICommunityCtxDBMgr method 
-	 * retrieveChildCommunities(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback)
-	 * 
-	 * @param community
-	 * @since 0.0.1
-	 */
-	public void childCommunitiesRetrieved(List<CtxEntityIdentifier> community);
+	@Override
+	public Map<CtxAttributeIdentifier, Double> evaluateSimilarity(
+			List<CtxAttributeIdentifier> arg0, List<CtxAttributeIdentifier> arg1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-	/**
-	 * The callback of ICommunityCtxDBMgr method
-	 * retrieveCommunityMembers(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback)
-	 * 
-	 * @param community
-	 * @since 0.0.1
-	 */
-	public void communityMembersRetrieved(List<CtxEntityIdentifier> community);
+	@Override
+	public void inheritContext(CtxAttributeIdentifier arg0,
+			CtxAttributeValueType arg1, EntityIdentifier arg2) {
+		// TODO Auto-generated method stub
+		
+	}
 
-	/**
-	 * The callback of ICommunityCtxDBMgr method
-	 * retrieveParentCommunities(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback)
-	 * 
-	 * @param community
-	 * @since 0.0.1
-	 */
-	public void parentCommunitiesRetrieved(List<CtxEntityIdentifier> community);
+	@Override
+	public CtxAttribute predictContext(CtxAttributeIdentifier arg0, Date arg1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CtxAttribute predictContext(CtxAttributeIdentifier arg0, int arg1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void refineContext(CtxAttributeIdentifier arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
