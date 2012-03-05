@@ -27,41 +27,27 @@ package org.societies.api.internal.security.policynegotiator;
 
 /**
  * Interface for invoking the provider.
- * To be used by Security Group Comms Manager locally (on same node) in server mode.
+ * To be used by generic secure policy negotiator on the requester side.
  * 
  * @author Mitja Vardjan
  *
  */
-public interface INegotiationProvider {
+public interface INegotiationProviderRemote {
 
 	/**
-	 * Get all available options for the policy.
-	 * 
-	 * @param callback The callback to be invoked to return the result.
-	 * 
-	 * @return All available options embedded in a single XML document.
+	 * See {@link INegotiationProvider#getPolicyOptions(INegotiationProviderCallback)}
 	 */
 	public void getPolicyOptions(INegotiationProviderCallback callback);
 
 	/**
-	 * Accept given policy option and get the final legal agreement signed by
-	 * both parties.
-	 * 
-	 * @param sessionId ID of this session
-	 * 
-	 * @param signedPolicyOption The selected policy alternative, accepted and
-	 * signed by the requester side. Includes requester identity and signature.
-	 * 
-	 * @param modified True if policy option has been changed during the
-	 * negotiation process. False if policy is as provided by the provider side.
+	 * See {@link INegotiationProvider#acceptPolicyAndGetSla(int, String,
+	 * boolean, INegotiationProviderCallback)}
 	 */
 	public void acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
 			boolean modified, INegotiationProviderCallback callback);
 	
 	/**
-	 * Reject all options and terminate negotiation.
-	 * 
-	 * @param sessionId ID of this session
+	 * See {@link INegotiationProvider#reject(int)}
 	 */
 	public void reject(int sessionId);
 }
