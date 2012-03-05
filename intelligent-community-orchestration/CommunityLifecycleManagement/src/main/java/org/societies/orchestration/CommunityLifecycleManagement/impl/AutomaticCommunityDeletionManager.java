@@ -25,6 +25,8 @@
 
 package org.societies.orchestration.CommunityLifecycleManagement.impl;
 
+import static org.mockito.Mockito.*;
+
 import org.societies.api.internal.css.directory.ICssDirectory;
 
 import org.societies.api.internal.css.discovery.ICssDiscovery;
@@ -51,8 +53,8 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
-//import org.societies.api.mock.Identity;
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
+//import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
 
@@ -91,12 +93,12 @@ import org.societies.api.internal.useragent.model.ExpProposalContent;
 public class AutomaticCommunityDeletionManager //implements ICommCallback
 {
 
-	private Identity linkedCss; // No datatype yet defined for CSS
+	private IIdentity linkedCss;
 	
     private CisRecord linkedCis;
     
     //private Domain linkedDomain;  // No datatype yet representing a domain
-	private Identity linkedDomain;
+	//private IIdentity linkedDomain;
 	
 	private int longestTimeWithoutActivity; //measured in minutes
 	
@@ -124,11 +126,11 @@ public class AutomaticCommunityDeletionManager //implements ICommCallback
 	 *              that this object will operate on behalf of.
 	 */
 	
-	public AutomaticCommunityDeletionManager(Identity linkedEntity, String linkType) {
+	public AutomaticCommunityDeletionManager(IIdentity linkedEntity, String linkType) {
 		if (linkType.equals("CSS"))
 			this.linkedCss = linkedEntity;
-		else
-			this.linkedDomain = linkedEntity;
+		//else
+		//	this.linkedDomain = linkedEntity;
 	}
 	
 	/*
@@ -154,32 +156,65 @@ public class AutomaticCommunityDeletionManager //implements ICommCallback
 	 */
 	
 	public void identifyCissToDelete() {
+		
+		String[] it = new String[1];
+		linkedCss = mock(IIdentity.class);
+		cisManager = mock(ICisManager.class);
+		it[0] = linkedCss.getIdentifier();
+		CisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new CisRecord(null, null, null, null, null, it, null, null, null));
+		ArrayList<CisRecord> userJoinedCiss = new ArrayList<CisRecord>();
+		
+		
 		CisRecord[] records;
-		if (linkedCss != null) {
+		if (linkedCss != null && listOfUserJoinedCiss != null) {
+			for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
+			    userJoinedCiss.add(listOfUserJoinedCiss[i]);   
+			}
 			//records = cisManager.getCisList(new CisRecord(null, linkedCss.toString(), null, null, null, null, null, null)/** CISs administrated by the CSS */);
 		}
 		if (linkedCis != null) {
-			//CisRecord james = new CisRecord();
-			records = new CisRecord[1];
-			records[0] = linkedCis;
-			//CisRecord[] records = ICisManager.getCisList(/** This CIS */new CisRecord());
+			userJoinedCiss.add(linkedCis);
 		}
-		if (linkedDomain != null) {
+		//if (linkedDomain != null) {
 			//records = cisManager.getCisList(new CisRecord(null, linkedDomain.toString(), null, null, null, null, null, null));
 			//CisRecord[] records = ICisManager.getCisList(/** CISs in the domain */);
-		}
+		//}
 		
-		//process
-		
-		CisRecord record;
 		ArrayList<CisRecord> cissToDelete = new ArrayList<CisRecord>();
 		
-		// VERY SIMPLISTIC v0.1 ALGORITHM
-		//if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - 1 hour) {
+		for (int i = 0; i < userJoinedCiss.size(); i++) {
+			CisRecord thisCis = userJoinedCiss.get(i);
+			String deadFeed = null;
+			//deadFeed = (thisCis.feed.getActivities(it[0], "between now and 2 hours ago"));
+		    if (deadFeed == null) {
 		//    if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - (longestTimeWithoutActivity/1440)) {
-		//        if (theCisRecord.getActivityFeed().search("CommunityLifecycleManagement metadata: temporary short-term)) {
-	    //            cissToDelete.add(theCisRecord);
-		//        }
+		        deadFeed = null;
+		        //deadFeed = thisCis.feed.getActivities(it[0], "CommunityLifecycleManagement metadata: temporary short-term", "forever")
+			    if (deadFeed == null) {
+	                cissToDelete.add(thisCis);
+		        }
+			    //could also check changed location on location-defined CIS and other things
+		    }
+		    
+		  //deadFeed = (thisCis.feed.getActivities(it[0], "between now and 2 weeks ago"));
+		    if (deadFeed == null) {
+		//    if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - (longestTimeWithoutActivity/1440)) {
+		        deadFeed = null;
+		        //deadFeed = thisCis.feed.getActivities(it[0], "CommunityLifecycleManagement metadata: temporary medium-term", "forever")
+			    if (deadFeed == null) {
+	                cissToDelete.add(thisCis);
+		        }
+		    }
+		    
+		  //deadFeed = (thisCis.feed.getActivities(it[0], "between now and 6 months ago"));
+		    if (deadFeed == null) {
+		//    if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - (longestTimeWithoutActivity/1440)) {
+		        deadFeed = null;
+		        //deadFeed = thisCis.feed.getActivities(it[0], "CommunityLifecycleManagement metadata: temporary long-term", "forever")
+			    if (deadFeed == null) {
+	                cissToDelete.add(thisCis);
+		        }
+		    }
 		//if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - 1 week) {
 				//    if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - (longestTimeWithoutActivity/1440)) {
 				//        if (theCisRecord.getActivityFeed().search("CommunityLifecycleManagement metadata: temporary medium-term)) {
@@ -205,14 +240,21 @@ public class AutomaticCommunityDeletionManager //implements ICommCallback
 		
 		//    }
 		//}
-		//invoke UserAgent suggestion GUI for deletions
-				//OR
-				//automatically call CIS management functions to delete CISs
-
-		//    
+		}
+		
+		//Can't use GUI in tests
+        //cissToDelete = getUserFeedbackOnDeletion(cissToDelete);
+		
+		for (int i = 0; i < cissToDelete.size(); i++)
+			cisManager.deleteCis(linkedCss.getIdentifier(), cissToDelete.get(i).getCisId());
 		
 		
 		
+		
+	}
+	
+	public ArrayList<CisRecord> getUserFeedbackOnDeletion(ArrayList<CisRecord> cissToDelete) {
+		ArrayList<CisRecord> realCissToDelete = new ArrayList<CisRecord>();
 		List<String> options = new ArrayList<String>();
 		options.add("options");
 		userResponse = null;
@@ -239,7 +281,7 @@ public class AutomaticCommunityDeletionManager //implements ICommCallback
 			while (iterator.hasNext()) {
 			    CisRecord potentiallyDeletableCis = iterator.next();
 		        if (userResponse.equals("Yes")) {
-				    
+				    realCissToDelete.add(potentiallyDeletableCis);
 			       // cisManager.deleteCis(linkedCss, potentiallyDeletableCis.getCisId());
 		        }
 		        else {
@@ -250,6 +292,7 @@ public class AutomaticCommunityDeletionManager //implements ICommCallback
 		        }
 		   }
 		}
+		return realCissToDelete;
 	}
 	
     public void initialiseAutomaticCommunityDeletionManager() {
@@ -258,11 +301,11 @@ public class AutomaticCommunityDeletionManager //implements ICommCallback
     	new AutomaticCommunityDeletionManager(linkedCss, "CSS");
     }
 
-    public Identity getLinkedCss() {
+    public IIdentity getLinkedCss() {
     	return linkedCss;
     }
     
-    public void setLinkedCss(Identity linkedCss) {
+    public void setLinkedCss(IIdentity linkedCss) {
     	this.linkedCss = linkedCss;
     }
     
@@ -274,13 +317,13 @@ public class AutomaticCommunityDeletionManager //implements ICommCallback
     	this.linkedCis = linkedCis;
     }
     
-    public Identity getLinkedDomain() {
+   /** public IIdentity getLinkedDomain() {
     	return linkedDomain;
     }
     
-    public void setLinkedDomain(Identity linkedDomain) {
+    public void setLinkedDomain(IIdentity linkedDomain) {
     	this.linkedDomain = linkedDomain;
-    }
+    }*/
     
     /**
     public void setUserContextDatabaseManager(IUserCtxDBMgr userContextDatabaseManager) {

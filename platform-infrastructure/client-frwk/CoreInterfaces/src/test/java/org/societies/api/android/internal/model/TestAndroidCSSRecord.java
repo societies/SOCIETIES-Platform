@@ -8,8 +8,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.internal.css.management.CSSManagerEnums;
-import org.societies.api.schema.cssmanagement.CssNode;
-import org.societies.api.schema.cssmanagement.CssProfile;
 
 public class TestAndroidCSSRecord {
 
@@ -29,28 +27,28 @@ public class TestAndroidCSSRecord {
 	public static final String TEST_PASSWORD = "P455W0RD";
 	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
 
-	private CssNode cssNode_1, cssNode_2;
-	private ArrayList<CssNode> cssNodes;
-	private ArrayList<CssNode> cssArchivedNodes;
+	private AndroidCSSNode cssNode_1, cssNode_2;
+	private ArrayList<AndroidCSSNode> cssNodes;
+	private ArrayList<AndroidCSSNode> cssArchivedNodes;
 	
 	
 	@Before
 	public void setUp() throws Exception {
-		cssNode_1 = new CssNode();
+		cssNode_1 = new AndroidCSSNode();
 		cssNode_1.setIdentity(TEST_IDENTITY_1);
 		cssNode_1.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
 		cssNode_1.setType(CSSManagerEnums.nodeType.Rich.ordinal());
 
-		cssNode_2 = new CssNode();
+		cssNode_2 = new AndroidCSSNode();
 		cssNode_2.setIdentity(TEST_IDENTITY_2);
 		cssNode_2.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
 		cssNode_2.setType(CSSManagerEnums.nodeType.Android.ordinal());
 		
-		cssNodes = new ArrayList<CssNode>();
+		cssNodes = new ArrayList<AndroidCSSNode>();
 		cssNodes.add(cssNode_1);
 		cssNodes.add(cssNode_2);
 		
-		cssArchivedNodes = new ArrayList<CssNode>();
+		cssArchivedNodes = new ArrayList<AndroidCSSNode>();
 		cssArchivedNodes.add(cssNode_1);
 		cssArchivedNodes.add(cssNode_2);
 	}
@@ -65,8 +63,11 @@ public class TestAndroidCSSRecord {
 
 	@Test
 	public void testConstructor() {
-		CssProfile cssProfile = new CssProfile();
-		
+		AndroidCSSRecord cssProfile = new AndroidCSSRecord();
+		cssProfile.getCssNodes().add(cssNode_1);
+		cssProfile.getCssNodes().add(cssNode_2);
+		cssProfile.getArchiveCSSNodes().add(cssNode_1);
+		cssProfile.getArchiveCSSNodes().add(cssNode_2);
 		cssProfile.setCssIdentity(TEST_IDENTITY);
 		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
 		cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
@@ -85,10 +86,10 @@ public class TestAndroidCSSRecord {
 		cssProfile.setSocialURI(TEST_SOCIAL_URI);
 		
 		
-//		assertEquals(cssArchivedNodes.size(), cssProfile.getArchiveCSSNodes().size());
+		assertEquals(cssArchivedNodes.size(), cssProfile.getArchiveCSSNodes().size());
 		assertEquals(TEST_IDENTITY, cssProfile.getCssIdentity());
 		assertEquals(TEST_INACTIVE_DATE, cssProfile.getCssInactivation());
-//		assertEquals(cssNodes.size(), cssProfile.getCssNodes().size());
+		assertEquals(cssNodes.size(), cssProfile.getCssNodes().size());
 		assertEquals(TEST_REGISTERED_DATE, cssProfile.getCssRegistration());
 		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), cssProfile.getStatus());
 		assertEquals(TEST_UPTIME, cssProfile.getCssUpTime());

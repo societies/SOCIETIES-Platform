@@ -22,70 +22,14 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
-
-import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Subject;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
-
-
+package org.societies.api.servicelifecycle.model;
 
 /**
- * This class is used to define that a CSS IIdentity should be used in a specific transaction if the preceding IPrivacyPreferenceConditions are true. 
- * The format of the IIdentity will be defined by the IIdentity Management component
- * @author Elizabeth
- *
+ * @author Antonio Panazzolo, Massimo Mazzariol (SN)
  */
-public class IdentitySelectionPreferenceOutcome implements IPrivacyOutcome{
 
-	private int confidenceLevel;
-	private IIdentity dpi;
-	private IServiceResourceIdentifier serviceID;
-	private Subject requestor;
-	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.preference.api.platform.IPrivacyOutcome#getOutcomeType()
-	 */
-	@Override
-	public PrivacyPreferenceTypeConstants getOutcomeType() {
-		return PrivacyPreferenceTypeConstants.IDS;
-	}
-	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.preference.api.platform.IPrivacyOutcome#getConfidenceLevel()
-	 */
-	@Override
-	public int getConfidenceLevel() {
-		return this.confidenceLevel;
-	}
-	
-	public void setConfidenceLevel(int c){
-		this.confidenceLevel = c;
-	}
-	
-	public void setIdentity(IIdentity dpi){
-		this.dpi = dpi;
-	}
-	
-	public IIdentity getIdentity(){
-		return this.dpi;
-	}
-	public void setServiceID(IServiceResourceIdentifier serviceID) {
-		this.serviceID = serviceID;
-	}
-	public IServiceResourceIdentifier getServiceID() {
-		return serviceID;
-	}
-	public void setRequestor(Subject requestor) {
-		this.requestor = requestor;
-	}
-	public Subject getRequestor() {
-		return requestor;
-	}
-	
-	public String toString(){
-		return "Select: "+this.dpi.toString();
-	}
-	
+public enum ServiceType {
+	ThirdPartyService,
+	CoreService
 }
-

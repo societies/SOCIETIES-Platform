@@ -26,8 +26,8 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 
 import java.io.Serializable;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 
@@ -35,7 +35,7 @@ public class PPNPreferenceDetails implements Serializable{
 
 	private String contextType;
 	private CtxAttributeIdentifier affectedCtxID;
-	private Identity requestorDPI;
+	private IIdentity requestorDPI;
 	private IServiceResourceIdentifier serviceID;
 	public PPNPreferenceDetails(String contextType){
 		this.setContextType(contextType);
@@ -49,11 +49,11 @@ public class PPNPreferenceDetails implements Serializable{
 		return affectedCtxID;
 	}
 
-	public void setRequestorDPI(Identity requestorDPI) {
+	public void setRequestorDPI(IIdentity requestorDPI) {
 		this.requestorDPI = requestorDPI;
 	}
 
-	public Identity getRequestorDPI() {
+	public IIdentity getRequestorDPI() {
 		return requestorDPI;
 	}
 
@@ -65,7 +65,7 @@ public class PPNPreferenceDetails implements Serializable{
 		return contextType;
 	}
 	
-	private boolean compareRequestorDPIs(Identity dpi){
+	private boolean compareRequestorDPIs(IIdentity dpi){
 		if (dpi==null){
 			if (this.requestorDPI==null){
 				return true;

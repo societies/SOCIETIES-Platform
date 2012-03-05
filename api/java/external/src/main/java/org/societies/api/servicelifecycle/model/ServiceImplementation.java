@@ -22,70 +22,58 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
-
-
-import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Subject;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
-
-
+package org.societies.api.servicelifecycle.model;
 
 /**
- * This class is used to define that a CSS IIdentity should be used in a specific transaction if the preceding IPrivacyPreferenceConditions are true. 
- * The format of the IIdentity will be defined by the IIdentity Management component
- * @author Elizabeth
- *
+ * Describe your class here...
+ * 
+ * @author solutanet
+ * 
  */
-public class IdentitySelectionPreferenceOutcome implements IPrivacyOutcome{
+public class ServiceImplementation {
 
-	private int confidenceLevel;
-	private IIdentity dpi;
-	private IServiceResourceIdentifier serviceID;
-	private Subject requestor;
-	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.preference.api.platform.IPrivacyOutcome#getOutcomeType()
+	/**
+	 * @param serviceNameSpace
+	 * @param serviceProvider
+	 * @param serviceVersion
 	 */
-	@Override
-	public PrivacyPreferenceTypeConstants getOutcomeType() {
-		return PrivacyPreferenceTypeConstants.IDS;
+	public ServiceImplementation(String serviceNameSpace,
+			String serviceProvider, String serviceVersion) {
+		super();
+		this.serviceNameSpace = serviceNameSpace;
+		this.serviceProvider = serviceProvider;
+		this.serviceVersion = serviceVersion;
 	}
-	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.preference.api.platform.IPrivacyOutcome#getConfidenceLevel()
-	 */
-	@Override
-	public int getConfidenceLevel() {
-		return this.confidenceLevel;
+
+	private String serviceNameSpace;
+	private String serviceProvider;
+	private String serviceVersion;
+
+	public String getServiceNameSpace() {
+		return serviceNameSpace;
 	}
-	
-	public void setConfidenceLevel(int c){
-		this.confidenceLevel = c;
+
+	public void setServiceNameSpace(String serviceNameSpace) {
+		this.serviceNameSpace = serviceNameSpace;
 	}
-	
-	public void setIdentity(IIdentity dpi){
-		this.dpi = dpi;
+
+	public String getServiceProvider() {
+		return serviceProvider;
 	}
-	
-	public IIdentity getIdentity(){
-		return this.dpi;
+
+	public void setServiceProvider(String serviceProvider) {
+		this.serviceProvider = serviceProvider;
 	}
-	public void setServiceID(IServiceResourceIdentifier serviceID) {
-		this.serviceID = serviceID;
+
+	public String getServiceVersion() {
+		return serviceVersion;
 	}
-	public IServiceResourceIdentifier getServiceID() {
-		return serviceID;
+
+	public void setServiceVersion(String serviceVersion) {
+		this.serviceVersion = serviceVersion;
 	}
-	public void setRequestor(Subject requestor) {
-		this.requestor = requestor;
+
+	public String getServiceImplementationId() {
+		return serviceProvider + serviceNameSpace + serviceVersion;
 	}
-	public Subject getRequestor() {
-		return requestor;
-	}
-	
-	public String toString(){
-		return "Select: "+this.dpi.toString();
-	}
-	
 }
-

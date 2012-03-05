@@ -22,70 +22,84 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
+package org.societies.platform.servicelifecycle.serviceRegistry.model;
 
-
-import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Subject;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
-
-
+import javax.annotation.Generated;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 /**
- * This class is used to define that a CSS IIdentity should be used in a specific transaction if the preceding IPrivacyPreferenceConditions are true. 
- * The format of the IIdentity will be defined by the IIdentity Management component
- * @author Elizabeth
+ * Describe your class here...
+ *
+ * @author solutanet
  *
  */
-public class IdentitySelectionPreferenceOutcome implements IPrivacyOutcome{
-
-	private int confidenceLevel;
-	private IIdentity dpi;
-	private IServiceResourceIdentifier serviceID;
-	private Subject requestor;
-	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.preference.api.platform.IPrivacyOutcome#getOutcomeType()
+@Entity
+@Table(name = "ServiceImplementation")
+public class ServiceImplementationDAO {
+	
+	private long id;
+	private String serviceNameSpace;
+	private String serviceProvider;
+	private String serviceVersion;
+	
+	/**
+	 
+	 * @param serviceNameSpace
+	 * @param serviceProvider
+	 * @param serviceVersion
 	 */
-	@Override
-	public PrivacyPreferenceTypeConstants getOutcomeType() {
-		return PrivacyPreferenceTypeConstants.IDS;
+	public ServiceImplementationDAO( String serviceNameSpace,
+			String serviceProvider, String serviceVersion) {
+		super();
+		
+		this.serviceNameSpace = serviceNameSpace;
+		this.serviceProvider = serviceProvider;
+		this.serviceVersion = serviceVersion;
 	}
-	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.preference.api.platform.IPrivacyOutcome#getConfidenceLevel()
+	/**
+	 * 
 	 */
-	@Override
-	public int getConfidenceLevel() {
-		return this.confidenceLevel;
+	public ServiceImplementationDAO() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	@Column(name = "ServiceNameSpace")
+	public String getServiceNameSpace() {
+		return serviceNameSpace;
+	}
+	public void setServiceNameSpace(String serviceNameSpace) {
+		this.serviceNameSpace = serviceNameSpace;
+	}
+	@Column(name = "ServiceProvider")
+	public String getServiceProvider() {
+		return serviceProvider;
+	}
+	public void setServiceProvider(String serviceProvider) {
+		this.serviceProvider = serviceProvider;
+	}
+	@Column(name = "ServiceVersion")
+	public String getServiceVersion() {
+		return serviceVersion;
+	}
+	public void setServiceVersion(String serviceVersion) {
+		this.serviceVersion = serviceVersion;
+	}
+	@Id
+	@GeneratedValue
+	@Column(name="id")
+	public long getId() {
+		return id;
+	}
+	public void setId(long id) {
+		this.id = id;
 	}
 	
-	public void setConfidenceLevel(int c){
-		this.confidenceLevel = c;
-	}
-	
-	public void setIdentity(IIdentity dpi){
-		this.dpi = dpi;
-	}
-	
-	public IIdentity getIdentity(){
-		return this.dpi;
-	}
-	public void setServiceID(IServiceResourceIdentifier serviceID) {
-		this.serviceID = serviceID;
-	}
-	public IServiceResourceIdentifier getServiceID() {
-		return serviceID;
-	}
-	public void setRequestor(Subject requestor) {
-		this.requestor = requestor;
-	}
-	public Subject getRequestor() {
-		return requestor;
-	}
-	
-	public String toString(){
-		return "Select: "+this.dpi.toString();
-	}
 	
 }
-

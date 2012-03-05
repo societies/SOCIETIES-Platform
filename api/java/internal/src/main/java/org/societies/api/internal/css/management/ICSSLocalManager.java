@@ -28,7 +28,7 @@ package org.societies.api.internal.css.management;
 import java.util.concurrent.Future;
 
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
-import org.societies.api.schema.cssmanagement.CssProfile;
+import org.societies.api.schema.cssmanagement.CssRecord;
 
 
 /**
@@ -56,28 +56,28 @@ public interface ICSSLocalManager {
 	  * @param profile
 	 * @return Future<CssInterfaceResult>
 	  */
-	 Future<CssInterfaceResult> registerXMPPServer(CssProfile profile);
+	 Future<CssInterfaceResult> registerXMPPServer(CssRecord profile);
 	/**
 	 * Unregister with chosen Domain Server
 	 * 
 	 * @param profile
 	 * @return Future<CssInterfaceResult>
 	 */
-	 Future<CssInterfaceResult> unregisterXMPPServer(CssProfile profile);
+	 Future<CssInterfaceResult> unregisterXMPPServer(CssRecord profile);
 	/**
 	 * Login with chosen Domain server
 	 * 
 	 * @param profile
 	 * @return Future<CssInterfaceResult>
 	 */
-	 Future<CssInterfaceResult> loginXMPPServer(CssProfile profile);
+	 Future<CssInterfaceResult> loginXMPPServer(CssRecord profile);
 	/**
 	 * Logout from chosen Domain server
 	 * 
 	 * @param profile
 	 * @return Future<CssInterfaceResult>
 	 */
-	 Future<CssInterfaceResult> logoutXMPPServer(CssProfile profile);
+	 Future<CssInterfaceResult> logoutXMPPServer(CssRecord profile);
 
 	 /**
 	 * Login a user to a CSS. 
@@ -85,7 +85,7 @@ public interface ICSSLocalManager {
 	 * @param profile
 	 * @return Future<CssInterfaceResult>
 	 */
-	 Future<CssInterfaceResult> loginCSS(CssProfile profile);	
+	 Future<CssInterfaceResult> loginCSS(CssRecord profile);	
 
 	/**
 	 * Logout the user from a CSS
@@ -93,7 +93,7 @@ public interface ICSSLocalManager {
 	 * @param profile
 	 * @return Future<CssInterfaceResult>
 	 */
-	 Future<CssInterfaceResult> logoutCSS(CssProfile profile);	
+	 Future<CssInterfaceResult> logoutCSS(CssRecord profile);	
 	
 	/**
 	 * Register a CSS
@@ -101,7 +101,7 @@ public interface ICSSLocalManager {
 	 * @param profile
 	 * @return Future<CssInterfaceResult>
 	 */
-	 Future<CssInterfaceResult> registerCSS(CssProfile profile);
+	 Future<CssInterfaceResult> registerCSS(CssRecord profile);
 
 	/**
 	 * Unregister the CSS
@@ -110,7 +110,7 @@ public interface ICSSLocalManager {
 	 * @param profile
 	 * @return Future<CssInterfaceResult>
 	 */
-	 Future<CssInterfaceResult> unregisterCSS(CssProfile profile);
+	 Future<CssInterfaceResult> unregisterCSS(CssRecord profile);
 
 	/**
 	 * Register a device(s) with a CSS
@@ -118,14 +118,14 @@ public interface ICSSLocalManager {
 	 * @param profile
 	 * @return Future<CssInterfaceResult>
 	 */
-	 Future<CssInterfaceResult> registerCSSNode(CssProfile profile);
+	 Future<CssInterfaceResult> registerCSSNode(CssRecord profile);
 	/**
 	 * Unregister a device(s) from a CSS
 	 * 
 	 * @param profile
 	 * @return Future<CssInterfaceResult>
 	 */
-	 Future<CssInterfaceResult> unregisterCSSNode(CssProfile profile);
+	 Future<CssInterfaceResult> unregisterCSSNode(CssRecord profile);
 	
 	/**
 	 * Get the CSS Profile. This operation will retrieve the local CSS Profile. 
@@ -134,7 +134,7 @@ public interface ICSSLocalManager {
 	 * 
 	 * @return Future<CssInterfaceResult>
 	 */
-	 Future<CssInterfaceResult> getCssProfile();
+	 Future<CssInterfaceResult> getCssRecord();
 
 	/**
 	 * Modify the CSS Profile
@@ -142,14 +142,14 @@ public interface ICSSLocalManager {
 	 * @param profile
 	 * @return Future<CssInterfaceResult>
 	 */
-	 Future<CssInterfaceResult> modifyCssProfile(CssProfile profile);
+	 Future<CssInterfaceResult> modifyCssRecord(CssRecord profile);
 	/**
 	 * Change the status a CSS device
 	 * 
 	 * @param profile
 	 * @return Future<CssInterfaceResult>
 	 */
-	 Future<CssInterfaceResult> changeCSSNodeStatus(CssProfile profile);
+	 Future<CssInterfaceResult> changeCSSNodeStatus(CssRecord profile);
 	
 	/**
 	 * Synchronise the CSS profile. The CSS cloud node's current profile is synchronised
@@ -158,7 +158,7 @@ public interface ICSSLocalManager {
 	 * @param profile
 	 * @return Future<CssInterfaceResult>
 	 */
-	 Future<CssInterfaceResult> synchProfile(CssProfile profile);
+	 Future<CssInterfaceResult> synchProfile(CssRecord profile);
 	
 	 /**
 	  * Set the presence status of the user
@@ -166,5 +166,5 @@ public interface ICSSLocalManager {
 	  * @param profile
 	  * @return Future<CssInterfaceResult>
 	  */
-	 Future<CssInterfaceResult> setPresenceStatus(CssProfile profile);
+	 Future<CssInterfaceResult> setPresenceStatus(CssRecord profile);
 }

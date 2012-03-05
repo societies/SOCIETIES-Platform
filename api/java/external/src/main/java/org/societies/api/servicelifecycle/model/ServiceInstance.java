@@ -22,33 +22,69 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.servicelifecycle.model;
+package org.societies.api.servicelifecycle.model;
 
-import java.net.URI;
+
 
 /**
  * Describe your class here...
  *
- * @author Eliza
+ * @author solutanet
  *
  */
-public interface IServiceResourceIdentifier {
+public class ServiceInstance {
 
 	/**
-	 * 
-	 * @return the identifier for Service Instance
+	 * This attribute must be set using the INetvorkNode getJid method.
 	 */
-	public URI getIdentifier();
+	private String fullJid;
+	/**
+	 * This attribute must be set using the XMPP node getNode method.
+	 */
+	private String XMPPNode;
+	private ServiceImplementation serviceImpl;
+	
+	
 	
 	/**
-	 * 
-	 * @param identifier for a Service Instance
+	 * @param fullJid
+	 * @param xMPPNode
+	 * @param serviceImpl
 	 */
-	public void setIdentifier(URI identifier);
+	public ServiceInstance(String fullJid, String xMPPNode,
+			ServiceImplementation serviceImpl) {
+		super();
+		this.fullJid = fullJid;
+		XMPPNode = xMPPNode;
+		this.serviceImpl = serviceImpl;
+	}
 	
-	/**
-	 * 
-	 * @return a string representation of the object.
-	 */
-	public String toString();
+	
+	public ServiceImplementation getServiceImpl() {
+		return serviceImpl;
+	}
+	public void setServiceImpl(ServiceImplementation serviceImpl) {
+		this.serviceImpl = serviceImpl;
+	}
+
+
+
+
+	public String getXMPPNode() {
+		return XMPPNode;
+	}
+
+
+	public void setXMPPNode(String xMPPNode) {
+		XMPPNode = xMPPNode;
+	}
+	public String getFullJid() {
+		return fullJid;
+	}
+	public void setFullJid(String fullJid) {
+		this.fullJid = fullJid;
+	}
+	public String getServiceInstanceId(){
+		return fullJid+XMPPNode+serviceImpl.getServiceImplementationId();
+	}
 }

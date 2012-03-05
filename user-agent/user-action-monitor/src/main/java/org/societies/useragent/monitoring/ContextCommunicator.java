@@ -22,84 +22,65 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
-import java.io.Serializable;
+package org.societies.useragent.monitoring;
 
-import javax.swing.tree.DefaultTreeModel;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
+public class ContextCommunicator {
 
+	ICtxBroker ctxBroker;
 
-/**
- * This class represents a tree model for Data Obfuscation Preferences and
- * encapsulates a tree of DObfPreference objects.
- * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 17:06:54
- */
-public class DObfPreferenceTreeModel extends DefaultTreeModel implements IPrivacyPreferenceTreeModel, Serializable{
-	private CtxAttributeIdentifier affectedCtxId;
-	private String myContextType;
-	private IIdentity providerDPI;
-	private IServiceResourceIdentifier serviceID;
-	private PrivacyPreferenceTypeConstants myPrivacyType;
-	private IPrivacyPreference pref;
-	
-	public DObfPreferenceTreeModel(String myCtxType, IPrivacyPreference preference){
-		super(preference);
-		this.myContextType = myCtxType;
-		this.myPrivacyType = PrivacyPreferenceTypeConstants.DOBF;
-		this.pref = preference;
-	}
-	
-	public CtxAttributeIdentifier getAffectedContextIdentifier() {
-		return this.getAffectedCtxId();
+	public ContextCommunicator(ICtxBroker ctxBroker){
+		this.ctxBroker = ctxBroker;
 	}
 
-	
-	public String getContextType() {
-		return this.myContextType;
+	public void updateHistory(IServiceResourceIdentifier serviceId, IIdentity owner, IAction action){
+		try {
+			//Get Entity with serviceId
+			Future<List<CtxIdentifier>> futureEntityIDs = ctxBroker.lookup(CtxModelType.ENTITY, serviceId.getIdentifier().toString());
+			List<CtxIdentifier> entityIds = futureEntityIDs.get();
+			if(entityIds.size() > 0){
+				//Get Attribute from Entity with parameter name
+				CtxEntityIdentifier entityId = (CtxEntityIdentifier)entityIds.get(0);
+				Future<List<CtxIdentifier>> futureAttrIDs = ctxBroker.lookup(CtxModelType.ATTRIBUTE, action.getparameterName());
+				List<CtxIdentifier> ids = futureAttrIDs.get();
+				if(ids.size() > 0){
+					Future<List<CtxAttribute>> futureAttrs = ctxBroker.retrieveFuture((CtxAttributeIdentifier)ids.get(0), null);
+					List<CtxAttribute> attrs = futureAttrs.get();
+				}else{ //no history for this parameter name
+					
+				}
+			}else{ //no histories for this services' parameters
+
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		} catch (CtxException e) {
+			e.printStackTrace();
+		}
 	}
 
-
-	@Override
-	public PrivacyPreferenceTypeConstants getPrivacyType() {
-		return this.myPrivacyType;
+	public void updateServiceModel(IServiceResourceIdentifier serviceId, IIdentity owner, IAction action){
+		try {
+			Future<List<CtxIdentifier>> futureIDs = ctxBroker.lookup(CtxModelType.ENTITY, serviceId.getIdentifier().toString());			
+		} catch (CtxException e) {
+			e.printStackTrace();
+		}
 	}
-
-
-	@Override
-	public IPrivacyPreference getRootPreference() {
-		return this.pref;
-	}
-
-	public void setAffectedCtxId(CtxAttributeIdentifier affectedCtxId) {
-		this.affectedCtxId = affectedCtxId;
-	}
-
-	public CtxAttributeIdentifier getAffectedCtxId() {
-		return affectedCtxId;
-	}
-
-	public void setProviderDPI(IIdentity providerDPI) {
-		this.providerDPI = providerDPI;
-	}
-
-	public IIdentity getProviderDPI() {
-		return providerDPI;
-	}
-
-	public void setServiceID(IServiceResourceIdentifier serviceID) {
-		this.serviceID = serviceID;
-	}
-
-	public IServiceResourceIdentifier getServiceID() {
-		return serviceID;
-	}
-
 }

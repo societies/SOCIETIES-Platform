@@ -23,13 +23,13 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.servicelifecycle.model;
+package org.societies.api.servicelifecycle.model;
 
 /**
  * @author Antonio Panazzolo, Massimo Mazzariol (SN)
  */
 
-public enum ServiceType {
-	ThirdPartyService,
-	CoreService
+public enum ServiceLocation {
+	Local,
+	Remote
 }
