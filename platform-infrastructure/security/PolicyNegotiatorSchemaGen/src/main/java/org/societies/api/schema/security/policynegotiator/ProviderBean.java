@@ -30,26 +30,47 @@ package org.societies.api.schema.security.policynegotiator;
  */
 public class ProviderBean {
 
+	// Methods
 	public enum MethodType {
+		acceptPolicyAndGetSla,
+		getPolicyOptions,
 		reject
 	};
 
 	private MethodType method;
+	
+	// Parameters
 	private int sessionId;
+	private boolean modified;
+	private String signedPolicyOption;
 
-	public int getSessionId() {
-		return sessionId;
-	}
-
-	public void setSessionId(int sessionId) {
-		this.sessionId = sessionId;
-	}
-
+	// Getter and setter for the method
+	
 	public MethodType getMethod() {
 		return method;
 	}
-
 	public void setMethod(MethodType method) {
 		this.method = method;
+	}
+
+	// Getters and setters for the parameters
+	
+	public int getSessionId() {
+		return sessionId;
+	}
+	public void setSessionId(int sessionId) {
+		this.sessionId = sessionId;
+	}
+	public boolean getModified() {
+		return modified;
+	}
+	public void setModified(boolean modified) {
+		this.modified = modified;
+	}
+	public String getSignedPolicyOption() {
+		return signedPolicyOption;
+	}
+	public void setSignedPolicyOption(String signedPolicyOption) {
+		this.signedPolicyOption = signedPolicyOption;
 	}
 }
