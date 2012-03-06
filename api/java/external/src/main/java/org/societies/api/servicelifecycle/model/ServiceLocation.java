@@ -28,7 +28,10 @@ package org.societies.api.servicelifecycle.model;
 /**
  * @author Antonio Panazzolo, Massimo Mazzariol (SN)
  */
-
+/**
+ * @deprecated  should reference implementation class org.societies.api.schema.servicelifecycle.model.ServiceLocation
+ */
+@Deprecated
 public enum ServiceLocation {
 	Local,
 	Remote

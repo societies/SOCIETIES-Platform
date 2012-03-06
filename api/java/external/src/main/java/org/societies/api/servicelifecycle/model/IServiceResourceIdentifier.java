@@ -32,6 +32,10 @@ import java.net.URI;
  * @author Eliza
  *
  */
+/**
+ * @deprecated  no direct replacement should reference implementation class org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
+ */
+@Deprecated
 public interface IServiceResourceIdentifier {
 
 	/**

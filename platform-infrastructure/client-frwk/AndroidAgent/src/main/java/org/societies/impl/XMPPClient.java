@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.AbstractMap.SimpleEntry;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -25,8 +26,12 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.provider.IQProvider;
 import org.jivesoftware.smack.provider.PacketExtensionProvider;
 import org.jivesoftware.smack.provider.ProviderManager;
+import org.jivesoftware.smackx.packet.DiscoverItems;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.api.comm.xmpp.datatypes.XMPPNode;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.interfaces.Callback;
 import org.societies.interfaces.XMPPAgent;
 import org.societies.utilities.DBC.Dbc;
@@ -94,8 +99,7 @@ public class XMPPClient implements XMPPAgent {
 		}
 	}
 	
-	public void register(String[] elementNames, String[] namespaces, final Callback callback) {		
-		
+	public void register(String[] elementNames, String[] namespaces, final Callback callback) {
 		for(int i=0; i<elementNames.length; i++) {
 			for(int j=0; j<namespaces.length; j++) {
 				providerRegistrar.register(new ProviderElementNamespaceRegistrar.ElementNamespaceTuple(elementNames[i], namespaces[j]));				
@@ -183,7 +187,53 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	public String getIdentity() {
-		return connection.getUser();
+		try {
+			connect();			
+			String identity = connection.getUser();			
+			disconnect();			
+			return identity;
+		} catch (XMPPException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+	
+	public String getItems(String entity, String node, final Callback callback) throws CommunicationException {		
+		try {
+			connect();
+			
+			DiscoverItems discoItems = new DiscoverItems();
+			discoItems.setTo(entity);
+			discoItems.setNode(node);		
+
+			PacketListener packetListener = new PacketListener() {
+				public void processPacket(Packet packet) {
+					IQ iq = (IQ)packet;
+					connection.removePacketListener(this);
+					disconnect();
+					try {
+						if(iq.getType() == IQ.Type.RESULT) {
+							if(isDiscoItem(iq))
+								callback.receiveItems(packet.toXML());
+							else
+								callback.receiveResult(packet.toXML());
+						}
+						else if(iq.getType() == IQ.Type.ERROR) {
+							callback.receiveError(packet.toXML());
+						}
+					} catch (Exception e) {
+						log.error(e.getMessage(), e);
+					}
+				}				
+			};
+			
+			connection.addPacketListener(packetListener, new AndFilter(new PacketTypeFilter(IQ.class),new PacketIDFilter(discoItems.getPacketID()))); 
+			
+			connection.sendPacket(discoItems);
+			
+			return discoItems.getPacketID();
+		} catch (XMPPException e) {
+			throw new CommunicationException(e.getMessage(), e);
+		}
 	}
 	
 	private void connect() throws XMPPException {		
@@ -207,6 +257,18 @@ public class XMPPClient implements XMPPAgent {
 				return xml;
 			}				
 		};
+	}
+	
+	private boolean isDiscoItem(IQ iq) throws SAXException, IOException, ParserConfigurationException {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setNamespaceAware(true);
+		Element element = factory.newDocumentBuilder().parse(new InputSource(new StringReader(iq.toXML()))).getDocumentElement();
+		if(element.getChildNodes().getLength() == 1) {
+			Node query = element.getChildNodes().item(0);
+			return query.getNodeName().equals("query") && query.lookupNamespaceURI(query.getPrefix()).equals(XMPPNode.ITEM_NAMESPACE);
+		}
+		else
+			return false;
 	}
 	
 	private static class NamespaceFilter implements PacketFilter {

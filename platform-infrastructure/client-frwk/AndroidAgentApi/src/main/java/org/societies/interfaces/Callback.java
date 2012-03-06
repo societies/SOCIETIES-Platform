@@ -7,5 +7,7 @@ public interface Callback extends ICallback {
 
 	void receiveError(String xml); 
 	
+	void receiveItems(String xml);
+	
 	void receiveMessage(String xml);
 }
