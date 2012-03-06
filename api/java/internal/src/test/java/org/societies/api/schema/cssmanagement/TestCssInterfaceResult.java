@@ -79,10 +79,8 @@ public class TestCssInterfaceResult {
 		this.record.setSocialURI(TEST_SOCIAL_URI);
 		
 		
-		assertEquals(cssArchivedNodes.size(), this.record.getArchiveCSSNodes().size());
 		assertEquals(TEST_IDENTITY, this.record.getCssIdentity());
 		assertEquals(TEST_INACTIVE_DATE, this.record.getCssInactivation());
-		assertEquals(cssNodes.size(), this.record.getCssNodes().size());
 		assertEquals(TEST_REGISTERED_DATE, this.record.getCssRegistration());
 		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), this.record.getStatus());
 		assertEquals(TEST_UPTIME, this.record.getCssUpTime());
@@ -93,7 +91,6 @@ public class TestCssInterfaceResult {
 		assertEquals(TEST_IDENTITY_NAME, this.record.getIdentityName());
 		assertEquals(TEST_IM_ID, this.record.getImID());
 		assertEquals(TEST_NAME, this.record.getName());
-//		assertEquals(TEST_PASSWORD, this.record.password);
 		assertEquals(CSSManagerEnums.presenceType.Available.ordinal(), this.record.getPresence());
 		assertEquals(CSSManagerEnums.genderType.Unspecified.ordinal(), this.record.getSex());
 		assertEquals(TEST_SOCIAL_URI, this.record.getSocialURI());
@@ -113,7 +110,7 @@ public class TestCssInterfaceResult {
 	public void testClass() {
 		CssInterfaceResult result = new CssInterfaceResult();
 		result.setResultStatus(true);
-		result.setProfile(this.record);
+//		result.setProfile(this.record);
 		
 		assertNotNull(result);
 		assertEquals(true, result.isResultStatus());

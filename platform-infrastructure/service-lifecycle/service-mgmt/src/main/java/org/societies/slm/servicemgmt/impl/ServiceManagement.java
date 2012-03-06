@@ -33,10 +33,9 @@ import java.util.List;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.servicelifecycle.model.Service;
-import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.internal.servicelifecycle.model.ServiceStatus;
-import org.societies.api.internal.servicelifecycle.serviceMgmt.IServiceManagement;
+import org.societies.api.servicelifecycle.model.Service;
+import org.societies.api.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.ServiceStatus;
 import org.societies.api.internal.servicelifecycle.serviceMgmt.ServiceMgmtException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.springframework.osgi.context.BundleContextAware;
@@ -49,7 +48,7 @@ import org.springframework.scheduling.annotation.Async;
  * @author pkuppuud
  * @author sanchocsa
  */
-public class ServiceManagement implements IServiceManagement, BundleContextAware{
+public class ServiceManagement implements BundleContextAware{
 
 	private IServiceRegistry serviceReg;
 	private BundleContext bundleContext;
@@ -261,7 +260,6 @@ public class ServiceManagement implements IServiceManagement, BundleContextAware
 		return result;
 	}
 
-	@Override
 	/**
 	 * This method returns the Service  identified by a given service identifier
 	 * @return the Service object that represents the Service, null if Service is not found
@@ -282,7 +280,6 @@ public class ServiceManagement implements IServiceManagement, BundleContextAware
 		
 	}
 
-	@Override
 	@Async
 	public void processServiceMetaData(List<URL> serviceMetaFileList, long bndlId, String bndlSymName) 
 			throws ServiceMgmtException {
@@ -321,4 +318,6 @@ public class ServiceManagement implements IServiceManagement, BundleContextAware
 		
 		return false;
 	}
+
+
 }

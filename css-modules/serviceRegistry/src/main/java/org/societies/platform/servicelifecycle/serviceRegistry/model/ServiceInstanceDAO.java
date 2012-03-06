@@ -22,14 +22,89 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.platform.servicelifecycle.serviceRegistry.model;
 
-package org.societies.slm.servicemanagment.schema.model;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 /**
- * @author Antonio Panazzolo, Massimo Mazzariol (SN)
+ * Describe your class here...
+ *
+ * @author solutanet
+ *
  */
+@Entity
+@Table(name = "ServiceInstanceEntry")
+public class ServiceInstanceDAO {
+	
+	private long id;
+	private String fullJid;
+	private String XMPPNode;
+	private ServiceImplementationDAO serviceImpl;
+	
+	/**
+	 
+	 * @param fullJid
+	 * @param xMPPNode
+	 * @param serviceImpl
+	 */
+	public ServiceInstanceDAO(String fullJid, String xMPPNode,
+			ServiceImplementationDAO serviceImpl) {
+		super();
+		
+		this.fullJid = fullJid;
+		XMPPNode = xMPPNode;
+		this.serviceImpl = serviceImpl;
+	}
+	
+	/**
+	 * 
+	 */
+	public ServiceInstanceDAO() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
-public enum ServiceType {
-	ThirdPartyService,
-	CoreService
+	@Column(name = "FullJid")
+	public String getFullJid() {
+		return fullJid;
+	}
+	public void setFullJid(String fullJid) {
+		this.fullJid = fullJid;
+	}
+	@Column(name = "XMPPNode")
+	public String getXMPPNode() {
+		return XMPPNode;
+	}
+	public void setXMPPNode(String xMPPNode) {
+		XMPPNode = xMPPNode;
+	}
+	@OneToOne(cascade=CascadeType.ALL)
+	
+	public ServiceImplementationDAO getServiceImpl() {
+		return serviceImpl;
+	}
+	public void setServiceImpl(ServiceImplementationDAO serviceImpl) {
+		this.serviceImpl = serviceImpl;
+	}
+	@Id
+	@GeneratedValue
+	@Column(name="id")
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	
+
+	
+	
 }

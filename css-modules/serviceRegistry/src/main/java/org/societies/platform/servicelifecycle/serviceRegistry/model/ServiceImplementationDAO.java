@@ -22,14 +22,84 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.platform.servicelifecycle.serviceRegistry.model;
 
-package org.societies.api.internal.servicelifecycle.model;
+import javax.annotation.Generated;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 /**
- * @author Antonio Panazzolo, Massimo Mazzariol (SN)
+ * Describe your class here...
+ *
+ * @author solutanet
+ *
  */
-
-public enum ServiceType {
-	ThirdPartyService,
-	CoreService
+@Entity
+@Table(name = "ServiceImplementation")
+public class ServiceImplementationDAO {
+	
+	private long id;
+	private String serviceNameSpace;
+	private String serviceProvider;
+	private String serviceVersion;
+	
+	/**
+	 
+	 * @param serviceNameSpace
+	 * @param serviceProvider
+	 * @param serviceVersion
+	 */
+	public ServiceImplementationDAO( String serviceNameSpace,
+			String serviceProvider, String serviceVersion) {
+		super();
+		
+		this.serviceNameSpace = serviceNameSpace;
+		this.serviceProvider = serviceProvider;
+		this.serviceVersion = serviceVersion;
+	}
+	/**
+	 * 
+	 */
+	public ServiceImplementationDAO() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	@Column(name = "ServiceNameSpace")
+	public String getServiceNameSpace() {
+		return serviceNameSpace;
+	}
+	public void setServiceNameSpace(String serviceNameSpace) {
+		this.serviceNameSpace = serviceNameSpace;
+	}
+	@Column(name = "ServiceProvider")
+	public String getServiceProvider() {
+		return serviceProvider;
+	}
+	public void setServiceProvider(String serviceProvider) {
+		this.serviceProvider = serviceProvider;
+	}
+	@Column(name = "ServiceVersion")
+	public String getServiceVersion() {
+		return serviceVersion;
+	}
+	public void setServiceVersion(String serviceVersion) {
+		this.serviceVersion = serviceVersion;
+	}
+	@Id
+	@GeneratedValue
+	@Column(name="id")
+	public long getId() {
+		return id;
+	}
+	public void setId(long id) {
+		this.id = id;
+	}
+	
+	
 }

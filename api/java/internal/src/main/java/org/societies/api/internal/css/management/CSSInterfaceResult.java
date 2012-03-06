@@ -27,6 +27,7 @@ package org.societies.api.internal.css.management;
 
 import org.societies.api.schema.cssmanagement.CssRecord;
 
+
 /**
  * Result class that is supplied by implementations of {@link ICSSRemoteManager}
  *

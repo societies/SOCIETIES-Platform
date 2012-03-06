@@ -40,4 +40,11 @@ public interface IService {
 
 	public IServiceResourceIdentifier getServiceIdentifier();
 	
+	public ServiceInstance getServiceInstance();
+	
+	public String getAuthorSignature();
+	public ServiceStatus getServiceStatus();
+	public String getServiceEndpoint() ;
+	public ServiceLocation getServiceLocation ();
+	
 }

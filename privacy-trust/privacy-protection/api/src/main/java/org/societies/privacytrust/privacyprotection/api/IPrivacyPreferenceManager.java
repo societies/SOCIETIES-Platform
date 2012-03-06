@@ -27,8 +27,8 @@ package org.societies.privacytrust.privacyprotection.api;
 
 import java.util.List;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement;
@@ -53,10 +53,10 @@ public interface IPrivacyPreferenceManager {
 	 * 
 	 * @param ctxId    the affected context identifier
 	 * @param action    the action requested
-	 * @param requestorIdentity    the identity of requestor
+	 * @param requestorIIdentity    the IIdentity of requestor
 	 * @exception PrivacyPreferenceException PrivacyPreferenceException
 	 */
-	public PrivacyOutcomeConstants checkPermission(CtxAttributeIdentifier ctxId, Action action, Identity requestorIdentity)
+	public PrivacyOutcomeConstants checkPermission(CtxAttributeIdentifier ctxId, Action action, IIdentity requestorIIdentity)
 	  throws PrivacyException;
 
 	/**
@@ -65,10 +65,10 @@ public interface IPrivacyPreferenceManager {
 	 * 
 	 * @param contextType    the affected context identifier
 	 * @param action    the action requested
-	 * @param requestorIdentity    the identity of requestor
+	 * @param requestorIIdentity    the IIdentity of requestor
 	 * @exception PrivacyPreferenceException PrivacyPreferenceException
 	 */
-	public PrivacyOutcomeConstants checkPermission(String contextType, Action action, Identity requestorIdentity)
+	public PrivacyOutcomeConstants checkPermission(String contextType, Action action, IIdentity requestorIIdentity)
 	  throws PrivacyException;
 
 	/**
@@ -77,27 +77,27 @@ public interface IPrivacyPreferenceManager {
 	 * 
 	 * @param userDPI    the dpi of the user to which the preference refers
 	 */
-	public void deleteIDSPreference(Identity userDPI);
+	public void deleteIDSPreference(IIdentity userDPI);
 
 	/**
 	 * Method to delete the IDS preference referring to the provided parameters
 	 * 
-	 * @param userIdentity    the DPI of the user to which the preference refers
-	 * @param serviceIdentity    the DPI of the provider to which the preference
+	 * @param userIIdentity    the DPI of the user to which the preference refers
+	 * @param serviceIIdentity    the DPI of the provider to which the preference
 	 * refers
 	 * @param serviceID    the serviceID of the service provided by the given
 	 * serviceDPI
 	 */
-	public void deleteIDSPreference(Identity userIdentity, Identity serviceIdentity, IServiceResourceIdentifier serviceID);
+	public void deleteIDSPreference(IIdentity userIIdentity, IIdentity serviceIIdentity, IServiceResourceIdentifier serviceID);
 
 	/**
 	 * Method to delete the IDS preference referring to this user dpi and provider dpi
 	 * (only deletes the generic preference for user-provider DPI combination)
 	 * 
-	 * @param userIdentity    the DPI of the user to which the preference refers
-	 * @param serviceIdentity    the DPI of the provider to which the preference refers
+	 * @param userIIdentity    the DPI of the user to which the preference refers
+	 * @param serviceIIdentity    the DPI of the provider to which the preference refers
 	 */
-	public void deleteIDSPreference(Identity userIdentity, Identity serviceIdentity);
+	public void deleteIDSPreference(IIdentity userIIdentity, IIdentity serviceIIdentity);
 
 	/**
 	 * Method to delete an existing PPN preference model (generic to a context type)
@@ -115,9 +115,9 @@ public interface IPrivacyPreferenceManager {
 	 * 
 	 * @param contextType    the affected contextType
 	 * @param affectedCtxID
-	 * @param requestorIdentity    the DPI of a requestor
+	 * @param requestorIIdentity    the DPI of a requestor
 	 */
-	public void deletePPNPreference(String contextType, CtxAttributeIdentifier affectedCtxID, Identity requestorIdentity);
+	public void deletePPNPreference(String contextType, CtxAttributeIdentifier affectedCtxID, IIdentity requestorIIdentity);
 
 	/**
 	 * Method to delete an existing PPN preference model
@@ -132,7 +132,7 @@ public interface IPrivacyPreferenceManager {
 	public void deletePPNPreference(String contextType, CtxAttributeIdentifier id);
 
 	/**
-	 * Method to request evaluation of identity selection preferences for a specific
+	 * Method to request evaluation of IIdentity selection preferences for a specific
 	 * transaction
 	 * @return			one DPI from the list of the DPIs or null if no DPIS in the list
 	 * should be used
@@ -140,7 +140,7 @@ public interface IPrivacyPreferenceManager {
 	 * @param agreement    the agreement between the consumer and the provider
 	 * @param identities    the list of DPIs that match the agreement.
 	 */
-	public Identity evaluateIDSPreferences(IAgreement agreement, List<Identity> identities);
+	public IIdentity evaluateIDSPreferences(IAgreement agreement, List<IIdentity> identities);
 
 	/**
 	 * 
@@ -161,25 +161,25 @@ public interface IPrivacyPreferenceManager {
 	 * 
 	 * @param service_id
 	 */
-	public Identity evaluateIdSPreference(IServiceResourceIdentifier service_id);
+	public IIdentity evaluateIdSPreference(IServiceResourceIdentifier service_id);
 
 	/**
 	 * Method to retrieve the list of IDSPreferences that affect the given DPI and
 	 * service provider
 	 * @return				the list of preference models (each one containing the preference)
 	 * 
-	 * @param affectedIdentity    the affected user DPI in the preference
-	 * @param serviceIdentity    the affected DPI of the provider (requestor)
+	 * @param affectedIIdentity    the affected user DPI in the preference
+	 * @param serviceIIdentity    the affected DPI of the provider (requestor)
 	 */
-	public List<IPrivacyPreferenceTreeModel> getIDSPreferences(Identity affectedIdentity, Identity serviceIdentity);
+	public List<IPrivacyPreferenceTreeModel> getIDSPreferences(IIdentity affectedIIdentity, IIdentity serviceIIdentity);
 
 	/**
 	 * Method to retrieve the list of IDSPreferences that affect the given DPI
 	 * @return				the list of preference models (each one containing the preference)
 	 * 
-	 * @param affectedIdentity    the affected user DPI in the preference
+	 * @param affectedIIdentity    the affected user DPI in the preference
 	 */
-	public List<IPrivacyPreferenceTreeModel> getIDSPreferences(Identity affectedIdentity);
+	public List<IPrivacyPreferenceTreeModel> getIDSPreferences(IIdentity affectedIIdentity);
 
 	/**
 	 * Method to retrieve the PPNP preferences for a context type
@@ -204,27 +204,27 @@ public interface IPrivacyPreferenceManager {
 	 * 
 	 * @param contextType    the context type affected
 	 * @param ctxID    the ctxID affected
-	 * @param requestorIdentity    the DPI of the requestor
+	 * @param requestorIIdentity    the DPI of the requestor
 	 */
-	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, CtxAttributeIdentifier ctxID, Identity requestorIdentity);
+	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, CtxAttributeIdentifier ctxID, IIdentity requestorIIdentity);
 
 	/**
 	 * Method to retrieve the list of ppn preferences based on the given parameters
 	 * @return				the list of PPNP models related to the supplied parameters
 	 * 
 	 * @param contextType    the context type affected
-	 * @param requestorIdentity    the DPI of the requestor
+	 * @param requestorIIdentity    the DPI of the requestor
 	 */
-	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, Identity requestorIdentity);
+	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, IIdentity requestorIIdentity);
 
 	/**
 	 * Method to retrieve the list of ppn preferences based on the given parameters
 	 * @return				the list of PPNP models related to the supplied parameters
 	 * 
 	 * @param contextType    the context type affected
-	 * @param requestorIdentity    the DPI of the requestor
+	 * @param requestorIIdentity    the DPI of the requestor
 	 * @param serviceID    the serviceID of the service provided by the requestor
 	 */
-	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, Identity requestorIdentity, IServiceResourceIdentifier serviceID);
+	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, IIdentity requestorIIdentity, IServiceResourceIdentifier serviceID);
 
 }
