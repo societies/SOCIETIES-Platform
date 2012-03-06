@@ -153,10 +153,13 @@ public class PubsubClientAndroid implements PubsubClient {
 		});
 	}
 	
-	public void publisherDelete(IIdentity pubsubService, String node,
-			String itemId) throws XMPPError, CommunicationException {
-		// TODO Auto-generated method stub
-		
+	public void publisherDelete(final IIdentity pubsubService, final String node, final String itemId) throws XMPPError, CommunicationException {
+		invokeRemoteMethod(new IMethodInvocation<Pubsub>() {
+			public Object invoke(Pubsub pubsub) throws Throwable {
+				pubsub.publisherDelete(pubsubService.getJid(), node, itemId);
+				return null;
+			}
+		});	
 	}
 
 	public void ownerDelete(IIdentity pubsubService, final String node)
@@ -170,10 +173,14 @@ public class PubsubClientAndroid implements PubsubClient {
 		});
 	}
 
-	public void ownerPurgeItems(IIdentity pubsubService, String node)
+	public void ownerPurgeItems(final IIdentity pubsubService, final String node)
 			throws XMPPError, CommunicationException {
-		// TODO Auto-generated method stub
-		
+		invokeRemoteMethod(new IMethodInvocation<Pubsub>() {
+			public Object invoke(Pubsub pubsub) throws Throwable {
+				pubsub.ownerPurgeItems(pubsubService.getJid(), node);
+				return null;
+			}
+		});	
 	}
 
 	public Map<IIdentity, SubscriptionState> ownerGetSubscriptions(
