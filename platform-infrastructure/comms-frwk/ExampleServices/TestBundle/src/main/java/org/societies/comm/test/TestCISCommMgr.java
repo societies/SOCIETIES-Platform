@@ -7,6 +7,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.comm.xmpp.pubsub.impl.PubsubServiceRouter;
+import org.societies.identity.IdentityImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

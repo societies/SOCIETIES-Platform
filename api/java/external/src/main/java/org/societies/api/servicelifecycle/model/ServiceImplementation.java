@@ -30,6 +30,10 @@ package org.societies.api.servicelifecycle.model;
  * @author solutanet
  * 
  */
+/**
+ * @deprecated  should reference implementation class org.societies.api.schema.servicelifecycle.model.ServiceImplementation
+ */
+@Deprecated
 public class ServiceImplementation {
 
 	/**
