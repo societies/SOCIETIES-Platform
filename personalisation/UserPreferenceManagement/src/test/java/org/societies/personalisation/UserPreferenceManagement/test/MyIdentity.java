@@ -24,25 +24,52 @@
  */
 package org.societies.personalisation.UserPreferenceManagement.test;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.comm.xmpp.datatypes.IdentityType;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
+
+
 /**
  * Describe your class here...
  *
  * @author Eliza
  *
  */
-public class MyIdentity extends Identity {
+public class MyIdentity implements IIdentity {
 
 	
 	public MyIdentity(IdentityType type, String identifier,
 			String domainIdentifier) {
-		super(type, identifier, domainIdentifier);
+		
+		
 		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public String getJid() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getBareJid() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getDomain() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getIdentifier() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IdentityType getType() {
 		// TODO Auto-generated method stub
 		return null;
 	}

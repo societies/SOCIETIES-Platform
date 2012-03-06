@@ -100,7 +100,6 @@ public class XMPPClient implements XMPPAgent {
 	}
 	
 	public void register(String[] elementNames, String[] namespaces, final Callback callback) {
-		
 		for(int i=0; i<elementNames.length; i++) {
 			for(int j=0; j<namespaces.length; j++) {
 				providerRegistrar.register(new ProviderElementNamespaceRegistrar.ElementNamespaceTuple(elementNames[i], namespaces[j]));				

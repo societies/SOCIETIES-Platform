@@ -26,7 +26,7 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 
 import java.io.Serializable;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
 
@@ -37,19 +37,19 @@ public class IDSPreferenceDetails implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private Identity affectedDPI;
-	private Identity providerDPI;
+	private IIdentity affectedDPI;
+	private IIdentity providerDPI;
 	private IServiceResourceIdentifier serviceID;
 	
-	public IDSPreferenceDetails(Identity affectedDPI){
+	public IDSPreferenceDetails(IIdentity affectedDPI){
 		this.affectedDPI = affectedDPI;
 	}
 	
-	public void setAffectedDPI(Identity affectedDPI) {
+	public void setAffectedDPI(IIdentity affectedDPI) {
 		this.affectedDPI = affectedDPI;
 	}
 
-	public Identity getAffectedDPI() {
+	public IIdentity getAffectedDPI() {
 		return affectedDPI;
 	}
 
@@ -61,15 +61,15 @@ public class IDSPreferenceDetails implements Serializable{
 		return serviceID;
 	}
 
-	public void setProviderDPI(Identity providerDPI) {
+	public void setProviderDPI(IIdentity providerDPI) {
 		this.providerDPI = providerDPI;
 	}
 
-	public Identity getProviderDPI() {
+	public IIdentity getProviderDPI() {
 		return providerDPI;
 	}
 	
-	private boolean compareProviderDPI(Identity requestorDPI){
+	private boolean compareProviderDPI(IIdentity requestorDPI){
 		if (requestorDPI==null){
 			if (this.providerDPI==null){
 				return true;

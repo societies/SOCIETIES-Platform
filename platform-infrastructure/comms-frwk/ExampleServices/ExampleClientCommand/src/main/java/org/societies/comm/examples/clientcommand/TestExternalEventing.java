@@ -30,25 +30,17 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javax.xml.bind.JAXBException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.comm.xmpp.datatypes.IdentityType;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.IIdentityManager;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.comm.xmpp.event.PubsubEvent;
-import org.societies.comm.xmpp.interfaces.IdentityManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.example.fortunecookie.IWisdom;
 import org.societies.example.fortunecookieservice.schema.Cookie;
-import org.societies.example.fortunecookieservice.schema.FortuneCookieBean;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * Describe your class here...
@@ -56,117 +48,96 @@ import org.w3c.dom.Node;
  * @author aleckey
  *
  */
-public class TestExternalEventing implements Runnable, org.societies.api.comm.xmpp.pubsub.Subscriber {
+public class TestExternalEventing implements Runnable, Subscriber {
 	private static final String PUBSUB_NODE_NAME = "Fortune_Cookies";
 	private static final String PUBSUB_NODE_DESC = "SOCIETIES Fortune Cookie Publishing Service";
 	
-	private org.societies.api.comm.xmpp.pubsub.PubsubClient pubSubManager;
+	private PubsubClient pubSubManager;
 	private IIdentityManager idManager;
 	private IWisdom fcGenerator;
+	private ICommManager commManager;
 	
 	//PROPERTIES
-	public PubsubClient getPubSubManager() {
-		return this.pubSubManager;
-	}
+	public PubsubClient getPubSubManager() { return this.pubSubManager;	}
+	public void setPubSubManager(PubsubClient pubSubManager) { this.pubSubManager = pubSubManager;	}
 
-	public void setPubSubManager(PubsubClient pubSubManager) {
-		this.pubSubManager = pubSubManager;
-	}
-
-	public IWisdom getFcGenerator() {
-		return fcGenerator;
-	}
-
-	public void setFcGenerator(IWisdom fcGenerator) {
-		this.fcGenerator = fcGenerator;
-	}
+	public IWisdom getFcGenerator() { return fcGenerator; }
+	public void setFcGenerator(IWisdom fcGenerator) { this.fcGenerator = fcGenerator; }
+	
+	public ICommManager getCommManager() { return commManager; }
+	public void setCommManager(ICommManager commManager) { this.commManager = commManager; }
 	
 	//CONSTRUCTOR
-	public TestExternalEventing() {
-		idManager = new IdentityManager();
-	}
+	public TestExternalEventing() { }
 
 	/* (non-Javadoc)
 	 * @see java.lang.Runnable#run() */
 	@Override
 	public void run() {
-		//CREATE A PUB-SUB NODE
-		Identity pubsubID = idManager.fromJid("XCManager.societies.local");
+		//GET IDENTITY MANAGER
+		idManager = commManager.getIdManager();
+		IIdentity pubsubID = null;
 		try {
-			pubSubManager.ownerCreate(pubsubID, PUBSUB_NODE_NAME);
-		} catch (XMPPError e) {
-			e.printStackTrace();
-		} catch (CommunicationException e) {
-			e.printStackTrace();
-		}
+			pubsubID = idManager.fromJid("XCManager.societies.local");
 		
-		//ADD LIST OF PACKAGES TO ADD SCHEMA OBJECTS
-		List<String> packageList = new ArrayList<String>();
-		packageList.add("org.societies.api.schema.calculator");
-		packageList.add("org.societies.api.schema.fortunecookie");
-		try {
+			//ADD LIST OF PACKAGES TO ADD SCHEMA OBJECTS
+			List<String> packageList = new ArrayList<String>();
+			packageList.add("org.societies.example.calculatorservice.schema");
+			packageList.add("org.societies.example.fortunecookieservice.schema");
 			pubSubManager.addJaxbPackages(packageList);
-		} catch (JAXBException e1) {
-			//ERROR RESOLVING PACKAGE NAMES - CHECK PATH IS CORRECT
-			e1.printStackTrace();
-		}
+			
+			//CREATE A PUB-SUB NODE
+			pubSubManager.ownerCreate(pubsubID, PUBSUB_NODE_NAME);
 		
-		//GET A LIST OF PUBSUB TOPICS (at root level)
-		try {
+			//GET A LIST OF PUBSUB TOPICS (at root level)
 			List<String> listTopics = pubSubManager.discoItems(pubsubID, null);
 			for (String s: listTopics)
 				System.out.println(s);
-		} catch (XMPPError e2) {
-			e2.printStackTrace();
-		} catch (CommunicationException e2) {
-			e2.printStackTrace();
-		}
 		
-		//SUBSCRIBE
-		try {
+			//SUBSCRIBE
 			pubSubManager.subscriberSubscribe(pubsubID, PUBSUB_NODE_NAME, this);
-		} catch (XMPPError e) {
-			e.printStackTrace();
-		} catch (CommunicationException e) {
-			e.printStackTrace();
-		}
-		
-		//EVERY 60 SEC, PUBLISH A NEW PIECE OF WISDOM
-		do {
-			try {
-				Thread.sleep(60000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			//GET A FORTUNE COOKIE
-			Future<Cookie> asyncCookie = fcGenerator.getCookie();
-			Cookie cookie = null;
-			try {
-				cookie = asyncCookie.get();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
-			}
 			
-			PubsubEvent payload = new PubsubEvent(this, cookie);
-			String itemID = String.valueOf(cookie.getId());
-			//PUBLISH
-			try {
+			//EVERY 60 SEC, PUBLISH A NEW PIECE OF WISDOM
+			do {
+				try {
+					Thread.sleep(60000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				//GET A FORTUNE COOKIE
+				Future<Cookie> asyncCookie = fcGenerator.getCookie();
+				Cookie cookie = null;
+				try {
+					cookie = asyncCookie.get();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				}
+				
+				PubsubEvent payload = new PubsubEvent(this, cookie);
+				String itemID = String.valueOf(cookie.getId());
+				//PUBLISH
 				String published = pubSubManager.publisherPublish(pubsubID, PUBSUB_NODE_NAME, itemID, payload);
 				System.out.println(published);
-			} catch (XMPPError e) {
-				e.printStackTrace();
-			} catch (CommunicationException e) {
-				e.printStackTrace();
-			}
-		} while (true);
+			} 
+			while (true);
+			
+		} catch (InvalidFormatException formatEx) {
+			formatEx.printStackTrace(); //Error with the Jabber ID, check format
+		} catch (JAXBException jaxEx) {
+			jaxEx.printStackTrace(); //ERROR RESOLVING PACKAGE NAMES - CHECK PATH IS CORRECT
+		} catch (XMPPError xmppEx) {
+			xmppEx.printStackTrace();
+		} catch (CommunicationException commEx) {
+			commEx.printStackTrace();
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.api.comm.xmpp.pubsub.Subscriber#pubsubEvent(org.societies.api.comm.xmpp.datatypes.Identity, java.lang.String, java.lang.String, java.lang.Object) */
 	@Override
-	public void pubsubEvent(Identity pubsubService, String node, String itemId, Object item) {
+	public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object item) {
 		System.out.println("New info published on topic" + node);
 		System.out.println("ID: " + itemId);
 		//CHECK WHAT PAYLOAD IS
@@ -174,5 +145,5 @@ public class TestExternalEventing implements Runnable, org.societies.api.comm.xm
 			Cookie cookie = (Cookie)item;
 			System.out.println("Wisdom: " + cookie.getValue());
 		}		
-	}	
+	}
 }

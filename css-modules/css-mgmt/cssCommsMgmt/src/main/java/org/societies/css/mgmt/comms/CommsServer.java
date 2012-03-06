@@ -42,7 +42,7 @@ import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
-import org.societies.api.schema.cssmanagement.CssProfile;
+import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.utilities.DBC.Dbc;
 
 public class CommsServer implements IFeatureServer {
@@ -109,7 +109,7 @@ public class CommsServer implements IFeatureServer {
 				case REGISTER_XMPP_SERVER:
 					LOG.debug("CSSManager remote invocation of method " + bean.getMethod().name());
 
-					CssProfile profile = (CssProfile) bean.getProfile();
+					CssRecord profile = (CssRecord) bean.getProfile();
 					asyncResult = this.cssManager.registerXMPPServer(profile);
 					break;
 				default:

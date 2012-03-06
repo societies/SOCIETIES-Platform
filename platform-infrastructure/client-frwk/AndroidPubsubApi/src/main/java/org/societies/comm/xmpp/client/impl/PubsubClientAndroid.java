@@ -2,7 +2,6 @@ package org.societies.comm.xmpp.client.impl;
 
 import static android.content.Context.BIND_AUTO_CREATE;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,24 +17,24 @@ import javax.xml.transform.TransformerException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.comm.android.ipc.IMethodInvocation;
-import org.societies.comm.android.ipc.MethodInvocationServiceConnection;
-import org.societies.comm.android.ipc.utils.MarshallUtils;
-import org.societies.comm.xmpp.interfaces.IdentityManager;
 import org.societies.api.comm.xmpp.pubsub.Affiliation;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.comm.xmpp.pubsub.Subscription;
 import org.societies.api.comm.xmpp.pubsub.SubscriptionState;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.comm.android.ipc.IMethodInvocation;
+import org.societies.comm.android.ipc.MethodInvocationServiceConnection;
+import org.societies.comm.android.ipc.utils.MarshallUtils;
+import org.societies.identity.IdentityManagerImpl;
 import org.societies.pubsub.interfaces.ISubscriber;
 import org.societies.pubsub.interfaces.Pubsub;
 import org.societies.pubsub.interfaces.SubscriptionParcelable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -68,19 +67,19 @@ public class PubsubClientAndroid implements PubsubClient {
 
 	}
 	
-	public void ownerCreate(Identity pubsubService, final String node) throws XMPPError, CommunicationException {
+	public void ownerCreate(IIdentity pubsubService, final String node) throws XMPPError, CommunicationException {		
 		final String pubsubServiceJid = pubsubService.getJid();
 		invokeRemoteMethod(new IMethodInvocation<Pubsub>() {
-			public Object invoke(Pubsub pubsub) throws Throwable {
-				pubsub.ownerCreate(pubsubServiceJid, node);
+			public Object invoke(Pubsub pubsub) throws Throwable {				
+				pubsub.ownerCreate(pubsubServiceJid, node);				
 				return null;
 			}
-		});
+		});		
 	}
 	
 	
 
-	public List<String> discoItems(final Identity pubsubService, final String node)
+	public List<String> discoItems(final IIdentity pubsubService, final String node)
 			throws XMPPError, CommunicationException {
 		return (List<String>)invokeRemoteMethod(new IMethodInvocation<Pubsub>() {
 			public Object invoke(Pubsub pubsub) throws Throwable {
@@ -89,7 +88,7 @@ public class PubsubClientAndroid implements PubsubClient {
 		});
 	}
 
-	public Subscription subscriberSubscribe(Identity pubsubService,
+	public Subscription subscriberSubscribe(IIdentity pubsubService,
 			final String node, final Subscriber subscriber) throws XMPPError,
 			CommunicationException {
 		final String pubsubServiceJid = pubsubService.getJid();
@@ -103,7 +102,7 @@ public class PubsubClientAndroid implements PubsubClient {
 		return subscription;
 	}
 
-	public void subscriberUnsubscribe(final Identity pubsubService, final String node,
+	public void subscriberUnsubscribe(final IIdentity pubsubService, final String node,
 			Subscriber subscriber) throws XMPPError, CommunicationException {
 		final String pubsubServiceJid = pubsubService.getJid();
 		final SubscriberAdapter subscriberAdapter = subscribersMap.get(subscriber);		
@@ -116,20 +115,20 @@ public class PubsubClientAndroid implements PubsubClient {
 		miServiceConnection.unbind();
 	}
 
-	public List<Element> subscriberRetrieveLast(Identity pubsubService,
+	public List<Element> subscriberRetrieveLast(IIdentity pubsubService,
 			String node, String subId) throws XMPPError, CommunicationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public List<Element> subscriberRetrieveSpecific(Identity pubsubService,
+	public List<Element> subscriberRetrieveSpecific(IIdentity pubsubService,
 			String node, String subId, List<String> itemIdList)
 			throws XMPPError, CommunicationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public String publisherPublish(Identity pubsubService, final String node,
+	public String publisherPublish(IIdentity pubsubService, final String node,
 			final String itemId, Object item) throws XMPPError,
 			CommunicationException {
 		final String pubsubServiceJid = pubsubService.getJid();
@@ -156,13 +155,13 @@ public class PubsubClientAndroid implements PubsubClient {
 		});
 	}
 	
-	public void publisherDelete(Identity pubsubService, String node,
+	public void publisherDelete(IIdentity pubsubService, String node,
 			String itemId) throws XMPPError, CommunicationException {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void ownerDelete(Identity pubsubService, final String node)
+	public void ownerDelete(IIdentity pubsubService, final String node)
 			throws XMPPError, CommunicationException {
 		final String pubsubServiceJid = pubsubService.getJid();
 		invokeRemoteMethod(new IMethodInvocation<Pubsub>() {
@@ -173,35 +172,35 @@ public class PubsubClientAndroid implements PubsubClient {
 		});
 	}
 
-	public void ownerPurgeItems(Identity pubsubService, String node)
+	public void ownerPurgeItems(IIdentity pubsubService, String node)
 			throws XMPPError, CommunicationException {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public Map<Identity, SubscriptionState> ownerGetSubscriptions(
-			Identity pubsubService, String node) throws XMPPError,
+	public Map<IIdentity, SubscriptionState> ownerGetSubscriptions(
+			IIdentity pubsubService, String node) throws XMPPError,
 			CommunicationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Map<Identity, Affiliation> ownerGetAffiliations(
-			Identity pubsubService, String node) throws XMPPError,
+	public Map<IIdentity, Affiliation> ownerGetAffiliations(
+			IIdentity pubsubService, String node) throws XMPPError,
 			CommunicationException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public void ownerSetSubscriptions(Identity pubsubService, String node,
-			Map<Identity, SubscriptionState> subscriptions) throws XMPPError,
+	public void ownerSetSubscriptions(IIdentity pubsubService, String node,
+			Map<IIdentity, SubscriptionState> subscriptions) throws XMPPError,
 			CommunicationException {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void ownerSetAffiliations(Identity pubsubService, String node,
-			Map<Identity, Affiliation> affiliations) throws XMPPError,
+	public void ownerSetAffiliations(IIdentity pubsubService, String node,
+			Map<IIdentity, Affiliation> affiliations) throws XMPPError,
 			CommunicationException {
 		// TODO Auto-generated method stub
 		
@@ -252,15 +251,17 @@ public class PubsubClientAndroid implements PubsubClient {
 		}
 
 		public void pubsubEvent(String pubsubService, String node, String itemId, String item) {			
-			Identity pubsubServiceIdentity = (new IdentityManager()).fromJid(pubsubService);			
-			
 			try {
+				IIdentity pubsubServiceIdentity = IdentityManagerImpl.staticfromJid(pubsubService);
+			
 				Object bean = null;
 				synchronized (contentUnmarshaller) {
 					Element element = MarshallUtils.stringToElement(item);
 					bean = contentUnmarshaller.unmarshal(element);
 				}
 				subscriber.pubsubEvent(pubsubServiceIdentity, node, itemId, bean);
+			} catch(InvalidFormatException e) {
+				LOG.error("InvalidFormatException parsing pubsub service JID.", e);
 			} catch (Exception e) {
 				LOG.error("Exception while unmarshalling pubsub event payload",e);
 			}

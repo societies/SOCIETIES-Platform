@@ -24,18 +24,21 @@
  */
 package org.societies.pubsub.interfaces;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.comm.xmpp.interfaces.IdentityManager;
 import org.societies.api.comm.xmpp.pubsub.Subscription;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 public class SubscriptionParcelable implements Parcelable {
 	private Subscription subscription;
+	private IIdentityManager idm;
 	
-	public SubscriptionParcelable(Subscription subscription) {
+	public SubscriptionParcelable(Subscription subscription, IIdentityManager idm) {
 		this.subscription = subscription;
+		this.idm = idm;
 	}
 	
 	public Subscription subscription() {
@@ -64,13 +67,16 @@ public class SubscriptionParcelable implements Parcelable {
         }
     };
     
-    private SubscriptionParcelable(Parcel in) {
-    	IdentityManager idm = new IdentityManager();
-    	Identity pubsubService = idm.fromJid(in.readString());
-    	Identity subscriber = idm.fromJid(in.readString());
-    	String node = in.readString();
-    	String subId = in.readString();
-    	subscription = new Subscription(pubsubService, subscriber, node, subId);
+    private SubscriptionParcelable(Parcel in) {    	
+    	try {
+			IIdentity pubsubService = idm.fromJid(in.readString());
+			IIdentity subscriber = idm.fromJid(in.readString());
+			String node = in.readString();
+			String subId = in.readString();
+			subscription = new Subscription(pubsubService, subscriber, node, subId);
+		} catch (InvalidFormatException e) {
+			throw new RuntimeException("InvalidFormatException converting Parcel to POJO.", e);
+		}
     }
 
 }

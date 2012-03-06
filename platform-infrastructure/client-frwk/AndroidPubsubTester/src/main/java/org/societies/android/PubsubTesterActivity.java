@@ -9,11 +9,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.comm.android.ipc.utils.MarshallUtils;
 import org.societies.comm.xmpp.client.impl.PubsubClientAndroid;
-import org.societies.comm.xmpp.interfaces.IdentityManager;
+import org.societies.identity.IdentityManagerImpl;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.w3c.dom.Element;
 import org.societies.api.schema.examples.calculatorbean.CalcBean;
 
@@ -60,7 +61,7 @@ public class PubsubTesterActivity extends Activity {
     }
      
     private static Subscriber subscriber = new Subscriber() {
-		public void pubsubEvent(Identity pubsubService, String node,
+		public void pubsubEvent(IIdentity pubsubService, String node,
 				String itemId, Object item) {
 			try {
 				log.debug("**************pubsubEvent: "+pubsubService.getJid()+" "+node+" "+itemId+" "+item.getClass().getCanonicalName());
@@ -76,9 +77,9 @@ public class PubsubTesterActivity extends Activity {
     private static class ExampleTask extends AsyncTask<PubsubClientAndroid, Void, Void> {
     	
     	protected Void doInBackground(PubsubClientAndroid... args) {
-    		PubsubClientAndroid pubsubClient = args[0];
-	    	Identity pubsubService = (new IdentityManager()).fromJid("xcmanager.societies.local");
+    		PubsubClientAndroid pubsubClient = args[0];	    	
 	        try {
+	        	IIdentity pubsubService = IdentityManagerImpl.staticfromJid("xcmanager.societies.local");
 	        	CalcBean item = new CalcBean();
 	        	item.setA(1);
 	        	item.setB(2);
@@ -92,9 +93,7 @@ public class PubsubTesterActivity extends Activity {
 	        	String id = pubsubClient.publisherPublish(pubsubService, nodeName, UUID.randomUUID().toString(), item);
 	        	log.debug("ID: "+id);
 	        	try {
-	        		log.debug("Sleeping");
 	        		Thread.sleep(1000);
-	        		log.debug("Waked");
 	        	} catch(InterruptedException e) {}
 	        	pubsubClient.subscriberUnsubscribe(pubsubService, nodeName, subscriber);
 				pubsubClient.ownerDelete(pubsubService, nodeName);

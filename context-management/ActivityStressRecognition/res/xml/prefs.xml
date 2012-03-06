@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="General settings">
+        <ListPreference android:key="@string/prefTimerKey"
+		    android:title="@string/prefTimerTitle" android:summary="@string/prefTimerDesc"
+		    android:entries="@array/prefTimerLabels" android:entryValues="@array/prefTimerValues"
+		    android:dialogTitle="@string/prefTimerDialog"
+		    android:persistent="true"
+		    android:defaultValue="5"
+		    android:shouldDisableView="false">
+    	</ListPreference>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Settings Stroop test">
+    	<ListPreference android:key="@string/prefActivityTraceKey"
+	    		android:title="@string/prefActivityTraceTitle" android:summary="@string/prefActivityTraceDesc"
+			    android:entries="@array/prefActivityTraceLabels" android:entryValues="@array/prefActivityTraceValues"
+			    android:dialogTitle="@string/prefActivityTraceDialog"
+			    android:persistent="true"
+			    android:defaultValue="0"
+			    android:shouldDisableView="false">
+		</ListPreference>
+        <ListPreference android:key="@string/prefDifficultyKey"
+		    android:title="@string/prefDifficultyTitle" android:summary="@string/prefDifficultyDesc"
+		    android:entries="@array/prefDifficultyLabels" android:entryValues="@array/prefDifficultyValues"
+		    android:dialogTitle="@string/prefDifficultyDialog"
+		    android:persistent="true"
+		    android:defaultValue="-1"
+		    android:shouldDisableView="false">
+    	</ListPreference>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Personal Information">
+    	<EditTextPreference android:title="@string/prefNameTitle" android:summary="@string/prefNameDesc" android:key="@string/prefNameKey" android:defaultValue="true" android:dialogTitle="@string/prefNameDialog"></EditTextPreference>
+    	<EditTextPreference android:persistent="true" android:dialogTitle="@string/prefAgeDialog" android:title="@string/prefAgeTitle" android:summary="@string/prefAgeDesc" android:key="@string/prefAgeKey"></EditTextPreference>
+	    <ListPreference android:key="@string/prefGenderKey"
+	    		android:title="@string/prefGenderTitle" android:summary="@string/prefGenderDesc"
+			    android:entries="@array/prefGenderLabels" android:entryValues="@array/prefGenderValues"
+			    android:dialogTitle="@string/prefGenderDialog"
+			    android:persistent="true"
+			    android:defaultValue="5"
+			    android:shouldDisableView="false">
+		</ListPreference>
+    </PreferenceCategory>
+</PreferenceScreen>

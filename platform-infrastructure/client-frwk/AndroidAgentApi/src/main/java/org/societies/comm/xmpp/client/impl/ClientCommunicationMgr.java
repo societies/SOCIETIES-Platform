@@ -5,17 +5,18 @@ import static android.content.Context.BIND_AUTO_CREATE;
 import java.security.InvalidParameterException;
 import java.util.List;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
-import org.societies.api.comm.xmpp.interfaces.IIdentityManager;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.identity.IdentityManagerImpl;
 import org.societies.interfaces.XMPPAgent;
-import org.societies.comm.android.ipc.IMethodInvocation;
 import org.societies.comm.android.ipc.MethodInvocationServiceConnection;
+import org.societies.comm.android.ipc.IMethodInvocation;
 import org.societies.comm.android.ipc.Stub;
-import org.societies.comm.xmpp.interfaces.IdentityManager;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 
@@ -32,25 +33,27 @@ public class ClientCommunicationMgr {
 
 	private Context androidContext;
 	private PacketMarshaller marshaller = new PacketMarshaller();
-	private ServiceConnection registerConnection;
-	private IdentityManager idm = new IdentityManager();
+	private ServiceConnection registerConnection;	
 	private MethodInvocationServiceConnection<XMPPAgent> miServiceConnection;
+	
+	protected IIdentityManager idm;
 	
 	public ClientCommunicationMgr(Context androidContext) {
 		this.androidContext = androidContext;
 		Intent intent = new Intent();
         intent.setComponent(serviceCN);
 		miServiceConnection = new MethodInvocationServiceConnection<XMPPAgent>(intent, androidContext, BIND_AUTO_CREATE, XMPPAgent.class);
+		createIdentityManager();
 	}
 	
-	public void register(final List<String> elementNames, final ICommCallback callback) {	
+	public void register(final List<String> elementNames, final ICommCallback callback) {
 		final List<String> namespaces = callback.getXMLNamespaces();
 		marshaller.register(elementNames, callback.getXMLNamespaces(), callback.getJavaPackages());
 		registerConnection = new ServiceConnection() {
 			@Override
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
-				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, new Messenger(binder));
-				agent.register(elementNames.toArray(new String[0]), namespaces.toArray(new String[0]), new CallbackAdapter(callback, androidContext, this, marshaller));	
+				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, new Messenger(binder));				
+				agent.register(elementNames.toArray(new String[0]), namespaces.toArray(new String[0]), new CallbackAdapter(callback, androidContext, this, marshaller, idm));				
 			}
 
 			@Override
@@ -113,29 +116,24 @@ public class ClientCommunicationMgr {
 		}
 	}
 	
-	public Identity getIdentity() {
-		String identityJid;
+	public IIdentity getIdentity() {
+		String identityJid = getIdentityJid();
 		try {
-			identityJid = (String)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
-				public Object invoke(XMPPAgent agent) throws Throwable {
-					return agent.getIdentity();
-				}
-			});
-		} catch (Throwable e) {
+			return getIdManager().fromJid(identityJid);
+		} catch (InvalidFormatException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
-		return idm.fromJid(identityJid);
 	}
 	
-	public IIdentityManager getIdManager() {
+	public IIdentityManager getIdManager() {		
 		return idm;
 	}
 	
-	public String getItems(final Identity entity, final String node, final ICommCallback callback) throws CommunicationException {
+	public String getItems(final IIdentity entity, final String node, final ICommCallback callback) throws CommunicationException {
 		try {
 			return (String)miServiceConnection.invokeAndKeepBound(new IMethodInvocation<XMPPAgent>() {
 				public Object invoke(XMPPAgent agent) throws Throwable {
-					return agent.getItems(entity.getJid(), node, new CallbackAdapter(callback, androidContext, miServiceConnection, marshaller));
+					return agent.getItems(entity.getJid(), node, new CallbackAdapter(callback, androidContext, miServiceConnection, marshaller, getIdManager()));
 				}
 			});
 		} catch (Throwable e) {
@@ -170,8 +168,8 @@ public class ClientCommunicationMgr {
 
 			@Override
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
-				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, new Messenger(binder));
-				agent.sendIQ(xml, new CallbackAdapter(callback, androidContext, this, marshaller));				
+				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, new Messenger(binder));				
+				agent.sendIQ(xml, new CallbackAdapter(callback, androidContext, this, marshaller, getIdManager()));
 			}
 
 			@Override
@@ -187,5 +185,27 @@ public class ClientCommunicationMgr {
 		Intent intent = new Intent();
         intent.setComponent(serviceCN);
         androidContext.bindService(intent, connection, BIND_AUTO_CREATE);
+	}
+	
+	private String getIdentityJid() {
+		String identityJid;
+		try {
+			identityJid = (String)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					return agent.getIdentity();
+				}
+			});
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+		return identityJid;
+	}
+	
+	protected void createIdentityManager() {
+		try {
+			idm = new IdentityManagerImpl(getIdentityJid());
+		} catch (InvalidFormatException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

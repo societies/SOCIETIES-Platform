@@ -55,7 +55,6 @@ import org.dom4j.Namespace;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.HostedNode;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.StanzaError;
@@ -65,6 +64,8 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
 import org.xml.sax.InputSource;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.IQ.Type;
@@ -270,6 +271,8 @@ public class CommManagerHelper {
 			LOG.info("JAXB error unmarshalling an IQ result", e);
 		} catch (UnavailableException e) {
 			LOG.info(e.getMessage());
+		} catch (InvalidFormatException e) {
+			LOG.warn("Unable to convert Tinder Packet into Stanza", e);
 		}
 	}
 
@@ -289,6 +292,8 @@ public class CommManagerHelper {
 			LOG.info(e.getMessage());
 		} catch (JAXBException e) {
 			LOG.info(e.getMessage());
+		} catch (InvalidFormatException e) {
+			LOG.warn("Unable to convert Tinder Packet into Stanza", e);
 		}
 	}
 
@@ -343,6 +348,11 @@ public class CommManagerHelper {
 					+ "Error (un)marshalling the message:" + e.getMessage();
 			LOG.info(message);
 			return buildErrorResponse(originalFrom, id, message);
+		} catch (InvalidFormatException e) {
+			String message = e.getClass().getName()
+					+ "Error (un)marshalling the message:" + e.getMessage();
+			LOG.info(message);
+			return buildErrorResponse(originalFrom, id, message);
 		}
 	}
 
@@ -361,6 +371,8 @@ public class CommManagerHelper {
 			LOG.info(m);
 		} catch (UnavailableException e) {
 			LOG.info(e.getMessage());
+		} catch (InvalidFormatException e) {
+			LOG.warn("Unable to convert Tinder Packet into Stanza", e);
 		}
 	}
 
@@ -544,7 +556,7 @@ public class CommManagerHelper {
 		}
 	}
 
-	public synchronized IQ buildInfoIq(Identity entity, String node, ICommCallback callback) throws CommunicationException {
+	public synchronized IQ buildInfoIq(IIdentity entity, String node, ICommCallback callback) throws CommunicationException {
 		IQ infoIq = new IQ(Type.get);
 		infoIq.setTo(entity.getJid());
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -562,7 +574,7 @@ public class CommManagerHelper {
 		return infoIq;
 	}
 
-	public synchronized IQ buildItemsIq(Identity entity, String node, ICommCallback callback) throws CommunicationException {
+	public synchronized IQ buildItemsIq(IIdentity entity, String node, ICommCallback callback) throws CommunicationException {
 		IQ itemsIq = new IQ(Type.get);
 		itemsIq.setTo(entity.getJid());
 		ByteArrayOutputStream os = new ByteArrayOutputStream();

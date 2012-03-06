@@ -85,6 +85,18 @@ var successfulLogin = function() {
 	$.mobile.changePage( ($("#menu")), { transition: "slideup"} );
 };
 
+
+
+var resetDeviceMgr = function(){
+    jQuery("#connStatuslist").text("");
+    jQuery("#battStatuslist").text("");
+    jQuery("#locStatuslist").text("");
+    
+    
+    
+}
+
+
 /**
  * Add Javascript functions to various HTML tags using JQuery
  */
@@ -101,7 +113,12 @@ jQuery(function() {
 	$('#connectXMPP').click(function() {
 		successfulLogin();
 	});
+	
+	$('#resetDeviceManager').click(function() {
+		resetDeviceMgr();
+	});
 
+	
 
 });
 

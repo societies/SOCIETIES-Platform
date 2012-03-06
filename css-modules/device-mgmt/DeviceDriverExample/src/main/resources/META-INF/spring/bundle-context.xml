@@ -19,7 +19,7 @@
   
   
   	<bean name="DeviceDriver" class="org.societies.css.devicemgmt.DeviceDriverExample.impl.DeviceDriverExample">
-  		<property name="deviceManager" ref ="deviceManager" />	
+  		<property name="deviceManager" ref ="deviceManager" />
+  		<property name="eventAdmin" ref ="eventAdmin" />	
   	</bean>
-
 </beans>

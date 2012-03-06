@@ -24,8 +24,8 @@
  */
 package org.societies.personalisation.DIANNE.api.DianneNetwork;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
@@ -40,51 +40,51 @@ public interface IDIANNE {
 	
 	/**
 	 * This method will return the current value of the DIANNE preference as an IDIANNEOutcome through the callback
-	 * @param ownerId	the DigitalIdentity of the owner of the preferences
+	 * @param ownerId	the DigitalIIdentity of the owner of the preferences
 	 * @param serviceId	the service identifier of the service requesting the outcome
 	 * @param preferenceName	the name of the preference being requested
 	 * @param callback  the callback to which the IDIANNEOutcome is sent
 	 */
-	public void getOutcome(Identity ownerId, 
+	public void getOutcome(IIdentity ownerId, 
 			IServiceResourceIdentifier serviceId, 
 			String preferenceName, 
 			IPersonalisationInternalCallback callback);
 	
 	/**
 	 * This method will return any updated values of the DIANNE preferences, as an IDIANNEOutcome through the callback, given the new context update
-	 * @param ownerId	the DigitalIdentity of the owner of the preference
+	 * @param ownerId	the DigitalIIdentity of the owner of the preference
 	 * @param serviceId	the service identifier of the service requesting the outcome
 	 * @param preferenceName	the name of the preference being requested
 	 * @param attribute		the context attribute update to implement in the DIANNE before retrieval
 	 * @param callback  the callback to which the IDIANNEOutcome is sent
 	 */
-	public void getOutcome(Identity ownerId, 
+	public void getOutcome(IIdentity ownerId, 
 			CtxAttribute attribute, 
 			IPersonalisationInternalCallback callback);
 	
 	/**
 	 * This method will return any updated values of the DIANNE preferences, as an IDIANNEOutcome through the callback, given the new action update.
 	 * NOTE: This will always return null
-	 * @param ownerId  the DigitalIdentity of the owner of the DIANNE
+	 * @param ownerId  the DigitalIIdentity of the owner of the DIANNE
 	 * @param action  the action update to implement in the DIANNE
 	 * @param callback  the callback to which the IDIANNEOutcome is sent
 	 */
-	public void getOutcome(Identity ownerId, 
+	public void getOutcome(IIdentity ownerId, 
 			IAction action, 
 			IPersonalisationInternalCallback callback);
 	
 	/**
 	 * This method will start DIANNE learning
-	 * @param ownerId  the DigitalIdentity for which DIANNE learning should be enabled
+	 * @param ownerId  the DigitalIIdentity for which DIANNE learning should be enabled
 	 * @param callback  the callback to which the IDIANNEOutcome is sent
 	 */
-	public void enableDIANNELearning(Identity ownerId);
+	public void enableDIANNELearning(IIdentity ownerId);
 	
 	/**
 	 * This method will stop DIANNE learning
-	 * @param ownerId  the DigitalIdentity for which DIANNE learning should be disabled
+	 * @param ownerId  the DigitalIIdentity for which DIANNE learning should be disabled
 	 */
-	public void disableDIANNELearning(Identity ownerId);
+	public void disableDIANNELearning(IIdentity ownerId);
 	
 	
 	

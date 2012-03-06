@@ -30,8 +30,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPreferenceDetails;
@@ -166,7 +166,7 @@ public class Registry implements Serializable{
 		return preferenceCtxIDs;
 	}
 
-	List<CtxAttributeIdentifier> getIDSPreferences(Identity dpi){
+	List<CtxAttributeIdentifier> getIDSPreferences(IIdentity dpi){
 		List<CtxAttributeIdentifier> preferenceCtxIDs = new ArrayList<CtxAttributeIdentifier>();
 		Enumeration<IDSPreferenceDetails> e = this.idsMappings.keys();
 		while (e.hasMoreElements()){
@@ -178,7 +178,7 @@ public class Registry implements Serializable{
 
 		return preferenceCtxIDs;
 	}
-	List<CtxAttributeIdentifier> getPPNPreferences(String contextType, Identity dpi){
+	List<CtxAttributeIdentifier> getPPNPreferences(String contextType, IIdentity dpi){
 		List<CtxAttributeIdentifier> preferenceCtxIDs = new ArrayList<CtxAttributeIdentifier>();
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
 		while (e.hasMoreElements()){
@@ -194,7 +194,7 @@ public class Registry implements Serializable{
 		return preferenceCtxIDs;
 	}
 
-	List<CtxAttributeIdentifier> getIDSPreferences(Identity affectedDPI, Identity providerDPI){
+	List<CtxAttributeIdentifier> getIDSPreferences(IIdentity affectedDPI, IIdentity providerDPI){
 		List<CtxAttributeIdentifier> preferenceCtxIDs = new ArrayList<CtxAttributeIdentifier>();
 		Enumeration<IDSPreferenceDetails> e = this.idsMappings.keys();
 
@@ -229,7 +229,7 @@ public class Registry implements Serializable{
 
 
 
-	List<CtxAttributeIdentifier> getPPNPreferences(String contextType, CtxAttributeIdentifier affectedCtxID, Identity dpi){
+	List<CtxAttributeIdentifier> getPPNPreferences(String contextType, CtxAttributeIdentifier affectedCtxID, IIdentity dpi){
 		List<CtxAttributeIdentifier> preferenceCtxIDs = new ArrayList<CtxAttributeIdentifier>();
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
 		while (e.hasMoreElements()){
@@ -252,7 +252,7 @@ public class Registry implements Serializable{
 
 
 
-	List<CtxAttributeIdentifier> getPPNPreferences(String contextType, Identity dpi, IServiceResourceIdentifier serviceID){
+	List<CtxAttributeIdentifier> getPPNPreferences(String contextType, IIdentity dpi, IServiceResourceIdentifier serviceID){
 		List<CtxAttributeIdentifier> preferenceCtxIDs = new ArrayList<CtxAttributeIdentifier>();
 
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
@@ -275,7 +275,7 @@ public class Registry implements Serializable{
 	}
 
 
-	CtxAttributeIdentifier getPPNPreference(String contextType, CtxAttributeIdentifier affectedCtxID, Identity dpi, IServiceResourceIdentifier serviceID){
+	CtxAttributeIdentifier getPPNPreference(String contextType, CtxAttributeIdentifier affectedCtxID, IIdentity dpi, IServiceResourceIdentifier serviceID){
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
 		while (e.hasMoreElements()){
 			PPNPreferenceDetails d = e.nextElement();
@@ -298,7 +298,7 @@ public class Registry implements Serializable{
 	}
 
 
-	CtxAttributeIdentifier getIDSPreference(Identity affectedDPI, Identity providerDPI, IServiceResourceIdentifier serviceID){
+	CtxAttributeIdentifier getIDSPreference(IIdentity affectedDPI, IIdentity providerDPI, IServiceResourceIdentifier serviceID){
 		Enumeration<IDSPreferenceDetails> e = this.idsMappings.keys();
 
 		while (e.hasMoreElements()){
@@ -320,7 +320,7 @@ public class Registry implements Serializable{
 
 	public static void main(String[] args){
 		PPNPreferenceDetails d = new PPNPreferenceDetails("symloc");
-		Identity dpi = null;
+		IIdentity dpi = null;
 		if (d.getRequestorDPI().equals(dpi)){
 			System.out.println("works");
 		}else{

@@ -29,11 +29,6 @@
 		    <artifactId>AndroidPubsubApi</artifactId>
 		    <version>${version.comm}</version>
 	    </dependency>
-            <dependency>
-		    <groupId>org.jabber.protocol.pubsub</groupId>
-		    <artifactId>PubsubXep</artifactId>
-		    <version>${release.version}</version>
-	    </dependency>
 	    <dependency>
 		    <groupId>org.societies</groupId>
 		    <artifactId>AndroidAgentApi</artifactId>

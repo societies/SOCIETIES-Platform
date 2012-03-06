@@ -40,6 +40,7 @@
   		<property name="remoteCalculator" ref="RemoteCalculator"/>
   		<property name="pubSubManager" ref="PubsubClient"/>
   		<property name="fcGenerator" ref="FortuneCookieBundle"/>
+  		<property name="commManager" ref="CommManager"/>
 	</bean>
 	
 </beans>

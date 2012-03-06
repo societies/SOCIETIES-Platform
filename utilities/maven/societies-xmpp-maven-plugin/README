@@ -1,0 +1,77 @@
+! Introduction
+The Societies-XMPP-Maven-Plugin helps creating XSD Schemas for XMPP usage.
+
+! Usage
+Add the "jaxb2" Maven plugin to your pom.xml
+Sample :
+	<plugin>
+		<groupId>org.codehaus.mojo</groupId>
+		<artifactId>jaxb2-maven-plugin</artifactId>
+		<version>1.3.1</version>
+		<executions>
+			<execution>
+				<phase>generate-sources</phase>
+				<goals>
+					<goal>schemagen</goal>
+				</goals>
+			</execution>
+		</executions>
+		<configuration>
+			<includes>
+				<include>**/*.java</include>
+			</includes>
+			<packageName>org.societies.example.complexservice.schema</packageName>
+		</configuration>
+	</plugin>
+	
+And then, add the "Societies-XMPP" Maven plugin to your pom.xml
+Sample:
+	<plugin>
+		<groupId>org.societies.maven</groupId>
+		<artifactId>societies-xmpp-maven-plugin</artifactId>
+		<version>1.0-SNAPSHOT</version>
+		<executions>
+			<execution>
+				<phase>generate-sources</phase>
+				<goals>
+					<goal>xsd</goal>
+				</goals>
+			</execution>
+		</executions>
+		<configuration>
+			<!-- List of Beans to refactor. This parameter is optional. By default, complexType with "Bean"
+			or "BeanResult" in their name or refactored. -->
+			<beans>
+				<bean>ServiceAMsgBean</bean>
+				<bean>ServiceAMsgBeanResult</bean>
+			</beans>
+			<!-- Namespace define in the CommClient and CommServer of the beans -->
+			<packageName>org.societies.example.complexservice.schema</packageName>
+			<httpNamespace>http://societies.org/example/complexservice/schema</httpNamespace>
+			<!-- Path to the Societies Schema API. The refactored schema will be copied to this location (pathToParentSchema+folderOutputDirectory) -->
+			<pathToParentSchema>../../../api/java/schema/</pathToParentSchema>
+			<!-- Output and input directories -->
+			<!-- <folderInputDirectory>${project.build.directory}/generated-resources/schemagen</folderInputDirectory> -->
+			<!-- <file>schema1.xsd</file> -->
+			<!-- <folderOutputDirectory>${project.basedir}/src/main/resources/</folderOutputDirectory> -->
+		</configuration>
+	</plugin>
+	
+Run mvn generate-sources
+
+Yeap, your schema is generated in your project <folderOutputDirectory><packageName>.xsd
+and also copied in the Societies Schema API (api/java/schema, defined in the <pathToParentSchema> parameter)
+in <folderOutputDirectory><packageName>.xsd
+
+! To do list
+A lot of improvement are still possible for this Maven plugin. Please, feel free
+to participate by creating a new version. Here are some ideas of improvements:
+* Find a way to launch this task in a Maven goal not in the Maven "install" goal, to avoid regenerating everytime XSD schemas.
+* Find a way to use this plugin directly with the jaxb2:schemagen plugin
+* Add configuration possibilities
+* Use the packageName and httpNamespace define in the Bean
+* Improve the robustness of the Societies-XMPP-Maven-Plugin (tests, ...)
+* Create a specific packaging instead of "jar" ("xsd" for exemple)
+* Create an Archetype to generate automatically the structure of a project for
+the creation of XSD XMPP Schemas
+* Generate the Beans directly from selected interfaces 

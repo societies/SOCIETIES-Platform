@@ -28,12 +28,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-import org.societies.personalisation.CRIST.api.model.CRISTUserTaskModelData;
 import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
 import org.societies.personalisation.CRIST.api.model.CRISTUserSituation;
 import org.societies.personalisation.CRIST.api.model.CRISTUserTask;
+import org.societies.personalisation.CRIST.api.model.CRISTUserTaskModelData;
 
 /**
 * @author Zhu WANG
@@ -72,7 +72,7 @@ public interface ICRISTUserIntentTaskManager {
 	 * @param ownerID		- the ID of the owner of the current user intent action
 	 * @param serviceID		- the ID of the related service 
 	 */
-	public CRISTUserAction getCurrentIntentAction(Identity requestor, Identity ownerID, IServiceResourceIdentifier serviceID);
+	public CRISTUserAction getCurrentIntentAction(IIdentity requestor, IIdentity ownerID, IServiceResourceIdentifier serviceID);
 
 	/**
 	 * This method will retrieve the user's current action

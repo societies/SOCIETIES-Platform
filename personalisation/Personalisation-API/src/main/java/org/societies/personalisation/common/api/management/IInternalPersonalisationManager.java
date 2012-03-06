@@ -24,9 +24,9 @@
  */
 package org.societies.personalisation.common.api.management;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IFeedbackEvent;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
@@ -53,21 +53,21 @@ public interface IInternalPersonalisationManager extends IPersonalisationManager
 	 * Allows any service to request an context-based evaluated preference outcome.
 	 * @return					the outcome in the form of an IAction object
 	 * 
-	 * @param ownerID    the DigitalIdentity of the owner of the preferences (i.e. the
+	 * @param ownerID    the DigitalIIdentity of the owner of the preferences (i.e. the
 	 * user of this service)
 	 * @param serviceType    the type of the service requesting the outcome
 	 * @param serviceID    the service identifier of the service requesting the
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
 	 */
-	public void getPreference(Identity ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
+	public void getPreference(IIdentity ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
 
 	/**
 	 * 
 	 * @param className
 	 * @param ctxAttributeId
 	 */
-	public void registerForContextUpdate(Identity id, PersonalisationTypes type, CtxAttributeIdentifier ctxAttributeId);
+	public void registerForContextUpdate(IIdentity id, PersonalisationTypes type, CtxAttributeIdentifier ctxAttributeId);
 
 	/**
 	 * 
@@ -82,5 +82,5 @@ public interface IInternalPersonalisationManager extends IPersonalisationManager
 	 * @param preferenceName
 	 * @param callback
 	 */
-	public void getIntentAction(Identity ownerID, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
+	public void getIntentAction(IIdentity ownerID, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
 }

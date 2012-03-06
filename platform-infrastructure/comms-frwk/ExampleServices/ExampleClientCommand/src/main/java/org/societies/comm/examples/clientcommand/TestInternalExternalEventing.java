@@ -30,21 +30,18 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javax.xml.bind.JAXBException;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.comm.xmpp.interfaces.IIdentityManager;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.comm.xmpp.event.PubsubEvent;
 import org.societies.comm.xmpp.event.PubsubEventFactory;
 import org.societies.comm.xmpp.event.PubsubEventStream;
-import org.societies.comm.xmpp.interfaces.IdentityManager;
 import org.societies.example.fortunecookie.IWisdom;
 import org.societies.example.fortunecookieservice.schema.Cookie;
 import org.springframework.context.ApplicationListener;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+
 /**
  * Describe your class here...
  *
@@ -56,62 +53,64 @@ public class TestInternalExternalEventing implements Runnable, ApplicationListen
 	private static final String EVENTING_NODE_NAME = "Fortune_Cookies";
 	private IIdentityManager idManager;
 	private IWisdom fcGenerator;
-
-	public IWisdom getFcGenerator() {
-		return fcGenerator;
-	}
-
-	public void setFcGenerator(IWisdom fcGenerator) {
-		this.fcGenerator = fcGenerator;
-	}
+	private ICommManager commManager;
 	
-	public TestInternalExternalEventing() {
-		idManager = new IdentityManager();
-	}
+	public IWisdom getFcGenerator() { return fcGenerator; }
+	public void setFcGenerator(IWisdom fcGenerator) {this.fcGenerator = fcGenerator; }
+	
+	public ICommManager getCommManager() { return commManager; }
+	public void setCommManager(ICommManager commManager) { this.commManager = commManager; }
+	
+	public TestInternalExternalEventing() { }
 	
 	public void run() {
-		//FIRST, CREATE THE EVENTING NODE
-		Identity pubsubID = idManager.fromJid("XCManager.societies.local");
-		PubsubEventFactory eventFactory = PubsubEventFactory.getInstance(pubsubID);
-		PubsubEventStream eventStream = eventFactory.getStream(pubsubID, EVENTING_NODE_NAME);
-		
-		//SUBSCRIBE TO EVENTS - IMPLEMENT THE ApplicationListerner<PubsubEvent> interface
-		eventStream.addApplicationListener(this);
-		
-		//ADD LIST OF PACKAGES TO SUPPORT SCHEMA OBJECTS
-		List<String> packageList = new ArrayList<String>();
-		packageList.add("org.societies.api.schema.calculator");
-		packageList.add("org.societies.api.schema.fortunecookie");
+		//GET IDENTITY MANAGER
+		idManager = commManager.getIdManager();
+		IIdentity pubsubID = null;
 		try {
+			pubsubID = idManager.fromJid("XCManager.societies.local");
+			
+			//FIRST, CREATE THE EVENTING NODE
+			PubsubEventFactory eventFactory = PubsubEventFactory.getInstance(pubsubID);
+			PubsubEventStream eventStream = eventFactory.getStream(pubsubID, EVENTING_NODE_NAME);
+		
+			//ADD LIST OF PACKAGES TO ADD SCHEMA OBJECTS
+			List<String> packageList = new ArrayList<String>();
+			packageList.add("org.societies.comm.examples.calculatorbean");
+			packageList.add("org.societies.comm.examples.fortunecookiebean");
 			eventStream.addJaxbPackages(packageList);
-		} catch (JAXBException e1) {
-			//ERROR RESOLVING PACKAGE NAMES - CHECK PATH IS CORRECT
-			e1.printStackTrace();
-		}
-		
-		//EVERY 60 SEC, PUBLISH A NEW PIECE OF WISDOM
-		do {
-			try {
-				Thread.sleep(60000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			//GET A FORTUNE COOKIE
-			Future<Cookie> asyncCookie = fcGenerator.getCookie();
-			Cookie cookie = null;
-			try {
-				cookie = asyncCookie.get();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
-			}			
 					
-			//GENERATE EVENT
-			PubsubEvent event = new PubsubEvent(this, cookie);
-			eventStream.multicastEvent(event);
-		} while (true);
+			//SUBSCRIBE TO EVENTS - IMPLEMENT THE ApplicationListerner<PubsubEvent> interface
+			eventStream.addApplicationListener(this);
 		
+			//EVERY 60 SEC, PUBLISH A NEW PIECE OF WISDOM
+			do {
+				try {
+					Thread.sleep(60000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				//GET A FORTUNE COOKIE
+				Future<Cookie> asyncCookie = fcGenerator.getCookie();
+				Cookie cookie = null;
+				try {
+					cookie = asyncCookie.get();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				}			
+						
+				//GENERATE EVENT
+				PubsubEvent event = new PubsubEvent(this, cookie);
+				eventStream.multicastEvent(event);
+				
+			} while (true);
+		} catch (InvalidFormatException formatEx) {
+			formatEx.printStackTrace(); //Error with the Jabber ID, check format
+		} catch (JAXBException e) {
+			e.printStackTrace();		//ERROR RESOLVING PACKAGE NAMES - CHECK PATH IS CORRECT
+		}
 	}
 
 	/* (non-Javadoc)
