@@ -13,8 +13,6 @@
    <bean id="CommunityLifecycleManagement" class="org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityLifecycleManagement" 
    depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, UserCtxHistoryManager, Identity, CommManagerBundle" init-method="initialiseCommunityLifecycleManagement">
    <property name="linkedCss" ref="Identity"></property>
-   <property name="linkedCis" ref="CisRecord"></property>
-   <property name="linkedDomain" ref="Identity"></property>
    <property name="autoCreationManager" ref="AutomaticCommunityCreationManager"></property>
    <property name="autoConfigurationManager" ref="AutomaticCommunityConfigurationManager"></property>
    <property name="autoDeletionManager" ref="AutomaticCommunityDeletionManager"></property>
@@ -24,8 +22,6 @@
    <bean id="AutomaticCommunityCreationManager" class="org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityCreationManager" 
    depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, CisManager, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, CommunityCtxBroker, UserCtxBroker, UserCtxHistoryManager, Identity, CommManagerBundle, UserFeedback, UserFeedbackCallback" init-method="initialiseAutomaticCommunityCreationManager">
    <property name="linkedCss" ref="Identity"></property>
-   <property name="linkedDomain" ref="Identity"></property>
-   <property name="linkedSuperCis" ref="CisRecord"></property>
    <property name="cisManager" ref="CisManager"></property>
    <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>
    <property name="userContextBroker" ref="UserCtxBroker"></property>
@@ -39,9 +35,7 @@
    <bean id="AutomaticCommunityConfigurationManager" class="org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityConfigurationManager" 
    depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, CisManager, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, CommunityCtxBroker, UserCtxBroker, UserCtxHistoryManager, Identity, CommManagerBundle, UserFeedback, UserFeedbackCallback" init-method="initialiseAutomaticCommunityConfigurationManager">
    <property name="linkedCss" ref="Identity"></property>
-   <property name="linkedCis" ref="CisRecord"></property>
    <property name="cisManager" ref="CisManager"></property>
-   <property name="linkedDomain" ref="Identity"></property>
    <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>
    <property name="userContextBroker" ref="UserCtxBroker"></property>
    <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>
@@ -54,9 +48,7 @@
    <bean id="AutomaticCommunityDeletionManager" class="org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityDeletionManager" 
    depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, CisManager, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, CommunityCtxBroker, UserCtxBroker, UserCtxHistoryManager, Identity, CommManagerBundle, UserFeedback, UserFeedbackCallback" init-method="initialiseAutomaticCommunityDeletionManager">
    <property name="linkedCss" ref="Identity"></property>
-   <property name="linkedCis" ref="CisRecord"></property>
    <property name="cisManager" ref="CisManager"></property>
-   <property name="linkedDomain" ref="Identity"></property>
    <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>
    <property name="userContextBroker" ref="UserCtxBroker"></property>
    <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>

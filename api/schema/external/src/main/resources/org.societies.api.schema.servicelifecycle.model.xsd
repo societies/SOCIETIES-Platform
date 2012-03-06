@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema  elementFormDefault="qualified" version="1.0" 
+            targetNamespace="http://societies.org/api/schema/servicelifecycle/model"   
+            xmlns:tns="http://societies.org/api/schema/servicelifecycle/model"   
+            xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0" 
+            xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:annotation>
+		<xs:documentation>
+			Schema doc to generate the model objects required to interface with the ServiceManagement service
+		</xs:documentation>
+		<xs:appinfo>
+			<jaxb:globalBindings>
+				<jaxb:javaType name="java.net.URI" xmlType="xs:anyURI" parseMethod="create" printMethod="toASCIIString"/>
+			</jaxb:globalBindings> 
+		</xs:appinfo> 
+	</xs:annotation>
+	
+
+  <xs:complexType name="service">
+    <xs:sequence>
+      <xs:element name="authorSignature" type="xs:string" minOccurs="0"/>
+      <xs:element name="serviceDescription" type="xs:string" minOccurs="0"/>
+      <xs:element name="serviceEndpoint" type="xs:string" minOccurs="0"/>
+      <xs:element name="serviceIdentifier" type="tns:serviceResourceIdentifier" minOccurs="0"/>
+      <xs:element name="serviceInstance" type="tns:serviceInstance" minOccurs="0"/>
+      <xs:element name="serviceLocation" type="tns:serviceLocation" minOccurs="0"/>
+      <xs:element name="serviceName" type="xs:string" minOccurs="0"/>
+      <xs:element name="serviceStatus" type="tns:serviceStatus" minOccurs="0"/>
+      <xs:element name="serviceType" type="tns:serviceType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="serviceResourceIdentifier">
+    <xs:sequence>
+      <xs:element name="identifier" type="xs:anyURI" minOccurs="0"/>
+      <xs:element name="serviceInstanceIdentifier" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="serviceInstance">
+    <xs:sequence>
+      <xs:element name="fullJid" type="xs:string" minOccurs="0"/>
+      <xs:element name="serviceImpl" type="tns:serviceImplementation" minOccurs="0"/>
+      <xs:element name="XMPPNode" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="serviceImplementation">
+    <xs:sequence>
+      <xs:element name="serviceNameSpace" type="xs:string" minOccurs="0"/>
+      <xs:element name="serviceProvider" type="xs:string" minOccurs="0"/>
+      <xs:element name="serviceVersion" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="serviceLocation">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Local"/>
+      <xs:enumeration value="Remote"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="serviceStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="STARTED"/>
+      <xs:enumeration value="STOPPED"/>
+      <xs:enumeration value="UNAVAILABLE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="serviceType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ThirdPartyService"/>
+      <xs:enumeration value="CoreService"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+

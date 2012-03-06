@@ -14,17 +14,21 @@ import org.jivesoftware.smack.packet.IQ;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.identity.IdentityManagerImpl;
+import org.societies.utilities.DBC.Dbc;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPNode;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
-import org.societies.comm.xmpp.interfaces.IdentityManager;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import java.io.Serializable;
@@ -36,19 +40,31 @@ public class TesterActivity extends Activity {
 
 	private static final Logger log = LoggerFactory.getLogger(TesterActivity.class);
 	
-    private final List<String> elementNames = Arrays.asList("pubsub");
+    private final List<String> elementNames = Arrays.asList("pubsub", "event", "query");
     private final List<String> namespaces = Arrays.asList(
 					"http://jabber.org/protocol/pubsub",
 			        "http://jabber.org/protocol/pubsub#errors",
 			        "http://jabber.org/protocol/pubsub#event",
-			        "http://jabber.org/protocol/pubsub#owner");
+			        "http://jabber.org/protocol/pubsub#owner",
+			        "http://jabber.org/protocol/disco#items");
     private final List<String> packages = Arrays.asList(
 					"org.jabber.protocol.pubsub",
 					"org.jabber.protocol.pubsub.errors",
 					"org.jabber.protocol.pubsub.owner",
 					"org.jabber.protocol.pubsub.event");
-    private ClientCommunicationMgr ccm = new ClientCommunicationMgr(this);
+    private ClientCommunicationMgr ccm;
+    private final IIdentity toXCManager;
+    private final ICommCallback callback = createCallback();
 
+    public TesterActivity() {
+    	try {
+			toXCManager = IdentityManagerImpl.staticfromJid("xcmanager.societies.local");
+		} catch (InvalidFormatException e) {
+			log.error(e.getMessage(), e);
+			throw new RuntimeException(e);
+		}     
+    }
+    
     /**
      * Called when the activity is first created.
      * @param savedInstanceState If the activity is being re-initialized after 
@@ -60,25 +76,9 @@ public class TesterActivity extends Activity {
         super.onCreate(savedInstanceState);
 		log.debug("onCreate");
         setContentView(R.layout.main);
-                 
-        Identity toXCManager = (new IdentityManager()).fromJid("xcmanager.societies.local");     // TODO
-        final ICommCallback callback = createCallback();
-        final Stanza stanza = new Stanza((new IdentityManager()).fromJid("psi@societies.local"));	 // TODO	
-        final Stanza stanza2 = new Stanza(toXCManager); 
-        final Stanza stanza3 = new Stanza(toXCManager); 
-        final Stanza stanza4 = new Stanza(toXCManager);
-        try {
-			Object payload = createPayload();			
-			ccm.register(elementNames, callback);
-			ccm.sendMessage(stanza, payload);
-//			ccm.sendIQ(stanza2, IQ.Type.GET, payload, callback);
-			String nodeName = "test3";
-			ccm.sendIQ(stanza2, IQ.Type.SET, createNodePayload(nodeName), callback);
-			ccm.sendIQ(stanza3, IQ.Type.SET, deleteNodePayload(nodeName), callback);
-			ccm.sendIQ(stanza4, IQ.Type.SET, deleteNodePayload(nodeName), callback);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
+        
+        ExampleTask task = new ExampleTask(this);
+        task.execute();
     }
     
     @Override
@@ -89,23 +89,25 @@ public class TesterActivity extends Activity {
     
     private class ExampleTask extends AsyncTask<Void, Void, Void> {
     	
+    	private Context context;
+    	
+    	public ExampleTask(Context context) {
+    		this.context = context;
+    	}
+    	
     	protected Void doInBackground(Void... args) {
-    		Identity toXCManager = (new IdentityManager()).fromJid("xcmanager.societies.local");     // TODO
-            final ICommCallback callback = createCallback();
-            final Stanza stanza = new Stanza((new IdentityManager()).fromJid("psi@societies.local"));	 // TODO	
-            final Stanza stanza2 = new Stanza(toXCManager); 
-            final Stanza stanza3 = new Stanza(toXCManager); 
-            final Stanza stanza4 = new Stanza(toXCManager);
-            try {
-    			Object payload = createPayload();			
+        	ccm = new ClientCommunicationMgr(context);
+            try {            	
+    			Object payload = createPayload();		
+    			ccm.getIdManager();
     			ccm.register(elementNames, callback);
-    			ccm.sendMessage(stanza, payload);
-//    			ccm.sendIQ(stanza2, IQ.Type.GET, payload, callback);
+    			ccm.sendMessage(new Stanza(IdentityManagerImpl.staticfromJid("psi@societies.local")), payload);
     			String nodeName = "test3";
-    			ccm.sendIQ(stanza2, IQ.Type.SET, createNodePayload(nodeName), callback);
-    			ccm.sendIQ(stanza3, IQ.Type.SET, deleteNodePayload(nodeName), callback);
-    			ccm.sendIQ(stanza4, IQ.Type.SET, deleteNodePayload(nodeName), callback);
+    			ccm.sendIQ(new Stanza(toXCManager), IQ.Type.SET, createNodePayload(nodeName), callback);
+    			ccm.sendIQ(new Stanza(toXCManager), IQ.Type.SET, deleteNodePayload(nodeName), callback);
+    			ccm.sendIQ(new Stanza(toXCManager), IQ.Type.SET, deleteNodePayload(nodeName), callback);
     			Dbc.assertion("android@societies.local/default".equals(ccm.getIdentity().getJid()));
+    			testGetItems();
     		} catch (Exception e) {
     			log.error(e.getMessage(), e);
     		}
@@ -150,24 +152,7 @@ public class TesterActivity extends Activity {
 
 			public void receiveResult(Stanza stanza, Object payload) {
 				log.debug("receiveResult");
-				debugStanza(stanza);
-				if(payload.getClass().equals(Pubsub.class)) {
-					Pubsub pubsub = (Pubsub)payload;
-					if(pubsub.getSubscriptions() != null) {
-						List<Subscription> subscriptions = pubsub.getSubscriptions().getSubscription();
-						log.debug("subcriptions=" + Arrays.toString(subscriptions.toArray()));
-						for(Subscription sub:subscriptions) {
-							log.debug("jid=" + sub.getJid());
-							log.debug("node=" + sub.getNode());
-							log.debug("subid=" + sub.getSubid());
-							log.debug("subscription=" + sub.getSubscription());							
-						}
-					}
-					else
-						log.debug("getSubscriptions == null");
-				}
-				else
-					log.debug("not pubsub");
+				debugStanza(stanza);				
 			}
 
 			public void receiveError(Stanza stanza, XMPPError error) {
@@ -181,23 +166,6 @@ public class TesterActivity extends Activity {
 			public void receiveMessage(Stanza stanza, Object payload) {
 				log.debug("receiveMessage");
 				debugStanza(stanza);
-				if(payload.getClass().equals(Pubsub.class)) {
-					Pubsub pubsub = (Pubsub)payload;
-					if(pubsub.getSubscriptions() != null) {
-						List<Subscription> subscriptions = pubsub.getSubscriptions().getSubscription();
-						log.debug("subcriptions=" + Arrays.toString(subscriptions.toArray()));
-						for(Subscription sub:subscriptions) {
-							log.debug("jid=" + sub.getJid());
-							log.debug("node=" + sub.getNode());
-							log.debug("subid=" + sub.getSubid());
-							log.debug("subscription=" + sub.getSubscription());							
-						}
-					}
-					else
-						log.debug("getSubscriptions == null");
-				}
-				else
-					log.debug("not pubsub");
 			}
 			
 			private void debugStanza(Stanza stanza) {
@@ -206,10 +174,21 @@ public class TesterActivity extends Activity {
 				log.debug("to="+stanza.getTo());
 			}
 
-			public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
+			public void receiveItems(Stanza stanza, String node, List<String> items) {
 				log.debug("receiveItems");
+				debugStanza(stanza);
+				log.debug("node: "+node);
+				log.debug("items:");
+				for(String  item:items)
+					log.debug(item);
 			}
 		};
+    }
+    
+    private void testGetItems() throws Exception {
+    	log.debug("getItems");
+    	String id = ccm.getItems(toXCManager, "", callback);
+    	log.debug("id: "+id);    	    	
     }
 }
 

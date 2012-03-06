@@ -1,59 +1,64 @@
 package org.societies.pubsub;
 
+import java.io.FileDescriptor;
+
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPNode;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
-import org.societies.api.comm.xmpp.interfaces.IIdentityManager;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
-import org.societies.comm.xmpp.interfaces.IdentityManager;
-import org.societies.comm.xmpp.pubsub.PubsubClient;
-import org.societies.comm.xmpp.pubsub.impl.PubsubClientImpl;
 import org.societies.pubsub.interfaces.Pubsub;
 import org.societies.comm.android.ipc.Skeleton;
+import org.societies.identity.IdentityManagerImpl;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.IInterface;
+import android.os.Messenger;
+import android.os.Parcel;
+import android.os.RemoteException;
 
 public class PubsubService extends Service {
 	
 	private static final Logger log = LoggerFactory.getLogger(PubsubService.class);
 	
-	private static Skeleton skeleton;   
+	private static Skeleton skeleton;
 	
 	@Override
     public IBinder onBind(Intent intent) {  
     	log.debug("onBind"); 
+    	IBinder rv = null;
     	if(skeleton != null)
-    		return skeleton.messenger().getBinder();    
+    		rv = skeleton.messenger().getBinder();
     	else
-    		return null;
+    		rv = null;
+    	return rv;
     }
     
     @Override
     public void onCreate()
-    {
-    	log.debug("onCreate");   
-    	if(skeleton == null) {
-    		try {
-    			ClientCommunicationMgr ccm = new ClientCommunicationMgr(this);
-    			IdentityManager idm = new IdentityManager();    	        
-    	        ICommManager endpoint = new CommManagerAdapter(ccm, idm.fromJid("android@societies.local/default")); // TODO
-    	        PubsubClient pubsubClient = new PubsubClientImpl(endpoint);
-    	        Pubsub pubsub = new PubsubSkeleton(pubsubClient);
-        		skeleton = new Skeleton(pubsub);	
-    		} catch (Exception e) {
-    			log.error(e.getMessage(), e);
-			}
-    	}
+    {    	    	
+    	log.debug("onCreate");  
+		ClientCommunicationMgr ccm = new ClientCommunicationMgr(PubsubService.this);
+        ICommManager endpoint = new CommManagerAdapter(ccm);
+        PubsubClientImpl pubsubClient = new PubsubClientImpl(endpoint);
+        Pubsub pubsub = new PubsubSkeleton(pubsubClient);
+		try {
+			skeleton = new Skeleton(pubsub);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}	
     }
     
     @Override
@@ -65,12 +70,9 @@ public class PubsubService extends Service {
     private static class CommManagerAdapter implements ICommManager {
     	
     	private ClientCommunicationMgr clientCommunicationMgr;
-    	private Identity identity;
-    	private IdentityManager identityManager = new IdentityManager();
     	
-    	public CommManagerAdapter(ClientCommunicationMgr clientCommunicationMgr, Identity identity) {
+    	public CommManagerAdapter(ClientCommunicationMgr clientCommunicationMgr) {
     		this.clientCommunicationMgr = clientCommunicationMgr;
-    		this.identity = identity;
     	}
 
 		public void register(IFeatureServer featureServer)
@@ -90,7 +92,6 @@ public class PubsubService extends Service {
 
 		public void sendIQSet(Stanza stanza, Object payload,
 				ICommCallback callback) throws CommunicationException {
-			log.debug("sendIQSet");
 			clientCommunicationMgr.sendIQ(stanza, IQ.Type.SET, payload, callback); // TODO remove dep with smack by changing interface
 		}
 
@@ -113,22 +114,22 @@ public class PubsubService extends Service {
 			throw new UnsupportedOperationException("Not implemented!");
 		}
 
-		public String getInfo(Identity entity, String node,
+		public String getInfo(IIdentity entity, String node,
 				ICommCallback callback) throws CommunicationException {
 			throw new UnsupportedOperationException("Not implemented!");
 		}
 
-		public String getItems(Identity entity, String node,
+		public String getItems(IIdentity entity, String node,
 				ICommCallback callback) throws CommunicationException {
-			throw new UnsupportedOperationException("Not implemented!");
+			return clientCommunicationMgr.getItems(entity, node, callback);
 		}
 
-		public Identity getIdentity() { // TODO get from AndroidAgent
-			return identity;
+		public IIdentity getIdentity() { 
+			return clientCommunicationMgr.getIdentity();
 		}
 
 		public IIdentityManager getIdManager() {
-			return identityManager;
+			return clientCommunicationMgr.getIdManager();
 		}
     }
 }

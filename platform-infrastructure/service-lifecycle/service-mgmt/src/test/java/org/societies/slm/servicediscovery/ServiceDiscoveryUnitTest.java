@@ -38,10 +38,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.servicelifecycle.model.Service;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.identity.IdentityImpl;
+import org.societies.identity.NetworkNodeImpl;
 
 /**
  * Describe your class here...
@@ -57,9 +60,10 @@ public class ServiceDiscoveryUnitTest {
 
 	private IServiceRegistry mockedServiceReg ; 
 	private ICommManager mockedCommManager;
+	private IIdentityManager mockedIdentityManager;
 
 
-	private IIdentity hostNode; 
+	private INetworkNode hostNode; 
 	private IIdentity remoteNode; 
 	/**
 	 * @throws java.lang.Exception
@@ -70,13 +74,9 @@ public class ServiceDiscoveryUnitTest {
 		//create the mocked classes
 		mockedServiceReg = mock(IServiceRegistry.class); 
 		mockedCommManager = mock(ICommManager.class);
+		mockedIdentityManager = mock(IIdentityManager.class);
 
-		hostNode = new IdentityImpl(IdentityType.CSS, "me", "myDomainID") {
-			@Override
-			public String getJid() {
-				return getIdentifier() + "." + getDomain();
-			}
-		};
+		hostNode = new NetworkNodeImpl(IdentityType.CSS, "me", "myDomainID", null);
 
 		remoteNode = new IdentityImpl(IdentityType.CSS, "them", "otherDomainID") {
 			@Override
@@ -91,7 +91,7 @@ public class ServiceDiscoveryUnitTest {
 		classUnderTest = new ServiceDiscovery();
 		//Initialize the set method (normally called by spring */
 		classUnderTest.setServiceReg(mockedServiceReg) ;
-//		classUnderTest.setCommMngr(mockedCommManager) ;
+		classUnderTest.setCommMngr(mockedCommManager) ;
 
 
 	}
@@ -121,8 +121,9 @@ public class ServiceDiscoveryUnitTest {
 		try
 		{
 			stub(mockedServiceReg.retrieveServicesSharedByCSS(hostNode.getJid())).toReturn(null);
-//			stub(mockedCommManager.getIdentity()).toReturn(hostNode);
-			stub((IIdentity)(mockedCommManager.getIdManager().getThisNetworkNode())).toReturn(hostNode);
+			stub(mockedCommManager.getIdManager()).toReturn(mockedIdentityManager);
+			stub(mockedCommManager.getIdManager().getThisNetworkNode()).toReturn(hostNode);
+			
 
 			asyncResult = classUnderTest.getServices();
 
@@ -151,8 +152,8 @@ public class ServiceDiscoveryUnitTest {
 		try
 		{
 			stub(mockedServiceReg.retrieveServicesSharedByCSS(hostNode.getJid())).toReturn(testLocalServiceList);
-//			stub(mockedCommManager.getIdentity()).toReturn(hostNode);
-			stub((IIdentity)(mockedCommManager.getIdManager().getThisNetworkNode())).toReturn(hostNode);
+			stub(mockedCommManager.getIdManager()).toReturn(mockedIdentityManager);
+			stub(mockedCommManager.getIdManager().getThisNetworkNode()).toReturn(hostNode);
 
 			asyncResult = classUnderTest.getServices();
 
@@ -180,8 +181,8 @@ public class ServiceDiscoveryUnitTest {
 		try
 		{
 			stub(mockedServiceReg.retrieveServicesSharedByCSS(hostNode.getJid())).toReturn(testLocalServiceList);
-//			stub(mockedCommManager.getIdentity()).toReturn(hostNode);
-			stub((IIdentity)(mockedCommManager.getIdManager().getThisNetworkNode())).toReturn(hostNode);
+			stub(mockedCommManager.getIdManager()).toReturn(mockedIdentityManager);
+			stub(mockedCommManager.getIdManager().getThisNetworkNode()).toReturn(hostNode);
 
 			asyncResult = classUnderTest.getServices(hostNode);
 

@@ -26,6 +26,7 @@
 package org.societies.slm.servicediscovery;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -36,10 +37,13 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.servicelifecycle.model.Service;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 
 
 public class ServiceDiscovery implements IServiceDiscovery {
@@ -47,6 +51,22 @@ public class ServiceDiscovery implements IServiceDiscovery {
 	static final Logger logger = LoggerFactory.getLogger(ServiceDiscovery.class);
 
 	private IServiceRegistry serviceReg;
+	private ICommManager commMngr;
+
+
+	/**
+	 * @return the commMngr
+	 */
+	public ICommManager getCommMngr() {
+		return commMngr;
+	}
+
+	/**
+	 * @param commMngr the commMngr to set
+	 */
+	public void setCommMngr(ICommManager commMngr) {
+		this.commMngr = commMngr;
+	}
 
 	public IServiceRegistry getServiceReg() {
 		return serviceReg;
@@ -55,52 +75,93 @@ public class ServiceDiscovery implements IServiceDiscovery {
 	public void setServiceReg(IServiceRegistry serviceReg) {
 		this.serviceReg = serviceReg;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.servicelifecycle.IServiceDiscovery#getServices()
 	 */
 	@Override
 	@Async
 	public Future<List<Service>> getServices() throws ServiceDiscoveryException {
-		
-		//TODO : Fix this up! 
-		IIdentity currentNode = null; // TODO : Get this!
-		
+
+		// TODO : Fix this up!
+		INetworkNode currentNode = commMngr.getIdManager().getThisNetworkNode();
+
 		Future<List<Service>> asyncResult = null;
 		List<Service> result = null;
-		
+
 		asyncResult = this.getServices(currentNode);
 
 		try {
 			result = asyncResult.get();
 		} catch (InterruptedException e) {
-			//TODO Auto-generated catch block
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
 
 		return new AsyncResult<List<Service>>(result);
 	}
-	
-	
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.servicelifecycle.IServiceDiscovery#getServices(org.societies.api.comm.xmpp.datatypes.Identity)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.societies.api.internal.servicelifecycle.IServiceDiscovery#getServices
+	 * (org.societies.api.comm.xmpp.datatypes.Identity)
 	 */
 	@Override
 	@Async
 	public Future<List<Service>> getServices(IIdentity node)
 			throws ServiceDiscoveryException {
-		//TODO : Figure out if node is current node or remote node
-		// IF current, get the details from the service registry and pass back to calling object
-		// otherwise it's remote, 
-		// so check if we have up to date services details in the local service reg?? 
-		// if we don't send the message via the gateway to get remote node services details, 
-		// save to service registry and pass back to calling function
-		return new AsyncResult<List<Service>>(null);
+		List<Service>  serviceList = new ArrayList<Service>();
+
+		try
+		{
+			switch (node.getType())
+			{
+			case CSS:
+			case CSS_RICH:
+			case CSS_LIGHT:
+				serviceList = getServiceReg().retrieveServicesSharedByCSS(node.getJid());
+				break;
+			case CIS:
+
+				serviceList = getServiceReg().retrieveServicesSharedByCIS(node.getJid());
+				break;
+
+			default: 
+				// No nothing, we will handle it below
+
+			} 
+		}catch (ServiceRetrieveException e)	{
+
+			//TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+
+
+
+		if (serviceList == null || serviceList.isEmpty())
+		{
+			IIdentity currentNode = commMngr.getIdManager().getThisNetworkNode();
+			
+			if (currentNode.getJid() != node.getJid())
+			{
+				// TODO : call gateway to get details from remote node
+			}
+		}
+		return new AsyncResult<List<Service>>(serviceList);
+
+
+
+
 	}
 
-	
+
 }

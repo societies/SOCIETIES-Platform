@@ -31,6 +31,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.mockito.Mockito.*;
+
 /**import org.societies.css.cssdirectory.api.ICssDirectoryCloud;
 import org.societies.css.cssdirectory.api.ICssDirectoryRich;
 import org.societies.css.cssdirectory.api.ICssDirectoryLight;
@@ -52,7 +54,8 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
 */
 
 import org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityDeletionManager;
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
+//import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 //import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.mock.EntityIdentifier;
@@ -72,20 +75,26 @@ public class AutomaticCommunityDeletionManagerTest {
 	private AutomaticCommunityDeletionManager autoCommunityDeletionManager;
 	private ICisManager cisManager;
 	
+	@Test
 	public void testIdentifyCissToDelete() {
 		
-		Identity ownerId = null; //James Jents CSS or CIS
+		IIdentity ownerId = null; //James Jents CSS or CIS
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
     	
 		//create CIS for James, with last activity being 1 year ago
-		//CisRecord jamesCis = cisManager.createCis("James", "James CIS");
+
+		cisManager = mock(ICisManager.class);
+		CisRecord jamesCis = cisManager.createCis("James", "James CIS");
 		
     	autoCommunityDeletionManager = new AutomaticCommunityDeletionManager(ownerId, "CSS");
 		
 		autoCommunityDeletionManager.identifyCissToDelete();
 		
+		String[] members = new String[1];
+		members[0] = "James";
 		//the CIS should have been deleted
-		Assert.assertNull(cisManager.getCis("James", "James CIS"));
+		
+		//Assert.assertNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null, null)));
 		
 		
 		
