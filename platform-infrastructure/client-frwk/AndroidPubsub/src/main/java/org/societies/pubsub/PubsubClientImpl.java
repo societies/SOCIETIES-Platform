@@ -337,8 +337,9 @@ public class PubsubClientImpl implements org.societies.pubsub.interfaces.Pubsub,
 		}
 	}
 
-	public void publisherDelete(IIdentity pubsubService, String node,
+	public void publisherDelete(String pubsubServiceJid, String node,
 			String itemId) throws XMPPError, CommunicationException {
+		IIdentity pubsubService = convertStringToIdentity(pubsubServiceJid);
 		Stanza stanza = new Stanza(pubsubService);
 		Pubsub payload = new Pubsub();
 		
@@ -374,8 +375,9 @@ public class PubsubClientImpl implements org.societies.pubsub.interfaces.Pubsub,
 		blockingIQ(stanza, payload);
 	}
 
-	public void ownerPurgeItems(IIdentity pubsubService, String node)
+	public void ownerPurgeItems(String pubsubServiceJid, String node)
 			throws XMPPError, CommunicationException {
+		IIdentity pubsubService = convertStringToIdentity(pubsubServiceJid);
 		Stanza stanza = new Stanza(pubsubService);
 		org.jabber.protocol.pubsub.owner.Pubsub payload = new org.jabber.protocol.pubsub.owner.Pubsub();
 		Purge purge = new Purge();
