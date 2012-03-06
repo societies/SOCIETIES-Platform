@@ -56,7 +56,7 @@ public class CisManager implements ICisManager {
 	private ICISCommunicationMgrFactory ccmFactory;
 	private IIdentity cisManagerId;
 	private ICommManager CSSendpoint;
-	private ICommManager CISendpoint;
+	private ICommManager CISMgmtendpoint;
 
 	private static Logger LOG = LoggerFactory
 			.getLogger(CisManager.class);
@@ -74,7 +74,7 @@ public class CisManager implements ICisManager {
 		
 		cisManagerId = new IdentityImpl(IdentityType.CIS, subDomain, host); 
 		
-		CISendpoint = ccmFactory.getNewCommManager(cisManagerId, secretKey);
+		CISMgmtendpoint = ccmFactory.getNewCommManager(cisManagerId, secretKey);
 		
 		LOG.info("endpoint created");
 		
@@ -83,7 +83,15 @@ public class CisManager implements ICisManager {
 		
 		
 		CISs = new HashSet<CisEditor>();
+		
+		CisEditor cEditor1 = new CisEditor(CSSendpoint.getIdManager().getThisNetworkNode().getJid(),
+				"cis1","thomas.local","","","cis1.password.thomas.local",ccmFactory);
+		
+		CISs.add(cEditor1);
+		
 	}
+
+
 
 	/**
 	 * @deprecated  Replaced by constructor which inherits the ComManager Factory and the IcommManager of the CSS
