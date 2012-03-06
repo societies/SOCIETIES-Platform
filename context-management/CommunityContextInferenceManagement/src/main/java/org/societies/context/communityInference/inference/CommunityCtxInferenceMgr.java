@@ -22,14 +22,57 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.context.communityInference.inference;
 
-package org.societies.slm.servicemanagment.schema.model;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
-/**
- * @author Antonio Panazzolo, Massimo Mazzariol (SN)
- */
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.mock.EntityIdentifier;
+import org.societies.context.api.community.inference.ICommunityCtxInferenceMgr;
 
-public enum ServiceType {
-	ThirdPartyService,
-	CoreService
+public class CommunityCtxInferenceMgr implements ICommunityCtxInferenceMgr{
+
+	@Override
+	public Double evaluateSimilarity(CtxAttributeIdentifier arg0,
+			CtxAttributeIdentifier arg1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<CtxAttributeIdentifier, Double> evaluateSimilarity(
+			List<CtxAttributeIdentifier> arg0, List<CtxAttributeIdentifier> arg1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void inheritContext(CtxAttributeIdentifier arg0,
+			CtxAttributeValueType arg1, EntityIdentifier arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public CtxAttribute predictContext(CtxAttributeIdentifier arg0, Date arg1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CtxAttribute predictContext(CtxAttributeIdentifier arg0, int arg1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void refineContext(CtxAttributeIdentifier arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

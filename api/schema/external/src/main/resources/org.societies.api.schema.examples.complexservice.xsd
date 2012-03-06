@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema version="1.0" elementFormDefault="qualified"
-	targetNamespace="http://societies.org/example/complexservice/schema"
-	xmlns:tns="http://societies.org/example/complexservice/schema"
+	targetNamespace="http://societies.org/api/schema/examples/complexservice"
+	xmlns:tns="http://societies.org/api/schema/examples/complexservice"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
   <xs:element name="serviceAMsgBean">

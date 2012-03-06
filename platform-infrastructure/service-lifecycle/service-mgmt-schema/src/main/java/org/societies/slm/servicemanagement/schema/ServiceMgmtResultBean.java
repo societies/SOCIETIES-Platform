@@ -26,8 +26,8 @@ package org.societies.slm.servicemanagement.schema;
 
 import java.util.Collection;
 
-import org.societies.slm.servicemanagment.schema.model.ServiceStatus;
-import org.societies.slm.servicemanagment.schema.model.Service;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 
 /**
  * @author aleckey
