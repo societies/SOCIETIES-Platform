@@ -121,6 +121,8 @@
 
 		<!-- Device Mgmt -->
 		<module>../css-modules/device-mgmt/devicemanager/</module>
+		<module>../css-modules/device-mgmt/DeviceRegistry/</module>
+		<module>../css-modules/device-mgmt/RegSynchroniser/</module>
 	
 		<!-- Intelligent community orchestration -->
 		<module>../intelligent-community-orchestration/CommunityLifecycleManagement
