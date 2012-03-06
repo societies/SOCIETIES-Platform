@@ -24,6 +24,7 @@
  */
 package org.societies.context.event.impl;
 
+import org.osgi.service.event.EventAdmin;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
@@ -31,6 +32,7 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.context.api.event.CtxEventScope;
 import org.societies.context.api.event.ICtxEventMgr;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -42,14 +44,15 @@ import org.springframework.stereotype.Service;
 @Service("ctxEventMgr")
 public final class CtxEventMgr implements ICtxEventMgr {
 
+	@Autowired(required=true)
+	private EventAdmin eventAdmin;
+	
 	/* (non-Javadoc)
 	 * @see org.societies.context.api.event.ICtxEventMgr#registerListener(org.societies.api.context.event.CtxChangeEventListener, java.lang.String[], org.societies.api.context.model.CtxIdentifier)
 	 */
 	@Override
 	public void registerListener(CtxChangeEventListener listener,
 			String[] topics, CtxIdentifier ctxId) throws CtxException {
-		// TODO Auto-generated method stub
-		
 	}
 
 	/* (non-Javadoc)
