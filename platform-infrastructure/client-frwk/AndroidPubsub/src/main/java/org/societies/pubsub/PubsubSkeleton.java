@@ -20,10 +20,8 @@ public class PubsubSkeleton implements Pubsub {
 		return pubsubClientImpl.discoItems(pubsubService, node);
 	}
 	
-	public void ownerCreate(final String pubsubService, final String node) throws XMPPError, CommunicationException {
-		System.err.println("PubsubSkeleton.ownerCreate"); // TODO remove debug
-		pubsubClientImpl.ownerCreate(pubsubService, node);
-		System.err.println("PubsubSkeleton.ownerCreated"); // TODO remove debug
+	public void ownerCreate(final String pubsubService, final String node) throws XMPPError, CommunicationException {		
+		pubsubClientImpl.ownerCreate(pubsubService, node);		
 	}
 	
 	public void ownerDelete(final String pubsubService, final String node) throws XMPPError, CommunicationException {

@@ -76,8 +76,6 @@ public class PubsubClientAndroid implements PubsubClient {
 			}
 		});		
 	}
-	
-	
 
 	public List<String> discoItems(final IIdentity pubsubService, final String node)
 			throws XMPPError, CommunicationException {

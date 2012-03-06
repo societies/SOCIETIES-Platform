@@ -75,15 +75,11 @@ public class PubsubClientImpl implements /*org.societies.pubsub.interfaces.Pubsu
 	private ICommManager endpoint;
 	private Map<String,Object> responses;
 	private Map<Subscription,List<ISubscriber>> subscribers;	
-	private IIdentity localIdentity;
-	private IIdentityManager idm;
 	
 	public PubsubClientImpl(ICommManager endpoint) {
 		responses = new HashMap<String, Object>();
 		subscribers = new HashMap<Subscription, List<ISubscriber>>();
 		this.endpoint = endpoint;
-		idm = endpoint.getIdManager(); 
-		localIdentity = idm.getThisNetworkNode();
 		try {
 			endpoint.register(this);
 		} catch (CommunicationException e) {
@@ -207,7 +203,7 @@ public class PubsubClientImpl implements /*org.societies.pubsub.interfaces.Pubsu
 	public SubscriptionParcelable subscriberSubscribe(String pubsubService, String node,
 			ISubscriber subscriber) throws XMPPError, CommunicationException {
 		IIdentity pubsubServiceIdentity = convertStringToIdentity(pubsubService);
-		Subscription subscription = new Subscription(pubsubServiceIdentity, localIdentity, node, null);
+		Subscription subscription = new Subscription(pubsubServiceIdentity, localIdentity(), node, null);
 		List<ISubscriber> subscriberList = subscribers.get(subscription);
 		
 		if (subscriberList==null) {
@@ -216,27 +212,27 @@ public class PubsubClientImpl implements /*org.societies.pubsub.interfaces.Pubsu
 			Stanza stanza = new Stanza(pubsubServiceIdentity);
 			Pubsub payload = new Pubsub();
 			Subscribe sub = new Subscribe();
-			sub.setJid(localIdentity.getBareJid());
+			sub.setJid(localIdentity().getBareJid());
 			sub.setNode(node);
 			payload.setSubscribe(sub);
 	
 			Object response = blockingIQ(stanza, payload);
 			
 			String subId = ((Pubsub)response).getSubscription().getSubid();
-			subscription = new Subscription(pubsubServiceIdentity, localIdentity, node, subId);
+			subscription = new Subscription(pubsubServiceIdentity, localIdentity(), node, subId);
 			subscribers.put(subscription, subscriberList);
 		}
 		
 		subscriberList.add(subscriber);
 		
-		return new SubscriptionParcelable(subscription, idm);
+		return new SubscriptionParcelable(subscription, endpoint.getIdManager());
 	}
 
 	public void subscriberUnsubscribe(String pubsubService, String node,
 			ISubscriber subscriber) throws XMPPError,
 			CommunicationException {
 		IIdentity pubsubServiceIdentity = convertStringToIdentity(pubsubService);
-		Subscription subscription = new Subscription(pubsubServiceIdentity, localIdentity, node, null);
+		Subscription subscription = new Subscription(pubsubServiceIdentity, localIdentity(), node, null);
 		List<ISubscriber> subscriberList = subscribers.get(subscription);
 //		subscriberList.remove(subscriber);  // TODO Unsubscribes all subcribers. Change 
 		subscriberList.clear();             //  to allow single unsubscription.
@@ -245,7 +241,7 @@ public class PubsubClientImpl implements /*org.societies.pubsub.interfaces.Pubsu
 			Stanza stanza = new Stanza(pubsubServiceIdentity);
 			Pubsub payload = new Pubsub();
 			Unsubscribe unsub = new Unsubscribe();
-			unsub.setJid(localIdentity.getJid());
+			unsub.setJid(localIdentity().getJid());
 			unsub.setNode(node);
 			payload.setUnsubscribe(unsub);
 	
@@ -406,7 +402,7 @@ public class PubsubClientImpl implements /*org.societies.pubsub.interfaces.Pubsu
 		Map<IIdentity, SubscriptionState> returnMap = new HashMap<IIdentity, SubscriptionState>();
 		for (org.jabber.protocol.pubsub.owner.Subscription s : subList)
 			try {
-				returnMap.put(idm.fromJid(s.getJid()), SubscriptionState.valueOf(s.getSubscription()));
+				returnMap.put(endpoint.getIdManager().fromJid(s.getJid()), SubscriptionState.valueOf(s.getSubscription()));
 			} catch (InvalidFormatException e) {
 				LOG.warn("Unable to parse subscription JIDs",e);
 			}
@@ -428,7 +424,7 @@ public class PubsubClientImpl implements /*org.societies.pubsub.interfaces.Pubsu
 		Map<IIdentity, Affiliation> returnMap = new HashMap<IIdentity, Affiliation>();
 		for (org.jabber.protocol.pubsub.owner.Affiliation a : affList)
 			try {
-				returnMap.put(idm.fromJid(a.getJid()), Affiliation.valueOf(a.getAffiliation()));
+				returnMap.put(endpoint.getIdManager().fromJid(a.getJid()), Affiliation.valueOf(a.getAffiliation()));
 			} catch (InvalidFormatException e) {
 				LOG.warn("Unable to parse affiliation JIDs",e);
 			}
@@ -481,10 +477,14 @@ public class PubsubClientImpl implements /*org.societies.pubsub.interfaces.Pubsu
 	
 	private IIdentity convertStringToIdentity(String jid) throws XMPPError {
 		try {
-			return idm.fromJid(jid);
+			return endpoint.getIdManager().fromJid(jid);
 		} catch (InvalidFormatException e) {
 			throw new XMPPError(StanzaError.jid_malformed, "Invalid JID: "+jid);
 		}
+	}
+	
+	private IIdentity localIdentity() {
+		return endpoint.getIdManager().getThisNetworkNode();
 	}
 	
 }

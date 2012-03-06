@@ -50,23 +50,15 @@ public class PubsubService extends Service {
     public void onCreate()
     {    	    	
     	log.debug("onCreate");  
+		ClientCommunicationMgr ccm = new ClientCommunicationMgr(PubsubService.this);
+        ICommManager endpoint = new CommManagerAdapter(ccm);
+        PubsubClientImpl pubsubClient = new PubsubClientImpl(endpoint);
+        Pubsub pubsub = new PubsubSkeleton(pubsubClient);
 		try {
-			ClientCommunicationMgr ccm = new ClientCommunicationMgr(PubsubService.this) {
-				protected void createIdentityManager() {
-					try {
-						idm = new IdentityManagerImpl("android@societies.local/default");
-					} catch (InvalidFormatException e) {
-						throw new RuntimeException(e);
-					}
-				}
-			};
-	        ICommManager endpoint = new CommManagerAdapter(ccm);
-	        PubsubClientImpl pubsubClient = new PubsubClientImpl(endpoint);
-	        Pubsub pubsub = new PubsubSkeleton(pubsubClient);
-    		skeleton = new Skeleton(pubsub);	
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}  	
+			skeleton = new Skeleton(pubsub);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}	
     }
     
     @Override
