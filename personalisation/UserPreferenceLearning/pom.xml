@@ -5,7 +5,7 @@
 	<!-- change the artifactid to your project artifactid -->
 	<groupId>org.societies.personalisation</groupId>
 	<artifactId>UserPreferenceLearning</artifactId>
-	<packaging>bundle</packaging>
+	<packaging>jar</packaging>
 	<version>${version.pm}</version>
 	<developers>
 		<developer>
@@ -51,10 +51,30 @@
 			<artifactId>com.springsource.junit</artifactId>
 			<version>3.8.2</version>
 		</dependency>
-
-
 	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+        		<groupId>org.apache.maven.plugins</groupId>
+        		<artifactId>maven-shade-plugin</artifactId>
+       			<executions>
+          			<execution>
+            			<phase>package</phase>
+            			<goals>
+              				<goal>shade</goal>
+            			</goals>
+          			</execution>
+        		</executions>
+      	</plugin>	
+		</plugins>
+	</build>
 
+<!--  
 	<build>
 		<plugins>
 			<plugin>
@@ -68,10 +88,6 @@
 						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -91,4 +107,5 @@
 			</plugin>
 		</plugins>
 	</build>
+-->
 </project>
