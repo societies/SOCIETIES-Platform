@@ -30,6 +30,10 @@ package org.societies.api.servicelifecycle.model;
  * @author sanchocsa
  *
  */
+/**
+ * @deprecated  no direct replacement should reference implementation class org.societies.api.schema.servicelifecycle.model.Service
+ */
+@Deprecated
 public interface IService {
 
 	public String getVersion();
