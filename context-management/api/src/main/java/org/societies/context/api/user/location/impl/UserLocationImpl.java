@@ -22,62 +22,67 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.servicelifecycle.model;
+package org.societies.context.api.user.location.impl;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.societies.context.api.user.location.ICoordinate;
+import org.societies.context.api.user.location.IUserLocation;
+import org.societies.context.api.user.location.IZone;
 
 /**
- * Describe your class here...
- * 
- * @author solutanet
- * 
- */
-/**
- * @deprecated  should reference implementation class org.societies.api.schema.servicelifecycle.model.ServiceImplementation
- */
-@Deprecated
-public class ServiceImplementation {
-
-	/**
-	 * @param serviceNameSpace
-	 * @param serviceProvider
-	 * @param serviceVersion
-	 */
-	public ServiceImplementation(String serviceNameSpace,
-			String serviceProvider, String serviceVersion) {
-		super();
-		this.serviceNameSpace = serviceNameSpace;
-		this.serviceProvider = serviceProvider;
-		this.serviceVersion = serviceVersion;
+*
+* @author guyf@il.ibm.com
+* 
+*/
+public class UserLocationImpl implements IUserLocation{
+	private ICoordinate xCoordinate;
+	private ICoordinate yCoordinate;
+	private Collection<IZone> zones;
+	private String id;
+	
+	@Override
+	public ICoordinate getXCoordinate() {
+		return xCoordinate;
 	}
 
-	private String serviceNameSpace;
-	private String serviceProvider;
-	private String serviceVersion;
-
-	public String getServiceNameSpace() {
-		return serviceNameSpace;
+	@Override
+	public ICoordinate getYCoordinate() {
+		return yCoordinate;
 	}
 
-	public void setServiceNameSpace(String serviceNameSpace) {
-		this.serviceNameSpace = serviceNameSpace;
+	@Override
+	public void setXCoordinate(ICoordinate coordinate) {
+		this.xCoordinate = coordinate;
 	}
 
-	public String getServiceProvider() {
-		return serviceProvider;
+	@Override
+	public void setYCoordinate(ICoordinate coordinate) {
+		this.yCoordinate = coordinate;
 	}
 
-	public void setServiceProvider(String serviceProvider) {
-		this.serviceProvider = serviceProvider;
+	@Override
+	public Collection<IZone> getZones() {
+		List<IZone> tempZones = new ArrayList<IZone>();
+		tempZones.addAll(zones);
+		return tempZones;
 	}
 
-	public String getServiceVersion() {
-		return serviceVersion;
+	@Override
+	public void setZones(Collection<IZone> zones) {
+		this.zones = new ArrayList<IZone>();
+		this.zones.addAll(zones);
 	}
 
-	public void setServiceVersion(String serviceVersion) {
-		this.serviceVersion = serviceVersion;
+	@Override
+	public String getId() {
+		return this.id;
 	}
 
-	public String getServiceImplementationId() {
-		return serviceProvider + serviceNameSpace + serviceVersion;
+	@Override
+	public void setId(String id) {
+		this.id = id;
 	}
 }

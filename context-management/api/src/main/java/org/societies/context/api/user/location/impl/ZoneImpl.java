@@ -22,62 +22,95 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.servicelifecycle.model;
+package org.societies.context.api.user.location.impl;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.societies.context.api.user.location.ITag;
+import org.societies.context.api.user.location.IZone;
+import org.societies.context.api.user.location.IZoneId;
 
 /**
- * Describe your class here...
- * 
- * @author solutanet
+ *
+ * @author guyf@il.ibm.com
  * 
  */
-/**
- * @deprecated  should reference implementation class org.societies.api.schema.servicelifecycle.model.ServiceImplementation
- */
-@Deprecated
-public class ServiceImplementation {
+public class ZoneImpl implements IZone {
 
-	/**
-	 * @param serviceNameSpace
-	 * @param serviceProvider
-	 * @param serviceVersion
-	 */
-	public ServiceImplementation(String serviceNameSpace,
-			String serviceProvider, String serviceVersion) {
-		super();
-		this.serviceNameSpace = serviceNameSpace;
-		this.serviceProvider = serviceProvider;
-		this.serviceVersion = serviceVersion;
+	IZoneId zoneId;
+	String description;
+	String name; 
+	String type;
+	ITag personalTag;
+	Collection<ITag> tags;
+	
+	
+	@Override
+	public IZoneId getId() {
+		// TODO Auto-generated method stub
+		return zoneId;
 	}
 
-	private String serviceNameSpace;
-	private String serviceProvider;
-	private String serviceVersion;
-
-	public String getServiceNameSpace() {
-		return serviceNameSpace;
+	@Override
+	public void setId(IZoneId zoneId) {
+		this.zoneId = zoneId;
 	}
 
-	public void setServiceNameSpace(String serviceNameSpace) {
-		this.serviceNameSpace = serviceNameSpace;
+	@Override
+	public String getDescription() {
+		return this.description;
 	}
 
-	public String getServiceProvider() {
-		return serviceProvider;
+	@Override
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
+	@Override
+	public String getName() {
+		return name;
+	}
+	
+	@Override
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	@Override
+	public String getType() {
+		return type;
+	}
+	
+	@Override
+	public void setType(String type) {
+		this.type = type;
 	}
 
-	public void setServiceProvider(String serviceProvider) {
-		this.serviceProvider = serviceProvider;
+	@Override
+	public void setPersonalTag(ITag personalTag) {
+		this.personalTag = personalTag;
+		
 	}
 
-	public String getServiceVersion() {
-		return serviceVersion;
+	@Override
+	public ITag getPersonalTag() {
+		return this.personalTag;
 	}
 
-	public void setServiceVersion(String serviceVersion) {
-		this.serviceVersion = serviceVersion;
+	@Override
+	public void setTags(Collection<ITag> tags) {
+		this.tags = new ArrayList<ITag>();
+		this.tags.addAll(tags);
 	}
 
-	public String getServiceImplementationId() {
-		return serviceProvider + serviceNameSpace + serviceVersion;
+	@Override
+	public Collection<ITag> getTags() {
+		List<ITag> tagsBuffer = new ArrayList<ITag>();
+		tagsBuffer.addAll(this.tags);
+		return tagsBuffer;
 	}
+
+
 }

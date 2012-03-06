@@ -11,7 +11,10 @@ import java.net.URI;
  * @created 06-dic-2011 12.12.59
  */
 
-
+/**
+ * @deprecated  should reference implementation class org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
+ */
+@Deprecated
 public class ServiceResourceIdentifier implements IServiceResourceIdentifier, Serializable {
 	
 	

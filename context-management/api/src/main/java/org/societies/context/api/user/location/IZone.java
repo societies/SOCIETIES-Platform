@@ -22,62 +22,34 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.servicelifecycle.model;
+package org.societies.context.api.user.location;
+
+import java.util.Collection;
 
 /**
- * Describe your class here...
  * 
- * @author solutanet
- * 
+ * This interface represents a zone in the system. It contains some metadata attributes as description, name, type
+ * and in addition the zone Tags and a user personal tag.  
+ * The tagging concept is similar concept to the tagging in Gmail. A zone can have multiple tags such as 
+ * IBM zone, IBM Tel-Aviv zone, IBM office or Office number 10. Nevertheless it can have only one 
+ * personal tag, which is the personal tag the user gave to the zone (e.g. "Dan's room" or "My room").
+ *
+ * @author guyf@il.ibm.com
+ *
  */
-/**
- * @deprecated  should reference implementation class org.societies.api.schema.servicelifecycle.model.ServiceImplementation
- */
-@Deprecated
-public class ServiceImplementation {
 
-	/**
-	 * @param serviceNameSpace
-	 * @param serviceProvider
-	 * @param serviceVersion
-	 */
-	public ServiceImplementation(String serviceNameSpace,
-			String serviceProvider, String serviceVersion) {
-		super();
-		this.serviceNameSpace = serviceNameSpace;
-		this.serviceProvider = serviceProvider;
-		this.serviceVersion = serviceVersion;
-	}
-
-	private String serviceNameSpace;
-	private String serviceProvider;
-	private String serviceVersion;
-
-	public String getServiceNameSpace() {
-		return serviceNameSpace;
-	}
-
-	public void setServiceNameSpace(String serviceNameSpace) {
-		this.serviceNameSpace = serviceNameSpace;
-	}
-
-	public String getServiceProvider() {
-		return serviceProvider;
-	}
-
-	public void setServiceProvider(String serviceProvider) {
-		this.serviceProvider = serviceProvider;
-	}
-
-	public String getServiceVersion() {
-		return serviceVersion;
-	}
-
-	public void setServiceVersion(String serviceVersion) {
-		this.serviceVersion = serviceVersion;
-	}
-
-	public String getServiceImplementationId() {
-		return serviceProvider + serviceNameSpace + serviceVersion;
-	}
+public interface IZone {
+	IZoneId getId();
+	void setId(IZoneId zoneId);
+	String getDescription();
+	void setDescription(String description);
+	void setPersonalTag(ITag personalTag);
+	ITag getPersonalTag();
+	void setTags(Collection<ITag>tags);
+	Collection<ITag> getTags();
+	void setName(String name);
+	String getName();
+	void setType(String type);
+	String getType();
+	
 }

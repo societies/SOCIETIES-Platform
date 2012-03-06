@@ -22,62 +22,37 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.servicelifecycle.model;
+package org.societies.context.api.user.location;
+
+import java.util.Collection;
+import java.util.Set;
 
 /**
- * Describe your class here...
  * 
- * @author solutanet
- * 
+ * This is the API to interact with the backed location management system. 
+ * More methods to be followed. 
+ *
+ * @author guyf@il.ibm.com
+ *
  */
-/**
- * @deprecated  should reference implementation class org.societies.api.schema.servicelifecycle.model.ServiceImplementation
- */
-@Deprecated
-public class ServiceImplementation {
 
+public interface ILocationInferenceAdapter {
 	/**
-	 * @param serviceNameSpace
-	 * @param serviceProvider
-	 * @param serviceVersion
+	 * Returns all the active zone in the system, those that at least one device was identified in them.
+	 * @return
 	 */
-	public ServiceImplementation(String serviceNameSpace,
-			String serviceProvider, String serviceVersion) {
-		super();
-		this.serviceNameSpace = serviceNameSpace;
-		this.serviceProvider = serviceProvider;
-		this.serviceVersion = serviceVersion;
-	}
-
-	private String serviceNameSpace;
-	private String serviceProvider;
-	private String serviceVersion;
-
-	public String getServiceNameSpace() {
-		return serviceNameSpace;
-	}
-
-	public void setServiceNameSpace(String serviceNameSpace) {
-		this.serviceNameSpace = serviceNameSpace;
-	}
-
-	public String getServiceProvider() {
-		return serviceProvider;
-	}
-
-	public void setServiceProvider(String serviceProvider) {
-		this.serviceProvider = serviceProvider;
-	}
-
-	public String getServiceVersion() {
-		return serviceVersion;
-	}
-
-	public void setServiceVersion(String serviceVersion) {
-		this.serviceVersion = serviceVersion;
-	}
-
-	public String getServiceImplementationId() {
-		return serviceProvider + serviceNameSpace + serviceVersion;
-	}
+	public Collection<IZone> getActiveZones();
+	
+	/**
+	 * Returns all the devices' entity ids that were identified in the given zones. 
+	 * @return
+	 */
+	public Set<String> getActiveEntitiesIdsInZone(IZoneId zoneId);
+	
+	/**
+	 * Returns the location of the given entity id.
+	 * @param entityId
+	 * @return
+	 */
+	public IUserLocation getEntityFullLocation(String entityId); 
 }
