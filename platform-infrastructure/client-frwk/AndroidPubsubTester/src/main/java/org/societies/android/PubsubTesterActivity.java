@@ -86,7 +86,7 @@ public class PubsubTesterActivity extends Activity {
 	        	
 	        	final String nodeName = "test3"; 
 				pubsubClient.ownerCreate(pubsubService, nodeName);
-				List<String> items = pubsubClient.discoItems(pubsubService, nodeName);
+				List<String> items = pubsubClient.discoItems(pubsubService, null);
 				for(String i:items)
 					log.debug("DiscoItem: "+i);
 				pubsubClient.subscriberSubscribe(pubsubService, nodeName, subscriber);
