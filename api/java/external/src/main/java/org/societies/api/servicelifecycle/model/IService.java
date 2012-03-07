@@ -28,10 +28,8 @@ package org.societies.api.servicelifecycle.model;
  * Public interface class for the Service object
  *
  * @author sanchocsa
+ * @deprecated Use {@link org.societies.api.schema.servicelifecycle.model.Service} instead
  *
- */
-/**
- * @deprecated  no direct replacement should reference implementation class org.societies.api.schema.servicelifecycle.model.Service
  */
 @Deprecated
 public interface IService {

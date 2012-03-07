@@ -9,10 +9,7 @@ import java.net.URI;
  * @author apanazzolo
  * @version 1.0
  * @created 06-dic-2011 12.12.59
- */
-
-/**
- * @deprecated  should reference implementation class org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
+ * @deprecated Use {@link org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier} instead
  */
 @Deprecated
 public class ServiceResourceIdentifier implements IServiceResourceIdentifier, Serializable {

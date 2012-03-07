@@ -1,5 +1,6 @@
 package org.societies.comm.android.ipc;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -77,8 +78,12 @@ class MessageMethodInvocation {
 
 	public Class<?>[] parameterTypes() {
 		List<Class<?>> rv = new ArrayList<Class<?>>();
-		for(int i=0; i<params.length; i++) 			
-			rv.add(params[i].getClass()); // TODO allow null parameters
+		for(int i=0; i<params.length; i++) {			
+			if(params[i] == null)
+				rv.add(null);
+			else
+				rv.add(params[i].getClass());
+		}
 		
 		if(hasCallback())
 			rv.add(callback);
@@ -107,6 +112,27 @@ class MessageMethodInvocation {
 	public Message message() {
 		return msg;
 	}
+	
+    public Method getMethod(Class<?> target) throws NoSuchMethodException {
+    	Class<?>[] methodParameterTypes = parameterTypes();
+    	for (Method method : target.getMethods()) {
+    		Class<?>[] parameterTypes = method.getParameterTypes();
+    		if (!method.getName().equals(name) || parameterTypes.length != methodParameterTypes.length) {
+    			continue;
+    		}
+    		boolean matches = true;
+    		for (int i = 0; i < parameterTypes.length; i++) {
+    			if (methodParameterTypes[i] != null && !parameterTypes[i].isAssignableFrom(methodParameterTypes[i])) {
+    				matches = false;
+    				break;
+    			}
+    		}
+    		if (matches) {
+    			return method;
+    		}
+    	}
+    	throw new NoSuchMethodException();
+    }
 	
 	private static class Params implements Parcelable {
 		

@@ -39,6 +39,7 @@ public class DeviceCommonInfo {
 	private String deviceConnectionType; 
 	private String deviceLocation;
 	private String deviceProvider;
+	private String deviceID;
 	private boolean contextSource;
 	
 	
@@ -59,6 +60,7 @@ public class DeviceCommonInfo {
 		this.deviceConnectionType = deviceConnectionType;
 		this.deviceLocation = deviceLocation;
 		this.deviceProvider = deviceProvider;
+		this.deviceID = deviceID;
 		this.contextSource = contextSource;
 	}
 	
@@ -124,7 +126,12 @@ public class DeviceCommonInfo {
 		this.deviceProvider = deviceProvider;
 	}
 	
-	
+	public String getDeviceID() {
+		return deviceID;
+	}
+	public void setDeviceID(String deviceID) {
+		this.deviceID = deviceID;
+	}
 	
 	public boolean getContextSource() {
 		return contextSource;
@@ -143,7 +150,8 @@ public class DeviceCommonInfo {
 				+ ", deviceDescription=" + deviceDescription
 				+ ", deviceConnectionType=" + deviceConnectionType
 				+ ", deviceLocation=" + deviceLocation 
-				+ ", deviceProvider=" + deviceProvider 
+				+ ", deviceProvider=" + deviceProvider
+				+ ", deviceID=" + deviceID 
 				+ ", contextSource=" + contextSource
 				+ "]";
 	}

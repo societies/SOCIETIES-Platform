@@ -38,16 +38,14 @@ import org.societies.api.comm.xmpp.pubsub.Affiliation;
 import org.societies.api.comm.xmpp.pubsub.Subscription;
 import org.societies.api.comm.xmpp.pubsub.SubscriptionState;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.comm.android.ipc.utils.MarshallUtils;
-import org.societies.identity.IdentityManagerImpl;
 import org.societies.pubsub.interfaces.ISubscriber;
 import org.societies.pubsub.interfaces.SubscriptionParcelable;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-public class PubsubClientImpl implements /*org.societies.pubsub.interfaces.Pubsub*/ ICommCallback { // TODO implement Pubsub
+public class PubsubClientImpl implements org.societies.pubsub.interfaces.Pubsub, ICommCallback {
 
 	public static final int TIMEOUT = 10000;
 	
@@ -339,8 +337,9 @@ public class PubsubClientImpl implements /*org.societies.pubsub.interfaces.Pubsu
 		}
 	}
 
-	public void publisherDelete(IIdentity pubsubService, String node,
+	public void publisherDelete(String pubsubServiceJid, String node,
 			String itemId) throws XMPPError, CommunicationException {
+		IIdentity pubsubService = convertStringToIdentity(pubsubServiceJid);
 		Stanza stanza = new Stanza(pubsubService);
 		Pubsub payload = new Pubsub();
 		
@@ -376,8 +375,9 @@ public class PubsubClientImpl implements /*org.societies.pubsub.interfaces.Pubsu
 		blockingIQ(stanza, payload);
 	}
 
-	public void ownerPurgeItems(IIdentity pubsubService, String node)
+	public void ownerPurgeItems(String pubsubServiceJid, String node)
 			throws XMPPError, CommunicationException {
+		IIdentity pubsubService = convertStringToIdentity(pubsubServiceJid);
 		Stanza stanza = new Stanza(pubsubService);
 		org.jabber.protocol.pubsub.owner.Pubsub payload = new org.jabber.protocol.pubsub.owner.Pubsub();
 		Purge purge = new Purge();
