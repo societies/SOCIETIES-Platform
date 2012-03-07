@@ -43,6 +43,13 @@
 	<scope>provided</scope>
 </dependency>
 
+		<dependency>
+			<groupId>org.societies.community</groupId>
+			<artifactId>CommunityXep</artifactId>
+			<version>0.0.1</version>
+			<scope>compile</scope>
+		</dependency>
+
 
 <!--   <dependency>
    <groupId>org.igniterealtime</groupId>
@@ -63,21 +70,14 @@
 		    <version>${version.comm}</version>	
 		</dependency>
 		
-		
-<dependency>
-    <groupId>org.societies.cis</groupId>
-    <artifactId>cis-comm-manager</artifactId>
-    <version>${version.comm}</version>	
-</dependency>	
 
-		<dependency>
+	<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
-		
-				<dependency>
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
@@ -89,7 +89,42 @@
 			<version>${slf4j.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+		</dependency>
+				
+<!--		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>org.springframework.beans</artifactId>
+            <version>${spring.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+              <exclusion>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+              </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>org.springframework.context</artifactId>
+            <version>${spring.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+              <exclusion>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+              </exclusion>
+            </exclusions>
+        </dependency>
+-->
 	</dependencies>
 
 	<build>
@@ -103,7 +138,7 @@
 						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<Import-Package>     						org.springframework.beans.factory.annotation*;version="0",
+						<Import-Package>    						org.springframework.beans.factory.annotation*;version="0",
     						org.springframework.stereotype*;version="0",
     						org.xmpp.packet*,
     						!org.gjt.*,
@@ -115,7 +150,10 @@
     						!com.sun.xml.fastinfoset.*,
     						!com.sun.msv.*,
 							*;resolution:=optional</Import-Package>
-						<Export-Package></Export-Package>
+						<Export-Package>
+						org.societies.community*,
+						org.societies.manager*
+						</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>

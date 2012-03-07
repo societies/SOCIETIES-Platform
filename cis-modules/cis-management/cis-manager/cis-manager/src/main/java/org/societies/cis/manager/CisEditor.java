@@ -25,33 +25,52 @@
 
 package org.societies.cis.manager;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 import java.util.Set;
 
 //import org.societies.cis.mgmt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.cis.management.CisActivityFeed;
 import org.societies.api.internal.cis.management.CisRecord;
 import org.societies.api.internal.cis.management.ICisEditor;
+import org.societies.api.internal.cis.management.ICisManager;
 import org.societies.api.internal.cis.management.ServiceSharingRecord;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.comm.xmpp.xc.impl.XCCommunicationMgr;
+import org.societies.community.Community;
+import org.societies.community.Participant;
+import org.societies.community.Who;
 import org.societies.identity.IdentityImpl;
 
 
+/**
+ * @author Thomas Vilarinho (Sintef)
+*/
 
-public class CisEditor implements ICisEditor {
+public class CisEditor implements ICisEditor, IFeatureServer {
 
 
 	public CisRecord cisRecord;
 	public CisActivityFeed cisActivityFeed;
 	public Set<ServiceSharingRecord> sharedServices; 
 //	public CommunityManagement commMgmt;
+	
+	
+	private final static List<String> NAMESPACES = Collections
+			.singletonList("http://societies.org/community");
+	private final static List<String> PACKAGES = Collections
+			.singletonList("org.societies.community");
 	
 	private ICommManager CISendpoint;
 	
@@ -90,7 +109,7 @@ public class CisEditor implements ICisEditor {
 		cisActivityFeed = new CisActivityFeed();
 		sharedServices = new HashSet<ServiceSharingRecord>();
 		membersCss = new String[MAX_NB_MEMBERS];
-		CISendpoint = 	new XCCommunicationMgr(host, cisId,password);
+		//CISendpoint = 	new XCCommunicationMgr(host, cisId,password);
 		
 		cisRecord = new CisRecord(cisActivityFeed,ownerCss, membershipCriteria, cisId, permaLink, membersCss,
 				password, host, sharedServices);
@@ -107,15 +126,24 @@ public class CisEditor implements ICisEditor {
 		sharedServices = new HashSet<ServiceSharingRecord>();
 		membersCss = new String[MAX_NB_MEMBERS];
 
-		
+		LOG.info("CIS editor created");
 		
 		
 		cisIdentity = new IdentityImpl(IdentityType.CIS, cisId, host);
 
 		CISendpoint = ccmFactory.getNewCommManager(cisIdentity, password);
 				
-		LOG.info("endpoint created");
+		LOG.info("CIS endpoint created");
 		
+		
+		
+		try {
+			CISendpoint.register(this);
+		} catch (CommunicationException e) {
+			e.printStackTrace();
+		} // TODO unregister??
+		
+		LOG.info("CIS listener registered");
 		
 		
 		
@@ -159,7 +187,7 @@ public class CisEditor implements ICisEditor {
 		
 		this.cisActivityFeed = this.cisRecord.feed;
 		this.sharedServices = this.cisRecord.sharedServices;
-		CISendpoint = 	new XCCommunicationMgr(cisRecord.getHost(), cisRecord.getCisId(),cisRecord.getPassword());
+		//CISendpoint = 	new XCCommunicationMgr(cisRecord.getHost(), cisRecord.getCisId(),cisRecord.getPassword());
 		
 		
 		// TODO: broadcast its creation to other nodes?
@@ -199,6 +227,82 @@ public class CisEditor implements ICisEditor {
 
 	public void setCisRecord(CisRecord cisRecord) {
 		this.cisRecord = cisRecord;
+	}
+
+
+	@Override
+	public List<String> getJavaPackages() {
+		return PACKAGES;
+	}
+
+
+
+	@Override
+	public Object getQuery(Stanza stanza, Object payload) {
+		// all received IQs contain a community element
+		LOG.info("get Query received");
+		if (payload.getClass().equals(Community.class)) {
+			Community c = (Community) payload;
+			if (c.getJoin() != null) {
+				LOG.info("join received");
+				String jid = stanza.getFrom().getJid();
+//				if (!participants.contains(jid)) {
+//					participants.add(jid);
+//				}
+				// TODO add error cases to schema
+				Community result = new Community();
+				result.setJoin(""); // null means no element and empty string
+									// means empty element
+				return result;
+			}
+			if (c.getLeave() != null) {
+				String jid = stanza.getFrom().getJid();
+//				if (participants.contains(jid)) {
+//					participants.remove(jid);
+//				}
+				// TODO add error cases to schema
+				Community result = new Community();
+				result.setLeave(""); // null means no element and empty string
+										// means empty element
+				return result;
+			}
+			if (c.getWho() != null) {
+				// TODO add error cases to schema
+				Community result = new Community();
+				Who who = new Who();
+/*				for (String jid : participants) {
+					Participant p = new Participant();
+					p.setJid(jid);
+					if (leaders.contains(jid))
+						p.setRole("leader");
+					else
+						p.setRole("participant");
+					who.getParticipant().add(p);
+				}*/
+				result.setWho(who);
+				return result;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public List<String> getXMLNamespaces() {
+		return NAMESPACES;
+	}
+
+
+	@Override
+	public void receiveMessage(Stanza arg0, Object arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public Object setQuery(Stanza arg0, Object arg1) throws XMPPError {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

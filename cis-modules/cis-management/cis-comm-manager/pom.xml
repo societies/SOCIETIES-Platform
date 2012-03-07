@@ -114,7 +114,7 @@
 							*;resolution:=optional
     					</Import-Package>
     					<Export-Package>
-
+							org.societies.community*
 		           		</Export-Package>
 		           		<Embed-Dependency>*;scope=compile</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
