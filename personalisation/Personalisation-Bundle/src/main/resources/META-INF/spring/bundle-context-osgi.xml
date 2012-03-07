@@ -32,13 +32,13 @@
         </osgi:interfaces>
         </osgi:service>    
         
-        <!--  
+         
         <osgi:service ref="userPrefLearning">
         <osgi:interfaces>
         <value>org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Learning</value>
         </osgi:interfaces>
         </osgi:service>    		
-        -->
+       
         
         <!-- PersonalisationManager is needed by pcm, dianne, cristPrediction, cauiPrediction -->
         <osgi:reference id="persoMgr" interface="org.societies.personalisation.common.api.management.IInternalPersonalisationManager" >
