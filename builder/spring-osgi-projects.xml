@@ -122,10 +122,14 @@
 		<module>../css-modules/device-mgmt/RegSynchroniser/</module>
 	
 		<!-- Intelligent community orchestration -->
+
 		<module>../intelligent-community-orchestration/CommunityLifecycleManagement
 		</module>
+
+		<!-- Context Management -->
+
 		<!-- Privacy Mgmt -->
-		<!--module>../privacy-trust/privacy-protection</module-->
+		<!-- <module>../privacy-trust/privacy-protection</module>  -->
 
 	</modules>
 </project>

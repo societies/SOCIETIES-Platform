@@ -39,9 +39,13 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
+import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.community.Community;
 import org.societies.community.Participant;
 import org.societies.community.Who;
+import org.societies.identity.IdentityImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -51,7 +55,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Joao M. Goncalves (PTIN)
+ * @author Joao M. Goncalves (PTIN) and Thomas Vilarinho (Sintef)
  * 
  *         This is the implementation of both the {@link CisCommunicationManagerInterface}
  *         service and of the {@link IFeatureServer} interface. It handles
@@ -75,23 +79,48 @@ public class CisCommunicationManager implements CisCommunicationManagerInterface
 	
 	private static Logger LOG = LoggerFactory.getLogger(CisCommunicationManager.class);
 
-
+	private ICISCommunicationMgrFactory ccmFactory;
 	private ICommManager endpoint;
 	private Set<String> participants;
 	private Set<String> leaders;
+	private IIdentity cisManagerId;
 
-	
-	public CisCommunicationManager(ICommManager endpoint) {
+	@Autowired
+	public CisCommunicationManager(ICISCommunicationMgrFactory ccmFactory) {
+		
 		LOG.info("CIS Comm Started");
-		participants = new HashSet<String>();
-		leaders = new HashSet<String>();
-		this.endpoint = endpoint;
-	
+		
+		this.ccmFactory = ccmFactory;
+		String host= "thomas.local";
+		String subDomain= "CISCommManager";
+		String secretKey= "password.thomas.local";
+		
+		LOG.info("factory bundled");
+		
+		cisManagerId = new IdentityImpl(IdentityType.CIS, subDomain, host); 
+		
+		endpoint = ccmFactory.getNewCommManager(cisManagerId, secretKey);
+		
+		LOG.info("endpoint created");
+		
+		
 		try {
 			endpoint.register(this);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		} // TODO unregister??
+		
+		LOG.info("listener registered");
+		
+		participants = new HashSet<String>();
+		leaders = new HashSet<String>();
+	
+		/*
+		try {
+			endpoint.register(this);
+		} catch (CommunicationException e) {
+			e.printStackTrace();
+		} // TODO unregister??*/
 		
 	}
 
