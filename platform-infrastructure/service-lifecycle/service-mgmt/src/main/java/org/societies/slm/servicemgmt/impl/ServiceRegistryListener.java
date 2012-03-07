@@ -123,7 +123,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 
 		case ServiceEvent.MODIFIED:
 			log.info("Service Modification");
-			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service));
+			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service, serBndl));
 			serviceList.add(service);
 			try {
 				serviceList.add(service);
@@ -135,7 +135,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 			break;
 		case ServiceEvent.REGISTERED:
 			log.info("Service Registered");			
-			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service));
+			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service, serBndl));
 			serviceList.add(service);			
 			try {
 				this.getServiceReg().registerServiceList(serviceList);
@@ -146,7 +146,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 			break;
 		case ServiceEvent.UNREGISTERING:
 			log.info("Service Unregistered");			
-			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service));
+			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service, serBndl));
 			serviceList.add(service);
 			try {
 				this.getServiceReg().unregisterServiceList(serviceList);
