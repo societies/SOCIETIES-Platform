@@ -49,13 +49,11 @@ public class ClientCommunicationMgr {
 		final List<String> namespaces = callback.getXMLNamespaces();
 		marshaller.register(elementNames, callback.getXMLNamespaces(), callback.getJavaPackages());
 		registerConnection = new ServiceConnection() {
-			@Override
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
 				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class}, new Messenger(binder));				
 				agent.register(elementNames.toArray(new String[0]), namespaces.toArray(new String[0]), new CallbackAdapter(callback, androidContext, this, marshaller));				
 			}
 
-			@Override
 			public void onServiceDisconnected(ComponentName cn) {				
 			}			
 		};
@@ -63,17 +61,16 @@ public class ClientCommunicationMgr {
 		bindService(registerConnection);
 	}
 	
-	public void unregister(final List<String> elementNames, final List<String> namespaces, List<String> packages) {
-		ServiceConnection connection = new ServiceConnection() {
-			@Override
+	public void unregister(final List<String> elementNames, final ICommCallback callback) {
+		final List<String> namespaces = callback.getXMLNamespaces();		
+		ServiceConnection connection = new ServiceConnection() {			
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
 				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class},  new Messenger(binder));
 				agent.unregister(elementNames.toArray(new String[0]), namespaces.toArray(new String[0]));	
 				androidContext.unbindService(this);
 				androidContext.unbindService(registerConnection);
 			}
-
-			@Override
+			
 			public void onServiceDisconnected(ComponentName cn) {				
 			}			
 		};

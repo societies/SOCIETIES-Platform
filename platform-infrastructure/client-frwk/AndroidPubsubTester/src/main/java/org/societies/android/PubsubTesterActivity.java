@@ -86,15 +86,17 @@ public class PubsubTesterActivity extends Activity {
 	        	
 	        	final String nodeName = "test3"; 
 				pubsubClient.ownerCreate(pubsubService, nodeName);
-				List<String> items = pubsubClient.discoItems(pubsubService, nodeName);
+				List<String> items = pubsubClient.discoItems(pubsubService, null);
 				for(String i:items)
 					log.debug("DiscoItem: "+i);
 				pubsubClient.subscriberSubscribe(pubsubService, nodeName, subscriber);
-	        	String id = pubsubClient.publisherPublish(pubsubService, nodeName, UUID.randomUUID().toString(), item);
-	        	log.debug("ID: "+id);
+	        	String itemId = pubsubClient.publisherPublish(pubsubService, nodeName, UUID.randomUUID().toString(), item);
+	        	log.debug("ID: "+itemId);
 	        	try {
 	        		Thread.sleep(1000);
 	        	} catch(InterruptedException e) {}
+	        	pubsubClient.publisherDelete(pubsubService, nodeName, itemId);
+	        	pubsubClient.ownerPurgeItems(pubsubService, nodeName);
 	        	pubsubClient.subscriberUnsubscribe(pubsubService, nodeName, subscriber);
 				pubsubClient.ownerDelete(pubsubService, nodeName);
 			} catch (Exception e) {

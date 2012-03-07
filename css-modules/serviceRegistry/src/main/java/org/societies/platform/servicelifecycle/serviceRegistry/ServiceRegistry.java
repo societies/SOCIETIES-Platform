@@ -11,8 +11,8 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegis
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
-import org.societies.api.servicelifecycle.model.Service;
-import org.societies.api.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.RegistryEntry;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceResourceIdentiferDAO;
 
@@ -25,8 +25,7 @@ public class ServiceRegistry implements IServiceRegistry {
 	}
 
 	@Override
-	public void registerServiceList(List<Service> servicesList)
-			throws ServiceRegistrationException {
+	public void registerServiceList(List<Service> servicesList)	throws ServiceRegistrationException {
 		Session session = sessionFactory.openSession();
 		RegistryEntry tmpRegistryEntry = null;
 		try {
