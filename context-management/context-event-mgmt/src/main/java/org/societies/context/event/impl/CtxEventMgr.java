@@ -25,6 +25,8 @@
 package org.societies.context.event.impl;
 
 import org.osgi.service.event.EventAdmin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
@@ -44,6 +46,8 @@ import org.springframework.stereotype.Service;
 @Service("ctxEventMgr")
 public final class CtxEventMgr implements ICtxEventMgr {
 
+	private static final Logger LOG = LoggerFactory.getLogger(CtxEventMgr.class);
+			
 	@Autowired(required=true)
 	private EventAdmin eventAdmin;
 	
