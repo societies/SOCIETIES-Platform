@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -23,7 +23,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.orchestration.CommunityLifecycleManagement.test;
+package org.societies.orchestration.EgocentricCommunityAnalyser.test;
 
 import junit.framework.Assert;
 
@@ -33,47 +33,24 @@ import org.junit.Test;
 
 import static org.mockito.Mockito.*;
 
-/**import org.societies.css.cssdirectory.api.ICssDirectoryCloud;
-import org.societies.css.cssdirectory.api.ICssDirectoryRich;
-import org.societies.css.cssdirectory.api.ICssDirectoryLight;
-
-import org.societies.cssmgmt.cssdiscovery.api.ICssDiscovery;
-
-import org.societies.cis.management.api.CisAcitivityFeed;
-import org.societies.cis.management.api.ServiceSharingRecord;
-import org.societies.cis.management.api.CisActivity;
-import org.societies.cis.management.api.CisRecord;
-
-import org.societies.context.user.similarity.api.platform.IUserCtxSimilarityEvaluator;
-
-import org.societies.context.user.prediction.api.platform.IUserCtxPredictionMgr;
-
-import org.societies.context.user.db.api.platform.IUserCtxDBMgr;
-
-import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
-*/
-
-import org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityConfigurationManager;
+import org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityConfigurationManager;
 import org.societies.api.identity.IIdentity;
-//import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxEntityIdentifier;
-//import org.societies.api.internal.servicelifecycle.model.Service;
-//import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.internal.cis.management.ICisManager;
 import org.societies.api.internal.cis.management.CisRecord;
 
 /**
- * This is the test class for the Automatic Community Configuration Manager component
+ * This is the test class for the Egocentric Community Configuration Manager component
  * 
  * @author Fraser Blackmun
  * @version 0
  * 
  */
 
-public class AutomaticCommunityConfigurationManagerTest {
+public class EgocentricCommunityConfigurationManagerTest {
 	
-	private AutomaticCommunityConfigurationManager autoCommunityConfigurationManager;
+	private EgocentricCommunityConfigurationManager egocentricCommunityConfigurationManager;
 	private ICisManager cisManager;
 	
 	@Test
@@ -86,9 +63,9 @@ public class AutomaticCommunityConfigurationManagerTest {
 	    
 		//CisRecord jamesCisRecord = cisManager.createCis("James", "James CIS");
 		
-    	autoCommunityConfigurationManager = new AutomaticCommunityConfigurationManager(ownerId, "CSS");
+    	egocentricCommunityConfigurationManager = new EgocentricCommunityConfigurationManager(ownerId, "CSS");
 		
-		autoCommunityConfigurationManager.identifyCissToConfigure();
+		egocentricCommunityConfigurationManager.identifyCissToConfigure();
 		
 		//James should have been suggested to leave the CIS.
 		// (No members list function in CisRecord API yet)

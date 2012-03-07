@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -23,7 +23,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.orchestration.CommunityLifecycleManagement.impl;
+package org.societies.orchestration.EgocentricCommunityAnalyser.impl;
 
 import java.util.List;
 
@@ -41,94 +41,53 @@ import org.societies.api.identity.IIdentity;
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
 
 /**
- * This is the class for the Community Lifecycle Management component
+ * This is the class for the Egocentric Community Analyser component
  * 
- * Manager of the three community lifecycle manager components, delegates CIS
- * lifecycle orchestration work to them.
+ * Works on a user's CSS to identify potential CIS creation,
+ * configuration, and deletion opportunities that aim to benefit
+ * both the user and as many other users as possible given
+ * the constraints on data available to do so.
  * 
  * @author Fraser Blackmun
  * @version 0
  * 
  */
 
-public class CommunityLifecycleManagement //implements ICommCallback
+public class EgocentricCommunityAnalyser //implements ICommCallback
 {
 	
-	private AutomaticCommunityCreationManager autoCreationManager;
-	private AutomaticCommunityConfigurationManager autoConfigurationManager;
-	private AutomaticCommunityDeletionManager autoDeletionManager;
+	private EgocentricCommunityCreationManager egocentricCreationManager;
+	private EgocentricCommunityConfigurationManager egocentricConfigurationManager;
+	private EgocentricCommunityDeletionManager egocentricDeletionManager;
 	
-	//private Css linkedCss;
 	private IIdentity linkedCss;
 	
-    private CisRecord linkedCis;
-    
-    //private Domain linkedDomain;  // No datatype yet representing a domain
-	//private IIdentity linkedDomain;
-	
 	/*
-     * Constructor for CommunityLifecycleManagement
+     * Constructor for EgocentricCommunityAnalyser
      * 
-	 * Description: The constructor creates the CommunityLifecycleManagement
+	 * Description: The constructor creates the EgocentricCommunityAnalyser
 	 *              component on a given CSS.
 	 * Parameters: 
 	 * 				linkedEntity - the non-CIS entity, either a user CSS or a domain deployment,
-	 *              that this object will operate on behalf of.
+	 *              that this object will operate on behalf of. (Currently can only be a user CSS)
 	 */
 	
-	public CommunityLifecycleManagement(IIdentity linkedEntity, String linkType) {
+	public EgocentricCommunityAnalyser(IIdentity linkedEntity, String linkType) {
 		if (linkType.equals("CSS"))
 			this.linkedCss = linkedEntity;
 		//else
 		//	this.linkedDomain = linkedEntity;
 	}
 	
-	/*
-     * Constructor for CommunityLifecycleManagement
-     * 
-	 * Description: The constructor creates the CommunityLifecycleManagement
-	 *              component either on a given CSS, or abstractly at a domain/cloud-level.
-	 * Parameters: 
-	 * 				
-	 */
-	
-	public CommunityLifecycleManagement(CisRecord linkedCis) {
-		this.linkedCis = linkedCis;
-	}
-	
-	/**
-	 * User Interface method - trigger creation of CIS following UI request
-	 */
-	
-	//public void createCiss() {
-		
-	//}
-	
-	/**
-	 * User Interface method - trigger configuration of CIS following UI request.
-	 */
-	
-	//public void configureCiss() {
-		
-	//}
-	
-	/**
-	 * User Interface method - trigger deletion of CIS following UI request.
-	 */
-	
-	//public void deleteCiss() {
-		
-	//}
-	
 	public void processPreviousLongTimeCycle() {
-		autoCreationManager.identifyCissToCreate("extensive");
-		autoConfigurationManager.identifyCissToConfigure();
-		autoDeletionManager.identifyCissToDelete();
+		egocentricCreationManager.identifyCissToCreate("extensive");
+		egocentricConfigurationManager.identifyCissToConfigure();
+		egocentricDeletionManager.identifyCissToDelete();
 	}
 	
 	public void processPreviousShortTimeCycle() {
-		autoCreationManager.identifyCissToCreate("not extensive");
-		autoConfigurationManager.identifyCissToConfigure();
+		egocentricCreationManager.identifyCissToCreate("not extensive");
+		egocentricConfigurationManager.identifyCissToConfigure();
 	}
 	
 	public void loop() {
@@ -137,14 +96,6 @@ public class CommunityLifecycleManagement //implements ICommCallback
         new LongSleepThread().start();
 		
 	}
-	
-	//public void stimulusForCommunityCreationDetected() {
-		//autoCreationManager.determineCissToCreate();
-	//}
-	
-	//public void stimulusForCommunityDeletionDetected() {
-	//	autoDeletionManager.determineCissToDelete();
-	//}
 	
 	class ShortSleepThread extends Thread {
 		
@@ -176,15 +127,11 @@ public class CommunityLifecycleManagement //implements ICommCallback
 		}
 	}
     
-    public void initialiseCommunityLifecycleManagement() {
+    public void initialiseEgocentricCommunityAnalyser() {
     	//getCommManager().register(this);
 
     	if (linkedCss != null) {
-    		new CommunityLifecycleManagement(linkedCss, "CSS");
-    		loop();
-    	}
-    	else if (linkedCis != null) {
-    		new CommunityLifecycleManagement(linkedCis);
+    		new EgocentricCommunityAnalyser(linkedCss, "CSS");
     		loop();
     	}
     	/**else if (linkedDomain != null) {
@@ -201,14 +148,6 @@ public class CommunityLifecycleManagement //implements ICommCallback
     	this.linkedCss = linkedCss;
     }
     
-    public CisRecord getLinkedCis() {
-    	return linkedCis;
-    }
-    
-    public void setLinkedCis(CisRecord linkedCis) {
-    	this.linkedCis = linkedCis;
-    }
-    
     /**public IIdentity getLinkedDomain() {
     	return linkedDomain;
     }
@@ -217,28 +156,28 @@ public class CommunityLifecycleManagement //implements ICommCallback
     	this.linkedDomain = linkedDomain;
     }*/
     
-    public AutomaticCommunityCreationManager getAutoCreationManager() {
-    	return autoCreationManager;
+    public EgocentricCommunityCreationManager getEgocentricCreationManager() {
+    	return egocentricCreationManager;
     }
     
-    public void setAutoCreationManager(AutomaticCommunityCreationManager autoCreationManager) {
-    	this.autoCreationManager = autoCreationManager;
+    public void setEgocentricCreationManager(EgocentricCommunityCreationManager egocentricCreationManager) {
+    	this.egocentricCreationManager = egocentricCreationManager;
     }
     
-    public AutomaticCommunityConfigurationManager getAutoConfigurationManager() {
-    	return autoConfigurationManager;
+    public EgocentricCommunityConfigurationManager getEgocentricConfigurationManager() {
+    	return egocentricConfigurationManager;
     }
     
-    public void setAutoConfigurationManager(AutomaticCommunityConfigurationManager autoConfigurationManager) {
-    	this.autoConfigurationManager = autoConfigurationManager;
+    public void setEgocentricConfigurationManager(EgocentricCommunityConfigurationManager egocentricConfigurationManager) {
+    	this.egocentricConfigurationManager = egocentricConfigurationManager;
     }
     
-    public AutomaticCommunityDeletionManager getAutoDeletionManager() {
-    	return autoDeletionManager;
+    public EgocentricCommunityDeletionManager getEgocentricDeletionManager() {
+    	return egocentricDeletionManager;
     }
     
-    public void setAutoDeletionManager(AutomaticCommunityDeletionManager autoDeletionManager) {
-    	this.autoDeletionManager = autoDeletionManager;
+    public void setEgocentricDeletionManager(EgocentricCommunityDeletionManager egocentricDeletionManager) {
+    	this.egocentricDeletionManager = egocentricDeletionManager;
     }
     
     //public CommManagerBundle getCommManager() {

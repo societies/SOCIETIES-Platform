@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -56,7 +56,7 @@ import org.societies.context.user.db.api.platform.IUserCtxDBMgr;
 import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
 */
 
-import org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityCreationManager;
+import org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityRecommender;
 
 import org.societies.api.identity.IIdentity;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
@@ -81,16 +81,16 @@ import org.societies.api.internal.cis.management.CisRecord;
 
 
 /**
- * This is the test class for the Automatic Community Creation Manager component
+ * This is the test class for the Community Recommender component
  * 
  * @author Fraser Blackmun
  * @version 0
  * 
  */
 
-public class AutomaticCommunityCreationManagerTest {
+public class CommunityRecommenderTest {
 	
-	private AutomaticCommunityCreationManager autoCommunityCreationManager;
+	private CommunityRecommender communityRecommender;
 	private ICtxBroker userCtxBroker;
 	//private IUserCtxDBMgr userCtxDBMgr;
 	private CtxEntityIdentifier entityId;
@@ -107,7 +107,7 @@ public class AutomaticCommunityCreationManagerTest {
 		userCtxBroker = mock(ICtxBroker.class);
 		
 		
-    	autoCommunityCreationManager = new AutomaticCommunityCreationManager(ownerId, "CSS");
+    	communityRecommender = new CommunityRecommender(ownerId, "CSS");
 		
     	
     	
@@ -131,7 +131,7 @@ public class AutomaticCommunityCreationManagerTest {
 			e.printStackTrace();
 		}
 		//check user joined CISs before
-		autoCommunityCreationManager.identifyCissToCreate("not extensive");
+		communityRecommender.identifyCissToCreate("not extensive");
 		//check and compare user joined CISs after
 		
 		String[] members = new String[1];
@@ -151,7 +151,7 @@ public class AutomaticCommunityCreationManagerTest {
 		cisManager = mock(ICisManager.class);
 		userCtxBroker = mock(ICtxBroker.class);
 		
-    	autoCommunityCreationManager = new AutomaticCommunityCreationManager(ownerId, "CSS");
+    	communityRecommender = new CommunityRecommender(ownerId, "CSS");
 		
     	
     	
@@ -182,7 +182,7 @@ public class AutomaticCommunityCreationManagerTest {
     	//userCtxBroker.addAttribute(ownerIdContextEntity, CtxAttributeValueType.INDIVIDUAL, "CSS proximity", IUserCtxBrokerCallback);
     	
     	//check user joined CISs before
-		autoCommunityCreationManager.identifyCissToCreate("extensive");
+		communityRecommender.identifyCissToCreate("extensive");
 		//check and compare user joined CISs after
 		
 		//Assert.assertNotNull(/**User's joined CISs*/);

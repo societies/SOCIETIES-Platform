@@ -12,7 +12,7 @@
        testing of the bundle outside of an OSGi container -->
        
         
-        <osgi:service ref="CommunityLifecycleManagement">
+        <osgi:service ref="EgocentricCommunityAnalyser">
         <osgi:interfaces>
         <value></value>
         </osgi:interfaces>

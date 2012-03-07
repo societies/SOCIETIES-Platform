@@ -120,9 +120,13 @@
 		<module>../css-modules/device-mgmt/DeviceRegistry/</module>
 		<module>../css-modules/device-mgmt/RegSynchroniser/</module>
 	
-		<!-- Intelligent community orchestration -->
+		<!-- Intelligent Community Orchestration -->
 
+		<module>../intelligent-community-orchestration/API
+		</module>
 		<module>../intelligent-community-orchestration/CommunityLifecycleManagement
+		</module>
+		<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser
 		</module>
 
 		<!-- Context Management -->

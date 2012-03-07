@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -23,13 +23,14 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.orchestration.CommunityLifecycleManagement.impl;
+package org.societies.orchestration.EgocentricCommunityAnalyser.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 
 import static org.mockito.Mockito.*;
 
@@ -72,10 +73,12 @@ import org.societies.api.identity.IIdentity;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.HashMap;
+
 import java.util.concurrent.Future;
 
 /**
- * This is the class for the Automatic Community Creation Manager component.
+ * This is the class for the Egocentric Community Creation Manager component.
  * 
  * The component is responsible for automating, and triggering the process of 
  * suggesting to one or more relevant CSSs, the creation of CISs and sub-CISs. This 
@@ -92,7 +95,7 @@ import java.util.concurrent.Future;
  * 
  */
 
-public class AutomaticCommunityCreationManager //implements ICommCallback
+public class EgocentricCommunityCreationManager //implements ICommCallback
 {
 	
 	private IIdentity linkedCss;
@@ -116,17 +119,19 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 	
 	private ICssDirectory userCssDirectory;
     
+	private ISuggestedCommunityAnalyser suggestedCommunityAnalyser;
+	
 	/*
-     * Constructor for AutomaticCommunityConfigurationManager
+     * Constructor for EgocentricCommunityConfigurationManager
      * 
-	 * Description: The constructor creates the AutomaticCommunityConfigurationManager
+	 * Description: The constructor creates the EgocentricCommunityConfigurationManager
 	 *              component on a given CSS.
 	 * Parameters: 
 	 * 				linkedEntity - the non-CIS entity, either a user CSS or a domain deployment,
 	 *              that this object will operate on behalf of.
 	 */
 	
-	public AutomaticCommunityCreationManager(IIdentity linkedEntity, String linkType) {
+	public EgocentricCommunityCreationManager(IIdentity linkedEntity, String linkType) {
 		if (linkType.equals("CSS"))
 			this.linkedCss = linkedEntity;
 		else
@@ -134,16 +139,16 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 	}
 	
 	/*
-     * Constructor for AutomaticCommunityCreationManager
+     * Constructor for EgocentricCommunityCreationManager
      * 
-	 * Description: The constructor creates the AutomaticCommunityCreationManager
+	 * Description: The constructor creates the EgocentricCommunityCreationManager
 	 *              component abstractly at a CIS level.
 	 * Parameters: 
 	 * 				linkedSuperCis - the CIS on behalf of which this object is to operate, by
 	 *                               suggesting sub-CISs on it.
 	 */
 	
-	public AutomaticCommunityCreationManager(CisRecord linkedSuperCis) {
+	public EgocentricCommunityCreationManager(CisRecord linkedSuperCis) {
 		this.linkedSuperCis = linkedSuperCis;
 	}
 	
@@ -459,6 +464,14 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 				//if (potentialCisMembers.size >= 2)
 				//    if (!joinedCiss.getMemberList().contains(thisone))
 				//        cissToCreate.add(new CisRecord(null, linkedCss, "Interactors on Service " + "serviceName", null, null, null, null, null);
+			    
+				//Now look for more specific sub-CISs
+				//for (int i = 0; i < interactedCssIDs.size(); i++) {
+				//    For last day, split time into 7 segments and compare segment total interactions to detect most popular segment(s)
+				//    Look for that over each day of last week
+				//    Apply same 7-segment analysis to last week, look for that over last month
+				//    Based on high-density segments relative to the others, suggest sub-CIS for either a day of the week, or a time of day, for using the service in question
+			    //}
 			}
 		}
 			
@@ -563,20 +576,16 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 			}
 		}
 		
-		
-		
-		
-		
-		//invoke UserAgent suggestion GUI for creation of CISs
-		//OR
-		//automatically call CIS management functions to create CISs
-		
 		//Can't use GUI in tests
 		//cissToCreate = getUserFeedbackOnCreation(cissToCreate);
 		
-		if (cissToCreate != null) 
-		    for (int i = 0; i < cissToCreate.size(); i++)
-			    cisManager.createCis(linkedCss.getIdentifier(), cissToCreate.get(i).getCisId());
+		HashMap<String, ArrayList<CisRecord>> theResult = new HashMap<String, ArrayList<CisRecord>>();
+		theResult.put("Create CISs", cissToCreate);
+		suggestedCommunityAnalyser.analyseEgocentricRecommendations(theResult);
+		
+		//if (cissToCreate != null) 
+		//    for (int i = 0; i < cissToCreate.size(); i++)
+		//	    cisManager.createCis(linkedCss.getIdentifier(), cissToCreate.get(i).getCisId());
 	}
 	
 	public ArrayList<CisRecord> getUserFeedbackOnCreation(ArrayList<CisRecord> cissToCreate) {
@@ -624,10 +633,10 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
 		return tempCisPossibility;
 	}
 	
-    public void initialiseAutomaticCommunityCreationManager() {
+    public void initialiseEgocentricCommunityCreationManager() {
     	//getCommManager().register(this);
     	
-    	new AutomaticCommunityCreationManager(linkedCss, "CSS");
+    	new EgocentricCommunityCreationManager(linkedCss, "CSS");
     }
     
     public IIdentity getLinkedCss() {
@@ -683,6 +692,14 @@ public class AutomaticCommunityCreationManager //implements ICommCallback
     
     public void setCisManager(ICisManager cisManager) {
     	this.cisManager = cisManager;
+    }
+    
+    public ISuggestedCommunityAnalyser getSuggestedCommunityAnalyser() {
+    	return suggestedCommunityAnalyser;
+    }
+    
+    public void setSuggestedCommunityAnalyser(ISuggestedCommunityAnalyser suggestedCommunityAnalyser) {
+    	this.suggestedCommunityAnalyser = suggestedCommunityAnalyser;
     }
     
     public IUserFeedback getUserFeedback() {
