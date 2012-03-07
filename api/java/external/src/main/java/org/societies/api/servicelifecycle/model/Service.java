@@ -33,7 +33,9 @@ import java.net.URISyntaxException;
  * @author mmazzariol
  * @version 1.0
  * @created 21-dic-2011 17.18.32
+ * @deprecated Use {@link org.societies.api.schema.servicelifecycle.model.Service} instead
  */
+@Deprecated
 public class Service implements IService{
 
 	/**

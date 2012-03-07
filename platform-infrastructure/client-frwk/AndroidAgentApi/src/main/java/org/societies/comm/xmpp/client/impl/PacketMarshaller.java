@@ -2,9 +2,11 @@ package org.societies.comm.xmpp.client.impl;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.AbstractMap.SimpleEntry;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -131,6 +133,22 @@ public class PacketMarshaller {
 		Object payload = u.unmarshal(new InputSource(new StringReader(xml)));
 
 		return payload;
+	}
+	
+	public SimpleEntry<String, List<String>> parseItemsResult(Packet packet) throws SAXException, IOException, ParserConfigurationException {
+		Element element = getElementAny(packet);
+		String node = element.getAttribute("node");
+		List<String> list = new ArrayList<String>();
+		NodeList childs = element.getChildNodes();
+		for(int i=0; i<childs.getLength(); i++) {
+			Node child = childs.item(i);
+			if(child instanceof Element) {
+				Element childElement = (Element)child;
+				list.add(childElement.getAttribute("node"));
+			}
+			
+		}
+		return new SimpleEntry<String, List<String>>(node, list);
 	}
 	
 	private String marshallPayload(Object payload) throws JAXBException, ParserConfigurationException, TransformerException {

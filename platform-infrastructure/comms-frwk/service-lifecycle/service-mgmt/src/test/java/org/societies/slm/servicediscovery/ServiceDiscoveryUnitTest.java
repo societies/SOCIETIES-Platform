@@ -24,14 +24,16 @@
  */
 package org.societies.slm.servicediscovery;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
-
 
 import org.junit.After;
 import org.junit.Before;
@@ -41,8 +43,8 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
-import org.societies.api.servicelifecycle.model.Service;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
+import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.identity.IdentityImpl;
 import org.societies.identity.NetworkNodeImpl;
 

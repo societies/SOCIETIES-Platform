@@ -28,8 +28,9 @@ package org.societies.api.servicelifecycle.model;
  * Describe your class here...
  * 
  * @author solutanet
- * 
+ * @deprecated Use {@link org.societies.api.schema.servicelifecycle.model.ServiceImplementation}
  */
+@Deprecated
 public class ServiceImplementation {
 
 	/**

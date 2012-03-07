@@ -1,80 +1,52 @@
 package org.societies.pubsub;
 
-import java.io.IOException;
+import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.comm.android.ipc.utils.MarshallUtils;
-import org.societies.comm.xmpp.interfaces.IdentityManager;
-import org.societies.comm.xmpp.pubsub.PubsubClient;
-import org.societies.comm.xmpp.pubsub.Subscriber;
-import org.societies.comm.xmpp.pubsub.Subscription;
 import org.societies.pubsub.interfaces.ISubscriber;
 import org.societies.pubsub.interfaces.Pubsub;
 import org.societies.pubsub.interfaces.SubscriptionParcelable;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 public class PubsubSkeleton implements Pubsub {
 
-	private PubsubClient pubsubClientImpl;
+	private PubsubClientImpl pubsubClientImpl;
 	
-	public PubsubSkeleton(PubsubClient pubsubClient) {
+	public PubsubSkeleton(PubsubClientImpl pubsubClient) {
 		pubsubClientImpl = pubsubClient; 
 	}
 	
-	public void ownerCreate(final String pubsubService, final String node) {
-		try {
-			pubsubClientImpl.ownerCreate((new IdentityManager()).fromJid(pubsubService), node);
-		} catch(Exception e) { // TODO
-			e.printStackTrace();
-			throw new RuntimeException(e.getMessage(), e);
-		}
+	public List<String> discoItems(String pubsubService, String node) throws XMPPError, CommunicationException  {
+		return pubsubClientImpl.discoItems(pubsubService, node);
 	}
 	
-	public void ownerDelete(final String pubsubService, final String node) {
-		try {
-			pubsubClientImpl.ownerDelete((new IdentityManager()).fromJid(pubsubService), node);
-		} catch(Exception e) { // TODO
-			e.printStackTrace();
-			throw new RuntimeException(e.getMessage(), e);
-		}
+	public void ownerCreate(final String pubsubService, final String node) throws XMPPError, CommunicationException {		
+		pubsubClientImpl.ownerCreate(pubsubService, node);		
 	}
-
-	public String publisherPublish(final String pubsubService,
-			final String node, final String itemId, final String item)
+	
+	public void ownerDelete(final String pubsubService, final String node) throws XMPPError, CommunicationException {
+		pubsubClientImpl.ownerDelete(pubsubService, node);
+	}
+	
+	public void ownerPurgeItems(String pubsubServiceJid, String node)
 			throws XMPPError, CommunicationException {
-		try { // TODO optimize: change pubsub to receive marshalled string directly
-			Element itemPojo = MarshallUtils.stringToElement(item);
-			
-			String id = pubsubClientImpl.publisherPublish(
-					(new IdentityManager()).fromJid(pubsubService), node,
-					itemId, itemPojo);
-			return id;
-		} catch (IOException e) {
-			throw new CommunicationException(e.getMessage(), e);
-		} catch (SAXException e) {
-			throw new CommunicationException(e.getMessage(), e);
-		} catch (ParserConfigurationException e) {
-			throw new CommunicationException(e.getMessage(), e);
-		}
+		pubsubClientImpl.ownerPurgeItems(pubsubServiceJid, node);
 	}
 
-	public SubscriptionParcelable subscriberSubscribe(String pubsubService,	String node, final ISubscriber subscriber) throws XMPPError, CommunicationException {
-		Subscription subscription = pubsubClientImpl.subscriberSubscribe((new IdentityManager()).fromJid(pubsubService), node, new Subscriber() {
-			public void pubsubEvent(Identity pubsubService, String node,
-					String itemId, Element item) {
-				try {
-					subscriber.pubsubEvent(pubsubService.getJid(), node, itemId, MarshallUtils.nodeToString(item));
-				} catch (TransformerException e) {
-					throw new RuntimeException(e.getMessage(), e);
-				}
-			}			
-		});
-		return new SubscriptionParcelable(subscription);
+	public String publisherPublish(final String pubsubService,	final String node, final String itemId, final String item) throws XMPPError, CommunicationException {
+		return pubsubClientImpl.publisherPublish(pubsubService, node, itemId, item);
+	}
+	
+	public void publisherDelete(String pubsubServiceJid, String node,
+			String itemId) throws XMPPError, CommunicationException {
+		pubsubClientImpl.publisherDelete(pubsubServiceJid, node, itemId);
+	}
+
+	public SubscriptionParcelable subscriberSubscribe(String pubsubService,	String node, final ISubscriber subscriber) throws XMPPError, CommunicationException {		
+		return pubsubClientImpl.subscriberSubscribe(pubsubService, node, subscriber);		
+	}
+	
+	public void subscriberUnsubscribe(String pubsubService,	String node, final ISubscriber subscriber) throws XMPPError, CommunicationException {		
+		pubsubClientImpl.subscriberUnsubscribe(pubsubService, node, subscriber);
 	}
 }
