@@ -33,6 +33,11 @@
 	<dependencies>
 		<!-- add your dependencies here -->
 		<dependency>
+			<groupId>org.societies.api.schema.internal</groupId>
+			<artifactId>societies-api-schema-internal</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
@@ -65,6 +70,13 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
@@ -77,17 +89,9 @@
 					</instructions>
 				</configuration>
 			</plugin>
-			<!-- used to exclude some certain files 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-						</exclude>
-					</excludes>
-				</configuration>
-			</plugin> -->
+			<!-- used to exclude some certain files <plugin> <groupId>org.apache.maven.plugins</groupId> 
+				<artifactId>maven-compiler-plugin</artifactId> <configuration> <excludes> 
+				<exclude> </exclude> </excludes> </configuration> </plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>

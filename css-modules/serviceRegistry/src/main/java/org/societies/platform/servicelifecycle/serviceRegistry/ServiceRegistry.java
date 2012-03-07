@@ -1,7 +1,5 @@
 package org.societies.platform.servicelifecycle.serviceRegistry;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -9,12 +7,12 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.servicelifecycle.model.Service;
-import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.RegistryEntry;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceResourceIdentiferDAO;
 
@@ -27,31 +25,20 @@ public class ServiceRegistry implements IServiceRegistry {
 	}
 
 	@Override
-	public void registerServiceList(List<Service> servicesList)
-			throws ServiceRegistrationException {
+	public void registerServiceList(List<Service> servicesList)	throws ServiceRegistrationException {
 		Session session = sessionFactory.openSession();
 		RegistryEntry tmpRegistryEntry = null;
 		try {
 			for (Service service : servicesList) {
 
-				tmpRegistryEntry = new RegistryEntry(
-						new ServiceResourceIdentifier(new URI(service
-								.getServiceIdentifier().toString())),
-						service.getCSSIDInstalled(), service.getVersion(),
-
-						service.getServiceName(),
-						service.getServiceDescription(),
-						service.getAuthorSignature(), service.getServiceType(),
-						service.getServiceLocation());
+				tmpRegistryEntry = new RegistryEntry(service.getServiceIdentifier(), service.getServiceEndpoint(), service.getServiceName(), service.getServiceDescription(), service.getAuthorSignature(), service.getServiceType(), service.getServiceLocation(), service.getServiceInstance(),service.getServiceStatus());
 
 				Transaction t = session.beginTransaction();
 				session.save(tmpRegistryEntry);
 				t.commit();
 			}
 			log.debug("Service list saved.");
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			throw new ServiceRegistrationException(e);
+		
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ServiceRegistrationException(e);
@@ -71,23 +58,17 @@ public class ServiceRegistry implements IServiceRegistry {
 		try {
 			for (Service service : servicesList) {
 
-				tmpRegistryEntry = new RegistryEntry(
-						new ServiceResourceIdentifier(new URI(service
-								.getServiceIdentifier().toString())),
-						service.getCSSIDInstalled(), service.getVersion(),
-						service.getServiceName(),
-						service.getServiceDescription(),
-						service.getAuthorSignature(), service.getServiceType(),
-						service.getServiceLocation());
-
+				tmpRegistryEntry = new RegistryEntry(service.getServiceIdentifier(), service.getServiceEndpoint(), service.getServiceName(), service.getServiceDescription(), service.getAuthorSignature(), service.getServiceType(), service.getServiceLocation(), service.getServiceInstance(),service.getServiceStatus());
+			//tmpRegistryEntry = (RegistryEntry) session.get(RegistryEntry.class,tmpRegistryEntry.getServiceIdentifier());
+				Object obj=	session.load(RegistryEntry.class, tmpRegistryEntry.getServiceIdentifier());	
 				Transaction t = session.beginTransaction();
-				session.delete(tmpRegistryEntry);
+				
+				session.delete(obj);
+				
 				t.commit();
 			}
 
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			throw new ServiceRegistrationException(e);
+		
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ServiceRegistrationException(e);
@@ -193,7 +174,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		try {
 			tmpRegistryEntry = (RegistryEntry) session.get(RegistryEntry.class,
 					new ServiceResourceIdentiferDAO(serviceIdentifier
-							.getIdentifier().toString()));
+							.getIdentifier().toString(),serviceIdentifier.getServiceInstanceIdentifier()));
 			tmpService = tmpRegistryEntry.createServiceFromRegistryEntry();
 		} catch (Exception e) {
 			e.printStackTrace();

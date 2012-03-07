@@ -1,12 +1,12 @@
 package org.societies.comm.xmpp.event;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
 import org.springframework.context.ApplicationEvent;
 import org.w3c.dom.Element;
 
 public class PubsubEvent extends ApplicationEvent {
 
-	private Identity pubsubService;
+	private IIdentity pubsubService;
 	private String node;
 	private String itemId;
 	private Object payload;
@@ -18,7 +18,7 @@ public class PubsubEvent extends ApplicationEvent {
 		this.isPublished = false;
 	}
 
-	public Identity getPubsubService() {
+	public IIdentity getPubsubService() {
 		return pubsubService;
 	}
 
@@ -38,7 +38,7 @@ public class PubsubEvent extends ApplicationEvent {
 		return isPublished;
 	}
 
-	protected void setPublished(Identity pubsubService, String node, String itemId) {
+	protected void setPublished(IIdentity pubsubService, String node, String itemId) {
 		this.pubsubService = pubsubService;
 		this.node = node;
 		this.isPublished = true;

@@ -27,7 +27,7 @@ package org.societies.api.internal.security.policynegotiator;
 
 /**
  * Interface for invoking the provider.
- * To be used by generic secure policy negotiator on the requester side.
+ * To be used by Security Group Comms Manager locally (on same node) in server mode.
  * 
  * @author Mitja Vardjan
  *

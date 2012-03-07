@@ -34,15 +34,14 @@ import android.os.IBinder;
 import android.os.Messenger;
 
 public class MethodInvocationServiceConnection<T> implements ServiceConnection {
+	
 	private Object rv;
 	private Object mutex = new Object();
-	private Throwable throwable = null;
 	private Intent intent;
 	private Context context;
 	private int flags;
 	private Class<?> clazz;
 	private T remote;
-	private IMethodInvocation<T> methodInvocation;
 	private int binds = 0;
 	
 	public MethodInvocationServiceConnection(Intent intent, Context context, int flags, Class<?> clazz) {
@@ -53,7 +52,6 @@ public class MethodInvocationServiceConnection<T> implements ServiceConnection {
 	}
 	
 	public Object invoke(IMethodInvocation<T> methodInvocation) throws Throwable {
-		this.methodInvocation = methodInvocation;
 		bind();
 		rv = methodInvocation.invoke(remote);
 		unbind();
@@ -77,8 +75,8 @@ public class MethodInvocationServiceConnection<T> implements ServiceConnection {
 	
 	private void bind() throws InterruptedException {
 		if(remote == null) {
-			synchronized(mutex) {
-				context.bindService(intent, this, flags);
+			synchronized(mutex) {		
+				context.bindService(intent, this, flags);				
 				mutex.wait();
 			}
 		}
@@ -91,8 +89,9 @@ public class MethodInvocationServiceConnection<T> implements ServiceConnection {
 		synchronized(mutex) {
 			mutex.notify();
 		}
+		
 	}
 	public void onServiceDisconnected(ComponentName cn) {
 		remote = null;
-	}		
+	}	
 }

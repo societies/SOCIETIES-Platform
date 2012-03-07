@@ -26,32 +26,45 @@ package org.societies.api.servicelifecycle.model;
 
 import java.net.URI;
 
-/**
- *  Massimo: this interface will be deprecated as soon as 
- * 						the service lifecycle management will run
- * 						and it will expose the interfaces for the
- * 						service registry
- * @author Eliza
- * 
- */
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
+/**
+ * Describe your class here...
+ *
+ * @author Eliza
+ * @deprecated Use {@link ServiceResourceIdentifier} instead
+ */
+@Deprecated
 public interface IServiceResourceIdentifier {
 
 	/**
 	 * 
-	 * @return the identifier for Service Instance
+	 * @return the identifier for Service Implementation
 	 */
 	public URI getIdentifier();
 	
 	/**
 	 * 
-	 * @param identifier for a Service Instance
+	 * @param identifier for a Service Implementation
 	 */
 	public void setIdentifier(URI identifier);
+	
+	/**
+	 * 
+	 * @return the identifier for a Service Instance
+	 */
+	public String getServiceInstanceIdentifier();
+	
+	/**
+	 * 
+	 * @param identifier for a Service Instance
+	 */
+	public void setServiceInstanceIdentifier(String serviceInstanceIdentifier);
 	
 	/**
 	 * 
 	 * @return a string representation of the object.
 	 */
 	public String toString();
+	
 }

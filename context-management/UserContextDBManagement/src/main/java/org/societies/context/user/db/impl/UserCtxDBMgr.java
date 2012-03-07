@@ -39,8 +39,8 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.identity.IIdentity;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +55,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 
 	private final Map<CtxIdentifier, CtxModelObject> modelObjects;
 
-	private final Identity privateId;
+	private final IIdentity privateId;
 	
 	public UserCtxDBMgr() {
 		this.modelObjects =  new HashMap<CtxIdentifier, CtxModelObject>();

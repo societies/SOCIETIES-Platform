@@ -46,15 +46,13 @@
 		<module>../utilities/DBC</module>
 
 		<!-- API -->
-		<module>../api/java/schema</module>
+		<module>../api/schema/external</module>
 		<module>../api/java/external</module>
+		<module>../api/schema/internal</module>
 		<module>../api/java/internal</module>
 
-		<!-- Context -->
-		<module>../context-management/api</module>
-		<module>../context-management/UserContextDBManagement</module>
-		<module>../context-management/UserContextHistoryManagement</module>
-		<module>../context-management/ContextBroker</module>
+		<!-- Context Management -->
+		<module>../context-management</module>
 
 		<!-- User Agent -->
 		<module>../user-agent/user-action-monitor</module>
@@ -72,8 +70,8 @@
 		</module>
 		<module>../platform-infrastructure/comms-frwk/XCCommunicationMgr
 		</module>
-		<module>../platform-infrastructure/comms-frwk/DataFormsXEP</module>
-		<module>../platform-infrastructure/comms-frwk/PubsubXEP</module>
+		<!-- <module>../platform-infrastructure/comms-frwk/DataFormsXEP</module>  -->
+		<!-- <module>../platform-infrastructure/comms-frwk/PubsubXEP</module> -->
 		<module>../platform-infrastructure/comms-frwk/PubsubServiceBundle
 		</module>
 		<module>../platform-infrastructure/comms-frwk/PubsubClientBundle
@@ -120,14 +118,14 @@
 
 		<!-- Device Mgmt -->
 		<module>../css-modules/device-mgmt/devicemanager/</module>
+		<module>../css-modules/device-mgmt/DeviceRegistry/</module>
+		<module>../css-modules/device-mgmt/RegSynchroniser/</module>
 	
-		
-		<!-- Context Management -->
-		<!-- Privacy Mgmt -->
-		<module>../privacy-trust/privacy-protection</module>
-		
 		<!-- Intelligent community orchestration -->
 		<module>../intelligent-community-orchestration/CommunityLifecycleManagement
 		</module>
+		<!-- Privacy Mgmt -->
+		<!--module>../privacy-trust/privacy-protection</module-->
+
 	</modules>
 </project>

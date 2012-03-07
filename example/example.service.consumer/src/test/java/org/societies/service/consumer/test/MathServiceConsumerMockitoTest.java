@@ -8,6 +8,7 @@ import org.societies.service.api.IMathServiceCallBack;
 import org.societies.service.consumer.MathServiceCallBack;
 import org.societies.service.consumer.MathServiceConsumer;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class MathServiceConsumerMockitoTest {

@@ -31,6 +31,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.mockito.Mockito.*;
+
 /**import org.societies.css.cssdirectory.api.ICssDirectoryCloud;
 import org.societies.css.cssdirectory.api.ICssDirectoryRich;
 import org.societies.css.cssdirectory.api.ICssDirectoryLight;
@@ -52,9 +54,10 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
 */
 
 import org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityConfigurationManager;
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
+//import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.internal.servicelifecycle.model.Service;
+//import org.societies.api.internal.servicelifecycle.model.Service;
 //import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.internal.cis.management.ICisManager;
@@ -73,9 +76,10 @@ public class AutomaticCommunityConfigurationManagerTest {
 	private AutomaticCommunityConfigurationManager autoCommunityConfigurationManager;
 	private ICisManager cisManager;
 	
+	@Test
     public void testIdentifyCissToConfigure() {
 		
-    	Identity ownerId = null; //James Jents CSS
+    	IIdentity ownerId = null; //James Jents CSS
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
     	
 		//create CIS for James where James himself has been inactive for 1 year.
@@ -88,7 +92,8 @@ public class AutomaticCommunityConfigurationManagerTest {
 		
 		//James should have been suggested to leave the CIS.
 		// (No members list function in CisRecord API yet)
-		//Assert.assertNull(cisManager.getCis("James", "James CIS").getMembersList().get("James"));
+		
+		//Assert.assertNull(cisManager.getCis("James", "James CIS").membersCss[0].equals("James"));
 		
 	}
     

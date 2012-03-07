@@ -24,6 +24,9 @@
  */
 package org.societies.context.api.community.db;
 
+import java.util.List;
+
+import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntityIdentifier;
 
 /**
@@ -42,7 +45,7 @@ public interface ICommunityCtxDBMgr {
 	 * @param callback 
 	 * @since 0.0.1
 	 */
-	public void retrieveBonds(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
+	public CtxBond retrieveBonds(CtxEntityIdentifier community);
 
 	/**
 	 * This applies for Community hierarchies. Retrieves the child communities
@@ -52,7 +55,7 @@ public interface ICommunityCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void retrieveChildCommunities(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
+	public List<CtxEntityIdentifier> retrieveChildCommunities(CtxEntityIdentifier community);
 
 	/**
 	 * Retrieves a list of Individual Context Entities that are members of the
@@ -62,7 +65,7 @@ public interface ICommunityCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void retrieveCommunityMembers(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
+	public List<CtxEntityIdentifier> retrieveCommunityMembers(CtxEntityIdentifier community);
 
 	/**
 	 * Retrieves communities characterized as parent for the community specified by the Community CtxEntityIdentifier  
@@ -71,6 +74,6 @@ public interface ICommunityCtxDBMgr {
 	 * @param callback
 	 * @since 0.0.1
 	 */
-	public void retrieveParentCommunities(CtxEntityIdentifier community, ICommunityCtxDBMgrCallback callback);
+	public List<CtxEntityIdentifier> retrieveParentCommunities(CtxEntityIdentifier community);
 
 }

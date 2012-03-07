@@ -5,8 +5,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.societies</groupId>
+		<artifactId>spring-osgi-parent</artifactId>
 		<version>0.1</version>
-		<artifactId>version-parent</artifactId>
 	</parent>
 	<groupId>org.societies.comm.xmpp</groupId>
 	<artifactId>CommunicationFrameworkCommons</artifactId>
@@ -22,6 +22,21 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-	</dependencies>
+	
+	
+		<!-- Virgo -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
 
+	</dependencies>
 </project>

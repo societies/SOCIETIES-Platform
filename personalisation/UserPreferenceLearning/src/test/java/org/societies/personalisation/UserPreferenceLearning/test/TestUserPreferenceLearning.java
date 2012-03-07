@@ -36,16 +36,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.comm.xmpp.datatypes.IdentityType;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.util.SerialisationHelper;
-import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.ServiceResourceIdentifier;
 //import org.societies.personalisation.UserPreferenceLearning.impl.CtxIdentifierCache;
 import org.societies.personalisation.UserPreferenceLearning.impl.PostProcessor;
 import org.societies.personalisation.UserPreferenceLearning.impl.PreProcessor;
@@ -63,14 +63,14 @@ public class TestUserPreferenceLearning extends TestCase{
 	PostProcessor post;
 	IServiceResourceIdentifier serviceId1;
 	IServiceResourceIdentifier serviceId2;
-	Identity ownerId;
+	IIdentity ownerId;
 	NumberGenerator ng;
 
 	public void setUp() throws Exception {
 		pre = new PreProcessor();
 		post = new PostProcessor();
-		serviceId1 = new ServiceResourceIdentifier(new URI("tennisPlanner"));
-		serviceId2 = new ServiceResourceIdentifier(new URI("lymphChecker"));
+		serviceId1 = new ServiceResourceIdentifier(new URI("tennisPlanner"), "instance1");
+		serviceId2 = new ServiceResourceIdentifier(new URI("lymphChecker"), "instance2");
 		ownerId = new MockIdentity(IdentityType.CSS, "test", "domain");
 		ng = new NumberGenerator();
 	}

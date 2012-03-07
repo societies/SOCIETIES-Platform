@@ -10,6 +10,8 @@ public class MathServiceConsumer{
 	private IMathService mathService;
 	private IMathServiceCallBack divisionCallBack;
 	
+	private int hiddenState;
+	
 	public MathServiceConsumer(int a, int b){
 		this.num_a=a;
 		this.num_b=b;
@@ -30,6 +32,14 @@ public class MathServiceConsumer{
 		this.divisionCallBack = mathServiceCallBack;
 	}
 		
+	public int getHiddenState() {
+		return hiddenState;
+	}
+
+	public void setHiddenState(int hiddenState) {
+		this.hiddenState = hiddenState;
+	}
+
 	// used to demonstrate how starting an execution of a bundle process
 	public void initMethod() throws Exception {		
 	System.out.println("add result is : "+ 	getMathService().add(num_a, num_b));
@@ -52,5 +62,12 @@ public class MathServiceConsumer{
 				System.out.println("an error occurs in the call");
 			}
 		}
-
+	// new coded added for stateful test
+		public void callStatefulMethod(){
+			if(this.hiddenState>10){
+				this.mathService.add(num_a, num_b);
+			}else{
+				this.mathService.multiply(num_a, num_b);
+			}
+		}
 }

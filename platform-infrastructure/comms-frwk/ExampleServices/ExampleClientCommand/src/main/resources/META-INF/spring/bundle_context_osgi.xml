@@ -36,6 +36,7 @@
 	 
 	<osgi:reference id="RemoteCalculator" interface="org.societies.example.calculator.ICalcRemote"/>
 	<osgi:reference id="FortuneCookieBundle" interface="org.societies.example.fortunecookie.IWisdom"/>
-	<osgi:reference id="PubsubClient" interface="org.societies.comm.xmpp.pubsub.PubsubClient"/>
-
+	<osgi:reference id="PubsubClient" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"/>
+	<osgi:reference id="CommManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
+	
 </beans>

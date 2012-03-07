@@ -3,8 +3,9 @@ package org.societies.slm.servicemgmt.impl;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.societies.api.internal.servicelifecycle.model.Service;
-import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
 
 public class ServiceMetaDataUtils {
 

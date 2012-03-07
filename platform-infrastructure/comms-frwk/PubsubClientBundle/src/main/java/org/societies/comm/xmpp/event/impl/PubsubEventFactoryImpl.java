@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.comm.xmpp.event.PubsubEvent;
 import org.societies.comm.xmpp.event.PubsubEventFactory;
 import org.societies.comm.xmpp.event.PubsubEventStream;
@@ -15,6 +14,7 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.comm.xmpp.pubsub.Subscription;
+import org.societies.api.identity.IIdentity;
 import org.societies.comm.xmpp.pubsub.impl.PubsubClientImpl;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.w3c.dom.Element;
@@ -25,18 +25,18 @@ public class PubsubEventFactoryImpl extends PubsubEventFactory implements Subscr
 			.getLogger(PubsubEventFactoryImpl.class);
 	
 	private PubsubClient ps;
-	private Identity localIdentity;
+	private IIdentity localIdentity;
 	private Map<Subscription,PubsubEventStreamImpl> psStreamMap;
 	
 	public PubsubEventFactoryImpl(PubsubClientImpl psi) {
 		ps = psi;
-		localIdentity = psi.getICommManager().getIdentity();
+		localIdentity = psi.getICommManager().getIdManager().getThisNetworkNode();
 		psStreamMap = new HashMap<Subscription, PubsubEventStreamImpl>();
 		newFactory(localIdentity, this);
 	}
 
 	@Override
-	public PubsubEventStream getStream(Identity pubsubService, String node) {
+	public PubsubEventStream getStream(IIdentity pubsubService, String node) {
 		Subscription s = new Subscription(pubsubService, localIdentity, node, null);
 		PubsubEventStreamImpl pesi = psStreamMap.get(s);
 		if (pesi==null) {
@@ -57,7 +57,7 @@ public class PubsubEventFactoryImpl extends PubsubEventFactory implements Subscr
 	}
 
 	@Override
-	public void pubsubEvent(Identity pubsubService, String node, String itemId,
+	public void pubsubEvent(IIdentity pubsubService, String node, String itemId,
 			Object item) {
 		Subscription s = new Subscription(pubsubService, localIdentity, node, null);
 		PubsubEventStreamImpl pesi = psStreamMap.get(s);

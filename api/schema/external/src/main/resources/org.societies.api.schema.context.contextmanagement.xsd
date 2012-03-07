@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+targetNamespace="http://societies.org/api/schema/context/contextSchema"
+            xmlns="http://societies.org/api/schema/context/contextSchema" >
+
+<xs:element name="ctxBroker">
+<xs:complexType>
+<xs:choice minOccurs='0' maxOccurs='1'>
+<xs:element name="retrieve" type="ctxBrokerRetrieveBean"/>
+<xs:element name="lookup" type="ctxBrokerLookupBean"/>
+<xs:element name="create" type="ctxBrokerCreateEntityBean"/>
+<xs:element name="updateAttr" type="ctxBrokerUpdateAttributeBean"/>
+<xs:element name="createAssoc" type="ctxBrokerCreateAssociationBean"/>
+<xs:element name="remove" type="ctxBrokerRemoveBean"/>
+<xs:element name="update" type="ctxBrokerUpdateBean"/>
+<xs:element name="createAttr" type="ctxBrokerCreateAttributeBean"/>
+</xs:choice>
+</xs:complexType>
+  </xs:element>
+  
+  <xs:complexType name="ctxBrokerRetrieveBean">
+    <xs:sequence>
+      <xs:element name="objectNumber" type="xs:long" minOccurs="0"/>
+      <xs:element name="operatorIdjid" type="xs:string" minOccurs="0"/>
+      <xs:element name="type" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="ctxBrokerLookupBean">
+    <xs:sequence>
+      <xs:element name="modelTypeName" type="xs:string" minOccurs="0"/>
+      <xs:element name="objectNumber" type="xs:long" minOccurs="0"/>
+      <xs:element name="operatorIdjid" type="xs:string" minOccurs="0"/>
+      <xs:element name="type" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ctxBrokerCreateEntityBean">
+    <xs:sequence>
+      <xs:element name="objectNumber" type="xs:long" minOccurs="0"/>
+      <xs:element name="operatorIdjid" type="xs:string" minOccurs="0"/>
+      <xs:element name="type" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+    <xs:complexType name="ctxBrokerUpdateAttributeBean">
+    <xs:sequence>
+      <xs:element name="objectNumber" type="xs:long" minOccurs="0"/>
+      <xs:element name="operatorIdjid" type="xs:string" minOccurs="0"/>
+      <xs:element name="type" type="xs:string" minOccurs="0"/>
+      <xs:element name="value" type="xs:base64Binary" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ctxBrokerCreateAssociationBean">
+    <xs:sequence>
+      <xs:element name="objectNumber" type="xs:long" minOccurs="0"/>
+      <xs:element name="operatorIdjid" type="xs:string" minOccurs="0"/>
+      <xs:element name="type" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ctxBrokerRemoveBean">
+    <xs:sequence>
+      <xs:element name="objectNumber" type="xs:long" minOccurs="0"/>
+      <xs:element name="operatorIdjid" type="xs:string" minOccurs="0"/>
+      <xs:element name="type" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ctxBrokerUpdateBean">
+    <xs:sequence>
+      <xs:element name="modelTypeName" type="xs:string" minOccurs="0"/>
+      <xs:element name="objectNumber" type="xs:long" minOccurs="0"/>
+      <xs:element name="operatorIdjid" type="xs:string" minOccurs="0"/>
+      <xs:element name="type" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ctxBrokerCreateAttributeBean">
+    <xs:sequence>
+      <xs:element name="objectNumber" type="xs:long" minOccurs="0"/>
+      <xs:element name="operatorIdjid" type="xs:string" minOccurs="0"/>
+      <xs:element name="type" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  
+
+  <xs:simpleType name="ctxModelType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ENTITY"/>
+      <xs:enumeration value="ATTRIBUTE"/>
+      <xs:enumeration value="ASSOCIATION"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

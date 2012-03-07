@@ -36,12 +36,12 @@ import javax.swing.JOptionPane;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.comm.xmpp.datatypes.IdentityType;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
@@ -69,8 +69,6 @@ import org.societies.privacytrust.privacyprotection.privacypreferencemanager.eva
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PrivateContextCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.management.PrivatePreferenceCache;
 
-import com.sun.jndi.toolkit.ctx.ComponentContext;
-
 /**
  * @author Elizabeth
  *
@@ -95,17 +93,17 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	}
 
 
-	private PrivacyOutcomeConstants checkPreferenceForAccessControl(IPrivacyPreferenceTreeModel model, Identity requestorIdentity, CtxAttributeIdentifier ctxId, Action action){
+	private PrivacyOutcomeConstants checkPreferenceForAccessControl(IPrivacyPreferenceTreeModel model, IIdentity requestorIIdentity, CtxAttributeIdentifier ctxId, Action action){
 		IPrivacyOutcome outcome = this.evaluatePreference(model.getRootPreference());
 		if (null==outcome){
 			this.logging.debug("Evaluation returned no result. Asking the user: "+ctxId.getType());
-			int n = JOptionPane.showConfirmDialog(null, requestorIdentity.toString()+" is requesting access to: \n"
+			int n = JOptionPane.showConfirmDialog(null, requestorIIdentity.toString()+" is requesting access to: \n"
 					+ "resource:"+ctxId.getType()+"\n("+ctxId.toUriString()+")\nto perform a "+action.getActionType()+" operation. \nAllow?", "Access request", JOptionPane.YES_NO_OPTION);
 			if (n==JOptionPane.YES_OPTION){
-				this.askToStoreDecision(requestorIdentity, ctxId, action, PrivacyOutcomeConstants.ALLOW);
+				this.askToStoreDecision(requestorIIdentity, ctxId, action, PrivacyOutcomeConstants.ALLOW);
 				return PrivacyOutcomeConstants.ALLOW;
 			}else{
-				this.askToStoreDecision(requestorIdentity, ctxId, action, PrivacyOutcomeConstants.BLOCK);
+				this.askToStoreDecision(requestorIIdentity, ctxId, action, PrivacyOutcomeConstants.BLOCK);
 				return PrivacyOutcomeConstants.BLOCK;
 			}
 		}else{
@@ -113,7 +111,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		}
 	}
 
-	private PrivacyOutcomeConstants checkPreferenceForAccessControl(IPrivacyPreferenceTreeModel model, Identity requestorIdentity, String ctxType, Action action){
+	private PrivacyOutcomeConstants checkPreferenceForAccessControl(IPrivacyPreferenceTreeModel model, IIdentity requestorIIdentity, String ctxType, Action action){
 		IPrivacyOutcome outcome = this.evaluatePreference(model.getRootPreference());
 		if (null==outcome){
 			this.logging.debug("Evaluation did not return a result");
@@ -132,15 +130,15 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 					ctxId = (CtxAttributeIdentifier) ctxIds.get(0);
 				}else{
 					this.logging.debug("Asking the user: "+ctxType);
-					ctxId = (CtxAttributeIdentifier) JOptionPane.showInputDialog(null, requestorIdentity.toString()+" is requesting access to: \n"
+					ctxId = (CtxAttributeIdentifier) JOptionPane.showInputDialog(null, requestorIIdentity.toString()+" is requesting access to: \n"
 							+ "resource:"+ctxType+"\n(to perform a "+action.getActionType()+" operation.\nSelect an attribute to provide access to or click cancel to abort.", "Access request", JOptionPane.PLAIN_MESSAGE, null, ctxIds.toArray(), ctxIds.get(0));
 					if (ctxId == null){
 						this.logging.debug("User aborted. Returning block");
-						this.askToStoreDecision(requestorIdentity, ctxId, action, PrivacyOutcomeConstants.BLOCK);
+						this.askToStoreDecision(requestorIIdentity, ctxId, action, PrivacyOutcomeConstants.BLOCK);
 						return PrivacyOutcomeConstants.BLOCK;
 					}
 				}
-					this.askToStoreDecision(requestorIdentity, ctxId, action, PrivacyOutcomeConstants.ALLOW);
+					this.askToStoreDecision(requestorIIdentity, ctxId, action, PrivacyOutcomeConstants.ALLOW);
 					return PrivacyOutcomeConstants.ALLOW;
 				
 			} catch (CtxException e) {
@@ -163,7 +161,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 			return ((PPNPOutcome) outcome).getEffect();
 		}
 	}
-	private void askToStoreDecision(Identity requestorDPI, CtxAttributeIdentifier ctxID, Action action, PrivacyOutcomeConstants decision){
+	private void askToStoreDecision(IIdentity requestorDPI, CtxAttributeIdentifier ctxID, Action action, PrivacyOutcomeConstants decision){
 		int n = JOptionPane.showConfirmDialog(null, "Do you want to store this decision permanently?", "Access request", JOptionPane.YES_NO_OPTION);
 		if (n==JOptionPane.YES_OPTION){
 			Subject sub = new Subject(requestorDPI);
@@ -192,7 +190,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 
 
 	@Override
-	public PrivacyOutcomeConstants checkPermission(CtxAttributeIdentifier ctxId, Action action, Identity requestorDPI) throws PrivacyException{
+	public PrivacyOutcomeConstants checkPermission(CtxAttributeIdentifier ctxId, Action action, IIdentity requestorDPI) throws PrivacyException{
 		if (null==ctxId){
 			this.logging.debug("requested permission for null CtxIdentifier. returning : BLOCK");
 			return PrivacyOutcomeConstants.BLOCK;
@@ -238,23 +236,23 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	/*
 	 * SOCIETIES new method 
 	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#checkPermission(java.lang.String, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action, org.societies.api.comm.xmpp.datatypes.Identity)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#checkPermission(java.lang.String, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action, org.societies.api.comm.xmpp.datatypes.IIdentity)
 	 */
 	@Override
-	public PrivacyOutcomeConstants checkPermission(String ctxType, Action action, Identity requestorIdentity) throws PrivacyException{
+	public PrivacyOutcomeConstants checkPermission(String ctxType, Action action, IIdentity requestorIIdentity) throws PrivacyException{
 
 		PPNPreferenceDetails details = new PPNPreferenceDetails(ctxType);
-		details.setRequestorDPI(requestorIdentity);
+		details.setRequestorDPI(requestorIIdentity);
 		IPrivacyPreferenceTreeModel model = prefCache.getPPNPreference(details);
 		if (model!=null){
-			return this.checkPreferenceForAccessControl(model, requestorIdentity, ctxType, action);
+			return this.checkPreferenceForAccessControl(model, requestorIIdentity, ctxType, action);
 		}
 
 
 
 		details = new PPNPreferenceDetails(ctxType);
 		if (model!=null){
-			return this.checkPreferenceForAccessControl(model, requestorIdentity, ctxType, action);
+			return this.checkPreferenceForAccessControl(model, requestorIIdentity, ctxType, action);
 		}
 		
 		try {
@@ -270,15 +268,15 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 				ctxId = (CtxAttributeIdentifier) ctxIds.get(0);
 			}else{
 				this.logging.debug("Asking the user: "+ctxType);
-				ctxId = (CtxAttributeIdentifier) JOptionPane.showInputDialog(null, requestorIdentity.toString()+" is requesting access to: \n"
+				ctxId = (CtxAttributeIdentifier) JOptionPane.showInputDialog(null, requestorIIdentity.toString()+" is requesting access to: \n"
 						+ "resource:"+ctxType+"\n(to perform a "+action.getActionType()+" operation.\nSelect an attribute to provide access to or click cancel to abort.", "Access request", JOptionPane.PLAIN_MESSAGE, null, ctxIds.toArray(), ctxIds.get(0));
 				if (ctxId == null){
 					this.logging.debug("User aborted. Returning block");
-					this.askToStoreDecision(requestorIdentity, ctxId, action, PrivacyOutcomeConstants.BLOCK);
+					this.askToStoreDecision(requestorIIdentity, ctxId, action, PrivacyOutcomeConstants.BLOCK);
 					return PrivacyOutcomeConstants.BLOCK;
 				}
 			}
-				this.askToStoreDecision(requestorIdentity, ctxId, action, PrivacyOutcomeConstants.ALLOW);
+				this.askToStoreDecision(requestorIIdentity, ctxId, action, PrivacyOutcomeConstants.ALLOW);
 				return PrivacyOutcomeConstants.ALLOW;
 			
 		} catch (CtxException e) {
@@ -348,48 +346,47 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 
 
 	@Override
-	public Identity evaluateIDSPreferences(IAgreement agreement, List<Identity> dpis){
+	public IIdentity evaluateIDSPreferences(IAgreement agreement, List<IIdentity> dpis){
 
-		Identity selectedIdentity = this.evaluateIDSPreferenceBasedOnAllInfo(agreement, dpis);
+		IIdentity selectedIIdentity = this.evaluateIDSPreferenceBasedOnAllInfo(agreement, dpis);
 
-		if (selectedIdentity==null){
-			selectedIdentity = this.evaluateIDSPreferenceBasedOnProviderDPI(agreement, dpis);
-			if (selectedIdentity == null){
-				selectedIdentity = this.evaluateIDSPreferenceIrrespectiveOfRequestor(agreement, dpis);
-				if (selectedIdentity == null){
+		if (selectedIIdentity==null){
+			selectedIIdentity = this.evaluateIDSPreferenceBasedOnProviderDPI(agreement, dpis);
+			if (selectedIIdentity == null){
+				selectedIIdentity = this.evaluateIDSPreferenceIrrespectiveOfRequestor(agreement, dpis);
+				if (selectedIIdentity == null){
 					return null;
-				}else if (selectedIdentity instanceof InvalidIdentity){
+				}else if (selectedIIdentity instanceof InvalidIdentity){
 					//user wants to use a new DPI
 					return null;
 				}else{
-					return selectedIdentity;
+					return selectedIIdentity;
 				}
-			}else if (selectedIdentity instanceof InvalidIdentity){
+			}else if (selectedIIdentity instanceof InvalidIdentity){
 				//user wants to use a new DPI
 				return null;
 			}else{
-				return selectedIdentity;
+				return selectedIIdentity;
 			}
-		}else if (selectedIdentity instanceof InvalidIdentity){
+		}else if (selectedIIdentity instanceof InvalidIdentity){
 			//user wants to use a new DPI
 			return null;
 		}else{
-			return selectedIdentity;
+			return selectedIIdentity;
 		}
 
 	}
 	
 	
-	private class InvalidIdentity extends Identity{
+	private class InvalidIdentity implements IIdentity{
 
 		public InvalidIdentity(IdentityType type, String identifier,
 				String domainIdentifier) {
-			super(type, "", "");
 			// TODO Auto-generated constructor stub
 		}
 		
 		public InvalidIdentity(){
-			super(IdentityType.CSS, "","");
+			
 		}
 
 		@Override
@@ -397,10 +394,34 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public String getBareJid() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String getDomain() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String getIdentifier() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public IdentityType getType() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 		
 	}
 
-	private Identity evaluateIDSPreferenceBasedOnAllInfo(IAgreement agreement, List<Identity> dpis){
+	private IIdentity evaluateIDSPreferenceBasedOnAllInfo(IAgreement agreement, List<IIdentity> dpis){
 		ArrayList<IdentitySelectionPreferenceOutcome> outcomes = new ArrayList<IdentitySelectionPreferenceOutcome>();
 		for (int i=0; i<dpis.size(); i++){
 			IDSPreferenceDetails details = new IDSPreferenceDetails(dpis.get(i));
@@ -423,22 +444,22 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		}
 
 		if (outcomes.size()==1){
-			//JOptionPane.showMessageDialog(null, "ONE preference was applicable. returning dpi:"+outcomes.get(0).getIdentity());
+			//JOptionPane.showMessageDialog(null, "ONE preference was applicable. returning dpi:"+outcomes.get(0).getIIdentity());
 			return outcomes.get(0).getIdentity();
 		}
 
 		if (outcomes.size()>1){
 			//JOptionPane.showMessageDialog(null, "MULTIPLE preferences were applicable. asking the user");
-			List<Identity> dpiList = new ArrayList<Identity>();
+			List<IIdentity> dpiList = new ArrayList<IIdentity>();
 			for (IdentitySelectionPreferenceOutcome out: outcomes){
 				dpiList.add(out.getIdentity());
 			}
-			return this.askUserToSelectIdentity(agreement, dpiList);
+			return this.askUserToSelectIIdentity(agreement, dpiList);
 		}
 		return null;
 	}
 
-	private Identity evaluateIDSPreferenceBasedOnProviderDPI(IAgreement agreement, List<Identity> dpis){
+	private IIdentity evaluateIDSPreferenceBasedOnProviderDPI(IAgreement agreement, List<IIdentity> dpis){
 		ArrayList<IdentitySelectionPreferenceOutcome> outcomes = new ArrayList<IdentitySelectionPreferenceOutcome>();
 		for (int i=0; i<dpis.size(); i++){
 			IDSPreferenceDetails details = new IDSPreferenceDetails(dpis.get(i));
@@ -459,16 +480,16 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		}
 
 		if (outcomes.size()>1){
-			List<Identity> dpiList = new ArrayList<Identity>();
+			List<IIdentity> dpiList = new ArrayList<IIdentity>();
 			for (IdentitySelectionPreferenceOutcome out: outcomes){
 				dpiList.add(out.getIdentity());
 			}
-			return this.askUserToSelectIdentity(agreement, dpiList);
+			return this.askUserToSelectIIdentity(agreement, dpiList);
 		}
 		return null;
 	}
 
-	private Identity evaluateIDSPreferenceIrrespectiveOfRequestor(IAgreement agreement, List<Identity> dpis){
+	private IIdentity evaluateIDSPreferenceIrrespectiveOfRequestor(IAgreement agreement, List<IIdentity> dpis){
 		ArrayList<IdentitySelectionPreferenceOutcome> outcomes = new ArrayList<IdentitySelectionPreferenceOutcome>();
 		for (int i=0; i<dpis.size(); i++){
 			IDSPreferenceDetails details = new IDSPreferenceDetails(dpis.get(i));
@@ -488,36 +509,36 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		}
 
 		if (outcomes.size()>1){
-			List<Identity> dpiList = new ArrayList<Identity>();
+			List<IIdentity> dpiList = new ArrayList<IIdentity>();
 			for (IdentitySelectionPreferenceOutcome out: outcomes){
 				dpiList.add(out.getIdentity());
 			}
-			return this.askUserToSelectIdentity(agreement, dpiList);
+			return this.askUserToSelectIIdentity(agreement, dpiList);
 		}
 		return null;
 	}
 
-	private Identity askUserToSelectIdentity(IAgreement agreement, List<Identity> candidateDPIs){
+	private IIdentity askUserToSelectIIdentity(IAgreement agreement, List<IIdentity> candidateDPIs){
 
 
 		List<String> strCandidateIDs = new ArrayList<String>();
 		strCandidateIDs.add((new InvalidIdentity()).toString());
 
-		for (Identity userId : candidateDPIs){
+		for (IIdentity userId : candidateDPIs){
 
 			strCandidateIDs.add(userId.toString());
 		}
 
 		String s = (String) JOptionPane.showInputDialog(
 				null,
-				"Select an identity for starting session with service:\n"
+				"Select an IIdentity for starting session with service:\n"
 						+ "provided by: "+agreement.getServiceDPI().toString(),
 						"\nwith serviceID: "+agreement.getServiceIdentifier(),
 						JOptionPane.QUESTION_MESSAGE, null,
 						strCandidateIDs.toArray(), strCandidateIDs.get(0));
 
 
-		for (Identity id : candidateDPIs){
+		for (IIdentity id : candidateDPIs){
 			if (s.equalsIgnoreCase(id.toString())){
 				return id;
 			}
@@ -538,7 +559,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	}
 
 	@Override
-	public void deletePPNPreference(String contextType, CtxAttributeIdentifier affectedCtxID, Identity requestorDPI){
+	public void deletePPNPreference(String contextType, CtxAttributeIdentifier affectedCtxID, IIdentity requestorDPI){
 		PPNPreferenceDetails details = new PPNPreferenceDetails(contextType);
 		details.setAffectedCtxID(affectedCtxID);
 		details.setRequestorDPI(requestorDPI);
@@ -562,12 +583,12 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		return outcomes;
 	}
 
-	/*	private  class  InvalidDPI implements Identity{
+	/*	private  class  InvalidDPI implements IIdentity{
 
 		private String annotation;
 
 		public InvalidDPI(){
-			this.annotation = "None, Create new Identity for me";
+			this.annotation = "None, Create new IIdentity for me";
 		}
 		@Override
 		public String getAnnotation() {
@@ -591,7 +612,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	}*/
 
 	
-	public Identity evaluateIDSPreference(
+	public IIdentity evaluateIDSPreference(
 			IDSPreferenceDetails details) {
 		IPrivacyPreferenceTreeModel model = this.prefCache.getIDSPreference(details);
 		IPrivacyOutcome out = this.evaluatePreference(model.getRootPreference());
@@ -613,12 +634,12 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	
 	@Override
 	public List<IPrivacyPreferenceTreeModel> getIDSPreferences(
-			Identity userDPI) {
+			IIdentity userDPI) {
 		return this.prefCache.getIDSPreferences(userDPI);
 	}
 	@Override
 	public List<IPrivacyPreferenceTreeModel> getIDSPreferences(
-			Identity userDPI, Identity providerDPI) {
+			IIdentity userDPI, IIdentity providerDPI) {
 		return this.prefCache.getIDSPreferences(userDPI, providerDPI);
 	}
 
@@ -633,9 +654,9 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	 * (non-Javadoc)
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#getIdSPreference(org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)
 	 */
-	public Identity evaluateIdSPreference(IServiceResourceIdentifier service_Id){
+	public IIdentity evaluateIdSPreference(IServiceResourceIdentifier service_Id){
 		List<IDSPreferenceDetails> details = this.prefCache.getIDSPreferenceDetails();
-		List<Identity> identities = new ArrayList<Identity>();
+		List<IIdentity> identities = new ArrayList<IIdentity>();
 		for (IDSPreferenceDetails detail : details){
 			if (detail.getServiceID().equals(service_Id)){
 				identities.add(this.evaluateIDSPreference(detail));
@@ -649,8 +670,8 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 			return identities.get(0);
 		}
 		
-		Identity selectedIdentity = (Identity) JOptionPane.showInputDialog(null, "The following identities are appropriate for using service :"+service_Id.toString()+" please select one to use", "Select Identity", JOptionPane.PLAIN_MESSAGE, null, identities.toArray(), identities.get(0));
-		return selectedIdentity;
+		IIdentity selectedIIdentity = (IIdentity) JOptionPane.showInputDialog(null, "The following identities are appropriate for using service :"+service_Id.toString()+" please select one to use", "Select IIdentity", JOptionPane.PLAIN_MESSAGE, null, identities.toArray(), identities.get(0));
+		return selectedIIdentity;
 		
 		
 		
@@ -659,22 +680,22 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	
 	
 	@Override
-	public void deleteIDSPreference(Identity userDPI) {
+	public void deleteIDSPreference(IIdentity userDPI) {
 		IDSPreferenceDetails details = new IDSPreferenceDetails(userDPI);
 		this.prefCache.removeIDSPreference(details);
 
 	}
 	@Override
-	public void deleteIDSPreference(Identity userDPI,
-			Identity providerDPI) {
+	public void deleteIDSPreference(IIdentity userDPI,
+			IIdentity providerDPI) {
 		IDSPreferenceDetails details = new IDSPreferenceDetails(userDPI);
 		details.setProviderDPI(providerDPI);
 		this.prefCache.removeIDSPreference(details);
 
 	}
 	@Override
-	public void deleteIDSPreference(Identity userDPI,
-			Identity providerDPI, IServiceResourceIdentifier serviceID) {
+	public void deleteIDSPreference(IIdentity userDPI,
+			IIdentity providerDPI, IServiceResourceIdentifier serviceID) {
 		IDSPreferenceDetails details = new IDSPreferenceDetails(userDPI);
 		details.setProviderDPI(providerDPI);
 		details.setServiceID(serviceID);
@@ -714,17 +735,17 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	}
 	@Override
 	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType,
-			Identity requestorDPI) {
+			IIdentity requestorDPI) {
 		return this.prefCache.getPPNPreferences(contextType, requestorDPI);
 	}
 	@Override
 	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType,
-			CtxAttributeIdentifier ctxID, Identity requestorDPI) {
+			CtxAttributeIdentifier ctxID, IIdentity requestorDPI) {
 		return this.prefCache.getPPNPreferences(contextType, ctxID, requestorDPI);
 	}
 	@Override
 	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType,
-			Identity requestorDPI, IServiceResourceIdentifier serviceID) {
+			IIdentity requestorDPI, IServiceResourceIdentifier serviceID) {
 		return this.prefCache.getPPNPreferences(contextType, requestorDPI, serviceID);
 	}
 	
@@ -766,8 +787,8 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	
 	
 	
-	public void addIDSDecision(Identity selectedDPI,
-			Identity providerDPI, IServiceResourceIdentifier serviceID) {
+	public void addIDSDecision(IIdentity selectedDPI,
+			IIdentity providerDPI, IServiceResourceIdentifier serviceID) {
 		IDSPreferenceDetails details = new IDSPreferenceDetails (selectedDPI);
 		details.setProviderDPI(providerDPI);
 		details.setServiceID(serviceID);
@@ -794,11 +815,11 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		IServiceResourceIdentifier sID = new PssServiceIdentifier("pss://Provider1234%5B574cb33a-6590-4aaa-a69c-565e83d645fd%5D@7596720118024345462");
 		ResponsePolicy policy = new ResponsePolicy(sub, new ArrayList<ResponseItem>(), NegotiationStatus.SUCCESSFUL);
 		NegotiationAgreement ag = new NegotiationAgreement(policy);
-		List<Identity> dpis = new ArrayList<Identity>();
+		List<IIdentity> dpis = new ArrayList<IIdentity>();
 		dpis.add(new DigitalPersonalIdentifier("John"));
 		dpis.add(new DigitalPersonalIdentifier("Sarah"));
 		dpis.add(new DigitalPersonalIdentifier("Mark"));
-		Identity selectedDPI = pm.askUserToSelectIdentity(ag, dpis);
+		IIdentity selectedDPI = pm.askUserToSelectIIdentity(ag, dpis);
 		System.out.println("Selected: "+selectedDPI.toUriString());
 
 	}*/

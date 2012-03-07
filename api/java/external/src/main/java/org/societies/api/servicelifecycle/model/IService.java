@@ -28,8 +28,10 @@ package org.societies.api.servicelifecycle.model;
  * Public interface class for the Service object
  *
  * @author sanchocsa
+ * @deprecated Use {@link org.societies.api.schema.servicelifecycle.model.Service} instead
  *
  */
+@Deprecated
 public interface IService {
 
 	public String getVersion();
@@ -39,5 +41,12 @@ public interface IService {
 	public String getServiceDescription(); 
 
 	public IServiceResourceIdentifier getServiceIdentifier();
+	
+	public ServiceInstance getServiceInstance();
+	
+	public String getAuthorSignature();
+	public ServiceStatus getServiceStatus();
+	public String getServiceEndpoint() ;
+	public ServiceLocation getServiceLocation ();
 	
 }

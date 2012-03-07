@@ -31,8 +31,8 @@ class Client {
             	case MessageMethodInvocation.WHAT:
             		MessageMethodInvocation msgMethod = new MessageMethodInvocation(msg);
             		Object callback = callbacks.get(msgMethod.callerId());            		
-					try {
-						Method method = callback.getClass().getMethod(msgMethod.name(), msgMethod.parameterTypes());
+					try {						
+						Method method = msgMethod.getMethod(callback.getClass());
 	            		Object rv = method.invoke(callback, msgMethod.params());
 	            		result = new MessageMethodResult(msgMethod, rv);
                 	} catch(Exception e) {

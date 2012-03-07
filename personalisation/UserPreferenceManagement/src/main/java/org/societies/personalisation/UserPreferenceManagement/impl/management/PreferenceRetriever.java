@@ -24,21 +24,19 @@
  */
 package org.societies.personalisation.UserPreferenceManagement.impl.management;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 
@@ -55,7 +53,7 @@ public class PreferenceRetriever {
 		this.broker = broker;
 	}
 	
-	public Registry retrieveRegistry(Identity dpi){
+	public Registry retrieveRegistry(IIdentity dpi){
 		try {
 			Future<List<CtxIdentifier>> futureAttrList = broker.lookup(CtxModelType.ATTRIBUTE, "PREFERENCE_REGISTRY");
 			if (futureAttrList==null){
@@ -69,25 +67,25 @@ public class PreferenceRetriever {
 					Object obj = this.convertToObject(attr.getBinaryValue());
 					
 					if (obj==null){
-						this.logging.debug("PreferenceRegistry not found in DB for dpi:"+dpi.toString()+". Creating new registry");
+						this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
 						return new Registry();
 					}else{
 						if (obj instanceof Registry){
-							this.logging.debug("PreferenceRegistry found in DB for dpi:"+dpi.toString());
+							this.logging.debug("PreferenceRegistry found in DB");
 							return (Registry) obj;
 						}else{
-							this.logging.debug("PreferenceRegistry not found in DB for dpi:"+dpi.toString()+". Creating new registry");
+							this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
 							return new Registry();
 						}
 					}
 				}
-				this.logging.debug("PreferenceRegistry not found in DB for dpi:"+dpi.toString()+". Creating new registry");
+				this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
 				return new Registry();
 			}
-			this.logging.debug("PreferenceRegistry not found in DB for dpi:"+dpi.toString()+". Creating new registry");
+			this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
 			return new Registry();
 		} catch (CtxException e) {
-			this.logging.debug("Exception while loading PreferenceRegistry from DB for dpi:"+dpi.toString());
+			this.logging.debug("Exception while loading PreferenceRegistry from DB");
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
