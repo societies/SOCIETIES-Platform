@@ -29,10 +29,10 @@ import java.net.URL;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.servicelifecycle.IServiceControl;
 import org.societies.api.servicelifecycle.ServiceControlException;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.springframework.osgi.context.BundleContextAware;
 
 /**
@@ -59,7 +59,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	 * @see org.societies.api.servicelifecycle.IServiceControl#startService(org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)
 	 */
 	@Override
-	public void startService(IServiceResourceIdentifier serviceId)
+	public void startService(ServiceResourceIdentifier serviceId)
 			throws ServiceControlException {
 		
 		if(logger.isDebugEnabled()) logger.debug("Service Management: startService method");
@@ -96,7 +96,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	 * @see org.societies.api.servicelifecycle.IServiceControl#stopService(org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)
 	 */
 	@Override
-	public void stopService(IServiceResourceIdentifier serviceId)
+	public void stopService(ServiceResourceIdentifier serviceId)
 			throws ServiceControlException {
 		
 		if(logger.isDebugEnabled()) logger.debug("Service Management: stopService method");
@@ -153,7 +153,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	 * @see org.societies.api.servicelifecycle.IServiceControl#uninstallService(org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)
 	 */
 	@Override
-	public void uninstallService(IServiceResourceIdentifier serviceId)
+	public void uninstallService(ServiceResourceIdentifier serviceId)
 			throws ServiceControlException {
 		
 		if(logger.isDebugEnabled()) logger.debug("Service Management: uninstallService method");
