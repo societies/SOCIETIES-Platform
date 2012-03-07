@@ -29,14 +29,12 @@ public class CallbackAdapter implements Callback {
 	private Context context;
 	private ServiceConnection service;
 	private PacketMarshaller marshaller;
-	private IIdentityManager idm;
 	
-	public CallbackAdapter(ICommCallback callback, Context context, ServiceConnection service, PacketMarshaller marshaller, IIdentityManager idm) {
+	public CallbackAdapter(ICommCallback callback, Context context, ServiceConnection service, PacketMarshaller marshaller) {
 		this.callback = callback;
 		this.context = context;
 		this.service = service;
 		this.marshaller = marshaller;
-		this.idm = idm;
 	}
 	
 	@Override
@@ -93,8 +91,8 @@ public class CallbackAdapter implements Callback {
 	
 	private Stanza stanzaFromPacket(Packet packet) {
 		try {
-			IIdentity to = idm.fromJid(packet.getTo().toString());
-			IIdentity from = idm.fromJid(packet.getFrom().toString());
+			IIdentity to = IdentityManagerImpl.staticfromJid(packet.getTo().toString());
+			IIdentity from =IdentityManagerImpl.staticfromJid(packet.getFrom().toString());
 			Stanza returnStanza = new Stanza(packet.getPacketID(), from, to);
 			return returnStanza;
 		} catch (InvalidFormatException e) {

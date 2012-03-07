@@ -26,14 +26,13 @@ package org.societies.api.servicelifecycle.model;
 
 import java.net.URI;
 
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
 /**
  * Describe your class here...
  *
  * @author Eliza
- *
- */
-/**
- * @deprecated  no direct replacement should reference implementation class org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
+ * @deprecated Use {@link ServiceResourceIdentifier} instead
  */
 @Deprecated
 public interface IServiceResourceIdentifier {

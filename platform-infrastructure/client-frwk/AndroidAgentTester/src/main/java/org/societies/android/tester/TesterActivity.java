@@ -84,7 +84,7 @@ public class TesterActivity extends Activity {
     @Override
     public void onDestroy() {
     	super.onDestroy();
-    	ccm.unregister(elementNames, namespaces, packages);
+    	ccm.unregister(elementNames, callback);
     }
     
     private class ExampleTask extends AsyncTask<Void, Void, Void> {
