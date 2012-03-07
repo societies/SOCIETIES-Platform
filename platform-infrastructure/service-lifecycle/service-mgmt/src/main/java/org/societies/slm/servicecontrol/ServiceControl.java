@@ -26,14 +26,10 @@ package org.societies.slm.servicecontrol;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
@@ -316,54 +312,6 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 		// Finally, we return
 		 return result;
-		 
-		 /*
-		// Gets the metadata properties of the service
-		HashMap<String,String> serviceProperties = new HashMap<String,String>();
-		
-		serviceProperties.put("serviceName", service.getServiceName());
-		serviceProperties.put("authorSignature", service.getAuthorSignature());
-		serviceProperties.put("version", service.getServiceInstance().getServiceImpl().getServiceVersion());
-		
-		// Creates the filter
-		String filter ="(&";
-		
-		Set<String> properties = serviceProperties.keySet();
-		
-		for(String propertyKey: properties){
-			filter+='('+propertyKey+'='+serviceProperties.get(propertyKey)+')';
-		}
-		
-		filter+=')';
-		
-		if(logger.isDebugEnabled()) logger.debug("Filter to search OSGI Registry: " + filter);
-		
-		try {
-			
-			// Next we get all the ServiceReferences for this metadata... there should only be one.
-			ServiceReference<?>[] serviceReferences = bundleContext.getAllServiceReferences(null, filter);
-			
-			// Is there more than one reference?
-			if(serviceReferences != null){
-				if(logger.isDebugEnabled()) 
-					logger.debug("There are " + serviceReferences.length + " services found.");
-				
-				result = serviceReferences[0].getBundle();
-
-				if(logger.isDebugEnabled()) 
-					logger.debug("Bundle is " + result.getSymbolicName() + " with id: " + result.getBundleId() + " and state: " + getStateName(result.getState()));
-				
-			} else{
-				if(logger.isDebugEnabled()) 
-					logger.debug("No services found in OSGI Registry for filter: " + filter);
-			}
-		
-		} catch (InvalidSyntaxException ex) {
-			ex.printStackTrace();
-			logger.error("Invalid filter while trying to get Bundle: " + ex.getMessage());
-		}
-		
-		*/
 		 
 	}
 
