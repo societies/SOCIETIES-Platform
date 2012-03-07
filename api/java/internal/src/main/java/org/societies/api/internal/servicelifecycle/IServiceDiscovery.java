@@ -1,3 +1,4 @@
+
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
@@ -57,3 +58,4 @@ public interface IServiceDiscovery {
 	public Future<List<Service>> getServices() throws ServiceDiscoveryException;
 	
 }
+
