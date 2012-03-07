@@ -28,6 +28,7 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 		this.genericPassword = genericPassword;
 		originalEndpoint = endpoint;
 		idm = originalEndpoint.getIdManager();
+		domainName = idm.getThisNetworkNode().getDomain();
 	}
 	
 	@Override
@@ -44,10 +45,6 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 
 	@Override
 	public ICommManager getNewCommManager() {
-		// TODO move to init method
-		if (domainName==null)
-			domainName = idm.getThisNetworkNode().getDomain();
-		
 		try {
 			String randomCisIdentifier = UUID.randomUUID().toString()+"."+domainName;
 			// TODO verify if exists
