@@ -28,7 +28,8 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 import org.societies.api.identity.IIdentity;
-import org.societies.api.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.Service;
+
 
 
 /**
