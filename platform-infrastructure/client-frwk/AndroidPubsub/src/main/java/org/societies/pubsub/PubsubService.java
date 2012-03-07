@@ -1,7 +1,5 @@
 package org.societies.pubsub;
 
-import java.io.FileDescriptor;
-
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.slf4j.Logger;
@@ -14,26 +12,21 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.InvalidFormatException;
+import org.societies.comm.android.ipc.Skeleton;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.pubsub.interfaces.Pubsub;
-import org.societies.comm.android.ipc.Skeleton;
-import org.societies.identity.IdentityManagerImpl;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.IInterface;
-import android.os.Messenger;
-import android.os.Parcel;
-import android.os.RemoteException;
 
 public class PubsubService extends Service {
 	
 	private static final Logger log = LoggerFactory.getLogger(PubsubService.class);
 	
 	private static Skeleton skeleton;
+	private ClientCommunicationMgr ccm;
+	private PubsubClientImpl pubsubClient;
 	
 	@Override
     public IBinder onBind(Intent intent) {  
@@ -50,29 +43,22 @@ public class PubsubService extends Service {
     public void onCreate()
     {    	    	
     	log.debug("onCreate");  
+		ccm = new ClientCommunicationMgr(PubsubService.this);
+        ICommManager endpoint = new CommManagerAdapter(ccm);
+        pubsubClient = new PubsubClientImpl(endpoint);
+        Pubsub pubsub = new PubsubSkeleton(pubsubClient);
 		try {
-			ClientCommunicationMgr ccm = new ClientCommunicationMgr(PubsubService.this) {
-				protected void createIdentityManager() {
-					try {
-						idm = new IdentityManagerImpl("android@societies.local/default");
-					} catch (InvalidFormatException e) {
-						throw new RuntimeException(e);
-					}
-				}
-			};
-	        ICommManager endpoint = new CommManagerAdapter(ccm);
-	        PubsubClientImpl pubsubClient = new PubsubClientImpl(endpoint);
-	        Pubsub pubsub = new PubsubSkeleton(pubsubClient);
-    		skeleton = new Skeleton(pubsub);	
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}  	
+			skeleton = new Skeleton(pubsub);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}	
     }
     
     @Override
     public void onDestroy()
     {
-    	log.debug("onDestroy");      
+    	log.debug("onDestroy");  
+    	ccm.unregister(PubsubClientImpl.getXMLElements(), pubsubClient);
     }
     
     private static class CommManagerAdapter implements ICommManager {

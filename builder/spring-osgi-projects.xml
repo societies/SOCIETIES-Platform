@@ -51,11 +51,8 @@
 		<module>../api/schema/internal</module>
 		<module>../api/java/internal</module>
 
-		<!-- Context -->
-		<module>../context-management/api</module>
-		<module>../context-management/UserContextDBManagement</module>
-		<module>../context-management/UserContextHistoryManagement</module>
-		<module>../context-management/ContextBroker</module>
+		<!-- Context Management -->
+		<module>../context-management</module>
 
 		<!-- User Agent -->
 		<module>../user-agent/user-action-monitor</module>
@@ -127,7 +124,6 @@
 		<!-- Intelligent community orchestration -->
 		<module>../intelligent-community-orchestration/CommunityLifecycleManagement
 		</module>
-		<!-- Context Management -->
 		<!-- Privacy Mgmt -->
 		<!--module>../privacy-trust/privacy-protection</module-->
 
