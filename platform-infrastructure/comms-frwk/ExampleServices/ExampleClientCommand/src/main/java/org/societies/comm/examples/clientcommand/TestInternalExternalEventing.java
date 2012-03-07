@@ -39,7 +39,7 @@ import org.societies.comm.xmpp.event.PubsubEvent;
 import org.societies.comm.xmpp.event.PubsubEventFactory;
 import org.societies.comm.xmpp.event.PubsubEventStream;
 import org.societies.example.fortunecookie.IWisdom;
-import org.societies.example.fortunecookieservice.schema.Cookie;
+import org.societies.api.schema.examples.fortunecookie.Cookie;
 import org.springframework.context.ApplicationListener;
 
 /**
@@ -76,8 +76,8 @@ public class TestInternalExternalEventing implements Runnable, ApplicationListen
 		
 			//ADD LIST OF PACKAGES TO ADD SCHEMA OBJECTS
 			List<String> packageList = new ArrayList<String>();
-			packageList.add("org.societies.comm.examples.calculatorbean");
-			packageList.add("org.societies.comm.examples.fortunecookiebean");
+			packageList.add("org.societies.api.schema.examples.calculatorbean");
+			packageList.add("org.societies.api.schema.examples.fortunecookie");
 			eventStream.addJaxbPackages(packageList);
 					
 			//SUBSCRIBE TO EVENTS - IMPLEMENT THE ApplicationListerner<PubsubEvent> interface

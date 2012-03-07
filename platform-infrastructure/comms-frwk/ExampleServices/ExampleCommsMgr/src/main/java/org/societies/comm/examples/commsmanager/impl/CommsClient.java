@@ -41,8 +41,8 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.example.IExamplesCallback;
 import org.societies.example.calculator.ICalcRemote;
-import org.societies.example.calculatorservice.schema.CalcBean;
-import org.societies.example.calculatorservice.schema.MethodType;
+import org.societies.api.schema.examples.calculatorbean.CalcBean;
+import org.societies.api.schema.examples.calculatorbean.MethodType;
 import org.springframework.scheduling.annotation.Async;
 
 /**
@@ -53,13 +53,13 @@ import org.springframework.scheduling.annotation.Async;
  */
 public class CommsClient implements ICalcRemote, ICommCallback{
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-			  Arrays.asList("http://societies.org/example/calculatorservice/schema",
-					  		"http://societies.org/example/fortunecookieservice/schema",
-					  		"http://societies.org/example/complexservice/schema"));
+			  Arrays.asList("http://societies.org/api/schema/examples/calculatorbean",
+				  		"http://societies.org/api/schema/examples/fortunecookie",
+				  		"http://societies.org/api/schema/examples/complexservice"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
-			  Arrays.asList("org.societies.example.calculatorservice.schema",
-							"org.societies.example.fortunecookieservice.schema",
-							"org.societies.example.complexservice.schema"));
+		  Arrays.asList("org.societies.api.schema.examples.calculatorbean",
+						"org.societies.api.schema.examples.fortunecookie",
+						"org.societies.api.schema.examples.complexservice"));
 
 	//PRIVATE VARIABLES
 	private ICommManager commManager;

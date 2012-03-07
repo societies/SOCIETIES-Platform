@@ -32,6 +32,12 @@
 			<version>0.1</version>
 			<scope>provided</scope>			
 		</dependency>
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
