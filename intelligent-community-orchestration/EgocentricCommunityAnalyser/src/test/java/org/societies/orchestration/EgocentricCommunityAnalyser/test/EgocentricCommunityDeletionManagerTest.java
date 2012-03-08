@@ -46,7 +46,7 @@ import org.societies.api.internal.cis.management.CisRecord;
  * This is the test class for the Egocentric Community Deletion Manager component
  * 
  * @author Fraser Blackmun
- * @version 0
+ * @version 1
  * 
  */
 
