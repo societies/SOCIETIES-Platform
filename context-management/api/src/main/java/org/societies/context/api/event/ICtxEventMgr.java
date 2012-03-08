@@ -146,6 +146,6 @@ public interface ICtxEventMgr {
      *            the scope of the event to be published.
      * @throws CtxException if publishing of the specified event fails
      */
-    public void publish(final CtxChangeEvent event, final String[] topics,
+    public void post(final CtxChangeEvent event, final String[] topics,
     		final CtxEventScope scope) throws CtxException;
 }

@@ -39,7 +39,7 @@ package org.societies.context.api.event;
  */
 public final class CtxChangeEventTopic {
 
-	private static final String BASE_TOPIC = "org/societies/context/event/"; 
+	private static final String BASE_TOPIC = "org/societies/context/change/event/"; 
 	
 	/** Context created event */
 	public static final String CREATED = BASE_TOPIC + "CREATED";

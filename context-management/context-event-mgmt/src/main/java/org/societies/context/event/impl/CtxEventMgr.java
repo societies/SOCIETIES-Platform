@@ -24,7 +24,20 @@
  */
 package org.societies.context.event.impl;
 
+import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
+import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
@@ -32,9 +45,14 @@ import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.CtxEventScope;
 import org.societies.context.api.event.ICtxEventMgr;
+import org.societies.context.event.api.CtxEventMgrException;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.context.annotation.Lazy;
+import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.stereotype.Service;
 
 /**
@@ -44,12 +62,18 @@ import org.springframework.stereotype.Service;
  * @since 0.0.4
  */
 @Service("ctxEventMgr")
-public final class CtxEventMgr implements ICtxEventMgr {
+@Lazy(false)
+public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CtxEventMgr.class);
 			
 	@Autowired(required=true)
 	private EventAdmin eventAdmin;
+	
+	private BundleContext bundleContext;
+	
+	private ConcurrentMap<String, ServiceRegistration<?>> registrations =
+			new ConcurrentHashMap<String, ServiceRegistration<?>>();
 	
 	/* (non-Javadoc)
 	 * @see org.societies.context.api.event.ICtxEventMgr#registerListener(org.societies.api.context.event.CtxChangeEventListener, java.lang.String[], org.societies.api.context.model.CtxIdentifier)
@@ -57,6 +81,17 @@ public final class CtxEventMgr implements ICtxEventMgr {
 	@Override
 	public void registerListener(CtxChangeEventListener listener,
 			String[] topics, CtxIdentifier ctxId) throws CtxException {
+		
+		final Dictionary<String, Object> props = new Hashtable<String, Object>();
+		props.put(EventConstants.EVENT_TOPIC, topics);
+		// TODO Add ctx event constants
+		props.put(EventConstants.EVENT_FILTER, "(idString=" + ctxId + ")");
+		if (LOG.isInfoEnabled()) 
+			LOG.info("Registering context event listener to topics "
+					+ Arrays.toString(topics)
+					+ " with properties '" + props + "'");
+		this.bundleContext.registerService(EventHandler.class.getName(),
+				new CtxChangeEventHandler(listener), props);
 	}
 
 	/* (non-Javadoc)
@@ -76,8 +111,18 @@ public final class CtxEventMgr implements ICtxEventMgr {
 	public void registerListener(CtxChangeEventListener listener,
 			String[] topics, CtxEntityIdentifier scope, String attrType)
 			throws CtxException {
-		// TODO Auto-generated method stub
 		
+		final Dictionary<String, Object> props = new Hashtable<String, Object>();
+		props.put(EventConstants.EVENT_TOPIC, topics);
+		// TODO Add ctx event constants
+		props.put(EventConstants.EVENT_FILTER, "(idString=" + scope
+				+ "/ATTRIBUTE/" + attrType + "/*)");
+		if (LOG.isInfoEnabled()) 
+			LOG.info("Registering context event listener to topics "
+					+ Arrays.toString(topics)
+					+ " with properties '" + props + "'");
+		this.bundleContext.registerService(EventHandler.class.getName(),
+				new CtxChangeEventHandler(listener), props);
 	}
 
 	/* (non-Javadoc)
@@ -92,12 +137,71 @@ public final class CtxEventMgr implements ICtxEventMgr {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.context.api.event.ICtxEventMgr#publish(org.societies.api.context.event.CtxChangeEvent, java.lang.String[], org.societies.context.api.event.CtxEventScope)
+	 * @see org.societies.context.api.event.ICtxEventMgr#post(org.societies.api.context.event.CtxChangeEvent, java.lang.String[], org.societies.context.api.event.CtxEventScope)
 	 */
 	@Override
-	public void publish(CtxChangeEvent event, String[] topics,
+	public void post(CtxChangeEvent event, String[] topics,
 			CtxEventScope scope) throws CtxException {
-		// TODO Auto-generated method stub
 		
+		// TODO Take event scope into account
+		
+		for (int i = 0; i < topics.length; ++i)
+			this.doPost(event, topics[i]);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.osgi.context.BundleContextAware#setBundleContext(org.osgi.framework.BundleContext)
+	 */
+	@Override
+	public void setBundleContext(BundleContext bundleContext) {
+
+		this.bundleContext = bundleContext;
+	}
+	
+	private void doPost(CtxChangeEvent event, String topic) throws CtxEventMgrException {
+		
+		if (this.eventAdmin == null)
+			throw new CtxEventMgrException("Could not send context event to topic '"
+					+ topic + "': OSGi EventAdmin service is not available");
+		
+		final Map<String, Object> props = new HashMap<String, Object>();
+		// TODO Add ctx event constants
+		props.put("id", event.getId());
+		props.put("idString", event.getId().toString());
+		if (LOG.isDebugEnabled()) 
+			LOG.debug("Sending context event to topic '" + topic + "'"
+					+ " with properties '" + props + "'");
+		this.eventAdmin.postEvent(new Event(topic, props));
+	}
+	
+	private class CtxChangeEventHandler implements EventHandler {
+
+		private final CtxChangeEventListener listener;
+		
+		private CtxChangeEventHandler(CtxChangeEventListener listener) {
+			this.listener = listener;
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.osgi.service.event.EventHandler#handleEvent(org.osgi.service.event.Event)
+		 */
+		@Override
+		public void handleEvent(Event osgiEvent) {
+		
+			// TODO Add ctx event constants
+			final CtxChangeEvent ctxChangeEvent = new CtxChangeEvent(
+					(CtxIdentifier) osgiEvent.getProperty("id"));
+			final String topic = osgiEvent.getTopic();
+			if (CtxChangeEventTopic.CREATED.equals(topic))
+				this.listener.onCreation(ctxChangeEvent);
+			else if (CtxChangeEventTopic.UPDATED.equals(topic))
+				this.listener.onUpdate(ctxChangeEvent);
+			else if (CtxChangeEventTopic.MODIFIED.equals(topic))
+				this.listener.onModification(ctxChangeEvent);
+			else if (CtxChangeEventTopic.REMOVED.equals(topic))
+				this.listener.onRemoval(ctxChangeEvent);
+			else
+				LOG.warn("Unexpected context change event topic name: " + topic);
+		}
 	}
 }
