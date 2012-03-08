@@ -64,9 +64,9 @@ public class IdentityImpl implements IIdentity {
 		int result = 1;
 		result = prime
 				* result
-				+ ((domainIdentifier == null) ? 0 : domainIdentifier.hashCode());
+				+ ((domainIdentifier == null) ? 0 : domainIdentifier.toLowerCase().hashCode());
 		result = prime * result
-				+ ((identifier == null) ? 0 : identifier.hashCode());
+				+ ((identifier == null) ? 0 : identifier.toLowerCase().hashCode());
 		return result;
 	}
 
@@ -82,12 +82,12 @@ public class IdentityImpl implements IIdentity {
 		if (domainIdentifier == null) {
 			if (other.getDomain() != null)
 				return false;
-		} else if (!domainIdentifier.equals(other.getDomain()))
+		} else if (!domainIdentifier.equalsIgnoreCase(other.getDomain()))
 			return false;
 		if (identifier == null) {
 			if (other.getIdentifier() != null)
 				return false;
-		} else if (!identifier.equals(other.getIdentifier()))
+		} else if (!identifier.equalsIgnoreCase(other.getIdentifier()))
 			return false;
 		return true;
 	}
