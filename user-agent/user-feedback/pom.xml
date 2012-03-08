@@ -5,7 +5,7 @@
 	<!-- change the artifactid to your project artifactid -->
 	<groupId>org.societies.useragent</groupId>
 	<artifactId>feedback</artifactId>
-	<packaging>bundle</packaging>
+	<packaging>jar</packaging>
 	<version>${version.ua}</version>
 	<developers>
 		<developer>
@@ -22,28 +22,36 @@
 	</parent>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.api.internal</groupId>
-			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit</groupId>
-			<artifactId>com.springsource.junit</artifactId>
-			<version>3.8.2</version>
-		</dependency>
-
-
+	<dependency>
+		<groupId>org.societies.api.external</groupId>
+		<artifactId>societies-api</artifactId>
+		<version>${release.version}</version>
+		<scope>provided</scope>
+	</dependency>
+	<dependency>
+		<groupId>org.societies.api.internal</groupId>
+		<artifactId>societies-api-internal</artifactId>
+		<version>${release.version}</version>
+		<scope>provided</scope>
+	</dependency>
+	<dependency>
+		<groupId>org.junit</groupId>
+		<artifactId>com.springsource.junit</artifactId>
+		<version>3.8.2</version>
+	</dependency>
 	</dependencies>
 
+
 	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+	<!-- <build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
@@ -56,10 +64,6 @@
 						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -78,5 +82,5 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>
+	</build> -->
 </project>
