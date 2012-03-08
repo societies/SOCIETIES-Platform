@@ -43,6 +43,12 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 	<!-- All Spring-OSGi Java projects to be included in nightly builds -->
 	<modules>
+		<!-- API -->
+		<module>../../api/schema/external</module>
+		<module>../../api/java/external</module>
+		<module>../../api/schema/internal</module>
+		<module>../../api/java/internal</module>
+		
 		<!-- Communications Infrastructure -->
 		<module>ExampleServices/api/java/schema</module>
 		<module>ExampleServices/api/java/internal</module>

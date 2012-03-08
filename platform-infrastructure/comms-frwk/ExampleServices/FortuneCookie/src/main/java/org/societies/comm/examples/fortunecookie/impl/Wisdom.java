@@ -36,7 +36,7 @@ import java.util.concurrent.Future;
 
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
-import org.societies.example.fortunecookieservice.schema.Cookie;
+import org.societies.api.schema.examples.fortunecookie.Cookie;
 import org.societies.example.fortunecookie.IWisdom;
 
 public class Wisdom implements IWisdom{
