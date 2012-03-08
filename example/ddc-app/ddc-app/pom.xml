@@ -4,15 +4,15 @@
 
   <parent>
     <groupId>com.disaster</groupId>
-    <artifactId>dcc-app-parent</artifactId>
+    <artifactId>ddc-app-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
   <groupId>com.disaster</groupId>
-  <artifactId>dcc-app</artifactId>
+  <artifactId>ddc-app</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>apk</packaging>
-  <name>dcc-app - Application</name>
+  <name>ddc-app - Application</name>
 
   <dependencies>
     <dependency>

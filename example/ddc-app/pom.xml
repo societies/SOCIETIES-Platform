@@ -3,14 +3,14 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.disaster</groupId>
-    <artifactId>dcc-app-parent</artifactId>
+    <artifactId>ddc-app-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>dcc-app - Parent</name>
+    <name>ddc-app - Parent</name>
 
     <modules>
-        <module>dcc-app</module>
-        <module>dcc-app-it</module>
+        <module>ddc-app</module>
+        <module>ddc-app-it</module>
     </modules>
 
     <dependencyManagement>
