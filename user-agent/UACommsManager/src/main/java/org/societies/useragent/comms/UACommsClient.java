@@ -23,39 +23,8 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.monitoring;
+package org.societies.useragent.comms;
 
-import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.useragent.monitoring.IInternalUserActionMonitor;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.useragent.monitoring.IUserActionMonitor;
+public class UACommsClient {
 
-public class UserActionMonitor implements IUserActionMonitor, IInternalUserActionMonitor{
-	
-	private ICtxBroker ctxBroker;
-
-	@Override
-	public void monitor(ServiceResourceIdentifier serviceId, String owner, String action) {
-		System.out.println("Received user action!");
-	}
-	
-	@Override
-	public void registerForActionUpdates() {
-		// TODO Auto-generated method stub	
-	}
-	
-	
-	
-	public void initialiseUserActionMonitor(){
-		System.out.println("Initialising user action monitor!");
-		if(this.ctxBroker == null){
-			System.out.println("ctxBroker is null :(");
-		}else{
-			System.out.println("ctxBroker is not null :)");
-		}
-	}
-
-	public void setCtxBroker(ICtxBroker broker){
-		this.ctxBroker = broker;
-	}
 }

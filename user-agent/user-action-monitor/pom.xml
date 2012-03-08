@@ -13,7 +13,7 @@
 			<email>s.gallacher@hw.ac.uk</email>
 		</developer>
 	</developers>
-	
+
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
@@ -22,22 +22,28 @@
 	</parent>
 
 	<dependencies>
-	<!-- add your dependencies here -->
-	<dependency>
-	<groupId>org.societies.api.external</groupId>
-	<artifactId>societies-api</artifactId>
-	<version>${release.version}</version>
-	<scope>provided</scope>
-	</dependency>
-	<dependency>
-	<groupId>org.societies.api.internal</groupId>
-	<artifactId>societies-api-internal</artifactId>
-	<version>${release.version}</version>
-	<scope>provided</scope>
-	</dependency>
+		<!-- add your dependencies here -->
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.schema</groupId>
+			<artifactId>societies-api-schema</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
-	
-	
+
+
 	<build>
 		<plugins>
 			<plugin>
@@ -47,36 +53,13 @@
 		</plugins>
 	</build>
 
-	<!-- <build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<Bundle-Activator></Bundle-Activator>
-						<Embed-Dependency>scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-					</instructions>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<configuration>
-					<artifactItems>
-						<artifactItem>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>${project.artifactId}</artifactId>
-							<version>${version.ua}</version>
-							<type>bundle</type>
-							<overWrite>true</overWrite>
-							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
-						</artifactItem>
-					</artifactItems>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build> -->
+	<!-- <build> <plugins> <plugin> <groupId>org.apache.felix</groupId> <artifactId>maven-bundle-plugin</artifactId> 
+		<extensions>true</extensions> <configuration> <instructions> <Bundle-Activator></Bundle-Activator> 
+		<Embed-Dependency>scope=compile|runtime</Embed-Dependency> <Embed-Transitive>true</Embed-Transitive> 
+		</instructions> </configuration> </plugin> <plugin> <groupId>org.apache.maven.plugins</groupId> 
+		<artifactId>maven-dependency-plugin</artifactId> <configuration> <artifactItems> 
+		<artifactItem> <groupId>${project.groupId}</groupId> <artifactId>${project.artifactId}</artifactId> 
+		<version>${version.ua}</version> <type>bundle</type> <overWrite>true</overWrite> 
+		<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory> </artifactItem> 
+		</artifactItems> </configuration> </plugin> </plugins> </build> -->
 </project>
