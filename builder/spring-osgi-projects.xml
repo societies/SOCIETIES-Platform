@@ -55,8 +55,7 @@
 		<module>../context-management</module>
 
 		<!-- User Agent -->
-		<module>../user-agent/user-action-monitor</module>
-		<!--<module>../user-agent/user-feedback</module> -->
+		<module>../user-agent</module>
 
 		<!-- Personalisation -->
 
@@ -118,12 +117,22 @@
 
 		<!-- Device Mgmt -->
 		<module>../css-modules/device-mgmt/devicemanager/</module>
+		<module>../css-modules/device-mgmt/DeviceRegistry/</module>
+		<module>../css-modules/device-mgmt/RegSynchroniser/</module>
 	
-		<!-- Intelligent community orchestration -->
+		<!-- Intelligent Community Orchestration -->
+
+		<module>../intelligent-community-orchestration/API
+		</module>
 		<module>../intelligent-community-orchestration/CommunityLifecycleManagement
 		</module>
+		<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser
+		</module>
+
+		<!-- Context Management -->
+
 		<!-- Privacy Mgmt -->
-		<!--module>../privacy-trust/privacy-protection</module-->
+		<!-- <module>../privacy-trust/privacy-protection</module>  -->
 
 	</modules>
 </project>
