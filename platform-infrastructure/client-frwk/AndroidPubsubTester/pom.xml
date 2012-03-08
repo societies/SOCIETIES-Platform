@@ -25,14 +25,14 @@
 		<version>${version.comm}</version>
 	</dependency>
 	<dependency>
-		<groupId>org.societies.comm.xmpp.pubsub</groupId>
-		<artifactId>Pubsub</artifactId>
-		<version>${version.comm}</version>
-	</dependency>
-	<dependency>
 		<groupId>org.societies.comm.android</groupId>
 		<artifactId>AndroidPubsubApi</artifactId>
 		<version>${version.comm}</version>
+	</dependency>
+	<dependency>
+		<groupId>org.societies.api.schema</groupId>
+		<artifactId>societies-api-schema</artifactId>
+		<version>${release.version}</version>
 	</dependency>
 	<dependency>
 	    <groupId>xerces</groupId>

@@ -27,8 +27,9 @@ package org.societies.api.servicelifecycle.model;
 
 /**
  * @author Antonio Panazzolo, Massimo Mazzariol (SN)
+ * @deprecated Use {@link org.societies.api.schema.servicelifecycle.model.ServiceType} instead
  */
-
+@Deprecated
 public enum ServiceType {
 	ThirdPartyService,
 	CoreService

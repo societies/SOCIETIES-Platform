@@ -20,7 +20,7 @@ public class Skeleton {
                 	
                 	MessageMethodResult result;
                 	try {
-                		Method method = getMethod(object.getClass(), msgMethod.name(), msgMethod.parameterTypes());
+                		Method method = msgMethod.getMethod(object.getClass());
                 		Object rv;
 	                	if(msgMethod.hasCallback()) {	                		
 	                		rv = method.invoke(object, msgMethod.params(msgMethod.id(), msg.replyTo));
@@ -43,25 +43,7 @@ public class Skeleton {
             }
         }
         
-        private Method getMethod(Class<?> target, String methodName, Class<?>[] methodParameterTypes) throws NoSuchMethodException {
-        	for (Method method : target.getMethods()) {
-        		Class<?>[] parameterTypes = method.getParameterTypes();
-        		if (!method.getName().equals(methodName) || parameterTypes.length != methodParameterTypes.length) {
-        			continue;
-        		}
-        		boolean matches = true;
-        		for (int i = 0; i < parameterTypes.length; i++) {
-        			if (!parameterTypes[i].isAssignableFrom(methodParameterTypes[i])) {
-        				matches = false;
-        				break;
-        			}
-        		}
-        		if (matches) {
-        			return method;
-        		}
-        	}
-        	throw new NoSuchMethodException();
-        }
+
 	}
 	
 	private Object object;
@@ -75,11 +57,6 @@ public class Skeleton {
 				return new IncomingHandler();
 			}			
 		}.createMessengerThread();
-//    	messenger = new Messenger(new MessengerThreadFactory().createThread(new IHandlerFactory() {
-//			public Handler createHandler() {
-//				return new IncomingHandler();
-//			}	    		
-//    	}));
     }
     
     public Messenger messenger() {

@@ -57,6 +57,7 @@
 								<exclude>pubsub#errors.xsd</exclude>
 								<exclude>pubsub#owner.xsd</exclude>
 								<exclude>pubsub#event.xsd</exclude>
+								<exclude>org.societies.api.schema.servicelifecycle.servicemanagement.xsd</exclude>
 							</schemaExcludes>
 						</configuration>
 					</execution>
@@ -81,13 +82,8 @@
 							<schemaIncludes>
 								<include>pubsub.xsd</include>
 							</schemaIncludes>
-							<episodes>
-								<episode>
-									<groupId>jabber.x.data</groupId>
-									<artifactId>DataFormsXep</artifactId>
-									<version>${release.version}</version>
-								</episode>
-							</episodes>
+							<bindingDirectory>target/generated-sources/dataforms/META-INF</bindingDirectory>
+							<bindingIncludes><include>*.episode</include></bindingIncludes>
 							<generateDirectory>${project.build.directory}/generated-sources/pubsub</generateDirectory>
 						</configuration>
 					</execution>
@@ -113,13 +109,8 @@
 							<schemaIncludes>
 								<include>pubsub#owner.xsd</include>
 							</schemaIncludes>
-							<episodes>
-								<episode>
-									<groupId>jabber.x.data</groupId>
-									<artifactId>DataFormsXep</artifactId>
-									<version>${release.version}</version>
-								</episode>
-							</episodes>
+							<bindingDirectory>target/generated-sources/dataforms/META-INF</bindingDirectory>
+							<bindingIncludes><include>*.episode</include></bindingIncludes>
 							<generatePackage>org.jabber.protocol.pubsub.owner</generatePackage>
 							<generateDirectory>${project.build.directory}/generated-sources/owner</generateDirectory>
 						</configuration>
@@ -133,13 +124,8 @@
 							<schemaIncludes>
 								<include>pubsub#event.xsd</include>
 							</schemaIncludes>
-							<episodes>
-								<episode>
-									<groupId>jabber.x.data</groupId>
-									<artifactId>DataFormsXep</artifactId>
-									<version>${release.version}</version>
-								</episode>
-							</episodes>
+							<bindingDirectory>target/generated-sources/dataforms/META-INF</bindingDirectory>
+							<bindingIncludes><include>*.episode</include></bindingIncludes>
 							<generatePackage>org.jabber.protocol.pubsub.event</generatePackage>
 							<generateDirectory>${project.build.directory}/generated-sources/event</generateDirectory>
 						</configuration>
