@@ -30,8 +30,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CommunityCtxEntity;
-import org.societies.api.context.model.CommunityMemberCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -140,13 +138,13 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	public void estimateContext(CtxEntityIdentifier communityID, String entityType, String attributeType) 
 			throws CtxException, InterruptedException, ExecutionException {
 	
-		Future<List<CtxEntityIdentifier>> allMembersList = getAllCommunityMembers(communityID);
-		Future<List<CtxEntityIdentifier>> membersOfSpecificType = getMembersOfSpecificType(allMembersList, entityType);
-		getValuesFromMembersAttribute(membersOfSpecificType, attributeType);
+		Future<List<CtxEntityIdentifier>> allMembersList = getAllCommunityMembers(communityID, entityType);
+		//Future<List<CtxEntityIdentifier>> membersOfSpecificType = getMembersOfSpecificType(allMembersList, entityType);
+		getValuesFromMembersAttribute(allMembersList, attributeType);
 	
 	}
 
-	private Future<List<CtxEntityIdentifier>> getAllCommunityMembers(CtxEntityIdentifier communityID) throws CtxException {
+	public Future<List<CtxEntityIdentifier>> getAllCommunityMembers(CtxEntityIdentifier communityID, String entityType2) throws CtxException {
 		// TODO Auto-generated method stub
 		//Θέλω μια λίστα με όλα τα CommunityMembers	
 		
@@ -160,12 +158,32 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		//TODO
 		//... και έστω ότι καταλήγουμε στην ListWithMembers
 	 return b.lookupEntities(entityType, attributeType, null, null);
+	 //return 1;
+	 
+	 //Future<List<CtxEntityIdentifier>>
 	}
 	
 	
 	
 	private List<Integer> getValuesFromMembersAttribute(Future<List<CtxEntityIdentifier>> membersOfSpecificType, String attributeType) {
 		// TODO Auto-generated method stub
+		//kalytera na gyriso lista apo attributes...
+		ArrayList<CtxAttribute> res = new ArrayList<CtxAttribute>();
+		try {
+			for(CtxEntityIdentifier c:membersOfSpecificType.get()){
+				//klisi se broker gia retrieve enos ctxentity me to sigekrimen identifier
+				//tha prepei na antikatastahei me methodo tou broker
+				CtxEntity entity = new CtxEntity(c);
+				res.addAll(entity.getAttributes(attributeType));
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+			
 		
 		//Από την καινούρια λίστα (με persons) πέρνω την τελική λίστα με τα values του συγκεκριμένου attribute
 		//TODO
