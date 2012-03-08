@@ -34,25 +34,63 @@ import org.societies.api.css.management.ISocietiesApp;
  *
  */
 public class SocietiesApp implements ISocietiesApp {
+    private String cssId;
+    private String cssPassword;
+    private Object cssManager = null;
+    private ICisManager cisManager = null;
+    private ICssDirectory cssDirectory = null;
+    private ICisDirectory cisDirectory = null;
+    
+    public SocietiesApp(String _cssId, String _cssPassword){
+	this.cssId = _cssId;
+	this.cssPassword = _cssPassword;
+	/*
+	 *  Here I need Android code to find out which platform components that are available
+	 *  on this node:
+	 *  - find CssManager content provider and initialize cssManager.
+	 *  - find CisManager content provided and initialize cisManager.
+	 *  - find CisDirectory content provided and initialize cisdirectory.
+	 *  - find CssDirectory content provided and initialize cssdirectory.
+	 */
+
+	
+    }
 
     public Object getCssManager() {
 	// TODO Auto-generated method stub
-	return null;
+	return cssManager;
     }
 
     public ICisManager getCisManager() {
 	// TODO Auto-generated method stub
-	return null;
+	return cisManager;
     }
 
     public ICssDirectory getCssDirectory() {
 	// TODO Auto-generated method stub
-	return null;
+	return cssDirectory;
     }
 
     public ICisDirectory getCisDirectory() {
 	// TODO Auto-generated method stub
-	return null;
+	return cisDirectory;
     }
 
+    public String getCssId() {
+        return cssId;
+    }
+
+    /**
+     * Change the password only if the correct old password is provided.
+     * 
+     * @param _oldPassword
+     * @param _newPassword
+     */
+    public boolean setCssPassword(String _oldPassword, String _newPassword) {
+        if (_oldPassword == cssPassword){
+            this.cssPassword = _newPassword;
+            return true;
+        }
+        return false;
+    }
 }

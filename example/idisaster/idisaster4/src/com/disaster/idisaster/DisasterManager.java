@@ -22,34 +22,18 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.management;
+package com.disaster.idisaster;
+
 
 /**
- * We need to remove this from the API. It is implementation specific.
+ * This is the class that manages the list of disasters that the user has
+ * created or is member of.
+ * 
  * @author Babak.Farshchian@sintef.no
  *
  */
-@Deprecated
-public interface ICisEditor {
-
-    /**
-     * Returns the CISActivityFeed for a specific CIS.
-     * 
-     * @param cssId The ID of the owner CSS.
-     * @param cisId The ID of the CIS.
-     * @return The CISActivityFeed of the CIS.
-     */
-    ICisActivityFeed getActivityFeed(String cssId, String cisId);
-    String getCisId();
-    /**
-     * Updates an existing CIS with the data in the newCis. Update is done canonical. If it fails, the old CIS is
-     * not changed at all.
-     * 
-     * @param cssId The ID of the owner CSS
-     * @param newCis the data to be updated is specified in this CISRecord.
-     * @param oldCisId The ID of the CIS that needs to be updated.
-     * @return true if update was successful, 
-     */
-    Boolean update(String cssId, ICisRecord newCis, String oldCisId);
-
+public class DisasterManager {
+    //List to hold disasters this user owns:
+    	
 }
+

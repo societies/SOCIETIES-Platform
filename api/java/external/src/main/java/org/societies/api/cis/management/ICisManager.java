@@ -31,33 +31,35 @@ package org.societies.api.cis.management;
  */
 public interface ICisManager {
 	/**
-	 * Create a new CIS for the CSS represented by cssId.
+	 * Create a new CIS for the CSS represented by cssId. Password is needed and is the
+	 * same as the CSS password.
+	 * After this method is called a CIS is created with mode set to mode.
+	 * 
+	 * The CSS who creates the CIS will be the owner. Ownership can be changed
+	 * later.
+	 * 
+	 * TODO: define what values mode can have and what each means.
 	 * TODO: change the type from String to proper type when CSS ID datatype is defined.
 	 *  
-	 * @param cssId, cisId
-	 * @return
+	 * @param cssId and cssPassword are to recognise the user
+	 * @param cisName is user given name for the CIS, e.g. "Footbal".
+	 * @param mode 
+	 * @return link to the {@link ICisEditor} representing the new CIS, or 
+	 * null if the CIS was not created.
 	 */
-	ICisRecord createCis(String cssId, String cssPassword, String cisId);
+	ICisEditor createCis(String cssId, String cssPassword, String cisName, int mode);
 	/**
-	 * Delete a specific CIS represented by cisId
+	 * Delete a specific CIS represented by cisId. The cisId is available in the
+	 * method of {@link ICisEditor} representing the CIS to be deleted. This method
+	 * will delete only one CIS with the ID passed as cisId.
+	 * 
 	 * TODO: Need to give a more meaningful return.
 	 * 
-	 * @param cssId the ID of the owner CSS
+	 * @param cssId and cssPassword of the owner of the CIS.
 	 * @param cisId The ID of the CIS to be deleted.
-	 * @return true if deleted, false otherwise. 
+	 * @return true if deleted, false otherwise.
 	 */
-	Boolean deleteCis(String cssId, String cisId);
-	/**
-	 * Updates an existing CIS with the data in the newCis. Update is done canonical. If it fails, the old CIS is
-	 * not changed at all.
-	 * 
-	 * @param cssId The ID of the owner CSS
-	 * @param newCis the data to be updated is specified in this CISRecord.
-	 * @param oldCisId The ID of the CIS that needs to be updated.
-	 * @return true if update was successful, 
-	 */
-	Boolean updateCis(String cssId, ICisRecord newCis, String oldCisId);
-	
+	Boolean deleteCis(String cssId, String cssPassword, String cisId);
 	/**
 	 * Get a CIS Record with the ID cisId.
 	 * 
@@ -79,13 +81,7 @@ public interface ICisManager {
 	 */
 	ICisRecord[] getCisList(ICisRecord query);
 	
-	/**
-	 * Returns the CISActivityFeed for a specific CIS.
-	 * 
-	 * @param cssId The ID of the owner CSS.
-	 * @param cisId The ID of the CIS.
-	 * @return The CISActivityFeed of the CIS.
-	 */
-	ICisActivityFeed getActivityFeed(String cssId, String cisId);
+	Boolean requestNewCisOwner(String currentOwnerCssId, String currentOwnerCssPassword,
+		String newOwnerCssId, String cisId);
 
 }

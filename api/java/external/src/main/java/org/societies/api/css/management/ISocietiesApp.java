@@ -37,8 +37,11 @@ import org.societies.api.css.directory.ICssDirectory;
  */
 public interface ISocietiesApp {
     //TODO: Fix this Object.
-    Object getCssManager();
-    ICisManager getCisManager();
-    ICssDirectory getCssDirectory();
-    ICisDirectory getCisDirectory();
+    public Object getCssManager();
+    public ICisManager getCisManager();
+    public ICssDirectory getCssDirectory();
+    public ICisDirectory getCisDirectory();
+    public String getCssId();
+    //TODO: Move this method to ICssManager when it exists:
+    public boolean setCssPassword(String _oldPassword, String _newPassword);
 }
