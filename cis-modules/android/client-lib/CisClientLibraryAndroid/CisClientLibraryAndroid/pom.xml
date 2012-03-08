@@ -16,8 +16,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.societies.api.internal</groupId>
-      <artifactId>societies-api-internal</artifactId>
+      <groupId>org.societies.api.external</groupId>
+      <artifactId>societies-api</artifactId>
       <version>0.1</version>
     </dependency>
     <dependency>

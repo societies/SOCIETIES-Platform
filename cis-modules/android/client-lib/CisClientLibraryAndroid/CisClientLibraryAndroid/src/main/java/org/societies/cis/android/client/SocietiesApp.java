@@ -24,12 +24,35 @@
  */
 package org.societies.cis.android.client;
 
-import ISocietiesApp;
+import org.societies.api.cis.directory.ICisDirectory;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.css.directory.ICssDirectory;
+import org.societies.api.css.management.ISocietiesApp;
 
 /**
  * @author Babak.Farshchian@sintef.no
  *
  */
-public class SocietiesApp extends ISocietiesApp {
+public class SocietiesApp implements ISocietiesApp {
+
+    public Object getCssManager() {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    public ICisManager getCisManager() {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    public ICssDirectory getCssDirectory() {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    public ICisDirectory getCisDirectory() {
+	// TODO Auto-generated method stub
+	return null;
+    }
 
 }

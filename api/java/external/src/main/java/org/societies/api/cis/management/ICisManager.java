@@ -37,7 +37,7 @@ public interface ICisManager {
 	 * @param cssId, cisId
 	 * @return
 	 */
-	ICisRecord createCis(String cssId, String cisId);
+	ICisRecord createCis(String cssId, String cssPassword, String cisId);
 	/**
 	 * Delete a specific CIS represented by cisId
 	 * TODO: Need to give a more meaningful return.

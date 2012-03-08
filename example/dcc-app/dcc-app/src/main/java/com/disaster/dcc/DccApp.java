@@ -1,8 +1,12 @@
 package com.disaster.dcc;
 
+import org.societies.api.css.management.ICssRecord;
+import org.societies.api.css.management.ISocietiesApp;
+import org.societies.api.schema.cssmanagement.CssRecord;
+import org.societies.cis.android.client.SocietiesApp;
+
 import android.app.Activity;
 import android.os.Bundle;
-import org.societies.api.internal.*;
 
 public class DccApp extends Activity {
 
@@ -12,12 +16,12 @@ public class DccApp extends Activity {
      * previously being shut down then this Bundle contains the data it most
      * recently supplied in onSaveInstanceState(Bundle). <b>Note: Otherwise it is null.</b>
      */
-    String societiesServer = "server.societies-eu";
+    String societiesServer = "server.societies.eu";
     String username = "Babak";
     String password = "SocietieS";
-    SocietiesApp dccSoc;
-    CssRecord cssRecord;
-    CssId cssId;  //TODO: Find out which class CssId is.
+    ISocietiesApp dccSoc;
+    ICssRecord cssRecord;
+    String cssId;  //TODO: Find out which class CssId is.
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,11 +36,12 @@ public class DccApp extends Activity {
         // create a new SocietiesApp that will provide access to the platform
         dccSoc = new SocietiesApp("DCC");
         // populate a CssRecord to create it later:
-        cssRecord = new CssRecord(societiesServer, username, password);
+        dccSoc.getCssManager().login(societiesServer, username, password);
+        	// new CssRecord(societiesServer, username, password);
         // contact CssManager to create the new CSS:
-        cssId = createCss(cssRecord);
+        // cssId = createCss(cssRecord);
     }
-    
+
     CssId createCss(CssRecord _record){
 	CssId cssId;
 	try{

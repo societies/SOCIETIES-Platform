@@ -31,7 +31,7 @@ package org.societies.cis.android.client;
  * @version 0
  * 
  */
-import org.societies.api.internal.cis.collaboration.ICisSubscriptionRecord;
+import org.societies.api.cis.collaboration.ICisSubscriptionRecord;
 
 public class CisSubscriptionRecord implements ICisSubscriptionRecord{
     	private String cssId, cisId, subscriptionMode;
