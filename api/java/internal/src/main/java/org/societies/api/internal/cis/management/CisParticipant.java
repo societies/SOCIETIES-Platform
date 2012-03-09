@@ -24,35 +24,72 @@
  */
 
 
+package org.societies.api.internal.cis.management;
+
+
 /**
- * Describe your class here...
- *
- * @author tcarlyle
- *
- */
+ * @author Thomas Vilarinho (Sintef)
+*/
 
-package org.societies.css;
+public class CisParticipant {
+	
+	public enum MembershipType {
+		   owner, participant, admin		 }
+	
+	 String membersJid;
+	 MembershipType mtype;
+	
+	
+	
+	
+	public CisParticipant(String membersJid, MembershipType mtype) {
+		super();
+		this.membersJid = membersJid;
+		this.mtype = mtype;
+	}
+	
+	
+	public String getMembersJid() {
+		return membersJid;
+	}
+	public void setMembersJid(String membersJid) {
+		this.membersJid = membersJid;
+	}
+	public MembershipType getMtype() {
+		return mtype;
+	}
+	public void setMtype(MembershipType mtype) {
+		this.mtype = mtype;
+	}
 
-public class CssManagerBean {
-	
-	public enum methodType {createCIS};
-	private methodType method;
-	private int cisName;
-	
-	
-	
-	public methodType getMethod() {
-		return method;
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((membersJid == null) ? 0 : membersJid.hashCode());
+		return result;
 	}
-	public void setMethod(methodType method) {
-		this.method = method;
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CisParticipant other = (CisParticipant) obj;
+		if (membersJid == null) {
+			if (other.membersJid != null)
+				return false;
+		} else if (!membersJid.equals(other.membersJid))
+			return false;
+		return true;
 	}
-	public int getCisName() {
-		return cisName;
-	}
-	public void setCisName(int cisName) {
-		this.cisName = cisName;
-	}
+	
 	
 	
 	

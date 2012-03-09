@@ -54,6 +54,7 @@ import org.springframework.stereotype.Component;
 import org.societies.identity.IdentityImpl;
 import org.societies.manager.Community;
 import org.societies.manager.Create;
+import org.societies.manager.Communities;
 
 // this is the class which manages all the CIS from a CSS
 // for the class responsible for editing and managing each CIS instance, consult the CISEditor
@@ -246,13 +247,13 @@ public class CisManager implements ICisManager, IFeatureServer{
 		LOG.info("get Query received");
 		if (payload.getClass().equals(Community.class)) {
 			Community c = (Community) payload;
-			
-			// CREATE CIS
-			
+
 			if (c.getCreate() != null) {
+				
+				// CREATE CIS
 				LOG.info("create received");
-				String jid = stanza.getFrom().getBareJid();
-				LOG.info("sender JID = " + jid);
+				String senderjid = stanza.getFrom().getBareJid();
+				LOG.info("sender JID = " + senderjid);
 				
 				//TODO: check if the sender is allowed to create a CIS
 				
@@ -263,7 +264,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 				String cisPassword = create.getCommunityPassword();
 				
 				if(cisPassword != null && ownerJid != null && cisJid != null ){
-					CisRecord cisR = this.createCis(jid,
+					CisRecord cisR = this.createCis(ownerJid,
 							cisJid,this.cisManagerId.getDomain(), cisPassword);
 					
 					LOG.info("CIS Created!!");
@@ -275,16 +276,27 @@ public class CisManager implements ICisManager, IFeatureServer{
 					// if one of those parameters did not come, we should return an error
 					return create;
 				}
-					
+				// END OF CREATE CIS					
 
 			}
 			if (c.getList() != null) {
 				LOG.info("list received");
+								
+				// GET LIST CODE
+				Communities com = new Communities();
+				List<CisRecord> l = this.getCisList();
+				Iterator<CisRecord> it = l.iterator();
 				
-
-					
+				while(it.hasNext()){
+					CisRecord element = it.next();
+					Community community = new Community();
+					community.setCommunityJid(element.getFullJid());
+					com.getCommunity().add(community);
+					 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
+			     }
+				return com;
+				// END OF GET LIST CODE
 				
-				return c;
 			}
 			if (c.getConfigure() != null) {
 				LOG.info("configure received");

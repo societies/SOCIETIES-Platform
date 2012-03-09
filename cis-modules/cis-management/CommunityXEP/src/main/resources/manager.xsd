@@ -45,6 +45,15 @@
       namespace='jabber:x:data'
       schemaLocation='http://xmpp.org/schemas/x-data.xsd'/>
 
+	<xs:element name='communities'>
+	   <xs:complexType>
+	       <xs:sequence>
+      		<xs:element ref='community' minOccurs='0' maxOccurs='unbounded'/>
+      		</xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+
+
 	<xs:element name='community'>
 	   <xs:complexType>
 	      <xs:choice>
@@ -54,6 +63,7 @@
 			  <xs:element ref='search-cis'/>
 			  <xs:element ref='configure'/>
 	      </xs:choice>
+	      <xs:attribute name='community-jid' type='xs:string'/>
 	    </xs:complexType>
 	</xs:element>
 	

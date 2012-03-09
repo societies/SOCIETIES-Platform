@@ -108,13 +108,6 @@
 		<!-- <module>../cis-modules/cis-management/CommunityXEP</module> <module>../cis-modules/cis-management/CommunityServiceBundle</module> -->
 
 
-		<!-- CSS Mgmt -->
-		<module>../css-modules/css-mgmt/css-manager-cloud/css-manager-cloud/
-		</module>
-		<module>../css-modules/css-comm-mgmt/css-communication-manager/
-		</module>
-		<!-- <module>../css-modules/css-ser-registry</module> -->
-
 		<!-- Device Mgmt -->
 		<module>../css-modules/device-mgmt/devicemanager/</module>
 		<module>../css-modules/device-mgmt/DeviceRegistry/</module>
