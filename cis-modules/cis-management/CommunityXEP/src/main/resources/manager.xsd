@@ -51,9 +51,8 @@
 	          <xs:element ref='create'/>
 	          <xs:element ref='delete'/>
 			  <xs:element ref='list'/>
-			  <xs:element ref='search'/>
+			  <xs:element ref='search-cis'/>
 			  <xs:element ref='configure'/>
-			  <xs:element ref='search'/>
 	      </xs:choice>
 	    </xs:complexType>
 	</xs:element>
@@ -70,19 +69,13 @@
     </xs:complexType>
   </xs:element>
   
-  <xs:element name='list' type='empty' />
+  <xs:element name='list' type='empty' /><!-- TODO-->
   
-    <xs:element name='configure'>
-    <xs:complexType>
-<!-- Todo -->
-    </xs:complexType>
-  </xs:element>
+    <xs:element name='configure' type='empty' /><!-- TODO-->
 
-	<xs:element name='search'>
-    <xs:complexType>
- <!-- Todo -->
-    </xs:complexType>
-  </xs:element>
+
+	<xs:element name='search-cis' type='empty' /><!-- TODO-->
+
 
 
   
