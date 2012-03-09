@@ -61,6 +61,7 @@ import org.societies.api.identity.IIdentity;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -85,12 +86,7 @@ public class CommunityRecommender //implements ICommCallback
 {
 
 	private IIdentity linkedCss;
-	
-    private CisRecord linkedCis;
-    
-    //private Domain linkedDomain;  // No datatype yet representing a domain
-	//private IIdentity linkedDomain;
-	
+		
 	private int longestTimeWithoutActivity; //measured in minutes
 	
 	private ICtxBroker userContextBroker;
@@ -112,9 +108,9 @@ public class CommunityRecommender //implements ICommCallback
 	private ArrayList<CisRecord> cissToDelete;
 	
 	/*
-     * Constructor for AutomaticCommunityConfigurationManager
+     * Constructor for Community Recommender
      * 
-	 * Description: The constructor creates the AutomaticCommunityConfigurationManager
+	 * Description: The constructor creates the Community Recommender
 	 *              component on a given CSS.
 	 * Parameters: 
 	 * 				linkedEntity - the non-CIS entity, either a user CSS or a domain deployment,
@@ -128,6 +124,15 @@ public class CommunityRecommender //implements ICommCallback
 		//	this.linkedDomain = linkedEntity;
 	}
 	
+	public void identifyCisActionForEgocentricCommunityAnalyser(HashMap<String, ArrayList<ArrayList<CisRecord>>> cisPossibilities) {
+		if (cisPossibilities.get("Create CISs") != null)
+		    identifyCissToCreate(cisPossibilities.get("Create CISs").get(0));
+		if (cisPossibilities.get("Delete CISs") != null)
+		    identifyCissToDelete(cisPossibilities.get("Delete CISs").get(0));
+		if (cisPossibilities.get("Configure CISs") != null)
+		    identifyCissToConfigure(cisPossibilities.get("Configure CISs"));
+	}
+	
 	/*
 	 * Description: The method looks for CISs to create, using as a base the information related to
 	 *              this object's 'linked' component (see the fields). If the linked component
@@ -139,9 +144,11 @@ public class CommunityRecommender //implements ICommCallback
 	 *              on collective aspects like context attributes.
 	 */
 	
-	public void identifyCissToCreate(String evaluationType) {		
+	public void identifyCissToCreate(ArrayList<CisRecord> creatableCiss) {		
 		//Can't use GUI in tests
 		//cissToCreate = getUserFeedbackOnCreation(cissToCreate);
+		
+		cissToCreate = creatableCiss;
 		
 		if (cissToCreate != null) 
 		    for (int i = 0; i < cissToCreate.size(); i++)
@@ -195,9 +202,11 @@ public class CommunityRecommender //implements ICommCallback
 	 *              a domain, the check is done on all CISs in that domain.
 	 */
 	
-	public void identifyCissToDelete() {	
+	public void identifyCissToDelete(ArrayList<CisRecord> cisPossibilities) {	
 		//Can't use GUI in tests
         //cissToDelete = getUserFeedbackOnDeletion(cissToDelete);
+		
+		cissToDelete = cisPossibilities;
 		
 		for (int i = 0; i < cissToDelete.size(); i++)
 			cisManager.deleteCis(linkedCss.getIdentifier(), cissToDelete.get(i).getCisId());
@@ -245,7 +254,7 @@ public class CommunityRecommender //implements ICommCallback
 		return realCissToDelete;
 	}
 	
-	public void identifyCissToConfigure() {
+	public void identifyCissToConfigure(ArrayList<ArrayList<CisRecord>> cisPossibilities) {
 	
 	    ArrayList<CisRecord> finalConfiguredCiss = new ArrayList<CisRecord>();
 	
@@ -328,20 +337,6 @@ public class CommunityRecommender //implements ICommCallback
     public void setLinkedCss(IIdentity linkedCss) {
     	this.linkedCss = linkedCss;
     }
-    
-   /** public IIdentity getLinkedDomain() {
-    	return linkedDomain;
-    }
-    
-    public void setLinkedDomain(IIdentity linkedDomain) {
-    	this.linkedDomain = linkedDomain;
-    }*/
-    
-    /**
-    public void setUserContextDatabaseManager(IUserCtxDBMgr userContextDatabaseManager) {
-    	System.out.println("GOT database" + userContextDatabaseManager);
-    	this.userContextDatabaseManager = userContextDatabaseManager;
-    }*/
     
     public void setUserContextBroker(ICtxBroker userContextBroker) {
     	System.out.println("GOT user context broker" + userContextBroker);
