@@ -25,7 +25,7 @@
 
 package org.societies.orchestration.EgocentricCommunityAnalyser.test;
 
-import org.junit.Assert;
+import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
@@ -33,54 +33,48 @@ import org.junit.Test;
 
 import static org.mockito.Mockito.*;
 
-import org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityDeletionManager;
+import org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityConfigurationManager;
 import org.societies.api.identity.IIdentity;
-//import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxEntityIdentifier;
-//import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.internal.cis.management.ICisManager;
 import org.societies.api.internal.cis.management.CisRecord;
 
 /**
- * This is the test class for the Egocentric Community Deletion Manager component
+ * This is the test class for the Egocentric Community Configuration Manager component
  * 
  * @author Fraser Blackmun
- * @version 0
+ * @version 1
  * 
  */
 
-public class EgocentricCommunityDeletionManagerTest {
+public class EgocentricCommunityConfigurationManagerTest {
 	
-	private EgocentricCommunityDeletionManager autoCommunityDeletionManager;
+	private EgocentricCommunityConfigurationManager egocentricCommunityConfigurationManager;
 	private ICisManager cisManager;
 	
 	@Test
-	public void testIdentifyCissToDelete() {
+    public void testIdentifyCissToConfigure() {
 		
-		IIdentity ownerId = null; //James Jents CSS or CIS
+    	IIdentity ownerId = null; //James Jents CSS
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
     	
-		//create CIS for James, with last activity being 1 year ago
-
-		cisManager = mock(ICisManager.class);
-		CisRecord jamesCis = cisManager.createCis("James", "James CIS");
+		//create CIS for James where James himself has been inactive for 1 year.
+	    
+		//CisRecord jamesCisRecord = cisManager.createCis("James", "James CIS");
 		
-    	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
+    	egocentricCommunityConfigurationManager = new EgocentricCommunityConfigurationManager(ownerId, "CSS");
 		
-		autoCommunityDeletionManager.identifyCissToDelete();
+		egocentricCommunityConfigurationManager.identifyCissToConfigure();
 		
-		String[] members = new String[1];
-		members[0] = "James";
-		//the CIS should have been deleted
+		//James should have been suggested to leave the CIS.
+		// (No members list function in CisRecord API yet)
 		
-		//Assert.assertNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null, null)));
-		
-		
+		//Assert.assertNull(cisManager.getCis("James", "James CIS").membersCss[0].equals("James"));
 		
 	}
-	
-	public void setCisManager(ICisManager cisManager){
+    
+    public void setCisManager(ICisManager cisManager){
 		this.cisManager = cisManager;
 	}
 	

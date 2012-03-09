@@ -50,7 +50,7 @@ import org.societies.api.identity.IdentityType;
  * This is the test class for the Egocentric Community Analyser component
  * 
  * @author Fraser Blackmun
- * @version 0
+ * @version 1
  * 
  */
 

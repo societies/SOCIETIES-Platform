@@ -26,6 +26,7 @@
 
 package org.societies.cis.manager;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -37,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
@@ -60,7 +62,7 @@ import org.societies.manager.Create;
  * @author Thomas Vilarinho (Sintef)
 */
 @Component
-public class CisManager implements ICisManager, IFeatureServer {
+public class CisManager implements ICisManager, IFeatureServer{
 
 	public Set<CisEditor> CISs; 
 	private ICISCommunicationMgrFactory ccmFactory;
@@ -126,16 +128,56 @@ public class CisManager implements ICisManager, IFeatureServer {
 		CISs = new HashSet<CisEditor>();
 	}
 	
-	// TODO: review this constructor in the future
+	/**
+	 * Create a CIS Editor with default settings and returns a CIS Record 
+	 * This function should generate automatically the jid for the CIS and the pwd
+	 * 
+	 * @param  creatorCssId  bareJid of the user creating the CIS
+	 * @param  cisname 		 term used by the user to map the CIS. needs to be matched with the real
+	 * 						 cis XMPP credentials in the database
+	 * @return      CisRecord
+	 * 
+	 */
+	
 	@Override
-	public CisRecord createCis(String cssId, String cisId) {
-		// check if ccs already exist
-		CisEditor cis = new CisEditor(cssId, cisId);
+	public CisRecord createCis(String creatorCssId, String cisname) {
+		// TODO: create and identity for the CIS and map it in the database with the cisname
+		// cisId = randon unused JID;
+		// cisId_pwd = random password;
+		String cisId = "cis1";
+		String host = this.cisManagerId.getDomain();
+		String password = "password.thomas.local";
+		
+		
+		return this.createCis(creatorCssId, cisId, host, password);
+	}
+	
+	
+	
+	/**
+	 * Create a CIS Editor with default settings and returns a CIS Record 
+	 * Function to be called from the XMPP or to be used by the 
+	 *  public method CisRecord createCis(String creatorCssId, String cisId) 
+	 * 
+	 * @param  creatorCssId  bareJid of the user creating the CIS
+	 * @param  cisId 		 jid to be given to the CIS
+	 * @param  host 		 jid to be given to the CIS
+	 * @password  host 		 jid to be given to the CIS
+	 * @return      CisRecord
+	 * 
+	 */
+	
+	private CisRecord createCis(String creatorCssId, String cisId, String host, String password) {
+		//TODO: check if 
+		// cIs already exist in the database or if this is a new CIS
+		CisEditor cis = new  CisEditor(creatorCssId,
+				cisId,host,"","",password,this.ccmFactory);
 		if (CISs.add(cis))
 			return cis.getCisRecord();
 		else
 			return null;
 	}
+
 
 	@Override
 	public Boolean deleteCis(String cssId, String cisId) {
@@ -155,12 +197,32 @@ public class CisManager implements ICisManager, IFeatureServer {
 		return null;
 	}
 
+	
+	
 	@Override
 	public CisRecord[] getCisList(CisRecord query) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public List<CisRecord> getCisList() {
+		
+		List<CisRecord> l = new ArrayList<CisRecord>();
 
+		Iterator<CisEditor> it = CISs.iterator();
+		 
+		while(it.hasNext()){
+			 CisEditor element = it.next();
+			 l.add(element.getCisRecord());
+			 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
+	     }
+			
+		
+		return l;
+	}
+	
+	
 	@Override
 	public CisActivityFeed getActivityFeed(String cssId, String cisId) {
 		// TODO Auto-generated method stub
@@ -184,10 +246,15 @@ public class CisManager implements ICisManager, IFeatureServer {
 		LOG.info("get Query received");
 		if (payload.getClass().equals(Community.class)) {
 			Community c = (Community) payload;
+			
+			// CREATE CIS
+			
 			if (c.getCreate() != null) {
 				LOG.info("create received");
-				String jid = stanza.getFrom().getJid();
+				String jid = stanza.getFrom().getBareJid();
 				LOG.info("sender JID = " + jid);
+				
+				//TODO: check if the sender is allowed to create a CIS
 				
 				Create create = c.getCreate();
 				
@@ -196,10 +263,10 @@ public class CisManager implements ICisManager, IFeatureServer {
 				String cisPassword = create.getCommunityPassword();
 				
 				if(cisPassword != null && ownerJid != null && cisJid != null ){
-					CisEditor cEditor1 = new CisEditor(jid,
-							cisJid,"thomas.local","","",cisPassword,ccmFactory);
+					CisRecord cisR = this.createCis(jid,
+							cisJid,this.cisManagerId.getDomain(), cisPassword);
+					
 					LOG.info("CIS Created!!");
-					CISs.add(cEditor1);
 					return create;
 					
 				}
@@ -214,13 +281,7 @@ public class CisManager implements ICisManager, IFeatureServer {
 			if (c.getList() != null) {
 				LOG.info("list received");
 				
-				Iterator<CisEditor> it = CISs.iterator();
-				 
-				while(it.hasNext()){
-					 CisEditor element = it.next();
-					 LOG.info("CIS with id " + element.getCisRecord().getCisId());
-			     }
-					
+
 					
 				
 				return c;
