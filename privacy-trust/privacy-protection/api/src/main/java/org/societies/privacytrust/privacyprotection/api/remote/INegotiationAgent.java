@@ -22,52 +22,61 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection;
+package org.societies.privacytrust.privacyprotection.api.remote;
+
+
+
+import java.util.concurrent.Future;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
-
 /**
- * Describe your class here...
- *
  * @author Eliza
- *
+ * @version 1.0
+ * @created 11-Nov-2011 18:55:01
  */
-public class NegotiationAgentBean {
+public interface INegotiationAgent {
 
-	public enum negAgentMethodType {acknowledgeAgreement, getPolicy, getProviderIdentity,negotiate};
-	private negAgentMethodType method;
-	private byte[] agreementEnvelope;
-	private ServiceResourceIdentifier serviceID;
-	private byte[] responsePolicy;
-	
-	
-	public byte[] getAgreementEnvelope() {
-		return agreementEnvelope;
-	}
-	public void setAgreementEnvelope(byte[] agreementEnvelope) {
-		this.agreementEnvelope = agreementEnvelope;
-	}
-	public ServiceResourceIdentifier getServiceID() {
-		return serviceID;
-	}
-	public void setServiceID(ServiceResourceIdentifier serviceID) {
-		this.serviceID = serviceID;
-	}
-	public byte[] getResponsePolicy() {
-		return responsePolicy;
-	}
-	public void setResponsePolicy(byte[] responsePolicy) {
-		this.responsePolicy = responsePolicy;
-	}
-	public negAgentMethodType getMethod() {
-		return method;
-	}
-	public void setMethod(negAgentMethodType method) {
-		this.method = method;
-	}
-	
-	
-	
+	/**
+	 * this method is called by the client and asks the provider to acknowledge the
+	 * agreement document.
+	 * 
+	 * 
+	 * @param contract    the agreement to acknowledge
+	 */
+	public Future<Boolean> acknowledgeAgreement(byte[] agreementEnvelope);
+
+	/**
+	 * this method is called by any CSS that wants to read the service's provider
+	 * RequestPolicy for a specific service it provides
+	 * @return				the policy of the service provider in the format of RequestPolicy
+	 * 
+	 * @param serviceID    the service identifier of the service for which the
+	 * negotiation will be performed
+	 */
+	public Future<byte[]> getPolicy(ServiceResourceIdentifier serviceID);
+
+	/**
+	 * This method is called by any CSS to get the Identity of the service provider.
+	 * This is needed to do trust evaluation and evaluation of privacy preferences
+	 * where applicable
+	 * 
+	 */
+	public Future<String> getProviderIdentity();
+
+	/**
+	 * this method is called by the client and informs the provider that it wants to
+	 * initiate a negotiation process for the specified serviceID and provides its
+	 * policy which is a response to the provider's advertised privacy policy. this
+	 * method can be called a number of times until the ResponsePolicy.getStatus
+	 * method returns SUCCESSFUL or FAILED status.
+	 * 
+	 * 
+	 * @param serviceID    the service identifier for which the negotiation is going
+	 * to be performed
+	 * @param policy    the ResponsePolicy to the provider's privacy policy
+	 */
+	public Future<byte[]> negotiate(ServiceResourceIdentifier serviceID, byte[] responsePolicy);
+
 }
