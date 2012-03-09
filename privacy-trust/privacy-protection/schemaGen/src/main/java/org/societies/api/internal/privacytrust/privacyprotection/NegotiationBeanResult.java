@@ -24,66 +24,52 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection;
 
-import org.societies.api.servicelifecycle.model.ServiceResourceIdentifier;
-
 /**
  * Describe your class here...
  *
  * @author Eliza
  *
  */
-public class NegotiationClientBean {
+public class NegotiationBeanResult {
+	
 
-	public enum negClientMethodType {acknowledgeAgreement, receiveNegotiationResponse, receiveProviderIdentity, receiveProviderPolicy};
-	private negClientMethodType method;
-	private ServiceResourceIdentifier serviceID;
-	private byte[] reponsePolicy;
+	private Boolean acknowledgement;
+	private byte[] responsePolicy;
+	private String identity;
 	private byte[] requestPolicy;
-	private String providerIdentity;
-	private byte[] envelope;
-	private boolean acknowledgement;
 	
-	
-	public ServiceResourceIdentifier getServiceID() {
-		return serviceID;
+	public Boolean getAcknowledgement() {
+		return acknowledgement;
 	}
-	public void setServiceID(ServiceResourceIdentifier serviceID) {
-		this.serviceID = serviceID;
+
+	public void setAcknowledgement(Boolean acknowledgement) {
+		this.acknowledgement = acknowledgement;
 	}
-	public byte[] getReponsePolicy() {
-		return reponsePolicy;
+
+	public byte[] getResponsePolicy() {
+		return responsePolicy;
 	}
-	public void setReponsePolicy(byte[] reponsePolicy) {
-		this.reponsePolicy = reponsePolicy;
+
+	public void setResponsePolicy(byte[] responsePolicy) {
+		this.responsePolicy = responsePolicy;
 	}
+
+	public String getIdentity() {
+		return identity;
+	}
+
+	public void setIdentity(String identity) {
+		this.identity = identity;
+	}
+
 	public byte[] getRequestPolicy() {
 		return requestPolicy;
 	}
+
 	public void setRequestPolicy(byte[] requestPolicy) {
 		this.requestPolicy = requestPolicy;
 	}
-	public String getProviderIdentity() {
-		return providerIdentity;
-	}
-	public void setProviderIdentity(String providerIdentity) {
-		this.providerIdentity = providerIdentity;
-	}
-	public byte[] getEnvelope() {
-		return envelope;
-	}
-	public void setEnvelope(byte[] envelope) {
-		this.envelope = envelope;
-	}
-	public boolean isAcknowledgement() {
-		return acknowledgement;
-	}
-	public void setAcknowledgement(boolean acknowledgement) {
-		this.acknowledgement = acknowledgement;
-	}
-	public negClientMethodType getMethod() {
-		return method;
-	}
-	public void setMethod(negClientMethodType method) {
-		this.method = method;
-	}
+	
+	
+	
 }

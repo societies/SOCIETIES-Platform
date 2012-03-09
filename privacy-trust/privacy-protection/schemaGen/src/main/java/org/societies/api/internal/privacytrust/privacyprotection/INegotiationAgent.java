@@ -24,9 +24,13 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection;
 
-//TODO : temporary mock package import to solve missing package in API folder
 
-import org.societies.api.servicelifecycle.model.ServiceResourceIdentifier;
+
+import java.util.concurrent.Future;
+
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
+
 /**
  * @author Eliza
  * @version 1.0
@@ -41,7 +45,7 @@ public interface INegotiationAgent {
 	 * 
 	 * @param contract    the agreement to acknowledge
 	 */
-	public void acknowledgeAgreement(byte[] agreementEnvelope);
+	public Future<Boolean> acknowledgeAgreement(byte[] agreementEnvelope);
 
 	/**
 	 * this method is called by any CSS that wants to read the service's provider
@@ -51,7 +55,7 @@ public interface INegotiationAgent {
 	 * @param serviceID    the service identifier of the service for which the
 	 * negotiation will be performed
 	 */
-	public void getPolicy(ServiceResourceIdentifier serviceID);
+	public Future<byte[]> getPolicy(ServiceResourceIdentifier serviceID);
 
 	/**
 	 * This method is called by any CSS to get the Identity of the service provider.
@@ -59,7 +63,7 @@ public interface INegotiationAgent {
 	 * where applicable
 	 * 
 	 */
-	public void getProviderIdentity();
+	public Future<String> getProviderIdentity();
 
 	/**
 	 * this method is called by the client and informs the provider that it wants to
@@ -73,6 +77,6 @@ public interface INegotiationAgent {
 	 * to be performed
 	 * @param policy    the ResponsePolicy to the provider's privacy policy
 	 */
-	public void negotiate(ServiceResourceIdentifier serviceID, byte[] responsePolicy);
+	public Future<byte[]> negotiate(ServiceResourceIdentifier serviceID, byte[] responsePolicy);
 
 }
