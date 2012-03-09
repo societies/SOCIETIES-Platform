@@ -7,7 +7,7 @@
 
 
 	<xs:import namespace="http://societies.org/api/schema/servicelifecycle/model"
-		schemaLocation="org.societies.api.schema.servicelifecycle.model.xsd" />
+		schemaLocation="https://raw.github.com/societies/SOCIETIES-Platform/development/api/schema/external/src/main/resources/org.societies.api.schema.servicelifecycle.model.xsd" />
 
 	<xs:element name="negotiationAgentBean">
 		<xs:complexType>
@@ -18,7 +18,7 @@
 					minOccurs="0" />
 				<xs:element name="responsePolicy" type="xs:base64Binary"
 					minOccurs="0" />
-				<xs:element name="serviceID" type="serviceResourceIdentifier" xsi:schemaLocation="{http://societies.org/api/schema/servicelifecycle/model} {org.societies.api.schema.servicelifecycle.model.xsd}"
+				<xs:element name="serviceID" type="serviceResourceIdentifier" xsi:schemaLocation="{http://societies.org/api/schema/servicelifecycle/model} {https://raw.github.com/societies/SOCIETIES-Platform/development/api/schema/external/src/main/resources/org.societies.api.schema.servicelifecycle.model.xsd}"
 					minOccurs="0" />
 			</xs:sequence>
 		</xs:complexType>
