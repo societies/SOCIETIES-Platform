@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -23,9 +23,9 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.orchestration.CommunityLifecycleManagement.test;
+package org.societies.orchestration.EgocentricCommunityAnalyser.test;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.After;
 import org.junit.Before;
@@ -33,71 +33,54 @@ import org.junit.Test;
 
 import static org.mockito.Mockito.*;
 
-/**import org.societies.css.cssdirectory.api.ICssDirectoryCloud;
-import org.societies.css.cssdirectory.api.ICssDirectoryRich;
-import org.societies.css.cssdirectory.api.ICssDirectoryLight;
-
-import org.societies.cssmgmt.cssdiscovery.api.ICssDiscovery;
-
-import org.societies.cis.management.api.CisAcitivityFeed;
-import org.societies.cis.management.api.ServiceSharingRecord;
-import org.societies.cis.management.api.CisActivity;
-import org.societies.cis.management.api.CisRecord;
-
-import org.societies.context.user.similarity.api.platform.IUserCtxSimilarityEvaluator;
-
-import org.societies.context.user.prediction.api.platform.IUserCtxPredictionMgr;
-
-import org.societies.context.user.db.api.platform.IUserCtxDBMgr;
-
-import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
-*/
-
-import org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityConfigurationManager;
+import org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityDeletionManager;
 import org.societies.api.identity.IIdentity;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxEntityIdentifier;
-//import org.societies.api.internal.servicelifecycle.model.Service;
 //import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.internal.cis.management.ICisManager;
 import org.societies.api.internal.cis.management.CisRecord;
 
 /**
- * This is the test class for the Automatic Community Configuration Manager component
+ * This is the test class for the Egocentric Community Deletion Manager component
  * 
  * @author Fraser Blackmun
- * @version 0
+ * @version 1
  * 
  */
 
-public class AutomaticCommunityConfigurationManagerTest {
+public class EgocentricCommunityDeletionManagerTest {
 	
-	private AutomaticCommunityConfigurationManager autoCommunityConfigurationManager;
+	private EgocentricCommunityDeletionManager autoCommunityDeletionManager;
 	private ICisManager cisManager;
 	
 	@Test
-    public void testIdentifyCissToConfigure() {
+	public void testIdentifyCissToDelete() {
 		
-    	IIdentity ownerId = null; //James Jents CSS
+		IIdentity ownerId = null; //James Jents CSS or CIS
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
     	
-		//create CIS for James where James himself has been inactive for 1 year.
-	    
-		//CisRecord jamesCisRecord = cisManager.createCis("James", "James CIS");
+		//create CIS for James, with last activity being 1 year ago
+
+		cisManager = mock(ICisManager.class);
+		CisRecord jamesCis = cisManager.createCis("James", "James CIS");
 		
-    	autoCommunityConfigurationManager = new AutomaticCommunityConfigurationManager(ownerId, "CSS");
+    	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
 		
-		autoCommunityConfigurationManager.identifyCissToConfigure();
+		autoCommunityDeletionManager.identifyCissToDelete();
 		
-		//James should have been suggested to leave the CIS.
-		// (No members list function in CisRecord API yet)
+		String[] members = new String[1];
+		members[0] = "James";
+		//the CIS should have been deleted
 		
-		//Assert.assertNull(cisManager.getCis("James", "James CIS").membersCss[0].equals("James"));
+		//Assert.assertNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null, null)));
+		
+		
 		
 	}
-    
-    public void setCisManager(ICisManager cisManager){
+	
+	public void setCisManager(ICisManager cisManager){
 		this.cisManager = cisManager;
 	}
 	

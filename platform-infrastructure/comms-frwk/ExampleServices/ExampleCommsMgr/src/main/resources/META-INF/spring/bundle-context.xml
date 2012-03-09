@@ -21,12 +21,12 @@
   
   <bean id="CommsServerManager" 
   		class="org.societies.comm.examples.commsmanager.impl.CommsServer"
-  		depends-on="CommManagerBundle, FortuneCookieBundle, CalculatorBundle, ComplexBundle" 
+  		depends-on="CommManagerBundle, FortuneCookieBundle, CalculatorBundle" 
   		init-method="InitService">
   		<property name="commManager" ref="CommManagerBundle"/>
   		<property name="fcGenerator" ref="FortuneCookieBundle"/>
   		<property name="calcService" ref="CalculatorBundle"/>
-  		<property name="complexSvc" ref="ComplexBundle"/>
+  		<!-- <property name="complexSvc" ref="ComplexBundle"/> ComplexBundle -->
   </bean>
 
   <bean id="CalcServiceRemote" 

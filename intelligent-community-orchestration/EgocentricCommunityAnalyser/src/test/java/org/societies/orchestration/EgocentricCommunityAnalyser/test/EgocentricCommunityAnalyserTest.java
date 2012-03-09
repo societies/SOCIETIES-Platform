@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -23,7 +23,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.orchestration.CommunityLifecycleManagement.test;
+package org.societies.orchestration.EgocentricCommunityAnalyser.test;
 
 //import org.societies.context.broker.api.IUserCtxBroker;
 //import org.societies.context.broker.api.ICommunityCtxBroker;
@@ -35,7 +35,7 @@ import org.junit.Test;
 import static org.mockito.Mockito.*;
 
 
-import org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityLifecycleManagement;
+import org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityAnalyser;
 import org.societies.api.identity.IIdentity;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -47,16 +47,16 @@ import org.societies.api.identity.IdentityType;
 //import org.societies.api.comm.xmpp.datatypes.IdentityType;
 
 /**
- * This is the test class for the Community Lifecycle Management component
+ * This is the test class for the Egocentric Community Analyser component
  * 
  * @author Fraser Blackmun
- * @version 0
+ * @version 1
  * 
  */
 
-public class CommunityLifecycleManagementTest {
+public class EgocentricCommunityAnalyserTest {
 	
-	private CommunityLifecycleManagement communityLifecycleManagement;
+	private EgocentricCommunityAnalyser egocentricCommunityAnalyser;
 	//@Test
 	//public void testLoop() {
 	//	CommunityLifecycleManagement.loop();
@@ -73,7 +73,7 @@ public class CommunityLifecycleManagementTest {
 	@Test
 	public void testSetup() {
 		IIdentity linkedCss = mock(IIdentity.class); 
-		CommunityLifecycleManagement communityLifecycleManagement = new CommunityLifecycleManagement(linkedCss, "CSS");
+		EgocentricCommunityAnalyser egocentricCommunityAnalyser = new EgocentricCommunityAnalyser(linkedCss, "CSS");
 		//communityLifecycleManagement = new CommunityLifecycleManagement(new Identity(IdentityType.CSS, "Test", "TestDomain"), "Domain");
 		//communityLifecycleManagement = new CommunityLifecycleManagement(new CisRecord(null, null, null, null, null, null, null, null));
 	}

@@ -26,7 +26,7 @@ package org.societies.api.servicelifecycle;
 
 import java.net.URL;
 
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
  * The interface class for the Service Control component. It permits a caller to tell the SLM to
@@ -43,14 +43,14 @@ public interface IServiceControl {
 	 * @param serviceId unique service identifier
 	 */
 	
-	public void startService(IServiceResourceIdentifier serviceId) throws ServiceControlException;
+	public void startService(ServiceResourceIdentifier serviceId) throws ServiceControlException;
 	
 	/**
 	 * This method stops the service running in the container that is identified by the </code>IServiceResourceIdentifier</code>
 	 * 
 	 * @param serviceId unique service identifier
 	 */
-	public void stopService(IServiceResourceIdentifier serviceId) throws ServiceControlException;
+	public void stopService(ServiceResourceIdentifier serviceId) throws ServiceControlException;
 	
 	/**
 	 * This method install a new service into the container
@@ -64,6 +64,6 @@ public interface IServiceControl {
 	 * 
 	 * @param serviceId unique service identifier
 	 */
-	public void uninstallService(IServiceResourceIdentifier serviceId) throws ServiceControlException;
+	public void uninstallService(ServiceResourceIdentifier serviceId) throws ServiceControlException;
 
 }

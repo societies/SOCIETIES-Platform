@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -23,7 +23,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.orchestration.CommunityLifecycleManagement.impl;
+package org.societies.orchestration.EgocentricCommunityAnalyser.impl;
 
 import org.societies.api.internal.css.directory.ICssDirectory;
 
@@ -59,6 +59,7 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
@@ -69,7 +70,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * This is the class for the Automatic Community Configuration Manager component
+ * This is the class for the Egocentric Community Configuration Manager component
  * 
  * The component is responsible for automating, and triggering the process of 
  * suggesting to one or more relevant CSSs, the configuration of CISs.
@@ -77,10 +78,9 @@ import java.util.List;
  * a sub-CIS or parent CIS being changed in any way, although a CIS 'splitting' into two or more
  * CISs (where the original CIS is deleted in the process) is covered as configuration. It includes:
  * 
- *   - CIS members being added/removed
+ *   - CIS members being removed
  *   - CIS attributes being changed, including its name, definition, membership criteria, goal/purpose (if any), etc.
  *   - CIS splitting or merging into/with other CISs.
- *   - And more
  *  
  * This is achieved by perform various forms of analysis on CSSs, CISs, their attributes, and their
  * connections, and using different algorithms. Social network analysis methods and similarity of users
@@ -94,12 +94,10 @@ import java.util.List;
  * 
  */
 
-public class AutomaticCommunityConfigurationManager //implements ICommCallback
+public class EgocentricCommunityConfigurationManager //implements ICommCallback
 {
 	
 	private IIdentity linkedCss;
-	
-    private CisRecord linkedCis;
     
 	//private IIdentity linkedDomain;
 	
@@ -115,34 +113,24 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
 
 	private IUserFeedbackCallback userFeedbackCallback;
     
+	private ISuggestedCommunityAnalyser suggestedCommunityAnalyser;
+	private ICisManager cisManager;
+	
 	/*
-     * Constructor for AutomaticCommunityConfigurationManager
+     * Constructor for EgocentricCommunityConfigurationManager
      * 
-	 * Description: The constructor creates the AutomaticCommunityConfigurationManager
+	 * Description: The constructor creates the EgocentricCommunityConfigurationManager
 	 *              component on a given CSS.
 	 * Parameters: 
 	 * 				linkedEntity - the non-CIS entity, either a user CSS or a domain deployment,
 	 *              that this object will operate on behalf of.
 	 */
 	
-	public AutomaticCommunityConfigurationManager(IIdentity linkedEntity, String linkType) {
+	public EgocentricCommunityConfigurationManager(IIdentity linkedEntity, String linkType) {
 		if (linkType.equals("CSS"))
 			this.linkedCss = linkedEntity;
 		//else
 			//this.linkedDomain = linkedEntity;
-	}
-	
-	/*
-     * Constructor for IAutomaticCommunityConfigurationManager
-     * 
-	 * Description: The constructor creates the AutomaticCommunityConfigurationManager
-	 *              component on a given CIS.
-	 * Parameters: 
-	 * 				linkedCis - the Cis that this object will be used to check for configuration on.
-	 */
-	
-	public AutomaticCommunityConfigurationManager(CisRecord linkedCis) {
-		this.linkedCis = linkedCis;
 	}
 	
 	/*
@@ -160,9 +148,7 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
 		if (linkedCss != null) {
 			//CisRecord[] records = ICisManager.getCisList(/** CISs administrated by the CSS */);
 		}
-		if (linkedCis != null) {
-			//CisRecord[] records = ICisManager.getCisList(/** This CIS */);
-		}
+		
 		//if (linkedDomain != null) {
 			//CisRecord[] records = ICisManager.getCisList(/** CISs in the domain */);
 		//}
@@ -283,10 +269,10 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
 		return finalisedCiss;
 	}
 	
-    public void initialiseAutomaticCommunityConfigurationManager() {
+    public void initialiseEgocentricCommunityConfigurationManager() {
     	//getCommManager().register(this);
     	
-    	new AutomaticCommunityConfigurationManager(linkedCss, "CSS");
+    	new EgocentricCommunityConfigurationManager(linkedCss, "CSS");
     }
     
     public IIdentity getLinkedCss() {
@@ -295,15 +281,6 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
     
     public void setLinkedCss(IIdentity linkedCss) {
     	this.linkedCss = linkedCss;
-    }
-    
-    public CisRecord getLinkedCis() {
-    	return linkedCis;
-    }
-    
-    public void setLinkedCis(CisRecord linkedCis) {
-    	System.out.println("GOT CISRECORD" + linkedCis.toString());
-    	this.linkedCis = linkedCis;
     }
     
     /**public IIdentity getLinkedDomain() {
@@ -343,6 +320,22 @@ public class AutomaticCommunityConfigurationManager //implements ICommCallback
     
     public void setUserFeedbackCallback(IUserFeedbackCallback userFeedbackCallback) {
     	this.userFeedbackCallback = userFeedbackCallback;
+    }
+    
+    public ISuggestedCommunityAnalyser getSuggestedCommunityAnalyser() {
+    	return suggestedCommunityAnalyser;
+    }
+    
+    public void setSuggestedCommunityAnalyser(ISuggestedCommunityAnalyser suggestedCommunityAnalyser) {
+    	this.suggestedCommunityAnalyser = suggestedCommunityAnalyser;
+    }
+    
+    public ICisManager getCisManager() {
+    	return cisManager;
+    }
+    
+    public void setCisManager(ICisManager cisManager) {
+    	this.cisManager = cisManager;
     }
     
   //public CommManagerBundle getCommManager() {
