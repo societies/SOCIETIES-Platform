@@ -31,6 +31,9 @@
  */
 package org.societies.api.internal.cis.management;
 
+import org.societies.api.internal.cis.management.CisRecord;
+import java.util.List;
+
 public interface ICisManager {
 	//
 	//
@@ -82,6 +85,16 @@ public interface ICisManager {
 	 * @return Array of CIS Records that match the query.
 	 */
 	CisRecord[] getCisList(CisRecord query);
+
+	
+	/**
+	 * Return an array of all the CISs managed by this CIS manager 
+	 * 
+	 * 
+	 * @return List<CisRecord> List of CIS Records are managed by this CIS manager
+	 */
+	List<CisRecord> getCisList();
+
 	
 	/**
 	 * Returns the CISActivityFeed for a specific CIS.

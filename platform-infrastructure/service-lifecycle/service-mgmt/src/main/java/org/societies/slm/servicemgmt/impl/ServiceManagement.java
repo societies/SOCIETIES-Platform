@@ -80,7 +80,10 @@ public class ServiceManagement implements BundleContextAware{
 			if(logger.isDebugEnabled()) logger.debug("Getting all services in the service registry");
 			
 			// We need some method in the service registry to clean it automatically
-			Object filter = "*.*"; //placeholder for a filter to all
+			//Toni//
+			//Object filter = "*.*"; //placeholder for a filter to all
+			Service filter=new Service();
+			//Toni//
 			List<Service> servicesToRemove= getServiceReg().findServices(filter);
 			
 			if(logger.isDebugEnabled()) logger.debug("Now unregistering all the services.");
@@ -237,7 +240,9 @@ public class ServiceManagement implements BundleContextAware{
 			if(logger.isDebugEnabled()) logger.debug("Getting All Services");
 
 			// TODO this needs to be changed, so we have a filter for all the services
-			Object filter = "*.*";
+			//Toni//
+			//Object filter = "*.*"; //placeholder for a filter to all
+			Service filter=new Service();
 			result = getServiceReg().findServices(filter);
 			
 			// Print out all the services that we've obtained

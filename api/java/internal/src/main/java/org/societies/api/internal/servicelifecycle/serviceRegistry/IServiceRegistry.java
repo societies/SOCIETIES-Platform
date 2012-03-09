@@ -95,7 +95,7 @@ public interface IServiceRegistry {
 	* @return the list of services that match the filter
 	* @throws ServiceRetrieveException
 	*/
-	public List<Service> findServices (Object filter) throws ServiceRetrieveException;
+	public List<Service> findServices (Service filter) throws ServiceRetrieveException;
 	
 	/**
 	* Description: Based on a service unique identifier this method returns the associated Service

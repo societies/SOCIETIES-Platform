@@ -42,6 +42,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.api.schema.servicelifecycle.model.ServiceType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.serviceloader.ServiceListFactoryBean;
 import org.springframework.test.annotation.ExpectedException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
@@ -59,13 +60,15 @@ public class ServiceRegistryTest extends
 	@Autowired
 	private ServiceRegistry serReg;
 	private String serviceUri = "testURI";
-	private List<Service> servicesList = generateServiceList(5);
+	private static final int _numberOfServiceCreated=10; 
+	private List<Service> servicesList = generateServiceList(_numberOfServiceCreated);
 
 	@Test
 	@Rollback(false)
 	public void testRegisterService() {
 
 		try {
+			
 			serReg.registerServiceList(servicesList);
 
 		} catch (ServiceRegistrationException e) {
@@ -100,6 +103,19 @@ public class ServiceRegistryTest extends
 		assertTrue(retrievedService.getServiceName().equals(
 				servicesList.get(0).getServiceName()));
 	}
+	
+	@Test
+	@Rollback(false)
+	public void retrieveServiceUsingTemplate() throws ServiceRetrieveException{
+		Service tmpServiceFilter=new Service();
+	    tmpServiceFilter.setServiceName("%");
+		List<Service> returnedList=serReg.findServices(tmpServiceFilter);
+		assert(returnedList.size()==_numberOfServiceCreated);
+		tmpServiceFilter=servicesList.get(0);
+		returnedList=serReg.findServices(tmpServiceFilter);
+		assert(returnedList.get(0).getServiceName().equals(tmpServiceFilter.getServiceName()));
+	}
+	
 
 	@Test
 	@ExpectedException(ServiceRetrieveException.class)
