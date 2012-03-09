@@ -4,6 +4,9 @@
 	xmlns:tns="http://societies.org/api/schema/useragent/monitoring"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
+	<xs:import namespace="http://societies.org/api/schema/servicelifecycle/model" 
+  			 schemaLocation="org.societies.api.schema.servicelifecycle.model.xsd"/>
+
 	<xs:element name="userActionMonitorBean">
 		<xs:complexType>
 			<xs:sequence>
@@ -15,7 +18,8 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-
+	
+	<!--  
 	<xs:complexType name="serviceResourceIdentifier">
 		<xs:sequence>
 			<xs:element name="identifier" type="xs:anyURI" minOccurs="0" />
@@ -23,6 +27,7 @@
 				minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>
+	-->
 
 	<xs:simpleType name="methodType">
 		<xs:restriction base="xs:string">
