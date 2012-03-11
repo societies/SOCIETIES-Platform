@@ -29,17 +29,6 @@
 		    <artifactId>AndroidPubsubApi</artifactId>
 		    <version>${version.comm}</version>
 	    </dependency>
-	    <!--dependency>
-		    <groupId>org.societies.comm.xmpp</groupId>
-		    <artifactId>CommunicationFrameworkCommons</artifactId>
-		    <version>${version.comm}</version>
-		    <scope>compile</scope>
-	    </dependency-->
-	    <!--dependency>
-		    <groupId>org.societies.comm.xmpp.pubsub</groupId>
-		    <artifactId>Pubsub</artifactId>
-		    <version>${version.comm}</version>
-	    </dependency-->
 	    <dependency>
 		    <groupId>org.societies</groupId>
 		    <artifactId>AndroidAgentApi</artifactId>
@@ -59,11 +48,6 @@
 		    <groupId>org.asmack</groupId>
 		    <artifactId>asmack</artifactId>
 	    </dependency>
-	    <!--dependency>
-		    <groupId>org.societies.android.jaxb</groupId>
-		    <artifactId>jaxb-android-societies</artifactId>
-		    <version>0.1</version>
-	    </dependency-->
 	    <dependency>
 	    <groupId>xerces</groupId>
 	    <artifactId>xercesImpl</artifactId>

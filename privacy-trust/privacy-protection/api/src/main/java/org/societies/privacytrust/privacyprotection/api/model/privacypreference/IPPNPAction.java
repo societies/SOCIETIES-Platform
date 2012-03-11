@@ -26,9 +26,9 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 
 import java.util.List;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 
@@ -50,6 +50,6 @@ public interface IPPNPAction {
 
 	public IServiceResourceIdentifier getServiceIdentifier();
 
-	public Identity getServiceIdentity();
+	public IIdentity getServiceIdentity();
 
 }

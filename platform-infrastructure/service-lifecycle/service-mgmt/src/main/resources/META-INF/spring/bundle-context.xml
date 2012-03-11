@@ -45,4 +45,8 @@
 	</bean>
 	-->
 	
+	<bean id="serviceControl" class="org.societies.slm.servicecontrol.ServiceControl" >
+		<property name="serviceReg" ref="serviceRegRef" />				
+	</bean>
+	
 </beans>

@@ -20,11 +20,6 @@
             <artifactId>android</artifactId>
         </dependency>
 	<dependency>
-	    <groupId>org.jabber.protocol.pubsub</groupId>
-	    <artifactId>PubsubXep</artifactId>
-	    <version>${release.version}</version>
-	</dependency>
-	<dependency>
 		<groupId>org.societies.comm.android</groupId>
 		<artifactId>AndroidAgent</artifactId>
 		<version>${version.comm}</version>

@@ -33,12 +33,12 @@ import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ContextPreferenceCondition;
@@ -65,8 +65,8 @@ public class PrivacyPreferenceMerger {
 		
 	}
 	
-	public void addIDSDecision(Identity selectedDPI,
-			Identity providerDPI, IServiceResourceIdentifier serviceID){
+	public void addIDSDecision(IIdentity selectedDPI,
+			IIdentity providerDPI, IServiceResourceIdentifier serviceID){
 		ContextSnapshot snapshot = this.takeSnapshot();
 		IDSPreferenceDetails details = new IDSPreferenceDetails(selectedDPI);
 		details.setProviderDPI(providerDPI);

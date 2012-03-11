@@ -75,9 +75,132 @@ public class EgocentricCommunityDeletionManagerTest {
 		//the CIS should have been deleted
 		
 		//Assert.assertNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null, null)));
+	}
+	
+	@Test
+	public void testIdentifyShortTermCissToDelete() {
 		
+		IIdentity ownerId = null; //James Jents CSS or CIS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+    	
+		//create CIS for James, with last activity being 2 hours ago
+
+		cisManager = mock(ICisManager.class);
+		CisRecord jamesCis = cisManager.createCis("James", "James CIS");
 		
+		//Date date = new Date();
+		//Timestamp time = new Timestamp(date.getTime() - (1000 * 60 * 60 * 2) - 1);
+		//jamesCis.setActivityFeed(new CisActivityFeed(new Activity(time + "")));
 		
+    	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
+		
+		autoCommunityDeletionManager.identifyCissToDelete();
+		
+		String[] members = new String[1];
+		members[0] = "James";
+		//the CIS should have been deleted
+		
+		//Assert.assertNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null, null)));
+	}
+	
+	@Test
+	public void testIdentifyMediumTermCissToDelete() {
+		
+		IIdentity ownerId = null; //James Jents CSS or CIS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+    	
+		//create CIS for James, with last activity being 2 weeks ago
+
+		cisManager = mock(ICisManager.class);
+		CisRecord jamesCis = cisManager.createCis("James", "James CIS");
+		
+		//Date date = new Date();
+				//Timestamp time = new Timestamp(date.getTime() - (1000 * 60 * 60 * * 24 * 14) - 1);
+				//jamesCis.setActivityFeed(new CisActivityFeed(new Activity(time + "")));
+		
+    	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
+		
+		autoCommunityDeletionManager.identifyCissToDelete();
+		
+		String[] members = new String[1];
+		members[0] = "James";
+		//the CIS should have been deleted
+		
+		//Assert.assertNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null, null)));
+	}
+	
+	@Test
+	public void testIdentifyLongTermCissToDelete() {
+		
+		IIdentity ownerId = null; //James Jents CSS or CIS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+    	
+		//create CIS for James, with last activity being 6 months year ago
+
+		cisManager = mock(ICisManager.class);
+		CisRecord jamesCis = cisManager.createCis("James", "James CIS");
+		
+		//Date date = new Date();
+				//Timestamp time = new Timestamp(date.getTime() - (1000 * 60 * 60 * 24 * 4 * 6) - 1);
+				//jamesCis.setActivityFeed(new CisActivityFeed(new Activity(time + "")));
+		
+    	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
+		
+		autoCommunityDeletionManager.identifyCissToDelete();
+		
+		String[] members = new String[1];
+		members[0] = "James";
+		//the CIS should have been deleted
+		
+		//Assert.assertNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null, null)));
+	}
+	
+	@Test
+	public void testIdentifyOngoingCissToDelete() {
+		
+		IIdentity ownerId = null; //James Jents CSS or CIS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+    	
+		//create CIS for James, with no members for the first time in its history since creation
+
+		cisManager = mock(ICisManager.class);
+		CisRecord jamesCis = cisManager.createCis("James", "James CIS");
+		
+		//Date date = new Date();
+		//Timestamp time = new Timestamp(date.getTime() - (1000 * 60 * 60 * 2));
+		//jamesCis.setActivityFeed(new CisActivityFeed(new Activity(time + "")));
+		
+    	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
+		
+		autoCommunityDeletionManager.identifyCissToDelete();
+		
+		String[] members = new String[1];
+		members[0] = "James";
+		//the CIS should have been deleted
+		
+		//Assert.assertNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null, null)));
+	}
+	
+	@Test
+	public void testIdentifyNoCissToDelete() {
+		
+		IIdentity ownerId = null; //James Jents CSS or CIS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+    	
+		//create CIS for James, that match none of deletion criteria but come close.
+
+		cisManager = mock(ICisManager.class);
+		CisRecord jamesCis = cisManager.createCis("James", "James CIS");
+		
+    	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
+		
+		autoCommunityDeletionManager.identifyCissToDelete();
+		
+		String[] members = new String[1];
+		members[0] = "James";
+		//the CIS should have been deleted
+		
+		//Assert.assertNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null, null)));
 	}
 	
 	public void setCisManager(ICisManager cisManager){

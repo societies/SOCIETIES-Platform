@@ -28,8 +28,8 @@ import java.io.Serializable;
 
 import javax.swing.tree.DefaultTreeModel;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
@@ -45,7 +45,7 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 public class DObfPreferenceTreeModel extends DefaultTreeModel implements IPrivacyPreferenceTreeModel, Serializable{
 	private CtxAttributeIdentifier affectedCtxId;
 	private String myContextType;
-	private Identity providerDPI;
+	private IIdentity providerDPI;
 	private IServiceResourceIdentifier serviceID;
 	private PrivacyPreferenceTypeConstants myPrivacyType;
 	private IPrivacyPreference pref;
@@ -86,11 +86,11 @@ public class DObfPreferenceTreeModel extends DefaultTreeModel implements IPrivac
 		return affectedCtxId;
 	}
 
-	public void setProviderDPI(Identity providerDPI) {
+	public void setProviderDPI(IIdentity providerDPI) {
 		this.providerDPI = providerDPI;
 	}
 
-	public Identity getProviderDPI() {
+	public IIdentity getProviderDPI() {
 		return providerDPI;
 	}
 

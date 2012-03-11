@@ -24,28 +24,29 @@
  */
 package org.societies.platform.servicelifecycle.serviceRegistry;
 
+import static org.junit.Assert.assertTrue;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.societies.api.servicelifecycle.model.Service;
-import org.societies.api.servicelifecycle.model.ServiceImplementation;
-import org.societies.api.servicelifecycle.model.ServiceInstance;
-import org.societies.api.servicelifecycle.model.ServiceLocation;
-import org.societies.api.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.servicelifecycle.model.ServiceStatus;
-import org.societies.api.servicelifecycle.model.ServiceType;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
+import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
+import org.societies.api.schema.servicelifecycle.model.ServiceLocation;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
+import org.societies.api.schema.servicelifecycle.model.ServiceType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.serviceloader.ServiceListFactoryBean;
 import org.springframework.test.annotation.ExpectedException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
-import static org.junit.Assert.*;
 
 /**
  * 
@@ -59,13 +60,15 @@ public class ServiceRegistryTest extends
 	@Autowired
 	private ServiceRegistry serReg;
 	private String serviceUri = "testURI";
-	private List<Service> servicesList = generateServiceList(5);
+	private static final int _numberOfServiceCreated=10; 
+	private List<Service> servicesList = generateServiceList(_numberOfServiceCreated);
 
 	@Test
 	@Rollback(false)
 	public void testRegisterService() {
 
 		try {
+			
 			serReg.registerServiceList(servicesList);
 
 		} catch (ServiceRegistrationException e) {
@@ -100,6 +103,19 @@ public class ServiceRegistryTest extends
 		assertTrue(retrievedService.getServiceName().equals(
 				servicesList.get(0).getServiceName()));
 	}
+	
+	@Test
+	@Rollback(false)
+	public void retrieveServiceUsingTemplate() throws ServiceRetrieveException{
+		Service tmpServiceFilter=new Service();
+	    tmpServiceFilter.setServiceName("%");
+		List<Service> returnedList=serReg.findServices(tmpServiceFilter);
+		assert(returnedList.size()==_numberOfServiceCreated);
+		tmpServiceFilter=servicesList.get(0);
+		returnedList=serReg.findServices(tmpServiceFilter);
+		assert(returnedList.get(0).getServiceName().equals(tmpServiceFilter.getServiceName()));
+	}
+	
 
 	@Test
 	@ExpectedException(ServiceRetrieveException.class)
@@ -107,10 +123,10 @@ public class ServiceRegistryTest extends
 	public void unregisterService() throws ServiceRetrieveException {
 		try {
 			serReg.unregisterServiceList(servicesList);
-
-			serReg.retrieveService(new ServiceResourceIdentifier(new URI(
-					serviceUri + "0"),"0"));
-
+			ServiceResourceIdentifier sri = new ServiceResourceIdentifier();
+			sri.setIdentifier(new URI(serviceUri + "0"));
+			sri.setServiceInstanceIdentifier("0");
+			serReg.retrieveService(sri);
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -124,15 +140,33 @@ public class ServiceRegistryTest extends
 	/* Utilities methods */
 	private List<Service> generateServiceList(int numberOfService) {
 		List<Service> returnedServiceList = new ArrayList<Service>();
+		Service result = null;
+		ServiceInstance si = null;
+		ServiceImplementation servImpl = null;
 		for (int i = 0; i < numberOfService; i++) {
 			try {
-				returnedServiceList.add(new Service(
-						
-						"serviceEndPoint", "serviceName" + i,
-						"serviceDescription" + i, "authorSignaturexx",
-						ServiceType.CoreService, ServiceLocation.Local,
-						new ServiceInstance("fullJid"+i, "XMPPNode"+i, new ServiceImplementation("net.calendar", "net.soluta", "1.0")),
-						ServiceStatus.STARTED));
+				result = new Service();
+				ServiceResourceIdentifier sid = new ServiceResourceIdentifier();
+				sid.setIdentifier(new URI("societies","the/path/of/the/service/v"+i,null));
+				sid.setServiceInstanceIdentifier("instance_"+i);
+				result.setServiceIdentifier(sid);
+				result.setAuthorSignature("authorSignaturexx");
+				result.setServiceDescription("serviceDescription" + i);
+				result.setServiceEndpoint("serviceEndPoint");
+				result.setServiceName("serviceName" + i);
+				result.setServiceType(ServiceType.CORE_SERVICE);
+				result.setServiceLocation(ServiceLocation.LOCAL);
+				result.setServiceStatus(ServiceStatus.STARTED);
+				si = new ServiceInstance();
+				si.setFullJid("fullJid"+i);
+				si.setXMPPNode("XMPPNode"+i);
+				servImpl = new ServiceImplementation();
+				servImpl.setServiceNameSpace("net.calendar");
+				servImpl.setServiceProvider("net.soluta");
+				servImpl.setServiceVersion("1.0");
+				si.setServiceImpl(servImpl);
+				result.setServiceInstance(si);
+				returnedServiceList.add(result);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

@@ -33,11 +33,11 @@ import java.util.List;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.servicelifecycle.model.Service;
-import org.societies.api.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.servicelifecycle.model.ServiceStatus;
 import org.societies.api.internal.servicelifecycle.serviceMgmt.ServiceMgmtException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.scheduling.annotation.Async;
 
@@ -80,7 +80,10 @@ public class ServiceManagement implements BundleContextAware{
 			if(logger.isDebugEnabled()) logger.debug("Getting all services in the service registry");
 			
 			// We need some method in the service registry to clean it automatically
-			Object filter = "*.*"; //placeholder for a filter to all
+			//Toni//
+			//Object filter = "*.*"; //placeholder for a filter to all
+			Service filter=new Service();
+			//Toni//
 			List<Service> servicesToRemove= getServiceReg().findServices(filter);
 			
 			if(logger.isDebugEnabled()) logger.debug("Now unregistering all the services.");
@@ -205,7 +208,7 @@ public class ServiceManagement implements BundleContextAware{
 				String debugMessage = "Attempting to remove a list of " + servicesToRemove.size() + " services from the registry:\n ";
 				
 				for(Service service : servicesToRemove ){
-					debugMessage += service.getServiceName() + "_" + service.getVersion() + '\n';
+					debugMessage += service.getServiceName() + "_" + service.getServiceInstance().getServiceImpl().getServiceVersion() + '\n';
 				}
 				
 				logger.debug(debugMessage);
@@ -237,7 +240,9 @@ public class ServiceManagement implements BundleContextAware{
 			if(logger.isDebugEnabled()) logger.debug("Getting All Services");
 
 			// TODO this needs to be changed, so we have a filter for all the services
-			Object filter = "*.*";
+			//Toni//
+			//Object filter = "*.*"; //placeholder for a filter to all
+			Service filter=new Service();
 			result = getServiceReg().findServices(filter);
 			
 			// Print out all the services that we've obtained
@@ -245,7 +250,7 @@ public class ServiceManagement implements BundleContextAware{
 
 				String debugMessage = "Obtained " + result.size() + " services from Registry:\n";
 				for(Service service : result){
-					debugMessage += service.getServiceName() + "_" + service.getVersion() + '\n';
+					debugMessage += service.getServiceName() + "_" + service.getServiceInstance().getServiceImpl().getServiceVersion() + '\n';
 				}
 				
 				logger.debug(debugMessage);

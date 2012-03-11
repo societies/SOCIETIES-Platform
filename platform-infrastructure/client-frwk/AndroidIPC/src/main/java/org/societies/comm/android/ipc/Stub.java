@@ -42,7 +42,7 @@ public class Stub implements InvocationHandler {
 		
 		public CallbackArgFilterer(Object[] args) {
 			int i = args.length - 1;
-			if(args[i] instanceof ICallback) {
+			if(i != -1 && args[i] instanceof ICallback) {
 				filteredArgs = removeIndexFromArray(args, i);
 				callback = args[i];
 			}
