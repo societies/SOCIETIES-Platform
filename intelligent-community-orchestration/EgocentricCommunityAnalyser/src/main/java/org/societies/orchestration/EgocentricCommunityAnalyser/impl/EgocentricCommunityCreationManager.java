@@ -273,14 +273,9 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				if (cisExistsAlready == false)
 				    cissToCreate.add(new CisRecord(null, linkedCss.toString(), "PERSONAL CIS for your CSS directory members", null, null, null, null, null, null));
 				
-				
-				//friends?
-				//userContextBroker.lookup(CtxModelType.ENTITY, "SNGroup", userContextBrokerCallback);
-				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
-				
-				//fanpage informs interests-based CISs
-				//userContextBroker.lookup(CtxModelType.ENTITY, "FanPage", userContextBrokerCallback);
-				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+				//Repeat the above for: friends, family members, working colleagues, and any other
+				//sufficiently important context containing a list of CSSs. The context ontology is used
+				//to determine what is worthy of this.
 				
 				Future<List<CtxIdentifier>> friendsFuture = null;
 				try {
@@ -307,6 +302,52 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 					// TODO Auto-generated catch block
 					e3.printStackTrace();
 				}
+				
+				//Does Personal CSS directory CIS need sub-CISs:
+				
+				if (cisExistsAlready == true) {
+					CisRecord thisCis = null;
+					boolean subCisExistsAlready = false;
+					//for (int i = 0; i < userJoinedCiss; i++) {
+					//    if (userJoinedCiss.get(i).getMetadata().contains("Personal CSS Directory")) {
+					//        thisCis = userJoinedCiss.get(i);
+					//    }
+					//}
+					//int confidence = 0;
+					//ArrayList<IIdentity> identifiedFriends = new ArrayList<IIdentity>();
+					//for (int i = 0; i < theFriends.size(); i++) {
+					//
+					//    if (thisCis.getMembersList().contains(theFriends.get(i))) {
+					//        confidence++;
+					//        identifiedFriends.add(theFriends.get(i));
+					//    }
+					//}
+					//if (confidence >= 3) {
+					//    ArrayList<CisRecord> subCiss = thisCis.getSubCiss();
+					//    for (int i = 0; i < subCiss.size(); i++) {
+					//        if (subCiss.get(i).getMembersList().contains(identifiedFriends) && subCiss.get(i).getMembershipCriteria.contains("friend"))
+					//            subCisExistsAlready = true;
+					//        if (identifiedFriends.contains(subCiss.get(i).getMembersList()) && subCiss.get(i).getMembershipCriteria.contains("friend"))
+					//            subCisExistsAlready = true;
+					//    //Potential to sub-CIS this with older friends, and make the top-layer CIS the one with all friends
+					//    //if 3 or more friends entered the directory CIS in the period since the Friends sub-CIS creation,
+					//    // and the time passed since then is at least the last 10% of its life... sub-CIS the old friends into a new overall one?
+					//    }
+					//    if ((subCisExistsAlready == false))
+					//        cissToCreate.add(new CisRecord(null, linkedCss.toString(), "Your friends in your CSS Directory", null, null, null, "friend", identifiedFriends, null));
+				}
+				
+				//friends?
+				//userContextBroker.lookup(CtxModelType.ENTITY, "SNGroup", userContextBrokerCallback);
+				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+				
+				//fanpage informs interests-based CISs
+				//userContextBroker.lookup(CtxModelType.ENTITY, "FanPage", userContextBrokerCallback);
+				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+				
+				//Mutual friends CIS creator
+				
+				
 				boolean similarCis = false;
 				if (listOfUserJoinedCiss != null) {
 				    for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
@@ -326,7 +367,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 						//		number++;
 						//}
 						
-			                cissToCreate.add(new CisRecord(null, linkedCss.toString(), "family relation to all members", null, null, null, null, null, null));
+			                //cissToCreate.add(new CisRecord(null, linkedCss.toString(), "family relation to all members", null, null, null, null, null, null));
 						
 					    }
 				    }
@@ -337,6 +378,57 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				}
 				
 				
+				
+				Future<List<CtxIdentifier>> locationFuture = null;
+				try {
+				    friendsFuture = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "location");
+			    } catch (CtxException e) {
+				    // TODO Auto-generated catch block
+				    e.printStackTrace();
+			    }
+				
+				List<CtxIdentifier> theLocation = null;
+				try {
+					if (locationFuture != null)
+					    theLocation = locationFuture.get();
+				} catch (InterruptedException e3) {
+					// TODO Auto-generated catch block
+					e3.printStackTrace();
+				} catch (ExecutionException e3) {
+					// TODO Auto-generated catch block
+					e3.printStackTrace();
+				}
+				
+				//cssActivityFeed.getActivities(theLocation);
+				
+				similarCis = false;
+				if (listOfUserJoinedCiss != null) {
+				    for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
+					    String[] members = ((CisRecord)listOfUserJoinedCiss[i]).membersCss;
+					    int number = 0;
+					    for (int m = 0; m < members.length; m++) {
+						    if (theFriends.contains(members[i]))
+							    number++;
+				    	}
+					    if (((number/theFriends.size()) >= 0.8) && (((number/members.length) >= 0.8))) {
+						    similarCis = true;
+						//if no CIS exists with 100% friend members, suggest sub-CIS of that one
+						
+						//number = 0;
+						//for (int m = 0; m < theFriends.size(); m++) {
+						//	if (members[i]theFriends.contains(members[i]))
+						//		number++;
+						//}
+						
+			                //cissToCreate.add(new CisRecord(null, linkedCss.toString(), "family relation to all members", null, null, null, null, null, null));
+						
+					    }
+				    }
+				}
+				if (similarCis == false) {
+		            cissToCreate.add(new CisRecord(null, linkedCss.toString(), "Mutual friends", null, null, null, null, null, null));
+				    
+				}
 				
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				//ArrayList<Identity> people = userCssDirectory.getContextMatchingCsss(list);
@@ -446,23 +538,83 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				////CssActivityFeed todayFeed = theFeed.searchQuery("contains: " + yesterdayHyphens[2].split(" ")[0]);
 				//ArrayList<String> interactionRecordsLastDay = todayFeed.searchQuery("interaction").toString();
 				
+				//CssActivityFeed theFeed = cssManager.getCssActivityFeed();
+				////CssActivityFeed betweenOneAndThreeDaysFeed = theFeed.searchQuery("contains: " + yesterdayHyphens[2].split(" ")[0]);
+				//ArrayList<String> interactionRecordsLastDay = todayFeed.searchQuery("interaction").toString();
 				
 				//CssActivityFeed theFeed = cssManager.getCssActivityFeed();
-				////CssActivityFeed todayFeed = theFeed.searchQuery("contains: " + lastWeekHyphens[2].split(" ")[0]);
+				////CssActivityFeed threeDaysFeed = theFeed.searchQuery("contains: " + yesterdayHyphens[2].split(" ")[0]);
+				//ArrayList<String> interactionRecordsLastDay = todayFeed.searchQuery("interaction").toString();
+				
+				//CssActivityFeed theFeed = cssManager.getCssActivityFeed();
+				////CssActivityFeed weekFeed = theFeed.searchQuery("contains: " + lastWeekHyphens[2].split(" ")[0]);
 				//ArrayList<String> interactionRecordsLastWeek = todayFeed.searchQuery("interaction").toString();
 				
 				//CssActivityFeed theFeed = cssManager.getCssActivityFeed();
-				////CssActivityFeed todayFeed = theFeed.searchQuery("contains: " + lastMonthHyphens[2].split(" ")[0]);
+				////CssActivityFeed monthFeed = theFeed.searchQuery("contains: " + lastMonthHyphens[2].split(" ")[0]);
+				//ArrayList<String> interactionRecordsLastMonth = todayFeed.searchQuery("interaction").toString();
+				
+				//CssActivityFeed theFeed = cssManager.getCssActivityFeed();
+				////CssActivityFeed sixMonthsFeed = theFeed.searchQuery("contains: " + lastMonthHyphens[2].split(" ")[0]);
 				//ArrayList<String> interactionRecordsLastMonth = todayFeed.searchQuery("interaction").toString();
 				
 				//ArrayList<String> potentialCisMembers = new ArrayList<String>;
+				
+				//ArrayList<IIdentify> theIDs = getIDsOfTodayInteractingCsss(1 day ago, now);
+				//HashMap<IIDentify, int> timesInteracted = new HashMap();
+				//ArrayList<int> timesThisCssInteracted = new ArrayList();
+				//for (int i = 0; i < theIDs.size(); i++) {
+				//    timesThisCssInteracted = 0;
+				//    for (int m = 0; m < todayFeed.size(); m++) {
+				//        if (todayFeed.get(m).contains(theIDs.get(i).toString()))
+				//            timesThisCssInteracted++;
+				//    }
+				//    timesInteracted.put(theIDs.get(i), timesThisCssInteracted);
+				//}
+				
+				//ArrayList<IIdentify> theIDs = getIDsOfThreeAndOneDaysInteractingCsss(3 days ago, 1 day ago);
+				//HashMap<IIDentify, int> timesInteractedBetweenThreeAndOneDays = new HashMap();
+				//ArrayList<int> timesThisCssInteracted = new ArrayList();
+				//for (int i = 0; i < theIDs.size(); i++) {
+				//    timesThisCssInteracted = 0;
+				//    for (int m = 0; m < betweenOneAndThreeDaysFeed.size(); m++) {
+				//        if (todayFeed.get(m).contains(theIDs.get(i).toString()))
+				//            timesThisCssInteracted++;
+				//    }
+				//    timesInteractedBetweenThreeAndOneDays.put(theIDs.get(i), timesThisCssInteracted);
+				//}
+				
+				//for (int i = 0; i < theIDs.size(); i++) {
+				//    if ((timesInteracted.get(theIDs.get(i)) >= 
+				//        (timesInteractedBetweenThreeAndOneDays.get(theIDs.get(i)) / 4)))
+				//        && (timesInteracted.get(theIDs.get(i)) >= 1st quartile where median isn't under 65% of average))
+				//            potentialCisMembers.add(theIDs.get(i));
+				//}
+				
+                //if (!joinedCiss.getMemberList().contains(potentialCis))
+				    //cissToCreate.add(new CisRecord(null, linkedCss, "Interactors on Service " + "serviceName", null, null, null, theIDs, null);
+				
+				//CssActivityFeed threeAndTwoDaysFeed = splitActivityFeed(3 day ago, 2 days ago);
+				//CssActivityFeed twoAndOneDaysFeed = splitActivityFeed(2 day ago, 1 days ago);
+				//ArrayList<CssActivityFeed> segmentDay = segmentActivityFeed(todayFeed, 3);
+				//if (segmentDay.get(0) > ((segmentDay.get(0) + segmentDay.get(1) + segmentDay.get(2)) * 0.7) {
+				//    ArrayList<CssActivityFeed> segmentThreeDays = segmentActivityFeed(threeDaysFeed, 9);
+				//    if (segmentDay.get(0) > ((segmentDay.get(0) + segmentDay.get(1) + segmentDay.get(2)) * 0.7) {
+				//        ////    if (!joinedCiss.getMemberList().contains(potentialCis))
+				//        cissToCreate.add(new CisRecord(null, linkedCss, "Interactors on Service in the morning" + "serviceName", null, null, null, null, null);
+				//}
+				
+				
+				
+				//for (int i = 0; i < theIDs.size(); i++) {
+				//    if (timesInteracted.get(theIDs.get(i)) == 0)
 				
 				//for (int i = 0; i < interactedCssIDs.size(); i++) {
 				//    if (interactionRecordsLastWeek.contains(interactedCssIDs.get(i)) && interactionRecordsLastMonth.contains(i))
 				//        potentialCisMembers.add(interactedCssIDs.get(i);
 				//}
 				//if (potentialCisMembers.size >= 2)
-				//    if (!joinedCiss.getMemberList().contains(thisone))
+				//    if (!joinedCiss.getMemberList().contains(potentialCis))
 				//        cissToCreate.add(new CisRecord(null, linkedCss, "Interactors on Service " + "serviceName", null, null, null, null, null);
 			    
 				//Now look for more specific sub-CISs

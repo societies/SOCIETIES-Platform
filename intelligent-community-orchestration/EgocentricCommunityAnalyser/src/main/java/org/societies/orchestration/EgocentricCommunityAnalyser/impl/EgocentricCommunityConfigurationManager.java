@@ -158,16 +158,17 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 		
 		//process
 		
-		//SIMPLISTIC v0.1 algorithm
+		//v1.0 algorithm
 		    //For each CIS member, If CIS member has been inactive for 1 month, suggest them to leave
 		    //If suggestion refused, suggest again in 2 * time before last suggestion to do so (or time inactive if this is first time)
 		    //If no response to suggestion after 1 month, issue warning. If no response to warning after another month, remove CSS from CIS
 		// ^ Above would be tailored to the nature of the CIS, e.g. one where members join and leave rapidly might lower these
 		//timeframes to 1 hour, etc.
 		
+		//Removing members
 		//for (int i = 0; i < cisRecords.size(); i++) {
 		//    CisRecord cisUnderAnalysis = cisRecords.get(i);
-		//    ArrayList<Identity> cisMembers = cisUnderAnalysis.getMembers();
+		//    ArrayList<IIdentity> cisMembers = cisUnderAnalysis.getMembers();
 		//    for (int i = 0; i < cisMembers.size(); i++) {
 		//        if (cisUnderAnalysis.getActivityFeed().getLastActivityForMember(cisMembers.get(i)).getTimestamp() < Time.current() - 240000000)
 		//            //make the suggestion to User Agent based on calcluation - see later
@@ -178,7 +179,7 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 		//If two unrelated CISs are similar, suggest merge
 		//for (int i = 0; i < cisRecords.size(); i++) {
 				//    CisRecord cisUnderAnalysis = cisRecords.get(i);
-				//    ArrayList<Identity> cisMembers = cisUnderAnalysis.getMembers();
+				//    ArrayList<IIdentity> cisMembers = cisUnderAnalysis.getMembers();
 		        //    for (int m = i + 1; m < cisRecords.size(); m++) {
 				//        for (int n = 0; n < cisMembers.size(); n++) {
 				//            if (cisMembers.contains(cisRecords.get(i).getMembers())) {}
@@ -190,13 +191,28 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 		//If one CIS seems split into two or more, suggest split
 		//for (int i = 0; i < cisRecords.size(); i++) {
 				//    CisRecord cisUnderAnalysis = cisRecords.get(i);
-				//    ArrayList<Identity> cisMembers = cisUnderAnalysis.getMembers();
+				//    ArrayList<IIdentity> cisMembers = cisUnderAnalysis.getMembers();
 				//    for (int i = 0; i < cisMembers.size(); i++) {
 				//        if (cisUnderAnalysis.getActivityFeed().getLastActivityForMember(cisMembers.get(i)).getTimestamp() < Time.current() - 240000000)
 				//            //make the suggestion to User Agent based on calcluation - see later
 				
 				//    }
 			    //}
+		
+		//Change owner or administrator
+		//for (int i = 0; i < cisRecords.size(); i++) {
+		//    CisRecord cisUnderAnalysis = cisRecords.get(i);
+		//    ArrayList<IIdentity> cisMembers = cisUnderAnalysis.getMembers();
+		//    for (int i = 0; i < cisMembers.size(); i++) {
+		//        CisActivityFeed theFeed = cisUnderAnalysis.getActivityFeed();
+		//        if ((theFeed.getAcitivites(cisMembers.get(i)) >= (theFeed.getActivities().size()/cisUnderAnalysis.getMembers.size()))
+		//            && the median isn't above the 3rd quartile)
+		//            suggest admin if not already
+		//        if high betweenness centrality OR prestige OR closeness from CIS activity feed (need to know syntaxes of feeds)
+		//        suggest owner for whoever ranks highest on average across all these, and admin for others who rank high for the individual ones / slightly lower across all three
+		//    }
+	    //}
+		
 		
 		
 		
