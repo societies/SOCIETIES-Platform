@@ -51,6 +51,7 @@
 	          <xs:element ref='create'/>
 	          <xs:element ref='delete'/>
 			  <xs:element ref='list'/>
+			  <xs:element ref='search-cis'/>
 			  <xs:element ref='configure'/>
 	      </xs:choice>
 	    </xs:complexType>
@@ -68,15 +69,15 @@
     </xs:complexType>
   </xs:element>
   
-  <xs:element name='list' type='empty' />
+  <xs:element name='list' type='empty' /><!-- TODO-->
   
-    <xs:element name='configure'>
-    <xs:complexType>
-      <xs:choice minOccurs='0' xmlns:xdata='jabber:x:data'>
-        <xs:element ref='xdata:x'/>
-      </xs:choice>
-    </xs:complexType>
-  </xs:element>
+    <xs:element name='configure' type='empty' /><!-- TODO-->
+
+
+	<xs:element name='search-cis' type='empty' /><!-- TODO-->
+
+
+
   
     <xs:element name='delete'>
     <xs:complexType>

@@ -53,7 +53,7 @@ import org.societies.api.internal.cis.management.CisRecord;
  * This is the test class for the Egocentric Community Creation Manager component
  * 
  * @author Fraser Blackmun
- * @version 0
+ * @version 1
  * 
  */
 
