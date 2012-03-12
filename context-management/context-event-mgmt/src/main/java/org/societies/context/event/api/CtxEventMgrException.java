@@ -22,51 +22,71 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.context.event;
+package org.societies.context.event.api;
+
+import org.societies.api.context.CtxException;
 
 /**
- * A listener for receiving {@link CtxChangeEvent CtxChangeEvents}. More
- * specifically, it defines methods for reacting to the addition, update,
- * modification or removal of context model objects.
+ * Thrown to indicate Context Event Manager exceptions
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.3
+ * @since 0.0.4
  */
-public interface CtxChangeEventListener extends CtxEventListener {
+public class CtxEventMgrException extends CtxException {
+
+	private static final long serialVersionUID = 1819833211226295093L;
 	
 	/**
-	 * This method is called when a context model object is created.
-	 *  
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was created.
-	 */
-	public void onCreation(CtxChangeEvent event);
-	
-	/**
-	 * This method is called when a context model object is updated.
-	 *  
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was updated.
-	 */
-	public void onUpdate(CtxChangeEvent event);
-	
-	/**
-	 * This method is called when a context model object is modified.
-	 *  
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was modified.
-	 */
-	public void onModification(CtxChangeEvent event);
-	
-	/**
-	 * This method is called when a context model object is removed.
-	 * 
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was removed.
-	 */
-	public void onRemoval(CtxChangeEvent event);
+     * Constructs a <code>CtxEventMgrException</code> with no detail message.
+     */
+    public CtxEventMgrException() {
+    	
+        super();
+    }
+
+    /**
+     * Constructs a <code>CtxEventMgrException</code> with the specified detail
+     * message.
+     * 
+     * @param s
+     *            the detail message.
+     */
+    public CtxEventMgrException(String s) {
+    	
+        super(s);
+    }
+
+    /**
+     * Creates a <code>CtxEventMgrException</code> with the specified detail message
+     * and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public CtxEventMgrException(String message, Throwable cause) {
+    	
+        super(message, cause);
+    }
+
+    /**
+     * Creates a <code>CtxEventMgrException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public CtxEventMgrException(Throwable cause) {
+    	
+        super(cause);
+    }
 }

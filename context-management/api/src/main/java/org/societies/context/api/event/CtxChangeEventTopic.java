@@ -22,51 +22,34 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.context.event;
+package org.societies.context.api.event;
 
 /**
- * A listener for receiving {@link CtxChangeEvent CtxChangeEvents}. More
- * specifically, it defines methods for reacting to the addition, update,
- * modification or removal of context model objects.
+ * The constants of this class specify the topic name of a context change event.
+ * The following names have been identified:
+ * <ul>
+ * <li>{@link #CREATED}: Context creation event</li>
+ * <li>{@link #UPDATED}: Context update event</li>
+ * <li>{@link #MODIFIED}: Context modification event</li>
+ * <li>{@link #REMOVED}: Context removal event</li>
+ * </ul>
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.3
+ * @since 0.0.4
  */
-public interface CtxChangeEventListener extends CtxEventListener {
+public final class CtxChangeEventTopic {
+
+	private static final String BASE_TOPIC = "org/societies/context/change/event/"; 
 	
-	/**
-	 * This method is called when a context model object is created.
-	 *  
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was created.
-	 */
-	public void onCreation(CtxChangeEvent event);
+	/** Context creation event */
+	public static final String CREATED = BASE_TOPIC + "CREATED";
 	
-	/**
-	 * This method is called when a context model object is updated.
-	 *  
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was updated.
-	 */
-	public void onUpdate(CtxChangeEvent event);
+	/** Context update event */
+	public static final String UPDATED = BASE_TOPIC + "UPDATED";
 	
-	/**
-	 * This method is called when a context model object is modified.
-	 *  
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was modified.
-	 */
-	public void onModification(CtxChangeEvent event);
+	/** Context modification event */
+	public static final String MODIFIED = BASE_TOPIC + "MODIFIED";
 	
-	/**
-	 * This method is called when a context model object is removed.
-	 * 
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was removed.
-	 */
-	public void onRemoval(CtxChangeEvent event);
+	/** Context removal event */
+	public static final String REMOVED = BASE_TOPIC + "REMOVED";
 }

@@ -24,49 +24,27 @@
  */
 package org.societies.api.context.event;
 
+import java.util.EventObject;
+
 /**
- * A listener for receiving {@link CtxChangeEvent CtxChangeEvents}. More
- * specifically, it defines methods for reacting to the addition, update,
- * modification or removal of context model objects.
+ * This abstract class is used to represent an event emitted by the Context
+ * Management system.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.3
+ * @since 0.0.4
  */
-public interface CtxChangeEventListener extends CtxEventListener {
-	
+public abstract class CtxEvent extends EventObject {
+
+	private static final long serialVersionUID = 2584003286855450802L;
+
 	/**
-	 * This method is called when a context model object is created.
-	 *  
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was created.
-	 */
-	public void onCreation(CtxChangeEvent event);
-	
-	/**
-	 * This method is called when a context model object is updated.
-	 *  
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was updated.
-	 */
-	public void onUpdate(CtxChangeEvent event);
-	
-	/**
-	 * This method is called when a context model object is modified.
-	 *  
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was modified.
-	 */
-	public void onModification(CtxChangeEvent event);
-	
-	/**
-	 * This method is called when a context model object is removed.
+	 * Constructs a <code>CtxEvent</code> with the specified source.
 	 * 
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was removed.
+	 * @param source
+	 *            the object upon which this event occurred.
 	 */
-	public void onRemoval(CtxChangeEvent event);
+	public CtxEvent(Object source) {
+		
+		super(source);
+	}
 }

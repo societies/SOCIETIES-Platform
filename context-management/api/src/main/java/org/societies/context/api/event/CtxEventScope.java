@@ -22,51 +22,31 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.context.event;
+package org.societies.context.api.event;
 
 /**
- * A listener for receiving {@link CtxChangeEvent CtxChangeEvents}. More
- * specifically, it defines methods for reacting to the addition, update,
- * modification or removal of context model objects.
+ * The constants of this enumerated type specify the publishing scope of a 
+ * context event. The following scopes have been identified:
+ * <ul>
+ * <li>{@link #LOCAL}: Denotes a context event published locally, i.e. within
+ * the container</li>
+ * <li>{@link #CSS}: Denotes a context event published to all device nodes of a
+ * CSS</li>
+ * </ul>
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.3
+ * @since 0.0.4
  */
-public interface CtxChangeEventListener extends CtxEventListener {
+public enum CtxEventScope {
+
+	/**
+	 * The enum constant for context events published locally, i.e. within the
+	 * running container.
+	 */
+	LOCAL,
 	
 	/**
-	 * This method is called when a context model object is created.
-	 *  
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was created.
+	 * The enum constant for context events published to all nodes of a CSS.
 	 */
-	public void onCreation(CtxChangeEvent event);
-	
-	/**
-	 * This method is called when a context model object is updated.
-	 *  
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was updated.
-	 */
-	public void onUpdate(CtxChangeEvent event);
-	
-	/**
-	 * This method is called when a context model object is modified.
-	 *  
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was modified.
-	 */
-	public void onModification(CtxChangeEvent event);
-	
-	/**
-	 * This method is called when a context model object is removed.
-	 * 
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was removed.
-	 */
-	public void onRemoval(CtxChangeEvent event);
+	CSS,
 }

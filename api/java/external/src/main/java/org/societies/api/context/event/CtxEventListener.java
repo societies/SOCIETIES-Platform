@@ -24,49 +24,15 @@
  */
 package org.societies.api.context.event;
 
+import java.util.EventListener;
+
 /**
- * A listener for receiving {@link CtxChangeEvent CtxChangeEvents}. More
- * specifically, it defines methods for reacting to the addition, update,
- * modification or removal of context model objects.
+ * A listener for receiving {@link CtxEvent CtxEvents}. Extensions of this
+ * interface (e.g. {@link CtxChangeEventListener}) define methods for handling
+ * concrete implementations of the <code>CtxEvent</code> class.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.3
+ * @since 0.0.4
  */
-public interface CtxChangeEventListener extends CtxEventListener {
-	
-	/**
-	 * This method is called when a context model object is created.
-	 *  
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was created.
-	 */
-	public void onCreation(CtxChangeEvent event);
-	
-	/**
-	 * This method is called when a context model object is updated.
-	 *  
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was updated.
-	 */
-	public void onUpdate(CtxChangeEvent event);
-	
-	/**
-	 * This method is called when a context model object is modified.
-	 *  
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was modified.
-	 */
-	public void onModification(CtxChangeEvent event);
-	
-	/**
-	 * This method is called when a context model object is removed.
-	 * 
-	 * @param event
-	 *            a <code>CtxChangeEvent</code> object referencing the context
-	 *            model object that was removed.
-	 */
-	public void onRemoval(CtxChangeEvent event);
+public interface CtxEventListener extends EventListener {
 }
