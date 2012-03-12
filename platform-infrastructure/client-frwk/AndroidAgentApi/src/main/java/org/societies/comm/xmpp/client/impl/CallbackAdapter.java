@@ -1,12 +1,21 @@
 package org.societies.comm.xmpp.client.impl;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.AbstractMap.SimpleEntry;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.identity.IdentityManagerImpl;
 import org.societies.interfaces.Callback;
+import org.xml.sax.SAXException;
 import org.jivesoftware.smack.packet.Packet;
 
 import android.content.Context;
@@ -53,6 +62,18 @@ public class CallbackAdapter implements Callback {
 		} 
 	}
 	
+	public void receiveItems(String xml) {
+		unbindService();
+		
+		try {
+			Packet packet = marshaller.unmarshallIq(xml);
+			SimpleEntry<String, List<String>> nodeMap = marshaller.parseItemsResult(packet);
+			callback.receiveItems(stanzaFromPacket(packet), nodeMap.getKey(), nodeMap.getValue());
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+	}
+	
 	public void receiveMessage(String xml) {	
 		
 		try {			
@@ -69,10 +90,13 @@ public class CallbackAdapter implements Callback {
 	}
 	
 	private Stanza stanzaFromPacket(Packet packet) {
-		IdentityManagerImpl idm = new IdentityManagerImpl();
-		Identity to = idm.fromJid(packet.getTo().toString());
-		Identity from = idm.fromJid(packet.getFrom().toString());
-		Stanza returnStanza = new Stanza(packet.getPacketID(), from, to);
-		return returnStanza;
+		try {
+			IIdentity to = IdentityManagerImpl.staticfromJid(packet.getTo().toString());
+			IIdentity from =IdentityManagerImpl.staticfromJid(packet.getFrom().toString());
+			Stanza returnStanza = new Stanza(packet.getPacketID(), from, to);
+			return returnStanza;
+		} catch (InvalidFormatException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
 	}
 }

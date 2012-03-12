@@ -67,25 +67,25 @@ public class PreferenceRetriever {
 					Object obj = this.convertToObject(attr.getBinaryValue());
 					
 					if (obj==null){
-						this.logging.debug("PreferenceRegistry not found in DB for dpi:"+dpi.toString()+". Creating new registry");
+						this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
 						return new Registry();
 					}else{
 						if (obj instanceof Registry){
-							this.logging.debug("PreferenceRegistry found in DB for dpi:"+dpi.toString());
+							this.logging.debug("PreferenceRegistry found in DB");
 							return (Registry) obj;
 						}else{
-							this.logging.debug("PreferenceRegistry not found in DB for dpi:"+dpi.toString()+". Creating new registry");
+							this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
 							return new Registry();
 						}
 					}
 				}
-				this.logging.debug("PreferenceRegistry not found in DB for dpi:"+dpi.toString()+". Creating new registry");
+				this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
 				return new Registry();
 			}
-			this.logging.debug("PreferenceRegistry not found in DB for dpi:"+dpi.toString()+". Creating new registry");
+			this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
 			return new Registry();
 		} catch (CtxException e) {
-			this.logging.debug("Exception while loading PreferenceRegistry from DB for dpi:"+dpi.toString());
+			this.logging.debug("Exception while loading PreferenceRegistry from DB");
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

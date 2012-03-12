@@ -26,6 +26,7 @@ package org.societies.slm.servicemgmt.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -34,9 +35,9 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.servicelifecycle.model.Service;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
+import org.societies.api.schema.servicelifecycle.model.Service;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.util.OsgiListenerUtils;
 
@@ -122,7 +123,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 
 		case ServiceEvent.MODIFIED:
 			log.info("Service Modification");
-			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service));
+			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service, serBndl));
 			serviceList.add(service);
 			try {
 				serviceList.add(service);
@@ -134,7 +135,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 			break;
 		case ServiceEvent.REGISTERED:
 			log.info("Service Registered");			
-			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service));
+			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service, serBndl));
 			serviceList.add(service);			
 			try {
 				this.getServiceReg().registerServiceList(serviceList);
@@ -145,7 +146,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 			break;
 		case ServiceEvent.UNREGISTERING:
 			log.info("Service Unregistered");			
-			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service));
+			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service, serBndl));
 			serviceList.add(service);
 			try {
 				this.getServiceReg().unregisterServiceList(serviceList);

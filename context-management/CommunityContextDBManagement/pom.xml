@@ -20,6 +20,12 @@
 			<version>${version.cm}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 	<parent>
 		<groupId>org.societies</groupId>
@@ -65,14 +71,14 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<!-- More Project Information -->
 	<name>Community Context DB Mgmt</name>
 	<description>
 		This project provides an implementation of the ICommunityCtxDBMgr service.
 	</description>
 	<developers>
-	    <developer>
+		<developer>
 			<id>pkosmides</id>
 			<name>Pavlos Kosmides</name>
 			<email>pkosmidi@central.ntua.gr</email>

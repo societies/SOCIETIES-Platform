@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" elementFormDefault="qualified" 
+		   xmlns="http://societies.org/api/schema/servicemanagement"
+		   targetNamespace="http://societies.org/api/schema/servicemanagement"
+		   xmlns:tns="http://societies.org/api/schema/servicelifecycle/model"
+		   xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://societies.org/api/schema/servicelifecycle/model" 
+  			 schemaLocation="org.societies.api.schema.servicelifecycle.model.xsd"/>
+
+  <xs:complexType name="serviceMgmtResultBean">
+    <xs:sequence>
+      <xs:element name="findAllServicesResult" type="tns:service" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="findServiceResult" type="tns:service" minOccurs="0"/>
+      <xs:element name="serviceRegistryActiveResult" type="xs:boolean"/>
+      <xs:element name="serviceStatusResult" type="tns:serviceStatus" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="serviceMgmtMsgBean">
+    <xs:sequence>
+      <xs:element name="method" type="methodName" minOccurs="0"/>
+      <xs:element name="serviceID" type="tns:serviceResourceIdentifier" minOccurs="0"/>
+      <xs:element name="serviceMetaFiles" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="serviceMgmtExceptionBean">
+    <xs:sequence>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="methodName">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="IsServiceRegistryActive"/>
+      <xs:enumeration value="cleanServiceRegistry"/>
+      <xs:enumeration value="startService"/>
+      <xs:enumeration value="stopService"/>
+      <xs:enumeration value="getServiceStatus"/>
+      <xs:enumeration value="addServices"/>
+      <xs:enumeration value="removeServices"/>
+      <xs:enumeration value="updateServices"/>
+      <xs:enumeration value="findAllServices"/>
+      <xs:enumeration value="processServiceMetaData"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+

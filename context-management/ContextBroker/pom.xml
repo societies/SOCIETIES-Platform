@@ -35,10 +35,10 @@
 			<artifactId>org.springframework.beans</artifactId>
 		</dependency>
 		<dependency>
-        	<groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.societies.context-management</groupId>
 			<artifactId>user-context-db-mgmt</artifactId>
@@ -51,7 +51,20 @@
 			<version>${version.cm}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
+
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
@@ -96,11 +109,11 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<!-- More Project Information -->
 	<name>Context Broker</name>
 	<developers>
-	    <developer>
+		<developer>
 			<id>jpapai</id>
 			<name>Ioannis Papaioannou</name>
 			<email>jpapai@cn.ntua.gr</email>
@@ -129,7 +142,7 @@
 			<name>Nicolas Liampotis</name>
 			<email>nicolas.liampotis@cn.ntua.gr</email>
 			<organization>ICCS</organization>
-      		<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
 			<roles>
 				<role>tester</role>
 			</roles>

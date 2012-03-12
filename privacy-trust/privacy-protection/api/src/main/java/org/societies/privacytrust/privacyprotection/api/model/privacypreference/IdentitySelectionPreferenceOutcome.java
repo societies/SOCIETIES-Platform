@@ -25,7 +25,7 @@
 package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Subject;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
@@ -33,15 +33,15 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 
 
 /**
- * This class is used to define that a CSS identity should be used in a specific transaction if the preceding IPrivacyPreferenceConditions are true. 
- * The format of the identity will be defined by the Identity Management component
+ * This class is used to define that a CSS IIdentity should be used in a specific transaction if the preceding IPrivacyPreferenceConditions are true. 
+ * The format of the IIdentity will be defined by the IIdentity Management component
  * @author Elizabeth
  *
  */
 public class IdentitySelectionPreferenceOutcome implements IPrivacyOutcome{
 
 	private int confidenceLevel;
-	private Identity dpi;
+	private IIdentity dpi;
 	private IServiceResourceIdentifier serviceID;
 	private Subject requestor;
 	/* (non-Javadoc)
@@ -63,11 +63,11 @@ public class IdentitySelectionPreferenceOutcome implements IPrivacyOutcome{
 		this.confidenceLevel = c;
 	}
 	
-	public void setIdentity(Identity dpi){
+	public void setIdentity(IIdentity dpi){
 		this.dpi = dpi;
 	}
 	
-	public Identity getIdentity(){
+	public IIdentity getIdentity(){
 		return this.dpi;
 	}
 	public void setServiceID(IServiceResourceIdentifier serviceID) {
