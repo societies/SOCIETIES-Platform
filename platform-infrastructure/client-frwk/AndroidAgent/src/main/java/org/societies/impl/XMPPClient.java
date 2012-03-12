@@ -27,8 +27,6 @@ import org.jivesoftware.smack.provider.IQProvider;
 import org.jivesoftware.smack.provider.PacketExtensionProvider;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.packet.DiscoverItems;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.datatypes.XMPPNode;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -40,10 +38,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import android.util.Log;
+
 
 public class XMPPClient implements XMPPAgent {
 
-	private static final Logger log = LoggerFactory.getLogger(XMPPClient.class);
+	private static final String LOG_TAG = XMPPClient.class.getName();
 	
 	private XMPPConnection connection;
 	private String username, password, resource;
@@ -73,7 +73,7 @@ public class XMPPClient implements XMPPAgent {
 			connection.addPacketListener(new PacketListener() {
 	
 				public void processPacket(Packet packet) {
-					log.debug("Packet received: " + packet.toXML());
+					Log.d(LOG_TAG, "Packet received: " + packet.toXML());
 				}
 				
 			}, new PacketFilter() {
@@ -86,7 +86,7 @@ public class XMPPClient implements XMPPAgent {
 			connection.addPacketSendingListener(new PacketListener() {
 	
 				public void processPacket(Packet packet) {
-					log.debug("Packet sent: " + packet.toXML());
+					Log.d(LOG_TAG, "Packet sent: " + packet.toXML());
 				}
 				
 			}, new PacketFilter() {
@@ -221,7 +221,7 @@ public class XMPPClient implements XMPPAgent {
 							callback.receiveError(packet.toXML());
 						}
 					} catch (Exception e) {
-						log.error(e.getMessage(), e);
+						Log.e(LOG_TAG, e.getMessage(), e);
 					}
 				}				
 			};
@@ -296,7 +296,7 @@ public class XMPPClient implements XMPPAgent {
 					}
 				}
 			} catch (Exception e) {
-				log.error(e.getMessage(), e);
+				Log.e(LOG_TAG, e.getMessage(), e);
 			}
 			return false;
 		}
