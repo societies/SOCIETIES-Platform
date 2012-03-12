@@ -25,6 +25,8 @@
 
 package org.societies.orchestration.EgocentricCommunityAnalyser.impl;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -62,6 +64,9 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 	
 	private IIdentity linkedCss;
 	
+	private Date lastTemporaryCheck;
+	private Date lastOngoingCheck;
+	
 	/*
      * Constructor for EgocentricCommunityAnalyser
      * 
@@ -75,6 +80,10 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 	public EgocentricCommunityAnalyser(IIdentity linkedEntity, String linkType) {
 		if (linkType.equals("CSS"))
 			this.linkedCss = linkedEntity;
+		
+		lastTemporaryCheck = new Date();
+		lastOngoingCheck = new Date();
+		
 		//else
 		//	this.linkedDomain = linkedEntity;
 	}
@@ -101,13 +110,18 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 		
 		public void run() {
 			while (true) {
-				try {
-					Thread.sleep(10000);
-				} catch (InterruptedException e) {
+				//try {
+					Date date = new Date();
+					if (date.getTime() >= (lastTemporaryCheck.getTime() + (1000 * 180))) {
+						processPreviousShortTimeCycle();
+						lastTemporaryCheck.setTime(date.getTime());
+					}
+					//Thread.sleep(10000);
+				//} //catch (InterruptedException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				processPreviousShortTimeCycle();
+					//e.printStackTrace();
+				//}
+				
 		    }
 		}
 	}
@@ -116,13 +130,18 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 		
 		public void run() {
 			while (true) {
-				try {
-					Thread.sleep(220000000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				Date date = new Date();
+				if (date.getTime() >= (lastOngoingCheck.getTime() + (1000 * 60 ^ 60 * 24))) {
+					processPreviousLongTimeCycle();
+					lastOngoingCheck.setTime(date.getTime());
 				}
-				processPreviousLongTimeCycle();
+				//try {
+				//	Thread.sleep(220000000);
+				//} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+				//	e.printStackTrace();
+				//}
+				
 		    }
 		}
 	}

@@ -100,8 +100,7 @@
               				org.societies.api.internal.css.devicemgmt,
               				org.societies.api.css.devicemgmt,
               				org.societies.api.internal.css.devicemgmt.model,
-              				org.springframework.context,
-              				org.societies.comm.xmpp.event
+              				org.springframework.context
               			</Import-Package> 
               			<Export-Package>
 							org.societies.css.devicemgmt.DeviceDriverExample

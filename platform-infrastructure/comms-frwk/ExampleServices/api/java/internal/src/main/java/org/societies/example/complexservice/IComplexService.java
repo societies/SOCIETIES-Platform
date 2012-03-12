@@ -25,7 +25,9 @@
 package org.societies.example.complexservice;
 
 import java.util.concurrent.Future;
+
 import org.societies.api.schema.examples.complexservice.MyComplexBean;
+
 
 /**
  * Describe your class here...

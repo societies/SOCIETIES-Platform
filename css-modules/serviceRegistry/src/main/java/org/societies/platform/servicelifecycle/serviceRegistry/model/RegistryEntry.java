@@ -68,9 +68,7 @@ public class RegistryEntry implements Serializable {
 
 	private String serviceStatus;
 
-	protected RegistryEntry() {
-
-	}
+	
 
 	/**
 	 * @param serviceEndpointURI
@@ -108,6 +106,10 @@ public class RegistryEntry implements Serializable {
 						.getServiceNameSpace(), serviceInstance
 						.getServiceImpl().getServiceProvider(), serviceInstance
 						.getServiceImpl().getServiceVersion()));
+	}
+	
+	public RegistryEntry(){
+		super();
 	}
 
 	@Column(name = "ServiceName")

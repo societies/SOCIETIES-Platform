@@ -45,14 +45,25 @@
       namespace='jabber:x:data'
       schemaLocation='http://xmpp.org/schemas/x-data.xsd'/>
 
+	<xs:element name='communities'>
+	   <xs:complexType>
+	       <xs:sequence>
+      		<xs:element ref='community' minOccurs='0' maxOccurs='unbounded'/>
+      		</xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+
+
 	<xs:element name='community'>
 	   <xs:complexType>
 	      <xs:choice>
 	          <xs:element ref='create'/>
 	          <xs:element ref='delete'/>
 			  <xs:element ref='list'/>
+			  <xs:element ref='search-cis'/>
 			  <xs:element ref='configure'/>
 	      </xs:choice>
+	      <xs:attribute name='community-jid' type='xs:string'/>
 	    </xs:complexType>
 	</xs:element>
 	
@@ -68,15 +79,15 @@
     </xs:complexType>
   </xs:element>
   
-  <xs:element name='list' type='empty' />
+  <xs:element name='list' type='empty' /><!-- TODO-->
   
-    <xs:element name='configure'>
-    <xs:complexType>
-      <xs:choice minOccurs='0' xmlns:xdata='jabber:x:data'>
-        <xs:element ref='xdata:x'/>
-      </xs:choice>
-    </xs:complexType>
-  </xs:element>
+    <xs:element name='configure' type='empty' /><!-- TODO-->
+
+
+	<xs:element name='search-cis' type='empty' /><!-- TODO-->
+
+
+
   
     <xs:element name='delete'>
     <xs:complexType>

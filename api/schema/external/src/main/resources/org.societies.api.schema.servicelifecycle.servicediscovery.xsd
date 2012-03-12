@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0" 
+	targetNamespace="http://societies.org/api/schema/servicelifecycle/servicediscovery" 
+	xmlns:ns1="http://societies.org/api/schema/servicelifecycle/model" 
+	xmlns:tns="http://societies.org/api/schema/servicelifecycle/servicediscovery" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://societies.org/api/schema/servicelifecycle/model" 
+  		schemaLocation="org.societies.api.schema.servicelifecycle.model.xsd"/>
+
+  <xs:element  name="serviceDiscoveryResultBean"> 
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="services" type="ns1:service" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
+<xs:element  name="serviceDiscoveryMsgBean">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="method" type="tns:methodName" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
+
+  <xs:simpleType name="methodName">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="getLocalServices"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+

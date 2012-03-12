@@ -19,14 +19,17 @@
 	</bean>
 -->
 
-	<bean id="serListener" class="org.societies.slm.servicemgmt.impl.ServiceRegistryListener"
+	<!-- <bean id="serListener" class="org.societies.slm.servicemgmt.impl.ServiceRegistryListener"
 		init-method="registerListener" destroy-method="unRegisterListener">	
 		<property name="serviceReg" ref="serviceRegRef" />				
 	</bean>
-	
+	-->
 	<bean id="serviceDiscovery" class="org.societies.slm.servicediscovery.ServiceDiscovery" >
 		<!-- <property name="converter" ref="XMLtoServiceObjectConverter" /> -->
-		<property name="serviceReg" ref="serviceRegRef" />				
+		<property name="serviceReg" ref="serviceRegRef" /> 	
+		<property name="commMngr" ref="commMngrRef" />
+		<property name="serviceDiscoveryRemote" ref="serviceDiscoveryRemoteRef" />
+						
 	</bean>
 	<!-- 
 	<bean id="XMLtoServiceObjectConverter" class="org.societies.slm.servicemgmt.impl.XMLServiceMetaDataToObjectConverter">
@@ -44,9 +47,5 @@
         <property name="schema" value="classpath:schema1.xsd"/>  
 	</bean>
 	-->
-	
-	<bean id="serviceControl" class="org.societies.slm.servicecontrol.ServiceControl" >
-		<property name="serviceReg" ref="serviceRegRef" />				
-	</bean>
 	
 </beans>
