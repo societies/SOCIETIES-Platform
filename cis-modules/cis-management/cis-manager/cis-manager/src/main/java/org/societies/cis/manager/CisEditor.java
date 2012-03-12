@@ -40,6 +40,7 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.cis.management.CisActivityFeed;
@@ -50,6 +51,7 @@ import org.societies.api.internal.cis.management.ICisEditor;
 import org.societies.api.internal.cis.management.ICisManager;
 import org.societies.api.internal.cis.management.ServiceSharingRecord;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.comm.xmpp.pubsub.impl.PubsubServiceRouter;
 import org.societies.comm.xmpp.xc.impl.XCCommunicationMgr;
 import org.societies.community.Community;
 import org.societies.community.Participant;
@@ -57,16 +59,15 @@ import org.societies.community.ParticipantRole;
 import org.societies.community.Who;
 import org.societies.identity.IdentityImpl;
 import org.societies.manager.Communities;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 
 /**
  * @author Thomas Vilarinho (Sintef)
 */
 
-/**
- * @author tvil
- *
- */
+//@Component
 public class CisEditor implements ICisEditor, IFeatureServer {
 
 
@@ -84,6 +85,7 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 	private ICommManager CISendpoint;
 	
 	private IIdentity cisIdentity;
+	private PubsubClient psc;
 
 	public Set<CisParticipant> membersCss; // TODO: this may be implemented in the CommunityManagement bundle. we need to define how they work together
 	
@@ -110,8 +112,11 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 
 	}
 	
-	
+	/**
+	 * @deprecated  Replaced by constructor which has the ICISCommunicationMgrFactory
+	 */
 	// constructor for creating a CIS from scratch
+	@Deprecated
 	public CisEditor(String ownerCss, String cisId,String host,
 			String membershipCriteria, String permaLink, String password) {
 		
@@ -126,9 +131,12 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 		
 
 		// TODO: broadcast its creation to other nodes?
+		
 
 	}
 
+	// it expects an existing Pubsubclient in the container in which it will autowire
+	//@Autowired	
 	public CisEditor(String ownerCss, String cisId,String host,
 			String membershipCriteria, String permaLink, String password,ICISCommunicationMgrFactory ccmFactory) {
 		
@@ -161,7 +169,16 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 		cisRecord = new CisRecord(cisActivityFeed,ownerCss, membershipCriteria, cisId, permaLink, membersCss,
 				password, host, sharedServices);
 		
+		LOG.info("CIS creating pub sub service");
+		
+//		PubsubServiceRouter psr = new PubsubServiceRouter(CISendpoint);
 
+		
+		LOG.info("CIS pub sub service created");
+		
+		//this.psc = psc;
+		
+		LOG.info("CIS autowired PubSubClient");
 		// TODO: broadcast its creation to other nodes?
 
 	}

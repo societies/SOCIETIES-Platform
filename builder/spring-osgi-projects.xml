@@ -119,8 +119,8 @@
 		</module>
 		<module>../intelligent-community-orchestration/CommunityLifecycleManagement
 		</module>
-		<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser
-		</module>
+		<!--<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser
+		</module>-->
 
 		<!-- Context Management -->
 
