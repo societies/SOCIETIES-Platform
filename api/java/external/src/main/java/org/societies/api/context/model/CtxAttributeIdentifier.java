@@ -98,7 +98,29 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 	public CtxModelType getModelType() {
 		return CtxModelType.ATTRIBUTE;
 	}
-
+	
+	/**
+	 * Returns a String representation of this context attribute identifier
+	 * 
+	 * @return a String representation of this context attribute identifier
+	 * @since 0.0.4
+	 */
+	@Override
+	public String toString() {
+		
+		StringBuilder result = new StringBuilder();
+		
+		result.append(this.scope);
+		result.append("/");
+		result.append(this.getModelType());
+		result.append("/");
+		result.append(this.getType());
+		result.append("/");
+		result.append(this.getObjectNumber());
+		
+		return result.toString();
+	}
+	
 	/**
 	 * @see java.lang.Object#hashCode()
 	 * @since 0.0.2
