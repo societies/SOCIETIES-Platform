@@ -39,9 +39,9 @@ import org.societies.api.internal.css.directory.ICssDirectory;
 
 // TODO: This class needs to be higher up in the package hierarchy and be a global 
 // class/interface.
-
+@Deprecated
 public interface ISocietiesApp {
-    ICssManager getCssManager();
+    Object getCssManager();
     ICisManager getCisManager();
     ICssDirectory getCssDirectory();
     ICisDirectory getCisDirectory();
