@@ -13,7 +13,11 @@ public interface Pubsub {
 	
 	public void ownerDelete(String pubsubService, String node) throws XMPPError, CommunicationException;
 	
+	public void ownerPurgeItems(String pubsubServiceJid, String node) throws XMPPError, CommunicationException;
+	
 	public String publisherPublish(String pubsubService, String node, String itemId, String item) throws XMPPError, CommunicationException;
+	
+	public void publisherDelete(String pubsubServiceJid, String node, String itemId) throws XMPPError, CommunicationException;
 	
 	public SubscriptionParcelable subscriberSubscribe(String pubsubService,	String node, ISubscriber subscriber) throws XMPPError, CommunicationException;
 	

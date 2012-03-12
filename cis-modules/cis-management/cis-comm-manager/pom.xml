@@ -31,6 +31,14 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.societies.community</groupId>
 			<artifactId>CommunityXep</artifactId>
@@ -41,12 +49,13 @@
 			<groupId>org.societies.comm.xmpp</groupId>
 	  		<artifactId>CommunicationFrameworkCommons</artifactId>
 	  		<version>${version.comm}</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
-		
-
-		
-		
+		<dependency>
+		    <groupId>org.societies.comm.xmpp</groupId>
+		    <artifactId>XCCommunicationMgr</artifactId>
+		    <version>${version.comm}</version>	
+		</dependency>
 		
 		
 		<dependency>
@@ -93,11 +102,19 @@
     					<Import-Package>
     						org.springframework.beans.factory.annotation*;version="0",
     						org.springframework.stereotype*;version="0",
-							*
+    						org.xmpp.packet*,
+    						!org.gjt.*,
+    						!org.jaxen.*,
+    						!org.mortbay.*,
+    						!org.relaxng.*,
+    						!org.jvnet.staxex,
+    						!org.jvnet.fastinfoset,
+    						!com.sun.xml.fastinfoset.*,
+    						!com.sun.msv.*,
+							*;resolution:=optional
     					</Import-Package>
     					<Export-Package>
-		           			org.societies.cis.mgmt,
-		           			org.societies.community
+							org.societies.community*
 		           		</Export-Package>
 		           		<Embed-Dependency>*;scope=compile</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>

@@ -6,17 +6,32 @@
 	<!-- All projects should inherit from societies-parent -->
 	<parent>
 		<groupId>org.societies</groupId>
-		<artifactId>virgo-parent</artifactId>
+		<artifactId>spring-osgi-parent</artifactId>
+		<relativePath>../../parent/spring-osgi.xml</relativePath>
 		<version>0.1</version>
-                <relativePath>../../parent/virgo.xml</relativePath>
 	</parent>
 
-	<!-- groupId is set in parent pom -->
-	<artifactId>intelligentCommunityOrchestration_api</artifactId>
+	<groupId>org.societies.orchestration</groupId>
+	<artifactId>intelligent-community-orchestration-api</artifactId>
 	<version>${version.ico}</version>
 	<name>Intelligent Community Orchestration API</name>
 	<packaging>bundle</packaging> 
-
+    <dependencies>
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+	
+	
 	<developers>
 	
     	<developer>
@@ -62,10 +77,8 @@
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>
-				<instructions>
-						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
-					    <_nouses>true</_nouses>
+				<instructions>						
+						<Export-Package>org.societies.orchestration.api.*</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -77,10 +90,10 @@
                         <artifactItem>
                             <groupId>${groupId}</groupId>
                             <artifactId>${artifactId}</artifactId>
-                            <version>${version.ua}</version>
-                            <type>jar</type>
+                            <version>${version.ico}</version>
+                            <type>bundle</type>
                             <overWrite>true</overWrite>
-                            <outputDirectory>${virgo.home}/pickup/</outputDirectory>                                                        
+                            <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>                                                        
                         </artifactItem>
                     </artifactItems>                                                    
                 </configuration>

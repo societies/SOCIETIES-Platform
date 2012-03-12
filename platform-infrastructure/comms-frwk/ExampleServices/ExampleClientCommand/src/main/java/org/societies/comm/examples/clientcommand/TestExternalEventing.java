@@ -30,6 +30,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javax.xml.bind.JAXBException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
@@ -40,7 +43,8 @@ import org.societies.comm.xmpp.event.PubsubEvent;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.example.fortunecookie.IWisdom;
-import org.societies.example.fortunecookieservice.schema.Cookie;
+import org.societies.api.schema.examples.fortunecookie.Cookie;
+import org.societies.api.schema.examples.fortunecookie.FortuneCookieBeanResult;
 
 /**
  * Describe your class here...
@@ -51,6 +55,8 @@ import org.societies.example.fortunecookieservice.schema.Cookie;
 public class TestExternalEventing implements Runnable, Subscriber {
 	private static final String PUBSUB_NODE_NAME = "Fortune_Cookies";
 	private static final String PUBSUB_NODE_DESC = "SOCIETIES Fortune Cookie Publishing Service";
+	
+	private static Logger LOG = LoggerFactory.getLogger(TestExternalEventing.class);
 	
 	private PubsubClient pubSubManager;
 	private IIdentityManager idManager;
@@ -78,48 +84,56 @@ public class TestExternalEventing implements Runnable, Subscriber {
 		idManager = commManager.getIdManager();
 		IIdentity pubsubID = null;
 		try {
-			pubsubID = idManager.fromJid("XCManager.societies.local");
+			pubsubID = idManager.fromJid("xcmanager.societies.local");
 		
 			//ADD LIST OF PACKAGES TO ADD SCHEMA OBJECTS
 			List<String> packageList = new ArrayList<String>();
-			packageList.add("org.societies.example.calculatorservice.schema");
-			packageList.add("org.societies.example.fortunecookieservice.schema");
+			packageList.add("org.societies.api.schema.examples.calculatorbean");
+			packageList.add("org.societies.api.schema.examples.fortunecookie");
 			pubSubManager.addJaxbPackages(packageList);
 			
 			//CREATE A PUB-SUB NODE
+			LOG.info("### Creating PubsubNode");
 			pubSubManager.ownerCreate(pubsubID, PUBSUB_NODE_NAME);
+			LOG.info("### Created PubsubNode");
 		
 			//GET A LIST OF PUBSUB TOPICS (at root level)
+			LOG.info("### Querying list of Nodes");
 			List<String> listTopics = pubSubManager.discoItems(pubsubID, null);
 			for (String s: listTopics)
-				System.out.println(s);
+				LOG.info("### Node: " + s);
 		
 			//SUBSCRIBE
+			LOG.info("### Subscribing to pubsub");
 			pubSubManager.subscriberSubscribe(pubsubID, PUBSUB_NODE_NAME, this);
 			
-			//EVERY 60 SEC, PUBLISH A NEW PIECE OF WISDOM
+			//PUBLISH A NEW PIECE OF WISDOM EVERY 60 SEC
 			do {
-				try {
-					Thread.sleep(60000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
 				//GET A FORTUNE COOKIE
 				Future<Cookie> asyncCookie = fcGenerator.getCookie();
 				Cookie cookie = null;
 				try {
 					cookie = asyncCookie.get();
+					LOG.info("### Generated Cookie: " + cookie.getValue());
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				} catch (ExecutionException e) {
 					e.printStackTrace();
 				}
 				
-				PubsubEvent payload = new PubsubEvent(this, cookie);
 				String itemID = String.valueOf(cookie.getId());
 				//PUBLISH
-				String published = pubSubManager.publisherPublish(pubsubID, PUBSUB_NODE_NAME, itemID, payload);
+				LOG.info("### Publishing Cookie");
+				FortuneCookieBeanResult event = new FortuneCookieBeanResult();
+				event.setCookie(cookie);
+				
+				String published = pubSubManager.publisherPublish(pubsubID, PUBSUB_NODE_NAME, itemID, event);
 				System.out.println(published);
+				try {
+					Thread.sleep(60000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			} 
 			while (true);
 			
@@ -138,12 +152,12 @@ public class TestExternalEventing implements Runnable, Subscriber {
 	 * @see org.societies.api.comm.xmpp.pubsub.Subscriber#pubsubEvent(org.societies.api.comm.xmpp.datatypes.Identity, java.lang.String, java.lang.String, java.lang.Object) */
 	@Override
 	public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object item) {
-		System.out.println("New info published on topic" + node);
-		System.out.println("ID: " + itemId);
+		LOG.info("### New Pubsub Event topic: " + node);
 		//CHECK WHAT PAYLOAD IS
-		if (item.getClass().equals(Cookie.class)) {
-			Cookie cookie = (Cookie)item;
-			System.out.println("Wisdom: " + cookie.getValue());
+		if (item.getClass().equals(FortuneCookieBeanResult.class)) {
+			FortuneCookieBeanResult info = (FortuneCookieBeanResult)item;
+			Cookie cookie = info.getCookie();
+			LOG.info("### Wisdom: " + cookie.getValue());
 		}		
 	}
 }

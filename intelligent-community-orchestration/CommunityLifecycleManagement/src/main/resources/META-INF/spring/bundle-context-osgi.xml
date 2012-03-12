@@ -31,7 +31,7 @@
 		<!-- <osgi:reference id="UserCtxPredictionMgr" interface="org.societies.api.internal.context.user.prediction.IUserCtxPredictionMgr"/>
 		<osgi:reference id="UserCtxDBMgr" interface="org.societies.api.internal.context.user.db.IUserCtxDBMgr"/>
 		<osgi:reference id="UserCtxHistoryMgr" interface="org.societies.api.internal.context.user.history.IUserCtxHistoryMgr"/> -->
-		<osgi:reference id="Identity" interface="org.societies.api.comm.xmpp.datatypes.Identity"/>
+		<osgi:reference id="IIdentity" interface="org.societies.api.identity.IIdentity"/>
 		<osgi:reference id="UserCtxBroker" interface="org.societies.api.internal.context.broker.IUserCtxBroker"/>
 		<!-- <osgi:reference id="CommunityCtxBroker" interface="org.societies.api.internal.context.broker.ICommunityCtxBroker"/> -->
 		<osgi:reference id="UserFeedback" interface="org.societies.api.internal.useragent.feedback.IUserFeedback"/>

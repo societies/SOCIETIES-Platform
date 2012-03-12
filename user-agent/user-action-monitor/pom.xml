@@ -5,7 +5,7 @@
 	<!-- change the artifactid to your project artifactid -->
 	<groupId>org.societies.useragent</groupId>
 	<artifactId>monitoring</artifactId>
-	<packaging>bundle</packaging>
+	<packaging>jar</packaging>
 	<version>${version.ua}</version>
 	<developers>
 		<developer>
@@ -35,11 +35,19 @@
 	<version>${release.version}</version>
 	<scope>provided</scope>
 	</dependency>
-
-
 	</dependencies>
-
+	
+	
 	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+	<!-- <build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
@@ -52,10 +60,6 @@
 						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -74,5 +78,5 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>
+	</build> -->
 </project>

@@ -1,7 +1,9 @@
 package org.societies.api.servicelifecycle.model;
 
 /**
- * @deprecated  should reference implementation class org.societies.api.schema.servicelifecycle.model.ServiceStatus
+ * 
+ * @author gspadotto
+ * @deprecated Use {@link org.societies.api.schema.servicelifecycle.model.ServiceStatus} instead
  */
 @Deprecated
 public enum ServiceStatus {

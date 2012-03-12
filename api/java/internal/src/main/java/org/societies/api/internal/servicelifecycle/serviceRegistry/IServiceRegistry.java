@@ -26,11 +26,11 @@ package org.societies.api.internal.servicelifecycle.serviceRegistry;
 
 import java.util.List;
 
-import org.societies.api.servicelifecycle.model.Service;
-import org.societies.api.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
  * @author Antonio Panazzolo, Massimo Mazzariol (SN)
@@ -95,7 +95,7 @@ public interface IServiceRegistry {
 	* @return the list of services that match the filter
 	* @throws ServiceRetrieveException
 	*/
-	public List<Service> findServices (Object filter) throws ServiceRetrieveException;
+	public List<Service> findServices (Service filter) throws ServiceRetrieveException;
 	
 	/**
 	* Description: Based on a service unique identifier this method returns the associated Service

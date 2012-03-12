@@ -25,7 +25,11 @@
 
 package org.societies.orchestration.api;
 
-import org.societies.cis.management.api.CisRecord;
+import java.util.ArrayList;
+
+import org.societies.api.internal.cis.management.CisRecord;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * This class represents a CIS orchestration task

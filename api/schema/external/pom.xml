@@ -34,7 +34,7 @@
 				<directory>src/main/resources</directory>
 				<excludes>
 					<exclude>*.xjb</exclude>
-					<exclude>*.xsd</exclude>
+					<!-- <exclude>*.xsd</exclude> -->
 				</excludes>
 				<filtering>true</filtering>
 			</resource>
@@ -57,7 +57,6 @@
 								<exclude>pubsub#errors.xsd</exclude>
 								<exclude>pubsub#owner.xsd</exclude>
 								<exclude>pubsub#event.xsd</exclude>
-								<exclude>org.societies.api.schema.servicelifecycle.servicemanagement.xsd</exclude>
 							</schemaExcludes>
 						</configuration>
 					</execution>

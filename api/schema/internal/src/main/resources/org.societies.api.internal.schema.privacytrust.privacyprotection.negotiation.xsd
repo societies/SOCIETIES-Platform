@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0"
+	targetNamespace="http://societies.org/api/internal/schema/privacytrust/privacyprotection/negotiation"
+	xmlns="http://societies.org/api/internal/schema/privacytrust/privacyprotection/negotiation"
+	xmlns:tns="http://societies.org/api/schema/servicelifecycle/model"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+
+	<xs:import namespace="http://societies.org/api/schema/servicelifecycle/model"
+		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.servicelifecycle.model.xsd" />
+
+	<xs:element name="negotiationAgentBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="agreementEnvelope" type="xs:base64Binary"
+					minOccurs="0" />
+				<xs:element name="method" type="negAgentMethodType"
+					minOccurs="0" />
+				<xs:element name="responsePolicy" type="xs:base64Binary"
+					minOccurs="0" />
+				<xs:element name="serviceID" type="tns:serviceResourceIdentifier"
+					minOccurs="0" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
+	<xs:element name="negotiationBeanResult">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="acknowledgement" type="xs:boolean"
+					minOccurs="0" />
+				<xs:element name="identity" type="xs:string" minOccurs="0" />
+				<xs:element name="requestPolicy" type="xs:base64Binary"
+					minOccurs="0" />
+				<xs:element name="responsePolicy" type="xs:base64Binary"
+					minOccurs="0" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="negAgentMethodType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="acknowledgeAgreement" />
+			<xs:enumeration value="getPolicy" />
+			<xs:enumeration value="getProviderIdentity" />
+			<xs:enumeration value="negotiate" />
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
+

@@ -28,17 +28,16 @@ import org.societies.api.comm.xmpp.pubsub.Subscription;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.identity.IdentityManagerImpl;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 public class SubscriptionParcelable implements Parcelable {
 	private Subscription subscription;
-	private IIdentityManager idm;
 	
 	public SubscriptionParcelable(Subscription subscription, IIdentityManager idm) {
 		this.subscription = subscription;
-		this.idm = idm;
 	}
 	
 	public Subscription subscription() {
@@ -69,8 +68,8 @@ public class SubscriptionParcelable implements Parcelable {
     
     private SubscriptionParcelable(Parcel in) {    	
     	try {
-			IIdentity pubsubService = idm.fromJid(in.readString());
-			IIdentity subscriber = idm.fromJid(in.readString());
+			IIdentity pubsubService = IdentityManagerImpl.staticfromJid(in.readString());
+			IIdentity subscriber = IdentityManagerImpl.staticfromJid(in.readString());
 			String node = in.readString();
 			String subId = in.readString();
 			subscription = new Subscription(pubsubService, subscriber, node, subId);

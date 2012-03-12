@@ -9,13 +9,14 @@ import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.societies.api.servicelifecycle.model.Service;
-import org.societies.api.servicelifecycle.model.ServiceImplementation;
-import org.societies.api.servicelifecycle.model.ServiceInstance;
-import org.societies.api.servicelifecycle.model.ServiceLocation;
-import org.societies.api.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.servicelifecycle.model.ServiceStatus;
-import org.societies.api.servicelifecycle.model.ServiceType;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
+import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
+import org.societies.api.schema.servicelifecycle.model.ServiceLocation;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
+import org.societies.api.schema.servicelifecycle.model.ServiceType;
+
 
 /**
  * This is the Class accepted by the ServiceRegistry when a service wants to
@@ -67,9 +68,7 @@ public class RegistryEntry implements Serializable {
 
 	private String serviceStatus;
 
-	protected RegistryEntry() {
-
-	}
+	
 
 	/**
 	 * @param serviceEndpointURI
@@ -107,6 +106,10 @@ public class RegistryEntry implements Serializable {
 						.getServiceNameSpace(), serviceInstance
 						.getServiceImpl().getServiceProvider(), serviceInstance
 						.getServiceImpl().getServiceVersion()));
+	}
+	
+	public RegistryEntry(){
+		super();
 	}
 
 	@Column(name = "ServiceName")
@@ -160,19 +163,19 @@ public class RegistryEntry implements Serializable {
 			 * create the appropriate enumeration type
 			 */
 			if (serviceType == "ThirdPartyService") {
-				tmpServiceType = ServiceType.ThirdPartyService;
+				tmpServiceType = ServiceType.THIRD_PARTY_SERVICE;
 			} else {
 				if (serviceType == "CoreService") {
-					tmpServiceType = ServiceType.CoreService;
+					tmpServiceType = ServiceType.CORE_SERVICE;
 				}
 			}
 			
 			/* Same as before but for service location */
 			if (serviceLocation == "Local") {
-				tmpServiceLocation = ServiceLocation.Local;
+				tmpServiceLocation = ServiceLocation.LOCAL;
 			} else {
 				if (serviceLocation == "Remote" ) {
-					tmpServiceLocation = ServiceLocation.Remote;
+					tmpServiceLocation = ServiceLocation.REMOTE;
 				}
 			}
 			
@@ -185,11 +188,22 @@ public class RegistryEntry implements Serializable {
 				}else{tmpServiceStatus=ServiceStatus.UNAVAILABLE;}
 			}
 
-			returnedService = new Service(
-					this.serviceEndPoint, this.serviceName,
-					this.serviceDescription, this.authorSignature,
-					tmpServiceType, tmpServiceLocation,new ServiceInstance(this.serviceInstance.getFullJid(), this.serviceInstance.getXMPPNode(), new ServiceImplementation(this.serviceInstance.getServiceImpl().getServiceNameSpace(), this.serviceInstance.getServiceImpl().getServiceProvider(), this.serviceInstance.getServiceImpl().getServiceVersion())),
-					tmpServiceStatus);
+			returnedService = new Service();
+			returnedService.setAuthorSignature(this.authorSignature);
+			returnedService.setServiceDescription(this.serviceDescription);
+			returnedService.setServiceEndpoint(serviceEndPoint);
+			ServiceInstance si = new ServiceInstance();
+			si.setFullJid(this.serviceInstance.getFullJid());
+			ServiceImplementation servImpl = new ServiceImplementation();
+			servImpl.setServiceNameSpace(this.serviceInstance.getServiceImpl().getServiceNameSpace());
+			servImpl.setServiceProvider(this.serviceInstance.getServiceImpl().getServiceProvider());
+			servImpl.setServiceVersion(this.serviceInstance.getServiceImpl().getServiceVersion());
+			si.setServiceImpl(servImpl);
+			returnedService.setServiceInstance(si);
+			returnedService.setServiceLocation(tmpServiceLocation);
+			returnedService.setServiceName(serviceName);
+			returnedService.setServiceStatus(tmpServiceStatus);
+			returnedService.setServiceType(tmpServiceType);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
