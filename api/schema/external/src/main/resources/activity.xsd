@@ -1,3 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
@@ -23,50 +26,38 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.css.manager;
 
+/**
 
+I wanted to base it on the activity stream spec, but I've just found an old schema from them at the myspace api http://wiki.developer.myspace.com/index.php?title=OpenSocial_v0.9_Activities
+for that reason, Im defining a simpler version here initially.
 
+ * @author Thomas Carlyle Vilarinho (tcarlyle) 
+ */
+  -->
 
-import org.societies.api.internal.cis.management.CisRecord;
-import org.societies.api.internal.css.management.ICssManagerCloud;
-
-import org.societies.cis.manager.CisManager;
-
-
-public class CssManagerCloud implements ICssManagerCloud {
-
-	private CisManager cisManager; //all of its CISs
-	private String username;
-	private String domainAuthority;
-	private int delMe;
-
-	public CssManagerCloud(String username, String domainAuthority) {
-		
-		// TODO? do we register the user here with the domain authority?
-		this.domainAuthority = domainAuthority;
-		this.username = username;
-		cisManager = new CisManager();
-	}
+<xs:schema targetNamespace='http://societies.org/activity'
+	elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://societies.org/activity">
 	
-	public CisRecord createCIS(String cisName) {	
-		
-		return cisManager.createCis(this.username, cisName);
-		 
-	}
-
-
 	
+	  <xs:complexType name="Activity">
+        <xs:sequence>
+        	<xs:element name='actor' type='xs:string' />
+            <xs:element ref='ActivityContext' />
+            <xs:element  name="time" type="xs:dateTime" />
+            <xs:element name="source" type="xs:string" />
+            <xs:element name="verb" type="xs:string" />
+            <xs:element name="object" type="xs:string" />
+            <xs:element name="target" type="xs:string" />
+        </xs:sequence>
+    </xs:complexType>
 
-	/*public CisRecord cisRecord;
-	public CisActivityFeed cisActivityFeed;
-	public List<ServiceSharingRecord> sharedServices; 
-//	public CommunityManagement commMgmt;
+	<xs:element name="ActivityContext">
+    <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="location" type="xs:string" />
+        </xs:choice>
+    </xs:complexType>
+    </xs:element>
+</xs:schema>
 	
-
-	// constructor for creating a CIS from scratch	
-	public CisEditor(String ownerCss,
-			String membershipCriteria, String permaLink, String[] membersCss,
-			String password) */
-
-}
