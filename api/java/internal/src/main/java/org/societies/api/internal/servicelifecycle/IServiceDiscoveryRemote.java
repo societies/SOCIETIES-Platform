@@ -22,38 +22,24 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.societies.api.internal.servicelifecycle;
 
-import java.util.List;
-import java.util.concurrent.Future;
-
+import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.schema.servicelifecycle.model.Service;
-
-
 
 /**
+ *  Each method requires a callback to receive the result
  * 
+ *
  * @author mmannion
  *
  */
-public interface IServiceDiscovery {
-	
-	/**
-	 * Description: Based on a identify this method returns all services shared by 
-	 * the specified CSS/CIS to other CSS's or CIS;s 
-	 * @param node IIdentity 		  
-	 * @return a List of services retrieved
-	 * @throws ServiceDiscoveryException
-	 */
-	public Future<List<Service>> getServices(IIdentity node) throws ServiceDiscoveryException;
-
-	
-	/**
-	 * Description: This method returns all services for the current node 
-	 * @return a List of services retrieved
-	 * @throws ServiceDiscoveryException
-	 */
-	public Future<List<Service>> getLocalServices() throws ServiceDiscoveryException;
-	
+public interface IServiceDiscoveryRemote {
+    
+    public void getServices(IIdentity node, IServiceDiscoveryCallback callback);
+    
 }
+
+
+
