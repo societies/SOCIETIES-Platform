@@ -24,8 +24,6 @@
  */
 package org.societies.api.context.event;
 
-import java.util.EventObject;
-
 import org.societies.api.context.model.CtxIdentifier;
 
 /**
@@ -35,7 +33,7 @@ import org.societies.api.context.model.CtxIdentifier;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.3
  */
-public class CtxChangeEvent extends EventObject {
+public class CtxChangeEvent extends CtxEvent {
 
 	private static final long serialVersionUID = 7552325378500918037L;
 
@@ -53,11 +51,11 @@ public class CtxChangeEvent extends EventObject {
 	}
 	
 	/**
-	 * Returns the <code>CtxIdentifier</code> of the context model object upon
-	 * which this event occurred.
+	 * Returns the <code>CtxIdentifier</code> of the context model object that
+	 * was added, removed or modified.
 	 * 
-	 * @return the <code>CtxIdentifier</code> of the context model object upon
-	 *         which this event occurred.
+	 * @return the <code>CtxIdentifier</code> of the context model object that
+	 *         was added, removed or modified.
 	 */
 	public CtxIdentifier getId() {
 		
