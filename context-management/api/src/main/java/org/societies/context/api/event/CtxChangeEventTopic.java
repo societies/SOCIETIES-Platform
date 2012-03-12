@@ -28,10 +28,10 @@ package org.societies.context.api.event;
  * The constants of this class specify the topic name of a context change event.
  * The following names have been identified:
  * <ul>
- * <li>{@link #CREATED}: Context created event</li>
- * <li>{@link #UPDATED}: Context updated event</li>
- * <li>{@link #MODIFIED}: Context modified event</li>
- * <li>{@link #REMOVED}: Context removed event</li>
+ * <li>{@link #CREATED}: Context creation event</li>
+ * <li>{@link #UPDATED}: Context update event</li>
+ * <li>{@link #MODIFIED}: Context modification event</li>
+ * <li>{@link #REMOVED}: Context removal event</li>
  * </ul>
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
@@ -41,15 +41,15 @@ public final class CtxChangeEventTopic {
 
 	private static final String BASE_TOPIC = "org/societies/context/change/event/"; 
 	
-	/** Context created event */
+	/** Context creation event */
 	public static final String CREATED = BASE_TOPIC + "CREATED";
 	
-	/** Context updated event */
+	/** Context update event */
 	public static final String UPDATED = BASE_TOPIC + "UPDATED";
 	
-	/** Context modified event */
+	/** Context modification event */
 	public static final String MODIFIED = BASE_TOPIC + "MODIFIED";
 	
-	/** Context removed event */
+	/** Context removal event */
 	public static final String REMOVED = BASE_TOPIC + "REMOVED";
 }

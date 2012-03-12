@@ -27,6 +27,7 @@ package org.societies.context.api.event;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
+import org.societies.api.context.event.CtxEvent;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 
@@ -39,6 +40,24 @@ import org.societies.api.context.model.CtxIdentifier;
  */
 public interface ICtxEventMgr {
 
+	/**
+     * Publishes the specified {@link CtxEvent} to the supplied topics with the
+     * specified scope.
+     * 
+     * @param event
+     *            the event to be published.
+     * @param topics
+     *            the topics to which the event will be published.
+     * @param scope
+     *            the scope under which the event will be published.
+     * @throws CtxException 
+     *             if publishing of the specified event fails.
+     * @throws NullPointerException
+     *             if any of the specified parameters is <code>null</code>.
+     */
+    public void post(final CtxEvent event, final String[] topics,
+    		final CtxEventScope scope) throws CtxException;
+	
 	/**
      * Registers the specified {@link CtxChangeEventListener} for events of the
      * supplied topics. Once registered, the <code>CtxChangeEventListener</code>
@@ -59,8 +78,10 @@ public interface ICtxEventMgr {
      * @throws CtxException
      *             if the registration process of the specified
      *             <code>CtxChangeEventListener</code> fails.
+     * @throws NullPointerException
+     *             if any of the specified parameters is <code>null</code>.
      */
-    public void registerListener(final CtxChangeEventListener listener,
+    public void registerChangeListener(final CtxChangeEventListener listener,
             final String[] topics, final CtxIdentifier ctxId) throws CtxException;
     
     /**
@@ -77,9 +98,11 @@ public interface ICtxEventMgr {
      * @throws CtxException
      *             if the unregistration process of the specified
      *             <code>CtxChangeEventListener</code> fails.
+     * @throws NullPointerException
+     *             if any of the specified parameters is <code>null</code>.
      * @see #registerListener(CtxChangeEventListener, String[], CtxIdentifier)
      */
-    public void unregisterListener(final CtxChangeEventListener listener,
+    public void unregisterChangeListener(final CtxChangeEventListener listener,
             final String[] topics, final CtxIdentifier ctxId) throws CtxException;
     
     /**
@@ -105,8 +128,10 @@ public interface ICtxEventMgr {
      * @throws CtxException
      *             if the registration process of the specified
      *             <code>CtxChangeEventListener</code> fails.
+     * @throws NullPointerException
+     *             if any of the specified parameters is <code>null</code>.
      */
-    public void registerListener(final CtxChangeEventListener listener,
+    public void registerChangeListener(final CtxChangeEventListener listener,
             final String[] topics, final CtxEntityIdentifier scope,
             final String attrType) throws CtxException;
     
@@ -128,24 +153,11 @@ public interface ICtxEventMgr {
      * @throws CtxException
      *             if the unregistration process of the specified
      *             <code>CtxChangeEventListener</code> fails.
+     * @throws NullPointerException
+     *             if any of the specified parameters is <code>null</code>.
      * @see #registerListener(CtxChangeEventListener, String[], CtxEntityIdentifier, String)
      */
-    public void unregisterListener(final CtxChangeEventListener listener,
+    public void unregisterChangeListener(final CtxChangeEventListener listener,
             final String[] topics, final CtxEntityIdentifier scope,
             final String attrType) throws CtxException;
-    
-    /**
-     * Publishes the specified {@link CtxChangeEvent} under the supplied topics
-     * and scope.
-     * 
-     * @param event
-     *            the event to be published.
-     * @param topics
-     *            the topics under which the event will be published.
-     * @param scope
-     *            the scope of the event to be published.
-     * @throws CtxException if publishing of the specified event fails
-     */
-    public void post(final CtxChangeEvent event, final String[] topics,
-    		final CtxEventScope scope) throws CtxException;
 }

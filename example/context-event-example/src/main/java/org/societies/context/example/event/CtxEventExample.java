@@ -67,7 +67,7 @@ public class CtxEventExample {
 		final CtxEntityIdentifier scope = new CtxEntityIdentifier(null, "person", 1l);
 		final CtxAttributeIdentifier id = new CtxAttributeIdentifier(scope, "location", 2l);
 		try {
-			this.ctxEventMgr.registerListener(new MyCtxChangeEventListener(), new String[] {CtxChangeEventTopic.UPDATED}, id);
+			this.ctxEventMgr.registerChangeListener(new MyCtxChangeEventListener(), new String[] {CtxChangeEventTopic.UPDATED}, id);
 		} catch (CtxException ce) {
 			LOG.error("Could not register context event listener", ce);
 		}
@@ -84,7 +84,7 @@ public class CtxEventExample {
 		final CtxEntityIdentifier scope = new CtxEntityIdentifier(null, "person", 1l);
 		final String attrType = "location";
 		try {
-			this.ctxEventMgr.registerListener(new MyCtxChangeEventListener(), new String[] {CtxChangeEventTopic.UPDATED}, scope, attrType);
+			this.ctxEventMgr.registerChangeListener(new MyCtxChangeEventListener(), new String[] {CtxChangeEventTopic.UPDATED}, scope, attrType);
 		} catch (CtxException ce) {
 			LOG.error("Could not register context event listener", ce);
 		}

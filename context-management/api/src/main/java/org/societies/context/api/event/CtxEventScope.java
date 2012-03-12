@@ -25,7 +25,7 @@
 package org.societies.context.api.event;
 
 /**
- * The constants of this enumerated type specify the scope of a 
+ * The constants of this enumerated type specify the publishing scope of a 
  * context event. The following scopes have been identified:
  * <ul>
  * <li>{@link #LOCAL}: Denotes a context event published locally, i.e. within

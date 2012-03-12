@@ -29,11 +29,8 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
@@ -43,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
+import org.societies.api.context.event.CtxEvent;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.context.api.event.CtxChangeEventTopic;
@@ -65,22 +63,53 @@ import org.springframework.stereotype.Service;
 @Lazy(false)
 public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 
+	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CtxEventMgr.class);
 			
+	/** The OSGi EventAdmin service. */
 	@Autowired(required=true)
 	private EventAdmin eventAdmin;
 	
+	/** The OSGi bundle context. */
 	private BundleContext bundleContext;
 	
-	private ConcurrentMap<String, ServiceRegistration<?>> registrations =
-			new ConcurrentHashMap<String, ServiceRegistration<?>>();
-	
 	/* (non-Javadoc)
-	 * @see org.societies.context.api.event.ICtxEventMgr#registerListener(org.societies.api.context.event.CtxChangeEventListener, java.lang.String[], org.societies.api.context.model.CtxIdentifier)
+	 * @see org.societies.context.api.event.ICtxEventMgr#post(org.societies.api.context.event.CtxEvent, java.lang.String[], org.societies.context.api.event.CtxEventScope)
 	 */
 	@Override
-	public void registerListener(CtxChangeEventListener listener,
-			String[] topics, CtxIdentifier ctxId) throws CtxException {
+	public void post(final CtxEvent event, final String[] topics,
+			final CtxEventScope scope) throws CtxException {
+		
+		if (event == null)
+			throw new NullPointerException("event can't be null");
+		if (topics == null)
+			throw new NullPointerException("topics can't be null");
+		if (scope == null)
+			throw new NullPointerException("scope can't be null");
+		
+		// TODO Take event scope into account
+		
+		if (event instanceof CtxChangeEvent)
+			this.postChangeEvent((CtxChangeEvent) event, topics);
+		else
+			throw new CtxEventMgrException("Cannot send event to topics "
+					+ Arrays.toString(topics) 
+					+ ": Unknown CtxEvent implementation");
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.context.api.event.ICtxEventMgr#registerChangeListener(org.societies.api.context.event.CtxChangeEventListener, java.lang.String[], org.societies.api.context.model.CtxIdentifier)
+	 */
+	@Override
+	public void registerChangeListener(final CtxChangeEventListener listener,
+			final String[] topics, final CtxIdentifier ctxId) throws CtxException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (topics == null)
+			throw new NullPointerException("topics can't be null");
+		if (ctxId == null)
+			throw new NullPointerException("ctxId can't be null");
 		
 		final Dictionary<String, Object> props = new Hashtable<String, Object>();
 		props.put(EventConstants.EVENT_TOPIC, topics);
@@ -95,22 +124,38 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.context.api.event.ICtxEventMgr#unregisterListener(org.societies.api.context.event.CtxChangeEventListener, java.lang.String[], org.societies.api.context.model.CtxIdentifier)
+	 * @see org.societies.context.api.event.ICtxEventMgr#unregisterChangeListener(org.societies.api.context.event.CtxChangeEventListener, java.lang.String[], org.societies.api.context.model.CtxIdentifier)
 	 */
 	@Override
-	public void unregisterListener(CtxChangeEventListener listener,
-			String[] topics, CtxIdentifier ctxId) throws CtxException {
-		// TODO Auto-generated method stub
+	public void unregisterChangeListener(final CtxChangeEventListener listener,
+			final String[] topics, final CtxIdentifier ctxId) throws CtxException {
 		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (topics == null)
+			throw new NullPointerException("topics can't be null");
+		if (ctxId == null)
+			throw new NullPointerException("ctxId can't be null");
+		
+		// TODO Auto-generated method stub
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.context.api.event.ICtxEventMgr#registerListener(org.societies.api.context.event.CtxChangeEventListener, java.lang.String[], org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
+	 * @see org.societies.context.api.event.ICtxEventMgr#registerChangeListener(org.societies.api.context.event.CtxChangeEventListener, java.lang.String[], org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
 	 */
 	@Override
-	public void registerListener(CtxChangeEventListener listener,
-			String[] topics, CtxEntityIdentifier scope, String attrType)
-			throws CtxException {
+	public void registerChangeListener(final CtxChangeEventListener listener,
+			final String[] topics, final CtxEntityIdentifier scope, 
+			final String attrType) throws CtxException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (topics == null)
+			throw new NullPointerException("topics can't be null");
+		if (scope == null)
+			throw new NullPointerException("scope can't be null");
+		if (attrType == null)
+			throw new NullPointerException("attrType can't be null");
 		
 		final Dictionary<String, Object> props = new Hashtable<String, Object>();
 		props.put(EventConstants.EVENT_TOPIC, topics);
@@ -126,27 +171,23 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.context.api.event.ICtxEventMgr#unregisterListener(org.societies.api.context.event.CtxChangeEventListener, java.lang.String[], org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
+	 * @see org.societies.context.api.event.ICtxEventMgr#unregisterChangeListener(org.societies.api.context.event.CtxChangeEventListener, java.lang.String[], org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
 	 */
 	@Override
-	public void unregisterListener(CtxChangeEventListener listener,
-			String[] topics, CtxEntityIdentifier scope, String attrType)
-			throws CtxException {
+	public void unregisterChangeListener(final CtxChangeEventListener listener,
+			final String[] topics, final CtxEntityIdentifier scope, 
+			final String attrType) throws CtxException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (topics == null)
+			throw new NullPointerException("topics can't be null");
+		if (scope == null)
+			throw new NullPointerException("scope can't be null");
+		if (attrType == null)
+			throw new NullPointerException("attrType can't be null");
+		
 		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.context.api.event.ICtxEventMgr#post(org.societies.api.context.event.CtxChangeEvent, java.lang.String[], org.societies.context.api.event.CtxEventScope)
-	 */
-	@Override
-	public void post(CtxChangeEvent event, String[] topics,
-			CtxEventScope scope) throws CtxException {
-		
-		// TODO Take event scope into account
-		
-		for (int i = 0; i < topics.length; ++i)
-			this.doPost(event, topics[i]);
 	}
 	
 	/* (non-Javadoc)
@@ -158,24 +199,28 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 		this.bundleContext = bundleContext;
 	}
 	
-	private void doPost(CtxChangeEvent event, String topic) throws CtxEventMgrException {
+	private void postChangeEvent(CtxChangeEvent event, String[] topics) throws CtxEventMgrException {
 		
-		if (this.eventAdmin == null)
-			throw new CtxEventMgrException("Could not send context event to topic '"
-					+ topic + "': OSGi EventAdmin service is not available");
+		for (int i = 0; i < topics.length; ++i) {
+			
+			if (this.eventAdmin == null)
+				throw new CtxEventMgrException("Could not send context event to topic '"
+						+ topics[i] + "': OSGi EventAdmin service is not available");
 		
-		final Map<String, Object> props = new HashMap<String, Object>();
-		// TODO Add ctx event constants
-		props.put("id", event.getId());
-		props.put("idString", event.getId().toString());
-		if (LOG.isDebugEnabled()) 
-			LOG.debug("Sending context event to topic '" + topic + "'"
-					+ " with properties '" + props + "'");
-		this.eventAdmin.postEvent(new Event(topic, props));
+			final Map<String, Object> props = new HashMap<String, Object>();
+			// TODO Add ctx event constants
+			props.put("id", event.getId());
+			props.put("idString", event.getId().toString());
+			if (LOG.isDebugEnabled()) 
+				LOG.debug("Sending context event to topic '" + topics[i] + "'"
+						+ " with properties '" + props + "'");
+			this.eventAdmin.postEvent(new Event(topics[i], props));
+		}
 	}
 	
 	private class CtxChangeEventHandler implements EventHandler {
 
+		/** The listener to forward CtxChangeEvents. */
 		private final CtxChangeEventListener listener;
 		
 		private CtxChangeEventHandler(CtxChangeEventListener listener) {
@@ -201,7 +246,7 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 			else if (CtxChangeEventTopic.REMOVED.equals(topic))
 				this.listener.onRemoval(ctxChangeEvent);
 			else
-				LOG.warn("Unexpected context change event topic name: " + topic);
+				LOG.warn("Unexpected context change event topic: '" + topic + "'");
 		}
 	}
 }
