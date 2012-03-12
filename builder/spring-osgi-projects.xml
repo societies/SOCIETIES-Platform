@@ -87,6 +87,8 @@
 		</module>
 		<module>../platform-infrastructure/service-lifecycle/platform-webapp/
 		</module>
+		<module>../platform-infrastructure/service-lifecycle/sl-comms-mgr/
+		</module>
 
 		<!-- <module>../platform-infrastructure/comms-frwk/ClientCommunicationMgr</module> -->
 
