@@ -11,11 +11,10 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
 	
-	<osgi:service ref="CalcServiceRemote" interface="org.societies.example.calculator.ICalcRemote" />
+	<osgi:service ref="ServiceDiscoveryRemote" interface="org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote" />
 	
-	<osgi:reference id="CommManagerBundle" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
-	<osgi:reference id="FortuneCookieBundle" interface="org.societies.example.fortunecookie.IWisdom"/>
-	<osgi:reference id="CalculatorBundle" interface="org.societies.example.calculator.ICalc"/>
-	<osgi:reference id="ComplexBundle" interface="org.societies.example.complexservice.IComplexService"/>
-
+  		
+	<osgi:reference id="CommManagerBundle" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="0..1" />
+	<osgi:reference id="ServiceDiscoveryBundle" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery" cardinality="0..1"/>
+	
 </beans>

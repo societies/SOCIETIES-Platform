@@ -19,20 +19,20 @@
 <!-- Required for Async processing -->
   <tx:annotation-driven />
   
-  <bean id="CommsServerManager" 
-  		class="org.societies.comm.examples.commsmanager.impl.CommsServer"
-  		depends-on="CommManagerBundle, FortuneCookieBundle, CalculatorBundle, ComplexBundle" 
+  <bean id="SLMCommsManager" 
+  		class="org.societies.slm.commsmanager.CommsServer"
+  		depends-on="CommManagerBundle,ServiceDiscoveryBundle" 
   		init-method="InitService">
   		<property name="commManager" ref="CommManagerBundle"/>
-  		<property name="fcGenerator" ref="FortuneCookieBundle"/>
-  		<property name="calcService" ref="CalculatorBundle"/>
-  		<property name="complexSvc" ref="ComplexBundle"/>
+  		<property name="serviceDiscovery" ref="ServiceDiscoveryBundle"/> 
   </bean>
-
-  <bean id="CalcServiceRemote" 
-  		class="org.societies.comm.examples.commsmanager.impl.CommsClient" 
+  
+   <bean id="ServiceDiscoveryRemote" 
+  		class="org.societies.slm.commsmanager.CommsClient" 
   		depends-on="CommManagerBundle" 
   		init-method="InitService" >
   		<property name="commManager" ref="CommManagerBundle"/>
   </bean>
+    
+
 </beans>
