@@ -27,7 +27,7 @@ package org.societies.api.personalisation.model;
 import java.util.List;
 
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
 /**

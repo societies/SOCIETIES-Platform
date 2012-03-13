@@ -28,7 +28,7 @@ import java.util.Date;
 
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
 
@@ -51,7 +51,7 @@ public interface IUserPreferenceMergingManager{
 	 * @param serviceId
 	 * @param action
 	 */
-	public void explicitlyTriggerLearning(Date date, IServiceResourceIdentifier serviceId, IAction action);
+	public void explicitlyTriggerLearning(Date date, ServiceResourceIdentifier serviceId, IAction action);
 
 	/**
 	 * 
@@ -60,7 +60,7 @@ public interface IUserPreferenceMergingManager{
 	 * @param serviceId
 	 * @param action
 	 */
-	public void explicitlyTriggerLearning(EntityIdentifier dpi, Date date, IServiceResourceIdentifier serviceId, IAction action);
+	public void explicitlyTriggerLearning(EntityIdentifier dpi, Date date, ServiceResourceIdentifier serviceId, IAction action);
 
 
 
@@ -78,6 +78,6 @@ public interface IUserPreferenceMergingManager{
 	 * @param serviceType
 	 * @param prefName
 	 */
-	public void sendEvent(EntityIdentifier dpi, IServiceResourceIdentifier serviceID, String serviceType, String prefName);
+	public void sendEvent(EntityIdentifier dpi, ServiceResourceIdentifier serviceID, String serviceType, String prefName);
 
 }

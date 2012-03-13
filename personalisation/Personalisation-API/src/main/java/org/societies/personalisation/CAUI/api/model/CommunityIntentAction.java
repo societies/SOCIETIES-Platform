@@ -29,7 +29,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
 
 
 /**
@@ -141,13 +142,13 @@ public class CommunityIntentAction implements ICommunityIntentAction{
 	}
 
 	@Override
-	public IServiceResourceIdentifier getServiceID() {
+	public ServiceResourceIdentifier getServiceID() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void setServiceID(IServiceResourceIdentifier arg0) {
+	public void setServiceID(ServiceResourceIdentifier arg0) {
 		// TODO Auto-generated method stub
 		
 	}
