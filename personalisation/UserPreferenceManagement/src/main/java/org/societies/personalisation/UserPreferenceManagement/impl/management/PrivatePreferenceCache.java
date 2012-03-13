@@ -33,7 +33,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceManagement.impl.Tools;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 
@@ -100,7 +100,7 @@ public class PrivatePreferenceCache {
 		}
 		return this.getPreference(id);
 	}
-	public IPreferenceTreeModel getPreference(String serviceType, IServiceResourceIdentifier serviceID, String preferenceName){
+	public IPreferenceTreeModel getPreference(String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
 		if (serviceType==null){
 			this.logging.debug("request to get preference with null serviceType, returning empty model");
 			return null;
@@ -150,7 +150,7 @@ public class PrivatePreferenceCache {
 		}
 	}
 
-	public void deletePreference(IIdentity dpi, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName){
+	public void deletePreference(IIdentity dpi, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
 		PreferenceDetails details = new PreferenceDetails(serviceType, serviceID, preferenceName);
 		CtxIdentifier id = this.registry.getCtxID(details);
 		if (id==null){
@@ -176,7 +176,7 @@ public class PrivatePreferenceCache {
 			storer.storeRegistry(dpi, registry);
 		}		
 	}
-	public List<String> getPreferenceNamesofService(String serviceType, IServiceResourceIdentifier serviceID){
+	public List<String> getPreferenceNamesofService(String serviceType, ServiceResourceIdentifier serviceID){
 		return this.registry.getPreferenceNamesofService(serviceType, serviceID);
 	}
 	

@@ -31,7 +31,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
 /**
@@ -55,14 +55,14 @@ public class MonitoredInfo {
 		}
 	}*/
 	
-	public void addInfo(String serviceType, IServiceResourceIdentifier serviceID, String prefName){
+	public void addInfo(String serviceType, ServiceResourceIdentifier serviceID, String prefName){
 		PreferenceDetails details = new PreferenceDetails(serviceType, serviceID, prefName);
 		if (null==lookup(serviceType, serviceID, prefName)){
 			this.list.add(details);
 		}		
 	}
 	
-	public PreferenceDetails lookup(String serviceType, IServiceResourceIdentifier serviceID, String prefName){
+	public PreferenceDetails lookup(String serviceType, ServiceResourceIdentifier serviceID, String prefName){
 		PreferenceDetails details = new PreferenceDetails(serviceType, serviceID, prefName);
 		Iterator<PreferenceDetails> i = this.list.iterator();
 		while (i.hasNext()){
@@ -93,7 +93,7 @@ public class MonitoredInfo {
 	}
 
 	
-	public void deleteInfo (String serviceType, IServiceResourceIdentifier serviceID){
+	public void deleteInfo (String serviceType, ServiceResourceIdentifier serviceID){
 		Iterator<PreferenceDetails> i = this.list.iterator();
 		
 		while (i.hasNext()){
