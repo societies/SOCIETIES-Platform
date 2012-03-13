@@ -31,6 +31,7 @@
  */
 package org.societies.api.internal.cis.management;
 
+@Deprecated
 public class ServiceSharingRecord {
 	
 	public ServiceSharingRecord (){}

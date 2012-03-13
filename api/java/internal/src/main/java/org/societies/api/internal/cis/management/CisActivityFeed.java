@@ -32,7 +32,7 @@
  */
 package org.societies.api.internal.cis.management;
 
-
+@Deprecated
 public class CisActivityFeed {
 	public CisActivity[] activities;
 	public void getActivities(String CssId, String timePeriod){};

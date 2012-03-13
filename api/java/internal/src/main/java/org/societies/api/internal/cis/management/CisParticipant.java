@@ -31,6 +31,7 @@ package org.societies.api.internal.cis.management;
  * @author Thomas Vilarinho (Sintef)
 */
 
+@Deprecated
 public class CisParticipant {
 	
 	public enum MembershipType {
