@@ -6,20 +6,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-import org.societies.platform.FacebookConn.Connector;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.societies.platform.FacebookConn.FacebookConnector;
+import org.societies.platform.FacebookConn.SocialConnector;
 import org.societies.platform.FacebookConn.exeptions.MissingTokenExeptions;
-import org.springframework.web.context.request.WebRequest;
 
-import com.restfb.Connection;
-import com.restfb.DefaultFacebookClient;
 import com.restfb.DefaultWebRequestor;
 import com.restfb.FacebookClient;
 import com.restfb.Parameter;
 import com.restfb.WebRequestor;
 import com.restfb.WebRequestor.Response;
-import com.restfb.types.Post;
 
 
 
@@ -29,21 +28,25 @@ public class FacebookConnectorImpl implements FacebookConnector {
 	private String 				access_token = null;
 	private String 				identity	 = null;
 	private String 				name;
+	private String 				id;
 	
 	private List<Object>		parameters;
 	private FacebookClient 		facebookClient;
 	private int					maxPostLimit = 50;
-	
+	private long				tokenExpiration=0;
 	
 	public FacebookConnectorImpl (String access_token, String identity){
 		
 		this.identity		= identity;
 		this.access_token	= access_token;
-		this.name 			= Connector.FACEBOOK_CONN;
-		
+		this.name 			= SocialConnector.FACEBOOK_CONN;
+		this.id				= this.name + "_" + UUID.randomUUID();
 		
 	}
 	
+	public String getID(){
+		return this.id;
+	}
 	
 	public void setToken(String access_token) {
 		this.access_token = access_token;
@@ -125,16 +128,88 @@ public class FacebookConnectorImpl implements FacebookConnector {
 				opt += "&" +p.name +"=" + p.value;
 			}
 		}
-		return "https://graph.facebook.com/"+path+"?access_token="+access_token+opt ;
+		 if (path.equals(FEED))
+			 		return "https://graph.facebook.com/me/"+path+"?access_token="+access_token+opt;
+			 	else
+			 		return "https://graph.facebook.com/"+path+"?access_token="+access_token+opt ;
 	}
 
 
 	public void resetParameters() {
 		parameters = null;
 	}
-	
-	
-	
+
 	
 
+	public JSONObject getUserProfile() {
+		JSONObject profile = null;
+		try {
+			profile = new JSONObject(getSocialData(ME));
+		} 
+		catch (MissingTokenExeptions e) {
+			e.printStackTrace();
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		} 
+		return profile;
+	}
+
+	
+	public JSONObject getUserFriends() {
+		JSONObject users= null;
+		try {
+			users = new JSONObject(getSocialData(FRIENDS));
+		} 
+		catch (MissingTokenExeptions e) {
+			e.printStackTrace();
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		} 
+		
+		return users;
+	}
+
+	public JSONObject getUserActivities() {
+		JSONObject users= null;
+		try {
+			users = new JSONObject(getSocialData(FEED));
+		} 
+		catch (MissingTokenExeptions e) {
+			e.printStackTrace();
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		} 
+		
+		return users;
+	}
+	
+
+	public JSONObject getUserGroups() {
+		JSONObject groups= null;
+		try {
+			groups = new JSONObject(getSocialData(GROUPS));
+		} 
+		catch (MissingTokenExeptions e) {
+			e.printStackTrace();
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		} 
+		
+		return groups;
+	}
+
+	public long getTokenExpiration() {
+		return tokenExpiration;
+	}
+	
+	public void setTokenExpiration(long expiration){
+		this.tokenExpiration = expiration;
+	}
+
+	
+	
 }
