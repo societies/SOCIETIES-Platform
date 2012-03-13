@@ -32,6 +32,7 @@
 package org.societies.api.internal.cis.management;
 
 
+
 import org.societies.api.internal.cis.management.CisRecord;
 import java.util.List;
 

@@ -33,6 +33,7 @@ package org.societies.api.internal.cis.management;
  * @version 0
  */
 
+import java.util.List;
 import java.util.Set;
 
 import org.societies.api.internal.cis.collaboration.IServiceSharingRecord;
@@ -117,6 +118,7 @@ public class CisRecord {
 		this.password = password;
 		this.sharedServices = sharedServices;
 	}
+	
 
 	 // hash code and equals using cisId and host
 
