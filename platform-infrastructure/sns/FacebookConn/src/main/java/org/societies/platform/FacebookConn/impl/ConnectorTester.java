@@ -1,7 +1,7 @@
 package org.societies.platform.FacebookConn.impl;
 
 
-import org.societies.platform.FacebookConn.Connector;
+import org.societies.platform.FacebookConn.SocialConnector;
 import org.societies.platform.FacebookConn.FacebookConnector;
 import org.societies.platform.FacebookConn.exeptions.MissingTokenExeptions;
 
@@ -10,16 +10,17 @@ import org.societies.platform.FacebookConn.exeptions.MissingTokenExeptions;
 public class ConnectorTester {
 
 	/**
-	 * @param args
+	 * to get the token there is right now a cloud API in 
+	 * http://wd.teamlife.it/fbconnector.php that allows to get the access token
 	 */
 	public static void main(String[] args) {
-		String access_token = "AAAFPIhZAkC90BACBKLvSePRQ58AKIRSicS3EpGOmhfUMeQSpDcjlo5kTpHs2Xl2oG1igLIMpZAYpNNOhdGSDQ4tpkNn1VZCoRG8NJdR0AZDZD";
-		Connector connector = new FacebookConnectorImpl(access_token,null);
+		String access_token = "AAAFPIhZAkC90BAI6gXREctk3mtdzoSHGAV1ElowxmyEbDWMAnq0zfzsfaLXFGtEt7bUezAZCKaXJFTIpsdblZCG2DUTXY31VAZAxXIprMAZDZD";
+		SocialConnector connector = new FacebookConnectorImpl(access_token,null);
 		
 		try {
 			
 			
-			String str = connector.getSocialData(FacebookConnector.CHECKINS);
+			String str = connector.getSocialData(FacebookConnector.FEED);
 			System.out.println("FACEBOOK DATA:");
 			
 			System.out.println(str);

@@ -3,14 +3,14 @@ package org.societies.platform.FacebookConn.impl;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.societies.platform.FacebookConn.Connector;
+import org.societies.platform.FacebookConn.SocialConnector;
 
 public class FacebookConnectorTest extends TestCase{
 
 	@Test
 	public void test() {
-		Connector facebook = new FacebookConnectorImpl("", "");
-		assertTrue(facebook.getConnectorName(), facebook.getConnectorName()==Connector.FACEBOOK_CONN);
+		SocialConnector facebook = new FacebookConnectorImpl("", "");
+		assertTrue(facebook.getConnectorName(), facebook.getConnectorName()==SocialConnector.FACEBOOK_CONN);
 		
     
 	}
