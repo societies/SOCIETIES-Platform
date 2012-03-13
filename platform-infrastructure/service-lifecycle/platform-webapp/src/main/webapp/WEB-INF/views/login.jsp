@@ -24,7 +24,7 @@
 
 <body>
 <h1>${message}</h1>
-	<h3>Login to your Societies account</h3>
+	<h3>please user below user name and password</h3>
 	 
 	<FONT color="blue">
 
