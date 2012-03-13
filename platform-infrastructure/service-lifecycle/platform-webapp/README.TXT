@@ -19,10 +19,10 @@ follow the few lines of guidelines as below.
 	1. org.springframework.osgi.web-1.2.1.jar
 	2. com.springsource.javax.validation-1.0.0.GA.jar
 	
-	these dep jars are already configured in maven pom file, 
+	these dependency jars are already configured in maven pom file, 
 	hence it will be downloaded to your local maven repository while maven build
 	
-3. Build the project as normal using mvn clean install and deploy the the war file to 
+3. Build the project as normal using mvn clean install and deploy the war file to 
 	pickup directory
 	
 	goto web browser and type http://localhost:8080/societies/login.html to start the web app
