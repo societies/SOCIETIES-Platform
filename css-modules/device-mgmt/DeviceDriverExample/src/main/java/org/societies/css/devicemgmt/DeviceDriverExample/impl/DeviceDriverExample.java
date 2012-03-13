@@ -40,9 +40,9 @@ import org.slf4j.LoggerFactory;
 
 import org.societies.api.internal.css.devicemgmt.IDeviceManager;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
-import org.societies.comm.xmpp.event.EventFactory;
-import org.societies.comm.xmpp.event.EventStream;
-import org.societies.comm.xmpp.event.InternalEvent;
+//import org.societies.comm.xmpp.event.EventFactory;
+//import org.societies.comm.xmpp.event.EventStream;
+//import org.societies.comm.xmpp.event.InternalEvent;
 import org.societies.css.devicemgmt.DeviceDriverExample.ControllerWs;
 
 
@@ -72,7 +72,7 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 	
 	private LightSensor lightSensor;
 	
-	private EventStream myStream;
+	//private EventStream myStream;
 	
 	private EventAdmin eventAdmin;
 	
@@ -174,31 +174,43 @@ public class DeviceDriverExample implements ControllerWs, BundleContextAware{
 		
 		this.lightLevel = lightLevel;
 
-		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% sending event by eventAdmin");
-		Dictionary<String, Long> eventAdminDic = new Hashtable<String, Long>();
-		
-		eventAdminDic.put("lightLevel", lightLevel);
+		if (deviceMacAddressList.contains(deviceMacAddress))
+		{
+			LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% sending event by eventAdmin");
+			Dictionary<String, Object> eventAdminDic = new Hashtable<String, Object>();
+			
+			eventAdminDic.put("lightLevel", lightLevel);
+			eventAdminDic.put("macAddress", deviceMacAddress);
+			
+			
+			//LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EVENT_TOPIC Value: " + EventConstants.EVENT_TOPIC);
+			//LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EVENT_FILTER Value: " + EventConstants.EVENT_FILTER);
+			
+			eventAdmin.sendEvent(new Event("LightSensorEvent", eventAdminDic));
 
-		eventAdmin.sendEvent(new Event("LightSensorEvent", eventAdminDic));
-
-		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% event sent by eventAdmin");
+			LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% event sent by eventAdmin");
+		}
+		else
+		{
+			LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% The device with a MAC Address " + deviceMacAddress + " doesn't exist");
+		}
 		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% sending event by Alec's eventing mecanism");
-		myStream = EventFactory.getStream("lightLevel");
-
-		Map<String, Long> dic = new HashMap<String, Long>();
-		
-		dic.put("lightLevel", lightLevel);
-		
-		InternalEvent myEvent = new InternalEvent(this, dic);
-		
-		LOG.info("DeviceDriverExample info:  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% myEvent.toString()" + myEvent.toString());
-
-		myStream.multicastEvent(myEvent);
-		
-		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% event sent by Alec's eventing mecanism");
+//		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% sending event by Alec's eventing mecanism");
+//		myStream = EventFactory.getStream("lightLevel");
+//
+//		Map<String, Long> dic = new HashMap<String, Long>();
+//		
+//		dic.put("lightLevel", lightLevel);
+//		
+//		InternalEvent myEvent = new InternalEvent(this, dic);
+//		
+//		LOG.info("DeviceDriverExample info:  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% myEvent.toString()" + myEvent.toString());
+//
+//		myStream.multicastEvent(myEvent);
+//		
+//		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% event sent by Alec's eventing mecanism");
 		
 	}
 }

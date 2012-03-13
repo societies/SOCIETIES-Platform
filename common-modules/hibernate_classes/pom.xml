@@ -133,8 +133,6 @@
 							org.hibernate.cfg,
 							org.hibernate.cfg.*,
 							javax.persistence,
-							org.dom4j,
-							org.dom4j.*,
 							javax.annotation.*,
 							javax.annotation.security.*,
 							javax.persistence.*,

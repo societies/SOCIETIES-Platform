@@ -87,6 +87,8 @@
 		</module>
 		<module>../platform-infrastructure/service-lifecycle/platform-webapp/
 		</module>
+		<module>../platform-infrastructure/service-lifecycle/sl-comms-mgr/
+		</module>
 
 		<!-- <module>../platform-infrastructure/comms-frwk/ClientCommunicationMgr</module> -->
 
@@ -108,13 +110,6 @@
 		<!-- <module>../cis-modules/cis-management/CommunityXEP</module> <module>../cis-modules/cis-management/CommunityServiceBundle</module> -->
 
 
-		<!-- CSS Mgmt -->
-		<module>../css-modules/css-mgmt/css-manager-cloud/css-manager-cloud/
-		</module>
-		<module>../css-modules/css-comm-mgmt/css-communication-manager/
-		</module>
-		<!-- <module>../css-modules/css-ser-registry</module> -->
-
 		<!-- Device Mgmt -->
 		<module>../css-modules/device-mgmt/devicemanager/</module>
 		<module>../css-modules/device-mgmt/DeviceRegistry/</module>
@@ -126,8 +121,8 @@
 		</module>
 		<module>../intelligent-community-orchestration/CommunityLifecycleManagement
 		</module>
-		<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser
-		</module>
+		<!--<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser
+		</module>-->
 
 		<!-- Context Management -->
 

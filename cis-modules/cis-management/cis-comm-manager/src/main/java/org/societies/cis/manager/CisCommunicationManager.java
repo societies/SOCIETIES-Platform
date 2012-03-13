@@ -176,10 +176,10 @@ public class CisCommunicationManager implements CisCommunicationManagerInterface
 				for (String jid : participants) {
 					Participant p = new Participant();
 					p.setJid(jid);
-					if (leaders.contains(jid))
+					/*if (leaders.contains(jid))
 						p.setRole("leader");
 					else
-						p.setRole("participant");
+						p.setRole("participant");*/
 					who.getParticipant().add(p);
 				}
 				result.setWho(who);

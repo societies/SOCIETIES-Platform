@@ -44,6 +44,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 	<!-- All Context Management projects to be included in nightly builds -->
 	<modules>
 		<module>api</module>
+		<module>context-event-mgmt</module>
 		<module>UserContextDBManagement</module>
 		<module>UserContextHistoryManagement</module>
 		<module>ContextBroker</module>
