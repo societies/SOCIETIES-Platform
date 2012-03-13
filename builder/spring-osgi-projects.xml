@@ -59,7 +59,8 @@
 
 		<!-- Personalisation -->
 
-		<module>../personalisation</module>
+
+		<!-- <module>../personalisation</module> TEMPORARILY REMOVED until refactoring of ServiceResourceIdentifier finishes -->
 
 
 		<!-- Platform Infrastructure -->
