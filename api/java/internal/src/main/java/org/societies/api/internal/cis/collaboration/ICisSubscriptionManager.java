@@ -36,10 +36,10 @@ package org.societies.api.internal.cis.collaboration;
 
 
 public interface ICisSubscriptionManager {
-	Boolean addSubscriptionRecord(CisSubscriptionRecord record);
-	Boolean updateSubscriptionRecord(CisSubscriptionRecord record);
-	Boolean deleteSubscriptionRecord(CisSubscriptionRecord record);
-	CisSubscriptionRecord getSubscriptionRecord(String cssId, String cisId);
-	CisSubscriptionRecord[] getSubscriptionRecords(String cssId);
+	Boolean addSubscriptionRecord(ICisSubscriptionRecord record);
+	Boolean updateSubscriptionRecord(ICisSubscriptionRecord record);
+	Boolean deleteSubscriptionRecord(ICisSubscriptionRecord record);
+	ICisSubscriptionRecord getSubscriptionRecord(String cssId, String cisId);
+	ICisSubscriptionRecord[] getSubscriptionRecords(String cssId);
 
 }

@@ -36,9 +36,12 @@ package org.societies.api.internal.cis.management;
 import java.util.List;
 import java.util.Set;
 
+import org.societies.api.internal.cis.collaboration.IServiceSharingRecord;
 
+
+@Deprecated
 public class CisRecord {
-	public CisActivityFeed feed;
+	public ICisActivityFeed feed;
 	public String ownerCss;
 	public String membershipCriteria;
 	public String cisId;
@@ -52,14 +55,14 @@ public class CisRecord {
 	public Set<CisParticipant> membersCss;
 	private String password = "none";
 	private String host = "none";
-	public Set<ServiceSharingRecord> sharedServices;
+	public Set<IServiceSharingRecord> sharedServices;
 	
 
 	
-	public CisRecord(CisActivityFeed feed, String ownerCss,
+	public CisRecord(ICisActivityFeed feed, String ownerCss,
 			String membershipCriteria, String cisId, String permaLink,
 			Set<CisParticipant> membersCss, String password, String host,
-			Set<ServiceSharingRecord> sharedServices) {
+			Set<IServiceSharingRecord> sharedServices) {
 		super();
 		this.feed = feed;
 		this.ownerCss = ownerCss;
@@ -79,10 +82,10 @@ public class CisRecord {
 	 */
 	
 	@Deprecated
-	public CisRecord(CisActivityFeed feed, String ownerCss,
+	public CisRecord(ICisActivityFeed feed, String ownerCss,
 			String membershipCriteria, String cisId, String permaLink,
 			String[] membersCss, String password, String host,
-			Set<ServiceSharingRecord> sharedServices) {
+			Set<IServiceSharingRecord> sharedServices) {
 		super();
 		this.feed = feed;
 		this.ownerCss = ownerCss;
@@ -101,10 +104,10 @@ public class CisRecord {
 	 */
 	
 	@Deprecated
-	public CisRecord(CisActivityFeed feed, String ownerCss,
+	public CisRecord(ICisActivityFeed feed, String ownerCss,
 			String membershipCriteria, String cisId, String permaLink,
 			String[] membersCss, String password,
-			Set<ServiceSharingRecord> sharedServices) {
+			Set<IServiceSharingRecord> sharedServices) {
 		super();
 		this.feed = feed;
 		this.ownerCss = ownerCss;
@@ -115,6 +118,7 @@ public class CisRecord {
 		this.password = password;
 		this.sharedServices = sharedServices;
 	}
+	
 
 	 // hash code and equals using cisId and host
 
