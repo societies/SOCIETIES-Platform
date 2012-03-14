@@ -36,8 +36,8 @@ for that reason, Im defining a simpler version here initially.
  */
   -->
 
-<xs:schema targetNamespace='http://societies.org/activity'
-	elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://societies.org/activity">
+<xs:schema targetNamespace='http://societies.org/api/schema/activity'
+	elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://societies.org/api/schema/activity">
 	
 	
 	  <xs:complexType name="Activity">

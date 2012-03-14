@@ -24,7 +24,7 @@
  */
 
 
-package org.societies.api.internal.cis.management;
+package org.societies.cis.manager;
 
 /**
  * Stores meta data relevant for a CIS.
@@ -33,15 +33,15 @@ package org.societies.api.internal.cis.management;
  * @version 0
  */
 
-import java.util.List;
+
 import java.util.Set;
 
-import org.societies.api.internal.cis.collaboration.IServiceSharingRecord;
+import org.societies.api.cis.collaboration.IServiceSharingRecord;
 
 
-@Deprecated
+
 public class CisRecord {
-	public ICisActivityFeed feed;
+	public CisActivityFeed feed;
 	public String ownerCss;
 	public String membershipCriteria;
 	public String cisId;
@@ -59,7 +59,7 @@ public class CisRecord {
 	
 
 	
-	public CisRecord(ICisActivityFeed feed, String ownerCss,
+	public CisRecord(CisActivityFeed feed, String ownerCss,
 			String membershipCriteria, String cisId, String permaLink,
 			Set<CisParticipant> membersCss, String password, String host,
 			Set<IServiceSharingRecord> sharedServices) {
@@ -77,48 +77,9 @@ public class CisRecord {
 		this.fullJid = cisId + "." + host;
 	}
 	
-	/**
-	 * @deprecated  Replaced membersCss from String to CisParticipants type
-	 */
+
 	
-	@Deprecated
-	public CisRecord(ICisActivityFeed feed, String ownerCss,
-			String membershipCriteria, String cisId, String permaLink,
-			String[] membersCss, String password, String host,
-			Set<IServiceSharingRecord> sharedServices) {
-		super();
-		this.feed = feed;
-		this.ownerCss = ownerCss;
-		this.membershipCriteria = membershipCriteria;
-		this.cisId = cisId;
-		this.permaLink = permaLink;
-		//this.membersCss = membersCss;
-		this.password = password;
-		this.host = host;
-		this.sharedServices = sharedServices;
-	}
-	
-	
-	/**
-	 * @deprecated  Replaced by constructor which has the new host field and replaced membersCss from String to CisParticipants type
-	 */
-	
-	@Deprecated
-	public CisRecord(ICisActivityFeed feed, String ownerCss,
-			String membershipCriteria, String cisId, String permaLink,
-			String[] membersCss, String password,
-			Set<IServiceSharingRecord> sharedServices) {
-		super();
-		this.feed = feed;
-		this.ownerCss = ownerCss;
-		this.membershipCriteria = membershipCriteria;
-		this.cisId = cisId;
-		this.permaLink = permaLink;
-		//this.membersCss = membersCss;
-		this.password = password;
-		this.sharedServices = sharedServices;
-	}
-	
+
 
 	 // hash code and equals using cisId and host
 
