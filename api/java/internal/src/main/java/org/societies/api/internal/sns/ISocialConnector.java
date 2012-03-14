@@ -1,4 +1,4 @@
-package org.societies.platform.FacebookConn;
+package rg.societies.api.internal.sns;
 
 import java.util.Map;
 
