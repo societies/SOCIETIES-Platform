@@ -18,5 +18,6 @@
 	<!-- Get a reference to Policy Negotiator -->
 	<!-- Security Group Manager and Policy Negotiator depend on each other => use cardinality="0..1" -->
 	<osgi:reference id="NegotiationProvider"  interface="org.societies.api.internal.security.policynegotiator.INegotiationProvider" cardinality="0..1" />
+	<osgi:reference id="NegotiationRequester" interface="org.societies.api.internal.security.policynegotiator.INegotiationRequester" cardinality="0..1" />
 
 </beans>

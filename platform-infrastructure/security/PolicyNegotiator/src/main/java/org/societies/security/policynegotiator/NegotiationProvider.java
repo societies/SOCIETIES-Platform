@@ -24,20 +24,21 @@ public class NegotiationProvider implements INegotiationProvider {
 	private INegotiationProviderRemote groupMgr;
 	
 	@Autowired
-	public NegotiationProvider(ISignatureMgr signatureMgr) {
+	public NegotiationProvider(ISignatureMgr signatureMgr, INegotiationProviderRemote groupMgr) {
 		this.signatureMgr = signatureMgr;
 		LOG.debug("NegotiationProvider({})", signatureMgr);
+
+		this.groupMgr = groupMgr;
+		LOG.debug("init(): group manager = {}", groupMgr);
 	}
 	
 	@PostConstruct
-	public void init(INegotiationProviderRemote groupMgr) {
-		
-		this.groupMgr = groupMgr;
-		LOG.debug("init(): group manager = {}", groupMgr);
+	public void init() {
 		
 		LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "id"));
 		LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
 		
+		LOG.debug("init(): group manager = {}", groupMgr);
 		//groupMgr.reject(0);
 	}
 	

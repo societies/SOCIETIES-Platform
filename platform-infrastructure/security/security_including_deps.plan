@@ -11,9 +11,10 @@
 	<artifact type="bundle" name="org.societies.api.internal.societies-api-internal"/>
 	
 	<!-- Communications framework -->
-    <artifact type="bundle" name="org.societies.comm.CommonLibraries"/>
-    <artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
-    <artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubServiceBundle"/>
+	<artifact type="bundle" name="org.societies.comm.CommonLibraries"/>
+	<artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
+	<artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubServiceBundle"/>
+	<artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubClientBundle"/>
 	
 	<!-- Security -->
 	<artifact type="bundle" name="org.societies.security.secure-storage"/>
