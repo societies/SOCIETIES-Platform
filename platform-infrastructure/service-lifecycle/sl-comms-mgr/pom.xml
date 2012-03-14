@@ -90,9 +90,6 @@
 							*
 						</Import-Package>
 						<Export-Package>
-							org.societies.comm.examples.commsmanager,
-							org.societies.comm.examples.fortunecookiebean,
-							org.societies.comm.examples.calculatorbean
 						</Export-Package>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
