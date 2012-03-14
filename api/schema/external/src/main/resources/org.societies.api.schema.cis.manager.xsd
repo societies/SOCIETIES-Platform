@@ -32,18 +32,14 @@
  */
   -->
  
-<xs:schema targetNamespace='http://societies.org/manager'
-	elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://societies.org/manager">
+<xs:schema targetNamespace='http://societies.org/api/schema/cis/manager'
+	elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://societies.org/api/schema/cis/manager">
 
 	<xs:annotation>
 		<xs:documentation>
 			The protocol documented by this schema is defined in XEP-SOC1.
 		</xs:documentation>
 	</xs:annotation>
-	
-	 <xs:import
-      namespace='jabber:x:data'
-      schemaLocation='http://xmpp.org/schemas/x-data.xsd'/>
 
 	<xs:element name='communities'>
 	   <xs:complexType>

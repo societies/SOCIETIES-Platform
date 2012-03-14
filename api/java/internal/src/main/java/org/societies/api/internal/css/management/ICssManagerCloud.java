@@ -26,11 +26,12 @@
 
 package org.societies.api.internal.css.management;
 
-import org.societies.api.internal.cis.management.CisRecord;
 
+
+@Deprecated
 public interface ICssManagerCloud {
 
 	
-	public CisRecord createCIS(String cisName);
+	
 
 }
