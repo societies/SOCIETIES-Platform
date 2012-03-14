@@ -116,9 +116,9 @@ public class ServiceRegistryListener implements BundleContextAware,
 		String propKeys[] = event.getServiceReference().getPropertyKeys();
 
 		for (String key : propKeys) {
-			log.debug("Property Key" + key);
+			log.info("Property Key" + key);
 			Object value = event.getServiceReference().getProperty(key);
-			log.debug("Property value" + value);
+			log.info("Property value" + value);
 			// serviceMeteData.put(key, value);
 		}
 		log.info("Bundle Id: " + serBndl.getBundleId() + "Bundle State: "
@@ -147,6 +147,9 @@ public class ServiceRegistryListener implements BundleContextAware,
 		si.setXMPPNode(commMngr.getIdManager().getThisNetworkNode().getJid());
 		
 		ServiceImplementation servImpl = new ServiceImplementation();
+		servImpl.setServiceVersion((String)event.getServiceReference().getProperty("Bundle-Version"));
+			
+		
 		si.setServiceImpl(servImpl);
 		service.setServiceInstance(si);
 		service.setServiceStatus(ServiceStatus.STARTED);
