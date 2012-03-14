@@ -24,7 +24,7 @@
  */
 package org.societies.privacytrust.privacyprotection.datamanagement;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 
@@ -38,7 +38,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	 */
 	@Override
 	public void updatePermissions(CtxIdentifier dataId, String agreementId,
-			Identity ownerId, Identity requestorId) {
+			IIdentity ownerId, IIdentity requestorId) {
 		// TODO Auto-generated method stub
 
 	}
