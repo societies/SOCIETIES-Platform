@@ -22,62 +22,24 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.preference.api.UserPreferenceMerging;
+package org.societies.personalisation.UserPreferenceManagement.impl.merging;
 
-import java.util.Date;
-
-import org.societies.api.identity.IIdentity;
-import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 14:51:55
+ * @author Elizabeth
+ *
  */
-public interface IUserPreferenceMergingManager{
+public class ConfidenceCalculator {
 
-	/**
-	 * 
-	 * @param date
-	 */
-	public void explicitlyTriggerLearning(Date date);
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
 
-	/**
-	 * 
-	 * @param date
-	 * @param serviceId
-	 * @param action
-	 */
-	public void explicitlyTriggerLearning(Date date, ServiceResourceIdentifier serviceId, IAction action);
-
-	/**
-	 * 
-	 * @param dpi
-	 * @param date
-	 * @param serviceId
-	 * @param action
-	 */
-	public void explicitlyTriggerLearning(IIdentity dpi, Date date, ServiceResourceIdentifier serviceId, IAction action);
-
-
-
-	/**
-	 * 
-	 * @param action
-	 * @param dpi
-	 */
-	public void processActionReceived(IAction action, IIdentity dpi);
-
-	/**
-	 * 
-	 * @param dpi
-	 * @param serviceID
-	 * @param serviceType
-	 * @param prefName
-	 */
-	public void sendEvent(IIdentity dpi, ServiceResourceIdentifier serviceID, String serviceType, String prefName);
-
+	public ConfidenceCalculator(){
+		
+	}
+	
+	public int calculateConfidenceLevel(){
+		return 0;
+	}
 }

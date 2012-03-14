@@ -22,62 +22,38 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.preference.api.UserPreferenceMerging;
 
-import java.util.Date;
+package org.societies.api.internal.useragent.monitoring;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
+public class UIMEvent {
+
+    private IIdentity userId;
+    private IAction action;
+    
+    private UIMEvent(){
+        
+    }
+
+    public UIMEvent(IIdentity userId, 
+            IAction action){
+        this.userId = userId;
+        this.action = action;
+        
+    }
+
+	public IIdentity getUserId() {
+		return userId;
+	}
+
+	
+
+	public IAction getAction() {
+		return action;
+	}
 
 
-
-/**
- * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 14:51:55
- */
-public interface IUserPreferenceMergingManager{
-
-	/**
-	 * 
-	 * @param date
-	 */
-	public void explicitlyTriggerLearning(Date date);
-
-	/**
-	 * 
-	 * @param date
-	 * @param serviceId
-	 * @param action
-	 */
-	public void explicitlyTriggerLearning(Date date, ServiceResourceIdentifier serviceId, IAction action);
-
-	/**
-	 * 
-	 * @param dpi
-	 * @param date
-	 * @param serviceId
-	 * @param action
-	 */
-	public void explicitlyTriggerLearning(IIdentity dpi, Date date, ServiceResourceIdentifier serviceId, IAction action);
-
-
-
-	/**
-	 * 
-	 * @param action
-	 * @param dpi
-	 */
-	public void processActionReceived(IAction action, IIdentity dpi);
-
-	/**
-	 * 
-	 * @param dpi
-	 * @param serviceID
-	 * @param serviceType
-	 * @param prefName
-	 */
-	public void sendEvent(IIdentity dpi, ServiceResourceIdentifier serviceID, String serviceType, String prefName);
 
 }
