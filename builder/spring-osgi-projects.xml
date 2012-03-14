@@ -86,8 +86,8 @@
 		<module>../css-modules/serviceRegistry</module>
 		<module>../platform-infrastructure/service-lifecycle/service-mgmt/
 		</module>
-		<module>../platform-infrastructure/service-lifecycle/platform-webapp/
-		</module>
+		<!--<module>../platform-infrastructure/service-lifecycle/platform-webapp/
+		</module>-->
 		<module>../platform-infrastructure/service-lifecycle/sl-comms-mgr/
 		</module>
 
@@ -106,8 +106,8 @@
 		</module>
 		<module>../cis-modules/cis-discovery/</module>
 		<module>../cis-modules/cis-collaboration/</module>
-		<module>../cis-modules/cis-management/CommunityXEP</module>
-		<module>../cis-modules/cis-management/cis-comm-manager/</module>
+		<!--<module>../cis-modules/cis-management/CommunityXEP</module>
+		<module>../cis-modules/cis-management/cis-comm-manager/</module>-->
 		<!-- <module>../cis-modules/cis-management/CommunityXEP</module> <module>../cis-modules/cis-management/CommunityServiceBundle</module> -->
 
 
@@ -118,11 +118,11 @@
 	
 		<!-- Intelligent Community Orchestration -->
 
-		<module>../intelligent-community-orchestration/API
+		<!--<module>../intelligent-community-orchestration/API
 		</module>
 		<module>../intelligent-community-orchestration/CommunityLifecycleManagement
 		</module>
-		<!--<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser
+		<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser
 		</module>-->
 
 		<!-- Context Management -->

@@ -21,13 +21,13 @@
  */
 
 /**
- * @author jmgoncalves
+ * @author jmgoncalves and tcarlyle
  */
  -->
-<xs:schema targetNamespace='http://societies.org/community'
+<xs:schema targetNamespace='http://societies.org/api/schema/cis/community'
 	elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema"  
-			xmlns:tns="http://societies.org/community" 
-	xmlns="http://societies.org/community">
+			xmlns:tns="http://societies.org/api/schema/cis/community" 
+	xmlns="http://societies.org/api/schema/cis/community">
 
 	<xs:annotation>
 		<xs:documentation>
