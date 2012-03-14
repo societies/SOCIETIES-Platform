@@ -224,7 +224,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		}
 	}
 	
-	public void processPreferenceChangedEvent(IIdentity userID, ServiceResourceIdentifier serviceId, String serviceType, String preferenceName){
+	public void processPreferenceChanged(IIdentity userID, ServiceResourceIdentifier serviceId, String serviceType, String preferenceName){
 		List<CtxIdentifier> ctxIDs = this.prefMgr.getPreferenceConditions(userID, serviceType, serviceId, preferenceName);
 		for (CtxIdentifier id : ctxIDs){
 			this.mt.addInfo(id, serviceId, serviceType, preferenceName);
