@@ -30,7 +30,7 @@ import java.util.List;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 /**
@@ -57,7 +57,7 @@ public interface ICAUIPrediction {
 	 * @param userActionName    the type of the user action requested
 	 * @return					the outcome in the form of an UserIntentAction object
 	 */
-	public IUserIntentAction getCurrentIntentAction(IIdentity ownerID, IServiceResourceIdentifier serviceID, String userActionType);
+	public IUserIntentAction getCurrentIntentAction(IIdentity ownerID, ServiceResourceIdentifier serviceID, String userActionType);
 	
 	/**
 	 * Predicts next user action based on an action update. 

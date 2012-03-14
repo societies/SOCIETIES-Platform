@@ -11,20 +11,20 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.css.devicemgmt.IAction;
 import org.societies.api.css.devicemgmt.IDevice;
 import org.societies.api.css.devicemgmt.IDeviceService;
-import org.societies.comm.xmpp.event.EventFactory;
-import org.societies.comm.xmpp.event.EventStream;
-import org.societies.comm.xmpp.event.InternalEvent;
+//import org.societies.comm.xmpp.event.EventFactory;
+//import org.societies.comm.xmpp.event.EventStream;
+//import org.societies.comm.xmpp.event.InternalEvent;
 import org.springframework.context.ApplicationListener;
 
 
 
 
 
-public class DeviceManagerConsumer implements EventHandler, ApplicationListener<InternalEvent>{
+public class DeviceManagerConsumer implements EventHandler{
 
 	private IDevice deviceService;
 	
-	private EventStream myStream;
+	//private EventStream myStream;
 	
 	private Long lightLevel = new Long(0); 
 	
@@ -41,9 +41,9 @@ public class DeviceManagerConsumer implements EventHandler, ApplicationListener<
 
 		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device manager consumer constructor");
 		
-		myStream = EventFactory.getStream("lightLevel");
+		//myStream = EventFactory.getStream("lightLevel");
 		
-		myStream.addApplicationListener(this);
+		//myStream.addApplicationListener(this);
 		
 		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% post addApplicationListener ");
 	}
@@ -96,18 +96,18 @@ public class DeviceManagerConsumer implements EventHandler, ApplicationListener<
 	/* (non-Javadoc)
 	 * @see org.springframework.context.ApplicationListener#onApplicationEvent(org.springframework.context.ApplicationEvent)
 	 */
-	public void onApplicationEvent(InternalEvent event) {
-		
-		 LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% onApplicationEvent ");
-		
-		if (event.getEventNode().equals("lightLevel"))
-		{
-				eventResult = (HashMap<String, Long>)event.getEventInfo();
-			     
-				lightLevel = eventResult.get("lightLevel");
-			     LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% onApplicationEvent: "+ lightLevel);
-		}	
-	}
+//	public void onApplicationEvent(InternalEvent event) {
+//		
+//		 LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% onApplicationEvent ");
+//		
+//		if (event.getEventNode().equals("lightLevel"))
+//		{
+//				eventResult = (HashMap<String, Long>)event.getEventInfo();
+//			     
+//				lightLevel = eventResult.get("lightLevel");
+//			     LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% onApplicationEvent: "+ lightLevel);
+//		}	
+//	}
 
 	/* (non-Javadoc)
 	 * @see org.osgi.service.event.EventHandler#handleEvent(org.osgi.service.event.Event)

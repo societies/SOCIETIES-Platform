@@ -11,5 +11,25 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
 
-	<osgi:service ref="CS" interface="org.societies.example.complexservice.IComplexService" />
+	<osgi:service ref="CS" interface="org.societies.example.complexservice.IComplexService" >
+		<osgi:service-properties>
+			<entry key="TargetPlatform" value="SOCIETIES" />
+			<entry key="ServiceMetaModel" value-ref="serMetamodel" />
+		</osgi:service-properties>
+	</osgi:service>
+
+	<bean id="serMetamodel"
+		class="org.societies.api.internal.servicelifecycle.model.Service">
+		<property name="authorSignature" value="dmckitterick" />
+		<property name="CSSIDInstalled" value="MyCSSIDequalJID@mydomain.org" />
+		<property name="serviceDescription" value="Example of a complex service with complex datatypes" />
+		<property name="serviceLocation">
+			<value type="org.societies.api.internal.servicelifecycle.model.ServiceLocation">Local</value>
+		</property>
+		<property name="serviceType">
+			<value type="org.societies.api.internal.servicelifecycle.model.ServiceType">ThirdPartyService</value>
+		</property>		
+		<property name="serviceName" value="Complex Service" />
+		<property name="version" value="1a.123.aaa" />
+	</bean>
 </beans>

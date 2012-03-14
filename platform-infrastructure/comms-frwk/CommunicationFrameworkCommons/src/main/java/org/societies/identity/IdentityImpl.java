@@ -52,6 +52,27 @@ public class IdentityImpl implements IIdentity {
 		this.identifier = identifier;
 		this.domainIdentifier = domainIdentifier;
 	}
+	
+	public IdentityImpl(String fullJid) {
+		// TODO: add error checks
+		int pos = fullJid.indexOf('@');
+		if( pos >0){
+			this.type = IdentityType.CSS;
+			
+		}else{
+			pos = fullJid.indexOf('.');
+			if(pos >0){
+				
+			}else {
+				// invalid jid, TODO: send a better error message
+				throw new IllegalArgumentException("invalid jid");
+			}
+		}
+		
+		this.identifier = fullJid.substring(0,pos);
+		this.domainIdentifier = fullJid.substring(pos+1);
+		
+	}
 
 	@Override
 	public String toString() {

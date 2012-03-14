@@ -33,28 +33,36 @@ package org.societies.api.internal.cis.management;
  * @version 0
  */
 
+import java.util.List;
 import java.util.Set;
 
+import org.societies.api.internal.cis.collaboration.IServiceSharingRecord;
 
+
+@Deprecated
 public class CisRecord {
-	public CisActivityFeed feed;
+	public ICisActivityFeed feed;
 	public String ownerCss;
 	public String membershipCriteria;
 	public String cisId;
+	public String fullJid;
+
+
 	/**
 	 * permaLink is a permanent URL to this CIS. A type of CIS homepage.
 	 */
 	public String permaLink;
-	public String[] membersCss;
+	public Set<CisParticipant> membersCss;
 	private String password = "none";
 	private String host = "none";
-	public Set<ServiceSharingRecord> sharedServices;
+	public Set<IServiceSharingRecord> sharedServices;
 	
+
 	
-	public CisRecord(CisActivityFeed feed, String ownerCss,
+	public CisRecord(ICisActivityFeed feed, String ownerCss,
 			String membershipCriteria, String cisId, String permaLink,
-			String[] membersCss, String password, String host,
-			Set<ServiceSharingRecord> sharedServices) {
+			Set<CisParticipant> membersCss, String password, String host,
+			Set<IServiceSharingRecord> sharedServices) {
 		super();
 		this.feed = feed;
 		this.ownerCss = ownerCss;
@@ -65,28 +73,52 @@ public class CisRecord {
 		this.password = password;
 		this.host = host;
 		this.sharedServices = sharedServices;
+		
+		this.fullJid = cisId + "." + host;
 	}
 	
-	
 	/**
-	 * @deprecated  Replaced by constructor which has the new host field
+	 * @deprecated  Replaced membersCss from String to CisParticipants type
 	 */
 	
 	@Deprecated
-	public CisRecord(CisActivityFeed feed, String ownerCss,
+	public CisRecord(ICisActivityFeed feed, String ownerCss,
 			String membershipCriteria, String cisId, String permaLink,
-			String[] membersCss, String password,
-			Set<ServiceSharingRecord> sharedServices) {
+			String[] membersCss, String password, String host,
+			Set<IServiceSharingRecord> sharedServices) {
 		super();
 		this.feed = feed;
 		this.ownerCss = ownerCss;
 		this.membershipCriteria = membershipCriteria;
 		this.cisId = cisId;
 		this.permaLink = permaLink;
-		this.membersCss = membersCss;
+		//this.membersCss = membersCss;
+		this.password = password;
+		this.host = host;
+		this.sharedServices = sharedServices;
+	}
+	
+	
+	/**
+	 * @deprecated  Replaced by constructor which has the new host field and replaced membersCss from String to CisParticipants type
+	 */
+	
+	@Deprecated
+	public CisRecord(ICisActivityFeed feed, String ownerCss,
+			String membershipCriteria, String cisId, String permaLink,
+			String[] membersCss, String password,
+			Set<IServiceSharingRecord> sharedServices) {
+		super();
+		this.feed = feed;
+		this.ownerCss = ownerCss;
+		this.membershipCriteria = membershipCriteria;
+		this.cisId = cisId;
+		this.permaLink = permaLink;
+		//this.membersCss = membersCss;
 		this.password = password;
 		this.sharedServices = sharedServices;
 	}
+	
 
 	 // hash code and equals using cisId and host
 
@@ -139,6 +171,7 @@ public class CisRecord {
 
 
 	public void setCisId(String cisId) {
+		// TODO: double check that this is consistent with the fulljid
 		this.cisId = cisId;
 	}
 
@@ -164,6 +197,13 @@ public class CisRecord {
 
 
 
+	public String getFullJid() {
+		return fullJid;
+	}
+
+	public void setFullJid(String fullJid) {
+		this.fullJid = fullJid;
+	}
 
 	
 

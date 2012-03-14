@@ -27,7 +27,7 @@ package org.societies.personalisation.CRIST.api.model;
 import java.util.HashMap;
 
 import org.societies.api.identity.IIdentity;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
  * This class is responsible for defining the data structure of individual user
@@ -124,7 +124,7 @@ public class CRISTUserTaskModelData {
 	 * @return currentUserAction
 	 */
 	public CRISTUserAction getCurrentIntentAction(IIdentity requestor,
-			IIdentity ownerID, IServiceResourceIdentifier serviceID) {
+			IIdentity ownerID, ServiceResourceIdentifier serviceID) {
 		CRISTUserAction currentUserAction = new CRISTUserAction();
 		// TODO
 
@@ -145,7 +145,7 @@ public class CRISTUserTaskModelData {
 	 */
 	public CRISTUserSituation getCurrentUserSituation(
 			IIdentity requestor, IIdentity ownerID,
-			IServiceResourceIdentifier serviceID) {
+			ServiceResourceIdentifier serviceID) {
 		CRISTUserSituation currentUserSituation = new CRISTUserSituation();
 		// TODO
 

@@ -32,7 +32,6 @@
 package org.societies.slm.commsmanager;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -45,35 +44,28 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
-import org.societies.api.internal.servicelifecycle.model.Service;
-import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryMsgBean;
+import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryResultBean;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.internal.servicelifecycle.serviceMgmt.IServiceManagement;
-import org.societies.api.internal.servicelifecycle.serviceMgmt.ServiceStatus;
-import org.societies.slm.servicemanagement.schema.ServiceMgmtMsgBean;
-import org.societies.slm.servicemanagement.schema.ServiceMgmtResultBean;
+
 
 public class CommsServer implements IFeatureServer {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-							  Arrays.asList("http://societies.org/slm/servicemanagement/schema",
-									  		"http://societies.org/slm/serviceregistry/schema"));
+							  Arrays.asList("http://societies.org/api/schema/servicelifecycle/model",
+									  		"http://societies.org/api/schema/servicelifecycle/servicediscovery"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
-							  Arrays.asList("org.societies.slm.servicemanagement.schema",
-											"org.societies.slm.serviceregistry.schema"));
+							  Arrays.asList("org.societies.api.schema.servicelifecycle.model",
+											"org.societies.api.schema.servicelifecycle.servicediscovery"));
 	
 	//PRIVATE VARIABLES
 	private ICommManager commManager;
-	private IServiceManagement serviceManagement;
+	private IServiceDiscovery serviceDiscovery;
 	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
 
-	//PROPERTIES
-	public IServiceManagement getServiceManagement() {
-		return serviceManagement;
-	}
-
-	public void setServiceManagement(IServiceManagement serviceManagement) {
-		this.serviceManagement = serviceManagement;
-	}
 	
 	public ICommManager getCommManager() {
 		return commManager;
@@ -82,6 +74,17 @@ public class CommsServer implements IFeatureServer {
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
 	}
+	
+	public IServiceDiscovery getServiceDiscovery() {
+		return serviceDiscovery;
+		
+	}
+	
+	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
+		this.serviceDiscovery = serviceDiscovery;
+		
+	}
+	
 	
 	//METHODS
 	public CommsServer() {
@@ -110,11 +113,15 @@ public class CommsServer implements IFeatureServer {
 		return NAMESPACES;
 	}
 	
+	
+	
 	/* Put your functionality here if there is NO return object, ie, VOID  */
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
 		//CHECK WHICH END BUNDLE TO BE CALLED THAT I MANAGE
 		// --------- Service Management BUNDLE ---------
+		
+		/* Not current;y used
 		if (payload.getClass().equals(ServiceMgmtMsgBean.class)) {
 			ServiceMgmtMsgBean serviceMessage = (ServiceMgmtMsgBean) payload;
 			
@@ -134,9 +141,12 @@ public class CommsServer implements IFeatureServer {
 				break;
 				
 			default :
-				throw new Exception("No such method found");
-			}
-		}
+			*/
+			//	throw new Exception("No such method found");
+			
+		/*}
+		*/
+		
 	}
 
 	/* Put your functionality here if there IS a return object */
@@ -145,6 +155,7 @@ public class CommsServer implements IFeatureServer {
 		//CHECK WHICH END BUNDLE TO BE CALLED THAT I MANAGE
 		
 		// --------- Service Management BUNDLE ---------
+		/*
 		if (payload.getClass().equals(ServiceMgmtMsgBean.class)) {
 			
 			ServiceMgmtMsgBean serviceMessage = (ServiceMgmtMsgBean) payload;
@@ -167,12 +178,64 @@ public class CommsServer implements IFeatureServer {
 					serviceCollection = serviceManagement.findAllServices();
 					break;
 			
-			}				
+			}
+			*/
+		if (payload.getClass().equals(ServiceDiscoveryMsgBean.class)) {
 			
+			ServiceDiscoveryMsgBean serviceMessage = (ServiceDiscoveryMsgBean) payload;
+			ServiceDiscoveryResultBean serviceResult = new ServiceDiscoveryResultBean(); 
+			
+			
+			
+			Future<List<Service>> returnList = null;
+			List<Service> resultBeanList = serviceResult.getServices();
+			List<Service> resultList = null;
+			
+			try
+			{
+				switch (serviceMessage.getMethod()) {
+					case GET_LOCAL_SERVICES :
+					{
+						
+						returnList = serviceDiscovery.getLocalServices();
+						resultList =  returnList.get();
+						
+			
+						
+						if (resultList != null)
+						{
+							for (int i = 0; i < resultList.size(); i++)
+							{
+								resultBeanList.add(resultList.get(i));
+							}
+						}
+					}		
+				}
+			}catch (ServiceDiscoveryException e) {
+					e.printStackTrace();
+			} catch (Exception e) {
+					e.printStackTrace();
+			};
+				
+			//			Service tempService = new Service();
+			//			tempService.setServiceName("pretendService");
+						
+			//			resultBeanList.add(tempService);
+						
+			//			break;
+			//			}
+			//		}
+			//	}
+			//	catch (Exception e) {
+			//		e.printStackTrace();
+			//	};
+					
 			//RETURN MESSAGEBEAN RESULT
 			return serviceResult;
+			
 		}
 		
+		//throw new Exception("No such bean found");
 		//TODO: Better error handling, ie, if there is no match on the received Message Bean
 		return null;
 	}

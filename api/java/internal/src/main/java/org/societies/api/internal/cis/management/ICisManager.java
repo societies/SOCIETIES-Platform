@@ -31,9 +31,12 @@
  */
 package org.societies.api.internal.cis.management;
 
+
+
 import org.societies.api.internal.cis.management.CisRecord;
 import java.util.List;
 
+@Deprecated
 public interface ICisManager {
 	//
 	//
@@ -103,6 +106,6 @@ public interface ICisManager {
 	 * @param cisId The ID of the CIS.
 	 * @return The CISActivityFeed of the CIS.
 	 */
-	CisActivityFeed getActivityFeed(String cssId, String cisId);
+	ICisActivityFeed getActivityFeed(String cssId, String cisId);
 
 }

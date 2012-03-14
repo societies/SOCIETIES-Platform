@@ -24,15 +24,15 @@
  */
 package org.societies.api.context.event;
 
-import java.util.EventListener;
-
 /**
- * A listener for receiving {@link CtxChangeEvent CtxChangeEvents}.
+ * A listener for receiving {@link CtxChangeEvent CtxChangeEvents}. More
+ * specifically, it defines methods for reacting to the addition, update,
+ * modification or removal of context model objects.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.3
  */
-public interface CtxChangeEventListener extends EventListener {
+public interface CtxChangeEventListener extends CtxEventListener {
 	
 	/**
 	 * This method is called when a context model object is created.

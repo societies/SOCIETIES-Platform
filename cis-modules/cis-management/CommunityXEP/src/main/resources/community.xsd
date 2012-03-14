@@ -25,7 +25,9 @@
  */
  -->
 <xs:schema targetNamespace='http://societies.org/community'
-	elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://societies.org/community">
+	elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema"  
+			xmlns:tns="http://societies.org/community" 
+	xmlns="http://societies.org/community">
 
 	<xs:annotation>
 		<xs:documentation>
@@ -43,6 +45,33 @@
 			</xs:choice>
 		</xs:complexType>
 	</xs:element>
+
+
+
+	<xs:element name='participant'>
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base='empty'>
+					<xs:attribute name='jid' type='xs:string' use='required'/>
+					<xs:attribute name='role' type='tns:participantRole' use='required'/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	
+	
+	<xs:simpleType name="participantRole">
+ 		 <xs:restriction base="xs:string">
+		    <xs:enumeration value="owner"/>
+		    <xs:enumeration value="admin"/>
+		    <xs:enumeration value="participant"/>
+		    <!-- and so on ... -->
+		 </xs:restriction>
+	</xs:simpleType>
+	
+	
+	
+	
 	
 	<xs:element name='join' type='empty' />
 	<xs:element name='leave' type='empty' />
@@ -62,16 +91,7 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-	<xs:element name='participant'>
-		<xs:complexType>
-			<xs:simpleContent>
-				<xs:extension base='empty'>
-					<xs:attribute name='jid' type='xs:string' use='required'/>
-					<xs:attribute name='role' type='xs:string' use='optional'/>
-				</xs:extension>
-			</xs:simpleContent>
-		</xs:complexType>
-	</xs:element>
+
 
 	<xs:simpleType name='empty'>
 		<xs:restriction base='xs:string'>

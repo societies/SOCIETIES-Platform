@@ -34,7 +34,7 @@ package org.societies.api.internal.cis.management;
  * @author Babak Farshchian
  * @version 0
  */
-
+@Deprecated
 public class CisActivity {
 	public String verb;
 	public String actor;

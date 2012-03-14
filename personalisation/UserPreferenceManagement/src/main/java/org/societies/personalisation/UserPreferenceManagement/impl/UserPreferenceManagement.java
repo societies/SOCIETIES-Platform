@@ -41,7 +41,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceManagement.impl.evaluation.PreferenceConditionExtractor;
 import org.societies.personalisation.UserPreferenceManagement.impl.evaluation.PreferenceEvaluator;
 import org.societies.personalisation.UserPreferenceManagement.impl.evaluation.PrivateContextCache;
@@ -88,11 +88,11 @@ public class UserPreferenceManagement{
 		return this.preferenceCache;
 	}
 
-	public void removePreference(IIdentity ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName) {
+	public void removePreference(IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName) {
 		this.preferenceCache.deletePreference(ownerID, serviceType, serviceID, preferenceName);		
 	}
 
-	public IPreferenceOutcome getPreference(IIdentity ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName) {
+	public IPreferenceOutcome getPreference(IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName) {
 		if (serviceID==null){
 			logging.debug("Request for preference with null serviceID, returning empty Action");
 			return null;
@@ -123,7 +123,7 @@ public class UserPreferenceManagement{
 		return null;
 	}
 
-	public List<IPreferenceConditionIOutcomeName> getPreferenceConditions(IIdentity ownerID, String serviceType, IServiceResourceIdentifier serviceID) {
+	public List<IPreferenceConditionIOutcomeName> getPreferenceConditions(IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID) {
 		logging.debug("extracting conditions for all preferences of : "+serviceType+":"+serviceID.toString());
 		List<IPreferenceConditionIOutcomeName> list = new ArrayList<IPreferenceConditionIOutcomeName>();
 		List<String> prefnames = this.preferenceCache.getPreferenceNamesofService(serviceType, serviceID);
@@ -153,7 +153,7 @@ public class UserPreferenceManagement{
 
 
 
-	public IPreferenceOutcome reEvaluatePreferences(IIdentity ownerID, CtxAttribute attribute, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName) {
+	public IPreferenceOutcome reEvaluatePreferences(IIdentity ownerID, CtxAttribute attribute, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName) {
 		logging.debug("New context event received, requested re-evaluation of preference: ");
 		logging.debug(preferenceName+""+serviceType+":"+serviceID.toString());
 		this.contextCache.updateCache(attribute);
@@ -181,7 +181,7 @@ public class UserPreferenceManagement{
 	}
 
 	/*
-	public void updatePreference(IIdentity ownerID, IPreference preference, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName) {
+	public void updatePreference(IIdentity ownerID, IPreference preference, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName) {
 		log("Request to update preference: "+preferenceName+" of "+serviceType+":"+serviceID.toString());
 		PreferenceRetriever retr = new PreferenceRetriever(this.myContext); 
 		IPreferenceTreeModel iptm = retr.retrievePreference(serviceID, serviceType, preferenceName);
@@ -250,7 +250,7 @@ public class UserPreferenceManagement{
 		
 
 	}
-	public IPreferenceOutcome getPreference(IIdentity requestor, IIdentity owner, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName) {
+	public IPreferenceOutcome getPreference(IIdentity requestor, IIdentity owner, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName) {
 		// TODO: Need to use the AccessControl to request permission to personalise service
 		return this.getPreference(requestor, serviceType, serviceID, preferenceName);
 		
@@ -327,13 +327,13 @@ public class UserPreferenceManagement{
 
 
 	//TODO: use PrivatePreferenceCache. not PreferenceRetriever
-	public IPreferenceTreeModel getModel(IIdentity ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName){
+	public IPreferenceTreeModel getModel(IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
 		return this.preferenceCache.getPreference(serviceType, serviceID, preferenceName);
 	}
 
 
 
-	public List<CtxIdentifier> getPreferenceConditions(IIdentity ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName){
+	public List<CtxIdentifier> getPreferenceConditions(IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
 		PreferenceConditionExtractor pce = new PreferenceConditionExtractor();
 		IPreferenceTreeModel model = this.preferenceCache.getPreference(serviceType, serviceID, preferenceName);
 		if (model==null){

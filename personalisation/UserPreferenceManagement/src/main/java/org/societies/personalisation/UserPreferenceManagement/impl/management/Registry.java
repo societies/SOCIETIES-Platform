@@ -32,7 +32,7 @@ import java.util.List;
 
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 public class Registry implements Serializable{
 
@@ -54,7 +54,7 @@ public class Registry implements Serializable{
 		
 	}
 	
-	public void addPreference(String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, CtxIdentifier id){
+	public void addPreference(String serviceType, ServiceResourceIdentifier serviceID, String preferenceName, CtxIdentifier id){
 		PreferenceDetails detail = new PreferenceDetails(serviceType, serviceID, preferenceName);
 		this.mappings.put(detail, id);
 	}
@@ -65,7 +65,7 @@ public class Registry implements Serializable{
 		
 	}
 	
-	public void deletePreference(String serviceType, IServiceResourceIdentifier serviceID, String preferenceName){
+	public void deletePreference(String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
 		PreferenceDetails detail = new PreferenceDetails(serviceType, serviceID, preferenceName);
 		this.mappings.remove(detail);
 	}
@@ -86,7 +86,7 @@ public class Registry implements Serializable{
 		return null;
 	}
 	
-	public CtxIdentifier getCtxID (String serviceType, IServiceResourceIdentifier serviceID, String preferenceName){
+	public CtxIdentifier getCtxID (String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
 		PreferenceDetails details = new PreferenceDetails(serviceType, serviceID, preferenceName);
 		if (this.mappings.containsKey(details)){
 			return this.mappings.get(details);
@@ -95,7 +95,7 @@ public class Registry implements Serializable{
 	}
 	
 	
-	public List<String> getPreferenceNamesofService(String serviceType, IServiceResourceIdentifier serviceID){
+	public List<String> getPreferenceNamesofService(String serviceType, ServiceResourceIdentifier serviceID){
 		ArrayList<String> prefNames = new ArrayList<String>();
 		Enumeration<PreferenceDetails> e = this.mappings.keys();
 		while (e.hasMoreElements()){

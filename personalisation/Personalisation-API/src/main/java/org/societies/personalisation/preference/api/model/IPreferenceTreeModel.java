@@ -29,7 +29,8 @@ import java.util.Date;
 
 import javax.swing.tree.TreeModel;
 
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
 
 
 /**
@@ -65,7 +66,7 @@ public interface IPreferenceTreeModel extends TreeModel, Serializable {
 	 * model
 	 * @return	the serviceID as String
 	 */
-	public IServiceResourceIdentifier getServiceID();
+	public ServiceResourceIdentifier getServiceID();
 
 	/**
 	 * Method to retrieve the service type of the service affected by this preference
@@ -95,7 +96,7 @@ public interface IPreferenceTreeModel extends TreeModel, Serializable {
 	 * 
 	 * @param id    the serviceID
 	 */
-	public void setServiceID(IServiceResourceIdentifier id);
+	public void setServiceID(ServiceResourceIdentifier id);
 
 	/**
 	 * Method to set the serviceType of the service affected by this preference model

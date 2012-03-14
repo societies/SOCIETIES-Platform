@@ -35,7 +35,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.ContextPreferenceCondition;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceCondition;
@@ -57,13 +57,13 @@ public class Tools {
 	public String convertToKey(String serviceType, String serviceID, String preferenceName){
 		return serviceType+":"+serviceID+":"+preferenceName;
 	}
-	public String convertToKey(String serviceType, IServiceResourceIdentifier serviceID, String preferenceName){
+	public String convertToKey(String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
 		return serviceType+":"+serviceID.toString()+":"+preferenceName;
 	}
-	public String convertTokey(String serviceType, IServiceResourceIdentifier serviceID){
+	public String convertTokey(String serviceType, ServiceResourceIdentifier serviceID){
 		return serviceType+":"+serviceID.toString();
 	}
-	public IPreferenceTreeModel convertPreferenceObjToModel(IPreference p, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName){
+	public IPreferenceTreeModel convertPreferenceObjToModel(IPreference p, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
 		if (null==p){
 			log("preference object is null");
 			return null;

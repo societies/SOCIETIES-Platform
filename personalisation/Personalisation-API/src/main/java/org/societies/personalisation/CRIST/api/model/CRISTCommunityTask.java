@@ -30,7 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
 
 /**
  * This class is used to define the data structure and methods for modelling and
@@ -189,7 +190,7 @@ public class CRISTCommunityTask implements ICRISTCommunityTask {
 	}
 
 	@Override
-	public IServiceResourceIdentifier getServiceID() {
+	public ServiceResourceIdentifier getServiceID() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -207,7 +208,7 @@ public class CRISTCommunityTask implements ICRISTCommunityTask {
 	}
 
 	@Override
-	public void setServiceID(IServiceResourceIdentifier id) {
+	public void setServiceID(ServiceResourceIdentifier id) {
 		// TODO Auto-generated method stub
 
 	}

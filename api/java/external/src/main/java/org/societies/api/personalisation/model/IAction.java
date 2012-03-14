@@ -29,7 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.Serializable;
 
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
 
 
 /**
@@ -58,7 +59,7 @@ public interface IAction extends Serializable{
 	/**
 	 * @return the identifier of the service to which this action is applied to
 	 */
-	public IServiceResourceIdentifier getServiceID();
+	public ServiceResourceIdentifier getServiceID();
 	
 	/**
 	 * 
@@ -75,7 +76,7 @@ public interface IAction extends Serializable{
 	/**
 	 * @param id	the identifier of the service this action is applied to
 	 */
-	public void setServiceID(IServiceResourceIdentifier id);
+	public void setServiceID(ServiceResourceIdentifier id);
 	
 	/**
 	 * 

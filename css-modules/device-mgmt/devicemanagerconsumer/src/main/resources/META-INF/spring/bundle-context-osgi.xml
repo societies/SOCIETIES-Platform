@@ -23,11 +23,12 @@
 
 		<osgi:service ref="deviceManagerConsumer">
   			<osgi:interfaces>
-    			 <value>org.springframework.context.ApplicationListener</value>
+    			 <!-- <value>org.springframework.context.ApplicationListener</value> -->
     			 <value>org.osgi.service.event.EventHandler</value>
   			</osgi:interfaces>
   			<osgi:service-properties>
 				<entry key="event.topics" value="LightSensorEvent"/>
+				<entry key="event.filter" value="(macAddress=3b.6d.23.75)"/>
 				<entry key="org.eclipse.virgo.service.scope" value="global" />
 			</osgi:service-properties>
 		</osgi:service>
