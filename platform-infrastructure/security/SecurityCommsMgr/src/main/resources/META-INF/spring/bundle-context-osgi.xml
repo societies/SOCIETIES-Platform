@@ -13,11 +13,10 @@
 	<osgi:service ref="NegotiationProviderRemote"  interface="org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote" />
 
 	<!-- Get a reference to the Platform Comms Gateway service -->
-	<!-- Comms Gateway and Policy Negotiator depend on each other => use cardinality="0..1" -->
  	<osgi:reference id="CommsGateway" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="0..1" />	
 
 	<!-- Get a reference to Policy Negotiator -->
-	<!-- Comms Gateway and Policy Negotiator depend on each other => use cardinality="0..1" -->
+	<!-- Security Group Manager and Policy Negotiator depend on each other => use cardinality="0..1" -->
 	<osgi:reference id="NegotiationProvider"  interface="org.societies.api.internal.security.policynegotiator.INegotiationProvider" cardinality="0..1" />
 
 </beans>
