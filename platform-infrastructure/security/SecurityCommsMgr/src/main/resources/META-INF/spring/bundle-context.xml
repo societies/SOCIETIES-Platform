@@ -18,8 +18,8 @@
 	<!--context:component-scan base-package="org.societies.security.policynegotiator" /-->
 	<!--context:component-scan base-package="org.societies.security.sign" /-->
 
-	<!--bean id="SecurityCommsServerManager"
-		class="org.societies.security.commsmgr.CommsServerMgr"
+	<!--bean id="SecurityCommsServer"
+		class="org.societies.security.commsmgr.CommsServer"
 		depends-on="CommManagerBundle, NegotiationProvider, NegotiationRequester"
 		init-method="init"
 		>
@@ -28,8 +28,8 @@
         <property name="negotiationRequester" ref="NegotiationRequester"/>
 	</bean-->
 	
-	<bean id="SecurityCommsServerManager"
-		class="org.societies.security.commsmgr.CommsServerMgr"
+	<bean id="SecurityCommsServer"
+		class="org.societies.security.commsmgr.CommsServer"
 		depends-on="CommsGateway, NegotiationProvider, NegotiationRequester"
 		>
 	</bean>

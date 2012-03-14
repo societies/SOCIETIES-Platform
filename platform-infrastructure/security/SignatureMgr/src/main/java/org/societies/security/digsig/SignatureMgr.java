@@ -10,7 +10,31 @@ public class SignatureMgr implements ISignatureMgr {
 
 	@Override
 	public String signXml(String xml, String id) {
+		
 		LOG.debug("signXml({}, {})", xml, id);
+
+		/*
+		SecurityManager sm = new SecurityManager();
+		sm.
+		*/
+		
+		/*
+		try {
+			throw new Exception();
+		} catch (Exception e) {
+			StackTraceElement[] stackTrace = e.getStackTrace();
+			LOG.debug("stackTrace length = {}", stackTrace.length);
+			if (stackTrace != null) {
+				for (StackTraceElement st : stackTrace) {
+					LOG.debug(" ");
+					LOG.debug("  ClassName : {}", st.getClassName());
+					//LOG.debug("  FileName  : {}", st.getFileName());
+					//LOG.debug("  MethodName: {}", st.getMethodName());
+				}
+			}
+		}
+		*/
+		
 		return "signature";  // FIXME
 	}
 

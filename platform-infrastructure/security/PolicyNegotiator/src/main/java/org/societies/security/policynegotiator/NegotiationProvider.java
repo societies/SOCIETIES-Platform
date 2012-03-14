@@ -1,5 +1,7 @@
 package org.societies.security.policynegotiator;
 
+import java.util.concurrent.Future;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
-import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
+import org.societies.api.internal.security.policynegotiator.Sla;
 import org.societies.api.security.digsig.ISignatureMgr;
 
 @Component
@@ -18,6 +21,7 @@ public class NegotiationProvider implements INegotiationProvider {
 	private static Logger LOG = LoggerFactory.getLogger(NegotiationProvider.class);
 	
 	private ISignatureMgr signatureMgr;
+	private INegotiationProviderRemote commsGroupMgr;
 	
 	@Autowired
 	public NegotiationProvider(ISignatureMgr signatureMgr) {
@@ -26,25 +30,29 @@ public class NegotiationProvider implements INegotiationProvider {
 	}
 	
 	@PostConstruct
-	public void init() {
+	public void init(INegotiationProviderRemote commsGroupMgr) {
+		
+		this.commsGroupMgr = commsGroupMgr;
+		
 		LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "id"));
 		LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
 	}
 	
 	@Override
-	public void getPolicyOptions(INegotiationProviderCallback callback) {
-		// TODO Auto-generated method stub
+	public Future<Sla> getPolicyOptions() {
+		return null;
 	}
 
 	@Override
-	public void acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
-			boolean modified, INegotiationProviderCallback callback) {
-		// TODO Auto-generated method stub
+	public Future<Sla> acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
+			boolean modified) {
+		
+		return null;
 	}
 
 	@Override
 	public void reject(int sessionId) {
-		// TODO Auto-generated method stub
+
 		LOG.debug("reject({})", sessionId);
 	}
 }

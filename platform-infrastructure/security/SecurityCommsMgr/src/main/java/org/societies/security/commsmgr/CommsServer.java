@@ -24,9 +24,9 @@ import org.societies.security.policynegotiator.NegotiationProvider;
 import org.societies.security.policynegotiator.NegotiationRequester;
 
 @Component
-public class CommsServerMgr implements IFeatureServer {
+public class CommsServer implements IFeatureServer {
 
-	private static Logger LOG = LoggerFactory.getLogger(CommsServerMgr.class);
+	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			  Arrays.asList("http://societies.org/api/schema/security/policynegotiator"
@@ -40,7 +40,7 @@ public class CommsServerMgr implements IFeatureServer {
 	private INegotiationRequester negotiationRequester;
 	
 	@Autowired
-	public CommsServerMgr(ICommManager commManager,
+	public CommsServer(ICommManager commManager,
 			INegotiationRequester negotiationRequester,
 			INegotiationProvider negotiationProvider) {
 		
@@ -48,12 +48,14 @@ public class CommsServerMgr implements IFeatureServer {
 		this.negotiationRequester = negotiationRequester;
 		this.negotiationProvider = negotiationProvider;
 		
-		LOG.debug("CommsServerMgr({})", commManager + ", " + negotiationRequester + ", " + negotiationProvider);
+		LOG.debug("CommsServer({})", commManager + ", " + negotiationRequester + ", " + negotiationProvider);
 	}
 	
 	@PostConstruct
 	public void init() {
+		
 		LOG.debug("init(): commManager = {}", commManager.toString());
+		
 		try {
 			commManager.register(this);
 			LOG.debug("init(): commManager registered");
@@ -67,17 +69,21 @@ public class CommsServerMgr implements IFeatureServer {
 	 */
 	@Override
 	public List<String> getJavaPackages() {
+		
 		LOG.debug("getJavaPackages()");
+		
 		return PACKAGES;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.api.comm.xmpp.interfaces.IFeatureServer#getQuery(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	 * @see org.societies.api.comm.xmpp.interfaces.IFeatureServer#getQuery(
+	 * org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
 	 */
 	@Override
 	public Object getQuery(Stanza stanza, Object messageBean) throws XMPPError {
-		// TODO Auto-generated method stub
+
 		LOG.debug("getQuery()");
+		
 		return null;
 	}
 
@@ -86,26 +92,41 @@ public class CommsServerMgr implements IFeatureServer {
 	 */
 	@Override
 	public List<String> getXMLNamespaces() {
+		
 		LOG.debug("getXMLNamespaces()");
+		
 		return NAMESPACES;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.api.comm.xmpp.interfaces.IFeatureServer#receiveMessage(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	 * @see org.societies.api.comm.xmpp.interfaces.IFeatureServer#receiveMessage(
+	 * org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
 	 */
 	@Override
 	public void receiveMessage(Stanza stanza, Object messageBean) {
-		// TODO Auto-generated method stub
+
 		LOG.debug("receiveMessage({}, {})", stanza, messageBean);
 		
 		if (messageBean.getClass().equals(NegotiationProvider.class)) {
-			LOG.debug("receiveMessage(): NegotiationProvider");
 			
+			// Method parameters
 			ProviderBean providerBean = (ProviderBean) messageBean;
+			int sessionId = providerBean.getSessionId();
+			String signedPolicyOption = providerBean.getSignedPolicyOption();
+			boolean isModified = providerBean.isModified();
+			
+			LOG.debug("receiveMessage(): NegotiationProvider. Params: " + isModified + ", " +
+					sessionId + ", " + signedPolicyOption);
 			
 			switch (providerBean.getMethod()) {
+			case GET_POLICY_OPTIONS:
+				negotiationProvider.getPolicyOptions();
+				break;
+			case ACCEPT_POLICY_AND_GET_SLA:
+				negotiationProvider.acceptPolicyAndGetSla(sessionId, signedPolicyOption, isModified);
+				break;
 			case REJECT:
-				negotiationProvider.reject(providerBean.getSessionId());
+				negotiationProvider.reject(sessionId);
 				break;
 			}
 		}
@@ -115,12 +136,14 @@ public class CommsServerMgr implements IFeatureServer {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.api.comm.xmpp.interfaces.IFeatureServer#setQuery(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
+	 * @see org.societies.api.comm.xmpp.interfaces.IFeatureServer#setQuery(
+	 * org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
 	 */
 	@Override
 	public Object setQuery(Stanza stanza, Object messageBean) throws XMPPError {
-		// TODO Auto-generated method stub
+		
 		LOG.debug("setQuery()");
+		
 		return null;
 	}
 }
