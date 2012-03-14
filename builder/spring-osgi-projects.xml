@@ -86,8 +86,10 @@
 		<module>../css-modules/serviceRegistry</module>
 		<module>../platform-infrastructure/service-lifecycle/service-mgmt/
 		</module>
+		<!-- 
 		<module>../platform-infrastructure/service-lifecycle/platform-webapp/
 		</module>
+		-->
 		<module>../platform-infrastructure/service-lifecycle/sl-comms-mgr/
 		</module>
 
