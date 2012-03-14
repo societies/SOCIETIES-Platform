@@ -34,14 +34,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IIdentityManager;
-import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.personalisation.model.FeedbackEvent;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
-import org.societies.api.internal.useragent.monitoring.IInternalUserActionMonitor;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
-import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.comm.xmpp.event.InternalEvent;
@@ -53,10 +48,6 @@ import org.societies.personalisation.preference.api.model.IC45Output;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 import org.springframework.context.ApplicationListener;
-
-import sun.awt.PeerEvent;
-
-import com.sun.jndi.toolkit.ctx.ComponentContext;
 
 
 public class MergingManager implements IC45Consumer, ApplicationListener<InternalEvent>{
