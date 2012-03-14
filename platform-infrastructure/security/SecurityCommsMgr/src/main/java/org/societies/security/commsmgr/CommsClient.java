@@ -251,7 +251,7 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 		try {
 			// SEND INFORMATION QUERY - RESPONSE WILL BE IN
 			// "callback.RecieveMessage()"
-			commManager.sendMessage(stanza, "", provider);
+			commManager.sendMessage(stanza, provider);
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
 		}
