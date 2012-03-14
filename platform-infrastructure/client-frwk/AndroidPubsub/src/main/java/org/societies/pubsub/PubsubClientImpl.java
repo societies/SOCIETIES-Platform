@@ -1,14 +1,13 @@
 package org.societies.pubsub;
 
 import java.io.IOException;
-import java.util.AbstractMap;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -152,8 +151,18 @@ public class PubsubClientImpl implements org.societies.pubsub.interfaces.Pubsub,
 		
 	}
 
-	public void receiveItems(Stanza stanza, String node, List<String> items) {
-		SimpleEntry<String, List<String>> mapSimpleEntry = new AbstractMap.SimpleEntry<String, List<String>>(node, items);
+	public void receiveItems(Stanza stanza, final String node, final List<String> items) {
+		Entry<String, List<String>> mapSimpleEntry = new Entry<String, List<String>>() {
+			public String getKey() {
+				return node;
+			}
+			public List<String> getValue() {
+				return items;
+			}
+			public List<String> setValue(List<String> value) {
+				throw new UnsupportedOperationException("Immutable object.");
+			}			
+		};
 		synchronized (responses) {
 			LOG.info("receiveItems 4 id "+stanza.getId());
 			responses.put(stanza.getId(), mapSimpleEntry);
@@ -195,7 +204,7 @@ public class PubsubClientImpl implements org.societies.pubsub.interfaces.Pubsub,
 //		String returnedNode = ((SimpleEntry<String, List<XMPPNode>>)response).getKey();
 //		if (returnedNode != node)
 //			throw new CommunicationException("");
-			return ((SimpleEntry<String, List<String>>)response).getValue();
+			return ((Entry<String, List<String>>)response).getValue();
 	}
 
 	public SubscriptionParcelable subscriberSubscribe(String pubsubService, String node,

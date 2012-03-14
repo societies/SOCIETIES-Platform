@@ -2,7 +2,7 @@ package org.societies.comm.xmpp.client.impl;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.AbstractMap.SimpleEntry;
+import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -66,7 +66,7 @@ public class CallbackAdapter implements Callback {
 		
 		try {
 			Packet packet = marshaller.unmarshallIq(xml);
-			SimpleEntry<String, List<String>> nodeMap = marshaller.parseItemsResult(packet);
+			Entry<String, List<String>> nodeMap = marshaller.parseItemsResult(packet);
 			callback.receiveItems(stanzaFromPacket(packet), nodeMap.getKey(), nodeMap.getValue());
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage(), e);

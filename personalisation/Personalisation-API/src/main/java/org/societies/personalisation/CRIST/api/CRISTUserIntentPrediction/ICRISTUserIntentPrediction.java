@@ -31,7 +31,7 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.FeedbackEvent;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
 import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 
@@ -67,7 +67,7 @@ public interface ICRISTUserIntentPrediction {
 	 *  @param serviceID	- the ID of the service related to the actions upon 
 	 *  which prediction should perform
 	 */
-	public CRISTUserAction getCurrentUserIntentAction(IIdentity requestor, IIdentity ownerID, IServiceResourceIdentifier serviceID);
+	public CRISTUserAction getCurrentUserIntentAction(IIdentity requestor, IIdentity ownerID, ServiceResourceIdentifier serviceID);
 	
 	/**
 	 * This method will send user's feedback about the predicted user intent

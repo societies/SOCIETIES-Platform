@@ -34,7 +34,7 @@ import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 
@@ -79,7 +79,10 @@ public class UserPreferenceManagementTest  {
 		
 		try {
 			IAction action = new Action("volume","10");
-			action.setServiceID(new ServiceResourceIdentifier(new URI("css://mycss.com/"), "MediaPlayer"));
+			ServiceResourceIdentifier sId = new ServiceResourceIdentifier();
+			sId.setIdentifier(new URI("css://mycss.com/MediaPlayer"));
+			
+			action.setServiceID(sId);
 			action.setServiceType("media");
 			
 			Callback callback = new Callback();

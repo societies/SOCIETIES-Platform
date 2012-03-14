@@ -5,6 +5,8 @@ import static android.content.Context.BIND_AUTO_CREATE;
 import java.security.InvalidParameterException;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -28,6 +30,8 @@ import android.os.IBinder;
 import android.os.Messenger;
 
 public class ClientCommunicationMgr {
+	
+	private static Logger LOG = LoggerFactory.getLogger(ClientCommunicationMgr.class);
 	
 	private static final ComponentName serviceCN = new ComponentName("org.societies", "org.societies.AgentService"); // TODO
 
@@ -66,9 +70,13 @@ public class ClientCommunicationMgr {
 		ServiceConnection connection = new ServiceConnection() {			
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
 				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class},  new Messenger(binder));
-				agent.unregister(elementNames.toArray(new String[0]), namespaces.toArray(new String[0]));	
-				androidContext.unbindService(this);
-				androidContext.unbindService(registerConnection);
+				agent.unregister(elementNames.toArray(new String[0]), namespaces.toArray(new String[0]));
+				try {
+					androidContext.unbindService(this);
+					androidContext.unbindService(registerConnection);
+				} catch(Exception e) {
+					LOG.error("Exception while unbinding service.", e);
+				}
 			}
 			
 			public void onServiceDisconnected(ComponentName cn) {				

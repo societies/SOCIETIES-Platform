@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.societies.api.identity.IIdentity;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
 import org.societies.personalisation.CRIST.api.model.CRISTUserSituation;
 import org.societies.personalisation.CRIST.api.model.CRISTUserTask;
@@ -72,7 +72,7 @@ public interface ICRISTUserIntentTaskManager {
 	 * @param ownerID		- the ID of the owner of the current user intent action
 	 * @param serviceID		- the ID of the related service 
 	 */
-	public CRISTUserAction getCurrentIntentAction(IIdentity requestor, IIdentity ownerID, IServiceResourceIdentifier serviceID);
+	public CRISTUserAction getCurrentIntentAction(IIdentity requestor, IIdentity ownerID, ServiceResourceIdentifier serviceID);
 
 	/**
 	 * This method will retrieve the user's current action
