@@ -21,7 +21,7 @@ public class NegotiationProvider implements INegotiationProvider {
 	private static Logger LOG = LoggerFactory.getLogger(NegotiationProvider.class);
 	
 	private ISignatureMgr signatureMgr;
-	private INegotiationProviderRemote commsGroupMgr;
+	private INegotiationProviderRemote groupMgr;
 	
 	@Autowired
 	public NegotiationProvider(ISignatureMgr signatureMgr) {
@@ -30,12 +30,15 @@ public class NegotiationProvider implements INegotiationProvider {
 	}
 	
 	@PostConstruct
-	public void init(INegotiationProviderRemote commsGroupMgr) {
+	public void init(INegotiationProviderRemote groupMgr) {
 		
-		this.commsGroupMgr = commsGroupMgr;
+		this.groupMgr = groupMgr;
+		LOG.debug("init(): group manager = {}", groupMgr);
 		
 		LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "id"));
 		LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
+		
+		//groupMgr.reject(0);
 	}
 	
 	@Override
