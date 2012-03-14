@@ -86,10 +86,8 @@
 		<module>../css-modules/serviceRegistry</module>
 		<module>../platform-infrastructure/service-lifecycle/service-mgmt/
 		</module>
-		<!--<module>../platform-infrastructure/service-lifecycle/platform-webapp/
+     	<!--<module>../platform-infrastructure/service-lifecycle/platform-webapp/
 		</module>-->
-		<module>../platform-infrastructure/service-lifecycle/sl-comms-mgr/
-		</module>
 
 		<!-- <module>../platform-infrastructure/comms-frwk/ClientCommunicationMgr</module> -->
 
@@ -102,12 +100,19 @@
 		<module>../css-modules/css-mgmt/TestccsCommsMgmt</module>
 
 		<!-- CIS Mgmt -->
+		
 		<module>../cis-modules/cis-management/cis-manager/cis-manager/
 		</module>
 		<module>../cis-modules/cis-discovery/</module>
 		<module>../cis-modules/cis-collaboration/</module>
+<<<<<<< HEAD
 		<!--<module>../cis-modules/cis-management/CommunityXEP</module>
 		<module>../cis-modules/cis-management/cis-comm-manager/</module>-->
+=======
+		<!-- <module>../cis-modules/cis-management/CommunityXEP</module>
+		<module>../cis-modules/cis-management/cis-comm-manager/</module>
+		-->
+>>>>>>> refs/heads/development
 		<!-- <module>../cis-modules/cis-management/CommunityXEP</module> <module>../cis-modules/cis-management/CommunityServiceBundle</module> -->
 
 

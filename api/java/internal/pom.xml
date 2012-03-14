@@ -32,12 +32,12 @@
 
 	<dependencies>
 		<!-- add your dependencies here -->
-		
-<!-- 		<dependency>
+
+		<dependency>
 			<groupId>org.societies.api.schema.internal</groupId>
 			<artifactId>societies-api-schema-internal</artifactId>
 			<version>${release.version}</version>
-		</dependency> -->
+		</dependency>
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
@@ -83,9 +83,12 @@
 				<configuration>
 					<instructions>
 						<!-- the API will export all interfaces packages for the rest of modules -->
-						<Export-Package>
-							org.societies.api.internal.**
-						</Export-Package>
+						<_exportcontents>
+							!org.societies.api.internal.schema,
+							*
+						</_exportcontents>
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
 				</configuration>
 			</plugin>
