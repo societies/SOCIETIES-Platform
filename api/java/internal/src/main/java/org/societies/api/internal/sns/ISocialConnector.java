@@ -1,4 +1,4 @@
-package rg.societies.api.internal.sns;
+package org.societies.api.internal.sns;
 
 import java.util.Map;
 
