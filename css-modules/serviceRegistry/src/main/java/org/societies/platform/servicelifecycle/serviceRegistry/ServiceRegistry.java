@@ -3,10 +3,12 @@ package org.societies.platform.servicelifecycle.serviceRegistry;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Example;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
@@ -14,6 +16,7 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.Ser
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
 import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.RegistryEntry;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceImplementationDAO;
@@ -106,8 +109,21 @@ public class ServiceRegistry implements IServiceRegistry {
 	@Override
 	public List<Service> retrieveServicesSharedByCSS(String CSSID)
 			throws ServiceRetrieveException {
-		// TODO Auto-generated method stub
-		return null;
+		List<Service> returnedServiceList=new ArrayList<Service>();
+		Session session=sessionFactory.openSession();
+		try {
+			
+			List<RegistryEntry> tmpRegistryEntryList=session.createCriteria(RegistryEntry.class).createCriteria("serviceInstance").
+				add(Restrictions.eq("fullJid", CSSID)).list();
+			for (RegistryEntry registryEntry : tmpRegistryEntryList) {
+				returnedServiceList.add(registryEntry.createServiceFromRegistryEntry());
+			}
+		} catch (Exception e) {
+			throw new ServiceRetrieveException(e);
+		}finally{
+			session.close();
+		}
+		return returnedServiceList;
 	}
 
 	/*
@@ -120,15 +136,23 @@ public class ServiceRegistry implements IServiceRegistry {
 	@Override
 	public List<Service> retrieveServicesSharedByCIS(String CISID)
 			throws ServiceRetrieveException {
+		List<Service> returnedServiceList=new ArrayList<Service>();
+		Session session= sessionFactory.openSession();
+		try{
 		ServiceSharedInCISDAO filterServiceSharedCISDAO= new ServiceSharedInCISDAO();
 		filterServiceSharedCISDAO.setCISId(CISID);
-		Session session= sessionFactory.openSession();
+		
 		List<ServiceSharedInCISDAO> serviceSharedInCISDAOList=session.createCriteria(ServiceSharedInCISDAO.class)
 				.add(Example.create(filterServiceSharedCISDAO)).list();
-		List<Service> returnedServiceList=new ArrayList<Service>();
+		
 		
 		for (ServiceSharedInCISDAO serviceSharedInCISDAO : serviceSharedInCISDAOList) {
 			returnedServiceList.add( ((RegistryEntry)session.load(RegistryEntry.class, serviceSharedInCISDAO.getServiceResourceIdentifier())).createServiceFromRegistryEntry());
+		}
+		}catch (Exception e){
+			throw new ServiceRetrieveException(e);
+		}finally{
+			session.close();
 		}
 		return returnedServiceList;
 	}

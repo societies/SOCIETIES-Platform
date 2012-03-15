@@ -143,6 +143,16 @@ public class ServiceRegistryTest extends
 	public void retrieveServicesSharedCIS() throws Exception{
 		List<Service> returnedList=serReg.retrieveServicesSharedByCIS("CISid");
 	}
+	
+	
+	@Test
+	@Rollback(false)
+	public void retrieveServicesSharedCSS() throws Exception{
+		List<Service> returnedServiceList=serReg.retrieveServicesSharedByCSS(servicesList.get(0).getServiceInstance().getFullJid());
+	assert(returnedServiceList.get(0).getServiceName().equals(servicesList.get(0).getServiceName()));
+	}
+	
+	
 	@Test
 	@ExpectedException(ServiceRetrieveException.class)
 	@Rollback(false)
