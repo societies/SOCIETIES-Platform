@@ -105,14 +105,7 @@
 		</module>
 		<module>../cis-modules/cis-discovery/</module>
 		<module>../cis-modules/cis-collaboration/</module>
-<<<<<<< HEAD
-		<!--<module>../cis-modules/cis-management/CommunityXEP</module>
-		<module>../cis-modules/cis-management/cis-comm-manager/</module>-->
-=======
-		<!-- <module>../cis-modules/cis-management/CommunityXEP</module>
-		<module>../cis-modules/cis-management/cis-comm-manager/</module>
-		-->
->>>>>>> refs/heads/development
+
 		<!-- <module>../cis-modules/cis-management/CommunityXEP</module> <module>../cis-modules/cis-management/CommunityServiceBundle</module> -->
 
 

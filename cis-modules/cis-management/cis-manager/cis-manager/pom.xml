@@ -29,15 +29,7 @@
 	<dependencies>
 	<!-- add your dependencies here -->
 		
-		
-<dependency>
-	<groupId>org.societies.api.schema</groupId>
-	<artifactId>societies-api-schema</artifactId>
-	<version>${release.version}</version>
-	<scope>provided</scope>
-</dependency>
-
-		
+	
 		
     	<dependency>
 			<groupId>org.societies.api.external</groupId>
@@ -46,14 +38,17 @@
 			<scope>provided</scope>
 		</dependency>		
 
-<dependency>
+	<dependency>
 	<groupId>org.societies.api.internal</groupId>
 	<artifactId>societies-api-internal</artifactId>
 	<version>${release.version}</version>
-	<scope>provided</scope>
-</dependency>
-
-
+	</dependency>	
+		
+		<dependency>
+			<groupId>org.societies.api.schema</groupId>
+			<artifactId>societies-api-schema</artifactId>
+			<version>${release.version}</version>
+		</dependency>
 
 <!-- 		<dependency>
 			<groupId>org.societies.community</groupId>
@@ -85,12 +80,6 @@
 		<dependency>
 			<groupId>org.societies.comm.xmpp.pubsub</groupId>
     		<artifactId>PubsubClientBundle</artifactId>
-	  		<version>${version.comm}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.comm.xmpp.pubsub</groupId>
-    		<artifactId>PubsubServiceBundle</artifactId>
 	  		<version>${version.comm}</version>
 			<scope>provided</scope>
 		</dependency>
@@ -150,6 +139,8 @@
             </exclusions>
         </dependency>
 -->
+
+
 	</dependencies>
 
 	<build>
@@ -166,7 +157,6 @@
 						<Import-Package>    						org.springframework.beans.factory.annotation*;version="0",
     						org.springframework.stereotype*;version="0",
     						org.xmpp.packet*,
-    						org.societies.api.schema.*,
     						!org.gjt.*,
     						!org.jaxen.*,
     						!org.mortbay.*,
@@ -177,8 +167,8 @@
     						!com.sun.msv.*,
 							*;resolution:=optional</Import-Package>
 						<Export-Package>
-						org.societies.api.schema.cis.community*,
-						org.societies.api.schema.cis.manager*
+						org.societies.api.schema.cis.community,
+						org.societies.api.schema.cis.manager
 						</Export-Package>
 					</instructions>
 				</configuration>

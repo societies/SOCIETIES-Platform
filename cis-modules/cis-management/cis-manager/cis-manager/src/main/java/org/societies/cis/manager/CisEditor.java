@@ -47,7 +47,6 @@ import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.cis.management.ICisEditor;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.cis.manager.CisParticipant.MembershipType;
-import org.societies.comm.xmpp.pubsub.impl.PubsubServiceRouter;
 import org.societies.comm.xmpp.xc.impl.XCCommunicationMgr;
 import org.societies.identity.IdentityImpl;
 

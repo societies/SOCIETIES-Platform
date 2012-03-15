@@ -47,7 +47,9 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.IdentityType;
+import org.societies.api.identity.InvalidFormatException;
 
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.cis.manager.CisEditor;
@@ -72,10 +74,10 @@ import org.societies.api.schema.cis.manager.Create;
 public class CisManager implements ICisManager, IFeatureServer{
 
 	public Set<CisEditor> CISs; 
-	private ICISCommunicationMgrFactory ccmFactory;
-	private IIdentity cisManagerId;
-	private ICommManager CSSendpoint;
-	private ICommManager CISMgmtendpoint;
+	ICISCommunicationMgrFactory ccmFactory;
+	IIdentity cisManagerId;
+	ICommManager CSSendpoint;
+	ICommManager CISMgmtendpoint;
 	
 	private final static List<String> NAMESPACES = Collections
 			.singletonList("http://societies.org/api/schema/cis/manager");
@@ -97,30 +99,40 @@ public class CisManager implements ICisManager, IFeatureServer{
 		
 		LOG.info("factory bundled");
 		
-		cisManagerId = new IdentityImpl(IdentityType.CIS, subDomain, host); 
+		IIdentityManager idm = CSSendpoint.getIdManager();
+	
+		LOG.info("got IDmanager");
+
 		
-		CISMgmtendpoint = ccmFactory.getNewCommManager(cisManagerId, secretKey);
+		//try {
+			
+			cisManagerId = new IdentityImpl(IdentityType.CIS, subDomain, host); //idm.fromJid("CISCommManager.thomas.local"); //= new IdentityImpl(IdentityType.CIS, subDomain, host); 
 		
-		
-		LOG.info("CIS Management endpoint created");
-		
-		
-		try {
-			CISMgmtendpoint.register(this);
-		} catch (CommunicationException e) {
-			e.printStackTrace();
-		} // TODO unregister??
-		
-		LOG.info("listener registered");
-		
-		
-		
-		CISs = new HashSet<CisEditor>();
-		
-	//	CisEditor cEditor1 = new CisEditor(CSSendpoint.getIdManager().getThisNetworkNode().getJid(),
-	//			"cis1","thomas.local","","","cis1.password.thomas.local",ccmFactory);
-		
-	//	CISs.add(cEditor1);
+			LOG.info("got Identity");
+			CISMgmtendpoint = ccmFactory.getNewCommManager(cisManagerId, secretKey);
+			
+			
+			LOG.info("CIS Management endpoint created");
+			
+			
+			try {
+				CISMgmtendpoint.register(this);
+			} catch (CommunicationException e) {
+				e.printStackTrace();
+			} // TODO unregister??
+			
+			LOG.info("listener registered");
+			
+			
+			
+			CISs = new HashSet<CisEditor>();
+			
+		//} catch (InvalidFormatException e1) {
+			
+		//	e1.printStackTrace();
+		//}
+			
+
 		
 	}
 
