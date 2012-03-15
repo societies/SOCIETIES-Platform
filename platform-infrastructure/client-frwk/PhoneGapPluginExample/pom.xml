@@ -10,8 +10,8 @@
    </parent>
 
    <groupId>org.societies.android.platform.gui</groupId>
-   <artifactId>phonegappluginexemple</artifactId>
-   <name>Phonegap Plugin Exemple</name>
+   <artifactId>phonegappluginexample</artifactId>
+   <name>PhoneGap Plugin Example</name>
    <version>${release.version}</version>
    <packaging>apk</packaging>
 

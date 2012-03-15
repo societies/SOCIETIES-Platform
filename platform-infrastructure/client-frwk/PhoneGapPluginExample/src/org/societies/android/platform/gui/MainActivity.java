@@ -27,7 +27,7 @@ import com.phonegap.DroidGap;
  * @author olivierm
  *
  */
-public class TestActivity extends DroidGap {
+public class MainActivity extends DroidGap {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
