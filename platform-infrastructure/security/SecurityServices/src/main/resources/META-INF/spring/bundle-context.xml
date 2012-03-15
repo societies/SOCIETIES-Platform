@@ -16,6 +16,7 @@
   
   <context:annotation-config />
 
-  <bean id="signatureMgr" class="org.societies.security.digsig.SignatureMgr" />
-  
+  <bean id="signatureMgr"  class="org.societies.security.digsig.SignatureMgr" />
+  <bean id="secureStorage" class="org.societies.security.storage.SecureStorage" />
+
 </beans>
