@@ -32,10 +32,13 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.servicelifecycle.IServiceControl;
+import org.societies.api.servicelifecycle.IServiceControlRemote;
 import org.societies.api.servicelifecycle.ServiceControlException;
 import org.springframework.osgi.context.BundleContextAware;
 
@@ -52,6 +55,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	static final Logger logger = LoggerFactory.getLogger(ServiceControl.class);
 
 	private IServiceRegistry serviceReg;
+	private ICommManager commMngr;
+	private IServiceControlRemote serviceControlRemote;
 
 	public IServiceRegistry getServiceReg() {
 		return serviceReg;
@@ -60,6 +65,24 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	public void setServiceReg(IServiceRegistry serviceReg) {
 		this.serviceReg = serviceReg;
 	}
+
+
+	public void setCommMngr(ICommManager commMngr) {
+		this.commMngr = commMngr;
+	}
+	
+	public ICommManager getCommMngr() {
+		return commMngr;
+	}
+
+	public void setServiceControlRemote(IServiceControlRemote serviceControlRemote){
+		this.serviceControlRemote = serviceControlRemote;
+	}
+	
+	public IServiceControlRemote getServiceControlRemote(){
+		return serviceControlRemote;
+	}
+	
 	
 	@Override
 	public void setBundleContext(BundleContext bundleContext) {
@@ -71,12 +94,37 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 
 
 	@Override
-	public void startService(ServiceResourceIdentifier serviceId)
+	public ServiceControlResult startService(ServiceResourceIdentifier serviceId)
 			throws ServiceControlException {
 		
 		if(logger.isDebugEnabled()) logger.debug("Service Management: startService method");
 
 		try{
+			
+			// Our first task is to determine whether the service we're searching for is local or remote
+			
+			String nodeJid = serviceId.getIdentifier().getHost();
+			String localNodeJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
+						
+			if(logger.isDebugEnabled())
+				logger.debug("The JID of the node where the Service is: " + nodeJid + " and the local JID: " + localNodeJid);
+				
+			if(!nodeJid.equals(localNodeJid)){
+				
+				if(logger.isDebugEnabled())
+					logger.debug("We're dealing with a different node! Need to do a remote call!");
+				
+				IIdentity node = getCommMngr().getIdManager().fromJid(nodeJid);
+				ServiceControlRemoteClient callback = new ServiceControlRemoteClient();
+				getServiceControlRemote().startService(serviceId, node, callback);
+				
+			}
+
+			
+			
+			//Is it this node?
+			
+			
 			
 			// Our first task is to obtain the Service object from the identifier, for this we got to the registry
 			if(logger.isDebugEnabled()) logger.debug("Obtaining Service from SOCIETIES Registry");
@@ -86,7 +134,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			// Check to see if we actually got a service
 			if(service == null){
 				if(logger.isDebugEnabled()) logger.debug("Service represented by " + serviceId + " does not exist in SOCIETIES Registry");
-				return;
+				return ServiceControlResult.SERVICE_NOT_FOUND;
 			}
 			
 			// Next step, we obtain the bundle that corresponds to this service			
@@ -95,7 +143,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			// And we check if it isn't null!
 			if(serviceBundle == null){
 				if(logger.isDebugEnabled()) logger.debug("Service Bundle obtained from " + service.getServiceName() + " couldn't be found");
-				return;			
+				return ServiceControlResult.BUNDLE_ERROR;			
 			}
 			
 			// Now we need to start the bundle
@@ -123,7 +171,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	 * @see org.societies.api.servicelifecycle.IServiceControl#stopService(org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)
 	 */
 	@Override
-	public void stopService(ServiceResourceIdentifier serviceId)
+	public ServiceControlResult stopService(ServiceResourceIdentifier serviceId)
 			throws ServiceControlException {
 		
 		if(logger.isDebugEnabled()) logger.debug("Service Management: stopService method");
@@ -174,7 +222,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	 * @see org.societies.api.servicelifecycle.IServiceControl#installService(java.net.URL)
 	 */
 	@Override
-	public void installService(URL bundleLocation)
+	public ServiceControlResult installService(URL bundleLocation)
 			throws ServiceControlException {
 		
 		if(logger.isDebugEnabled()) logger.debug("Service Management: installService method");
@@ -210,7 +258,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	 * @see org.societies.api.servicelifecycle.IServiceControl#uninstallService(org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)
 	 */
 	@Override
-	public void uninstallService(ServiceResourceIdentifier serviceId)
+	public ServiceControlResult uninstallService(ServiceResourceIdentifier serviceId)
 			throws ServiceControlException {
 		
 		if(logger.isDebugEnabled()) logger.debug("Service Management: uninstallService method");

@@ -28,47 +28,55 @@ import java.net.URL;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.IServiceControl.ServiceControlResult;
 
 /**
- * The interface class for the Service Control component. It permits a caller to tell the SLM to
+ * The interface class for remote calls to the Service Control component. It permits a caller to tell the SLM to
  * start a service, to stop a service, to install a new service and to uninstall a service.
  *
  * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
  */
-public interface IServiceControl {
-	
-	public enum ServiceControlResult{ SUCCESS, SERVICE_NOT_FOUND, BUNDLE_ERROR, FILE_NOT_FOUND, OSGI_ERROR }
-	
+public interface IServiceControlRemote {
+
 	/**
 	 * This method starts the service that is identified by the </code>ServiceResourceIdentifier</code>
 	 * 
 	 * @param serviceId unique service identifier
+	 * @param node The node where the service is located
+	 * @param callback The callback object
 	 */
 	
-	public ServiceControlResult startService(ServiceResourceIdentifier serviceId) throws ServiceControlException;
+	public void startService(ServiceResourceIdentifier serviceId, IIdentity node, IServiceControlCallback callback);
 
 	
 	/**
 	 * This method stops the service running in the container that is identified by the </code>ServiceResourceIdentifier</code>
 	 * 
 	 * @param serviceId unique service identifier
+	 * @param node The node where the service is located
+	 * @param callback The callback object
 	 */
-	public ServiceControlResult stopService(ServiceResourceIdentifier serviceId) throws ServiceControlException;
+	public void stopService(ServiceResourceIdentifier serviceId, IIdentity node, IServiceControlCallback callback);
 	
 	/**
 	 * This method install a new service into the container
 	 * 
 	 * @param serviceLocation the URL of the bundle to install
+	 * @param node The node where the service is located
+	 * @param callback The callback object
 	 */
-	public ServiceControlResult installService(URL bundleLocation) throws ServiceControlException;
+	public void installService(URL bundleLocation, IIdentity node, IServiceControlCallback callback);
 
 	/**
 	 * This method removes a service from the container.
 	 * 
 	 * @param serviceId unique service identifier
+	 * @param node The node where the service is located
+	 * @param callback The callback object
 	 */
-	public ServiceControlResult uninstallService(ServiceResourceIdentifier serviceId) throws ServiceControlException;
+	public void uninstallService(ServiceResourceIdentifier serviceId, IIdentity node, IServiceControlCallback callback);
 
+	
 	
 }

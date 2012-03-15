@@ -36,6 +36,7 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryResultBean;
+import org.societies.api.servicelifecycle.IServiceControlCallback;
 
 
 /**
@@ -55,14 +56,24 @@ public class CommsClientCallback implements ICommCallback {
 
 	//MAP TO STORE THE ALL THE CLIENT CONNECTIONS
 	private final Map<String, IServiceDiscoveryCallback> serviceDiscoveryClients = new HashMap<String, IServiceDiscoveryCallback>();
+	private final Map<String, IServiceControlCallback> serviceControlClients = new HashMap<String,IServiceControlCallback>();
 	
 	/** Constructor for callback
 	 * @param clientID unique ID of send request to comms framework
-	 * @param calcClient callback from originating client
+	 * @param serviceDiscoveryClient callback from originating client
 	 */
 	public CommsClientCallback(String clientID, IServiceDiscoveryCallback serviceDiscoveryClient) {
 		//STORE THIS CALLBACK WITH THIS REQUEST ID
 		serviceDiscoveryClients.put(clientID, serviceDiscoveryClient);
+	}
+	
+	/** Constructor for callback
+	 * @param clientID unique ID of send request to comms framework
+	 * @param serviceControlClient callback from originating client
+	 */
+	public CommsClientCallback(String clientID, IServiceControlCallback serviceControlClient) {
+		//STORE THIS CALLBACK WITH THIS REQUEST ID
+		serviceControlClients.put(clientID, serviceControlClient);
 	}
 
 	/**Returns the correct calculator client callback for this request 
@@ -73,6 +84,17 @@ public class CommsClientCallback implements ICommCallback {
 	private IServiceDiscoveryCallback getRequestingClient(String requestID) {
 		IServiceDiscoveryCallback requestingClient = (IServiceDiscoveryCallback) serviceDiscoveryClients.get(requestID);
 		serviceDiscoveryClients.remove(requestID);
+		return requestingClient;
+	}
+
+	/**Returns the correct calculator client callback for this request 
+	 * @param requestID the id of the initiating request
+	 * @return
+	 * @throws UnavailableException
+	 */
+	private IServiceControlCallback getRequestingControlClient(String requestID) {
+		IServiceControlCallback requestingClient = (IServiceControlCallback) serviceControlClients.get(requestID);
+		serviceControlClients.remove(requestID);
 		return requestingClient;
 	}
 	

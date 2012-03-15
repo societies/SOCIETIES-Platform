@@ -22,53 +22,16 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.servicelifecycle;
+package org.societies.slm.servicecontrol;
 
-import java.net.URL;
-
-import org.societies.api.identity.IIdentity;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.IServiceControlCallback;
 
 /**
- * The interface class for the Service Control component. It permits a caller to tell the SLM to
- * start a service, to stop a service, to install a new service and to uninstall a service.
+ * Describe your class here...
  *
- * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
+ * @author 10036469
  *
  */
-public interface IServiceControl {
-	
-	public enum ServiceControlResult{ SUCCESS, SERVICE_NOT_FOUND, BUNDLE_ERROR, FILE_NOT_FOUND, OSGI_ERROR }
-	
-	/**
-	 * This method starts the service that is identified by the </code>ServiceResourceIdentifier</code>
-	 * 
-	 * @param serviceId unique service identifier
-	 */
-	
-	public ServiceControlResult startService(ServiceResourceIdentifier serviceId) throws ServiceControlException;
+public class ServiceControlRemoteClient implements IServiceControlCallback {
 
-	
-	/**
-	 * This method stops the service running in the container that is identified by the </code>ServiceResourceIdentifier</code>
-	 * 
-	 * @param serviceId unique service identifier
-	 */
-	public ServiceControlResult stopService(ServiceResourceIdentifier serviceId) throws ServiceControlException;
-	
-	/**
-	 * This method install a new service into the container
-	 * 
-	 * @param serviceLocation the URL of the bundle to install
-	 */
-	public ServiceControlResult installService(URL bundleLocation) throws ServiceControlException;
-
-	/**
-	 * This method removes a service from the container.
-	 * 
-	 * @param serviceId unique service identifier
-	 */
-	public ServiceControlResult uninstallService(ServiceResourceIdentifier serviceId) throws ServiceControlException;
-
-	
 }
