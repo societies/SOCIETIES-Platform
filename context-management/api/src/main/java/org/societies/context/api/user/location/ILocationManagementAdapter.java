@@ -36,7 +36,7 @@ import java.util.Set;
  *
  */
 
-public interface ILocationInferenceAdapter {
+public interface ILocationManagementAdapter {
 	/**
 	 * Returns all the active zone in the system, those that at least one device was identified in them.
 	 * @return
