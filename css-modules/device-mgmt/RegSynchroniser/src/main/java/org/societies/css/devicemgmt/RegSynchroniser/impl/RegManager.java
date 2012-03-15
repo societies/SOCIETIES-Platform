@@ -28,6 +28,7 @@ package org.societies.css.devicemgmt.RegSynchroniser.impl;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.logging.LogManager;
 
 import org.apache.commons.logging.LogFactory;
@@ -43,12 +44,27 @@ import org.societies.css.devicemgmt.deviceregistry.DeviceRegistry;
 import org.societies.api.internal.css.devicemgmt.ILocalDevice;
 //import org.societies.css.devicemgmt.RegSynchroniser.impl.LocalDevices;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.societies.comm.xmpp.event.InternalEvent;
+import org.societies.comm.xmpp.event.PubsubEvent;
+import org.societies.comm.xmpp.event.PubsubEventFactory;
+import org.societies.comm.xmpp.event.PubsubEventStream;
+import org.societies.api.schema.css.devicemanagment.DmEvent;
+import org.societies.comm.xmpp.event.EventFactory;
+import org.societies.comm.xmpp.event.EventStream;
 
-public class RegManager implements ILocalDevice, BundleContextAware{
+public class RegManager implements ILocalDevice, ApplicationListener<InternalEvent>, BundleContextAware{
 
 	//private static org.apache.commons.logging.Log LOG = LogFactory.getLog(RegManager.class);
     private IDeviceRegistry deviceRegistry;
     private BundleContext bundleContext;
+    private EventStream stream1;
+    private EventStream stream2;
+    
+    //private HashMap<String, String> eventResult;
+    
+	
     
     
     
@@ -73,6 +89,11 @@ public class RegManager implements ILocalDevice, BundleContextAware{
     	this.bundleContext = bundlecontext;
         
         this.deviceRegistry = DeviceRegistry.getInstance();
+        stream1 = EventFactory.getStream("DEVICE_REGISTERED");
+    	stream2 = EventFactory.getStream("DEVICE_DISCONNECTED");
+    	
+    	stream1.addApplicationListener(this);
+    	stream2.addApplicationListener(this);
 
     }
 
@@ -177,6 +198,40 @@ public class RegManager implements ILocalDevice, BundleContextAware{
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	public void onApplicationEvent(InternalEvent event) {
+		String CSSID = "liam.societies.org";	
+		System.out.println(event.getTimestamp());
+		System.out.println(event.getSource());
+		DeviceCommonInfo device = (DeviceCommonInfo)event.getEventInfo();
+		if (event.getEventNode().equals("DEVICE_REGISTERED"))
+		{
+			try {
+				LocalDevices.addDevice(device, CSSID);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if (event.getEventNode().equals("DEVICE_DISCONNECTED"))
+		{
+			try {
+				LocalDevices.removeDevice((DeviceCommonInfo) event.getEventInfo(), CSSID);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+		}
+		
+	}
+
+//	@Override
+	//public void onApplicationEvent(DmEvent arg0) {
+		// TODO Auto-generated method stub
+		
+//	}
 
 //	public boolean removedevices(Collection<String> deviceCollection)
 	//		throws Exception {
