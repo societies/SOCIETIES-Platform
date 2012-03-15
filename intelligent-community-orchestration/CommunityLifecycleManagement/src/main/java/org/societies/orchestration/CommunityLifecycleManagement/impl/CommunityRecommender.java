@@ -31,11 +31,20 @@ import org.societies.api.internal.css.directory.ICssDirectory;
 
 import org.societies.api.internal.css.discovery.ICssDiscovery;
 
-import org.societies.api.internal.cis.management.CisActivityFeed;
+import org.societies.api.internal.cis.management.ICisActivityFeed;
 import org.societies.api.internal.cis.management.ServiceSharingRecord;
-import org.societies.api.internal.cis.management.CisActivity;
-import org.societies.api.internal.cis.management.CisRecord;
+import org.societies.api.internal.cis.management.ICisActivity;
+import org.societies.api.internal.cis.management.ICisRecord;
 import org.societies.api.internal.cis.management.ICisManager;
+
+//import org.societies.api.cis.management.ICisRecord;
+//import org.societies.api.cis.management.ICisManager;
+//import org.societies.api.cis.management.ICisOwned;
+//import org.societies.api.cis.management.ICisSubscribed;
+//import org.societies.api.cis.management.ICisEditor;
+//import org.societies.api.cis.management.ICisActivity;
+//import org.societies.api.cis.management.ICisActivityFeed;
+//import org.societies.api.cis.management.ICis;
 
 //import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
 
@@ -99,13 +108,13 @@ public class CommunityRecommender //implements ICommCallback
 	//private IUserFeedbackCallback userFeedbackCallback;
 	private String userResponse;
 	
-	private ArrayList<CisRecord> recentRefusals;
+	private ArrayList<ICisRecord> recentRefusals;
 
 	private IUserFeedbackCallback userFeedbackCallback;
 	
-	private ArrayList<CisRecord> cissToCreate;
-	private ArrayList<CisRecord> cissToConfigure;
-	private ArrayList<CisRecord> cissToDelete;
+	private ArrayList<ICisRecord> cissToCreate;
+	private ArrayList<ICisRecord> cissToConfigure;
+	private ArrayList<ICisRecord> cissToDelete;
 	
 	/*
      * Constructor for Community Recommender
@@ -124,7 +133,7 @@ public class CommunityRecommender //implements ICommCallback
 		//	this.linkedDomain = linkedEntity;
 	}
 	
-	public void identifyCisActionForEgocentricCommunityAnalyser(HashMap<String, ArrayList<ArrayList<CisRecord>>> cisPossibilities) {
+	public void identifyCisActionForEgocentricCommunityAnalyser(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisPossibilities) {
 		if (cisPossibilities.get("Create CISs") != null)
 		    identifyCissToCreate(cisPossibilities.get("Create CISs").get(0));
 		if (cisPossibilities.get("Delete CISs") != null)
@@ -144,19 +153,19 @@ public class CommunityRecommender //implements ICommCallback
 	 *              on collective aspects like context attributes.
 	 */
 	
-	public void identifyCissToCreate(ArrayList<CisRecord> creatableCiss) {		
+	public void identifyCissToCreate(ArrayList<ICisRecord> creatableCiss) {		
 		//Can't use GUI in tests
 		//cissToCreate = getUserFeedbackOnCreation(cissToCreate);
 		
 		cissToCreate = creatableCiss;
 		
-		if (cissToCreate != null) 
-		    for (int i = 0; i < cissToCreate.size(); i++)
-			    cisManager.createCis(linkedCss.getIdentifier(), cissToCreate.get(i).getCisId());
+		//if (cissToCreate != null) 
+		  //  for (int i = 0; i < cissToCreate.size(); i++)
+			//    cisManager.createCis(linkedCss.getIdentifier(), cissToCreate.get(i).getCisId());
 	}
 	
-	public ArrayList<CisRecord> getUserFeedbackOnCreation(ArrayList<CisRecord> cissToCreate) {
-		ArrayList<CisRecord> finalisedCiss = null;
+	public ArrayList<ICisRecord> getUserFeedbackOnCreation(ArrayList<ICisRecord> cissToCreate) {
+		ArrayList<ICisRecord> finalisedCiss = null;
 		String[] options = new String[1];
 		options[0] = "options";
 		String userResponse = null;
@@ -179,9 +188,9 @@ public class CommunityRecommender //implements ICommCallback
 		    String background = "This message is in your inbox or something, waiting for you to read it";
 		}
 		else {
-		   	Iterator<CisRecord> iterator = cissToCreate.iterator();
+		   	Iterator<ICisRecord> iterator = cissToCreate.iterator();
 			while (iterator.hasNext()) {
-			    CisRecord potentiallyCreatableCis = iterator.next();
+			    ICisRecord potentiallyCreatableCis = iterator.next();
 		        if (userResponse.equals("Yes")) {
 				    finalisedCiss.add(potentiallyCreatableCis);
 			       // cisManager.createCis(linkedCss, potentiallyCreatableCis.getCisId());
@@ -202,18 +211,18 @@ public class CommunityRecommender //implements ICommCallback
 	 *              a domain, the check is done on all CISs in that domain.
 	 */
 	
-	public void identifyCissToDelete(ArrayList<CisRecord> cisPossibilities) {	
+	public void identifyCissToDelete(ArrayList<ICisRecord> cisPossibilities) {	
 		//Can't use GUI in tests
         //cissToDelete = getUserFeedbackOnDeletion(cissToDelete);
 		
 		cissToDelete = cisPossibilities;
 		
-		for (int i = 0; i < cissToDelete.size(); i++)
-			cisManager.deleteCis(linkedCss.getIdentifier(), cissToDelete.get(i).getCisId());
+		//for (int i = 0; i < cissToDelete.size(); i++)
+			//cisManager.deleteCis(linkedCss.getIdentifier(), cissToDelete.get(i).getCisId());
 	}
 	
-	public ArrayList<CisRecord> getUserFeedbackOnDeletion(ArrayList<CisRecord> cissToDelete) {
-		ArrayList<CisRecord> realCissToDelete = new ArrayList<CisRecord>();
+	public ArrayList<ICisRecord> getUserFeedbackOnDeletion(ArrayList<ICisRecord> cissToDelete) {
+		ArrayList<ICisRecord> realCissToDelete = new ArrayList<ICisRecord>();
 		List<String> options = new ArrayList<String>();
 		options.add("options");
 		userResponse = null;
@@ -236,9 +245,9 @@ public class CommunityRecommender //implements ICommCallback
 		    String background = "This message is in your inbox or something, waiting for you to read it";
 		}
 		else {
-		   	Iterator<CisRecord> iterator = cissToDelete.iterator();
+		   	Iterator<ICisRecord> iterator = cissToDelete.iterator();
 			while (iterator.hasNext()) {
-			    CisRecord potentiallyDeletableCis = iterator.next();
+			    ICisRecord potentiallyDeletableCis = iterator.next();
 		        if (userResponse.equals("Yes")) {
 				    realCissToDelete.add(potentiallyDeletableCis);
 			       // cisManager.deleteCis(linkedCss, potentiallyDeletableCis.getCisId());
@@ -254,19 +263,19 @@ public class CommunityRecommender //implements ICommCallback
 		return realCissToDelete;
 	}
 	
-	public void identifyCissToConfigure(ArrayList<ArrayList<CisRecord>> cisPossibilities) {
+	public void identifyCissToConfigure(ArrayList<ArrayList<ICisRecord>> cisPossibilities) {
 	
-	    ArrayList<CisRecord> finalConfiguredCiss = new ArrayList<CisRecord>();
+	    ArrayList<ICisRecord> finalConfiguredCiss = new ArrayList<ICisRecord>();
 	
 	    //can't use GUI in tests
 	    //finalConfiguredCiss = getUserFeedbackOnConfiguration(cissToConfigure);
 	
 	    finalConfiguredCiss = cissToConfigure;
 	
-	    Iterator<CisRecord> iterator = finalConfiguredCiss.iterator();
+	    Iterator<ICisRecord> iterator = finalConfiguredCiss.iterator();
 	
 	    while (iterator.hasNext()) {
-	        CisRecord configurableCis = iterator.next();
+	        ICisRecord configurableCis = iterator.next();
 
 		    //if "remove members"
         	//    attempt to remove members - perhaps SOCIETIES platform itself should have mechanism
@@ -285,8 +294,8 @@ public class CommunityRecommender //implements ICommCallback
         }
     }
 
-    public ArrayList<CisRecord> getUserFeedbackOnConfiguration(ArrayList<CisRecord> cissToConfigure) {
-	    ArrayList<CisRecord> finalisedCiss = null;
+    public ArrayList<ICisRecord> getUserFeedbackOnConfiguration(ArrayList<ICisRecord> cissToConfigure) {
+	    ArrayList<ICisRecord> finalisedCiss = null;
 	    String[] options = new String[1];
 	    options[0] = "options";
 	    String userResponse = null;
@@ -309,9 +318,9 @@ public class CommunityRecommender //implements ICommCallback
 	        String background = "This message is in your inbox or something, waiting for you to read it";
 	    }
 	    else {
-	   	    Iterator<CisRecord> iterator = cissToConfigure.iterator();
+	   	    Iterator<ICisRecord> iterator = cissToConfigure.iterator();
 		    while (iterator.hasNext()) {
-		        CisRecord potentiallyCreatableCis = iterator.next();
+		        ICisRecord potentiallyCreatableCis = iterator.next();
 	            if (userResponse.equals("Yes")) {
 			        finalisedCiss.add(potentiallyCreatableCis);
 		            // cisManager.createCis(linkedCss, potentiallyCreatableCis.getCisId());
