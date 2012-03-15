@@ -37,14 +37,14 @@
 		<table>
 			<tr>
 				<td>UserName :</td>
-				<td><form:input path="userName" />
+				<td><form:input path="userName" value="userid"  />
 				</td>
 				<td><form:errors path="userName" cssClass="error" />
 				</td>
 			</tr>			
 			<tr>
 				<td>Password :</td>
-				<td><form:password path="password" />
+				<td><form:password path="password" value="password" />
 				</td>
 				<td><form:errors path="password" cssClass="error" />
 				</td>
