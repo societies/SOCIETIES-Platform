@@ -36,8 +36,7 @@
 		<module>../comms-frwk/PubsubClientBundle</module>
 		
 		<!-- Security -->
-		<module>SecureStorage</module>
-		<module>SignatureMgr</module>
+		<module>SecurityServices</module>
 		<module>PolicyNegotiator</module>
 		<module>SecurityCommsMgr</module>
 	</modules>
