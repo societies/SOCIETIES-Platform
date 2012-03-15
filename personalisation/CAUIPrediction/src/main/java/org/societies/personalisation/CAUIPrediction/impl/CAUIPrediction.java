@@ -26,7 +26,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
@@ -48,7 +48,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 	@Override
 	public IUserIntentAction getCurrentIntentAction(IIdentity arg0,
-			IServiceResourceIdentifier arg1, String arg2) {
+			ServiceResourceIdentifier arg1, String arg2) {
 		// TODO Auto-generated method stub
 		return null;
 	}
