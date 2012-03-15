@@ -23,11 +23,6 @@
 	    <groupId>android</groupId>
 	    <artifactId>android</artifactId>
 	</dependency>
-	<dependency>
-	    <groupId>org.slf4j</groupId>
-	    <artifactId>slf4j-android</artifactId>
-	    <version>1.6.1-RC1</version>
-	</dependency>
     </dependencies>
 
 </project>

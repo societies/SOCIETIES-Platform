@@ -29,6 +29,16 @@
 	<dependencies>
 	<!-- add your dependencies here -->
 		
+		
+<dependency>
+	<groupId>org.societies.api.schema</groupId>
+	<artifactId>societies-api-schema</artifactId>
+	<version>${release.version}</version>
+	<scope>provided</scope>
+</dependency>
+
+		
+		
     	<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
@@ -43,7 +53,9 @@
 	<scope>provided</scope>
 </dependency>
 
-		<dependency>
+
+
+<!-- 		<dependency>
 			<groupId>org.societies.community</groupId>
 			<artifactId>CommunityXep</artifactId>
 			<version>0.0.1</version>
@@ -51,7 +63,7 @@
 		</dependency>
 
 
-<!--   <dependency>
+  <dependency>
    <groupId>org.igniterealtime</groupId>
    <artifactId>whack</artifactId>
    <type>jar</type>
@@ -154,6 +166,7 @@
 						<Import-Package>    						org.springframework.beans.factory.annotation*;version="0",
     						org.springframework.stereotype*;version="0",
     						org.xmpp.packet*,
+    						org.societies.api.schema.*,
     						!org.gjt.*,
     						!org.jaxen.*,
     						!org.mortbay.*,
@@ -164,8 +177,8 @@
     						!com.sun.msv.*,
 							*;resolution:=optional</Import-Package>
 						<Export-Package>
-						org.societies.community*,
-						org.societies.manager*
+						org.societies.api.schema.cis.community*,
+						org.societies.api.schema.cis.manager*
 						</Export-Package>
 					</instructions>
 				</configuration>

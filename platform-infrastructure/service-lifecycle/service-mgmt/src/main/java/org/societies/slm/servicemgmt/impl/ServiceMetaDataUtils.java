@@ -21,7 +21,7 @@ public class ServiceMetaDataUtils {
 		// then pass return this object
 		ServiceResourceIdentifier serResId=new ServiceResourceIdentifier();		
 		try {
-			serResId.setIdentifier(new URI("http://perumal@societies.org/pkcss/someservice"));
+			serResId.setIdentifier(new URI("http://" + service.getServiceEndpoint() + "/" + service.getServiceName().replaceAll(" ", "")));
 			//This next line is for solving https://redmine.ict-societies.eu/issues/619
 			serResId.setServiceInstanceIdentifier(String.valueOf(serBndl.getBundleId()));
 		} catch (URISyntaxException e) {

@@ -29,9 +29,24 @@ import com.phonegap.api.PluginResult;
 import com.phonegap.api.PluginResult.Status;
 
 /**
- * @author Olivier Maridat
- *
- */
+ * PhoneGap plugin to say hello
+ * It can be involved in following manner from javascript
+ * <p>
+ * Result example: "Hello <your name>!"
+ * </p>
+ * <pre>
+ * {@code
+ * HelloWorldPluginNameInConfiguration.sayHello("your name", successCallback, failureCallback);
+ * successCallback = function(result){
+ *     //result is a json
+ * }
+ * failureCallback = function(error){
+ *     //error is error message
+ * }
+ * }
+ * </pre>
+ * @author Olivier Maridat (Trialog)
+*/
 public class HelloWorldPlugin extends Plugin {
 
 	/** Actions List */

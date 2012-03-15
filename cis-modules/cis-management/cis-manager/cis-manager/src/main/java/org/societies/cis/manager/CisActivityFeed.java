@@ -23,75 +23,26 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-package org.societies.api.internal.cis.management;
-
-
 /**
- * @author Thomas Vilarinho (Sintef)
-*/
-
-@Deprecated
-public class CisParticipant {
-	
-	public enum MembershipType {
-		   owner, participant, admin		 }
-	
-	 String membersJid;
-	 MembershipType mtype;
-	
-	
-	
-	
-	public CisParticipant(String membersJid, MembershipType mtype) {
-		super();
-		this.membersJid = membersJid;
-		this.mtype = mtype;
-	}
-	
-	
-	public String getMembersJid() {
-		return membersJid;
-	}
-	public void setMembersJid(String membersJid) {
-		this.membersJid = membersJid;
-	}
-	public MembershipType getMtype() {
-		return mtype;
-	}
-	public void setMtype(MembershipType mtype) {
-		this.mtype = mtype;
-	}
+ * Is a feed of activities that are collected from CIS members and their shared services.
+ * 
+ * @link CISActivity
+ * @author Babak.Farshchian@sintef.no
+ * @version 0
+ */
+package org.societies.cis.manager;
 
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((membersJid == null) ? 0 : membersJid.hashCode());
-		return result;
-	}
-
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		CisParticipant other = (CisParticipant) obj;
-		if (membersJid == null) {
-			if (other.membersJid != null)
-				return false;
-		} else if (!membersJid.equals(other.membersJid))
-			return false;
-		return true;
-	}
+public class CisActivityFeed {
+	public CisActivity[] activities;
+	public void getActivities(String CssId, String timePeriod){};
+	public void getActivities(String CssId, String query, String timePeriod){};
+	public void addCisActivity(CisActivity activity){};
+	public void cleanupFeed(String criteria){}
 	
+	public CisActivityFeed() {
 	
+	};
 	
 	
 

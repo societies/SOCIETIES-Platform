@@ -76,7 +76,10 @@
 						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<!-- <Export-Package></Export-Package>  -->
+						<Export-Package>
+    						org.societies.css.devicemgmt.DeviceCommsMgr.*
+		           		</Export-Package>
+		           		<DynamicImport-Package>*</DynamicImport-Package>
 					</instructions>
 				</configuration>
 			</plugin>

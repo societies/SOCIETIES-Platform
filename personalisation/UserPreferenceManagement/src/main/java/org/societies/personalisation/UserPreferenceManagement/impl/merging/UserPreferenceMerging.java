@@ -22,37 +22,52 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.api.user.location;
+package org.societies.personalisation.UserPreferenceManagement.impl.merging;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.Date;
 
-/**
- * 
- * This is the API to interact with the backed location management system. 
- * More methods to be followed. 
- *
- * @author guyf@il.ibm.com
- *
- */
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.personalisation.model.IAction;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.personalisation.preference.api.UserPreferenceMerging.IUserPreferenceMergingManager;
 
-public interface ILocationInferenceAdapter {
-	/**
-	 * Returns all the active zone in the system, those that at least one device was identified in them.
-	 * @return
-	 */
-	public Collection<IZone> getActiveZones();
-	
-	/**
-	 * Returns all the devices' entity ids that were identified in the given zones. 
-	 * @return
-	 */
-	public Set<String> getActiveEntitiesIdsInZone(IZoneId zoneId);
-	
-	/**
-	 * Returns the location of the given entity id.
-	 * @param entityId
-	 * @return
-	 */
-	public IUserLocation getEntityFullLocation(String entityId); 
+public class UserPreferenceMerging implements IUserPreferenceMergingManager{
+
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
+
+	@Override
+	public void explicitlyTriggerLearning(Date arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void explicitlyTriggerLearning(Date arg0,
+			ServiceResourceIdentifier arg1, IAction arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void explicitlyTriggerLearning(IIdentity arg0, Date arg1,
+			ServiceResourceIdentifier arg2, IAction arg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void processActionReceived(IAction arg0, IIdentity arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void sendEvent(IIdentity arg0, ServiceResourceIdentifier arg1,
+			String arg2, String arg3) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

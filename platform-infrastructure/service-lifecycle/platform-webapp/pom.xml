@@ -117,12 +117,32 @@
 			<version>1.2.1</version>
 		</dependency>
 		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.schema</groupId>
+			<artifactId>societies-api-schema</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>example.service.api</artifactId>
 			<version>0.1</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
+	
 	<build>
 		<finalName>societies-webapp</finalName>
 		<plugins>

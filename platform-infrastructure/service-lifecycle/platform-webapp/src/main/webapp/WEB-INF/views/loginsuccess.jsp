@@ -19,6 +19,9 @@
 			<td><a href="calculator.html">Calculator Service</a></td>
 		</tr>
 		<tr>
+			<td><a href="servicediscovery.html">Service Discovery Service</a></td>
+		</tr>
+		<tr>
 			<td><a href="otherservice.html">Other Service</a></td>
 		</tr>
 		<tr>
