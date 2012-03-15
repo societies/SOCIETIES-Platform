@@ -19,5 +19,5 @@
     <plugin name="Capture" value="com.phonegap.Capture"/>
     
     <!-- Societies Plugins -->
-	<plugin name="HelloWorldPlugin" value="org.societies.android.platform.gui.HelloWorldPlugin" />
+	<plugin name="HelloWorldPlugin" value="org.societies.android.platform.gui.plugin.HelloWorldPlugin" />
 </plugins>

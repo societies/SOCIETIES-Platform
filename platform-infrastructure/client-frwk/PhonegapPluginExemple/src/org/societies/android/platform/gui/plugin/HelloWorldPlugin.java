@@ -17,10 +17,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.gui;
-
-import java.util.ArrayList;
-import java.util.List;
+package org.societies.android.platform.gui.plugin;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,7 +29,7 @@ import com.phonegap.api.PluginResult;
 import com.phonegap.api.PluginResult.Status;
 
 /**
- * @author olivierm
+ * @author Olivier Maridat
  *
  */
 public class HelloWorldPlugin extends Plugin {
@@ -45,13 +42,13 @@ public class HelloWorldPlugin extends Plugin {
 	 * @see com.phonegap.api.Plugin#execute(java.lang.String, org.json.JSONArray, java.lang.String)
 	 */
 	@Override
-	public PluginResult execute(String action, JSONArray arguments, String callbackID) {
+	public PluginResult execute(String methodName, JSONArray arguments, String callbackID) {
 		Log.d(this.getClass().getSimpleName(), "Plugin Called");
 
 		PluginResult result = null;
 		try {
-			// -- Manage the relevant ACTION
-			if (ACTION_HELLO.equals(action)) {
+			// -- Manage the relevant method
+			if (ACTION_HELLO.equals(methodName)) {
 				String name = arguments.getString(0);
 				Log.d(this.getClass().getSimpleName(), name);
 				if (null == name || "".equals(name)) {
@@ -61,7 +58,7 @@ public class HelloWorldPlugin extends Plugin {
 				Log.d(this.getClass().getSimpleName(), "Returning "+ helloSentance);
 				result = new PluginResult(Status.OK, helloSentance);
 			}
-			else if (ACTION_HELLO_LIST.equals(action)) {
+			else if (ACTION_HELLO_LIST.equals(methodName)) {
 				JSONArray names = arguments.getJSONArray(0);
 				StringBuffer helloSentance = new StringBuffer();
 				for(int i=0; i<names.length(); i++) {
@@ -74,10 +71,10 @@ public class HelloWorldPlugin extends Plugin {
 				Log.d(this.getClass().getSimpleName(), "Returning "+ helloSentance);
 				result = new PluginResult(Status.OK, helloSentance.toString());
 			}
-			// -- Error: No ACTION to manage
+			// -- Error: Unknown method name
 			else {
 				result = new PluginResult(Status.INVALID_ACTION);
-				Log.d(this.getClass().getSimpleName(), "Invalid action : "+action+" passed");
+				Log.d(this.getClass().getSimpleName(), "Invalid method name : "+methodName+" passed");
 			}
 		}
 		// -- Error

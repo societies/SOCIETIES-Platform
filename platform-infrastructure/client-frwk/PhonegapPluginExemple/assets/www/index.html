@@ -24,7 +24,9 @@
 	<article data-role="content">
 		<input type="text" name="name" id="name" placeholder="Your name" value="" />
 		<input type="button" name="sayHello" id="sayHello" value="Say Hello" data-role="button" data-inline="true" />
-		<input type="button" name="sayHelloList" id="sayHelloList" value="Say Hello List" data-role="button" data-inline="true" />
+		<p>This button will say hello to the name you typed.</p><br />
+		<input type="button" name="sayHelloList" id="sayHelloList" value="Say Hellos" data-role="button" data-inline="true" />
+		<p>This button will say hello to Bruno, Rafik, World and Olivier.</p><br />
 	</article>
 	
 	<footer data-role="footer" data-position="fixed">
@@ -51,9 +53,11 @@ document.addEventListener('deviceready', function() {
 
 function onSuccess_sayHello(data) {
 	$('.result').remove();
+	$('.error').remove();
 	$('<span>').addClass('result').html(data).appendTo('#main article[data-role=content]');
 }
 function onFailure_sayHello(e) {
+	$('.result').remove();
 	$('.error').remove();
 	$('<span>').addClass('error').html(e).appendTo('#main article[data-role=content]');
 }

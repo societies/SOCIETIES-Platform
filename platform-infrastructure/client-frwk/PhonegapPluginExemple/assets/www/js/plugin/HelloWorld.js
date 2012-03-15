@@ -2,7 +2,7 @@
  *  
  * @return Object literal singleton instance of DirectoryListing
  */
-var HelloWorld = function() {
+var HelloWorldJS = function() {
 };
 
 /**
@@ -10,7 +10,7 @@ var HelloWorld = function() {
  * @param successCallback The callback which will be called when directory listing is successful
  * @param failureCallback The callback which will be called when directory listing encouters an error
  */
-HelloWorld.prototype.sayHello = function(name, successCallback, failureCallback) {
+HelloWorldJS.prototype.sayHello = function(name, successCallback, failureCallback) {
 	return PhoneGap.exec(
 			successCallback,	//Success callback from the plugin
 			failureCallback,	//Error callback from the plugin
@@ -19,7 +19,7 @@ HelloWorld.prototype.sayHello = function(name, successCallback, failureCallback)
 			[name]);			//Passing list of args to the plugin
 
 };
-HelloWorld.prototype.sayHelloList = function(names, successCallback, failureCallback) {
+HelloWorldJS.prototype.sayHelloList = function(names, successCallback, failureCallback) {
 	return PhoneGap.exec(
 			successCallback,	//Success callback from the plugin
 			failureCallback,	//Error callback from the plugin
@@ -30,5 +30,5 @@ HelloWorld.prototype.sayHelloList = function(names, successCallback, failureCall
 };
 
 PhoneGap.addConstructor(function() {
-	PhoneGap.addPlugin("HelloWorld", new HelloWorld());
+	PhoneGap.addPlugin("HelloWorld", new HelloWorldJS());
 });
