@@ -14,5 +14,5 @@
 		<osgi:reference id="CommManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
 		
 		<osgi:service ref="DmCommManager" interface="org.societies.api.internal.css.devicemgmt.comm.DmCommManager"/>
-	
+		
 </beans>

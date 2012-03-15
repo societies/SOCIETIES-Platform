@@ -22,37 +22,38 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.api.user.location;
 
-import java.util.Collection;
-import java.util.Set;
+package org.societies.api.internal.useragent.monitoring;
 
-/**
- * 
- * This is the API to interact with the backed location management system. 
- * More methods to be followed. 
- *
- * @author guyf@il.ibm.com
- *
- */
+import org.societies.api.identity.IIdentity;
+import org.societies.api.personalisation.model.IAction;
 
-public interface ILocationInferenceAdapter {
-	/**
-	 * Returns all the active zone in the system, those that at least one device was identified in them.
-	 * @return
-	 */
-	public Collection<IZone> getActiveZones();
+public class UIMEvent {
+
+    private IIdentity userId;
+    private IAction action;
+    
+    private UIMEvent(){
+        
+    }
+
+    public UIMEvent(IIdentity userId, 
+            IAction action){
+        this.userId = userId;
+        this.action = action;
+        
+    }
+
+	public IIdentity getUserId() {
+		return userId;
+	}
+
 	
-	/**
-	 * Returns all the devices' entity ids that were identified in the given zones. 
-	 * @return
-	 */
-	public Set<String> getActiveEntitiesIdsInZone(IZoneId zoneId);
-	
-	/**
-	 * Returns the location of the given entity id.
-	 * @param entityId
-	 * @return
-	 */
-	public IUserLocation getEntityFullLocation(String entityId); 
+
+	public IAction getAction() {
+		return action;
+	}
+
+
+
 }

@@ -35,9 +35,13 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
+import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
+import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.util.OsgiListenerUtils;
 
@@ -52,6 +56,8 @@ public class ServiceRegistryListener implements BundleContextAware,
 	private BundleContext bctx;
 	private static Logger log = LoggerFactory.getLogger(ServiceRegistryListener.class);
 	private IServiceRegistry serviceReg;
+	private ICommManager commMngr;
+	
 
 	public IServiceRegistry getServiceReg() {
 		return serviceReg;
@@ -61,6 +67,20 @@ public class ServiceRegistryListener implements BundleContextAware,
 		this.serviceReg = serviceReg;
 	}
 
+	/**
+	 * @return the commMngr
+	 */
+	public ICommManager getCommMngr() {
+		return commMngr;
+	}
+	
+	/**
+	 * @param commMngr the commMngr to set
+	 */
+	public void setCommMngr(ICommManager commMngr) {
+		this.commMngr = commMngr;
+	}
+	
 	public ServiceRegistryListener() {
 		log.info("Service RegistryListener Bean Instantiated");
 	}
@@ -96,9 +116,9 @@ public class ServiceRegistryListener implements BundleContextAware,
 		String propKeys[] = event.getServiceReference().getPropertyKeys();
 
 		for (String key : propKeys) {
-			log.debug("Property Key" + key);
+			log.info("Property Key" + key);
 			Object value = event.getServiceReference().getProperty(key);
-			log.debug("Property value" + value);
+			log.info("Property value" + value);
 			// serviceMeteData.put(key, value);
 		}
 		log.info("Bundle Id: " + serBndl.getBundleId() + "Bundle State: "
@@ -117,6 +137,22 @@ public class ServiceRegistryListener implements BundleContextAware,
 		log.info("**Service Name** : "+service.getServiceName());
 		log.info("**Service Desc** : "+service.getServiceDescription());
 		log.info("**Service type** : "+service.getServiceType().toString());
+		
+		
+		service.setServiceEndpoint(commMngr.getIdManager().getThisNetworkNode().getJid());
+		
+		//TODO: Do this properly!
+		ServiceInstance si = new ServiceInstance();
+		si.setFullJid(commMngr.getIdManager().getThisNetworkNode().getJid() + service.getServiceName().replaceAll(" ", ""));
+		si.setXMPPNode(commMngr.getIdManager().getThisNetworkNode().getJid());
+		
+		ServiceImplementation servImpl = new ServiceImplementation();
+		servImpl.setServiceVersion((String)event.getServiceReference().getProperty("Bundle-Version"));
+			
+		
+		si.setServiceImpl(servImpl);
+		service.setServiceInstance(si);
+		service.setServiceStatus(ServiceStatus.STARTED);
 		
 		List<Service> serviceList = new ArrayList<Service>();
 		switch (event.getType()) {
