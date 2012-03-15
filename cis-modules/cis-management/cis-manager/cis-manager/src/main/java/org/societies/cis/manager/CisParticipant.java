@@ -22,62 +22,77 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.preference.api.UserPreferenceMerging;
 
-import java.util.Date;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-
+package org.societies.cis.manager;
 
 
 /**
- * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 14:51:55
- */
-public interface IUserPreferenceMergingManager{
-
-	/**
-	 * 
-	 * @param date
-	 */
-	public void explicitlyTriggerLearning(Date date);
-
-	/**
-	 * 
-	 * @param date
-	 * @param serviceId
-	 * @param action
-	 */
-	public void explicitlyTriggerLearning(Date date, ServiceResourceIdentifier serviceId, IAction action);
-
-	/**
-	 * 
-	 * @param dpi
-	 * @param date
-	 * @param serviceId
-	 * @param action
-	 */
-	public void explicitlyTriggerLearning(IIdentity dpi, Date date, ServiceResourceIdentifier serviceId, IAction action);
+ * @author Thomas Vilarinho (Sintef)
+*/
 
 
+public class CisParticipant {
+	
+	public enum MembershipType {
+		   owner, participant, admin		 }
+	
+	 String membersJid;
+	 MembershipType mtype;
+	
+	
+	
+	
+	public CisParticipant(String membersJid, MembershipType mtype) {
+		super();
+		this.membersJid = membersJid;
+		this.mtype = mtype;
+	}
+	
+	
+	public String getMembersJid() {
+		return membersJid;
+	}
+	public void setMembersJid(String membersJid) {
+		this.membersJid = membersJid;
+	}
+	public MembershipType getMtype() {
+		return mtype;
+	}
+	public void setMtype(MembershipType mtype) {
+		this.mtype = mtype;
+	}
 
-	/**
-	 * 
-	 * @param action
-	 * @param dpi
-	 */
-	public void processActionReceived(IAction action, IIdentity dpi);
 
-	/**
-	 * 
-	 * @param dpi
-	 * @param serviceID
-	 * @param serviceType
-	 * @param prefName
-	 */
-	public void sendEvent(IIdentity dpi, ServiceResourceIdentifier serviceID, String serviceType, String prefName);
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((membersJid == null) ? 0 : membersJid.hashCode());
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CisParticipant other = (CisParticipant) obj;
+		if (membersJid == null) {
+			if (other.membersJid != null)
+				return false;
+		} else if (!membersJid.equals(other.membersJid))
+			return false;
+		return true;
+	}
+	
+	
+	
+	
 
 }

@@ -22,28 +22,64 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.personalisation.UserPreferenceManagement.impl.merging;
+
+import java.util.ArrayList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.personalisation.preference.api.model.IPreference;
 
 /**
- * Is a feed of activities that are collected from CIS members and their shared services.
- * 
- * @link CISActivity
- * @author Babak.Farshchian@sintef.no
- * @version 0
+ * @author Elizabeth
+ *
  */
-package org.societies.api.internal.cis.management;
+public class CommonNodeCounter {
 
-@Deprecated
-public class CisActivityFeed {
-	public CisActivity[] activities;
-	public void getActivities(String CssId, String timePeriod){};
-	public void getActivities(String CssId, String query, String timePeriod){};
-	public void addCisActivity(CisActivity activity){};
-	public void cleanupFeed(String criteria){}
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
+	private class NodeCounter{
+		IPreference node;
+		int counter;
+		
+		NodeCounter(IPreference ptn, int c){
+			this.node = ptn;
+			this.counter = c;
+			
+		}
+		
+		public int getCounter(){
+			return this.counter;
+		}
+		
+		public IPreference getNode(){
+			return this.node;
+		}
+	}
 	
-	public CisActivityFeed() {
+	ArrayList<NodeCounter> nc;
+	public CommonNodeCounter(){
+		nc = new ArrayList<NodeCounter>();
+	}
 	
-	};
+	public void add(IPreference ptn, int counter){
+		this.nc.add(new NodeCounter(ptn,counter));
+	}
 	
+	public IPreference getMostCommonNode(){
+		int counter = 0;
+		IPreference ptn = null;
+		logging.debug("nc size:"+this.nc.size());
+		for (int i = 0; i< this.nc.size(); i++){
+			int c = this.nc.get(i).getCounter();
+			if (counter < c){
+				counter = c;
+				ptn = this.nc.get(i).getNode();
+			}
+		}
+		
+		return ptn;
+	}
 	
 
 }
+

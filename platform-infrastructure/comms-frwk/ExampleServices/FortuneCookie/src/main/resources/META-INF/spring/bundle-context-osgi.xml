@@ -19,17 +19,11 @@
 	</osgi:service>
 
 	<bean id="serMetamodel"
-		class="org.societies.api.internal.servicelifecycle.model.Service">
+		class="org.societies.api.schema.servicelifecycle.model.Service">
 		<property name="authorSignature" value="aleckey" />
-		<property name="CSSIDInstalled" value="MyCSSIDequalJID@mydomain.org" />
 		<property name="serviceDescription" value="Fortune Cookie service offering your fortune" />
-		<property name="serviceLocation">
-			<value type="org.societies.api.internal.servicelifecycle.model.ServiceLocation">Local</value>
-		</property>
-		<property name="serviceType">
-			<value type="org.societies.api.internal.servicelifecycle.model.ServiceType">ThirdPartyService</value>
-		</property>		
+		<property name="serviceLocation" value = "LOCAL" />
+		<property name="serviceType" value = "THIRD_PARTY_SERVICE" />
 		<property name="serviceName" value="FortuneCookie Service" />
-		<property name="version" value="1a.123.aaa" />
 	</bean>
 </beans>

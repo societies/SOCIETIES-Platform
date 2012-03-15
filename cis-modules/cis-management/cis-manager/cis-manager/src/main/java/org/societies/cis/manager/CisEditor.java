@@ -35,6 +35,7 @@ import java.util.Set;
 //import org.societies.cis.mgmt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.collaboration.IServiceSharingRecord;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -43,24 +44,21 @@ import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
-import org.societies.api.internal.cis.management.CisActivityFeed;
-import org.societies.api.internal.cis.management.CisParticipant;
-import org.societies.api.internal.cis.management.CisParticipant.MembershipType;
-import org.societies.api.internal.cis.management.CisRecord;
 import org.societies.api.internal.cis.management.ICisEditor;
-import org.societies.api.internal.cis.management.ICisManager;
-import org.societies.api.internal.cis.management.ServiceSharingRecord;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.cis.manager.CisParticipant.MembershipType;
 import org.societies.comm.xmpp.pubsub.impl.PubsubServiceRouter;
 import org.societies.comm.xmpp.xc.impl.XCCommunicationMgr;
-import org.societies.community.Community;
-import org.societies.community.Participant;
-import org.societies.community.ParticipantRole;
-import org.societies.community.Who;
 import org.societies.identity.IdentityImpl;
-import org.societies.manager.Communities;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import org.societies.api.schema.cis.community.Who;
+import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.cis.community.Participant;
+import org.societies.api.schema.cis.community.ParticipantRole;
 
 
 /**
@@ -73,14 +71,14 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 
 	public CisRecord cisRecord;
 	public CisActivityFeed cisActivityFeed;
-	public Set<ServiceSharingRecord> sharedServices; 
+	public Set<IServiceSharingRecord> sharedServices; 
 //	public CommunityManagement commMgmt;
 	
 	
 	private final static List<String> NAMESPACES = Collections
-			.singletonList("http://societies.org/community");
+			.singletonList("http://societies.org/api/schema/cis/community");
 	private final static List<String> PACKAGES = Collections
-			.singletonList("org.societies.community");
+			.singletonList("org.societies.api.schema.cis.community");
 	
 	private ICommManager CISendpoint;
 	
@@ -95,45 +93,8 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 	private static Logger LOG = LoggerFactory
 			.getLogger(CisEditor.class);	
 	
-	/**
-	 * @deprecated  Replaced by constructor which has the new host field
-	 */
-	
-	@Deprecated
-	public CisEditor(String ownerCss, String cisId,
-			String membershipCriteria, String permaLink, String password) {
-		
-		cisActivityFeed = new CisActivityFeed();
-		sharedServices = new HashSet<ServiceSharingRecord>();
-		//membersCss = new CisParticipant[MAX_NB_MEMBERS];
-		
 
-		// TODO: broadcast its creation to other nodes?
 
-	}
-	
-	/**
-	 * @deprecated  Replaced by constructor which has the ICISCommunicationMgrFactory
-	 */
-	// constructor for creating a CIS from scratch
-	@Deprecated
-	public CisEditor(String ownerCss, String cisId,String host,
-			String membershipCriteria, String permaLink, String password) {
-		
-		cisActivityFeed = new CisActivityFeed();
-		sharedServices = new HashSet<ServiceSharingRecord>();
-		membersCss = new HashSet<CisParticipant>();
-		membersCss.add(new CisParticipant(ownerCss,MembershipType.owner));
-		//CISendpoint = 	new XCCommunicationMgr(host, cisId,password);
-		
-		cisRecord = new CisRecord(cisActivityFeed,ownerCss, membershipCriteria, cisId, permaLink, membersCss,
-				password, host, sharedServices);
-		
-
-		// TODO: broadcast its creation to other nodes?
-		
-
-	}
 
 	// it expects an existing Pubsubclient in the container in which it will autowire
 	//@Autowired	
@@ -141,7 +102,7 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 			String membershipCriteria, String permaLink, String password,ICISCommunicationMgrFactory ccmFactory) {
 		
 		cisActivityFeed = new CisActivityFeed();
-		sharedServices = new HashSet<ServiceSharingRecord>();
+		sharedServices = new HashSet<IServiceSharingRecord>();
 		membersCss = new HashSet<CisParticipant>();
 		membersCss.add(new CisParticipant(ownerCss,MembershipType.owner));
 
@@ -183,29 +144,7 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 
 	}
 
-	
-	// if just ownerCss and cisId are passed,
-	// password will be set to ""
-	// membership to "default"
-	// permalink to ""
-	/**
-	 * @deprecated  See if there is really a need for this constructor
-	 */
-	
-	@Deprecated
-	public CisEditor(String ownerCss, String cisId) {
-		
-		membersCss = new HashSet<CisParticipant>();
-		cisActivityFeed = new CisActivityFeed();
-		sharedServices = new HashSet<ServiceSharingRecord>();
-		
-		cisRecord = new CisRecord(cisActivityFeed,ownerCss, "default", cisId, "", membersCss,
-				"","", sharedServices);
-		
 
-		// TODO: broadcast its creation to other nodes?
-
-	}
 
 	public Set<CisParticipant> getMembersCss() {
 		return membersCss;
@@ -343,6 +282,7 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 		LOG.info("get Query received");
 		if (payload.getClass().equals(Community.class)) {
 			Community c = (Community) payload;
+			// JOIN
 			if (c.getJoin() != null) {
 				LOG.info("join received");
 				String jid = stanza.getFrom().getBareJid();

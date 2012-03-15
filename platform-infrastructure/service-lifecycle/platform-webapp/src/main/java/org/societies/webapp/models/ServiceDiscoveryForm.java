@@ -22,62 +22,33 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.preference.api.UserPreferenceMerging;
-
-import java.util.Date;
-
-import org.societies.api.identity.IIdentity;
-import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-
-
-
 /**
- * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 14:51:55
+ * 
  */
-public interface IUserPreferenceMergingManager{
+package org.societies.webapp.models;
+/**
+ * 
+ * @author Maria Mannion
+ * 
+ * This is a data model class for data input from html Service discovery page.
+ */
+public class ServiceDiscoveryForm {
 
-	/**
-	 * 
-	 * @param date
-	 */
-	public void explicitlyTriggerLearning(Date date);
-
-	/**
-	 * 
-	 * @param date
-	 * @param serviceId
-	 * @param action
-	 */
-	public void explicitlyTriggerLearning(Date date, ServiceResourceIdentifier serviceId, IAction action);
-
-	/**
-	 * 
-	 * @param dpi
-	 * @param date
-	 * @param serviceId
-	 * @param action
-	 */
-	public void explicitlyTriggerLearning(IIdentity dpi, Date date, ServiceResourceIdentifier serviceId, IAction action);
-
-
-
-	/**
-	 * 
-	 * @param action
-	 * @param dpi
-	 */
-	public void processActionReceived(IAction action, IIdentity dpi);
-
-	/**
-	 * 
-	 * @param dpi
-	 * @param serviceID
-	 * @param serviceType
-	 * @param prefName
-	 */
-	public void sendEvent(IIdentity dpi, ServiceResourceIdentifier serviceID, String serviceType, String prefName);
-
+	private String node;
+	private String method; 
+	
+	public String getNode() {
+		return node;
+	}
+	public void setNode(String node) {
+		this.node = node;
+	}
+	
+	public String getMethod() {
+		return method;
+	}
+	public void setMethod(String method) {
+		this.method = method;
+	}
+	
 }

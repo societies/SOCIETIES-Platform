@@ -9,25 +9,15 @@
 <title>Societies user login</title>
 </head>
 <body>
-	<h3>Hello: ${name}, ${result}, Today:  <%= new java.util.Date() %> </h3>
+	<h3>${servicediscoveryResult}</h3>
 	
 	<h4>Please click the service to use</h4>
-	
-	<table>
-	
+		
+	<table>	
 		<tr>
 			<td><a href="calculator.html">Calculator Service</a></td>
-		</tr>
-		<tr>
 			<td><a href="servicediscovery.html">Service Discovery Service</a></td>
-		</tr>
-		<tr>
-			<td><a href="otherservice.html">Other Service</a></td>
-		</tr>
-		<tr>
-			<td><a href="moreservice.html">More Service</a></td>
-		</tr>
-	</table>
-	
+		</tr>		
+	</table>	
 </body>
 </html>

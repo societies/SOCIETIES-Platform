@@ -22,62 +22,47 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.preference.api.UserPreferenceMerging;
 
-import java.util.Date;
-
-import org.societies.api.identity.IIdentity;
-import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-
-
-
+package org.societies.cis.manager;
 /**
- * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 14:51:55
+ * We use the definition of an Activity from www.activitystrea.ms. "The Activity
+ * in ActivityStreams is a description of an action that was performed (the verb)
+ * at some instant in time by someone or something (the actor) against some kind
+ * of person, place, or thing (the object). There may also be a target (like a 
+ * photo album or wishlist) involved".
+ * 
+ * @author Babak Farshchian
+ * @version 0
  */
-public interface IUserPreferenceMergingManager{
 
-	/**
-	 * 
-	 * @param date
-	 */
-	public void explicitlyTriggerLearning(Date date);
+public class CisActivity {
+	public String verb;
+	public String actor;
+	public String object;
+	public String target;
 
-	/**
-	 * 
-	 * @param date
-	 * @param serviceId
-	 * @param action
-	 */
-	public void explicitlyTriggerLearning(Date date, ServiceResourceIdentifier serviceId, IAction action);
-
-	/**
-	 * 
-	 * @param dpi
-	 * @param date
-	 * @param serviceId
-	 * @param action
-	 */
-	public void explicitlyTriggerLearning(IIdentity dpi, Date date, ServiceResourceIdentifier serviceId, IAction action);
-
-
-
-	/**
-	 * 
-	 * @param action
-	 * @param dpi
-	 */
-	public void processActionReceived(IAction action, IIdentity dpi);
-
-	/**
-	 * 
-	 * @param dpi
-	 * @param serviceID
-	 * @param serviceType
-	 * @param prefName
-	 */
-	public void sendEvent(IIdentity dpi, ServiceResourceIdentifier serviceID, String serviceType, String prefName);
-
+	public String getVerb() {
+		return verb;
+	}
+	public void setVerb(String verb) {
+		this.verb = verb;
+	}
+	public String getActor() {
+		return actor;
+	}
+	public void setActor(String actor) {
+		this.actor = actor;
+	}
+	public String getObject() {
+		return object;
+	}
+	public void setObject(String object) {
+		this.object = object;
+	}
+	public String getTarget() {
+		return target;
+	}
+	public void setTarget(String target) {
+		this.target = target;
+	}
 }
