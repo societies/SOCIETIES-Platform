@@ -93,7 +93,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 		this.ccmFactory = ccmFactory;
 		this.CSSendpoint = CSSendpoint;
 		this.ccmFactory = ccmFactory;
-		String host= "thomas.local";
+		String host= "societies.local";
 		String subDomain= "CISCommManager";
 		String secretKey= "password.thomas.local";
 		
@@ -104,13 +104,14 @@ public class CisManager implements ICisManager, IFeatureServer{
 		LOG.info("got IDmanager");
 
 		
-		//try {
+		try {
 			
-			cisManagerId = new IdentityImpl(IdentityType.CIS, subDomain, host); //idm.fromJid("CISCommManager.thomas.local"); //= new IdentityImpl(IdentityType.CIS, subDomain, host); 
+			//cisManagerId = new IdentityImpl(IdentityType.CIS, subDomain, host); //idm.fromJid("CISCommManager.thomas.local"); //= new IdentityImpl(IdentityType.CIS, subDomain, host); 
+			cisManagerId = idm.fromJid("CISCommManager.societies.local");
 		
 			LOG.info("got Identity");
-			CISMgmtendpoint = ccmFactory.getNewCommManager(cisManagerId, secretKey);
-			
+			//CISMgmtendpoint = ccmFactory.getNewCommManager(cisManagerId, secretKey);
+			CISMgmtendpoint = ccmFactory.getNewCommManager();
 			
 			LOG.info("CIS Management endpoint created");
 			
@@ -127,10 +128,9 @@ public class CisManager implements ICisManager, IFeatureServer{
 			
 			CISs = new HashSet<CisEditor>();
 			
-		//} catch (InvalidFormatException e1) {
-			
-		//	e1.printStackTrace();
-		//}
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 			
 
 		
