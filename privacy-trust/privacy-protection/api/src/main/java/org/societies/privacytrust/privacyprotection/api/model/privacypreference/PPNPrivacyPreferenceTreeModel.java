@@ -30,7 +30,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
 /**
@@ -44,7 +44,7 @@ public class PPNPrivacyPreferenceTreeModel extends DefaultTreeModel implements I
 	private CtxAttributeIdentifier affectedCtxId;
 	private String myContextType;
 	private IIdentity providerDPI;
-	private IServiceResourceIdentifier serviceID;
+	private ServiceResourceIdentifier serviceID;
 	private PrivacyPreferenceTypeConstants myPrivacyType;
 	private IPrivacyPreference pref;
 	
@@ -92,11 +92,11 @@ public class PPNPrivacyPreferenceTreeModel extends DefaultTreeModel implements I
 		return providerDPI;
 	}
 
-	public void setServiceID(IServiceResourceIdentifier serviceID) {
+	public void setServiceID(ServiceResourceIdentifier serviceID) {
 		this.serviceID = serviceID;
 	}
 
-	public IServiceResourceIdentifier getServiceID() {
+	public ServiceResourceIdentifier getServiceID() {
 		return serviceID;
 	}
 

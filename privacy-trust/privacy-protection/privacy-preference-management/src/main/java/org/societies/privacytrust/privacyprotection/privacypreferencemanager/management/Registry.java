@@ -32,7 +32,7 @@ import java.util.List;
 
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
@@ -252,7 +252,7 @@ public class Registry implements Serializable{
 
 
 
-	List<CtxAttributeIdentifier> getPPNPreferences(String contextType, IIdentity dpi, IServiceResourceIdentifier serviceID){
+	List<CtxAttributeIdentifier> getPPNPreferences(String contextType, IIdentity dpi, ServiceResourceIdentifier serviceID){
 		List<CtxAttributeIdentifier> preferenceCtxIDs = new ArrayList<CtxAttributeIdentifier>();
 
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
@@ -275,7 +275,7 @@ public class Registry implements Serializable{
 	}
 
 
-	CtxAttributeIdentifier getPPNPreference(String contextType, CtxAttributeIdentifier affectedCtxID, IIdentity dpi, IServiceResourceIdentifier serviceID){
+	CtxAttributeIdentifier getPPNPreference(String contextType, CtxAttributeIdentifier affectedCtxID, IIdentity dpi, ServiceResourceIdentifier serviceID){
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
 		while (e.hasMoreElements()){
 			PPNPreferenceDetails d = e.nextElement();
@@ -298,7 +298,7 @@ public class Registry implements Serializable{
 	}
 
 
-	CtxAttributeIdentifier getIDSPreference(IIdentity affectedDPI, IIdentity providerDPI, IServiceResourceIdentifier serviceID){
+	CtxAttributeIdentifier getIDSPreference(IIdentity affectedDPI, IIdentity providerDPI, ServiceResourceIdentifier serviceID){
 		Enumeration<IDSPreferenceDetails> e = this.idsMappings.keys();
 
 		while (e.hasMoreElements()){

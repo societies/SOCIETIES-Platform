@@ -28,16 +28,16 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 import java.util.List;
 
 import org.societies.api.identity.IIdentity;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 public interface IAgreement {
 	
 	
 	public List<RequestItem> getRequestedItems();
 	
-	public IServiceResourceIdentifier getServiceIdentifier();
+	public ServiceResourceIdentifier getServiceIdentifier();
 	
-	public void setServiceIdentifier(IServiceResourceIdentifier serviceId);
+	public void setServiceIdentifier(ServiceResourceIdentifier serviceId);
 	
 	public IIdentity getServiceDPI();
 	
