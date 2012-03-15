@@ -4,12 +4,12 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.security</groupId>
-	<artifactId>signature-mgr</artifactId>
+	<artifactId>security-services</artifactId>
 	<version>${release.version}</version>
 	<packaging>bundle</packaging>
-	<name>Digital Signature Service Bundle</name>
+	<name>Security Services Bundle</name>
 
-	<description>This bundle provides the ability to digitally sign XML contents and verify signatures.</description>
+	<description>This bundle provides some of the low level security services, including ability to digitally sign XML contents, verify signatures and securely store passwords, certificates and documents.</description>
 
 	<developers>
 		<developer>
@@ -37,6 +37,13 @@
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
@@ -75,7 +82,7 @@
 						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Import-Package>*;resolution:=optional</Import-Package>
-						<Export-Package>org.societies.api.security.digsig.*</Export-Package>
+						<Export-Package>org.societies.api.security.digsig.*,org.societies.api.internal.security.storage.*</Export-Package>
 						<!-- Private-Package> org.societies.security.digsig.*, org.societies.security.something.* 
 							</Private-Package -->
 						<_nouses>true</_nouses>
