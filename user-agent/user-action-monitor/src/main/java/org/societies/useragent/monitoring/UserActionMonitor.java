@@ -27,6 +27,7 @@ package org.societies.useragent.monitoring;
 
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.useragent.monitoring.IInternalUserActionMonitor;
+import org.societies.api.internal.useragent.monitoring.IUserActionListener;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 
@@ -40,7 +41,7 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 	}
 	
 	@Override
-	public void registerForActionUpdates() {
+	public void registerForActionUpdates(IUserActionListener listener) {
 		// TODO Auto-generated method stub	
 	}
 	

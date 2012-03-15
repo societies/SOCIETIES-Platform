@@ -23,13 +23,18 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.useragent.monitoring;
+package org.societies.useragent.api.monitoring.remote;
 
-public interface IInternalUserActionMonitor {
-	
+public interface IUserActionMonitorRemote {
+
 	/**
-	 * This method allows platform components to register for events that occur when actions are received
+	 * 
+	 * @param serviceId  ID of monitored service
+	 * @param owner  Identity of user where action originated from
+	 * @param parameterName  Parameter name of action
+	 * @param value  Value of action
 	 */
+	public void monitor(ServiceResourceIdentifier serviceId, IIdentity owner, String parameterName, String value);
+	
 	public void registerForActionUpdates(IUserActionListener listener);
-
 }
