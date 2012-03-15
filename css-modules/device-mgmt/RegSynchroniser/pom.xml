@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.societies.css.devicemgmt</groupId>
   <artifactId>RegSynchroniser</artifactId>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
   <name>RegSynchroniser</name>
   <version>0.0.1-SNAPSHOT</version>
   
@@ -24,9 +24,9 @@
   <parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		
 		<version>0.1</version>
-	</parent>
+		<relativePath>../../../parent/spring-osgi.xml</relativePath>
+  </parent>
   
   <dependencies>
   		<dependency>
@@ -84,6 +84,24 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.comm.xmpp</groupId>
+			<artifactId>CommunicationFrameworkCommons</artifactId>
+			<version>${version.comm}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.comm.xmpp.pubsub</groupId>
+			<artifactId>PubsubClientBundle</artifactId>
+			<version>${version.comm}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.schema</groupId>
+			<artifactId>societies-api-schema</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
 				
 	</dependencies>
 	
@@ -99,16 +117,21 @@
               			<Bundle-Name>${project.artifactId}</Bundle-Name>
               			<Bundle-Version>${project.version}</Bundle-Version>
               			<Import-Package>
-              				org.springframework.beans.factory.xml,
-              				org.springframework.aop, org.springframework.aop.framework,
-              				org.aopalliance.aop, org.xml.sax, org.osgi.framework,
+              				<!-- org.springframework.beans.factory.xml,
+              				org.springframework.aop, 
+              				org.springframework.aop.framework,
+              				org.aopalliance.aop, 
+              				org.xml.sax, 
               				org.springframework.osgi.service.importer.support,
               				org.springframework.beans.propertyeditors,
               				org.springframework.osgi.service.exporter.support,
+              				org.springframework.osgi.service.exporter, -->
+              				org.societies.comm.xmpp.event,
+              				org.springframework.context,
+              				org.osgi.framework,
               				org.springframework.osgi.context,
-              				org.springframework.osgi.service.exporter,
               				org.slf4j.*,
-              				<!--org.societies.api.internal.css.devicemgmt,-->
+              				org.societies.api.internal.css.devicemgmt,
               				org.societies.api.internal.css.devicemgmt.model,
               				org.societies.css.devicemgmt.deviceregistry
               			</Import-Package> 
