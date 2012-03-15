@@ -43,20 +43,15 @@ import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.IdentityType;
-import org.societies.api.identity.InvalidFormatException;
 
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.cis.manager.CisEditor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import org.societies.identity.IdentityImpl;
 
 import org.societies.api.schema.cis.manager.Community;
 import org.societies.api.schema.cis.manager.Communities;
@@ -90,7 +85,6 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 	@Autowired
 	public CisManager(ICISCommunicationMgrFactory ccmFactory,ICommManager CSSendpoint) {
-		this.ccmFactory = ccmFactory;
 		this.CSSendpoint = CSSendpoint;
 		this.ccmFactory = ccmFactory;
 		String host= "societies.local";
@@ -98,24 +92,18 @@ public class CisManager implements ICisManager, IFeatureServer{
 		String secretKey= "password.thomas.local";
 		
 		LOG.info("factory bundled");
-		
 		IIdentityManager idm = CSSendpoint.getIdManager();
-	
 		LOG.info("got IDmanager");
-
 		
 		try {
-			
 			//cisManagerId = new IdentityImpl(IdentityType.CIS, subDomain, host); //idm.fromJid("CISCommManager.thomas.local"); //= new IdentityImpl(IdentityType.CIS, subDomain, host); 
 			cisManagerId = idm.fromJid("CISCommManager.societies.local");
 		
 			LOG.info("got Identity");
 			//CISMgmtendpoint = ccmFactory.getNewCommManager(cisManagerId, secretKey);
 			CISMgmtendpoint = ccmFactory.getNewCommManager();
-			
 			LOG.info("CIS Management endpoint created");
-			
-			
+
 			try {
 				CISMgmtendpoint.register(this);
 			} catch (CommunicationException e) {
@@ -123,21 +111,12 @@ public class CisManager implements ICisManager, IFeatureServer{
 			} // TODO unregister??
 			
 			LOG.info("listener registered");
-			
-			
-			
-			CISs = new HashSet<CisEditor>();
-			
+
+			CISs = new HashSet<CisEditor>();			
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
-			
-
-		
 	}
-
-
-
 
 	/**
 	 * Create a CIS Editor with default settings and returns a CIS Record 
@@ -149,8 +128,6 @@ public class CisManager implements ICisManager, IFeatureServer{
 	 * @return      CisRecord
 	 * 
 	 */
-	
-
 	public CisRecord createCis(String creatorCssId, String cisname) {
 		// TODO: create and identity for the CIS and map it in the database with the cisname
 		// cisId = randon unused JID;
@@ -158,8 +135,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 		String cisId = "cis1";
 		String host = this.cisManagerId.getDomain();
 		String password = "password.thomas.local";
-		
-		
+
 		return this.createCis(creatorCssId, cisId, host, password);
 	}
 	
@@ -190,11 +166,6 @@ public class CisManager implements ICisManager, IFeatureServer{
 	}
 
 
-
-	
-	
-
-
 	public List<CisRecord> getCisList() {
 		
 		List<CisRecord> l = new ArrayList<CisRecord>();
@@ -206,22 +177,14 @@ public class CisManager implements ICisManager, IFeatureServer{
 			 l.add(element.getCisRecord());
 			 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 	     }
-			
 		
 		return l;
 	}
-	
-	
-
 
 	@Override
 	public List<String> getJavaPackages() {
-		
 		return  PACKAGES;
-
 	}
-
-
 
 	@Override
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
