@@ -83,9 +83,9 @@
 			<module>../platform-infrastructure/comms-frwk/ExampleServices/FortuneCookieBean</module> 
 			<module>../platform-infrastructure/comms-frwk/ExampleServices/ExampleServiceMgr</module> -->
 		<!-- Service Registry -->
-<!--
+
 		<module>../css-modules/serviceRegistry</module>
--->
+
 		<module>../platform-infrastructure/service-lifecycle/service-mgmt/
 		</module>
 		<!-- 
