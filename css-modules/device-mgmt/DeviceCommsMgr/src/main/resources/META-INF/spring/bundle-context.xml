@@ -14,9 +14,11 @@
   		 <property name="commManager" ref="CommManager" />
   	</bean>
   
-   <bean id="DmCommunicationManager" 
+  
+   <bean id="DmCommManager" 
        		 class="org.societies.css.devicemgmt.DeviceCommsMgr.impl.CommAdapterImpl" 
        		 depends-on="CommManager">
 			<property name="commManager" ref="CommManager" />
    </bean>
+   
 </beans>

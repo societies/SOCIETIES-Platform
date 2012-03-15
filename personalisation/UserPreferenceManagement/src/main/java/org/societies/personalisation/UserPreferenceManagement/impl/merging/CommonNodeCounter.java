@@ -22,62 +22,64 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.preference.api.UserPreferenceMerging;
+package org.societies.personalisation.UserPreferenceManagement.impl.merging;
 
-import java.util.Date;
+import java.util.ArrayList;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.personalisation.preference.api.model.IPreference;
 
 /**
- * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 14:51:55
+ * @author Elizabeth
+ *
  */
-public interface IUserPreferenceMergingManager{
+public class CommonNodeCounter {
 
-	/**
-	 * 
-	 * @param date
-	 */
-	public void explicitlyTriggerLearning(Date date);
-
-	/**
-	 * 
-	 * @param date
-	 * @param serviceId
-	 * @param action
-	 */
-	public void explicitlyTriggerLearning(Date date, ServiceResourceIdentifier serviceId, IAction action);
-
-	/**
-	 * 
-	 * @param dpi
-	 * @param date
-	 * @param serviceId
-	 * @param action
-	 */
-	public void explicitlyTriggerLearning(IIdentity dpi, Date date, ServiceResourceIdentifier serviceId, IAction action);
-
-
-
-	/**
-	 * 
-	 * @param action
-	 * @param dpi
-	 */
-	public void processActionReceived(IAction action, IIdentity dpi);
-
-	/**
-	 * 
-	 * @param dpi
-	 * @param serviceID
-	 * @param serviceType
-	 * @param prefName
-	 */
-	public void sendEvent(IIdentity dpi, ServiceResourceIdentifier serviceID, String serviceType, String prefName);
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
+	private class NodeCounter{
+		IPreference node;
+		int counter;
+		
+		NodeCounter(IPreference ptn, int c){
+			this.node = ptn;
+			this.counter = c;
+			
+		}
+		
+		public int getCounter(){
+			return this.counter;
+		}
+		
+		public IPreference getNode(){
+			return this.node;
+		}
+	}
+	
+	ArrayList<NodeCounter> nc;
+	public CommonNodeCounter(){
+		nc = new ArrayList<NodeCounter>();
+	}
+	
+	public void add(IPreference ptn, int counter){
+		this.nc.add(new NodeCounter(ptn,counter));
+	}
+	
+	public IPreference getMostCommonNode(){
+		int counter = 0;
+		IPreference ptn = null;
+		logging.debug("nc size:"+this.nc.size());
+		for (int i = 0; i< this.nc.size(); i++){
+			int c = this.nc.get(i).getCounter();
+			if (counter < c){
+				counter = c;
+				ptn = this.nc.get(i).getNode();
+			}
+		}
+		
+		return ptn;
+	}
+	
 
 }
+
