@@ -26,8 +26,13 @@ package org.societies.context.community.estimation.test;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.junit.After;
@@ -36,12 +41,16 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.mockito.internal.util.IdentitySet;
 import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.comm.xmpp.datatypes.IdentityType;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.context.broker.impl.CtxBroker;
 import org.societies.context.broker.impl.InternalCtxBroker;
 import org.societies.context.community.estimation.impl.CommunityContextEstimation;
 import org.societies.context.user.db.impl.UserCtxDBMgr;
@@ -143,13 +152,12 @@ public class TE_ST {
 //		 * 
 //		 */
 //		
-//		/*
+	//		/*
 //		 * Step1: Use CtxBroker to access the Attributes
 //		 */
-//		System.out.println("Hallo");
+//		System.out.println("Hello");
 //		System.out.println(communityContextEntity.getMembers());
-//		
-//		
+//		//		
 //		/*
 //		 *Step2: Populate the list
 //		 * 
@@ -163,12 +171,42 @@ public class TE_ST {
 //	}
 	
 	@Test
-	public void TestCalculation() throws CtxException{
-		InternalCtxBroker brok = Mockito.mock(InternalCtxBroker.class);
-		System.out.println(brok.retrieveCommunityMembers(null));
-		//ftiaxno 
-	
+	public void TestCalculation() throws CtxException, Exception, Exception{
+		CtxBroker brok = Mockito.mock(CtxBroker.class);
 		
+		System.out.println("brok.retrieveCommunityMembers is: "+brok.retrieveCommunityMembers(null, null));
+		
+//		ExecutorService executor = Executors.newFixedThreadPool(1);
+//		executor = Executors.newCachedThreadPool();
+//		
+//		Future<?> f1 = executor.submit(new CtxEntity(null));
+//		
+//
+//		// reject new tasks, must call in order to exit VM
+//		executor.shutdown();
+//		
+//		Mockito.when(brok.createEntity(null, null)).then(fe);
+//		Future<?> fe = E
+		
+		
+		
+																						HashMap entityYboul = new HashMap();
+																						entityYboul.put("age", 38);
+																						entityYboul.put("name", "yboul");
+																						System.out.println(entityYboul.toString());
+																												
+																						HashMap entityMm = new HashMap();
+																						entityMm.put("age", 35);
+																						entityMm.put("name", "mmous");
+																						System.out.println(entityMm.toString());
+		
+
+		//brok.createEntity(requester, "person");
+		
+		
+		System.out.println("brok.createEntity is: "+brok.createEntity(null,"person"));
+		
+	
 		//CommunityContextEstimation c = Mockito.mock(CommunityContextEstimation.class);
 
 	
