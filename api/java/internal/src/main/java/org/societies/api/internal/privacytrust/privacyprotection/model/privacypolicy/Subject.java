@@ -29,7 +29,7 @@ import java.io.Serializable;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.TargetMatchConstants;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
 /**
@@ -40,7 +40,7 @@ import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 public class Subject implements Serializable{
 
 	private IIdentity dpi;
-	private IServiceResourceIdentifier serviceID;
+	private ServiceResourceIdentifier serviceID;
 
 	public Subject(){
 		
@@ -49,7 +49,7 @@ public class Subject implements Serializable{
 		this.dpi = dpi;
 	}
 
-	public Subject(IIdentity dpi, IServiceResourceIdentifier serviceID){
+	public Subject(IIdentity dpi, ServiceResourceIdentifier serviceID){
 		this.dpi = dpi;
 		this.serviceID = serviceID;
 	}
@@ -87,7 +87,7 @@ public class Subject implements Serializable{
 	private String serviceIDToXMLString(){
 		String str = "";
 		str = str.concat("\n\t<Attribute AttributeId=\"serviceID\"" +
-				"\n\t\t\tDataType=\"org.personalsmartspace.sre.api.pss3p.IServiceResourceIdentifier\">");
+				"\n\t\t\tDataType=\"org.personalsmartspace.sre.api.pss3p.ServiceResourceIdentifier\">");
 		str = str.concat("\n\t\t<AttributeValue>");
 		str = str.concat(this.serviceID.toString());
 		str = str.concat("</AttributeValue>");
@@ -103,7 +103,7 @@ public class Subject implements Serializable{
 		return this.dpi;
 	}
 	
-	public IServiceResourceIdentifier getServiceID(){
+	public ServiceResourceIdentifier getServiceID(){
 		return this.serviceID;
 	}
 	

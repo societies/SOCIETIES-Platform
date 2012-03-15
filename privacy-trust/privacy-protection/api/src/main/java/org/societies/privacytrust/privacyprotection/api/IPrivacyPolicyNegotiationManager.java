@@ -25,7 +25,7 @@
 package org.societies.privacytrust.privacyprotection.api;
 
 import org.societies.api.identity.IIdentity;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
 /**
@@ -47,6 +47,6 @@ public interface IPrivacyPolicyNegotiationManager {
 	 * @param transient_id    temp id
 	 * @param service_id
 	 */
-	public void negotiateServicePolicy(IIdentity transient_id, IServiceResourceIdentifier service_id);
+	public void negotiateServicePolicy(IIdentity transient_id, ServiceResourceIdentifier service_id);
 
 }
