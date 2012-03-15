@@ -12,7 +12,7 @@
        testing of the bundle outside of an OSGi container -->
   
 <!--   <osgi:service ref="serviceMgmt" interface="org.societies.api.internal.servicelifecycle.serviceMgmt.IServiceManagement"/> -->
-<osgi:service ref="serListener" interface="org.societies.slm.servicemgmt.impl.ServiceRegistryListener"/>	
+<osgi:service ref="serListener" interface="org.societies.slm.servicecontrol.ServiceRegistryListener"/>	
 <osgi:service ref="serviceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"/>
 
 <!-- Commenting out for now. No bean in bundle-context.xml file. so causes problem on deployment

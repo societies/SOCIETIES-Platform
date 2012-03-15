@@ -19,7 +19,7 @@
 	</bean>
 -->
 
-	<bean id="serListener" class="org.societies.slm.servicemgmt.impl.ServiceRegistryListener"
+	<bean id="serListener" class="org.societies.slm.servicecontrol.ServiceRegistryListener"
 		init-method="registerListener" destroy-method="unRegisterListener">	
 		<property name="serviceReg" ref="serviceRegRef" />
 		<property name="commMngr" ref="commMngrRef" />				
