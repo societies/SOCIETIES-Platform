@@ -117,6 +117,32 @@ public class ServiceRegistryTest extends
 	}
 	
 
+	
+	
+	@Test
+	@Rollback(false)
+	public void notifyServiceSharedCIS() throws Exception{
+		for (Service service : servicesList) {
+			serReg.notifyServiceIsSharedInCIS(service.getServiceIdentifier(), "CISid");
+			serReg.notifyServiceIsSharedInCIS(service.getServiceIdentifier(), "CISid1");
+		}
+	}
+	
+	@Test
+	@Rollback(false)
+	public void removeNotifyServiceSharedCIS() throws Exception{
+		
+			for (Service service : servicesList) {
+				serReg.removeServiceSharingInCIS(service.getServiceIdentifier(), "CISid1");
+				
+			}
+	}
+	
+	@Test
+	@Rollback(false)
+	public void retrieveServicesSharedCIS() throws Exception{
+		List<Service> returnedList=serReg.retrieveServicesSharedByCIS("CISid");
+	}
 	@Test
 	@ExpectedException(ServiceRetrieveException.class)
 	@Rollback(false)
