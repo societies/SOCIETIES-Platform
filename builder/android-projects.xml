@@ -44,6 +44,14 @@
 		<!-- Utilities -->
 		<module>../utilities/DBC</module>
 
+		<!-- Android Communication components -->
+		<module>../platform-infrastructure/client-frwk/AndroidIPC</module>
+		<module>../platform-infrastructure/client-frwk/AndroidAgentApi</module>
+		<module>../platform-infrastructure/client-frwk/AndroidPubsubApi</module>
+		<module>../platform-infrastructure/client-frwk/AndroidAgent</module>
+		<module>../platform-infrastructure/client-frwk/AndroidPubsub</module>
+
+
 		<!-- API -->
 		<module>../platform-infrastructure/client-frwk/CoreInterfaces</module>
 

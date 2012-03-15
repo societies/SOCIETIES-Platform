@@ -162,6 +162,18 @@ public class EgocentricCommunityCreationManagerTest {
 		Assert.assertNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null, null)));
 	}
     
+    public void testCreateCisForPeopleTemporarilyUsingServiceTogether() {
+    	
+    }
+    
+    public void testNotCreateDuplicateCis() {
+    	
+    }
+    
+    public void testNotSuggestUndesiredCis() {
+    	
+    }
+    
     public void setCtxBroker(ICtxBroker userCtxBroker){
 		this.userCtxBroker = userCtxBroker;
 	}

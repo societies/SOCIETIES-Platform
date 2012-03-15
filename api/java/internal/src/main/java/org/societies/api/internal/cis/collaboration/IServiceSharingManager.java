@@ -34,9 +34,13 @@
 package org.societies.api.internal.cis.collaboration;
 
 
-import org.societies.api.internal.cis.management.ServiceSharingRecord;
 
 
+/**
+ * @author Babak.Farshchian@sintef.no
+ *
+ */
+@Deprecated
 public interface IServiceSharingManager {
-	boolean addServiceSharingRecord(String cisId, ServiceSharingRecord sharingRecord);
+	boolean addServiceSharingRecord(String cisId, IServiceSharingRecord sharingRecord);
 }

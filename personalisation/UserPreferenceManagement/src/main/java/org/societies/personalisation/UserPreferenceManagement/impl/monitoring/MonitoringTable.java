@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
  * @author Elizabeth
@@ -44,25 +44,25 @@ public class MonitoringTable {
 
 	//holds the CtxIdentifiers and all the affected services underneath them
 	private Hashtable<CtxIdentifier,MonitoredInfo> mainDataTable;
-	private ArrayList<IServiceResourceIdentifier> services;
+	private ArrayList<ServiceResourceIdentifier> services;
 	private Hashtable<PreferenceDetails, IOutcome> lastOutcomes;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	
 	/*
 	 * fullPreferencenametoServiceID:
 	 *    String: fullpreferencename as: <serviceType>:<serviceID>.toString():<preferenceName
-	 *    IServiceResourceIdentifier: the id of the service 
+	 *    ServiceResourceIdentifier: the id of the service 
 	 */
-	private Hashtable<PreferenceDetails, IServiceResourceIdentifier> fullPreferenceNametoServiceID;
+	private Hashtable<PreferenceDetails, ServiceResourceIdentifier> fullPreferenceNametoServiceID;
 	
 	public MonitoringTable(){
 		 this.mainDataTable = new Hashtable<CtxIdentifier,MonitoredInfo>();
-		 this.services = new ArrayList<IServiceResourceIdentifier>();
+		 this.services = new ArrayList<ServiceResourceIdentifier>();
 		 this.lastOutcomes = new Hashtable<PreferenceDetails, IOutcome>();
-		 this.fullPreferenceNametoServiceID = new Hashtable<PreferenceDetails, IServiceResourceIdentifier>();
+		 this.fullPreferenceNametoServiceID = new Hashtable<PreferenceDetails, ServiceResourceIdentifier>();
 	}
 	
-	public boolean isServiceRunning(String serviceType, IServiceResourceIdentifier serviceID){
+	public boolean isServiceRunning(String serviceType, ServiceResourceIdentifier serviceID){
 		Tools t = new Tools();
 		return this.services.contains(t.convertToKey(serviceType, serviceID.toString()));
 	}
@@ -88,7 +88,7 @@ public class MonitoringTable {
 		return this.mainDataTable.containsKey(id);
 	}
 	
-	public void addInfo(CtxIdentifier id, IServiceResourceIdentifier serviceID, String serviceType, String prefName){
+	public void addInfo(CtxIdentifier id, ServiceResourceIdentifier serviceID, String serviceType, String prefName){
 		if (this.mainDataTable.containsKey(id)){
 			//JOptionPaneshowMessageDialog(null, "Adding new CtxID to tables of PCM "+id.toString());
 			MonitoredInfo mInfo = this.mainDataTable.get(id);
@@ -118,7 +118,7 @@ public class MonitoringTable {
 	
 
 	
-	private void deleteInfo(String serviceType, IServiceResourceIdentifier serviceID){
+	private void deleteInfo(String serviceType, ServiceResourceIdentifier serviceID){
 		Enumeration<CtxIdentifier> ids = this.mainDataTable.keys();
 		while (ids.hasMoreElements()){
 			MonitoredInfo mInfo = this.mainDataTable.get(ids.nextElement());
@@ -126,7 +126,7 @@ public class MonitoringTable {
 		}		
 	}
 	
-	public void updateLastAction(String serviceType, IServiceResourceIdentifier serviceID, String prefName, IOutcome o){
+	public void updateLastAction(String serviceType, ServiceResourceIdentifier serviceID, String prefName, IOutcome o){
 		
 		PreferenceDetails key = new PreferenceDetails(serviceType,serviceID,prefName);
 		if (this.lastOutcomes.containsKey(key)){
@@ -143,12 +143,12 @@ public class MonitoringTable {
 		return null;
 	}
 	
-	public IOutcome getLastAction(String serviceType, IServiceResourceIdentifier serviceID, String preferenceName){
+	public IOutcome getLastAction(String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
 		PreferenceDetails d = new PreferenceDetails(serviceType, serviceID, preferenceName);
 		return getLastAction(d);
 	}
 	
-	public void removeServiceInfo(String serviceType, IServiceResourceIdentifier serviceID){
+	public void removeServiceInfo(String serviceType, ServiceResourceIdentifier serviceID){
 		Enumeration<CtxIdentifier> ids = this.mainDataTable.keys();
 		
 		while(ids.hasMoreElements()){
@@ -164,7 +164,7 @@ public class MonitoringTable {
 		
 		while (fullPreferenceNames.hasMoreElements()){
 			PreferenceDetails temp = fullPreferenceNames.nextElement();
-			IServiceResourceIdentifier Id = this.fullPreferenceNametoServiceID.get(temp);
+			ServiceResourceIdentifier Id = this.fullPreferenceNametoServiceID.get(temp);
 			if (serviceID.equals(Id)){
 				if (this.lastOutcomes.containsKey(temp)){
 					this.lastOutcomes.remove(temp);

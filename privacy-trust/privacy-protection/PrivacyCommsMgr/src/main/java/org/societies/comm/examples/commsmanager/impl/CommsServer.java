@@ -34,6 +34,7 @@ package org.societies.comm.examples.commsmanager.impl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,13 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationAgentBean;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
 
 public class CommsServer implements IFeatureServer {
 
@@ -78,15 +86,7 @@ public class CommsServer implements IFeatureServer {
 		this.commManager = commManager;
 	}
 
-	
-/*	public ICalc getCalcService() {
-		return calcService;
-	}
 
-	public void setCalcService(ICalc calcService) {
-		this.calcService = calcService;
-	}
-*/
 	
 	//METHODS
 	public CommsServer() {
@@ -140,7 +140,69 @@ public class CommsServer implements IFeatureServer {
 	}
 	
 	public Object getQuery(Stanza stanza, NegotiationAgentBean bean){
-		
+		if (bean.getMethod().equals("acknowledgeAgreement")){
+			byte[] agreementEnvelopeArray = bean.getAgreementEnvelope();
+			Object obj = Util.convertToObject(agreementEnvelopeArray, this.getClass());
+			if (obj!=null){
+				if (obj instanceof AgreementEnvelope){
+					Boolean b;
+					try {
+						b = this.negAgent.acknowledgeAgreement((IAgreementEnvelope) obj).get();
+						return b;
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ExecutionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					return false;
+				}
+			}
+		}else if (bean.getMethod().equals("getPolicy")){
+			try{
+			RequestPolicy policy =  this.negAgent.getPolicy((ServiceResourceIdentifier) bean.getServiceID()).get();
+			if (policy!=null){
+				return Util.toByteArray(policy);
+			}
+			} catch (InterruptedException e){
+				
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return null;
+		}else if (bean.getMethod().equals("getProviderIdentity")){
+			try {
+				return this.getNegAgent().getProviderIdentity().get().getJid();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}else if (bean.getMethod().equals("negotiate")){
+			try{
+			byte[] responseArray = bean.getResponsePolicy();
+			Object obj = Util.convertToObject(responseArray,this.getClass());
+			if (obj!=null){
+				if (obj instanceof ResponsePolicy){
+					ResponsePolicy policy = (this.negAgent.negotiate(bean.getServiceID(), (ResponsePolicy) obj)).get();
+					if (policy!=null){
+						return Util.toByteArray(policy);
+					}
+				}
+			}
+			} catch (InterruptedException e){
+				
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+			
+		return null;
 	}
 
 
@@ -153,4 +215,6 @@ public class CommsServer implements IFeatureServer {
 		return null;
 	}
 	
+	
+
 }

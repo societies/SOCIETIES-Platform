@@ -9,7 +9,7 @@ import android.util.Log;
 
 public class Skeleton {
 	
-	private static final String TAG =  Skeleton.class.getSimpleName();
+	private static final String TAG =  Skeleton.class.getName();
 	
 	private class IncomingHandler extends Handler {		
         @Override

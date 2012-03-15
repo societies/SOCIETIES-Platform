@@ -37,16 +37,22 @@
 package org.societies.api.internal.cis.directory;
 
 
+
+/**
+ * @author Babak.Farshchian@sintef.no
+ *
+ */
+@Deprecated
 public interface ICisDirectory {
 	/*
 	 * Various search methods that return an array of CISAdvertisementRecords.
 	 */
-	CisAdvertisementRecord[] searchByName(String cisName);
-	CisAdvertisementRecord[] searchByOwner(String ownerId);
-	CisAdvertisementRecord[] searchByUri(String uri);
+	ICisAdvertisementRecord[] searchByName(String cisName);
+	ICisAdvertisementRecord[] searchByOwner(String ownerId);
+	ICisAdvertisementRecord[] searchByUri(String uri);
 	
-	Boolean RegisterCis (CisAdvertisementRecord cis);
-	Boolean UnregisterCis (CisAdvertisementRecord cis);
+	Boolean RegisterCis (ICisAdvertisementRecord cis);
+	Boolean UnregisterCis (ICisAdvertisementRecord cis);
 	/*
 	 * This method is used to add CIS Directories that reside on other nodes.
 	 * 

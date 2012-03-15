@@ -37,6 +37,8 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
+import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
@@ -44,20 +46,34 @@ import org.societies.api.schema.servicelifecycle.model.Service;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 
-
 public class ServiceDiscovery implements IServiceDiscovery {
 
 	static final Logger logger = LoggerFactory.getLogger(ServiceDiscovery.class);
 
 	private IServiceRegistry serviceReg;
 	private ICommManager commMngr;
-
+	private IServiceDiscoveryRemote serviceDiscoveryRemote;
 
 	/**
 	 * @return the commMngr
 	 */
 	public ICommManager getCommMngr() {
 		return commMngr;
+	}
+
+	/**
+	 * @return the serviceDiscoveryRemote
+	 */
+	public IServiceDiscoveryRemote getServiceDiscoveryRemote() {
+		return serviceDiscoveryRemote;
+	}
+
+	/**
+	 * @param serviceDiscoveryRemote the serviceDiscoveryRemote to set
+	 */
+	public void setServiceDiscoveryRemote(
+			IServiceDiscoveryRemote serviceDiscoveryRemote) {
+		this.serviceDiscoveryRemote = serviceDiscoveryRemote;
 	}
 
 	/**
@@ -80,7 +96,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 	 */
 	@Override
 	@Async
-	public Future<List<Service>> getServices() throws ServiceDiscoveryException {
+	public Future<List<Service>> getLocalServices() throws ServiceDiscoveryException {
 
 		// TODO : Fix this up!
 		INetworkNode currentNode = commMngr.getIdManager().getThisNetworkNode();
@@ -118,16 +134,27 @@ public class ServiceDiscovery implements IServiceDiscovery {
 
 		try
 		{
+			//Object filter = "*.*"; //placeholder for a filter to all
+			Service filter=new Service();
+			
 			switch (node.getType())
 			{
 			case CSS:
 			case CSS_RICH:
 			case CSS_LIGHT:
-				serviceList = getServiceReg().retrieveServicesSharedByCSS(node.getJid());
+				//serviceList = getServiceReg().retrieveServicesSharedByCSS(node.getJid());
+				//TODO : Temporary measure until retrieveServicesSharedByCSS implemented
+				
+				 serviceList= getServiceReg().findServices(filter);
+				
 				break;
 			case CIS:
 
-				serviceList = getServiceReg().retrieveServicesSharedByCIS(node.getJid());
+				//serviceList = getServiceReg().retrieveServicesSharedByCIS(node.getJid());
+				//TODO : Temporary measure until retrieveServicesSharedByCIS implemented
+
+				serviceList= getServiceReg().findServices(filter);
+				
 				break;
 
 			default: 
@@ -150,9 +177,14 @@ public class ServiceDiscovery implements IServiceDiscovery {
 		{
 			IIdentity currentNode = commMngr.getIdManager().getThisNetworkNode();
 			
-			if (currentNode.getJid() != node.getJid())
+			if (!currentNode.getJid().contentEquals(node.getJid()))
 			{
-				// TODO : call gateway to get details from remote node
+				
+				ServiceDiscoveryRemoteClient callback = new ServiceDiscoveryRemoteClient();
+				
+				getServiceDiscoveryRemote().getServices(node, callback); 
+				serviceList = callback.getResultList();
+				
 			}
 		}
 		return new AsyncResult<List<Service>>(serviceList);

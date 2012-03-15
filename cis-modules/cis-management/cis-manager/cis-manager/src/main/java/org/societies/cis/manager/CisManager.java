@@ -35,6 +35,11 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.societies.api.cis.management.ICisEditor;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisRecord;
+
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -43,17 +48,19 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
-import org.societies.api.internal.cis.management.CisActivityFeed;
-import org.societies.api.internal.cis.management.CisRecord;
-import org.societies.api.internal.cis.management.ICisManager;
+
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.cis.manager.CisEditor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import org.societies.identity.IdentityImpl;
-import org.societies.manager.Community;
-import org.societies.manager.Create;
+
+import org.societies.api.schema.cis.manager.Community;
+import org.societies.api.schema.cis.manager.Communities;
+import org.societies.api.schema.cis.manager.Create;
+
+
 
 // this is the class which manages all the CIS from a CSS
 // for the class responsible for editing and managing each CIS instance, consult the CISEditor
@@ -71,9 +78,9 @@ public class CisManager implements ICisManager, IFeatureServer{
 	private ICommManager CISMgmtendpoint;
 	
 	private final static List<String> NAMESPACES = Collections
-			.singletonList("http://societies.org/manager");
+			.singletonList("http://societies.org/api/schema/cis/manager");
 	private final static List<String> PACKAGES = Collections
-			.singletonList("org.societies.manager");
+			.singletonList("org.societies.api.schema.cis.manager");
 	
 
 	private static Logger LOG = LoggerFactory
@@ -119,15 +126,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 
 
-	/**
-	 * @deprecated  Replaced by constructor which inherits the ComManager Factory and the IcommManager of the CSS
-	 */
-	
-	@Deprecated
-	public CisManager() {
-		CISs = new HashSet<CisEditor>();
-	}
-	
+
 	/**
 	 * Create a CIS Editor with default settings and returns a CIS Record 
 	 * This function should generate automatically the jid for the CIS and the pwd
@@ -139,7 +138,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 	 * 
 	 */
 	
-	@Override
+
 	public CisRecord createCis(String creatorCssId, String cisname) {
 		// TODO: create and identity for the CIS and map it in the database with the cisname
 		// cisId = randon unused JID;
@@ -179,33 +178,11 @@ public class CisManager implements ICisManager, IFeatureServer{
 	}
 
 
-	@Override
-	public Boolean deleteCis(String cssId, String cisId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Boolean updateCis(String cssId, CisRecord newCis, String oldCisId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CisRecord getCis(String cssId, String cisId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	
 	
-	@Override
-	public CisRecord[] getCisList(CisRecord query) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
+
+
 	public List<CisRecord> getCisList() {
 		
 		List<CisRecord> l = new ArrayList<CisRecord>();
@@ -223,12 +200,6 @@ public class CisManager implements ICisManager, IFeatureServer{
 	}
 	
 	
-	@Override
-	public CisActivityFeed getActivityFeed(String cssId, String cisId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 
 
 	@Override
@@ -246,13 +217,13 @@ public class CisManager implements ICisManager, IFeatureServer{
 		LOG.info("get Query received");
 		if (payload.getClass().equals(Community.class)) {
 			Community c = (Community) payload;
-			
-			// CREATE CIS
-			
+
 			if (c.getCreate() != null) {
+				
+				// CREATE CIS
 				LOG.info("create received");
-				String jid = stanza.getFrom().getBareJid();
-				LOG.info("sender JID = " + jid);
+				String senderjid = stanza.getFrom().getBareJid();
+				LOG.info("sender JID = " + senderjid);
 				
 				//TODO: check if the sender is allowed to create a CIS
 				
@@ -263,7 +234,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 				String cisPassword = create.getCommunityPassword();
 				
 				if(cisPassword != null && ownerJid != null && cisJid != null ){
-					CisRecord cisR = this.createCis(jid,
+					CisRecord cisR = this.createCis(ownerJid,
 							cisJid,this.cisManagerId.getDomain(), cisPassword);
 					
 					LOG.info("CIS Created!!");
@@ -275,16 +246,27 @@ public class CisManager implements ICisManager, IFeatureServer{
 					// if one of those parameters did not come, we should return an error
 					return create;
 				}
-					
+				// END OF CREATE CIS					
 
 			}
 			if (c.getList() != null) {
 				LOG.info("list received");
+								
+				// GET LIST CODE
+				Communities com = new Communities();
+				List<CisRecord> l = this.getCisList();
+				Iterator<CisRecord> it = l.iterator();
 				
-
-					
+				while(it.hasNext()){
+					CisRecord element = it.next();
+					Community community = new Community();
+					community.setCommunityJid(element.getFullJid());
+					com.getCommunity().add(community);
+					 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
+			     }
+				return com;
+				// END OF GET LIST CODE
 				
-				return c;
 			}
 			if (c.getConfigure() != null) {
 				LOG.info("configure received");
@@ -318,6 +300,52 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 	@Override
 	public Object setQuery(Stanza arg0, Object arg1) throws XMPPError {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public ICisEditor createCis(String arg0, String arg1, String arg2,
+			String arg3, int arg4) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public Boolean deleteCis(String arg0, String arg1, String arg2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public ICisRecord[] getCisList(ICisRecord arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public Boolean requestNewCisOwner(String arg0, String arg1, String arg2,
+			String arg3) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+
+
+
+
+	@Override
+	public ICisRecord getCis(String arg0, String arg1) {
 		// TODO Auto-generated method stub
 		return null;
 	}

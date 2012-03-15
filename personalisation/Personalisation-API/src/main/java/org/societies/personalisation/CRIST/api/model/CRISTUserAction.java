@@ -30,8 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.api.personalisation.model.Action;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
  * This class is used to define the data structure and methods for modelling and
@@ -180,7 +180,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	/**
 	 * @return the identifier of the service to which this action is applied to
 	 */
-	public IServiceResourceIdentifier getServiceID() {
+	public ServiceResourceIdentifier getServiceID() {
 		return null;
 	}
 
@@ -212,7 +212,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 * @param id
 	 *            the identifier of the service this action is applied to
 	 */
-	public void setServiceID(IServiceResourceIdentifier id) {
+	public void setServiceID(ServiceResourceIdentifier id) {
 
 	}
 

@@ -36,7 +36,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceManagement.impl.UserPreferenceManagement;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
@@ -193,7 +193,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	}
 
 	
-	public void processServiceStarted(IIdentity userId, String serviceType, IServiceResourceIdentifier serviceID){
+	public void processServiceStarted(IIdentity userId, String serviceType, ServiceResourceIdentifier serviceID){
 
 		
 		//JOptionPaneshowMessageDialog(null, "Processing service started event: "+serviceID.toUriString());
@@ -216,7 +216,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	}
 
 
-	public void processServiceStopped(IIdentity userId, String serviceType, IServiceResourceIdentifier serviceID){
+	public void processServiceStopped(IIdentity userId, String serviceType, ServiceResourceIdentifier serviceID){
 		if (this.mt.isServiceRunning(serviceType, serviceID)){
 			mt.removeServiceInfo(serviceType, serviceID);
 		}else{
@@ -224,7 +224,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		}
 	}
 	
-	public void processPreferenceChangedEvent(IIdentity userID, IServiceResourceIdentifier serviceId, String serviceType, String preferenceName){
+	public void processPreferenceChanged(IIdentity userID, ServiceResourceIdentifier serviceId, String serviceType, String preferenceName){
 		List<CtxIdentifier> ctxIDs = this.prefMgr.getPreferenceConditions(userID, serviceType, serviceId, preferenceName);
 		for (CtxIdentifier id : ctxIDs){
 			this.mt.addInfo(id, serviceId, serviceType, preferenceName);

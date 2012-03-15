@@ -26,17 +26,14 @@ package org.societies.comm.examples.commsmanager.impl;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import javax.servlet.UnavailableException;
+
 import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.example.IExamplesCallback;
-import org.societies.example.calculatorservice.schema.CalcBeanResult;
-import org.societies.example.fortunecookieservice.schema.FortuneCookieBeanResult;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 
 /**
  * Describe your class here...
@@ -47,39 +44,37 @@ import org.societies.example.fortunecookieservice.schema.FortuneCookieBeanResult
 public class CommsClientCallback implements ICommCallback {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-			  Arrays.asList("http://societies.org/example/calculatorservice/schema",
-					  		"http://societies.org/example/fortunecookieservice/schema",
-					  		"http://societies.org/example/complexservice/schema"));
+			  Arrays.asList("http://societies.org/api/internal/schema/privacytrust/privacyprotection/negotiation", 
+					  		"http://societies.org/api/schema/servicelifecycle/model"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
-			  Arrays.asList("org.societies.example.calculatorservice.schema",
-							"org.societies.example.fortunecookieservice.schema",
-							"org.societies.example.complexservice.schema"));
-
+			  Arrays.asList("org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation",
+					  		"org.societies.api.schema.servicelifecycle.model"));
+/*
 	//MAP TO STORE THE ALL THE CLIENT CONNECTIONS
 	private final Map<String, IExamplesCallback> calcClients = new HashMap<String, IExamplesCallback>();
 	
-	/** Constructor for callback
+	*//** Constructor for callback
 	 * @param clientID unique ID of send request to comms framework
 	 * @param calcClient callback from originating client
-	 */
+	 *//*
 	public CommsClientCallback(String clientID, IExamplesCallback calcClient) {
 		//STORE THIS CALLBACK WITH THIS REQUEST ID
 		calcClients.put(clientID, calcClient);
 	}
 
-	/**Returns the correct calculator client callback for this request 
+	*//**Returns the correct calculator client callback for this request 
 	 * @param requestID the id of the initiating request
 	 * @return
 	 * @throws UnavailableException
-	 */
+	 *//*
 	private IExamplesCallback getRequestingClient(String requestID) {
 		IExamplesCallback requestingClient = (IExamplesCallback) calcClients.get(requestID);
 		calcClients.remove(requestID);
 		return requestingClient;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveResult(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object) */
+	 (non-Javadoc)
+	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveResult(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object) 
 	@Override
 	public void receiveResult(Stanza returnStanza, Object msgBean) {
 		//CHECK WHICH END SERVICE IS SENDING US A MESSAGE
@@ -96,7 +91,7 @@ public class CommsClientCallback implements ICommCallback {
 			FortuneCookieBeanResult fcBeanResult = (FortuneCookieBeanResult) msgBean;
 			//return the fcBeanResult to the calling client
 		}
-	}
+	}*/
 
 	/* (non-Javadoc)
 	 * @see org.societies.comm.xmpp.interfaces.CommCallback#getJavaPackages() */
@@ -144,5 +139,11 @@ public class CommsClientCallback implements ICommCallback {
 	@Override
 	public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
 		// TODO Auto-generated method stub	
+	}
+
+	@Override
+	public void receiveResult(Stanza arg0, Object arg1) {
+		// TODO Auto-generated method stub
+		
 	}
 }

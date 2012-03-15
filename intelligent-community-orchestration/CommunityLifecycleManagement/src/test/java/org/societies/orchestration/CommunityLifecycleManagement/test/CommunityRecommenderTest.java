@@ -26,6 +26,7 @@
 package org.societies.orchestration.CommunityLifecycleManagement.test;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.concurrent.Future;
 
 import org.junit.Assert;
@@ -131,7 +132,7 @@ public class CommunityRecommenderTest {
 			e.printStackTrace();
 		}
 		//check user joined CISs before
-		communityRecommender.identifyCissToCreate("not extensive");
+		communityRecommender.identifyCissToCreate(new ArrayList<CisRecord>());
 		//check and compare user joined CISs after
 		
 		String[] members = new String[1];
@@ -182,7 +183,7 @@ public class CommunityRecommenderTest {
     	//userCtxBroker.addAttribute(ownerIdContextEntity, CtxAttributeValueType.INDIVIDUAL, "CSS proximity", IUserCtxBrokerCallback);
     	
     	//check user joined CISs before
-		communityRecommender.identifyCissToCreate("extensive");
+		communityRecommender.identifyCissToCreate(new ArrayList<CisRecord>());
 		//check and compare user joined CISs after
 		
 		//Assert.assertNotNull(/**User's joined CISs*/);

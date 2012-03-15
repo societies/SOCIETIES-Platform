@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Map.Entry;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -135,10 +136,10 @@ public class PacketMarshaller {
 		return payload;
 	}
 	
-	public SimpleEntry<String, List<String>> parseItemsResult(Packet packet) throws SAXException, IOException, ParserConfigurationException {
+	public Entry<String, List<String>> parseItemsResult(Packet packet) throws SAXException, IOException, ParserConfigurationException {
 		Element element = getElementAny(packet);
-		String node = element.getAttribute("node");
-		List<String> list = new ArrayList<String>();
+		final String node = element.getAttribute("node");
+		final List<String> list = new ArrayList<String>();
 		NodeList childs = element.getChildNodes();
 		for(int i=0; i<childs.getLength(); i++) {
 			Node child = childs.item(i);
@@ -148,7 +149,17 @@ public class PacketMarshaller {
 			}
 			
 		}
-		return new SimpleEntry<String, List<String>>(node, list);
+		return new Entry<String, List<String>>() {
+			public String getKey() {
+				return node;
+			}
+			public List<String> getValue() {
+				return list;
+			}
+			public List<String> setValue(List<String> value) {
+				throw new UnsupportedOperationException("Immutable object.");
+			}			
+		};
 	}
 	
 	private String marshallPayload(Object payload) throws JAXBException, ParserConfigurationException, TransformerException {

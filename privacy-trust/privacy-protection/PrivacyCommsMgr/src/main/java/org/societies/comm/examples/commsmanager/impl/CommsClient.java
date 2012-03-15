@@ -34,6 +34,13 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegAgentMethodType;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationAgentBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationBeanResult;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
@@ -41,9 +48,8 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.privacytrust.privacyprotection.api.remote.INegotiationAgent;
 import org.springframework.scheduling.annotation.Async;
-
+import org.springframework.scheduling.annotation.AsyncResult;
 /**
  * Comms Client that initiates the remote communication
  *
@@ -62,6 +68,7 @@ public class CommsClient implements INegotiationAgent, ICommCallback{
 	private ICommManager commManager;
 	private static Logger LOG = LoggerFactory.getLogger(CommsClient.class);
 	private IIdentityManager idMgr;
+	private NegotiationBeanResult negBeanResult = null;
 	
 	//PROPERTIES
 	public ICommManager getCommManager() {
@@ -84,62 +91,7 @@ public class CommsClient implements INegotiationAgent, ICommCallback{
 		idMgr = commManager.getIdManager();
 	}
 	
-/*	 (non-Javadoc)
-	 * @see org.societies.comm.examples.commsmanager.ICalcRemote#AddAsync(int, int)
-	 
-	@Override
-	@Async
-	public void Add(int valA, int valB, IExamplesCallback calcCallback) {
-		IIdentity toIdentity = null;
-		try {
-			toIdentity = idMgr.fromJid("XCManager.societies.local");
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
-		}
-		Stanza stanza = new Stanza(toIdentity);
 
-		//SETUP CALC CLIENT RETURN STUFF
-		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), calcCallback);
-
-		//CREATE MESSAGE BEAN
-		CalcBean calc = new CalcBean();
-		calc.setA(valA); 
-		calc.setB(valB);
-		calc.setMethod(MethodType.ADD);
-		try {
-			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
-			commManager.sendIQGet(stanza, calc, callback);
-		} catch (CommunicationException e) {
-			LOG.warn(e.getMessage());
-		};
-	}
-	
-
-	@Override
-	public void Subtract(int valA, int valB, IExamplesCallback calcCallback) {
-		IIdentity toIdentity = null;
-		try {
-			toIdentity = idMgr.fromJid("XCManager.societies.local");
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
-		}
-		Stanza stanza = new Stanza(toIdentity);
-
-		//SETUP CALC CLIENT RETURN STUFF
-		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), calcCallback);
-
-		//CREATE MESSAGE BEAN
-		CalcBean calc = new CalcBean();
-		calc.setA(valA); 
-		calc.setB(valB);
-		calc.setMethod(MethodType.SUBTRACT);
-		try {
-			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
-			commManager.sendIQGet(stanza, calc, callback);
-		} catch (CommunicationException e) {
-			LOG.warn(e.getMessage());
-		};
-	}*/
 
 	/* (non-Javadoc)
 	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#getJavaPackages() */
@@ -162,10 +114,17 @@ public class CommsClient implements INegotiationAgent, ICommCallback{
 	public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) { }
 
 	@Override
-	public void receiveMessage(Stanza arg0, Object arg1) { }
+	public void receiveMessage(Stanza arg0, Object arg1) { 
+		
+	}
 
 	@Override
-	public void receiveResult(Stanza arg0, Object arg1) { }
+	public void receiveResult(Stanza arg0, Object obj) {
+		if (obj instanceof NegotiationBeanResult){
+			negBeanResult = (NegotiationBeanResult) obj;	
+		}
+		
+	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveItems(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.String, java.util.List)
@@ -174,40 +133,159 @@ public class CommsClient implements INegotiationAgent, ICommCallback{
 	public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
 		// TODO Auto-generated method stub
 	}
-	
-	
+
 	
 	/**
 	 * INegotiationAgent remote interface
 	 */
 
-
 	@Override
-	public Future<Boolean> acknowledgeAgreement(byte[] arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public Future<Boolean> acknowledgeAgreement(IAgreementEnvelope arg0) {
+		IIdentity toIdentity = null;
+		try {
+			toIdentity = idMgr.fromJid("XCManager.societies.local");
+		} catch (InvalidFormatException e1) {
+			e1.printStackTrace();
+		}
+		Stanza stanza = new Stanza(toIdentity);
+		NegotiationAgentBean bean = new NegotiationAgentBean();
+		bean.setAgreementEnvelope(Util.toByteArray(arg0));
+		bean.setMethod(NegAgentMethodType.ACKNOWLEDGE_AGREEMENT);
+		try {
+			this.commManager.sendIQGet(stanza, bean, this);
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		while (negBeanResult == null){
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		this.negBeanResult = null;
+		return new AsyncResult<Boolean> (this.negBeanResult.isAcknowledgement());
+		
 	}
 
 	@Override
-	public Future<byte[]> getPolicy(ServiceResourceIdentifier arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public Future<RequestPolicy> getPolicy(ServiceResourceIdentifier serviceId) {
+		IIdentity toIdentity = null;
+		try {
+			toIdentity = idMgr.fromJid("XCManager.societies.local");
+		} catch (InvalidFormatException e1) {
+			e1.printStackTrace();
+		}
+		Stanza stanza = new Stanza(toIdentity);
+		NegotiationAgentBean bean = new NegotiationAgentBean();
+		bean.setServiceID(serviceId);
+		bean.setMethod(NegAgentMethodType.GET_POLICY);
+		
+		try{
+			this.commManager.sendIQGet(stanza, bean, this);
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		while (negBeanResult == null){
+			try{
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		RequestPolicy policy = (RequestPolicy) Util.convertToObject(this.negBeanResult.getRequestPolicy(), this.getClass());
+		this.negBeanResult = null;
+		return new AsyncResult<RequestPolicy> (policy);
 	}
 
 	@Override
-	public Future<String> getProviderIdentity() {
-		// TODO Auto-generated method stub
+	public Future<IIdentity> getProviderIdentity() {
+		IIdentity toIdentity = null;
+		try {
+			toIdentity = idMgr.fromJid("XCManager.societies.local");
+		} catch (InvalidFormatException e1) {
+			e1.printStackTrace();
+		}
+		Stanza stanza = new Stanza(toIdentity);
+		NegotiationAgentBean bean = new NegotiationAgentBean();
+		bean.setMethod(NegAgentMethodType.GET_PROVIDER_IDENTITY);
+		try{
+			this.commManager.sendIQGet(stanza, bean, this);
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		while (negBeanResult == null){
+			try{
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		String idstr = this.negBeanResult.getIdentity();
+		IIdentity id;
+		try {
+			id = idMgr.fromJid(idstr);
+			this.negBeanResult = null;
+			return new AsyncResult<IIdentity> (id);
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		this.negBeanResult = null;
 		return null;
+		
 	}
 
 	@Override
-	public Future<byte[]> negotiate(ServiceResourceIdentifier arg0, byte[] arg1) {
-		// TODO Auto-generated method stub
-		return null;
+	public Future<ResponsePolicy> negotiate(ServiceResourceIdentifier serviceId,
+			ResponsePolicy policy) {
+		IIdentity toIdentity = null;
+		try {
+			toIdentity = idMgr.fromJid("XCManager.societies.local");
+		} catch (InvalidFormatException e1) {
+			e1.printStackTrace();
+		}
+		Stanza stanza = new Stanza(toIdentity);
+		NegotiationAgentBean bean = new NegotiationAgentBean();
+		bean.setMethod(NegAgentMethodType.NEGOTIATE);
+		bean.setServiceID(serviceId);
+		bean.setResponsePolicy(Util.toByteArray(policy));
+		try{
+			this.commManager.sendIQGet(stanza, bean, this);
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		while (negBeanResult == null){
+			try{
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}		
+		ResponsePolicy resp = (ResponsePolicy) Util.convertToObject(this.negBeanResult.getRequestPolicy(), this.getClass());
+		this.negBeanResult = null;
+		return new AsyncResult<ResponsePolicy> (resp);		
 	}
-
-
 	
+	
+	
+
+
+
 	
 	
 	

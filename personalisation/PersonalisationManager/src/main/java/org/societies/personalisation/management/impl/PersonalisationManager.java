@@ -38,7 +38,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.IFeedbackEvent;
 import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
@@ -272,10 +272,10 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 	
 	/*
 	 * (non-Javadoc)
-	 * @see org.societies.personalisation.common.api.management.IInternalPersonalisationManager#getPreference(org.societies.api.comm.xmpp.datatypes.IIdentity, java.lang.String, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier, java.lang.String, org.societies.api.personalisation.mgmt.IPersonalisationCallback)
+	 * @see org.societies.personalisation.common.api.management.IInternalPersonalisationManager#getPreference(org.societies.api.comm.xmpp.datatypes.IIdentity, java.lang.String, org.societies.api.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String, org.societies.api.personalisation.mgmt.IPersonalisationCallback)
 	 */
 	@Override
-	public void getPreference(IIdentity ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback) {
+	public void getPreference(IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -284,29 +284,29 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.societies.api.personalisation.mgmt.IPersonalisationManager#getIntentAction(org.societies.api.comm.xmpp.datatypes.IIdentity, org.societies.api.comm.xmpp.datatypes.IIdentity, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier, java.lang.String, org.societies.api.personalisation.mgmt.IPersonalisationCallback)
+	 * @see org.societies.api.personalisation.mgmt.IPersonalisationManager#getIntentAction(org.societies.api.comm.xmpp.datatypes.IIdentity, org.societies.api.comm.xmpp.datatypes.IIdentity, org.societies.api.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String, org.societies.api.personalisation.mgmt.IPersonalisationCallback)
 	 */
 	@Override
-	public void getIntentAction(IIdentity requestor, IIdentity ownerID, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback){
+	public void getIntentAction(IIdentity requestor, IIdentity ownerID, ServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback){
 		
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.societies.api.personalisation.mgmt.IPersonalisationManager#getPreference(org.societies.api.comm.xmpp.datatypes.IIdentity, org.societies.api.comm.xmpp.datatypes.IIdentity, java.lang.String, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier, java.lang.String, org.societies.api.personalisation.mgmt.IPersonalisationCallback)
+	 * @see org.societies.api.personalisation.mgmt.IPersonalisationManager#getPreference(org.societies.api.comm.xmpp.datatypes.IIdentity, org.societies.api.comm.xmpp.datatypes.IIdentity, java.lang.String, org.societies.api.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String, org.societies.api.personalisation.mgmt.IPersonalisationCallback)
 	 */
 	@Override
-	public void getPreference(IIdentity requestor, IIdentity ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback){
+	public void getPreference(IIdentity requestor, IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback){
 		// TODO Auto-generated method stub
 		
 	}
 	
 	/*
 	 * (non-Javadoc)
-	 * @see org.societies.personalisation.common.api.management.IInternalPersonalisationManager#getIntentAction(org.societies.api.comm.xmpp.datatypes.IIdentity, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier, java.lang.String, org.societies.api.personalisation.mgmt.IPersonalisationCallback)
+	 * @see org.societies.personalisation.common.api.management.IInternalPersonalisationManager#getIntentAction(org.societies.api.comm.xmpp.datatypes.IIdentity, org.societies.api.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String, org.societies.api.personalisation.mgmt.IPersonalisationCallback)
 	 */
 	@Override
-	public void getIntentAction(IIdentity ownerID, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback){
+	public void getIntentAction(IIdentity ownerID, ServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback){
 		
 	}
 	

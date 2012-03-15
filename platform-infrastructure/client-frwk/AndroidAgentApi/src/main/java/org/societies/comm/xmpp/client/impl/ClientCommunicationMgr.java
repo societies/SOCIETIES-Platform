@@ -26,9 +26,12 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.Messenger;
+import android.util.Log;
 
 public class ClientCommunicationMgr {
 	
+	private static final String LOG_TAG = ClientCommunicationMgr.class.getName();
+
 	private static final ComponentName serviceCN = new ComponentName("org.societies", "org.societies.AgentService"); // TODO
 
 	private Context androidContext;
@@ -66,9 +69,13 @@ public class ClientCommunicationMgr {
 		ServiceConnection connection = new ServiceConnection() {			
 			public void onServiceConnected(ComponentName cn, IBinder binder) {
 				XMPPAgent agent = (XMPPAgent)Stub.newInstance(new Class<?>[]{XMPPAgent.class},  new Messenger(binder));
-				agent.unregister(elementNames.toArray(new String[0]), namespaces.toArray(new String[0]));	
-				androidContext.unbindService(this);
-				androidContext.unbindService(registerConnection);
+				agent.unregister(elementNames.toArray(new String[0]), namespaces.toArray(new String[0]));
+				try {
+					androidContext.unbindService(this);
+					androidContext.unbindService(registerConnection);
+				} catch(Exception e) {
+					Log.e(LOG_TAG, "Exception while unbinding service.", e);
+				}
 			}
 			
 			public void onServiceDisconnected(ComponentName cn) {				

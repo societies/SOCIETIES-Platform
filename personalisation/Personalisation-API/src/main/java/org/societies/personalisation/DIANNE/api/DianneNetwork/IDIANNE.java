@@ -27,7 +27,7 @@ package org.societies.personalisation.DIANNE.api.DianneNetwork;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 
 /**
@@ -46,7 +46,7 @@ public interface IDIANNE {
 	 * @param callback  the callback to which the IDIANNEOutcome is sent
 	 */
 	public void getOutcome(IIdentity ownerId, 
-			IServiceResourceIdentifier serviceId, 
+			ServiceResourceIdentifier serviceId, 
 			String preferenceName, 
 			IPersonalisationInternalCallback callback);
 	

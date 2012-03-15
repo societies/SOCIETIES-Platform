@@ -25,19 +25,12 @@
 package org.societies.personalisation.common.api.management;
 
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IFeedbackEvent;
-import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
-import org.societies.api.personalisation.model.IAction;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
-import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
-import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
-import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 
 
 
@@ -60,7 +53,7 @@ public interface IInternalPersonalisationManager extends IPersonalisationManager
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
 	 */
-	public void getPreference(IIdentity ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
+	public void getPreference(IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
 
 	/**
 	 * 
@@ -82,5 +75,5 @@ public interface IInternalPersonalisationManager extends IPersonalisationManager
 	 * @param preferenceName
 	 * @param callback
 	 */
-	public void getIntentAction(IIdentity ownerID, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
+	public void getIntentAction(IIdentity ownerID, ServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
 }

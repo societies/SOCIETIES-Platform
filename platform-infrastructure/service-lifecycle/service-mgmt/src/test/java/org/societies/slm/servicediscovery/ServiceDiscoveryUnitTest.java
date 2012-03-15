@@ -127,7 +127,7 @@ public class ServiceDiscoveryUnitTest {
 			stub(mockedCommManager.getIdManager().getThisNetworkNode()).toReturn(hostNode);
 			
 
-			asyncResult = classUnderTest.getServices();
+			asyncResult = classUnderTest.getLocalServices();
 
 			assertNull(asyncResult.get());
 
@@ -157,7 +157,7 @@ public class ServiceDiscoveryUnitTest {
 			stub(mockedCommManager.getIdManager()).toReturn(mockedIdentityManager);
 			stub(mockedCommManager.getIdManager().getThisNetworkNode()).toReturn(hostNode);
 
-			asyncResult = classUnderTest.getServices();
+			asyncResult = classUnderTest.getLocalServices();
 
 			assertNotNull(asyncResult.get());
 			assertTrue(asyncResult.get().size() == 1);
