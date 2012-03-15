@@ -54,5 +54,25 @@ public interface ILocationManagementAdapter {
 	 * @param entityId
 	 * @return
 	 */
-	public IUserLocation getEntityFullLocation(String entityId); 
+	public IUserLocation getEntityFullLocation(String entityId);
+	
+	
+	/**
+	 * Registers the given CSS device in the location management system
+	 * @param entityId
+	 * @param deviceId
+	 * @param macAddress
+	 * @return
+	 */
+	public void registerCSSdevice(String entityId,String deviceId,String macAddress);
+	
+	/**
+	 * Removes the given CSS device from the location management system
+	 * @param entityId
+	 * @param deviceId
+	 * @param macAddress
+	 * @return
+	 */
+	public void removeCSSdevice(String entityId,String deviceId,String macAddress);
+
 }
