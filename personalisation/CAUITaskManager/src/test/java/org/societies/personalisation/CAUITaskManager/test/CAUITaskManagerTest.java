@@ -53,9 +53,6 @@ import org.societies.personalisation.CAUITaskManager.impl.CAUITaskManager;
  */
 public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private static boolean useSystemLookAndFeel = false;
 
@@ -68,10 +65,6 @@ public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener
 	private static boolean DEBUG = false;
 	//Optionally set the look and feel.
 	
-	
-	
-	
-	
 	ICAUITaskManager modelManager;
 	
 	
@@ -82,13 +75,9 @@ public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener
 		modelManager = new CAUITaskManager();
 		
 		createModel();
-		
-		
-		
+	
 		//visualise model
 		this.tree = modelManager.getModelTree();
-		
-		
 		this.tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
 		//Listen for when the selection changes.
@@ -122,12 +111,9 @@ public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener
 		//Add the split pane to this panel.
 		add(splitPane);
 		//visualise model end
-		
-		
-		
+	
 		//start testing
 		retrieveTests();
-		
 		System.out.println("CAUITaskManagerTest end");
 	}
 
@@ -192,8 +178,7 @@ public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener
 		actCtxB2.put("ToD", "night");
 		actionB2.setActionContext(actCtxB2);
 		DefaultMutableTreeNode task1ActionB2 = new DefaultMutableTreeNode(actionB2);
-		
-		
+			
 		IUserIntentAction actionC1 = modelManager.createAction("C-roomLights","off",100);
 		HashMap<String, Serializable> actCtxC1 = new HashMap<String,Serializable>();
 		actCtxC1.put("ToD", "morning");
@@ -291,19 +276,7 @@ public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener
 
 
 
-
-
-
-
-
-
-
-
-	
-
 	public static void main(String[] args) {
-
-
 
 		//Schedule a job for the event dispatch thread:
 		//creating and showing this application's GUI.
@@ -315,13 +288,9 @@ public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener
 	}
 
 
-
-
-
 	@Override
 	public void valueChanged(TreeSelectionEvent e) {
 		// TODO Auto-generated method stub
-		
 	}
 
 }
