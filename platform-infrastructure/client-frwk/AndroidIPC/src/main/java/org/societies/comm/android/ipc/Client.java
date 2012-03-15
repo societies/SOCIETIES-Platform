@@ -4,16 +4,13 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
+import android.util.Log;
 
 class Client {
-	
-	private static final Logger log = LoggerFactory.getLogger(Client.class);
 	
 	private Messenger outMessenger, inMessenger;
 	private String id;
@@ -22,6 +19,8 @@ class Client {
 	private Object methodReturn;
 	private boolean hasThrowable = false;
 	private Throwable throwable;
+	private static final String LOG_TAG = Client.class.getName();
+
 	
 	private class IncomingHandler extends Handler {
         @Override
@@ -41,7 +40,7 @@ class Client {
 					try {
                 		msg.replyTo.send(result.message());   
 					} catch (Exception e) {
-						log.error(e.getMessage(), e);
+						Log.e(LOG_TAG, e.getMessage(), e);
 					}
             		break;  
             	case MessageMethodResult.WHAT:

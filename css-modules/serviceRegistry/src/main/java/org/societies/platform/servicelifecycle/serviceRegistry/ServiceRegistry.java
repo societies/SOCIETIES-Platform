@@ -19,6 +19,7 @@ import org.societies.platform.servicelifecycle.serviceRegistry.model.RegistryEnt
 import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceImplementationDAO;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceInstanceDAO;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceResourceIdentiferDAO;
+import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceSharedInCISDAO;
 
 public class ServiceRegistry implements IServiceRegistry {
 	private SessionFactory sessionFactory;
@@ -46,10 +47,10 @@ public class ServiceRegistry implements IServiceRegistry {
 						service.getServiceInstance(),
 						service.getServiceStatus());
 
-				
 				session.save(tmpRegistryEntry);
-				
-			}t.commit();
+
+			}
+			t.commit();
 			log.debug("Service list saved.");
 
 		} catch (Exception e) {
@@ -119,8 +120,17 @@ public class ServiceRegistry implements IServiceRegistry {
 	@Override
 	public List<Service> retrieveServicesSharedByCIS(String CISID)
 			throws ServiceRetrieveException {
-		// TODO Auto-generated method stub
-		return null;
+		ServiceSharedInCISDAO filterServiceSharedCISDAO= new ServiceSharedInCISDAO();
+		filterServiceSharedCISDAO.setCISId(CISID);
+		Session session= sessionFactory.openSession();
+		List<ServiceSharedInCISDAO> serviceSharedInCISDAOList=session.createCriteria(ServiceSharedInCISDAO.class)
+				.add(Example.create(filterServiceSharedCISDAO)).list();
+		List<Service> returnedServiceList=new ArrayList<Service>();
+		
+		for (ServiceSharedInCISDAO serviceSharedInCISDAO : serviceSharedInCISDAOList) {
+			returnedServiceList.add( ((RegistryEntry)session.load(RegistryEntry.class, serviceSharedInCISDAO.getServiceResourceIdentifier())).createServiceFromRegistryEntry());
+		}
+		return returnedServiceList;
 	}
 
 	/*
@@ -164,7 +174,8 @@ public class ServiceRegistry implements IServiceRegistry {
 				tmpServiceResourceIdentifierDAO.setInstanceId(filter
 						.getServiceIdentifier().getServiceInstanceIdentifier());
 			}
-			filterRegistryEntry.setServiceIdentifier(tmpServiceResourceIdentifierDAO);
+			filterRegistryEntry
+					.setServiceIdentifier(tmpServiceResourceIdentifierDAO);
 		}
 		if (filter.getServiceInstance() != null) {
 			ServiceInstanceDAO tmpServiceInstanceDAO = new ServiceInstanceDAO();
@@ -235,8 +246,24 @@ public class ServiceRegistry implements IServiceRegistry {
 	public void notifyServiceIsSharedInCIS(
 			ServiceResourceIdentifier serviceIdentifier, String CISID)
 			throws ServiceSharingNotificationException {
-		// TODO Auto-generated method stub
+		Session session = sessionFactory.openSession();
+		Transaction t = session.beginTransaction();
+		try {
+			ServiceSharedInCISDAO tmpSharedInCIS = new ServiceSharedInCISDAO(
+					CISID, new ServiceResourceIdentiferDAO(serviceIdentifier
+							.getIdentifier().toString(),
+							serviceIdentifier.getServiceInstanceIdentifier()));
 
+			session.save(tmpSharedInCIS);
+			t.commit();
+
+		} catch (Exception e) {
+			t.rollback();
+			throw new ServiceSharingNotificationException(e);
+		} finally {
+
+			session.close();
+		}
 	}
 
 	/*
@@ -249,11 +276,27 @@ public class ServiceRegistry implements IServiceRegistry {
 	 * .ServiceResourceIdentifier, java.lang.String)
 	 */
 	@Override
-	public void removeServiceSharingInCIS(
-			ServiceResourceIdentifier serviceIdentifier, String CISID)
-			throws ServiceSharingNotificationException {
-		// TODO Auto-generated method stub
+	public void removeServiceSharingInCIS(ServiceResourceIdentifier serviceIdentifier, String CISID) throws ServiceSharingNotificationException {
 
+		Session session = sessionFactory.openSession();
+		Transaction t = session.beginTransaction();
+		try {
+			ServiceSharedInCISDAO tmpSharedInCIS = new ServiceSharedInCISDAO(
+					CISID, new ServiceResourceIdentiferDAO(serviceIdentifier
+							.getIdentifier().toString(),
+							serviceIdentifier.getServiceInstanceIdentifier()));
+			Object obj = session.load(ServiceSharedInCISDAO.class,
+					tmpSharedInCIS.getId());
+			session.delete(obj);
+			t.commit();
+
+		} catch (Exception e) {
+			t.rollback();
+			throw new ServiceSharingNotificationException(e);
+		} finally {
+
+			session.close();
+		}
 	}
 
 	/*
