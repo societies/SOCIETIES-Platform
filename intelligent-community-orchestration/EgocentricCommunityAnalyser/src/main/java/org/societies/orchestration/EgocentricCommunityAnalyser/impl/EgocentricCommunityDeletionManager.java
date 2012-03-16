@@ -33,11 +33,20 @@ import org.societies.api.internal.css.directory.ICssDirectory;
 
 import org.societies.api.internal.css.discovery.ICssDiscovery;
 
-import org.societies.api.internal.cis.management.CisActivityFeed;
+import org.societies.api.internal.cis.management.ICisActivityFeed;
 import org.societies.api.internal.cis.management.ServiceSharingRecord;
-import org.societies.api.internal.cis.management.CisActivity;
-import org.societies.api.internal.cis.management.CisRecord;
+import org.societies.api.internal.cis.management.ICisActivity;
+import org.societies.api.internal.cis.management.ICisRecord;
 import org.societies.api.internal.cis.management.ICisManager;
+
+//import org.societies.api.cis.management.ICisRecord;
+//import org.societies.api.cis.management.ICisManager;
+//import org.societies.api.cis.management.ICisOwned;
+//import org.societies.api.cis.management.ICisSubscribed;
+//import org.societies.api.cis.management.ICisEditor;
+//import org.societies.api.cis.management.ICisActivity;
+//import org.societies.api.cis.management.ICisActivityFeed;
+//import org.societies.api.cis.management.ICis;
 
 //import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
 
@@ -97,7 +106,7 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 
 	private IIdentity linkedCss;
 	
-    private CisRecord linkedCis;
+    private ICisRecord linkedCis;
     
     //private Domain linkedDomain;  // No datatype yet representing a domain
 	//private IIdentity linkedDomain;
@@ -114,7 +123,7 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 	//private IUserFeedbackCallback userFeedbackCallback;
 	private String userResponse;
 	
-	private ArrayList<CisRecord> recentRefusals;
+	private ArrayList<ICisRecord> recentRefusals;
 
 	private IUserFeedbackCallback userFeedbackCallback;
 	
@@ -147,7 +156,7 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 	 *                          continually checking for whether to delete it/suggest deleting it.
 	 */
 	
-	public EgocentricCommunityDeletionManager(CisRecord linkedCis) {
+	public EgocentricCommunityDeletionManager(ICisRecord linkedCis) {
 		this.linkedCis = linkedCis;
 	}
 	
@@ -165,11 +174,12 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 		linkedCss = mock(IIdentity.class);
 		cisManager = mock(ICisManager.class);
 		it[0] = linkedCss.getIdentifier();
-		CisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new CisRecord(null, null, null, null, null, it, null, null, null));
-		ArrayList<CisRecord> userJoinedCiss = new ArrayList<CisRecord>();
+		//ICisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new ICisRecord(null, null, null, null, null, it, null, null, null));
+		ICisRecord[] listOfUserJoinedCiss = new ICisRecord[0];
+		ArrayList<ICisRecord> userJoinedCiss = new ArrayList<ICisRecord>();
 		
 		
-		CisRecord[] records;
+		ICisRecord[] records;
 		if (linkedCss != null && listOfUserJoinedCiss != null) {
 			for (int i = 0; i < listOfUserJoinedCiss.length; i++) {
 			    userJoinedCiss.add(listOfUserJoinedCiss[i]);   
@@ -184,10 +194,10 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 			//CisRecord[] records = ICisManager.getCisList(/** CISs in the domain */);
 		//}
 		
-		ArrayList<CisRecord> cissToDelete = new ArrayList<CisRecord>();
+		ArrayList<ICisRecord> cissToDelete = new ArrayList<ICisRecord>();
 		
 		for (int i = 0; i < userJoinedCiss.size(); i++) {
-			CisRecord thisCis = userJoinedCiss.get(i);
+			ICisRecord thisCis = userJoinedCiss.get(i);
 			String deadFeed = null;
 			//deadFeed = (thisCis.feed.getActivities(it[0], "between now and 2 hours ago"));
 		    if (deadFeed == null) {
@@ -249,16 +259,16 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 		//Can't use GUI in tests
         //cissToDelete = getUserFeedbackOnDeletion(cissToDelete);
 		
-		for (int i = 0; i < cissToDelete.size(); i++)
-			cisManager.deleteCis(linkedCss.getIdentifier(), cissToDelete.get(i).getCisId());
+		//for (int i = 0; i < cissToDelete.size(); i++)
+		//	cisManager.deleteCis(linkedCss.getIdentifier(), cissToDelete.get(i).getCisId());
 		
 		
 		
 		
 	}
 	
-	public ArrayList<CisRecord> getUserFeedbackOnDeletion(ArrayList<CisRecord> cissToDelete) {
-		ArrayList<CisRecord> realCissToDelete = new ArrayList<CisRecord>();
+	public ArrayList<ICisRecord> getUserFeedbackOnDeletion(ArrayList<ICisRecord> cissToDelete) {
+		ArrayList<ICisRecord> realCissToDelete = new ArrayList<ICisRecord>();
 		List<String> options = new ArrayList<String>();
 		options.add("options");
 		userResponse = null;
@@ -281,9 +291,9 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 		    String background = "This message is in your inbox or something, waiting for you to read it";
 		}
 		else {
-		   	Iterator<CisRecord> iterator = cissToDelete.iterator();
+		   	Iterator<ICisRecord> iterator = cissToDelete.iterator();
 			while (iterator.hasNext()) {
-			    CisRecord potentiallyDeletableCis = iterator.next();
+			    ICisRecord potentiallyDeletableCis = iterator.next();
 		        if (userResponse.equals("Yes")) {
 				    realCissToDelete.add(potentiallyDeletableCis);
 			       // cisManager.deleteCis(linkedCss, potentiallyDeletableCis.getCisId());

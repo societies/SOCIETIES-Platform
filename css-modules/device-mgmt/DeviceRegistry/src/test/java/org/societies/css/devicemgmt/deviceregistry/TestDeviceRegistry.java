@@ -81,7 +81,7 @@ public class TestDeviceRegistry {
 	private DeviceCommonInfo device_3;
 	
 	
-	private String CSSID = "liam@societies.org";
+	private String CSSNodeID = "liam@societies.org";
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -140,7 +140,7 @@ public class TestDeviceRegistry {
 	@Test
 	public void addaDevice() throws Exception{
 		//fail("Tests Not yet implemented just putting in place holder");
-		String result =  registry.addDevice(device_1, CSSID);
+		String result =  registry.addDevice(device_1, CSSNodeID);
 		assertTrue(null != result);
 		assertEquals(1, registry.registrySize());
 		registry.clearRegistry();
@@ -150,11 +150,11 @@ public class TestDeviceRegistry {
 	@Test
 	public void addmoreDevices() throws Exception{
 		//fail("Tests Not yet implemented just putting in place holder");
-		String result1 =  registry.addDevice(device_1, CSSID);
+		String result1 =  registry.addDevice(device_1, CSSNodeID);
 		assertTrue(null != result1);
-		String result2 =  registry.addDevice(device_2, CSSID);
+		String result2 =  registry.addDevice(device_2, CSSNodeID);
 		assertTrue(null != result2);
-		String result3 =  registry.addDevice(device_3, CSSID);
+		String result3 =  registry.addDevice(device_3, CSSNodeID);
 		assertTrue(null != result3);
 		assertEquals(3, registry.registrySize());
 		//registry.clearRegistry();
@@ -163,7 +163,7 @@ public class TestDeviceRegistry {
 		System.out.println("Device Name is  = " + device_1.getDeviceName());
 		System.out.println("Device Type is  = " + device_1.getDeviceType());
 		System.out.println("Device Description is  = " + device_1.getDeviceDescription());
-		System.out.println("CSSID is  = " + CSSID);
+		System.out.println("CSSID is  = " + CSSNodeID);
         Collection<DeviceCommonInfo> alldevices =  registry.findAllDevices();
         assertTrue(null != alldevices);
         assertEquals(3, alldevices.size());
@@ -172,11 +172,11 @@ public class TestDeviceRegistry {
 	
 	@Test
 	public void allDevices() throws Exception{
-		String result1 =  registry.addDevice(device_1, CSSID);
+		String result1 =  registry.addDevice(device_1, CSSNodeID);
 		assertTrue(null != result1);
-		String result2 =  registry.addDevice(device_2, CSSID);
+		String result2 =  registry.addDevice(device_2, CSSNodeID);
 		assertTrue(null != result2);
-		String result3 =  registry.addDevice(device_3, CSSID);
+		String result3 =  registry.addDevice(device_3, CSSNodeID);
 		assertTrue(null != result3);
 		assertEquals(3, registry.registrySize());
 		
@@ -189,15 +189,15 @@ public class TestDeviceRegistry {
 	
 	@Test
 	public void removeDevice() throws Exception{
-		String result1 =  registry.addDevice(device_1, CSSID);
+		String result1 =  registry.addDevice(device_1, CSSNodeID);
 		assertTrue(null != result1);
-		String result2 =  registry.addDevice(device_2, CSSID);
+		String result2 =  registry.addDevice(device_2, CSSNodeID);
 		assertTrue(null != result2);
-		String result3 =  registry.addDevice(device_3, CSSID);
+		String result3 =  registry.addDevice(device_3, CSSNodeID);
 		assertTrue(null != result3);
 		assertEquals(3, registry.registrySize());
 		
-		assertTrue(registry.deleteDevice(device_1, CSSID));
+		assertTrue(registry.deleteDevice(device_1, CSSNodeID));
 		assertTrue(registry.unregisterDevice(deviceId2));
 		
         Collection<DeviceCommonInfo> alldevices =  registry.findAllDevices();
@@ -208,11 +208,11 @@ public class TestDeviceRegistry {
 	
 	@Test
 	public void findDevice() throws Exception{
-		String result1 =  registry.addDevice(device_1, CSSID);
+		String result1 =  registry.addDevice(device_1, CSSNodeID);
 		assertTrue(null != result1);
-		String result2 =  registry.addDevice(device_2, CSSID);
+		String result2 =  registry.addDevice(device_2, CSSNodeID);
 		assertTrue(null != result2);
-		String result3 =  registry.addDevice(device_3, CSSID);
+		String result3 =  registry.addDevice(device_3, CSSNodeID);
 		assertTrue(null != result3);
 		assertEquals(3, registry.registrySize());
 
@@ -232,11 +232,11 @@ public class TestDeviceRegistry {
 	public void findDeviceType() throws Exception{
 		Collection<DeviceCommonInfo> Result = null;
 		
-		String result1 =  registry.addDevice(device_1, CSSID);
+		String result1 =  registry.addDevice(device_1, CSSNodeID);
 		assertTrue(null != result1);
-		String result2 =  registry.addDevice(device_2, CSSID);
+		String result2 =  registry.addDevice(device_2, CSSNodeID);
 		assertTrue(null != result2);
-		String result3 =  registry.addDevice(device_3, CSSID);
+		String result3 =  registry.addDevice(device_3, CSSNodeID);
 		assertTrue(null != result3);
 		assertEquals(3, registry.registrySize());
 		System.out.println("reg size = " + registry.registrySize());

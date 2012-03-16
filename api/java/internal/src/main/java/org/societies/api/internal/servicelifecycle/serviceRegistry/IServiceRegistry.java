@@ -31,6 +31,7 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.Ser
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 
 /**
  * @author Antonio Panazzolo, Massimo Mazzariol (SN)
@@ -104,4 +105,12 @@ public interface IServiceRegistry {
 	* @throws ServiceRetrieveException
 	*/
 	public Service retrieveService(ServiceResourceIdentifier serviceIdentifier) throws ServiceRetrieveException;
+	
+	/**
+	 * 
+	 * @param serviceIdentifier the unique identifier for the Service
+	 * @param serviceStatus the new status for the service
+	 * @return true if all is performed correctly
+	 */
+	public boolean changeStatusOfService(ServiceResourceIdentifier serviceIdentifier, ServiceStatus serviceStatus);
 }

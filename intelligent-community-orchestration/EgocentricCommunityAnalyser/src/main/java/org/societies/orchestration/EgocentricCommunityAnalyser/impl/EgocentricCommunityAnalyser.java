@@ -31,8 +31,18 @@ import java.util.List;
 
 import static org.mockito.Mockito.*;
 
-import org.societies.api.internal.cis.management.CisRecord;
+import org.societies.api.internal.cis.management.ICisRecord;
 import org.societies.api.internal.context.broker.ICtxBroker;
+
+//import org.societies.api.cis.management.ICisRecord;
+//import org.societies.api.cis.management.ICisManager;
+//import org.societies.api.cis.management.ICisOwned;
+//import org.societies.api.cis.management.ICisSubscribed;
+//import org.societies.api.cis.management.ICisEditor;
+//import org.societies.api.cis.management.ICisActivity;
+//import org.societies.api.cis.management.ICisActivityFeed;
+//import org.societies.api.cis.management.ICis;
+
 //import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 
 import org.societies.api.identity.IIdentity;
