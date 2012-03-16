@@ -45,10 +45,23 @@
         </osgi:interfaces>
         </osgi:service>
         
+        <osgi:service ref="cauiPrediction">
+        <osgi:interfaces>
+        	<value>org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction</value>
+        </osgi:interfaces>
+        </osgi:service>
+        
+        <osgi:service ref="cauiDiscovery">
+        <osgi:interfaces>
+        	<value>org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery</value>
+        </osgi:interfaces>
+        </osgi:service>
+        
         <!-- PersonalisationManager is needed by pcm, dianne, cristPrediction, cauiPrediction -->
         <osgi:reference id="persoMgr" interface="org.societies.personalisation.common.api.management.IInternalPersonalisationManager" >
 	        <osgi:listener bind-method="setPersoMgr" ref="pcm"></osgi:listener>
 	        <osgi:listener bind-method="setPersoMgr" ref="dianne"></osgi:listener>
+	        <osgi:listener bind-method="setPersoMgr" ref="cauiPrediction"></osgi:listener>
         </osgi:reference>
 
 <!-- start importing internal services. cardinality is set to 0..1 because we have a cyclic dependency and the PersonalisationManager has lazy-init -->
@@ -60,6 +73,15 @@
 		<!-- dianne is needed by personalisationManager -->
 		<osgi:reference id="dianne" interface="org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE" cardinality="0..1"> 
 			<osgi:listener bind-method="setDianne" ref="persoMgr"></osgi:listener>
+		</osgi:reference>
+		
+		<osgi:reference id="cauiPrediction" interface="org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction" cardinality="0..1">
+			<osgi:listener bind-method="setCauiPrediction" ref="persoMgr"></osgi:listener>
+		</osgi:reference>
+		
+		<osgi:reference id="cauiTaskManager" interface="org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager" cardinality="1..1">
+			<osgi:listener bind-method="setCAUITaskManager" ref="cauiPrediction"></osgi:listener>
+			<osgi:listener bind-method="setCAUITaskManager" ref="cauiDiscovery"></osgi:listener>
 		</osgi:reference>
 		
 <!-- end importing internal services -->
