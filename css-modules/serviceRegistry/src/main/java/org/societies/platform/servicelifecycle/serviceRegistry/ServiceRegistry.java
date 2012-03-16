@@ -18,6 +18,7 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.Ser
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.RegistryEntry;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceImplementationDAO;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceInstanceDAO;
@@ -147,7 +148,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		
 		
 		for (ServiceSharedInCISDAO serviceSharedInCISDAO : serviceSharedInCISDAOList) {
-			returnedServiceList.add( ((RegistryEntry)session.load(RegistryEntry.class, serviceSharedInCISDAO.getServiceResourceIdentifier())).createServiceFromRegistryEntry());
+			returnedServiceList.add( ((RegistryEntry)session.get(RegistryEntry.class, serviceSharedInCISDAO.getServiceResourceIdentifier())).createServiceFromRegistryEntry());
 		}
 		}catch (Exception e){
 			throw new ServiceRetrieveException(e);
@@ -373,5 +374,16 @@ public class ServiceRegistry implements IServiceRegistry {
 					.createServiceFromRegistryEntry());
 		}
 		return returnedServiceList;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry#changeStatusOfService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, org.societies.api.schema.servicelifecycle.model.ServiceStatus)
+	 */
+	@Override
+	public boolean changeStatusOfService(
+			ServiceResourceIdentifier serviceIdentifier,
+			ServiceStatus serviceStatus) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
