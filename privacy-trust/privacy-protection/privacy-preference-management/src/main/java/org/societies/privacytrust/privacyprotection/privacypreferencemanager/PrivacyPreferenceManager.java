@@ -53,7 +53,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RuleTarget;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Subject;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPrivacyPreferenceTreeModel;
@@ -652,9 +652,9 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	/*
 	 * new societies method
 	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#getIdSPreference(org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#getIdSPreference(org.societies.api.servicelifecycle.model.ServiceResourceIdentifier)
 	 */
-	public IIdentity evaluateIdSPreference(IServiceResourceIdentifier service_Id){
+	public IIdentity evaluateIdSPreference(ServiceResourceIdentifier service_Id){
 		List<IDSPreferenceDetails> details = this.prefCache.getIDSPreferenceDetails();
 		List<IIdentity> identities = new ArrayList<IIdentity>();
 		for (IDSPreferenceDetails detail : details){
@@ -695,7 +695,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	}
 	@Override
 	public void deleteIDSPreference(IIdentity userDPI,
-			IIdentity providerDPI, IServiceResourceIdentifier serviceID) {
+			IIdentity providerDPI, ServiceResourceIdentifier serviceID) {
 		IDSPreferenceDetails details = new IDSPreferenceDetails(userDPI);
 		details.setProviderDPI(providerDPI);
 		details.setServiceID(serviceID);
@@ -745,7 +745,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	}
 	@Override
 	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType,
-			IIdentity requestorDPI, IServiceResourceIdentifier serviceID) {
+			IIdentity requestorDPI, ServiceResourceIdentifier serviceID) {
 		return this.prefCache.getPPNPreferences(contextType, requestorDPI, serviceID);
 	}
 	
@@ -788,7 +788,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	
 	
 	public void addIDSDecision(IIdentity selectedDPI,
-			IIdentity providerDPI, IServiceResourceIdentifier serviceID) {
+			IIdentity providerDPI, ServiceResourceIdentifier serviceID) {
 		IDSPreferenceDetails details = new IDSPreferenceDetails (selectedDPI);
 		details.setProviderDPI(providerDPI);
 		details.setServiceID(serviceID);
@@ -812,7 +812,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	/*	public static void main(String[] args){
 		PrivacyPreferenceManager pm = new PrivacyPreferenceManager();
 		Subject sub = new Subject(new DigitalPersonalIdentifier("Provider"));
-		IServiceResourceIdentifier sID = new PssServiceIdentifier("pss://Provider1234%5B574cb33a-6590-4aaa-a69c-565e83d645fd%5D@7596720118024345462");
+		ServiceResourceIdentifier sID = new PssServiceIdentifier("pss://Provider1234%5B574cb33a-6590-4aaa-a69c-565e83d645fd%5D@7596720118024345462");
 		ResponsePolicy policy = new ResponsePolicy(sub, new ArrayList<ResponseItem>(), NegotiationStatus.SUCCESSFUL);
 		NegotiationAgreement ag = new NegotiationAgreement(policy);
 		List<IIdentity> dpis = new ArrayList<IIdentity>();

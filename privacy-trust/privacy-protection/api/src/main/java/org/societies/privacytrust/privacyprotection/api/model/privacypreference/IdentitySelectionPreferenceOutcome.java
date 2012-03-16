@@ -27,7 +27,7 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Subject;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
 
@@ -42,7 +42,7 @@ public class IdentitySelectionPreferenceOutcome implements IPrivacyOutcome{
 
 	private int confidenceLevel;
 	private IIdentity dpi;
-	private IServiceResourceIdentifier serviceID;
+	private ServiceResourceIdentifier serviceID;
 	private Subject requestor;
 	/* (non-Javadoc)
 	 * @see org.personalsmartspace.spm.preference.api.platform.IPrivacyOutcome#getOutcomeType()
@@ -70,10 +70,10 @@ public class IdentitySelectionPreferenceOutcome implements IPrivacyOutcome{
 	public IIdentity getIdentity(){
 		return this.dpi;
 	}
-	public void setServiceID(IServiceResourceIdentifier serviceID) {
+	public void setServiceID(ServiceResourceIdentifier serviceID) {
 		this.serviceID = serviceID;
 	}
-	public IServiceResourceIdentifier getServiceID() {
+	public ServiceResourceIdentifier getServiceID() {
 		return serviceID;
 	}
 	public void setRequestor(Subject requestor) {
