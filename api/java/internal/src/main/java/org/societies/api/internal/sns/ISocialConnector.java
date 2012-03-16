@@ -92,11 +92,12 @@ public interface ISocialConnector {
      */
     void setMaxPostLimit(int postLimit);
     
-    /**
-     * Set specific parameter for the social network to make rich query
-     * @param parmeters with the social network sintax
-     */
-    void setParameter(Object p);
+   /**
+    * Set specific parameter for the social network to make rich query
+    * @param key of the param
+    * @param value in a string form
+    */
+    void setParameter(String key, String value);
     
     /**
      * Remove previus parameters configuration
