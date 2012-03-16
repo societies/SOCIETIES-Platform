@@ -27,9 +27,9 @@ package org.societies.personalisation.UserPreferenceLearning.impl;
 
 import java.util.Date;
 
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceLearning.impl.threads.AA_AI;
 import org.societies.personalisation.UserPreferenceLearning.impl.threads.AA_SI;
 import org.societies.personalisation.UserPreferenceLearning.impl.threads.SA_AI;
@@ -56,7 +56,7 @@ public class UserPreferenceLearning implements IC45Learning{
 	@Override
 	//run preference learning on specific service action parameterName for all identities
 	public void runC45Learning(IC45Consumer requestor, Date startDate,
-			IServiceResourceIdentifier serviceId, String parameterName) {
+			ServiceResourceIdentifier serviceId, String parameterName) {
 		sa_ai = new SA_AI(requestor, startDate, serviceId, parameterName, historyRetriever);
         sa_ai.start();
 	}
@@ -71,7 +71,7 @@ public class UserPreferenceLearning implements IC45Learning{
 	@Override
     //run C45 learning on specific service action for specific identity
     public void runC45Learning(IC45Consumer requestor, Date startDate, IIdentity historyOwner,
-    		IServiceResourceIdentifier serviceId, String parameterName){
+    		ServiceResourceIdentifier serviceId, String parameterName){
         sa_si = new SA_SI(requestor, startDate, historyOwner, serviceId, parameterName, historyRetriever);
         sa_si.start();
     }
