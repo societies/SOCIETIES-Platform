@@ -49,6 +49,7 @@ public class SecureStorageUnitTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
+		classUnderTest = new SecureStorage();
 	}
 
 	/**
@@ -56,6 +57,15 @@ public class SecureStorageUnitTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
+		classUnderTest = null;
 	}
 
+	@Test
+	public void testGetPassword() {
+		
+		String id = "idA";
+		String result;
+		
+		result = classUnderTest.getPassword(id);
+	}
 }

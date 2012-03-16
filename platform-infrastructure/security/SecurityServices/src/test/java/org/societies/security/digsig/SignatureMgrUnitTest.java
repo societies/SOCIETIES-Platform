@@ -54,6 +54,7 @@ public class SignatureMgrUnitTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
+		classUnderTest = null;
 	}
 
 	/**
