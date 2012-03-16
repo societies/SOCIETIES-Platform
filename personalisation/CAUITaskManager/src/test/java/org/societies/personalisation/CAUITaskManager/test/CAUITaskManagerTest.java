@@ -51,7 +51,7 @@ import org.societies.personalisation.CAUITaskManager.impl.CAUITaskManager;
  * @author nikosk
  * @created 12-Jan-2012 7:15:15 PM
  */
-public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener{
+public class CAUITaskManagerTest {
 
 	private static final long serialVersionUID = 1L;
 	private static boolean useSystemLookAndFeel = false;
@@ -64,74 +64,24 @@ public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener
 	private String helpURL;
 	private static boolean DEBUG = false;
 	//Optionally set the look and feel.
-	
+
 	ICAUITaskManager modelManager;
 	
 	
 	CAUITaskManagerTest(){
-		super(new GridLayout(1,0));
-		
-		System.out.println("CAUITaskManagerTest start");
 		modelManager = new CAUITaskManager();
 		
 		createModel();
-	
-		//visualise model
-		this.tree = modelManager.getModelTree();
-		this.tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-
-		//Listen for when the selection changes.
-		this.tree.addTreeSelectionListener(this);
-
-		if (playWithLineStyle) {
-			System.out.println("line style = " + lineStyle);
-			this.tree.putClientProperty("JTree.lineStyle", lineStyle);
-		}
-
-		//Create the scroll pane and add the tree to it. 
-		JScrollPane treeView = new JScrollPane(this.tree);
-
-		//Create the HTML viewing pane.
-		htmlPane = new JEditorPane();
-		htmlPane.setEditable(false);
-		//	initHelp();
-		JScrollPane htmlView = new JScrollPane(htmlPane);
-
-		//Add the scroll panes to a split pane.
-		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		splitPane.setTopComponent(treeView);
-		splitPane.setBottomComponent(htmlView);
-
-		Dimension minimumSize = new Dimension(100, 50);
-		htmlView.setMinimumSize(minimumSize);
-		treeView.setMinimumSize(minimumSize);
-		splitPane.setDividerLocation(100); 
-		splitPane.setPreferredSize(new Dimension(500, 300));
-
-		//Add the split pane to this panel.
-		add(splitPane);
-		//visualise model end
-	
-		//start testing
 		retrieveTests();
-		System.out.println("CAUITaskManagerTest end");
-	}
+		modelManager.visualiseModel();
+}
 
 	
-	
+	/*
 	private void  retrieveTests(){
 		
 		//type based retrieval
 		
-		/*
-		DefaultMutableTreeNode root = modelManager.getRoot();
-		System.out.println("The root has " + root.getChildCount() + " children");
-	    System.out.println("The tree's depth is " + root.getDepth());
-	    System.out.println("The tree has " + root.getLeafCount() + " leaves");
-	    System.out.println("'Root' is really a root? " + root.isRoot());
-	    System.out.println("Root's userObject: " + root.toString());
-	    */
-	
 		UserIntentAction retrievedAction = modelManager.retrieveAction("Actions=start/0");
 		System.out.println("retrievedAction "+ retrievedAction.getparameterName()+" "+retrievedAction.getvalue());
 		
@@ -145,8 +95,44 @@ public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener
 		System.out.println ("action:"+actionsResult.toString()+" "+this.modelManager.actionBelongsToModel(actionsResult));
 		
 	}
+		
+*/
+	private void createModel(){
 	
-
+		IUserIntentAction userActionA = modelManager.createAction("A-homePc","off",50);
+		IUserIntentAction userActionB = modelManager.createAction("B-homePc","off",50);
+		IUserIntentAction userActionC = modelManager.createAction("C-homePc","off",50);
+		IUserIntentAction userActionD = modelManager.createAction("D-homePc","off",50);
+		
+		Map<IUserIntentAction,Double> actionTrgtsRoot = new HashMap<IUserIntentAction,Double>();
+		actionTrgtsRoot.put(userActionA, 39.8);
+		actionTrgtsRoot.put(userActionB, 39.8);
+		actionTrgtsRoot.put(userActionC, 39.8);
+		actionTrgtsRoot.put(userActionD, 39.8);
+		modelManager.setNextActionLink(null, actionTrgtsRoot);
+		
+		IUserIntentAction userActionAB = modelManager.createAction("B-homePc","off",50);
+		IUserIntentAction userActionAC = modelManager.createAction("C-homePc","off",50);
+		IUserIntentAction userActionAD = modelManager.createAction("D-homePc","off",50);
+		
+		System.out.println ("action: "+userActionA);
+		
+		
+		Map<IUserIntentAction,Double> actionTrgts = new HashMap<IUserIntentAction,Double>();
+		actionTrgts.put(userActionAB, 39.8);
+		actionTrgts.put(userActionAC, 39.8);
+		actionTrgts.put(userActionAD, 39.8);
+		System.out.println(actionTrgts.size());
+		modelManager.setNextActionLink(userActionA, actionTrgts);
+	}
+	
+	
+	private void  retrieveTests(){
+		UserIntentAction retrievedAction = modelManager.retrieveAction("A-homePc=off/0");
+		System.out.println ("retrievedAction: "+retrievedAction);
+		
+	}
+/*
 	private void createModel(){
 		
 		DefaultMutableTreeNode model = modelManager.retrieveModel();
@@ -244,53 +230,10 @@ public class CAUITaskManagerTest extends JPanel implements TreeSelectionListener
 		modelManager.updateModel(model);
 	}
 	
-	
-
-
-	/**
-	 * Create the GUI and show it.  For thread safety,
-	 * this method should be invoked from the
-	 * event dispatch thread.
-	 */
-	private static void createAndShowGUI() {
-		if (useSystemLookAndFeel) {
-			try {
-				UIManager.setLookAndFeel(
-						UIManager.getSystemLookAndFeelClassName());
-			} catch (Exception e) {
-				System.err.println("Couldn't use system look and feel.");
-			}
-		}
-
-		//Create and set up the window.
-		JFrame frame = new JFrame("TreeDemo");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		//Add content to the window.
-		frame.add(new CAUITaskManagerTest());
-
-		//Display the window.
-		frame.pack();
-		frame.setVisible(true);
-	}
-
+	*/
 
 
 	public static void main(String[] args) {
-
-		//Schedule a job for the event dispatch thread:
-		//creating and showing this application's GUI.
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				createAndShowGUI();
-			}
-		});
+		new CAUITaskManagerTest();
 	}
-
-
-	@Override
-	public void valueChanged(TreeSelectionEvent e) {
-		// TODO Auto-generated method stub
-	}
-
 }

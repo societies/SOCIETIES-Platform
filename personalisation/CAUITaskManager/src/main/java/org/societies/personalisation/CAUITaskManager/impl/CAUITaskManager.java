@@ -28,7 +28,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JFrame;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.societies.api.identity.IIdentity;
@@ -51,24 +53,29 @@ import org.societies.personalisation.CAUI.api.model.UserIntentTask;
 public class CAUITaskManager  implements ICAUITaskManager{
 
 	private JTree tree;
-	DefaultMutableTreeNode model; 
+	
+	//the tree model
+  DefaultMutableTreeNode model; 
 
 
 	public CAUITaskManager(){
-		model = new DefaultMutableTreeNode("User Intent Task model");	
+		this.model = new DefaultMutableTreeNode("User Intent Task model");	
 	}
 
 
 	public DefaultMutableTreeNode retrieveModel(){
-		return model;
+		return this.model;
 	}
 
+	
 	public void updateModel(DefaultMutableTreeNode top){
 		this.model = top;
 	}
-
+	 
+	
 	//call this after the top variable is filled with uiModel objects
 	public JTree getModelTree(){
+		System.out.println("inside model "+ this.model.getChildCount());
 		tree = new JTree(this.model);
 		return tree;
 	}
@@ -77,6 +84,7 @@ public class CAUITaskManager  implements ICAUITaskManager{
 	@Override
 	public UserIntentAction createAction(String par, String val, double transProb) {
 		UserIntentAction action = new UserIntentAction (par, val, UIModelObjectNumberGenerator.getNextValue(), transProb);
+
 		return action;
 	}
 
@@ -93,9 +101,35 @@ public class CAUITaskManager  implements ICAUITaskManager{
 		return null;
 	}
 
+	//this method needs to be added to ifc.
 	@Override
-	public void setNextActionLink(UserIntentAction arg0, UserIntentAction arg1,
-			Double arg2) {
+	public void setNextActionLink(IUserIntentAction actionSrc, Map<IUserIntentAction,Double> actionTrgts) {
+		
+		DefaultMutableTreeNode sourceNode =null;
+		DefaultMutableTreeNode targetNode = null ;
+		//System.out.println(actionTrgts.size());
+		//HashMap<IUserIntentAction,Double> actionTargets = actionTrgts; 
+			
+		if(actionSrc != null) {
+			if (this.retrieveAction(actionSrc.getActionID()) != null){
+				sourceNode = this.retrieveNodeAction(actionSrc);
+	//			System.out.println("sourceNode = "+sourceNode + " "+ retrieveAction(actionSrc.getActionID()));
+								
+				for(IUserIntentAction action : actionTrgts.keySet()){
+					//System.out.println("acti = "+action + "source "+sourceNode );
+					targetNode = new DefaultMutableTreeNode(action);
+					sourceNode.add(targetNode);
+				}
+			}
+		}
+	//	System.out.println("actionSrc = "+actionSrc+" actionTrgts"+actionTrgts);
+		if(actionSrc == null && actionTrgts != null ) {
+			//System.out.println("actionSrc = "+actionSrc);
+			for(IUserIntentAction action : actionTrgts.keySet()){
+				DefaultMutableTreeNode newChild = new DefaultMutableTreeNode(action);
+				this.model.add(newChild);
+			}
+		}
 	}
 
 	@Override
@@ -105,16 +139,13 @@ public class CAUITaskManager  implements ICAUITaskManager{
 		DefaultMutableTreeNode sourceNode= new DefaultMutableTreeNode(sourceTask);
 
 		if(sourceTask == null) this.model.add(targetNode);
-
+	
 		if(sourceTask != null) {
-
 			if (this.retrieveTask(sourceTask.getTaskID()) != null){
 				this.retrieveNodeTask(targetTask);
 			}
-
 			this.model.add(sourceNode);
 		}
-
 	}
 
 
@@ -132,7 +163,7 @@ public class CAUITaskManager  implements ICAUITaskManager{
 			node = (DefaultMutableTreeNode) e.nextElement();
 			if (node.getUserObject() instanceof UserIntentAction && node.getUserObject() != null){
 				userTask =  (UserIntentTask)node.getUserObject();
-				System.out.println("node casted to userTask "+ userTask.getTaskID());
+			//	System.out.println("node casted to userTask "+ userTask.getTaskID());
 				if (taskID.equals(userTask.getTaskID())) {
 					System.out.println("FOUND "+taskID);
 					return userTask;
@@ -213,9 +244,31 @@ public class CAUITaskManager  implements ICAUITaskManager{
 		return null;
 	}
 
-
+	
 	public DefaultMutableTreeNode retrieveNodeAction(IUserIntentAction userAction){
-		DefaultMutableTreeNode treeNode = null;
+		//DefaultMutableTreeNode treeNode = null;
+
+		DefaultMutableTreeNode node = null;
+		IUserIntentAction tempAction = null;
+
+		Enumeration e =this.retrieveModel().breadthFirstEnumeration();
+		while (e.hasMoreElements()) {
+			node = (DefaultMutableTreeNode) e.nextElement();
+			if (node.getUserObject() instanceof IUserIntentAction && node.getUserObject() != null){
+				tempAction =  (IUserIntentAction)node.getUserObject();
+				//System.out.println("node casted to userAction: "+ userTask.getTaskID());
+				if (userAction.equals(tempAction)) {
+					System.out.println("node FOUND "+node);
+					return node;
+				}
+			}
+		}
+		return null;
+	}
+	
+/*
+	public DefaultMutableTreeNode retrieveNodeAction(IUserIntentAction userAction){
+		//DefaultMutableTreeNode treeNode = null;
 
 		DefaultMutableTreeNode node = null;
 		IUserIntentTask tempAction = null;
@@ -234,8 +287,8 @@ public class CAUITaskManager  implements ICAUITaskManager{
 		}
 		return null;
 	}
-
-
+*/
+	
 	/*
 	 * add this method to interface 
 	 * @param par
@@ -314,25 +367,35 @@ public class CAUITaskManager  implements ICAUITaskManager{
 
 		if( this.retrieveNodeAction(userAction) != null && this.retrieveNodeAction(userAction) instanceof IUserIntentAction) {
 			return true; 
-
 		}else return false;
 	}
 
 
 	@Override
 	public boolean taskBelongsToModel(IUserIntentTask userTask) {
-
 		if( this.retrieveNodeTask(userTask) != null && this.retrieveNodeTask(userTask) instanceof IUserIntentTask) return true; 
-
 		else return false;
 	}
 
 
-	
 	@Override
 	public UserIntentAction retrieveCurrentIntentAction(IIdentity arg0,
 			IIdentity arg1, ServiceResourceIdentifier arg2, String arg3) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	
+	public void visualiseModel(){
+		new TreeModelVisualizer(this.getModelTree());
+	}
+
+
+	@Override
+	public void setNextActionLink(IUserIntentAction arg0,
+			IUserIntentAction arg1, Double arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

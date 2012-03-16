@@ -19,14 +19,64 @@
  */
 package org.societies.personalisation.CAUIDiscovery.impl;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+
 import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
 
 public class CAUIDiscovery implements ICAUIDiscovery{
 
+
+	LinkedHashMap<String,Integer> dictionary = new LinkedHashMap<String,Integer>();
+	List<String> charList = null;
+
+
 	@Override
 	public void generateNewUserModel() {
-	
+		charList = new ArrayList<String>();
+	}
+
+	public LinkedHashMap<String,Integer> getDictionary(){
+		return this.dictionary;
+	}
+
+
+
+	void findOccurences(int step, String array){
+
+		int arraySize = array.length();
+		String currentPhrase = null;
+
+		for (int i = 0; i < arraySize-step ; i++){
+			currentPhrase = array.substring(i, i+step);
+			System.out.println(" currentChar "+currentPhrase);
+
+			if(this.dictionary.containsKey(currentPhrase)){
+				//HashMap<String,Integer> container = dictionary.get(currentChar);
+				Integer previousScore = this.dictionary.get(currentPhrase);
+				this.dictionary.put(currentPhrase,previousScore+1);
+			} else {
+				this.dictionary.put(currentPhrase, 1);
+			}
+		}
+
 		
+	}
+
+	public static void main(String[] args) {
+
+		CAUIDiscovery cd = new CAUIDiscovery();
+		//String array = "AAABABBBBAABCCDDCBAAA";
+		//String array = "ABCEZDEFJKABCODEFPABCIOIKDEF";
+		String array = "ABCDEFABCDEF";
+		System.out.println("array: "+array);
+		//	sd.findStates(array);
+		//System.out.println("created dictionary1 :"+sd.getDictionary());
+		for (int i=1; i<5; i++){
+			cd.findOccurences(i ,array);
+		}
+		System.out.println("populated dictionary :"+cd.getDictionary());
 	}
 
 }
