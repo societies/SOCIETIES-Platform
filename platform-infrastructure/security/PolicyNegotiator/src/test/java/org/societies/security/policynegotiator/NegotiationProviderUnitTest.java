@@ -28,6 +28,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -114,9 +115,15 @@ public class NegotiationProviderUnitTest {
 	@Test
 	public void testReject() throws InterruptedException, ExecutionException {
 		
+		Random rnd = new Random();
 		int sessionId;
-		
-		sessionId = 1;
+
+		// Test for a non-existing session
+		sessionId = rnd.nextInt();
 		classUnderTest.reject(sessionId);
+		
+		// Test for an existing session
+		//sessionId = ;
+		//classUnderTest.reject(sessionId);
 	}
 }

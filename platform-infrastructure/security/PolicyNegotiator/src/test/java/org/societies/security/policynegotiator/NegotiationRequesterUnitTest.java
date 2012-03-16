@@ -53,6 +53,7 @@ public class NegotiationRequesterUnitTest {
 
 		signatureMgrMock = mock(ISignatureMgr.class);
 		classUnderTest = new NegotiationRequester(signatureMgrMock);
+		classUnderTest.init();
 	}
 
 	/**
@@ -60,14 +61,6 @@ public class NegotiationRequesterUnitTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
-	}
-
-	/**
-	 * Test method for {@link org.societies.security.policynegotiator.NegotiationRequester#init()}.
-	 */
-	@Test
-	public void testInit() {
-		classUnderTest.init();
 	}
 
 	/**
