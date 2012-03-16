@@ -38,11 +38,20 @@ import org.societies.api.internal.css.directory.ICssDirectory;
 
 import org.societies.api.internal.css.discovery.ICssDiscovery;
 
-import org.societies.api.internal.cis.management.CisActivityFeed;
+import org.societies.api.internal.cis.management.ICisActivityFeed;
 import org.societies.api.internal.cis.management.ServiceSharingRecord;
-import org.societies.api.internal.cis.management.CisActivity;
-import org.societies.api.internal.cis.management.CisRecord;
+import org.societies.api.internal.cis.management.ICisActivity;
+import org.societies.api.internal.cis.management.ICisRecord;
 import org.societies.api.internal.cis.management.ICisManager;
+
+//import org.societies.api.cis.management.ICisRecord;
+//import org.societies.api.cis.management.ICisManager;
+//import org.societies.api.cis.management.ICisOwned;
+//import org.societies.api.cis.management.ICisSubscribed;
+//import org.societies.api.cis.management.ICisEditor;
+//import org.societies.api.cis.management.ICisActivity;
+//import org.societies.api.cis.management.ICisActivityFeed;
+//import org.societies.api.cis.management.ICis;
 
 //import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
 
@@ -93,7 +102,7 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
 	//private IUserCtxBroker userContextBroker;
 	//private ICommunityCtxBroker communityContextBroker;
 	//private IUserCtxBrokerCallback userContextBrokerCallback;
-	private ArrayList<CisRecord> recentRefusals;
+	private ArrayList<ICisRecord> recentRefusals;
 	private IUserFeedback userFeedback;
 	private IUserFeedbackCallback userFeedbackCallback;
 	
@@ -126,31 +135,31 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
     	new SuggestedCommunityAnalyser(linkedCss, "CSS");
     }
     
-    public void analyseEgocentricRecommendations(HashMap<String, ArrayList<CisRecord>> cisRecommendations) {
+    public void analyseEgocentricRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
     	//go straight to Community Recommender
     	
     	
     }
     
-    public void analyseEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<CisRecord>>> cisRecommendations) {
+    public void analyseEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
     	//go straight to Community Recommender
     	
     	
     }
     
-    public void analyseCSCWRecommendations(HashMap<String, ArrayList<CisRecord>> cisRecommendations) {
+    public void analyseCSCWRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
     	
     }
 
-    public void analyseCSCWConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<CisRecord>>> cisRecommendations) {
+    public void analyseCSCWConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
     	
     }
     
-    public void analyseCSMAnalyserRecommendations(HashMap<String, ArrayList<CisRecord>> cisRecommendations) {
+    public void analyseCSMAnalyserRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
 	
     }
     
-    public void analyseCSMAnalyserConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<CisRecord>>> cisRecommendations) {
+    public void analyseCSMAnalyserConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
     	
     }
     
