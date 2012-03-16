@@ -100,9 +100,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 			LOG.info("listener registered");
 
 			CISs = new HashSet<CisEditor>();			
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
+
 	}
 
 	/**
