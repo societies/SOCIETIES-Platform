@@ -22,37 +22,32 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package org.societies.api.security.digsig;
+package org.societies.api.schema.security.policynegotiator;
 
 /**
- * Methods to digitally sign given data and methods to verify given signatures.
  * 
+ *
  * @author Mitja Vardjan
  *
  */
-public interface ISignatureMgr {
-
-	/**
-	 * Digitally sign given XML data and embed the signature in the given XML.
-	 * 
-	 * @param xml The XML String to be signed.
-	 * @param xmlNodeId Identifier of the XML node to sign (value of attribute "Id")
-	 * @param identity The identity to be used for signature.
-	 * 
-	 * @return XML with embedded signature.
-	 */
-	public String signXml(String xml, String xmlNodeId, String identity);
+public class SlaBean {
 	
-	/**
-	 * Verify all digital signatures embedded in given XML. Verify also if the
-	 * identities used are valid.
-	 * 
-	 * @param xml The XML containing embedded digital signatures to be verified.
-	 * 
-	 * @return True if all digital signatures and identities are valid.
-	 * False otherwise or if no signatures found.
-	 */
-	public boolean verify(String xml);
+	private int sessionId;
+	private String sla;
 
+	public int getSessionId() {
+		return sessionId;
+	}
+
+	public void setSessionId(int sessionId) {
+		this.sessionId = sessionId;
+	}
+
+	public String getSla() {
+		return sla;
+	}
+
+	public void setSla(String sla) {
+		this.sla = sla;
+	}
 }

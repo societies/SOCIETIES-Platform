@@ -7,8 +7,7 @@
 		        http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
 	<!-- Security -->
-	<artifact type="bundle" name="org.societies.security.secure-storage"/>
-	<artifact type="bundle" name="org.societies.security.signature-mgr"/>
+	<artifact type="bundle" name="org.societies.security.security-services"/>
 	<artifact type="bundle" name="org.societies.security.policynegotiator"/>
 	<artifact type="bundle" name="org.societies.security.commsmgr"/>
 
