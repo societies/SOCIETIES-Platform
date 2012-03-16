@@ -42,7 +42,7 @@ import org.societies.api.internal.security.storage.ISecureStorage;
 
 public class SecureStorageUnitTest {
 
-	private ISecureStorage classUnderTest;
+	private SecureStorage classUnderTest;
 
 	/**
 	 * @throws java.lang.Exception
@@ -60,6 +60,9 @@ public class SecureStorageUnitTest {
 		classUnderTest = null;
 	}
 
+	/**
+	 * Test method for {@link ISecureStorage#getPassword(String)}
+	 */
 	@Test
 	public void testGetPassword() {
 		
