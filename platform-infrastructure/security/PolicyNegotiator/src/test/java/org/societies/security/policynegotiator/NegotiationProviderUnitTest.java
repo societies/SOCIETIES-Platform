@@ -24,31 +24,36 @@
  */
 package org.societies.security.policynegotiator;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
+import org.societies.api.schema.security.policynegotiator.SlaBean;
+import org.societies.api.security.digsig.ISignatureMgr;
 
 public class NegotiationProviderUnitTest {
 
-	private INegotiationProvider classUnderTest;
+	private NegotiationProvider classUnderTest;
+	private ISignatureMgr signatureMgrMock;
+	private INegotiationProviderRemote groupMgrMock;
 
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
+		
+		signatureMgrMock = mock(ISignatureMgr.class);
+		groupMgrMock = mock(INegotiationProviderRemote.class);
+		classUnderTest = new NegotiationProvider(signatureMgrMock, groupMgrMock);
 	}
 
 	/**
@@ -57,5 +62,61 @@ public class NegotiationProviderUnitTest {
 	@After
 	public void tearDown() throws Exception {
 	}
-
+	
+	/**
+	 * Test method for {@link INegotiationProvider#acceptPolicyAndGetSla(int, String, boolean)}
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testAcceptPolicyAndGetSla() throws InterruptedException, ExecutionException {
+		
+		int sessionId;
+		String signedPolicyOption;
+		boolean modified;
+		Future<SlaBean> result;
+		
+		sessionId = 1;
+		signedPolicyOption = "1";
+		modified = false;
+		result = classUnderTest.acceptPolicyAndGetSla(sessionId, signedPolicyOption, modified);
+		assertNotNull(result.get());
+		assertEquals(sessionId, result.get().getSessionId());
+		assertNotNull(result.get().getSla());
+	}
+	
+	/**
+	 * Test method for {@link INegotiationProvider#getPolicyOptions()}
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testGetPolicyOptions() throws InterruptedException, ExecutionException {
+		
+		Future<SlaBean> result1;
+		Future<SlaBean> result2;
+		
+		result1 = classUnderTest.getPolicyOptions();
+		assertNotNull(result1.get());
+		result2 = classUnderTest.getPolicyOptions();
+		assertNotNull(result2.get());
+		
+		assertTrue("Different negotiation processes got same session ID!",
+				result1.get().getSessionId() != result2.get().getSessionId());
+		assertNotNull(result1.get().getSla());
+	}
+	
+	/**
+	 * Test method for {@link INegotiationProvider#reject(int)}
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testReject() throws InterruptedException, ExecutionException {
+		
+		int sessionId;
+		
+		sessionId = 1;
+		classUnderTest.reject(sessionId);
+	}
 }

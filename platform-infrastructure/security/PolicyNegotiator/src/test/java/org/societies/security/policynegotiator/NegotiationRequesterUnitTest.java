@@ -24,31 +24,35 @@
  */
 package org.societies.security.policynegotiator;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Future;
+import java.util.Random;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.societies.api.internal.security.policynegotiator.INegotiationRequester;
+import org.societies.api.security.digsig.ISignatureMgr;
 
+/**
+ * 
+ *
+ * @author Mitja Vardjan
+ *
+ */
 public class NegotiationRequesterUnitTest {
 
-	private INegotiationRequester requester;
+	private NegotiationRequester classUnderTest;
+	private ISignatureMgr signatureMgrMock;
 
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
+
+		signatureMgrMock = mock(ISignatureMgr.class);
+		classUnderTest = new NegotiationRequester(signatureMgrMock);
 	}
 
 	/**
@@ -56,6 +60,56 @@ public class NegotiationRequesterUnitTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
+	}
+
+	/**
+	 * Test method for {@link org.societies.security.policynegotiator.NegotiationRequester#init()}.
+	 */
+	@Test
+	public void testInit() {
+		classUnderTest.init();
+	}
+
+	/**
+	 * Test method for {@link org.societies.security.policynegotiator.NegotiationRequester#acceptUnmodifiedPolicy(int, java.lang.String)}.
+	 */
+	@Test
+	public void testAcceptUnmodifiedPolicy() {
+		//classUnderTest.acceptUnmodifiedPolicy(sessionId, selectedPolicyOptionId);
+	}
+
+	/**
+	 * Test method for {@link org.societies.security.policynegotiator.NegotiationRequester#reject(int)}.
+	 */
+	@Test
+	public void testReject() {
+		
+		Random rnd = new Random();
+		int sessionId;
+
+		// Test for a non-existing session
+		sessionId = rnd.nextInt();
+		classUnderTest.reject(sessionId);
+		
+		// Test for an existing session
+		//sessionId = ;
+		//classUnderTest.reject(sessionId);
+	}
+
+	/**
+	 * Test method for {@link org.societies.security.policynegotiator.NegotiationRequester#acceptModifiedPolicy(int, java.lang.Object)}.
+	 */
+	@Test
+	public void testAcceptModifiedPolicy() {
+		//classUnderTest.acceptModifiedPolicy(sessionId, agreement);
+	}
+
+	/**
+	 * Test method for {@link org.societies.security.policynegotiator.NegotiationRequester#receiveResult(java.lang.Object)}.
+	 */
+	@Test
+	public void testReceiveResult() {
+		//classUnderTest.receiveResult(returnValue);
 	}
 
 }

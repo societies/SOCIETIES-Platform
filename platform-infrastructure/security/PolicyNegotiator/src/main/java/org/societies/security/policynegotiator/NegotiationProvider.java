@@ -1,10 +1,12 @@
 package org.societies.security.policynegotiator;
 
+import java.util.Random;
 import java.util.concurrent.Future;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 
 import org.slf4j.Logger;
@@ -44,14 +46,35 @@ public class NegotiationProvider implements INegotiationProvider {
 	
 	@Override
 	public Future<SlaBean> getPolicyOptions() {
-		return null;
+		
+		SlaBean sla = new SlaBean();
+		Random rnd = new Random();
+		int sessionId = rnd.nextInt();
+		
+		sla.setSessionId(sessionId);
+		// TODO: store session ID
+		sla.setSla("<a/>");  // FIXME
+		
+		return new AsyncResult<SlaBean>(sla);
 	}
 
 	@Override
 	public Future<SlaBean> acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
 			boolean modified) {
 		
-		return null;
+		SlaBean sla = new SlaBean();
+		String finalSla;
+		
+		sla.setSessionId(sessionId);
+		finalSla = signedPolicyOption;  //TODO: add provider's signature
+		
+		if (!signatureMgr.verify(signedPolicyOption)) {
+			LOG.info("acceptPolicyAndGetSla({}): invalid signature", sessionId);
+			//sla.setError();
+		}
+
+		sla.setSla(finalSla);
+		return new AsyncResult<SlaBean>(sla);
 	}
 
 	@Override
