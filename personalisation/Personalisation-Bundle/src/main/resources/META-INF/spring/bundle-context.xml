@@ -37,6 +37,27 @@
 		<property name="ctxBroker" ref="ctxBroker"></property>
 	</bean>
 
+	<bean id="cristPrediction"
+		class="org.societies.personalisation.CRISTUserIntentPrediction.impl.CRISTUserIntentPrediction"
+		name="cristPrediction" init-method="initialiseCRISTPrediction">
+		<property name="ctxBroker" ref="ctxBroker"></property>
+		<property name="persoMgr" ref="persoMgr"></property>
+	</bean>
+
+	<bean id="cristDiscovery"
+		class="org.societies.personalisation.CRISTUserIntentDiscovery.impl.CRISTUserIntentDiscovery"
+		name="cristDiscovery" init-method="initialiseCRISTDiscovery">
+	</bean>
+	
+	<bean id="cristTaskManager"
+		class="org.societies.personalisation.CRISTUserIntentTaskManager.impl.CRISTUserIntentTaskManager"
+		name="cristTaskManager" init-method="initialiseCRISTUserIntentManager">
+		<property name="ctxBroker" ref="ctxBroker"></property>
+		<property name="cristPrediction" ref="cristPrediction"></property>
+		<property name="cristDiscovery" ref="cristDiscovery"></property>
+		</bean>
+
+
 	<bean id="persoMgr"
 		class="org.societies.personalisation.management.impl.PersonalisationManager"
 		name="persoMgr" depends-on="ctxBroker" lazy-init="true"
