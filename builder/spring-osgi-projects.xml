@@ -94,6 +94,9 @@
 		<!-- <module>../platform-infrastructure/comms-frwk/ClientCommunicationMgr</module> -->
 
 		<!-- Security and Dependability Mgmt -->
+		<module>../platform-infrastructure/security/SecurityServices</module>
+		<module>../platform-infrastructure/security/PolicyNegotiator</module>
+		<module>../platform-infrastructure/security/SecurityCommsMgr</module>
 
 		<!-- CSS Mgmt -->
 
