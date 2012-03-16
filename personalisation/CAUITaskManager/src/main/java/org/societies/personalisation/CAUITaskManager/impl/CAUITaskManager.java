@@ -28,14 +28,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JFrame;
 import javax.swing.JTree;
-import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentTask;
@@ -43,7 +40,6 @@ import org.societies.personalisation.CAUI.api.model.TaskModelData;
 import org.societies.personalisation.CAUI.api.model.UIModelObjectNumberGenerator;
 import org.societies.personalisation.CAUI.api.model.UserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentTask;
-import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
 
 /**
@@ -55,9 +51,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 public class CAUITaskManager  implements ICAUITaskManager{
 
 
-	private IInternalPersonalisationManager persoMgr;
 	private ICtxBroker ctxBroker;
-
 
 	private JTree tree;
 
@@ -72,17 +66,6 @@ public class CAUITaskManager  implements ICAUITaskManager{
 		System.out.println(this.getClass().getName()+": Got ctxBroker");
 
 		this.ctxBroker = ctxBroker;
-	}
-
-	public IInternalPersonalisationManager getPersoMgr() {
-		System.out.println(this.getClass().getName()+": Return persoMgr");
-		return persoMgr;
-	}
-
-
-	public void setPersoMgr(IInternalPersonalisationManager persoMgr) {
-		System.out.println(this.getClass().getName()+": Got persoMgr");
-		this.persoMgr = persoMgr;
 	}
 
 	// constructor

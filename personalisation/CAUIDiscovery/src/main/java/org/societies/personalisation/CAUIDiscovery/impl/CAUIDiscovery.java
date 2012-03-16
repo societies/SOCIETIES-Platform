@@ -23,10 +23,55 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
+//import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
+
 
 public class CAUIDiscovery implements ICAUIDiscovery{
 
+	
+	private ICAUITaskManager cauiTaskManager;
+	
+	private ICtxBroker ctxBroker;
+
+
+	public ICAUITaskManager getCAUITaskManager() {
+		System.out.println(this.getClass().getName()+": Return cauiTaskManager");
+
+		return cauiTaskManager;
+	}
+
+
+	public void setCAUITaskManager(ICAUITaskManager cauiTaskManager) {
+		System.out.println(this.getClass().getName()+": Got cauiTaskManager");
+
+		this.cauiTaskManager = cauiTaskManager;
+	}
+
+	public ICtxBroker getCtxBroker() {
+		System.out.println(this.getClass().getName()+": Return ctxBroker");
+
+		return ctxBroker;
+	}
+
+
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		System.out.println(this.getClass().getName()+": Got ctxBroker");
+
+		this.ctxBroker = ctxBroker;
+	}
+
+
+	
+
+	// constructor
+	public void initialiseCAUIDiscovery(){
+		 dictionary = new LinkedHashMap<String,Integer>();
+	}
+	
+	
 	
 	LinkedHashMap<String,Integer> dictionary = null;
 	List<String> charList = null;
