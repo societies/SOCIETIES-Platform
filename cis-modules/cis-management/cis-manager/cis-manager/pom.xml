@@ -27,44 +27,19 @@
 	</parent>
 
 	<dependencies>
-	<!-- add your dependencies here -->
-		
-	
-		
+	<!-- add your dependencies here -->	
     	<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>		
-
-	<dependency>
-	<groupId>org.societies.api.internal</groupId>
-	<artifactId>societies-api-internal</artifactId>
-	<version>${release.version}</version>
-	</dependency>	
-		
 		<dependency>
-			<groupId>org.societies.api.schema</groupId>
-			<artifactId>societies-api-schema</artifactId>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
 			<version>${release.version}</version>
-		</dependency>
-
-<!-- 		<dependency>
-			<groupId>org.societies.community</groupId>
-			<artifactId>CommunityXep</artifactId>
-			<version>0.0.1</version>
-			<scope>compile</scope>
-		</dependency>
-
-
-  <dependency>
-   <groupId>org.igniterealtime</groupId>
-   <artifactId>whack</artifactId>
-   <type>jar</type>
-   <scope>provided</scope>
-  </dependency>-->
-
+			<scope>provided</scope>
+		</dependency>	
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 	  		<artifactId>CommunicationFrameworkCommons</artifactId>
@@ -72,20 +47,12 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.societies.comm.xmpp</groupId>
-		    <artifactId>XCCommunicationMgr</artifactId>
-		    <version>${version.comm}</version>	
-		</dependency>
-		
-		<dependency>
 			<groupId>org.societies.comm.xmpp.pubsub</groupId>
     		<artifactId>PubsubClientBundle</artifactId>
 	  		<version>${version.comm}</version>
 			<scope>provided</scope>
 		</dependency>
-
-
-	<dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
@@ -107,40 +74,6 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
 		</dependency>
-				
-<!--		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>org.springframework.beans</artifactId>
-            <version>${spring.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-              <exclusion>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>com.springsource.org.apache.commons.logging</artifactId>
-              </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>org.springframework.context</artifactId>
-            <version>${spring.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-              <exclusion>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>com.springsource.org.apache.commons.logging</artifactId>
-              </exclusion>
-            </exclusions>
-        </dependency>
--->
-
-
 	</dependencies>
 
 	<build>
