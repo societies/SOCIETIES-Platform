@@ -36,15 +36,18 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	
 	private ICtxBroker ctxBroker;
 
-
-	public ICAUITaskManager getCAUITaskManager() {
+	public CAUIDiscovery(){
+		 dictionary = new LinkedHashMap<String,Integer>();
+	}
+	
+	public ICAUITaskManager getCauiTaskManager() {
 		System.out.println(this.getClass().getName()+": Return cauiTaskManager");
 
 		return cauiTaskManager;
 	}
 
 
-	public void setCAUITaskManager(ICAUITaskManager cauiTaskManager) {
+	public void setCauiTaskManager(ICAUITaskManager cauiTaskManager) {
 		System.out.println(this.getClass().getName()+": Got cauiTaskManager");
 
 		this.cauiTaskManager = cauiTaskManager;
@@ -77,9 +80,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	List<String> charList = null;
 	
 	
-	public CAUIDiscovery(){
-		 dictionary = new LinkedHashMap<String,Integer>();
-	}
+
 
 	
 	

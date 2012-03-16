@@ -76,12 +76,12 @@
 		</osgi:reference>
 		
 		<osgi:reference id="cauiPrediction" interface="org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction" cardinality="0..1">
-			<osgi:listener bind-method="setCauiPrediction" ref="persoMgr"></osgi:listener>
+			<osgi:listener bind-method="setCAUIPrediction" ref="persoMgr"></osgi:listener>
 		</osgi:reference>
 		
-		<osgi:reference id="cauiTaskManager" interface="org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager" cardinality="1..1">
-			<osgi:listener bind-method="setCAUITaskManager" ref="cauiPrediction"></osgi:listener>
-			<osgi:listener bind-method="setCAUITaskManager" ref="cauiDiscovery"></osgi:listener>
+		<osgi:reference id="cauiTaskManager" interface="org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager" cardinality="0..1">
+			<osgi:listener bind-method="setCauiTaskManager" ref="cauiPrediction"></osgi:listener>
+			<osgi:listener bind-method="setCauiTaskManager" ref="cauiDiscovery"></osgi:listener>
 		</osgi:reference>
 		
 <!-- end importing internal services -->
