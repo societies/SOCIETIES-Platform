@@ -24,10 +24,7 @@
  */
 package org.societies.security.digsig;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 
@@ -42,13 +39,14 @@ import org.societies.api.security.digsig.ISignatureMgr;
 
 public class SignatureMgrUnitTest {
 
-	private ISignatureMgr classUnderTest;
+	private SignatureMgr classUnderTest;
 
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
+		classUnderTest = new SignatureMgr();
 	}
 
 	/**
@@ -58,4 +56,37 @@ public class SignatureMgrUnitTest {
 	public void tearDown() throws Exception {
 	}
 
+	/**
+	 * Test method for {@link ISignatureMgr#signXml(String, String)}.
+	 */
+	@Test
+	public void testSignXml() {
+		
+		String xml = "<?xml version=\"1.0\"?><aaa><bbb>text</bbb></aaa>";
+		String xmlNodeId = "nodeA";
+		String identity = "";
+		String result;
+		
+		result = classUnderTest.signXml(xml, xmlNodeId, identity);
+		assertEquals("", result);  // TODO
+	}
+
+
+	/**
+	 * Test method for {@link ISignatureMgr#verify(String)}.
+	 */
+	@Test
+	public void testVerify() {
+		
+		// TODO: use real signatures. Now the test only shows the SignatureMgr is initialized and doesn't crash
+		String xmlWithValidSig = "<?xml version=\"1.0\"?><aaa><bbb>text</bbb></aaa>";
+		String xmlWithInvalidSig = "<?xml version=\"1.0\"?><aaa><bbb>text</bbb></aaa>";
+		boolean result;
+		
+		result = classUnderTest.verify(xmlWithValidSig);
+		//assertTrue(result);
+		
+		result = classUnderTest.verify(xmlWithInvalidSig);
+		assertFalse(result);
+	}
 }

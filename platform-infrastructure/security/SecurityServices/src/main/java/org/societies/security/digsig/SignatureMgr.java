@@ -9,9 +9,9 @@ public class SignatureMgr implements ISignatureMgr {
 	private static Logger LOG = LoggerFactory.getLogger(SignatureMgr.class);
 
 	@Override
-	public String signXml(String xml, String id) {
+	public String signXml(String xml, String xmlNodeId, String identity) {
 		
-		LOG.debug("signXml({}, {})", xml, id);
+		LOG.debug("signXml(" + xml + ", " + xmlNodeId + ", " + identity + ")");
 
 		/*
 		SecurityManager sm = new SecurityManager();
@@ -35,7 +35,7 @@ public class SignatureMgr implements ISignatureMgr {
 		}
 		*/
 		
-		return "signature";  // FIXME
+		return "";  // FIXME
 	}
 
 	@Override

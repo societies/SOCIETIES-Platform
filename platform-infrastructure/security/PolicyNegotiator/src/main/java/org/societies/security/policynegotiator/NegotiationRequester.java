@@ -25,7 +25,7 @@ public class NegotiationRequester implements INegotiationRequester, INegotiation
 	
 	@PostConstruct
 	public void init() {
-		LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "id"));
+		LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "xmlNodeId", "id"));
 		LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
 	}
 	

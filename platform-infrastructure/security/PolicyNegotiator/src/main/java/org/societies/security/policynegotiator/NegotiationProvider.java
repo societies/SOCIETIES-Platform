@@ -35,7 +35,7 @@ public class NegotiationProvider implements INegotiationProvider {
 	@PostConstruct
 	public void init() {
 		
-		LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "id"));
+		LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "xmlNodeId", "identity"));
 		LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
 		
 		LOG.debug("init(): group manager = {}", groupMgr);
