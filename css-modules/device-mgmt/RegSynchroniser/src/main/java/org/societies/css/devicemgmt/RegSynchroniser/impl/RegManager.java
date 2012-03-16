@@ -28,6 +28,7 @@ package org.societies.css.devicemgmt.RegSynchroniser.impl;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.logging.LogManager;
 
 import org.apache.commons.logging.LogFactory;
@@ -43,12 +44,27 @@ import org.societies.css.devicemgmt.deviceregistry.DeviceRegistry;
 import org.societies.api.internal.css.devicemgmt.ILocalDevice;
 //import org.societies.css.devicemgmt.RegSynchroniser.impl.LocalDevices;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.societies.comm.xmpp.event.InternalEvent;
+import org.societies.comm.xmpp.event.PubsubEvent;
+import org.societies.comm.xmpp.event.PubsubEventFactory;
+import org.societies.comm.xmpp.event.PubsubEventStream;
+import org.societies.api.schema.css.devicemanagment.DmEvent;
+import org.societies.comm.xmpp.event.EventFactory;
+import org.societies.comm.xmpp.event.EventStream;
 
-public class RegManager implements ILocalDevice, BundleContextAware{
+public class RegManager implements ILocalDevice, ApplicationListener<InternalEvent>, BundleContextAware{
 
 	//private static org.apache.commons.logging.Log LOG = LogFactory.getLog(RegManager.class);
     private IDeviceRegistry deviceRegistry;
     private BundleContext bundleContext;
+    private EventStream stream1;
+    private EventStream stream2;
+    
+    //private HashMap<String, String> eventResult;
+    
+	
     
     
     
@@ -73,6 +89,11 @@ public class RegManager implements ILocalDevice, BundleContextAware{
     	this.bundleContext = bundlecontext;
         
         this.deviceRegistry = DeviceRegistry.getInstance();
+        stream1 = EventFactory.getStream("DEVICE_REGISTERED");
+    	stream2 = EventFactory.getStream("DEVICE_DISCONNECTED");
+    	
+    	stream1.addApplicationListener(this);
+    	stream2.addApplicationListener(this);
 
     }
 
@@ -96,11 +117,11 @@ public class RegManager implements ILocalDevice, BundleContextAware{
      * 
      * @param device
      */
-    public boolean addDevice(DeviceCommonInfo device, String CSSID) throws Exception {
+    public boolean addDevice(DeviceCommonInfo device, String CSSNodeID) throws Exception {
 
         boolean retValue = true;
         
-        retValue = LocalDevices.addDevice(device, CSSID);
+        retValue = LocalDevices.addDevice(device, CSSNodeID);
         
         return retValue;
     }
@@ -109,12 +130,12 @@ public class RegManager implements ILocalDevice, BundleContextAware{
      * Convenience method to add a collection of devices
      */
 
-    public boolean addDevices(Collection<DeviceCommonInfo> deviceCollection, String CSSID)
+    public boolean addDevices(Collection<DeviceCommonInfo> deviceCollection, String CSSNodeID)
             throws Exception {
         boolean retValue = true;
 
         for (DeviceCommonInfo device : deviceCollection) {
-            if (!this.addDevice(device, CSSID)) {
+            if (!this.addDevice(device, CSSNodeID)) {
                 retValue = false;
                 break;
             }
@@ -127,24 +148,24 @@ public class RegManager implements ILocalDevice, BundleContextAware{
      * 
      * @param device
      */
-    public boolean removeDevice(DeviceCommonInfo device, String CSSID)
+    public boolean removeDevice(DeviceCommonInfo device, String CSSNodeID)
             throws Exception {
         
 
-        return LocalDevices.removeDevice(device, CSSID);
+        return LocalDevices.removeDevice(device, CSSNodeID);
     }
 
     /**
      * Convenience method to remove a collection of devices
      */
     public boolean removeDevices(
-            Collection<DeviceCommonInfo> deviceCollection, String CSSID)
+            Collection<DeviceCommonInfo> deviceCollection, String CSSNodeID)
             throws Exception {
 
         boolean retValue = true;
 
         for (DeviceCommonInfo device : deviceCollection) {
-            if (!this.removeDevice(device, CSSID)) {
+            if (!this.removeDevice(device, CSSNodeID)) {
                 retValue = false;
                 break;
             }
@@ -173,20 +194,36 @@ public class RegManager implements ILocalDevice, BundleContextAware{
 		
 	}
 
-	public boolean removedevice(String deviceID, String CSSID) throws Exception {
+	public boolean removedevice(String deviceID, String CSSNodeID) throws Exception {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-//	public boolean removedevices(Collection<String> deviceCollection)
-	//		throws Exception {
-		// TODO Auto-generated method stub
-		//return false;
-	//}
-
-	//@Override
-//	public boolean removeDevice(String deviceID, String CSSID) throws Exception {
-		// TODO Auto-generated method stub
-	//	return false;
-	//}
+	public void onApplicationEvent(InternalEvent event) {
+		String CSSNodeID = "liam.societies.org";	
+		System.out.println(event.getTimestamp());
+		System.out.println(event.getSource());
+		DeviceCommonInfo device = (DeviceCommonInfo)event.getEventInfo();
+		if (event.getEventNode().equals("DEVICE_REGISTERED"))
+		{
+			try {
+				LocalDevices.addDevice(device, CSSNodeID);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if (event.getEventNode().equals("DEVICE_DISCONNECTED"))
+		{
+			try {
+				LocalDevices.removeDevice((DeviceCommonInfo) event.getEventInfo(), CSSNodeID);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+		}
+		
+	}
 }

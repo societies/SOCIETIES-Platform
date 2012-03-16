@@ -53,7 +53,7 @@ public class TestLocalDevices {
     private DeviceCommonInfo device_1;
 	private DeviceCommonInfo device_2;
 	private DeviceCommonInfo device_3;
-	private String CSSID = "liam@societies.org";
+	private String CSSNodeID = "liam@societies.org";
 
 	@Before
 	public void setUp() throws Exception {
@@ -89,9 +89,9 @@ public class TestLocalDevices {
         assertEquals(0, registry.registrySize());
 
         try {
-            retValue = LocalDevices.addDevice(device_1, CSSID);
+            retValue = LocalDevices.addDevice(device_1, CSSNodeID);
             assertTrue(retValue);
-            retValue = LocalDevices.addDevice(device_2, CSSID);
+            retValue = LocalDevices.addDevice(device_2, CSSNodeID);
             assertTrue(retValue);
 
         } catch (Exception e) {
@@ -125,13 +125,13 @@ public class TestLocalDevices {
         assertEquals(0, registry.registrySize());
 
         try {
-            retValue = LocalDevices.addDevice(device_1, CSSID);
+            retValue = LocalDevices.addDevice(device_1, CSSNodeID);
             assertTrue(retValue);
-            retValue = LocalDevices.addDevice(device_2, CSSID);
+            retValue = LocalDevices.addDevice(device_2, CSSNodeID);
             assertTrue(retValue);
-            retValue = LocalDevices.addDevice(device_3, CSSID);
+            retValue = LocalDevices.addDevice(device_3, CSSNodeID);
             assertTrue(retValue);
-            retValue = LocalDevices.removeDevice(device_2, CSSID);
+            retValue = LocalDevices.removeDevice(device_2, CSSNodeID);
             assertTrue(retValue);
 
         } catch (Exception e) {

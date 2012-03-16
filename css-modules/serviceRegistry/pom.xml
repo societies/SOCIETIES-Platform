@@ -27,6 +27,7 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
+			<version>${spring.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<!-- databases -->

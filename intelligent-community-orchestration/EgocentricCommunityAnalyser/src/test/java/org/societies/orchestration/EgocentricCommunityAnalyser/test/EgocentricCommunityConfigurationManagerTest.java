@@ -38,7 +38,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.internal.cis.management.ICisManager;
-import org.societies.api.internal.cis.management.CisRecord;
+import org.societies.api.internal.cis.management.ICisRecord;
 
 /**
  * This is the test class for the Egocentric Community Configuration Manager component

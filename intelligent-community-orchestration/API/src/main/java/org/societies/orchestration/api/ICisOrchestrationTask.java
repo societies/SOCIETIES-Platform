@@ -27,7 +27,8 @@ package org.societies.orchestration.api;
 
 import java.util.ArrayList;
 
-import org.societies.api.internal.cis.management.CisRecord;
+//import org.societies.api.internal.cis.management.CisRecord;
+import org.societies.api.internal.cis.management.ICisRecord;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -50,7 +51,7 @@ public interface ICisOrchestrationTask {
 	 * 				True if successful in orchestrating the CIS, false otherwise.
 	 */
 	
-	public boolean orchestrateCis(CisRecord cisToOrchestrate);
+	public boolean orchestrateCis(ICisRecord cisToOrchestrate);
 	
 	public boolean orchestrateCis(HashMap cisToOrchestrate);
 
@@ -64,7 +65,7 @@ public interface ICisOrchestrationTask {
 	 * 				True if successful in orchestrating the CIS, false otherwise.
 	 */
 	
-	public boolean orchestrateCis(CisRecord cisToOrchestrate, ArrayList<CisRecord> otherCissInvolved);
+	public boolean orchestrateCis(ICisRecord cisToOrchestrate, ArrayList<ICisRecord> otherCissInvolved);
 	
 	/*
 	 * Description: The getTask method returns the task.

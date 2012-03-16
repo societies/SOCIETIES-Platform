@@ -56,6 +56,9 @@
 	<modules>
 		<module>Personalisation-API</module>
 		<module>PersonalisationManager</module>
+		<module>CAUITaskManager</module>
+		<module>CAUIDiscovery</module>
+		<module>CAUIPrediction</module>
 		<module>UserPreferenceManagement</module>
 		<module>UserPreferenceLearning</module>
 		<module>DIANNE</module>

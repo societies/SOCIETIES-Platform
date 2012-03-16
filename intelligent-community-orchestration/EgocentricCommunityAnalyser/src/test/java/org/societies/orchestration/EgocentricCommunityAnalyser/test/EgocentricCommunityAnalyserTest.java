@@ -41,7 +41,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxModelType;
 //import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.internal.cis.management.CisRecord;
+import org.societies.api.internal.cis.management.ICisRecord;
 //import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.identity.IdentityType;
 //import org.societies.api.comm.xmpp.datatypes.IdentityType;

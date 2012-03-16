@@ -40,7 +40,7 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 //import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.internal.cis.management.ICisManager;
-import org.societies.api.internal.cis.management.CisRecord;
+import org.societies.api.internal.cis.management.ICisRecord;
 
 /**
  * This is the test class for the Egocentric Community Deletion Manager component
@@ -64,7 +64,7 @@ public class EgocentricCommunityDeletionManagerTest {
 		//create CIS for James, with last activity being 1 year ago
 
 		cisManager = mock(ICisManager.class);
-		CisRecord jamesCis = cisManager.createCis("James", "James CIS");
+		//ICisRecord jamesCis = cisManager.createCis("James", "James CIS");
 		
     	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
 		
@@ -86,7 +86,7 @@ public class EgocentricCommunityDeletionManagerTest {
 		//create CIS for James, with last activity being 2 hours ago
 
 		cisManager = mock(ICisManager.class);
-		CisRecord jamesCis = cisManager.createCis("James", "James CIS");
+		//ICisRecord jamesCis = cisManager.createCis("James", "James CIS");
 		
 		//Date date = new Date();
 		//Timestamp time = new Timestamp(date.getTime() - (1000 * 60 * 60 * 2) - 1);
@@ -112,7 +112,7 @@ public class EgocentricCommunityDeletionManagerTest {
 		//create CIS for James, with last activity being 2 weeks ago
 
 		cisManager = mock(ICisManager.class);
-		CisRecord jamesCis = cisManager.createCis("James", "James CIS");
+		//ICisRecord jamesCis = cisManager.createCis("James", "James CIS");
 		
 		//Date date = new Date();
 				//Timestamp time = new Timestamp(date.getTime() - (1000 * 60 * 60 * * 24 * 14) - 1);
@@ -138,7 +138,7 @@ public class EgocentricCommunityDeletionManagerTest {
 		//create CIS for James, with last activity being 6 months year ago
 
 		cisManager = mock(ICisManager.class);
-		CisRecord jamesCis = cisManager.createCis("James", "James CIS");
+		//ICisRecord jamesCis = cisManager.createCis("James", "James CIS");
 		
 		//Date date = new Date();
 				//Timestamp time = new Timestamp(date.getTime() - (1000 * 60 * 60 * 24 * 4 * 6) - 1);
@@ -164,7 +164,7 @@ public class EgocentricCommunityDeletionManagerTest {
 		//create CIS for James, with no members for the first time in its history since creation
 
 		cisManager = mock(ICisManager.class);
-		CisRecord jamesCis = cisManager.createCis("James", "James CIS");
+		//ICisRecord jamesCis = cisManager.createCis("James", "James CIS");
 		
 		//Date date = new Date();
 		//Timestamp time = new Timestamp(date.getTime() - (1000 * 60 * 60 * 2));
@@ -190,7 +190,7 @@ public class EgocentricCommunityDeletionManagerTest {
 		//create CIS for James, that match none of deletion criteria but come close.
 
 		cisManager = mock(ICisManager.class);
-		CisRecord jamesCis = cisManager.createCis("James", "James CIS");
+		//ICisRecord jamesCis = cisManager.createCis("James", "James CIS");
 		
     	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
 		

@@ -35,7 +35,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceTreeModel;
 
@@ -88,7 +88,7 @@ public interface IPrivacyPreferenceManager {
 	 * @param serviceID    the serviceID of the service provided by the given
 	 * serviceDPI
 	 */
-	public void deleteIDSPreference(IIdentity userIIdentity, IIdentity serviceIIdentity, IServiceResourceIdentifier serviceID);
+	public void deleteIDSPreference(IIdentity userIIdentity, IIdentity serviceIIdentity, ServiceResourceIdentifier serviceID);
 
 	/**
 	 * Method to delete the IDS preference referring to this user dpi and provider dpi
@@ -161,7 +161,7 @@ public interface IPrivacyPreferenceManager {
 	 * 
 	 * @param service_id
 	 */
-	public IIdentity evaluateIdSPreference(IServiceResourceIdentifier service_id);
+	public IIdentity evaluateIdSPreference(ServiceResourceIdentifier service_id);
 
 	/**
 	 * Method to retrieve the list of IDSPreferences that affect the given DPI and
@@ -225,6 +225,6 @@ public interface IPrivacyPreferenceManager {
 	 * @param requestorIIdentity    the DPI of the requestor
 	 * @param serviceID    the serviceID of the service provided by the requestor
 	 */
-	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, IIdentity requestorIIdentity, IServiceResourceIdentifier serviceID);
+	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, IIdentity requestorIIdentity, ServiceResourceIdentifier serviceID);
 
 }
