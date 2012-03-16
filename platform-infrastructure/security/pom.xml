@@ -20,6 +20,9 @@
 
    <!-- Modules to build -->
 	<modules>
+		<module>../../parent/version.xml</module>
+		<module>../../parent/spring-osgi.xml</module>
+
 		<!-- API -->
 		<module>../../api/schema/external</module>
 		<module>../../api/schema/internal</module>
