@@ -47,13 +47,7 @@ import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.cis.management.ICisEditor;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.cis.manager.CisParticipant.MembershipType;
-import org.societies.comm.xmpp.pubsub.impl.PubsubServiceRouter;
-import org.societies.comm.xmpp.xc.impl.XCCommunicationMgr;
 import org.societies.identity.IdentityImpl;
-
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import org.societies.api.schema.cis.community.Who;
 import org.societies.api.schema.cis.community.Community;

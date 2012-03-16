@@ -43,18 +43,15 @@ import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
+import org.societies.api.identity.IIdentityManager;
 
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.cis.manager.CisEditor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import org.societies.identity.IdentityImpl;
 
 import org.societies.api.schema.cis.manager.Community;
 import org.societies.api.schema.cis.manager.Communities;
@@ -72,10 +69,11 @@ import org.societies.api.schema.cis.manager.Create;
 public class CisManager implements ICisManager, IFeatureServer{
 
 	public Set<CisEditor> CISs; 
-	private ICISCommunicationMgrFactory ccmFactory;
-	private IIdentity cisManagerId;
-	private ICommManager CSSendpoint;
-	private ICommManager CISMgmtendpoint;
+	ICISCommunicationMgrFactory ccmFactory;
+	//IIdentity cisManagerId;
+	ICommManager CSSendpoint;
+	//IIdentity cssManagerId;
+	//ICommManager CISMgmtendpoint;
 	
 	private final static List<String> NAMESPACES = Collections
 			.singletonList("http://societies.org/api/schema/cis/manager");
@@ -88,44 +86,24 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 	@Autowired
 	public CisManager(ICISCommunicationMgrFactory ccmFactory,ICommManager CSSendpoint) {
-		this.ccmFactory = ccmFactory;
 		this.CSSendpoint = CSSendpoint;
 		this.ccmFactory = ccmFactory;
-		String host= "thomas.local";
-		String subDomain= "CISCommManager";
-		String secretKey= "password.thomas.local";
+
 		
-		LOG.info("factory bundled");
-		
-		cisManagerId = new IdentityImpl(IdentityType.CIS, subDomain, host); 
-		
-		CISMgmtendpoint = ccmFactory.getNewCommManager(cisManagerId, secretKey);
-		
-		
-		LOG.info("CIS Management endpoint created");
-		
-		
-		try {
-			CISMgmtendpoint.register(this);
-		} catch (CommunicationException e) {
-			e.printStackTrace();
-		} // TODO unregister??
-		
-		LOG.info("listener registered");
-		
-		
-		
-		CISs = new HashSet<CisEditor>();
-		
-	//	CisEditor cEditor1 = new CisEditor(CSSendpoint.getIdManager().getThisNetworkNode().getJid(),
-	//			"cis1","thomas.local","","","cis1.password.thomas.local",ccmFactory);
-		
-	//	CISs.add(cEditor1);
-		
+
+			try {
+				CSSendpoint.register(this);
+			} catch (CommunicationException e) {
+				e.printStackTrace();
+			} // TODO unregister??
+			
+			LOG.info("listener registered");
+
+			CISs = new HashSet<CisEditor>();			
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 	}
-
-
-
 
 	/**
 	 * Create a CIS Editor with default settings and returns a CIS Record 
@@ -137,17 +115,14 @@ public class CisManager implements ICisManager, IFeatureServer{
 	 * @return      CisRecord
 	 * 
 	 */
-	
-
 	public CisRecord createCis(String creatorCssId, String cisname) {
 		// TODO: create and identity for the CIS and map it in the database with the cisname
 		// cisId = randon unused JID;
 		// cisId_pwd = random password;
 		String cisId = "cis1";
-		String host = this.cisManagerId.getDomain();
+		String host = this.CSSendpoint.getIdManager().getThisNetworkNode().getDomain();
 		String password = "password.thomas.local";
-		
-		
+
 		return this.createCis(creatorCssId, cisId, host, password);
 	}
 	
@@ -178,11 +153,6 @@ public class CisManager implements ICisManager, IFeatureServer{
 	}
 
 
-
-	
-	
-
-
 	public List<CisRecord> getCisList() {
 		
 		List<CisRecord> l = new ArrayList<CisRecord>();
@@ -194,22 +164,14 @@ public class CisManager implements ICisManager, IFeatureServer{
 			 l.add(element.getCisRecord());
 			 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 	     }
-			
 		
 		return l;
 	}
-	
-	
-
 
 	@Override
 	public List<String> getJavaPackages() {
-		
 		return  PACKAGES;
-
 	}
-
-
 
 	@Override
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
@@ -232,10 +194,10 @@ public class CisManager implements ICisManager, IFeatureServer{
 				String ownerJid = create.getOwnerJid();
 				String cisJid = create.getCommunityJid();
 				String cisPassword = create.getCommunityPassword();
-				
+				LOG.info("CIS to be created with " + ownerJid + " " + cisJid + " "+ cisPassword + " ");
 				if(cisPassword != null && ownerJid != null && cisJid != null ){
 					CisRecord cisR = this.createCis(ownerJid,
-							cisJid,this.cisManagerId.getDomain(), cisPassword);
+							cisJid,this.CSSendpoint.getIdManager().getThisNetworkNode().getDomain(), cisPassword);
 					
 					LOG.info("CIS Created!!");
 					return create;
