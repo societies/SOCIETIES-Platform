@@ -52,8 +52,8 @@
 			<version>${slf4j.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
-		<!--  PERSONALISATION COMPONENTS: -->
+
+		<!-- PERSONALISATION COMPONENTS: -->
 		<dependency>
 			<groupId>org.societies.personalisation</groupId>
 			<artifactId>personalisation_api</artifactId>
@@ -63,7 +63,7 @@
 			<groupId>org.societies.personalisation</groupId>
 			<artifactId>personalisation_Manager</artifactId>
 			<version>${version.pm}</version>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.societies.personalisation</groupId>
 			<artifactId>UserPreferenceManagement</artifactId>
@@ -79,8 +79,22 @@
 			<artifactId>UserPreferenceLearning</artifactId>
 			<version>${version.pm}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.personalisation</groupId>
+			<artifactId>CAUITaskManager</artifactId>
+			<version>${version.pm}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.personalisation</groupId>
+			<artifactId>CAUIPrediction</artifactId>
+			<version>${version.pm}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.personalisation</groupId>
+			<artifactId>CAUIDiscovery</artifactId>
+			<version>${version.pm}</version>
+		</dependency>
 	</dependencies>
-
 
 	<build>
 		<plugins>
@@ -93,14 +107,17 @@
 						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-Name>${project.name}</Bundle-Name>
 						<Bundle-Version>${project.version}</Bundle-Version>
-						
+
 						<Embed-Dependency>
 							personalisation_api;scope=compile|runtime,
 							UserPreferenceManagement;scope=compile|runtime,
 							dianne;scope=compile|runtime,
 							UserPreferenceLearning;scope=compile|runtime,
 							personalisation_Manager;scope=compile|runtime
-							</Embed-Dependency> 
+							CAUITaskManager;scope=compile|runtime
+							CAUIDiscovert;scope=compile|runtime
+							CAUIPrediction;scope=compile|runtime
+						</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
 
 						<Export-Package></Export-Package>

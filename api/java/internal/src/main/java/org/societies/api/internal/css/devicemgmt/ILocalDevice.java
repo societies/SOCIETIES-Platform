@@ -11,7 +11,7 @@ public interface ILocalDevice {
      * 
      * @param device
      */
-    public boolean addDevice(DeviceCommonInfo device, String CSSID)
+    public boolean addDevice(DeviceCommonInfo device, String CSSNodeID)
             throws Exception;
 
     /**
@@ -20,7 +20,7 @@ public interface ILocalDevice {
      * 
      * @param deviceCollection
      */
-    public boolean addDevices(Collection<DeviceCommonInfo> deviceCollection, String CSSID)
+    public boolean addDevices(Collection<DeviceCommonInfo> deviceCollection, String CSSNodeID)
             throws Exception;
 
     /**
@@ -28,7 +28,7 @@ public interface ILocalDevice {
      * 
      * @param device
      */
-    public boolean removeDevice(DeviceCommonInfo device, String CSSID)
+    public boolean removeDevice(DeviceCommonInfo device, String CSSNodeID)
             throws Exception;
 
     /**
@@ -37,7 +37,7 @@ public interface ILocalDevice {
      * @param serviceCollection
      */
     public boolean removeDevices(
-            Collection<DeviceCommonInfo> deviceCollection, String CSSID)
+            Collection<DeviceCommonInfo> deviceCollection, String CSSNodeID)
             throws Exception;
 
     /**

@@ -36,64 +36,24 @@ import java.util.Map;
  */
 public class CommunityIntentTask implements ICommunityIntentTask{
 
-	@Override
-	public String getTaskID() {
-		// TODO Auto-generated method stub
-		return null;
+	Double commLevel = null;
+	String userTaskID = null;
+	
+	CommunityIntentTask(String userTaskID){
+		this.userTaskID = userTaskID;
 	}
-
-	@Override
-	public Map<IUserIntentAction, Double> getActions() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void addActions(LinkedHashMap<IUserIntentAction, Double> userActions) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Map<String, Serializable> getTaskContext() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setTaskContext(Map<String, Serializable> taskContext) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	@Override
 	public Double getCommonalityLevel() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setCommonalityLevel(Double doub) {
-		// TODO Auto-generated method stub
 		
+		return commLevel;
 	}
 
 	@Override
-	public void setConfidenceLevel(int confidenceLevel) {
-		// TODO Auto-generated method stub
-		
+	public void setCommonalityLevel(Double commLevel) {
+		this.commLevel = commLevel;
 	}
 
-	@Override
-	public int getConfidenceLevel() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public double getTransProb() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	
 
 }

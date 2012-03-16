@@ -45,7 +45,7 @@
 				<value>org.societies.platform.servicelifecycle.serviceRegistry.model.RegistryEntry</value>
 				<value>org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceInstanceDAO</value>
 				<value>org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceImplementationDAO</value>
-			
+			<value>org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceSharedInCISDAO</value>
 			</list>
 		</property>
 

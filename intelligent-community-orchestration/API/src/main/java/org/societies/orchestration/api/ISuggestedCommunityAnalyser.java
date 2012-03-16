@@ -27,7 +27,9 @@ package org.societies.orchestration.api;
 
 import java.util.ArrayList;
 
-import org.societies.api.internal.cis.management.CisRecord;
+//import org.societies.api.internal.cis.management.CisRecord;
+import org.societies.api.internal.cis.management.ICisRecord;
+//import org.societies.api.cis.management.ICisRecord;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -59,7 +61,7 @@ public interface ISuggestedCommunityAnalyser {
 	 * It contains all the CisRecords to delete.
 	 * 
 	 */
-    public void analyseCSCWRecommendations(HashMap<String, ArrayList<CisRecord>> cisRecommendations);
+    public void analyseCSCWRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations);
 	
     /**
 	 * Takes as input a collection of CISs, and what they represent, and performs analysis on them
@@ -73,7 +75,7 @@ public interface ISuggestedCommunityAnalyser {
 	 * result if the configuration happens.
 	 * 
 	 */
-    public void analyseCSCWConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<CisRecord>>> cisRecommendations);
+    public void analyseCSCWConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations);
     
     /**
 	 * Takes as input a collection of CISs, and what they represent, and performs analysis on them
@@ -89,7 +91,7 @@ public interface ISuggestedCommunityAnalyser {
 	 * It contains all the CisRecords to delete.
 	 * 
 	 */
-    public void analyseCSMAnalyserRecommendations(HashMap<String, ArrayList<CisRecord>> cisRecommendations);
+    public void analyseCSMAnalyserRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations);
     
     /**
 	 * Takes as input a collection of CISs, and what they represent, and performs analysis on them
@@ -103,7 +105,7 @@ public interface ISuggestedCommunityAnalyser {
 	 * result if the configuration happens.
 	 * 
 	 */
-    public void analyseCSMAnalyserConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<CisRecord>>> cisRecommendations);
+    public void analyseCSMAnalyserConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations);
     /**
 	 * Takes as input a collection of CISs, and what they represent, and performs analysis on them
 	 * which may lead to action being taken for some or all of them.
@@ -118,7 +120,7 @@ public interface ISuggestedCommunityAnalyser {
 	 * It contains all the CisRecords to delete.
 	 * 
 	 */
-    public void analyseEgocentricRecommendations(HashMap<String, ArrayList<CisRecord>> cisRecommendations);
+    public void analyseEgocentricRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations);
     
     /**
 	 * Takes as input a collection of CISs, and what they represent, and performs analysis on them
@@ -132,6 +134,6 @@ public interface ISuggestedCommunityAnalyser {
 	 * result if the configuration happens.
 	 * 
 	 */
-    public void analyseEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<CisRecord>>> cisRecommendations);
+    public void analyseEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations);
 
 }

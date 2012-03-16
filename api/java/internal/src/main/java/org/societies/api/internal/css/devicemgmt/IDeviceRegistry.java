@@ -39,7 +39,7 @@ public interface IDeviceRegistry {
 	 * 				
 	 * @return 			IDeviceidentifier
 	 */
-	public String addDevice (DeviceCommonInfo device, String CSSID);
+	public String addDevice (DeviceCommonInfo device, String CSSNodeID);
 
 	/* 
 	 * Description: 	Remove device from the device registry
@@ -47,7 +47,7 @@ public interface IDeviceRegistry {
 	 * @return 			boolean
 	 */
 
-	public boolean deleteDevice (DeviceCommonInfo device, String CSSID);
+	public boolean deleteDevice (DeviceCommonInfo device, String CSSNodeID);
 	
 	/* 
 	 * Description:		Search the device registry for a particular device given the deviceID 

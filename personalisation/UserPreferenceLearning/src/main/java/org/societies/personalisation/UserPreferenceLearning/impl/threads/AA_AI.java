@@ -33,7 +33,7 @@ import java.util.Map;
 
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceLearning.impl.C45Output;
 import org.societies.personalisation.UserPreferenceLearning.impl.CtxIdentifierCache;
 import org.societies.personalisation.UserPreferenceLearning.impl.HistoryRetriever;
@@ -110,7 +110,7 @@ public class AA_AI extends Thread{
 					ServiceSubset trimmedHistory = preProcessor.trimServiceSubset(nextServiceSubset);
 					System.out.println("Split subset has been trimmed!");
 
-					IServiceResourceIdentifier nextServiceId = trimmedHistory.getServiceId();
+					ServiceResourceIdentifier nextServiceId = trimmedHistory.getServiceId();
 					String nextServiceType = trimmedHistory.getServiceType();
 
 					//create new IC45Output object
@@ -152,7 +152,7 @@ public class AA_AI extends Thread{
 			IIdentity historyOwner, 
 			ActionSubset input, 
 			CtxIdentifierCache cache,
-			IServiceResourceIdentifier serviceId,
+			ServiceResourceIdentifier serviceId,
 			String serviceType){
 
 		//convert to Instances for each serviceId
