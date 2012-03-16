@@ -25,14 +25,30 @@ import java.util.List;
 
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
-import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+//import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
+
 
 public class CAUIDiscovery implements ICAUIDiscovery{
 
 	
-	private IInternalPersonalisationManager persoMgr;
+	private ICAUITaskManager cauiTaskManager;
+	
 	private ICtxBroker ctxBroker;
 
+
+	public ICAUITaskManager getCAUITaskManager() {
+		System.out.println(this.getClass().getName()+": Return cauiTaskManager");
+
+		return cauiTaskManager;
+	}
+
+
+	public void setCAUITaskManager(ICAUITaskManager cauiTaskManager) {
+		System.out.println(this.getClass().getName()+": Got cauiTaskManager");
+
+		this.cauiTaskManager = cauiTaskManager;
+	}
 
 	public ICtxBroker getCtxBroker() {
 		System.out.println(this.getClass().getName()+": Return ctxBroker");
@@ -47,16 +63,8 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		this.ctxBroker = ctxBroker;
 	}
 
-	public IInternalPersonalisationManager getPersoMgr() {
-		System.out.println(this.getClass().getName()+": Return persoMgr");
-		return persoMgr;
-	}
 
-
-	public void setPersoMgr(IInternalPersonalisationManager persoMgr) {
-		System.out.println(this.getClass().getName()+": Got persoMgr");
-		this.persoMgr = persoMgr;
-	}
+	
 
 	// constructor
 	public void initialiseCAUIDiscovery(){

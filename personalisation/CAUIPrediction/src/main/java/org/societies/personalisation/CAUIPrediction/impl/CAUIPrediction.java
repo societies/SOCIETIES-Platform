@@ -31,6 +31,7 @@ import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
+import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
@@ -44,10 +45,11 @@ import org.societies.personalisation.common.api.management.IPersonalisationInter
  */
 public class CAUIPrediction implements ICAUIPrediction{
 
+	//CAUIPrediction depends on CauiTaskManager,PersonalisationManager and CtxBroker
 	
-	private IInternalPersonalisationManager persoMgr;
 	private ICtxBroker ctxBroker;
-
+	private IInternalPersonalisationManager persoMgr;
+	private ICAUITaskManager cauiTaskManager;
 
 	public ICtxBroker getCtxBroker() {
 		System.out.println(this.getClass().getName()+": Return ctxBroker");
@@ -73,6 +75,22 @@ public class CAUIPrediction implements ICAUIPrediction{
 		this.persoMgr = persoMgr;
 	}
 
+	public ICAUITaskManager getCAUITaskManager() {
+		System.out.println(this.getClass().getName()+": Return cauiTaskManager");
+
+		return cauiTaskManager;
+	}
+
+	public void setCAUITaskManager(ICAUITaskManager cauiTaskManager) {
+		System.out.println(this.getClass().getName()+": Got cauiTaskManager");
+
+		this.cauiTaskManager = cauiTaskManager;
+	}
+	
+	
+	
+	
+	
 	// constructor
 	public void initialiseCAUIPrediction(){
 			
