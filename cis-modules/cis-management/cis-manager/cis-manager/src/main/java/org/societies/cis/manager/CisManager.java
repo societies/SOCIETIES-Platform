@@ -70,9 +70,10 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 	public Set<CisEditor> CISs; 
 	ICISCommunicationMgrFactory ccmFactory;
-	IIdentity cisManagerId;
+	//IIdentity cisManagerId;
 	ICommManager CSSendpoint;
-	ICommManager CISMgmtendpoint;
+	//IIdentity cssManagerId;
+	//ICommManager CISMgmtendpoint;
 	
 	private final static List<String> NAMESPACES = Collections
 			.singletonList("http://societies.org/api/schema/cis/manager");
@@ -87,25 +88,11 @@ public class CisManager implements ICisManager, IFeatureServer{
 	public CisManager(ICISCommunicationMgrFactory ccmFactory,ICommManager CSSendpoint) {
 		this.CSSendpoint = CSSendpoint;
 		this.ccmFactory = ccmFactory;
-		String host= "societies.local";
-		String subDomain= "CISCommManager";
-		String secretKey= "password.thomas.local";
+
 		
-		LOG.info("factory bundled");
-		IIdentityManager idm = CSSendpoint.getIdManager();
-		LOG.info("got IDmanager");
-		
-		try {
-			//cisManagerId = new IdentityImpl(IdentityType.CIS, subDomain, host); //idm.fromJid("CISCommManager.thomas.local"); //= new IdentityImpl(IdentityType.CIS, subDomain, host); 
-			cisManagerId = idm.fromJid("CISCommManager.societies.local");
-		
-			LOG.info("got Identity");
-			//CISMgmtendpoint = ccmFactory.getNewCommManager(cisManagerId, secretKey);
-			CISMgmtendpoint = ccmFactory.getNewCommManager();
-			LOG.info("CIS Management endpoint created");
 
 			try {
-				CISMgmtendpoint.register(this);
+				CSSendpoint.register(this);
 			} catch (CommunicationException e) {
 				e.printStackTrace();
 			} // TODO unregister??
@@ -133,7 +120,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 		// cisId = randon unused JID;
 		// cisId_pwd = random password;
 		String cisId = "cis1";
-		String host = this.cisManagerId.getDomain();
+		String host = this.CSSendpoint.getIdManager().getThisNetworkNode().getDomain();
 		String password = "password.thomas.local";
 
 		return this.createCis(creatorCssId, cisId, host, password);
@@ -207,10 +194,10 @@ public class CisManager implements ICisManager, IFeatureServer{
 				String ownerJid = create.getOwnerJid();
 				String cisJid = create.getCommunityJid();
 				String cisPassword = create.getCommunityPassword();
-				
+				LOG.info("CIS to be created with " + ownerJid + " " + cisJid + " "+ cisPassword + " ");
 				if(cisPassword != null && ownerJid != null && cisJid != null ){
 					CisRecord cisR = this.createCis(ownerJid,
-							cisJid,this.cisManagerId.getDomain(), cisPassword);
+							cisJid,this.CSSendpoint.getIdManager().getThisNetworkNode().getDomain(), cisPassword);
 					
 					LOG.info("CIS Created!!");
 					return create;
