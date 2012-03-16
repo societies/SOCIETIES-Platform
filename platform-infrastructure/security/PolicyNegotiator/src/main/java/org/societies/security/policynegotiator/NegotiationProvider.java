@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
-import org.societies.api.internal.security.policynegotiator.Sla;
+import org.societies.api.schema.security.policynegotiator.SlaBean;
 import org.societies.api.security.digsig.ISignatureMgr;
 
 @Component
@@ -43,12 +43,12 @@ public class NegotiationProvider implements INegotiationProvider {
 	}
 	
 	@Override
-	public Future<Sla> getPolicyOptions() {
+	public Future<SlaBean> getPolicyOptions() {
 		return null;
 	}
 
 	@Override
-	public Future<Sla> acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
+	public Future<SlaBean> acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
 			boolean modified) {
 		
 		return null;

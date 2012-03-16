@@ -27,6 +27,9 @@ package org.societies.api.internal.security.policynegotiator;
 
 import java.util.concurrent.Future;
 
+import org.societies.api.schema.security.policynegotiator.SlaBean;
+
+
 /**
  * Interface for invoking the provider.
  * To be used by Security Group Comms Manager locally (on same node) in server mode.
