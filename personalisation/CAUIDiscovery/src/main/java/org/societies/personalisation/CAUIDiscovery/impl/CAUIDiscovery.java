@@ -27,9 +27,17 @@ import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
 
 public class CAUIDiscovery implements ICAUIDiscovery{
 
-
-	LinkedHashMap<String,Integer> dictionary = new LinkedHashMap<String,Integer>();
+	
+	LinkedHashMap<String,Integer> dictionary = null;
 	List<String> charList = null;
+	
+	
+	public CAUIDiscovery(){
+		 dictionary = new LinkedHashMap<String,Integer>();
+	}
+
+	
+	
 
 
 	@Override
@@ -43,7 +51,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 
 
-	void findOccurences(int step, String array){
+	public void findOccurences(int step, String array){
 
 		int arraySize = array.length();
 		String currentPhrase = null;
