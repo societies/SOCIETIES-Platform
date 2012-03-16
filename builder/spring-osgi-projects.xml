@@ -126,12 +126,12 @@
 	
 		<!-- Intelligent Community Orchestration -->
 
-		<!--<module>../intelligent-community-orchestration/API
+		<module>../intelligent-community-orchestration/API
 		</module>
 		<module>../intelligent-community-orchestration/CommunityLifecycleManagement
 		</module>
 		<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser
-		</module>-->
+		</module>
 
 		<!-- Context Management -->
 

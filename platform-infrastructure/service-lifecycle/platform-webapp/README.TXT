@@ -6,7 +6,7 @@ follow the few lines of guidelines as below.
 1. This project uses example Math service to demonstrate the 
 	consumption of OSGI service within Web app bundle
 	
-	So, Compile the following two project and deploy to pickup first
+	So, Compile the following two projects first
 	
 	1- SOCIETIES-Platform\example\example.service.api
 	2- SOCIETIES-Platform\example\example.service.provider
@@ -20,11 +20,16 @@ follow the few lines of guidelines as below.
 	2. com.springsource.javax.validation-1.0.0.GA.jar
 	
 	these dependency jars are already configured in maven pom file, 
-	hence it will be downloaded to your local maven repository while maven build
+	hence it will be downloaded to your local maven repository when maven builds
 	
-3. Build the project as normal using mvn clean install and deploy the war file to 
-	pickup directory
+3. Build the project as normal using mvn clean install
+
+4. The get the full WebApp experience you should deploy the following plans
+	CommsFramework.plan
+	ExampleServices.plan
+	service-lifecycle.plan 
+	societies-webapp.plan
 	
-	goto web browser and type http://localhost:8080/societies/login.html to start the web app
+	Then go to web browser and type http://localhost:8080/societies/login.html to start the web app
 	 
 	

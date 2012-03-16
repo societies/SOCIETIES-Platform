@@ -31,11 +31,20 @@ import static org.mockito.Mockito.*;
 
 import org.societies.api.internal.css.discovery.ICssDiscovery;
 
-import org.societies.api.internal.cis.management.CisActivityFeed;
+import org.societies.api.internal.cis.management.ICisActivityFeed;
 import org.societies.api.internal.cis.management.ICisManager;
 import org.societies.api.internal.cis.management.ServiceSharingRecord;
-import org.societies.api.internal.cis.management.CisActivity;
-import org.societies.api.internal.cis.management.CisRecord;
+import org.societies.api.internal.cis.management.ICisActivity;
+import org.societies.api.internal.cis.management.ICisRecord;
+
+//import org.societies.api.cis.management.ICisRecord;
+//import org.societies.api.cis.management.ICisManager;
+//import org.societies.api.cis.management.ICisOwned;
+//import org.societies.api.cis.management.ICisSubscribed;
+//import org.societies.api.cis.management.ICisEditor;
+//import org.societies.api.cis.management.ICisActivity;
+//import org.societies.api.cis.management.ICisActivityFeed;
+//import org.societies.api.cis.management.ICis;
 
 import java.util.concurrent.Future;
 
@@ -107,7 +116,7 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 	//private ICommunityCtxBroker communityContextBroker;
 	//private IUserCtxBrokerCallback userContextBrokerCallback;
 
-	private ArrayList<CisRecord> recentRefusals;
+	private ArrayList<ICisRecord> recentRefusals;
 
 	private IUserFeedback userFeedback;
 
@@ -142,8 +151,8 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 	 */
 	
 	public void identifyCissToConfigure() {
-		ArrayList<CisRecord> cisRecords = new ArrayList();
-		ArrayList<CisRecord> cissToConfigure = new ArrayList();
+		ArrayList<ICisRecord> cisRecords = new ArrayList();
+		ArrayList<ICisRecord> cissToConfigure = new ArrayList();
 		
 		if (linkedCss != null) {
 			//CisRecord[] records = ICisManager.getCisList(/** CISs administrated by the CSS */);
@@ -216,17 +225,17 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 		
 		
 		
-		ArrayList<CisRecord> finalConfiguredCiss = new ArrayList<CisRecord>();
+		ArrayList<ICisRecord> finalConfiguredCiss = new ArrayList<ICisRecord>();
 		
 		//can't use GUI in tests
 		//finalConfiguredCiss = getUserFeedbackOnConfiguration(cissToConfigure);
 		
 		finalConfiguredCiss = cissToConfigure;
 		
-		Iterator<CisRecord> iterator = finalConfiguredCiss.iterator();
+		Iterator<ICisRecord> iterator = finalConfiguredCiss.iterator();
 		
 		while (iterator.hasNext()) {
-		    CisRecord configurableCis = iterator.next();
+		    ICisRecord configurableCis = iterator.next();
 
 			    //if "remove members"
 	        	//    attempt to remove members - perhaps SOCIETIES platform itself should have mechanism
@@ -246,8 +255,8 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 		
 	}
 	
-	public ArrayList<CisRecord> getUserFeedbackOnConfiguration(ArrayList<CisRecord> cissToConfigure) {
-		ArrayList<CisRecord> finalisedCiss = null;
+	public ArrayList<ICisRecord> getUserFeedbackOnConfiguration(ArrayList<ICisRecord> cissToConfigure) {
+		ArrayList<ICisRecord> finalisedCiss = null;
 		String[] options = new String[1];
 		options[0] = "options";
 		String userResponse = null;
@@ -270,9 +279,9 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 		    String background = "This message is in your inbox or something, waiting for you to read it";
 		}
 		else {
-		   	Iterator<CisRecord> iterator = cissToConfigure.iterator();
+		   	Iterator<ICisRecord> iterator = cissToConfigure.iterator();
 			while (iterator.hasNext()) {
-			    CisRecord potentiallyCreatableCis = iterator.next();
+			    ICisRecord potentiallyCreatableCis = iterator.next();
 		        if (userResponse.equals("Yes")) {
 				    finalisedCiss.add(potentiallyCreatableCis);
 			       // cisManager.createCis(linkedCss, potentiallyCreatableCis.getCisId());

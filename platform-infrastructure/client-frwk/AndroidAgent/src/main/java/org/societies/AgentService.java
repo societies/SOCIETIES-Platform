@@ -3,24 +3,24 @@ package org.societies;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.impl.XMPPClient;
 import org.societies.comm.android.ipc.Skeleton;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
+import org.societies.impl.XMPPClient;
+
 
 public class AgentService extends Service {
 	
-	private static final Logger log = LoggerFactory.getLogger(AgentService.class);
+	private static final String LOG_TAG = AgentService.class.getName();
 	
 	private static Skeleton skeleton;   
 	
 	@Override
     public IBinder onBind(Intent intent) {  
-    	log.debug("onBind"); 
+    	Log.d(LOG_TAG, "onBind");
     	if(skeleton != null)
     		return skeleton.messenger().getBinder();    
     	else
@@ -30,13 +30,13 @@ public class AgentService extends Service {
     @Override
     public void onCreate()
     {
-    	log.debug("onCreate");   
+    	Log.d(LOG_TAG, "onCreate");
     	if(skeleton == null) {
     		try {
     			ResourceBundle config = new PropertyResourceBundle(getAssets().open("config.properties"));
         		skeleton = new Skeleton(new XMPPClient(config));	
     		} catch (Exception e) {
-    			log.error(e.getMessage(), e);
+    	    	Log.e(LOG_TAG, e.getMessage(), e);
 			}
     	}
     }
@@ -44,7 +44,7 @@ public class AgentService extends Service {
     @Override
     public void onDestroy()
     {
-    	log.debug("onDestroy");      
+    	Log.d(LOG_TAG, "onDestroy");
     	skeleton = null;
     }
 }

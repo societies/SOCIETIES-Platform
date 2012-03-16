@@ -1,6 +1,7 @@
 package org.societies.platform.servicelifecycle.serviceRegistry.model;
 
 import java.io.Serializable;
+import java.net.URI;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -162,28 +163,28 @@ public class RegistryEntry implements Serializable {
 			/* Retrieve the service type from the service and
 			 * create the appropriate enumeration type
 			 */
-			if (serviceType == "ThirdPartyService") {
+			if (serviceType.equals(ServiceType.THIRD_PARTY_SERVICE.toString())) {
 				tmpServiceType = ServiceType.THIRD_PARTY_SERVICE;
 			} else {
-				if (serviceType == "CoreService") {
+				if (serviceType.equals( ServiceType.CORE_SERVICE.toString())) {
 					tmpServiceType = ServiceType.CORE_SERVICE;
 				}
 			}
 			
 			/* Same as before but for service location */
-			if (serviceLocation == "Local") {
+			if (serviceLocation.equals(ServiceLocation.LOCAL.toString())) {
 				tmpServiceLocation = ServiceLocation.LOCAL;
 			} else {
-				if (serviceLocation == "Remote" ) {
+				if (serviceLocation.equals(ServiceLocation.REMOTE.toString()) ) {
 					tmpServiceLocation = ServiceLocation.REMOTE;
 				}
 			}
 			
 			/*Same but for the serviceStatus*/
-			if (serviceStatus=="STARTED"){
+			if (serviceStatus.equals(ServiceStatus.STARTED.toString())){
 				tmpServiceStatus=ServiceStatus.STARTED;
 			}else{
-				if (serviceStatus=="STOPPED"){
+				if (serviceStatus.equals(ServiceStatus.STOPPED.toString())){
 					tmpServiceStatus=ServiceStatus.STOPPED;
 				}else{tmpServiceStatus=ServiceStatus.UNAVAILABLE;}
 			}
@@ -204,6 +205,10 @@ public class RegistryEntry implements Serializable {
 			returnedService.setServiceName(serviceName);
 			returnedService.setServiceStatus(tmpServiceStatus);
 			returnedService.setServiceType(tmpServiceType);
+			ServiceResourceIdentifier serviceResourceIdentifier=new ServiceResourceIdentifier();
+			serviceResourceIdentifier.setIdentifier(new URI(this.getServiceIdentifier().getIdentifier()));
+			serviceResourceIdentifier.setServiceInstanceIdentifier(this.getServiceIdentifier().getInstanceId());
+			returnedService.setServiceIdentifier(serviceResourceIdentifier);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

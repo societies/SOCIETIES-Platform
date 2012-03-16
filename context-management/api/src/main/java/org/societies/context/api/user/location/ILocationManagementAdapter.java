@@ -36,7 +36,7 @@ import java.util.Set;
  *
  */
 
-public interface ILocationInferenceAdapter {
+public interface ILocationManagementAdapter {
 	/**
 	 * Returns all the active zone in the system, those that at least one device was identified in them.
 	 * @return
@@ -54,5 +54,25 @@ public interface ILocationInferenceAdapter {
 	 * @param entityId
 	 * @return
 	 */
-	public IUserLocation getEntityFullLocation(String entityId); 
+	public IUserLocation getEntityFullLocation(String entityId);
+	
+	
+	/**
+	 * Registers the given CSS device in the location management system
+	 * @param entityId
+	 * @param deviceId
+	 * @param macAddress
+	 * @return
+	 */
+	public void registerCSSdevice(String entityId,String deviceId,String macAddress);
+	
+	/**
+	 * Removes the given CSS device from the location management system
+	 * @param entityId
+	 * @param deviceId
+	 * @param macAddress
+	 * @return
+	 */
+	public void removeCSSdevice(String entityId,String deviceId,String macAddress);
+
 }

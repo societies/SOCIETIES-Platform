@@ -115,6 +115,7 @@ public class ServiceDiscoveryController {
 			}
 		
 			services = asynchResult.get();
+			model.put("services", services);
 		}
 		catch (ServiceDiscoveryException e)
 		{
@@ -126,23 +127,8 @@ public class ServiceDiscoveryController {
 		};
 		
 		
-			if (services == null)
-			{
-				res+= "No services found! <br/><br/>";
-			}
-			else
-			{	
-						
-			res+= services.size() + " services found!<br/>";
-			res+= "start : service list<br/><br/>";
-			for ( int i = 0; i < services.size(); i++)
-			{
-				res += services.get(i).getServiceDescription() + "<br/>";
-			}
-			res+= "end : service list<br/><br/>";
-		}
-		model.put("servicediscoveryResult", res);		
 		return new ModelAndView("servicediscoveryresult", model);
+		
 
 	}
 }

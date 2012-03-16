@@ -36,7 +36,8 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 
-import org.societies.api.mock.EntityIdentifier;
+
+import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.TaskModelData;
@@ -144,7 +145,7 @@ public interface ICAUITaskManager {
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
 	 */
-	public UserIntentAction retrieveCurrentIntentAction(EntityIdentifier requestor, EntityIdentifier ownerID, ServiceResourceIdentifier serviceID, String preferenceName);
+	public UserIntentAction retrieveCurrentIntentAction(IIdentity requestor, IIdentity ownerID, ServiceResourceIdentifier serviceID, String preferenceName);
 
 	/**
 	 * Returns a map of next userActions and the relevant probabilities given the
