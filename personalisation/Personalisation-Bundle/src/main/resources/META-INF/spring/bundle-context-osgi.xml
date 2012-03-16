@@ -38,7 +38,12 @@
         <value>org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Learning</value>
         </osgi:interfaces>
         </osgi:service>    		
-       
+        
+        <osgi:service ref="cauiTaskManager">
+        <osgi:interfaces>
+        	<value>org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager</value>
+        </osgi:interfaces>
+        </osgi:service>
         
         <!-- PersonalisationManager is needed by pcm, dianne, cristPrediction, cauiPrediction -->
         <osgi:reference id="persoMgr" interface="org.societies.personalisation.common.api.management.IInternalPersonalisationManager" >
@@ -62,7 +67,7 @@
 		<!-- context Broker is needed by personalisationManager (at least) -->
 		<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker">
 		</osgi:reference>        
-		
+
 		
 
         

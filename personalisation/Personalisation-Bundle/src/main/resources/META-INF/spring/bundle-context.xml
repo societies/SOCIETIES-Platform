@@ -16,8 +16,12 @@
   <property name="persoMgr" ref="persoMgr"></property>
   <property name="ctxBroker" ref="ctxBroker"></property>
   </bean>
-
-
+  
+  <bean id="cauiTaskManager" class="org.societies.personalisation.CAUITaskManager.impl.CAUITaskManager" name="cauiTaskManager"
+  init-method="initialiseCAUITaskManager">
+    <property name="persoMgr" ref="persoMgr"></property>
+  	<property name="ctxBroker" ref="ctxBroker"></property>
+  </bean>
    <bean id="persoMgr" class="org.societies.personalisation.management.impl.PersonalisationManager" name="persoMgr" depends-on="ctxBroker"
     lazy-init="true" init-method="initialisePersonalisationManager">
    <property name="pcm" ref="pcm"></property>
