@@ -7,10 +7,10 @@
                 http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
 	<!-- Device Management bundles. Note :CommFramework.plan should be deployed first -->
-	<!-- 
-	<artifact type="bundle" name="org.societies.css.devicemgmt.RegSynchroniser"/>
-	<artifact type="bundle" name="org.societies.css.devicemgmt.deviceregistry"/>
+	
 	<artifact type="bundle" name="org.societies.css.devicemgmt.devicemanager"/>
+	<artifact type="bundle" name="org.societies.css.devicemgmt.deviceregistry"/>
+	<artifact type="bundle" name="org.societies.css.devicemgmt.RegSynchroniser"/>
 	<artifact type="bundle" name="org.societies.css.devicemgmt.DeviceCommsMgr"/>
-	 -->
+	 
 </plan>
