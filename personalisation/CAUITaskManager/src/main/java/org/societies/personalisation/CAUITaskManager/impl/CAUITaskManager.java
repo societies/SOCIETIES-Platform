@@ -96,7 +96,7 @@ public class CAUITaskManager  implements ICAUITaskManager{
 	DefaultMutableTreeNode model; 
 
 	public CAUITaskManager(){
-		//this.model = new DefaultMutableTreeNode("User Intent Task model");	
+		this.model = new DefaultMutableTreeNode("User Intent Task model");	
 	}
 
 
