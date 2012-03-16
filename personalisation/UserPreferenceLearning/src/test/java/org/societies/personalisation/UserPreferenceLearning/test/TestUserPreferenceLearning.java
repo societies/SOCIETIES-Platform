@@ -44,8 +44,7 @@ import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.personalisation.model.Action;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-import org.societies.api.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 //import org.societies.personalisation.UserPreferenceLearning.impl.CtxIdentifierCache;
 import org.societies.personalisation.UserPreferenceLearning.impl.PostProcessor;
 import org.societies.personalisation.UserPreferenceLearning.impl.PreProcessor;
@@ -61,16 +60,18 @@ public class TestUserPreferenceLearning extends TestCase{
 
 	PreProcessor pre;
 	PostProcessor post;
-	IServiceResourceIdentifier serviceId1;
-	IServiceResourceIdentifier serviceId2;
+	ServiceResourceIdentifier serviceId1;
+	ServiceResourceIdentifier serviceId2;
 	IIdentity ownerId;
 	NumberGenerator ng;
 
 	public void setUp() throws Exception {
 		pre = new PreProcessor();
 		post = new PostProcessor();
-		serviceId1 = new ServiceResourceIdentifier(new URI("tennisPlanner"), "instance1");
-		serviceId2 = new ServiceResourceIdentifier(new URI("lymphChecker"), "instance2");
+		serviceId1 = new ServiceResourceIdentifier();
+		serviceId1.setIdentifier(new URI("tennisPlanner"));
+		serviceId2 = new ServiceResourceIdentifier();
+		serviceId2.setIdentifier(new URI("lymphChecker"));
 		ownerId = new MockIdentity(IdentityType.CSS, "test", "domain");
 		ng = new NumberGenerator();
 	}
@@ -93,7 +94,7 @@ public class TestUserPreferenceLearning extends TestCase{
 		ServiceSubset results = pre.extractServiceActions(dataset, serviceId1, "tennis1");
 		Assert.assertNotNull(results);
 
-		IServiceResourceIdentifier serviceId = results.getServiceId();
+		ServiceResourceIdentifier serviceId = results.getServiceId();
 		System.out.println("serviceId = "+serviceId.getIdentifier());
 		Assert.assertNotNull(serviceId);
 		Assert.assertEquals(serviceId1.getIdentifier(), serviceId.getIdentifier());
@@ -149,7 +150,7 @@ public class TestUserPreferenceLearning extends TestCase{
 		System.out.println("service list size = "+results.size());
 
 		for(ServiceSubset nextService: results){
-			IServiceResourceIdentifier serviceId = nextService.getServiceId();
+			ServiceResourceIdentifier serviceId = nextService.getServiceId();
 			Assert.assertNotNull(serviceId);
 			System.out.println("serviceId = "+serviceId.getIdentifier());
 
@@ -199,7 +200,7 @@ public class TestUserPreferenceLearning extends TestCase{
 		System.out.println("*************************************************");
 		ServiceSubset results = pre.trimServiceSubset(dataset);
 		Assert.assertNotNull(results);
-		IServiceResourceIdentifier serviceId = results.getServiceId();
+		ServiceResourceIdentifier serviceId = results.getServiceId();
 		Assert.assertNotNull(serviceId);
 		System.out.println("serviceId = "+serviceId.getIdentifier());
 

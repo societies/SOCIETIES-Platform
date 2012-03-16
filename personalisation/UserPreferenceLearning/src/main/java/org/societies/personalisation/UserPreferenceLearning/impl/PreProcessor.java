@@ -35,7 +35,7 @@ import java.util.Map;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.personalisation.model.Action;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.ActionSubset;
 import org.societies.personalisation.preference.api.model.ServiceSubset;
 
@@ -49,7 +49,7 @@ public class PreProcessor {
 	Map<String, ArrayList<String>> ruleVariables; //paramName, list of values
 
 	public ServiceSubset extractServiceActions
-	(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> data, IServiceResourceIdentifier serviceId, String parameterName){
+	(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> data, ServiceResourceIdentifier serviceId, String parameterName){
 
 		ActionSubset actionSubset = new ActionSubset(parameterName);
 		String serviceType = null;
@@ -94,7 +94,7 @@ public class PreProcessor {
 
 				//extract action from nextActionAttr
 				Action nextAction = (Action) SerialisationHelper.deserialise(nextActionAttr.getBinaryValue(), this.getClass().getClassLoader());
-				IServiceResourceIdentifier serviceId = nextAction.getServiceID();
+				ServiceResourceIdentifier serviceId = nextAction.getServiceID();
 				String serviceType = nextAction.getServiceType();
 
 				//check if service id exists in subsets
@@ -437,7 +437,7 @@ public class PreProcessor {
 	}
 
 
-	private ServiceSubset getServiceSubset(List<ServiceSubset> subsets, IServiceResourceIdentifier serviceId){
+	private ServiceSubset getServiceSubset(List<ServiceSubset> subsets, ServiceResourceIdentifier serviceId){
 		ServiceSubset serviceSubset = null;
 
 		Iterator<ServiceSubset> subsets_it = subsets.iterator();
