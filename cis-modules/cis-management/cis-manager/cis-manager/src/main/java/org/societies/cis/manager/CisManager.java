@@ -115,7 +115,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 	 */
 	public CisRecord createCis(String creatorCssId, String cisname) {
 		// TODO: create and identity for the CIS and map it in the database with the cisname
-		// cisId = randon unused JID;
+		// cisName = randon unused JID;
 		// cisId_pwd = random password;
 		String cisId = "cis1";
 		String host = this.CSSendpoint.getIdManager().getThisNetworkNode().getDomain();
@@ -125,14 +125,51 @@ public class CisManager implements ICisManager, IFeatureServer{
 	}
 	
 	
+	/**
+	 * Create a new CIS for the CSS represented by cssId. Password is needed and is the
+	 * same as the CSS password.
+	 * After this method is called a CIS is created with mode set to mode.
+	 * 
+	 * The CSS who creates the CIS will be the owner. Ownership can be changed
+	 * later.
+	 * 
+	 * TODO: define what values mode can have and what each means.
+	 * TODO: change the type from String to proper type when CSS ID datatype is defined.
+	 *  
+	 * @param cssId and cssPassword are to recognise the user
+	 * @param cisName is user given name for the CIS, e.g. "Footbal".
+	 * @param cisType E.g. "disaster"
+	 * @param mode membership type, e.g 1= read-only.
+	 * TODO define mode better.
+	 * @return link to the {@link ICisEditor} representing the new CIS, or 
+	 * null if the CIS was not created.
+	 */
+	
+	
+	@Override
+	public ICisEditor createCis(String cssId, String cssPassword, String cisName, String cisType, int mode) {
+		// TODO: how do we check fo the cssID/pwd?
+		if(!cssId.equals(this.CSSendpoint.getIdManager().getThisNetworkNode().getJid())){ // if the cssID does not match with the host owner
+			LOG.info("cssID does not match with the host owner");
+			return null;
+		}
+		// TODO: review this logic as maybe I should probably check if it exists before creating
+		CisEditor cis = new  CisEditor(cssId, cisName, cisType, mode,this.ccmFactory);		
+		if (CISs.add(cis))
+			return cis;
+		else
+			return null;
+		
+	}
+
 	
 	/**
 	 * Create a CIS Editor with default settings and returns a CIS Record 
 	 * Function to be called from the XMPP or to be used by the 
-	 *  public method CisRecord createCis(String creatorCssId, String cisId) 
+	 *  public method CisRecord createCis(String creatorCssId, String cisName) 
 	 * 
 	 * @param  creatorCssId  bareJid of the user creating the CIS
-	 * @param  cisId 		 jid to be given to the CIS
+	 * @param  cisName 		 jid to be given to the CIS
 	 * @param  host 		 jid to be given to the CIS
 	 * @password  host 		 jid to be given to the CIS
 	 * @return      CisRecord
@@ -143,7 +180,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 		//TODO: check if 
 		// cIs already exist in the database or if this is a new CIS
 		CisEditor cis = new  CisEditor(creatorCssId,
-				cisId,host,"","",password,this.ccmFactory);
+				cisId,host,0,"",password,this.ccmFactory);
 		if (CISs.add(cis))
 			return cis.getCisRecord();
 		else
@@ -192,6 +229,10 @@ public class CisManager implements ICisManager, IFeatureServer{
 				String ownerJid = create.getOwnerJid();
 				String cisJid = create.getCommunityJid();
 				String cisPassword = create.getCommunityPassword();
+				String ownerPassword = create.getOwnerPassword();
+				String cisType = create.getCommunityType();
+				String cisName = create.getCommunityName();
+				int cisMode = create.getMembershipMode().intValue();
 				LOG.info("CIS to be created with " + ownerJid + " " + cisJid + " "+ cisPassword + " ");
 				if(cisPassword != null && ownerJid != null && cisJid != null ){
 					CisRecord cisR = this.createCis(ownerJid,
@@ -202,6 +243,14 @@ public class CisManager implements ICisManager, IFeatureServer{
 					
 				}
 				else{
+					if(ownerJid != null && ownerPassword != null && cisType != null && cisName != null){
+						ICisEditor icis = createCis(ownerJid, ownerPassword, cisName, cisType, cisMode);
+						
+						create.setCommunityJid(icis.getCisId());
+						LOG.info("CIS with self assigned ID Created!!");
+						return create;  
+					}
+					
 					LOG.info("missing parameter on the create");
 					// if one of those parameters did not come, we should return an error
 					return create;
@@ -220,7 +269,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 				while(it.hasNext()){
 					CisRecord element = it.next();
 					Community community = new Community();
-					community.setCommunityJid(element.getFullJid());
+					community.setCommunityJid(element.getCisJID());
 					com.getCommunity().add(community);
 					 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 			     }
@@ -260,15 +309,6 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 	@Override
 	public Object setQuery(Stanza arg0, Object arg1) throws XMPPError {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-
-	@Override
-	public ICisEditor createCis(String arg0, String arg1, String arg2,
-			String arg3, int arg4) {
 		// TODO Auto-generated method stub
 		return null;
 	}
