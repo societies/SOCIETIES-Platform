@@ -6,7 +6,7 @@
   <artifactId>RegSynchroniser</artifactId>
   <packaging>bundle</packaging>
   <name>RegSynchroniser</name>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>${release.version}-SNAPSHOT</version>
   
   <properties>
 	<slf4j.version>1.4.3</slf4j.version>

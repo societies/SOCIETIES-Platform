@@ -165,7 +165,7 @@ public class DeviceRegistry implements IDeviceRegistry {
      * 
      * @return	deviceID
      */
-	public String addDevice(DeviceCommonInfo device, String CSSID) {
+	public String addDevice(DeviceCommonInfo device, String CSSNodeID) {
     	//registry.put(RegistryUtility.createKeyString(device.getdeviceId()), device);
 		registry.put(device.getDeviceID(), device);
         return device.getDeviceID();
@@ -177,7 +177,7 @@ public class DeviceRegistry implements IDeviceRegistry {
      * 
      * @return	boolean
      */
-	public boolean deleteDevice(DeviceCommonInfo device, String CSSID) {
+	public boolean deleteDevice(DeviceCommonInfo device, String CSSNodeID) {
 		boolean retValue = false;
         String key = RegistryUtility.createKeyString(device.getDeviceID());
 

@@ -77,7 +77,7 @@ public class TestRegManager {
     private DeviceCommonInfo device_1;
 	private DeviceCommonInfo device_2;
 	private DeviceCommonInfo device_3;
-	private String CSSID = "liam@societies.org";
+	private String CSSNodeID = "liam@societies.org";
 	
 	private String node = "DEVICE_REGISTERED";
 	
@@ -120,9 +120,9 @@ public class TestRegManager {
         assertEquals(0, registry.registrySize());
 
         try {
-            retValue = regmanager.addDevice(device_1, CSSID);
+            retValue = regmanager.addDevice(device_1, CSSNodeID);
             assertTrue(retValue);
-            retValue = regmanager.addDevice(device_2, CSSID);
+            retValue = regmanager.addDevice(device_2, CSSNodeID);
             assertTrue(retValue);
 
         } catch (Exception e) {
@@ -156,13 +156,13 @@ public class TestRegManager {
         assertEquals(0, registry.registrySize());
 
         try {
-            retValue = regmanager.addDevice(device_1, CSSID);
+            retValue = regmanager.addDevice(device_1, CSSNodeID);
             assertTrue(retValue);
-            retValue = regmanager.addDevice(device_2, CSSID);
+            retValue = regmanager.addDevice(device_2, CSSNodeID);
             assertTrue(retValue);
-            retValue = regmanager.addDevice(device_3, CSSID);
+            retValue = regmanager.addDevice(device_3, CSSNodeID);
             assertTrue(retValue);
-            retValue = regmanager.removeDevice(device_2, CSSID);
+            retValue = regmanager.removeDevice(device_2, CSSNodeID);
             assertTrue(retValue);
 
         } catch (Exception e) {
@@ -201,11 +201,11 @@ public class TestRegManager {
         Devices.add(device_2);
         Devices.add(device_3);
         
-		retValue =  regmanager.addDevices(Devices, CSSID);
+		retValue =  regmanager.addDevices(Devices, CSSNodeID);
 		assertTrue(retValue);
-		//retValue =  regmanager.addDevice(device_2, CSSID);
+		//retValue =  regmanager.addDevice(device_2, CSSNodeID);
 		//assertTrue(retValue);
-		//retValue =  regmanager.addDevice(device_3, CSSID);
+		//retValue =  regmanager.addDevice(device_3, CSSNodeID);
 		//assertTrue(retValue);
 		//assertEquals(3, registry.registrySize());
 		//registry.clearRegistry();
@@ -236,15 +236,15 @@ public class TestRegManager {
         Devices.add(device_2);
         //Devices.add(device_3);
         
-		retValue =  regmanager.addDevice(device_1, CSSID);
+		retValue =  regmanager.addDevice(device_1, CSSNodeID);
 		assertTrue(retValue);
-		retValue =  regmanager.addDevice(device_2, CSSID);
+		retValue =  regmanager.addDevice(device_2, CSSNodeID);
 		assertTrue(retValue);
-		retValue =  regmanager.addDevice(device_3, CSSID);
+		retValue =  regmanager.addDevice(device_3, CSSNodeID);
 		assertTrue(retValue);
 		assertEquals(3, registry.registrySize());
 		
-		retValue = regmanager.removeDevices(Devices, CSSID);
+		retValue = regmanager.removeDevices(Devices, CSSNodeID);
 		assertEquals(1, registry.registrySize());
 		
 		registry.clearRegistry();
@@ -269,9 +269,9 @@ public class TestRegManager {
         
         System.out.println("Testing --------: testEvent ");
         try {
-            retValue = regmanager.addDevice(device_1, CSSID);
+            retValue = regmanager.addDevice(device_1, CSSNodeID);
             assertTrue(retValue);
-            retValue = regmanager.addDevice(device_2, CSSID);
+            retValue = regmanager.addDevice(device_2, CSSNodeID);
             assertTrue(retValue);
 
         } catch (Exception e) {
@@ -296,7 +296,7 @@ public class TestRegManager {
 		System.out.println("Event Info is  = " + event1.getEventInfo());
 		
 		
-		System.out.println("CSSID is  = " + CSSID);
+		System.out.println("CSSID is  = " + CSSNodeID);
 		
 		System.out.println("Created new Event");
 		myStream.multicastEvent(event1); 
@@ -321,11 +321,11 @@ public class TestRegManager {
         registry.clearRegistry();
         assertEquals(0, registry.registrySize());
         
-        retValue =  regmanager.addDevice(device_1, CSSID);
+        retValue =  regmanager.addDevice(device_1, CSSNodeID);
 		assertTrue(retValue);
-		retValue =  regmanager.addDevice(device_2, CSSID);
+		retValue =  regmanager.addDevice(device_2, CSSNodeID);
 		assertTrue(retValue);
-		retValue =  regmanager.addDevice(device_3, CSSID);
+		retValue =  regmanager.addDevice(device_3, CSSNodeID);
 		assertTrue(retValue);
 		assertEquals(3, registry.registrySize());
 
