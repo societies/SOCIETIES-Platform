@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0" 
+	targetNamespace="http://societies.org/api/schema/servicelifecycle/servicecontrol" 
+	xmlns:ns1="http://societies.org/api/schema/servicelifecycle/model" 
+	xmlns:tns="http://societies.org/api/schema/servicelifecycle/servicecontrol" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://societies.org/api/schema/servicelifecycle/model" 
+  		schemaLocation="org.societies.api.schema.servicelifecycle.model.xsd"/>
+
+  <xs:element  name="serviceControlResultBean"> 
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="controlResult" type="tns:serviceControlResult" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
+<xs:element  name="serviceControlMsgBean">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="method" type="tns:methodName" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
+  <xs:simpleType name="serviceControlResult">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SUCCESS"/>
+      <xs:enumeration value="SERVICE_NOT_FOUND"/>
+      <xs:enumeration value="BUNDLE_NOT_FOUND"/>
+      <xs:enumeration value="OSGI_PROBLEM"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  
+  <xs:simpleType name="methodName">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="startService"/>
+	  <xs:enumeration value="stopService"/>
+	  <xs:enumeration value="installService"/>
+	  <xs:enumeration value="uninstallService"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+

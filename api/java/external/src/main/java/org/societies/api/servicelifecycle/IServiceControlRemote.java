@@ -28,7 +28,6 @@ import java.net.URL;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.servicelifecycle.IServiceControl.ServiceControlResult;
 
 /**
  * The interface class for remote calls to the Service Control component. It permits a caller to tell the SLM to

@@ -27,6 +27,7 @@ package org.societies.slm.servicecontrol;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Future;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -37,6 +38,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.servicelifecycle.IServiceControl;
 import org.societies.api.servicelifecycle.IServiceControlRemote;
 import org.societies.api.servicelifecycle.ServiceControlException;
@@ -94,7 +96,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 
 
 	@Override
-	public ServiceControlResult startService(ServiceResourceIdentifier serviceId)
+	public Future<ServiceControlResult> startService(ServiceResourceIdentifier serviceId)
 			throws ServiceControlException {
 		
 		if(logger.isDebugEnabled()) logger.debug("Service Management: startService method");
@@ -282,7 +284,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			// And we check if it isn't null!
 			if(serviceBundle == null){
 				if(logger.isDebugEnabled()) logger.debug("Couldn't uninstall: Service Bundle obtained from " + service.getServiceName() + " couldn't be found");
-				return;			
+				return new AsyncResult<ServiceControlResult>;			
 			}
 
 			// It's not, so we proceed to remove the bundle

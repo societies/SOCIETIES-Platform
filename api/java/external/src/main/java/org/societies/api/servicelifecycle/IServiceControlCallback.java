@@ -24,12 +24,17 @@
  */
 package org.societies.api.servicelifecycle;
 
+import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
+
 /**
- * Describe your class here...
- *
- * @author 10036469
+ * The callback to a remote service control call
+ * 
+ * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
  */
 public interface IServiceControlCallback {
 
+	public void setResult(ServiceControlResult result);
+	
+	public ServiceControlResult getResult();
 }

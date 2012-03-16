@@ -24,14 +24,27 @@
  */
 package org.societies.slm.servicecontrol;
 
+import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.servicelifecycle.IServiceControlCallback;
 
 /**
- * Describe your class here...
- *
- * @author 10036469
+ * The callback to a remote service control call
+ * 
+ * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
  */
 public class ServiceControlRemoteClient implements IServiceControlCallback {
+	
+	private ServiceControlResult result;
+
+	@Override
+	public void setResult(ServiceControlResult result) {
+		this.result=result;
+	}
+
+	@Override
+	public ServiceControlResult getResult() {
+		return result;
+	}
 
 }
