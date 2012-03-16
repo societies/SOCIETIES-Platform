@@ -32,16 +32,22 @@
  */
 package org.societies.cis.manager;
 
+import java.util.HashSet;
+import java.util.Set;
+
 
 public class CisActivityFeed {
-	public CisActivity[] activities;
+	public Set<CisActivity> activitySet;
 	public void getActivities(String CssId, String timePeriod){};
 	public void getActivities(String CssId, String query, String timePeriod){};
 	public void addCisActivity(CisActivity activity){};
 	public void cleanupFeed(String criteria){}
 	
-	public CisActivityFeed() {
+	String activityFeedUri;
 	
+	public CisActivityFeed() {
+		activityFeedUri = "";
+		activitySet = new HashSet<CisActivity>();
 	};
 	
 	
