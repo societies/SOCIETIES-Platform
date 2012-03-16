@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.security.policynegotiator;
+package org.societies.api.schema.security.policynegotiator;
 
 /**
  * 
@@ -30,7 +30,7 @@ package org.societies.api.internal.security.policynegotiator;
  * @author Mitja Vardjan
  *
  */
-public class Sla {
+public class SlaBean {
 	
 	private int sessionId;
 	private String sla;
