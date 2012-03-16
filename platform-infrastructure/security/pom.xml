@@ -30,13 +30,11 @@
 		<module>../../api/java/internal</module>
 		
 		<!-- Comms Framework -->
-		<module>../comms-frwk/CommonLibraries</module>
+		<!--module>../comms-frwk/CommonLibraries</module>
 		<module>../comms-frwk/CommunicationFrameworkCommons</module>
 		<module>../comms-frwk/XCCommunicationMgr</module>
-		<!-- <module>../comms-frwk/DataFormsXEP</module>  -->
-		<!-- <module>../comms-frwk/PubsubXEP</module> -->
 		<module>../comms-frwk/PubsubServiceBundle</module>
-		<module>../comms-frwk/PubsubClientBundle</module>
+		<module>../comms-frwk/PubsubClientBundle</module-->
 		
 		<!-- Security -->
 		<module>SecurityServices</module>
