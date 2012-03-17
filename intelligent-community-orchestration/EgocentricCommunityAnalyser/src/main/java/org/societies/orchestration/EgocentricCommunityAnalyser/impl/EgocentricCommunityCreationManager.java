@@ -53,6 +53,14 @@ import org.societies.api.internal.cis.management.ICisManager;
 //import org.societies.api.cis.management.ICisActivityFeed;
 //import org.societies.api.cis.management.ICis;
 
+import org.societies.api.internal.css.management.CSSRecord;
+import org.societies.api.internal.css.management.ICssActivity;
+import org.societies.api.internal.css.management.ICssActivityFeed;
+import org.societies.api.internal.css.management.ICSSLocalManager;
+import org.societies.api.internal.css.management.ICSSManagerCallback;
+import org.societies.api.internal.css.management.ICSSRemoteManager;
+//import org.societies.api.internal.css.management.ICssManagerCloud;
+
 import org.societies.api.internal.context.broker.ICtxBroker;
 
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
@@ -112,10 +120,14 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 	private IUserFeedbackCallback userFeedbackCallback;
 	
 	private ICisManager cisManager;
+	private ICSSLocalManager cssManager;
     
 	private ArrayList<CtxEntity> availableContextData;
 	
 	private ICssDirectory userCssDirectory;
+	
+	private ICssActivityFeed activityFeed;
+	
     
 	private ISuggestedCommunityAnalyser suggestedCommunityAnalyser;
 	
@@ -209,6 +221,8 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		
 		linkedCss = mock(IIdentity.class);
 		cisManager = mock(ICisManager.class);
+		cssManager = mock(ICSSLocalManager.class);
+		activityFeed = mock(ICssActivityFeed.class);
 		userContextBroker = mock(ICtxBroker.class);
 		userCssDirectory = mock(ICssDirectory.class);
 		
