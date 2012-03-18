@@ -127,17 +127,6 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	}
 
 	@Override
-	public void registerForUpdates(CtxAttributeIdentifier arg0) {
-		// TODO Auto-generated method stub
-	}
-
-	
-	@Override
-	public void registerForUpdates(CtxEntityIdentifier scope, String attributeType) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
 	public CtxModelObject remove(CtxIdentifier arg0) {
 		// TODO Auto-generated method stub
 		return null;
@@ -155,16 +144,6 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 
 	public CtxModelObject retrieveSynch(CtxIdentifier id) {
 		return this.modelObjects.get(id);
-	}
-
-	@Override
-	public void unregisterForUpdates(CtxAttributeIdentifier arg0) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void unregisterForUpdates(CtxEntityIdentifier arg0, String arg1) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
