@@ -27,11 +27,11 @@ public class NegotiationProvider implements INegotiationProvider {
 	
 	@Autowired
 	public NegotiationProvider(ISignatureMgr signatureMgr, INegotiationProviderRemote groupMgr) {
+		
 		this.signatureMgr = signatureMgr;
-		LOG.debug("NegotiationProvider({})", signatureMgr);
-
 		this.groupMgr = groupMgr;
-		LOG.debug("init(): group manager = {}", groupMgr);
+
+		LOG.debug("NegotiationProvider({}, {})", signatureMgr.toString(), groupMgr.toString());
 	}
 	
 	@PostConstruct
