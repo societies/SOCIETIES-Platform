@@ -27,6 +27,7 @@ package org.societies.context.api.user.db;
 import java.io.Serializable;
 import java.util.List;
 
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
@@ -36,7 +37,6 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
-
 
 /**
  * 
@@ -50,7 +50,7 @@ public interface IUserCtxDBMgr {
 	 * 
 	 * @param type
 	 */
-	public CtxAssociation createAssociation(String type);
+	public CtxAssociation createAssociation(String type) throws CtxException;
 
 	/**
 	 * Creates a Context Attribute
@@ -59,7 +59,7 @@ public interface IUserCtxDBMgr {
 	 * @param enum
 	 * @param type
 	 */
-	public CtxAttribute createAttribute(CtxEntityIdentifier scope, CtxAttributeValueType enumeration, String type);
+	public CtxAttribute createAttribute(CtxEntityIdentifier scope, CtxAttributeValueType enumeration, String type) throws CtxException;
 
 	/**
 	 * Creates a Context Entity of a generic type. The created <code>CtxEntity</code> 
@@ -72,7 +72,7 @@ public interface IUserCtxDBMgr {
 	 * 
 	 * @param type
 	 */
-	public CtxEntity createEntity(String type);
+	public CtxEntity createEntity(String type) throws CtxException;
 
 	/**
 	 * Creates an individual Context Entity that is possible to join or to form a community. 
@@ -84,7 +84,7 @@ public interface IUserCtxDBMgr {
 	 *  
 	 * @param type
 	 */
-	public CtxEntity createIndividualCtxEntity(String type);	
+	public IndividualCtxEntity createIndividualCtxEntity(String type) throws CtxException;
 	
 	/**
 	 * Looks up CtxModelObjects, i.e. CtxEntities, CtxAttributes, or
@@ -93,7 +93,7 @@ public interface IUserCtxDBMgr {
 	 * @param modelType
 	 * @param type
 	 */
-	public List<CtxIdentifier> lookup(CtxModelType modelType, String type);
+	public List<CtxIdentifier> lookup(CtxModelType modelType, String type) throws CtxException;
 
 	/**
 	 * Looks up CtxEntities of the specified type, containing the specified
@@ -104,26 +104,26 @@ public interface IUserCtxDBMgr {
 	 * @param minAttribValue
 	 * @param maxAttribValue
 	 */
-	public List<CtxEntityIdentifier> lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue);
+	public List<CtxEntityIdentifier> lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue) throws CtxException;
 
 	/**
 	 * Removes the specified context model object.
 	 * 
 	 * @param identifier
 	 */
-	public CtxModelObject remove(CtxIdentifier identifier);
+	public CtxModelObject remove(CtxIdentifier identifier) throws CtxException;
 
 	/**
 	 * Retrieves the specified context model object.
 	 * 
 	 * @param identifier
 	 */
-	public CtxModelObject retrieve(CtxIdentifier identifier);
+	public CtxModelObject retrieve(CtxIdentifier identifier) throws CtxException;
 
 	/**
 	 * Updates a single context model object.
 	 * 
 	 * @param modelObject
 	 */
-	public CtxModelObject update(CtxModelObject modelObject);
+	public CtxModelObject update(CtxModelObject modelObject) throws CtxException;
 }
