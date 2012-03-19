@@ -65,8 +65,8 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(UserCtxDBMgr.class);
 	
-	/** The Context Event Mgr. */
-	@Autowired
+	/** The Context Event Mgmt service reference. */
+	@Autowired(required=true)
 	private ICtxEventMgr ctxEventMgr;
 
 	private final Map<CtxIdentifier, CtxModelObject> modelObjects;
