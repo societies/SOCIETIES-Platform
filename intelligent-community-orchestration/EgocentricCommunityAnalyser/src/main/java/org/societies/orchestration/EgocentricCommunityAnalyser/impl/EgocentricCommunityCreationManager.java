@@ -128,8 +128,10 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 	
 	private ICssActivityFeed activityFeed;
 	
-    
+	private HashMap<String, ICisRecord> personalCiss;
+	
 	private ISuggestedCommunityAnalyser suggestedCommunityAnalyser;
+	
 	
 	/*
      * Constructor for EgocentricCommunityConfigurationManager
@@ -404,6 +406,54 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		return interactingCsss;
 	}
 	
+	public ArrayList<IIdentity> getIDsOfCsssInProximity(String startingDate, String endingDate, String service) {
+		//What CSSs is this one currently interacting with across the specified service?
+		//Found by: For each service, shared service, and resource the user is using (within the time period specified), is there an end-CSS they're interacting with?
+		//Is there a CSS they're indirectly interacting with over the service (e.g. both using the same service or accessing the same resource over it)?
+		
+		
+		//Needs a framework for capturing this in the platform.
+		//It needs a timestamp for this, so either the context is stored with timestamps or 
+		//we get it from the CSS activity feed (which isn't implemented yet)
+		ArrayList<IIdentity> interactingCsss = new ArrayList<IIdentity>();
+		//           2010-03-08 14:59:30.252
+		//ICssActivityFeed subfeed = activityFeed.getActivities(startingDate, endingDate);
+		//
+		//for (int i = 0; i < subfeed.size(); i++) {
+		//    ICssActivity thisActivity = subfeed.getActivity(i);
+		//    if (thisActivity.getObject().equals(service) &&
+		//        thisActivity.getTarget().contains("CSS") &&
+		//        !(interactingCss.contains(thisActivity.getTarget())))
+		//        interactingCsss.add(thisActivity.getTarget();
+        //    else if (thisActivity.getObject().equals(service) &&
+		//        thisActivity.getActor().contains("CSS") &&
+		//        (thisActivity.getActor() != linkedCss) &&
+		//        !(interactingCss.contains(thisActivity.getActor())))
+		//        interactingCsss.add(thisActivity.getTarget();
+		//}
+		
+		try {
+			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
+        //
+		//    Get the lists from the callbacks
+		//
+		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
+		//}
+//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
+
+		
+		
+		return interactingCsss;
+	}
+	
 	/*
 	 * Description: The method looks for CISs to create, using as a base the information related to
 	 *              this object's 'linked' component (see the fields). If the linked component
@@ -419,13 +469,13 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		
 		
 		
-		ArrayList<IIdentity> interactedCssIDs = null;
-		ArrayList<IIdentity> friendCssIDs = null;
-		ArrayList<IIdentity> localCsss = null;
+		ArrayList<IIdentity> interactedCssIDs = new ArrayList<IIdentity>();
+		ArrayList<IIdentity> friendCssIDs = new ArrayList<IIdentity>();
+		ArrayList<IIdentity> localCsss = new ArrayList<IIdentity>();
 		// ...
 		
 		ArrayList<ICisRecord> cissToCreate = new ArrayList<ICisRecord>();
-		ArrayList<ICisRecord> cissToAutomaticallyCreate = null;
+		ArrayList<ICisRecord> cissToAutomaticallyCreate = new ArrayList<ICisRecord>();
 		//v1.0 algorithms
 		
 		linkedCss = mock(IIdentity.class);
@@ -446,7 +496,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		        userJoinedCiss.add(listOfUserJoinedCiss[i]);   
 		    }
 		
-		if (evaluationType.equals("extensive")) { //every day or so
+		if (evaluationType.equals("extensive")) { //every day
 			if (linkedCss != null) {
 				//interactedCssIDs = getIDsOfInteractingCsss();
 				
@@ -465,10 +515,15 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				
 				
 				
-				//CSS directory
+				//Personal CSS directory CIS
 				Collection<Object/**CssAdvertisementRecord*/> cssDirectoryMembers = userCssDirectory.findForAllCss();
 				boolean cisExistsAlready = false;
-				if (cssDirectoryMembers.size() >= 2)
+				ArrayList<String> joinedCisIDs = new ArrayList<String>();
+				for (int i = 0; i < userJoinedCiss.size(); i++)
+					joinedCisIDs.add(userJoinedCiss.get(i).toString());
+				if (joinedCisIDs.contains(personalCiss.get("CSS Directory")))
+					cisExistsAlready = true;
+				else if (cssDirectoryMembers.size() >= 2)
 				for (int i = 0; i < userJoinedCiss.size(); i++) {
 					//if (userJoinedCiss.get(i).getOrchestrationMetdata.contains("Personal CSS directory")) cisExistsAlready = true;
 					Collection<Object> membersOfCis = null;
@@ -492,8 +547,11 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				     //    cisExistsAlready = true;
 				/**    if (!cisManager.getCiss().get(i).getMembers() == people)*/
 				}
-				//if (cisExistsAlready == false)
+				//if (cisExistsAlready == false) {
 				//    cissToCreate.add(new ICisRecord(null, linkedCss.toString(), "PERSONAL CIS for your CSS directory members", null, null, null, null, null, null));
+				//    personalCiss.remove("CSS Directory");
+				//    personalCiss.add("CSS Directory", new ICisRecord(null, linkedCss.toString(), "PERSONAL CIS for your CSS directory members", null, null, null, null, null, null));
+				//}
 				
 				//Repeat the above for: friends, family members, working colleagues, and any other
 				//sufficiently important context containing a list of CSSs. The context ontology is used
