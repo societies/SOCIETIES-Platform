@@ -3,9 +3,8 @@ package org.societies.platform.socialdata.service;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.platform.FacebookConn.FacebookConnector;
-import org.societies.platform.FacebookConn.SocialConnector;
-import org.societies.platform.FacebookConn.exeptions.MissingTokenExeptions;
 import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
 import org.societies.platform.socialdata.model.PersonConverterFromFacebook;
 
@@ -42,7 +41,7 @@ public class JsonToSocialDataService {
 	  public static void main(String[]args){
 		  System.out.println("Convert JSON to SocialDATA");
 		  String access_token = "AAAFPIhZAkC90BAJy6bV7hnRJcBs3VZAmr4mtSrdJpszhXO6ZAwNdQfSZAZCDx3VLQql84NefBBp11IrnZCUFGP9H731m4K0RoZCMzQbvZCIcZAAZDZD";
-		  SocialConnector c = new FacebookConnectorImpl(access_token, null);
+		  ISocialConnector c = new FacebookConnectorImpl(access_token, null);
 		  
 		  JsonToSocialDataService service = new JsonToSocialDataService();
 		  try {
@@ -57,7 +56,7 @@ public class JsonToSocialDataService {
 			
 		  } catch (JSONException e) {
 			e.printStackTrace();
-		} catch (MissingTokenExeptions e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		  

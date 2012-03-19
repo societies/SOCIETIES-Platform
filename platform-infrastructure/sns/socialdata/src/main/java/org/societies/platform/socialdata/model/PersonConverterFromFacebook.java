@@ -2,19 +2,30 @@ package org.societies.platform.socialdata.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import org.apache.shindig.social.core.model.AccountImpl;
+import org.apache.shindig.social.core.model.AddressImpl;
 import org.apache.shindig.social.core.model.NameImpl;
 import org.apache.shindig.social.core.model.PersonImpl;
+import org.apache.shindig.social.opensocial.model.Account;
+import org.apache.shindig.social.opensocial.model.Address;
 import org.apache.shindig.social.opensocial.model.Name;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.apache.shindig.social.opensocial.model.Person.Gender;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.societies.platform.FacebookConn.SocialConnector;
 
 
 public class PersonConverterFromFacebook implements PersonConverter{
 	
+	public static String USERNAME 		= "username";
+	public static String LOCATION		= "location";
+	public static String RELIGION		= "religion";
+	public static String RELATIONSHIP 	= "relationship_status";
+	public static String SPORTS  		= "sports";
+	public static String SPORT_NAME 	= "name";
 	public static String ID 			= "id";
 	public static String NAME 			= "name";
 	public static String FIRSTNAME 		= "first_name";
@@ -44,20 +55,92 @@ public class PersonConverterFromFacebook implements PersonConverter{
 			
 			person.setId(db.getString(ID));
 			//if(db.has(UCT)) person.setUtcOffset(db.getLong(UCT));
-			if(db.has(BIO)) person.setAboutMe(db.getString(BIO));
+			if (db.has(BIO))		 	person.setAboutMe(db.getString(BIO));
+			if (db.has(SPORTS)) 	 	person.setSports(setSports(db.getString(SPORTS)));
+			if (db.has(RELATIONSHIP)) 	person.setRelationshipStatus(db.getString(RELATIONSHIP));
+			if (db.has(RELIGION))       person.setReligion(db.getString(RELIGION));
+			if (db.has(LOCATION))		person.setCurrentLocation(setLocation(db.getString(LOCATION)));
+			
+			
 			
 		}
 		catch (JSONException e) {
 			e.printStackTrace();
 		}
-		person.setRelationshipStatus("me");
+		
 		person.setName(genName());
 		person.setGender(genGender());
 		person.setEmails(genEmails());
+		person.setActivities(genActivities());
 		
+		setAccount();  // Set Facebook Account
+			
 		return person;
 	}
 	
+	private List<String> genActivities() {
+		List<String> activities = new ArrayList<String>();
+//		try{
+//			
+//			
+//		}
+//		catch (JSONException e) {
+//			e.printStackTrace();
+//		}
+		
+		return activities;
+	}
+
+	private void setAccount(){
+		Account account = new AccountImpl();
+		try{
+			account.setDomain("facebook.com");
+			account.setUsername(db.getString(USERNAME));
+			account.setUserId(db.getString(ID));
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		//Add the account facebook
+		List<Account> accounts = new ArrayList<Account>();
+		accounts.add(account);
+		person.setAccounts(accounts);
+	}
+	
+	private Address setLocation(String data) {
+		Address address = new AddressImpl();
+		try{
+			
+			JSONObject loc = new JSONObject(data);
+			address.setFormatted(loc.getString("name"));
+		
+			
+		}
+		catch(Exception ex){}
+		
+		return address;
+	}
+
+	private List<String> setSports(String data) {
+		JSONArray sports = null;
+		List<String> sportList = null;
+		try {
+			
+			 sports = new JSONArray(data);
+			 sportList= new ArrayList<String>();
+			 
+			 for(int i=0; i< sports.length(); i++){
+				 JSONObject sport = sports.getJSONObject(i);
+				 sportList.add(sport.getString(SPORT_NAME));
+			 }
+		} 
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return sportList;
+	}
+
 	private ArrayList genEmails(){
 		
 		ArrayList emails = new ArrayList();
