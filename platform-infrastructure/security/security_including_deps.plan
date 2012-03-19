@@ -17,8 +17,8 @@
 	<artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubClientBundle"/>
 	
 	<!-- Security -->
-	<artifact type="bundle" name="org.societies.security.security-services"/>
-	<artifact type="bundle" name="org.societies.security.policynegotiator"/>
-	<artifact type="bundle" name="org.societies.security.commsmgr"/>
+	<artifact type="bundle" name="org.societies.security.secur-services"/>
+	<artifact type="bundle" name="org.societies.security.policy-negotiator"/>
+	<artifact type="bundle" name="org.societies.security.secur-commsmgr"/>
 
 </plan>
