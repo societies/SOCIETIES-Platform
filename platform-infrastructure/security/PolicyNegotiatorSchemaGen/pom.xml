@@ -8,7 +8,7 @@
 		<version>0.1</version>
 	</parent>
 	<groupId>org.societies.security</groupId>
-	<artifactId>policynegotiator-schema-gen</artifactId>
+	<artifactId>policy-negotiator-schema-gen</artifactId>
 	<version>${release.version}</version>
 	<packaging>jar</packaging>
 

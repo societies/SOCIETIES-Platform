@@ -4,7 +4,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.security</groupId>
-	<artifactId>policynegotiator</artifactId>
+	<artifactId>policy-negotiator</artifactId>
 	<version>${release.version}</version>
 	<packaging>bundle</packaging>
 	<name>Secure Policy Negotiator Bundle</name>

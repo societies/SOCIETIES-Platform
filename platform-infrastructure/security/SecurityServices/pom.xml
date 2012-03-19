@@ -4,7 +4,8 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.security</groupId>
-	<artifactId>security-services</artifactId>
+	<!-- If name starts with "security" it gets cut off -->
+	<artifactId>secur-services</artifactId>
 	<version>${release.version}</version>
 	<packaging>bundle</packaging>
 	<name>Security Services Bundle</name>
@@ -82,7 +83,8 @@
 						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Import-Package>*;resolution:=optional</Import-Package>
-						<Export-Package>org.societies.api.security.digsig.*,org.societies.api.internal.security.storage.*</Export-Package>
+						<Export-Package>org.societies.api.security.digsig.*,org.societies.api.internal.security.storage.*</Export-Package>
+
 						<!-- Private-Package> org.societies.security.digsig.*, org.societies.security.something.* 
 							</Private-Package -->
 						<_nouses>true</_nouses>
