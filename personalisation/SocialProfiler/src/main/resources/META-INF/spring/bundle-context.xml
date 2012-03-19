@@ -8,6 +8,6 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-  <bean name="myBean" class="org.societies.platform.FacebookConn.impl.FacebookConnectorImpl" />
+  <bean name="socialprofiler" class="org.societies.personalization.socialprofiler.impl.SocialProfilerImpl" />
 
 </beans>

@@ -57,9 +57,10 @@ public class EngineImpl implements Engine, Variables{
 	private SocialDataImpl	socialdata;
 	
 	public EngineImpl(ServiceImpl service, DatabaseConnectionImpl databaseConnection){
-		this.service = service;
-		this.socialdata =new SocialDataImpl();
-		this.databaseConnection = databaseConnection;
+	
+		this.service 				= service;
+		this.socialdata 			= new SocialDataImpl();
+		this.databaseConnection 	= databaseConnection;
 		
 	}
 	
@@ -112,7 +113,7 @@ public class EngineImpl implements Engine, Variables{
 			
 			for (int i=0;i<list_usersIds.size();i++){
 				if (list_usersIds.get(i)!=null){
-					generate_tree(list_usersIds.get(i),null,option);
+					generate_tree(list_usersIds.get(i), null, option);
 				}
 			}
 		}

@@ -5,7 +5,7 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-  <!-- definitions using elements of the osgi namespace can be included
+  <!-- definitions using elemsents of the osgi namespace can be included
        in this file. There is no requirement to keep these definitions
        in a separate file if you do not want to. The rationale for 
        keeping these definitions separate is to facilitate integration

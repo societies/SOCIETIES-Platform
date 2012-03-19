@@ -68,7 +68,7 @@ public class SocialProfilerImpl implements SocialProfiler {
 		this.databaseConnection	    = new DatabaseConnectionImpl();
 		
 		logger.info("Engine Initialization ...");
-		this.engine	=new EngineImpl(service, databaseConnection);
+		this.engine	= new EngineImpl(service, databaseConnection);
 		
 		///////////////////////////////////////////////////
 		//
@@ -105,7 +105,7 @@ public class SocialProfilerImpl implements SocialProfiler {
 	            inputStream.close();
 	        }
            
-            
+            logger.info("engine activated.");
 
 		}catch(IOException e){
 			logger.error("Unable to read property file CAUSE: "+e);
