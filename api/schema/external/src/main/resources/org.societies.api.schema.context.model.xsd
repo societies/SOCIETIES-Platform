@@ -7,7 +7,7 @@
 
   <xs:complexType name="individualCtxEntity">
     <xs:complexContent>
-      <xs:extension base="communityMemberCtxEntity">
+      <xs:extension base="tns:communityMemberCtxEntity">
         <xs:sequence/>
       </xs:extension>
     </xs:complexContent>
@@ -15,12 +15,12 @@
 
   <xs:complexType name="communityMemberCtxEntity" abstract="true">
     <xs:complexContent>
-      <xs:extension base="ctxEntity">
+      <xs:extension base="tns:ctxEntity">
         <xs:sequence>
           <xs:element name="communities" minOccurs="0">
             <xs:complexType>
               <xs:sequence>
-                <xs:element name="community" type="communityCtxEntity" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="community" type="tns:communityCtxEntity" minOccurs="0" maxOccurs="unbounded"/>
               </xs:sequence>
             </xs:complexType>
           </xs:element>
@@ -31,19 +31,19 @@
 
   <xs:complexType name="ctxEntity">
     <xs:complexContent>
-      <xs:extension base="ctxModelObject">
+      <xs:extension base="tns:ctxModelObject">
         <xs:sequence>
           <xs:element name="attributes" minOccurs="0">
             <xs:complexType>
               <xs:sequence>
-                <xs:element name="attribute" type="ctxAttribute" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="attribute" type="tns:ctxAttribute" minOccurs="0" maxOccurs="unbounded"/>
               </xs:sequence>
             </xs:complexType>
           </xs:element>
           <xs:element name="associations" minOccurs="0">
             <xs:complexType>
               <xs:sequence>
-                <xs:element name="association" type="ctxAssociationIdentifier" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="association" type="tns:ctxAssociationIdentifier" minOccurs="0" maxOccurs="unbounded"/>
               </xs:sequence>
             </xs:complexType>
           </xs:element>
@@ -54,26 +54,26 @@
 
   <xs:complexType name="ctxModelObject" abstract="true">
     <xs:sequence>
-      <xs:element name="id" type="ctxIdentifier"/>
+      <xs:element name="id" type="tns:ctxIdentifier"/>
       <xs:element name="lastModified" type="xs:dateTime"/>
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="communityCtxEntity">
     <xs:complexContent>
-      <xs:extension base="communityMemberCtxEntity">
+      <xs:extension base="tns:communityMemberCtxEntity">
         <xs:sequence>
           <xs:element name="members" minOccurs="0">
             <xs:complexType>
               <xs:sequence>
-                <xs:element name="member" type="communityMemberCtxEntity" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="member" type="tns:communityMemberCtxEntity" minOccurs="0" maxOccurs="unbounded"/>
               </xs:sequence>
             </xs:complexType>
           </xs:element>
           <xs:element name="bonds" minOccurs="0">
             <xs:complexType>
               <xs:sequence>
-                <xs:element name="bond" type="ctxBond" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="bond" type="tns:ctxBond" minOccurs="0" maxOccurs="unbounded"/>
               </xs:sequence>
             </xs:complexType>
           </xs:element>
@@ -84,23 +84,23 @@
 
   <xs:complexType name="ctxBond" abstract="true">
     <xs:sequence>
-      <xs:element name="modelType" type="ctxModelType"/>
+      <xs:element name="modelType" type="tns:ctxModelType"/>
       <xs:element name="type" type="xs:string"/>
-      <xs:element name="originType" type="ctxBondOriginType"/>
+      <xs:element name="originType" type="tns:ctxBondOriginType"/>
     </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="ctxAttribute">
     <xs:complexContent>
-      <xs:extension base="ctxModelObject">
+      <xs:extension base="tns:ctxModelObject">
         <xs:sequence>
           <xs:element name="stringValue" type="xs:string" nillable="true"/>
           <xs:element name="integerValue" type="xs:int" nillable="true"/>
           <xs:element name="doubleValue" type="xs:double" nillable="true"/>
           <xs:element name="binaryValue" type="xs:base64Binary" nillable="true"/>
-          <xs:element name="valueType" type="ctxAttributeValueType"/>
+          <xs:element name="valueType" type="tns:ctxAttributeValueType"/>
           <xs:element name="valueMetric" type="xs:string" nillable="true"/>
-          <xs:element name="quality" type="ctxQuality"/>
+          <xs:element name="quality" type="tns:ctxQuality"/>
           <xs:element name="sourceId" type="xs:string" nillable="true"/>
           <xs:element name="historyRecorded" type="xs:boolean"/>
         </xs:sequence>
@@ -110,9 +110,9 @@
 
   <xs:complexType name="ctxQuality">
     <xs:sequence>
-      <xs:element name="attribute" type="ctxAttribute" minOccurs="0"/>
+      <xs:element name="attribute" type="tns:ctxAttribute" minOccurs="0"/>
       <xs:element name="lastUpdated" type="xs:dateTime" nillable="true"/>
-      <xs:element name="originType" type="ctxOriginType" nillable="true"/>
+      <xs:element name="originType" type="tns:ctxOriginType" nillable="true"/>
       <xs:element name="precision" type="xs:double" nillable="true"/>
       <xs:element name="updateFrequency" type="xs:double" nillable="true"/>
     </xs:sequence>
@@ -121,7 +121,7 @@
   <xs:complexType name="ctxIdentifier" abstract="true">
     <xs:sequence>
       <xs:element name="operatorId" type="xs:string"/>
-      <xs:element name="modelType" type="ctxModelType"/>
+      <xs:element name="modelType" type="tns:ctxModelType"/>
       <xs:element name="type" type="xs:string"/>
       <xs:element name="objectNumber" type="xs:long"/>
     </xs:sequence>
@@ -129,7 +129,7 @@
 
   <xs:complexType name="ctxAssociationIdentifier">
     <xs:complexContent>
-      <xs:extension base="ctxIdentifier">
+      <xs:extension base="tns:ctxIdentifier">
         <xs:sequence/>
       </xs:extension>
     </xs:complexContent>
@@ -137,7 +137,7 @@
 
   <xs:complexType name="ctxEntityIdentifier">
     <xs:complexContent>
-      <xs:extension base="ctxIdentifier">
+      <xs:extension base="tns:ctxIdentifier">
         <xs:sequence/>
       </xs:extension>
     </xs:complexContent>
@@ -145,13 +145,13 @@
 
   <xs:complexType name="ctxAssociation">
     <xs:complexContent>
-      <xs:extension base="ctxModelObject">
+      <xs:extension base="tns:ctxModelObject">
         <xs:sequence>
-          <xs:element name="parentEntity" type="ctxEntityIdentifier" nillable="true"/>
+          <xs:element name="parentEntity" type="tns:ctxEntityIdentifier" nillable="true"/>
           <xs:element name="childEntities" minOccurs="0">
             <xs:complexType>
               <xs:sequence>
-                <xs:element name="childEntity" type="ctxEntityIdentifier" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="childEntity" type="tns:ctxEntityIdentifier" minOccurs="0" maxOccurs="unbounded"/>
               </xs:sequence>
             </xs:complexType>
           </xs:element>
@@ -162,7 +162,7 @@
 
   <xs:complexType name="ctxHistoryAttribute">
     <xs:complexContent>
-      <xs:extension base="ctxModelObject">
+      <xs:extension base="tns:ctxModelObject">
         <xs:sequence/>
       </xs:extension>
     </xs:complexContent>
@@ -170,9 +170,9 @@
 
   <xs:complexType name="ctxAttributeIdentifier">
     <xs:complexContent>
-      <xs:extension base="ctxIdentifier">
+      <xs:extension base="tns:ctxIdentifier">
         <xs:sequence>
-          <xs:element name="scope" type="ctxEntityIdentifier"/>
+          <xs:element name="scope" type="tns:ctxEntityIdentifier"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
