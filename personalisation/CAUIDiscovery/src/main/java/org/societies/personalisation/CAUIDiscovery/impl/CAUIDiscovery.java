@@ -19,27 +19,26 @@
  */
 package org.societies.personalisation.CAUIDiscovery.impl;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
 //import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
+import org.societies.personalisation.CAUIDiscovery.test.MockHistoryData;
 
 
 public class CAUIDiscovery implements ICAUIDiscovery{
 
-	
 	private ICAUITaskManager cauiTaskManager;
-	
 	private ICtxBroker ctxBroker;
 
 	public CAUIDiscovery(){
-		 dictionary = new LinkedHashMap<String,Integer>();
+		dictionary = new LinkedHashMap<String,Integer>();
 	}
-	
+
 	public ICAUITaskManager getCauiTaskManager() {
 		System.out.println(this.getClass().getName()+": Return cauiTaskManager");
 
@@ -49,53 +48,91 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 	public void setCauiTaskManager(ICAUITaskManager cauiTaskManager) {
 		System.out.println(this.getClass().getName()+": Got cauiTaskManager");
-
 		this.cauiTaskManager = cauiTaskManager;
 	}
 
 	public ICtxBroker getCtxBroker() {
 		System.out.println(this.getClass().getName()+": Return ctxBroker");
-
 		return ctxBroker;
 	}
 
 
 	public void setCtxBroker(ICtxBroker ctxBroker) {
 		System.out.println(this.getClass().getName()+": Got ctxBroker");
-
 		this.ctxBroker = ctxBroker;
 	}
 
 
-	
-
 	// constructor
 	public void initialiseCAUIDiscovery(){
-		 dictionary = new LinkedHashMap<String,Integer>();
+		dictionary = new LinkedHashMap<String,Integer>();
 	}
-	
-	
-	
+
 	LinkedHashMap<String,Integer> dictionary = null;
 	List<String> charList = null;
-	
-	
-
-
-	
-	
-
+	List<MockHistoryData> historyList = null;
 
 	@Override
 	public void generateNewUserModel() {
-		charList = new ArrayList<String>();
+	}
+
+	public void generateNewUserModel(List data) {
+		this.historyList = data;
+		populateDictionary();
+	}
+
+	public void  populateDictionary(){
+
+		int historySize = this.historyList.size();
+		String currentPhrase = null;
+
+		// j is the step and the longest phrase has 5 actions
+		for (int j=1; j<5; j++) {
+		//	System.out.println("dictionary "+this.dictionary);
+		//	System.out.println("-------");
+
+			for (int i = 0; i < historySize ; i++) {
+				//	currentPhrase = array.substring(i, i+j);
+				LinkedList<String> actionNameObj = new LinkedList<String>();
+				MockHistoryData currentHocData =  this.historyList.get(i);
+				String actionName = currentHocData.getActionValue();
+				actionNameObj.add(actionName);
+		//		System.out.println("j="+j+" i="+i+" actionName "+actionName);
+
+				MockHistoryData tempHocData = null;
+				LinkedList<String> nextActName = new LinkedList<String>();
+
+				for (int k=1; k<j; k++){
+					if( i+k < historySize ){ 
+						tempHocData = this.historyList.get(i+k);
+						String tempNextActName = tempHocData.getActionValue();
+						//nextActName = nextActName + tempNextActName;
+						nextActName.add(tempNextActName);
+			//			System.out.println("k="+k+" nextActName "+nextActName);
+					}
+				}
+				actionNameObj.addAll(nextActName);
+				//currentPhrase = actionName + nextActName;
+		//		System.out.println("j="+j+" i="+i+" currentPhrase "+actionNameObj);
+				currentPhrase = actionNameObj.toString();
+		//		System.out.println(" actionNameObj.toString "+currentPhrase);
+				if (actionNameObj.size() == j){
+					if( this.dictionary.containsKey(currentPhrase)){
+						//	HashMap<String,Integer> container = dictionary.get(currentChar);
+						Integer previousScore = this.dictionary.get(currentPhrase);
+						this.dictionary.put(currentPhrase,previousScore+1);
+					} else {
+						this.dictionary.put(currentPhrase, 1);
+					}
+				}
+			}
+		}
+		System.out.println("dictionary "+this.dictionary);
 	}
 
 	public LinkedHashMap<String,Integer> getDictionary(){
 		return this.dictionary;
 	}
-
-
 
 	public void findOccurences(int step, String array){
 
@@ -114,23 +151,16 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				this.dictionary.put(currentPhrase, 1);
 			}
 		}
-
-		
 	}
-
-	public static void main(String[] args) {
-
-		CAUIDiscovery cd = new CAUIDiscovery();
-		//String array = "AAABABBBBAABCCDDCBAAA";
-		//String array = "ABCEZDEFJKABCODEFPABCIOIKDEF";
-		String array = "ABCDEFABCDEF";
-		System.out.println("array: "+array);
-		//	sd.findStates(array);
-		//System.out.println("created dictionary1 :"+sd.getDictionary());
-		for (int i=1; i<5; i++){
-			cd.findOccurences(i ,array);
+	
+	public LinkedHashMap<String,Integer> getMaxFreqSeq(int score){
+		LinkedHashMap<String,Integer> results = new LinkedHashMap<String,Integer>();
+		LinkedHashMap<String,Integer> dic = getDictionary();
+		
+		for (String act : dic.keySet()){
+		if(dic.get(act) > score) results.put(act, dic.get(act));	
 		}
-		System.out.println("populated dictionary :"+cd.getDictionary());
+		return results;
 	}
 
 }
