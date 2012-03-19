@@ -117,6 +117,15 @@ public class ServiceRegistryTest extends
 	}
 	
 
+	@Test
+	@Rollback(false)
+	public void changeServcieStatus() throws Exception{
+		boolean isOk=serReg.changeStatusOfService(servicesList.get(0).getServiceIdentifier(), ServiceStatus.STOPPED);
+		assert(isOk);
+		Service service=serReg.retrieveService(servicesList.get(0).getServiceIdentifier());
+		assert(service.getServiceStatus().equals(ServiceStatus.STOPPED));
+		
+	}
 	
 	
 	@Test
