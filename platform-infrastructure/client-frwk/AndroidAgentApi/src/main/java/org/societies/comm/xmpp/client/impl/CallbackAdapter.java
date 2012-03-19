@@ -2,12 +2,10 @@ package org.societies.comm.xmpp.client.impl;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.AbstractMap.SimpleEntry;
+import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
@@ -20,10 +18,11 @@ import org.jivesoftware.smack.packet.Packet;
 
 import android.content.Context;
 import android.content.ServiceConnection;
+import android.util.Log;
 
 public class CallbackAdapter implements Callback {
 	
-	private static final Logger log = LoggerFactory.getLogger(CallbackAdapter.class);
+	private static final String LOG_TAG = CallbackAdapter.class.getName();
 	
 	private ICommCallback callback;
 	private Context context;
@@ -46,7 +45,7 @@ public class CallbackAdapter implements Callback {
 			Object payload = marshaller.unmarshallPayload(packet);
 			callback.receiveResult(stanzaFromPacket(packet), payload);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			Log.e(LOG_TAG, e.getMessage(), e);
 		} 
 
 	}
@@ -58,7 +57,7 @@ public class CallbackAdapter implements Callback {
 			Packet packet = marshaller.unmarshallIq(xml);
 			callback.receiveError(stanzaFromPacket(packet), null); // TODO parse error
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			Log.e(LOG_TAG, e.getMessage(), e);
 		} 
 	}
 	
@@ -67,10 +66,10 @@ public class CallbackAdapter implements Callback {
 		
 		try {
 			Packet packet = marshaller.unmarshallIq(xml);
-			SimpleEntry<String, List<String>> nodeMap = marshaller.parseItemsResult(packet);
+			Entry<String, List<String>> nodeMap = marshaller.parseItemsResult(packet);
 			callback.receiveItems(stanzaFromPacket(packet), nodeMap.getKey(), nodeMap.getValue());
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			Log.e(LOG_TAG, e.getMessage(), e);
 		}
 	}
 	
@@ -81,7 +80,7 @@ public class CallbackAdapter implements Callback {
 			Object payload = marshaller.unmarshallPayload(packet);				
 			callback.receiveMessage(stanzaFromPacket(packet), payload);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			Log.e(LOG_TAG, e.getMessage(), e);
 		} 
 	}
 	

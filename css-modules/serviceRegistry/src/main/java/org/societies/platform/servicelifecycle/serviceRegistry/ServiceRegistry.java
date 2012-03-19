@@ -3,22 +3,28 @@ package org.societies.platform.servicelifecycle.serviceRegistry;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Example;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
 import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.RegistryEntry;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceImplementationDAO;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceInstanceDAO;
 import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceResourceIdentiferDAO;
+import org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceSharedInCISDAO;
 
 public class ServiceRegistry implements IServiceRegistry {
 	private SessionFactory sessionFactory;
@@ -46,10 +52,10 @@ public class ServiceRegistry implements IServiceRegistry {
 						service.getServiceInstance(),
 						service.getServiceStatus());
 
-				
 				session.save(tmpRegistryEntry);
-				
-			}t.commit();
+
+			}
+			t.commit();
 			log.debug("Service list saved.");
 
 		} catch (Exception e) {
@@ -105,8 +111,21 @@ public class ServiceRegistry implements IServiceRegistry {
 	@Override
 	public List<Service> retrieveServicesSharedByCSS(String CSSID)
 			throws ServiceRetrieveException {
-		// TODO Auto-generated method stub
-		return null;
+		List<Service> returnedServiceList=new ArrayList<Service>();
+		Session session=sessionFactory.openSession();
+		try {
+			
+			List<RegistryEntry> tmpRegistryEntryList=session.createCriteria(RegistryEntry.class).createCriteria("serviceInstance").
+				add(Restrictions.eq("fullJid", CSSID)).list();
+			for (RegistryEntry registryEntry : tmpRegistryEntryList) {
+				returnedServiceList.add(registryEntry.createServiceFromRegistryEntry());
+			}
+		} catch (Exception e) {
+			throw new ServiceRetrieveException(e);
+		}finally{
+			session.close();
+		}
+		return returnedServiceList;
 	}
 
 	/*
@@ -119,8 +138,25 @@ public class ServiceRegistry implements IServiceRegistry {
 	@Override
 	public List<Service> retrieveServicesSharedByCIS(String CISID)
 			throws ServiceRetrieveException {
-		// TODO Auto-generated method stub
-		return null;
+		List<Service> returnedServiceList=new ArrayList<Service>();
+		Session session= sessionFactory.openSession();
+		try{
+		ServiceSharedInCISDAO filterServiceSharedCISDAO= new ServiceSharedInCISDAO();
+		filterServiceSharedCISDAO.setCISId(CISID);
+		
+		List<ServiceSharedInCISDAO> serviceSharedInCISDAOList=session.createCriteria(ServiceSharedInCISDAO.class)
+				.add(Example.create(filterServiceSharedCISDAO)).list();
+		
+		
+		for (ServiceSharedInCISDAO serviceSharedInCISDAO : serviceSharedInCISDAOList) {
+			returnedServiceList.add( ((RegistryEntry)session.get(RegistryEntry.class, serviceSharedInCISDAO.getServiceResourceIdentifier())).createServiceFromRegistryEntry());
+		}
+		}catch (Exception e){
+			throw new ServiceRetrieveException(e);
+		}finally{
+			session.close();
+		}
+		return returnedServiceList;
 	}
 
 	/*
@@ -164,7 +200,8 @@ public class ServiceRegistry implements IServiceRegistry {
 				tmpServiceResourceIdentifierDAO.setInstanceId(filter
 						.getServiceIdentifier().getServiceInstanceIdentifier());
 			}
-			filterRegistryEntry.setServiceIdentifier(tmpServiceResourceIdentifierDAO);
+			filterRegistryEntry
+					.setServiceIdentifier(tmpServiceResourceIdentifierDAO);
 		}
 		if (filter.getServiceInstance() != null) {
 			ServiceInstanceDAO tmpServiceInstanceDAO = new ServiceInstanceDAO();
@@ -235,8 +272,27 @@ public class ServiceRegistry implements IServiceRegistry {
 	public void notifyServiceIsSharedInCIS(
 			ServiceResourceIdentifier serviceIdentifier, String CISID)
 			throws ServiceSharingNotificationException {
-		// TODO Auto-generated method stub
+		Session session = sessionFactory.openSession();
+		Transaction t = session.beginTransaction();
+		try {
+			if(session.get(RegistryEntry.class, new ServiceResourceIdentiferDAO(serviceIdentifier.getIdentifier().toString(), serviceIdentifier.getServiceInstanceIdentifier()))!=null){
+			ServiceSharedInCISDAO tmpSharedInCIS = new ServiceSharedInCISDAO(
+					CISID, new ServiceResourceIdentiferDAO(serviceIdentifier
+							.getIdentifier().toString(),
+							serviceIdentifier.getServiceInstanceIdentifier()));
 
+			session.save(tmpSharedInCIS);
+			t.commit();
+			}else{throw new ServiceNotFoundException("The service doesn't exist in the registry.");
+			}
+			
+		} catch (Exception e) {
+			t.rollback();
+			throw new ServiceSharingNotificationException(e);
+		} finally {
+
+			session.close();
+		}
 	}
 
 	/*
@@ -249,11 +305,27 @@ public class ServiceRegistry implements IServiceRegistry {
 	 * .ServiceResourceIdentifier, java.lang.String)
 	 */
 	@Override
-	public void removeServiceSharingInCIS(
-			ServiceResourceIdentifier serviceIdentifier, String CISID)
-			throws ServiceSharingNotificationException {
-		// TODO Auto-generated method stub
+	public void removeServiceSharingInCIS(ServiceResourceIdentifier serviceIdentifier, String CISID) throws ServiceSharingNotificationException {
 
+		Session session = sessionFactory.openSession();
+		Transaction t = session.beginTransaction();
+		try {
+			ServiceSharedInCISDAO tmpSharedInCIS = new ServiceSharedInCISDAO(
+					CISID, new ServiceResourceIdentiferDAO(serviceIdentifier
+							.getIdentifier().toString(),
+							serviceIdentifier.getServiceInstanceIdentifier()));
+			Object obj = session.load(ServiceSharedInCISDAO.class,
+					tmpSharedInCIS.getId());
+			session.delete(obj);
+			t.commit();
+
+		} catch (Exception e) {
+			t.rollback();
+			throw new ServiceSharingNotificationException(e);
+		} finally {
+
+			session.close();
+		}
 	}
 
 	/*
@@ -288,6 +360,24 @@ public class ServiceRegistry implements IServiceRegistry {
 		return tmpService;
 
 	}
+	
+	@Override
+	public boolean changeStatusOfService (ServiceResourceIdentifier serviceIdentifier,ServiceStatus serviceStatus) throws ServiceNotFoundException{
+		Session session=sessionFactory.openSession();
+		Transaction t=session.beginTransaction();
+		try {
+			RegistryEntry tmpRegistryEntry=(RegistryEntry)session.get(RegistryEntry.class, new ServiceResourceIdentiferDAO(serviceIdentifier.getIdentifier().toString(),serviceIdentifier.getServiceInstanceIdentifier()));
+		tmpRegistryEntry.setServiceStatus(serviceStatus.toString());
+		session.update(tmpRegistryEntry);
+		t.commit();
+		} catch (Exception e) {
+			t.rollback();
+			new ServiceNotFoundException(e);
+		}finally{
+			session.close();
+		}
+		return true;
+	}
 
 	public SessionFactory getSessionFactory() {
 		return sessionFactory;
@@ -307,4 +397,9 @@ public class ServiceRegistry implements IServiceRegistry {
 		}
 		return returnedServiceList;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry#changeStatusOfService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, org.societies.api.schema.servicelifecycle.model.ServiceStatus)
+	 */
+	
 }

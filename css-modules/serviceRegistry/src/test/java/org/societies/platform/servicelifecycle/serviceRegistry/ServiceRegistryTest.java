@@ -118,6 +118,51 @@ public class ServiceRegistryTest extends
 	
 
 	@Test
+	@Rollback(false)
+	public void changeServcieStatus() throws Exception{
+		boolean isOk=serReg.changeStatusOfService(servicesList.get(0).getServiceIdentifier(), ServiceStatus.STOPPED);
+		assert(isOk);
+		Service service=serReg.retrieveService(servicesList.get(0).getServiceIdentifier());
+		assert(service.getServiceStatus().equals(ServiceStatus.STOPPED));
+		
+	}
+	
+	
+	@Test
+	@Rollback(false)
+	public void notifyServiceSharedCIS() throws Exception{
+		for (Service service : servicesList) {
+			serReg.notifyServiceIsSharedInCIS(service.getServiceIdentifier(), "CISid");
+			serReg.notifyServiceIsSharedInCIS(service.getServiceIdentifier(), "CISid1");
+		}
+	}
+	
+	@Test
+	@Rollback(false)
+	public void removeNotifyServiceSharedCIS() throws Exception{
+		
+			for (Service service : servicesList) {
+				serReg.removeServiceSharingInCIS(service.getServiceIdentifier(), "CISid1");
+				
+			}
+	}
+	
+	@Test
+	@Rollback(false)
+	public void retrieveServicesSharedCIS() throws Exception{
+		List<Service> returnedList=serReg.retrieveServicesSharedByCIS("CISid");
+	}
+	
+	
+	@Test
+	@Rollback(false)
+	public void retrieveServicesSharedCSS() throws Exception{
+		List<Service> returnedServiceList=serReg.retrieveServicesSharedByCSS(servicesList.get(0).getServiceInstance().getFullJid());
+	assert(returnedServiceList.get(0).getServiceName().equals(servicesList.get(0).getServiceName()));
+	}
+	
+	
+	@Test
 	@ExpectedException(ServiceRetrieveException.class)
 	@Rollback(false)
 	public void unregisterService() throws ServiceRetrieveException {

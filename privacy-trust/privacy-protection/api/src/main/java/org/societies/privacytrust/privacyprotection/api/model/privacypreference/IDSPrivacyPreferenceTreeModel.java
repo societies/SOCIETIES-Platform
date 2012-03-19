@@ -24,12 +24,13 @@
  */
 package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
+
 import java.io.Serializable;
 
 import javax.swing.tree.DefaultTreeModel;
 
 import org.societies.api.identity.IIdentity;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
 
@@ -45,7 +46,7 @@ public class IDSPrivacyPreferenceTreeModel extends DefaultTreeModel implements I
 	
 	private IIdentity affectedDPI;
 	private IIdentity serviceDPI;
-	private IServiceResourceIdentifier serviceID;
+	private ServiceResourceIdentifier serviceID;
 	private PrivacyPreferenceTypeConstants myPrivacyType;
 	private IPrivacyPreference pref;
 	
@@ -84,12 +85,12 @@ public class IDSPrivacyPreferenceTreeModel extends DefaultTreeModel implements I
 	}
 
 
-	public void setServiceID(IServiceResourceIdentifier serviceID) {
+	public void setServiceID(ServiceResourceIdentifier serviceID) {
 		this.serviceID = serviceID;
 	}
 
 
-	public IServiceResourceIdentifier getServiceID() {
+	public ServiceResourceIdentifier getServiceID() {
 		return serviceID;
 	}
 

@@ -44,7 +44,16 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 //import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.internal.cis.management.ICisManager;
-import org.societies.api.internal.cis.management.CisRecord;
+import org.societies.api.internal.cis.management.ICisRecord;
+
+//import org.societies.api.cis.management.ICisRecord;
+//import org.societies.api.cis.management.ICisManager;
+//import org.societies.api.cis.management.ICisOwned;
+//import org.societies.api.cis.management.ICisSubscribed;
+//import org.societies.api.cis.management.ICisEditor;
+//import org.societies.api.cis.management.ICisActivity;
+//import org.societies.api.cis.management.ICisActivityFeed;
+//import org.societies.api.cis.management.ICis;
 
 /**
  * This is the test class for the Suggested Community Analyser component
@@ -70,7 +79,7 @@ public class SuggestedCommunityAnalyserTest {
 		//CisRecord jamesCisRecord = cisManager.createCis("James", "James CIS");
 		
     	suggestedCommunityAnalyser = new SuggestedCommunityAnalyser(ownerId, "CSS");
-		HashMap<String, ArrayList<CisRecord>> recommendations = new HashMap<String, ArrayList<CisRecord>>();
+		HashMap<String, ArrayList<ICisRecord>> recommendations = new HashMap<String, ArrayList<ICisRecord>>();
 		suggestedCommunityAnalyser.analyseEgocentricRecommendations(recommendations);
 		
 		//James should have been suggested to leave the CIS.

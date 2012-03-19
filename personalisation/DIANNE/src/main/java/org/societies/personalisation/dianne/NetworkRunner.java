@@ -36,7 +36,7 @@ import org.societies.personalisation.dianne.model.OutcomeGroup;
 import org.societies.personalisation.dianne.model.OutcomeNode;
 import org.societies.personalisation.dianne.model.Synapse;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 public class NetworkRunner implements Runnable{
 
@@ -205,7 +205,7 @@ public class NetworkRunner implements Runnable{
 		{
 			IAction nextUpdate = (IAction)outcomeUpdates_it.next();
 
-			IServiceResourceIdentifier serviceId = nextUpdate.getServiceID();
+			ServiceResourceIdentifier serviceId = nextUpdate.getServiceID();
 			String serviceType = nextUpdate.getServiceType();
 			String groupName = nextUpdate.getparameterName();
 			String nodeName = nextUpdate.getvalue();
@@ -258,7 +258,7 @@ public class NetworkRunner implements Runnable{
 		activateOutcomeUpdate(outcomeGroup, newOutcomeNode);
 	}
 
-	public void createNewOutcomeGroup(IServiceResourceIdentifier serviceId, String serviceType, String groupName, String nodeName)
+	public void createNewOutcomeGroup(ServiceResourceIdentifier serviceId, String serviceType, String groupName, String nodeName)
 	{
 		//create new outcome group
 		OutcomeGroup newOutcomeGroup = new OutcomeGroup(serviceId, serviceType, groupName);

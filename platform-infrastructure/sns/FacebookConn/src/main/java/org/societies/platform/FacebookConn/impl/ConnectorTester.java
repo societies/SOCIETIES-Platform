@@ -1,9 +1,8 @@
 package org.societies.platform.FacebookConn.impl;
 
 
-import org.societies.platform.FacebookConn.SocialConnector;
+import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.platform.FacebookConn.FacebookConnector;
-import org.societies.platform.FacebookConn.exeptions.MissingTokenExeptions;
 
 
 
@@ -14,19 +13,14 @@ public class ConnectorTester {
 	 * http://wd.teamlife.it/fbconnector.php that allows to get the access token
 	 */
 	public static void main(String[] args) {
-		String access_token = "AAAFPIhZAkC90BAI6gXREctk3mtdzoSHGAV1ElowxmyEbDWMAnq0zfzsfaLXFGtEt7bUezAZCKaXJFTIpsdblZCG2DUTXY31VAZAxXIprMAZDZD";
-		SocialConnector connector = new FacebookConnectorImpl(access_token,null);
+		String access_token = "AAAFPIhZAkC90BAO1fmJZAxs754pEGhaGQesb9haktJ8JgDOnxsSUo2A9PJOnQa34b2mRUuRXRUS1mhUIJG8RMetAUwZBZBkOBFfo7G0h6wZDZD";
+		ISocialConnector connector = new FacebookConnectorImpl(access_token,null);
 		
-		try {
+		
+		String str = connector.getSocialData(FacebookConnector.ME);
+		System.out.println("FACEBOOK DATA:");
 			
-			
-			String str = connector.getSocialData(FacebookConnector.FEED);
-			System.out.println("FACEBOOK DATA:");
-			
-			System.out.println(str);
-		} catch (MissingTokenExeptions e) {
-			
-		}
+		System.out.println(str);
 		
 		System.out.println("=== END ===");
 

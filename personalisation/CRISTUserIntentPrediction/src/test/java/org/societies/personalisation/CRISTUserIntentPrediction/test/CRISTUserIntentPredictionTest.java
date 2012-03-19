@@ -21,14 +21,14 @@
 package org.societies.personalisation.CRISTUserIntentPrediction.test;
 
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
 import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 
 public class CRISTUserIntentPredictionTest {
 	
 	private ICRISTUserIntentPrediction cristPredictor;
-	Identity myID;
+	IIdentity myID;
 	private CtxAttribute myCtx;
 	IPersonalisationInternalCallback myCallback;
 	

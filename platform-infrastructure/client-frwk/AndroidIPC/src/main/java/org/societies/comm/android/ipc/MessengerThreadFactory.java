@@ -24,12 +24,10 @@
  */
 package org.societies.comm.android.ipc;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Messenger;
+import android.util.Log;
 
 /**
 
@@ -37,7 +35,7 @@ import android.os.Messenger;
  */
 abstract class MessengerThreadFactory {
 	
-	private static Logger log = LoggerFactory.getLogger(MessengerThreadFactory.class);
+	private static final String LOG_TAG = MessengerThreadFactory.class.getName();
 	
 	private Object mutex = new Object();
     private Handler handler;
@@ -69,7 +67,7 @@ abstract class MessengerThreadFactory {
 					}
 					Looper.loop();
 				} catch (Exception e) {
-					log.error(e.getMessage(), e);
+					Log.e(LOG_TAG, e.getMessage(), e);
 				}
     		}
     	}).start();

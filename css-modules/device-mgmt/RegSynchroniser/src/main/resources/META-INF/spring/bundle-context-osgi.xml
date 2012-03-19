@@ -12,19 +12,6 @@
        testing of the bundle outside of an OSGi container -->
        
        
-       <osgi:service ref="RegManager" interface="org.societies.css.devicemgmt.RegSynchroniser.api.IRegManager" />	 
-
-       
-       
-       <!-- <osgi:service ref="DeviceManager">	
-			<osgi:interfaces>
-				<value>org.societies.css.devicemgmt.devicemanager.ControllerWs</value>
-			</osgi:interfaces>
-			<osgi:service-properties>
-				<entry key="service.exported.interfaces" value="*"/>
-				<entry key="org.apache.cxf.ws.httpservice.context" value="/WsController"/>
-				<entry key="org.apache.cxf.ws.address" value="http://localhost:9090/Configurator"/>
-			</osgi:service-properties>
-       </osgi:service> -->
+       <osgi:service ref="RegSynchroniser" interface="org.societies.api.internal.css.devicemgmt.ILocalDevice"></osgi:service> 
 
 </beans>

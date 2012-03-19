@@ -37,7 +37,7 @@ import org.societies.api.internal.css.devicemgmt.IDeviceRegistry;
 
 public class LocalDevices {
 
-	static boolean addDevice(DeviceCommonInfo device, String CSSID) throws Exception {
+	static boolean addDevice(DeviceCommonInfo device, String CSSNodeID) throws Exception {
 		boolean retValue = false;
 
 
@@ -45,7 +45,7 @@ public class LocalDevices {
         
         if (null != deviceRegistry) {
 
-            if (null != deviceRegistry.addDevice(device, CSSID)) 
+            if (null != deviceRegistry.addDevice(device, CSSNodeID)) 
             {
             	
                 retValue = true;
@@ -59,7 +59,7 @@ public class LocalDevices {
 		
 	}
 
-	static boolean removeDevice(DeviceCommonInfo device, String CSSID) throws Exception{
+	static boolean removeDevice(DeviceCommonInfo device, String CSSNodeID) throws Exception{
 		
 		boolean retValue = false;
 		
@@ -67,7 +67,7 @@ public class LocalDevices {
         
         if (null != deviceRegistry) {
 
-            if (!deviceRegistry.deleteDevice(device, CSSID)); 
+            if (!deviceRegistry.deleteDevice(device, CSSNodeID)); 
             {
             	
                 retValue = true;

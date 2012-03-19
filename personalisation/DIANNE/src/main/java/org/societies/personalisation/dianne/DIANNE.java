@@ -33,7 +33,7 @@ import org.societies.personalisation.common.api.management.IPersonalisationInter
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 public class DIANNE implements IDIANNE{
 
@@ -50,7 +50,7 @@ public class DIANNE implements IDIANNE{
 
 	@Override
 	public void getOutcome(IIdentity ownerId,
-			IServiceResourceIdentifier serviceId, 
+			ServiceResourceIdentifier serviceId, 
 			String preferenceName, 
 			IPersonalisationInternalCallback callback) {
 		// TODO Auto-generated method stub

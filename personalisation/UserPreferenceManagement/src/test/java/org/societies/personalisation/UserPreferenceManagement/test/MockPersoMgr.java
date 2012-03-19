@@ -28,7 +28,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IFeedbackEvent;
 import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
 
@@ -43,7 +43,7 @@ public class MockPersoMgr implements IInternalPersonalisationManager{
 
 	@Override
 	public void getIntentAction(IIdentity arg0, IIdentity arg1,
-			IServiceResourceIdentifier arg2, String arg3,
+			ServiceResourceIdentifier arg2, String arg3,
 			IPersonalisationCallback arg4) {
 		// TODO Auto-generated method stub
 		
@@ -51,14 +51,14 @@ public class MockPersoMgr implements IInternalPersonalisationManager{
 
 	@Override
 	public void getPreference(IIdentity arg0, IIdentity arg1, String arg2,
-			IServiceResourceIdentifier arg3, String arg4,
+			ServiceResourceIdentifier arg3, String arg4,
 			IPersonalisationCallback arg5) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void getIntentAction(IIdentity arg0, IServiceResourceIdentifier arg1,
+	public void getIntentAction(IIdentity arg0, ServiceResourceIdentifier arg1,
 			String arg2, IPersonalisationCallback arg3) {
 		// TODO Auto-generated method stub
 		
@@ -66,7 +66,7 @@ public class MockPersoMgr implements IInternalPersonalisationManager{
 
 	@Override
 	public void getPreference(IIdentity arg0, String arg1,
-			IServiceResourceIdentifier arg2, String arg3,
+			ServiceResourceIdentifier arg2, String arg3,
 			IPersonalisationCallback arg4) {
 		// TODO Auto-generated method stub
 		

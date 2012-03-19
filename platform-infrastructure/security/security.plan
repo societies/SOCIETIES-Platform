@@ -6,18 +6,8 @@
 		        http://www.eclipse.org/virgo/schema/plan 
 		        http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
-	<!-- API -->
-	<artifact type="bundle" name="org.societies.api.external.societies-api"/>
-	<artifact type="bundle" name="org.societies.api.internal.societies-api-internal"/>
-	
-	<!-- Communications framework -->
-    <artifact type="bundle" name="org.societies.comm.CommonLibraries"/>
-    <artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
-    <artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubServiceBundle"/>
-	
 	<!-- Security -->
-	<artifact type="bundle" name="org.societies.security.secure-storage"/>
-	<artifact type="bundle" name="org.societies.security.signature-mgr"/>
+	<artifact type="bundle" name="org.societies.security.security-services"/>
 	<artifact type="bundle" name="org.societies.security.policynegotiator"/>
 	<artifact type="bundle" name="org.societies.security.commsmgr"/>
 

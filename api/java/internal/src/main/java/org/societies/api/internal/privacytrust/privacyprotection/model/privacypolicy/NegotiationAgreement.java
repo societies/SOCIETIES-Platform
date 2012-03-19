@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.api.identity.IIdentity;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
  * The NegotiationAgreement class represents the agreement reached between the user and the service provider. 
@@ -45,7 +45,7 @@ import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 public class NegotiationAgreement implements IAgreement, Serializable {
 
 	private List<RequestItem> items;
-	private IServiceResourceIdentifier serviceID;
+	private ServiceResourceIdentifier serviceID;
 	private IIdentity serviceDPI;
 	private IIdentity userDPI;
 	private IIdentity userPublicDPI;
@@ -70,7 +70,7 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#getServiceIdentifier()
 	 */
 	@Override
-	public IServiceResourceIdentifier getServiceIdentifier() {
+	public ServiceResourceIdentifier getServiceIdentifier() {
 		
 		return this.serviceID;
 	}
@@ -115,10 +115,10 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#setServiceIdentifier(org.personalsmartspace.sre.api.pss3p.IServiceResourceIdentifier)
+	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#setServiceIdentifier(org.personalsmartspace.sre.api.pss3p.ServiceResourceIdentifier)
 	 */
 	@Override
-	public void setServiceIdentifier(IServiceResourceIdentifier serviceId) {
+	public void setServiceIdentifier(ServiceResourceIdentifier serviceId) {
 		this.serviceID = serviceId;
 		
 	}

@@ -30,7 +30,7 @@ package org.societies.personalisation.CAUI.api.model;
  * @author <a href="mailto:nikoskal@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
  * @version 0.0.1
  */
-public interface ICommunityIntentTask extends IUserIntentTask {
+public interface ICommunityIntentTask  {
 
 	
 	/**

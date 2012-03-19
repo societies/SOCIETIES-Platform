@@ -59,7 +59,8 @@
 
 		<!-- Personalisation -->
 
-		<module>../personalisation</module>
+
+		<!-- <module>../personalisation</module> TEMPORARILY REMOVED until refactoring of ServiceResourceIdentifier finishes -->
 
 
 		<!-- Platform Infrastructure -->
@@ -82,17 +83,20 @@
 			<module>../platform-infrastructure/comms-frwk/ExampleServices/FortuneCookieBean</module> 
 			<module>../platform-infrastructure/comms-frwk/ExampleServices/ExampleServiceMgr</module> -->
 		<!-- Service Registry -->
+
 		<module>../css-modules/serviceRegistry</module>
+
 		<module>../platform-infrastructure/service-lifecycle/service-mgmt/
 		</module>
-		<module>../platform-infrastructure/service-lifecycle/platform-webapp/
-		</module>
-		<module>../platform-infrastructure/service-lifecycle/sl-comms-mgr/
-		</module>
+     	<!--<module>../platform-infrastructure/service-lifecycle/platform-webapp/
+		</module>-->
 
 		<!-- <module>../platform-infrastructure/comms-frwk/ClientCommunicationMgr</module> -->
 
 		<!-- Security and Dependability Mgmt -->
+		<module>../platform-infrastructure/security/SecurityServices</module>
+		<module>../platform-infrastructure/security/PolicyNegotiator</module>
+		<module>../platform-infrastructure/security/SecurityCommsMgr</module>
 
 		<!-- CSS Mgmt -->
 
@@ -101,12 +105,12 @@
 		<module>../css-modules/css-mgmt/TestccsCommsMgmt</module>
 
 		<!-- CIS Mgmt -->
+		
 		<module>../cis-modules/cis-management/cis-manager/cis-manager/
 		</module>
 		<module>../cis-modules/cis-discovery/</module>
 		<module>../cis-modules/cis-collaboration/</module>
-		<module>../cis-modules/cis-management/CommunityXEP</module>
-		<module>../cis-modules/cis-management/cis-comm-manager/</module>
+
 		<!-- <module>../cis-modules/cis-management/CommunityXEP</module> <module>../cis-modules/cis-management/CommunityServiceBundle</module> -->
 
 
@@ -114,6 +118,8 @@
 		<module>../css-modules/device-mgmt/devicemanager/</module>
 		<module>../css-modules/device-mgmt/DeviceRegistry/</module>
 		<module>../css-modules/device-mgmt/RegSynchroniser/</module>
+		<module>../css-modules/device-mgmt/DeviceCommsMgr/</module>
+
 	
 		<!-- Intelligent Community Orchestration -->
 
@@ -121,8 +127,8 @@
 		</module>
 		<module>../intelligent-community-orchestration/CommunityLifecycleManagement
 		</module>
-		<!--<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser
-		</module>-->
+		<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser
+		</module>
 
 		<!-- Context Management -->
 

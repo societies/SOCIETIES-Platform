@@ -35,26 +35,29 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.societies.api.cis.management.ICisEditor;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisRecord;
+
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
-import org.societies.api.internal.cis.management.CisActivityFeed;
-import org.societies.api.internal.cis.management.CisRecord;
-import org.societies.api.internal.cis.management.ICisManager;
+import org.societies.api.identity.IIdentityManager;
+
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.cis.manager.CisEditor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import org.societies.identity.IdentityImpl;
-import org.societies.manager.Community;
-import org.societies.manager.Create;
-import org.societies.manager.Communities;
+import org.societies.api.schema.cis.manager.Community;
+import org.societies.api.schema.cis.manager.Communities;
+import org.societies.api.schema.cis.manager.Create;
+
+
 
 // this is the class which manages all the CIS from a CSS
 // for the class responsible for editing and managing each CIS instance, consult the CISEditor
@@ -66,15 +69,16 @@ import org.societies.manager.Communities;
 public class CisManager implements ICisManager, IFeatureServer{
 
 	public Set<CisEditor> CISs; 
-	private ICISCommunicationMgrFactory ccmFactory;
-	private IIdentity cisManagerId;
-	private ICommManager CSSendpoint;
-	private ICommManager CISMgmtendpoint;
+	ICISCommunicationMgrFactory ccmFactory;
+	//IIdentity cisManagerId;
+	ICommManager CSSendpoint;
+	//IIdentity cssManagerId;
+	//ICommManager CISMgmtendpoint;
 	
 	private final static List<String> NAMESPACES = Collections
-			.singletonList("http://societies.org/manager");
+			.singletonList("http://societies.org/api/schema/cis/manager");
 	private final static List<String> PACKAGES = Collections
-			.singletonList("org.societies.manager");
+			.singletonList("org.societies.api.schema.cis.manager");
 	
 
 	private static Logger LOG = LoggerFactory
@@ -82,53 +86,23 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 	@Autowired
 	public CisManager(ICISCommunicationMgrFactory ccmFactory,ICommManager CSSendpoint) {
-		this.ccmFactory = ccmFactory;
 		this.CSSendpoint = CSSendpoint;
 		this.ccmFactory = ccmFactory;
-		String host= "thomas.local";
-		String subDomain= "CISCommManager";
-		String secretKey= "password.thomas.local";
+
 		
-		LOG.info("factory bundled");
-		
-		cisManagerId = new IdentityImpl(IdentityType.CIS, subDomain, host); 
-		
-		CISMgmtendpoint = ccmFactory.getNewCommManager(cisManagerId, secretKey);
-		
-		
-		LOG.info("CIS Management endpoint created");
-		
-		
-		try {
-			CISMgmtendpoint.register(this);
-		} catch (CommunicationException e) {
-			e.printStackTrace();
-		} // TODO unregister??
-		
-		LOG.info("listener registered");
-		
-		
-		
-		CISs = new HashSet<CisEditor>();
-		
-	//	CisEditor cEditor1 = new CisEditor(CSSendpoint.getIdManager().getThisNetworkNode().getJid(),
-	//			"cis1","thomas.local","","","cis1.password.thomas.local",ccmFactory);
-		
-	//	CISs.add(cEditor1);
-		
+
+			try {
+				CSSendpoint.register(this);
+			} catch (CommunicationException e) {
+				e.printStackTrace();
+			} // TODO unregister??
+			
+			LOG.info("listener registered");
+
+			CISs = new HashSet<CisEditor>();			
+
 	}
 
-
-
-	/**
-	 * @deprecated  Replaced by constructor which inherits the ComManager Factory and the IcommManager of the CSS
-	 */
-	
-	@Deprecated
-	public CisManager() {
-		CISs = new HashSet<CisEditor>();
-	}
-	
 	/**
 	 * Create a CIS Editor with default settings and returns a CIS Record 
 	 * This function should generate automatically the jid for the CIS and the pwd
@@ -139,29 +113,63 @@ public class CisManager implements ICisManager, IFeatureServer{
 	 * @return      CisRecord
 	 * 
 	 */
-	
-	@Override
 	public CisRecord createCis(String creatorCssId, String cisname) {
 		// TODO: create and identity for the CIS and map it in the database with the cisname
-		// cisId = randon unused JID;
+		// cisName = randon unused JID;
 		// cisId_pwd = random password;
 		String cisId = "cis1";
-		String host = this.cisManagerId.getDomain();
+		String host = this.CSSendpoint.getIdManager().getThisNetworkNode().getDomain();
 		String password = "password.thomas.local";
-		
-		
+
 		return this.createCis(creatorCssId, cisId, host, password);
 	}
 	
 	
+	/**
+	 * Create a new CIS for the CSS represented by cssId. Password is needed and is the
+	 * same as the CSS password.
+	 * After this method is called a CIS is created with mode set to mode.
+	 * 
+	 * The CSS who creates the CIS will be the owner. Ownership can be changed
+	 * later.
+	 * 
+	 * TODO: define what values mode can have and what each means.
+	 * TODO: change the type from String to proper type when CSS ID datatype is defined.
+	 *  
+	 * @param cssId and cssPassword are to recognise the user
+	 * @param cisName is user given name for the CIS, e.g. "Footbal".
+	 * @param cisType E.g. "disaster"
+	 * @param mode membership type, e.g 1= read-only.
+	 * TODO define mode better.
+	 * @return link to the {@link ICisEditor} representing the new CIS, or 
+	 * null if the CIS was not created.
+	 */
+	
+	
+	@Override
+	public ICisEditor createCis(String cssId, String cssPassword, String cisName, String cisType, int mode) {
+		// TODO: how do we check fo the cssID/pwd?
+		if(!cssId.equals(this.CSSendpoint.getIdManager().getThisNetworkNode().getJid())){ // if the cssID does not match with the host owner
+			LOG.info("cssID does not match with the host owner");
+			return null;
+		}
+		// TODO: review this logic as maybe I should probably check if it exists before creating
+		CisEditor cis = new  CisEditor(cssId, cisName, cisType, mode,this.ccmFactory);		
+		if (CISs.add(cis))
+			return cis;
+		else
+			return null;
+		
+	}
+
 	
 	/**
 	 * Create a CIS Editor with default settings and returns a CIS Record 
 	 * Function to be called from the XMPP or to be used by the 
-	 *  public method CisRecord createCis(String creatorCssId, String cisId) 
+	 *  public method CisRecord createCis(String creatorCssId, String cisName) 
 	 * 
 	 * @param  creatorCssId  bareJid of the user creating the CIS
-	 * @param  cisId 		 jid to be given to the CIS
+	 * @param  cisName 		 jid to be given to the CIS
 	 * @param  host 		 jid to be given to the CIS
 	 * @password  host 		 jid to be given to the CIS
 	 * @return      CisRecord
@@ -172,7 +180,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 		//TODO: check if 
 		// cIs already exist in the database or if this is a new CIS
 		CisEditor cis = new  CisEditor(creatorCssId,
-				cisId,host,"","",password,this.ccmFactory);
+				cisId,host,0,"",password,this.ccmFactory);
 		if (CISs.add(cis))
 			return cis.getCisRecord();
 		else
@@ -180,33 +188,6 @@ public class CisManager implements ICisManager, IFeatureServer{
 	}
 
 
-	@Override
-	public Boolean deleteCis(String cssId, String cisId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Boolean updateCis(String cssId, CisRecord newCis, String oldCisId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CisRecord getCis(String cssId, String cisId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
-	
-	@Override
-	public CisRecord[] getCisList(CisRecord query) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
 	public List<CisRecord> getCisList() {
 		
 		List<CisRecord> l = new ArrayList<CisRecord>();
@@ -218,28 +199,14 @@ public class CisManager implements ICisManager, IFeatureServer{
 			 l.add(element.getCisRecord());
 			 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 	     }
-			
 		
 		return l;
 	}
-	
-	
-	@Override
-	public CisActivityFeed getActivityFeed(String cssId, String cisId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
 
 	@Override
 	public List<String> getJavaPackages() {
-		
 		return  PACKAGES;
-
 	}
-
-
 
 	@Override
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
@@ -262,16 +229,28 @@ public class CisManager implements ICisManager, IFeatureServer{
 				String ownerJid = create.getOwnerJid();
 				String cisJid = create.getCommunityJid();
 				String cisPassword = create.getCommunityPassword();
-				
+				String ownerPassword = create.getOwnerPassword();
+				String cisType = create.getCommunityType();
+				String cisName = create.getCommunityName();
+				int cisMode = create.getMembershipMode().intValue();
+				LOG.info("CIS to be created with " + ownerJid + " " + cisJid + " "+ cisPassword + " ");
 				if(cisPassword != null && ownerJid != null && cisJid != null ){
 					CisRecord cisR = this.createCis(ownerJid,
-							cisJid,this.cisManagerId.getDomain(), cisPassword);
+							cisJid,this.CSSendpoint.getIdManager().getThisNetworkNode().getDomain(), cisPassword);
 					
 					LOG.info("CIS Created!!");
 					return create;
 					
 				}
 				else{
+					if(ownerJid != null && ownerPassword != null && cisType != null && cisName != null){
+						ICisEditor icis = createCis(ownerJid, ownerPassword, cisName, cisType, cisMode);
+						
+						create.setCommunityJid(icis.getCisId());
+						LOG.info("CIS with self assigned ID Created!!");
+						return create;  
+					}
+					
 					LOG.info("missing parameter on the create");
 					// if one of those parameters did not come, we should return an error
 					return create;
@@ -290,7 +269,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 				while(it.hasNext()){
 					CisRecord element = it.next();
 					Community community = new Community();
-					community.setCommunityJid(element.getFullJid());
+					community.setCommunityJid(element.getCisJID());
 					com.getCommunity().add(community);
 					 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 			     }
@@ -330,6 +309,43 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 	@Override
 	public Object setQuery(Stanza arg0, Object arg1) throws XMPPError {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public Boolean deleteCis(String arg0, String arg1, String arg2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public ICisRecord[] getCisList(ICisRecord arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public Boolean requestNewCisOwner(String arg0, String arg1, String arg2,
+			String arg3) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+
+
+
+
+	@Override
+	public ICisRecord getCis(String arg0, String arg1) {
 		// TODO Auto-generated method stub
 		return null;
 	}

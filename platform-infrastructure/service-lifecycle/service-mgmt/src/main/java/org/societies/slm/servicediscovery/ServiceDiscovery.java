@@ -134,16 +134,27 @@ public class ServiceDiscovery implements IServiceDiscovery {
 
 		try
 		{
+			//Object filter = "*.*"; //placeholder for a filter to all
+			Service filter=new Service();
+			
 			switch (node.getType())
 			{
 			case CSS:
 			case CSS_RICH:
 			case CSS_LIGHT:
-				serviceList = getServiceReg().retrieveServicesSharedByCSS(node.getJid());
+				//serviceList = getServiceReg().retrieveServicesSharedByCSS(node.getJid());
+				//TODO : Temporary measure until retrieveServicesSharedByCSS implemented
+				
+				 serviceList= getServiceReg().findServices(filter);
+				
 				break;
 			case CIS:
 
-				serviceList = getServiceReg().retrieveServicesSharedByCIS(node.getJid());
+				//serviceList = getServiceReg().retrieveServicesSharedByCIS(node.getJid());
+				//TODO : Temporary measure until retrieveServicesSharedByCIS implemented
+
+				serviceList= getServiceReg().findServices(filter);
+				
 				break;
 
 			default: 

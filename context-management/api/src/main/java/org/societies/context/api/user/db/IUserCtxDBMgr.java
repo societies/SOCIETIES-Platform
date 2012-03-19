@@ -27,20 +27,21 @@ package org.societies.context.api.user.db;
 import java.io.Serializable;
 import java.util.List;
 
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.IndividualCtxEntity;
-import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 
-
 /**
- * @author <a href="mailto:nikosk@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
  */
 public interface IUserCtxDBMgr {
 
@@ -48,21 +49,17 @@ public interface IUserCtxDBMgr {
 	 * Creates a Context Association
 	 * 
 	 * @param type
-	 * @param callback
-	 * @since 0.0.1
 	 */
-	public CtxAssociation createAssociation(String type);
+	public CtxAssociation createAssociation(String type) throws CtxException;
 
 	/**
 	 * Creates a Context Attribute
 	 * 
-	 * @param source
+	 * @param scope
 	 * @param enum
 	 * @param type
-	 * @param callback
-	 * @since 0.0.1
 	 */
-	public CtxAttribute createAttribute(CtxEntityIdentifier source, CtxAttributeValueType enumeration, String type);
+	public CtxAttribute createAttribute(CtxEntityIdentifier scope, CtxAttributeValueType enumeration, String type) throws CtxException;
 
 	/**
 	 * Creates a Context Entity of a generic type. The created <code>CtxEntity</code> 
@@ -73,12 +70,9 @@ public interface IUserCtxDBMgr {
 	 * the age, and the location of a person are described by different context attributes.
 	 * Relations that may exist among different entities are described by the {@link CtxAssociation} class.
 	 * 
-	 * 
 	 * @param type
-	 * @param callback
-	 * @since 0.0.1
 	 */
-	public CtxEntity createEntity(String type);
+	public CtxEntity createEntity(String type) throws CtxException;
 
 	/**
 	 * Creates an individual Context Entity that is possible to join or to form a community. 
@@ -89,103 +83,47 @@ public interface IUserCtxDBMgr {
 	 * infrastructures, autonomous or semi-autonomous agents, etc.
 	 *  
 	 * @param type
-	 * @param callback
-	 * @since 0.0.1
 	 */
-	public CtxEntity createIndividualCtxEntity(String type);
-	
+	public IndividualCtxEntity createIndividualCtxEntity(String type) throws CtxException;
 	
 	/**
-	 * Looks up for a list of CtxModelObjects defined by the <code>CtxModelType (CtxEntity,
-	 * CtxAttribute, CtxAssociation)</code> of  the specified type.
+	 * Looks up CtxModelObjects, i.e. CtxEntities, CtxAttributes, or
+	 * CtxAssociations, of the specified type.
 	 * 
 	 * @param modelType
 	 * @param type
-	 * @param callback
-	 * @since 0.0.1
 	 */
-	public List<CtxIdentifier> lookup(CtxModelType modelType, String type);
+	public List<CtxIdentifier> lookup(CtxModelType modelType, String type) throws CtxException;
 
 	/**
-	 * Looks up for a list of CtxEntities of  the specified type, containing the
-	 * specified attributes
+	 * Looks up CtxEntities of the specified type, containing the specified
+	 * attributes
 	 * 
 	 * @param entityType
 	 * @param attribType
 	 * @param minAttribValue
 	 * @param maxAttribValue
-	 * @param callback
-	 * @since 0.0.1
 	 */
-	public List<CtxEntityIdentifier> lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue);
-
-	/**
-	 * Registers the specified EventListener for value modification events of context
-	 * attribute(s) with the supplied scope and type.
-	 * 
-	 * @param scope
-	 * @param attrType
-	 * @param callback
-	 * @since 0.0.1
-	 */
-	public void registerForUpdates(CtxEntityIdentifier scope, String attrType);
-
-	/**
-	 * Registers the specified EventListener for value modification events of the
-	 * specified context attribute.
-	 * 
-	 * @param attrId
-	 * @param callback
-	 * @since 0.0.1
-	 */
-	public void registerForUpdates(CtxAttributeIdentifier attrId);
+	public List<CtxEntityIdentifier> lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue) throws CtxException;
 
 	/**
 	 * Removes the specified context model object.
 	 * 
 	 * @param identifier
-	 * @param callback
-	 * @since 0.0.1
 	 */
-	public CtxModelObject remove(CtxIdentifier identifier);
+	public CtxModelObject remove(CtxIdentifier identifier) throws CtxException;
 
 	/**
 	 * Retrieves the specified context model object.
 	 * 
 	 * @param identifier
-	 * @param callback
-	 * @since 0.0.1
 	 */
-	public CtxModelObject retrieve(CtxIdentifier identifier);
-
-	/**
-	 * Registers the specified EventListener for value modification events of the
-	 * specified context attribute.
-	 * 
-	 * @param attrId
-	 * @param callback
-	 * @since 0.0.1
-	 */
-	public void unregisterForUpdates(CtxAttributeIdentifier attrId);
-
-	/**
-	 * Unregisters the specified EventListener for value modification events of
-	 * context attribute(s) with the supplied scope and type.
-	 * 
-	 * @param scope
-	 * @param attributeType
-	 * @param callback
-	 * @since 0.0.1
-	 */
-	public void unregisterForUpdates(CtxEntityIdentifier scope, String attributeType);
+	public CtxModelObject retrieve(CtxIdentifier identifier) throws CtxException;
 
 	/**
 	 * Updates a single context model object.
 	 * 
-	 * @param identifier
-	 * @param callback
-	 * @since 0.0.1
+	 * @param modelObject
 	 */
-	public CtxModelObject update(CtxModelObject identifier);
-	
+	public CtxModelObject update(CtxModelObject modelObject) throws CtxException;
 }
