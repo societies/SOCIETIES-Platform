@@ -5,7 +5,7 @@ import java.util.List;
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
-import org.societies.platform.FacebookConn.SocialConnector;
+import org.societies.api.internal.sns.ISocialConnector;
 
 public interface SocialData {
 
@@ -15,7 +15,7 @@ public interface SocialData {
      * @param socialConnector Interface of the specific connector
      * @throws Exception 
      */
-    void addSocialConnector(SocialConnector socialConnector) throws Exception;
+    void addSocialConnector(ISocialConnector socialConnector) throws Exception;
     
     /**
      * Remove a social connector by his unique ID
@@ -28,7 +28,7 @@ public interface SocialData {
      * Provide a list of the available social connector
      * @return List of Social Connector
      */
-    List<SocialConnector> getSocialConnectors();
+    List<ISocialConnector> getSocialConnectors();
     
     /**
      * Provide the list of Profiles coming from different social Networks
@@ -71,5 +71,5 @@ public interface SocialData {
      * @param connector Connetor instance
      * @return boolean
      */
-    boolean isAvailable(SocialConnector connector);
+    boolean isAvailable(ISocialConnector connector);
 }

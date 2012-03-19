@@ -3,6 +3,8 @@ package org.societies.platform.socialdata.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.shindig.protocol.model.ExtendableBean;
+import org.apache.shindig.protocol.model.ExtendableBeanImpl;
 import org.apache.shindig.social.core.model.ActivityEntryImpl;
 import org.apache.shindig.social.core.model.ActivityObjectImpl;
 import org.apache.shindig.social.core.model.MediaLinkImpl;
@@ -31,6 +33,7 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 	private static final String CREATED_TIME 		= "created_time";
 	private static final String LINK 				= "link";
 	private static final String APPLICATION 		= "application";
+	private static final String ACTIONLINKS 		= "actionLinks";
 	
 	
 	String		imageUrl   	 = "https://graph.facebook.com/FBID/picture?type=normal&access_token=";      
@@ -55,6 +58,17 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 				entry.setUpdated(elm.getString(UPDATED_TIME));
 				entry.setPublished(elm.getString(CREATED_TIME));
 				
+			
+				ArrayList<ActionLink> actionLinks = new ArrayList<ActionLink>();
+				
+				
+				ExtendableBean actionlinksEB= new ExtendableBeanImpl();
+				actionlinksEB.put(ACTIONLINKS, actionLinks);
+				
+				
+				entry.setOpenSocial(actionlinksEB);
+				
+			
 				
 				
 				if (elm.has(LINK)) 	entry.setUrl(elm.getString(LINK));
