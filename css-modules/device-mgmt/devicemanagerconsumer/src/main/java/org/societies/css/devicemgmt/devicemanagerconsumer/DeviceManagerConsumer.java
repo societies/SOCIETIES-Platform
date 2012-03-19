@@ -26,10 +26,10 @@ public class DeviceManagerConsumer implements EventHandler{
 	
 	//private EventStream myStream;
 	
-	private Long lightLevel = new Long(0); 
+	private Double lightLevel = new Double(0.0); 
 	
 	//TODO For Test
-	private Long ll = new Long(0);
+	private Double ll = new Double(0.0);
 	
 	private HashMap<String, Long> eventResult;
 	
@@ -118,7 +118,7 @@ public class DeviceManagerConsumer implements EventHandler{
 		
 		if (event.getTopic().equals("LightSensorEvent"))
 		{
-			ll = (Long)event.getProperty("lightLevel");
+			ll = (Double)event.getProperty("lightLevel");
 		}
 		LOG.info("DeviceMgmtConsumer: ***********%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent " + ll);
 	}
