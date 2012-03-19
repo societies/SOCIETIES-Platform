@@ -44,7 +44,9 @@ import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
-import org.societies.api.internal.cis.management.ICisEditor;
+import org.societies.api.cis.management.ICisActivityFeed;
+import org.societies.api.cis.management.ICisEditor;
+import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.cis.manager.CisParticipant.MembershipType;
 import org.societies.identity.IdentityImpl;
@@ -93,7 +95,7 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 	// it expects an existing Pubsubclient in the container in which it will autowire
 	//@Autowired	
 	public CisEditor(String ownerCss, String cisId,String host,
-			String membershipCriteria, String permaLink, String password,ICISCommunicationMgrFactory ccmFactory) {
+			int membershipCriteria, String permaLink, String password,ICISCommunicationMgrFactory ccmFactory) {
 		
 		cisActivityFeed = new CisActivityFeed();
 		sharedServices = new HashSet<IServiceSharingRecord>();
@@ -138,7 +140,55 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 
 	}
 
+	// constructor of a CIS without a pre-determined ID or host
+	public CisEditor(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory) {
+		
+		cisActivityFeed = new CisActivityFeed();
+		sharedServices = new HashSet<IServiceSharingRecord>();
+		membersCss = new HashSet<CisParticipant>();
+		membersCss.add(new CisParticipant(cssOwner,MembershipType.owner));
 
+		LOG.info("CIS editor created");
+		
+		CISendpoint = ccmFactory.getNewCommManager();
+		
+		try {
+		cisIdentity = CISendpoint.getIdManager().getThisNetworkNode();//CISendpoint.getIdManager().fromJid(CISendpoint.getIdManager().getThisNetworkNode().getJid());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+			
+		LOG.info("CIS endpoint created");
+		
+		
+		
+		try {
+			CISendpoint.register(this);
+		} catch (CommunicationException e) {
+			e.printStackTrace();
+		} // TODO unregister??
+		
+		LOG.info("CIS listener registered");
+		
+		
+		// TODO: we have to get a proper identity and pwd for the CIS...
+		cisRecord = new CisRecord(cisActivityFeed,cssOwner, mode, cisIdentity.getJid(), "", membersCss,
+				cisIdentity.getDomain(), sharedServices,cisType,cisName);
+		
+		LOG.info("CIS creating pub sub service");
+		
+//		PubsubServiceRouter psr = new PubsubServiceRouter(CISendpoint);
+
+		
+		LOG.info("CIS pub sub service created");
+		
+		//this.psc = psc;
+		
+		LOG.info("CIS autowired PubSubClient");
+		// TODO: broadcast its creation to other nodes?
+
+	}
+	
 
 	public Set<CisParticipant> getMembersCss() {
 		return membersCss;
@@ -348,6 +398,24 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 
 	@Override
 	public Object setQuery(Stanza arg0, Object arg1) throws XMPPError {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ICisActivityFeed getActivityFeed(String arg0, String arg1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getCisId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Boolean update(String arg0, ICisRecord arg1, String arg2) {
 		// TODO Auto-generated method stub
 		return null;
 	}

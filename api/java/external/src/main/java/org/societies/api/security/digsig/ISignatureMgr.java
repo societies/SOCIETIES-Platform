@@ -37,12 +37,12 @@ public interface ISignatureMgr {
 	 * Digitally sign given XML data and embed the signature in the given XML.
 	 * 
 	 * @param xml The XML String to be signed.
-	 * 
-	 * @param xml The identity to be used for signature.
+	 * @param xmlNodeId Identifier of the XML node to sign (value of attribute "Id")
+	 * @param identity The identity to be used for signature.
 	 * 
 	 * @return XML with embedded signature.
 	 */
-	public String signXml(String xml, String id);
+	public String signXml(String xml, String xmlNodeId, String identity);
 	
 	/**
 	 * Verify all digital signatures embedded in given XML. Verify also if the

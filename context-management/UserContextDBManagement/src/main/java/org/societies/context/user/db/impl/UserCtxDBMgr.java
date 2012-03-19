@@ -25,10 +25,15 @@
 package org.societies.context.user.db.impl;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -41,7 +46,11 @@ import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 
+import org.societies.context.api.event.CtxChangeEventTopic;
+import org.societies.context.api.event.CtxEventScope;
+import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -52,6 +61,13 @@ import org.springframework.stereotype.Service;
  */
 @Service("userCtxDBMgr")
 public class UserCtxDBMgr implements IUserCtxDBMgr {
+	
+	/** The logging facility. */
+	private static final Logger LOG = LoggerFactory.getLogger(UserCtxDBMgr.class);
+	
+	/** The Context Event Mgr. */
+	@Autowired
+	private ICtxEventMgr ctxEventMgr;
 
 	private final Map<CtxIdentifier, CtxModelObject> modelObjects;
 
@@ -64,19 +80,23 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		this.privateId = null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#createAssociation(java.lang.String)
+	 */
 	@Override
-	public CtxAssociation createAssociation(String arg0) {
+	public CtxAssociation createAssociation(String type) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
 	/*
 	 * (non-Javadoc)
-	 * @see org.societies.api.internal.context.user.db.IUserCtxDBMgr#createAttribute(org.societies.api.context.model.CtxEntityIdentifier, org.societies.api.context.model.CtxAttributeValueType, java.lang.String, org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback)
+	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#createAttribute(org.societies.api.context.model.CtxEntityIdentifier, org.societies.api.context.model.CtxAttributeValueType, java.lang.String)
 	 */
 	@Override
 	public CtxAttribute createAttribute(CtxEntityIdentifier scope,
-			CtxAttributeValueType valueType, String type) {
+			CtxAttributeValueType valueType, String type) throws CtxException {
 		
 		if (scope == null)
 			throw new NullPointerException("scope can't be null");
@@ -94,103 +114,117 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 
 		this.modelObjects.put(attribute.getId(), attribute);
 		entity.addAttribute(attribute);
-		// AGAIN?? modelObjects.put(entity.getId(), entity);
-//		callback.ctxAttributeCreated(attribute);
+		
+		if (this.ctxEventMgr != null) {
+			this.ctxEventMgr.post(new CtxChangeEvent(attribute.getId()), 
+					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.LOCAL);
+		} else {
+			LOG.warn("Could not send context change event to topics '" 
+					+ CtxChangeEventTopic.CREATED 
+					+ "' with scope '" + CtxEventScope.LOCAL + "': "
+					+ "ICtxEventMgr service is not available");
+		}
+
 		return attribute;
 	}
 
-	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#createEntity(java.lang.String)
+	 */
 	@Override
-	public CtxEntity createEntity(String type) {
+	public CtxEntity createEntity(String type) throws CtxException {
 
 		final CtxEntityIdentifier identifier = new CtxEntityIdentifier(this.privateId, 
 				type, CtxModelObjectNumberGenerator.getNextValue());
 		final CtxEntity entity = new  CtxEntity(identifier);
 		this.modelObjects.put(entity.getId(), entity);		
 
-//		callback.ctxEntityCreated(entity);
+		if (this.ctxEventMgr != null) {
+			this.ctxEventMgr.post(new CtxChangeEvent(entity.getId()), 
+					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.LOCAL);
+		} else {
+			LOG.warn("Could not send context change event to topics '" 
+					+ CtxChangeEventTopic.CREATED 
+					+ "' with scope '" + CtxEventScope.LOCAL + "': "
+					+ "ICtxEventMgr service is not available");
+		}
+		
 		return entity;
 	}
-
-
-	@Override
-	public List<CtxIdentifier> lookup(CtxModelType arg0, String arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<CtxEntityIdentifier> lookupEntities(String arg0, String arg1, Serializable arg2,
-			Serializable arg3) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void registerForUpdates(CtxAttributeIdentifier arg0) {
-		// TODO Auto-generated method stub
-	}
-
 	
-	@Override
-	public void registerForUpdates(CtxEntityIdentifier scope, String attributeType) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public CtxModelObject remove(CtxIdentifier arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	/*
 	 * (non-Javadoc)
-	 * @see org.societies.api.internal.context.user.db.IUserCtxDBMgr#retrieve(org.societies.api.context.model.CtxIdentifier, org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback)
+	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#createIndividualCtxEntity(java.lang.String)
 	 */
 	@Override
-	public CtxModelObject retrieve(CtxIdentifier id) {
-//		callback.ctxModelObjectRetrieved(this.modelObjects.get(id));
-		return this.modelObjects.get(id);
-	}
-
-	public CtxModelObject retrieveSynch(CtxIdentifier id) {
-		return this.modelObjects.get(id);
-	}
-
-	@Override
-	public void unregisterForUpdates(CtxAttributeIdentifier arg0) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void unregisterForUpdates(CtxEntityIdentifier arg0, String arg1) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public CtxModelObject update(CtxModelObject modelObject) {
-
-		if (this.modelObjects.containsValue(modelObject)) {
-			this.modelObjects.put(modelObject.getId(), modelObject);
-			
-//			callback.ctxModelObjectUpdated(modelObject);
-		}
-		return modelObject;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.context.user.db.IUserCtxDBMgr#createIndividualCtxEntity(java.lang.String, org.societies.api.internal.context.user.db.IUserCtxDBMgrCallback)
-	 */
-	@Override
-	public IndividualCtxEntity createIndividualCtxEntity(String type)  {
+	public IndividualCtxEntity createIndividualCtxEntity(String type) throws CtxException {
 
 		CtxEntityIdentifier identifier = new CtxEntityIdentifier(this.privateId,
 				type, CtxModelObjectNumberGenerator.getNextValue());
 		IndividualCtxEntity entity = new IndividualCtxEntity(identifier);
 		this.modelObjects.put(entity.getId(), entity);
 
-//		callback.ctxIndividualCtxEntityCreated(entity);
+		if (this.ctxEventMgr != null) {
+			this.ctxEventMgr.post(new CtxChangeEvent(entity.getId()), 
+					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.LOCAL);
+		} else {
+			LOG.warn("Could not send context change event to topics '" 
+					+ CtxChangeEventTopic.CREATED 
+					+ "' with scope '" + CtxEventScope.LOCAL + "': "
+					+ "ICtxEventMgr service is not available");
+		}
+
 		return entity;
+	}
+
+	@Override
+	public List<CtxIdentifier> lookup(CtxModelType arg0, String arg1) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<CtxEntityIdentifier> lookupEntities(String arg0, String arg1, Serializable arg2,
+			Serializable arg3) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CtxModelObject remove(CtxIdentifier arg0) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#retrieve(org.societies.api.context.model.CtxIdentifier)
+	 */
+	@Override
+	public CtxModelObject retrieve(CtxIdentifier id) throws CtxException {
+
+		return this.modelObjects.get(id);
+	}
+
+	@Override
+	public CtxModelObject update(CtxModelObject modelObject) throws CtxException {
+
+		if (this.modelObjects.keySet().contains(modelObject.getId())) {
+			this.modelObjects.put(modelObject.getId(), modelObject);
+			
+			// TODO CtxChangeEventTopic.MODIFIED should only be used if the model object is actually modified
+			final String[] topics = new String[] { CtxChangeEventTopic.UPDATED, CtxChangeEventTopic.MODIFIED };
+			if (this.ctxEventMgr != null) {
+				this.ctxEventMgr.post(new CtxChangeEvent(modelObject.getId()), 
+						topics, CtxEventScope.LOCAL);
+			} else {
+				LOG.warn("Could not send context change event to topics '" 
+						+ Arrays.toString(topics) 
+						+ "' with scope '" + CtxEventScope.LOCAL 
+						+ "': ICtxEventMgr service is not available");
+			}
+		}
+		return modelObject;
 	}	
 }

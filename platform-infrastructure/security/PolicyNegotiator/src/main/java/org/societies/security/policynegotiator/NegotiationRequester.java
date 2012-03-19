@@ -25,19 +25,19 @@ public class NegotiationRequester implements INegotiationRequester, INegotiation
 	
 	@PostConstruct
 	public void init() {
-		LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "id"));
+		LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "xmlNodeId", "id"));
 		LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
 	}
 	
-	@Override
-	public void onGetPolicyOptions(int sessionId, String sops) {
-		// TODO Auto-generated method stub
-	}
+//	@Override
+//	public void onGetPolicyOptions(int sessionId, String sops) {
+//		// TODO Auto-generated method stub
+//	}
 
-	@Override
-	public void onAcceptPolicyAndGetSla(int sessionId, String policy) {
-		// TODO Auto-generated method stub
-	}
+//	@Override
+//	public void onAcceptPolicyAndGetSla(int sessionId, String policy) {
+//		// TODO Auto-generated method stub
+//	}
 
 	@Override
 	public void acceptUnmodifiedPolicy(int sessionId,
@@ -53,6 +53,14 @@ public class NegotiationRequester implements INegotiationRequester, INegotiation
 	@Override
 	public void acceptModifiedPolicy(int sessionId, Object agreement) {
 		// TODO Auto-generated method stub
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback
+	 * #receiveExamplesResult(java.lang.Object)
+	 */
+	@Override
+	public void receiveResult(Object returnValue) {
 	}
 
 }
