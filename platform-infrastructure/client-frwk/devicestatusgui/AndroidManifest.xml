@@ -33,11 +33,14 @@
 
     <application android:icon="@drawable/icon" android:label="@string/app_name">
         <activity android:label="@string/app_name"
-                  android:configChanges="orientation|keyboardHidden" android:name=".devicestatus.DeviceStatusActivity"> 
+                  android:configChanges="orientation|keyboardHidden" android:name=".devicestatus.MainActivity"> 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:label="@string/app_name"
+                  android:configChanges="orientation|keyboardHidden" android:name=".devicestatus.DeviceStatusActivity"> 
         </activity>
         <service
             android:name=".devicestatus.DeviceStatusServiceDifferentProcess"
