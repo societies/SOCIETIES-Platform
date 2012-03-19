@@ -12,10 +12,6 @@ import org.societies.platform.socialdata.model.PersonConverterFromFacebook;
 
 public class JsonToSocialDataService {
 
-	
-	
-	
-	
 	 /**
 	   * The DB
 	   */
