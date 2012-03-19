@@ -13,7 +13,7 @@
 
 	<!-- groupId is set in parent pom -->
 	<groupId>org.societies.context-management</groupId>
-	<artifactId>context-broker-test</artifactId>
+	<artifactId>context-broker-example</artifactId>
 	<version>${version.cm}</version>
 	<packaging>bundle</packaging>
 
@@ -24,7 +24,19 @@
 			<organization>ICCS</organization>
 			<organizationUrl>http://www.iccs.gr/</organizationUrl>
 			<roles>
-				<role>Senior Developer</role>
+				<role>owner</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+2</timezone>
+		</developer>
+		<developer>
+			<id>NicolasLiampotis</id>
+			<name>Nicolas Liampotis</name>
+			<email>nicolas.liampotis@cn.ntua.gr</email>
+			<organization>ICCS</organization>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
+				<role>developer</role>
 			</roles>
 			<timezone>+2</timezone>
 		</developer>
@@ -50,6 +62,14 @@
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.context</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.beans</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -87,6 +107,6 @@
 
 		</plugins>
 	</build>
-	<description>This bundle allows testing the context broker in an OSGI environment.</description>
-	<name>Context Broker Test</name>
+	<description>This bundle provides examples for using the Internal Context Broker in an OSGi environment.</description>
+	<name>Context Broker Example</name>
 </project>

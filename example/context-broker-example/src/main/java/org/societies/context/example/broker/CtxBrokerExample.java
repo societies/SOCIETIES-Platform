@@ -22,8 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.brokerTest.impl;
-
+package org.societies.context.example.broker;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -33,67 +32,54 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.event.CtxChangeEvent;
+import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.util.SerialisationHelper;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
- * Context Broker Implementation
- * This class provides tests for internal Context Broker in Osgi environment 
- * 
+ * This class provides examples for using the internal Context Broker in OSGi. 
  */
-public class CtxBrokerTest 	{
+@Service
+public class CtxBrokerExample 	{
 
+	/** The logging facility. */
+	private static final Logger LOG = LoggerFactory.getLogger(CtxBrokerExample.class);
+	
+	/** The Internal Context Broker service reference. */
 	private ICtxBroker internalCtxBroker;
 
-	CtxEntityIdentifier ctxEntityIdentifier = null;
-	CtxIdentifier ctxAttributeStringIdentifier = null;
-	CtxIdentifier ctxAttributeBinaryIdentifier = null;
+	private CtxEntityIdentifier ctxEntityIdentifier = null;
+	private CtxIdentifier ctxAttributeStringIdentifier = null;
+	private CtxIdentifier ctxAttributeBinaryIdentifier = null;
 
-	Logger log;
-
-	public CtxBrokerTest() {
-
+	@Autowired(required=true)
+	public CtxBrokerExample(ICtxBroker internalCtxBroker) {
+		
+		LOG.info("CtxBrokerExample instantiated");
+		this.internalCtxBroker = internalCtxBroker;
+		
+		LOG.info("Starting examples...");
+		this.createContext();
+		this.retrieveContext();
+		this.registerForContextChanges();
 	}
 
-	public CtxBrokerTest(ICtxBroker ctxBroker) {
-		this.internalCtxBroker = ctxBroker;
-
-	}
-
-	public ICtxBroker getCtxBroker(){
-		//System.out.println(this.getClass().getName()+" getCtxBroker");
-
-		return this.internalCtxBroker;
-	}
-
-	public void setCtxBroker(ICtxBroker ctxBroker){
-		//System.out.println(this.getClass().getName()+" setCtxBroker");
-		this.internalCtxBroker = ctxBroker;
-
-	}
-
-	public void initialiseCtxBrokerTest(){
-		this.log = LoggerFactory.getLogger(CtxBrokerTest.class);
-		if (this.internalCtxBroker==null){
-			//System.out.println(this.getClass().getName()+"CtxBroker is null");
-			log.info(this.getClass().getName()+"CtxBroker is null");
-		}else{
-			//System.out.println(this.getClass().getName()+"CtxBroker is NOT null");
-			log.info("Start Testing");
-			log.info(this.getClass().getName()+"CtxBroker is NOT null");
-			createContext();
-			retrieveContext();
-		}
-	}
-
-	// At this point a CtxEntity of type "Device" is created with an attribute of type "DeviceID" with a string value "device1234"
+	/**
+	 * At this point a CtxEntity of type "Device" is created with an attribute
+	 * of type "DeviceID" with a string value "device1234".
+	 */
 	private void createContext(){
 
+		LOG.info("*** createContext");
+		
 		//create ctxEntity of type "Device"
 		Future<CtxEntity> futureEnt;
 		try {
@@ -158,10 +144,12 @@ public class CtxBrokerTest 	{
 		}
 	}
 
-
-
-	// This test demonstrates how to retrieve context data from context database
+	/**
+	 * This method demonstrates how to retrieve context data from the context database
+	 */
 	private void retrieveContext() {
+		
+		LOG.info("*** retrieveContext");
 
 		// if the CtxEntityID or CtxAttributeID is known the retrieval is performed by using the ctxBroker.retrieve(CtxIdentifier) method
 		try {
@@ -171,13 +159,13 @@ public class CtxBrokerTest 	{
 			Future<CtxModelObject> ctxEntityRetrievedFuture = this.internalCtxBroker.retrieve(this.ctxEntityIdentifier);
 			CtxEntity retrievedCtxEntity = (CtxEntity) ctxEntityRetrievedFuture.get();
 
-			this.log.info("Retrieved ctxEntity id " +retrievedCtxEntity.getId()+ " of type: "+retrievedCtxEntity.getType());
+			LOG.info("Retrieved ctxEntity id " +retrievedCtxEntity.getId()+ " of type: "+retrievedCtxEntity.getType());
 
 			// retrieve the CtxAttribute contained in the CtxEntity with the string value
 			// again the retrieval is based on an known identifier, it is possible to retrieve it based on type.This will be demonstrated in a later example.
 			Future<CtxModelObject> ctxAttributeRetrievedStringFuture = this.internalCtxBroker.retrieve(this.ctxAttributeStringIdentifier);
 			CtxAttribute retrievedCtxAttribute = (CtxAttribute) ctxAttributeRetrievedStringFuture.get();
-			this.log.info("Retrieved ctxAttribute id " +retrievedCtxAttribute.getId()+ " and value: "+retrievedCtxAttribute.getStringValue());
+			LOG.info("Retrieved ctxAttribute id " +retrievedCtxAttribute.getId()+ " and value: "+retrievedCtxAttribute.getStringValue());
 
 			// retrieve ctxAttribute with the binary value
 			Future<CtxModelObject> ctxAttributeRetrievedBinaryFuture = this.internalCtxBroker.retrieve(this.ctxAttributeBinaryIdentifier);
@@ -185,7 +173,7 @@ public class CtxBrokerTest 	{
 
 			//deserialise object
 			MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(ctxAttributeRetrievedBinary.getBinaryValue(), this.getClass().getClassLoader());
-			this.log.info("Retrieved ctxAttribute id " +ctxAttributeRetrievedBinary.getId()+ "and value: "+ retrievedBlob.toString());
+			LOG.info("Retrieved ctxAttribute id " +ctxAttributeRetrievedBinary.getId()+ "and value: "+ retrievedBlob.toString());
 
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
@@ -204,5 +192,67 @@ public class CtxBrokerTest 	{
 			e.printStackTrace();
 		}
 
+	}
+	
+	/**
+	 * This method demonstrates how to register for context change events in the context database
+	 */
+	private void registerForContextChanges() {
+		
+		LOG.info("*** registerForContextChanges");
+		
+		try {
+			// 1a. Register listener by specifying the context attribute identifier
+			this.internalCtxBroker.registerForChanges(new MyCtxChangeEventListener(), this.ctxAttributeStringIdentifier);
+			
+			// 1b. Register listener by specifying the context attribute scope and type
+			this.internalCtxBroker.registerForChanges(new MyCtxChangeEventListener(), this.ctxEntityIdentifier, "DeviceID");
+			
+			// 2. Update attribute to see some event action
+			this.internalCtxBroker.updateAttribute((CtxAttributeIdentifier) this.ctxAttributeStringIdentifier, "newDeviceIdValue");
+			
+		} catch (CtxException ce) {
+			
+			LOG.error("CM sucks", ce);
+		}
+	}
+	
+	private class MyCtxChangeEventListener implements CtxChangeEventListener {
+
+		/* (non-Javadoc)
+		 * @see org.societies.api.context.event.CtxChangeEventListener#onCreation(org.societies.api.context.event.CtxChangeEvent)
+		 */
+		@Override
+		public void onCreation(CtxChangeEvent event) {
+			
+			LOG.info(event.getId() + ": *** CREATED event ***");
+		}
+
+		/* (non-Javadoc)
+		 * @see org.societies.api.context.event.CtxChangeEventListener#onModification(org.societies.api.context.event.CtxChangeEvent)
+		 */
+		@Override
+		public void onModification(CtxChangeEvent event) {
+			
+			LOG.info(event.getId() + ": *** MODIFIED event ***");
+		}
+
+		/* (non-Javadoc)
+		 * @see org.societies.api.context.event.CtxChangeEventListener#onRemoval(org.societies.api.context.event.CtxChangeEvent)
+		 */
+		@Override
+		public void onRemoval(CtxChangeEvent event) {
+			
+			LOG.info(event.getId() + ": *** REMOVED event ***");
+		}
+
+		/* (non-Javadoc)
+		 * @see org.societies.api.context.event.CtxChangeEventListener#onUpdate(org.societies.api.context.event.CtxChangeEvent)
+		 */
+		@Override
+		public void onUpdate(CtxChangeEvent event) {
+			
+			LOG.info(event.getId() + ": *** UPDATED event ***");
+		}
 	}
 }
