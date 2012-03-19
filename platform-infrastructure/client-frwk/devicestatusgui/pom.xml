@@ -12,7 +12,7 @@
 
 	<groupId>org.societies.android.platform</groupId>
 	<artifactId>devicestatus</artifactId>
-	<name>DeviceStatusGui</name>
+	<name>Device Status GUI</name>
 	<version>${release.version}</version>
 	<packaging>apk</packaging>
 
@@ -30,6 +30,15 @@
 			<version>${release.version}</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.phonegap</groupId>
+			<artifactId>phonegap</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>1.7.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -39,19 +48,11 @@
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
-				<!-- <extensions>true</extensions>
-				<configuration>
-					emma start
-					<emma>
-						<enable>true</enable>
-						<classFolders>${project.build.outputDirectory}</classFolders>
-						<outputMetaFile>${project.build.directory}/emma/coverage.em</outputMetaFile>
-					</emma>
-					emma stop
-					<dex>
-						<noLocals>true</noLocals> must be set for emma
-					</dex>
-				</configuration> -->
+				<!-- <extensions>true</extensions> <configuration> emma start <emma> 
+					<enable>true</enable> <classFolders>${project.build.outputDirectory}</classFolders> 
+					<outputMetaFile>${project.build.directory}/emma/coverage.em</outputMetaFile> 
+					</emma> emma stop <dex> <noLocals>true</noLocals> must be set for emma </dex> 
+					</configuration> -->
 			</plugin>
 		</plugins>
 	</build>
