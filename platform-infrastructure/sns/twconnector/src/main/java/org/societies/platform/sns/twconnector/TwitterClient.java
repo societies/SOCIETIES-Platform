@@ -9,7 +9,7 @@ import org.scribe.oauth.*;
 /*
  * twitter sn client 
  */
-class TwitterClient{
+public class TwitterClient{
 	
 	private TwitterToken twToken = null;
 	private OAuthService service;

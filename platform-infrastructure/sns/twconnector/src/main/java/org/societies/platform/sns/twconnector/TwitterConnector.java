@@ -1,7 +1,7 @@
 package org.societies.platform.sns.twconnector;
 
 
-class TwitterConnector{
+public class TwitterConnector{
 	
 	public TwitterClient twClient = null;
 	
