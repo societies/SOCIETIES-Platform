@@ -49,13 +49,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.societies.security</groupId>
-			<artifactId>security-commsmgr</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>

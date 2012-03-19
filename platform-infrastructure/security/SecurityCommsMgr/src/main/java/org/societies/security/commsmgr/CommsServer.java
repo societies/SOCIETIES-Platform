@@ -20,8 +20,6 @@ import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationRequester;
 import org.societies.api.schema.security.policynegotiator.ProviderBean;
-import org.societies.security.policynegotiator.NegotiationProvider;
-import org.societies.security.policynegotiator.NegotiationRequester;
 
 @Component
 public class CommsServer implements IFeatureServer {
@@ -107,7 +105,7 @@ public class CommsServer implements IFeatureServer {
 
 		LOG.debug("receiveMessage({}, {})", stanza, messageBean);
 		
-		if (messageBean.getClass().equals(NegotiationProvider.class)) {
+		if (messageBean instanceof INegotiationProvider) {
 			
 			// Method parameters
 			ProviderBean providerBean = (ProviderBean) messageBean;
@@ -130,7 +128,7 @@ public class CommsServer implements IFeatureServer {
 				break;
 			}
 		}
-		else if (messageBean.getClass().equals(NegotiationRequester.class)) {
+		else if (messageBean instanceof INegotiationRequester) {
 			LOG.debug("receiveMessage(): NegotiationRequester");
 		}
 	}
