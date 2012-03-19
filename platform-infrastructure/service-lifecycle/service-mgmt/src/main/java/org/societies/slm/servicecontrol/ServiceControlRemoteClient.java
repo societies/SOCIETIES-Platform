@@ -24,6 +24,12 @@
  */
 package org.societies.slm.servicecontrol;
 
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.servicelifecycle.IServiceControlCallback;
 
@@ -34,17 +40,41 @@ import org.societies.api.servicelifecycle.IServiceControlCallback;
  *
  */
 public class ServiceControlRemoteClient implements IServiceControlCallback {
+
+	static final Logger logger = LoggerFactory.getLogger(ServiceControlRemoteClient.class);
+
+	private final long TIMEOUT = 5;
 	
 	private ServiceControlResult result;
+	private BlockingQueue<ServiceControlResult> resultList;
+	
+	public ServiceControlRemoteClient(){
+		
+		resultList = new ArrayBlockingQueue<ServiceControlResult>(1);
+		if(logger.isDebugEnabled())
+			logger.debug("ServiceControlRemoteClient created");
+		
+	}
 
 	@Override
 	public void setResult(ServiceControlResult result) {
-		this.result=result;
+		try {
+			resultList.put(result);
+		} catch (InterruptedException e) {
+			logger.error("Error putting result in List");
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public ServiceControlResult getResult() {
-		return result;
+		try {
+			return resultList.poll(TIMEOUT, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			logger.error("Error getting result in List");
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 }

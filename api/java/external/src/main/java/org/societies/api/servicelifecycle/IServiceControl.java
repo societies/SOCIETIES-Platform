@@ -27,6 +27,7 @@ package org.societies.api.servicelifecycle;
 import java.net.URL;
 import java.util.concurrent.Future;
 
+import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 
@@ -64,6 +65,15 @@ public interface IServiceControl {
 	 * @return the result of the operation
 	 */
 	public Future<ServiceControlResult> installService(URL bundleLocation) throws ServiceControlException;
+
+	/**
+	 * This method install a new service into the container present on a given node
+	 * 
+	 * @param serviceLocation the URL of the bundle to install
+	 * @param node The node where we wish to install the service
+	 * @return the result of the operation
+	 */
+	public Future<ServiceControlResult> installService(URL bundleLocation, IIdentity node) throws ServiceControlException;
 
 	/**
 	 * This method removes a service from the container.
