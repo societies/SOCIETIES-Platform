@@ -49,16 +49,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.societies.security</groupId>
-			<artifactId>policynegotiator</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${version.comm}</version>
 			<scope>provided</scope>
 		</dependency>
 
