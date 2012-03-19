@@ -50,7 +50,7 @@
 
 		<dependency>
 			<groupId>org.societies.security</groupId>
-			<artifactId>signature-mgr</artifactId>
+			<artifactId>security-commsmgr</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
