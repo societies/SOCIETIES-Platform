@@ -24,218 +24,240 @@
  */
 
 /**
- * @return Object literal singleton instance of DeviceStatus
+ * @author Olivier Maridat (Trialog)
+ * @version 1.0
+ * @class
+ * @constructor
  */
-var DeviceStatus = function(){};
+var DeviceStatus = {
+	/**
+	 * To retrieve the connectivity provider status
+	 * 
+	 * @param {Object} successCallback The callback which will be called when result is successful.
+	 * Example of JSON result:
+	 * <pre>
+	 * {"isInternetEnabled":true, "providerList":[{"name":"WiFi", "enabled":true}, {"name":"mobile mms", "enabled":false}]}
+	 * </pre>
+	 * Schema of the JSON result:
+	 * <pre>
+	 * {
+	 *  	"name":"ConnectivityProviderStatus",
+	 *  	"properties":{
+	 *  		"isInternetEnabled":{
+	 *  			"required":true,
+	 *  			"type":"boolean",
+	 *  			"description":"To know if Internet is available or not"
+	 *  		},
+	 *  		"providerList":{
+	 *  			"required":false,
+	 *  			"type":"array",
+	 *  			"description":"List of connectivity providers",
+	 *  			"items":{
+	 *  				"name":{
+	 *  					"required":true,
+	 *  					"type":"string",
+	 *  					"description":"Name of the connectivity provider"
+	 *  				},
+	 *  				"enabled":{
+	 *  					"required":true,
+	 *  					"type":"boolean",
+	 *  					"description":"To know if this provider is available or not"
+	 *  				}
+	 *  			}
+	 *  		}
+	 *  	}
+	 * }
+	 * </pre>
+	 * @param {Object} failureCallback The callback which will be called when result encounters an error. (String result)
+	 */
+	getConnectivityStatus: function(successCallback, failureCallback){
+		var parameters = null;
+		return PhoneGap.exec(
+				successCallback,
+				failureCallback,
+				'DeviceStatus',
+				'getConnectivityStatus',
+				[parameters]);
+	},
 
-/**
- * To retrieve the connectivity provider status
- * 
- * @param successCallback The callback which will be called when result is successful.
- * Example of JSON result:
- * {"isInternetEnabled":true, "providerList":[{"name":"WiFi", "enabled":true}, {"name":"mobile mms", "enabled":false}]}
- * Schema of the JSON result:
- * {
- *  	"name":"ConnectivityProviderStatus",
- *  	"properties":{
- *  		"isInternetEnabled":{
- *  			"required":true,
- *  			"type":"boolean",
- *  			"description":"To know if Internet is available or not"
- *  		},
- *  		"providerList":{
- *  			"required":false,
- *  			"type":"array",
- *  			"description":"List of connectivity providers",
- *  			"items":{
- *  				"name":{
- *  					"required":true,
- *  					"type":"string",
- *  					"description":"Name of the connectivity provider"
- *  				},
- *  				"enabled":{
- *  					"required":true,
- *  					"type":"boolean",
- *  					"description":"To know if this provider is available or not"
- *  				}
- *  			}
- *  		}
- *  	}
- * }
- * @param failureCallback The callback which will be called when result encounters an error. (String result)
- */
-DeviceStatus.prototype.getConnectivityStatus = function(successCallback, failureCallback){
-	var parameters = null;
-	return PhoneGap.exec(
-			successCallback,
-			failureCallback,
-			'DeviceStatus',
-			'getConnectivityStatus',
-			[parameters]);
+
+	/**
+	 * To retrieve the location provider status
+	 * 
+	 * @param {Object} successCallback The callback which will be called when result is successful.
+	 * Example of JSON result:
+	 * <pre>
+	 * {"providerList":[{"name":"gps", "enabled":true}, {"name":"network", "enabled":false}]}
+	 * </pre>
+	 * Schema of the JSON result:
+	 * <pre>
+	 * {
+	 *  	"name":"LocationProviderStatus",
+	 *  	"properties":{
+	 *  		"providerList":{
+	 *  			"required":false,
+	 *  			"type":"array",
+	 *  			"description":"List of location providers",
+	 *  			"items":{
+	 *  				"name":{
+	 *  					"required":true,
+	 *  					"type":"string",
+	 *  					"description":"Name of the location provider"
+	 *  				},
+	 *  				"enabled":{
+	 *  					"required":true,
+	 *  					"type":"boolean",
+	 *  					"description":"To know if this provider is available or not"
+	 *  				}
+	 *  			}
+	 *  		}
+	 *  	}
+	 * }
+	 * </pre>
+	 * @param {Object} failureCallback The callback which will be called when result encounters an error. (String result)
+	 */
+	getLocationStatus: function(successCallback, failureCallback){
+		var parameters = null;
+		return PhoneGap.exec(
+				successCallback,
+				failureCallback,
+				'DeviceStatus',
+				'getLocationStatus',
+				[parameters]);
+	},
+
+	/**
+	 * To retrieve the battery status
+	 * 
+	 * @param {Object} successCallback The callback which will be called when result is successful.
+	 * Example of JSON result:
+	 * <pre>
+	 * {"scale":100,"plugged":1,"level":50,"status":2,"voltage":0,"temperature":0}
+	 * </pre>
+	 * Schema of the JSON result:
+	 * <pre>
+	 * {
+	 *  	"name":"BatteryStatus",
+	 *  	"properties":{
+	 *  		"scale":{
+	 *  			"required":false,
+	 *  			"type":"number",
+	 *  			"min":0,
+	 *  			"description":"Scale"
+	 *  		},
+	 *  		"plugged":{
+	 *  			"required":false,
+	 *  			"type":"number",
+	 *  			"enum": [BATTERY_NOT_PLUGGED, BATTERY_PLUGGED_AC, BATTERY_PLUGGED_USB],
+	 *  			"description":"To know if the mobile is plugged or not"
+	 *  		},
+	 *  		"level":{
+	 *  			"required":false,
+	 *  			"type":"number",
+	 *  			"min":0,
+	 *  			"max":100,
+	 *  			"description":"Level of battery (%)"
+	 *  		},
+	 *  		"status":{
+	 *  			"required":false,
+	 *  			"type":"number",
+	 *  			"min":1,
+	 *  			"max":5,
+	 *  			"enum": [BATTERY_STATUS_UNKNOWN, BATTERY_STATUS_CHARGING, BATTERY_STATUS_DISCHARGING, BATTERY_STATUS_NOT_CHARGING, BATTERY_STATUS_FULL],
+	 *  			"description":"Level of battery (%)"
+	 *  		},
+	 *  		"voltage":{
+	 *  			"required":false,
+	 *  			"type":"nomber",
+	 *  			"description":"Voltage"
+	 *  		},
+	 *  		"temperature":{
+	 *  			"required":false,
+	 *  			"type":"number",
+	 *  			"description":"Temperatue (°C)"
+	 *  		}
+	 *  	}
+	 * }
+	 * </pre>
+	 * @param {Object} failureCallback The callback which will be called when result encounters an error. (String result)
+	 */
+	getBatteryStatus: function(successCallback, failureCallback){
+		var parameters = null;
+		return PhoneGap.exec(
+				successCallback,
+				failureCallback,
+				'DeviceStatus',
+				'getBatteryStatus',
+				[parameters]);
+	},
+
+	/**
+	 * To register to battery status
+	 * 
+	 * @param {Object} successCallback The callback which will be called when result is successful.
+	 * Example of JSON result:
+	 * <pre>
+	 * {"scale":100,"plugged":1,"level":50,"status":2,"voltage":0,"temperature":0}
+	 * </pre>
+	 * Schema of the JSON result:
+	 * <pre>
+	 * {
+	 *  	"name":"BatteryStatus",
+	 *  	"properties":{
+	 *  		"scale":{
+	 *  			"required":false,
+	 *  			"type":"number",
+	 *  			"min":0,
+	 *  			"description":"Scale"
+	 *  		},
+	 *  		"plugged":{
+	 *  			"required":false,
+	 *  			"type":"number",
+	 *  			"enum": [BATTERY_NOT_PLUGGED, BATTERY_PLUGGED_AC, BATTERY_PLUGGED_USB],
+	 *  			"description":"To know if the mobile is plugged or not"
+	 *  		},
+	 *  		"level":{
+	 *  			"required":false,
+	 *  			"type":"number",
+	 *  			"min":0,
+	 *  			"max":100,
+	 *  			"description":"Level of battery (%)"
+	 *  		},
+	 *  		"status":{
+	 *  			"required":false,
+	 *  			"type":"number",
+	 *  			"min":1,
+	 *  			"max":5,
+	 *  			"enum": [BATTERY_STATUS_UNKNOWN, BATTERY_STATUS_CHARGING, BATTERY_STATUS_DISCHARGING, BATTERY_STATUS_NOT_CHARGING, BATTERY_STATUS_FULL],
+	 *  			"description":"Level of battery (%)"
+	 *  		},
+	 *  		"voltage":{
+	 *  			"required":false,
+	 *  			"type":"nomber",
+	 *  			"description":"Voltage"
+	 *  		},
+	 *  		"temperature":{
+	 *  			"required":false,
+	 *  			"type":"number",
+	 *  			"description":"Temperatue (°C)"
+	 *  		}
+	 *  	}
+	 * }
+	 * </pre>
+	 * @param {Object} failureCallback The callback which will be called when result encounters an error. (String result)
+	 */
+	registerToBatteryStatus: function(successCallback, failureCallback){
+		var parameters = {"register":true};
+		return PhoneGap.exec(
+				successCallback,
+				failureCallback,
+				'DeviceStatus',
+				'getBatteryStatus',
+				[parameters]);
+	}
 };
 
-/**
- * To retrieve the location provider status
- * 
- * @param successCallback The callback which will be called when result is successful.
- * Example of JSON result:
- * {"providerList":[{"name":"gps", "enabled":true}, {"name":"network", "enabled":false}]}
- * Schema of the JSON result:
- * {
- *  	"name":"LocationProviderStatus",
- *  	"properties":{
- *  		"providerList":{
- *  			"required":false,
- *  			"type":"array",
- *  			"description":"List of location providers",
- *  			"items":{
- *  				"name":{
- *  					"required":true,
- *  					"type":"string",
- *  					"description":"Name of the location provider"
- *  				},
- *  				"enabled":{
- *  					"required":true,
- *  					"type":"boolean",
- *  					"description":"To know if this provider is available or not"
- *  				}
- *  			}
- *  		}
- *  	}
- * }
- * @param failureCallback The callback which will be called when result encounters an error. (String result)
- */
-DeviceStatus.prototype.getLocationStatus = function(successCallback, failureCallback){
-	var parameters = null;
-	return PhoneGap.exec(
-			successCallback,
-			failureCallback,
-			'DeviceStatus',
-			'getLocationStatus',
-			[parameters]);
-};
-
-/**
- * To retrieve the battery status
- * 
- * @param successCallback The callback which will be called when result is successful.
- * Example of JSON result:
- * {"scale":100,"plugged":1,"level":50,"status":2,"voltage":0,"temperature":0}
- * Schema of the JSON result:
- * {
- *  	"name":"BatteryStatus",
- *  	"properties":{
- *  		"scale":{
- *  			"required":false,
- *  			"type":"number",
- *  			"min":0,
- *  			"description":"Scale"
- *  		},
- *  		"plugged":{
- *  			"required":false,
- *  			"type":"number",
- *  			"enum": [BATTERY_NOT_PLUGGED, BATTERY_PLUGGED_AC, BATTERY_PLUGGED_USB],
- *  			"description":"To know if the mobile is plugged or not"
- *  		},
- *  		"level":{
- *  			"required":false,
- *  			"type":"number",
- *  			"min":0,
- *  			"max":100,
- *  			"description":"Level of battery (%)"
- *  		},
- *  		"status":{
- *  			"required":false,
- *  			"type":"number",
- *  			"min":1,
- *  			"max":5,
- *  			"enum": [BATTERY_STATUS_UNKNOWN, BATTERY_STATUS_CHARGING, BATTERY_STATUS_DISCHARGING, BATTERY_STATUS_NOT_CHARGING, BATTERY_STATUS_FULL],
- *  			"description":"Level of battery (%)"
- *  		},
- *  		"voltage":{
- *  			"required":false,
- *  			"type":"nomber",
- *  			"description":"Voltage"
- *  		},
- *  		"temperature":{
- *  			"required":false,
- *  			"type":"number",
- *  			"description":"Temperatue (°C)"
- *  		}
- *  	}
- * }
- * @param failureCallback The callback which will be called when result encounters an error. (String result)
- */
-DeviceStatus.prototype.getBatteryStatus = function(successCallback, failureCallback){
-	var parameters = null;
-	return PhoneGap.exec(
-			successCallback,
-			failureCallback,
-			'DeviceStatus',
-			'getBatteryStatus',
-			[parameters]);
-};
-/**
- * To register to battery status
- * 
- * @param successCallback The callback which will be called when result is successful.
- * Example of JSON result:
- * {"scale":100,"plugged":1,"level":50,"status":2,"voltage":0,"temperature":0}
- * Schema of the JSON result:
- * {
- *  	"name":"BatteryStatus",
- *  	"properties":{
- *  		"scale":{
- *  			"required":false,
- *  			"type":"number",
- *  			"min":0,
- *  			"description":"Scale"
- *  		},
- *  		"plugged":{
- *  			"required":false,
- *  			"type":"number",
- *  			"enum": [BATTERY_NOT_PLUGGED, BATTERY_PLUGGED_AC, BATTERY_PLUGGED_USB],
- *  			"description":"To know if the mobile is plugged or not"
- *  		},
- *  		"level":{
- *  			"required":false,
- *  			"type":"number",
- *  			"min":0,
- *  			"max":100,
- *  			"description":"Level of battery (%)"
- *  		},
- *  		"status":{
- *  			"required":false,
- *  			"type":"number",
- *  			"min":1,
- *  			"max":5,
- *  			"enum": [BATTERY_STATUS_UNKNOWN, BATTERY_STATUS_CHARGING, BATTERY_STATUS_DISCHARGING, BATTERY_STATUS_NOT_CHARGING, BATTERY_STATUS_FULL],
- *  			"description":"Level of battery (%)"
- *  		},
- *  		"voltage":{
- *  			"required":false,
- *  			"type":"nomber",
- *  			"description":"Voltage"
- *  		},
- *  		"temperature":{
- *  			"required":false,
- *  			"type":"number",
- *  			"description":"Temperatue (°C)"
- *  		}
- *  	}
- * }
- * @param failureCallback The callback which will be called when result encounters an error. (String result)
- */
-DeviceStatus.prototype.registerToBatteryStatus = function(successCallback, failureCallback){
-	var parameters = {"register":true};
-	return PhoneGap.exec(
-			successCallback,
-			failureCallback,
-			'DeviceStatus',
-			'getBatteryStatus',
-			[parameters]);
-};
 
 PhoneGap.addConstructor(function() {
-	PhoneGap.addPlugin("DeviceStatus", new DeviceStatus());
+	PhoneGap.addPlugin("DeviceStatus", DeviceStatus);
 });

@@ -19,23 +19,35 @@
  */
 package org.societies.android.platform.gui.plugin;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.societies.android.platform.devicestatus.DeviceStatus;
+import org.societies.android.platform.devicestatus.DeviceStatusServiceDifferentProcess;
+import org.societies.android.platform.interfaces.ServiceMethodTranslator;
+import org.societies.api.android.internal.IDeviceStatus;
 import org.societies.api.android.internal.model.BatteryStatus;
 import org.societies.api.android.internal.model.ProviderStatus;
 
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.BatteryManager;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.phonegap.api.PhonegapActivity;
 import com.phonegap.api.Plugin;
 import com.phonegap.api.PluginResult;
 import com.phonegap.api.PluginResult.Status;
@@ -47,22 +59,49 @@ import com.phonegap.api.PluginResult.Status;
 public class DeviceStatusPlugin extends Plugin {
 	/** Actions List */
 	public static final String ACTION_CONNECTIVITY = "getConnectivityStatus";
+	public static final String ACTION_LOCATION = "getLocationStatus";
 	public static final String ACTION_BATTERY = "getBatteryStatus";
 	public static final String ACTION_BATTERY_REGISTER = "registerBatteryStatus";
-	public static final String ACTION_LOCATION = "getLocationStatus";
 
 	/** Callback to call */
 	public String callbackID;
 
-	public DeviceStatus deviceStatus;
+	/** Helpers */
 	protected Gson jsonHelper;
-	boolean batteryStatusRegistration = false;
+
+	/** Local data */
+	private boolean batteryStatusRegistration = false;
+	/* Device Status Service */
+	private boolean deviceStatusServiceConnected = false;
+	private Messenger deviceStatusService = null;
+	private ServiceReceiver deviceStatusReceiver = null;
+
+
+	/**
+	 * This method is called when the plugin is created
+	 * before the excecution of "excecute"
+	 * Perfect to initialize an Android Service
+	 */
+	@Override
+	public void onResume(boolean arg) {
+		Log.d("DeviceStatusPlugin", "DeviceStatusPlugin resumed");
+		// Link to the Android service
+		if (!deviceStatusServiceConnected) {
+			Intent deviceStatusIntent = new Intent(this.ctx, DeviceStatusServiceDifferentProcess.class);
+			this.ctx.bindService(deviceStatusIntent, deviceStatusServiceConnection, Context.BIND_AUTO_CREATE);
+		}
+		// Create the broadcast receiver
+		if (null == deviceStatusReceiver) {
+			deviceStatusReceiver = new ServiceReceiver();
+		}
+	}
 
 	/*
 	 * @see com.phonegap.api.Plugin#execute(java.lang.String, org.json.JSONArray, java.lang.String)
 	 */
 	@Override
-	public PluginResult execute(String methodName, JSONArray arguments, String callbackID) {
+	public PluginResult execute(String methodName, JSONArray arguments, String callbackID)
+	{
 		Log.d(this.getClass().getSimpleName(), "Plugin Called");
 
 		// --- Save the callback
@@ -70,43 +109,83 @@ public class DeviceStatusPlugin extends Plugin {
 
 		// --- Prepare the result
 		PluginResult result = null;
-		deviceStatus = new DeviceStatus(this.ctx);
 		jsonHelper = new Gson();
 
 		try {
 			// -- Manage the relevant method
+			// - Connectivity Provider Status
 			if (ACTION_CONNECTIVITY.equals(methodName)) {
 				Log.d(this.getClass().getSimpleName(), "Connectivity Status");
-				// Avert: async
+				// - Inform the JS side: async mode
 				result = new PluginResult(Status.NO_RESULT);
 				result.setKeepCallback(true);
 				this.success(result, callbackID);
-				// Launch connectivity status retrieval
-				getConnectivityStatus();
+
+				// - Launch location status retrieval
+				// Register to the relevant broadcast receiver
+				IntentFilter filter = new IntentFilter(IDeviceStatus.CONNECTIVITY_STATUS);
+				ctx.registerReceiver(deviceStatusReceiver, filter);
+
+				// Launch the relevant method
+				// Fill the method name
+				String nameGetConnectivityProvidersStatus = "getConnectivityProvidersStatus(String callerPackageName)";
+				Message getConnectivityProvidersStatus = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IDeviceStatus.methodsArray, nameGetConnectivityProvidersStatus), 0, 0);
+				// Fill the parameters
+				Bundle getConnectivityProvidersStatusParams = new Bundle();
+				getConnectivityProvidersStatusParams.putString(ServiceMethodTranslator.getMethodParameterName(nameGetConnectivityProvidersStatus, 0), this.getClass().getPackage().getName());
+				getConnectivityProvidersStatus.setData(getConnectivityProvidersStatusParams);
+				// Launch
+				if (deviceStatusServiceConnected) {
+					deviceStatusService.send(getConnectivityProvidersStatus);
+				}
+				else {
+					Log.d(this.getClass().getSimpleName(), "DeviceStatus service not connected.");
+				}
 			}
+			// - Location Provider Status
 			else if (ACTION_LOCATION.equals(methodName)) {
 				Log.d(this.getClass().getSimpleName(), "Location Status");
-				// Avert: async
+				// - Inform the JS side: async mode
 				result = new PluginResult(Status.NO_RESULT);
 				result.setKeepCallback(true);
 				this.success(result, callbackID);
-				// Launch location status retrieval
-				getLocationStatus();
+
+				// - Launch location status retrieval
+				// Register to the relevant broadcast receiver
+				IntentFilter filter = new IntentFilter(IDeviceStatus.LOCATION_STATUS);
+				ctx.registerReceiver(deviceStatusReceiver, filter);
+
+				// Launch the relevant method
+				// Fill the method name
+				String nameGetLocationProvidersStatus = "getLocationProvidersStatus(String callerPackageName)";
+				Message getLocationProvidersStatus = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IDeviceStatus.methodsArray, nameGetLocationProvidersStatus), 0, 0);
+				// Fill the parameters
+				Bundle getLocationProvidersStatusParams = new Bundle();
+				getLocationProvidersStatusParams.putString(ServiceMethodTranslator.getMethodParameterName(nameGetLocationProvidersStatus, 0), this.getClass().getPackage().getName());
+				getLocationProvidersStatus.setData(getLocationProvidersStatusParams);
+				// Launch
+				if (deviceStatusServiceConnected) {
+					deviceStatusService.send(getLocationProvidersStatus);
+				}
+				else {
+					Log.d(this.getClass().getSimpleName(), "DeviceStatus service not connected.");
+				}
 			}
+			// - Battery Status
 			else if (ACTION_BATTERY.equals(methodName)) {
 				Log.d(this.getClass().getSimpleName(), "Battery Status");
-				// Avert: async
+				// Inform the JS side: async mode
 				result = new PluginResult(Status.NO_RESULT);
 				result.setKeepCallback(true);
 				this.success(result, callbackID);
 				// -- Launch the intent to retrieve the battery status
-				// Register or poll?
 				IntentFilter batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-				ctx.registerReceiver(new ServiceReceiver(), batteryLevelFilter);
+				ctx.registerReceiver(deviceStatusReceiver, batteryLevelFilter);
 			}
+			// - Register to battery status
 			else if (ACTION_BATTERY_REGISTER.equals(methodName)) {
 				Log.d(this.getClass().getSimpleName(), "Register battery Status");
-				// Avert: async
+				// Inform the JS side: async mode
 				result = new PluginResult(Status.NO_RESULT);
 				result.setKeepCallback(true);
 				this.success(result, callbackID);
@@ -114,10 +193,10 @@ public class DeviceStatusPlugin extends Plugin {
 				// Register or poll?
 				JSONObject params = (JSONObject) arguments.get(0);
 				batteryStatusRegistration = params.getBoolean("register");
-				IntentFilter batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-				ctx.registerReceiver(new ServiceReceiver(), batteryLevelFilter);
+				IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+				ctx.registerReceiver(deviceStatusReceiver, filter);
 			}
-			
+
 			// -- Error: Unknown method name
 			else {
 				Log.d(this.getClass().getSimpleName(), "Invalid method name : "+methodName+" passed");
@@ -129,17 +208,48 @@ public class DeviceStatusPlugin extends Plugin {
 			result.setKeepCallback(false);
 			this.error(result, this.callbackID);
 		}
+		catch (RemoteException e) {
+			result = new PluginResult(Status.ERROR, "No such method in this service");
+			result.setKeepCallback(false);
+			this.error(result, this.callbackID);
+		}
 		return result;
 	}
 
-	public PluginResult getConnectivityStatus() throws JSONException {
+	@Override
+	public void onDestroy()
+	{
+		Log.d(this.getClass().getSimpleName(), "DeviceStatusPlugin Destroy");
+		// -- Close the broadcast receiver
+		if (null != deviceStatusReceiver) {
+			ctx.unregisterReceiver(deviceStatusReceiver);
+		}
+		// -- Unlink with services
+		if (deviceStatusServiceConnected) {
+			ctx.unbindService(deviceStatusServiceConnection);
+		}
+	}
+
+
+	//--------------------------------------------------------------------------
+	// LOCAL METHODS
+	//--------------------------------------------------------------------------
+
+	public PluginResult getConnectivityStatus(Intent intent) throws JSONException
+	{
 		JSONObject data = new JSONObject();
 		// --- Internet
-		boolean isInternetEnabled = deviceStatus.isInternetConnectivityOn(this.getClass().getPackage().getName());
+		boolean isInternetEnabled = false;
+		if(intent.hasExtra(IDeviceStatus.CONNECTIVITY_INTERNET_ON)) {
+			isInternetEnabled = intent.getBooleanExtra(IDeviceStatus.CONNECTIVITY_INTERNET_ON, false);
+		}
 		data.put("isInternetEnabled", isInternetEnabled);
 
 		// --- Providers
-		List<ProviderStatus> connectivityProviders = (List<ProviderStatus>) deviceStatus.getConnectivityProvidersStatus(this.getClass().getPackage().getName());
+		List<ProviderStatus> connectivityProviders = new ArrayList<ProviderStatus>();
+		if(intent.hasExtra(IDeviceStatus.CONNECTIVITY_PROVIDER_LIST)) {
+			connectivityProviders = intent.getParcelableArrayListExtra(IDeviceStatus.CONNECTIVITY_PROVIDER_LIST);
+		}
 		JSONArray connectivityProviderList = new JSONArray();
 		for(ProviderStatus provider : connectivityProviders) {
 			JSONObject connectivityProvider = new JSONObject();
@@ -149,7 +259,7 @@ public class DeviceStatusPlugin extends Plugin {
 		}
 		data.put("providerList", connectivityProviderList);
 		Log.d(this.getClass().getSimpleName(), data.toString());
-		
+
 		// -- Send data
 		PluginResult result = new PluginResult(Status.OK, data);
 		result.setKeepCallback(false);
@@ -157,7 +267,33 @@ public class DeviceStatusPlugin extends Plugin {
 		return result;
 	}
 
-	public PluginResult getBatteryStatus(Intent intent) throws JSONException {
+	public PluginResult getLocationStatus(Intent intent) throws JSONException
+	{
+		JSONObject data = new JSONObject();
+		// --- Providers
+		List<ProviderStatus> locationProviders = new ArrayList<ProviderStatus>();
+		if(intent.hasExtra(IDeviceStatus.LOCATION_PROVIDER_LIST)) {
+			locationProviders = intent.getParcelableArrayListExtra(IDeviceStatus.LOCATION_PROVIDER_LIST);
+		}
+		JSONArray connectivityProviderList = new JSONArray();
+		for(ProviderStatus provider : locationProviders) {
+			JSONObject locationProvider = new JSONObject();
+			locationProvider.put("name", provider.getName());
+			locationProvider.put("enabled", provider.isEnabled());
+			connectivityProviderList.put(locationProvider);
+		}
+		data.put("providerList", connectivityProviderList);
+		Log.d(this.getClass().getSimpleName(), data.toString());
+
+		// -- Send data
+		PluginResult result = new PluginResult(Status.OK, data);
+		result.setKeepCallback(false);
+		this.success(result, this.callbackID);
+		return result;
+	}
+
+	public PluginResult getBatteryStatus(Intent intent) throws JSONException
+	{
 		// -- Battery
 		double level = -1;
 		double temperature = -1;
@@ -188,27 +324,6 @@ public class DeviceStatusPlugin extends Plugin {
 		return result;
 	}
 
-	public PluginResult getLocationStatus() throws JSONException {
-		JSONObject data = new JSONObject();
-		// --- Providers
-		List<ProviderStatus> locationProviders = (List<ProviderStatus>) deviceStatus.getLocationProvidersStatus(this.getClass().getPackage().getName());
-		JSONArray connectivityProviderList = new JSONArray();
-		for(ProviderStatus provider : locationProviders) {
-			JSONObject locationProvider = new JSONObject();
-			locationProvider.put("name", provider.getName());
-			locationProvider.put("enabled", provider.isEnabled());
-			connectivityProviderList.put(locationProvider);
-		}
-		data.put("providerList", connectivityProviderList);
-		Log.d(this.getClass().getSimpleName(), data.toString());
-		
-		// -- Send data
-		PluginResult result = new PluginResult(Status.OK, data);
-		result.setKeepCallback(false);
-		this.success(result, this.callbackID);
-		return result;
-	}
-
 	/**
 	 * Broadcast receiver to receive intents from Service methods
 	 * 
@@ -220,42 +335,22 @@ public class DeviceStatusPlugin extends Plugin {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Log.i(this.getClass().getSimpleName(), intent.getAction());
-
 			try {
+				// -- Connectivity
+				if (intent.getAction().equals(IDeviceStatus.CONNECTIVITY_STATUS)) {
+					getConnectivityStatus(intent);
+				}
+				// -- Location
+				else if (intent.getAction().equals(IDeviceStatus.LOCATION_STATUS)) {
+					getLocationStatus(intent);
+				}
 				// -- Battery
-				if (intent.getAction().equals(Intent.ACTION_BATTERY_CHANGED)) {
+				else if (intent.getAction().equals(Intent.ACTION_BATTERY_CHANGED)) {
 					if (!batteryStatusRegistration) {
 						context.unregisterReceiver(this);
 					}
 					getBatteryStatus(intent);
 				}
-				//			// Connectivity
-				//			if (intent.getAction().equals(IDeviceStatus.CONNECTIVITY_STATUS)) {
-				//				Log.i(this.getClass().getSimpleName(), "Out of process real service received intent - CONNECTIVITY");
-				//
-				//				boolean isInternetEnabled = false;
-				//				List<ProviderStatus> connectivityProviders = new ArrayList<ProviderStatus>();
-				//				if(intent.hasExtra(IDeviceStatus.CONNECTIVITY_INTERNET_ON)) {
-				//					isInternetEnabled = intent.getBooleanExtra(IDeviceStatus.CONNECTIVITY_INTERNET_ON, false);
-				//				}
-				//				if(intent.hasExtra(IDeviceStatus.CONNECTIVITY_PROVIDER_LIST)) {
-				//					connectivityProviders = intent.getParcelableArrayListExtra(IDeviceStatus.CONNECTIVITY_PROVIDER_LIST);
-				//				}
-				//				
-				//				StringBuffer sb = new StringBuffer();
-				//				sb.append(updateConnectivity(isInternetEnabled, connectivityProviders));
-				//				txtConnectivity.setText(sb.toString());
-				//			}
-				//			// Location
-				//			else if (intent.getAction().equals(IDeviceStatus.LOCATION_STATUS)) {
-				//				Log.i(this.getClass().getSimpleName(), "Out of process real service received intent - LOCATION_STATUS");
-				//				
-				//				List<ProviderStatus> locationProvidersStatus =  intent.getParcelableArrayListExtra(IDeviceStatus.LOCATION_PROVIDER_LIST);
-				//				
-				//				StringBuffer sb = new StringBuffer();
-				//				sb.append(updateLocation(locationProvidersStatus));
-				//				txtLocation.setText(sb.toString());
-				//			}
 			}
 			catch (JSONException e) {
 				PluginResult result = new PluginResult(Status.ERROR, "Error during the JSON parsing of the result");
@@ -263,6 +358,18 @@ public class DeviceStatusPlugin extends Plugin {
 				error(result, callbackID);
 			}
 		}
-
 	}
+
+	private ServiceConnection deviceStatusServiceConnection = new ServiceConnection()
+	{
+		public void onServiceDisconnected(ComponentName name)
+		{
+			deviceStatusServiceConnected = false;
+		}
+		public void onServiceConnected(ComponentName name, IBinder service)
+		{
+			deviceStatusService = new Messenger(service);
+			deviceStatusServiceConnected = true;
+		}
+	};
 }
