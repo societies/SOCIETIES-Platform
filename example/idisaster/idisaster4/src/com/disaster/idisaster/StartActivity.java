@@ -25,6 +25,7 @@
 package com.disaster.idisaster;
 
 import android.app.Activity;
+import android.os.Bundle;
 
 /**
  * This is the activity (without GUI) that starts as the first
@@ -37,4 +38,22 @@ import android.app.Activity;
  */
 public class StartActivity extends Activity {
 
+    /* (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+	// TODO Auto-generated method stub
+	super.onCreate(savedInstanceState);
+	/*
+	 * check to see if the user has already provided
+	 * a user name and password.
+	 * 
+	 * If yes, go to HomeActivity
+	 * -- Send intent to HomeActivity
+	 * In no, go to LoginActivity
+	 * -- Send intent to LoginActivity
+	 *
+	 */
+    }
 }
