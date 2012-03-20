@@ -9,7 +9,7 @@
 	
 	<display-name>societies web-app</display-name>
 
-	<description>Societies Platfor webapplication using Spring MVC </description>
+	<description>Societies Platforn webapplication using Spring MVC </description>
 
 <!-- OSGI aware web application context declaration -->
 	<context-param>

@@ -8,8 +8,6 @@
 
 	<!-- Note :CommFramework.plan , exampleServices.plan and servicelifecycleplan hould be deployed also -->
 	
-	<artifact type="bundle" name="org.societies.example.service.api"/>
-	<artifact type="bundle" name="org.societies.example.service.provider"/>
 	<artifact type="bundle" name="societies-webapp"/>
 </plan>
 

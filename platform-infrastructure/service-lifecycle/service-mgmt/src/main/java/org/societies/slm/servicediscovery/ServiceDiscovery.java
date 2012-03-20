@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
@@ -119,6 +120,45 @@ public class ServiceDiscovery implements IServiceDiscovery {
 		return new AsyncResult<List<Service>>(result);
 	}
 
+	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.societies.api.internal.servicelifecycle.IServiceDiscovery#getServices
+	 * ()
+	 */
+	@Override
+	@Async
+	public Future<List<Service>> getServices(String jid)
+			throws ServiceDiscoveryException {
+		
+		Future<List<Service>> asyncResult = null;
+		List<Service> result = null;
+
+		try {
+			
+			asyncResult = this.getServices(commMngr.getIdManager().fromJid(jid));
+
+		
+			result = asyncResult.get();
+			} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+		} catch (InvalidFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		return new AsyncResult<List<Service>>(result);
+	}
+		
+
+		
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -142,24 +182,11 @@ public class ServiceDiscovery implements IServiceDiscovery {
 			case CSS:
 			case CSS_RICH:
 			case CSS_LIGHT:
-				//serviceList = getServiceReg().retrieveServicesSharedByCSS(node.getJid());
-				//TODO : Temporary measure until retrieveServicesSharedByCSS implemented
-				
-				 serviceList= getServiceReg().findServices(filter);
-				
+				serviceList = getServiceReg().retrieveServicesSharedByCSS(node.getJid());
 				break;
-			case CIS:
-
-				//serviceList = getServiceReg().retrieveServicesSharedByCIS(node.getJid());
-				//TODO : Temporary measure until retrieveServicesSharedByCIS implemented
-
-				serviceList= getServiceReg().findServices(filter);
-				
-				break;
-
 			default: 
-				// No nothing, we will handle it below
-
+				serviceList = getServiceReg().retrieveServicesSharedByCIS(node.getJid());
+				break;
 			} 
 		}catch (ServiceRetrieveException e)	{
 
