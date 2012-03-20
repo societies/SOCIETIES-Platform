@@ -19,7 +19,7 @@
 <xs:element  name="serviceControlMsgBean">
   <xs:complexType>
     <xs:sequence>
-      <xs:element name="method" type="tns:methodName" minOccurs="0"/>
+      <xs:element name="method" type="tns:methodType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
 </xs:element>
@@ -31,11 +31,12 @@
       <xs:enumeration value="BUNDLE_NOT_FOUND"/>
       <xs:enumeration value="OSGI_PROBLEM"/>
       <xs:enumeration value="COMMUNICATION_ERROR"/>
+      <xs:enumeration value="EXCEPTION_ON_REMOTE"/>
     </xs:restriction>
   </xs:simpleType>
   
   
-  <xs:simpleType name="methodName">
+  <xs:simpleType name="methodType">
     <xs:restriction base="xs:string">
       <xs:enumeration value="startService"/>
 	  <xs:enumeration value="stopService"/>
