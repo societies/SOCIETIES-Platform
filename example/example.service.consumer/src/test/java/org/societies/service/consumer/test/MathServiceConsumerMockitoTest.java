@@ -37,7 +37,8 @@ public class MathServiceConsumerMockitoTest {
     	classUnderTest.collaborationCall(1, 15);
     	
 //    	then check whether the mock call has been as expected
-    	verify(mock).add(1, 15) ; 
+    	verify(mock).add(1, 15) ;
+
     }  
 
 	@Test
