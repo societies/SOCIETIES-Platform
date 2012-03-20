@@ -53,6 +53,7 @@ import org.societies.cis.manager.CisEditor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+
 import org.societies.api.schema.cis.manager.Community;
 import org.societies.api.schema.cis.manager.Communities;
 import org.societies.api.schema.cis.manager.Create;
@@ -68,12 +69,11 @@ import org.societies.api.schema.cis.manager.Create;
 @Component
 public class CisManager implements ICisManager, IFeatureServer{
 
-	public Set<CisEditor> CISs; 
+	Set<CisEditor> ownedCISs; 
 	ICISCommunicationMgrFactory ccmFactory;
 	IIdentity cisManagerId;
 	ICommManager CSSendpoint;
-	//IIdentity cssManagerId;
-	//ICommManager CISMgmtendpoint;
+	Set<CisRecord> subscribedCISs;
 	
 	private final static List<String> NAMESPACES = Collections
 			.singletonList("http://societies.org/api/schema/cis/manager");
@@ -101,7 +101,8 @@ public class CisManager implements ICisManager, IFeatureServer{
 			
 			LOG.info("listener registered");
 
-			CISs = new HashSet<CisEditor>();			
+			ownedCISs = new HashSet<CisEditor>();	
+			subscribedCISs = new HashSet<CisRecord>();
 
 	}
 
@@ -159,7 +160,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 		}
 		// TODO: review this logic as maybe I should probably check if it exists before creating
 		CisEditor cis = new  CisEditor(cssId, cisName, cisType, mode,this.ccmFactory);		
-		if (CISs.add(cis))
+		if (ownedCISs.add(cis))
 			return cis;
 		else
 			return null;
@@ -185,18 +186,19 @@ public class CisManager implements ICisManager, IFeatureServer{
 		// cIs already exist in the database or if this is a new CIS
 		CisEditor cis = new  CisEditor(creatorCssId,
 				cisId,host,0,"",password,this.ccmFactory);
-		if (CISs.add(cis))
+		if (ownedCISs.add(cis))
 			return cis.getCisRecord();
 		else
 			return null;
 	}
 
 
-	public List<CisRecord> getCisList() {
+
+	public List<CisRecord> getOwnedCisList() {
 		
 		List<CisRecord> l = new ArrayList<CisRecord>();
 
-		Iterator<CisEditor> it = CISs.iterator();
+		Iterator<CisEditor> it = ownedCISs.iterator();
 		 
 		while(it.hasNext()){
 			 CisEditor element = it.next();
@@ -207,6 +209,14 @@ public class CisManager implements ICisManager, IFeatureServer{
 		return l;
 	}
 
+	public List<CisRecord> getSubscribedCisList() {
+		
+		List<CisRecord> l = new ArrayList<CisRecord>(this.subscribedCISs);
+		return l;
+	}
+
+	
+	
 	@Override
 	public List<String> getJavaPackages() {
 		return  PACKAGES;
@@ -266,9 +276,9 @@ public class CisManager implements ICisManager, IFeatureServer{
 			if (c.getList() != null) {
 				LOG.info("list received");
 								
-				// GET LIST CODE
+				// GET LIST CODE of ownedCIS
 				Communities com = new Communities();
-				List<CisRecord> l = this.getCisList();
+				List<CisRecord> l = this.getOwnedCisList();
 				Iterator<CisRecord> it = l.iterator();
 				
 				while(it.hasNext()){
@@ -278,9 +288,24 @@ public class CisManager implements ICisManager, IFeatureServer{
 					com.getCommunity().add(community);
 					 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 			     }
-				return com;
+				// END OF GET LIST CODE
+
+				// GET LIST CODE of subscribedCIS
+				List<CisRecord> li = this.getOwnedCisList();
+				it = li.iterator();
+				
+				while(it.hasNext()){
+					CisRecord element = it.next();
+					Community community = new Community();
+					community.setCommunityJid(element.getCisJID());
+					com.getCommunity().add(community);
+					 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
+			     }
 				// END OF GET LIST CODE
 				
+				
+				return com;
+
 			}
 			if (c.getConfigure() != null) {
 				LOG.info("configure received");

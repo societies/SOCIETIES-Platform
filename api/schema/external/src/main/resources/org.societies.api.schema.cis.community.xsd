@@ -43,9 +43,20 @@
 				<xs:element ref='invite'/>
 				<xs:element ref='who'/>
 				<xs:element ref='add'/>
+				<xs:element ref='subscription'/>
 			</xs:choice>
 		</xs:complexType>
 	</xs:element>
+
+
+	<xs:element name='subscription'>
+		<xs:complexType>
+			<xs:sequence minOccurs='1' maxOccurs='1'>
+				<xs:element ref='participant'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
 
 
 
