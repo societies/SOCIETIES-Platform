@@ -37,11 +37,13 @@ import org.junit.Test;
 import static org.mockito.Mockito.*;
 import org.objenesis.instantiator.basic.NewInstanceInstantiator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.societies.api.css.devicemgmt.IDevice;
 import org.societies.api.css.devicemgmt.model.DeviceMgmtConstants;
 import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.osgi.mock.*;
 
 /**
  * Describe your class here...
@@ -61,14 +63,24 @@ public class DeviceManagerUnitTest {
 	
 	private Dictionary<String, String> properties;
 	
+	private ServiceRegistration sr;
 	
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
+		properties = new Hashtable<String, String>();
 		
+		properties.put(DeviceMgmtConstants.DEVICE_NAME, deviceCommonInfo.getDeviceName());
+		properties.put(DeviceMgmtConstants.DEVICE_TYPE, deviceCommonInfo.getDeviceType());
+		properties.put(DeviceMgmtConstants.DEVICE_ID, "testId");
+		properties.put(DeviceMgmtConstants.DEVICE_FAMILY, deviceCommonInfo.getDeviceFamilyIdentity());
+		properties.put(DeviceMgmtConstants.DEVICE_LOCATION, deviceCommonInfo.getDeviceLocation());
+		properties.put(DeviceMgmtConstants.DEVICE_PROVIDER, deviceCommonInfo.getDeviceProvider());
+		properties.put(DeviceMgmtConstants.DEVICE_CONNECTION_TYPE, deviceCommonInfo.getDeviceConnectionType());
 		
+		String [] test = {IDevice.class.getName()};
 		
 		mock = mock(BundleContext.class);
 		
@@ -89,22 +101,11 @@ public class DeviceManagerUnitTest {
 	@Test
 	public void testFireNewDeviceConnected() {
 		
+		//when(mock.registerService(IDevice.class.getName(), deviceManager, properties)).thenReturn(sr);
 		
-		properties = new Hashtable<String, String>();
-		
-		properties.put(DeviceMgmtConstants.DEVICE_NAME, deviceCommonInfo.getDeviceName());
-		properties.put(DeviceMgmtConstants.DEVICE_TYPE, deviceCommonInfo.getDeviceType());
-		properties.put(DeviceMgmtConstants.DEVICE_ID, "testId");
-		properties.put(DeviceMgmtConstants.DEVICE_FAMILY, deviceCommonInfo.getDeviceFamilyIdentity());
-		properties.put(DeviceMgmtConstants.DEVICE_LOCATION, deviceCommonInfo.getDeviceLocation());
-		properties.put(DeviceMgmtConstants.DEVICE_PROVIDER, deviceCommonInfo.getDeviceProvider());
-		properties.put(DeviceMgmtConstants.DEVICE_CONNECTION_TYPE, deviceCommonInfo.getDeviceConnectionType());
-		
-		mock.registerService(IDevice.class.getName(), deviceManager, properties);
-		
-		
-		//deviceManager.fireNewDeviceConnected(deviceMacAddress, deviceCommonInfo, serviceIds);
+		deviceManager.fireNewDeviceConnected(deviceMacAddress, deviceCommonInfo, serviceIds);
 
+		properties.put(DeviceMgmtConstants.DEVICE_FAMILY, "rr");
 		
 		verify(mock).registerService(IDevice.class.getName(), deviceManager, properties);
 		
