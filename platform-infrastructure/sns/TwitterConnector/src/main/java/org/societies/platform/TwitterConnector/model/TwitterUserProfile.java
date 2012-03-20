@@ -1,4 +1,4 @@
-package org.societies.platform.sns.twconnector;
+package org.societies.platform.TwitterConnector.model;
 
 import java.util.ArrayList;
 
