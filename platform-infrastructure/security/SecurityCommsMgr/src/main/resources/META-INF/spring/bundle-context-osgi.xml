@@ -10,14 +10,22 @@
 		is to facilitate integration testing of the bundle outside of an OSGi container -->
 
 	<!-- Register remote interfaces of remote services -->	
-	<osgi:service ref="NegotiationProviderRemote"  interface="org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote" />
+	<osgi:service ref="NegotiationProviderRemote"
+		interface="org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote" />
 
 	<!-- Get a reference to the Platform Comms Gateway service -->
- 	<osgi:reference id="CommsGateway" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="0..1" />	
+ 	<osgi:reference id="CommManagerBundle"
+ 		interface="org.societies.api.comm.xmpp.interfaces.ICommManager" />	
 
 	<!-- Get a reference to Policy Negotiator -->
 	<!-- Security Group Manager and Policy Negotiator depend on each other => use cardinality="0..1" -->
-	<osgi:reference id="NegotiationProvider"  interface="org.societies.api.internal.security.policynegotiator.INegotiationProvider" cardinality="0..1" />
-	<osgi:reference id="NegotiationRequester" interface="org.societies.api.internal.security.policynegotiator.INegotiationRequester" cardinality="0..1" />
+	<osgi:reference id="NegotiationProvider"
+		interface="org.societies.api.internal.security.policynegotiator.INegotiationProvider"
+		cardinality="0..1"
+		/>
+	<osgi:reference id="NegotiationRequester"
+		interface="org.societies.api.internal.security.policynegotiator.INegotiationRequester"
+		cardinality="0..1"
+		/>
 
 </beans>

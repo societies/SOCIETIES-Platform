@@ -1,13 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:context="http://www.springframework.org/schema/context"
-  xsi:schemaLocation="http://www.springframework.org/schema/osgi 
-    http://www.springframework.org/schema/osgi/spring-osgi-1.2.xsd
-    http://www.springframework.org/schema/beans 
-    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-    http://www.springframework.org/schema/context 
-    http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/osgi 
+		http://www.springframework.org/schema/osgi/spring-osgi-1.2.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/osgi-compendium
+		http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx.xsd"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	>
 
 	<!-- regular spring configuration file defining the beans for this bundle. 
 		We've kept the osgi definitions in a separate configuration file so that 
@@ -15,23 +24,27 @@
 
 	<context:annotation-config />
 	
-	<!--context:component-scan base-package="org.societies.security.policynegotiator" /-->
-	<!--context:component-scan base-package="org.societies.security.sign" /-->
+	<context:component-scan base-package="org.societies.security.commsmgr" />
 
-	<!--bean id="SecurityCommsServer"
-		class="org.societies.security.commsmgr.CommsServer"
-		depends-on="CommManagerBundle, NegotiationProvider, NegotiationRequester"
-		init-method="init"
-		>
-		<property name="commManager" ref="CommManagerBundle"/>
-        <property name="negotiationProvider" ref="NegotiationProvider"/>
-        <property name="negotiationRequester" ref="NegotiationRequester"/>
-	</bean-->
+	<!-- Required for Async processing -->
+	<tx:annotation-driven />
 	
 	<bean id="SecurityCommsServer"
 		class="org.societies.security.commsmgr.CommsServer"
-		depends-on="CommsGateway, NegotiationProvider, NegotiationRequester"
-		>
+		depends-on="CommManagerBundle,NegotiationProvider,NegotiationRequester"
+		init-method="init"
+  		>
+  		<property name="commMgr" ref="CommManagerBundle"/>
+        <property name="negotiationProvider" ref="NegotiationProvider"/>
+        <property name="negotiationRequester" ref="NegotiationRequester"/>
 	</bean>
-
+	
+	<bean id="NegotiationProviderRemote"
+		class="org.societies.security.commsmgr.CommsClient"
+		depends-on="CommManagerBundle"
+  		init-method="init"
+  		>
+  		<property name="commMgr" ref="CommManagerBundle"/>
+	</bean>
+	
 </beans>
