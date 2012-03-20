@@ -105,7 +105,7 @@ public class DeviceManagerUnitTest {
 		
 		deviceManager.fireNewDeviceConnected(deviceMacAddress, deviceCommonInfo, serviceIds);
 
-		properties.put(DeviceMgmtConstants.DEVICE_FAMILY, "rr");
+		//properties.put(DeviceMgmtConstants.DEVICE_FAMILY, "rr");
 		
 		verify(mock).registerService(IDevice.class.getName(), deviceManager, properties);
 		
