@@ -24,16 +24,15 @@
  */
 package com.disaster.idisaster;
 
+import android.app.Activity;
 
 /**
- * This is the class that manages the list of disasters that the user has
- * created or is member of.
+ * This activity allows the user to look up users
+ * in a directory, more to be added.
  * 
  * @author Babak.Farshchian@sintef.no
  *
  */
-public class DisasterManager {
-    //List to hold disasters this user owns:
-    	
-}
+public class UserActivity extends Activity {
 
+}

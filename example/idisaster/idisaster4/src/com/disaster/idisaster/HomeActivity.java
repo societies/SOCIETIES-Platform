@@ -6,8 +6,16 @@ import org.societies.cis.android.client.SocietiesApp;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.widget.ListView;
 
-public class IDisaster4Activity extends Activity {
+/**
+ * This activity is responsible for interaction with the
+ * main home page for iDisaster.
+ * 
+ * @author Babak.Farshchian@sintef.no
+ *
+ */
+public class HomeActivity extends Activity {
     String societiesServer = "server.societies.eu"; // The name of the server where cloud node is hosted
     String username = "Babak"; // username to log into societiesServer
     String password = "SocietieS"; // password for username.
@@ -19,11 +27,12 @@ public class IDisaster4Activity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.list_cis);
+        ListView cisList = (ListView) findViewById(R.id.listCisLayout);
 
         //Instantiate iDisasterSoc which will give us handles to platform
         // components:
-        //TODO: Later on we need to throw an exceltion if SOCIETIES platform is not
+        //TODO: Later on we need to throw an exception if SOCIETIES platform is not
         // installed on this node.
         iDisasterSoc = new SocietiesApp(username, password);
     }
