@@ -33,7 +33,15 @@
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
-		</dependency>		
+		</dependency>
+		
+    	<dependency>
+			<groupId>org.societies.api.schema</groupId>
+			<artifactId>societies-api-schema</artifactId>
+			<version>${release.version}</version>
+			<scope>compile</scope>
+		</dependency>
+				
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
