@@ -24,6 +24,9 @@
  */
 
 package org.societies.cis.manager;
+
+import java.util.Date;
+
 /**
  * We use the definition of an Activity from www.activitystrea.ms. "The Activity
  * in ActivityStreams is a description of an action that was performed (the verb)
@@ -40,6 +43,7 @@ public class CisActivity {
 	public String actor;
 	public String object;
 	public String target;
+	Date timestamp;
 
 	public String getVerb() {
 		return verb;

@@ -62,6 +62,9 @@
 		<module>UserPreferenceManagement</module>
 		<module>UserPreferenceLearning</module>
 		<module>DIANNE</module>
+		<module>CRISTUserIntentDiscovery</module>
+		<module>CRISTUserIntentPrediction</module>
+		<module>CRISTUserIntentTaskManager</module>
 		<module>Personalisation-Bundle</module>
 	</modules>
 </project>

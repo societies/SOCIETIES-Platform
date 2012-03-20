@@ -15,12 +15,19 @@
 		</xs:complexType>
 	</xs:element>
 
+	<xs:complexType name="slaBean">
+		<xs:sequence>
+			<xs:element name="sessionId" type="xs:int"/>
+			<xs:element name="sla" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	
 	<xs:simpleType name="methodType">
-	<xs:restriction base="xs:string">
-		<xs:enumeration value="acceptPolicyAndGetSla"/>
-		<xs:enumeration value="getPolicyOptions"/>
-		<xs:enumeration value="reject"/>
-	</xs:restriction>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="acceptPolicyAndGetSla"/>
+			<xs:enumeration value="getPolicyOptions"/>
+			<xs:enumeration value="reject"/>
+		</xs:restriction>
 	</xs:simpleType>
 
 </xs:schema>

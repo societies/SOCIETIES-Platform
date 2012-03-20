@@ -40,6 +40,7 @@ import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
+import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
 import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
@@ -55,7 +56,7 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 	private IUserPreferenceConditionMonitor pcm;
 	private IDIANNE dianne;
 		private ICAUIPrediction cauiPrediction;
-	/* private ICRISTUserIntentPrediction cristPrediction;*/
+	private ICRISTUserIntentPrediction cristPrediction;
 	
 	//data structures
 	ArrayList<CtxAttributeIdentifier> dianneList;
@@ -166,13 +167,13 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 		this.cauiPrediction = cauiPrediction;
 	}
 
-/*	public ICRISTUserIntentPrediction getCristPrediction() {
+	public ICRISTUserIntentPrediction getCristPrediction() {
 		return cristPrediction;
 	}
 
 	public void setCristPrediction(ICRISTUserIntentPrediction cristPrediction) {
 		this.cristPrediction = cristPrediction;
-	}*/
+	}
 
 	public IUserPreferenceConditionMonitor getPcm() {
 		System.out.println(this.getClass().getName()+"Return PCM");		

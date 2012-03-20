@@ -6,11 +6,14 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Societies user login</title>
+<title>Societies Service Discovery Result</title>
 </head>
 <body>
 
-<TABle>
+<h4>${result}</h4>
+<br/>
+<br/>
+<Table>
 <tr><td><B>Name</B></td><td><B>Description</B></td><td><B>Author</B></td><td><B>Endpoint</B></td>
 <td><B>Status</B></td><td><B>Type</B></td></tr> 
 
@@ -33,7 +36,6 @@
 		
 	<table>	
 		<tr>
-			<td><a href="calculator.html">Calculator Service</a></td>
 			<td><a href="servicediscovery.html">Service Discovery Service</a></td>
 		</tr>		
 	</table>	
