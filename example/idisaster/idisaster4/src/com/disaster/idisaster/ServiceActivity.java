@@ -25,6 +25,8 @@
 package com.disaster.idisaster;
 
 import android.app.Activity;
+import android.os.Bundle;
+import android.widget.TextView;
 
 /**
  * This activity allows the user to browse available
@@ -35,5 +37,14 @@ import android.app.Activity;
  *
  */
 public class ServiceActivity extends Activity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+	// TODO Auto-generated method stub
+	super.onCreate(savedInstanceState);
+
+	TextView textview = new TextView(this);
+        textview.setText("This is the Services tab");
+        setContentView(textview);
+    }
 
 }
