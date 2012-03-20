@@ -56,8 +56,8 @@ public class HomeActivity extends TabActivity {
                           res.getDrawable(R.drawable.ic_tab_disasters))
                       .setContent(intent);
         tabHost.addTab(spec);
-
-        tabHost.setCurrentTab(2);
+        // Start with disasters tab visible:
+        tabHost.setCurrentTab(0);
 
         //Instantiate iDisasterSoc which will give us handles to platform
         // components:
