@@ -42,12 +42,14 @@ public class ServiceMethodTranslator {
 	
 	private static final String ParameterStart = "(";
 	private static final String ParameterEnd = ")";
+	private static final String PACKAGE_SEPARATOR = ".";
 	private static final String ParameterDelimiter = ",";
 	private static final String ParameterSeparator = " ";
-	public static final String JAVA_LANG_SUFFIX = "java.lang.";
+	public static final String JAVA_LANG_PREFIX = "java.lang.";
+	public static final String ANDROID_OS_PREFIX = "android.os.";
 	
 	public static final String JAVA_PRIMITIVES [] = {"int", "long", "double", "float", "byte", "char", "boolean", "short"};
-
+	public static final String JAVA_LANG_CLASSES [] = {"String"};
 	
 	/**
 	 * Determine whether a method signature exists and if it does what is its
@@ -270,9 +272,12 @@ public class ServiceMethodTranslator {
 			try {
 				if (arrayContains(JAVA_PRIMITIVES, paramTypes[i])) {
 					paramClasses[i] = getPrimitiveClass(paramTypes[i]);
+				} else if (arrayContains(JAVA_LANG_CLASSES, paramTypes[i])) {
+					paramClasses[i] = Class.forName(JAVA_LANG_PREFIX + paramTypes[i]);
 				} else {
-					paramClasses[i] = Class.forName(JAVA_LANG_SUFFIX + paramTypes[i]);
+					paramClasses[i] = Class.forName(paramTypes[i]);
 				}
+					
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -294,20 +299,23 @@ public class ServiceMethodTranslator {
 
 	/**
 	 * Capitalise a string value
+	 * Does not capitalise parameter type if it contains a fully qualified class
 	 * 
 	 * @param value
 	 * @return String capitalised version
 	 */
 	static String capitaliseString(String value) {
-		String retValue = null;
+		String retValue = value;
 		
-		StringBuffer newValue = new StringBuffer();
-		
-		if (value != null && value.length() > 0) {
-			newValue.append(value.substring(0, 1).toUpperCase());
+		if (!value.contains(PACKAGE_SEPARATOR)) {
+			StringBuffer newValue = new StringBuffer();
 			
-			newValue.append(value.substring(1));
-			retValue = newValue.toString();
+			if (value != null && value.length() > 0) {
+				newValue.append(value.substring(0, 1).toUpperCase());
+				
+				newValue.append(value.substring(1));
+				retValue = newValue.toString();
+			}
 		}
 		return retValue;
 

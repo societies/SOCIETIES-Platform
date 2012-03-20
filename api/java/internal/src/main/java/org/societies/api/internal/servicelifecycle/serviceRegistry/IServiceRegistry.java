@@ -92,7 +92,7 @@ public interface IServiceRegistry {
 	
 	/**
 	* Description: Based on a Filter this method returns the services list
-	* matching that particular filter
+	* matching that particular filter. Null attributes are excluded and associations are ignored.
 	* @param the object used as filter for the query
 	* @return the list of services that match the filter
 	* @throws ServiceRetrieveException
