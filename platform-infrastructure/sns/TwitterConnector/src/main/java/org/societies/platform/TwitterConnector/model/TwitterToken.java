@@ -1,4 +1,4 @@
-package org.societies.platform.sns.twconnector;
+package org.societies.platform.TwitterConnector.model;
 
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.builder.api.TwitterApi;
@@ -10,7 +10,7 @@ import org.scribe.oauth.OAuthService;
 /*
  * twitter access token manager
  */
-class TwitterToken{
+public class TwitterToken{
 
 
 	private String defaultApiKey = "cLD3W6l4bfXs8cwlzXGmRQ";
