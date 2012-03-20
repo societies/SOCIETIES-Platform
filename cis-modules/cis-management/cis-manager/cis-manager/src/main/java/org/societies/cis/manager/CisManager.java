@@ -70,7 +70,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 	public Set<CisEditor> CISs; 
 	ICISCommunicationMgrFactory ccmFactory;
-	//IIdentity cisManagerId;
+	IIdentity cisManagerId;
 	ICommManager CSSendpoint;
 	//IIdentity cssManagerId;
 	//ICommManager CISMgmtendpoint;
@@ -89,7 +89,9 @@ public class CisManager implements ICisManager, IFeatureServer{
 		this.CSSendpoint = CSSendpoint;
 		this.ccmFactory = ccmFactory;
 
-		
+		cisManagerId = CSSendpoint.getIdManager().getThisNetworkNode();
+		LOG.info("Jid = " + cisManagerId.getBareJid() + ", domain = " + cisManagerId.getDomain() );
+
 
 			try {
 				CSSendpoint.register(this);
@@ -103,7 +105,8 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 	}
 
-	/**
+	/** Deprecated, has been replaced by the function bellow
+	 * 
 	 * Create a CIS Editor with default settings and returns a CIS Record 
 	 * This function should generate automatically the jid for the CIS and the pwd
 	 * 
@@ -113,6 +116,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 	 * @return      CisRecord
 	 * 
 	 */
+	@Deprecated
 	public CisRecord createCis(String creatorCssId, String cisname) {
 		// TODO: create and identity for the CIS and map it in the database with the cisname
 		// cisName = randon unused JID;
@@ -149,7 +153,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 	@Override
 	public ICisEditor createCis(String cssId, String cssPassword, String cisName, String cisType, int mode) {
 		// TODO: how do we check fo the cssID/pwd?
-		if(!cssId.equals(this.CSSendpoint.getIdManager().getThisNetworkNode().getJid())){ // if the cssID does not match with the host owner
+		if(cssId.equals(this.CSSendpoint.getIdManager().getThisNetworkNode().getJid()) == false){ // if the cssID does not match with the host owner
 			LOG.info("cssID does not match with the host owner");
 			return null;
 		}
@@ -232,7 +236,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 				String ownerPassword = create.getOwnerPassword();
 				String cisType = create.getCommunityType();
 				String cisName = create.getCommunityName();
-				int cisMode = create.getMembershipMode().intValue();
+				//int cisMode = create.getMembershipMode().intValue();
 				LOG.info("CIS to be created with " + ownerJid + " " + cisJid + " "+ cisPassword + " ");
 				if(cisPassword != null && ownerJid != null && cisJid != null ){
 					CisRecord cisR = this.createCis(ownerJid,
@@ -243,7 +247,8 @@ public class CisManager implements ICisManager, IFeatureServer{
 					
 				}
 				else{
-					if(ownerJid != null && ownerPassword != null && cisType != null && cisName != null){
+					if(ownerJid != null && ownerPassword != null && cisType != null && cisName != null &&  create.getMembershipMode()!= null){
+						int cisMode = create.getMembershipMode().intValue();
 						ICisEditor icis = createCis(ownerJid, ownerPassword, cisName, cisType, cisMode);
 						
 						create.setCommunityJid(icis.getCisId());

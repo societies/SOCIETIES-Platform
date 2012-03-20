@@ -55,7 +55,7 @@ import org.societies.api.schema.cis.community.Who;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.ParticipantRole;
-
+import org.societies.api.schema.cis.community.Add;
 
 /**
  * @author Thomas Vilarinho (Sintef)
@@ -202,37 +202,31 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 	
 
 	/**
-	 * add a member to the CIS and at the same time send the XMPP notification to the user that he has been added to the community
-	 * if this is called through a XMPP message, the fail response is responsability of the XMPP query handler
+	 * add a member to the CIS and at the same time send the XMPP notification to all the other users that this user has been added to the community
+	 * the return message to the added user must be handled outside of this function
 	 * 
 	 * @param jid is the full jid of the user
-	 * @param role
+	 * @param role, if the role is null, the member will be set as a participant
 	 * @return true if it worked and false if the jid was already there
 	 * @throws CommunicationException 
 	 */
 	boolean addMember(String jid, MembershipType role) throws  CommunicationException{
 		
+		LOG.info("add member invoked");
+		if (role == null)
+			role = MembershipType.participant; // default role is participant
 		
 		if (membersCss.add(new CisParticipant(jid, role))){
 			// should we send a XMPP notification to all the users to say that the new member has been added to the group
 			// I thought of that as a way to tell the participants CIS Managers that there is a new participant in that group
 			// and the GUI can be updated with that new member
+			LOG.info("new member added, going to notify community");
 			
 			
-			// 1) Sending message to user to notify that he is now member of the community
-			// creating payload 
-			Community c = new Community();
-			c.setJoin("");
-			
-			IIdentity targetCssIdentity = new IdentityImpl(jid);
-
-			Stanza s = new Stanza(targetCssIdentity);
-			CISendpoint.sendMessage(s, c);
-			
-			// 2) Sending a notification to all the other users // TODO: probably change this to a thread that process a queue or similar
+			// 1) Sending a notification to all the other users // TODO: probably change this to a thread that process a queue or similar
 			
 			//creating payload
-			c = new Community();
+			Community c = new Community();
 			Who w = new Who();
 			Participant p = new Participant();
 			p.setJid(jid);
@@ -246,14 +240,25 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 			
 			while(it.hasNext()){
 				CisParticipant element = it.next();
-				targetCssIdentity = new IdentityImpl(element.getMembersJid());
+				LOG.info("sending notification to " + element.getMembersJid());
+				IIdentity targetCssIdentity = new IdentityImpl(element.getMembersJid());
 				Stanza sta = new Stanza(targetCssIdentity);
 				CISendpoint.sendMessage(sta, c);
 				
 		     }
+
 			
+			// 2) Sending message to user to notify that he is now member of the community
+			// creating payload 
+/*			c = new Community();
+			c.setJoin("success");
 			
-			
+			IIdentity targetCssIdentity = new IdentityImpl(jid);
+
+			Stanza s = new Stanza(targetCssIdentity);
+			CISendpoint.sendMessage(s, c);*/
+									
+			LOG.info("returning true on Add member");
 			return true;
 		}else{
 			return false;
@@ -299,7 +304,7 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 		if (cisRecord == null) {
 			if (other.cisRecord != null)
 				return false;
-		} else if (!cisRecord.equals(other.cisRecord))
+		} else if (cisRecord.equals(other.cisRecord) == false)
 			return false;
 		return true;
 	}
@@ -330,19 +335,22 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 			if (c.getJoin() != null) {
 				LOG.info("join received");
 				String jid = stanza.getFrom().getBareJid();
+				LOG.info( jid + " joinining");
 				boolean addresult = false; 
 				try{ 
 					addresult = this.addMember(jid, MembershipType.participant);
 				}catch(CommunicationException e){
-					;
+					e.printStackTrace();
 				}
-				if(!addresult){
+				if(addresult == false){
 					Community result = new Community();
 					result.setJoin("error");
 					return result;
 				}
 				else{
-					return null;
+					Community result = new Community();
+					result.setJoin("success");
+					return result;
 				}
 				//return result;
 			}
@@ -379,6 +387,37 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 				return result;
 				// END OF WHO
 			}
+			if (c.getAdd() != null) {
+				// ADD
+				Community result = new Community();
+				Add a = new Add();
+				result.setAdd(a);
+				this.getMembersCss();
+		
+				Participant p = c.getAdd().getParticipant();
+				if(p!= null && p.getJid() != null){
+					String role = "";
+					if (p.getRole() != null)				
+						role = p.getRole().value();
+					
+					try{
+						if(this.addMember(p.getJid(), MembershipType.valueOf(role))){
+							a.setParticipant(p);
+							// here we send the notification to the user that he has been added
+							IIdentity targetCssIdentity = new IdentityImpl(p.getJid());
+							Stanza s = new Stanza(targetCssIdentity);
+							CISendpoint.sendMessage(s, result);
+						}
+					}
+					catch(Exception e){
+						e.printStackTrace();
+					}
+				}
+				return result;
+				// END OF ADD
+			}
+
+			
 		}
 		return null;
 	}
@@ -410,8 +449,8 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 
 	@Override
 	public String getCisId() {
-		// TODO Auto-generated method stub
-		return null;
+	
+		return this.cisRecord.getCisJID();
 	}
 
 	@Override

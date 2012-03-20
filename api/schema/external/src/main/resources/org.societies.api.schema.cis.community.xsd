@@ -42,6 +42,7 @@
 				<xs:element ref='leave'/>
 				<xs:element ref='invite'/>
 				<xs:element ref='who'/>
+				<xs:element ref='add'/>
 			</xs:choice>
 		</xs:complexType>
 	</xs:element>
@@ -91,7 +92,13 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-
+	<xs:element name='add'>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='participant'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 
 	<xs:simpleType name='empty'>
 		<xs:restriction base='xs:string'>
