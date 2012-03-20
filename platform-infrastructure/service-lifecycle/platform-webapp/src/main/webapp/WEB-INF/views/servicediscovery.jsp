@@ -7,7 +7,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Societies services</title>
+<title>Societies services - Service Discovery</title>
 <style>
 .error {
 	color: #ff0000;
@@ -26,26 +26,27 @@
 <body>
 
 	<h3>Service Discovery Service</h3>
+
 		
 <form:form method="POST" action="servicediscovery.html" commandName="sdForm">
 		<form:errors path="*" cssClass="errorblock" element="div" />
 		<table>
+			<tr>
+				<td>Service Discovery Methods :</td>
+					<td><form:select path="method" >
+					   <form:option value="NONE" label="--- Select ---" />
+					   <form:options items="${methods}" />
+					</form:select></td>
+				<td><form:errors path="method" cssClass="error" />
+				</td>
+			</tr>
 			<tr>
 				<td>Node :</td>
 				<td><form:input path="node" />
 				</td>
 				<td><form:errors path="node" cssClass="error" />
 				</td>
-			</tr>			
-			<tr>
-				<td>Service Discovery Methods :</td>
-				<td><form:select path="method">
-					   <form:option value="NONE" label="--- Select ---" />
-					   <form:options items="${methods}" />
-					</form:select></td>
-				<td><form:errors path="method" cssClass="error" />
-				</td>
-			</tr>					
+			</tr>	
 			<tr>
 				<td colspan="3"><input type="submit" /></td>
 			</tr>

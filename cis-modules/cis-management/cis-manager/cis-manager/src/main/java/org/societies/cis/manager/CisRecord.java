@@ -53,10 +53,12 @@ public class CisRecord {
 	 * permaLink is a permanent URL to this CIS. A type of CIS homepage.
 	 */
 	public String permaLink;
-	public Set<CisParticipant> membersCss;
+	public Set<CisParticipant> membersCss; //TODO: maybe this should be moved to the CIS Editor (or in other words, we should 
+	// not keep track of members of CISs which we do not own 
 	private String password = "none";
 	private String host = "none";
-	public Set<IServiceSharingRecord> sharedServices;
+	public Set<IServiceSharingRecord> sharedServices;//TODO: maybe this should be moved to the CIS Editor (or in other words, we should 
+	// not keep track of members of CISs which we do not own
 	
 
 	
