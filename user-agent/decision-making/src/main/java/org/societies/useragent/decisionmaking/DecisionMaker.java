@@ -49,7 +49,7 @@ public class DecisionMaker extends AbstractDecisionMaker {
 	}
 	@Override
 	protected ConflictType detectConflict(IOutcome intent, IOutcome prefernce) {
-		// TODO Auto-generated method stub
+		// TODO Auto-generated  method stub
 		try {
 			if (intent.getServiceID().equals(prefernce.getServiceID())) {
 				if (intent.getparameterName().equals(

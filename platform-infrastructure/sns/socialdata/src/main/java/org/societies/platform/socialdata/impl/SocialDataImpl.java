@@ -8,13 +8,12 @@ import java.util.List;
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
-import org.json.JSONObject;
-import org.societies.platform.FacebookConn.SocialConnector;
+import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.platform.socialdata.SocialData;
 
 public class SocialDataImpl implements SocialData {
 
-    HashMap<String, SocialConnector> connectors = new HashMap<String, SocialConnector>();
+    HashMap<String, ISocialConnector> connectors = new HashMap<String, ISocialConnector>();
     
     ArrayList<Person> 				socialPersonList;
     ArrayList<ActivityEntry> 		socialActivityList;
@@ -37,7 +36,7 @@ public class SocialDataImpl implements SocialData {
     
 
 	@Override
-	public void addSocialConnector(SocialConnector socialConnector) throws Exception {
+	public void addSocialConnector(ISocialConnector socialConnector) throws Exception {
 		if (connectors.containsKey(socialConnector.getID())){
 			throw new Exception("this connetor lready exists");
 		}
@@ -55,9 +54,9 @@ public class SocialDataImpl implements SocialData {
 	}
 
 	@Override
-	public List<SocialConnector> getSocialConnectors() {
-		Iterator<SocialConnector>it = connectors.values().iterator();
-		List <SocialConnector> list = new ArrayList<SocialConnector>();
+	public List<ISocialConnector> getSocialConnectors() {
+		Iterator<ISocialConnector>it = connectors.values().iterator();
+		List <ISocialConnector> list = new ArrayList<ISocialConnector>();
 		while (it.hasNext()){
 			list.add(it.next());
 		}
@@ -88,10 +87,10 @@ public class SocialDataImpl implements SocialData {
 	@Override
 	public void updateSocialData() {
 
-		Iterator<SocialConnector>it = connectors.values().iterator();
-		List <SocialConnector> list = new ArrayList<SocialConnector>();
+		Iterator<ISocialConnector>it = connectors.values().iterator();
+		List <ISocialConnector> list = new ArrayList<ISocialConnector>();
 		while (it.hasNext()){
-			SocialConnector connector = it.next();
+			ISocialConnector connector = it.next();
 		    
 			updateProfile(connector.getUserProfile());
 			updateFriends(connector.getUserFriends());
@@ -110,25 +109,25 @@ public class SocialDataImpl implements SocialData {
 	
 	
 
-	private void updateGroups(JSONObject userGroups) {
+	private void updateGroups(String userGroups) {
 		// TODO Auto-generated method stub
 		
 	}
 
 
-	private void getActivities(JSONObject userActivities) {
+	private void getActivities(String userActivities) {
 		// TODO Auto-generated method stub
 		
 	}
 
 
-	private void updateFriends(JSONObject userFriends) {
+	private void updateFriends(String userFriends) {
 		// TODO Auto-generated method stub
 		
 	}
 
 
-	private void updateProfile(JSONObject userProfile) {
+	private void updateProfile(String userProfile) {
 		 // UPDATE Social profile (per SN)
 		
 	}
@@ -145,7 +144,7 @@ public class SocialDataImpl implements SocialData {
     }
 
 	@Override
-	public boolean isAvailable(SocialConnector connector) {
+	public boolean isAvailable(ISocialConnector connector) {
 		
 		if (connector==null) return false;
 		

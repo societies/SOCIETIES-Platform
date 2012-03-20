@@ -75,13 +75,13 @@ public class CAUIPrediction implements ICAUIPrediction{
 		this.persoMgr = persoMgr;
 	}
 
-	public ICAUITaskManager getCAUITaskManager() {
+	public ICAUITaskManager getCauiTaskManager() {
 		System.out.println(this.getClass().getName()+": Return cauiTaskManager");
 
 		return cauiTaskManager;
 	}
 
-	public void setCAUITaskManager(ICAUITaskManager cauiTaskManager) {
+	public void setCauiTaskManager(ICAUITaskManager cauiTaskManager) {
 		System.out.println(this.getClass().getName()+": Got cauiTaskManager");
 
 		this.cauiTaskManager = cauiTaskManager;
