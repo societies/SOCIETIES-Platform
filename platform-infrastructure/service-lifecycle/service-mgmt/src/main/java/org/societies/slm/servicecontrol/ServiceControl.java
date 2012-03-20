@@ -130,7 +130,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					if(logger.isDebugEnabled())
 						logger.debug("Error with communication to remote client");
 					
-					return new AsyncResult<ServiceControlResult>(ServiceControlResult.OSGI_PROBLEM);
+					return new AsyncResult<ServiceControlResult>(ServiceControlResult.COMMUNICATION_ERROR);
 				} else{
 					if(logger.isDebugEnabled())
 						logger.debug("Result of operation was: " + result);
@@ -223,7 +223,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					if(logger.isDebugEnabled())
 						logger.debug("Error with communication to remote client");
 					
-					return new AsyncResult<ServiceControlResult>(ServiceControlResult.OSGI_PROBLEM);
+					return new AsyncResult<ServiceControlResult>(ServiceControlResult.COMMUNICATION_ERROR);
 				} else{
 					if(logger.isDebugEnabled())
 						logger.debug("Result of operation was: " + result);
@@ -332,18 +332,18 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			// Our first task is to verify if we're installing in the right node..
 
 			String localNodeJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
-						
+			String nodeJid = node.getJid();
+			
 			if(logger.isDebugEnabled())
 				logger.debug("The JID of the node where the Service is: " + nodeJid + " and the local JID: " + localNodeJid);
 				
-			if(!node.getJid().equals(localNodeJid)){
+			if(!nodeJid.equals(localNodeJid)){
 				
 				if(logger.isDebugEnabled())
 					logger.debug("We're dealing with a different node! Need to do a remote call!");
 				
-				IIdentity node = getCommMngr().getIdManager().fromJid(nodeJid);
 				ServiceControlRemoteClient callback = new ServiceControlRemoteClient();
-				getServiceControlRemote().startService(serviceId, node, callback);
+				getServiceControlRemote().installService(bundleLocation, node, callback);
 				
 				if(logger.isDebugEnabled())
 					logger.debug("Remote call complete, now we need to wait for the result...");
@@ -354,7 +354,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					if(logger.isDebugEnabled())
 						logger.debug("Error with communication to remote client");
 					
-					return new AsyncResult<ServiceControlResult>(ServiceControlResult.OSGI_PROBLEM);
+					return new AsyncResult<ServiceControlResult>(ServiceControlResult.COMMUNICATION_ERROR);
+					
 				} else{
 					if(logger.isDebugEnabled())
 						logger.debug("Result of operation was: " + result);
@@ -393,6 +394,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		}
 
 	}
+	
 	@Override
 	public Future<ServiceControlResult> uninstallService(ServiceResourceIdentifier serviceId)
 			throws ServiceControlException {
@@ -427,7 +429,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					if(logger.isDebugEnabled())
 						logger.debug("Error with communication to remote client");
 					
-					return new AsyncResult<ServiceControlResult>(ServiceControlResult.OSGI_PROBLEM);
+					return new AsyncResult<ServiceControlResult>(ServiceControlResult.COMMUNICATION_ERROR);
 				} else{
 					if(logger.isDebugEnabled())
 						logger.debug("Result of operation was: " + result);

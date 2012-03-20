@@ -30,6 +30,7 @@
       <xs:enumeration value="SERVICE_NOT_FOUND"/>
       <xs:enumeration value="BUNDLE_NOT_FOUND"/>
       <xs:enumeration value="OSGI_PROBLEM"/>
+      <xs:enumeration value="COMMUNICATION_ERROR"/>
     </xs:restriction>
   </xs:simpleType>
   

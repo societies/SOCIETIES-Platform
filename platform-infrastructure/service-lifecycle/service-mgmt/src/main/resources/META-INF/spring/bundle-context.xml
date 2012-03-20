@@ -26,27 +26,15 @@
 	</bean>
 	
 	<bean id="serviceDiscovery" class="org.societies.slm.servicediscovery.ServiceDiscovery" >
-		<!-- <property name="converter" ref="XMLtoServiceObjectConverter" /> -->
 		<property name="serviceReg" ref="serviceRegRef" /> 	
 		<property name="commMngr" ref="commMngrRef" />
-		<property name="serviceDiscoveryRemote" ref="serviceDiscoveryRemoteRef" />
-						
+		<property name="serviceDiscoveryRemote" ref="serviceDiscoveryRemoteRef" />					
 	</bean>
-	<!-- 
-	<bean id="XMLtoServiceObjectConverter" class="org.societies.slm.servicemgmt.impl.XMLServiceMetaDataToObjectConverter">
-		<property name="marshaller" ref="jaxbMarshaller" />
-		<property name="unmarshaller" ref="jaxbMarshaller" />
+
+	<bean id="serviceControl" class="org.societies.slm.servicecontrol.ServiceControl" >
+		<property name="serviceReg" ref="serviceRegRef" /> 	
+		<property name="commMngr" ref="commMngrRef" />
+		<property name="serviceControlRemote" ref="serviceControlRemoteRef" />				
 	</bean>
-		
-	<bean id="jaxbMarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
-		 <property name="classesToBeBound" >
-            <list>
-                <value>org.societies.api.internal.servicelifecycle.model.Service</value>
-                <value>org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier</value>                            
-            </list>
-        </property>
-        <property name="schema" value="classpath:schema1.xsd"/>  
-	</bean>
-	-->
 	
 </beans>

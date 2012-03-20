@@ -14,12 +14,12 @@
 <!--   <osgi:service ref="serviceMgmt" interface="org.societies.api.internal.servicelifecycle.serviceMgmt.IServiceManagement"/> -->
 <osgi:service ref="serListener" interface="org.societies.slm.servicecontrol.ServiceRegistryListener"/>	
 <osgi:service ref="serviceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"/>
+<osgi:service ref="serviceControl" interface="org.societies.api.servicelifecycle.IServiceControl"/>
 
-<!-- Commenting out for now. No bean in bundle-context.xml file. so causes problem on deployment
-<osgi:service ref="serviceControl" interface="org.societies.api.servicelifecycle.IServiceControl"/> -->
 <osgi:reference id="serviceRegRef" interface="org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry"/>
 <osgi:reference id="commMngrRef" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="0..1"/>
 <osgi:reference id="serviceDiscoveryRemoteRef" interface="org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote" cardinality="0..1" />
+<osgi:reference id="serviceControlRemoteRef" interface="org.societies.api.servicelifecycle.IServiceControlRemote" cardinality="0..1" />
 	
 	  
 </beans>
