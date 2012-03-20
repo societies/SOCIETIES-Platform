@@ -162,8 +162,14 @@
 
   <xs:complexType name="ctxHistoryAttribute">
     <xs:complexContent>
-      <xs:extension base="tns:ctxModelObject">
-        <xs:sequence/>
+      <xs:extension base="ctxModelObject">
+        <xs:sequence>
+          <xs:element name="historyRecordId" type="xs:long"/>
+          <xs:element name="stringValue" type="xs:string" nillable="true"/>
+          <xs:element name="integerValue" type="xs:int" nillable="true"/>
+          <xs:element name="doubleValue" type="xs:double" nillable="true"/>
+          <xs:element name="binaryValue" type="xs:base64Binary" nillable="true"/>
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

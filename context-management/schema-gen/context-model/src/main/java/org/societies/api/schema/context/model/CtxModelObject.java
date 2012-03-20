@@ -85,6 +85,10 @@ public abstract class CtxModelObject implements Serializable {
 		return this.lastModified;
 	}
 	
+	void setLastModified(Date lastModified) {
+		this.lastModified = lastModified;
+	}
+	
 	/**
 	 * Returns the model type of this context model object, i.e. Entity,
 	 * Attribute or Association
