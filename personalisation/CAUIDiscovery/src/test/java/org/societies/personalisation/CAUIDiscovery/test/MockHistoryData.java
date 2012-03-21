@@ -15,6 +15,20 @@ public class MockHistoryData {
 	
 	
 	
+	public List<String> getContext() {
+		return context;
+	}
+
+
+
+
+	public void setContext(List<String> context) {
+		this.context = context;
+	}
+
+
+
+
 	public String getActionValue() {
 		return actionValue;
 	}

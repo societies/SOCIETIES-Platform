@@ -88,12 +88,18 @@
 
 		<module>../platform-infrastructure/service-lifecycle/service-mgmt/
 		</module>
-     	<!--<module>../platform-infrastructure/service-lifecycle/platform-webapp/
-		</module>-->
+		
+		
+		<module>../platform-infrastructure/service-lifecycle/sl-comms-mgr/
+		</module>
 
+	
 		<!-- <module>../platform-infrastructure/comms-frwk/ClientCommunicationMgr</module> -->
 
 		<!-- Security and Dependability Mgmt -->
+		<module>../platform-infrastructure/security/SecurityServices</module>
+		<module>../platform-infrastructure/security/PolicyNegotiator</module>
+		<module>../platform-infrastructure/security/SecurityCommsMgr</module>
 
 		<!-- CSS Mgmt -->
 
@@ -130,7 +136,13 @@
 		<!-- Context Management -->
 
 		<!-- Privacy Mgmt -->
-		<!-- <module>../privacy-trust/privacy-protection</module>  -->
+		<module>../privacy-trust/privacy-protection</module>
+
+
+		<!-- PlatForm Web App -->	
+		<module>../platform-infrastructure/service-lifecycle/platform-webapp/
+		</module>
+		
 
 	</modules>
 </project>

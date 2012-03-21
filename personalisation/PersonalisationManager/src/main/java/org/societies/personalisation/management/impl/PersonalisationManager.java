@@ -39,6 +39,8 @@ import org.societies.api.internal.personalisation.model.IFeedbackEvent;
 import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
+import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
 import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
@@ -53,8 +55,8 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private IUserPreferenceConditionMonitor pcm;
 	private IDIANNE dianne;
-	/*	private ICAUIPrediction cauiPrediction;
-	private ICRISTUserIntentPrediction cristPrediction;*/
+		private ICAUIPrediction cauiPrediction;
+	private ICRISTUserIntentPrediction cristPrediction;
 	
 	//data structures
 	ArrayList<CtxAttributeIdentifier> dianneList;
@@ -155,13 +157,7 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 
 	}
 
-/*	public IDIANNE getdianne() {
-		return dianne;
-	}
 
-	public void setdianne(IDIANNE dianne) {
-		this.dianne = dianne;
-	}
 
 	public ICAUIPrediction getCauiPrediction() {
 		return cauiPrediction;
@@ -177,7 +173,7 @@ public class PersonalisationManager implements IPersonalisationManager, IInterna
 
 	public void setCristPrediction(ICRISTUserIntentPrediction cristPrediction) {
 		this.cristPrediction = cristPrediction;
-	}*/
+	}
 
 	public IUserPreferenceConditionMonitor getPcm() {
 		System.out.println(this.getClass().getName()+"Return PCM");		

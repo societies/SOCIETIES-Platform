@@ -27,6 +27,7 @@ package org.societies.context.broker.impl;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
@@ -50,6 +53,8 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.context.api.event.CtxChangeEventTopic;
+import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
 import org.societies.context.broker.api.CtxBrokerException;
@@ -66,6 +71,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class InternalCtxBroker implements ICtxBroker {
 
+	/** The logging facility. */
+	private static final Logger LOG = LoggerFactory.getLogger(InternalCtxBroker.class);
+	
+	/** The Context Event Mgmt service reference. */
+	@Autowired(required=true)
+	private ICtxEventMgr ctxEventMgr;
+	
 	/**
 	 * The User Context DB Mgmt service reference.
 	 * 
@@ -82,30 +94,6 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Autowired(required=true)
 	private IUserCtxHistoryMgr userCtxHistoryMgr = null;
 
-	/**
-	 * Sets the User Context DB Mgmt service reference.
-	 * 
-	 * @param userDB
-	 *            the User Context DB Mgmt service reference to set.
-	 */
-	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) {
-		this.userCtxDBMgr = userDB;
-	}
-
-	/**
-	 * Sets the User Context History Mgmt service reference.
-	 * 
-	 * @param userCtxHistoryMgr
-	 *            the User Context History Mgmt service reference to set
-	 */
-	public void setUserCtxHistoryMgr(IUserCtxHistoryMgr userCtxHistoryMgr) {
-		this.userCtxHistoryMgr = userCtxHistoryMgr;
-	}
-
-	
-	
-	
-	
 	/*
 	 * (non-Javadoc)
 	 * @see org.societies.api.internal.context.broker.ICtxBroker#createAssociation(java.lang.String)
@@ -350,7 +338,21 @@ public class InternalCtxBroker implements ICtxBroker {
 		if (ctxId == null)
 			throw new NullPointerException("ctxId can't be null");
 		
-		// TODO Auto-generated method stub
+		final String[] topics = new String[] {
+				CtxChangeEventTopic.UPDATED,
+				CtxChangeEventTopic.MODIFIED,
+				CtxChangeEventTopic.REMOVED,
+		};
+		if (this.ctxEventMgr != null) {
+			if (LOG.isInfoEnabled())
+				LOG.info("Registering context change event listener for object '"
+						+ ctxId + "' to topics '" + Arrays.toString(topics) + "'");
+			this.ctxEventMgr.registerChangeListener(listener, topics, ctxId);
+		} else {
+			throw new CtxBrokerException("Could not register context change event listener for object '"
+					+ ctxId + "' to topics '" + Arrays.toString(topics)
+				    + "': ICtxEventMgr service is not available");
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -382,7 +384,22 @@ public class InternalCtxBroker implements ICtxBroker {
 		if (attrType == null)
 			throw new NullPointerException("attrType can't be null");
 		
-		// TODO Auto-generated method stub
+		final String[] topics = new String[] {
+				CtxChangeEventTopic.UPDATED,
+				CtxChangeEventTopic.MODIFIED,
+				CtxChangeEventTopic.REMOVED,
+		};
+		if (this.ctxEventMgr != null) {
+			if (LOG.isInfoEnabled())
+				LOG.info("Registering context change event listener for attributes with scope '"
+						+ scope + "' and type '" + attrType + "' to topics '" 
+						+ Arrays.toString(topics) + "'");
+			this.ctxEventMgr.registerChangeListener(listener, topics, scope, attrType );
+		} else {
+			throw new CtxBrokerException("Could not register context change event listener for attributes with scope '"
+					+ scope + "' and type '" + attrType + "' to topics '" + Arrays.toString(topics)
+				    + "': ICtxEventMgr service is not available");
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -592,7 +609,26 @@ public class InternalCtxBroker implements ICtxBroker {
 		return null;
 	}
 
+	/**
+	 * Sets the User Context DB Mgmt service reference.
+	 * 
+	 * @param userDB
+	 *            the User Context DB Mgmt service reference to set.
+	 */
+	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) {
+		this.userCtxDBMgr = userDB;
+	}
 
+	/**
+	 * Sets the User Context History Mgmt service reference.
+	 * 
+	 * @param userCtxHistoryMgr
+	 *            the User Context History Mgmt service reference to set
+	 */
+	public void setUserCtxHistoryMgr(IUserCtxHistoryMgr userCtxHistoryMgr) {
+		this.userCtxHistoryMgr = userCtxHistoryMgr;
+	}
+	
 	private CtxAttributeValueType findAttributeValueType(Serializable value) {
 		if (value == null)
 			return CtxAttributeValueType.EMPTY;

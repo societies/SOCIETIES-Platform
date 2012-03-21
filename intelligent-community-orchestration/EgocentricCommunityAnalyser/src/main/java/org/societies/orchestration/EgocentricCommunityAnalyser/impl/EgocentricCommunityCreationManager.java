@@ -53,6 +53,14 @@ import org.societies.api.internal.cis.management.ICisManager;
 //import org.societies.api.cis.management.ICisActivityFeed;
 //import org.societies.api.cis.management.ICis;
 
+import org.societies.api.internal.css.management.CSSRecord;
+import org.societies.api.internal.css.management.ICssActivity;
+import org.societies.api.internal.css.management.ICssActivityFeed;
+import org.societies.api.internal.css.management.ICSSLocalManager;
+import org.societies.api.internal.css.management.ICSSManagerCallback;
+import org.societies.api.internal.css.management.ICSSRemoteManager;
+//import org.societies.api.internal.css.management.ICssManagerCloud;
+
 import org.societies.api.internal.context.broker.ICtxBroker;
 
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
@@ -112,10 +120,14 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 	private IUserFeedbackCallback userFeedbackCallback;
 	
 	private ICisManager cisManager;
+	private ICSSLocalManager cssManager;
     
 	private ArrayList<CtxEntity> availableContextData;
 	
 	private ICssDirectory userCssDirectory;
+	
+	private ICssActivityFeed activityFeed;
+	
     
 	private ISuggestedCommunityAnalyser suggestedCommunityAnalyser;
 	
@@ -209,6 +221,8 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		
 		linkedCss = mock(IIdentity.class);
 		cisManager = mock(ICisManager.class);
+		cssManager = mock(ICSSLocalManager.class);
+		activityFeed = mock(ICssActivityFeed.class);
 		userContextBroker = mock(ICtxBroker.class);
 		userCssDirectory = mock(ICssDirectory.class);
 		
@@ -681,7 +695,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				//            cissToCreate.add(new CisRecord(null, linkedCss, "Local proximity", null, null, null, null, null));
 				
 				int sharingCis = 0;
-				// processing - here or delegated to local method
+
 				if (localCsss != null) {
 					//for (int m = 0; m < cisManager.getCisList(linkedCss); m++)
 				    for (int n = 0; n < localCsss.size(); n++) {
@@ -710,6 +724,69 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 					
 					
 				}
+				
+				//CssActivityFeed theFeed = cssManager.getCssActivityFeed();
+				////CssActivityFeed fiveMinutesFeed = theFeed.searchQuery("contains: " + lastFiveMinutesHyphens[2].split(" ")[0]);
+				//ArrayList<String> interactionRecordsLastMonth = fiveMinutesFeed.searchQuery("interaction").toString();
+				
+				////CssActivityFeed fifteenMinutesFeed = theFeed.searchQuery("contains: " + lastFifteenMinutesHyphens[2].split(" ")[0]);
+				//ArrayList<String> interactionRecordsLastMonth = fiveMinutesFeed.searchQuery("interaction").toString();
+				
+				//ArrayList<String> potentialCisMembers = new ArrayList<String>;
+				
+				//CssActivityFeed fifteenAndFiveMinutesFeed = splitActivityFeed(15 minutes ago, 5 minutes ago);
+				
+				//ArrayList<IIdentify> theIDs = getIDsOfInteractingCsss(5 minutes ago, now);
+				//HashMap<IIDentify, int> timesInteracted = new HashMap();
+				//ArrayList<int> timesThisCssInteracted = new ArrayList();
+				//for (int i = 0; i < theIDs.size(); i++) {
+				//    timesThisCssInteracted = 0;
+				//    for (int m = 0; m < fiveMinutesFeed.size(); m++) {
+				//        if (fiveMinutesFeed.get(m).contains(theIDs.get(i).toString()))
+				//            timesThisCssInteracted++;
+				//    }
+				//    timesInteracted.put(theIDs.get(i), timesThisCssInteracted);
+				//}
+				
+				//ArrayList<IIdentify> theIDs = getIDsOfInteractingCsss(15 minutes ago, 5 minutes ago);
+				//HashMap<IIDentify, int> timesInteractedBetweenFifteenAndFiveMinutes = new HashMap();
+				//ArrayList<int> timesThisCssInteractedBetweenFifteenAndFiveMinutes = new ArrayList();
+				//for (int i = 0; i < theIDs.size(); i++) {
+				//    timesThisCssInteracted = 0;
+				//    for (int m = 0; m < fifteenAndFiveMinutesFeed.size(); m++) {
+				//        if (fiftenMinutesFeed.get(m).contains(theIDs.get(i).toString()))
+				//            timesThisCssInteractedBetweenFifteenAndFiveMinutes++;
+				//    }
+				//    timesInteractedBetweenFifteenAndFiveMinutes.put(theIDs.get(i), timesThisCssInteractedBetweenFifteenAndFiveMinutes);
+				//}
+				
+				//for (int i = 0; i < theIDs.size(); i++) {
+				//    if ((timesInteracted.get(theIDs.get(i)) >= 
+				//        (timesInteractedBetweenFifteenAndFiveMinutes.get(theIDs.get(i)) / 4)))
+				//        && (timesInteracted.get(theIDs.get(i)) >= 1st quartile where median isn't under 65% of average))
+				//            potentialCisMembers.add(theIDs.get(i));
+				//}
+				
+                //if (!joinedCiss.getMemberList().contains(potentialCis))
+				//do below
+				
+				//ArrayList<CssActivityFeed> segmentFive = segmentActivityFeed(fiveMinutesFeed, 7);
+				//ArrayList<CssActivityFeed> segmentFifteen = segmentActivityFeed(fifteenMinutesFeed, 7);
+				boolean temporaryActivity = true;
+				//if (segmentFive.get(4).size() == 0 && segmentFive.get(5).size() == 0 && segmentFive.get(6).size())
+				//	temporaryActivity = false;
+				//else if (!(((segmentFive.get(0).size() + segmentFive.get(1).size() + segmentFive.get(2).size() + segmentFive.get(3).size() + segmentFive.get(4).size() + segmentFive.get(5).size() + segmentFive.get(6).size() + segmentFive.get(7).size()) / 7) >= 2)) 
+				//	temporaryActivity = false;
+				//else if (!(((segmentFive.get(6) + segmentFive.get(5) / 2) >= ((segmentFive.get(0).size() + segmentFive.get(1).size() + segmentFive.get(2).size() + segmentFive.get(3).size() + segmentFive.get(4).size() + segmentFive.get(5).size() + segmentFive.get(6).size() + segmentFive.get(7).size()) / 7) >= 2))) 
+				//	temporaryActivity = false;
+				//else if (segmentFive.get(0).size() > ((segmentDay.get(0) + segmentDay.get(1) + segmentDay.get(2)) * 0.7) {
+				//    ArrayList<CssActivityFeed> segmentThreeDays = segmentActivityFeed(threeDaysFeed, 9);
+				//    if (segmentDay.get(0) > ((segmentDay.get(0) + segmentDay.get(1) + segmentDay.get(2)) * 0.7) {
+				//        ////    if (!joinedCiss.getMemberList().contains(potentialCis))
+				//        cissToCreate.add(new CisRecord(null, linkedCss, "Interactors on Service in the morning" + "serviceName", null, null, null, null, null);
+				//}
+				
+				
 				
 				//boolean flag doneLocalVicinityCheckRecently = false;
 				

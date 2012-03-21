@@ -12,6 +12,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
@@ -274,6 +275,7 @@ public class ServiceRegistry implements IServiceRegistry {
 		Session session = sessionFactory.openSession();
 		Transaction t = session.beginTransaction();
 		try {
+			if(session.get(RegistryEntry.class, new ServiceResourceIdentiferDAO(serviceIdentifier.getIdentifier().toString(), serviceIdentifier.getServiceInstanceIdentifier()))!=null){
 			ServiceSharedInCISDAO tmpSharedInCIS = new ServiceSharedInCISDAO(
 					CISID, new ServiceResourceIdentiferDAO(serviceIdentifier
 							.getIdentifier().toString(),
@@ -281,7 +283,9 @@ public class ServiceRegistry implements IServiceRegistry {
 
 			session.save(tmpSharedInCIS);
 			t.commit();
-
+			}else{throw new ServiceNotFoundException("The service doesn't exist in the registry.");
+			}
+			
 		} catch (Exception e) {
 			t.rollback();
 			throw new ServiceSharingNotificationException(e);
@@ -356,6 +360,24 @@ public class ServiceRegistry implements IServiceRegistry {
 		return tmpService;
 
 	}
+	
+	@Override
+	public boolean changeStatusOfService (ServiceResourceIdentifier serviceIdentifier,ServiceStatus serviceStatus) throws ServiceNotFoundException{
+		Session session=sessionFactory.openSession();
+		Transaction t=session.beginTransaction();
+		try {
+			RegistryEntry tmpRegistryEntry=(RegistryEntry)session.get(RegistryEntry.class, new ServiceResourceIdentiferDAO(serviceIdentifier.getIdentifier().toString(),serviceIdentifier.getServiceInstanceIdentifier()));
+		tmpRegistryEntry.setServiceStatus(serviceStatus.toString());
+		session.update(tmpRegistryEntry);
+		t.commit();
+		} catch (Exception e) {
+			t.rollback();
+			new ServiceNotFoundException(e);
+		}finally{
+			session.close();
+		}
+		return true;
+	}
 
 	public SessionFactory getSessionFactory() {
 		return sessionFactory;
@@ -379,11 +401,5 @@ public class ServiceRegistry implements IServiceRegistry {
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry#changeStatusOfService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, org.societies.api.schema.servicelifecycle.model.ServiceStatus)
 	 */
-	@Override
-	public boolean changeStatusOfService(
-			ServiceResourceIdentifier serviceIdentifier,
-			ServiceStatus serviceStatus) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	
 }

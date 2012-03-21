@@ -41,7 +41,7 @@ public interface INegotiationProviderCallback {
 	 * @param sessionId ID of this session
 	 * @param sops All available options for policy, embedded in a single XML document.
 	 */
-	public void onGetPolicyOptions(int sessionId, String sops);
+	//public void onGetPolicyOptions(int sessionId, String sops);
 	
 	/**
 	 * Async return for
@@ -50,5 +50,12 @@ public interface INegotiationProviderCallback {
 	 * @param sessionId ID of this session
 	 * @param policy XML-based final policy signed by both parties.
 	 */
-	public void onAcceptPolicyAndGetSla(int sessionId, String policy);
+	//public void onAcceptPolicyAndGetSla(int sessionId, String policy);
+	
+	/**
+	 * Receive result of asynchronous method
+	 * 
+	 * @param returnValue
+	 */
+	public void receiveResult(Object returnValue);
 }

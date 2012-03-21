@@ -141,7 +141,9 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 			deviceInstanceContainer = new HashMap<String, DeviceImpl>();
 			
 			//TODO here generate the deviceId from  the CssId and CssNodeId
-			int deviceId = rdmNumber.nextInt();
+			//int deviceId = rdmNumber.nextInt();
+			
+			String deviceId ="testId"; 
 			
 			deviceIdBindingTable.put(""+deviceId, deviceMacAddress);
 			

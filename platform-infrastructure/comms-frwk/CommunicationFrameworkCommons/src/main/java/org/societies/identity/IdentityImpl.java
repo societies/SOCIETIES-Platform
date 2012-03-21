@@ -60,6 +60,7 @@ public class IdentityImpl implements IIdentity {
 			this.type = IdentityType.CSS;
 			
 		}else{
+			this.type = IdentityType.CIS;
 			pos = fullJid.indexOf('.');
 			if(pos >0){
 				
@@ -132,7 +133,17 @@ public class IdentityImpl implements IIdentity {
 			return identifier+"."+domainIdentifier;
 	}
 
-	public String getBareJid() {
-		return ((IIdentity)this).getJid();
-	}
+	//public String getBareJid() {
+	//	return ((IIdentity)this).getJid();
+	//}
+   	public String getBareJid() {
+		String identity = ((IIdentity)this).getJid();
+		int pos = identity.indexOf('/');
+		if( pos >0){
+		return identity.substring(0,pos);
+		}
+		return identity;
+   	}
+   	
+   	
 }

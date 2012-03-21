@@ -25,8 +25,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.ICRISTUserIntentDiscovery;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager;
 import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
@@ -37,23 +39,50 @@ import org.societies.personalisation.common.api.management.IPersonalisationInter
 
 public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager{
 
-	private ICRISTUserIntentPrediction cristPredictor;
+	private ICRISTUserIntentPrediction cristPrediction;
+	private ICRISTUserIntentDiscovery cristDiscovery;
+	private ICtxBroker ctxBroker;
+	
 	private CtxAttribute myCtx;
-	private Identity myID;
+	private IIdentity myID;
 	private IPersonalisationInternalCallback myCallback;
 		
 	public CRISTUserIntentTaskManager(){
 		System.out.println("Hello! I'm the CRIST User Intent Manager!");
 	}
 	
+	public ICRISTUserIntentPrediction getCristPrediction() {
+		return cristPrediction;
+	}
+
+	public void setCristPrediction(ICRISTUserIntentPrediction cristPrediction) {
+		this.cristPrediction = cristPrediction;
+	}
+
+	public ICRISTUserIntentDiscovery getCristDiscovery() {
+		return cristDiscovery;
+	}
+
+	public void setCristDiscovery(ICRISTUserIntentDiscovery cristDiscovery) {
+		this.cristDiscovery = cristDiscovery;
+	}
+
+	public ICtxBroker getCtxBroker() {
+		return ctxBroker;
+	}
+
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		this.ctxBroker = ctxBroker;
+	}
+
 	public CRISTUserIntentTaskManager(ICRISTUserIntentPrediction CRISTPredictor){
 		System.out.println("This is the testing class for CRIST Model!");
-		this.cristPredictor = CRISTPredictor;
+		this.setCristPrediction(CRISTPredictor);
 	}
 	
 	public void initialiseCRISTUserIntentManager(){
 				
-		if (this.cristPredictor == null) {
+		if (this.getCristPrediction() == null) {
 			System.out
 					.println(this.getClass().getName() + "CRIST UI Predictor is null");
 		} else {
@@ -64,7 +93,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager{
 		System.out.println("Yo!! I'm a brand new service and my interface is: "
 				+ this.getClass().getName());
 		try{
-			this.cristPredictor.getCRISTPrediction(myID, myCtx, myCallback);
+			this.getCristPrediction().getCRISTPrediction(myID, myCtx, myCallback);
 			System.out.println("CRIST Tester got the CRIST Prediction Result");
 		}catch(Exception e){
 			System.err.println("Exception when trying to get the CRIST Prediction Result");
@@ -74,12 +103,12 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager{
 	
 	public ICRISTUserIntentPrediction getCristPredictor() {
 		System.out.println(this.getClass().getName()+" Return CRISTPredictor");
-		return cristPredictor;
+		return getCristPrediction();
 	}
 
 	public void setCristPredictor(ICRISTUserIntentPrediction CRISTPredictor) {
 		System.out.println(this.getClass().getName()+" GOT CRISTPredictor");
-		this.cristPredictor = CRISTPredictor;
+		this.setCristPrediction(CRISTPredictor);
 	}
 
 	/* (non-Javadoc)
@@ -112,11 +141,11 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager{
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager#getCurrentIntentAction(org.societies.api.comm.xmpp.datatypes.Identity, org.societies.api.comm.xmpp.datatypes.Identity, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager#getCurrentIntentAction(org.societies.api.comm.xmpp.datatypes.IIdentity, org.societies.api.comm.xmpp.datatypes.IIdentity, org.societies.api.servicelifecycle.model.ServiceResourceIdentifier)
 	 */
 	@Override
-	public CRISTUserAction getCurrentIntentAction(Identity arg0, Identity arg1,
-			IServiceResourceIdentifier arg2) {
+	public CRISTUserAction getCurrentIntentAction(IIdentity arg0, IIdentity arg1,
+			ServiceResourceIdentifier arg2) {
 		// TODO Auto-generated method stub
 		return null;
 	}
