@@ -1,4 +1,4 @@
-package org.societies.security.policynegotiator;
+package org.societies.security.policynegotiator.requester;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

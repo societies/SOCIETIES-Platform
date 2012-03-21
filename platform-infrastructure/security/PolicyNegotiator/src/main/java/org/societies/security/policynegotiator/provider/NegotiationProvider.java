@@ -1,4 +1,4 @@
-package org.societies.security.policynegotiator;
+package org.societies.security.policynegotiator.provider;
 
 import java.util.Random;
 import java.util.concurrent.Future;
