@@ -234,13 +234,11 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 			
 			CommunityManager cMan = new CommunityManager();
 			SubscribedTo s = (SubscribedTo) cMan.getSubscribedTo();
-			s.setCisJid(jid);
+			s.setCisJid(this.getCisId());
 			s.setCisRole(role.toString());
 			cMan.setSubscribedTo(s);
 			
-			Participant p = new Participant();
-			p.setJid(this.getCisId());
-			p.setRole( ParticipantRole.fromValue(role.toString())  );
+
 			IIdentity targetCssIdentity = new IdentityImpl(jid);
 			Stanza sta = new Stanza(targetCssIdentity);
 			CISendpoint.sendMessage(sta, cMan);
@@ -249,6 +247,9 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 			//2) Sending a notification to all the other users // TODO: probably change this to a thread that process a queue or similar
 			
 			//creating payload
+			Participant p = new Participant();
+			p.setJid(jid);
+			p.setRole( ParticipantRole.fromValue(role.toString())  );
 			Community c = new Community();
 			Who w = new Who();
 			w.getParticipant().add(p);// p has been set on the 1st message
