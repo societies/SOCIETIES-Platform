@@ -38,6 +38,13 @@
 			<artifactId>societies-api-schema</artifactId>
 			<version>${release.version}</version>
 		</dependency>
+		<!-- Needed for OSGI (Internal) Event -->
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<version>4.1.0</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

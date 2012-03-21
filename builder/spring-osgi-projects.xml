@@ -88,9 +88,12 @@
 
 		<module>../platform-infrastructure/service-lifecycle/service-mgmt/
 		</module>
-     	<!--<module>../platform-infrastructure/service-lifecycle/platform-webapp/
-		</module>-->
+		
+		
+		<module>../platform-infrastructure/service-lifecycle/sl-comms-mgr/
+		</module>
 
+	
 		<!-- <module>../platform-infrastructure/comms-frwk/ClientCommunicationMgr</module> -->
 
 		<!-- Security and Dependability Mgmt -->
@@ -134,6 +137,12 @@
 
 		<!-- Privacy Mgmt -->
 		<!-- <module>../privacy-trust/privacy-protection</module>  -->
+
+
+		<!-- PlatForm Web App -->	
+		<module>../platform-infrastructure/service-lifecycle/platform-webapp/
+		</module>
+		
 
 	</modules>
 </project>
