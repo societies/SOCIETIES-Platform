@@ -85,7 +85,13 @@
 	
 	
 	
-	<xs:element name='join' type='empty' />
+	<xs:element name='join' >
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='participant'/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 	<xs:element name='leave' type='empty' />
 	<xs:element name='invite'>
 		<xs:complexType>
