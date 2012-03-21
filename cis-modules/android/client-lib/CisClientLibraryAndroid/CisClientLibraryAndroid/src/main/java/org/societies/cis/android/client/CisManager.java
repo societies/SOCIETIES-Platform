@@ -34,13 +34,13 @@ import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.cis.management.ICisSubscribed;
 
 /**
- * Android implementation of CisManager.
+ * Android implementation of ICisManager.
  * 
  * @author Babak.Farshchian@sintef.no
  *
  */
 public class CisManager implements ICisManager {
-    public ICisEditor createCis(String arg0, String arg1, String arg2,
+    public ICisOwned createCis(String arg0, String arg1, String arg2,
 	    String arg3, int arg4) {
 	// TODO Auto-generated method stub
 	return null;
