@@ -136,7 +136,7 @@
 		<!-- Context Management -->
 
 		<!-- Privacy Mgmt -->
-		<!-- <module>../privacy-trust/privacy-protection</module>  -->
+		<module>../privacy-trust/privacy-protection</module>
 
 
 		<!-- PlatForm Web App -->	
