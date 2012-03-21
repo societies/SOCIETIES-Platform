@@ -22,24 +22,45 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.datamanagement;
+package com.disaster.idisaster;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
+import android.app.ListActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 /**
- * @state skeleton 
- * @author olivierm
+ * This activity allows the users to manage their 
+ * disasters or the disasters they subscribe to.
+ * 
+ * @author Babak.Farshchian@sintef.no
+ *
  */
-public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.internal.IPrivacyDataManagerInternal#updatePermissions(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public void updatePermissions(CtxIdentifier dataId, String agreementId,
-			IIdentity ownerId, IIdentity requestorId) {
-		// TODO Auto-generated method stub
+public class DisasterActivity extends ListActivity {
+    static final String[] CISLIST = new String[] { "Disaster 1", "Disaster 2", "Disaster 3", "Disaster 4",
+	"Disaster 5", "Disaster 6", "Disaster 7", "Disaster 8"};
 
-	}
-}
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+	// TODO Auto-generated method stub
+	super.onCreate(savedInstanceState);
+	setListAdapter(new ArrayAdapter<String>(this, R.layout.cis_list_item, CISLIST));
+
+	  ListView lv = getListView();
+	  lv.setTextFilterEnabled(true);
+
+	  lv.setOnItemClickListener(new OnItemClickListener() {
+	    public void onItemClick(AdapterView<?> parent, View view,
+	        int position, long id) {
+	      // When clicked, show a toast with the TextView text
+	      Toast.makeText(getApplicationContext(), ((TextView) view).getText(),
+	          Toast.LENGTH_SHORT).show();
+	    }
+	  });
+	  }
+    }

@@ -22,24 +22,17 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.datamanagement;
+package com.disaster.idisaster;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
+import android.app.Activity;
 
 /**
- * @state skeleton 
- * @author olivierm
+ * This activity is responsible for loging in the user,
+ * including handling wrong user name and password.
+ * 
+ * @author Babak.Farshchian@sintef.no
+ *
  */
-public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.internal.IPrivacyDataManagerInternal#updatePermissions(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public void updatePermissions(CtxIdentifier dataId, String agreementId,
-			IIdentity ownerId, IIdentity requestorId) {
-		// TODO Auto-generated method stub
+public class LoginActivity extends Activity {
 
-	}
 }
