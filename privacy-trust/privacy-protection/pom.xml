@@ -55,8 +55,12 @@
 	
 	<modules>
 		<module>api</module>
+		<module>identity-selection</module>
 		<module>privacy-data-management</module>
 		<module>privacy-policy-management</module>
+		<module>privacy-preference-management</module>
+		<module>privacy-negotiation-management</module>
+		<module>assessment</module>
 		<module>privacy-protection-bundle</module>
 		<module>privacy-protection-bundle-test</module>
 	</modules>
