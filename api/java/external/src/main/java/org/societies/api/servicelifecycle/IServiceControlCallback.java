@@ -24,64 +24,17 @@
  */
 package org.societies.api.servicelifecycle;
 
-import java.net.URL;
-import java.util.concurrent.Future;
-
-import org.societies.api.identity.IIdentity;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 
 /**
- * The interface class for the Service Control component. It permits a caller to tell the SLM to
- * start a service, to stop a service, to install a new service and to uninstall a service.
- *
+ * The callback to a remote service control call
+ * 
  * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
  */
-public interface IServiceControl {
-		
-	/**
-	 * This method starts the service that is identified by the </code>ServiceResourceIdentifier</code>
-	 * 
-	 * @param serviceId unique service identifier
-	 * @return the result of the operation
-	 */
-	
-	public Future<ServiceControlResult> startService(ServiceResourceIdentifier serviceId) throws ServiceControlException;
+public interface IServiceControlCallback {
 
+	public void setResult(ServiceControlResult result);
 	
-	/**
-	 * This method stops the service running in the container that is identified by the </code>ServiceResourceIdentifier</code>
-	 * 
-	 * @param serviceId unique service identifier
-	 * @return the result of the operation
-	 */
-	public Future<ServiceControlResult> stopService(ServiceResourceIdentifier serviceId) throws ServiceControlException;
-	
-	/**
-	 * This method install a new service into the container
-	 * 
-	 * @param serviceLocation the URL of the bundle to install
-	 * @return the result of the operation
-	 */
-	public Future<ServiceControlResult> installService(URL bundleLocation) throws ServiceControlException;
-
-	/**
-	 * This method install a new service into the container present on a given node
-	 * 
-	 * @param serviceLocation the URL of the bundle to install
-	 * @param node The node where we wish to install the service
-	 * @return the result of the operation
-	 */
-	public Future<ServiceControlResult> installService(URL bundleLocation, IIdentity node) throws ServiceControlException;
-
-	/**
-	 * This method removes a service from the container.
-	 * 
-	 * @param serviceId unique service identifier
-	 * @return the result of the operation
-	 */
-	public Future<ServiceControlResult> uninstallService(ServiceResourceIdentifier serviceId) throws ServiceControlException;
-
-	
+	public ServiceControlResult getResult();
 }
