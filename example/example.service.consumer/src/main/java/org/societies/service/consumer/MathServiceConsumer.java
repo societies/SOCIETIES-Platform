@@ -1,5 +1,8 @@
 package org.societies.service.consumer;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
 import org.societies.service.api.*;
 
 public class MathServiceConsumer{
@@ -48,11 +51,24 @@ public class MathServiceConsumer{
 	}
 	
 	// used to demonstrate how to test a method calling an interface of another bundle
-	public void collaborationCall(int num_a, int num_b) {
-		System.out.println("add result is : "+ 	getMathService().add(num_a, num_b));
+	public int collaborationCall(int num_a, int num_b) {
+		return getMathService().add(num_a, num_b);
 	}
 	
-	//use to demonstrate how to test a method which uses a callback */
+	//used to demonstrate how the mock can manage the Asynch Interface.
+	public boolean collaborationAsynchronousCall(int num_a, int num_b, int result) throws InterruptedException, ExecutionException {
+		Future<Integer> res = null;
+		res = getMathService().multiply(num_a, num_b);
+		/* if (result == res.get()) {
+			return true;
+		} else {
+			return false;
+		} */
+		System.out.println("valeur de res  " + res);
+		return true;
+	}
+	
+	//used to demonstrate how to test a method which uses a callback */
 		public void callDivisionWithCallBack(int num_a, int num_b) {
 			boolean r = getMathService().divise(num_a, num_b, divisionCallBack);
 			
@@ -62,6 +78,7 @@ public class MathServiceConsumer{
 				System.out.println("an error occurs in the call");
 			}
 		}
+		
 	// new coded added for stateful test
 		public void callStatefulMethod(){
 			if(this.hiddenState>10){
