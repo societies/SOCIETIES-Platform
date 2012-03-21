@@ -90,7 +90,6 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 
 	public Set<CisParticipant> membersCss; // TODO: this may be implemented in the CommunityManagement bundle. we need to define how they work together
 	
-	//public static final int MAX_NB_MEMBERS = 100;// TODO: this is temporary, we have to set the memberCss to something more suitable
 
 
 	private static Logger LOG = LoggerFactory
@@ -99,8 +98,7 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 
 
 
-	// it expects an existing Pubsubclient in the container in which it will autowire
-	//@Autowired	
+	// at the moment we are not using this constructor, but just the one below, as that one generates the CIS id for us
 	public CisEditor(String ownerCss, String cisId,String host,
 			int membershipCriteria, String permaLink, String password,ICISCommunicationMgrFactory ccmFactory) {
 		
@@ -424,10 +422,6 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 					try{
 						if(this.addMember(p.getJid(), MembershipType.valueOf(role))){
 							a.setParticipant(p);
-							// here we send the notification to the user that he has been added
-							IIdentity targetCssIdentity = new IdentityImpl(p.getJid());
-							Stanza s = new Stanza(targetCssIdentity);
-							CISendpoint.sendMessage(s, result);
 						}
 					}
 					catch(Exception e){

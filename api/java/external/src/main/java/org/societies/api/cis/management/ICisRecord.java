@@ -29,5 +29,9 @@ package org.societies.api.cis.management;
  *
  */
 public interface ICisRecord {
+	
+	
+	
+	public String getCisJID();
 
 }
