@@ -186,13 +186,47 @@ public class CisRecord implements ICisRecord{
 
 
 	@Override
-	public String getCisJID() {
+	public String getCisId() {
 		return cisJID;
 	}
 
-	public void setCisJID(String fullJid) {
-		this.cisJID = fullJid;
+
+
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
 	}
+
+
+
+	@Override
+	public String getOwnerId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public String getUserDefineName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public String setUserDefinedName(String arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+
+
 
 	
 

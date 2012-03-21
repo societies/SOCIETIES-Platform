@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import org.societies.api.cis.management.ICisEditor;
 import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisRecord;
 
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -158,7 +159,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 	
 	
 	@Override
-	public ICisEditor createCis(String cssId, String cssPassword, String cisName, String cisType, int mode) {
+	public ICisOwned createCis(String cssId, String cssPassword, String cisName, String cisType, int mode) {
 		// TODO: how do we check fo the cssID/pwd?
 		//if(cssId.equals(this.CSSendpoint.getIdManager().getThisNetworkNode().getJid()) == false){ // if the cssID does not match with the host owner
 		//	LOG.info("cssID does not match with the host owner");
@@ -167,7 +168,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 		// TODO: review this logic as maybe I should probably check if it exists before creating
 		CisEditor cis = new  CisEditor(cssId, cisName, cisType, mode,this.ccmFactory);		
 		if (ownedCISs.add(cis))
-			return cis;
+			return (ICisOwned)cis.getCisRecord();
 		else
 			return null;
 		
@@ -175,7 +176,8 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 	
 	public boolean subscribeToCis(ICisRecord i) {
-		this.subscribedCISs.add(new CisRecord(i.getCisJID()));
+
+		this.subscribedCISs.add(new CisRecord(i.getCisId()));
 		return true;
 		
 	}
@@ -264,7 +266,9 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 				if(ownerJid != null && ownerPassword != null && cisType != null && cisName != null &&  create.getMembershipMode()!= null){
 					int cisMode = create.getMembershipMode().intValue();
-					ICisEditor icis = createCis(ownerJid, ownerPassword, cisName, cisType, cisMode);
+
+					ICisOwned icis = createCis(ownerJid, ownerPassword, cisName, cisType, cisMode);
+
 					
 					create.setCommunityJid(icis.getCisId());
 					LOG.info("CIS with self assigned ID Created!!");
@@ -296,7 +300,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 					while(it.hasNext()){
 						CisRecord element = it.next();
 						Community community = new Community();
-						community.setCommunityJid(element.getCisJID());
+						community.setCommunityJid(element.getCisId());
 						com.getCommunity().add(community);
 						 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 				     }
@@ -310,7 +314,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 					while(it.hasNext()){
 						CisRecord element = it.next();
 						Community community = new Community();
-						community.setCommunityJid(element.getCisJID());
+						community.setCommunityJid(element.getCisId());
 						com.getCommunity().add(community);
 						 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 				     }

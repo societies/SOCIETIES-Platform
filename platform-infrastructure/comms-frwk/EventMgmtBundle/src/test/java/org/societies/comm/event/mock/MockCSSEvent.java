@@ -22,20 +22,55 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.management;
+package org.societies.comm.event.mock;
+
+import java.io.Serializable;
 
 /**
- * This is the base CIS interface. See {@link ICisOwned} and {@link ICisSubscribed}
- * for the two types of CISs.
  * 
- * @author Babak.Farshchian@sintef.no
+ * @author pkuppuud
  *
  */
-public interface ICis {
-    public String getCisId();
-    public String getName();
-    public String getOwnerId();
-    public String setUserDefinedName(String _name);
-    public String getUserDefineName();
+public class MockCSSEvent implements Serializable {
 
+	/**
+	 * Default
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private String eventType;
+	private String eventName;
+	private String eventSource;
+	private String eventInfoAsXML;
+
+	/**
+	 * Constructor
+	 * 
+	 * @param eventType String for the type of event {@link EventTypes} 
+	 * @param eventName String for the name of event
+	 * @param eventSource String for the source component or peer id
+	 * @param eventInfo String for the event info as serialised XML
+	 */
+	public MockCSSEvent(String eventType, String eventName, String eventSource, String eventInfoAsXML){
+		this.eventType = eventType;
+		this.eventName = eventName;
+		this.eventSource = eventSource;
+		this.eventInfoAsXML = eventInfoAsXML;
+	}
+
+	public String geteventInfoAsXML(){
+		return eventInfoAsXML;
+	}
+
+	public String geteventSource(){
+		return eventSource;
+	}
+
+	public String geteventName(){
+		return eventName;
+	}
+
+	public String geteventType(){
+		return eventType;
+	}
 }

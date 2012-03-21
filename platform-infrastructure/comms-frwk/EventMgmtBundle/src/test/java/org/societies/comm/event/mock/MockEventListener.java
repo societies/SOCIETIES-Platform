@@ -22,18 +22,29 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.disaster.idisaster;
+package org.societies.comm.event.mock; 
 
+import org.societies.api.osgi.event.CSSEvent;
+import org.societies.api.osgi.event.EventListener;
+import org.societies.api.osgi.event.InternalEvent;
 
 /**
- * This is the class that manages the list of disasters that the user has
- * created or is member of.
  * 
- * @author Babak.Farshchian@sintef.no
+ * @author pkuppuud
  *
  */
-public class DisasterManager {
-    //List to hold disasters this user owns:
-    	
-}
+public class MockEventListener extends EventListener {
 
+	@Override
+	public void handleInternalEvent(InternalEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleExternalEvent(CSSEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+}

@@ -465,7 +465,7 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 	@Override
 	public String getCisId() {
 	
-		return this.cisRecord.getCisJID();
+		return this.cisRecord.getCisId();
 	}
 
 	@Override

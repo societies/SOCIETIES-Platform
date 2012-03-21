@@ -148,6 +148,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 		stanza.setFrom(thisIdentity);
 		Type mType = Message.Type.valueOf(type);
 		Message m = helper.sendMessage(stanza, mType, payload);
+		System.out.println("sending message: "+m.toXML());
 		this.send(m);
 	}
 
@@ -156,6 +157,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 			throws CommunicationException {
 		stanza.setFrom(thisIdentity);
 		Message m = helper.sendMessage(stanza, null, payload);
+		System.out.println("sending message: "+m.toXML());
 		this.send(m);
 	}
 
