@@ -19,5 +19,6 @@
     <plugin name="Capture" value="com.phonegap.Capture"/>
     
     <!-- Societies Plugins -->
+	<!-- <plugin name="DeviceStatus" value="org.societies.android.platform.gui.plugin.DeviceStatusSimpleJavaCallPlugin" /> -->
 	<plugin name="DeviceStatus" value="org.societies.android.platform.gui.plugin.DeviceStatusPlugin" />
 </plugins>
