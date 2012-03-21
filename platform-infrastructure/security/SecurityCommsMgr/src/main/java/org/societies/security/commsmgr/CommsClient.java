@@ -28,8 +28,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
@@ -251,12 +249,14 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 		
 		LOG.debug("reject({})", sessionId);
 		
-		IIdentity toIdentity = null;
+		IIdentity toIdentity;
 		try {
 			toIdentity = idMgr.fromJid("XCManager.societies.local");
 		} catch (InvalidFormatException e) {
 			LOG.error("reject({}): ", sessionId, e);
+			return;
 		}
+		
 		Stanza stanza = new Stanza(toIdentity);
 
 		// CREATE MESSAGE BEAN
@@ -269,7 +269,7 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 			commMgr.sendMessage(stanza, provider);
 			LOG.debug("reject({}): message sent to {}", sessionId, toIdentity.getJid());
 		} catch (CommunicationException e) {
-			LOG.warn(e.getMessage());
+			LOG.warn("reject({}): could not send message to " + toIdentity.getJid(), sessionId, e);
 		}
 		;
 	}

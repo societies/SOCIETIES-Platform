@@ -27,48 +27,67 @@ package org.societies.api.android.internal.model;
 
 
 
-import org.societies.api.schema.cssmanagement.CssNode;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 
 /**
- * Android version of {@link CSSNode}. Implements Parcelable interface for
- * Android IPC.
+ * Android example of a {@link Parcelable} class
  *
  */
-public class AndroidCSSNode extends CssNode implements Parcelable {
+public class AndroidParcelable  implements Parcelable {
+	/**
+	 * unique within context of CSS
+	 */
+	String identity = null;
 	
 	/**
-	 * Default Constructor
+	 * status of device
 	 */
-	public AndroidCSSNode() {
-		super();
-	}
-
-	public void setIdentity (String identity) {
-		this.identity = identity;
-	}
+	int status = 0;
+	/**
+	 * node type of device
+	 */
+	int type = 0;
 	
 	public String getIdentity() {
-		return this.identity;
+		return identity;
 	}
-	
-	public void setStatus (int status) {
+
+
+	public void setIdentity(String identity) {
+		this.identity = identity;
+	}
+
+
+	public int getStatus() {
+		return status;
+	}
+
+
+	public void setStatus(int status) {
 		this.status = status;
 	}
-	public int getStatus() {
-		return this.status;
+
+
+	public int getType() {
+		return type;
 	}
-	
+
+
 	public void setType(int type) {
 		this.type = type;
 	}
-	
-	public int getType() {
-		return this.type;
+
+
+	/**
+	 * Default Constructor
+	 */
+	public AndroidParcelable() {
+		super();
 	}
+
 	
 	/**
 	 * Parcelable implementation
@@ -84,21 +103,21 @@ public class AndroidCSSNode extends CssNode implements Parcelable {
 			out.writeInt(getStatus());
 	}
 	
-	public static final Parcelable.Creator<AndroidCSSNode> CREATOR = new Parcelable.Creator<AndroidCSSNode>() {
+	public static final Parcelable.Creator<AndroidParcelable> CREATOR = new Parcelable.Creator<AndroidParcelable>() {
 
 		@Override
-		public AndroidCSSNode createFromParcel(Parcel in) {
-			return new AndroidCSSNode(in);
+		public AndroidParcelable createFromParcel(Parcel in) {
+			return new AndroidParcelable(in);
 		}
 
 		@Override
-		public AndroidCSSNode[] newArray(int size) {
-			return new AndroidCSSNode[size];
+		public AndroidParcelable[] newArray(int size) {
+			return new AndroidParcelable[size];
 		}
 		
 	};
 	
-	private AndroidCSSNode(Parcel in) {
+	private AndroidParcelable(Parcel in) {
 		super();
 		setIdentity(in.readString());
 		setType(in.readInt());
