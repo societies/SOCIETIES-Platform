@@ -22,20 +22,16 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.management;
+package com.disaster.idisaster;
+
+import android.app.Activity;
 
 /**
- * This is the base CIS interface. See {@link ICisOwned} and {@link ICisSubscribed}
- * for the two types of CISs.
+ * Allows user to view and update account data.
  * 
  * @author Babak.Farshchian@sintef.no
  *
  */
-public interface ICis {
-    public String getCisId();
-    public String getName();
-    public String getOwnerId();
-    public String setUserDefinedName(String _name);
-    public String getUserDefineName();
+public class AccountManagerActivity extends Activity {
 
 }

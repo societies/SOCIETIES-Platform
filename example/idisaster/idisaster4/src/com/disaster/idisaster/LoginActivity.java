@@ -22,14 +22,17 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.management;
+package com.disaster.idisaster;
+
+import android.app.Activity;
 
 /**
- * This interface represents the CISs that are owned by this CSS.
+ * This activity is responsible for loging in the user,
+ * including handling wrong user name and password.
  * 
  * @author Babak.Farshchian@sintef.no
  *
  */
-public interface ICisOwned extends ICisRecord {
+public class LoginActivity extends Activity {
 
 }

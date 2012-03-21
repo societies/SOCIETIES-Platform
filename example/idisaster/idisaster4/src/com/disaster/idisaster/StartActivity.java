@@ -24,16 +24,36 @@
  */
 package com.disaster.idisaster;
 
+import android.app.Activity;
+import android.os.Bundle;
 
 /**
- * This is the class that manages the list of disasters that the user has
- * created or is member of.
+ * This is the activity (without GUI) that starts as the first
+ * activity, when you click on the icon in Android. It checks to
+ * see whether you are a registered user, if not shows the login
+ * page.
  * 
  * @author Babak.Farshchian@sintef.no
  *
  */
-public class DisasterManager {
-    //List to hold disasters this user owns:
-    	
-}
+public class StartActivity extends Activity {
 
+    /* (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+	// TODO Auto-generated method stub
+	super.onCreate(savedInstanceState);
+	/*
+	 * check to see if the user has already provided
+	 * a user name and password.
+	 * 
+	 * If yes, go to HomeActivity
+	 * -- Send intent to HomeActivity
+	 * In no, go to LoginActivity
+	 * -- Send intent to LoginActivity
+	 *
+	 */
+    }
+}

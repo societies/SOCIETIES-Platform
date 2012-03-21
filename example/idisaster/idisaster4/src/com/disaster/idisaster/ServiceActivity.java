@@ -22,14 +22,29 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.management;
+package com.disaster.idisaster;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.widget.TextView;
 
 /**
- * This interface represents the CISs that are owned by this CSS.
+ * This activity allows the user to browse available
+ * DDC applications on the device, add DDC applications 
+ * to a disaster, etc.
  * 
  * @author Babak.Farshchian@sintef.no
  *
  */
-public interface ICisOwned extends ICisRecord {
+public class ServiceActivity extends Activity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+	// TODO Auto-generated method stub
+	super.onCreate(savedInstanceState);
+
+	TextView textview = new TextView(this);
+        textview.setText("This is the Services tab");
+        setContentView(textview);
+    }
 
 }
