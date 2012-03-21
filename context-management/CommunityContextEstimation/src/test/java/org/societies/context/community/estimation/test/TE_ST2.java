@@ -172,9 +172,7 @@ public class TE_ST2 {
 			//this.ctxEntityIdentifier = ctxEntity1.getId();
 		//	System.out.println("2. ctxEntity.getId()="+ this.ctxEntityIdentifier.getType());//getObjectNumber()); //=null/ENTITY/Device/2 (operatorID/modelType/Type/ObjectNumber)
 						
-			//create ctxAttribute with a String value that it is assigned to the previously created ctxEntity
-			
-			
+			//create ctxAttribute with a String value that it is assigned to the previously created ctxEntity			
 			Future<CtxAttribute> futureCtxAttrString1 = this.internalCtxBroker.createAttribute(ctxEntity1.getId(), "Age"); //null/ENTITY/Device/2
 			Future<CtxAttribute> futureCtxAttrString2 = this.internalCtxBroker.createAttribute(ctxEntity2.getId(), "Age");
 			
@@ -264,7 +262,6 @@ public class TE_ST2 {
 		return 0;
 		
 	}
-
 	
 	
 	//@Test	
@@ -315,33 +312,4 @@ public class TE_ST2 {
 
 		}
 	
-//	@Test
-	//public List<CtxAttribute> getListOfCtxAttributes(List<CommunityCtxEntity> lst, CtxEntity ctxId) {
-//		public void getListOfCtxAttributes() {
-//		/*
-//		 * This method will return a list of attributes. As input it will have to have the attributes of a given (common CIS)
-//		 * (we will have to use communityCtxEntity)
-//		 */
-//		
-//		/*Step0: use the getMembers() of the communityContextEntity class to retrieve communityCtxEntitys
-//		 * 
-//		 */
-//		
-	//		/*
-//		 * Step1: Use CtxBroker to access the Attributes
-//		 */
-//		System.out.println("Hello");
-//		System.out.println(communityContextEntity.getMembers());
-//		//		
-//		/*
-//		 *Step2: Populate the list
-//		 * 
-//		 */
-//		
-//		/*
-//		 * Return the list
-//		 */
-//		//return null;
-		
-//	}
 }
