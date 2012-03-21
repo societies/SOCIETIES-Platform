@@ -106,11 +106,9 @@ public class TE_ST {
 		new CommunityContextEstimation();
 
 		
-		Identity operatorId = null;
 		Long objectNumber = null;
 		String type = null;
-		CtxEntityIdentifier ctxEntityId = new CtxEntityIdentifier(operatorId, type, objectNumber);
-		
+	
 		
 		new CommunityCtxEntity(ctxEntityId);
 		

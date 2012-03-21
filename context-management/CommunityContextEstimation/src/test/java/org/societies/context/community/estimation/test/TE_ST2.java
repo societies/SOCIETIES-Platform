@@ -28,9 +28,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -39,28 +36,17 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.CtxException;
-import org.societies.api.context.broker.ICtxBroker;
-import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
-import org.societies.api.context.model.util.SerialisationHelper;
-import org.societies.context.broker.impl.CtxBroker;
 import org.societies.context.broker.impl.InternalCtxBroker;
-import org.societies.context.community.estimation.impl.CommunityContextEstimation;
 import org.societies.context.user.db.impl.UserCtxDBMgr;
 import org.societies.context.userHistory.impl.UserContextHistoryManagement;
-
-import sun.font.CreatedFontTracker;
-
-import com.sun.corba.se.pept.broker.Broker;
 
 /**
  * Describe your class here...
@@ -114,9 +100,8 @@ public class TE_ST2 {
 		//initialization add create & retrieve methods
 		createEntities();
 		
-		Identity operatorId = null;
-		Long objectNumber = null;
-		String type = null;
+//		Long objectNumber = null;
+//		String type = null;
 		//CtxEntityIdentifier ctxEntityId = new CtxEntityIdentifier(operatorId, type, objectNumber);
 		
 		//new CommunityCtxEntity(ctxEntityId);		
@@ -280,21 +265,23 @@ public class TE_ST2 {
 		System.out.println("0.");
 		// if the CtxEntityID or CtxAttributeID is known the retrieval is performed by using the ctxBroker.retrieve(CtxIdentifier) method
 		try {
-			System.out.println("0.1");
+			System.out.println("0.1"+this.ctxEntityId);
 
 		// retrieve ctxEntity
 		// This retrieval is performed based on the known CtxEntity identifier
 		// Retrieve is also possible to be performed based on the type of the CtxEntity. This will be demonstrated in a later example.
-		
+
 			
 		Future<CtxModelObject> ctxEntityRetrievedFuture = this.internalCtxBroker.retrieve(this.ctxEntityId);
 		Future<CtxModelObject> ctxEntityRetrievedFuture2 = this.internalCtxBroker.retrieve(this.ctxEntityId1);
 		
 		System.out.println("0.2:" + ctxEntityRetrievedFuture.get());
 		CtxEntity retrievedCtxEntity = (CtxEntity) ctxEntityRetrievedFuture.get();
-		System.out.println("0.3:" + retrievedCtxEntity);
+		CtxEntity retrievedCtxEntity2 = (CtxEntity) ctxEntityRetrievedFuture.get();
+		
+		System.out.println("0.3:" + retrievedCtxEntity.toString());
 
-		this.log.info("Retrieved ctxEntity id " +retrievedCtxEntity.getId()+ " of type: "+retrievedCtxEntity.getType());
+		this.log.info("Retrieved ctxEntity id " +retrievedCtxEntity.getId() + " of type: "+retrievedCtxEntity.getType());
 		System.out.println("4. " );
 
 		// retrieve the CtxAttribute contained in the CtxEntity with the string value
