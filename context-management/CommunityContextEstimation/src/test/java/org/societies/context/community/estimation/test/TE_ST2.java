@@ -30,6 +30,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -57,13 +58,15 @@ import org.societies.context.community.estimation.impl.CommunityContextEstimatio
 import org.societies.context.user.db.impl.UserCtxDBMgr;
 import org.societies.context.userHistory.impl.UserContextHistoryManagement;
 
+import com.sun.corba.se.pept.broker.Broker;
+
 /**
  * Describe your class here...
  *
  * @author 
  *
  */
-public class TE_ST {
+public class TE_ST2 {
 	
 	/******************************************************************************************
 		This component is responsible for collecting the User Context data of the Community members, couple these and infer the respective Context
@@ -103,18 +106,13 @@ public class TE_ST {
 		internalCtxBroker = new InternalCtxBroker();
 		internalCtxBroker.setUserCtxDBMgr(new UserCtxDBMgr());
 		internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
-		new CommunityContextEstimation();
-
 		
 		Identity operatorId = null;
 		Long objectNumber = null;
 		String type = null;
 		CtxEntityIdentifier ctxEntityId = new CtxEntityIdentifier(operatorId, type, objectNumber);
 		
-		
-		new CommunityCtxEntity(ctxEntityId);
-		
-		
+		new CommunityCtxEntity(ctxEntityId);		
 	}
 
 	/**
@@ -144,79 +142,71 @@ public class TE_ST {
 		assertTrue(ctxAttribute.getType().equalsIgnoreCase("attrType"));
 		
 	}
-//	@Test
-	//public List<CtxAttribute> getListOfCtxAttributes(List<CommunityCtxEntity> lst, CtxEntity ctxId) {
-//		public void getListOfCtxAttributes() {
-//		/*
-//		 * This method will return a list of attributes. As input it will have to have the attributes of a given (common CIS)
-//		 * (we will have to use communityCtxEntity)
-//		 */
-//		
-//		/*Step0: use the getMembers() of the communityContextEntity class to retrieve communityCtxEntitys
-//		 * 
-//		 */
-//		
-	//		/*
-//		 * Step1: Use CtxBroker to access the Attributes
-//		 */
-//		System.out.println("Hello");
-//		System.out.println(communityContextEntity.getMembers());
-//		//		
-//		/*
-//		 *Step2: Populate the list
-//		 * 
-//		 */
-//		
-//		/*
-//		 * Return the list
-//		 */
-//		//return null;
-		
-//	}
+
 	
 	@Test
 	public void TestCalculation() throws CtxException, Exception, Exception{
 		
-		CtxBroker brok = Mockito.mock(CtxBroker.class);
+		InternalCtxBroker brok = Mockito.mock(InternalCtxBroker.class);
 
-		//Create a futureEnt
+		//Create two futureEntities
 
-		Future<CtxEntity> futureEnt;
+		Future<CtxEntity> futureEnt1, futureEnt2;
 		
 		try {
-			futureEnt = this.internalCtxBroker.createEntity("Device");
-			CtxEntity ctxEntity = (CtxEntity) futureEnt.get();
-			System.out.println("1. CtxEntity (futureEnt.get()="+ctxEntity); //= org.societies.api.context.model.CtxEntity@8e08ed4f
+			futureEnt1 = this.internalCtxBroker.createEntity("Person");
+			futureEnt2 = this.internalCtxBroker.createEntity("Person");
+			
+			System.out.println(futureEnt1);
+			System.out.println(futureEnt2);
+			
+			CtxEntity ctxEntity1 = (CtxEntity) futureEnt1.get();
+			CtxEntity ctxEntity2 = (CtxEntity) futureEnt2.get();
+			
+			System.out.println(ctxEntity1.getType());
+			System.out.println(ctxEntity2.getType());
+			System.out.println("1. CtxEntity (futureEnt.get()="+ctxEntity2.getType()); //= Person
 						
 			//get the context identifier of the created entity (to be used at the next step)
 			
-			this.ctxEntityIdentifier = ctxEntity.getId();
-			System.out.println("2. ctxEntity.getId()="+ctxEntity.getId()); //=null/ENTITY/Device/2
-			
-			System.out.println("3. get the contextEntity ID:"+ctxEntity.getId()); //null/ENTITY/DeviceID/2
-			
+			//this.ctxEntityIdentifier = ctxEntity1.getId();
+		//	System.out.println("2. ctxEntity.getId()="+ this.ctxEntityIdentifier.getType());//getObjectNumber()); //=null/ENTITY/Device/2 (operatorID/modelType/Type/ObjectNumber)
+						
 			//create ctxAttribute with a String value that it is assigned to the previously created ctxEntity
-			Future<CtxAttribute> futureCtxAttrString = this.internalCtxBroker.createAttribute(this.ctxEntityIdentifier, "DeviceID"); //null/ENTITY/Device/2
+			
+			
+			Future<CtxAttribute> futureCtxAttrString1 = this.internalCtxBroker.createAttribute(ctxEntity1.getId(), "Age"); //null/ENTITY/Device/2
+			Future<CtxAttribute> futureCtxAttrString2 = this.internalCtxBroker.createAttribute(ctxEntity2.getId(), "Age");
+			
 			// get the object of the created CtxAttribute
-			CtxAttribute ctxAttributeString = (CtxAttribute) futureCtxAttrString.get();
-
+			CtxAttribute ctxAttributeString1 = (CtxAttribute) futureCtxAttrString1.get();
+			CtxAttribute ctxAttributeString2 = (CtxAttribute) futureCtxAttrString2.get();
+			
+			System.out.println("3.1 getType1: " + ctxAttributeString1.getType()); //DeviceID
+			System.out.println("4.1 getValueType1: " + ctxAttributeString1.getValueType()); //EMPTY
+			System.out.println("5.1 getModelType1: " + ctxAttributeString1.getModelType()); //Attribute			
+			
+			
+			
 			// by setting this flag to true the CtxAttribute values will be stored to Context History Database upon update
-			ctxAttributeString.setHistoryRecorded(true);
+			ctxAttributeString1.setHistoryRecorded(true);
 
 			// set a string value to CtxAttribute
-			ctxAttributeString.setStringValue("device1234");
+			ctxAttributeString1.setIntegerValue(39);
+			ctxAttributeString2.setIntegerValue(41);
+			
+			System.out.println("6. getIntegerType1: " + ctxAttributeString1.getIntegerValue()); //device1234
+			System.out.println("7. getIntegerType2: " + ctxAttributeString2.getIntegerValue()); //device1234
 
 			// with this update the attribute is stored in Context DB
-			Future<CtxModelObject> futureAttrUpdated = this.internalCtxBroker.update(ctxAttributeString);
+			Future<CtxModelObject> futureAttrUpdated = this.internalCtxBroker.update(ctxAttributeString1);
 			
 			// get the updated CtxAttribute object and identifier (to be used later for retrieval purposes)
-			ctxAttributeString = (CtxAttribute) futureAttrUpdated.get();
-			this.ctxAttributeStringIdentifier = ctxAttributeString.getId();
+			ctxAttributeString1 = (CtxAttribute) futureAttrUpdated.get();
+			this.ctxAttributeStringIdentifier = ctxAttributeString1.getId();
 			
 			//create a ctxAttribute with a Binary value that is assigned to the same CtxEntity
-			Future<CtxAttribute> futureCtxAttrBinary = this.internalCtxBroker.createAttribute(ctxEntity.getId(), "CustomData");
-			//System.out.println("ctxAttributeStringIdentifier:"+ctxAttributeStringIdentifier);
-			//System.out.println("ctxAttributeString ID:"+ ctxAttributeString.getId());
+			Future<CtxAttribute> futureCtxAttrBinary = this.internalCtxBroker.createAttribute(ctxEntity1.getId(), "CustomData");
 			
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
@@ -228,32 +218,10 @@ public class TE_ST {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+	}	
+		
 	
-		
-		
-		
-		
-		
-		CtxBroker brok = Mockito.mock(CtxBroker.class);
-		
-		
-		
-		//System.out.println("brok.retrieveCommunityMembers is: "+brok.retrieveCommunityMembers(null, null));
-		
-		
-//		ExecutorService executor = Executors.newFixedThreadPool(1);
-//		executor = Executors.newCachedThreadPool();
-//		
-//		Future<?> f1 = executor.submit(new CtxEntity(null));
-//		
-//
-//		// reject new tasks, must call in order to exit VM
-//		executor.shutdown();
-//		
-//		Mockito.when(brok.createEntity(null, null)).then(fe);
-//		Future<?> fe = E
-
+	
 
 		//brok.createEntity(requester, "person");
 		
@@ -299,61 +267,7 @@ public class TE_ST {
 
 	
 	
-	//@Test
-	public void createContext(){
-		
-		Future<CtxEntity> futureEnt;
-		
-		try {
-			futureEnt = this.internalCtxBroker.createEntity("Device");
-			CtxEntity ctxEntity = (CtxEntity) futureEnt.get();
-			System.out.println("1. CtxEntity (futureEnt.get()="+ctxEntity); //= org.societies.api.context.model.CtxEntity@8e08ed4f
-						
-			//get the context identifier of the created entity (to be used at the next step)
-			
-			this.ctxEntityIdentifier = ctxEntity.getId();
-			System.out.println("2. ctxEntity.getId()="+ctxEntity.getId()); //=null/ENTITY/Device/2
-			
-			System.out.println("3. get the contextEntity ID:"+ctxEntity.getId()); //null/ENTITY/DeviceID/2
-			
-			//create ctxAttribute with a String value that it is assigned to the previously created ctxEntity
-			Future<CtxAttribute> futureCtxAttrString = this.internalCtxBroker.createAttribute(this.ctxEntityIdentifier, "DeviceID"); //null/ENTITY/Device/2
-			// get the object of the created CtxAttribute
-			CtxAttribute ctxAttributeString = (CtxAttribute) futureCtxAttrString.get();
-
-			// by setting this flag to true the CtxAttribute values will be stored to Context History Database upon update
-			ctxAttributeString.setHistoryRecorded(true);
-
-			// set a string value to CtxAttribute
-			ctxAttributeString.setStringValue("device1234");
-
-			// with this update the attribute is stored in Context DB
-			Future<CtxModelObject> futureAttrUpdated = this.internalCtxBroker.update(ctxAttributeString);
-			
-			// get the updated CtxAttribute object and identifier (to be used later for retrieval purposes)
-			ctxAttributeString = (CtxAttribute) futureAttrUpdated.get();
-			this.ctxAttributeStringIdentifier = ctxAttributeString.getId();
-			
-			//create a ctxAttribute with a Binary value that is assigned to the same CtxEntity
-			Future<CtxAttribute> futureCtxAttrBinary = this.internalCtxBroker.createAttribute(ctxEntity.getId(), "CustomData");
-			//System.out.println("ctxAttributeStringIdentifier:"+ctxAttributeStringIdentifier);
-			//System.out.println("ctxAttributeString ID:"+ ctxAttributeString.getId());
-			
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	
-	
-	@Test	
+	//@Test	
 	public void retrieveContext() {
 		System.out.println("0.");
 		// if the CtxEntityID or CtxAttributeID is known the retrieval is performed by using the ctxBroker.retrieve(CtxIdentifier) method
@@ -400,4 +314,34 @@ public class TE_ST {
 		}
 
 		}
+	
+//	@Test
+	//public List<CtxAttribute> getListOfCtxAttributes(List<CommunityCtxEntity> lst, CtxEntity ctxId) {
+//		public void getListOfCtxAttributes() {
+//		/*
+//		 * This method will return a list of attributes. As input it will have to have the attributes of a given (common CIS)
+//		 * (we will have to use communityCtxEntity)
+//		 */
+//		
+//		/*Step0: use the getMembers() of the communityContextEntity class to retrieve communityCtxEntitys
+//		 * 
+//		 */
+//		
+	//		/*
+//		 * Step1: Use CtxBroker to access the Attributes
+//		 */
+//		System.out.println("Hello");
+//		System.out.println(communityContextEntity.getMembers());
+//		//		
+//		/*
+//		 *Step2: Populate the list
+//		 * 
+//		 */
+//		
+//		/*
+//		 * Return the list
+//		 */
+//		//return null;
+		
+//	}
 }

@@ -62,7 +62,7 @@ public class CommunityContextEstimation<communityMembers> implements ICommunityC
 	
 	@Autowired
 	//private InternalCtxBroker b;
-	private CtxBroker b;
+	private InternalCtxBroker b;
 	private CtxEntityIdentifier comId;
 	private String entityType;
 	private String attributeType;
@@ -92,43 +92,6 @@ public class CommunityContextEstimation<communityMembers> implements ICommunityC
 		// TODO Auto-generated method stub
 		
 	}
-	
-//	public void estimateContext_John(EntityIdentifier communityID, List<CtxAttribute> list, Boolean currentDB) throws CtxException{
-//		// TODO Auto-generated method stub
-//		
-//	//	CtxAttribute a = new CtxAttribute(null);
-////		a.getId().getType();
-////		a.getIntegerValue();
-//		
-//		ArrayList<CtxAttribute> allAttributes = new ArrayList<CtxAttribute>();
-//		
-//		ArrayList<CtxEntity> m = retrieveCisMembersWitPredefinedAttr_John(communityID, list);
-//		// elegxos gia null h oxi (ta members)
-//		for (CtxEntity e:m){
-//			allAttributes.addAll((retrieveMembersAttribute_John(e, list)));
-//		}
-//		
-//		CalculateAlgorithm(allAttributes);
-//		CtxEntityIdentifier community = null;
-//		Identity requester = null;
-//		b.retrieveCommunityMembers(requester, community);
-//		
-//	}
-//	
-//	private ArrayList<CtxEntity> retrieveCisMembersWitPredefinedAttr_John(EntityIdentifier communityID, List<CtxAttribute> hasTheseAttributes) throws CtxException {
-//		// TODO Auto-generated method stub
-//		//b
-//		//return (ArrayList<CtxEntity>) b.retrieveAdministratingCSS(null, null); na vro tin kanoniki methodo tou broker...
-//		return null;
-//	}
-//
-//	
-//	private ArrayList<CtxAttribute> retrieveMembersAttribute_John(CtxEntity member, List<CtxAttribute> hasTheseAttributes) {
-//		// TODO Auto-generated method stub
-//		//b
-//		//return (ArrayList<CtxEntity>) b.retrieveAdministratingCSS(null, null); na vro tin kanoniki methodo tou broker...
-//		return null;
-//	}
 
 	
 	//******************************************NEW***************************************************************************
@@ -146,14 +109,14 @@ public class CommunityContextEstimation<communityMembers> implements ICommunityC
 			throws CtxException, InterruptedException, ExecutionException {
 	
 		//The getAllCommunityMembers(), uses the retrieveCommunityMembers() that returns a Future<List> with all the members of a given community)
-		Future<List<CtxEntityIdentifier>> allMembersListFuture = getAllCommunityMembers(communityID);
+		Future<CtxModelObject> allMembersListFuture = getAllCommunityMembers(communityID);
 		//From Future<List> I get the List with community members of the given Community. So allMembersList will contain a list of (members of Community) contextEntities
-		List<CtxEntityIdentifier> allMembersList = allMembersListFuture.get();
+		CtxModelObject allMembersList = (CtxEntity) allMembersListFuture.get();
 		//return list of members of the given type (e.g. person)
-		List<CtxAttributeIdentifier> listOfMembersOfGivenType = returnEntitiesWithGivenEntiryType(allMembersList);
 		
-		returnListOfDesiredAttributes(listOfMembersOfGivenType);
-	
+		
+		//List<CtxAttributeIdentifier> listOfMembersOfGivenType = returnEntitiesWithGivenEntiryType(allMembersList);
+			
 		
 		// getMembersOfSpecificType(), returns a list with Future objects (from broker)
 		Future<List<CtxEntityIdentifier>> membOfSpecificTypeAndAttributeFuture = getMembersOfSpecificTypeAndAttribute(allMembersListFuture, entityType, attributeType);
@@ -166,69 +129,23 @@ public class CommunityContextEstimation<communityMembers> implements ICommunityC
 		calculationAlgorithm(membOfSpecificTypeAndAttribute);
 	}
 
-
-	private List<CtxAttributeIdentifier> returnEntitiesWithGivenEntiryType(List<CtxEntityIdentifier> allMembersList) {
-	// TODO Auto-generated method stub
-		//If the modelType is Entity then put in the listCtxEntityIdentifier this ctxEntityIdentifier.
-		//So at the end I will have a list with Entity ctxEntityIdentifiers of the community under discussion
-		
-	 List<CtxAttributeIdentifier> listCtxEntityIdentifier = new ArrayList<CtxAttributeIdentifier>();
-		
-		Iterator<CtxEntityIdentifier> membIterator = allMembersList.iterator();
-		while (membIterator.hasNext()){
-			CtxEntityIdentifier cEI = membIterator.next();
-			CtxAttributeIdentifier a = new CtxAttributeIdentifier(cEI, cEI.getType(),cEI.getObjectNumber());
-			{
-				if
-				(cEI.getModelType().ENTITY != null && cEI.getType().equals(entityType)) 
-					listCtxEntityIdentifier.add(a);
-				else
-					System.out.println(cEI.getType());
-			}
-				
-		}
-		return listCtxEntityIdentifier;
-}
-	
-	private void returnListOfDesiredAttributes(List<CtxAttributeIdentifier> listOfMembersOfGivenType) {
-		// TODO Auto-generated method stub
-		// I want to receive the attributes value through the contextIdentifier
-		
-		ArrayList<CtxAttribute> listOfAttributes = new ArrayList<CtxAttribute>();
-		Iterator<CtxAttributeIdentifier> membIterator = listOfMembersOfGivenType.iterator();
-		while (membIterator.hasNext()){
-			CtxAttributeIdentifier cEI = membIterator.next();
-			CtxAttribute ctxAtt;
-			CtxModelObject ctxModObj;
-			//if 
-			//(cEI.getModelType().ATTRIBUTE != null)
-				//ctxModObj.
-				//listOfAttributes.add(e);
-			
-		}
-	}
-
-
-	public Future<List<CtxEntityIdentifier>> getAllCommunityMembers(CtxEntityIdentifier communityID) throws CtxException {
+	public Future<CtxModelObject> getAllCommunityMembers(CtxEntityIdentifier communityID) throws CtxException {
 		// TODO Auto-generated method stub
 		//I want a list with all the CommunityMembers	and I use the methods of ctxBroker
 		
-		Future<List<CtxEntityIdentifier>> allCommunityMembers = b.retrieveCommunityMembers(null, communityID);
+		Future<CtxModelObject> allCommunityMembers = b.retrieve(communityID);
 		return allCommunityMembers;
 	}
 	
-	
-	private Future<List<CtxEntityIdentifier>> getMembersOfSpecificTypeAndAttribute(Future<List<CtxEntityIdentifier>> allMembersList, String entityType, String attributeType) throws CtxException {
+	private Future<List<CtxEntityIdentifier>> getMembersOfSpecificTypeAndAttribute(Future<CtxModelObject> allMembersListFuture, String entityType, String attributeType) throws CtxException {
 		// TODO Auto-generated method stub
 		//Since I got it, somehow, I will iterate in order to put in a new list the members of a given (e.g. "person)"
 		//... let say that we end up with a ListWithMembers
 		
-		Future<List<CtxEntityIdentifier>> membersOfSpecificTypeFuture = b.lookupEntities(null, entityType, attributeType, null, null);
+		Future<List<CtxEntityIdentifier>> membersOfSpecificTypeFuture = b.lookupEntities(null, entityType, attributeType, null);
 		return membersOfSpecificTypeFuture;
 
 	}
-	
-	
 	
 	private ArrayList<CtxAttribute> getValuesFromMembersAttribute(List<CtxEntityIdentifier> membOfSpecificType, String attributeType) {
 		// TODO Auto-generated method stub
@@ -262,11 +179,11 @@ public class CommunityContextEstimation<communityMembers> implements ICommunityC
 	
 // Setters and Getters for the private fields ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^//^
 
-	public CtxBroker getB() {                                                                                                  
+	public InternalCtxBroker getB() {                                                                                                  
 		return b;																												 
 	}																															  
 
-	public void setB(CtxBroker b) {																								
+	public void setB(InternalCtxBroker b) {																								
 		this.b = b;																												
 	}																															
 
@@ -300,6 +217,90 @@ public class CommunityContextEstimation<communityMembers> implements ICommunityC
 		this.attributeType = attributeType;
 	}
 
+//	
+	
+	
+	
+//	private void returnListOfDesiredAttributes(List<CtxAttributeIdentifier> listOfMembersOfGivenType) {
+//	// TODO Auto-generated method stub
+//	// I want to receive the attributes value through the contextIdentifier
+//	
+//	ArrayList<CtxAttribute> listOfAttributes = new ArrayList<CtxAttribute>();
+//	Iterator<CtxAttributeIdentifier> membIterator = listOfMembersOfGivenType.iterator();
+//	while (membIterator.hasNext()){
+//		CtxAttributeIdentifier cEI = membIterator.next();
+//		CtxAttribute ctxAtt;
+//		CtxModelObject ctxModObj;
+//		//if 
+//		//(cEI.getModelType().ATTRIBUTE != null)
+//			//ctxModObj.
+//			//listOfAttributes.add(e);
+//		
+//	}
+//}
 
+	
+	
+//	private List<CtxAttributeIdentifier> returnEntitiesWithGivenEntiryType(List<CtxEntityIdentifier> allMembersList) {
+//	// TODO Auto-generated method stub
+//		//If the modelType is Entity then put in the listCtxEntityIdentifier this ctxEntityIdentifier.
+//		//So at the end I will have a list with Entity ctxEntityIdentifiers of the community under discussion
+//		
+//	 List<CtxAttributeIdentifier> listCtxEntityIdentifier = new ArrayList<CtxAttributeIdentifier>();
+//		
+//		Iterator<CtxEntityIdentifier> membIterator = allMembersList.iterator();
+//		while (membIterator.hasNext()){
+//			CtxEntityIdentifier cEI = membIterator.next();
+//			CtxAttributeIdentifier a = new CtxAttributeIdentifier(cEI, cEI.getType(),cEI.getObjectNumber());
+//			{
+//				if
+//				(cEI.getModelType().ENTITY != null && cEI.getType().equals(entityType)) 
+//					listCtxEntityIdentifier.add(a);
+//				else
+//					System.out.println(cEI.getType());
+//			}
+//				
+//		}
+//		return listCtxEntityIdentifier;
+//}	
+	
+	
+	
+//	public void estimateContext_John(EntityIdentifier communityID, List<CtxAttribute> list, Boolean currentDB) throws CtxException{
+//	// TODO Auto-generated method stub
+//	
+////	CtxAttribute a = new CtxAttribute(null);
+////	a.getId().getType();
+////	a.getIntegerValue();
+//	
+//	ArrayList<CtxAttribute> allAttributes = new ArrayList<CtxAttribute>();
+//	
+//	ArrayList<CtxEntity> m = retrieveCisMembersWitPredefinedAttr_John(communityID, list);
+//	// elegxos gia null h oxi (ta members)
+//	for (CtxEntity e:m){
+//		allAttributes.addAll((retrieveMembersAttribute_John(e, list)));
+//	}
+//	
+//	CalculateAlgorithm(allAttributes);
+//	CtxEntityIdentifier community = null;
+//	Identity requester = null;
+//	b.retrieveCommunityMembers(requester, community);
+//	
+//}
+//
+//private ArrayList<CtxEntity> retrieveCisMembersWitPredefinedAttr_John(EntityIdentifier communityID, List<CtxAttribute> hasTheseAttributes) throws CtxException {
+//	// TODO Auto-generated method stub
+//	//b
+//	//return (ArrayList<CtxEntity>) b.retrieveAdministratingCSS(null, null); na vro tin kanoniki methodo tou broker...
+//	return null;
+//}
+//
+//
+//private ArrayList<CtxAttribute> retrieveMembersAttribute_John(CtxEntity member, List<CtxAttribute> hasTheseAttributes) {
+//	// TODO Auto-generated method stub
+//	//b
+//	//return (ArrayList<CtxEntity>) b.retrieveAdministratingCSS(null, null); na vro tin kanoniki methodo tou broker...
+//	return null;
+//}
 
 }
