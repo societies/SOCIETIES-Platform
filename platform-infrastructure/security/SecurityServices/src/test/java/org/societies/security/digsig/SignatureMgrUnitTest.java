@@ -69,7 +69,7 @@ public class SignatureMgrUnitTest {
 		String result;
 		
 		result = classUnderTest.signXml(xml, xmlNodeId, identity);
-		assertEquals("", result);  // TODO
+		assertEquals("<sig>", result);  // TODO
 	}
 
 

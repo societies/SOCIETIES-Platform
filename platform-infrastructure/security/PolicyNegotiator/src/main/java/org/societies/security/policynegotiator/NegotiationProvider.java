@@ -3,11 +3,7 @@ package org.societies.security.policynegotiator;
 import java.util.Random;
 import java.util.concurrent.Future;
 
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.AsyncResult;
-import org.springframework.stereotype.Component;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +13,7 @@ import org.societies.api.internal.security.policynegotiator.INegotiationProvider
 import org.societies.api.schema.security.policynegotiator.SlaBean;
 import org.societies.api.security.digsig.ISignatureMgr;
 
-@Component
+//@Component
 public class NegotiationProvider implements INegotiationProvider {
 
 	private static Logger LOG = LoggerFactory.getLogger(NegotiationProvider.class);
@@ -25,23 +21,40 @@ public class NegotiationProvider implements INegotiationProvider {
 	private ISignatureMgr signatureMgr;
 	private INegotiationProviderRemote groupMgr;
 	
-	@Autowired
-	public NegotiationProvider(ISignatureMgr signatureMgr, INegotiationProviderRemote groupMgr) {
-		
-		this.signatureMgr = signatureMgr;
-		this.groupMgr = groupMgr;
+//	@Autowired
+//	public NegotiationProvider(ISignatureMgr signatureMgr) {
+//		
+//		this.signatureMgr = signatureMgr;
+//
+//		LOG.info("NegotiationProvider({})", signatureMgr.toString());
+//	}
 
-		LOG.debug("NegotiationProvider({}, {})", signatureMgr.toString(), groupMgr.toString());
+	public NegotiationProvider() {
+		LOG.info("NegotiationProvider()");
 	}
 	
-	@PostConstruct
+//	@PostConstruct
 	public void init() {
 		
 		LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "xmlNodeId", "identity"));
 		LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
 		
-		LOG.debug("init(): group manager = {}", groupMgr);
-		//groupMgr.reject(0);
+		LOG.debug("init(): group manager = {}", groupMgr.toString());
+		groupMgr.reject(0);
+	}
+	
+	// Getters and setters for beans
+	public INegotiationProviderRemote getGroupMgr() {
+		return groupMgr;
+	}
+	public void setGroupMgr(INegotiationProviderRemote groupMgr) {
+		this.groupMgr = groupMgr;
+	}
+	public ISignatureMgr getSignatureMgr() {
+		return signatureMgr;
+	}
+	public void setSignatureMgr(ISignatureMgr signatureMgr) {
+		this.signatureMgr = signatureMgr;
 	}
 	
 	@Override

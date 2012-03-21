@@ -59,7 +59,11 @@ public class CommsServerUnitTest {
 		negotiationProviderMock = mock(INegotiationProvider.class);
 		negotiationRequesterMock = mock(INegotiationRequester.class);
 		
-		classUnderTest = new CommsServer(commMgrMock, negotiationRequesterMock, negotiationProviderMock);
+		//classUnderTest = new CommsServer(commMgrMock, negotiationRequesterMock, negotiationProviderMock);
+		classUnderTest = new CommsServer();
+		classUnderTest.setCommMgr(commMgrMock);
+		classUnderTest.setNegotiationProvider(negotiationProviderMock);
+		classUnderTest.setNegotiationRequester(negotiationRequesterMock);
 		classUnderTest.init();
 	}
 

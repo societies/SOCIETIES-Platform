@@ -26,7 +26,6 @@ package org.societies.security.policynegotiator;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
 
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -54,7 +53,13 @@ public class NegotiationProviderUnitTest {
 		
 		signatureMgrMock = mock(ISignatureMgr.class);
 		groupMgrMock = mock(INegotiationProviderRemote.class);
-		classUnderTest = new NegotiationProvider(signatureMgrMock, groupMgrMock);
+		
+		//classUnderTest = new NegotiationProvider(signatureMgrMock, groupMgrMock);
+		
+		classUnderTest = new NegotiationProvider();
+		classUnderTest.setGroupMgr(groupMgrMock);
+		classUnderTest.setSignatureMgr(signatureMgrMock);
+		classUnderTest.init();
 	}
 
 	/**
