@@ -58,6 +58,8 @@ import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.ParticipantRole;
 import org.societies.api.schema.cis.community.Add;
 import org.societies.api.schema.cis.community.Subscription;
+import org.societies.api.schema.cis.manager.CommunityManager;
+import org.societies.api.schema.cis.manager.SubscribedTo;
 
 /**
  * @author Thomas Vilarinho (Sintef)
@@ -229,27 +231,25 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 			
 			// 1) Notifying the added user
 
+			
+			CommunityManager cMan = new CommunityManager();
+			SubscribedTo s = (SubscribedTo) cMan.getSubscribedTo();
+			s.setCisJid(jid);
+			s.setCisRole(role.toString());
+			cMan.setSubscribedTo(s);
+			
 			Participant p = new Participant();
-			p.setJid(jid);
+			p.setJid(this.getCisId());
 			p.setRole( ParticipantRole.fromValue(role.toString())  );
-
-			
-			
-			Community c = new Community();
-			LOG.info( jid + " being added");
-			Subscription sub = new Subscription();
-			sub.setParticipant(p);
-			c.setSubscription(sub);
 			IIdentity targetCssIdentity = new IdentityImpl(jid);
 			Stanza sta = new Stanza(targetCssIdentity);
-			CISendpoint.sendMessage(sta, c);
-
-			
+			CISendpoint.sendMessage(sta, cMan);
+					
 			
 			//2) Sending a notification to all the other users // TODO: probably change this to a thread that process a queue or similar
 			
 			//creating payload
-			c = new Community();
+			Community c = new Community();
 			Who w = new Who();
 			w.getParticipant().add(p);// p has been set on the 1st message
 			c.setWho(w);

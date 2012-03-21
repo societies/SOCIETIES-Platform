@@ -328,8 +328,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 			if (c.getSubscribedTo()!= null) {
 				LOG.info("subscribedTo received");
 				SubscribedTo s = (SubscribedTo) c.getSubscribedTo();
-				Community com = (Community) s.getCommunity(); 
-				CisRecord r = new CisRecord(com.getCommunityJid());
+				CisRecord r = new CisRecord(s.getCisJid());
 				this.subscribeToCis(r);
 				return null;
 			}

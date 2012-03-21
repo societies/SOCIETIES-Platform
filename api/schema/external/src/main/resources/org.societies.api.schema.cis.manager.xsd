@@ -50,10 +50,13 @@
 	</xs:element>
 	
 	<xs:element name='subscribedTo'>
-	   <xs:complexType>
-	       <xs:sequence>
-      		<xs:element ref='community' minOccurs='1' maxOccurs='1'/>
-      		</xs:sequence>
+	    <xs:complexType>
+	      <xs:simpleContent>
+	        <xs:extension base='empty'>
+	          <xs:attribute name='cis-jid' type='xs:string' use='required'/> 
+	          <xs:attribute name='cis-role' type='xs:string' use='required'/> 
+	        </xs:extension>
+	      </xs:simpleContent>
 	    </xs:complexType>
 	</xs:element>
 
