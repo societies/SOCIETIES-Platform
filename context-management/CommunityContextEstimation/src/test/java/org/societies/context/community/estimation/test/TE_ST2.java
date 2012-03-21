@@ -58,6 +58,8 @@ import org.societies.context.community.estimation.impl.CommunityContextEstimatio
 import org.societies.context.user.db.impl.UserCtxDBMgr;
 import org.societies.context.userHistory.impl.UserContextHistoryManagement;
 
+import sun.font.CreatedFontTracker;
+
 import com.sun.corba.se.pept.broker.Broker;
 
 /**
@@ -80,10 +82,12 @@ public class TE_ST2 {
 	 ******************************************************************************************/
 
 	private InternalCtxBroker internalCtxBroker;
-	CtxEntityIdentifier ctxEntityIdentifier = null;
+	CtxEntityIdentifier ctxEntityId = null;
+	CtxEntityIdentifier ctxEntityId1 = null;
 	CtxIdentifier ctxAttributeStringIdentifier = null;
 	CtxIdentifier ctxAttributeBinaryIdentifier = null;
 	Logger log;
+
 	
 	
 
@@ -107,12 +111,15 @@ public class TE_ST2 {
 		internalCtxBroker.setUserCtxDBMgr(new UserCtxDBMgr());
 		internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
 		
+		//initialization add create & retrieve methods
+		createEntities();
+		
 		Identity operatorId = null;
 		Long objectNumber = null;
 		String type = null;
-		CtxEntityIdentifier ctxEntityId = new CtxEntityIdentifier(operatorId, type, objectNumber);
+		//CtxEntityIdentifier ctxEntityId = new CtxEntityIdentifier(operatorId, type, objectNumber);
 		
-		new CommunityCtxEntity(ctxEntityId);		
+		//new CommunityCtxEntity(ctxEntityId);		
 	}
 
 	/**
@@ -125,9 +132,7 @@ public class TE_ST2 {
 	
 	@Test
 	public void testComCtxEst() throws CtxException, InterruptedException, ExecutionException{
-	
-		//CommunityContextEstimation cce = new CommunityContextEstimation();
-			
+		
 		final CtxAttribute ctxAttribute;
 		final CtxEntity ctxEntity;
 		
@@ -151,6 +156,10 @@ public class TE_ST2 {
 
 		//Create two futureEntities
 
+		
+	}	
+	
+		public void createEntities(){
 		Future<CtxEntity> futureEnt1, futureEnt2;
 		
 		try {
@@ -162,6 +171,9 @@ public class TE_ST2 {
 			
 			CtxEntity ctxEntity1 = (CtxEntity) futureEnt1.get();
 			CtxEntity ctxEntity2 = (CtxEntity) futureEnt2.get();
+			
+			this.ctxEntityId=ctxEntity1.getId();
+			this.ctxEntityId=ctxEntity2.getId();
 			
 			System.out.println(ctxEntity1.getType());
 			System.out.println(ctxEntity2.getType());
@@ -216,11 +228,11 @@ public class TE_ST2 {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}	
+	}
+	//	Mockito.when(brok.createEntity("Person")}	
 		
 	
 	
-
 		//brok.createEntity(requester, "person");
 		
 		
@@ -262,33 +274,38 @@ public class TE_ST2 {
 		return 0;
 		
 	}
-	
-	
-	//@Test	
+		
+	@Test	
 	public void retrieveContext() {
 		System.out.println("0.");
 		// if the CtxEntityID or CtxAttributeID is known the retrieval is performed by using the ctxBroker.retrieve(CtxIdentifier) method
 		try {
 			System.out.println("0.1");
-		
+
 		// retrieve ctxEntity
 		// This retrieval is performed based on the known CtxEntity identifier
 		// Retrieve is also possible to be performed based on the type of the CtxEntity. This will be demonstrated in a later example.
-		Future<CtxModelObject> ctxEntityRetrievedFuture = this.internalCtxBroker.retrieve(this.ctxEntityIdentifier);
+		
+			
+		Future<CtxModelObject> ctxEntityRetrievedFuture = this.internalCtxBroker.retrieve(this.ctxEntityId);
+		Future<CtxModelObject> ctxEntityRetrievedFuture2 = this.internalCtxBroker.retrieve(this.ctxEntityId1);
+		
 		System.out.println("0.2:" + ctxEntityRetrievedFuture.get());
 		CtxEntity retrievedCtxEntity = (CtxEntity) ctxEntityRetrievedFuture.get();
-		System.out.println("0.2:" + retrievedCtxEntity.getId());
+		System.out.println("0.3:" + retrievedCtxEntity);
 
 		this.log.info("Retrieved ctxEntity id " +retrievedCtxEntity.getId()+ " of type: "+retrievedCtxEntity.getType());
 		System.out.println("4. " );
-		System.out.println("0.3");
 
 		// retrieve the CtxAttribute contained in the CtxEntity with the string value
 		// again the retrieval is based on an known identifier, it is possible to retrieve it based on type.This will be demonstrated in a later example.
 		Future<CtxModelObject> ctxAttributeRetrievedStringFuture = this.internalCtxBroker.retrieve(this.ctxAttributeStringIdentifier);
 		CtxAttribute retrievedCtxAttribute = (CtxAttribute) ctxAttributeRetrievedStringFuture.get();
 		this.log.info("Retrieved ctxAttribute id " +retrievedCtxAttribute.getId()+ " and value: "+retrievedCtxAttribute.getStringValue());
-
+		System.out.println("BLABLA "+ retrievedCtxAttribute.getIntegerValue());
+		
+		System.out.println("5. " );
+		
 		// retrieve ctxAttribute with the binary value
 		Future<CtxModelObject> ctxAttributeRetrievedBinaryFuture = this.internalCtxBroker.retrieve(this.ctxAttributeBinaryIdentifier);
 		CtxAttribute ctxAttributeRetrievedBinary = (CtxAttribute) ctxAttributeRetrievedBinaryFuture.get();
