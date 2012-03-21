@@ -51,6 +51,7 @@ import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.cis.manager.CisParticipant.MembershipType;
 import org.societies.identity.IdentityImpl;
 
+import org.societies.api.schema.cis.community.Join;
 import org.societies.api.schema.cis.community.Who;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Participant;
@@ -340,20 +341,25 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 		LOG.info("get Query received");
 		if (payload.getClass().equals(Community.class)) {
 			Community c = (Community) payload;
+
 			// JOIN
 			if (c.getJoin() != null) {
+				String jid = "";
 				LOG.info("join received");
-				String jid = stanza.getFrom().getBareJid();
-				LOG.info( jid + " joinining");
+				String senderjid = stanza.getFrom().getBareJid();
 				boolean addresult = false; 
-				try{ 
-					addresult = this.addMember(jid, MembershipType.participant);
+				try{
+					if(c.getJoin().getParticipant() != null){
+						jid = c.getJoin().getParticipant().getJid();
+						addresult = this.addMember(jid, MembershipType.participant);
+					}
+						
 				}catch(CommunicationException e){
 					e.printStackTrace();
 				}
 				Community result = new Community();
 				if(addresult == false){
-					result.setJoin("error");
+					result.setJoin(new Join());
 				}
 				else{
 					

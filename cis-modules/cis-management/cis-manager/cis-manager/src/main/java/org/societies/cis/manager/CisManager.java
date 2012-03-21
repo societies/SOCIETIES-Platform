@@ -275,33 +275,42 @@ public class CisManager implements ICisManager, IFeatureServer{
 			}
 			if (c.getList() != null) {
 				LOG.info("list received");
-								
-				// GET LIST CODE of ownedCIS
-				Communities com = new Communities();
-				List<CisRecord> l = this.getOwnedCisList();
-				Iterator<CisRecord> it = l.iterator();
 				
-				while(it.hasNext()){
-					CisRecord element = it.next();
-					Community community = new Community();
-					community.setCommunityJid(element.getCisJID());
-					com.getCommunity().add(community);
-					 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
-			     }
-				// END OF GET LIST CODE
+				String listingType = "owned"; // default is owned
+				if(c.getList().getListCriteria() !=null)
+					listingType = c.getList().getListCriteria();
+								
+				
+				Communities com = new Communities();
+				
+				if(listingType.equals("owned") || listingType.equals("all")){
+				// GET LIST CODE of ownedCIS
+					List<CisRecord> l = this.getOwnedCisList();
+					Iterator<CisRecord> it = l.iterator();
+					
+					while(it.hasNext()){
+						CisRecord element = it.next();
+						Community community = new Community();
+						community.setCommunityJid(element.getCisJID());
+						com.getCommunity().add(community);
+						 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
+				     }
+				}
 
 				// GET LIST CODE of subscribedCIS
-				List<CisRecord> li = this.getOwnedCisList();
-				it = li.iterator();
-				
-				while(it.hasNext()){
-					CisRecord element = it.next();
-					Community community = new Community();
-					community.setCommunityJid(element.getCisJID());
-					com.getCommunity().add(community);
-					 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
-			     }
-				// END OF GET LIST CODE
+				if(listingType.equals("subscribed") || listingType.equals("all")){
+					List<CisRecord> li = this.getOwnedCisList();
+					Iterator<CisRecord> it = li.iterator();
+					
+					while(it.hasNext()){
+						CisRecord element = it.next();
+						Community community = new Community();
+						community.setCommunityJid(element.getCisJID());
+						com.getCommunity().add(community);
+						 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
+				     }
+				}
+			
 				
 				
 				return com;
