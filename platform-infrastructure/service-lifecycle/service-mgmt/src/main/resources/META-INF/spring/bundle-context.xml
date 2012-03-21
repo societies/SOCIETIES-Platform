@@ -12,12 +12,9 @@
 	<!-- regular spring configuration file defining the beans for this bundle. 
 		We've kept the osgi definitions in a separate configuration file so that 
 		this file can easily be used for integration testing outside of an OSGi environment -->
-<!--  
-	<bean id="serviceMgmt" class="org.societies.slm.servicemgmt.impl.ServiceManagement" >
-		<!- - <property name="converter" ref="XMLtoServiceObjectConverter" /> - ->
-<!- -		<property name="serviceReg" ref="serviceRegRef" />				
-	</bean>
--->
+
+<!-- Required for Async processing -->
+  <tx:annotation-driven />
 
 	<bean id="serListener" class="org.societies.slm.servicecontrol.ServiceRegistryListener"
 		init-method="registerListener" destroy-method="unRegisterListener">	

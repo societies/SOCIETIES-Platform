@@ -20,6 +20,8 @@
   <xs:complexType>
     <xs:sequence>
       <xs:element name="method" type="tns:methodType" minOccurs="0"/>
+      <xs:element name="serviceId" type="ns1:serviceResourceIdentifier" minOccurs="0" />
+      <xs:element name="URL" type="xs:anyURI" minOccurs="0" />
     </xs:sequence>
   </xs:complexType>
 </xs:element>
