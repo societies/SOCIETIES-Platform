@@ -27,11 +27,11 @@ package org.societies.privacytrust.privacyprotection.privacypolicy;
 import java.util.List;
 import java.util.Map;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager;
 
 /**
@@ -72,30 +72,30 @@ public class PolicyAgreementManager implements IPolicyAgreementManager {
 
 	@Override
 	public ResponseItem getPermissionConditionsInAgreement(
-			CtxIdentifier dataId, Identity ownerId,
-			Identity requestorId, IServiceResourceIdentifier serviceId) {
+			CtxIdentifier dataId, IIdentity ownerId,
+			IIdentity requestorId, ServiceResourceIdentifier serviceId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public ResponseItem getPermissionConditionsInAgreement(
-			CtxIdentifier dataId, Identity ownerId,
-			Identity requestorId, Identity cisId) {
+			CtxIdentifier dataId, IIdentity ownerId,
+			IIdentity requestorId, IIdentity cisId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public NegotiationAgreement updateAgreement(NegotiationAgreement agreement,
-			Identity myId, IServiceResourceIdentifier serviceId) {
+			IIdentity myId, ServiceResourceIdentifier serviceId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public NegotiationAgreement updateAgreement(NegotiationAgreement agreement,
-			Identity myId, Identity cisId) {
+			IIdentity myId, IIdentity cisId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
