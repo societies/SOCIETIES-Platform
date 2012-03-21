@@ -41,7 +41,7 @@ import javax.xml.bind.annotation.XmlType;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @version 0.0.1
  */
-@XmlType(propOrder = {"parentEntity", "childEntities"})
+@XmlType(namespace="http://societies.org/api/schema/context/model", propOrder = {"parentEntity", "childEntities"})
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CtxAssociation extends CtxModelObject {
 

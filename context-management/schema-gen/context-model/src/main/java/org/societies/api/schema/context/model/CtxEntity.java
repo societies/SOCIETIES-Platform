@@ -52,7 +52,7 @@ import javax.xml.bind.annotation.XmlType;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @version 0.0.1
  */
-@XmlType(propOrder = {"attributes", "associations"})
+@XmlType(namespace="http://societies.org/api/schema/context/model", propOrder = {"attributes", "associations"})
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CtxEntity extends CtxModelObject {
 

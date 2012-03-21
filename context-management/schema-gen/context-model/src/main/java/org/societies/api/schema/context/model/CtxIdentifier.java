@@ -24,6 +24,10 @@
  */
 package org.societies.api.schema.context.model;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -53,24 +57,27 @@ import javax.xml.bind.annotation.XmlType;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-@XmlType(propOrder = {"operatorId", "modelType", "type", "objectNumber"})
+@XmlType(namespace="http://societies.org/api/schema/context/model")
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class CtxIdentifier implements Serializable {
 
 	private static final long serialVersionUID = 3552976823045895472L;
 	
-	// TODO change nillable to false
-	@XmlElement(required = true, nillable=false)
-	private /* final */ String operatorId;
+	/** The unique identifier of the CSS or CIS where the identified context model object is stored.*/
+	private transient String operatorId;
 	
-	@XmlElement(required = true, nillable=false)
-	private /* final */ CtxModelType modelType;
+	/** The type of the identified context model object. */
+	private transient CtxModelType modelType;
 	
-	@XmlElement(required = true, nillable=false)
-	private /* final */ String type;
+	/** The semantic tag that characterises the identified context model object. */
+	private transient String type;
 	
+	/** The unique number within the CSS/CIS where the identified context model object was initially sensed/collected and stored. */
+	private transient Long objectNumber;
+	
+	/** The string form of this context identifier. */
 	@XmlElement(required = true, nillable=false)
-	private /* final */ Long objectNumber;
+	private volatile String string;    // The only serialisable field
 
 	CtxIdentifier() {}
 	
@@ -89,12 +96,18 @@ public abstract class CtxIdentifier implements Serializable {
 	 *            the unique numeric model object identifier
 	 */
 	CtxIdentifier(String operatorId, CtxModelType modelType, String type, Long objectNumber) {
+		
 		this.operatorId = operatorId;
 		this.modelType = modelType;
 		this.type = type;
 		this.objectNumber = objectNumber;
 	}
 
+	CtxIdentifier(String str) throws MalformedCtxIdentifierException {
+		
+		this.parse(str);
+	}
+	
 	/**
 	 * Returns a unique identifier of the CSS or CIS where the identified
 	 * context model object is stored
@@ -103,6 +116,7 @@ public abstract class CtxIdentifier implements Serializable {
 	 * context model object is stored
 	 */
 	public String getOperatorId() {
+		
 		return this.operatorId;
 	}
 	
@@ -113,6 +127,7 @@ public abstract class CtxIdentifier implements Serializable {
 	 * @see CtxModelType
 	 */
 	public CtxModelType getModelType() {
+		
 		return this.modelType;
 	}
 
@@ -123,6 +138,7 @@ public abstract class CtxIdentifier implements Serializable {
      * @return the semantic tag of the identified context model object 
 	 */
 	public String getType() {
+		
 		return this.type;
 	}
 	
@@ -132,6 +148,7 @@ public abstract class CtxIdentifier implements Serializable {
      * @return the numeric part of this context model object identifier
 	 */
 	public Long getObjectNumber() {
+		
 		return this.objectNumber;
 	}
 	
@@ -143,6 +160,7 @@ public abstract class CtxIdentifier implements Serializable {
 	 * object identifier
 	 */
 	public String toUriString() {
+		
 		return this.toString();
 	}
 	
@@ -154,17 +172,9 @@ public abstract class CtxIdentifier implements Serializable {
 	@Override
 	public String toString() {
 		
-		StringBuilder result = new StringBuilder();
+		this.initString();
 		
-		result.append(this.getOperatorId());
-		result.append("/");
-		result.append(this.getModelType());
-		result.append("/");
-		result.append(this.getType());
-		result.append("/");
-		result.append(this.getObjectNumber());
-		
-		return result.toString();
+		return this.string;
 	}
 	
 	/**
@@ -180,7 +190,7 @@ public abstract class CtxIdentifier implements Serializable {
         result = prime * result
                 + ((this.operatorId == null) ? 0 : this.operatorId.hashCode());
         result = prime * result
-                + ((this.getModelType() == null) ? 0 : this.getModelType().hashCode());
+                + ((this.modelType == null) ? 0 : this.modelType.hashCode());
         result = prime * result
                 + ((this.type == null) ? 0 : this.type.hashCode());
         result = prime * result
@@ -209,10 +219,10 @@ public abstract class CtxIdentifier implements Serializable {
                 return false;
         } else if (!this.operatorId.equals(other.operatorId))
             return false;
-        if (this.getModelType() == null) {
-            if (other.getModelType() != null)
+        if (this.modelType == null) {
+            if (other.modelType != null)
                 return false;
-        } else if (!this.getModelType().equals(other.getModelType()))
+        } else if (!this.modelType.equals(other.modelType))
             return false;
         if (this.type == null) {
             if (other.type != null)
@@ -227,4 +237,103 @@ public abstract class CtxIdentifier implements Serializable {
         
         return true;
     }
+	
+	/**
+     * Writes the contents of this CtxIdentifier to the given object output stream.
+     * <p> 
+     * The only serialisable field of a CtxIdentifier instance is its 
+     * {@link #string} field. That field is given a value, if it does not have
+     * one already, and then the {@link java.io.ObjectOutputStream#defaultWriteObject()}
+     * method of the given object-output stream is invoked.
+     *
+     * @param os
+     *            The object output stream to which this object is to be written
+     */
+    private void writeObject(ObjectOutputStream os)	throws IOException {
+    	
+    	this.initString();          // Initialise the string field
+    	os.defaultWriteObject();	// Write the string field only!
+    }
+
+    /**
+     * Reconstructs a CtxIdentifier from the given serial stream.
+     * <p> 
+     * The {@link java.io.ObjectInputStream#defaultReadObject()} method is
+     * invoked to read the value of the <tt>string</tt> field. The result is
+     * then parsed in the usual way.
+     *
+     * @param is
+     *            The object input stream from which this object is being read
+     */
+    private void readObject(ObjectInputStream is) throws ClassNotFoundException, IOException {
+	
+    	is.defaultReadObject();     // Read the string field only!
+    	try {
+    		this.parse(this.string);
+    	} catch (MalformedCtxIdentifierException mcie) {
+    		IOException ioe = new InvalidObjectException("Invalid Context Identifier");
+    		ioe.initCause(mcie);
+    		throw ioe;
+    	}
+    }
+	
+    // <operatorId>/<modelType>/<type>/<objectNumber>
+    private void initString() {
+		
+		if (this.string != null) 
+			return;
+		
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append(this.operatorId);
+		sb.append("/");
+		sb.append(this.modelType);
+		sb.append("/");
+		sb.append(this.type);
+		sb.append("/");
+		sb.append(this.objectNumber);
+		
+		this.string = sb.toString();
+	}
+    
+    // <operatorId>/<modelType>/<type>/<objectNumber>
+	private void parse(String input) throws MalformedCtxIdentifierException {
+		
+		this.string = input;
+
+		final int length = input.length();
+
+		final int objectNumberDelim = input.lastIndexOf("/");
+		if (objectNumberDelim == -1)
+			throw new MalformedCtxIdentifierException("'" + input + "'");
+		final String objectNumberStr = input.substring(objectNumberDelim+1, length);
+		try { 
+			objectNumber = new Long(objectNumberStr);
+		} catch (NumberFormatException nfe) {
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Invalid context model object number", nfe);
+		}
+
+		final int typeDelim = input.lastIndexOf("/", objectNumberDelim-1);
+		type = input.substring(typeDelim+1, objectNumberDelim);
+		if (type.isEmpty())
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Context type cannot be empty");
+
+		final int modelTypeDelim = input.lastIndexOf("/", typeDelim-1);
+		if (modelTypeDelim == -1)
+			throw new MalformedCtxIdentifierException("'" + input + "'");
+		final String modelTypeStr = input.substring(modelTypeDelim+1, typeDelim);
+		try {
+			modelType = CtxModelType.valueOf(modelTypeStr);
+		} catch (IllegalArgumentException iae) {
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Malformed context model type", iae);
+		}
+
+		operatorId = input.substring(0, modelTypeDelim);
+		if (operatorId.isEmpty())
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Operator ID cannot be empty");
+	}
 }

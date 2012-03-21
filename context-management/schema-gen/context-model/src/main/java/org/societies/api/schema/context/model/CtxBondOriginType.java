@@ -24,6 +24,8 @@
  */
 package org.societies.api.schema.context.model;
 
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * The constants of this enumerated type specify the origin of a context bond.
  * More specifically, a {@link CtxBond} can be one of the following types:
@@ -37,6 +39,7 @@ package org.societies.api.schema.context.model;
  *         Liampotis</a> (ICCS)
  * @version 0.0.1
  */
+@XmlType(namespace="http://societies.org/api/schema/context/model")
 public enum CtxBondOriginType {
 
     /**

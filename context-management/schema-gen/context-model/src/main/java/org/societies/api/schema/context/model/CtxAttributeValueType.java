@@ -24,6 +24,8 @@
  */
 package org.societies.api.schema.context.model;
 
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * The constants of this enumerated type specify the data type of the {@link CtxAttribute}
  * value. To this end, the following value types have been identified:
@@ -43,6 +45,7 @@ package org.societies.api.schema.context.model;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
+@XmlType(namespace="http://societies.org/api/schema/context/model")
 public enum CtxAttributeValueType {
 
 	/**

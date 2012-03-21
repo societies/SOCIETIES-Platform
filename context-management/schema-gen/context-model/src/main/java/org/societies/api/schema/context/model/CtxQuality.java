@@ -62,7 +62,7 @@ import javax.xml.bind.annotation.XmlType;
  * @see CtxOriginType
  * @since 0.0.1
  */
-@XmlType(propOrder = {"attribute", "lastUpdated", "originType", "precision", "updateFrequency"})
+@XmlType(namespace="http://societies.org/api/schema/context/model", propOrder = {"attribute", "lastUpdated", "originType", "precision", "updateFrequency"})
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CtxQuality implements Serializable {
 

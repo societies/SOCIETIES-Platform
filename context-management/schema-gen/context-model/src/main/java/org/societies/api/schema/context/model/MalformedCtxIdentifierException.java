@@ -24,55 +24,69 @@
  */
 package org.societies.api.schema.context.model;
 
-import javax.xml.bind.annotation.XmlType;
+import org.societies.api.context.CtxException;
 
 /**
- * This class is used to identify context associations. It provides methods that
- * return information about the identified association including:
- * <ul>
- * <li><tt>OperatorId</tt>: A unique identifier of the CSS or CIS where the 
- * identified context association is stored.</li>
- * <li><tt>ModelType</tt>: Describes the type of the identified context model
- * object, i.e. {@link CtxModelType#ASSOCIATION ASSOCIATION}.</li>
- * <li><tt>Type</tt>: A semantic tag that characterises the identified context
- * association, e.g. "isFriendWith".</li>
- * <li><tt>ObjectNumber</tt>: A unique number within the CSS/CIS where the
- * respective context information was initially sensed/collected and stored.</li>
- * </ul>
- * <p>
- * A context association identifier can be represented as a URI formatted
- * String as follows:
- * <pre>
- * &lt;OperatorId&gt;/ASSOCIATION/&lt;Type&gt;/&lt;ObjectNumber&gt;
- * </pre>
- * 
- * @see CtxIdentifier
+ * Thrown to indicate that a string could not be parsed into a context identifier. 
+ *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.1
+ * @since 0.0.4
  */
-@XmlType(namespace="http://societies.org/api/schema/context/model")
-public class CtxAssociationIdentifier extends CtxIdentifier {
+public class MalformedCtxIdentifierException extends CtxException {
 
-	private static final long serialVersionUID = -7991875953413583564L;
+	private static final long serialVersionUID = -1989914038541623047L;
 
-	CtxAssociationIdentifier() {}
-	
 	/**
-	 * Creates a context association identifier by specifying the CSS/CIS ID
-	 * where the identified context model object is stored, as well as,
-	 * the association type and the unique numeric model object identifier.
-	 * 
-	 * @param operatorId
-	 *            the identifier of the CSS/CIS where the identified context
-	 *            model object is stored
-	 * @param type
-	 *            the association type, e.g. "device"
-	 * @param objectNumber
-	 *            the unique numeric model object identifier
-	 */
-	public CtxAssociationIdentifier(String operatorId, String type,
-			Long objectNumber) {
-		
-		super(operatorId, CtxModelType.ASSOCIATION, type, objectNumber);
-	}
+     * Constructs a <code>MalformedCtxIdentifierException</code> with no detail message.
+     */
+    public MalformedCtxIdentifierException() {
+    	
+        super();
+    }
+
+    /**
+     * Constructs a <code>MalformedCtxIdentifierException</code> with the specified detail
+     * message.
+     * 
+     * @param message
+     *            the detail message.
+     */
+    public MalformedCtxIdentifierException(String message) {
+
+        super(message);
+    }
+
+    /**
+     * Creates a <code>MalformedCtxIdentifierException</code> with the specified detail
+     * message and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public MalformedCtxIdentifierException(String message, Throwable cause) {
+
+        super(message, cause);
+    }
+
+    /**
+     * Creates a <code>MalformedCtxIdentifierException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public MalformedCtxIdentifierException(Throwable cause) {
+
+        super(cause);
+    }
 }

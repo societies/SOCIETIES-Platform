@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * This class is used to represent community context entities. A
@@ -46,6 +47,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
+@XmlType(namespace="http://societies.org/api/schema/context/model")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	

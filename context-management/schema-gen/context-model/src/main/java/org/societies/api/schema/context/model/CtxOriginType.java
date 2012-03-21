@@ -24,6 +24,8 @@
  */
 package org.societies.api.schema.context.model;
 
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * The constants of this enumerated type specify the origin of a context
  * attribute value. This information is part of the Quality of Context (QoC)
@@ -41,6 +43,7 @@ package org.societies.api.schema.context.model;
  * @see CtxQuality
  * @since 0.0.1
  */
+@XmlType(namespace="http://societies.org/api/schema/context/model")
 public enum CtxOriginType {
 
     /**

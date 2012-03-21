@@ -41,7 +41,7 @@ import javax.xml.bind.annotation.XmlType;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-@XmlType(propOrder= {"modelType", "type", "originType"})
+@XmlType(namespace="http://societies.org/api/schema/context/model", propOrder= {"modelType", "type", "originType"})
 public abstract class CtxBond implements Serializable {
 	
 	private static final long serialVersionUID = 2972314471738603009L;

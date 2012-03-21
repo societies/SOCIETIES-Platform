@@ -24,6 +24,8 @@
  */
 package org.societies.api.schema.context.model;
 
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * The constants of this enumerated type specify the context model type of a 
  * {@link CtxModelObject}. Context model objects can be of one of the following types:
@@ -40,6 +42,7 @@ package org.societies.api.schema.context.model;
  * @see CtxAssociation
  * @since 0.0.1 
  */
+@XmlType(namespace="http://societies.org/api/schema/context/model")
 public enum CtxModelType {
 	
 	/**

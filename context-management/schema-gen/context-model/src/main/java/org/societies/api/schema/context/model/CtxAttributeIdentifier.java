@@ -26,7 +26,7 @@ package org.societies.api.schema.context.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * This class is used to identify context attributes. It provides methods
@@ -58,14 +58,14 @@ import javax.xml.bind.annotation.XmlElement;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
+@XmlType(namespace="http://societies.org/api/schema/context/model")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CtxAttributeIdentifier extends CtxIdentifier {
 	
 	private static final long serialVersionUID = -282171829285239788L;
 	
 	/** The scope of this context attribute identifier. */
-	@XmlElement(required = true, nillable=false)
-	private /* final */ CtxEntityIdentifier scope;
+	private transient CtxEntityIdentifier scope;
 
 	CtxAttributeIdentifier() {}
 	

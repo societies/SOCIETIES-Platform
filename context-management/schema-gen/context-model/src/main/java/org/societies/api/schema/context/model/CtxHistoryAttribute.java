@@ -36,7 +36,7 @@ import javax.xml.bind.annotation.XmlType;
  * @author <a href="mailto:nikosk@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
  * @since 0.0.1
  */
-@XmlType(propOrder = {"historyRecordId", "stringValue", "integerValue", "doubleValue", "binaryValue"})
+@XmlType(namespace="http://societies.org/api/schema/context/model", propOrder = {"historyRecordId", "stringValue", "integerValue", "doubleValue", "binaryValue"})
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CtxHistoryAttribute extends CtxModelObject {
 

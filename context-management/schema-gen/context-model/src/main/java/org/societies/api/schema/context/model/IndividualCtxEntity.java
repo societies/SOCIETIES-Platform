@@ -24,6 +24,8 @@
  */
 package org.societies.api.schema.context.model;
 
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * This class is used to represent a single participant (CSS) of a
  * {@link CommunityCtxEntity} (CIS). An <code>IndividualCtxEntity</code> may belong to
@@ -35,6 +37,7 @@ package org.societies.api.schema.context.model;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
+@XmlType(namespace="http://societies.org/api/schema/context/model")
 public class IndividualCtxEntity extends CommunityMemberCtxEntity {
 
 	private static final long serialVersionUID = -1841816618272931692L;

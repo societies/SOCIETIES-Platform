@@ -75,7 +75,7 @@ import javax.xml.bind.annotation.XmlType;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-@XmlType(propOrder = {"stringValue", "integerValue", "doubleValue", "binaryValue", "valueType", "valueMetric", "quality", "sourceId", "historyRecorded"})
+@XmlType(namespace="http://societies.org/api/schema/context/model", propOrder = {"stringValue", "integerValue", "doubleValue", "binaryValue", "valueType", "valueMetric", "quality", "sourceId", "historyRecorded"})
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CtxAttribute extends CtxModelObject {
 
