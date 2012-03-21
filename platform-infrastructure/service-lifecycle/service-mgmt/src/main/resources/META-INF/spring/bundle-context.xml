@@ -7,7 +7,8 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
 		http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi-1.2.xsd"
 	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:osgi="http://www.springframework.org/schema/osgi">
+	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xmlns:tx="http://www.springframework.org/schema/tx">
 
 	<!-- regular spring configuration file defining the beans for this bundle. 
 		We've kept the osgi definitions in a separate configuration file so that 
