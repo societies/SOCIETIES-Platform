@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
@@ -148,7 +149,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 		
 		ServiceImplementation servImpl = new ServiceImplementation();
 		servImpl.setServiceVersion((String)event.getServiceReference().getProperty("Bundle-Version"));
-			
+
 		
 		si.setServiceImpl(servImpl);
 		service.setServiceInstance(si);
@@ -181,13 +182,14 @@ public class ServiceRegistryListener implements BundleContextAware,
 			}
 			break;
 		case ServiceEvent.UNREGISTERING:
-			log.info("Service Unregistered");			
+			log.info("Service Unregistered, so we set it to stopped but do not remove from registry");			
 			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service, serBndl));
-			serviceList.add(service);
+			//serviceList.add(service);
+			
 			try {
-				this.getServiceReg().unregisterServiceList(serviceList);
-			} catch (ServiceRegistrationException e) {
-				log.debug("Error while removing service meta data");
+				this.getServiceReg().changeStatusOfService(service.getServiceIdentifier(), ServiceStatus.STOPPED);
+			} catch (ServiceNotFoundException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
