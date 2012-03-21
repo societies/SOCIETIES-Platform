@@ -9,55 +9,31 @@
        bundle. We've kept the osgi definitions in a separate 
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
-
-   <bean id="CommunityLifecycleManagement" class="org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityLifecycleManagement" 
-   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, UserCtxHistoryManager, EntityIdentifier, CommManagerBundle" init-method="initialiseCommunityLifecycleManagement">
-   <property name="linkedCss" ref="EntityIdentifier"></property>
-   <property name="linkedCis" ref="CisRecord"></property>
-   <property name="linkedDomain" ref="EntityIdentifier"></property>
-   <property name="autoCreationManager" ref="AutomaticCommunityCreationManager"></property>
-   <property name="autoConfigurationManager" ref="AutomaticCommunityConfigurationManager"></property>
-   <property name="autoDeletionManager" ref="AutomaticCommunityDeletionManager"></property>
-   <property name="commManager" ref="CommManagerBundle"></property>
-   </bean>
    
-   <bean id="AutomaticCommunityCreationManager" class="org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityCreationManager" 
-   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, CisManager, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, CommunityCtxBroker, UserCtxBroker, UserCtxHistoryManager, EntityIdentifier, CommManagerBundle" init-method="initialiseAutomaticCommunityCreationManager">
-   <property name="linkedCss" ref="EntityIdentifier"></property>
-   <property name="linkedDomain" ref="EntityIdentifier"></property>
-   <property name="linkedSuperCis" ref="CisRecord"></property>
+   <bean id="SuggestedCommunityAnalyser" class="org.societies.orchestration.CommunityLifecycleManagement.impl.SuggestedCommunityAnalyser" 
+   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, CisManager, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, CommunityCtxBroker, UserCtxBroker, UserCtxHistoryManager, IIdentity, CommManagerBundle, UserFeedback, UserFeedbackCallback" init-method="initialiseSuggestedCommunityAnalyser">
+   <property name="linkedCss" ref="IIdentity"></property>
    <property name="cisManager" ref="CisManager"></property>
    <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>
    <property name="userContextBroker" ref="UserCtxBroker"></property>
    <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>
    <property name="communityContextBroker" ref="CommunityCtxBroker"></property>
    <property name="commManager" ref="CommManagerBundle"></property>
+   <property name="userFeedback" ref="UserFeedback"></property>
+   <property name="userFeedbackCallback" ref="UserFeedbackCallback"></property>
    </bean>
    
-   <bean id="AutomaticCommunityConfigurationManager" class="org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityConfigurationManager" 
-   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, CisManager, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, CommunityCtxBroker, UserCtxBroker, UserCtxHistoryManager, EntityIdentifier, CommManagerBundle" init-method="initialiseAutomaticCommunityConfigurationManager">
-   <property name="linkedCss" ref="EntityIdentifier"></property>
-   <property name="linkedCis" ref="CisRecord"></property>
+   <bean id="CommunityRecommender" class="org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityRecommender" 
+   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, CisManager, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, CommunityCtxBroker, UserCtxBroker, UserCtxHistoryManager, IIdentity, CommManagerBundle, UserFeedback, UserFeedbackCallback" init-method="initialiseCommunityRecommender">
+   <property name="linkedCss" ref="IIdentity"></property>
    <property name="cisManager" ref="CisManager"></property>
-   <property name="linkedDomain" ref="EntityIdentifier"></property>
    <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>
    <property name="userContextBroker" ref="UserCtxBroker"></property>
    <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>
    <property name="communityContextBroker" ref="CommunityCtxBroker"></property>
    <property name="commManager" ref="CommManagerBundle"></property>
-   </bean>
-   
-   <bean id="AutomaticCommunityDeletionManager" class="org.societies.orchestration.CommunityLifecycleManagement.impl.AutomaticCommunityDeletionManager" 
-   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, CisManager, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, CommunityCtxBroker, UserCtxBroker, UserCtxHistoryManager, EntityIdentifier, CommManagerBundle" init-method="initialiseAutomaticCommunityDeletionManager">
-   <property name="linkedCss" ref="EntityIdentifier"></property>
-   <property name="linkedCis" ref="CisRecord"></property>
-   <property name="cisManager" ref="CisManager"></property>
-   <property name="linkedDomain" ref="EntityIdentifier"></property>
-   <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>
-   <property name="userContextBroker" ref="UserCtxBroker"></property>
-   <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>
-   <property name="communityContextBroker" ref="CommunityCtxBroker"></property>
-   <property name="commManager" ref="CommManagerBundle"></property>
+   <property name="userFeedback" ref="UserFeedback"></property>
+   <property name="userFeedbackCallback" ref="UserFeedbackCallback"></property>
    </bean>
 <!--   <context:component-scan base-package="org.societies.orchestration.CommunityLifecycleManagement.impl"></context:component-scan> -->
 </beans>

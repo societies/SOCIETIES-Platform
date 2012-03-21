@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -20,11 +25,9 @@
 package org.societies.personalisation.preference.api.UserPreferenceConditionMonitor;
 
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxModelObject;
-import org.societies.api.internal.personalisation.model.IFeedbackEvent;
-import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
-import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.personalisation.model.IAction;
+import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 
 
 /**
@@ -34,57 +37,20 @@ import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
  */
 public interface IUserPreferenceConditionMonitor {
 
-	public void disableAllPCM();
+	/**
+	 * 
+	 * @param ownerId
+	 * @param attribute
+	 * @param callback
+	 */
+	public void getOutcome(IIdentity ownerId, CtxAttribute attribute, IPersonalisationInternalCallback callback);
+	
 
 	/**
 	 * 
-	 * @param dpi
+	 * @param ownerId
+	 * @param action
+	 * @param callback
 	 */
-	public void disablePCM(EntityIdentifier dpi);
-
-	public void enableAllPCM();
-
-	/**
-	 * 
-	 * @param dpi
-	 */
-	public void enablePCM(EntityIdentifier dpi);
-
-	/**
-	 * 
-	 * @param contextAttribute
-	 * @param user_id
-	 */
-	public IPreferenceOutcome getOutcome(CtxAttribute contextAttribute, EntityIdentifier user_id);
-
-	/**
-	 * 
-	 * @param user_id
-	 * @param serviceType
-	 * @param serviceID
-	 * @param preferenceName
-	 */
-	public IPreferenceOutcome requestOutcomeWithCurrentContext(EntityIdentifier user_id, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName);
-
-	/**
-	 * 
-	 * @param user_id
-	 * @param serviceType
-	 * @param serviceID
-	 * @param preferenceName
-	 */
-	public IPreferenceOutcome requestOutcomeWithFutureContext(EntityIdentifier user_id, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName);
-
-	/**
-	 * 
-	 * @param FeedbackEvent
-	 */
-	public void sendFeedback(IFeedbackEvent FeedbackEvent);
-
-	/**
-	 * 
-	 * @param ctxModelObj
-	 */
-	public void updateReceived(CtxModelObject ctxModelObj);
-
+	public void getOutcome(IIdentity ownerId, IAction action, IPersonalisationInternalCallback callback);
 }

@@ -23,9 +23,12 @@ import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.provider.IQProvider;
+import org.jivesoftware.smack.provider.PacketExtensionProvider;
 import org.jivesoftware.smack.provider.ProviderManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jivesoftware.smackx.packet.DiscoverItems;
+import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.api.comm.xmpp.datatypes.XMPPNode;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.interfaces.Callback;
 import org.societies.interfaces.XMPPAgent;
 import org.societies.utilities.DBC.Dbc;
@@ -34,16 +37,18 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import android.util.Log;
+
 
 public class XMPPClient implements XMPPAgent {
 
-	private static final Logger log = LoggerFactory.getLogger(XMPPClient.class);
+	private static final String LOG_TAG = XMPPClient.class.getName();
 	
 	private XMPPConnection connection;
 	private String username, password, resource;
 	private int usingConnectionCounter = 0;
 	private ProviderElementNamespaceRegistrar providerRegistrar = new ProviderElementNamespaceRegistrar();
-	private IQProvider iqProvider = new RawXmlProvider();
+	private RawXmlProvider rawXmlProvider = new RawXmlProvider();
 	
 	public XMPPClient(ResourceBundle configutationBundle) {
 		
@@ -67,7 +72,7 @@ public class XMPPClient implements XMPPAgent {
 			connection.addPacketListener(new PacketListener() {
 	
 				public void processPacket(Packet packet) {
-					log.debug("Packet received: " + packet.toXML());
+					Log.d(LOG_TAG, "Packet received: " + packet.toXML());
 				}
 				
 			}, new PacketFilter() {
@@ -80,7 +85,7 @@ public class XMPPClient implements XMPPAgent {
 			connection.addPacketSendingListener(new PacketListener() {
 	
 				public void processPacket(Packet packet) {
-					log.debug("Packet sent: " + packet.toXML());
+					Log.d(LOG_TAG, "Packet sent: " + packet.toXML());
 				}
 				
 			}, new PacketFilter() {
@@ -93,12 +98,12 @@ public class XMPPClient implements XMPPAgent {
 		}
 	}
 	
-	public void register(String[] elementNames, String[] namespaces, final Callback callback) {		
-		
+	public void register(String[] elementNames, String[] namespaces, final Callback callback) {
 		for(int i=0; i<elementNames.length; i++) {
 			for(int j=0; j<namespaces.length; j++) {
 				providerRegistrar.register(new ProviderElementNamespaceRegistrar.ElementNamespaceTuple(elementNames[i], namespaces[j]));				
-				ProviderManager.getInstance().addIQProvider(elementNames[i], namespaces[j], iqProvider);
+				ProviderManager.getInstance().addIQProvider(elementNames[i], namespaces[j], rawXmlProvider);
+				ProviderManager.getInstance().addExtensionProvider(elementNames[i], namespaces[j], rawXmlProvider);
 			}
 		}
 		
@@ -123,8 +128,10 @@ public class XMPPClient implements XMPPAgent {
 			for(int j=0; j<namespaces.length; j++) {
 				ProviderElementNamespaceRegistrar.ElementNamespaceTuple tuple = new ProviderElementNamespaceRegistrar.ElementNamespaceTuple(elementNames[i], namespaces[j]);		
 				providerRegistrar.unregister(tuple);
-				if(!providerRegistrar.isRegistered(tuple)) 
+				if(!providerRegistrar.isRegistered(tuple)) { 
 					ProviderManager.getInstance().removeIQProvider(tuple.elementName, tuple.namespace);
+					ProviderManager.getInstance().removeExtensionProvider(tuple.elementName, tuple.namespace);
+				}
 			}
 		}
 		
@@ -178,6 +185,56 @@ public class XMPPClient implements XMPPAgent {
 		}
 	}
 	
+	public String getIdentity() {
+		try {
+			connect();			
+			String identity = connection.getUser();			
+			disconnect();			
+			return identity;
+		} catch (XMPPException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+	
+	public String getItems(String entity, String node, final Callback callback) throws CommunicationException {		
+		try {
+			connect();
+			
+			DiscoverItems discoItems = new DiscoverItems();
+			discoItems.setTo(entity);
+			discoItems.setNode(node);		
+
+			PacketListener packetListener = new PacketListener() {
+				public void processPacket(Packet packet) {
+					IQ iq = (IQ)packet;
+					connection.removePacketListener(this);
+					disconnect();
+					try {
+						if(iq.getType() == IQ.Type.RESULT) {
+							if(isDiscoItem(iq))
+								callback.receiveItems(packet.toXML());
+							else
+								callback.receiveResult(packet.toXML());
+						}
+						else if(iq.getType() == IQ.Type.ERROR) {
+							callback.receiveError(packet.toXML());
+						}
+					} catch (Exception e) {
+						Log.e(LOG_TAG, e.getMessage(), e);
+					}
+				}				
+			};
+			
+			connection.addPacketListener(packetListener, new AndFilter(new PacketTypeFilter(IQ.class),new PacketIDFilter(discoItems.getPacketID()))); 
+			
+			connection.sendPacket(discoItems);
+			
+			return discoItems.getPacketID();
+		} catch (XMPPException e) {
+			throw new CommunicationException(e.getMessage(), e);
+		}
+	}
+	
 	private void connect() throws XMPPException {		
 		if(!connection.isConnected()) {
 			connection.connect();
@@ -199,6 +256,18 @@ public class XMPPClient implements XMPPAgent {
 				return xml;
 			}				
 		};
+	}
+	
+	private boolean isDiscoItem(IQ iq) throws SAXException, IOException, ParserConfigurationException {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setNamespaceAware(true);
+		Element element = factory.newDocumentBuilder().parse(new InputSource(new StringReader(iq.toXML()))).getDocumentElement();
+		if(element.getChildNodes().getLength() == 1) {
+			Node query = element.getChildNodes().item(0);
+			return query.getNodeName().equals("query") && query.lookupNamespaceURI(query.getPrefix()).equals(XMPPNode.ITEM_NAMESPACE);
+		}
+		else
+			return false;
 	}
 	
 	private static class NamespaceFilter implements PacketFilter {
@@ -226,7 +295,7 @@ public class XMPPClient implements XMPPAgent {
 					}
 				}
 			} catch (Exception e) {
-				log.error(e.getMessage(), e);
+				Log.e(LOG_TAG, e.getMessage(), e);
 			}
 			return false;
 		}

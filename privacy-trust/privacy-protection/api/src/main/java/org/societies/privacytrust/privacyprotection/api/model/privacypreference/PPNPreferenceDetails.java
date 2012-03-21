@@ -26,17 +26,18 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 
 import java.io.Serializable;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
 
 
 public class PPNPreferenceDetails implements Serializable{
 
 	private String contextType;
 	private CtxAttributeIdentifier affectedCtxID;
-	private Identity requestorDPI;
-	private IServiceResourceIdentifier serviceID;
+	private IIdentity requestorDPI;
+	private ServiceResourceIdentifier serviceID;
 	public PPNPreferenceDetails(String contextType){
 		this.setContextType(contextType);
 	}
@@ -49,11 +50,11 @@ public class PPNPreferenceDetails implements Serializable{
 		return affectedCtxID;
 	}
 
-	public void setRequestorDPI(Identity requestorDPI) {
+	public void setRequestorDPI(IIdentity requestorDPI) {
 		this.requestorDPI = requestorDPI;
 	}
 
-	public Identity getRequestorDPI() {
+	public IIdentity getRequestorDPI() {
 		return requestorDPI;
 	}
 
@@ -65,7 +66,7 @@ public class PPNPreferenceDetails implements Serializable{
 		return contextType;
 	}
 	
-	private boolean compareRequestorDPIs(Identity dpi){
+	private boolean compareRequestorDPIs(IIdentity dpi){
 		if (dpi==null){
 			if (this.requestorDPI==null){
 				return true;
@@ -85,7 +86,7 @@ public class PPNPreferenceDetails implements Serializable{
 		}
 	}
 	
-	private boolean compareServiceID(IServiceResourceIdentifier serviceID2){
+	private boolean compareServiceID(ServiceResourceIdentifier serviceID2){
 		if (serviceID2==null){
 			if (this.serviceID == null){
 				return true;
@@ -159,11 +160,11 @@ public class PPNPreferenceDetails implements Serializable{
 		return str;
 	}
 
-	public void setServiceID(IServiceResourceIdentifier serviceID) {
+	public void setServiceID(ServiceResourceIdentifier serviceID) {
 		this.serviceID = serviceID;
 	}
 
-	public IServiceResourceIdentifier getServiceID() {
+	public ServiceResourceIdentifier getServiceID() {
 		return serviceID;
 	}
 	

@@ -33,7 +33,7 @@ package org.societies.example.fortunecookie;
 
 import java.util.concurrent.Future;
 
-import org.societies.example.fortunecookieservice.schema.Cookie;
+import org.societies.api.schema.examples.fortunecookie.Cookie;
 
 public interface IWisdom {
 

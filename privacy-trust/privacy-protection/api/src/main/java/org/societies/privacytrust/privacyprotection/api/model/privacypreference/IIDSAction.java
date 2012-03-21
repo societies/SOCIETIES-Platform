@@ -26,9 +26,9 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 
 import java.util.List;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
 /**
@@ -42,10 +42,10 @@ public interface IIDSAction {
 
 	public List<CtxAttribute> getContext();
 
-	public Identity getSelectedIdentity();
+	public IIdentity getSelectedIdentity();
 
-	public IServiceResourceIdentifier getServiceIdentifier();
+	public ServiceResourceIdentifier getServiceIdentifier();
 
-	public Identity getServiceIdentity();
+	public IIdentity getServiceIdentity();
 
 }

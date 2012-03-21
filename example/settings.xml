@@ -42,28 +42,45 @@
 	</proxies>
 	<profiles>
 		<profile>
-			<id>SOCIETIES_Build</id>
+			<id>SOCIETIES_REPO</id>
 			<repositories>
 				<!-- Societies repository -->
 				<repository>
 					<id>societies</id>
 					<name>Societies Maven Repository</name>
 					<url>http://maven.ict-societies.eu/nexus/content/repositories/thirdparty/</url>
+					<releases>
+						<enabled>true</enabled>
+						<updatePolicy>daily</updatePolicy>
+					</releases>
+					<snapshots>
+						<enabled>true</enabled>
+						<updatePolicy>daily</updatePolicy>
+					</snapshots>
 				</repository>
 			</repositories>
 		</profile>
 		<profile>
-			<id>Virgo_Deploy_dir</id>
+			<id>VIRGO_DEPLOY_DIR</id>
 			<properties>
 				<spring.osgi.deploy.dir>
 					CHANGE_TO_YOUR_VIRGO_HOME_DIRECTORY/repository/usr
 				</spring.osgi.deploy.dir>
 			</properties>
 		</profile>
+		<profile>
+			<id>ANDROID_HOME</id>
+			<properties>
+				<android.home>
+					USER_HOME/local/dev/android/r15/android-sdk-linux
+				</android.home>
+			</properties>
+		</profile>
 	</profiles>
 	<!-- activeProfiles | List of profiles that are active for all builds. | -->
 	<activeProfiles>
-		<activeProfile>SOCIETIES_Build</activeProfile>
-		<activeProfile>Virgo_Deploy_dir</activeProfile>
+		<activeProfile>SOCIETIES_REPO</activeProfile>
+		<activeProfile>VIRGO_DEPLOY_DIR</activeProfile>
+		<activeProfile>ANDROID_HOME</activeProfile>
 	</activeProfiles>
 </settings>

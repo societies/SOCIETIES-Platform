@@ -25,8 +25,10 @@
 
 package org.societies.css.devicemgmt.devicemanager.impl;
 
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 
 import org.osgi.framework.BundleContext;
@@ -36,9 +38,9 @@ import org.osgi.framework.ServiceRegistration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.css.devicemgmt.IAction;
+
 import org.societies.api.css.devicemgmt.IDevice;
-import org.societies.api.css.devicemgmt.IDeviceStateVariable;
+import org.societies.api.css.devicemgmt.IDeviceService;
 import org.societies.api.css.devicemgmt.model.DeviceMgmtConstants;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 
@@ -56,12 +58,14 @@ public class DeviceImpl implements IDevice{
 	private String deviceId;
 	private boolean status;
 
+
 	public DeviceImpl(BundleContext bc, DeviceManager deviceMgr, String deviceId, DeviceCommonInfo deviceCommonInfo) {
 		
 		this.bundleContext = bc;
 		this.deviceManager = deviceMgr;
 		this.deviceCommonInfo = deviceCommonInfo;
 		this.deviceId = deviceId;
+		
 		
 		
 		properties = new Hashtable<String, String>();
@@ -100,7 +104,7 @@ public class DeviceImpl implements IDevice{
 		if (registration != null)
 		{
 			registration.unregister();
-			deviceManager.removeDeviceFromContainer(deviceId);
+			deviceManager.removeDeviceFromContainer(deviceCommonInfo.getDeviceFamilyIdentity(), deviceId);
 			
 			LOG.info("-- The device " + properties.get("deviceId") + " has been removed");
 		}
@@ -160,46 +164,66 @@ public class DeviceImpl implements IDevice{
 		return deviceCommonInfo.getContextSource();
 	}
 
+	@Override
+	public IDeviceService getService(String serviceId) {
 	
-	/**
-	 *  TODO we will use the actionName + deviceId to get Action service, 
-	 *  so firstly we have to create binding table to get the MAC address of the device by using the device Id
-	 */
-	public IAction getAction(String actionName) {
-		
-		
-		ServiceReference[] sr = null;
-		try 
+		String deviceMacAddress = deviceManager.getDeviceMacAddress(this.deviceId);
+		List <String> serviceList = deviceManager.getDeviceServiceIds(this.deviceId);
+		if (serviceList != null && deviceMacAddress != null) 
 		{
-			
-			sr = bundleContext.getServiceReferences(IAction.class.getName(), "(actionName=getLightLevel)");
-		
-		} catch (InvalidSyntaxException e) {
-			//TODO in case of exception 
-			e.printStackTrace();
+			if (serviceList.contains(serviceId))
+			{
+				ServiceReference[] sr = null;
+				try 
+				{
+					sr = bundleContext.getServiceReferences(IDeviceService.class.getName(), "(&(serviceId="+serviceId+")(deviceMacAddress="+deviceMacAddress+"))");
+				} 
+				catch (InvalidSyntaxException e) 
+				{
+					e.printStackTrace();
+				}
+				if (sr != null)
+				{
+					IDeviceService iDeviceService = (IDeviceService)bundleContext.getService(sr[0]);
+
+					return iDeviceService;
+				}
+				return null;
+			}
+			return null;
 		}
+		return null;
+	}
+
+	@Override
+	public IDeviceService [] getServices() {
+
+		String deviceMacAddress = deviceManager.getDeviceMacAddress(this.deviceId);
+		List <String> serviceList = deviceManager.getDeviceServiceIds(this.deviceId);
 		
-		if (sr != null)
+		List<IDeviceService> deviceServiceList = new ArrayList<IDeviceService>();
+		
+		if (serviceList != null && deviceMacAddress != null) 
 		{
-			
-			IAction ia = (IAction)bundleContext.getService(sr[0]);
-			return ia;
+			ServiceReference[] sr = null;
+			for(String serviceId : serviceList)
+			{
+				try 
+				{
+					sr = bundleContext.getServiceReferences(IDeviceService.class.getName(), "(&(serviceId="+serviceId+")(deviceMacAddress="+deviceMacAddress+"))");
+				
+				} catch (InvalidSyntaxException e) {
+					e.printStackTrace();
+				}
+				if (sr != null)
+				{
+					IDeviceService iDeviceService = (IDeviceService)bundleContext.getService(sr[0]);
+
+					deviceServiceList.add(iDeviceService);
+				}
+			}
+			return (IDeviceService [])deviceServiceList.toArray(new IDeviceService []{});
 		}
-		return null;
-	}
-
-	public List<IAction> getActions() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public IDeviceStateVariable getStateVariable(String stateVariableName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<IDeviceStateVariable> getStateVariables() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

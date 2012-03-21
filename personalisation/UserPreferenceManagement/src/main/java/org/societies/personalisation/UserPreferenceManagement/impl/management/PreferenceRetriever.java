@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -19,21 +24,19 @@
  */
 package org.societies.personalisation.UserPreferenceManagement.impl.management;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 
@@ -50,35 +53,39 @@ public class PreferenceRetriever {
 		this.broker = broker;
 	}
 	
-	public Registry retrieveRegistry(Identity dpi){
+	public Registry retrieveRegistry(IIdentity dpi){
 		try {
 			Future<List<CtxIdentifier>> futureAttrList = broker.lookup(CtxModelType.ATTRIBUTE, "PREFERENCE_REGISTRY");
+			if (futureAttrList==null){
+				return new Registry();
+			}
 			List<CtxIdentifier> attrList = futureAttrList.get();
 			if (null!=attrList){
 				if (attrList.size()>0){
 					CtxIdentifier identifier = attrList.get(0);
-					CtxAttribute attr = (CtxAttribute) broker.retrieve(identifier);
+					CtxAttribute attr = (CtxAttribute) broker.retrieve(identifier).get();
 					Object obj = this.convertToObject(attr.getBinaryValue());
 					
 					if (obj==null){
-						this.logging.debug("PreferenceRegistry not found in DB for dpi:"+dpi.toString()+". Creating new registry");
+						this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
 						return new Registry();
 					}else{
 						if (obj instanceof Registry){
-							this.logging.debug("PreferenceRegistry found in DB for dpi:"+dpi.toString());
+							this.logging.debug("PreferenceRegistry found in DB");
 							return (Registry) obj;
 						}else{
+							this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
 							return new Registry();
 						}
 					}
 				}
-				this.logging.debug("PreferenceRegistry not found in DB for dpi:"+dpi.toString()+". Creating new registry");
+				this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
 				return new Registry();
 			}
-			this.logging.debug("PreferenceRegistry not found in DB for dpi:"+dpi.toString()+". Creating new registry");
+			this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
 			return new Registry();
 		} catch (CtxException e) {
-			this.logging.debug("Exception while loading PreferenceRegistry from DB for dpi:"+dpi.toString());
+			this.logging.debug("Exception while loading PreferenceRegistry from DB");
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -130,7 +137,7 @@ public class PreferenceRetriever {
 	public IPreferenceTreeModel retrievePreference(CtxIdentifier id){
 		try{
 			//retrieve directly the attribute in context that holds the preference as a blob value
-			CtxAttribute attrPref = (CtxAttribute) broker.retrieve(id);
+			CtxAttribute attrPref = (CtxAttribute) broker.retrieve(id).get();
 			//cast the blob value to type IPreference and return it
 			Object obj = this.convertToObject(attrPref.getBinaryValue());
 			if (null!=obj){
@@ -140,6 +147,12 @@ public class PreferenceRetriever {
 			}
 		}
 		catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

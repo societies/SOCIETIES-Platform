@@ -24,9 +24,9 @@
  */
 package org.societies.api.personalisation.mgmt;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
  * Describe your class here...
@@ -36,5 +36,5 @@ import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
  */
 public interface IPersonalisationCallback {
 
-	public void receiveIAction(Identity providerId, Identity userId, IServiceResourceIdentifier serviceId, IAction action);
+	public void receiveIAction(IIdentity providerId, IIdentity userId, ServiceResourceIdentifier serviceId, IAction action);
 }

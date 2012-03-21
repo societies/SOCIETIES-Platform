@@ -28,30 +28,36 @@ package org.societies.personalisation.dianne;
 import java.util.HashMap;
 
 import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE;
+import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 public class DIANNE implements IDIANNE{
 
-	private HashMap<Identity, NetworkRunner> networks;
+	private HashMap<IIdentity, NetworkRunner> networks;
 
+	/*
+	 * Do not rename this variable. The name is referenced in the spring osgi files. 
+	 */
+	private IInternalPersonalisationManager persoMgr;
+	
 	public DIANNE(){
-		networks = new HashMap<Identity, NetworkRunner>();
+		networks = new HashMap<IIdentity, NetworkRunner>();
 	}
 
 	@Override
-	public void getOutcome(Identity ownerId,
-			IServiceResourceIdentifier serviceId, 
+	public void getOutcome(IIdentity ownerId,
+			ServiceResourceIdentifier serviceId, 
 			String preferenceName, 
 			IPersonalisationInternalCallback callback) {
 		// TODO Auto-generated method stub
 	}
 
 	@Override
-	public void getOutcome(Identity ownerId,
+	public void getOutcome(IIdentity ownerId,
 			CtxAttribute attribute, 
 			IPersonalisationInternalCallback callback) {
 		// Context update received!!!
@@ -63,14 +69,14 @@ public class DIANNE implements IDIANNE{
 	}
 	
 	@Override
-	public void getOutcome(Identity ownerId,
+	public void getOutcome(IIdentity ownerId,
 			IAction action,
 			IPersonalisationInternalCallback callback){
 		// Action update received!!!
 	}
 
 	@Override
-	public void enableDIANNELearning(Identity ownerId) {
+	public void enableDIANNELearning(IIdentity ownerId) {
 		System.out.println("Enabling incremental learning for identity: "+ ownerId);
 		if(networks.containsKey(ownerId)){
 			NetworkRunner network = networks.get(ownerId);
@@ -81,7 +87,7 @@ public class DIANNE implements IDIANNE{
 	}
 
 	@Override
-	public void disableDIANNELearning(Identity ownerId) {
+	public void disableDIANNELearning(IIdentity ownerId) {
 		System.out.println("Disabling incremental learning for identity: "+ ownerId);	
 		if(networks.containsKey(ownerId)){
 			NetworkRunner network = networks.get(ownerId);
@@ -97,5 +103,21 @@ public class DIANNE implements IDIANNE{
 		//register for action updates from PersonalisationMgr
 		
 		//register for context updates from PersonalisationMgr
+	}
+
+	/*
+	 * getter method for PersonalisationManager. Do not rename. The name of the method is referenced in the spring osgi files
+	 */
+	public IInternalPersonalisationManager getPersoMgr() {
+		System.out.println(this.getClass().getName()+"Return PersoManager");
+		return persoMgr;
+	}
+
+	/*
+	 * setter method for PersonalisationManager. Do not rename. The name of the method is referenced in the spring osgi files
+	 */
+	public void setPersoMgr(IInternalPersonalisationManager persoMgr) {
+		System.out.println(this.getClass().getName()+"GOT PersoManager");		
+		this.persoMgr = persoMgr;
 	}
 }

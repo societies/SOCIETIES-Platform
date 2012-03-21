@@ -17,11 +17,11 @@
 
 	<bean id="ServiceRegPropConfig"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="ignoreResourceNotFound" value="true"></property>
+		<property name="ignoreResourceNotFound" value="false"></property>
 		<property name="locations">
 			<list>
 			 	<value>classpath:META-INF/spring/derby_database.properties</value>
-				<value>file:${VIRGO_HOME}\config\org.societies.platform.properties</value>
+				<!-- <value>file:${VIRGO_HOME}\config\org.societies.platform.properties</value> -->
 			</list>
 		</property>	
 	</bean>
@@ -42,9 +42,10 @@
 
 		<property name="annotatedClasses">
 			<list>
-				<value>org.societies.platform.servicelifecycle.serviceRegistry.model.RegistryEntry
-				</value>
-				
+				<value>org.societies.platform.servicelifecycle.serviceRegistry.model.RegistryEntry</value>
+				<value>org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceInstanceDAO</value>
+				<value>org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceImplementationDAO</value>
+				<value>org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceSharedInCISDAO</value>
 			</list>
 		</property>
 
@@ -60,10 +61,11 @@
 			<props>
 				<!-- <prop key="hibernate.dialect">${hibernate.dialect}</prop>
 				<prop key="hibernate.hbm2ddl.auto">create-drop</prop>
-				<prop key="hibernate.jdbc.batch_size">0</prop> -->
+				<prop key="hibernate.jdbc.batch_size">0</prop> 
+				-->
 				<prop key="hibernate.show_sql">true</prop>
 				<prop key="hibernate.cache.use_second_level_cache">false</prop>
-				<prop key="hibernate.hbm2ddl.auto">create</prop>
+				<prop key="hibernate.hbm2ddl.auto">create-drop</prop>
 				<prop key="hibernate.format_sql">true</prop>
 			</props>
 		</property>

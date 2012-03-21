@@ -26,7 +26,7 @@ package org.societies.personalisation.preference.api.callback;
 
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
  * This class must be implemented by a component that requests a preference outcome from the UserPreferenceManager and the instance of the class that
@@ -37,5 +37,5 @@ import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
  */
 public interface IPreferenceOutcomeCallback {
 
-	public void receivePreferenceOutcome(EntityIdentifier providerId, EntityIdentifier userId, IServiceResourceIdentifier serviceId, IAction action);
+	public void receivePreferenceOutcome(EntityIdentifier providerId, EntityIdentifier userId, ServiceResourceIdentifier serviceId, IAction action);
 }

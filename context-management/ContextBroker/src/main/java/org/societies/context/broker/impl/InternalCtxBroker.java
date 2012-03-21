@@ -27,6 +27,7 @@ package org.societies.context.broker.impl;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,10 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -49,41 +53,46 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.context.api.event.CtxChangeEventTopic;
+import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
 import org.societies.context.broker.api.CtxBrokerException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
+import org.springframework.stereotype.Service;
 
 /**
  * Internal Context Broker Implementation
  * This class implements the internal context broker interfaces and orchestrates the db 
  * management 
  */
+@Service
 public class InternalCtxBroker implements ICtxBroker {
 
-	private IUserCtxDBMgr userCtxDBMgr;
-	private IUserCtxHistoryMgr userCtxHistoryMgr;
+	/** The logging facility. */
+	private static final Logger LOG = LoggerFactory.getLogger(InternalCtxBroker.class);
+	
+	/** The Context Event Mgmt service reference. */
+	@Autowired(required=true)
+	private ICtxEventMgr ctxEventMgr;
+	
+	/**
+	 * The User Context DB Mgmt service reference.
+	 * 
+	 * @see {@link #setUserCtxDBMgr(IUserCtxDBMgr)}
+	 */
+	@Autowired(required=true)
+	private IUserCtxDBMgr userCtxDBMgr = null;
 
-	public InternalCtxBroker(IUserCtxDBMgr userDB,IUserCtxHistoryMgr userHocDB) throws CtxException {
-		this.userCtxDBMgr=userDB;
-		this.userCtxHistoryMgr = userHocDB;
-		// TODO Use logging.debug
-		//System.out.println(this.getClass().getName()+" full");
-	}
-
-	public InternalCtxBroker() throws CtxException {
-		// TODO Use logging.debug
-		//System.out.println(this.getClass().getName()+ " empty");
-	}
-
-	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) throws CtxException {
-		this.userCtxDBMgr = userDB;
-	}
-
-	public void setUserCtxHistoryMgr (IUserCtxHistoryMgr userHocDB) throws CtxException {
-		this.userCtxHistoryMgr = userHocDB;
-	}
+	/**
+	 * The User Context History Mgmt service reference. 
+	 * 
+	 * @see {@link #setUserCtxHistoryMgr(IUserCtxHistoryMgr)}
+	 */
+	@Autowired(required=true)
+	private IUserCtxHistoryMgr userCtxHistoryMgr = null;
 
 	/*
 	 * (non-Javadoc)
@@ -168,30 +177,20 @@ public class InternalCtxBroker implements ICtxBroker {
 			Serializable maxAttribValue) throws CtxException {
 
 		final List<CtxEntityIdentifier> results = new ArrayList<CtxEntityIdentifier>(); 
-		
+
 		results.addAll(
 				this.userCtxDBMgr.lookupEntities(entityType, attribType, minAttribValue, maxAttribValue));
 
 		return new AsyncResult<List<CtxEntityIdentifier>>(results);
 	}
 
-	@Override
-	public void registerForUpdates(CtxEntityIdentifier scope,
-			String attrType) throws CtxException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void registerForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
 	public Future<CtxModelObject> remove(CtxIdentifier identifier) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		final CtxModelObject modelObj = this.userCtxDBMgr.remove(identifier);
+
+		return new AsyncResult<CtxModelObject>(modelObj) ;
 	}
 
 	/*
@@ -201,39 +200,12 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Override
 	@Async
 	public Future<CtxModelObject> retrieve(CtxIdentifier identifier) throws CtxException {
-		
+
 		final CtxModelObject modelObj = this.userCtxDBMgr.retrieve(identifier);
 
 		return new AsyncResult<CtxModelObject>(modelObj);
 	}
 
-	@Override
-	public Future<List<CtxAttribute>> retrieveFuture(
-			CtxAttributeIdentifier attrId, Date date) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Future<List<CtxAttribute>> retrieveFuture(
-			CtxAttributeIdentifier attrId, int modificationIndex) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public void unregisterForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void unregisterForUpdates(CtxEntityIdentifier scope,
-			String attributeType) throws CtxException {
-		// TODO Auto-generated method stub
-
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -247,11 +219,10 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		// this part allows the storage of attribute updates to context history
 		if (CtxModelType.ATTRIBUTE.equals(modelObject.getModelType())) {
-			final CtxAttribute ctxAttr = (CtxAttribute) modelObject; 
+			final CtxAttribute ctxAttr = (CtxAttribute) modelObject;
 			if (ctxAttr.isHistoryRecorded() && this.userCtxHistoryMgr != null)
 				this.userCtxHistoryMgr.storeHoCAttribute(ctxAttr);
 		}
-		 
 		return new AsyncResult<CtxModelObject>(modelObject);
 	}
 
@@ -318,19 +289,167 @@ public class InternalCtxBroker implements ICtxBroker {
 	}
 
 	@Override
-	public Future<IndividualCtxEntity> retrieveAdministratingCSS(
-			CtxEntityIdentifier community) throws CtxException {
+	public Future<List<CtxIdentifier>> lookup(CtxModelType modelType,
+			String type) throws CtxException {
+
+		final List<CtxIdentifier> results = this.userCtxDBMgr.lookup(modelType, type);
+
+		return new AsyncResult<List<CtxIdentifier>>(results) ;
+
+	}
+
+	//***********************************************
+	//     Context Update Events Methods  
+	//***********************************************
+	@Override
+	public void unregisterForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void unregisterForUpdates(CtxEntityIdentifier scope,
+			String attributeType) throws CtxException {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void registerForUpdates(CtxEntityIdentifier scope,
+			String attrType) throws CtxException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void registerForUpdates(CtxAttributeIdentifier attrId) throws CtxException {
+		// TODO Auto-generated method stub
+
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
+	 */
+	@Override
+	public void registerForChanges(final CtxChangeEventListener listener,
+			final CtxIdentifier ctxId) throws CtxException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (ctxId == null)
+			throw new NullPointerException("ctxId can't be null");
+		
+		final String[] topics = new String[] {
+				CtxChangeEventTopic.UPDATED,
+				CtxChangeEventTopic.MODIFIED,
+				CtxChangeEventTopic.REMOVED,
+		};
+		if (this.ctxEventMgr != null) {
+			if (LOG.isInfoEnabled())
+				LOG.info("Registering context change event listener for object '"
+						+ ctxId + "' to topics '" + Arrays.toString(topics) + "'");
+			this.ctxEventMgr.registerChangeListener(listener, topics, ctxId);
+		} else {
+			throw new CtxBrokerException("Could not register context change event listener for object '"
+					+ ctxId + "' to topics '" + Arrays.toString(topics)
+				    + "': ICtxEventMgr service is not available");
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.api.context.broker.ICtxBroker#unregisterFromChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
+	 */
+	@Override
+	public void unregisterFromChanges(final CtxChangeEventListener listener,
+			final CtxIdentifier ctxId) throws CtxException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (ctxId == null)
+			throw new NullPointerException("ctxId can't be null");
+		
+		// TODO Auto-generated method stub
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
+	 */
+	@Override
+	public void registerForChanges(final CtxChangeEventListener listener,
+			final CtxEntityIdentifier scope, final String attrType) throws CtxException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (scope == null)
+			throw new NullPointerException("scope can't be null");
+		if (attrType == null)
+			throw new NullPointerException("attrType can't be null");
+		
+		final String[] topics = new String[] {
+				CtxChangeEventTopic.UPDATED,
+				CtxChangeEventTopic.MODIFIED,
+				CtxChangeEventTopic.REMOVED,
+		};
+		if (this.ctxEventMgr != null) {
+			if (LOG.isInfoEnabled())
+				LOG.info("Registering context change event listener for attributes with scope '"
+						+ scope + "' and type '" + attrType + "' to topics '" 
+						+ Arrays.toString(topics) + "'");
+			this.ctxEventMgr.registerChangeListener(listener, topics, scope, attrType );
+		} else {
+			throw new CtxBrokerException("Could not register context change event listener for attributes with scope '"
+					+ scope + "' and type '" + attrType + "' to topics '" + Arrays.toString(topics)
+				    + "': ICtxEventMgr service is not available");
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.api.context.broker.ICtxBroker#unregisterFromChanges(org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
+	 */
+	@Override
+	public void unregisterFromChanges(final CtxChangeEventListener listener,
+			final CtxEntityIdentifier scope, final String attrType) throws CtxException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (scope == null)
+			throw new NullPointerException("scope can't be null");
+		if (attrType == null)
+			throw new NullPointerException("attrType can't be null");
+		
+		// TODO Auto-generated method stub
+	}
+
+
+	//***********************************************
+	//     Context Inference Methods  
+	//***********************************************
+
+	@Override
+	public Future<List<Object>> evaluateSimilarity(
+			Serializable objectUnderComparison,
+			List<Serializable> referenceObjects) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public Future<List<CtxAttribute>> retrieveFuture(
+			CtxAttributeIdentifier attrId, Date date) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Future<Set<CtxBond>> retrieveBonds(CtxEntityIdentifier community) throws CtxException {
+	public Future<List<CtxAttribute>> retrieveFuture(
+			CtxAttributeIdentifier attrId, int modificationIndex) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-
+	//***********************************************
+	//     Community Context Management Methods  
+	//***********************************************
 	@Override
 	public Future<List<CtxEntityIdentifier>> retrieveCommunityMembers(
 			CtxEntityIdentifier community) throws CtxException {
@@ -346,23 +465,21 @@ public class InternalCtxBroker implements ICtxBroker {
 	}
 
 	@Override
-	public Future<List<Object>> evaluateSimilarity(
-			Serializable objectUnderComparison,
-			List<Serializable> referenceObjects) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Future<List<CtxIdentifier>> lookup(CtxModelType modelType,
-			String type) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public Future<List<CtxEntityIdentifier>> retrieveSubCommunities(
 			CtxEntityIdentifier community) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<IndividualCtxEntity> retrieveAdministratingCSS(
+			CtxEntityIdentifier community) throws CtxException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Future<Set<CtxBond>> retrieveBonds(CtxEntityIdentifier community) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -434,12 +551,12 @@ public class InternalCtxBroker implements ICtxBroker {
 			// store each escorting attribute in hoc
 			Future<CtxModelObject> attrFuture = this.retrieve(escortingAttrID);
 			CtxAttribute attr;
-			
+
 			try {
 				attr = (CtxAttribute) attrFuture.get();
 				attr.setHistoryRecorded(true);
 				this.update(attr);
-				
+
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -460,10 +577,11 @@ public class InternalCtxBroker implements ICtxBroker {
 			tupleAttr.setBinaryValue(attrIdsBlob);
 
 			tupleAttrFuture= this.update(tupleAttr);
-		
+
 			// use this for test only
 			CtxAttribute  tupleAttrRetrieved = (CtxAttribute) tupleAttrFuture.get();
-			System.out.println("tupleAttr "+tupleAttrRetrieved.getId() );
+			// TODO use LOGGING
+			//System.out.println("tupleAttr "+tupleAttrRetrieved.getId() );
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -491,6 +609,26 @@ public class InternalCtxBroker implements ICtxBroker {
 		return null;
 	}
 
+	/**
+	 * Sets the User Context DB Mgmt service reference.
+	 * 
+	 * @param userDB
+	 *            the User Context DB Mgmt service reference to set.
+	 */
+	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) {
+		this.userCtxDBMgr = userDB;
+	}
+
+	/**
+	 * Sets the User Context History Mgmt service reference.
+	 * 
+	 * @param userCtxHistoryMgr
+	 *            the User Context History Mgmt service reference to set
+	 */
+	public void setUserCtxHistoryMgr(IUserCtxHistoryMgr userCtxHistoryMgr) {
+		this.userCtxHistoryMgr = userCtxHistoryMgr;
+	}
+	
 	private CtxAttributeValueType findAttributeValueType(Serializable value) {
 		if (value == null)
 			return CtxAttributeValueType.EMPTY;

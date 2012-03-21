@@ -29,6 +29,7 @@ import java.util.Collection;
 
 /**
  * @author Perumal Kuppuudaiyar
+ * @author Babak.Farshchian@sintef.no
  */
 public interface ICssDirectory {
 

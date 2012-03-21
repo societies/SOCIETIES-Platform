@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -33,7 +38,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 public class PrivateContextCache {
 	
@@ -164,8 +169,8 @@ public class PrivateContextCache {
 
 	private class Pair{
 		private String type;
-		private IServiceResourceIdentifier id;
-		Pair(String serviceType, IServiceResourceIdentifier serviceID){
+		private ServiceResourceIdentifier id;
+		Pair(String serviceType, ServiceResourceIdentifier serviceID){
 			this.setServiceType(serviceType);
 			this.setServiceId(serviceID);
 		}
@@ -175,10 +180,10 @@ public class PrivateContextCache {
 		public String getServiceType() {
 			return type;
 		}
-		public void setServiceId(IServiceResourceIdentifier id) {
+		public void setServiceId(ServiceResourceIdentifier id) {
 			this.id = id;
 		}
-		public IServiceResourceIdentifier getServiceId() {
+		public ServiceResourceIdentifier getServiceId() {
 			return this.id;
 		}
 		

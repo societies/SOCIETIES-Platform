@@ -27,21 +27,22 @@ package org.societies.personalisation.preference.api.model;
 
 import java.util.List;
 
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
 
 public class ServiceSubset {
     
-    IServiceResourceIdentifier serviceId;
+    ServiceResourceIdentifier serviceId;
     String serviceType;
     List<ActionSubset> actionSubsets;
     
-    public ServiceSubset(IServiceResourceIdentifier serviceId, String serviceType, List<ActionSubset> actionSubsets){
+    public ServiceSubset(ServiceResourceIdentifier serviceId, String serviceType, List<ActionSubset> actionSubsets){
         this.serviceId = serviceId;
         this.serviceType = serviceType;
         this.actionSubsets = actionSubsets;
     }
     
-    public IServiceResourceIdentifier getServiceId(){
+    public ServiceResourceIdentifier getServiceId(){
         return this.serviceId;
     }
     

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi-1.2.xsd"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:osgi="http://www.springframework.org/schema/osgi">
+
+	<!-- regular spring configuration file defining the beans for this bundle. 
+		We've kept the osgi definitions in a separate configuration file so that 
+		this file can easily be used for integration testing outside of an OSGi environment -->
+<!--  
+	<bean id="serviceMgmt" class="org.societies.slm.servicemgmt.impl.ServiceManagement" >
+		<!- - <property name="converter" ref="XMLtoServiceObjectConverter" /> - ->
+<!- -		<property name="serviceReg" ref="serviceRegRef" />				
+	</bean>
+-->
+
+	<bean id="serListener" class="org.societies.slm.servicemgmt.impl.ServiceRegistryListener"
+		init-method="registerListener" destroy-method="unRegisterListener">	
+		<property name="serviceReg" ref="serviceRegRef" />
+		<property name="commMngr" ref="commMngrRef" />				
+	</bean>
+	
+	<bean id="serviceDiscovery" class="org.societies.slm.servicediscovery.ServiceDiscovery" >
+		<!-- <property name="converter" ref="XMLtoServiceObjectConverter" /> -->
+		<property name="serviceReg" ref="serviceRegRef" /> 	
+		<property name="commMngr" ref="commMngrRef" />
+		<property name="serviceDiscoveryRemote" ref="serviceDiscoveryRemoteRef" />
+						
+	</bean>
+	<!-- 
+	<bean id="XMLtoServiceObjectConverter" class="org.societies.slm.servicemgmt.impl.XMLServiceMetaDataToObjectConverter">
+		<property name="marshaller" ref="jaxbMarshaller" />
+		<property name="unmarshaller" ref="jaxbMarshaller" />
+	</bean>
+		
+	<bean id="jaxbMarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+		 <property name="classesToBeBound" >
+            <list>
+                <value>org.societies.api.internal.servicelifecycle.model.Service</value>
+                <value>org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier</value>                            
+            </list>
+        </property>
+        <property name="schema" value="classpath:schema1.xsd"/>  
+	</bean>
+	-->
+	
+</beans>

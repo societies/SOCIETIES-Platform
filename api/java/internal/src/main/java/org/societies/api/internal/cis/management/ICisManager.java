@@ -31,17 +31,17 @@
  */
 package org.societies.api.internal.cis.management;
 
+
+
+import java.util.List;
+
+
+
+@Deprecated
 public interface ICisManager {
 	//
 	//
-	/**
-	 * Create a new CIS for the CSS represented by cssId.
-	 * TODO: change the type from String to proper type when CSS ID datatype is defined.
-	 *  
-	 * @param cssId, cisId
-	 * @return
-	 */
-	CisRecord createCis(String cssId, String cisId);
+
 	/**
 	 * Delete a specific CIS represented by cisId
 	 * TODO: Need to give a more meaningful return.
@@ -51,37 +51,10 @@ public interface ICisManager {
 	 * @return true if deleted, false otherwise. 
 	 */
 	Boolean deleteCis(String cssId, String cisId);
-	/**
-	 * Updates an existing CIS with the data in the newCis. Update is done canonical. If it fails, the old CIS is
-	 * not changed at all.
-	 * 
-	 * @param cssId The ID of the owner CSS
-	 * @param newCis the data to be updated is specified in this CISRecord.
-	 * @param oldCisId The ID of the CIS that needs to be updated.
-	 * @return true if update was successful, 
-	 */
-	Boolean updateCis(String cssId, CisRecord newCis, String oldCisId);
+
 	
-	/**
-	 * Get a CIS Record with the ID cisId.
-	 * 
-	 * TODO: Check the return value. Should be something more meaningful.
-	 * 
-	 * @param cisId The ID of the CIS to get.
-	 * @return the CISRecord with the ID cisID, or null if no such CIS exists.
-	 */
-	CisRecord getCis(String cssId, String cisId);
-	
-	/**
-	 * Return an array of all the CISs that match the query. 
-	 * 
-	 * TODO: need to refine this to something better. I am not sure how the query will be created.
-	 * 
-	 * @param cssId The ID of the owner CSS
-	 * @param query Defines what to search for.
-	 * @return Array of CIS Records that match the query.
-	 */
-	CisRecord[] getCisList(CisRecord query);
+
+
 	
 	/**
 	 * Returns the CISActivityFeed for a specific CIS.
@@ -90,6 +63,6 @@ public interface ICisManager {
 	 * @param cisId The ID of the CIS.
 	 * @return The CISActivityFeed of the CIS.
 	 */
-	CisActivityFeed getActivityFeed(String cssId, String cisId);
+	ICisActivityFeed getActivityFeed(String cssId, String cisId);
 
 }

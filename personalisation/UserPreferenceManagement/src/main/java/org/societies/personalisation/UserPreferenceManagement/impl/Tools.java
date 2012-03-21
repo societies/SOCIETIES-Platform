@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -30,7 +35,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.ContextPreferenceCondition;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceCondition;
@@ -52,13 +57,13 @@ public class Tools {
 	public String convertToKey(String serviceType, String serviceID, String preferenceName){
 		return serviceType+":"+serviceID+":"+preferenceName;
 	}
-	public String convertToKey(String serviceType, IServiceResourceIdentifier serviceID, String preferenceName){
+	public String convertToKey(String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
 		return serviceType+":"+serviceID.toString()+":"+preferenceName;
 	}
-	public String convertTokey(String serviceType, IServiceResourceIdentifier serviceID){
+	public String convertTokey(String serviceType, ServiceResourceIdentifier serviceID){
 		return serviceType+":"+serviceID.toString();
 	}
-	public IPreferenceTreeModel convertPreferenceObjToModel(IPreference p, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName){
+	public IPreferenceTreeModel convertPreferenceObjToModel(IPreference p, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
 		if (null==p){
 			log("preference object is null");
 			return null;

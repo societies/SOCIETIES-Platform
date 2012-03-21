@@ -28,19 +28,19 @@ package org.societies.personalisation.UserPreferenceLearning.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IC45Output;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 
 public class C45Output implements IC45Output{
 
-    Identity dataOwner;
-    IServiceResourceIdentifier serviceId;
+    IIdentity dataOwner;
+    ServiceResourceIdentifier serviceId;
     String serviceType;
     List<IPreferenceTreeModel> treeList;
     
-    public C45Output(Identity dataOwner, IServiceResourceIdentifier serviceId, String serviceType){
+    public C45Output(IIdentity dataOwner, ServiceResourceIdentifier serviceId, String serviceType){
         
         this.dataOwner = dataOwner;
         this.serviceId = serviceId;
@@ -52,11 +52,11 @@ public class C45Output implements IC45Output{
         treeList.add(tree);
     }
     
-    public Identity getOwner(){
+    public IIdentity getOwner(){
         return this.dataOwner;
     }
     
-    public IServiceResourceIdentifier getServiceId(){
+    public ServiceResourceIdentifier getServiceId(){
         return this.serviceId;
     }
     

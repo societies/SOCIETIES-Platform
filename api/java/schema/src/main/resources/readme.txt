@@ -1,1 +1,0 @@
-Add your xsd files to this folder

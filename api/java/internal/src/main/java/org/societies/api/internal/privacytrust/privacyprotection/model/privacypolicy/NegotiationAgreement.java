@@ -29,8 +29,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
  * The NegotiationAgreement class represents the agreement reached between the user and the service provider. 
@@ -45,10 +45,10 @@ import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 public class NegotiationAgreement implements IAgreement, Serializable {
 
 	private List<RequestItem> items;
-	private IServiceResourceIdentifier serviceID;
-	private Identity serviceDPI;
-	private Identity userDPI;
-	private Identity userPublicDPI;
+	private ServiceResourceIdentifier serviceID;
+	private IIdentity serviceDPI;
+	private IIdentity userDPI;
+	private IIdentity userPublicDPI;
 
 	private NegotiationAgreement(){
 		this.items = new ArrayList<RequestItem>();
@@ -70,7 +70,7 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#getServiceIdentifier()
 	 */
 	@Override
-	public IServiceResourceIdentifier getServiceIdentifier() {
+	public ServiceResourceIdentifier getServiceIdentifier() {
 		
 		return this.serviceID;
 	}
@@ -84,7 +84,7 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#getServiceDPI()
 	 */
 	@Override
-	public Identity getServiceDPI() {
+	public IIdentity getServiceDPI() {
 		return this.serviceDPI;
 	}
 
@@ -92,15 +92,15 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#getUserDPI()
 	 */
 	@Override
-	public Identity getUserDPI() {
+	public IIdentity getUserDPI() {
 		return this.userDPI;
 	}
 
-	public Identity getUserPublicDPI(){
+	public IIdentity getUserPublicDPI(){
 		return this.userPublicDPI;
 	}
 
-	public void setUserPublicDPI(Identity userPublicDPI){
+	public void setUserPublicDPI(IIdentity userPublicDPI){
 		this.userPublicDPI = userPublicDPI;
 	}
 
@@ -109,16 +109,16 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#setServiceDPI(org.personalsmartspace.sre.api.pss3p.Identity)
 	 */
 	@Override
-	public void setServiceDPI(Identity serviceDPI) {
+	public void setServiceDPI(IIdentity serviceDPI) {
 		this.serviceDPI = serviceDPI;
 		
 	}
 
 	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#setServiceIdentifier(org.personalsmartspace.sre.api.pss3p.IServiceResourceIdentifier)
+	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#setServiceIdentifier(org.personalsmartspace.sre.api.pss3p.ServiceResourceIdentifier)
 	 */
 	@Override
-	public void setServiceIdentifier(IServiceResourceIdentifier serviceId) {
+	public void setServiceIdentifier(ServiceResourceIdentifier serviceId) {
 		this.serviceID = serviceId;
 		
 	}
@@ -127,7 +127,7 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#setUserDPI(org.personalsmartspace.sre.api.pss3p.Identity)
 	 */
 	@Override
-	public void setUserDPI(Identity userDPI) {
+	public void setUserDPI(IIdentity userDPI) {
 		this.userDPI = userDPI;
 		
 	}

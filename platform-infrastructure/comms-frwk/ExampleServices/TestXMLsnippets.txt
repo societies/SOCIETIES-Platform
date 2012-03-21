@@ -33,6 +33,17 @@
    </fortuneCookieBean>
 </iq>
 
+#serviceDiscoveryMsgBean
+<iq type='get'
+    from='green@red.local/laptop'
+    to='XCManager.societies.local'
+    id='getServices1'>
+   <serviceDiscoveryMsgBean xmlns='http://societies.org/api/schema/servicelifecycle/servicediscovery'>
+   <method>getLocalServices</method>
+   </serviceDiscoveryMsgBean>
+</iq>
+
+
 #COMPLEX SERVICE CALL
 <iq type='get' from='green@red.local/laptop' to='XCManager.red.local'
 	id='add1'>

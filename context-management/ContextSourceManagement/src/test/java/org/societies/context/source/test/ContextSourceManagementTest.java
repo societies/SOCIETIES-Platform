@@ -24,6 +24,46 @@
  */
 package org.societies.context.source.test;
 
-public class ContextSourceManagementTest {
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.context.source.ICtxSourceMgr;
+import org.societies.context.source.impl.ContextSourceManagement;
 
+public class ContextSourceManagementTest {
+    private static ICtxSourceMgr csm;
+	private static Logger LOG = LoggerFactory
+			.getLogger(ContextSourceManagementTest.class);
+
+	@BeforeClass
+    public static void setUpClass() throws Exception {
+    	csm = new ContextSourceManagement();
+    }
+ 
+    @Before
+    public void setUp() throws Exception {
+        // Code executed before each test    
+    }
+ 
+    @Test
+    public void testWithoutRegistration() {
+    	csm.sendUpdate("IamAnewID", "SensorMeasurement");
+    	
+    	LOG.info("There must have been an error message");
+    	assert(true);
+    }
+    
+    @After
+    public void tearDown() throws Exception {
+        // Code executed after each test   
+    }
+ 
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+        csm = null; 
+    }
 }

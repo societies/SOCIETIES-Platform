@@ -24,8 +24,8 @@
  */
 package org.societies.privacytrust.privacyprotection.api;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
 /**
@@ -40,13 +40,13 @@ public interface IPrivacyPolicyNegotiationManager {
 	 * @param css_id
 	 * @param cis_id    CIS admin
 	 */
-	public void negotiateCISPolicy(Identity css_id, Identity cis_id);
+	public void negotiateCISPolicy(IIdentity css_id, IIdentity cis_id);
 
 	/**
 	 * 
 	 * @param transient_id    temp id
 	 * @param service_id
 	 */
-	public void negotiateServicePolicy(Identity transient_id, IServiceResourceIdentifier service_id);
+	public void negotiateServicePolicy(IIdentity transient_id, ServiceResourceIdentifier service_id);
 
 }

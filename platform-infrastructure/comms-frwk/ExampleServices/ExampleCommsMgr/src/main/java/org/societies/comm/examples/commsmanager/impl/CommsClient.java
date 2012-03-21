@@ -27,27 +27,22 @@ package org.societies.comm.examples.commsmanager.impl;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.comm.xmpp.datatypes.IdentityImpl;
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.comm.xmpp.datatypes.IdentityType;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.datatypes.XMPPNode;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.example.calculator.ICalcRemote;
 import org.societies.example.IExamplesCallback;
-import org.societies.example.calculatorservice.schema.CalcBean;
-import org.societies.example.calculatorservice.schema.MethodType;
+import org.societies.example.calculator.ICalcRemote;
+import org.societies.api.schema.examples.calculatorbean.CalcBean;
+import org.societies.api.schema.examples.calculatorbean.MethodType;
 import org.springframework.scheduling.annotation.Async;
 
 /**
@@ -58,17 +53,18 @@ import org.springframework.scheduling.annotation.Async;
  */
 public class CommsClient implements ICalcRemote, ICommCallback{
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-			  Arrays.asList("http://societies.org/example/calculatorservice/schema",
-					  		"http://societies.org/example/fortunecookieservice/schema",
-					  		"http://societies.org/example/complexservice/schema"));
+			  Arrays.asList("http://societies.org/api/schema/examples/calculatorbean",
+				  		"http://societies.org/api/schema/examples/fortunecookie",
+				  		"http://societies.org/api/schema/examples/complexservice"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
-			  Arrays.asList("org.societies.example.calculatorservice.schema",
-							"org.societies.example.fortunecookieservice.schema",
-							"org.societies.example.complexservice.schema"));
+		  Arrays.asList("org.societies.api.schema.examples.calculatorbean",
+						"org.societies.api.schema.examples.fortunecookie",
+						"org.societies.api.schema.examples.complexservice"));
 
 	//PRIVATE VARIABLES
 	private ICommManager commManager;
 	private static Logger LOG = LoggerFactory.getLogger(CommsClient.class);
+	private IIdentityManager idMgr;
 	
 	//PROPERTIES
 	public ICommManager getCommManager() {
@@ -79,7 +75,7 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 		this.commManager = commManager;
 	}
 
-	public CommsClient() {}
+	public CommsClient() {	}
 
 	public void InitService() {
 		//REGISTER OUR ServiceManager WITH THE XMPP Communication Manager
@@ -88,6 +84,7 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
+		idMgr = commManager.getIdManager();
 	}
 	
 	/* (non-Javadoc)
@@ -96,13 +93,12 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 	@Override
 	@Async
 	public void Add(int valA, int valB, IExamplesCallback calcCallback) {
-		//Identity id = new IdentityImpl(IdentityType.CSS, "XCManager", "red.local");
-		Identity toIdentity = new Identity(IdentityType.CSS, "XCManager", "red.local") {
-			@Override
-			public String getJid() {
-				return getIdentifier() + "." + getDomainIdentifier();
-			}
-		};
+		IIdentity toIdentity = null;
+		try {
+			toIdentity = idMgr.fromJid("XCManager.societies.local");
+		} catch (InvalidFormatException e1) {
+			e1.printStackTrace();
+		}
 		Stanza stanza = new Stanza(toIdentity);
 
 		//SETUP CALC CLIENT RETURN STUFF
@@ -124,12 +120,12 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 
 	@Override
 	public void Subtract(int valA, int valB, IExamplesCallback calcCallback) {
-		Identity toIdentity = new Identity(IdentityType.CSS, "XCManager", "red.local") {
-			@Override
-			public String getJid() {
-				return getIdentifier() + "." + getDomainIdentifier();
-			}
-		};
+		IIdentity toIdentity = null;
+		try {
+			toIdentity = idMgr.fromJid("XCManager.societies.local");
+		} catch (InvalidFormatException e1) {
+			e1.printStackTrace();
+		}
 		Stanza stanza = new Stanza(toIdentity);
 
 		//SETUP CALC CLIENT RETURN STUFF

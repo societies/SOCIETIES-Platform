@@ -24,13 +24,6 @@
  */
 package org.societies.personalisation.CAUI.api.model;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-
 
 /**
  * Implementation class of the ICommunityIntentAction.
@@ -40,139 +33,23 @@ import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
  */
 public class CommunityIntentAction implements ICommunityIntentAction{
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	@Override
-	public String getActionID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public HashMap<String, Serializable> getActionContext() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setActionContext(HashMap<String, Serializable> context) {
-		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public void setConfidenceLevel(int confidenceLevel) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int getConfidenceLevel() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public String getvalue() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getparameterName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<String> getparameterNames() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	Double commLevel = null;
+	String userActionID = null;
 	
-	@Override
-	public String getServiceType() {
-		// TODO Auto-generated method stub
-		return null;
+	CommunityIntentAction(String userActionID){
+		this.userActionID = userActionID;
 	}
-
-	@Override
-	public List<String> getServiceTypes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
 	
-
-	@Override
-	public void setServiceTypes(List<String> types) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	@Override
 	public Double getCommonalityLevel() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setCommonalityLevel(Double doub) {
-		// TODO Auto-generated method stub
 		
+		return commLevel;
 	}
 
 	@Override
-	public double getTransProb() {
-		// TODO Auto-generated method stub
-		return 0;
+	public void setCommonalityLevel(Double commLevel) {
+		this.commLevel = commLevel;
 	}
-
-
-	@Override
-	public void setServiceType(String arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public IServiceResourceIdentifier getServiceID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setServiceID(IServiceResourceIdentifier arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public long getDuration() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void setDuration(long duration) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setTaskID(String taskID) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getTaskID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 }

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical"
+  android:id="@+id/barLayout">
+	<LinearLayout
+	  android:layout_width="match_parent"
+	  android:layout_height="wrap_content"
+	  android:orientation="horizontal"
+	  android:id="@+id/linLayout01"
+	  android:paddingTop="10dip">
+    	<TextView android:text="@string/stress_level" android:layout_width="110dip" android:layout_height="wrap_content" android:id="@+id/stress"></TextView>
+    	<TextView android:text="" android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/hrValue"></TextView>
+    </LinearLayout>
+    <LinearLayout
+	  android:layout_width="match_parent"
+	  android:layout_height="wrap_content"
+	  android:orientation="horizontal"
+	  android:id="@+id/linLayout01"
+	  android:paddingTop="10dip">
+    	<TextView android:text="@string/stressBarLabelResting" android:layout_width="70dip" android:layout_height="wrap_content" android:id="@+id/TextView06"></TextView>
+    	<dlr.stressrecognition.utils.TextProgressBar android:layout_width="match_parent" android:id="@+id/pbResting" style="?android:attr/progressBarStyleHorizontal" android:paddingBottom="10dip" android:layout_height="wrap_content" android:maxHeight="30px" android:max="100"></dlr.stressrecognition.utils.TextProgressBar>
+    </LinearLayout>
+    <LinearLayout
+	  android:layout_width="match_parent"
+	  android:layout_height="wrap_content"
+	  android:orientation="horizontal"
+	  android:id="@+id/linLayout01">
+	    <TextView android:text="@string/stressBarLabelOne" android:layout_width="70dip" android:layout_height="wrap_content" android:id="@+id/TextView05"></TextView>
+	    <dlr.stressrecognition.utils.TextProgressBar style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:id="@+id/pbStressOne" android:layout_height="wrap_content" android:maxHeight="30px" android:max="100" android:paddingBottom="10dip" />
+    </LinearLayout>
+    <LinearLayout
+	  android:layout_width="match_parent"
+	  android:layout_height="wrap_content"
+	  android:orientation="horizontal"
+	  android:id="@+id/linLayout01">
+	    <TextView android:text="@string/stressBarLabelTwo" android:layout_width="70dip" android:layout_height="wrap_content" android:id="@+id/TextView04"></TextView>
+	    <dlr.stressrecognition.utils.TextProgressBar style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:id="@+id/pbStressTwo" android:layout_height="wrap_content" android:maxHeight="30px" android:max="100" android:paddingBottom="10dip" />
+    </LinearLayout>
+    <LinearLayout
+	  android:layout_width="match_parent"
+	  android:layout_height="wrap_content"
+	  android:orientation="horizontal"
+	  android:id="@+id/linLayout01">
+	    <TextView android:text="@string/stressBarLabelThree" android:layout_width="70dip" android:layout_height="wrap_content" android:id="@+id/TextView03"></TextView>
+	    <dlr.stressrecognition.utils.TextProgressBar style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:id="@+id/pbStressThree" android:layout_height="wrap_content" android:maxHeight="30px" android:max="100" android:paddingBottom="10dip" />
+    </LinearLayout>
+    <LinearLayout
+	  android:layout_width="match_parent"
+	  android:layout_height="wrap_content"
+	  android:orientation="horizontal"
+	  android:id="@+id/linLayout01">
+	    <TextView android:text="@string/stressBarLabelFour" android:layout_width="70dip" android:layout_height="wrap_content" android:id="@+id/textView1"></TextView>
+	    <dlr.stressrecognition.utils.TextProgressBar style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:id="@+id/pbStressFour" android:layout_height="wrap_content" android:maxHeight="30px" android:max="100" android:paddingBottom="10dip" />
+    </LinearLayout>
+    <LinearLayout
+	  android:layout_width="match_parent"
+	  android:layout_height="wrap_content"
+	  android:orientation="horizontal"
+	  android:id="@+id/linLayout01">
+	    <TextView android:text="@string/stressBarLabelFive" android:layout_width="70dip" android:layout_height="wrap_content" android:id="@+id/textView2"></TextView>
+	    <dlr.stressrecognition.utils.TextProgressBar style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:id="@+id/pbStressFive" android:layout_height="wrap_content" android:maxHeight="30px" android:max="100" android:paddingBottom="10dip" />
+    </LinearLayout>
+</LinearLayout>
+

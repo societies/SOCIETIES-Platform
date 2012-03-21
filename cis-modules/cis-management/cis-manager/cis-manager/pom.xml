@@ -23,27 +23,59 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../../parent/spring-osgi.xml</relativePath>
 		<version>0.1</version>
 	</parent>
 
 	<dependencies>
-	<!-- add your dependencies here -->
-<dependency>
-	<groupId>org.societies.api.internal</groupId>
-	<artifactId>societies-api-internal</artifactId>
-	<version>${release.version}</version>
-</dependency>
+	<!-- add your dependencies here -->	
+    	<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
 		
-  <dependency>  
-  <groupId>org.societies.cis</groupId>
-  <artifactId>cis-editor</artifactId>
-   <version>${version.cis}</version>
-</dependency>	
-	
-	
-	
-
+ 
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>	
+		<dependency>
+			<groupId>org.societies.comm.xmpp</groupId>
+	  		<artifactId>CommunicationFrameworkCommons</artifactId>
+	  		<version>${version.comm}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.comm.xmpp.pubsub</groupId>
+    		<artifactId>PubsubClientBundle</artifactId>
+	  		<version>${version.comm}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -57,8 +89,22 @@
 						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<Import-Package>*;resolution:=optional</Import-Package>
-						<Export-Package></Export-Package>
+						<Import-Package>    						org.springframework.beans.factory.annotation*;version="0",
+    						org.springframework.stereotype*;version="0",
+    						org.xmpp.packet*,
+    						!org.gjt.*,
+    						!org.jaxen.*,
+    						!org.mortbay.*,
+    						!org.relaxng.*,
+    						!org.jvnet.staxex,
+    						!org.jvnet.fastinfoset,
+    						!com.sun.xml.fastinfoset.*,
+    						!com.sun.msv.*,
+							*;resolution:=optional</Import-Package>
+						<Export-Package>
+						org.societies.api.schema.cis.community,
+						org.societies.api.schema.cis.manager
+						</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>

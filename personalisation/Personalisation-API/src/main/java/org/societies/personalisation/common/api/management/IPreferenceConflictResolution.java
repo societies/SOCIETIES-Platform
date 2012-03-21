@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -20,7 +25,7 @@
 
 package org.societies.personalisation.common.api.management;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
@@ -42,7 +47,7 @@ public interface IPreferenceConflictResolution {
 	 * @param dianneAction
 	 * @param preferenceAction
 	 */
-	public IOutcome resolveConflict(Identity user_id, IDIANNEOutcome dianneAction, IPreferenceOutcome preferenceAction);
+	public IOutcome resolveConflict(IIdentity user_id, IDIANNEOutcome dianneAction, IPreferenceOutcome preferenceAction);
 
 	/**
 	 * 
@@ -50,6 +55,6 @@ public interface IPreferenceConflictResolution {
 	 * @param intentActionICCS
 	 * @param intentActionITSUD
 	 */
-	public IOutcome resolveConflict(Identity user_id, IUserIntentAction intentActionICCS, ICRISTUserAction intentActionITSUD);
+	public IOutcome resolveConflict(IIdentity user_id, IUserIntentAction intentActionICCS, ICRISTUserAction intentActionITSUD);
 
 }

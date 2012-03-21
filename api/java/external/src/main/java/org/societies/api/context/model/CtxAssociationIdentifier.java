@@ -24,7 +24,9 @@
  */
 package org.societies.api.context.model;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
+
+
 
 /**
  * This class is used to identify context associations. It provides methods that
@@ -67,7 +69,7 @@ public class CtxAssociationIdentifier extends CtxIdentifier {
 	 * @param objectNumber
 	 *            the unique numeric model object identifier
 	 */
-	public CtxAssociationIdentifier(Identity operatorId, String type,
+	public CtxAssociationIdentifier(IIdentity operatorId, String type,
 			Long objectNumber) {
 		super(operatorId, type, objectNumber);
 	}

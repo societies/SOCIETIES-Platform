@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -23,12 +28,11 @@ package org.societies.personalisation.CAUI.api.CAUIPrediction;
 import java.util.List;
 
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
-import org.societies.api.comm.xmpp.datatypes.Identity;
-
+import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 /**
  * @since 0.0.1
  * @author nikosk(ICCS)
@@ -53,7 +57,7 @@ public interface ICAUIPrediction {
 	 * @param userActionName    the type of the user action requested
 	 * @return					the outcome in the form of an UserIntentAction object
 	 */
-	public IUserIntentAction getCurrentIntentAction(Identity ownerID, IServiceResourceIdentifier serviceID, String userActionType);
+	public IUserIntentAction getCurrentIntentAction(IIdentity ownerID, ServiceResourceIdentifier serviceID, String userActionType);
 	
 	/**
 	 * Predicts next user action based on an action update. 
@@ -62,12 +66,12 @@ public interface ICAUIPrediction {
 	 * @param action
 	 * @return predicted action 
 	 */
-	public void getPrediction(Identity requestor, IAction action, IPersonalisationCallback persCallback); 
+	public void getPrediction(IIdentity requestor, IAction action, IPersonalisationInternalCallback persCallback); 
 	
 	/**
 	 * Predicts next user action based on a context attribute update. 
 	 */	   
-	public void getPrediction(Identity requestor, CtxAttribute contextAttribute, IPersonalisationCallback persCallback);
+	public void getPrediction(IIdentity requestor, CtxAttribute contextAttribute, IPersonalisationInternalCallback persCallback);
 	
 	/**
 	 * Returns a list with the performed predictions.

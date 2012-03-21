@@ -25,17 +25,23 @@
 package org.societies.api.internal.servicelifecycle.serviceMgmt;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
-import org.societies.api.internal.servicelifecycle.model.Service;
-import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.Service;
+import org.societies.api.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.model.ServiceStatus;
 import org.societies.api.internal.servicelifecycle.serviceMgmt.ServiceMgmtException;
 /**
  * 
  * @author pkuppuud
  *
  */
+/**
+ * @deprecated  Will be replaced by IServiceControl and IServiceDiscovery
+ */
+@Deprecated
 public interface IServiceManagement {
 	/**
 	 * This method checks virgo-osgi container whether the service registry
@@ -96,7 +102,15 @@ public interface IServiceManagement {
 	 */
 	public Service findService(ServiceResourceIdentifier serviceId)
 			throws ServiceMgmtException;
-	
-	public void processServiceMetaData(List<File> serviceMetaFile) throws ServiceMgmtException;
+	/**
+	 * This method is called by service metadata broker to inform service mgmt component
+	 * about services to be managed.
+	 * @param fileURL list file URL contains metadata of services
+	 * @param bundleId OSGI bundle id of service
+	 * @param symbolicName of service bundle
+	 * @throws ServiceMgmtException
+	 */
+	public void processServiceMetaData(List<URL> fileURL, long bundleId,
+			String symbolicName) throws ServiceMgmtException;	
  
 }

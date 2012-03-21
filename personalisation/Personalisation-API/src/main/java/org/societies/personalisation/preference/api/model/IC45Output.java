@@ -28,9 +28,8 @@ package org.societies.personalisation.preference.api.model;
 
 import java.util.List;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
  * @author S.GALLACHER@hw.ac.uk
@@ -49,16 +48,16 @@ public interface IC45Output {
 
 	/**
 	 * This method returns the EntityIdentifier related to this object
-	 * @return EntityIdentifier - the identity under which the info in this
+	 * @return EntityIdentifier - the IIdentity under which the info in this
 	 * IC45Output object corresponds
 	 */
-	public Identity getOwner();
+	public IIdentity getOwner();
 
 	/**
 	 * This method returns the IServiceIdentifier related to this object
 	 * @return ServiceResourceIdentifier - the service ID
 	 */
-	public IServiceResourceIdentifier getServiceId();
+	public ServiceResourceIdentifier getServiceId();
 
 	/**
 	 * This method returns the type of the service e.g. "multi-media"

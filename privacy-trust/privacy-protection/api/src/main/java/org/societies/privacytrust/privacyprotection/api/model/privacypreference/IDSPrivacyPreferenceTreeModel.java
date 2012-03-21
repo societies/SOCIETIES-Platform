@@ -24,32 +24,33 @@
  */
 package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
+
 import java.io.Serializable;
 
 import javax.swing.tree.DefaultTreeModel;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
 
 /**
- * This class is used to represent a privacy preference for identity selection. This class represents a node in a tree. 
+ * This class is used to represent a privacy preference for IIdentity selection. This class represents a node in a tree. 
  * If the node is a branch, then the embedded object of the node is a condition (IPrivacyPreferenceCondition), otherwise, 
- * if it's a leaf, the embedded object is an IdentitySelectionPreferenceOutcome.
+ * if it's a leaf, the embedded object is an IIdentitySelectionPreferenceOutcome.
  * @author Elizabeth
  *
  */
 public class IDSPrivacyPreferenceTreeModel extends DefaultTreeModel implements IPrivacyPreferenceTreeModel, Serializable {
 
 	
-	private Identity affectedDPI;
-	private Identity serviceDPI;
-	private IServiceResourceIdentifier serviceID;
+	private IIdentity affectedDPI;
+	private IIdentity serviceDPI;
+	private ServiceResourceIdentifier serviceID;
 	private PrivacyPreferenceTypeConstants myPrivacyType;
 	private IPrivacyPreference pref;
 	
-	public IDSPrivacyPreferenceTreeModel(Identity affectedDPI,  IPrivacyPreference preference){
+	public IDSPrivacyPreferenceTreeModel(IIdentity affectedDPI,  IPrivacyPreference preference){
 		super(preference);
 		this.setAffectedDPI(affectedDPI);
 		this.myPrivacyType = PrivacyPreferenceTypeConstants.IDS;
@@ -74,32 +75,32 @@ public class IDSPrivacyPreferenceTreeModel extends DefaultTreeModel implements I
 	}
 
 
-	public void setAffectedDPI(Identity affectedDPI) {
+	public void setAffectedDPI(IIdentity affectedDPI) {
 		this.affectedDPI = affectedDPI;
 	}
 
 
-	public Identity getAffectedDPI() {
+	public IIdentity getAffectedDPI() {
 		return affectedDPI;
 	}
 
 
-	public void setServiceID(IServiceResourceIdentifier serviceID) {
+	public void setServiceID(ServiceResourceIdentifier serviceID) {
 		this.serviceID = serviceID;
 	}
 
 
-	public IServiceResourceIdentifier getServiceID() {
+	public ServiceResourceIdentifier getServiceID() {
 		return serviceID;
 	}
 
 
-	public void setServiceDPI(Identity serviceDPI) {
+	public void setServiceDPI(IIdentity serviceDPI) {
 		this.serviceDPI = serviceDPI;
 	}
 
 
-	public Identity getServiceDPI() {
+	public IIdentity getServiceDPI() {
 		return serviceDPI;
 	}
 

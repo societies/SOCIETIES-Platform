@@ -30,9 +30,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxHistoryAttribute;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceLearning.impl.C45Output;
 import org.societies.personalisation.UserPreferenceLearning.impl.CtxIdentifierCache;
 import org.societies.personalisation.UserPreferenceLearning.impl.HistoryRetriever;
@@ -51,14 +51,14 @@ public class SA_AI extends Thread{
 
 	private IC45Consumer requestor;
 	private Date startDate;
-	private IServiceResourceIdentifier serviceId;
+	private ServiceResourceIdentifier serviceId;
 	private String parameterName;
 	private HistoryRetriever historyRetriever;
 	//private DPIRetriever dpiRetriever;
 	private PreProcessor preProcessor;
 	private PostProcessor postProcessor;
 
-	public SA_AI(IC45Consumer requestor, Date startDate, IServiceResourceIdentifier serviceId, String parameterName, HistoryRetriever historyRetriever){
+	public SA_AI(IC45Consumer requestor, Date startDate, ServiceResourceIdentifier serviceId, String parameterName, HistoryRetriever historyRetriever){
 		this.requestor = requestor;
 		this.startDate = startDate;
 		this.serviceId = serviceId;
@@ -77,13 +77,13 @@ public class SA_AI extends Thread{
 		CtxIdentifierCache cache = new CtxIdentifierCache();
 
 		//logging.info("Retrieving all DPIs");
-		Identity[] historyOwners = null; //dpiRetriever.getDPIs();
+		IIdentity[] historyOwners = null; //dpiRetriever.getDPIs();
 
 		List<IC45Output> output = new ArrayList<IC45Output>();
 
 		//For each DPI
 		for(int i=0; i<historyOwners.length; i++){
-			Identity nextHistoryOwner = (Identity)historyOwners[i];
+			IIdentity nextHistoryOwner = (IIdentity)historyOwners[i];
 
 			//get history
 			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history = 
@@ -131,7 +131,7 @@ public class SA_AI extends Thread{
 	 * Algorithm methods
 	 */  
 	private IPreferenceTreeModel runCycle(
-			Identity dataOwner, 
+			IIdentity dataOwner, 
 			ActionSubset input, 
 			CtxIdentifierCache cache,
 			String serviceType){

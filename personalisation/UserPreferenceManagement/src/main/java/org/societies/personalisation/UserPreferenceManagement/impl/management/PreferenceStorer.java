@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -19,9 +24,7 @@
  */
 package org.societies.personalisation.UserPreferenceManagement.impl.management;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -30,7 +33,6 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
@@ -40,8 +42,8 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 
 
@@ -61,7 +63,7 @@ public class PreferenceStorer {
 	}
 
 
-	public void deletePreference(Identity userId, CtxIdentifier id){
+	public void deletePreference(IIdentity userId, CtxIdentifier id){
 		CtxAttribute attrPreference;
 		try {
 			attrPreference = (CtxAttribute) broker.retrieve(id);
@@ -77,7 +79,7 @@ public class PreferenceStorer {
 
 
 	}
-	public boolean storeExisting(Identity userId, CtxIdentifier id, IPreferenceTreeModel p){
+	public boolean storeExisting(IIdentity userId, CtxIdentifier id, IPreferenceTreeModel p){
 		try {
 			p.setLastModifiedDate(new Date());
 			CtxAttribute attrPreference = (CtxAttribute) broker.retrieve(id);
@@ -128,13 +130,13 @@ public class PreferenceStorer {
 	}
 
 
-	public CtxIdentifier storeNewPreference(Identity userId, IPreferenceTreeModel iptm, String key){
+	public CtxIdentifier storeNewPreference(IIdentity userId, IPreferenceTreeModel iptm, String key){
 		iptm.setLastModifiedDate(new Date());
 
 
 		try {
-			//the original code has the lookup based on an identity. this has to be updated accordingly if the contextAPI is to change and 
-			//methods will include the extra identity parameter for the user (data owner)
+			//the original code has the lookup based on an IIdentity. this has to be updated accordingly if the contextAPI is to change and 
+			//methods will include the extra IIdentity parameter for the user (data owner)
 			Future<List<CtxIdentifier>> futureCtxIDs = broker.lookup(/*userId,*/ CtxModelType.ENTITY, "PREFERENCE"); 
 			List<CtxIdentifier> ctxIDs = futureCtxIDs.get();
 			if (ctxIDs.size()==0){
@@ -206,7 +208,7 @@ public class PreferenceStorer {
 		return null;
 	}
 	
-	public void storeRegistry(Identity userId, Registry registry){
+	public void storeRegistry(IIdentity userId, Registry registry){
 		try {
 			List<CtxIdentifier> attrList = (broker.lookup(/*userId, */CtxModelType.ATTRIBUTE, CtxModelTypes.PREFERENCE_REGISTRY)).get();
 			

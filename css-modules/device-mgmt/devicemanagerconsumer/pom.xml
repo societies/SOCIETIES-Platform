@@ -7,9 +7,24 @@
   <packaging>bundle</packaging>
   <name>Spring OSGi Bundle</name>
   <version>0.0.1-SNAPSHOT</version>
+  
+  <developers>
+		<developer>
+			<name>Rafik Said Mansour</name>
+			<email>rafik.saidmansour@trialog.com</email>
+			<organization>Trialog</organization>
+			<timezone>+1</timezone>
+			<roles>
+				<role>Owner</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+	</developers>
+  
   <parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
+		<relativePath>../../parent/spring-osgi.xml</relativePath>
 		<version>0.1</version>
 	</parent>
 
@@ -19,6 +34,21 @@
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.osgi</groupId>
+			<artifactId>spring-osgi-core</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>4.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<version>4.0.0</version>
 		</dependency>
 		<dependency>
    			<groupId>org.slf4j</groupId>
@@ -31,6 +61,12 @@
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+      		<groupId>org.societies.comm.xmpp.pubsub</groupId>
+      		<artifactId>PubsubClientBundle</artifactId>
+      		<version>${version.comm}</version>
+      		<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	<build>
@@ -45,15 +81,10 @@
               			<Bundle-Name>${pom.artifactId}</Bundle-Name>
               			<Bundle-Version>${pom.version}</Bundle-Version>
               			<Import-Package>
-              				org.springframework.beans.factory.xml,
-              				org.springframework.aop, org.springframework.aop.framework,
-              				org.aopalliance.aop, org.xml.sax, org.osgi.framework,
-              				org.springframework.osgi.service.importer.support,
-              				org.springframework.beans.propertyeditors,
-              				org.springframework.osgi.service.importer,
-              				org.springframework.osgi.service.exporter.support,
               				org.slf4j.*,
-              				org.societies.api.css.devicemgmt
+              				org.osgi.service.event,
+              				org.societies.api.css.devicemgmt,
+              				org.springframework.context
               			</Import-Package>
               			<!-- <DynamicImport-Package>
               				org.societies.css.devicemgmt.devicemanager

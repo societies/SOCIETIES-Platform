@@ -13,10 +13,17 @@
        bundle. The configuration of OSGi definitions is kept in a separate 
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
-       <bean id="xcCommunication" class="org.societies.comm.xmpp.xc.impl.XCCommunicationMgr">
+       <bean id="xcCommunication" 
+       		 class="org.societies.comm.xmpp.xc.impl.XCCommunicationMgr" 
+       		 destroy-method="UnRegisterCommManager">
                 <constructor-arg value="${host}"/>
                 <constructor-arg value="${subDomain}"/>
                 <constructor-arg value="${secretKey}"/>
+        </bean>
+        
+        <bean id="cisCommMgrFactory" class="org.societies.comm.xmpp.xc.impl.CISCommunicationMgrFactoryImpl">
+        	<constructor-arg ref="xcCommunication"/>
+            <constructor-arg value="${secretKey}"/>
         </bean>
 
         <context:property-placeholder properties-ref="componentConfig"/>

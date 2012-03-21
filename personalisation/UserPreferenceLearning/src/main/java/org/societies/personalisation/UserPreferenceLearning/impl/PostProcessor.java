@@ -25,11 +25,11 @@
 
 package org.societies.personalisation.UserPreferenceLearning.impl;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceCondition;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
@@ -40,11 +40,11 @@ import org.societies.personalisation.preference.api.model.PreferenceTreeNode;
 public class PostProcessor 
 {
 	public IPreferenceTreeModel process(
-			Identity dataOwner, 
+			IIdentity dataOwner, 
 			String paramName, 
 			String treeString, 
 			CtxIdentifierCache cache,
-			IServiceResourceIdentifier serviceId,
+			ServiceResourceIdentifier serviceId,
 			String serviceType){
 
 		System.out.println("Converting String to tree: "+treeString);
@@ -194,7 +194,7 @@ public class PostProcessor
 		return false;
 	}
 
-	private IPreferenceCondition createCondition(Identity dataOwner, String temp, CtxIdentifierCache cache){
+	private IPreferenceCondition createCondition(IIdentity dataOwner, String temp, CtxIdentifierCache cache){
 
 		System.out.println("Creating condition from String: "+temp);
 		String noBars = removeChar(temp, '|');
@@ -206,7 +206,7 @@ public class PostProcessor
 		return condition;
 	}
 
-	private IOutcome createOutcome(String paramName, String temp, IServiceResourceIdentifier serviceId, String serviceType){
+	private IOutcome createOutcome(String paramName, String temp, ServiceResourceIdentifier serviceId, String serviceType){
 
 		System.out.println("Creating outcome from String: "+temp);
 		IOutcome action = new PreferenceOutcome(paramName, temp);

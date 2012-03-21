@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -24,11 +29,11 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceManagement.impl.Tools;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 
@@ -54,7 +59,7 @@ public class PrivatePreferenceCache {
 	private final ICtxBroker broker;
 	private PreferenceRetriever retriever;
 	
-	public PrivatePreferenceCache(Identity dpi, ICtxBroker broker){
+	public PrivatePreferenceCache(IIdentity dpi, ICtxBroker broker){
 		
 		this.broker = broker;
 		this.idToIPreferenceTreeModel = new Hashtable<CtxIdentifier, IPreferenceTreeModel>();
@@ -95,7 +100,7 @@ public class PrivatePreferenceCache {
 		}
 		return this.getPreference(id);
 	}
-	public IPreferenceTreeModel getPreference(String serviceType, IServiceResourceIdentifier serviceID, String preferenceName){
+	public IPreferenceTreeModel getPreference(String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
 		if (serviceType==null){
 			this.logging.debug("request to get preference with null serviceType, returning empty model");
 			return null;
@@ -112,7 +117,7 @@ public class PrivatePreferenceCache {
 	}
 
 	
-	public void storePreference(Identity dpi, PreferenceDetails details, IPreferenceTreeModel model){
+	public void storePreference(IIdentity dpi, PreferenceDetails details, IPreferenceTreeModel model){
 		this.logging.debug("Request to store preference for:"+details.toString());
 
 		
@@ -145,7 +150,7 @@ public class PrivatePreferenceCache {
 		}
 	}
 
-	public void deletePreference(Identity dpi, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName){
+	public void deletePreference(IIdentity dpi, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
 		PreferenceDetails details = new PreferenceDetails(serviceType, serviceID, preferenceName);
 		CtxIdentifier id = this.registry.getCtxID(details);
 		if (id==null){
@@ -159,7 +164,7 @@ public class PrivatePreferenceCache {
 		}
 	}
 	
-	public void deletePreference(Identity dpi, PreferenceDetails details){
+	public void deletePreference(IIdentity dpi, PreferenceDetails details){
 		CtxIdentifier id = this.registry.getCtxID(details);
 		if (id==null){
 			//preference doesn't exist. can't delete it
@@ -171,7 +176,7 @@ public class PrivatePreferenceCache {
 			storer.storeRegistry(dpi, registry);
 		}		
 	}
-	public List<String> getPreferenceNamesofService(String serviceType, IServiceResourceIdentifier serviceID){
+	public List<String> getPreferenceNamesofService(String serviceType, ServiceResourceIdentifier serviceID){
 		return this.registry.getPreferenceNamesofService(serviceType, serviceID);
 	}
 	

@@ -9,6 +9,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.jabber.protocol.pubsub.Create;
 import org.jabber.protocol.pubsub.Item;
 import org.jabber.protocol.pubsub.Items;
@@ -23,22 +31,23 @@ import org.jabber.protocol.pubsub.owner.Purge;
 import org.jabber.protocol.pubsub.owner.Subscriptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.datatypes.XMPPNode;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.comm.xmpp.interfaces.IIdentityManager;
-import org.societies.comm.xmpp.pubsub.Affiliation;
-import org.societies.comm.xmpp.pubsub.PubsubClient;
-import org.societies.comm.xmpp.pubsub.Subscriber;
-import org.societies.comm.xmpp.pubsub.Subscription;
-import org.societies.comm.xmpp.pubsub.SubscriptionState;
+import org.societies.api.comm.xmpp.pubsub.Affiliation;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.api.comm.xmpp.pubsub.Subscription;
+import org.societies.api.comm.xmpp.pubsub.SubscriptionState;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 @Component
@@ -62,6 +71,10 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	private Map<String,Object> responses;
 	private Map<Subscription,List<Subscriber>> subscribers;
 	private IIdentityManager idm;
+	private Marshaller contentMarshaller;
+	private Unmarshaller contentUnmarshaller;
+	private String packagesContextPath;
+	private IIdentity localIdentity;
 	
 	@Autowired
 	public PubsubClientImpl(ICommManager endpoint) {
@@ -69,9 +82,16 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		subscribers = new HashMap<Subscription, List<Subscriber>>();
 		this.endpoint = endpoint;
 		idm = endpoint.getIdManager();
+		localIdentity = idm.getThisNetworkNode();
+		packagesContextPath = "";
 		try {
+			JAXBContext jc = JAXBContext.newInstance();
+			contentUnmarshaller = jc.createUnmarshaller();
+			contentMarshaller = jc.createMarshaller();
 			endpoint.register(this);
 		} catch (CommunicationException e) {
+			LOG.error(e.getMessage());
+		} catch (JAXBException e) {
 			LOG.error(e.getMessage());
 		}
 	}
@@ -99,11 +119,19 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		if (payload instanceof org.jabber.protocol.pubsub.event.Event) {
 			org.jabber.protocol.pubsub.event.Items items = ((org.jabber.protocol.pubsub.event.Event)payload).getItems();
 			String node = items.getNode();
-			Subscription sub = new Subscription(stanza.getFrom(), stanza.getTo(), node, null); // TODO may break due to mismatch between "to" and local identity
-			List<Subscriber> subscriberList = subscribers.get(sub);
-			for (Subscriber subscriber : subscriberList)
-				for (org.jabber.protocol.pubsub.event.Item i : items.getItem())
-					subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), (Element) i.getAny());
+			Subscription sub = new Subscription(stanza.getFrom(), stanza.getTo(), node, null); // TODO may break due to mismatch between "to" and local IIdentity
+			org.jabber.protocol.pubsub.event.Item i = items.getItem().get(0); // TODO assume only one item per notification
+			try {
+				Object bean = null;
+				synchronized (contentUnmarshaller) {
+					bean = contentUnmarshaller.unmarshal((Element)i.getAny());
+				}
+				List<Subscriber> subscriberList = subscribers.get(sub);
+				for (Subscriber subscriber : subscriberList)
+					subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), bean);
+			} catch (JAXBException e) {
+				LOG.warn("JAXBException while unmarshalling pubsub payload",e);
+			}
 		}
 	}
 	// TODO subId
@@ -165,9 +193,8 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	
 	private Object waitForResponse(String id) throws XMPPError {
 		Object response = null;
-		synchronized (responses) {
-			response = responses.remove(id);
-			while (response==null) {
+		synchronized (responses) {				
+			while (!responses.containsKey(id)) {
 				try {
 					LOG.info("waiting response 4 id "+id);
 					responses.wait(TIMEOUT);
@@ -175,8 +202,8 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 					LOG.info(e.getMessage());
 				}
 				LOG.info("checking response 4 id "+id+" in "+Arrays.toString(responses.keySet().toArray()));
-				response = responses.remove(id);
 			}
+			response = responses.remove(id);
 			LOG.info("got response 4 id "+id);
 		}
 		if (response instanceof XMPPError)
@@ -185,7 +212,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	}
 
 	@Override
-	public List<String> discoItems(Identity pubsubService, String node)
+	public List<String> discoItems(IIdentity pubsubService, String node)
 			throws XMPPError, CommunicationException {
 		String id = endpoint.getItems(pubsubService, node, this);
 		Object response = waitForResponse(id);
@@ -198,9 +225,9 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	}
 
 	@Override
-	public Subscription subscriberSubscribe(Identity pubsubService, String node,
+	public Subscription subscriberSubscribe(IIdentity pubsubService, String node,
 			Subscriber subscriber) throws XMPPError, CommunicationException {
-		Subscription subscription = new Subscription(pubsubService, endpoint.getIdentity(), node, null);
+		Subscription subscription = new Subscription(pubsubService, localIdentity, node, null);
 		List<Subscriber> subscriberList = subscribers.get(subscription);
 		
 		if (subscriberList==null) {
@@ -209,14 +236,14 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			Stanza stanza = new Stanza(pubsubService);
 			Pubsub payload = new Pubsub();
 			Subscribe sub = new Subscribe();
-			sub.setJid(endpoint.getIdentity().getJid());
+			sub.setJid(localIdentity.getBareJid());
 			sub.setNode(node);
 			payload.setSubscribe(sub);
 	
 			Object response = blockingIQ(stanza, payload);
 			
 			String subId = ((Pubsub)response).getSubscription().getSubid();
-			subscription = new Subscription(pubsubService, endpoint.getIdentity(), node, subId);
+			subscription = new Subscription(pubsubService, localIdentity, node, subId);
 			subscribers.put(subscription, subscriberList);
 		}
 		
@@ -226,11 +253,11 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	}
 
 	@Override
-	public void subscriberUnsubscribe(Identity pubsubService, String node,
+	public void subscriberUnsubscribe(IIdentity pubsubService, String node,
 			Subscriber subscriber) throws XMPPError,
 			CommunicationException {
 		
-		Subscription subscription = new Subscription(pubsubService, endpoint.getIdentity(), node, null);
+		Subscription subscription = new Subscription(pubsubService, localIdentity, node, null);
 		List<Subscriber> subscriberList = subscribers.get(subscription);
 		subscriberList.remove(subscriber);
 		
@@ -238,7 +265,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			Stanza stanza = new Stanza(pubsubService);
 			Pubsub payload = new Pubsub();
 			Unsubscribe unsub = new Unsubscribe();
-			unsub.setJid(endpoint.getIdentity().getJid());
+			unsub.setJid(localIdentity.getJid());
 			unsub.setNode(node);
 			payload.setUnsubscribe(unsub);
 	
@@ -249,7 +276,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	
 
 	@Override
-	public List<Element> subscriberRetrieveLast(Identity pubsubService,
+	public List<Element> subscriberRetrieveLast(IIdentity pubsubService,
 			String node, String subId) throws XMPPError, CommunicationException {
 		Stanza stanza = new Stanza(pubsubService);
 		Pubsub payload = new Pubsub();
@@ -271,7 +298,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	}
 
 	@Override
-	public List<Element> subscriberRetrieveSpecific(Identity pubsubService,
+	public List<Element> subscriberRetrieveSpecific(IIdentity pubsubService,
 			String node, String subId, List<String> itemIdList)
 			throws XMPPError, CommunicationException {
 		Stanza stanza = new Stanza(pubsubService);
@@ -300,8 +327,8 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	}
 
 	@Override
-	public String publisherPublish(Identity pubsubService, String node,
-			String itemId, Element item) throws XMPPError,
+	public String publisherPublish(IIdentity pubsubService, String node,
+			String itemId, Object item) throws XMPPError,
 			CommunicationException {
 		Stanza stanza = new Stanza(pubsubService);
 		Pubsub payload = new Pubsub();
@@ -310,17 +337,31 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		Item i = new Item();
 		if (itemId!=null)
 			i.setId(itemId);
-		i.setAny(item);
-		p.setItem(i);
-		payload.setPublish(p);
-		
-		Object response = blockingIQ(stanza, payload);
-		
-		return ((Pubsub)response).getPublish().getItem().getId();
+
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		try {
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document doc = db.newDocument();
+			synchronized (contentMarshaller) {
+				contentMarshaller.marshal(item, doc);
+			}
+			i.setAny(doc.getDocumentElement());
+			
+			p.setItem(i);
+			payload.setPublish(p);
+			
+			Object response = blockingIQ(stanza, payload);
+			
+			return ((Pubsub)response).getPublish().getItem().getId();
+		} catch (ParserConfigurationException e) {
+			throw new CommunicationException("ParserConfigurationException while marshalling item to publish", e);
+		} catch (JAXBException e) {
+			throw new CommunicationException("JAXBException while marshalling item to publish", e);
+		}
 	}
 
 	@Override
-	public void publisherDelete(Identity pubsubService, String node,
+	public void publisherDelete(IIdentity pubsubService, String node,
 			String itemId) throws XMPPError, CommunicationException {
 		Stanza stanza = new Stanza(pubsubService);
 		Pubsub payload = new Pubsub();
@@ -336,7 +377,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	}
 
 	@Override
-	public void ownerCreate(Identity pubsubService, String node)
+	public void ownerCreate(IIdentity pubsubService, String node)
 			throws XMPPError, CommunicationException {
 		Stanza stanza = new Stanza(pubsubService);
 		Pubsub payload = new Pubsub();
@@ -348,7 +389,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	}
 
 	@Override
-	public void ownerDelete(Identity pubsubService, String node)
+	public void ownerDelete(IIdentity pubsubService, String node)
 			throws XMPPError, CommunicationException {
 		Stanza stanza = new Stanza(pubsubService);
 		org.jabber.protocol.pubsub.owner.Pubsub payload = new org.jabber.protocol.pubsub.owner.Pubsub();
@@ -360,7 +401,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	}
 
 	@Override
-	public void ownerPurgeItems(Identity pubsubService, String node)
+	public void ownerPurgeItems(IIdentity pubsubService, String node)
 			throws XMPPError, CommunicationException {
 		Stanza stanza = new Stanza(pubsubService);
 		org.jabber.protocol.pubsub.owner.Pubsub payload = new org.jabber.protocol.pubsub.owner.Pubsub();
@@ -372,8 +413,8 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	}
 
 	@Override
-	public Map<Identity, SubscriptionState> ownerGetSubscriptions(
-			Identity pubsubService, String node) throws XMPPError,
+	public Map<IIdentity, SubscriptionState> ownerGetSubscriptions(
+			IIdentity pubsubService, String node) throws XMPPError,
 			CommunicationException {
 		Stanza stanza = new Stanza(pubsubService);
 		org.jabber.protocol.pubsub.owner.Pubsub payload = new org.jabber.protocol.pubsub.owner.Pubsub();
@@ -384,16 +425,20 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		blockingIQ(stanza, payload);
 		
 		List<org.jabber.protocol.pubsub.owner.Subscription> subList = ((org.jabber.protocol.pubsub.owner.Pubsub)payload).getSubscriptions().getSubscription();
-		Map<Identity, SubscriptionState> returnMap = new HashMap<Identity, SubscriptionState>();
+		Map<IIdentity, SubscriptionState> returnMap = new HashMap<IIdentity, SubscriptionState>();
 		for (org.jabber.protocol.pubsub.owner.Subscription s : subList)
-			returnMap.put(idm.fromJid(s.getJid()), SubscriptionState.valueOf(s.getSubscription()));
+			try {
+				returnMap.put(idm.fromJid(s.getJid()), SubscriptionState.valueOf(s.getSubscription()));
+			} catch (InvalidFormatException e) {
+				LOG.warn("Unable to parse subscription JIDs",e);
+			}
 		
 		return returnMap;
 	}
 
 	@Override
-	public Map<Identity, Affiliation> ownerGetAffiliations(
-			Identity pubsubService, String node) throws XMPPError,
+	public Map<IIdentity, Affiliation> ownerGetAffiliations(
+			IIdentity pubsubService, String node) throws XMPPError,
 			CommunicationException {
 		Stanza stanza = new Stanza(pubsubService);
 		org.jabber.protocol.pubsub.owner.Pubsub payload = new org.jabber.protocol.pubsub.owner.Pubsub();
@@ -404,16 +449,20 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		blockingIQ(stanza, payload);
 		
 		List<org.jabber.protocol.pubsub.owner.Affiliation> affList = ((org.jabber.protocol.pubsub.owner.Pubsub)payload).getAffiliations().getAffiliation();
-		Map<Identity, Affiliation> returnMap = new HashMap<Identity, Affiliation>();
+		Map<IIdentity, Affiliation> returnMap = new HashMap<IIdentity, Affiliation>();
 		for (org.jabber.protocol.pubsub.owner.Affiliation a : affList)
-			returnMap.put(idm.fromJid(a.getJid()), Affiliation.valueOf(a.getAffiliation()));
+			try {
+				returnMap.put(idm.fromJid(a.getJid()), Affiliation.valueOf(a.getAffiliation()));
+			} catch (InvalidFormatException e) {
+				LOG.warn("Unable to parse affiliation JIDs",e);
+			}
 		
 		return returnMap;
 	}
 
 	@Override
-	public void ownerSetSubscriptions(Identity pubsubService, String node,
-			Map<Identity, SubscriptionState> subscriptions) throws XMPPError,
+	public void ownerSetSubscriptions(IIdentity pubsubService, String node,
+			Map<IIdentity, SubscriptionState> subscriptions) throws XMPPError,
 			CommunicationException {
 		Stanza stanza = new Stanza(pubsubService);
 		org.jabber.protocol.pubsub.owner.Pubsub payload = new org.jabber.protocol.pubsub.owner.Pubsub();
@@ -421,7 +470,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		subs.setNode(node);
 		payload.setSubscriptions(subs);
 		
-		for (Identity subscriber : subscriptions.keySet()) {
+		for (IIdentity subscriber : subscriptions.keySet()) {
 			org.jabber.protocol.pubsub.owner.Subscription s = new org.jabber.protocol.pubsub.owner.Subscription();
 			s.setJid(subscriber.getJid());
 			s.setSubscription(subscriptions.get(subscriber).toString());
@@ -434,8 +483,8 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 	}
 
 	@Override
-	public void ownerSetAffiliations(Identity pubsubService, String node,
-			Map<Identity, Affiliation> affiliations) throws XMPPError,
+	public void ownerSetAffiliations(IIdentity pubsubService, String node,
+			Map<IIdentity, Affiliation> affiliations) throws XMPPError,
 			CommunicationException {
 		Stanza stanza = new Stanza(pubsubService);
 		org.jabber.protocol.pubsub.owner.Pubsub payload = new org.jabber.protocol.pubsub.owner.Pubsub();
@@ -443,7 +492,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		affs.setNode(node);
 		payload.setAffiliations(affs);
 		
-		for (Identity subscriber : affiliations.keySet()) {
+		for (IIdentity subscriber : affiliations.keySet()) {
 			org.jabber.protocol.pubsub.owner.Affiliation a = new org.jabber.protocol.pubsub.owner.Affiliation();
 			a.setJid(subscriber.getJid());
 			a.setAffiliation(affiliations.get(subscriber).toString());
@@ -454,6 +503,24 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 		
 		// TODO error handling on multiple affiliation changes
 		
+	}
+
+	@Override
+	public synchronized void addJaxbPackages(List<String> packageList) throws JAXBException {
+		if (packagesContextPath.length()==0) {
+			// TODO first run!
+		}
+		
+		StringBuilder contextPath = new StringBuilder(packagesContextPath);
+		for (String pack : packageList)
+			contextPath.append(":" + pack);
+
+		JAXBContext jc = JAXBContext.newInstance(contextPath.toString(),
+				this.getClass().getClassLoader());
+		contentUnmarshaller = jc.createUnmarshaller();
+		contentMarshaller = jc.createMarshaller();
+		
+		packagesContextPath = contextPath.toString();
 	}
 	
 }

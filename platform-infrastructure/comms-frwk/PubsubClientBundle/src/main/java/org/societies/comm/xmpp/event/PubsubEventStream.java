@@ -1,24 +1,29 @@
 package org.societies.comm.xmpp.event;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import java.util.List;
+
+import javax.xml.bind.JAXBException;
+
+import org.societies.api.identity.IIdentity;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
-import org.w3c.dom.Element;
 
 public abstract class PubsubEventStream implements ApplicationEventMulticaster {
 
-	protected Identity pubsubService;
+	protected IIdentity pubsubService;
 	protected String node;
 	protected ApplicationEventMulticaster multicaster;
 	
-	public PubsubEventStream(Identity pubsubService, String node, ApplicationEventMulticaster multicaster) {
+	public PubsubEventStream(IIdentity pubsubService, String node, ApplicationEventMulticaster multicaster) {
 		this.pubsubService = pubsubService;
 		this.node = node;
 		this.multicaster = multicaster;
 	}
 	
-	public abstract String publishLocalEvent(Element payload);
+	public abstract String publishLocalEvent(Object payload);
+	
+	public abstract void addJaxbPackages(List<String> packageList) throws JAXBException;
 	
 	protected void multicastRemoteEvent(PubsubEvent pe, String itemId) {
 		pe.setPublished(pubsubService, node, itemId);
@@ -31,9 +36,9 @@ public abstract class PubsubEventStream implements ApplicationEventMulticaster {
 	}
 
 	@Override
-	public void multicastEvent(ApplicationEvent arg0) {
-		if (arg0 instanceof PubsubEvent) {
-			PubsubEvent pe = (PubsubEvent)arg0;
+	public void multicastEvent(ApplicationEvent event) {
+		if (event instanceof PubsubEvent) {
+			PubsubEvent pe = (PubsubEvent)event;
 			if (!pe.isPublished()) {
 				// publish to XMPP node
 				String itemId = publishLocalEvent(pe.getPayload());

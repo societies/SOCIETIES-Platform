@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:osgi="http://www.springframework.org/schema/osgi"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                      http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+  <!-- definitions using elements of the osgi namespace can be included
+       in this file. There is no requirement to keep these definitions
+       in a separate file if you do not want to. The rationale for 
+       keeping these definitions separate is to facilitate integration
+       testing of the bundle outside of an OSGi container -->
+       
+        
+        <osgi:service ref="persoMgr">
+        <osgi:interfaces>
+        <value>org.societies.api.personalisation.mgmt.IPersonalisationManager</value>
+        <value>org.societies.personalisation.common.api.management.IInternalPersonalisationManager</value>
+        </osgi:interfaces>
+        </osgi:service>
+        
+		
+		<osgi:service ref="pcm">
+        <osgi:interfaces>
+        <value>org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor</value>
+        </osgi:interfaces>
+        </osgi:service>
+        
+        <osgi:service ref="dianne">
+        <osgi:interfaces>
+        <value>org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE</value>
+        </osgi:interfaces>
+        </osgi:service>    
+        
+         
+        <osgi:service ref="userPrefLearning">
+        <osgi:interfaces>
+        <value>org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Learning</value>
+        </osgi:interfaces>
+        </osgi:service>    		
+        
+        <osgi:service ref="cauiTaskManager">
+        <osgi:interfaces>
+        	<value>org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager</value>
+        </osgi:interfaces>
+        </osgi:service>
+        
+        <osgi:service ref="cauiPrediction">
+        <osgi:interfaces>
+        	<value>org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction</value>
+        </osgi:interfaces>
+        </osgi:service>
+        
+        <osgi:service ref="cauiDiscovery">
+        <osgi:interfaces>
+        	<value>org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery</value>
+        </osgi:interfaces>
+        </osgi:service>
+        
+        <osgi:service ref="cristPrediction">
+        <osgi:interfaces>
+        	<value>org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction</value>
+        </osgi:interfaces>
+        </osgi:service>
+        
+        <osgi:service ref="cristDiscovery">
+        <osgi:interfaces>
+        	<value>org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.ICRISTUserIntentDiscovery</value>
+        </osgi:interfaces>
+        </osgi:service>
+        
+        <osgi:service ref="cristTaskManager">
+        <osgi:interfaces>
+        	<value>org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager</value>
+        </osgi:interfaces>
+        
+        </osgi:service>
+        
+        
+        
+        
+        <!-- PersonalisationManager is needed by pcm, dianne, cristPrediction, cauiPrediction -->
+        <osgi:reference id="persoMgr" interface="org.societies.personalisation.common.api.management.IInternalPersonalisationManager" >
+	        <osgi:listener bind-method="setPersoMgr" ref="pcm"></osgi:listener>
+	        <osgi:listener bind-method="setPersoMgr" ref="dianne"></osgi:listener>
+	        <osgi:listener bind-method="setPersoMgr" ref="cauiPrediction"></osgi:listener>
+	        <osgi:listener bind-method="setPersoMgr" ref="cristPrediction"></osgi:listener>
+        </osgi:reference>
+
+<!-- start importing internal services. cardinality is set to 0..1 because we have a cyclic dependency and the PersonalisationManager has lazy-init -->
+		<!-- PCM is needed by personalisationManager -->
+		<osgi:reference id="pcm" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor" cardinality="0..1">
+			<osgi:listener bind-method="setPcm" ref="persoMgr"></osgi:listener>
+		</osgi:reference>
+		
+		<!-- dianne is needed by personalisationManager -->
+		<osgi:reference id="dianne" interface="org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE" cardinality="0..1"> 
+			<osgi:listener bind-method="setDianne" ref="persoMgr"></osgi:listener>
+		</osgi:reference>
+		
+		<osgi:reference id="cauiPrediction" interface="org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction" cardinality="0..1">
+			<osgi:listener bind-method="setCAUIPrediction" ref="persoMgr"></osgi:listener>
+		</osgi:reference>
+		
+		<osgi:reference id="cauiTaskManager" interface="org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager" cardinality="0..1">
+			<osgi:listener bind-method="setCauiTaskManager" ref="cauiPrediction"></osgi:listener>
+			<osgi:listener bind-method="setCauiTaskManager" ref="cauiDiscovery"></osgi:listener>
+		</osgi:reference>
+		
+		<osgi:reference id="cristPrediction" interface="org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction" cardinality="0..1">
+			<osgi:listener bind-method="setCristPrediction" ref="persoMgr"></osgi:listener>
+			<osgi:listener bind-method="setCristPrediction" ref="cristTaskManager"></osgi:listener>
+		</osgi:reference>
+		
+		<osgi:reference id="cristDiscovery" interface="org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.ICRISTUserIntentDiscovery"> 
+			<osgi:listener bind-method="setCristDiscovery" ref="cristTaskManager"></osgi:listener>
+		</osgi:reference>
+<!-- end importing internal services -->
+	
+		<!-- context Broker is needed by personalisationManager (at least) -->
+		<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker">
+		</osgi:reference>        
+
+		
+
+        
+		
+		
+		
+		<!--  <osgi:reference id="upcm" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/> -->
+		
+</beans>

@@ -32,7 +32,7 @@
 package org.societies.useragent.decisionmaking;
 
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.internal.useragent.model.ConflictType;
+import org.societies.useragent.conflict.*;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.useragent.conflict.ConfidenceTradeoffRule;
 import org.societies.useragent.conflict.ConflictResolutionManager;
@@ -49,7 +49,7 @@ public class DecisionMaker extends AbstractDecisionMaker {
 	}
 	@Override
 	protected ConflictType detectConflict(IOutcome intent, IOutcome prefernce) {
-		// TODO Auto-generated method stub
+		// TODO Auto-generated  method stub
 		try {
 			if (intent.getServiceID().equals(prefernce.getServiceID())) {
 				if (intent.getparameterName().equals(

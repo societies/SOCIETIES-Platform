@@ -31,8 +31,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.societies.android.platform.interfaces.ICoreServiceExample;
 import org.societies.android.platform.interfaces.ICoreServiceMonitor;
-import org.societies.android.platform.interfaces.ServiceMethodTranslator;
 import org.societies.android.platform.servicemonitor.SameProcessService.LocalBinder;
+import org.societies.android.platform.utilities.ServiceMethodTranslator;
+import org.societies.api.android.internal.model.AndroidParcelable;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -102,6 +103,7 @@ public class ExampleServiceActivity extends Activity {
         IntentFilter intentFilter = new IntentFilter() ;
         intentFilter.addAction(CoreMonitor.ACTIVE_TASKS);
         intentFilter.addAction(CoreMonitor.ACTIVE_SERVICES);
+        intentFilter.addAction(CoreMonitor.GET_NODE_DETAILS);
         intentFilter.addAction(AnotherStartedService.PROGRESS_STATUS_INTENT);
         this.registerReceiver(new ServiceReceiver(), intentFilter);
 
@@ -199,7 +201,31 @@ public class ExampleServiceActivity extends Activity {
     public void onButtonRealProcessClick(View view) {
     	if (realBoundToService) {
     		
-    		String targetMethod = "activeServices(String client)";
+//    		String targetMethod = "activeServices(String client)";
+//    		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICoreServiceMonitor.methodsArray, targetMethod), 0, 0);
+//    		Bundle outBundle = new Bundle();
+//    		/*
+//    		 * By passing the client package name to the service, the service can modify its broadcast intent so that 
+//    		 * only the client can receive it.
+//    		 */
+//    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.getPackageName());
+//    		Log.d(this.getClass().getName(), "Client Package Name: " + this.getPackageName());
+//    		outMessage.setData(outBundle);
+//    		serviceInvoke = System.currentTimeMillis();
+//        	Log.i(this.getClass().getName(), "Call out of process real service: " + Long.toString(serviceInvoke));
+//        	Log.i(this.getClass().getName(), "Number of invocations: " + NUM_SERVICE_INVOKES);
+//
+//    		try {
+//    			for (int i = 0; i < NUM_SERVICE_INVOKES; i++) {
+//    				targetRealService.send(outMessage);
+//    			}
+//	        	Log.i(this.getClass().getName(), "End call out of process real service: " + Long.toString(serviceInvoke - System.currentTimeMillis()));
+//	        	Log.i(this.getClass().getName(), "Average out of process real service call: " + Long.toString((serviceInvoke - System.currentTimeMillis())/NUM_SERVICE_INVOKES));
+//			} catch (RemoteException e) {
+//				e.printStackTrace();
+//			}
+    		
+    		String targetMethod = ICoreServiceMonitor.methodsArray[8];
     		Message outMessage = Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICoreServiceMonitor.methodsArray, targetMethod), 0, 0);
     		Bundle outBundle = new Bundle();
     		/*
@@ -207,6 +233,7 @@ public class ExampleServiceActivity extends Activity {
     		 * only the client can receive it.
     		 */
     		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.getPackageName());
+    		outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), new AndroidParcelable());
     		Log.d(this.getClass().getName(), "Client Package Name: " + this.getPackageName());
     		outMessage.setData(outBundle);
     		serviceInvoke = System.currentTimeMillis();
@@ -222,6 +249,7 @@ public class ExampleServiceActivity extends Activity {
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
+
     	}
     }
     /**
@@ -335,6 +363,14 @@ public class ExampleServiceActivity extends Activity {
 													"Process ID: " + ((ActivityManager.RunningServiceInfo) parcel).pid + 
 													"Process: " + ((ActivityManager.RunningServiceInfo) parcel).process);
 				}
+				
+			} else if (intent.getAction().equals(CoreMonitor.GET_NODE_DETAILS)) {
+		    	Log.i(this.getClass().getName(), "Out of process real service received intent - active services: " + Long.toString(serviceInvoke - System.currentTimeMillis()));
+	        	Log.i(this.getClass().getName(), "Average out of process real service call -  - active services: " + Long.toString((serviceInvoke - System.currentTimeMillis())/NUM_SERVICE_INVOKES));
+				Parcelable parcel =  intent.getParcelableExtra(CoreMonitor.INTENT_RETURN_KEY);
+				
+				AndroidParcelable cssNode = (AndroidParcelable) parcel;
+				Log.i("ServiceReceiver", "Node: status" + cssNode.getStatus() + " type: " + cssNode.getType() + " identity: " + cssNode.getIdentity());
 				
 			} else if (intent.getAction().equals(AnotherStartedService.PROGRESS_STATUS_INTENT)) {
 				serviceProgress.setProgress(intent.getIntExtra(AnotherStartedService.PROGRESS_STATUS_VALUE, serviceProgress.getProgress()));

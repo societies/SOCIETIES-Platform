@@ -25,9 +25,9 @@
 
 package org.societies.useragent.monitoring;
 
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.useragent.monitoring.IInternalUserActionMonitor;
-import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
@@ -37,7 +37,7 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 	private ICtxBroker ctxBroker;
 
 	@Override
-	public void monitor(IServiceResourceIdentifier serviceId, EntityIdentifier owner, IAction action) {
+	public void monitor(IServiceResourceIdentifier serviceId, IIdentity owner, IAction action) {
 		System.out.println("Received user action!");
 	}
 	

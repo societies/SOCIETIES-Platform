@@ -28,7 +28,8 @@ package org.societies.personalisation.dianne.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
 
 public class Network 
 {
@@ -70,7 +71,7 @@ public class Network
 		return requestedGroup;
 	}
 	
-	public OutcomeGroup getOutcomeGroup(IServiceResourceIdentifier serviceId, String groupName){
+	public OutcomeGroup getOutcomeGroup(ServiceResourceIdentifier serviceId, String groupName){
 		OutcomeGroup requestedGroup = null;
 
 		Iterator <OutcomeGroup>list_it = outcomeGroups.iterator();

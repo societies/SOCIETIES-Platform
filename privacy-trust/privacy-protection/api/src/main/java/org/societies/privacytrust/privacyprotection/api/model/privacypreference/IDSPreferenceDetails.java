@@ -26,8 +26,8 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 
 import java.io.Serializable;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
 
@@ -37,39 +37,39 @@ public class IDSPreferenceDetails implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private Identity affectedDPI;
-	private Identity providerDPI;
-	private IServiceResourceIdentifier serviceID;
+	private IIdentity affectedDPI;
+	private IIdentity providerDPI;
+	private ServiceResourceIdentifier serviceID;
 	
-	public IDSPreferenceDetails(Identity affectedDPI){
+	public IDSPreferenceDetails(IIdentity affectedDPI){
 		this.affectedDPI = affectedDPI;
 	}
 	
-	public void setAffectedDPI(Identity affectedDPI) {
+	public void setAffectedDPI(IIdentity affectedDPI) {
 		this.affectedDPI = affectedDPI;
 	}
 
-	public Identity getAffectedDPI() {
+	public IIdentity getAffectedDPI() {
 		return affectedDPI;
 	}
 
-	public void setServiceID(IServiceResourceIdentifier serviceID) {
+	public void setServiceID(ServiceResourceIdentifier serviceID) {
 		this.serviceID = serviceID;
 	}
 
-	public IServiceResourceIdentifier getServiceID() {
+	public ServiceResourceIdentifier getServiceID() {
 		return serviceID;
 	}
 
-	public void setProviderDPI(Identity providerDPI) {
+	public void setProviderDPI(IIdentity providerDPI) {
 		this.providerDPI = providerDPI;
 	}
 
-	public Identity getProviderDPI() {
+	public IIdentity getProviderDPI() {
 		return providerDPI;
 	}
 	
-	private boolean compareProviderDPI(Identity requestorDPI){
+	private boolean compareProviderDPI(IIdentity requestorDPI){
 		if (requestorDPI==null){
 			if (this.providerDPI==null){
 				return true;
@@ -89,7 +89,7 @@ public class IDSPreferenceDetails implements Serializable{
 		}
 	}
 	
-	private boolean compareServiceID(IServiceResourceIdentifier serviceID2){
+	private boolean compareServiceID(ServiceResourceIdentifier serviceID2){
 		if (serviceID2==null){
 			if (this.serviceID == null){
 				return true;

@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -19,20 +24,13 @@
  */
 package org.societies.personalisation.common.api.management;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IFeedbackEvent;
-import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
-import org.societies.api.personalisation.model.IAction;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
-import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
-import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
-import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 
 
 
@@ -48,21 +46,21 @@ public interface IInternalPersonalisationManager extends IPersonalisationManager
 	 * Allows any service to request an context-based evaluated preference outcome.
 	 * @return					the outcome in the form of an IAction object
 	 * 
-	 * @param ownerID    the DigitalIdentity of the owner of the preferences (i.e. the
+	 * @param ownerID    the DigitalIIdentity of the owner of the preferences (i.e. the
 	 * user of this service)
 	 * @param serviceType    the type of the service requesting the outcome
 	 * @param serviceID    the service identifier of the service requesting the
 	 * outcome
 	 * @param preferenceName    the name of the preference requested
 	 */
-	public void getPreference(Identity ownerID, String serviceType, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
+	public void getPreference(IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
 
 	/**
 	 * 
 	 * @param className
 	 * @param ctxAttributeId
 	 */
-	public void registerForContextUpdate(Identity id, PersonalisationTypes type, CtxAttributeIdentifier ctxAttributeId);
+	public void registerForContextUpdate(IIdentity id, PersonalisationTypes type, CtxAttributeIdentifier ctxAttributeId);
 
 	/**
 	 * 
@@ -77,5 +75,5 @@ public interface IInternalPersonalisationManager extends IPersonalisationManager
 	 * @param preferenceName
 	 * @param callback
 	 */
-	public void getIntentAction(Identity ownerID, IServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
+	public void getIntentAction(IIdentity ownerID, ServiceResourceIdentifier serviceID, String preferenceName, IPersonalisationCallback callback);
 }

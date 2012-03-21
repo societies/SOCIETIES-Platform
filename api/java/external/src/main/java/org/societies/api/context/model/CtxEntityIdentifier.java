@@ -24,7 +24,8 @@
  */
 package org.societies.api.context.model;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentity;
+
 
 /**
  * This class is used to identify context entities. It provides methods that
@@ -67,7 +68,7 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 	 * @param objectNumber
 	 *            the unique numeric model object identifier
 	 */
-	public CtxEntityIdentifier(Identity operatorId, String type, 
+	public CtxEntityIdentifier(IIdentity operatorId, String type, 
 			Long objectNumber) {
 		super(operatorId, type, objectNumber);
 	}

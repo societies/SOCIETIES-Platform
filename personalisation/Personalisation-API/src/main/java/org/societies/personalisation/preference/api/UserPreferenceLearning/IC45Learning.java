@@ -27,8 +27,8 @@ package org.societies.personalisation.preference.api.UserPreferenceLearning;
 
 import java.util.Date;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IC45Consumer;
 
 /**
@@ -65,24 +65,24 @@ public interface IC45Learning
 	 * @param parameterName    - specifies the parameterName (of an IAction) to focus
 	 * C4.5 learning on.
 	 */
-	public void runC45Learning(IC45Consumer requestor, Date date, IServiceResourceIdentifier serviceId, String parameterName);
+	public void runC45Learning(IC45Consumer requestor, Date date, ServiceResourceIdentifier serviceId, String parameterName);
 	
 	/**
 	 * This method starts the C4.5 learning process on context history from the date
-	 * specified to present for all actions for a specific identity. (If Date is
+	 * specified to present for all actions for a specific IIdentity. (If Date is
 	 * null, all available history is retrieved.) It returns output to a call-back
 	 * method implemented by the requestor.
 	 * 
 	 * @param requestor - an instance of the IC45Consumer to which the output should be returned
 	 * @param date - defines the start date of history to use as input.
-	 * @param historyOwner - the identity under which learning should run
+	 * @param historyOwner - the IIdentity under which learning should run
 	 */
-	public void runC45Learning(IC45Consumer requestor, Date date, Identity historyOwner);
+	public void runC45Learning(IC45Consumer requestor, Date date, IIdentity historyOwner);
 	
 	/**
 	 * This method starts the C4.5 learning process on context history from the date
 	 * specified to present for the specified parameterName of an IAction from the specified
-	 * service over the specified identity.(If Date is null, all available history is retrieved.) 
+	 * service over the specified IIdentity.(If Date is null, all available history is retrieved.) 
 	 * It returns output to a call-back method implemented by the requestor.
 	 * 
 	 * @param requestor
@@ -91,7 +91,7 @@ public interface IC45Learning
 	 * @param serviceId
 	 * @param parameterName
 	 */
-	public void runC45Learning(IC45Consumer requestor, Date date, Identity historyOwner,
-    		IServiceResourceIdentifier serviceId, String parameterName);
+	public void runC45Learning(IC45Consumer requestor, Date date, IIdentity historyOwner,
+    		ServiceResourceIdentifier serviceId, String parameterName);
 
 }

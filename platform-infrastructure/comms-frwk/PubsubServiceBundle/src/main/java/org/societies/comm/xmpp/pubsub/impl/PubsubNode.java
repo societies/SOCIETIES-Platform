@@ -12,8 +12,8 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.HostedNode;
+import org.societies.api.identity.IIdentity;
 
 // TODO collection node support
 public class PubsubNode extends HostedNode {
@@ -21,27 +21,27 @@ public class PubsubNode extends HostedNode {
 	private static Logger LOG = LoggerFactory
 			.getLogger(PubsubNode.class);
 	
-	private Identity owner;
+	private IIdentity owner;
 	// configurations
-	private Map<String, Identity> subscriptionsById;
-	private Map<Identity, List<String>> subscriptionsByUser;
+	private Map<String, IIdentity> subscriptionsById;
+	private Map<IIdentity, List<String>> subscriptionsByUser;
 	// subscriberoptions
 	private Stack<String> itemIdByOrder;
 	private Map<String, Object> itemsById;
 	private Map<String, String> publisherByItemId;
 	// itempublishoptions??? these suck!
 	
-	public PubsubNode(Identity owner, String nodeId) {
+	public PubsubNode(IIdentity owner, String nodeId) {
 		super(nodeId, null); // TODO collection nodes
 		this.owner = owner;
-		subscriptionsById = new HashMap<String, Identity>();
-		subscriptionsByUser = new HashMap<Identity, List<String>>();
+		subscriptionsById = new HashMap<String, IIdentity>();
+		subscriptionsByUser = new HashMap<IIdentity, List<String>>();
 		itemIdByOrder = new Stack<String>();
 		itemsById = new HashMap<String, Object>();
 		publisherByItemId = new HashMap<String, String>();
 	}
 
-	public String newSubscription(Identity subscriber) {
+	public String newSubscription(IIdentity subscriber) {
 		// Generate subId
 		String subId = UUID.randomUUID().toString();
 		while (subscriptionsById.containsKey(subId))
@@ -58,16 +58,16 @@ public class PubsubNode extends HostedNode {
 		return subId;
 	}
 	
-	public List<String> getSubscriptions(Identity subscriber) {
+	public List<String> getSubscriptions(IIdentity subscriber) {
 		return subscriptionsByUser.get(subscriber);
 	}
 	
-	public Collection<Identity> getSubscribers() {
+	public Collection<IIdentity> getSubscribers() {
 		return subscriptionsByUser.keySet();
 	}
 
 	public void unsubscribe(String string) {
-		Identity subscriber = subscriptionsById.get(string);
+		IIdentity subscriber = subscriptionsById.get(string);
 		subscriptionsById.remove(string);
 		subscriptionsByUser.remove(subscriber);
 	}
@@ -114,7 +114,7 @@ public class PubsubNode extends HostedNode {
 		publisherByItemId = new HashMap<String, String>();
 	}
 
-	public Identity getOwner() {
+	public IIdentity getOwner() {
 		return owner;
 	}
 }

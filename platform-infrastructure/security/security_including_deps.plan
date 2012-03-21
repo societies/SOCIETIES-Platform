@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plan name="org.societies.mitja.plan" version="3.0.0" scoped="false" atomic="true"
+        xmlns="http://www.eclipse.org/virgo/schema/plan"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="
+		        http://www.eclipse.org/virgo/schema/plan 
+		        http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
+
+	<!-- API -->
+	<!--artifact type="bundle" name="org.societies.api.external.societies-api"/>
+	<artifact type="bundle" name="org.societies.api.internal.societies-api-internal"/-->
+	
+	<!-- Communications framework -->
+	<artifact type="bundle" name="org.societies.comm.CommonLibraries"/>
+	<artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
+	<artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubServiceBundle"/>
+	<artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubClientBundle"/>
+	
+	<!-- Security -->
+	<artifact type="bundle" name="org.societies.security.secur-services"/>
+	<artifact type="bundle" name="org.societies.security.policy-negotiator"/>
+	<artifact type="bundle" name="org.societies.security.secur-commsmgr"/>
+
+</plan>

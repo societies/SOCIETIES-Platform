@@ -55,7 +55,6 @@ import org.dom4j.Namespace;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.HostedNode;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.StanzaError;
@@ -65,6 +64,8 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
 import org.xml.sax.InputSource;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.IQ.Type;
@@ -103,7 +104,7 @@ public class CommManagerHelper {
 
 	private static Logger LOG = LoggerFactory
 			.getLogger(CommManagerHelper.class);
-	private SAXReader reader = new SAXReader();
+	private SAXReader reader = new SAXReader(); // TODO the sax reader is not threadsafe either so I turned every method where it is used to synchronized :(
 
 	private final Map<String, IFeatureServer> featureServers = new HashMap<String, IFeatureServer>();
 	private final Map<String, ICommCallback> commCallbacks = new HashMap<String, ICommCallback>();
@@ -119,7 +120,7 @@ public class CommManagerHelper {
 		return featureServers.keySet().toArray(returnArray);
 	}
 	
-	public IQ handleDiscoItems(IQ iq) {
+	public synchronized IQ handleDiscoItems(IQ iq) {
 		String node = null;
 		Attribute nodeAttr = iq.getElement().attribute("node");
 		if (nodeAttr!=null)
@@ -165,11 +166,12 @@ public class CommManagerHelper {
 		try {
 			if (os.size()>0) {
 				ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
-				Document dom4jItems = reader.read(is);
 				
 				// return items
 				IQ response = new IQ(Type.result, iq.getID());
 				response.setTo(iq.getFrom());
+
+				Document dom4jItems = reader.read(is);
 				response.getElement().add(dom4jItems.getRootElement());
 				return response;
 			}
@@ -269,6 +271,8 @@ public class CommManagerHelper {
 			LOG.info("JAXB error unmarshalling an IQ result", e);
 		} catch (UnavailableException e) {
 			LOG.info(e.getMessage());
+		} catch (InvalidFormatException e) {
+			LOG.warn("Unable to convert Tinder Packet into Stanza", e);
 		}
 	}
 
@@ -288,6 +292,8 @@ public class CommManagerHelper {
 			LOG.info(e.getMessage());
 		} catch (JAXBException e) {
 			LOG.info(e.getMessage());
+		} catch (InvalidFormatException e) {
+			LOG.warn("Unable to convert Tinder Packet into Stanza", e);
 		}
 	}
 
@@ -342,6 +348,11 @@ public class CommManagerHelper {
 					+ "Error (un)marshalling the message:" + e.getMessage();
 			LOG.info(message);
 			return buildErrorResponse(originalFrom, id, message);
+		} catch (InvalidFormatException e) {
+			String message = e.getClass().getName()
+					+ "Error (un)marshalling the message:" + e.getMessage();
+			LOG.info(message);
+			return buildErrorResponse(originalFrom, id, message);
 		}
 	}
 
@@ -360,6 +371,8 @@ public class CommManagerHelper {
 			LOG.info(m);
 		} catch (UnavailableException e) {
 			LOG.info(e.getMessage());
+		} catch (InvalidFormatException e) {
+			LOG.warn("Unable to convert Tinder Packet into Stanza", e);
 		}
 	}
 
@@ -474,7 +487,7 @@ public class CommManagerHelper {
 		}
 	}
 	
-	private IQ buildApplicationErrorResponse(JID originalFrom, String id, XMPPError error) {
+	private synchronized IQ buildApplicationErrorResponse(JID originalFrom, String id, XMPPError error) {
 		try {
 			IQ errorResponse = new IQ(Type.error, id);
 			errorResponse.setTo(originalFrom);
@@ -496,6 +509,7 @@ public class CommManagerHelper {
 			
 			Document dom4jError = reader.read(is);
 			errorResponse.getElement().add(dom4jError.getRootElement());
+			
 			return errorResponse;
 		} catch (JAXBException e) {
 			return buildErrorResponse(originalFrom, id, "JAXBException while building application error");
@@ -542,7 +556,7 @@ public class CommManagerHelper {
 		}
 	}
 
-	public IQ buildInfoIq(Identity entity, String node, ICommCallback callback) throws CommunicationException {
+	public synchronized IQ buildInfoIq(IIdentity entity, String node, ICommCallback callback) throws CommunicationException {
 		IQ infoIq = new IQ(Type.get);
 		infoIq.setTo(entity.getJid());
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -560,7 +574,7 @@ public class CommManagerHelper {
 		return infoIq;
 	}
 
-	public IQ buildItemsIq(Identity entity, String node, ICommCallback callback) throws CommunicationException {
+	public synchronized IQ buildItemsIq(IIdentity entity, String node, ICommCallback callback) throws CommunicationException {
 		IQ itemsIq = new IQ(Type.get);
 		itemsIq.setTo(entity.getJid());
 		ByteArrayOutputStream os = new ByteArrayOutputStream();

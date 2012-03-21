@@ -31,14 +31,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.datatypes.XMPPNode;
 import org.societies.example.IExamplesCallback;
-import org.societies.example.calculatorservice.schema.CalcBeanResult;
-import org.societies.example.fortunecookieservice.schema.FortuneCookieBeanResult;
+import org.societies.api.schema.examples.calculatorbean.CalcBeanResult;
+import org.societies.api.schema.examples.fortunecookie.FortuneCookieBeanResult;
 
 /**
  * Describe your class here...
@@ -49,13 +47,13 @@ import org.societies.example.fortunecookieservice.schema.FortuneCookieBeanResult
 public class CommsClientCallback implements ICommCallback {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-			  Arrays.asList("http://societies.org/example/calculatorservice/schema",
-					  		"http://societies.org/example/fortunecookieservice/schema",
-					  		"http://societies.org/example/complexservice/schema"));
+			  Arrays.asList("http://societies.org/api/schema/examples/calculatorbean",
+				  		"http://societies.org/api/schema/examples/fortunecookie",
+				  		"http://societies.org/api/schema/examples/complexservice"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
-			  Arrays.asList("org.societies.example.calculatorservice.schema",
-							"org.societies.example.fortunecookieservice.schema",
-							"org.societies.example.complexservice.schema"));
+		  Arrays.asList("org.societies.api.schema.examples.calculatorbean",
+						"org.societies.api.schema.examples.fortunecookie",
+						"org.societies.api.schema.examples.complexservice"));
 
 	//MAP TO STORE THE ALL THE CLIENT CONNECTIONS
 	private final Map<String, IExamplesCallback> calcClients = new HashMap<String, IExamplesCallback>();

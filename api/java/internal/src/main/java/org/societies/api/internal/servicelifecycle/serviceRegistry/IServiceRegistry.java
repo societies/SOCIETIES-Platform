@@ -26,11 +26,13 @@ package org.societies.api.internal.servicelifecycle.serviceRegistry;
 
 import java.util.List;
 
-import org.societies.api.internal.servicelifecycle.model.Service;
-import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 
 /**
  * @author Antonio Panazzolo, Massimo Mazzariol (SN)
@@ -90,12 +92,12 @@ public interface IServiceRegistry {
 	
 	/**
 	* Description: Based on a Filter this method returns the services list
-	* matching that particular filter
+	* matching that particular filter. Null attributes are excluded and associations are ignored.
 	* @param the object used as filter for the query
 	* @return the list of services that match the filter
 	* @throws ServiceRetrieveException
 	*/
-	public List<Service> findServices (Object filter) throws ServiceRetrieveException;
+	public List<Service> findServices (Service filter) throws ServiceRetrieveException;
 	
 	/**
 	* Description: Based on a service unique identifier this method returns the associated Service
@@ -104,4 +106,12 @@ public interface IServiceRegistry {
 	* @throws ServiceRetrieveException
 	*/
 	public Service retrieveService(ServiceResourceIdentifier serviceIdentifier) throws ServiceRetrieveException;
+	
+	/**
+	 * 
+	 * @param serviceIdentifier the unique identifier for the Service
+	 * @param serviceStatus the new status for the service
+	 * @return true if all is performed correctly
+	 */
+	public boolean changeStatusOfService(ServiceResourceIdentifier serviceIdentifier, ServiceStatus serviceStatus) throws ServiceNotFoundException;
 }

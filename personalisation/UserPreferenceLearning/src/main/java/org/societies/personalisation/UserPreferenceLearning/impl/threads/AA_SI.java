@@ -31,9 +31,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxHistoryAttribute;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceLearning.impl.C45Output;
 import org.societies.personalisation.UserPreferenceLearning.impl.CtxIdentifierCache;
 import org.societies.personalisation.UserPreferenceLearning.impl.HistoryRetriever;
@@ -52,12 +52,12 @@ public class AA_SI extends Thread{
 
 	private IC45Consumer requestor;
 	private Date startDate;
-	private Identity historyOwner;
+	private IIdentity historyOwner;
 	private HistoryRetriever historyRetriever;
 	private PreProcessor preProcessor;
 	private PostProcessor postProcessor;
 
-	public AA_SI(IC45Consumer requestor, Date startDate, Identity historyOwner, HistoryRetriever historyRetriever){
+	public AA_SI(IC45Consumer requestor, Date startDate, IIdentity historyOwner, HistoryRetriever historyRetriever){
 		this.requestor = requestor;
 		this.startDate = startDate;
 		this.historyOwner = historyOwner;
@@ -134,7 +134,7 @@ public class AA_SI extends Thread{
 	private IPreferenceTreeModel runCycle( 
 			ActionSubset input, 
 			CtxIdentifierCache cache,
-			IServiceResourceIdentifier serviceId,
+			ServiceResourceIdentifier serviceId,
 			String serviceType){
 
 		//convert to Instances for each serviceId

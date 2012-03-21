@@ -41,11 +41,11 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.util.SerialisationHelper;
-import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.personalisation.model.Action;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
-import org.societies.personalisation.UserPreferenceLearning.impl.CtxIdentifierCache;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+//import org.societies.personalisation.UserPreferenceLearning.impl.CtxIdentifierCache;
 import org.societies.personalisation.UserPreferenceLearning.impl.PostProcessor;
 import org.societies.personalisation.UserPreferenceLearning.impl.PreProcessor;
 import org.societies.personalisation.preference.api.model.ActionSubset;
@@ -60,14 +60,20 @@ public class TestUserPreferenceLearning extends TestCase{
 
 	PreProcessor pre;
 	PostProcessor post;
-	IServiceResourceIdentifier serviceId1;
-	IServiceResourceIdentifier serviceId2;
+	ServiceResourceIdentifier serviceId1;
+	ServiceResourceIdentifier serviceId2;
+	IIdentity ownerId;
+	NumberGenerator ng;
 
 	public void setUp() throws Exception {
 		pre = new PreProcessor();
 		post = new PostProcessor();
-		serviceId1 = new ServiceResourceIdentifier(new URI("tennisPlanner"));
-		serviceId2 = new ServiceResourceIdentifier(new URI("lymphChecker"));
+		serviceId1 = new ServiceResourceIdentifier();
+		serviceId1.setIdentifier(new URI("tennisPlanner"));
+		serviceId2 = new ServiceResourceIdentifier();
+		serviceId2.setIdentifier(new URI("lymphChecker"));
+		ownerId = new MockIdentity(IdentityType.CSS, "test", "domain");
+		ng = new NumberGenerator();
 	}
 
 	public void tearDown() throws Exception {
@@ -88,7 +94,7 @@ public class TestUserPreferenceLearning extends TestCase{
 		ServiceSubset results = pre.extractServiceActions(dataset, serviceId1, "tennis1");
 		Assert.assertNotNull(results);
 
-		IServiceResourceIdentifier serviceId = results.getServiceId();
+		ServiceResourceIdentifier serviceId = results.getServiceId();
 		System.out.println("serviceId = "+serviceId.getIdentifier());
 		Assert.assertNotNull(serviceId);
 		Assert.assertEquals(serviceId1.getIdentifier(), serviceId.getIdentifier());
@@ -121,7 +127,8 @@ public class TestUserPreferenceLearning extends TestCase{
 				for(CtxHistoryAttribute nextContext: context){
 					System.out.println(nextContext.getType()+" = "+nextContext.getStringValue());
 				}
-			}*/
+			}
+			System.out.println("DONE PRINTING");*/
 		}
 
 		System.out.println();
@@ -143,10 +150,10 @@ public class TestUserPreferenceLearning extends TestCase{
 		System.out.println("service list size = "+results.size());
 
 		for(ServiceSubset nextService: results){
-			IServiceResourceIdentifier serviceId = nextService.getServiceId();
+			ServiceResourceIdentifier serviceId = nextService.getServiceId();
 			Assert.assertNotNull(serviceId);
 			System.out.println("serviceId = "+serviceId.getIdentifier());
-			
+
 			List<ActionSubset> actionList = nextService.getActionSubsets();
 			Assert.assertNotNull(actionList);
 			System.out.println("action list size = "+actionList.size());
@@ -193,15 +200,15 @@ public class TestUserPreferenceLearning extends TestCase{
 		System.out.println("*************************************************");
 		ServiceSubset results = pre.trimServiceSubset(dataset);
 		Assert.assertNotNull(results);
-		IServiceResourceIdentifier serviceId = results.getServiceId();
+		ServiceResourceIdentifier serviceId = results.getServiceId();
 		Assert.assertNotNull(serviceId);
 		System.out.println("serviceId = "+serviceId.getIdentifier());
-		
+
 		List<ActionSubset> actionList = results.getActionSubsets();
 		Assert.assertNotNull(actionList);
 		System.out.println("action list size = "+actionList.size());
 		Assert.assertTrue(actionList.size() == 2);
-		
+
 		for(ActionSubset nextSubset: actionList){
 			String actionType = nextSubset.getParameterName();
 			Assert.assertNotNull(actionType);
@@ -226,7 +233,7 @@ public class TestUserPreferenceLearning extends TestCase{
 				}
 			}*/
 		}
-		
+
 		System.out.println();
 		System.out.println("-----------------------------------------------------------");
 		System.out.println();
@@ -243,7 +250,7 @@ public class TestUserPreferenceLearning extends TestCase{
 		Instances results = pre.toInstances(dataset);
 		Assert.assertNotNull(results);
 		results.toString();
-		
+
 		System.out.println();
 		System.out.println("-----------------------------------------------------------");
 		System.out.println();
@@ -253,14 +260,14 @@ public class TestUserPreferenceLearning extends TestCase{
 	 * PostProcessor tests
 	 */
 	public void testPostProcessor(){
-		String dataset = this.getTreeString();
-		EntityIdentifier ownerId = new EntityIdentifier();
+		//String dataset = this.getTreeString();
+		//EntityIdentifier ownerId = new EntityIdentifier();
 		//IPreferenceTreeModel preference = post.process(ownerId, "tennis", dataset, cache, serviceId1, "testService"); 
 	}
-	
-	
-	
-	
+
+
+
+
 
 	/*
 	 * Dataset methods
@@ -270,7 +277,6 @@ public class TestUserPreferenceLearning extends TestCase{
 				new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 
 		//Create EntityIdentifier
-		EntityIdentifier ownerId = new EntityIdentifier();
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "testEntity", new Long(12345));
 
 		//extract tennis dataset
@@ -296,7 +302,7 @@ public class TestUserPreferenceLearning extends TestCase{
 				value.setServiceID(serviceId1);
 				byte[] blobValue = SerialisationHelper.serialise(value);
 				action_attribute.setBinaryValue(blobValue);
-				CtxHistoryAttribute action = new CtxHistoryAttribute(action_attribute);
+				CtxHistoryAttribute action = new CtxHistoryAttribute(action_attribute, ng.getNextValue());
 
 				//add context CtxHistoryAttribute attributes
 				ArrayList<CtxHistoryAttribute> context = new ArrayList<CtxHistoryAttribute>();
@@ -304,7 +310,7 @@ public class TestUserPreferenceLearning extends TestCase{
 					CtxAttributeIdentifier context_attrId = new CtxAttributeIdentifier(entityId, "context"+i, new Long(12345));
 					CtxAttribute context_attribute = new CtxAttribute(context_attrId);
 					context_attribute.setStringValue(instance[i]);
-					CtxHistoryAttribute nextContext = new CtxHistoryAttribute(context_attribute);
+					CtxHistoryAttribute nextContext = new CtxHistoryAttribute(context_attribute, ng.getNextValue());
 					context.add(nextContext);
 				}
 				tennis_data.put(action, context);
@@ -312,6 +318,8 @@ public class TestUserPreferenceLearning extends TestCase{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		//printDataset(tennis_data);
 
 		//extract lymphography dataset
 		//ServiceId = lymphChecker;
@@ -335,7 +343,7 @@ public class TestUserPreferenceLearning extends TestCase{
 				value.setServiceID(serviceId2);
 				byte[] blobValue = SerialisationHelper.serialise(value);
 				action_attribute.setBinaryValue(blobValue);
-				CtxHistoryAttribute action = new CtxHistoryAttribute(action_attribute);
+				CtxHistoryAttribute action = new CtxHistoryAttribute(action_attribute, ng.getNextValue());
 
 				//add context CtxHistoryAttribute attributes
 				ArrayList<CtxHistoryAttribute> context = new ArrayList<CtxHistoryAttribute>();
@@ -343,7 +351,7 @@ public class TestUserPreferenceLearning extends TestCase{
 					CtxAttributeIdentifier context_attrId = new CtxAttributeIdentifier(entityId, "context"+i, new Long(12345));
 					CtxAttribute context_attribute = new CtxAttribute(context_attrId);
 					context_attribute.setStringValue(instance[i]);
-					CtxHistoryAttribute nextContext = new CtxHistoryAttribute(context_attribute);
+					CtxHistoryAttribute nextContext = new CtxHistoryAttribute(context_attribute, ng.getNextValue());
 					context.add(nextContext);
 				}
 				lymph_data.put(action, context);
@@ -351,6 +359,8 @@ public class TestUserPreferenceLearning extends TestCase{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		//printDataset(lymph_data);
 
 		//merge datasets
 		boolean readTennis = true;
@@ -374,13 +384,13 @@ public class TestUserPreferenceLearning extends TestCase{
 			}
 		}
 
+		//printDataset(fulldataset);
 		return fulldataset;
 	}
 
 
 	private ServiceSubset getServiceSubset(){
 		//Create EntityIdentifier
-		EntityIdentifier ownerId = new EntityIdentifier();
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "testEntity", new Long(12345));
 		List<ActionSubset> actionSubsets = new ArrayList<ActionSubset>();
 
@@ -403,7 +413,7 @@ public class TestUserPreferenceLearning extends TestCase{
 				value.setServiceID(serviceId1);
 				byte[] blobValue = SerialisationHelper.serialise(value);
 				action_attribute.setBinaryValue(blobValue);
-				CtxHistoryAttribute action = new CtxHistoryAttribute(action_attribute);
+				CtxHistoryAttribute action = new CtxHistoryAttribute(action_attribute, ng.getNextValue());
 
 				//add context CtxHistoryAttribute attributes
 				ArrayList<CtxHistoryAttribute> context = new ArrayList<CtxHistoryAttribute>();
@@ -411,7 +421,7 @@ public class TestUserPreferenceLearning extends TestCase{
 					CtxAttributeIdentifier context_attrId = new CtxAttributeIdentifier(entityId, "context"+i, new Long(12345));
 					CtxAttribute context_attribute = new CtxAttribute(context_attrId);
 					context_attribute.setStringValue(instance[i]);
-					CtxHistoryAttribute nextContext = new CtxHistoryAttribute(context_attribute);
+					CtxHistoryAttribute nextContext = new CtxHistoryAttribute(context_attribute, ng.getNextValue());
 					context.add(nextContext);
 				}
 				tennisActionSubset.put(action, context);
@@ -438,7 +448,7 @@ public class TestUserPreferenceLearning extends TestCase{
 				value.setServiceID(serviceId1);
 				byte[] blobValue = SerialisationHelper.serialise(value);
 				action_attribute.setBinaryValue(blobValue);
-				CtxHistoryAttribute action = new CtxHistoryAttribute(action_attribute);
+				CtxHistoryAttribute action = new CtxHistoryAttribute(action_attribute, ng.getNextValue());
 
 				//add context CtxHistoryAttribute attributes
 				ArrayList<CtxHistoryAttribute> context = new ArrayList<CtxHistoryAttribute>();
@@ -446,7 +456,7 @@ public class TestUserPreferenceLearning extends TestCase{
 					CtxAttributeIdentifier context_attrId = new CtxAttributeIdentifier(entityId, "context"+i, new Long(12345));
 					CtxAttribute context_attribute = new CtxAttribute(context_attrId);
 					context_attribute.setStringValue(instance[i]);
-					CtxHistoryAttribute nextContext = new CtxHistoryAttribute(context_attribute);
+					CtxHistoryAttribute nextContext = new CtxHistoryAttribute(context_attribute, ng.getNextValue());
 					context.add(nextContext);
 				}
 				lymphActionSubset.put(action, context);
@@ -462,14 +472,13 @@ public class TestUserPreferenceLearning extends TestCase{
 
 		return serviceSubset;
 	}
-	
+
 
 	private ActionSubset getActionSubset(){
 		//Create EntityIdentifier
-		EntityIdentifier ownerId = new EntityIdentifier();
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "testEntity", new Long(12345));
 		ActionSubset actionSubset = new ActionSubset("tennis");
-		
+
 		URL url = getClass().getResource("/tennis.txt");
 		BufferedReader br;
 		try {
@@ -478,14 +487,14 @@ public class TestUserPreferenceLearning extends TestCase{
 			//Read File Line By Line
 			while ((strLine = br.readLine()) != null)   {
 				String[] instance = strLine.split(",");
-				
+
 				CtxAttributeIdentifier action_attrId = new CtxAttributeIdentifier(entityId, "action", new Long(12345));
 				CtxAttribute action_attribute = new CtxAttribute(action_attrId);
 				Action value = new Action("tennis", instance[0]);
 				value.setServiceID(serviceId1);
 				byte[] blobValue = SerialisationHelper.serialise(value);
 				action_attribute.setBinaryValue(blobValue);
-				CtxHistoryAttribute action = new CtxHistoryAttribute(action_attribute);
+				CtxHistoryAttribute action = new CtxHistoryAttribute(action_attribute, ng.getNextValue());
 
 				//add context CtxHistoryAttribute attributes
 				ArrayList<CtxHistoryAttribute> context = new ArrayList<CtxHistoryAttribute>();
@@ -493,7 +502,7 @@ public class TestUserPreferenceLearning extends TestCase{
 					CtxAttributeIdentifier context_attrId = new CtxAttributeIdentifier(entityId, "context"+i, new Long(12345));
 					CtxAttribute context_attribute = new CtxAttribute(context_attrId);
 					context_attribute.setStringValue(instance[i]);
-					CtxHistoryAttribute nextContext = new CtxHistoryAttribute(context_attribute);
+					CtxHistoryAttribute nextContext = new CtxHistoryAttribute(context_attribute, ng.getNextValue());
 					context.add(nextContext);
 				}
 				actionSubset.put(action, context);
@@ -503,14 +512,13 @@ public class TestUserPreferenceLearning extends TestCase{
 		}
 		return actionSubset;
 	}
-	
-	
+
+
 	private String getTreeString(){
 		return null;
 	}
 
-
-	private void printDataset(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> dataset){
+	/*private void printDataset(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> dataset){
 		//printout full dataset test
 		for(Iterator<CtxHistoryAttribute> dataset_it = dataset.keySet().iterator(); dataset_it.hasNext();){
 			CtxHistoryAttribute printAction = dataset_it.next();
@@ -529,5 +537,5 @@ public class TestUserPreferenceLearning extends TestCase{
 				e.printStackTrace();
 			}
 		}
-	}
+	}*/
 }

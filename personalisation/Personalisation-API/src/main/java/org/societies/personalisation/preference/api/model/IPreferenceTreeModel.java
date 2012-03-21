@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -24,7 +29,8 @@ import java.util.Date;
 
 import javax.swing.tree.TreeModel;
 
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
 
 
 /**
@@ -60,7 +66,7 @@ public interface IPreferenceTreeModel extends TreeModel, Serializable {
 	 * model
 	 * @return	the serviceID as String
 	 */
-	public IServiceResourceIdentifier getServiceID();
+	public ServiceResourceIdentifier getServiceID();
 
 	/**
 	 * Method to retrieve the service type of the service affected by this preference
@@ -90,7 +96,7 @@ public interface IPreferenceTreeModel extends TreeModel, Serializable {
 	 * 
 	 * @param id    the serviceID
 	 */
-	public void setServiceID(IServiceResourceIdentifier id);
+	public void setServiceID(ServiceResourceIdentifier id);
 
 	/**
 	 * Method to set the serviceType of the service affected by this preference model

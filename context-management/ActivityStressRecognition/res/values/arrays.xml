@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="prefGenderValues">
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="prefGenderLabels">
+        <item>Female</item>
+        <item>Male</item>
+    </string-array>
+    <string-array name="prefTimerValues">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+    <string-array name="prefTimerLabels">
+        <item>1 minute</item>
+        <item>2 minutes</item>
+        <item>3 minutes</item>
+        <item>4 minutes</item>
+        <item>5 minutes</item>
+    </string-array>
+    <string-array name="prefDifficultyValues">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+    <string-array name="prefDifficultyLabels">
+        <item>Very easy</item>
+        <item>Easy</item>
+        <item>Moderate</item>
+        <item>Hard</item>
+        <item>Very hard</item>
+    </string-array>
+    <string-array name="prefActivityTraceValues">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
+    <string-array name="prefActivityTraceLabels">
+        <item>Sitting</item>
+        <item>Walking</item>
+        <item>Running</item>
+        <item>Running->Walking->Sitting</item>
+        <item>Walking->Running->Walking->Sitting->Running->Walking</item>
+        <item>Running->Walking->Sitting->Walking->Sitting->Running</item>
+    </string-array>
+</resources>
