@@ -11,8 +11,7 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
   
-<!--   <osgi:service ref="serviceMgmt" interface="org.societies.api.internal.servicelifecycle.serviceMgmt.IServiceManagement"/> -->
-<osgi:service ref="serListener" interface="org.societies.slm.servicecontrol.ServiceRegistryListener"/>	
+<!--<osgi:service ref="serListener" interface="org.societies.slm.servicecontrol.ServiceRegistryListener"/>-->	
 <osgi:service ref="serviceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"/>
 <osgi:service ref="serviceControl" interface="org.societies.api.servicelifecycle.IServiceControl"/>
 
