@@ -22,37 +22,55 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.osgi.event;
+package org.societies.comm.event.mock;
 
-import org.osgi.service.event.EventConstants;
+import java.io.Serializable;
+
 /**
  * 
  * @author pkuppuud
  *
  */
-public interface IEventMgr {
+public class MockCSSEvent implements Serializable {
 
 	/**
-	 * To subscribe a listener for events
-	 * 
-	 * @param listener instance of the EventListener
-	 * @param eventType	String array of event types {@link EventTypes}
-	 * @param filterOption a String containing an LDAP-style filter specification {@link EventConstants}
+	 * Default
 	 */
-	public void subscribeInternalEvent(EventListener listener, String[] eventTypes, String filterOption);
-	/**
-	 * To unSubscribe a listerner for events
-	 * @param listener
-	 * @param eventTypes
-	 * @param filterOption
-	 */
-	public void unSubscribeInternalEvent(EventListener listener, String[] eventTypes, String filterOption);
+	private static final long serialVersionUID = 1L;
 	
+	private String eventType;
+	private String eventName;
+	private String eventSource;
+	private String eventInfoAsXML;
+
 	/**
-	 * To publish a internal event
+	 * Constructor
 	 * 
-	 * @param event
-	 * @throws EMSException
+	 * @param eventType String for the type of event {@link EventTypes} 
+	 * @param eventName String for the name of event
+	 * @param eventSource String for the source component or peer id
+	 * @param eventInfo String for the event info as serialised XML
 	 */
-	public void publishInternalEvent(InternalEvent event) throws EMSException;
+	public MockCSSEvent(String eventType, String eventName, String eventSource, String eventInfoAsXML){
+		this.eventType = eventType;
+		this.eventName = eventName;
+		this.eventSource = eventSource;
+		this.eventInfoAsXML = eventInfoAsXML;
+	}
+
+	public String geteventInfoAsXML(){
+		return eventInfoAsXML;
+	}
+
+	public String geteventSource(){
+		return eventSource;
+	}
+
+	public String geteventName(){
+		return eventName;
+	}
+
+	public String geteventType(){
+		return eventType;
+	}
 }

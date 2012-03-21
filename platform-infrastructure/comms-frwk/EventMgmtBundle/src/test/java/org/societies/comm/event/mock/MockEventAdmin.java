@@ -22,37 +22,33 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.osgi.event;
+package org.societies.comm.event.mock;
 
-import org.osgi.service.event.EventConstants;
-/**
- * 
- * @author pkuppuud
- *
- */
-public interface IEventMgr {
+import junit.framework.Assert;
 
-	/**
-	 * To subscribe a listener for events
-	 * 
-	 * @param listener instance of the EventListener
-	 * @param eventType	String array of event types {@link EventTypes}
-	 * @param filterOption a String containing an LDAP-style filter specification {@link EventConstants}
-	 */
-	public void subscribeInternalEvent(EventListener listener, String[] eventTypes, String filterOption);
-	/**
-	 * To unSubscribe a listerner for events
-	 * @param listener
-	 * @param eventTypes
-	 * @param filterOption
-	 */
-	public void unSubscribeInternalEvent(EventListener listener, String[] eventTypes, String filterOption);
-	
-	/**
-	 * To publish a internal event
-	 * 
-	 * @param event
-	 * @throws EMSException
-	 */
-	public void publishInternalEvent(InternalEvent event) throws EMSException;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
+import org.societies.api.osgi.event.CSSEventConstants;
+import org.societies.api.osgi.event.EventTypes;
+
+public class MockEventAdmin implements EventAdmin {
+
+	public MockEventAdmin() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public void postEvent(Event testEvent) {
+		Assert.assertEquals(EventTypes.CONTEXT_EVENT, testEvent.getTopic());
+		Assert.assertEquals("css1", testEvent.getProperty(CSSEventConstants.EVENT_SOURCE));
+		Assert.assertEquals("css1_event", testEvent.getProperty(CSSEventConstants.EVENT_NAME));
+		Assert.assertEquals(
+				new String("content").toString(), 
+				testEvent.getProperty(CSSEventConstants.EVENT_INFO).toString());
+	}
+
+	public void sendEvent(Event arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

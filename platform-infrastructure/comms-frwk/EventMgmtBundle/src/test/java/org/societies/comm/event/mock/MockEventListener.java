@@ -22,37 +22,29 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.osgi.event;
+package org.societies.comm.event.mock; 
 
-import org.osgi.service.event.EventConstants;
+import org.societies.api.osgi.event.CSSEvent;
+import org.societies.api.osgi.event.EventListener;
+import org.societies.api.osgi.event.InternalEvent;
+
 /**
  * 
  * @author pkuppuud
  *
  */
-public interface IEventMgr {
+public class MockEventListener extends EventListener {
 
-	/**
-	 * To subscribe a listener for events
-	 * 
-	 * @param listener instance of the EventListener
-	 * @param eventType	String array of event types {@link EventTypes}
-	 * @param filterOption a String containing an LDAP-style filter specification {@link EventConstants}
-	 */
-	public void subscribeInternalEvent(EventListener listener, String[] eventTypes, String filterOption);
-	/**
-	 * To unSubscribe a listerner for events
-	 * @param listener
-	 * @param eventTypes
-	 * @param filterOption
-	 */
-	public void unSubscribeInternalEvent(EventListener listener, String[] eventTypes, String filterOption);
+	@Override
+	public void handleInternalEvent(InternalEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleExternalEvent(CSSEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
 	
-	/**
-	 * To publish a internal event
-	 * 
-	 * @param event
-	 * @throws EMSException
-	 */
-	public void publishInternalEvent(InternalEvent event) throws EMSException;
 }
