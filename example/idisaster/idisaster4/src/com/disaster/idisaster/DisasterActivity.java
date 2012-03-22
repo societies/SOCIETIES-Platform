@@ -25,6 +25,9 @@
 package com.disaster.idisaster;
 
 import android.app.ListActivity;
+import android.content.ContentResolver;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -49,6 +52,12 @@ public class DisasterActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
 	// TODO Auto-generated method stub
 	super.onCreate(savedInstanceState);
+	// Going to ask CisManager for Cis List:
+	ContentResolver cr = getContentResolver();
+	
+//	Uri uri;
+//	Cursor cursor = managedQuery(uri, null, null, null, null);
+	
 	setListAdapter(new ArrayAdapter<String>(this, R.layout.cis_list_item, CISLIST));
 
 	  ListView lv = getListView();
