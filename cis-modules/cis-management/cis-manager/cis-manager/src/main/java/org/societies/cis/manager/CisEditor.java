@@ -25,6 +25,7 @@
 
 package org.societies.cis.manager;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -67,7 +68,7 @@ import org.societies.api.schema.cis.manager.SubscribedTo;
 
 
 /**
- * This objecto corresponds to an owned CIS. The CIS record will be the CIS data which is stored on DataBase
+ * This object corresponds to an owned CIS. The CIS record will be the CIS data which is stored on DataBase
 */
 
 //@Component
@@ -81,9 +82,13 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 	
 	
 	private final static List<String> NAMESPACES = Collections
-			.singletonList("http://societies.org/api/schema/cis/community");
+			.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
+					  		"http://societies.org/api/schema/cis/community"));
+			//.singletonList("http://societies.org/api/schema/cis/community");
 	private final static List<String> PACKAGES = Collections
-			.singletonList("org.societies.api.schema.cis.community");
+			//.singletonList("org.societies.api.schema.cis.community");
+	.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
+		"org.societies.api.schema.cis.community"));
 	
 	private ICommManager CISendpoint;
 	
@@ -233,16 +238,19 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 
 			
 			CommunityManager cMan = new CommunityManager();
-			SubscribedTo s = (SubscribedTo) cMan.getSubscribedTo();
+			SubscribedTo s = new SubscribedTo();
 			s.setCisJid(this.getCisId());
 			s.setCisRole(role.toString());
 			cMan.setSubscribedTo(s);
 			
+			
+			LOG.info("finished building notification");
 
 			IIdentity targetCssIdentity = new IdentityImpl(jid);
 			Stanza sta = new Stanza(targetCssIdentity);
 			CISendpoint.sendMessage(sta, cMan);
 					
+			LOG.info("notification sent to the new user");
 			
 			//2) Sending a notification to all the other users // TODO: probably change this to a thread that process a queue or similar
 			
@@ -267,6 +275,7 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 				CISendpoint.sendMessage(sta, c);
 				
 		     }
+			LOG.info("notification sents to the existing user");
 
 			return true;
 		}else{

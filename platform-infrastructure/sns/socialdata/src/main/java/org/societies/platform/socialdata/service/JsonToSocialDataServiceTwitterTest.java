@@ -1,9 +1,6 @@
 package org.societies.platform.socialdata.service;
 
-import org.apache.shindig.social.opensocial.model.Person;
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.societies.api.internal.sns.ISocialConnector;
 
 
 

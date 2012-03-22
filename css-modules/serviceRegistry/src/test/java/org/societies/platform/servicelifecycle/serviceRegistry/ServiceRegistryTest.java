@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.CISNotFoundException;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.CSSNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.schema.servicelifecycle.model.Service;
@@ -62,6 +64,9 @@ public class ServiceRegistryTest extends
 	private String serviceUri = "testURI";
 	private static final int _numberOfServiceCreated=10; 
 	private List<Service> servicesList = generateServiceList(_numberOfServiceCreated);
+	private final String _cisTestId="CISid";
+	private final String _cisTestId1="CISid1";
+	
 
 	@Test
 	@Rollback(false)
@@ -132,8 +137,8 @@ public class ServiceRegistryTest extends
 	@Rollback(false)
 	public void notifyServiceSharedCIS() throws Exception{
 		for (Service service : servicesList) {
-			serReg.notifyServiceIsSharedInCIS(service.getServiceIdentifier(), "CISid");
-			serReg.notifyServiceIsSharedInCIS(service.getServiceIdentifier(), "CISid1");
+			serReg.notifyServiceIsSharedInCIS(service.getServiceIdentifier(), _cisTestId);
+			serReg.notifyServiceIsSharedInCIS(service.getServiceIdentifier(), _cisTestId1);
 		}
 	}
 	
@@ -142,7 +147,7 @@ public class ServiceRegistryTest extends
 	public void removeNotifyServiceSharedCIS() throws Exception{
 		
 			for (Service service : servicesList) {
-				serReg.removeServiceSharingInCIS(service.getServiceIdentifier(), "CISid1");
+				serReg.removeServiceSharingInCIS(service.getServiceIdentifier(), _cisTestId1);
 				
 			}
 	}
@@ -162,15 +167,29 @@ public class ServiceRegistryTest extends
 	}
 	
 	
+	
+	
 	@Test
-	@ExpectedException(ServiceRetrieveException.class)
+	@Rollback(false)
+	public void removeServiceCSS() throws CSSNotFoundException{
+		serReg.deleteServiceCSS(servicesList.get(0).getServiceInstance().getFullJid());
+	}
+	
+	@Test
+	@Rollback(false)
+	public void clearServiceCIS() throws CISNotFoundException{
+		serReg.clearServiceSharedCIS(_cisTestId);
+	}
+	
+	@Test
+	//@ExpectedException(ServiceRetrieveException.class)
 	@Rollback(false)
 	public void unregisterService() throws ServiceRetrieveException {
 		try {
-			serReg.unregisterServiceList(servicesList.subList(0, 4));
+			serReg.unregisterServiceList(servicesList);
 			ServiceResourceIdentifier sri = new ServiceResourceIdentifier();
-			sri.setIdentifier(new URI(serviceUri + "0"));
-			sri.setServiceInstanceIdentifier("0");
+			sri.setIdentifier(new URI("societies","the/path/of/the/service/v9",null));
+			sri.setServiceInstanceIdentifier("instance_9");
 			serReg.retrieveService(sri);
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
