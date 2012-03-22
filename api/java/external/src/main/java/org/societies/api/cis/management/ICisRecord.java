@@ -33,6 +33,7 @@ public interface ICisRecord {
     public String getCisId();
     public String getName();
     public String getOwnerId();
+    public String getCreationDate();
     public String setUserDefinedName(String _name);
     public String getUserDefineName();
 
