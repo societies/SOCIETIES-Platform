@@ -27,7 +27,6 @@ package org.societies.cis.android.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.api.cis.management.ICisEditor;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisRecord;
@@ -49,15 +48,6 @@ public class CisManager implements ICisManager {
     private List<ICisOwned> ownedDisasterList = new ArrayList<ICisOwned>();
     //List to hold disasters this users is only a member of:
     private List<ICisSubscribed> subscribedDisasterList = new ArrayList<ICisSubscribed>();
-
-    /* (non-Javadoc)
-     * @see org.societies.api.cis.management.ICisManager#createCis(java.lang.String, java.lang.String, java.lang.String, int)
-     */
-    public ICisEditor createCis(String cssId, String cssPassword,
-	    String cisName, int mode) {
-	// TODO Auto-generated method stub
-	return null;
-    }
 
     /* (non-Javadoc)
      * @see org.societies.api.cis.management.ICisManager#deleteCis(java.lang.String, java.lang.String, java.lang.String)
