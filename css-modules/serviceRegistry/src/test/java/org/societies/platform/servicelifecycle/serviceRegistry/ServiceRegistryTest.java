@@ -182,14 +182,14 @@ public class ServiceRegistryTest extends
 	}
 	
 	@Test
-	@ExpectedException(ServiceRetrieveException.class)
+	//@ExpectedException(ServiceRetrieveException.class)
 	@Rollback(false)
 	public void unregisterService() throws ServiceRetrieveException {
 		try {
-			serReg.unregisterServiceList(servicesList.subList(5, 9));
+			serReg.unregisterServiceList(servicesList);
 			ServiceResourceIdentifier sri = new ServiceResourceIdentifier();
-			sri.setIdentifier(new URI(serviceUri + "9"));
-			sri.setServiceInstanceIdentifier("9");
+			sri.setIdentifier(new URI("societies","the/path/of/the/service/v9",null));
+			sri.setServiceInstanceIdentifier("instance_9");
 			serReg.retrieveService(sri);
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
