@@ -1,32 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema elementFormDefault="qualified" version="1.0"
+	xmlns="http://societies.org/api/schema/useragent/monitoring"
 	targetNamespace="http://societies.org/api/schema/useragent/monitoring"
-	xmlns:tns="http://societies.org/api/schema/useragent/monitoring"
+	xmlns:tns="http://societies.org/api/schema/servicelifecycle/model"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
+
+	<xs:import namespace="http://societies.org/api/schema/servicelifecycle/model" 
+  			 schemaLocation="org.societies.api.schema.servicelifecycle.model.xsd"/>
+
+ 
 	<xs:element name="userActionMonitorBean">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="action" type="xs:string" minOccurs="0" />
 				<xs:element name="identity" type="xs:string" minOccurs="0" />
-				<xs:element name="method" type="tns:methodType" minOccurs="0" />
-				<xs:element name="serviceResourceIdentifier" type="tns:serviceResourceIdentifier"
-					minOccurs="0" />
+				<xs:element name="serviceResourceIdentifier" type="tns:serviceResourceIdentifier" minOccurs="0" />
+				<xs:element name="serviceType" type="xs:string" minOccurs="0" />
+				<xs:element name="parameterName" type="xs:string" minOccurs="0" />
+				<xs:element name="value" type="xs:string" minOccurs="0" />
+				<xs:element name="method" type="methodType" minOccurs="0" />
+				
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 
-	<xs:complexType name="serviceResourceIdentifier">
-		<xs:sequence>
-			<xs:element name="identifier" type="xs:anyURI" minOccurs="0" />
-			<xs:element name="serviceInstanceIdentifier" type="xs:string"
-				minOccurs="0" />
-		</xs:sequence>
-	</xs:complexType>
-
 	<xs:simpleType name="methodType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="monitor" />
+			<xs:enumeration value="registerForActionUpdates" />
 		</xs:restriction>
 	</xs:simpleType>
 </xs:schema>

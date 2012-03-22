@@ -69,7 +69,7 @@
 			  <xs:element ref='list'/>
 			  <xs:element ref='search-cis'/>
 			  <xs:element ref='configure'/>
-			  <xs:element name='subscribedTo'/>
+			  <xs:element ref='subscribedTo'/>
 	      </xs:choice>
 	    </xs:complexType>
 	</xs:element>

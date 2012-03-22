@@ -166,11 +166,14 @@ public class CisManager implements ICisManager, IFeatureServer{
 		//	return null;
 		//}
 		// TODO: review this logic as maybe I should probably check if it exists before creating
+		
 		CisEditor cis = new  CisEditor(cssId, cisName, cisType, mode,this.ccmFactory);		
-		if (ownedCISs.add(cis))
-			return (ICisOwned)cis.getCisRecord();
-		else
+		if (ownedCISs.add(cis)){
+			ICisOwned i = cis.getCisRecord();
+			return i;
+		}else{
 			return null;
+		}
 		
 	}
 
@@ -308,7 +311,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 				// GET LIST CODE of subscribedCIS
 				if(listingType.equals("subscribed") || listingType.equals("all")){
-					List<CisRecord> li = this.getOwnedCisList();
+					List<CisRecord> li = this.getSubscribedCisList();
 					Iterator<CisRecord> it = li.iterator();
 					
 					while(it.hasNext()){

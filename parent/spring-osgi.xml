@@ -108,6 +108,12 @@
 			</snapshots>
 		</repository>
 
+		<!-- General repository -->
+		<repository>
+			<id>mvnrepository.com</id>
+			<name>mvnrepository.com</name>
+			<url>http://mvnrepository.com/artifact/</url>
+		</repository>
 	</repositories>
 
 
