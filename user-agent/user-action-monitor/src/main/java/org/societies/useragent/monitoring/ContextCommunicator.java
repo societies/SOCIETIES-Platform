@@ -51,7 +51,7 @@ public class ContextCommunicator {
 	public void updateHistory(IIdentity owner, IAction action){
 		try {
 			//Get Entity with serviceId
-			Future<List<CtxIdentifier>> futureEntityIDs = ctxBroker.lookup(CtxModelType.ENTITY, serviceId.getIdentifier().toString());
+			Future<List<CtxIdentifier>> futureEntityIDs = ctxBroker.lookup(CtxModelType.ENTITY, action.getServiceID().getIdentifier().toString());
 			List<CtxIdentifier> entityIds = futureEntityIDs.get();
 			if(entityIds.size() > 0){
 				//Get Attribute from Entity with parameter name
