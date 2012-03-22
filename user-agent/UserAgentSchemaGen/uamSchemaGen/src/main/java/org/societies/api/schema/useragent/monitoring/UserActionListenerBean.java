@@ -24,6 +24,8 @@
  */
 
 package org.societies.api.schema.useragent.monitoring;
+import android.content.ContentResolver;
+import android.os.Bundle;
 
 import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean.methodType;
 
@@ -33,5 +35,14 @@ public class UserActionListenerBean {
 	private methodType method;
 	private String parameterName; //IAction.parameterName
 	private String value;  
+    /* (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+	// TODO Auto-generated method stub
+	super.onCreate(savedInstanceState);
+	ContentResolver cr = getContentResolver();
+    }
 
 }

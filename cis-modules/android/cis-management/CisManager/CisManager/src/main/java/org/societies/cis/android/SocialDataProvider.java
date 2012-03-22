@@ -26,31 +26,50 @@ package org.societies.cis.android;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 /**
- * This is the Android CisManager. It provides a content provider interface to access CIS data.
- * It communicates with CisManager on cloud using the communication framework.
+ * This is the Android-based SocialDataProvider. It provides a content provider interface to access CIS and related data.
+ * 
  * 
  * @author Babak.Farshchian@sintef.no
  *
  */
-public class CisManager extends ContentProvider {
+public class SocialDataProvider extends ContentProvider {
 
     public static final Uri CONTENT_URI = 
-            Uri.parse("content://org.societies.cis.android.provider");
+            Uri.parse("content://org.societies.cis.android.SocialDataProvider");
     
-    /* (non-Javadoc)
-     * @see android.content.ContentProvider#delete(android.net.Uri, java.lang.String, java.lang.String[])
+    private boolean online = false; // True when we are online.
+    private DatabaseAdapter dbAdapter = null;
+    private CommunicationAdapter comAdapter = null;
+    /* 
+     * Here I should do the following:
+     * - Create a CommunicationAdapter and try to get connection with cloud CisManager
+     * - Initiate local database if any
+     * 
+     * (non-Javadoc)
+     * @see android.content.ContentProvider#onCreate()
      */
-    
     @Override
     public boolean onCreate() {
 	// TODO Auto-generated method stub
+	Context context = getContext();
+	dbAdapter = new DatabaseAdapter(context);
+	comAdapter = new CommunicationAdapter();
+	comAdapter.goOnline();
+	if (comAdapter.isOnline()){
+	    online = true;
+	}
 	return false;
     }
 
+    /* (non-Javadoc)
+     * @see android.content.ContentProvider#delete(android.net.Uri, java.lang.String, java.lang.String[])
+     */
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
 	// TODO Auto-generated method stub
@@ -85,6 +104,8 @@ public class CisManager extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection,
 	    String[] selectionArgs, String sortOrder) {
 	// TODO Auto-generated method stub
+	SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+
 	return null;
     }
 
@@ -97,5 +118,23 @@ public class CisManager extends ContentProvider {
 	// TODO Auto-generated method stub
 	return 0;
     }
+    /**
+     * Constants and helpers for the CIS metadata table
+     * 
+     * @author Babak.Farshchian@sintef.no
+     *
+     */
+    public boolean isOnline(){
+	return online;
+    }
+    
+    public static final class Groups {
+	String _ID = "_id"; //Key column in the table
+	String NAME = "name"; //Name column in the group
+	String JID = "jid"; //Unique JID of the group
+	String OWNER = "owner"; //Owner CSS jid of the group
+	String CREATION_DATE = "creation_date";	
+    };
+    
 
 }

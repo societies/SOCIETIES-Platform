@@ -36,15 +36,16 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
+ * 
  * @author Babak.Farshchian@sintef.no
  *
  */
-public class CisDatabaseAdapter {
-	private static final String DB_NAME = "cis.db";
+class DatabaseAdapter {
+	private static final String DB_NAME = "groups.db";
 	private static final String TABLE_NAME = "groups";
 	private static final int DB_VERSION = 1;
 	
-	//DB column names:
+	//DB column names. These are moved to SocialDataProvider.Groups
 	private static final String KEY_ID = "_id"; //Key
 	private static final String KEY_NAME = "name"; //Name of the group
 	private static final String KEY_JID = "jid"; //unique JID of the group
@@ -97,7 +98,7 @@ public class CisDatabaseAdapter {
 	}
 	private CisDBOpenHelper dbHelper;
 	
-	public CisDatabaseAdapter(Context _context){
+	public DatabaseAdapter(Context _context){
 		this.context = _context;
 		dbHelper = new CisDBOpenHelper(context, DB_NAME, null, DB_VERSION);
 	}
