@@ -8,6 +8,13 @@
     <packaging>pom</packaging>
     <name>CisDirectory - Parent</name>
 
+   <parent>
+        <groupId>org.societies</groupId>
+        <artifactId>android-parent</artifactId>
+        <version>0.1</version>
+        <relativePath>../../../parent/android.xml</relativePath>
+   </parent>
+
     <modules>
         <module>CisDirectory</module>
         <module>CisDirectory-it</module>
