@@ -59,7 +59,7 @@ public class SocialDataProvider extends ContentProvider {
 	// TODO Auto-generated method stub
 	Context context = getContext();
 	dbAdapter = new DatabaseAdapter(context);
-	comAdapter = new CommunicationAdapter();
+	comAdapter = new CommunicationAdapter(context);
 	comAdapter.goOnline();
 	if (comAdapter.isOnline()){
 	    online = true;
@@ -85,7 +85,8 @@ public class SocialDataProvider extends ContentProvider {
 	return null;
     }
 
-    /* (non-Javadoc)
+    /* 
+     * (non-Javadoc)
      * @see android.content.ContentProvider#insert(android.net.Uri, android.content.ContentValues)
      */
     @Override

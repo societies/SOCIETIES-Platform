@@ -23,6 +23,9 @@ public class CisManagerActivity extends Activity {
         Log.i(this, "onCreate");
 
         setContentView(R.layout.main);
+        CommunicationAdapter comAd = new CommunicationAdapter(this);
+        CisRecord group = new CisRecord("A", "B", "C", "D");
+        comAd.createGroup(group);
     }
 
 }

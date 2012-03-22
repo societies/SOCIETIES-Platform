@@ -27,21 +27,26 @@ package org.societies.cis.android;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jivesoftware.smack.packet.IQ;
+import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.schema.cis.manager.Create;
+import org.societies.api.schema.cssmanagement.CssRecord;
+import org.societies.api.schema.cssmanagement.MethodType;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.identity.IdentityManagerImpl;
 
+import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
 /**
  * In charge of setting up communication with the CisManager cloud.
  * 
- * TODO: This should be generalized later for different types of conenctions.
+ * TODO: This should be generalized later for different types of connections.
  * 
  * @author Babak.Farshchian@sintef.no
  *
@@ -52,22 +57,30 @@ class CommunicationAdapter {
 	
     // Get an identifier for log messages:
     private static final String LOG_TAG = CommunicationAdapter.class.getName();
-    //TODO: change these to the CIS manager relevant beans!
-    private static final List<String> ELEMENT_NAMES = Arrays.asList("communities", "subscribedTo");
+    //CIS manager relevant messages:
+    private static final List<String> ELEMENT_NAMES = Arrays.asList("communities", "subscribedTo",
+	    	"community-manager", "community", "create", "configure", "search-cis", "list", "delete");
     //Specify the XCCom name spaces you understand:
     private static final List<String> NAME_SPACES = Arrays.asList(
-	    		"http://societies.org/api/schema/cis/manager");
+	    		"http://societies.org/api/schema/cis/manager",
+	    		"http://societies.org/api/schema/cis/community");
     // TODO: What does this mean?
     private static final List<String> PACKAGES = Arrays.asList(
-			"org.societies.api.schema.cis.manager");
+			"org.societies.api.schema.cis.manager",
+			"org.societies.api.schema.cis.community");
     //TODO: Address of the cloud node? I thought this was set in the comms manager?
     private static final String DESTINATION = "xcmanager.jabber.sintef9013.com";
 
     private final IIdentity toXCManager;
-    private final ICommCallback callback = createCallback();
+    private final ICommCallback callback;
     private ClientCommunicationMgr ccm;
+    private Context context;
 
-    public CommunicationAdapter(){
+    public CommunicationAdapter(Context _context){
+	context = _context;
+	//Create a callback class that will handle incoming messages:
+	callback = new CommunicationCallback(context, NAME_SPACES,PACKAGES);
+	
     	try {
     	    toXCManager = IdentityManagerImpl.staticfromJid(DESTINATION);
     	    } catch (InvalidFormatException e) {
@@ -104,52 +117,49 @@ class CommunicationAdapter {
 	// TODO: clean up network
 	return 0;
     }
-    private ICommCallback createCallback() {
-    	return new ICommCallback() {
-
-			public List<String> getXMLNamespaces() {
-				return NAME_SPACES;
-			}
-
-			public List<String> getJavaPackages() {
-				return PACKAGES;
-			}
-
-			public void receiveResult(Stanza stanza, Object payload) {
-				Log.d(LOG_TAG, "receiveResult");
-				Log.d(LOG_TAG, "Payload class of type: " + payload.getClass().getName());
-				debugStanza(stanza);				
-			}
-
-			public void receiveError(Stanza stanza, XMPPError error) {
-				Log.d(LOG_TAG, "receiveError");
-			}
-
-			public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
-				Log.d(LOG_TAG, "receiveInfo");
-			}
-
-			public void receiveMessage(Stanza stanza, Object payload) {
-				Log.d(LOG_TAG, "receiveMessage");
-				debugStanza(stanza);
-				
-			}
-			
-			private void debugStanza(Stanza stanza) {
-				Log.d(LOG_TAG, "id="+stanza.getId());
-				Log.d(LOG_TAG, "from="+stanza.getFrom());
-				Log.d(LOG_TAG, "to="+stanza.getTo());
-			}
-
-			public void receiveItems(Stanza stanza, String node, List<String> items) {
-				Log.d(LOG_TAG, "receiveItems");
-				debugStanza(stanza);
-				Log.d(LOG_TAG, "node: "+node);
-				Log.d(LOG_TAG, "items:");
-				for(String  item:items)
-					Log.d(LOG_TAG, item);
-			}
-		};
+    /**
+     * Starts an asynch task to go out in the network and create a group
+     * in the CisManager cloud.
+     * 
+     * TODO This method should return possible error message code
+     * @param _record
+     */
+    public void createGroup(ICisRecord _record){
+	CreateGroupTask task = new CreateGroupTask(context);
+	task.execute(_record);
+	
     }
+    
+    private class CreateGroupTask extends AsyncTask<ICisRecord, Integer, Integer> {
 
+    	private Context context;
+    	private ICisRecord group;
+    	
+    	public CreateGroupTask(Context _context) {
+    		context = _context;
+    	}
+
+    	protected Integer doInBackground(ICisRecord... args) {
+    		ccm = new ClientCommunicationMgr(context);
+    		//We create only one group:
+    		group = args[0];
+    		//Create bean to send over:
+    		Create messageBean = new Create();
+    		//Populate the data from provided CisRecord:
+    		messageBean.setCommunityName(group.getName());
+    		messageBean.setOwnerJid(group.getOwnerId());
+    		
+    		Stanza stanza = new Stanza(toXCManager);
+    		//Try to send the message:
+    		try {
+    			ccm.register(ELEMENT_NAMES, callback);
+    			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
+    			Log.d(LOG_TAG, "Send stanza");
+    			} catch (Exception e) {
+    			    Log.e(this.getClass().getName(), e.getMessage());
+    			    }
+            return null;
+    	}
+    }
+ 
 }
