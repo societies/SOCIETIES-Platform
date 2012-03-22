@@ -218,7 +218,7 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 		
 		IIdentity toIdentity;
 		try {
-			toIdentity = idMgr.fromJid("XCManager.societies.local");
+			toIdentity = idMgr.fromJid("xcmanager.societies.local");
 		} catch (InvalidFormatException e) {
 			LOG.error("reject({}): ", sessionId, e);
 			return;
