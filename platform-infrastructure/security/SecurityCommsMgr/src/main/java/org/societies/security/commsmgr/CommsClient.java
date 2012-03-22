@@ -133,7 +133,25 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
-		LOG.debug("receiveMessage()");
+
+		LOG.debug("receiveMessage({}, {})", stanza, payload);
+		LOG.debug("receiveMessage(): stanza.id   = ", stanza.getId());
+		LOG.debug("receiveMessage(): stanza.from = ", stanza.getFrom());
+		LOG.debug("receiveMessage(): stanza.to   = ", stanza.getTo());
+		
+		if (payload != null && payload instanceof ProviderBean) {
+			
+			// Method parameters
+			ProviderBean providerBean = (ProviderBean) payload;
+			String serviceId = providerBean.getServiceId();
+			int sessionId = providerBean.getSessionId();
+			String signedPolicyOption = providerBean.getSignedPolicyOption();
+			boolean isModified = providerBean.isModified();
+			
+			LOG.debug("receiveMessage(): NegotiationProvider. Method: " + providerBean.getMethod());
+			LOG.debug("receiveMessage(): NegotiationProvider. Params: " + serviceId + ", " +
+					isModified + ", " +	sessionId + ", " + signedPolicyOption);
+		}
 	}
 
 	@Override
