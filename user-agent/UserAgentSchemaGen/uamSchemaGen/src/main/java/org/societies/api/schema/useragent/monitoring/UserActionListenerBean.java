@@ -23,13 +23,15 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.useragent.monitoring;
+package org.societies.api.schema.useragent.monitoring;
 
-public interface IInternalUserActionMonitor {
+import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean.methodType;
+
+public class UserActionListenerBean {
 	
-	/**
-	 * This method allows platform components to register for events that occur when actions are received
-	 */
-	public void registerForActionUpdates(IUserActionListener listener);
+	public enum methodType {handleUserAction};
+	private methodType method;
+	private String parameterName; //IAction.parameterName
+	private String value;  
 
 }

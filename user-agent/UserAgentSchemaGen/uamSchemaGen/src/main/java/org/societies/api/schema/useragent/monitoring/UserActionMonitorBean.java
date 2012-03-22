@@ -23,11 +23,14 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 
 public class UserActionMonitorBean {
 
-	public enum methodType {monitor};
+	public enum methodType {monitor, registerForActionUpdates};
 	private methodType method;
-	private ServiceResourceIdentifier serviceId;
 	private String owner; //IIdentity
-	private String action; //IAction
+	private ServiceResourceIdentifier serviceId;
+	private String serviceType;
+	private String parameterName; //IAction.parameterName
+	private String value;  //IAction.value
+	//private IUserActionListener listener;
 
 	public methodType getMethod(){
 		return method;
@@ -53,11 +56,27 @@ public class UserActionMonitorBean {
 		this.serviceId = serviceId;
 	}
 	
-	public String getAction(){
-		return this.action;
+	public String getServiceType(){
+		return this.serviceType;
 	}
 	
-	public void setAction(String action){
-		this.action = action;
+	public void setServiceType(String serviceType){
+		this.serviceType = serviceType;
+	}
+	
+	public String getParameterName(){
+		return this.parameterName;
+	}
+	
+	public void setParameterName(String parameterName){
+		this.parameterName = parameterName;
+	}
+	
+	public String getValue(){
+		return this.value;
+	}
+	
+	public void setValue(String value){
+		this.value = value;
 	}
 }
