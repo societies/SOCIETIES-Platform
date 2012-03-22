@@ -167,7 +167,7 @@ public class ServiceRegistryTest extends
 	@Rollback(false)
 	public void unregisterService() throws ServiceRetrieveException {
 		try {
-			serReg.unregisterServiceList(servicesList);
+			serReg.unregisterServiceList(servicesList.subList(0, 4));
 			ServiceResourceIdentifier sri = new ServiceResourceIdentifier();
 			sri.setIdentifier(new URI(serviceUri + "0"));
 			sri.setServiceInstanceIdentifier("0");

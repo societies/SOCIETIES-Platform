@@ -48,9 +48,20 @@
       		</xs:sequence>
 	    </xs:complexType>
 	</xs:element>
+	
+	<xs:element name='subscribedTo'>
+	    <xs:complexType>
+	      <xs:simpleContent>
+	        <xs:extension base='empty'>
+	          <xs:attribute name='cis-jid' type='xs:string' use='required'/> 
+	          <xs:attribute name='cis-role' type='xs:string' use='required'/> 
+	        </xs:extension>
+	      </xs:simpleContent>
+	    </xs:complexType>
+	</xs:element>
 
 
-	<xs:element name='community'>
+	<xs:element name='community-manager'>
 	   <xs:complexType>
 	      <xs:choice>
 	          <xs:element ref='create'/>
@@ -58,10 +69,21 @@
 			  <xs:element ref='list'/>
 			  <xs:element ref='search-cis'/>
 			  <xs:element ref='configure'/>
+			  <xs:element ref='subscribedTo'/>
 	      </xs:choice>
-	      <xs:attribute name='community-jid' type='xs:string'/>
 	    </xs:complexType>
 	</xs:element>
+	
+	<xs:element name='community'>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base='empty'>
+         	<xs:attribute name='community-jid' type='xs:string'/><!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
 	
 	<xs:element name='create'>
     <xs:complexType>

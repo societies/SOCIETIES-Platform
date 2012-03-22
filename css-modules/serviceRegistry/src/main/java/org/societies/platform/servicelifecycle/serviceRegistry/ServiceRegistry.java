@@ -7,6 +7,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Example;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -92,7 +93,20 @@ public class ServiceRegistry implements IServiceRegistry {
 						tmpRegistryEntry.getServiceIdentifier());
 				Transaction t = session.beginTransaction();
 
+				//Delete the corresponding entry for service shared in CIS sorry for criterion name ;)
+				Criterion a = Restrictions.eq("serviceResourceIdentifier.identifier", service.getServiceIdentifier().getIdentifier().toString());
+				Criterion b = Restrictions.eq("serviceResourceIdentifier.instanceId", service.getServiceIdentifier().getServiceInstanceIdentifier());
+
+				List<ServiceSharedInCISDAO> serviceSharedInCISList = (List<ServiceSharedInCISDAO> ) session.createCriteria(ServiceSharedInCISDAO.class)
+	                    .add(Restrictions.and(a, b)).list();
+	  for (ServiceSharedInCISDAO serviceSharedInCISDAO : serviceSharedInCISList) {
+		  session.delete(serviceSharedInCISDAO);
+	}
+	                    
+
+				
 				session.delete(obj);
+				
 
 				t.commit();
 			}

@@ -33,6 +33,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.security.digsig.ISignatureMgr;
+import org.societies.security.policynegotiator.requester.NegotiationRequester;
 
 /**
  * 
@@ -66,7 +67,7 @@ public class NegotiationRequesterUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.policynegotiator.NegotiationRequester#acceptUnmodifiedPolicy(int, java.lang.String)}.
+	 * Test method for {@link org.societies.security.policynegotiator.requester.NegotiationRequester#acceptUnmodifiedPolicy(int, java.lang.String)}.
 	 */
 	@Test
 	public void testAcceptUnmodifiedPolicy() {
@@ -74,7 +75,7 @@ public class NegotiationRequesterUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.policynegotiator.NegotiationRequester#reject(int)}.
+	 * Test method for {@link org.societies.security.policynegotiator.requester.NegotiationRequester#reject(int)}.
 	 */
 	@Test
 	public void testReject() {
@@ -92,7 +93,7 @@ public class NegotiationRequesterUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.policynegotiator.NegotiationRequester#acceptModifiedPolicy(int, java.lang.Object)}.
+	 * Test method for {@link org.societies.security.policynegotiator.requester.NegotiationRequester#acceptModifiedPolicy(int, java.lang.Object)}.
 	 */
 	@Test
 	public void testAcceptModifiedPolicy() {
@@ -100,7 +101,7 @@ public class NegotiationRequesterUnitTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.security.policynegotiator.NegotiationRequester#receiveResult(java.lang.Object)}.
+	 * Test method for {@link org.societies.security.policynegotiator.requester.NegotiationRequester#receiveResult(java.lang.Object)}.
 	 */
 	@Test
 	public void testReceiveResult() {
