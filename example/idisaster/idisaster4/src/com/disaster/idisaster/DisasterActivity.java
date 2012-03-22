@@ -49,7 +49,7 @@ public class DisasterActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
 	// TODO Auto-generated method stub
 	super.onCreate(savedInstanceState);
-	setListAdapter(new ArrayAdapter<String>(this, R.layout.cis_list_item, CISLIST));
+	setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, CISLIST));
 
 	  ListView lv = getListView();
 	  lv.setTextFilterEnabled(true);

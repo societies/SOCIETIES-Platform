@@ -49,7 +49,7 @@ public class FeedActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
 	// TODO Auto-generated method stub
 	super.onCreate(savedInstanceState);
-	setListAdapter(new ArrayAdapter<String>(this, R.layout.cis_list_item, FEEDLIST));
+	setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, FEEDLIST));
 
 	  ListView lv = getListView();
 	  lv.setTextFilterEnabled(true);
