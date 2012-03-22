@@ -22,19 +22,60 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.management;
+package org.societies.api.servicelifecycle;
+
+import java.net.URL;
+
+import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
- * @author Babak.Farshchian@sintef.no
+ * The interface class for remote calls to the Service Control component. It permits a caller to tell the SLM to
+ * start a service, to stop a service, to install a new service and to uninstall a service.
+ *
+ * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
  */
-public interface ICisRecord {
+public interface IServiceControlRemote {
 
-    public String getCisId();
-    public String getName();
-    public String getOwnerId();
-    public String getCreationDate();
-    public String setUserDefinedName(String _name);
-    public String getUserDefineName();
+	/**
+	 * This method starts the service that is identified by the </code>ServiceResourceIdentifier</code>
+	 * 
+	 * @param serviceId unique service identifier
+	 * @param node The node where the service is located
+	 * @param callback The callback object
+	 */
+	
+	public void startService(ServiceResourceIdentifier serviceId, IIdentity node, IServiceControlCallback callback);
 
+	
+	/**
+	 * This method stops the service running in the container that is identified by the </code>ServiceResourceIdentifier</code>
+	 * 
+	 * @param serviceId unique service identifier
+	 * @param node The node where the service is located
+	 * @param callback The callback object
+	 */
+	public void stopService(ServiceResourceIdentifier serviceId, IIdentity node, IServiceControlCallback callback);
+	
+	/**
+	 * This method install a new service into the container
+	 * 
+	 * @param serviceLocation the URL of the bundle to install
+	 * @param node The node where the service is located
+	 * @param callback The callback object
+	 */
+	public void installService(URL bundleLocation, IIdentity node, IServiceControlCallback callback);
+
+	/**
+	 * This method removes a service from the container.
+	 * 
+	 * @param serviceId unique service identifier
+	 * @param node The node where the service is located
+	 * @param callback The callback object
+	 */
+	public void uninstallService(ServiceResourceIdentifier serviceId, IIdentity node, IServiceControlCallback callback);
+
+	
+	
 }

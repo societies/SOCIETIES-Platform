@@ -58,6 +58,8 @@ import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.ParticipantRole;
 import org.societies.api.schema.cis.community.Add;
 import org.societies.api.schema.cis.community.Subscription;
+import org.societies.api.schema.cis.manager.CommunityManager;
+import org.societies.api.schema.cis.manager.SubscribedTo;
 
 /**
  * @author Thomas Vilarinho (Sintef)
@@ -90,7 +92,6 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 
 	public Set<CisParticipant> membersCss; // TODO: this may be implemented in the CommunityManagement bundle. we need to define how they work together
 	
-	//public static final int MAX_NB_MEMBERS = 100;// TODO: this is temporary, we have to set the memberCss to something more suitable
 
 
 	private static Logger LOG = LoggerFactory
@@ -99,8 +100,7 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 
 
 
-	// it expects an existing Pubsubclient in the container in which it will autowire
-	//@Autowired	
+	// at the moment we are not using this constructor, but just the one below, as that one generates the CIS id for us
 	public CisEditor(String ownerCss, String cisId,String host,
 			int membershipCriteria, String permaLink, String password,ICISCommunicationMgrFactory ccmFactory) {
 		
@@ -231,27 +231,26 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 			
 			// 1) Notifying the added user
 
-			Participant p = new Participant();
-			p.setJid(jid);
-			p.setRole( ParticipantRole.fromValue(role.toString())  );
+			
+			CommunityManager cMan = new CommunityManager();
+			SubscribedTo s = (SubscribedTo) cMan.getSubscribedTo();
+			s.setCisJid(this.getCisId());
+			s.setCisRole(role.toString());
+			cMan.setSubscribedTo(s);
+			
 
-			
-			
-			Community c = new Community();
-			LOG.info( jid + " being added");
-			Subscription sub = new Subscription();
-			sub.setParticipant(p);
-			c.setSubscription(sub);
 			IIdentity targetCssIdentity = new IdentityImpl(jid);
 			Stanza sta = new Stanza(targetCssIdentity);
-			CISendpoint.sendMessage(sta, c);
-
-			
+			CISendpoint.sendMessage(sta, cMan);
+					
 			
 			//2) Sending a notification to all the other users // TODO: probably change this to a thread that process a queue or similar
 			
 			//creating payload
-			c = new Community();
+			Participant p = new Participant();
+			p.setJid(jid);
+			p.setRole( ParticipantRole.fromValue(role.toString())  );
+			Community c = new Community();
 			Who w = new Who();
 			w.getParticipant().add(p);// p has been set on the 1st message
 			c.setWho(w);
@@ -424,10 +423,6 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 					try{
 						if(this.addMember(p.getJid(), MembershipType.valueOf(role))){
 							a.setParticipant(p);
-							// here we send the notification to the user that he has been added
-							IIdentity targetCssIdentity = new IdentityImpl(p.getJid());
-							Stanza s = new Stanza(targetCssIdentity);
-							CISendpoint.sendMessage(s, result);
 						}
 					}
 					catch(Exception e){
@@ -471,7 +466,7 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 	@Override
 	public String getCisId() {
 	
-		return this.cisRecord.getCisJID();
+		return this.cisRecord.getCisId();
 	}
 
 	@Override

@@ -22,19 +22,59 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.management;
+package org.societies.slm.servicecontrol;
+
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
+import org.societies.api.servicelifecycle.IServiceControlCallback;
 
 /**
- * @author Babak.Farshchian@sintef.no
+ * The callback to a remote service control call
+ * 
+ * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
  */
-public interface ICisRecord {
+public class ServiceControlRemoteClient implements IServiceControlCallback {
 
-    public String getCisId();
-    public String getName();
-    public String getOwnerId();
-    public String getCreationDate();
-    public String setUserDefinedName(String _name);
-    public String getUserDefineName();
+	static final Logger logger = LoggerFactory.getLogger(ServiceControlRemoteClient.class);
+
+	private final long TIMEOUT = 5;
+	
+	private ServiceControlResult result;
+	private BlockingQueue<ServiceControlResult> resultList;
+	
+	public ServiceControlRemoteClient(){
+		
+		resultList = new ArrayBlockingQueue<ServiceControlResult>(1);
+		if(logger.isDebugEnabled())
+			logger.debug("ServiceControlRemoteClient created");
+		
+	}
+
+	@Override
+	public void setResult(ServiceControlResult result) {
+		try {
+			resultList.put(result);
+		} catch (InterruptedException e) {
+			logger.error("Error putting result in List");
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public ServiceControlResult getResult() {
+		try {
+			return resultList.poll(TIMEOUT, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			logger.error("Error getting result in List");
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 }
