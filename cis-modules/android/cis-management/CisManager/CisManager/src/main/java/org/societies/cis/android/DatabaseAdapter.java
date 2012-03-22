@@ -127,7 +127,7 @@ class DatabaseAdapter {
 		newValues.put(KEY_NAME, _cis.getName());
 		newValues.put(KEY_JID, _cis.getCisId());
 		newValues.put(KEY_OWNER, _cis.getOwnerId());
-		newValues.put(KEY_CREATION_DATE, _cis.getCreationDate());
+//		newValues.put(KEY_CREATION_DATE, _cis.getCreationDate());
 		//Insert the row:
 		return db.insert(TABLE_NAME, null, newValues);
 	}
