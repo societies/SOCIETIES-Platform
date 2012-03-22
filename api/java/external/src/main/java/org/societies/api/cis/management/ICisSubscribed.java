@@ -31,6 +31,6 @@ package org.societies.api.cis.management;
  * @author Babak.Farshchian@sintef.no
  *
  */
-public interface ICisSubscribed extends ICis {
+public interface ICisSubscribed extends ICisRecord {
 
 }
