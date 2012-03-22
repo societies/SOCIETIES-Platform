@@ -68,6 +68,12 @@ public class DisasterActivity extends ListActivity {
     	// TODO Auto-generated method stub
 
     	super.onCreate(savedInstanceState);
+	// Going to ask CisManager for Cis List:
+	ContentResolver cr = getContentResolver();
+	
+//	Uri uri;
+//	Cursor cursor = managedQuery(uri, null, null, null, null);
+	
     	
     	setContentView (R.layout.disaster_layout);
     	ListView listView = getListView();
