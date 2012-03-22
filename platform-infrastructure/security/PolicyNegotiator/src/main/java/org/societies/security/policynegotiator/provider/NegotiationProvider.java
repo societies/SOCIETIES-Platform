@@ -82,7 +82,7 @@ public class NegotiationProvider implements INegotiationProvider {
 	}
 	
 	@Override
-	public Future<SlaBean> getPolicyOptions() {
+	public Future<SlaBean> getPolicyOptions(String serviceId) {
 		
 		SlaBean sla = new SlaBean();
 		Random rnd = new Random();

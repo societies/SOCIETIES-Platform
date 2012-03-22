@@ -160,6 +160,7 @@ public class CommsServer implements IFeatureServer {
 			ProviderBean providerBean = (ProviderBean) messageBean;
 			int sessionId = providerBean.getSessionId();
 			String signedPolicyOption = providerBean.getSignedPolicyOption();
+			String serviceId = providerBean.getServiceId();
 			boolean isModified = providerBean.isModified();
 			
 			LOG.debug("receiveMessage(): NegotiationProvider. Params: " + isModified + ", " +
@@ -167,7 +168,8 @@ public class CommsServer implements IFeatureServer {
 			
 			switch (providerBean.getMethod()) {
 			case GET_POLICY_OPTIONS:
-				negotiationProvider.getPolicyOptions();
+				LOG.debug("receiveMessage(): NegotiationProvider.getPolicyOptions({})" + serviceId);
+				negotiationProvider.getPolicyOptions(serviceId);
 				break;
 			case ACCEPT_POLICY_AND_GET_SLA:
 				negotiationProvider.acceptPolicyAndGetSla(sessionId, signedPolicyOption, isModified);

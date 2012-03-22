@@ -105,6 +105,7 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 	 */
 	@Override
 	public List<String> getJavaPackages() {
+		LOG.debug("getJavaPackages()");
 		return PACKAGES;
 	}
 
@@ -116,23 +117,28 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 	 */
 	@Override
 	public List<String> getXMLNamespaces() {
+		LOG.debug("getXMLNamespaces()");
 		return NAMESPACES;
 	}
 
 	@Override
-	public void receiveError(Stanza arg0, XMPPError arg1) {
+	public void receiveError(Stanza stanza, XMPPError error) {
+		LOG.debug("receiveError()");
 	}
 
 	@Override
-	public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
+	public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
+		LOG.debug("receiveInfo()");
 	}
 
 	@Override
-	public void receiveMessage(Stanza arg0, Object arg1) {
+	public void receiveMessage(Stanza stanza, Object payload) {
+		LOG.debug("receiveMessage()");
 	}
 
 	@Override
-	public void receiveResult(Stanza arg0, Object arg1) {
+	public void receiveResult(Stanza stanza, Object payload) {
+		LOG.debug("receiveResult()");
 	}
 
 	/*
@@ -143,8 +149,8 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 	 * java.util.List)
 	 */
 	@Override
-	public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
-		// TODO Auto-generated method stub
+	public void receiveItems(Stanza stanza, String node, List<String> items) {
+		LOG.debug("receiveItems()");
 	}
 
 	/*
@@ -199,9 +205,33 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 	 */
 	@Override
 	@Async
-	public void getPolicyOptions(INegotiationProviderCallback callback) {
+	public void getPolicyOptions(String serviceId, INegotiationProviderCallback callback) {
 		
-		LOG.debug("getPolicyOptions({})", callback);
+		LOG.debug("getPolicyOptions({})", serviceId);
+		
+		IIdentity toIdentity;
+		try {
+			toIdentity = idMgr.fromJid("xcmanager.societies.local");
+		} catch (InvalidFormatException e) {
+			LOG.error("getPolicyOptions({}): ", serviceId, e);
+			return;
+		}
+		
+		Stanza stanza = new Stanza(toIdentity);
+
+		// CREATE MESSAGE BEAN
+		ProviderBean provider = new ProviderBean();
+		provider.setServiceId(serviceId);
+		provider.setMethod(MethodType.GET_POLICY_OPTIONS);
+		try {
+			// SEND INFORMATION QUERY - RESPONSE WILL BE IN
+			// "callback.RecieveMessage()"
+			commMgr.sendIQGet(stanza, provider, this);
+			LOG.debug("getPolicyOptions({}): message sent to {}", serviceId, toIdentity.getJid());
+		} catch (CommunicationException e) {
+			LOG.warn("getPolicyOptions({}): could not send message to " + toIdentity.getJid(), serviceId, e);
+		}
+		;
 	}
 
 	/*
