@@ -364,7 +364,8 @@ public class ServiceRegistry implements IServiceRegistry {
 					new ServiceResourceIdentiferDAO(serviceIdentifier
 							.getIdentifier().toString(), serviceIdentifier
 							.getServiceInstanceIdentifier()));
-			tmpService = tmpRegistryEntry.createServiceFromRegistryEntry();
+			if (tmpRegistryEntry!=null){
+			tmpService = tmpRegistryEntry.createServiceFromRegistryEntry();}
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ServiceRetrieveException(e);
