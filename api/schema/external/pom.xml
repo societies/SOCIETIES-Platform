@@ -52,12 +52,34 @@
 						</goals>
 						<configuration>
 							<schemaExcludes>
+								<exclude>org.societies.api.schema.servicelifecycle.model.xsd</exclude>
 								<exclude>dataforms.xsd</exclude>
 								<exclude>pubsub.xsd</exclude>
 								<exclude>pubsub#errors.xsd</exclude>
 								<exclude>pubsub#owner.xsd</exclude>
 								<exclude>pubsub#event.xsd</exclude>
 							</schemaExcludes>
+						</configuration>
+					</execution>
+					<execution>
+						<id>Serialization-generate</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<schemaIncludes>
+								<include>org.societies.api.schema.servicelifecycle.model.xsd</include>
+							</schemaIncludes>
+							<args>
+								<arg>-Xinheritance</arg>
+							</args>
+							<plugins>
+								<plugin>
+									<groupId>org.jvnet.jaxb2_commons</groupId>
+									<artifactId>jaxb2-basics</artifactId>
+									<version>0.5.2</version>
+								</plugin>
+							</plugins>
 						</configuration>
 					</execution>
 					<execution>
