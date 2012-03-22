@@ -100,7 +100,7 @@ public class EgocentricCommunityCreationManagerTest {
 			e.printStackTrace();
 		}
 		//check user joined CISs before
-		egocentricCommunityCreationManager.identifyCissToCreate("not extensive");
+		egocentricCommunityCreationManager.identifyCissToCreate("not extensive", null);
 		//check and compare user joined CISs after
 		
 		String[] members = new String[1];
@@ -151,7 +151,7 @@ public class EgocentricCommunityCreationManagerTest {
     	//userCtxBroker.addAttribute(ownerIdContextEntity, CtxAttributeValueType.INDIVIDUAL, "CSS proximity", IUserCtxBrokerCallback);
     	
     	//check user joined CISs before
-		egocentricCommunityCreationManager.identifyCissToCreate("extensive");
+		egocentricCommunityCreationManager.identifyCissToCreate("extensive", null);
 		//check and compare user joined CISs after
 		
 		//Assert.assertNotNull(/**User's joined CISs*/);

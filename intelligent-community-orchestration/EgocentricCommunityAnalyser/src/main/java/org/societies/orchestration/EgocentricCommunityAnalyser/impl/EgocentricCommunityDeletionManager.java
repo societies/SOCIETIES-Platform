@@ -79,6 +79,7 @@ import org.societies.api.identity.IIdentity;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -178,7 +179,7 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 	 *              a domain, the check is done on all CISs in that domain.
 	 */
 	
-	public void identifyCissToDelete() {
+	public void identifyCissToDelete(HashMap <IIdentity, String> userCissMetadata) {
 		
 		String[] it = new String[1];
 		linkedCss = mock(IIdentity.class);

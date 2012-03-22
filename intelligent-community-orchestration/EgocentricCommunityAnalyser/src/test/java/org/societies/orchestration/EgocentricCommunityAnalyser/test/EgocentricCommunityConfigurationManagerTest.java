@@ -53,7 +53,7 @@ public class EgocentricCommunityConfigurationManagerTest {
 	private EgocentricCommunityConfigurationManager egocentricCommunityConfigurationManager;
 	private ICisManager cisManager;
 	
-	@Test
+	//@Test
     public void testIdentifyCissToConfigure() {
 		
     	IIdentity ownerId = null; //James Jents CSS

@@ -163,297 +163,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 	public EgocentricCommunityCreationManager(ICisRecord linkedSuperCis) {
 		this.linkedSuperCis = linkedSuperCis;
 	}
-	
-	public ArrayList<IIdentity> getIDsOfInteractingCsss(String startingDate, String endingDate) {
-		//What CSSs is this one currently interacting with across all services?
-		//Found by: For each service, shared service, and resource the user is using (in the last ~5 minutes), is there an end-CSS they're interacting with?
-		//Is there a CSS they're indirectly interacting with over the service?
 		
-		
-		//Needs a framework for capturing this in the platform.
-		//It needs a timestamp for this, so either the context is stored with timestamps or 
-		//we get it from the CSS activity feed (which isn't implemented yet)
-		ArrayList<IIdentity> interactingCsss = null;
-		
-		try {
-			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
-		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
-		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
-		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
-        //
-		//    Get the lists from the callbacks
-		//
-		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
-		//}
-//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
-
-		
-		
-		return interactingCsss;
-	}
-	
-	public ArrayList<IIdentity> getIDsOfDirectlyInteractingCsssOverAService(String startingDate, String endingDate, String service) {
-		//What CSSs is this one currently interacting with across the specified service?
-		//Found by: For each service, shared service, and resource the user is using (within the time period specified), is there an end-CSS they're interacting with?
-		//Is there a CSS they're indirectly interacting with over the service (e.g. both using the same service or accessing the same resource over it)?
-		
-		
-		//Needs a framework for capturing this in the platform.
-		//It needs a timestamp for this, so either the context is stored with timestamps or 
-		//we get it from the CSS activity feed (which isn't implemented yet)
-		ArrayList<IIdentity> interactingCsss = new ArrayList<IIdentity>();
-		//           2010-03-08 14:59:30.252
-		//ICssActivityFeed subfeed = activityFeed.getActivities(startingDate, endingDate);
-		//
-		//for (int i = 0; i < subfeed.size(); i++) {
-		//    ICssActivity thisActivity = subfeed.getActivity(i);
-		//    if (thisActivity.getObject().equals(service) &&
-		//        thisActivity.getTarget().contains("CSS") &&
-		//        !(interactingCss.contains(thisActivity.getTarget())))
-		//        interactingCsss.add(thisActivity.getTarget();
-        //    else if (thisActivity.getObject().equals(service) &&
-		//        thisActivity.getActor().contains("CSS") &&
-		//        (thisActivity.getActor() != linkedCss) &&
-		//        !(interactingCss.contains(thisActivity.getActor())))
-		//        interactingCsss.add(thisActivity.getTarget();
-		//}
-		
-		try {
-			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
-		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
-		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
-		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
-        //
-		//    Get the lists from the callbacks
-		//
-		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
-		//}
-//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
-
-		
-		
-		return interactingCsss;
-	}
-	
-	public ArrayList<IIdentity> getIDsOfCsssUsingAService(String startingDate, String endingDate, String service) {
-		//What CSSs is this one currently interacting with across the specified service?
-		//Found by: For each service, shared service, and resource the user is using (within the time period specified), is there an end-CSS they're interacting with?
-		//Is there a CSS they're indirectly interacting with over the service (e.g. both using the same service or accessing the same resource over it)?
-		
-		
-		//Needs a framework for capturing this in the platform.
-		//It needs a timestamp for this, so either the context is stored with timestamps or 
-		//we get it from the CSS activity feed (which isn't implemented yet)
-		ArrayList<IIdentity> interactingCsss = new ArrayList<IIdentity>();
-		//           2010-03-08 14:59:30.252
-		//ICssActivityFeed subfeed = activityFeed.getActivities(startingDate, endingDate);
-		//ArrayList<ICssActivityFeed> otherActivityFeeds = new ArrayList<ICssActivityFeed>();
-		//
-		//for (int i = 0; i < subfeed.size(); i++) {
-		//    ICssActivity thisActivity = subfeed.getActivity(i);
-        //    if (thisActivity.getActor().contains("CSS") &&
-		//        (thisActivity.getActor() != linkedCss) &&
-		//        !(interactingCsss.contains(thisActivity.getActor())))
-		//        interactingCsss.add(thisActivity.getTarget();
-		//    if (thisActivity.getTarget().contains("CSS") &&
-		//        (thisActivity.getTarget() != linkedCss) &&
-		//        !(interactingCsss.contains(thisActivity.getTarget())))
-		//        interactingCsss.add(thisActivity.getTarget();
-		//}
-		
-		//for (int i = 0; i < cssDirectory.size(); i++) {
-		//    
-		//    ICssActivity thisActivity = subfeed.getActivity(i);
-		//    if (thisActivity.getActor().contains("CSS") &&
-		//        (thisActivity.getActor() != linkedCss) &&
-		//        !(interactingCsss.contains(thisActivity.getActor())))
-		//        interactingCsss.add(thisActivity.getTarget();
-		//    if (thisActivity.getTarget().contains("CSS") &&
-		//        (thisActivity.getTarget() != linkedCss) &&
-		//        !(interactingCsss.contains(thisActivity.getTarget())))
-		//        interactingCsss.add(thisActivity.getTarget();
-		//}
-		
-		//for (int i = 0; i < interactingCsss.size(); i++) {
-		//    
-		//}
-		
-		try {
-			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
-		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
-		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
-		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
-        //
-		//    Get the lists from the callbacks
-		//
-		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
-		//}
-//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
-
-		
-		
-		return interactingCsss;
-	}
-	
-	public ArrayList<IIdentity> getIDsOfCsssAccessingResourceOverAService(String startingDate, String endingDate, String resource, String service) {
-		//What CSSs is this one currently interacting with across the specified service?
-		//Found by: For each service, shared service, and resource the user is using (within the time period specified), is there an end-CSS they're interacting with?
-		//Is there a CSS they're indirectly interacting with over the service (e.g. both using the same service or accessing the same resource over it)?
-		
-		
-		//Needs a framework for capturing this in the platform.
-		//It needs a timestamp for this, so either the context is stored with timestamps or 
-		//we get it from the CSS activity feed (which isn't implemented yet)
-		ArrayList<IIdentity> interactingCsss = new ArrayList<IIdentity>();
-		//           2010-03-08 14:59:30.252
-		//ICssActivityFeed subfeed = activityFeed.getActivities(startingDate, endingDate);
-		//
-		//for (int i = 0; i < subfeed.size(); i++) {
-		//    ICssActivity thisActivity = subfeed.getActivity(i);
-		//    if (thisActivity.getObject().equals(service) &&
-		//        thisActivity.getTarget().contains("CSS") &&
-		//        !(interactingCss.contains(thisActivity.getTarget())))
-		//        interactingCsss.add(thisActivity.getTarget();
-        //    else if (thisActivity.getObject().equals(service) &&
-		//        thisActivity.getActor().contains("CSS") &&
-		//        (thisActivity.getActor() != linkedCss) &&
-		//        !(interactingCss.contains(thisActivity.getActor())))
-		//        interactingCsss.add(thisActivity.getTarget();
-		//}
-		
-		try {
-			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
-		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
-		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
-		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
-        //
-		//    Get the lists from the callbacks
-		//
-		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
-		//}
-//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
-
-		
-		
-		return interactingCsss;
-	}
-	
-	public ArrayList<IIdentity> getIDsOfInteractingCsssOverAService(String startingDate, String endingDate, String service) {
-		//What CSSs is this one currently interacting with across the specified service?
-		//Found by: For each service, shared service, and resource the user is using (within the time period specified), is there an end-CSS they're interacting with?
-		//Is there a CSS they're indirectly interacting with over the service (e.g. both using the same service or accessing the same resource over it)?
-		
-		
-		//Needs a framework for capturing this in the platform.
-		//It needs a timestamp for this, so either the context is stored with timestamps or 
-		//we get it from the CSS activity feed (which isn't implemented yet)
-		ArrayList<IIdentity> interactingCsss = new ArrayList<IIdentity>();
-		//           2010-03-08 14:59:30.252
-		//ICssActivityFeed subfeed = activityFeed.getActivities(startingDate, endingDate);
-		//
-		//for (int i = 0; i < subfeed.size(); i++) {
-		//    ICssActivity thisActivity = subfeed.getActivity(i);
-		//    if (thisActivity.getObject().equals(service) &&
-		//        thisActivity.getTarget().contains("CSS") &&
-		//        !(interactingCss.contains(thisActivity.getTarget())))
-		//        interactingCsss.add(thisActivity.getTarget();
-        //    else if (thisActivity.getObject().equals(service) &&
-		//        thisActivity.getActor().contains("CSS") &&
-		//        (thisActivity.getActor() != linkedCss) &&
-		//        !(interactingCss.contains(thisActivity.getActor())))
-		//        interactingCsss.add(thisActivity.getTarget();
-		//}
-		
-		try {
-			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
-		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
-		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
-		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
-        //
-		//    Get the lists from the callbacks
-		//
-		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
-		//}
-//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
-
-		
-		
-		return interactingCsss;
-	}
-	
-	public ArrayList<IIdentity> getIDsOfCsssInProximity(String startingDate, String endingDate, String service) {
-		//What CSSs is this one currently interacting with across the specified service?
-		//Found by: For each service, shared service, and resource the user is using (within the time period specified), is there an end-CSS they're interacting with?
-		//Is there a CSS they're indirectly interacting with over the service (e.g. both using the same service or accessing the same resource over it)?
-		
-		
-		//Needs a framework for capturing this in the platform.
-		//It needs a timestamp for this, so either the context is stored with timestamps or 
-		//we get it from the CSS activity feed (which isn't implemented yet)
-		ArrayList<IIdentity> interactingCsss = new ArrayList<IIdentity>();
-		//           2010-03-08 14:59:30.252
-		//ICssActivityFeed subfeed = activityFeed.getActivities(startingDate, endingDate);
-		//
-		//for (int i = 0; i < subfeed.size(); i++) {
-		//    ICssActivity thisActivity = subfeed.getActivity(i);
-		//    if (thisActivity.getObject().equals(service) &&
-		//        thisActivity.getTarget().contains("CSS") &&
-		//        !(interactingCss.contains(thisActivity.getTarget())))
-		//        interactingCsss.add(thisActivity.getTarget();
-        //    else if (thisActivity.getObject().equals(service) &&
-		//        thisActivity.getActor().contains("CSS") &&
-		//        (thisActivity.getActor() != linkedCss) &&
-		//        !(interactingCss.contains(thisActivity.getActor())))
-		//        interactingCsss.add(thisActivity.getTarget();
-		//}
-		
-		try {
-			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
-		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
-		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
-		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
-        //
-		//    Get the lists from the callbacks
-		//
-		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
-		//}
-//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
-
-		
-		
-		return interactingCsss;
-	}
-	
 	/*
 	 * Description: The method looks for CISs to create, using as a base the information related to
 	 *              this object's 'linked' component (see the fields). If the linked component
@@ -465,7 +175,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 	 *              on collective aspects like context attributes.
 	 */
 	
-	public void identifyCissToCreate(String evaluationType) {
+	public ArrayList<String> identifyCissToCreate(String evaluationType, HashMap<IIdentity, String> userCissMetadata) {
 		
 		
 		
@@ -475,6 +185,8 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		// ...
 		
 		ArrayList<ICisRecord> cissToCreate = new ArrayList<ICisRecord>();
+		ArrayList<String> cissToCreateMetadata = new ArrayList<String>();
+		
 		ArrayList<ICisRecord> cissToAutomaticallyCreate = new ArrayList<ICisRecord>();
 		//v1.0 algorithms
 		
@@ -519,6 +231,10 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				Collection<Object/**CssAdvertisementRecord*/> cssDirectoryMembers = userCssDirectory.findForAllCss();
 				boolean cisExistsAlready = false;
 				ArrayList<String> joinedCisIDs = new ArrayList<String>();
+				for (int i = 0; i < userCissMetadata.size(); i++) {
+				    if (userCissMetadata.get(i).contains("PERSONAL CIS for your CSS directory"))
+				        cisExistsAlready = true;
+				}
 				for (int i = 0; i < userJoinedCiss.size(); i++)
 					joinedCisIDs.add(userJoinedCiss.get(i).toString());
 				if (joinedCisIDs.contains(personalCiss.get("CSS Directory")))
@@ -551,6 +267,8 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				//    cissToCreate.add(new ICisRecord(null, linkedCss.toString(), "PERSONAL CIS for your CSS directory members", null, null, null, null, null, null));
 				//    personalCiss.remove("CSS Directory");
 				//    personalCiss.add("CSS Directory", new ICisRecord(null, linkedCss.toString(), "PERSONAL CIS for your CSS directory members", null, null, null, null, null, null));
+			    //    cissToCreateMetadata.add("PERSONAL CIS for your CSS directory");
+				//
 				//}
 				
 				//Repeat the above for: friends, family members, working colleagues, and any other
@@ -1076,7 +794,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		
 		HashMap<String, ArrayList<ICisRecord>> theResult = new HashMap<String, ArrayList<ICisRecord>>();
 		theResult.put("Create CISs", cissToCreate);
-		suggestedCommunityAnalyser.analyseEgocentricRecommendations(theResult);
+		return suggestedCommunityAnalyser.analyseEgocentricRecommendations(theResult, cissToCreateMetadata);
 		//if (cissToCreate != null) 
 		//    for (int i = 0; i < cissToCreate.size(); i++)
 		//	    cisManager.createCis(linkedCss.getIdentifier(), cissToCreate.get(i).getCisId());
@@ -1132,6 +850,298 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
     	
     	new EgocentricCommunityCreationManager(linkedCss, "CSS");
     }
+    
+
+	public ArrayList<IIdentity> getIDsOfInteractingCsss(String startingDate, String endingDate) {
+		//What CSSs is this one currently interacting with across all services?
+		//Found by: For each service, shared service, and resource the user is using (in the last ~5 minutes), is there an end-CSS they're interacting with?
+		//Is there a CSS they're indirectly interacting with over the service?
+		
+		
+		//Needs a framework for capturing this in the platform.
+		//It needs a timestamp for this, so either the context is stored with timestamps or 
+		//we get it from the CSS activity feed (which isn't implemented yet)
+		ArrayList<IIdentity> interactingCsss = null;
+		
+		try {
+			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
+        //
+		//    Get the lists from the callbacks
+		//
+		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
+		//}
+//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
+
+		
+		
+		return interactingCsss;
+	}
+	
+	public ArrayList<IIdentity> getIDsOfDirectlyInteractingCsssOverAService(String startingDate, String endingDate, String service) {
+		//What CSSs is this one currently interacting with across the specified service?
+		//Found by: For each service, shared service, and resource the user is using (within the time period specified), is there an end-CSS they're interacting with?
+		//Is there a CSS they're indirectly interacting with over the service (e.g. both using the same service or accessing the same resource over it)?
+		
+		
+		//Needs a framework for capturing this in the platform.
+		//It needs a timestamp for this, so either the context is stored with timestamps or 
+		//we get it from the CSS activity feed (which isn't implemented yet)
+		ArrayList<IIdentity> interactingCsss = new ArrayList<IIdentity>();
+		//           2010-03-08 14:59:30.252
+		//ICssActivityFeed subfeed = activityFeed.getActivities(startingDate, endingDate);
+		//
+		//for (int i = 0; i < subfeed.size(); i++) {
+		//    ICssActivity thisActivity = subfeed.getActivity(i);
+		//    if (thisActivity.getObject().equals(service) &&
+		//        thisActivity.getTarget().contains("CSS") &&
+		//        !(interactingCss.contains(thisActivity.getTarget())))
+		//        interactingCsss.add(thisActivity.getTarget();
+        //    else if (thisActivity.getObject().equals(service) &&
+		//        thisActivity.getActor().contains("CSS") &&
+		//        (thisActivity.getActor() != linkedCss) &&
+		//        !(interactingCss.contains(thisActivity.getActor())))
+		//        interactingCsss.add(thisActivity.getTarget();
+		//}
+		
+		try {
+			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
+        //
+		//    Get the lists from the callbacks
+		//
+		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
+		//}
+//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
+
+		
+		
+		return interactingCsss;
+	}
+	
+	public ArrayList<IIdentity> getIDsOfCsssUsingAService(String startingDate, String endingDate, String service) {
+		//What CSSs is this one currently interacting with across the specified service?
+		//Found by: For each service, shared service, and resource the user is using (within the time period specified), is there an end-CSS they're interacting with?
+		//Is there a CSS they're indirectly interacting with over the service (e.g. both using the same service or accessing the same resource over it)?
+		
+		
+		//Needs a framework for capturing this in the platform.
+		//It needs a timestamp for this, so either the context is stored with timestamps or 
+		//we get it from the CSS activity feed (which isn't implemented yet)
+		ArrayList<IIdentity> interactingCsss = new ArrayList<IIdentity>();
+		//           2010-03-08 14:59:30.252
+		//ICssActivityFeed subfeed = activityFeed.getActivities(startingDate, endingDate);
+		//ArrayList<ICssActivityFeed> otherActivityFeeds = new ArrayList<ICssActivityFeed>();
+		//
+		//for (int i = 0; i < subfeed.size(); i++) {
+		//    ICssActivity thisActivity = subfeed.getActivity(i);
+        //    if (thisActivity.getActor().contains("CSS") &&
+		//        (thisActivity.getActor() != linkedCss) &&
+		//        !(interactingCsss.contains(thisActivity.getActor())))
+		//        interactingCsss.add(thisActivity.getTarget();
+		//    if (thisActivity.getTarget().contains("CSS") &&
+		//        (thisActivity.getTarget() != linkedCss) &&
+		//        !(interactingCsss.contains(thisActivity.getTarget())))
+		//        interactingCsss.add(thisActivity.getTarget();
+		//}
+		
+		//for (int i = 0; i < cssDirectory.size(); i++) {
+		//    
+		//    ICssActivity thisActivity = subfeed.getActivity(i);
+		//    if (thisActivity.getActor().contains("CSS") &&
+		//        (thisActivity.getActor() != linkedCss) &&
+		//        !(interactingCsss.contains(thisActivity.getActor())))
+		//        interactingCsss.add(thisActivity.getTarget();
+		//    if (thisActivity.getTarget().contains("CSS") &&
+		//        (thisActivity.getTarget() != linkedCss) &&
+		//        !(interactingCsss.contains(thisActivity.getTarget())))
+		//        interactingCsss.add(thisActivity.getTarget();
+		//}
+		
+		//for (int i = 0; i < interactingCsss.size(); i++) {
+		//    
+		//}
+		
+		try {
+			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
+        //
+		//    Get the lists from the callbacks
+		//
+		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
+		//}
+//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
+
+		
+		
+		return interactingCsss;
+	}
+	
+	public ArrayList<IIdentity> getIDsOfCsssAccessingResourceOverAService(String startingDate, String endingDate, String resource, String service) {
+		//What CSSs is this one currently interacting with across the specified service?
+		//Found by: For each service, shared service, and resource the user is using (within the time period specified), is there an end-CSS they're interacting with?
+		//Is there a CSS they're indirectly interacting with over the service (e.g. both using the same service or accessing the same resource over it)?
+		
+		
+		//Needs a framework for capturing this in the platform.
+		//It needs a timestamp for this, so either the context is stored with timestamps or 
+		//we get it from the CSS activity feed (which isn't implemented yet)
+		ArrayList<IIdentity> interactingCsss = new ArrayList<IIdentity>();
+		//           2010-03-08 14:59:30.252
+		//ICssActivityFeed subfeed = activityFeed.getActivities(startingDate, endingDate);
+		//
+		//for (int i = 0; i < subfeed.size(); i++) {
+		//    ICssActivity thisActivity = subfeed.getActivity(i);
+		//    if (thisActivity.getObject().equals(service) &&
+		//        thisActivity.getTarget().contains("CSS") &&
+		//        !(interactingCss.contains(thisActivity.getTarget())))
+		//        interactingCsss.add(thisActivity.getTarget();
+        //    else if (thisActivity.getObject().equals(service) &&
+		//        thisActivity.getActor().contains("CSS") &&
+		//        (thisActivity.getActor() != linkedCss) &&
+		//        !(interactingCss.contains(thisActivity.getActor())))
+		//        interactingCsss.add(thisActivity.getTarget();
+		//}
+		
+		try {
+			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
+        //
+		//    Get the lists from the callbacks
+		//
+		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
+		//}
+//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
+
+		
+		
+		return interactingCsss;
+	}
+	
+	public ArrayList<IIdentity> getIDsOfInteractingCsssOverAService(String startingDate, String endingDate, String service) {
+		//What CSSs is this one currently interacting with across the specified service?
+		//Found by: For each service, shared service, and resource the user is using (within the time period specified), is there an end-CSS they're interacting with?
+		//Is there a CSS they're indirectly interacting with over the service (e.g. both using the same service or accessing the same resource over it)?
+		
+		
+		//Needs a framework for capturing this in the platform.
+		//It needs a timestamp for this, so either the context is stored with timestamps or 
+		//we get it from the CSS activity feed (which isn't implemented yet)
+		ArrayList<IIdentity> interactingCsss = new ArrayList<IIdentity>();
+		//           2010-03-08 14:59:30.252
+		//ICssActivityFeed subfeed = activityFeed.getActivities(startingDate, endingDate);
+		//
+		//for (int i = 0; i < subfeed.size(); i++) {
+		//    ICssActivity thisActivity = subfeed.getActivity(i);
+		//    if (thisActivity.getObject().equals(service) &&
+		//        thisActivity.getTarget().contains("CSS") &&
+		//        !(interactingCss.contains(thisActivity.getTarget())))
+		//        interactingCsss.add(thisActivity.getTarget();
+        //    else if (thisActivity.getObject().equals(service) &&
+		//        thisActivity.getActor().contains("CSS") &&
+		//        (thisActivity.getActor() != linkedCss) &&
+		//        !(interactingCss.contains(thisActivity.getActor())))
+		//        interactingCsss.add(thisActivity.getTarget();
+		//}
+		
+		try {
+			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
+        //
+		//    Get the lists from the callbacks
+		//
+		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
+		//}
+//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
+
+		
+		
+		return interactingCsss;
+	}
+	
+	public ArrayList<IIdentity> getIDsOfCsssInProximity(String startingDate, String endingDate, String service) {
+		//What CSSs is this one currently interacting with across the specified service?
+		//Found by: For each service, shared service, and resource the user is using (within the time period specified), is there an end-CSS they're interacting with?
+		//Is there a CSS they're indirectly interacting with over the service (e.g. both using the same service or accessing the same resource over it)?
+		
+		
+		//Needs a framework for capturing this in the platform.
+		//It needs a timestamp for this, so either the context is stored with timestamps or 
+		//we get it from the CSS activity feed (which isn't implemented yet)
+		ArrayList<IIdentity> interactingCsss = new ArrayList<IIdentity>();
+		//           2010-03-08 14:59:30.252
+		//ICssActivityFeed subfeed = activityFeed.getActivities(startingDate, endingDate);
+		//
+		//for (int i = 0; i < subfeed.size(); i++) {
+		//    ICssActivity thisActivity = subfeed.getActivity(i);
+		//    if (thisActivity.getObject().equals(service) &&
+		//        thisActivity.getTarget().contains("CSS") &&
+		//        !(interactingCss.contains(thisActivity.getTarget())))
+		//        interactingCsss.add(thisActivity.getTarget();
+        //    else if (thisActivity.getObject().equals(service) &&
+		//        thisActivity.getActor().contains("CSS") &&
+		//        (thisActivity.getActor() != linkedCss) &&
+		//        !(interactingCss.contains(thisActivity.getActor())))
+		//        interactingCsss.add(thisActivity.getTarget();
+		//}
+		
+		try {
+			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
+        //
+		//    Get the lists from the callbacks
+		//
+		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
+		//}
+//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
+
+		
+		
+		return interactingCsss;
+	}
+
     
     public IIdentity getLinkedCss() {
     	return linkedCss;

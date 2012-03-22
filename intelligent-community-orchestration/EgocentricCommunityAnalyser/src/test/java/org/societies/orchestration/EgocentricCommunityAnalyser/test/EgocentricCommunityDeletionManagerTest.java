@@ -68,7 +68,7 @@ public class EgocentricCommunityDeletionManagerTest {
 		
     	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
 		
-		autoCommunityDeletionManager.identifyCissToDelete();
+		autoCommunityDeletionManager.identifyCissToDelete(null);
 		
 		String[] members = new String[1];
 		members[0] = "James";
@@ -94,7 +94,7 @@ public class EgocentricCommunityDeletionManagerTest {
 		
     	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
 		
-		autoCommunityDeletionManager.identifyCissToDelete();
+		autoCommunityDeletionManager.identifyCissToDelete(null);
 		
 		String[] members = new String[1];
 		members[0] = "James";
@@ -120,7 +120,7 @@ public class EgocentricCommunityDeletionManagerTest {
 		
     	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
 		
-		autoCommunityDeletionManager.identifyCissToDelete();
+		autoCommunityDeletionManager.identifyCissToDelete(null);
 		
 		String[] members = new String[1];
 		members[0] = "James";
@@ -146,7 +146,7 @@ public class EgocentricCommunityDeletionManagerTest {
 		
     	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
 		
-		autoCommunityDeletionManager.identifyCissToDelete();
+		autoCommunityDeletionManager.identifyCissToDelete(null);
 		
 		String[] members = new String[1];
 		members[0] = "James";
@@ -172,7 +172,7 @@ public class EgocentricCommunityDeletionManagerTest {
 		
     	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
 		
-		autoCommunityDeletionManager.identifyCissToDelete();
+		autoCommunityDeletionManager.identifyCissToDelete(null);
 		
 		String[] members = new String[1];
 		members[0] = "James";
@@ -194,7 +194,7 @@ public class EgocentricCommunityDeletionManagerTest {
 		
     	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
 		
-		autoCommunityDeletionManager.identifyCissToDelete();
+		autoCommunityDeletionManager.identifyCissToDelete(null);
 		
 		String[] members = new String[1];
 		members[0] = "James";
