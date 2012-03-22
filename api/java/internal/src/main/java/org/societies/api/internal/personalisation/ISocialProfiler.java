@@ -1,28 +1,15 @@
-package org.societies.personalization.socialprofiler;
+package org.societies.api.internal.personalisation;
 
 import java.util.List;
 
-import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.api.internal.sns.ISocialData;
 
 
 
-public interface SocialProfiler  {
+public interface ISocialProfiler  {
 	
 	
-	/**
-	 * Return a ContextBroker Interface instance	
-	 * @return ICtxBroker
-	 */
-	public ICtxBroker getCtxBroker(); 
-	
-	
-	/**
-	 * Set a Context Broker instance to store social data
-	 * @param ctxBroker
-	 */
-	public void setCtxBroker(ICtxBroker ctxBroker);
-
 	/**
 	 * Add a new Social Network connector to fetch social data
 	 * @param connector
@@ -47,7 +34,23 @@ public interface SocialProfiler  {
 	 */
 	public float getUpdateFrequency();
 	
+	/**
+	 * Get a list of all the available connectors
+	 * @return List<ISocialConnector>
+	 */
 	public List<ISocialConnector> getListOfLinkedSN();
+	
+	/**
+	 * Get instance of ISocialData 
+	 * @return ISocialData interdace
+	 */
+	public ISocialData getSocialdata();
+
+	/**
+	 * Set an instanco of ISocialData
+	 * @param socialdata inferface
+	 */
+	public void setSocialdata(ISocialData socialdata);
 	
 	
 }
