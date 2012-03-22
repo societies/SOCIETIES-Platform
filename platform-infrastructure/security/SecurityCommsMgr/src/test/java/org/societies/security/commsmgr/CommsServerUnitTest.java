@@ -27,8 +27,6 @@ package org.societies.security.commsmgr;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.After;
@@ -37,8 +35,6 @@ import org.junit.Test;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationRequester;
-import org.societies.api.security.digsig.ISignatureMgr;
-import org.societies.comm.xmpp.interfaces.CommManager;
 
 /**
  * 
@@ -63,7 +59,11 @@ public class CommsServerUnitTest {
 		negotiationProviderMock = mock(INegotiationProvider.class);
 		negotiationRequesterMock = mock(INegotiationRequester.class);
 		
-		classUnderTest = new CommsServer(commMgrMock, negotiationRequesterMock, negotiationProviderMock);
+		//classUnderTest = new CommsServer(commMgrMock, negotiationRequesterMock, negotiationProviderMock);
+		classUnderTest = new CommsServer();
+		classUnderTest.setCommMgr(commMgrMock);
+		classUnderTest.setNegotiationProvider(negotiationProviderMock);
+		classUnderTest.setNegotiationRequester(negotiationRequesterMock);
 		classUnderTest.init();
 	}
 

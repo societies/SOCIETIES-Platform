@@ -29,14 +29,25 @@ public class IdentityManagerImpl implements IIdentityManager {
 		ctxMapper = new IdentityContextMapperImpl();
 	}
 	
+	// TODO good domain check 
+	// http://commons.apache.org/validator/apidocs/org/apache/commons/validator/routines/DomainValidator.html
+	private static boolean checkDomainNameFormat(String domain) {
+		String[] domainParts = domain.split("\\.");
+		if (domainParts.length>1)
+			return true;
+		return false;
+	}
+	
 	public static IIdentity staticfromJid(String jid) throws InvalidFormatException {
 		String[] parts = jid.split("@|/"); // TODO regexp
 		switch (parts.length) {
 			case 1:
-				String[] richParts = jid.split("\\."); // TODO regexp
+//				String[] richParts = jid.split("\\."); // TODO regexp
 //				LOG.info("JID="+jid+";richParts.length="+richParts.length);
-				if (richParts.length==3)
-					return new NetworkNodeImpl(IdentityType.CSS_RICH, richParts[0], richParts[1]+"."+richParts[2],"rich");
+				int firstDotIndex = jid.indexOf(".");
+				String domain = jid.substring(firstDotIndex+1);
+				if (checkDomainNameFormat(domain))
+					return new NetworkNodeImpl(IdentityType.CSS_RICH, jid.substring(0,firstDotIndex), domain,"rich");
 				break;
 			case 2:
 				return new IdentityImpl(IdentityType.CSS, parts[0], parts[1]);

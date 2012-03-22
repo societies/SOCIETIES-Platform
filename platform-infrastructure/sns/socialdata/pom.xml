@@ -6,7 +6,7 @@
 	<groupId>org.societies.platform</groupId>
 	<artifactId>socialdata</artifactId>
 	<packaging>jar</packaging>
-	<version>${version.platform}</version>
+	<version>${release.version}-SNAPSHOT</version>
 
 	<developers></developers>
 
@@ -71,7 +71,7 @@
 		</dependency>
 
 
-		<!-- JUST FOR TEST -->
+		<!-- JUST FOR TEST 
 		<dependency>
 			<groupId>com.restfb</groupId>
 			<artifactId>restfb</artifactId>
@@ -83,7 +83,15 @@
 			<artifactId>facebook_connector</artifactId>
 			<version>${release.version}-SNAPSHOT</version>
 		</dependency>
-
+		
+		
+		<dependency>
+			<groupId>org.societies.platform</groupId>
+			<artifactId>socialdata</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+	-->
+	
 	</dependencies>
 
 

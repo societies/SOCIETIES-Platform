@@ -20,23 +20,6 @@
 
    <!-- Modules to build -->
 	<modules>
-		<module>../../parent/version.xml</module>
-		<module>../../parent/spring-osgi.xml</module>
-
-		<!-- API -->
-		<module>../../api/schema/external</module>
-		<module>../../api/schema/internal</module>
-		<module>../../api/java/external</module>
-		<module>../../api/java/internal</module>
-		
-		<!-- Comms Framework -->
-		<!--module>../comms-frwk/CommonLibraries</module>
-		<module>../comms-frwk/CommunicationFrameworkCommons</module>
-		<module>../comms-frwk/XCCommunicationMgr</module>
-		<module>../comms-frwk/PubsubServiceBundle</module>
-		<module>../comms-frwk/PubsubClientBundle</module-->
-		
-		<!-- Security -->
 		<module>SecurityServices</module>
 		<module>PolicyNegotiator</module>
 		<module>SecurityCommsMgr</module>

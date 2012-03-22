@@ -48,6 +48,15 @@ public interface IServiceDiscovery {
 	 */
 	public Future<List<Service>> getServices(IIdentity node) throws ServiceDiscoveryException;
 
+	/**
+	 * Description: Based on a jid this method returns all services shared by 
+	 * the specified CSS/CIS to other CSS's or CIS;s 
+	 * @param String jib 		  
+	 * @return a List of services retrieved
+	 * @throws ServiceDiscoveryException
+	 */
+	public Future<List<Service>> getServices(String jid) throws ServiceDiscoveryException;
+
 	
 	/**
 	 * Description: This method returns all services for the current node 

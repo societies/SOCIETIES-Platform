@@ -2,35 +2,39 @@ package org.societies.platform.FacebookConn.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.platform.FacebookConn.FacebookConnector;
-import org.societies.platform.FacebookConn.SocialConnector;
-import org.societies.platform.FacebookConn.exeptions.MissingTokenExeptions;
 
+import com.restfb.DefaultFacebookClient;
 import com.restfb.DefaultWebRequestor;
 import com.restfb.FacebookClient;
-import com.restfb.Parameter;
 import com.restfb.WebRequestor;
 import com.restfb.WebRequestor.Response;
+import com.restfb.json.JsonObject;
+import com.restfb.types.Photo;
 
 
 
 public class FacebookConnectorImpl implements FacebookConnector {
 
 	
+	private static final String DATA 		 = "data";
 	private String 				access_token = null;
 	private String 				identity	 = null;
 	private String 				name;
 	private String 				id;
 	
-	private List<Object>		parameters;
+	private Properties			parameters;
 	private FacebookClient 		facebookClient;
 	private int					maxPostLimit = 50;
 	private long				tokenExpiration=0;
@@ -39,7 +43,7 @@ public class FacebookConnectorImpl implements FacebookConnector {
 		
 		this.identity		= identity;
 		this.access_token	= access_token;
-		this.name 			= SocialConnector.FACEBOOK_CONN;
+		this.name 			= ISocialConnector.FACEBOOK_CONN;
 		this.id				= this.name + "_" + UUID.randomUUID();
 		
 	}
@@ -63,20 +67,56 @@ public class FacebookConnectorImpl implements FacebookConnector {
 		return name;
 	}
 	
+
 	
-	public String getSocialData(String path) throws MissingTokenExeptions {
+	
+	public String getSocialData(String path)  {
 		
-		if (access_token==null) throw new MissingTokenExeptions();
+		if (access_token==null) return null;
+		facebookClient = new DefaultFacebookClient(access_token);
+		return facebookClient.fetchObject(path, JsonObject.class).toString();
 		
-		
-		WebRequestor requestor = new DefaultWebRequestor();
-		try {
-		
-			Response response = requestor.executeGet(genURL(path));
-			return response.getBody();
-		}
-		catch (IOException e) {}
-		return null;
+//		WebRequestor requestor = new DefaultWebRequestor();
+//		try {
+//		
+//			Response response = requestor.executeGet(genURL(path));
+//			JSONObject json_response = null;
+//			boolean next = true;
+//			
+//			System.out.println("Response code:"+response.getStatusCode());
+//			while (next && response.getStatusCode()==200){
+//				
+//				JSONObject json = null;
+//				try {
+//					System.out.println("=== RESPONSE BODY:");
+//					System.out.println(response.getBody());
+//					json = new JSONObject(response.getBody());
+//					if (json_response == null) {
+//						json_response = json;  // FIRST TIME;
+//						System.out.println("=== MAKE JSON");
+//					}
+//					else
+//						json_response.append("data", json.getString("data"));
+//					
+//					
+//					if (json.has("paging")) {
+//						JSONObject paging = new JSONObject(json.getString("paging"));
+//						if (paging.has("next"))
+//							response = requestor.executeGet(paging.getString("next"));
+//						else
+//							return json_response.toString(1);
+//					}	
+//					else
+//						return json_response.toString(1);
+//					
+//				} catch (JSONException e) {
+//					next= false;
+//					e.printStackTrace();
+//				}
+//			}
+//		}
+//		catch (IOException e) {}
+//		return null;
 		
 		
 		// TODO Auto-generated method stub
@@ -87,7 +127,7 @@ public class FacebookConnectorImpl implements FacebookConnector {
 		try {
 		
 			WebRequestor doGet = new DefaultWebRequestor();
-			Response response = doGet.executeGet("http://wd.teamlife.it/test.php");
+			Response response = doGet.executeGet("http://wd.teamlife.it/fbconnector.php");
 			System.out.println("Auth: " +response.getBody()+ " code:" + response.getStatusCode());
 			
 		} 
@@ -109,29 +149,27 @@ public class FacebookConnectorImpl implements FacebookConnector {
 		 this.maxPostLimit = postLimit;
 	}
 	
-	public void setParameter(Object p){
+	public void setParameter(String key, String value){
 		if (parameters == null){
-			parameters= new ArrayList<Object>();
+			parameters= new Properties();
 		}
-		
-		parameters.add(p);
+		parameters.put(key, value);
 	}
 	
 	
 	
 	public String genURL(String path){
 		String opt= "";
-		if (parameters!=null){
-			Iterator it = parameters.iterator();
-			while (it.hasNext()){
-				Parameter p = (Parameter) it.next();
-				opt += "&" +p.name +"=" + p.value;
-			}
+		if (parameters ==null) parameters = new Properties();
+		if (!parameters.contains("limit")) parameters.put("limit", ""+this.maxPostLimit);
+		//if (!parameters.contains("until")) parameters.put("until", "yesterday");
+	    Enumeration it = parameters.keys();
+	    while (it.hasMoreElements()){
+			String k = it.nextElement().toString();
+			opt += "&" +k +"=" +parameters.getProperty(k);
 		}
-		 if (path.equals(FEED))
-			 		return "https://graph.facebook.com/me/"+path+"?access_token="+access_token+opt;
-			 	else
-			 		return "https://graph.facebook.com/"+path+"?access_token="+access_token+opt ;
+		
+		return "https://graph.facebook.com/"+path+"?access_token="+access_token+opt ;
 	}
 
 
@@ -141,65 +179,51 @@ public class FacebookConnectorImpl implements FacebookConnector {
 
 	
 
-	public JSONObject getUserProfile() {
-		JSONObject profile = null;
-		try {
-			profile = new JSONObject(getSocialData(ME));
-		} 
-		catch (MissingTokenExeptions e) {
-			e.printStackTrace();
-		}
-		catch (JSONException e) {
-			e.printStackTrace();
-		} 
-		return profile;
+	public String getUserProfile() {
+		
+			
+			if (access_token==null) return null;
+			facebookClient = new DefaultFacebookClient(access_token);
+			
+			JsonObject profile 		= facebookClient.fetchObject(ME, JsonObject.class); 
+			JsonObject photos		= facebookClient.fetchObject("me/picture",JsonObject.class );
+			JsonObject activities   = facebookClient.fetchObject(ACTIVITIES, JsonObject.class);
+			JsonObject books		= facebookClient.fetchObject(BOOKS, JsonObject.class);
+			JsonObject movies		= facebookClient.fetchObject(MOVIES, JsonObject.class);
+			
+			// We can add whatever is missing
+			JsonObject photo = new JsonObject();
+			photo.put("type", "thumb");
+			photo.put("primary", true);
+			photo.put("value", photos);
+			
+			profile.accumulate("photos",	 new JSONArray().put(photo));
+			profile.accumulate("books", 	 books.getString("data"));
+			profile.accumulate("activities", activities.getString("data"));
+			profile.accumulate("movies", 	 movies.getString("data"));
+			
+			
+		
+			
+		
+			return profile.toString(1);
+		
 	}
 
 	
-	public JSONObject getUserFriends() {
-		JSONObject users= null;
-		try {
-			users = new JSONObject(getSocialData(FRIENDS));
-		} 
-		catch (MissingTokenExeptions e) {
-			e.printStackTrace();
-		}
-		catch (JSONException e) {
-			e.printStackTrace();
-		} 
-		
-		return users;
+	public String getUserFriends() {
+		return getSocialData(FRIENDS);
 	}
 
-	public JSONObject getUserActivities() {
-		JSONObject users= null;
-		try {
-			users = new JSONObject(getSocialData(FEED));
-		} 
-		catch (MissingTokenExeptions e) {
-			e.printStackTrace();
-		}
-		catch (JSONException e) {
-			e.printStackTrace();
-		} 
+	public String getUserActivities() {
 		
-		return users;
+		return getSocialData(FEED);
+		
 	}
 	
 
-	public JSONObject getUserGroups() {
-		JSONObject groups= null;
-		try {
-			groups = new JSONObject(getSocialData(GROUPS));
-		} 
-		catch (MissingTokenExeptions e) {
-			e.printStackTrace();
-		}
-		catch (JSONException e) {
-			e.printStackTrace();
-		} 
-		
-		return groups;
+	public String getUserGroups() {
+		return getSocialData(GROUPS);
 	}
 
 	public long getTokenExpiration() {
@@ -210,6 +234,7 @@ public class FacebookConnectorImpl implements FacebookConnector {
 		this.tokenExpiration = expiration;
 	}
 
+	
 	
 	
 }

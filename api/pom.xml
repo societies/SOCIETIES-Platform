@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.societies.api</groupId>
+	<artifactId>apibuilder</artifactId>
+	<version>${release.version}</version>
+	<name>APIs Builder</name>
+	<packaging>pom</packaging>
+
+	<developers>
+		<developer>
+			<name>Bruno Jean-Bart </name>
+			<organization>Trialog</organization>
+			<organizationUrl>http://www.trialog.com/</organizationUrl>
+		</developer>
+	</developers>
+	
+	<!-- All builder projects should inherit from version-parent -->
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>version-parent</artifactId>
+		<version>0.1</version>
+	</parent>
+	
+	<modules>
+		<module>schema/external</module>
+		<module>schema/internal</module>
+		<module>java/external</module>
+		<module>java/internal</module>
+	</modules>
+</project>

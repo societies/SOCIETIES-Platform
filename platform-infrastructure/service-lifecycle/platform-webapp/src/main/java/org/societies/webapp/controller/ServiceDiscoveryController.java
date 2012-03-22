@@ -45,8 +45,6 @@ import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 
 
-
-
 @Controller
 public class ServiceDiscoveryController {
 
@@ -105,17 +103,25 @@ public class ServiceDiscoveryController {
 		
 			if (method.equalsIgnoreCase("GetLocalServices")) {
 				asynchResult=this.getSDService().getLocalServices();
-				res="ServiceDiscovery Result <br/><br/>";
+				res="ServiceDiscovery Result For Local Node ";
+				
+				services = asynchResult.get();
+				model.put("services", services);
+				
 			}else if (method.equalsIgnoreCase("GetServices")) {
-				//TODO : Create identity. for now just get local services
-				asynchResult=this.getSDService().getLocalServices();
-				res="ServiceDiscovery Result <br/><br/>";
+				
+				asynchResult=this.getSDService().getServices(node);
+				res="ServiceDiscovery Result for Node : [" + node + "]";
+					
+				services = asynchResult.get();
+				model.put("services", services);
+					
 			}else{
 				res="error unknown metod";
 			}
 		
-			services = asynchResult.get();
-			model.put("services", services);
+			model.put("result", res);
+			
 		}
 		catch (ServiceDiscoveryException e)
 		{
