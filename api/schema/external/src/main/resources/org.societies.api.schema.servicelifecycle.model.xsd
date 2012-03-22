@@ -14,7 +14,6 @@
 		<xs:appinfo>
 			<jaxb:globalBindings>
 				<jaxb:javaType name="java.net.URI" xmlType="xs:anyURI" parseMethod="create" printMethod="toASCIIString"/>
-				<xjc:serializable uid="12343"/>
 			</jaxb:globalBindings> 
 		</xs:appinfo> 
 	</xs:annotation>
