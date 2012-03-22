@@ -48,7 +48,7 @@ public class ContextCommunicator {
 		this.ctxBroker = ctxBroker;
 	}
 
-	public void updateHistory(IServiceResourceIdentifier serviceId, IIdentity owner, IAction action){
+	public void updateHistory(IIdentity owner, IAction action){
 		try {
 			//Get Entity with serviceId
 			Future<List<CtxIdentifier>> futureEntityIDs = ctxBroker.lookup(CtxModelType.ENTITY, serviceId.getIdentifier().toString());
@@ -76,9 +76,9 @@ public class ContextCommunicator {
 		}
 	}
 
-	public void updateServiceModel(IServiceResourceIdentifier serviceId, IIdentity owner, IAction action){
+	public void updateServiceModel(IIdentity owner, IAction action){
 		try {
-			Future<List<CtxIdentifier>> futureIDs = ctxBroker.lookup(CtxModelType.ENTITY, serviceId.getIdentifier().toString());			
+			Future<List<CtxIdentifier>> futureIDs = ctxBroker.lookup(CtxModelType.ENTITY, action.getServiceID().getIdentifier().toString());			
 		} catch (CtxException e) {
 			e.printStackTrace();
 		}

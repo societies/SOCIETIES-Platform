@@ -34,6 +34,11 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.personalisation.model.Action;
+import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
@@ -48,6 +53,7 @@ public class UACommsServer implements IFeatureServer{
 	//PRIVATE VARIABLES
 	private ICommManager commManager;
 	private IUserActionMonitor uam;
+	private IIdentityManager idManager;
 
 	//PROPERTIES
 	public ICommManager getCommManager() {
@@ -77,6 +83,7 @@ public class UACommsServer implements IFeatureServer{
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
+		idManager = commManager.getIdManager();
 	}
 
 	public List<String> getJavaPackages() {
@@ -91,23 +98,30 @@ public class UACommsServer implements IFeatureServer{
 		//CHECK WHICH END BUNDLE TO BE CALLED THAT I MANAGE
 		if (payload instanceof UserActionMonitorBean){ this.receiveMessage(stanza, (UserActionMonitorBean)payload);}	
 	}
-	
+
 	public void receiveMessage(Stanza stanza, UserActionMonitorBean payload){
 		//---- UAM Bundle ---
 		UserActionMonitorBean monitorBean = (UserActionMonitorBean) payload;
-		
+
 		switch(monitorBean.getMethod()){
 		case MONITOR:
-			ServiceResourceIdentifier serviceId = monitorBean.getServiceResourceIdentifier();
-			String owner = monitorBean.getIdentity();
-			String action = monitorBean.getAction();
-			uam.monitor(serviceId, owner, action);
-			break;
+			try {
+				IIdentity owner = idManager.fromJid(monitorBean.getIdentity());
+				ServiceResourceIdentifier serviceId = monitorBean.getServiceResourceIdentifier();
+				String serviceType = monitorBean.getServiceType();
+				String parameterName = monitorBean.getParameterName();
+				String value = monitorBean.getValue();
+				IAction action = new Action(serviceId, serviceType, parameterName, value);
+				uam.monitor(owner, action);
+				break;
+			} catch (InvalidFormatException e) {
+				e.printStackTrace();
+			}
 		}
 	}
-	
-	
-	
+
+
+
 	public Object getQuery(Stanza arg0, Object arg1) throws XMPPError {
 		//PUT FUNCTIONALITY HERE FOR IF THERE IS A RETURN TYPE
 		return null;

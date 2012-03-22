@@ -50,6 +50,12 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.useragent</groupId>
+			<artifactId>user-agent-api</artifactId>
+			<version>${version.ua}</version>
+			<scope>provided</scope>
+		</dependency>
 		<!-- Communication Manager  -->
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>

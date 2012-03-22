@@ -25,6 +25,10 @@
 
 package org.societies.useragent.api.monitoring.remote;
 
+import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.useragent.monitoring.IUserActionListener;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
 public interface IUserActionMonitorRemote {
 
 	/**
@@ -34,7 +38,7 @@ public interface IUserActionMonitorRemote {
 	 * @param parameterName  Parameter name of action
 	 * @param value  Value of action
 	 */
-	public void monitor(ServiceResourceIdentifier serviceId, IIdentity owner, String parameterName, String value);
+	public void monitor(IIdentity owner, ServiceResourceIdentifier serviceId, String serviceType, String parameterName, String value);
 	
 	public void registerForActionUpdates(IUserActionListener listener);
 }
