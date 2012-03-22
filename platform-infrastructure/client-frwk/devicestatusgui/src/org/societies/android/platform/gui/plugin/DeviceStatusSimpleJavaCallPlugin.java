@@ -77,21 +77,13 @@ public class DeviceStatusSimpleJavaCallPlugin extends Plugin {
 			// -- Manage the relevant method
 			if (ACTION_CONNECTIVITY.equals(methodName)) {
 				Log.d(this.getClass().getSimpleName(), "Connectivity Status");
-				// Avert: async
-				result = new PluginResult(Status.NO_RESULT);
-				result.setKeepCallback(true);
-				this.success(result, callbackID);
 				// Launch connectivity status retrieval
-				getConnectivityStatus();
+				return getConnectivityStatus();
 			}
 			else if (ACTION_LOCATION.equals(methodName)) {
 				Log.d(this.getClass().getSimpleName(), "Location Status");
-				// Avert: async
-				result = new PluginResult(Status.NO_RESULT);
-				result.setKeepCallback(true);
-				this.success(result, callbackID);
 				// -- Launch location status retrieval
-				getLocationStatus();
+				return getLocationStatus();
 			}
 			else if (ACTION_BATTERY.equals(methodName)) {
 				Log.d(this.getClass().getSimpleName(), "Battery Status");
@@ -151,8 +143,6 @@ public class DeviceStatusSimpleJavaCallPlugin extends Plugin {
 
 		// -- Send data
 		PluginResult result = new PluginResult(Status.OK, data);
-		result.setKeepCallback(false);
-		this.success(result, this.callbackID);
 		return result;
 	}
 
@@ -172,8 +162,6 @@ public class DeviceStatusSimpleJavaCallPlugin extends Plugin {
 
 		// -- Send data
 		PluginResult result = new PluginResult(Status.OK, data);
-		result.setKeepCallback(false);
-		this.success(result, this.callbackID);
 		return result;
 	}
 

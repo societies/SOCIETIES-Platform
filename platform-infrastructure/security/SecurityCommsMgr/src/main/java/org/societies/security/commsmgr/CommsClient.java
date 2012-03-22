@@ -28,8 +28,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
@@ -99,65 +97,6 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 		this.commMgr = commMgr;
 	}
 
-//	@Override
-//	@Async
-//	public void Add(int valA, int valB, IExamplesCallback calcCallback) {
-//		IIdentity toIdentity = null;
-//		try {
-//			toIdentity = idMgr.fromJid("XCManager.societies.local");
-//		} catch (InvalidFormatException e1) {
-//			e1.printStackTrace();
-//		}
-//		Stanza stanza = new Stanza(toIdentity);
-//
-//		// SETUP CALC CLIENT RETURN STUFF
-//		CommsClientCallback callback = new CommsClientCallback(stanza.getId(),
-//				calcCallback);
-//
-//		// CREATE MESSAGE BEAN
-//		CalcBean calc = new CalcBean();
-//		calc.setA(valA);
-//		calc.setB(valB);
-//		calc.setMethod(MethodType.ADD);
-//		try {
-//			// SEND INFORMATION QUERY - RESPONSE WILL BE IN
-//			// "callback.RecieveMessage()"
-//			commManager.sendIQGet(stanza, calc, callback);
-//		} catch (CommunicationException e) {
-//			LOG.warn(e.getMessage());
-//		}
-//		;
-//	}
-
-//	@Override
-//	public void Subtract(int valA, int valB, IExamplesCallback calcCallback) {
-//		IIdentity toIdentity = null;
-//		try {
-//			toIdentity = idMgr.fromJid("XCManager.societies.local");
-//		} catch (InvalidFormatException e1) {
-//			e1.printStackTrace();
-//		}
-//		Stanza stanza = new Stanza(toIdentity);
-//
-//		// SETUP CALC CLIENT RETURN STUFF
-//		CommsClientCallback callback = new CommsClientCallback(stanza.getId(),
-//				calcCallback);
-//
-//		// CREATE MESSAGE BEAN
-//		CalcBean calc = new CalcBean();
-//		calc.setA(valA);
-//		calc.setB(valB);
-//		calc.setMethod(MethodType.SUBTRACT);
-//		try {
-//			// SEND INFORMATION QUERY - RESPONSE WILL BE IN
-//			// "callback.RecieveMessage()"
-//			commManager.sendIQGet(stanza, calc, callback);
-//		} catch (CommunicationException e) {
-//			LOG.warn(e.getMessage());
-//		}
-//		;
-//	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -222,6 +161,32 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 			boolean modified, INegotiationProviderCallback callback) {
 		
 		LOG.debug("acceptPolicyAndGetSla({}, ...)", sessionId);
+
+//		IIdentity toIdentity = null;
+//		try {
+//			toIdentity = idMgr.fromJid("XCManager.societies.local");
+//		} catch (InvalidFormatException e1) {
+//			e1.printStackTrace();
+//		}
+//		Stanza stanza = new Stanza(toIdentity);
+//
+//		// SETUP CALC CLIENT RETURN STUFF
+//		CommsClientCallback groupCallback = new CommsClientCallback(stanza.getId(),
+//				callback);
+//
+//		// CREATE MESSAGE BEAN
+//		CalcBean calc = new CalcBean();
+//		calc.setA(valA);
+//		calc.setB(valB);
+//		calc.setMethod(MethodType.SUBTRACT);
+//		try {
+//			// SEND INFORMATION QUERY - RESPONSE WILL BE IN
+//			// "callback.RecieveMessage()"
+//			commMgr.sendIQGet(stanza, calc, groupCallback);
+//		} catch (CommunicationException e) {
+//			LOG.warn(e.getMessage());
+//		}
+//		;
 	}
 
 	/*
@@ -251,12 +216,14 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 		
 		LOG.debug("reject({})", sessionId);
 		
-		IIdentity toIdentity = null;
+		IIdentity toIdentity;
 		try {
 			toIdentity = idMgr.fromJid("XCManager.societies.local");
 		} catch (InvalidFormatException e) {
 			LOG.error("reject({}): ", sessionId, e);
+			return;
 		}
+		
 		Stanza stanza = new Stanza(toIdentity);
 
 		// CREATE MESSAGE BEAN
@@ -269,7 +236,7 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 			commMgr.sendMessage(stanza, provider);
 			LOG.debug("reject({}): message sent to {}", sessionId, toIdentity.getJid());
 		} catch (CommunicationException e) {
-			LOG.warn(e.getMessage());
+			LOG.warn("reject({}): could not send message to " + toIdentity.getJid(), sessionId, e);
 		}
 		;
 	}

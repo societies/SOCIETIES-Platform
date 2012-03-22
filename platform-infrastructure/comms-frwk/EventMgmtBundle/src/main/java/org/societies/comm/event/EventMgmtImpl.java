@@ -87,22 +87,19 @@ public class EventMgmtImpl implements IEventMgr, BundleContextAware {
 
 		if (serRegMap.containsKey(listener)) {
 			(serRegMap.get(listener)).unregister();
+			serRegMap.remove(listener);
 			logger.debug("Unregistered for event: " + eventTypes[0]);
 		} else {
-			logger.debug("Listener object does not exists to unregister: "
-					+ eventTypes[0]);
+			logger.debug("Listener object does not exists to unregister: " + eventTypes[0]);
 		}
-
 	}
 
 	public void publishInternalEvent(InternalEvent event) throws EMSException {
 		if (getEventAdmin() != null) {
 			Dictionary<String, Object> properties = new Hashtable<String, Object>();
-			properties.put(CSSEventConstants.EVENT_TARGET,
-					CSSEventConstants.INTERNAL_EVENT);
+			properties.put(CSSEventConstants.EVENT_TARGET,CSSEventConstants.INTERNAL_EVENT);
 			properties.put(CSSEventConstants.EVENT_NAME, event.geteventName());
-			properties.put(CSSEventConstants.EVENT_SOURCE,
-					event.geteventSource());
+			properties.put(CSSEventConstants.EVENT_SOURCE,event.geteventSource());
 			properties.put(CSSEventConstants.EVENT_INFO, event.geteventInfo());
 			getEventAdmin().postEvent(
 					new Event(event.geteventType(), properties));
@@ -115,7 +112,7 @@ public class EventMgmtImpl implements IEventMgr, BundleContextAware {
 
 	@Override
 	public void setBundleContext(BundleContext bc) {
+		logger.debug("Bundle context is set for event mgmt system");
 		this.bc = bc;
 	}
-
 }

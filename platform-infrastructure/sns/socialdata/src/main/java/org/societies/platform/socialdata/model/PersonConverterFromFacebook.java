@@ -1,15 +1,19 @@
 package org.societies.platform.socialdata.model;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
 
-import org.apache.shindig.social.core.model.AccountImpl;
 import org.apache.shindig.social.core.model.AddressImpl;
+import org.apache.shindig.social.core.model.ListFieldImpl;
 import org.apache.shindig.social.core.model.NameImpl;
 import org.apache.shindig.social.core.model.PersonImpl;
 import org.apache.shindig.social.opensocial.model.Account;
 import org.apache.shindig.social.opensocial.model.Address;
+import org.apache.shindig.social.opensocial.model.ListField;
 import org.apache.shindig.social.opensocial.model.Name;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.apache.shindig.social.opensocial.model.Person.Gender;
@@ -20,6 +24,8 @@ import org.json.JSONObject;
 
 public class PersonConverterFromFacebook implements PersonConverter{
 	
+	public static String WORKS 			= "works";
+	public static String ACCOUNTS 		= "accounts";
 	public static String USERNAME 		= "username";
 	public static String LOCATION		= "location";
 	public static String RELIGION		= "religion";
@@ -35,6 +41,8 @@ public class PersonConverterFromFacebook implements PersonConverter{
 	public static String BIO 			= "bio";
 	public static String BIRTHDAY		= "birthday";
 	public static String EMAIL			= "email";
+	public static String PROFILELINK 	= "link";
+	public static String PHOTOS 		= "photos";
 	
 	
 	// portable contact ids
@@ -54,14 +62,21 @@ public class PersonConverterFromFacebook implements PersonConverter{
 		try{
 			
 			person.setId(db.getString(ID));
+			
 			//if(db.has(UCT)) person.setUtcOffset(db.getLong(UCT));
 			if (db.has(BIO))		 	person.setAboutMe(db.getString(BIO));
 			if (db.has(SPORTS)) 	 	person.setSports(setSports(db.getString(SPORTS)));
 			if (db.has(RELATIONSHIP)) 	person.setRelationshipStatus(db.getString(RELATIONSHIP));
 			if (db.has(RELIGION))       person.setReligion(db.getString(RELIGION));
 			if (db.has(LOCATION))		person.setCurrentLocation(setLocation(db.getString(LOCATION)));
-			
-			
+			if (db.has(ACCOUNTS))		person.setAccounts(setAccounts(db.getString(ACCOUNTS)));
+			if (db.has(WORKS))			person.setActivities(setActivities(WORKS));
+			if (db.has(PROFILELINK))	person.setProfileUrl(db.getString(PROFILELINK));
+			if (db.has(BIRTHDAY))		person.setBirthday(getBirthDay(db.getString(BIRTHDAY)));
+			if (db.has(GENDER))			person.setGender(gender(db.getString(GENDER)));
+			if (db.has(EMAIL))			person.setEmails(getMails(db.getString(EMAIL)));
+			if (db.has(PHOTOS))			person.setPhotos(getPhotos(db.getString(PHOTOS)));
+										
 			
 		}
 		catch (JSONException e) {
@@ -69,15 +84,63 @@ public class PersonConverterFromFacebook implements PersonConverter{
 		}
 		
 		person.setName(genName());
-		person.setGender(genGender());
-		person.setEmails(genEmails());
 		person.setActivities(genActivities());
 		
-		setAccount();  // Set Facebook Account
+		
 			
 		return person;
 	}
 	
+	private List<ListField> getPhotos(String data) {
+		List<ListField> photos = new ArrayList<ListField>();
+		try {
+			JSONArray json_photos = new JSONArray(data);
+			for(int i=0; i<json_photos.length();i++){
+				JSONObject p = (JSONObject) json_photos.get(i);
+				
+				ListField photo = new ListFieldImpl();
+				photo.setPrimary(p.getBoolean("primary"));
+				photo.setType(p.getString("type"));
+				photo.setValue(p.getString("value"));
+				photos.add(photo);
+				
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		return photos;
+	}
+
+	private Date getBirthDay(String date) {
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			return df.parse(date);
+			} catch (ParseException e) {
+			
+		}
+		return null;
+
+	}
+
+	private List<String> setActivities(String data) {
+		List<String> works = new ArrayList<String>();
+		try {
+			JSONArray json_works = new JSONArray(data);
+			for(int i=0; i<json_works.length();i++){
+				JSONObject work = (JSONObject) json_works.get(i);
+				works.add(work.getString("description"));
+			}
+		}
+		catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return works;
+	}
+
 	private List<String> genActivities() {
 		List<String> activities = new ArrayList<String>();
 //		try{
@@ -91,21 +154,12 @@ public class PersonConverterFromFacebook implements PersonConverter{
 		return activities;
 	}
 
-	private void setAccount(){
-		Account account = new AccountImpl();
-		try{
-			account.setDomain("facebook.com");
-			account.setUsername(db.getString(USERNAME));
-			account.setUserId(db.getString(ID));
-		}
-		catch (JSONException e) {
-			e.printStackTrace();
-		}
+	private List<Account> setAccounts(String data){
 		
-		//Add the account facebook
 		List<Account> accounts = new ArrayList<Account>();
-		accounts.add(account);
-		person.setAccounts(accounts);
+		
+		// not usefull!
+		return accounts;
 	}
 	
 	private Address setLocation(String data) {
@@ -141,21 +195,14 @@ public class PersonConverterFromFacebook implements PersonConverter{
 		return sportList;
 	}
 
-	private ArrayList genEmails(){
+	private List<ListField> getMails(String mail){
 		
-		ArrayList emails = new ArrayList();
-		try{
-			if (!db.has(EMAIL)) return null;
-			
-			
-			HashMap<String, String> email = new HashMap<String, String>();
-			email.put("value", db.getString(EMAIL));
-			email.put("type", "home");
-			email.put("primary", "true");
-			emails.add(email);
-		}
-		catch(JSONException ex){}
-		
+		List<ListField> emails = new ArrayList<ListField>();
+		ListField email = new ListFieldImpl();
+		email.setPrimary(true);
+		email.setType("home");
+		email.setValue(mail);
+		emails.add(email);
 		return emails;
 	}
 	
@@ -173,48 +220,14 @@ public class PersonConverterFromFacebook implements PersonConverter{
 		return name;
 	}
 	
-	private Gender genGender(){
-		
-		if (db.has(GENDER)){
-			if (getString(GENDER)=="male")
+	private Gender gender(String g){
+			if (g.equals("male"))
 				return Gender.male;
 			else
 				return Gender.female;
-		}
-		
-		//?????
-		return Gender.male;	
 	}
 	
 	
-	private ArrayList emails(){
-		ArrayList mails = new ArrayList();
-		
-		try{
-			HashMap<String, String> mail = new HashMap<String, String>();
-			mail.put("value", db.getString(EMAIL));
-			mail.put("type", "home");
-			mail.put("primary","true");
-			mails.add(mail);
-		}
-		catch(Exception ex){}
-		
-		return mails;
-		
-	}
-	
-	
-	private Object getData(String key){
-		try {
-			if (db.has(key)){
-				return db.get(key);
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return null;
-
-	}
 	
 	private String getString(String key){
 		try {

@@ -114,8 +114,6 @@
 		<module>../cis-modules/cis-discovery/</module>
 		<module>../cis-modules/cis-collaboration/</module>
 
-		<!-- <module>../cis-modules/cis-management/CommunityXEP</module> <module>../cis-modules/cis-management/CommunityServiceBundle</module> -->
-
 
 		<!-- Device Mgmt -->
 		<module>../css-modules/device-mgmt/devicemanager/</module>
@@ -136,7 +134,7 @@
 		<!-- Context Management -->
 
 		<!-- Privacy Mgmt -->
-		<!-- <module>../privacy-trust/privacy-protection</module>  -->
+		<module>../privacy-trust/privacy-protection</module>
 
 
 		<!-- PlatForm Web App -->	

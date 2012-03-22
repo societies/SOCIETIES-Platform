@@ -33,15 +33,26 @@ import org.osgi.service.event.EventConstants;
 public interface IEventMgr {
 
 	/**
-	 * To register a listener for events
+	 * To subscribe a listener for events
 	 * 
 	 * @param listener instance of the EventListener
 	 * @param eventType	String array of event types {@link EventTypes}
 	 * @param filterOption a String containing an LDAP-style filter specification {@link EventConstants}
 	 */
 	public void subscribeInternalEvent(EventListener listener, String[] eventTypes, String filterOption);
-	
+	/**
+	 * To unSubscribe a listerner for events
+	 * @param listener
+	 * @param eventTypes
+	 * @param filterOption
+	 */
 	public void unSubscribeInternalEvent(EventListener listener, String[] eventTypes, String filterOption);
 	
+	/**
+	 * To publish a internal event
+	 * 
+	 * @param event
+	 * @throws EMSException
+	 */
 	public void publishInternalEvent(InternalEvent event) throws EMSException;
 }
