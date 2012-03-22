@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.slm.servicemgmt.impl;
+package org.societies.slm.servicecontrol;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
@@ -139,16 +140,16 @@ public class ServiceRegistryListener implements BundleContextAware,
 		log.info("**Service type** : "+service.getServiceType().toString());
 		
 		
-		service.setServiceEndpoint(service.getServiceName().replaceAll(" ", "") + "/" + commMngr.getIdManager().getThisNetworkNode().getJid());
+		service.setServiceEndpoint(commMngr.getIdManager().getThisNetworkNode().getJid());
 		
 		//TODO: Do this properly!
 		ServiceInstance si = new ServiceInstance();
-		si.setFullJid(commMngr.getIdManager().getThisNetworkNode().getJid());
+		si.setFullJid(commMngr.getIdManager().getThisNetworkNode().getJid() + service.getServiceName().replaceAll(" ", ""));
 		si.setXMPPNode(commMngr.getIdManager().getThisNetworkNode().getJid());
 		
 		ServiceImplementation servImpl = new ServiceImplementation();
 		servImpl.setServiceVersion((String)event.getServiceReference().getProperty("Bundle-Version"));
-			
+
 		
 		si.setServiceImpl(servImpl);
 		service.setServiceInstance(si);
@@ -181,13 +182,14 @@ public class ServiceRegistryListener implements BundleContextAware,
 			}
 			break;
 		case ServiceEvent.UNREGISTERING:
-			log.info("Service Unregistered");			
+			log.info("Service Unregistered, so we set it to stopped but do not remove from registry");			
 			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service, serBndl));
-			serviceList.add(service);
+			//serviceList.add(service);
+			
 			try {
-				this.getServiceReg().unregisterServiceList(serviceList);
-			} catch (ServiceRegistrationException e) {
-				log.debug("Error while removing service meta data");
+				this.getServiceReg().changeStatusOfService(service.getServiceIdentifier(), ServiceStatus.STOPPED);
+			} catch (ServiceNotFoundException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

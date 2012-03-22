@@ -22,66 +22,59 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.servicelifecycle;
+package org.societies.slm.servicecontrol;
 
-import java.net.URL;
-import java.util.concurrent.Future;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
+import org.societies.api.servicelifecycle.IServiceControlCallback;
 
 /**
- * The interface class for the Service Control component. It permits a caller to tell the SLM to
- * start a service, to stop a service, to install a new service and to uninstall a service.
- *
+ * The callback to a remote service control call
+ * 
  * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
  */
-public interface IServiceControl {
+public class ServiceControlRemoteClient implements IServiceControlCallback {
+
+	static final Logger logger = LoggerFactory.getLogger(ServiceControlRemoteClient.class);
+
+	private final long TIMEOUT = 5;
+	
+	private ServiceControlResult result;
+	private BlockingQueue<ServiceControlResult> resultList;
+	
+	public ServiceControlRemoteClient(){
 		
-	/**
-	 * This method starts the service that is identified by the </code>ServiceResourceIdentifier</code>
-	 * 
-	 * @param serviceId unique service identifier
-	 * @return the result of the operation
-	 */
-	
-	public Future<ServiceControlResult> startService(ServiceResourceIdentifier serviceId) throws ServiceControlException;
+		resultList = new ArrayBlockingQueue<ServiceControlResult>(1);
+		if(logger.isDebugEnabled())
+			logger.debug("ServiceControlRemoteClient created");
+		
+	}
 
-	
-	/**
-	 * This method stops the service running in the container that is identified by the </code>ServiceResourceIdentifier</code>
-	 * 
-	 * @param serviceId unique service identifier
-	 * @return the result of the operation
-	 */
-	public Future<ServiceControlResult> stopService(ServiceResourceIdentifier serviceId) throws ServiceControlException;
-	
-	/**
-	 * This method install a new service into the container
-	 * 
-	 * @param serviceLocation the URL of the bundle to install
-	 * @return the result of the operation
-	 */
-	public Future<ServiceControlResult> installService(URL bundleLocation) throws ServiceControlException;
+	@Override
+	public void setResult(ServiceControlResult result) {
+		try {
+			resultList.put(result);
+		} catch (InterruptedException e) {
+			logger.error("Error putting result in List");
+			e.printStackTrace();
+		}
+	}
 
-	/**
-	 * This method install a new service into the container present on a given node
-	 * 
-	 * @param serviceLocation the URL of the bundle to install
-	 * @param node The node where we wish to install the service
-	 * @return the result of the operation
-	 */
-	public Future<ServiceControlResult> installService(URL bundleLocation, IIdentity node) throws ServiceControlException;
+	@Override
+	public ServiceControlResult getResult() {
+		try {
+			return resultList.poll(TIMEOUT, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			logger.error("Error getting result in List");
+			e.printStackTrace();
+			return null;
+		}
+	}
 
-	/**
-	 * This method removes a service from the container.
-	 * 
-	 * @param serviceId unique service identifier
-	 * @return the result of the operation
-	 */
-	public Future<ServiceControlResult> uninstallService(ServiceResourceIdentifier serviceId) throws ServiceControlException;
-
-	
 }

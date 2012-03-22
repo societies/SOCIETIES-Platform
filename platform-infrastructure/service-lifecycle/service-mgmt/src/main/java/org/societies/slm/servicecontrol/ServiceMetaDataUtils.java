@@ -1,4 +1,4 @@
-package org.societies.slm.servicemgmt.impl;
+package org.societies.slm.servicecontrol;
 
 import java.net.URI;
 import java.net.URISyntaxException;
