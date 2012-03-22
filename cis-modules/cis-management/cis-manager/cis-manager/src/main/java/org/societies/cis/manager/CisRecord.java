@@ -197,16 +197,14 @@ public class CisRecord implements ICisOwned, ICisSubscribed{
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return cisName;
 	}
 
 
 
 	@Override
 	public String getOwnerId() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.ownerCss;
 	}
 
 

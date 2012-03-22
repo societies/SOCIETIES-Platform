@@ -72,7 +72,7 @@ import org.societies.api.schema.cis.manager.SubscribedTo;
 */
 
 //@Component
-public class CisEditor implements ICisEditor, IFeatureServer {
+public class CisEditor implements IFeatureServer {
 
 
 	public CisRecord cisRecord;
@@ -466,24 +466,14 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 		return null;
 	}
 
-	@Override
-	public ICisActivityFeed getActivityFeed(String arg0, String arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
+
 	public String getCisId() {
 	
 		return this.cisRecord.getCisId();
 	}
 
-	@Override
-	public Boolean update(String arg0, ICisRecord arg1, String arg2) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
+
 	
 
     
