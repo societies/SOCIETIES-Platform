@@ -22,18 +22,19 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.management;
+package org.societies.api.servicelifecycle;
+
+import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 
 /**
- * @author Babak.Farshchian@sintef.no
+ * The callback to a remote service control call
+ * 
+ * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
  */
-public interface ICisRecord {
+public interface IServiceControlCallback {
 
-    public String getCisId();
-    public String getName();
-    public String getOwnerId();
-    public String setUserDefinedName(String _name);
-    public String getUserDefineName();
-
+	public void setResult(ServiceControlResult result);
+	
+	public ServiceControlResult getResult();
 }

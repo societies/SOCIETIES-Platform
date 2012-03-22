@@ -37,10 +37,11 @@ package org.societies.cis.manager;
 import java.util.Set;
 
 import org.societies.api.cis.collaboration.IServiceSharingRecord;
+import org.societies.api.cis.management.ICisRecord;
 
 
 
-public class CisRecord {
+public class CisRecord implements ICisRecord{
 	public CisActivityFeed feed;
 	public String ownerCss;
 	public int membershipCriteria;
@@ -104,17 +105,21 @@ public class CisRecord {
 		this.cisType = cisType;
 	}
 	
+	public CisRecord(String cisJid) {		
+		this.cisJID = cisJid;
+		
+	}
 
-	 // hash code and equals using cisName and host
+	 // hash code and equals using CISjID
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((cisName == null) ? 0 : cisName.hashCode());
-		result = prime * result + ((host == null) ? 0 : host.hashCode());
+		result = prime * result + ((cisJID == null) ? 0 : cisJID.hashCode());
 		return result;
 	}
+
 
 
 	@Override
@@ -126,23 +131,22 @@ public class CisRecord {
 		if (getClass() != obj.getClass())
 			return false;
 		CisRecord other = (CisRecord) obj;
-		if (cisName == null) {
-			if (other.cisName != null)
+		if (cisJID == null) {
+			if (other.cisJID != null)
 				return false;
-		} else if (!cisName.equals(other.cisName))
-			return false;
-		if (host == null) {
-			if (other.host != null)
-				return false;
-		} else if (!host.equals(other.host))
+		} else if (!cisJID.equals(other.cisJID))
 			return false;
 		return true;
 	}
 
-
+	
+	
 	public String getOwnerCss() {
 		return ownerCss;
 	}
+
+
+
 
 
 	public void setOwnerCss(String ownerCss) {
@@ -181,14 +185,48 @@ public class CisRecord {
 	}
 
 
-
-	public String getCisJID() {
+	@Override
+	public String getCisId() {
 		return cisJID;
 	}
 
-	public void setCisJID(String fullJid) {
-		this.cisJID = fullJid;
+
+
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
 	}
+
+
+
+	@Override
+	public String getOwnerId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public String getUserDefineName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public String setUserDefinedName(String arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+
+
 
 	
 

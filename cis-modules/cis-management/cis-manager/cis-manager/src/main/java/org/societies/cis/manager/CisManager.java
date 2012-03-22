@@ -27,6 +27,7 @@
 package org.societies.cis.manager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -38,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import org.societies.api.cis.management.ICisEditor;
 import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisRecord;
 
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -56,7 +58,9 @@ import org.springframework.stereotype.Component;
 
 import org.societies.api.schema.cis.manager.Community;
 import org.societies.api.schema.cis.manager.Communities;
+import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
+import org.societies.api.schema.cis.manager.SubscribedTo;
 
 
 
@@ -76,10 +80,13 @@ public class CisManager implements ICisManager, IFeatureServer{
 	Set<CisRecord> subscribedCISs;
 	
 	private final static List<String> NAMESPACES = Collections
+			//.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
+				//		  		"http://societies.org/api/schema/cis/community"));
 			.singletonList("http://societies.org/api/schema/cis/manager");
 	private final static List<String> PACKAGES = Collections
 			.singletonList("org.societies.api.schema.cis.manager");
-	
+			//.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
+				//	"org.societies.api.schema.cis.community"));
 
 	private static Logger LOG = LoggerFactory
 			.getLogger(CisManager.class);
@@ -152,18 +159,26 @@ public class CisManager implements ICisManager, IFeatureServer{
 	
 	
 	@Override
-	public ICisEditor createCis(String cssId, String cssPassword, String cisName, String cisType, int mode) {
+	public ICisOwned createCis(String cssId, String cssPassword, String cisName, String cisType, int mode) {
 		// TODO: how do we check fo the cssID/pwd?
-		if(cssId.equals(this.CSSendpoint.getIdManager().getThisNetworkNode().getJid()) == false){ // if the cssID does not match with the host owner
-			LOG.info("cssID does not match with the host owner");
-			return null;
-		}
+		//if(cssId.equals(this.CSSendpoint.getIdManager().getThisNetworkNode().getJid()) == false){ // if the cssID does not match with the host owner
+		//	LOG.info("cssID does not match with the host owner");
+		//	return null;
+		//}
 		// TODO: review this logic as maybe I should probably check if it exists before creating
 		CisEditor cis = new  CisEditor(cssId, cisName, cisType, mode,this.ccmFactory);		
 		if (ownedCISs.add(cis))
-			return cis;
+			return (ICisOwned)cis.getCisRecord();
 		else
 			return null;
+		
+	}
+
+	
+	public boolean subscribeToCis(ICisRecord i) {
+
+		this.subscribedCISs.add(new CisRecord(i.getCisId()));
+		return true;
 		
 	}
 
@@ -225,9 +240,10 @@ public class CisManager implements ICisManager, IFeatureServer{
 	@Override
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
 		// all received IQs contain a community element
+		
 		LOG.info("get Query received");
-		if (payload.getClass().equals(Community.class)) {
-			Community c = (Community) payload;
+		if (payload.getClass().equals(org.societies.api.schema.cis.manager.CommunityManager.class)) {
+			CommunityManager c = (CommunityManager) payload;
 
 			if (c.getCreate() != null) {
 				
@@ -247,28 +263,21 @@ public class CisManager implements ICisManager, IFeatureServer{
 				String cisType = create.getCommunityType();
 				String cisName = create.getCommunityName();
 				//int cisMode = create.getMembershipMode().intValue();
-				LOG.info("CIS to be created with " + ownerJid + " " + cisJid + " "+ cisPassword + " ");
-				if(cisPassword != null && ownerJid != null && cisJid != null ){
-					CisRecord cisR = this.createCis(ownerJid,
-							cisJid,this.CSSendpoint.getIdManager().getThisNetworkNode().getDomain(), cisPassword);
+
+				if(ownerJid != null && ownerPassword != null && cisType != null && cisName != null &&  create.getMembershipMode()!= null){
+					int cisMode = create.getMembershipMode().intValue();
+
+					ICisOwned icis = createCis(ownerJid, ownerPassword, cisName, cisType, cisMode);
+
 					
-					LOG.info("CIS Created!!");
-					return create;
-					
-				}
-				else{
-					if(ownerJid != null && ownerPassword != null && cisType != null && cisName != null &&  create.getMembershipMode()!= null){
-						int cisMode = create.getMembershipMode().intValue();
-						ICisEditor icis = createCis(ownerJid, ownerPassword, cisName, cisType, cisMode);
-						
-						create.setCommunityJid(icis.getCisId());
-						LOG.info("CIS with self assigned ID Created!!");
-						return create;  
-					}
-					
-					LOG.info("missing parameter on the create");
-					// if one of those parameters did not come, we should return an error
-					return create;
+					create.setCommunityJid(icis.getCisId());
+					LOG.info("CIS with self assigned ID Created!!");
+					return c;  
+				}else{
+				
+				LOG.info("missing parameter on the create");
+				// if one of those parameters did not come, we should return an error
+				return new CommunityManager();
 				}
 				// END OF CREATE CIS					
 
@@ -291,7 +300,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 					while(it.hasNext()){
 						CisRecord element = it.next();
 						Community community = new Community();
-						community.setCommunityJid(element.getCisJID());
+						community.setCommunityJid(element.getCisId());
 						com.getCommunity().add(community);
 						 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 				     }
@@ -305,7 +314,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 					while(it.hasNext()){
 						CisRecord element = it.next();
 						Community community = new Community();
-						community.setCommunityJid(element.getCisJID());
+						community.setCommunityJid(element.getCisId());
 						com.getCommunity().add(community);
 						 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 				     }
@@ -320,6 +329,14 @@ public class CisManager implements ICisManager, IFeatureServer{
 				LOG.info("configure received");
 				return c;
 			}
+			if (c.getSubscribedTo()!= null) {
+				LOG.info("subscribedTo received");
+				SubscribedTo s = (SubscribedTo) c.getSubscribedTo();
+				CisRecord r = new CisRecord(s.getCisJid());
+				this.subscribeToCis(r);
+				return null;
+			}
+			
 			if (c.getDelete() != null) {
 				LOG.info("delete received");
 				return c;

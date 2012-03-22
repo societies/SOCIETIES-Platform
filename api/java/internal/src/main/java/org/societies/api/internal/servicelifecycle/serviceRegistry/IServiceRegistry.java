@@ -114,4 +114,6 @@ public interface IServiceRegistry {
 	 * @return true if all is performed correctly
 	 */
 	public boolean changeStatusOfService(ServiceResourceIdentifier serviceIdentifier, ServiceStatus serviceStatus) throws ServiceNotFoundException;
+	
+	
 }
