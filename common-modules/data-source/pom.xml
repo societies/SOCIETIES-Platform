@@ -24,13 +24,14 @@
 	STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN 
 	ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
 	OF SUCH DAMAGE. -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>data-source</artifactId>
-  <description>common data source bundle</description>
-  <packaging>bundle</packaging>
-  
-  <developers>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>data-source</artifactId>
+	<description>common data source bundle</description>
+	<packaging>bundle</packaging>
+
+	<developers>
 		<developer>
 			<id>pkudaiyar</id>
 			<name>Perumal K</name>
@@ -38,24 +39,24 @@
 			<organization>Intel</organization>
 			<roles>
 				<role>owner, developer</role>
-			</roles>			
+			</roles>
 		</developer>
 	</developers>
-	  
-  <parent>
+
+	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>0.1</version>
-  </parent>
-	
-  <dependencies>
-  	<dependency>
+	</parent>
+
+	<dependencies>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
-			<type>libd</type>			
+			<type>libd</type>
 			<scope>provided</scope>
-	</dependency>
-	<!-- logging -->
+		</dependency>
+		<!-- logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
@@ -68,7 +69,7 @@
 			<version>${slf4j.version}</version>
 			<scope>compile</scope>
 		</dependency>
-		
+
 		<!-- databases -->
 		<dependency>
 			<groupId>org.apache.derby</groupId>
@@ -90,20 +91,20 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>com.springsource.org.apache.commons.dbcp</artifactId>
-			<version>1.2.2.osgi</version>			
+			<version>1.2.2.osgi</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>com.springsource.org.apache.commons.pool</artifactId>
-			<version>1.5.3</version>			
+			<version>1.5.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>com.springsource.org.apache.commons.collections</artifactId>
-			<version>3.2.1</version>			
+			<version>3.2.1</version>
 		</dependency>
-  </dependencies>
-  <build>
+	</dependencies>
+	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
@@ -113,11 +114,11 @@
 					<instructions>
 						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<Import-Package>*;resolution:=optional</Import-Package>						
+						<Import-Package>*;resolution:=optional</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -135,5 +136,5 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>	
+	</build>
 </project>
