@@ -24,44 +24,43 @@
  */
 package com.disaster.idisaster;
 
-import android.app.Activity;
-import android.content.Intent;
+import android.app.ListActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 /**
- * This is the activity (without GUI) that starts as the first
- * activity, when you click on the icon in Android. It checks to
- * see whether you are a registered user, if not shows the login
- * page.
+ * This activity allows the users to manage their 
+ * disasters or the disasters they subscribe to.
  * 
  * @author Babak.Farshchian@sintef.no
- * 		   Jacqueline.Floch@sintef.no
- * 
  *
  */
-public class StartActivity extends Activity {
+public class FeedActivity extends ListActivity {
+    static final String[] FEEDLIST = new String[] { "Feed 1", "Feed 2", "FEed 3", "Feed 4",
+	"Feed 5", "Feed 6", "Feed 7", "Feed 8"};
 
-    /* (non-Javadoc)
-     * @see android.app.Activity#onCreate(android.os.Bundle)
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+	// TODO Auto-generated method stub
+	super.onCreate(savedInstanceState);
+	setListAdapter(new ArrayAdapter<String>(this, R.layout.cis_list_item, FEEDLIST));
 
-    	super.onCreate(savedInstanceState);
-	/*
-	 * check to see if the user has already provided
-	 * a user name and password.
-	 * 
-	 * If yes, go to HomeActivity
-	 * -- Send intent to HomeActivity
-	 * In no, go to LoginActivity
-	 * -- Send intent to LoginActivity
-	 *
-	 */
-// test: start another Activity   	
-    	if (iDisasterApplication.getinstance().username == "Babak") {
-    			
-    	startActivity(new Intent(StartActivity.this, HomeActivity.class));
-    	}
+	  ListView lv = getListView();
+	  lv.setTextFilterEnabled(true);
+
+	  lv.setOnItemClickListener(new OnItemClickListener() {
+	    public void onItemClick(AdapterView<?> parent, View view,
+	        int position, long id) {
+	      // When clicked, show a toast with the TextView text
+	      Toast.makeText(getApplicationContext(), ((TextView) view).getText(),
+	          Toast.LENGTH_SHORT).show();
+	    }
+	  });
+	  }
     }
-}

@@ -24,12 +24,59 @@
  */
 package com.disaster.idisaster;
 
+
+import org.societies.api.css.management.ICssRecord;
+import org.societies.api.css.management.ISocietiesApp;
+
 import android.app.Application;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 /**
- * @author Babak.Farshchian@sintef.no
+ * The application for managing common resources used by 
+ * iDisaster application components.
+ * 
+ * @author 	Babak.Farshchian@sintef.no
+ *			Jacqueline.Floch@sintef.no
  *
  */
 public class iDisasterApplication extends Application {
 
+	private static iDisasterApplication singleton; // Reference to the single instance of the Application
+	
+	public static final String PREFS_NAME = "DisasterPrefsFile"; // Preferences file
+	
+    String societiesServer = "server.societies.eu"; // The name of the server where cloud node is hosted
+    String username = "Babak"; // username to log into societiesServer
+    String password = "SocietieS"; // password for username.
+    ISocietiesApp iDisasterSoc; // represents access to the SOCIETIES platform.
+    ICssRecord cssRecord; // Represents information about the user of the application. to be populated.
+    String cssId;  //TODO: Find out which class CssId is.
+
+
+	// returns application instance
+	public static iDisasterApplication getinstance () {
+		return singleton;
+	}
+	
+	@Override
+	public final void onCreate() {
+
+		super.onCreate ();
+		singleton = this;
+
+	    // Restore preferences from preferences file
+		// If the preferences file by this name does not exist, it is be created
+		// when an editor is retrieved and changes are committed.
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+	    SharedPreferences.Editor editor = settings.edit();
+//	    editor.commit ();
+	    
+	    // Test setting preferences 
+	    String testname = settings.getString ("username","");
+	    testname = "Babak";
+	    editor.putString ("username", testname);	    
+	    
+	}//onCreate
+	
 }
