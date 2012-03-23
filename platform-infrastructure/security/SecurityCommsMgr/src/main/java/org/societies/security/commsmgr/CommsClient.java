@@ -37,6 +37,8 @@ import org.societies.api.internal.security.policynegotiator.INegotiationProvider
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.schema.security.policynegotiator.MethodType;
 import org.societies.api.schema.security.policynegotiator.ProviderBean;
+import org.societies.api.schema.security.policynegotiator.ProviderBeanResult;
+import org.societies.api.schema.security.policynegotiator.SlaBean;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -155,8 +157,19 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 	}
 
 	@Override
-	public void receiveResult(Stanza stanza, Object payload) {
-		LOG.debug("receiveResult()");
+	public void receiveResult(Stanza returnStanza, Object msgBean) {
+		
+		LOG.debug("receiveResult({}, {})", returnStanza, msgBean);
+		
+		if (msgBean instanceof ProviderBeanResult) {
+			
+			ProviderBeanResult providerResult = (ProviderBeanResult) msgBean;
+			SlaBean result = providerResult.getSlaBean();
+			
+			int sessionId = result.getSessionId();
+			String sla = result.getSla();
+			LOG.debug("receiveResult(): sessionId = {}, sla = {}", sessionId, sla);
+		}
 	}
 
 	/*

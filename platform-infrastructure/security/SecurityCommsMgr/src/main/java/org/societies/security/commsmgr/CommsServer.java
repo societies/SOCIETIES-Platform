@@ -136,8 +136,6 @@ public class CommsServer implements IFeatureServer {
 
 		// Put your functionality here if there IS a return object
 		
-		LOG.debug("getQuery()");
-
 		LOG.debug("getQuery({}, {})", stanza, messageBean);
 		LOG.debug("getQuery(): stanza.id   = ", stanza.getId());
 		LOG.debug("getQuery(): stanza.from = ", stanza.getFrom());
@@ -164,7 +162,7 @@ public class CommsServer implements IFeatureServer {
 
 			switch (providerBean.getMethod()) {
 			case GET_POLICY_OPTIONS:
-				LOG.debug("receiveMessage(): NegotiationProvider.getPolicyOptions({})" + serviceId);
+				LOG.debug("getQuery(): NegotiationProvider.getPolicyOptions({})", serviceId);
 				resultFuture = negotiationProvider.getPolicyOptions(serviceId);
 				try {
 					resultBean = resultFuture.get();
