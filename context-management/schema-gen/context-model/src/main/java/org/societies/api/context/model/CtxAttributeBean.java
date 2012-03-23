@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.schema.context.model;
+package org.societies.api.context.model;
 
 import java.util.Date;
 
@@ -33,17 +33,17 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * This class is used to represent context attributes which describe the
- * properties of a {@link CtxEntity}. Multiple <code>CtxAttribute</code>
+ * properties of a {@link CtxEntityBean}. Multiple <code>CtxAttributeBean</code>
  * objects can be assigned to an entity. For example, concepts such as the name,
  * the age, and the location of a person entity are described by different
  * attributes. Similarly, attributes describing a device's properties might be
  * the identity, the voltage, and the operational status of the device.
- * Essentially, CtxAttribute objects are used to identify an entity's status in
+ * Essentially, CtxAttributeBean objects are used to identify an entity's status in
  * terms of its static and dynamic properties and therefore, capture all context
  * information items that characterise the situation of the owner entity. Note
  * that the containing entity is called the attribute's scope.
  * <p>
- * The value of a <code>CtxAttribute</code> can be set and retrieved using the
+ * The value of a <code>CtxAttributeBean</code> can be set and retrieved using the
  * appropriate setter and getter method. The following value types are supported:
  * <dl>
  * <dt><code>String</code></dt>
@@ -59,25 +59,25 @@ import javax.xml.bind.annotation.XmlType;
  * <code>String</code> value:
  * <pre>
  * // Assuming we have obtained a reference to the context attribute 
- * CtxAttribute nameAttr;
+ * CtxAttributeBean nameAttr;
  * // Initialise or update its value 
  * nameAttr.setStringValue(&quot;Sakis Rouvas&quot;);
  * // Retrieve its value 
  * String name = nameAttr.getStringValue();
  * </pre>
  * <p>
- * The <code>CtxAttribute</code> class also provides access to the history flag
+ * The <code>CtxAttributeBean</code> class also provides access to the history flag
  * which controls whether the represented attribute is maintained in the
  * historic context database.
  * 
- * @see CtxAttributeIdentifier
- * @see CtxEntity
+ * @see CtxAttributeIdentifierBean
+ * @see CtxEntityBean
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
 @XmlType(namespace="http://societies.org/api/schema/context/model", propOrder = {"stringValue", "integerValue", "doubleValue", "binaryValue", "valueType", "valueMetric", "quality", "sourceId", "historyRecorded"})
 @XmlAccessorType(XmlAccessType.FIELD)
-public class CtxAttribute extends CtxModelObject {
+public class CtxAttributeBean extends CtxModelObjectBean {
 
 	private static final long serialVersionUID = 2885099443175534995L;
 	
@@ -99,7 +99,7 @@ public class CtxAttribute extends CtxModelObject {
 	
 	/** The value type of this context attribute */
 	@XmlElement(required = true, nillable=false)
-	private CtxAttributeValueType valueType = CtxAttributeValueType.EMPTY;
+	private CtxAttributeValueTypeBean valueType = CtxAttributeValueTypeBean.EMPTY;
 	
 	/** The metric for the current context attribute value */
 	@XmlElement(required = true, nillable=true)
@@ -107,7 +107,7 @@ public class CtxAttribute extends CtxModelObject {
 	
 	/** The QoC meta-data. */
 	@XmlElement(required = true, nillable=false)
-	private CtxQuality quality;
+	private CtxQualityBean quality;
 	
 	/** The identifier of the context source for the current attribute value. */
 	@XmlElement(required = true, nillable=true)
@@ -117,18 +117,18 @@ public class CtxAttribute extends CtxModelObject {
 	@XmlElement(required = true, nillable=false)
 	private boolean historyRecorded;
 
-	CtxAttribute() {}
+	CtxAttributeBean() {}
 	
 	/**
-	 * Constructs a CtxAttribute with the specified identifier.
+	 * Constructs a CtxAttributeBean with the specified identifier.
 	 * 
 	 * @param id
 	 *            the identifier of the newly created context attribute
 	 */
-	public CtxAttribute(CtxAttributeIdentifier id) {
+	public CtxAttributeBean(CtxAttributeIdentifierBean id) {
 		
 		super(id);
-		this.quality = new CtxQuality(this);
+		this.quality = new CtxQualityBean(this);
 	}
 	
 	/**
@@ -137,9 +137,9 @@ public class CtxAttribute extends CtxModelObject {
 	 * @return the identifier of this context attribute.
 	 */
 	@Override
-	public CtxAttributeIdentifier getId() {
+	public CtxAttributeIdentifierBean getId() {
 		
-		return (CtxAttributeIdentifier) super.getId();
+		return (CtxAttributeIdentifierBean) super.getId();
 	}
 	
 	/**
@@ -147,7 +147,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * 
 	 * @return the identifier of the context entity containing this attribute
 	 */
-	public CtxEntityIdentifier getScope() {
+	public CtxEntityIdentifierBean getScope() {
 		
 		return this.getId().getScope();
 	}
@@ -293,7 +293,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * 
 	 * @return the value type of this context attribute
 	 */
-	public CtxAttributeValueType getValueType() {
+	public CtxAttributeValueTypeBean getValueType() {
 		
 		return this.valueType;
 	}
@@ -303,9 +303,9 @@ public class CtxAttribute extends CtxModelObject {
 	 * 
 	 * @param valueType 
 	 *            the value type to set for this context attribute
-	 * @see CtxAttributeValueType
+	 * @see CtxAttributeValueTypeBean
 	 */
-	public void setValueType(CtxAttributeValueType valueType) {
+	public void setValueType(CtxAttributeValueTypeBean valueType) {
 		
 		this.valueType = valueType;
 	}
@@ -335,11 +335,11 @@ public class CtxAttribute extends CtxModelObject {
 	 * Returns the Quality of Context (QoC) information associated to this context
 	 * attribute.
 	 * 
-	 * @return the <code>CtxQuality</code> associated to this context
+	 * @return the <code>CtxQualityBean</code> associated to this context
 	 *         attribute.
-	 * @see CtxQuality
+	 * @see CtxQualityBean
 	 */
-	public CtxQuality getQuality() {
+	public CtxQualityBean getQuality() {
 		
 		return this.quality;
 	}

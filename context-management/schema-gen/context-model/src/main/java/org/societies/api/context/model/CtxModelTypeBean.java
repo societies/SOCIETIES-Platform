@@ -22,13 +22,13 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.schema.context.model;
+package org.societies.api.context.model;
 
 import javax.xml.bind.annotation.XmlType;
 
 /**
  * The constants of this enumerated type specify the context model type of a 
- * {@link CtxModelObject}. Context model objects can be of one of the following types:
+ * {@link CtxModelObjectBean}. Context model objects can be of one of the following types:
  * <ul>
  * <li>{@link #ENTITY}: Denotes a context entity</li>
  * <li>{@link #ATTRIBUTE}: Denotes a context attribute</li>
@@ -36,14 +36,14 @@ import javax.xml.bind.annotation.XmlType;
  * </ul>
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @see CtxModelObject
- * @see CtxEntity
- * @see CtxAttribute 
- * @see CtxAssociation
+ * @see CtxModelObjectBean
+ * @see CtxEntityBean
+ * @see CtxAttributeBean 
+ * @see CtxAssociationBean
  * @since 0.0.1 
  */
 @XmlType(namespace="http://societies.org/api/schema/context/model")
-public enum CtxModelType {
+public enum CtxModelTypeBean {
 	
 	/**
 	 * The enum constant for context entities

@@ -22,71 +22,54 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.schema.context.model;
+package org.societies.api.context.model;
 
-import org.societies.api.context.CtxException;
+import javax.xml.bind.annotation.XmlType;
 
 /**
- * Thrown to indicate that a string could not be parsed into a context identifier. 
- *
+ * The constants of this enumerated type specify the data type of the {@link CtxAttributeBean}
+ * value. To this end, the following value types have been identified:
+ * <dl>
+ * <dt>{@link #EMPTY}</dt>
+ * <dd>No value set.</dd>
+ * <dt>{@link #STRING}</dt>
+ * <dd>Text value.</dd>
+ * <dt>{@link #INTEGER}</dt>
+ * <dd>Integer value.</dd>
+ * <dt>{@link #DOUBLE}</dt>
+ * <dd>Double-precision floating point numeric value.</dd>
+ * <dt>{@link #BINARY}</dt>
+ * <dd>Binary value, i.e. a byte[].</dd>
+ * </dl>
+ * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.4
+ * @since 0.0.1
  */
-public class MalformedCtxIdentifierException extends CtxException {
-
-	private static final long serialVersionUID = -1989914038541623047L;
+@XmlType(namespace="http://societies.org/api/schema/context/model")
+public enum CtxAttributeValueTypeBean {
 
 	/**
-     * Constructs a <code>MalformedCtxIdentifierException</code> with no detail message.
-     */
-    public MalformedCtxIdentifierException() {
-    	
-        super();
-    }
-
-    /**
-     * Constructs a <code>MalformedCtxIdentifierException</code> with the specified detail
-     * message.
-     * 
-     * @param message
-     *            the detail message.
-     */
-    public MalformedCtxIdentifierException(String message) {
-
-        super(message);
-    }
-
-    /**
-     * Creates a <code>MalformedCtxIdentifierException</code> with the specified detail
-     * message and cause.
-     * 
-     * @param message
-     *            the detail message (which is saved for later retrieval by the
-     *            {@link #getMessage()} method).
-     * @param cause
-     *            the cause (which is saved for later retrieval by the
-     *            {@link #getCause()} method). (A <tt>null</tt> value is
-     *            permitted, and indicates that the cause is nonexistent or
-     *            unknown.)
-     */
-    public MalformedCtxIdentifierException(String message, Throwable cause) {
-
-        super(message, cause);
-    }
-
-    /**
-     * Creates a <code>MalformedCtxIdentifierException</code> with the specified cause and a
-     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
-     * typically contains the class and detail message of <tt>cause</tt>).
-     * 
-     * @param cause
-     *            the cause (which is saved for later retrieval by the
-     *            {@link #getCause()} method). (A <tt>null</tt> value is
-     *            permitted, and indicates that the cause is nonexistent or
-     *            unknown.)
-     */
-    public MalformedCtxIdentifierException(Throwable cause) {
-
-        super(cause);
-    }
+	 * Denotes a {@link CtxAttributeBean} with no value set
+	 */
+	EMPTY,
+	
+	/**
+	 * Denotes a {@link CtxAttributeBean} value of type <code>String</code>
+	 */
+	STRING,
+	
+	/**
+	 * Denotes a {@link CtxAttributeBean} value is of type <code>Integer</code>
+	 */
+	INTEGER,
+	
+	/**
+	 * Denotes that the {@link CtxAttributeBean} value is of type <code>Double</code>
+	 */
+	DOUBLE,
+	
+	/**
+	 * Denotes that the {@link CtxAttributeBean} value is of type <code>byte[]</code>
+	 */
+	BINARY,
 }

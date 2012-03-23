@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.schema.context.model;
+package org.societies.api.context.model;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -44,8 +44,8 @@ import javax.xml.bind.annotation.XmlType;
  * <li><tt>OperatorId</tt>: A unique identifier of the CSS or CIS where the 
  * identified context model object is stored.</li>
  * <li><tt>ModelType</tt>: Describes the type of the identified context model
- * object, i.e. is one of the following: {@link CtxModelType#ENTITY ENTITY},
- * {@link CtxModelType#ATTRIBUTE ATTRIBUTE}, or {@link CtxModelType#ASSOCIATION
+ * object, i.e. is one of the following: {@link CtxModelTypeBean#ENTITY ENTITY},
+ * {@link CtxModelTypeBean#ATTRIBUTE ATTRIBUTE}, or {@link CtxModelTypeBean#ASSOCIATION
  * ASSOCIATION}.</li>
  * <li><tt>Type</tt>: A semantic tag that characterises the identified context
  * model object. e.g. "person".</li>
@@ -53,37 +53,37 @@ import javax.xml.bind.annotation.XmlType;
  * respective context information was initially sensed/collected and stored.</li>
  * </ul>
  * 
- * @see CtxModelType
+ * @see CtxModelTypeBean
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
 @XmlType(namespace="http://societies.org/api/schema/context/model")
 @XmlAccessorType(XmlAccessType.FIELD)
-public abstract class CtxIdentifier implements Serializable {
+public abstract class CtxIdentifierBean implements Serializable {
 
 	private static final long serialVersionUID = 3552976823045895472L;
 	
 	/** The unique identifier of the CSS or CIS where the identified context model object is stored.*/
-	private transient String operatorId;
+	protected transient String operatorId;
 	
 	/** The type of the identified context model object. */
-	private transient CtxModelType modelType;
+	protected transient CtxModelTypeBean modelType;
 	
 	/** The semantic tag that characterises the identified context model object. */
-	private transient String type;
+	protected transient String type;
 	
 	/** The unique number within the CSS/CIS where the identified context model object was initially sensed/collected and stored. */
-	private transient Long objectNumber;
+	protected transient Long objectNumber;
 	
 	/** The string form of this context identifier. */
 	@XmlElement(required = true, nillable=false)
-	private volatile String string;    // The only serialisable field
+	protected volatile String string;    // The only serialisable field
 
-	CtxIdentifier() {}
+	CtxIdentifierBean() {}
 	
 	/**
-	 * Creates a context model object identifier by specifying the CSS/CIS ID
-	 * where the identified object is stored, as well as, the {@link CtxModelType}
+	 * Constructs a context model object identifier by specifying the CSS/CIS ID
+	 * where the identified object is stored, as well as, the {@link CtxModelTypeBean}
 	 * and the unique numeric model object identifier.
 	 * 
 	 * @param operatorId
@@ -95,17 +95,23 @@ public abstract class CtxIdentifier implements Serializable {
 	 * @param objectNumber
 	 *            the unique numeric model object identifier
 	 */
-	CtxIdentifier(String operatorId, CtxModelType modelType, String type, Long objectNumber) {
+	CtxIdentifierBean(String operatorId, CtxModelTypeBean modelType, String type, Long objectNumber) {
 		
 		this.operatorId = operatorId;
 		this.modelType = modelType;
 		this.type = type;
 		this.objectNumber = objectNumber;
 	}
-
-	CtxIdentifier(String str) throws MalformedCtxIdentifierException {
+	
+	/**
+	 * Constructs a context model object identifier by parsing the given string. 
+	 * 
+	 * @throws MalformedCtxIdentifierException
+	 *             if the given string cannot be parsed
+	 */
+	CtxIdentifierBean(String str) throws MalformedCtxIdentifierException {
 		
-		this.parse(str);
+		this.parseString(str);
 	}
 	
 	/**
@@ -124,9 +130,9 @@ public abstract class CtxIdentifier implements Serializable {
 	 * Returns the type of the identified context model object
 	 * 
 	 * @return the type of the identified context model object
-	 * @see CtxModelType
+	 * @see CtxModelTypeBean
 	 */
-	public CtxModelType getModelType() {
+	public CtxModelTypeBean getModelType() {
 		
 		return this.modelType;
 	}
@@ -172,7 +178,7 @@ public abstract class CtxIdentifier implements Serializable {
 	@Override
 	public String toString() {
 		
-		this.initString();
+		this.defineString();
 		
 		return this.string;
 	}
@@ -213,7 +219,7 @@ public abstract class CtxIdentifier implements Serializable {
         if (this.getClass() != that.getClass())
             return false;
         
-        CtxIdentifier other = (CtxIdentifier) that;
+        CtxIdentifierBean other = (CtxIdentifierBean) that;
         if (this.operatorId == null) {
             if (other.operatorId != null)
                 return false;
@@ -239,101 +245,56 @@ public abstract class CtxIdentifier implements Serializable {
     }
 	
 	/**
-     * Writes the contents of this CtxIdentifier to the given object output stream.
+     * Formats the string representation of this context identifier.
+     */
+    protected abstract void defineString();
+    
+    /**
+     * Parses the information contained in the given context identifier string.
+     * 
+     * @param input
+     *            the context identifier string to parse
+     * @throws MalformedCtxIdentifierException
+     *             if the given string cannot be parsed.             
+     */
+	protected abstract void parseString(String input) throws MalformedCtxIdentifierException;
+	
+	/**
+     * Writes the contents of this CtxIdentifierBean to the given object output stream.
      * <p> 
-     * The only serialisable field of a CtxIdentifier instance is its 
+     * The only serialisable field of a CtxIdentifierBean instance is its 
      * {@link #string} field. That field is given a value, if it does not have
      * one already, and then the {@link java.io.ObjectOutputStream#defaultWriteObject()}
      * method of the given object-output stream is invoked.
      *
      * @param os
-     *            The object output stream to which this object is to be written
+     *            the object output stream to which this object is to be written
      */
     private void writeObject(ObjectOutputStream os)	throws IOException {
     	
-    	this.initString();          // Initialise the string field
-    	os.defaultWriteObject();	// Write the string field only!
+    	this.defineString();        // Initialise the string field
+    	os.defaultWriteObject();	// Write the string field only
     }
 
     /**
-     * Reconstructs a CtxIdentifier from the given serial stream.
+     * Reconstructs a CtxIdentifierBean from the given serial stream.
      * <p> 
      * The {@link java.io.ObjectInputStream#defaultReadObject()} method is
      * invoked to read the value of the <tt>string</tt> field. The result is
      * then parsed in the usual way.
      *
      * @param is
-     *            The object input stream from which this object is being read
+     *            the object input stream from which this object is being read
      */
     private void readObject(ObjectInputStream is) throws ClassNotFoundException, IOException {
 	
-    	is.defaultReadObject();     // Read the string field only!
+    	is.defaultReadObject();     // Read the string field only
     	try {
-    		this.parse(this.string);
+    		this.parseString(this.string);
     	} catch (MalformedCtxIdentifierException mcie) {
-    		IOException ioe = new InvalidObjectException("Invalid Context Identifier");
+    		IOException ioe = new InvalidObjectException("Invalid context identifier");
     		ioe.initCause(mcie);
     		throw ioe;
     	}
     }
-	
-    // <operatorId>/<modelType>/<type>/<objectNumber>
-    private void initString() {
-		
-		if (this.string != null) 
-			return;
-		
-		StringBuilder sb = new StringBuilder();
-		
-		sb.append(this.operatorId);
-		sb.append("/");
-		sb.append(this.modelType);
-		sb.append("/");
-		sb.append(this.type);
-		sb.append("/");
-		sb.append(this.objectNumber);
-		
-		this.string = sb.toString();
-	}
-    
-    // <operatorId>/<modelType>/<type>/<objectNumber>
-	private void parse(String input) throws MalformedCtxIdentifierException {
-		
-		this.string = input;
-
-		final int length = input.length();
-
-		final int objectNumberDelim = input.lastIndexOf("/");
-		if (objectNumberDelim == -1)
-			throw new MalformedCtxIdentifierException("'" + input + "'");
-		final String objectNumberStr = input.substring(objectNumberDelim+1, length);
-		try { 
-			objectNumber = new Long(objectNumberStr);
-		} catch (NumberFormatException nfe) {
-			throw new MalformedCtxIdentifierException("'" + input 
-					+ "': Invalid context model object number", nfe);
-		}
-
-		final int typeDelim = input.lastIndexOf("/", objectNumberDelim-1);
-		type = input.substring(typeDelim+1, objectNumberDelim);
-		if (type.isEmpty())
-			throw new MalformedCtxIdentifierException("'" + input 
-					+ "': Context type cannot be empty");
-
-		final int modelTypeDelim = input.lastIndexOf("/", typeDelim-1);
-		if (modelTypeDelim == -1)
-			throw new MalformedCtxIdentifierException("'" + input + "'");
-		final String modelTypeStr = input.substring(modelTypeDelim+1, typeDelim);
-		try {
-			modelType = CtxModelType.valueOf(modelTypeStr);
-		} catch (IllegalArgumentException iae) {
-			throw new MalformedCtxIdentifierException("'" + input 
-					+ "': Malformed context model type", iae);
-		}
-
-		operatorId = input.substring(0, modelTypeDelim);
-		if (operatorId.isEmpty())
-			throw new MalformedCtxIdentifierException("'" + input 
-					+ "': Operator ID cannot be empty");
-	}
 }

@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.schema.context.model;
+package org.societies.api.context.model;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,42 +30,39 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
 /**
  * This class is used to represent community context entities. A
- * <code>CommunityCtxEntity</code> corresponds to a pervasive community (CIS)
- * and is associated with a set of {@link CommunityMemberCtxEntity} objects
- * representing its members, i.e. {@link IndividualCtxEntity individuals}
- * and/or other {@link CommunityCtxEntity communities}. The {@link CtxAttribute}
+ * <code>CommunityCtxEntityBean</code> corresponds to a pervasive community (CIS)
+ * and is associated with a set of {@link CommunityMemberCtxEntityBean} objects
+ * representing its members, i.e. {@link IndividualCtxEntityBean individuals}
+ * and/or other {@link CommunityCtxEntityBean communities}. The {@link CtxAttributeBean}
  * class is used in order to describe the community context attributes of a CIS.
  * Common context characteristics shared among community members are described
- * by the {@link CtxBond} class. 
+ * by the {@link CtxBondBean} class. 
  * 
- * @see CtxEntityIdentifier
+ * @see CtxEntityIdentifierBean
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-@XmlType(namespace="http://societies.org/api/schema/context/model")
+@XmlType(namespace="http://societies.org/api/schema/context/model", propOrder = {"members", "bonds"})
 @XmlAccessorType(XmlAccessType.FIELD)
-public class CommunityCtxEntity extends CommunityMemberCtxEntity {
+public class CommunityCtxEntityBean extends CommunityMemberCtxEntityBean {
 	
 	private static final long serialVersionUID = -8564823052068362334L;
 	
 	/** The members of this CIS. */
-	@XmlElementWrapper(name = "members")
-	@XmlElement(name = "member")
-	private Set<CommunityMemberCtxEntity> members = new HashSet<CommunityMemberCtxEntity>();
+	@XmlElement(required = true, nillable=false)
+	private Set<CommunityMemberCtxEntityBean> members = new HashSet<CommunityMemberCtxEntityBean>();
 	
-	@XmlElementWrapper(name = "bonds")
-	@XmlElement(name = "bond")
 	/** The context bond of this CIS. */
-	private Set<CtxBond> bonds = new HashSet<CtxBond>();
+	@XmlElement(required = true, nillable=false)
+	private Set<CtxBondBean> bonds = new HashSet<CtxBondBean>();
 
-	CommunityCtxEntity() {}
+	CommunityCtxEntityBean() {}
 	
-	public CommunityCtxEntity(CtxEntityIdentifier id) {
+	public CommunityCtxEntityBean(CtxEntityIdentifierBean id) {
 		
 		super(id);
 	}
@@ -75,8 +72,8 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 *  
 	 * @return a set containing the members of this CIS.
 	 */
-	public Set<CommunityMemberCtxEntity> getMembers() {
-		return new HashSet<CommunityMemberCtxEntity>(this.members);
+	public Set<CommunityMemberCtxEntityBean> getMembers() {
+		return new HashSet<CommunityMemberCtxEntityBean>(this.members);
 	}
 	
 	/**
@@ -86,7 +83,7 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 *            the new member of this CIS
 	 * @throws NullPointerException if the specified member is <code>null</code>
 	 */
-	public void addMember(CommunityMemberCtxEntity member) {
+	public void addMember(CommunityMemberCtxEntityBean member) {
 		
 		if (member == null)
 			throw new NullPointerException("member can't be null");
@@ -101,7 +98,7 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 *            the member to remove from this CIS
 	 * @throws NullPointerException if the specified member is <code>null</code>
 	 */
-	public void removeMember(CommunityMemberCtxEntity member) {
+	public void removeMember(CommunityMemberCtxEntityBean member) {
 		
 		if (member == null)
 			throw new NullPointerException("member can't be null");
@@ -114,9 +111,9 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 *  
 	 * @return a set containing the context bonds of this CIS.
 	 */
-	public Set<CtxBond> getBonds() {
+	public Set<CtxBondBean> getBonds() {
 		
-		return new HashSet<CtxBond>(this.bonds);
+		return new HashSet<CtxBondBean>(this.bonds);
 	}
 	
 	/**
@@ -126,7 +123,7 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 *            the context bond to add
 	 * @throws NullPointerException if the specified context bond is <code>null</code>
 	 */
-	public void addBond(CtxBond bond) {
+	public void addBond(CtxBondBean bond) {
 		
 		if (bond == null)
 			throw new NullPointerException("bond can't be null");
@@ -141,7 +138,7 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 *            the context bond to remove
 	 * @throws NullPointerException if the specified context bond is <code>null</code>
 	 */
-	public void removeBond(CtxBond bond) {
+	public void removeBond(CtxBondBean bond) {
 		
 		if (bond == null)
 			throw new NullPointerException("bond can't be null");

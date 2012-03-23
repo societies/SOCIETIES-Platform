@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.schema.context.model;
+package org.societies.api.context.model;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,63 +30,60 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
 /**
  * This class is used to represent context entities. A
- * <code>CtxEntity</code> is the core concept upon which the context model is
+ * <code>CtxEntityBean</code> is the core concept upon which the context model is
  * built. It corresponds to an object of the physical or conceptual world. For
  * example an entity could be a person, a device, or a service. The
- * {@link CtxAttribute} class is used in order to describe an entity's
+ * {@link CtxAttributeBean} class is used in order to describe an entity's
  * properties. Concepts such as the name, the age, and the location of a person
  * are described by different context attributes. Relations that may exist among
- * different entities are described by the {@link CtxAssociation} class.
+ * different entities are described by the {@link CtxAssociationBean} class.
  * <p>
- * The <code>CtxEntity</code> class provides access to the contained
+ * The <code>CtxEntityBean</code> class provides access to the contained
  * context attributes and the associations this entity is member of.
  * 
- * @see CtxEntityIdentifier
- * @see CtxAttribute
- * @see CtxAssociation
+ * @see CtxEntityIdentifierBean
+ * @see CtxAttributeBean
+ * @see CtxAssociationBean
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @version 0.0.1
  */
 @XmlType(namespace="http://societies.org/api/schema/context/model", propOrder = {"attributes", "associations"})
 @XmlAccessorType(XmlAccessType.FIELD)
-public class CtxEntity extends CtxModelObject {
+public class CtxEntityBean extends CtxModelObjectBean {
 
 	private static final long serialVersionUID = -9180016236230471418L;
 	
-	@XmlElementWrapper(name = "attributes")
-	@XmlElement(name = "attribute")
-	private Set<CtxAttribute> attributes = new HashSet<CtxAttribute>();
+	@XmlElement(required = true, nillable=false)
+	private Set<CtxAttributeBean> attributes = new HashSet<CtxAttributeBean>();
 	
-	@XmlElementWrapper(name = "associations")
-	@XmlElement(name = "association")
-	private Set<CtxAssociationIdentifier> associations = new HashSet<CtxAssociationIdentifier>();
+	@XmlElement(required = true, nillable=false)
+	private Set<CtxAssociationIdentifierBean> associations = new HashSet<CtxAssociationIdentifierBean>();
 
-	CtxEntity() {}
+	CtxEntityBean() {}
 	
 	/**
-	 * Constructs a CtxEntity with the specified identifier
+	 * Constructs a CtxEntityBean with the specified identifier
 	 * 
 	 * @param id
 	 *            the identifier of the newly created context entity
 	 */
-	public CtxEntity(CtxEntityIdentifier id) {
+	public CtxEntityBean(CtxEntityIdentifierBean id) {
 		
 		super(id);
 	}
 	
 	/**
 	 * Returns the identifier of this context entity.
-	 * @see CtxEntityIdentifier
+	 * @see CtxEntityIdentifierBean
 	 */
 	@Override
-	public CtxEntityIdentifier getId() {
+	public CtxEntityIdentifierBean getId() {
 		
-		return (CtxEntityIdentifier) super.getId();
+		return (CtxEntityIdentifierBean) super.getId();
 	}
 
 	/**
@@ -95,10 +92,10 @@ public class CtxEntity extends CtxModelObject {
      * attributes.
      * 
      * @return a set of the context attributes contained in this entity.
-     * @see CtxAttribute
+     * @see CtxAttributeBean
      * @see #getAttributes(String)
 	 */
-	public Set<CtxAttribute> getAttributes(){
+	public Set<CtxAttributeBean> getAttributes(){
 		
 		return this.getAttributes(null);
 	}
@@ -116,17 +113,17 @@ public class CtxEntity extends CtxModelObject {
 	 *            the context attribute type to match.
 	 * @return a set of the context attributes contained in this entity that
 	 *         have the specified type.
-	 * @see CtxAttribute
+	 * @see CtxAttributeBean
 	 * @see #getAttributes()
 	 */
-	public Set<CtxAttribute> getAttributes(String type) {
+	public Set<CtxAttributeBean> getAttributes(String type) {
 		
-		final Set<CtxAttribute> result = new HashSet<CtxAttribute>();
+		final Set<CtxAttributeBean> result = new HashSet<CtxAttributeBean>();
 		
 		if (type == null) {
 			result.addAll(this.attributes);
 		} else {
-			for (final CtxAttribute attr : this.attributes)
+			for (final CtxAttributeBean attr : this.attributes)
 				if (type.equalsIgnoreCase(attr.getType()))
 						result.add(attr);
 		}
@@ -139,10 +136,10 @@ public class CtxEntity extends CtxModelObject {
 	 * member of any association.
 	 * 
 	 * @return a set containing all association identifiers this entity is member of
-	 * @see CtxAssociationIdentifier
+	 * @see CtxAssociationIdentifierBean
 	 * @see #getAssociations(String)
 	 */
-	public Set<CtxAssociationIdentifier> getAssociations() {
+	public Set<CtxAssociationIdentifierBean> getAssociations() {
 		
 		return this.getAssociations(null);
 	}
@@ -159,17 +156,17 @@ public class CtxEntity extends CtxModelObject {
 	 *            the context association type to match
 	 * @return a set containing all associations of the specified type this
 	 *         entity is member of
-	 * @see CtxAssociationIdentifier
+	 * @see CtxAssociationIdentifierBean
 	 * @see #getAssociations()
 	 */
-	public Set<CtxAssociationIdentifier> getAssociations(String type) {
+	public Set<CtxAssociationIdentifierBean> getAssociations(String type) {
 		
-		final Set<CtxAssociationIdentifier> result = new HashSet<CtxAssociationIdentifier>();
+		final Set<CtxAssociationIdentifierBean> result = new HashSet<CtxAssociationIdentifierBean>();
 		
 		if (type == null) {
 			result.addAll(this.associations);
 		} else {
-			for (final CtxAssociationIdentifier assoc : this.associations)
+			for (final CtxAssociationIdentifierBean assoc : this.associations)
 				if (type.equalsIgnoreCase(assoc.getType()))
 						result.add(assoc);
 		}
@@ -180,7 +177,7 @@ public class CtxEntity extends CtxModelObject {
 	 * TO BE REMOVED DO NOT USE
 	 */
 	@Deprecated
-	public void addAttribute(CtxAttribute attribute) {
+	public void addAttribute(CtxAttributeBean attribute) {
         attributes.add(attribute);
     }
 

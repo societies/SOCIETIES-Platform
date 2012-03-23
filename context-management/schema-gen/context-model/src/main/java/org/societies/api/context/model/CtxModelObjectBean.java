@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.schema.context.model;
+package org.societies.api.context.model;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -34,35 +34,35 @@ import javax.xml.bind.annotation.XmlType;
  * Base class for representing context model objects. This class defines methods
  * for accessing information common to all <code>CtxModelOject</code>
  * implementations. More specifically, every context model object can be referenced
- * by its {@link CtxIdentifier}. In addition, upon modification of a CtxModelOject
+ * by its {@link CtxIdentifierBean}. In addition, upon modification of a CtxModelOject
  * the last modification time is updated.   
  * 
- * @see CtxModelType
+ * @see CtxModelTypeBean
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
 @XmlType(namespace="http://societies.org/api/schema/context/model", propOrder= {"id", "lastModified"})
-public abstract class CtxModelObject implements Serializable {
+public abstract class CtxModelObjectBean implements Serializable {
 
 	private static final long serialVersionUID = 7349640661605024918L;
 	
 	/** The identifier of this context model object. */
 	@XmlElement(required = true, nillable=false)
-	private /* final */ CtxIdentifier id;
+	private /* final */ CtxIdentifierBean id;
 	
 	/** The last modification time of this context model object. */
 	@XmlElement(required = true, nillable=false)
 	private Date lastModified;
 
-	CtxModelObject() {}
+	CtxModelObjectBean() {}
 	
 	/**
-	 * Constructs a CtxModelObject with the specified identifier
+	 * Constructs a CtxModelObjectBean with the specified identifier
 	 * 
 	 * @param id
 	 *            the identifier of the newly created context model object
 	 */
-	CtxModelObject(CtxIdentifier id) {
+	CtxModelObjectBean(CtxIdentifierBean id) {
 		this.id = id;
 	}
 
@@ -70,9 +70,9 @@ public abstract class CtxModelObject implements Serializable {
 	 * Returns the identifier of this context model object
      * 
      * @return the identifier of this context model object
-     * @see CtxIdentifier
+     * @see CtxIdentifierBean
 	 */
-	public CtxIdentifier getId(){
+	public CtxIdentifierBean getId(){
 		return this.id;
 	}
 
@@ -94,9 +94,9 @@ public abstract class CtxModelObject implements Serializable {
 	 * Attribute or Association
 	 * 
 	 * @return the enum constant for the context model type
-	 * @see CtxIdentifier#getModelType()
+	 * @see CtxIdentifierBean#getModelType()
 	 */
-	public CtxModelType getModelType() {
+	public CtxModelTypeBean getModelType() {
 	    return this.getId().getModelType();
 	}
 	
@@ -104,7 +104,7 @@ public abstract class CtxModelObject implements Serializable {
 	 * Returns the semantic tag (e.g. "person") of this context model object
 	 * 
 	 * @return the semantic tag of this context model object
-	 * @see CtxIdentifier#getType()
+	 * @see CtxIdentifierBean#getType()
 	 */
 	public String getType() {
 		return this.getId().getType();
@@ -114,7 +114,7 @@ public abstract class CtxModelObject implements Serializable {
 	 * Returns the numeric part of this context model object identifier 
 	 * 
 	 * @return the numeric part of this context model object identifier
-	 * @see CtxIdentifier#getObjectNumber()
+	 * @see CtxIdentifierBean#getObjectNumber()
 	 */
 	public Long getObjectNumber() {
 		return this.getId().getObjectNumber();
@@ -159,7 +159,7 @@ public abstract class CtxModelObject implements Serializable {
         if (this.getClass() != that.getClass())
             return false;
         
-        CtxModelObject other = (CtxModelObject) that;
+        CtxModelObjectBean other = (CtxModelObjectBean) that;
         if (this.id == null) {
             if (other.id != null)
                 return false;

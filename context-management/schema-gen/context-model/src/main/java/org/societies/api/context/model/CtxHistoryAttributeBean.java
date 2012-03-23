@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.schema.context.model;
+package org.societies.api.context.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -38,7 +38,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlType(namespace="http://societies.org/api/schema/context/model", propOrder = {"historyRecordId", "stringValue", "integerValue", "doubleValue", "binaryValue"})
 @XmlAccessorType(XmlAccessType.FIELD)
-public class CtxHistoryAttribute extends CtxModelObject {
+public class CtxHistoryAttributeBean extends CtxModelObjectBean {
 
 	private static final long serialVersionUID = -1908778456166623132L;
 
@@ -62,9 +62,9 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	@XmlElement(required = true, nillable=true)
 	private /* final */ byte[] binaryValue;
 
-	CtxHistoryAttribute() {}
+	CtxHistoryAttributeBean() {}
 
-	public CtxHistoryAttribute(CtxAttribute ctxAttribute, Long historyRecordId) {
+	public CtxHistoryAttributeBean(CtxAttributeBean ctxAttribute, Long historyRecordId) {
 		super(ctxAttribute.getId());
 		super.setLastModified(ctxAttribute.getQuality().getLastUpdated());
 		this.historyRecordId = historyRecordId;
@@ -77,8 +77,8 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	 * @return the identifier of this historic context attribute.
 	 */
 	@Override
-	public CtxAttributeIdentifier getId() {
-		return (CtxAttributeIdentifier) super.getId();
+	public CtxAttributeIdentifierBean getId() {
+		return (CtxAttributeIdentifierBean) super.getId();
 	}
 	
 	/**
@@ -158,7 +158,7 @@ public class CtxHistoryAttribute extends CtxModelObject {
 		if (this.getClass() != that.getClass())
 			return false;
 		
-		CtxHistoryAttribute other = (CtxHistoryAttribute) that;
+		CtxHistoryAttributeBean other = (CtxHistoryAttributeBean) that;
 		if (this.historyRecordId == null) {
 			if (other.historyRecordId != null)
 				return false;
@@ -167,7 +167,7 @@ public class CtxHistoryAttribute extends CtxModelObject {
 		return true;
 	}
 	
-	private void setValues(CtxAttribute ctxAttribute) {
+	private void setValues(CtxAttributeBean ctxAttribute) {
 		this.stringValue = ctxAttribute.getStringValue();
 		this.integerValue = ctxAttribute.getIntegerValue();
 		this.doubleValue = ctxAttribute.getDoubleValue();

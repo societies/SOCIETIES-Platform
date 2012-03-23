@@ -22,13 +22,13 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.schema.context.model;
+package org.societies.api.context.model;
 
 import javax.xml.bind.annotation.XmlType;
 
 /**
  * The constants of this enumerated type specify the origin of a context bond.
- * More specifically, a {@link CtxBond} can be one of the following types:
+ * More specifically, a {@link CtxBondBean} can be one of the following types:
  * <ul>
  * <li>{@link #MANUALLY_SET}: Denotes a manually set context bond</li>
  * <li>{@link #DISCOVERED}: Denotes a discovered context bond</li>
@@ -40,7 +40,7 @@ import javax.xml.bind.annotation.XmlType;
  * @version 0.0.1
  */
 @XmlType(namespace="http://societies.org/api/schema/context/model")
-public enum CtxBondOriginType {
+public enum CtxBondOriginTypeBean {
 
     /**
      * The enum constant for manually set context bonds.

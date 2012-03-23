@@ -22,14 +22,14 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.schema.context.model;
+package org.societies.api.context.model;
 
 import javax.xml.bind.annotation.XmlType;
 
 /**
  * The constants of this enumerated type specify the origin of a context
  * attribute value. This information is part of the Quality of Context (QoC)
- * parameters of {@link CtxAttribute} objects. The context origin can be one of
+ * parameters of {@link CtxAttributeBean} objects. The context origin can be one of
  * the following types:
  * <ul>
  * <li>{@link #MANUALLY_SET}: Denotes a manually set context attribute value</li>
@@ -40,11 +40,11 @@ import javax.xml.bind.annotation.XmlType;
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas
  *         Liampotis</a> (ICCS)
- * @see CtxQuality
+ * @see CtxQualityBean
  * @since 0.0.1
  */
 @XmlType(namespace="http://societies.org/api/schema/context/model")
-public enum CtxOriginType {
+public enum CtxOriginTypeBean {
 
     /**
      * The enum constant for manually set context attribute values

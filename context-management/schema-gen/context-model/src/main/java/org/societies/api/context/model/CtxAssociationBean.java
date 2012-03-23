@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.schema.context.model;
+package org.societies.api.context.model;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,39 +30,37 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
 /**
  * This class is used to represent context associations.
  * 
- * @see CtxAssociationIdentifier
- * @see CtxEntity
+ * @see CtxAssociationIdentifierBean
+ * @see CtxEntityBean
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @version 0.0.1
  */
 @XmlType(namespace="http://societies.org/api/schema/context/model", propOrder = {"parentEntity", "childEntities"})
 @XmlAccessorType(XmlAccessType.FIELD)
-public class CtxAssociation extends CtxModelObject {
+public class CtxAssociationBean extends CtxModelObjectBean {
 
 	private static final long serialVersionUID = 4837712964619525572L;
 	
 	@XmlElement(required = true, nillable=true)
-	public CtxEntityIdentifier parentEntity;
+	public CtxEntityIdentifierBean parentEntity;
 	
-	@XmlElementWrapper(name = "childEntities")
-	@XmlElement(name = "childEntity")
-	public /* final */ Set<CtxEntityIdentifier> childEntities = new HashSet<CtxEntityIdentifier>();
+	@XmlElement(required = true, nillable=false)
+	public /* final */ Set<CtxEntityIdentifierBean> childEntities = new HashSet<CtxEntityIdentifierBean>();
 
-	CtxAssociation() {}
+	CtxAssociationBean() {}
 	
 	/**
-	 * Constructs a CtxAssociation with the specified identifier
+	 * Constructs a CtxAssociationBean with the specified identifier
 	 * 
 	 * @param id
 	 *            the identifier of the newly created cotnext association
 	 */
-	public CtxAssociation(CtxAssociationIdentifier id) {
+	public CtxAssociationBean(CtxAssociationIdentifierBean id) {
 		
 		super(id);
 	}
@@ -70,12 +68,12 @@ public class CtxAssociation extends CtxModelObject {
 	/**
 	 * Returns the identifier of this context association.
 	 * 
-	 * @see CtxAssociationIdentifier
+	 * @see CtxAssociationIdentifierBean
 	 */
 	@Override
-	public CtxAssociationIdentifier getId() {
+	public CtxAssociationIdentifierBean getId() {
 		
-		return (CtxAssociationIdentifier) super.getId();
+		return (CtxAssociationIdentifierBean) super.getId();
 	}
 
 	/**
@@ -83,9 +81,9 @@ public class CtxAssociation extends CtxModelObject {
      * <code>null</code> to indicate an undirected association.
      * 
      * @return the parent entity of this context association
-     * @see CtxEntity
+     * @see CtxEntityBean
 	 */
-	public CtxEntityIdentifier getParentEntity() {
+	public CtxEntityIdentifierBean getParentEntity() {
 		
 		return this.parentEntity;
 	}
@@ -96,7 +94,7 @@ public class CtxAssociation extends CtxModelObject {
      * If a <code>null</code> parameter is specified then the current parent
      * entity is unset and this association becomes undirected.
 	 */
-	public void setParentEntity(CtxEntityIdentifier parentEntity){
+	public void setParentEntity(CtxEntityIdentifierBean parentEntity){
 		
 		this.parentEntity = parentEntity;
 	}
@@ -109,7 +107,7 @@ public class CtxAssociation extends CtxModelObject {
 	 * @return a set containing the child entities in this context association
 	 * @see #getEntities(String)
 	 */
-	public Set<CtxEntityIdentifier> getChildEntities() {
+	public Set<CtxEntityIdentifierBean> getChildEntities() {
 		
 		return this.getChildEntities(null);
 	}
@@ -128,14 +126,14 @@ public class CtxAssociation extends CtxModelObject {
      * @return the associated context entities with the specified type
      * @see #getEntities() 
 	 */
-	public Set<CtxEntityIdentifier> getChildEntities(String type) {
+	public Set<CtxEntityIdentifierBean> getChildEntities(String type) {
 		
-		final Set<CtxEntityIdentifier> result = new HashSet<CtxEntityIdentifier>();
+		final Set<CtxEntityIdentifierBean> result = new HashSet<CtxEntityIdentifierBean>();
 		
 		if (type == null) {
 			result.addAll(this.childEntities);
 		} else {
-			for (final CtxEntityIdentifier entity : this.childEntities)
+			for (final CtxEntityIdentifierBean entity : this.childEntities)
 				if (type.equalsIgnoreCase(entity.getType()))
 					result.add(entity);
 		}
@@ -150,9 +148,9 @@ public class CtxAssociation extends CtxModelObject {
      * @throws NullPointerException
      *             if the specified context entity identifier is
      *             <code>null</code>
-     * @see CtxEntityIdentifier
+     * @see CtxEntityIdentifierBean
 	 */
-	public void addChildEntity(CtxEntityIdentifier childEntity) {
+	public void addChildEntity(CtxEntityIdentifierBean childEntity) {
 		
 		if (childEntity == null)
 			throw new NullPointerException("childEntity can't be null");
@@ -168,9 +166,9 @@ public class CtxAssociation extends CtxModelObject {
      * @throws NullPointerException
      *             if the specified context entity identifier is
      *             <code>null</code>
-     * @see CtxEntityIdentifier
+     * @see CtxEntityIdentifierBean
 	 */
-	public void removeChildEntity(CtxEntityIdentifier childEntity) {
+	public void removeChildEntity(CtxEntityIdentifierBean childEntity) {
 		
 		if (childEntity == null)
 			throw new NullPointerException("childEntity can't be null");

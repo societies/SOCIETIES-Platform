@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.schema.context.model;
+package org.societies.api.context.model;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -41,9 +41,9 @@ import javax.xml.bind.annotation.XmlType;
  * derived from the time that particular piece of context information was last
  * updated.</li>
  * <li><b>Origin</b>: Denotes whether a context attribute value was
- * {@link CtxOriginType#MANUALLY_SET manually set}, {@link CtxOriginType#SENSED
- * sensed}, {@link CtxOriginType#INFERRED inferred}, or 
- * {@link CtxOriginType#INHERITED inherited}.</li>
+ * {@link CtxOriginTypeBean#MANUALLY_SET manually set}, {@link CtxOriginTypeBean#SENSED
+ * sensed}, {@link CtxOriginTypeBean#INFERRED inferred}, or 
+ * {@link CtxOriginTypeBean#INHERITED inherited}.</li>
  * <li><b>Precision:</b> Denotes the quality of coherence or reproducibility of
  * measured context attribute values. It is usually expressed in terms of the
  * standard deviation of the extended set of measurement results from a well
@@ -58,18 +58,18 @@ import javax.xml.bind.annotation.XmlType;
  * </ul>
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @see CtxAttribute
- * @see CtxOriginType
+ * @see CtxAttributeBean
+ * @see CtxOriginTypeBean
  * @since 0.0.1
  */
 @XmlType(namespace="http://societies.org/api/schema/context/model", propOrder = {"attribute", "lastUpdated", "originType", "precision", "updateFrequency"})
 @XmlAccessorType(XmlAccessType.FIELD)
-public class CtxQuality implements Serializable {
+public class CtxQualityBean implements Serializable {
 
 	private static final long serialVersionUID = 2596329083367854427L;
 
 	/** The context attribute this QoC information refers to. */
-	private CtxAttribute attribute;
+	private CtxAttributeBean attribute;
 	
 	/** The time the current context attribute value was last updated. */
 	@XmlElement(required = true, nillable=true)
@@ -77,7 +77,7 @@ public class CtxQuality implements Serializable {
 	
 	/** The origin type of the current context attribute value. */
 	@XmlElement(required = true, nillable=true)
-	private CtxOriginType originType;
+	private CtxOriginTypeBean originType;
 	
 	/** The precision of the current context attribute value. */
 	@XmlElement(required = true, nillable=true)
@@ -87,16 +87,16 @@ public class CtxQuality implements Serializable {
 	@XmlElement(required = true, nillable=true)
 	private Double updateFrequency;
 	
-	CtxQuality() {}
+	CtxQualityBean() {}
 	
 	/**
-	 * Constructs a <code>CtxQuality</code> object for the specified context
+	 * Constructs a <code>CtxQualityBean</code> object for the specified context
 	 * attribute.
 	 * 
 	 * @param attribute
 	 * the context attribute to associate with this QoC information.
 	 */
-	CtxQuality(CtxAttribute attribute) {
+	CtxQualityBean(CtxAttributeBean attribute) {
 		
 		this.attribute = attribute;
 	}
@@ -106,7 +106,7 @@ public class CtxQuality implements Serializable {
 	 * 
 	 * @return the context attribute associated to this QoC information.
 	 */
-	public CtxAttribute getAttribute() {
+	public CtxAttributeBean getAttribute() {
 		
 		return this.attribute;
 	}
@@ -158,9 +158,9 @@ public class CtxQuality implements Serializable {
      * The method returns <code>null</code> if the origin type has not been set. 
      * 
      * @return the origin type of the current context attribute value.
-     * @see CtxOriginType 
+     * @see CtxOriginTypeBean 
 	 */
-	public CtxOriginType getOriginType() {
+	public CtxOriginTypeBean getOriginType() {
 		
 		return this.originType;
 	}
@@ -171,9 +171,9 @@ public class CtxQuality implements Serializable {
      * @param originType
      *            the origin type of the current context attribute value to set
      * @throws NullPointerException if the specified origin type is <code>null</code>.
-     * @see CtxOriginType
+     * @see CtxOriginTypeBean
 	 */
-	public void setOriginType(CtxOriginType originType) {
+	public void setOriginType(CtxOriginTypeBean originType) {
 		
 		if (originType == null)
 			throw new NullPointerException("originType can't be null");
@@ -268,7 +268,7 @@ public class CtxQuality implements Serializable {
 		if (this.getClass() != that.getClass())
 			return false;
 		
-		CtxQuality other = (CtxQuality) that;
+		CtxQualityBean other = (CtxQualityBean) that;
 		if (this.attribute == null) {
 			if (other.attribute != null)
 				return false;

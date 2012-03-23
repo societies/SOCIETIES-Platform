@@ -22,57 +22,72 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.schema.context.model;
+package org.societies.api.context.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- * This class is used to identify context associations. It provides methods that
- * return information about the identified association including:
- * <ul>
- * <li><tt>OperatorId</tt>: A unique identifier of the CSS or CIS where the 
- * identified context association is stored.</li>
- * <li><tt>ModelType</tt>: Describes the type of the identified context model
- * object, i.e. {@link CtxModelType#ASSOCIATION ASSOCIATION}.</li>
- * <li><tt>Type</tt>: A semantic tag that characterises the identified context
- * association, e.g. "isFriendWith".</li>
- * <li><tt>ObjectNumber</tt>: A unique number within the CSS/CIS where the
- * respective context information was initially sensed/collected and stored.</li>
- * </ul>
- * <p>
- * A context association identifier can be represented as a URI formatted
- * String as follows:
- * <pre>
- * &lt;OperatorId&gt;/ASSOCIATION/&lt;Type&gt;/&lt;ObjectNumber&gt;
- * </pre>
+ * This abstract class is used in order to represent members of a
+ * {@link CommunityCtxEntityBean} (CIS). A <code>CommunityMemberCtxEntityBean</code>
+ * can be an individual or a sub-community, hence, there are two concrete
+ * implementations of this class, namely {@link IndividualCtxEntityBean} and
+ * {@link CommunityCtxEntityBean}. A CommunityMemberCtxEntityBean may belong to
+ * multiple communities, simultaneously. This class provides methods for
+ * accessing and modifying these communities.
  * 
- * @see CtxIdentifier
+ * @see CtxEntityIdentifierBean
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-@XmlType(namespace="http://societies.org/api/schema/context/model")
-public class CtxAssociationIdentifier extends CtxIdentifier {
+@XmlType(namespace="http://societies.org/api/schema/context/model", propOrder = {"communities"})
+@XmlAccessorType(XmlAccessType.FIELD)
+public abstract class CommunityMemberCtxEntityBean extends CtxEntityBean {
+	
+	private static final long serialVersionUID = 3614587369237968591L;
+	
+	/** The communities this entity is member of. */
+	@XmlElement(required = true, nillable=false)
+	private Set<CommunityCtxEntityBean> communities = new HashSet<CommunityCtxEntityBean>();
 
-	private static final long serialVersionUID = -7991875953413583564L;
+	CommunityMemberCtxEntityBean() {}
+	
+	CommunityMemberCtxEntityBean(CtxEntityIdentifierBean id) {
+		super(id);
+	}
 
-	CtxAssociationIdentifier() {}
+	/**
+	 * Returns a set with the community members.
+	 * 
+	 * @return set CommunityCtxEntityBean
+	 */
+	public Set<CommunityCtxEntityBean> getCommunities() {
+		
+		return new HashSet<CommunityCtxEntityBean>(this.communities);
+	}
 	
 	/**
-	 * Creates a context association identifier by specifying the CSS/CIS ID
-	 * where the identified context model object is stored, as well as,
-	 * the association type and the unique numeric model object identifier.
+	 * Add a CommunityCtxEntityBean to the community
 	 * 
-	 * @param operatorId
-	 *            the identifier of the CSS/CIS where the identified context
-	 *            model object is stored
-	 * @param type
-	 *            the association type, e.g. "device"
-	 * @param objectNumber
-	 *            the unique numeric model object identifier
+	 * @param community
 	 */
-	public CtxAssociationIdentifier(String operatorId, String type,
-			Long objectNumber) {
+	public void addCommunity(CommunityCtxEntityBean community) {
 		
-		super(operatorId, CtxModelType.ASSOCIATION, type, objectNumber);
+		this.communities.add(community);
+	}
+	
+	/**
+	 * Remove a CommunityCtxEntityBean from the community.
+	 * 
+	 * @param community
+	 */
+	public void removeCommunity(CommunityCtxEntityBean community) {
+		
+		this.communities.remove(community);
 	}
 }
