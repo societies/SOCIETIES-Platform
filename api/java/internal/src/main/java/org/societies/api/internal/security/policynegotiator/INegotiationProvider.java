@@ -44,7 +44,7 @@ public interface INegotiationProvider {
 	 * 
 	 * @return All available options embedded in a single XML document.
 	 */
-	public Future<SlaBean> getPolicyOptions();
+	public Future<SlaBean> getPolicyOptions(String serviceId);
 
 	/**
 	 * Accept given policy option and get the final legal agreement signed by

@@ -130,6 +130,25 @@ public class CommsServer implements IFeatureServer {
 	public Object getQuery(Stanza stanza, Object messageBean) throws XMPPError {
 
 		LOG.debug("getQuery()");
+
+		LOG.debug("getQuery({}, {})", stanza, messageBean);
+		LOG.debug("getQuery(): stanza.id   = ", stanza.getId());
+		LOG.debug("getQuery(): stanza.from = ", stanza.getFrom());
+		LOG.debug("getQuery(): stanza.to   = ", stanza.getTo());
+		
+		if (messageBean != null && messageBean instanceof ProviderBean) {
+			
+			// Method parameters
+			ProviderBean providerBean = (ProviderBean) messageBean;
+			String serviceId = providerBean.getServiceId();
+			int sessionId = providerBean.getSessionId();
+			String signedPolicyOption = providerBean.getSignedPolicyOption();
+			boolean isModified = providerBean.isModified();
+			
+			LOG.debug("getQuery(): NegotiationProvider. Method: " + providerBean.getMethod());
+			LOG.debug("getQuery(): NegotiationProvider. Params: " + serviceId + ", " +
+					isModified + ", " +	sessionId + ", " + signedPolicyOption);
+		}
 		
 		return null;
 	}
@@ -154,12 +173,13 @@ public class CommsServer implements IFeatureServer {
 
 		LOG.debug("receiveMessage({}, {})", stanza, messageBean);
 		
-		if (messageBean instanceof INegotiationProvider) {
+		if (messageBean instanceof ProviderBean) {
 			
 			// Method parameters
 			ProviderBean providerBean = (ProviderBean) messageBean;
 			int sessionId = providerBean.getSessionId();
 			String signedPolicyOption = providerBean.getSignedPolicyOption();
+			String serviceId = providerBean.getServiceId();
 			boolean isModified = providerBean.isModified();
 			
 			LOG.debug("receiveMessage(): NegotiationProvider. Params: " + isModified + ", " +
@@ -167,7 +187,8 @@ public class CommsServer implements IFeatureServer {
 			
 			switch (providerBean.getMethod()) {
 			case GET_POLICY_OPTIONS:
-				negotiationProvider.getPolicyOptions();
+				LOG.debug("receiveMessage(): NegotiationProvider.getPolicyOptions({})" + serviceId);
+				negotiationProvider.getPolicyOptions(serviceId);
 				break;
 			case ACCEPT_POLICY_AND_GET_SLA:
 				negotiationProvider.acceptPolicyAndGetSla(sessionId, signedPolicyOption, isModified);
@@ -176,9 +197,6 @@ public class CommsServer implements IFeatureServer {
 				negotiationProvider.reject(sessionId);
 				break;
 			}
-		}
-		else if (messageBean instanceof INegotiationRequester) {
-			LOG.debug("receiveMessage(): NegotiationRequester");
 		}
 	}
 
