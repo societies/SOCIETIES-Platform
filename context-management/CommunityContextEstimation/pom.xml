@@ -31,7 +31,8 @@
 			<groupId>org.societies.context-management</groupId>
 			<artifactId>context-broker</artifactId>
 			<version>${version.cm}</version>
-			<scope>provided</scope>
+			<!--<scope>provided</scope>  -->
+			<scope>test</scope>
 		</dependency>
 		
 		<dependency>
