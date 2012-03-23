@@ -4,7 +4,6 @@
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
-		<relativePath>../../../../parent/spring-osgi.xml</relativePath>
 		<version>0.1</version>
 	</parent>
 	<groupId>org.societies.comm.examples</groupId>
@@ -55,8 +54,8 @@
 			<artifactId>org.osgi.compendium</artifactId>
 			<version>4.1.0</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
+		</dependency> 
+		<!--<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
 			<version>4.1.0</version>
@@ -67,7 +66,7 @@
 			<artifactId>org.springframework.osgi.core</artifactId>
 			<version>1.2.1</version>
 			<scope>provided</scope>
-		</dependency>
+		</dependency>-->
 		<!--  Required for Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
