@@ -68,6 +68,12 @@
 			<artifactId>spring-osgi-core</artifactId>
 			<version>1.1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.css.devicemgmt</groupId>
+			<artifactId>DeviceCommsMgr</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 	
 	<build>
@@ -89,6 +95,7 @@
               				org.springframework.osgi.context,
               				org.societies.api.internal.css.devicemgmt,
               				org.societies.api.internal.css.devicemgmt.model,
+              				org.societies.api.internal.css.devicemgmt.comm,
               			</Import-Package> 
           </instructions>
       </configuration>

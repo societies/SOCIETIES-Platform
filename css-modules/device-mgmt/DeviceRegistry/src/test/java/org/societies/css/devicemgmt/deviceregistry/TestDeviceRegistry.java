@@ -35,6 +35,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 //import org.societies.css.devicemgmt.deviceregistry.CSSDevice;
+import org.societies.api.internal.css.devicemgmt.comm.DmCommManager;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 
 public class TestDeviceRegistry {
@@ -79,6 +80,7 @@ public class TestDeviceRegistry {
 	private DeviceCommonInfo device_1;
 	private DeviceCommonInfo device_2;
 	private DeviceCommonInfo device_3;
+	private DmCommManager dmCommManager;
 	
 	
 	private String CSSNodeID = "liam@societies.org";
@@ -98,6 +100,8 @@ public class TestDeviceRegistry {
         registry = DeviceRegistry.getInstance();
         assertTrue(null != registry);
         registry.clearRegistry();
+        //dmCommManager = DmCommManager.class.newInstance();
+        //dmCommManager = DmCommManager.class.newInstance();
 
         //Create mock CSSDevice
         

@@ -16,5 +16,10 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-   <bean name="DeviceRegistry" class="org.societies.css.devicemgmt.deviceregistry.DeviceRegistry" />
+   <bean name="DeviceRegistry"
+   			class="org.societies.css.devicemgmt.deviceregistry.DeviceRegistry"
+   			depends-on="DmCommManager">
+			<property name="dmCommManager" ref="DmCommManager" />
+			
+	</bean>
 </beans>

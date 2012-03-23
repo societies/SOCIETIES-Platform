@@ -32,10 +32,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.societies.css.devicemgmt.deviceregistry.*;
 import org.societies.api.internal.css.devicemgmt.IDeviceRegistry;
+import org.societies.api.internal.css.devicemgmt.comm.DmCommManager;
+import org.societies.css.devicemgmt.DeviceCommsMgr.impl.CommAdapterImpl;
+//import org.societies.css.devicemgmt.DeviceCommsMgr.impl.CommAdapterImpl;
 //import org.societies.css.devicemgmt.devicemgmtold.deviceregistry.api.IDeviceRegistry;
 
 
@@ -46,8 +48,11 @@ public class DeviceRegistry implements IDeviceRegistry {
     //Ensure that HashMap basis of registry is synchronized
     private Map<String, DeviceCommonInfo> registry = Collections.synchronizedMap(new HashMap<String, DeviceCommonInfo>());
     private static DeviceRegistry instance = new DeviceRegistry();
-
     
+    private DmCommManager dmCommManager;
+    
+
+    //private static DmCommManager instance = new dmCommManager();
 
     /**
      * private constructor
@@ -55,6 +60,7 @@ public class DeviceRegistry implements IDeviceRegistry {
     private DeviceRegistry() {
 
  //       cssPublicIdentifier = null;
+    	
 
     }
 
@@ -68,7 +74,6 @@ public class DeviceRegistry implements IDeviceRegistry {
         return instance;
     }
 
- 
 
     /**
      * Description: Find all devices registered in the device registry
@@ -168,6 +173,13 @@ public class DeviceRegistry implements IDeviceRegistry {
 	public String addDevice(DeviceCommonInfo device, String CSSNodeID) {
     	//registry.put(RegistryUtility.createKeyString(device.getdeviceId()), device);
 		registry.put(device.getDeviceID(), device);
+		//fireNewDeviceConnected(device.getDeviceID(),device);
+		fireNewDeviceConnected(device.getDeviceID(), device);
+		
+		
+		//dmCommManager.fireNewDeviceConnected(device.getDeviceID(), device);
+			//dmCommManager = DmCommManager.class.newInstance();
+		
         return device.getDeviceID();
 		
 	}
@@ -185,6 +197,8 @@ public class DeviceRegistry implements IDeviceRegistry {
             registry.remove(key);
             retValue = true;
         }
+        fireDeviceDisconnected(device.getDeviceID(), device);      	
+      	
         return retValue;
 		
 	}
@@ -199,6 +213,26 @@ public class DeviceRegistry implements IDeviceRegistry {
 	public Collection<Object> getDeviceList(Object deviceID) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public void fireNewDeviceConnected(String deviceID,
+			DeviceCommonInfo deviceCommonInfo) {
+		System.out.println("fireNewDeviceConnected " + deviceCommonInfo.getDeviceID());
+		//dmCommManager.fireNewDeviceConnected(deviceCommonInfo.getDeviceID(), deviceCommonInfo);
+	}
+
+	
+	public void fireDeviceDisconnected(String deviceID,
+			DeviceCommonInfo deviceCommonInfo) {
+		System.out.println("fireDeviceDisconnected " + deviceCommonInfo.getDeviceID());
+		//dmCommManager.fireDeviceDisconnected(deviceCommonInfo.getDeviceID(), deviceCommonInfo);
+	}
+
+	
+	public void fireDeviceDataChanged(String deviceId,
+			DeviceCommonInfo deviceCommonInfo, String key, String value) {
+		
+		
 	}
 }
 
