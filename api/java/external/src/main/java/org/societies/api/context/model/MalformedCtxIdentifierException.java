@@ -24,23 +24,69 @@
  */
 package org.societies.api.context.model;
 
-/**
- * This class is used to represent a single participant (CSS) of a
- * {@link CommunityCtxEntity} (CIS). An <code>IndividualCtxEntity</code> may belong to
- * zero or more CISs, simultaneously. The individual members of a pervasive community do
- * not need to be human beings. They can also be organisations, smart space
- * infrastructures, autonomous or semi-autonomous agents, etc.
- * 
- * @see CtxEntityIdentifier
- * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.1
- */
-public class IndividualCtxEntity extends CommunityMemberCtxEntity {
+import org.societies.api.context.CtxException;
 
-	private static final long serialVersionUID = -1841816618272931692L;
-	
-	public IndividualCtxEntity(CtxEntityIdentifier id) {
-		
-		super(id);
-	}
+/**
+ * Thrown to indicate that a string could not be parsed into a context identifier. 
+ *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.4
+ */
+public class MalformedCtxIdentifierException extends CtxException {
+
+	private static final long serialVersionUID = -1989914038541623047L;
+
+	/**
+     * Constructs a <code>MalformedCtxIdentifierException</code> with no detail message.
+     */
+    public MalformedCtxIdentifierException() {
+    	
+        super();
+    }
+
+    /**
+     * Constructs a <code>MalformedCtxIdentifierException</code> with the specified detail
+     * message.
+     * 
+     * @param message
+     *            the detail message.
+     */
+    public MalformedCtxIdentifierException(String message) {
+
+        super(message);
+    }
+
+    /**
+     * Creates a <code>MalformedCtxIdentifierException</code> with the specified detail
+     * message and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public MalformedCtxIdentifierException(String message, Throwable cause) {
+
+        super(message, cause);
+    }
+
+    /**
+     * Creates a <code>MalformedCtxIdentifierException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public MalformedCtxIdentifierException(Throwable cause) {
+
+        super(cause);
+    }
 }
