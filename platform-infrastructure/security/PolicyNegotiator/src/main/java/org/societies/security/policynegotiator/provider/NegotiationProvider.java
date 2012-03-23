@@ -85,6 +85,8 @@ public class NegotiationProvider implements INegotiationProvider {
 	@Override
 	public Future<SlaBean> getPolicyOptions(String serviceId) {
 		
+		LOG.debug("getPolicyOptions({})", serviceId);
+		
 		SlaBean sla = new SlaBean();
 		Random rnd = new Random();
 		int sessionId = rnd.nextInt();
@@ -99,7 +101,9 @@ public class NegotiationProvider implements INegotiationProvider {
 	@Override
 	public Future<SlaBean> acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
 			boolean modified) {
-		
+
+		LOG.debug("acceptPolicyAndGetSla({})", sessionId + ", ..., " + modified);
+
 		SlaBean sla = new SlaBean();
 		String finalSla;
 		
