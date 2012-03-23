@@ -67,7 +67,7 @@ public interface ICisManager {
 	 * 
 	 * TODO: Check the return value. Should be something more meaningful.
 	 * 
-	 * @param cisId The ID of the CIS to get.
+	 * @param cisId The ID (jabber ID) of the CIS to get.
 	 * @return the CISRecord with the ID cisID, or null if no such CIS exists.
 	 */
 	ICisRecord getCis(String cssId, String cisId);

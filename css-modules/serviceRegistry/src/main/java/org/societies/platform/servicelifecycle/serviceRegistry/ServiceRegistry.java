@@ -13,6 +13,8 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.CISNotFoundException;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.CSSNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
@@ -362,7 +364,8 @@ public class ServiceRegistry implements IServiceRegistry {
 					new ServiceResourceIdentiferDAO(serviceIdentifier
 							.getIdentifier().toString(), serviceIdentifier
 							.getServiceInstanceIdentifier()));
-			tmpService = tmpRegistryEntry.createServiceFromRegistryEntry();
+			if (tmpRegistryEntry!=null){
+			tmpService = tmpRegistryEntry.createServiceFromRegistryEntry();}
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ServiceRetrieveException(e);
@@ -401,6 +404,74 @@ public class ServiceRegistry implements IServiceRegistry {
 		this.sessionFactory = sessionFactory;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry#deleteServiceCSS(java.lang.String)
+	 */
+	@Override
+	public boolean deleteServiceCSS(String CSSId) throws CSSNotFoundException{
+		Session session=sessionFactory.openSession();
+		
+		boolean returnedValue=false;
+		try {
+			List<RegistryEntry> tmpRegistryEntryList= session.createCriteria(RegistryEntry.class).createCriteria("serviceInstance").
+					add(Restrictions.eq("fullJid", CSSId)).list();
+			if (tmpRegistryEntryList.size()==0){throw new CSSNotFoundException("The CSS with Id: "+ CSSId+" is not present in the Registry");}
+			List<Service> tmpServiceList=new ArrayList<Service>();
+			for (RegistryEntry registryEntry : tmpRegistryEntryList) {
+				tmpServiceList.add(registryEntry.createServiceFromRegistryEntry());
+			}
+			this.unregisterServiceList(tmpServiceList);
+			returnedValue=true;
+		} 
+		catch (CSSNotFoundException ex) {
+		
+		log.error(ex.getMessage());
+		throw ex;
+		}
+		catch (Exception e) {
+			
+			log.error(e.getMessage());
+		}finally{
+			session.close();
+		}
+		return returnedValue;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry#clearServiceSharedCIS(java.lang.String)
+	 */
+	@Override
+	public boolean clearServiceSharedCIS(String CISId) throws CISNotFoundException{
+		Session session=sessionFactory.openSession();
+		Transaction t=null;
+		try {
+			List<ServiceSharedInCISDAO> tmpServiceSharedCIS= session.createCriteria(ServiceSharedInCISDAO.class).add(Restrictions.eq("CISId", CISId)).list();
+		if (tmpServiceSharedCIS.size()==0){
+			throw  new CISNotFoundException("The CIS with id: "+CISId+" is not in the Registry.");
+		}
+			t=session.beginTransaction();
+		for (ServiceSharedInCISDAO serviceSharedInCISDAO : tmpServiceSharedCIS) {
+			session.delete(serviceSharedInCISDAO);
+		}t.commit();
+		}catch (CISNotFoundException ex) {
+			
+			log.error(ex.getMessage());
+			throw ex;
+		} 
+		catch (Exception e) {
+			if (t!=null){
+				t.rollback();
+			}
+			log.error(e.getMessage());
+		}finally{
+			if (session!=null)
+			{session.close();}
+		}
+		return false;
+	}
+	
+	
+	
 	/* Utility methods */
 	private List<Service> createListService(
 			List<RegistryEntry> inListRegistryEntry) {
@@ -412,8 +483,8 @@ public class ServiceRegistry implements IServiceRegistry {
 		return returnedServiceList;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry#changeStatusOfService(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, org.societies.api.schema.servicelifecycle.model.ServiceStatus)
-	 */
+	
+
+	
 	
 }

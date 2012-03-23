@@ -37,11 +37,13 @@ package org.societies.cis.manager;
 import java.util.Set;
 
 import org.societies.api.cis.collaboration.IServiceSharingRecord;
+import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.cis.management.ICisSubscribed;
 
 
 
-public class CisRecord implements ICisRecord{
+public class CisRecord implements ICisOwned, ICisSubscribed{
 	public CisActivityFeed feed;
 	public String ownerCss;
 	public int membershipCriteria;
@@ -195,16 +197,14 @@ public class CisRecord implements ICisRecord{
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return cisName;
 	}
 
 
 
 	@Override
 	public String getOwnerId() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.ownerCss;
 	}
 
 

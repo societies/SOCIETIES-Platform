@@ -166,11 +166,14 @@ public class CisManager implements ICisManager, IFeatureServer{
 		//	return null;
 		//}
 		// TODO: review this logic as maybe I should probably check if it exists before creating
+		
 		CisEditor cis = new  CisEditor(cssId, cisName, cisType, mode,this.ccmFactory);		
-		if (ownedCISs.add(cis))
-			return (ICisOwned)cis.getCisRecord();
-		else
+		if (ownedCISs.add(cis)){
+			ICisOwned i = cis.getCisRecord();
+			return i;
+		}else{
 			return null;
+		}
 		
 	}
 
@@ -308,7 +311,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 				// GET LIST CODE of subscribedCIS
 				if(listingType.equals("subscribed") || listingType.equals("all")){
-					List<CisRecord> li = this.getOwnedCisList();
+					List<CisRecord> li = this.getSubscribedCisList();
 					Iterator<CisRecord> it = li.iterator();
 					
 					while(it.hasNext()){
@@ -329,13 +332,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 				LOG.info("configure received");
 				return c;
 			}
-			if (c.getSubscribedTo()!= null) {
-				LOG.info("subscribedTo received");
-				SubscribedTo s = (SubscribedTo) c.getSubscribedTo();
-				CisRecord r = new CisRecord(s.getCisJid());
-				this.subscribeToCis(r);
-				return null;
-			}
+
 			
 			if (c.getDelete() != null) {
 				LOG.info("delete received");
@@ -356,8 +353,20 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 
 	@Override
-	public void receiveMessage(Stanza arg0, Object arg1) {
-		// TODO Auto-generated method stub
+	public void receiveMessage(Stanza stanza, Object payload) {
+		LOG.info("message received");
+		if (payload.getClass().equals(org.societies.api.schema.cis.manager.CommunityManager.class)) {
+
+			CommunityManager c = (CommunityManager) payload;
+
+			if (c.getSubscribedTo()!= null) {
+				LOG.info("subscribedTo received");
+				SubscribedTo s = (SubscribedTo) c.getSubscribedTo();
+				CisRecord r = new CisRecord(s.getCisJid());
+				this.subscribeToCis(r);
+				return;
+			}
+		}
 		
 	}
 
@@ -401,8 +410,33 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 
 	@Override
-	public ICisRecord getCis(String arg0, String arg1) {
-		// TODO Auto-generated method stub
+	/**
+	 * Get a CIS Record with the ID cisId.
+	 * 
+	 * TODO: Check the return value. Should be something more meaningful.
+	 * 
+	 * @param cisId The ID (jabber ID) of the CIS to get.
+	 * @return the CISRecord with the ID cisID, or null if no such CIS exists.
+	 */
+	public ICisRecord getCis(String cssId, String cisId) {
+		
+		// first we check it on the owned CISs		
+		Iterator<CisEditor> it = ownedCISs.iterator();
+		while(it.hasNext()){
+			 CisEditor element = it.next();
+			 if (element.getCisId().equals(cisId))
+				 return element.cisRecord;
+	     }
+		
+		// then we check on the subscribed CISs
+		Iterator<CisRecord> iterator = this.subscribedCISs.iterator();
+		while(iterator.hasNext()){
+			CisRecord element = iterator.next();
+			 if (element.getCisId().equals(cisId))
+				 return element;
+	     }
+		
+		
 		return null;
 	}
 	

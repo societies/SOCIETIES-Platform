@@ -4,31 +4,47 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.shindig.social.opensocial.model.ActivityEntry;
+import org.apache.shindig.social.opensocial.model.Group;
+import org.apache.shindig.social.opensocial.model.Person;
 
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialData;
+
+
+import org.societies.platform.socialdata.converters.ActivityConverter;
+import org.societies.platform.socialdata.converters.ActivityConveterFactory;
+import org.societies.platform.socialdata.converters.FriendsConverter;
+import org.societies.platform.socialdata.converters.FriendsConveterFactory;
+import org.societies.platform.socialdata.converters.GroupConverter;
+import org.societies.platform.socialdata.converters.GroupConveterFactory;
+import org.societies.platform.socialdata.converters.PersonConverter;
+import org.societies.platform.socialdata.converters.PersonConveterFactory;
 
 public class SocialData implements ISocialData {
 
     HashMap<String, ISocialConnector> connectors = new HashMap<String, ISocialConnector>();
     
-    ArrayList<Object> 				socialPersonList;
-    ArrayList<Object>	 			socialActivityList;
-    ArrayList<Object>				socialGroupList;
-    ArrayList<Object>				socialProfiles;
+    Map<String, Person> 			socialFriends;
+    Map<String, Group>				socialGroups;
+    Map<String, Person>				socialProfiles;
+    
+    List<ActivityEntry>	 			socialActivities;
     
     long lastUpate;
     
     
     public SocialData(){
     		
-    	socialPersonList 		= new ArrayList<Object>();
-    	socialActivityList		= new ArrayList<Object>();
-    	socialGroupList			= new ArrayList<Object>();
-    	socialProfiles			= new ArrayList<Object>();
+    	socialFriends 			= new HashMap<String, Person>();
+    	socialGroups			= new HashMap<String, Group>();
+    	socialProfiles			= new HashMap<String, Person>();
+    	
+    	socialActivities		= new ArrayList<ActivityEntry>();
     	
     }
-    
     
 
 	@Override
@@ -61,23 +77,23 @@ public class SocialData implements ISocialData {
 	}
 
 	@Override
-	public List<Object> getSocialPeople() {
-		return socialPersonList;
+	public List<Person> getSocialPeople() {
+		return (List<Person>)socialFriends.values();
 	}
 
 	@Override
-	public List<Object> getSocialActivity() {
-		return socialActivityList;
+	public List<ActivityEntry> getSocialActivity() {
+		return socialActivities;
 	}
 
 	@Override
-	public List<Object> getSocialGroups() {
-		return socialGroupList;
+	public List<Group> getSocialGroups() {
+		return (List<Group>)socialGroups.values();
 	}
 	
 	@Override
-	public List<Object> getSocialProfiles() {
-		return socialProfiles;
+	public List<Person> getSocialProfiles() {
+		return (List<Person>)socialProfiles.values();
 	}
 	
 
@@ -85,14 +101,15 @@ public class SocialData implements ISocialData {
 	public void updateSocialData() {
 
 		Iterator<ISocialConnector>it = connectors.values().iterator();
-		List <ISocialConnector> list = new ArrayList<ISocialConnector>();
+		socialActivities = new ArrayList<ActivityEntry>();  // reset old Activities
+		
 		while (it.hasNext()){
 			ISocialConnector connector = it.next();
 		    
-			updateProfile(connector.getUserProfile());
-			updateFriends(connector.getUserFriends());
-			updateGroups(connector.getUserGroups());
-			getActivities(connector.getUserActivities());
+			updateProfile(connector);
+			updateFriends(connector);
+			updateGroups(connector);
+			getActivities(connector);
 			
 			/// UPDATE ALL DATA
 			
@@ -106,27 +123,61 @@ public class SocialData implements ISocialData {
 	
 	
 
-	private void updateGroups(String userGroups) {
-		// TODO Auto-generated method stub
+	private void updateGroups(ISocialConnector connector) {
+		GroupConverter parser = GroupConveterFactory.getPersonConverter(connector);
+		List<Group> groups = parser.load(connector.getUserGroups());
+		Iterator<Group> it = groups.iterator();
+		while (it.hasNext()){
+			Group g = it.next();
+			if (socialGroups.containsKey(g.getId())){
+				socialGroups.remove(g.getId().getGroupId());
+				// Send notification of UPDATE?
+			}	
+			else {
+				// Send Notitication of NEW PROFILE?
+			}
+			socialGroups.put(g.getId().getGroupId(), g);
+		}
 		
 	}
 
 
-	private void getActivities(String userActivities) {
-		// TODO Auto-generated method stub
-		
+	private void getActivities(ISocialConnector connector) {
+		ActivityConverter parser = ActivityConveterFactory.getPersonConverter(connector);
+		socialActivities.addAll(parser.load(connector.getUserActivities()));
 	}
 
 
-	private void updateFriends(String userFriends) {
-		// TODO Auto-generated method stub
+	private void updateFriends(ISocialConnector connector) {
+		FriendsConverter parser = FriendsConveterFactory.getPersonConverter(connector);
+		List<Person> friends = parser.load(connector.getUserProfile());
+		Iterator<Person> it = friends.iterator();
 		
+		while (it.hasNext()){
+			Person friend = it.next();
+			if (socialFriends.containsKey(friend.getId())){
+				socialFriends.remove(friend.getId());
+				// Send notification of UPDATE?
+			}	
+			else {
+				// Send Notitication of NEW PROFILE?
+			}
+			socialFriends.put(friend.getId(), friend);
+		}
 	}
 
 
-	private void updateProfile(String userProfile) {
-		 
-		
+	private void updateProfile(ISocialConnector connector) {
+			PersonConverter parser = PersonConveterFactory.getPersonConverter(connector);
+			Person profile = parser.load(connector.getUserProfile());
+			if (socialProfiles.containsKey(profile.getId())){
+				socialProfiles.remove(profile.getId());
+				// Send notification of UPDATE?
+			}	
+			else {
+				// Send Notitication of NEW PROFILE?
+			}
+			socialProfiles.put(profile.getId(), profile);
 	}
 
 
