@@ -4,6 +4,7 @@
             xmlns:tns="http://societies.org/api/schema/security/policynegotiator"
             xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
+	<!-- Message bean and result bean require the additional "element" node -->
 	<xs:element name="providerBean">
 		<xs:complexType>
 			<xs:sequence>
@@ -15,7 +16,17 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-
+	
+	<!-- Message bean and result bean require the additional "element" node -->
+	<xs:element name="providerBeanResult">
+		<xs:complexType >
+			<xs:sequence>
+				<xs:element name="slaBean" type="tns:slaBean" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<!-- Other datatypes do not require the additional "element" node -->
 	<xs:complexType name="slaBean">
 		<xs:sequence>
 			<xs:element name="sessionId" type="xs:int"/>
@@ -23,6 +34,7 @@
 		</xs:sequence>
 	</xs:complexType>
 	
+	<!-- Other datatypes do not require the additional "element" node -->
 	<xs:simpleType name="methodType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="acceptPolicyAndGetSla"/>

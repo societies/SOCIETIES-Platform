@@ -185,32 +185,6 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 			boolean modified, INegotiationProviderCallback callback) {
 		
 		LOG.debug("acceptPolicyAndGetSla({}, ...)", sessionId);
-
-//		IIdentity toIdentity = null;
-//		try {
-//			toIdentity = idMgr.fromJid("XCManager.societies.local");
-//		} catch (InvalidFormatException e1) {
-//			e1.printStackTrace();
-//		}
-//		Stanza stanza = new Stanza(toIdentity);
-//
-//		// SETUP CALC CLIENT RETURN STUFF
-//		CommsClientCallback groupCallback = new CommsClientCallback(stanza.getId(),
-//				callback);
-//
-//		// CREATE MESSAGE BEAN
-//		CalcBean calc = new CalcBean();
-//		calc.setA(valA);
-//		calc.setB(valB);
-//		calc.setMethod(MethodType.SUBTRACT);
-//		try {
-//			// SEND INFORMATION QUERY - RESPONSE WILL BE IN
-//			// "callback.RecieveMessage()"
-//			commMgr.sendIQGet(stanza, calc, groupCallback);
-//		} catch (CommunicationException e) {
-//			LOG.warn(e.getMessage());
-//		}
-//		;
 	}
 
 	/*
@@ -237,19 +211,17 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 		
 		Stanza stanza = new Stanza(toIdentity);
 
-		// CREATE MESSAGE BEAN
+		// Create message bean
 		ProviderBean provider = new ProviderBean();
 		provider.setServiceId(serviceId);
 		provider.setMethod(MethodType.GET_POLICY_OPTIONS);
 		try {
-			// SEND INFORMATION QUERY - RESPONSE WILL BE IN
-			// "callback.RecieveMessage()"
+			// Send information query
 			commMgr.sendIQGet(stanza, provider, this);
 			LOG.debug("getPolicyOptions({}): message sent to {}", serviceId, toIdentity.getJid());
 		} catch (CommunicationException e) {
 			LOG.warn("getPolicyOptions({}): could not send message to " + toIdentity.getJid(), serviceId, e);
 		}
-		;
 	}
 
 	/*
@@ -274,18 +246,17 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 		
 		Stanza stanza = new Stanza(toIdentity);
 
-		// CREATE MESSAGE BEAN
+		// Create message bean
 		ProviderBean provider = new ProviderBean();
 		provider.setSessionId(sessionId);
 		provider.setMethod(MethodType.REJECT);
+		
 		try {
-			// SEND INFORMATION QUERY - RESPONSE WILL BE IN
-			// "callback.RecieveMessage()"
+			// Send message
 			commMgr.sendMessage(stanza, provider);
 			LOG.debug("reject({}): message sent to {}", sessionId, toIdentity.getJid());
 		} catch (CommunicationException e) {
 			LOG.warn("reject({}): could not send message to " + toIdentity.getJid(), sessionId, e);
 		}
-		;
 	}
 }
