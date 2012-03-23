@@ -140,11 +140,11 @@ public class ServiceRegistryListener implements BundleContextAware,
 		log.info("**Service type** : "+service.getServiceType().toString());
 		
 		
-		service.setServiceEndpoint(commMngr.getIdManager().getThisNetworkNode().getJid());
-		
+		service.setServiceEndpoint(service.getServiceName().replaceAll(" ", "") + "/" + commMngr.getIdManager().getThisNetworkNode().getJid());
+
 		//TODO: Do this properly!
 		ServiceInstance si = new ServiceInstance();
-		si.setFullJid(commMngr.getIdManager().getThisNetworkNode().getJid() + service.getServiceName().replaceAll(" ", ""));
+		si.setFullJid(commMngr.getIdManager().getThisNetworkNode().getJid());
 		si.setXMPPNode(commMngr.getIdManager().getThisNetworkNode().getJid());
 		
 		ServiceImplementation servImpl = new ServiceImplementation();

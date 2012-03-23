@@ -172,7 +172,7 @@ public class ServiceRegistryTest extends
 	@Test
 	@Rollback(false)
 	public void removeServiceCSS() throws CSSNotFoundException{
-		serReg.deleteServiceCSS(servicesList.get(0).getServiceInstance().getFullJid());
+		serReg.deleteServiceCSS(servicesList.get(9).getServiceInstance().getFullJid());
 	}
 	
 	@Test
@@ -182,15 +182,17 @@ public class ServiceRegistryTest extends
 	}
 	
 	@Test
-	//@ExpectedException(ServiceRetrieveException.class)
+	@ExpectedException(NullPointerException.class)
 	@Rollback(false)
 	public void unregisterService() throws ServiceRetrieveException {
 		try {
+			servicesList.remove(9);
 			serReg.unregisterServiceList(servicesList);
 			ServiceResourceIdentifier sri = new ServiceResourceIdentifier();
 			sri.setIdentifier(new URI("societies","the/path/of/the/service/v9",null));
 			sri.setServiceInstanceIdentifier("instance_9");
-			serReg.retrieveService(sri);
+			Service retrievedService=serReg.retrieveService(sri);
+			retrievedService.getServiceName();
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
