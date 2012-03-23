@@ -34,8 +34,6 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.cis.manager.Create;
-import org.societies.api.schema.cssmanagement.CssRecord;
-import org.societies.api.schema.cssmanagement.MethodType;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.identity.IdentityManagerImpl;
 
@@ -80,7 +78,8 @@ class CommunicationAdapter {
 	context = _context;
 	//Create a callback class that will handle incoming messages:
 	callback = new CommunicationCallback(context, NAME_SPACES,PACKAGES);
-	
+	//Get a JID-compatible identity for the XCManager in the cloud node:
+	// TODO: Why can't I use DESTINATIO directly?
     	try {
     	    toXCManager = IdentityManagerImpl.staticfromJid(DESTINATION);
     	    } catch (InvalidFormatException e) {
@@ -89,6 +88,11 @@ class CommunicationAdapter {
 		}     
     }
 	    
+    /**
+     * TODO: Need to implement this. It is going to be either done through a presence
+     * value or through rela XMPP login.
+     * @return
+     */
     boolean isOnline(){
 	return online;
     }
@@ -130,6 +134,19 @@ class CommunicationAdapter {
 	
     }
     
+    //public ICisRecord getGroupInfo(String _name){
+	//GetGroupInfoTask task = new GetGroupInfoTask(context);
+	//task.execute(_name);
+    //}
+    /**
+     * Parameters to generic AsynchTask:
+     * 1- ICisRecord (Params): This is the group to be created. Param to execute method.
+     * 2- Integer (Progress): The type of progress units used to check task progress.
+     * 3- Integer (Result): The type of the result returned by the task i.e. by doInBackground.
+     * 
+     * @author Babak.Farshchian@sintef.no
+     *
+     */
     private class CreateGroupTask extends AsyncTask<ICisRecord, Integer, Integer> {
 
     	private Context context;
@@ -162,4 +179,44 @@ class CommunicationAdapter {
     	}
     }
  
+    /**
+     * Parameters to generic AsynchTask:
+     * 1- String (Params): This is the ID to look for.
+     * 2- Integer (Progress): The type of progress units used to check task progress.
+     * 3- Integer (Result): The type of the result returned by the task i.e. by doInBackground.
+     * 
+     * @author Babak.Farshchian@sintef.no
+     *
+     */
+    private class GetGroupInfoTask extends AsyncTask<String, Integer, ICisRecord> {
+
+    	private Context context;
+    	private ICisRecord group;
+    	
+    	public GetGroupInfoTask(Context _context) {
+    		context = _context;
+    	}
+
+    	protected ICisRecord doInBackground(String... args) {
+    		ccm = new ClientCommunicationMgr(context);
+    		//We create only one group:
+    		String groupNames = args[0];
+    		//Create bean to send over:
+    		Create messageBean = new Create();
+    		//Populate the data from provided CisRecord:
+    		messageBean.setCommunityName(group.getName());
+    		messageBean.setOwnerJid(group.getOwnerId());
+    		
+    		Stanza stanza = new Stanza(toXCManager);
+    		//Try to send the message:
+    		try {
+    			ccm.register(ELEMENT_NAMES, callback);
+    			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
+    			Log.d(LOG_TAG, "Send stanza");
+    			} catch (Exception e) {
+    			    Log.e(this.getClass().getName(), e.getMessage());
+    			    }
+            return null;
+    	}
+    }
 }
