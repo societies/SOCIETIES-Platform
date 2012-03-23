@@ -41,7 +41,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
-import org.societies.api.comm.xmpp.datatypes.Identity;
+//import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.context.model.CommunityCtxEntity;
@@ -107,11 +107,7 @@ public class TE_ST {
 
 		
 		Long objectNumber = null;
-		String type = null;
-	
-		
-		new CommunityCtxEntity(ctxEntityId);
-		
+		String type = null;	
 		
 	}
 

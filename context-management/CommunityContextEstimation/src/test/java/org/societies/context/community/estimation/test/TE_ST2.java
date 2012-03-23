@@ -24,6 +24,7 @@
  */
 package org.societies.context.community.estimation.test;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -68,8 +69,8 @@ public class TE_ST2 {
 	 ******************************************************************************************/
 
 	private InternalCtxBroker internalCtxBroker;
-	CtxEntityIdentifier ctxEntityId = null;
 	CtxEntityIdentifier ctxEntityId1 = null;
+	CtxEntityIdentifier ctxEntityId2 = null;
 	CtxIdentifier ctxAttributeStringIdentifier = null;
 	CtxIdentifier ctxAttributeBinaryIdentifier = null;
 	Logger log;
@@ -157,8 +158,8 @@ public class TE_ST2 {
 			CtxEntity ctxEntity1 = (CtxEntity) futureEnt1.get();
 			CtxEntity ctxEntity2 = (CtxEntity) futureEnt2.get();
 			
-			this.ctxEntityId=ctxEntity1.getId();
-			this.ctxEntityId=ctxEntity2.getId();
+			this.ctxEntityId1=ctxEntity1.getId();
+			this.ctxEntityId2=ctxEntity2.getId();
 			
 			System.out.println(ctxEntity1.getType());
 			System.out.println(ctxEntity2.getType());
@@ -201,7 +202,6 @@ public class TE_ST2 {
 			this.ctxAttributeStringIdentifier = ctxAttributeString1.getId();
 			
 			//create a ctxAttribute with a Binary value that is assigned to the same CtxEntity
-			Future<CtxAttribute> futureCtxAttrBinary = this.internalCtxBroker.createAttribute(ctxEntity1.getId(), "CustomData");
 			
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
@@ -265,34 +265,47 @@ public class TE_ST2 {
 		System.out.println("0.");
 		// if the CtxEntityID or CtxAttributeID is known the retrieval is performed by using the ctxBroker.retrieve(CtxIdentifier) method
 		try {
-			System.out.println("0.1"+this.ctxEntityId);
+			System.out.println("0.1"+this.ctxEntityId1);
 
 		// retrieve ctxEntity
 		// This retrieval is performed based on the known CtxEntity identifier
 		// Retrieve is also possible to be performed based on the type of the CtxEntity. This will be demonstrated in a later example.
 
 			
-		Future<CtxModelObject> ctxEntityRetrievedFuture = this.internalCtxBroker.retrieve(this.ctxEntityId);
-		Future<CtxModelObject> ctxEntityRetrievedFuture2 = this.internalCtxBroker.retrieve(this.ctxEntityId1);
+		Future<CtxModelObject> ctxEntityRetrievedFuture1 = this.internalCtxBroker.retrieve(this.ctxEntityId1);
+		Future<CtxModelObject> ctxEntityRetrievedFuture2 = this.internalCtxBroker.retrieve(this.ctxEntityId2);
 		
-		System.out.println("0.2:" + ctxEntityRetrievedFuture.get());
-		CtxEntity retrievedCtxEntity = (CtxEntity) ctxEntityRetrievedFuture.get();
-		CtxEntity retrievedCtxEntity2 = (CtxEntity) ctxEntityRetrievedFuture.get();
+		System.out.println("0.2:" + ctxEntityRetrievedFuture1.get());
+		CtxEntity retrievedCtxEntity = (CtxEntity) ctxEntityRetrievedFuture1.get();
+		assertNotNull(retrievedCtxEntity);
 		
-		System.out.println("0.3:" + retrievedCtxEntity.toString());
-
-		this.log.info("Retrieved ctxEntity id " +retrievedCtxEntity.getId() + " of type: "+retrievedCtxEntity.getType());
-		System.out.println("4. " );
-
+		
+		CtxEntity retrievedCtxEntity2 = (CtxEntity) ctxEntityRetrievedFuture2.get();
+		assertNotNull(retrievedCtxEntity2);
+		
+		System.out.println("4. "+ retrievedCtxEntity);
+		assertNotNull(retrievedCtxEntity.getId());
+		
+		//this.log.info("Retrieved ctxEntity id " +retrievedCtxEntity.getId());//" + " of type: "+retrievedCtxEntity.getType());
+		
 		// retrieve the CtxAttribute contained in the CtxEntity with the string value
 		// again the retrieval is based on an known identifier, it is possible to retrieve it based on type.This will be demonstrated in a later example.
-		Future<CtxModelObject> ctxAttributeRetrievedStringFuture = this.internalCtxBroker.retrieve(this.ctxAttributeStringIdentifier);
-		CtxAttribute retrievedCtxAttribute = (CtxAttribute) ctxAttributeRetrievedStringFuture.get();
-		this.log.info("Retrieved ctxAttribute id " +retrievedCtxAttribute.getId()+ " and value: "+retrievedCtxAttribute.getStringValue());
-		System.out.println("BLABLA "+ retrievedCtxAttribute.getIntegerValue());
+		
+		//den xreiazetai, mporo na paro to attribute eite exointas to attribute id, eite meso entity, .getattributes()
+		
+//		Future<CtxModelObject> ctxAttributeRetrievedStringFuture = this.internalCtxBroker.retrieve(this.ctxAttributeStringIdentifier);
+//		CtxAttribute retrievedCtxAttribute = (CtxAttribute) ctxAttributeRetrievedStringFuture.get();
+		
+		//this.log.info("Retrieved ctxAttribute id " +retrievedCtxAttribute.getId()+ " and value: "+retrievedCtxAttribute.getStringValue());
+		
+		//System.out.println("BLABLA "+ retrievedCtxAttribute.getIntegerValue());
 		
 		System.out.println("5. " );
+		assertNotNull(retrievedCtxEntity);
+		assertFalse(retrievedCtxEntity.getAttributes("Age").isEmpty());
 		
+		Integer attrValue1 = retrievedCtxEntity.getAttributes("Age").iterator().next().getIntegerValue();
+		assertEquals(new Integer(39), attrValue1);
 		// retrieve ctxAttribute with the binary value
 		Future<CtxModelObject> ctxAttributeRetrievedBinaryFuture = this.internalCtxBroker.retrieve(this.ctxAttributeBinaryIdentifier);
 		CtxAttribute ctxAttributeRetrievedBinary = (CtxAttribute) ctxAttributeRetrievedBinaryFuture.get();
