@@ -27,6 +27,8 @@ package org.societies.security.commsmgr;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,8 @@ import org.societies.api.internal.security.policynegotiator.INegotiationProvider
 import org.societies.api.internal.security.policynegotiator.INegotiationRequester;
 import org.societies.api.schema.security.policynegotiator.MethodType;
 import org.societies.api.schema.security.policynegotiator.ProviderBean;
+import org.societies.api.schema.security.policynegotiator.ProviderBeanResult;
+import org.societies.api.schema.security.policynegotiator.SlaBean;
 
 //@Component
 public class CommsServer implements IFeatureServer {
@@ -130,7 +134,7 @@ public class CommsServer implements IFeatureServer {
 	@Override
 	public Object getQuery(Stanza stanza, Object messageBean) throws XMPPError {
 
-		//Put your functionality here if there IS a return object
+		// Put your functionality here if there IS a return object
 		
 		LOG.debug("getQuery()");
 
@@ -138,6 +142,10 @@ public class CommsServer implements IFeatureServer {
 		LOG.debug("getQuery(): stanza.id   = ", stanza.getId());
 		LOG.debug("getQuery(): stanza.from = ", stanza.getFrom());
 		LOG.debug("getQuery(): stanza.to   = ", stanza.getTo());
+		
+		Future<SlaBean> resultFuture;
+		SlaBean resultBean;
+		ProviderBeanResult result = new ProviderBeanResult();
 		
 		if (messageBean != null && messageBean instanceof ProviderBean) {
 			
@@ -157,7 +165,15 @@ public class CommsServer implements IFeatureServer {
 			switch (providerBean.getMethod()) {
 			case GET_POLICY_OPTIONS:
 				LOG.debug("receiveMessage(): NegotiationProvider.getPolicyOptions({})" + serviceId);
-				negotiationProvider.getPolicyOptions(serviceId);
+				resultFuture = negotiationProvider.getPolicyOptions(serviceId);
+				try {
+					resultBean = resultFuture.get();
+					result.setSlaBean(resultBean);
+				} catch (InterruptedException e) {
+					LOG.warn("getQuery()", e);
+				} catch (ExecutionException e) {
+					LOG.warn("getQuery()", e);
+				}
 				break;
 			case ACCEPT_POLICY_AND_GET_SLA:
 				negotiationProvider.acceptPolicyAndGetSla(sessionId, signedPolicyOption, isModified);
@@ -168,7 +184,7 @@ public class CommsServer implements IFeatureServer {
 			}
 		}
 		
-		return null;
+		return result;
 	}
 
 	/* (non-Javadoc)
