@@ -24,10 +24,6 @@
  */
 package org.societies.security.commsmgr;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
@@ -37,13 +33,8 @@ import org.societies.api.internal.security.policynegotiator.INegotiationProvider
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.schema.security.policynegotiator.MethodType;
 import org.societies.api.schema.security.policynegotiator.ProviderBean;
-import org.societies.api.schema.security.policynegotiator.ProviderBeanResult;
-import org.societies.api.schema.security.policynegotiator.SlaBean;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.springframework.scheduling.annotation.Async;
 
@@ -54,18 +45,12 @@ import org.springframework.scheduling.annotation.Async;
  * 
  */
 //@Component
-public class CommsClient implements INegotiationProviderRemote, ICommCallback {
-	private static final List<String> NAMESPACES = Collections
-			.unmodifiableList(Arrays.asList(
-					"http://societies.org/api/schema/security/policynegotiator"));
-	private static final List<String> PACKAGES = Collections
-			.unmodifiableList(Arrays.asList(
-					"org.societies.api.schema.security.policynegotiator"));
-
-	// PRIVATE VARIABLES
+public class CommsClient implements INegotiationProviderRemote {
+	
 	private ICommManager commMgr;
 	private static Logger LOG = LoggerFactory.getLogger(CommsClient.class);
 	private IIdentityManager idMgr;
+	private CommsClientCallback clientCallback;
 
 //	@Autowired
 //	public CommsClient(ICommManager commManager) {
@@ -81,9 +66,14 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 
 //	@PostConstruct
 	public void init() {
+
+		LOG.debug("init()");
+		
+		clientCallback = new CommsClientCallback();
+		
 		// REGISTER OUR ServiceManager WITH THE XMPP Communication Manager
 		try {
-			commMgr.register(this);
+			commMgr.register(clientCallback);
 			LOG.debug("init(): commMgr registered");
 		} catch (CommunicationException e) {
 			LOG.error("init(): ", e);
@@ -99,90 +89,6 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 		this.commMgr = commMgr;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.societies.api.comm.xmpp.interfaces.ICommCallback#getJavaPackages()
-	 */
-	@Override
-	public List<String> getJavaPackages() {
-		LOG.debug("getJavaPackages()");
-		return PACKAGES;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.societies.api.comm.xmpp.interfaces.ICommCallback#getXMLNamespaces()
-	 */
-	@Override
-	public List<String> getXMLNamespaces() {
-		LOG.debug("getXMLNamespaces()");
-		return NAMESPACES;
-	}
-
-	@Override
-	public void receiveError(Stanza stanza, XMPPError error) {
-		LOG.debug("receiveError()");
-	}
-
-	@Override
-	public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
-		LOG.debug("receiveInfo()");
-	}
-
-	@Override
-	public void receiveMessage(Stanza stanza, Object payload) {
-
-		LOG.debug("receiveMessage({}, {})", stanza, payload);
-		LOG.debug("receiveMessage(): stanza.id   = ", stanza.getId());
-		LOG.debug("receiveMessage(): stanza.from = ", stanza.getFrom());
-		LOG.debug("receiveMessage(): stanza.to   = ", stanza.getTo());
-		
-		if (payload != null && payload instanceof ProviderBean) {
-			
-			// Method parameters
-			ProviderBean providerBean = (ProviderBean) payload;
-			String serviceId = providerBean.getServiceId();
-			int sessionId = providerBean.getSessionId();
-			String signedPolicyOption = providerBean.getSignedPolicyOption();
-			boolean isModified = providerBean.isModified();
-			
-			LOG.debug("receiveMessage(): NegotiationProvider. Method: " + providerBean.getMethod());
-			LOG.debug("receiveMessage(): NegotiationProvider. Params: " + serviceId + ", " +
-					isModified + ", " +	sessionId + ", " + signedPolicyOption);
-		}
-	}
-
-	@Override
-	public void receiveResult(Stanza returnStanza, Object msgBean) {
-		
-		LOG.debug("receiveResult({}, {})", returnStanza, msgBean);
-		
-		if (msgBean instanceof ProviderBeanResult) {
-			
-			ProviderBeanResult providerResult = (ProviderBeanResult) msgBean;
-			SlaBean result = providerResult.getSlaBean();
-			
-			int sessionId = result.getSessionId();
-			String sla = result.getSla();
-			LOG.debug("receiveResult(): sessionId = {}, sla = {}", sessionId, sla);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveItems(
-	 * org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.String,
-	 * java.util.List)
-	 */
-	@Override
-	public void receiveItems(Stanza stanza, String node, List<String> items) {
-		LOG.debug("receiveItems()");
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -230,7 +136,7 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 		provider.setMethod(MethodType.GET_POLICY_OPTIONS);
 		try {
 			// Send information query
-			commMgr.sendIQGet(stanza, provider, this);
+			commMgr.sendIQGet(stanza, provider, clientCallback);
 			LOG.debug("getPolicyOptions({}): message sent to {}", serviceId, toIdentity.getJid());
 		} catch (CommunicationException e) {
 			LOG.warn("getPolicyOptions({}): could not send message to " + toIdentity.getJid(), serviceId, e);
