@@ -1,0 +1,98 @@
+<!--  
+Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+(SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
+conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+   disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Societies - Device Status</title>
+	<meta name="author" content="Olivier Maridat (Trialog)" />
+	
+	<script type="text/javascript" src="js/lib/phonegap.js"></script>
+	<!--[if IE]><script type="text/javascript" src="js/lib/html5-ie.js"></script><![endif]--> 
+	<link type="text/css" rel="stylesheet" href="design/css/lib/jquery.mobile.css" /> 
+	<link type="text/css" rel="stylesheet" href="design/css/societies.css" /> 
+	<script type="text/javascript" src="js/lib/jquery.js"></script>
+	<script type="text/javascript" src="js/lib/jquery.mobile.js"></script>
+</head> 
+<body>
+
+
+<section data-role="page" id="main">
+	<header data-role="header">
+		<h1>Device Status</h1>
+	</header>
+	
+	<article data-role="content">
+		<input type="button" name="connectivity" id="connectivity" value="Connectivity Status" data-role="button" data-inline="true" />
+		<input type="button" name="location" id="location" value="Location Status" data-role="button" data-inline="true" />
+		<input type="button" name="battery" id="battery" value="Battery Status" data-role="button" data-inline="true" />
+		<input type="button" name="registerBattery" id="registerBattery" value="Register to Battery Status" data-role="button" data-inline="true" />
+		<br />
+	</article>
+	
+	<footer data-role="footer" data-position="fixed">
+		<a href="#main" data-role="button" data-icon="back" data-inline="true">Back to main</a>
+	</footer>
+</section>
+
+<script type="text/javascript" src="js/plugin/DeviceStatus.js"></script>
+<script type="text/javascript" >
+document.addEventListener('deviceready', function() {
+//jQuery(function() {
+	$('#connectivity').click(function() {
+		window.plugins.DeviceStatus.getConnectivityStatus(onSuccess, onFailure);
+	});
+	
+	$('#location').click(function() {
+		window.plugins.DeviceStatus.getLocationStatus(onSuccess, onFailure);
+	});
+	
+	$('#battery').click(function() {
+		window.plugins.DeviceStatus.getBatteryStatus(onSuccess, onFailure);
+	});
+	$('#registerBattery').click(function() {
+		window.plugins.DeviceStatus.registerToBatteryStatus(onSuccess, onFailure);
+	});
+});
+
+function onSuccess(data) {
+	console.log("JS Success");
+	console.log(JSON.stringify(data));
+	$('.result').remove();
+	$('.error').remove();
+	$('<span>').addClass('result').html("Result: "+JSON.stringify(data)).appendTo('#main article[data-role=content]');
+}
+function onFailure(e) {
+	console.log("JS Error");
+	console.log(e);
+	$('.result').remove();
+	$('.error').remove();
+	$('<span>').addClass('error').html(e).appendTo('#main article[data-role=content]');
+}
+</script>
+
+</body>
+</html>

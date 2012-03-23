@@ -4,11 +4,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +16,7 @@ import org.societies.api.internal.security.policynegotiator.INegotiationProvider
 import org.societies.api.internal.security.policynegotiator.INegotiationRequester;
 import org.societies.api.schema.security.policynegotiator.ProviderBean;
 
-@Component
+//@Component
 public class CommsServer implements IFeatureServer {
 
 	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
@@ -33,35 +28,65 @@ public class CommsServer implements IFeatureServer {
 			  Arrays.asList("org.societies.api.schema.security.policynegotiator"
 					  ));
 	
-	private ICommManager commManager;
+	private ICommManager commMgr;
 	private INegotiationProvider negotiationProvider;
 	private INegotiationRequester negotiationRequester;
 	
-	@Autowired
-	public CommsServer(ICommManager commManager,
-			INegotiationRequester negotiationRequester,
-			INegotiationProvider negotiationProvider) {
-		
-		this.commManager = commManager;
-		this.negotiationRequester = negotiationRequester;
-		this.negotiationProvider = negotiationProvider;
-		
-		LOG.debug("CommsServer({})", commManager + ", " + negotiationRequester + ", " + negotiationProvider);
+//	@Autowired
+//	public CommsServer(ICommManager commManager,
+//			INegotiationRequester negotiationRequester,
+//			INegotiationProvider negotiationProvider) {
+//		
+//		this.commManager = commManager;
+//		this.negotiationRequester = negotiationRequester;
+//		this.negotiationProvider = negotiationProvider;
+//		
+//		LOG.info("CommsServer({})", commManager + ", " + negotiationRequester + ", " + negotiationProvider);
+//	}
+
+	public CommsServer() {
+		LOG.info("CommsServer()");
 	}
 	
-	@PostConstruct
+//	@PostConstruct
 	public void init() {
 		
-		LOG.debug("init(): commManager = {}", commManager.toString());
+		LOG.debug("init(): commMgr = {}", commMgr.toString());
 		
 		try {
-			commManager.register(this);
-			LOG.debug("init(): commManager registered");
+			commMgr.register(this);
+			LOG.debug("init(): commMgr registered");
 		} catch (CommunicationException e) {
 			LOG.error("init(): ", e);
 		}
 	}
 
+	// Getters and setters for beans
+	public INegotiationProvider getNegotiationProvider() {
+		return negotiationProvider;
+	}
+	public void setNegotiationProvider(INegotiationProvider negotiationProvider) {
+		this.negotiationProvider = negotiationProvider;
+		//LOG.debug("setNegotiationProvider()");
+		//LOG.debug("setNegotiationProvider({})", negotiationProvider);
+	}
+	public INegotiationRequester getNegotiationRequester() {
+		return negotiationRequester;
+	}
+	public void setNegotiationRequester(INegotiationRequester negotiationRequester) {
+		this.negotiationRequester = negotiationRequester;
+		//LOG.debug("setNegotiationRequester()");
+		//LOG.debug("setNegotiationRequester({})", negotiationRequester);
+	}
+	public ICommManager getCommMgr() {
+		return commMgr;
+	}
+	public void setCommMgr(ICommManager commMgr) {
+		this.commMgr = commMgr;
+		//LOG.debug("setCommManager()");
+		//LOG.debug("setCommManager({})", commManager);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.societies.api.comm.xmpp.interfaces.IFeatureServer#getJavaPackages()
 	 */

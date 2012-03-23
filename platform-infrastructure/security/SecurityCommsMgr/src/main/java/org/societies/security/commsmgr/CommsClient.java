@@ -28,8 +28,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
@@ -45,9 +43,7 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 
 /**
  * Comms Client that initiates the remote communication
@@ -55,7 +51,7 @@ import org.springframework.stereotype.Component;
  * @author Mitja Vardjan
  * 
  */
-@Component
+//@Component
 public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 	private static final List<String> NAMESPACES = Collections
 			.unmodifiableList(Arrays.asList(
@@ -65,28 +61,40 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 					"org.societies.api.schema.security.policynegotiator"));
 
 	// PRIVATE VARIABLES
-	private ICommManager commManager;
+	private ICommManager commMgr;
 	private static Logger LOG = LoggerFactory.getLogger(CommsClient.class);
 	private IIdentityManager idMgr;
 
-	@Autowired
-	public CommsClient(ICommManager commManager) {
-		
-		this.commManager = commManager;
-		
-		LOG.debug("CommsServer({})", commManager);
+//	@Autowired
+//	public CommsClient(ICommManager commManager) {
+//		
+//		this.commManager = commManager;
+//		
+//		LOG.info("CommsClient({})", commManager);
+//	}
+	
+	public CommsClient() {
+		LOG.info("CommsClient()");
 	}
 
-	@PostConstruct
+//	@PostConstruct
 	public void init() {
 		// REGISTER OUR ServiceManager WITH THE XMPP Communication Manager
 		try {
-			commManager.register(this);
-			LOG.debug("init(): commManager registered");
+			commMgr.register(this);
+			LOG.debug("init(): commMgr registered");
 		} catch (CommunicationException e) {
 			LOG.error("init(): ", e);
 		}
-		idMgr = commManager.getIdManager();
+		idMgr = commMgr.getIdManager();
+	}
+
+	// Getters and setters for beans
+	public ICommManager getCommMgr() {
+		return commMgr;
+	}
+	public void setCommMgr(ICommManager commMgr) {
+		this.commMgr = commMgr;
 	}
 
 //	@Override
@@ -210,7 +218,8 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 	@Async
 	public void acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
 			boolean modified, INegotiationProviderCallback callback) {
-
+		
+		LOG.debug("acceptPolicyAndGetSla({}, ...)", sessionId);
 	}
 
 	/*
@@ -224,6 +233,8 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 	@Override
 	@Async
 	public void getPolicyOptions(INegotiationProviderCallback callback) {
+		
+		LOG.debug("getPolicyOptions({})", callback);
 	}
 
 	/*
@@ -236,12 +247,16 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 	@Async
 	public void reject(int sessionId) {
 		
-		IIdentity toIdentity = null;
+		LOG.debug("reject({})", sessionId);
+		
+		IIdentity toIdentity;
 		try {
 			toIdentity = idMgr.fromJid("XCManager.societies.local");
 		} catch (InvalidFormatException e) {
 			LOG.error("reject({}): ", sessionId, e);
+			return;
 		}
+		
 		Stanza stanza = new Stanza(toIdentity);
 
 		// CREATE MESSAGE BEAN
@@ -251,9 +266,10 @@ public class CommsClient implements INegotiationProviderRemote, ICommCallback {
 		try {
 			// SEND INFORMATION QUERY - RESPONSE WILL BE IN
 			// "callback.RecieveMessage()"
-			commManager.sendMessage(stanza, provider);
+			commMgr.sendMessage(stanza, provider);
+			LOG.debug("reject({}): message sent to {}", sessionId, toIdentity.getJid());
 		} catch (CommunicationException e) {
-			LOG.warn(e.getMessage());
+			LOG.warn("reject({}): could not send message to " + toIdentity.getJid(), sessionId, e);
 		}
 		;
 	}

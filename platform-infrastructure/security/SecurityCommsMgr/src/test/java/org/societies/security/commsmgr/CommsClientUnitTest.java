@@ -34,8 +34,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
-import org.societies.api.internal.security.policynegotiator.INegotiationRequester;
 
 /**
  * 
@@ -47,8 +45,6 @@ public class CommsClientUnitTest {
 
 	private CommsClient classUnderTest;
 	private ICommManager commMgrMock;
-	private INegotiationProvider negotiationProviderMock;
-	private INegotiationRequester negotiationRequesterMock;
 
 	/**
 	 * @throws java.lang.Exception
@@ -58,10 +54,9 @@ public class CommsClientUnitTest {
 
 		commMgrMock = mock(ICommManager.class);
 		//assertNotNull(commMgrMock.getIdManager());
-		negotiationProviderMock = mock(INegotiationProvider.class);
-		negotiationRequesterMock = mock(INegotiationRequester.class);
 		
-		classUnderTest = new CommsClient(commMgrMock);
+		classUnderTest = new CommsClient();
+		classUnderTest.setCommMgr(commMgrMock);
 		classUnderTest.init();
 	}
 

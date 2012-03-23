@@ -52,7 +52,9 @@ public class NegotiationRequesterUnitTest {
 	public void setUp() throws Exception {
 
 		signatureMgrMock = mock(ISignatureMgr.class);
-		classUnderTest = new NegotiationRequester(signatureMgrMock);
+		//classUnderTest = new NegotiationRequester(signatureMgrMock);
+		classUnderTest = new NegotiationRequester();
+		classUnderTest.setSignatureMgr(signatureMgrMock);
 		classUnderTest.init();
 	}
 

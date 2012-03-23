@@ -1,27 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:context="http://www.springframework.org/schema/context"
-  xsi:schemaLocation="http://www.springframework.org/schema/osgi 
-    http://www.springframework.org/schema/osgi/spring-osgi-1.2.xsd
-    http://www.springframework.org/schema/beans 
-    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-    http://www.springframework.org/schema/context 
-    http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/osgi 
+		http://www.springframework.org/schema/osgi/spring-osgi-1.2.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/osgi-compendium
+		http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx.xsd"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	>
 
 	<!-- regular spring configuration file defining the beans for this bundle. 
 		We've kept the osgi definitions in a separate configuration file so that 
 		this file can easily be used for integration testing outside of an OSGi environment -->
 
 	<context:annotation-config />
+	<context:component-scan base-package="org.societies.security.policynegotiator" />
+	
+	<!-- Required for Async processing -->
+	<tx:annotation-driven />
 	
 	<bean id="NegotiationProvider"
 		class="org.societies.security.policynegotiator.NegotiationProvider"
-		>
+		depends-on="NegotiationProviderRemote,SignatureMgr"
+		init-method="init" >
+  		<property name="groupMgr" ref="NegotiationProviderRemote"/>
+        <property name="signatureMgr" ref="SignatureMgr"/>
 	</bean>
 	<bean id="NegotiationRequester"
 		class="org.societies.security.policynegotiator.NegotiationRequester"
-		>
+		depends-on="NegotiationProviderRemote,SignatureMgr"
+		init-method="init" >
+        <property name="signatureMgr" ref="SignatureMgr"/>
 	</bean>
 
 </beans>

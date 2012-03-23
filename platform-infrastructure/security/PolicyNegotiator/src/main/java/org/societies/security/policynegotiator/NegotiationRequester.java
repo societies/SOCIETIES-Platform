@@ -1,34 +1,42 @@
 package org.societies.security.policynegotiator;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationRequester;
 import org.societies.api.security.digsig.ISignatureMgr;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class NegotiationRequester implements INegotiationRequester, INegotiationProviderCallback {
 
 	private static Logger LOG = LoggerFactory.getLogger(NegotiationRequester.class);
 	
 	private ISignatureMgr signatureMgr;
 	
-	@Autowired
-	public NegotiationRequester(ISignatureMgr signatureMgr) {
-		this.signatureMgr = signatureMgr;
-		LOG.debug("NegotiationRequester({})", signatureMgr);
+//	@Autowired
+//	public NegotiationRequester(ISignatureMgr signatureMgr) {
+//		this.signatureMgr = signatureMgr;
+//		LOG.info("NegotiationRequester({})", signatureMgr);
+//	}
+	
+	public NegotiationRequester() {
+		LOG.info("NegotiationRequester()");
 	}
 	
-	@PostConstruct
+//	@PostConstruct
 	public void init() {
 		LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "xmlNodeId", "id"));
 		LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
 	}
-	
+
+	// Getters and setters for beans
+	public ISignatureMgr getSignatureMgr() {
+		return signatureMgr;
+	}
+	public void setSignatureMgr(ISignatureMgr signatureMgr) {
+		this.signatureMgr = signatureMgr;
+	}
+
 //	@Override
 //	public void onGetPolicyOptions(int sessionId, String sops) {
 //		// TODO Auto-generated method stub

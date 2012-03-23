@@ -78,16 +78,22 @@
       </xs:simpleContent>
     </xs:complexType>
   </xs:element>
-  
-  <xs:element name='list' type='empty' /><!-- TODO-->
-  
+    
     <xs:element name='configure' type='empty' /><!-- TODO-->
 
 
 	<xs:element name='search-cis' type='empty' /><!-- TODO-->
 
 
-
+    <xs:element name='list'>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base='empty'>
+          <xs:attribute name='list-criteria' type='xs:string'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
   
     <xs:element name='delete'>
     <xs:complexType>

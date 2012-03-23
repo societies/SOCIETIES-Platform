@@ -13,14 +13,11 @@ public class ConnectorTester {
 	 * http://wd.teamlife.it/fbconnector.php that allows to get the access token
 	 */
 	public static void main(String[] args) {
-		String access_token = "AAAFPIhZAkC90BAO1fmJZAxs754pEGhaGQesb9haktJ8JgDOnxsSUo2A9PJOnQa34b2mRUuRXRUS1mhUIJG8RMetAUwZBZBkOBFfo7G0h6wZDZD";
+		String access_token = "AAAFPIhZAkC90BAGbr1zzIiGRZAJ6khAsnCLhMPPxJdOuixheZCbooPwNGLgFX4pbZBacBH1JP9SOVF4vbfau3HSIgS8VKbSJ3gNbUVCZAbQZDZD";
 		ISocialConnector connector = new FacebookConnectorImpl(access_token,null);
 		
-		
-		String str = connector.getSocialData(FacebookConnector.ME);
-		System.out.println("FACEBOOK DATA:");
+		System.out.println("FACEBOOK DATA:"+connector.getUserProfile());
 			
-		System.out.println(str);
 		
 		System.out.println("=== END ===");
 

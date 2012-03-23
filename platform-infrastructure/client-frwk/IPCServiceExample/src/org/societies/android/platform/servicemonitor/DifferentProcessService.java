@@ -30,8 +30,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.societies.android.platform.interfaces.ICoreServiceExample;
-import org.societies.android.platform.interfaces.ServiceMethodTranslator;
-import org.societies.android.platform.servicemonitor.CoreMonitor.IncomingHandler;
+import org.societies.android.platform.utilities.ServiceMethodTranslator;
+import org.societies.api.android.internal.model.AndroidCSSNode;
 
 import android.app.Service;
 import android.content.Intent;
@@ -132,6 +132,7 @@ public class DifferentProcessService extends Service implements ICoreServiceExam
 		Toast.makeText(getApplicationContext(), ("Bugger off " + appendToMessage + " index: " + index), Toast.LENGTH_LONG).show();
 		return null;
 	}
+
 
 
 }
