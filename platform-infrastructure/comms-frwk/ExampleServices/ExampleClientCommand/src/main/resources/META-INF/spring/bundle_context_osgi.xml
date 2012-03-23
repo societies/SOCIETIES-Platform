@@ -38,5 +38,6 @@
 	<osgi:reference id="FortuneCookieBundle" interface="org.societies.example.fortunecookie.IWisdom"/>
 	<osgi:reference id="PubsubClient" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"/>
 	<osgi:reference id="CommManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
+	<osgi:reference id="eventMgmtRef" interface="org.societies.api.osgi.event.IEventMgr" />
 	
 </beans>

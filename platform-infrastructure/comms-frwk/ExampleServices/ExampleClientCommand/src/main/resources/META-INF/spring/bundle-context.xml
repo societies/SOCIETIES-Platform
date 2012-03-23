@@ -35,12 +35,12 @@
 	 
 	<bean id="ClientTest" 
   		class="org.societies.comm.examples.clientcommand.ClientTester"
-  		depends-on="RemoteCalculator, PubsubClient, FortuneCookieBundle"
+  		depends-on="RemoteCalculator, PubsubClient, FortuneCookieBundle, eventMgmtRef"
   		init-method="StartTest">
   		<property name="remoteCalculator" ref="RemoteCalculator"/>
   		<property name="pubSubManager" ref="PubsubClient"/>
   		<property name="fcGenerator" ref="FortuneCookieBundle"/>
   		<property name="commManager" ref="CommManager"/>
+  		<property name="eventMgr" ref="eventMgmtRef"/>
 	</bean>
-	
 </beans>
