@@ -47,14 +47,25 @@ public class Action implements IAction, Serializable{
 	private int confidenceLevel;
 
 	public Action(){
+		this.serviceID = null;
+		this.serviceType = "not_initialised";
 		this.parameterName = "not_initialised";
 		this.value = "not_initialised";
 	}
+	
+	@Deprecated
 	public Action(String par, String val){
 		this.parameterName = par;
 		this.value = val;
 	}
 
+	public Action(ServiceResourceIdentifier serviceID, String serviceType, String parameterName, String value){
+		this.serviceID = serviceID;
+		this.serviceType = serviceType;
+		this.parameterName = parameterName;
+		this.value = value;
+	}
+	
 	public String getvalue(){
 		return value;
 	}

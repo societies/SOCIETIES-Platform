@@ -2,6 +2,9 @@ package org.societies.service.provider.test;
 
 import static org.junit.Assert.*;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,8 +30,17 @@ public class MathServiceUnitTest {
 	}
 	
 	@Test
-	public void testmultiply() {
-		assertEquals(15,myMathService.multiply(1,15));
+	public void testmultiply() throws InterruptedException, ExecutionException {
+		Future<Integer> res = null;
+		res = myMathService.multiply(1,15);
+		try {
+			assertEquals(15,res.get());
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Test

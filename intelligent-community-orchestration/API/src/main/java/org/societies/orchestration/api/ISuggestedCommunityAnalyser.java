@@ -120,7 +120,7 @@ public interface ISuggestedCommunityAnalyser {
 	 * It contains all the CisRecords to delete.
 	 * 
 	 */
-    public void analyseEgocentricRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations);
+    public ArrayList<String> analyseEgocentricRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations, ArrayList<String> cissToCreateMetadata);
     
     /**
 	 * Takes as input a collection of CISs, and what they represent, and performs analysis on them
@@ -134,6 +134,6 @@ public interface ISuggestedCommunityAnalyser {
 	 * result if the configuration happens.
 	 * 
 	 */
-    public void analyseEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations);
+    public ArrayList<String> analyseEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations, ArrayList<String> cissToCreateMetadata);
 
 }

@@ -29,14 +29,14 @@
 	<tx:annotation-driven />
 	
 	<bean id="NegotiationProvider"
-		class="org.societies.security.policynegotiator.NegotiationProvider"
+		class="org.societies.security.policynegotiator.provider.NegotiationProvider"
 		depends-on="NegotiationProviderRemote,SignatureMgr"
 		init-method="init" >
   		<property name="groupMgr" ref="NegotiationProviderRemote"/>
         <property name="signatureMgr" ref="SignatureMgr"/>
 	</bean>
 	<bean id="NegotiationRequester"
-		class="org.societies.security.policynegotiator.NegotiationRequester"
+		class="org.societies.security.policynegotiator.requester.NegotiationRequester"
 		depends-on="NegotiationProviderRemote,SignatureMgr"
 		init-method="init" >
         <property name="signatureMgr" ref="SignatureMgr"/>
