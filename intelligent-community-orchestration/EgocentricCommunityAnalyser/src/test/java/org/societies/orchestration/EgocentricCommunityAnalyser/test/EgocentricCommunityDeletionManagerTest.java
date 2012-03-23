@@ -64,16 +64,20 @@ public class EgocentricCommunityDeletionManagerTest {
 		//create CIS for James, with last activity being 1 year ago
 
 		cisManager = mock(ICisManager.class);
+		ICisRecord cisRecord = mock(ICisRecord.class);
+		autoCommunityDeletionManager.setCisManager(cisManager);
 		//ICisRecord jamesCis = cisManager.createCis("James", "James CIS");
 		
     	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
 		
+    	//when(cisManager.getCiss()).thenReturn(cisRecord);
+    	
 		autoCommunityDeletionManager.identifyCissToDelete(null);
 		
 		String[] members = new String[1];
 		members[0] = "James";
 		//the CIS should have been deleted
-		
+		//verify(cisManager.getCiss());
 		//Assert.assertNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null, null)));
 	}
 	

@@ -275,31 +275,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				//sufficiently important context containing a list of CSSs. The context ontology is used
 				//to determine what is worthy of this.
 				
-				Future<List<CtxIdentifier>> friendsFuture = null;
-				try {
-				    friendsFuture = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "close friends");
-				    //Filter to friends who all consider each-other friends, within the group of user's friends
-				    //Need API in place to obtain this data
-			    } catch (CtxException e) {
-				    // TODO Auto-generated catch block
-				    e.printStackTrace();
-			    }
 				
-				//while (friendsFuture == null) {
-				//	continue;
-				//}
-				
-				List<CtxIdentifier> theFriends = null;
-				try {
-					if (friendsFuture != null)
-					    theFriends = friendsFuture.get();
-				} catch (InterruptedException e3) {
-					// TODO Auto-generated catch block
-					e3.printStackTrace();
-				} catch (ExecutionException e3) {
-					// TODO Auto-generated catch block
-					e3.printStackTrace();
-				}
 				
 				//Does Personal CSS directory CIS need sub-CISs:
 				
@@ -344,6 +320,46 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				
 				//Mutual friends CIS creator
+				
+				Future<List<CtxIdentifier>> friendsFuture = null;
+				try {
+				    friendsFuture = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "close friends");
+				    //Filter to friends who all consider each-other friends, within the group of user's friends
+				    //Need API in place to obtain this data
+			    } catch (CtxException e) {
+				    // TODO Auto-generated catch block
+				    e.printStackTrace();
+			    }
+				
+				//while (friendsFuture == null) {
+				//	continue;
+				//}
+				
+				List<CtxIdentifier> theFriends = null;
+				try {
+					if (friendsFuture != null)
+					    theFriends = friendsFuture.get();
+				} catch (InterruptedException e3) {
+					// TODO Auto-generated catch block
+					e3.printStackTrace();
+				} catch (ExecutionException e3) {
+					// TODO Auto-generated catch block
+					e3.printStackTrace();
+				}
+				
+				cisExistsAlready = false;
+				for (int i = 0; i < userCissMetadata.size(); i++) {
+				    if (userCissMetadata.get(i).contains("PERSONAL CIS for your friends"))
+				        cisExistsAlready = true;
+				}
+				
+				//if (cisExistsAlready == false) {
+				//    cissToCreate.add(new ICisRecord(null, linkedCss.toString(), "PERSONAL CIS for your friends", null, null, null, theFriends, null, null));
+				//    personalCiss.remove("CSS Directory");
+				//    personalCiss.add("CSS Directory", new ICisRecord(null, linkedCss.toString(), "PERSONAL CIS for your friends", null, null, null, null, null, null));
+			    //    cissToCreateMetadata.add("PERSONAL CIS for your friends");
+				//
+				//}
 				
 				
 				boolean similarCis = false;
