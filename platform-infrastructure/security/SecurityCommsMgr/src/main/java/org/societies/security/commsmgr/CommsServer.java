@@ -27,6 +27,8 @@ package org.societies.security.commsmgr;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +40,10 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationRequester;
+import org.societies.api.schema.security.policynegotiator.MethodType;
 import org.societies.api.schema.security.policynegotiator.ProviderBean;
+import org.societies.api.schema.security.policynegotiator.ProviderBeanResult;
+import org.societies.api.schema.security.policynegotiator.SlaBean;
 
 //@Component
 public class CommsServer implements IFeatureServer {
@@ -129,12 +134,16 @@ public class CommsServer implements IFeatureServer {
 	@Override
 	public Object getQuery(Stanza stanza, Object messageBean) throws XMPPError {
 
-		LOG.debug("getQuery()");
-
+		// Put your functionality here if there IS a return object
+		
 		LOG.debug("getQuery({}, {})", stanza, messageBean);
 		LOG.debug("getQuery(): stanza.id   = ", stanza.getId());
 		LOG.debug("getQuery(): stanza.from = ", stanza.getFrom());
 		LOG.debug("getQuery(): stanza.to   = ", stanza.getTo());
+		
+		Future<SlaBean> resultFuture;
+		SlaBean resultBean;
+		ProviderBeanResult result = new ProviderBeanResult();
 		
 		if (messageBean != null && messageBean instanceof ProviderBean) {
 			
@@ -145,12 +154,35 @@ public class CommsServer implements IFeatureServer {
 			String signedPolicyOption = providerBean.getSignedPolicyOption();
 			boolean isModified = providerBean.isModified();
 			
+			MethodType method = providerBean.getMethod();
+			
 			LOG.debug("getQuery(): NegotiationProvider. Method: " + providerBean.getMethod());
 			LOG.debug("getQuery(): NegotiationProvider. Params: " + serviceId + ", " +
 					isModified + ", " +	sessionId + ", " + signedPolicyOption);
+
+			switch (providerBean.getMethod()) {
+			case GET_POLICY_OPTIONS:
+				LOG.debug("getQuery(): NegotiationProvider.getPolicyOptions({})", serviceId);
+				resultFuture = negotiationProvider.getPolicyOptions(serviceId);
+				try {
+					resultBean = resultFuture.get();
+					result.setSlaBean(resultBean);
+				} catch (InterruptedException e) {
+					LOG.warn("getQuery()", e);
+				} catch (ExecutionException e) {
+					LOG.warn("getQuery()", e);
+				}
+				break;
+			case ACCEPT_POLICY_AND_GET_SLA:
+				negotiationProvider.acceptPolicyAndGetSla(sessionId, signedPolicyOption, isModified);
+				break;
+			case REJECT:
+				LOG.warn("getQuery(): Method {} returns void and should not be handled here.", method);
+				break;
+			}
 		}
 		
-		return null;
+		return result;
 	}
 
 	/* (non-Javadoc)
@@ -170,28 +202,32 @@ public class CommsServer implements IFeatureServer {
 	 */
 	@Override
 	public void receiveMessage(Stanza stanza, Object messageBean) {
-
+		
+		// Put your functionality here if there is NO return object, ie, VOID
+		
 		LOG.debug("receiveMessage({}, {})", stanza, messageBean);
 		
 		if (messageBean instanceof ProviderBean) {
 			
 			// Method parameters
 			ProviderBean providerBean = (ProviderBean) messageBean;
+			String serviceId = providerBean.getServiceId();
 			int sessionId = providerBean.getSessionId();
 			String signedPolicyOption = providerBean.getSignedPolicyOption();
-			String serviceId = providerBean.getServiceId();
 			boolean isModified = providerBean.isModified();
 			
-			LOG.debug("receiveMessage(): NegotiationProvider. Params: " + isModified + ", " +
-					sessionId + ", " + signedPolicyOption);
+			MethodType method = providerBean.getMethod();
+			
+			LOG.debug("receiveMessage(): NegotiationProvider. Method: " + method);
+			LOG.debug("receiveMessage(): NegotiationProvider. Params: " + serviceId + ", " +
+					isModified + ", " +	sessionId + ", " + signedPolicyOption);
 			
 			switch (providerBean.getMethod()) {
 			case GET_POLICY_OPTIONS:
-				LOG.debug("receiveMessage(): NegotiationProvider.getPolicyOptions({})" + serviceId);
-				negotiationProvider.getPolicyOptions(serviceId);
+				LOG.warn("receiveMessage(): Method {} returns a value and should not be handled here.", method);
 				break;
 			case ACCEPT_POLICY_AND_GET_SLA:
-				negotiationProvider.acceptPolicyAndGetSla(sessionId, signedPolicyOption, isModified);
+				LOG.warn("receiveMessage(): Method {} returns a value and should not be handled here.", method);
 				break;
 			case REJECT:
 				negotiationProvider.reject(sessionId);
