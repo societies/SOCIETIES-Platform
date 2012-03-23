@@ -69,8 +69,9 @@ public class EgocentricCommunityCreationManagerTest {
 	//@Test
 	public void testNonExtensiveCreationCheck() {
 		
-		IIdentity ownerId = null; //James Jents CSS
-		entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
+    	
     	
 		cisManager = mock(ICisManager.class);
 		userCtxBroker = mock(ICtxBroker.class);
@@ -114,8 +115,9 @@ public class EgocentricCommunityCreationManagerTest {
 	//@Test
     public void testExtensiveCreationCheck() {
     	
-    	IIdentity ownerId = null; //James Jents CSS
-		entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+    	IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
+    	
     	
 		cisManager = mock(ICisManager.class);
 		userCtxBroker = mock(ICtxBroker.class);

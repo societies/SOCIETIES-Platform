@@ -58,8 +58,8 @@ public class EgocentricCommunityDeletionManagerTest {
 	@Test
 	public void testIdentifyCissToDelete() {
 		
-		IIdentity ownerId = null; //James Jents CSS or CIS
-		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
     	
 		//create CIS for James, with last activity being 1 year ago
 
@@ -84,8 +84,8 @@ public class EgocentricCommunityDeletionManagerTest {
 	@Test
 	public void testIdentifyShortTermCissToDelete() {
 		
-		IIdentity ownerId = null; //James Jents CSS or CIS
-		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
     	
 		//create CIS for James, with last activity being 2 hours ago
 
@@ -110,8 +110,8 @@ public class EgocentricCommunityDeletionManagerTest {
 	@Test
 	public void testIdentifyMediumTermCissToDelete() {
 		
-		IIdentity ownerId = null; //James Jents CSS or CIS
-		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
     	
 		//create CIS for James, with last activity being 2 weeks ago
 
@@ -136,8 +136,8 @@ public class EgocentricCommunityDeletionManagerTest {
 	@Test
 	public void testIdentifyLongTermCissToDelete() {
 		
-		IIdentity ownerId = null; //James Jents CSS or CIS
-		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
     	
 		//create CIS for James, with last activity being 6 months year ago
 
@@ -162,8 +162,8 @@ public class EgocentricCommunityDeletionManagerTest {
 	@Test
 	public void testIdentifyOngoingCissToDelete() {
 		
-		IIdentity ownerId = null; //James Jents CSS or CIS
-		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
     	
 		//create CIS for James, with no members for the first time in its history since creation
 
@@ -188,8 +188,8 @@ public class EgocentricCommunityDeletionManagerTest {
 	@Test
 	public void testIdentifyNoCissToDelete() {
 		
-		IIdentity ownerId = null; //James Jents CSS or CIS
-		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
     	
 		//create CIS for James, that match none of deletion criteria but come close.
 
