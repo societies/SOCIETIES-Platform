@@ -72,6 +72,7 @@
 		<module>../platform-infrastructure/comms-frwk/XCCommunicationMgr</module>
 		<module>../platform-infrastructure/comms-frwk/PubsubServiceBundle</module>
 		<module>../platform-infrastructure/comms-frwk/PubsubClientBundle</module>
+		<module>../platform-infrastructure/comms-frwk/EventMgmtBundle</module>
 		<!-- Example 3rd party services
 		<module>../platform-infrastructure/comms-frwk/ExampleServices/Calculator</module>  
 		<module>../platform-infrastructure/comms-frwk/ExampleServices/FortuneCookie</module>  
