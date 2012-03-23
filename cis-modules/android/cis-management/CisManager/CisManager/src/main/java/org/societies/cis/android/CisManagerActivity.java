@@ -2,7 +2,6 @@ package org.societies.cis.android;
 
 import android.app.Activity;
 import android.os.Bundle;
-import de.akquinet.android.androlog.Log;
 
 public class CisManagerActivity extends Activity {
 
@@ -16,11 +15,6 @@ public class CisManagerActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Initializes the logging
-        Log.init();
-
-        // Log a message (only on dev platform)
-        Log.i(this, "onCreate");
 
         setContentView(R.layout.main);
         CommunicationAdapter comAd = new CommunicationAdapter(this);

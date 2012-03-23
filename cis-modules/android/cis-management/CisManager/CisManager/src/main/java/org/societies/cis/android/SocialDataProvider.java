@@ -28,7 +28,6 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 /**
@@ -38,13 +37,17 @@ import android.net.Uri;
  * @author Babak.Farshchian@sintef.no
  *
  */
+/**
+ * @author Babak.Farshchian@sintef.no
+ *
+ */
 public class SocialDataProvider extends ContentProvider {
 
     public static final Uri CONTENT_URI = 
             Uri.parse("content://org.societies.cis.android.SocialDataProvider");
     
     private boolean online = false; // True when we are online.
-    private DatabaseAdapter dbAdapter = null;
+    //private DatabaseAdapter dbAdapter = null;
     private CommunicationAdapter comAdapter = null;
     /* 
      * Here I should do the following:
@@ -56,9 +59,10 @@ public class SocialDataProvider extends ContentProvider {
      */
     @Override
     public boolean onCreate() {
-	// TODO Auto-generated method stub
 	Context context = getContext();
-	dbAdapter = new DatabaseAdapter(context);
+	//TODO: to be used in later versions with local caching:
+	//dbAdapter = new DatabaseAdapter(context);
+	//Used to send queries over network:
 	comAdapter = new CommunicationAdapter(context);
 	comAdapter.goOnline();
 	if (comAdapter.isOnline()){
@@ -105,7 +109,7 @@ public class SocialDataProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection,
 	    String[] selectionArgs, String sortOrder) {
 	// TODO Auto-generated method stub
-	SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+	//SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
 	return null;
     }
@@ -129,7 +133,16 @@ public class SocialDataProvider extends ContentProvider {
 	return online;
     }
     
+    
+    /**
+     * Provides constants for managing CIS-related queries.
+     * 
+     * @author Babak.Farshchian@sintef.no
+     *
+     */
     public static final class Groups {
+	public static final Uri CONTENT_URI = 
+	            Uri.parse("content://org.societies.cis.android.SocialDataProvider/groups");
 	String _ID = "_id"; //Key column in the table
 	String NAME = "name"; //Name column in the group
 	String JID = "jid"; //Unique JID of the group
@@ -137,5 +150,20 @@ public class SocialDataProvider extends ContentProvider {
 	String CREATION_DATE = "creation_date";	
     };
     
+    /**
+     * Provides constants for managing CIS-related queries.
+     * 
+     * @author Babak.Farshchian@sintef.no
+     *
+     */
+    public static final class People {
+	public static final Uri CONTENT_URI = 
+	            Uri.parse("content://org.societies.cis.android.SocialDataProvider/people");
+	String _ID = "_id"; //Key column in the table
+	String NAME = "name"; //Name of the person
+	String JID = "jid"; //Unique JID of the group
+	String EMAIL = "email"; //Owner CSS jid of the group
+	String CREATION_DATE = "creation_date";	
+    };
 
 }
