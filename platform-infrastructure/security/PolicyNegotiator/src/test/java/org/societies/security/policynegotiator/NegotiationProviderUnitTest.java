@@ -103,9 +103,9 @@ public class NegotiationProviderUnitTest {
 		Future<SlaBean> result1;
 		Future<SlaBean> result2;
 		
-		result1 = classUnderTest.getPolicyOptions();
+		result1 = classUnderTest.getPolicyOptions("1");
 		assertNotNull(result1.get());
-		result2 = classUnderTest.getPolicyOptions();
+		result2 = classUnderTest.getPolicyOptions("1");
 		assertNotNull(result2.get());
 		
 		assertTrue("Different negotiation processes got same session ID!",

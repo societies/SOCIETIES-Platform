@@ -60,11 +60,12 @@ public class NegotiationProvider implements INegotiationProvider {
 //	@PostConstruct
 	public void init() {
 		
-		LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "xmlNodeId", "identity"));
-		LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
+		//LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "xmlNodeId", "identity"));
+		//LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
 		
 		LOG.debug("init(): group manager = {}", groupMgr.toString());
-		groupMgr.reject(0);
+		//groupMgr.reject(0);
+		groupMgr.getPolicyOptions("123", null);
 	}
 	
 	// Getters and setters for beans
@@ -82,7 +83,7 @@ public class NegotiationProvider implements INegotiationProvider {
 	}
 	
 	@Override
-	public Future<SlaBean> getPolicyOptions() {
+	public Future<SlaBean> getPolicyOptions(String serviceId) {
 		
 		SlaBean sla = new SlaBean();
 		Random rnd = new Random();

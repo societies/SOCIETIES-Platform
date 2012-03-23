@@ -8,10 +8,16 @@ import java.util.List;
 // import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.societies.api.internal.servicelifecycle.model.Service;
-import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
+
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
+import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
+import org.societies.api.schema.servicelifecycle.model.ServiceLocation;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
+import org.societies.api.schema.servicelifecycle.model.ServiceType;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -37,53 +43,47 @@ public class ServiceRegistryConsumer {
 	}
 
 	public void init() throws Exception {
-		int i = 0;
-		List<Service> services = new ArrayList<Service>();
-		
-		/* Store a mock service */
-		for (i = 0; i < 20; i++) {
-			ServiceResourceIdentifier sri = null;
+		serReg.registerServiceList(generateServiceList(12));
+		Service tmpServiceFilter=new Service();
+	    tmpServiceFilter.setServiceName("%");
+		List<Service> returnedList=serReg.findServices(tmpServiceFilter);
+		System.out.println("Returned list: "+returnedList.size());
+	}
+	/* Utilities methods */
+	private List<Service> generateServiceList(int numberOfService) {
+		List<Service> returnedServiceList = new ArrayList<Service>();
+		Service result = null;
+		ServiceInstance si = null;
+		ServiceImplementation servImpl = null;
+		for (int i = 0; i < numberOfService; i++) {
 			try {
-				sri = new ServiceResourceIdentifier(new URI("xmpp://test"
-						+ i));
-			} catch (URISyntaxException e1) {
-				e1.printStackTrace();
+				result = new Service();
+				ServiceResourceIdentifier sid = new ServiceResourceIdentifier();
+				sid.setIdentifier(new URI("societies","the/path/of/the/service/v"+i,null));
+				sid.setServiceInstanceIdentifier("instance_"+i);
+				result.setServiceIdentifier(sid);
+				result.setAuthorSignature("authorSignaturexx");
+				result.setServiceDescription("serviceDescription" + i);
+				result.setServiceEndpoint("serviceEndPoint");
+				result.setServiceName("serviceName" + i);
+				result.setServiceType(ServiceType.CORE_SERVICE);
+				result.setServiceLocation(ServiceLocation.LOCAL);
+				result.setServiceStatus(ServiceStatus.STARTED);
+				si = new ServiceInstance();
+				si.setFullJid("fullJid"+i);
+				si.setXMPPNode("XMPPNode"+i);
+				servImpl = new ServiceImplementation();
+				servImpl.setServiceNameSpace("net.calendar");
+				servImpl.setServiceProvider("net.soluta");
+				servImpl.setServiceVersion("1.0");
+				si.setServiceImpl(servImpl);
+				result.setServiceInstance(si);
+				returnedServiceList.add(result);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			String cSSIDInstalled = "cSSIDInstalled";
-			Service newlocalservice = new Service(sri, cSSIDInstalled, "0.0.1",
-					"serviceName1", "serviceDescription1", "authorSignature1");
-
-			services.add(newlocalservice);
 		}
-		
-		try {
-			this.serReg.registerServiceList(services);
-		} catch (ServiceRegistrationException e) {
-			e.printStackTrace();
-		}
-		
-		
-		
-		
-		/* Delete a mock service */
-		services = null;
-		ServiceResourceIdentifier sri = null;
-		try {
-			sri = new ServiceResourceIdentifier(new URI("xmpp://test5"));
-		} catch (URISyntaxException e1) {
-			e1.printStackTrace();
-		}
-		String cSSIDInstalled = "cSSIDInstalled";
-		Service newlocalservice = new Service(sri, cSSIDInstalled, "0.0.1",
-				"serviceName1", "serviceDescription1", "authorSignature1");
-
-		services = new ArrayList<Service>();
-		services.add(newlocalservice);		
-		this.serReg.unregisterServiceList(services);
-		
-		/* Retrieve a Service using ServiceResourceIdentifier*/
-		ServiceResourceIdentifier tmpServiceResourceIdentifier= new ServiceResourceIdentifier(new URI("xmpp://test10"));
-		Service tmpRetrievedService= serReg.retrieveService(tmpServiceResourceIdentifier);
-		System.out.println("Service Retrieved: "+tmpRetrievedService.getServiceName());
+		return returnedServiceList;
 	}
 }
