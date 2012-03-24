@@ -161,7 +161,7 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 	 *              a domain, the check is done on all CISs in that domain.
 	 */
 	
-	public ArrayList<String> identifyCissToConfigure() {
+	public ArrayList<String> identifyCissToConfigure(HashMap <IIdentity, String> userCissMetadata) {
 		ArrayList<ICisRecord> cisRecords = new ArrayList();
 		ArrayList<ICisRecord> cissToConfigure = new ArrayList<ICisRecord>();
 		HashMap<ICisRecord, ICisRecord> configurationsToCiss = new HashMap<ICisRecord, ICisRecord>();

@@ -11,7 +11,7 @@
        for integration testing outside of an OSGi environment -->
    
    <bean id="SuggestedCommunityAnalyser" class="org.societies.orchestration.CommunityLifecycleManagement.impl.SuggestedCommunityAnalyser" 
-   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, CisManager, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, CommunityCtxBroker, UserCtxBroker, UserCtxHistoryManager, IIdentity, CommManagerBundle, UserFeedback, UserFeedbackCallback" init-method="initialiseSuggestedCommunityAnalyser">
+   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, CisManager, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, CommunityCtxBroker, UserCtxBroker, UserCtxHistoryManager, IIdentity, CommManagerBundle, UserFeedback, UserFeedbackCallback, CommunityRecommender" init-method="initialiseSuggestedCommunityAnalyser">
    <property name="linkedCss" ref="IIdentity"></property>
    <property name="cisManager" ref="CisManager"></property>
    <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>
@@ -21,6 +21,7 @@
    <property name="commManager" ref="CommManagerBundle"></property>
    <property name="userFeedback" ref="UserFeedback"></property>
    <property name="userFeedbackCallback" ref="UserFeedbackCallback"></property>
+   <property name="communityRecommender" ref="CommunityRecommender"></property>
    </bean>
    
    <bean id="CommunityRecommender" class="org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityRecommender" 

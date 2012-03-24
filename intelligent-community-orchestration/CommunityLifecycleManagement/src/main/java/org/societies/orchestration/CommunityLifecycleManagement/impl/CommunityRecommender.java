@@ -133,13 +133,26 @@ public class CommunityRecommender //implements ICommCallback
 		//	this.linkedDomain = linkedEntity;
 	}
 	
-	public void identifyCisActionForEgocentricCommunityAnalyser(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisPossibilities) {
+	public ArrayList<String> identifyCisActionForEgocentricCommunityAnalyser(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisPossibilities, ArrayList<String> cissToCreateMetadata) {
+		ArrayList<String> cisAddMetadata = new ArrayList<String>();
+		ArrayList<String> cisDeleteMetadata = new ArrayList<String>();
+		ArrayList<String> cisConfigureMetadata = new ArrayList<String>();
 		if (cisPossibilities.get("Create CISs") != null)
-		    identifyCissToCreate(cisPossibilities.get("Create CISs").get(0));
+		    cisAddMetadata = identifyCissToCreate(cisPossibilities.get("Create CISs").get(0), cissToCreateMetadata);
 		if (cisPossibilities.get("Delete CISs") != null)
-		    identifyCissToDelete(cisPossibilities.get("Delete CISs").get(0));
+		    cisDeleteMetadata = identifyCissToDelete(cisPossibilities.get("Delete CISs").get(0), cissToCreateMetadata);
 		if (cisPossibilities.get("Configure CISs") != null)
-		    identifyCissToConfigure(cisPossibilities.get("Configure CISs"));
+		    cisConfigureMetadata = identifyCissToConfigure(cisPossibilities.get("Configure CISs"), cissToCreateMetadata);
+		
+		ArrayList<String> cisMetadata = new ArrayList<String>();
+		for (int i = 0; i < cisAddMetadata.size(); i++)
+			cisMetadata.add(cisAddMetadata.get(i));
+		for (int i = 0; i < cisDeleteMetadata.size(); i++)
+			cisMetadata.add(cisDeleteMetadata.get(i));
+		for (int i = 0; i < cisConfigureMetadata.size(); i++)
+			cisMetadata.add(cisConfigureMetadata.get(i));
+		
+		return cisMetadata;
 	}
 	
 	/*
@@ -153,12 +166,16 @@ public class CommunityRecommender //implements ICommCallback
 	 *              on collective aspects like context attributes.
 	 */
 	
-	public void identifyCissToCreate(ArrayList<ICisRecord> creatableCiss) {		
+	public ArrayList<String> identifyCissToCreate(ArrayList<ICisRecord> creatableCiss, ArrayList<String> cissToCreateMetadata) {		
 		//Can't use GUI in tests
 		//cissToCreate = getUserFeedbackOnCreation(cissToCreate);
 		
 		cissToCreate = creatableCiss;
-		
+		for (int i = 0; i < cissToCreateMetadata.size(); i++) {
+			if (!(cissToCreateMetadata.get(i).split("---")[0].substring(0, 3).equals("CIS")))
+				cissToCreateMetadata.set(i, cissToCreateMetadata.get(i).concat(cissToCreate.get(i).toString()));
+		}
+		return new ArrayList<String>();
 		//if (cissToCreate != null) 
 		  //  for (int i = 0; i < cissToCreate.size(); i++)
 			//    cisManager.createCis(linkedCss.getIdentifier(), cissToCreate.get(i).getCisId());
@@ -211,12 +228,12 @@ public class CommunityRecommender //implements ICommCallback
 	 *              a domain, the check is done on all CISs in that domain.
 	 */
 	
-	public void identifyCissToDelete(ArrayList<ICisRecord> cisPossibilities) {	
+	public ArrayList<String> identifyCissToDelete(ArrayList<ICisRecord> cisPossibilities, ArrayList<String> cissToCreateMetadata) {	
 		//Can't use GUI in tests
         //cissToDelete = getUserFeedbackOnDeletion(cissToDelete);
 		
 		cissToDelete = cisPossibilities;
-		
+		return new ArrayList<String>();
 		//for (int i = 0; i < cissToDelete.size(); i++)
 			//cisManager.deleteCis(linkedCss.getIdentifier(), cissToDelete.get(i).getCisId());
 	}
@@ -263,7 +280,7 @@ public class CommunityRecommender //implements ICommCallback
 		return realCissToDelete;
 	}
 	
-	public void identifyCissToConfigure(ArrayList<ArrayList<ICisRecord>> cisPossibilities) {
+	public ArrayList<String> identifyCissToConfigure(ArrayList<ArrayList<ICisRecord>> cisPossibilities, ArrayList<String> cissToCreateMetadata) {
 	
 	    ArrayList<ICisRecord> finalConfiguredCiss = new ArrayList<ICisRecord>();
 	
@@ -292,6 +309,7 @@ public class CommunityRecommender //implements ICommCallback
         	//
 	        // cisManager.configureCis(linkedCss, potentiallyConfigurableCis.getCisId());
         }
+	    return new ArrayList<String>();
     }
 
     public ArrayList<ICisRecord> getUserFeedbackOnConfiguration(ArrayList<ICisRecord> cissToConfigure) {

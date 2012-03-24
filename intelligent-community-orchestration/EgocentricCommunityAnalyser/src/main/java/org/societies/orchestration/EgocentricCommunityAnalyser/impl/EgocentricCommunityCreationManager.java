@@ -616,9 +616,53 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				//    if (segmentDay.get(0) > ((segmentDay.get(0) + segmentDay.get(1) + segmentDay.get(2)) * 0.7) {
 				//        ////    if (!joinedCiss.getMemberList().contains(potentialCis))
 				//        cissToCreate.add(new CisRecord(null, linkedCss, "Interactors on Service in the morning" + "serviceName", null, null, null, null, null);
+				//        if (!(segmentDay.get(1) + segmentDay.get(2) >= 3))
+				//            cissToCreate.remove(cissToCreate.size()-2);
 				//}
 				
+				//Last 2 weeks
 				
+				//CssActivityFeed threeAndTwoDaysFeed = splitActivityFeed(3 day ago, 2 days ago);
+				//CssActivityFeed twoAndOneDaysFeed = splitActivityFeed(2 day ago, 1 days ago);
+				//ArrayList<CssActivityFeed> segmentDay = segmentActivityFeed(todayFeed, 3);
+				//if (segmentDay.get(0) > ((segmentDay.get(0) + segmentDay.get(1) + segmentDay.get(2)) * 0.7) {
+				//    ArrayList<CssActivityFeed> segmentThreeDays = segmentActivityFeed(threeDaysFeed, 9);
+				//    if (segmentDay.get(0) > ((segmentDay.get(0) + segmentDay.get(1) + segmentDay.get(2)) * 0.7) {
+				//        ////    if (!joinedCiss.getMemberList().contains(potentialCis))
+				//        cissToCreate.add(new CisRecord(null, linkedCss, "Interactors on Service in the morning" + "serviceName", null, null, null, null, null);
+				//        if (!(segmentDay.get(1) + segmentDay.get(2) >= 3))
+				//            cissToCreate.remove(cissToCreate.size()-2);
+				//}
+				
+				//Last 4 months
+				
+				//CssActivityFeed threeAndTwoDaysFeed = splitActivityFeed(3 day ago, 2 days ago);
+				//CssActivityFeed twoAndOneDaysFeed = splitActivityFeed(2 day ago, 1 days ago);
+				//ArrayList<CssActivityFeed> segmentDay = segmentActivityFeed(todayFeed, 3);
+				//if (segmentDay.get(0) > ((segmentDay.get(0) + segmentDay.get(1) + segmentDay.get(2)) * 0.7) {
+				//    ArrayList<CssActivityFeed> segmentThreeDays = segmentActivityFeed(threeDaysFeed, 9);
+				//    if (segmentDay.get(0) > ((segmentDay.get(0) + segmentDay.get(1) + segmentDay.get(2)) * 0.7) {
+				//        ////    if (!joinedCiss.getMemberList().contains(potentialCis))
+				//        cissToCreate.add(new CisRecord(null, linkedCss, "Interactors on Service in the morning" + "serviceName", null, null, null, null, null);
+				//        if (!(segmentDay.get(1) + segmentDay.get(2) >= 3))
+				//            cissToCreate.remove(cissToCreate.size()-2);
+				//}
+				
+				//All time
+				//ArrayList<CssActivityFeed> segmentAll = segmentActivityFeed(theFeed, 15);
+				//if (segmentAll.get(0) > 0)
+				//    add interactor as potential CIS member
+				//if (total members >= 2) {
+				//    cissToCreate.add(new CisRecord());
+				//    cisMetadata.add("Ongoing");
+				//if (segmentAll.get(0) > ((segmentDay.get(0) + segmentDay.get(1) + segmentDay.get(2)) * 0.7) {
+				//    ArrayList<CssActivityFeed> segmentThreeDays = segmentActivityFeed(threeDaysFeed, 9);
+				//    if (segmentDay.get(0) > ((segmentDay.get(0) + segmentDay.get(1) + segmentDay.get(2)) * 0.7) {
+				//        ////    if (!joinedCiss.getMemberList().contains(potentialCis))
+				//        cissToCreate.add(new CisRecord(null, linkedCss, "Interactors on Service in the morning" + "serviceName", null, null, null, null, null);
+				//        if (!(segmentDay.get(1) + segmentDay.get(2) >= 3))
+				//            cissToCreate.remove(cissToCreate.size()-2);
+				//}
 				
 				//for (int i = 0; i < theIDs.size(); i++) {
 				//    if (timesInteracted.get(theIDs.get(i)) == 0)

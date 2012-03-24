@@ -111,6 +111,8 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
 	private ArrayList<CtxEntity> availableContextData;
 	
 	private ICssDirectory userCssDirectory;
+	
+	private CommunityRecommender communityRecommender;
     
 	/*
      * Constructor for SuggestedCommunityAnalyser
@@ -127,6 +129,7 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
 			this.linkedCss = linkedEntity;
 		//else
 		//	this.linkedDomain = linkedEntity;
+		
 	}
 	
     public void initialiseSuggestedCommunityAnalyser() {
@@ -135,16 +138,31 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
     	new SuggestedCommunityAnalyser(linkedCss, "CSS");
     }
     
-    public void analyseEgocentricRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
+    public ArrayList<String> analyseEgocentricRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations, ArrayList<String> cissToCreateMetadata) {
     	//go straight to Community Recommender
+    	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
+    	ArrayList<ICisRecord> creations = cisRecommendations.get("Create CISs");
+    	if (creations != null) {
+    	    ArrayList<ArrayList<ICisRecord>> abstractCreations = new ArrayList<ArrayList<ICisRecord>>();
+    	    abstractCreations.add(creations);
+    	    convertedRecommendations.put("Create CISs", abstractCreations);
+    	}
     	
+    	ArrayList<ICisRecord> deletions = cisRecommendations.get("Delete CISs");
+    	if (deletions != null) {
+    	    ArrayList<ArrayList<ICisRecord>> abstractDeletions = new ArrayList<ArrayList<ICisRecord>>();
+    	    abstractDeletions.add(deletions);
+    	    convertedRecommendations.put("Delete CISs", abstractDeletions);
+    	}
+    	
+    	return communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(convertedRecommendations, cissToCreateMetadata);
     	
     }
     
-    public void analyseEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
+    public ArrayList<String> analyseEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations, ArrayList<String> cissToCreateMetadata) {
     	//go straight to Community Recommender
     	
-    	
+    	return communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(cisRecommendations, cissToCreateMetadata);
     }
     
     public void analyseCSCWRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
@@ -224,6 +242,14 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
     
     public void setUserFeedbackCallback(IUserFeedbackCallback userFeedbackCallback) {
     	this.userFeedbackCallback = userFeedbackCallback;
+    }
+    
+    public CommunityRecommender getCommunityRecommender() {
+    	return communityRecommender;
+    }
+    
+    public void setCommunityRecommender(CommunityRecommender communityRecommender) {
+    	this.communityRecommender = communityRecommender;
     }
     
   //public CommManagerBundle getCommManager() {
