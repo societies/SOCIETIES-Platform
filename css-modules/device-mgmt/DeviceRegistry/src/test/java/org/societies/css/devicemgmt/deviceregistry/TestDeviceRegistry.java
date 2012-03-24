@@ -167,7 +167,7 @@ public class TestDeviceRegistry {
 		System.out.println("Device Name is  = " + device_1.getDeviceName());
 		System.out.println("Device Type is  = " + device_1.getDeviceType());
 		System.out.println("Device Description is  = " + device_1.getDeviceDescription());
-		System.out.println("CSSID is  = " + CSSNodeID);
+		System.out.println("CSSNodeID is  = " + CSSNodeID);
         Collection<DeviceCommonInfo> alldevices =  registry.findAllDevices();
         assertTrue(null != alldevices);
         assertEquals(3, alldevices.size());

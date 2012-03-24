@@ -32,11 +32,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.societies.css.devicemgmt.deviceregistry.*;
 import org.societies.api.internal.css.devicemgmt.IDeviceRegistry;
 import org.societies.api.internal.css.devicemgmt.comm.DmCommManager;
-import org.societies.css.devicemgmt.DeviceCommsMgr.impl.CommAdapterImpl;
+//import org.societies.css.devicemgmt.DeviceCommsMgr.impl.CommAdapterImpl;
 //import org.societies.css.devicemgmt.DeviceCommsMgr.impl.CommAdapterImpl;
 //import org.societies.css.devicemgmt.devicemgmtold.deviceregistry.api.IDeviceRegistry;
 
@@ -51,6 +55,7 @@ public class DeviceRegistry implements IDeviceRegistry {
     
     private DmCommManager dmCommManager;
     
+    private static Logger LOG = LoggerFactory.getLogger(DeviceRegistry.class);
 
     //private static DmCommManager instance = new dmCommManager();
 
@@ -94,7 +99,7 @@ public class DeviceRegistry implements IDeviceRegistry {
      */
     public Collection<DeviceCommonInfo> findByDeviceType(String deviceType) {
         
-       
+    	LOG.info("+++ The findByDeviceType method has been called for: " +deviceType);
         Collection<DeviceCommonInfo> typedDevices = new ArrayList<DeviceCommonInfo>();
 
         for (DeviceCommonInfo device : registry.values()) {
@@ -114,7 +119,7 @@ public class DeviceRegistry implements IDeviceRegistry {
     public DeviceCommonInfo findDevice(String deviceID) {
         
     	DeviceCommonInfo device = null;
-
+    	LOG.info("+++ The findDevice method has been called looking for: " +deviceID);
         //String key = RegistryUtility.createKeyString(deviceID);
         String key = deviceID;
 
@@ -132,6 +137,7 @@ public class DeviceRegistry implements IDeviceRegistry {
     public boolean unregisterDevice(String deviceID) {
 
         boolean retValue = false;
+        LOG.info("+++ The unregisterDevice method has been called removing: " +deviceID);
         String key = RegistryUtility.createKeyString(deviceID);
 
         if (registry.containsKey(key)) {
@@ -172,6 +178,7 @@ public class DeviceRegistry implements IDeviceRegistry {
      */
 	public String addDevice(DeviceCommonInfo device, String CSSNodeID) {
     	//registry.put(RegistryUtility.createKeyString(device.getdeviceId()), device);
+		LOG.info("+++ The addDevice method has been called adding: " +device.getDeviceID() +" CSSNodeID = " +CSSNodeID);
 		registry.put(device.getDeviceID(), device);
 		//fireNewDeviceConnected(device.getDeviceID(),device);
 		fireNewDeviceConnected(device.getDeviceID(), device);
@@ -191,6 +198,7 @@ public class DeviceRegistry implements IDeviceRegistry {
      */
 	public boolean deleteDevice(DeviceCommonInfo device, String CSSNodeID) {
 		boolean retValue = false;
+		LOG.info("+++ The deleteDevice method has been called removing: " +device.getDeviceID() +"CSSNodeID" +CSSNodeID);
         String key = RegistryUtility.createKeyString(device.getDeviceID());
 
         if (registry.containsKey(key)) {
@@ -217,15 +225,29 @@ public class DeviceRegistry implements IDeviceRegistry {
 
 	public void fireNewDeviceConnected(String deviceID,
 			DeviceCommonInfo deviceCommonInfo) {
-		System.out.println("fireNewDeviceConnected " + deviceCommonInfo.getDeviceID());
-		//dmCommManager.fireNewDeviceConnected(deviceCommonInfo.getDeviceID(), deviceCommonInfo);
+		System.out.println("XXXXXX entering fireNewDeviceConnected method " );
+		
+		if(dmCommManager != null){
+			System.out.println("fireNewDeviceConnected " + deviceCommonInfo.getDeviceID());
+			dmCommManager.fireNewDeviceConnected(deviceCommonInfo.getDeviceID(), deviceCommonInfo);
+		}else{
+			System.out.println("+++ dmCommManager not available ");
+		}
+		
 	}
 
 	
 	public void fireDeviceDisconnected(String deviceID,
 			DeviceCommonInfo deviceCommonInfo) {
-		System.out.println("fireDeviceDisconnected " + deviceCommonInfo.getDeviceID());
-		//dmCommManager.fireDeviceDisconnected(deviceCommonInfo.getDeviceID(), deviceCommonInfo);
+		System.out.println("XXXXXX entering fireDeviceDisconnected ");
+		
+		if(dmCommManager != null){
+			System.out.println("fireDeviceDisconnected " + deviceCommonInfo.getDeviceID());
+			dmCommManager.fireDeviceDisconnected(deviceCommonInfo.getDeviceID(), deviceCommonInfo);
+		}else{
+			System.out.println("+++ dmCommManager not available ");
+		}
+		
 	}
 
 	

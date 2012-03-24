@@ -93,6 +93,7 @@
  						<Embed-Transitive>false</Embed-Transitive>
               			<Import-Package>
               				org.springframework.osgi.context,
+              				org.slf4j.*,
               				org.societies.api.internal.css.devicemgmt,
               				org.societies.api.internal.css.devicemgmt.model,
               				org.societies.api.internal.css.devicemgmt.comm,
