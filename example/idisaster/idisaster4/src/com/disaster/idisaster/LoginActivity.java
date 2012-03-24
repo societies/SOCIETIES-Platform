@@ -24,15 +24,130 @@
  */
 package com.disaster.idisaster;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
+import android.os.Bundle;
+
+import android.view.View;
+import android.widget.EditText;
+import android.text.InputType;
+
+import android.widget.Toast;
+
+import android.widget.Button;
+import android.view.View.OnClickListener;
+
+import android.content.DialogInterface;
+import android.content.SharedPreferences.Editor;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+
 
 /**
- * This activity is responsible for loging in the user,
+ * This activity is responsible for user login,
  * including handling wrong user name and password.
  * 
- * @author Babak.Farshchian@sintef.no
+ * @author Jacqueline.Floch@sintef.no
  *
  */
-public class LoginActivity extends Activity {
+public class LoginActivity extends Activity implements OnClickListener {
 
+	private EditText userNameView;
+	private EditText userPasswordView;
+	private String userName;
+	private String userPassword;
+
+	
+	@Override
+	    protected void onCreate(Bundle savedInstanceState) {
+		
+	    	super.onCreate(savedInstanceState);
+	    	setContentView (R.layout.login_layout);
+
+	    	// Get editable fields
+	    	userNameView = (EditText) findViewById(R.id.editUserName);
+	    	userPasswordView = (EditText) findViewById(R.id.editPassword);
+	    	userPasswordView.setInputType (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+	    	// Add click listener to button
+	    	final Button button = (Button) findViewById(R.id.LoginButton);
+	    	button.setOnClickListener(this);
+	    }
+
+ 		// This method is called at button click because we assigned the name to the
+ 		// "On Click property" of the button
+
+		public void onClick (View view) {
+			
+	    	if (userNameView.getText().length() == 0) {					// check input for user name
+	    		Toast.makeText(this, "Please enter a user name", 
+	    				Toast.LENGTH_LONG).show();
+	    		return;
+
+	    	} else if (userPasswordView.getText().length() == 0) {		// check input for password
+	    		Toast.makeText(this, "Please enter a password", 
+	    				Toast.LENGTH_LONG).show();
+	    		return;
+
+	    	} else {													// verify the password and store in preferences file
+
+	    		userName = userNameView.getText().toString();
+	    		userPassword = userPasswordView.getText().toString();
+
+	    		//TODO: Add call to the Societes API plaftorm
+	    		// If not correct add a dialog box
+
+	    		//TODO: Add dialog for wrong password
+	    		
+/**				AlertDialog.Builder alert = new AlertDialog.Builder(this);
+				alert.setTitle("Filter");
+				ArrayList<String> cat = (ArrayList<String>) categories.clone();
+				cat.add(0, "Favourites");
+
+*/
+	    		AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+	    		alertBuilder.setMessage("Please re-enter your user name and password.")
+	    		       .setCancelable(false)
+	    		       .setPositiveButton ("OK", new DialogInterface.OnClickListener() {
+	    		           public void onClick(DialogInterface dialog, int id) {
+//	    		        	   LoginActivity.this.finish();
+	    		        	   return;
+	    		           }
+	    		       });
+
+	    		AlertDialog alert = alertBuilder.create();
+	    		alert.show();
+	    		
+	    		
+
+	    		//TODO: store user name and password in preferences
+	    		Editor editor = iDisasterApplication.getinstance().editor;
+	    		editor.putString ("pref.username", userName);
+	    		editor.putString ("pref.password", userPassword);
+	    	    editor.commit ();
+
+	    	    
+// TODO: Remove code for testing the correct setting of preferences 
+	    	    String testName = iDisasterApplication.getinstance().preferences.
+	    	    		getString ("pref.username","");
+	    	    String testPassword = iDisasterApplication.getinstance().preferences.
+	    	    		getString ("pref.password","");
+	    	    Toast.makeText(this, "Debug: "  + testName + " " + testPassword, 
+	    				Toast.LENGTH_LONG).show();
+	    	    
+	    		// TODO: Send intent to next activity
+
+	    		return;
+	    	}	
+	    		
+	    }
+
+
+	 	// TODO: remove if not needed
+/**  		private boolean checkPassword () {
+   			return true;
+   		}
+*/
 }

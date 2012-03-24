@@ -45,7 +45,7 @@ public class StartActivity extends Activity {
      * @see android.app.Activity#onCreate(android.os.Bundle)
      */
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
 
     	super.onCreate(savedInstanceState);
 	/*
@@ -60,8 +60,11 @@ public class StartActivity extends Activity {
 	 */
 // test: start another Activity   	
     	if (iDisasterApplication.getinstance().username == "Babak") {
-    			
-    	startActivity(new Intent(StartActivity.this, HomeActivity.class));
+    		
+    	startActivity(new Intent(StartActivity.this, DisasterActivity.class));
+    		
+//    	startActivity(new Intent(StartActivity.this, HomeActivity.class));
+    	
     	}
     }
 }

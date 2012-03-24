@@ -42,14 +42,14 @@ import android.widget.Toast;
  *
  */
 public class FeedActivity extends ListActivity {
-    static final String[] FEEDLIST = new String[] { "Feed 1", "Feed 2", "FEed 3", "Feed 4",
+    static final String[] FEEDLIST = new String[] { "Feed 1", "Feed 2", "Feed 3", "Feed 4",
 	"Feed 5", "Feed 6", "Feed 7", "Feed 8"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 	// TODO Auto-generated method stub
 	super.onCreate(savedInstanceState);
-	setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, FEEDLIST));
+	setListAdapter(new ArrayAdapter<String>(this, R.layout.tab_list_item, FEEDLIST));
 
 	  ListView lv = getListView();
 	  lv.setTextFilterEnabled(true);

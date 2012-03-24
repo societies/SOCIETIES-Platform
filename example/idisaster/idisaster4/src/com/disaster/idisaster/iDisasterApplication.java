@@ -30,28 +30,34 @@ import org.societies.api.css.management.ISocietiesApp;
 
 import android.app.Application;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import android.content.SharedPreferences.Editor;
 
 /**
  * The application for managing common resources used by 
  * iDisaster application components.
  * 
- * @author 	Babak.Farshchian@sintef.no
- *			Jacqueline.Floch@sintef.no
+ * @author 	Jacqueline.Floch@sintef.no
  *
  */
 public class iDisasterApplication extends Application {
 
 	private static iDisasterApplication singleton; // Reference to the single instance of the Application
 	
-	public static final String PREFS_NAME = "DisasterPrefsFile"; // Preferences file
-	
+	static final String PREFS_NAME = "DisasterPrefsFile"; 	// File for storing preferences
+	SharedPreferences preferences;								// Preferences shared with all activities
+	Editor editor;											// Editor for changing preferences
+
+
+	// TODO: Remove unnecessary attributes 
     String societiesServer = "server.societies.eu"; // The name of the server where cloud node is hosted
     String username = "Babak"; // username to log into societiesServer
     String password = "SocietieS"; // password for username.
     ISocietiesApp iDisasterSoc; // represents access to the SOCIETIES platform.
     ICssRecord cssRecord; // Represents information about the user of the application. to be populated.
     String cssId;  //TODO: Find out which class CssId is.
+
+    
+
 
 
 	// returns application instance
@@ -68,14 +74,20 @@ public class iDisasterApplication extends Application {
 	    // Restore preferences from preferences file
 		// If the preferences file by this name does not exist, it is be created
 		// when an editor is retrieved and changes are committed.
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-	    SharedPreferences.Editor editor = settings.edit();
-//	    editor.commit ();
+		preferences = getSharedPreferences(PREFS_NAME, 0);
+	    editor = preferences.edit();
+	    editor.putString ("pref.dummy", "");
+	    editor.commit ();
 	    
-	    // Test setting preferences 
-	    String testname = settings.getString ("username","");
-	    testname = "Babak";
-	    editor.putString ("username", testname);	    
+        //Instantiate iDisasterSoc which will give a handle to the platform
+        // components:
+        //TODO: Later on we need to throw an exception if SOCIETIES platform is not
+        // installed on this node.
+        // Comment added to avoid Bug!
+        // iDisasterSoc = new SocietiesApp (username, password);
+	    /// ???? Is password needed to instantiate the platform - If so this code should be move to Start activity 
+
+	    
 	    
 	}//onCreate
 	

@@ -24,66 +24,82 @@
  */
 package com.disaster.idisaster;
 
-
 import android.app.Activity;
 import android.os.Bundle;
+
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
+import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
-import android.content.Intent;
-
-import android.widget.ListView;
-/**
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-
-import android.widget.TextView;
-import android.widget.Toast;
- * 
- */
-import android.widget.AdapterView.OnItemClickListener;
-
+// added
+import android.widget.Button;
+import android.view.View.OnClickListener;
 
 /**
- * This activity allows the users to manage their 
- * disasters or the disasters they subscribe to.
+ * This activity is responsible for loging in the user,
+ * including handling wrong user name and password.
  * 
  * @author Jacqueline.Floch@sintef.no
  *
  */
-public class DisasterActivity extends Activity {
-    static final String[] CISLIST = new String[] { "Disaster 1", "Disaster 2", "Disaster 3", "Disaster 4",
-	"Disaster 5", "Disaster 6", "Disaster 7", "Disaster 8"};
+public class LoginActivityCopy extends Activity { //implements OnClickListener {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-    	// TODO Auto-generated method stub
-    	super.onCreate(savedInstanceState);
-//    	setContentView (R.layout.???);
-/**    	
+	private EditText userName;
+	private EditText userPassword;
 
-    	ListView listView = getListView();
-    	listView.setTextFilterEnabled(true);
- 
-    	
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.tab_list_item, CISLIST);
-		listView.setAdapter(adapter);
-		
-		 
-		listView.setOnItemClickListener(new OnItemClickListener() {
-		    public void onItemClick(AdapterView<?> parent, View view,
-		        int position, long id) {
-		      // When clicked, show a toast with the TextView text
-		      Toast.makeText(getApplicationContext(), ((TextView) view).getText(),
-		          Toast.LENGTH_SHORT).show();
-		    }
-        });
- */       
-//    	startActivity(new Intent(DisasterActivity.this, HomeActivity.class));
+	@Override
+	    protected void onCreate(Bundle savedInstanceState) {
+	    	// TODO Auto-generated method stub
+	    	super.onCreate(savedInstanceState);
+	    	setContentView (R.layout.login_layout);
+	    	
+/**	    	userName = (EditText) findViewById(R.id.editText1);
+	    
+         final Button button = (Button) findViewById(R.id.button1);
+         button.setOnClickListener(this);
 
-}
+*/
+	    }
+
+ 		// This method is called at button click because we assigned the name to the
+ 		// "On Click property" of the button
+
+/**		public void onClick (View view) {
+			switch (view.getId()) {
+				case R.id.button1:
+	    			RadioButton celsiusButton = (RadioButton) findViewById(R.id.radio0);
+	    			RadioButton fahrenheitButton = (RadioButton) findViewById(R.id.radio1);
+	    			if (userName.getText().length() == 0) {
+	    				Toast.makeText(this, "Please enter a valid number",
+	    						Toast.LENGTH_LONG).show();
+	    				return;
+	    			}
+
+ 				float inputValue = Float.parseFloat(userName.getText().toString());
+				if (celsiusButton.isChecked()) {
+   					userName.setText(String
+   						.valueOf(convertFahrenheitToCelsius(inputValue)));
+	    			celsiusButton.setChecked(false);
+	    			fahrenheitButton.setChecked(true);
+	    		} else {
+	    			userName.setText(String
+	    					.valueOf(convertCelsiusToFahrenheit(inputValue)));
+	    			fahrenheitButton.setChecked(false);
+	    			celsiusButton.setChecked(true);
+	    		}
+	    		break;
+	    	}
+	    }
+
+	 	// Converts to celsius
+  		private float convertFahrenheitToCelsius(float fahrenheit) {
+   			return ((fahrenheit - 32) * 5 / 9);
+   		}
+
+  		// Converts to fahrenheit
+	   	private float convertCelsiusToFahrenheit(float celsius) {
+			return ((celsius * 9) / 5) + 32;
+		}
+*/
 }

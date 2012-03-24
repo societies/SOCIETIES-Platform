@@ -1,8 +1,8 @@
 package com.disaster.idisaster;
 
-import org.societies.api.css.management.ICssRecord;
-import org.societies.api.css.management.ISocietiesApp;
-import org.societies.cis.android.client.SocietiesApp;
+//import org.societies.api.css.management.ICssRecord;
+//import org.societies.api.css.management.ISocietiesApp;
+// import org.societies.cis.android.client.SocietiesApp;
 
 import android.app.TabActivity;
 import android.content.Intent;
@@ -26,9 +26,9 @@ public class HomeActivity extends TabActivity {
 	String societiesServer = "server.societies.eu"; // The name of the server where cloud node is hosted
     String username = "Babak"; // username to log into societiesServer
     String password = "SocietieS"; // password for username.
-    ISocietiesApp iDisasterSoc; // represents access to the SOCIETIES platform.
-    ICssRecord cssRecord; // Represents information about the user of the application. to be populated.
-    String cssId;  //TODO: Find out which class CssId is.
+//    ISocietiesApp iDisasterSoc; // represents access to the SOCIETIES platform.
+//    ICssRecord cssRecord; // Represents information about the user of the application. to be populated.
+//    String cssId;  //TODO: Find out which class CssId is.
 
     /** Called when the activity is first created. */
     @Override
@@ -65,12 +65,6 @@ public class HomeActivity extends TabActivity {
         // Start with disasters tab visible:
         tabHost.setCurrentTab(0);
 
-        //Instantiate iDisasterSoc which will give us handles to platform
-        // components:
-        //TODO: Later on we need to throw an exception if SOCIETIES platform is not
-        // installed on this node.
-        // Comment added to avoid Bug!
-        // iDisasterSoc = new SocietiesApp(username, password);
     }
 
     /** Called at start of the active lifetime. */
