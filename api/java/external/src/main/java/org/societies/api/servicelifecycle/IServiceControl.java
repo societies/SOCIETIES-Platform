@@ -76,6 +76,15 @@ public interface IServiceControl {
 	public Future<ServiceControlResult> installService(URL bundleLocation, IIdentity node) throws ServiceControlException;
 
 	/**
+	 * This method install a new service into the container present on a given node, given by the jid
+	 * 
+	 * @param serviceLocation the URL of the bundle to install
+	 * @param jid The node where we wish to install the service
+	 * @return the result of the operation
+	 */
+	public Future<ServiceControlResult> installService(URL bundleLocation, String jid) throws ServiceControlException;
+
+	/**
 	 * This method removes a service from the container.
 	 * 
 	 * @param serviceId unique service identifier
