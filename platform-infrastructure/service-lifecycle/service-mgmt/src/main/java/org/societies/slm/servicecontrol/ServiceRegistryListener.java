@@ -88,8 +88,10 @@ public class ServiceRegistryListener implements BundleContextAware,
 
 	public void registerListener() {
 		Filter fltr = null;
+		
 		try {
 			fltr = this.bctx.createFilter("(TargetPlatform=SOCIETIES)");
+			log.info("Filter Registered");
 		} catch (InvalidSyntaxException e) {
 			log.error("Error creating Service Listener Filter");
 			e.printStackTrace();
@@ -112,35 +114,41 @@ public class ServiceRegistryListener implements BundleContextAware,
 
 		// Map<String, Object> serviceMeteData = new HashMap<String, Object>();
 
-		log.info("Service Listener event received");
+		if(log.isDebugEnabled())
+			log.debug("Service Listener event received");
+		
 		Bundle serBndl = event.getServiceReference().getBundle();
 		String propKeys[] = event.getServiceReference().getPropertyKeys();
 
-		for (String key : propKeys) {
-			log.info("Property Key" + key);
-			Object value = event.getServiceReference().getProperty(key);
-			log.info("Property value" + value);
-			// serviceMeteData.put(key, value);
-		}
-		log.info("Bundle Id: " + serBndl.getBundleId() + "Bundle State: "
-				+ serBndl.getState() + "Bundle Symbolic Name: "
+		if(log.isDebugEnabled()){
+			for (String key : propKeys) {
+				log.debug("Property Key: " + key);
+				Object value = event.getServiceReference().getProperty(key);
+				log.debug("Property value: " + value);
+				// serviceMeteData.put(key, value);
+			}
+		
+		log.debug("Bundle Id: " + serBndl.getBundleId() + " Bundle State: "
+				+ serBndl.getState() + "  Bundle Symbolic Name: "
 				+ serBndl.getSymbolicName());
-
+		}
+		
 		Service service = (Service) event.getServiceReference().getProperty(
 				"ServiceMetaModel");
 		
 		if(service==null || (!(service instanceof Service) )){
-			log.info("**Service MetadataModel object is null**");
+			if(log.isDebugEnabled()) log.debug("**Service MetadataModel object is null**");
 			return;
 		}
 		
-		log.info("**Service MetadataModel Data Read**");
-		log.info("**Service Name** : "+service.getServiceName());
-		log.info("**Service Desc** : "+service.getServiceDescription());
-		log.info("**Service type** : "+service.getServiceType().toString());
+		if(log.isDebugEnabled()){
+			log.debug("**Service MetadataModel Data Read**");
+			log.debug("**Service Name** : "+service.getServiceName());
+			log.debug("**Service Desc** : "+service.getServiceDescription());
+			log.debug("**Service type** : "+service.getServiceType().toString());
+		}
 		
-		
-		service.setServiceEndpoint(service.getServiceName().replaceAll(" ", "") + "/" + commMngr.getIdManager().getThisNetworkNode().getJid());
+		service.setServiceEndpoint(commMngr.getIdManager().getThisNetworkNode().getJid()  + "/" +  service.getServiceName().replaceAll(" ", ""));
 
 		//TODO: Do this properly!
 		ServiceInstance si = new ServiceInstance();
@@ -159,30 +167,46 @@ public class ServiceRegistryListener implements BundleContextAware,
 		switch (event.getType()) {
 
 		case ServiceEvent.MODIFIED:
-			log.info("Service Modification");
+			if(log.isDebugEnabled()) log.debug("Service Modification");
 			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service, serBndl));
-			serviceList.add(service);
+			
 			try {
 				serviceList.add(service);
+				this.getServiceReg().unregisterServiceList(serviceList);
 				this.getServiceReg().registerServiceList(serviceList);
+				
 			} catch (ServiceRegistrationException e) {
 				log.debug("Error while modifying service meta data");
 				e.printStackTrace();
 			}
 			break;
 		case ServiceEvent.REGISTERED:
-			log.info("Service Registered");			
+			
+			if(log.isDebugEnabled()) log.debug("Service Registered");			
 			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service, serBndl));
-			serviceList.add(service);			
+			serviceList.add(service);
+			
 			try {
-				this.getServiceReg().registerServiceList(serviceList);
-			} catch (ServiceRegistrationException e) {
-				log.debug("Error while persisting service meta data");
+				if(log.isDebugEnabled()) log.debug("First, checking if the service already exists...");
+			
+				Service existService = this.getServiceReg().retrieveService(service.getServiceIdentifier());
+				
+				if(existService == null){
+					if(log.isDebugEnabled()) log.debug("Registering Service: " + service.getServiceName());
+					this.getServiceReg().registerServiceList(serviceList);
+				} else{
+					if(log.isDebugEnabled()) log.debug(service.getServiceName() + " already exists, setting status to STARTED");
+					this.getServiceReg().changeStatusOfService(service.getServiceIdentifier(), ServiceStatus.STARTED);
+
+				}
+			} catch (Exception e) {
+				log.error("Error while persisting service meta data");
 				e.printStackTrace();
 			}
 			break;
+			
 		case ServiceEvent.UNREGISTERING:
-			log.info("Service Unregistered, so we set it to stopped but do not remove from registry");			
+			if(log.isDebugEnabled()) log.debug("Service Unregistered, so we set it to stopped but do not remove from registry");			
 			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service, serBndl));
 			//serviceList.add(service);
 			
