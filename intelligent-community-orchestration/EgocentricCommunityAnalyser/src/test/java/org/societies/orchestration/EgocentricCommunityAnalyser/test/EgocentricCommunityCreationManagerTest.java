@@ -49,6 +49,11 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.internal.cis.management.ICisManager;
 import org.societies.api.internal.cis.management.ICisRecord;
 
+import org.societies.api.css.directory.ICssDirectory;
+import org.societies.api.css.directory.ICssAdvertisementRecord;
+
+import org.societies.api.css.management.ICssRecord;
+
 /**
  * This is the test class for the Egocentric Community Creation Manager component
  * 
@@ -65,6 +70,8 @@ public class EgocentricCommunityCreationManagerTest {
 	private CtxEntityIdentifier entityId;
 	//private IUserCtxBrokerCallback userCtxBrokerCallback;
 	private ICisManager cisManager;
+	
+	private ICssDirectory cssDirectory;
 	
 	//@Test
 	public void testNonExtensiveCreationCheck() {
@@ -87,7 +94,7 @@ public class EgocentricCommunityCreationManagerTest {
     	Future <CtxEntity> theEntity = null;
     	try {
 			if (userCtxBroker != null)
-    		    theEntity = userCtxBroker.createEntity("CSS User");
+    		    theEntity = userCtxBroker.createEntity(ownerId.toString());
 		} catch (CtxException e) {
 			e.printStackTrace();
 		}
@@ -116,11 +123,25 @@ public class EgocentricCommunityCreationManagerTest {
     public void testExtensiveCreationCheck() {
     	
     	IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
-		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
+    	IIdentity friend1Id = mock(IIdentity.class); //Friend 1 CSS
+    	IIdentity friend2Id = mock(IIdentity.class); //Friend 2 CSS
+    	
+    	ICssAdvertisementRecord friend1Ad = mock(ICssAdvertisementRecord.class);
+    	ICssAdvertisementRecord friend2Ad = mock(ICssAdvertisementRecord.class);
+    	
+    	cssDirectory.addCssAdvertisementRecord(friend1Ad);
+    	cssDirectory.addCssAdvertisementRecord(friend2Ad);
+    
+        ICssRecord thisCss = mock(ICssRecord.class);
+        //thisCss.addCssDirectory(cssDirectory);
+    	
+    	CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
     	
     	
 		cisManager = mock(ICisManager.class);
 		userCtxBroker = mock(ICtxBroker.class);
+		
+		//when(cisManager.getCiss()).thenReturn(cisRecord);
 		
     	egocentricCommunityCreationManager = new EgocentricCommunityCreationManager(ownerId, "CSS");
 		
@@ -131,7 +152,7 @@ public class EgocentricCommunityCreationManagerTest {
     
     	Future <CtxEntity> theEntity = null;
     	try {
-			theEntity = userCtxBroker.createEntity("CSS User");
+			theEntity = userCtxBroker.createEntity(ownerId.toString());
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

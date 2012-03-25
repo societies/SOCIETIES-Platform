@@ -42,6 +42,11 @@ import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.internal.cis.management.ICisManager;
 import org.societies.api.internal.cis.management.ICisRecord;
 
+import org.societies.api.css.directory.ICssDirectory;
+import org.societies.api.css.directory.ICssAdvertisementRecord;
+
+import org.societies.api.css.management.ICssRecord;
+
 /**
  * This is the test class for the Egocentric Community Deletion Manager component
  * 
