@@ -2,7 +2,21 @@
 <resources>
 
     <string name="app_name">iDisaster</string>
-    <string name="hello">Hello World, IDisaster4Activity!</string>
+    <string name="dialogOK">OK</string>
+    <string name="disasterListHeading">Disaster communities</string>
+    <string name="emptyText"></string>
+    <string name="loginButton">Log In</string>
+    <string name="loginDialog">Please re-enter your user name and password.</string>
+    <string name="loginHeading">iDisaster</string>
+    <string name="loginInfo">Sign up for Societies</string>
+    <string name="loginPasswordHint">Password</string>
+    <string name="loginPasswordLabel">Password:</string>
+    <string name="loginTestDialog">The application is in LoginActivity.</string>
+    <string name="loginUserNameHint">Name</string>
+    <string name="loginUserNameLabel">Login as:</string>
+    <string name="startButton">Start</string>
+    <string name="startTestDialog">The application is in StartActivity.</string>
+    <string name="toastUserName">Please enter a user name.</string>
+    <string name="toastPassword">Please enter a password.</string>
     
-
 </resources>

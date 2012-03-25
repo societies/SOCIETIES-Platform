@@ -24,8 +24,6 @@
  */
 package com.disaster.idisaster;
 
-import java.util.ArrayList;
-
 import android.app.Activity;
 import android.os.Bundle;
 
@@ -38,11 +36,13 @@ import android.widget.Toast;
 import android.widget.Button;
 import android.view.View.OnClickListener;
 
-import android.content.DialogInterface;
-import android.content.SharedPreferences.Editor;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+
+import android.content.SharedPreferences.Editor;
+
+import android.view.inputmethod.InputMethodManager;
 
 
 /**
@@ -52,6 +52,7 @@ import android.content.DialogInterface;
  * @author Jacqueline.Floch@sintef.no
  *
  */
+
 public class LoginActivity extends Activity implements OnClickListener {
 
 	private EditText userNameView;
@@ -72,22 +73,34 @@ public class LoginActivity extends Activity implements OnClickListener {
 	    	userPasswordView.setInputType (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
 	    	// Add click listener to button
-	    	final Button button = (Button) findViewById(R.id.LoginButton);
+	    	final Button button = (Button) findViewById(R.id.loginButton);
 	    	button.setOnClickListener(this);
 	    }
 
- 		// This method is called at button click because we assigned the name to the
- 		// "On Click property" of the button
-
+ 		
+/**
+ * onClick is called when button is clicked because
+ * the OnClickListener is assigned to the button
+ */
 		public void onClick (View view) {
 			
 	    	if (userNameView.getText().length() == 0) {					// check input for user name
-	    		Toast.makeText(this, "Please enter a user name", 
+
+	    		// Hide the soft keyboard otherwise the toast message does appear more clearly.
+	    	    InputMethodManager mgr = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
+	    	    mgr.hideSoftInputFromWindow(userPasswordView.getWindowToken(), 0);
+	    	    
+	    		Toast.makeText(this, getString(R.string.toastUserName), 
 	    				Toast.LENGTH_LONG).show();
 	    		return;
 
 	    	} else if (userPasswordView.getText().length() == 0) {		// check input for password
-	    		Toast.makeText(this, "Please enter a password", 
+
+	    		// Hide the soft keyboard otherwise the toast message does appear more clearly.
+	    	    InputMethodManager mgr = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
+	    	    mgr.hideSoftInputFromWindow(userPasswordView.getWindowToken(), 0);
+
+	    		Toast.makeText(this, getString(R.string.toastPassword), 
 	    				Toast.LENGTH_LONG).show();
 	    		return;
 
@@ -97,37 +110,32 @@ public class LoginActivity extends Activity implements OnClickListener {
 	    		userPassword = userPasswordView.getText().toString();
 
 	    		//TODO: Add call to the Societes API plaftorm
-	    		// If not correct add a dialog box
 
-	    		//TODO: Add dialog for wrong password
-	    		
-/**				AlertDialog.Builder alert = new AlertDialog.Builder(this);
-				alert.setTitle("Filter");
-				ArrayList<String> cat = (ArrayList<String>) categories.clone();
-				cat.add(0, "Favourites");
-
-*/
-	    		AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
-	    		alertBuilder.setMessage("Please re-enter your user name and password.")
-	    		       .setCancelable(false)
-	    		       .setPositiveButton ("OK", new DialogInterface.OnClickListener() {
+	    		boolean loginCode = false;	// TODO: replace by code returned by Societes API
+	    			    		
+	    		// Create dialog for wrong password
+	    		if (loginCode) { 							
+	    			AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+	    			alertBuilder.setMessage(getString(R.string.loginDialog))
+	    				.setCancelable(false)
+	    				.setPositiveButton (getString(R.string.dialogOK), new DialogInterface.OnClickListener() {
 	    		           public void onClick(DialogInterface dialog, int id) {
-//	    		        	   LoginActivity.this.finish();
+	    		        	   userNameView.setText(getString(R.string.emptyText));
+	    		        	   userNameView.setHint(getString(R.string.loginUserNameHint));
+	    		        	   userPasswordView.setText(getString(R.string.emptyText));
+	    		        	   userPasswordView.setHint(getString(R.string.loginPasswordHint));
 	    		        	   return;
 	    		           }
 	    		       });
-
-	    		AlertDialog alert = alertBuilder.create();
-	    		alert.show();
+	    			AlertDialog alert = alertBuilder.create();
+	    			alert.show();
+	    		}
 	    		
-	    		
-
-	    		//TODO: store user name and password in preferences
+	    		// Store user name and password in preferences
 	    		Editor editor = iDisasterApplication.getinstance().editor;
 	    		editor.putString ("pref.username", userName);
 	    		editor.putString ("pref.password", userPassword);
 	    	    editor.commit ();
-
 	    	    
 // TODO: Remove code for testing the correct setting of preferences 
 	    	    String testName = iDisasterApplication.getinstance().preferences.
@@ -136,18 +144,32 @@ public class LoginActivity extends Activity implements OnClickListener {
 	    	    		getString ("pref.password","");
 	    	    Toast.makeText(this, "Debug: "  + testName + " " + testPassword, 
 	    				Toast.LENGTH_LONG).show();
-	    	    
-	    		// TODO: Send intent to next activity
 
-	    		return;
-	    	}	
-	    		
+	    	    // Hide the soft keyboard:
+				// - the soft keyboard will not appear on next activity window!
+	    	    InputMethodManager mgr = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
+	    	    mgr.hideSoftInputFromWindow(userPasswordView.getWindowToken(), 0);
+
+	    		// Send intent to Disaster activity
+	    		startActivity(new Intent(LoginActivity.this, DisasterActivity.class));
+	    	}
+	    	
 	    }
+		
+/**
+ * showDialog is used under testing
+ */
+	private void showDialog () {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(getString(R.string.startTestDialog))
+			.setCancelable(false)
+			.setPositiveButton (getString(R.string.dialogOK), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					return;
+			    }
+			});
+		AlertDialog dialog = builder.create();
+		dialog.show();
+	}
 
-
-	 	// TODO: remove if not needed
-/**  		private boolean checkPassword () {
-   			return true;
-   		}
-*/
 }

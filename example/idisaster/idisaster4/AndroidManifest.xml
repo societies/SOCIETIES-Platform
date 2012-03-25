@@ -12,21 +12,41 @@
  		android:debuggable="true" android:allowTaskReparenting="false" android:name="iDisasterApplication">
          
         <activity
-            android:name=".LoginActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
-            
-<!--   Remove title with application name in display window 
-		<activity
-            android:name=".LoginActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
- -->
+            android:name=".StartActivity"
+            android:theme="@android:style/Theme.NoTitleBar" >         
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    </application>
-    
+
+<!-- noHistory: the activity will not be shown whne the user pressed on the "back" button -->        
+        <activity
+            android:name=".LoginActivity"
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:noHistory="true" >
+        </activity>
+
+        <activity
+            android:name=".DisasterActivity"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        
+        <activity
+            android:name=".HomeActivity"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        
+        
+<!--   Remove title with application name in display window 
+		<activity
+            android:name=".LoginActivity"
+            android:theme="@android:style/Theme.NoTitleBar" >
+ -->
+        
+	</application>
+
+	
     
 <!--     
     <application
@@ -42,8 +62,6 @@
             </intent-filter>
         </activity>
 		
-		<activity android:name=".DisasterActivity"></activity>
-        <activity android:name=".HomeActivity"></activity>
 		<activity android:name=".FeedActivity"></activity>
         <activity android:name=".ServiceActivity"></activity>
         <activity android:name=".UserActivity"></activity>

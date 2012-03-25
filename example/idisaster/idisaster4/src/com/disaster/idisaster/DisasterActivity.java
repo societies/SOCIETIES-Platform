@@ -26,6 +26,8 @@ package com.disaster.idisaster;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -33,6 +35,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 
 import android.widget.ListView;
@@ -55,25 +58,45 @@ import android.widget.AdapterView.OnItemClickListener;
  * @author Jacqueline.Floch@sintef.no
  *
  */
-public class DisasterActivity extends Activity {
-    static final String[] CISLIST = new String[] { "Disaster 1", "Disaster 2", "Disaster 3", "Disaster 4",
-	"Disaster 5", "Disaster 6", "Disaster 7", "Disaster 8"};
+public class DisasterActivity extends ListActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
     	// TODO Auto-generated method stub
     	super.onCreate(savedInstanceState);
-//    	setContentView (R.layout.???);
-/**    	
-
-    	ListView listView = getListView();
-    	listView.setTextFilterEnabled(true);
- 
+    	setContentView (R.layout.disaster_layout);
     	
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.tab_list_item, CISLIST);
-		listView.setAdapter(adapter);
+//    	ListView listView = (ListView) findViewById(R.id.disasterlist);
+    	ListView listView = getListView();
+    	
+    	// TODO: Get the list from Societies API
+    	String[] CISLIST = new String[] { "Disaster 1", "Disaster 2", "Disaster 3", "Disaster 4",
+    			"Disaster 5", "Disaster 6", "Disaster 7", "Disaster 8", "Disaster 2", "Disaster 3", "Disaster 4",
+    			"Disaster 5", "Disaster 6", "Disaster 7", "Disaster 8", "Disaster 2", "Disaster 3", "Disaster 4",
+    			"Disaster 5", "Disaster 6", "Disaster 7", "Disaster 8", "Disaster 2", "Disaster 3", "Disaster 4",
+    			"Disaster 5", "Disaster 6", "Disaster 7", "Disaster 8"};
+    	
+    	// First paramenter - Context
+    	// Second parameter - Layout for the row
+    	// Third parameter - ID of the View to which the data is written
+    	// Forth - the Array of data
+    	ArrayAdapter<String> adapter = new ArrayAdapter<String> (this,
+    		android.R.layout.simple_list_item_1, android.R.id.text1, CISLIST);
+
+    	// Assign adapter to ListView
+    	listView.setAdapter(adapter);
+    	
+    	listView.setOnItemClickListener(new OnItemClickListener() {
+    		public void onItemClick (AdapterView<?> parent, View view,
+    			int position, long id) {
+    			Toast.makeText(getApplicationContext(),
+    				"Click ListItem Number " + position, Toast.LENGTH_LONG)
+    				.show();
+    		}
+    	});
+    	
 		
-		 
+/**		 
 		listView.setOnItemClickListener(new OnItemClickListener() {
 		    public void onItemClick(AdapterView<?> parent, View view,
 		        int position, long id) {
@@ -82,7 +105,22 @@ public class DisasterActivity extends Activity {
 		          Toast.LENGTH_SHORT).show();
 		    }
         });
- */       
+ */
+    	
+		// TODO: Remove code for termination
+/**		AlertDialog.Builder terminateBuilder = new AlertDialog.Builder(this);
+		terminateBuilder.setMessage(getString(R.string.terminateDialog))
+			.setCancelable(false)
+			.setPositiveButton (getString(R.string.dialogOK), new DialogInterface.OnClickListener() {
+	           public void onClick(DialogInterface dialog, int id) {
+		    	   DisasterActivity.this.finish();
+		           }
+		       });
+			AlertDialog terminate = terminateBuilder.create();
+			terminate.show();
+ */   	
+    	
+    	
 //    	startActivity(new Intent(DisasterActivity.this, HomeActivity.class));
 
 }

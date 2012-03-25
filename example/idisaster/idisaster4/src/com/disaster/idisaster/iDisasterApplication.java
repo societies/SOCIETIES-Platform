@@ -43,9 +43,9 @@ public class iDisasterApplication extends Application {
 
 	private static iDisasterApplication singleton; // Reference to the single instance of the Application
 	
-	static final String PREFS_NAME = "DisasterPrefsFile"; 	// File for storing preferences
+	static final String PREFS_NAME = "iDisasterPreferences"; 	// File for storing preferences
 	SharedPreferences preferences;								// Preferences shared with all activities
-	Editor editor;											// Editor for changing preferences
+	Editor editor;												// Editor for changing preferences
 
 
 	// TODO: Remove unnecessary attributes 
