@@ -25,6 +25,8 @@
 
 package org.societies.orchestration.EgocentricCommunityAnalyser.test;
 
+import java.util.HashMap;
+
 import junit.framework.Assert;
 
 import org.junit.After;
@@ -65,7 +67,7 @@ public class EgocentricCommunityConfigurationManagerTest {
 		
     	egocentricCommunityConfigurationManager = new EgocentricCommunityConfigurationManager(ownerId, "CSS");
 		
-		egocentricCommunityConfigurationManager.identifyCissToConfigure();
+		egocentricCommunityConfigurationManager.identifyCissToConfigure(new HashMap<IIdentity, String>());
 		
 		//James should have been suggested to leave the CIS.
 		// (No members list function in CisRecord API yet)

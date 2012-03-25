@@ -37,7 +37,7 @@ import org.junit.Test;
 import static org.mockito.Mockito.*;
 
 import org.societies.orchestration.CommunityLifecycleManagement.impl.SuggestedCommunityAnalyser;
-import org.societies.orchestration.EgocentricCommunityAnalyser.test.ownerId;
+
 import org.societies.api.identity.IIdentity;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -81,7 +81,7 @@ public class SuggestedCommunityAnalyserTest {
 		
     	suggestedCommunityAnalyser = new SuggestedCommunityAnalyser(ownerId, "CSS");
 		HashMap<String, ArrayList<ICisRecord>> recommendations = new HashMap<String, ArrayList<ICisRecord>>();
-		suggestedCommunityAnalyser.analyseEgocentricRecommendations(recommendations);
+		suggestedCommunityAnalyser.analyseEgocentricRecommendations(recommendations, new ArrayList<String>());
 		
 		//James should have been suggested to leave the CIS.
 		// (No members list function in CisRecord API yet)

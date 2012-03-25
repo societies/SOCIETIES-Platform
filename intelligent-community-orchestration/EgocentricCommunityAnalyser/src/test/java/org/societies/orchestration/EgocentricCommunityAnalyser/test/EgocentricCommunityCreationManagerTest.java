@@ -148,7 +148,7 @@ public class EgocentricCommunityCreationManagerTest {
     	//create some test context data for the CSS?	
     	//ServiceResourceIdentifier userInterfacedService = new ServiceResourceIdentifier(/**new URI("Chat system")*/);
     	
-    	//userCtxBroker = new userCtxBroker();
+    	//userCtxBroker = new ICtxBroker();
     	//userCtxBroker.createEntity("CSS User", IUserCtxBrokerCallback);
     	//userCtxBroker.addAttribute(ownerIdContextEntity, CtxAttributeValueType.INDIVIDUAL, "CSS proximity", IUserCtxBrokerCallback);
     	
