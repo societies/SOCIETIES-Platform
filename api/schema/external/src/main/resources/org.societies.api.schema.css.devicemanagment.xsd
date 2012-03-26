@@ -4,6 +4,7 @@
 			xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 
+<!-- 
 <xs:element name="dmEvent">
  	<xs:complexType>
 	    <xs:sequence>
@@ -16,5 +17,19 @@
   	</xs:complexType>
 </xs:element>
 </xs:schema>
+-->
+
+ 	<xs:complexType name="dmEvent">
+	    <xs:sequence>
+			<xs:element name="description" type="xs:string" minOccurs="0"/>
+			<xs:element name="deviceId" type="xs:string" minOccurs="0"/>
+			<xs:element name="key" type="xs:string" minOccurs="0"/>
+			<xs:element name="value" type="xs:string" minOccurs="0"/>
+			<xs:element name="type" type="xs:string" minOccurs="0"/>
+	    </xs:sequence>
+  	</xs:complexType>
+
+</xs:schema>
+
 
  
