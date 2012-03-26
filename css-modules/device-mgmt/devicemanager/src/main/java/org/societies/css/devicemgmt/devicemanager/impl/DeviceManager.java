@@ -27,21 +27,27 @@ package org.societies.css.devicemgmt.devicemanager.impl;
 
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import org.apache.commons.collections.BidiMap;
-import org.apache.commons.collections.MapIterator;
 import org.apache.commons.collections.bidimap.DualHashBidiMap;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.css.devicemgmt.IDevice;
+import org.societies.api.css.devicemgmt.model.DeviceMgmtConstants;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.css.devicemgmt.IDeviceManager;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.springframework.osgi.context.BundleContextAware;
@@ -63,6 +69,18 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 	private BundleContext bundleContext;
 	
 	private BidiMap deviceIdBindingTable;
+	
+	private IIdentityManager idManager;
+	
+	private ICommManager commManager;
+	
+	private INetworkNode nodeId = null;
+	
+	private Dictionary<String, String> properties;
+	
+	private ServiceRegistration registration;
+
+	
 
 	//TODO just for test
 	private Random rdmNumber;
@@ -76,6 +94,22 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 		
 		rdmNumber = new Random();
 		//LOG.info("DeviceMgmt: " + "=========++++++++++------ DeviceManager constructor");
+	}
+	
+	
+	
+	public ICommManager getCommManager() 
+	{
+		return commManager; 
+	}
+	
+	public void setCommManager(ICommManager commManager) 
+	{ 
+		this.commManager = commManager;
+		
+		idManager = commManager.getIdManager();
+		
+		nodeId = idManager.getThisNetworkNode();
 	}
 	
 	public void setBundleContext(BundleContext bundleContext) {
@@ -129,9 +163,8 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 	/**
 	 * TODO Add in this method a call to a device binding table class to generate an Id to each new device connected
 	 */
-	public String fireNewDeviceConnected(String deviceMacAddress, DeviceCommonInfo deviceCommonInfo, String [] serviceIds) 
+	public String fireNewDeviceConnected(String physicalDeviceId, DeviceCommonInfo deviceCommonInfo, String [] serviceIds) 
 	{
-		
 		LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceManager info: fireNewDeviceConnected ");
 		
 		// Check if the device Family container contains device Instance container for this family of devices
@@ -143,47 +176,108 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 			//TODO here generate the deviceId from  the CssId and CssNodeId
 			//int deviceId = rdmNumber.nextInt();
 			
-			String deviceId ="testId"; 
 			
-			deviceIdBindingTable.put(""+deviceId, deviceMacAddress);
+			String deviceId =  nodeId.getJid() + "." + deviceCommonInfo.getDeviceFamilyIdentity()+ "." + deviceCommonInfo.getDeviceType() + "." + physicalDeviceId;
 			
-			LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceManager info: deviceIdBindingTable.getKey " + deviceIdBindingTable.getKey(deviceMacAddress));
-			LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceManager info:  deviceIdBindingTable.inverseBidiMap().getKey" + deviceIdBindingTable.inverseBidiMap().getKey(""+deviceId));
 			
+			deviceIdBindingTable.put(deviceId, physicalDeviceId);
+			
+			LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceManager info: deviceIdBindingTable.getKey =" + deviceIdBindingTable.getKey(physicalDeviceId));
+			LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceManager info:  deviceIdBindingTable.inverseBidiMap().getKey =" + deviceIdBindingTable.inverseBidiMap().getKey(deviceId));
+			
+			properties = new Hashtable<String, String>();
+			
+			properties.put(DeviceMgmtConstants.DEVICE_NAME, deviceCommonInfo.getDeviceName());
+			properties.put(DeviceMgmtConstants.DEVICE_TYPE, deviceCommonInfo.getDeviceType());
+			properties.put(DeviceMgmtConstants.DEVICE_ID, deviceId);
+			properties.put(DeviceMgmtConstants.DEVICE_FAMILY, deviceCommonInfo.getDeviceFamilyIdentity());
+			properties.put(DeviceMgmtConstants.DEVICE_LOCATION, deviceCommonInfo.getDeviceLocation());
+			properties.put(DeviceMgmtConstants.DEVICE_PROVIDER, deviceCommonInfo.getDeviceProvider());
+			properties.put(DeviceMgmtConstants.DEVICE_CONNECTION_TYPE, deviceCommonInfo.getDeviceConnectionType());
+			if (deviceCommonInfo.getContextSource())
+			{
+				properties.put(DeviceMgmtConstants.DEVICE_CONTEXT_SOURCE, "isContextSource");
+			}
+			else
+			{
+				properties.put(DeviceMgmtConstants.DEVICE_CONTEXT_SOURCE, "isNotContextSource");
+			}
+			
+			
+			Object lock = new Object();
+
 			//create a new IDevice implementation
-			deviceImpl = new DeviceImpl(bundleContext, this, /*TODO here set the id*/""+deviceId, deviceCommonInfo);
+			deviceImpl = new DeviceImpl(bundleContext, this, deviceId, deviceCommonInfo);
 			
-			deviceInstanceContainer.put(/*TODO here set the id*/""+deviceId, deviceImpl);
-			deviceServiceIdsContainer.put(/*TODO here set the id*/""+deviceId, serviceIds);
+			synchronized(lock)
+			{
+				registration = bundleContext.registerService(IDevice.class.getName(), deviceImpl, properties);
+				
+				LOG.info("-- A device service with the deviceId: " + properties.get("deviceId") + " has been registred"); 
+			}
+
+			
+			deviceInstanceContainer.put(deviceId, deviceImpl);
+			deviceServiceIdsContainer.put(deviceId, serviceIds);
 			
 			
 			deviceFamilyContainer.put(deviceCommonInfo.getDeviceFamilyIdentity(), deviceInstanceContainer);
 			
-			return "A new device family bundle. A new device instance containers created and stored to the device family container";
+			return deviceId;
 		}
 		else
 		{
 			//The bundle is Known, so get the device instance container
 			deviceInstanceContainer = deviceFamilyContainer.get(deviceCommonInfo.getDeviceFamilyIdentity());
 			
-			if (!deviceIdBindingTable.containsValue(deviceMacAddress))
+			if (!deviceIdBindingTable.containsValue(physicalDeviceId))
 			{
 				//TODO here generate the deviceId from  the CssId and CssNodeId
-				int deviceId = rdmNumber.nextInt();
+				//int deviceId = rdmNumber.nextInt();
+				String deviceId =  nodeId.getJid() + "." + deviceCommonInfo.getDeviceFamilyIdentity()+ "." + deviceCommonInfo.getDeviceType() + "." + physicalDeviceId;
+
+				deviceIdBindingTable.put(deviceId, physicalDeviceId);
+
+				properties = new Hashtable<String, String>();
 				
-				deviceIdBindingTable.put(""+deviceId, deviceMacAddress);
+				properties.put(DeviceMgmtConstants.DEVICE_NAME, deviceCommonInfo.getDeviceName());
+				properties.put(DeviceMgmtConstants.DEVICE_TYPE, deviceCommonInfo.getDeviceType());
+				properties.put(DeviceMgmtConstants.DEVICE_ID, deviceId);
+				properties.put(DeviceMgmtConstants.DEVICE_FAMILY, deviceCommonInfo.getDeviceFamilyIdentity());
+				properties.put(DeviceMgmtConstants.DEVICE_LOCATION, deviceCommonInfo.getDeviceLocation());
+				properties.put(DeviceMgmtConstants.DEVICE_PROVIDER, deviceCommonInfo.getDeviceProvider());
+				properties.put(DeviceMgmtConstants.DEVICE_CONNECTION_TYPE, deviceCommonInfo.getDeviceConnectionType());
 				
-				deviceImpl = new DeviceImpl(bundleContext, this, ""+deviceId, deviceCommonInfo);
+				if (deviceCommonInfo.getContextSource())
+				{
+					properties.put(DeviceMgmtConstants.DEVICE_CONTEXT_SOURCE, "isContextSource");
+				}
+				else
+				{
+					properties.put(DeviceMgmtConstants.DEVICE_CONTEXT_SOURCE, "isNotContextSource");
+				}
 				
-				deviceInstanceContainer.put(/*TODO here set the id*/""+deviceId, deviceImpl);
+				Object lock = new Object();
+
+				//create a new IDevice implementation
+				deviceImpl = new DeviceImpl(bundleContext, this, deviceId, deviceCommonInfo);
 				
-				deviceServiceIdsContainer.put(/*TODO here set the id*/""+deviceId, serviceIds);
+				synchronized(lock)
+				{
+					registration = bundleContext.registerService(IDevice.class.getName(), deviceImpl, properties);
+					
+					LOG.info("-- A device service with the deviceId: " + properties.get("deviceId") + " has been registred"); 
+				}
+				
+				deviceInstanceContainer.put(deviceId, deviceImpl);
+				
+				deviceServiceIdsContainer.put(deviceId, serviceIds);
 					
 				deviceFamilyContainer.put(deviceCommonInfo.getDeviceFamilyIdentity(), deviceInstanceContainer);
 					
-				return "A new device instance stored to the existing device instance container";
+				return deviceId;
 			}
-			return"The device already exist in the container";
+			return null;
 		}
 	}
 

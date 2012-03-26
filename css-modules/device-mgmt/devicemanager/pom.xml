@@ -29,17 +29,17 @@
 	</parent>
 
 	<dependencies>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
 			<scope>provided</scope>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
-			<scope>provided</scope>
+			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
@@ -47,11 +47,11 @@
 			<artifactId>org.osgi.core</artifactId>
 			<version>4.1.0</version>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.compendium</artifactId>
 			<version>4.0.0</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.springframework.osgi</groupId>
 			<artifactId>spring-osgi-core</artifactId>
@@ -117,7 +117,9 @@
 							org.slf4j.*,
 							org.societies.api.css.devicemgmt,
 							org.societies.api.internal.css.devicemgmt,
-							org.societies.api.internal.css.devicemgmt.model,
+							org.societies.api.comm.xmpp.interfaces, 
+							org.societies.api.identity,
+							org.societies.api.internal.css.devicemgmt.model
 						</Import-Package>
 
 					</instructions>
