@@ -64,8 +64,8 @@ public class NegotiationProvider implements INegotiationProvider {
 		//LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
 		
 		LOG.debug("init(): group manager = {}", groupMgr.toString());
-		groupMgr.reject(0, null);
-		//groupMgr.getPolicyOptions("123", null);
+		//groupMgr.reject(0, null);
+		groupMgr.getPolicyOptions("123", null);
 	}
 	
 	// Getters and setters for beans
