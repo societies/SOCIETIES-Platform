@@ -34,21 +34,15 @@ import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 public interface IDeviceManager {
 	
 
+
 	/**
-	 * Method used to inform the Device Manager about a connection of a new device
 	 * 
-	 * @param deviceFamily
-	 * @param deviceMacAddress
-	 * @param deviceName
-	 * @param deviceType
-	 * @param deviceDescription
-	 * @param deviceConnectionType
-	 * @param deviceLocation
-	 * @param deviceProvider
-	 * @param contextCompliant
-	 * @return
+	 * @param physicalDeviceId
+	 * @param deviceCommonInfo
+	 * @param serviceIds
+	 * @return a deviceId
 	 */
-	public String fireNewDeviceConnected (String deviceMacAddress, DeviceCommonInfo deviceCommonInfo, String [] serviceIds);
+	public String fireNewDeviceConnected (String physicalDeviceId, DeviceCommonInfo deviceCommonInfo, String [] serviceIds);
 	
 	/**
 	 * Method used to inform the Device Manager about disconnection of a device
