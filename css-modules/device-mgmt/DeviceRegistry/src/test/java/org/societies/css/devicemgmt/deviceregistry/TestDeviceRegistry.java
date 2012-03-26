@@ -236,6 +236,7 @@ public class TestDeviceRegistry {
 	public void findDeviceType() throws Exception{
 		Collection<DeviceCommonInfo> Result = null;
 		
+		
 		String result1 =  registry.addDevice(device_1, CSSNodeID);
 		assertTrue(null != result1);
 		String result2 =  registry.addDevice(device_2, CSSNodeID);
@@ -247,13 +248,16 @@ public class TestDeviceRegistry {
 		
 		Result = registry.findByDeviceType(device_1.getDeviceType());
         assertEquals(1, Result.size());
-		System.out.println("query Result size = " + Result.size());
-
-        Result = registry.findByDeviceType(deviceType2);
+		
+		
+        Result = registry.findByDeviceType(device_2.getDeviceType());
+        System.out.println("retrieved devicetype = " + device_2.getDeviceType());
         assertEquals(1, Result.size());
-
-        Result = registry.findByDeviceType(deviceType3);
+       
+      
+        Result = registry.findByDeviceType(device_3.getDeviceType());
         assertEquals(1, Result.size());
+        
 
             
 	}

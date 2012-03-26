@@ -14,18 +14,9 @@
 	<h4>Please click the service to use</h4>
 	
 	<table>
-	
-		<tr>
-			<td><a href="calculator.html">Calculator Service</a></td>
-		</tr>
 		<tr>
 			<td><a href="servicediscovery.html">Service Discovery Service</a></td>
-		</tr>
-		<tr>
-			<td><a href="otherservice.html">Other Service</a></td>
-		</tr>
-		<tr>
-			<td><a href="moreservice.html">More Service</a></td>
+			<td><a href="servicecontrol.html">Service Control Service</a></td>
 		</tr>
 	</table>
 	

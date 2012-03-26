@@ -30,7 +30,7 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
 /**
@@ -48,7 +48,7 @@ public interface IPPNPAction {
 
 	public Decision getDecision();
 
-	public IServiceResourceIdentifier getServiceIdentifier();
+	public ServiceResourceIdentifier getServiceIdentifier();
 
 	public IIdentity getServiceIdentity();
 

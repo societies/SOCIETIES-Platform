@@ -25,7 +25,6 @@
 	</developers>
 	
 	<dependencies>
-	
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>

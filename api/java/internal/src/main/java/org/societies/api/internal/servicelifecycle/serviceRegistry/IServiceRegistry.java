@@ -26,11 +26,15 @@ package org.societies.api.internal.servicelifecycle.serviceRegistry;
 
 import java.util.List;
 
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.CISNotFoundException;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.CSSNotFoundException;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 
 /**
  * @author Antonio Panazzolo, Massimo Mazzariol (SN)
@@ -90,7 +94,7 @@ public interface IServiceRegistry {
 	
 	/**
 	* Description: Based on a Filter this method returns the services list
-	* matching that particular filter
+	* matching that particular filter. Null attributes are excluded and associations are ignored.
 	* @param the object used as filter for the query
 	* @return the list of services that match the filter
 	* @throws ServiceRetrieveException
@@ -104,4 +108,30 @@ public interface IServiceRegistry {
 	* @throws ServiceRetrieveException
 	*/
 	public Service retrieveService(ServiceResourceIdentifier serviceIdentifier) throws ServiceRetrieveException;
+	
+	/**
+	 * 
+	 * @param serviceIdentifier the unique identifier for the Service
+	 * @param serviceStatus the new status for the service
+	 * @return true if all is performed correctly
+	 * @throws ServiceNotFoundException
+	 */
+	public boolean changeStatusOfService(ServiceResourceIdentifier serviceIdentifier, ServiceStatus serviceStatus) throws ServiceNotFoundException;
+	
+	/**
+	 * Description: Based on the CSSId this method delete all service that belong to the CSS and that are registered in the ServiceRegistry.
+	 * @param CSSId 
+	 * @return true if all is performed correctly
+	 * @throws CSSNotFoundException
+	 */
+	public boolean deleteServiceCSS(String CSSId) throws CSSNotFoundException;
+	
+	/**
+	 * Description: Based on the CISId this method clear the list of services shared inside a CIS.
+	 * @param CISId
+	 * @return true if all is performed correctly
+	 * @throws CISNotFoundException
+	 */
+	
+	public boolean clearServiceSharedCIS(String CISId) throws CISNotFoundException;
 }

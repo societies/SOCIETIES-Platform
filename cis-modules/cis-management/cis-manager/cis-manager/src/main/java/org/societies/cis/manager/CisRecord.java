@@ -37,60 +37,91 @@ package org.societies.cis.manager;
 import java.util.Set;
 
 import org.societies.api.cis.collaboration.IServiceSharingRecord;
+import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.cis.management.ICisSubscribed;
 
 
 
-public class CisRecord {
+public class CisRecord implements ICisOwned, ICisSubscribed{
 	public CisActivityFeed feed;
 	public String ownerCss;
-	public String membershipCriteria;
-	public String cisId;
-	public String fullJid;
+	public int membershipCriteria;
+	public String cisName;
+	public String cisJID;
+	public String cisType;
 
 
 	/**
 	 * permaLink is a permanent URL to this CIS. A type of CIS homepage.
 	 */
 	public String permaLink;
-	public Set<CisParticipant> membersCss;
+	public Set<CisParticipant> membersCss; //TODO: maybe this should be moved to the CIS Editor (or in other words, we should 
+	// not keep track of members of CISs which we do not own 
 	private String password = "none";
 	private String host = "none";
-	public Set<IServiceSharingRecord> sharedServices;
+	public Set<IServiceSharingRecord> sharedServices;//TODO: maybe this should be moved to the CIS Editor (or in other words, we should 
+	// not keep track of members of CISs which we do not own
 	
 
 	
 	public CisRecord(CisActivityFeed feed, String ownerCss,
-			String membershipCriteria, String cisId, String permaLink,
+			int membershipCriteria, String cisId, String permaLink,
 			Set<CisParticipant> membersCss, String password, String host,
 			Set<IServiceSharingRecord> sharedServices) {
 		super();
 		this.feed = feed;
 		this.ownerCss = ownerCss;
 		this.membershipCriteria = membershipCriteria;
-		this.cisId = cisId;
+		this.cisName = cisId;
 		this.permaLink = permaLink;
 		this.membersCss = membersCss;
 		this.password = password;
 		this.host = host;
 		this.sharedServices = sharedServices;
 		
-		this.fullJid = cisId + "." + host;
+		this.cisJID = cisId + "." + host;
+		
+		this.cisType = "default";
 	}
 	
 
 	
+	public CisRecord(CisActivityFeed feed, String ownerCss,
+			int membershipCriteria, String cisJid, String permaLink,
+			Set<CisParticipant> membersCss, String password,
+			Set<IServiceSharingRecord> sharedServices, String cisType, String cisName) {
+		super();
+		this.feed = feed;
+		this.ownerCss = ownerCss;
+		this.membershipCriteria = membershipCriteria;
+		this.cisName = cisName;
+		this.permaLink = permaLink;
+		this.membersCss = membersCss;
+		this.password = password;
+		this.host = host;
+		this.sharedServices = sharedServices;
+		
+		this.cisJID = cisJid;
+		
+		this.cisType = cisType;
+	}
+	
+	public CisRecord(String cisJid) {		
+		this.cisJID = cisJid;
+		
+	}
 
-
-	 // hash code and equals using cisId and host
+	 // hash code and equals using CISjID
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((cisId == null) ? 0 : cisId.hashCode());
-		result = prime * result + ((host == null) ? 0 : host.hashCode());
+		result = prime * result + ((cisJID == null) ? 0 : cisJID.hashCode());
 		return result;
 	}
+
 
 
 	@Override
@@ -102,23 +133,22 @@ public class CisRecord {
 		if (getClass() != obj.getClass())
 			return false;
 		CisRecord other = (CisRecord) obj;
-		if (cisId == null) {
-			if (other.cisId != null)
+		if (cisJID == null) {
+			if (other.cisJID != null)
 				return false;
-		} else if (!cisId.equals(other.cisId))
-			return false;
-		if (host == null) {
-			if (other.host != null)
-				return false;
-		} else if (!host.equals(other.host))
+		} else if (!cisJID.equals(other.cisJID))
 			return false;
 		return true;
 	}
 
-
+	
+	
 	public String getOwnerCss() {
 		return ownerCss;
 	}
+
+
+
 
 
 	public void setOwnerCss(String ownerCss) {
@@ -126,14 +156,14 @@ public class CisRecord {
 	}
 
 
-	public String getCisId() {
-		return cisId;
+	public String getCisName() {
+		return cisName;
 	}
 
 
-	public void setCisId(String cisId) {
+	public void setCisName(String cisId) {
 		// TODO: double check that this is consistent with the fulljid
-		this.cisId = cisId;
+		this.cisName = cisId;
 	}
 
 
@@ -157,14 +187,46 @@ public class CisRecord {
 	}
 
 
-
-	public String getFullJid() {
-		return fullJid;
+	@Override
+	public String getCisId() {
+		return cisJID;
 	}
 
-	public void setFullJid(String fullJid) {
-		this.fullJid = fullJid;
+
+
+
+	@Override
+	public String getName() {
+		return cisName;
 	}
+
+
+
+	@Override
+	public String getOwnerId() {
+		return this.ownerCss;
+	}
+
+
+
+	@Override
+	public String getUserDefineName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public String setUserDefinedName(String arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+
+
 
 	
 

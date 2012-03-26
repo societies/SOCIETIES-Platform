@@ -48,6 +48,13 @@ import org.societies.api.internal.cis.management.ICisManager;
 //import org.societies.api.cis.management.ICisActivityFeed;
 //import org.societies.api.cis.management.ICis;
 
+import org.societies.api.internal.css.management.CSSRecord;
+import org.societies.api.internal.css.management.ICssActivity;
+import org.societies.api.internal.css.management.ICssActivityFeed;
+import org.societies.api.internal.css.management.ICSSLocalManager;
+import org.societies.api.internal.css.management.ICSSManagerCallback;
+import org.societies.api.internal.css.management.ICSSRemoteManager;
+
 //import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
 
 //import org.societies.api.internal.context.user.prediction.IUserCtxPredictionMgr;
@@ -119,6 +126,9 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 	//private ICommunityCtxBroker communityContextBroker;
 	//private IUserCtxBrokerCallback userContextBrokerCallback;
 	private ICisManager cisManager;
+	private ICSSLocalManager cssManager;
+	private ICssActivityFeed activityFeed;
+	
 	private IUserFeedback userFeedback;
 	//private IUserFeedbackCallback userFeedbackCallback;
 	private String userResponse;
@@ -173,6 +183,9 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 		String[] it = new String[1];
 		linkedCss = mock(IIdentity.class);
 		cisManager = mock(ICisManager.class);
+		cssManager = mock(ICSSLocalManager.class);
+		activityFeed = mock(ICssActivityFeed.class);
+		
 		it[0] = linkedCss.getIdentifier();
 		//ICisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new ICisRecord(null, null, null, null, null, it, null, null, null));
 		ICisRecord[] listOfUserJoinedCiss = new ICisRecord[0];

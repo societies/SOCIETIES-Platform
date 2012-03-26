@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.osgi.event.IEventMgr;
 import org.societies.example.calculator.ICalc;
 import org.societies.example.IExamplesCallback;
 import org.societies.example.calculator.ICalcRemote;
@@ -46,7 +47,12 @@ public class ClientTester implements IExamplesCallback {
 	private ICalcRemote remoteCalculator;
 	private PubsubClient pubSubManager;
 	private IWisdom fcGenerator;
+	private IEventMgr eventMgr;
+
 	private static Logger LOG = LoggerFactory.getLogger(ClientTester.class);
+
+	public IEventMgr getEventMgr() { return eventMgr; }
+	public void setEventMgr(IEventMgr eventMgr) { this.eventMgr = eventMgr; }
 	
 	public ICommManager getCommManager() { return commManager;	}
 	public void setCommManager(ICommManager commManager) { this.commManager = commManager; }
@@ -60,13 +66,15 @@ public class ClientTester implements IExamplesCallback {
 	public IWisdom getFcGenerator() { return fcGenerator; }
 	public void setFcGenerator(IWisdom fcGenerator) { this.fcGenerator = fcGenerator; }
 
+	
 	//ENTRY POINT
 	public void StartTest() {
-		//TEST SPRING EVENTING
-		//System.out.println("Starting Spring Eventing Test");
-		//TestInternalEventing springTest = new TestInternalEventing();
-		//Thread springThread = new Thread(springTest);
-		//springThread.start();
+		//TEST OSGI EVENTING
+		//System.out.println("Starting OSGI Eventing Test");
+		TestInternalEventing springTest = new TestInternalEventing();
+		springTest.setEventMgr(eventMgr);
+		Thread springThread = new Thread(springTest);
+		springThread.start();
 		
 		//TEST MESSAGING
 		//System.out.println("Starting Client Test");
@@ -74,12 +82,12 @@ public class ClientTester implements IExamplesCallback {
 		//System.out.println("Waiting...");
 		
 		//TEST PUBSUB
-		TestExternalEventing testPubSub = new TestExternalEventing();
-		testPubSub.setFcGenerator(this.fcGenerator);
-		testPubSub.setPubSubManager(this.pubSubManager);
-		testPubSub.setCommManager(this.commManager);
-		Thread pubsubThread = new Thread(testPubSub);
-		pubsubThread.start();
+		//TestExternalEventing testPubSub = new TestExternalEventing();
+		//testPubSub.setFcGenerator(this.fcGenerator);
+		//testPubSub.setPubSubManager(this.pubSubManager);
+		//testPubSub.setCommManager(this.commManager);
+		//Thread pubsubThread = new Thread(testPubSub);
+		//pubsubThread.start();
 	}
 	
 	/* (non-Javadoc)

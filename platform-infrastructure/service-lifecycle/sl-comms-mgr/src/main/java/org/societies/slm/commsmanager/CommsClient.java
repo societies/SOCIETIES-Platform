@@ -24,6 +24,7 @@
  */
 package org.societies.slm.commsmanager;
 
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -48,25 +49,34 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 //import org.societies.example.calculatorservice.schema.MethodType;
 import org.springframework.scheduling.annotation.Async;
 
+import org.societies.api.schema.servicelifecycle.servicecontrol.MethodType;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlMsgBean;
 import org.societies.api.schema.servicelifecycle.servicediscovery.MethodName;
 import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryMsgBean;
 import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryResultBean;
 import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.servicelifecycle.IServiceControlCallback;
+import org.societies.api.servicelifecycle.IServiceControlRemote;
 
 /**
- * Comms Client that initiates the remote communication
+ * Comms Client that initiates the remote communication for the Service Lifecycle
  *
  * @author aleckey
+ * @author Maria Mannion
+ * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
  */
-public class CommsClient implements IServiceDiscoveryRemote, ICommCallback{
+public class CommsClient implements IServiceDiscoveryRemote, IServiceControlRemote, ICommCallback{
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			  Arrays.asList("http://societies.org/api/schema/servicelifecycle/model",
-					  		"http://societies.org/api/schema/servicelifecycle/servicediscovery"));
+					  		"http://societies.org/api/schema/servicelifecycle/servicediscovery",
+					  		"http://societies.org/api/schema/servicelifecycle/servicecontrol"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			  Arrays.asList("org.societies.api.schema.servicelifecycle.model",
-							"org.societies.api.schema.servicelifecycle.servicediscovery"));
-
+							"org.societies.api.schema.servicelifecycle.servicediscovery",
+							"org.societies.api.schema.servicelifecycle.servicecontrol"));
+	
 	//PRIVATE VARIABLES
 	private ICommManager commManager;
 	private static Logger LOG = LoggerFactory.getLogger(CommsClient.class);
@@ -85,6 +95,9 @@ public class CommsClient implements IServiceDiscoveryRemote, ICommCallback{
 
 	public void InitService() {
 		//REGISTER OUR ServiceManager WITH THE XMPP Communication Manager
+		
+		if(LOG.isDebugEnabled()) LOG.debug("Registering the SLM Communication Manager with the XMPP Communication Manager");
+		
 		try {
 			getCommManager().register(this); 
 		} catch (CommunicationException e) {
@@ -93,12 +106,13 @@ public class CommsClient implements IServiceDiscoveryRemote, ICommCallback{
 		idMgr = commManager.getIdManager();
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.societies.comm.examples.commsmanager.ICalcRemote#AddAsync(int, int)
-	 */
+
 	@Override
 	@Async
 	public void getServices(IIdentity node, IServiceDiscoveryCallback serviceDiscoveryCallback) {
+		
+
+		if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: getServices called");
 		
 		Stanza stanza = new Stanza(node);
 
@@ -109,7 +123,7 @@ public class CommsClient implements IServiceDiscoveryRemote, ICommCallback{
 		ServiceDiscoveryMsgBean bean = new ServiceDiscoveryMsgBean();
 		bean.setMethod(MethodName.GET_LOCAL_SERVICES);
 		try {
-			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
+			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
 			commManager.sendIQGet(stanza, bean, callback);
 			
 		} catch (CommunicationException e) {
@@ -117,6 +131,129 @@ public class CommsClient implements IServiceDiscoveryRemote, ICommCallback{
 		};
 	}
 	
+	@Override
+	@Async
+	public void startService(ServiceResourceIdentifier serviceId,
+			IIdentity node, IServiceControlCallback serviceControlCallback) {
+	
+		if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: startService called");
+
+		Stanza stanza = new Stanza(node);
+
+		//SETUP CALC CLIENT RETURN STUFF
+		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), serviceControlCallback);
+
+		//CREATE MESSAGE BEAN
+		ServiceControlMsgBean bean = new ServiceControlMsgBean();
+		bean.setMethod(MethodType.START_SERVICE);
+		bean.setServiceId(serviceId);
+		
+		try {
+			
+			if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: Sending Message...");
+
+			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
+			commManager.sendIQGet(stanza, bean, callback);
+			
+		} catch (CommunicationException e) {
+			LOG.warn(e.getMessage());
+		};
+		
+	}
+
+	@Override
+	@Async
+	public void stopService(ServiceResourceIdentifier serviceId,
+			IIdentity node, IServiceControlCallback serviceControlCallback) {
+		
+		if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: stopService called");
+
+		Stanza stanza = new Stanza(node);
+
+		//SETUP CALC CLIENT RETURN STUFF
+		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), serviceControlCallback);
+
+		//CREATE MESSAGE BEAN
+		ServiceControlMsgBean bean = new ServiceControlMsgBean();
+		bean.setMethod(MethodType.STOP_SERVICE);
+		bean.setServiceId(serviceId);
+		
+		try {
+			
+			if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: Sending Message...");
+
+			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
+			commManager.sendIQGet(stanza, bean, callback);
+			
+		} catch (CommunicationException e) {
+			LOG.warn(e.getMessage());
+		};
+		
+		
+	}
+
+	@Override
+	@Async
+	public void installService(URL bundleLocation, IIdentity node,
+			IServiceControlCallback serviceControlCallback) {
+
+		if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: installService called");
+
+		Stanza stanza = new Stanza(node);
+
+		//SETUP CALC CLIENT RETURN STUFF
+		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), serviceControlCallback);
+
+		//CREATE MESSAGE BEAN
+		ServiceControlMsgBean bean = new ServiceControlMsgBean();
+		bean.setMethod(MethodType.INSTALL_SERVICE);
+		try {
+		
+			bean.setURL(bundleLocation.toURI());
+		
+			if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: Sending Message...");
+
+			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
+			commManager.sendIQGet(stanza, bean, callback);
+			
+		} catch (Exception e) {
+			LOG.warn(e.getMessage());
+		};
+		
+		
+		
+	}
+
+	@Override
+	@Async
+	public void uninstallService(ServiceResourceIdentifier serviceId,
+			IIdentity node, IServiceControlCallback serviceControlCallback) {
+		
+		
+		if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: uninstallService called");
+
+		Stanza stanza = new Stanza(node);
+
+		//SETUP CALC CLIENT RETURN STUFF
+		CommsClientCallback callback = new CommsClientCallback(stanza.getId(), serviceControlCallback);
+
+		//CREATE MESSAGE BEAN
+		ServiceControlMsgBean bean = new ServiceControlMsgBean();
+		bean.setMethod(MethodType.UNINSTALL_SERVICE);
+		bean.setServiceId(serviceId);
+		
+		try {
+			
+			if(LOG.isDebugEnabled()) LOG.debug("SLM CommsClient: Sending Message...");
+
+			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback"
+			commManager.sendIQGet(stanza, bean, callback);
+			
+		} catch (CommunicationException e) {
+			LOG.warn(e.getMessage());
+		};
+		
+	}
 
 	
 	/* (non-Javadoc)
@@ -152,4 +289,5 @@ public class CommsClient implements IServiceDiscoveryRemote, ICommCallback{
 	public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
 		// TODO Auto-generated method stub
 	}
+
 }

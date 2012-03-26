@@ -6,22 +6,25 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Societies user login</title>
+<title>Societies Service Discovery Result</title>
 </head>
 <body>
 
-<TABle>
+<h4>${result}</h4>
+<br/>
+<br/>
+<Table>
 <tr><td><B>Name</B></td><td><B>Description</B></td><td><B>Author</B></td><td><B>Endpoint</B></td>
-<td><B>Status</B></td><td><B>Type</B></td></tr> 
+<td><B>Type</B></td><td><B>Status</B></td></tr> 
 
 	<xc:forEach var="service" items="${services}">
         <tr>
         	<td>${service.serviceName}</td>
          	<td>${service.serviceDescription}</td>
             <td>${service.authorSignature}</td>
-            <td>${service.serviceEndpoint}</td>
-            <td>${service.serviceStatus}</td>
+            <td>${service.serviceEndpoint}</td>            
             <td>${service.serviceType}</td>
+            <td>${service.serviceStatus}</td>
         </tr>
     </xc:forEach>
     	
@@ -33,8 +36,8 @@
 		
 	<table>	
 		<tr>
-			<td><a href="calculator.html">Calculator Service</a></td>
 			<td><a href="servicediscovery.html">Service Discovery Service</a></td>
+			<td><a href="servicecontrol.html">Service Control Service</a></td>
 		</tr>		
 	</table>	
 </body>

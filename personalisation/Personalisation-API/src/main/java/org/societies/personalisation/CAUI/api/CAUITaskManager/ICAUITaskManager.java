@@ -59,6 +59,7 @@ public interface ICAUITaskManager {
 	
 	public boolean taskBelongsToModel(IUserIntentTask userTask);
 	
+	public void visualiseModel();
 	/**
 	 * 
 	 * @return
@@ -217,8 +218,8 @@ public interface ICAUITaskManager {
 	 * @param targetAction
 	 * @param weigth    the transition probability
 	 */
-	public void setNextActionLink(UserIntentAction sourceAction, UserIntentAction targetAction, Double weigth);
-
+	public void setNextActionLink(IUserIntentAction sourceAction, IUserIntentAction targetAction, Double weigth);
+	public void setNextActionLink(IUserIntentAction actionSrc, Map<IUserIntentAction,Double> actionTrgts);
 	/**
 	 * Creates a weighted link between two Tasks.
 	 * If sourceTask is null, then the task is added to root level.

@@ -20,15 +20,7 @@
 
    <!-- Modules to build -->
 	<modules>
-		<!-- API -->
-		<module>../../api/schema/external</module>
-		<module>../../api/schema/internal</module>
-		<module>../../api/java/external</module>
-		<module>../../api/java/internal</module>
-		
-		<!-- Security -->
-		<module>SecureStorage</module>
-		<module>SignatureMgr</module>
+		<module>SecurityServices</module>
 		<module>PolicyNegotiator</module>
 		<module>SecurityCommsMgr</module>
 	</modules>

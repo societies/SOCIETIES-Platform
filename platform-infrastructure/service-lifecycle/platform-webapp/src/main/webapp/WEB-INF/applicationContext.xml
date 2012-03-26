@@ -33,7 +33,7 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
 		http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 	
-<osgi:reference id="calServiceRef" interface="org.societies.service.api.IMathService" cardinality="0..1"  />
 <osgi:reference id="ServiceDiscoveryBundle" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery" cardinality="0..1"/>
+<osgi:reference id="ServiceControlBundle" interface="org.societies.api.servicelifecycle.IServiceControl" cardinality="0..1"/>
 
 </beans>

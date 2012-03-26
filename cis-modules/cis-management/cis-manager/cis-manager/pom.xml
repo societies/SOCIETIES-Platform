@@ -27,49 +27,21 @@
 	</parent>
 
 	<dependencies>
-	<!-- add your dependencies here -->
-		
-		
-<dependency>
-	<groupId>org.societies.api.schema</groupId>
-	<artifactId>societies-api-schema</artifactId>
-	<version>${release.version}</version>
-	<scope>provided</scope>
-</dependency>
-
-		
-		
+	<!-- add your dependencies here -->	
     	<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
-		</dependency>		
-
-<dependency>
-	<groupId>org.societies.api.internal</groupId>
-	<artifactId>societies-api-internal</artifactId>
-	<version>${release.version}</version>
-	<scope>provided</scope>
-</dependency>
-
-
-
-<!-- 		<dependency>
-			<groupId>org.societies.community</groupId>
-			<artifactId>CommunityXep</artifactId>
-			<version>0.0.1</version>
-			<scope>compile</scope>
 		</dependency>
-
-
-  <dependency>
-   <groupId>org.igniterealtime</groupId>
-   <artifactId>whack</artifactId>
-   <type>jar</type>
-   <scope>provided</scope>
-  </dependency>-->
-
+		
+ 
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>	
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 	  		<artifactId>CommunicationFrameworkCommons</artifactId>
@@ -77,26 +49,12 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.societies.comm.xmpp</groupId>
-		    <artifactId>XCCommunicationMgr</artifactId>
-		    <version>${version.comm}</version>	
-		</dependency>
-		
-		<dependency>
 			<groupId>org.societies.comm.xmpp.pubsub</groupId>
     		<artifactId>PubsubClientBundle</artifactId>
 	  		<version>${version.comm}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.comm.xmpp.pubsub</groupId>
-    		<artifactId>PubsubServiceBundle</artifactId>
-	  		<version>${version.comm}</version>
-			<scope>provided</scope>
-		</dependency>
-
-
-	<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
@@ -118,38 +76,6 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
 		</dependency>
-				
-<!--		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>org.springframework.beans</artifactId>
-            <version>${spring.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-              <exclusion>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>com.springsource.org.apache.commons.logging</artifactId>
-              </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>org.springframework.context</artifactId>
-            <version>${spring.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-              <exclusion>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>com.springsource.org.apache.commons.logging</artifactId>
-              </exclusion>
-            </exclusions>
-        </dependency>
--->
 	</dependencies>
 
 	<build>
@@ -166,7 +92,6 @@
 						<Import-Package>    						org.springframework.beans.factory.annotation*;version="0",
     						org.springframework.stereotype*;version="0",
     						org.xmpp.packet*,
-    						org.societies.api.schema.*,
     						!org.gjt.*,
     						!org.jaxen.*,
     						!org.mortbay.*,
@@ -177,8 +102,8 @@
     						!com.sun.msv.*,
 							*;resolution:=optional</Import-Package>
 						<Export-Package>
-						org.societies.api.schema.cis.community*,
-						org.societies.api.schema.cis.manager*
+						org.societies.api.schema.cis.community,
+						org.societies.api.schema.cis.manager
 						</Export-Package>
 					</instructions>
 				</configuration>

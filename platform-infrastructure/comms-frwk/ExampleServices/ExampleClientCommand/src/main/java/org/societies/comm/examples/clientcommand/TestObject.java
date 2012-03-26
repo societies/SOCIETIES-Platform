@@ -24,13 +24,15 @@
  */
 package org.societies.comm.examples.clientcommand;
 
+import java.io.Serializable;
+
 /**
  * Describe your class here...
  *
  * @author aleckey
  *
  */
-public class TestObject {
+public class TestObject implements Serializable {
 
 	private String name;
 	private String desc;

@@ -28,6 +28,9 @@ package org.societies.android.platform.interfaces;
 
 import java.util.List;
 
+import org.societies.api.android.internal.model.AndroidParcelable;
+
+
 public interface ICoreServiceMonitor {
 	String methodsArray [] = {"activeTasks(String client)", 
 								"activeTasks(String client, String taskFilter)",
@@ -36,7 +39,8 @@ public interface ICoreServiceMonitor {
 								"startService(String client, String service)",
 								"startActivity(String client, String activity)",
 								"stopService(String client, String service)",
-								"stopActivity(String client, String activity)"};
+								"stopActivity(String client, String activity)",
+								"getNodeDetails(String client, org.societies.api.android.internal.model.AndroidParcelable node)"};
 
 	/**
 	 * Generate a list of tasks currently "running" on the Android device
@@ -78,4 +82,13 @@ public interface ICoreServiceMonitor {
 	boolean startActivity(String client, String activity);
 	boolean stopService(String client, String service);
 	boolean stopActivity(String client, String activity);
+
+	/**
+	 * Parcelable example method
+	 * Non primitive and String parameters must be fully qualified
+	 * @param client
+	 * @param node 
+	 * @return AndroidParcelable
+	 */
+	AndroidParcelable getNodeDetails(String client, org.societies.api.android.internal.model.AndroidParcelable node);
 }

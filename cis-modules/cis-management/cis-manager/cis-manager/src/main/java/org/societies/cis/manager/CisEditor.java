@@ -25,6 +25,7 @@
 
 package org.societies.cis.manager;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -44,29 +45,34 @@ import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
-import org.societies.api.internal.cis.management.ICisEditor;
+import org.societies.api.cis.management.ICisActivityFeed;
+import org.societies.api.cis.management.ICisEditor;
+import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.cis.manager.CisParticipant.MembershipType;
-import org.societies.comm.xmpp.pubsub.impl.PubsubServiceRouter;
-import org.societies.comm.xmpp.xc.impl.XCCommunicationMgr;
 import org.societies.identity.IdentityImpl;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
+import org.societies.api.schema.cis.community.Join;
 import org.societies.api.schema.cis.community.Who;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.ParticipantRole;
-
+import org.societies.api.schema.cis.community.Add;
+import org.societies.api.schema.cis.community.Subscription;
+import org.societies.api.schema.cis.manager.CommunityManager;
+import org.societies.api.schema.cis.manager.SubscribedTo;
 
 /**
  * @author Thomas Vilarinho (Sintef)
 */
 
+
+/**
+ * This object corresponds to an owned CIS. The CIS record will be the CIS data which is stored on DataBase
+*/
+
 //@Component
-public class CisEditor implements ICisEditor, IFeatureServer {
+public class CisEditor implements IFeatureServer {
 
 
 	public CisRecord cisRecord;
@@ -76,9 +82,13 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 	
 	
 	private final static List<String> NAMESPACES = Collections
-			.singletonList("http://societies.org/api/schema/cis/community");
+			.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
+					  		"http://societies.org/api/schema/cis/community"));
+			//.singletonList("http://societies.org/api/schema/cis/community");
 	private final static List<String> PACKAGES = Collections
-			.singletonList("org.societies.api.schema.cis.community");
+			//.singletonList("org.societies.api.schema.cis.community");
+	.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
+		"org.societies.api.schema.cis.community"));
 	
 	private ICommManager CISendpoint;
 	
@@ -87,7 +97,6 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 
 	public Set<CisParticipant> membersCss; // TODO: this may be implemented in the CommunityManagement bundle. we need to define how they work together
 	
-	//public static final int MAX_NB_MEMBERS = 100;// TODO: this is temporary, we have to set the memberCss to something more suitable
 
 
 	private static Logger LOG = LoggerFactory
@@ -96,10 +105,9 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 
 
 
-	// it expects an existing Pubsubclient in the container in which it will autowire
-	//@Autowired	
+	// at the moment we are not using this constructor, but just the one below, as that one generates the CIS id for us
 	public CisEditor(String ownerCss, String cisId,String host,
-			String membershipCriteria, String permaLink, String password,ICISCommunicationMgrFactory ccmFactory) {
+			int membershipCriteria, String permaLink, String password,ICISCommunicationMgrFactory ccmFactory) {
 		
 		cisActivityFeed = new CisActivityFeed();
 		sharedServices = new HashSet<IServiceSharingRecord>();
@@ -144,7 +152,55 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 
 	}
 
+	// constructor of a CIS without a pre-determined ID or host
+	public CisEditor(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory) {
+		
+		cisActivityFeed = new CisActivityFeed();
+		sharedServices = new HashSet<IServiceSharingRecord>();
+		membersCss = new HashSet<CisParticipant>();
+		membersCss.add(new CisParticipant(cssOwner,MembershipType.owner));
 
+		LOG.info("CIS editor created");
+		
+		CISendpoint = ccmFactory.getNewCommManager();
+		
+		try {
+		cisIdentity = CISendpoint.getIdManager().getThisNetworkNode();//CISendpoint.getIdManager().fromJid(CISendpoint.getIdManager().getThisNetworkNode().getJid());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+			
+		LOG.info("CIS endpoint created");
+		
+		
+		
+		try {
+			CISendpoint.register(this);
+		} catch (CommunicationException e) {
+			e.printStackTrace();
+		} // TODO unregister??
+		
+		LOG.info("CIS listener registered");
+		
+		
+		// TODO: we have to get a proper identity and pwd for the CIS...
+		cisRecord = new CisRecord(cisActivityFeed,cssOwner, mode, cisIdentity.getJid(), "", membersCss,
+				cisIdentity.getDomain(), sharedServices,cisType,cisName);
+		
+		LOG.info("CIS creating pub sub service");
+		
+//		PubsubServiceRouter psr = new PubsubServiceRouter(CISendpoint);
+
+		
+		LOG.info("CIS pub sub service created");
+		
+		//this.psc = psc;
+		
+		LOG.info("CIS autowired PubSubClient");
+		// TODO: broadcast its creation to other nodes?
+
+	}
+	
 
 	public Set<CisParticipant> getMembersCss() {
 		return membersCss;
@@ -155,45 +211,56 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 		this.membersCss = membersCss;
 	}
 	
-	
 
 	/**
-	 * add a member to the CIS and at the same time send the XMPP notification to the user that he has been added to the community
-	 * if this is called through a XMPP message, the fail response is responsability of the XMPP query handler
+	 * add a member to the CIS and at the same time send the XMPP notification to all the other users that this user has been added to the community
+	 * and send a notification to that user
 	 * 
 	 * @param jid is the full jid of the user
-	 * @param role
+	 * @param role, if the role is null, the member will be set as a participant
 	 * @return true if it worked and false if the jid was already there
 	 * @throws CommunicationException 
 	 */
-	boolean addMember(String jid, MembershipType role) throws  CommunicationException{
+	public boolean addMember(String jid, MembershipType role) throws  CommunicationException{
 		
+		
+		LOG.info("add member invoked");
+		if (role == null)
+			role = MembershipType.participant; // default role is participant
 		
 		if (membersCss.add(new CisParticipant(jid, role))){
 			// should we send a XMPP notification to all the users to say that the new member has been added to the group
 			// I thought of that as a way to tell the participants CIS Managers that there is a new participant in that group
 			// and the GUI can be updated with that new member
+			LOG.info("new member added, going to notify community");
 			
-			
-			// 1) Sending message to user to notify that he is now member of the community
-			// creating payload 
-			Community c = new Community();
-			c.setJoin("");
-			
-			IIdentity targetCssIdentity = new IdentityImpl(jid);
+			// 1) Notifying the added user
 
-			Stanza s = new Stanza(targetCssIdentity);
-			CISendpoint.sendMessage(s, c);
 			
-			// 2) Sending a notification to all the other users // TODO: probably change this to a thread that process a queue or similar
+			CommunityManager cMan = new CommunityManager();
+			SubscribedTo s = new SubscribedTo();
+			s.setCisJid(this.getCisId());
+			s.setCisRole(role.toString());
+			cMan.setSubscribedTo(s);
+			
+			
+			LOG.info("finished building notification");
+
+			IIdentity targetCssIdentity = new IdentityImpl(jid);
+			Stanza sta = new Stanza(targetCssIdentity);
+			CISendpoint.sendMessage(sta, cMan);
+					
+			LOG.info("notification sent to the new user");
+			
+			//2) Sending a notification to all the other users // TODO: probably change this to a thread that process a queue or similar
 			
 			//creating payload
-			c = new Community();
-			Who w = new Who();
 			Participant p = new Participant();
 			p.setJid(jid);
 			p.setRole( ParticipantRole.fromValue(role.toString())  );
-			w.getParticipant().add(p);
+			Community c = new Community();
+			Who w = new Who();
+			w.getParticipant().add(p);// p has been set on the 1st message
 			c.setWho(w);
 			// sending to all members
 			
@@ -202,14 +269,14 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 			
 			while(it.hasNext()){
 				CisParticipant element = it.next();
+				LOG.info("sending notification to " + element.getMembersJid());
 				targetCssIdentity = new IdentityImpl(element.getMembersJid());
-				Stanza sta = new Stanza(targetCssIdentity);
+				sta = new Stanza(targetCssIdentity);
 				CISendpoint.sendMessage(sta, c);
 				
 		     }
-			
-			
-			
+			LOG.info("notification sents to the existing user");
+
 			return true;
 		}else{
 			return false;
@@ -255,7 +322,7 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 		if (cisRecord == null) {
 			if (other.cisRecord != null)
 				return false;
-		} else if (!cisRecord.equals(other.cisRecord))
+		} else if (cisRecord.equals(other.cisRecord) == false)
 			return false;
 		return true;
 	}
@@ -282,24 +349,38 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 		LOG.info("get Query received");
 		if (payload.getClass().equals(Community.class)) {
 			Community c = (Community) payload;
+
 			// JOIN
 			if (c.getJoin() != null) {
+				String jid = "";
 				LOG.info("join received");
-				String jid = stanza.getFrom().getBareJid();
+				String senderjid = stanza.getFrom().getBareJid();
 				boolean addresult = false; 
-				try{ 
-					addresult = this.addMember(jid, MembershipType.participant);
+				try{
+					if(c.getJoin().getParticipant() != null){
+						jid = c.getJoin().getParticipant().getJid();
+						addresult = this.addMember(jid, MembershipType.participant);
+					}
+						
 				}catch(CommunicationException e){
-					;
+					e.printStackTrace();
 				}
-				if(!addresult){
-					Community result = new Community();
-					result.setJoin("error");
-					return result;
+				Community result = new Community();
+				if(addresult == false){
+					result.setJoin(new Join());
 				}
 				else{
-					return null;
+					
+					Participant p = new Participant();
+					p.setJid(jid);
+					p.setRole( ParticipantRole.fromValue("participant")  );
+					Subscription sub = new Subscription();
+					sub.setParticipant(p);
+					result.setSubscription(sub);
+					
 				}
+				return result;
+
 				//return result;
 			}
 			if (c.getLeave() != null) {
@@ -335,6 +416,33 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 				return result;
 				// END OF WHO
 			}
+			if (c.getAdd() != null) {
+				// ADD
+				Community result = new Community();
+				Add a = new Add();
+				result.setAdd(a);
+
+				//TODO: possibly check that the sender is the owner of the CSS
+				Participant p = c.getAdd().getParticipant();
+				if(p!= null && p.getJid() != null){
+					String role = "";
+					if (p.getRole() != null)				
+						role = p.getRole().value();
+					
+					try{
+						if(this.addMember(p.getJid(), MembershipType.valueOf(role))){
+							a.setParticipant(p);
+						}
+					}
+					catch(Exception e){
+						e.printStackTrace();
+					}
+				}
+				return result;
+				// END OF ADD
+			}
+
+			
 		}
 		return null;
 	}
@@ -357,7 +465,15 @@ public class CisEditor implements ICisEditor, IFeatureServer {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
+
+	public String getCisId() {
 	
+		return this.cisRecord.getCisId();
+	}
+
+
 	
 
     

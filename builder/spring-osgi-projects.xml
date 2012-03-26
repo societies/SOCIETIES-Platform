@@ -44,6 +44,8 @@
 		
 		<!-- Utilities -->
 		<module>../utilities/DBC</module>
+		<module>../common-modules/data-source</module>
+		<module>../common-modules/hibernate_classes</module>
 
 		<!-- API -->
 		<module>../api/schema/external</module>
@@ -66,77 +68,57 @@
 		<!-- Platform Infrastructure -->
 		<!-- Communications Infrastructure -->
 		<module>../platform-infrastructure/comms-frwk/CommonLibraries</module>
-		<module>../platform-infrastructure/comms-frwk/CommunicationFrameworkCommons
-		</module>
-		<module>../platform-infrastructure/comms-frwk/XCCommunicationMgr
-		</module>
-		<!-- <module>../platform-infrastructure/comms-frwk/DataFormsXEP</module>  -->
-		<!-- <module>../platform-infrastructure/comms-frwk/PubsubXEP</module> -->
-		<module>../platform-infrastructure/comms-frwk/PubsubServiceBundle
-		</module>
-		<module>../platform-infrastructure/comms-frwk/PubsubClientBundle
-		</module>
-
-		<!-- <module>../platform-infrastructure/comms-frwk/ExampleServices/Calculator</module> 
-			<module>../platform-infrastructure/comms-frwk/ExampleServices/CalculatorBean</module> 
-			<module>../platform-infrastructure/comms-frwk/ExampleServices/FortuneCookie</module> 
-			<module>../platform-infrastructure/comms-frwk/ExampleServices/FortuneCookieBean</module> 
-			<module>../platform-infrastructure/comms-frwk/ExampleServices/ExampleServiceMgr</module> -->
-		<!-- Service Registry -->
-
-		<module>../css-modules/serviceRegistry</module>
-
-		<module>../platform-infrastructure/service-lifecycle/service-mgmt/
-		</module>
-		<!-- 
-		<module>../platform-infrastructure/service-lifecycle/platform-webapp/
-		</module>
+		<module>../platform-infrastructure/comms-frwk/CommunicationFrameworkCommons</module>
+		<module>../platform-infrastructure/comms-frwk/XCCommunicationMgr</module>
+		<module>../platform-infrastructure/comms-frwk/PubsubServiceBundle</module>
+		<module>../platform-infrastructure/comms-frwk/PubsubClientBundle</module>
+		<module>../platform-infrastructure/comms-frwk/EventMgmtBundle</module>
+		<!-- Example 3rd party services
+		<module>../platform-infrastructure/comms-frwk/ExampleServices/Calculator</module>  
+		<module>../platform-infrastructure/comms-frwk/ExampleServices/FortuneCookie</module>  
+		<module>../platform-infrastructure/comms-frwk/ExampleServices/ComplexServiceBundle</module>
+		<module>../platform-infrastructure/comms-frwk/ExampleServices/ExampleServiceMgr</module> 
 		-->
-		<module>../platform-infrastructure/service-lifecycle/sl-comms-mgr/
-		</module>
-
-		<!-- <module>../platform-infrastructure/comms-frwk/ClientCommunicationMgr</module> -->
+		<!-- Service Registry -->
+		<module>../css-modules/serviceRegistry</module>
+		<module>../platform-infrastructure/service-lifecycle/service-mgmt/</module>
+		<module>../platform-infrastructure/service-lifecycle/sl-comms-mgr/</module>
 
 		<!-- Security and Dependability Mgmt -->
+		<module>../platform-infrastructure/security/SecurityServices</module>
+		<module>../platform-infrastructure/security/PolicyNegotiator</module>
+		<module>../platform-infrastructure/security/SecurityCommsMgr</module>
 
 		<!-- CSS Mgmt -->
 
+		<module>../css-modules/css-registry</module>
 		<module>../css-modules/css-mgmt/cssCommsMgmt</module>
 		<module>../css-modules/css-mgmt/cssmgmt</module>
 		<module>../css-modules/css-mgmt/TestccsCommsMgmt</module>
 
 		<!-- CIS Mgmt -->
-		
-		<module>../cis-modules/cis-management/cis-manager/cis-manager/
-		</module>
+		<module>../cis-modules/cis-management/cis-manager/cis-manager/</module>
 		<module>../cis-modules/cis-discovery/</module>
 		<module>../cis-modules/cis-collaboration/</module>
-		<!-- <module>../cis-modules/cis-management/CommunityXEP</module>
-		<module>../cis-modules/cis-management/cis-comm-manager/</module>
-		-->
-		<!-- <module>../cis-modules/cis-management/CommunityXEP</module> <module>../cis-modules/cis-management/CommunityServiceBundle</module> -->
-
 
 		<!-- Device Mgmt -->
 		<module>../css-modules/device-mgmt/devicemanager/</module>
 		<module>../css-modules/device-mgmt/DeviceRegistry/</module>
 		<module>../css-modules/device-mgmt/RegSynchroniser/</module>
 		<module>../css-modules/device-mgmt/DeviceCommsMgr/</module>
-
 	
 		<!-- Intelligent Community Orchestration -->
-
-		<module>../intelligent-community-orchestration/API
-		</module>
-		<module>../intelligent-community-orchestration/CommunityLifecycleManagement
-		</module>
-		<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser
-		</module>
+		<module>../intelligent-community-orchestration/API</module>
+		<module>../intelligent-community-orchestration/CommunityLifecycleManagement</module>
+		<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser</module>
 
 		<!-- Context Management -->
 
 		<!-- Privacy Mgmt -->
-		<!-- <module>../privacy-trust/privacy-protection</module>  -->
+		<module>../privacy-trust/privacy-protection</module>
+
+		<!-- PlatForm Web App -->	
+		<module>../platform-infrastructure/service-lifecycle/platform-webapp/</module>
 
 	</modules>
 </project>

@@ -25,6 +25,10 @@
 
 package org.societies.api.internal.security.policynegotiator;
 
+import java.util.concurrent.Future;
+
+import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
+
 /**
  * Interface for invoking the provider.
  * To be used by Security Group Comms Manager locally (on same node) in server mode.
@@ -37,11 +41,9 @@ public interface INegotiationProvider {
 	/**
 	 * Get all available options for the policy.
 	 * 
-	 * @param callback The callback to be invoked to return the result.
-	 * 
 	 * @return All available options embedded in a single XML document.
 	 */
-	public void getPolicyOptions(INegotiationProviderCallback callback);
+	public Future<SlaBean> getPolicyOptions(String serviceId);
 
 	/**
 	 * Accept given policy option and get the final legal agreement signed by
@@ -54,14 +56,18 @@ public interface INegotiationProvider {
 	 * 
 	 * @param modified True if policy option has been changed during the
 	 * negotiation process. False if policy is as provided by the provider side.
+	 * 
+	 * @return The final legal agreement signed by both parties.
 	 */
-	public void acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
-			boolean modified, INegotiationProviderCallback callback);
+	public Future<SlaBean> acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
+			boolean modified);
 	
 	/**
 	 * Reject all options and terminate negotiation.
 	 * 
 	 * @param sessionId ID of this session
+	 * 
+	 * @return success status in {@link SlaBean#isSuccess()}
 	 */
-	public void reject(int sessionId);
+	public Future<SlaBean> reject(int sessionId);
 }

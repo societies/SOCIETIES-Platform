@@ -56,9 +56,15 @@
 	<modules>
 		<module>Personalisation-API</module>
 		<module>PersonalisationManager</module>
+		<module>CAUITaskManager</module>
+		<module>CAUIDiscovery</module>
+		<module>CAUIPrediction</module>
 		<module>UserPreferenceManagement</module>
 		<module>UserPreferenceLearning</module>
 		<module>DIANNE</module>
+		<module>CRISTUserIntentDiscovery</module>
+		<module>CRISTUserIntentPrediction</module>
+		<module>CRISTUserIntentTaskManager</module>
 		<module>Personalisation-Bundle</module>
 	</modules>
 </project>

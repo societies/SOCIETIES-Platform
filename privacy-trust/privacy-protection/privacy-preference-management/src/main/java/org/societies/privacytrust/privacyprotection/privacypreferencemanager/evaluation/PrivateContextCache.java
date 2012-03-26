@@ -38,7 +38,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 public class PrivateContextCache {
 	
@@ -171,8 +171,8 @@ public class PrivateContextCache {
 
 	private class Pair{
 		private String type;
-		private IServiceResourceIdentifier id;
-		Pair(String serviceType, IServiceResourceIdentifier serviceID){
+		private ServiceResourceIdentifier id;
+		Pair(String serviceType, ServiceResourceIdentifier serviceID){
 			this.setServiceType(serviceType);
 			this.setServiceId(serviceID);
 		}
@@ -182,10 +182,10 @@ public class PrivateContextCache {
 		public String getServiceType() {
 			return type;
 		}
-		public void setServiceId(IServiceResourceIdentifier id) {
+		public void setServiceId(ServiceResourceIdentifier id) {
 			this.id = id;
 		}
-		public IServiceResourceIdentifier getServiceId() {
+		public ServiceResourceIdentifier getServiceId() {
 			return this.id;
 		}
 		

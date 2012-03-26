@@ -28,7 +28,7 @@
   			</osgi:interfaces>
   			<osgi:service-properties>
 				<entry key="event.topics" value="LightSensorEvent"/>
-				<entry key="event.filter" value="(macAddress=3b.6d.23.75)"/>
+				<!-- <entry key="event.filter" value="(macAddress=3b.6d.23.75)"/> -->
 				<entry key="org.eclipse.virgo.service.scope" value="global" />
 			</osgi:service-properties>
 		</osgi:service>
