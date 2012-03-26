@@ -151,7 +151,7 @@ public class CommsClient implements INegotiationProviderRemote {
 	 */
 	@Override
 	@Async
-	public void reject(int sessionId) {
+	public void reject(int sessionId, INegotiationProviderCallback callback) {
 		
 		LOG.debug("reject({})", sessionId);
 		
@@ -171,8 +171,8 @@ public class CommsClient implements INegotiationProviderRemote {
 		provider.setMethod(MethodType.REJECT);
 		
 		try {
-			// Send message
-			commMgr.sendMessage(stanza, provider);
+			// Send information query
+			commMgr.sendIQGet(stanza, provider, clientCallback);
 			LOG.debug("reject({}): message sent to {}", sessionId, toIdentity.getJid());
 		} catch (CommunicationException e) {
 			LOG.warn("reject({}): could not send message to " + toIdentity.getJid(), sessionId, e);

@@ -30,16 +30,12 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.identity.IIdentityManager;
-import org.societies.api.schema.security.policynegotiator.ProviderBean;
 import org.societies.api.schema.security.policynegotiator.ProviderBeanResult;
 import org.societies.api.schema.security.policynegotiator.SlaBean;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
 
 /**
  * Comms Client Callback that receives results from remote method invocations
@@ -105,35 +101,46 @@ public class CommsClientCallback implements ICommCallback {
 		LOG.debug("receiveMessage(): stanza.id   = ", stanza.getId());
 		LOG.debug("receiveMessage(): stanza.from = ", stanza.getFrom());
 		LOG.debug("receiveMessage(): stanza.to   = ", stanza.getTo());
-		
-		if (payload != null && payload instanceof ProviderBean) {
-			
-			// Method parameters
-			ProviderBean providerBean = (ProviderBean) payload;
-			String serviceId = providerBean.getServiceId();
-			int sessionId = providerBean.getSessionId();
-			String signedPolicyOption = providerBean.getSignedPolicyOption();
-			boolean isModified = providerBean.isModified();
-			
-			LOG.debug("receiveMessage(): NegotiationProvider. Method: " + providerBean.getMethod());
-			LOG.debug("receiveMessage(): NegotiationProvider. Params: " + serviceId + ", " +
-					isModified + ", " +	sessionId + ", " + signedPolicyOption);
-		}
-	}
 
-	@Override
-	public void receiveResult(Stanza returnStanza, Object msgBean) {
-		
-		LOG.debug("receiveResult({}, {})", returnStanza, msgBean);
-		
-		if (msgBean instanceof ProviderBeanResult) {
+		if (payload instanceof ProviderBeanResult) {
 			
-			ProviderBeanResult providerResult = (ProviderBeanResult) msgBean;
+			ProviderBeanResult providerResult = (ProviderBeanResult) payload;
 			SlaBean result = providerResult.getSlaBean();
 			
 			int sessionId = result.getSessionId();
 			String sla = result.getSla();
-			LOG.debug("receiveResult(): sessionId = {}, sla = {}", sessionId, sla);
+			boolean success = result.isSuccess();
+			
+			LOG.debug("receiveMessage(): success = {}, sessionId = {}, sla = " + sla,
+					sessionId, success);
+		}
+		else {
+			LOG.warn("receiveMessage(): unexpected payload type {}", payload);
+		}
+	}
+
+	@Override
+	public void receiveResult(Stanza stanza, Object payload) {
+		
+		LOG.debug("receiveResult({}, {})", stanza, payload);
+		LOG.debug("receiveResult(): stanza.id   = ", stanza.getId());
+		LOG.debug("receiveResult(): stanza.from = ", stanza.getFrom());
+		LOG.debug("receiveResult(): stanza.to   = ", stanza.getTo());
+		
+		if (payload instanceof ProviderBeanResult) {
+			
+			ProviderBeanResult providerResult = (ProviderBeanResult) payload;
+			SlaBean result = providerResult.getSlaBean();
+
+			int sessionId = result.getSessionId();
+			String sla = result.getSla();
+			boolean success = result.isSuccess();
+
+			LOG.debug("receiveResult(): success = {}, sessionId = {}, sla = " + sla,
+					sessionId, success);
+		}
+		else {
+			LOG.warn("receiveResult(): unexpected payload type {}", payload);
 		}
 	}
 

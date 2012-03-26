@@ -29,6 +29,7 @@
 	<!-- Other datatypes do not require the additional "element" node -->
 	<xs:complexType name="slaBean">
 		<xs:sequence>
+			<xs:element name="success" type="xs:boolean"/>
 			<xs:element name="sessionId" type="xs:int"/>
 			<xs:element name="sla" type="xs:string" minOccurs="0"/>
 		</xs:sequence>
