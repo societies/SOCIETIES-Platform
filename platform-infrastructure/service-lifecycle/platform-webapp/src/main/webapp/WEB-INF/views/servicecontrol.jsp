@@ -32,7 +32,7 @@
 		<form:errors path="*" cssClass="errorblock" element="div" />
 		<table>
 			<tr>
-				<td>Service Discovery Methods: </td>
+				<td>Service Control Methods: </td>
 					<td><form:select path="method" >
 					   <form:option value="NONE" label="--- Select ---" />
 					   <form:options items="${methods}" />
