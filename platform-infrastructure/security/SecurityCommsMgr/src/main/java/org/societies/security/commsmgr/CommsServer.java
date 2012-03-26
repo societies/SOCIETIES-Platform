@@ -40,10 +40,10 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationRequester;
-import org.societies.api.schema.security.policynegotiator.MethodType;
-import org.societies.api.schema.security.policynegotiator.ProviderBean;
-import org.societies.api.schema.security.policynegotiator.ProviderBeanResult;
-import org.societies.api.schema.security.policynegotiator.SlaBean;
+import org.societies.api.internal.schema.security.policynegotiator.MethodType;
+import org.societies.api.internal.schema.security.policynegotiator.ProviderBean;
+import org.societies.api.internal.schema.security.policynegotiator.ProviderBeanResult;
+import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 
 //@Component
 public class CommsServer implements IFeatureServer {
@@ -51,10 +51,10 @@ public class CommsServer implements IFeatureServer {
 	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-			  Arrays.asList("http://societies.org/api/schema/security/policynegotiator"
+			  Arrays.asList("http://societies.org/api/internal/schema/security/policynegotiator"
 					  ));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
-			  Arrays.asList("org.societies.api.schema.security.policynegotiator"
+			  Arrays.asList("org.societies.api.internal.schema.security.policynegotiator"
 					  ));
 	
 	private ICommManager commMgr;
@@ -156,29 +156,35 @@ public class CommsServer implements IFeatureServer {
 			
 			MethodType method = providerBean.getMethod();
 			
-			LOG.debug("getQuery(): NegotiationProvider. Method: " + providerBean.getMethod());
+			LOG.debug("getQuery(): NegotiationProvider. Method: " + method);
 			LOG.debug("getQuery(): NegotiationProvider. Params: " + serviceId + ", " +
 					isModified + ", " +	sessionId + ", " + signedPolicyOption);
 
-			switch (providerBean.getMethod()) {
-			case GET_POLICY_OPTIONS:
-				LOG.debug("getQuery(): NegotiationProvider.getPolicyOptions({})", serviceId);
-				resultFuture = negotiationProvider.getPolicyOptions(serviceId);
-				try {
-					resultBean = resultFuture.get();
-					result.setSlaBean(resultBean);
-				} catch (InterruptedException e) {
-					LOG.warn("getQuery()", e);
-				} catch (ExecutionException e) {
-					LOG.warn("getQuery()", e);
+				switch (method) {
+				case GET_POLICY_OPTIONS:
+					LOG.debug("getQuery(): NegotiationProvider.getPolicyOptions({})", serviceId);
+					resultFuture = negotiationProvider.getPolicyOptions(serviceId);
+					break;
+				case ACCEPT_POLICY_AND_GET_SLA:
+					resultFuture = negotiationProvider.acceptPolicyAndGetSla(sessionId,
+							signedPolicyOption, isModified);
+					break;
+				case REJECT:
+					// LOG.warn("getQuery(): Method {} returns void and should not be handled here.",
+					// method);
+					resultFuture = negotiationProvider.reject(sessionId);
+					break;
+				default:
+					LOG.warn("getQuery(): unrecognized method: {}", method);
+					return null;
 				}
-				break;
-			case ACCEPT_POLICY_AND_GET_SLA:
-				negotiationProvider.acceptPolicyAndGetSla(sessionId, signedPolicyOption, isModified);
-				break;
-			case REJECT:
-				LOG.warn("getQuery(): Method {} returns void and should not be handled here.", method);
-				break;
+			try {
+				resultBean = resultFuture.get();
+				result.setSlaBean(resultBean);
+			} catch (InterruptedException e) {
+				LOG.warn("getQuery()", e);
+			} catch (ExecutionException e) {
+				LOG.warn("getQuery()", e);
 			}
 		}
 		
@@ -222,7 +228,7 @@ public class CommsServer implements IFeatureServer {
 			LOG.debug("receiveMessage(): NegotiationProvider. Params: " + serviceId + ", " +
 					isModified + ", " +	sessionId + ", " + signedPolicyOption);
 			
-			switch (providerBean.getMethod()) {
+			switch (method) {
 			case GET_POLICY_OPTIONS:
 				LOG.warn("receiveMessage(): Method {} returns a value and should not be handled here.", method);
 				break;
@@ -230,7 +236,8 @@ public class CommsServer implements IFeatureServer {
 				LOG.warn("receiveMessage(): Method {} returns a value and should not be handled here.", method);
 				break;
 			case REJECT:
-				negotiationProvider.reject(sessionId);
+				//negotiationProvider.reject(sessionId);
+				LOG.warn("receiveMessage(): Method {} returns a value and should not be handled here.", method);
 				break;
 			}
 		}

@@ -31,8 +31,8 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
-import org.societies.api.schema.security.policynegotiator.MethodType;
-import org.societies.api.schema.security.policynegotiator.ProviderBean;
+import org.societies.api.internal.schema.security.policynegotiator.MethodType;
+import org.societies.api.internal.schema.security.policynegotiator.ProviderBean;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -104,6 +104,17 @@ public class CommsClient implements INegotiationProviderRemote {
 			boolean modified, INegotiationProviderCallback callback) {
 		
 		LOG.debug("acceptPolicyAndGetSla({}, ...)", sessionId);
+		
+		IIdentity toIdentity;
+		try {
+			toIdentity = idMgr.fromJid("xcmanager.societies.local");
+		} catch (InvalidFormatException e) {
+			LOG.error("acceptPolicyAndGetSla({}): ", sessionId, e);
+			return;
+		}
+
+		sendIQ(toIdentity, MethodType.ACCEPT_POLICY_AND_GET_SLA, null,
+				sessionId, signedPolicyOption, modified);
 	}
 
 	/*
@@ -127,20 +138,8 @@ public class CommsClient implements INegotiationProviderRemote {
 			LOG.error("getPolicyOptions({}): ", serviceId, e);
 			return;
 		}
-		
-		Stanza stanza = new Stanza(toIdentity);
 
-		// Create message bean
-		ProviderBean provider = new ProviderBean();
-		provider.setServiceId(serviceId);
-		provider.setMethod(MethodType.GET_POLICY_OPTIONS);
-		try {
-			// Send information query
-			commMgr.sendIQGet(stanza, provider, clientCallback);
-			LOG.debug("getPolicyOptions({}): message sent to {}", serviceId, toIdentity.getJid());
-		} catch (CommunicationException e) {
-			LOG.warn("getPolicyOptions({}): could not send message to " + toIdentity.getJid(), serviceId, e);
-		}
+		sendIQ(toIdentity, MethodType.GET_POLICY_OPTIONS, serviceId, -1, null, false);
 	}
 
 	/*
@@ -151,10 +150,10 @@ public class CommsClient implements INegotiationProviderRemote {
 	 */
 	@Override
 	@Async
-	public void reject(int sessionId) {
-		
+	public void reject(int sessionId, INegotiationProviderCallback callback) {
+
 		LOG.debug("reject({})", sessionId);
-		
+
 		IIdentity toIdentity;
 		try {
 			toIdentity = idMgr.fromJid("xcmanager.societies.local");
@@ -162,20 +161,33 @@ public class CommsClient implements INegotiationProviderRemote {
 			LOG.error("reject({}): ", sessionId, e);
 			return;
 		}
+
+		sendIQ(toIdentity, MethodType.REJECT, null, sessionId, null, false);
+	}
+	
+	private void sendIQ(IIdentity toIdentity, MethodType method,
+			String serviceId, int sessionId, String sla, boolean modified) {
+		
+		LOG.debug("send(" + toIdentity + ", " + method + ", " + serviceId +
+				", " + sessionId + ", ..., " + modified + ")");
 		
 		Stanza stanza = new Stanza(toIdentity);
-
+		stanza.setId(StanzaIdGenerator.next());
+		
 		// Create message bean
 		ProviderBean provider = new ProviderBean();
+		provider.setMethod(method);
+		provider.setServiceId(serviceId);
 		provider.setSessionId(sessionId);
-		provider.setMethod(MethodType.REJECT);
+		provider.setSignedPolicyOption(sla);
+		provider.setModified(modified);
 		
 		try {
-			// Send message
-			commMgr.sendMessage(stanza, provider);
-			LOG.debug("reject({}): message sent to {}", sessionId, toIdentity.getJid());
+			// Send information query
+			commMgr.sendIQGet(stanza, provider, clientCallback);
+			LOG.debug("send({}): IQ sent to {}", sessionId, toIdentity.getJid());
 		} catch (CommunicationException e) {
-			LOG.warn("reject({}): could not send message to " + toIdentity.getJid(), sessionId, e);
+			LOG.warn("send({}): could not send IQ to " + toIdentity.getJid(), sessionId, e);
 		}
 	}
 }

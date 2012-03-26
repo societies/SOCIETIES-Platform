@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema  elementFormDefault="qualified" version="1.0" 
-            targetNamespace="http://societies.org/api/schema/security/policynegotiator"
-            xmlns:tns="http://societies.org/api/schema/security/policynegotiator"
+			targetNamespace="http://societies.org/api/internal/schema/security/policynegotiator"
+			xmlns:tns="http://societies.org/api/internal/schema/security/policynegotiator"
             xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 	<!-- Message bean and result bean require the additional "element" node -->
@@ -29,6 +29,7 @@
 	<!-- Other datatypes do not require the additional "element" node -->
 	<xs:complexType name="slaBean">
 		<xs:sequence>
+			<xs:element name="success" type="xs:boolean"/>
 			<xs:element name="sessionId" type="xs:int"/>
 			<xs:element name="sla" type="xs:string" minOccurs="0"/>
 		</xs:sequence>

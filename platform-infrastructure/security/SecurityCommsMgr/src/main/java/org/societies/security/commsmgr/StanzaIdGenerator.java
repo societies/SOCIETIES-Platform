@@ -22,52 +22,28 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package org.societies.api.internal.security.policynegotiator;
-
-import java.util.concurrent.Future;
-
-import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
+package org.societies.security.commsmgr;
 
 /**
- * Interface for invoking the provider.
- * To be used by Security Group Comms Manager locally (on same node) in server mode.
  * 
+ *
  * @author Mitja Vardjan
  *
  */
-public interface INegotiationProvider {
+public class StanzaIdGenerator {
 
-	/**
-	 * Get all available options for the policy.
-	 * 
-	 * @return All available options embedded in a single XML document.
-	 */
-	public Future<SlaBean> getPolicyOptions(String serviceId);
-
-	/**
-	 * Accept given policy option and get the final legal agreement signed by
-	 * both parties.
-	 * 
-	 * @param sessionId ID of this session
-	 * 
-	 * @param signedPolicyOption The selected policy alternative, accepted and
-	 * signed by the requester side. Includes requester identity and signature.
-	 * 
-	 * @param modified True if policy option has been changed during the
-	 * negotiation process. False if policy is as provided by the provider side.
-	 * 
-	 * @return The final legal agreement signed by both parties.
-	 */
-	public Future<SlaBean> acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
-			boolean modified);
+	private static int counter = 0;
 	
+	private static int nextInt() {
+		return counter++;
+	}
+
 	/**
-	 * Reject all options and terminate negotiation.
+	 * Generates a number that is increased by one with each call. Starting with zero.
 	 * 
-	 * @param sessionId ID of this session
-	 * 
-	 * @return success status in {@link SlaBean#isSuccess()}
+	 * @return String representation of next number
 	 */
-	public Future<SlaBean> reject(int sessionId);
+	public static String next() {
+		return String.valueOf(nextInt());
+	}
 }
