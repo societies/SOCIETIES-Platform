@@ -2,9 +2,7 @@ package org.societies.api.internal.sns;
 
 import java.util.List;
 
-import org.apache.shindig.social.opensocial.model.ActivityEntry;
-import org.apache.shindig.social.opensocial.model.Group;
-import org.apache.shindig.social.opensocial.model.Person;
+
 
 public interface ISocialData {
 
