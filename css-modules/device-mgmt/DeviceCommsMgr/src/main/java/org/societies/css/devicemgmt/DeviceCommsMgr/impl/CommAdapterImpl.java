@@ -28,12 +28,18 @@ package org.societies.css.devicemgmt.DeviceCommsMgr.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBException;
 
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.css.devicemgmt.comm.DmCommManager;
+import org.societies.api.internal.css.devicemgmt.comm.EventsType;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.societies.api.schema.css.devicemanagment.DmEvent;
 import org.societies.comm.xmpp.event.PubsubEvent;
@@ -49,33 +55,35 @@ import org.societies.comm.xmpp.event.PubsubEventStream;
  */
 public class CommAdapterImpl implements DmCommManager{
 
-	public static final String DEVICE_CONNECTED = "DEVICE_REGISTERED";
-	public static final String DEVICE_DISCONNECTED = "DEVICE_DISCONNECTED";
-	public static final String DATA_CAHNGED_PREFIX_EVENT = "DEVICE_DATA_CAHNGED_PREFIX";
 	public static final String JID = "XCManager.societies.local";
 	public static final String SCHEMA = "org.societies.api.schema.css.devicemanagement";
 
 	private IIdentityManager idManager;
 	private ICommManager commManager;
+	private PubsubClient pubSubManager;
+	
 	
 	@Override
 	public void fireNewDeviceConnected(String deviceId,DeviceCommonInfo deviceCommonInfo) {
 		DmEvent dmEvent = generateEvent(deviceId, deviceCommonInfo);
-		sendEvent(DEVICE_CONNECTED, dmEvent);
+		sendEvent(EventsType.DEVICE_CONNECTED, dmEvent);
 	}
 
 	@Override
 	public void fireDeviceDisconnected(String deviceId,	DeviceCommonInfo deviceCommonInfo) {
 		DmEvent dmEvent = generateEvent(deviceId, deviceCommonInfo);
-		sendEvent(DEVICE_DISCONNECTED, dmEvent);
+		sendEvent(EventsType.DEVICE_DISCONNECTED, dmEvent);
 	}
 
 	@Override
 	public void fireDeviceDataChanged(String deviceId,DeviceCommonInfo deviceCommonInfo, String key,String value) {
+		
+		//TODO !!!!!!!  how to create owner for the "DATA_CAHNGED_PREFIX_EVENT" just once. 
+		//Should we use synch in the "fireNewDeviceConnected" method in order to create the event type
 		DmEvent dmEvent = generateEvent(deviceId, deviceCommonInfo);
 		dmEvent.setKey(key);
 		dmEvent.setValue(value);
-		String eventNodeId = DATA_CAHNGED_PREFIX_EVENT+deviceId;
+		String eventNodeId = EventsType.DATA_CAHNGED_PREFIX_EVENT+deviceId;
 		sendEvent(eventNodeId, dmEvent);
 	}
 	
@@ -87,30 +95,41 @@ public class CommAdapterImpl implements DmCommManager{
 		return dmEvent;
 	}
 	
+	@PostConstruct
+	private void init(){
+		idManager = commManager.getIdManager();
+		IIdentity pubsubID = null;
+		
+		try {
+			//we can add "."
+			//idManager.getThisNetworkNode().getJid();
+			pubsubID = idManager.fromJid("XCManager.societies.local");
+			pubSubManager.ownerCreate(pubsubID, EventsType.DEVICE_CONNECTED);
+			pubSubManager.ownerCreate(pubsubID, EventsType.DEVICE_DISCONNECTED);
+		
+		} catch (InvalidFormatException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (XMPPError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	private void sendEvent(String type, DmEvent dmEvent){
 		try{
 			idManager = commManager.getIdManager();
 			IIdentity pubsubID;
 			pubsubID = idManager.fromJid(JID);
 			
-			PubsubEventFactory eventFactory = PubsubEventFactory.getInstance(pubsubID);
-			PubsubEventStream eventStream=null;
-
-			eventStream = eventFactory.getStream(pubsubID, type);
-			//ADD LIST OF PACKAGES TO SUPPORT SCHEMA OBJECTS
 			List<String> packageList = new ArrayList<String>();
 			packageList.add(SCHEMA);
+			pubSubManager.addJaxbPackages(packageList);
+			String published = pubSubManager.publisherPublish(pubsubID, type,dmEvent.getDeviceId(), dmEvent);
 			
-			try {
-				eventStream.addJaxbPackages(packageList);
-			} catch (JAXBException e1) {
-				//ERROR RESOLVING PACKAGE NAMES - CHECK PATH IS CORRECT
-				e1.printStackTrace();
-			}
-			
-			//GENERATE EVENT
-			PubsubEvent event = new PubsubEvent(this, dmEvent);
-			eventStream.multicastEvent(event);
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -123,5 +142,14 @@ public class CommAdapterImpl implements DmCommManager{
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
 	}
+	
+	public PubsubClient getPubSubManager() {
+		return pubSubManager;
+	}
+
+	public void setPubSubManager(PubsubClient pubSubManager) {
+		this.pubSubManager = pubSubManager;
+	}
+
 }
 
