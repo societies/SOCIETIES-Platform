@@ -52,7 +52,7 @@ public class DisasterActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
 	// TODO Auto-generated method stub
 	super.onCreate(savedInstanceState);
-	// Going to ask SocialDataProvider for Cis List:
+	// Going to ask SocialProvider for Cis List:
 	ContentResolver cr = getContentResolver();
 	
 //	Uri uri;

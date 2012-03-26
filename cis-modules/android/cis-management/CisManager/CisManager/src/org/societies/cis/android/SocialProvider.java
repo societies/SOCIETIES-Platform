@@ -27,32 +27,32 @@ package org.societies.cis.android;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
 
 /**
- * This is the Android-based SocialDataProvider. It provides a content provider interface to access CIS and related data.
+ * This is the Android-based SocialProvider. It provides a content provider interface to access CIS and related data.
+ * Currently it is working with a local database due to the problems we have with the communication manager working
+ * on Android.
  * 
  * 
  * @author Babak.Farshchian@sintef.no
  *
  */
-/**
- * @author Babak.Farshchian@sintef.no
- *
- */
-public class SocialDataProvider extends ContentProvider {
+public class SocialProvider extends ContentProvider {
 
-    public static final Uri CONTENT_URI = 
-            Uri.parse("content://org.societies.cis.android.SocialDataProvider");
     
+    private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+
     private boolean online = false; // True when we are online.
-    //private DatabaseAdapter dbAdapter = null;
-    private CommunicationAdapter comAdapter = null;
+    private SocialDatabaseAdapter dbAdapter = null;
+    //private CommunicationAdapter comAdapter = null;
     /* 
      * Here I should do the following:
-     * - Create a CommunicationAdapter and try to get connection with cloud CisManager
-     * - Initiate local database if any
+     * - Create a {@link CommunicationAdapter} and try to get connection with cloud CisManager (currently not here 
+     *   due to problems with communication manager.
+     * - Initiate local database using {@link SocialDatabaseAdapter}
      * 
      * (non-Javadoc)
      * @see android.content.ContentProvider#onCreate()
@@ -61,13 +61,22 @@ public class SocialDataProvider extends ContentProvider {
     public boolean onCreate() {
 	Context context = getContext();
 	//TODO: to be used in later versions with local caching:
-	//dbAdapter = new DatabaseAdapter(context);
-	//Used to send queries over network:
-	comAdapter = new CommunicationAdapter(context);
-	comAdapter.goOnline();
-	if (comAdapter.isOnline()){
-	    online = true;
-	}
+	dbAdapter = new SocialDatabaseAdapter(context);
+	//Used to send queries over network: Currently not working.
+//	comAdapter = new CommunicationAdapter(context);
+//	comAdapter.goOnline();
+//	if (comAdapter.isOnline()){
+//	    online = true;
+//	}
+	//Construct all the legal query URIs:
+	//TODO replace with constants or move to SocialContract.
+	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people", 1);
+	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people/#", 2);
+	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "groups", 3);
+	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "groups/#", 4);
+	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "services", 5);
+	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "services/#", 6);
+
 	return false;
     }
 
@@ -96,6 +105,7 @@ public class SocialDataProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues values) {
 	// TODO Auto-generated method stub
+	
 	return null;
     }
 
@@ -131,39 +141,6 @@ public class SocialDataProvider extends ContentProvider {
      */
     public boolean isOnline(){
 	return online;
-    }
-    
-    
-    /**
-     * Provides constants for managing CIS-related queries.
-     * 
-     * @author Babak.Farshchian@sintef.no
-     *
-     */
-    public static final class Groups {
-	public static final Uri CONTENT_URI = 
-	            Uri.parse("content://org.societies.cis.android.SocialDataProvider/groups");
-	String _ID = "_id"; //Key column in the table
-	String NAME = "name"; //Name column in the group
-	String JID = "jid"; //Unique JID of the group
-	String OWNER = "owner"; //Owner CSS jid of the group
-	String CREATION_DATE = "creation_date";	
-    };
-    
-    /**
-     * Provides constants for managing CIS-related queries.
-     * 
-     * @author Babak.Farshchian@sintef.no
-     *
-     */
-    public static final class People {
-	public static final Uri CONTENT_URI = 
-	            Uri.parse("content://org.societies.cis.android.SocialDataProvider/people");
-	String _ID = "_id"; //Key column in the table
-	String NAME = "name"; //Name of the person
-	String JID = "jid"; //Unique JID of the group
-	String EMAIL = "email"; //Owner CSS jid of the group
-	String CREATION_DATE = "creation_date";	
     };
 
 }
