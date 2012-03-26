@@ -48,5 +48,5 @@ public interface INegotiationProviderRemote {
 	/**
 	 * See {@link INegotiationProvider#reject(int)}
 	 */
-	public void reject(int sessionId);
+	public void reject(int sessionId, INegotiationProviderCallback callback);
 }

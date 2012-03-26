@@ -65,7 +65,7 @@ public class CommsClientCallbackUnitTest {
 	@Test
 	public void testGetJavaPackages() {
 
-		String PACKAGE = "org.societies.api.schema.security.policynegotiator";
+		String PACKAGE = "org.societies.api.internal.schema.security.policynegotiator";
 		List<String> result;
 		
 		result = classUnderTest.getJavaPackages();
@@ -80,7 +80,7 @@ public class CommsClientCallbackUnitTest {
 	@Test
 	public void testGetXMLNamespaces() {
 		
-		String NAMESPACE = "http://societies.org/api/schema/security/policynegotiator";
+		String NAMESPACE = "http://societies.org/api/internal/schema/security/policynegotiator";
 		List<String> result;
 		
 		result = classUnderTest.getXMLNamespaces();
