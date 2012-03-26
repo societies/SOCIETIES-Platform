@@ -40,10 +40,10 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationRequester;
-import org.societies.api.schema.security.policynegotiator.MethodType;
-import org.societies.api.schema.security.policynegotiator.ProviderBean;
-import org.societies.api.schema.security.policynegotiator.ProviderBeanResult;
-import org.societies.api.schema.security.policynegotiator.SlaBean;
+import org.societies.api.internal.schema.security.policynegotiator.MethodType;
+import org.societies.api.internal.schema.security.policynegotiator.ProviderBean;
+import org.societies.api.internal.schema.security.policynegotiator.ProviderBeanResult;
+import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 
 //@Component
 public class CommsServer implements IFeatureServer {
@@ -51,10 +51,10 @@ public class CommsServer implements IFeatureServer {
 	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-			  Arrays.asList("http://societies.org/api/schema/security/policynegotiator"
+			  Arrays.asList("http://societies.org/api/internal/schema/security/policynegotiator"
 					  ));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
-			  Arrays.asList("org.societies.api.schema.security.policynegotiator"
+			  Arrays.asList("org.societies.api.internal.schema.security.policynegotiator"
 					  ));
 	
 	private ICommManager commMgr;

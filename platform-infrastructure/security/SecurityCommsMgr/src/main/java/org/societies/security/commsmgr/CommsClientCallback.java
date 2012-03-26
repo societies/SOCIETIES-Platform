@@ -30,8 +30,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.schema.security.policynegotiator.ProviderBeanResult;
-import org.societies.api.schema.security.policynegotiator.SlaBean;
+import org.societies.api.internal.schema.security.policynegotiator.ProviderBeanResult;
+import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -46,10 +46,10 @@ public class CommsClientCallback implements ICommCallback {
 
 	private static final List<String> NAMESPACES = Collections
 			.unmodifiableList(Arrays.asList(
-					"http://societies.org/api/schema/security/policynegotiator"));
+					"http://societies.org/api/internal/schema/security/policynegotiator"));
 	private static final List<String> PACKAGES = Collections
 			.unmodifiableList(Arrays.asList(
-					"org.societies.api.schema.security.policynegotiator"));
+					"org.societies.api.internal.schema.security.policynegotiator"));
 
 	private static Logger LOG = LoggerFactory.getLogger(CommsClientCallback.class);
 

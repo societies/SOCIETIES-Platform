@@ -27,8 +27,7 @@ package org.societies.api.internal.security.policynegotiator;
 
 import java.util.concurrent.Future;
 
-import org.societies.api.schema.security.policynegotiator.SlaBean;
-
+import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 
 /**
  * Interface for invoking the provider.
