@@ -26,6 +26,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 package org.societies.api.android.internal.model;
 
 
+import java.util.List;
+
+import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
 
 import android.os.Parcel;
@@ -43,6 +46,143 @@ public class AndroidCSSRecord extends CssRecord implements Parcelable {
 	 */
 	public AndroidCSSRecord() {
 		super();
+	}
+	
+	public String getDomainServer() {
+		return domainServer;
+	}
+	public void setDomainServer(String domainServer) {
+		this.domainServer = domainServer;
+	}
+	public String getCssHostingLocation() {
+		return cssHostingLocation;
+	}
+	public void setCssHostingLocation(String cssHostingLocation) {
+		this.cssHostingLocation = cssHostingLocation;
+	}
+	public int getEntity() {
+		return entity;
+	}
+	public void setEntity(int entity) {
+		this.entity = entity;
+	}
+	public String getForeName() {
+		return foreName;
+	}
+	public void setForeName(String foreName) {
+		this.foreName = foreName;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getIdentityName() {
+		return identityName;
+	}
+	public void setIdentityName(String identityName) {
+		this.identityName = identityName;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public String getEmailID() {
+		return emailID;
+	}
+	public void setEmailID(String emailID) {
+		this.emailID = emailID;
+	}
+	public String getImID() {
+		return imID;
+	}
+	public void setImID(String imID) {
+		this.imID = imID;
+	}
+	public String getSocialURI() {
+		return socialURI;
+	}
+	public void setSocialURI(String socialURI) {
+		this.socialURI = socialURI;
+	}
+	public int getSex() {
+		return sex;
+	}
+	public void setSex(int sex) {
+		this.sex = sex;
+	}
+	public String getHomeLocation() {
+		return homeLocation;
+	}
+	public void setHomeLocation(String homeLocation) {
+		this.homeLocation = homeLocation;
+	}
+	public String getCssIdentity() {
+		return cssIdentity;
+	}
+	public void setCssIdentity(String cssIdentity) {
+		this.cssIdentity = cssIdentity;
+	}
+	public AndroidCSSNode[] getCSSNodes() {
+		AndroidCSSNode androidNodes [] = new AndroidCSSNode[cssNodes.size()];
+		
+		for (int i = 0; i < cssNodes.size(); i++) {
+			androidNodes[i] = (AndroidCSSNode) cssNodes.get(i);
+		}
+		return androidNodes;
+	}
+	public void setCSSNodes(AndroidCSSNode[] androidCSSNodes) {
+		cssNodes.clear();
+		for (int i = 0; i < androidCSSNodes.length; i++) {
+			cssNodes.add(androidCSSNodes[i]);
+		}
+	}
+	public int getStatus() {
+		return status;
+	}
+	public void setStatus(int status) {
+		this.status = status;
+	}
+	public String getCssRegistration() {
+		return cssRegistration;
+	}
+	public void setCssRegistration(String cssRegistration) {
+		this.cssRegistration = cssRegistration;
+	}
+	public String getCssInactivation() {
+		return cssInactivation;
+	}
+	public void setCssInactivation(String cssInactivation) {
+		this.cssInactivation = cssInactivation;
+	}
+	public int getCssUpTime() {
+		return cssUpTime;
+	}
+	public void setCssUpTime(int cssUpTime) {
+		this.cssUpTime = cssUpTime;
+	}
+	public AndroidCSSNode[] getArchivedCSSNodes() {
+		AndroidCSSNode androidNodes [] = new AndroidCSSNode[archiveCSSNodes.size()];
+		
+		for (int i = 0; i < archiveCSSNodes.size(); i++) {
+			androidNodes[i] = (AndroidCSSNode) archiveCSSNodes.get(i);
+		}
+		return androidNodes;
+	}
+	public void setArchiveCSSNodes(AndroidCSSNode[] androidArchiveCSSNodes) {
+		archiveCSSNodes.clear();
+		for (int i = 0; i < androidArchiveCSSNodes.length; i++) {
+			archiveCSSNodes.add(androidArchiveCSSNodes[i]);
+		}
+	}
+	public int getPresence() {
+		return presence;
+	}
+	public void setPresence(int presence) {
+		this.presence = presence;
 	}
 	/**
 	 * Private constructor 
@@ -63,14 +203,14 @@ public class AndroidCSSRecord extends CssRecord implements Parcelable {
 		setSex(in.readInt());
 		setHomeLocation(in.readString());
 		setCssIdentity(in.readString());
-//		setCssNodes((AndroidCSSNode[]) in.readParcelableArray(AndroidCSSNode.class.getClassLoader()));
+		setCSSNodes((AndroidCSSNode[]) in.readParcelableArray(AndroidCSSNode.class.getClassLoader()));
 		setStatus(in.readInt());
 		setCssRegistration(in.readString());
 		setCssInactivation(in.readString());
 		setCssUpTime(in.readInt());
 		
 //		CSSDevice encounteredCIS[] = null;
-//		setArchiveCSSNodes((AndroidCSSNode[]) in.readParcelableArray(AndroidCSSNode.class.getClassLoader()));
+		setArchiveCSSNodes((AndroidCSSNode[]) in.readParcelableArray(AndroidCSSNode.class.getClassLoader()));
 		setPresence(in.readInt());
 
 	}
@@ -95,14 +235,14 @@ public class AndroidCSSRecord extends CssRecord implements Parcelable {
 		out.writeInt(getSex());
 		out.writeString(getHomeLocation());
 		out.writeString(getCssIdentity());
-//		out.writeParcelableArray((AndroidCSSNode[])getCssNodes(), 0);
+		out.writeParcelableArray(getCSSNodes(), 0);
 		out.writeInt(getStatus());
 		out.writeString(getCssRegistration());
 		out.writeString(getCssInactivation());
 		out.writeInt(getCssUpTime());
 		
 //		CSSDevice encounteredCIS[] = null;
-//		out.writeParcelableArray((AndroidCSSNode[]) getArchiveCSSNodes(), 0);
+		out.writeParcelableArray(getArchivedCSSNodes(), 0);
 		out.writeInt(getPresence());
 
 	}

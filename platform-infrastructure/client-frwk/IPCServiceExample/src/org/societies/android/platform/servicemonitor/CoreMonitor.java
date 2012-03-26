@@ -56,7 +56,6 @@ public class CoreMonitor extends Service implements ICoreServiceMonitor {
 	public void onCreate () {
 		this.inMessenger = new Messenger(new RemoteServiceHandler(this.getClass(), this));
 		Log.i(LOG_TAG, "Service starting");
-
 	}
 	
 //	class IncomingHandler extends Handler {
