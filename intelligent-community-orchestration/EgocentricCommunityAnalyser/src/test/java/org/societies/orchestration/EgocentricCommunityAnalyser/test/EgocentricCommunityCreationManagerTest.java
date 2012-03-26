@@ -29,6 +29,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Future;
+import java.util.Calendar;
 
 import org.junit.Assert;
 
@@ -104,14 +105,21 @@ public class EgocentricCommunityCreationManagerTest {
     	
     	try {
 			if (userCtxBroker != null)
-    		    userCtxBroker.createAttribute(entityId, "proximity");
+    		    userCtxBroker.createAttribute(entityId, "proximity: donald, douglas");
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+    	
+    	
+    	egocentricCommunityCreationManager.setUserContextBroker(userCtxBroker);
+    	egocentricCommunityCreationManager.setCisManager(cisManager);
+    	
 		//check user joined CISs before
 		egocentricCommunityCreationManager.identifyCissToCreate("not extensive", null);
 		//check and compare user joined CISs after
+		boolean success = false;
+		//if (cisManager.getCisList().size() > 0) success = true;
 		
 		String[] members = new String[1];
 		members[0] = "James";
@@ -187,10 +195,12 @@ public class EgocentricCommunityCreationManagerTest {
 		//Assert.assertNull(cisManager.getCisList(new ICisRecord(null, null, null, null, null, members, null, null, null)));
 	}
     
+    @Test
     public void testCreateCisForPeopleTemporarilyUsingServiceTogether() {
     	
     }
     
+    @Test
     public void testNotCreateDuplicateCis() {
     	cisManager = mock(ICisManager.class);
     	ICisRecord cisRecord = mock(ICisRecord.class);
@@ -198,9 +208,19 @@ public class EgocentricCommunityCreationManagerTest {
     	//cisManager.addCis(ownerId, cisRecord);
     	egocentricCommunityCreationManager = new EgocentricCommunityCreationManager(ownerId, "CSS");
 		
+    	egocentricCommunityCreationManager.setCisManager(cisManager);
+    	
     	egocentricCommunityCreationManager.identifyCissToCreate("extensive", new HashMap<IIdentity, String>());
+        ICisManager resultCisManager = egocentricCommunityCreationManager.getCisManager();
+        int cisCount = 0;
+       // for (int i = 0; i < resultCisManager.getCisList().size(); i++) {
+       // 	if (resultCisManager.getCisList().get(i).getMembersList() == cisRecord.getMembersList() &&
+       // 			resultCisManager.getCisList().get(i).getMembershipCriteria() == cisRecord.getMembershipCriteria() ) cisCount++;
+        //}
+        //Assert.assertTrue(cisCount == 1);
     }
     
+    @Test
     public void testNotSuggestUndesiredCis() {
     	
     }

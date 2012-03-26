@@ -85,6 +85,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Calendar;
 
 /**
  * This is the class for the Egocentric Community Configuration Manager component

@@ -46,6 +46,8 @@ import org.societies.api.internal.cis.management.ICisRecord;
 import org.societies.api.identity.IdentityType;
 //import org.societies.api.comm.xmpp.datatypes.IdentityType;
 
+import java.util.Calendar;
+
 /**
  * This is the test class for the Egocentric Community Analyser component
  * 

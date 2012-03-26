@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Calendar;
 
 import static org.mockito.Mockito.*;
 
@@ -56,6 +57,8 @@ import org.societies.api.identity.IIdentity;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer;
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
+
+
 
 /**
  * This is the class for the Egocentric Community Analyser component
