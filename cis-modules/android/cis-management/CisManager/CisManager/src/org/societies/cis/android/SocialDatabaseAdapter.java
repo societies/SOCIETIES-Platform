@@ -40,38 +40,44 @@ import android.database.sqlite.SQLiteOpenHelper;
  * @author Babak.Farshchian@sintef.no
  *
  */
-class DatabaseAdapter {
-	private static final String DB_NAME = "groups.db";
-	private static final String TABLE_NAME = "groups";
+class SocialDatabaseAdapter {
+	private static final String DB_NAME = "societies_social.db";
+	private static final String GROUP_TABLE_NAME = "groups";
+	private static final String PEOPLE_TABLE_NAME = "people";
+	
 	private static final int DB_VERSION = 1;
 	
-	//DB column names. These are moved to SocialDataProvider.Groups
-	private static final String KEY_ID = "_id"; //Key
-	private static final String KEY_NAME = "name"; //Name of the group
-	private static final String KEY_JID = "jid"; //unique JID of the group
-	private static final String KEY_OWNER = "owner"; //Owner of the group
-	private static final String KEY_CREATION_DATE = "creation_date";	
+	//DB column names. These are moved to SocialContract.Groups
+//	private static final String KEY_ID = "_id"; //Key
+//	private static final String KEY_NAME = "name"; //Name of the group
+//	private static final String KEY_JID = "jid"; //unique JID of the group
+//	private static final String KEY_OWNER = "owner"; //Owner of the group
+//	private static final String KEY_CREATION_DATE = "creation_date";	
 	
 	
 	private SQLiteDatabase db;
 	private final Context context;
 
-	private static class CisDBOpenHelper extends SQLiteOpenHelper {
+	private static class SocialDBOpenHelper extends SQLiteOpenHelper {
 		
-		//SQL query for creating the DB:
-		private static final String DB_CREAT = "create table " + TABLE_NAME
-				+ " (" + KEY_ID + " integer primary key autoincrement, " +
-				KEY_NAME + " text not null, " + KEY_JID + " text not null, " + 
-				KEY_OWNER + " text not null, " +
-				KEY_CREATION_DATE + "text not null);";
+		//SQL query for creating the Group DB:
+		private static final String GROUP_DB_CREAT = "create table " + GROUP_TABLE_NAME
+				+ " (" + 
+				SocialContract.Groups._ID + " integer primary key autoincrement, " +
+				SocialContract.Groups.NAME + " text not null, " + 
+				SocialContract.Groups.DISPLAY_NAME + " text not null, " + 
+				SocialContract.Groups.OWNER_ID + " text not null, " +
+				SocialContract.Groups.CREATION_DATE + "text not null);";
+		//TODO: Need the same for other DBs, e.g. people.
 
+		
 		/**
 		 * @param context
 		 * @param name
 		 * @param factory
 		 * @param version
 		 */
-		public CisDBOpenHelper(Context _context, String _name,
+		public SocialDBOpenHelper(Context _context, String _name,
 				CursorFactory _factory, int _version) {
 		    super(_context, _name, _factory, _version);
 			// TODO Auto-generated constructor stub
@@ -82,7 +88,8 @@ class DatabaseAdapter {
 		 */
 		@Override
 		public void onCreate(SQLiteDatabase _db) {
-			_db.execSQL(DB_CREAT);
+			_db.execSQL(GROUP_DB_CREAT);
+			//TODO: Do the same for all other tables.
 		}
 
 		/* (non-Javadoc)
@@ -91,23 +98,24 @@ class DatabaseAdapter {
 		@Override
 		public void onUpgrade(SQLiteDatabase _db, int _oldVersion, int _newVersion) {
 			// Drop the old table:
-			_db.execSQL("drop table if exists " + TABLE_NAME);
+			_db.execSQL("drop table if exists " + GROUP_TABLE_NAME);
+			//TODO: Do the same for all other tables.
 			// Create a new table:
 			onCreate(_db);
 		}
 	}
-	private CisDBOpenHelper dbHelper;
+	private SocialDBOpenHelper dbHelper;
 	
-	public DatabaseAdapter(Context _context){
+	public SocialDatabaseAdapter(Context _context){
 		this.context = _context;
-		dbHelper = new CisDBOpenHelper(context, DB_NAME, null, DB_VERSION);
+		dbHelper = new SocialDBOpenHelper(context, DB_NAME, null, DB_VERSION);
 	}
 	
-	public void close(){
+	public void closeDB(){
 		db.close();
 	}
 	
-	public void open() throws SQLiteException {
+	public void openDB() throws SQLiteException {
 		try{
 			db = dbHelper.getWritableDatabase();
 		} catch (SQLiteException ex){
@@ -117,70 +125,84 @@ class DatabaseAdapter {
 	
 
 	/**
-	 * Insert a row with community data into the database.
+	 * Insert a row with CIS data into the database.
 	 * @param _community
 	 * @return
 	 */
 	public long insertCis(ICisRecord _cis){
 		// Create a new row of values to insert: 
 		ContentValues newValues = new ContentValues();
-		newValues.put(KEY_NAME, _cis.getName());
-		newValues.put(KEY_JID, _cis.getCisId());
-		newValues.put(KEY_OWNER, _cis.getOwnerId());
+		newValues.put(SocialContract.Groups._ID, _cis.getCisId());
+		newValues.put(SocialContract.Groups.NAME, _cis.getName());
+		newValues.put(SocialContract.Groups.OWNER_ID, _cis.getOwnerId());
+		newValues.put(SocialContract.Groups.DISPLAY_NAME, _cis.getUserDefineName());
 //		newValues.put(KEY_CREATION_DATE, _cis.getCreationDate());
 		//Insert the row:
-		return db.insert(TABLE_NAME, null, newValues);
+		return db.insert(GROUP_TABLE_NAME, null, newValues);
 	}
 	
 	/**
-	 * Remove a community from the database.
+	 * Remove a CIS from the database.
 	 * @param _rowIndex
 	 * @return
 	 */
-	public boolean removeCis(long _rowIndex){
-		return db.delete(TABLE_NAME, KEY_ID + "=" + _rowIndex, null) > 0;
+	public boolean deleteCis(long _rowIndex){
+		return db.delete(GROUP_TABLE_NAME, SocialContract.Groups._ID + "=" + _rowIndex, null) > 0;
 	}
 	
 	/**
-	 * Update the name of an existing community.
+	 * Update the name of an existing CIS.
 	 * @param _rowIndex
 	 * @param _name
 	 * @return
 	 */
 	public boolean updateCis(long _rowIndex, String _name){
 		ContentValues newValues = new ContentValues();
-		newValues.put(KEY_NAME, _name);
-		return db.update(TABLE_NAME, newValues, KEY_ID + "=" + _rowIndex, null) >0;
+		newValues.put(SocialContract.Groups.NAME, _name);
+		return db.update(GROUP_TABLE_NAME, newValues, 
+			SocialContract.Groups._ID + "=" + _rowIndex, null) >0;
 	}
 	
 	/**
-	 * Return a cursor for all of the communities in the
+	 * Return a cursor for all of the CISs in the
 	 * database.
 	 * 
 	 * @return
 	 */
 	public Cursor getAllCisCursor(){
-		return db.query(TABLE_NAME, 
-				new String[]{ KEY_ID, KEY_NAME, KEY_JID, KEY_OWNER, KEY_CREATION_DATE }, 
+		return db.query(GROUP_TABLE_NAME, 
+				new String[]{
+			SocialContract.Groups._ID,
+			SocialContract.Groups.NAME, 
+			SocialContract.Groups.OWNER_ID,
+			SocialContract.Groups.DISPLAY_NAME }, 
 					null, null, null, null, null);
 	}
 	
-	public Cursor setCursorToCommunity(long _rowIndex) throws SQLException {
-		Cursor result = db.query(true, TABLE_NAME,
-				new String[] {KEY_ID, KEY_NAME},
-				KEY_ID + "=" + _rowIndex, 
-				null, null, null, null, null);
+	public Cursor setCursorToCis(long _rowIndex) throws SQLException {
+		Cursor result = db.query(true, GROUP_TABLE_NAME,
+			new String[] {SocialContract.Groups._ID, 
+			SocialContract.Groups.DISPLAY_NAME},
+			SocialContract.Groups._ID + "=" + _rowIndex, 
+			null, null, null, null, null);
+		
 		if ((result.getCount() == 0) || !result.moveToFirst()) {
-			throw new SQLException("No groups found for row: " + _rowIndex);
+			throw new SQLException("No CISs found for row: " + _rowIndex);
 		}
 		return result;
 	}
 	
 	public ICisRecord getCis(long _rowIndex) throws SQLException {
 		Cursor cursor = db.query(true, 
-				TABLE_NAME, 
-				new String[] {KEY_ID, KEY_NAME, KEY_JID, KEY_OWNER, KEY_CREATION_DATE},
-				KEY_ID + "=" + _rowIndex, null, null, null, null, null);
+				GROUP_TABLE_NAME, 
+				new String[] {
+			SocialContract.Groups._ID,
+			SocialContract.Groups.NAME, 
+			SocialContract.Groups.OWNER_ID,
+			SocialContract.Groups.DISPLAY_NAME},
+			SocialContract.Groups._ID + "=" + _rowIndex,
+			null, null, null, null, null);
+		
 		if((cursor.getCount() == 0) || !cursor.moveToFirst()) {
 			throw new SQLException("No groups found for row: " + _rowIndex);
 		}

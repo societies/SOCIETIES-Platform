@@ -5,28 +5,16 @@
     <parent>
         <groupId>org.societies</groupId>
         <artifactId>CisManager-parent</artifactId>
-        <version>${release.version}</version>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
 
     <groupId>org.societies</groupId>
     <artifactId>CisManager-it-it</artifactId>
-    <version>${release.version}</version>
+    <version>0.0.1-SNAPSHOT</version>
     <packaging>apk</packaging>
     <name>CisManager-it - Integration tests</name>
 
     <dependencies>
-        <!-- I copied this from Alan's CSS maanger. I get force close without this! -->
-    			<dependency>
-	    		<groupId>xerces</groupId>
-	    		<artifactId>xercesImpl</artifactId>
-	    		<exclusions>
-					<exclusion>
-		    			<groupId>xml-apis</groupId> 
-		    			<artifactId>xml-apis</artifactId>
-					</exclusion>
-	    		</exclusions>
-	</dependency>
-    
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
@@ -39,13 +27,13 @@
             <groupId>org.societies</groupId>
             <artifactId>CisManager</artifactId>
             <type>apk</type>
-            <version>${release.version}</version>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.societies</groupId>
             <artifactId>CisManager</artifactId>
             <type>jar</type>
-            <version>${release.version}</version>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

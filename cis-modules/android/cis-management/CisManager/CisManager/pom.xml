@@ -8,60 +8,28 @@
   <packaging>apk</packaging>
   <name>CisManagerLight</name>
 
-<!--    <parent> -->
-<!--         <groupId>org.societies</groupId> -->
-<!--         <artifactId>CisManager-parent</artifactId> -->
-<!--         <version>${release.version}</version> -->
-<!--     </parent> -->
-
    <parent>
         <groupId>org.societies</groupId>
-        <artifactId>android-parent</artifactId>
-        <version>0.1</version>
-        <relativePath>../../../../../parent/android.xml</relativePath>
-   </parent>
+        <artifactId>CisManager-parent</artifactId>
+        <version>${release.version}</version>
+    </parent>
 
-    <!-- I copied this from Alan's CSS mananger. -->
-  <dependencies>
-	<dependency>
-		<groupId>org.asmack</groupId>
-	        <artifactId>asmack</artifactId>
-	</dependency>
-	<dependency>
-            <groupId>android</groupId>
-            <artifactId>android</artifactId>
-        </dependency>
-	<dependency>
+	<dependencies>
+            <dependency>
+                <groupId>com.google.android</groupId>
+                <artifactId>android</artifactId>
+<!--                 <version>2.1.2</version> -->
+                <scope>provided</scope>
+            </dependency>
+	    		<dependency>
 	    	<groupId>org.societies.api.external</groupId>
 	    	<artifactId>societies-api</artifactId>
-	    	<version>${release.version}</version>
-	</dependency>
-	<dependency>
- 		 <groupId>org.slf4j</groupId>
-  		<artifactId>slf4j-api</artifactId>
-		<version>1.6.2</version>
-	</dependency>	
-	<dependency>
-	    <groupId>xerces</groupId>
-	    <artifactId>xercesImpl</artifactId>
-	    <version>2.10.0</version>
-	    <exclusions>
-		<exclusion>
-		    <groupId>xml-apis</groupId> 
-		    <artifactId>xml-apis</artifactId>
-		</exclusion>
-	    </exclusions>
-	</dependency>
-	<dependency>
-		<groupId>org.societies</groupId>
-		<artifactId>AndroidAgentApi</artifactId>
-		<version>${version.comm}</version>
-	</dependency>
-	<dependency>
-	    	<groupId>org.societies.utilities</groupId>
-	    	<artifactId>DBC</artifactId>
-	    	<version>${release.version}</version>
-	</dependency>
+<!-- 	    	<version>${release.version}</version> -->
+		</dependency>
+		<dependency>
+ 			<groupId>org.slf4j</groupId>
+  			<artifactId>slf4j-api</artifactId>
+		</dependency>	
   </dependencies>
   <build>
     <finalName>${project.artifactId}</finalName>
@@ -69,46 +37,16 @@
         <plugins>
             <plugin>
                 <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-                <artifactId>maven-android-plugin</artifactId>
-                <version>2.9.0-issue170</version>
-		<extensions>true</extensions>
+                <artifactId>android-maven-plugin</artifactId>
+<!--                 <version>3.1.1</version> -->
+				<extensions>true</extensions>
                 <configuration>
                     <sdk>
-			<platform>8</platform>
-                    <path>${android.home}</path>
-		    </sdk>
-		    <emulator>
-		        <!-- the name of the avd device to use for starting the emulator -->
-		        <avd>Test22Device</avd>
-		    </emulator>
-		    <undeployBeforeDeploy>true</undeployBeforeDeploy>
-		    <unpackDependencies>false</unpackDependencies>
-		    <fileToUnpack>${project.artifactId}.${project.version}-shaded.apk</fileToUnpack>
-		    <jvmArguments>
-			    <jvmArgument>-Xms256m</jvmArgument>
-			    <jvmArgument>-Xmx512m</jvmArgument>
-		    </jvmArguments>
-                </configuration>
+						<platform>8</platform>
+                    	<path>${android.home}</path>
+		    		</sdk>
+		        </configuration>
             </plugin>
-	    	<plugin>
-		    <groupId>org.apache.maven.plugins</groupId>
-		    <artifactId>maven-shade-plugin</artifactId>
-		    <version>1.5</version>
-		    <configuration>
-			    <shadedArtifactAttached>true</shadedArtifactAttached>
-			    <finalName>${project.artifactId}.${project.version}-shaded</finalName>
-			    <relocations>
-				    <relocation>
-					    <pattern>javax.xml.bind</pattern>
-					    <shadedPattern>jaxb</shadedPattern>
-				    </relocation>
-				    <relocation>
-					    <pattern>javax.xml.stream</pattern>
-					    <shadedPattern>stax</shadedPattern>
-				    </relocation>
-			    </relocations>
-		    </configuration>
-	    </plugin>
         </plugins>
     <pluginManagement>
     	<plugins>
@@ -129,7 +67,7 @@
     									android-maven-plugin
     								</artifactId>
     								<versionRange>
-    									[3.0.0,)
+    									[3.1.1,)
     								</versionRange>
     								<goals>
     									<goal>proguard</goal>
