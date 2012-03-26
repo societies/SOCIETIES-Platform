@@ -29,8 +29,12 @@
 		<dependency>
  			<groupId>org.slf4j</groupId>
   			<artifactId>slf4j-api</artifactId>
-		</dependency>	
-  </dependencies>
+		</dependency>
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>CisClientLibraryAndroid</artifactId>
+		</dependency>
+	</dependencies>
   <build>
     <finalName>${project.artifactId}</finalName>
 	<sourceDirectory>src</sourceDirectory>

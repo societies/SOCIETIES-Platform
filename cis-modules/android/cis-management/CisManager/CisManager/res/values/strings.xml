@@ -2,4 +2,7 @@
 <resources>
     <string name="hello">This is the social content provider!</string>
     <string name="app_name">CisManagerLight</string>
+    <string name="provider_authority">org.societies.cis.android.SocialProvider</string>
+    <string name="provider_read_permission">org.societies.cis.android.SocialProvider.READ</string>
+    <string name="provider_write_permission">org.societies.cis.android.SocialProvider.WRITE</string>
 </resources>

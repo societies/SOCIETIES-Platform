@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.cis.android;
+package org.societies.cis.android.client;
 
 import android.net.Uri;
 
@@ -43,6 +43,8 @@ public final class SocialContract {
      */
     public static final Uri AUTHORITY = 
             Uri.parse("content://org.societies.cis.android.SocialProvider");
+    public static final String PROVIDER_READ_PERMISSION = "org.societies.cis.android.SocialProvider.READ";
+    public static final String PROVIDER_WRITE_PERMISSION = "org.societies.cis.android.SocialProvider.WRITE";
     
     public static final class Groups {
         public static final Uri CONTENT_URI = 
