@@ -27,23 +27,21 @@ package org.societies.css.devicemgmt.devicemanager.impl;
 import static org.junit.Assert.*;
 
 import java.util.Dictionary;
-import java.util.Hashtable;
-
-import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static org.mockito.Mockito.*;
-import org.objenesis.instantiator.basic.NewInstanceInstantiator;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.css.devicemgmt.IDevice;
-import org.societies.api.css.devicemgmt.model.DeviceMgmtConstants;
+
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
-import org.springframework.osgi.context.BundleContextAware;
-import org.springframework.osgi.mock.*;
 
 /**
  * Describe your class here...
@@ -54,12 +52,12 @@ import org.springframework.osgi.mock.*;
 public class DeviceManagerUnitTest {
 
 	private DeviceManager deviceManager;
-	private BundleContext mock;
-	private IDeviceManager mock2;
+	private BundleContext bundleContextMock;
+	private ICommManager commManagerMock;
+	private IIdentityManager identityManagerMock;
+	private INetworkNode iNetworkNodeMock;
+	
 	private String [] serviceIds = {"service1"};
-	private DeviceCommonInfo deviceCommonInfo = new DeviceCommonInfo("family1", "33:40:F5", "Light Sensor", "LightSensor", "just for test", 
-																	"zigbee", "room1", "trialog", true);
-	private String deviceMacAddress = "33:40:F5";
 	
 	private Dictionary<String, String> properties;
 	
@@ -70,23 +68,18 @@ public class DeviceManagerUnitTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		properties = new Hashtable<String, String>();
 		
-		properties.put(DeviceMgmtConstants.DEVICE_NAME, deviceCommonInfo.getDeviceName());
-		properties.put(DeviceMgmtConstants.DEVICE_TYPE, deviceCommonInfo.getDeviceType());
-		properties.put(DeviceMgmtConstants.DEVICE_ID, "testId");
-		properties.put(DeviceMgmtConstants.DEVICE_FAMILY, deviceCommonInfo.getDeviceFamilyIdentity());
-		properties.put(DeviceMgmtConstants.DEVICE_LOCATION, deviceCommonInfo.getDeviceLocation());
-		properties.put(DeviceMgmtConstants.DEVICE_PROVIDER, deviceCommonInfo.getDeviceProvider());
-		properties.put(DeviceMgmtConstants.DEVICE_CONNECTION_TYPE, deviceCommonInfo.getDeviceConnectionType());
+		bundleContextMock = mock(BundleContext.class);
 		
-		String [] test = {IDevice.class.getName()};
+		commManagerMock = mock(ICommManager.class);
 		
-		mock = mock(BundleContext.class);
+		identityManagerMock = mock(IIdentityManager.class);
+		
+		iNetworkNodeMock = mock(INetworkNode.class);
 		
 		deviceManager = new DeviceManager();
-		
-		deviceManager.setBundleContext(mock);
+	
+		deviceManager.setBundleContext(bundleContextMock);
 	}
 
 	/**
@@ -101,16 +94,39 @@ public class DeviceManagerUnitTest {
 	@Test
 	public void testFireNewDeviceConnected() {
 		
-		//when(mock.registerService(IDevice.class.getName(), deviceManager, properties)).thenReturn(sr);
+		//Initial condition
+		String deviceId;
+		String physicalDeviceId;
+		DeviceCommonInfo deviceCommonInfo;
+		when(commManagerMock.getIdManager()).thenReturn(identityManagerMock);	
+		when(identityManagerMock.getThisNetworkNode()).thenReturn(iNetworkNodeMock);
+		//
+		when(iNetworkNodeMock.getJid()).thenReturn("node1");
+		//
+		deviceManager.setCommManager(commManagerMock);
 		
-		deviceManager.fireNewDeviceConnected(deviceMacAddress, deviceCommonInfo, serviceIds);
-
-		//properties.put(DeviceMgmtConstants.DEVICE_FAMILY, "rr");
 		
-		verify(mock).registerService(IDevice.class.getName(), deviceManager, properties);
+		// Test suit
+		deviceCommonInfo = new DeviceCommonInfo("family1", "Light Sensor", "LightSensor", "just for test", "zigbee", "room1","trialog", null, true);
+		physicalDeviceId = "33:40:F5";
+		deviceId = iNetworkNodeMock.getJid() + "." + deviceCommonInfo.getDeviceFamilyIdentity()+ "." + deviceCommonInfo.getDeviceType() + "." + physicalDeviceId;	
+		//
+		assertEquals( deviceId , deviceManager.fireNewDeviceConnected(physicalDeviceId, deviceCommonInfo, serviceIds));
+		//
+		assertEquals(null, deviceManager.fireNewDeviceConnected(physicalDeviceId, deviceCommonInfo, serviceIds));
 		
-
+		//
+		physicalDeviceId = "2012";
+		deviceId = iNetworkNodeMock.getJid() + "." + deviceCommonInfo.getDeviceFamilyIdentity()+ "." + deviceCommonInfo.getDeviceType() + "." + physicalDeviceId;		
+		assertEquals( deviceId , deviceManager.fireNewDeviceConnected(physicalDeviceId, deviceCommonInfo, serviceIds));
+		assertEquals(null, deviceManager.fireNewDeviceConnected(physicalDeviceId, deviceCommonInfo, serviceIds));
 		
+		//
+		deviceCommonInfo.setDeviceFamilyIdentity("family2");
+		physicalDeviceId = "2011";	
+		deviceId = iNetworkNodeMock.getJid() + "." + deviceCommonInfo.getDeviceFamilyIdentity()+ "." + deviceCommonInfo.getDeviceType() + "." + physicalDeviceId;
+		assertEquals( deviceId , deviceManager.fireNewDeviceConnected(physicalDeviceId, deviceCommonInfo, serviceIds));
+		assertEquals(null, deviceManager.fireNewDeviceConnected(physicalDeviceId, deviceCommonInfo, serviceIds));
 	}
 
 }

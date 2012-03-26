@@ -57,7 +57,7 @@
 					<instructions>
 						<!-- the API will export all interfaces packages for the rest of modules. 
 							The exclusion of internal package can be avoided as the plugin excludes automatically 
-							'internal' and 'impl' package names org.societies.api.**-->
+							'internal' and 'impl' package names org.societies.api.** -->
 						<_exportcontents>
 							!org.societies.api.internal,
 							*
@@ -90,7 +90,20 @@
 					</artifactItems>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<reportPlugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-javadoc-plugin</artifactId>
+							<version>2.8</version>
+						</plugin>
+					</reportPlugins>
+				</configuration>
+			</plugin>
 		</plugins>
-
 	</build>
 </project>

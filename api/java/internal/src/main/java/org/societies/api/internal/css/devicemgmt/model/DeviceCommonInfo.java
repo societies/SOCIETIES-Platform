@@ -48,9 +48,9 @@ public class DeviceCommonInfo {
 	}
 	
 	public DeviceCommonInfo(String deviceFamilyIdentity,
-			String deviceMacAddress, String deviceName, String deviceType,
+			String deviceName, String deviceType,
 			String deviceDescription, String deviceConnectionType,
-			String deviceLocation, String deviceProvider,
+			String deviceLocation, String deviceProvider, String deviceID,
 			boolean contextSource) {
 		super();
 		this.deviceFamilyIdentity = deviceFamilyIdentity;
@@ -129,6 +129,7 @@ public class DeviceCommonInfo {
 	public String getDeviceID() {
 		return deviceID;
 	}
+	
 	public void setDeviceID(String deviceID) {
 		this.deviceID = deviceID;
 	}
