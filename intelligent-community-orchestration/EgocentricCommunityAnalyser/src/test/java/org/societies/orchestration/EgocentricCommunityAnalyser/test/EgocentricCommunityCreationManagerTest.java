@@ -26,6 +26,8 @@
 package org.societies.orchestration.EgocentricCommunityAnalyser.test;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.Future;
 
 import org.junit.Assert;
@@ -190,7 +192,13 @@ public class EgocentricCommunityCreationManagerTest {
     }
     
     public void testNotCreateDuplicateCis() {
-    	
+    	cisManager = mock(ICisManager.class);
+    	ICisRecord cisRecord = mock(ICisRecord.class);
+    	IIdentity ownerId = mock(IIdentity.class);
+    	//cisManager.addCis(ownerId, cisRecord);
+    	egocentricCommunityCreationManager = new EgocentricCommunityCreationManager(ownerId, "CSS");
+		
+    	egocentricCommunityCreationManager.identifyCissToCreate("extensive", new HashMap<IIdentity, String>());
     }
     
     public void testNotSuggestUndesiredCis() {
