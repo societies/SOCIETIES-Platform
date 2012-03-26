@@ -71,6 +71,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
@@ -85,7 +86,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Calendar;
 
 /**
  * This is the class for the Egocentric Community Configuration Manager component
@@ -135,6 +135,8 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 	private ICisManager cisManager;
 	private ICSSLocalManager cssManager;
 	private ICssActivityFeed activityFeed;
+	
+	private ICommManager commManager;
 	
 	
 	/*
@@ -412,13 +414,13 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
     	this.cisManager = cisManager;
     }
     
-  //public CommManagerBundle getCommManager() {
-    //	return commManager;
-    //}
+    public ICommManager getCommManager() {
+    	return commManager;
+    }
     
-    //public void setCommManager(CommManagerBundle commManager) {
-    //	this.commManager = commManager;
-    //}
+    public void setCommManager(ICommManager commManager) {
+    	this.commManager = commManager;
+    }
     
     /**Returns the list of package names of the message beans you'll be passing*/
     public List<String> getJavaPackages() {

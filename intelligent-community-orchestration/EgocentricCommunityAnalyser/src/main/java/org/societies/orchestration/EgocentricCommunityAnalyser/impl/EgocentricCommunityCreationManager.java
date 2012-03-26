@@ -30,8 +30,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.Calendar;
-
 import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 
 import static org.mockito.Mockito.*;
@@ -75,6 +73,7 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
 
@@ -133,6 +132,8 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 	private HashMap<String, ICisRecord> personalCiss;
 	
 	private ISuggestedCommunityAnalyser suggestedCommunityAnalyser;
+	
+	private ICommManager commManager;
 	
 	
 	/*
@@ -1157,25 +1158,23 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 	}
 	
 	public ArrayList<IIdentity> getIDsOfCsssInProximity(String startingDate, String endingDate, String service) {
-		//What CSSs is this one currently interacting with across the specified service?
-		//Found by: For each service, shared service, and resource the user is using (within the time period specified), is there an end-CSS they're interacting with?
-		//Is there a CSS they're indirectly interacting with over the service (e.g. both using the same service or accessing the same resource over it)?
+		//What CSSs has this one been in proximity with, over the specified time range?
+		//Found by: checking proximity context (within the time period specified), what CSS IDs are found either (1) entering proximity
+		//within this period, or (2) have entered proximity before this time period but hadn't gone out of proximity before the time period started?
 		
 		
 		//Needs a framework for capturing this in the platform.
-		//It needs a timestamp for this, so either the context is stored with timestamps or 
-		//we get it from the CSS activity feed (which isn't implemented yet)
-		ArrayList<IIdentity> interactingCsss = new ArrayList<IIdentity>();
+		ArrayList<IIdentity> proximityCsss = new ArrayList<IIdentity>();
 		//           2010-03-08 14:59:30.252
 		//ICssActivityFeed subfeed = activityFeed.getActivities(startingDate, endingDate);
 		//
 		//for (int i = 0; i < subfeed.size(); i++) {
 		//    ICssActivity thisActivity = subfeed.getActivity(i);
-		//    if (thisActivity.getObject().equals(service) &&
+		//    if (thisActivity.getObject().equals(proximity) &&
 		//        thisActivity.getTarget().contains("CSS") &&
 		//        !(interactingCss.contains(thisActivity.getTarget())))
 		//        interactingCsss.add(thisActivity.getTarget();
-        //    else if (thisActivity.getObject().equals(service) &&
+        //    else if (thisActivity.getObject().equals(proximity) &&
 		//        thisActivity.getActor().contains("CSS") &&
 		//        (thisActivity.getActor() != linkedCss) &&
 		//        !(interactingCss.contains(thisActivity.getActor())))
@@ -1183,25 +1182,23 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		//}
 		
 		try {
-			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
+			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "proximity");
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
-		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
-		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs proximity " + thisService, userContextBrokerCallback);
         //
 		//    Get the lists from the callbacks
 		//
 		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
 		//}
-//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
 
 		
 		
-		return interactingCsss;
+		return proximityCsss;
 	}
 
     
@@ -1284,13 +1281,13 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
     	this.userFeedbackCallback = userFeedbackCallback;
     }
     
-  //public CommManagerBundle getCommManager() {
-    //	return commManager;
-    //}
+    public ICommManager getCommManager() {
+    	return commManager;
+    }
     
-    //public void setCommManager(CommManagerBundle commManager) {
-    //	this.commManager = commManager;
-    //}
+    public void setCommManager(ICommManager commManager) {
+    	this.commManager = commManager;
+    }
     
     /**Returns the list of package names of the message beans you'll be passing*/
     public List<String> getJavaPackages() {

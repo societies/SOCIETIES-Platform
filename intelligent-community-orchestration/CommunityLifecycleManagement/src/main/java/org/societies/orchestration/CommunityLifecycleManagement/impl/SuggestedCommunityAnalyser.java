@@ -69,12 +69,15 @@ import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
@@ -113,6 +116,8 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
 	private ICssDirectory userCssDirectory;
 	
 	private CommunityRecommender communityRecommender;
+	
+	private ICommManager commManager;
     
 	/*
      * Constructor for SuggestedCommunityAnalyser
@@ -252,13 +257,13 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
     	this.communityRecommender = communityRecommender;
     }
     
-  //public CommManagerBundle getCommManager() {
-    //	return commManager;
-    //}
+    public ICommManager getCommManager() {
+    	return commManager;
+    }
     
-    //public void setCommManager(CommManagerBundle commManager) {
-    //	this.commManager = commManager;
-    //}
+    public void setCommManager(ICommManager commManager) {
+    	this.commManager = commManager;
+    }
     
     /**Returns the list of package names of the message beans you'll be passing*/
     public List<String> getJavaPackages() {

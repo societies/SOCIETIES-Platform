@@ -11,7 +11,7 @@
        for integration testing outside of an OSGi environment -->
 
    <bean id="EgocentricCommunityAnalyser" class="org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityAnalyser" 
-   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, UserCtxHistoryManager, IIdentity, CommManagerBundle" init-method="initialiseEgocentricCommunityAnalyser">
+   depends-on="ICssDirectory, ICssDiscovery, ICssActivityFeed, ServiceSharingRecord, ICisActivityFeed, ICisRecord, IIdentity, ICommManager" init-method="initialiseEgocentricCommunityAnalyser">
    <property name="linkedCss" ref="IIdentity"></property>
    <property name="egocentricCreationManager" ref="EgocentricCommunityCreationManager"></property>
    <property name="egocentricConfigurationManager" ref="EgocentricCommunityConfigurationManager"></property>
@@ -20,46 +20,46 @@
    </bean>
    
    <bean id="EgocentricCommunityCreationManager" class="org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityCreationManager" 
-   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, CisManager, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, CommunityCtxBroker, UserCtxBroker, UserCtxHistoryManager, IIdentity, CommManagerBundle, UserFeedback, UserFeedbackCallback" init-method="initialiseEgocentricCommunityCreationManager">
+   depends-on="ICssDirectory, ICssDiscovery, ICssActivityFeed, ServiceSharingRecord, ICisActivityFeed, ICisRecord, ICisManager, ICtxBroker, IIdentity, ICommManager, IUserFeedback, IUserFeedbackCallback" init-method="initialiseEgocentricCommunityCreationManager">
    <property name="linkedCss" ref="IIdentity"></property>
    <property name="cisManager" ref="ICisManager"></property>
-   <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>
-   <property name="userContextBroker" ref="UserCtxBroker"></property>
-   <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>
-   <property name="communityContextBroker" ref="CommunityCtxBroker"></property>
+   <!-- <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>-->
+   <property name="userContextBroker" ref="ICtxBroker"></property>
+   <!-- <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>-->
+   <!-- <property name="communityContextBroker" ref="CommunityCtxBroker"></property>-->
    <property name="commManager" ref="CommManagerBundle"></property>
-   <property name="userFeedback" ref="UserFeedback"></property>
-   <property name="userFeedbackCallback" ref="UserFeedbackCallback"></property>
+   <property name="userFeedback" ref="IUserFeedback"></property>
+   <property name="userFeedbackCallback" ref="IUserFeedbackCallback"></property>
    <property name="cssManager" ref="ICSSLocalManager"></property>
    <property name="activityFeed" ref="ICssActivityFeed"></property>
    </bean>
    
    <bean id="EgocentricCommunityConfigurationManager" class="org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityConfigurationManager" 
-   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, CisManager, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, CommunityCtxBroker, UserCtxBroker, UserCtxHistoryManager, IIdentity, CommManagerBundle, UserFeedback, UserFeedbackCallback" init-method="initialiseEgocentricCommunityConfigurationManager">
+   depends-on="ICssDirectory, ICssDiscovery, ICssActivityFeed, ServiceSharingRecord, ICisActivityFeed, ICisRecord, ICisManager, ICtxBroker, IIdentity, ICommManager, IUserFeedback, IUserFeedbackCallback" init-method="initialiseEgocentricCommunityConfigurationManager">
    <property name="linkedCss" ref="IIdentity"></property>
    <property name="cisManager" ref="ICisManager"></property>
-   <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>
-   <property name="userContextBroker" ref="UserCtxBroker"></property>
-   <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>
-   <property name="communityContextBroker" ref="CommunityCtxBroker"></property>
+   <!-- <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>-->
+   <property name="userContextBroker" ref="ICtxBroker"></property>
+   <!-- <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>-->
+   <!-- <property name="communityContextBroker" ref="CommunityCtxBroker"></property>-->
    <property name="commManager" ref="CommManagerBundle"></property>
-   <property name="userFeedback" ref="UserFeedback"></property>
-   <property name="userFeedbackCallback" ref="UserFeedbackCallback"></property>
+   <property name="userFeedback" ref="IUserFeedback"></property>
+   <property name="userFeedbackCallback" ref="IUserFeedbackCallback"></property>
    <property name="cssManager" ref="ICSSLocalManager"></property>
    <property name="activityFeed" ref="ICssActivityFeed"></property>
    </bean>
    
    <bean id="EgocentricCommunityDeletionManager" class="org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityDeletionManager" 
-   depends-on="CssDirectory, CssDiscovery, CisActivityFeed, ServiceSharingRecord, CisActivityFeed, CisRecord, CisManager, UserCtxSimilarityEvaluator, UserCtxPredictionManager, UserCtxDBManager, CommunityCtxBroker, UserCtxBroker, UserCtxHistoryManager, IIdentity, CommManagerBundle, UserFeedback, UserFeedbackCallback" init-method="initialiseEgocentricCommunityDeletionManager">
+   depends-on="ICssDirectory, ICssDiscovery, ICssActivityFeed, ServiceSharingRecord, ICisActivityFeed, ICisRecord, ICisManager, ICtxBroker, IIdentity, ICommManager, IUserFeedback, IUserFeedbackCallback" init-method="initialiseEgocentricCommunityDeletionManager">
    <property name="linkedCss" ref="IIdentity"></property>
    <property name="cisManager" ref="ICisManager"></property>
-   <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>
-   <property name="userContextBroker" ref="UserCtxBroker"></property>
-   <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>
-   <property name="communityContextBroker" ref="CommunityCtxBroker"></property>
+   <!-- <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>-->
+   <property name="userContextBroker" ref="ICtxBroker"></property>
+   <!-- <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>-->
+   <!-- <property name="communityContextBroker" ref="CommunityCtxBroker"></property>-->
    <property name="commManager" ref="CommManagerBundle"></property>
-   <property name="userFeedback" ref="UserFeedback"></property>
-   <property name="userFeedbackCallback" ref="UserFeedbackCallback"></property>
+   <property name="userFeedback" ref="IUserFeedback"></property>
+   <property name="userFeedbackCallback" ref="IUserFeedbackCallback"></property>
    <property name="cssManager" ref="ICSSLocalManager"></property>
    <property name="activityFeed" ref="ICssActivityFeed"></property>
    </bean>

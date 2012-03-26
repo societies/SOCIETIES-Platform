@@ -30,13 +30,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Calendar;
 
 import static org.mockito.Mockito.*;
 
 //import org.societies.api.internal.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 //import org.societies.api.internal.cis.management.ICisRecord;
 import org.societies.api.internal.context.broker.ICtxBroker;
 
@@ -57,8 +57,6 @@ import org.societies.api.identity.IIdentity;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer;
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
-
-
 
 /**
  * This is the class for the Egocentric Community Analyser component
@@ -89,6 +87,9 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 	private Date lastOngoingCheck;
 	
 	private ICisManager cisManager;
+	
+	private ICommManager commManager;
+	
 	/*
      * Constructor for EgocentricCommunityAnalyser
      * 
@@ -247,13 +248,13 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
     	this.egocentricDeletionManager = egocentricDeletionManager;
     }
     
-    //public CommManagerBundle getCommManager() {
-    //	return commManager;
-    //}
+    public ICommManager getCommManager() {
+    	return commManager;
+    }
     
-    //public void setCommManager(CommManagerBundle commManager) {
-    //	this.commManager = commManager;
-    //}
+    public void setCommManager(ICommManager commManager) {
+    	this.commManager = commManager;
+    }
     
     /**Returns the list of package names of the message beans you'll be passing*/
     public List<String> getJavaPackages() {

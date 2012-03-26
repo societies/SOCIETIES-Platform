@@ -33,8 +33,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Calendar;
-
 import static org.mockito.Mockito.*;
 
 import org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityConfigurationManager;

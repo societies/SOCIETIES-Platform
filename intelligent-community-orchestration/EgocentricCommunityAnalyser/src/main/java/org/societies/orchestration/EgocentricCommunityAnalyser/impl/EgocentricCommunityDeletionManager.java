@@ -68,6 +68,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 //import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 //import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
 
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
@@ -77,13 +78,12 @@ import org.societies.api.identity.IIdentity;
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
 
 import java.sql.Timestamp;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Calendar;
+
 
 
 //import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
@@ -140,6 +140,8 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 	private IUserFeedbackCallback userFeedbackCallback;
 	
 	private ISuggestedCommunityAnalyser suggestedCommunityAnalyser;
+	
+	private ICommManager commManager;
 	
 	/*
      * Constructor for EgocentricCommunityConfigurationManager
@@ -403,13 +405,13 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
     	this.userResponse = userResponse;
     }
     
-  //public CommManagerBundle getCommManager() {
-    //	return commManager;
-    //}
+    public ICommManager getCommManager() {
+    	return commManager;
+    }
     
-    //public void setCommManager(CommManagerBundle commManager) {
-    //	this.commManager = commManager;
-    //}
+    public void setCommManager(ICommManager commManager) {
+    	this.commManager = commManager;
+    }
     
     /**Returns the list of package names of the message beans you'll be passing*/
     public List<String> getJavaPackages() {
