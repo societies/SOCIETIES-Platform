@@ -137,7 +137,7 @@ public class CommsClientCallback implements ICommCallback {
 			boolean success = result.isSuccess();
 
 			LOG.debug("receiveResult(): success = {}, sessionId = {}, sla = " + sla,
-					sessionId, success);
+					success, sessionId);
 		}
 		else {
 			LOG.warn("receiveResult(): unexpected payload type {}", payload);
