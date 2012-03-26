@@ -284,24 +284,34 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 	/**
 	 * 
 	 */
-	public void fireDeviceDisconnected(String deviceFamily, String deviceMacAddress) 
+	public String fireDeviceDisconnected(String deviceFamily, String physicalDeviceId) 
 	{	
-		String deviceId = (String)deviceIdBindingTable.getKey(deviceMacAddress);
+		String deviceId = (String)deviceIdBindingTable.getKey(physicalDeviceId);
 		
 		if (deviceFamilyContainer.get(deviceFamily) != null)
 		{
-			if (deviceFamilyContainer.get(deviceFamily).get(deviceId) != null)
+			if (deviceId != null) 
 			{
-				deviceFamilyContainer.get(deviceFamily).get(deviceId).removeDevice();
+				if (deviceFamilyContainer.get(deviceFamily).get(deviceId) != null)
+				{
+					deviceFamilyContainer.get(deviceFamily).get(deviceId).removeDevice();
+					return physicalDeviceId;
+				}
 			}
-			
+			else
+			{
+				return null;
+			}
 		}
+		return null;
 	}
 		
 	/**
 	 * 
 	 */
-	public void fireNewDataReceived(String deviceFamily, String deviceMacAddress, String data) {
+	public String fireNewDataReceived(String deviceFamily, String deviceMacAddress, Dictionary<String, Object> data) {
+		
+		return null;
 		
 	}
 }
