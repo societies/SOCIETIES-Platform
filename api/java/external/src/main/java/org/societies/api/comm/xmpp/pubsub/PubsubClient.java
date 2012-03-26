@@ -52,31 +52,109 @@ import org.w3c.dom.Element;
 
 public interface PubsubClient {
 	
+	/**
+	 * Add the list of package names that will be used as payloads for pubsub events
+	 * @param packageList List of package names
+	 * @throws JAXBException
+	 */
 	public void addJaxbPackages(List<String> packageList) throws JAXBException;
 	public List<String> discoItems(IIdentity pubsubService, String node) throws XMPPError, CommunicationException;
 	// TODO remove subId from interface - it's not interesting for the API users, only for the client implementation
 	// TODO disco info nodes
 	// TODO reception of notifications from a 3rd party subscription
+
+	/**
+	 * Subscribe to a pubsub node and provide the subscriber callback object
+	 * @param pubsubService Identity of the pubsub service
+	 * @param node Pubsub event node
+	 * @param subscriber
+	 * @return
+	 * @throws XMPPError
+	 * @throws CommunicationException
+	 */
 	public Subscription subscriberSubscribe(IIdentity pubsubService, String node, Subscriber subscriber) throws XMPPError, CommunicationException;
-//	public String subscriberSubscribe(IIdentity pubsubService, String node, IIdentity subscriber) throws XMPPError, CommunicationException;
+
+	/**
+	 * Unsubscribe from an pubsub node of this identity
+	 * @param pubsubService Identity of the pubsub service
+	 * @param node Pubsub event node
+	 * @param subscriber
+	 * @throws XMPPError
+	 * @throws CommunicationException
+	 */
 	public void subscriberUnsubscribe(IIdentity pubsubService, String node, Subscriber subscriber) throws XMPPError, CommunicationException;
-//	public Pubsub subscriberOptionsRequest(IIdentity pubsubService) throws XMPPError, CommunicationException;
-//	public Pubsub subscriberOptionsSubmission(IIdentity pubsubService) throws XMPPError, CommunicationException;
-//	public Pubsub subscriberSubscribeConfigure(IIdentity pubsubService) throws XMPPError, CommunicationException;
-//	public Pubsub subscriberDefaultOptions(IIdentity pubsubService) throws XMPPError, CommunicationException;
+
+	/**
+	 * Retrieve the last event that was published to this node
+	 * @param pubsubService Identity of the pubsub service
+	 * @param node Pubsub event node
+	 * @param subId 
+	 * @return
+	 * @throws XMPPError
+	 * @throws CommunicationException
+	 */
 	public List<Element> subscriberRetrieveLast(IIdentity pubsubService, String node, String subId) throws XMPPError, CommunicationException;
 	public List<Element> subscriberRetrieveSpecific(IIdentity pubsubService, String node, String subId, List<String> itemIdList) throws XMPPError, CommunicationException;
+	
+	/**
+	 * Publishes an event for this identity, on this node of unique itemID and content of item
+	 * @param pubsubService Identity of the pubsub service
+	 * @param node Pubsub event node
+	 * @param itemId unique id for this publish event
+	 * @param item Payload object for this event. Must map to the JaxbMapping provided earlier
+	 * @return
+	 * @throws XMPPError
+	 * @throws CommunicationException
+	 */
 	public String publisherPublish(IIdentity pubsubService, String node, String itemId, Object item) throws XMPPError, CommunicationException;
-//	public Pubsub publisherPublishOptions(Stanza stanza, Pubsub payload) throws XMPPError, CommunicationException;
+
+	/**
+	 * Remove an event for this node of provided itemID
+	 * @param pubsubService Identity of the pubsub service
+	 * @param node Pubsub event node
+	 * @param itemId unique id of the published event
+	 * @throws XMPPError
+	 * @throws CommunicationException
+	 */
 	public void publisherDelete(IIdentity pubsubService, String node, String itemId) throws XMPPError, CommunicationException;
+	
+	/**
+	 * Creates a pubsub node for this identity using the provided node name ("topic")
+	 * @param pubsubService Identity of the pubsub service
+	 * @param node Pubsub event node
+	 * @throws XMPPError
+	 * @throws CommunicationException
+	 */
 	public void ownerCreate(IIdentity pubsubService, String node) throws XMPPError, CommunicationException;
-//	public Pubsub ownerCreateConfigure(Stanza stanza, Pubsub payload) throws XMPPError, CommunicationException;
-//	public org.jabber.protocol.pubsub.owner.Pubsub ownerConfigureRequest(Stanza stanza, org.jabber.protocol.pubsub.owner.Pubsub payload) throws XMPPError, CommunicationException;
-//	public org.jabber.protocol.pubsub.owner.Pubsub ownerConfigureSubmission(Stanza stanza, org.jabber.protocol.pubsub.owner.Pubsub payload) throws XMPPError, CommunicationException;
-//	public org.jabber.protocol.pubsub.owner.Pubsub ownerDefaultConfiguration(Stanza stanza, org.jabber.protocol.pubsub.owner.Pubsub payload) throws XMPPError, CommunicationException;
+	
+	/**
+	 * Deletes the pubsub node for this identity and node name
+	 * @param pubsubService Identity of the pubsub service
+	 * @param node Pubsub event node
+	 * @throws XMPPError
+	 * @throws CommunicationException
+	 */
 	public void ownerDelete(IIdentity pubsubService, String node) throws XMPPError, CommunicationException;
+	
+	/**
+	 * Deletes all the published events for this identity on this node
+	 * @param pubsubService Identity of the pubsub service
+	 * @param node Pubsub event node
+	 * @throws XMPPError
+	 * @throws CommunicationException
+	 */
 	public void ownerPurgeItems(IIdentity pubsubService, String node) throws XMPPError, CommunicationException;
+	
+	/**
+	 * Returns the list of identities of users who are subscribed to this pubsub node
+	 * @param pubsubService Identity of the pubsub service
+	 * @param node Pubsub event node
+	 * @return
+	 * @throws XMPPError
+	 * @throws CommunicationException
+	 */
 	public Map<IIdentity, SubscriptionState> ownerGetSubscriptions(IIdentity pubsubService, String node) throws XMPPError, CommunicationException;
+	
 	public Map<IIdentity, Affiliation> ownerGetAffiliations(IIdentity pubsubService, String node) throws XMPPError, CommunicationException;
 	public void ownerSetSubscriptions(IIdentity pubsubService, String node, Map<IIdentity, SubscriptionState> subscriptions) throws XMPPError, CommunicationException;
 	public void ownerSetAffiliations(IIdentity pubsubService, String node, Map<IIdentity, Affiliation> affiliations) throws XMPPError, CommunicationException;
