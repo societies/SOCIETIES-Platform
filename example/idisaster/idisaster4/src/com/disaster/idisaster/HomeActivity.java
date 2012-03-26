@@ -6,9 +6,13 @@ package com.disaster.idisaster;
 
 import android.app.TabActivity;
 import android.content.Intent;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TabHost;
+import android.widget.TextView;
 
 /**
  * This activity is responsible for interaction with the
@@ -17,24 +21,28 @@ import android.widget.TabHost;
  * and provide access to activity feeds, users and services
  * related to the community.
  * 
- * @authors Babak.Farshchian@sintef.no
- * 			Jacqueline.Floch@sintef.no
+ * @authors Jacqueline.Floch@sintef.no
+ * 			Babak.Farshchian@sintef.no
  *
  */
 public class HomeActivity extends TabActivity {
 
-	String societiesServer = "server.societies.eu"; // The name of the server where cloud node is hosted
-    String username = "Babak"; // username to log into societiesServer
-    String password = "SocietieS"; // password for username.
-//    ISocietiesApp iDisasterSoc; // represents access to the SOCIETIES platform.
-//    ICssRecord cssRecord; // Represents information about the user of the application. to be populated.
-//    String cssId;  //TODO: Find out which class CssId is.
-
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+    	
         super.onCreate(savedInstanceState);
+        
+// TODO: Add check that 1) a disaster is selected 2) the sleected disaster still exists...
+        
         setContentView(R.layout.home_layout);
+
+        // Set view label to selected disaster name
+    	String disasterName = iDisasterApplication.getinstance().preferences.
+        		getString ("pref.disastername","n/a");
+		TextView title = (TextView)findViewById(R.id.disasterLabel);
+		title.setText (disasterName);
+        
         Resources res = getResources(); // Resource object to get Drawables
         TabHost tabHost = getTabHost();  // The activity TabHost
         TabHost.TabSpec spec;  // Resuable TabSpec for each tab
@@ -73,5 +81,46 @@ public class HomeActivity extends TabActivity {
 		super.onResume();
 	}//onResume
 
-    
+/**
+ * onCreateOptionsMenu creates the activity menu.
+ */
+     
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+    	menu.clear();
+    	getMenuInflater().inflate(R.menu.home_menu, menu);
+    	
+//    	It is possible to set up a variable menu		
+//    	menu.findItem (R.id....).setVisible(true);	
+    	return true;
+    }
+
+ /**
+  * onOptionsItemSelected handles the selection of an item in the activity menu.
+  */
+	@Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+		Editor editor =iDisasterApplication.getinstance().editor;
+		switch (item.getItemId()) {
+    		case R.id.homeMenuSelectDisaster:
+    			editor.putString ("pref.disastername", "n/a");
+    			editor.commit ();
+    			startActivity(new Intent(HomeActivity.this, StartActivity.class));
+			break;
+    	case R.id.homeMenuLogoff:
+//TODO: Call the Societies platform
+	    	editor.putString ("pref.username", "n/a");
+	    	editor.putString ("pref.password", "n/a");
+	    	editor.commit ();
+    		startActivity(new Intent(HomeActivity.this, StartActivity.class));
+    		break;
+
+    		
+    	default:
+    		break;
+    	}
+    	return true;
+    }
+
+  
 }

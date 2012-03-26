@@ -104,7 +104,7 @@ public class StartActivity extends Activity implements OnClickListener {
 /**
  * onClick is called when button is clicked because
  * the OnClickListener is assigned to the button
- * */
+ */
 	public void onClick (View view) {
 		getPreferences ();				// retrieve user preferences
 		startNextActivity ();			// select next activity

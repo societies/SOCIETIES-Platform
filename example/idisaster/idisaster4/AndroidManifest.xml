@@ -20,7 +20,8 @@
             </intent-filter>
         </activity>
 
-<!-- noHistory: the activity will not be shown whne the user pressed on the "back" button -->        
+<!-- noHistory: the activity will not be shown whne the user pressed on the "back" button -->     
+<!-- Theme.NoTitleBar: the application name is not shown as title in display window -->   
         <activity
             android:name=".LoginActivity"
             android:theme="@android:style/Theme.NoTitleBar"
@@ -31,18 +32,32 @@
             android:name=".DisasterActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
+
+        <activity
+            android:name=".NewDisasterActivity"
+            android:theme="@android:style/Theme.NoTitleBar" 
+            android:noHistory="true" >
+        </activity>
         
         <activity
             android:name=".HomeActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
-        
-        
-<!--   Remove title with application name in display window 
+
 		<activity
-            android:name=".LoginActivity"
+		    android:name=".FeedActivity"
+            android:theme="@android:style/Theme.NoTitleBar" >  
+		</activity>
+		
+        <activity
+            android:name=".ServiceActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
- -->
+        </activity>
+        
+        <activity
+            android:name=".UserActivity"
+            android:theme="@android:style/Theme.NoTitleBar" > 
+        </activity>       
         
 	</application>
 

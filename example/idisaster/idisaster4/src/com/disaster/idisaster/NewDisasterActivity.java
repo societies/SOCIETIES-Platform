@@ -25,105 +25,96 @@
 package com.disaster.idisaster;
 
 import android.app.Activity;
-import android.os.Bundle;
-
-import android.view.View;
-import android.widget.EditText;
-import android.text.InputType;
-
-import android.widget.Toast;
-
-import android.widget.Button;
-import android.view.View.OnClickListener;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-
 import android.content.SharedPreferences.Editor;
-
+import android.os.Bundle;
+import android.widget.EditText;
+import android.widget.Toast;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
-
+import android.widget.Button;
 
 /**
- * This activity is responsible for user login,
- * including handling wrong user name and password.
+ * Activity for creating a new disaster community.
  * 
  * @author Jacqueline.Floch@sintef.no
  *
  */
+public class NewDisasterActivity extends Activity implements OnClickListener {
 
-public class LoginActivity extends Activity implements OnClickListener {
+	private EditText disasterNameView;
+	private EditText disasterDescriptionView;
+	private String disasterName;
+	private String disasterDescription;
 
-	private EditText userNameView;
-	private EditText userPasswordView;
-	private String userName;
-	private String userPassword;
 
-	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+
 		super.onCreate(savedInstanceState);
-		setContentView (R.layout.login_layout);
+		setContentView(R.layout.new_disaster_layout);
 
 		// Get editable fields
-		userNameView = (EditText) findViewById(R.id.editUserName);
-	    userPasswordView = (EditText) findViewById(R.id.editPassword);
-	    userPasswordView.setInputType (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+		disasterNameView = (EditText) findViewById(R.id.editNewDisasterName);
+		disasterDescriptionView = (EditText) findViewById(R.id.editNewDisasterDescription);
 
     	// Add click listener to button
-    	final Button button = (Button) findViewById(R.id.loginButton);
-    	button.setOnClickListener(this);
+    	final Button button = (Button) findViewById(R.id.newDisasterCreateButton);
+    	button.setOnClickListener(this);	
     }
 
- 		
+
 /**
  * onClick is called when button is clicked because
  * the OnClickListener is assigned to the button
- */
-	public void onClick (View view) {
-			
-    	if (userNameView.getText().length() == 0) {					// check input for user name
+ * */
 
-    	// Hide the soft keyboard otherwise the toast message does appear more clearly.
-    	    InputMethodManager mgr = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
-    	    mgr.hideSoftInputFromWindow(userNameView.getWindowToken(), 0);
-	    
-    		Toast.makeText(this, getString(R.string.toastUserName), 
-    				Toast.LENGTH_LONG).show();
-    		return;
+	public void onClick(View view) {
 
-    	} else if (userPasswordView.getText().length() == 0) {		// check input for password
+    	if (disasterNameView.getText().length() == 0) {					// check input for disaster name
 
     		// Hide the soft keyboard otherwise the toast message does appear more clearly.
     	    InputMethodManager mgr = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
-    	    mgr.hideSoftInputFromWindow(userPasswordView.getWindowToken(), 0);
+    	    mgr.hideSoftInputFromWindow(disasterNameView.getWindowToken(), 0);
+	    
+    		Toast.makeText(this, getString(R.string.toastDisasterName), 
+    				Toast.LENGTH_LONG).show();
+    		return;
 
-    	    Toast.makeText(this, getString(R.string.toastPassword), 
+    	} else if (disasterDescriptionView.getText().length() == 0) {	// check input for description (or any obligatory field
+
+    		// Hide the soft keyboard otherwise the toast message does appear more clearly.
+    	    InputMethodManager mgr = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
+    	    mgr.hideSoftInputFromWindow(disasterDescriptionView.getWindowToken(), 0);
+
+    	    Toast.makeText(this, getString(R.string.toastDisasterDescription), 
 	    			Toast.LENGTH_LONG).show();
 	    	return;
 
-    	} else {													// verify the password and store in preferences file
+    	} else {														// verify the password and store in preferences file
 
-    		userName = userNameView.getText().toString();
-    		userPassword = userPasswordView.getText().toString();
+    		disasterName = disasterNameView.getText().toString();
+    		disasterDescription = disasterDescriptionView.getText().toString();
 
-    		//TODO: Add call to the Societes API plaftorm
+    		//TODO: Add call to the Societes API plaftorm to create community
 
-    		boolean loginCode = false;	// TODO: replace by code returned by Societes API
+    		boolean disasterCreationCode = false;	// TODO: replace by code returned by Societes API
     			    		
     		// Create dialog for wrong password
-    		if (loginCode) { 							
+    		if (disasterCreationCode) { 							
     			AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
-    			alertBuilder.setMessage(getString(R.string.loginDialog))
+    			alertBuilder.setMessage(getString(R.string.newDisasterDialog))
     				.setCancelable(false)
     				.setPositiveButton (getString(R.string.dialogOK), new DialogInterface.OnClickListener() {
     					public void onClick(DialogInterface dialog, int id) {
-	    		           userNameView.setText(getString(R.string.emptyText));
-	    		           userNameView.setHint(getString(R.string.loginUserNameHint));
-	    		           userPasswordView.setText(getString(R.string.emptyText));
-	    		           userPasswordView.setHint(getString(R.string.loginPasswordHint));
+    						disasterNameView.setText(getString(R.string.emptyText));
+    						disasterNameView.setHint(getString(R.string.loginUserNameHint));
+// description needs not to be changed
+//	    		           userPasswordView.setText(getString(R.string.emptyText));
+//	    		           userPasswordView.setHint(getString(R.string.loginPasswordHint));
 	    		           return;
     					}
     				});
@@ -132,27 +123,19 @@ public class LoginActivity extends Activity implements OnClickListener {
 	    		return;
 	   		}
 	    		
-    		// Store user name and password in preferences
-	    	Editor editor = iDisasterApplication.getinstance().editor;
-	    	editor.putString ("pref.username", userName);
-	    	editor.putString ("pref.password", userPassword);
-	    	editor.commit ();
+    		//TODO: Refresh list of disasters - so it is displayed in the previous activity
 	    	    
 // TODO: Remove code for testing the correct setting of preferences 
-    	    String testName = iDisasterApplication.getinstance().preferences.
-    	    	getString ("pref.username","");
-    	    String testPassword = iDisasterApplication.getinstance().preferences.
-    	    	getString ("pref.password","");
-    	    Toast.makeText(this, "Debug: "  + testName + " " + testPassword, 
+    	    Toast.makeText(this, "Debug: "  + disasterName + " " + disasterDescription, 
     			Toast.LENGTH_LONG).show();
 
     	    // Hide the soft keyboard:
 			// - the soft keyboard will not appear on next activity window!
     	    InputMethodManager mgr = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
-    	    mgr.hideSoftInputFromWindow(userPasswordView.getWindowToken(), 0);
+    	    mgr.hideSoftInputFromWindow(disasterNameView.getWindowToken(), 0);
 
-	    	// Send intent to Disaster activity
-	    	startActivity(new Intent(LoginActivity.this, DisasterActivity.class));
+// TODO: Go back to list of next activity? Should it be Home?
+	    	startActivity(new Intent(NewDisasterActivity.this, DisasterActivity.class));
 	    }
     }
 		
@@ -161,7 +144,7 @@ public class LoginActivity extends Activity implements OnClickListener {
  */
 	private void showDialog () {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(getString(R.string.loginTestDialog))
+		builder.setMessage(getString(R.string.newDisasterTestDialog))
 			.setCancelable(false)
 			.setPositiveButton (getString(R.string.dialogOK), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
@@ -171,4 +154,5 @@ public class LoginActivity extends Activity implements OnClickListener {
 		AlertDialog dialog = builder.create();
 		dialog.show();
 	}
+
 }

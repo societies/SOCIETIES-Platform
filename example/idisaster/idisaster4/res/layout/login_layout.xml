@@ -1,44 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!--     Not sure if linera layout is needed when a table is used... -->
-<LinearLayout android:layout_width="fill_parent"
-	android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
 
-<!--     Not sure id relative layout is needed when a table is used...
-	<RelativeLayout android:layout_width="fill_parent"
-		android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
-
--->
-<!-- 	<TextView android:id="@+id/loginLabel" android:layout_width="fill_parent"
-     	android:text="@string/loginHeading" 
-     	android:textSize="20dip" android:textStyle="bold"
-		android:textColor="#EBF2FA" android:background="#E3701A"
-		android:layout_height="wrap_content" 
-		android:paddingLeft="5dip"
-		android:paddingTop="2dip" android:paddingBottom="2dip" />
- -->		
+ 		<TextView android:id="@+id/loginLabel" android:layout_width="fill_parent"
+     		android:text="@string/loginHeading" 
+     		android:textSize="20dip" android:textStyle="bold"
+     		android:textColor="@color/white" android:background="@color/orange"
+     		android:layout_height="wrap_content" 
+			android:paddingLeft="5dip"
+			android:paddingTop="2dip" android:paddingBottom="2dip" />
+ 				
 	 	<TableLayout android:id="@+id/loginTable"
 			android:layout_width="fill_parent" android:layout_height="fill_parent"
-			xmlns:android="http://schemas.android.com/apk/res/android">
+			xmlns:android="http://schemas.android.com/apk/res/android"
+			android:layout_below="@id/loginLabel"
+			android:background="@color/white"
+			>
+			
  
 			<TableRow>
 				<TextView android:id="@+id/editUserNameLabel"
-					android:text="@string/loginUserNameLabel" android:textColor="#FFFFFF"
+					android:text="@string/loginUserNameLabel" android:textColor="@color/black"
 					android:textStyle="bold" android:width="100dp" 
 					android:layout_width="wrap_content" android:layout_height="wrap_content"
 					android:paddingLeft="2dip" android:paddingRight="2dip"
-					android:paddingTop="2dip" android:paddingBottom="2dip" />
+					android:paddingTop="2dip" android:paddingBottom="2dip" 
+					/>
 
-<!-- Not sure if android:text is needed below -->
+				<!-- Not sure if android:text is needed below -->
 				<EditText
 				    android:id="@+id/editUserName"
 				    android:text="@string/emptyText"
-				    android:hint="@string/loginUserNameHint" android:textColor="#000000"
+				    android:hint="@string/loginUserNameHint" android:textColor="@color/black"
 				    android:background="@android:drawable/editbox_background"
 				    android:width="140dp" android:maxWidth="140dp"
 				    android:layout_width="fill_parent" android:layout_height="wrap_content"
 				    android:paddingRight="2dip"
-				    android:paddingTop="10dip" android:paddingBottom="10dip" />
+				    android:paddingTop="10dip" android:paddingBottom="10dip" 
+				    />
+				
 <!--			    android:layout_toRightOf="@id/editUserNameLabel"  -->
 				
 			</TableRow>
@@ -47,18 +50,19 @@
 
 				<TextView
 				    android:id="@+id/editPasswordLabel"
-				    android:text="@string/loginPasswordLabel" android:textColor="#FFFFFF"
+				    android:text="@string/loginPasswordLabel" android:textColor= "@color/black" 
 					android:textStyle="bold" android:width="100dp" 
 					android:layout_width="wrap_content" android:layout_height="wrap_content"
 					android:paddingLeft="2dip" android:paddingRight="2dip"
-					android:paddingTop="2dip" android:paddingBottom="2dip" />
+					android:paddingTop="2dip" android:paddingBottom="2dip" 
+					/>
 <!-- 				android:layout_below="@id/editUserNameLabel"  -->
 
 <!-- Not sure if android:text is needed below -->
 				<EditText
 				    android:id="@+id/editPassword"
 				    android:text="@string/emptyText"
-				    android:hint= "@string/loginPasswordHint" android:textColor="#000000"
+				    android:hint= "@string/loginPasswordHint" android:textColor="@color/black"
 				    android:background="@android:drawable/editbox_background"
 				    android:width="140dp" android:maxWidth="140dp"
 				    android:layout_width="fill_parent" android:layout_height="wrap_content"
@@ -72,20 +76,33 @@
 
 			    <TextView
 				    android:id="@+id/loginDummy1"
-				    android:text="@string/emptyText" android:textColor="#FFFFFF"
+				    android:text="@string/emptyText" android:textColor= "@color/black"
 					android:textStyle="bold" android:width="100dp" 
 					android:layout_width="wrap_content" android:layout_height="wrap_content"
 					android:paddingLeft="2dip" android:paddingRight="2dip"
 					android:paddingTop="2dip" android:paddingBottom="2dip" />					
 <!-- 				android:layout_below="@id/editPasswordLabel" -->
-						    
+
 				<Button
 				    android:id="@+id/loginButton" 
 				    android:layout_width="wrap_content" android:layout_height="wrap_content"
 				    android:text="@string/loginButton"
-				    android:textColor="#000000" 
-				    />
+				    android:textColor="@color/black" 
+				/>
 <!-- 				android:layout_toRightOf="@id/loginDummy1" -->
+
+<!-- The button style of the start page is not kept yet - as long it is not centered 				    
+				<Button 
+	    			android:id="@+id/loginButton"
+	    			android:text="@string/loginButton"
+	   				android:layout_width="wrap_content" android:layout_height="wrap_content"
+	   				android:layout_width="200dp" android:layout_height="50dp"
+	   				android:textColor="@android:color/white" android:textSize="20dip" android:textStyle="bold"
+	    			android:background="@drawable/button_idisaster"
+	    			/> 
+ 
+ -->
+
 
 			</TableRow>
 
@@ -93,7 +110,7 @@
 			
 			    <TextView
 				    android:id="@+id/loginDummy2"
-				    android:text="@string/emptyText" android:textColor="#FFFFFF"
+				    android:text="@string/emptyText" android:textColor= "@color/black"
 					android:textStyle="bold" android:width="100dp" 
 					android:layout_width="wrap_content" android:layout_height="wrap_content"
 					android:paddingLeft="2dip" android:paddingRight="2dip"
@@ -102,7 +119,7 @@
 	
 				<TextView 
 			    	android:id="@+id/loginInfo"
-					android:text="@string/loginInfo" android:textColor="#FFFFFF"
+					android:text="@string/loginInfo" android:textColor= "@color/black" 
 					android:textSize="14dip" 
 					android:layout_width="wrap_content" android:layout_height="wrap_content"
 					android:paddingRight="20dip" android:paddingTop="20dip"
@@ -111,103 +128,6 @@
 		
 			</TableRow>
  						
-		</TableLayout> 
-<!-- 
-	</RelativeLayout>
- -->
-</LinearLayout>
-
-<!--
-
-<ScrollView android:layout_width="fill_parent"
-	android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
-
-	<RelativeLayout android:layout_width="fill_parent"
-		android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
- 		
-		<TextView android:id="@+id/loginHeader" android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:text="Login"
-			android:textStyle="bold" android:textSize="20dip" android:background="#4556A6"
-			android:textColor="#EBF2FA" android:paddingLeft="5dip"
-			android:paddingTop="2dip" android:paddingBottom="2dip" />
- --> <!--
-		<TableLayout android:id="@+id/loginTable"
-			android:layout_width="fill_parent" android:layout_height="fill_parent"
-			android:layout_below="@+id/loginHeader" xmlns:android="http://schemas.android.com/apk/res/android">
-
-			<TableRow>
-				<TextView android:id="@+id/editUserNameLabel"
-					android:layout_width="wrap_content" android:layout_height="wrap_content"
-					android:text="User name" android:textColor="#FFFFFF"
-					android:paddingLeft="2dip" android:paddingRight="2dip"
-					android:paddingTop="2dip" android:paddingBottom="2dip"
-					android:textStyle="bold" android:width="100dp" />
-
-				<EditText android:id="@+id/editUserName" android:layout_width="fill_parent"
-					android:layout_height="wrap_content" android:background="@android:drawable/editbox_background"
-					android:layout_toRightOf="@id/editUserNameLabel" android:textColor="#000000"
-					android:paddingRight="2dip" android:paddingTop="10dip"
-					android:paddingBottom="10dip" android:width="140dp"
-					android:maxWidth="140dp" android:hint="Name" />
-			</TableRow>
-
-			<TableRow>
-				<TextView android:id="@+id/editPasswordLabel"
-					android:layout_width="wrap_content" android:layout_height="wrap_content"
-					android:text="Password" android:layout_below="@id/editUserNameLabel"
-					android:textColor="#FFFFFF" android:paddingLeft="2dip"
-					android:paddingRight="2dip" android:paddingTop="2dip"
-					android:paddingBottom="2dip" android:textStyle="bold" />
-
-				<EditText android:id="@+id/editPassword"
-					android:layout_width="fill_parent" android:layout_height="wrap_content"
-					android:background="@android:drawable/editbox_background"
-					android:layout_toRightOf="@id/editPasswordLabel"
-					android:textColor="#000000" android:paddingRight="2dip"
-					android:paddingTop="10dip" android:paddingBottom="10dip"
-					android:hint="Password" />
-			</TableRow>
-						
-			<TableRow android:layout_span="2" >
- --> <!--
-			<TableRow>
- 				<TextView android:id="@+id/loginDummy1"
-					android:layout_width="wrap_content" android:layout_height="wrap_content"
-					android:text="" android:layout_below="@id/editPasswordLabel"
-					android:textColor="#FFFFFF" android:paddingLeft="2dip"
-					android:paddingRight="2dip" android:paddingTop="2dip"
-					android:paddingBottom="2dip" android:textStyle="bold" />
-			    
-				<Button
-				    android:id="@+id/LoginButton" 
-				    android:layout_width="wrap_content" android:layout_height="wrap_content"
-					android:layout_toRightOf="@id/loginDummy1"
-				    android:text="Login"
-				    android:textColor="#000000" 
-				    />
-
-			</TableRow>
-
-			<TableRow>			
-				<TextView android:id="@+id/loginDummy2"
-					android:layout_width="wrap_content" android:layout_height="wrap_content"
-					android:text="" android:layout_below="@id/loginDummy2"
-					android:textColor="#FFFFFF" android:paddingLeft="2dip"
-					android:paddingRight="2dip" android:paddingTop="2dip"
-					android:paddingBottom="2dip" android:textStyle="bold" />
-		
-			<TextView android:id="@+id/loginInfo"
-				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:layout_toRightOf="@id/loginDummy2"
-				android:text="Sign up for Societies"
-				android:textSize="14dip" android:textColor="#FFFFFF"
-				android:paddingRight="20dip" android:paddingTop="20dip"
-				android:paddingBottom="20dip" />
-			
-			</TableRow>
-						
-		</TableLayout>
-
-	</RelativeLayout>
-</ScrollView>
- -->
+	</TableLayout> 
+ 
+</RelativeLayout>
