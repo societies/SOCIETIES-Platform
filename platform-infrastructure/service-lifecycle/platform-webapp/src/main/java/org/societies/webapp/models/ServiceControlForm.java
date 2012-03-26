@@ -37,12 +37,21 @@ public class ServiceControlForm {
 	private String method;
 	private String url;
 	private String service;
+	private String endpoint;
 	
 	public String getNode() {
 		return node;
 	}
 	public void setNode(String node) {
 		this.node = node;
+	}
+	
+	public String getEndpoint(){
+		return endpoint;
+	}
+	
+	public void setEndpoint(String endpoint){
+		this.endpoint=endpoint;
 	}
 	
 	public String getMethod() {
@@ -55,6 +64,7 @@ public class ServiceControlForm {
 	public String getUrl() {
 		return url;
 	}
+	
 	public void setUrl(String url) {
 		this.url = url;
 	}
@@ -62,6 +72,7 @@ public class ServiceControlForm {
 	public String getService() {
 		return service;
 	}
+	
 	public void setService(String service) {
 		this.service = service;
 	}
