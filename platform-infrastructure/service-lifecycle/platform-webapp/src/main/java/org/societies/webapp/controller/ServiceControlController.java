@@ -124,7 +124,7 @@ public class ServiceControlController {
 		methods.put("StopService", "Stop a Service");
 		methods.put("UninstallService", "Uninstall a Service");
 		methods.put("InstallService", "Install a Service");
-		methods.put("InstallServiceRemote", "Install a Service on a Remote Node");
+		//methods.put("InstallServiceRemote", "Install a Service on a Remote Node");
 		model.put("services", services);
 		model.put("methods", methods);
 		model.put("scForm", scForm);
@@ -173,7 +173,7 @@ public class ServiceControlController {
 		
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 		
-		if(serviceUri != null && !serviceUri.equals("NONE") && !serviceUri.equals("REMOTE")){
+		if(!serviceUri.equals("NONE") && !serviceUri.equals("REMOTE")){
 			int index = serviceUri.indexOf('_');	
 			String bundleExtract = serviceUri.substring(0, index);
 			String identifierExtract = serviceUri.substring(index+1);
@@ -189,7 +189,7 @@ public class ServiceControlController {
 			}
 		}
 		
-		if(!method.equalsIgnoreCase("InstallService") && endpoint!= null && (serviceUri.equals("REMOTE") || serviceUri.equals("NONE"))){
+		if(!method.equalsIgnoreCase("InstallService") && !endpoint.isEmpty() && (serviceUri.equals("REMOTE") || serviceUri.equals("NONE"))){
 			if(logger.isDebugEnabled()) logger.debug("It's a remote service, so we need to check it: " + endpoint);
 			
 			Future<List<Service>> asynchResult = null;
@@ -231,12 +231,22 @@ public class ServiceControlController {
 				
 				URL serviceUrl = new URL(url);
 				
+				/*
 				if(logger.isDebugEnabled()) logger.debug("InstallService Method on:" + serviceUrl);
 				
 				asynchResult=this.getSCService().installService(serviceUrl);
 				
 				res="ServiceControl Result Installing in Local Node: ";
+				*/
 				
+				if(logger.isDebugEnabled()) logger.debug("InstallService Remote Method on:" + serviceUrl +" on node " + node);
+				
+				asynchResult=this.getSCService().installService(serviceUrl, node);
+				if(!node.isEmpty())
+					res="ServiceControl Result for Node : [" + node + "]";
+				else
+					res="ServiceControl Result Installing in Local Node: ";
+					
 				scresult = asynchResult.get();
 				model.put("serviceResult", scresult);
 				
