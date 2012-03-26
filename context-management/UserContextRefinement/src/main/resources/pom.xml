@@ -1,0 +1,158 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <properties>
+		<component.descriptor.name>BayesianInference.xml</component.descriptor.name>
+		<trunkRelativePath>../..</trunkRelativePath>
+		<env.KF_HOME>${trunkRelativePath}/PersistContainer</env.KF_HOME>
+	</properties>
+  <parent>
+    <groupId>org.personalsmartspace</groupId>
+    <artifactId>persist-parent</artifactId>
+    <version>1.0</version>
+    <relativePath>../../Parent/parent.xml</relativePath>
+  </parent>
+
+  <!-- groupId is set in parent pom -->
+  <groupId>${release.groupId}</groupId>
+  <artifactId>pss_cm_bayesian</artifactId>
+  <version>${version.cm}</version>
+  <name>Bayesian Ctx Inference</name>
+  <packaging>bundle</packaging>
+
+   <developers>
+	<developer>
+            <name>Korbinian Frank</name>
+            <email>korbinianf@users.sourceforge.net</email>
+            <organization>DLR</organization>
+            <organizationUrl>www.dlr.de</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>+1</timezone>
+      </developer>
+  </developers>
+  
+  <dependencies>
+  	<!-- Persist dependencies -->
+        <dependency>
+          <groupId>${release.groupId}</groupId>
+          <artifactId>pss_pm_api</artifactId>
+          <version>${version.pm}</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>${release.groupId}</groupId>
+          <artifactId>pss_cm_api</artifactId>
+          <version>${version.cm}</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>${release.groupId}</groupId>
+          <artifactId>pss_cm_platform_api</artifactId>
+          <version>${version.cm}</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>${release.groupId}</groupId>
+          <artifactId>pss_sre_api</artifactId>
+          <version>${version.sre}</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${release.groupId}</groupId>
+            <artifactId>pss_log</artifactId>
+            <version>${version.log}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>${release.groupId}</groupId>
+          <artifactId>pss_lm_common_api</artifactId>
+          <version>${version.lm}</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>${release.groupId}</groupId>
+          <artifactId>pss_lm_bayesian</artifactId>
+          <version>${version.lm}</version>
+          <scope>provided</scope>
+        </dependency>
+		<dependency>
+		  <groupId>junit</groupId>
+		  <artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+		  <groupId>org.knopflerfish</groupId>
+		  <artifactId>knopflerfish-framework</artifactId>
+		</dependency>
+		<dependency>
+		  <groupId>org.knopflerfish</groupId>
+		  <artifactId>knopflerfish-log</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.knopflerfish</groupId>
+			<artifactId>knopflerfish-component</artifactId>
+			<scope>provided</scope>
+		</dependency>
+  </dependencies>
+  
+  <build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Bundle-Name>${project.name}</Bundle-Name>
+ 						<Export-Package>org.personalsmartspace.cm.reasoning.bayesian.*</Export-Package>
+						<Service-Component>OSGI-INF/${component.descriptor.name}</Service-Component>
+<!--						<Embed-Dependency>pss_sm_registry, pss_sm_osgi</Embed-Dependency>-->
+<!--						<Embed-Transitive>true</Embed-Transitive>						-->
+					</instructions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-scr-plugin</artifactId>
+				<configuration>
+					<finalName>${component.descriptor.name}</finalName>
+				</configuration>
+				<executions>
+					<execution>
+						<id>generate-scr-scrdescriptor</id>
+						<goals>
+							<goal>scr</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+							<groupId>${groupId}</groupId>
+							<artifactId>${artifactId}</artifactId>
+							<version>${version.cm}</version>
+							<type>bundle</type>
+							<overWrite>true</overWrite>							
+							<outputDirectory>${kf.pssstandard.deploy.dir}</outputDirectory>
+						</artifactItem>
+					</artifactItems>
+				</configuration>
+			</plugin>	
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+			</plugin>		
+		</plugins>
+	</build>
+
+</project>
+
