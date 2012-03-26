@@ -24,6 +24,8 @@
  */
 package org.societies.cis.android;
 
+import org.societies.cis.android.client.SocialContract;
+
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;

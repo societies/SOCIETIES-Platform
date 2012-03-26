@@ -9,6 +9,7 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
+    <provider android:name=".SocialProvider" android:authorities="@string/provider_authority" android:exported="true" android:syncable="true" android:enabled="true" android:readPermission="@string/provider_read_permission" android:writePermission="@string/provider_write_permission"></provider>
   </application>
 
 </manifest>

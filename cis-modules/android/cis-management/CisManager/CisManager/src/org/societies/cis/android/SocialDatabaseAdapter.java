@@ -25,6 +25,7 @@
 package org.societies.cis.android;
 
 import org.societies.api.cis.management.ICisRecord;
+import org.societies.cis.android.client.SocialContract;
 
 import android.content.ContentValues;
 import android.content.Context;
