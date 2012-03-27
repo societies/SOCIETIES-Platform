@@ -64,6 +64,10 @@
 		<!-- Client Framework -->
 		<module>../platform-infrastructure/client-frwk/MasterGUI</module>
 
+		<!-- CIS manager light modules -->
+		<module>../cis-modules/android/client-lib/CisClientLibraryAndroid</module>
+		<module>../cis-modules/android/cis-management/CisManager</module>
+		
 		<!-- Test applications N.B. Requires that emulator is started -->
 		<!--module>../platform-infrastructure/client-frwk/TestIPCServices</module -->
 
