@@ -319,6 +319,211 @@ public class DisasterActivity extends ListActivity {
 				.setPositiveButton (getString(R.string.dialogOK), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						return;
+    		}
+    	});	
+
+    	// Add listener for long click
+    	// listView.setOnItemLongClickListener(new DrawPopup());
+
+    }
+
+/**
+ * onCreateOptionsMenu creates the activity menu.
+ */
+ 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu){
+		menu.clear();
+		getMenuInflater().inflate(R.menu.disaster_menu, menu);
+
+//		It is possible to set up a variable menu		
+//			menu.findItem (R.id....).setVisible(true);
+
+		return true;
+	}
+
+/**
+ * onOptionsItemSelected handles the selection of an item in the activity menu.
+ */
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		switch (item.getItemId()) {
+		case R.id.disasterMenuAdd:
+			startActivity(new Intent(DisasterActivity.this, NewDisasterActivity.class));
+			break;
+		default:
+			break;
+		}
+		return true;
+	}
+
+/**
+	@Override
+	public void onListItemClick (ListView l, View v, int pos, long id) {
+		if(l.getAdapter().getItemViewType(pos) == SeparatedListAdapter.TYPE_SECTION_HEADER)
+		{
+			//Pressing a header			
+			return;
+		}
+		Poi p = (Poi) l.getAdapter().getItem(pos);
+
+		if (requestCode == NewPoiActivity.CHOOSE_POI){
+			Intent resultIntent = new Intent();
+			resultIntent.putExtra(IntentPassable.POI, p);
+			setResult( Activity.RESULT_OK, resultIntent );
+			finish();
+			return;
+		}
+
+		if (requestCode == PlanTripTab.ADD_TO_TRIP || requestCode == TripListActivity.ADD_TO_TRIP){
+
+			if(selectedPois == null){				
+				selectedPois = new ArrayList<Poi>();
+			}
+			if(!selectedPois.contains(p)){
+				v.setBackgroundColor(0xff9ba7d5);
+				selectedPois.add(p);
+			}else {
+				v.setBackgroundColor(Color.TRANSPARENT);
+				selectedPois.remove(p);
+			}
+			return;
+		}
+
+
+		if (requestCode == SHARE_POI){
+			if(sharePois == null){				
+				sharePois = new ArrayList<Poi>();
+			}
+			if(!sharePois.contains(p)){
+				v.setBackgroundColor(0xff9ba7d5);
+				sharePois.add(p);
+			}else {
+				v.setBackgroundColor(Color.TRANSPARENT);
+				sharePois.remove(p);
+			}
+			return;
+		}
+
+		if (requestCode == DOWNLOAD_POI){
+
+			if(downloadedPois == null){				
+				downloadedPois = new ArrayList<Poi>();
+			}
+			if(!downloadedPois.contains(p)){
+				v.setBackgroundColor(0xff9ba7d5);
+				downloadedPois.add(p);
+			}else {
+				v.setBackgroundColor(Color.TRANSPARENT);
+				downloadedPois.remove(p);
+			}
+			return;
+		}
+
+		Intent details = new Intent(PlanPoiTab.this, PoiDetailsActivity.class);
+		details.putExtra(IntentPassable.POI, p);
+
+		startActivity(details);
+	}//onListItemClick
+	
+*/
+
+/**
+ * Show quick actions when the user long-presses an item 
+ */
+	/**
+	final private class DrawPopup implements AdapterView.OnItemLongClickListener {
+
+		public boolean onItemLongClick(AdapterView<?> parent, View v, int pos, long id) {
+
+			final String	s 			= (String) parent.getAdapter().getItem(pos);
+			final AdapterView<?> par 	= parent;
+			final int	idx				= pos;
+			final int[] xy 				= new int[2];
+			
+			v.getLocationInWindow(xy);
+
+			final Rect rect 		= new Rect(	xy[0], 
+					xy[1], 
+					xy[0]+v.getWidth(), 
+					xy[1]+v.getHeight());
+
+			final QuickActionPopup qa = new QuickActionPopup (DisasterActivity.this, v, rect);
+
+			Drawable mapviewIcon	= res.getDrawable(android.R.drawable.ic_menu_mapmode);
+			Drawable directIcon		= res.getDrawable(android.R.drawable.ic_menu_directions);
+			Drawable deleteIcon		= res.getDrawable(android.R.drawable.ic_menu_delete);
+
+			// declare quick actions 			
+			qa.addItem(deleteIcon, "Delete from tour", new OnClickListener(){
+
+				public void onClick(View view){
+					db.deleteFromTrip(trip, trip.getPoiAt(idx));
+
+					trip.removePoi(idx);
+
+					//delete from list
+					((PoiAdapter)par.getAdapter()).remove(p);	
+					((PoiAdapter)par.getAdapter()).notifyDataSetChanged();
+					qa.dismiss();
+				}
+			});
+
+			qa.addItem(mapviewIcon,	"Show on map",		new OnClickListener(){
+
+				public void onClick(View view){
+
+					Intent showInMap = new Intent(TripListActivity.this, MapsActivity.class);
+					ArrayList<Poi> selectedPois = new ArrayList<Poi>();
+					selectedPois.add(p);
+					showInMap.putParcelableArrayListExtra(IntentPassable.POILIST, selectedPois);
+
+					startActivity(showInMap);
+					qa.dismiss();
+				}
+			});
+
+			qa.addItem(directIcon,	"Get directions",	new OnClickListener(){
+
+				public void onClick(View view){
+
+					//Latitude and longitude for current position
+					double slon = userLocation.getLongitude();
+					double slat = userLocation.getLatitude();
+					//Latitude and longitude for selected poi
+					double dlon = p.getGeoPoint().getLongitudeE6()/1E6;
+					double dlat = p.getGeoPoint().getLatitudeE6()/1E6;
+
+					Intent navigate = new Intent(TripListActivity.this, NavigateFrom.class);
+					navigate.putExtra("slon", slon);
+					navigate.putExtra("slat", slat);
+					navigate.putExtra("dlon", dlon);
+					navigate.putExtra("dlat", dlat);
+					startActivity(navigate);
+
+					qa.dismiss();
+
+				}
+			});
+
+			qa.show();
+
+			return true;
+		}
+	}
+*/
+
+/**
+ * showDialog is used under testing
+ */
+	private void showDialog () {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage(getString(R.string.disasterTestDialog))
+				.setCancelable(false)
+				.setPositiveButton (getString(R.string.dialogOK), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						return;
 				    }
 				});
 		AlertDialog dialog = builder.create();
