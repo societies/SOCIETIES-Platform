@@ -39,7 +39,6 @@ import android.widget.ArrayAdapter;
 import android.content.Intent;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -101,9 +100,8 @@ public class DisasterActivity extends ListActivity {
     		public void onItemClick (AdapterView<?> parent, View view,
     			int position, long id) {
     			// Store the selected disaster in preferences
-    			Editor editor = iDisasterApplication.getinstance().editor;
-    	    	editor.putString ("pref.disastername", CISLIST [position]);
-    	    	editor.commit ();
+            	iDisasterApplication.getinstance().setDisasterName (CISLIST [position]);
+
 // TODO: Remove code for testing the correct setting of preferences 
     			Toast.makeText(getApplicationContext(),
     				"Click ListItem Number " + (position+1) + " " + CISLIST [position], Toast.LENGTH_LONG)

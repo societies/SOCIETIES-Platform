@@ -56,9 +56,6 @@ public class iDisasterApplication extends Application {
     ICssRecord cssRecord; // Represents information about the user of the application. to be populated.
     String cssId;  //TODO: Find out which class CssId is.
 
-    
-
-
 
 	// returns application instance
 	public static iDisasterApplication getinstance () {
@@ -91,4 +88,24 @@ public class iDisasterApplication extends Application {
 	    
 	}//onCreate
 	
+	public String getUserName () {
+		return preferences.getString ("pref.username",getString(R.string.noPreference));
+	}
+
+	public void setUserName (String name, String password) {
+    	editor.putString ("pref.username", name);
+    	editor.putString ("pref.password", password);
+    	editor.commit ();    	
+	}
+
+	public String getDisasterName () {
+		return preferences.getString ("pref.disastername",getString(R.string.noPreference));
+	}
+
+	public void setDisasterName (String name) {
+    	editor.putString ("pref.disastername", name);
+    	editor.commit ();
+		
+	}
+
 }

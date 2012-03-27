@@ -12,7 +12,8 @@
     <string name="disasterListHeading">Disaster teams</string>
     
     <string name="emptyText"></string>
-
+    <string name="noPreference">n/a</string>
+    
     <string name="home_menu_selectDisaster">Select new team</string>
     <string name="home_menu_logoff">Log off</string>
     <string name="homeHeading">Selected team</string>

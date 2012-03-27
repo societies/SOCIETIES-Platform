@@ -40,8 +40,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 
-import android.content.SharedPreferences.Editor;
-
 import android.view.inputmethod.InputMethodManager;
 
 
@@ -133,11 +131,8 @@ public class LoginActivity extends Activity implements OnClickListener {
 	   		}
 	    		
     		// Store user name and password in preferences
-	    	Editor editor = iDisasterApplication.getinstance().editor;
-	    	editor.putString ("pref.username", userName);
-	    	editor.putString ("pref.password", userPassword);
-	    	editor.commit ();
-	    	    
+        	iDisasterApplication.getinstance().setUserName (userName, userPassword);
+        	
 // TODO: Remove code for testing the correct setting of preferences 
     	    String testName = iDisasterApplication.getinstance().preferences.
     	    	getString ("pref.username","");

@@ -33,19 +33,18 @@ public class HomeActivity extends TabActivity {
     	
         super.onCreate(savedInstanceState);
         
-// TODO: Add check that 1) a disaster is selected 2) the sleected disaster still exists...
+// TODO: Add check that 1) a disaster is selected 2) the selected disaster still exists...
         
         setContentView(R.layout.home_layout);
 
         // Set view label to selected disaster name
-    	String disasterName = iDisasterApplication.getinstance().preferences.
-        		getString ("pref.disastername","n/a");
+    	String disasterName = iDisasterApplication.getinstance().getDisasterName ();
 		TextView title = (TextView)findViewById(R.id.disasterLabel);
 		title.setText (disasterName);
         
         Resources res = getResources(); // Resource object to get Drawables
         TabHost tabHost = getTabHost();  // The activity TabHost
-        TabHost.TabSpec spec;  // Resuable TabSpec for each tab
+        TabHost.TabSpec spec;  // Reusable TabSpec for each tab
         Intent intent;  // Reusable Intent for each tab
 
         // Create an Intent to launch an Activity for the tab (to be reused)
@@ -100,18 +99,16 @@ public class HomeActivity extends TabActivity {
   */
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
-		Editor editor =iDisasterApplication.getinstance().editor;
 		switch (item.getItemId()) {
     		case R.id.homeMenuSelectDisaster:
-    			editor.putString ("pref.disastername", "n/a");
-    			editor.commit ();
+            	iDisasterApplication.getinstance().setDisasterName 
+            		(getString(R.string.noPreference));									// reset user preferences
     			startActivity(new Intent(HomeActivity.this, StartActivity.class));
 			break;
     	case R.id.homeMenuLogoff:
 //TODO: Call the Societies platform
-	    	editor.putString ("pref.username", "n/a");
-	    	editor.putString ("pref.password", "n/a");
-	    	editor.commit ();
+        	iDisasterApplication.getinstance().setUserName
+        		(getString(R.string.noPreference), getString(R.string.noPreference));	// reset user preferences
     		startActivity(new Intent(HomeActivity.this, StartActivity.class));
     		break;
 

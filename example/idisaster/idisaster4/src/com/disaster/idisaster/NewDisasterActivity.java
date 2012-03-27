@@ -28,7 +28,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -112,9 +111,6 @@ public class NewDisasterActivity extends Activity implements OnClickListener {
     					public void onClick(DialogInterface dialog, int id) {
     						disasterNameView.setText(getString(R.string.emptyText));
     						disasterNameView.setHint(getString(R.string.loginUserNameHint));
-// description needs not to be changed
-//	    		           userPasswordView.setText(getString(R.string.emptyText));
-//	    		           userPasswordView.setHint(getString(R.string.loginPasswordHint));
 	    		           return;
     					}
     				});

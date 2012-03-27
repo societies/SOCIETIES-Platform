@@ -28,7 +28,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
@@ -74,10 +73,8 @@ public class StartActivity extends Activity implements OnClickListener {
  */
     private void getPreferences () {
 
-    	userName = iDisasterApplication.getinstance().preferences.
-    		getString ("pref.username","n/a");
-    	disasterName = iDisasterApplication.getinstance().preferences.
-    		getString ("pref.disastername","n/a");
+    	userName = iDisasterApplication.getinstance().getUserName ();
+    	disasterName = iDisasterApplication.getinstance().getDisasterName ();
 	}
 		
 /**
@@ -89,10 +86,10 @@ public class StartActivity extends Activity implements OnClickListener {
  */
 	private void startNextActivity () {
 		
-    	if (userName == "n/a") {
+    	if (userName == getString(R.string.noPreference)) {
     		startActivity(new Intent(StartActivity.this, LoginActivity.class));
     		return;
-    	} else if (disasterName == "n/a") {
+    	} else if (disasterName == getString(R.string.noPreference)) {
     		startActivity(new Intent(StartActivity.this, DisasterActivity.class));
     		return;
     	} else {
