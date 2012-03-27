@@ -46,6 +46,7 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 
+
 /**
  * This interface provides access to current, past and future context data. The
  * past context refers to the data stored in the context history database. The
@@ -90,6 +91,18 @@ public interface ICtxBroker {
 	 */
 	public Future<CtxEntity> createEntity(String type) throws CtxException;
 
+	/**
+	 * Creates an individual Context Entity that is possible to join or to form a community. 
+	 * The  created <code>IndividualCtxEntity</code> is used to represent a single participant 
+	 * (CSS) of a {@link CommunityCtxEntity} (CIS). An <code>IndividualCtxEntity</code> may 
+	 * belong to zero or more CISs, simultaneously. The individual members of a pervasive 
+	 * community do not need to be human beings. They can also be organisations, smart space
+	 * infrastructures, autonomous or semi-autonomous agents, etc.
+	 *  
+	 * @param type
+	 */
+	public Future<IndividualCtxEntity> createIndividualEntity(String type) throws CtxException;
+		
 	/**
 	 * Disables context monitoring to Context Database
 	 * 

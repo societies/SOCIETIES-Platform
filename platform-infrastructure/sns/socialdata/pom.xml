@@ -6,7 +6,7 @@
 	<groupId>org.societies.platform</groupId>
 	<artifactId>socialdata</artifactId>
 	<packaging>jar</packaging>
-	<version>${release.version}-SNAPSHOT</version>
+	<version>${release.version}</version>
 
 	<developers></developers>
 
@@ -21,12 +21,7 @@
 
 	<dependencies>
 		<!-- add your dependencies here -->
-		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
+		
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
@@ -34,12 +29,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.societies.personalisation</groupId>
-			<artifactId>personalisation_api</artifactId>
-			<version>${version.pm}</version>
-			<scope>provided</scope>
-		</dependency>
+		
 
 
 		<dependency>
