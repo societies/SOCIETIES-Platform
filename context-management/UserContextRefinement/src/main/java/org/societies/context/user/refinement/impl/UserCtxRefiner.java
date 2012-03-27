@@ -26,16 +26,28 @@ package org.societies.context.user.refinement.impl;
 
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.context.api.user.refinement.IUserCtxRefiner;
+import org.springframework.stereotype.Service;
 
+/**
+ * UserCtxRefiner Implementation This class implements the interface between the
+ * context broker, context inference manager and the Bayesian library
+ */
+@Service
 public class UserCtxRefiner implements IUserCtxRefiner {
 
-	/* (non-Javadoc)
-	 * @see org.societies.context.api.user.refinement.IUserCtxRefiner#refineContext(org.societies.api.context.model.CtxAttributeIdentifier)
+	private BayesEngine learner = BayesEngine.getInstance();
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.societies.context.api.user.refinement.IUserCtxRefiner#refineContext
+	 * (org.societies.api.context.model.CtxAttributeIdentifier)
 	 */
 	@Override
 	public void refineContext(CtxAttributeIdentifier arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

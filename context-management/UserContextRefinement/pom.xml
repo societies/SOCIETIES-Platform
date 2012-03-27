@@ -41,8 +41,26 @@
 			<version>${version.cm}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>user-context-db-mgmt</artifactId>
+			<version>${version.cm}</version>
+			<scope>test</scope>
+		</dependency>
 
 
+  		<dependency>
+  		  <groupId>colt</groupId>
+  		  <artifactId>colt</artifactId>
+  		  <version>1.0</version>
+  		</dependency>
+  		<dependency>
+  		  <groupId>concurrent</groupId>
+  		  <artifactId>concurrent</artifactId>
+  		  <version>1.0</version>
+  		</dependency>
+  		
+  		
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.beans</artifactId>
@@ -72,7 +90,6 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
 		</dependency>
-
 
 	</dependencies>
 	<parent>
