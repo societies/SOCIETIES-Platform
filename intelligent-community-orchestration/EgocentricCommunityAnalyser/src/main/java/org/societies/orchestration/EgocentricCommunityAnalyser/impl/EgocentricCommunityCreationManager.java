@@ -857,7 +857,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		
 		HashMap<String, ArrayList<ICisRecord>> theResult = new HashMap<String, ArrayList<ICisRecord>>();
 		theResult.put("Create CISs", cissToCreate);
-		return suggestedCommunityAnalyser.analyseEgocentricRecommendations(theResult, cissToCreateMetadata);
+		return suggestedCommunityAnalyser.processEgocentricRecommendations(theResult, cissToCreateMetadata);
 		//if (cissToCreate != null) 
 		//    for (int i = 0; i < cissToCreate.size(); i++)
 		//	    cisManager.createCis(linkedCss.getIdentifier(), cissToCreate.get(i).getCisId());

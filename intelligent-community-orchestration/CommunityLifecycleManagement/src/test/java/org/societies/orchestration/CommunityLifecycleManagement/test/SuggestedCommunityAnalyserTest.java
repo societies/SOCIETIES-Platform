@@ -81,7 +81,7 @@ public class SuggestedCommunityAnalyserTest {
 		
     	suggestedCommunityAnalyser = new SuggestedCommunityAnalyser(ownerId, "CSS");
 		HashMap<String, ArrayList<ICisRecord>> recommendations = new HashMap<String, ArrayList<ICisRecord>>();
-		suggestedCommunityAnalyser.analyseEgocentricRecommendations(recommendations, new ArrayList<String>());
+		suggestedCommunityAnalyser.processEgocentricRecommendations(recommendations, new ArrayList<String>());
 		
 		//James should have been suggested to leave the CIS.
 		// (No members list function in CisRecord API yet)

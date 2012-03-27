@@ -302,7 +302,7 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 	        	//
 		       // cisManager.configureCis(linkedCss, potentiallyConfigurableCis.getCisId());
 	   }
-		return suggestedCommunityAnalyser.analyseEgocentricConfigurationRecommendations(null, null);
+		return suggestedCommunityAnalyser.processEgocentricConfigurationRecommendations(null, null);
 		
 	}
 	
