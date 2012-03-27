@@ -24,124 +24,70 @@
  */
 package org.societies.api.context.model;
 
+import javax.xml.bind.annotation.XmlType;
+
 /**
- * This class is used to identify context attributes. It provides methods
- * that return information about the identified attribute including:
+ * This class is used to identify context associations. It provides methods that
+ * return information about the identified association including:
  * <ul>
  * <li><tt>OperatorId</tt>: A unique identifier of the CSS or CIS where the 
- * entity containing the identified context attribute was first stored.</li>
+ * identified context association is stored.</li>
  * <li><tt>ModelType</tt>: Describes the type of the identified context model
- * object, i.e. {@link CtxModelType#ATTRIBUTE ATTRIBUTE}.</li>
+ * object, i.e. {@link CtxModelTypeBean#ASSOCIATION ASSOCIATION}.</li>
  * <li><tt>Type</tt>: A semantic tag that characterises the identified context
- * attribute. e.g. "name".</li>
+ * association, e.g. "isFriendWith".</li>
  * <li><tt>ObjectNumber</tt>: A unique number within the CSS/CIS where the
  * respective context information was initially sensed/collected and stored.</li>
  * </ul>
  * <p>
- * Compared to context entity or association identifiers, attribute identifiers
- * additionally contain their <tt>Scope</tt>, i.e. the Entity identifier they
- * are associated with. The format of the resulting identifier is as follows:
+ * A context association identifier can be represented as a URI formatted
+ * String as follows:
  * <pre>
- * &lt;Scope&gt;/ATTRIBUTE/&lt;Type&gt;/&lt;ObjectNumber&gt;
+ * &lt;OperatorId&gt;/ASSOCIATION/&lt;Type&gt;/&lt;ObjectNumber&gt;
  * </pre>
- * <p>
- * Use the {@link #getScope()} method to retrieve the {@link CtxEntityIdentifier}
- * representing the attribute's <tt>Scope</tt>
- * as a <code>CtxEntityIdentifier</code> object.
  * 
- * @see CtxEntityIdentifier
- * @see CtxIdentifier
+ * @see CtxIdentifierBean
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-public class CtxAttributeIdentifier extends CtxIdentifier {
-	
-	private static final long serialVersionUID = -282171829285239788L;
-	
-	/** The scope of this context attribute identifier. */
-	private transient CtxEntityIdentifier scope;
+@XmlType(namespace="http://societies.org/api/schema/context/model")
+public class CtxAssociationIdentifierBean extends CtxIdentifierBean {
+
+	private static final long serialVersionUID = -7991875953413583564L;
+
+	CtxAssociationIdentifierBean() {}
 	
 	/**
-	 * Creates a context attribute identifier by specifying the containing
-	 * entity, the attribute type and the unique numeric model object identifier
+	 * Creates a context association identifier by specifying the CSS/CIS ID
+	 * where the identified context model object is stored, as well as,
+	 * the association type and the unique numeric model object identifier.
 	 * 
-	 * @param scope
-	 *            the {@link CtxEntityIdentifier} of the context entity containing
-	 *            the identified attribute
+	 * @param operatorId
+	 *            the identifier of the CSS/CIS where the identified context
+	 *            model object is stored
 	 * @param type
-	 *            the attribute type, e.g. "name"
+	 *            the association type, e.g. "device"
 	 * @param objectNumber
 	 *            the unique numeric model object identifier
 	 */
-	public CtxAttributeIdentifier(CtxEntityIdentifier scope, String type, Long objectNumber) {
+	public CtxAssociationIdentifierBean(String operatorId, String type,
+			Long objectNumber) {
 		
-		super(scope.getOperatorId(), CtxModelType.ATTRIBUTE, type, objectNumber);
-		this.scope = scope;
+		super(operatorId, CtxModelTypeBean.ASSOCIATION, type, objectNumber);
 	}
 	
-	CtxAttributeIdentifier(String str) throws MalformedCtxIdentifierException {
+	CtxAssociationIdentifierBean(String str) throws MalformedCtxIdentifierException {
 		
 		super(str);
 	}
-	
-	/**
-	 * Returns the {@link CtxEntityIdentifier} of the context entity containing
-	 * the identified attribute.
-	 * 
-	 * @return the {@link CtxEntityIdentifier} of the context entity containing
-	 *         the identified attribute.
-	 */
-	public CtxEntityIdentifier getScope() {
-		
-		return this.scope;
-	}
-	
-	/**
-	 * @see java.lang.Object#hashCode()
-	 * @since 0.0.2
-	 */
-	@Override
-	public int hashCode() {
-		
-		final int prime = 31;
-		int result = super.hashCode();
-		
-		result = prime * result + ((this.scope == null) ? 0 : this.scope.hashCode());
-		
-		return result;
-	}
 
 	/**
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 * @since 0.0.2
-	 */
-	@Override
-	public boolean equals(Object that) {
-		
-		if (this == that)
-			return true;
-		if (!super.equals(that))
-			return false;
-		if (this.getClass() != that.getClass())
-			return false;
-		
-		CtxAttributeIdentifier other = (CtxAttributeIdentifier) that;
-		if (this.scope == null) {
-			if (other.scope != null)
-				return false;
-		} else if (!this.scope.equals(other.scope))
-			return false;
-		
-		return true;
-	}
-
-	/**
-	 * Formats the string representation of a context attribute identifier as follows:
+	 * Formats the string representation of a context association identifier as follows:
 	 * <pre> 
-	 * scope/ATTRIBUTE/type/objectNumber
+	 * operatorId/ASSOCIATION/type/objectNumber
 	 * </pre>
 	 * 
-	 * @see CtxIdentifier#defineString()
+	 * @see CtxIdentifierBean#defineString()
 	 */
 	@Override
 	protected void defineString() {
@@ -151,9 +97,9 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append(this.scope);
+		sb.append(super.operatorId);
 		sb.append("/");
-		sb.append(CtxModelType.ATTRIBUTE);
+		sb.append(CtxModelTypeBean.ASSOCIATION);
 		sb.append("/");
 		sb.append(super.type);
 		sb.append("/");
@@ -163,17 +109,17 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 	}
 
 	/**
-	 * Parses the string form of a context attribute identifier as follows:
+	 * Parses the string form of a context association identifier as follows:
 	 * <pre> 
-	 * scope/ATTRIBUTE/type/objectNumber
+	 * operatorId/ASSOCIATION/type/objectNumber
 	 * </pre>
 	 * 
-	 * @see CtxIdentifier#parseString(java.lang.String)
+	 * @see CtxIdentifierBean#parseString(java.lang.String)
 	 */
 	@Override
 	protected void parseString(String input)
 			throws MalformedCtxIdentifierException {
-	
+		
 		super.string = input;
 
 		final int length = input.length();
@@ -186,40 +132,33 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 			super.objectNumber = new Long(objectNumberStr);
 		} catch (NumberFormatException nfe) {
 			throw new MalformedCtxIdentifierException("'" + input 
-					+ "': Invalid context attribute object number", nfe);
+					+ "': Invalid context association object number", nfe);
 		}
 
 		final int typeDelim = input.lastIndexOf("/", objectNumberDelim-1);
 		super.type = input.substring(typeDelim+1, objectNumberDelim);
 		if (super.type.isEmpty())
 			throw new MalformedCtxIdentifierException("'" + input 
-					+ "': Context attribute type cannot be empty");
+					+ "': Context association type cannot be empty");
 
 		final int modelTypeDelim = input.lastIndexOf("/", typeDelim-1);
 		if (modelTypeDelim == -1)
 			throw new MalformedCtxIdentifierException("'" + input + "'");
 		final String modelTypeStr = input.substring(modelTypeDelim+1, typeDelim);
 		try {
-			super.modelType = CtxModelType.valueOf(modelTypeStr);
+			super.modelType = CtxModelTypeBean.valueOf(modelTypeStr);
 		} catch (IllegalArgumentException iae) {
 			throw new MalformedCtxIdentifierException("'" + input 
 					+ "': Malformed context model type", iae);
 		}
-		if (!CtxModelType.ATTRIBUTE.equals(super.modelType))
+		if (!CtxModelTypeBean.ASSOCIATION.equals(super.modelType))
 			throw new MalformedCtxIdentifierException("'" + input 
-					+ "': Expected 'ATTRIBUTE' but found '"
+					+ "': Expected 'ASSOCIATION' but found '"
 					+ super.modelType + "'");
 
-		final String scopeStr = input.substring(0, modelTypeDelim);
-		if (scopeStr.isEmpty())
+		operatorId = input.substring(0, modelTypeDelim);
+		if (operatorId.isEmpty())
 			throw new MalformedCtxIdentifierException("'" + input 
-					+ "': Context attribute scope cannot be empty");
-		try { 
-			this.scope = new CtxEntityIdentifier(scopeStr);
-		} catch (MalformedCtxIdentifierException mcie) {
-			throw new MalformedCtxIdentifierException("'" + input
-					+ "': Malformed context attribute scope", mcie);
-		}
-		super.operatorId = this.scope.getOperatorId();
+					+ "': Operator ID cannot be empty");
 	}
 }

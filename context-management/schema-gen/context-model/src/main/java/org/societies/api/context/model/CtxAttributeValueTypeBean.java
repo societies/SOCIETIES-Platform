@@ -24,23 +24,52 @@
  */
 package org.societies.api.context.model;
 
+import javax.xml.bind.annotation.XmlType;
+
 /**
- * This class is used to represent a single participant (CSS) of a
- * {@link CommunityCtxEntity} (CIS). An <code>IndividualCtxEntity</code> may belong to
- * zero or more CISs, simultaneously. The individual members of a pervasive community do
- * not need to be human beings. They can also be organisations, smart space
- * infrastructures, autonomous or semi-autonomous agents, etc.
+ * The constants of this enumerated type specify the data type of the {@link CtxAttributeBean}
+ * value. To this end, the following value types have been identified:
+ * <dl>
+ * <dt>{@link #EMPTY}</dt>
+ * <dd>No value set.</dd>
+ * <dt>{@link #STRING}</dt>
+ * <dd>Text value.</dd>
+ * <dt>{@link #INTEGER}</dt>
+ * <dd>Integer value.</dd>
+ * <dt>{@link #DOUBLE}</dt>
+ * <dd>Double-precision floating point numeric value.</dd>
+ * <dt>{@link #BINARY}</dt>
+ * <dd>Binary value, i.e. a byte[].</dd>
+ * </dl>
  * 
- * @see CtxEntityIdentifier
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-public class IndividualCtxEntity extends CommunityMemberCtxEntity {
+@XmlType(namespace="http://societies.org/api/schema/context/model")
+public enum CtxAttributeValueTypeBean {
 
-	private static final long serialVersionUID = -1841816618272931692L;
+	/**
+	 * Denotes a {@link CtxAttributeBean} with no value set
+	 */
+	EMPTY,
 	
-	public IndividualCtxEntity(CtxEntityIdentifier id) {
-		
-		super(id);
-	}
+	/**
+	 * Denotes a {@link CtxAttributeBean} value of type <code>String</code>
+	 */
+	STRING,
+	
+	/**
+	 * Denotes a {@link CtxAttributeBean} value is of type <code>Integer</code>
+	 */
+	INTEGER,
+	
+	/**
+	 * Denotes that the {@link CtxAttributeBean} value is of type <code>Double</code>
+	 */
+	DOUBLE,
+	
+	/**
+	 * Denotes that the {@link CtxAttributeBean} value is of type <code>byte[]</code>
+	 */
+	BINARY,
 }

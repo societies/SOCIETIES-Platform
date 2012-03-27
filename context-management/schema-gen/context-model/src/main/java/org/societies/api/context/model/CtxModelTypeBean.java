@@ -24,23 +24,39 @@
  */
 package org.societies.api.context.model;
 
-/**
- * This class is used to represent a single participant (CSS) of a
- * {@link CommunityCtxEntity} (CIS). An <code>IndividualCtxEntity</code> may belong to
- * zero or more CISs, simultaneously. The individual members of a pervasive community do
- * not need to be human beings. They can also be organisations, smart space
- * infrastructures, autonomous or semi-autonomous agents, etc.
- * 
- * @see CtxEntityIdentifier
- * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.1
- */
-public class IndividualCtxEntity extends CommunityMemberCtxEntity {
+import javax.xml.bind.annotation.XmlType;
 
-	private static final long serialVersionUID = -1841816618272931692L;
+/**
+ * The constants of this enumerated type specify the context model type of a 
+ * {@link CtxModelObjectBean}. Context model objects can be of one of the following types:
+ * <ul>
+ * <li>{@link #ENTITY}: Denotes a context entity</li>
+ * <li>{@link #ATTRIBUTE}: Denotes a context attribute</li>
+ * <li>{@link #ASSOCIATION}: Denotes a context association</li>
+ * </ul>
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @see CtxModelObjectBean
+ * @see CtxEntityBean
+ * @see CtxAttributeBean 
+ * @see CtxAssociationBean
+ * @since 0.0.1 
+ */
+@XmlType(namespace="http://societies.org/api/schema/context/model")
+public enum CtxModelTypeBean {
 	
-	public IndividualCtxEntity(CtxEntityIdentifier id) {
-		
-		super(id);
-	}
+	/**
+	 * The enum constant for context entities
+	 */
+	ENTITY,
+	
+	/**
+	 * The enum constant for context attributes
+	 */
+	ATTRIBUTE,
+	
+	/**
+	 * The enum constant for context associations
+	 */
+	ASSOCIATION,
 }

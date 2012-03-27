@@ -30,6 +30,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+
 //import org.societies.api.identity.IIdentity;
 
 /**
@@ -39,8 +44,8 @@ import java.io.Serializable;
  * <li><tt>OperatorId</tt>: A unique identifier of the CSS or CIS where the 
  * identified context model object is stored.</li>
  * <li><tt>ModelType</tt>: Describes the type of the identified context model
- * object, i.e. is one of the following: {@link CtxModelType#ENTITY ENTITY},
- * {@link CtxModelType#ATTRIBUTE ATTRIBUTE}, or {@link CtxModelType#ASSOCIATION
+ * object, i.e. is one of the following: {@link CtxModelTypeBean#ENTITY ENTITY},
+ * {@link CtxModelTypeBean#ATTRIBUTE ATTRIBUTE}, or {@link CtxModelTypeBean#ASSOCIATION
  * ASSOCIATION}.</li>
  * <li><tt>Type</tt>: A semantic tag that characterises the identified context
  * model object. e.g. "person".</li>
@@ -48,11 +53,13 @@ import java.io.Serializable;
  * respective context information was initially sensed/collected and stored.</li>
  * </ul>
  * 
- * @see CtxModelType
+ * @see CtxModelTypeBean
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-public abstract class CtxIdentifier implements Serializable {
+@XmlType(namespace="http://societies.org/api/schema/context/model")
+@XmlAccessorType(XmlAccessType.FIELD)
+public abstract class CtxIdentifierBean implements Serializable {
 
 	private static final long serialVersionUID = 3552976823045895472L;
 	
@@ -60,7 +67,7 @@ public abstract class CtxIdentifier implements Serializable {
 	protected transient String operatorId;
 	
 	/** The type of the identified context model object. */
-	protected transient CtxModelType modelType;
+	protected transient CtxModelTypeBean modelType;
 	
 	/** The semantic tag that characterises the identified context model object. */
 	protected transient String type;
@@ -69,11 +76,14 @@ public abstract class CtxIdentifier implements Serializable {
 	protected transient Long objectNumber;
 	
 	/** The string form of this context identifier. */
+	@XmlElement(required = true, nillable=false)
 	protected volatile String string;    // The only serialisable field
+
+	CtxIdentifierBean() {}
 	
 	/**
 	 * Constructs a context model object identifier by specifying the CSS/CIS ID
-	 * where the identified object is stored, as well as, the {@link CtxModelType}
+	 * where the identified object is stored, as well as, the {@link CtxModelTypeBean}
 	 * and the unique numeric model object identifier.
 	 * 
 	 * @param operatorId
@@ -85,7 +95,7 @@ public abstract class CtxIdentifier implements Serializable {
 	 * @param objectNumber
 	 *            the unique numeric model object identifier
 	 */
-	CtxIdentifier(String operatorId, CtxModelType modelType, String type, Long objectNumber) {
+	CtxIdentifierBean(String operatorId, CtxModelTypeBean modelType, String type, Long objectNumber) {
 		
 		this.operatorId = operatorId;
 		this.modelType = modelType;
@@ -99,7 +109,7 @@ public abstract class CtxIdentifier implements Serializable {
 	 * @throws MalformedCtxIdentifierException
 	 *             if the given string cannot be parsed
 	 */
-	CtxIdentifier(String str) throws MalformedCtxIdentifierException {
+	CtxIdentifierBean(String str) throws MalformedCtxIdentifierException {
 		
 		this.parseString(str);
 	}
@@ -120,9 +130,9 @@ public abstract class CtxIdentifier implements Serializable {
 	 * Returns the type of the identified context model object
 	 * 
 	 * @return the type of the identified context model object
-	 * @see CtxModelType
+	 * @see CtxModelTypeBean
 	 */
-	public CtxModelType getModelType() {
+	public CtxModelTypeBean getModelType() {
 		
 		return this.modelType;
 	}
@@ -209,7 +219,7 @@ public abstract class CtxIdentifier implements Serializable {
         if (this.getClass() != that.getClass())
             return false;
         
-        CtxIdentifier other = (CtxIdentifier) that;
+        CtxIdentifierBean other = (CtxIdentifierBean) that;
         if (this.operatorId == null) {
             if (other.operatorId != null)
                 return false;
@@ -250,9 +260,9 @@ public abstract class CtxIdentifier implements Serializable {
 	protected abstract void parseString(String input) throws MalformedCtxIdentifierException;
 	
 	/**
-     * Writes the contents of this CtxIdentifier to the given object output stream.
+     * Writes the contents of this CtxIdentifierBean to the given object output stream.
      * <p> 
-     * The only serialisable field of a CtxIdentifier instance is its 
+     * The only serialisable field of a CtxIdentifierBean instance is its 
      * {@link #string} field. That field is given a value, if it does not have
      * one already, and then the {@link java.io.ObjectOutputStream#defaultWriteObject()}
      * method of the given object-output stream is invoked.
@@ -267,7 +277,7 @@ public abstract class CtxIdentifier implements Serializable {
     }
 
     /**
-     * Reconstructs a CtxIdentifier from the given serial stream.
+     * Reconstructs a CtxIdentifierBean from the given serial stream.
      * <p> 
      * The {@link java.io.ObjectInputStream#defaultReadObject()} method is
      * invoked to read the value of the <tt>string</tt> field. The result is

@@ -25,22 +25,56 @@
 package org.societies.api.context.model;
 
 /**
- * This class is used to represent a single participant (CSS) of a
- * {@link CommunityCtxEntity} (CIS). An <code>IndividualCtxEntity</code> may belong to
- * zero or more CISs, simultaneously. The individual members of a pervasive community do
- * not need to be human beings. They can also be organisations, smart space
- * infrastructures, autonomous or semi-autonomous agents, etc.
- * 
- * @see CtxEntityIdentifier
+ * Describe your class here...
+ *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.1
+ * @since 0.0.4
  */
-public class IndividualCtxEntity extends CommunityMemberCtxEntity {
-
-	private static final long serialVersionUID = -1841816618272931692L;
+public final class CtxIdentifierFactory {
 	
-	public IndividualCtxEntity(CtxEntityIdentifier id) {
+	private static CtxIdentifierFactory instance = new CtxIdentifierFactory();
+	 
+	/**
+	 * Prevents re-instantiation of this factory. 
+	 */
+	private CtxIdentifierFactory() {}
+	
+	/**
+	 * Returns the instance of the context identifier factory.
+	 * 
+	 * @return the instance of the context identifier factory.
+	 */
+	public static synchronized CtxIdentifierFactory getInstance() {
+	
+		return instance;
+	}
+	
+	/**
+	 * 
+	 * @param str
+	 * @return
+	 * @throws MalformedCtxIdentifierException
+	 */
+	public CtxIdentifier fromString(String str) throws MalformedCtxIdentifierException {
 		
-		super(id);
+		if (str == null)
+			throw new NullPointerException("str cannot be null");
+		
+		if (str.indexOf(CtxModelType.ATTRIBUTE.toString()) != -1) 
+			return new CtxAttributeIdentifier(str);
+		else if (str.indexOf(CtxModelType.ENTITY.toString()) != -1)
+			return new CtxEntityIdentifier(str);
+		else if (str.indexOf(CtxModelType.ASSOCIATION.toString()) != -1)
+			return new CtxAssociationIdentifier(str);
+		else
+			throw new MalformedCtxIdentifierException();
+	}
+	 
+	/**
+	 * Prevents cloning
+	 */
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		throw new CloneNotSupportedException("Clone is not allowed.");
 	}
 }

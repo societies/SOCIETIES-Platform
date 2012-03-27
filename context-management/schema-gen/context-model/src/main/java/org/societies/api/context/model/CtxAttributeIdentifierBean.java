@@ -24,6 +24,10 @@
  */
 package org.societies.api.context.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * This class is used to identify context attributes. It provides methods
  * that return information about the identified attribute including:
@@ -31,7 +35,7 @@ package org.societies.api.context.model;
  * <li><tt>OperatorId</tt>: A unique identifier of the CSS or CIS where the 
  * entity containing the identified context attribute was first stored.</li>
  * <li><tt>ModelType</tt>: Describes the type of the identified context model
- * object, i.e. {@link CtxModelType#ATTRIBUTE ATTRIBUTE}.</li>
+ * object, i.e. {@link CtxModelTypeBean#ATTRIBUTE ATTRIBUTE}.</li>
  * <li><tt>Type</tt>: A semantic tag that characterises the identified context
  * attribute. e.g. "name".</li>
  * <li><tt>ObjectNumber</tt>: A unique number within the CSS/CIS where the
@@ -45,53 +49,58 @@ package org.societies.api.context.model;
  * &lt;Scope&gt;/ATTRIBUTE/&lt;Type&gt;/&lt;ObjectNumber&gt;
  * </pre>
  * <p>
- * Use the {@link #getScope()} method to retrieve the {@link CtxEntityIdentifier}
+ * Use the {@link #getScope()} method to retrieve the {@link CtxEntityIdentifierBean}
  * representing the attribute's <tt>Scope</tt>
- * as a <code>CtxEntityIdentifier</code> object.
+ * as a <code>CtxEntityIdentifierBean</code> object.
  * 
- * @see CtxEntityIdentifier
- * @see CtxIdentifier
+ * @see CtxEntityIdentifierBean
+ * @see CtxIdentifierBean
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-public class CtxAttributeIdentifier extends CtxIdentifier {
+@XmlType(namespace="http://societies.org/api/schema/context/model")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class CtxAttributeIdentifierBean extends CtxIdentifierBean {
 	
 	private static final long serialVersionUID = -282171829285239788L;
 	
 	/** The scope of this context attribute identifier. */
-	private transient CtxEntityIdentifier scope;
+	private transient CtxEntityIdentifierBean scope;
+
+	@SuppressWarnings("unused")
+	private CtxAttributeIdentifierBean() {}
 	
 	/**
 	 * Creates a context attribute identifier by specifying the containing
 	 * entity, the attribute type and the unique numeric model object identifier
 	 * 
 	 * @param scope
-	 *            the {@link CtxEntityIdentifier} of the context entity containing
+	 *            the {@link CtxEntityIdentifierBean} of the context entity containing
 	 *            the identified attribute
 	 * @param type
 	 *            the attribute type, e.g. "name"
 	 * @param objectNumber
 	 *            the unique numeric model object identifier
 	 */
-	public CtxAttributeIdentifier(CtxEntityIdentifier scope, String type, Long objectNumber) {
+	public CtxAttributeIdentifierBean(CtxEntityIdentifierBean scope, String type, Long objectNumber) {
 		
-		super(scope.getOperatorId(), CtxModelType.ATTRIBUTE, type, objectNumber);
+		super(scope.getOperatorId(), CtxModelTypeBean.ATTRIBUTE, type, objectNumber);
 		this.scope = scope;
 	}
 	
-	CtxAttributeIdentifier(String str) throws MalformedCtxIdentifierException {
+	CtxAttributeIdentifierBean(String str) throws MalformedCtxIdentifierException {
 		
 		super(str);
 	}
 	
 	/**
-	 * Returns the {@link CtxEntityIdentifier} of the context entity containing
+	 * Returns the {@link CtxEntityIdentifierBean} of the context entity containing
 	 * the identified attribute.
 	 * 
-	 * @return the {@link CtxEntityIdentifier} of the context entity containing
+	 * @return the {@link CtxEntityIdentifierBean} of the context entity containing
 	 *         the identified attribute.
 	 */
-	public CtxEntityIdentifier getScope() {
+	public CtxEntityIdentifierBean getScope() {
 		
 		return this.scope;
 	}
@@ -125,7 +134,7 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 		if (this.getClass() != that.getClass())
 			return false;
 		
-		CtxAttributeIdentifier other = (CtxAttributeIdentifier) that;
+		CtxAttributeIdentifierBean other = (CtxAttributeIdentifierBean) that;
 		if (this.scope == null) {
 			if (other.scope != null)
 				return false;
@@ -141,7 +150,7 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 	 * scope/ATTRIBUTE/type/objectNumber
 	 * </pre>
 	 * 
-	 * @see CtxIdentifier#defineString()
+	 * @see CtxIdentifierBean#defineString()
 	 */
 	@Override
 	protected void defineString() {
@@ -153,7 +162,7 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 
 		sb.append(this.scope);
 		sb.append("/");
-		sb.append(CtxModelType.ATTRIBUTE);
+		sb.append(CtxModelTypeBean.ATTRIBUTE);
 		sb.append("/");
 		sb.append(super.type);
 		sb.append("/");
@@ -168,7 +177,7 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 	 * scope/ATTRIBUTE/type/objectNumber
 	 * </pre>
 	 * 
-	 * @see CtxIdentifier#parseString(java.lang.String)
+	 * @see CtxIdentifierBean#parseString(java.lang.String)
 	 */
 	@Override
 	protected void parseString(String input)
@@ -200,12 +209,12 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 			throw new MalformedCtxIdentifierException("'" + input + "'");
 		final String modelTypeStr = input.substring(modelTypeDelim+1, typeDelim);
 		try {
-			super.modelType = CtxModelType.valueOf(modelTypeStr);
+			super.modelType = CtxModelTypeBean.valueOf(modelTypeStr);
 		} catch (IllegalArgumentException iae) {
 			throw new MalformedCtxIdentifierException("'" + input 
 					+ "': Malformed context model type", iae);
 		}
-		if (!CtxModelType.ATTRIBUTE.equals(super.modelType))
+		if (!CtxModelTypeBean.ATTRIBUTE.equals(super.modelType))
 			throw new MalformedCtxIdentifierException("'" + input 
 					+ "': Expected 'ATTRIBUTE' but found '"
 					+ super.modelType + "'");
@@ -215,7 +224,7 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 			throw new MalformedCtxIdentifierException("'" + input 
 					+ "': Context attribute scope cannot be empty");
 		try { 
-			this.scope = new CtxEntityIdentifier(scopeStr);
+			this.scope = new CtxEntityIdentifierBean(scopeStr);
 		} catch (MalformedCtxIdentifierException mcie) {
 			throw new MalformedCtxIdentifierException("'" + input
 					+ "': Malformed context attribute scope", mcie);

@@ -24,6 +24,11 @@
  */
 package org.societies.api.context.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * This class is used in order to represent context history attributes
  * maintained in the context history database.
@@ -31,33 +36,39 @@ package org.societies.api.context.model;
  * @author <a href="mailto:nikosk@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
  * @since 0.0.1
  */
-public class CtxHistoryAttribute extends CtxModelObject {
+@XmlType(namespace="http://societies.org/api/schema/context/model", propOrder = {"historyRecordId", "stringValue", "integerValue", "doubleValue", "binaryValue"})
+@XmlAccessorType(XmlAccessType.FIELD)
+public class CtxHistoryAttributeBean extends CtxModelObjectBean {
 
 	private static final long serialVersionUID = -1908778456166623132L;
 
 	/** The numeric id of this context history attribute in the database. */
-	private final Long historyRecordId;
+	@XmlElement(required = true, nillable=false)
+	private /* final */ Long historyRecordId;
 	
 	/** The text value of this context history attribute. */
-	private final String stringValue;
+	@XmlElement(required = true, nillable=true)
+	private /* final */ String stringValue;
 	
 	/** The integer value of this context history attribute. */
-	private final Integer integerValue;
+	@XmlElement(required = true, nillable=true)
+	private /* final */ Integer integerValue;
 	
 	/** The double-precision floating point numeric value of this context history attribute. */
-	private final Double doubleValue;
+	@XmlElement(required = true, nillable=true)
+	private /* final */ Double doubleValue;
 	
 	/** The binary value of this context history attribute. */
-	private final byte[] binaryValue;
+	@XmlElement(required = true, nillable=true)
+	private /* final */ byte[] binaryValue;
 
-	public CtxHistoryAttribute(CtxAttribute ctxAttribute, Long historyRecordId) {
+	CtxHistoryAttributeBean() {}
+
+	public CtxHistoryAttributeBean(CtxAttributeBean ctxAttribute, Long historyRecordId) {
 		super(ctxAttribute.getId());
 		super.setLastModified(ctxAttribute.getQuality().getLastUpdated());
 		this.historyRecordId = historyRecordId;
-		this.stringValue = ctxAttribute.getStringValue();
-		this.integerValue = ctxAttribute.getIntegerValue();
-		this.doubleValue = ctxAttribute.getDoubleValue();
-		this.binaryValue = ctxAttribute.getBinaryValue();
+		this.setValues(ctxAttribute);
 	}
 
 	/**
@@ -66,9 +77,8 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	 * @return the identifier of this historic context attribute.
 	 */
 	@Override
-	public CtxAttributeIdentifier getId() {
-		
-		return (CtxAttributeIdentifier) super.getId();
+	public CtxAttributeIdentifierBean getId() {
+		return (CtxAttributeIdentifierBean) super.getId();
 	}
 	
 	/**
@@ -77,7 +87,6 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	 * @return string value
 	 */
 	public String getStringValue() {
-		
 		return this.stringValue;
 	}
 
@@ -87,7 +96,6 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	 * @return integer value
 	 */
 	public Integer getIntegerValue() {
-		
 		return this.integerValue;
 	}
 
@@ -97,7 +105,6 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	 * @return double value
 	 */
 	public Double getDoubleValue() {
-		
 		return this.doubleValue;
 	}
 
@@ -107,7 +114,6 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	 * @return blob value
 	 */
 	public byte[] getBinaryValue() {
-		
 		return this.binaryValue;
 	}
 	
@@ -119,7 +125,6 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	 */
 	@Override
 	public String toString() {
-		
 		return getId().toString(); 
 	}
 
@@ -153,12 +158,19 @@ public class CtxHistoryAttribute extends CtxModelObject {
 		if (this.getClass() != that.getClass())
 			return false;
 		
-		CtxHistoryAttribute other = (CtxHistoryAttribute) that;
+		CtxHistoryAttributeBean other = (CtxHistoryAttributeBean) that;
 		if (this.historyRecordId == null) {
 			if (other.historyRecordId != null)
 				return false;
 		} else if (!this.historyRecordId.equals(other.historyRecordId))
 			return false;
 		return true;
+	}
+	
+	private void setValues(CtxAttributeBean ctxAttribute) {
+		this.stringValue = ctxAttribute.getStringValue();
+		this.integerValue = ctxAttribute.getIntegerValue();
+		this.doubleValue = ctxAttribute.getDoubleValue();
+		this.binaryValue = ctxAttribute.getBinaryValue();
 	}
 }

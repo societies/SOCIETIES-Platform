@@ -24,23 +24,70 @@
  */
 package org.societies.api.context.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+
 /**
- * This class is used to represent a single participant (CSS) of a
- * {@link CommunityCtxEntity} (CIS). An <code>IndividualCtxEntity</code> may belong to
- * zero or more CISs, simultaneously. The individual members of a pervasive community do
- * not need to be human beings. They can also be organisations, smart space
- * infrastructures, autonomous or semi-autonomous agents, etc.
+ * This abstract class is used in order to represent members of a
+ * {@link CommunityCtxEntityBean} (CIS). A <code>CommunityMemberCtxEntityBean</code>
+ * can be an individual or a sub-community, hence, there are two concrete
+ * implementations of this class, namely {@link IndividualCtxEntityBean} and
+ * {@link CommunityCtxEntityBean}. A CommunityMemberCtxEntityBean may belong to
+ * multiple communities, simultaneously. This class provides methods for
+ * accessing and modifying these communities.
  * 
- * @see CtxEntityIdentifier
+ * @see CtxEntityIdentifierBean
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-public class IndividualCtxEntity extends CommunityMemberCtxEntity {
-
-	private static final long serialVersionUID = -1841816618272931692L;
+@XmlType(namespace="http://societies.org/api/schema/context/model", propOrder = {"communities"})
+@XmlAccessorType(XmlAccessType.FIELD)
+public abstract class CommunityMemberCtxEntityBean extends CtxEntityBean {
 	
-	public IndividualCtxEntity(CtxEntityIdentifier id) {
-		
+	private static final long serialVersionUID = 3614587369237968591L;
+	
+	/** The communities this entity is member of. */
+	@XmlElement(required = true, nillable=false)
+	private Set<CommunityCtxEntityBean> communities = new HashSet<CommunityCtxEntityBean>();
+
+	CommunityMemberCtxEntityBean() {}
+	
+	CommunityMemberCtxEntityBean(CtxEntityIdentifierBean id) {
 		super(id);
+	}
+
+	/**
+	 * Returns a set with the community members.
+	 * 
+	 * @return set CommunityCtxEntityBean
+	 */
+	public Set<CommunityCtxEntityBean> getCommunities() {
+		
+		return new HashSet<CommunityCtxEntityBean>(this.communities);
+	}
+	
+	/**
+	 * Add a CommunityCtxEntityBean to the community
+	 * 
+	 * @param community
+	 */
+	public void addCommunity(CommunityCtxEntityBean community) {
+		
+		this.communities.add(community);
+	}
+	
+	/**
+	 * Remove a CommunityCtxEntityBean from the community.
+	 * 
+	 * @param community
+	 */
+	public void removeCommunity(CommunityCtxEntityBean community) {
+		
+		this.communities.remove(community);
 	}
 }

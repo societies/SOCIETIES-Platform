@@ -24,22 +24,27 @@
  */
 package org.societies.api.context.model;
 
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * This class is used to represent a single participant (CSS) of a
- * {@link CommunityCtxEntity} (CIS). An <code>IndividualCtxEntity</code> may belong to
+ * {@link CommunityCtxEntityBean} (CIS). An <code>IndividualCtxEntityBean</code> may belong to
  * zero or more CISs, simultaneously. The individual members of a pervasive community do
  * not need to be human beings. They can also be organisations, smart space
  * infrastructures, autonomous or semi-autonomous agents, etc.
  * 
- * @see CtxEntityIdentifier
+ * @see CtxEntityIdentifierBean
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-public class IndividualCtxEntity extends CommunityMemberCtxEntity {
+@XmlType(namespace="http://societies.org/api/schema/context/model")
+public class IndividualCtxEntityBean extends CommunityMemberCtxEntityBean {
 
 	private static final long serialVersionUID = -1841816618272931692L;
 	
-	public IndividualCtxEntity(CtxEntityIdentifier id) {
+	IndividualCtxEntityBean() {}
+	
+	public IndividualCtxEntityBean(CtxEntityIdentifierBean id) {
 		
 		super(id);
 	}
