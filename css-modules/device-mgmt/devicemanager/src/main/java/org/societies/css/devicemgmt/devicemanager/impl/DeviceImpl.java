@@ -26,22 +26,17 @@
 package org.societies.css.devicemgmt.devicemanager.impl;
 
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.societies.api.css.devicemgmt.IDevice;
 import org.societies.api.css.devicemgmt.IDeviceService;
-import org.societies.api.css.devicemgmt.model.DeviceMgmtConstants;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 
 
@@ -51,9 +46,7 @@ public class DeviceImpl implements IDevice{
 	
 	private static Logger LOG = LoggerFactory.getLogger(DeviceImpl.class);
 	private DeviceManager deviceManager;
-	private ServiceRegistration registration;
 	private BundleContext bundleContext;
-	private Dictionary<String, String> properties;
 	private DeviceCommonInfo deviceCommonInfo;
 	private String deviceId;
 	private boolean status;
@@ -65,49 +58,13 @@ public class DeviceImpl implements IDevice{
 		this.deviceManager = deviceMgr;
 		this.deviceCommonInfo = deviceCommonInfo;
 		this.deviceId = deviceId;
-		
-		
-		
-		properties = new Hashtable<String, String>();
-		
-		properties.put(DeviceMgmtConstants.DEVICE_NAME, deviceCommonInfo.getDeviceName());
-		properties.put(DeviceMgmtConstants.DEVICE_TYPE, deviceCommonInfo.getDeviceType());
-		properties.put(DeviceMgmtConstants.DEVICE_ID, deviceId);
-		properties.put(DeviceMgmtConstants.DEVICE_FAMILY, deviceCommonInfo.getDeviceFamilyIdentity());
-		properties.put(DeviceMgmtConstants.DEVICE_LOCATION, deviceCommonInfo.getDeviceLocation());
-		properties.put(DeviceMgmtConstants.DEVICE_PROVIDER, deviceCommonInfo.getDeviceProvider());
-		properties.put(DeviceMgmtConstants.DEVICE_CONNECTION_TYPE, deviceCommonInfo.getDeviceConnectionType());
-		if (deviceCommonInfo.getContextSource())
-		{
-			properties.put(DeviceMgmtConstants.DEVICE_CONTEXT_SOURCE, "isContextSource");
-		}
-		else
-		{
-			properties.put(DeviceMgmtConstants.DEVICE_CONTEXT_SOURCE, "isNotContextSource");
-		}
-		
-		
-		
-		Object lock = new Object();
-
-		synchronized(lock)
-		{
-			registration = bundleContext.registerService(IDevice.class.getName(), this, properties);
-			
-			LOG.info("-- A device service with the deviceId: " + properties.get("deviceId") + " has been registred"); 
-		}
-		
 	}
 	
 	public void removeDevice()
 	{
-		if (registration != null)
-		{
-			registration.unregister();
-			deviceManager.removeDeviceFromContainer(deviceCommonInfo.getDeviceFamilyIdentity(), deviceId);
+		deviceManager.removeDeviceFromContainer(deviceCommonInfo.getDeviceFamilyIdentity(), deviceId);
 			
-			LOG.info("-- The device " + properties.get("deviceId") + " has been removed");
-		}
+			LOG.info("-- The device " + deviceId + " has been removed");
 	}
 
 	public String getDeviceName() {

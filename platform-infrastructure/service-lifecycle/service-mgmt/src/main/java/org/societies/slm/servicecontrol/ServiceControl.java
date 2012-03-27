@@ -46,7 +46,7 @@ import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
- * Describe your class here...
+ * Implementation of Service Control
  *
  * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
@@ -332,7 +332,10 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			// Our first task is to verify if we're installing in the right node..
 
 			String localNodeJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
-			String nodeJid = node.getJid();
+			String nodeJid = localNodeJid;
+			
+			if(node != null)
+				nodeJid = node.getJid();
 			
 			if(logger.isDebugEnabled())
 				logger.debug("The JID of the node where the Service is: " + nodeJid + " and the local JID: " + localNodeJid);
@@ -394,6 +397,35 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		}
 
 	}
+
+	@Override
+	public Future<ServiceControlResult> installService(URL bundleLocation, String nodeJid)
+			throws ServiceControlException {
+		
+		if(logger.isDebugEnabled()) logger.debug("Service Management: installService method, on another node");
+				
+		try {
+			
+			// We convert to a node, then call the other method...
+			IIdentity node = null;
+			
+			if(nodeJid != null && !nodeJid.isEmpty())
+				node = getCommMngr().getIdManager().fromJid(nodeJid);
+			
+			Future<ServiceControlResult> asyncResult = null;
+			
+			asyncResult = installService(bundleLocation,node);
+			ServiceControlResult result = asyncResult.get();
+			
+			return new AsyncResult<ServiceControlResult>(result);
+					
+		} catch (Exception ex) {
+			logger.error("Exception while attempting to install a bundle: " + ex.getMessage());
+			throw new ServiceControlException("Exception while attempting to install a bundle.", ex);
+		}
+
+	}
+	
 	
 	@Override
 	public Future<ServiceControlResult> uninstallService(ServiceResourceIdentifier serviceId)

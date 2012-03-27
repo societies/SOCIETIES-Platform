@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
-import org.societies.api.schema.security.policynegotiator.SlaBean;
+import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 import org.societies.api.security.digsig.ISignatureMgr;
 
 //@Component
@@ -64,7 +64,7 @@ public class NegotiationProvider implements INegotiationProvider {
 		//LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
 		
 		LOG.debug("init(): group manager = {}", groupMgr.toString());
-		//groupMgr.reject(0);
+		//groupMgr.reject(0, null);
 		groupMgr.getPolicyOptions("123", null);
 	}
 	
@@ -82,24 +82,39 @@ public class NegotiationProvider implements INegotiationProvider {
 		this.signatureMgr = signatureMgr;
 	}
 	
+	private SlaBean createSlaBean(boolean success, int sessionId, String sla) {
+		
+		SlaBean bean = new SlaBean();
+		
+		bean.setSuccess(success);
+		bean.setSessionId(sessionId);
+		bean.setSla(sla);
+		
+		return bean;
+	}
+	
 	@Override
 	public Future<SlaBean> getPolicyOptions(String serviceId) {
 		
-		SlaBean sla = new SlaBean();
+		LOG.debug("getPolicyOptions({})", serviceId);
+		
 		Random rnd = new Random();
 		int sessionId = rnd.nextInt();
-		
-		sla.setSessionId(sessionId);
+		boolean success = true;
+		String sla = "<a/>";  // FIXME
+		SlaBean result = createSlaBean(success, sessionId, sla);
+
 		// TODO: store session ID
-		sla.setSla("<a/>");  // FIXME
 		
-		return new AsyncResult<SlaBean>(sla);
+		return new AsyncResult<SlaBean>(result);
 	}
 
 	@Override
 	public Future<SlaBean> acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
 			boolean modified) {
-		
+
+		LOG.debug("acceptPolicyAndGetSla({})", sessionId + ", ..., " + modified);
+
 		SlaBean sla = new SlaBean();
 		String finalSla;
 		
@@ -116,8 +131,14 @@ public class NegotiationProvider implements INegotiationProvider {
 	}
 
 	@Override
-	public void reject(int sessionId) {
+	public Future<SlaBean> reject(int sessionId) {
 
 		LOG.debug("reject({})", sessionId);
+
+		boolean success = true;  // TODO: check if session ID is valid
+		String sla = null;
+		SlaBean result = createSlaBean(success, sessionId, sla);
+
+		return new AsyncResult<SlaBean>(result);
 	}
 }

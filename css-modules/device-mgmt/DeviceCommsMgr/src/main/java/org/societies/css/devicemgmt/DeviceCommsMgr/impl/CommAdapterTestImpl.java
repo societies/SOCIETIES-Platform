@@ -30,10 +30,14 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBException;
 
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
@@ -46,21 +50,14 @@ import org.societies.comm.xmpp.event.PubsubEventStream;
 import org.springframework.context.ApplicationListener;
 
 
-public class CommAdapterTestImpl implements DmCommManager,ApplicationListener<PubsubEvent>{
+public class CommAdapterTestImpl implements DmCommManager,Subscriber{
 	
 	private IIdentityManager idManager;
 	private ICommManager commManager;
-	public static final String SCHEMA = "org.societies.api.schema.css.devicemanagement";
-										    
+	public static final String SCHEMA = "org.societies.api.schema.css.devicemanagment";
+	private PubsubClient pubSubManager;  
 	
-	public ICommManager getCommManager() {
-		return commManager;
-	}
-
-
-	public void setCommManager(ICommManager commManager) {
-		this.commManager = commManager;
-	}
+	
 
 
 	private String EVENTING_NODE_NAME = "GUY";
@@ -71,18 +68,43 @@ public class CommAdapterTestImpl implements DmCommManager,ApplicationListener<Pu
 	
 	PubsubClient pubsubClient;
 	
-	public CommAdapterTestImpl(){
-		timer.scheduleAtFixedRate(new TimerTask() {
-		        public void run() {
-		        	try{
-		        		sendEvent();
-		        	}catch (Exception e) {
-						e.printStackTrace();
-					}
-		        }
-		    }, delay, period);
-	}
+	
+	public CommAdapterTestImpl(){}
+	
+	@PostConstruct 
+	private void init(){
+		idManager = commManager.getIdManager();
+		IIdentity pubsubID = null;
 		
+		try {
+			//we can add "."
+			//idManager.getThisNetworkNode().getJid();
+			
+			pubsubID = idManager.fromJid("XCManager.societies.local");
+			pubSubManager.ownerCreate(pubsubID, EVENTING_NODE_NAME);
+		} catch (InvalidFormatException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (XMPPError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	
+	
+	timer.scheduleAtFixedRate(new TimerTask() {
+	        public void run() {
+	        	try{
+	        		sendEvent();
+	        	}catch (Exception e) {
+					e.printStackTrace();
+				}
+	        }
+	    }, delay, period);
+	}
 	
 	public void fireNewDeviceConnected(String deviceID, DeviceCommonInfo deviceCommonInfo){
 		
@@ -99,6 +121,51 @@ public class CommAdapterTestImpl implements DmCommManager,ApplicationListener<Pu
 	}
 
 	private void sendEvent(){
+		
+		try{
+			idManager = commManager.getIdManager();
+			IIdentity pubsubID = null;
+			
+			try {
+				//we can add "."
+				//idManager.getThisNetworkNode().getJid();
+				
+				pubsubID = idManager.fromJid("XCManager.societies.local");
+				//pubSubManager.ownerCreate(pubsubID, EVENTING_NODE_NAME);
+			} catch (InvalidFormatException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			}
+			
+			List<String> packageList = new ArrayList<String>();
+			packageList.add(SCHEMA);
+			try {
+				pubSubManager.addJaxbPackages(packageList);
+			} catch (JAXBException e1) {
+				//ERROR RESOLVING PACKAGE NAMES - CHECK PATH IS CORRECT
+				e1.printStackTrace();
+			}
+			
+			DmEvent dmEvent = new DmEvent();
+			dmEvent.setDeviceId("123456");
+			dmEvent.setDescription("aaaa");
+			dmEvent.setType("bbb");
+			
+			
+			pubSubManager.subscriberSubscribe(pubsubID, EVENTING_NODE_NAME, this);
+			String published = pubSubManager.publisherPublish(pubsubID, EVENTING_NODE_NAME, "Guy", dmEvent);
+			System.out.println(published);
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+		
+		
+		
+		/*
 		idManager = commManager.getIdManager();
 		IIdentity pubsubID = null;
 		try {
@@ -140,36 +207,18 @@ public class CommAdapterTestImpl implements DmCommManager,ApplicationListener<Pu
 		dmEvent.setDescription("aaaa");
 		dmEvent.setType("bbb");
 		
-		/*
-		Document doc; Element root = null;
-		try {
-			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-			root = doc.createElement("root");
-			
-			Node wisdom = doc.createElement("wisdom"); 
-			wisdom.setNodeValue(Long.valueOf(System.currentTimeMillis()).toString());
-			root.appendChild(wisdom);
-		} catch (ParserConfigurationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		
-		}
-		eventStream.addApplicationListener(this);
-
-			//GENERATE EVENT
-		PubsubEvent event = new PubsubEvent(this, root);
-		eventStream.multicastEvent(event);
-
-		*/
+	
 
 		eventStream.addApplicationListener(this);
 		//GENERATE EVENT
 		PubsubEvent event = new PubsubEvent(this, dmEvent);
 		eventStream.multicastEvent(event);
+		*/
 	}
 	
 	
-
+/*
 	@Override
 	public void onApplicationEvent(PubsubEvent arg0) {
 		System.out.println(arg0.getTimestamp());
@@ -183,21 +232,42 @@ public class CommAdapterTestImpl implements DmCommManager,ApplicationListener<Pu
 		}
 		
 	}
+*/
 	
 	public static void main(String[] agrgs){
 		CommAdapterTestImpl commAdapterImpl = new CommAdapterTestImpl();
 		commAdapterImpl.sendEvent();
 	}
 
-
-	public PubsubClient getPubsubClient() {
-		return pubsubClient;
+	
+	public PubsubClient getPubSubManager() {
+		return pubSubManager;
 	}
 
-
-	public void setPubsubClient(PubsubClient pubsubClient) {
-		this.pubsubClient = pubsubClient;
+	public void setPubSubManager(PubsubClient pubSubManager) {
+		this.pubSubManager = pubSubManager;
 	}
 	
+	public ICommManager getCommManager() {
+		return commManager;
+	}
+
+
+	public void setCommManager(ICommManager commManager) {
+		this.commManager = commManager;
+	}
+
+
+	@Override
+	public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object item) {
+		DmEvent dmEvent = null;
+		try{
+			dmEvent = (DmEvent)item;
+			System.out.println(dmEvent.getDescription());
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
 	
 }

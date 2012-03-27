@@ -30,34 +30,23 @@ package org.societies.api.osgi.event;
  */
 public class EventTypes {
 
-	
 	public static final String CSS_ADV_EVENT = "org/societies/css/advert";	
 	public static final String CSS_JOINED_EVENT = "eu/persist/css/joined";
 	public static final String CSS_LEFT_EVENT = "org/societies/css/left";
 	public static final String CSS_NOTIFICATION_EVENT = "org/societies/notification";
 	public static final String CONTEXT_EVENT = "org/societies/context";
 	public static final String SERVICE_LIFECYCLE_EVENT = "org/societies/service/lifecycle";
-	public static final String SERVICE_FAULT_EVENT = "org/societies/service/fault";	
-	public static final String PSS_ADV_EVENT = "eu/persist/onm/pss/advert";	
+	public static final String SERVICE_FAULT_EVENT = "org/societies/service/fault";
 	
-	/**
-	 * Used by Service Management (Session Manager) to publish events concerning the status
-	 * of sessions 
-	 */
-        public static final String SERVICE_SESSION_EVENT = "org/societies//servicemgmt/session/status";
-        /**
-         * Used by Service Management (Service Discovery) to notify peers of a new service
-         */
-        public static final String NEW_SERVICE_EVENT = "org/societies/servicemgmt/service/newservice";
-        /**
-         * Used by Service Management (Service Discovery) to notify peers of a removed service
-         */
-        public static final String REMOVED_SERVICE_EVENT = "org/societies/servicemgmt/service/removeservice";
-        /**
-         * Used by Service Management (Service Discovery) to notify a local peer of a failed service
-         */
-        public static final String FAILED_SERVICE_EVENT = "org/societies/servicemgmt/service/failedservice";
-        
-
-        
+	/**Used by Service Management (Session Manager) to publish events concerning the status of sessions */
+    public static final String SERVICE_SESSION_EVENT = "org/societies/servicemgmt/session/status";
+    
+    /**Used by Service Management (Service Discovery) to notify peers of a new service */
+	public static final String NEW_SERVICE_EVENT = "org/societies/servicemgmt/service/newservice";
+	
+	/**Used by Service Management (Service Discovery) to notify peers of a removed service*/
+	public static final String REMOVED_SERVICE_EVENT = "org/societies/servicemgmt/service/removeservice";
+	
+	/**Used by Service Management (Service Discovery) to notify a local peer of a failed service */
+	public static final String FAILED_SERVICE_EVENT = "org/societies/servicemgmt/service/failedservice";        
 }

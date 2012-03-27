@@ -75,7 +75,19 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 		}
 	}
 
+	/**
+	 * Obtain an identity to communicate with
+	 * 
+	 * @return IIdentity identity
+	 * @throws InvalidFormatException
+	 */
+	private IIdentity getIdentity() throws InvalidFormatException {
+		IIdentity toIdentity = idMgr.fromJid(EXTERNAL_COMMUNICATION_MANAGER);
+		return toIdentity;
+
+	}
 	
+	// ICommCallback implementation
 	@Override
 	public List<String> getJavaPackages() {
 		Dbc.ensure("Message bean Java packages list must have at least one member ", CommsServer.MESSAGE_BEAN_PACKAGES != null && CommsServer.MESSAGE_BEAN_PACKAGES.size() > 0);
@@ -139,95 +151,331 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 	}
 	@Override
 	public void loginCSS(CssRecord profile, ICSSManagerCallback callback) {
-		// TODO Auto-generated method stub
-		
+		LOG.debug("Remote call on loginCSS");
+
+		IIdentity toIdentity;
+		try {
+			toIdentity = getIdentity();
+			Stanza stanza = new Stanza(toIdentity);
+			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
+			
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+			messageBean.setProfile(profile);
+			messageBean.setMethod(MethodType.LOGIN_CSS);
+			
+			try {
+				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
+		
 	@Override
 	public void loginXMPPServer(CssRecord profile, ICSSManagerCallback callback) {
-		// TODO Auto-generated method stub
-		
+		LOG.debug("Remote call on loginXMPPServer");
+
+		IIdentity toIdentity;
+		try {
+			toIdentity = getIdentity();
+			Stanza stanza = new Stanza(toIdentity);
+			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
+			
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+			messageBean.setProfile(profile);
+			messageBean.setMethod(MethodType.LOGIN_XMPP_SERVER);
+			
+			try {
+				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 	@Override
 	public void logoutCSS(CssRecord profile, ICSSManagerCallback callback) {
-		// TODO Auto-generated method stub
-		
+		LOG.debug("Remote call on logoutCSS");
+
+		IIdentity toIdentity;
+		try {
+			toIdentity = getIdentity();
+			Stanza stanza = new Stanza(toIdentity);
+			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
+			
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+			messageBean.setProfile(profile);
+			messageBean.setMethod(MethodType.LOGOUT_CSS);
+			
+			try {
+				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 	@Override
 	public void logoutXMPPServer(CssRecord profile, ICSSManagerCallback callback) {
-		// TODO Auto-generated method stub
-		
+		LOG.debug("Remote call on logoutXMPPServer");
+
+		IIdentity toIdentity;
+		try {
+			toIdentity = getIdentity();
+			Stanza stanza = new Stanza(toIdentity);
+			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
+			
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+			messageBean.setProfile(profile);
+			messageBean.setMethod(MethodType.LOGOUT_XMPP_SERVER);
+			
+			try {
+				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 	@Override
 	public void modifyCssRecord(CssRecord profile, ICSSManagerCallback callback) {
-		// TODO Auto-generated method stub
-		
+		LOG.debug("Remote call on modifyCssRecord");
+
+		IIdentity toIdentity;
+		try {
+			toIdentity = getIdentity();
+			Stanza stanza = new Stanza(toIdentity);
+			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
+			
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+			messageBean.setProfile(profile);
+			messageBean.setMethod(MethodType.MODIFY_CSS_RECORD);
+			
+			try {
+				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 	@Override
 	public void registerCSS(CssRecord profile, ICSSManagerCallback callback) {
-		// TODO Auto-generated method stub
-		
+		LOG.debug("Remote call on registerCSS");
+
+		IIdentity toIdentity;
+		try {
+			toIdentity = getIdentity();
+			Stanza stanza = new Stanza(toIdentity);
+			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
+			
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+			messageBean.setProfile(profile);
+			messageBean.setMethod(MethodType.REGISTER_CSS);
+			
+			try {
+				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 	@Override
 	public void registerCSSNode(CssRecord profile, ICSSManagerCallback callback) {
-		// TODO Auto-generated method stub
-		
+		LOG.debug("Remote call on registerCSSNode");
+
+		IIdentity toIdentity;
+		try {
+			toIdentity = getIdentity();
+			Stanza stanza = new Stanza(toIdentity);
+			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
+			
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+			messageBean.setProfile(profile);
+			messageBean.setMethod(MethodType.REGISTER_CSS_NODE);
+			
+			try {
+				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 	@Override
 	public void registerXMPPServer(CssRecord profile, ICSSManagerCallback callback) {
 		LOG.debug("Remote call on registerXMPPServer");
 
-		IIdentity toIdentity = null;
+		IIdentity toIdentity;
 		try {
-			toIdentity = idMgr.fromJid(EXTERNAL_COMMUNICATION_MANAGER);
+			toIdentity = getIdentity();
+			Stanza stanza = new Stanza(toIdentity);
+			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
+			
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+			messageBean.setProfile(profile);
+			messageBean.setMethod(MethodType.REGISTER_XMPP_SERVER);
+			
+			try {
+				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-
-//		Identity toIdentity = new Identity(IdentityType.CSS, EXTERNAL_COMMUNICATION_MANAGER, XMPP_SERVER) {
-//			@Override
-//			public String getJid() {
-//				return getIdentifier() + "." + getDomainIdentifier();
-//			}
-//		};
-		Stanza stanza = new Stanza(toIdentity);
-		CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
-		
-		CssManagerMessageBean messageBean = new CssManagerMessageBean();
-		messageBean.setProfile(profile);
-		messageBean.setMethod(MethodType.REGISTER_XMPP_SERVER);
-		
-		try {
-			this.commManager.sendIQGet(stanza, messageBean, commsCallback);
-		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 	}
+	
 	@Override
 	public void setPresenceStatus(CssRecord profile, ICSSManagerCallback callback) {
-		// TODO Auto-generated method stub
-		
+		LOG.debug("Remote call on setPresenceStatus");
+
+		IIdentity toIdentity;
+		try {
+			toIdentity = getIdentity();
+			Stanza stanza = new Stanza(toIdentity);
+			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
+			
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+			messageBean.setProfile(profile);
+			messageBean.setMethod(MethodType.SET_PRESENCE_STATUS);
+			
+			try {
+				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 	@Override
 	public void synchProfile(CssRecord profile, ICSSManagerCallback callback) {
-		// TODO Auto-generated method stub
-		
+		LOG.debug("Remote call on synchProfile");
+
+		IIdentity toIdentity;
+		try {
+			toIdentity = getIdentity();
+			Stanza stanza = new Stanza(toIdentity);
+			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
+			
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+			messageBean.setProfile(profile);
+			messageBean.setMethod(MethodType.SYNCH_PROFILE);
+			
+			try {
+				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
+		
 	@Override
 	public void unregisterCSS(CssRecord profile, ICSSManagerCallback callback) {
-		// TODO Auto-generated method stub
-		
+		LOG.debug("Remote call on unregisterCSS");
+
+		IIdentity toIdentity;
+		try {
+			toIdentity = getIdentity();
+			Stanza stanza = new Stanza(toIdentity);
+			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
+			
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+			messageBean.setProfile(profile);
+			messageBean.setMethod(MethodType.UNREGISTER_CSS);
+			
+			try {
+				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 	@Override
 	public void unregisterCSSNode(CssRecord profile, ICSSManagerCallback callback) {
-		// TODO Auto-generated method stub
-		
+		LOG.debug("Remote call on unregisterCSSNode");
+
+		IIdentity toIdentity;
+		try {
+			toIdentity = getIdentity();
+			Stanza stanza = new Stanza(toIdentity);
+			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
+			
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+			messageBean.setProfile(profile);
+			messageBean.setMethod(MethodType.UNREGISTER_CSS_NODE);
+			
+			try {
+				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 	@Override
 	public void unregisterXMPPServer(CssRecord profile, ICSSManagerCallback callback) {
-		// TODO Auto-generated method stub
-		
+		LOG.debug("Remote call on unregisterXMPPServer");
+
+		IIdentity toIdentity;
+		try {
+			toIdentity = getIdentity();
+			Stanza stanza = new Stanza(toIdentity);
+			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
+			
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+			messageBean.setProfile(profile);
+			messageBean.setMethod(MethodType.UNREGISTER_XMPP_SERVER);
+			
+			try {
+				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 
 }

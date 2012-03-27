@@ -165,7 +165,7 @@ public class CtxBrokerServer implements IFeatureServer{
 
 					Future<CtxAttribute> newAttributeFuture;
 					newAttributeFuture = ctxbroker.createAttribute(requesterIdentity,
-							new CtxEntityIdentifier(requesterIdentity, cbPayload.getCreateAttr().getType(), cbPayload.getCreateAttr().getObjectNumber()),
+							new CtxEntityIdentifier(requesterIdentity.toString(), cbPayload.getCreateAttr().getType(), cbPayload.getCreateAttr().getObjectNumber()),
 							cbPayload.getCreateAttr().getType());
 					CtxAttribute newCtxAttribute= newAttributeFuture.get();
 					// the attribute is created
@@ -208,7 +208,7 @@ public class CtxBrokerServer implements IFeatureServer{
 					IIdentity requesterIdentity = this.identMgr.fromJid(xmppIdentityJid);
 					Future<CtxModelObject> removeModelObjectFuture;
 					removeModelObjectFuture = ctxbroker.remove(requesterIdentity,
-							new CtxEntityIdentifier(requesterIdentity, cbPayload.getRemove().getType(), cbPayload.getRemove().getObjectNumber()) );
+							new CtxEntityIdentifier(requesterIdentity.toString(), cbPayload.getRemove().getType(), cbPayload.getRemove().getObjectNumber()) );
 
 					CtxModelObject removedModelObject = removeModelObjectFuture.get();
 					// the object has been removed
@@ -250,7 +250,7 @@ public class CtxBrokerServer implements IFeatureServer{
 
 					Future<CtxModelObject> retrieveModelObjectFuture;
 					retrieveModelObjectFuture = ctxbroker.retrieve(requesterIdentity,
-							new CtxEntityIdentifier(requesterIdentity, cbPayload.getRetrieve().getType(), cbPayload.getRetrieve().getObjectNumber()) );
+							new CtxEntityIdentifier(requesterIdentity.toString(), cbPayload.getRetrieve().getType(), cbPayload.getRetrieve().getObjectNumber()) );
 
 					CtxModelObject retrievedModelObject = retrieveModelObjectFuture.get();
 					// the object has been retrieved
@@ -345,7 +345,7 @@ public class CtxBrokerServer implements IFeatureServer{
 					IIdentity requesterIdentity = this.identMgr.fromJid(xmppIdentityJid);
 					Future<CtxModelObject> updateModelObjectFuture;
 
-					CtxEntityIdentifier innerIdentifier = new CtxEntityIdentifier(requesterIdentity, cbPayload.getUpdate().getType(),
+					CtxEntityIdentifier innerIdentifier = new CtxEntityIdentifier(requesterIdentity.toString(), cbPayload.getUpdate().getType(),
 							cbPayload.getUpdate().getObjectNumber());
 					CtxModelObject innerModelObject = new CtxEntity(innerIdentifier);
 

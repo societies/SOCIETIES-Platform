@@ -25,14 +25,145 @@
 package com.disaster.idisaster;
 
 import android.app.Activity;
+import android.os.Bundle;
+
+import android.view.View;
+import android.widget.EditText;
+import android.text.InputType;
+
+import android.widget.Toast;
+
+import android.widget.Button;
+import android.view.View.OnClickListener;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+
+import android.view.inputmethod.InputMethodManager;
+
 
 /**
- * This activity is responsible for loging in the user,
+ * This activity is responsible for user login,
  * including handling wrong user name and password.
  * 
- * @author Babak.Farshchian@sintef.no
+ * @author Jacqueline.Floch@sintef.no
  *
  */
-public class LoginActivity extends Activity {
 
+public class LoginActivity extends Activity implements OnClickListener {
+
+	private EditText userNameView;
+	private EditText userPasswordView;
+	private String userName;
+	private String userPassword;
+
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		
+		super.onCreate(savedInstanceState);
+		setContentView (R.layout.login_layout);
+
+		// Get editable fields
+		userNameView = (EditText) findViewById(R.id.editUserName);
+	    userPasswordView = (EditText) findViewById(R.id.editPassword);
+	    userPasswordView.setInputType (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+    	// Add click listener to button
+    	final Button button = (Button) findViewById(R.id.loginButton);
+    	button.setOnClickListener(this);
+    }
+
+ 		
+/**
+ * onClick is called when button is clicked because
+ * the OnClickListener is assigned to the button
+ */
+	public void onClick (View view) {
+			
+    	if (userNameView.getText().length() == 0) {					// check input for user name
+
+    	// Hide the soft keyboard otherwise the toast message does appear more clearly.
+    	    InputMethodManager mgr = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
+    	    mgr.hideSoftInputFromWindow(userNameView.getWindowToken(), 0);
+	    
+    		Toast.makeText(this, getString(R.string.toastUserName), 
+    				Toast.LENGTH_LONG).show();
+    		return;
+
+    	} else if (userPasswordView.getText().length() == 0) {		// check input for password
+
+    		// Hide the soft keyboard otherwise the toast message does appear more clearly.
+    	    InputMethodManager mgr = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
+    	    mgr.hideSoftInputFromWindow(userPasswordView.getWindowToken(), 0);
+
+    	    Toast.makeText(this, getString(R.string.toastPassword), 
+	    			Toast.LENGTH_LONG).show();
+	    	return;
+
+    	} else {													// verify the password and store in preferences file
+
+    		userName = userNameView.getText().toString();
+    		userPassword = userPasswordView.getText().toString();
+
+    		//TODO: Add call to the Societes API plaftorm
+
+    		boolean loginCode = false;	// TODO: replace by code returned by Societes API
+    			    		
+    		// Create dialog for wrong password
+    		if (loginCode) { 							
+    			AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+    			alertBuilder.setMessage(getString(R.string.loginDialog))
+    				.setCancelable(false)
+    				.setPositiveButton (getString(R.string.dialogOK), new DialogInterface.OnClickListener() {
+    					public void onClick(DialogInterface dialog, int id) {
+	    		           userNameView.setText(getString(R.string.emptyText));
+	    		           userNameView.setHint(getString(R.string.loginUserNameHint));
+	    		           userPasswordView.setText(getString(R.string.emptyText));
+	    		           userPasswordView.setHint(getString(R.string.loginPasswordHint));
+	    		           return;
+    					}
+    				});
+	    		AlertDialog alert = alertBuilder.create();
+	    		alert.show();
+	    		return;
+	   		}
+	    		
+    		// Store user name and password in preferences
+        	iDisasterApplication.getinstance().setUserName (userName, userPassword);
+        	
+// TODO: Remove code for testing the correct setting of preferences 
+    	    String testName = iDisasterApplication.getinstance().preferences.
+    	    	getString ("pref.username","");
+    	    String testPassword = iDisasterApplication.getinstance().preferences.
+    	    	getString ("pref.password","");
+    	    Toast.makeText(this, "Debug: "  + testName + " " + testPassword, 
+    			Toast.LENGTH_LONG).show();
+
+    	    // Hide the soft keyboard:
+			// - the soft keyboard will not appear on next activity window!
+    	    InputMethodManager mgr = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
+    	    mgr.hideSoftInputFromWindow(userPasswordView.getWindowToken(), 0);
+
+	    	// Send intent to Disaster activity
+	    	startActivity(new Intent(LoginActivity.this, DisasterActivity.class));
+	    }
+    }
+		
+/**
+ * showDialog is used under testing
+ */
+	private void showDialog () {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(getString(R.string.loginTestDialog))
+			.setCancelable(false)
+			.setPositiveButton (getString(R.string.dialogOK), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					return;
+			    }
+			});
+		AlertDialog dialog = builder.create();
+		dialog.show();
+	}
 }

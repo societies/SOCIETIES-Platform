@@ -27,8 +27,7 @@ package org.societies.api.internal.security.policynegotiator;
 
 import java.util.concurrent.Future;
 
-import org.societies.api.schema.security.policynegotiator.SlaBean;
-
+import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 
 /**
  * Interface for invoking the provider.
@@ -67,6 +66,8 @@ public interface INegotiationProvider {
 	 * Reject all options and terminate negotiation.
 	 * 
 	 * @param sessionId ID of this session
+	 * 
+	 * @return success status in {@link SlaBean#isSuccess()}
 	 */
-	public void reject(int sessionId);
+	public Future<SlaBean> reject(int sessionId);
 }

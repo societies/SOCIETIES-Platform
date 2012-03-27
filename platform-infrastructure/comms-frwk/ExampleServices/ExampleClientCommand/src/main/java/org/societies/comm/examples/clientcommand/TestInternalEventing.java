@@ -24,13 +24,17 @@
  */
 package org.societies.comm.examples.clientcommand;
 
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.comm.xmpp.event.EventFactory;
-import org.societies.comm.xmpp.event.EventStream;
-import org.societies.comm.xmpp.event.InternalEvent;
+
+import org.societies.api.osgi.event.CSSEvent;
+import org.societies.api.osgi.event.CSSEventConstants;
+import org.societies.api.osgi.event.EMSException;
+import org.societies.api.osgi.event.EventListener;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
+
 
 /**
  * Describe your class here...
@@ -38,17 +42,17 @@ import org.societies.comm.xmpp.event.InternalEvent;
  * @author aleckey
  *
  */
-public class TestInternalEventing implements Runnable, ApplicationListener<InternalEvent> {
+public class TestInternalEventing extends EventListener implements Runnable  {
 
 	private static Logger LOG = LoggerFactory.getLogger(TestInternalEventing.class);
-	
-	/* (non-Javadoc)
-	 * @see org.springframework.context.ApplicationListener#onApplicationEvent(org.springframework.context.ApplicationEvent)  */
-	@Override
-	public void onApplicationEvent(InternalEvent event) {
-		LOG.info(event.getEventNode());
-		TestObject obj = (TestObject)event.getEventInfo();
-		LOG.info(obj.getName());
+	private IEventMgr eventMgr;
+
+	public IEventMgr getEventMgr() {
+		return eventMgr;
+	}
+
+	public void setEventMgr(IEventMgr eventMgr) {
+		this.eventMgr = eventMgr;
 	}
 
 	/* (non-Javadoc)
@@ -56,23 +60,56 @@ public class TestInternalEventing implements Runnable, ApplicationListener<Inter
 	@Override
 	public void run() {
 		//CREATE EVENT NODE
-		EventStream stream1 = EventFactory.getStream("societies.test1");
-		EventStream stream2 = EventFactory.getStream("societies.test2");
+		String eventFilter = "(&" + 
+ 			    "(" + CSSEventConstants.EVENT_NAME + "=" + "test_event_name" + ")" + 
+ 			    "(" + CSSEventConstants.EVENT_SOURCE + "=" + "test_event_source" + ")" + 
+				 			  ")";
 		
-		//SUBSCRIBE
-		stream1.addApplicationListener(this);
-		stream2.addApplicationListener(this);
+		LOG.info("eventFilter=" + eventFilter);
+		LOG.info("*** subscribing to internal event ***");
+		getEventMgr().subscribeInternalEvent(this, new String[] {EventTypes.CONTEXT_EVENT}, eventFilter);
+
+		LOG.info("*** creating internal event ***** ");
+		TestObject payload = new TestObject("John1", "Smith1");
+		InternalEvent event = new InternalEvent(EventTypes.CONTEXT_EVENT, "test_event_name", "test_event_source", payload);	
+		 
+		try {
+			LOG.info("*** publishing internal event ***** ");
+			getEventMgr().publishInternalEvent(event);
+		} catch (EMSException e) {			
+			LOG.info("*** EMS exception while publishing event ***** ");
+			e.printStackTrace();
+		}
+		 
+		LOG.info("*** unsubscribing to internal event ***** ");
+		getEventMgr().unSubscribeInternalEvent(this, new String[] {EventTypes.CONTEXT_EVENT}, "someFilter");
+		LOG.info("*** publishing event after unsubscribe to internal event ***** ");
 		
-		//GENERATE PAYLOAD
-		TestObject payload1 = new TestObject("John1", "Smith1");
-		TestObject payload2 = new TestObject("John2", "Smith2");
-		
-		//GENERATE EVENT
-		InternalEvent event1 = new InternalEvent(this, payload1);
-		InternalEvent event2 = new InternalEvent(this, payload2);
-		
-		stream1.multicastEvent(event1);
-		stream2.multicastEvent(event2);
+		try {
+			LOG.info("**** publishing internal event ***** ");
+			getEventMgr().publishInternalEvent(event);
+		} catch (EMSException e) {			
+			LOG.info("*** EMS exception while publishing event ***** ");
+			e.printStackTrace();
+		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.societies.api.osgi.event.EventListener#handleExternalEvent(org.societies.api.osgi.event.CSSEvent) */
+	@Override
+	public void handleExternalEvent(CSSEvent event) {
+		LOG.info("*** CSS event received");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.osgi.event.EventListener#handleInternalEvent(org.societies.api.osgi.event.InternalEvent) */
+	@Override
+	public void handleInternalEvent(InternalEvent event) {
+		LOG.info("*** internal event received *****");	
+		LOG.info("*** event name : "+ event.geteventName());
+		LOG.info("*** event source : "+ event.geteventSource());
+		LOG.info("*** event type : "+ event.geteventType());
+		TestObject payload = (TestObject)event.geteventInfo();
+		LOG.info("*** event name : "+ payload.getName());
+	}
 }

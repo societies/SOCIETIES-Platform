@@ -29,7 +29,7 @@ public class ConnectionPlugin extends Plugin {
 	//If a connection receiver action is received, create the listener and
 	//signal ok back to the Webview
 	//The ConnectionReceiver class will handle the asynchronous updates
-	public PluginResult execute(String action, JSONArray arg1, String callbackID) {
+	public PluginResult execute(String action, JSONArray data, String callbackID) {
 		PluginResult result = null;
 		
 		if (action.equals(CREATE_CONNECTION_LISTENER)) {
