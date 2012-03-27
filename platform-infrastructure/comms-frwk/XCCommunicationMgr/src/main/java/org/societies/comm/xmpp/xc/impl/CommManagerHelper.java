@@ -306,8 +306,6 @@ public class CommManagerHelper {
 			Object appError = u.unmarshal(new InputSource(new StringReader(e.asXML())));
 			return new XMPPError(error, "", appError);
 		}
-		
-		
 	}
 
 	public IQ dispatchIQ(IQ iq) {
@@ -358,13 +356,12 @@ public class CommManagerHelper {
 
 	public void dispatchMessage(Message message) {
 		Element element = getElementAny(message);
+		String namespace = element.getNamespace().getURI();
 		try {
-			ICommCallback cb = getCommCallback(element.getNamespace()
-					.getURI());
-			Unmarshaller u = getUnmarshaller(element.getNamespace().getURI());
-			Object bean = u.unmarshal(new InputSource(new StringReader(element
-					.asXML())));
-			cb.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
+			IFeatureServer fs = getFeatureServer(namespace);
+			Unmarshaller u = getUnmarshaller(namespace);
+			Object bean = u.unmarshal(new InputSource(new StringReader(element.asXML())));
+			fs.receiveMessage(TinderUtils.stanzaFromPacket(message), bean);
 		} catch (JAXBException e) {
 			String m = e.getClass().getName()
 					+ "Error unmarshalling the message:" + e.getMessage();
