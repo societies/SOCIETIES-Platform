@@ -37,7 +37,7 @@ import org.junit.Test;
 import static org.mockito.Mockito.*;
 
 import org.societies.orchestration.CommunityLifecycleManagement.impl.SuggestedCommunityAnalyser;
-
+//import org.societies.orchestration.EgocentricCommunityAnalyser.test.ownerId;
 import org.societies.api.identity.IIdentity;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxEntityIdentifier;
