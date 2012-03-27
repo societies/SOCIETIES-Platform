@@ -24,14 +24,43 @@
  */
 package com.disaster.idisaster;
 
-import android.app.Activity;
+import android.app.ListActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 /**
- * Activity for editing the metadata for a disaster.
+ * This activity allows the users to manage their 
+ * disasters or the disasters they subscribe to.
  * 
  * @author Babak.Farshchian@sintef.no
  *
  */
-public class EditDisasterMetadataActivity extends Activity {
+public class FeedActivity extends ListActivity {
+    static final String[] FEEDLIST = new String[] { "Feed 1", "Feed 2", "Feed 3", "Feed 4",
+	"Feed 5", "Feed 6", "Feed 7", "Feed 8"};
 
-}
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+	// TODO Auto-generated method stub
+	super.onCreate(savedInstanceState);
+	setListAdapter(new ArrayAdapter<String>(this, R.layout.tab_list_item, FEEDLIST));
+
+	  ListView lv = getListView();
+	  lv.setTextFilterEnabled(true);
+
+	  lv.setOnItemClickListener(new OnItemClickListener() {
+	    public void onItemClick(AdapterView<?> parent, View view,
+	        int position, long id) {
+	      // When clicked, show a toast with the TextView text
+	      Toast.makeText(getApplicationContext(), ((TextView) view).getText(),
+	          Toast.LENGTH_SHORT).show();
+	    }
+	  });
+	  }
+    }
