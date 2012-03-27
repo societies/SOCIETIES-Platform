@@ -3,10 +3,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.societies</groupId>
-  <artifactId>CisManagerLight</artifactId>
+  <artifactId>CisManager</artifactId>
   <version>${release.version}</version>
   <packaging>apk</packaging>
-  <name>CisManagerLight</name>
+  <name>CisManager</name>
 
    <parent>
         <groupId>org.societies</groupId>
@@ -29,10 +29,6 @@
 		<dependency>
  			<groupId>org.slf4j</groupId>
   			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>CisClientLibraryAndroid</artifactId>
 		</dependency>
 	</dependencies>
   <build>

@@ -30,7 +30,6 @@ import java.util.List;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisRecord;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;

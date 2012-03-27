@@ -50,11 +50,6 @@
 	    		<artifactId>societies-api</artifactId>
 	    		<version>${release.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>org.societies</groupId>
-				<artifactId>CisClientLibraryAndroid</artifactId>
-				<version>0.0.1-SNAPSHOT</version>
-			</dependency>
         </dependencies>
     </dependencyManagement>
 
