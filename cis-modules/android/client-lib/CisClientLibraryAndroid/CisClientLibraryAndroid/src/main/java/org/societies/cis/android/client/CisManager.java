@@ -30,7 +30,12 @@ import java.util.List;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisRecord;
-import org.societies.api.cis.management.ICisSubscribed;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.util.Log;
 
 /**
  * Android implementation of ICisManager.
@@ -39,15 +44,44 @@ import org.societies.api.cis.management.ICisSubscribed;
  *
  */
 public class CisManager implements ICisManager {
-    public ICisOwned createCis(String arg0, String arg1, String arg2,
-	    String arg3, int arg4) {
-	// TODO Auto-generated method stub
-	return null;
+
+//    private List<ICisOwned> ownedDisasterList = new ArrayList<ICisOwned>();
+    //List to hold disasters this users is only a member of:
+//    private List<ICisSubscribed> subscribedDisasterList = new ArrayList<ICisSubscribed>();
+    Context context;
+    
+    public CisManager(Context _context){
+	context = _context;
     }
 
-    private List<ICisOwned> ownedDisasterList = new ArrayList<ICisOwned>();
-    //List to hold disasters this users is only a member of:
-    private List<ICisSubscribed> subscribedDisasterList = new ArrayList<ICisSubscribed>();
+    /* 
+     * This method adds a CisOwned to CIS manager. It returns the added CIS 
+     * with the cisId set.
+     * 
+     * 
+     * @see org.societies.api.cis.management.ICisManager#createCis(java.lang.String, java.lang.String, java.lang.String, java.lang.String, int)
+     */
+    //TODO _cisId should be removed from the signature:
+    public ICisOwned createCis(String _cisId, String _cisName, String _ownerId,
+	    String _cisType, int _membershipType) {
+	Uri newUri;
+	//Create a new CIS in the content provider:
+	ContentValues cv = new ContentValues();
+	cv.put(SocialContract.Groups.NAME , _cisName);
+	cv.put(SocialContract.Groups.OWNER_ID , _ownerId);
+	cv.put(SocialContract.Groups.TYPE , _cisType);
+	cv.put(SocialContract.Groups.MEMBERSHIP_TYPE , Integer.toString(_membershipType));
+	//Send the CIS to the content provider:
+	newUri = context.getContentResolver().insert(
+		    SocialContract.Groups.CONTENT_URI,   // the user dictionary content URI
+		    cv                          // the values to insert
+		);
+	//Create a new CIS with the returned ID from the content provider:
+	CisOwned newCis = new CisOwned(
+		newUri.getLastPathSegment() , 
+		_cisName, _ownerId, _cisType, _membershipType);
+	return newCis;
+    }
 
     /* (non-Javadoc)
      * @see org.societies.api.cis.management.ICisManager#deleteCis(java.lang.String, java.lang.String, java.lang.String)
@@ -70,6 +104,52 @@ public class CisManager implements ICisManager {
      */
     public ICisRecord[] getCisList(ICisRecord query) {
 	// TODO Auto-generated method stub
+	return null;
+    }
+
+    /* (non-Javadoc)
+     * @see org.societies.api.cis.management.ICisManager#getCisList()
+     */
+    public List<ICisRecord> getOwnedCisList(String _cssId, 
+	    String _cssPassword, String _cisType) {
+
+	// TODO Auto-generated method stub
+	List<ICisRecord> cisList = new ArrayList<ICisRecord>();
+	String[] mProjection =
+	    {
+	        SocialContract.Groups._ID,
+	        SocialContract.Groups.NAME,
+	        SocialContract.Groups.OWNER_ID,
+	        SocialContract.Groups.TYPE	        
+	    };
+
+	// Defines a string to select all rows with type _cisType:
+	String mSelectionClause = SocialContract.Groups.TYPE + " = " + _cisType;
+	//Get the cursor from the content provider:
+	Cursor cursor= context.getContentResolver().query(
+		SocialContract.Groups.CONTENT_URI,
+		mProjection,
+		mSelectionClause,
+		null, null);
+	if (cursor == null){
+	    Log.d("CisManager", "CisManager: Got null after query from content provider");
+	}
+	else if (cursor.getCount() <1){
+	    Log.d("CisManager", "CisManager: Got minus after query from content provider");
+	}
+	else {
+	    cursor.moveToFirst();
+	    for (int i = 0; i< cursor.getCount();i++){
+	    String id = cursor.getString(0);
+	    String name = cursor.getString(1);
+	    String ownerId = cursor.getString(2);
+	    String type = cursor.getString(3);
+	    CisOwned record = new CisOwned(id, name, ownerId, type, 1);
+	    cisList.add(record);
+	    cursor.moveToNext();
+	    }
+	    return cisList;
+	}
 	return null;
     }
 

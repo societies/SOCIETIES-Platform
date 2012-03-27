@@ -56,6 +56,8 @@ public final class SocialContract {
         public static final String DISPLAY_NAME = "display_name";
         public static final String OWNER_ID = "owner"; //Owner CSS jid of the group
         public static final String CREATION_DATE = "creation_date";	
+        public static final String MEMBERSHIP_TYPE = "membership_type";	
+
     }
 
     /**

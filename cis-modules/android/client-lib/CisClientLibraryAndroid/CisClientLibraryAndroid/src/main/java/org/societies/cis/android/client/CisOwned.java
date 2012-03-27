@@ -24,78 +24,65 @@
  */
 package org.societies.cis.android.client;
 
-import org.societies.api.cis.directory.ICisDirectory;
-import org.societies.api.cis.management.ICisManager;
-import org.societies.api.css.directory.ICssDirectory;
-import org.societies.api.css.management.ISocietiesApp;
-
-import android.content.Context;
+import org.societies.api.cis.management.ICisOwned;
 
 /**
  * @author Babak.Farshchian@sintef.no
  *
  */
-public class SocietiesApp implements ISocietiesApp {
-    private String cssId;
-    private String cssPassword;
-    private Object cssManager = null;
-    private ICisManager cisManager = null;
-    private ICssDirectory cssDirectory = null;
-    private ICisDirectory cisDirectory = null;
-    private Context context;
+public class CisOwned implements ICisOwned{
+
+    private String cisId;
+    private String cisName;
+    private String ownerId;
+    private String displayName;
     
-    public SocietiesApp(String _cssId, String _cssPassword, Context _context){
-	this.cssId = _cssId;
-	this.cssPassword = _cssPassword;
-	this.context = _context;
-	/*
-	 *  Here I need Android code to find out which platform components that are available
-	 *  on this node:
-	 *  - find CssManager content provider and initialize cssManager.
-	 *  - find CisManager content provided and initialize cisManager.
-	 *  - find CisDirectory content provided and initialize cisdirectory.
-	 *  - find CssDirectory content provided and initialize cssdirectory.
-	 */
-	cisManager = new CisManager(_context);
-
-	
+    protected CisOwned(String _cisId, String _cisName, 
+	    String _ownerId, String _displayName, int _membershipType){
+	cisId = _cisId;
+	cisName = _cisName;
+	ownerId = _ownerId;
+	displayName = _displayName;
     }
-
-    public Object getCssManager() {
-	// TODO Auto-generated method stub
-	return cssManager;
-    }
-
-    public ICisManager getCisManager() {
-	// TODO Auto-generated method stub
-	return cisManager;
-    }
-
-    public ICssDirectory getCssDirectory() {
-	// TODO Auto-generated method stub
-	return cssDirectory;
-    }
-
-    public ICisDirectory getCisDirectory() {
-	// TODO Auto-generated method stub
-	return cisDirectory;
-    }
-
-    public String getCssId() {
-        return cssId;
-    }
-
-    /**
-     * Change the password only if the correct old password is provided.
-     * 
-     * @param _oldPassword
-     * @param _newPassword
+    /* (non-Javadoc)
+     * @see org.societies.api.cis.management.ICisRecord#getCisId()
      */
-    public boolean setCssPassword(String _oldPassword, String _newPassword) {
-        if (_oldPassword == cssPassword){
-            this.cssPassword = _newPassword;
-            return true;
-        }
-        return false;
+    public String getCisId() {
+	// TODO Auto-generated method stub
+	return cisId;
     }
+
+    /* (non-Javadoc)
+     * @see org.societies.api.cis.management.ICisRecord#getName()
+     */
+    public String getName() {
+	// TODO Auto-generated method stub
+	return cisName;
+    }
+
+    /* (non-Javadoc)
+     * @see org.societies.api.cis.management.ICisRecord#getOwnerId()
+     */
+    public String getOwnerId() {
+	// TODO Auto-generated method stub
+	return ownerId;
+    }
+
+    /* (non-Javadoc)
+     * @see org.societies.api.cis.management.ICisRecord#setUserDefinedName(java.lang.String)
+     */
+    public String setUserDefinedName(String _name) {
+	// TODO Auto-generated method stub
+	displayName = _name;
+	return displayName;
+    }
+
+    /* (non-Javadoc)
+     * @see org.societies.api.cis.management.ICisRecord#getUserDefineName()
+     */
+    public String getUserDefineName() {
+	// TODO Auto-generated method stub
+	return displayName;
+    }
+
 }
