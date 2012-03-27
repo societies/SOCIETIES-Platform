@@ -22,16 +22,38 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.disaster.idisaster;
+package org.societies.api.context.model;
 
-import android.app.Activity;
+import javax.xml.bind.annotation.XmlType;
 
 /**
- * Activity for editing the metadata for a disaster.
+ * The constants of this enumerated type specify the origin of a context bond.
+ * More specifically, a {@link CtxBondBean} can be one of the following types:
+ * <ul>
+ * <li>{@link #MANUALLY_SET}: Denotes a manually set context bond</li>
+ * <li>{@link #DISCOVERED}: Denotes a discovered context bond</li>
+ * <li>{@link #INHERITED}: Denotes an inherited context bond</li>
+ * </ul>
  * 
- * @author Babak.Farshchian@sintef.no
- *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas
+ *         Liampotis</a> (ICCS)
+ * @version 0.0.1
  */
-public class EditDisasterMetadataActivity extends Activity {
+@XmlType(namespace="http://societies.org/api/schema/context/model")
+public enum CtxBondOriginTypeBean {
 
+    /**
+     * The enum constant for manually set context bonds.
+     */
+    MANUALLY_SET,
+
+    /**
+     * The enum constant for discovered context bonds.
+     */
+    DISCOVERED,
+
+    /**
+     * The enum constant for inherited context bonds.
+     */
+    INHERITED,
 }

@@ -43,11 +43,11 @@ public abstract class CtxModelObject implements Serializable {
 	private static final long serialVersionUID = 7349640661605024918L;
 	
 	/** The identifier of this context model object. */
-	private CtxIdentifier id;
+	private final CtxIdentifier id;
 	
 	/** The last modification time of this context model object. */
 	private Date lastModified;
-
+	
 	/**
 	 * Constructs a CtxModelObject with the specified identifier
 	 * 
@@ -55,6 +55,7 @@ public abstract class CtxModelObject implements Serializable {
 	 *            the identifier of the newly created context model object
 	 */
 	CtxModelObject(CtxIdentifier id) {
+		
 		this.id = id;
 	}
 
@@ -65,6 +66,7 @@ public abstract class CtxModelObject implements Serializable {
      * @see CtxIdentifier
 	 */
 	public CtxIdentifier getId(){
+		
 		return this.id;
 	}
 
@@ -74,7 +76,13 @@ public abstract class CtxModelObject implements Serializable {
 	 * @return the last modification time of this context model object
 	 */
 	public Date getLastModified(){
+		
 		return this.lastModified;
+	}
+	
+	void setLastModified(Date lastModified) {
+		
+		this.lastModified = lastModified;
 	}
 	
 	/**
@@ -85,6 +93,7 @@ public abstract class CtxModelObject implements Serializable {
 	 * @see CtxIdentifier#getModelType()
 	 */
 	public CtxModelType getModelType() {
+		
 	    return this.getId().getModelType();
 	}
 	
@@ -95,6 +104,7 @@ public abstract class CtxModelObject implements Serializable {
 	 * @see CtxIdentifier#getType()
 	 */
 	public String getType() {
+		
 		return this.getId().getType();
 	}
 	
@@ -105,6 +115,7 @@ public abstract class CtxModelObject implements Serializable {
 	 * @see CtxIdentifier#getObjectNumber()
 	 */
 	public Long getObjectNumber() {
+		
 		return this.getId().getObjectNumber();
 	}
 	

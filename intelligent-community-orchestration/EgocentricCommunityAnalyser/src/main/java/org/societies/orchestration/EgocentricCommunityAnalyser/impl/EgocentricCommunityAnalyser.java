@@ -26,12 +26,17 @@
 package org.societies.orchestration.EgocentricCommunityAnalyser.impl;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
 
-import org.societies.api.internal.cis.management.ICisRecord;
+//import org.societies.api.internal.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisRecord;
+//import org.societies.api.internal.cis.management.ICisRecord;
 import org.societies.api.internal.context.broker.ICtxBroker;
 
 //import org.societies.api.cis.management.ICisRecord;
@@ -72,11 +77,15 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 	private EgocentricCommunityConfigurationManager egocentricConfigurationManager;
 	private EgocentricCommunityDeletionManager egocentricDeletionManager;
 	
+	private ArrayList<ICisRecord> userCiss;
+	private HashMap<IIdentity, String> userCissMetadata;
+	
 	private IIdentity linkedCss;
 	
 	private Date lastTemporaryCheck;
 	private Date lastOngoingCheck;
 	
+	private ICisManager cisManager;
 	/*
      * Constructor for EgocentricCommunityAnalyser
      * 
@@ -91,6 +100,9 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 		if (linkType.equals("CSS"))
 			this.linkedCss = linkedEntity;
 		
+		userCiss = new ArrayList<ICisRecord>();
+		userCissMetadata = new HashMap<IIdentity, String>();
+		
 		lastTemporaryCheck = new Date();
 		lastOngoingCheck = new Date();
 		
@@ -98,15 +110,35 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 		//	this.linkedDomain = linkedEntity;
 	}
 	
+	public void removeObsoleteRecordedCiss() {
+		ICisRecord[] ciss = cisManager.getCisList(null);
+		//boolean notFound = true;
+		//for (int m = 0; m < ciss.length; m++) {
+		//    if (userCissMetadata.get(ciss[m].getID()) == null)
+		//        userCissMetadata.remove(ciss[m]);
+		//}
+	}
+	
+	public void addNewCissToRecords(ArrayList<String> newCissMetadata) {
+		//for (int i = 0; i < newCissMetadata.size(); i++)
+				//    if (userCissMetadata.get(newCissMetadata.get(i).split("---")[0]) == null)
+				//        userCissMetadata.add(newCissMetadata..get(i).split("---")[0], newCissMetadata.get(i));
+	}
+	
 	public void processPreviousLongTimeCycle() {
-		egocentricCreationManager.identifyCissToCreate("extensive");
-		egocentricConfigurationManager.identifyCissToConfigure();
-		egocentricDeletionManager.identifyCissToDelete();
+		removeObsoleteRecordedCiss();
+		
+		addNewCissToRecords(egocentricCreationManager.identifyCissToCreate("extensive", userCissMetadata));
+		addNewCissToRecords(egocentricConfigurationManager.identifyCissToConfigure());
+		removeObsoleteRecordedCiss();
+		
+		egocentricDeletionManager.identifyCissToDelete(userCissMetadata);
 	}
 	
 	public void processPreviousShortTimeCycle() {
-		egocentricCreationManager.identifyCissToCreate("not extensive");
-		egocentricConfigurationManager.identifyCissToConfigure();
+		removeObsoleteRecordedCiss();
+		addNewCissToRecords(egocentricCreationManager.identifyCissToCreate("not extensive", userCissMetadata));
+		//egocentricConfigurationManager.identifyCissToConfigure();
 	}
 	
 	public void loop() {

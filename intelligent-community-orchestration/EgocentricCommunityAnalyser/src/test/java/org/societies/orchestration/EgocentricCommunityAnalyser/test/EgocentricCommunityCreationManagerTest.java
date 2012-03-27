@@ -69,8 +69,9 @@ public class EgocentricCommunityCreationManagerTest {
 	//@Test
 	public void testNonExtensiveCreationCheck() {
 		
-		IIdentity ownerId = null; //James Jents CSS
-		entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
+    	
     	
 		cisManager = mock(ICisManager.class);
 		userCtxBroker = mock(ICtxBroker.class);
@@ -100,7 +101,7 @@ public class EgocentricCommunityCreationManagerTest {
 			e.printStackTrace();
 		}
 		//check user joined CISs before
-		egocentricCommunityCreationManager.identifyCissToCreate("not extensive");
+		egocentricCommunityCreationManager.identifyCissToCreate("not extensive", null);
 		//check and compare user joined CISs after
 		
 		String[] members = new String[1];
@@ -114,8 +115,9 @@ public class EgocentricCommunityCreationManagerTest {
 	//@Test
     public void testExtensiveCreationCheck() {
     	
-    	IIdentity ownerId = null; //James Jents CSS
-		entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+    	IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
+    	
     	
 		cisManager = mock(ICisManager.class);
 		userCtxBroker = mock(ICtxBroker.class);
@@ -151,7 +153,7 @@ public class EgocentricCommunityCreationManagerTest {
     	//userCtxBroker.addAttribute(ownerIdContextEntity, CtxAttributeValueType.INDIVIDUAL, "CSS proximity", IUserCtxBrokerCallback);
     	
     	//check user joined CISs before
-		egocentricCommunityCreationManager.identifyCissToCreate("extensive");
+		egocentricCommunityCreationManager.identifyCissToCreate("extensive", null);
 		//check and compare user joined CISs after
 		
 		//Assert.assertNotNull(/**User's joined CISs*/);

@@ -37,6 +37,7 @@ import org.junit.Test;
 import static org.mockito.Mockito.*;
 
 import org.societies.orchestration.CommunityLifecycleManagement.impl.SuggestedCommunityAnalyser;
+//import org.societies.orchestration.EgocentricCommunityAnalyser.test.ownerId;
 import org.societies.api.identity.IIdentity;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -71,8 +72,8 @@ public class SuggestedCommunityAnalyserTest {
 	@Test
     public void testIdentifyCissToConfigure() {
 		
-    	IIdentity ownerId = null; //James Jents CSS
-		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
     	
 		//create CIS for James where James himself has been inactive for 1 year.
 	    

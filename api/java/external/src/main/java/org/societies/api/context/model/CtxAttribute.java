@@ -93,14 +93,14 @@ public class CtxAttribute extends CtxModelObject {
 	private String valueMetric;
 	
 	/** The QoC meta-data. */
-	private CtxQuality quality;
+	private final CtxQuality quality = new CtxQuality(this);
 	
 	/** The identifier of the context source for the current attribute value. */
 	private String sourceId;
 	
 	/** The history flag of this context attribute. */
 	private boolean historyRecorded;
-
+	
 	/**
 	 * Constructs a CtxAttribute with the specified identifier.
 	 * 
@@ -108,8 +108,8 @@ public class CtxAttribute extends CtxModelObject {
 	 *            the identifier of the newly created context attribute
 	 */
 	public CtxAttribute(CtxAttributeIdentifier id) {
+		
 		super(id);
-		this.quality = new CtxQuality(this);
 	}
 	
 	/**
@@ -119,6 +119,7 @@ public class CtxAttribute extends CtxModelObject {
 	 */
 	@Override
 	public CtxAttributeIdentifier getId() {
+		
 		return (CtxAttributeIdentifier) super.getId();
 	}
 	
@@ -128,6 +129,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @return the identifier of the context entity containing this attribute
 	 */
 	public CtxEntityIdentifier getScope() {
+		
 		return this.getId().getScope();
 	}
 
@@ -142,6 +144,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @see #getBinaryValue()
 	 */
 	public String getStringValue() {
+		
 		return this.stringValue;
 	}
 	
@@ -155,6 +158,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @see #setBinaryValue(byte[])
 	 */
 	public void setStringValue(String value) {
+		
 		this.stringValue = value;
 		this.integerValue = null;
 		this.doubleValue = null;
@@ -174,6 +178,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @see #getBinaryValue()
 	 */
 	public Integer getIntegerValue() {
+		
 		return this.integerValue;
 	}
 	
@@ -187,6 +192,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @see #setBinaryValue(byte[])
 	 */
 	public void setIntegerValue(Integer value) {
+		
 		this.stringValue = null;
 		this.integerValue = value;
 		this.doubleValue = null;
@@ -206,6 +212,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @see #getBinaryValue()
 	 */
 	public Double getDoubleValue() {
+		
 		return this.doubleValue;
 	}
 	
@@ -219,6 +226,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @see #setBinaryValue(byte[])
 	 */
 	public void setDoubleValue(Double value) {
+		
 		this.stringValue = null;
 		this.integerValue = null;
 		this.doubleValue = value;
@@ -238,6 +246,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @see #getDoubleValue()
 	 */
 	public byte[] getBinaryValue() {
+		
 		return this.binaryValue;
 	}
 	
@@ -251,6 +260,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @see #setDoubleValue(Double)
 	 */
 	public void setBinaryValue(byte[] value) {
+		
 		this.stringValue = null;
 		this.integerValue = null;
 		this.doubleValue = null;
@@ -265,6 +275,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @return the value type of this context attribute
 	 */
 	public CtxAttributeValueType getValueType() {
+		
 		return this.valueType;
 	}
 	
@@ -276,6 +287,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @see CtxAttributeValueType
 	 */
 	public void setValueType(CtxAttributeValueType valueType) {
+		
 		this.valueType = valueType;
 	}
 	
@@ -285,6 +297,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @return the metric for the context attribute value.
 	 */
 	public String getValueMetric() {
+		
 		return this.valueMetric;
 	}
 	
@@ -295,6 +308,7 @@ public class CtxAttribute extends CtxModelObject {
 	 *            the metric for the context attribute value to set
 	 */
 	public void setValueMetric(String valueMetric) {
+		
 		this.valueMetric = valueMetric;
 	}
 	
@@ -307,6 +321,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @see CtxQuality
 	 */
 	public CtxQuality getQuality() {
+		
 		return this.quality;
 	}
 	
@@ -316,6 +331,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @return the identifier of the context source for the current attribute value.
 	 */
 	public String getSourceId() {
+		
 		return this.sourceId;
 	}
 	
@@ -326,6 +342,7 @@ public class CtxAttribute extends CtxModelObject {
 	 *            the identifier of the context source to set.
 	 */
 	public void setSourceId(String sourceId) {
+		
 		this.sourceId = sourceId;
 	}
 	
@@ -337,6 +354,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * context history repository; <code>false</code> otherwise
 	 */
 	public boolean isHistoryRecorded() {
+		
 		return this.historyRecorded;
 	}
 		
@@ -350,6 +368,7 @@ public class CtxAttribute extends CtxModelObject {
 	 *            <code>false</code> otherwise
 	 */
 	public void setHistoryRecorded(boolean historyRecorded) {
+		
 		this.historyRecorded = historyRecorded;
 	}
 }

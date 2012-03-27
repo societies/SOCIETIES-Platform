@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:padding="6dp"
+	>
+
+    
+
+	<TextView
+		android:id="@+id/disaster_item"
+		android:layout_height="wrap_content" android:layout_width="fill_parent"
+		android:layout_alignParentTop="true" android:layout_alignParentRight="true"
+		android:paddingLeft="4dip"
+		android:gravity="top"
+		android:textColor="@color/black"
+		android:cacheColorHint="@color/black"
+		/>
+<!--	
+	<TextView  
+		android:id="@+id/description"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" 
+		android:layout_below="@id/label"
+		android:layout_alignParentRight="true"
+		android:paddingLeft="4dip"
+		android:maxLines="1"
+		android:ellipsize="marquee"
+		android:gravity="center_vertical"
+		android:textColor="#000000"/>
+	
+
+	<ImageButton 
+		android:id="@+id/favicon_button" 
+		android:background="@android:color/transparent"
+		android:layout_alignParentRight="true"
+		android:layout_height="fill_parent" 
+		android:layout_width="wrap_content" 
+		android:layout_marginLeft="6dip"
+		android:src="@drawable/favstar_on"/>
+    -->
+</RelativeLayout>

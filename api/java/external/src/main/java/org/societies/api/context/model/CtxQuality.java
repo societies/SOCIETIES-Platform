@@ -62,7 +62,7 @@ public class CtxQuality implements Serializable {
 	private static final long serialVersionUID = 2596329083367854427L;
 
 	/** The context attribute this QoC information refers to. */
-	private CtxAttribute attribute;
+	private final CtxAttribute attribute;
 	
 	/** The time the current context attribute value was last updated. */
 	private Date lastUpdated;
@@ -84,6 +84,7 @@ public class CtxQuality implements Serializable {
 	 * the context attribute to associate with this QoC information.
 	 */
 	CtxQuality(CtxAttribute attribute) {
+		
 		this.attribute = attribute;
 	}
 	
@@ -93,9 +94,10 @@ public class CtxQuality implements Serializable {
 	 * @return the context attribute associated to this QoC information.
 	 */
 	public CtxAttribute getAttribute() {
+		
 		return this.attribute;
 	}
-
+	
 	/**
 	 * Returns the time in milliseconds since the last update of the current
 	 * context attribute value.
@@ -105,6 +107,7 @@ public class CtxQuality implements Serializable {
      * @see #getLastUpdated()
 	 */
 	public long getFreshness() {
+		
 		return new Date().getTime() - this.getLastUpdated().getTime();
 	}
 	
@@ -115,6 +118,7 @@ public class CtxQuality implements Serializable {
      * @see #getFreshness()
      */
 	public Date getLastUpdated() {
+		
 		return (this.lastUpdated != null) 
 				? new Date(this.lastUpdated.getTime())
 				: new Date(this.attribute.getLastModified().getTime());
@@ -128,6 +132,7 @@ public class CtxQuality implements Serializable {
 	 * @throws NullPointerException if the specified last update time is <code>null</code>
 	 */
 	void setLastUpdated(Date lastUpdated) {
+		
 		if (lastUpdated == null)
 			throw new NullPointerException("lastUpdated can't be null");
 		
@@ -143,6 +148,7 @@ public class CtxQuality implements Serializable {
      * @see CtxOriginType 
 	 */
 	public CtxOriginType getOriginType() {
+		
 		return this.originType;
 	}
 	
@@ -155,6 +161,7 @@ public class CtxQuality implements Serializable {
      * @see CtxOriginType
 	 */
 	public void setOriginType(CtxOriginType originType) {
+		
 		if (originType == null)
 			throw new NullPointerException("originType can't be null");
 			
@@ -169,6 +176,7 @@ public class CtxQuality implements Serializable {
      * @return the precision of the current context attribute value.
 	 */
 	public Double getPrecision() {
+		
 		return (this.precision != null) ? new Double(this.precision) : null;
 	}
 
@@ -180,6 +188,7 @@ public class CtxQuality implements Serializable {
      * @throws NullPointerException if the specified precision is <code>null</code>.
 	 */
 	public void setPrecision(Double precision){
+		
 		this.precision = (precision != null) ? new Double(precision) : null;
 	}
 	
@@ -192,6 +201,7 @@ public class CtxQuality implements Serializable {
 	 * @return the update frequency of the current context attribute value
 	 */
 	public Double getUpdateFrequency() {
+		
 		return (this.updateFrequency != null) ? new Double(this.updateFrequency) : null;
 	}
 	
@@ -202,6 +212,7 @@ public class CtxQuality implements Serializable {
 	 *            the update frequency of the current context attribute value to set.
 	 */
 	public void setUpdateFrequency(Double updateFrequency) {
+		
 		this.updateFrequency = (updateFrequency != null) ? new Double(updateFrequency) : null;
 	}
 

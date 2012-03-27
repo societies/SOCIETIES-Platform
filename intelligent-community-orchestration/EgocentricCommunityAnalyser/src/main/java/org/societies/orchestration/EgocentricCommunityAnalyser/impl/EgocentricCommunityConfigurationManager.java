@@ -161,7 +161,7 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 	 *              a domain, the check is done on all CISs in that domain.
 	 */
 	
-	public void identifyCissToConfigure() {
+	public ArrayList<String> identifyCissToConfigure() {
 		ArrayList<ICisRecord> cisRecords = new ArrayList();
 		ArrayList<ICisRecord> cissToConfigure = new ArrayList<ICisRecord>();
 		HashMap<ICisRecord, ICisRecord> configurationsToCiss = new HashMap<ICisRecord, ICisRecord>();
@@ -299,6 +299,7 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 	        	//
 		       // cisManager.configureCis(linkedCss, potentiallyConfigurableCis.getCisId());
 	   }
+		return suggestedCommunityAnalyser.analyseEgocentricConfigurationRecommendations(null, null);
 		
 	}
 	
