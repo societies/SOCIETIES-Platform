@@ -24,6 +24,9 @@
  */
 package org.societies.api.cis.management;
 
+import java.util.List;
+
+
 
 /**
  * @author Babak.Farshchian@sintef.no
@@ -81,8 +84,10 @@ public interface ICisManager {
 	 * @param query Defines what to search for.
 	 * @return Array of CIS Records that match the query.
 	 */
+	@Deprecated
 	ICisRecord[] getCisList(ICisRecord query);
-	
+	//TODO: Should this be list or ArrayList?
+	List<ICisRecord> getOwnedCisList(String cssId, String cssPassword, String cisType);
 	Boolean requestNewCisOwner(String currentOwnerCssId, String currentOwnerCssPassword,
 		String newOwnerCssId, String cisId);
 
