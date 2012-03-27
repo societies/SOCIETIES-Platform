@@ -6,6 +6,8 @@
   <artifactId>CisManager</artifactId>
   <version>${release.version}</version>
   <packaging>apk</packaging>
+  <version>${release.version}</version>
+  <packaging>apk</packaging>
   <name>CisManager</name>
 
    <parent>
