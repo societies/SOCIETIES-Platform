@@ -213,7 +213,7 @@ public class CommsServer implements IFeatureServer {
 				switch (serviceMessage.getMethod()) {
 					case START_SERVICE :
 					{											
-						if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Discovery: START SERVICE");
+						if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Control: START SERVICE");
 														
 						controlResult = getServiceControl().startService(serviceMessage.getServiceId());
 						ServiceControlResult result = controlResult.get();
@@ -221,11 +221,12 @@ public class CommsServer implements IFeatureServer {
 						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result);
 						
 						serviceResult.setControlResult(result);
+						break;
 			
 					}
 					case STOP_SERVICE:
 					{
-						if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Discovery: STOP SERVICE");
+						if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Control: STOP SERVICE");
 								
 						controlResult = getServiceControl().stopService(serviceMessage.getServiceId());
 						ServiceControlResult result = controlResult.get();
@@ -233,10 +234,11 @@ public class CommsServer implements IFeatureServer {
 						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result);
 						
 						serviceResult.setControlResult(result);
+						break;
 					}
 					case INSTALL_SERVICE:
 					{
-						if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Discovery: INSTALL SERVICE");
+						if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Control: INSTALL SERVICE");
 								
 						controlResult = getServiceControl().installService(serviceMessage.getURL().toURL());
 						ServiceControlResult result = controlResult.get();
@@ -244,10 +246,11 @@ public class CommsServer implements IFeatureServer {
 						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result);
 						
 						serviceResult.setControlResult(result);
+						break;
 					}
 					case UNINSTALL_SERVICE:
 					{
-						if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Discovery: UNINSTALL SERVICE");
+						if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Control: UNINSTALL SERVICE");
 								
 						controlResult = getServiceControl().uninstallService(serviceMessage.getServiceId());
 						ServiceControlResult result = controlResult.get();
@@ -255,13 +258,15 @@ public class CommsServer implements IFeatureServer {
 						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result);
 						
 						serviceResult.setControlResult(result);
+						break;
 					}
 					default:
 						serviceResult.setControlResult(ServiceControlResult.COMMUNICATION_ERROR);
 				}
 			} catch (Exception e) {
-					e.printStackTrace();
-					serviceResult.setControlResult(ServiceControlResult.EXCEPTION_ON_REMOTE);
+				LOG.error("Exception: " + e);
+				e.printStackTrace();
+				serviceResult.setControlResult(ServiceControlResult.EXCEPTION_ON_REMOTE);
 			};
 				
 			//RETURN MESSAGEBEAN RESULT

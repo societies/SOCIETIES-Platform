@@ -44,6 +44,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 
 import org.societies.context.broker.impl.InternalCtxBroker;
@@ -147,6 +148,26 @@ public class InternalCtxBrokerTest {
 		assertTrue(ctxEntity.getType().equalsIgnoreCase("entType"));
 	}
 
+	
+	/**
+	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createEntity(java.lang.String)}.
+	 * 
+	 * @throws CtxException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testcreateIndividualCtxEntity() throws CtxException, InterruptedException, ExecutionException {
+
+		final IndividualCtxEntity individualCtxEnt ;
+
+		final Future<IndividualCtxEntity> futureIndividualCtxEntity = internalCtxBroker.createIndividualEntity("Person");
+		individualCtxEnt = futureIndividualCtxEntity.get();
+		assertNotNull(individualCtxEnt);
+		assertTrue(individualCtxEnt.getType().equalsIgnoreCase("Person"));
+	}
+	
+	
 	/**
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createAssociation(java.lang.String)}.
 	 */

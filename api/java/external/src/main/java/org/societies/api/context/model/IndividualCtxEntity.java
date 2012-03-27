@@ -40,6 +40,7 @@ public class IndividualCtxEntity extends CommunityMemberCtxEntity {
 	private static final long serialVersionUID = -1841816618272931692L;
 	
 	public IndividualCtxEntity(CtxEntityIdentifier id) {
+		
 		super(id);
 	}
 }

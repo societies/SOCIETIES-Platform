@@ -58,6 +58,7 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
 */
 
 import org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityRecommender;
+//import org.societies.orchestration.EgocentricCommunityAnalyser.test.ownerId;
 
 import org.societies.api.identity.IIdentity;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
@@ -110,8 +111,8 @@ public class CommunityRecommenderTest {
 	@Test
 	public void testNonExtensiveCreationCheck() {
 		
-		IIdentity ownerId = null; //James Jents CSS
-		entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
     	
 		cisManager = mock(ICisManager.class);
 		userCtxBroker = mock(ICtxBroker.class);
@@ -155,8 +156,8 @@ public class CommunityRecommenderTest {
 	@Test
     public void testExtensiveCreationCheck() {
     	
-    	IIdentity ownerId = null; //James Jents CSS
-		entityId = new CtxEntityIdentifier(ownerId, "James Jents", new Long(1));
+		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
     	
 		cisManager = mock(ICisManager.class);
 		userCtxBroker = mock(ICtxBroker.class);
