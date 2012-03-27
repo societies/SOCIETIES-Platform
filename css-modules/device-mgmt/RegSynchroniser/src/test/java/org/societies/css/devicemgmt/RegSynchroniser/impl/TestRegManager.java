@@ -9,7 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import org.societies.css.devicemgmt.deviceregistry.CSSDevice;
 import org.societies.css.devicemgmt.deviceregistry.DeviceRegistry;
 import org.societies.api.internal.css.devicemgmt.ILocalDevice;
@@ -22,21 +22,14 @@ import org.societies.comm.xmpp.event.PubsubEventStream;
 import org.societies.comm.xmpp.event.EventFactory;
 import org.societies.comm.xmpp.event.EventStream;
 
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.css.devicemgmt.IDevice;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.identity.IIdentity;
+
 public class TestRegManager {
-/*	
-    private static String deviceName_1 = "Device1";
-    private static String deviceDescription = "this is a good device";
-    private static String deviceId = "liam.societies.org/first/service";
-    private static String deviceType = "lightSensor";
-    private static String deviceName_2 = "Device2";
-    private static String deviceDescription2 = "this is a fair device";
-    private static String deviceId2 = "liam.societies.org/second/service";
-    private static String deviceType2 = "TempSensor";
-    private static String deviceName_3 = "Device3";
-    private static String deviceDescription3 = "this is a bad device";
-    private static String deviceId3 = "liam.societies.org/third/service";
-    private static String deviceType3 = "GPSSensor";
-*/
 	
 	private String deviceFamilyIdentity1 = "Sensors"; 
 	private String deviceMacAddress1 = "aa:bb:cc";
@@ -72,22 +65,41 @@ public class TestRegManager {
     private String deviceProvider3 = "MICROSOFT";
     private String deviceId3 = "liam.societies.org/third/service";
     private boolean contextSource3 = true;
+    
     private BundleContext context;
     private DeviceRegistry registry;
+    private RegManager regmanager;
+    private PubsubClient pubSubManager;  
     private DeviceCommonInfo device_1;
 	private DeviceCommonInfo device_2;
 	private DeviceCommonInfo device_3;
 	private String CSSNodeID = "liam@societies.org";
 	
 	private String node = "DEVICE_REGISTERED";
+	private String EVENTING_NODE_NAME = "DEVICE_REGISTERED";
+	private IIdentityManager idManager;
 	
-	
-	private EventStream myStream;
+	//private BundleContext bundleContextMock;
+	private ICommManager commManagerMock;
+	private IIdentityManager identityManagerMock;
+	private INetworkNode iNetworkNodeMock;
+	private PubsubClient pubSubManagerMock; 
 
 
 	@Before
 	public void setUp() throws Exception {
+		
+		//bundleContextMock = mock(BundleContext.class);
+		
+		commManagerMock = mock(ICommManager.class);
+		
+		identityManagerMock = mock(IIdentityManager.class);
 		context = mock(BundleContext.class);
+		pubSubManagerMock = mock(PubsubClient.class);
+		
+		regmanager = new RegManager();
+		regmanager.setBundleContext(context);
+		
 		device_1 = new DeviceCommonInfo(deviceFamilyIdentity1, deviceMacAddress1, deviceName_1, deviceType, deviceDescription, deviceConnectionType1, deviceLocation1, deviceProvider1, contextSource1);
         assertTrue(null != device_1);
         device_1.setDeviceID(deviceId);
@@ -100,6 +112,13 @@ public class TestRegManager {
         assertTrue(null != device_3);
         device_3.setDeviceID(deviceId3);
         
+        //when(commManagerMock.getIdManager()).thenReturn(identityManagerMock);	
+		//when(identityManagerMock.getThisNetworkNode()).thenReturn(iNetworkNodeMock);
+		//
+		//when(iNetworkNodeMock.getJid()).thenReturn("node1");
+		//
+		
+        
 	}
 
 	@After
@@ -108,11 +127,20 @@ public class TestRegManager {
 
 	@Test
 	public void testAddDevice() throws Exception {
+		
+		
 
         boolean retValue = false;
         
         RegManager regmanager = new RegManager(
                 this.context);
+        
+        when(commManagerMock.getIdManager()).thenReturn(identityManagerMock);	
+		when(identityManagerMock.getThisNetworkNode()).thenReturn(iNetworkNodeMock);
+		//
+		//when(iNetworkNodeMock.getJid()).thenReturn("node1");
+		//
+		regmanager.setCommManager(commManagerMock);
 
         DeviceRegistry registry = DeviceRegistry.getInstance();
         assertTrue(null != registry);
@@ -149,6 +177,13 @@ public class TestRegManager {
         
         RegManager regmanager = new RegManager(
                 this.context);
+        
+        when(commManagerMock.getIdManager()).thenReturn(identityManagerMock);	
+		when(identityManagerMock.getThisNetworkNode()).thenReturn(iNetworkNodeMock);
+		//
+		//when(iNetworkNodeMock.getJid()).thenReturn("node1");
+		//
+		regmanager.setCommManager(commManagerMock);
 
         DeviceRegistry registry = DeviceRegistry.getInstance();
         assertTrue(null != registry);
@@ -203,13 +238,7 @@ public class TestRegManager {
         
 		retValue =  regmanager.addDevices(Devices, CSSNodeID);
 		assertTrue(retValue);
-		//retValue =  regmanager.addDevice(device_2, CSSNodeID);
-		//assertTrue(retValue);
-		//retValue =  regmanager.addDevice(device_3, CSSNodeID);
-		//assertTrue(retValue);
-		//assertEquals(3, registry.registrySize());
-		//registry.clearRegistry();
-        //assertEquals(0, registry.registrySize());
+		
 		
         Devices =  registry.findAllDevices();
         assertTrue(null != Devices);
@@ -257,15 +286,29 @@ public class TestRegManager {
 	public void receiveEvent() throws Exception{
 		
 		boolean retValue = false;
-        RegManager regmanager = new RegManager(
-                this.context);
+      //  RegManager regmanager = new RegManager(
+       //         this.context);
+        IIdentity pubsubID = null;
+        
+        
+        when(commManagerMock.getIdManager()).thenReturn(identityManagerMock);	
+		when(identityManagerMock.getThisNetworkNode()).thenReturn(iNetworkNodeMock);
+		//
+		//when(iNetworkNodeMock.getJid()).thenReturn("XCManager.societies.local");
+		//
+		regmanager.setCommManager(commManagerMock);
+        regmanager.setPubSubManager(pubSubManagerMock);
 
         DeviceRegistry registry = DeviceRegistry.getInstance();
         assertTrue(null != registry);
         registry.clearRegistry();
         
-        myStream = EventFactory.getStream("DEVICE_REGISTERED");
-        assertTrue(null != myStream);
+        pubsubID = identityManagerMock.fromJid("XCManager.societies.local");
+        String published = pubSubManagerMock.publisherPublish(pubsubID, EVENTING_NODE_NAME, "Liam", device_1); 
+        
+        System.out.println("PubSubID is " +pubsubID);
+        System.out.println("NodeName is " +EVENTING_NODE_NAME);
+        System.out.println("published is " +published);
         
         System.out.println("Testing --------: testEvent ");
         try {
@@ -289,21 +332,13 @@ public class TestRegManager {
         assertEquals(device_1, registry.findDevice(device_1.getDeviceID()));
         assertEquals(device_2, registry.findDevice(device_2.getDeviceID()));
 		
-		InternalEvent event1 = new InternalEvent(node, device_3);
-		//event1.setEventNode(node);
-		
-		System.out.println("Event Node is  = " + event1.getEventNode());
-		System.out.println("Event Info is  = " + event1.getEventInfo());
-		
 		
 		System.out.println("CSSID is  = " + CSSNodeID);
 		
-		System.out.println("Created new Event");
-		myStream.multicastEvent(event1); 
-		System.out.println("Just returning from sending event");
-		assertEquals(2, registry.registrySize());
-		registry.clearRegistry();
-        assertEquals(0, registry.registrySize());
+		
+		//assertEquals(2, registry.registrySize());
+		//registry.clearRegistry();
+        //assertEquals(0, registry.registrySize());
 		
             
 	}

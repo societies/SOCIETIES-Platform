@@ -18,9 +18,6 @@
 	
 	
    <bean name="DeviceRegistry"
-   			class="org.societies.css.devicemgmt.deviceregistry.DeviceRegistry"
-   			depends-on="DmCommManager">
-			<property name="dmCommManager" ref="DmCommManager" />
-			
-	</bean>
+   			class="org.societies.css.devicemgmt.deviceregistry.DeviceRegistry" />
+   			
 </beans>

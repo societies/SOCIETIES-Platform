@@ -25,8 +25,7 @@
 
 package org.societies.css.devicemgmt.RegSynchroniser.impl;
 
-import java.io.Serializable;
-import java.util.ArrayList;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.logging.LogManager;
@@ -37,32 +36,40 @@ import org.osgi.framework.BundleContext;
 //import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.osgi.context.BundleContextAware;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.css.devicemgmt.IDeviceRegistry;
 import org.societies.css.devicemgmt.deviceregistry.DeviceRegistry;
-//import org.societies.css.devicemgmt.deviceregistry.CSSDevice;
-//import org.societies.css.devicemgmt.deviceregistry.IDeviceRegistry;
 import org.societies.api.internal.css.devicemgmt.ILocalDevice;
-//import org.societies.css.devicemgmt.RegSynchroniser.impl.LocalDevices;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.comm.xmpp.event.InternalEvent;
 import org.societies.comm.xmpp.event.PubsubEvent;
 import org.societies.comm.xmpp.event.PubsubEventFactory;
-import org.societies.comm.xmpp.event.PubsubEventStream;
 import org.societies.api.schema.css.devicemanagment.DmEvent;
 import org.societies.comm.xmpp.event.EventFactory;
 import org.societies.comm.xmpp.event.EventStream;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.identity.INetworkNode;
 
-public class RegManager implements ILocalDevice, ApplicationListener<InternalEvent>, BundleContextAware{
+public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
 
 	//private static org.apache.commons.logging.Log LOG = LogFactory.getLog(RegManager.class);
     private IDeviceRegistry deviceRegistry;
     private BundleContext bundleContext;
-    private EventStream stream1;
-    private EventStream stream2;
+    private PubsubClient pubSubManager;  
+    private IIdentityManager idManager;
+	private ICommManager commManager;
+	private INetworkNode nodeId = null;
+	IIdentity pubsubID = null;
     
     //private HashMap<String, String> eventResult;
+    
     
 	
     
@@ -85,15 +92,33 @@ public class RegManager implements ILocalDevice, ApplicationListener<InternalEve
     public RegManager(BundleContext bundlecontext) {
                 
         //Log("Synchroniser Manager created", this.LOG);
+    	
+    	//IIdentity pubsubID = null;
+    	//idManager = commManager.getIdManager();
         
     	this.bundleContext = bundlecontext;
         
         this.deviceRegistry = DeviceRegistry.getInstance();
-        stream1 = EventFactory.getStream("DEVICE_REGISTERED");
-    	stream2 = EventFactory.getStream("DEVICE_DISCONNECTED");
+        
+        //if((idManager = commManager.getIdManager()!= null) != null){
+//        	try {
+//    			pubsubID = idManager.fromJid("XCManager.societies.local");
+//    		} catch (InvalidFormatException e) {
+ //   			// TODO Auto-generated catch block
+ //   			e.printStackTrace();
+ //   		}
+        	
+ //       	try {
+//    			pubSubManager.subscriberSubscribe(pubsubID, "DEVICE_REGISTERED", this);
+//    		} catch (XMPPError e) {
+//    			// TODO Auto-generated catch block
+ //   			e.printStackTrace();
+//    		} catch (CommunicationException e) {
+//    			// TODO Auto-generated catch block
+//    			e.printStackTrace();
+//    		}
+       // }
     	
-    	stream1.addApplicationListener(this);
-    	stream2.addApplicationListener(this);
 
     }
 
@@ -199,13 +224,52 @@ public class RegManager implements ILocalDevice, ApplicationListener<InternalEve
 		return false;
 	}
 
-	public void onApplicationEvent(InternalEvent event) {
+	
+	public PubsubClient getPubSubManager() {
+		return pubSubManager;
+	}
+
+	public void setPubSubManager(PubsubClient pubSubManager) {
+		this.pubSubManager = pubSubManager;
+		try {
+			pubSubManager.subscriberSubscribe(pubsubID, "DEVICE_REGISTERED", this);
+		} catch (XMPPError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public ICommManager getCommManager() {
+		return commManager;
+	}
+
+
+	public void setCommManager(ICommManager commManager) {
+		this.commManager = commManager;
+		idManager = commManager.getIdManager();
+		
+		nodeId = idManager.getThisNetworkNode();
+		
+		try {
+			pubsubID = idManager.fromJid("XCManager.societies.local");
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object payload) {
+		DmEvent dmEvent = null;
+		//dmEvent = (DmEvent)payload;
+		
 		String CSSNodeID = "liam.societies.org";	
-		System.out.println(event.getTimestamp());
-		System.out.println(event.getSource());
-		DeviceCommonInfo device = (DeviceCommonInfo)event.getEventInfo();
-		if (event.getEventNode().equals("DEVICE_REGISTERED"))
-		{
+		DeviceCommonInfo device = (DeviceCommonInfo)payload;
+		
+		if(node.equals("DEVICE_REGISTERED")){
 			try {
 				LocalDevices.addDevice(device, CSSNodeID);
 			} catch (Exception e) {
@@ -213,16 +277,13 @@ public class RegManager implements ILocalDevice, ApplicationListener<InternalEve
 				e.printStackTrace();
 			}
 		}
-		if (event.getEventNode().equals("DEVICE_DISCONNECTED"))
-		{
+		if(node.equals("DEVICE_DISCONNECTED")){
 			try {
-				LocalDevices.removeDevice((DeviceCommonInfo) event.getEventInfo(), CSSNodeID);
+				LocalDevices.removeDevice(device, CSSNodeID);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			
 		}
 		
 	}

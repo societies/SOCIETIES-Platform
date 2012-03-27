@@ -14,7 +14,7 @@
         
         <osgi:service ref="DeviceRegistry" interface="org.societies.api.internal.css.devicemgmt.IDeviceRegistry" />
         
-        <osgi:reference id="DmCommManager" interface="org.societies.api.internal.css.devicemgmt.comm.DmCommManager"/>
+        
        
         
 		

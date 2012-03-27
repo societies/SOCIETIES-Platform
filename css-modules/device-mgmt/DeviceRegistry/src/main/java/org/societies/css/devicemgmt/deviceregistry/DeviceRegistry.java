@@ -36,8 +36,11 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+//import org.societies.api.comm.xmpp.interfaces.ICommManager;
+//import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.societies.css.devicemgmt.deviceregistry.*;
+import org.societies.css.devicemgmt.DeviceCommsMgr.*;
 import org.societies.api.internal.css.devicemgmt.IDeviceRegistry;
 import org.societies.api.internal.css.devicemgmt.comm.DmCommManager;
 //import org.societies.css.devicemgmt.DeviceCommsMgr.impl.CommAdapterImpl;
@@ -54,6 +57,7 @@ public class DeviceRegistry implements IDeviceRegistry {
     private static DeviceRegistry instance = new DeviceRegistry();
     
     private DmCommManager dmCommManager;
+    
     
     private static Logger LOG = LoggerFactory.getLogger(DeviceRegistry.class);
 
@@ -225,10 +229,10 @@ public class DeviceRegistry implements IDeviceRegistry {
 
 	public void fireNewDeviceConnected(String deviceID,
 			DeviceCommonInfo deviceCommonInfo) {
-		System.out.println("XXXXXX entering fireNewDeviceConnected method " );
+		System.out.println("---entering fireNewDeviceConnected method XXXXXXXXXXXXXX" );
 		
 		if(dmCommManager != null){
-			System.out.println("fireNewDeviceConnected " + deviceCommonInfo.getDeviceID());
+			System.out.println("XXXXXXXXX fireNewDeviceConnected " + deviceCommonInfo.getDeviceID());
 			dmCommManager.fireNewDeviceConnected(deviceCommonInfo.getDeviceID(), deviceCommonInfo);
 		}else{
 			System.out.println("+++ dmCommManager not available ");
@@ -239,10 +243,19 @@ public class DeviceRegistry implements IDeviceRegistry {
 	
 	public void fireDeviceDisconnected(String deviceID,
 			DeviceCommonInfo deviceCommonInfo) {
-		System.out.println("XXXXXX entering fireDeviceDisconnected ");
+		System.out.println(" ---entering fireDeviceDisconnected ZZZZZZZZZ");
+		/*try {
+			dmCommManager = DmCommManager.class.newInstance();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
 		
 		if(dmCommManager != null){
-			System.out.println("fireDeviceDisconnected " + deviceCommonInfo.getDeviceID());
+			System.out.println("ZZZZZZZZ fireDeviceDisconnected " + deviceCommonInfo.getDeviceID());
 			dmCommManager.fireDeviceDisconnected(deviceCommonInfo.getDeviceID(), deviceCommonInfo);
 		}else{
 			System.out.println("+++ dmCommManager not available ");
@@ -255,6 +268,15 @@ public class DeviceRegistry implements IDeviceRegistry {
 			DeviceCommonInfo deviceCommonInfo, String key, String value) {
 		
 		
+	}
+	
+	public DmCommManager getdmCommManager() {
+		return dmCommManager;
+	}
+
+
+	public void setCommManager(DmCommManager dmCommManager) {
+		this.dmCommManager = dmCommManager;
 	}
 }
 
