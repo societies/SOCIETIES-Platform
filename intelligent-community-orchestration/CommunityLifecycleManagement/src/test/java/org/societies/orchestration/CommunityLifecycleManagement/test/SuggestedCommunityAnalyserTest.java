@@ -69,7 +69,7 @@ public class SuggestedCommunityAnalyserTest {
 	private SuggestedCommunityAnalyser suggestedCommunityAnalyser;
 	private ICisManager cisManager;
 	
-	@Test
+	//@Test
     public void testIdentifyCissToConfigure() {
 		
 		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS

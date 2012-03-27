@@ -210,8 +210,8 @@ public class EgocentricCommunityCreationManagerTest {
 		
     	egocentricCommunityCreationManager.setCisManager(cisManager);
     	
-    	egocentricCommunityCreationManager.identifyCissToCreate("extensive", new HashMap<IIdentity, String>());
-        ICisManager resultCisManager = egocentricCommunityCreationManager.getCisManager();
+    	//egocentricCommunityCreationManager.identifyCissToCreate("extensive", new HashMap<IIdentity, String>());
+        //ICisManager resultCisManager = egocentricCommunityCreationManager.getCisManager();
         int cisCount = 0;
        // for (int i = 0; i < resultCisManager.getCisList().size(); i++) {
        // 	if (resultCisManager.getCisList().get(i).getMembersList() == cisRecord.getMembersList() &&
