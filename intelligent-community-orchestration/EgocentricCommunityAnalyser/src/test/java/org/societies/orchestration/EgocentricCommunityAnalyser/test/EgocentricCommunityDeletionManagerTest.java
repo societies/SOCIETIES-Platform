@@ -65,10 +65,10 @@ public class EgocentricCommunityDeletionManagerTest {
 
 		cisManager = mock(ICisManager.class);
 		ICisRecord cisRecord = mock(ICisRecord.class);
-		autoCommunityDeletionManager.setCisManager(cisManager);
 		//ICisRecord jamesCis = cisManager.createCis("James", "James CIS");
 		
     	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
+    	autoCommunityDeletionManager.setCisManager(cisManager);
 		
     	//when(cisManager.getCiss()).thenReturn(cisRecord);
     	
