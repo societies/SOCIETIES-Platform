@@ -24,6 +24,9 @@
  */
 package org.societies.api.cis.management;
 
+import java.util.List;
+
+
 
 /**
  * @author Babak.Farshchian@sintef.no
@@ -67,7 +70,7 @@ public interface ICisManager {
 	 * 
 	 * TODO: Check the return value. Should be something more meaningful.
 	 * 
-	 * @param cisId The ID of the CIS to get.
+	 * @param cisId The ID (jabber ID) of the CIS to get.
 	 * @return the CISRecord with the ID cisID, or null if no such CIS exists.
 	 */
 	ICisRecord getCis(String cssId, String cisId);
@@ -81,8 +84,10 @@ public interface ICisManager {
 	 * @param query Defines what to search for.
 	 * @return Array of CIS Records that match the query.
 	 */
+	@Deprecated
 	ICisRecord[] getCisList(ICisRecord query);
-	
+	//TODO: Should this be list or ArrayList?
+	List<ICisRecord> getOwnedCisList(String cssId, String cssPassword, String cisType);
 	Boolean requestNewCisOwner(String currentOwnerCssId, String currentOwnerCssPassword,
 		String newOwnerCssId, String cisId);
 
