@@ -170,26 +170,43 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
     	
     }
     
-    public ArrayList<String> processEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations, ArrayList<String> cissToCreateMetadata) {
-    	//go straight to Community Recommender
-    	
-    	return communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(cisRecommendations, cissToCreateMetadata);
-    }
-    
     public void processCSCWRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
     	
-    }
-
-    public void processCSCWConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
     	
+    	
+    	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
+    	ArrayList<ICisRecord> creations = cisRecommendations.get("Create CISs");
+    	if (creations != null) {
+    	    ArrayList<ArrayList<ICisRecord>> abstractCreations = new ArrayList<ArrayList<ICisRecord>>();
+    	    abstractCreations.add(creations);
+    	    convertedRecommendations.put("Create CISs", abstractCreations);
+    	}
+    	
+    	ArrayList<ICisRecord> deletions = cisRecommendations.get("Delete CISs");
+    	if (deletions != null) {
+    	    ArrayList<ArrayList<ICisRecord>> abstractDeletions = new ArrayList<ArrayList<ICisRecord>>();
+    	    abstractDeletions.add(deletions);
+    	    convertedRecommendations.put("Delete CISs", abstractDeletions);
+    	}
+    	communityRecommender.identifyCisActionForCSCW(convertedRecommendations);
     }
     
     public void processCSMAnalyserRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
-	
-    }
-    
-    public void processCSMAnalyserConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
+    	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
+    	ArrayList<ICisRecord> creations = cisRecommendations.get("Create CISs");
+    	if (creations != null) {
+    	    ArrayList<ArrayList<ICisRecord>> abstractCreations = new ArrayList<ArrayList<ICisRecord>>();
+    	    abstractCreations.add(creations);
+    	    convertedRecommendations.put("Create CISs", abstractCreations);
+    	}
     	
+    	ArrayList<ICisRecord> deletions = cisRecommendations.get("Delete CISs");
+    	if (deletions != null) {
+    	    ArrayList<ArrayList<ICisRecord>> abstractDeletions = new ArrayList<ArrayList<ICisRecord>>();
+    	    abstractDeletions.add(deletions);
+    	    convertedRecommendations.put("Delete CISs", abstractDeletions);
+    	}
+    	communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations);
     }
     
     public IIdentity getLinkedCss() {

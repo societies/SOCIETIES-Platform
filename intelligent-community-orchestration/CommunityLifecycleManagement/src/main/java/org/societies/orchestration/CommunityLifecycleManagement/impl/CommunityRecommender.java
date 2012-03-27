@@ -164,6 +164,14 @@ public class CommunityRecommender //implements ICommCallback
 		return cisMetadata;
 	}
 	
+	public void identifyCisActionForCSCW(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisPossibilities) {
+		
+	}
+	
+    public void identifyCisActionForCSMAnalyser(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisPossibilities) {
+		
+	}
+	
 	/*
 	 * Description: The method looks for CISs to create, using as a base the information related to
 	 *              this object's 'linked' component (see the fields). If the linked component
