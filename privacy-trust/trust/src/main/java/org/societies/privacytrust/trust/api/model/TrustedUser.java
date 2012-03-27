@@ -24,113 +24,73 @@
  */
 package org.societies.privacytrust.trust.api.model;
 
-import java.io.Serializable;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
- * This abstract class is used to represent an entity trusted by the trustor, i.e.
- * the owner of a CSS. Each trusted entity is referenced by its {@link TrustedEntityId},
- * while the associated Trust objects express the trustworthiness of that entity,
- * i.e. direct, indirect and user-perceived trust.
+ * This class represents trusted CSSs. A <code>TrustedUser</code> object is
+ * referenced by its {@link TrustedEntityId}, while the associated 
+ * {@link Trust} value objects express the trustworthiness of this CSS, i.e.
+ * direct, indirect and user-perceived. Each trusted CSS is assigned a set of
+ * {@link TrustedService} objects.
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.1 
+ * @since 0.0.1
  */
-public abstract class TrustedEntity implements Serializable {
+public final class TrustedUser extends TrustedEntity {
 	
-	private static final long serialVersionUID = -495088232194787430L;
+	private static final long serialVersionUID = -5663024798098392757L;
+	
+	/** The communities this CSS is member of. */
+	private Set<TrustedCommunity> communities = new CopyOnWriteArraySet<TrustedCommunity>();
+	
+	/** The services provided by this CSS. */
+	private Set<TrustedService> services = new CopyOnWriteArraySet<TrustedService>();
 
-	/** The identifier of the trustor. */
-	private final TrustedEntityId trustor;
-	
-	/** The identifier of this trusted entity. */
-	private final TrustedEntityId teid;
-	
-	private DirectTrust directTrust ;
-	private IndirectTrust indirectTrust ;
-	private UserPerceivedTrust userPerceivedTrust;
-
-	TrustedEntity(TrustedEntityId trustor, TrustedEntityId teid) {
-		this.trustor = trustor;
-		this.teid = teid;
+	public TrustedUser(TrustedEntityId trustor, TrustedEntityId teid) {
+		super(trustor, teid);
 	}
 	
 	/**
-	 * Returns the identifier of the trustor.
 	 * 
-	 * @return the identifier of the trustor.
+	 * @param community
+	 * @since 0.0.3
 	 */
-	public TrustedEntityId getTrustor() {
+	public void addCommunity(final TrustedCommunity community) {
 		
-		return this.trustor;
+		if (!this.communities.contains(community))
+			this.communities.add(community);
+		
+		if (!community.getMembers().contains(this))
+			community.getMembers().add(this);
 	}
 	
 	/**
-	 * Returns the identifier of this trusted entity.
 	 * 
-	 * @return the identifier of this trusted entity.
+	 * @param community
+	 * @since 0.0.3
 	 */
-	public TrustedEntityId getId() {
+	public void removeCommunity(final TrustedCommunity community) {
 		
-		return this.teid;
+		if (this.communities.contains(community))
+			this.communities.remove(community);
+		
+		if (community.getMembers().contains(this))
+			community.getMembers().remove(this);
 	}
 	
 	/**
 	 * 
 	 * @return
-	 * @since 0.0.3
 	 */
-	public DirectTrust getDirectTrust() {
+	Set<TrustedCommunity> getCommunities() {
 		
-		return this.directTrust;
+		return this.communities;
 	}
 	
-	/**
-	 * 
-	 * @param directTrust
-	 * @since 0.0.3
-	 */
-	public void setDirectTrust(DirectTrust directTrust) {
+	public void addService(final TrustedService service) {
 		
-		this.directTrust = directTrust;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 * @since 0.0.3
-	 */
-	public IndirectTrust getIndirectTrust() {
-		
-		return this.indirectTrust;
-	}
-	
-	/**
-	 * 
-	 * @param indirectTrust
-	 * @since 0.0.3
-	 */
-	public void setIndirectTrust(IndirectTrust indirectTrust) {
-		
-		this.indirectTrust = indirectTrust;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 * @since 0.0.3
-	 */
-	public UserPerceivedTrust getUserPerceivedTrust() {
-		
-		return this.userPerceivedTrust;
-	}
-	
-	/**
-	 * 
-	 * @param userPerceivedTrust
-	 * @since 0.0.3
-	 */
-	public void setUserPerceivedTrust(UserPerceivedTrust userPerceivedTrust) {
-		
-		this.userPerceivedTrust = userPerceivedTrust;
+		if (!this.services.contains(service))
+			this.services.add(service);
 	}
 }

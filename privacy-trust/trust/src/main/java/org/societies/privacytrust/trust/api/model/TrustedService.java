@@ -24,7 +24,6 @@
  */
 package org.societies.privacytrust.trust.api.model;
 
-import java.net.URI;
 import java.util.Set;
 
 /**
@@ -33,29 +32,28 @@ import java.util.Set;
  * trustworthiness of this service, i.e. direct, indirect and user-perceived. Each
  * trusted service is also associated with a TrustedCSS which represents its
  * provider.
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
  */
 public class TrustedService extends TrustedEntity {
 
 	private static final long serialVersionUID = 8253551733059925542L;
 	
-	private Set<TrustedCis> communities;
-	private URI id;
-	private TrustedCss provider;
-	private String type;
-	public TrustedDeveloper developer;
+	private final Set<TrustedCommunity> communities;
+	private final TrustedUser provider;
+	private final String type;
+	public final TrustedDeveloper developer;
 
-	public TrustedService() {
+	public TrustedService(TrustedEntityId trustor, TrustedEntityId teid) {
+		super(trustor, teid);
 	}
 
-	public Set<TrustedCis> getCommunities(){
+	public Set<TrustedCommunity> getCommunities(){
 		return this.communities;
 	}
 
-	public URI getId(){
-		return this.id;
-	}
-
-	public TrustedCss getProvider(){
+	public TrustedUser getProvider(){
 		return this.provider;
 	}
 

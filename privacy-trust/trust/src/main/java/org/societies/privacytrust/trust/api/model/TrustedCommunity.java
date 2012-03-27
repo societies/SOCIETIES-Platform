@@ -24,113 +24,69 @@
  */
 package org.societies.privacytrust.trust.api.model;
 
-import java.io.Serializable;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
- * This abstract class is used to represent an entity trusted by the trustor, i.e.
- * the owner of a CSS. Each trusted entity is referenced by its {@link TrustedEntityId},
- * while the associated Trust objects express the trustworthiness of that entity,
- * i.e. direct, indirect and user-perceived trust.
+ * This class represents trusted CISs. A TrustedCIS object is referenced by its
+ * TrustedEntityId, while the associated Trust value objects express the
+ * trustworthiness of this community, i.e. direct, indirect and user-perceived.
+ * Each trusted CIS is assigned a set of TrustedCSS objects, which represent its
+ * members.
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.1 
+ * @since 0.0.1
  */
-public abstract class TrustedEntity implements Serializable {
-	
-	private static final long serialVersionUID = -495088232194787430L;
+public final class TrustedCommunity extends TrustedEntity {
 
-	/** The identifier of the trustor. */
-	private final TrustedEntityId trustor;
+	private static final long serialVersionUID = -438368876927927076L;
 	
-	/** The identifier of this trusted entity. */
-	private final TrustedEntityId teid;
+	private final Set<TrustedUser> members = new CopyOnWriteArraySet<TrustedUser>();
 	
-	private DirectTrust directTrust ;
-	private IndirectTrust indirectTrust ;
-	private UserPerceivedTrust userPerceivedTrust;
+	// TODO
+	//private Set<TrustedService> services;
 
-	TrustedEntity(TrustedEntityId trustor, TrustedEntityId teid) {
-		this.trustor = trustor;
-		this.teid = teid;
+	public TrustedCommunity(TrustedEntityId trustor, TrustedEntityId teid){
+		super(trustor, teid);
+	}
+
+	/**
+	 * Adds the specified trusted individual to the members of this community.
+	 * 
+	 * @param member
+	 *            the trusted individual to add to the members of this community
+	 * @since 0.0.3
+	 */
+	public void addMember(final TrustedUser member) {
+		
+		if (!this.members.contains(member))
+			this.members.add(member);
+		
+		if (!member.getCommunities().contains(this))
+			member.getCommunities().add(this);
 	}
 	
 	/**
-	 * Returns the identifier of the trustor.
 	 * 
-	 * @return the identifier of the trustor.
+	 * @param member
+	 *            the trusted individual to remove from the members of this community
+	 * @since 0.0.3
 	 */
-	public TrustedEntityId getTrustor() {
+	public void removeMember(final TrustedUser member) {
 		
-		return this.trustor;
-	}
-	
-	/**
-	 * Returns the identifier of this trusted entity.
-	 * 
-	 * @return the identifier of this trusted entity.
-	 */
-	public TrustedEntityId getId() {
+		if (this.members.contains(member))
+			this.members.remove(member);
 		
-		return this.teid;
+		if (member.getCommunities().contains(this))
+			member.getCommunities().remove(this);
 	}
 	
 	/**
 	 * 
 	 * @return
-	 * @since 0.0.3
 	 */
-	public DirectTrust getDirectTrust() {
+	Set<TrustedUser> getMembers() {
 		
-		return this.directTrust;
-	}
-	
-	/**
-	 * 
-	 * @param directTrust
-	 * @since 0.0.3
-	 */
-	public void setDirectTrust(DirectTrust directTrust) {
-		
-		this.directTrust = directTrust;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 * @since 0.0.3
-	 */
-	public IndirectTrust getIndirectTrust() {
-		
-		return this.indirectTrust;
-	}
-	
-	/**
-	 * 
-	 * @param indirectTrust
-	 * @since 0.0.3
-	 */
-	public void setIndirectTrust(IndirectTrust indirectTrust) {
-		
-		this.indirectTrust = indirectTrust;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 * @since 0.0.3
-	 */
-	public UserPerceivedTrust getUserPerceivedTrust() {
-		
-		return this.userPerceivedTrust;
-	}
-	
-	/**
-	 * 
-	 * @param userPerceivedTrust
-	 * @since 0.0.3
-	 */
-	public void setUserPerceivedTrust(UserPerceivedTrust userPerceivedTrust) {
-		
-		this.userPerceivedTrust = userPerceivedTrust;
+		return this.members;
 	}
 }
