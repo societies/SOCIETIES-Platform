@@ -16,7 +16,7 @@
    <property name="egocentricCreationManager" ref="EgocentricCommunityCreationManager"></property>
    <property name="egocentricConfigurationManager" ref="EgocentricCommunityConfigurationManager"></property>
    <property name="egocentricDeletionManager" ref="EgocentricCommunityDeletionManager"></property>
-   <property name="commManager" ref="CommManagerBundle"></property>
+   <property name="commManager" ref="ICommManager"></property>
    </bean>
    
    <bean id="EgocentricCommunityCreationManager" class="org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityCreationManager" 
@@ -27,7 +27,7 @@
    <property name="userContextBroker" ref="ICtxBroker"></property>
    <!-- <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>-->
    <!-- <property name="communityContextBroker" ref="CommunityCtxBroker"></property>-->
-   <property name="commManager" ref="CommManagerBundle"></property>
+   <property name="commManager" ref="ICommManager"></property>
    <property name="userFeedback" ref="IUserFeedback"></property>
    <property name="userFeedbackCallback" ref="IUserFeedbackCallback"></property>
    <property name="cssManager" ref="ICSSLocalManager"></property>
@@ -42,7 +42,7 @@
    <property name="userContextBroker" ref="ICtxBroker"></property>
    <!-- <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>-->
    <!-- <property name="communityContextBroker" ref="CommunityCtxBroker"></property>-->
-   <property name="commManager" ref="CommManagerBundle"></property>
+   <property name="commManager" ref="ICommManager"></property>
    <property name="userFeedback" ref="IUserFeedback"></property>
    <property name="userFeedbackCallback" ref="IUserFeedbackCallback"></property>
    <property name="cssManager" ref="ICSSLocalManager"></property>
@@ -57,7 +57,7 @@
    <property name="userContextBroker" ref="ICtxBroker"></property>
    <!-- <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>-->
    <!-- <property name="communityContextBroker" ref="CommunityCtxBroker"></property>-->
-   <property name="commManager" ref="CommManagerBundle"></property>
+   <property name="commManager" ref="ICommManager"></property>
    <property name="userFeedback" ref="IUserFeedback"></property>
    <property name="userFeedbackCallback" ref="IUserFeedbackCallback"></property>
    <property name="cssManager" ref="ICSSLocalManager"></property>
