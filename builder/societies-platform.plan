@@ -34,11 +34,5 @@
 	<artifact type="bundle" name="org.societies.cis.manager"/>
 	<artifact type="bundle" name="org.societies.css.mgmt.cssmgmt"/>
     <artifact type="bundle" name="org.societies.css.mgmt.comms.cssmgmt-comms"/>
-     
-    <!-- Example 3rd Party Services -->
-	<artifact type="bundle" name="org.societies.comm.examples.Calculator"/>
-    <artifact type="bundle" name="org.societies.comm.examples.FortuneCookie"/>
-    <artifact type="bundle" name="org.societies.example.complexservice"/>
-    <artifact type="bundle" name="org.societies.comm.examples.ExampleCommsManager"/>
-	
+     	
 </plan>
