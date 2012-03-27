@@ -13,6 +13,7 @@ import org.societies.android.platform.interfaces.IAndroidCSSManager;
 import org.societies.android.platform.utilities.ServiceMethodTranslator;
 import org.societies.api.android.internal.model.AndroidCSSNode;
 import org.societies.api.android.internal.model.AndroidCSSRecord;
+import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -105,8 +106,10 @@ public class PluginCSSManager extends Plugin {
 	private boolean sendJavascriptResult(String callbackId, Intent intent, String key) {
 		boolean retValue = false;
 		Log.d(LOG_TAG, "returnJavascriptResult called for intent: " + intent.getAction() + " and callback ID: " + callbackId);	
+		
+		CssInterfaceResult cssResult = (CssInterfaceResult) intent.getParcelableExtra(AndroidCoreIntents.INTENT_RETURN_KEY);
 
-		PluginResult result = new PluginResult(PluginResult.Status.OK, convertCSSRecord((AndroidCSSRecord) intent.getParcelableExtra(AndroidCoreIntents.INTENT_RETURN_KEY)));
+		PluginResult result = new PluginResult(PluginResult.Status.OK, convertCSSRecord((AndroidCSSRecord) cssResult.getProfile()));
 		result.setKeepCallback(false);
 		this.success(result, this.callbackId);
 		
