@@ -142,7 +142,7 @@ public class CommunityRecommenderTest {
 			e.printStackTrace();
 		}
 		//check user joined CISs before
-		communityRecommender.identifyCissToCreate(new ArrayList<ICisRecord>());
+		communityRecommender.identifyCissToCreate(new ArrayList<ICisRecord>(), new ArrayList<String>());
 		//check and compare user joined CISs after
 		
 		String[] members = new String[1];
@@ -193,7 +193,7 @@ public class CommunityRecommenderTest {
     	//userCtxBroker.addAttribute(ownerIdContextEntity, CtxAttributeValueType.INDIVIDUAL, "CSS proximity", IUserCtxBrokerCallback);
     	
     	//check user joined CISs before
-		communityRecommender.identifyCissToCreate(new ArrayList<ICisRecord>());
+		communityRecommender.identifyCissToCreate(new ArrayList<ICisRecord>(), new ArrayList<String>());
 		//check and compare user joined CISs after
 		
 		//Assert.assertNotNull(/**User's joined CISs*/);

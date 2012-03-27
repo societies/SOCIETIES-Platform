@@ -61,7 +61,7 @@ public interface ISuggestedCommunityAnalyser {
 	 * It contains all the CisRecords to delete.
 	 * 
 	 */
-    public void analyseCSCWRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations);
+    public void processCSCWRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations);
 	
     /**
 	 * Takes as input a collection of CISs, and what they represent, and performs analysis on them
@@ -70,12 +70,23 @@ public interface ISuggestedCommunityAnalyser {
 	 * @param cisRecommendations
 	 * Holds all the CIS recommendation information, as a String-to-Arraylist hashmap. The possible values are as follows:
 	 * 
-	 * Key: "Configure CISs" Value: Arraylist(1) of arraylist(2) of CisRecords. (1) has one entry per configuration recommendation.
+	 * Key: "Configure CISs attributes" Value: Arraylist(1) of arraylist(2) of CisRecords. (1) has one entry per configuration recommendation.
 	 * (2) Has two entries for each of (1) - the first is the CisRecord to be configured, and the second is the CisRecord that would 
 	 * result if the configuration happens.
 	 * 
+	 *  Key: "Split CISs" Value: Arraylist(1) of arraylist(2) of CisRecords. (1) has one entry per configuration recommendation.
+	 * (2) Has three entries for each of (1) - the first is the CisRecord to be split, and the other two are the new CISs to be
+	 * created by the split.
+	 * 
+	 *  Key: "Merge CISs" Value: Arraylist(1) of arraylist(2) of CisRecords. (1) has one entry per configuration recommendation.
+	 * (2) Has three entries for each of (1) - the first two are the CisRecords that are to be merged into one. The third is optional,
+	 * and it is the CisRecord that is to be created by the merge. This could be used in order to specify
+	 * for example who the new owner should be.
+	 * 
+	 * 
+	 * 
 	 */
-    public void analyseCSCWConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations);
+    public void processCSCWConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations);
     
     /**
 	 * Takes as input a collection of CISs, and what they represent, and performs analysis on them
@@ -91,7 +102,7 @@ public interface ISuggestedCommunityAnalyser {
 	 * It contains all the CisRecords to delete.
 	 * 
 	 */
-    public void analyseCSMAnalyserRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations);
+    public void processCSMAnalyserRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations);
     
     /**
 	 * Takes as input a collection of CISs, and what they represent, and performs analysis on them
@@ -105,7 +116,7 @@ public interface ISuggestedCommunityAnalyser {
 	 * result if the configuration happens.
 	 * 
 	 */
-    public void analyseCSMAnalyserConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations);
+    public void processCSMAnalyserConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations);
     /**
 	 * Takes as input a collection of CISs, and what they represent, and performs analysis on them
 	 * which may lead to action being taken for some or all of them.
@@ -120,7 +131,7 @@ public interface ISuggestedCommunityAnalyser {
 	 * It contains all the CisRecords to delete.
 	 * 
 	 */
-    public ArrayList<String> analyseEgocentricRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations, ArrayList<String> cissToCreateMetadata);
+    public ArrayList<String> processEgocentricRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations, ArrayList<String> cissToCreateMetadata);
     
     /**
 	 * Takes as input a collection of CISs, and what they represent, and performs analysis on them
@@ -134,6 +145,6 @@ public interface ISuggestedCommunityAnalyser {
 	 * result if the configuration happens.
 	 * 
 	 */
-    public ArrayList<String> analyseEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations, ArrayList<String> cissToCreateMetadata);
+    public ArrayList<String> processEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations, ArrayList<String> cissToCreateMetadata);
 
 }
