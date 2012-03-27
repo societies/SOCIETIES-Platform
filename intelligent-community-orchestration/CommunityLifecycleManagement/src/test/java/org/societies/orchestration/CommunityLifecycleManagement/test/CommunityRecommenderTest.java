@@ -58,7 +58,7 @@ import org.societies.context.user.history.api.platform.IUserCtxHistoryMgr;
 */
 
 import org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityRecommender;
-import org.societies.orchestration.EgocentricCommunityAnalyser.test.ownerId;
+//import org.societies.orchestration.EgocentricCommunityAnalyser.test.ownerId;
 
 import org.societies.api.identity.IIdentity;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
