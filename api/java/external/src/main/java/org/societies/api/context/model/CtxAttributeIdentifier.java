@@ -59,8 +59,8 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 	private static final long serialVersionUID = -282171829285239788L;
 	
 	/** The scope of this context attribute identifier. */
-	private final CtxEntityIdentifier scope;
-
+	private transient CtxEntityIdentifier scope;
+	
 	/**
 	 * Creates a context attribute identifier by specifying the containing
 	 * entity, the attribute type and the unique numeric model object identifier
@@ -74,8 +74,14 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 	 *            the unique numeric model object identifier
 	 */
 	public CtxAttributeIdentifier(CtxEntityIdentifier scope, String type, Long objectNumber) {
-		super(scope.getOperatorId(), type, objectNumber);
+		
+		super(scope.getOperatorId(), CtxModelType.ATTRIBUTE, type, objectNumber);
 		this.scope = scope;
+	}
+	
+	CtxAttributeIdentifier(String str) throws MalformedCtxIdentifierException {
+		
+		super(str);
 	}
 	
 	/**
@@ -86,39 +92,8 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 	 *         the identified attribute.
 	 */
 	public CtxEntityIdentifier getScope() {
+		
 		return this.scope;
-	}
-
-	/**
-	 *  Returns the type of the identified context model object, i.e. CtxModelType.ATTRIBUTE
-	 *   
-	 *  @return CtxModelType#ATTRIBUTE
-	 */
-	@Override
-	public CtxModelType getModelType() {
-		return CtxModelType.ATTRIBUTE;
-	}
-	
-	/**
-	 * Returns a String representation of this context attribute identifier
-	 * 
-	 * @return a String representation of this context attribute identifier
-	 * @since 0.0.4
-	 */
-	@Override
-	public String toString() {
-		
-		StringBuilder result = new StringBuilder();
-		
-		result.append(this.scope);
-		result.append("/");
-		result.append(this.getModelType());
-		result.append("/");
-		result.append(this.getType());
-		result.append("/");
-		result.append(this.getObjectNumber());
-		
-		return result.toString();
 	}
 	
 	/**
@@ -158,5 +133,93 @@ public class CtxAttributeIdentifier extends CtxIdentifier {
 			return false;
 		
 		return true;
+	}
+
+	/**
+	 * Formats the string representation of a context attribute identifier as follows:
+	 * <pre> 
+	 * scope/ATTRIBUTE/type/objectNumber
+	 * </pre>
+	 * 
+	 * @see CtxIdentifier#defineString()
+	 */
+	@Override
+	protected void defineString() {
+
+		if (super.string != null) 
+			return;
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append(this.scope);
+		sb.append("/");
+		sb.append(CtxModelType.ATTRIBUTE);
+		sb.append("/");
+		sb.append(super.type);
+		sb.append("/");
+		sb.append(super.objectNumber);
+
+		super.string = sb.toString();
+	}
+
+	/**
+	 * Parses the string form of a context attribute identifier as follows:
+	 * <pre> 
+	 * scope/ATTRIBUTE/type/objectNumber
+	 * </pre>
+	 * 
+	 * @see CtxIdentifier#parseString(java.lang.String)
+	 */
+	@Override
+	protected void parseString(String input)
+			throws MalformedCtxIdentifierException {
+	
+		super.string = input;
+
+		final int length = input.length();
+
+		final int objectNumberDelim = input.lastIndexOf("/");
+		if (objectNumberDelim == -1)
+			throw new MalformedCtxIdentifierException("'" + input + "'");
+		final String objectNumberStr = input.substring(objectNumberDelim+1, length);
+		try { 
+			super.objectNumber = new Long(objectNumberStr);
+		} catch (NumberFormatException nfe) {
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Invalid context attribute object number", nfe);
+		}
+
+		final int typeDelim = input.lastIndexOf("/", objectNumberDelim-1);
+		super.type = input.substring(typeDelim+1, objectNumberDelim);
+		if (super.type.isEmpty())
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Context attribute type cannot be empty");
+
+		final int modelTypeDelim = input.lastIndexOf("/", typeDelim-1);
+		if (modelTypeDelim == -1)
+			throw new MalformedCtxIdentifierException("'" + input + "'");
+		final String modelTypeStr = input.substring(modelTypeDelim+1, typeDelim);
+		try {
+			super.modelType = CtxModelType.valueOf(modelTypeStr);
+		} catch (IllegalArgumentException iae) {
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Malformed context model type", iae);
+		}
+		if (!CtxModelType.ATTRIBUTE.equals(super.modelType))
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Expected 'ATTRIBUTE' but found '"
+					+ super.modelType + "'");
+
+		final String scopeStr = input.substring(0, modelTypeDelim);
+		if (scopeStr.isEmpty())
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Context attribute scope cannot be empty");
+		try { 
+			this.scope = new CtxEntityIdentifier(scopeStr);
+		} catch (MalformedCtxIdentifierException mcie) {
+			throw new MalformedCtxIdentifierException("'" + input
+					+ "': Malformed context attribute scope", mcie);
+		}
+		super.operatorId = this.scope.getOperatorId();
 	}
 }

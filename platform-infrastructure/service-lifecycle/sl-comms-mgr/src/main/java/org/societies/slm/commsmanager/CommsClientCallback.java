@@ -30,12 +30,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResultBean;
 import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryResultBean;
+import org.societies.api.servicelifecycle.IServiceControlCallback;
 
 
 /**
@@ -48,21 +52,35 @@ public class CommsClientCallback implements ICommCallback {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			  Arrays.asList("http://societies.org/api/schema/servicelifecycle/model",
-					  		"http://societies.org/api/schema/servicelifecycle/servicediscovery"));
+				  		"http://societies.org/api/schema/servicelifecycle/servicediscovery",
+				  		"http://societies.org/api/schema/servicelifecycle/servicecontrol"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			  Arrays.asList("org.societies.api.schema.servicelifecycle.model",
-							"org.societies.api.schema.servicelifecycle.servicediscovery"));
+						"org.societies.api.schema.servicelifecycle.servicediscovery",
+						"org.societies.api.schema.servicelifecycle.servicecontrol"));
 
+	private static Logger logger = LoggerFactory.getLogger(CommsClientCallback.class);
+	
 	//MAP TO STORE THE ALL THE CLIENT CONNECTIONS
-	private final Map<String, IServiceDiscoveryCallback> serviceDiscoveryClients = new HashMap<String, IServiceDiscoveryCallback>();
+	private static final Map<String, IServiceDiscoveryCallback> serviceDiscoveryClients = new HashMap<String, IServiceDiscoveryCallback>();
+	private static final Map<String, IServiceControlCallback> serviceControlClients = new HashMap<String,IServiceControlCallback>();
 	
 	/** Constructor for callback
 	 * @param clientID unique ID of send request to comms framework
-	 * @param calcClient callback from originating client
+	 * @param serviceDiscoveryClient callback from originating client
 	 */
 	public CommsClientCallback(String clientID, IServiceDiscoveryCallback serviceDiscoveryClient) {
 		//STORE THIS CALLBACK WITH THIS REQUEST ID
 		serviceDiscoveryClients.put(clientID, serviceDiscoveryClient);
+	}
+	
+	/** Constructor for callback
+	 * @param clientID unique ID of send request to comms framework
+	 * @param serviceControlClient callback from originating client
+	 */
+	public CommsClientCallback(String clientID, IServiceControlCallback serviceControlClient) {
+		//STORE THIS CALLBACK WITH THIS REQUEST ID
+		serviceControlClients.put(clientID, serviceControlClient);
 	}
 
 	/**Returns the correct calculator client callback for this request 
@@ -75,18 +93,50 @@ public class CommsClientCallback implements ICommCallback {
 		serviceDiscoveryClients.remove(requestID);
 		return requestingClient;
 	}
+
+	/**Returns the correct calculator client callback for this request 
+	 * @param requestID the id of the initiating request
+	 * @return
+	 * @throws UnavailableException
+	 */
+	private IServiceControlCallback getRequestingControlClient(String requestID) {
+		IServiceControlCallback requestingClient = (IServiceControlCallback) serviceControlClients.get(requestID);
+		serviceControlClients.remove(requestID);
+		return requestingClient;
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveResult(org.societies.comm.xmpp.datatypes.Stanza, java.lang.Object) */
 	@Override
 	public void receiveResult(Stanza returnStanza, Object msgBean) {
+		
+		if(logger.isDebugEnabled()) logger.debug("SLM Callback called!");
+		
 		//CHECK WHICH END SERVICE IS SENDING US A MESSAGE
+		
 		// --------- Service Discovery Bean ---------
 		if (msgBean.getClass().equals(ServiceDiscoveryResultBean.class)) {
+			
+			if(logger.isDebugEnabled()) logger.debug("ServiceDiscoveryBeanResult!");
+			
 			ServiceDiscoveryResultBean serviceDiscoveryResult = (ServiceDiscoveryResultBean) msgBean;
 			
 			IServiceDiscoveryCallback serviceDiscoveryClient = getRequestingClient(returnStanza.getId());
 			serviceDiscoveryClient.getResult(serviceDiscoveryResult.getServices());	
+		} 
+		
+		if(msgBean.getClass().equals(ServiceControlResultBean.class)){
+		
+			if(logger.isDebugEnabled()) logger.debug("ServiceControlBeanResult!");
+			
+			ServiceControlResultBean serviceControlResult = (ServiceControlResultBean) msgBean;
+			
+			IServiceControlCallback serviceControlClient = getRequestingControlClient(returnStanza.getId());
+			
+			if(logger.isDebugEnabled()) logger.debug("ServiceControlBeanResult: " + serviceControlResult.getControlResult());
+			
+			serviceControlClient.setResult(serviceControlResult.getControlResult());
+			
 		}
 	}
 
@@ -109,7 +159,8 @@ public class CommsClientCallback implements ICommCallback {
 	 */
 	@Override
 	public void receiveError(Stanza returnStanza, XMPPError info) {
-		System.out.println(info.getMessage());
+		if(logger.isDebugEnabled()) logger.debug("received an Error!");
+		logger.error(info.getMessage());
 		
 	}
 

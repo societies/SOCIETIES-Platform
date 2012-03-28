@@ -12,7 +12,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.useragent.conflict.ConflictResolutionManager;
 import org.societies.useragent.decisionmaking.DecisionMaker;
 
@@ -21,14 +21,14 @@ public class DecisionMakerMockitoTest {
 	private IOutcome preference;
     private ConflictResolutionManager mock; 
     private DecisionMaker classUnderTest;
-    private IServiceResourceIdentifier id;
+    private ServiceResourceIdentifier id;
     @Before  
     public void setUp() {  
 //    	creat mocked class
         mock = mock(ConflictResolutionManager.class); 
         intent=mock(IOutcome.class);
         preference=mock(IOutcome.class);
-        id=mock(IServiceResourceIdentifier.class);
+        id=mock(ServiceResourceIdentifier.class);
 //      creat an instance of your tested class
         classUnderTest = new DecisionMaker();
 //      set mock class to the test class

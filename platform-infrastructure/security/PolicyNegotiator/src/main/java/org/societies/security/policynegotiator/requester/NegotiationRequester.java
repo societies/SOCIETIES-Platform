@@ -27,6 +27,7 @@ package org.societies.security.policynegotiator.requester;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.security.policynegotiator.INegotiationRequester;
 import org.societies.api.security.digsig.ISignatureMgr;
 
@@ -36,7 +37,8 @@ public class NegotiationRequester implements INegotiationRequester, INegotiation
 	private static Logger LOG = LoggerFactory.getLogger(NegotiationRequester.class);
 	
 	private ISignatureMgr signatureMgr;
-	
+	private INegotiationProviderRemote groupMgr;
+
 //	@Autowired
 //	public NegotiationRequester(ISignatureMgr signatureMgr) {
 //		this.signatureMgr = signatureMgr;
@@ -49,11 +51,22 @@ public class NegotiationRequester implements INegotiationRequester, INegotiation
 	
 //	@PostConstruct
 	public void init() {
-		LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "xmlNodeId", "id"));
-		LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
+		//LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "xmlNodeId", "id"));
+		//LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
+
+		LOG.debug("init(): group manager = {}", groupMgr.toString());
+		
+		//groupMgr.reject(0, null);
+		groupMgr.getPolicyOptions("123", null);
 	}
 
 	// Getters and setters for beans
+	public INegotiationProviderRemote getGroupMgr() {
+		return groupMgr;
+	}
+	public void setGroupMgr(INegotiationProviderRemote groupMgr) {
+		this.groupMgr = groupMgr;
+	}
 	public ISignatureMgr getSignatureMgr() {
 		return signatureMgr;
 	}

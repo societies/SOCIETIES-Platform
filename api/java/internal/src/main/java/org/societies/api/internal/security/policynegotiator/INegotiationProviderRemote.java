@@ -35,13 +35,12 @@ package org.societies.api.internal.security.policynegotiator;
 public interface INegotiationProviderRemote {
 
 	/**
-	 * See {@link INegotiationProvider#getPolicyOptions(INegotiationProviderCallback)}
+	 * See {@link INegotiationProvider#getPolicyOptions(String)}
 	 */
-	public void getPolicyOptions(INegotiationProviderCallback callback);
+	public void getPolicyOptions(String serviceId, INegotiationProviderCallback callback);
 
 	/**
-	 * See {@link INegotiationProvider#acceptPolicyAndGetSla(int, String,
-	 * boolean, INegotiationProviderCallback)}
+	 * See {@link INegotiationProvider#acceptPolicyAndGetSla(int, String, boolean)}
 	 */
 	public void acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
 			boolean modified, INegotiationProviderCallback callback);
@@ -49,5 +48,5 @@ public interface INegotiationProviderRemote {
 	/**
 	 * See {@link INegotiationProvider#reject(int)}
 	 */
-	public void reject(int sessionId);
+	public void reject(int sessionId, INegotiationProviderCallback callback);
 }

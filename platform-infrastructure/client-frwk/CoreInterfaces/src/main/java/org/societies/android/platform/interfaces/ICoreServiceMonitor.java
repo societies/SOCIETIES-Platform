@@ -30,6 +30,8 @@ import java.util.List;
 
 import org.societies.api.android.internal.model.AndroidParcelable;
 
+import android.app.ActivityManager;
+
 
 public interface ICoreServiceMonitor {
 	String methodsArray [] = {"activeTasks(String client)", 
@@ -49,7 +51,7 @@ public interface ICoreServiceMonitor {
 	 * 
 	 * @return List (ActivityManager.RunningTaskInfo)
 	 */
-	List<?> activeTasks(String client);
+	List<ActivityManager.RunningTaskInfo> activeTasks(String client);
 	/**
 	 * Generate a list of tasks currently "running" on the Android device
 	 * which are filtered by their Component name
@@ -59,14 +61,14 @@ public interface ICoreServiceMonitor {
 	 * @param taskFilter filters running tasks according to filter value
 	 * @return List (ActivityManager.RunningTaskInfo)
 	 */
-	List<?> activeTasks(String client, String taskFilter);
+	List<ActivityManager.RunningTaskInfo> activeTasks(String client, String taskFilter);
 	/**
 	 * Generate a list of services currently "running" on the Android device
 	 * 
 	 * @param client package name of service caller 
 	 * @return List (ActivityManager.RunningServiceInfo)
 	 */
-	List<?> activeServices(String client);
+	List<ActivityManager.RunningServiceInfo> activeServices(String client);
 	/**
 	 * Generate a list of services currently "running" on the Android device
 	 * which are filtered by their Component name
@@ -77,7 +79,8 @@ public interface ICoreServiceMonitor {
 	 * @return List (ActivityManager.RunningServiceInfo)
 	 */
 
-	List<?> activeServices(String client, String serviceFilter);
+	List<ActivityManager.RunningServiceInfo> activeServices(String client, String serviceFilter);
+	
 	boolean startService(String client, String service);
 	boolean startActivity(String client, String activity);
 	boolean stopService(String client, String service);

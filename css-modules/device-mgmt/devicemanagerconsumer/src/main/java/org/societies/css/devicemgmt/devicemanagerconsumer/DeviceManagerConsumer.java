@@ -1,126 +1,181 @@
 package org.societies.css.devicemgmt.devicemanagerconsumer;
 
 import java.util.Dictionary;
-import java.util.HashMap;
+import java.util.Hashtable;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.css.devicemgmt.IAction;
 import org.societies.api.css.devicemgmt.IDevice;
-import org.societies.api.css.devicemgmt.IDeviceService;
-//import org.societies.comm.xmpp.event.EventFactory;
-//import org.societies.comm.xmpp.event.EventStream;
-//import org.societies.comm.xmpp.event.InternalEvent;
-import org.springframework.context.ApplicationListener;
+import org.societies.api.css.devicemgmt.IDriverService;
+import org.springframework.osgi.context.BundleContextAware;
 
 
 
-
-
-public class DeviceManagerConsumer implements EventHandler{
-
-	private IDevice deviceService;
-	
-	//private EventStream myStream;
-	
-	private Double lightLevel = new Double(0.0); 
+public class DeviceManagerConsumer implements EventHandler, ServiceTrackerCustomizer, BundleContextAware{
 	
 	//TODO For Test
 	private Double ll = new Double(0.0);
-	
-	private HashMap<String, Long> eventResult;
+	private String screenMessage = "default message";
 	
 	private static Logger LOG = LoggerFactory.getLogger(DeviceManagerConsumer.class);
 	
-	public DeviceManagerConsumer() {
-		
-		eventResult = new HashMap<String, Long>();
-
+	private BundleContext bundleContext;
+	
+	private ServiceTracker serviceTracker;
+	
+	public DeviceManagerConsumer() 
+	{
 		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device manager consumer constructor");
-		
-		//myStream = EventFactory.getStream("lightLevel");
-		
-		//myStream.addApplicationListener(this);
-		
-		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% post addApplicationListener ");
 	}
 	
-	public IDevice getDeviceService()
-	{
-		return deviceService;
-	}
 	
-	public void setDeviceService(IDevice deviceService)
-	{
-		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% deviceService pre injection ");
+	@Override
+	public void setBundleContext(BundleContext bundleContext) {
+		this.bundleContext = bundleContext;
 		
-		this.deviceService=deviceService;
-		
-		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% deviceService post injection "+ deviceService.getDeviceId());
 	}
 	
 	public void initConsumer()
-	{
-		IDeviceService ds = getDeviceService().getService("lightSensor1");
-				
-		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% pre ds.getAction ");
-				
-		IAction ia = ds.getAction("getLightLevel");
+	{	
+		this.serviceTracker = new ServiceTracker(bundleContext, IDevice.class.getName(), this);
+		this.serviceTracker.open();
 		
-		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% post ds.getAction ");
-				
-		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% post ia.invokeAction ");
-		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Action Name is: "+ ia.getName());
-				
-		int a = 1, b=2;
-		while (a<2) 
-		{
-			try 
-			{
-				Dictionary dic = ia.invokeAction(null);
-				LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Action Return is: "+ dic.get("outputLightLevel")); 
-				Thread.sleep(4000);
-			} 
-			catch (InterruptedException e) 
-			{
-						
-				e.printStackTrace();
-			}
-			a = 3;	
-		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.context.ApplicationListener#onApplicationEvent(org.springframework.context.ApplicationEvent)
-	 */
-//	public void onApplicationEvent(InternalEvent event) {
-//		
-//		 LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% onApplicationEvent ");
-//		
-//		if (event.getEventNode().equals("lightLevel"))
-//		{
-//				eventResult = (HashMap<String, Long>)event.getEventInfo();
-//			     
-//				lightLevel = eventResult.get("lightLevel");
-//			     LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% onApplicationEvent: "+ lightLevel);
-//		}	
-//	}
 
-	/* (non-Javadoc)
-	 * @see org.osgi.service.event.EventHandler#handleEvent(org.osgi.service.event.Event)
-	 */
 	public void handleEvent(Event event) {
 		
 		LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent ");
-		
-		if (event.getTopic().equals("LightSensorEvent"))
+		if (event.getProperty("event_name").equals("Sensor/LigntSensorEvent")) 
 		{
 			ll = (Double)event.getProperty("lightLevel");
+			LOG.info("DeviceMgmtConsumer: ***********%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent lightLevel: " + ll);
 		}
-		LOG.info("DeviceMgmtConsumer: ***********%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent " + ll);
+		else if (event.getProperty("event_name").equals("Actuator/ScreenActuatorEvent"))
+		{
+			screenMessage = (String)event.getProperty("screenEvent");
+			LOG.info("DeviceMgmtConsumer: ***********%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% handleEvent screenMessage: " + screenMessage);
+		}
+	}
+	
+	
+	@Override
+	public Object addingService(ServiceReference reference) 
+	{
+		Object obj = bundleContext.getService(reference);
+
+		IDevice iDevice = (IDevice)obj;
+
+		if (iDevice != null) 
+		{ 		
+			if (iDevice.getDeviceType() == "LightSensor") 
+			{
+				if (iDevice.getDeviceLocation().equalsIgnoreCase("Room1")) 
+				{
+					
+					IDevice ls1 = iDevice;
+					IDriverService driverService = ls1.getService("lightSensorService");
+					
+					IAction ia = driverService.getAction("getLightLevel");
+					
+					Dictionary dic = ia.invokeAction(null);
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Name: "+ ls1.getDeviceName());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Location: "+ ls1.getDeviceType());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device ID: "+ ls1.getDeviceId());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Description: "+ ls1.getDeviceDescription());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device provider: "+ ls1.getDeviceProvider());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Connection Type: "+ ls1.getDeviceConnetionType());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Location: "+ ls1.getDeviceLocation());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% getLightLevel action Return: "+ dic.get("outputLightLevel"));
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+				}
+				else if (iDevice.getDeviceLocation().equalsIgnoreCase("Room2")) 
+				{
+					
+					IDevice ls2 = iDevice;
+					IDriverService driverService = ls2.getService("lightSensorService");
+					
+					IAction ia = driverService.getAction("getLightLevel");
+
+					Dictionary dic = ia.invokeAction(null);
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Name: "+ ls2.getDeviceName());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Location: "+ ls2.getDeviceType());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device ID: "+ ls2.getDeviceId());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Description: "+ ls2.getDeviceDescription());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device provider: "+ ls2.getDeviceProvider());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Connection Type: "+ ls2.getDeviceConnetionType());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Location: "+ ls2.getDeviceLocation());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% getLightLevel action Return: "+ dic.get("outputLightLevel"));
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+				}
+				else if (iDevice.getDeviceLocation().equalsIgnoreCase("Room3")) 
+				{
+					IDevice ls3 = iDevice;
+					IDriverService driverService = ls3.getService("lightSensorService");
+					
+					IAction ia = driverService.getAction("getLightLevel");
+
+					Dictionary dic = ia.invokeAction(null);
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Name: "+ ls3.getDeviceName());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Location: "+ ls3.getDeviceType());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device ID: "+ ls3.getDeviceId());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Description: "+ ls3.getDeviceDescription());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device provider: "+ ls3.getDeviceProvider());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Connection Type: "+ ls3.getDeviceConnetionType());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Location: "+ ls3.getDeviceLocation());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% getLightLevel action Return: "+ dic.get("outputLightLevel"));
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+				}
+			}
+			else if (iDevice.getDeviceType() == "Screen")
+			{
+				if (iDevice.getDeviceLocation().equalsIgnoreCase("Corridor1")) 
+				{
+					IDevice screen1 = iDevice;
+					IDriverService driverService = screen1.getService("screenService");
+					
+					IAction ia = driverService.getAction("displayMessage");
+
+					Dictionary<String, Object> dic = new Hashtable<String, Object>();
+					dic.put("message", "Display this message for me please ! ");
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Name: "+ screen1.getDeviceName());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Location: "+ screen1.getDeviceType());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device ID: "+ screen1.getDeviceId());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Description: "+ screen1.getDeviceDescription());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device provider: "+ screen1.getDeviceProvider());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Connection Type: "+ screen1.getDeviceConnetionType());
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Device Location: "+ screen1.getDeviceLocation());
+					ia.invokeAction(dic);
+					
+					LOG.info("DeviceMgmtConsumer: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+				}
+				
+			}
+		}
+		return null;
 	}
 
+
+	@Override
+	public void modifiedService(ServiceReference reference, Object service) {
+		
+	}
+
+
+	@Override
+	public void removedService(ServiceReference reference, Object service) {
+
+	}
 }

@@ -27,7 +27,10 @@ package org.societies.api.css.directory;
 /**
  * @author Babak.Farshchian@sintef.no
  *
+ *Class deprecated : use org.societies.api.schema.css.directory.CssAdvertisementRecord
  */
+
+@Deprecated
 public interface ICssAdvertisementRecord {
 	public String getName();
 	public void setName(String name);

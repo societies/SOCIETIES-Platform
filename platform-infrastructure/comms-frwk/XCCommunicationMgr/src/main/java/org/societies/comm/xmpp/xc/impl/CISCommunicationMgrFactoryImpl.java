@@ -28,7 +28,11 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 		this.genericPassword = genericPassword;
 		originalEndpoint = endpoint;
 		idm = originalEndpoint.getIdManager();
-		domainName = idm.getThisNetworkNode().getDomain();
+		if (idm!=null && idm.getThisNetworkNode()!=null){
+            domainName = idm.getThisNetworkNode().getDomain();
+        }else{
+            LOG.warn("Unable to set the domainName attribute");
+        }     
 	}
 	
 	@Override

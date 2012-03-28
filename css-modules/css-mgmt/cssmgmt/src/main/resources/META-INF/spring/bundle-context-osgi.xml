@@ -12,4 +12,9 @@
        testing of the bundle outside of an OSGi container -->
 
 	<osgi:service ref="CSSManager" interface="org.societies.api.internal.css.management.ICSSLocalManager" />
+	<osgi:reference id="CssRegistryBundle" interface="org.societies.api.internal.css.cssRegistry.ICssRegistry" />
+	<osgi:reference id="cssDirectoryRemote" interface="org.societies.api.css.directory.ICssDirectoryRemote" cardinality="0..1" />
+	<osgi:reference id="serviceDiscoveryRef" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"/>
+	
+	
 </beans>

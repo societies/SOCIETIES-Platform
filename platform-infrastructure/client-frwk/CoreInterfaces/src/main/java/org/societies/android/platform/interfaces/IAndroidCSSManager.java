@@ -25,7 +25,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.android.platform.interfaces;
 
-import java.util.concurrent.Future;
 
 import org.societies.api.android.internal.model.AndroidCSSRecord;
 /**
@@ -44,7 +43,9 @@ import org.societies.api.android.internal.model.AndroidCSSRecord;
  * This interface will be implemented for android nodes. 
  *
  */
+
 public interface IAndroidCSSManager {
+
 	String methodsArray [] = {"registerXMPPServer(String client, AndroidCSSRecord profile)",
 			"unregisterXMPPServer(String client, AndroidCSSRecord profile)",
 			"loginXMPPServer(String client, AndroidCSSRecord profile)",
@@ -81,17 +82,17 @@ public interface IAndroidCSSManager {
 	 * 
 	 * @param client component package calling method
 	 * @param profile
-	 * @return AndroidCSSRecord
+	 * @return boolean
 	 */
-	AndroidCSSRecord loginXMPPServer(String client, AndroidCSSRecord profile);
+	boolean loginXMPPServer(String client, AndroidCSSRecord profile);
 	/**
 	 * Logout from chosen Domain server
 	 * 
 	 * @param client component package calling method
 	 * @param profile
-	 * @return AndroidCSSRecord
+	 * @return boolean
 	 */
-	AndroidCSSRecord logoutXMPPServer(String client, AndroidCSSRecord profile);
+	boolean logoutXMPPServer(String client, AndroidCSSRecord profile);
 
 	
 	/**
@@ -158,7 +159,7 @@ public interface IAndroidCSSManager {
 	 * @param profile
 	 * @return AndroidCSSRecord
 	 */
-	AndroidCSSRecord getAndroidAndroidCSSRecord(String client);
+	AndroidCSSRecord getAndroidCSSRecord(String client);
 
 	/**
 	 * Modify the CSS Profile

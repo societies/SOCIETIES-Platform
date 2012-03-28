@@ -26,9 +26,13 @@ package org.societies.slm.servicediscovery;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 
 /**
  * Describe your class here...
@@ -39,7 +43,15 @@ import org.societies.api.schema.servicelifecycle.model.Service;
 public class ServiceDiscoveryRemoteClient implements IServiceDiscoveryCallback {
 
 		List<Service> resultList;
-	
+
+		private final long TIMEOUT = 5;
+
+		private BlockingQueue<List<Service>> returnList;		
+		
+		public ServiceDiscoveryRemoteClient(){
+			
+			returnList = new ArrayBlockingQueue<List<Service>>(1);
+		}
 		
 		public void getResult(List<Service> services) {
 			resultList = new ArrayList<Service>();
@@ -48,6 +60,8 @@ public class ServiceDiscoveryRemoteClient implements IServiceDiscoveryCallback {
 			{
 				resultList.add(services.get(i));
 			}
+			
+			setResultList(resultList);
 
 		}
 
@@ -56,7 +70,12 @@ public class ServiceDiscoveryRemoteClient implements IServiceDiscoveryCallback {
 		 * @return the resultList
 		 */
 		public List<Service> getResultList() {
-			return resultList;
+			try {
+				return returnList.poll(TIMEOUT, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				return null;
+			}
 		}
 
 
@@ -64,7 +83,11 @@ public class ServiceDiscoveryRemoteClient implements IServiceDiscoveryCallback {
 		 * @param resultList the resultList to set
 		 */
 		public void setResultList(List<Service> resultList) {
-			this.resultList = resultList;
+			try {
+				returnList.put(resultList);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 
 

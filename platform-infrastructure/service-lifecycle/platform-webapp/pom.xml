@@ -140,8 +140,18 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<finalName>societies-webapp</finalName>
 		<plugins>
@@ -219,8 +229,6 @@
 							org.apache.taglibs.standard.tag.rt.xml; version="[1.2.0,2)",
 							org.apache.taglibs.standard.tei; version="[1.2.0,2)",
 							org.apache.taglibs.standard.tlv; version="[1.2.0,2)",
-							<!-- Societies Service -->
-							org.societies.service.api,
 							org.osgi.framework,
 							<!-- Form validation -->
 							javax.validation,*;resolution:=optional
@@ -253,23 +261,30 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
+				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>features</id>
-						<phase>generate-resources</phase>
+						<id>copy-installed</id>
+						<phase>install</phase>
 						<goals>
-							<goal>copy-resources</goal>
+							<goal>copy</goal>
 						</goals>
 						<configuration>
-							<resources>
-								<resource>
-									<directory>src/main/features</directory>
-									<filtering>true</filtering>
-								</resource>
-							</resources>
-							<outputDirectory>target/features</outputDirectory>
+							<artifactItems>
+								<artifactItem>
+									<groupId>javax.validation</groupId>
+									<artifactId>com.springsource.javax.validation</artifactId>
+									<version>1.0.0.GA</version>
+									<type>jar</type>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.springframework.osgi</groupId>
+									<artifactId>org.springframework.osgi.web</artifactId>
+									<version>1.2.1</version>
+									<type>jar</type>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>

@@ -39,12 +39,12 @@ public class SignatureMgr implements ISignatureMgr {
 		}
 		*/
 		
-		return "<sig>";  // FIXME
+		return xml;  // FIXME
 	}
 
 	@Override
 	public boolean verify(String xml) {
 		LOG.debug("verify({})", xml);
-		return false;  // FIXME
+		return true;  // FIXME
 	}
 }
