@@ -13,7 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.servicelifecycle.model.IServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.internal.useragent.conflict.ConflictResolutionRule;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
@@ -27,7 +27,7 @@ public class DecsionMakerGUIMockitoTest {
 	private IOutcome preference;
     private ConflictResolutionManager mock; 
     private DecisionMaker classUnderTest;
-    private IServiceResourceIdentifier id;
+    private ServiceResourceIdentifier id;
     private IUserFeedback GUI;
     @Before  
     public void setUp() {  
@@ -35,7 +35,7 @@ public class DecsionMakerGUIMockitoTest {
         mock = mock(ConflictResolutionManager.class); 
         intent=mock(IOutcome.class);
         preference=mock(IOutcome.class);
-        id=mock(IServiceResourceIdentifier.class);
+        id=mock(ServiceResourceIdentifier.class);
         GUI=mock(IUserFeedback.class);
 //      creat an instance of your tested class
         classUnderTest = new DecisionMaker();
