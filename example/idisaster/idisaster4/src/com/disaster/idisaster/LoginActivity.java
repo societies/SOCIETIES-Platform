@@ -110,8 +110,11 @@ public class LoginActivity extends Activity implements OnClickListener {
     		userName = userNameView.getText().toString();
     		userPassword = userPasswordView.getText().toString();
 
-    		//TODO: Add call to the Societes API plaftorm
+//TODO: the user name and pasword should be checked by the platform
+        	// Instantiate the Societies platform => needs modification of platforLogin
+        	iDisasterApplication.getinstance().platformLogIn ();
 
+    		
     		boolean loginCode = false;	// TODO: replace by code returned by Societes API
     			    		
     		// Create dialog for wrong password
@@ -135,8 +138,6 @@ public class LoginActivity extends Activity implements OnClickListener {
 	    		
     		// Store user name and password in preferences
         	iDisasterApplication.getinstance().setUserName (userName, userPassword);
-        	// Instantiate the Societies platform
-        	iDisasterApplication.getinstance().platformLogIn ();
         	
 // Code for testing the correct setting of preferences 
 //    	    String testName = iDisasterApplication.getinstance().preferences.

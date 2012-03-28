@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    	
+	<item 
+	    android:id="@+id/disasterMenuAdd" 
+	    android:icon="@android:drawable/ic_menu_add"
+		android:title="@string/disaster_list_menu_createCommunity" />
+</menu>
+
+<!-- To hide a menu item use (the item can be made visilble programmatically)
+		android:visible="false"
+ -->
+
+<!-- From City Explorer
+	<item 
+	    android:id="@+id/triplistMenuMap" 
+	    android:icon="@android:drawable/ic_menu_mapmode"
+		android:title="@string/activity_triplist_menu_showOnMap" />
+	<item 
+	    android:id="@+id/triplistMenuAddPoi" 
+	    android:icon="@android:drawable/ic_menu_add" 
+	    android:title="@string/activity_triplist_menu_addPoi" />
+	<item
+	    android:id="@+id/triplistMenuDelete" 
+	    android:icon="@android:drawable/ic_menu_delete"
+		android:title="@string/activity_triplist_menu_delete" />
+	<item
+	    android:id="@+id/triplistMenuCalendar" 
+	    android:icon="@android:drawable/ic_menu_recent_history"
+		android:title="@string/activity_triplist_menu_calendar"
+		android:visible="false" />
+ -->
