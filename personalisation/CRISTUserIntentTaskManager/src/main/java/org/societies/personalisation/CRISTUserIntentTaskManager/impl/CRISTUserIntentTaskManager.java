@@ -23,6 +23,7 @@ package org.societies.personalisation.CRISTUserIntentTaskManager.impl;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.identity.IIdentity;
@@ -201,6 +202,10 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager{
 	@Override
 	public CRISTUserTaskModelData getTaskModelData() {
 		// TODO Auto-generated method stub
+		List<MockHistoryData> historyData = null;
+		
+		cristDiscovery.enableCRISTUIDiscovery(true);
+		cristDiscovery.generateNewCRISTUIModel(historyData);
 		return null;
 	}
 
@@ -217,7 +222,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager{
 	/* (non-Javadoc)
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager#identifyActionTaskInModel(java.lang.String, java.lang.String, java.util.HashMap)
 	 */
-	@Override
+	@Override	
 	public HashMap<CRISTUserAction, CRISTUserTask> identifyActionTaskInModel(
 			String arg0, String arg1, HashMap<String, Serializable> arg2) {
 		// TODO Auto-generated method stub
