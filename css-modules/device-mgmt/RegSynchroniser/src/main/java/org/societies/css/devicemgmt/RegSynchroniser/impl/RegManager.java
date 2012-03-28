@@ -28,9 +28,7 @@ package org.societies.css.devicemgmt.RegSynchroniser.impl;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.logging.LogManager;
 
-import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +55,8 @@ import org.societies.api.identity.INetworkNode;
 
 public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
 
-	//private static org.apache.commons.logging.Log LOG = LogFactory.getLog(RegManager.class);
+	
+	private static Logger LOG = LoggerFactory.getLogger(RegManager.class);
     private IDeviceRegistry deviceRegistry;
     private BundleContext bundleContext;
     private PubsubClient pubSubManager;  
@@ -89,8 +88,8 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
     
     public RegManager(BundleContext bundlecontext) {
                 
-        //Log("Synchroniser Manager created", this.LOG);
-    	
+        
+    	LOG.info("+++ RegManager has been created ");
     	//IIdentity pubsubID = null;
     	//idManager = commManager.getIdManager();
         
@@ -142,6 +141,7 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
      */
     public boolean addDevice(DeviceCommonInfo device, String CSSNodeID) throws Exception {
 
+    	LOG.info("+++ RegManager addDevice called to add device: " +device.getDeviceID());
         boolean retValue = true;
         
         retValue = LocalDevices.addDevice(device, CSSNodeID);
@@ -155,6 +155,8 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
 
     public boolean addDevices(Collection<DeviceCommonInfo> deviceCollection, String CSSNodeID)
             throws Exception {
+    	
+    	LOG.info("+++ RegManager addDevices called to add devices: " +deviceCollection);
         boolean retValue = true;
 
         for (DeviceCommonInfo device : deviceCollection) {
@@ -173,7 +175,7 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
      */
     public boolean removeDevice(DeviceCommonInfo device, String CSSNodeID)
             throws Exception {
-        
+    	LOG.info("+++ RegManager removeDevice called to remove device: " +device.getDeviceID());
 
         return LocalDevices.removeDevice(device, CSSNodeID);
     }
@@ -185,6 +187,7 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
             Collection<DeviceCommonInfo> deviceCollection, String CSSNodeID)
             throws Exception {
 
+    	LOG.info("+++ RegManager removeDevices called to add devices: " +deviceCollection);
         boolean retValue = true;
 
         for (DeviceCommonInfo device : deviceCollection) {
@@ -203,6 +206,7 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
     public boolean clearRegistry() throws Exception {
         boolean retValue = false;
 
+        LOG.info("+++ RegManager Clear Registry called: ");
         this.deviceRegistry.clearRegistry();
 
         if (0 == this.deviceRegistry.registrySize()) {
@@ -229,6 +233,7 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
 
 	public void setPubSubManager(PubsubClient pubSubManager) {
 		this.pubSubManager = pubSubManager;
+		LOG.info("+++ RegManager setPubSubManager called: ");
 		try {
 			pubSubManager.subscriberSubscribe(pubsubID, "DEVICE_REGISTERED", this);
 			pubSubManager.subscriberSubscribe(pubsubID, "DEVICE_DISCONNECTED", this);
@@ -248,6 +253,7 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
 
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
+		LOG.info("+++ RegManager setCommManager called: ");
 		idManager = commManager.getIdManager();
 		
 		nodeId = idManager.getThisNetworkNode();
@@ -262,6 +268,8 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
 	
 	@Override
 	public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object payload) {
+		
+		LOG.info("+++ RegManager pubsubEvent called with the following event: " +node);
 		DmEvent dmEvent = null;
 		DeviceCommonInfo device = new DeviceCommonInfo();
 		dmEvent = (DmEvent)payload;

@@ -34,7 +34,7 @@ import org.societies.api.identity.IIdentity;
 public class TestRegManager {
 	
 	private String deviceFamilyIdentity1 = "Sensors"; 
-	private String deviceMacAddress1 = "aa:bb:cc";
+	//private String deviceMacAddress1 = "aa:bb:cc";
 	private String deviceName_1 = "Device1";
 	private String deviceType = "lightSensor";
     private String deviceDescription = "this is a good device";
@@ -46,7 +46,7 @@ public class TestRegManager {
     
     
     private String deviceFamilyIdentity2 = "Actuators"; 
-    private String deviceMacAddress2 = "dd:ee:ff";
+    //private String deviceMacAddress2 = "dd:ee:ff";
     private String deviceName_2 = "Device2";
     private String deviceType2 = "TempSensor";
     private String deviceDescription2 = "this is a fair device";
@@ -58,7 +58,7 @@ public class TestRegManager {
     
     
     private String deviceFamilyIdentity3 = "GPS"; 
-    private String deviceMacAddress3 = "aa:aa:aa";
+    //private String deviceMacAddress3 = "aa:aa:aa";
     private String deviceName_3 = "Device3";
     private String deviceType3 = "GPSSensor";
     private String deviceDescription3 = "this is a bad device";
@@ -127,15 +127,15 @@ public class TestRegManager {
 		dmEvent1Mock.setType(deviceType2);
 	
 		
-		device_1 = new DeviceCommonInfo(deviceFamilyIdentity1, deviceMacAddress1, deviceName_1, deviceType, deviceDescription, deviceConnectionType1, deviceLocation1, deviceProvider1, contextSource1);
+		device_1 = new DeviceCommonInfo(deviceFamilyIdentity1, deviceName_1, deviceType, deviceDescription, deviceConnectionType1, deviceLocation1, deviceProvider1, deviceId, contextSource1);
         assertTrue(null != device_1);
         device_1.setDeviceID(deviceId);
         
-        device_2 = new DeviceCommonInfo(deviceFamilyIdentity2, deviceMacAddress2, deviceName_2, deviceType2, deviceDescription2, deviceConnectionType2, deviceLocation2, deviceProvider2, contextSource2);
+        device_2 = new DeviceCommonInfo(deviceFamilyIdentity2, deviceName_2, deviceType2, deviceDescription2, deviceConnectionType2, deviceLocation2, deviceProvider2, deviceId2, contextSource2);
         assertTrue(null != device_2);
         device_2.setDeviceID(deviceId2);
         
-        device_3 = new DeviceCommonInfo(deviceFamilyIdentity3, deviceMacAddress3, deviceName_3, deviceType3, deviceDescription3, deviceConnectionType3, deviceLocation3, deviceProvider3, contextSource3);
+        device_3 = new DeviceCommonInfo(deviceFamilyIdentity3, deviceName_3, deviceType3, deviceDescription3, deviceConnectionType3, deviceLocation3, deviceProvider3, deviceId3, contextSource3);
         assertTrue(null != device_3);
         device_3.setDeviceID(deviceId3);
         
