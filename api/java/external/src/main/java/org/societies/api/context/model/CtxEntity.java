@@ -51,8 +51,9 @@ public class CtxEntity extends CtxModelObject {
 	private static final long serialVersionUID = -9180016236230471418L;
 	
 	private final Set<CtxAttribute> attributes = new HashSet<CtxAttribute>();
+	
 	private final Set<CtxAssociationIdentifier> associations = new HashSet<CtxAssociationIdentifier>();
-
+	
 	/**
 	 * Constructs a CtxEntity with the specified identifier
 	 * 
@@ -60,6 +61,7 @@ public class CtxEntity extends CtxModelObject {
 	 *            the identifier of the newly created context entity
 	 */
 	public CtxEntity(CtxEntityIdentifier id) {
+		
 		super(id);
 	}
 	
@@ -69,6 +71,7 @@ public class CtxEntity extends CtxModelObject {
 	 */
 	@Override
 	public CtxEntityIdentifier getId() {
+		
 		return (CtxEntityIdentifier) super.getId();
 	}
 
@@ -82,6 +85,7 @@ public class CtxEntity extends CtxModelObject {
      * @see #getAttributes(String)
 	 */
 	public Set<CtxAttribute> getAttributes(){
+		
 		return this.getAttributes(null);
 	}
 	
@@ -102,6 +106,7 @@ public class CtxEntity extends CtxModelObject {
 	 * @see #getAttributes()
 	 */
 	public Set<CtxAttribute> getAttributes(String type) {
+		
 		final Set<CtxAttribute> result = new HashSet<CtxAttribute>();
 		
 		if (type == null) {
@@ -124,6 +129,7 @@ public class CtxEntity extends CtxModelObject {
 	 * @see #getAssociations(String)
 	 */
 	public Set<CtxAssociationIdentifier> getAssociations() {
+		
 		return this.getAssociations(null);
 	}
 	
@@ -143,6 +149,7 @@ public class CtxEntity extends CtxModelObject {
 	 * @see #getAssociations()
 	 */
 	public Set<CtxAssociationIdentifier> getAssociations(String type) {
+		
 		final Set<CtxAssociationIdentifier> result = new HashSet<CtxAssociationIdentifier>();
 		
 		if (type == null) {

@@ -40,8 +40,9 @@ public class CtxAssociation extends CtxModelObject {
 	private static final long serialVersionUID = 4837712964619525572L;
 	
 	public CtxEntityIdentifier parentEntity;
-	public Set<CtxEntityIdentifier> entities = new HashSet<CtxEntityIdentifier>();
-
+	
+	public final Set<CtxEntityIdentifier> childEntities = new HashSet<CtxEntityIdentifier>();
+	
 	/**
 	 * Constructs a CtxAssociation with the specified identifier
 	 * 
@@ -49,6 +50,7 @@ public class CtxAssociation extends CtxModelObject {
 	 *            the identifier of the newly created cotnext association
 	 */
 	public CtxAssociation(CtxAssociationIdentifier id) {
+		
 		super(id);
 	}
 
@@ -59,6 +61,7 @@ public class CtxAssociation extends CtxModelObject {
 	 */
 	@Override
 	public CtxAssociationIdentifier getId() {
+		
 		return (CtxAssociationIdentifier) super.getId();
 	}
 
@@ -70,45 +73,41 @@ public class CtxAssociation extends CtxModelObject {
      * @see CtxEntity
 	 */
 	public CtxEntityIdentifier getParentEntity() {
+		
 		return this.parentEntity;
 	}
 	
 	/**
-	 * Sets the parent entity of this context association. The method also adds
-     * the specified context entity to this association if it is not already a
-     * member. 
+	 * Sets the parent entity of this context association.
      * <p>
-     * If a <code>null</code> parameter is specified then the current
-     * parent entity is unset but not removed from this association. Effectively,
-     * this association becomes undirected.
-     * 
-	 * @param parentEntity
-	 *            the identifier of the context entity to set as parent
+     * If a <code>null</code> parameter is specified then the current parent
+     * entity is unset and this association becomes undirected.
 	 */
-	public void setParentEntity(CtxEntityIdentifier parentEntityId){
-		this.parentEntity = parentEntityId;
-		if (parentEntityId != null)
-			this.entities.add(parentEntityId);
+	public void setParentEntity(CtxEntityIdentifier parentEntity){
+		
+		this.parentEntity = parentEntity;
 	}
 	
 	/**
-	 * Returns a set containing the entities in this context association. The method
-	 * returns an <i>empty</i> set if this association contains no context entities.
+	 * Returns a set containing the child entities in this context association.
+	 * The method returns an <i>empty</i> set if this association contains no
+	 * child entities.
 	 *
-	 * @return a set containing the entities in this context association
+	 * @return a set containing the child entities in this context association
 	 * @see #getEntities(String)
 	 */
-	public Set<CtxEntityIdentifier> getEntities() {
-		return this.getEntities(null);
+	public Set<CtxEntityIdentifier> getChildEntities() {
+		
+		return this.getChildEntities(null);
 	}
 	
 	/**
-	 * Returns a set containing the entities in this context association with the
-	 * specified type. The method returns an <i>empty</i> set if this association
-	 * contains no context entities with the specified type.
+	 * Returns a set containing the child entities in this context association
+	 * with the specified type. The method returns an <i>empty</i> set if this
+	 * association contains no child entities with the specified type.
      * <p>
 	 * Note that the method is equivalent to {@link #getEntities()} if the
-	 * specified context entity type is <code>null</code>, i.e. all
+	 * specified context entity type is <code>null</code>, i.e. all child
 	 * entities contained in this association are returned.
 	 *  
      * @param type
@@ -116,13 +115,14 @@ public class CtxAssociation extends CtxModelObject {
      * @return the associated context entities with the specified type
      * @see #getEntities() 
 	 */
-	public Set<CtxEntityIdentifier> getEntities(String type) {
+	public Set<CtxEntityIdentifier> getChildEntities(String type) {
+		
 		final Set<CtxEntityIdentifier> result = new HashSet<CtxEntityIdentifier>();
 		
 		if (type == null) {
-			result.addAll(this.entities);
+			result.addAll(this.childEntities);
 		} else {
-			for (final CtxEntityIdentifier entity : this.entities)
+			for (final CtxEntityIdentifier entity : this.childEntities)
 				if (type.equalsIgnoreCase(entity.getType()))
 					result.add(entity);
 		}
@@ -130,39 +130,39 @@ public class CtxAssociation extends CtxModelObject {
 	}
 	
 	/**
-	 * Adds the specified entity to this context association
+	 * Adds the specified entity to this context association.
      * 
-     * @param entityId
-     *            the identifier of the context entity to add
+     * @param childEntity
+     *            the identifier of the child entity to add
      * @throws NullPointerException
      *             if the specified context entity identifier is
      *             <code>null</code>
      * @see CtxEntityIdentifier
 	 */
-	public void addEntity(CtxEntityIdentifier entityId) {
-		if (entityId == null)
-			throw new NullPointerException("entityId can't be null");
+	public void addChildEntity(CtxEntityIdentifier childEntity) {
 		
-		this.entities.add(entityId);
+		if (childEntity == null)
+			throw new NullPointerException("childEntity can't be null");
+		
+		this.childEntities.add(childEntity);
 	}
 
 	/**
-	 * Removes the specified entity from this context association. As a side
-     * effect, if the entity to be removed is parent in this association then
-     * it is set to <code>null</code> after this operation.
+	 * Removes the specified entity from this context association.
      * 
-     * @param entityId
-     *            the identifier of the context entity to remove
+     * @param childEntity
+     *            the identifier of the child entity to remove
      * @throws NullPointerException
      *             if the specified context entity identifier is
      *             <code>null</code>
      * @see CtxEntityIdentifier
 	 */
-	public void removeEntity(CtxEntityIdentifier entityId) {
-		if (entityId == null)
-			throw new NullPointerException("entityId can't be null");
+	public void removeChildEntity(CtxEntityIdentifier childEntity) {
 		
-		this.entities.remove(entityId);
+		if (childEntity == null)
+			throw new NullPointerException("childEntity can't be null");
+		
+		this.childEntities.remove(childEntity);
 	}
 	
 	/* TODO

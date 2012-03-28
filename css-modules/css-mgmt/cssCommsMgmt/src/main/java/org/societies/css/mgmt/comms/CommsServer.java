@@ -104,16 +104,52 @@ public class CommsServer implements IFeatureServer {
 			Future<CssInterfaceResult> asyncResult = null;
 			CssInterfaceResult result = null;
 			
-			switch (bean.getMethod()) {
-			
-				case REGISTER_XMPP_SERVER:
-					LOG.debug("CSSManager remote invocation of method " + bean.getMethod().name());
+			LOG.debug("CSSManager remote invocation of method "
+					+ bean.getMethod().name());
 
-					CssRecord profile = (CssRecord) bean.getProfile();
-					asyncResult = this.cssManager.registerXMPPServer(profile);
-					break;
-				default:
-					break;
+			switch (bean.getMethod()) {
+
+			case REGISTER_XMPP_SERVER:
+				asyncResult = this.cssManager.registerXMPPServer((CssRecord) bean.getProfile());
+				break;
+			case LOGIN_CSS:
+				asyncResult = this.cssManager.loginCSS((CssRecord) bean.getProfile());
+				break;
+			case LOGOUT_CSS:
+				asyncResult = this.cssManager.logoutCSS((CssRecord) bean.getProfile());
+				break;
+			case LOGIN_XMPP_SERVER:
+				asyncResult = this.cssManager.loginXMPPServer((CssRecord) bean.getProfile());
+				break;
+			case LOGOUT_XMPP_SERVER:
+				asyncResult = this.cssManager.logoutXMPPServer((CssRecord) bean.getProfile());
+				break;
+			case SYNCH_PROFILE:
+				asyncResult = this.cssManager.synchProfile((CssRecord) bean.getProfile());
+				break;
+			case UNREGISTER_CSS:
+				asyncResult = this.cssManager.unregisterCSS((CssRecord) bean.getProfile());
+				break;
+			case UNREGISTER_CSS_NODE:
+				asyncResult = this.cssManager.unregisterCSSNode((CssRecord) bean.getProfile());
+				break;
+			case UNREGISTER_XMPP_SERVER:
+				asyncResult = this.cssManager.unregisterXMPPServer((CssRecord) bean.getProfile());
+				break;
+			case SET_PRESENCE_STATUS:
+				asyncResult = this.cssManager.setPresenceStatus((CssRecord) bean.getProfile());
+				break;
+			case GET_CSS_RECORD:
+				asyncResult = this.cssManager.getCssRecord();
+				break;
+			case REGISTER_CSS:
+				asyncResult = this.cssManager.registerCSS((CssRecord) bean.getProfile());
+				break;
+			case REGISTER_CSS_NODE:
+				asyncResult = this.cssManager.registerCSSNode((CssRecord) bean.getProfile());
+				break;
+			default:
+				break;
 			}
 			
 			try {

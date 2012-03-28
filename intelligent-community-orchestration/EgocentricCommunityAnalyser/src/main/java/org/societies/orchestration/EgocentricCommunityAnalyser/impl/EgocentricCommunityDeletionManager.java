@@ -68,6 +68,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 //import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 //import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
 
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
@@ -79,6 +80,7 @@ import org.societies.api.identity.IIdentity;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -139,6 +141,8 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 	
 	private ISuggestedCommunityAnalyser suggestedCommunityAnalyser;
 	
+	private ICommManager commManager;
+	
 	/*
      * Constructor for EgocentricCommunityConfigurationManager
      * 
@@ -178,7 +182,7 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 	 *              a domain, the check is done on all CISs in that domain.
 	 */
 	
-	public void identifyCissToDelete() {
+	public void identifyCissToDelete(HashMap <IIdentity, String> userCissMetadata) {
 		
 		String[] it = new String[1];
 		linkedCss = mock(IIdentity.class);
@@ -401,13 +405,13 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
     	this.userResponse = userResponse;
     }
     
-  //public CommManagerBundle getCommManager() {
-    //	return commManager;
-    //}
+    public ICommManager getCommManager() {
+    	return commManager;
+    }
     
-    //public void setCommManager(CommManagerBundle commManager) {
-    //	this.commManager = commManager;
-    //}
+    public void setCommManager(ICommManager commManager) {
+    	this.commManager = commManager;
+    }
     
     /**Returns the list of package names of the message beans you'll be passing*/
     public List<String> getJavaPackages() {

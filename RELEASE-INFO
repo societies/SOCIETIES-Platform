@@ -1,0 +1,23 @@
+Branch Structure
+    Permanent Branches
+        Development Branch - this is main development branch where all code changes are merged and built nightly
+        Testing Branch - this branch is used before version release to take a stable snapshot of the development branch, perform tests, trigger bug fixing if necessary, and then provide a stable snapshot for the master branch
+        Master Branch - this branch is a stable release branch which has the latest version of the platform
+    Temporary Branches
+        Feature Branches - these branches are created by developers when working on code feature which are to be merged to the development when stable and tested
+        Bug Fix Branches - these branches are created by developers or testers to address specific issues from the testing branch during a pre-release cycle
+
+Release Procedure
+
+The following procedure is to ensure that any release of source files or binary distributions from the SOCIETIES project's open source repositories adheres to licensing and copyright terms for artifacts created by the project or other open source 3rd party artifacts that are integrated into code, configurations and distributions.
+All contributing developers and their organisations will:
+
+    ensure that they have, where necessary, sought permission within their organisation to release any contributions as open source and within the terms of the project's open source license
+    ensure that checks are performed on all code contributions made to any repository against any copyright breaches, as each project partner, and their employees, are solely responsible and liable for any copyright breaches caused by their code contributions.
+    ensure that each source file contains the project's license header
+    ensure that any 3rd party artifact which is integrated within code, configurations or distributions, will not break the terms of the project's license and the license of any 3rd party artifact
+    ensure that contributing developers are named in all source and configuration files
+
+Release managers will:
+
+    create the distribution packages and installers, while ensuring that all license conditions are met, e.g. listing the enclosed licenses of integrated artifacts

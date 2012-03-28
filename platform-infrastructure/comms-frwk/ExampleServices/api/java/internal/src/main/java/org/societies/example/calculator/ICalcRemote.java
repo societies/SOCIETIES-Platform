@@ -39,4 +39,7 @@ public interface ICalcRemote {
     
     /**Subtracts 2 numbers and returns total */
     public void Subtract(int a, int b, IExamplesCallback callback);
+    
+    /**Logs a message in the OSGI log*/
+    public void LogMessage(String message);
 }

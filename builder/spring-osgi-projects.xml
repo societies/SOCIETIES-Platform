@@ -90,6 +90,9 @@
 		<module>../platform-infrastructure/security/SecurityCommsMgr</module>
 
 		<!-- CSS Mgmt -->
+
+		<module>../css-modules/css-registry</module>
+		<module>../css-modules/css-directory</module>
 		<module>../css-modules/css-mgmt/cssCommsMgmt</module>
 		<module>../css-modules/css-mgmt/cssmgmt</module>
 		<module>../css-modules/css-mgmt/TestccsCommsMgmt</module>

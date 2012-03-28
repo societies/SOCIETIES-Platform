@@ -50,6 +50,12 @@
       <!--  <scope>test</scope> -->
     </dependency>
 	
+	<dependency>
+	<groupId>org.societies.orchestration</groupId>
+	<artifactId>intelligent-community-orchestration-api</artifactId>
+	<version>${version.ico}</version>
+	<scope>provided</scope>
+	</dependency>
 
 	</dependencies>
 

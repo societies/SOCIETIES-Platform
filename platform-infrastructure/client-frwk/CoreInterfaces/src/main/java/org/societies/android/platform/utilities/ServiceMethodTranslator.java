@@ -35,7 +35,7 @@ import org.societies.utilities.DBC.Dbc;
  * This class provides a set of static methods to help make the Service Messenger API calling mechanism
  * as simple as possible while allowing the service and the consumer to share a common service API. 
  * 
- * TODO parameter arrays and possible Parcelable parameter objects
+ * TODO parameter arrays 
  */
 
 public class ServiceMethodTranslator {

@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.internal.css.management.CSSManagerEnums;
 
-import android.os.Parcel;
 
 public class TestAndroidCSSNode {
 
@@ -55,6 +54,41 @@ public class TestAndroidCSSNode {
 //		
 //		cssNode.writeToParcel(out, flags)
 //		
+//	}
+	
+//	@Test
+	/**
+	 * Tests the use GSON and JSON libraries to allow Java classes to be 
+	 * converted to and from JSON. Cannot work in this project as Android 
+	 * library is stubbed.
+	 */
+//	public void testJSONConversion() {
+//		AndroidCSSNode cssNode = new AndroidCSSNode();
+//		assertNotNull(cssNode);
+//		
+//		cssNode.setIdentity(TEST_IDENTITY_1);
+//		cssNode.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
+//		cssNode.setType(CSSManagerEnums.nodeType.Cloud.ordinal());
+//		
+//		assertEquals(TEST_IDENTITY_1, cssNode.getIdentity());
+//		assertEquals(CSSManagerEnums.nodeStatus.Available.ordinal(), cssNode.getStatus());
+//		assertEquals(CSSManagerEnums.nodeType.Cloud.ordinal(), cssNode.getType());
+//
+//		
+//		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//		String jSON = gson.toJson(cssNode);
+//		System.out.println(jSON);
+//		
+//		gson = new Gson();
+//		jSON = gson.toJson(cssNode);
+//		try {
+//			JSONObject jObj =  (JSONObject) new JSONTokener(jSON).nextValue();
+//			assertEquals(jObj.get("identity"), cssNode.getIdentity());
+//			
+//		} catch (JSONException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 //	}
 
 

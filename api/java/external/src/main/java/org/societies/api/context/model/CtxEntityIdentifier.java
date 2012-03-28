@@ -24,9 +24,6 @@
  */
 package org.societies.api.context.model;
 
-import org.societies.api.identity.IIdentity;
-
-
 /**
  * This class is used to identify context entities. It provides methods that
  * return information about the identified entity including:
@@ -54,7 +51,7 @@ import org.societies.api.identity.IIdentity;
 public class CtxEntityIdentifier extends CtxIdentifier {
 
 	private static final long serialVersionUID = 1550923933016203797L;
-
+	
 	/**
 	 * Creates a context entity identifier by specifying the CSS/CIS ID
 	 * where the identified context model object is stored, as well as,
@@ -68,18 +65,95 @@ public class CtxEntityIdentifier extends CtxIdentifier {
 	 * @param objectNumber
 	 *            the unique numeric model object identifier
 	 */
-	public CtxEntityIdentifier(IIdentity operatorId, String type, 
+	public CtxEntityIdentifier(String operatorId, String type, 
 			Long objectNumber) {
-		super(operatorId, type, objectNumber);
+		
+		super(operatorId, CtxModelType.ENTITY, type, objectNumber);
+	}
+	
+	public CtxEntityIdentifier(String str) throws MalformedCtxIdentifierException {
+		
+		super(str);
+	}
+
+	/** 
+	 * Formats the string representation of a context entity identifier as follows:
+	 * <pre> 
+	 * operatorId/ENTITY/type/objectNumber
+	 * </pre>
+	 * 
+	 * @see CtxIdentifier#defineString()
+	 */
+	@Override
+	protected void defineString() {
+
+		if (super.string != null) 
+			return;
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append(super.operatorId);
+		sb.append("/");
+		sb.append(CtxModelType.ENTITY);
+		sb.append("/");
+		sb.append(super.type);
+		sb.append("/");
+		sb.append(super.objectNumber);
+
+		super.string = sb.toString();
 	}
 
 	/**
-	 * Returns the type of the identified context model object, i.e. CtxModelType.ENTITY
-	 *   
-	 *  @return CtxModelType#ENTITY 
+	 * Parses the string form of a context entity identifier as follows:
+	 * <pre> 
+	 * operatorId/ENTITY/type/objectNumber
+	 * </pre>
+	 * 
+	 * @see CtxIdentifier#parseString(java.lang.String)
 	 */
 	@Override
-	public CtxModelType getModelType() {
-		return CtxModelType.ENTITY;
+	protected void parseString(String input)
+			throws MalformedCtxIdentifierException {
+	
+		super.string = input;
+
+		final int length = input.length();
+
+		final int objectNumberDelim = input.lastIndexOf("/");
+		if (objectNumberDelim == -1)
+			throw new MalformedCtxIdentifierException("'" + input + "'");
+		final String objectNumberStr = input.substring(objectNumberDelim+1, length);
+		try { 
+			super.objectNumber = new Long(objectNumberStr);
+		} catch (NumberFormatException nfe) {
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Invalid context entity object number", nfe);
+		}
+
+		final int typeDelim = input.lastIndexOf("/", objectNumberDelim-1);
+		super.type = input.substring(typeDelim+1, objectNumberDelim);
+		if (super.type.isEmpty())
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Context entity type cannot be empty");
+
+		final int modelTypeDelim = input.lastIndexOf("/", typeDelim-1);
+		if (modelTypeDelim == -1)
+			throw new MalformedCtxIdentifierException("'" + input + "'");
+		final String modelTypeStr = input.substring(modelTypeDelim+1, typeDelim);
+		try {
+			super.modelType = CtxModelType.valueOf(modelTypeStr);
+		} catch (IllegalArgumentException iae) {
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Malformed context model type", iae);
+		}
+		if (!CtxModelType.ENTITY.equals(super.modelType))
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Expected 'ENTITY' but found '"
+					+ super.modelType + "'");
+
+		operatorId = input.substring(0, modelTypeDelim);
+		if (operatorId.isEmpty())
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Operator ID cannot be empty");
 	}
 }

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0" 
+           targetNamespace="http://societies.org/api/schema/context/model"   
+           xmlns:tns="http://societies.org/api/schema/context/model"   
+           xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0" 
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:complexType name="ctxIdentifierBean" abstract="true">
+    <xs:sequence>
+      <xs:element name="string" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="ctxEntityIdentifierBean">
+    <xs:complexContent>
+      <xs:extension base="tns:ctxIdentifierBean">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:complexType name="ctxAttributeIdentifierBean">
+    <xs:complexContent>
+      <xs:extension base="tns:ctxIdentifierBean">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:complexType name="ctxAssociationIdentifierBean">
+    <xs:complexContent>
+      <xs:extension base="tns:ctxIdentifierBean">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ctxModelObjectBean" abstract="true">
+    <xs:sequence>
+      <xs:element name="id" type="tns:ctxIdentifierBean"/>
+      <xs:element name="lastModified" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ctxEntityBean">
+    <xs:complexContent>
+      <xs:extension base="tns:ctxModelObjectBean">
+        <xs:sequence>
+          <xs:element name="attributes" type="tns:ctxAttributeBean" maxOccurs="unbounded"/>
+          <xs:element name="associations" type="tns:ctxAssociationIdentifierBean" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:complexType name="ctxAttributeBean">
+    <xs:complexContent>
+      <xs:extension base="tns:ctxModelObjectBean">
+        <xs:sequence>
+          <xs:element name="stringValue" type="xs:string" nillable="true"/>
+          <xs:element name="integerValue" type="xs:int" nillable="true"/>
+          <xs:element name="doubleValue" type="xs:double" nillable="true"/>
+          <xs:element name="binaryValue" type="xs:base64Binary" nillable="true"/>
+          <xs:element name="valueType" type="tns:ctxAttributeValueType"/>
+          <xs:element name="valueMetric" type="xs:string" nillable="true"/>
+          <xs:element name="quality" type="tns:ctxQualityBean"/>
+          <xs:element name="sourceId" type="xs:string" nillable="true"/>
+          <xs:element name="historyRecorded" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ctxQualityBean">
+    <xs:sequence>
+      <xs:element name="attribute" type="tns:ctxAttributeBean" minOccurs="0"/>
+      <xs:element name="lastUpdated" type="xs:dateTime" nillable="true"/>
+      <xs:element name="originType" type="tns:ctxOriginType" nillable="true"/>
+      <xs:element name="precision" type="xs:double" nillable="true"/>
+      <xs:element name="updateFrequency" type="xs:double" nillable="true"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ctxAssociation">
+    <xs:complexContent>
+      <xs:extension base="tns:ctxModelObjectBean">
+        <xs:sequence>
+          <xs:element name="parentEntity" type="tns:ctxEntityIdentifierBean" nillable="true"/>
+          <xs:element name="childEntities" type="tns:ctxEntityIdentifierBean" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:complexType name="communityMemberCtxEntityBean" abstract="true">
+    <xs:complexContent>
+      <xs:extension base="tns:ctxEntityBean">
+        <xs:sequence>
+          <xs:element name="communities" type="tns:communityCtxEntityBean" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:complexType name="individualCtxEntityBean">
+    <xs:complexContent>
+      <xs:extension base="tns:communityMemberCtxEntityBean">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="communityCtxEntityBean">
+    <xs:complexContent>
+      <xs:extension base="tns:communityMemberCtxEntityBean">
+        <xs:sequence>
+          <xs:element name="members" type="tns:communityMemberCtxEntityBean" maxOccurs="unbounded"/>
+          <xs:element name="bonds" type="tns:ctxBondBean" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ctxBondBean" abstract="true">
+    <xs:sequence>
+      <xs:element name="modelType" type="tns:ctxModelType"/>
+      <xs:element name="type" type="xs:string"/>
+      <xs:element name="originType" type="tns:ctxBondOriginType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ctxHistoryAttributeBean">
+    <xs:complexContent>
+      <xs:extension base="tns:ctxModelObjectBean">
+        <xs:sequence>
+          <xs:element name="historyRecordId" type="xs:long"/>
+          <xs:element name="stringValue" type="xs:string" nillable="true"/>
+          <xs:element name="integerValue" type="xs:int" nillable="true"/>
+          <xs:element name="doubleValue" type="xs:double" nillable="true"/>
+          <xs:element name="binaryValue" type="xs:base64Binary" nillable="true"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="ctxModelType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ENTITY"/>
+      <xs:enumeration value="ATTRIBUTE"/>
+      <xs:enumeration value="ASSOCIATION"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ctxBondOriginType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="MANUALLY_SET"/>
+      <xs:enumeration value="DISCOVERED"/>
+      <xs:enumeration value="INHERITED"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ctxAttributeValueType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="EMPTY"/>
+      <xs:enumeration value="STRING"/>
+      <xs:enumeration value="INTEGER"/>
+      <xs:enumeration value="DOUBLE"/>
+      <xs:enumeration value="BINARY"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ctxOriginType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="MANUALLY_SET"/>
+      <xs:enumeration value="SENSED"/>
+      <xs:enumeration value="INFERRED"/>
+      <xs:enumeration value="INHERITED"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

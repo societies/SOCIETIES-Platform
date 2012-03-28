@@ -25,35 +25,101 @@
 package com.disaster.idisaster;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 /**
- * This is the activity (without GUI) that starts as the first
- * activity, when you click on the icon in Android. It checks to
- * see whether you are a registered user, if not shows the login
- * page.
+ * This is the activity (without GUI) that starts 
+ * when you first click on the icon in Android.
  * 
- * @author Babak.Farshchian@sintef.no
+ * The GUI is not shown the first time the application
+ * is launched since the user should first log in.
+ * 
+ * @author Jacqueline.Floch@sintef.no
+ * 
  *
  */
-public class StartActivity extends Activity {
+public class StartActivity extends Activity implements OnClickListener {
 
-    /* (non-Javadoc)
-     * @see android.app.Activity#onCreate(android.os.Bundle)
-     */
+	String userName;
+	String disasterName;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-	// TODO Auto-generated method stub
-	super.onCreate(savedInstanceState);
-	/*
-	 * check to see if the user has already provided
-	 * a user name and password.
-	 * 
-	 * If yes, go to HomeActivity
-	 * -- Send intent to HomeActivity
-	 * In no, go to LoginActivity
-	 * -- Send intent to LoginActivity
-	 *
-	 */
+    public void onCreate(Bundle savedInstanceState) {
+
+    	super.onCreate(savedInstanceState);
+    	
+		getPreferences ();						// retrieve user preferences
+
+    	startNextActivity (); 					// select next activity
+			
+	    setContentView (R.layout.start_layout);	// create GUI
+	    // Add click listener to button
+	    final Button button = (Button) findViewById(R.id.startButton);
+	    button.setOnClickListener(this);
     }
+
+/**
+ * getPreferences retrieves the preferences stored in the preferences file.
+ */
+    private void getPreferences () {
+
+    	userName = iDisasterApplication.getinstance().getUserName ();
+    	disasterName = iDisasterApplication.getinstance().getDisasterName ();
+	}
+		
+/**
+ * startNextActivity is called when to select the next activity.
+ * 
+ * If the user is not registered, it starts the LoginActivity,
+ * otherwise if no disaster is selected, it starts the DisasterActivity
+ * otherwise it starts the HomeActivity.
+ */
+	private void startNextActivity () {
+		
+    	if (userName == getString(R.string.noPreference)) {
+    		startActivity(new Intent(StartActivity.this, LoginActivity.class));
+    		return;
+    	} else if (disasterName == getString(R.string.noPreference)) {
+    		startActivity(new Intent(StartActivity.this, DisasterActivity.class));
+    		return;
+    	} else {
+    		startActivity(new Intent(StartActivity.this, HomeActivity.class));
+    		return;
+    	}
+    }
+
+/**
+ * onClick is called when button is clicked because
+ * the OnClickListener is assigned to the button
+ */
+	public void onClick (View view) {
+		getPreferences ();				// retrieve user preferences
+		startNextActivity ();			// select next activity
+	}
+
+/**
+ * showDialog is used under testing
+ */
+	private void showDialog () {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(getString(R.string.startTestDialog))
+			.setCancelable(false)
+			.setPositiveButton (getString(R.string.dialogOK), new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+	    	   return;
+	         }
+	       });
+		AlertDialog dialog = builder.create();
+		dialog.show();
+	}
 }

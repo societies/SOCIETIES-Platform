@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+
+ 		<TextView android:id="@+id/newDisasterLabel" android:layout_width="fill_parent"
+     		android:text="@string/newDisasterHeading" 
+     		android:textSize="20dip" android:textStyle="bold"
+     		android:textColor="@color/white" android:background="@color/orange"
+			android:layout_height="wrap_content" 
+			android:paddingLeft="5dip"
+			android:paddingTop="2dip" android:paddingBottom="2dip" />
+ 				
+	 	<TableLayout android:id="@+id/newDisasterTable"
+			android:layout_width="fill_parent" android:layout_height="fill_parent"
+			xmlns:android="http://schemas.android.com/apk/res/android"
+			android:layout_below="@id/newDisasterLabel"
+			android:background="@color/white"
+			>
+			
+			<TableRow>
+				<TextView android:id="@+id/editNewDisasterNameLabel"
+					android:text="@string/newDisasterNameLabel" android:textColor="@color/black"
+					android:textStyle="bold" android:width="100dp" 
+					android:layout_width="wrap_content" android:layout_height="wrap_content"
+					android:paddingLeft="2dip" android:paddingRight="2dip"
+					android:paddingTop="2dip" android:paddingBottom="2dip" 
+					/>
+
+				<!-- Not sure if android:text is needed below -->
+				<EditText
+				    android:id="@+id/editNewDisasterName"
+				    android:text="@string/emptyText"
+				    android:hint="@string/newDisasterNameHint" android:textColor="@color/black"
+				    android:background="@android:drawable/editbox_background"
+				    android:width="200dp" android:maxWidth="200dp"
+				    android:layout_width="fill_parent" android:layout_height="wrap_content"
+				    android:paddingRight="2dip"
+				    android:paddingTop="10dip" android:paddingBottom="10dip" 
+				    />
+				
+<!--			    android:layout_toRightOf="@id/editUserNameLabel"  -->
+				
+			</TableRow>
+
+			<TableRow>
+
+				<TextView
+				    android:id="@+id/editNewDisasterDescriptionLabel"
+				    android:text="@string/newDisasterDescriptionLabel" android:textColor= "@color/black" 
+					android:textStyle="bold" android:width="100dp" 
+					android:layout_width="wrap_content" android:layout_height="wrap_content"
+					android:paddingLeft="2dip" android:paddingRight="2dip"
+					android:paddingTop="2dip" android:paddingBottom="2dip" 
+					/>
+<!-- 				android:layout_below="@id/editUserNameLabel"  -->
+
+<!-- Not sure if android:text is needed below -->
+				<EditText
+				    android:id="@+id/editNewDisasterDescription"
+				    android:text="@string/emptyText"
+				    android:hint= "@string/newDisasterDescriptionHint" android:textColor="@color/black"
+				    android:background="@android:drawable/editbox_background"
+				    android:width="200dp" 
+				    
+				    android:layout_width="fill_parent" android:layout_height="wrap_content"
+				    android:paddingRight="2dip"
+				    android:paddingTop="10dip" android:paddingBottom="10dip" />
+<!-- 
+android:maxWidth="140dp"
+ -->
+<!-- 				    android:layout_toRightOf="@id/editPasswordLabel" -->				
+			</TableRow>
+
+			<TableRow>
+
+			    <TextView
+				    android:id="@+id/newDisasterDummy1"
+				    android:text="@string/emptyText" android:textColor= "@color/black"
+					android:textStyle="bold" android:width="100dp" 
+					android:layout_width="wrap_content" android:layout_height="wrap_content"
+					android:paddingLeft="2dip" android:paddingRight="2dip"
+					android:paddingTop="2dip" android:paddingBottom="2dip" />					
+<!-- 				android:layout_below="@id/editPasswordLabel" -->
+
+				<Button
+				    android:id="@+id/newDisasterCreateButton" 
+				    android:layout_width="wrap_content" android:layout_height="wrap_content"
+				    android:text="@string/newDisasterCreateButton"
+				    android:textColor="@color/black" 
+				/>
+<!-- 				android:layout_toRightOf="@id/loginDummy1" -->
+
+<!-- The button style of the start page is not kept yet - see lgin_layout -->
+
+			</TableRow>
+ 						
+		</TableLayout> 
+ 
+	</RelativeLayout>

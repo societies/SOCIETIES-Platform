@@ -77,7 +77,7 @@ public class RemoteServiceHandler extends Handler {
 							.getMethodParameterTypesCapitalised(targetMethod);
 
 					for (String type : paramTypeList) {
-						Log.i(LOG_TAG, "Parameter type: " + type);
+						Log.d(LOG_TAG, "Parameter type: " + type);
 					}
 
 					String paramNameList[] = ServiceMethodTranslator
@@ -89,13 +89,13 @@ public class RemoteServiceHandler extends Handler {
 
 					for (int i = 0; i < paramTypeList.length; i++) {
 						Class bundleParam[] = { String.class };
-						Log.i(LOG_TAG, "param list: " + paramNameList[i]);
+						Log.d(LOG_TAG, "param list: " + paramNameList[i]);
 						Object bundleValue[] = { paramNameList[i] };
 
 						Method bundleMethod = null;
 
 						if (implementsParcelable(parameterClasses[i])) {
-							Log.i(LOG_TAG, "Class: " + parameterClasses[i]
+							Log.d(LOG_TAG, "Class: " + parameterClasses[i]
 									+ " is an instance of Parcelable");
 							bundleMethod = Bundle.class.getMethod(
 									"getParcelable", bundleParam);
@@ -103,7 +103,7 @@ public class RemoteServiceHandler extends Handler {
 							bundleMethod = Bundle.class.getMethod("get"
 									+ paramTypeList[i], bundleParam);
 						}
-						Log.i(LOG_TAG,
+						Log.d(LOG_TAG,
 								"Method invoked: " + bundleMethod.getName());
 
 						params[i] = bundleMethod.invoke(bundle, bundleValue);
@@ -142,7 +142,7 @@ public class RemoteServiceHandler extends Handler {
 
 		Class interfaces[] = clazz.getInterfaces();
 		for (Class interfaze : interfaces) {
-			Log.i(LOG_TAG, "interface: " + interfaze.getSimpleName());
+			Log.d(LOG_TAG, "interface: " + interfaze.getSimpleName());
 			if (interfaze.getSimpleName().equals("Parcelable")) {
 				retValue = true;
 				break;

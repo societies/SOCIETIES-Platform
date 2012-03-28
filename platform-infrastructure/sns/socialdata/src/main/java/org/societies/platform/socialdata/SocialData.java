@@ -9,11 +9,8 @@ import java.util.Map;
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
-
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialData;
-
-
 import org.societies.platform.socialdata.converters.ActivityConverter;
 import org.societies.platform.socialdata.converters.ActivityConveterFactory;
 import org.societies.platform.socialdata.converters.FriendsConverter;
@@ -27,22 +24,22 @@ public class SocialData implements ISocialData {
 
     HashMap<String, ISocialConnector> connectors = new HashMap<String, ISocialConnector>();
     
-    Map<String, Person> 			socialFriends;
-    Map<String, Group>				socialGroups;
-    Map<String, Person>				socialProfiles;
+    Map<String, Object> 			socialFriends;
+    Map<String, Object>				socialGroups;
+    Map<String, Object>				socialProfiles;
     
-    List<ActivityEntry>	 			socialActivities;
+    List<Object>	 			socialActivities;
     
     long lastUpate;
     
     
     public SocialData(){
     		
-    	socialFriends 			= new HashMap<String, Person>();
-    	socialGroups			= new HashMap<String, Group>();
-    	socialProfiles			= new HashMap<String, Person>();
+    	socialFriends 			= new HashMap<String, Object>();
+    	socialGroups			= new HashMap<String, Object>();
+    	socialProfiles			= new HashMap<String, Object>();
     	
-    	socialActivities		= new ArrayList<ActivityEntry>();
+    	socialActivities		= new ArrayList<Object>();
     	
     }
     
@@ -77,23 +74,23 @@ public class SocialData implements ISocialData {
 	}
 
 	@Override
-	public List<Person> getSocialPeople() {
-		return (List<Person>)socialFriends.values();
+	public List<Object> getSocialPeople() {
+		return (List<Object>)socialFriends.values();
 	}
 
 	@Override
-	public List<ActivityEntry> getSocialActivity() {
+	public List<Object> getSocialActivity() {
 		return socialActivities;
 	}
 
 	@Override
-	public List<Group> getSocialGroups() {
-		return (List<Group>)socialGroups.values();
+	public List<Object> getSocialGroups() {
+		return (List<Object>)socialGroups.values();
 	}
 	
 	@Override
-	public List<Person> getSocialProfiles() {
-		return (List<Person>)socialProfiles.values();
+	public List<Object> getSocialProfiles() {
+		return (List<Object>)socialProfiles.values();
 	}
 	
 
@@ -101,7 +98,7 @@ public class SocialData implements ISocialData {
 	public void updateSocialData() {
 
 		Iterator<ISocialConnector>it = connectors.values().iterator();
-		socialActivities = new ArrayList<ActivityEntry>();  // reset old Activities
+		socialActivities = new ArrayList<Object>();  // reset old Activities
 		
 		while (it.hasNext()){
 			ISocialConnector connector = it.next();

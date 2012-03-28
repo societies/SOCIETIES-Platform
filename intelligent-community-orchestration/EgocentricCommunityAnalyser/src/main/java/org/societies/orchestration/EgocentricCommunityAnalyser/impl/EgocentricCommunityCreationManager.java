@@ -73,6 +73,7 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
 
@@ -128,8 +129,12 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 	
 	private ICssActivityFeed activityFeed;
 	
-    
+	private HashMap<String, ICisRecord> personalCiss;
+	
 	private ISuggestedCommunityAnalyser suggestedCommunityAnalyser;
+	
+	private ICommManager commManager;
+	
 	
 	/*
      * Constructor for EgocentricCommunityConfigurationManager
@@ -161,40 +166,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 	public EgocentricCommunityCreationManager(ICisRecord linkedSuperCis) {
 		this.linkedSuperCis = linkedSuperCis;
 	}
-	
-	public ArrayList<IIdentity> getIDsOfInteractingCsss(String startingDate, String endingDate) {
-		//What CSSs is this one currently interacting with?
-		//Found by: For each service, shared service, and resource the user is using (in the last ~5 minutes), is there an end-CSS they're interacting with?
-		//Is there a CSS they're indirectly interacting with over the service?
 		
-		
-		//Needs a framework for capturing this in the platform.
-		//It needs a timestamp for this, so either the context is stored with timestamps or 
-		//we get it from the CSS activity feed (which isn't implemented yet)
-		ArrayList<IIdentity> interactingCsss = null;
-		
-		try {
-			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
-		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
-		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
-		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
-        //
-		//    Get the lists from the callbacks
-		//
-		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
-		//}
-//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
-
-		
-		
-		return interactingCsss;
-	}
-	
 	/*
 	 * Description: The method looks for CISs to create, using as a base the information related to
 	 *              this object's 'linked' component (see the fields). If the linked component
@@ -206,17 +178,19 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 	 *              on collective aspects like context attributes.
 	 */
 	
-	public void identifyCissToCreate(String evaluationType) {
+	public ArrayList<String> identifyCissToCreate(String evaluationType, HashMap<IIdentity, String> userCissMetadata) {
 		
 		
 		
-		ArrayList<IIdentity> interactedCssIDs = null;
-		ArrayList<IIdentity> friendCssIDs = null;
-		ArrayList<IIdentity> localCsss = null;
+		ArrayList<IIdentity> interactedCssIDs = new ArrayList<IIdentity>();
+		ArrayList<IIdentity> friendCssIDs = new ArrayList<IIdentity>();
+		ArrayList<IIdentity> localCsss = new ArrayList<IIdentity>();
 		// ...
 		
 		ArrayList<ICisRecord> cissToCreate = new ArrayList<ICisRecord>();
-		ArrayList<ICisRecord> cissToAutomaticallyCreate = null;
+		ArrayList<String> cissToCreateMetadata = new ArrayList<String>();
+		
+		ArrayList<ICisRecord> cissToAutomaticallyCreate = new ArrayList<ICisRecord>();
 		//v1.0 algorithms
 		
 		linkedCss = mock(IIdentity.class);
@@ -237,7 +211,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		        userJoinedCiss.add(listOfUserJoinedCiss[i]);   
 		    }
 		
-		if (evaluationType.equals("extensive")) { //every day or so
+		if (evaluationType.equals("extensive")) { //every day
 			if (linkedCss != null) {
 				//interactedCssIDs = getIDsOfInteractingCsss();
 				
@@ -256,10 +230,19 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				
 				
 				
-				//CSS directory
+				//Personal CSS directory CIS
 				Collection<Object/**CssAdvertisementRecord*/> cssDirectoryMembers = userCssDirectory.findForAllCss();
 				boolean cisExistsAlready = false;
-				if (cssDirectoryMembers.size() >= 2)
+				ArrayList<String> joinedCisIDs = new ArrayList<String>();
+				for (int i = 0; i < userCissMetadata.size(); i++) {
+				    if (userCissMetadata.get(i).contains("PERSONAL CIS for your CSS directory"))
+				        cisExistsAlready = true;
+				}
+				for (int i = 0; i < userJoinedCiss.size(); i++)
+					joinedCisIDs.add(userJoinedCiss.get(i).toString());
+				if (joinedCisIDs.contains(personalCiss.get("CSS Directory")))
+					cisExistsAlready = true;
+				else if (cssDirectoryMembers.size() >= 2)
 				for (int i = 0; i < userJoinedCiss.size(); i++) {
 					//if (userJoinedCiss.get(i).getOrchestrationMetdata.contains("Personal CSS directory")) cisExistsAlready = true;
 					Collection<Object> membersOfCis = null;
@@ -283,38 +266,19 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				     //    cisExistsAlready = true;
 				/**    if (!cisManager.getCiss().get(i).getMembers() == people)*/
 				}
-				//if (cisExistsAlready == false)
+				//if (cisExistsAlready == false) {
 				//    cissToCreate.add(new ICisRecord(null, linkedCss.toString(), "PERSONAL CIS for your CSS directory members", null, null, null, null, null, null));
+				//    personalCiss.remove("CSS Directory");
+				//    personalCiss.add("CSS Directory", new ICisRecord(null, linkedCss.toString(), "PERSONAL CIS for your CSS directory members", null, null, null, null, null, null));
+			    //    cissToCreateMetadata.add("PERSONAL CIS for your CSS directory");
+				//
+				//}
 				
 				//Repeat the above for: friends, family members, working colleagues, and any other
 				//sufficiently important context containing a list of CSSs. The context ontology is used
 				//to determine what is worthy of this.
 				
-				Future<List<CtxIdentifier>> friendsFuture = null;
-				try {
-				    friendsFuture = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "close friends");
-				    //Filter to friends who all consider each-other friends, within the group of user's friends
-				    //Need API in place to obtain this data
-			    } catch (CtxException e) {
-				    // TODO Auto-generated catch block
-				    e.printStackTrace();
-			    }
 				
-				//while (friendsFuture == null) {
-				//	continue;
-				//}
-				
-				List<CtxIdentifier> theFriends = null;
-				try {
-					if (friendsFuture != null)
-					    theFriends = friendsFuture.get();
-				} catch (InterruptedException e3) {
-					// TODO Auto-generated catch block
-					e3.printStackTrace();
-				} catch (ExecutionException e3) {
-					// TODO Auto-generated catch block
-					e3.printStackTrace();
-				}
 				
 				//Does Personal CSS directory CIS need sub-CISs:
 				
@@ -359,6 +323,46 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				
 				//Mutual friends CIS creator
+				
+				Future<List<CtxIdentifier>> friendsFuture = null;
+				try {
+				    friendsFuture = userContextBroker.lookup(CtxModelType.ATTRIBUTE, "close friends");
+				    //Filter to friends who all consider each-other friends, within the group of user's friends
+				    //Need API in place to obtain this data
+			    } catch (CtxException e) {
+				    // TODO Auto-generated catch block
+				    e.printStackTrace();
+			    }
+				
+				//while (friendsFuture == null) {
+				//	continue;
+				//}
+				
+				List<CtxIdentifier> theFriends = null;
+				try {
+					if (friendsFuture != null)
+					    theFriends = friendsFuture.get();
+				} catch (InterruptedException e3) {
+					// TODO Auto-generated catch block
+					e3.printStackTrace();
+				} catch (ExecutionException e3) {
+					// TODO Auto-generated catch block
+					e3.printStackTrace();
+				}
+				
+				cisExistsAlready = false;
+				for (int i = 0; i < userCissMetadata.size(); i++) {
+				    if (userCissMetadata.get(i).contains("PERSONAL CIS for your friends"))
+				        cisExistsAlready = true;
+				}
+				
+				//if (cisExistsAlready == false) {
+				//    cissToCreate.add(new ICisRecord(null, linkedCss.toString(), "PERSONAL CIS for your friends", null, null, null, theFriends, null, null));
+				//    personalCiss.remove("CSS Directory");
+				//    personalCiss.add("CSS Directory", new ICisRecord(null, linkedCss.toString(), "PERSONAL CIS for your friends", null, null, null, null, null, null));
+			    //    cissToCreateMetadata.add("PERSONAL CIS for your friends");
+				//
+				//}
 				
 				
 				boolean similarCis = false;
@@ -615,9 +619,53 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				//    if (segmentDay.get(0) > ((segmentDay.get(0) + segmentDay.get(1) + segmentDay.get(2)) * 0.7) {
 				//        ////    if (!joinedCiss.getMemberList().contains(potentialCis))
 				//        cissToCreate.add(new CisRecord(null, linkedCss, "Interactors on Service in the morning" + "serviceName", null, null, null, null, null);
+				//        if (!(segmentDay.get(1) + segmentDay.get(2) >= 3))
+				//            cissToCreate.remove(cissToCreate.size()-2);
 				//}
 				
+				//Last 2 weeks
 				
+				//CssActivityFeed threeAndTwoDaysFeed = splitActivityFeed(3 day ago, 2 days ago);
+				//CssActivityFeed twoAndOneDaysFeed = splitActivityFeed(2 day ago, 1 days ago);
+				//ArrayList<CssActivityFeed> segmentDay = segmentActivityFeed(todayFeed, 3);
+				//if (segmentDay.get(0) > ((segmentDay.get(0) + segmentDay.get(1) + segmentDay.get(2)) * 0.7) {
+				//    ArrayList<CssActivityFeed> segmentThreeDays = segmentActivityFeed(threeDaysFeed, 9);
+				//    if (segmentDay.get(0) > ((segmentDay.get(0) + segmentDay.get(1) + segmentDay.get(2)) * 0.7) {
+				//        ////    if (!joinedCiss.getMemberList().contains(potentialCis))
+				//        cissToCreate.add(new CisRecord(null, linkedCss, "Interactors on Service in the morning" + "serviceName", null, null, null, null, null);
+				//        if (!(segmentDay.get(1) + segmentDay.get(2) >= 3))
+				//            cissToCreate.remove(cissToCreate.size()-2);
+				//}
+				
+				//Last 4 months
+				
+				//CssActivityFeed threeAndTwoDaysFeed = splitActivityFeed(3 day ago, 2 days ago);
+				//CssActivityFeed twoAndOneDaysFeed = splitActivityFeed(2 day ago, 1 days ago);
+				//ArrayList<CssActivityFeed> segmentDay = segmentActivityFeed(todayFeed, 3);
+				//if (segmentDay.get(0) > ((segmentDay.get(0) + segmentDay.get(1) + segmentDay.get(2)) * 0.7) {
+				//    ArrayList<CssActivityFeed> segmentThreeDays = segmentActivityFeed(threeDaysFeed, 9);
+				//    if (segmentDay.get(0) > ((segmentDay.get(0) + segmentDay.get(1) + segmentDay.get(2)) * 0.7) {
+				//        ////    if (!joinedCiss.getMemberList().contains(potentialCis))
+				//        cissToCreate.add(new CisRecord(null, linkedCss, "Interactors on Service in the morning" + "serviceName", null, null, null, null, null);
+				//        if (!(segmentDay.get(1) + segmentDay.get(2) >= 3))
+				//            cissToCreate.remove(cissToCreate.size()-2);
+				//}
+				
+				//All time
+				//ArrayList<CssActivityFeed> segmentAll = segmentActivityFeed(theFeed, 15);
+				//if (segmentAll.get(0) > 0)
+				//    add interactor as potential CIS member
+				//if (total members >= 2) {
+				//    cissToCreate.add(new CisRecord());
+				//    cisMetadata.add("Ongoing");
+				//if (segmentAll.get(0) > ((segmentDay.get(0) + segmentDay.get(1) + segmentDay.get(2)) * 0.7) {
+				//    ArrayList<CssActivityFeed> segmentThreeDays = segmentActivityFeed(threeDaysFeed, 9);
+				//    if (segmentDay.get(0) > ((segmentDay.get(0) + segmentDay.get(1) + segmentDay.get(2)) * 0.7) {
+				//        ////    if (!joinedCiss.getMemberList().contains(potentialCis))
+				//        cissToCreate.add(new CisRecord(null, linkedCss, "Interactors on Service in the morning" + "serviceName", null, null, null, null, null);
+				//        if (!(segmentDay.get(1) + segmentDay.get(2) >= 3))
+				//            cissToCreate.remove(cissToCreate.size()-2);
+				//}
 				
 				//for (int i = 0; i < theIDs.size(); i++) {
 				//    if (timesInteracted.get(theIDs.get(i)) == 0)
@@ -809,7 +857,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		
 		HashMap<String, ArrayList<ICisRecord>> theResult = new HashMap<String, ArrayList<ICisRecord>>();
 		theResult.put("Create CISs", cissToCreate);
-		suggestedCommunityAnalyser.analyseEgocentricRecommendations(theResult);
+		return suggestedCommunityAnalyser.processEgocentricRecommendations(theResult, cissToCreateMetadata);
 		//if (cissToCreate != null) 
 		//    for (int i = 0; i < cissToCreate.size(); i++)
 		//	    cisManager.createCis(linkedCss.getIdentifier(), cissToCreate.get(i).getCisId());
@@ -865,6 +913,294 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
     	
     	new EgocentricCommunityCreationManager(linkedCss, "CSS");
     }
+    
+
+	public ArrayList<IIdentity> getIDsOfInteractingCsss(String startingDate, String endingDate) {
+		//What CSSs is this one currently interacting with across all services?
+		//Found by: For each service, shared service, and resource the user is using (in the last ~5 minutes), is there an end-CSS they're interacting with?
+		//Is there a CSS they're indirectly interacting with over the service?
+		
+		
+		//Needs a framework for capturing this in the platform.
+		//It needs a timestamp for this, so either the context is stored with timestamps or 
+		//we get it from the CSS activity feed (which isn't implemented yet)
+		ArrayList<IIdentity> interactingCsss = null;
+		
+		try {
+			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
+        //
+		//    Get the lists from the callbacks
+		//
+		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
+		//}
+//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
+
+		
+		
+		return interactingCsss;
+	}
+	
+	public ArrayList<IIdentity> getIDsOfDirectlyInteractingCsssOverAService(String startingDate, String endingDate, String service) {
+		//What CSSs is this one currently interacting with across the specified service?
+		//Found by: For each service, shared service, and resource the user is using (within the time period specified), is there an end-CSS they're interacting with?
+		//Is there a CSS they're indirectly interacting with over the service (e.g. both using the same service or accessing the same resource over it)?
+		
+		
+		//Needs a framework for capturing this in the platform.
+		//It needs a timestamp for this, so either the context is stored with timestamps or 
+		//we get it from the CSS activity feed (which isn't implemented yet)
+		ArrayList<IIdentity> interactingCsss = new ArrayList<IIdentity>();
+		//           2010-03-08 14:59:30.252
+		//ICssActivityFeed subfeed = activityFeed.getActivities(startingDate, endingDate);
+		//
+		//for (int i = 0; i < subfeed.size(); i++) {
+		//    ICssActivity thisActivity = subfeed.getActivity(i);
+		//    if (thisActivity.getObject().equals(service) &&
+		//        thisActivity.getTarget().contains("CSS") &&
+		//        !(interactingCss.contains(thisActivity.getTarget())))
+		//        interactingCsss.add(thisActivity.getTarget();
+        //    else if (thisActivity.getObject().equals(service) &&
+		//        thisActivity.getActor().contains("CSS") &&
+		//        (thisActivity.getActor() != linkedCss) &&
+		//        !(interactingCss.contains(thisActivity.getActor())))
+		//        interactingCsss.add(thisActivity.getTarget();
+		//}
+		
+		try {
+			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
+        //
+		//    Get the lists from the callbacks
+		//
+		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
+		//}
+//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
+
+		
+		
+		return interactingCsss;
+	}
+	
+	public ArrayList<IIdentity> getIDsOfCsssUsingAService(String startingDate, String endingDate, String service) {
+		//What CSSs is this one currently interacting with across the specified service?
+		//Found by: For each service, shared service, and resource the user is using (within the time period specified), is there an end-CSS they're interacting with?
+		//Is there a CSS they're indirectly interacting with over the service (e.g. both using the same service or accessing the same resource over it)?
+		
+		
+		//Needs a framework for capturing this in the platform.
+		//It needs a timestamp for this, so either the context is stored with timestamps or 
+		//we get it from the CSS activity feed (which isn't implemented yet)
+		ArrayList<IIdentity> interactingCsss = new ArrayList<IIdentity>();
+		//           2010-03-08 14:59:30.252
+		//ICssActivityFeed subfeed = activityFeed.getActivities(startingDate, endingDate);
+		//ArrayList<ICssActivityFeed> otherActivityFeeds = new ArrayList<ICssActivityFeed>();
+		//
+		//for (int i = 0; i < subfeed.size(); i++) {
+		//    ICssActivity thisActivity = subfeed.getActivity(i);
+        //    if (thisActivity.getActor().contains("CSS") &&
+		//        (thisActivity.getActor() != linkedCss) &&
+		//        !(interactingCsss.contains(thisActivity.getActor())))
+		//        interactingCsss.add(thisActivity.getTarget();
+		//    if (thisActivity.getTarget().contains("CSS") &&
+		//        (thisActivity.getTarget() != linkedCss) &&
+		//        !(interactingCsss.contains(thisActivity.getTarget())))
+		//        interactingCsss.add(thisActivity.getTarget();
+		//}
+		
+		//for (int i = 0; i < cssDirectory.size(); i++) {
+		//    
+		//    ICssActivity thisActivity = subfeed.getActivity(i);
+		//    if (thisActivity.getActor().contains("CSS") &&
+		//        (thisActivity.getActor() != linkedCss) &&
+		//        !(interactingCsss.contains(thisActivity.getActor())))
+		//        interactingCsss.add(thisActivity.getTarget();
+		//    if (thisActivity.getTarget().contains("CSS") &&
+		//        (thisActivity.getTarget() != linkedCss) &&
+		//        !(interactingCsss.contains(thisActivity.getTarget())))
+		//        interactingCsss.add(thisActivity.getTarget();
+		//}
+		
+		//for (int i = 0; i < interactingCsss.size(); i++) {
+		//    
+		//}
+		
+		try {
+			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
+        //
+		//    Get the lists from the callbacks
+		//
+		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
+		//}
+//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
+
+		
+		
+		return interactingCsss;
+	}
+	
+	public ArrayList<IIdentity> getIDsOfCsssAccessingResourceOverAService(String startingDate, String endingDate, String resource, String service) {
+		//What CSSs is this one currently interacting with across the specified service?
+		//Found by: For each service, shared service, and resource the user is using (within the time period specified), is there an end-CSS they're interacting with?
+		//Is there a CSS they're indirectly interacting with over the service (e.g. both using the same service or accessing the same resource over it)?
+		
+		
+		//Needs a framework for capturing this in the platform.
+		//It needs a timestamp for this, so either the context is stored with timestamps or 
+		//we get it from the CSS activity feed (which isn't implemented yet)
+		ArrayList<IIdentity> interactingCsss = new ArrayList<IIdentity>();
+		//           2010-03-08 14:59:30.252
+		//ICssActivityFeed subfeed = activityFeed.getActivities(startingDate, endingDate);
+		//
+		//for (int i = 0; i < subfeed.size(); i++) {
+		//    ICssActivity thisActivity = subfeed.getActivity(i);
+		//    if (thisActivity.getObject().equals(service) &&
+		//        thisActivity.getTarget().contains("CSS") &&
+		//        !(interactingCss.contains(thisActivity.getTarget())))
+		//        interactingCsss.add(thisActivity.getTarget();
+        //    else if (thisActivity.getObject().equals(service) &&
+		//        thisActivity.getActor().contains("CSS") &&
+		//        (thisActivity.getActor() != linkedCss) &&
+		//        !(interactingCss.contains(thisActivity.getActor())))
+		//        interactingCsss.add(thisActivity.getTarget();
+		//}
+		
+		try {
+			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
+        //
+		//    Get the lists from the callbacks
+		//
+		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
+		//}
+//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
+
+		
+		
+		return interactingCsss;
+	}
+	
+	public ArrayList<IIdentity> getIDsOfInteractingCsssOverAService(String startingDate, String endingDate, String service) {
+		//What CSSs is this one currently interacting with across the specified service?
+		//Found by: For each service, shared service, and resource the user is using (within the time period specified), is there an end-CSS they're interacting with?
+		//Is there a CSS they're indirectly interacting with over the service (e.g. both using the same service or accessing the same resource over it)?
+		
+		
+		//Needs a framework for capturing this in the platform.
+		//It needs a timestamp for this, so either the context is stored with timestamps or 
+		//we get it from the CSS activity feed (which isn't implemented yet)
+		ArrayList<IIdentity> interactingCsss = new ArrayList<IIdentity>();
+		//           2010-03-08 14:59:30.252
+		//ICssActivityFeed subfeed = activityFeed.getActivities(startingDate, endingDate);
+		//
+		//for (int i = 0; i < subfeed.size(); i++) {
+		//    ICssActivity thisActivity = subfeed.getActivity(i);
+		//    if (thisActivity.getObject().equals(service) &&
+		//        thisActivity.getTarget().contains("CSS") &&
+		//        !(interactingCss.contains(thisActivity.getTarget())))
+		//        interactingCsss.add(thisActivity.getTarget();
+        //    else if (thisActivity.getObject().equals(service) &&
+		//        thisActivity.getActor().contains("CSS") &&
+		//        (thisActivity.getActor() != linkedCss) &&
+		//        !(interactingCss.contains(thisActivity.getActor())))
+		//        interactingCsss.add(thisActivity.getTarget();
+		//}
+		
+		try {
+			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "used services");
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs sharing service " + thisService, userContextBrokerCallback);
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs interacted with over service " + thisService, userContextBrokerCallback);
+        //
+		//    Get the lists from the callbacks
+		//
+		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
+		//}
+//	    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs shared resources with", userContextBrokerCallback);
+
+		
+		
+		return interactingCsss;
+	}
+	
+	public ArrayList<IIdentity> getIDsOfCsssInProximity(String startingDate, String endingDate, String service) {
+		//What CSSs has this one been in proximity with, over the specified time range?
+		//Found by: checking proximity context (within the time period specified), what CSS IDs are found either (1) entering proximity
+		//within this period, or (2) have entered proximity before this time period but hadn't gone out of proximity before the time period started?
+		
+		
+		//Needs a framework for capturing this in the platform.
+		ArrayList<IIdentity> proximityCsss = new ArrayList<IIdentity>();
+		//           2010-03-08 14:59:30.252
+		//ICssActivityFeed subfeed = activityFeed.getActivities(startingDate, endingDate);
+		//
+		//for (int i = 0; i < subfeed.size(); i++) {
+		//    ICssActivity thisActivity = subfeed.getActivity(i);
+		//    if (thisActivity.getObject().equals(proximity) &&
+		//        thisActivity.getTarget().contains("CSS") &&
+		//        !(interactingCss.contains(thisActivity.getTarget())))
+		//        interactingCsss.add(thisActivity.getTarget();
+        //    else if (thisActivity.getObject().equals(proximity) &&
+		//        thisActivity.getActor().contains("CSS") &&
+		//        (thisActivity.getActor() != linkedCss) &&
+		//        !(interactingCss.contains(thisActivity.getActor())))
+		//        interactingCsss.add(thisActivity.getTarget();
+		//}
+		
+		try {
+			userContextBroker.lookup(CtxModelType.ATTRIBUTE, "proximity");
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
+		//for (int i = 0; i < userContextBrokerCallback.size(); i++) {
+		//    userContextBroker.lookup(CtxModelType.ATTRIBUTE, "CSSs proximity " + thisService, userContextBrokerCallback);
+        //
+		//    Get the lists from the callbacks
+		//
+		//    filter (sharingAndInteractingCsssList).split("timestamp: ")[1] >= Date.getDate() - 300000;
+		//}
+
+		
+		
+		return proximityCsss;
+	}
+
     
     public IIdentity getLinkedCss() {
     	return linkedCss;
@@ -945,13 +1281,13 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
     	this.userFeedbackCallback = userFeedbackCallback;
     }
     
-  //public CommManagerBundle getCommManager() {
-    //	return commManager;
-    //}
+    public ICommManager getCommManager() {
+    	return commManager;
+    }
     
-    //public void setCommManager(CommManagerBundle commManager) {
-    //	this.commManager = commManager;
-    //}
+    public void setCommManager(ICommManager commManager) {
+    	this.commManager = commManager;
+    }
     
     /**Returns the list of package names of the message beans you'll be passing*/
     public List<String> getJavaPackages() {
