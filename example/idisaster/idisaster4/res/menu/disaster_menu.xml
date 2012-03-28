@@ -2,9 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     	
 	<item 
-	    android:id="@+id/disasterMenuAdd" 
-	    android:icon="@android:drawable/ic_menu_add"
-		android:title="@string/disaster_menu_createCommunity" />
+	    android:id="@+id/disasterMenuSelectDisaster" 
+	    android:icon="@android:drawable/ic_menu_preferences"
+		android:title="@string/disaster_menu_selectDisaster" />
+	<item 
+	    android:id="@+id/disasterMenuLogoff" 
+	    android:icon="@android:drawable/ic_lock_power_off"
+		android:title="@string/disaster_menu_logoff" />
+	
 </menu>
 
 <!-- To hide a menu item use (the item can be made visilble programmatically)

@@ -73,8 +73,11 @@ public class LoginActivity extends Activity implements OnClickListener {
     	// Add click listener to button
     	final Button button = (Button) findViewById(R.id.loginButton);
     	button.setOnClickListener(this);
-    }
+    	
+//	    Test dialog
+//    	iDisasterApplication.getinstance().showDialog (this, getString(R.string.loginTestDialog), getString(R.string.dialogOK));
 
+    }
  		
 /**
  * onClick is called when button is clicked because
@@ -132,38 +135,26 @@ public class LoginActivity extends Activity implements OnClickListener {
 	    		
     		// Store user name and password in preferences
         	iDisasterApplication.getinstance().setUserName (userName, userPassword);
+        	// Instantiate the Societies platform
+        	iDisasterApplication.getinstance().platformLogIn ();
         	
-// TODO: Remove code for testing the correct setting of preferences 
-    	    String testName = iDisasterApplication.getinstance().preferences.
-    	    	getString ("pref.username","");
-    	    String testPassword = iDisasterApplication.getinstance().preferences.
-    	    	getString ("pref.password","");
-    	    Toast.makeText(this, "Debug: "  + testName + " " + testPassword, 
-    			Toast.LENGTH_LONG).show();
+// Code for testing the correct setting of preferences 
+//    	    String testName = iDisasterApplication.getinstance().preferences.
+//    	    	getString ("pref.username","");
+//    	    String testPassword = iDisasterApplication.getinstance().preferences.
+//    	    	getString ("pref.password","");
+//    	    Toast.makeText(this, "Debug: "  + testName + " " + testPassword, 
+//    			Toast.LENGTH_LONG).show();
 
     	    // Hide the soft keyboard:
 			// - the soft keyboard will not appear on next activity window!
     	    InputMethodManager mgr = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
     	    mgr.hideSoftInputFromWindow(userPasswordView.getWindowToken(), 0);
 
+//    	    finish();	// noHistory=true in Manifest => the activity is removed from the activity stack and finished.
+
 	    	// Send intent to Disaster activity
-	    	startActivity(new Intent(LoginActivity.this, DisasterActivity.class));
+	    	startActivity(new Intent(LoginActivity.this, DisasterListActivity.class));
 	    }
     }
-		
-/**
- * showDialog is used under testing
- */
-	private void showDialog () {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(getString(R.string.loginTestDialog))
-			.setCancelable(false)
-			.setPositiveButton (getString(R.string.dialogOK), new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					return;
-			    }
-			});
-		AlertDialog dialog = builder.create();
-		dialog.show();
-	}
 }

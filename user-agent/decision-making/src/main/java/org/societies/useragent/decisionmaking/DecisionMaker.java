@@ -76,7 +76,7 @@ public class DecisionMaker extends AbstractDecisionMaker {
 		System.out.println("with Parameter:\t"+action.getparameterName());
 		System.out.println("with Parameter:\t"+action.getvalue());
 		System.out.println("****************************************");
-
+		
 	}
 
 }

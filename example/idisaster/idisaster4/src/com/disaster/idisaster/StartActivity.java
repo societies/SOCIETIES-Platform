@@ -57,15 +57,15 @@ public class StartActivity extends Activity implements OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
 
     	super.onCreate(savedInstanceState);
-    	
-		getPreferences ();						// retrieve user preferences
-
-    	startNextActivity (); 					// select next activity
-			
+    				
 	    setContentView (R.layout.start_layout);	// create GUI
 	    // Add click listener to button
 	    final Button button = (Button) findViewById(R.id.startButton);
 	    button.setOnClickListener(this);
+
+//	    Test dialog
+//    	iDisasterApplication.getinstance().showDialog (this, getString(R.string.startTestDialog), getString(R.string.dialogOK));
+
     }
 
 /**
@@ -86,14 +86,15 @@ public class StartActivity extends Activity implements OnClickListener {
  */
 	private void startNextActivity () {
 		
-    	if (userName == getString(R.string.noPreference)) {
+    	if (userName == getString(R.string.noPreference)) {								// no user name (no password)
     		startActivity(new Intent(StartActivity.this, LoginActivity.class));
     		return;
-    	} else if (disasterName == getString(R.string.noPreference)) {
-    		startActivity(new Intent(StartActivity.this, DisasterActivity.class));
+    	} else if (disasterName == getString(R.string.noPreference)) {					// no disaster selected
+    		startActivity(new Intent(StartActivity.this, DisasterListActivity.class));
     		return;
     	} else {
-    		startActivity(new Intent(StartActivity.this, HomeActivity.class));
+    		
+    		startActivity(new Intent(StartActivity.this, DisasterActivity.class));
     		return;
     	}
     }
@@ -107,19 +108,4 @@ public class StartActivity extends Activity implements OnClickListener {
 		startNextActivity ();			// select next activity
 	}
 
-/**
- * showDialog is used under testing
- */
-	private void showDialog () {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(getString(R.string.startTestDialog))
-			.setCancelable(false)
-			.setPositiveButton (getString(R.string.dialogOK), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-	    	   return;
-	         }
-	       });
-		AlertDialog dialog = builder.create();
-		dialog.show();
-	}
 }

@@ -172,6 +172,7 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 	/**
 	 * TODO Add in this method a call to a device binding table class to generate an Id to each new device connected
 	 */
+	@Override
 	public String fireNewDeviceConnected(String physicalDeviceId, DeviceCommonInfo deviceCommonInfo, String [] serviceIds) 
 	{
 		LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceManager info: fireNewDeviceConnected ");
@@ -287,28 +288,41 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	public void fireDeviceDisconnected(String deviceFamily, String deviceMacAddress) 
-	{	
-		String deviceId = (String)deviceIdBindingTable.getKey(deviceMacAddress);
-		
+	@Override
+	public String fireDeviceDisconnected(String deviceFamily, String physicalDeviceId)
+	{
+		String deviceId = (String)deviceIdBindingTable.getKey(physicalDeviceId);
+
 		if (deviceFamilyContainer.get(deviceFamily) != null)
 		{
-			if (deviceFamilyContainer.get(deviceFamily).get(deviceId) != null)
+			if (deviceId != null)
 			{
-				deviceFamilyContainer.get(deviceFamily).get(deviceId).removeDevice();
+				if (deviceFamilyContainer.get(deviceFamily).get(deviceId) != null)
+				{
+					deviceFamilyContainer.get(deviceFamily).get(deviceId).removeDevice();
+					return physicalDeviceId;
+				}
 			}
-			
+			else
+			{
+				return null;
+			}
 		}
+		return null;
 	}
-		
+
 	/**
-	 * 
+	 *
 	 */
-	public void fireNewDataReceived(String deviceFamily, String deviceMacAddress, String data) {
-		
+	@Override
+	public String fireNewDataReceived(String deviceFamily, String physicalDeviceId, Dictionary<String, Object> data) {
+
+		return null;
 	}
+
+
 }
 
 
