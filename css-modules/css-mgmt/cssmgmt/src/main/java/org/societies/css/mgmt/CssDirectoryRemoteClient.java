@@ -22,17 +22,75 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.css.directory;
+package org.societies.css.mgmt;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
+
+import org.societies.api.css.directory.ICssDirectoryCallback;
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
+
 
 /**
- * @author Babak.Farshchian@sintef.no
+ * Describe your class here...
+ *
+ * @author mmanniox
  *
  */
-public interface ICssAdvertisementRecord {
-	public String getName();
-	public void setName(String name);
-	public String getId();
-	public String getUri();
-	public void setUri(String uri);
+public class CssDirectoryRemoteClient implements ICssDirectoryCallback {
 
+		List<CssAdvertisementRecord> resultList;
+
+		private final long TIMEOUT = 5;
+
+		private BlockingQueue<List<CssAdvertisementRecord>> returnList;		
+		
+		public CssDirectoryRemoteClient(){
+			
+			returnList = new ArrayBlockingQueue<List<CssAdvertisementRecord>>(1);
+		}
+		
+		public void getResult(List<CssAdvertisementRecord> records) {
+			resultList = new ArrayList<CssAdvertisementRecord>();
+			
+			for (int i = 0; i < records.size(); i++)
+			{
+				resultList.add(records.get(i));
+			}
+			
+			setResultList(resultList);
+
+		}
+
+
+		/**
+		 * @return the resultList
+		 */
+		public List<CssAdvertisementRecord> getResultList() {
+			try {
+				return returnList.poll(TIMEOUT, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+
+
+		/**
+		 * @param resultList the resultList to set
+		 */
+		public void setResultList(List<CssAdvertisementRecord> resultList) {
+			try {
+				returnList.put(resultList);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+	
+
+		 
 }

@@ -24,65 +24,17 @@
  */
 package org.societies.api.css.directory;
 
-import java.util.List;
-import java.util.concurrent.Future;
 
+import java.util.List;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 
 /**
- * 
- * @author Perumal Kuppuudaiyar
- * @author Babak.Farshchian@sintef.no
- * @author Maria Mannion
- * 
+ * Used as a generic callback class to handle asynch messaging
+ *
+ * @author aleckey
+ *
  */
-public interface ICssDirectory {
-	/**
-	 * Description: This method provide interface to add new CSS object to CSS
-	 * directory
-	 * 
-	 * @param css
-	 *            object to be added to directory
-	 */
-	void addCssAdvertisementRecord(CssAdvertisementRecord cssAdvert);
-
-	/**
-	 * Description: This method allows to delete specific CSS entry from CSS
-	 * Directory
-	 * 
-	 * @param css
-	 *            object to be deleted from directory
-	 */
-	void deleteCssAdvertisementRecord(CssAdvertisementRecord cssAdvert);
-
-	/**
-	 * Description : This method can be used to update the changes in the CSS
-	 * which is already exists in the CSS directory
-	 * 
-	 * @param css
-	 *            to be updated or replaced
-	 * @param update
-	 *            new css object to be placed in the directory
-	 */
-	void updateCssAdvertisementRecord(CssAdvertisementRecord oldCssAdvert,
-			CssAdvertisementRecord updatedCssAdvert);
-
-	/**
-	 * Description : Queries list of CSS available in the CSS directory
-	 * 
-	 * @return list of CssAdvertisementRecord from CSS directory
-	 */
-	Future<List<CssAdvertisementRecord>> findAllCssAdvertisementRecords();
-
-	/**
-	 * Description : Queries list of CSS object with CSS advertisement record
-	 * filter
-	 * 
-	 * @param cssFilter
-	 *            for which list of CSS will retrieved from directory
-	 * @return list of CssAdvertisementRecords
-	 */
-	Future<List<CssAdvertisementRecord>> findForAllCss(
-			CssAdvertisementRecord cssFilter);
-
+public interface ICssDirectoryCallback {
+	
+	public void getResult(List<CssAdvertisementRecord> cssAdvertisementRecords);
 }
