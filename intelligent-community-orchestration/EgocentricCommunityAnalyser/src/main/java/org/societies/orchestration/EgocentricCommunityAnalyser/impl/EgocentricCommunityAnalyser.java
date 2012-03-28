@@ -36,6 +36,7 @@ import static org.mockito.Mockito.*;
 //import org.societies.api.internal.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 //import org.societies.api.internal.cis.management.ICisRecord;
 import org.societies.api.internal.context.broker.ICtxBroker;
 
@@ -86,6 +87,9 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 	private Date lastOngoingCheck;
 	
 	private ICisManager cisManager;
+	
+	private ICommManager commManager;
+	
 	/*
      * Constructor for EgocentricCommunityAnalyser
      * 
@@ -120,16 +124,19 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 	}
 	
 	public void addNewCissToRecords(ArrayList<String> newCissMetadata) {
-		//for (int i = 0; i < newCissMetadata.size(); i++)
+		//for (int i = 0; i < newCissMetadata.size(); i++) {
 				//    if (userCissMetadata.get(newCissMetadata.get(i).split("---")[0]) == null)
 				//        userCissMetadata.add(newCissMetadata..get(i).split("---")[0], newCissMetadata.get(i));
+		        //    else if (userCissMetadata.get(newCissMetadata.get(i).split"---")[0] != null)
+		        //        userCissMetadata.replace(newCissMetadata.get(i).split("---")[0], newCissMetadata.get(i));
+	    //}
 	}
 	
 	public void processPreviousLongTimeCycle() {
 		removeObsoleteRecordedCiss();
 		
 		addNewCissToRecords(egocentricCreationManager.identifyCissToCreate("extensive", userCissMetadata));
-		addNewCissToRecords(egocentricConfigurationManager.identifyCissToConfigure());
+		addNewCissToRecords(egocentricConfigurationManager.identifyCissToConfigure(userCissMetadata));
 		removeObsoleteRecordedCiss();
 		
 		egocentricDeletionManager.identifyCissToDelete(userCissMetadata);
@@ -241,13 +248,13 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
     	this.egocentricDeletionManager = egocentricDeletionManager;
     }
     
-    //public CommManagerBundle getCommManager() {
-    //	return commManager;
-    //}
+    public ICommManager getCommManager() {
+    	return commManager;
+    }
     
-    //public void setCommManager(CommManagerBundle commManager) {
-    //	this.commManager = commManager;
-    //}
+    public void setCommManager(ICommManager commManager) {
+    	this.commManager = commManager;
+    }
     
     /**Returns the list of package names of the message beans you'll be passing*/
     public List<String> getJavaPackages() {

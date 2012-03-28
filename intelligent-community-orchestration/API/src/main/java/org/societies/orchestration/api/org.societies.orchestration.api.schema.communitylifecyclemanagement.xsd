@@ -17,16 +17,15 @@
 	<xs:element name="suggestedCommunityAnalyserBeanResult">
 	  <xs:complexType >
 	    <xs:sequence>
-	      <xs:element name="nothing" type="xs:string"/>
-	      <xs:element name="nothing2" type="xs:string" minOccurs="0"/>
+	      <xs:element name="cissMetadata" type="tns:arrayList" />
 	    </xs:sequence>
 	  </xs:complexType>
 	</xs:element>
 
 	<xs:simpleType name="methodType">
 	  <xs:restriction base="xs:string">
-	    <xs:enumeration value="processECARecommendations"/>
-	    <xs:enumeration value="processECAConfigurationRecommendations"/>
+	    <xs:enumeration value="processEgocentricRecommendations"/>
+	    <xs:enumeration value="processEgocentricConfigurationRecommendations"/>
         <xs:enumeration value="processCSCWRecommendations"/>
 	    <xs:enumeration value="processCSCWConfigurationRecommendations"/>
 	    <xs:enumeration value="processCSMRecommendations"/>
@@ -50,7 +49,8 @@
   
   <xs:complexType name="arrayList">
     <xs:sequence>
-      <xs:element name="cisRecord" type="tns:cisRecord" minOccurs="1"/>
+      <xs:element name="cisMetadata" type="xs:string" minOccurs="1"/>
+      <!-- <xs:element name="cisRecord" type="tns:cisRecord" minOccurs="1"/>-->
     </xs:sequence>
   </xs:complexType>
 	

@@ -71,6 +71,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
@@ -135,6 +136,8 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 	private ICSSLocalManager cssManager;
 	private ICssActivityFeed activityFeed;
 	
+	private ICommManager commManager;
+	
 	
 	/*
      * Constructor for EgocentricCommunityConfigurationManager
@@ -161,7 +164,7 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 	 *              a domain, the check is done on all CISs in that domain.
 	 */
 	
-	public ArrayList<String> identifyCissToConfigure() {
+	public ArrayList<String> identifyCissToConfigure(HashMap <IIdentity, String> userCissMetadata) {
 		ArrayList<ICisRecord> cisRecords = new ArrayList();
 		ArrayList<ICisRecord> cissToConfigure = new ArrayList<ICisRecord>();
 		HashMap<ICisRecord, ICisRecord> configurationsToCiss = new HashMap<ICisRecord, ICisRecord>();
@@ -299,7 +302,7 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 	        	//
 		       // cisManager.configureCis(linkedCss, potentiallyConfigurableCis.getCisId());
 	   }
-		return suggestedCommunityAnalyser.analyseEgocentricConfigurationRecommendations(null, null);
+		return suggestedCommunityAnalyser.processEgocentricConfigurationRecommendations(null, null);
 		
 	}
 	
@@ -411,13 +414,13 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
     	this.cisManager = cisManager;
     }
     
-  //public CommManagerBundle getCommManager() {
-    //	return commManager;
-    //}
+    public ICommManager getCommManager() {
+    	return commManager;
+    }
     
-    //public void setCommManager(CommManagerBundle commManager) {
-    //	this.commManager = commManager;
-    //}
+    public void setCommManager(ICommManager commManager) {
+    	this.commManager = commManager;
+    }
     
     /**Returns the list of package names of the message beans you'll be passing*/
     public List<String> getJavaPackages() {

@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske držbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske drÅ¾be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOAÃ‡ÃƒO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -26,7 +26,10 @@
 package org.societies.orchestration.EgocentricCommunityAnalyser.test;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.Future;
+import java.util.Calendar;
 
 import org.junit.Assert;
 
@@ -49,6 +52,11 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.internal.cis.management.ICisManager;
 import org.societies.api.internal.cis.management.ICisRecord;
 
+import org.societies.api.css.directory.ICssDirectory;
+import org.societies.api.css.directory.ICssAdvertisementRecord;
+
+import org.societies.api.css.management.ICssRecord;
+
 /**
  * This is the test class for the Egocentric Community Creation Manager component
  * 
@@ -65,6 +73,8 @@ public class EgocentricCommunityCreationManagerTest {
 	private CtxEntityIdentifier entityId;
 	//private IUserCtxBrokerCallback userCtxBrokerCallback;
 	private ICisManager cisManager;
+	
+	private ICssDirectory cssDirectory;
 	
 	//@Test
 	public void testNonExtensiveCreationCheck() {
@@ -87,7 +97,7 @@ public class EgocentricCommunityCreationManagerTest {
     	Future <CtxEntity> theEntity = null;
     	try {
 			if (userCtxBroker != null)
-    		    theEntity = userCtxBroker.createEntity("CSS User");
+    		    theEntity = userCtxBroker.createEntity(ownerId.toString());
 		} catch (CtxException e) {
 			e.printStackTrace();
 		}
@@ -95,14 +105,21 @@ public class EgocentricCommunityCreationManagerTest {
     	
     	try {
 			if (userCtxBroker != null)
-    		    userCtxBroker.createAttribute(entityId, "proximity");
+    		    userCtxBroker.createAttribute(entityId, "proximity: donald, douglas");
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+    	
+    	
+    	egocentricCommunityCreationManager.setUserContextBroker(userCtxBroker);
+    	egocentricCommunityCreationManager.setCisManager(cisManager);
+    	
 		//check user joined CISs before
 		egocentricCommunityCreationManager.identifyCissToCreate("not extensive", null);
 		//check and compare user joined CISs after
+		boolean success = false;
+		//if (cisManager.getCisList().size() > 0) success = true;
 		
 		String[] members = new String[1];
 		members[0] = "James";
@@ -116,11 +133,25 @@ public class EgocentricCommunityCreationManagerTest {
     public void testExtensiveCreationCheck() {
     	
     	IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
-		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
+    	IIdentity friend1Id = mock(IIdentity.class); //Friend 1 CSS
+    	IIdentity friend2Id = mock(IIdentity.class); //Friend 2 CSS
+    	
+    	ICssAdvertisementRecord friend1Ad = mock(ICssAdvertisementRecord.class);
+    	ICssAdvertisementRecord friend2Ad = mock(ICssAdvertisementRecord.class);
+    	
+    	cssDirectory.addCssAdvertisementRecord(friend1Ad);
+    	cssDirectory.addCssAdvertisementRecord(friend2Ad);
+    
+        ICssRecord thisCss = mock(ICssRecord.class);
+        //thisCss.addCssDirectory(cssDirectory);
+    	
+    	CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
     	
     	
 		cisManager = mock(ICisManager.class);
 		userCtxBroker = mock(ICtxBroker.class);
+		
+		//when(cisManager.getCiss()).thenReturn(cisRecord);
 		
     	egocentricCommunityCreationManager = new EgocentricCommunityCreationManager(ownerId, "CSS");
 		
@@ -131,7 +162,7 @@ public class EgocentricCommunityCreationManagerTest {
     
     	Future <CtxEntity> theEntity = null;
     	try {
-			theEntity = userCtxBroker.createEntity("CSS User");
+			theEntity = userCtxBroker.createEntity(ownerId.toString());
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -148,7 +179,7 @@ public class EgocentricCommunityCreationManagerTest {
     	//create some test context data for the CSS?	
     	//ServiceResourceIdentifier userInterfacedService = new ServiceResourceIdentifier(/**new URI("Chat system")*/);
     	
-    	//userCtxBroker = new userCtxBroker();
+    	//userCtxBroker = new ICtxBroker();
     	//userCtxBroker.createEntity("CSS User", IUserCtxBrokerCallback);
     	//userCtxBroker.addAttribute(ownerIdContextEntity, CtxAttributeValueType.INDIVIDUAL, "CSS proximity", IUserCtxBrokerCallback);
     	
@@ -164,14 +195,32 @@ public class EgocentricCommunityCreationManagerTest {
 		//Assert.assertNull(cisManager.getCisList(new ICisRecord(null, null, null, null, null, members, null, null, null)));
 	}
     
+    @Test
     public void testCreateCisForPeopleTemporarilyUsingServiceTogether() {
     	
     }
     
+    @Test
     public void testNotCreateDuplicateCis() {
+    	cisManager = mock(ICisManager.class);
+    	ICisRecord cisRecord = mock(ICisRecord.class);
+    	IIdentity ownerId = mock(IIdentity.class);
+    	//cisManager.addCis(ownerId, cisRecord);
+    	egocentricCommunityCreationManager = new EgocentricCommunityCreationManager(ownerId, "CSS");
+		
+    	egocentricCommunityCreationManager.setCisManager(cisManager);
     	
+    	//egocentricCommunityCreationManager.identifyCissToCreate("extensive", new HashMap<IIdentity, String>());
+        //ICisManager resultCisManager = egocentricCommunityCreationManager.getCisManager();
+        int cisCount = 0;
+       // for (int i = 0; i < resultCisManager.getCisList().size(); i++) {
+       // 	if (resultCisManager.getCisList().get(i).getMembersList() == cisRecord.getMembersList() &&
+       // 			resultCisManager.getCisList().get(i).getMembershipCriteria() == cisRecord.getMembershipCriteria() ) cisCount++;
+        //}
+        //Assert.assertTrue(cisCount == 1);
     }
     
+    @Test
     public void testNotSuggestUndesiredCis() {
     	
     }
