@@ -120,7 +120,7 @@ public class CommsClient implements INegotiationProviderRemote {
 		LOG.debug("acceptPolicyAndGetSla({}, ...)", sessionId);
 		
 		sendIQ(toIdentity, MethodType.ACCEPT_POLICY_AND_GET_SLA, null,
-				sessionId, signedPolicyOption, modified);
+				sessionId, signedPolicyOption, modified, callback);
 	}
 
 	/*
@@ -137,7 +137,7 @@ public class CommsClient implements INegotiationProviderRemote {
 		
 		LOG.debug("getPolicyOptions({})", serviceId);
 		
-		sendIQ(toIdentity, MethodType.GET_POLICY_OPTIONS, serviceId, -1, null, false);
+		sendIQ(toIdentity, MethodType.GET_POLICY_OPTIONS, serviceId, -1, null, false, callback);
 	}
 
 	/*
@@ -152,7 +152,7 @@ public class CommsClient implements INegotiationProviderRemote {
 
 		LOG.debug("reject({})", sessionId);
 
-		sendIQ(toIdentity, MethodType.REJECT, null, sessionId, null, false);
+		sendIQ(toIdentity, MethodType.REJECT, null, sessionId, null, false, callback);
 	}
 	
 	/**
@@ -165,10 +165,11 @@ public class CommsClient implements INegotiationProviderRemote {
 	 * @param sessionId
 	 * @param sla
 	 * @param modified
-	 * @return True for success, false for error
+	 * @return Stanza ID for success, null for error
 	 */
-	private boolean sendIQ(IIdentity toIdentity, MethodType method,
-			String serviceId, int sessionId, String sla, boolean modified) {
+	private String sendIQ(IIdentity toIdentity, MethodType method,
+			String serviceId, int sessionId, String sla, boolean modified,
+			INegotiationProviderCallback callback) {
 		
 		LOG.debug("send(" + toIdentity + ", " + method + ", " + serviceId +
 				", " + sessionId + ", ..., " + modified + ")");
@@ -185,14 +186,18 @@ public class CommsClient implements INegotiationProviderRemote {
 		provider.setSignedPolicyOption(sla);
 		provider.setModified(modified);
 		
+		// Just to avoid theoretical race condition, add callback BEFORE sending IQ
+		clientCallback.addCallback(stanza.getId(), callback);
+		
+		// Send information query
 		try {
-			// Send information query
 			commMgr.sendIQGet(stanza, provider, clientCallback);
 			LOG.debug("send({}): IQ sent to {}", sessionId, toIdentity.getJid());
-			return true;
+			return stanza.getId();
 		} catch (CommunicationException e) {
 			LOG.warn("send({}): could not send IQ to " + toIdentity.getJid(), sessionId, e);
-			return false;
+			clientCallback.removeCallback(stanza.getId());
+			return null;
 		}
 	}
 }

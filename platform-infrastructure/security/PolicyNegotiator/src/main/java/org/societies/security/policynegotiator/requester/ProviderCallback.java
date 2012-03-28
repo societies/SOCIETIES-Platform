@@ -22,42 +22,49 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.security.policynegotiator;
+package org.societies.security.policynegotiator.requester;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.internal.schema.security.policynegotiator.MethodType;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
+import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
 
 /**
- * Interface for invoking the requester side (either the policy negotiator or
- * some other component).
- * To be used by policy negotiator from the provider side (from some other node).
- * 
+ * This class receives results from async invocations of {@link INegotiationProvider}
+ *
  * @author Mitja Vardjan
  *
  */
-public interface INegotiationProviderCallback {
+public class ProviderCallback implements INegotiationProviderCallback {
 
-	/**
-	 * Async return for
-	 * {@link INegotiationProvider#getPolicyOptions(INegotiationProviderCallback)}.
-	 * 
-	 * @param sessionId ID of this session
-	 * @param sops All available options for policy, embedded in a single XML document.
-	 */
-	//public void onGetPolicyOptions(int sessionId, String sops);
+	private static Logger LOG = LoggerFactory.getLogger(ProviderCallback.class);
+
+	private NegotiationRequester requester;
+	private MethodType method;
 	
-	/**
-	 * Async return for
-	 * {@link INegotiationProvider#acceptPolicyAndGetSla }.
-	 * 
-	 * @param sessionId ID of this session
-	 * @param policy XML-based final policy signed by both parties.
-	 */
-	//public void onAcceptPolicyAndGetSla(int sessionId, String policy);
+	public ProviderCallback(NegotiationRequester requester, MethodType method) {
+		this.requester = requester;
+		this.method = method;
+		LOG.debug("ProviderCallback({})", method);
+	}
 	
-	/**
-	 * Receive result of asynchronous method that has been invoked on {@link INegotiationProvider}
-	 * 
-	 * @param result Asynchronous return value
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback
+	 * #receiveExamplesResult(java.lang.Object)
 	 */
-	public void receiveResult(SlaBean result);
+	@Override
+	public void receiveResult(SlaBean returnValue) {
+		LOG.debug("receiveResult({})", returnValue);
+		
+		switch(method) {
+		case GET_POLICY_OPTIONS:
+			break;
+		case ACCEPT_POLICY_AND_GET_SLA:
+			break;
+		case REJECT:
+			break;
+		}
+	}
 }

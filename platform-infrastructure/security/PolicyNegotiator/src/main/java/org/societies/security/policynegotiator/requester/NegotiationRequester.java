@@ -26,13 +26,13 @@ package org.societies.security.policynegotiator.requester;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
+import org.societies.api.internal.schema.security.policynegotiator.MethodType;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.security.policynegotiator.INegotiationRequester;
 import org.societies.api.security.digsig.ISignatureMgr;
 
 //@Component
-public class NegotiationRequester implements INegotiationRequester, INegotiationProviderCallback {
+public class NegotiationRequester implements INegotiationRequester {
 
 	private static Logger LOG = LoggerFactory.getLogger(NegotiationRequester.class);
 	
@@ -56,8 +56,7 @@ public class NegotiationRequester implements INegotiationRequester, INegotiation
 
 		LOG.debug("init(): group manager = {}", groupMgr.toString());
 		
-		//groupMgr.reject(0, null);
-		groupMgr.getPolicyOptions("123", null);
+		groupMgr.getPolicyOptions("service123", new ProviderCallback(this, MethodType.GET_POLICY_OPTIONS));
 	}
 
 	// Getters and setters for beans
@@ -99,13 +98,4 @@ public class NegotiationRequester implements INegotiationRequester, INegotiation
 	public void acceptModifiedPolicy(int sessionId, Object agreement) {
 		// TODO Auto-generated method stub
 	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback
-	 * #receiveExamplesResult(java.lang.Object)
-	 */
-	@Override
-	public void receiveResult(Object returnValue) {
-	}
-
 }
