@@ -93,12 +93,8 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 	@Override
 	@Async
 	public void Add(int valA, int valB, IExamplesCallback calcCallback) {
-		IIdentity toIdentity = null;
-		try {
-			toIdentity = idMgr.fromJid("XCManager.societies.local");
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
-		}
+		//GET CURRENT NODE IDENTITY
+		IIdentity toIdentity = idMgr.getThisNetworkNode();
 		Stanza stanza = new Stanza(toIdentity);
 
 		//SETUP CALC CLIENT RETURN STUFF
@@ -120,12 +116,8 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 
 	@Override
 	public void Subtract(int valA, int valB, IExamplesCallback calcCallback) {
-		IIdentity toIdentity = null;
-		try {
-			toIdentity = idMgr.fromJid("XCManager.societies.local");
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
-		}
+		//GET CURRENT NODE IDENTITY
+		IIdentity toIdentity = idMgr.getThisNetworkNode();
 		Stanza stanza = new Stanza(toIdentity);
 
 		//SETUP CALC CLIENT RETURN STUFF
@@ -139,6 +131,26 @@ public class CommsClient implements ICalcRemote, ICommCallback{
 		try {
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
 			commManager.sendIQGet(stanza, calc, callback);
+		} catch (CommunicationException e) {
+			LOG.warn(e.getMessage());
+		};
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.example.calculator.ICalcRemote#LogMessage(java.lang.String) */
+	@Override
+	public void LogMessage(String message) {
+		//GET CURRENT NODE IDENTITY
+		IIdentity toIdentity = idMgr.getThisNetworkNode();
+		Stanza stanza = new Stanza(toIdentity);
+		
+		//CREATE MESSAGE BEAN
+		CalcBean calc = new CalcBean();
+		calc.setMessage(toIdentity.getJid() + " - message sent"); 
+		calc.setMethod(MethodType.LOG_MESSAGE);
+		try {
+			//SEND MESSAGE - NO RESPONSE EXPECTED
+			commManager.sendMessage(stanza, calc);
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
 		};

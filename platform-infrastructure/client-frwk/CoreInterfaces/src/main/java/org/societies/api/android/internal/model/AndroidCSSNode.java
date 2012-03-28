@@ -39,7 +39,6 @@ import android.os.Parcelable;
  *
  */
 public class AndroidCSSNode extends CssNode implements Parcelable {
-	
 	/**
 	 * Default Constructor
 	 */
@@ -47,7 +46,28 @@ public class AndroidCSSNode extends CssNode implements Parcelable {
 		super();
 	}
 
-
+	public void setIdentity (String identity) {
+		this.identity = identity;
+	}
+	
+	public String getIdentity() {
+		return this.identity;
+	}
+	
+	public void setStatus (int status) {
+		this.status = status;
+	}
+	public int getStatus() {
+		return this.status;
+	}
+	
+	public void setType(int type) {
+		this.type = type;
+	}
+	
+	public int getType() {
+		return this.type;
+	}
 	
 	/**
 	 * Parcelable implementation

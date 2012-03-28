@@ -30,6 +30,6 @@ public interface IInternalUserActionMonitor {
 	/**
 	 * This method allows platform components to register for events that occur when actions are received
 	 */
-	public void registerForActionUpdates();
+	public void registerForActionUpdates(IUserActionListener listener);
 
 }

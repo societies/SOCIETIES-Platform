@@ -59,7 +59,11 @@ public class CommsServerUnitTest {
 		negotiationProviderMock = mock(INegotiationProvider.class);
 		negotiationRequesterMock = mock(INegotiationRequester.class);
 		
-		classUnderTest = new CommsServer(commMgrMock, negotiationRequesterMock, negotiationProviderMock);
+		//classUnderTest = new CommsServer(commMgrMock, negotiationRequesterMock, negotiationProviderMock);
+		classUnderTest = new CommsServer();
+		classUnderTest.setCommMgr(commMgrMock);
+		classUnderTest.setNegotiationProvider(negotiationProviderMock);
+		classUnderTest.setNegotiationRequester(negotiationRequesterMock);
 		classUnderTest.init();
 	}
 
@@ -76,7 +80,7 @@ public class CommsServerUnitTest {
 	@Test
 	public void testGetJavaPackages() {
 		
-		String PACKAGE = "org.societies.api.schema.security.policynegotiator";
+		String PACKAGE = "org.societies.api.internal.schema.security.policynegotiator";
 		List<String> result;
 		
 		result = classUnderTest.getJavaPackages();
@@ -99,7 +103,7 @@ public class CommsServerUnitTest {
 	@Test
 	public void testGetXMLNamespaces() {
 		
-		String NAMESPACE = "http://societies.org/api/schema/security/policynegotiator";
+		String NAMESPACE = "http://societies.org/api/internal/schema/security/policynegotiator";
 		List<String> result;
 		
 		result = classUnderTest.getXMLNamespaces();

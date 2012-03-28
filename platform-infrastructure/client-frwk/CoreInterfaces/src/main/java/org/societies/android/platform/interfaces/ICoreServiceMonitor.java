@@ -28,6 +28,11 @@ package org.societies.android.platform.interfaces;
 
 import java.util.List;
 
+import org.societies.api.android.internal.model.AndroidParcelable;
+
+import android.app.ActivityManager;
+
+
 public interface ICoreServiceMonitor {
 	String methodsArray [] = {"activeTasks(String client)", 
 								"activeTasks(String client, String taskFilter)",
@@ -36,7 +41,8 @@ public interface ICoreServiceMonitor {
 								"startService(String client, String service)",
 								"startActivity(String client, String activity)",
 								"stopService(String client, String service)",
-								"stopActivity(String client, String activity)"};
+								"stopActivity(String client, String activity)",
+								"getNodeDetails(String client, org.societies.api.android.internal.model.AndroidParcelable node)"};
 
 	/**
 	 * Generate a list of tasks currently "running" on the Android device
@@ -45,7 +51,7 @@ public interface ICoreServiceMonitor {
 	 * 
 	 * @return List (ActivityManager.RunningTaskInfo)
 	 */
-	List<?> activeTasks(String client);
+	List<ActivityManager.RunningTaskInfo> activeTasks(String client);
 	/**
 	 * Generate a list of tasks currently "running" on the Android device
 	 * which are filtered by their Component name
@@ -55,14 +61,14 @@ public interface ICoreServiceMonitor {
 	 * @param taskFilter filters running tasks according to filter value
 	 * @return List (ActivityManager.RunningTaskInfo)
 	 */
-	List<?> activeTasks(String client, String taskFilter);
+	List<ActivityManager.RunningTaskInfo> activeTasks(String client, String taskFilter);
 	/**
 	 * Generate a list of services currently "running" on the Android device
 	 * 
 	 * @param client package name of service caller 
 	 * @return List (ActivityManager.RunningServiceInfo)
 	 */
-	List<?> activeServices(String client);
+	List<ActivityManager.RunningServiceInfo> activeServices(String client);
 	/**
 	 * Generate a list of services currently "running" on the Android device
 	 * which are filtered by their Component name
@@ -73,9 +79,19 @@ public interface ICoreServiceMonitor {
 	 * @return List (ActivityManager.RunningServiceInfo)
 	 */
 
-	List<?> activeServices(String client, String serviceFilter);
+	List<ActivityManager.RunningServiceInfo> activeServices(String client, String serviceFilter);
+	
 	boolean startService(String client, String service);
 	boolean startActivity(String client, String activity);
 	boolean stopService(String client, String service);
 	boolean stopActivity(String client, String activity);
+
+	/**
+	 * Parcelable example method
+	 * Non primitive and String parameters must be fully qualified
+	 * @param client
+	 * @param node 
+	 * @return AndroidParcelable
+	 */
+	AndroidParcelable getNodeDetails(String client, org.societies.api.android.internal.model.AndroidParcelable node);
 }

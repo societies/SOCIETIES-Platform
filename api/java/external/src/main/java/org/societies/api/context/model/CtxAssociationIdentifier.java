@@ -24,10 +24,6 @@
  */
 package org.societies.api.context.model;
 
-import org.societies.api.identity.IIdentity;
-
-
-
 /**
  * This class is used to identify context associations. It provides methods that
  * return information about the identified association including:
@@ -55,7 +51,7 @@ import org.societies.api.identity.IIdentity;
 public class CtxAssociationIdentifier extends CtxIdentifier {
 
 	private static final long serialVersionUID = -7991875953413583564L;
-
+	
 	/**
 	 * Creates a context association identifier by specifying the CSS/CIS ID
 	 * where the identified context model object is stored, as well as,
@@ -69,18 +65,95 @@ public class CtxAssociationIdentifier extends CtxIdentifier {
 	 * @param objectNumber
 	 *            the unique numeric model object identifier
 	 */
-	public CtxAssociationIdentifier(IIdentity operatorId, String type,
+	public CtxAssociationIdentifier(String operatorId, String type,
 			Long objectNumber) {
-		super(operatorId, type, objectNumber);
+		
+		super(operatorId, CtxModelType.ASSOCIATION, type, objectNumber);
+	}
+	
+	CtxAssociationIdentifier(String str) throws MalformedCtxIdentifierException {
+		
+		super(str);
 	}
 
 	/**
-	 * Returns the type of the identified context model object, i.e. CtxModelType.ASSOCIATION
-	 *   
-	 *  @return CtxModelType#ASSOCIATION
+	 * Formats the string representation of a context association identifier as follows:
+	 * <pre> 
+	 * operatorId/ASSOCIATION/type/objectNumber
+	 * </pre>
+	 * 
+	 * @see CtxIdentifier#defineString()
 	 */
 	@Override
-	public CtxModelType getModelType() {
-		return CtxModelType.ASSOCIATION;
+	protected void defineString() {
+
+		if (super.string != null) 
+			return;
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append(super.operatorId);
+		sb.append("/");
+		sb.append(CtxModelType.ASSOCIATION);
+		sb.append("/");
+		sb.append(super.type);
+		sb.append("/");
+		sb.append(super.objectNumber);
+
+		super.string = sb.toString();
+	}
+
+	/**
+	 * Parses the string form of a context association identifier as follows:
+	 * <pre> 
+	 * operatorId/ASSOCIATION/type/objectNumber
+	 * </pre>
+	 * 
+	 * @see CtxIdentifier#parseString(java.lang.String)
+	 */
+	@Override
+	protected void parseString(String input)
+			throws MalformedCtxIdentifierException {
+		
+		super.string = input;
+
+		final int length = input.length();
+
+		final int objectNumberDelim = input.lastIndexOf("/");
+		if (objectNumberDelim == -1)
+			throw new MalformedCtxIdentifierException("'" + input + "'");
+		final String objectNumberStr = input.substring(objectNumberDelim+1, length);
+		try { 
+			super.objectNumber = new Long(objectNumberStr);
+		} catch (NumberFormatException nfe) {
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Invalid context association object number", nfe);
+		}
+
+		final int typeDelim = input.lastIndexOf("/", objectNumberDelim-1);
+		super.type = input.substring(typeDelim+1, objectNumberDelim);
+		if (super.type.isEmpty())
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Context association type cannot be empty");
+
+		final int modelTypeDelim = input.lastIndexOf("/", typeDelim-1);
+		if (modelTypeDelim == -1)
+			throw new MalformedCtxIdentifierException("'" + input + "'");
+		final String modelTypeStr = input.substring(modelTypeDelim+1, typeDelim);
+		try {
+			super.modelType = CtxModelType.valueOf(modelTypeStr);
+		} catch (IllegalArgumentException iae) {
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Malformed context model type", iae);
+		}
+		if (!CtxModelType.ASSOCIATION.equals(super.modelType))
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Expected 'ASSOCIATION' but found '"
+					+ super.modelType + "'");
+
+		operatorId = input.substring(0, modelTypeDelim);
+		if (operatorId.isEmpty())
+			throw new MalformedCtxIdentifierException("'" + input 
+					+ "': Operator ID cannot be empty");
 	}
 }

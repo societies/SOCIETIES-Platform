@@ -84,7 +84,9 @@
               				org.slf4j.*,
               				org.osgi.service.event,
               				org.societies.api.css.devicemgmt,
-              				org.springframework.context
+              				org.osgi.framework,
+              				org.osgi.util.tracker,
+              				org.springframework.osgi.context,
               			</Import-Package>
               			<!-- <DynamicImport-Package>
               				org.societies.css.devicemgmt.devicemanager

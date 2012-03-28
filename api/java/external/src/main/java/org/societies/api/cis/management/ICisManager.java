@@ -49,7 +49,7 @@ public interface ICisManager {
 	 * @return link to the {@link ICisEditor} representing the new CIS, or 
 	 * null if the CIS was not created.
 	 */
-	ICisEditor createCis(String cssId, String cssPassword, String cisName, String cisType, int mode);
+	ICisOwned createCis(String cssId, String cssPassword, String cisName, String cisType, int mode);
 	/**
 	 * Delete a specific CIS represented by cisId. The cisId is available in the
 	 * method of {@link ICisEditor} representing the CIS to be deleted. This method
@@ -67,7 +67,7 @@ public interface ICisManager {
 	 * 
 	 * TODO: Check the return value. Should be something more meaningful.
 	 * 
-	 * @param cisId The ID of the CIS to get.
+	 * @param cisId The ID (jabber ID) of the CIS to get.
 	 * @return the CISRecord with the ID cisID, or null if no such CIS exists.
 	 */
 	ICisRecord getCis(String cssId, String cisId);

@@ -27,15 +27,12 @@ package org.societies.security.commsmgr;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
-import java.util.List;
 import java.util.Random;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
-import org.societies.api.internal.security.policynegotiator.INegotiationRequester;
 
 /**
  * 
@@ -47,8 +44,6 @@ public class CommsClientUnitTest {
 
 	private CommsClient classUnderTest;
 	private ICommManager commMgrMock;
-	private INegotiationProvider negotiationProviderMock;
-	private INegotiationRequester negotiationRequesterMock;
 
 	/**
 	 * @throws java.lang.Exception
@@ -58,10 +53,9 @@ public class CommsClientUnitTest {
 
 		commMgrMock = mock(ICommManager.class);
 		//assertNotNull(commMgrMock.getIdManager());
-		negotiationProviderMock = mock(INegotiationProvider.class);
-		negotiationRequesterMock = mock(INegotiationRequester.class);
 		
-		classUnderTest = new CommsClient(commMgrMock);
+		classUnderTest = new CommsClient();
+		classUnderTest.setCommMgr(commMgrMock);
 		classUnderTest.init();
 	}
 
@@ -70,81 +64,6 @@ public class CommsClientUnitTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
-	}
-
-	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsClient#getJavaPackages()}.
-	 */
-	@Test
-	public void testGetJavaPackages() {
-
-		String PACKAGE = "org.societies.api.schema.security.policynegotiator";
-		List<String> result;
-		
-		result = classUnderTest.getJavaPackages();
-		assertNotNull(result);
-		assertEquals(1, result.size());
-		assertTrue(result.contains(PACKAGE));
-	}
-
-	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsClient#getXMLNamespaces()}.
-	 */
-	@Test
-	public void testGetXMLNamespaces() {
-		
-		String NAMESPACE = "http://societies.org/api/schema/security/policynegotiator";
-		List<String> result;
-		
-		result = classUnderTest.getXMLNamespaces();
-		assertNotNull(result);
-		assertEquals(1, result.size());
-		assertTrue(result.contains(NAMESPACE));
-	}
-
-	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsClient#
-	 * receiveError(org.societies.api.comm.xmpp.datatypes.Stanza, org.societies.api.comm.xmpp.exceptions.XMPPError)}.
-	 */
-	@Test
-	public void testReceiveError() {
-		//classUnderTest.receiveError(arg0, arg1);
-	}
-
-	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsClient#
-	 * receiveInfo(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.String, org.societies.api.comm.xmpp.datatypes.XMPPInfo)}.
-	 */
-	@Test
-	public void testReceiveInfo() {
-		//classUnderTest.receiveInfo(arg0, arg1, arg2);
-	}
-
-	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsClient#
-	 * receiveMessage(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)}.
-	 */
-	@Test
-	public void testReceiveMessage() {
-		//classUnderTest.receiveMessage(arg0, arg1);
-	}
-
-	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsClient#
-	 * receiveResult(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)}.
-	 */
-	@Test
-	public void testReceiveResult() {
-		//classUnderTest.receiveResult(arg0, arg1);
-	}
-
-	/**
-	 * Test method for {@link org.societies.security.commsmgr.CommsClient#
-	 * receiveItems(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.String, java.util.List)}.
-	 */
-	@Test
-	public void testReceiveItems() {
-		//classUnderTest.receiveItems(arg0, arg1, arg2);
 	}
 
 	/**

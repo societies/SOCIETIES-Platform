@@ -8,6 +8,10 @@ public class SignatureMgr implements ISignatureMgr {
 
 	private static Logger LOG = LoggerFactory.getLogger(SignatureMgr.class);
 
+	public SignatureMgr() {
+		LOG.info("SignatureMgr()");
+	}
+	
 	@Override
 	public String signXml(String xml, String xmlNodeId, String identity) {
 		
@@ -35,12 +39,12 @@ public class SignatureMgr implements ISignatureMgr {
 		}
 		*/
 		
-		return "";  // FIXME
+		return xml;  // FIXME
 	}
 
 	@Override
 	public boolean verify(String xml) {
 		LOG.debug("verify({})", xml);
-		return false;  // FIXME
+		return true;  // FIXME
 	}
 }

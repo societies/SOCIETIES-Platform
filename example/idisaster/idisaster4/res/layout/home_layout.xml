@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+ 
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/tabhost"
+    android:layout_width="fill_parent"   android:layout_height="fill_parent">
+     
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent" android:layout_height="fill_parent"
+		android:background="@color/white"
+		android:padding="5dp">
+		
+		<TextView android:id="@+id/disasterLabel" android:layout_width="fill_parent"
+     	android:text="@string/homeHeading" 
+     	android:textSize="20dip" android:textStyle="bold"
+     	android:textColor="@color/white" android:background="@color/orange"
+		android:layout_height="wrap_content" 
+		android:paddingLeft="5dip"
+		android:paddingTop="2dip" android:paddingBottom="2dip" />
+        
+        <TabWidget
+            android:id="@android:id/tabs"
+            android:layout_width="fill_parent" android:layout_height="wrap_content" 
+            android:background="@color/orange"
+         />
+
+        <FrameLayout
+            android:id="@android:id/tabcontent"
+            android:layout_width="fill_parent" android:layout_height="438dp"
+            android:padding="5dp" 
+			android:background="@color/white"					
+        />
+
+    </LinearLayout>
+</TabHost>
+
+
+<!-- old version working
+<?xml version="1.0" encoding="utf-8"?>
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/tabhost"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:padding="5dp">
+        <TabWidget
+            android:id="@android:id/tabs"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+
+        <FrameLayout
+            android:id="@android:id/tabcontent"
+            android:layout_width="fill_parent"
+            android:layout_height="438dp"
+            android:padding="5dp" />
+
+    </LinearLayout>
+</TabHost>
+
+-->

@@ -73,6 +73,9 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 
 	private final IIdentity privateId;
 	
+	// TODO Remove and instantiate privateId properly so that privateId.toString() can be used instead
+	private final String privateIdtoString = "myFooIIdentity";
+	
 	public UserCtxDBMgr() {
 		this.modelObjects =  new HashMap<CtxIdentifier, CtxModelObject>();
 		
@@ -135,7 +138,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	@Override
 	public CtxEntity createEntity(String type) throws CtxException {
 
-		final CtxEntityIdentifier identifier = new CtxEntityIdentifier(this.privateId, 
+		final CtxEntityIdentifier identifier = new CtxEntityIdentifier(this.privateIdtoString, 
 				type, CtxModelObjectNumberGenerator.getNextValue());
 		final CtxEntity entity = new  CtxEntity(identifier);
 		this.modelObjects.put(entity.getId(), entity);		
@@ -160,7 +163,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	@Override
 	public IndividualCtxEntity createIndividualCtxEntity(String type) throws CtxException {
 
-		CtxEntityIdentifier identifier = new CtxEntityIdentifier(this.privateId,
+		CtxEntityIdentifier identifier = new CtxEntityIdentifier(this.privateIdtoString,
 				type, CtxModelObjectNumberGenerator.getNextValue());
 		IndividualCtxEntity entity = new IndividualCtxEntity(identifier);
 		this.modelObjects.put(entity.getId(), entity);

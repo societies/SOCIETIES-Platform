@@ -12,9 +12,22 @@
 
 	<groupId>org.societies.android.platform</groupId>
 	<artifactId>devicestatus</artifactId>
-	<name>DeviceStatusGui</name>
+	<name>Device Status GUI</name>
 	<version>${release.version}</version>
 	<packaging>apk</packaging>
+	
+	<developers>
+		<developer>
+			<name>Olivier Maridat</name>
+			<email>olivier.maridat@trialog.com</email>
+			<organization>Trialog</organization>
+			<timezone>+1</timezone>
+			<roles>
+				<role>Owner</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+	</developers>
 
 
 	<dependencies>
@@ -30,7 +43,23 @@
 			<version>${release.version}</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.phonegap</groupId>
+			<artifactId>phonegap</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>1.7.1</version>
+		</dependency>
 	</dependencies>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>jsdoctk2</id>
+			<url>http://jsdoctk-plugin.googlecode.com/svn/repo</url>
+		</pluginRepository>
+	</pluginRepositories>
 
 	<build>
 		<finalName>${project.artifactId}</finalName>
@@ -39,19 +68,29 @@
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
-				<!-- <extensions>true</extensions>
+				<!-- <extensions>true</extensions> <configuration> emma start <emma> 
+					<enable>true</enable> <classFolders>${project.build.outputDirectory}</classFolders> 
+					<outputMetaFile>${project.build.directory}/emma/coverage.em</outputMetaFile> 
+					</emma> emma stop <dex> <noLocals>true</noLocals> must be set for emma </dex> 
+					</configuration> -->
+			</plugin>
+			<plugin>
+				<groupId>nl.windgazer</groupId>
+				<artifactId>jsdoctk-plugin</artifactId>
+				<version>2.3.2</version>
+				<executions>
+					<execution>
+						<phase>site</phase>
+						<goals>
+							<goal>jsdoc</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
-					emma start
-					<emma>
-						<enable>true</enable>
-						<classFolders>${project.build.outputDirectory}</classFolders>
-						<outputMetaFile>${project.build.directory}/emma/coverage.em</outputMetaFile>
-					</emma>
-					emma stop
-					<dex>
-						<noLocals>true</noLocals> must be set for emma
-					</dex>
-				</configuration> -->
+					<directory>${project.build.directory}/doc</directory>
+					<srcDir>${basedir}/assets/www/js/plugin</srcDir>
+					<recurse>5</recurse>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

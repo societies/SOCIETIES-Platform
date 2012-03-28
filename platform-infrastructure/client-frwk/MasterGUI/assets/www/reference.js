@@ -28,42 +28,54 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 function onDeviceReady() {
 	console.log("PhoneGap Loaded, Device Ready");
 	
-	/**
-	 * Register any PhoneGap plugins here. Example shown for illustration
+	//Register any PhoneGap plugins here. Example shown for illustration
 	 
 	PhoneGap.addConstructor(function() {
 		//Register the javascript plugin with PhoneGap
-		console.log("Register Connection Listener plugin ");
-		PhoneGap.addPlugin('ConnectionListener', new ConnectionListener());
+		console.log("Register CoreServiceMonitorService plugin ");
+		PhoneGap.addPlugin('CoreServiceMonitorService', new CoreServiceMonitorService());
 	 
 	});
-	*/
 }
 
 /**
  * Example of a PhoneGap plugin  being created and configured 
  * @return Instance of ConnectionListener
- 
-var ConnectionListener = function() { 
+ */
+var CoreServiceMonitorService = function() { 
 }
-*/
 
 /**
- * @param directory The directory for which we want the listing
- * @param successCallback The callback which will be called when directory listing is successful
- * @param failureCallback The callback which will be called when directory listing encouters an error
- 
-ConnectionListener.prototype.createListener = function(successCallback, failureCallback) {
- 
-	console.log("Create Connection Listener");
+ * @param successCallback The callback which will be called when Java method is successful
+ * @param failureCallback The callback which will be called when Java method has an error
+*/
+CoreServiceMonitorService.prototype.activeServices = function(successCallback, failureCallback) {
+	var clientPackage = "org.societies.android.platform.gui";
+
+	console.log("Call CoreServiceMonitorService - activeServices");
 
 	return PhoneGap.exec(successCallback,    //Callback which will be called when plugin action is successful
 	failureCallback,     //Callback which will be called when plugin action encounters an error
-	'ConnectionPlugin',  //Telling PhoneGap that we want to run specified plugin
-	'createListener',              //Telling the plugin, which action we want to perform
+	'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
+	'activeServices',              //Telling the plugin, which action we want to perform
 	[]);        //Passing a list of arguments to the plugin
 };
+
+/**
+ * @param successCallback The callback which will be called when Java method is successful
+ * @param failureCallback The callback which will be called when Java method has an error
 */
+CoreServiceMonitorService.prototype.activeTasks = function(successCallback, failureCallback) {
+	var clientPackage = "org.societies.android.platform.gui";
+
+	console.log("Call CoreServiceMonitorService - activeTasks");
+
+	return PhoneGap.exec(successCallback,    //Callback which will be called when plugin action is successful
+	failureCallback,     //Callback which will be called when plugin action encounters an error
+	'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
+	'activeTasks',              //Telling the plugin, which action we want to perform
+	[]);        //Passing a list of arguments to the plugin
+};
 
 var deviceInfo = function() {
 	console.log("Get device information");
@@ -96,7 +108,69 @@ var resetDeviceMgr = function(){
     
 }
 
+var refreshActiveServices = function() {
+	console.log("Refresh Active Service");
 
+	function success(data) {
+		//empty table
+		jQuery('#activeServicesTable tbody').remove();
+		
+		for (i  = 0; i < data.length; i++) {
+			var tableEntry = "<tr>" + 
+			"<td>" + data[i].className + "</td>" + 
+			"<td>" + convertMilliseconds(data[i].activeSince) + "</td>" + 
+				+ "</tr>"
+
+			jQuery('#activeServicesTable tr:last').after(tableEntry);
+			
+		}
+		
+	}
+	
+	function failure(data) {
+		alert(data);
+	}
+    window.plugins.CoreServiceMonitorService.activeServices(success, failure);
+	
+};
+var refreshActiveTasks = function() {
+	console.log("Refresh Active Tasks");
+
+	function success(data) {
+		//empty table
+		jQuery('#activeTasksTable tbody').remove();
+		
+		for (i  = 0; i < data.length; i++) {
+			var tableEntry = "<tr>" + 
+			"<td>" + data[i].className + "</td>" + 
+			"<td>" + data[i].numRunningActivities + "</td>" + 
+				+ "</tr>"
+
+			jQuery('#activeTasksTable tr:last').after(tableEntry);
+			
+		}
+		
+	}
+	
+	function failure(data) {
+		alert(data);
+	}
+    window.plugins.CoreServiceMonitorService.activeTasks(success, failure);
+	
+};
+
+//Convert an elapsed time in milliseconds
+var convertMilliseconds = function(milliseconds) {
+	value = milliseconds / 1000
+	seconds = value % 60
+	value /= 60
+	minutes = value % 60
+	value /= 60
+	hours = value % 24
+	value /= 24
+	days = value	
+	return "d: " + days + " h: " + hours + " m:" + minutes;
+}
 /**
  * Add Javascript functions to various HTML tags using JQuery
  */
@@ -118,7 +192,13 @@ jQuery(function() {
 		resetDeviceMgr();
 	});
 
-	
+	$('#refreshServices').click(function() {
+		refreshActiveServices();
+	});
+
+	$('#refreshTasks').click(function() {
+		refreshActiveTasks();
+	});
 
 });
 

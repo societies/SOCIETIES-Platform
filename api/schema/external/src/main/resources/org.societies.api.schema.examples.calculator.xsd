@@ -9,6 +9,7 @@
 	    <xs:sequence>
 	      <xs:element name="a" type="xs:int"/>
 	      <xs:element name="b" type="xs:int"/>
+	      <xs:element name="message" type="xs:string"/>
 	      <xs:element name="method" type="tns:methodType" minOccurs="0"/>
 	    </xs:sequence>
 	  </xs:complexType>
@@ -27,7 +28,7 @@
 	  <xs:restriction base="xs:string">
 	    <xs:enumeration value="Add"/>
 	    <xs:enumeration value="Subtract"/>
-	    <xs:enumeration value="AddAsync"/>
+	    <xs:enumeration value="LogMessage"/>
 	  </xs:restriction>
 	</xs:simpleType>
 </xs:schema>

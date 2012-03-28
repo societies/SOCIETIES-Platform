@@ -16,6 +16,7 @@
 	<table>
 		<tr>
 			<td><a href="servicediscovery.html">Service Discovery Service</a></td>
+			<td><a href="servicecontrol.html">Service Control Service</a></td>
 		</tr>
 	</table>
 	

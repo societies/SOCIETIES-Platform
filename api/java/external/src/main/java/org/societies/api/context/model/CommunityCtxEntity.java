@@ -50,8 +50,9 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	
 	/** The context bond of this CIS. */
 	private Set<CtxBond> bonds = new HashSet<CtxBond>();
-
+	
 	public CommunityCtxEntity(CtxEntityIdentifier id) {
+		
 		super(id);
 	}
 
@@ -61,6 +62,7 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 * @return a set containing the members of this CIS.
 	 */
 	public Set<CommunityMemberCtxEntity> getMembers() {
+		
 		return new HashSet<CommunityMemberCtxEntity>(this.members);
 	}
 	
@@ -72,6 +74,7 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 * @throws NullPointerException if the specified member is <code>null</code>
 	 */
 	public void addMember(CommunityMemberCtxEntity member) {
+		
 		if (member == null)
 			throw new NullPointerException("member can't be null");
 		
@@ -86,6 +89,7 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 * @throws NullPointerException if the specified member is <code>null</code>
 	 */
 	public void removeMember(CommunityMemberCtxEntity member) {
+		
 		if (member == null)
 			throw new NullPointerException("member can't be null");
 		
@@ -98,6 +102,7 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 * @return a set containing the context bonds of this CIS.
 	 */
 	public Set<CtxBond> getBonds() {
+		
 		return new HashSet<CtxBond>(this.bonds);
 	}
 	
@@ -109,6 +114,7 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 * @throws NullPointerException if the specified context bond is <code>null</code>
 	 */
 	public void addBond(CtxBond bond) {
+		
 		if (bond == null)
 			throw new NullPointerException("bond can't be null");
 		
@@ -123,6 +129,7 @@ public class CommunityCtxEntity extends CommunityMemberCtxEntity {
 	 * @throws NullPointerException if the specified context bond is <code>null</code>
 	 */
 	public void removeBond(CtxBond bond) {
+		
 		if (bond == null)
 			throw new NullPointerException("bond can't be null");
 		

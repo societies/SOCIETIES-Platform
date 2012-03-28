@@ -1,6 +1,10 @@
 package org.societies.service.provider.impl;
 
+import java.util.concurrent.Future;
+
 import org.societies.service.api.*;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 public class MathService implements IMathService {
 
@@ -23,8 +27,9 @@ public class MathService implements IMathService {
 		return a-b;
 	}
 
-	public int multiply(int a, int b) {
-		return a*b;
+	@Async
+	public Future<Integer> multiply(int a, int b) {
+		return new AsyncResult<Integer>(a*b);
 	}
 
 	public boolean divise(int a, int b, IMathServiceCallBack callback) {

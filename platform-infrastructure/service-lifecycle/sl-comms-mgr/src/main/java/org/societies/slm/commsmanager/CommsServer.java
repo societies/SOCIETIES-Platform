@@ -34,7 +34,6 @@ package org.societies.slm.commsmanager;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
@@ -46,24 +45,30 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryMsgBean;
 import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryResultBean;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlMsgBean;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResultBean;
 import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
-import org.societies.api.internal.servicelifecycle.serviceMgmt.IServiceManagement;
 
 
 public class CommsServer implements IFeatureServer {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-							  Arrays.asList("http://societies.org/api/schema/servicelifecycle/model",
-									  		"http://societies.org/api/schema/servicelifecycle/servicediscovery"));
+			  Arrays.asList("http://societies.org/api/schema/servicelifecycle/model",
+				  		"http://societies.org/api/schema/servicelifecycle/servicediscovery",
+				  		"http://societies.org/api/schema/servicelifecycle/servicecontrol"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
-							  Arrays.asList("org.societies.api.schema.servicelifecycle.model",
-											"org.societies.api.schema.servicelifecycle.servicediscovery"));
+			  Arrays.asList("org.societies.api.schema.servicelifecycle.model",
+						"org.societies.api.schema.servicelifecycle.servicediscovery",
+						"org.societies.api.schema.servicelifecycle.servicecontrol"));
 	
 	//PRIVATE VARIABLES
 	private ICommManager commManager;
 	private IServiceDiscovery serviceDiscovery;
+	private IServiceControl serviceControl;
 	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
 
 	
@@ -85,6 +90,14 @@ public class CommsServer implements IFeatureServer {
 		
 	}
 	
+	public IServiceControl getServiceControl(){
+		return serviceControl;
+	}
+	
+	public void setServiceControl(IServiceControl serviceControl){
+		this.serviceControl = serviceControl;
+	}
+	
 	
 	//METHODS
 	public CommsServer() {
@@ -99,15 +112,12 @@ public class CommsServer implements IFeatureServer {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.interfaces.FeatureServer#getJavaPackages() */
+
 	@Override
 	public List<String> getJavaPackages() {
 		return PACKAGES;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.societies.comm.xmpp.interfaces.FeatureServer#getXMLNamespaces() */
 	@Override
 	public List<String> getXMLNamespaces() {
 		return NAMESPACES;
@@ -118,75 +128,23 @@ public class CommsServer implements IFeatureServer {
 	/* Put your functionality here if there is NO return object, ie, VOID  */
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
-		//CHECK WHICH END BUNDLE TO BE CALLED THAT I MANAGE
-		// --------- Service Management BUNDLE ---------
-		
-		/* Not current;y used
-		if (payload.getClass().equals(ServiceMgmtMsgBean.class)) {
-			ServiceMgmtMsgBean serviceMessage = (ServiceMgmtMsgBean) payload;
-			
-			switch (serviceMessage.getMethod()) {
-			case CLEAN_SERVICE_REGISTRY:
-				serviceManagement.cleanServiceRegistry();
-				break;
-				
-			case START_SERVICE: //startService(ServiceResourceIdentifier serviceId)
-				org.societies.slm.servicemanagement.schema.ServiceResourceIdentifier serviceId = serviceMessage.getServiceID();
-				serviceManagement.startService(serviceId);
-				break;
-				
-			case STOP_SERVICE : //startService(ServiceResourceIdentifier serviceId)
-				org.societies.slm.servicemanagement.schema.ServiceResourceIdentifier serviceId = serviceMessage.getServiceID();
-				serviceManagement.stopService(serviceId);
-				break;
-				
-			default :
-			*/
-			//	throw new Exception("No such method found");
-			
-		/*}
-		*/
 		
 	}
 
 	/* Put your functionality here if there IS a return object */
 	@Override
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
-		//CHECK WHICH END BUNDLE TO BE CALLED THAT I MANAGE
+
+		if(LOG.isDebugEnabled()) LOG.debug("getQuery: Received a message!");
 		
-		// --------- Service Management BUNDLE ---------
-		/*
-		if (payload.getClass().equals(ServiceMgmtMsgBean.class)) {
-			
-			ServiceMgmtMsgBean serviceMessage = (ServiceMgmtMsgBean) payload;
-			ServiceMgmtResultBean serviceResult;
-			
-			switch (serviceMessage.getMethod()) {
-				case IS_SERVICE_REGISTRY_ACTIVE :
-					boolean IsServiceRegistryActive = serviceManagement.IsServiceRegistryActive();
-					serviceResult.setServiceRegistryActiveResult(IsServiceRegistryActive);
-					break;
-					
-				case GET_SERVICE_STATUS :
-					org.societies.slm.servicemanagement.schema.ServiceResourceIdentifier serviceId = serviceMessage.getServiceID();
-					org.societies.slm.servicemanagement.schema.ServiceStatus status = serviceManagement.getServiceStatus(serviceId);
-					serviceResult.setServiceStatusResult(status);
-					break;
-					
-				case FIND_ALL_SERVICES :
-					Collection<org.societies.slm.servicemanagement.schema.Service> serviceCollection = serviceResult.getFindAllServicesResult();
-					serviceCollection = serviceManagement.findAllServices();
-					break;
-			
-			}
-			*/
 		if (payload.getClass().equals(ServiceDiscoveryMsgBean.class)) {
+			
+			if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Discovery");
 			
 			ServiceDiscoveryMsgBean serviceMessage = (ServiceDiscoveryMsgBean) payload;
 			ServiceDiscoveryResultBean serviceResult = new ServiceDiscoveryResultBean(); 
 			
-			
-			
+				
 			Future<List<Service>> returnList = null;
 			List<Service> resultBeanList = serviceResult.getServices();
 			List<Service> resultList = null;
@@ -235,8 +193,88 @@ public class CommsServer implements IFeatureServer {
 			
 		}
 		
-		//throw new Exception("No such bean found");
-		//TODO: Better error handling, ie, if there is no match on the received Message Bean
+		
+		// Is it Service Control?
+		
+		if (payload.getClass().equals(ServiceControlMsgBean.class)) {
+			
+			if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Control");
+
+			
+			ServiceControlMsgBean serviceMessage = (ServiceControlMsgBean) payload;
+			ServiceControlResultBean serviceResult = new ServiceControlResultBean(); 
+			
+				
+			Future<ServiceControlResult> controlResult = null;
+	
+			try
+			{
+
+				switch (serviceMessage.getMethod()) {
+					case START_SERVICE :
+					{											
+						if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Control: START SERVICE");
+														
+						controlResult = getServiceControl().startService(serviceMessage.getServiceId());
+						ServiceControlResult result = controlResult.get();
+						
+						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result);
+						
+						serviceResult.setControlResult(result);
+						break;
+			
+					}
+					case STOP_SERVICE:
+					{
+						if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Control: STOP SERVICE");
+								
+						controlResult = getServiceControl().stopService(serviceMessage.getServiceId());
+						ServiceControlResult result = controlResult.get();
+						
+						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result);
+						
+						serviceResult.setControlResult(result);
+						break;
+					}
+					case INSTALL_SERVICE:
+					{
+						if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Control: INSTALL SERVICE");
+								
+						controlResult = getServiceControl().installService(serviceMessage.getURL().toURL());
+						ServiceControlResult result = controlResult.get();
+						
+						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result);
+						
+						serviceResult.setControlResult(result);
+						break;
+					}
+					case UNINSTALL_SERVICE:
+					{
+						if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Control: UNINSTALL SERVICE");
+								
+						controlResult = getServiceControl().uninstallService(serviceMessage.getServiceId());
+						ServiceControlResult result = controlResult.get();
+						
+						if(LOG.isDebugEnabled()) LOG.debug("Result was: " + result);
+						
+						serviceResult.setControlResult(result);
+						break;
+					}
+					default:
+						serviceResult.setControlResult(ServiceControlResult.COMMUNICATION_ERROR);
+				}
+			} catch (Exception e) {
+				LOG.error("Exception: " + e);
+				e.printStackTrace();
+				serviceResult.setControlResult(ServiceControlResult.EXCEPTION_ON_REMOTE);
+			};
+				
+			//RETURN MESSAGEBEAN RESULT
+			return serviceResult;
+			
+		}
+		
+		
 		return null;
 	}
 

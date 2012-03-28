@@ -142,6 +142,18 @@ public class InternalCtxBroker implements ICtxBroker {
 		return new AsyncResult<CtxEntity>(entity);
 	}
 
+	
+	@Override
+	public Future<IndividualCtxEntity> createIndividualEntity(String type)
+			throws CtxException {
+		
+		IndividualCtxEntity individualCtxEnt = null; 
+		individualCtxEnt = this.userCtxDBMgr.createIndividualCtxEntity(type);
+		
+		return new AsyncResult<IndividualCtxEntity>(individualCtxEnt);
+	}
+	
+	
 	@Override
 	public void disableCtxMonitoring(CtxAttributeValueType type) throws CtxException {
 		// TODO Auto-generated method stub
@@ -643,4 +655,6 @@ public class InternalCtxBroker implements ICtxBroker {
 		else
 			throw new IllegalArgumentException(value + ": Invalid value type");
 	}
+
+
 }

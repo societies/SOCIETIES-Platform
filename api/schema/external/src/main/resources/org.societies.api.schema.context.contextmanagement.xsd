@@ -85,13 +85,4 @@ targetNamespace="http://societies.org/api/schema/context/contextSchema"
     </xs:sequence>
   </xs:complexType>
 
-  
-
-  <xs:simpleType name="ctxModelType">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="ENTITY"/>
-      <xs:enumeration value="ATTRIBUTE"/>
-      <xs:enumeration value="ASSOCIATION"/>
-    </xs:restriction>
-  </xs:simpleType>
 </xs:schema>

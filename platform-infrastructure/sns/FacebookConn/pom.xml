@@ -51,44 +51,13 @@
 			<version>20090211</version>
 		</dependency>
 	    
-	    <!-- <dependency> <groupId>net.oauth</groupId> <artifactId>oauth-parent</artifactId> 
-			<version>20100527</version> <scope>compile</scope> </dependency> -->
-		<!-- 
-		<dependency>
-			<groupId>net.oauth</groupId>
-			<artifactId>oauth-parent</artifactId>
-			<version>20090825</version>
-		</dependency>
- 		gir-->
-
+	  
 		<dependency>
 			<groupId>com.restfb</groupId>
 			<artifactId>restfb</artifactId>
 			<version>1.6.9</version>
 		</dependency>
-<!--
-		<dependency>
-			<groupId>com.googlecode.json-simple</groupId>
-			<artifactId>json-simple</artifactId>
-			<version>1.1</version>
-		</dependency>
 
-
-		
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>1.3</version>
-		</dependency>
-		
-		
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.16</version>
-			<scope>provided</scope>
-		</dependency>
--->	
 	</dependencies>
 
 		<build>

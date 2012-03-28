@@ -30,4 +30,10 @@ package org.societies.api.cis.management;
  */
 public interface ICisRecord {
 
+    public String getCisId();
+    public String getName();
+    public String getOwnerId();
+    public String setUserDefinedName(String _name);
+    public String getUserDefineName();
+
 }

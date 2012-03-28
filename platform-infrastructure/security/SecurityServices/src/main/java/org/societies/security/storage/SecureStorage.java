@@ -8,6 +8,10 @@ public class SecureStorage implements ISecureStorage {
 
 	private static Logger LOG = LoggerFactory.getLogger(SecureStorage.class);
 
+	public SecureStorage() {
+		LOG.info("SecureStorage()");
+	}
+	
 	public String getPassword(String id) {
 		LOG.debug("getPassword({})", id);
 		return "fooPass";  // FIXME

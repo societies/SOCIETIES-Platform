@@ -24,8 +24,6 @@
  */
 package org.societies.api.context.model;
 
-import java.util.Date;
-
 /**
  * This class is used in order to represent context history attributes
  * maintained in the context history database.
@@ -37,24 +35,29 @@ public class CtxHistoryAttribute extends CtxModelObject {
 
 	private static final long serialVersionUID = -1908778456166623132L;
 
-	private Long historyRecordId;
+	/** The numeric id of this context history attribute in the database. */
+	private final Long historyRecordId;
 	
-	private String stringValue;
-	private Integer integerValue;
-	private Double doubleValue;
-	private byte[] binaryValue;
-
-	private Date lastModified;
-
-	public CtxHistoryAttribute(CtxAttribute ctxAttribute) {
-		super(ctxAttribute.getId());
-		this.setValues(ctxAttribute);
-		this.lastModified = ctxAttribute.getQuality().getLastUpdated();
-	}
+	/** The text value of this context history attribute. */
+	private final String stringValue;
 	
+	/** The integer value of this context history attribute. */
+	private final Integer integerValue;
+	
+	/** The double-precision floating point numeric value of this context history attribute. */
+	private final Double doubleValue;
+	
+	/** The binary value of this context history attribute. */
+	private final byte[] binaryValue;
+
 	public CtxHistoryAttribute(CtxAttribute ctxAttribute, Long historyRecordId) {
-		this(ctxAttribute);
+		super(ctxAttribute.getId());
+		super.setLastModified(ctxAttribute.getQuality().getLastUpdated());
 		this.historyRecordId = historyRecordId;
+		this.stringValue = ctxAttribute.getStringValue();
+		this.integerValue = ctxAttribute.getIntegerValue();
+		this.doubleValue = ctxAttribute.getDoubleValue();
+		this.binaryValue = ctxAttribute.getBinaryValue();
 	}
 
 	/**
@@ -64,15 +67,17 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	 */
 	@Override
 	public CtxAttributeIdentifier getId() {
+		
 		return (CtxAttributeIdentifier) super.getId();
 	}
-
+	
 	/**
 	 * Returns the string value of this historic context attribute.
 	 * 
 	 * @return string value
 	 */
 	public String getStringValue() {
+		
 		return this.stringValue;
 	}
 
@@ -82,6 +87,7 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	 * @return integer value
 	 */
 	public Integer getIntegerValue() {
+		
 		return this.integerValue;
 	}
 
@@ -91,6 +97,7 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	 * @return double value
 	 */
 	public Double getDoubleValue() {
+		
 		return this.doubleValue;
 	}
 
@@ -100,6 +107,7 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	 * @return blob value
 	 */
 	public byte[] getBinaryValue() {
+		
 		return this.binaryValue;
 	}
 	
@@ -111,19 +119,8 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	 */
 	@Override
 	public String toString() {
+		
 		return getId().toString(); 
-	}
-
-
-	private void setValues(CtxAttribute ctxAttribute) {
-		this.stringValue = ctxAttribute.getStringValue();
-		this.integerValue = ctxAttribute.getIntegerValue();
-		this.doubleValue = ctxAttribute.getDoubleValue();
-		this.binaryValue = ctxAttribute.getBinaryValue();
-	}
-
-	public Date getLastModified(){
-		return this.lastModified;
 	}
 
 	/**

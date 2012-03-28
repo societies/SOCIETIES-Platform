@@ -1,6 +1,6 @@
 package org.societies.platform.socialdata.impl;
 
-import org.societies.platform.socialdata.SocialData;
+import org.societies.api.internal.sns.ISocialData;
 
 
 /**
@@ -9,13 +9,13 @@ import org.societies.platform.socialdata.SocialData;
  */
 public class BeanIntegrationTest {
 
-	private SocialData myBean;
+	private ISocialData myBean;
 	
 	protected String[] getConfigLocations() {
 	  return new String[] {"META-INF/spring/bundle-context.xml"};
 	}
 	
-	public void setBean(SocialData bean) {
+	public void setBean(ISocialData bean) {
 	  this.myBean = bean;
 	}
 	

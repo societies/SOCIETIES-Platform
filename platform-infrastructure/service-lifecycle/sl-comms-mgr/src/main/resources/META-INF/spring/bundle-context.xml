@@ -21,18 +21,19 @@
   
   <bean id="SLMCommsManager" 
   		class="org.societies.slm.commsmanager.CommsServer"
-  		depends-on="CommManagerBundle,ServiceDiscoveryBundle" 
+  		depends-on="CommManagerBundle,ServiceDiscoveryBundle,ServiceControlBundle" 
   		init-method="InitService">
   		<property name="commManager" ref="CommManagerBundle"/>
   		<property name="serviceDiscovery" ref="ServiceDiscoveryBundle"/> 
+  		<property name="serviceControl" ref="ServiceControlBundle"/> 
   </bean>
   
-   <bean id="ServiceDiscoveryRemote" 
+   <bean id="ServiceLifecycleManagementRemote" 
   		class="org.societies.slm.commsmanager.CommsClient" 
   		depends-on="CommManagerBundle" 
   		init-method="InitService" >
   		<property name="commManager" ref="CommManagerBundle"/>
   </bean>
-    
+
 
 </beans>

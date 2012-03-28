@@ -26,6 +26,8 @@ package org.societies.api.internal.servicelifecycle.serviceRegistry;
 
 import java.util.List;
 
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.CISNotFoundException;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.CSSNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
@@ -112,6 +114,24 @@ public interface IServiceRegistry {
 	 * @param serviceIdentifier the unique identifier for the Service
 	 * @param serviceStatus the new status for the service
 	 * @return true if all is performed correctly
+	 * @throws ServiceNotFoundException
 	 */
 	public boolean changeStatusOfService(ServiceResourceIdentifier serviceIdentifier, ServiceStatus serviceStatus) throws ServiceNotFoundException;
+	
+	/**
+	 * Description: Based on the CSSId this method delete all service that belong to the CSS and that are registered in the ServiceRegistry.
+	 * @param CSSId 
+	 * @return true if all is performed correctly
+	 * @throws CSSNotFoundException
+	 */
+	public boolean deleteServiceCSS(String CSSId) throws CSSNotFoundException;
+	
+	/**
+	 * Description: Based on the CISId this method clear the list of services shared inside a CIS.
+	 * @param CISId
+	 * @return true if all is performed correctly
+	 * @throws CISNotFoundException
+	 */
+	
+	public boolean clearServiceSharedCIS(String CISId) throws CISNotFoundException;
 }
