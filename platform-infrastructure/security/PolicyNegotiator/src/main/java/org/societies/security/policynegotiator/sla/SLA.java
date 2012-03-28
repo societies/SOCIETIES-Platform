@@ -39,7 +39,7 @@ public class SLA {
 
 	private static Logger Log = LoggerFactory.getLogger(SLA.class);
 
-	Xml xml;
+	private Xml xml;
 
 	/**
 	 * Constructor
@@ -112,5 +112,10 @@ public class SLA {
         String xpath = SLA.XPath.SOP + "[@" + SLA.Attribute.SOP_ID + "!=\"" + sopName + "\"]";
         xml.removeNodes(xpath);
         return xml.toString();
+    }
+    
+    @Override
+    public String toString() {
+    	return xml.toString();
     }
 }
