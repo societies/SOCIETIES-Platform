@@ -30,6 +30,9 @@ import org.societies.api.internal.schema.security.policynegotiator.MethodType;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
+import org.societies.security.policynegotiator.sla.SLA;
+import org.societies.security.policynegotiator.xml.Xml;
+import org.societies.security.policynegotiator.xml.XmlException;
 
 /**
  * This class receives results from async invocations of {@link INegotiationProvider}
@@ -60,13 +63,24 @@ public class ProviderCallback implements INegotiationProviderCallback {
 		LOG.debug("receiveResult({})", result);
 		
 		int sessionId;
-		String sla;
+		String sop;
 		
 		switch(method) {
 		case GET_POLICY_OPTIONS:
 			if (result.isSuccess()) {
 				sessionId = result.getSessionId();
-				sla = result.getSla();
+				sop = result.getSla();
+				try {
+					String selectedSop = selectSopOption(sop);
+					// TODO: use real identity when it can be gathered from other components
+					sop = requester.getSignatureMgr().signXml(sop, selectedSop, "identity");
+					requester.getGroupMgr().acceptPolicyAndGetSla(
+							sessionId,
+							sop,
+							false,
+							new ProviderCallback(requester, MethodType.ACCEPT_POLICY_AND_GET_SLA));
+				} catch (XmlException e) {
+				}
 			}
 			break;
 		case ACCEPT_POLICY_AND_GET_SLA:
@@ -74,5 +88,22 @@ public class ProviderCallback implements INegotiationProviderCallback {
 		case REJECT:
 			break;
 		}
+	}
+	
+	private String selectSopOption(String sopString) throws XmlException {
+		
+		Xml xml = new Xml(sopString);
+		SLA sop = new SLA(xml);
+		String[] sopName = sop.getSopNames();
+		String[] providerName = new String[sopName.length];
+		String[] sopContent = new String[sopName.length];
+		
+		for (int k = 0; k < sopName.length; k++) {
+			providerName[k] = sop.getProviderName(sopName[k]);
+			sopContent[k] = sop.getSopContent(sopName[k]);
+			LOG.debug("selectSopOption(): SOP = {}, provider = {}", sopName[k], providerName[k]);
+		}
+
+		return sopName[0];  // TODO: display all options in GUI and return what user has chosen
 	}
 }
