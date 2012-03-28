@@ -75,8 +75,6 @@ public class TE_ST2 {
 	CtxIdentifier ctxAttributeBinaryIdentifier = null;
 	Logger log;
 
-	
-	
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -100,12 +98,7 @@ public class TE_ST2 {
 		
 		//initialization add create & retrieve methods
 		createEntities();
-		
-//		Long objectNumber = null;
-//		String type = null;
-		//CtxEntityIdentifier ctxEntityId = new CtxEntityIdentifier(operatorId, type, objectNumber);
-		
-		//new CommunityCtxEntity(ctxEntityId);		
+	
 	}
 
 	/**
@@ -310,7 +303,6 @@ public class TE_ST2 {
 		Future<CtxModelObject> ctxAttributeRetrievedBinaryFuture = this.internalCtxBroker.retrieve(this.ctxAttributeBinaryIdentifier);
 		CtxAttribute ctxAttributeRetrievedBinary = (CtxAttribute) ctxAttributeRetrievedBinaryFuture.get();
 
-		//deserialize object
 //		MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(ctxAttributeRetrievedBinary.getBinaryValue(), this.getClass().getClassLoader());
 //		this.log.info("Retrieved ctxAttribute id " +ctxAttributeRetrievedBinary.getId()+ "and value: "+ retrievedBlob.toString());
 
