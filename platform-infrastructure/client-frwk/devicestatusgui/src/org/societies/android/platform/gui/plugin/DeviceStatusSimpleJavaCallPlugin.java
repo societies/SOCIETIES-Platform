@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -42,6 +47,10 @@ import com.phonegap.api.PluginResult.Status;
 
 /**
  * PhoneGap plugin to use device status
+ * This class file is just an example about how to use simple Java call in a PhoneGap plugin. 
+ * For the real plugin, see:
+ * @see org.societies.android.platform.gui.plugin.DeviceStatusPlugin
+ * To show the Javascript API: use "mvn site" on this project, and go to target/doc folder
  * @author Olivier Maridat (Trialog)
  */
 public class DeviceStatusSimpleJavaCallPlugin extends Plugin {

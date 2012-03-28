@@ -60,7 +60,7 @@ import android.widget.Toast;
 
 
 /**
- * @author Olivier Maridat
+ * @author Olivier Maridat (Trialog)
  * @date 28 nov. 2011
  */
 public class DeviceStatusActivity extends Activity {

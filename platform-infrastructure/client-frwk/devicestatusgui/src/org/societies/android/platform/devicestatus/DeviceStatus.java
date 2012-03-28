@@ -37,7 +37,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 /**
- * @author olivierm
+ * @author Olivier Maridat (Trialog)
  *
  */
 public class DeviceStatus implements IDeviceStatus {
