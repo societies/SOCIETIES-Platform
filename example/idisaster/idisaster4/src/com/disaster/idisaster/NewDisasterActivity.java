@@ -136,6 +136,9 @@ public class NewDisasterActivity extends Activity implements OnClickListener {
 
 //	    	finish();	// noHistory=true in Manifest => the activity is removed from the activity stack and finished.
 
+//TODO: remove test code
+    	    iDisasterApplication.getinstance().disasterNameList.add(disasterName);
+    	    
     	    // Go back to the list of disasters
 	    	startActivity(new Intent(NewDisasterActivity.this, DisasterListActivity.class));
 	    }

@@ -24,6 +24,8 @@
  */
 package com.disaster.idisaster;
 
+import java.util.ArrayList;
+
 import org.societies.android.platform.client.SocietiesApp;
 
 import android.app.AlertDialog;
@@ -51,6 +53,10 @@ public class iDisasterApplication extends Application {
 
 	Boolean platformLoggedIn = false;
 	SocietiesApp iDisasterSoc; 							// represents access to the SOCIETIES platform.
+
+//TODO: remove test code	
+	ArrayList <String> disasterNameList = new ArrayList ();
+
 
 	// TODO: Remove unnecessary attributes 
 //    String societiesServer = "server.societies.eu";	// The name of the server where cloud node is hosted
@@ -80,6 +86,12 @@ public class iDisasterApplication extends Application {
 	    editor = preferences.edit();
 	    editor.putString ("pref.dummy", "");
 	    editor.commit ();
+
+//TODO: remove test code
+    	for (int i = 1; i < 10; i = i + 1) {
+    		disasterNameList.add ("Disaster " + Integer.toString (i));
+		}
+
 
 	    if (getUserName () != getString(R.string.noPreference)){
 	    	platformLogIn();	// Instantiate the Societies platform
