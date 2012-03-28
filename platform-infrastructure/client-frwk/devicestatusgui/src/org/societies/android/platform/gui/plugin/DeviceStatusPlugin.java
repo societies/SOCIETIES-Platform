@@ -70,6 +70,8 @@ public class DeviceStatusPlugin extends Plugin {
 	public static final String ACTION_BATTERY_REGISTER = "registerBatteryStatus";
 
 	/** Callback to call */
+	public String methodName;
+	public JSONArray arguments;
 	public String callbackID;
 
 	/** Helpers */
@@ -90,16 +92,16 @@ public class DeviceStatusPlugin extends Plugin {
 	 */
 	@Override
 	public void onResume(boolean arg) {
-		Log.d("DeviceStatusPlugin", "DeviceStatusPlugin resumed");
-		// Link to the Android service
-		if (!deviceStatusServiceConnected) {
-			Intent deviceStatusIntent = new Intent(this.ctx, DeviceStatusServiceDifferentProcess.class);
-			this.ctx.bindService(deviceStatusIntent, deviceStatusServiceConnection, Context.BIND_AUTO_CREATE);
-		}
-		// Create the broadcast receiver
-		if (null == deviceStatusReceiver) {
-			deviceStatusReceiver = new ServiceReceiver();
-		}
+//		Log.d("DeviceStatusPlugin", "DeviceStatusPlugin resumed");
+//		// Link to the Android service
+//		if (!deviceStatusServiceConnected) {
+//			Intent deviceStatusIntent = new Intent(this.ctx, DeviceStatusServiceDifferentProcess.class);
+//			this.ctx.bindService(deviceStatusIntent, deviceStatusServiceConnection, Context.BIND_AUTO_CREATE);
+//		}
+//		// Create the broadcast receiver
+//		if (null == deviceStatusReceiver) {
+//			deviceStatusReceiver = new ServiceReceiver();
+//		}
 	}
 
 	/*
@@ -108,7 +110,34 @@ public class DeviceStatusPlugin extends Plugin {
 	@Override
 	public PluginResult execute(String methodName, JSONArray arguments, String callbackID)
 	{
+		// If needed : connect to the DeviceStatus Android service
+		// /!\ This is dirty, but "onResume" method seems to be bugged. We will clean that later.
+		if (!deviceStatusServiceConnected && null != methodName && (ACTION_CONNECTIVITY.equals(methodName) || ACTION_LOCATION.equals(methodName))) {
+			Log.d(this.getClass().getSimpleName(), "Plugin Called (first time: connect to service)");
+			Intent deviceStatusIntent = new Intent(this.ctx, DeviceStatusServiceDifferentProcess.class);
+			// - Inform the JS side: async mode
+			PluginResult result = new PluginResult(Status.NO_RESULT);
+			result.setKeepCallback(true);
+			this.methodName = methodName;
+			this.arguments = arguments;
+			this.callbackID = callbackID;
+			this.ctx.bindService(deviceStatusIntent, deviceStatusServiceConnection, Context.BIND_AUTO_CREATE);
+			return result;
+		}
+		else {
+			return executePlugin(methodName, arguments, callbackID);
+		}
+	}
+
+	public PluginResult executePlugin(String methodName, JSONArray arguments, String callbackID)
+	{
 		Log.d(this.getClass().getSimpleName(), "Plugin Called");
+
+
+		// Create the broadcast receiver
+		if (null == deviceStatusReceiver) {
+			deviceStatusReceiver = new ServiceReceiver();
+		}
 
 		// --- Save the callback
 		this.callbackID = callbackID;
@@ -232,6 +261,7 @@ public class DeviceStatusPlugin extends Plugin {
 		}
 		// -- Unlink with services
 		if (deviceStatusServiceConnected) {
+			deviceStatusServiceConnected = false;
 			ctx.unbindService(deviceStatusServiceConnection);
 		}
 	}
@@ -376,6 +406,7 @@ public class DeviceStatusPlugin extends Plugin {
 		{
 			deviceStatusService = new Messenger(service);
 			deviceStatusServiceConnected = true;
+			executePlugin(methodName, arguments, callbackID);
 		}
 	};
 }
