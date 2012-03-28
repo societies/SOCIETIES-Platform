@@ -52,6 +52,16 @@ public class ProviderCallback implements INegotiationProviderCallback {
 		this.method = method;
 		LOG.debug("ProviderCallback({})", method);
 	}
+
+//	@Override
+//	public void onGetPolicyOptions(int sessionId, String sops) {
+//		// TODO Auto-generated method stub
+//	}
+
+//	@Override
+//	public void onAcceptPolicyAndGetSla(int sessionId, String policy) {
+//		// TODO Auto-generated method stub
+//	}
 	
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback
@@ -60,15 +70,14 @@ public class ProviderCallback implements INegotiationProviderCallback {
 	@Override
 	public void receiveResult(SlaBean result) {
 		
-		LOG.debug("receiveResult({})", result);
+		LOG.debug("receiveResult(): method = ", method);
 		
-		int sessionId;
-		String sop;
+		int sessionId = result.getSessionId();
 		
 		switch(method) {
 		case GET_POLICY_OPTIONS:
 			if (result.isSuccess()) {
-				sessionId = result.getSessionId();
+				String sop;
 				sop = result.getSla();
 				try {
 					String selectedSop = selectSopOption(sop);
@@ -80,12 +89,28 @@ public class ProviderCallback implements INegotiationProviderCallback {
 							false,
 							new ProviderCallback(requester, MethodType.ACCEPT_POLICY_AND_GET_SLA));
 				} catch (XmlException e) {
+					LOG.warn("receiveResult(): session {}: ", sessionId, e);
 				}
 			}
 			break;
 		case ACCEPT_POLICY_AND_GET_SLA:
+			if (result.isSuccess()) {
+				String sla;
+				sla = result.getSla();
+				if (requester.getSignatureMgr().verify(sla)) {
+					LOG.info("receiveResult(): session = {}, final SLA reached.", sessionId);
+					LOG.debug("receiveResult(): session = {}, final SLA: {}", sessionId, sla);
+					// TODO: store the SLA when secure services are implemented
+				}
+				else {
+					LOG.warn("receiveResult(): session = {}, final SLA invalid!", sessionId);
+				}
+			}
 			break;
 		case REJECT:
+			// No need for action.
+			// After more tests, the method could be changed back to void to save some bandwidth.
+			LOG.debug("receiveResult(): session = {}, reject success = ", sessionId, result.isSuccess());
 			break;
 		}
 	}

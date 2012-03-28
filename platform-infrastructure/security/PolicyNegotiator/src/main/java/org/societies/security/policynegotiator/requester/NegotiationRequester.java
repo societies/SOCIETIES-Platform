@@ -73,16 +73,6 @@ public class NegotiationRequester implements INegotiationRequester {
 		this.signatureMgr = signatureMgr;
 	}
 
-//	@Override
-//	public void onGetPolicyOptions(int sessionId, String sops) {
-//		// TODO Auto-generated method stub
-//	}
-
-//	@Override
-//	public void onAcceptPolicyAndGetSla(int sessionId, String policy) {
-//		// TODO Auto-generated method stub
-//	}
-
 	@Override
 	public void acceptUnmodifiedPolicy(int sessionId,
 			String selectedPolicyOptionId) {
