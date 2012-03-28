@@ -46,9 +46,8 @@ var CoreServiceMonitorService = function() {
 }
 
 /**
- * @param directory The directory for which we want the listing
- * @param successCallback The callback which will be called when directory listing is successful
- * @param failureCallback The callback which will be called when directory listing encouters an error
+ * @param successCallback The callback which will be called when Java method is successful
+ * @param failureCallback The callback which will be called when Java method has an error
 */
 CoreServiceMonitorService.prototype.activeServices = function(successCallback, failureCallback) {
 	var clientPackage = "org.societies.android.platform.gui";
@@ -59,6 +58,22 @@ CoreServiceMonitorService.prototype.activeServices = function(successCallback, f
 	failureCallback,     //Callback which will be called when plugin action encounters an error
 	'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
 	'activeServices',              //Telling the plugin, which action we want to perform
+	[]);        //Passing a list of arguments to the plugin
+};
+
+/**
+ * @param successCallback The callback which will be called when Java method is successful
+ * @param failureCallback The callback which will be called when Java method has an error
+*/
+CoreServiceMonitorService.prototype.activeTasks = function(successCallback, failureCallback) {
+	var clientPackage = "org.societies.android.platform.gui";
+
+	console.log("Call CoreServiceMonitorService - activeTasks");
+
+	return PhoneGap.exec(successCallback,    //Callback which will be called when plugin action is successful
+	failureCallback,     //Callback which will be called when plugin action encounters an error
+	'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
+	'activeTasks',              //Telling the plugin, which action we want to perform
 	[]);        //Passing a list of arguments to the plugin
 };
 
@@ -94,10 +109,21 @@ var resetDeviceMgr = function(){
 }
 
 var refreshActiveServices = function() {
-	console.log("Refresh the Active Service");
+	console.log("Refresh Active Service");
 
 	function success(data) {
-		alert(data[0].activeSince + " " + data[0].className);
+		//empty table
+		jQuery('#activeServicesTable tbody').remove();
+		
+		for (i  = 0; i < data.length; i++) {
+			var tableEntry = "<tr>" + 
+			"<td>" + data[i].className + "</td>" + 
+			"<td>" + convertMilliseconds(data[i].activeSince) + "</td>" + 
+				+ "</tr>"
+
+			jQuery('#activeServicesTable tr:last').after(tableEntry);
+			
+		}
 		
 	}
 	
@@ -107,7 +133,44 @@ var refreshActiveServices = function() {
     window.plugins.CoreServiceMonitorService.activeServices(success, failure);
 	
 };
+var refreshActiveTasks = function() {
+	console.log("Refresh Active Tasks");
 
+	function success(data) {
+		//empty table
+		jQuery('#activeTasksTable tbody').remove();
+		
+		for (i  = 0; i < data.length; i++) {
+			var tableEntry = "<tr>" + 
+			"<td>" + data[i].className + "</td>" + 
+			"<td>" + data[i].numRunningActivities + "</td>" + 
+				+ "</tr>"
+
+			jQuery('#activeTasksTable tr:last').after(tableEntry);
+			
+		}
+		
+	}
+	
+	function failure(data) {
+		alert(data);
+	}
+    window.plugins.CoreServiceMonitorService.activeTasks(success, failure);
+	
+};
+
+//Convert an elapsed time in milliseconds
+var convertMilliseconds = function(milliseconds) {
+	value = milliseconds / 1000
+	seconds = value % 60
+	value /= 60
+	minutes = value % 60
+	value /= 60
+	hours = value % 24
+	value /= 24
+	days = value	
+	return "d: " + days + " h: " + hours + " m:" + minutes;
+}
 /**
  * Add Javascript functions to various HTML tags using JQuery
  */
@@ -131,6 +194,10 @@ jQuery(function() {
 
 	$('#refreshServices').click(function() {
 		refreshActiveServices();
+	});
+
+	$('#refreshTasks').click(function() {
+		refreshActiveTasks();
 	});
 
 });
