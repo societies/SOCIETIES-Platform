@@ -60,6 +60,7 @@
 		</module>
 		<module>../platform-infrastructure/client-frwk/IPCServiceExample
 		</module>
+		<module>../platform-infrastructure/client-frwk/devicestatusgui</module>
 
 		<!-- Client Framework -->
 		<module>../platform-infrastructure/client-frwk/MasterGUI</module>
