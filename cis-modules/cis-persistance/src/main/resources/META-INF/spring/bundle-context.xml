@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <!-- regular spring configuration file defining the beans for this
@@ -8,6 +9,7 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-  <bean name="myBean" class="org.societies.cis.management.cis_editor.impl.BeanImpl" />
-
+  <bean id="PersistanceManager" class="org.societies.cis.persistance.PersistanceManager" />
+  
+  <context:component-scan base-package="org.societies.cis.manager"></context:component-scan>
 </beans>

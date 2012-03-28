@@ -6,13 +6,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PersistanceManager {
+public class PersistanceManager implements IPersistanceManager {
 	private EntityManager em = null;
 	@Autowired
 	public PersistanceManager(EntityManager em){
 		this.em = em;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.societies.cis.persistance.IPersistanceManager#persist(java.lang.Object)
+	 */
+	@Override
 	public void persist(Object o){
 		em.persist(o);
 	}

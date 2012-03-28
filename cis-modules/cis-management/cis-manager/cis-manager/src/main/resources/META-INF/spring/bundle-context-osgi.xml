@@ -15,6 +15,7 @@
        testing of the bundle outside of an OSGi container -->
 	<osgi:reference id="cisCommMgrFactory" interface="org.societies.api.internal.comm.ICISCommunicationMgrFactory"/>
 	<osgi:reference id="xcCommunication" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
+	<osgi:reference id="PersistanceManager" interface="org.societies.cis.persistance.IPersistanceManager"/>
 	
 	
 </beans>
