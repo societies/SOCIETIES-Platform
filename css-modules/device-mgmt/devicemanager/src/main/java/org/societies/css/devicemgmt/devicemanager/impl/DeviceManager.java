@@ -129,29 +129,38 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 	
 	public List<String> getDeviceServiceIds (String deviceId)
 	{
-		String [] deviceListArray = this.deviceServiceIdsContainer.get(deviceId);
+		LOG.info("////////////////////////////////// getDeviceServiceIds : " + deviceId); 
+		String [] deviceListArray = deviceServiceIdsContainer.get(deviceId);
+		
+		LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceManager info: fireNewDeviceConnected " + deviceServiceIdsContainer.toString());
+		
+		LOG.info("////////////////////////////////// getDeviceServiceIds : " + deviceListArray.toString()); 
+		
 		if( deviceListArray != null)
 		{
+			LOG.info("////////////////////////////////// deviceListArray non null"); 
+			
 			List <String> deviceIdsList = new ArrayList<String>();
 			
 			for (String str : deviceListArray)
 			{
 				deviceIdsList.add(str);
 			}
+			LOG.info("////////////////////////////////// deviceListArray non null" + deviceIdsList.toString()); 
 			return deviceIdsList;
 		}
 		return null;
 	}
 	
-	public String getDeviceMacAddress(String deviceId)
+	public String getPhysicalDeviceId(String deviceId)
 	{
-		String deviceMacAddress = (String) deviceIdBindingTable.inverseBidiMap().getKey(deviceId);
+		String physicalDeviceId = (String) deviceIdBindingTable.inverseBidiMap().getKey(deviceId);
 		
-		LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceManager info: getDeviceMacAddress ::::::::::: " + deviceMacAddress);
+		LOG.info(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DeviceManager info: getPhysicalDeviceId ::::::::::: " + physicalDeviceId);
 		
-		if (deviceMacAddress != null) 
+		if (physicalDeviceId != null) 
 		{
-			return deviceMacAddress;
+			return physicalDeviceId;
 		}
 		return null;
 	}
@@ -177,7 +186,7 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 			//int deviceId = rdmNumber.nextInt();
 			
 			
-			String deviceId =  nodeId.getJid() + "." + deviceCommonInfo.getDeviceFamilyIdentity()+ "." + deviceCommonInfo.getDeviceType() + "." + physicalDeviceId;
+			String deviceId =  nodeId.getJid() + "/" + deviceCommonInfo.getDeviceFamilyIdentity()+ "/" + deviceCommonInfo.getDeviceType() + "/" + physicalDeviceId;
 			
 			
 			deviceIdBindingTable.put(deviceId, physicalDeviceId);
@@ -209,20 +218,17 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 			//create a new IDevice implementation
 			deviceImpl = new DeviceImpl(bundleContext, this, deviceId, deviceCommonInfo);
 			
+			deviceInstanceContainer.put(deviceId, deviceImpl);
+			deviceServiceIdsContainer.put(deviceId, serviceIds);
+			LOG.info(" %%%%%%%%%%%%%%%%======================%%%%%%%%%%%%%%%%% DeviceManager info: fireNewDeviceConnected " + deviceServiceIdsContainer.toString());
+			deviceFamilyContainer.put(deviceCommonInfo.getDeviceFamilyIdentity(), deviceInstanceContainer);
+			
 			synchronized(lock)
 			{
 				registration = bundleContext.registerService(IDevice.class.getName(), deviceImpl, properties);
 				
 				LOG.info("-- A device service with the deviceId: " + properties.get("deviceId") + " has been registred"); 
 			}
-
-			
-			deviceInstanceContainer.put(deviceId, deviceImpl);
-			deviceServiceIdsContainer.put(deviceId, serviceIds);
-			
-			
-			deviceFamilyContainer.put(deviceCommonInfo.getDeviceFamilyIdentity(), deviceInstanceContainer);
-			
 			return deviceId;
 		}
 		else
@@ -234,7 +240,7 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 			{
 				//TODO here generate the deviceId from  the CssId and CssNodeId
 				//int deviceId = rdmNumber.nextInt();
-				String deviceId =  nodeId.getJid() + "." + deviceCommonInfo.getDeviceFamilyIdentity()+ "." + deviceCommonInfo.getDeviceType() + "." + physicalDeviceId;
+				String deviceId =  nodeId.getJid() + "/" + deviceCommonInfo.getDeviceFamilyIdentity()+ "/" + deviceCommonInfo.getDeviceType() + "/" + physicalDeviceId;
 
 				deviceIdBindingTable.put(deviceId, physicalDeviceId);
 
@@ -262,19 +268,18 @@ public class DeviceManager implements IDeviceManager, BundleContextAware{
 				//create a new IDevice implementation
 				deviceImpl = new DeviceImpl(bundleContext, this, deviceId, deviceCommonInfo);
 				
+				deviceInstanceContainer.put(deviceId, deviceImpl);
+				deviceServiceIdsContainer.put(deviceId, serviceIds);
+				LOG.info(" %%%%%%%%%%%%%%%%======================%%%%%%%%%%%%%%%%% DeviceManager info: fireNewDeviceConnected " + deviceServiceIdsContainer.toString());
+					
+				deviceFamilyContainer.put(deviceCommonInfo.getDeviceFamilyIdentity(), deviceInstanceContainer);
+				
 				synchronized(lock)
 				{
 					registration = bundleContext.registerService(IDevice.class.getName(), deviceImpl, properties);
 					
 					LOG.info("-- A device service with the deviceId: " + properties.get("deviceId") + " has been registred"); 
-				}
-				
-				deviceInstanceContainer.put(deviceId, deviceImpl);
-				
-				deviceServiceIdsContainer.put(deviceId, serviceIds);
-					
-				deviceFamilyContainer.put(deviceCommonInfo.getDeviceFamilyIdentity(), deviceInstanceContainer);
-					
+				}	
 				return deviceId;
 			}
 			return null;

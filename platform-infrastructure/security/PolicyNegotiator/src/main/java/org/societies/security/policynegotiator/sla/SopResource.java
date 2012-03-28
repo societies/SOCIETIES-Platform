@@ -22,98 +22,40 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.security.policynegotiator.sla;
 
-package org.societies.api.css.devicemgmt;
+import java.io.IOException;
+import java.net.URL;
 
-import java.util.List;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
-public interface IDevice {
+/**
+ * 
+ *
+ * @author Mitja Vardjan
+ *
+ */
+public class SopResource {
 
-	/**
-	 * 
-	 * @return
-	 */
-    public String getDeviceName();
-   
-    /**
-     * 
-     * @return
-     */
-    public String getDeviceId();
-    
-    /**
-     * 
-     * @return
-     */
-    public String getDeviceType();
-    
-    /**
-     * 
-     * @return
-     */
-    public String getDeviceDescription();
-    
-    /**
-     * 
-     * @return
-     */
-    public String getDeviceConnetionType();
-    
-    /**
-     * 
-     */
-    public void enable();
-    
-    /**
-     * 
-     */
-    public void disable();
-    
-    /**
-     * 
-     * @return
-     */
-    public boolean isEnable();
-    
-    /**
-     * 
-     * @return
-     */
-    public String getDeviceLocation();
-    
-    /**
-     * 
-     * @return
-     */
-    public String getDeviceProvider();
-    
-    /**
-     * 
-     * @return
-     */
-    public boolean isContextSource();
-    
-    
-    /**
-     * 
-     * @param serviceId
-     * @return
-     */
-    public IDriverService getService (String serviceId);
-    
-    
-    /**
-     * 
-     * @return
-     * 
-     */
-    public IDriverService[] getServices ();
-    
-    
-    /**
-	 * 
-	 * @return
-	 */
-	public List<String> getEvenNametList();
+    public static Document getSop(String filename) throws
+    		ParserConfigurationException, SAXException, IOException {
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        Document document = null;
+
+        // factory.setValidating(true);
+        // factory.setNamespaceAware(true);
+       	DocumentBuilder builder = factory.newDocumentBuilder();
+       	URL resource = SopResource.class.getClassLoader().getResource(filename);
+       	if (resource != null) {
+       		document = builder.parse(resource.openStream());
+       	}
+       	
+       	return document;
+    }
 }

@@ -40,7 +40,7 @@ public class LightSimulator extends Thread {
 			lightSensor.setLightLevel();
 
 			System.out.println ("**************************************************");
-			System.out.println ("<-- Driver : New Light received : "+Double.toString(lightSensor.getLightLevel()) + " from sensor number " + lsId);
+			System.out.println ("<-- Driver : New Light received : "+Double.toString(lightSensor.getLightValue()) + " from sensor number " + lsId);
 			System.out.println ("**************************************************\n\n");
 			
 			try {
