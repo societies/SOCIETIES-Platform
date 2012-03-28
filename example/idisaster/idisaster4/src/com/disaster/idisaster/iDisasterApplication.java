@@ -47,7 +47,7 @@ public class iDisasterApplication extends Application {
 	SharedPreferences preferences;								// Preferences shared with all activities
 	Editor editor;												// Editor for changing preferences
 
-	Boolean userLoggedIn = false;
+//	Boolean userLoggedIn = false;
 //    SocietiesApp iDisasterSoc; // represents access to the SOCIETIES platform.
 
 	// TODO: Remove unnecessary attributes 
@@ -88,15 +88,13 @@ public class iDisasterApplication extends Application {
         // Comment added to avoid Bug!
         // 
 	    /// ???? Is password needed to instantiate the platform - If so this code should be move to Start activity 
-
-	    
 	    
 	}//onCreate
 
 	public void logIn () {
     	//TODO: catch exception if user and password are not correct 
 //    	iDisasterSoc = new SocietiesApp (getUserName (), getPassword ());	// Get reference to the Societies platform 
-    	userLoggedIn = true;
+//    	userLoggedIn = true;
 	}
 
 	public String getUserName () {

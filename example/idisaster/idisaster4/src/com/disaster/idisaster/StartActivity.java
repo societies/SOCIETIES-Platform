@@ -57,11 +57,7 @@ public class StartActivity extends Activity implements OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
 
     	super.onCreate(savedInstanceState);
-    	
-		getPreferences ();						// retrieve user preferences
-
-    	startNextActivity (); 					// select next activity
-			
+    				
 	    setContentView (R.layout.start_layout);	// create GUI
 	    // Add click listener to button
 	    final Button button = (Button) findViewById(R.id.startButton);
@@ -86,14 +82,12 @@ public class StartActivity extends Activity implements OnClickListener {
  */
 	private void startNextActivity () {
 		
-//    	if (userName == getString(R.string.noPreference)) {
-// TODO:not sure whether or not the activity should finish
-//		finish();
-		if (iDisasterApplication.getinstance().userLoggedIn == false) {
-			finish();
+		getPreferences ();					// retrieve user preferences
+		
+    	if (userName == getString(R.string.noPreference)) {								// no user name (no password)
     		startActivity(new Intent(StartActivity.this, LoginActivity.class));
     		return;
-    	} else if (disasterName == getString(R.string.noPreference)) {
+    	} else if (disasterName == getString(R.string.noPreference)) {					// no disaster selected
     		startActivity(new Intent(StartActivity.this, DisasterListActivity.class));
     		return;
     	} else {

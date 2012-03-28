@@ -112,7 +112,7 @@ public class DisasterActivity extends TabActivity {
 //TODO: Call the Societies platform
         	iDisasterApplication.getinstance().setUserName
         		(getString(R.string.noPreference), getString(R.string.noPreference));	// reset user preferences
-        	iDisasterApplication.getinstance().userLoggedIn = false;
+//        	iDisasterApplication.getinstance().userLoggedIn = false;
 // TODO:not sure whether or not the activity should finish
 // noHistory is used in Manifest to avoid putting activity on stack
 //        	finish();
