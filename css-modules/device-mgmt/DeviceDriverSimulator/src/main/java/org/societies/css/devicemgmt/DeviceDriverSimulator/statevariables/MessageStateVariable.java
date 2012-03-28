@@ -22,44 +22,71 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.css.devicemgmt.DeviceDriverSimulator.statevariables;
 
-package org.societies.api.css.devicemgmt;
+import org.societies.api.css.devicemgmt.IDeviceStateVariable;
 
-import java.util.Dictionary;
-import java.util.List;
+/**
+ * Describe your class here...
+ *
+ * @author rafik
+ *
+ */
+public class MessageStateVariable implements IDeviceStateVariable{
 
-public interface IAction {
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public List<String> getInputArgumentNames();
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public String getName();
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public List <String> getOutputArgumentNames();
-	
-	/**
-	 * 
-	 * @param argumentName
-	 * @return
-	 */
-	public IDeviceStateVariable getStateVariable (String argumentName);
-	
-	/**
-	 * 
-	 * @param arguments
-	 * @return
-	 */
-	public Dictionary<String, Object> invokeAction(Dictionary<String, Object> arguments);
+	final private String NAME = "message";
+
+	@Override
+	public String[] getAllowedValues() {
+		return null;
+	}
+
+
+	@Override
+	public Object getDefaultValue() {
+		
+		return "Display messages";
+	}
+
+
+	@Override
+	public Class<?> getDataJavaType() {
+		return String.class;
+	}
+
+
+	@Override
+	public Number getMaximumValue() {
+		return null;
+	}
+
+
+	@Override
+	public Number getMinimumValue() {
+		return null;
+	}
+
+
+	@Override
+	public String getName() {
+		return NAME;
+	}
+
+
+	@Override
+	public Number getStep() {
+		return null;
+	}
+
+
+	@Override
+	public String getDeviceMgmtDataType() {
+		return null;
+	}
+
+	@Override
+	public boolean isEnventable() {
+		return false;
+	}
 
 }

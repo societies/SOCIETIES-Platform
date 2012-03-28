@@ -27,6 +27,7 @@ package org.societies.api.css.devicemgmt;
 
 import java.util.List;
 
+
 public interface IDevice {
 
 	/**
@@ -99,7 +100,7 @@ public interface IDevice {
      * @param serviceId
      * @return
      */
-    public IDeviceService getService (String serviceId);
+    public IDriverService getService (String serviceId);
     
     
     /**
@@ -107,6 +108,12 @@ public interface IDevice {
      * @return
      * 
      */
-    public IDeviceService[] getServices ();
-
+    public IDriverService[] getServices ();
+    
+    
+    /**
+	 * 
+	 * @return
+	 */
+	public List<String> getEvenNametList();
 }

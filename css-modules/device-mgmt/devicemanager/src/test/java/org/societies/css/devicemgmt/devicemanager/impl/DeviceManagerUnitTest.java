@@ -36,11 +36,9 @@ import static org.mockito.Mockito.*;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.css.devicemgmt.IDevice;
 
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
-import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 
 /**

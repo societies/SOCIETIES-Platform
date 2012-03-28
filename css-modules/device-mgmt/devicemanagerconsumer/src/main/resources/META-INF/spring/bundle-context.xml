@@ -24,7 +24,7 @@
        for integration testing outside of an OSGi environment -->
 
   	<bean id="deviceManagerConsumer" class="org.societies.css.devicemgmt.devicemanagerconsumer.DeviceManagerConsumer" init-method="initConsumer">
-		<property name="deviceService" ref ="deviceService" />
+		<!-- <property name="deviceService" ref ="deviceService" /> -->
   	</bean>
   	
 </beans>
