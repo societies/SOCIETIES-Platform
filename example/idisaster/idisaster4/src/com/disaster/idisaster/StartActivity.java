@@ -86,14 +86,18 @@ public class StartActivity extends Activity implements OnClickListener {
  */
 	private void startNextActivity () {
 		
-    	if (userName == getString(R.string.noPreference)) {
+//    	if (userName == getString(R.string.noPreference)) {
+// TODO:not sure whether or not the activity should finish
+//		finish();
+		if (iDisasterApplication.getinstance().userLoggedIn == false) {
+			finish();
     		startActivity(new Intent(StartActivity.this, LoginActivity.class));
     		return;
     	} else if (disasterName == getString(R.string.noPreference)) {
-    		startActivity(new Intent(StartActivity.this, DisasterActivity.class));
+    		startActivity(new Intent(StartActivity.this, DisasterListActivity.class));
     		return;
     	} else {
-    		startActivity(new Intent(StartActivity.this, HomeActivity.class));
+    		startActivity(new Intent(StartActivity.this, DisasterActivity.class));
     		return;
     	}
     }

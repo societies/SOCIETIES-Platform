@@ -130,8 +130,12 @@ public class NewDisasterActivity extends Activity implements OnClickListener {
     	    InputMethodManager mgr = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
     	    mgr.hideSoftInputFromWindow(disasterNameView.getWindowToken(), 0);
 
-// TODO: Go back to list of next activity? Should it be Home?
-	    	startActivity(new Intent(NewDisasterActivity.this, DisasterActivity.class));
+// TODO:not sure whether or not the activity should finish
+// noHistory is used in Manifest to avoid putting activity on stack
+//    	    finish();
+
+// TODO: Go back to list of next activity? Should it be Disaster instead?
+	    	startActivity(new Intent(NewDisasterActivity.this, DisasterListActivity.class));
 	    }
     }
 		

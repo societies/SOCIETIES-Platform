@@ -1,64 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/disasterListTop"
-	android:layout_width="wrap_content" android:layout_height="fill_parent"
-	>
-	<!-- android:orientation="vertical"  -->
-
-	<TextView android:id="@+id/disasterLabel" android:layout_width="fill_parent"
-     	android:text="@string/disasterListHeading" 
-     	android:textSize="20dip" android:textStyle="bold"
-     	android:textColor="@color/white" android:background="@color/orange"
-		android:layout_height="wrap_content" 
-		android:paddingLeft="5dip"
-		android:paddingTop="2dip" android:paddingBottom="2dip" />
-	
-	<ListView android:id="@android:id/list"
-	    android:layout_width="fill_parent" android:layout_height="fill_parent"
-		android:background="@color/white" 
-		android:cacheColorHint="@color/white"
-		android:layout_below="@id/disasterLabel"/>
-	
-	<TextView android:id="@id/android:empty" android:layout_width="fill_parent"
-		android:layout_height="fill_parent" android:background="@color/white"
-		android:text="@string/add_item_menu"
-		android:layout_below="@id/disasterLabel"/>
-</RelativeLayout>
-
-
-
-<!--  old does not work... No text appear since background is set to white...
-
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
-    
- <TextView android:id="@+id/disasterLabel" android:layout_width="fill_parent"
-     	android:text="@string/disasterListHeading" 
-     	android:textSize="20dip" android:textStyle="bold"
-     	android:textColor="@color/white" android:background="@color/orange"
-		android:layout_height="wrap_content" 
-		android:paddingLeft="5dip"
-		android:paddingTop="2dip" android:paddingBottom="2dip" />
-		
-
  
-    <ListView android:id="@android:id/list" android:layout_width="fill_parent"
-		android:layout_height="fill_parent"
-		android:background="@color/white" android:textColor= "@color/black"
-		/> 
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/tabhost"
+    android:layout_width="fill_parent"   android:layout_height="fill_parent">
+     
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent" android:layout_height="fill_parent"
+		android:background="@color/white"
+		android:padding="5dp">
+		
+		<TextView android:id="@+id/disasterLabel" android:layout_width="fill_parent"
+     	android:text="@string/disasterHeading" 
+     	android:textSize="20dip" android:textStyle="bold"
+     	android:textColor="@color/white" android:background="@color/orange"
+		android:layout_height="wrap_content" 
+		android:paddingLeft="5dip"
+		android:paddingTop="2dip" android:paddingBottom="2dip" />
+        
+        <TabWidget
+            android:id="@android:id/tabs"
+            android:layout_width="fill_parent" android:layout_height="wrap_content" 
+            android:background="@color/orange"
+         />
+
+        <FrameLayout
+            android:id="@android:id/tabcontent"
+            android:layout_width="fill_parent" android:layout_height="438dp"
+            android:padding="5dp" 
+			android:background="@color/white"					
+        />
+
+    </LinearLayout>
+</TabHost>
+
+
+<!-- old version working
+<?xml version="1.0" encoding="utf-8"?>
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/tabhost"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:padding="5dp">
+        <TabWidget
+            android:id="@android:id/tabs"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+
+        <FrameLayout
+            android:id="@android:id/tabcontent"
+            android:layout_width="fill_parent"
+            android:layout_height="438dp"
+            android:padding="5dp" />
+
+    </LinearLayout>
+</TabHost>
+
 -->
-<!--
-     android:cacheColorHint= "@color/black"   
-    <ListView
-		android:id="@+id/disasterlist"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-    </ListView>
-  android:id="@android:id/list" does not work. version depenedent ? -->
-    
-<!-- 
-</LinearLayout>
- -->

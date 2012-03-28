@@ -74,7 +74,6 @@ public class LoginActivity extends Activity implements OnClickListener {
     	final Button button = (Button) findViewById(R.id.loginButton);
     	button.setOnClickListener(this);
     }
-
  		
 /**
  * onClick is called when button is clicked because
@@ -132,6 +131,8 @@ public class LoginActivity extends Activity implements OnClickListener {
 	    		
     		// Store user name and password in preferences
         	iDisasterApplication.getinstance().setUserName (userName, userPassword);
+        	// Log in to Societies platform
+        	iDisasterApplication.getinstance().logIn();
         	
 // TODO: Remove code for testing the correct setting of preferences 
     	    String testName = iDisasterApplication.getinstance().preferences.
@@ -146,8 +147,12 @@ public class LoginActivity extends Activity implements OnClickListener {
     	    InputMethodManager mgr = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
     	    mgr.hideSoftInputFromWindow(userPasswordView.getWindowToken(), 0);
 
+    	    // TODO:not sure whether or not the activity should finish
+    	    // noHistory is used in Manifest to avoid putting activity on stack
+//    	    finish();
+
 	    	// Send intent to Disaster activity
-	    	startActivity(new Intent(LoginActivity.this, DisasterActivity.class));
+	    	startActivity(new Intent(LoginActivity.this, DisasterListActivity.class));
 	    }
     }
 		

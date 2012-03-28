@@ -25,8 +25,8 @@
 package com.disaster.idisaster;
 
 
-import org.societies.api.css.management.ICssRecord;
-import org.societies.api.css.management.ISocietiesApp;
+//import org.societies.api.css.management.ICssRecord;
+//import org.societies.cis.android.client.SocietiesApp;
 
 import android.app.Application;
 import android.content.SharedPreferences;
@@ -47,14 +47,15 @@ public class iDisasterApplication extends Application {
 	SharedPreferences preferences;								// Preferences shared with all activities
 	Editor editor;												// Editor for changing preferences
 
+	Boolean userLoggedIn = false;
+//    SocietiesApp iDisasterSoc; // represents access to the SOCIETIES platform.
 
 	// TODO: Remove unnecessary attributes 
-    String societiesServer = "server.societies.eu"; // The name of the server where cloud node is hosted
-    String username = "Babak"; // username to log into societiesServer
-    String password = "SocietieS"; // password for username.
-    ISocietiesApp iDisasterSoc; // represents access to the SOCIETIES platform.
-    ICssRecord cssRecord; // Represents information about the user of the application. to be populated.
-    String cssId;  //TODO: Find out which class CssId is.
+//    String societiesServer = "server.societies.eu"; // The name of the server where cloud node is hosted
+//    String username = "Babak"; // username to log into societiesServer
+//    String password = "SocietieS"; // password for username.
+//    CssRecord cssRecord; // Represents information about the user of the application. to be populated.
+//    String cssId;  //TODO: Find out which class CssId is.
 
 
 	// returns application instance
@@ -75,19 +76,29 @@ public class iDisasterApplication extends Application {
 	    editor = preferences.edit();
 	    editor.putString ("pref.dummy", "");
 	    editor.commit ();
+
+	    if (getUserName () != getString(R.string.noPreference)){
+	    	logIn();
+	    }
 	    
         //Instantiate iDisasterSoc which will give a handle to the platform
         // components:
         //TODO: Later on we need to throw an exception if SOCIETIES platform is not
         // installed on this node.
         // Comment added to avoid Bug!
-        // iDisasterSoc = new SocietiesApp (username, password);
+        // 
 	    /// ???? Is password needed to instantiate the platform - If so this code should be move to Start activity 
 
 	    
 	    
 	}//onCreate
-	
+
+	public void logIn () {
+    	//TODO: catch exception if user and password are not correct 
+//    	iDisasterSoc = new SocietiesApp (getUserName (), getPassword ());	// Get reference to the Societies platform 
+    	userLoggedIn = true;
+	}
+
 	public String getUserName () {
 		return preferences.getString ("pref.username",getString(R.string.noPreference));
 	}
@@ -96,6 +107,10 @@ public class iDisasterApplication extends Application {
     	editor.putString ("pref.username", name);
     	editor.putString ("pref.password", password);
     	editor.commit ();    	
+	}
+
+	public String getPassword () {
+		return preferences.getString ("pref.password",getString(R.string.noPreference));
 	}
 
 	public String getDisasterName () {
