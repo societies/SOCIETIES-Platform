@@ -47,6 +47,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
@@ -123,7 +124,7 @@ public class ServiceControlController {
 		methods.put("StopService", "Stop a Service");
 		methods.put("UninstallService", "Uninstall a Service");
 		methods.put("InstallService", "Install a Service");
-		methods.put("InstallServiceRemote", "Install a Service on a Remote Node");
+		//methods.put("InstallServiceRemote", "Install a Service on a Remote Node");
 		model.put("services", services);
 		model.put("methods", methods);
 		model.put("scForm", scForm);
@@ -151,17 +152,28 @@ public class ServiceControlController {
 		String url = scForm.getUrl();
 		//Service service = scForm.getService();
 		String serviceUri = scForm.getService();
+		String endpoint = scForm.getEndpoint();
+		
+
 		
 		if(logger.isDebugEnabled()){
 			logger.debug("node =  " + node );
 			logger.debug("method=" + method );
 			logger.debug("url: " + url );
 			logger.debug("Service Id:" + serviceUri );
+			logger.debug("Endpoint: " + endpoint);
+		}
+		
+		if(method.equalsIgnoreCase("NONE")){
+			
+			model.put("result", "No method selected");
+			model.put("scResult", "NOTHING");
+			return new ModelAndView("servicecontrolresult", model);
 		}
 		
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 		
-		if(serviceUri != null && !serviceUri.equals("NONE")){
+		if(!serviceUri.equals("NONE") && !serviceUri.equals("REMOTE")){
 			int index = serviceUri.indexOf('_');	
 			String bundleExtract = serviceUri.substring(0, index);
 			String identifierExtract = serviceUri.substring(index+1);
@@ -177,6 +189,35 @@ public class ServiceControlController {
 			}
 		}
 		
+		if(!method.equalsIgnoreCase("InstallService") && !endpoint.isEmpty() && (serviceUri.equals("REMOTE") || serviceUri.equals("NONE"))){
+			if(logger.isDebugEnabled()) logger.debug("It's a remote service, so we need to check it: " + endpoint);
+			
+			Future<List<Service>> asynchResult = null;
+			List<Service> services =  new ArrayList<Service>();
+			int index = endpoint.indexOf('/');	
+			String remoteJid = endpoint.substring(0, index);
+			
+			if(logger.isDebugEnabled()) logger.debug("Remote JID is: " + remoteJid);
+			
+			try {
+				asynchResult=this.getSDService().getServices(remoteJid);
+				services = asynchResult.get();
+			} catch (Exception e) {
+				logger.error("exception getting services from remote node: " + e.getMessage());
+				e.printStackTrace();
+			}
+			
+			for(Service remoteService: services){
+				if(logger.isDebugEnabled()) logger.debug("Remote service: " + remoteService.getServiceName());
+				if(remoteService.getServiceEndpoint().equals(endpoint)){
+					if(logger.isDebugEnabled()) logger.debug("Found the correct service: " + remoteService.getServiceEndpoint());
+					serviceId = remoteService.getServiceIdentifier();
+					break;
+				}
+			}
+			
+		}
+		
 		
 		Future<ServiceControlResult> asynchResult = null;
 		ServiceControlResult scresult;
@@ -185,19 +226,27 @@ public class ServiceControlController {
 		
 		try {
 	
-			if(logger.isDebugEnabled()) logger.debug("Service:" + serviceId);
-
 	
 			if (method.equalsIgnoreCase("InstallService")) {
 				
 				URL serviceUrl = new URL(url);
 				
+				/*
 				if(logger.isDebugEnabled()) logger.debug("InstallService Method on:" + serviceUrl);
 				
 				asynchResult=this.getSCService().installService(serviceUrl);
 				
 				res="ServiceControl Result Installing in Local Node: ";
+				*/
 				
+				if(logger.isDebugEnabled()) logger.debug("InstallService Remote Method on:" + serviceUrl +" on node " + node);
+				
+				asynchResult=this.getSCService().installService(serviceUrl, node);
+				if(!node.isEmpty())
+					res="ServiceControl Result for Node : [" + node + "]";
+				else
+					res="ServiceControl Result Installing in Local Node: ";
+					
 				scresult = asynchResult.get();
 				model.put("serviceResult", scresult);
 				

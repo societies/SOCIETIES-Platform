@@ -69,12 +69,20 @@ import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.orchestration.api.SuggestedCommunityAnalyserBean;
+
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
@@ -111,6 +119,11 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
 	private ArrayList<CtxEntity> availableContextData;
 	
 	private ICssDirectory userCssDirectory;
+	
+	private CommunityRecommender communityRecommender;
+	
+	private ICommManager commManager;
+	private IIdentityManager identityManager;
     
 	/*
      * Constructor for SuggestedCommunityAnalyser
@@ -127,40 +140,73 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
 			this.linkedCss = linkedEntity;
 		//else
 		//	this.linkedDomain = linkedEntity;
+		
 	}
 	
     public void initialiseSuggestedCommunityAnalyser() {
     	//getCommManager().register(this);
-    	
+    	identityManager = commManager.getIdManager();
     	new SuggestedCommunityAnalyser(linkedCss, "CSS");
     }
     
-    public void analyseEgocentricRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
+    public ArrayList<String> processEgocentricRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations, ArrayList<String> cissToCreateMetadata) {
     	//go straight to Community Recommender
+    	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
+    	ArrayList<ICisRecord> creations = cisRecommendations.get("Create CISs");
+    	if (creations != null) {
+    	    ArrayList<ArrayList<ICisRecord>> abstractCreations = new ArrayList<ArrayList<ICisRecord>>();
+    	    abstractCreations.add(creations);
+    	    convertedRecommendations.put("Create CISs", abstractCreations);
+    	}
     	
+    	ArrayList<ICisRecord> deletions = cisRecommendations.get("Delete CISs");
+    	if (deletions != null) {
+    	    ArrayList<ArrayList<ICisRecord>> abstractDeletions = new ArrayList<ArrayList<ICisRecord>>();
+    	    abstractDeletions.add(deletions);
+    	    convertedRecommendations.put("Delete CISs", abstractDeletions);
+    	}
+    	
+    	return communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(convertedRecommendations, cissToCreateMetadata);
     	
     }
     
-    public void analyseEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
-    	//go straight to Community Recommender
+    public void processCSCWRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
     	
     	
+    	
+    	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
+    	ArrayList<ICisRecord> creations = cisRecommendations.get("Create CISs");
+    	if (creations != null) {
+    	    ArrayList<ArrayList<ICisRecord>> abstractCreations = new ArrayList<ArrayList<ICisRecord>>();
+    	    abstractCreations.add(creations);
+    	    convertedRecommendations.put("Create CISs", abstractCreations);
+    	}
+    	
+    	ArrayList<ICisRecord> deletions = cisRecommendations.get("Delete CISs");
+    	if (deletions != null) {
+    	    ArrayList<ArrayList<ICisRecord>> abstractDeletions = new ArrayList<ArrayList<ICisRecord>>();
+    	    abstractDeletions.add(deletions);
+    	    convertedRecommendations.put("Delete CISs", abstractDeletions);
+    	}
+    	communityRecommender.identifyCisActionForCSCW(convertedRecommendations);
     }
     
-    public void analyseCSCWRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
+    public void processCSMAnalyserRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
+    	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
+    	ArrayList<ICisRecord> creations = cisRecommendations.get("Create CISs");
+    	if (creations != null) {
+    	    ArrayList<ArrayList<ICisRecord>> abstractCreations = new ArrayList<ArrayList<ICisRecord>>();
+    	    abstractCreations.add(creations);
+    	    convertedRecommendations.put("Create CISs", abstractCreations);
+    	}
     	
-    }
-
-    public void analyseCSCWConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
-    	
-    }
-    
-    public void analyseCSMAnalyserRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
-	
-    }
-    
-    public void analyseCSMAnalyserConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
-    	
+    	ArrayList<ICisRecord> deletions = cisRecommendations.get("Delete CISs");
+    	if (deletions != null) {
+    	    ArrayList<ArrayList<ICisRecord>> abstractDeletions = new ArrayList<ArrayList<ICisRecord>>();
+    	    abstractDeletions.add(deletions);
+    	    convertedRecommendations.put("Delete CISs", abstractDeletions);
+    	}
+    	communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations);
     }
     
     public IIdentity getLinkedCss() {
@@ -226,13 +272,21 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
     	this.userFeedbackCallback = userFeedbackCallback;
     }
     
-  //public CommManagerBundle getCommManager() {
-    //	return commManager;
-    //}
+    public CommunityRecommender getCommunityRecommender() {
+    	return communityRecommender;
+    }
     
-    //public void setCommManager(CommManagerBundle commManager) {
-    //	this.commManager = commManager;
-    //}
+    public void setCommunityRecommender(CommunityRecommender communityRecommender) {
+    	this.communityRecommender = communityRecommender;
+    }
+    
+    public ICommManager getCommManager() {
+    	return commManager;
+    }
+    
+    public void setCommManager(ICommManager commManager) {
+    	this.commManager = commManager;
+    }
     
     /**Returns the list of package names of the message beans you'll be passing*/
     public List<String> getJavaPackages() {
@@ -251,9 +305,24 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
     //}
     
     /** Put your functionality here if there IS a return object */
-    //public Object getQuery(Stanza stanza, Object messageBean) {
-    //	return null;
-    //}
+    public Object getQuery(Stanza stanza, Object messageBean) {
+    	SuggestedCommunityAnalyserBean scaBean = (SuggestedCommunityAnalyserBean) messageBean;
+    	try {
+    	IIdentity returnIdentity = identityManager.fromJid("XCManager.societies.local");
+    	} catch (InvalidFormatException e) {}
+    	switch(scaBean.getMethod()){
+		case processEgocentricRecommendations:
+			try {
+				//IIdentity owner = identityManager.fromJid(scaBean.getIdentity());
+				//String serviceType = scaBean.getServiceType();
+				break;
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+			}
+		}
+    	
+    	return null;
+    }
     
     /** Put your functionality here if there IS a return object and you are updating also */
     //public Object setQuery(Stanza arg0, Object arg1) {

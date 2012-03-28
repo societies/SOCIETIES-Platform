@@ -40,14 +40,15 @@ import java.util.Set;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
-
 public abstract class CommunityMemberCtxEntity extends CtxEntity {
 	
 	private static final long serialVersionUID = 3614587369237968591L;
 	
+	/** The communities this entity is member of. */
 	private Set<CommunityCtxEntity> communities = new HashSet<CommunityCtxEntity>();
-
+	
 	CommunityMemberCtxEntity(CtxEntityIdentifier id) {
+		
 		super(id);
 	}
 
@@ -56,7 +57,8 @@ public abstract class CommunityMemberCtxEntity extends CtxEntity {
 	 * 
 	 * @return set CommunityCtxEntity
 	 */
-	public Set<CommunityCtxEntity> getCommunities(){
+	public Set<CommunityCtxEntity> getCommunities() {
+		
 		return new HashSet<CommunityCtxEntity>(this.communities);
 	}
 	
@@ -66,6 +68,7 @@ public abstract class CommunityMemberCtxEntity extends CtxEntity {
 	 * @param community
 	 */
 	public void addCommunity(CommunityCtxEntity community) {
+		
 		this.communities.add(community);
 	}
 	
@@ -75,6 +78,7 @@ public abstract class CommunityMemberCtxEntity extends CtxEntity {
 	 * @param community
 	 */
 	public void removeCommunity(CommunityCtxEntity community) {
+		
 		this.communities.remove(community);
 	}
 }

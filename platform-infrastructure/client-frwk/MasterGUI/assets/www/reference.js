@@ -28,42 +28,39 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 function onDeviceReady() {
 	console.log("PhoneGap Loaded, Device Ready");
 	
-	/**
-	 * Register any PhoneGap plugins here. Example shown for illustration
+	//Register any PhoneGap plugins here. Example shown for illustration
 	 
 	PhoneGap.addConstructor(function() {
 		//Register the javascript plugin with PhoneGap
-		console.log("Register Connection Listener plugin ");
-		PhoneGap.addPlugin('ConnectionListener', new ConnectionListener());
+		console.log("Register CoreServiceMonitorService plugin ");
+		PhoneGap.addPlugin('CoreServiceMonitorService', new CoreServiceMonitorService());
 	 
 	});
-	*/
 }
 
 /**
  * Example of a PhoneGap plugin  being created and configured 
  * @return Instance of ConnectionListener
- 
-var ConnectionListener = function() { 
+ */
+var CoreServiceMonitorService = function() { 
 }
-*/
 
 /**
  * @param directory The directory for which we want the listing
  * @param successCallback The callback which will be called when directory listing is successful
  * @param failureCallback The callback which will be called when directory listing encouters an error
- 
-ConnectionListener.prototype.createListener = function(successCallback, failureCallback) {
- 
-	console.log("Create Connection Listener");
+*/
+CoreServiceMonitorService.prototype.activeServices = function(successCallback, failureCallback) {
+	var clientPackage = "org.societies.android.platform.gui";
+
+	console.log("Call CoreServiceMonitorService - activeServices");
 
 	return PhoneGap.exec(successCallback,    //Callback which will be called when plugin action is successful
 	failureCallback,     //Callback which will be called when plugin action encounters an error
-	'ConnectionPlugin',  //Telling PhoneGap that we want to run specified plugin
-	'createListener',              //Telling the plugin, which action we want to perform
+	'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
+	'activeServices',              //Telling the plugin, which action we want to perform
 	[]);        //Passing a list of arguments to the plugin
 };
-*/
 
 var deviceInfo = function() {
 	console.log("Get device information");
@@ -96,6 +93,20 @@ var resetDeviceMgr = function(){
     
 }
 
+var refreshActiveServices = function() {
+	console.log("Refresh the Active Service");
+
+	function success(data) {
+		alert(data[0].activeSince + " " + data[0].className);
+		
+	}
+	
+	function failure(data) {
+		alert(data);
+	}
+    window.plugins.CoreServiceMonitorService.activeServices(success, failure);
+	
+};
 
 /**
  * Add Javascript functions to various HTML tags using JQuery
@@ -118,7 +129,9 @@ jQuery(function() {
 		resetDeviceMgr();
 	});
 
-	
+	$('#refreshServices').click(function() {
+		refreshActiveServices();
+	});
 
 });
 

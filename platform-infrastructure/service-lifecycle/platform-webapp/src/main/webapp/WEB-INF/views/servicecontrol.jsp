@@ -32,7 +32,7 @@
 		<form:errors path="*" cssClass="errorblock" element="div" />
 		<table>
 			<tr>
-				<td>Service Discovery Methods :</td>
+				<td>Service Control Methods: </td>
 					<td><form:select path="method" >
 					   <form:option value="NONE" label="--- Select ---" />
 					   <form:options items="${methods}" />
@@ -41,26 +41,34 @@
 				</td>
 			</tr>
 			<tr>
-				<td>Services:</td>
+				<td>Services: </td>
 					<td><form:select path="service" >
 					   <form:option value="NONE" label="--- Select ---" />
+					   <form:option value="REMOTE" label="-- Remote Service --" />
 					   <form:options items="${services}" />
 					</form:select></td>
 				<td><form:errors path="service" cssClass="error" />
 				</td>
-			</tr>			
-			<tr>
-				<td>Node :</td>
-				<td><form:input path="node" />
-				</td>
-				<td><form:errors path="node" cssClass="error" />
-				</td>
 			</tr>
 			<tr>
-				<td>Url :</td>
+				<td>Remote Service Endpoint: </td>
+				<td><form:input path="endpoint" />
+				</td>
+				<td><form:errors path="endpoint" cssClass="error" />
+				</td>
+			</tr>			
+			<tr>
+				<td>Bundle Url: </td>
 				<td><form:input path="url" />
 				</td>
 				<td><form:errors path="url" cssClass="error" />
+				</td>
+			</tr>						
+			<tr>
+				<td>Node to Install: </td>
+				<td><form:input path="node" />
+				</td>
+				<td><form:errors path="node" cssClass="error" />
 				</td>
 			</tr>					
 			<tr>

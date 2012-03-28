@@ -62,6 +62,7 @@
 	<div data-role="content" data-theme="a">	
     	<a href="#deviceManager" data-theme="a" data-transition="pop" data-role="button" >Device Manager</a>
     	<a href="#cssRegistration" data-theme="a" data-transition="pop" data-role="button" >CSS Registration</a>
+    	<a href="#activeServices" data-theme="a" data-transition="pop" data-role="button" >Active Services Monitor</a>
 	
 	</div><!-- /content -->
 
@@ -119,6 +120,45 @@
 	</div><!-- /header -->
 
 	<div data-role="content" data-theme="a">	
+	</div><!-- /content -->
+
+	<div data-role="footer" data-theme="a" data-position="fixed">
+		<a href="#menu" data-role="button" data-icon="back" data-inline="true">menu</a>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of Active Services page -->
+<div data-role="page" id="activeServices">
+
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Active Services</p>
+	</div><!-- /header -->
+
+	<div data-role="content" data-theme="a">	
+		<button id="refreshServices" data-theme="a">Refresh services</button>	
+	
+		<table border="1">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Package Name</th>
+				<th>Process</th>
+				<th>Elapsed Time</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!--tr>
+				<td>row 1, cell 1</td>
+				<td>row 1, cell 2</td>
+				<td>row 1, cell 3</td>
+			</tr>
+			<tr>
+				<td>row 2, cell 1</td>
+				<td>row 2, cell 2</td>
+				<td>row 2, cell 3</td>
+			</tr-->
+		</tbody>
+		</table>
 	</div><!-- /content -->
 
 	<div data-role="footer" data-theme="a" data-position="fixed">

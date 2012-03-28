@@ -39,7 +39,6 @@ import android.os.Parcelable;
  *
  */
 public class AndroidCSSNode extends CssNode implements Parcelable {
-	
 	/**
 	 * Default Constructor
 	 */

@@ -27,7 +27,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 package org.societies.android.platform.servicemonitor;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.societies.android.platform.interfaces.ICoreServiceExample;
 import org.societies.android.platform.interfaces.ICoreServiceMonitor;
@@ -47,7 +46,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.RemoteException;
 import android.util.Log;

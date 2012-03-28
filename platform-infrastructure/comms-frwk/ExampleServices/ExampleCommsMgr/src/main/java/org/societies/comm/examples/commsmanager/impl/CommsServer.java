@@ -138,16 +138,17 @@ public class CommsServer implements IFeatureServer {
 		return NAMESPACES;
 	}
 	
-	/* Put your functionality here if there is NO return object, ie, VOID 
-	 */
+	/* Put your functionality here if there is NO return object, ie, VOID  */
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
 		//CHECK WHICH END BUNDLE TO BE CALLED THAT I MANAGE
-		
+		if (payload instanceof CalcBean){ 
+			CalcBean messageBean = (CalcBean)payload;
+			LOG.debug("*** Message Recieved by ExampleCommMgr: " + messageBean.getMessage());
+		}
 	}
 
-	/* Put your functionality here if there IS a return object
-	 */
+	/* Put your functionality here if there IS a return object */
 	@Override
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
 		//CHECK WHICH END BUNDLE TO BE CALLED THAT I MANAGE
