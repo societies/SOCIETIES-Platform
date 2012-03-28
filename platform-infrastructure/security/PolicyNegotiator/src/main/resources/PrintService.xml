@@ -1,0 +1,573 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?><societies>
+	<serviceOperationPolicy Id="Container">
+		<sop Id="Premium Printing for businesses. Costs 0.02€ per A4, but requires more that 2000 sheets to be printed per month">
+			<SLA xmlns="http://www.ibm.com/wsla" name="StockquoteServiceAgreement12345" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ibm.com/wsla c:\Projects\WSLA\wsla.xsd">
+				
+				<Parties>
+					
+					<ServiceProvider name="ACMEProvider">
+						<Contact>
+							<POBox>P.O.Box 218</POBox>
+							<City>Yorktown, NY 10598, USA</City>
+						</Contact>
+						<Action name="Notification" partyName="ACMEProvider" xsi:type="WSDLSOAPActionDescriptionType">
+							<WSDLFile>Notification.wsdl</WSDLFile>
+							<SOAPBindingName>SOAPNotificationBinding</SOAPBindingName>
+							<SOAPOperationName>Notify</SOAPOperationName>
+						</Action>
+					</ServiceProvider>
+					
+					<ServiceConsumer name="TheConsumer">
+						<Contact>
+							<Street>30 Saw Mill River RD</Street>
+							<City>Hawthorne, NY 10532, USA</City>
+						</Contact>
+						<Action name="Notification" partyName="TheConsumer" xsi:type="WSDLSOAPActionDescriptionType">
+							<WSDLFile>Notification.wsdl</WSDLFile>
+							<SOAPBindingName>SOAPNotificationBinding</SOAPBindingName>
+							<SOAPOperationName>Notify</SOAPOperationName>
+						</Action>
+					</ServiceConsumer>
+					
+					<SupportingParty name="ms" role="MeasurementServiceProvider" sponsor="ACMEProvider">
+						<Contact>
+							<Street>Saeumerstrasse 4</Street>
+							<City>CH-8803 Ruschlikon, Switzerland</City>
+						</Contact>
+					</SupportingParty>
+					
+				</Parties>
+				
+				<ServiceDefinition name="StockQuoteservice">
+					
+					<Operation name="WSDLSOAPGetQuote" xsi:type="wsla:WSDLSOAPOperationDescriptionType">
+						<Schedule name="MainSchedule">
+							<Period>
+								<Start>2001-11-30T14:00:00.000-05:00</Start>
+								<End>2001-12-31T14:00:00.000-05:00</End>
+							</Period>
+							<Interval>
+								<Minutes>2</Minutes>
+								<Seconds>30</Seconds>
+							</Interval>
+						</Schedule>
+						<SLAParameter name="AverageResponseTime" type="float" unit="seconds">
+							<Metric>averageResponseTime</Metric>
+						</SLAParameter>
+						<Metric name="averageResponseTime" type="double" unit="seconds">
+							<Source>ms</Source>
+							<Function resultType="double" xsi:type="wsla:Divide">
+								<Operand>
+									<Function resultType="double" xsi:type="wsla:Plus">
+										<Operand>
+											<Metric>averageResponseTimeHost1</Metric>
+										</Operand>
+										<Operand>
+											<Metric>averageResponseTimeHost2</Metric>
+										</Operand>
+									</Function>
+								</Operand>
+								<Operand>
+									<LongScalar>2</LongScalar>
+								</Operand>
+							</Function>
+						</Metric>
+						<Metric name="averageResponseTimeHost1" type="double" unit="seconds">
+							<Source>ms</Source>
+							<Function resultType="double" xsi:type="wsla:Mean">
+								<Metric>responseTimesHost1</Metric>
+							</Function>
+						</Metric>
+						<Metric name="responseTimesHost1" type="TS" unit="seconds">
+							<Source>ms</Source>
+							<Function resultType="TS" xsi:type="wsla:TSConstructor">
+								<Schedule>MainSchedule</Schedule>
+								<Metric>responseTimeHost1</Metric>
+							</Function>
+						</Metric>
+						<Metric name="responseTimeHost1" type="double" unit="seconds">
+							<Source>ms</Source>
+							<MeasurementDirective resultType="double" xsi:type="wsla:ResponseTime">
+								<MeasurementURI>http://ms.com/testResponse</MeasurementURI>
+							</MeasurementDirective>
+						</Metric>
+						<Metric name="averageResponseTimeHost2" type="double" unit="seconds">
+							<Source>ms</Source>
+							<Function resultType="double" xsi:type="wsla:Mean">
+								<Metric>responseTimesHost2</Metric>
+							</Function>
+						</Metric>
+						<Metric name="responseTimesHost2" type="TS" unit="seconds">
+							<Source>ms</Source>
+							<Function resultType="TS" xsi:type="wsla:TSConstructor">
+								<Schedule>MainSchedule</Schedule>
+								<Metric>ResponseTimeHost2</Metric>
+							</Function>
+						</Metric>
+						<Metric name="responseTimeHost2" type="double" unit="seconds">
+							<Source>ms</Source>
+							<MeasurementDirective resultType="double" xsi:type="wsla:ResponseTime">
+								<MeasurementURI>http://ms.com/testResponse</MeasurementURI>
+							</MeasurementDirective>
+						</Metric>
+						<WSDLFile>StockQuoteService.wsdl</WSDLFile>
+						<SOAPBindingName>SOAPNotificationBinding</SOAPBindingName>
+						<SOAPOperationName>getQuote</SOAPOperationName>
+					</Operation>
+					
+				</ServiceDefinition>
+				
+				<Obligations>
+					
+					<ServiceLevelObjective name="g1" serviceObject="WSDLSOAPGetQuote">
+						<Obliged>ACMEProvider</Obliged>
+						<Validity>
+							<StartDate>2001-08-15:1400</StartDate>
+							<EndDate>2001-09-15:1400</EndDate>
+						</Validity>
+						<Expression>
+							<Predicate xsi:type="wsla:Less">
+								<SLAParameter>AverageResponseTime</SLAParameter>
+								<Value>15</Value>
+							</Predicate>
+						</Expression>
+						<EvaluationEvent>NewValue</EvaluationEvent>
+					</ServiceLevelObjective>
+					
+					<ActionGuarantee name="g2">
+						<Obliged>ms</Obliged>
+						<Expression>
+							<Predicate xsi:type="wsla:Violation">
+								<ServiceLevelObjective>g1</ServiceLevelObjective>
+							</Predicate>
+						</Expression>
+						<EvaluationEvent>NewValue</EvaluationEvent>
+						<QualifiedAction>
+							<Party>TheConsumer</Party>
+							<Action actionName="notification" xsi:type="Notification">
+								<NotificationType>Violation</NotificationType>
+								<CausingGuarantee>g1</CausingGuarantee>
+								<SLAParameter>AverageResponseTime</SLAParameter>
+							</Action>
+						</QualifiedAction>
+						<ExecutionModality>Always</ExecutionModality>
+					</ActionGuarantee>
+					
+					<ActionGuarantee name="g3">
+						<Obliged>ms</Obliged>
+						<Expression>
+							<Predicate xsi:type="wsla:Less">
+								<SLAParameter>AverageResponseTime</SLAParameter>
+								<Value>4</Value>
+							</Predicate>
+						</Expression>
+						<EvaluationEvent>NewValue</EvaluationEvent>
+						<QualifiedAction>
+							<Party>TheConsumer</Party>
+							<Action actionName="notification" xsi:type="Notification">
+								<NotificationType>Violation</NotificationType>
+								<CausingGuarantee>g1</CausingGuarantee>
+								<SLAParameter>AverageResponseTime</SLAParameter>
+							</Action>
+						</QualifiedAction>
+						<QualifiedAction>
+							<Party>ACMEProvider</Party>
+							<Action actionName="notification" xsi:type="Notification">
+								<NotificationType>Violation</NotificationType>
+								<CausingGuarantee>g1</CausingGuarantee>
+								<SLAParameter>AverageResponseTime</SLAParameter>
+							</Action>
+						</QualifiedAction>
+						<ExecutionModality>OnEnteringAndOnLeavingCondition
+						</ExecutionModality>
+					</ActionGuarantee>
+					
+				</Obligations>
+				
+			</SLA>
+		</sop>
+		<sop Id="Standard Printing. Costs 0.1€ per A4">
+			<SLA xmlns="http://www.ibm.com/wsla" name="StockquoteServiceAgreement12345" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ibm.com/wsla c:\Projects\WSLA\wsla.xsd">
+				
+				<Parties>
+					
+					<ServiceProvider name="ACMEProvider">
+						<Contact>
+							<POBox>P.O.Box 218</POBox>
+							<City>Yorktown, NY 10598, USA</City>
+						</Contact>
+						<Action name="Notification" partyName="ACMEProvider" xsi:type="WSDLSOAPActionDescriptionType">
+							<WSDLFile>Notification.wsdl</WSDLFile>
+							<SOAPBindingName>SOAPNotificationBinding</SOAPBindingName>
+							<SOAPOperationName>Notify</SOAPOperationName>
+						</Action>
+					</ServiceProvider>
+					
+					<ServiceConsumer name="TheConsumer">
+						<Contact>
+							<Street>30 Saw Mill River RD</Street>
+							<City>Hawthorne, NY 10532, USA</City>
+						</Contact>
+						<Action name="Notification" partyName="TheConsumer" xsi:type="WSDLSOAPActionDescriptionType">
+							<WSDLFile>Notification.wsdl</WSDLFile>
+							<SOAPBindingName>SOAPNotificationBinding</SOAPBindingName>
+							<SOAPOperationName>Notify</SOAPOperationName>
+						</Action>
+					</ServiceConsumer>
+					
+					<SupportingParty name="ms" role="MeasurementServiceProvider" sponsor="ACMEProvider">
+						<Contact>
+							<Street>Saeumerstrasse 4</Street>
+							<City>CH-8803 Ruschlikon, Switzerland</City>
+						</Contact>
+					</SupportingParty>
+					
+				</Parties>
+				
+				<ServiceDefinition name="StockQuoteservice">
+					
+					<Operation name="WSDLSOAPGetQuote" xsi:type="wsla:WSDLSOAPOperationDescriptionType">
+						<Schedule name="MainSchedule">
+							<Period>
+								<Start>2001-11-30T14:00:00.000-05:00</Start>
+								<End>2001-12-31T14:00:00.000-05:00</End>
+							</Period>
+							<Interval>
+								<Minutes>2</Minutes>
+								<Seconds>30</Seconds>
+							</Interval>
+						</Schedule>
+						<SLAParameter name="AverageResponseTime" type="float" unit="seconds">
+							<Metric>averageResponseTime</Metric>
+						</SLAParameter>
+						<Metric name="averageResponseTime" type="double" unit="seconds">
+							<Source>ms</Source>
+							<Function resultType="double" xsi:type="wsla:Divide">
+								<Operand>
+									<Function resultType="double" xsi:type="wsla:Plus">
+										<Operand>
+											<Metric>averageResponseTimeHost1</Metric>
+										</Operand>
+										<Operand>
+											<Metric>averageResponseTimeHost2</Metric>
+										</Operand>
+									</Function>
+								</Operand>
+								<Operand>
+									<LongScalar>2</LongScalar>
+								</Operand>
+							</Function>
+						</Metric>
+						<Metric name="averageResponseTimeHost1" type="double" unit="seconds">
+							<Source>ms</Source>
+							<Function resultType="double" xsi:type="wsla:Mean">
+								<Metric>responseTimesHost1</Metric>
+							</Function>
+						</Metric>
+						<Metric name="responseTimesHost1" type="TS" unit="seconds">
+							<Source>ms</Source>
+							<Function resultType="TS" xsi:type="wsla:TSConstructor">
+								<Schedule>MainSchedule</Schedule>
+								<Metric>responseTimeHost1</Metric>
+							</Function>
+						</Metric>
+						<Metric name="responseTimeHost1" type="double" unit="seconds">
+							<Source>ms</Source>
+							<MeasurementDirective resultType="double" xsi:type="wsla:ResponseTime">
+								<MeasurementURI>http://ms.com/testResponse</MeasurementURI>
+							</MeasurementDirective>
+						</Metric>
+						<Metric name="averageResponseTimeHost2" type="double" unit="seconds">
+							<Source>ms</Source>
+							<Function resultType="double" xsi:type="wsla:Mean">
+								<Metric>responseTimesHost2</Metric>
+							</Function>
+						</Metric>
+						<Metric name="responseTimesHost2" type="TS" unit="seconds">
+							<Source>ms</Source>
+							<Function resultType="TS" xsi:type="wsla:TSConstructor">
+								<Schedule>MainSchedule</Schedule>
+								<Metric>ResponseTimeHost2</Metric>
+							</Function>
+						</Metric>
+						<Metric name="responseTimeHost2" type="double" unit="seconds">
+							<Source>ms</Source>
+							<MeasurementDirective resultType="double" xsi:type="wsla:ResponseTime">
+								<MeasurementURI>http://ms.com/testResponse</MeasurementURI>
+							</MeasurementDirective>
+						</Metric>
+						<WSDLFile>StockQuoteService.wsdl</WSDLFile>
+						<SOAPBindingName>SOAPNotificationBinding</SOAPBindingName>
+						<SOAPOperationName>getQuote</SOAPOperationName>
+					</Operation>
+					
+				</ServiceDefinition>
+				
+				<Obligations>
+					
+					<ServiceLevelObjective name="g1" serviceObject="WSDLSOAPGetQuote">
+						<Obliged>ACMEProvider</Obliged>
+						<Validity>
+							<StartDate>2001-08-15:1400</StartDate>
+							<EndDate>2001-09-15:1400</EndDate>
+						</Validity>
+						<Expression>
+							<Predicate xsi:type="wsla:Less">
+								<SLAParameter>AverageResponseTime</SLAParameter>
+								<Value>50</Value>
+							</Predicate>
+						</Expression>
+						<EvaluationEvent>NewValue</EvaluationEvent>
+					</ServiceLevelObjective>
+					
+					<ActionGuarantee name="g2">
+						<Obliged>ms</Obliged>
+						<Expression>
+							<Predicate xsi:type="wsla:Violation">
+								<ServiceLevelObjective>g1</ServiceLevelObjective>
+							</Predicate>
+						</Expression>
+						<EvaluationEvent>NewValue</EvaluationEvent>
+						<QualifiedAction>
+							<Party>TheConsumer</Party>
+							<Action actionName="notification" xsi:type="Notification">
+								<NotificationType>Violation</NotificationType>
+								<CausingGuarantee>g1</CausingGuarantee>
+								<SLAParameter>AverageResponseTime</SLAParameter>
+							</Action>
+						</QualifiedAction>
+						<ExecutionModality>Always</ExecutionModality>
+					</ActionGuarantee>
+					
+					<ActionGuarantee name="g3">
+						<Obliged>ms</Obliged>
+						<Expression>
+							<Predicate xsi:type="wsla:Less">
+								<SLAParameter>AverageResponseTime</SLAParameter>
+								<Value>4</Value>
+							</Predicate>
+						</Expression>
+						<EvaluationEvent>NewValue</EvaluationEvent>
+						<QualifiedAction>
+							<Party>TheConsumer</Party>
+							<Action actionName="notification" xsi:type="Notification">
+								<NotificationType>Violation</NotificationType>
+								<CausingGuarantee>g1</CausingGuarantee>
+								<SLAParameter>AverageResponseTime</SLAParameter>
+							</Action>
+						</QualifiedAction>
+						<QualifiedAction>
+							<Party>ACMEProvider</Party>
+							<Action actionName="notification" xsi:type="Notification">
+								<NotificationType>Violation</NotificationType>
+								<CausingGuarantee>g1</CausingGuarantee>
+								<SLAParameter>AverageResponseTime</SLAParameter>
+							</Action>
+						</QualifiedAction>
+						<ExecutionModality>OnEnteringAndOnLeavingCondition
+						</ExecutionModality>
+					</ActionGuarantee>
+					
+				</Obligations>
+				
+			</SLA>
+		</sop>
+		<sop Id="Free Printing with Ads. Extracts texts from printed material and uses it for targeted ad delivery. Ads apear in client and on printed paper">
+			<SLA xmlns="http://www.ibm.com/wsla" name="StockquoteServiceAgreement12345" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ibm.com/wsla c:\Projects\WSLA\wsla.xsd">
+				
+				<Parties>
+					
+					<ServiceProvider name="ACMEProvider">
+						<Contact>
+							<POBox>P.O.Box 218</POBox>
+							<City>Yorktown, NY 10598, USA</City>
+						</Contact>
+						<Action name="Notification" partyName="ACMEProvider" xsi:type="WSDLSOAPActionDescriptionType">
+							<WSDLFile>Notification.wsdl</WSDLFile>
+							<SOAPBindingName>SOAPNotificationBinding</SOAPBindingName>
+							<SOAPOperationName>Notify</SOAPOperationName>
+						</Action>
+					</ServiceProvider>
+					
+					<ServiceConsumer name="TheConsumer">
+						<Contact>
+							<Street>30 Saw Mill River RD</Street>
+							<City>Hawthorne, NY 10532, USA</City>
+						</Contact>
+						<Action name="Notification" partyName="TheConsumer" xsi:type="WSDLSOAPActionDescriptionType">
+							<WSDLFile>Notification.wsdl</WSDLFile>
+							<SOAPBindingName>SOAPNotificationBinding</SOAPBindingName>
+							<SOAPOperationName>Notify</SOAPOperationName>
+						</Action>
+					</ServiceConsumer>
+					
+					<SupportingParty name="ms" role="MeasurementServiceProvider" sponsor="ACMEProvider">
+						<Contact>
+							<Street>Saeumerstrasse 4</Street>
+							<City>CH-8803 Ruschlikon, Switzerland</City>
+						</Contact>
+					</SupportingParty>
+					
+				</Parties>
+				
+				<ServiceDefinition name="StockQuoteservice">
+					
+					<Operation name="WSDLSOAPGetQuote" xsi:type="wsla:WSDLSOAPOperationDescriptionType">
+						<Schedule name="MainSchedule">
+							<Period>
+								<Start>2001-11-30T14:00:00.000-05:00</Start>
+								<End>2001-12-31T14:00:00.000-05:00</End>
+							</Period>
+							<Interval>
+								<Minutes>2</Minutes>
+								<Seconds>30</Seconds>
+							</Interval>
+						</Schedule>
+						<SLAParameter name="AverageResponseTime" type="float" unit="seconds">
+							<Metric>averageResponseTime</Metric>
+						</SLAParameter>
+						<Metric name="averageResponseTime" type="double" unit="seconds">
+							<Source>ms</Source>
+							<Function resultType="double" xsi:type="wsla:Divide">
+								<Operand>
+									<Function resultType="double" xsi:type="wsla:Plus">
+										<Operand>
+											<Metric>averageResponseTimeHost1</Metric>
+										</Operand>
+										<Operand>
+											<Metric>averageResponseTimeHost2</Metric>
+										</Operand>
+									</Function>
+								</Operand>
+								<Operand>
+									<LongScalar>2</LongScalar>
+								</Operand>
+							</Function>
+						</Metric>
+						<Metric name="averageResponseTimeHost1" type="double" unit="seconds">
+							<Source>ms</Source>
+							<Function resultType="double" xsi:type="wsla:Mean">
+								<Metric>responseTimesHost1</Metric>
+							</Function>
+						</Metric>
+						<Metric name="responseTimesHost1" type="TS" unit="seconds">
+							<Source>ms</Source>
+							<Function resultType="TS" xsi:type="wsla:TSConstructor">
+								<Schedule>MainSchedule</Schedule>
+								<Metric>responseTimeHost1</Metric>
+							</Function>
+						</Metric>
+						<Metric name="responseTimeHost1" type="double" unit="seconds">
+							<Source>ms</Source>
+							<MeasurementDirective resultType="double" xsi:type="wsla:ResponseTime">
+								<MeasurementURI>http://ms.com/testResponse</MeasurementURI>
+							</MeasurementDirective>
+						</Metric>
+						<Metric name="averageResponseTimeHost2" type="double" unit="seconds">
+							<Source>ms</Source>
+							<Function resultType="double" xsi:type="wsla:Mean">
+								<Metric>responseTimesHost2</Metric>
+							</Function>
+						</Metric>
+						<Metric name="responseTimesHost2" type="TS" unit="seconds">
+							<Source>ms</Source>
+							<Function resultType="TS" xsi:type="wsla:TSConstructor">
+								<Schedule>MainSchedule</Schedule>
+								<Metric>ResponseTimeHost2</Metric>
+							</Function>
+						</Metric>
+						<Metric name="responseTimeHost2" type="double" unit="seconds">
+							<Source>ms</Source>
+							<MeasurementDirective resultType="double" xsi:type="wsla:ResponseTime">
+								<MeasurementURI>http://ms.com/testResponse</MeasurementURI>
+							</MeasurementDirective>
+						</Metric>
+						<WSDLFile>StockQuoteService.wsdl</WSDLFile>
+						<SOAPBindingName>SOAPNotificationBinding</SOAPBindingName>
+						<SOAPOperationName>getQuote</SOAPOperationName>
+					</Operation>
+					
+				</ServiceDefinition>
+				
+				<Obligations>
+					
+					<ServiceLevelObjective name="g1" serviceObject="WSDLSOAPGetQuote">
+						<Obliged>ACMEProvider</Obliged>
+						<Validity>
+							<StartDate>2001-08-15:1400</StartDate>
+							<EndDate>2001-09-15:1400</EndDate>
+						</Validity>
+						<Expression>
+							<Predicate xsi:type="wsla:Less">
+								<SLAParameter>AverageResponseTime</SLAParameter>
+								<Value>5</Value>
+							</Predicate>
+						</Expression>
+						<EvaluationEvent>NewValue</EvaluationEvent>
+					</ServiceLevelObjective>
+					
+					<ActionGuarantee name="g2">
+						<Obliged>ms</Obliged>
+						<Expression>
+							<Predicate xsi:type="wsla:Violation">
+								<ServiceLevelObjective>g1</ServiceLevelObjective>
+							</Predicate>
+						</Expression>
+						<EvaluationEvent>NewValue</EvaluationEvent>
+						<QualifiedAction>
+							<Party>TheConsumer</Party>
+							<Action actionName="notification" xsi:type="Notification">
+								<NotificationType>Violation</NotificationType>
+								<CausingGuarantee>g1</CausingGuarantee>
+								<SLAParameter>AverageResponseTime</SLAParameter>
+							</Action>
+						</QualifiedAction>
+						<ExecutionModality>Always</ExecutionModality>
+					</ActionGuarantee>
+					
+					<ActionGuarantee name="g3">
+						<Obliged>ms</Obliged>
+						<Expression>
+							<Predicate xsi:type="wsla:Less">
+								<SLAParameter>AverageResponseTime</SLAParameter>
+								<Value>4</Value>
+							</Predicate>
+						</Expression>
+						<EvaluationEvent>NewValue</EvaluationEvent>
+						<QualifiedAction>
+							<Party>TheConsumer</Party>
+							<Action actionName="notification" xsi:type="Notification">
+								<NotificationType>Violation</NotificationType>
+								<CausingGuarantee>g1</CausingGuarantee>
+								<SLAParameter>AverageResponseTime</SLAParameter>
+							</Action>
+						</QualifiedAction>
+						<QualifiedAction>
+							<Party>ACMEProvider</Party>
+							<Action actionName="notification" xsi:type="Notification">
+								<NotificationType>Violation</NotificationType>
+								<CausingGuarantee>g1</CausingGuarantee>
+								<SLAParameter>AverageResponseTime</SLAParameter>
+							</Action>
+						</QualifiedAction>
+						<ExecutionModality>OnEnteringAndOnLeavingCondition
+						</ExecutionModality>
+					</ActionGuarantee>
+					
+				</Obligations>
+				
+			</SLA>
+		</sop>
+	</serviceOperationPolicy>
+<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="Signature-7E1CE4B4-9B25-11E0-BA24-005056C00008"><ds:SignedInfo Id="SignedInfo-7E1CE4B5-9B25-11E0-BA24-005056C00008"><ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/><ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><ds:Reference URI="#Container"><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>QGqeEBSSZcWvjKgrJUsdDaSAFIY=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue Id="SignatureValue-7E1CE4B6-9B25-11E0-BA24-005056C00008">R/VZKRt0aDVBFrrHU2wUzwm/W6qTK3hZLrZvToCTWh5Z7eIkqUvMJe/jh5Xp+OvqlNVwqvE6/ba8
+eWy3HW2X7juitbf82Cy7NXy95NUnzKeX5FatqbOrSUxwdSNy5fcu0dqlDRC04ZoauTPsUXszIYOG
+ML/vkvBSODcEpYhxVSE=</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIB7DCCAVUCBE3yJZAwDQYJKoZIhvcNAQEFBQAwPTEWMBQGA1UECgwNSUNUIFNPQ0lFVElF
+UzEjMCEGA1UEAwwaU29jaWV0aWVzIFNlcnZpY2UgUHJvdmlkZXIwHhcNMTEwNjEwMTQwOTIw
+WhcNMTMwNjA5MTQwOTIwWjA9MRYwFAYDVQQKDA1JQ1QgU09DSUVUSUVTMSMwIQYDVQQDDBpT
+b2NpZXRpZXMgU2VydmljZSBQcm92aWRlcjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA
+8J1KXqL1OrJCF6+g3JOmUFoOcs1gzjocyLRBS0xyfV1JYbn6yY0ZYIH37OG/jXcuiZaD/PQL
+KMGGxL5nyQd13dkVMNvR0p3hPTTfcAt8+sGXE1PWP11MNz3KyX2nFg2yxBBTJe7BX+7yzi4G
+aewFphtAiQtCrgtH5OHggI7yvVkCAwEAATANBgkqhkiG9w0BAQUFAAOBgQBK1M8dF0BZO/Rb
+g8Zs1xhNKcwnZIrTq2SwdQVBA5U2C3FXeV2hvCUlJyUqgD0EaF/j6V85pxFUlWgA1LoONzZd
+afOIIvCheoUH6lyxqzrKH8E2Yh6/Hwvc0XX9phFx8UrRaMYJxRhHQYR2z+6Tdj/WfHa4i23h
+18Wx86iM+xViBA==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature></societies>

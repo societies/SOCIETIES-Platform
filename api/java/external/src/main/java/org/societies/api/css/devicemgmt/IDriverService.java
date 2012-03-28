@@ -1,7 +1,7 @@
 package org.societies.api.css.devicemgmt;
 
 
-public interface IDeviceService {
+public interface IDriverService {
 	
 	 /**
      * 

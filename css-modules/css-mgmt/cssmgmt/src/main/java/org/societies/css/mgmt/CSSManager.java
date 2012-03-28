@@ -84,8 +84,8 @@ public class CSSManager implements ICSSLocalManager {
 	 * @param cssDiscoveryRemote
 	 *            the cssDiscoveryRemote to set
 	 */
-	public void setCssDiscoveryRemote(ICssDirectoryRemote cssDirectoryRemote) {
-		this.cssDirectoryRemote = cssDirectoryRemote;
+	public void setCssDiscoveryRemote(ICssDirectoryRemote cssDiscoveryRemote) {
+		this.cssDirectoryRemote = cssDiscoveryRemote;
 	}
 
 	/**

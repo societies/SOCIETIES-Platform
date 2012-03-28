@@ -22,98 +22,79 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.security.policynegotiator.sla;
 
-package org.societies.api.css.devicemgmt;
+import java.util.Random;
 
-import java.util.List;
+import org.societies.api.identity.IIdentity;
 
+/**
+ * 
+ *
+ * @author Mitja Vardjan
+ *
+ */
+public class Session {
 
-public interface IDevice {
+	private static Random rnd = new Random();
+	
+	private int sessionId;
+	private IIdentity requester;
+	private IIdentity provider;
+	private SLA sla;
 
 	/**
-	 * 
-	 * @return
+	 * Constructor. Session ID is generated automatically.
 	 */
-    public String getDeviceName();
-   
-    /**
-     * 
-     * @return
-     */
-    public String getDeviceId();
-    
-    /**
-     * 
-     * @return
-     */
-    public String getDeviceType();
-    
-    /**
-     * 
-     * @return
-     */
-    public String getDeviceDescription();
-    
-    /**
-     * 
-     * @return
-     */
-    public String getDeviceConnetionType();
-    
-    /**
-     * 
-     */
-    public void enable();
-    
-    /**
-     * 
-     */
-    public void disable();
-    
-    /**
-     * 
-     * @return
-     */
-    public boolean isEnable();
-    
-    /**
-     * 
-     * @return
-     */
-    public String getDeviceLocation();
-    
-    /**
-     * 
-     * @return
-     */
-    public String getDeviceProvider();
-    
-    /**
-     * 
-     * @return
-     */
-    public boolean isContextSource();
-    
-    
-    /**
-     * 
-     * @param serviceId
-     * @return
-     */
-    public IDriverService getService (String serviceId);
-    
-    
-    /**
-     * 
-     * @return
-     * 
-     */
-    public IDriverService[] getServices ();
-    
-    
-    /**
-	 * 
-	 * @return
+	public Session() {
+		sessionId = rnd.nextInt();
+	}
+	
+	/**
+	 * Constructor. Session ID is generated automatically.
 	 */
-	public List<String> getEvenNametList();
+	public Session(int sessionId) {
+		this.sessionId = sessionId;
+	}
+
+	/**
+	 * @return Session ID
+	 */
+	public int getId() {
+		return sessionId;
+	}
+
+	/**
+	 * Get Service Operation Policy (SOP) or the final Service Level Agreement (SLA)
+	 * 
+	 * @return SOP or SLA
+	 */
+	public SLA getSla() {
+		return sla;
+	}
+	
+	/**
+	 * Set Service Operation Policy (SOP) or the final Service Level Agreement (SLA)
+	 * 
+	 * @param sla SOP or SLA
+	 */
+	public void setSla(SLA sla) {
+		this.sla = sla;
+	}
+
+	public IIdentity getRequester() {
+		return requester;
+	}
+	
+	public void setRequester(IIdentity requester) {
+		this.requester = requester;
+	}
+
+	public IIdentity getProvider() {
+		return provider;
+	}
+	
+	public void setProvider(IIdentity provider) {
+		this.provider = provider;
+	}
 }

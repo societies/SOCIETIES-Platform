@@ -22,44 +22,87 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.css.devicemgmt.DeviceDriverSimulator.actions;
 
-package org.societies.api.css.devicemgmt;
-
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
 
-public interface IAction {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.css.devicemgmt.IAction;
+import org.societies.api.css.devicemgmt.IDeviceStateVariable;
+import org.societies.css.devicemgmt.DeviceDriverSimulator.Screen;
+import org.societies.css.devicemgmt.DeviceDriverSimulator.statevariables.MessageStateVariable;
+
+/**
+ * Describe your class here...
+ *
+ * @author rafik
+ *
+ */
+public class DisplayMessageAction implements IAction{
+
+	final private String NAME = "displayMessage";
 	
-	/**
-	 * 
-	 * @return
-	 */
-	public List<String> getInputArgumentNames();
+	final private String OUTPUT = null;
 	
-	/**
-	 * 
-	 * @return
-	 */
-	public String getName();
+	final private String INPUT = "message";
+
+	private static Logger LOG = LoggerFactory.getLogger(DisplayMessageAction.class);
 	
-	/**
-	 * 
-	 * @return
-	 */
-	public List <String> getOutputArgumentNames();
+	private List<String> outputArguments;
+	private List<String> inputArguments;
 	
-	/**
-	 * 
-	 * @param argumentName
-	 * @return
-	 */
-	public IDeviceStateVariable getStateVariable (String argumentName);
+	private Screen screen;
 	
-	/**
-	 * 
-	 * @param arguments
-	 * @return
-	 */
-	public Dictionary<String, Object> invokeAction(Dictionary<String, Object> arguments);
+	private MessageStateVariable messageStateVariable;
+	
+	
+	
+	public DisplayMessageAction(Screen screen , MessageStateVariable messageStateVariable) {
+
+		this.screen = screen;
+		this.messageStateVariable = messageStateVariable;
+		
+		inputArguments = new ArrayList<String>();
+		this.inputArguments.add(INPUT);
+	}
+
+
+	@Override
+	public List<String> getInputArgumentNames() {
+		return inputArguments;
+	}
+
+
+	@Override
+	public String getName() {
+		return NAME;
+	}
+
+
+	@Override
+	public List<String> getOutputArgumentNames() {
+		return null;
+	}
+
+	
+	@Override
+	public IDeviceStateVariable getStateVariable(String argumentName) {
+
+		return messageStateVariable;
+	}
+
+
+	@Override
+	public Dictionary<String, Object> invokeAction(Dictionary<String, Object> arguments) {
+	
+		String msg = (String)arguments.get(INPUT);
+		
+		screen.sendMessageToScreen(msg);
+		
+		return null;
+	}
 
 }

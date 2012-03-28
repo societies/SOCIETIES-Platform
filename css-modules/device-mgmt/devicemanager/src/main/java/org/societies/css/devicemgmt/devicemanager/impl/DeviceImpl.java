@@ -36,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.societies.api.css.devicemgmt.IDevice;
-import org.societies.api.css.devicemgmt.IDeviceService;
+import org.societies.api.css.devicemgmt.IDriverService;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 
 
@@ -122,18 +122,28 @@ public class DeviceImpl implements IDevice{
 	}
 
 	@Override
-	public IDeviceService getService(String serviceId) {
+	public IDriverService getService(String serviceId) {
 	
-		String deviceMacAddress = deviceManager.getDeviceMacAddress(this.deviceId);
-		List <String> serviceList = deviceManager.getDeviceServiceIds(this.deviceId);
-		if (serviceList != null && deviceMacAddress != null) 
+		LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ getService 1 " + serviceId); 
+		
+		String physicalDeviceId = deviceManager.getPhysicalDeviceId(deviceId);
+		
+		LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ getService 2 physicalDeviceId: " + physicalDeviceId);
+		
+		List <String> serviceList = deviceManager.getDeviceServiceIds(deviceId);
+		
+		LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ getService 3"); 
+		
+		if (serviceList != null && physicalDeviceId != null) 
 		{
+			LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ serviceList non null"); 
 			if (serviceList.contains(serviceId))
 			{
+				LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ serviceList.contains(serviceId) get service by: service id = " + serviceId +" and device Id = " + deviceId); 
 				ServiceReference[] sr = null;
 				try 
 				{
-					sr = bundleContext.getServiceReferences(IDeviceService.class.getName(), "(&(serviceId="+serviceId+")(deviceMacAddress="+deviceMacAddress+"))");
+					sr = bundleContext.getServiceReferences(IDriverService.class.getName(), "(&(driverServiceId="+serviceId+")(physicalDeviceId="+physicalDeviceId+"))");
 				} 
 				catch (InvalidSyntaxException e) 
 				{
@@ -141,10 +151,13 @@ public class DeviceImpl implements IDevice{
 				}
 				if (sr != null)
 				{
-					IDeviceService iDeviceService = (IDeviceService)bundleContext.getService(sr[0]);
+					LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ sr"); 
+					
+					IDriverService iDeviceService = (IDriverService)bundleContext.getService(sr[0]);
 
 					return iDeviceService;
 				}
+				LOG.info("++++++++++++++++++++++++++++++++++++++++++++++ sr null"); 
 				return null;
 			}
 			return null;
@@ -153,34 +166,39 @@ public class DeviceImpl implements IDevice{
 	}
 
 	@Override
-	public IDeviceService [] getServices() {
+	public IDriverService [] getServices() {
 
-		String deviceMacAddress = deviceManager.getDeviceMacAddress(this.deviceId);
+		String physicalDeviceId = deviceManager.getPhysicalDeviceId(this.deviceId);
 		List <String> serviceList = deviceManager.getDeviceServiceIds(this.deviceId);
 		
-		List<IDeviceService> deviceServiceList = new ArrayList<IDeviceService>();
+		List<IDriverService> deviceServiceList = new ArrayList<IDriverService>();
 		
-		if (serviceList != null && deviceMacAddress != null) 
+		if (serviceList != null && physicalDeviceId != null) 
 		{
 			ServiceReference[] sr = null;
 			for(String serviceId : serviceList)
 			{
 				try 
 				{
-					sr = bundleContext.getServiceReferences(IDeviceService.class.getName(), "(&(serviceId="+serviceId+")(deviceMacAddress="+deviceMacAddress+"))");
+					sr = bundleContext.getServiceReferences(IDriverService.class.getName(), "(&(driverServiceId="+serviceId+")(physicalDeviceId="+physicalDeviceId+"))");
 				
 				} catch (InvalidSyntaxException e) {
 					e.printStackTrace();
 				}
 				if (sr != null)
 				{
-					IDeviceService iDeviceService = (IDeviceService)bundleContext.getService(sr[0]);
+					IDriverService iDeviceService = (IDriverService)bundleContext.getService(sr[0]);
 
 					deviceServiceList.add(iDeviceService);
 				}
 			}
-			return (IDeviceService [])deviceServiceList.toArray(new IDeviceService []{});
+			return (IDriverService [])deviceServiceList.toArray(new IDriverService []{});
 		}
+		return null;
+	}
+	
+	@Override
+	public List<String> getEvenNametList(){
 		return null;
 	}
 
