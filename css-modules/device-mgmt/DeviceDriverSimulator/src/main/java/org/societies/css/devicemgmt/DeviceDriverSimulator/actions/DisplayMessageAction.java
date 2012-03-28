@@ -100,6 +100,8 @@ public class DisplayMessageAction implements IAction{
 	
 		String msg = (String)arguments.get(INPUT);
 		
+		LOG.info("DisplayMessageAction info: yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy invokeAction " + msg);
+		
 		screen.sendMessageToScreen(msg);
 		
 		return null;

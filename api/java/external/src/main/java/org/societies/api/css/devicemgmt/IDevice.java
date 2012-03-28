@@ -28,6 +28,7 @@ package org.societies.api.css.devicemgmt;
 import java.util.List;
 
 /**
+ * Interface used to expose a device as an OSGI Service, this interface will be used by a device consumer to get device metadata and to get device services
  * @author Rafik (Trialog)
  *
  */
@@ -35,65 +36,65 @@ public interface IDevice {
 
 	/**
 	 * 
-	 * @return
+	 * @return A device name
 	 */
     public String getDeviceName();
    
     /**
      * 
-     * @return
+     * @return A device ID
      */
     public String getDeviceId();
     
     /**
      * 
-     * @return
+     * @return a device type
      */
     public String getDeviceType();
     
     /**
      * 
-     * @return
+     * @return a device description
      */
     public String getDeviceDescription();
     
     /**
      * 
-     * @return
+     * @return return a device connection type (e.g. Zigbee, Wi-Fi and so on)
      */
     public String getDeviceConnetionType();
     
     /**
-     * 
+     * method used to enable a device
      */
     public void enable();
     
     /**
-     * 
+     * method used to disable a device
      */
     public void disable();
     
     /**
      * 
-     * @return
+     * @return true if the device is enable else false
      */
     public boolean isEnable();
     
     /**
      * 
-     * @return
+     * @return a device physical location (e.g. "room1")
      */
     public String getDeviceLocation();
     
     /**
      * 
-     * @return
+     * @return a device provider (e.g. "Trialog")
      */
     public String getDeviceProvider();
     
     /**
      * 
-     * @return
+     * @return true if the device can be used by the context management
      */
     public boolean isContextSource();
     
@@ -101,14 +102,14 @@ public interface IDevice {
     /**
      * 
      * @param serviceId
-     * @return
+     * @return a service provided by the driver that provides this device
      */
     public IDriverService getService (String serviceId);
     
     
     /**
      * 
-     * @return
+     * @return All services provided by the driver that provides this device 
      * 
      */
     public IDriverService[] getServices ();
@@ -116,7 +117,7 @@ public interface IDevice {
     
     /**
 	 * 
-	 * @return
+	 * @return a list of event name to be used to subscribe to the events published by this device
 	 */
-	public List<String> getEvenNametList();
+	public List<String> getEventNameList();
 }

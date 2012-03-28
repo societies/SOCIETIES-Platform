@@ -198,7 +198,7 @@ public class DeviceImpl implements IDevice{
 	}
 	
 	@Override
-	public List<String> getEvenNametList(){
+	public List<String> getEventNameList(){
 		return null;
 	}
 
