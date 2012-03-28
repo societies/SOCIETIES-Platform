@@ -11,8 +11,9 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
 	
-	<osgi:service ref="cssDirectory" interface="org.societies.api.css.directory.ICssDirectory" />
-	
+	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
+
+	<osgi:service ref="CssDirectoryRemote" interface="org.societies.css.directory.CommsClient" />
 	<osgi:reference id="CommManagerBundle" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="0..1" />
 	
 </beans>

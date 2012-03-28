@@ -41,7 +41,7 @@ public interface INegotiationRequester {
 	 * should be used instead.
 	 * 
 	 * @param sessionId ID of this session
-	 * @param signedPolicyOption The selected policy alternative
+	 * @param selectedPolicyOptionId The selected policy alternative
 	 */
 	public void acceptUnmodifiedPolicy(int sessionId, String selectedPolicyOptionId);
 	

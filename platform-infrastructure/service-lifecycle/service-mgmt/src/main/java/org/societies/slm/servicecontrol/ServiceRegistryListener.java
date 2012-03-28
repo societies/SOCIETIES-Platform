@@ -41,16 +41,23 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.Ser
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
+import org.societies.api.schema.servicelifecycle.model.ServiceLocation;
 import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
+import org.societies.api.schema.servicelifecycle.model.ServiceType;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.util.OsgiListenerUtils;
 
 /**
  * 
+ * This class implements the Service Registry Listener, that registers and unregisters services
+ * 
  * @author pkuppuud
+ * @author mmanniox
+ * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  * 
  */
+
 public class ServiceRegistryListener implements BundleContextAware,
 		ServiceListener {
 
@@ -141,12 +148,9 @@ public class ServiceRegistryListener implements BundleContextAware,
 			return;
 		}
 		
-		if(log.isDebugEnabled()){
-			log.debug("**Service MetadataModel Data Read**");
-			log.debug("**Service Name** : "+service.getServiceName());
-			log.debug("**Service Desc** : "+service.getServiceDescription());
-			log.debug("**Service type** : "+service.getServiceType().toString());
-		}
+		
+		service.setServiceLocation(ServiceLocation.LOCAL);
+		service.setServiceType(ServiceType.THIRD_PARTY_SERVICE);
 		
 		service.setServiceEndpoint(commMngr.getIdManager().getThisNetworkNode().getJid()  + "/" +  service.getServiceName().replaceAll(" ", ""));
 
@@ -157,10 +161,24 @@ public class ServiceRegistryListener implements BundleContextAware,
 		
 		ServiceImplementation servImpl = new ServiceImplementation();
 		servImpl.setServiceVersion((String)event.getServiceReference().getProperty("Bundle-Version"));
-
+		servImpl.setServiceNameSpace(serBndl.getSymbolicName());
+		servImpl.setServiceProvider((String) event.getServiceReference().getProperty("ServiceProvider"));
 		
 		si.setServiceImpl(servImpl);
 		service.setServiceInstance(si);
+		
+		if(log.isDebugEnabled()){
+			log.debug("**Service MetadataModel Data Read**");
+			log.debug("**Service Name** : "+service.getServiceName());
+			log.debug("**Service Desc** : "+service.getServiceDescription());
+			log.debug("**Service type** : "+service.getServiceType().toString());
+			log.debug("**Service Location** : "+service.getServiceLocation().toString());
+			log.debug("**Service Endpoint** : "+service.getServiceEndpoint());
+			log.debug("**Service Provider** : "+service.getServiceInstance().getServiceImpl().getServiceProvider());
+			log.debug("**Service Namespace** : "+service.getServiceInstance().getServiceImpl().getServiceNameSpace());
+			log.debug("**Service Version** : "+service.getServiceInstance().getServiceImpl().getServiceVersion());
+		}
+		
 		service.setServiceStatus(ServiceStatus.STARTED);
 		
 		List<Service> serviceList = new ArrayList<Service>();

@@ -25,6 +25,8 @@
 package org.societies.api.css.devicemgmt;
 
 /**
+ * 
+ * Interface used to declare  a driver device service
  * @author Rafik (Trialog)
  *
  */
@@ -52,14 +54,14 @@ public interface IDriverService {
     
     /**
      * 
-     * @return
+     * @return A list of state variables used by this driver device service
      */
     public IDeviceStateVariable [] getStateVariables ();
 
     
     /**
      * 
-     * @return
+     * @return driver device service id
      */
     public String getId ();
     

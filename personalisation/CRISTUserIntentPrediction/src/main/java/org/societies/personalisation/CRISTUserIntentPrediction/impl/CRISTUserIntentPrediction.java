@@ -21,6 +21,7 @@
 package org.societies.personalisation.CRISTUserIntentPrediction.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 // import javax.annotation.PostConstruct;
 // import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.stereotype.Component;
@@ -35,6 +36,7 @@ import org.societies.api.internal.personalisation.model.FeedbackEvent;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
+import org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager;
 import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
@@ -44,6 +46,8 @@ import org.societies.personalisation.common.api.management.IPersonalisationInter
 public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 
 	private IInternalPersonalisationManager persoMgr;
+	private ICRISTUserIntentTaskManager cristTaskManager;
+	
 	private IIdentity myId;
 	private CtxAttributeIdentifier myCtxId;
 	private ServiceResourceIdentifier serviceId;
@@ -135,7 +139,18 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 			IIdentity entityID,
 			IAction action, IPersonalisationInternalCallback callback) {
 		// TODO Auto-generated method stub
-		return null;
+		ArrayList<CRISTUserAction> results = new ArrayList<CRISTUserAction>();
+		HashMap<CRISTUserAction, Double> predictionResult = null;
+		predictionResult = cristTaskManager.getNextActions((CRISTUserAction) action);
+		
+		ArrayList<CRISTUserAction> predictedCadidates = (ArrayList<CRISTUserAction>) predictionResult.keySet();
+		for (int i=0;i<predictionResult.size();i++){
+			if (predictionResult.get(predictedCadidates.get(i))>=1){
+				results.add(predictedCadidates.get(i));
+			}
+		}
+		
+		return results;
 	}
 
 	/* (non-Javadoc)

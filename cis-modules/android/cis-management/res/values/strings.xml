@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">This is the social content provider, and it rocks!</string>
+    <string name="app_name">CisManagerLight</string>
+    <string name="provider_authority">org.societies.cis.android.SocialProvider</string>
+    <string name="provider_read_permission">Read social data</string>
+    <string name="provider_write_permission">Write social data</string>
+    <string name="provider_read_permission_desc">Allows the application to read data related to groups and contacts.</string>
+    <string name="provider_write_permission_desc">Allows the application to modify or delete data related to groups and contacts.</string>
+</resources>

@@ -23,6 +23,7 @@ package org.societies.personalisation.CRISTUserIntentTaskManager.impl;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.societies.api.context.model.CtxAttribute;
@@ -40,6 +41,8 @@ import org.societies.personalisation.common.api.management.IPersonalisationInter
 
 public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager{
 
+	private LinkedHashMap<String,Integer> intentModel = null; 
+	
 	private ICRISTUserIntentPrediction cristPrediction;
 	private ICRISTUserIntentDiscovery cristDiscovery;
 	private ICtxBroker ctxBroker;
@@ -173,8 +176,34 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager{
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager#getNextActions(org.societies.personalisation.CRIST.api.model.CRISTUserAction)
 	 */
 	@Override
-	public HashMap<CRISTUserAction, Double> getNextActions(CRISTUserAction arg0) {
+	public HashMap<CRISTUserAction, Double> getNextActions(CRISTUserAction currentAction) {
 		// TODO Auto-generated method stub
+		String actionValue = currentAction.getActionID();
+		CRISTUserSituation currentSituation = getCurrentUserSituation();
+		String situationValue = currentSituation.getSituationID();
+		
+		if (this.intentModel == null){
+			// TODO: Retrieve intent model from CtxBroker
+			System.out.println("Trying to retrieve the user's intent model from CtxBroker...");
+			// this.ctxBroker.retrieveHistory();
+			
+			if (this.intentModel == null){
+				// In case there is no intent model on the CtxBroker, generate a new model
+				// TODO: Retrieve the user's history data from CtxBroker
+				// this.ctxBroker.retrieveHistory();
+				ArrayList<MockHistoryData> historyData = null;
+				
+				this.cristDiscovery.enableCRISTUIDiscovery(true);
+				this.intentModel = this.cristDiscovery.generateNewCRISTUIModel(historyData);
+				// TODO: Upload the new intentModel to the CtxBroker				
+			}
+		}
+		
+		if (this.intentModel != null){
+			// TODO: Get the next actions
+			
+		}
+		
 		return null;
 	}
 
@@ -202,10 +231,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager{
 	@Override
 	public CRISTUserTaskModelData getTaskModelData() {
 		// TODO Auto-generated method stub
-		List<MockHistoryData> historyData = null;
 		
-		cristDiscovery.enableCRISTUIDiscovery(true);
-		cristDiscovery.generateNewCRISTUIModel(historyData);
+		
 		return null;
 	}
 
