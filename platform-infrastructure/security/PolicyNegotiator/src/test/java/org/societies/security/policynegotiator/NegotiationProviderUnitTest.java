@@ -56,7 +56,6 @@ public class NegotiationProviderUnitTest {
 		groupMgrMock = mock(INegotiationProviderRemote.class);
 		
 		//classUnderTest = new NegotiationProvider(signatureMgrMock, groupMgrMock);
-		
 		classUnderTest = new NegotiationProvider();
 		classUnderTest.setGroupMgr(groupMgrMock);
 		classUnderTest.setSignatureMgr(signatureMgrMock);
