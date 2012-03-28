@@ -26,7 +26,7 @@ import android.widget.TextView;
  *
  */
 public class DisasterActivity extends TabActivity {
-
+	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,6 +40,7 @@ public class DisasterActivity extends TabActivity {
         // Set view label to selected disaster name
     	String disasterName = iDisasterApplication.getinstance().getDisasterName ();
 		TextView title = (TextView)findViewById(R.id.disasterLabel);
+
 		title.setText (disasterName);
         
         Resources res = getResources(); // Resource object to get Drawables
@@ -113,9 +114,9 @@ public class DisasterActivity extends TabActivity {
         	iDisasterApplication.getinstance().setUserName
         		(getString(R.string.noPreference), getString(R.string.noPreference));	// reset user preferences
 //        	iDisasterApplication.getinstance().userLoggedIn = false;
-// TODO:not sure whether or not the activity should finish
-// noHistory is used in Manifest to avoid putting activity on stack
-//        	finish();
+
+//	    	finish();	// noHistory=true in Manifest => the activity is removed from the activity stack and finished.
+
     		startActivity(new Intent(DisasterActivity.this, StartActivity.class));
     		break;
 

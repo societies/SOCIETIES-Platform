@@ -62,6 +62,10 @@ public class StartActivity extends Activity implements OnClickListener {
 	    // Add click listener to button
 	    final Button button = (Button) findViewById(R.id.startButton);
 	    button.setOnClickListener(this);
+
+//	    Test dialog
+//    	iDisasterApplication.getinstance().showDialog (this, getString(R.string.startTestDialog), getString(R.string.dialogOK));
+
     }
 
 /**
@@ -82,8 +86,6 @@ public class StartActivity extends Activity implements OnClickListener {
  */
 	private void startNextActivity () {
 		
-		getPreferences ();					// retrieve user preferences
-		
     	if (userName == getString(R.string.noPreference)) {								// no user name (no password)
     		startActivity(new Intent(StartActivity.this, LoginActivity.class));
     		return;
@@ -91,6 +93,7 @@ public class StartActivity extends Activity implements OnClickListener {
     		startActivity(new Intent(StartActivity.this, DisasterListActivity.class));
     		return;
     	} else {
+    		
     		startActivity(new Intent(StartActivity.this, DisasterActivity.class));
     		return;
     	}
@@ -105,19 +108,4 @@ public class StartActivity extends Activity implements OnClickListener {
 		startNextActivity ();			// select next activity
 	}
 
-/**
- * showDialog is used under testing
- */
-	private void showDialog () {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(getString(R.string.startTestDialog))
-			.setCancelable(false)
-			.setPositiveButton (getString(R.string.dialogOK), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-	    	   return;
-	         }
-	       });
-		AlertDialog dialog = builder.create();
-		dialog.show();
-	}
 }
