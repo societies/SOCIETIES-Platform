@@ -31,7 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.societies.android.platform.devicestatus.DeviceStatusServiceDifferentProcess;
-import org.societies.android.platform.interfaces.ServiceMethodTranslator;
+import org.societies.android.platform.utilities.ServiceMethodTranslator;
 import org.societies.api.android.internal.IDeviceStatus;
 import org.societies.api.android.internal.model.BatteryStatus;
 import org.societies.api.android.internal.model.ProviderStatus;

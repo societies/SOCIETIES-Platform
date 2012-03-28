@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.android.platform.devicestatus.DeviceStatus;
-import org.societies.android.platform.interfaces.ServiceMethodTranslator;
+import org.societies.android.platform.utilities.ServiceMethodTranslator;
 import org.societies.api.android.internal.IDeviceStatus;
 import org.societies.api.android.internal.model.ProviderStatus;
 
