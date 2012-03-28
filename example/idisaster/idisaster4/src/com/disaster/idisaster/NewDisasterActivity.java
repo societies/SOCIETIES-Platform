@@ -62,7 +62,11 @@ public class NewDisasterActivity extends Activity implements OnClickListener {
 
     	// Add click listener to button
     	final Button button = (Button) findViewById(R.id.newDisasterCreateButton);
-    	button.setOnClickListener(this);	
+    	button.setOnClickListener(this);
+
+//	    Test dialog
+//    	iDisasterApplication.getinstance().showDialog (this, getString(R.string.newDisasterTestDialog), getString(R.string.dialogOK));
+
     }
 
 
@@ -130,25 +134,14 @@ public class NewDisasterActivity extends Activity implements OnClickListener {
     	    InputMethodManager mgr = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
     	    mgr.hideSoftInputFromWindow(disasterNameView.getWindowToken(), 0);
 
-// TODO: Go back to list of next activity? Should it be Home?
-	    	startActivity(new Intent(NewDisasterActivity.this, DisasterActivity.class));
+//	    	finish();	// noHistory=true in Manifest => the activity is removed from the activity stack and finished.
+
+//TODO: remove test code
+    	    iDisasterApplication.getinstance().disasterNameList.add(disasterName);
+    	    
+    	    // Go back to the list of disasters
+	    	startActivity(new Intent(NewDisasterActivity.this, DisasterListActivity.class));
 	    }
     }
-		
-/**
- * showDialog is used under testing
- */
-	private void showDialog () {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(getString(R.string.newDisasterTestDialog))
-			.setCancelable(false)
-			.setPositiveButton (getString(R.string.dialogOK), new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					return;
-			    }
-			});
-		AlertDialog dialog = builder.create();
-		dialog.show();
-	}
 
 }

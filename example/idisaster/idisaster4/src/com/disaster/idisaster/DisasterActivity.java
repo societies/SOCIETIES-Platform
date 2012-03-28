@@ -1,321 +1,131 @@
-/**
- * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
- * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
- * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
- * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
- * conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
- *    disclaimer in the documentation and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
- * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
- * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package com.disaster.idisaster;
 
-import java.util.ArrayList;
+//import org.societies.api.css.management.ICssRecord;
+//import org.societies.api.css.management.ISocietiesApp;
+// import org.societies.cis.android.client.SocietiesApp;
 
-import android.app.Activity;
-import android.app.ListActivity;
+import android.app.TabActivity;
+import android.content.Intent;
+import android.content.SharedPreferences.Editor;
+import android.content.res.Resources;
 import android.os.Bundle;
-import android.widget.ListView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.content.Intent;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.graphics.Color;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.widget.Toast;
+import android.widget.TabHost;
+import android.widget.TextView;
 
 /**
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-
+ * This activity is responsible for interaction with the
+ * main home page for iDisaster.
+ * The home page relates to a specific Disaster community
+ * and provide access to activity feeds, users and services
+ * related to the community.
  * 
- */
-import android.widget.AdapterView.OnItemClickListener;
-
-
-/**
- * This activity allows the users to manage the disasters they own and
- * or the disasters they subscribe to.
- * 
- * @author Jacqueline.Floch@sintef.no
+ * @authors Jacqueline.Floch@sintef.no
+ * 			Babak.Farshchian@sintef.no
  *
  */
-public class DisasterActivity extends ListActivity {
-
+public class DisasterActivity extends TabActivity {
+	
+    /** Called when the activity is first created. */
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-    	// TODO Auto-generated method stub
-
-    	super.onCreate(savedInstanceState);
+    public void onCreate(Bundle savedInstanceState) {
     	
-    	setContentView (R.layout.disaster_layout);
-    	ListView listView = getListView();
-    	
-    	// Enable filtering for the contents of the list view.
-    	// The filtering logic should be provided
-    	// listView.setTextFilterEnabled(true);  
-    	
-    	
-    	// TODO: Get the list from Societies API
-    	final String[] CISLIST = new String[] { "Disaster 1", "Disaster 2", "Disaster 3", "Disaster 4",
-    			"Disaster 5", "Disaster 6", "Disaster 7", "Disaster 8", "Disaster 9", "Disaster 10", "Disaster 11",
-    			"Disaster 12", "Disaster 13", "Disaster 14", "Disaster 15", "Disaster 16", "Disaster 17", "Disaster 18",
-    			"Disaster 19", "Disaster 20", "Disaster 21", "Disaster 22", "Disaster 23", "Disaster 24", "Disaster 25",
-    			"Disaster 26", "Disaster 27", "Disaster 28", "Disaster 29" };
+        super.onCreate(savedInstanceState);
+        
+// TODO: Add check that 1) a disaster is selected 2) the selected disaster still exists...
+        
+        setContentView(R.layout.disaster_layout);
 
-    	// The Adapter provides access to the data items.
-    	// The Adapter is also responsible for making a View for each item in the data set.
-    	//  Parameters: Context, Layout for the row, ID of the View to which the data is written, Array of data
+        // Set view label to selected disaster name
+    	String disasterName = iDisasterApplication.getinstance().getDisasterName ();
+		TextView title = (TextView)findViewById(R.id.disasterLabel);
 
-    	ArrayAdapter<String> adapter = new ArrayAdapter<String> (this,
-    			R.layout.disaster_list_item, R.id.disaster_item, CISLIST);
-    	
-    	// Assign adapter to ListView
-    	listView.setAdapter(adapter);
+		title.setText (disasterName);
+        
+        Resources res = getResources(); // Resource object to get Drawables
+        TabHost tabHost = getTabHost();  // The activity TabHost
+        TabHost.TabSpec spec;  // Reusable TabSpec for each tab
+        Intent intent;  // Reusable Intent for each tab
 
-    	// Add listener for short click.
-    	// 
-    	listView.setOnItemClickListener(new OnItemClickListener() {
-    		public void onItemClick (AdapterView<?> parent, View view,
-    			int position, long id) {
-    			// Store the selected disaster in preferences
-            	iDisasterApplication.getinstance().setDisasterName (CISLIST [position]);
+        // Create an Intent to launch an Activity for the tab (to be reused)
+        intent = new Intent().setClass(this, FeedActivity.class);
 
-// TODO: Remove code for testing the correct setting of preferences 
-    			Toast.makeText(getApplicationContext(),
-    				"Click ListItem Number " + (position+1) + " " + CISLIST [position], Toast.LENGTH_LONG)
-    				.show();
-    			// Start the Home Activity
-    			startActivity(new Intent(DisasterActivity.this, HomeActivity.class));
-    		}
-    	});	
+        // Initialize a TabSpec for each tab and add it to the TabHost
+        spec = tabHost.newTabSpec("activities").setIndicator("Activities",
+                          res.getDrawable(R.drawable.ic_tab_home))
+                      .setContent(intent);
+        tabHost.addTab(spec);
 
-    	// Add listener for long click
-    	// listView.setOnItemLongClickListener(new DrawPopup());
+        // Do the same for the other tabs
+        intent = new Intent().setClass(this, UserActivity.class);
+        spec = tabHost.newTabSpec("users").setIndicator("Users",
+                          res.getDrawable(R.drawable.ic_tab_home))
+                      .setContent(intent);
+        tabHost.addTab(spec);
+
+        intent = new Intent().setClass(this, ServiceActivity.class);
+        spec = tabHost.newTabSpec("services").setIndicator("Services",
+                          res.getDrawable(R.drawable.ic_tab_home))
+                      .setContent(intent);
+        tabHost.addTab(spec);
+
+        // Start with disasters tab visible:
+        tabHost.setCurrentTab(0);
 
     }
+
+    /** Called at start of the active lifetime. */
+    @Override
+	protected void onResume() {
+		super.onResume();
+	}//onResume
 
 /**
  * onCreateOptionsMenu creates the activity menu.
  */
- 
+     
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+    	menu.clear();
+    	getMenuInflater().inflate(R.menu.disaster_menu, menu);
+    	
+//    	It is possible to set up a variable menu		
+//    	menu.findItem (R.id....).setVisible(true);	
+    	return true;
+    }
+
+ /**
+  * onOptionsItemSelected handles the selection of an item in the activity menu.
+  */
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu){
-		menu.clear();
-		getMenuInflater().inflate(R.menu.disaster_menu, menu);
-
-//		It is possible to set up a variable menu		
-//			menu.findItem (R.id....).setVisible(true);
-
-		return true;
-	}
-
-/**
- * onOptionsItemSelected handles the selection of an item in the activity menu.
- */
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-
+    public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.disasterMenuAdd:
-			startActivity(new Intent(DisasterActivity.this, NewDisasterActivity.class));
+    		case R.id.disasterMenuSelectDisaster:
+            	iDisasterApplication.getinstance().setDisasterName 
+            		(getString(R.string.noPreference));									// reset user preferences
+// TODO:not sure whether or not the activity should finish
+// noHistory is used in Manifest to avoid putting activity on stack
+//            	 finish();	
+    			startActivity(new Intent(DisasterActivity.this, DisasterListActivity.class));
 			break;
-		default:
-			break;
-		}
-		return true;
-	}
+    	case R.id.disasterMenuLogoff:
+//TODO: Call the Societies platform
+        	iDisasterApplication.getinstance().setUserName
+        		(getString(R.string.noPreference), getString(R.string.noPreference));	// reset user preferences
+//        	iDisasterApplication.getinstance().userLoggedIn = false;
 
-/**
-	@Override
-	public void onListItemClick (ListView l, View v, int pos, long id) {
-		if(l.getAdapter().getItemViewType(pos) == SeparatedListAdapter.TYPE_SECTION_HEADER)
-		{
-			//Pressing a header			
-			return;
-		}
-		Poi p = (Poi) l.getAdapter().getItem(pos);
+//	    	finish();	// noHistory=true in Manifest => the activity is removed from the activity stack and finished.
 
-		if (requestCode == NewPoiActivity.CHOOSE_POI){
-			Intent resultIntent = new Intent();
-			resultIntent.putExtra(IntentPassable.POI, p);
-			setResult( Activity.RESULT_OK, resultIntent );
-			finish();
-			return;
-		}
+    		startActivity(new Intent(DisasterActivity.this, StartActivity.class));
+    		break;
 
-		if (requestCode == PlanTripTab.ADD_TO_TRIP || requestCode == TripListActivity.ADD_TO_TRIP){
+    		
+    	default:
+    		break;
+    	}
+    	return true;
+    }
 
-			if(selectedPois == null){				
-				selectedPois = new ArrayList<Poi>();
-			}
-			if(!selectedPois.contains(p)){
-				v.setBackgroundColor(0xff9ba7d5);
-				selectedPois.add(p);
-			}else {
-				v.setBackgroundColor(Color.TRANSPARENT);
-				selectedPois.remove(p);
-			}
-			return;
-		}
-
-
-		if (requestCode == SHARE_POI){
-			if(sharePois == null){				
-				sharePois = new ArrayList<Poi>();
-			}
-			if(!sharePois.contains(p)){
-				v.setBackgroundColor(0xff9ba7d5);
-				sharePois.add(p);
-			}else {
-				v.setBackgroundColor(Color.TRANSPARENT);
-				sharePois.remove(p);
-			}
-			return;
-		}
-
-		if (requestCode == DOWNLOAD_POI){
-
-			if(downloadedPois == null){				
-				downloadedPois = new ArrayList<Poi>();
-			}
-			if(!downloadedPois.contains(p)){
-				v.setBackgroundColor(0xff9ba7d5);
-				downloadedPois.add(p);
-			}else {
-				v.setBackgroundColor(Color.TRANSPARENT);
-				downloadedPois.remove(p);
-			}
-			return;
-		}
-
-		Intent details = new Intent(PlanPoiTab.this, PoiDetailsActivity.class);
-		details.putExtra(IntentPassable.POI, p);
-
-		startActivity(details);
-	}//onListItemClick
-	
-*/
-
-/**
- * Show quick actions when the user long-presses an item 
- */
-	/**
-	final private class DrawPopup implements AdapterView.OnItemLongClickListener {
-
-		public boolean onItemLongClick(AdapterView<?> parent, View v, int pos, long id) {
-
-			final String	s 			= (String) parent.getAdapter().getItem(pos);
-			final AdapterView<?> par 	= parent;
-			final int	idx				= pos;
-			final int[] xy 				= new int[2];
-			
-			v.getLocationInWindow(xy);
-
-			final Rect rect 		= new Rect(	xy[0], 
-					xy[1], 
-					xy[0]+v.getWidth(), 
-					xy[1]+v.getHeight());
-
-			final QuickActionPopup qa = new QuickActionPopup (DisasterActivity.this, v, rect);
-
-			Drawable mapviewIcon	= res.getDrawable(android.R.drawable.ic_menu_mapmode);
-			Drawable directIcon		= res.getDrawable(android.R.drawable.ic_menu_directions);
-			Drawable deleteIcon		= res.getDrawable(android.R.drawable.ic_menu_delete);
-
-			// declare quick actions 			
-			qa.addItem(deleteIcon, "Delete from tour", new OnClickListener(){
-
-				public void onClick(View view){
-					db.deleteFromTrip(trip, trip.getPoiAt(idx));
-
-					trip.removePoi(idx);
-
-					//delete from list
-					((PoiAdapter)par.getAdapter()).remove(p);	
-					((PoiAdapter)par.getAdapter()).notifyDataSetChanged();
-					qa.dismiss();
-				}
-			});
-
-			qa.addItem(mapviewIcon,	"Show on map",		new OnClickListener(){
-
-				public void onClick(View view){
-
-					Intent showInMap = new Intent(TripListActivity.this, MapsActivity.class);
-					ArrayList<Poi> selectedPois = new ArrayList<Poi>();
-					selectedPois.add(p);
-					showInMap.putParcelableArrayListExtra(IntentPassable.POILIST, selectedPois);
-
-					startActivity(showInMap);
-					qa.dismiss();
-				}
-			});
-
-			qa.addItem(directIcon,	"Get directions",	new OnClickListener(){
-
-				public void onClick(View view){
-
-					//Latitude and longitude for current position
-					double slon = userLocation.getLongitude();
-					double slat = userLocation.getLatitude();
-					//Latitude and longitude for selected poi
-					double dlon = p.getGeoPoint().getLongitudeE6()/1E6;
-					double dlat = p.getGeoPoint().getLatitudeE6()/1E6;
-
-					Intent navigate = new Intent(TripListActivity.this, NavigateFrom.class);
-					navigate.putExtra("slon", slon);
-					navigate.putExtra("slat", slat);
-					navigate.putExtra("dlon", dlon);
-					navigate.putExtra("dlat", dlat);
-					startActivity(navigate);
-
-					qa.dismiss();
-
-				}
-			});
-
-			qa.show();
-
-			return true;
-		}
-	}
-*/
-
-/**
- * showDialog is used under testing
- */
-	private void showDialog () {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage(getString(R.string.disasterTestDialog))
-				.setCancelable(false)
-				.setPositiveButton (getString(R.string.dialogOK), new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						return;
-				    }
-				});
-		AlertDialog dialog = builder.create();
-		dialog.show();
-	}
+  
 }
