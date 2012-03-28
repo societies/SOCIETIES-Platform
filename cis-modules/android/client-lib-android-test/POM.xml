@@ -60,7 +60,27 @@
             <plugin>
                 <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                 <artifactId>android-maven-plugin</artifactId>
+				<configuration>
+					<test>
+				<!--<skip>true|false|auto</skip>-->
+				<!--<instrumentationPackage>packageName</instrumentationPackage>-->
+				<!--<instrumentationRunner>className</instrumentationRunner>-->
+				<!--<debug>true|false</debug>-->
+				<!--coverage>true</coverage-->
+				<!--<logonly>true|false</logonly> avd-->
+				<!--<testsize>small|medium|large</testsize>-->
+				<!--testSize>small</testSize-->
+						<createReport>true</createReport>
+				<!--classes>
+					<class>org.societies.android.platform.servicemonitor.test.TestStartedService</class>
+				</classes-->
+				<!--<packages>-->
+				<!--<package>your.package.name</package>-->
+				<!--</packages>-->
+					</test>
+				</configuration>
             </plugin>
         </plugins>
+    </build>
     </build>
 </project>
