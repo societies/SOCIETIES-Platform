@@ -13,7 +13,7 @@
    <groupId>org.societies.android.platform</groupId>
    <artifactId>cis-manager-light</artifactId>
    <!-- see Redmine wiki for componentname from project structure -->
-   <version>0.1</version> 
+   <version>${release.version}</version> 
    <!-- still being discussed -->
    <name>CisManagerLight</name>
    <packaging>apk</packaging>

@@ -11,7 +11,7 @@
    </parent>
 
    <groupId>org.societies.android.platform</groupId>
-   <artifactId>cis-lib-android</artifactId>
+   <artifactId>client-lib-android</artifactId>
    <!-- see Redmine wiki for componentname from project structure -->
    <version>0.1</version> 
    <!-- still being discussed -->

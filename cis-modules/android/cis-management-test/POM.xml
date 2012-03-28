@@ -50,6 +50,11 @@
             <groupId>com.phonegap</groupId>
             <artifactId>phonegap</artifactId>
         </dependency>
+        <dependency>
+			<groupId>org.societies.android.platform</groupId>
+			<artifactId>cis-manager-light</artifactId>
+	    	<version>${release.version}</version>
+        </dependency>		
     </dependencies>
 
     <build>
