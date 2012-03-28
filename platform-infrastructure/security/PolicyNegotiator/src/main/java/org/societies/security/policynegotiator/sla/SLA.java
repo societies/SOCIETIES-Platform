@@ -65,6 +65,10 @@ public class SLA {
 		public static final String NAME = "name";
 	}
 	
+	/**
+	 * @return Array of Strings.
+	 * If there are no valid SOPs, then Array of length 0 is returned, never null
+	 */
     public String[] getSopNames() {
     	
         String[] sopOptionEntries;

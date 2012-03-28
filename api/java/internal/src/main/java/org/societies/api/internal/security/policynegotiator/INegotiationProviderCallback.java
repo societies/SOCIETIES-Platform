@@ -24,6 +24,8 @@
  */
 package org.societies.api.internal.security.policynegotiator;
 
+import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
+
 /**
  * Interface for invoking the requester side (either the policy negotiator or
  * some other component).
@@ -53,9 +55,9 @@ public interface INegotiationProviderCallback {
 	//public void onAcceptPolicyAndGetSla(int sessionId, String policy);
 	
 	/**
-	 * Receive result of asynchronous method
+	 * Receive result of asynchronous method that has been invoked on {@link INegotiationProvider}
 	 * 
-	 * @param returnValue
+	 * @param result Asynchronous return value
 	 */
-	public void receiveResult(Object returnValue);
+	public void receiveResult(SlaBean result);
 }

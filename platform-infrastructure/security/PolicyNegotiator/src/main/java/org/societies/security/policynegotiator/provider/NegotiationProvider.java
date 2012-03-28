@@ -168,9 +168,19 @@ public class NegotiationProvider implements INegotiationProvider {
 
 		LOG.debug("reject({})", sessionId);
 
-		boolean success = true;  // TODO: check if session ID is valid
-		String sla = null;
-		SlaBean result = createSlaBean(success, sessionId, sla);
+		Session session = sessions.remove(sessionId);
+		boolean success;
+		SlaBean result;
+		
+		if (session != null) {
+			success = true;
+			LOG.info("reject({}) successful", sessionId);
+		}
+		else {
+			success = false;
+			LOG.warn("reject({}): no such session", sessionId);
+		}
+		result = createSlaBean(success, sessionId, null);
 
 		return new AsyncResult<SlaBean>(result);
 	}
