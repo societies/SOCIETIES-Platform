@@ -24,6 +24,12 @@
 
 	<dependencies>
 		<dependency>
+       		<groupId>org.mockito</groupId>
+       		<artifactId>mockito-core</artifactId>
+       		<version>1.6</version>
+       		<scope>test</scope>
+   		</dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
@@ -68,6 +74,12 @@
 			<artifactId>spring-osgi-core</artifactId>
 			<version>1.1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.css.devicemgmt</groupId>
+			<artifactId>DeviceCommsMgr</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 	
 	<build>
@@ -87,8 +99,10 @@
  						<Embed-Transitive>false</Embed-Transitive>
               			<Import-Package>
               				org.springframework.osgi.context,
+              				org.slf4j.*,
               				org.societies.api.internal.css.devicemgmt,
               				org.societies.api.internal.css.devicemgmt.model,
+              				org.societies.api.internal.css.devicemgmt.comm,
               			</Import-Package> 
           </instructions>
       </configuration>

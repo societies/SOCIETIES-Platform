@@ -26,21 +26,24 @@
 package org.societies.css.devicemgmt.RegSynchroniser.impl;
 
 import java.util.Collection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-//import org.societies.css.devicemgmt.deviceregistry.CSSDevice;
 import org.societies.css.devicemgmt.deviceregistry.DeviceRegistry;
-//import org.societies.css.devicemgmt.deviceregistry.IDeviceRegistry;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
-//import org.societies.css.devicemgmt.deviceregistry.RegistryUtility;
-//import org.societies.api.internal.css.devicemgmt.ILocalDevice;
 import org.societies.api.internal.css.devicemgmt.IDeviceRegistry;
 
 public class LocalDevices {
+	
+	private static Logger LOG = LoggerFactory.getLogger(LocalDevices.class);
 
 	static boolean addDevice(DeviceCommonInfo device, String CSSNodeID) throws Exception {
 		boolean retValue = false;
+		
+		LOG.info("+++ LocalDevices addDevice method has been called for: " +device.getDeviceID());
 
 
+		
         IDeviceRegistry deviceRegistry = DeviceRegistry.getInstance();
         
         if (null != deviceRegistry) {
@@ -62,7 +65,7 @@ public class LocalDevices {
 	static boolean removeDevice(DeviceCommonInfo device, String CSSNodeID) throws Exception{
 		
 		boolean retValue = false;
-		
+		LOG.info("+++ LocalDevices removeDevice method has been called for: " +device.getDeviceID());
 		IDeviceRegistry deviceRegistry = DeviceRegistry.getInstance();
         
         if (null != deviceRegistry) {

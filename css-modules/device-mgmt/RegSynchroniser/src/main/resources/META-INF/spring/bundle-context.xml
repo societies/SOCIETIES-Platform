@@ -14,6 +14,10 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-  <bean name="RegSynchroniser" class="org.societies.css.devicemgmt.RegSynchroniser.impl.RegManager" />
+  <bean name="RegSynchroniser" class="org.societies.css.devicemgmt.RegSynchroniser.impl.RegManager"
+  			depends-on="CommManager,PubsubClient" init-method="init">
+       		<property name="pubSubManager" ref="PubsubClient"/>
+  			<property name="commManager" ref="CommManager"/>
+  </bean>
 
 </beans>
