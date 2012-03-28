@@ -206,6 +206,8 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 
 			
 			intent.putExtra(INTENT_RETURN_KEY, arrayTasks);
+			intent.setPackage(client);
+			Log.d(this.getClass().getName(), "Intent package name: " + client);
 			this.sendBroadcast(intent);
 			
 		}
