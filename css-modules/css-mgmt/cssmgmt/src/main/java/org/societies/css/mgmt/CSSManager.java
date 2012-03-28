@@ -76,7 +76,7 @@ public class CSSManager implements ICSSLocalManager {
 	/**
 	 * @return the cssDiscoveryRemote
 	 */
-	public ICssDirectoryRemote getCssDiscoveryRemote() {
+	public ICssDirectoryRemote getCssDirectoryRemote() {
 		return cssDirectoryRemote;
 	}
 
@@ -84,8 +84,8 @@ public class CSSManager implements ICSSLocalManager {
 	 * @param cssDiscoveryRemote
 	 *            the cssDiscoveryRemote to set
 	 */
-	public void setCssDiscoveryRemote(ICssDirectoryRemote cssDiscoveryRemote) {
-		this.cssDirectoryRemote = cssDiscoveryRemote;
+	public void setCssDirectoryRemote(ICssDirectoryRemote cssDirectoryRemote) {
+		this.cssDirectoryRemote = cssDirectoryRemote;
 	}
 
 	/**
@@ -338,7 +338,7 @@ public class CSSManager implements ICSSLocalManager {
 	 */
 	@Override
 	public void addAdvertisementRecord(CssAdvertisementRecord record) {
-		getCssDiscoveryRemote().addCssAdvertisementRecord(record);
+		getCssDirectoryRemote().addCssAdvertisementRecord(record);
 	}
 
 	/*
@@ -350,7 +350,7 @@ public class CSSManager implements ICSSLocalManager {
 	 */
 	@Override
 	public void deleteAdvertisementRecord(CssAdvertisementRecord record) {
-		getCssDiscoveryRemote().deleteCssAdvertisementRecord(record);
+		getCssDirectoryRemote().deleteCssAdvertisementRecord(record);
 
 	}
 
@@ -365,7 +365,7 @@ public class CSSManager implements ICSSLocalManager {
 	@Override
 	public void updateAdvertisementRecord(CssAdvertisementRecord currentRecord,
 			CssAdvertisementRecord updatedRecord) {
-		getCssDiscoveryRemote().updateCssAdvertisementRecord(currentRecord,
+		getCssDirectoryRemote().updateCssAdvertisementRecord(currentRecord,
 				updatedRecord);
 	}
 
@@ -383,7 +383,7 @@ public class CSSManager implements ICSSLocalManager {
 
 		CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
 
-		getCssDiscoveryRemote().findAllCssAdvertisementRecords(callback);
+		getCssDirectoryRemote().findAllCssAdvertisementRecords(callback);
 		recordList = callback.getResultList();
 
 		return new AsyncResult<List<CssAdvertisementRecord>>(recordList);
@@ -404,7 +404,6 @@ public class CSSManager implements ICSSLocalManager {
 		Future<List<Service>> asyncResult = null;
 		List<Service> cssServiceList = null;
 
-		String currentSearchCss = new String();
 
 		for (CssAdvertisementRecord cssAdd : listCssAds) {
 			try {
