@@ -55,11 +55,19 @@ public class ProviderCallback implements INegotiationProviderCallback {
 	 * #receiveExamplesResult(java.lang.Object)
 	 */
 	@Override
-	public void receiveResult(SlaBean returnValue) {
-		LOG.debug("receiveResult({})", returnValue);
+	public void receiveResult(SlaBean result) {
+		
+		LOG.debug("receiveResult({})", result);
+		
+		int sessionId;
+		String sla;
 		
 		switch(method) {
 		case GET_POLICY_OPTIONS:
+			if (result.isSuccess()) {
+				sessionId = result.getSessionId();
+				sla = result.getSla();
+			}
 			break;
 		case ACCEPT_POLICY_AND_GET_SLA:
 			break;

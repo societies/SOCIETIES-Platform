@@ -142,9 +142,11 @@ public class CommsClientCallback implements ICommCallback {
 
 	@Override
 	public void receiveResult(Stanza stanza, Object payload) {
+
+		String stanzaId = stanza.getId();
 		
 		LOG.debug("receiveResult({}, {})", stanza, payload);
-		LOG.debug("receiveResult(): stanza.id   = {}", stanza.getId());
+		LOG.debug("receiveResult(): stanza.id   = {}", stanzaId);
 		LOG.debug("receiveResult(): stanza.from = {}", stanza.getFrom());
 		LOG.debug("receiveResult(): stanza.to   = {}", stanza.getTo());
 		
@@ -160,13 +162,14 @@ public class CommsClientCallback implements ICommCallback {
 			LOG.debug("receiveResult(): success = {}, sessionId = {}, sla = " + sla,
 					success, sessionId);
 			
-			INegotiationProviderCallback cb = callbacks.get(stanza.getId());
+			INegotiationProviderCallback cb = callbacks.get(stanzaId);
 			if (cb != null) {
 				cb.receiveResult(result);
 			}
 			else {
-				LOG.warn("receiveResult(): There is no callback for stanza ID {}", stanza.getId());
+				LOG.warn("receiveResult(): There is no callback for stanza ID {}", stanzaId);
 			}
+			callbacks.remove(stanzaId);
 		}
 		else {
 			LOG.warn("receiveResult(): unexpected payload type {}", payload);
