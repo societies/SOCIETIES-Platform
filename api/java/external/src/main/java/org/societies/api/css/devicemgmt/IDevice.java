@@ -27,7 +27,10 @@ package org.societies.api.css.devicemgmt;
 
 import java.util.List;
 
-
+/**
+ * @author Rafik (Trialog)
+ *
+ */
 public interface IDevice {
 
 	/**

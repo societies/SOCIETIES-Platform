@@ -26,10 +26,7 @@
 package org.societies.api.css.devicemgmt;
 
 /**
- * 
- * Describe your class here...
- *
- * @author rafik
+ * @author Rafik (Trialog)
  *
  */
 public interface IDeviceStateVariable {

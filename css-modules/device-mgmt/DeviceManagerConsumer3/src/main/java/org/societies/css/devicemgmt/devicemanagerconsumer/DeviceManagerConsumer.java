@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.css.devicemgmt.IAction;
 import org.societies.api.css.devicemgmt.IDevice;
-import org.societies.api.css.devicemgmt.IDeviceService;
+import org.societies.api.css.devicemgmt.IDriverService;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.CSSEventConstants;
 import org.societies.api.osgi.event.EventListener;
@@ -28,7 +28,7 @@ public class DeviceManagerConsumer extends EventListener  {
 	public void initConsumer()
 	{
 		// -- Track LightSensor (to know what to subscribe)
-		IDeviceService driverService = deviceService.getService("lightSensorService");
+		IDriverService driverService = deviceService.getService("lightSensorService");
 		if (null != driverService) {
 			IAction getEventNames = driverService.getAction("getEventNames");
 			if (null != getEventNames) {

@@ -7,7 +7,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.css.devicemgmt.IDeviceService;
+import org.societies.api.css.devicemgmt.IDriverService;
 import org.societies.api.internal.css.devicemgmt.IDeviceManager;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 import org.societies.api.osgi.event.IEventMgr;
@@ -81,17 +81,17 @@ public class SampleActivatorDriver implements BundleContextAware{
 			properties = new Hashtable<String, String>();
 			properties.put("serviceId", deviceServiceId1);
 			properties.put("deviceMacAddress", deviceMacAddress1);
-			lsReg = bc.registerService(IDeviceService.class.getName(), ls, properties);
+			lsReg = bc.registerService(IDriverService.class.getName(), ls, properties);
 			
 			properties = new Hashtable<String, String>();
 			properties.put("serviceId", deviceServiceId2);
 			properties.put("deviceMacAddress", deviceMacAddress2);
-			lsReg2 = bc.registerService(IDeviceService.class.getName(), ls2, properties);
+			lsReg2 = bc.registerService(IDriverService.class.getName(), ls2, properties);
 			
 			properties = new Hashtable<String, String>();
 			properties.put("serviceId", deviceServiceId3);
 			properties.put("deviceMacAddress", deviceMacAddress3);
-			lsReg3 = bc.registerService(IDeviceService.class.getName(), ls3, properties);
+			lsReg3 = bc.registerService(IDriverService.class.getName(), ls3, properties);
 		}
 	}
 	

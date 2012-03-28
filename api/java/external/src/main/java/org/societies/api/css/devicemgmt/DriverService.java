@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.societies.api.css.devicemgmt.IAction;
-import org.societies.api.css.devicemgmt.IDeviceService;
+import org.societies.api.css.devicemgmt.IDriverService;
 import org.societies.api.css.devicemgmt.IDeviceStateVariable;
 import org.societies.api.osgi.event.IEventMgr;
 
@@ -36,7 +36,7 @@ import org.societies.api.osgi.event.IEventMgr;
  * Abstract class to create more easily driver services
  * @author Olivier Maridat (Trialog)
  */
-public abstract class DriverService implements IDeviceService {
+public abstract class DriverService implements IDriverService {
 	/**
 	 * ID of the service
 	 */

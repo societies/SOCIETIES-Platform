@@ -60,7 +60,7 @@ public class GetLightLevelAction implements IAction {
 	}
 
 
-	public Dictionary<String, String> invokeAction(Dictionary<String, String> arguments) {
+	public Dictionary<String, Object> invokeAction(Dictionary<String, Object> arguments) {
 	
 		Double lightLevel = lightSensor.getLightValue();
 		
@@ -68,5 +68,4 @@ public class GetLightLevelAction implements IAction {
 		result.put(OUTPUT_LIGHT_LEVEL, lightLevel);
 		return result;
 	}
-
 }

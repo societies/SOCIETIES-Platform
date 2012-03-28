@@ -28,6 +28,10 @@ package org.societies.api.css.devicemgmt;
 import java.util.Dictionary;
 import java.util.List;
 
+/**
+ * @author Rafik (Trialog)
+ *
+ */
 public interface IAction {
 	
 	/**
