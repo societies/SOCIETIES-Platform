@@ -11,11 +11,11 @@
    </parent>
 
    <groupId>org.societies.android.platform</groupId>
-   <artifactId>cis-manager-light</artifactId>
+   <artifactId>cis-manager-light-test</artifactId>
    <!-- see Redmine wiki for componentname from project structure -->
    <version>0.1</version> 
    <!-- still being discussed -->
-   <name>CisManagerLight</name>
+   <name>CisManagerLightTest</name>
    <packaging>apk</packaging>
 	<developers>
 	    <developer>
@@ -46,7 +46,6 @@
 	    	<artifactId>societies-api</artifactId>
 	    	<version>${release.version}</version>
 		</dependency>
-
         <dependency>
             <groupId>com.phonegap</groupId>
             <artifactId>phonegap</artifactId>

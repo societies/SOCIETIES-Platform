@@ -42,28 +42,27 @@
 		<module>../parent/android.xml</module>
 		
 		<!-- Utilities -->
-		<module>../utilities/DBC</module>
+<!-- 		<module>../utilities/DBC</module> -->
 
 		<!-- Android Communication components -->
-		<module>../platform-infrastructure/client-frwk/AndroidIPC</module>
-		<module>../platform-infrastructure/client-frwk/AndroidAgentApi</module>
-		<module>../platform-infrastructure/client-frwk/AndroidPubsubApi</module>
-		<module>../platform-infrastructure/client-frwk/AndroidAgent</module>
-		<module>../platform-infrastructure/client-frwk/AndroidPubsub</module>
+<!-- 		<module>../platform-infrastructure/client-frwk/AndroidIPC</module> -->
+<!-- 		<module>../platform-infrastructure/client-frwk/AndroidAgentApi</module> -->
+<!-- 		<module>../platform-infrastructure/client-frwk/AndroidPubsubApi</module> -->
+<!-- 		<module>../platform-infrastructure/client-frwk/AndroidAgent</module> -->
+<!-- 		<module>../platform-infrastructure/client-frwk/AndroidPubsub</module> -->
 
 
 		<!-- API -->
-		<module>../platform-infrastructure/client-frwk/CoreInterfaces</module>
+<!-- 		<module>../platform-infrastructure/client-frwk/CoreInterfaces</module> -->
 
 		<!-- Client Framework Examples -->
-		<module>../platform-infrastructure/client-frwk/PhoneGapReference
-		</module>
-		<module>../platform-infrastructure/client-frwk/IPCServiceExample
-		</module>
-		<module>../platform-infrastructure/client-frwk/devicestatusgui</module>
+<!-- 		<module>../platform-infrastructure/client-frwk/PhoneGapReference -->
+<!-- 		</module> -->
+<!-- 		<module>../platform-infrastructure/client-frwk/IPCServiceExample -->
+<!-- 		</module> -->
 
 		<!-- Client Framework -->
-		<module>../platform-infrastructure/client-frwk/MasterGUI</module>
+<!-- 		<module>../platform-infrastructure/client-frwk/MasterGUI</module> -->
 
 		<!-- CIS manager light modules -->
 		<module>../cis-modules/android/client-lib-android</module>
@@ -72,7 +71,6 @@
 		<module>../cis-modules/android/client-lib-android-test</module>
 		<module>../cis-modules/android/cis-management-test</module>
 		
-
 		<!-- Test applications N.B. Requires that emulator is started -->
 		<!--module>../platform-infrastructure/client-frwk/TestIPCServices</module -->
 
