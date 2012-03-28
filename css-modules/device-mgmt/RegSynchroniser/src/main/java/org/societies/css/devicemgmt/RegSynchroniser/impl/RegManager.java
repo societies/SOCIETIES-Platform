@@ -32,8 +32,8 @@ import java.util.logging.LogManager;
 
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.osgi.context.BundleContextAware;
 import org.societies.api.identity.IIdentity;
@@ -47,8 +47,6 @@ import org.societies.comm.xmpp.event.InternalEvent;
 import org.societies.comm.xmpp.event.PubsubEvent;
 import org.societies.comm.xmpp.event.PubsubEventFactory;
 import org.societies.api.schema.css.devicemanagment.DmEvent;
-import org.societies.comm.xmpp.event.EventFactory;
-import org.societies.comm.xmpp.event.EventStream;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
@@ -233,6 +231,7 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
 		this.pubSubManager = pubSubManager;
 		try {
 			pubSubManager.subscriberSubscribe(pubsubID, "DEVICE_REGISTERED", this);
+			pubSubManager.subscriberSubscribe(pubsubID, "DEVICE_DISCONNECTED", this);
 		} catch (XMPPError e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -264,10 +263,19 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
 	@Override
 	public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object payload) {
 		DmEvent dmEvent = null;
-		//dmEvent = (DmEvent)payload;
-		
+		DeviceCommonInfo device = new DeviceCommonInfo();
+		dmEvent = (DmEvent)payload;
+		device.setDeviceConnectionType(dmEvent.getConnectionType());
+		device.setContextSource(dmEvent.isContextSource());
+		device.setDeviceDescription(dmEvent.getDescription());
+		//device.setDeviceFamilyIdentity(dmEvent.getType());
+		device.setDeviceID(dmEvent.getDeviceId());
+		device.setDeviceLocation(dmEvent.getLocation());
+		device.setDeviceName(dmEvent.getName());
+		device.setDeviceProvider(dmEvent.getProvider());
+		device.setDeviceType(dmEvent.getType());
+	
 		String CSSNodeID = "liam.societies.org";	
-		DeviceCommonInfo device = (DeviceCommonInfo)payload;
 		
 		if(node.equals("DEVICE_REGISTERED")){
 			try {
