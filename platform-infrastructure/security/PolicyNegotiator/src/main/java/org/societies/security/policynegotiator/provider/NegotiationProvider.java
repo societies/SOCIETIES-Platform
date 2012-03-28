@@ -24,6 +24,8 @@
  */
 package org.societies.security.policynegotiator.provider;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Future;
 
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -48,6 +50,11 @@ public class NegotiationProvider implements INegotiationProvider {
 	
 	private ISignatureMgr signatureMgr;
 	private INegotiationProviderRemote groupMgr;
+	
+	/**
+	 * Negotiation sessions
+	 */
+	private Map<Integer, Session> sessions = new HashMap<Integer, Session>();
 	
 //	@Autowired
 //	public NegotiationProvider(ISignatureMgr signatureMgr) {
@@ -109,7 +116,6 @@ public class NegotiationProvider implements INegotiationProvider {
 			doc = SopResource.getSop("PrintService.xml");  // TODO: Get from Marketplace
 			if (doc != null) {
 				Xml xml = new Xml(doc);
-				success = doc != null;
 				SLA sla = new SLA(xml);
 				slaStr = xml.toString();
 				success = true;
@@ -123,6 +129,9 @@ public class NegotiationProvider implements INegotiationProvider {
 		} catch (Exception e) {
 			success = false;
 			LOG.warn("getPolicyOptions({}): could not get SOP: ", serviceId, e);
+		}
+		if (success) {
+			sessions.put(session.getId(), session);
 		}
 		
 		SlaBean result = createSlaBean(success, session.getId(), slaStr);
