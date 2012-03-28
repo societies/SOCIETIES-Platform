@@ -27,7 +27,6 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.phonegap.api.Plugin;
 import com.phonegap.api.PluginResult;
-import com.phonegap.api.PluginResult.Status;
 
 /**
  * PhoneGap plugin to allow the CSSManager service to be used by HTML web views.
@@ -44,9 +43,8 @@ public class PluginCSSManager extends Plugin {
 	private static final String LOG_TAG = PluginCSSManager.class.getName();
 	
 	//Required to match method calls with callbackIds
-	private HashMap<String, String> methodCallbacks = new HashMap<String, String>();
+	private HashMap<String, String> methodCallbacks;
 
-    private String callbackId;
     private IAndroidCSSManager localCSSManager;
     private boolean connectedtoCSSManager = false;
 
@@ -54,12 +52,18 @@ public class PluginCSSManager extends Plugin {
      * Constructor
      */
     public PluginCSSManager() {
+    	this.methodCallbacks = new HashMap<String, String>();
     	//Create intent to select service to bind to
     	Intent intent = new Intent(this.ctx, LocalCSSManagerService.class);
     	//bind to the service
     	this.ctx.bindService(intent, ccsManagerConnection, Context.BIND_AUTO_CREATE);
 
-    	this.callbackId = null;
+    	//register broad
+        IntentFilter intentFilter = new IntentFilter() ;
+        intentFilter.addAction(AndroidCoreIntents.LOGIN_CSS);
+        intentFilter.addAction(AndroidCoreIntents.LOGOUT_CSS);
+        this.ctx.registerReceiver(new bReceiver(), intentFilter);
+
     }
 
 	@Override
@@ -75,7 +79,6 @@ public class PluginCSSManager extends Plugin {
 
 		if (this.validRemoteCall(action)) {
 			
-			this.callbackId = callbackId;
 			Log.d(LOG_TAG, "adding to Map store: " + callbackId + " for action: " + action);
 			this.methodCallbacks.put(action, callbackId);
 			
@@ -103,20 +106,20 @@ public class PluginCSSManager extends Plugin {
 	 * @param intent
 	 * @return boolean
 	 */
-	private boolean sendJavascriptResult(String callbackId, Intent intent, String key) {
+	private boolean sendJavascriptResult(String methodCallbackId, Intent intent, String key) {
 		boolean retValue = false;
-		Log.d(LOG_TAG, "returnJavascriptResult called for intent: " + intent.getAction() + " and callback ID: " + callbackId);	
+		Log.d(LOG_TAG, "returnJavascriptResult called for intent: " + intent.getAction() + " and callback ID: " + methodCallbackId);	
 		
 		CssInterfaceResult cssResult = (CssInterfaceResult) intent.getParcelableExtra(AndroidCoreIntents.INTENT_RETURN_KEY);
 
 		PluginResult result = new PluginResult(PluginResult.Status.OK, convertCSSRecord((AndroidCSSRecord) cssResult.getProfile()));
 		result.setKeepCallback(false);
-		this.success(result, this.callbackId);
+		this.success(result, methodCallbackId);
 		
 		//remove callback ID for given method invocation
 		PluginCSSManager.this.methodCallbacks.remove(key);
 
-		Log.d(LOG_TAG, "Plugin success method called, target: " + this.callbackId);
+		Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 		return retValue;
 		
 	}
@@ -192,7 +195,7 @@ public class PluginCSSManager extends Plugin {
     /**
      * Broadcast receiver to receive intent return values from service method calls
      */
-    private BroadcastReceiver bReceiver = new BroadcastReceiver() {
+    private class bReceiver extends BroadcastReceiver {
 		
 		@Override
 		public void onReceive(Context context, Intent intent) {
