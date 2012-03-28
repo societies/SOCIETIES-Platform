@@ -13,6 +13,7 @@
 		interface="org.societies.example.service.api.IAddService">
 		<osgi:service-properties>
 			<entry key="TargetPlatform" value="SOCIETIES" />
+			<entry key="ServiceProvider" value="IST-SOCIETIES" />			
 			<entry key="ServiceMetaModel" value-ref="serMetamodel" />
 		</osgi:service-properties>
 	</osgi:service>
@@ -21,11 +22,7 @@
 		class="org.societies.api.schema.servicelifecycle.model.Service">
 		<property name="authorSignature" value="mySignature" />
 		<property name="serviceDescription" value="some service description" />
-		<property name="serviceLocation" value = "LOCAL" />
-		<property name="serviceType" value = "THIRD_PARTY_SERVICE" />
 		<property name="serviceName" value="some service name" />
 	</bean>
-
-
 
 </beans>
