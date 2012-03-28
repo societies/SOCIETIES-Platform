@@ -86,6 +86,8 @@ public class Screen implements IDriverService{
 		this.physicalDeviceId = physicalDeviceId;
 		
 		
+		eventAdmin = sampleActivatorDriver.getEventAdmin();
+		
 		IDeviceStateVariable stateVariable;
 		IAction action;
 		
@@ -138,7 +140,7 @@ public class Screen implements IDriverService{
 	
 	public  void sendMessageToScreen (String message)
 	{
-		//LOG.info("DeviceDriverSimulator Screen Displays: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% " + message);
+		LOG.info("DeviceDriverSimulator Screen Displays: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% " + message);
 		
 		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% sending event by eventAdmin");
 		Dictionary<String, Object> eventAdminDic = new Hashtable<String, Object>();
