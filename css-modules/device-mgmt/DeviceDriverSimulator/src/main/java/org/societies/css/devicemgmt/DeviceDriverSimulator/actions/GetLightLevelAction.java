@@ -29,7 +29,6 @@ public class GetLightLevelAction implements IAction {
 	
 	public GetLightLevelAction(LightSensor lightSensor, LightLevelStateVariable lightLevelStateVariable) {
 
-		
 		this.lightSensor = lightSensor;
 		this.lightLevelStateVariable =lightLevelStateVariable;
 		
@@ -60,9 +59,9 @@ public class GetLightLevelAction implements IAction {
 	}
 
 
-	public Dictionary<String, String> invokeAction(Dictionary<String, String> arguments) {
+	public Dictionary<String, Object> invokeAction(Dictionary<String, Object> arguments) {
 	
-		Double lightLevel = lightSensor.getLightLevel();
+		Double lightLevel = lightSensor.getLightValue();
 		
 		Hashtable result = new Hashtable();
 		result.put(OUTPUT_LIGHT_LEVEL, lightLevel);

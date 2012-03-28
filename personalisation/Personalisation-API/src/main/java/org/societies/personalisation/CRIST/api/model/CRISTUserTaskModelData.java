@@ -25,6 +25,7 @@
 package org.societies.personalisation.CRIST.api.model;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -56,6 +57,7 @@ public class CRISTUserTaskModelData {
 	 */
 	public HashMap<CRISTUserTask, HashMap<CRISTUserTask, Double>> taskList;
 
+	public LinkedHashMap<String, Integer> intentModel = new LinkedHashMap<String, Integer>();
 	/**
 	 * Constructor
 	 */

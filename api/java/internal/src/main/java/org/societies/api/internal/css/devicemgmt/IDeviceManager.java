@@ -24,6 +24,8 @@
  */
 package org.societies.api.internal.css.devicemgmt;
 
+import java.util.Dictionary;
+
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 /**
  * Interface used by the device deriver bundles to inform the device manager about a state of devices
@@ -50,7 +52,7 @@ public interface IDeviceManager {
 	 * @param deviceFamily
 	 * @param deviceMacAddress
 	 */
-	public void fireDeviceDisconnected (String deviceFamily, String deviceMacAddress);
+	public String fireDeviceDisconnected (String deviceFamily, String physicalDeviceId);
 	
 	/**
 	 * 
@@ -59,6 +61,6 @@ public interface IDeviceManager {
 	 * @param deviceMacAddress
 	 * @param data TODO to define
 	 */
-	public void fireNewDataReceived (String deviceFamily, String deviceMacAddress, String data);
+	public String fireNewDataReceived (String deviceFamily, String physicalDeviceId, Dictionary<String, Object> data);
 
 }

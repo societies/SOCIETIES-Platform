@@ -28,39 +28,43 @@ package org.societies.api.css.devicemgmt;
 import java.util.Dictionary;
 import java.util.List;
 
+/**
+ * Interface used to invoke action in a device 
+ * @author Rafik (Trialog)
+ *
+ */
 public interface IAction {
 	
 	/**
 	 * 
-	 * @return
+	 * @return a list of action input arguments
 	 */
 	public List<String> getInputArgumentNames();
 	
 	/**
 	 * 
-	 * @return
+	 * @return the action name
 	 */
 	public String getName();
 	
 	/**
 	 * 
-	 * @return
+	 * @return a list of action output arguments
 	 */
 	public List <String> getOutputArgumentNames();
 	
 	/**
 	 * 
-	 * @param argumentName
-	 * @return
+	 * @param argumentName: the name of the state variable
+	 * @return a device state variable
 	 */
 	public IDeviceStateVariable getStateVariable (String argumentName);
 	
 	/**
 	 * 
 	 * @param arguments
-	 * @return
+	 * @return 
 	 */
-	public Dictionary<String, String> invokeAction(Dictionary<String, String> arguments); 
-	
+	public Dictionary<String, Object> invokeAction(Dictionary<String, Object> arguments);
 
 }

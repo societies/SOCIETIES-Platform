@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -25,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.android.platform.devicestatus.DeviceStatus;
-import org.societies.android.platform.interfaces.ServiceMethodTranslator;
+import org.societies.android.platform.utilities.ServiceMethodTranslator;
 import org.societies.api.android.internal.IDeviceStatus;
 import org.societies.api.android.internal.model.ProviderStatus;
 
@@ -48,7 +53,7 @@ import android.util.Log;
  * Android Service running in a different process of its activity
  * This service uses DeviceStatus and wraps it into an Android service
  * @see org.societies.android.platform.devicestatus.DeviceStatus
- * @author olivierm
+ * @author Olivier Maridat (Trialog)
  */
 public class DeviceStatusServiceDifferentProcess extends Service implements IDeviceStatus {
 	private Messenger inMessenger;

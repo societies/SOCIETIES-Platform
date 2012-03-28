@@ -39,7 +39,7 @@ public class SLA {
 
 	private static Logger Log = LoggerFactory.getLogger(SLA.class);
 
-	Xml xml;
+	private Xml xml;
 
 	/**
 	 * Constructor
@@ -65,6 +65,10 @@ public class SLA {
 		public static final String NAME = "name";
 	}
 	
+	/**
+	 * @return Array of Strings.
+	 * If there are no valid SOPs, then Array of length 0 is returned, never null
+	 */
     public String[] getSopNames() {
     	
         String[] sopOptionEntries;
@@ -112,5 +116,10 @@ public class SLA {
         String xpath = SLA.XPath.SOP + "[@" + SLA.Attribute.SOP_ID + "!=\"" + sopName + "\"]";
         xml.removeNodes(xpath);
         return xml.toString();
+    }
+    
+    @Override
+    public String toString() {
+    	return xml.toString();
     }
 }

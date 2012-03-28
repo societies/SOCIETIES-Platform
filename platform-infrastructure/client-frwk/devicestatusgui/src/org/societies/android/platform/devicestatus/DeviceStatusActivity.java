@@ -30,7 +30,7 @@ import java.util.Set;
 
 import org.societies.android.platform.R;
 import org.societies.android.platform.devicestatus.DeviceStatusServiceSameProcess.LocalBinder;
-import org.societies.android.platform.interfaces.ServiceMethodTranslator;
+import org.societies.android.platform.utilities.ServiceMethodTranslator;
 import org.societies.api.android.internal.IDeviceStatus;
 import org.societies.api.android.internal.model.BatteryStatus;
 import org.societies.api.android.internal.model.ProviderStatus;
@@ -60,7 +60,7 @@ import android.widget.Toast;
 
 
 /**
- * @author Olivier Maridat
+ * @author Olivier Maridat (Trialog)
  * @date 28 nov. 2011
  */
 public class DeviceStatusActivity extends Activity {

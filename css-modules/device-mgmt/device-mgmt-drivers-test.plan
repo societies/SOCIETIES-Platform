@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plan name="org.societies.device-mgmt.plan" version="3.0.0" scoped="false" atomic="true" 
+        xmlns="http://www.eclipse.org/virgo/schema/plan" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation=" 
+                http://www.eclipse.org/virgo/schema/plan 
+                http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
+
+	<!-- API bundles should be deployed first (if needed, uncomment following lines) -->
+	<!-- <artifact type="bundle" name="org.societies.api.external.societies-api" version="0.1.0"/>
+	<artifact type="bundle" name="org.societies.api.internal.societies-api-internal" version="0.1.0"/> -->
+	
+	
+	<!-- CommFramework.plan should be deployed first (if needed, uncomment following lines) -->
+	<!-- <artifact type="bundle" name="org.societies.comm.CommonLibraries"/>
+	<artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
+	<artifact type="bundle" name="org.societies.comm.event.mgmt" /> -->
+	
+	
+	<!-- Device Management Bundles -->
+	<artifact type="bundle" name="org.societies.css.devicemgmt.devicemanager"/>
+	
+	<!-- Select relevant bundles (simulator + consumer) to test -->
+	<artifact type="bundle" name="org.societies.css.devicemgmt.DeviceDriverSimulator" version="0.0.1.SNAPSHOT" />
+	<artifact type="bundle" name="org.societies.css.devicemgmt.devicemanagerconsumer" version="0.0.1.SNAPSHOT"/>
+	<!--<artifact type="bundle" name="org.societies.css.devicemgmt.DeviceDriverSimulator3" version="0.0.1.SNAPSHOT" />-->
+	<!--<artifact type="bundle" name="org.societies.css.devicemgmt.devicemanagerconsumer3" />-->
+</plan>
