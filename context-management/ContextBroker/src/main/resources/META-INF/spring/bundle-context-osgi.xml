@@ -14,8 +14,10 @@
        testing of the bundle outside of an OSGi container -->
 
 	<osgi:service ref="internalCtxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker" />
+	<osgi:service ref="ctxBroker" interface="org.societies.api.context.broker.ICtxBroker" />
 	
 	<osgi:reference id="ctxEventMgr" interface="org.societies.context.api.event.ICtxEventMgr" cardinality="1..1" />
 	<osgi:reference id="userCtxDBMgr" interface="org.societies.context.api.user.db.IUserCtxDBMgr" cardinality="1..1" />
 	<osgi:reference id="userCtxHistoryMgr" interface="org.societies.context.api.user.history.IUserCtxHistoryMgr" cardinality="1..1" />
+	<osgi:reference id="identManager" interface="org.societies.api.identity.IIdentityManager" cardinality="1..1" />
 </beans>
