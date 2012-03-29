@@ -24,15 +24,19 @@
 	<artifact type="bundle" name="org.societies.security.policy-negotiator"/>
 	<artifact type="bundle" name="org.societies.security.secur-commsmgr"/>
 
+    <!-- CSS / CIS Management -->
+    <artifact type="bundle" name="org.societies.css.CssDirectory"/>
+    <artifact type="bundle" name="org.societies.css.CssRegistry"/>
+    <artifact type="bundle" name="org.societies.css.mgmt.cssmgmt"/>
+    <artifact type="bundle" name="org.societies.css.mgmt.comms.cssmgmt-comms"/>
+    <artifact type="bundle" name="org.societies.cis.manager"/>
+
 	<!-- Device Management -->
+	<artifact type="bundle" name="org.societies.css.devicemgmt.DeviceCommsMgr"/>
 	<artifact type="bundle" name="org.societies.css.devicemgmt.devicemanager"/>
 	<artifact type="bundle" name="org.societies.css.devicemgmt.deviceregistry"/>
 	<artifact type="bundle" name="org.societies.css.devicemgmt.RegSynchroniser"/>
-	<artifact type="bundle" name="org.societies.css.devicemgmt.DeviceCommsMgr"/>
 	
-	<!-- CSS / CIS Management -->
-	<artifact type="bundle" name="org.societies.cis.manager"/>
-	<artifact type="bundle" name="org.societies.css.mgmt.cssmgmt"/>
-    <artifact type="bundle" name="org.societies.css.mgmt.comms.cssmgmt-comms"/>
-     	
+	
+	
 </plan>

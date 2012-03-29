@@ -79,7 +79,7 @@ public class DataLoader{
 			CtxEntity entPref = futureEntPref.get();
 			this.logging.info("created Entity Preference:"+entPref.toString());
 			assoc.setParentEntity(entPerson.getId());
-			assoc.addEntity(entPref.getId());
+			assoc.addChildEntity(entPref.getId());
 			assoc = (CtxAssociation) broker.update(assoc);
 			this.logging.info("updated assoc hasPreferences: "+assoc.toString());
 			Future<CtxAttribute> futureAttr =broker.createAttribute(entPref.getId(), "serviceTypeserviceIDprefName"); 

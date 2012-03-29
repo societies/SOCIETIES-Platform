@@ -62,22 +62,14 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
     private PubsubClient pubSubManager;  
     private IIdentityManager idManager;
 	private ICommManager commManager;
-	private INetworkNode nodeId = null;
 	IIdentity pubsubID = null;
     
     //private HashMap<String, String> eventResult;
     
-    
-	
-    
-    
-    
     /**
      * Default Constructor
-     * 
      */
     public RegManager() {
-    
     }
 
     /**
@@ -85,7 +77,6 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
      * 
      * @param context
      */
-    
     public RegManager(BundleContext bundlecontext) {
                 
         
@@ -245,25 +236,13 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
 		LOG.info("+++ RegManager setCommManager called: ");
-		idManager = commManager.getIdManager();
-		
-		nodeId = idManager.getThisNetworkNode();
-		
-		try {
-			pubsubID = idManager.fromJid("XCManager.societies.local");
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	
 	private void init(){
 		LOG.info("+++ RegManager init called: ");
 		idManager = commManager.getIdManager();
-		IIdentity pubsubID = null;
 		try {
 			pubsubID = idManager.getThisNetworkNode();
-			//pubsubID = idManager.fromJid("XCManager.societies.local");
 			pubSubManager.subscriberSubscribe(pubsubID, "DEVICE_REGISTERED", this);
 			pubSubManager.subscriberSubscribe(pubsubID, "DEVICE_DISCONNECTED", this);
 		} catch (XMPPError e) {

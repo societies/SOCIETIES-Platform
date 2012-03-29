@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
@@ -27,17 +28,24 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 		cisCommManagers = new HashMap<IIdentity, ICommManager>();
 		this.genericPassword = genericPassword;
 		originalEndpoint = endpoint;
+		
+		initCISCommunicationMgrFactoryImpl();
+	}
+	
+	public boolean initCISCommunicationMgrFactoryImpl() {
 		idm = originalEndpoint.getIdManager();
 		if (idm!=null && idm.getThisNetworkNode()!=null){
             domainName = idm.getThisNetworkNode().getDomain();
-        }else{
-            LOG.warn("Unable to set the domainName attribute");
-        }     
+            return true;
+        }
+		return false;
 	}
 	
 	@Override
-	public ICommManager getNewCommManager(IIdentity cisIdentity, String credentials) {
+	public ICommManager getNewCommManager(IIdentity cisIdentity, String credentials) throws CommunicationException {
 		XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), credentials);
+		if (commMgr.getIdManager()==null)
+			throw new CommunicationException("Not connected to domain!");
 		cisCommManagers.put(cisIdentity, commMgr);
 		return commMgr;
 	}
@@ -48,8 +56,12 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 	}
 
 	@Override
-	public ICommManager getNewCommManager() {
+	public ICommManager getNewCommManager() throws CommunicationException {
 		try {
+			if (domainName==null)
+				if (initCISCommunicationMgrFactoryImpl())
+					throw new CommunicationException("Not connected to domain!");
+				
 			String randomCisIdentifier = UUID.randomUUID().toString()+"."+domainName;
 			// TODO verify if exists
 			IIdentity cisIdentity = idm.fromJid(randomCisIdentifier);

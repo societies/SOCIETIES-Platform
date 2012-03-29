@@ -23,6 +23,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import junit.framework.TestCase;
 
@@ -44,6 +46,7 @@ import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 public class UserPreferenceManagementTest  {
@@ -56,7 +59,6 @@ public class UserPreferenceManagementTest  {
 	@Before
 	public void Setup(){
 		pcm = new UserPreferenceConditionMonitor();
-		persoMgr = new MockPersoMgr();
 		pcm.initialisePreferenceManagement(broker, persoMgr);
 		mockId = new MyIdentity(IdentityType.CSS, "myId", "domain");
 	}
@@ -65,7 +67,7 @@ public class UserPreferenceManagementTest  {
 	@Test
 	public void TestgetOutcomeWithCtxEvent() {
 		try{
-		CtxEntityIdentifier ctxEntityId = new CtxEntityIdentifier(mockId, "Person", new Long(1));
+		CtxEntityIdentifier ctxEntityId = new CtxEntityIdentifier(mockId.getJid(), "Person", new Long(1));
 		CtxEntity ctxEntity = new CtxEntity(ctxEntityId);
 		CtxAttributeIdentifier ctxAttrId = new CtxAttributeIdentifier(ctxEntityId, "location", new Long(1));
 		CtxAttribute attr = new CtxAttribute(ctxAttrId);
@@ -80,11 +82,11 @@ public class UserPreferenceManagementTest  {
 		tempAttributeList.add(ctxAttrId);
 		Mockito.when(broker.lookup(CtxModelType.ATTRIBUTE, "location")).thenReturn(new AsyncResult(tempAttributeList));
 		
-		Callback callback = new Callback();
-		pcm.getOutcome(mockId, attr, callback);
 		
+		Future<List<IPreferenceOutcome>> futureOutcomes = pcm.getOutcome(mockId, attr);
+		List<IPreferenceOutcome> outcomes = futureOutcomes.get();
 		
-		if (callback.getReturnedOutcome()==null){
+		if (outcomes==null){
 			TestCase.fail("Test Failed: getOutcome(Identity arg0, CtxAttribute arg1, IPersonalisationInternalCallback arg2)");
 		}else{
 			System.out.println("Successful test: getOutcome(Identity arg0, CtxAttribute arg1, IPersonalisationInternalCallback arg2)");
@@ -92,6 +94,12 @@ public class UserPreferenceManagementTest  {
 		}catch (CtxException ctxE){
 			TestCase.fail();
 			ctxE.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		
@@ -106,14 +114,12 @@ public class UserPreferenceManagementTest  {
 			sId.setIdentifier(new URI("css://mycss.com/MediaPlayer"));
 			
 			action.setServiceID(sId);
-			action.setServiceType("media");
+			action.setServiceType("media");			
 			
-			Callback callback = new Callback();
+			Future<List<IPreferenceOutcome>> futureOutcomes = pcm.getOutcome(mockId, action);
+			List<IPreferenceOutcome> outcomes = futureOutcomes.get();
 			
-			
-			pcm.getOutcome(mockId, action, callback);
-			
-			if (callback.getReturnedOutcome()==null){
+			if (outcomes==null){
 				TestCase.fail("Test Failed: getOutcome(Identity arg0, IAction arg1, IPersonalisationInternalCallback arg2)");
 			}else{
 				System.out.println("Successful test: getOutcome(Identity arg0, IAction arg1, IPersonalisationInternalCallback arg2)");
@@ -121,6 +127,12 @@ public class UserPreferenceManagementTest  {
 			
 		} catch (URISyntaxException e) {
 			TestCase.fail("Test Failed: getOutcome(Identity arg0, IAction arg1, IPersonalisationInternalCallback arg2)");
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

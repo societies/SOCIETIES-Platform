@@ -177,7 +177,7 @@ public class PreferenceStorer {
 				}
 
 				CtxEntity preferenceEntity = (broker.createEntity(/*userId, */CtxModelTypes.PREFERENCE)).get();
-				assoc.addEntity(preferenceEntity.getId());
+				assoc.addChildEntity(preferenceEntity.getId());
 				broker.update(assoc);
 				CtxAttribute attr = (broker.createAttribute(preferenceEntity.getId(), key)).get();
 				attr.setBinaryValue(this.toByteArray(iptm));
