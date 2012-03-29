@@ -26,13 +26,12 @@
 
 package org.societies.personalization.socialprofiler.datamodel.behaviour;
 
-/**
- * @author lucasimone
- */
+
 import org.neo4j.graphdb.RelationshipType;
 
 
 public enum RelTypes implements RelationshipType{
+	
 	IS_FRIEND_WITH ,
 	IS_A_MEMBER_OF ,
 	IS_A_FAN_OF,

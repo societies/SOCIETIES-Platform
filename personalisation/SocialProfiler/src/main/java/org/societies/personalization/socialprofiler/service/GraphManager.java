@@ -9,23 +9,30 @@ import org.neo4j.graphalgo.impl.centrality.ClosenessCentrality;
 import org.neo4j.graphalgo.impl.centrality.EigenvectorCentralityArnoldi;
 import org.neo4j.graphalgo.impl.centrality.EigenvectorCentralityPower;
 import org.neo4j.graphalgo.impl.shortestpath.SingleSourceShortestPath;
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.ReturnableEvaluator;
+import org.neo4j.graphdb.StopEvaluator;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.Traverser;
 import org.neo4j.index.lucene.LuceneIndexService;
-import org.societies.personalization.socialprofiler.datamodel.Description;
+import org.societies.personalization.socialprofiler.Variables;
 import org.societies.personalization.socialprofiler.datamodel.GeneralInfo;
-import org.societies.personalization.socialprofiler.datamodel.Group;
 import org.societies.personalization.socialprofiler.datamodel.GroupCategory;
 import org.societies.personalization.socialprofiler.datamodel.GroupSubCategory;
 import org.societies.personalization.socialprofiler.datamodel.Interests;
 import org.societies.personalization.socialprofiler.datamodel.PageCategory;
 import org.societies.personalization.socialprofiler.datamodel.PageOfInterest;
-import org.societies.personalization.socialprofiler.datamodel.Person;
+import org.societies.personalization.socialprofiler.datamodel.RelationshipDescription;
+import org.societies.personalization.socialprofiler.datamodel.SocialGroup;
+import org.societies.personalization.socialprofiler.datamodel.SocialPerson;
 import org.societies.personalization.socialprofiler.datamodel.UserInfo;
+import org.societies.personalization.socialprofiler.datamodel.impl.SocialPersonImpl;
 import org.societies.personalization.socialprofiler.exception.NeoException;
-import org.societies.personalization.socialprofiler.impl.Variables;
+import org.societies.personalization.socialprofiler.datamodel.impl.RelTypes;
+
 
 
 
@@ -46,10 +53,13 @@ public class ServiceImpl implements Service,Variables{
 	 * @param neoService
 	 */
 	public ServiceImpl(GraphDatabaseService neoService) {
+		
 		this.neoService = neoService;
 		this.luceneIndexService=new LuceneIndexService(neoService);
+		
 		//enable caching to improve performance
-		this.luceneIndexService.enableCache(NAME_INDEX, 1000);																	//this.searchEngine=new SearchEngineImpl(neoService,indexService);
+		this.luceneIndexService.enableCache(NAME_INDEX, 1000);		
+		//this.searchEngine=new SearchEngineImpl(neoService,indexService);
 	}
 	
 	
@@ -67,7 +77,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#createPerson(java.lang.String)
 	 */
 	@Override
-	public Person createPerson(String name) {
+	public SocialPerson createPerson(String name) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -85,10 +95,37 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#getPerson(java.lang.String)
 	 */
 	@Override
-	public Person getPerson(String name) {
-		// TODO Auto-generated method stub
-		return null;
+	public SocialPerson getPerson(String name) {
+		
+		SocialPerson person = null;
+		Transaction tx = getNeoService().beginTx();
+		try{
+			logger.debug("**Reading Lucene Index**  searching for person "+name);
+			Node personNode = luceneIndexService.getSingleNode( NAME_INDEX, name );
+			if ( personNode == null )
+			{
+				logger.debug("person "+name+" was not found in lucene index");
+			}
+			
+			if ( personNode != null )
+			{
+				logger.debug("person "+name+" was found on Lucene index => returning it");
+				person = new SocialPersonImpl( personNode );
+				
+				if(person==null){logger.error("ERROR while creating instance of person - to be returned");}
+			}else{
+				logger.debug("returning NULL: Reason : no person found on Lucene with that name ");
+			}
+			tx.success();
+		}finally{
+			tx.finish();
+		}						
+		return person;
 	}
+	
+	
+	
+	
 
 //	/* (non-Javadoc)
 //	 * @see org.societies.personalisation.socialprofiler.service.Service#updatePersonPercentages(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
@@ -235,7 +272,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#createDescription(org.societies.personalisation.socialprofiler.datamodel.Person, org.societies.personalisation.socialprofiler.datamodel.Person, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public void createDescription(Person startPerson, Person endPerson,
+	public void createDescription(SocialPerson startPerson, SocialPerson endPerson,
 			String first, String second) {
 		// TODO Auto-generated method stub
 		
@@ -245,7 +282,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#getDescription(org.societies.personalisation.socialprofiler.datamodel.Person, org.societies.personalisation.socialprofiler.datamodel.Person)
 	 */
 	@Override
-	public Description getDescription(Person startPerson, Person endPerson) {
+	public RelationshipDescription getDescription(SocialPerson startPerson, SocialPerson endPerson) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -254,7 +291,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#createGroup(java.lang.String)
 	 */
 	@Override
-	public Group createGroup(String name) {
+	public SocialGroup createGroup(String name) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -263,7 +300,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#getGroup(java.lang.String)
 	 */
 	@Override
-	public Group getGroup(String name) {
+	public SocialGroup getGroup(String name) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -272,7 +309,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#linkGroup(org.societies.personalisation.socialprofiler.datamodel.Person, java.lang.String)
 	 */
 	@Override
-	public Group linkGroup(Person person, String groupId) {
+	public SocialGroup linkGroup(SocialPerson person, String groupId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -310,7 +347,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#linkPageOfInterest(org.societies.personalisation.socialprofiler.datamodel.Person, java.lang.String)
 	 */
 	@Override
-	public PageOfInterest linkPageOfInterest(Person person,
+	public PageOfInterest linkPageOfInterest(SocialPerson person,
 			String PageOfInterestId) {
 		// TODO Auto-generated method stub
 		return null;
@@ -349,7 +386,7 @@ public class ServiceImpl implements Service,Variables{
 	 */
 	@Override
 	public void linkPageOfInterestCategory(PageOfInterest PageOfInterest,
-			String type, Person person) {
+			String type, SocialPerson person) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -369,7 +406,7 @@ public class ServiceImpl implements Service,Variables{
 	 */
 	@Override
 	public boolean existsRelationshipPersonPageOfInterestCategory(
-			Person startPerson, PageCategory PageOfInterestCategory) {
+			SocialPerson startPerson, PageCategory PageOfInterestCategory) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -378,7 +415,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#getTopNInterests(org.societies.personalisation.socialprofiler.datamodel.Person, int)
 	 */
 	@Override
-	public ArrayList<String> getTopNInterests(Person person, int n) {
+	public ArrayList<String> getTopNInterests(SocialPerson person, int n) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -602,8 +639,8 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#linkGroupCategoryAndSubCategory(org.societies.personalisation.socialprofiler.datamodel.Group, java.lang.String, java.lang.String, org.societies.personalisation.socialprofiler.datamodel.Person)
 	 */
 	@Override
-	public void linkGroupCategoryAndSubCategory(Group group, String type,
-			String subType, Person person) {
+	public void linkGroupCategoryAndSubCategory(SocialGroup group, String type,
+			String subType, SocialPerson person) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -612,7 +649,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#existsRelationshipGroupGroupSubCategory(org.societies.personalisation.socialprofiler.datamodel.Group, org.societies.personalisation.socialprofiler.datamodel.GroupSubCategory)
 	 */
 	@Override
-	public boolean existsRelationshipGroupGroupSubCategory(Group group,
+	public boolean existsRelationshipGroupGroupSubCategory(SocialGroup group,
 			GroupSubCategory groupSubCategory) {
 		// TODO Auto-generated method stub
 		return false;
@@ -632,7 +669,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#existsRelationshipPersonGroupSubCategory(org.societies.personalisation.socialprofiler.datamodel.Person, org.societies.personalisation.socialprofiler.datamodel.GroupSubCategory)
 	 */
 	@Override
-	public boolean existsRelationshipPersonGroupSubCategory(Person startPerson,
+	public boolean existsRelationshipPersonGroupSubCategory(SocialPerson startPerson,
 			GroupSubCategory groupSubCategory) {
 		// TODO Auto-generated method stub
 		return false;
@@ -642,7 +679,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#existsRelationshipPersonGroupCategory(org.societies.personalisation.socialprofiler.datamodel.Person, org.societies.personalisation.socialprofiler.datamodel.GroupCategory)
 	 */
 	@Override
-	public boolean existsRelationshipPersonGroupCategory(Person startPerson,
+	public boolean existsRelationshipPersonGroupCategory(SocialPerson startPerson,
 			GroupCategory groupCategory) {
 		// TODO Auto-generated method stub
 		return false;
@@ -652,7 +689,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#getTopNGlobalPreferences(org.societies.personalisation.socialprofiler.datamodel.Person, int)
 	 */
 	@Override
-	public ArrayList<String> getTopNGlobalPreferences(Person person, int n) {
+	public ArrayList<String> getTopNGlobalPreferences(SocialPerson person, int n) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -680,7 +717,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#getTopNDetailedPreferences(org.societies.personalisation.socialprofiler.datamodel.Person, int)
 	 */
 	@Override
-	public ArrayList<String> getTopNDetailedPreferences(Person person, int n) {
+	public ArrayList<String> getTopNDetailedPreferences(SocialPerson person, int n) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -769,7 +806,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#linkNarcissismManiac(org.societies.personalisation.socialprofiler.datamodel.Person, java.lang.String)
 	 */
 	@Override
-	public void linkNarcissismManiac(Person person, String narcissismManiacId) {
+	public void linkNarcissismManiac(SocialPerson person, String narcissismManiacId) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -824,7 +861,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#linkSuperActiveManiac(org.societies.personalisation.socialprofiler.datamodel.Person, java.lang.String)
 	 */
 	@Override
-	public void linkSuperActiveManiac(Person person, String superActiveManiacId) {
+	public void linkSuperActiveManiac(SocialPerson person, String superActiveManiacId) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -879,7 +916,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#linkPhotoManiac(org.societies.personalisation.socialprofiler.datamodel.Person, java.lang.String)
 	 */
 	@Override
-	public void linkPhotoManiac(Person person, String photoManiacId) {
+	public void linkPhotoManiac(SocialPerson person, String photoManiacId) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -934,7 +971,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#linkSurfManiac(org.societies.personalisation.socialprofiler.datamodel.Person, java.lang.String)
 	 */
 	@Override
-	public void linkSurfManiac(Person person, String surfManiacId) {
+	public void linkSurfManiac(SocialPerson person, String surfManiacId) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -989,7 +1026,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#linkQuizManiac(org.societies.personalisation.socialprofiler.datamodel.Person, java.lang.String)
 	 */
 	@Override
-	public void linkQuizManiac(Person person, String quizManiacId) {
+	public void linkQuizManiac(SocialPerson person, String quizManiacId) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -1102,7 +1139,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#linkInterests(org.societies.personalisation.socialprofiler.datamodel.Person, java.lang.String)
 	 */
 	@Override
-	public void linkInterests(Person person, String interestsId) {
+	public void linkInterests(SocialPerson person, String interestsId) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -1149,7 +1186,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#linkGeneralInfo(org.societies.personalisation.socialprofiler.datamodel.Person, java.lang.String)
 	 */
 	@Override
-	public void linkGeneralInfo(Person person, String generalInfoId) {
+	public void linkGeneralInfo(SocialPerson person, String generalInfoId) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -1187,7 +1224,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#setUndefinedParameters(org.societies.personalisation.socialprofiler.datamodel.Person)
 	 */
 	@Override
-	public void setUndefinedParameters(Person person) {
+	public void setUndefinedParameters(SocialPerson person) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -1205,7 +1242,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#getGraphNodes(org.societies.personalisation.socialprofiler.datamodel.Person)
 	 */
 	@Override
-	public Traverser getGraphNodes(Person person) {
+	public Traverser getGraphNodes(SocialPerson person) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -1215,18 +1252,51 @@ public class ServiceImpl implements Service,Variables{
 	 */
 	@Override
 	public Traverser getAllGraphNodes() throws NeoException {
-		// TODO Auto-generated method stub
-		return null;
+		Traverser graph =null;
+		Transaction tx = getNeoService().beginTx();
+		try{
+			SocialPersonImpl person=(SocialPersonImpl) getPerson("ROOT");
+		   
+			graph = person.getUnderlyingNode().traverse(
+			Traverser.Order.BREADTH_FIRST,
+			StopEvaluator.END_OF_GRAPH,
+			ReturnableEvaluator.ALL_BUT_START_NODE,
+			RelTypes.TRAVERSER,
+			Direction.BOTH );
+			tx.success();
+			
+		}catch(Exception e){
+			logger.error("Error traversing NeoDB graph. Reason: " + e.getMessage());
+			throw new NeoException("Error traversing graph: " + e.getMessage());
+		}finally{
+			tx.finish();
+		}	
+		return graph;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.personalisation.socialprofiler.service.Service#getGraphNodesIds(org.neo4j.graphdb.Traverser)
 	 */
 	@Override
-	public ArrayList<String> getGraphNodesIds(Traverser traverser)
-			throws NeoException {
-		// TODO Auto-generated method stub
-		return null;
+	public ArrayList<String> getGraphNodesIds(Traverser traverser) throws NeoException {
+		
+		ArrayList <String> result=new ArrayList <String>();
+		Transaction tx = getNeoService().beginTx();
+		try{
+			for ( Node friendNode : traverser )
+			{
+				SocialPersonImpl user=new SocialPersonImpl(friendNode);
+				result.add(user.getName());
+			}
+			tx.success();
+		}catch(Exception e){
+			logger.error("Error getting NeoDB nodes IDs: " + e.getMessage());
+			throw new NeoException("Error getting NeoDB nodes IDs: " + e.getMessage());
+		}finally{
+			tx.finish();
+		}		
+		return result;
+		
 	}
 
 	/* (non-Javadoc)
@@ -1271,7 +1341,7 @@ public class ServiceImpl implements Service,Variables{
 	 */
 	@Override
 	public BetweennessCentrality<Integer> generateBetweennessCentrality(
-			Person person) {
+			SocialPerson person) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -1328,7 +1398,7 @@ public class ServiceImpl implements Service,Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#updateParameters(org.societies.personalisation.socialprofiler.datamodel.Person)
 	 */
 	@Override
-	public void updateParameters(Person person) {
+	public void updateParameters(SocialPerson person) {
 		// TODO Auto-generated method stub
 		
 	}

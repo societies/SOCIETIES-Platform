@@ -3,10 +3,7 @@
  */
 package org.societies.personalization.socialprofiler.datamodel;
 
-/**
- * @author X0145160
- *
- */
+
 public interface GroupSubCategory {
 
 	/**

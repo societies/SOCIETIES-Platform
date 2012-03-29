@@ -19,7 +19,7 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.jfree.data.xy.XYSeries;
-import org.societies.personalization.socialprofiler.impl.Variables;
+import org.societies.personalization.socialprofiler.Variables;
 
 
 

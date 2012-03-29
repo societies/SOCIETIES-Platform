@@ -19,6 +19,11 @@
 		<groupId>org.asmack</groupId>
 	        <artifactId>asmack</artifactId>
 	</dependency>
+    <dependency>
+		<groupId>org.societies.android.platform</groupId>
+		<artifactId>CoreInterfaces</artifactId>
+		<version>${release.version}</version>
+    </dependency>
     
 	<dependency>
             <groupId>android</groupId>
@@ -29,6 +34,10 @@
 	    	<artifactId>societies-api</artifactId>
 	    	<version>${release.version}</version>
 	</dependency>
+    	<dependency>
+		   <groupId>org.societies.api.internal</groupId>
+		   <artifactId>societies-api-internal</artifactId>
+        </dependency>
 	
 	<dependency>
  		 <groupId>org.slf4j</groupId>

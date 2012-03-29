@@ -62,22 +62,14 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
     private PubsubClient pubSubManager;  
     private IIdentityManager idManager;
 	private ICommManager commManager;
-	private INetworkNode nodeId = null;
 	IIdentity pubsubID = null;
     
     //private HashMap<String, String> eventResult;
     
-    
-	
-    
-    
-    
     /**
      * Default Constructor
-     * 
      */
     public RegManager() {
-    
     }
 
     /**
@@ -85,7 +77,6 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
      * 
      * @param context
      */
-    
     public RegManager(BundleContext bundlecontext) {
                 
         
@@ -234,16 +225,7 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
 	public void setPubSubManager(PubsubClient pubSubManager) {
 		this.pubSubManager = pubSubManager;
 		LOG.info("+++ RegManager setPubSubManager called: ");
-		try {
-			pubSubManager.subscriberSubscribe(pubsubID, "DEVICE_REGISTERED", this);
-			pubSubManager.subscriberSubscribe(pubsubID, "DEVICE_DISCONNECTED", this);
-		} catch (XMPPError e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 	}
 	
 	public ICommManager getCommManager() {
@@ -254,16 +236,22 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
 		LOG.info("+++ RegManager setCommManager called: ");
+	}
+	
+	private void init(){
+		LOG.info("+++ RegManager init called: ");
 		idManager = commManager.getIdManager();
-		
-		nodeId = idManager.getThisNetworkNode();
-		
 		try {
-			pubsubID = idManager.fromJid("XCManager.societies.local");
-		} catch (InvalidFormatException e) {
+			pubsubID = idManager.getThisNetworkNode();
+			pubSubManager.subscriberSubscribe(pubsubID, "DEVICE_REGISTERED", this);
+			pubSubManager.subscriberSubscribe(pubsubID, "DEVICE_DISCONNECTED", this);
+		} catch (XMPPError e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 	}
 	
 	@Override

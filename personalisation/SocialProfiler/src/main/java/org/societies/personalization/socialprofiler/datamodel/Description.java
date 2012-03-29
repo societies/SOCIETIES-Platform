@@ -4,12 +4,12 @@
 package org.societies.personalization.socialprofiler.datamodel;
 
 /**
- * used to describe a relation between 2 persons , 
+ * @author X0145160  - used to describe a relation between 2 persons , 
  * what they have in common
  * Note : for facebook all the relationships are symetric , there 
  * is no INCOMING or OUTGOIING but only BOTH
  */
-public interface RelationshipDescription  {
+public interface Description  {
 	/**
 	 * return name of description 
 	 */
