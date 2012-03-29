@@ -266,6 +266,20 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
 		}
 	}
 	
+	private void init(){
+		LOG.info("+++ RegManager init called: ");
+		try {
+			pubSubManager.subscriberSubscribe(pubsubID, "DEVICE_REGISTERED", this);
+			pubSubManager.subscriberSubscribe(pubsubID, "DEVICE_DISCONNECTED", this);
+		} catch (XMPPError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	@Override
 	public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object payload) {
 		
