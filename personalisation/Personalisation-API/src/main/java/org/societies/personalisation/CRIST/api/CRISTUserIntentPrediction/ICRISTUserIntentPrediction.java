@@ -24,7 +24,8 @@
  */
 package org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Future;
 
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxModelObject;
@@ -33,7 +34,6 @@ import org.societies.api.internal.personalisation.model.FeedbackEvent;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
-import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 
 
 /**
@@ -55,9 +55,9 @@ public interface ICRISTUserIntentPrediction {
 	 * 
 	 * @param ctxAttribute		- a set of context
 	 */
-	public ArrayList<CRISTUserAction> getCRISTPrediction(IIdentity entityID, CtxAttribute ctxAttribute, IPersonalisationInternalCallback callback);
+	public Future<List<CRISTUserAction>> getCRISTPrediction(IIdentity entityID, CtxAttribute ctxAttribute);
 	
-	public ArrayList<CRISTUserAction> getCRISTPrediction(IIdentity entityID, IAction action, IPersonalisationInternalCallback callback);
+	public Future<List<CRISTUserAction>> getCRISTPrediction(IIdentity entityID, IAction action);
 	
 	/**
 	 * This method will return the user's current intent
@@ -67,7 +67,7 @@ public interface ICRISTUserIntentPrediction {
 	 *  @param serviceID	- the ID of the service related to the actions upon 
 	 *  which prediction should perform
 	 */
-	public CRISTUserAction getCurrentUserIntentAction(IIdentity requestor, IIdentity ownerID, ServiceResourceIdentifier serviceID);
+	public Future<CRISTUserAction> getCurrentUserIntentAction(IIdentity requestor, IIdentity ownerID, ServiceResourceIdentifier serviceID);
 	
 	/**
 	 * This method will send user's feedback about the predicted user intent
