@@ -150,7 +150,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		
 		Dbc.require("CSS record cannot be null", record != null);
 
-		ccm.register(ELEMENT_NAMES, new CSSManagerCallback(client, LOGIN_CSS));
+//		ccm.register(ELEMENT_NAMES, new CSSManagerCallback(client, LOGIN_CSS));
 		
 		CssManagerMessageBean messageBean = new CssManagerMessageBean();
 		messageBean.setProfile(record);
