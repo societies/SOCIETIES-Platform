@@ -173,6 +173,13 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
     	
     }
     
+    public ArrayList<String> processEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations, ArrayList<String> cissToCreateMetadata) {
+    	//go straight to Community Recommender
+    	
+    	return communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(cisRecommendations, cissToCreateMetadata);
+    	
+    }
+    
     public void processCSCWRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
     	
     	
@@ -191,7 +198,15 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
     	    abstractDeletions.add(deletions);
     	    convertedRecommendations.put("Delete CISs", abstractDeletions);
     	}
+    	
     	communityRecommender.identifyCisActionForCSCW(convertedRecommendations);
+    }
+    
+    public void processCSCWConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
+    	//go straight to Community Recommender
+    	
+    	communityRecommender.identifyCisActionForCSCW(cisRecommendations);
+    	
     }
     
     public void processCSMAnalyserRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
@@ -209,7 +224,27 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
     	    abstractDeletions.add(deletions);
     	    convertedRecommendations.put("Delete CISs", abstractDeletions);
     	}
+    	
+    	for (int i = 0; i < convertedRecommendations.size(); i++) {
+    		//userContextBroker.evaluateSimilarity("location", convertedRecommendations.get(i).get(0).getMembersList());
+    		//if > 90% of members share that context, and there's no other context with more coverage of members,
+    		//let this be the highest level CIS criteria.
+    		//
+    		//else if (more members share some other context)
+    		//    convertedRecommendations.replace(i, same but with criteria changed to other context, or original as sub-CIS too);
+    		
+    		//else
+    		//    convertedRecommendations.remove(i);
+    	}
+    	
     	communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations);
+    }
+    
+    public void processCSMAnalyserConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
+    	//go straight to Community Recommender
+    	
+    	communityRecommender.identifyCisActionForCSMAnalyser(cisRecommendations);
+    	
     }
     
     public IIdentity getLinkedCss() {
