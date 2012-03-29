@@ -26,6 +26,7 @@ package org.societies.security.policynegotiator.requester;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
@@ -46,23 +47,15 @@ public class ProviderCallback implements INegotiationProviderCallback {
 
 	private NegotiationRequester requester;
 	private MethodType method;
+	private IIdentity provider;
 	
-	public ProviderCallback(NegotiationRequester requester, MethodType method) {
+	public ProviderCallback(NegotiationRequester requester, IIdentity provider, MethodType method) {
 		this.requester = requester;
 		this.method = method;
+		this.provider = provider;
 		LOG.debug("ProviderCallback({})", method);
 	}
 
-//	@Override
-//	public void onGetPolicyOptions(int sessionId, String sops) {
-//		// TODO Auto-generated method stub
-//	}
-
-//	@Override
-//	public void onAcceptPolicyAndGetSla(int sessionId, String policy) {
-//		// TODO Auto-generated method stub
-//	}
-	
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback
 	 * #receiveExamplesResult(java.lang.Object)
@@ -87,7 +80,8 @@ public class ProviderCallback implements INegotiationProviderCallback {
 							sessionId,
 							sop,
 							false,
-							new ProviderCallback(requester, MethodType.ACCEPT_POLICY_AND_GET_SLA));
+							provider,
+							new ProviderCallback(requester, provider, MethodType.ACCEPT_POLICY_AND_GET_SLA));
 				} catch (XmlException e) {
 					LOG.warn("receiveResult(): session {}: ", sessionId, e);
 				}

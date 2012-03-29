@@ -26,6 +26,8 @@ package org.societies.security.policynegotiator.requester;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.security.policynegotiator.INegotiationRequester;
@@ -56,7 +58,11 @@ public class NegotiationRequester implements INegotiationRequester {
 
 		LOG.debug("init(): group manager = {}", groupMgr.toString());
 		
-		groupMgr.getPolicyOptions("service123", new ProviderCallback(this, MethodType.GET_POLICY_OPTIONS));
+		// TODO: remove when somebody else initiates negotiation and supplies provider identity.
+		IIdentityManager idMgr = groupMgr.getIdMgr();
+		IIdentity providerId = idMgr.getThisNetworkNode();
+		groupMgr.getPolicyOptions("service123", providerId,
+				new ProviderCallback(this, providerId, MethodType.GET_POLICY_OPTIONS));
 	}
 
 	// Getters and setters for beans

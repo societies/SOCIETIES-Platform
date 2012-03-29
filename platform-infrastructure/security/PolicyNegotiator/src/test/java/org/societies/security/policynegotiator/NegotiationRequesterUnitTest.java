@@ -25,13 +25,14 @@
 package org.societies.security.policynegotiator;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 import java.util.Random;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.security.policynegotiator.requester.NegotiationRequester;
@@ -47,6 +48,7 @@ public class NegotiationRequesterUnitTest {
 	private NegotiationRequester classUnderTest;
 	private ISignatureMgr signatureMgrMock;
 	private INegotiationProviderRemote groupMgrMock;
+	private IIdentityManager idMgrMock;
 
 	/**
 	 * @throws java.lang.Exception
@@ -54,9 +56,16 @@ public class NegotiationRequesterUnitTest {
 	@Before
 	public void setUp() throws Exception {
 
+		// Signature manager
 		signatureMgrMock = mock(ISignatureMgr.class);
+
+		// Security comms group manager
 		groupMgrMock = mock(INegotiationProviderRemote.class);
-		//classUnderTest = new NegotiationRequester(signatureMgrMock);
+		idMgrMock = mock(IIdentityManager.class);
+		when(groupMgrMock.getIdMgr()).thenReturn(idMgrMock); 
+//		verify(groupMgrMock).getIdMgr();
+
+		// Class under test
 		classUnderTest = new NegotiationRequester();
 		classUnderTest.setGroupMgr(groupMgrMock);
 		classUnderTest.setSignatureMgr(signatureMgrMock);
@@ -83,14 +92,14 @@ public class NegotiationRequesterUnitTest {
 	 */
 	@Test
 	public void testReject() {
-		
+
 		Random rnd = new Random();
 		int sessionId;
 
 		// Test for a non-existing session
 		sessionId = rnd.nextInt();
 		classUnderTest.reject(sessionId);
-		
+
 		// Test for an existing session
 		//sessionId = ;
 		//classUnderTest.reject(sessionId);
