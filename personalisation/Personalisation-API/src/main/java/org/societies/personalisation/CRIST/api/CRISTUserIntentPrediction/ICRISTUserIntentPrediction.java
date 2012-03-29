@@ -67,7 +67,7 @@ public interface ICRISTUserIntentPrediction {
 	 *  @param serviceID	- the ID of the service related to the actions upon 
 	 *  which prediction should perform
 	 */
-	public Future<CRISTUserAction> getCurrentUserIntentAction(IIdentity requestor, IIdentity ownerID, ServiceResourceIdentifier serviceID);
+	public Future<CRISTUserAction> getCurrentUserIntentAction(IIdentity ownerID, ServiceResourceIdentifier serviceID);
 	
 	/**
 	 * This method will send user's feedback about the predicted user intent
