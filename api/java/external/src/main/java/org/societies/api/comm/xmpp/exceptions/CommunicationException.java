@@ -40,4 +40,8 @@ public class CommunicationException extends Exception {
 	public CommunicationException(String m, Throwable t) {
 		super(m,t);
 	}
+
+	public CommunicationException(String string) {
+		super(m);
+	}
 }
