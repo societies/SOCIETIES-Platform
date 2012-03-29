@@ -83,6 +83,9 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserBean;
 
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
+import org.societies.api.personalisation.mgmt.IPersonalisationManager;
+import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
