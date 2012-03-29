@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+z * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
  * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
  * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
@@ -32,17 +32,17 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
+import org.apache.shindig.social.opensocial.model.ActivityEntry;
+import org.apache.shindig.social.opensocial.model.Group;
+import org.apache.shindig.social.opensocial.model.Person;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.personalization.socialprofiler.datamodel.Person;
-import org.societies.personalization.socialprofiler.datamodel.PersonImpl;
+import org.societies.api.internal.sns.ISocialData;
+import org.societies.personalization.socialprofiler.Variables;
+import org.societies.personalization.socialprofiler.datamodel.SocialPerson;
 import org.societies.personalization.socialprofiler.datamodel.behaviour.RelTypes;
+import org.societies.personalization.socialprofiler.datamodel.impl.SocialPersonImpl;
 import org.societies.personalization.socialprofiler.exception.NeoException;
-import org.societies.personalization.socialprofiler.impl.Variables;
-import org.societies.platform.socialdata.impl.SocialDataImpl;
-
-import com.sun.corba.se.spi.legacy.connection.GetEndPointInfoAgainException;
 
 
 public class EngineImpl implements Engine, Variables{
@@ -51,18 +51,23 @@ public class EngineImpl implements Engine, Variables{
 	private ServiceImpl 					service;
 	private DatabaseConnectionImpl 			databaseConnection;
 
+	private List<Person> 			friends;
+	private List<Person> 			profiles;
+	private List<Group>	 			groups;
+	private List<ActivityEntry> 	activities;
+	
 	
 	private Hashtable<String, ArrayList<String>>  credentials_sn			= new Hashtable<String, ArrayList<String>> ();
 	private Hashtable<String, ArrayList<String>>  credentials_sn_auxiliary	= new Hashtable<String, ArrayList<String>> ();
-	private SocialDataImpl	socialdata;
 	
 	public EngineImpl(ServiceImpl service, DatabaseConnectionImpl databaseConnection){
 	
 		this.service 				= service;
-		this.socialdata 			= new SocialDataImpl();
 		this.databaseConnection 	= databaseConnection;
-		
 	}
+	
+	
+	
 	
 	/**
 	 * returns the service given as parameter to the constructor
@@ -93,11 +98,18 @@ public class EngineImpl implements Engine, Variables{
 	 * done if option 2 , the function generates if necessary but 
 	 * also updates
 	 */
-	public void UpdateNetwork(int option){
+	public void UpdateNetwork(ISocialData socialData, int option){
 	
 
 		logger.debug("UPDATING NETWORK , all new users will be added to network");
 		logger.debug("updating or removing if necessary the existing users"); 
+		
+		socialData.updateSocialData();
+		// Update data source
+		profiles 	= socialData.getSocialProfiles();
+		friends  	= socialData.getSocialPeople();
+		groups 	 	= socialData.getSocialGroups();
+		activities	= socialData.getSocialActivity();
 		
 		ArrayList<String> list_usersIds =null;
 		
@@ -133,15 +145,24 @@ public class EngineImpl implements Engine, Variables{
 	
 	
 	
+	
+
+
+
+	
+
+
+
+
 	/**
 	 * 
 	 * @param p
 	 */
-	public void linkToRoot(Person p){
+	public void linkToRoot(SocialPerson p){
 		Transaction tx = service.getNeoService().beginTx();
 		try{
-			Node startPersonNode	=  ((PersonImpl) p).getUnderlyingNode();
-			Node rootNode			=  ((PersonImpl)service.getPerson("ROOT")).getUnderlyingNode();
+			Node startPersonNode	=  ((SocialPersonImpl) p).getUnderlyingNode();
+			Node rootNode			=  ((SocialPersonImpl)service.getPerson("ROOT")).getUnderlyingNode();
 			
 			startPersonNode.createRelationshipTo(rootNode, RelTypes.TRAVERSER);
 			tx.success();
@@ -152,7 +173,7 @@ public class EngineImpl implements Engine, Variables{
 	}
 	
 	
-	public void generate_tree(String current_id, String previous_id,int option) {
+	public void generate_tree(String current_id, String previous_id, int option) {
 		
 		
 		
@@ -162,7 +183,7 @@ public class EngineImpl implements Engine, Variables{
 		
 		logger.debug("----checking if current user "+current_id+" exists on neo network");
 		
-		Person currentPerson=service.getPerson(current_id);
+		SocialPerson currentPerson=service.getPerson(current_id);
 		
 		if (currentPerson==null){
 			
@@ -177,7 +198,7 @@ public class EngineImpl implements Engine, Variables{
 				//
 
 
-				List<Person> list=  new ArrayList<Person>();//socialdata.getSocialPeople();   //serviceXml.friendsGetFacebook(client);
+				List<SocialPerson> list=  new ArrayList<SocialPerson>();//socialdata.getSocialPeople();   //serviceXml.friendsGetFacebook(client);
 				
 			
 				if (list.size()==0) {
@@ -188,7 +209,7 @@ public class EngineImpl implements Engine, Variables{
 				else{
 					logger.debug("the credentials of user "+current_id+" function properly");
 					logger.debug("-->creating user "+current_id+" on Neo network");
-					Person startPerson=service.createPerson(current_id);
+					SocialPerson startPerson=service.createPerson(current_id);
 					//String ca_Name=serviceXml.getCANameFromCredentials(credentials_sn_auxiliary, current_id);
 					
 //					service.setPersonCAName(current_id,ca_Name );
@@ -210,7 +231,7 @@ public class EngineImpl implements Engine, Variables{
 					}
 					else{
 						String nameDescription=current_id+previous_id;
-						Person endPerson=service.getPerson(previous_id);
+						SocialPerson endPerson=service.getPerson(previous_id);
 						logger.debug("---# Trying to create relationship between "+current_id+" and "+previous_id+" with name "+nameDescription);
 						service.createDescription(startPerson, endPerson, current_id,previous_id);
 					}
@@ -260,7 +281,7 @@ public class EngineImpl implements Engine, Variables{
 		
 			logger.debug("---current user "+current_id+" exists on Neo network");
 			if (option==FIRST_TIME){
-				Person startPerson=service.getPerson(current_id);
+				SocialPerson startPerson=service.getPerson(current_id);
 //				FacebookXmlRestClient client=serviceXml.getFacebookClient(credentials_sn_auxiliary,current_id);
 				
 //				if (client ==null){
@@ -271,7 +292,7 @@ public class EngineImpl implements Engine, Variables{
 					logger.debug("previous user is null=> nothing to check - end of this sub-branch");
 				}else{
 					logger.debug("####checking if there is a relationship between current "+current_id+" and previous"+previous_id);
-					Person endPerson=service.getPerson(previous_id);
+					SocialPerson endPerson=service.getPerson(previous_id);
 					
 					boolean exists= false;  //service.existsRelationship(startPerson, endPerson);
 					
@@ -340,12 +361,12 @@ public class EngineImpl implements Engine, Variables{
 								
 									logger.debug("the credentials of user "+current_id+" function properly");
 									credentials_sn.remove(current_id);
-									Person startPerson=service.getPerson(current_id);
+									SocialPerson startPerson=service.getPerson(current_id);
 									if (previous_id==null){
 										logger.debug("previous user is null=> nothing to check - end of this sub-branch");
 									}else{
 										logger.debug("####checking if there is a relationship between current "+current_id+" and previous"+previous_id);
-										Person endPerson=service.getPerson(previous_id);
+										SocialPerson endPerson=service.getPerson(previous_id);
 										boolean exists= false;//service.existsRelationship(startPerson, endPerson);
 							
 										if (exists==false){
@@ -414,30 +435,7 @@ public class EngineImpl implements Engine, Variables{
 		}	
 	}
 
-	@Override
-	public void linkSocialNetwork(ISocialConnector connector) {
-		try {
-			this.socialdata.addSocialConnector(connector);
-		} catch (Exception e) {
-			
-			e.printStackTrace();
-		}
-		
-	}
+	
 
-	@Override
-	public void unlinkSocialNetwork(ISocialConnector connector) {
-		try {
-			this.socialdata.removeSocialConnector(connector.getID());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-
-	@Override
-	public List<ISocialConnector> getSNConnectors() {
-		return this.socialdata.getSocialConnectors();
-	}
+	
 }

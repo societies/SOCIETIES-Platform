@@ -43,6 +43,8 @@ import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.event.CtxEvent;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxIdentifierFactory;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.CtxEventScope;
 import org.societies.context.api.event.ICtxEventMgr;
@@ -73,6 +75,12 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 	/** The OSGi bundle context. */
 	private BundleContext bundleContext;
 	
+	CtxEventMgr() {
+		
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.societies.context.api.event.ICtxEventMgr#post(org.societies.api.context.event.CtxEvent, java.lang.String[], org.societies.context.api.event.CtxEventScope)
 	 */
@@ -94,7 +102,7 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 		else
 			throw new CtxEventMgrException("Cannot send event to topics "
 					+ Arrays.toString(topics) 
-					+ ": Unknown CtxEvent implementation");
+					+ ": Unsupported CtxEvent implementation");
 	}
 	
 	/* (non-Javadoc)
@@ -114,7 +122,7 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 		final Dictionary<String, Object> props = new Hashtable<String, Object>();
 		props.put(EventConstants.EVENT_TOPIC, topics);
 		// TODO Add ctx event constants
-		props.put(EventConstants.EVENT_FILTER, "(idString=" + ctxId + ")");
+		props.put(EventConstants.EVENT_FILTER, "(id=" + ctxId + ")");
 		if (LOG.isInfoEnabled()) 
 			LOG.info("Registering context event listener to topics "
 					+ Arrays.toString(topics)
@@ -160,7 +168,7 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 		final Dictionary<String, Object> props = new Hashtable<String, Object>();
 		props.put(EventConstants.EVENT_TOPIC, topics);
 		// TODO Add ctx event constants
-		props.put(EventConstants.EVENT_FILTER, "(idString=" + scope
+		props.put(EventConstants.EVENT_FILTER, "(id=" + scope
 				+ "/ATTRIBUTE/" + attrType + "/*)");
 		if (LOG.isInfoEnabled()) 
 			LOG.info("Registering context event listener to topics "
@@ -209,8 +217,7 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 		
 			final Map<String, Object> props = new HashMap<String, Object>();
 			// TODO Add ctx event constants
-			props.put("id", event.getId());
-			props.put("idString", event.getId().toString());
+			props.put("id", event.getId().toString());
 			if (LOG.isDebugEnabled()) 
 				LOG.debug("Sending context event to topic '" + topics[i] + "'"
 						+ " with properties '" + props + "'");
@@ -234,19 +241,41 @@ public class CtxEventMgr implements ICtxEventMgr, BundleContextAware {
 		public void handleEvent(Event osgiEvent) {
 		
 			// TODO Add ctx event constants
-			final CtxChangeEvent ctxChangeEvent = new CtxChangeEvent(
-					(CtxIdentifier) osgiEvent.getProperty("id"));
-			final String topic = osgiEvent.getTopic();
-			if (CtxChangeEventTopic.CREATED.equals(topic))
-				this.listener.onCreation(ctxChangeEvent);
-			else if (CtxChangeEventTopic.UPDATED.equals(topic))
-				this.listener.onUpdate(ctxChangeEvent);
-			else if (CtxChangeEventTopic.MODIFIED.equals(topic))
-				this.listener.onModification(ctxChangeEvent);
-			else if (CtxChangeEventTopic.REMOVED.equals(topic))
-				this.listener.onRemoval(ctxChangeEvent);
-			else
-				LOG.warn("Unexpected context change event topic: '" + topic + "'");
+			try {
+				this.checkEventProps(osgiEvent);
+
+				// Extract the String form of the CtxIdentifier
+				final String ctxIdStr = (String) osgiEvent.getProperty("id");
+				final CtxIdentifier ctxId = CtxIdentifierFactory.getInstance().fromString(ctxIdStr);
+				
+				final CtxChangeEvent ctxChangeEvent = new CtxChangeEvent(ctxId);
+				final String topic = osgiEvent.getTopic();
+				if (CtxChangeEventTopic.CREATED.equals(topic))
+					this.listener.onCreation(ctxChangeEvent);
+				else if (CtxChangeEventTopic.UPDATED.equals(topic))
+					this.listener.onUpdate(ctxChangeEvent);
+				else if (CtxChangeEventTopic.MODIFIED.equals(topic))
+					this.listener.onModification(ctxChangeEvent);
+				else if (CtxChangeEventTopic.REMOVED.equals(topic))
+					this.listener.onRemoval(ctxChangeEvent);
+				else
+					LOG.error("Unexpected context change event topic: '" + topic + "'");
+
+			} catch (CtxEventMgrException ceme) {
+				
+				LOG.error("Malformed context change event: " 
+						+ ceme.getLocalizedMessage(), ceme);
+			} catch (MalformedCtxIdentifierException mcie) {
+				
+				LOG.error("Malformed context identifier in context change event: "
+						+ mcie.getLocalizedMessage(), mcie);
+			}
+		}
+		
+		private void checkEventProps(final Event osgiEvent) throws CtxEventMgrException {
+			
+			if (!(osgiEvent.getProperty("id") instanceof String))
+				throw new CtxEventMgrException("'id' property is missing or incorrect");
 		}
 	}
 }

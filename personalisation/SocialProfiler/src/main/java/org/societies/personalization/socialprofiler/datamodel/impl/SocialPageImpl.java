@@ -1,10 +1,12 @@
 /**
  * 
  */
-package org.societies.personalization.socialprofiler.datamodel;
+package org.societies.personalization.socialprofiler.datamoldel.utils;
 
 
 import org.neo4j.graphdb.Node;
+import org.societies.personalization.socialprofiler.datamodel.NodeProperties;
+import org.societies.personalization.socialprofiler.datamodel.PageOfInterest;
 
 public class PageOfInterestImpl implements PageOfInterest, NodeProperties {
 

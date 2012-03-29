@@ -4,12 +4,12 @@
 package org.societies.personalization.socialprofiler.datamodel.impl;
 
 import org.neo4j.graphdb.Relationship;
-import org.societies.personalization.socialprofiler.datamodel.NodeProperties;
-import org.societies.personalization.socialprofiler.datamodel.RelationshipDescription;
+import org.societies.personalization.socialprofiler.datamodel.Description;
+import org.societies.personalization.socialprofiler.datamodel.utils.NodeProperties;
 
 
 
-public class RelationshipDescriptionImpl implements RelationshipDescription, NodeProperties  {
+public class DescriptionImpl implements Description, NodeProperties  {
 
 	private final Relationship underlyingRel;
     
@@ -17,7 +17,7 @@ public class RelationshipDescriptionImpl implements RelationshipDescription, Nod
 	/**
 	 * @param underlyingRel Constructor using the relationship
 	 */
-	public RelationshipDescriptionImpl(final Relationship underlyingRel) {
+	public DescriptionImpl(final Relationship underlyingRel) {
 		this.underlyingRel = underlyingRel;
 	}
 

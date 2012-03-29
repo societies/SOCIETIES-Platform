@@ -1,10 +1,12 @@
 /**
  * 
  */
-package org.societies.personalization.socialprofiler.datamodel;
+package org.societies.personalization.socialprofiler.datamodel.impl;
 
 
 import org.neo4j.graphdb.Node;
+import org.societies.personalization.socialprofiler.datamodel.NodeProperties;
+import org.societies.personalization.socialprofiler.datamodel.PageCategory;
 
 
 public class PageCategoryImpl implements PageCategory, NodeProperties {
