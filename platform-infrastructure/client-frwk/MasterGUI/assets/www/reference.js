@@ -156,7 +156,7 @@ var successfulLogin = function() {
 	}
     window.plugins.LocalCSSManagerService.loginCSS(success, failure);
 
-//	$.mobile.changePage( ($("#menu")), { transition: "slideup"} );
+	$.mobile.changePage( ($("#menu")), { transition: "slideup"} );
 };
 
 

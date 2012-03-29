@@ -234,16 +234,7 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
 	public void setPubSubManager(PubsubClient pubSubManager) {
 		this.pubSubManager = pubSubManager;
 		LOG.info("+++ RegManager setPubSubManager called: ");
-		try {
-			pubSubManager.subscriberSubscribe(pubsubID, "DEVICE_REGISTERED", this);
-			pubSubManager.subscriberSubscribe(pubsubID, "DEVICE_DISCONNECTED", this);
-		} catch (XMPPError e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 	}
 	
 	public ICommManager getCommManager() {
@@ -264,6 +255,24 @@ public class RegManager implements ILocalDevice, Subscriber, BundleContextAware{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private void init(){
+		LOG.info("+++ RegManager init called: ");
+		idManager = commManager.getIdManager();
+		IIdentity pubsubID = null;
+		try {
+			pubsubID = idManager.getThisNetworkNode();
+			//pubsubID = idManager.fromJid("XCManager.societies.local");
+			pubSubManager.subscriberSubscribe(pubsubID, "DEVICE_REGISTERED", this);
+			pubSubManager.subscriberSubscribe(pubsubID, "DEVICE_DISCONNECTED", this);
+		} catch (XMPPError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 	}
 	
 	@Override
