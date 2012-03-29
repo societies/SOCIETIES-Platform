@@ -3,10 +3,7 @@
  */
 package org.societies.personalization.socialprofiler.datamodel;
 
-/**
- * @author X0145160
- *
- */
+
 public interface Interests {
 	/**
      * returns the id of the interests node, a.k.a the method is called getName just to stay coeherent with the

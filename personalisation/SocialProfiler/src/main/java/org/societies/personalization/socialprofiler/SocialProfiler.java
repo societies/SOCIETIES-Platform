@@ -1,4 +1,4 @@
-package org.societies.personalization.socialprofiler.impl;
+package org.societies.personalization.socialprofiler;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,18 +10,18 @@ import java.util.Timer;
 
 import org.apache.log4j.Logger;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
-import org.societies.api.context.broker.ICtxBroker;
+import org.societies.api.internal.personalisation.ISocialProfiler;
 import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.personalization.socialprofiler.SocialProfiler;
+import org.societies.api.internal.sns.ISocialData;
 import org.societies.personalization.socialprofiler.service.DatabaseConnectionImpl;
 import org.societies.personalization.socialprofiler.service.EngineImpl;
 import org.societies.personalization.socialprofiler.service.ServiceImpl;
 import org.societies.personalization.socialprofiler.service.SocialTimerTask;
-import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
 
-public class SocialProfilerImpl implements SocialProfiler {
 
-	private static final Logger 	logger 			= Logger.getLogger(SocialProfiler.class);
+public class SocialProfiler implements ISocialProfiler {
+
+	private static final Logger 	logger 			= Logger.getLogger(ISocialProfiler.class);
 	private Properties 				props 			= new Properties();
 	private String 					configFileName	= "config.properties";
 	private EmbeddedGraphDatabase 	neo;
@@ -29,27 +29,27 @@ public class SocialProfilerImpl implements SocialProfiler {
 	private DatabaseConnectionImpl  databaseConnection;
 
 	private EngineImpl 				engine;
-
+	private ISocialData				socialdata;
+	
+	private boolean 				watingForFirstConnector=true;
 	
 	
-	
-	private ICtxBroker ctxBroker;
 	private float daysFull = 0;
 
-	public SocialProfilerImpl(){
-		
-		initializationSocialProfiler();
-		
-		// network update timeout setup
- 	    this.scheduleNetworkUpdate();
- 	    
- 	    // JUST FOR NOW
- 	    if (neo!=null)   neo.shutdown();
-		
+	
+	public ISocialData getSocialdata() {
+		return socialdata;
 	}
-	
 
-	
+
+	public void setSocialdata(ISocialData socialdata) {
+		this.socialdata = socialdata;
+		initializationSocialProfiler();
+	}
+
+
+
+
 	public void initializationSocialProfiler(){
 		
 		logger.info("Social Profiler Intialized");
@@ -67,33 +67,17 @@ public class SocialProfilerImpl implements SocialProfiler {
 		this.service				= new ServiceImpl(neo);
 		this.databaseConnection	    = new DatabaseConnectionImpl();
 		
+		
 		logger.info("Engine Initialization ...");
 		this.engine	= new EngineImpl(service, databaseConnection);
 		
-		///////////////////////////////////////////////////
-		//
-		// Add SOCIAL CONNECTOR -- FACEBOOK
-		//
-		///////////////////////////////////////////////////
-		String access_token = "AAAFPIhZAkC90BAO1fmJZAxs754pEGhaGQesb9haktJ8JgDOnxsSUo2A9PJOnQa34b2mRUuRXRUS1mhUIJG8RMetAUwZBZBkOBFfo7G0h6wZDZD";
-		String identity		= "";
-		ISocialConnector connector =  new FacebookConnectorImpl(access_token, identity);
 		
-		// ENGINE
-		this.engine.linkSocialNetwork(connector);
+		
+		
 		
 	}
 
 	
-	
-	public ICtxBroker getCtxBroker() {
-		return ctxBroker;
-	}
-
-
-	public void setCtxBroker(ICtxBroker ctxBroker) {
-		this.ctxBroker = ctxBroker;
-	}
 	
 	private void enableProperties(){
 		try{
@@ -114,7 +98,9 @@ public class SocialProfilerImpl implements SocialProfiler {
 	
 	
 	 private void scheduleNetworkUpdate() {
-	    	daysFull  = new Integer(props.getProperty("updateFreq.full")).intValue();
+		 	
+		 
+		 	daysFull  = new Integer(props.getProperty("updateFreq.full")).intValue();
 			
 	    	//int initialDelay = 1000 * 60 * 60 * 24 * daysFull;
 			//int period = initialDelay;
@@ -128,12 +114,31 @@ public class SocialProfilerImpl implements SocialProfiler {
 		}
 
 
+	 
+	 
 
 
 	@Override
 	public void addSocialNetwork(ISocialConnector connector) {
-		this.engine.linkSocialNetwork(connector);
-		logger.info("Add new connector "+connector.getConnectorName() + "with id:"+connector.getID());
+		
+		
+		try {
+			this.socialdata.addSocialConnector(connector);
+			logger.info("Add new connector "+connector.getConnectorName() + "with id:"+connector.getID());
+			
+			if (watingForFirstConnector){
+				
+					watingForFirstConnector	=false;
+					initializationSocialProfiler();
+			
+					// network update timeout setup
+					this.scheduleNetworkUpdate();
+			}
+	 	    
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 
@@ -141,8 +146,22 @@ public class SocialProfilerImpl implements SocialProfiler {
 	@Override
 	public void removeSocialNetwork(ISocialConnector connector) {
 	
-		this.engine.unlinkSocialNetwork(connector);
-		logger.info("Removed connector "+connector.getConnectorName() + "with id:"+connector.getID());
+		try {
+			
+			this.socialdata.removeSocialConnector(connector);
+			logger.info("Removed connector "+connector.getConnectorName() + "with id:"+connector.getID());
+			
+			if (this.socialdata.getSocialConnectors().size()==0){
+				logger.info("No connector Available -- Stop component task");
+				watingForFirstConnector = true;
+				neo.shutdown();
+				databaseConnection.closeMysql();
+				logger.info("Engine stopped - DB closed");
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 	}
 
@@ -150,6 +169,8 @@ public class SocialProfilerImpl implements SocialProfiler {
 
 	@Override
 	public void setUpdateFrequency(float frequency) {
+		
+		logger.info("Frequency update changed into :"+frequency + "days");
 		this.daysFull=frequency;
 		
 	}
@@ -165,7 +186,7 @@ public class SocialProfilerImpl implements SocialProfiler {
 
 	@Override
 	public List<ISocialConnector> getListOfLinkedSN() {
-		return this.engine.getSNConnectors();
+		return this.socialdata.getSocialConnectors();
 	}
 
 }
