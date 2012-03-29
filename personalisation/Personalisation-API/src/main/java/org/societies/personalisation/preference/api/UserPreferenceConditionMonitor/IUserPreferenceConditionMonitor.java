@@ -24,10 +24,14 @@
  */
 package org.societies.personalisation.preference.api.UserPreferenceConditionMonitor;
 
+import java.util.List;
+import java.util.concurrent.Future;
+
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 
 
 /**
@@ -43,7 +47,7 @@ public interface IUserPreferenceConditionMonitor {
 	 * @param attribute
 	 * @param callback
 	 */
-	public void getOutcome(IIdentity ownerId, CtxAttribute attribute, IPersonalisationInternalCallback callback);
+	public Future<List<IPreferenceOutcome>> getOutcome(IIdentity ownerId, CtxAttribute attribute);
 	
 
 	/**
@@ -52,5 +56,15 @@ public interface IUserPreferenceConditionMonitor {
 	 * @param action
 	 * @param callback
 	 */
-	public void getOutcome(IIdentity ownerId, IAction action, IPersonalisationInternalCallback callback);
+	public Future<List<IPreferenceOutcome>> getOutcome(IIdentity ownerId, IAction action);
+	
+	
+	/**
+	 * 
+	 * @param ownerId
+	 * @param serviceId
+	 * @param preferenceName
+	 * @return
+	 */
+	public Future<IPreferenceOutcome> getOutcome(IIdentity ownerId, ServiceResourceIdentifier serviceId, String preferenceName);
 }

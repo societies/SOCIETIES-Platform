@@ -26,13 +26,13 @@ package org.societies.personalisation.CAUI.api.CAUIPrediction;
 
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
-import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 /**
  * @since 0.0.1
  * @author nikosk(ICCS)
@@ -57,7 +57,7 @@ public interface ICAUIPrediction {
 	 * @param userActionName    the type of the user action requested
 	 * @return					the outcome in the form of an UserIntentAction object
 	 */
-	public IUserIntentAction getCurrentIntentAction(IIdentity ownerID, ServiceResourceIdentifier serviceID, String userActionType);
+	public Future<IUserIntentAction> getCurrentIntentAction(IIdentity ownerID, ServiceResourceIdentifier serviceID, String userActionType);
 	
 	/**
 	 * Predicts next user action based on an action update. 
@@ -66,12 +66,12 @@ public interface ICAUIPrediction {
 	 * @param action
 	 * @return predicted action 
 	 */
-	public void getPrediction(IIdentity requestor, IAction action, IPersonalisationInternalCallback persCallback); 
+	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor, IAction action); 
 	
 	/**
 	 * Predicts next user action based on a context attribute update. 
 	 */	   
-	public void getPrediction(IIdentity requestor, CtxAttribute contextAttribute, IPersonalisationInternalCallback persCallback);
+	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor, CtxAttribute contextAttribute);
 	
 	/**
 	 * Returns a list with the performed predictions.
