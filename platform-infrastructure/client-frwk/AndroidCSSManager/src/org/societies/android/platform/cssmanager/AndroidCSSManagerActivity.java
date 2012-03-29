@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.api.android.internal.model.AndroidCSSNode;
+import org.societies.api.android.internal.model.AndroidCSSRecord;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -50,7 +52,7 @@ public class AndroidCSSManagerActivity extends Activity {
 	public static final String TEST_PASSWORD = "P455W0RD";
 	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
 
-	private CssNode cssNode_1, cssNode_2;
+
 
     private static final String DESTINATION = "xcmanager.societies.local";
 
@@ -99,7 +101,7 @@ public class AndroidCSSManagerActivity extends Activity {
     		ccm = new ClientCommunicationMgr(context);
     		
     		CssManagerMessageBean messageBean = new CssManagerMessageBean();
-    		messageBean.setProfile(new CssRecord());
+    		messageBean.setProfile(AndroidCSSManagerActivity.this.createAndroidRecord());
     		messageBean.setMethod(MethodType.REGISTER_XMPP_SERVER);
 
     		Stanza stanza = new Stanza(toXCManager);
@@ -116,7 +118,58 @@ public class AndroidCSSManagerActivity extends Activity {
     	}
     }
  
+    private AndroidCSSRecord createAndroidRecord() {
+    	
+    	AndroidCSSNode aCSSNode_1, aCSSNode_2;
+    	AndroidCSSNode aCSSNodes [];
+    	AndroidCSSNode aCSSArchivedNodes [];
+
+    	aCSSNode_1 = new AndroidCSSNode();
+    	aCSSNode_1.setIdentity(TEST_IDENTITY_1);
+    	aCSSNode_1.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
+    	aCSSNode_1.setType(CSSManagerEnums.nodeType.Rich.ordinal());
+
+    	aCSSNode_2 = new AndroidCSSNode();
+    	aCSSNode_2.setIdentity(TEST_IDENTITY_2);
+    	aCSSNode_2.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
+    	aCSSNode_2.setType(CSSManagerEnums.nodeType.Android.ordinal());
+		
+    	aCSSNodes = new AndroidCSSNode[2];
+    	aCSSNodes[0] = aCSSNode_1;
+    	aCSSNodes[1] = aCSSNode_2;
+		
+    	aCSSArchivedNodes = new AndroidCSSNode[2];
+    	aCSSArchivedNodes[0] = aCSSNode_1;
+    	aCSSArchivedNodes[1] = aCSSNode_1;
+
+		AndroidCSSRecord cssProfile = new AndroidCSSRecord();
+		
+		cssProfile.setCSSNodes(aCSSNodes);
+		cssProfile.setArchiveCSSNodes(aCSSArchivedNodes);
+		cssProfile.setCssIdentity(TEST_IDENTITY);
+		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
+		cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
+		cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
+		cssProfile.setCssUpTime(TEST_UPTIME);
+		cssProfile.setEmailID(TEST_EMAIL);
+		cssProfile.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
+		cssProfile.setForeName(TEST_FORENAME);
+		cssProfile.setHomeLocation(TEST_HOME_LOCATION);
+		cssProfile.setIdentityName(TEST_IDENTITY_NAME);
+		cssProfile.setImID(TEST_IM_ID);
+		cssProfile.setName(TEST_NAME);
+		cssProfile.setPassword(TEST_PASSWORD);
+		cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
+		cssProfile.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
+		cssProfile.setSocialURI(TEST_SOCIAL_URI);
+		
+		return cssProfile;
+		
+    }
+    
     private CssRecord createRecord() {
+    	CssNode cssNode_1, cssNode_2;
+
 		cssNode_1 = new CssNode();
 		cssNode_1.setIdentity(TEST_IDENTITY_1);
 		cssNode_1.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
