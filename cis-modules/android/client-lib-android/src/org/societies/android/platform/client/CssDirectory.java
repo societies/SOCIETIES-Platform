@@ -28,17 +28,18 @@ import java.util.Collection;
 
 import org.societies.api.css.directory.ICssAdvertisementRecord;
 import org.societies.api.css.directory.ICssDirectory;
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 
 /**
  * @author Babak.Farshchian@sintef.no
  *
  */
-public class CssDirectory implements ICssDirectory {
+public class CssDirectory {
 
     /* (non-Javadoc)
      * @see org.societies.api.css.directory.ICssDirectory#addCssAdvertisementRecord(org.societies.api.css.directory.ICssAdvertisementRecord)
      */
-    public void addCssAdvertisementRecord(ICssAdvertisementRecord css) {
+    public void addCssAdvertisementRecord(CssAdvertisementRecord css) {
 	// TODO Auto-generated method stub
 
     }
@@ -46,7 +47,7 @@ public class CssDirectory implements ICssDirectory {
     /* (non-Javadoc)
      * @see org.societies.api.css.directory.ICssDirectory#deleteCssAdvertisementRecord(org.societies.api.css.directory.ICssAdvertisementRecord)
      */
-    public void deleteCssAdvertisementRecord(ICssAdvertisementRecord css) {
+    public void deleteCssAdvertisementRecord(CssAdvertisementRecord css) {
 	// TODO Auto-generated method stub
 
     }
