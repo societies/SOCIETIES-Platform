@@ -41,7 +41,7 @@ public class CommunicationException extends Exception {
 		super(m,t);
 	}
 
-	public CommunicationException(String string) {
+	public CommunicationException(String m) {
 		super(m);
 	}
 }
