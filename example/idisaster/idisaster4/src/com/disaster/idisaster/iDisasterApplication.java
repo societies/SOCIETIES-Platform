@@ -34,6 +34,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.widget.ArrayAdapter;
 
 /**
  * The application for managing common resources used by 
@@ -56,6 +57,9 @@ public class iDisasterApplication extends Application {
 
 //TODO: remove test code	
 	ArrayList <String> disasterNameList = new ArrayList ();
+
+// Common resources	
+	ArrayAdapter<String> disasterAdapter;
 
 
 	// TODO: Remove unnecessary attributes 

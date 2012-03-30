@@ -89,12 +89,16 @@ public class DisasterListActivity extends ListActivity {
 //     	ArrayAdapter<String> adapter = new ArrayAdapter<String> (this,
 //		R.layout.disaster_list_item, R.id.disaster_item, disasterNameList);
 
-     	ArrayAdapter<String> adapter = new ArrayAdapter<String> (this,
-		R.layout.disaster_list_item, R.id.disaster_item, iDisasterApplication.getinstance().disasterNameList);
-     	
-    	// Assign adapter to ListView
-    	listView.setAdapter(adapter);
+//     	ArrayAdapter<String> adapter = new ArrayAdapter<String> (this,
+//		R.layout.disaster_list_item, R.id.disaster_item, iDisasterApplication.getinstance().disasterNameList);
 
+    	iDisasterApplication.getinstance().disasterAdapter = new ArrayAdapter<String> (this,
+		R.layout.disaster_list_item, R.id.disaster_item, iDisasterApplication.getinstance().disasterNameList);
+
+    	// Assign adapter to ListView
+//    	listView.setAdapter(adapter);
+
+    	listView.setAdapter(iDisasterApplication.getinstance().disasterAdapter);
 //	    Test dialog
 //    	iDisasterApplication.getinstance().showDialog (this, getString(R.string.disasterListTestDialog), getString(R.string.dialogOK));
 

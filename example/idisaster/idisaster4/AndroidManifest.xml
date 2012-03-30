@@ -35,13 +35,19 @@
         <activity
             android:name=".DisasterListActivity"
             android:theme="@android:style/Theme.NoTitleBar" 
+            >
+            <!-- 
             android:noHistory="true" >
+             -->
         </activity>
 
         <activity
             android:name=".NewDisasterActivity"
-            android:theme="@android:style/Theme.NoTitleBar" 
+            android:theme="@android:style/Theme.NoTitleBar"
+            >
+            <!-- 
             android:noHistory="true" >
+             -->
         </activity>
         
         <activity

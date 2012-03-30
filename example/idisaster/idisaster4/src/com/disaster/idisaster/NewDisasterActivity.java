@@ -123,8 +123,15 @@ public class NewDisasterActivity extends Activity implements OnClickListener {
 	    		return;
 	   		}
 	    		
-    		//TODO: Refresh list of disasters - so it is displayed in the previous activity
-	    	    
+//TODO: Refresh list of disasters? - so it is displayed in the previous activity
+    		
+//TODO: remove test code
+    	    iDisasterApplication.getinstance().disasterNameList.add(disasterName);
+    	    
+    	    // report data change to adapter
+    	    iDisasterApplication.getinstance().disasterAdapter.notifyDataSetChanged();
+
+    		
 // TODO: Remove code for testing the correct setting of preferences 
     	    Toast.makeText(this, "Debug: "  + disasterName + " " + disasterDescription, 
     			Toast.LENGTH_LONG).show();
@@ -134,13 +141,11 @@ public class NewDisasterActivity extends Activity implements OnClickListener {
     	    InputMethodManager mgr = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
     	    mgr.hideSoftInputFromWindow(disasterNameView.getWindowToken(), 0);
 
-//	    	finish();	// noHistory=true in Manifest => the activity is removed from the activity stack and finished.
 
-//TODO: remove test code
-    	    iDisasterApplication.getinstance().disasterNameList.add(disasterName);
-    	    
+	    	finish();	// noHistory=true in Manifest => the activity is removed from the activity stack and finished.
+
     	    // Go back to the list of disasters
-	    	startActivity(new Intent(NewDisasterActivity.this, DisasterListActivity.class));
+//	    	startActivity(new Intent(NewDisasterActivity.this, DisasterListActivity.class));
 	    }
     }
 
