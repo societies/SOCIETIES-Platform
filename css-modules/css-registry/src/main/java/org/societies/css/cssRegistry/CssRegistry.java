@@ -198,6 +198,7 @@ public class CssRegistry implements ICssRegistry {
 	 * org.societies.api.internal.css.cssRegistry.ICssRegistry#registerCss(org
 	 * .societies.api.internal.css.management.CSSRecord)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public CssRecord getCssRecord() throws CssRegistrationException {
 		Session session = sessionFactory.openSession();
@@ -207,8 +208,7 @@ public class CssRegistry implements ICssRegistry {
 		Transaction t = session.beginTransaction();
 		try {
 
-			List<CssRegistryEntry> tmpRegistryEntryList = session
-					.createCriteria(CssRegistryEntry.class).list();
+			List<CssRegistryEntry> tmpRegistryEntryList = session.createCriteria(CssRegistryEntry.class).list();
 
 			cssDetails.setDomainServer(tmpRegistryEntryList.get(0)
 					.getDomainServer());
@@ -271,6 +271,7 @@ public class CssRegistry implements ICssRegistry {
 	 * org.societies.api.internal.css.cssRegistry.ICssRegistry#registerCss(org
 	 * .societies.api.internal.css.management.CSSRecord)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void updateCssRecord(CssRecord cssDetails)
 			throws CssRegistrationException {

@@ -18,11 +18,16 @@
 <br/>		
 	<h4>Please click the service to use .....</h4>
 		
-	<table>	
+		<table>	
 		<tr>
 			<td><a href="servicediscovery.html">Service Discovery Service</a></td>
+		</tr>
+		<tr>	
 			<td><a href="servicecontrol.html">Service Control Service</a></td>
-		</tr>		
-	</table>	
+		</tr>
+		<tr>	
+			<td><a href="cssmanager.html">Css Manager Service</a></td>
+		</tr>			
+	</table>
 </body>
 </html>
