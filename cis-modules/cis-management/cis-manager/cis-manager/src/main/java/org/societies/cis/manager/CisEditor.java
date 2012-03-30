@@ -116,10 +116,13 @@ public class CisEditor implements IFeatureServer {
 
 		LOG.info("CIS editor created");
 		
-		
 		cisIdentity = new IdentityImpl(IdentityType.CIS, cisId, host);
 
+		try{
 		CISendpoint = ccmFactory.getNewCommManager(cisIdentity, password);
+		} catch (CommunicationException e) {
+			e.printStackTrace();
+		}
 				
 		LOG.info("CIS endpoint created");
 		
@@ -162,7 +165,11 @@ public class CisEditor implements IFeatureServer {
 
 		LOG.info("CIS editor created");
 		
+		try{ 
 		CISendpoint = ccmFactory.getNewCommManager();
+		} catch  (CommunicationException e) {
+			e.printStackTrace();
+		}
 		
 		try {
 		cisIdentity = CISendpoint.getIdManager().getThisNetworkNode();//CISendpoint.getIdManager().fromJid(CISendpoint.getIdManager().getThisNetworkNode().getJid());
