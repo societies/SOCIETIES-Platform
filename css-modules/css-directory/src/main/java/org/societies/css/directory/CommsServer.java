@@ -55,7 +55,7 @@ import org.societies.api.schema.css.directory.CssDirectoryBeanResult;
 public class CommsServer implements IFeatureServer {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-			  Arrays.asList("http://societies.org/api/schema/css/direcory"));
+			  Arrays.asList("http://societies.org/api/schema/css/directory"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			  Arrays.asList("org.societies.api.schema.css.directory"));
 	
@@ -92,7 +92,6 @@ public class CommsServer implements IFeatureServer {
 		//Registry Css Directory with the Comms Manager
 		try {
 			getCommManager().register(this); 
-			this.setCssDirectory(new CssDirectory());
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}

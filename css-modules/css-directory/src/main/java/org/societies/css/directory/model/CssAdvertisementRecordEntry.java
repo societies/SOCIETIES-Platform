@@ -120,6 +120,8 @@ public class CssAdvertisementRecordEntry implements Serializable {
 		this.uri = uri;
 	}
 	
-	
+	public CssAdvertisementRecordEntry(){
+		super();
+	}
 
 }

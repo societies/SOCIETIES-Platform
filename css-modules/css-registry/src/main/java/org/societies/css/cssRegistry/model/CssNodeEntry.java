@@ -111,12 +111,17 @@ public class CssNodeEntry implements Serializable {
 	 * @param type
 	 */
 	public CssNodeEntry(String identity, int status, int type, boolean archived) {
+		super();
 		this.identity = identity;
 		this.status = status;
 		this.type = type;
 		this.archived = archived;
 	}
     
+	public CssNodeEntry() {
+		super();
+	}
+	
 
 	
 
