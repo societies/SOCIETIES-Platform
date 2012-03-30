@@ -271,6 +271,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		// Retrieve the user's real-time context: How to retrieve a given user's context
 		// this.ctxBroker.retrieve();
 		
+		
 		CRISTUserSituation userSituation = new CRISTUserSituation();
 		// MOCK
 		userSituation.setSituationID("Outdoor");
