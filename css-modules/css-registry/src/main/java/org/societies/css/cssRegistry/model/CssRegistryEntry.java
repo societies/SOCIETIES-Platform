@@ -334,6 +334,7 @@ public class CssRegistryEntry implements Serializable {
 			String identityName, String imID, String name, String password,
 			int presence, int sex, String socialURI, int status) {
 
+		super();
 		this.cssHostingLocation = cssHostingLocation;
 		this.cssIdentity = cssIdentity;
 		this.cssInactivation = cssInactivation;
@@ -354,5 +355,9 @@ public class CssRegistryEntry implements Serializable {
 		this.status = status;
 	}
 
+	public CssRegistryEntry() {
+		super();
+	}
+	
 	
 }
