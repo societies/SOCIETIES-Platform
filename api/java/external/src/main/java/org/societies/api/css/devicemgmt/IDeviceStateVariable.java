@@ -26,10 +26,9 @@
 package org.societies.api.css.devicemgmt;
 
 /**
+ * Interface used to declare a device state variable
  * 
- * Describe your class here...
- *
- * @author rafik
+ * @author Rafik (Trialog)
  *
  */
 public interface IDeviceStateVariable {
@@ -42,37 +41,37 @@ public interface IDeviceStateVariable {
 	
 	/**
 	 * 
-	 * @return
+	 * @return a default value of this state variable
 	 */
 	public Object getDefaultValue();
 	
 	/**
 	 * 
-	 * @return
+	 * @return 
 	 */
 	public Class<?> getDataJavaType();
 	
 	/**
 	 * 
-	 * @return
+	 * @return a maximum that we can assign to this state variable
 	 */
 	public Number getMaximumValue();
 	
 	/**
 	 * 
-	 * @return
+	 * @return a minimum value that we can assign to this state variable 
 	 */
 	public Number getMinimumValue();
 	
 	/**
 	 * 
-	 * @return
+	 * @return the state variable name
 	 */
 	public String getName();
 	
 	/**
 	 * 
-	 * @return
+	 * @return 
 	 */
 	public Number getStep();
 	

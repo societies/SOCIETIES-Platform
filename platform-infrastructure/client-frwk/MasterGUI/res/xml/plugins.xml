@@ -16,6 +16,9 @@
     <plugin name="Temperature" value="com.phonegap.TempListener"/>
     <plugin name="FileTransfer" value="com.phonegap.FileTransfer"/>
     <plugin name="Capture" value="com.phonegap.Capture"/>
-    <!--Example of bespoke plugin declaration
-    plugin name="ConnectionPlugin" value="org.societies.cft.ConnectionPlugin"/-->
+    
+    <!-- Societies Android plugins -->
+    <plugin name="PluginCoreServiceMonitor" value="org.societies.android.platform.phongegap.PluginCoreServiceMonitor"/>
+    <plugin name="PluginCSSManager" value="org.societies.android.platform.phongegap.PluginCSSManager"/>
 </plugins>
+

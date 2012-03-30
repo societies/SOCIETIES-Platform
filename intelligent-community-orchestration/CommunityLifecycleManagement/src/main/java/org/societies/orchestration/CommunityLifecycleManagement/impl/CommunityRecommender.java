@@ -116,7 +116,7 @@ public class CommunityRecommender //implements ICommCallback
 	private IUserFeedbackCallback userFeedbackCallback;
 	
 	private ArrayList<ICisRecord> cissToCreate;
-	private ArrayList<ArrayList<ICisRecord>> cissToConfigure;
+	private HashMap<String, ArrayList<ArrayList<ICisRecord>>> cissToConfigure;
 	private ArrayList<ICisRecord> cissToDelete;
 	
 	private ICommManager commManager;
@@ -317,7 +317,7 @@ public class CommunityRecommender //implements ICommCallback
 	
 	public ArrayList<String> identifyCissToConfigure(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisPossibilities, ArrayList<String> cissToCreateMetadata) {
 	
-	    cissToConfigure = new ArrayList<ArrayList<ICisRecord>>();
+	    cissToConfigure = new HashMap <String, ArrayList<ArrayList<ICisRecord>>> ();
 	
 	    
 	    //can't use GUI in tests
@@ -325,31 +325,80 @@ public class CommunityRecommender //implements ICommCallback
 	
 	    //finalConfiguredCiss = cissToConfigure;
 	
-	    Iterator<ArrayList<ICisRecord>> iterator = cissToConfigure.iterator();
+	    //Iterator<ArrayList<ICisRecord>> iterator = cissToConfigure.iterator();
 	
-	    while (iterator.hasNext()) {
-	        ArrayList<ICisRecord> configurableCis = iterator.next();
-
-		    //if "remove members"
+	    for (int i = 0; i < cissToConfigure.size(); i++) {
+	        ArrayList<ICisRecord> configurableCis = cissToConfigure.get("Configure CISs").get(i);
+            //IIdentity cisID = configurableCis.get(i).get(0).getCisId();
+		    //if (cisManager.get(cisID).getMembersList() != configurableCis.get(i).get(1).getMembersList())
+	        //    cisManager.setMembersList(cisID, configurableCis.get(i).get(1).getMembersList();
+	        //if (cisManager.get(cisID).getMembershipCriteria() != configurableCis.get(i).get(1).getMembershipCriteria())
+	        //    cisManager.setMembershipCriteria(cisID, configurableCis.get(i).get(1).getMembershipCriteria();
+	        //if (cisManager.get(cisID).getOwner() != configurableCis.get(i).get(1).getOwner())
+	        //    cisManager.setOwner(cisID, configurableCis.get(i).get(1).getOwner();
+	        //if (cisManager.get(cisID).getAdministrators() != configurableCis.get(i).get(1).getAdministrators())
+	        //    cisManager.setAdministrators(cisID, configurableCis.get(i).get(1).getAdministrators();
+	        //if "remove members"
         	//    attempt to remove members - perhaps SOCIETIES platform itself should have mechanism
         	//    where if a user deletion from CIS attempt is made, 
         	//    that user will be informed by the system and given a chance to respond?
         	//    The admin/owner could have an override option in case e.g. offensive person is being deleted.
         	//if "merge with other CIS"
         	//
+	        configurableCis = cissToConfigure.get("Merge CISs").get(i);
+	        //
+	        //IIdentity[] membersList = configurableCis.get(i).get(0).getMembersList();
+	        //IIdentity[] membersList2 = configurableCis.get(i).get(1).getMembersList()
+	        //IIdentity[] mergedMembersList = new IIdentity[membersList.size() + membersList2.size()];
+	        //for (int m = 0; m < mergedMembersList.length; m++)
+	        //    
+	        //    if (m < membersList.length) {
+	        //        if (!mergedMembersList.contains(membersList[m]))
+	        //            mergedMembersList[m] = membersList[m];
+	        //    }
+	        //    else if (!mergedMembersList.contains(membersList2[m-membersList.length])) (mergedMembersList[m] = membersList2[m-membersList.length];
+	        
+	        //IIdentity[] administrators = configurableCis.get(i).get(0).getAdministrators();
+	        //IIdentity[] administrators2 = configurableCis.get(i).get(1).getAdministrators()
+	        //IIdentity[] mergedAdministrators = new IIdentity[administrators.size() + administrators2.size()];
+	        //for (int m = 0; m < mergedAdministrators.length; m++)
+	        //    
+	        //    if (m < administrators.length) {
+	        //        if (!mergedadministrators.contains(administrators[m]))
+	        //            mergedAdministrators[m] = administrators[m];
+	        //    }
+	        //    else if (!mergedAdministrators.contains(administrators2[m-administrators.length])) (mergedAdministrators[m] = administrators2[m-administrators.length];
+	        
+	        //IIdentity[] owner = configurableCis.get(i).get(0).getMembersList();
+            //if (configurableCis.get(i).get(0).getOwner() != configurableCis.get(i).get(1).getOwner())
+	        //    owner = configurableCis.get(i).get(1);
+	        
+	        //for (int m = 0; m < mergedMembersList.length; m++)
+	        //    
+	        //    if (m < membersList.length) {
+	        //        if (!mergedMembersList.contains(membersList[m]))
+	        //            mergedMembersList[m] = membersList[m];
+	        //    }
+	        //    else if (!mergedMembersList.contains(membersList2[m-membersList.length])) (mergedMembersList[m] = membersList2[m-membersList.length];
+	        
+	        
+	        //cisManager.createCis(configurableCis.get(i).get(0).getName() + " MERGED WITH " + configurableCis.get(i).get(1).getName(),
+	        //                     mergedMembersList, null, null);
         	//if "split into distinct CISs"
         	//
+	        configurableCis = cissToConfigure.get("Split CISs").get(i);
+	        //cisManager.createCis(configurableCis.get(i).get(1));
+	        //cisManager.createCis(configurableCis.get(i).get(2));
         	//if "switch sub-CIS and CIS"
         	//
-        	//if "change owner or administrator"
         	//
 	        // cisManager.configureCis(linkedCss, potentiallyConfigurableCis.getCisId());
         }
 	    return new ArrayList<String>();
     }
 
-    public ArrayList<ICisRecord> getUserFeedbackOnConfiguration(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cissToConfigure) {
-	    ArrayList<ICisRecord> realCissToConfigure = new ArrayList<ICisRecord>();
+    public HashMap<String, ArrayList<ArrayList<ICisRecord>>> getUserFeedbackOnConfiguration(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cissToConfigure) {
+	    HashMap<String, ArrayList<ArrayList<ICisRecord>>> realCissToConfigure = new HashMap<String, ArrayList<ArrayList<ICisRecord>>> ();
 	    String[] options = new String[cissToConfigure.size()];
 	    options[0] = "options";
 	    for (int i = 0; i < cissToConfigure.get("Configure CISs").size(); i++) {
@@ -360,7 +409,7 @@ public class CommunityRecommender //implements ICommCallback
 			
 	    	options[options.length] = "Merge " + cissToConfigure.get("Merge CISs").get(i).get(0).toString() + "and " + cissToConfigure.get("Merge CISs").get(i).get(1).toString();
 		}
-        for (int i = 0; i < cissToConfigure.get("Merge CISs").size(); i++) {
+        for (int i = 0; i < cissToConfigure.get("Split CISs").size(); i++) {
 	
 	        options[options.length] ="Split " + cissToConfigure.get("Split CISs").get(i).get(0).toString() + " into " + cissToConfigure.get("Split CISs").get(i).get(1).toString() + " and " + cissToConfigure.get("Split CISs").get(i).get(2).toString();
         }

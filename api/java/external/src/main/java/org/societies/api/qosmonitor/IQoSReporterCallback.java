@@ -31,7 +31,7 @@ public interface IQoSReporterCallback {
 
 	/**
 	 * Async return for
-	 * {@link IQoSReporter#getCommunityData(String, IQoS3PMonitor)}
+	 * {@link IQoSReporter#getCommunityData(String, IQoSReporterCallback)}
 	 * 
 	 * @param dataId Data ID
 	 * 

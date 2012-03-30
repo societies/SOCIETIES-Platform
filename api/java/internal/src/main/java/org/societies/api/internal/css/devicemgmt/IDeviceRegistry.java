@@ -31,19 +31,30 @@ import java.util.List;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 //import org.societies.css.devicemgmt.deviceregistry.CSSDevice;
 
-
+/**
+ * Interface used to add and remove devices from the Device Registry. It can also be used to find devices within the registry 
+ * whether all devices or particular types of devices
+ *
+ * @author Liam
+ *
+ */
 public interface IDeviceRegistry {
 	
 	/*
 	 * Description:		Add new device to the device registry
+	 * 
+	 * @param 			<DeviceCommonInfo>
+     * @param 			CSSNodeID
 	 * 				
-	 * @return 			IDeviceidentifier
+	 * @return 			String
 	 */
 	public String addDevice (DeviceCommonInfo device, String CSSNodeID);
 
 	/* 
 	 * Description: 	Remove device from the device registry
-	 * 				
+	 * 
+	 * @param 			<DeviceCommonInfo>
+     * @param 			CSSNodeID				
 	 * @return 			boolean
 	 */
 
@@ -51,7 +62,10 @@ public interface IDeviceRegistry {
 	
 	/* 
 	 * Description:		Search the device registry for a particular device given the deviceID 
-	 * @return 			CSSDevice
+	 * 
+	 * @param 			deviceID
+     * 
+	 * @return 			DeviceCommonInfo
 	 */
 
 	public DeviceCommonInfo findDevice(String deviceID);
@@ -64,7 +78,8 @@ public interface IDeviceRegistry {
 	
 	/* 
 	 * Description: 	Search the device registry for all devices registered 
-	 * @return 			collection
+	 * 
+	 * @return 			Collection<DeviceCommonInfo>
 	 */
 	
 	public Collection<DeviceCommonInfo> findAllDevices();
@@ -72,6 +87,8 @@ public interface IDeviceRegistry {
 	
 	/* 
 	 * Description:		Search the device registry for a particular device type 
+	 * 
+	 * @param 			deviceType
 	 * @return 			collection of device types
 	 */
 	public Collection<DeviceCommonInfo> findByDeviceType(String deviceType);
@@ -79,12 +96,13 @@ public interface IDeviceRegistry {
 	
 	/* 
 	 * Description:		Clear the device registry of all entries
-	 * @return 			
+	 * @return 			void
 	 */
     public void clearRegistry();
 
     /* 
 	 * Description:		Determine the number of devices registered in the device registry
+	 * 
 	 * @return 			int
 	 */
     public int registrySize();

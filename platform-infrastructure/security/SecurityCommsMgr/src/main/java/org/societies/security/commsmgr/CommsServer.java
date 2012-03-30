@@ -137,9 +137,9 @@ public class CommsServer implements IFeatureServer {
 		// Put your functionality here if there IS a return object
 		
 		LOG.debug("getQuery({}, {})", stanza, messageBean);
-		LOG.debug("getQuery(): stanza.id   = ", stanza.getId());
-		LOG.debug("getQuery(): stanza.from = ", stanza.getFrom());
-		LOG.debug("getQuery(): stanza.to   = ", stanza.getTo());
+		LOG.debug("getQuery(): stanza.id   = {}", stanza.getId());
+		LOG.debug("getQuery(): stanza.from = {}", stanza.getFrom());
+		LOG.debug("getQuery(): stanza.to   = {}", stanza.getTo());
 		
 		Future<SlaBean> resultFuture;
 		SlaBean resultBean;

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/disasterListTop"
+	android:layout_width="wrap_content" android:layout_height="fill_parent"
+	>
+	<!-- android:orientation="vertical"  -->
+
+	<TextView android:id="@+id/disasterLabel" android:layout_width="fill_parent"
+     	android:text="@string/disasterListHeading" 
+     	android:textSize="20dip" android:textStyle="bold"
+     	android:textColor="@color/white" android:background="@color/orange"
+		android:layout_height="wrap_content" 
+		android:paddingLeft="5dip"
+		android:paddingTop="2dip" android:paddingBottom="2dip" />
+	
+	<ListView android:id="@android:id/list"
+	    android:layout_width="fill_parent" android:layout_height="fill_parent"
+		android:background="@color/white" 
+		android:cacheColorHint="@color/white"
+		android:layout_below="@id/disasterLabel"/>
+	
+	<TextView android:id="@id/android:empty" android:layout_width="fill_parent"
+		android:layout_height="fill_parent" android:background="@color/white"
+		android:text="@string/add_item_menu"
+		android:layout_below="@id/disasterLabel"/>
+</RelativeLayout>
+
+
+
+<!--  old does not work... No text appear since background is set to white...
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+    
+ <TextView android:id="@+id/disasterLabel" android:layout_width="fill_parent"
+     	android:text="@string/disasterListHeading" 
+     	android:textSize="20dip" android:textStyle="bold"
+     	android:textColor="@color/white" android:background="@color/orange"
+		android:layout_height="wrap_content" 
+		android:paddingLeft="5dip"
+		android:paddingTop="2dip" android:paddingBottom="2dip" />
+		
+
+ 
+    <ListView android:id="@android:id/list" android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:background="@color/white" android:textColor= "@color/black"
+		/> 
+-->
+<!--
+     android:cacheColorHint= "@color/black"   
+    <ListView
+		android:id="@+id/disasterlist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </ListView>
+  android:id="@android:id/list" does not work. version depenedent ? -->
+    
+<!-- 
+</LinearLayout>
+ -->

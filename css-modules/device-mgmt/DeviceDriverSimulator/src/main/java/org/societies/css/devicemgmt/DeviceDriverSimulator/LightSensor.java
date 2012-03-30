@@ -10,13 +10,12 @@ import org.osgi.service.event.EventAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.css.devicemgmt.IAction;
-import org.societies.api.css.devicemgmt.IDeviceService;
+import org.societies.api.css.devicemgmt.IDriverService;
 import org.societies.api.css.devicemgmt.IDeviceStateVariable;
-import org.societies.comm.xmpp.event.EventStream;
 import org.societies.css.devicemgmt.DeviceDriverSimulator.actions.GetLightLevelAction;
 import org.societies.css.devicemgmt.DeviceDriverSimulator.statevariables.LightLevelStateVariable;
 
-public class LightSensor implements IDeviceService{
+public class LightSensor implements IDriverService{
 
 	private Map<String, IDeviceStateVariable> stateVariables = new HashMap<String, IDeviceStateVariable>();
 	private Map<String, IAction> actions = new HashMap<String, IAction>(); 
@@ -34,20 +33,55 @@ public class LightSensor implements IDeviceService{
 	
 	private SampleActivatorDriver activatorDriver;
 	
+	private String deviceId;
+	
+	private int deviceCount;
+	
 	private Double lightLevel = new Double (0.0);
 	
-	
+	private boolean state = false;
 	//private EventStream myStream;
 	
 	private EventAdmin eventAdmin;
 	
 	
-	public LightSensor(SampleActivatorDriver activatorDriver, String serviceId, String deviceMacAddress, int deviceId) {
+	public LightSensor(SampleActivatorDriver activatorDriver, String serviceId, String deviceMacAddress, int deviceCount) {
 		
 		this.activatorDriver = activatorDriver;
 		this.deviceMacAddress = deviceMacAddress;
 		this.serviceId = serviceId;
+		this.deviceCount = deviceCount;
+		
+		this.state = false;
+		
+		eventAdmin = activatorDriver.getEventAdmin();
+		
+		IDeviceStateVariable stateVariable;
+		IAction action;
+		
+		stateVariable = new LightLevelStateVariable();
+		stateVariables.put(stateVariable.getName(), stateVariable);
+		
+		
+		lightValue= 100.0;
+		maxValue= 150.0 ;
+		minValue= 50.0;
+		dec=true;
+		
+		action = new GetLightLevelAction(this, (LightLevelStateVariable) stateVariable);
+		actions.put(action.getName(), action);
+	}
 	
+	public LightSensor(SampleActivatorDriver activatorDriver, String serviceId, String deviceMacAddress, int deviceCount, String deviceId) {
+		
+		this.activatorDriver = activatorDriver;
+		this.deviceMacAddress = deviceMacAddress;
+		this.serviceId = serviceId;
+		this.deviceCount = deviceCount;
+		this.deviceId = deviceId;
+		
+		this.state = true;
+		
 		eventAdmin = activatorDriver.getEventAdmin();
 		
 		IDeviceStateVariable stateVariable;
@@ -65,7 +99,18 @@ public class LightSensor implements IDeviceService{
 		action = new GetLightLevelAction(this, (LightLevelStateVariable) stateVariable);
 		actions.put(action.getName(), action);
 		
-		lightSimulator = new LightSimulator(this, deviceId);
+		lightSimulator = new LightSimulator(this, deviceCount);
+	}
+	
+	public void setDeviceId (String deviceId)
+	{
+		this.deviceId = deviceId;
+		this.state = true;
+		
+		if (null == lightSimulator) 
+		{
+			lightSimulator = new LightSimulator(this, deviceCount);
+		}		
 	}
 
 
@@ -99,18 +144,6 @@ public class LightSensor implements IDeviceService{
 	}
 	
 	
-
-	public double getLightLevel (){
-		double result;
-		
-		if (lightValue > 250) {
-			result = 100;
-		}
-		else {
-			result = (lightValue*10)/250;
-		}
-		return result;
-	}
 	
 	public double getLightValue() {
 		 
@@ -137,10 +170,10 @@ public class LightSensor implements IDeviceService{
 		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% sending event by eventAdmin");
 		Dictionary<String, Object> eventAdminDic = new Hashtable<String, Object>();
 		
-		eventAdminDic.put("lightLevel", getLightLevel());
-		eventAdminDic.put("macAddress", deviceMacAddress);
+		eventAdminDic.put("lightLevel", getLightValue());
+		eventAdminDic.put("event_name", "Sensor/LigntSensorEvent");
 		
-		eventAdmin.sendEvent(new Event("LightSensorEvent", eventAdminDic));
+		eventAdmin.sendEvent(new Event("org/societies/css/device", eventAdminDic));
 		LOG.info("DeviceDriverExample info: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% event sent by eventAdmin");
 	}
 }

@@ -20,6 +20,8 @@
 
   <bean id="CSSManager" class="org.societies.css.mgmt.CSSManager">
   <property name="cssRegistry" ref="CssRegistryBundle"/>
+  <property name="cssDirectoryRemote" ref="cssDirectoryRemote"/>
+  <property name="serviceDiscovery" ref="serviceDiscoveryRef"/>
   </bean>
 
 </beans>

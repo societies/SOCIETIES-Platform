@@ -56,7 +56,6 @@ public class NegotiationProviderUnitTest {
 		groupMgrMock = mock(INegotiationProviderRemote.class);
 		
 		//classUnderTest = new NegotiationProvider(signatureMgrMock, groupMgrMock);
-		
 		classUnderTest = new NegotiationProvider();
 		classUnderTest.setGroupMgr(groupMgrMock);
 		classUnderTest.setSignatureMgr(signatureMgrMock);
@@ -82,14 +81,19 @@ public class NegotiationProviderUnitTest {
 		String signedPolicyOption;
 		boolean modified;
 		Future<SlaBean> result;
+		SlaBean sla;
 		
-		sessionId = 1;
-		signedPolicyOption = "1";
+		sessionId = 82943;
+		signedPolicyOption = "2";
 		modified = false;
 		result = classUnderTest.acceptPolicyAndGetSla(sessionId, signedPolicyOption, modified);
-		assertNotNull(result.get());
-		assertEquals(sessionId, result.get().getSessionId());
-		assertNotNull(result.get().getSla());
+		sla = result.get();
+		assertNotNull(sla);
+		assertEquals(sessionId, sla.getSessionId());
+		
+		// Actual signature manager would be needed for the following tests
+		//assertTrue(sla.isSuccess());
+		//assertNotNull(sla.getSla());
 	}
 	
 	/**
@@ -110,7 +114,6 @@ public class NegotiationProviderUnitTest {
 		
 		assertTrue("Different negotiation processes got same session ID!",
 				result1.get().getSessionId() != result2.get().getSessionId());
-		assertNotNull(result1.get().getSla());
 	}
 	
 	/**
@@ -123,13 +126,21 @@ public class NegotiationProviderUnitTest {
 		
 		Random rnd = new Random();
 		int sessionId;
-
+		Future<SlaBean> result;
+		SlaBean sla;
+		
 		// Test for a non-existing session
 		sessionId = rnd.nextInt();
-		classUnderTest.reject(sessionId);
+		result = classUnderTest.reject(sessionId);
+		sla = result.get();
+		assertFalse(sla.isSuccess());
+		assertEquals(sessionId, sla.getSessionId());
 		
 		// Test for an existing session
-		//sessionId = ;
-		//classUnderTest.reject(sessionId);
+//		sessionId = ;
+//		result = classUnderTest.reject(sessionId);
+//		sla = result.get();
+//		assertTrue(sla.isSuccess());
+//		assertEquals(sessionId, sla.getSessionId());
 	}
 }

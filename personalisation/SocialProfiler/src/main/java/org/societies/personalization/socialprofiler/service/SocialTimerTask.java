@@ -35,7 +35,7 @@ public class SocialTimerTask extends TimerTask {
 	
 	public void updateNetwork() {
    			String option= "200";
-	   		engine.UpdateNetwork(Integer.parseInt(option));
+	   		//engine.UpdateNetwork(Integer.parseInt(option));
 //	   		engine.generateUniformProfilePercentagesUsingBayesianSistem(); // this creates a bayesian system overall
 //	   		engine.updateCentralityParameters();
 	}

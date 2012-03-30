@@ -6,13 +6,9 @@
                 http://www.eclipse.org/virgo/schema/plan 
                 http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
 
-    <artifact type="bundle" name="org.societies.api.external.societies-api"/>
-    <artifact type="bundle" name="org.societies.api.internal.societies-api-internal"/>
-    <artifact type="bundle" name="org.societies.comm.CommonLibraries"/>
-    <artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
-    <artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubServiceBundle"/>
+    <artifact type="bundle" name="org.societies.css.CssDirectory"/>
+    <artifact type="bundle" name="org.societies.css.CssRegistry"/>
     <artifact type="bundle" name="org.societies.css.mgmt.cssmgmt"/>
     <artifact type="bundle" name="org.societies.css.mgmt.comms.cssmgmt-comms"/>
-    <artifact type="bundle" name="org.societies.css.mgmt.testcomms.cssmgmt-testcomms"/>
 
 </plan>

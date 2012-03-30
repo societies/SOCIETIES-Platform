@@ -2,10 +2,16 @@ package org.societies.api.android.internal.model;
 
 import static org.junit.Assert.*;
 
+//import org.json.JSONException;
+//import org.json.JSONObject;
+//import org.json.JSONTokener;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.internal.css.management.CSSManagerEnums;
+
+//import com.google.gson.Gson;
+//import com.google.gson.GsonBuilder;
 
 
 public class TestAndroidCSSNode {
@@ -57,11 +63,11 @@ public class TestAndroidCSSNode {
 //	}
 	
 //	@Test
-	/**
-	 * Tests the use GSON and JSON libraries to allow Java classes to be 
-	 * converted to and from JSON. Cannot work in this project as Android 
-	 * library is stubbed.
-	 */
+//	/**
+//	 * Tests the use GSON and JSON libraries to allow Java classes to be 
+//	 * converted to and from JSON. Cannot work in this project as Android 
+//	 * library is stubbed.
+//	 */
 //	public void testJSONConversion() {
 //		AndroidCSSNode cssNode = new AndroidCSSNode();
 //		assertNotNull(cssNode);

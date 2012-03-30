@@ -82,9 +82,8 @@ public class TestExternalEventing implements Runnable, Subscriber {
 	public void run() {
 		//GET IDENTITY MANAGER
 		idManager = commManager.getIdManager();
-		IIdentity pubsubID = null;
 		try {
-			pubsubID = idManager.fromJid("xcmanager.societies.local");
+			IIdentity pubsubID = idManager.getThisNetworkNode();
 		
 			//ADD LIST OF PACKAGES TO ADD SCHEMA OBJECTS
 			List<String> packageList = new ArrayList<String>();
@@ -136,9 +135,6 @@ public class TestExternalEventing implements Runnable, Subscriber {
 				}
 			} 
 			while (true);
-			
-		} catch (InvalidFormatException formatEx) {
-			formatEx.printStackTrace(); //Error with the Jabber ID, check format
 		} catch (JAXBException jaxEx) {
 			jaxEx.printStackTrace(); //ERROR RESOLVING PACKAGE NAMES - CHECK PATH IS CORRECT
 		} catch (XMPPError xmppEx) {

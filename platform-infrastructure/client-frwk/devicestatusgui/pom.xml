@@ -15,6 +15,19 @@
 	<name>Device Status GUI</name>
 	<version>${release.version}</version>
 	<packaging>apk</packaging>
+	
+	<developers>
+		<developer>
+			<name>Olivier Maridat</name>
+			<email>olivier.maridat@trialog.com</email>
+			<organization>Trialog</organization>
+			<timezone>+1</timezone>
+			<roles>
+				<role>Owner</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+	</developers>
 
 
 	<dependencies>

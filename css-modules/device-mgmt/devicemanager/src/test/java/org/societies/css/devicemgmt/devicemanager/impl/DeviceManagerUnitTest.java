@@ -56,30 +56,44 @@ public class DeviceManagerUnitTest {
 	private ICommManager commManagerMock;
 	private IIdentityManager identityManagerMock;
 	private INetworkNode iNetworkNodeMock;
-	
+
 	private String [] serviceIds = {"service1"};
-	
+
 	private Dictionary<String, String> properties;
-	
+
 	private ServiceRegistration sr;
-	
+
+	private String deviceId;
+	private String physicalDeviceId;
+	private DeviceCommonInfo deviceCommonInfo;
+
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
-		
+		// create the necessary mocks
 		bundleContextMock = mock(BundleContext.class);
-		
 		commManagerMock = mock(ICommManager.class);
-		
 		identityManagerMock = mock(IIdentityManager.class);
-		
 		iNetworkNodeMock = mock(INetworkNode.class);
-		
+
 		deviceManager = new DeviceManager();
-	
+
+		//Simulate a BundleContext injection
 		deviceManager.setBundleContext(bundleContextMock);
+
+		//Create a stub to simulate getIdManager method call by returning identityManagerMock
+		when(commManagerMock.getIdManager()).thenReturn(identityManagerMock);
+
+		//Create a stub to simulate getThisNetworkNode method call by returning iNetworkNodeMock
+		when(identityManagerMock.getThisNetworkNode()).thenReturn(iNetworkNodeMock);
+
+		//Create a stub to simulate getting CSSNodeId
+		when(iNetworkNodeMock.getJid()).thenReturn("node1");
+
+		//Simulate a Communication manager injection
+		deviceManager.setCommManager(commManagerMock);
 	}
 
 	/**
@@ -93,40 +107,60 @@ public class DeviceManagerUnitTest {
 
 	@Test
 	public void testFireNewDeviceConnected() {
-		
-		//Initial condition
-		String deviceId;
-		String physicalDeviceId;
-		DeviceCommonInfo deviceCommonInfo;
-		when(commManagerMock.getIdManager()).thenReturn(identityManagerMock);	
-		when(identityManagerMock.getThisNetworkNode()).thenReturn(iNetworkNodeMock);
-		//
-		when(iNetworkNodeMock.getJid()).thenReturn("node1");
-		//
-		deviceManager.setCommManager(commManagerMock);
-		
-		
-		// Test suit
+		// this test case tests the fireNewDeviceConnected method
+
+
+		//Simulate a new deviceCommonInfo received by the device manager by creating a new instance of DeviceCommonInfo class
 		deviceCommonInfo = new DeviceCommonInfo("family1", "Light Sensor", "LightSensor", "just for test", "zigbee", "room1","trialog", null, true);
 		physicalDeviceId = "33:40:F5";
-		deviceId = iNetworkNodeMock.getJid() + "." + deviceCommonInfo.getDeviceFamilyIdentity()+ "." + deviceCommonInfo.getDeviceType() + "." + physicalDeviceId;	
-		//
+		//Generate a deviceId from the physicalDeviceId and deviceCommonInfo information
+		deviceId = iNetworkNodeMock.getJid() + "/" + deviceCommonInfo.getDeviceFamilyIdentity()+ "/" + deviceCommonInfo.getDeviceType() + "/" + physicalDeviceId;
+		//Verify if the the deviceId generated equals to the deviceId returned by the fireNewDeviceConnected method.
 		assertEquals( deviceId , deviceManager.fireNewDeviceConnected(physicalDeviceId, deviceCommonInfo, serviceIds));
-		//
+		//Verify if the the fireNewDeviceConnected method returns null if it is called with the same deviceFamily and the deviceId
 		assertEquals(null, deviceManager.fireNewDeviceConnected(physicalDeviceId, deviceCommonInfo, serviceIds));
-		
-		//
+
+		//Changing physicalDeviceId only
 		physicalDeviceId = "2012";
-		deviceId = iNetworkNodeMock.getJid() + "." + deviceCommonInfo.getDeviceFamilyIdentity()+ "." + deviceCommonInfo.getDeviceType() + "." + physicalDeviceId;		
+		//Generating a new deviceId.
+		deviceId = iNetworkNodeMock.getJid() + "/" + deviceCommonInfo.getDeviceFamilyIdentity()+ "/" + deviceCommonInfo.getDeviceType() + "/" + physicalDeviceId;
+		//Verify if the the deviceId generated equals to the deviceId returned by the fireNewDeviceConnected method when we change the deviceId and no change for deviceFamily.
 		assertEquals( deviceId , deviceManager.fireNewDeviceConnected(physicalDeviceId, deviceCommonInfo, serviceIds));
+		//Verify if the the fireNewDeviceConnected method returns null if it is called with the same deviceFamily and the deviceId
 		assertEquals(null, deviceManager.fireNewDeviceConnected(physicalDeviceId, deviceCommonInfo, serviceIds));
-		
-		//
+
+		//Changing the deviceFamily
 		deviceCommonInfo.setDeviceFamilyIdentity("family2");
-		physicalDeviceId = "2011";	
-		deviceId = iNetworkNodeMock.getJid() + "." + deviceCommonInfo.getDeviceFamilyIdentity()+ "." + deviceCommonInfo.getDeviceType() + "." + physicalDeviceId;
+		//Create the physicalDeviceId
+		physicalDeviceId = "2011";
+		//Generating a new deviceId.
+		deviceId = iNetworkNodeMock.getJid() + "/" + deviceCommonInfo.getDeviceFamilyIdentity()+ "/" + deviceCommonInfo.getDeviceType() + "/" + physicalDeviceId;
+		//Verify if the the deviceId generated equals to the deviceId returned by the fireNewDeviceConnected method when we change the deviceId and the deviceFamily.
 		assertEquals( deviceId , deviceManager.fireNewDeviceConnected(physicalDeviceId, deviceCommonInfo, serviceIds));
+		//Verify if the the fireNewDeviceConnected method returns null if it is called with the same deviceFamily and the deviceId
 		assertEquals(null, deviceManager.fireNewDeviceConnected(physicalDeviceId, deviceCommonInfo, serviceIds));
+	}
+
+	@Test
+	public void testFireNewDeviceDisconnected() {
+		// this test case tests the fireNewDeviceDisconnected method
+
+		//Simulate a new deviceCommonInfo received by the device manager by creating a new instance of DeviceCommonInfo class
+		deviceCommonInfo = new DeviceCommonInfo("family1", "Light Sensor", "LightSensor", "just for test", "zigbee", "room1","trialog", null, true);
+		physicalDeviceId = "33:40:F5";
+		//Verify that the method fireDeviceDisconnected returns null when we never connect device before
+		assertEquals( null , deviceManager.fireDeviceDisconnected(deviceCommonInfo.getDeviceFamilyIdentity(), physicalDeviceId));
+
+		//Simulate notifying DeviceManager about new device connected
+		deviceManager.fireNewDeviceConnected(physicalDeviceId, deviceCommonInfo, serviceIds);
+
+		//Verify that the method fireDeviceDisconnected returns the same physicalDeviceId that it receives
+		assertEquals( physicalDeviceId , deviceManager.fireDeviceDisconnected(deviceCommonInfo.getDeviceFamilyIdentity(), physicalDeviceId));
+
+		//Verify that the method fireDeviceDisconnected returns null when we pass to it a physicalDeviceId of a device that is never been connected before
+		assertEquals( null , deviceManager.fireDeviceDisconnected(deviceCommonInfo.getDeviceFamilyIdentity(), "any"));
+
+
 	}
 
 }

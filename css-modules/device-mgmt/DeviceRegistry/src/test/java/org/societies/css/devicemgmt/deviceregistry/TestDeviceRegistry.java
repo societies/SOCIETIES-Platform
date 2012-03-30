@@ -28,6 +28,7 @@ package org.societies.css.devicemgmt.deviceregistry;
 import static org.junit.Assert.*;
 
 import java.util.Collection;
+import static org.mockito.Mockito.*;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -35,6 +36,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 //import org.societies.css.devicemgmt.deviceregistry.CSSDevice;
+import org.osgi.framework.BundleContext;
+//import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+//import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.internal.css.devicemgmt.comm.DmCommManager;
 import org.societies.api.internal.css.devicemgmt.model.DeviceCommonInfo;
 
 public class TestDeviceRegistry {
@@ -74,11 +79,13 @@ public class TestDeviceRegistry {
     private String deviceId3 = "liam.societies.org/third/service";
     private boolean contextSource3 = true;
     
-	
+    private BundleContext context;
 	private DeviceRegistry registry;
 	private DeviceCommonInfo device_1;
 	private DeviceCommonInfo device_2;
 	private DeviceCommonInfo device_3;
+	//private DmCommManager dmCommManager;
+	private DmCommManager dmCommManagerMock; 
 	
 	
 	private String CSSNodeID = "liam@societies.org";
@@ -98,8 +105,12 @@ public class TestDeviceRegistry {
         registry = DeviceRegistry.getInstance();
         assertTrue(null != registry);
         registry.clearRegistry();
+        //dmCommManager = DmCommManager.class.newInstance();
+        //dmCommManager = DmCommManager.class.newInstance();
 
-        //Create mock CSSDevice
+        //Create mocks
+        context = mock(BundleContext.class);
+        dmCommManagerMock = mock(DmCommManager.class);
         
         /*	
     	private String deviceFamilyIdentity; 
@@ -140,6 +151,7 @@ public class TestDeviceRegistry {
 	@Test
 	public void addaDevice() throws Exception{
 		//fail("Tests Not yet implemented just putting in place holder");
+		registry.setCommManager(dmCommManagerMock);
 		String result =  registry.addDevice(device_1, CSSNodeID);
 		assertTrue(null != result);
 		assertEquals(1, registry.registrySize());
@@ -150,6 +162,8 @@ public class TestDeviceRegistry {
 	@Test
 	public void addmoreDevices() throws Exception{
 		//fail("Tests Not yet implemented just putting in place holder");
+		
+		registry.setCommManager(dmCommManagerMock);
 		String result1 =  registry.addDevice(device_1, CSSNodeID);
 		assertTrue(null != result1);
 		String result2 =  registry.addDevice(device_2, CSSNodeID);
@@ -163,7 +177,7 @@ public class TestDeviceRegistry {
 		System.out.println("Device Name is  = " + device_1.getDeviceName());
 		System.out.println("Device Type is  = " + device_1.getDeviceType());
 		System.out.println("Device Description is  = " + device_1.getDeviceDescription());
-		System.out.println("CSSID is  = " + CSSNodeID);
+		System.out.println("CSSNodeID is  = " + CSSNodeID);
         Collection<DeviceCommonInfo> alldevices =  registry.findAllDevices();
         assertTrue(null != alldevices);
         assertEquals(3, alldevices.size());
@@ -172,6 +186,8 @@ public class TestDeviceRegistry {
 	
 	@Test
 	public void allDevices() throws Exception{
+		
+		registry.setCommManager(dmCommManagerMock);
 		String result1 =  registry.addDevice(device_1, CSSNodeID);
 		assertTrue(null != result1);
 		String result2 =  registry.addDevice(device_2, CSSNodeID);
@@ -189,6 +205,7 @@ public class TestDeviceRegistry {
 	
 	@Test
 	public void removeDevice() throws Exception{
+		registry.setCommManager(dmCommManagerMock);
 		String result1 =  registry.addDevice(device_1, CSSNodeID);
 		assertTrue(null != result1);
 		String result2 =  registry.addDevice(device_2, CSSNodeID);
@@ -208,6 +225,7 @@ public class TestDeviceRegistry {
 	
 	@Test
 	public void findDevice() throws Exception{
+		registry.setCommManager(dmCommManagerMock);
 		String result1 =  registry.addDevice(device_1, CSSNodeID);
 		assertTrue(null != result1);
 		String result2 =  registry.addDevice(device_2, CSSNodeID);
@@ -232,7 +250,7 @@ public class TestDeviceRegistry {
 	public void findDeviceType() throws Exception{
 		Collection<DeviceCommonInfo> Result = null;
 		
-		
+		registry.setCommManager(dmCommManagerMock);
 		String result1 =  registry.addDevice(device_1, CSSNodeID);
 		assertTrue(null != result1);
 		String result2 =  registry.addDevice(device_2, CSSNodeID);

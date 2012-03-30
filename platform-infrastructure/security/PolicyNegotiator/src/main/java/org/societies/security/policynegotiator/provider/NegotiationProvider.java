@@ -24,7 +24,8 @@
  */
 package org.societies.security.policynegotiator.provider;
 
-import java.util.Random;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Future;
 
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -36,6 +37,11 @@ import org.societies.api.internal.security.policynegotiator.INegotiationProvider
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 import org.societies.api.security.digsig.ISignatureMgr;
+import org.societies.security.policynegotiator.sla.SLA;
+import org.societies.security.policynegotiator.sla.Session;
+import org.societies.security.policynegotiator.sla.SopResource;
+import org.societies.security.policynegotiator.xml.Xml;
+import org.w3c.dom.Document;
 
 //@Component
 public class NegotiationProvider implements INegotiationProvider {
@@ -44,6 +50,11 @@ public class NegotiationProvider implements INegotiationProvider {
 	
 	private ISignatureMgr signatureMgr;
 	private INegotiationProviderRemote groupMgr;
+	
+	/**
+	 * Negotiation sessions
+	 */
+	private Map<Integer, Session> sessions = new HashMap<Integer, Session>();
 	
 //	@Autowired
 //	public NegotiationProvider(ISignatureMgr signatureMgr) {
@@ -64,8 +75,6 @@ public class NegotiationProvider implements INegotiationProvider {
 		//LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
 		
 		LOG.debug("init(): group manager = {}", groupMgr.toString());
-		//groupMgr.reject(0, null);
-		groupMgr.getPolicyOptions("123", null);
 	}
 	
 	// Getters and setters for beans
@@ -97,15 +106,36 @@ public class NegotiationProvider implements INegotiationProvider {
 	public Future<SlaBean> getPolicyOptions(String serviceId) {
 		
 		LOG.debug("getPolicyOptions({})", serviceId);
-		
-		Random rnd = new Random();
-		int sessionId = rnd.nextInt();
-		boolean success = true;
-		String sla = "<a/>";  // FIXME
-		SlaBean result = createSlaBean(success, sessionId, sla);
 
-		// TODO: store session ID
+		Session session = new Session();
+		boolean success;
+		String slaStr = null;
+		Document doc;
 		
+		try {
+			doc = SopResource.getSop("PrintService.xml");  // TODO: Get from Marketplace
+			if (doc != null) {
+				Xml xml = new Xml(doc);
+				SLA sla = new SLA(xml);
+				slaStr = xml.toString();
+				success = true;
+				session.setSla(sla);
+				LOG.debug("getPolicyOptions({}): SOP: {}", serviceId, doc);
+			}
+			else {
+				success = false;
+				LOG.warn("getPolicyOptions({}): could not get SOP", serviceId);
+			}
+		} catch (Exception e) {
+			success = false;
+			LOG.warn("getPolicyOptions({}): could not get SOP: ", serviceId, e);
+		}
+		if (success) {
+			sessions.put(session.getId(), session);
+		}
+		
+		SlaBean result = createSlaBean(success, session.getId(), slaStr);
+
 		return new AsyncResult<SlaBean>(result);
 	}
 
@@ -121,12 +151,15 @@ public class NegotiationProvider implements INegotiationProvider {
 		sla.setSessionId(sessionId);
 		finalSla = signedPolicyOption;  //TODO: add provider's signature
 		
-		if (!signatureMgr.verify(signedPolicyOption)) {
+		if (signatureMgr.verify(signedPolicyOption)) {
+			sla.setSla(finalSla);
+			sla.setSuccess(true);
+		}
+		else {
 			LOG.info("acceptPolicyAndGetSla({}): invalid signature", sessionId);
-			//sla.setError();
+			sla.setSuccess(false);
 		}
 
-		sla.setSla(finalSla);
 		return new AsyncResult<SlaBean>(sla);
 	}
 
@@ -135,9 +168,19 @@ public class NegotiationProvider implements INegotiationProvider {
 
 		LOG.debug("reject({})", sessionId);
 
-		boolean success = true;  // TODO: check if session ID is valid
-		String sla = null;
-		SlaBean result = createSlaBean(success, sessionId, sla);
+		Session session = sessions.remove(sessionId);
+		boolean success;
+		SlaBean result;
+		
+		if (session != null) {
+			success = true;
+			LOG.info("reject({}) successful", sessionId);
+		}
+		else {
+			success = false;
+			LOG.warn("reject({}): no such session", sessionId);
+		}
+		result = createSlaBean(success, sessionId, null);
 
 		return new AsyncResult<SlaBean>(result);
 	}

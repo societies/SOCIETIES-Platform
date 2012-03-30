@@ -1,0 +1,48 @@
+<xs:schema elementFormDefault="qualified" version="1.0"
+	xmlns="http://societies.org/api/schema/css/directory" targetNamespace="http://societies.org/api/schema/css/directory"
+	xmlns:tns="http://societies.org/api/schema/css/directory" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+
+
+
+	<xs:element name="cssDirectoryBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="cssA" type="tns:cssAdvertisementRecord"
+					minOccurs="0" />
+				<xs:element name="cssB" type="tns:cssAdvertisementRecord"
+					minOccurs="0" />
+				<xs:element name="method" type="tns:methodType"
+					minOccurs="0" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="cssAdvertisementRecord">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string" minOccurs="0" />
+			<xs:element name="id" type="xs:string" minOccurs="0" />
+			<xs:element name="uri" type="xs:string" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="cssDirectoryBeanResult">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="resultCss" type="tns:cssAdvertisementRecord"
+					nillable="true" minOccurs="0" maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="methodType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="addCssAdvertisementRecord" />
+			<xs:enumeration value="deleteCssAdvertisementRecord" />
+			<xs:enumeration value="updateCssAdvertisementRecord" />
+			<xs:enumeration value="findAllCssAdvertisementRecords" />
+			<xs:enumeration value="findForAllCss" />
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
+

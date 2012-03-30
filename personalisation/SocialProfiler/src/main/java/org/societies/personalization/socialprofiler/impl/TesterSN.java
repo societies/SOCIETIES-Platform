@@ -24,6 +24,7 @@
  */
 package org.societies.personalization.socialprofiler.impl;
 
+import org.societies.personalization.socialprofiler.SocialProfiler;
 import org.societies.personalization.socialprofiler.service.EngineImpl;
 
 public class TesterSN {
@@ -31,7 +32,7 @@ public class TesterSN {
 	
 	public static void main(String[] args) {
 		
-		new SocialProfilerImpl();
+		new SocialProfiler();
 	}
 
 	

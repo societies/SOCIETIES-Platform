@@ -3,10 +3,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.css</groupId>
-	<artifactId>cssRegistry</artifactId>
+	<artifactId>CssRegistry</artifactId>
 	<packaging>bundle</packaging>
-	<name>CSS Registry</name>
-	<version>${release.version}-SNAPSHOT</version>
+	<name>cssRegistry</name>
+	<version>${release.version}</version>
 	<url>http://www.springframework.org/osgi</url>
 
 	<parent>
@@ -116,17 +116,22 @@
 
 
 		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
+			<groupId>org.societies.api.schema</groupId>
+			<artifactId>societies-api-schema</artifactId>
 			<version>${release.version}</version>
-
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
@@ -138,7 +143,9 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-
+						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
+						<Import-Package>*;resolution:=optional</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>

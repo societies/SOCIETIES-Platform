@@ -92,6 +92,7 @@
 		<!-- CSS Mgmt -->
 
 		<module>../css-modules/css-registry</module>
+		<module>../css-modules/css-directory</module>
 		<module>../css-modules/css-mgmt/cssCommsMgmt</module>
 		<module>../css-modules/css-mgmt/cssmgmt</module>
 		<module>../css-modules/css-mgmt/TestccsCommsMgmt</module>
@@ -106,6 +107,10 @@
 		<module>../css-modules/device-mgmt/DeviceRegistry/</module>
 		<module>../css-modules/device-mgmt/RegSynchroniser/</module>
 		<module>../css-modules/device-mgmt/DeviceCommsMgr/</module>
+		<module>../css-modules/device-mgmt/DeviceDriverSimulator/</module>
+		<module>../css-modules/device-mgmt/devicemanagerconsumer/</module>
+		<module>../css-modules/device-mgmt/DeviceDriverSimulator3/</module>
+		<module>../css-modules/device-mgmt/DeviceManagerConsumer3/</module>
 	
 		<!-- Intelligent Community Orchestration -->
 		<module>../intelligent-community-orchestration/API</module>

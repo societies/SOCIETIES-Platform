@@ -14,13 +14,13 @@ public interface ISocialProfiler  {
 	 * Add a new Social Network connector to fetch social data
 	 * @param connector
 	 */
-	public void addSocialNetwork(ISocialConnector connector);
+	public void addSocialNetwork(List<ISocialConnector> connectors);
 	
 	/**
 	 * Remove a connector from the connectors list
 	 * @param connector
 	 */
-	public void removeSocialNetwork(ISocialConnector connector);
+	public void removeSocialNetwork(List<ISocialConnector> connectors);
 	
 	/**
 	 * Set frequency on how the graph will be updated

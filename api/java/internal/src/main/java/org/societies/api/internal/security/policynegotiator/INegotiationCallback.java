@@ -27,7 +27,7 @@ package org.societies.api.internal.security.policynegotiator;
 import java.net.URI;
 
 /**
- * 
+ * Callback for {@link INegotiation}
  *
  * @author Mitja Vardjan
  *
@@ -36,7 +36,7 @@ public interface INegotiationCallback {
 	
 	/**
 	 * Async return for
-	 * {@link INegotiation#startNegotiation(INegotiationCallback)}
+	 * {@link INegotiation#startNegotiation(INegotiationCallback, URI)}
 	 * 
 	 * TODO: fix datatype for the agreement
 	 */

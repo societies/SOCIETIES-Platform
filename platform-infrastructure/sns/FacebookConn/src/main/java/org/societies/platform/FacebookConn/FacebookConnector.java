@@ -25,9 +25,10 @@ public interface FacebookConnector extends ISocialConnector {
 	public String TAGGED     = "me/tagged";
 	public String STATUSES	 = "me/statuses";
 	public String POSTS	     = "me/posts";
-	public String MYPICTURE  = "me/pucture";
+	public String MYPICTURE  = "me/picture";
 	public String PHOTOS	 = "me/photos";
 	public String NOTES	 	 = "me/notes";
 	public String ACCOUNTS	 = "me/accounts";
+	public String THUMB		 = "me/picture";
 	
 }

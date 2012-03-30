@@ -1,16 +1,21 @@
 package org.societies.android.platform.cssmanager;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.societies.api.android.internal.model.AndroidCSSNode;
+import org.societies.api.android.internal.model.AndroidCSSRecord;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.css.management.CSSManagerEnums;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
+import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.MethodType;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
@@ -30,6 +35,25 @@ public class AndroidCSSManagerActivity extends Activity {
     private static final List<String> PACKAGES = Arrays.asList(
 		"org.societies.api.schema.cssmanagement");
     
+    
+	public static final String TEST_IDENTITY_1 = "node11";
+	public static final String TEST_IDENTITY_2 = "node22";
+
+	public static final String TEST_IDENTITY = "CSSProfile1";
+	public static final String TEST_INACTIVE_DATE = "20121029";
+	public static final String TEST_REGISTERED_DATE = "20120229";
+	public static final int TEST_UPTIME = 7799;
+	public static final String TEST_EMAIL = "somebody@tssg.org";
+	public static final String TEST_FORENAME = "4Name";
+	public static final String TEST_HOME_LOCATION = "The Hearth";
+	public static final String TEST_IDENTITY_NAME = "Id Name";
+	public static final String TEST_IM_ID = "somebody.tssg.org";
+	public static final String TEST_NAME = "The CSS";
+	public static final String TEST_PASSWORD = "P455W0RD";
+	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
+
+
+
     private static final String DESTINATION = "xcmanager.societies.local";
 
     private final IIdentity toXCManager;
@@ -77,7 +101,7 @@ public class AndroidCSSManagerActivity extends Activity {
     		ccm = new ClientCommunicationMgr(context);
     		
     		CssManagerMessageBean messageBean = new CssManagerMessageBean();
-    		messageBean.setProfile(new CssRecord());
+    		messageBean.setProfile(AndroidCSSManagerActivity.this.createAndroidRecord());
     		messageBean.setMethod(MethodType.REGISTER_XMPP_SERVER);
 
     		Stanza stanza = new Stanza(toXCManager);
@@ -94,7 +118,93 @@ public class AndroidCSSManagerActivity extends Activity {
     	}
     }
  
+    private AndroidCSSRecord createAndroidRecord() {
+    	
+    	AndroidCSSNode aCSSNode_1, aCSSNode_2;
+    	AndroidCSSNode aCSSNodes [];
+    	AndroidCSSNode aCSSArchivedNodes [];
+
+    	aCSSNode_1 = new AndroidCSSNode();
+    	aCSSNode_1.setIdentity(TEST_IDENTITY_1);
+    	aCSSNode_1.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
+    	aCSSNode_1.setType(CSSManagerEnums.nodeType.Rich.ordinal());
+
+    	aCSSNode_2 = new AndroidCSSNode();
+    	aCSSNode_2.setIdentity(TEST_IDENTITY_2);
+    	aCSSNode_2.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
+    	aCSSNode_2.setType(CSSManagerEnums.nodeType.Android.ordinal());
+		
+    	aCSSNodes = new AndroidCSSNode[2];
+    	aCSSNodes[0] = aCSSNode_1;
+    	aCSSNodes[1] = aCSSNode_2;
+		
+    	aCSSArchivedNodes = new AndroidCSSNode[2];
+    	aCSSArchivedNodes[0] = aCSSNode_1;
+    	aCSSArchivedNodes[1] = aCSSNode_1;
+
+		AndroidCSSRecord cssProfile = new AndroidCSSRecord();
+		
+		cssProfile.setCSSNodes(aCSSNodes);
+		cssProfile.setArchiveCSSNodes(aCSSArchivedNodes);
+		cssProfile.setCssIdentity(TEST_IDENTITY);
+		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
+		cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
+		cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
+		cssProfile.setCssUpTime(TEST_UPTIME);
+		cssProfile.setEmailID(TEST_EMAIL);
+		cssProfile.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
+		cssProfile.setForeName(TEST_FORENAME);
+		cssProfile.setHomeLocation(TEST_HOME_LOCATION);
+		cssProfile.setIdentityName(TEST_IDENTITY_NAME);
+		cssProfile.setImID(TEST_IM_ID);
+		cssProfile.setName(TEST_NAME);
+		cssProfile.setPassword(TEST_PASSWORD);
+		cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
+		cssProfile.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
+		cssProfile.setSocialURI(TEST_SOCIAL_URI);
+		
+		return cssProfile;
+		
+    }
     
+    private CssRecord createRecord() {
+    	CssNode cssNode_1, cssNode_2;
+
+		cssNode_1 = new CssNode();
+		cssNode_1.setIdentity(TEST_IDENTITY_1);
+		cssNode_1.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
+		cssNode_1.setType(CSSManagerEnums.nodeType.Rich.ordinal());
+
+		cssNode_2 = new CssNode();
+		cssNode_2.setIdentity(TEST_IDENTITY_2);
+		cssNode_2.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
+		cssNode_2.setType(CSSManagerEnums.nodeType.Android.ordinal());
+		
+
+		CssRecord cssProfile = new CssRecord();
+		cssProfile.getCssNodes().add(cssNode_1);
+		cssProfile.getCssNodes().add(cssNode_2);
+		cssProfile.getArchiveCSSNodes().add(cssNode_1);
+		cssProfile.getArchiveCSSNodes().add(cssNode_2);
+		
+		cssProfile.setCssIdentity(TEST_IDENTITY);
+		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
+		cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
+		cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
+		cssProfile.setCssUpTime(TEST_UPTIME);
+		cssProfile.setEmailID(TEST_EMAIL);
+		cssProfile.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
+		cssProfile.setForeName(TEST_FORENAME);
+		cssProfile.setHomeLocation(TEST_HOME_LOCATION);
+		cssProfile.setIdentityName(TEST_IDENTITY_NAME);
+		cssProfile.setImID(TEST_IM_ID);
+		cssProfile.setName(TEST_NAME);
+		cssProfile.setPassword(TEST_PASSWORD);
+		cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
+		cssProfile.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
+		cssProfile.setSocialURI(TEST_SOCIAL_URI);
+		return cssProfile;
+    }
     
     private ICommCallback createCallback() {
     	return new ICommCallback() {

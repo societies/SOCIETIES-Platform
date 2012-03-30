@@ -53,7 +53,7 @@ import org.societies.api.internal.cis.management.ICisManager;
 import org.societies.api.internal.cis.management.ICisRecord;
 
 import org.societies.api.css.directory.ICssDirectory;
-import org.societies.api.css.directory.ICssAdvertisementRecord;
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 
 import org.societies.api.css.management.ICssRecord;
 
@@ -136,8 +136,8 @@ public class EgocentricCommunityCreationManagerTest {
     	IIdentity friend1Id = mock(IIdentity.class); //Friend 1 CSS
     	IIdentity friend2Id = mock(IIdentity.class); //Friend 2 CSS
     	
-    	ICssAdvertisementRecord friend1Ad = mock(ICssAdvertisementRecord.class);
-    	ICssAdvertisementRecord friend2Ad = mock(ICssAdvertisementRecord.class);
+    	CssAdvertisementRecord friend1Ad = mock(CssAdvertisementRecord.class);
+    	CssAdvertisementRecord friend2Ad = mock(CssAdvertisementRecord.class);
     	
     	cssDirectory.addCssAdvertisementRecord(friend1Ad);
     	cssDirectory.addCssAdvertisementRecord(friend2Ad);

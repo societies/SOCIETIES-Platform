@@ -9,7 +9,7 @@ package org.societies.personalization.socialprofiler.datamodel;
  * Note : for facebook all the relationships are symetric , there 
  * is no INCOMING or OUTGOIING but only BOTH
  */
-public interface Description  {
+public interface RelationshipDescription  {
 	/**
 	 * return name of description 
 	 */
