@@ -24,11 +24,14 @@
  */
 package org.societies.personalisation.DIANNE.api.DianneNetwork;
 
+import java.util.List;
+import java.util.concurrent.Future;
+
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
+import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
 
 /**
  * 
@@ -39,16 +42,15 @@ import org.societies.personalisation.common.api.management.IPersonalisationInter
 public interface IDIANNE {
 	
 	/**
-	 * This method will return the current value of the DIANNE preference as an IDIANNEOutcome through the callback
+	 * This method will return the current value of the DIANNE preference as an IDIANNEOutcome
 	 * @param ownerId	the DigitalIIdentity of the owner of the preferences
 	 * @param serviceId	the service identifier of the service requesting the outcome
 	 * @param preferenceName	the name of the preference being requested
 	 * @param callback  the callback to which the IDIANNEOutcome is sent
 	 */
-	public void getOutcome(IIdentity ownerId, 
+	public Future<List<IDIANNEOutcome>> getOutcome(IIdentity ownerId, 
 			ServiceResourceIdentifier serviceId, 
-			String preferenceName, 
-			IPersonalisationInternalCallback callback);
+			String preferenceName);
 	
 	/**
 	 * This method will return any updated values of the DIANNE preferences, as an IDIANNEOutcome through the callback, given the new context update
@@ -58,9 +60,8 @@ public interface IDIANNE {
 	 * @param attribute		the context attribute update to implement in the DIANNE before retrieval
 	 * @param callback  the callback to which the IDIANNEOutcome is sent
 	 */
-	public void getOutcome(IIdentity ownerId, 
-			CtxAttribute attribute, 
-			IPersonalisationInternalCallback callback);
+	public Future<List<IDIANNEOutcome>> getOutcome(IIdentity ownerId, 
+			CtxAttribute attribute);
 	
 	/**
 	 * This method will return any updated values of the DIANNE preferences, as an IDIANNEOutcome through the callback, given the new action update.
@@ -69,9 +70,8 @@ public interface IDIANNE {
 	 * @param action  the action update to implement in the DIANNE
 	 * @param callback  the callback to which the IDIANNEOutcome is sent
 	 */
-	public void getOutcome(IIdentity ownerId, 
-			IAction action, 
-			IPersonalisationInternalCallback callback);
+	public Future<List<IDIANNEOutcome>> getOutcome(IIdentity ownerId, 
+			IAction action);
 	
 	/**
 	 * This method will start DIANNE learning

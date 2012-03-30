@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.societies.api.internal.sns.ISocialConnector;
@@ -18,7 +17,7 @@ import org.societies.platform.socialdata.converters.FriendsConveterFactory;
 import org.societies.platform.socialdata.converters.GroupConverter;
 import org.societies.platform.socialdata.converters.GroupConveterFactory;
 import org.societies.platform.socialdata.converters.PersonConverter;
-import org.societies.platform.socialdata.converters.PersonConveterFactory;
+import org.societies.platform.socialdata.converters.PersonConverterFactory;
 
 public class SocialData implements ISocialData {
 
@@ -28,7 +27,7 @@ public class SocialData implements ISocialData {
     Map<String, Object>				socialGroups;
     Map<String, Object>				socialProfiles;
     
-    List<Object>	 			socialActivities;
+    Map<String, Object>	 			socialActivities;
     
     long lastUpate;
     
@@ -39,7 +38,7 @@ public class SocialData implements ISocialData {
     	socialGroups			= new HashMap<String, Object>();
     	socialProfiles			= new HashMap<String, Object>();
     	
-    	socialActivities		= new ArrayList<Object>();
+    	socialActivities		= new HashMap<String, Object>();
     	
     }
     
@@ -52,6 +51,8 @@ public class SocialData implements ISocialData {
 		connectors.put(socialConnector.getID(), socialConnector);
 		log("Add connector "+socialConnector.getID());
 	}
+	
+	
 
 	@Override
 	public void removeSocialConnector(String connectorId) throws Exception{
@@ -62,6 +63,8 @@ public class SocialData implements ISocialData {
 		else throw new Exception("This connector not found");
 		
 	}
+	
+	
 
 	@Override
 	public List<ISocialConnector> getSocialConnectors() {
@@ -75,22 +78,22 @@ public class SocialData implements ISocialData {
 
 	@Override
 	public List<Object> getSocialPeople() {
-		return (List<Object>)socialFriends.values();
+		return new ArrayList(socialFriends.values());
 	}
 
 	@Override
 	public List<Object> getSocialActivity() {
-		return socialActivities;
+		return new ArrayList(socialActivities.values());
 	}
 
 	@Override
 	public List<Object> getSocialGroups() {
-		return (List<Object>)socialGroups.values();
+		return new ArrayList(socialGroups.values());
 	}
 	
 	@Override
 	public List<Object> getSocialProfiles() {
-		return (List<Object>)socialProfiles.values();
+		return new ArrayList(socialProfiles.values());
 	}
 	
 
@@ -98,7 +101,7 @@ public class SocialData implements ISocialData {
 	public void updateSocialData() {
 
 		Iterator<ISocialConnector>it = connectors.values().iterator();
-		socialActivities = new ArrayList<Object>();  // reset old Activities
+		socialActivities = new HashMap<String, Object>();  // reset old Activities
 		
 		while (it.hasNext()){
 			ISocialConnector connector = it.next();
@@ -141,7 +144,7 @@ public class SocialData implements ISocialData {
 
 	private void getActivities(ISocialConnector connector) {
 		ActivityConverter parser = ActivityConveterFactory.getPersonConverter(connector);
-		socialActivities.addAll(parser.load(connector.getUserActivities()));
+		socialActivities.put(connector.getID(), parser.load(connector.getUserActivities()));
 	}
 
 
@@ -165,7 +168,7 @@ public class SocialData implements ISocialData {
 
 
 	private void updateProfile(ISocialConnector connector) {
-			PersonConverter parser = PersonConveterFactory.getPersonConverter(connector);
+			PersonConverter parser = PersonConverterFactory.getPersonConverter(connector);
 			Person profile = parser.load(connector.getUserProfile());
 			if (socialProfiles.containsKey(profile.getId())){
 				socialProfiles.remove(profile.getId());

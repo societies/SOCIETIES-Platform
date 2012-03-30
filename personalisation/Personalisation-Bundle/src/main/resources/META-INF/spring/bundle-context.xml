@@ -65,6 +65,8 @@
 		<property name="pcm" ref="pcm"></property>
 		<property name="dianne" ref="dianne"></property>
 		<property name="ctxBroker" ref="ctxBroker"></property>
+		<property name="idm" ref="idm"></property>
+		<property name="decisionMaker" ref="decisionMaker"></property>
 	</bean>
 
 	<bean id="dianne" class="org.societies.personalisation.dianne.DIANNE"

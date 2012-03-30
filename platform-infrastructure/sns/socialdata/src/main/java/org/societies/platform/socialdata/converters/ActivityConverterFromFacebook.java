@@ -25,7 +25,7 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 	public static final String ID					=	"id";
 	
 	
-	private static final String AUTOR_NAME 			= "name";
+	private static final String AUTHOR_NAME 		= "name";
 	private static final String MESSAGE 			= "message";
 	private static final String FROM 				= "from";
 	private static final String ICON 				= "icon";
@@ -55,8 +55,8 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 				ActivityEntry entry = new ActivityEntryImpl();
 				entry.setId(elm.getString(ID));
 				entry.setActor(setActor(elm.getString(FROM)));
-				entry.setContent(elm.getString(MESSAGE));
-				entry.setIcon(getIcon(elm));
+				if (elm.has(MESSAGE)) entry.setContent(elm.getString(MESSAGE));
+				if (elm.has(ICON)) 	  entry.setIcon(getIcon(elm));
 				entry.setVerb(elm.getString(TYPE));
 				entry.setUpdated(elm.getString(UPDATED_TIME));
 				entry.setPublished(elm.getString(CREATED_TIME));
@@ -94,7 +94,7 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 		try {
 			elm = new JSONObject(string);
 			provider.setId(elm.getString(ID));
-			provider.setDisplayName(elm.getString(AUTOR_NAME));
+			provider.setDisplayName(elm.getString(AUTHOR_NAME));
 		
 		
 		} catch (JSONException e) {
@@ -127,7 +127,7 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 		try {
 			elm = new JSONObject(data);
 			actor.setId(elm.getString(ID));
-			actor.setDisplayName(elm.getString(AUTOR_NAME));
+			actor.setDisplayName(elm.getString(AUTHOR_NAME));
 			actor.setUrl(imageUrl.replaceAll("FBID", actor.getId()));
 		
 		} catch (JSONException e) {
