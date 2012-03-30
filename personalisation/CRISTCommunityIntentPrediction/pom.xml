@@ -4,10 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<!-- change the artifactid to your project artifactid -->
 	<groupId>org.societies.personalisation</groupId>
-	<artifactId>CRISTUserIntentPrediction</artifactId>
+	<artifactId>CRISTCommunityIntentPrediction</artifactId>
 	<version>${version.pm}</version>
 	<packaging>jar</packaging>
-
 	
 	<developers>
 		<developer>
@@ -25,12 +24,6 @@
 
 	<dependencies>
 		<!-- add your dependencies here -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.spring-library</artifactId>
-			<type>libd</type>
-			<scope>provided</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
@@ -87,10 +80,9 @@
 						</artifactItem>
 					</artifactItems>
 				</configuration>
-			</plugin>
--->
-		</plugins> 
+			</plugin> -->
+
+		</plugins>
 	</build>
-
-
+	
 </project>

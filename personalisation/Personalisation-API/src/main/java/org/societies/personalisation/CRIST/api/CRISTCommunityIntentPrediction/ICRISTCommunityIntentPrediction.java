@@ -33,7 +33,6 @@ import org.societies.api.internal.personalisation.model.FeedbackEvent;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CRIST.api.model.CRISTCommunityAction;
-import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 
 
 /**
@@ -55,9 +54,9 @@ public interface ICRISTCommunityIntentPrediction {
 	 * 
 	 * @param ctxAttribute		- a set of context
 	 */
-	public ArrayList<CRISTCommunityAction> getCRISTPrediction(IIdentity entityID, CtxAttribute ctxAttribute, IPersonalisationInternalCallback callback);
+	public ArrayList<CRISTCommunityAction> getCRISTPrediction(IIdentity entityID, CtxAttribute ctxAttribute);
 	
-	public ArrayList<CRISTCommunityAction> getCRISTPrediction(IIdentity entityID, IAction action, IPersonalisationInternalCallback callback);
+	public ArrayList<CRISTCommunityAction> getCRISTPrediction(IIdentity entityID, IAction action);
 	
 	/**
 	 * This method will return the user's current intent
