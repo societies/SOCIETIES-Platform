@@ -23,9 +23,9 @@
 		interface="org.societies.api.internal.security.policynegotiator.INegotiationProvider"
 		cardinality="0..1"
 		/>
-	<osgi:reference id="NegotiationRequester"
+	<!--osgi:reference id="NegotiationRequester"
 		interface="org.societies.api.internal.security.policynegotiator.INegotiationRequester"
 		cardinality="0..1"
-		/>
+		/-->
 
 </beans>

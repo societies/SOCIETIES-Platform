@@ -35,7 +35,10 @@
 		<module>../comms-frwk/XCCommunicationMgr</module>
 		<module>../comms-frwk/PubsubServiceBundle</module>
 		<module>../comms-frwk/PubsubClientBundle</module>
-		
+
+		<!-- Personalization -->
+		<module>../../personalisation/Personalisation-API</module>
+
 		<!-- Security -->
 		<module>SecurityServices</module>
 		<module>PolicyNegotiator</module>

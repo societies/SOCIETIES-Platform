@@ -10,9 +10,13 @@
 		is to facilitate integration testing of the bundle outside of an OSGi container -->
 	
 	<osgi:reference id="SignatureMgr" interface="org.societies.api.security.digsig.ISignatureMgr" />
-	
+	<osgi:reference id="SecureStorage" interface="org.societies.api.internal.security.storage.ISecureStorage" />
 	<osgi:reference id="NegotiationProviderRemote"
 		interface="org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote"
+		cardinality="0..1"
+		/>
+	<osgi:reference id="PersonalizationMgr"
+		interface="org.societies.personalisation.common.api.management.IInternalPersonalisationManager"
 		cardinality="0..1"
 		/>
 	

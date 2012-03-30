@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
+import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
 import org.societies.security.policynegotiator.sla.SLA;
@@ -48,12 +49,33 @@ public class ProviderCallback implements INegotiationProviderCallback {
 	private NegotiationRequester requester;
 	private MethodType method;
 	private IIdentity provider;
+	private INegotiationCallback finalCallback;
+	private String serviceId;
 	
-	public ProviderCallback(NegotiationRequester requester, IIdentity provider, MethodType method) {
+	public ProviderCallback(NegotiationRequester requester, IIdentity provider,
+			String serviceId, MethodType method) {
+		
+		LOG.debug("ProviderCallback({})", method);
+
 		this.requester = requester;
 		this.method = method;
 		this.provider = provider;
+		this.serviceId = serviceId;
+	}
+	
+	public ProviderCallback(NegotiationRequester requester, IIdentity provider,
+			String serviceId, MethodType method, INegotiationCallback callback) {
+		
 		LOG.debug("ProviderCallback({})", method);
+
+		this.requester = requester;
+		this.method = method;
+		this.provider = provider;
+		this.serviceId = serviceId;
+		this.finalCallback = callback;
+		if (method != MethodType.GET_POLICY_OPTIONS) {
+			LOG.warn("Wrong constructor is used");
+		}
 	}
 
 	/* (non-Javadoc)
@@ -76,12 +98,14 @@ public class ProviderCallback implements INegotiationProviderCallback {
 					String selectedSop = selectSopOption(sop);
 					// TODO: use real identity when it can be gathered from other components
 					sop = requester.getSignatureMgr().signXml(sop, selectedSop, "identity");
+					ProviderCallback callback = new ProviderCallback(requester, provider, serviceId,
+							MethodType.ACCEPT_POLICY_AND_GET_SLA); 
 					requester.getGroupMgr().acceptPolicyAndGetSla(
 							sessionId,
 							sop,
 							false,
 							provider,
-							new ProviderCallback(requester, provider, MethodType.ACCEPT_POLICY_AND_GET_SLA));
+							callback);
 				} catch (XmlException e) {
 					LOG.warn("receiveResult(): session {}: ", sessionId, e);
 				}
@@ -94,7 +118,12 @@ public class ProviderCallback implements INegotiationProviderCallback {
 				if (requester.getSignatureMgr().verify(sla)) {
 					LOG.info("receiveResult(): session = {}, final SLA reached.", sessionId);
 					LOG.debug("receiveResult(): session = {}, final SLA: {}", sessionId, sla);
+					String key = "service-" + serviceId + "-SLA";
+					requester.getSecureStorage().putDocument(key, sla.getBytes());
 					// TODO: store the SLA when secure services are implemented
+					if (finalCallback != null) {
+						finalCallback.onNegotiationComplete(key);
+					}
 				}
 				else {
 					LOG.warn("receiveResult(): session = {}, final SLA invalid!", sessionId);
@@ -122,7 +151,10 @@ public class ProviderCallback implements INegotiationProviderCallback {
 			sopContent[k] = sop.getSopContent(sopName[k]);
 			LOG.debug("selectSopOption(): SOP = {}, provider = {}", sopName[k], providerName[k]);
 		}
-
-		return sopName[0];  // TODO: display all options in GUI and return what user has chosen
+		
+		//SopSuitability suitability = new SopSuitability(personalizationMgr);
+		//suitability.calculateSuitability(preferenceNames, valuesInSop, weights);
+		
+		return sopName[0];  // FIXME: display all options in a pop-up GUI and return what user has chosen
 	}
 }
