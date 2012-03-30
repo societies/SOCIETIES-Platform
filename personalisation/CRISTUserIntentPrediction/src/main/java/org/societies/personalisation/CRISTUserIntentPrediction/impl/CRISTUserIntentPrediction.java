@@ -49,12 +49,12 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 
 	private IInternalPersonalisationManager persoMgr;
 	private ICRISTUserIntentTaskManager cristTaskManager;
+	private ICtxBroker ctxBroker;
 	
 	private IIdentity myId;
 	private CtxAttributeIdentifier myCtxId;
 	private ServiceResourceIdentifier serviceId;
-	private ICRISTUserAction cristOutcome = null; 
-	private ICtxBroker ctxBroker;
+	private ICRISTUserAction cristOutcome = null; 	
 
 	public CRISTUserIntentPrediction() {
 		System.out.println("Hello! I'm the CRIST User Intent Prediction!");
@@ -75,10 +75,13 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	public void setCtxBroker(ICtxBroker ctxBroker) {
 		this.ctxBroker = ctxBroker;
 	}
-
-	// @Autowired
-	public CRISTUserIntentPrediction(IInternalPersonalisationManager internalPreManager) {
-		this.setPersoMgr(internalPreManager);
+	
+	public ICRISTUserIntentTaskManager getCristTaskManager(){
+		return cristTaskManager;
+	}
+	
+	public void setCristTaskManager(ICRISTUserIntentTaskManager cristTaskManager){
+		this.cristTaskManager = cristTaskManager;
 	}
 	
 	public void initialiseCRISTPrediction() {
@@ -148,7 +151,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 			CtxAttribute ctxAttribute) {
 		// TODO Auto-generated method stub
 		List<CRISTUserAction> results = new ArrayList<CRISTUserAction>();
-		results = cristTaskManager.predictUserIntent(entityID, ctxAttribute);
+		results = this.cristTaskManager.predictUserIntent(entityID, ctxAttribute);
 		
 		return new AsyncResult<List<CRISTUserAction>>(results);
 	}
@@ -161,7 +164,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 			IAction action) {
 		// TODO Auto-generated method stub
 		List<CRISTUserAction> results = new ArrayList<CRISTUserAction>();
-		results = cristTaskManager.predictUserIntent(entityID, (CRISTUserAction) action);
+		results = this.cristTaskManager.predictUserIntent(entityID, (CRISTUserAction) action);
 		
 		return new AsyncResult<List<CRISTUserAction>>(results);
 	}

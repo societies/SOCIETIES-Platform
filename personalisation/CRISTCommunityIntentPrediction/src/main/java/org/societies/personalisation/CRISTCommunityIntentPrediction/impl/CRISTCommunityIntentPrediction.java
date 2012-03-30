@@ -67,11 +67,6 @@ public class CRISTCommunityIntentPrediction implements ICRISTCommunityIntentPred
 	public void setCtxBroker(ICtxBroker ctxBroker) {
 		this.ctxBroker = ctxBroker;
 	}
-
-	// @Autowired
-	public CRISTCommunityIntentPrediction(IInternalPersonalisationManager internalPreManager) {
-		this.setPersoMgr(internalPreManager);
-	}
 	
 	public void initialiseCRISTPrediction() {
 
