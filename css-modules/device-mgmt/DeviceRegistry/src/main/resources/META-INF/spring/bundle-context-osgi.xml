@@ -11,7 +11,11 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
        
+        
         <osgi:service ref="DeviceRegistry" interface="org.societies.api.internal.css.devicemgmt.IDeviceRegistry" />
+        
+        
+       
         
 		
 </beans>

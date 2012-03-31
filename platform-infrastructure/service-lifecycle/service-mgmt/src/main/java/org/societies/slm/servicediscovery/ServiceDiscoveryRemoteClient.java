@@ -35,7 +35,7 @@ import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 
 /**
- * Describe your class here...
+ * The callback for a remote service discovery call
  *
  * @author mmanniox
  *

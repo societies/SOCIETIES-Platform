@@ -28,7 +28,7 @@ import org.neo4j.graphdb.Traverser;
 import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile;
 
 
-public interface Person {
+public interface SocialPerson {
 
 	
 	/**

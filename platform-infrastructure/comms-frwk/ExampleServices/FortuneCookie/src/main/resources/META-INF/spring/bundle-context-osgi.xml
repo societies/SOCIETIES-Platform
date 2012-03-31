@@ -14,6 +14,7 @@
 	<osgi:service ref="FortuneCookieService" interface="org.societies.example.fortunecookie.IWisdom" >
 		<osgi:service-properties>
 			<entry key="TargetPlatform" value="SOCIETIES" />
+			<entry key="ServiceProvider" value="IST-SOCIETIES" />			
 			<entry key="ServiceMetaModel" value-ref="serMetamodel" />
 		</osgi:service-properties>
 	</osgi:service>
@@ -22,8 +23,6 @@
 		class="org.societies.api.schema.servicelifecycle.model.Service">
 		<property name="authorSignature" value="aleckey" />
 		<property name="serviceDescription" value="Fortune Cookie service offering your fortune" />
-		<property name="serviceLocation" value = "LOCAL" />
-		<property name="serviceType" value = "THIRD_PARTY_SERVICE" />
 		<property name="serviceName" value="FortuneCookie Service" />
 	</bean>
 </beans>

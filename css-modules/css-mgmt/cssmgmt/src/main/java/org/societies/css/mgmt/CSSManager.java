@@ -34,7 +34,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.css.directory.ICssDirectoryRemote;
-import org.societies.api.internal.css.management.CSSNode;
 import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
@@ -48,7 +47,6 @@ import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.utilities.DBC.Dbc;
 
-import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.servicelifecycle.model.Service;
 
 public class CSSManager implements ICSSLocalManager {
@@ -76,7 +74,7 @@ public class CSSManager implements ICSSLocalManager {
 	/**
 	 * @return the cssDiscoveryRemote
 	 */
-	public ICssDirectoryRemote getCssDiscoveryRemote() {
+	public ICssDirectoryRemote getCssDirectoryRemote() {
 		return cssDirectoryRemote;
 	}
 
@@ -84,8 +82,8 @@ public class CSSManager implements ICSSLocalManager {
 	 * @param cssDiscoveryRemote
 	 *            the cssDiscoveryRemote to set
 	 */
-	public void setCssDiscoveryRemote(ICssDirectoryRemote cssDiscoveryRemote) {
-		this.cssDirectoryRemote = cssDiscoveryRemote;
+	public void setCssDirectoryRemote(ICssDirectoryRemote cssDirectoryRemote) {
+		this.cssDirectoryRemote = cssDirectoryRemote;
 	}
 
 	/**
@@ -118,8 +116,16 @@ public class CSSManager implements ICSSLocalManager {
 
 	@Override
 	public Future<CssInterfaceResult> getCssRecord() {
-		// TODO Auto-generated method stub
-		return null;
+		CssInterfaceResult result = new CssInterfaceResult();
+		try {
+			CssRecord currentCssRecord = cssRegistry.getCssRecord();
+			result.setProfile(currentCssRecord);
+			result.setResultStatus(true);
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return new AsyncResult<CssInterfaceResult>(result);
 	}
 
 	@Override
@@ -338,7 +344,7 @@ public class CSSManager implements ICSSLocalManager {
 	 */
 	@Override
 	public void addAdvertisementRecord(CssAdvertisementRecord record) {
-		getCssDiscoveryRemote().addCssAdvertisementRecord(record);
+		getCssDirectoryRemote().addCssAdvertisementRecord(record);
 	}
 
 	/*
@@ -350,7 +356,7 @@ public class CSSManager implements ICSSLocalManager {
 	 */
 	@Override
 	public void deleteAdvertisementRecord(CssAdvertisementRecord record) {
-		getCssDiscoveryRemote().deleteCssAdvertisementRecord(record);
+		getCssDirectoryRemote().deleteCssAdvertisementRecord(record);
 
 	}
 
@@ -365,7 +371,7 @@ public class CSSManager implements ICSSLocalManager {
 	@Override
 	public void updateAdvertisementRecord(CssAdvertisementRecord currentRecord,
 			CssAdvertisementRecord updatedRecord) {
-		getCssDiscoveryRemote().updateCssAdvertisementRecord(currentRecord,
+		getCssDirectoryRemote().updateCssAdvertisementRecord(currentRecord,
 				updatedRecord);
 	}
 
@@ -383,7 +389,7 @@ public class CSSManager implements ICSSLocalManager {
 
 		CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
 
-		getCssDiscoveryRemote().findAllCssAdvertisementRecords(callback);
+		getCssDirectoryRemote().findAllCssAdvertisementRecords(callback);
 		recordList = callback.getResultList();
 
 		return new AsyncResult<List<CssAdvertisementRecord>>(recordList);
@@ -404,7 +410,6 @@ public class CSSManager implements ICSSLocalManager {
 		Future<List<Service>> asyncResult = null;
 		List<Service> cssServiceList = null;
 
-		String currentSearchCss = new String();
 
 		for (CssAdvertisementRecord cssAdd : listCssAds) {
 			try {

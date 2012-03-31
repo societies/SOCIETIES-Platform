@@ -55,7 +55,6 @@ import org.societies.comm.xmpp.event.PubsubEventStream;
  */
 public class CommAdapterImpl implements DmCommManager{
 
-	public static final String JID = "XCManager.societies.local";
 	public static final String SCHEMA = "org.societies.api.schema.css.devicemanagement";
 
 	private IIdentityManager idManager;
@@ -98,18 +97,10 @@ public class CommAdapterImpl implements DmCommManager{
 	@PostConstruct
 	private void init(){
 		idManager = commManager.getIdManager();
-		IIdentity pubsubID = null;
-		
 		try {
-			//we can add "."
-			//idManager.getThisNetworkNode().getJid();
-			pubsubID = idManager.fromJid("XCManager.societies.local");
+			IIdentity pubsubID = idManager.getThisNetworkNode();
 			pubSubManager.ownerCreate(pubsubID, EventsType.DEVICE_CONNECTED);
 			pubSubManager.ownerCreate(pubsubID, EventsType.DEVICE_DISCONNECTED);
-		
-		} catch (InvalidFormatException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
 		} catch (XMPPError e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -122,8 +113,7 @@ public class CommAdapterImpl implements DmCommManager{
 	private void sendEvent(String type, DmEvent dmEvent){
 		try{
 			idManager = commManager.getIdManager();
-			IIdentity pubsubID;
-			pubsubID = idManager.fromJid(JID);
+			IIdentity pubsubID = idManager.getThisNetworkNode();
 			
 			List<String> packageList = new ArrayList<String>();
 			packageList.add(SCHEMA);

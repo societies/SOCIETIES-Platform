@@ -5,7 +5,7 @@
   <groupId>org.societies.css.devicemgmt</groupId>
   <artifactId>devicemanagerconsumer</artifactId>
   <packaging>bundle</packaging>
-  <name>Spring OSGi Bundle</name>
+  <name>Device Manager Consumer</name>
   <version>0.0.1-SNAPSHOT</version>
   
   <developers>

@@ -14,9 +14,12 @@
     
 	<!-- Device Management bundles.  -->
 	<!-- 
-	<artifact type="bundle" name="org.societies.css.devicemgmt.RegSynchroniser"/>
-	<artifact type="bundle" name="org.societies.css.devicemgmt.deviceregistry"/>
-	<artifact type="bundle" name="org.societies.css.devicemgmt.devicemanager"/>
 	<artifact type="bundle" name="org.societies.css.devicemgmt.DeviceCommsMgr"/>
+	<artifact type="bundle" name="org.societies.css.devicemgmt.devicemanager"/>
+	<artifact type="bundle" name="org.societies.css.devicemgmt.deviceregistry"/>
+	<artifact type="bundle" name="org.societies.css.devicemgmt.RegSynchroniser"/>
+	
+	
+	
 	 -->
 </plan>

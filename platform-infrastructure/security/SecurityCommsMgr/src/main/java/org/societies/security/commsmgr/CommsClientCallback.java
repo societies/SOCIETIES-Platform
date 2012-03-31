@@ -26,12 +26,15 @@ package org.societies.security.commsmgr;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.schema.security.policynegotiator.ProviderBeanResult;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
+import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -51,6 +54,11 @@ public class CommsClientCallback implements ICommCallback {
 			.unmodifiableList(Arrays.asList(
 					"org.societies.api.internal.schema.security.policynegotiator"));
 
+	/**
+	 * Callbacks provided by original invokers. These need to be invoked in this class.
+	 */
+	private Map<String, INegotiationProviderCallback> callbacks = new HashMap<String, INegotiationProviderCallback>();
+	
 	private static Logger LOG = LoggerFactory.getLogger(CommsClientCallback.class);
 
 	public CommsClientCallback() {
@@ -58,6 +66,19 @@ public class CommsClientCallback implements ICommCallback {
 	}
 
 	public void init() {
+	}
+
+	public void addCallback(String stanzaId, INegotiationProviderCallback callback) {
+		LOG.debug("addCallback({}, {})", stanzaId, callback);
+		callbacks.put(stanzaId, callback);
+	}
+	
+	public void removeCallback(String stanzaId) {
+		
+		Object previous;
+		
+		previous = callbacks.remove(stanzaId);
+		LOG.debug("removeCallback({}): success = {}", stanzaId, previous != null);
 	}
 
 	/*
@@ -121,11 +142,13 @@ public class CommsClientCallback implements ICommCallback {
 
 	@Override
 	public void receiveResult(Stanza stanza, Object payload) {
+
+		String stanzaId = stanza.getId();
 		
 		LOG.debug("receiveResult({}, {})", stanza, payload);
-		LOG.debug("receiveResult(): stanza.id   = ", stanza.getId());
-		LOG.debug("receiveResult(): stanza.from = ", stanza.getFrom());
-		LOG.debug("receiveResult(): stanza.to   = ", stanza.getTo());
+		LOG.debug("receiveResult(): stanza.id   = {}", stanzaId);
+		LOG.debug("receiveResult(): stanza.from = {}", stanza.getFrom());
+		LOG.debug("receiveResult(): stanza.to   = {}", stanza.getTo());
 		
 		if (payload instanceof ProviderBeanResult) {
 			
@@ -138,6 +161,15 @@ public class CommsClientCallback implements ICommCallback {
 
 			LOG.debug("receiveResult(): success = {}, sessionId = {}, sla = " + sla,
 					success, sessionId);
+			
+			INegotiationProviderCallback cb = callbacks.get(stanzaId);
+			if (cb != null) {
+				cb.receiveResult(result);
+			}
+			else {
+				LOG.warn("receiveResult(): There is no callback for stanza ID {}", stanzaId);
+			}
+			callbacks.remove(stanzaId);
 		}
 		else {
 			LOG.warn("receiveResult(): unexpected payload type {}", payload);

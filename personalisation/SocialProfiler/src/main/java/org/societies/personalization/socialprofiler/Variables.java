@@ -1,4 +1,4 @@
-package org.societies.personalization.socialprofiler.impl;
+package org.societies.personalization.socialprofiler;
 
 
 public interface Variables {

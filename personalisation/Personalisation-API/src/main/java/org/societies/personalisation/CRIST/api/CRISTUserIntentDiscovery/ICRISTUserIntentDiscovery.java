@@ -31,7 +31,8 @@ package org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery;
  * @created 14-Nov-2011 16:38:20
  *
  */
-import java.util.List;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public interface ICRISTUserIntentDiscovery {
 
@@ -47,7 +48,7 @@ public interface ICRISTUserIntentDiscovery {
 	 * This method will generate a new CRIST User Intent Model based on the current available
 	 * information, i.e., action records, situations records and context records
 	 */
-	public void generateNewCRISTUIModel();
+	public LinkedHashMap generateNewCRISTUIModel();
 	
-	public void generateNewCRISTUIModel(List historyData);
+	public LinkedHashMap generateNewCRISTUIModel(ArrayList historyData);
 }

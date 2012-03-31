@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.societies.android.platform.interfaces.ICoreServiceMonitor;
 import org.societies.android.platform.servicemonitor.CoreServiceMonitor;
@@ -27,13 +26,24 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.phonegap.api.Plugin;
 import com.phonegap.api.PluginResult;
+/**
+ * PhoneGap plugin to allow the CoreMonitor service to be used by HTML web views.
+ * 
+ * Note: As a PhoneGap plugin is not a standard Android component a lot of assumed 
+ * functionality such as creating intents and bind to services is not automatic. The 
+ * Plugin class does however have an application context, this.ctx, which supplies the 
+ * context to allow this functionality to operate.
+ * 
+ *
+ */
 
 public class PluginCoreServiceMonitor extends Plugin {
 	//Logging tag
 	private static final String LOG_TAG = PluginCoreServiceMonitor.class.getName();
+	private static final String CLASSNAME_SEPARATOR = "\\.";
 	
 	//Required to match method calls with callbackIds
-	private HashMap<String, String> methodCallbacks = new HashMap<String, String>();
+	private HashMap<String, String> methodCallbacks;;
 
     private ICoreServiceMonitor coreServiceMonitor;
     private boolean connectedtoCoreMonitor = false;
@@ -65,9 +75,15 @@ public class PluginCoreServiceMonitor extends Plugin {
     }
 	@Override
 	public PluginResult execute(String action, JSONArray data, String callbackId) {
+		Log.d(LOG_TAG, "execute: " + action);
+		try {
+			Log.d(LOG_TAG, "parameters: " + data.getString(0));
+		} catch (JSONException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		PluginResult result = null;
 		
-		Log.d(LOG_TAG, "execute: " + action);
 
 		//initialise the service binding. Didn't work in constructor
 		if (!initBinding) {
@@ -81,9 +97,19 @@ public class PluginCoreServiceMonitor extends Plugin {
 			
 			//Call local service method
 			if (action.equals(ServiceMethodTranslator.getMethodName(ICoreServiceMonitor.methodsArray, 2))) {
-				this.coreServiceMonitor.activeServices("org.societies.android.platform.gui");
+				try {
+					this.coreServiceMonitor.activeServices(data.getString(0));
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			} else if (action.equals(ServiceMethodTranslator.getMethodName(ICoreServiceMonitor.methodsArray, 0))) {
-				this.coreServiceMonitor.activeTasks("org.societies.android.platform.gui");
+				try {
+					this.coreServiceMonitor.activeTasks(data.getString(0));
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			
             // Don't return any result now, since status results will be sent when events come in from broadcast receiver 
@@ -292,7 +318,7 @@ public class PluginCoreServiceMonitor extends Plugin {
     	Log.d(LOG_TAG, "extractService for class: " + className );
     	String serviceName = className;
     	
-    	String tokens [] = className.split("\\.");
+    	String tokens [] = className.split(CLASSNAME_SEPARATOR);
     	if (tokens.length > 0) {
         	serviceName = tokens[tokens.length - 1];
     	}

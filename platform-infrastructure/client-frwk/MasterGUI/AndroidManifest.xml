@@ -49,6 +49,10 @@
         	android:name="org.societies.android.platform.servicemonitor.CoreServiceMonitor"
         	>
         </service>
-        
+         <service
+        	android:name="org.societies.android.platform.cssmanager.LocalCSSManagerService"
+        	>
+        </service>
+         
     </application>
 </manifest>

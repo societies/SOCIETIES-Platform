@@ -26,25 +26,21 @@
 		</property>	
 	</bean>
 
-<!-- 	
-
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
 
 		<property name="annotatedClasses">
 			<list>
-				<value>org.societies.platform.servicelifecycle.serviceRegistry.model.RegistryEntry</value>
-				<value>org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceInstanceDAO</value>
-				<value>org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceImplementationDAO</value>
-			<value>org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceSharedInCISDAO</value>
+				<value>org.societies.css.cssRegistry.model.CssRegistryEntry</value>
+				<value>org.societies.css.cssRegistry.model.CssNodeEntry</value>
 			</list>
 		</property>
 
 		<property name="annotatedPackages">
 			<list>
 				
-				<value>org.societies.platform.servicelifecycle.serviceRegistry.model
+				<value>org.societies.css.cssRegistry.model
 				</value>
 			</list>
 		</property>
@@ -58,7 +54,7 @@
 			</props>
 		</property>
 	</bean>
--->
+
 
 	<!-- enable the configuration of transactional behavior based on annotations -->
 	<tx:annotation-driven transaction-manager="transactionManager" />
@@ -69,7 +65,7 @@
 	</bean>
 
 	<bean id="cssRegistry"
-		class="org.societies.css.cssRegistry">
+		class="org.societies.css.cssRegistry.CssRegistry">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 </beans>

@@ -26,6 +26,7 @@ package org.societies.personalisation.UserPreferenceManagement.impl.monitoring;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,12 +40,12 @@ import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceManagement.impl.UserPreferenceManagement;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
-import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
 import org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor;
 import org.societies.personalisation.preference.api.model.IPreferenceConditionIOutcomeName;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 import org.societies.personalisation.preference.api.model.PreferenceOutcome;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
  * Describe your class here...
@@ -131,9 +132,10 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	 * @param ownerId
 	 * @param attribute
 	 * @param callback
+	 * @return 
 	 */
 	@Override
-	public void getOutcome(IIdentity ownerId, CtxAttribute attribute, IPersonalisationInternalCallback callback){
+	public Future<List<IPreferenceOutcome>> getOutcome(IIdentity ownerId, CtxAttribute attribute){
 		/*
 		 * in this method, we need to check what preferences are affected, request re-evaluation of them, compare last ioutcome with new and send it to 
 		 * the proactivity decision maker component
@@ -144,14 +146,14 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 			//JOptionPane.showMessageDialog(null, "no affected preferences found for ctxID: "+ctxAttr.getCtxIdentifier().toUriString()+",\n ignoring event");
 			System.out.println("no affected preferences found for ctxID: "+attribute.getId().toString()+", ignoring event");
 			this.logging.debug("no affected preferences found for ctxID: "+attribute.getId().toString()+", ignoring event");
-			callback.sendPrefOutcome(ownerId, new ArrayList<IPreferenceOutcome>());
+			return new AsyncResult<List<IPreferenceOutcome>>(new ArrayList<IPreferenceOutcome>());
 		}else{
 			System.out.println("found affected preferences");
 			this.logging.debug("found affected preferences");
 			if (null == this.prefMgr){
 				
 				this.logging.debug(UserPreferenceManagement.class.getName()+" not found");
-				return;
+				return new AsyncResult<List<IPreferenceOutcome>>(new ArrayList<IPreferenceOutcome>());
 			}else{
 				this.logging.debug(UserPreferenceManagement.class.getName()+" Found");
 			}
@@ -160,8 +162,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 			System.out.println("requested re-evaluation of preferences");
 			logging.info("requested re-evaluation of preferences");
 			System.out.println("Returning outcome");
-			callback.sendPrefOutcome(ownerId, outcomes);
-			System.out.println("Returned outcome");
+			return new AsyncResult<List<IPreferenceOutcome>>(outcomes);			
 		}
 	}
 	
@@ -171,9 +172,10 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	 * @param ownerId
 	 * @param action
 	 * @param callback
+	 * @return 
 	 */
 	@Override
-	public void getOutcome(IIdentity ownerId, IAction action, IPersonalisationInternalCallback callback){
+	public Future<List<IPreferenceOutcome>> getOutcome(IIdentity ownerId, IAction action){
 		/*
 		 * an action describes a personalisable parameter that the user (manually) or the User Agent (proactively) changed.
 		 * An action does not describe a change in the state of the service. i.e. starting or stopping a service. Therefore,
@@ -187,7 +189,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		outcome.setServiceID(action.getServiceID());
 		outcome.setServiceType(action.getServiceType());
 		outcomes.add(outcome);
-		callback.sendPrefOutcome(ownerId, outcomes);
+		return new AsyncResult<List<IPreferenceOutcome>>(outcomes);
 		
 		
 	}
@@ -244,5 +246,12 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		}*/
 	
 
+	}
+
+
+	@Override
+	public Future<IPreferenceOutcome> getOutcome(IIdentity ownerID,
+			ServiceResourceIdentifier serviceID, String preferenceName) {
+		return new AsyncResult<IPreferenceOutcome> (this.prefMgr.getPreference(ownerID, "", serviceID, preferenceName));
 	}
 }

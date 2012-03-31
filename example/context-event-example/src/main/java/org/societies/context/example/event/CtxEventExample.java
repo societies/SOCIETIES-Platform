@@ -38,18 +38,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * Context event subscription/publishing example 
+ * Context event subscription/publishing example for CM components
  */
 @Service
 public class CtxEventExample {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CtxEventExample.class);
 	
+	private static final String IDENTITY = "fooIIdentity";
+	private static final String ENTITY_TYPE = "person";
+	private static final String ATTRIBUTE_TYPE = "location";
+	
 	private ICtxEventMgr ctxEventMgr;
 	
 	@Autowired(required=true)
 	public CtxEventExample(ICtxEventMgr ctxEventMgr) {
-		LOG.info("CtxEventExample instantiated");
+		
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
 		this.ctxEventMgr = ctxEventMgr;
 		this.registerListenerByCtxId();
 		this.registerListenerByScopeAttrType();
@@ -64,8 +70,8 @@ public class CtxEventExample {
 			return;
 		}
 		
-		final CtxEntityIdentifier scope = new CtxEntityIdentifier(null, "person", 1l);
-		final CtxAttributeIdentifier id = new CtxAttributeIdentifier(scope, "location", 2l);
+		final CtxEntityIdentifier scope = new CtxEntityIdentifier(IDENTITY, ENTITY_TYPE, 1l);
+		final CtxAttributeIdentifier id = new CtxAttributeIdentifier(scope, ATTRIBUTE_TYPE, 2l);
 		try {
 			this.ctxEventMgr.registerChangeListener(new MyCtxChangeEventListener(), new String[] {CtxChangeEventTopic.UPDATED}, id);
 		} catch (CtxException ce) {
@@ -81,8 +87,8 @@ public class CtxEventExample {
 			return;
 		}
 		
-		final CtxEntityIdentifier scope = new CtxEntityIdentifier(null, "person", 1l);
-		final String attrType = "location";
+		final CtxEntityIdentifier scope = new CtxEntityIdentifier(IDENTITY, ENTITY_TYPE, 1l);
+		final String attrType = ATTRIBUTE_TYPE;
 		try {
 			this.ctxEventMgr.registerChangeListener(new MyCtxChangeEventListener(), new String[] {CtxChangeEventTopic.UPDATED}, scope, attrType);
 		} catch (CtxException ce) {
@@ -98,8 +104,8 @@ public class CtxEventExample {
 			return;
 		}
 		
-		final CtxEntityIdentifier scope = new CtxEntityIdentifier(null, "person", 1l);
-		final CtxAttributeIdentifier id = new CtxAttributeIdentifier(scope, "location", 2l);
+		final CtxEntityIdentifier scope = new CtxEntityIdentifier(IDENTITY, ENTITY_TYPE, 1l);
+		final CtxAttributeIdentifier id = new CtxAttributeIdentifier(scope, ATTRIBUTE_TYPE, 2l);
 		final CtxChangeEvent event = new CtxChangeEvent(id);
 		try {
 			this.ctxEventMgr.post(event, new String[] {CtxChangeEventTopic.UPDATED}, CtxEventScope.LOCAL);

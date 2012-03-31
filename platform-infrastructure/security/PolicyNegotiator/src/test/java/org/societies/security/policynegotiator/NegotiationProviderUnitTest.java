@@ -126,13 +126,21 @@ public class NegotiationProviderUnitTest {
 		
 		Random rnd = new Random();
 		int sessionId;
-
+		Future<SlaBean> result;
+		SlaBean sla;
+		
 		// Test for a non-existing session
 		sessionId = rnd.nextInt();
-		classUnderTest.reject(sessionId);
+		result = classUnderTest.reject(sessionId);
+		sla = result.get();
+		assertFalse(sla.isSuccess());
+		assertEquals(sessionId, sla.getSessionId());
 		
 		// Test for an existing session
-		//sessionId = ;
-		//classUnderTest.reject(sessionId);
+//		sessionId = ;
+//		result = classUnderTest.reject(sessionId);
+//		sla = result.get();
+//		assertTrue(sla.isSuccess());
+//		assertEquals(sessionId, sla.getSessionId());
 	}
 }

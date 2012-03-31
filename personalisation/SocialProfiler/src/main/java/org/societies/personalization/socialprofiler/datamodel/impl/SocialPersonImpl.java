@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalization.socialprofiler.datamodel;
+package org.societies.personalization.socialprofiler.datamodel.impl;
 
 import java.util.HashMap;
 
@@ -32,12 +32,14 @@ import org.neo4j.graphdb.ReturnableEvaluator;
 import org.neo4j.graphdb.StopEvaluator;
 import org.neo4j.graphdb.TraversalPosition;
 import org.neo4j.graphdb.Traverser;
+import org.societies.personalization.socialprofiler.datamodel.NodeProperties;
+import org.societies.personalization.socialprofiler.datamodel.SocialPerson;
 import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile;
 import org.societies.personalization.socialprofiler.datamodel.behaviour.RelTypes;
 
 
 
-public class PersonImpl implements Person, NodeProperties/*,DirtyMaker*/ {
+public class SocialPersonImpl implements SocialPerson, NodeProperties/*,DirtyMaker*/ {
 
 	
 	private final Node underlyingNode;
@@ -47,7 +49,7 @@ public class PersonImpl implements Person, NodeProperties/*,DirtyMaker*/ {
 	/**
 	 * @param underlyingNode
 	 */
-	public PersonImpl(final Node underlyingNode) {
+	public SocialPersonImpl(final Node underlyingNode) {
 		this.underlyingNode = underlyingNode;
 	}
 

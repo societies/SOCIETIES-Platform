@@ -10,8 +10,6 @@
        for integration testing outside of an OSGi environment
     -->
 
-    <bean
-        class="org.societies.platform.socialdata.impl.BeanImpl"
-        name="myBean" />
+    
 
 </beans>

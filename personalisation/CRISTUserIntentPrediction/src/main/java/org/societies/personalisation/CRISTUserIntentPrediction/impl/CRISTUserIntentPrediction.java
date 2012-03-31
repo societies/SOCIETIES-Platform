@@ -21,10 +21,14 @@
 package org.societies.personalisation.CRISTUserIntentPrediction.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.Future;
 // import javax.annotation.PostConstruct;
 // import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.stereotype.Component;
-
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxModelObject;
@@ -35,20 +39,22 @@ import org.societies.api.internal.personalisation.model.FeedbackEvent;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
+import org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager;
 import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
-import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 
 // @Component
 public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 
 	private IInternalPersonalisationManager persoMgr;
+	private ICRISTUserIntentTaskManager cristTaskManager;
+	private ICtxBroker ctxBroker;
+	
 	private IIdentity myId;
 	private CtxAttributeIdentifier myCtxId;
 	private ServiceResourceIdentifier serviceId;
-	private ICRISTUserAction cristOutcome = null; 
-	private ICtxBroker ctxBroker;
+	private ICRISTUserAction cristOutcome = null; 	
 
 	public CRISTUserIntentPrediction() {
 		System.out.println("Hello! I'm the CRIST User Intent Prediction!");
@@ -69,10 +75,13 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	public void setCtxBroker(ICtxBroker ctxBroker) {
 		this.ctxBroker = ctxBroker;
 	}
-
-	// @Autowired
-	public CRISTUserIntentPrediction(IInternalPersonalisationManager internalPreManager) {
-		this.setPersoMgr(internalPreManager);
+	
+	public ICRISTUserIntentTaskManager getCristTaskManager(){
+		return cristTaskManager;
+	}
+	
+	public void setCristTaskManager(ICRISTUserIntentTaskManager cristTaskManager){
+		this.cristTaskManager = cristTaskManager;
 	}
 	
 	public void initialiseCRISTPrediction() {
@@ -117,40 +126,6 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCRISTPrediction(org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.IIdentity, org.societies.api.context.model.CtxAttribute, org.societies.personalisation.common.api.management.IPersonalisationInternalCallback)
-	 */
-	@Override
-	public ArrayList<CRISTUserAction> getCRISTPrediction(
-			IIdentity entityID,
-			CtxAttribute ctxAttribute, IPersonalisationInternalCallback callback) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCRISTPrediction(org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.IIdentity, org.societies.api.personalisation.model.IAction, org.societies.personalisation.common.api.management.IPersonalisationInternalCallback)
-	 */
-	@Override
-	public ArrayList<CRISTUserAction> getCRISTPrediction(
-			IIdentity entityID,
-			IAction action, IPersonalisationInternalCallback callback) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCurrentUserIntentAction(org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.IIdentity, org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.IIdentity, org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ServiceResourceIdentifier)
-	 */
-	@Override
-	public CRISTUserAction getCurrentUserIntentAction(
-			IIdentity requestor,
-			IIdentity ownerID,
-			ServiceResourceIdentifier serviceID) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#sendFeedback(org.societies.api.internal.personalisation.model.FeedbackEvent)
 	 */
 	@Override
@@ -166,5 +141,42 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	public void updateReceived(CtxModelObject ctxModelObj) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCRISTPrediction(org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxAttribute)
+	 */
+	@Override
+	public Future<List<CRISTUserAction>> getCRISTPrediction(IIdentity entityID,
+			CtxAttribute ctxAttribute) {
+		// TODO Auto-generated method stub
+		List<CRISTUserAction> results = new ArrayList<CRISTUserAction>();
+		results = this.cristTaskManager.predictUserIntent(entityID, ctxAttribute);
+		
+		return new AsyncResult<List<CRISTUserAction>>(results);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCRISTPrediction(org.societies.api.identity.IIdentity, org.societies.api.personalisation.model.IAction)
+	 */
+	@Override
+	public Future<List<CRISTUserAction>> getCRISTPrediction(IIdentity entityID,
+			IAction action) {
+		// TODO Auto-generated method stub
+		List<CRISTUserAction> results = new ArrayList<CRISTUserAction>();
+		results = this.cristTaskManager.predictUserIntent(entityID, (CRISTUserAction) action);
+		
+		return new AsyncResult<List<CRISTUserAction>>(results);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCurrentUserIntentAction(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)
+	 */
+	@Override
+	public Future<CRISTUserAction> getCurrentUserIntentAction(
+			IIdentity ownerID, ServiceResourceIdentifier serviceID) {
+		// TODO Auto-generated method stub
+		
+		return null;
 	}
 }

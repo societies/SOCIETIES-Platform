@@ -34,13 +34,65 @@ function onDeviceReady() {
 		//Register the javascript plugin with PhoneGap
 		console.log("Register CoreServiceMonitorService plugin ");
 		PhoneGap.addPlugin('CoreServiceMonitorService', new CoreServiceMonitorService());
+		
+		console.log("Register LocalCSSManagerService plugin ");
+		PhoneGap.addPlugin('LocalCSSManagerService', new LocalCSSManagerService());
 	 
 	});
 }
 
 /**
- * Example of a PhoneGap plugin  being created and configured 
+ * LocalCSSManagerService object
  * @return Instance of ConnectionListener
+ */
+var LocalCSSManagerService = function() { 
+}
+
+/**
+ * @param successCallback The callback which will be called when Java method is successful
+ * @param failureCallback The callback which will be called when Java method has an error
+*/
+LocalCSSManagerService.prototype.loginCSS = function(successCallback, failureCallback) {
+	var client = "org.societies.android.platform.gui";
+	var cssRecord = {
+			  			"archiveCSSNodes": [],
+	                    "cssIdentity": "android@societies.local",
+	                    "cssInactivation": null,
+	                    "cssNodes": [{
+	                        "identity": "android@societies.local/androidOne",
+	                        "status": 0,
+	                        "type": 0}],
+	                    "cssRegistration": null,
+	                    "cssHostingLocation" : null,
+	                    "domainServer" : null,
+	                    "cssUpTime": 0,
+	                    "emailID": null,
+	                    "entity": 0,
+	                    "foreName": null,
+	                    "homeLocation": null,
+	                    "identityName": null,
+	                    "imID": null,
+	                    "name": null,
+	                    "password": "android",
+	                    "presence": 0,
+	                    "sex": 0,
+	                    "socialURI": null,
+	                    "status": 0
+			                  }
+
+
+	console.log("Call LocalCSSManagerService - loginCSS");
+
+	return PhoneGap.exec(successCallback,    //Callback which will be called when plugin action is successful
+	failureCallback,     //Callback which will be called when plugin action encounters an error
+	'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
+	'loginCSS',          //Telling the plugin, which action we want to perform
+	[client, cssRecord]);        //Passing a list of arguments to the plugin
+};
+
+/**
+ * CoreServiceMonitorService object
+ * @return Instance of CoreServiceMonitorService
  */
 var CoreServiceMonitorService = function() { 
 }
@@ -50,7 +102,6 @@ var CoreServiceMonitorService = function() {
  * @param failureCallback The callback which will be called when Java method has an error
 */
 CoreServiceMonitorService.prototype.activeServices = function(successCallback, failureCallback) {
-	var clientPackage = "org.societies.android.platform.gui";
 
 	console.log("Call CoreServiceMonitorService - activeServices");
 
@@ -58,7 +109,7 @@ CoreServiceMonitorService.prototype.activeServices = function(successCallback, f
 	failureCallback,     //Callback which will be called when plugin action encounters an error
 	'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
 	'activeServices',              //Telling the plugin, which action we want to perform
-	[]);        //Passing a list of arguments to the plugin
+	["org.societies.android.platform.gui"]);        //Passing a list of arguments to the plugin
 };
 
 /**
@@ -74,7 +125,7 @@ CoreServiceMonitorService.prototype.activeTasks = function(successCallback, fail
 	failureCallback,     //Callback which will be called when plugin action encounters an error
 	'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
 	'activeTasks',              //Telling the plugin, which action we want to perform
-	[]);        //Passing a list of arguments to the plugin
+	["org.societies.android.platform.gui"]);        //Passing a list of arguments to the plugin
 };
 
 var deviceInfo = function() {
@@ -94,6 +145,17 @@ var deviceInfo = function() {
 };
 
 var successfulLogin = function() {
+	console.log("Login to CSS");
+
+	function success(data) {
+		
+	}
+	
+	function failure(data) {
+		alert(data);
+	}
+    window.plugins.LocalCSSManagerService.loginCSS(success, failure);
+
 	$.mobile.changePage( ($("#menu")), { transition: "slideup"} );
 };
 

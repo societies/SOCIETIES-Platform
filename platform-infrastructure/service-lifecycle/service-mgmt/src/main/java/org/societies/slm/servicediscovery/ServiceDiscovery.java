@@ -47,6 +47,12 @@ import org.societies.api.schema.servicelifecycle.model.Service;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 
+/**
+ * The implementation of Service Discovery
+ *
+ * @author mmanniox
+ *
+ */
 public class ServiceDiscovery implements IServiceDiscovery {
 
 	static final Logger logger = LoggerFactory.getLogger(ServiceDiscovery.class);

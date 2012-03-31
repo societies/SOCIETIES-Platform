@@ -14,6 +14,7 @@
 	<osgi:service ref="CalcService" interface="org.societies.example.calculator.ICalc" >
 		<osgi:service-properties>
 			<entry key="TargetPlatform" value="SOCIETIES" />
+			<entry key="ServiceProvider" value="IST-SOCIETIES" />
 			<entry key="ServiceMetaModel" value-ref="serMetamodel" />
 		</osgi:service-properties>
 	</osgi:service>
@@ -22,8 +23,6 @@
 		class="org.societies.api.schema.servicelifecycle.model.Service">
 		<property name="authorSignature" value="aleckey" />
 		<property name="serviceDescription" value="Basic calculator service, supports Add/Subtract" />
-		<property name="serviceLocation" value = "LOCAL" />
-		<property name="serviceType" value = "THIRD_PARTY_SERVICE" />
 		<property name="serviceName" value="Calculator Service" />
 	</bean>
 </beans>
