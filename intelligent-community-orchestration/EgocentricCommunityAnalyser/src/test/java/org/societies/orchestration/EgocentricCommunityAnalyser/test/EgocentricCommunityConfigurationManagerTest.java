@@ -50,6 +50,8 @@ import org.societies.api.cis.management.ICisEditor;
 import org.societies.api.cis.management.ICisActivity;
 import org.societies.api.cis.management.ICisActivityFeed;
 
+import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
+
 /**
  * This is the test class for the Egocentric Community Configuration Manager component
  * 

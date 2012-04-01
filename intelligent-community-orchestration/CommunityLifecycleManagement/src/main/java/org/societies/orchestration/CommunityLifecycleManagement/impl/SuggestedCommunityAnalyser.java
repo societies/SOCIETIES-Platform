@@ -247,6 +247,17 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
     	
     }
     
+    public ArrayList<String> checkForPrivacyConflicts() {
+    	ArrayList<String> conflictingPrivacyPolicies = new ArrayList<String>();
+    	return conflictingPrivacyPolicies;
+    	
+    }
+    
+    public ArrayList<String> checkForPreferenceConflicts() {
+    	ArrayList<String> conflictingPreferences = new ArrayList<String>();
+		return conflictingPreferences;
+    	
+    }
     public IIdentity getLinkedCss() {
     	return linkedCss;
     }

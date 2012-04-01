@@ -70,6 +70,8 @@ import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataMan
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 
+import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
+
 /**
  * This is the test class for the Egocentric Community Creation Manager component
  * 
