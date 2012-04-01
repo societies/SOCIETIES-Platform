@@ -1,32 +1,49 @@
-package org.societies.platform.TwitterConnector.impl;
+package org.societies.platform.FoursquareConnector.impl;
 
 import java.util.Map;
 
 import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.scribe.builder.ServiceBuilder;
+import org.scribe.builder.api.Foursquare2Api;
 import org.scribe.model.*;
 import org.scribe.oauth.*;
-import org.societies.platform.TwitterConnector.*;
-import org.societies.platform.TwitterConnector.model.TwitterToken;
+import org.societies.platform.FoursquareConnector.FoursquareConnector;
 
 /*
- * twitter connector implementation
+ * Foursquare connector implementation
+ * 
+ * dingqi yang
  */
-public class TwitterConnectorImpl implements TwitterConnector{
+public class FoursquareConnectorImpl implements FoursquareConnector{
 
-	private TwitterToken twToken = null;
+	private String 	accessTokenString = null;
+	private Token 	accessToken = null;
+	private String 	identity = null;
+
+
+	private String apiKey = "LTNRV3JPEKSFUCMOF4HY05GZHW4BWIZ1Y2YGBJCLMGEXZFG4";
+	private String apiSecret = "2Y0YDIH5XQV13P2ZE3EWZDGEAIHXXQNMOUAEVU4XIWRYRBBS";
+
 	private OAuthService service;
 
-	public TwitterConnectorImpl(){
-		this.twToken = new TwitterToken();
-		this.service = twToken.getAuthService();
+	public FoursquareConnectorImpl(String access_token, String identity){
+		this.accessTokenString = access_token;
+		this.identity = identity;
+		this.service =  new ServiceBuilder()
+							.provider(Foursquare2Api.class)
+							.apiKey(apiKey)
+							.apiSecret(apiSecret)
+							.callback("http://localhost:8080/examples/servlets/auth")
+							.build();
+		this.accessToken = new Token(this.accessTokenString,"");
 	}
 
 	
 	public String getUserProfile(){
-		OAuthRequest request = new OAuthRequest(Verb.GET, ACCOUNT_VERIFICATION);
-		this.service.signRequest(twToken.getAccessToken(), request);
+		OAuthRequest request = new OAuthRequest(Verb.GET, RECENT_CHECKINS + accessToken.getToken());
+		this.service.signRequest(accessToken, request);
 		Response response = request.send();
 		JSONParser parser=new JSONParser();
 		Object obj=null;
@@ -43,9 +60,10 @@ public class TwitterConnectorImpl implements TwitterConnector{
 			return null;
 	}
 	
-	public String getUserFriends(){
-		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FRIENDS_URL);
-		this.service.signRequest(twToken.getAccessToken(), request);
+	
+	public String getRecentCheckins(){
+		OAuthRequest request = new OAuthRequest(Verb.GET, USER_PROFILE + accessToken.getToken());
+		this.service.signRequest(accessToken, request);
 		Response response = request.send();
 		JSONParser parser=new JSONParser();
 		Object obj=null;
@@ -59,25 +77,6 @@ public class TwitterConnectorImpl implements TwitterConnector{
 		if(res!=null)
 			return res.toJSONString();
 		else
-			return null;
-	}
-
-	public String getUserFollowers(){
-		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FOLLOWERS_URL);
-		this.service.signRequest(twToken.getAccessToken(), request);
-		Response response = request.send();
-		JSONParser parser=new JSONParser();
-		Object obj=null;
-		try {
-			obj = parser.parse(response.getBody());
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		JSONObject res=(JSONObject)obj;
-		if(res!=null)
-			return res.toJSONString();
-		else 
 			return null;
 	}
 
@@ -213,6 +212,16 @@ public class TwitterConnectorImpl implements TwitterConnector{
 
 
 	/* (non-Javadoc)
+	 * @see org.societies.api.internal.sns.ISocialConnector#getUserFriends()
+	 */
+	@Override
+	public String getUserFriends() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	/* (non-Javadoc)
 	 * @see org.societies.api.internal.sns.ISocialConnector#getUserActivities()
 	 */
 	@Override
@@ -230,5 +239,6 @@ public class TwitterConnectorImpl implements TwitterConnector{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 
 }
