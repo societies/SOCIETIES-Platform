@@ -246,9 +246,9 @@ public class EgocentricCommunityDeletionManagerTest {
 		
 		String[] members = new String[1];
 		members[0] = "James";
-		//the CIS should have been deleted
+		//the CIS should not have been deleted
 		
-		//Assert.assertNull(cisManager.getCisList(new CisRecord(null, null, null, null, null, members, null, null, null)));
+		//Assert.assertNotNull(cisManager.getCisList(jamesCis));
 	}
 	
 	public void setCisManager(ICisManager cisManager){
