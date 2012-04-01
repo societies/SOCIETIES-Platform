@@ -12,7 +12,7 @@
 
 
     <bean
-        class="org.societies.platform.TwitterConnector.impl.TwitterConnectorImpl"
-        name="TwitterConnector" />
+        class="org.societies.platform.FoursquareConnector.impl.FoursquareConnectorImpl"
+        name="FoursquareConnector" />
 
 </beans>
