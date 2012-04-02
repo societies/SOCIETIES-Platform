@@ -300,7 +300,7 @@ public class RegistryEntry implements Serializable {
 		if (service.getServiceEndpoint() != null) {
 			this.setServiceEndPoint(service.getServiceEndpoint());
 		}
-		if (service.getServiceInstance() != null) {
+		/*if (service.getServiceInstance() != null) {
 			if (service.getServiceInstance().getFullJid() != null) {
 				this.getServiceInstance().setFullJid(
 						service.getServiceInstance().getFullJid());
@@ -344,7 +344,7 @@ public class RegistryEntry implements Serializable {
 
 			}
 
-		}
+		}*/
 		if (service.getServiceLocation()!=null){
 			this.setServiceLocation(service.getServiceLocation().toString());
 		}
