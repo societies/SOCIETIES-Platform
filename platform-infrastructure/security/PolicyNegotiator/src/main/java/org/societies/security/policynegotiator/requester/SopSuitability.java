@@ -26,7 +26,8 @@ package org.societies.security.policynegotiator.requester;
 
 import java.util.Random;
 
-import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+import org.societies.api.personalisation.mgmt.IPersonalisationManager;
+
 
 /**
  * 
@@ -36,9 +37,9 @@ import org.societies.personalisation.common.api.management.IInternalPersonalisat
  */
 public class SopSuitability {
 
-	private IInternalPersonalisationManager personalizationMgr;
+	private IPersonalisationManager personalizationMgr;
 	
-	public SopSuitability(IInternalPersonalisationManager personalizationMgr) {
+	public SopSuitability(IPersonalisationManager personalizationMgr) {
 		this.personalizationMgr = personalizationMgr;
 	}
 	

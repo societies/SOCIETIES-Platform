@@ -33,8 +33,8 @@ import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.security.storage.ISecureStorage;
+import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.security.digsig.ISignatureMgr;
-import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 
 //@Component
 public class NegotiationRequester implements INegotiation {
@@ -44,7 +44,7 @@ public class NegotiationRequester implements INegotiation {
 	private ISignatureMgr signatureMgr;
 	private ISecureStorage secureStorage;
 	private INegotiationProviderRemote groupMgr;
-	private IInternalPersonalisationManager personalizationMgr;
+	private IPersonalisationManager personalizationMgr;
 
 //	@Autowired
 //	public NegotiationRequester(ISignatureMgr signatureMgr) {
@@ -93,10 +93,10 @@ public class NegotiationRequester implements INegotiation {
 	public void setSecureStorage(ISecureStorage secureStorage) {
 		this.secureStorage = secureStorage;
 	}
-	public IInternalPersonalisationManager getPersonalizationMgr() {
+	public IPersonalisationManager getPersonalizationMgr() {
 		return personalizationMgr;
 	}
-	public void setPersonalizationMgr(IInternalPersonalisationManager personalizationMgr) {
+	public void setPersonalizationMgr(IPersonalisationManager personalizationMgr) {
 		this.personalizationMgr = personalizationMgr;
 	}
 

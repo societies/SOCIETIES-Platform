@@ -35,8 +35,8 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.security.storage.ISecureStorage;
+import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.security.digsig.ISignatureMgr;
-import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.security.policynegotiator.requester.NegotiationRequester;
 
 /**
@@ -52,7 +52,7 @@ public class NegotiationRequesterUnitTest {
 	private ISecureStorage secureStorageMock;
 	private INegotiationProviderRemote groupMgrMock;
 	private IIdentityManager idMgrMock;
-	private IInternalPersonalisationManager personalizationMgrMock;
+	private IPersonalisationManager personalizationMgrMock;
 
 	/**
 	 * @throws java.lang.Exception
@@ -69,7 +69,7 @@ public class NegotiationRequesterUnitTest {
 		when(groupMgrMock.getIdMgr()).thenReturn(idMgrMock); 
 //		verify(groupMgrMock).getIdMgr();
 		secureStorageMock = mock(ISecureStorage.class);
-		personalizationMgrMock = mock(IInternalPersonalisationManager.class);
+		personalizationMgrMock = mock(IPersonalisationManager.class);
 
 		// Class under test
 		classUnderTest = new NegotiationRequester();

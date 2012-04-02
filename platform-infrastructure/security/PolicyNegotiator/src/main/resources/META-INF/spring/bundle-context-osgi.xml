@@ -16,7 +16,7 @@
 		cardinality="0..1"
 		/>
 	<osgi:reference id="PersonalizationMgr"
-		interface="org.societies.personalisation.common.api.management.IInternalPersonalisationManager"
+		interface="org.societies.api.personalisation.mgmt.IPersonalisationManager"
 		cardinality="0..1"
 		/>
 	
