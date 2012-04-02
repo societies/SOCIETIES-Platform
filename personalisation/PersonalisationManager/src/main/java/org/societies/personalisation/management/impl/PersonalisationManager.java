@@ -47,6 +47,8 @@ import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
 import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
+import org.societies.api.personalisation.model.Action;
+import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
@@ -312,8 +314,30 @@ public class PersonalisationManager implements IPersonalisationManager,
 	public void getPreference(IIdentity ownerID, String serviceType,
 			ServiceResourceIdentifier serviceID, String preferenceName,
 			IPersonalisationCallback callback) {
-		// TODO Auto-generated method stub
-
+		Future<List<IDIANNEOutcome>> futureDianneOuts = this.dianne.getOutcome(ownerID, serviceID, preferenceName);
+		Future<IPreferenceOutcome> futurePrefOuts = this.pcm.getOutcome(ownerID, serviceID, preferenceName);
+		IAction action;
+		try {
+			IDIANNEOutcome dianneOut = futureDianneOuts.get().get(0);
+			IPreferenceOutcome prefOut = futurePrefOuts.get();
+			
+			if (dianneOut.getvalue().equalsIgnoreCase(prefOut.getvalue())){
+				action = new Action(serviceID, serviceType, preferenceName, prefOut.getvalue());
+				action.setServiceID(serviceID);
+				action.setServiceType(serviceType);
+				
+				callback.receiveIAction(null, ownerID, serviceID, action);
+			}else{
+				callback.receiveIAction(null, ownerID, serviceID, this.resolvePreferenceConflicts(dianneOut, prefOut));
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 	/*
@@ -330,7 +354,7 @@ public class PersonalisationManager implements IPersonalisationManager,
 	public void getIntentAction(IIdentity requestor, IIdentity ownerID,
 			ServiceResourceIdentifier serviceID, String preferenceName,
 			IPersonalisationCallback callback) {
-
+		this.getIntentAction(ownerID, serviceID, preferenceName, callback);
 	}
 
 	/*
@@ -348,7 +372,8 @@ public class PersonalisationManager implements IPersonalisationManager,
 	public void getPreference(IIdentity requestor, IIdentity ownerID,
 			String serviceType, ServiceResourceIdentifier serviceID,
 			String preferenceName, IPersonalisationCallback callback) {
-		// TODO Auto-generated method stub
+		//check with access control 
+		this.getPreference(ownerID, serviceType, serviceID, preferenceName, callback);
 
 	}
 
@@ -366,7 +391,30 @@ public class PersonalisationManager implements IPersonalisationManager,
 	public void getIntentAction(IIdentity ownerID,
 			ServiceResourceIdentifier serviceID, String preferenceName,
 			IPersonalisationCallback callback) {
-
+		
+		Future<IUserIntentAction> futureCAUIOuts = this.cauiPrediction.getCurrentIntentAction(ownerID, serviceID, preferenceName);
+		Future<CRISTUserAction> futureCRISTOuts = this.cristPrediction.getCurrentUserIntentAction(ownerID, serviceID, preferenceName);
+		IAction action;
+		
+		try {
+			IUserIntentAction cauiOut = futureCAUIOuts.get();
+			CRISTUserAction cristOut = futureCRISTOuts.get();
+			
+			if (cauiOut.getvalue().equalsIgnoreCase(cristOut.getvalue())){
+				action = new Action(serviceID, "", preferenceName, cauiOut.getvalue());
+				callback.receiveIAction(null, ownerID, serviceID, action);
+			}else{
+				callback.receiveIAction(null, ownerID, serviceID, this.resolveIntentConflicts(cristOut, cauiOut));
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
 
 
@@ -434,7 +482,7 @@ public class PersonalisationManager implements IPersonalisationManager,
 					List<IUserIntentAction> cauiActions = futureCauiActions.get();
 					
 					for (IUserIntentAction cauiAction : cauiActions){
-						CRISTUserAction cristAction = this.cristPrediction.getCurrentUserIntentAction(userId, cauiAction.getServiceID()).get();
+						CRISTUserAction cristAction = this.cristPrediction.getCurrentUserIntentAction(userId, cauiAction.getServiceID(), cauiAction.getparameterName()).get();
 						if (cristAction.getvalue().equalsIgnoreCase(cauiAction.getvalue())){
 							results.add(cauiAction);
 						}else{
