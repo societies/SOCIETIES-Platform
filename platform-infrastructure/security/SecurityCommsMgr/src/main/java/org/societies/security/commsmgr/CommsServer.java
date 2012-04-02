@@ -61,14 +61,12 @@ public class CommsServer implements IFeatureServer {
 	
 //	@Autowired
 //	public CommsServer(ICommManager commManager,
-//			INegotiationRequester negotiationRequester,
 //			INegotiationProvider negotiationProvider) {
 //		
 //		this.commManager = commManager;
-//		this.negotiationRequester = negotiationRequester;
 //		this.negotiationProvider = negotiationProvider;
 //		
-//		LOG.info("CommsServer({})", commManager + ", " + negotiationRequester + ", " + negotiationProvider);
+//		LOG.info("CommsServer({})", commManager + ", " + negotiationProvider);
 //	}
 
 	public CommsServer() {

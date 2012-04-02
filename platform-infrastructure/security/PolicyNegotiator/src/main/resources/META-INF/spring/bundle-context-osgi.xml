@@ -21,6 +21,6 @@
 		/>
 	
 	<osgi:service ref="NegotiationProvider"  interface="org.societies.api.internal.security.policynegotiator.INegotiationProvider" />
-	<osgi:service ref="NegotiationRequester" interface="org.societies.api.internal.security.policynegotiator.INegotiationRequester" />
+	<osgi:service ref="NegotiationRequester" interface="org.societies.api.internal.security.policynegotiator.INegotiation" />
 	
 </beans>

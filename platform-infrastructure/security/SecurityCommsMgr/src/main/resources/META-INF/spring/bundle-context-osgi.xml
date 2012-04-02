@@ -24,7 +24,7 @@
 		cardinality="0..1"
 		/>
 	<!--osgi:reference id="NegotiationRequester"
-		interface="org.societies.api.internal.security.policynegotiator.INegotiationRequester"
+		interface="org.societies.api.internal.security.policynegotiator.INegotiation"
 		cardinality="0..1"
 		/-->
 
