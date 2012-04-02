@@ -14,7 +14,7 @@
 	<osgi:service ref="CalcService" interface="org.societies.example.calculator.ICalc" >
 		<osgi:service-properties>
 			<entry key="TargetPlatform" value="SOCIETIES" />
-			<entry key="ServiceProvider" value="IST-SOCIETIES" />
+			<entry key="ServiceProvider" value="ICT-SOCIETIES" />
 			<entry key="ServiceMetaModel" value-ref="serMetamodel" />
 		</osgi:service-properties>
 	</osgi:service>
