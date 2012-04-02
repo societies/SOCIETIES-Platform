@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-
+	<name>Twitter Connector</name>
 	<groupId>org.societies.platform</groupId>
 	<artifactId>twitter_connector</artifactId>
 	<version>${release.version}-SNAPSHOT</version>
@@ -79,8 +79,10 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
+						
 						<Embed-Dependency>scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
+						
 					</instructions>
 				</configuration>
 			</plugin>

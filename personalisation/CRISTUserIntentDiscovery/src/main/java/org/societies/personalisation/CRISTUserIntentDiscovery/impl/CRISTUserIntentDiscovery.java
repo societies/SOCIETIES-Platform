@@ -25,12 +25,26 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.ICRISTUserIntentDiscovery;
+import org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager;
 
 public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 
+	private ICRISTUserIntentTaskManager cristTaskManager;
 	ArrayList<MockHistoryData> historyList = new ArrayList<MockHistoryData>();
 	LinkedHashMap<String, Integer> intentModel = new LinkedHashMap<String, Integer>();
 
+	public CRISTUserIntentDiscovery(ICRISTUserIntentTaskManager cristTaskManager){
+		this.setCristTaskManager(cristTaskManager);
+	}
+	
+	public ICRISTUserIntentTaskManager getCristTaskManager(){
+		return cristTaskManager;
+	}
+	
+	public void setCristTaskManager(ICRISTUserIntentTaskManager cristTaskManager){
+		this.cristTaskManager = cristTaskManager;
+	}
+	
 	public void initialiseCRISTDiscovery() {
 		System.out.println("Yo!! I'm a brand new service and my interface is: "
 				+ this.getClass().getName());

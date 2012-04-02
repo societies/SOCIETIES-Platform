@@ -144,11 +144,12 @@ public class CssDirectory implements ICssDirectory {
 	 * org.societies.api.css.directory.ICssDirectory#findAllCssAdvertisementRecords
 	 * ()
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	@Async
 	public Future<List<CssAdvertisementRecord>> findAllCssAdvertisementRecords() {
 		Session session = sessionFactory.openSession();
-		List<CssAdvertisementRecordEntry> tmpAdvertList = null;
+		List<CssAdvertisementRecordEntry> tmpAdvertList = new ArrayList<CssAdvertisementRecordEntry>();
 		List<CssAdvertisementRecord> returnList = new ArrayList<CssAdvertisementRecord>();
 		CssAdvertisementRecord record = null;
 
@@ -187,6 +188,7 @@ public class CssDirectory implements ICssDirectory {
 	 * org.societies.api.css.directory.ICssDirectory#findForAllCss(org.societies
 	 * .api.schema.css.directory.CssAdvertisementRecord)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	@Async
 	public Future<List<CssAdvertisementRecord>> findForAllCss(
@@ -194,7 +196,7 @@ public class CssDirectory implements ICssDirectory {
 		
 	//TODO : Need to add filter . for now it returns everything	
 		Session session = sessionFactory.openSession();
-		List<CssAdvertisementRecordEntry> tmpAdvertList = null;
+		List<CssAdvertisementRecordEntry> tmpAdvertList = new ArrayList<CssAdvertisementRecordEntry>();
 		List<CssAdvertisementRecord> returnList = new ArrayList<CssAdvertisementRecord>();
 		CssAdvertisementRecord record = null;
 

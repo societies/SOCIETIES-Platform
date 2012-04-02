@@ -10,9 +10,9 @@
        for integration testing outside of an OSGi environment
     -->
 
+
     <bean
-        class="org.societies.twconnector.TwitterConnector"
-        depends-on="CtxBroker"
-        name="TWConnector" />
+        class="org.societies.platform.TwitterConnector.impl.TwitterConnectorImpl"
+        name="TwitterConnector" />
 
 </beans>

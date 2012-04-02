@@ -31,19 +31,19 @@ import org.societies.api.internal.css.directory.ICssDirectory;
 
 import org.societies.api.internal.css.discovery.ICssDiscovery;
 
-import org.societies.api.internal.cis.management.ICisActivityFeed;
-import org.societies.api.internal.cis.management.ServiceSharingRecord;
-import org.societies.api.internal.cis.management.ICisActivity;
-import org.societies.api.internal.cis.management.ICisRecord;
-import org.societies.api.internal.cis.management.ICisManager;
+//import org.societies.api.internal.cis.management.ICisActivityFeed;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+//import org.societies.api.internal.cis.management.ICisActivity;
+//import org.societies.api.internal.cis.management.ICisRecord;
+//import org.societies.api.internal.cis.management.ICisManager;
 
-//import org.societies.api.cis.management.ICisRecord;
-//import org.societies.api.cis.management.ICisManager;
-//import org.societies.api.cis.management.ICisOwned;
-//import org.societies.api.cis.management.ICisSubscribed;
-//import org.societies.api.cis.management.ICisEditor;
-//import org.societies.api.cis.management.ICisActivity;
-//import org.societies.api.cis.management.ICisActivityFeed;
+import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.cis.management.ICisSubscribed;
+import org.societies.api.cis.management.ICisEditor;
+import org.societies.api.cis.management.ICisActivity;
+import org.societies.api.cis.management.ICisActivityFeed;
 //import org.societies.api.cis.management.ICis;
 
 //import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;

@@ -27,9 +27,8 @@ package org.societies.orchestration.api;
 
 import java.util.ArrayList;
 
-//import org.societies.api.internal.cis.management.CisRecord;
-import org.societies.api.internal.cis.management.ICisRecord;
-//import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.cis.management.ICisRecord;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 

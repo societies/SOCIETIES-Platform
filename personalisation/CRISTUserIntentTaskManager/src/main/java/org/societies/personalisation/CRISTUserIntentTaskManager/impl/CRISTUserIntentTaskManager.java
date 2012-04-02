@@ -38,7 +38,6 @@ import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
 import org.societies.personalisation.CRIST.api.model.CRISTUserSituation;
 import org.societies.personalisation.CRIST.api.model.CRISTUserTask;
 import org.societies.personalisation.CRIST.api.model.CRISTUserTaskModelData;
-import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 
 public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 
@@ -53,7 +52,6 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 
 	private CtxAttribute myCtx;
 	private IIdentity myID;
-	private IPersonalisationInternalCallback myCallback;
 
 	private int maxStep = 3;
 
@@ -61,6 +59,11 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 
 	public CRISTUserIntentTaskManager() {
 		System.out.println("Hello! I'm the CRIST User Intent Manager!");
+	}
+
+	public CRISTUserIntentTaskManager(ICRISTUserIntentPrediction cristPrediction) {
+		System.out.println("This is the testing class for CRIST Model!");
+		this.setCristPrediction(cristPrediction);
 	}
 
 	public ICRISTUserIntentPrediction getCristPrediction() {
@@ -87,11 +90,6 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		this.ctxBroker = ctxBroker;
 	}
 
-	public CRISTUserIntentTaskManager(ICRISTUserIntentPrediction CRISTPredictor) {
-		System.out.println("This is the testing class for CRIST Model!");
-		this.setCristPrediction(CRISTPredictor);
-	}
-
 	public void initialiseCRISTUserIntentManager() {
 
 		if (this.getCristPrediction() == null) {
@@ -105,8 +103,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		System.out.println("Yo!! I'm a brand new service and my interface is: "
 				+ this.getClass().getName());
 		try {
-			this.getCristPrediction().getCRISTPrediction(myID, myCtx,
-					myCallback);
+			// this.getCristPrediction().getCRISTPrediction(myID, myCtx);
 			System.out.println("CRIST Tester got the CRIST Prediction Result");
 		} catch (Exception e) {
 			System.err
@@ -164,17 +161,6 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 					historyAction.get(i), historySituation.get(i), null);
 			this.historyList.add(currentHisData);
 		}
-	}
-
-	public ICRISTUserIntentPrediction getCristPredictor() {
-		System.out
-				.println(this.getClass().getName() + " Return CRISTPredictor");
-		return getCristPrediction();
-	}
-
-	public void setCristPredictor(ICRISTUserIntentPrediction CRISTPredictor) {
-		System.out.println(this.getClass().getName() + " GOT CRISTPredictor");
-		this.setCristPrediction(CRISTPredictor);
 	}
 
 	/*
@@ -273,6 +259,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		// TODO: Identify the user's current situation based on her real-time context
 		// Retrieve the user's real-time context: How to retrieve a given user's context
 		// this.ctxBroker.retrieve();
+		
 		
 		CRISTUserSituation userSituation = new CRISTUserSituation();
 		// MOCK
