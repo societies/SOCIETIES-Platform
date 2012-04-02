@@ -41,6 +41,8 @@
 		init-method="init" >
   		<property name="groupMgr" ref="NegotiationProviderRemote"/>
         <property name="signatureMgr" ref="SignatureMgr"/>
+        <property name="secureStorage" ref="SecureStorage"/>
+        <property name="personalizationMgr" ref="PersonalizationMgr"/>
 	</bean>
 
 </beans>

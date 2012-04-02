@@ -25,14 +25,17 @@
 package org.societies.security.policynegotiator;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-
-import java.util.Random;
+import static org.mockito.Mockito.*;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
+import org.societies.api.internal.security.storage.ISecureStorage;
+import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.security.policynegotiator.requester.NegotiationRequester;
 
@@ -46,7 +49,10 @@ public class NegotiationRequesterUnitTest {
 
 	private NegotiationRequester classUnderTest;
 	private ISignatureMgr signatureMgrMock;
+	private ISecureStorage secureStorageMock;
 	private INegotiationProviderRemote groupMgrMock;
+	private IIdentityManager idMgrMock;
+	private IPersonalisationManager personalizationMgrMock;
 
 	/**
 	 * @throws java.lang.Exception
@@ -54,12 +60,23 @@ public class NegotiationRequesterUnitTest {
 	@Before
 	public void setUp() throws Exception {
 
+		// Signature manager
 		signatureMgrMock = mock(ISignatureMgr.class);
+
+		// Security comms group manager
 		groupMgrMock = mock(INegotiationProviderRemote.class);
-		//classUnderTest = new NegotiationRequester(signatureMgrMock);
+		idMgrMock = mock(IIdentityManager.class);
+		when(groupMgrMock.getIdMgr()).thenReturn(idMgrMock); 
+//		verify(groupMgrMock).getIdMgr();
+		secureStorageMock = mock(ISecureStorage.class);
+		personalizationMgrMock = mock(IPersonalisationManager.class);
+
+		// Class under test
 		classUnderTest = new NegotiationRequester();
 		classUnderTest.setGroupMgr(groupMgrMock);
 		classUnderTest.setSignatureMgr(signatureMgrMock);
+		classUnderTest.setSecureStorage(secureStorageMock);
+		classUnderTest.setPersonalizationMgr(personalizationMgrMock);
 		classUnderTest.init();
 	}
 
@@ -70,46 +87,24 @@ public class NegotiationRequesterUnitTest {
 	public void tearDown() throws Exception {
 	}
 
-	/**
-	 * Test method for {@link org.societies.security.policynegotiator.requester.NegotiationRequester#acceptUnmodifiedPolicy(int, java.lang.String)}.
-	 */
 	@Test
-	public void testAcceptUnmodifiedPolicy() {
-		//classUnderTest.acceptUnmodifiedPolicy(sessionId, selectedPolicyOptionId);
+	public void testSettersAndGetters() {
+		assertNotNull(classUnderTest.getGroupMgr());
+		assertNotNull(classUnderTest.getPersonalizationMgr());
+		assertNotNull(classUnderTest.getSecureStorage());
+		assertNotNull(classUnderTest.getSignatureMgr());
 	}
-
+	
 	/**
 	 * Test method for {@link org.societies.security.policynegotiator.requester.NegotiationRequester#reject(int)}.
 	 */
 	@Test
 	public void testReject() {
+
+		IIdentity provider = mock(IIdentity.class);
+		String serviceId = "service-386";
+		INegotiationCallback callback = mock(INegotiationCallback.class);
 		
-		Random rnd = new Random();
-		int sessionId;
-
-		// Test for a non-existing session
-		sessionId = rnd.nextInt();
-		classUnderTest.reject(sessionId);
-		
-		// Test for an existing session
-		//sessionId = ;
-		//classUnderTest.reject(sessionId);
+		classUnderTest.startNegotiation(provider, serviceId, callback);
 	}
-
-	/**
-	 * Test method for {@link org.societies.security.policynegotiator.requester.NegotiationRequester#acceptModifiedPolicy(int, java.lang.Object)}.
-	 */
-	@Test
-	public void testAcceptModifiedPolicy() {
-		//classUnderTest.acceptModifiedPolicy(sessionId, agreement);
-	}
-
-	/**
-	 * Test method for {@link org.societies.security.policynegotiator.requester.NegotiationRequester#receiveResult(java.lang.Object)}.
-	 */
-	@Test
-	public void testReceiveResult() {
-		//classUnderTest.receiveResult(returnValue);
-	}
-
 }

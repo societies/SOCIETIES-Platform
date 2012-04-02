@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
@@ -51,9 +50,7 @@ public class CommsClient implements INegotiationProviderRemote {
 	private static Logger LOG = LoggerFactory.getLogger(CommsClient.class);
 	private IIdentityManager idMgr;
 	private CommsClientCallback clientCallback;
-
-	private IIdentity toIdentity;  // TODO: remove when not needed anymore
-
+	
 //	@Autowired
 //	public CommsClient(ICommManager commManager) {
 //		
@@ -80,16 +77,10 @@ public class CommsClient implements INegotiationProviderRemote {
 		} catch (CommunicationException e) {
 			LOG.error("init(): ", e);
 		}
+
 		idMgr = commMgr.getIdManager();
 
-		if (idMgr != null) {
-			try {
-				toIdentity = idMgr.fromJid("xcmanager.societies.local");
-			} catch (InvalidFormatException e) {
-				LOG.error("init({}): ", e);
-			}
-		}
-		else {
+		if (idMgr == null) {
 			LOG.error("init({}): Could not get IdManager from ICommManager");
 		}
 
@@ -103,7 +94,6 @@ public class CommsClient implements INegotiationProviderRemote {
 		this.commMgr = commMgr;
 	}
 
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -115,7 +105,7 @@ public class CommsClient implements INegotiationProviderRemote {
 	@Override
 	@Async
 	public void acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
-			boolean modified, INegotiationProviderCallback callback) {
+			boolean modified, IIdentity toIdentity, INegotiationProviderCallback callback) {
 		
 		LOG.debug("acceptPolicyAndGetSla({}, ...)", sessionId);
 		
@@ -133,9 +123,9 @@ public class CommsClient implements INegotiationProviderRemote {
 	 */
 	@Override
 	@Async
-	public void getPolicyOptions(String serviceId, INegotiationProviderCallback callback) {
+	public void getPolicyOptions(String serviceId, IIdentity toIdentity, INegotiationProviderCallback callback) {
 		
-		LOG.debug("getPolicyOptions({})", serviceId);
+		LOG.debug("getPolicyOptions({}, {})", serviceId, toIdentity);
 		
 		sendIQ(toIdentity, MethodType.GET_POLICY_OPTIONS, serviceId, -1, null, false, callback);
 	}
@@ -148,7 +138,7 @@ public class CommsClient implements INegotiationProviderRemote {
 	 */
 	@Override
 	@Async
-	public void reject(int sessionId, INegotiationProviderCallback callback) {
+	public void reject(int sessionId, IIdentity toIdentity, INegotiationProviderCallback callback) {
 
 		LOG.debug("reject({})", sessionId);
 
@@ -199,5 +189,13 @@ public class CommsClient implements INegotiationProviderRemote {
 			clientCallback.removeCallback(stanza.getId());
 			return null;
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote#getIdMgr()
+	 */
+	@Override
+	public IIdentityManager getIdMgr() {
+		return idMgr;
 	}
 }

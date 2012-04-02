@@ -39,7 +39,6 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
-import org.societies.api.internal.security.policynegotiator.INegotiationRequester;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
 import org.societies.api.internal.schema.security.policynegotiator.ProviderBean;
 import org.societies.api.internal.schema.security.policynegotiator.ProviderBeanResult;
@@ -59,18 +58,15 @@ public class CommsServer implements IFeatureServer {
 	
 	private ICommManager commMgr;
 	private INegotiationProvider negotiationProvider;
-	private INegotiationRequester negotiationRequester;
 	
 //	@Autowired
 //	public CommsServer(ICommManager commManager,
-//			INegotiationRequester negotiationRequester,
 //			INegotiationProvider negotiationProvider) {
 //		
 //		this.commManager = commManager;
-//		this.negotiationRequester = negotiationRequester;
 //		this.negotiationProvider = negotiationProvider;
 //		
-//		LOG.info("CommsServer({})", commManager + ", " + negotiationRequester + ", " + negotiationProvider);
+//		LOG.info("CommsServer({})", commManager + ", " + negotiationProvider);
 //	}
 
 	public CommsServer() {
@@ -98,14 +94,6 @@ public class CommsServer implements IFeatureServer {
 		this.negotiationProvider = negotiationProvider;
 		//LOG.debug("setNegotiationProvider()");
 		//LOG.debug("setNegotiationProvider({})", negotiationProvider);
-	}
-	public INegotiationRequester getNegotiationRequester() {
-		return negotiationRequester;
-	}
-	public void setNegotiationRequester(INegotiationRequester negotiationRequester) {
-		this.negotiationRequester = negotiationRequester;
-		//LOG.debug("setNegotiationRequester()");
-		//LOG.debug("setNegotiationRequester({})", negotiationRequester);
 	}
 	public ICommManager getCommMgr() {
 		return commMgr;

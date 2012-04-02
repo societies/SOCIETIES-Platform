@@ -26,18 +26,25 @@ package org.societies.security.policynegotiator.requester;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
+import org.societies.api.internal.security.policynegotiator.INegotiation;
+import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
-import org.societies.api.internal.security.policynegotiator.INegotiationRequester;
+import org.societies.api.internal.security.storage.ISecureStorage;
+import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.security.digsig.ISignatureMgr;
 
 //@Component
-public class NegotiationRequester implements INegotiationRequester {
+public class NegotiationRequester implements INegotiation {
 
 	private static Logger LOG = LoggerFactory.getLogger(NegotiationRequester.class);
 	
 	private ISignatureMgr signatureMgr;
+	private ISecureStorage secureStorage;
 	private INegotiationProviderRemote groupMgr;
+	private IPersonalisationManager personalizationMgr;
 
 //	@Autowired
 //	public NegotiationRequester(ISignatureMgr signatureMgr) {
@@ -56,10 +63,18 @@ public class NegotiationRequester implements INegotiationRequester {
 
 		LOG.debug("init(): group manager = {}", groupMgr.toString());
 		
-		groupMgr.getPolicyOptions("service123", new ProviderCallback(this, MethodType.GET_POLICY_OPTIONS));
+		// TODO: remove when somebody else (Marketplace?) initiates negotiation
+		IIdentityManager idMgr = groupMgr.getIdMgr();
+		IIdentity provider = idMgr.getThisNetworkNode();
+		startNegotiation(provider, "service-123", new INegotiationCallback() {
+			@Override
+			public void onNegotiationComplete(String agreementKey) {
+				LOG.info("onNegotiationComplete({})", agreementKey);
+			}
+		});
 	}
 
-	// Getters and setters for beans
+	// Getters and setters for other OSGi services
 	public INegotiationProviderRemote getGroupMgr() {
 		return groupMgr;
 	}
@@ -72,20 +87,27 @@ public class NegotiationRequester implements INegotiationRequester {
 	public void setSignatureMgr(ISignatureMgr signatureMgr) {
 		this.signatureMgr = signatureMgr;
 	}
-
-	@Override
-	public void acceptUnmodifiedPolicy(int sessionId,
-			String selectedPolicyOptionId) {
-		// TODO Auto-generated method stub
+	public ISecureStorage getSecureStorage() {
+		return secureStorage;
+	}
+	public void setSecureStorage(ISecureStorage secureStorage) {
+		this.secureStorage = secureStorage;
+	}
+	public IPersonalisationManager getPersonalizationMgr() {
+		return personalizationMgr;
+	}
+	public void setPersonalizationMgr(IPersonalisationManager personalizationMgr) {
+		this.personalizationMgr = personalizationMgr;
 	}
 
 	@Override
-	public void reject(int sessionId) {
-		// TODO Auto-generated method stub
-	}
+	public void startNegotiation(IIdentity provider, String serviceId, INegotiationCallback callback) {
 
-	@Override
-	public void acceptModifiedPolicy(int sessionId, Object agreement) {
-		// TODO Auto-generated method stub
+		LOG.info("startNegotiation({}, {})", provider, serviceId);
+		
+		ProviderCallback providerCallback = new ProviderCallback(this, provider,
+				serviceId, MethodType.GET_POLICY_OPTIONS, callback);
+		
+		groupMgr.getPolicyOptions(serviceId, provider, providerCallback);
 	}
 }

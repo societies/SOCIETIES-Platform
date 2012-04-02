@@ -68,7 +68,13 @@ public class NegotiationProviderUnitTest {
 	@After
 	public void tearDown() throws Exception {
 	}
-	
+
+	@Test
+	public void testSettersAndGetters() {
+		assertNotNull(classUnderTest.getGroupMgr());
+		assertNotNull(classUnderTest.getSignatureMgr());
+	}
+
 	/**
 	 * Test method for {@link INegotiationProvider#acceptPolicyAndGetSla(int, String, boolean)}
 	 * @throws ExecutionException 
