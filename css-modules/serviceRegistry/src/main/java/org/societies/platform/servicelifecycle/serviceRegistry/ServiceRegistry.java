@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -43,6 +44,7 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.Ser
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceUpdateException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -537,6 +539,41 @@ public class ServiceRegistry implements IServiceRegistry {
 		}
 		return false;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry#updateRegisteredService(org.societies.api.schema.servicelifecycle.model.Service)
+	 */
+	@Override
+	public boolean updateRegisteredService(Service service)
+			throws ServiceUpdateException {
+		boolean returnedStatus=false;
+		Session session = sessionFactory.openSession();
+		Transaction t = null;
+		try {
+		 RegistryEntry retrievedRegistryEntry= (RegistryEntry)session.get(RegistryEntry.class, new ServiceResourceIdentiferDAO(service.getServiceIdentifier().getIdentifier().toString(),service.getServiceIdentifier().getServiceInstanceIdentifier()));
+	     if(retrievedRegistryEntry!=null){
+	     retrievedRegistryEntry.updateRegistryEntry(service);
+	     t=session.beginTransaction();
+	     session.update(retrievedRegistryEntry);
+	     t.commit();
+	     }
+	    returnedStatus=true;
+		} catch (HibernateException he) {
+			t.rollback();
+			log.error(he.getMessage());
+			throw new ServiceUpdateException(he);
+		}
+		catch (Exception e) {
+			log.error(e.getMessage());
+			throw new ServiceUpdateException(e);
+		}
+		finally{
+			if (session!=null){
+				session.close();
+			}
+		}
+		return returnedStatus;
+	}
 
 	/* Utility methods */
 	private List<Service> createListService(
@@ -548,5 +585,8 @@ public class ServiceRegistry implements IServiceRegistry {
 		}
 		return returnedServiceList;
 	}
+
+	
+	
 
 }

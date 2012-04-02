@@ -44,7 +44,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.api.schema.servicelifecycle.model.ServiceType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.serviceloader.ServiceListFactoryBean;
+
 import org.springframework.test.annotation.ExpectedException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
@@ -67,7 +67,11 @@ public class ServiceRegistryTest extends
 	private final String _cisTestId="CISid";
 	private final String _cisTestId1="CISid1";
 	
+	static {
+        ClassLoader.getSystemClassLoader().setDefaultAssertionStatus(true);
+    }
 
+	
 	@Test
 	@Rollback(false)
 	public void testRegisterService() {
@@ -115,10 +119,10 @@ public class ServiceRegistryTest extends
 		Service tmpServiceFilter=new Service();
 	    tmpServiceFilter.setServiceName("%");
 		List<Service> returnedList=serReg.findServices(tmpServiceFilter);
-		assert(returnedList.size()==_numberOfServiceCreated);
+		assertTrue(returnedList.size()==_numberOfServiceCreated);
 		tmpServiceFilter=servicesList.get(0);
 		returnedList=serReg.findServices(tmpServiceFilter);
-		assert(returnedList.get(0).getServiceName().equals(tmpServiceFilter.getServiceName()));
+		assertTrue(returnedList.get(0).getServiceName().equals(tmpServiceFilter.getServiceName()));
 	}
 	
 
@@ -126,9 +130,25 @@ public class ServiceRegistryTest extends
 	@Rollback(false)
 	public void changeServcieStatus() throws Exception{
 		boolean isOk=serReg.changeStatusOfService(servicesList.get(0).getServiceIdentifier(), ServiceStatus.STOPPED);
-		assert(isOk);
+		assertTrue(isOk);
 		Service service=serReg.retrieveService(servicesList.get(0).getServiceIdentifier());
-		assert(service.getServiceStatus().equals(ServiceStatus.STOPPED));
+		assertTrue(service.getServiceStatus().equals(ServiceStatus.STOPPED));
+		
+	}
+	
+	@Test
+	@Rollback(false)
+	public void updateService() throws Exception{
+		Service serviceUpdated=servicesList.get(3);
+		serviceUpdated.setAuthorSignature(null);
+		//serviceUpdated.setServiceIdentifier(null);
+		serviceUpdated.setServiceName("Updated service");
+		boolean isOk=serReg.updateRegisteredService(serviceUpdated);
+		assertTrue(isOk);
+		Service service=serReg.retrieveService(servicesList.get(3).getServiceIdentifier());
+		
+		assertTrue(service.getServiceName().equals("Updated service"));
+		
 		
 	}
 	
@@ -163,7 +183,7 @@ public class ServiceRegistryTest extends
 	@Rollback(false)
 	public void retrieveServicesSharedCSS() throws Exception{
 		List<Service> returnedServiceList=serReg.retrieveServicesSharedByCSS(servicesList.get(0).getServiceInstance().getFullJid());
-	assert(returnedServiceList.get(0).getServiceName().equals(servicesList.get(0).getServiceName()));
+		assertTrue(returnedServiceList.get(0).getServiceName().equals(servicesList.get(0).getServiceName()));
 	}
 	
 	
