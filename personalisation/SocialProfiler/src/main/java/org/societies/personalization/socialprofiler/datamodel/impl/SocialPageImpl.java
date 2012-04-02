@@ -1,14 +1,14 @@
 /**
  * 
  */
-package org.societies.personalization.socialprofiler.datamoldel.utils;
+package org.societies.personalization.socialprofiler.datamodel.impl;
 
 
 import org.neo4j.graphdb.Node;
-import org.societies.personalization.socialprofiler.datamodel.NodeProperties;
-import org.societies.personalization.socialprofiler.datamodel.PageOfInterest;
+import org.societies.personalization.socialprofiler.datamodel.SocialPage;
+import org.societies.personalization.socialprofiler.datamodel.utils.NodeProperties;
 
-public class PageOfInterestImpl implements PageOfInterest, NodeProperties {
+public class SocialPageImpl implements SocialPage, NodeProperties {
 
 	private final Node underlyingNode;
 	
@@ -18,7 +18,7 @@ public class PageOfInterestImpl implements PageOfInterest, NodeProperties {
 	 * contructor of FanPage
 	 * @param underlyingNode
 	 */
-	public PageOfInterestImpl(Node underlyingNode) {
+	public SocialPageImpl(Node underlyingNode) {
 		super();
 		this.underlyingNode = underlyingNode;
 	}

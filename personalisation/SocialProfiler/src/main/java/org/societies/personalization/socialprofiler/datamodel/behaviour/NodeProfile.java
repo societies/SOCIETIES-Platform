@@ -1,17 +1,17 @@
 package org.societies.personalization.socialprofiler.datamodel.behaviour;
 
 import org.neo4j.graphdb.Node;
-import org.societies.personalization.socialprofiler.datamodel.NodeProperties;
+import org.societies.personalization.socialprofiler.datamodel.utils.NodeProperties;
 
-public class DefaultProfile implements Profile, NodeProperties{
+public class NodeProfile implements Profile, NodeProperties{
 
 	private final Node underlyingNode;
 	private final int id;
 	
-	public DefaultProfile(Node underlyingNode) {
+	public NodeProfile(Node underlyingNode) {
 		super();
 		this.underlyingNode = underlyingNode;
-		this.id =ProfileUtils.DEFAULT_PROFILE_ID;
+		this.id = ProfileUtils.DEFAULT_PROFILE_ID;
 		underlyingNode.setProperty( NAME_PROPERTY, ProfileUtils.DEFAULT_PROFILE_NAME );
 		
 	}
@@ -27,13 +27,13 @@ public class DefaultProfile implements Profile, NodeProperties{
 
 	
 	@Override
-	public void getName(String name) {
-		underlyingNode.setProperty( NAME_PROPERTY, name );
+	public void setName(Profile.Type name) {
+		underlyingNode.setProperty( NAME_PROPERTY, (Profile.Type)name );
 	}
 	
 	@Override
-	public String getName() {
-		return (String) underlyingNode.getProperty( NAME_PROPERTY );
+	public Profile.Type getName() {
+		return (Profile.Type) underlyingNode.getProperty( NAME_PROPERTY );
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class DefaultProfile implements Profile, NodeProperties{
 	}
 
 	@Override
-	public void setNumer(int number) {
+	public void setNumber(int number) {
 		underlyingNode.setProperty(NAME_PROPERTY, number);
 	}
 

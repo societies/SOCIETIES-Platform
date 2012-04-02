@@ -6,14 +6,14 @@ package org.societies.platform.socialdata.impl;
  * OSGi integration test (inside OSGi).
  * @see AbstractConfigurableBundleCreatorTests
  */
-public class BeanOsgiIntegrationTest {
+public class SocialDataOsgiIntegrationTest {
 
 	protected String[] getConfigLocations() {
-	  return new String[] {"META-INF/spring/*.xml"};
+		return new String[] {"META-INF/spring/*.xml"};
 	}
 	
 	public void testOsgiBundleContext() {
-	 
+		
 	}
 
 }

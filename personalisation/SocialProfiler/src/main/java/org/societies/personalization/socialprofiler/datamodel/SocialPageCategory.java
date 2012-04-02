@@ -4,7 +4,7 @@
 package org.societies.personalization.socialprofiler.datamodel;
 
 
-public interface PageCategory {
+public interface SocialPageCategory {
 	
 	/**
      * returns the name of the fan page category, this is actually the page category type from facebook

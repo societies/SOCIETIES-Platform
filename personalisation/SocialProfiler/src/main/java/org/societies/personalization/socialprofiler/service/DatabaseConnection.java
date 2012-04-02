@@ -3,122 +3,248 @@
  */
 package org.societies.personalization.socialprofiler.service;
 
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.TimeZone;
 
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
 import org.jfree.data.xy.XYSeries;
+import org.societies.personalization.socialprofiler.Variables;
 
-/**
- * @author X0145160
- * this interface holds all the method for connecting to the database
- */
-public interface DatabaseConnection {
-	
-	/**
-	 * creates a connection to the mysql database and sets time zone to GMT
-	 */
-	public boolean connectMysql();
-	
-	
-	/**
-	 * closes the connection with the mysql database
-	 */
-	public void closeMysql();
 
+
+public class DatabaseConnection implements Variables {
+	private static final Logger logger = Logger.getLogger(DatabaseConnection.class);
+	private Connection connection;
 	
 	/**
-	 * add a user from neo and ca platform into the mysql database , table : users
-	 * @param current_id
-	 * 			id of the user from facebook and neo
-	 * @param ca_Name
-	 * 			id of user form ca_platform
+	 * DatabaseConnectionImpl
 	 */
-	public void addUserToDatabase(String current_id,String ca_Name);
-	
-	
-	/**
-	 * deletes a user from the mysql database if the user is deleted from neo
-	 * @param current_id
-	 * 			id of the user= facebook id
-	 */
-	public void deleteUserFromDatabase(String current_id);
-	
+	public DatabaseConnection() {}
 	
 	/**
-	 * add user data , so called moments into the database , these moments are used for reconstruction and 
-	 * and time windows when doing request
-	 * 
-	 * @param userId
-	 * 			id of user , facebook id
-	 * @param lastTime
-	 * 			last time the user interacted as a particular profile
-	 * @param number
-	 * 			number of actions as a particular user profile
-	 * @param option
-	 * 			profile type	
-	 */
-	public void sendMomentToDatabase(String userId,String lastTime, int number,int option);
-	
-	
-	/**
-	 * calculates the week number using a unix timestamp from facebook ,
-	 * week 0 starts on 1 aug 2009 00:00 GMT
-	 * note : in order to use in java , timestamp has to written in ms and not in s like in unix
-	 * @param lastTime
-	 * 			unix timestamp from facebook
-	 * @return week number
-	 */
-	public int calculateWeek(String lastTime);
-	
-	
-	/**
-	 * converts a string containing a facebook timestamp into a string format mysql timestamp in order to be inserted 
-	into mysql
-	 * @param time
-	 * 			facebook timestamp
-	 * @return string format mysql timestamp yyyy-MM-dd HH:mm:ss
-	 */
-	public String getMysqlTimeStamp(String time);
-	
-	
-	/**
-	 * returns a string format mysql timestamp equivalent of first day of the week , week 0 being 1 aug 2009 GMT , 
-	 * in order to be inserted into mysql and to permit to read the mysql database easily
-	 * @param week
+	 * returns a java.sql.Connection , the actual connection to the mysql database
 	 * @return
 	 */
-	public String getMysqlTimeStampForWeek(int week);
+	public final Connection getConnection() {
+		return connection;
+	}
 	
 	
-	/**
-	 *this function returns the total number of actions for a particular user in the past , 
-	 *using the number of week and the type of profile
-	 * @param week
-	 * 			week number , week 0= 1 aug 2009 00:00 GMT
-	 * @param profile
-	 * 			profile type
-	 * @param user_id
-	 * 			facebook id or neo id
-	 * @return 
-	 */
-	public int getNumberOfActionInPast(int week, int profile , String user_id);
+	public boolean connectMysql(){
+		java.util.TimeZone.setDefault(TimeZone.getTimeZone("GMT")); 
+		InitialContext ctx = null;
+		DataSource ds = null;
+		try {
+		
+			/*
+			ctx = new javax.naming.InitialContext();
+			ds = (DataSource)ctx.lookup("java:jdbc/social_db");
+			logger.debug("connecting Mysql database.....");
+			connection = ds.getConnection();
+			logger.debug("Connection to Mysql Database terminated succesfully");
+			*/
+			
+			  String url 	= "jdbc:mysql://localhost:3306/";
+			  String dbName = "social";
+			  String driver = "com.mysql.jdbc.Driver";
+			  String userName = "root"; 
+			  String password = "";
+			  connection = DriverManager.getConnection(url+dbName,userName,password);
+			  
+			  //connection = DriverManager.getConnection("jdbc:mysql://localhost/social?user=root&password=");
+		}
+//		catch (NamingException e) {
+//			logger.fatal("Connection to Mysql database was unsuccesful due to NamingException.");
+//			return false;
+//		} 
+		catch (SQLException e) {
+			logger.fatal("Connection to Mysql database was unsuccesful.");
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
 	
 	
-	/**
-	 * this function fills in the XYSeries with values from the Mysql Db corrsponding to a user and a profile
-	 * @param userId
-	 * 			user id
-	 * @param profile
-	 * 			user profile
-	 * @param caName
-	 * 			user id for CA platform
-	 * @param profile_name
-	 * 			profile name (conversion from int)
-	 * @param legend_option
-	 * 			specify what to contain the legend , name of the users (PROFILE dimension in title) or
-	 * 			name of the profiles , USER dimension in title
-	 * @return
-	 */
-	public XYSeries createSeries(String userId , int profile,String caName, String profile_name,int legend_option);
+	public void closeMysql(){
+		try {
+			connection.close();
+		} catch (SQLException e) {
+			logger.error("Cannot close connection to Mysql database ;  "+ e.getMessage());
+		}	
+	}
+	
+	
+	public void addUserToDatabase(String current_id,String ca_Name){
+		try {
+			logger.debug("adding user "+current_id+" : "+ca_Name+" to database");
+			Statement st = connection.createStatement();
+			st.execute("INSERT into users (facebook_id,ca_id) values ("+current_id +",'"+ca_Name+"') " +
+					"on duplicate key update ca_id='"+ca_Name+"';");
+		}catch (SQLException e) {
+			logger.error("Error while inserting user "+current_id+" : "+ca_Name+" to Mysql: "+ e.getMessage());
+		}
+	}
+	
+	
+	public void deleteUserFromDatabase(String current_id){
+		try {
+			logger.debug("deleting user "+current_id+" from database");
+			Statement st = connection.createStatement();
+			st.execute("Delete from users where facebook_id ="+current_id +";");
+		}catch (SQLException e) {
+			logger.error("error while deleting user "+current_id+" from Mysql: "+e.getMessage());
+		}
+	}
+		
+	
+	public void sendMomentToDatabase(String userId,String lastTime, int number,int option){
+		
+		int week_number=calculateWeek(lastTime);
+		try {
+			//logger.debug("adding moment for user "+userId+" profile "+option+"  week "+week_number+" to database");
+			Statement st = connection.createStatement();
+			logger.debug("insert into info (week ,starts , profile , last_time , number_actions ,user_id) values " +
+					"( "+week_number+","+option+","+lastTime+","+number+","+userId+") " +
+					"on duplicate key update last_time="+lastTime+" , number_actions="+number+" ;");
+			st.execute("insert into info (week ,starts, profile , last_time ,last_time_timestamp, number_actions ,user_id) " +
+					"values " +	"( "+week_number+", '"+getMysqlTimeStampForWeek(week_number)+"',"+option+","+lastTime+
+					",'"+getMysqlTimeStamp(lastTime)+"',"+number+","+userId+") " +
+					"on duplicate key update starts='"+getMysqlTimeStampForWeek(week_number)+"' ,last_time="+lastTime+" ,last_time_timestamp='"+getMysqlTimeStamp(lastTime)+
+					"' ,  number_actions="+number+" ;");
+			
+		}catch (SQLException e) {
+			logger.debug("error while adding moment for user "+userId+" to Mysql"+e);
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public int calculateWeek(String lastTime){
+		//1249084800=1 aug 2009 00:00:00 GMT
+		long date_start=1249084800L;
+		long date_lastTime=Long.parseLong(lastTime);
+		long difference= date_lastTime-date_start;
+		//1 week=7 x 24 x 60 x 60=604800
+		int week_time=604800;
+		int week_number=(int) (difference/week_time);
+		//logger.debug("date last time "+date_lastTime+" difference "+difference+" week "+week_number);
+		return week_number;
+	}
+	
+	 	
+	public String getMysqlTimeStamp(String time){
+		long t=Long.parseLong(time)*1000;
+		Date time1 = new Date(t);
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		df.setTimeZone(TimeZone.getTimeZone("GMT"));
+		String mysql_time = df.format(time1);	
+		return mysql_time;
+	}
+	
+		
+	public String getMysqlTimeStampForWeek(int week){
+		long date_start=1249084800L;
+		long week_time=604800L;
+		long date =date_start+week*week_time;
+		Date time = new Date(date*1000);
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		df.setTimeZone(TimeZone.getTimeZone("GMT"));
+		String mysql_time = df.format(time);	
+		return mysql_time;
+	}
+	
+	
+	public int getNumberOfActionInPast(int week, int profile , String user_id){
+		int number_actions=0;
+		try {
+			Statement st = connection.createStatement();
+			boolean continue_quering=true;
+			while (continue_quering==true&&week>=0){
+				
+				ResultSet result=st.executeQuery("select number_actions from info where week="+week+" " +
+						"and profile="+profile+" and user_id="+user_id+" ;");
+				if (result.next()){
+					String number=result.getString("number_actions");
+					if (number!=null){
+						number_actions=Integer.parseInt(number);
+						continue_quering=false;	
+						//logger.debug("number is"+number);
+					}
+				}
+				week--;
+			}
+		}catch (SQLException e) {
+			logger.debug("error while retrieving number_actions for user "+user_id+" " +
+					"profile="+profile+" week="+week+" from Mysql"+e);
+			e.printStackTrace();
+		}
+		return number_actions;
+	}
+	
+	
+	public XYSeries createSeries(String userId , int profile,String caName, String profile_name,int legend_option){
+		XYSeries series = null;
+		if (legend_option==USER_DIMENSION){
+			series=new XYSeries(profile_name+" Profile ");
+		}else {     //PROFILE_DIMENSION
+			series=new XYSeries("User "+caName+"("+userId+")");
+		}
+		java.util.Date today = new java.util.Date();//current date
+	    java.sql.Timestamp timestamp=new java.sql.Timestamp(today.getTime());
+	    long current_time = timestamp.getTime()/1000;
+	    int current_week=calculateWeek(String.valueOf(current_time));
+	    int week=0,aux=0,aux_number=0; 
+	    if (caName.equals("user_not_found_on_CA")){
+	    	logger.error("error while trying to generate profile evolution for user "+
+	    			userId+" reason: user was not found on CA platform");
+	    	return series;
+	    }
+	    try {
+	    	Statement st = connection.createStatement();
+	    	while ((week)<=current_week){   //adding procedure
+	    		ResultSet result=st.executeQuery("select number_actions from info where week="+week+" " +
+						"and profile="+profile+" and user_id="+userId+" ;");
+				if (result.next()){
+					String number=result.getString("number_actions");
+					if (number!=null){
+						int number_actions=Integer.parseInt(number);
+						if (week-aux>1){                 //there is at least an empty week between
+							for (int j=aux+1;j<week;j++){
+								series.add(j-current_week,0);
+								//logger.debug("XY point week "+j+" number 0");
+							}
+						}
+						int delta_actions = number_actions-aux_number;
+						series.add(week-current_week,delta_actions);
+//						series.add(week-current_week,number_actions);
+						logger.warn("[lukostaz] added number_actions=" + number_actions + " - aux_number=" + aux_number + "=number_actions= " + delta_actions); 
+						//logger.debug("XY point week "+(week-current_week)+" number "+(number_actions-aux_number)+" aux "+aux);
+						aux=week;
+						aux_number=number_actions;
+					}
+				}
+				week++;
+	    	}
+	    	//series.add(current_week, 0);
+	    }catch (SQLException e) {
+			logger.debug("error (create_Series) while retrieving number_actions for user "+userId+" " +
+					"profile="+profile+" week="+current_week+" from Mysql"+e);
+			e.printStackTrace();
+		}
+	    return series;
+	}
 	
 	
 	/************************************************************************************/
@@ -126,32 +252,35 @@ public interface DatabaseConnection {
 	/************************************************************************************/
 	
 	
-	/**
-	 * this functions returns ths sum of a number of interactions for a group of users passed through an array,
-	 * for a particular week and profile; the result will be used to generate charts for group evolutions
-	 * @param valid_group
-	 * 			array containing a list with users ; all the users have to be valid , or this array checked before
-	 * @param week
-	 * 			number of the week
-	 * @param profile
-	 * 			type of profile
-	 * @return sum
-	 */
-	public int getSumForGroup(ArrayList<String> valid_group ,int week , int profile);
-
+	public int getSumForGroup(ArrayList<String> valid_group ,int week , int profile){
+		int sum=0;
+		for(int i=0;i<valid_group.size();i++){
+			sum+=getNumberOfActionInPast(week, profile, valid_group.get(i));
+		}
+		return sum;
+	}
 	
-	/**
-	 * this functions creates an XYSeries with the profile of a group 
-	 * @param group
-	 * 			array containing a list with users;NOTE: all users in this array have to be valid or the array 
-	 * 			ckecked and corrected before
-	 * @param profile
-	 * 			type of profile
-	 * @param profile_name
-	 * 			name of profile or DNS translation for type
-	 * @return XYSeries wich will be used to generate the chart
-	 */
-	public XYSeries createSeriesForGroupProfile( ArrayList<String>group ,int profile, String profile_name);
+	
+	public XYSeries createSeriesForGroupProfile( ArrayList<String>group ,int profile, String profile_name){
+		XYSeries series = new XYSeries(profile_name+" Profile ");
+		
+		//current week
+		java.util.Date today = new java.util.Date();
+	    java.sql.Timestamp timestamp=new java.sql.Timestamp(today.getTime());
+	    long current_time = timestamp.getTime()/1000;
+	    int current_week=calculateWeek(String.valueOf(current_time));
+		
+		//add points to series
+		int aux=getSumForGroup(group, 0, profile);
+		series.add(0-current_week,aux);
+		for (int j=1;j<=current_week;j++){
+			int value=getSumForGroup(group, j, profile);
+			series.add(j-current_week,value-aux);
+			aux=value;
+		}
+		
+	    return series;
+	}
 	
 	
 	/************************************************************************************/
@@ -159,84 +288,205 @@ public interface DatabaseConnection {
 	/************************************************************************************/
 	
 	
-	/**
-	 * this function returns the last week which was introduced in the mysql table total_info, in other words , the week 
-	 * from the last time the user made an update on the engine and network
-	 *
-	 * @return number of the last week
-	 */
-	public int getLastWeekForCommunity();
+	public int getLastWeekForCommunity(){
+		int lastWeek=0;
+		try {
+			Statement st = connection.createStatement();
+			ResultSet result=st.executeQuery("select week from total_info order by week desc;");
+			if (result.next()){
+				String number=result.getString("week");
+				if (number!=null){
+						lastWeek=Integer.parseInt(number);
+						logger.debug("number is "+lastWeek);
+				}
+			}
+				
+			
+		}catch (SQLException e) {
+			logger.debug("error while selecting last week from total info. Reason: "+e);
+			e.printStackTrace();
+		}
+		return lastWeek;
+	}
 	
 	
-	/**
-	 * this returns the sum of all interactions of the community , in other words the whole AUP platform
-	 * @param week
-	 * 			number of the week
-	 * @param profile
-	 * 			type of profile
-	 * @return sum of interactions
-	 * 	
-	 */
-	public int getSumForCommunity(int week , int profile);
+	public int getSumForCommunity(int week , int profile){
+		int sum=0;
+		try {
+			Statement st = connection.createStatement();
+			ResultSet result=st.executeQuery("select facebook_id from users ;");
+			while (result.next()){
+				String userId=result.getString("facebook_id");
+				if (userId!=null){
+					//logger.debug("userId is"+userId);
+					sum+=getNumberOfActionInPast(week, profile, userId);
+				}
+			}
+		}catch (SQLException e) {
+			logger.debug("error while sum of number_actions for "+
+					"profile="+profile+"and  week="+week+" from Mysql"+e);
+			e.printStackTrace();
+		}
+		return sum;
+	}
 	
 	
-	/**
-	 * add a result , or a sum of interactions for the community into the mysql , Total_info table , result 
-	 * corresponding to a particular week and profile
-	 * @param week
-	 * 			number of week
-	 * @param profile
-	 * 			type of profile
-	 * @param sum 
-	 * 			total number of interactions for the community
-	 */
-	public void addSumforWeekAndProfile(int week,int profile,int sum);
+	public void addSumforWeekAndProfile(int week,int profile,int sum){
+		try {
+			logger.debug("adding SUM "+sum+" : week "+week+" profile "+profile+" to database");
+			Statement st = connection.createStatement();
+			st.execute("INSERT into total_info (week,profile,number_actions) values ("+week +","+profile+","+sum+") " +
+					"on duplicate key update number_actions="+sum+";");
+		}catch (SQLException e) {
+			logger.debug("error while adding sum into total info for week "+week+" , profile "+profile+" Reason: "+e);
+			e.printStackTrace();
+		}
+	}
 	
 	
-	/**
-	 * this functions adds the total number of interactions of the community for each available profile
-	 * @param week
-	 */
-	public void addSumsToTotalInfo(int week);
+	public void addSumsToTotalInfo(int week){
+		addSumforWeekAndProfile(week, NARCISSISM_PROFILE, getSumForCommunity(week, NARCISSISM_PROFILE));
+		addSumforWeekAndProfile(week, PHOTO_PROFILE, getSumForCommunity(week, PHOTO_PROFILE));
+		addSumforWeekAndProfile(week, SUPERACTIVE_PROFILE, getSumForCommunity(week, SUPERACTIVE_PROFILE));
+		addSumforWeekAndProfile(week, QUIZ_PROFILE, getSumForCommunity(week, QUIZ_PROFILE));
+		addSumforWeekAndProfile(week, SURF_PROFILE, getSumForCommunity(week, SURF_PROFILE));
+	}
+		
+	
+	public void addInfoForCommunityProfile(){
+		logger.debug("updating global community info");
+		java.util.Date today = new java.util.Date();
+	    java.sql.Timestamp timestamp=new java.sql.Timestamp(today.getTime()); //FIXME: minor: il fuso orario e' sbagliato.
+	    long current_time = timestamp.getTime()/1000;
+	    int current_week=calculateWeek(String.valueOf(current_time));
+		logger.debug("current week is "+current_week+" :"+timestamp);//current date and week
+		
+		int lastWeek=getLastWeekForCommunity(); //last week on total info
+		for (int i=lastWeek;i<=current_week;i++){
+			addSumsToTotalInfo(i);
+		}
+	}
 	
 	
-	/**
-	 * this is the function that is called by the engine when updating; it actually updates the total_info table with the 
-	 * latest information
-	 */
-	public void addInfoForCommunityProfile();
-
+	public XYSeries createSeriesForCommunityProfile( int profile, String profile_name){
+		XYSeries series = new XYSeries(profile_name+" Profile ");
+		//current week
+		java.util.Date today = new java.util.Date();
+	    java.sql.Timestamp timestamp=new java.sql.Timestamp(today.getTime());
+	    long current_time = timestamp.getTime()/1000;
+	    int current_week=calculateWeek(String.valueOf(current_time));
+		
+		int lastWeek=getLastWeekForCommunity(); //last week on total info
+	    int week=0,aux_number=0; 
+	    try {
+	    	Statement st = connection.createStatement();
+	    	while ((week)<=lastWeek){   //adding procedure
+	    		ResultSet result=st.executeQuery("select number_actions from total_info where week="+week+" " +
+						"and profile="+profile+";");
+				if (result.next()){
+					String number=result.getString("number_actions");
+					if (number!=null){
+						int number_actions=Integer.parseInt(number);
+						series.add(week-current_week,number_actions-aux_number);
+						//logger.debug("XY point week "+week+" number "+(number_actions-aux_number));
+						aux_number=number_actions;
+					}
+				}
+				week++;
+	    	}
+	    }catch (SQLException e) {
+			logger.debug("error (create_XSeries) while retrieving number_actions for " +
+					"profile="+profile+" week="+week+" from Mysql"+e);
+			e.printStackTrace();
+		}
+	    return series;
+	}
 	
-	/**
-	 * creates and returns an XY series for the whole community and for a particular given profile
-	 * @param profile
-	 * 			type of profile
-	 * @param profile_name
-	 * 			name of profile
-	 * @return
-	 */
-	public XYSeries createSeriesForCommunityProfile( int profile, String profile_name);
+	
+	@Deprecated
+	public int getLastBlogWeekForUser(String userId){
+		int lastWeek=-1;
+		try {
+			Statement st = connection.createStatement();
+			ResultSet result=st.executeQuery("select week from blog_info where user_id='"+userId+"' order by week desc;");
+			if (result.next()){
+				String number=result.getString("week");
+				if (number!=null){
+						lastWeek=Integer.parseInt(number);
+						logger.debug("number is"+lastWeek);
+				}
+			}
+		}catch (SQLException e) {
+			logger.debug("error while selecting last week from blog info. Reason :"+e);
+			e.printStackTrace();
+		}
+		return lastWeek;
+		
+	}
+	
+	//replace into code with this function - avoid redondancy
+	public int getCurrentWeek(){
+		java.util.Date today = new java.util.Date();
+	    java.sql.Timestamp timestamp=new java.sql.Timestamp(today.getTime());
+	    long current_time = timestamp.getTime()/1000;
+	    int current_week=calculateWeek(String.valueOf(current_time));
+		logger.debug("current week is "+current_week+" :"+timestamp);//current date and week
+		return current_week; 
+	}
+	
+	@Deprecated
+	public void insertBlogWeekForUser(String userId , String week){
+		try {
+			logger.debug("adding blog week  "+week+" for user "+userId+" to table blog_info");
+			Statement st = connection.createStatement();
+			st.execute("INSERT into blog_info (week,user_id) values ("+week +","+userId+") ;");
+		}catch (SQLException e) {
+			logger.debug("error while inserting blog week "+week+" for user "+userId+" into blog_info"+e);
+			e.printStackTrace();
+		}
+	}
 	
 	
-	/**
-	 * returns the current week
-	 * @return
-	 */
-	public int getCurrentWeek();
-
+	public int getNumberOfInteractionForWeek(int week, int profile , String userId){
+		int result=-1;
+		result=getNumberOfActionInPast(week, profile, userId)-getNumberOfActionInPast(week-1, profile, userId);
+		if (result<0){
+			logger.fatal("somehting is wrong : info from past superior than info from present");
+		}
+		return result;
+	}
 	
-	/**
-	 * returns the number of interactions from a user for a  particular profile and a week
-	 * @param week
-	 * 			number of week
-	 * @param profile
-	 * 			type of profile	
-	 * @param userId
-	 * 			user id=facebook id
-	 * @return
-	 */
-	public int getNumberOfInteractionForWeek(int week, int profile , String userId);
-
 	
+	public int getLastBlogWeek(){
+		int lastWeek=-1;
+		try {
+			Statement st = connection.createStatement();
+			ResultSet result=st.executeQuery("select week from blog order by week desc;");
+			if (result.next()){
+				String number=result.getString("week");
+				if (number!=null){
+						lastWeek=Integer.parseInt(number);
+						logger.debug("number is"+lastWeek);
+				}
+			}
+		}catch (SQLException e) {
+			logger.debug("error while selecting last week from blog . Reason :"+e);
+			e.printStackTrace();
+		}
+		return lastWeek;
+		
+	}
+	
+	
+	public void insertBlogWeek( int week){
+		try {
+			logger.debug("adding blog week  "+week+" to table blog");
+			Statement st = connection.createStatement();
+			st.execute("INSERT into blog (week) values ("+week +") ;");
+		}catch (SQLException e) {
+			logger.debug("error while inserting blog week "+week+" "+e);
+			e.printStackTrace();
+		}
+	}	
 	
 }

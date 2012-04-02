@@ -32,10 +32,10 @@ import org.neo4j.graphdb.ReturnableEvaluator;
 import org.neo4j.graphdb.StopEvaluator;
 import org.neo4j.graphdb.TraversalPosition;
 import org.neo4j.graphdb.Traverser;
-import org.societies.personalization.socialprofiler.datamodel.NodeProperties;
 import org.societies.personalization.socialprofiler.datamodel.SocialPerson;
 import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile;
 import org.societies.personalization.socialprofiler.datamodel.behaviour.RelTypes;
+import org.societies.personalization.socialprofiler.datamodel.utils.NodeProperties;
 
 
 

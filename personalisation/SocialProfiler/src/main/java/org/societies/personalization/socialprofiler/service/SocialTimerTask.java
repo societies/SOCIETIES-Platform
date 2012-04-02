@@ -6,12 +6,13 @@ import org.apache.log4j.Logger;
 
 public class SocialTimerTask extends TimerTask {
 
-	private static final Logger logger = Logger.getLogger(SocialTimerTask.class);
-	private DatabaseConnectionImpl databaseConnection;
-	private EngineImpl engine;
+	private static final Logger 		logger = Logger.getLogger(SocialTimerTask.class);
+	private DatabaseConnection		databaseConnection;
+	private ProfilerEngine				engine;
 	
 
-	public SocialTimerTask(EngineImpl engine,DatabaseConnectionImpl databaseConnection) {
+	public SocialTimerTask(ProfilerEngine engine, DatabaseConnection databaseConnection) {
+		
 		super();
 		this.engine = engine;
 		this.databaseConnection = databaseConnection;
@@ -20,7 +21,7 @@ public class SocialTimerTask extends TimerTask {
 
 	@Override
 	public void run() {
-		logger.info("Starting full network update...");
+			logger.info("Starting full network update...");
 		   if (!databaseConnection.connectMysql()){
 			   logger.error("Cannot update network due to database connection problems.");
 			   return;
@@ -33,9 +34,9 @@ public class SocialTimerTask extends TimerTask {
 	}
 	
 	
-	public void updateNetwork() {
-   			String option= "200";
-	   		//engine.UpdateNetwork(Integer.parseInt(option));
+	private void updateNetwork() {
+			logger.info("Update Network ....");
+	   		engine.UpdateNetwork(200);
 //	   		engine.generateUniformProfilePercentagesUsingBayesianSistem(); // this creates a bayesian system overall
 //	   		engine.updateCentralityParameters();
 	}

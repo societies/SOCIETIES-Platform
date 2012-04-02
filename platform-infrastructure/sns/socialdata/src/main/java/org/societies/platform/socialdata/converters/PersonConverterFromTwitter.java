@@ -110,7 +110,7 @@ public class PersonConverterFromTwitter implements PersonConverter {
 		return address;
 	}
 	
-	private Object getData(String key){
+	public Object getData(String key){
 		try {
 			if (db.has(key)){
 				return db.get(key);
@@ -122,7 +122,7 @@ public class PersonConverterFromTwitter implements PersonConverter {
 
 	}
 	
-	private String getString(String key){
+	public String getString(String key){
 		try {
 			if (db.has(key)){
 				return db.getString(key);
@@ -132,6 +132,10 @@ public class PersonConverterFromTwitter implements PersonConverter {
 		}
 		return "";
 
+	}
+	
+	public String getRawData(){
+		return rawData;
 	}
 
 }

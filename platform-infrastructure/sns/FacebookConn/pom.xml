@@ -44,22 +44,20 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
+		<!-- 
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20090211</version>
-			<scope>compile</scope>
+			<scope>provided</scope>
 			
 		</dependency>
-	    
+	     -->
 	  
 		<dependency>
 			<groupId>com.restfb</groupId>
 			<artifactId>restfb</artifactId>
 			<version>1.6.9</version>
-			<scope>compile</scope>
-			
 		</dependency>
  
 	</dependencies>
@@ -73,15 +71,11 @@
 				<configuration>
 				
     				<instructions>	
-    					<Import-Package>
-    						org.json*;version="20090211",
-    						com.restfb*;version="1.6.9",
-    						*;resolution:=optional
-    					</Import-Package>
+    					
     					<Export-Package>
-							org.societies.api.internal.sns*;
+    					   org.societies.api.internal.sns*;
 		           		</Export-Package>
-		           		<Embed-Dependency>*;scope=compile</Embed-Dependency>
+		           		<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
 		         	</instructions>
 		          

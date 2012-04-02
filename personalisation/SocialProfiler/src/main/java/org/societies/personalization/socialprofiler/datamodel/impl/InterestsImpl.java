@@ -2,7 +2,7 @@ package org.societies.personalization.socialprofiler.datamodel.impl;
 
 import org.neo4j.graphdb.Node;
 import org.societies.personalization.socialprofiler.datamodel.Interests;
-import org.societies.personalization.socialprofiler.datamodel.NodeProperties;
+import org.societies.personalization.socialprofiler.datamodel.utils.NodeProperties;
 
 public class InterestsImpl implements Interests,NodeProperties {
 

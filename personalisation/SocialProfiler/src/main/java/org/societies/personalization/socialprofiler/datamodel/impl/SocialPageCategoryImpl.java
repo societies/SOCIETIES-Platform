@@ -5,11 +5,11 @@ package org.societies.personalization.socialprofiler.datamodel.impl;
 
 
 import org.neo4j.graphdb.Node;
-import org.societies.personalization.socialprofiler.datamodel.NodeProperties;
-import org.societies.personalization.socialprofiler.datamodel.PageCategory;
+import org.societies.personalization.socialprofiler.datamodel.SocialPageCategory;
+import org.societies.personalization.socialprofiler.datamodel.utils.NodeProperties;
 
 
-public class PageCategoryImpl implements PageCategory, NodeProperties {
+public class SocialPageCategoryImpl implements SocialPageCategory, NodeProperties {
 
 	private final Node underlyingNode;
 	
@@ -19,7 +19,7 @@ public class PageCategoryImpl implements PageCategory, NodeProperties {
 	 * contructor of FanPagecategory
 	 * @param underlyingNode
 	 */
-	public PageCategoryImpl(Node underlyingNode) {
+	public SocialPageCategoryImpl(Node underlyingNode) {
 		super();
 		this.underlyingNode = underlyingNode;
 	}

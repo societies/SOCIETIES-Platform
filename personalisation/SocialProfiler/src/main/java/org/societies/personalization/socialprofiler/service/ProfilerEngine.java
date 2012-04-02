@@ -26,55 +26,71 @@ package org.societies.personalization.socialprofiler.service;
 
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
-import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.societies.api.internal.sns.ISocialData;
 import org.societies.personalization.socialprofiler.Variables;
+import org.societies.personalization.socialprofiler.datamodel.SocialGroup;
 import org.societies.personalization.socialprofiler.datamodel.SocialPerson;
-import org.societies.personalization.socialprofiler.datamodel.behaviour.RelTypes;
+import org.societies.personalization.socialprofiler.datamodel.impl.RelTypes;
 import org.societies.personalization.socialprofiler.datamodel.impl.SocialPersonImpl;
 import org.societies.personalization.socialprofiler.exception.NeoException;
 
+import sun.misc.Perf.GetPerfAction;
 
-public class EngineImpl implements Engine, Variables{
 
-	private static final Logger 			logger 							= Logger.getLogger(EngineImpl.class);
-	private ServiceImpl 					service;
-	private DatabaseConnectionImpl 			databaseConnection;
 
-	private List<Person> 			friends;
-	private List<Person> 			profiles;
-	private List<Group>	 			groups;
-	private List<ActivityEntry> 	activities;
+
+
+public class ProfilerEngine implements Variables{
+
+	private static final Logger 			logger 							= Logger.getLogger(ProfilerEngine.class);
+	private GraphManager					graph;
+	private DatabaseConnection 				databaseConnection;
+	private ISocialData						socialData;
+	
+	private List<?> 			friends;
+	private List<?> 			profiles;
+	private List<?>	 			groups;
+	private List<?> 			activities;
 	
 	
 	private Hashtable<String, ArrayList<String>>  credentials_sn			= new Hashtable<String, ArrayList<String>> ();
 	private Hashtable<String, ArrayList<String>>  credentials_sn_auxiliary	= new Hashtable<String, ArrayList<String>> ();
 	
-	public EngineImpl(ServiceImpl service, DatabaseConnectionImpl databaseConnection){
 	
-		this.service 				= service;
+	public ProfilerEngine(GraphManager graph, DatabaseConnection databaseConnection, ISocialData socialData){
+	
+		this.graph 					= graph;
 		this.databaseConnection 	= databaseConnection;
+		this.socialData				= socialData;
+		
 	}
 	
 	
+	public ISocialData getSocialData(){
+		return this.socialData;
+	}
+
+	public void setSocialData(ISocialData socialData){
+		this.socialData = socialData;
+	}
 	
 	
 	/**
 	 * returns the service given as parameter to the constructor
 	 * @return ServiceImpl
 	 */
-	 public ServiceImpl getService() {
-		return service;
+	 public GraphManager getService() {
+		return graph;
 	}
 
 	
@@ -82,11 +98,11 @@ public class EngineImpl implements Engine, Variables{
 	 * returns the databaseConnection given as parameter to the constructor
 	 * @return
 	 */
-	public final DatabaseConnectionImpl getDatabaseConnection() {
+	public final DatabaseConnection getDatabaseConnection() {
 		return databaseConnection;
 	}
 	
-	public void setDatabaseConnection(DatabaseConnectionImpl databaseConnection) {
+	public void setDatabaseConnection(DatabaseConnection databaseConnection) {
 		this.databaseConnection = databaseConnection;
 	}
 	
@@ -98,11 +114,14 @@ public class EngineImpl implements Engine, Variables{
 	 * done if option 2 , the function generates if necessary but 
 	 * also updates
 	 */
-	public void UpdateNetwork(ISocialData socialData, int option){
+	public void UpdateNetwork(int option){
 	
-
-		logger.debug("UPDATING NETWORK , all new users will be added to network");
-		logger.debug("updating or removing if necessary the existing users"); 
+		logger.debug("=============================================================");
+		logger.debug("====           SOCIAL PROFILER UPDATE                   =====");
+		logger.debug("=============================================================");
+		logger.debug("=== UPDATING NETWORK , all new users will be added to network");
+		logger.debug("=== updating or removing if necessary the existing users     "); 
+		logger.debug("=============================================================");
 		
 		socialData.updateSocialData();
 		// Update data source
@@ -111,58 +130,51 @@ public class EngineImpl implements Engine, Variables{
 		groups 	 	= socialData.getSocialGroups();
 		activities	= socialData.getSocialActivity();
 		
-		ArrayList<String> list_usersIds =null;
+	
+		logger.debug("=============================================================");
+		logger.debug("=== Traversing NEO GRAPH     "); 
+		logger.debug("=============================================================");
+		
+		// ANALIZZO ESISTENTI
+		ArrayList<String> list_usersIds = new ArrayList<String>();  // empty LIST
 		
 		try {
-			list_usersIds = service.getGraphNodesIds(service.getAllGraphNodes());
+			list_usersIds = graph.getGraphNodesIds(graph.getAllGraphNodes());
 		} 
 		catch (NeoException e) {
 			logger.error("Cannot get graph nodes IDs: " + e.getMessage());
 			return;
 		}
 		
+		// If the Graph Node contains at least one node ....
 		if (list_usersIds.size()>0){
 			
 			for (int i=0;i<list_usersIds.size();i++){
 				if (list_usersIds.get(i)!=null){
-					generate_tree(list_usersIds.get(i), null, option);
+					generateTree(list_usersIds.get(i), null, option);
 				}
 			}
 		}
+		else generateTree("myself", null, FIRST_TIME);
 		
-		logger.info("UPDATE -> adding new users to neo network");
-		Enumeration <ArrayList <String>> enumeration=credentials_sn.elements();
 		
-		while (enumeration.hasMoreElements()){
-			ArrayList <String> element=enumeration.nextElement();
-			String userId=element.get(3);
-			logger.info("add a new user "+userId);
-			generate_tree(userId,null, FIRST_TIME);
-		}	
 		
 		databaseConnection.addInfoForCommunityProfile();
+		logger.debug("=============================================================");
+		logger.debug("====      SOCIAL PROFILER COMPLETED UPDATE              =====");
+		logger.debug("=============================================================");
 	}
 	
 	
-	
-	
-
-
-
-	
-
-
-
-
 	/**
-	 * 
+	 * Add a new User
 	 * @param p
 	 */
 	public void linkToRoot(SocialPerson p){
-		Transaction tx = service.getNeoService().beginTx();
+		Transaction tx = graph.getNeoService().beginTx();
 		try{
 			Node startPersonNode	=  ((SocialPersonImpl) p).getUnderlyingNode();
-			Node rootNode			=  ((SocialPersonImpl)service.getPerson("ROOT")).getUnderlyingNode();
+			Node rootNode			=  ((SocialPersonImpl)graph.getPerson("ROOT")).getUnderlyingNode();
 			
 			startPersonNode.createRelationshipTo(rootNode, RelTypes.TRAVERSER);
 			tx.success();
@@ -173,47 +185,38 @@ public class EngineImpl implements Engine, Variables{
 	}
 	
 	
-	public void generate_tree(String current_id, String previous_id, int option) {
+	
+	
+	public void generateTree(String current_id, String previous_id, int option) {
 		
 		
 		
-		logger.debug("**********************************************************************");
-		logger.debug("GENERATING TREE ->> current_id : "+current_id+" previous_id: "+previous_id+" opt:"+option);
-		logger.debug("**********************************************************************");
+		logger.debug("=============================================================");
+		logger.debug("==== 					GENERATING TREE 					===");
+		logger.debug("=============================================================");
+		logger.debug("->> current_id : "+current_id+" previous_id: "+previous_id+" opt:"+option);
+		logger.debug("=============================================================");
+
 		
-		logger.debug("----checking if current user "+current_id+" exists on neo network");
+		logger.debug("--- checking if current user "+current_id+" exists on neo network");
 		
-		SocialPerson currentPerson=service.getPerson(current_id);
+		SocialPerson currentPerson=graph.getPerson(current_id);
 		
 		if (currentPerson==null){
 			
 			logger.debug("----the current user "+current_id+" doesn't exist on Neo network");
 			logger.debug("--checking if current user "+current_id+" exists on CA platform");
 			
-			boolean answer = true;//serviceXml.checkIfUserExists(credentials_sn, "facebook", current_id);
-			
-			if (answer==true)
-			{
-				
-				//
-
-
-				List<SocialPerson> list=  new ArrayList<SocialPerson>();//socialdata.getSocialPeople();   //serviceXml.friendsGetFacebook(client);
+				    
+					// friends List but not used any more!
+					//List<SocialPerson> list= new ArrayList(getSocialData().getSocialPeople());   //serviceXml.friendsGetFacebook(client);
 				
 			
-				if (list.size()==0) {
-					logger.debug("the credentials of user "+current_id+" don't function : Reason : possible invalid session keys");
-					logger.debug("REMOVING USER "+current_id);
-					credentials_sn.remove(current_id);
-				}
-				else{
 					logger.debug("the credentials of user "+current_id+" function properly");
 					logger.debug("-->creating user "+current_id+" on Neo network");
-					SocialPerson startPerson=service.createPerson(current_id);
-					//String ca_Name=serviceXml.getCANameFromCredentials(credentials_sn_auxiliary, current_id);
+					SocialPerson startPerson=graph.createPerson(current_id);
 					
-//					service.setPersonCAName(current_id,ca_Name );
-//					databaseConnection.addUserToDatabase(current_id, ca_Name);
+					databaseConnection.addUserToDatabase(current_id, startPerson.getName());
 					
 					logger.debug("REMOVING USER "+current_id);
 					credentials_sn.remove(current_id);
@@ -231,22 +234,28 @@ public class EngineImpl implements Engine, Variables{
 					}
 					else{
 						String nameDescription=current_id+previous_id;
-						SocialPerson endPerson=service.getPerson(previous_id);
+						SocialPerson endPerson=graph.getPerson(previous_id);
 						logger.debug("---# Trying to create relationship between "+current_id+" and "+previous_id+" with name "+nameDescription);
-						service.createDescription(startPerson, endPerson, current_id,previous_id);
+						graph.createDescription(startPerson, endPerson, current_id, previous_id);
 					}
 					
 					
 					
-					/**
-					createGroupsAndCategories(current_id, startPerson, client);			 	
-					createFanPagesAndCategories(current_id, startPerson, client);    
+					// ADD GROUP for the USER	
+					createGroupsAndCategories(current_id, startPerson, (List<Group>)groups);			 	
+					
+					// TODO: actually is not used
+					//     createFanPagesAndCategories(current_id, startPerson, client);    
+					
+					// Update USER INTERESTs
 					initialiseUserInformation(current_id, startPerson);
-					generateUserInformation(current_id, client);
-					initialiseUserProfiles(current_id, startPerson);
-					**/					
+					
+					generateUserInformation(current_id, (List<Person>)profiles);
+					
+					initialiseUserProfiles(current_id, (List<Person>)profiles);
 					
 					
+					//// SET WINDOW TIME to get the last Activities
 					
 					
 					//current time- 1 week				
@@ -260,39 +269,34 @@ public class EngineImpl implements Engine, Variables{
 					long end_date1=end_date*1000;
 					Date d_end = new Date(end_date1);
 					
-					//generateInitialProfileContent(current_id, client, d_end); 		//till one week before , then update
+					///// ANALIZZARE LE ACTIVITIES
+					//generateInitialProfileContent(current_id, activities, d_end); 		//till one week before , then update
 										
-					for(int i=0;i<list.size();i++){
-						String friend="";//list.get(i);
+					for(int i=0;i<friends.size();i++){
+						
+						String friend= ((Person)friends.get(i)).getId();
 						if (friend==null){  
 							logger.warn("retrieved a null friends");
 						}else{
 							logger.debug("friend id "+ friend);
 						}
-						generate_tree(friend, current_id,option);
+						generateTree(friend, current_id, option);
 					}
-				}	
-			}
-			else{
-				logger.debug("--current user"+current_id+" not found on CA platform-->nothing is to be done--end of this sub-branch");
-			}
+					
 		}
 		else{
 		
 			logger.debug("---current user "+current_id+" exists on Neo network");
 			if (option==FIRST_TIME){
-				SocialPerson startPerson=service.getPerson(current_id);
-//				FacebookXmlRestClient client=serviceXml.getFacebookClient(credentials_sn_auxiliary,current_id);
+				SocialPerson startPerson=graph.getPerson(current_id);
 				
-//				if (client ==null){
-//					logger.error("Tree generation aborted. User " + current_id + " Facebook client is null.");
-//					return;
-//				}
+				
+				
 				if (previous_id==null){
 					logger.debug("previous user is null=> nothing to check - end of this sub-branch");
 				}else{
 					logger.debug("####checking if there is a relationship between current "+current_id+" and previous"+previous_id);
-					SocialPerson endPerson=service.getPerson(previous_id);
+					SocialPerson endPerson=graph.getPerson(previous_id);
 					
 					boolean exists= false;  //service.existsRelationship(startPerson, endPerson);
 					
@@ -312,7 +316,7 @@ public class EngineImpl implements Engine, Variables{
 							logger.debug("a relationship is necessary and will be created");
 							String nameDescription=current_id+previous_id;
 							logger.debug("---Creating relationship between "+current_id+" and "+previous_id+" with name "+nameDescription);
-//							service.createDescription(startPerson, endPerson, current_id,previous_id);	
+							graph.createDescription(startPerson, endPerson, current_id, previous_id);	
 							
 						}else{
 							logger.debug("NO relationship is necessary - end of check");
@@ -322,7 +326,6 @@ public class EngineImpl implements Engine, Variables{
 					}
 				}
 			}
-			
 			else if((option==UPDATE_EVERYTHING)		||
 					(option==UPDATE_ONLY_STREAM)	||
 					(option==UPDATE_STREAM_AND_FANPAGES_AND_GROUPS)	||
@@ -335,16 +338,6 @@ public class EngineImpl implements Engine, Variables{
 							logger.debug("--current user "+current_id+" found on CA platfrom");
 					
 					
-							// WE SHOULD USE SOCIAL DATA !!!!!!!
-														
-							//					FacebookXmlRestClient client=serviceXml.getFacebookClient(credentials_sn_auxiliary,current_id);
-							//					
-							//					
-							//					if (client ==null){
-							//						logger.error("Tree generation aborted. User " + current_id + " Facebook client is null.");
-							//						return;
-							//					}
-							
 							
 							ArrayList<String> list1=null;//serviceXml.friendsGetFacebook(client);
 							logger.debug("@@@verifying that user "+current_id+" credentials are valid and that basic permissions function properly@@@");
@@ -354,19 +347,19 @@ public class EngineImpl implements Engine, Variables{
 									logger.debug("removing current id "+current_id+" from neo netowrk , index and from credentials database");
 									logger.debug("REMOVING USER + DELETING FROM NEO"+current_id);
 									credentials_sn.remove(current_id);
-									service.deletePerson(current_id);
+									graph.deletePerson(current_id);
 						
 							}
 							else{
 								
 									logger.debug("the credentials of user "+current_id+" function properly");
 									credentials_sn.remove(current_id);
-									SocialPerson startPerson=service.getPerson(current_id);
+									SocialPerson startPerson=graph.getPerson(current_id);
 									if (previous_id==null){
 										logger.debug("previous user is null=> nothing to check - end of this sub-branch");
 									}else{
 										logger.debug("####checking if there is a relationship between current "+current_id+" and previous"+previous_id);
-										SocialPerson endPerson=service.getPerson(previous_id);
+										SocialPerson endPerson=graph.getPerson(previous_id);
 										boolean exists= false;//service.existsRelationship(startPerson, endPerson);
 							
 										if (exists==false){
@@ -384,7 +377,7 @@ public class EngineImpl implements Engine, Variables{
 												logger.debug("a relationship is necessary and will be created");
 												String nameDescription=current_id+previous_id;
 												logger.debug("---Creating relationship between "+current_id+" and "+previous_id+" with name "+nameDescription);
-												service.createDescription(startPerson, endPerson, current_id,previous_id);	
+												graph.createDescription(startPerson, endPerson, current_id,previous_id);	
 											}else{
 												logger.debug("NO relationship is necessary - end of check");
 											}
@@ -428,14 +421,146 @@ public class EngineImpl implements Engine, Variables{
 					}
 				}else{ 
 					logger.debug("removing current id"+current_id+" from neo netowrk , index ");
-					service.deletePerson(current_id);
+					graph.deletePerson(current_id);
 					databaseConnection.deleteUserFromDatabase(current_id);
 				}
+					
+					
+					
+				
 			}
 		}	
 	}
 
 	
+	/**
+	 * Create associtation between USER <==> GROUP
+	 * @param current_id
+	 * @param startPerson
+	 * @param groups
+	 */
+	public void createGroupsAndCategories(String current_id,  SocialPerson startPerson, List<Group> groups){
 
+		logger.debug(" === [ GROUPS ] followed by user "+current_id);	
+					
+		ArrayList <String> groups_ids=new ArrayList <String> ();
+		
+		ArrayList <Long> existent_groups_ids	=  graph.getListOfGroups(current_id);
+		ArrayList <Long> remaining_groups_ids	=  graph.convertArrayOfStringToLong(groups_ids);
+		
+		graph.projectArrays(remaining_groups_ids, existent_groups_ids);
+				
+		for(int j=0;j<remaining_groups_ids.size();j++){
+			
+			String groupId=remaining_groups_ids.get(j).toString();
+			
+			if (groupId!=null){
+			
+				logger.debug("Group[id] => "+ groupId);
+				SocialGroup group	=	graph.linkGroup(startPerson, groupId);
+				logger.debug("[ADD] Content to [GROUP]:"+groupId);
+				
+				
+				Group currentGroup 	= findGroup(groupId);
+				String type			= currentGroup.getTitle();
+				String subType		= currentGroup.getDescription();
+				
+				graph.updateGroup	(groupId, currentGroup.getId().getGroupId() , type, subType,
+									null/*group_data.get(5)*/,null/*group_data.get(1)*/,null/*group_data.get(4)*/
+					);
+				
+				if ((!type.equals(""))&&(type!=null)&&(!subType.equals(""))&&(subType!=null)){
+//					logger.debug("checking if type "+type+" and subtype "+subType+" of Group "+groupId+" exists" );
+//					group.linkGroupCategoryAndSubCategory(group, type, subType, startPerson);
+				}
+			}
+			else logger.warn(" Group [NULL]");
+	
+		}
+	}
+
+	
+	
+	public void initialiseUserInformation(String current_id, SocialPerson person){
+		
+		logger.debug("[INIT] GeneralInfo and Interest for user "+current_id);
+		
+		logger.debug("[INTERESTS]");
+		
+		graph.linkInterests(person,current_id+"_Interests" );   
+		
+		graph.updateInterests(current_id+"_Interests","nothing_yet","nothing_yet","nothing_yet","nothing_yet","nothing_yet","nothing_yet","nothing_yet","0");
+		
+		logger.debug("[GENERAL_INFO]");
+		
+		graph.linkGeneralInfo(person,current_id+"_GeneralInfo"); 
+		graph.updateGeneralInfo(current_id+"_GeneralInfo","nothing_yet","nothing_yet","nothing_yet","nothing_yet", "nothing_yet","nothing_yet","nothing_yet","nothing_yet");
+	}
+
+	private Group findGroup(String groupId) {
+		for (int i=0; i<groups.size(); i++)
+			if (groupId.equals(((Group)groups.get(i)).getId().getGroupId())) return (Group)groups.get(i);	
+		return null;
+	}
+	
+	
+	public void generateUserInformation(String current_id, List<Person> profiles){
+		
+		logger.debug("===== [MAKE Basic INFO] GeneralInfo and Interests for user "+current_id);
+		
+		
+		ArrayList <Long> userId=new ArrayList<Long> ();
+		userId.add(Long.parseLong(current_id));
+		
+			Person user = profiles.get(0); // to be improved!!!!
+			
+			// TODO: Transform List of values into strings!
+			graph.updateInterests(user.getName()+"_Interests", 
+								  "activities", 
+								  "interestList", 
+							      "music",
+							      "movies", 
+							      "books", 
+							      "quotations", 
+							      user.getAboutMe(),
+								  user.getUpdated().toString());
+				
+			
+			
+			graph.updateGeneralInfo(user.getName()+"_GeneralInfo", 
+									user.getName().getGivenName(), 
+									user.getName().getFamilyName(),	
+									user.getBirthday().toString(), 
+									user.getGender().name(), 
+									user.getLivingArrangement().toString(), 
+									user.getCurrentLocation().getFormatted(), 
+									user.getPoliticalViews(), 
+									user.getReligion());
+			
+		
+	}
+	
+	
+	
+	public void initialiseUserProfiles(String current_id, List<Person> profiles){
+		
+		logger.debug("@@@@ creating and initialising the user profiles @@@@");
+		logger.debug(" ---- NarcissismManiac---Profile  ");
+		
+		//		graph.linkNarcissismManiac(person,current_id+"_NarcissismManiac" );
+		//		service.updateNarcissismManiac(current_id+"_NarcissismManiac", "0", "0", "0");
+		//		logger.debug(" ---- SuperActiveManiac---Profile  ");
+		//		service.linkSuperActiveManiac(person, current_id+"_SuperActiveManiac");
+		//		service.updateSuperActiveManiac(current_id+"_SuperActiveManiac", "0", "0", "0");
+		//		logger.debug(" ---- PhotoManiac---Profile  ");
+		//		service.linkPhotoManiac(person, current_id+"_PhotoManiac");
+		//		service.updatePhotoManiac(current_id+"_PhotoManiac", "0", "0", "0");
+		//		logger.debug(" ---- SurfManiac---Profile  ");
+		//		service.linkSurfManiac(person, current_id+"_SurfManiac");
+		//		service.updateSurfManiac(current_id+"_SurfManiac", "0", "0", "0");
+		//		logger.debug(" ---- QuizManiac---Profile  ");
+		//		service.linkQuizManiac(person, current_id+"_QuizManiac");
+		//		service.updateQuizManiac(current_id+"_QuizManiac", "0", "0","0");
+	}
 	
 }

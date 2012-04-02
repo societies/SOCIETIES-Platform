@@ -26,18 +26,27 @@ package org.societies.personalization.socialprofiler.datamodel.behaviour;
 
 public interface Profile {
 	
+	public enum Type {
+		EGO_MANIAC, 
+		PHOTO_MANIAC,
+		QUIZ_MANIAC,
+		SUPER_ACTIVE,
+		SURF
+		};
+		
+		
 	/**
 	 * Set the profile name
 	 * @param name
 	 */
-	public void getName(String name);
+	public void setName(Profile.Type name);
 	
 	
 	/**
 	 * Profile name, that define in a single string the main character of the profile
 	 * @return Profile string name
 	 */
-	public String getName();
+	public Profile.Type getName();
 	
 	/**
 	 * Short description about the behavior of this Profile
@@ -93,7 +102,7 @@ public interface Profile {
 	 * sets sets the number of times which conclued to this profile - number of points of the analysis
 	 * @param String number
 	 */
-	public void setNumer(int number);
+	public void setNumber(int number);
 	
 	
 	/**

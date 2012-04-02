@@ -4,8 +4,8 @@
 package org.societies.personalization.socialprofiler.datamodel.impl;
 
 import org.neo4j.graphdb.Relationship;
-import org.societies.personalization.socialprofiler.datamodel.NodeProperties;
 import org.societies.personalization.socialprofiler.datamodel.RelationshipDescription;
+import org.societies.personalization.socialprofiler.datamodel.utils.NodeProperties;
 
 
 

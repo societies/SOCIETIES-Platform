@@ -4,7 +4,7 @@
 package org.societies.personalization.socialprofiler.datamodel;
 
 
-public interface PageOfInterest {
+public interface SocialPage {
 	
 	/**
      * returns the name of the fan page, this is actually the page id from facebook
