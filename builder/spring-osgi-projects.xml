@@ -53,16 +53,7 @@
 		<module>../api/schema/internal</module>
 		<module>../api/java/internal</module>
 
-		<!-- Context Management -->
-		<module>../context-management</module>
-
-		<!-- User Agent -->
-		<module>../user-agent</module>
-
-		<!-- Personalisation -->
-
-
-		<!-- <module>../personalisation</module> TEMPORARILY REMOVED until refactoring of ServiceResourceIdentifier finishes -->
+		
 
 
 		<!-- Platform Infrastructure -->
@@ -112,12 +103,22 @@
 		<module>../css-modules/device-mgmt/DeviceDriverSimulator3/</module>
 		<module>../css-modules/device-mgmt/DeviceManagerConsumer3/</module>
 	
+		
+		
+		<!-- WP5 Modules -->
+		<!-- Context Management -->
+		<module>../context-management</module>
+
+		<!-- User Agent -->
+		<module>../user-agent</module>
+
+		<!-- Personalisation -->
+		<!-- <module>../personalisation</module> TEMPORARILY REMOVED until refactoring of ServiceResourceIdentifier finishes -->
+		
 		<!-- Intelligent Community Orchestration -->
 		<module>../intelligent-community-orchestration/API</module>
 		<module>../intelligent-community-orchestration/CommunityLifecycleManagement</module>
 		<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser</module>
-
-		<!-- Context Management -->
 
 		<!-- Privacy Mgmt -->
 		<module>../privacy-trust/privacy-protection</module>
