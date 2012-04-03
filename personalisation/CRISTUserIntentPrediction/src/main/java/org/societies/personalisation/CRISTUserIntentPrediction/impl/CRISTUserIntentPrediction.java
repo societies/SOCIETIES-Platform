@@ -171,10 +171,12 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 
 	/* (non-Javadoc)
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCurrentUserIntentAction(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)
+	 * 
+	 * parameterName: the name of the outcome (e.g., volume, font, backgroundColour etc.)
 	 */
 	@Override
 	public Future<CRISTUserAction> getCurrentUserIntentAction(
-			IIdentity ownerID, ServiceResourceIdentifier serviceID) {
+			IIdentity ownerID, ServiceResourceIdentifier serviceID, String parameterName) { 
 		// TODO Auto-generated method stub
 		
 		return null;

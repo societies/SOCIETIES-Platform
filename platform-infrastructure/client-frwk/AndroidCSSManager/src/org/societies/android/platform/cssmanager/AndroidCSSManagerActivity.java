@@ -14,7 +14,9 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.css.management.CSSManagerEnums;
+import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
+import org.societies.api.schema.cssmanagement.CssManagerResultBean;
 import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.MethodType;
@@ -39,7 +41,7 @@ public class AndroidCSSManagerActivity extends Activity {
 	public static final String TEST_IDENTITY_1 = "node11";
 	public static final String TEST_IDENTITY_2 = "node22";
 
-	public static final String TEST_IDENTITY = "CSSProfile1";
+	public static final String TEST_IDENTITY = "android";
 	public static final String TEST_INACTIVE_DATE = "20121029";
 	public static final String TEST_REGISTERED_DATE = "20120229";
 	public static final int TEST_UPTIME = 7799;
@@ -49,7 +51,7 @@ public class AndroidCSSManagerActivity extends Activity {
 	public static final String TEST_IDENTITY_NAME = "Id Name";
 	public static final String TEST_IM_ID = "somebody.tssg.org";
 	public static final String TEST_NAME = "The CSS";
-	public static final String TEST_PASSWORD = "P455W0RD";
+	public static final String TEST_PASSWORD = "androidpass";
 	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
 
 
@@ -102,7 +104,7 @@ public class AndroidCSSManagerActivity extends Activity {
     		
     		CssManagerMessageBean messageBean = new CssManagerMessageBean();
     		messageBean.setProfile(AndroidCSSManagerActivity.this.createAndroidRecord());
-    		messageBean.setMethod(MethodType.REGISTER_XMPP_SERVER);
+    		messageBean.setMethod(MethodType.LOGIN_CSS);
 
     		Stanza stanza = new Stanza(toXCManager);
     		
@@ -220,6 +222,13 @@ public class AndroidCSSManagerActivity extends Activity {
 			public void receiveResult(Stanza stanza, Object payload) {
 				Log.d(LOG_TAG, "receiveResult");
 				Log.d(LOG_TAG, "Payload class of type: " + payload.getClass().getName());
+				if (payload instanceof CssManagerResultBean) {
+					CssManagerResultBean resultBean = (CssManagerResultBean) payload;
+					CssInterfaceResult cssResult = (CssInterfaceResult) resultBean.getResult();
+					Log.d(LOG_TAG, "bean result: " + cssResult.isResultStatus());
+					Log.d(LOG_TAG, "bean CssRecord: " + cssResult.getProfile().getCssIdentity());
+					
+				}
 				debugStanza(stanza);				
 			}
 

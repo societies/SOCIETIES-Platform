@@ -41,13 +41,15 @@ public class PluginCoreServiceMonitor extends Plugin {
 	//Logging tag
 	private static final String LOG_TAG = PluginCoreServiceMonitor.class.getName();
 	private static final String CLASSNAME_SEPARATOR = "\\.";
+
+	private static final String CONNECT_SERVICE = "connectService";
+	private static final String DISCONNECT_SERVICE = "disconnectService";
 	
 	//Required to match method calls with callbackIds
 	private HashMap<String, String> methodCallbacks;;
 
     private ICoreServiceMonitor coreServiceMonitor;
     private boolean connectedtoCoreMonitor = false;
-    private boolean initBinding = false;
 
     /**
      * Constructor
@@ -71,27 +73,46 @@ public class PluginCoreServiceMonitor extends Plugin {
         intentFilter.addAction(CoreServiceMonitor.ACTIVE_SERVICES);
         intentFilter.addAction(CoreServiceMonitor.ACTIVE_TASKS);
         this.ctx.registerReceiver(new bReceiver(), intentFilter);
-        initBinding = true;
     }
+    /**
+     * Unbind from service
+     */
+    private void disconnectServiceBinding() {
+    	if (connectedtoCoreMonitor) {
+    		this.ctx.unbindService(coreServiceMonitorConnection);
+    	}
+    }
+    
+
 	@Override
 	public PluginResult execute(String action, JSONArray data, String callbackId) {
 		Log.d(LOG_TAG, "execute: " + action);
-		try {
-			Log.d(LOG_TAG, "parameters: " + data.getString(0));
-		} catch (JSONException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 		PluginResult result = null;
 		
+		if (action.equals(CONNECT_SERVICE)) {
+			if (!connectedtoCoreMonitor) {
+				this.initialiseServiceBinding();
+			}
+            result = new PluginResult(PluginResult.Status.OK, "connected");
+            result.setKeepCallback(false);
+            return result;
+		} 
 
-		//initialise the service binding. Didn't work in constructor
-		if (!initBinding) {
-			this.initialiseServiceBinding();
-		}
+		if (action.equals(DISCONNECT_SERVICE)) {
+			this.disconnectServiceBinding();
+            result = new PluginResult(PluginResult.Status.OK, "disconnected");
+            result.setKeepCallback(false);
+            return result;
+		} 
 		
 		if (this.validRemoteCall(action) && connectedtoCoreMonitor) {
-			
+			try {
+				Log.d(LOG_TAG, "parameters: " + data.getString(0));
+			} catch (JSONException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
 			Log.d(LOG_TAG, "adding to Map store: " + callbackId + " for action: " + action);
 			this.methodCallbacks.put(action, callbackId);
 			
@@ -115,7 +136,11 @@ public class PluginCoreServiceMonitor extends Plugin {
             // Don't return any result now, since status results will be sent when events come in from broadcast receiver 
             result = new PluginResult(PluginResult.Status.NO_RESULT);
             result.setKeepCallback(true);
-		} 
+		} else {
+            result = new PluginResult(PluginResult.Status.ERROR);
+            result.setKeepCallback(false);
+
+		}
 		return result;	
 	}
 
@@ -125,9 +150,7 @@ public class PluginCoreServiceMonitor extends Plugin {
 	 * Unbind from service to prevent service being kept alive
 	 */
 	public void onDestroy() {
-    	if (connectedtoCoreMonitor) {
-    		this.ctx.unbindService(coreServiceMonitorConnection);
-    	}
+		disconnectServiceBinding();
     }
 
     /**
