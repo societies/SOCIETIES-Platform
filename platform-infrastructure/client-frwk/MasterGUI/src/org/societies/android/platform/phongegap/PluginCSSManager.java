@@ -1,3 +1,28 @@
+/**
+Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+
+(SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp (IBM),
+INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ITALIA S.p.a.(TI), TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
+conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+   disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.societies.android.platform.phongegap;
 
 import java.util.HashMap;
@@ -8,12 +33,10 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService;
 import org.societies.android.platform.cssmanager.LocalCSSManagerService.LocalBinder;
-import org.societies.android.platform.intents.AndroidCoreIntents;
 import org.societies.android.platform.interfaces.IAndroidCSSManager;
 import org.societies.android.platform.utilities.ServiceMethodTranslator;
 import org.societies.api.android.internal.model.AndroidCSSNode;
 import org.societies.api.android.internal.model.AndroidCSSRecord;
-import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.utilities.DBC.Dbc;
 
 import android.content.BroadcastReceiver;
@@ -33,7 +56,7 @@ import com.phonegap.api.PluginResult;
  * PhoneGap plugin to allow the CSSManager service to be used by HTML web views.
  * 
  * Note: As a PhoneGap plugin is not a standard Android component a lot of assumed 
- * functionality such as creating intents and bind to services is not automatic. The 
+ * functionality such as creating intents and binding to services is not automatic. The 
  * Plugin class does however have an application context, this.ctx, which supplies the 
  * context to allow this functionality to operate.
  * 
@@ -43,10 +66,15 @@ public class PluginCSSManager extends Plugin {
 	//Logging tag
 	private static final String LOG_TAG = PluginCSSManager.class.getName();
 
+	/**
+	 * Actions required to bind and unbind to any Android service(s) 
+	 * required by this plugin. It is imperative that dependent 
+	 * services are binded to before invoking invoking methods.
+	 */
 	private static final String CONNECT_SERVICE = "connectService";
 	private static final String DISCONNECT_SERVICE = "disconnectService";
 	
-	//Required to match method calls with callbackIds
+	//Required to match method calls with callbackIds (used by PhoneGap)
 	private HashMap<String, String> methodCallbacks;
 
     private IAndroidCSSManager localCSSManager;
@@ -95,11 +123,11 @@ public class PluginCSSManager extends Plugin {
 	 * in situations where the result will be determined in some undefined future instance
 	 */
 	public PluginResult execute(String action, JSONArray data, String callbackId) {
-		Log.d(LOG_TAG, "execute: " + action);
+		Log.d(LOG_TAG, "execute: " + action + " for callback: " + callbackId);
 
 
 		PluginResult result = null;
-
+		//uses synchronous call to ensure that service is binded to
 		if (action.equals(CONNECT_SERVICE)) {
 			if (!connectedtoCSSManager) {
 				this.initialiseServiceBinding();
@@ -109,6 +137,7 @@ public class PluginCSSManager extends Plugin {
             return result;
 		} 
 
+		//uses synchronous call to ensure that service is unbound
 		if (action.equals(DISCONNECT_SERVICE)) {
 			this.disconnectServiceBinding();
             result = new PluginResult(PluginResult.Status.OK, "disconnected");
@@ -117,7 +146,7 @@ public class PluginCSSManager extends Plugin {
 		} 
 
 
-
+		//uses asynchronous calls
 		if (this.validRemoteCall(action) && this.connectedtoCSSManager) {
 
 			try {
@@ -147,6 +176,7 @@ public class PluginCSSManager extends Plugin {
             result = new PluginResult(PluginResult.Status.NO_RESULT);
             result.setKeepCallback(true);
 		} else {
+			//if method does not exist send synchronous error result
             result = new PluginResult(PluginResult.Status.ERROR);
             result.setKeepCallback(false);
 		}
@@ -249,7 +279,8 @@ public class PluginCSSManager extends Plugin {
     	return anode;
     }
     /**
-     * Creates a AndroidCSSRecord from a JSONObject
+     * Creates a AndroidCSSRecord from a JSONObject. Required as GSON
+     * could not cope with class structure.
      * 
      * @param jNode JSONObject representation of record
      * @return AndroidCSSRecord 
