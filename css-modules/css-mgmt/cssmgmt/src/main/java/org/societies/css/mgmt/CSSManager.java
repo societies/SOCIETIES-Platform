@@ -34,6 +34,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.css.directory.ICssDirectoryRemote;
+import org.societies.api.internal.css.management.CSSManagerEnums;
 import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
@@ -51,63 +52,84 @@ import org.societies.api.schema.servicelifecycle.model.Service;
 
 public class CSSManager implements ICSSLocalManager {
 	private static Logger LOG = LoggerFactory.getLogger(CSSManager.class);
+	
+	public static final String TEST_IDENTITY_1 = "node11";
+	public static final String TEST_IDENTITY_2 = "node22";
+
+	public static final String TEST_IDENTITY = "android";
+	public static final String TEST_INACTIVE_DATE = "20121029";
+	public static final String TEST_REGISTERED_DATE = "20120229";
+	public static final int TEST_UPTIME = 7799;
+	public static final String TEST_EMAIL = "somebody@tssg.org";
+	public static final String TEST_FORENAME = "4Name";
+	public static final String TEST_HOME_LOCATION = "The Hearth";
+	public static final String TEST_IDENTITY_NAME = "Id Name";
+	public static final String TEST_IM_ID = "somebody.tssg.org";
+	public static final String TEST_NAME = "The CSS";
+	public static final String TEST_PASSWORD = "androidpass";
+	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
+
 
 	private ICssRegistry cssRegistry;
 	private ICssDirectoryRemote cssDirectoryRemote;
 	private IServiceDiscovery serviceDiscovery;
-
-	/**
-	 * @return the cssRegistry
-	 */
-	public ICssRegistry getCssRegistry() {
-		return cssRegistry;
-	}
-
-	/**
-	 * @param cssRegistry
-	 *            the cssRegistry to set
-	 */
-	public void setCssRegistry(ICssRegistry cssRegistry) {
-		this.cssRegistry = cssRegistry;
-	}
-
-	/**
-	 * @return the cssDiscoveryRemote
-	 */
-	public ICssDirectoryRemote getCssDirectoryRemote() {
-		return cssDirectoryRemote;
-	}
-
-	/**
-	 * @param cssDiscoveryRemote
-	 *            the cssDiscoveryRemote to set
-	 */
-	public void setCssDirectoryRemote(ICssDirectoryRemote cssDirectoryRemote) {
-		this.cssDirectoryRemote = cssDirectoryRemote;
-	}
-
-	/**
-	 * @return the serviceDiscovery
-	 */
-	public IServiceDiscovery getServiceDiscovery() {
-		return serviceDiscovery;
-	}
-
-	/**
-	 * @param serviceDiscovery
-	 *            the serviceDiscovery to set
-	 */
-	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
-		this.serviceDiscovery = serviceDiscovery;
-	}
-
-	/**
-	 * Default constructor
-	 */
-	public CSSManager() {
+	
+	private CssRecord cssRecord;
+	
+	public void cssManagerInit() {
 		LOG.debug("CSS Manager initialised");
+		this.cssRecord = createCSSRecord();
 	}
 
+	
+
+	/**
+	 * Create a default CSSrecord
+	 * This is a temporary measure until genuine CSSs can be created
+	 * 
+	 * @return CssRecord
+	 */
+	private CssRecord createCSSRecord() {
+		
+    	CssNode cssNode_1, cssNode_2;
+
+		cssNode_1 = new CssNode();
+		cssNode_1.setIdentity(TEST_IDENTITY_1);
+		cssNode_1.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
+		cssNode_1.setType(CSSManagerEnums.nodeType.Rich.ordinal());
+
+		cssNode_2 = new CssNode();
+		cssNode_2.setIdentity(TEST_IDENTITY_2);
+		cssNode_2.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
+		cssNode_2.setType(CSSManagerEnums.nodeType.Android.ordinal());
+		
+
+		CssRecord cssProfile = new CssRecord();
+		cssProfile.getCssNodes().add(cssNode_1);
+		cssProfile.getCssNodes().add(cssNode_2);
+		cssProfile.getArchiveCSSNodes().add(cssNode_1);
+		cssProfile.getArchiveCSSNodes().add(cssNode_2);
+		
+		cssProfile.setCssIdentity(TEST_IDENTITY);
+		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
+		cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
+		cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
+		cssProfile.setCssUpTime(TEST_UPTIME);
+		cssProfile.setEmailID(TEST_EMAIL);
+		cssProfile.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
+		cssProfile.setForeName(TEST_FORENAME);
+		cssProfile.setHomeLocation(TEST_HOME_LOCATION);
+		cssProfile.setIdentityName(TEST_IDENTITY_NAME);
+		cssProfile.setImID(TEST_IM_ID);
+		cssProfile.setName(TEST_NAME);
+		cssProfile.setPassword(TEST_PASSWORD);
+		cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
+		cssProfile.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
+		cssProfile.setSocialURI(TEST_SOCIAL_URI);
+
+		
+		return cssProfile;
+	}
 	@Override
 	public Future<CssInterfaceResult> changeCSSNodeStatus(CssRecord profile) {
 		// TODO Auto-generated method stub
@@ -127,7 +149,47 @@ public class CSSManager implements ICSSLocalManager {
 		}
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
-
+//	@Override
+//	/**
+//	 * Requires that CssRecord parameter has one node in its collection and that 
+//	 * the node corresponds to the node being logged in. The CSS identity and password
+//	 * must also be set to appropriate values
+//	 */
+//	public Future<CssInterfaceResult> loginCSS(CssRecord profile) {
+//		LOG.debug("Calling loginCSS");
+//
+//		Dbc.require("CssRecord parameter cannot be null", profile != null);
+//		Dbc.require("Cssrecord parameter must contain CSS identity",
+//				profile.getCssIdentity() != null
+//						&& profile.getCssIdentity().length() > 0);
+//		Dbc.require("Cssrecord parameter must contain CSS password",
+//				profile.getPassword() != null
+//						&& profile.getPassword().length() > 0);
+//
+//		CssInterfaceResult result = new CssInterfaceResult();
+//		result.setProfile(profile);
+//		result.setResultStatus(false);
+//
+//		CssRecord record;
+//		try {
+//			record = this.cssRegistry.getCssRecord();
+//			if (profile.getCssIdentity().equals(record.getCssIdentity())
+//					&& profile.getPassword().equals(record.getPassword())) {
+//				// add new node to login to cloud CssRecord
+//				record.getCssNodes().add(profile.getCssNodes().get(0));
+//				// update the CSS registry
+//				this.cssRegistry.updateCssRecord(record);
+//
+//				result.setProfile(record);
+//				result.setResultStatus(true);
+//			}
+//		} catch (CssRegistrationException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return new AsyncResult<CssInterfaceResult>(result);
+//	}
+//
 	@Override
 	/**
 	 * Requires that CssRecord parameter has one node in its collection and that 
@@ -149,22 +211,13 @@ public class CSSManager implements ICSSLocalManager {
 		result.setProfile(profile);
 		result.setResultStatus(false);
 
-		CssRecord record;
-		try {
-			record = this.cssRegistry.getCssRecord();
-			if (profile.getCssIdentity().equals(record.getCssIdentity())
-					&& profile.getPassword().equals(record.getPassword())) {
-				// add new node to login to cloud CssRecord
-				record.getCssNodes().add(profile.getCssNodes().get(0));
-				// update the CSS registry
-				this.cssRegistry.updateCssRecord(record);
+		if (profile.getCssIdentity().equals(this.cssRecord.getCssIdentity())
+				&& profile.getPassword().equals(this.cssRecord.getPassword())) {
+			// add new node to login to cloud CssRecord
+			this.cssRecord.getCssNodes().add(profile.getCssNodes().get(0));
 
-				result.setProfile(record);
-				result.setResultStatus(true);
-			}
-		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			result.setProfile(this.cssRecord);
+			result.setResultStatus(true);
 		}
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
@@ -435,6 +488,60 @@ public class CSSManager implements ICSSLocalManager {
 
 		}
 		return new AsyncResult<List<Service>>(serviceList);
+	}
+
+	//Spring injection
+	
+	/**
+	 * @return the cssRegistry
+	 */
+	public ICssRegistry getCssRegistry() {
+		return cssRegistry;
+	}
+
+	/**
+	 * @param cssRegistry
+	 *            the cssRegistry to set
+	 */
+	public void setCssRegistry(ICssRegistry cssRegistry) {
+		this.cssRegistry = cssRegistry;
+//		try {
+//			this.cssRegistry.registerCss(createCSSRecord());
+//		} catch (CssRegistrationException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+
+	}
+
+	/**
+	 * @return the cssDiscoveryRemote
+	 */
+	public ICssDirectoryRemote getCssDirectoryRemote() {
+		return cssDirectoryRemote;
+	}
+
+	/**
+	 * @param cssDiscoveryRemote
+	 *            the cssDiscoveryRemote to set
+	 */
+	public void setCssDirectoryRemote(ICssDirectoryRemote cssDirectoryRemote) {
+		this.cssDirectoryRemote = cssDirectoryRemote;
+	}
+
+	/**
+	 * @return the serviceDiscovery
+	 */
+	public IServiceDiscovery getServiceDiscovery() {
+		return serviceDiscovery;
+	}
+
+	/**
+	 * @param serviceDiscovery
+	 *            the serviceDiscovery to set
+	 */
+	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
+		this.serviceDiscovery = serviceDiscovery;
 	}
 
 }

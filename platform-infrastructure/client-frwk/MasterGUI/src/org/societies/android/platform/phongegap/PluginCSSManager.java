@@ -42,13 +42,15 @@ import com.phonegap.api.PluginResult;
 public class PluginCSSManager extends Plugin {
 	//Logging tag
 	private static final String LOG_TAG = PluginCSSManager.class.getName();
+
+	private static final String CONNECT_SERVICE = "connectService";
+	private static final String DISCONNECT_SERVICE = "disconnectService";
 	
 	//Required to match method calls with callbackIds
 	private HashMap<String, String> methodCallbacks;
 
     private IAndroidCSSManager localCSSManager;
     private boolean connectedtoCSSManager = false;
-    private boolean initBinding = false;
 
 
     /**
@@ -75,6 +77,16 @@ public class PluginCSSManager extends Plugin {
         this.ctx.registerReceiver(new bReceiver(), intentFilter);
     	
     }
+    
+    /**
+     * Unbind from service
+     */
+    private void disconnectServiceBinding() {
+    	if (connectedtoCSSManager) {
+    		this.ctx.unbindService(ccsManagerConnection);
+    	}
+    }
+
 
 	@Override
 	/**
@@ -85,25 +97,38 @@ public class PluginCSSManager extends Plugin {
 	public PluginResult execute(String action, JSONArray data, String callbackId) {
 		Log.d(LOG_TAG, "execute: " + action);
 
-		try {
-			Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
-			Log.d(LOG_TAG, "parameter 1: " + data.getJSONObject(1).getString("cssIdentity"));
-			Log.d(LOG_TAG, "parameter 1: " + data.getJSONObject(1).getString("cssHostingLocation"));
-			Log.d(LOG_TAG, "parameter 1: " + data.getJSONObject(1).getJSONArray("cssNodes").getJSONObject(0).getString("identity"));
-		} catch (JSONException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 
 		PluginResult result = null;
-		
 
-		//initialise the service binding. Didn't work in constructor
-		if (!initBinding) {
-			this.initialiseServiceBinding();
-		}
+		if (action.equals(CONNECT_SERVICE)) {
+			if (!connectedtoCSSManager) {
+				this.initialiseServiceBinding();
+			}
+            result = new PluginResult(PluginResult.Status.OK, "connected");
+            result.setKeepCallback(false);
+            return result;
+		} 
+
+		if (action.equals(DISCONNECT_SERVICE)) {
+			this.disconnectServiceBinding();
+            result = new PluginResult(PluginResult.Status.OK, "disconnected");
+            result.setKeepCallback(false);
+            return result;
+		} 
+
+
 
 		if (this.validRemoteCall(action) && this.connectedtoCSSManager) {
+
+			try {
+				Log.d(LOG_TAG, "parameter 0: " + data.getString(0));
+				Log.d(LOG_TAG, "parameter 1: " + data.getJSONObject(1).getString("cssIdentity"));
+				Log.d(LOG_TAG, "parameter 1: " + data.getJSONObject(1).getString("cssHostingLocation"));
+				Log.d(LOG_TAG, "parameter 1: " + data.getJSONObject(1).getJSONArray("cssNodes").getJSONObject(0).getString("identity"));
+			} catch (JSONException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			
 			Log.d(LOG_TAG, "adding to Map store: " + callbackId + " for action: " + action);
 			this.methodCallbacks.put(action, callbackId);
@@ -116,12 +141,16 @@ public class PluginCSSManager extends Plugin {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			}
+			} 
 			
 			// Don't return any result now, since status results will be sent when events come in from broadcast receiver 
             result = new PluginResult(PluginResult.Status.NO_RESULT);
             result.setKeepCallback(true);
-		} 
+		} else {
+            result = new PluginResult(PluginResult.Status.ERROR);
+            result.setKeepCallback(false);
+		}
+		
 		return result;	
 	}
 
@@ -130,10 +159,8 @@ public class PluginCSSManager extends Plugin {
 	 * Unbind from service to prevent service being kept alive
 	 */
 	public void onDestroy() {
-    	if (connectedtoCSSManager) {
-    		this.ctx.unbindService(ccsManagerConnection);
-    	}
-    }
+		disconnectServiceBinding();
+	}
 	
 	/**
 	 * Return result to Javascript call
@@ -146,11 +173,19 @@ public class PluginCSSManager extends Plugin {
 		boolean retValue = false;
 		Log.d(LOG_TAG, "returnJavascriptResult called for intent: " + intent.getAction() + " and callback ID: " + methodCallbackId);	
 		
-		CssInterfaceResult cssResult = (CssInterfaceResult) intent.getParcelableExtra(LocalCSSManagerService.INTENT_RETURN_KEY);
-
-		PluginResult result = new PluginResult(PluginResult.Status.OK, convertCSSRecord((AndroidCSSRecord) cssResult.getProfile()));
-		result.setKeepCallback(false);
-		this.success(result, methodCallbackId);
+		AndroidCSSRecord cssRecord = (AndroidCSSRecord) intent.getParcelableExtra(LocalCSSManagerService.INTENT_RETURN_VALUE_KEY);
+		boolean resultStatus = intent.getBooleanExtra(LocalCSSManagerService.INTENT_RETURN_STATUS_KEY, false);
+		
+		if (resultStatus) {
+			PluginResult result = new PluginResult(PluginResult.Status.OK, convertCSSRecord(cssRecord));
+			result.setKeepCallback(false);
+			this.success(result, methodCallbackId);
+		} else {
+			PluginResult result = new PluginResult(PluginResult.Status.ERROR);
+			result.setKeepCallback(false);
+			this.success(result, methodCallbackId);
+		}
+			
 		
 		//remove callback ID for given method invocation
 		PluginCSSManager.this.methodCallbacks.remove(key);

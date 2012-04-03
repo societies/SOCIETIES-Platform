@@ -110,7 +110,7 @@ public class TestCssInterfaceResult {
 	public void testClass() {
 		CssInterfaceResult result = new CssInterfaceResult();
 		result.setResultStatus(true);
-//		result.setProfile(this.record);
+		result.setProfile(this.record);
 		
 		assertNotNull(result);
 		assertEquals(true, result.isResultStatus());

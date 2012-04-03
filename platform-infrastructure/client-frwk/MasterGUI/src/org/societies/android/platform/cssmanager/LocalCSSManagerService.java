@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
-import org.societies.android.platform.intents.AndroidCoreIntents;
 import org.societies.android.platform.interfaces.IAndroidCSSManager;
 import org.societies.api.android.internal.model.AndroidCSSRecord;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -38,9 +37,13 @@ import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
+import org.societies.api.schema.cssmanagement.CssManagerResultBean;
+import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.MethodType;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
+import org.societies.identity.IdentityManagerImpl;
 import org.societies.utilities.DBC.Dbc;
 
 import android.app.Service;
@@ -69,7 +72,8 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	 * CSS Manager intents
 	 */
 	//Intents corresponding to return values of methods
-	public static final String INTENT_RETURN_KEY = "org.societies.android.platform.cssmanager.ReturnValue";
+	public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.platform.cssmanager.ReturnValue";
+	public static final String INTENT_RETURN_STATUS_KEY = "org.societies.android.platform.cssmanager.ReturnStatus";
 
 	public static final String CHANGE_CSS_NODE_STATUS = "org.societies.android.platform.cssmanager.CHANGE_CSS_NODE_STATUS";
 	public static final String GET_ANDROID_CSS_RECORD = "org.societies.android.platform.cssmanager.GET_ANDROID_CSS_RECORD";
@@ -88,7 +92,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	public static final String UNREGISTER_XMPP_SERVER = "org.societies.android.platform.cssmanager.UNREGISTER_XMPP_SERVER";
 
 
-    private final IIdentity toXCManager = null;
+    private IIdentity toXCManager = null;
     private ClientCommunicationMgr ccm;
 
 	private IBinder binder = null;
@@ -105,6 +109,14 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		//This should replaced with persisted value if available
 		this.cssRecord = null;
 		this.ccm = new ClientCommunicationMgr(this);
+		
+    	try {
+			toXCManager = IdentityManagerImpl.staticfromJid(DESTINATION);
+		} catch (InvalidFormatException e) {
+			Log.e(LOG_TAG, e.getMessage(), e);
+			throw new RuntimeException(e);
+		}     
+
 
 		Log.d(LOG_TAG, "CSSManager service starting");
 	}
@@ -149,8 +161,6 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Log.d(LOG_TAG, "loginCSS called with client: " + client);
 		
 		Dbc.require("CSS record cannot be null", record != null);
-
-//		ccm.register(ELEMENT_NAMES, new CSSManagerCallback(client, LOGIN_CSS));
 		
 		CssManagerMessageBean messageBean = new CssManagerMessageBean();
 		messageBean.setProfile(record);
@@ -177,25 +187,25 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("CSS record cannot be null", record != null);
 		boolean retValue = true;
 		
-		ccm.register(ELEMENT_NAMES, new CSSManagerCallback(client, LOGIN_XMPP_SERVER));
-		
-		/**
-		 * Create intent to broadcast results to interested receivers in the event 
-		 * of a client binding to the service using Android IPC
-		 */
-		if (client != null) {
-			Intent intent = new Intent(LOGIN_XMPP_SERVER);
-			intent.putExtra(INTENT_RETURN_KEY, retValue);
-			intent.setPackage(client);
-
-			
-			Log.d(LOG_TAG, "loginXMPPServer sent return value: " + retValue);
-			this.sendBroadcast(intent);
-		}
-		/**
-		 * Return value returned to client binding using a local bind
-		 */
-		Log.d(LOG_TAG, "loginXMPPServer return value: " + retValue);
+//		ccm.register(ELEMENT_NAMES, new CSSManagerCallback(client, LOGIN_XMPP_SERVER));
+//		
+//		/**
+//		 * Create intent to broadcast results to interested receivers in the event 
+//		 * of a client binding to the service using Android IPC
+//		 */
+//		if (client != null) {
+//			Intent intent = new Intent(LOGIN_XMPP_SERVER);
+//			intent.putExtra(INTENT_RETURN_KEY, retValue);
+//			intent.setPackage(client);
+//
+//			
+//			Log.d(LOG_TAG, "loginXMPPServer sent return value: " + retValue);
+//			this.sendBroadcast(intent);
+//		}
+//		/**
+//		 * Return value returned to client binding using a local bind
+//		 */
+//		Log.d(LOG_TAG, "loginXMPPServer return value: " + retValue);
 		return retValue;
 	}
 
@@ -230,24 +240,24 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Dbc.require("CSS record cannot be null", record != null);
 		
 		boolean retValue = true;
-		ccm.unregister(ELEMENT_NAMES, new CSSManagerCallback(client, LOGOUT_XMPP_SERVER));
-		/**
-		 * Create intent to broadcast results to interested receivers in the event 
-		 * of a client binding to the service using Android IPC
-		 */
-		if (client != null) {
-			Intent intent = new Intent(LOGOUT_XMPP_SERVER);
-			intent.putExtra(INTENT_RETURN_KEY, retValue);
-			intent.setPackage(client);
-
-			Log.d(LOG_TAG, "logoutXMPPServer sent return value: " + retValue);
-
-			this.sendBroadcast(intent);
-		}
-		/**
-		 * Return value returned to client binding using a local bind
-		 */
-		Log.d(LOG_TAG, "logoutXMPPServer return value: " + retValue);
+//		ccm.unregister(ELEMENT_NAMES, new CSSManagerCallback(client, LOGOUT_XMPP_SERVER));
+//		/**
+//		 * Create intent to broadcast results to interested receivers in the event 
+//		 * of a client binding to the service using Android IPC
+//		 */
+//		if (client != null) {
+//			Intent intent = new Intent(LOGOUT_XMPP_SERVER);
+//			intent.putExtra(INTENT_RETURN_KEY, retValue);
+//			intent.setPackage(client);
+//
+//			Log.d(LOG_TAG, "logoutXMPPServer sent return value: " + retValue);
+//
+//			this.sendBroadcast(intent);
+//		}
+//		/**
+//		 * Return value returned to client binding using a local bind
+//		 */
+//		Log.d(LOG_TAG, "logoutXMPPServer return value: " + retValue);
 
 		return retValue;
 	}
@@ -354,7 +364,13 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 			Log.d(LOG_TAG, "Callback receiveResult");
 			if (client != null) {
 				Intent intent = new Intent(returnIntent);
-				intent.putExtra(INTENT_RETURN_KEY, (Parcelable)retValue);
+				CssManagerResultBean resultBean = (CssManagerResultBean) retValue;
+
+				intent.putExtra(INTENT_RETURN_STATUS_KEY, resultBean.getResult().isResultStatus());
+
+				AndroidCSSRecord aRecord = AndroidCSSRecord.convertCssRecord(resultBean.getResult().getProfile());
+				
+				intent.putExtra(INTENT_RETURN_VALUE_KEY, (Parcelable) aRecord);
 				intent.setPackage(client);
 
 				Log.d(LOG_TAG, "Callback receiveResult sent return value: " + retValue);

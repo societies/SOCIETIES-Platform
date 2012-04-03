@@ -26,7 +26,8 @@ package org.societies.privacytrust.trust.api;
 
 import java.util.Date;
 
-import org.societies.privacytrust.trust.api.mock.EntityIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 public interface ITrustEvidenceCollector {
 
@@ -38,7 +39,7 @@ public interface ITrustEvidenceCollector {
 	 * @param rating
 	 * @param timestamp
 	 */
-	public void addServiceExperience(EntityIdentifier trustor, EntityIdentifier provider, EntityIdentifier serviceId, double rating, Date timestamp);
+	public void addServiceExperience(IIdentity trustor, IIdentity provider, ServiceResourceIdentifier serviceId, double rating, Date timestamp);
 
 	/**
 	 * 
@@ -46,7 +47,7 @@ public interface ITrustEvidenceCollector {
 	 * @param trustee
 	 * @param value
 	 */
-	public void addTrustOpinion(EntityIdentifier trustor, EntityIdentifier trustee, double value);
+	public void addTrustOpinion(IIdentity trustor, IIdentity trustee, double value);
 
 	/**
 	 * 
@@ -56,5 +57,5 @@ public interface ITrustEvidenceCollector {
 	 * @param rating
 	 * @param timestamp
 	 */
-	public void addUserInteractionExperience(EntityIdentifier trustor, EntityIdentifier trustee, String type, double rating, Date timestamp);
+	public void addUserInteractionExperience(IIdentity trustor, IIdentity trustee, String type, double rating, Date timestamp);
 }
