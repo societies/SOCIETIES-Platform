@@ -37,6 +37,8 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.comm.xmpp.event.InternalEvent;
@@ -62,16 +64,19 @@ public class MergingManager implements IC45Consumer, ApplicationListener<Interna
 
 
 	private IC45Learning c45Learning;
+	private final IEventMgr eventMgr;
 	
-	public MergingManager(IC45Learning c45Learning, UserPreferenceManagement prefImpl, UserPreferenceConditionMonitor pcm){
+	public MergingManager(IC45Learning c45Learning, UserPreferenceManagement prefImpl, UserPreferenceConditionMonitor pcm, IEventMgr eventMgr){
 		this.c45Learning = c45Learning;
 		this.prefImpl = prefImpl;
 		this.pcm = pcm;
+		this.eventMgr = eventMgr;
 	}
 
 	public void initialise(){
 		
 		this.counters = new Hashtable<IIdentity,Hashtable<IAction, Integer>>();
+		this.eventMgr.subscribeInternalEvent(this, new String[]{EventTypes.UIM_EVENT}, "");
 		//this.eventMgr.registerListener(this, new String[]{PSSEventTypes.UIM_USERACTION_EVENT}, null);
 		//this.eventMgr.registerListener(this, new String[]{PSSEventTypes.PROACTIVITY_FEEDBACK}, null);
 		logging.debug("**********************"+this.getClass()+"Initialised **********************");    	

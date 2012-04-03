@@ -135,7 +135,8 @@
 		
 		<osgi:reference id="decisionMaker" interface="org.societies.api.internal.useragent.decisionmaking.IDecisionMaker">
 		</osgi:reference>
-        
+        <osgi:reference id="eventMgmtRef" interface="org.societies.api.osgi.event.IEventMgr">
+        </osgi:reference>
 		
 		
 		

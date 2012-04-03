@@ -25,6 +25,8 @@
 package org.societies.personalisation.management.impl;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -45,11 +47,13 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.IFeedbackEvent;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
+import org.societies.api.internal.useragent.monitoring.UIMEvent;
 import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.comm.xmpp.event.InternalEvent;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
@@ -60,9 +64,10 @@ import org.societies.personalisation.common.api.management.IInternalPersonalisat
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
 import org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
+import org.springframework.context.ApplicationListener;
 
 public class PersonalisationManager implements IPersonalisationManager,
-		IInternalPersonalisationManager, CtxChangeEventListener {
+		IInternalPersonalisationManager, CtxChangeEventListener, ApplicationListener<InternalEvent> {
 
 	// services
 	private ICtxBroker ctxBroker;
@@ -609,6 +614,95 @@ public class PersonalisationManager implements IPersonalisationManager,
 	public void onUpdate(CtxChangeEvent arg0) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void onApplicationEvent(InternalEvent event) {
+		if (event.getEventNode().equals("UIM_EVENT")){
+			UIMEvent uimEvent = (UIMEvent) event.getEventInfo();
+			Future<List<IUserIntentAction>> futureCauiActions = this.cauiPrediction.getPrediction(uimEvent.getUserId(), uimEvent.getAction());
+			
+			Future<List<CRISTUserAction>> futureCristActions = this.cristPrediction.getCRISTPrediction(uimEvent.getUserId(), uimEvent.getAction());
+			
+			try {
+				List<IUserIntentAction> cauiActions = futureCauiActions.get();
+				List<CRISTUserAction> cristActions = futureCristActions.get();
+				Hashtable<IUserIntentAction,CRISTUserAction> overlapping = new Hashtable<IUserIntentAction,CRISTUserAction>(); 
+				List<IOutcome> nonOverlapping = new ArrayList<IOutcome>();
+				
+				
+				
+				
+				for (IUserIntentAction caui : cauiActions){
+					CRISTUserAction crist = this.exists(cristActions, caui);
+					if (null==crist){
+						nonOverlapping.add(caui);
+					}else{
+						overlapping.put(caui, crist);
+					}
+				}
+				
+				for (CRISTUserAction crist: cristActions){
+					IUserIntentAction caui = this.exists(cauiActions, crist);
+					if (null==caui){
+						nonOverlapping.add(crist);
+					}
+				}
+				
+				Enumeration<IUserIntentAction> cauiEnum = overlapping.keys();
+				
+				while (cauiEnum.hasMoreElements()){
+					IUserIntentAction caui = cauiEnum.nextElement();
+					CRISTUserAction crist = overlapping.get(caui);
+					nonOverlapping.add(this.resolveIntentConflicts(crist,caui));
+				}
+				
+				this.decisionMaker.makeDecision(nonOverlapping, new ArrayList<IOutcome>());
+				
+				
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+			
+			
+		}
+		
+	}
+	
+	private IUserIntentAction exists(List<IUserIntentAction> cauiActions,	CRISTUserAction crist) {
+		for (IUserIntentAction o : cauiActions){
+			if (this.outcomesMatch(o, crist)){
+				return o;
+			}
+		}		return null;
+	}
+
+	private CRISTUserAction exists(List<CRISTUserAction> cristActions, IOutcome caui){
+		
+		for (CRISTUserAction o : cristActions){
+			if (this.outcomesMatch(o, caui)){
+				return o;
+			}
+		}
+		
+		return null;
+	}
+	
+	
+	private boolean outcomesMatch(IOutcome outcome1, IOutcome outcome2){
+		if (outcome1.getServiceID().getServiceInstanceIdentifier().equalsIgnoreCase(outcome2.getServiceID().getServiceInstanceIdentifier())){
+			if (outcome1.getparameterName().equalsIgnoreCase(outcome2.getparameterName())){
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 }
