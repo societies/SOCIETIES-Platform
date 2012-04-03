@@ -102,7 +102,7 @@ public class SocialProfiler implements ISocialProfiler {
 			//int period = initialDelay;
 			
 	    	int initialDelay =0;
-			int period		 = (int)(1000 * 60 * 60 * 24 * daysFull);
+			int period		 = 30000; //(int)(1000 * 60 * 60 * 24 * daysFull);
 	    	Timer timer = new Timer();
 			SocialTimerTask task = new SocialTimerTask(this.engine,  this.databaseConnection);
 			timer.scheduleAtFixedRate(task, initialDelay, period);
@@ -128,7 +128,7 @@ public class SocialProfiler implements ISocialProfiler {
 			
 			}
 			
-			engine.UpdateNetwork(200);
+			engine.UpdateNetwork(ProfilerEngine.UPDATE_EVERYTHING);
 	 	    
 		} catch (Exception e) {
 			e.printStackTrace();

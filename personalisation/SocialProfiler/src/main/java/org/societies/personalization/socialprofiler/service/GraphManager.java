@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.apache.shindig.social.core.model.PersonImpl;
 import org.neo4j.graphalgo.impl.centrality.BetweennessCentrality;
 import org.neo4j.graphalgo.impl.centrality.ClosenessCentrality;
 import org.neo4j.graphalgo.impl.centrality.EigenvectorCentralityArnoldi;
@@ -37,14 +36,8 @@ import org.societies.personalization.socialprofiler.datamodel.impl.InterestsImpl
 import org.societies.personalization.socialprofiler.datamodel.impl.RelTypes;
 import org.societies.personalization.socialprofiler.datamodel.impl.SocialGroupImpl;
 import org.societies.personalization.socialprofiler.datamodel.impl.SocialPersonImpl;
+import org.societies.personalization.socialprofiler.datamodel.impl.GeneralInfoImpl;
 import org.societies.personalization.socialprofiler.exception.NeoException;
-
-import com.sun.org.apache.xerces.internal.impl.xs.opti.NodeImpl;
-
-
-
-
-
 
 public class GraphManager implements Variables{
 
@@ -86,9 +79,31 @@ public class GraphManager implements Variables{
 	 * @see org.societies.personalisation.socialprofiler.service.Service#createPerson(java.lang.String)
 	 */
 	
-	public SocialPerson createPerson(String name) {
-		// TODO Auto-generated method stub
-		return null;
+	public SocialPerson createPerson(final String name) {
+		SocialPerson person=null;
+		Transaction tx = getNeoService().beginTx();
+		try{
+		
+			logger.debug("creating person with name "+name);
+			logger.debug(" verifying there is no person in the index with the same name");
+			SocialPerson test=getPerson(name);
+			if (test!=null){
+				logger.info("unable to create person with name "+name+", already exists a person with this name");
+				return null;
+			}
+		
+			logger.debug("no person found with the same name=> creating person properly");
+			final Node personNode=neoService.createNode();
+			person=new SocialPersonImpl(personNode);
+			person.setName(name);
+		
+			logger.debug("indexing new created person to Lucene");
+			luceneIndexService.index(personNode,NAME_INDEX,name);
+			tx.success();
+		}finally{
+			tx.finish();
+		}																			
+		return person;
 	}
 
 	/* (non-Javadoc)
@@ -1276,8 +1291,32 @@ public class GraphManager implements Variables{
 	 */
 	
 	public Interests createInterests(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		Interests interests=null;
+		Transaction tx_active = getNeoService().beginTx();
+		try{
+		
+			logger.debug("creating Interests with name "+name);
+			logger.debug(" verying there is no Interests in the index with the same name");
+			Interests test=getInterests(name);
+			if (test!=null){
+				logger.info("unable to create Interests with name "+name+", already " +
+						"exists an Interests profile with this name");
+				return null;
+			}
+		
+			logger.debug("no Interests found with the same name=>ALLOW-> creating " +
+					"Interests properly");
+			final Node interestsNode=neoService.createNode();
+			interests=new InterestsImpl(interestsNode);
+			interests.setName(name);
+		
+			logger.debug("indexing new created Interests to Lucene");
+			luceneIndexService.index(interestsNode,NAME_INDEX,name);
+			tx_active.success();
+		}finally{
+			tx_active.finish();
+		}																			
+		return interests;
 	}
 
 	
@@ -1298,9 +1337,6 @@ public class GraphManager implements Variables{
 			{
 				logger.debug(" [Interest] "+name+" was found on Lucene index => returning it");
 				interests = new InterestsImpl( interestsNode );
-				if (interests==null) {
-						logger.error("ERROR while creating instance of [Interest] - to be returned");
-				}
 			}
 			else{
 				
@@ -1437,8 +1473,37 @@ public class GraphManager implements Variables{
 	 */
 	
 	public void linkGeneralInfo(SocialPerson person, String generalInfoId) {
-		// TODO Auto-generated method stub
-		
+		logger.debug("linking generalInfo to person");
+		Transaction tx_active = getNeoService().beginTx();
+		try{
+			if (person==null){
+				logger.error("ERROR-person which was suposed to be linked with generalInfo is null");
+			}else{
+				logger.debug("verifying there is no other GeneralInfo for this person");
+				GeneralInfo generalInfo=getGeneralInfo(generalInfoId);
+				if (generalInfo==null){
+					logger.debug("creating the GeneralInfo and then linking it");
+					generalInfo=createGeneralInfo(generalInfoId);
+					if (generalInfo==null){
+						logger.fatal("ERROR - GeneralInfo seemed not to exist - " +
+								"was created - but is null");
+					}
+				}else{
+					logger.debug("GeneralInfo was found succesfully => linking");
+				}
+				final Node startNode = ((SocialPersonImpl) person).getUnderlyingNode();
+				final Node endNode = ((GeneralInfoImpl) generalInfo).getUnderlyingNode();
+				@SuppressWarnings("unused")
+				final Relationship relationship = startNode.createRelationshipTo( endNode,
+	        		RelTypes.IS_KNOWN_AS );
+				logger.debug("relationship was created");
+				logger.debug("Now user "+person.getName()+"IS KNOWN AS  GENERAL INFO"+
+						generalInfo.getName());
+			}
+			tx_active.success();
+		}finally{
+			tx_active.finish();
+		}		
 	}
 
 	/* (non-Javadoc)
@@ -1448,8 +1513,43 @@ public class GraphManager implements Variables{
 	public void updateGeneralInfo(String generalInfoId, String firstName,
 			String lastName, String birthday, String sex, String hometown,
 			String current_location, String political, String religious) {
-		// TODO Auto-generated method stub
-		
+		logger.debug("updating GeneralInfo information using the latest info found");
+		Transaction tx = getNeoService().beginTx();
+		try{
+			GeneralInfo generalInfo=getGeneralInfo(generalInfoId);
+			if (generalInfo==null){
+				logger.error("GeneralInfo is null - impossible to update it");
+			}else{
+				if (firstName!=null){
+					generalInfo.setFirstName(firstName);
+				}
+				if (lastName!=null){
+					generalInfo.setLastName(lastName);
+				}
+				if (birthday!=null){
+					generalInfo.setBirthday(birthday);
+				}
+				if (sex!=null){
+					generalInfo.setSex(sex);
+				}
+				if (hometown!=null){
+					generalInfo.setHometown(hometown);
+				}
+				if (current_location!=null){
+					generalInfo.setCurrentLocation(current_location);
+				}
+				if (political!=null){
+					generalInfo.setPolitical(political);
+				}
+				if (religious!=null){
+					generalInfo.setReligious(religious);
+				}
+				logger.debug("GeneralInfo information was updated successfully");
+			}
+			tx.success();
+		}finally{
+			tx.finish();
+		}	
 	}
 
 	/* (non-Javadoc)
