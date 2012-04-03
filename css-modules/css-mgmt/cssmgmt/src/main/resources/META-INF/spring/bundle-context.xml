@@ -18,7 +18,9 @@
   <!-- Required for Async processing -->
   <tx:annotation-driven />
 
-  <bean id="CSSManager" class="org.societies.css.mgmt.CSSManager">
+  <bean id="CSSManager" 
+  	class="org.societies.css.mgmt.CSSManager" 
+  	init-method="cssManagerInit">
   <property name="cssRegistry" ref="CssRegistryBundle"/>
   <property name="cssDirectoryRemote" ref="cssDirectoryRemote"/>
   <property name="serviceDiscovery" ref="serviceDiscoveryRef"/>

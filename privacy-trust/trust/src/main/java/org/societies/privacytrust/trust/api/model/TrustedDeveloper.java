@@ -38,10 +38,11 @@ public class TrustedDeveloper extends TrustedEntity {
 	
 	private Set<TrustedService> services;
 
-	public TrustedDeveloper() {
+	public TrustedDeveloper(TrustedEntityId trustor, TrustedEntityId teid) {
+		super(trustor, teid);
 	}
 
-	public Set<TrustedService> getServices(){
+	public Set<TrustedService> getServices() {
 		return this.services;
 	}
 }

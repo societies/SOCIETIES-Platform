@@ -55,12 +55,12 @@ public class TestXMPPBeans {
 		this.record = new CssRecord();
 		this.record.setCssIdentity(TEST_IDENTITY);
 		
-//		this.record.getCssNodes().add(cssNode_1);
-//		this.record.getCssNodes().add(cssNode_2);
-//		
-//		this.record.getArchiveCSSNodes().add(cssNode_1);
-//		this.record.getArchiveCSSNodes().add(cssNode_2);
-//		
+		this.record.getCssNodes().add(cssNode_1);
+		this.record.getCssNodes().add(cssNode_2);
+		
+		this.record.getArchiveCSSNodes().add(cssNode_1);
+		this.record.getArchiveCSSNodes().add(cssNode_2);
+		
 		this.record.setCssInactivation(TEST_INACTIVE_DATE);
 		this.record.setCssRegistration(TEST_REGISTERED_DATE);
 		this.record.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
@@ -78,10 +78,10 @@ public class TestXMPPBeans {
 		this.record.setSocialURI(TEST_SOCIAL_URI);
 		
 		
-//		assertEquals(cssArchivedNodes.size(), this.record.getArchiveCSSNodes().size());
+		assertEquals(cssArchivedNodes.size(), this.record.getArchiveCSSNodes().size());
 		assertEquals(TEST_IDENTITY, this.record.getCssIdentity());
 		assertEquals(TEST_INACTIVE_DATE, this.record.getCssInactivation());
-//		assertEquals(cssNodes.size(), this.record.getCssNodes().size());
+		assertEquals(cssNodes.size(), this.record.getCssNodes().size());
 		assertEquals(TEST_REGISTERED_DATE, this.record.getCssRegistration());
 		assertEquals(CSSManagerEnums.cssStatus.Active.ordinal(), this.record.getStatus());
 		assertEquals(TEST_UPTIME, this.record.getCssUpTime());
@@ -92,7 +92,7 @@ public class TestXMPPBeans {
 		assertEquals(TEST_IDENTITY_NAME, this.record.getIdentityName());
 		assertEquals(TEST_IM_ID, this.record.getImID());
 		assertEquals(TEST_NAME, this.record.getName());
-//		assertEquals(TEST_PASSWORD, this.record.password);
+		assertEquals(TEST_PASSWORD, this.record.password);
 		assertEquals(CSSManagerEnums.presenceType.Available.ordinal(), this.record.getPresence());
 		assertEquals(CSSManagerEnums.genderType.Unspecified.ordinal(), this.record.getSex());
 		assertEquals(TEST_SOCIAL_URI, this.record.getSocialURI());
@@ -111,7 +111,7 @@ public class TestXMPPBeans {
 	public void testMessageBean() {
 		CssManagerMessageBean bean = new CssManagerMessageBean();
 		bean.setMethod(MethodType.LOGIN_CSS);
-//		bean.setProfile(this.record);
+		bean.setProfile(this.record);
 		
 		assertNotNull(bean);
 		assertEquals(bean.getMethod(), MethodType.LOGIN_CSS);
@@ -142,7 +142,7 @@ public class TestXMPPBeans {
 	public void testMessageResultBean() {
 		CssInterfaceResult result = new CssInterfaceResult();
 		result.setResultStatus(false);
-//		result.setProfile(this.record);
+		result.setProfile(this.record);
 		
 		CssManagerResultBean resultBean = new CssManagerResultBean();
 		resultBean.setResult(result);

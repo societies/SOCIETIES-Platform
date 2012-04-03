@@ -70,6 +70,21 @@ public class AndroidCSSNode extends CssNode implements Parcelable {
 	}
 	
 	/**
+	 * Convert CssNode to AndroidCSSNode 
+	 * @param cssNode
+	 * 
+	 * @return AndroidCSSNode
+	 */
+	public static AndroidCSSNode convertCssNode(CssNode cssNode) {
+		AndroidCSSNode aNode = new AndroidCSSNode();
+		
+		aNode.setIdentity(cssNode.getIdentity());
+		aNode.setStatus(cssNode.getStatus());
+		aNode.setType(cssNode.getType());
+		
+		return aNode;
+	}
+	/**
 	 * Parcelable implementation
 	 */
 	@Override
