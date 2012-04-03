@@ -9,6 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.internal.css.management.CSSManagerEnums;
+import org.societies.api.schema.cssmanagement.CssNode;
 
 //import com.google.gson.Gson;
 //import com.google.gson.GsonBuilder;
@@ -52,6 +53,26 @@ public class TestAndroidCSSNode {
 		assertEquals(CSSManagerEnums.nodeStatus.Hibernating.ordinal(), cssNode.getStatus());
 	}
 	
+	@Test 
+	public void testConversion() {
+		CssNode cssNode = new CssNode();
+		assertNotNull(cssNode);
+		
+		cssNode.setIdentity(TEST_IDENTITY_1);
+		cssNode.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
+		cssNode.setType(CSSManagerEnums.nodeType.Cloud.ordinal());
+		
+		assertEquals(TEST_IDENTITY_1, cssNode.getIdentity());
+		assertEquals(CSSManagerEnums.nodeStatus.Available.ordinal(), cssNode.getStatus());
+		assertEquals(CSSManagerEnums.nodeType.Cloud.ordinal(), cssNode.getType());
+
+		AndroidCSSNode aNode = AndroidCSSNode.convertCssNode(cssNode);
+
+		assertEquals(TEST_IDENTITY_1, aNode.getIdentity());
+		assertEquals(CSSManagerEnums.nodeStatus.Available.ordinal(), aNode.getStatus());
+		assertEquals(CSSManagerEnums.nodeType.Cloud.ordinal(), aNode.getType());
+		
+	}
 //	@Test
 //	public void testParcelable() {
 //		AndroidCSSNode cssNode = new AndroidCSSNode(TEST_IDENTITY_1, CSSNode.nodeStatus.Hibernating.ordinal(), CSSNode.nodeType.Rich.ordinal());
