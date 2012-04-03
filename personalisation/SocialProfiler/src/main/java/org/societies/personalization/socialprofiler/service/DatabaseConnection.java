@@ -12,6 +12,7 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.TimeZone;
 
 import javax.naming.InitialContext;
@@ -26,11 +27,21 @@ import org.societies.personalization.socialprofiler.Variables;
 public class DatabaseConnection implements Variables {
 	private static final Logger logger = Logger.getLogger(DatabaseConnection.class);
 	private Connection connection;
+	private Properties 	props; 			
+	
+	private static final String URL			= "db.url";
+	private static final String DBNAME 		= "db.name";
+	private static final String DRIVER 		= "db.driver";
+	private static final String USERNAME 	= "db.username";
+	private static final String PWD		 	= "db.password";
+	
 	
 	/**
 	 * DatabaseConnectionImpl
 	 */
-	public DatabaseConnection() {}
+	public DatabaseConnection(Properties properties) {
+		this.props = properties;
+	}
 	
 	/**
 	 * returns a java.sql.Connection , the actual connection to the mysql database
@@ -43,31 +54,15 @@ public class DatabaseConnection implements Variables {
 	
 	public boolean connectMysql(){
 		java.util.TimeZone.setDefault(TimeZone.getTimeZone("GMT")); 
-		InitialContext ctx = null;
-		DataSource ds = null;
 		try {
 		
-			/*
-			ctx = new javax.naming.InitialContext();
-			ds = (DataSource)ctx.lookup("java:jdbc/social_db");
-			logger.debug("connecting Mysql database.....");
-			connection = ds.getConnection();
-			logger.debug("Connection to Mysql Database terminated succesfully");
-			*/
-			
-			  String url 	= "jdbc:mysql://localhost:3306/";
-			  String dbName = "social";
-			  String driver = "com.mysql.jdbc.Driver";
-			  String userName = "root"; 
-			  String password = "";
+			  String url 	= props.getProperty(URL); //"jdbc:mysql://localhost:3306/";
+			  String dbName = props.getProperty(DBNAME); //"social";
+			  //String driver = props.getProperty(DRIVER); //"com.mysql.jdbc.Driver";
+			  String userName = props.getProperty(USERNAME); //"root"; 
+			  String password = props.getProperty(PWD); //"";
 			  connection = DriverManager.getConnection(url+dbName,userName,password);
-			  
-			  //connection = DriverManager.getConnection("jdbc:mysql://localhost/social?user=root&password=");
 		}
-//		catch (NamingException e) {
-//			logger.fatal("Connection to Mysql database was unsuccesful due to NamingException.");
-//			return false;
-//		} 
 		catch (SQLException e) {
 			logger.fatal("Connection to Mysql database was unsuccesful.");
 			e.printStackTrace();
@@ -345,16 +340,16 @@ public class DatabaseConnection implements Variables {
 	
 	
 	public void addSumsToTotalInfo(int week){
-		addSumforWeekAndProfile(week, NARCISSISM_PROFILE, getSumForCommunity(week, NARCISSISM_PROFILE));
-		addSumforWeekAndProfile(week, PHOTO_PROFILE, getSumForCommunity(week, PHOTO_PROFILE));
-		addSumforWeekAndProfile(week, SUPERACTIVE_PROFILE, getSumForCommunity(week, SUPERACTIVE_PROFILE));
-		addSumforWeekAndProfile(week, QUIZ_PROFILE, getSumForCommunity(week, QUIZ_PROFILE));
-		addSumforWeekAndProfile(week, SURF_PROFILE, getSumForCommunity(week, SURF_PROFILE));
+//		addSumforWeekAndProfile(week, NARCISSISM_PROFILE, getSumForCommunity(week, NARCISSISM_PROFILE));
+//		addSumforWeekAndProfile(week, PHOTO_PROFILE, getSumForCommunity(week, PHOTO_PROFILE));
+//		addSumforWeekAndProfile(week, SUPERACTIVE_PROFILE, getSumForCommunity(week, SUPERACTIVE_PROFILE));
+//		addSumforWeekAndProfile(week, QUIZ_PROFILE, getSumForCommunity(week, QUIZ_PROFILE));
+//		addSumforWeekAndProfile(week, SURF_PROFILE, getSumForCommunity(week, SURF_PROFILE));
 	}
 		
 	
 	public void addInfoForCommunityProfile(){
-		logger.debug("updating global community info");
+		logger.debug("==== updating global community info");
 		java.util.Date today = new java.util.Date();
 	    java.sql.Timestamp timestamp=new java.sql.Timestamp(today.getTime()); //FIXME: minor: il fuso orario e' sbagliato.
 	    long current_time = timestamp.getTime()/1000;
@@ -403,26 +398,7 @@ public class DatabaseConnection implements Variables {
 	}
 	
 	
-	@Deprecated
-	public int getLastBlogWeekForUser(String userId){
-		int lastWeek=-1;
-		try {
-			Statement st = connection.createStatement();
-			ResultSet result=st.executeQuery("select week from blog_info where user_id='"+userId+"' order by week desc;");
-			if (result.next()){
-				String number=result.getString("week");
-				if (number!=null){
-						lastWeek=Integer.parseInt(number);
-						logger.debug("number is"+lastWeek);
-				}
-			}
-		}catch (SQLException e) {
-			logger.debug("error while selecting last week from blog info. Reason :"+e);
-			e.printStackTrace();
-		}
-		return lastWeek;
-		
-	}
+	
 	
 	//replace into code with this function - avoid redondancy
 	public int getCurrentWeek(){
@@ -434,17 +410,7 @@ public class DatabaseConnection implements Variables {
 		return current_week; 
 	}
 	
-	@Deprecated
-	public void insertBlogWeekForUser(String userId , String week){
-		try {
-			logger.debug("adding blog week  "+week+" for user "+userId+" to table blog_info");
-			Statement st = connection.createStatement();
-			st.execute("INSERT into blog_info (week,user_id) values ("+week +","+userId+") ;");
-		}catch (SQLException e) {
-			logger.debug("error while inserting blog week "+week+" for user "+userId+" into blog_info"+e);
-			e.printStackTrace();
-		}
-	}
+	
 	
 	
 	public int getNumberOfInteractionForWeek(int week, int profile , String userId){
