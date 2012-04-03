@@ -22,75 +22,71 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
+package org.societies.privacytrust.trust.api.repo;
 
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+import org.societies.api.internal.privacytrust.trust.TrustException;
 
 /**
- * This class represents trusted CSSs. A <code>TrustedUser</code> object is
- * referenced by its {@link TrustedEntityId}, while the associated 
- * {@link Trust} value objects express the trustworthiness of this CSS, i.e.
- * direct, indirect and user-perceived. Each trusted CSS is assigned a set of
- * {@link TrustedService} objects.
- * 
+ * Thrown to indicate problems in the Trust Repository.
+ *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.1
+ * @since 0.0.5
  */
-public final class TrustedUser extends TrustedEntity {
-	
-	private static final long serialVersionUID = -5663024798098392757L;
-	
-	/** The communities this CSS is member of. */
-	private Set<TrustedCommunity> communities = new CopyOnWriteArraySet<TrustedCommunity>();
-	
-	/** The services provided by this CSS. */
-	private Set<TrustedService> services = new CopyOnWriteArraySet<TrustedService>();
+public class TrustRepositoryException extends TrustException {
 
-	public TrustedUser(TrustedEntityId trustor, TrustedEntityId teid) {
-		super(trustor, teid);
-	}
-	
+	private static final long serialVersionUID = -8614206161480834290L;
+
 	/**
-	 * 
-	 * @param community
-	 * @since 0.0.3
-	 */
-	public void addCommunity(final TrustedCommunity community) {
-		
-		if (!this.communities.contains(community))
-			this.communities.add(community);
-		
-		if (!community.getMembers().contains(this))
-			community.getMembers().add(this);
-	}
-	
-	/**
-	 * 
-	 * @param community
-	 * @since 0.0.3
-	 */
-	public void removeCommunity(final TrustedCommunity community) {
-		
-		if (this.communities.contains(community))
-			this.communities.remove(community);
-		
-		if (community.getMembers().contains(this))
-			community.getMembers().remove(this);
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	Set<TrustedCommunity> getCommunities() {
-		
-		return this.communities;
-	}
-	
-	public void addService(final TrustedService service) {
-		
-		if (!this.services.contains(service))
-			this.services.add(service);
-	}
+     * Constructs a <code>TrustRepositoryException</code> with no detail message.
+     */
+    public TrustRepositoryException() {
+    	
+        super();
+    }
+
+    /**
+     * Constructs a <code>TrustRepositoryException</code> with the specified detail
+     * message.
+     * 
+     * @param message
+     *            the detail message.
+     */
+    public TrustRepositoryException(String message) {
+    	
+        super(message);
+    }
+
+    /**
+     * Creates a <code>TrustRepositoryException</code> with the specified detail message
+     * and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustRepositoryException(String message, Throwable cause) {
+    	
+        super(message, cause);
+    }
+
+    /**
+     * Creates a <code>TrustRepositoryException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustRepositoryException(Throwable cause) {
+    	
+        super(cause);
+    }
 }

@@ -24,9 +24,6 @@
  */
 package org.societies.privacytrust.trust.api.repo;
 
-import java.util.Set;
-
-import org.societies.privacytrust.trust.api.mock.EntityIdentifier;
 import org.societies.privacytrust.trust.api.model.TrustedEntity;
 import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 
@@ -34,79 +31,32 @@ public interface ITrustRepository {
 
 	/**
 	 * 
-	 * @param cisId
-	 * @param members
+	 * 
+	 * @param entity
+	 * @throws TrustRepositoryException
+	 * @since 0.0.5
 	 */
-	public void addCommunity(EntityIdentifier cisId, Set<EntityIdentifier> members);
+	public void addEntity(final TrustedEntity entity) throws TrustRepositoryException;
 
 	/**
 	 * 
-	 * @param cisId
+	 * @param teid
+	 * @throws TrustRepositoryException
 	 */
-	public void addCommunity(EntityIdentifier cisId);
-
+	public void retrieveEntity(final TrustedEntityId teid) throws TrustRepositoryException;
+	
 	/**
 	 * 
-	 * @param developerId
+	 * @param entity
+	 * @throws TrustRepositoryException
 	 */
-	public void addDeveloper(EntityIdentifier developerId);
-
+	public void updateEntity(TrustedEntity entity) throws TrustRepositoryException;
+	
 	/**
 	 * 
-	 * @param serviceId
-	 * @param serviceType
-	 * @param provider
+	 * @param entity
 	 */
-	public void addService(EntityIdentifier serviceId, String serviceType, EntityIdentifier provider);
-
-	/**
-	 * 
-	 * @param cssId
-	 */
-	public void addUser(EntityIdentifier cssId);
+	public void removeEntity(TrustedEntity entity) throws TrustRepositoryException;
 
 	public void registerEntityEventListener();
-
-	/**
-	 * 
-	 * @param entity
-	 */
-	public void removeEntity(TrustedEntity entity);
-
-	/**
-	 * 
-	 * @param teid
-	 */
-	public void removeEntity(TrustedEntityId teid);
-
-	/**
-	 * 
-	 * @param cisId
-	 */
-	public void retrieveCommunityTrustValue(EntityIdentifier cisId);
-
-	/**
-	 * 
-	 * @param teid
-	 * @param trustType
-	 */
-	public void retrieveEntity(TrustedEntityId teid, int trustType);
-
-	/**
-	 * 
-	 * @param serviceId
-	 */
-	public void retrieveServiceTrustValue(EntityIdentifier serviceId);
-
-	/**
-	 * 
-	 * @param cssId
-	 */
-	public void retrieveUserTrustValue(EntityIdentifier cssId);
-
-	/**
-	 * 
-	 * @param entity
-	 */
-	public void updateEntity(TrustedEntity entity);
 }

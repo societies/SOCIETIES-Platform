@@ -24,8 +24,6 @@
  */
 package org.societies.privacytrust.trust.api.model;
 
-import java.util.Set;
-
 /**
  * This class represents trusted services. A TrustedService object is referenced
  * by its TrustedEntityId, while the associated Trust value objects express the
@@ -40,24 +38,62 @@ public class TrustedService extends TrustedEntity {
 
 	private static final long serialVersionUID = 8253551733059925542L;
 	
-	private final Set<TrustedCommunity> communities;
-	private final TrustedUser provider;
+	/** The CSS providing this service. */
+	private final TrustedCss provider;
+	
+	/* The communities sharing this service. */
+	//private final Set<TrustedCis> communities = new CopyOnWriteArraySet<TrustedCis>();
+	
+	/** The type of this service. */
 	private final String type;
-	public final TrustedDeveloper developer;
+	
+	/** The developer of this service. */
+	private TrustedDeveloper developer;
 
-	public TrustedService(TrustedEntityId trustor, TrustedEntityId teid) {
+	public TrustedService(TrustedEntityId trustor, TrustedEntityId teid, String type, TrustedCss provider) {
+		
 		super(trustor, teid);
+		this.type = type;
+		this.provider = provider;
 	}
 
-	public Set<TrustedCommunity> getCommunities(){
-		return this.communities;
+	/**
+	 * Returns the type of this service.
+	 * 
+	 * @return the type of this service.
+	 */
+	public String getType() {
+		
+		return this.type;
 	}
-
-	public TrustedUser getProvider(){
+	
+	/**
+	 * Returns the CSS providing this service.
+	 * 
+	 * @return the CSS providing this service.
+	 */
+	public TrustedCss getProvider() {
+		
 		return this.provider;
 	}
-
-	public String getType(){
-		return this.type;
+	
+	/** 
+	 * Returns the developer of this service.
+	 * 
+	 * @return the developer of this service.
+	 */
+	public TrustedDeveloper getDeveloper() {
+		
+		return this.developer;
+	}
+	
+	/**
+	 * Sets the developer of this service.
+	 * 
+	 * @param developer the service developer to set. 
+	 */
+	public void setDeveloper(TrustedDeveloper developer) {
+		
+		this.developer = developer;
 	}
 }

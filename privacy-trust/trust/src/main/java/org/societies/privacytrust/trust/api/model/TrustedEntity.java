@@ -27,10 +27,11 @@ package org.societies.privacytrust.trust.api.model;
 import java.io.Serializable;
 
 /**
- * This abstract class is used to represent an entity trusted by the trustor, i.e.
- * the owner of a CSS. Each trusted entity is referenced by its {@link TrustedEntityId},
- * while the associated Trust objects express the trustworthiness of that entity,
- * i.e. direct, indirect and user-perceived trust.
+ * This abstract class is used to represent an entity trusted by the trustor,
+ * i.e. the owner of a CSS. Each trusted entity is referenced by its
+ * {@link TrustedEntityId}, while the associated {@link Trust} objects express
+ * the trustworthiness of that entity, i.e. direct, indirect and user-perceived
+ * trust.
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1 
@@ -50,6 +51,7 @@ public abstract class TrustedEntity implements Serializable {
 	private UserPerceivedTrust userPerceivedTrust;
 
 	TrustedEntity(TrustedEntityId trustor, TrustedEntityId teid) {
+		
 		this.trustor = trustor;
 		this.teid = teid;
 	}
