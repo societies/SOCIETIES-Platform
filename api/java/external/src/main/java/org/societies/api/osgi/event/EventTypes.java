@@ -49,4 +49,6 @@ public class EventTypes {
 	
 	/**Used by Service Management (Service Discovery) to notify a local peer of a failed service */
 	public static final String FAILED_SERVICE_EVENT = "org/societies/servicemgmt/service/failedservice";        
+	
+	public static final String UIM_EVENT = "org/societies/useragent/monitoring/newaction";
 }
