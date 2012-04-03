@@ -64,6 +64,12 @@ public class GraphManager implements Variables{
 		//this.searchEngine=new SearchEngineImpl(neoService,indexService);
 	}
 	
+
+	public void shutdown(){
+		luceneIndexService.shutdown();
+		neoService.shutdown();	
+    }
+	
 	
 	/**
      * return the neoService used by ServiceImpl ,a.k.a the reference node

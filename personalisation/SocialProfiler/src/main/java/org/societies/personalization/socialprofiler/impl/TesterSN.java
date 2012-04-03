@@ -50,7 +50,14 @@ public class TesterSN {
 		profiler.setSocialdata(socialData);
 		profiler.addSocialNetwork(snList);
 		
-		
+		try {
+			Thread.sleep(15000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			profiler.shutdown();
+		}
 	}
 
 	
