@@ -14,7 +14,7 @@
 	<jsp:include page="leftbar.jsp" />
 	<!-- END LEFTBAR -->
 <!-- .................PLACE YOUR CONTENT HERE ................ -->
-content
+Welcome to the societies admin page
 
 
 <!-- .................END PLACE YOUR CONTENT HERE ................ -->

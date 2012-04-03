@@ -5,7 +5,7 @@
 	<table border="0" align="center">
 	  <tr>
 	    <td>
-		  <center>Societies web application</center>
+		  <center><img src="images/societiesheader.jpg"> Societies web application</center>
 		 </td>
 	  </tr>
 	</table>

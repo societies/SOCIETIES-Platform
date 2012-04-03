@@ -8,6 +8,14 @@
 <title>Registration Page</title>
 </head>
 <body>
+	<!-- HEADER -->
+	<jsp:include page="header.jsp" />
+	<!-- END HEADER -->
+
+	<!-- LEFTBAR -->
+	<jsp:include page="leftbar.jsp" />
+	<!-- END LEFTBAR -->
+<!-- .................PLACE YOUR CONTENT HERE ................ -->
 
 	<form:form method="POST" commandName="user">
 		<table>
@@ -54,6 +62,10 @@
 			</tr>
 		</table>
 	</form:form>
-
+	
+<!-- .................END PLACE YOUR CONTENT HERE ................ -->
+	<!-- FOOTER -->
+	<jsp:include page="footer.jsp" />
+	<!-- END FOOTER -->
 </body>
 </html>
