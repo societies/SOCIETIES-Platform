@@ -26,6 +26,8 @@ package org.societies.privacytrust.trust.impl;
 
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.TrustUpdateListener;
@@ -41,6 +43,13 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class TrustBroker implements ITrustBroker {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(TrustBroker.class);
+			
+	TrustBroker() {
+		
+		LOG.info(this.getClass() + " instantiated");
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrust(java.lang.Object)
