@@ -1,24 +1,24 @@
 package org.societies.personalisation.CRISTUserIntentTaskManager.impl;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class MockHistoryData {
 
-	List<String> context;
+	ArrayList<String> context;
 	String actionValue;
 	String situationValue;
 
-	MockHistoryData(String action, String situation, List<String> context) {
+	MockHistoryData(String action, String situation, ArrayList<String> context) {
 		this.actionValue = action;
 		this.situationValue = situation;
 		this.context = context;
 	}
 
-	public List<String> getContext() {
+	public ArrayList<String> getContext() {
 		return context;
 	}
 
-	public void setContext(List<String> context) {
+	public void setContext(ArrayList<String> context) {
 		this.context = context;
 	}
 
