@@ -25,39 +25,114 @@
 package org.societies.privacytrust.trust.api.model;
 
 import java.io.Serializable;
-import java.net.URI;
 
 /**
- * This abstract class is used to represent an entity trusted by the trustor, i.e.
- * the owner of a CSS. Each trusted entity is referenced by its {@link TrustedEntityId},
- * while the associated Trust objects express the trustworthiness of that entity,
- * i.e. direct, indirect and user-perceived.
+ * This abstract class is used to represent an entity trusted by the trustor,
+ * i.e. the owner of a CSS. Each trusted entity is referenced by its
+ * {@link TrustedEntityId}, while the associated {@link Trust} objects express
+ * the trustworthiness of that entity, i.e. direct, indirect and user-perceived
+ * trust.
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1 
  */
 public abstract class TrustedEntity implements Serializable {
 	
 	private static final long serialVersionUID = -495088232194787430L;
 
-	private TrustedEntityId teid;
+	/** The identifier of the trustor. */
+	private final TrustedEntityId trustor;
+	
+	/** The identifier of this trusted entity. */
+	private final TrustedEntityId teid;
 	
 	private DirectTrust directTrust ;
 	private IndirectTrust indirectTrust ;
-	private UserPerceivedTrust trust;
-	
-	private URI trustor;
+	private UserPerceivedTrust userPerceivedTrust;
 
-	public TrustedEntity() {
-
+	TrustedEntity(TrustedEntityId trustor, TrustedEntityId teid) {
+		
+		this.trustor = trustor;
+		this.teid = teid;
 	}
-
-	public URI getTrustor() {
+	
+	/**
+	 * Returns the identifier of the trustor.
+	 * 
+	 * @return the identifier of the trustor.
+	 */
+	public TrustedEntityId getTrustor() {
+		
 		return this.trustor;
 	}
 	
-	public UserPerceivedTrust getTrust(){
-		return this.trust;
-	}
-
-	public TrustedEntityId getTrustedEntityId(){
+	/**
+	 * Returns the identifier of this trusted entity.
+	 * 
+	 * @return the identifier of this trusted entity.
+	 */
+	public TrustedEntityId getId() {
+		
 		return this.teid;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @since 0.0.3
+	 */
+	public DirectTrust getDirectTrust() {
+		
+		return this.directTrust;
+	}
+	
+	/**
+	 * 
+	 * @param directTrust
+	 * @since 0.0.3
+	 */
+	public void setDirectTrust(DirectTrust directTrust) {
+		
+		this.directTrust = directTrust;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @since 0.0.3
+	 */
+	public IndirectTrust getIndirectTrust() {
+		
+		return this.indirectTrust;
+	}
+	
+	/**
+	 * 
+	 * @param indirectTrust
+	 * @since 0.0.3
+	 */
+	public void setIndirectTrust(IndirectTrust indirectTrust) {
+		
+		this.indirectTrust = indirectTrust;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @since 0.0.3
+	 */
+	public UserPerceivedTrust getUserPerceivedTrust() {
+		
+		return this.userPerceivedTrust;
+	}
+	
+	/**
+	 * 
+	 * @param userPerceivedTrust
+	 * @since 0.0.3
+	 */
+	public void setUserPerceivedTrust(UserPerceivedTrust userPerceivedTrust) {
+		
+		this.userPerceivedTrust = userPerceivedTrust;
 	}
 }

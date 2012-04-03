@@ -1512,6 +1512,8 @@ public class GraphManager implements Variables{
 		Transaction tx = getNeoService().beginTx();
 		try{
 			SocialPersonImpl person=  (SocialPersonImpl) getPerson("ROOT");
+			
+			
 		   
 			graph = person.getUnderlyingNode().traverse(
 			Traverser.Order.BREADTH_FIRST,

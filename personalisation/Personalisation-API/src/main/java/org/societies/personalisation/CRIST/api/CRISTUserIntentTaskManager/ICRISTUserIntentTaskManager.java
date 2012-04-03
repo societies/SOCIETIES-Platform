@@ -84,6 +84,11 @@ public interface ICRISTUserIntentTaskManager {
 	 * This method will retrieve the user's current situation
 	 */
 	public CRISTUserSituation getCurrentUserSituation(IIdentity entityID);
+	
+	/**
+	 * This method will retrieve the user's current context clique
+	 */
+	public ArrayList<String> getCurrentUserContext(IIdentity entityID);
 
 	public void updateUserSituation(IIdentity entityID, CtxAttribute ctxAttribute); 
 	/**

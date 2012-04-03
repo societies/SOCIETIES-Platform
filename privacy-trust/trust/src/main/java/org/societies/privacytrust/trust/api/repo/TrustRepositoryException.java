@@ -24,39 +24,69 @@
  */
 package org.societies.privacytrust.trust.api.repo;
 
-import org.societies.privacytrust.trust.api.model.TrustedEntity;
-import org.societies.privacytrust.trust.api.model.TrustedEntityId;
+import org.societies.api.internal.privacytrust.trust.TrustException;
 
-public interface ITrustRepository {
+/**
+ * Thrown to indicate problems in the Trust Repository.
+ *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.5
+ */
+public class TrustRepositoryException extends TrustException {
 
-	/**
-	 * 
-	 * 
-	 * @param entity
-	 * @throws TrustRepositoryException
-	 * @since 0.0.5
-	 */
-	public void addEntity(final TrustedEntity entity) throws TrustRepositoryException;
+	private static final long serialVersionUID = -8614206161480834290L;
 
 	/**
-	 * 
-	 * @param teid
-	 * @throws TrustRepositoryException
-	 */
-	public void retrieveEntity(final TrustedEntityId teid) throws TrustRepositoryException;
-	
-	/**
-	 * 
-	 * @param entity
-	 * @throws TrustRepositoryException
-	 */
-	public void updateEntity(TrustedEntity entity) throws TrustRepositoryException;
-	
-	/**
-	 * 
-	 * @param entity
-	 */
-	public void removeEntity(TrustedEntity entity) throws TrustRepositoryException;
+     * Constructs a <code>TrustRepositoryException</code> with no detail message.
+     */
+    public TrustRepositoryException() {
+    	
+        super();
+    }
 
-	public void registerEntityEventListener();
+    /**
+     * Constructs a <code>TrustRepositoryException</code> with the specified detail
+     * message.
+     * 
+     * @param message
+     *            the detail message.
+     */
+    public TrustRepositoryException(String message) {
+    	
+        super(message);
+    }
+
+    /**
+     * Creates a <code>TrustRepositoryException</code> with the specified detail message
+     * and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustRepositoryException(String message, Throwable cause) {
+    	
+        super(message, cause);
+    }
+
+    /**
+     * Creates a <code>TrustRepositoryException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustRepositoryException(Throwable cause) {
+    	
+        super(cause);
+    }
 }

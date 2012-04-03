@@ -23,7 +23,9 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
       <xs:element name="eventId" type="xs:string" minOccurs="0"/>
       <xs:element name="keyWord" type="xs:string" minOccurs="0"/>
       <xs:element name="method" type="tns:methodType" minOccurs="0"/>
-      <xs:element name="subscriverId" type="xs:string" minOccurs="0"/>
+      <xs:element name="subscriberId" type="xs:string" minOccurs="0"/>
+      <xs:element name="privateCalendarSummary" type="xs:string" minOccurs="0"/>
+      <xs:element name="newEvent" type="tns:event" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   </xs:element>
@@ -31,12 +33,12 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
   <xs:complexType name="event" >
     <xs:sequence>
-      <xs:element name="endDate" type="xs:string" minOccurs="0"/>
+    <xs:element name="startDate" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="endDate" type="xs:dateTime" minOccurs="0"/>
       <xs:element name="eventDescription" type="xs:string" minOccurs="0"/>
       <xs:element name="eventId" type="xs:string" minOccurs="0"/>
       <xs:element name="eventSummary" type="xs:string" minOccurs="0"/>
       <xs:element name="location" type="xs:string" minOccurs="0"/>
-      <xs:element name="startDate" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -47,6 +49,8 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
       <xs:element name="calendarList" type="tns:calendar" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="eventList" type="tns:event" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="subscribingResult" type="xs:boolean"/>
+      <xs:element name="createPrivateCalendarResult" type="xs:boolean"/>
+      <xs:element name="eventId" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
   </xs:element>
@@ -58,6 +62,9 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema">
       <xs:enumeration value="subscribeToEvent"/>
       <xs:enumeration value="findEvents"/>
       <xs:enumeration value="unsubscribeFromEvent"/>
+      <xs:enumeration value="createPrivateCalendar"/>
+      <xs:enumeration value="createEventOnPrivateCalendar"/>
+      <xs:enumeration value="retrieveEventsPrivateCalendar"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

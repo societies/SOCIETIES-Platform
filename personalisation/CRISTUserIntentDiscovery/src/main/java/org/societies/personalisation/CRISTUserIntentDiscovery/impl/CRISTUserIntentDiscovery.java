@@ -101,7 +101,7 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 		// By mining user behavior patterns
 		// Identify all the possible user behaviors
 		for (int i = 0; i < historySize; i++) {
-			MockHistoryData currentHisData = historyList.get(i);
+			MockHistoryData currentHisData = this.historyList.get(i);
 			String currentHisAction = currentHisData.getActionValue();
 			String currentHisSituation = currentHisData.getSituationValue();
 			String currentBehavior = currentHisAction + "@"
@@ -113,7 +113,7 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 
 		// Convert history data to the "Action#Situation" format
 		for (int i = 0; i < historySize; i++) {
-			MockHistoryData currentHisData = historyList.get(i);
+			MockHistoryData currentHisData = this.historyList.get(i);
 			String currentHisAction = currentHisData.getActionValue();
 			String currentHisSituation = currentHisData.getSituationValue();
 			String currentBehavior = currentHisAction + "@"
@@ -133,11 +133,11 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 					int currentIndex = indexList[j] + k;
 					if (indexList[j] + k < historySize
 							&& behaviorRecords.get(i).endsWith(
-									historyList.get(currentIndex)
+									this.historyList.get(currentIndex)
 											.getSituationValue())) {
 						currentCadidate = currentCadidate
 								+ "#"
-								+ historyList.get(currentIndex)
+								+ this.historyList.get(currentIndex)
 										.getActionValue();
 					} else {
 						break;

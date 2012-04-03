@@ -62,9 +62,9 @@
 		</module>
 		<module>../platform-infrastructure/client-frwk/devicestatusgui</module>
 
-		<!-- Client Framework -->
+		<!-- Client Framework 
 		<module>../platform-infrastructure/client-frwk/MasterGUI</module>
-
+		-->
 		<!-- CIS manager light modules -->
 		<module>../cis-modules/android/client-lib-android</module>
 		<module>../cis-modules/android/cis-management</module>

@@ -25,41 +25,91 @@
 package org.societies.privacytrust.trust.api.model;
 
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
- * This class represents trusted CISs. A TrustedCIS object is referenced by its
- * TrustedEntityId, while the associated Trust value objects express the
- * trustworthiness of this community, i.e. direct, indirect and user-perceived.
- * Each trusted CIS is assigned a set of TrustedCSS objects, which represent its
- * members.
+ * This class represents trusted CISs. A <code>TrustedCis</code> object is
+ * referenced by its {@link TrustedEntityId}, while the associated {@link Trust}
+ * value objects express the trustworthiness of this community, i.e. direct, 
+ * indirect and user-perceived. Each trusted CIS is assigned a set of 
+ * {@link TrustedCss} objects, which represent its members.
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
  */
 public class TrustedCis extends TrustedEntity {
 
 	private static final long serialVersionUID = -438368876927927076L;
 	
-	private Set<TrustedCss> members;
-	private Set<TrustedService> services;
+	/** The members of this trusted CIS. */
+	private Set<TrustedCss> members = new CopyOnWriteArraySet<TrustedCss>();
+	
+	/* TODO The services shared by this trusted CIS. */
+	// private Set<TrustedService> services = new CopyOnWriteArraySet<TrustedService>();
 
-	public TrustedCis(){
-
-	}
-
-	public Set<TrustedCss> getMembers(){
-		return this.members;
+	/**
+	 * @param trustor
+	 * @param teid
+	 */
+	public TrustedCis(TrustedEntityId trustor, TrustedEntityId teid) {
+		
+		super(trustor, teid);
 	}
 
 	/**
-	 * 			
+	 * Returns a set containing the members of this community.
+	 * 
+	 * @return a set containing the members of this community.
 	 */
-	public Set<TrustedService> getServices(){
+	public Set<TrustedCss> getMembers() {
+		
+		return this.members;
+	}
+	
+	/**
+	 * Adds the specified trusted individual to the members of this community.
+	 * 
+	 * @param member
+	 *            the trusted individual to add to the members of this community
+	 * @since 0.0.3
+	 */
+	public void addMember(final TrustedCss member) {
+		
+		if (!this.members.contains(member))
+			this.members.add(member);
+		
+		if (!member.getCommunities().contains(this))
+			member.getCommunities().add(this);
+	}
+	
+	/**
+	 * Removes the specified trusted individual from the members of this community.
+	 * 
+	 * @param member
+	 *            the trusted individual to remove from the members of this community
+	 * @since 0.0.3
+	 */
+	public void removeMember(final TrustedCss member) {
+		
+		if (this.members.contains(member))
+			this.members.remove(member);
+		
+		if (member.getCommunities().contains(this))
+			member.getCommunities().remove(this);
+	}
+
+	/*
+	 * TODO			
+	 *
+	public Set<TrustedService> getServices() {
 		return this.services;
 	}
 
 	/**
 	 * 
 	 * @param s
-	 */
-	public Set<TrustedService> getServices(String serviceType){
+	 *
+	public Set<TrustedService> getServices(String serviceType) {
 		return null;
-	}
+	}*/
 }
