@@ -25,6 +25,9 @@
 
 package org.societies.api.internal.security.policynegotiator;
 
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+
 /**
  * Interface for invoking the provider.
  * To be used by generic secure policy negotiator on the requester side.
@@ -37,16 +40,24 @@ public interface INegotiationProviderRemote {
 	/**
 	 * See {@link INegotiationProvider#getPolicyOptions(String)}
 	 */
-	public void getPolicyOptions(String serviceId, INegotiationProviderCallback callback);
+	public void getPolicyOptions(String serviceId, IIdentity toIdentity,
+			INegotiationProviderCallback callback);
 
 	/**
 	 * See {@link INegotiationProvider#acceptPolicyAndGetSla(int, String, boolean)}
 	 */
 	public void acceptPolicyAndGetSla(int sessionId, String signedPolicyOption,
-			boolean modified, INegotiationProviderCallback callback);
+			boolean modified, IIdentity toIdentity, INegotiationProviderCallback callback);
 	
 	/**
 	 * See {@link INegotiationProvider#reject(int)}
 	 */
-	public void reject(int sessionId, INegotiationProviderCallback callback);
+	public void reject(int sessionId, IIdentity toIdentity, INegotiationProviderCallback callback);
+	
+	/**
+	 * Get local instance of Identity Manager
+	 * 
+	 * @return Identity Manager
+	 */
+	public IIdentityManager getIdMgr();
 }

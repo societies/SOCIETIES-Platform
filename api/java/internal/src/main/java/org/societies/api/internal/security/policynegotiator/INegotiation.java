@@ -24,12 +24,12 @@
  */
 package org.societies.api.internal.security.policynegotiator;
 
-import java.net.URI;
+import org.societies.api.identity.IIdentity;
 
 /**
- * High-level interface for invoking the policy negotiator.
+ * High-level interface for invoking the secure policy negotiator.
  * Includes high-level interactions with the requester side of policy negotiator.
- * To be used by other components (Service Marketplace ?) from same node.
+ * To be used by other components (Service Marketplace ?) locally, from same node.
  *
  * @author Mitja Vardjan
  *
@@ -39,9 +39,9 @@ public interface INegotiation {
 	/**
 	 * Start policy negotiation procedure.
 	 * 
-	 * @param callback The callback to be invoked to return the result.
-	 * 
-	 * TODO: fix parameters 
+	 * @param provider Identity of the service provider
+	 * @param serviceId Service ID
+	 * @param callback The callback to be invoked to receive the result of this method
 	 */
-	public void startNegotiation(INegotiationCallback callback, URI sopOptions);
+	public void startNegotiation(IIdentity provider, String serviceId, INegotiationCallback callback);
 }
