@@ -26,12 +26,13 @@ package org.societies.personalization.socialprofiler.service;
 
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
+import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.neo4j.graphdb.Node;
@@ -44,8 +45,6 @@ import org.societies.personalization.socialprofiler.datamodel.impl.RelTypes;
 import org.societies.personalization.socialprofiler.datamodel.impl.SocialPersonImpl;
 import org.societies.personalization.socialprofiler.exception.NeoException;
 
-import sun.misc.Perf.GetPerfAction;
-
 
 
 
@@ -57,10 +56,12 @@ public class ProfilerEngine implements Variables{
 	private DatabaseConnection 				databaseConnection;
 	private ISocialData						socialData;
 	
-	private List<?> 			friends;
-	private List<?> 			profiles;
-	private List<?>	 			groups;
-	private List<?> 			activities;
+	private List<?> 			friends 	= new ArrayList<Person>();
+	private List<?> 			profiles 	= new ArrayList<Person>();
+	private List<?>	 			groups 		= new ArrayList<Group>();
+	private List<?> 			activities = new ArrayList<ActivityEntry>();
+	
+	private boolean 			firstTime   = true;
 	
 	
 	private Hashtable<String, ArrayList<String>>  credentials_sn			= new Hashtable<String, ArrayList<String>> ();
@@ -73,6 +74,7 @@ public class ProfilerEngine implements Variables{
 		this.databaseConnection 	= databaseConnection;
 		this.socialData				= socialData;
 		
+		
 	}
 	
 	
@@ -82,6 +84,7 @@ public class ProfilerEngine implements Variables{
 
 	public void setSocialData(ISocialData socialData){
 		this.socialData = socialData;
+		
 	}
 	
 	
@@ -107,6 +110,22 @@ public class ProfilerEngine implements Variables{
 	}
 	
 	
+	
+	public void generateCompleteNetwork(){
+		logger.debug("GENERATING the whole network including isolated clusters and/or nodes");
+		graph.createPerson("ROOT");
+		
+		Iterator it = profiles.iterator();
+		
+		while (it.hasNext()){
+			Person user =  (Person) it.next();
+			logger.debug("### adding new cluster using user "+user.getId()); 
+			generateTree(user.getId(), null, FIRST_TIME); 
+		}	
+		
+		//databaseConnection.addInfoForCommunityProfile();
+	}
+	
 	/**
 	 * 
 	 * @param option can be 1:FIRST TIME or 2:UPDATE ONLY if option is 1 
@@ -130,7 +149,13 @@ public class ProfilerEngine implements Variables{
 		groups 	 	= socialData.getSocialGroups();
 		activities	= socialData.getSocialActivity();
 		
+		if (firstTime){
+			generateCompleteNetwork();
+			firstTime=false;
+		}
 	
+		
+		
 		logger.debug("=============================================================");
 		logger.debug("=== Traversing NEO GRAPH     "); 
 		logger.debug("=============================================================");
@@ -174,7 +199,7 @@ public class ProfilerEngine implements Variables{
 		Transaction tx = graph.getNeoService().beginTx();
 		try{
 			Node startPersonNode	=  ((SocialPersonImpl) p).getUnderlyingNode();
-			Node rootNode			=  ((SocialPersonImpl)graph.getPerson("ROOT")).getUnderlyingNode();
+			Node rootNode			=  ((SocialPersonImpl) graph.getPerson("ROOT")).getUnderlyingNode();
 			
 			startPersonNode.createRelationshipTo(rootNode, RelTypes.TRAVERSER);
 			tx.success();
@@ -216,7 +241,7 @@ public class ProfilerEngine implements Variables{
 					logger.debug("-->creating user "+current_id+" on Neo network");
 					SocialPerson startPerson=graph.createPerson(current_id);
 					
-					databaseConnection.addUserToDatabase(current_id, startPerson.getName());
+					//databaseConnection.addUserToDatabase(current_id, startPerson.getName());
 					
 					logger.debug("REMOVING USER "+current_id);
 					credentials_sn.remove(current_id);
