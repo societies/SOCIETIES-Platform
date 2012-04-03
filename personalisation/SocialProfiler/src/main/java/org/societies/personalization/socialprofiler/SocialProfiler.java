@@ -27,12 +27,15 @@ public class SocialProfiler implements ISocialProfiler {
 	private String 					configFileName	= "config.properties";
 	private EmbeddedGraphDatabase 	neo;
 	private GraphManager	 		graph;
-	private DatabaseConnection  databaseConnection;
+	private DatabaseConnection  	databaseConnection;
 
 	private ProfilerEngine 			engine;
 	
 	
-
+	public SocialProfiler(){
+		
+	}
+	
 	private float daysFull = 0;
 
 	@Override
@@ -63,13 +66,13 @@ public class SocialProfiler implements ISocialProfiler {
 		// Start and Create (if necessary) the Graph
 		this.neo 					= new EmbeddedGraphDatabase(neoDBPath);
 		this.graph					= new GraphManager(neo);
-		this.databaseConnection	    = new DatabaseConnection();
+		this.databaseConnection	    = new DatabaseConnection(props);
 		
 		logger.info("Engine Initialization ...");
 		this.engine	= new ProfilerEngine(graph, databaseConnection, socialdata);
+		this.engine.generateCompleteNetwork();
+	
 		
-		// start Scheduler
-		scheduleNetworkUpdate();
 		
 	}
 
