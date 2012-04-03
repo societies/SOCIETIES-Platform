@@ -21,15 +21,15 @@ public class SocialTimerTask extends TimerTask {
 
 	@Override
 	public void run() {
-			logger.info("Starting full network update...");
-		   if (!databaseConnection.connectMysql()){
-			   logger.error("Cannot update network due to database connection problems.");
-			   return;
-		}
+//		logger.info("Starting full network update...");
+//		   if (!databaseConnection.connectMysql()){
+//			   logger.error("Cannot update network due to database connection problems.");
+//			   return;
+//		}
 		
-		this.engine.setDatabaseConnection(databaseConnection);
+		//this.engine.setDatabaseConnection(databaseConnection);
 		this.updateNetwork();
-		databaseConnection.closeMysql();
+		//databaseConnection.closeMysql();
 		logger.info("Network update routine terminated.");
 	}
 	
