@@ -26,10 +26,12 @@
 package org.societies.personalisation.dianne;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.Future;
 
 import org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE;
+import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
-import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
@@ -49,30 +51,29 @@ public class DIANNE implements IDIANNE{
 	}
 
 	@Override
-	public void getOutcome(IIdentity ownerId,
+	public Future<List<IDIANNEOutcome>> getOutcome(IIdentity ownerId,
 			ServiceResourceIdentifier serviceId, 
-			String preferenceName, 
-			IPersonalisationInternalCallback callback) {
-		// TODO Auto-generated method stub
+			String preferenceName) {
+		return null;
 	}
 
 	@Override
-	public void getOutcome(IIdentity ownerId,
-			CtxAttribute attribute, 
-			IPersonalisationInternalCallback callback) {
+	public Future<List<IDIANNEOutcome>> getOutcome(IIdentity ownerId,
+			CtxAttribute attribute) {
 		// Context update received!!!
 		if(networks.containsKey(ownerId)){
 			
 		}else{
 			NetworkRunner newNetwork = new NetworkRunner();
 		}
+		return null;
 	}
 	
 	@Override
-	public void getOutcome(IIdentity ownerId,
-			IAction action,
-			IPersonalisationInternalCallback callback){
+	public Future<List<IDIANNEOutcome>> getOutcome(IIdentity ownerId,
+			IAction action){
 		// Action update received!!!
+		return null;
 	}
 
 	@Override

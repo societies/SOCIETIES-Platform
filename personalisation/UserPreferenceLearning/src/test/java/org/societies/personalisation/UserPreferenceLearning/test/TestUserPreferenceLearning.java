@@ -41,8 +41,8 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.util.SerialisationHelper;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
+/*import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;*/
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 //import org.societies.personalisation.UserPreferenceLearning.impl.CtxIdentifierCache;
@@ -62,7 +62,8 @@ public class TestUserPreferenceLearning extends TestCase{
 	PostProcessor post;
 	ServiceResourceIdentifier serviceId1;
 	ServiceResourceIdentifier serviceId2;
-	IIdentity ownerId;
+	//IIdentity ownerId;
+	String identity;
 	NumberGenerator ng;
 
 	public void setUp() throws Exception {
@@ -72,7 +73,8 @@ public class TestUserPreferenceLearning extends TestCase{
 		serviceId1.setIdentifier(new URI("tennisPlanner"));
 		serviceId2 = new ServiceResourceIdentifier();
 		serviceId2.setIdentifier(new URI("lymphChecker"));
-		ownerId = new MockIdentity(IdentityType.CSS, "test", "domain");
+		//ownerId = new MockIdentity(IdentityType.CSS, "test", "domain");
+		identity = "sarah@societies.org";
 		ng = new NumberGenerator();
 	}
 
@@ -277,7 +279,7 @@ public class TestUserPreferenceLearning extends TestCase{
 				new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 
 		//Create EntityIdentifier
-		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "testEntity", new Long(12345));
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(identity, "testEntity", new Long(12345));
 
 		//extract tennis dataset
 		//ServiceId = tennisPlanner
@@ -391,7 +393,7 @@ public class TestUserPreferenceLearning extends TestCase{
 
 	private ServiceSubset getServiceSubset(){
 		//Create EntityIdentifier
-		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "testEntity", new Long(12345));
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(identity, "testEntity", new Long(12345));
 		List<ActionSubset> actionSubsets = new ArrayList<ActionSubset>();
 
 		URL url = getClass().getResource("/tennis_singletons.txt");
@@ -476,7 +478,7 @@ public class TestUserPreferenceLearning extends TestCase{
 
 	private ActionSubset getActionSubset(){
 		//Create EntityIdentifier
-		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId, "testEntity", new Long(12345));
+		CtxEntityIdentifier entityId = new CtxEntityIdentifier(identity, "testEntity", new Long(12345));
 		ActionSubset actionSubset = new ActionSubset("tennis");
 
 		URL url = getClass().getResource("/tennis.txt");
