@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
@@ -77,20 +78,33 @@ public interface ICRISTUserIntentTaskManager {
 	/**
 	 * This method will retrieve the user's current action
 	 */
-	public CRISTUserAction getCurrentUserAction();
+	public CRISTUserAction getCurrentUserAction(IIdentity entityID);
 
 	/**
 	 * This method will retrieve the user's current situation
 	 */
-	public CRISTUserSituation getCurrentUserSituation();
+	public CRISTUserSituation getCurrentUserSituation(IIdentity entityID);
+	
+	/**
+	 * This method will retrieve the user's current context clique
+	 */
+	public ArrayList<String> getCurrentUserContext(IIdentity entityID);
 
+	public void updateUserSituation(IIdentity entityID, CtxAttribute ctxAttribute); 
 	/**
 	 * This method returns a map of next userActions and the relevant probabilities given the
 	 * current action. Next userActions are only one step from the given action.
 	 *  
 	 * @param userAction	- the given user action
 	 */
-	public HashMap<CRISTUserAction, Double> getNextActions(CRISTUserAction userAction);
+	public ArrayList<CRISTUserAction> getNextActions(IIdentity entityID, CRISTUserAction userAction, CRISTUserSituation userSituation);
+	
+	/**
+	 
+	 */
+	public ArrayList<CRISTUserAction> predictUserIntent(IIdentity entityID, CtxAttribute ctxAttribute);
+	
+	public ArrayList<CRISTUserAction> predictUserIntent(IIdentity entityID, CRISTUserAction userAction);
 
 	/**
 	 * This method returns a map of next user tasks and the relevant probabilities given the
@@ -98,7 +112,7 @@ public interface ICRISTUserIntentTaskManager {
 	 * 
 	 * @param userTask		- the given user task
 	 */
-	public HashMap<CRISTUserTask, Double> getNextTasks(CRISTUserTask userTask);
+	public ArrayList<CRISTUserTask> getNextTasks(CRISTUserTask userTask);
 	
 	/**
 	 * This method returns the user task according to the given task ID

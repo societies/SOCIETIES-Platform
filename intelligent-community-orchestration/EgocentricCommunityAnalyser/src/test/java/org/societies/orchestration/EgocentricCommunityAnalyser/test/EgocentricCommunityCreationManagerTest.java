@@ -49,13 +49,28 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.internal.context.broker.ICtxBroker;
 
 import org.societies.api.context.model.CtxAttributeValueType;
-import org.societies.api.internal.cis.management.ICisManager;
-import org.societies.api.internal.cis.management.ICisRecord;
+
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
+import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.cis.management.ICisSubscribed;
+import org.societies.api.cis.management.ICisEditor;
+import org.societies.api.cis.management.ICisActivity;
+import org.societies.api.cis.management.ICisActivityFeed;
 
 import org.societies.api.css.directory.ICssDirectory;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 import org.societies.api.css.management.ICssRecord;
+
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
+import org.societies.api.personalisation.mgmt.IPersonalisationManager;
+import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
+
+import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 
 /**
  * This is the test class for the Egocentric Community Creation Manager component
@@ -222,7 +237,21 @@ public class EgocentricCommunityCreationManagerTest {
     
     @Test
     public void testNotSuggestUndesiredCis() {
+    	cisManager = mock(ICisManager.class);
+    	ICisRecord cisRecord = mock(ICisRecord.class);
+    	IIdentity ownerId = mock(IIdentity.class);
+    	//cisManager.addCis(ownerId, cisRecord);
+    	ServiceResourceIdentifier serviceId = mock(ServiceResourceIdentifier.class);
     	
+    	IPersonalisationManager personalisationManager = mock(IPersonalisationManager.class);
+    	IPersonalisationCallback pc = mock(IPersonalisationCallback.class);
+    	personalisationManager.getPreference(ownerId, ownerId, "refuse creation of " + cisRecord.toString(), serviceId, "", pc);
+    	egocentricCommunityCreationManager = new EgocentricCommunityCreationManager(ownerId, "CSS");
+		
+    	egocentricCommunityCreationManager.setCisManager(cisManager);
+    	
+    	//egocentricCommunityCreationManager.identifyCissToCreate("extensive", new HashMap<IIdentity, String>());
+        //ICisManager resultCisManager = egocentricCommunityCreationManager.getCisManager();
     }
     
     public void setCtxBroker(ICtxBroker userCtxBroker){

@@ -28,29 +28,167 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.societies.privacytrust.trust.api.mock.EntityIdentifier;
-
+/**
+ * This class is used to uniquely identify a {@link TrustedEntity}. Trusted
+ * Entity Identifiers (TEIDs) are formatted as Uniform Name Numbers (URNs). A
+ * URN is composed of the Namespace Identifier (NID) and the Namespace Specific
+ * String (NSS). More specifically, using EBNF notation, a URN has the form:
+ * 
+ * <pre>
+ * urn = "urn:" , nid , ":" , nss ;
+ * </pre>
+ * 
+ * The structure of a TEID has the form:
+ * 
+ * <pre> 
+ * teid = "urn:" , "teid" , ":" , ? entity-type ? , ":" , ? entity-id ? ;     
+ * </pre>
+ * where <code>"teid"</code> is the NID of all TEID URNs, while the NSS is
+ * composed of the <code>entity-type</code> and the <code>entity-id</code>:
+ * <dl>
+ * <dt><code>entity-type<code></dt>
+ * <dd>Denotes the type of the identified trusted entity and can be retrieved
+ * using {@link #getEntityType()}. All available trusted entity types are
+ * defined in {@link TrustedEntityType}.</dd>
+ * <dt><code>entity-id</code></dt>
+ * <dd>A unique identifier of the referenced trusted entity, available through
+ * {@link #getEntityId()}.</dd>
+ * </dl>
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1 
+ */
 public class TrustedEntityId implements Serializable {
 
 	private static final long serialVersionUID = 7390835311816850816L;
 	
-	private final EntityIdentifier entityId;
-	private URI urn;
+	/** The URI encoding scheme to use for representing trusted entity identifiers. */
+    public static final String URI_SCHEME = "urn";
+    
+    /** The URN delimiter. */
+    public static final String URN_DELIM = ":";
+    
+    /** The URN NID. */
+    public static final String URN_NID = "teid";
 
-	public TrustedEntityId(EntityIdentifier entityId) throws URISyntaxException{
+    /** The trusted entity type. */
+    private final TrustedEntityType entityType;
+    
+    /** The String representation of the unique identifier of the referenced trusted entity. */
+    private final String entityId;
+	
+    /** The URN-formatted representation of this trusted entity identifier. */
+	private final URI urn;
+
+	/**
+	 * Constructs a <code>TrustedEntityId</code> with the specified entity type and id.
+	 * 
+	 * @param entityType
+	 *            the trusted entity type
+	 * @param entityId
+	 *            the String representation of the unique identifier of the
+	 *            referenced trusted entity
+	 *        
+	 * @throws URISyntaxException if the URN of this identifier cannot be created
+	 */
+	public TrustedEntityId(TrustedEntityType entityType, String entityId) throws URISyntaxException {
+		
+		this.entityType = entityType;
 		this.entityId = entityId;
-		this.urn = new URI("teid" + entityId.toString());
+		this.urn = URI.create(URI_SCHEME 
+                + URN_DELIM
+                + URN_NID
+                + URN_DELIM 
+                + this.getEntityType()
+                + URN_DELIM
+                + this.getEntityId()); 
 	}
 
-	public EntityIdentifier getEntityId(){
+	/**
+	 * Returns the {@link TrustedEntityType} of the entity referenced by this
+	 * identifier.
+	 * 
+	 * @return the {@link TrustedEntityType} of the entity referenced by this
+	 *         trusted entity identifier.
+	 * @since 0.0.3
+	 */
+	public TrustedEntityType getEntityType() {
+		
+		return this.entityType;
+	}
+	
+	/**
+	 * Returns the String representation of the unique identifier of the
+	 * referenced trusted entity.
+	 * 
+	 * @return the String representation of the unique identifier of the
+	 *         referenced trusted entity.
+	 */
+	public String getEntityId() {
+		
 		return this.entityId;
 	}
 
-	public URI getUrn(){
+	/**
+	 * Returns a URI representation of this identifier.
+     *
+     * @return a URI representation of this identifier.
+     * @since 0.0.3
+	 */
+	public URI getUri() {
+		
 		return this.urn;
 	}
 	
+	/**
+	 * Returns a String representation of this identifier. The format of the
+	 * returned String is as follows: 
+     * <pre>
+     * urn:teid:entity-type:entity-id
+     * </pre>
+     * 
+     * @return a String representation of this identifier.
+	 */
+	@Override
 	public String toString() {
+		
 		return this.urn.toString();
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		
+		final int prime = 31;
+		
+		int result = 1;
+		result = prime * result + ((this.urn == null) ? 0 : this.urn.hashCode());
+		
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object that) {
+		
+		if (this == that)
+			return true;
+		if (that == null)
+			return false;
+		if (this.getClass() != that.getClass())
+			return false;
+		
+		TrustedEntityId other = (TrustedEntityId) that;
+		if (this.urn == null) {
+			if (other.urn != null)
+				return false;
+		} else if (!this.urn.equals(other.urn))
+			return false;
+		
+		return true;
 	}
 }

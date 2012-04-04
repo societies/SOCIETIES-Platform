@@ -39,13 +39,23 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 //import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.internal.cis.management.ICisManager;
-import org.societies.api.internal.cis.management.ICisRecord;
+
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
+import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.cis.management.ICisSubscribed;
+import org.societies.api.cis.management.ICisEditor;
+import org.societies.api.cis.management.ICisActivity;
+import org.societies.api.cis.management.ICisActivityFeed;
 
 import org.societies.api.css.directory.ICssDirectory;
 import org.societies.api.css.directory.ICssAdvertisementRecord;
 
 import org.societies.api.css.management.ICssRecord;
+
+import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 
 /**
  * This is the test class for the Egocentric Community Deletion Manager component
@@ -59,10 +69,12 @@ public class EgocentricCommunityDeletionManagerTest {
 	
 	private EgocentricCommunityDeletionManager autoCommunityDeletionManager;
 	private ICisManager cisManager;
+	private ISuggestedCommunityAnalyser suggestedCommunityAnalyser;
 	
 	@Test
 	public void testIdentifyCissToDelete() {
 		
+		suggestedCommunityAnalyser = mock(ISuggestedCommunityAnalyser.class);
 		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
     	
@@ -74,7 +86,9 @@ public class EgocentricCommunityDeletionManagerTest {
 		
     	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
     	autoCommunityDeletionManager.setCisManager(cisManager);
-		
+    	autoCommunityDeletionManager.setLinkedCss(ownerId);
+    	autoCommunityDeletionManager.setSuggestedCommunityAnalyser(suggestedCommunityAnalyser);
+    	
     	//when(cisManager.getCiss()).thenReturn(cisRecord);
     	
 		autoCommunityDeletionManager.identifyCissToDelete(null);
@@ -89,6 +103,7 @@ public class EgocentricCommunityDeletionManagerTest {
 	@Test
 	public void testIdentifyShortTermCissToDelete() {
 		
+		suggestedCommunityAnalyser = mock(ISuggestedCommunityAnalyser.class);
 		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
     	
@@ -103,6 +118,10 @@ public class EgocentricCommunityDeletionManagerTest {
 		
     	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
 		
+    	autoCommunityDeletionManager.setCisManager(cisManager);
+    	autoCommunityDeletionManager.setLinkedCss(ownerId);
+    	autoCommunityDeletionManager.setSuggestedCommunityAnalyser(suggestedCommunityAnalyser);
+    	
 		autoCommunityDeletionManager.identifyCissToDelete(null);
 		
 		String[] members = new String[1];
@@ -115,6 +134,7 @@ public class EgocentricCommunityDeletionManagerTest {
 	@Test
 	public void testIdentifyMediumTermCissToDelete() {
 		
+		suggestedCommunityAnalyser = mock(ISuggestedCommunityAnalyser.class);
 		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
     	
@@ -129,6 +149,10 @@ public class EgocentricCommunityDeletionManagerTest {
 		
     	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
 		
+    	autoCommunityDeletionManager.setCisManager(cisManager);
+    	autoCommunityDeletionManager.setLinkedCss(ownerId);
+    	autoCommunityDeletionManager.setSuggestedCommunityAnalyser(suggestedCommunityAnalyser);
+    	
 		autoCommunityDeletionManager.identifyCissToDelete(null);
 		
 		String[] members = new String[1];
@@ -141,6 +165,7 @@ public class EgocentricCommunityDeletionManagerTest {
 	@Test
 	public void testIdentifyLongTermCissToDelete() {
 		
+		suggestedCommunityAnalyser = mock(ISuggestedCommunityAnalyser.class);
 		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
     	
@@ -155,6 +180,10 @@ public class EgocentricCommunityDeletionManagerTest {
 		
     	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
 		
+    	autoCommunityDeletionManager.setCisManager(cisManager);
+    	autoCommunityDeletionManager.setLinkedCss(ownerId);
+    	autoCommunityDeletionManager.setSuggestedCommunityAnalyser(suggestedCommunityAnalyser);
+    	
 		autoCommunityDeletionManager.identifyCissToDelete(null);
 		
 		String[] members = new String[1];
@@ -167,6 +196,7 @@ public class EgocentricCommunityDeletionManagerTest {
 	@Test
 	public void testIdentifyOngoingCissToDelete() {
 		
+		suggestedCommunityAnalyser = mock(ISuggestedCommunityAnalyser.class);
 		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
     	
@@ -181,6 +211,10 @@ public class EgocentricCommunityDeletionManagerTest {
 		
     	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
 		
+    	autoCommunityDeletionManager.setCisManager(cisManager);
+    	autoCommunityDeletionManager.setLinkedCss(ownerId);
+    	autoCommunityDeletionManager.setSuggestedCommunityAnalyser(suggestedCommunityAnalyser);
+    	
 		autoCommunityDeletionManager.identifyCissToDelete(null);
 		
 		String[] members = new String[1];
@@ -193,6 +227,7 @@ public class EgocentricCommunityDeletionManagerTest {
 	@Test
 	public void testIdentifyNoCissToDelete() {
 		
+		suggestedCommunityAnalyser = mock(ISuggestedCommunityAnalyser.class);
 		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
 		CtxEntityIdentifier entityId = new CtxEntityIdentifier(ownerId.toString(), "James Jents", new Long(1));
     	
@@ -203,6 +238,10 @@ public class EgocentricCommunityDeletionManagerTest {
 		
     	autoCommunityDeletionManager = new EgocentricCommunityDeletionManager(ownerId, "CSS");
 		
+    	autoCommunityDeletionManager.setCisManager(cisManager);
+    	autoCommunityDeletionManager.setLinkedCss(ownerId);
+    	autoCommunityDeletionManager.setSuggestedCommunityAnalyser(suggestedCommunityAnalyser);
+    	
 		autoCommunityDeletionManager.identifyCissToDelete(null);
 		
 		String[] members = new String[1];

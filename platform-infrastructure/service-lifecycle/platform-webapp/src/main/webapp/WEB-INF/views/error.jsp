@@ -9,7 +9,23 @@
 <title>Societies Page request Error</title>
 </head>
 <body>
+	<!-- HEADER -->
+	<jsp:include page="header.jsp" />
+	<!-- END HEADER -->
+
+	<!-- LEFTBAR -->
+	<jsp:include page="leftbar.jsp" />
+	<!-- END LEFTBAR -->
+<!-- .................PLACE YOUR CONTENT HERE ................ -->
+
 <h3>Opps!  please try again </h3>
 <h4>Error : ${errormsg}</h4>
+<br/>
+<br/>
+
+<!-- .................END PLACE YOUR CONTENT HERE ................ -->
+	<!-- FOOTER -->
+	<jsp:include page="footer.jsp" />
+	<!-- END FOOTER -->
 </body>
 </html>

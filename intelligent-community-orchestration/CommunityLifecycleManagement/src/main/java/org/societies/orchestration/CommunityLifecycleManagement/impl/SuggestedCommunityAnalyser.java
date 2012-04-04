@@ -38,19 +38,19 @@ import org.societies.api.internal.css.directory.ICssDirectory;
 
 import org.societies.api.internal.css.discovery.ICssDiscovery;
 
-import org.societies.api.internal.cis.management.ICisActivityFeed;
-import org.societies.api.internal.cis.management.ServiceSharingRecord;
-import org.societies.api.internal.cis.management.ICisActivity;
-import org.societies.api.internal.cis.management.ICisRecord;
-import org.societies.api.internal.cis.management.ICisManager;
+//import org.societies.api.internal.cis.management.ICisActivityFeed;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+//import org.societies.api.internal.cis.management.ICisActivity;
+//import org.societies.api.internal.cis.management.ICisRecord;
+//import org.societies.api.internal.cis.management.ICisManager;
 
-//import org.societies.api.cis.management.ICisRecord;
-//import org.societies.api.cis.management.ICisManager;
-//import org.societies.api.cis.management.ICisOwned;
-//import org.societies.api.cis.management.ICisSubscribed;
-//import org.societies.api.cis.management.ICisEditor;
-//import org.societies.api.cis.management.ICisActivity;
-//import org.societies.api.cis.management.ICisActivityFeed;
+import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.cis.management.ICisSubscribed;
+import org.societies.api.cis.management.ICisEditor;
+import org.societies.api.cis.management.ICisActivity;
+import org.societies.api.cis.management.ICisActivityFeed;
 //import org.societies.api.cis.management.ICis;
 
 //import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
@@ -83,6 +83,9 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserBean;
 
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
+import org.societies.api.personalisation.mgmt.IPersonalisationManager;
+import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
@@ -170,6 +173,13 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
     	
     }
     
+    public ArrayList<String> processEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations, ArrayList<String> cissToCreateMetadata) {
+    	//go straight to Community Recommender
+    	
+    	return communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(cisRecommendations, cissToCreateMetadata);
+    	
+    }
+    
     public void processCSCWRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
     	
     	
@@ -188,7 +198,15 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
     	    abstractDeletions.add(deletions);
     	    convertedRecommendations.put("Delete CISs", abstractDeletions);
     	}
+    	
     	communityRecommender.identifyCisActionForCSCW(convertedRecommendations);
+    }
+    
+    public void processCSCWConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
+    	//go straight to Community Recommender
+    	
+    	communityRecommender.identifyCisActionForCSCW(cisRecommendations);
+    	
     }
     
     public void processCSMAnalyserRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
@@ -206,9 +224,40 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
     	    abstractDeletions.add(deletions);
     	    convertedRecommendations.put("Delete CISs", abstractDeletions);
     	}
+    	
+    	for (int i = 0; i < convertedRecommendations.size(); i++) {
+    		//userContextBroker.evaluateSimilarity("location", convertedRecommendations.get(i).get(0).getMembersList());
+    		//if > 90% of members share that context, and there's no other context with more coverage of members,
+    		//let this be the highest level CIS criteria.
+    		//
+    		//else if (more members share some other context)
+    		//    convertedRecommendations.replace(i, same but with criteria changed to other context, or original as sub-CIS too);
+    		
+    		//else
+    		//    convertedRecommendations.remove(i);
+    	}
+    	
     	communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations);
     }
     
+    public void processCSMAnalyserConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
+    	//go straight to Community Recommender
+    	
+    	communityRecommender.identifyCisActionForCSMAnalyser(cisRecommendations);
+    	
+    }
+    
+    public ArrayList<String> checkForPrivacyConflicts() {
+    	ArrayList<String> conflictingPrivacyPolicies = new ArrayList<String>();
+    	return conflictingPrivacyPolicies;
+    	
+    }
+    
+    public ArrayList<String> checkForPreferenceConflicts() {
+    	ArrayList<String> conflictingPreferences = new ArrayList<String>();
+		return conflictingPreferences;
+    	
+    }
     public IIdentity getLinkedCss() {
     	return linkedCss;
     }

@@ -42,7 +42,6 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.api.schema.servicelifecycle.model.ServiceType;
 
-
 /**
  * This is the Class accepted by the ServiceRegistry when a service wants to
  * register. This Object contains attributes used to retrieve services shared
@@ -93,8 +92,6 @@ public class RegistryEntry implements Serializable {
 
 	private String serviceStatus;
 
-	
-
 	/**
 	 * @param serviceEndpointURI
 	 * @param cSSIDInstalled
@@ -132,8 +129,8 @@ public class RegistryEntry implements Serializable {
 						.getServiceImpl().getServiceProvider(), serviceInstance
 						.getServiceImpl().getServiceVersion()));
 	}
-	
-	public RegistryEntry(){
+
+	public RegistryEntry() {
 		super();
 	}
 
@@ -182,35 +179,38 @@ public class RegistryEntry implements Serializable {
 		try {
 			ServiceType tmpServiceType = null;
 			ServiceLocation tmpServiceLocation = null;
-			ServiceStatus tmpServiceStatus=null;
-			
-			/* Retrieve the service type from the service and
-			 * create the appropriate enumeration type
+			ServiceStatus tmpServiceStatus = null;
+
+			/*
+			 * Retrieve the service type from the service and create the
+			 * appropriate enumeration type
 			 */
 			if (serviceType.equals(ServiceType.THIRD_PARTY_SERVICE.toString())) {
 				tmpServiceType = ServiceType.THIRD_PARTY_SERVICE;
 			} else {
-				if (serviceType.equals( ServiceType.CORE_SERVICE.toString())) {
+				if (serviceType.equals(ServiceType.CORE_SERVICE.toString())) {
 					tmpServiceType = ServiceType.CORE_SERVICE;
 				}
 			}
-			
+
 			/* Same as before but for service location */
 			if (serviceLocation.equals(ServiceLocation.LOCAL.toString())) {
 				tmpServiceLocation = ServiceLocation.LOCAL;
 			} else {
-				if (serviceLocation.equals(ServiceLocation.REMOTE.toString()) ) {
+				if (serviceLocation.equals(ServiceLocation.REMOTE.toString())) {
 					tmpServiceLocation = ServiceLocation.REMOTE;
 				}
 			}
-			
-			/*Same but for the serviceStatus*/
-			if (serviceStatus.equals(ServiceStatus.STARTED.toString())){
-				tmpServiceStatus=ServiceStatus.STARTED;
-			}else{
-				if (serviceStatus.equals(ServiceStatus.STOPPED.toString())){
-					tmpServiceStatus=ServiceStatus.STOPPED;
-				}else{tmpServiceStatus=ServiceStatus.UNAVAILABLE;}
+
+			/* Same but for the serviceStatus */
+			if (serviceStatus.equals(ServiceStatus.STARTED.toString())) {
+				tmpServiceStatus = ServiceStatus.STARTED;
+			} else {
+				if (serviceStatus.equals(ServiceStatus.STOPPED.toString())) {
+					tmpServiceStatus = ServiceStatus.STOPPED;
+				} else {
+					tmpServiceStatus = ServiceStatus.UNAVAILABLE;
+				}
 			}
 
 			returnedService = new Service();
@@ -220,18 +220,23 @@ public class RegistryEntry implements Serializable {
 			ServiceInstance si = new ServiceInstance();
 			si.setFullJid(this.serviceInstance.getFullJid());
 			ServiceImplementation servImpl = new ServiceImplementation();
-			servImpl.setServiceNameSpace(this.serviceInstance.getServiceImpl().getServiceNameSpace());
-			servImpl.setServiceProvider(this.serviceInstance.getServiceImpl().getServiceProvider());
-			servImpl.setServiceVersion(this.serviceInstance.getServiceImpl().getServiceVersion());
+			servImpl.setServiceNameSpace(this.serviceInstance.getServiceImpl()
+					.getServiceNameSpace());
+			servImpl.setServiceProvider(this.serviceInstance.getServiceImpl()
+					.getServiceProvider());
+			servImpl.setServiceVersion(this.serviceInstance.getServiceImpl()
+					.getServiceVersion());
 			si.setServiceImpl(servImpl);
 			returnedService.setServiceInstance(si);
 			returnedService.setServiceLocation(tmpServiceLocation);
 			returnedService.setServiceName(serviceName);
 			returnedService.setServiceStatus(tmpServiceStatus);
 			returnedService.setServiceType(tmpServiceType);
-			ServiceResourceIdentifier serviceResourceIdentifier=new ServiceResourceIdentifier();
-			serviceResourceIdentifier.setIdentifier(new URI(this.getServiceIdentifier().getIdentifier()));
-			serviceResourceIdentifier.setServiceInstanceIdentifier(this.getServiceIdentifier().getInstanceId());
+			ServiceResourceIdentifier serviceResourceIdentifier = new ServiceResourceIdentifier();
+			serviceResourceIdentifier.setIdentifier(new URI(this
+					.getServiceIdentifier().getIdentifier()));
+			serviceResourceIdentifier.setServiceInstanceIdentifier(this
+					.getServiceIdentifier().getInstanceId());
 			returnedService.setServiceIdentifier(serviceResourceIdentifier);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -284,4 +289,74 @@ public class RegistryEntry implements Serializable {
 		this.serviceStatus = serviceStatus;
 	}
 
+	public void updateRegistryEntry(Service service) {
+		if (service.getAuthorSignature() != null) {
+			this.setAuthorSignature(service.getAuthorSignature());
+		}
+		if (service.getServiceDescription() != null) {
+			this
+					.setServiceDescription(service.getServiceDescription());
+		}
+		if (service.getServiceEndpoint() != null) {
+			this.setServiceEndPoint(service.getServiceEndpoint());
+		}
+		/*if (service.getServiceInstance() != null) {
+			if (service.getServiceInstance().getFullJid() != null) {
+				this.getServiceInstance().setFullJid(
+						service.getServiceInstance().getFullJid());
+			}
+			if (service.getServiceInstance().getXMPPNode() != null) {
+				this.getServiceInstance().setXMPPNode(
+						service.getServiceInstance().getXMPPNode());
+			}
+			if (service.getServiceInstance().getServiceImpl() != null) {
+				if (service.getServiceInstance().getServiceImpl()
+						.getServiceNameSpace() != null) {
+					this
+							.getServiceInstance()
+							.getServiceImpl()
+							.setServiceNameSpace(
+									service.getServiceInstance()
+											.getServiceImpl()
+											.getServiceNameSpace());
+
+				}
+				if (service.getServiceInstance().getServiceImpl()
+						.getServiceProvider() != null) {
+					this
+							.getServiceInstance()
+							.getServiceImpl()
+							.setServiceProvider(
+									service.getServiceInstance()
+											.getServiceImpl()
+											.getServiceProvider());
+				}
+				if (service.getServiceInstance().getServiceImpl()
+						.getServiceVersion() != null) {
+					this
+							.getServiceInstance()
+							.getServiceImpl()
+							.setServiceVersion(
+									service.getServiceInstance()
+											.getServiceImpl()
+											.getServiceVersion());
+				}
+
+			}
+
+		}*/
+		if (service.getServiceLocation()!=null){
+			this.setServiceLocation(service.getServiceLocation().toString());
+		}
+		if (service.getServiceName()!=null){
+			this.setServiceName(service.getServiceName());
+			
+		}
+		if (service.getServiceStatus()!=null){
+			this.setServiceStatus(service.getServiceStatus().toString());
+		}
+		if (service.getServiceType()!=null){
+			this.setServiceType(service.getServiceType().toString());
+		}
+	}
 }

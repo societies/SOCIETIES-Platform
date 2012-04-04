@@ -98,31 +98,43 @@
 			<osgi:listener bind-method="setDianne" ref="persoMgr"></osgi:listener>
 		</osgi:reference>
 		
+		<!-- cauiPrediction needed by personalisationManager -->
 		<osgi:reference id="cauiPrediction" interface="org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction" cardinality="0..1">
 			<osgi:listener bind-method="setCAUIPrediction" ref="persoMgr"></osgi:listener>
 		</osgi:reference>
 		
+		<!-- cauiPrediction and cauiDiscovery depend on the cauiTaskManager  -->
 		<osgi:reference id="cauiTaskManager" interface="org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager" cardinality="0..1">
 			<osgi:listener bind-method="setCauiTaskManager" ref="cauiPrediction"></osgi:listener>
 			<osgi:listener bind-method="setCauiTaskManager" ref="cauiDiscovery"></osgi:listener>
 		</osgi:reference>
 		
+		<!-- cristPrediction is needed by personalisationManager  -->
 		<osgi:reference id="cristPrediction" interface="org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction" cardinality="0..1">
 			<osgi:listener bind-method="setCristPrediction" ref="persoMgr"></osgi:listener>
-			<osgi:listener bind-method="setCristPrediction" ref="cristTaskManager"></osgi:listener>
 		</osgi:reference>
 		
+		<!-- cristTaskManager is needed by cristPrediction -->
+		<osgi:reference id="cristTaskManager" interface="org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager"> 
+			<osgi:listener bind-method="setCristTaskManager" ref="cristPrediction"></osgi:listener>
+		</osgi:reference>
+		
+		<!-- cristDiscovery is needed by cristTaskManager -->
 		<osgi:reference id="cristDiscovery" interface="org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.ICRISTUserIntentDiscovery"> 
 			<osgi:listener bind-method="setCristDiscovery" ref="cristTaskManager"></osgi:listener>
 		</osgi:reference>
-<!-- end importing internal services -->
+		
+		
+<!-- importing external services -->
 	
-		<!-- context Broker is needed by personalisationManager (at least) -->
 		<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker">
 		</osgi:reference>        
 
+		<osgi:reference id="idm" interface="org.societies.api.identity.IIdentityManager">
+		</osgi:reference>
 		
-
+		<osgi:reference id="decisionMaker" interface="org.societies.api.internal.useragent.decisionmaking.IDecisionMaker">
+		</osgi:reference>
         
 		
 		

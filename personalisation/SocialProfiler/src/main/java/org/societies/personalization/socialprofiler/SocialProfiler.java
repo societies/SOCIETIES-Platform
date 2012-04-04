@@ -1,56 +1,58 @@
-package org.societies.personalization.socialprofiler.impl;
+package org.societies.personalization.socialprofiler;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Timer;
 
 import org.apache.log4j.Logger;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
-import org.societies.api.context.broker.ICtxBroker;
+import org.societies.api.internal.personalisation.ISocialProfiler;
 import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.personalization.socialprofiler.SocialProfiler;
-import org.societies.personalization.socialprofiler.service.DatabaseConnectionImpl;
-import org.societies.personalization.socialprofiler.service.EngineImpl;
-import org.societies.personalization.socialprofiler.service.ServiceImpl;
+import org.societies.api.internal.sns.ISocialData;
+import org.societies.personalization.socialprofiler.service.DatabaseConnection;
+import org.societies.personalization.socialprofiler.service.GraphManager;
+import org.societies.personalization.socialprofiler.service.ProfilerEngine;
 import org.societies.personalization.socialprofiler.service.SocialTimerTask;
-import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
 
-public class SocialProfilerImpl implements SocialProfiler {
 
-	private static final Logger 	logger 			= Logger.getLogger(SocialProfiler.class);
+public class SocialProfiler implements ISocialProfiler {
+
+	private static final Logger 	logger 			= Logger.getLogger(ISocialProfiler.class);
 	private Properties 				props 			= new Properties();
 	private String 					configFileName	= "config.properties";
-	private EmbeddedGraphDatabase 	neo;
-	private ServiceImpl	 			service;
-	private DatabaseConnectionImpl  databaseConnection;
+	private GraphManager	 		graph;
+	private DatabaseConnection  	databaseConnection;
 
-	private EngineImpl 				engine;
-
+	private ProfilerEngine 			engine;
+	
+	private Timer 					timer;
 	
 	
-	
-	private ICtxBroker ctxBroker;
-	private float daysFull = 0;
-
-	public SocialProfilerImpl(){
-		
-		initializationSocialProfiler();
-		
-		// network update timeout setup
- 	    this.scheduleNetworkUpdate();
- 	    
- 	    // JUST FOR NOW
- 	    if (neo!=null)   neo.shutdown();
+	public SocialProfiler(){
 		
 	}
 	
+	private float daysFull = 0;
 
+	@Override
+	public void setSocialdata(ISocialData socialData) {
+		initializationSocialProfiler(socialData);
+	}
 	
-	public void initializationSocialProfiler(){
+	
+	public ISocialData getSocialdata() {
+		return engine.getSocialData();
+	}
+	
+	
+
+
+	private void initializationSocialProfiler(ISocialData socialdata){
 		
 		logger.info("Social Profiler Intialized");
 		
@@ -63,37 +65,18 @@ public class SocialProfilerImpl implements SocialProfiler {
 		}
 		
 		// Start and Create (if necessary) the Graph
-		this.neo 					= new EmbeddedGraphDatabase(neoDBPath);
-		this.service				= new ServiceImpl(neo);
-		this.databaseConnection	    = new DatabaseConnectionImpl();
+		EmbeddedGraphDatabase neo	= new EmbeddedGraphDatabase(neoDBPath);
+		this.graph					= new GraphManager(neo);
+		this.databaseConnection	    = new DatabaseConnection(props);
 		
 		logger.info("Engine Initialization ...");
-		this.engine	= new EngineImpl(service, databaseConnection);
+		this.engine	= new ProfilerEngine(graph, databaseConnection, socialdata);
 		
-		///////////////////////////////////////////////////
-		//
-		// Add SOCIAL CONNECTOR -- FACEBOOK
-		//
-		///////////////////////////////////////////////////
-		String access_token = "AAAFPIhZAkC90BAO1fmJZAxs754pEGhaGQesb9haktJ8JgDOnxsSUo2A9PJOnQa34b2mRUuRXRUS1mhUIJG8RMetAUwZBZBkOBFfo7G0h6wZDZD";
-		String identity		= "";
-		ISocialConnector connector =  new FacebookConnectorImpl(access_token, identity);
-		
-		// ENGINE
-		this.engine.linkSocialNetwork(connector);
-		
+		// start Scheduler
+		scheduleNetworkUpdate();
 	}
 
 	
-	
-	public ICtxBroker getCtxBroker() {
-		return ctxBroker;
-	}
-
-
-	public void setCtxBroker(ICtxBroker ctxBroker) {
-		this.ctxBroker = ctxBroker;
-	}
 	
 	private void enableProperties(){
 		try{
@@ -114,42 +97,89 @@ public class SocialProfilerImpl implements SocialProfiler {
 	
 	
 	 private void scheduleNetworkUpdate() {
-	    	daysFull  = new Integer(props.getProperty("updateFreq.full")).intValue();
+		 	
+		 
+		 	daysFull  = new Integer(props.getProperty("updateFreq.full")).intValue();
 			
 	    	//int initialDelay = 1000 * 60 * 60 * 24 * daysFull;
 			//int period = initialDelay;
 			
 	    	int initialDelay =0;
-			int period		 = (int)(1000 * 60 * 60 * 24 * daysFull);
-	    	Timer timer = new Timer();
+			int period		 = 30000; //(int)(1000 * 60 * 60 * 24 * daysFull);
+	    	this.timer = new Timer();
 			SocialTimerTask task = new SocialTimerTask(this.engine,  this.databaseConnection);
 			timer.scheduleAtFixedRate(task, initialDelay, period);
 			logger.info("Next network update scheduled in " + daysFull + " days. The procedure will be repeated every " + daysFull + " days.");
+	 }
+
+
+	 
+	 
+
+
+	@Override
+	public void addSocialNetwork(List<ISocialConnector> connectors) {
+		
+		
+		try {
+			Iterator<ISocialConnector>it = connectors.iterator();
+			while (it.hasNext()){
+				
+				ISocialConnector connector = it.next();
+				this.engine.getSocialData().addSocialConnector(connector);
+				logger.info("Add new connector "+connector.getConnectorName() + "with id:"+connector.getID());
+			
+			}
+			
+			engine.UpdateNetwork(ProfilerEngine.UPDATE_EVERYTHING);
+	 	    
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-
-
-
-
-	@Override
-	public void addSocialNetwork(ISocialConnector connector) {
-		this.engine.linkSocialNetwork(connector);
-		logger.info("Add new connector "+connector.getConnectorName() + "with id:"+connector.getID());
-	}
-
-
-
-	@Override
-	public void removeSocialNetwork(ISocialConnector connector) {
-	
-		this.engine.unlinkSocialNetwork(connector);
-		logger.info("Removed connector "+connector.getConnectorName() + "with id:"+connector.getID());
 		
 	}
 
 
 
 	@Override
+	public void removeSocialNetwork(List<ISocialConnector> connectors) {
+	
+		try {
+			Iterator<ISocialConnector>it = connectors.iterator();
+			while (it.hasNext()){
+			
+				ISocialConnector connector = it.next();
+				this.engine.getSocialData().removeSocialConnector(connector);
+				logger.info("Removed connector "+connector.getConnectorName() + "with id:"+connector.getID());
+			
+			}
+			
+			if (this.engine.getSocialData().getSocialConnectors().size()==0)
+				shutdown();
+			else 
+				engine.UpdateNetwork(200);
+			
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
+	public void shutdown(){
+		logger.info("No connector Available -- Stop component task");
+		timer.cancel();
+		graph.shutdown();
+		databaseConnection.closeMysql();
+		logger.info("Engine stopped - DB closed");
+	}
+
+
+
+	@Override
 	public void setUpdateFrequency(float frequency) {
+		logger.info("Frequency update changed into :"+frequency + "days");
 		this.daysFull=frequency;
 		
 	}
@@ -165,7 +195,12 @@ public class SocialProfilerImpl implements SocialProfiler {
 
 	@Override
 	public List<ISocialConnector> getListOfLinkedSN() {
-		return this.engine.getSNConnectors();
+		return this.engine.getSocialData().getSocialConnectors();
 	}
+
+
+	
+
+	
 
 }

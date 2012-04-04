@@ -103,10 +103,10 @@ public class SocialProvider extends ContentProvider {
      * @see android.content.ContentProvider#insert(android.net.Uri, android.content.ContentValues)
      */
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
+    public Uri insert(Uri _uri, ContentValues _values) {
 	// TODO Auto-generated method stub
-	
-	return null;
+	long id = dbAdapter.insertCis(_values);
+	return Uri.withAppendedPath(_uri, Long.toString(id));
     }
 
     /* (non-Javadoc)

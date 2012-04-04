@@ -34,9 +34,46 @@ package org.societies.api.internal.security.storage;
 public interface ISecureStorage {
 
 	/**
-	 * Get credentials
+	 * Get password or credentials.
 	 * 
 	 * @param id Data ID.
 	 */
 	public String getPassword(String id);
+
+	/**
+	 * Put password or credentials. If one with given ID already exists, it will be overwritten.
+	 * 
+	 * @param id Data ID.
+	 * @param password the new password
+	 * 
+	 * @return True on success, false on error.
+	 */
+	public boolean putPassword(String id, String password);
+
+	/**
+	 * Get a document, certificate, private key, etc.
+	 * 
+	 * @param id Data ID.
+	 */
+	public byte[] getDocument(String id);
+
+	/**
+	 * Put or update a document, certificate, private key, etc.
+	 * 
+	 * @param id Data ID.
+	 * @param doc the document to store
+	 * 
+	 * @return True on success, false on error.
+	 */
+	public boolean putDocument(String id, byte[] doc);
+
+	/**
+	 * @return IDs of all stored passwords.
+	 */
+	public String[] getPasswordIds();
+
+	/**
+	 * @return IDs of all stored documents, certificates, private keys, etc.
+	 */
+	public String[] getDocumentIds();
 }

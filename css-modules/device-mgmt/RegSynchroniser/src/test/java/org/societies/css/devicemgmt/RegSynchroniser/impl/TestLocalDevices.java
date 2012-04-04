@@ -1,7 +1,7 @@
 package org.societies.css.devicemgmt.RegSynchroniser.impl;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 import org.junit.After;
 import org.junit.Before;
@@ -53,11 +53,13 @@ public class TestLocalDevices {
     private DeviceCommonInfo device_1;
 	private DeviceCommonInfo device_2;
 	private DeviceCommonInfo device_3;
+	private BundleContext context;
 	private String CSSNodeID = "liam@societies.org";
 
 	@Before
 	public void setUp() throws Exception {
-		//context = mock(BundleContext.class);
+		context = mock(BundleContext.class);
+		
 		device_1 = new DeviceCommonInfo(deviceFamilyIdentity1, deviceMacAddress1, deviceName_1, deviceType, deviceDescription, deviceConnectionType1, deviceLocation1, deviceProvider1, contextSource1);
         assertTrue(null != device_1);
         device_1.setDeviceID(deviceId);
@@ -80,8 +82,8 @@ public class TestLocalDevices {
 
         boolean retValue = false;
         
-       // RegManager regmanager = new RegManager(
-         //       this.context);
+       RegManager regmanager = new RegManager(
+                this.context);
 
         DeviceRegistry registry = DeviceRegistry.getInstance();
         assertTrue(null != registry);

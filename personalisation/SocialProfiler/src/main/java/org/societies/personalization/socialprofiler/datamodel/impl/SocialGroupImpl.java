@@ -23,13 +23,15 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.personalization.socialprofiler.datamodel;
+package org.societies.personalization.socialprofiler.datamodel.impl;
 
 
 import org.neo4j.graphdb.Node;
+import org.societies.personalization.socialprofiler.datamodel.SocialGroup;
+import org.societies.personalization.socialprofiler.datamodel.utils.NodeProperties;
 
 
-public class GroupImpl implements Group, NodeProperties{
+public class SocialGroupImpl implements SocialGroup, NodeProperties{
 
 	private final Node underlyingNode;
 	
@@ -38,7 +40,7 @@ public class GroupImpl implements Group, NodeProperties{
 	 * @param underlyingNode
 	 * 			Node
 	 */			
-	public GroupImpl(Node underlyingNode) {
+	public SocialGroupImpl(Node underlyingNode) {
 		super();
 		this.underlyingNode = underlyingNode;
 	}

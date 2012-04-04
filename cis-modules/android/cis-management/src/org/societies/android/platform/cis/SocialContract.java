@@ -19,13 +19,13 @@ public final class SocialContract {
      *
      */
     public static final Uri AUTHORITY = 
-            Uri.parse("content://org.societies.cis.android.SocialProvider");
+            Uri.parse("content://org.societies.android.platform.cis");
     public static final String PROVIDER_READ_PERMISSION = "org.societies.cis.android.SocialProvider.READ";
     public static final String PROVIDER_WRITE_PERMISSION = "org.societies.cis.android.SocialProvider.WRITE";
     
     public static final class Groups {
         public static final Uri CONTENT_URI = 
-                    Uri.parse("content://org.societies.cis.android.SocialProvider/groups");
+                    Uri.parse("content://org.societies.android.platform.cis/groups");
         public static final String _ID = "_id"; //Key column in the table
         public static final String GLOBAL_ID = "global_id"; //Global ID for the group.
         public static final String TYPE = "type"; //The type of the element being stored. CIS for groups.
@@ -45,7 +45,7 @@ public final class SocialContract {
      */
     public static final class People {
         public static final Uri CONTENT_URI = 
-                    Uri.parse("content://org.societies.cis.android.SocialProvider/people");
+                    Uri.parse("content://org.societies.android.platform.cis/people");
         public static final String _ID = "_id"; //Key column in the table
         public static final String GLOBAL_ID = "global_id"; //Global ID for the person.
         public static final String TYPE = "type"; //The type of the element being stored. CSS for people
@@ -57,7 +57,7 @@ public final class SocialContract {
     
     public static final class Services {
         public static final Uri CONTENT_URI = 
-                Uri.parse("content://org.societies.cis.android.SocialProvider/services");
+                Uri.parse("content://org.societies.android.platform.cis/services");
         public static final String _ID = "_id"; //Key column in the table
         public static final String GLOBAL_ID = "global_id"; //Global ID for the service. E.g. URL.
         public static final String TYPE = "type"; //The type of the element being stored. Service for service

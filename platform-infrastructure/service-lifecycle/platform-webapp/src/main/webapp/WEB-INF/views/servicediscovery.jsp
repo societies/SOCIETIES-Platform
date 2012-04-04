@@ -24,9 +24,16 @@
 </head>
 
 <body>
+	<!-- HEADER -->
+	<jsp:include page="header.jsp" />
+	<!-- END HEADER -->
+
+	<!-- LEFTBAR -->
+	<jsp:include page="leftbar.jsp" />
+	<!-- END LEFTBAR -->
+<!-- .................PLACE YOUR CONTENT HERE ................ -->
 
 	<h3>Service Discovery Service</h3>
-
 		
 <form:form method="POST" action="servicediscovery.html" commandName="sdForm">
 		<form:errors path="*" cssClass="errorblock" element="div" />
@@ -53,16 +60,10 @@
 		</table>		
 	</form:form>
 	
-	<br/>		
-	<h4>Please click the service to use .....</h4>
-		
-	<table>	
-		<tr>
-			<td><a href="servicediscovery.html">Service Discovery Service</a></td>
-			<td><a href="servicecontrol.html">Service Control Service</a></td>
-		</tr>		
-	</table>
-		
+<!-- .................END PLACE YOUR CONTENT HERE ................ -->
+	<!-- FOOTER -->
+	<jsp:include page="footer.jsp" />
+	<!-- END FOOTER -->
 </body>
 </html>
 

@@ -25,7 +25,7 @@
 package org.societies.personalization.socialprofiler.datamodel;
 
 
-public interface Group {
+public interface SocialGroup {
 	
 	/**
      * returns the name of the group, a.k.a Group ID from facebook actually

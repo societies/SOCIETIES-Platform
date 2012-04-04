@@ -33,19 +33,21 @@ import org.societies.api.internal.css.directory.ICssDirectory;
 
 import org.societies.api.internal.css.discovery.ICssDiscovery;
 
-import org.societies.api.internal.cis.management.ICisActivityFeed;
-import org.societies.api.internal.cis.management.ServiceSharingRecord;
-import org.societies.api.internal.cis.management.ICisActivity;
-import org.societies.api.internal.cis.management.ICisRecord;
-import org.societies.api.internal.cis.management.ICisManager;
+//import org.societies.api.internal.cis.management.ICisActivityFeed;
+//import org.societies.api.internal.cis.management.ServiceSharingRecord;
+//import org.societies.api.internal.cis.management.ICisActivity;
+//import org.societies.api.internal.cis.management.ICisRecord;
+//import org.societies.api.internal.cis.management.ICisManager;
 
-//import org.societies.api.cis.management.ICisRecord;
-//import org.societies.api.cis.management.ICisManager;
-//import org.societies.api.cis.management.ICisOwned;
-//import org.societies.api.cis.management.ICisSubscribed;
-//import org.societies.api.cis.management.ICisEditor;
-//import org.societies.api.cis.management.ICisActivity;
-//import org.societies.api.cis.management.ICisActivityFeed;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
+import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.cis.management.ICisSubscribed;
+import org.societies.api.cis.management.ICisEditor;
+import org.societies.api.cis.management.ICisActivity;
+import org.societies.api.cis.management.ICisActivityFeed;
 //import org.societies.api.cis.management.ICis;
 
 import org.societies.api.internal.css.management.CSSRecord;
@@ -144,13 +146,13 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 	private ICommManager commManager;
 	
 	/*
-     * Constructor for EgocentricCommunityConfigurationManager
+     * Constructor for EgocentricCommunityDeletionManager
      * 
-	 * Description: The constructor creates the EgocentricCommunityConfigurationManager
+	 * Description: The constructor creates the EgocentricCommunityDeletionManager
 	 *              component on a given CSS.
 	 * Parameters: 
 	 * 				linkedEntity - the non-CIS entity, either a user CSS or a domain deployment,
-	 *              that this object will operate on behalf of.
+	 *              that this object will operate on behalf of. Currently just user CSS deployment
 	 */
 	
 	public EgocentricCommunityDeletionManager(IIdentity linkedEntity, String linkType) {
@@ -185,16 +187,15 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 	public void identifyCissToDelete(HashMap <IIdentity, String> userCissMetadata) {
 		
 		String[] it = new String[1];
-		linkedCss = mock(IIdentity.class);
-		cisManager = mock(ICisManager.class);
-		cssManager = mock(ICSSLocalManager.class);
-		activityFeed = mock(ICssActivityFeed.class);
+		//linkedCss = mock(IIdentity.class);
+		//cisManager = mock(ICisManager.class);
+		//cssManager = mock(ICSSLocalManager.class);
+		//activityFeed = mock(ICssActivityFeed.class);
 		
 		it[0] = linkedCss.getIdentifier();
 		//ICisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new ICisRecord(null, null, null, null, null, it, null, null, null));
 		ICisRecord[] listOfUserJoinedCiss = new ICisRecord[0];
 		ArrayList<ICisRecord> userJoinedCiss = new ArrayList<ICisRecord>();
-		
 		
 		ICisRecord[] records;
 		if (linkedCss != null && listOfUserJoinedCiss != null) {
@@ -214,15 +215,23 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 		ArrayList<ICisRecord> cissToDelete = new ArrayList<ICisRecord>();
 		
 		for (int i = 0; i < userJoinedCiss.size(); i++) {
+			boolean deleteThisCis = false;
 			ICisRecord thisCis = userJoinedCiss.get(i);
 			String deadFeed = null;
 			//deadFeed = (thisCis.feed.getActivities(it[0], "between now and 2 hours ago"));
 		    if (deadFeed == null) {
 		//    if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - (longestTimeWithoutActivity/1440)) {
 		        deadFeed = null;
+		        String cisMetadata = "";
+		        for (int m = 0; m < userJoinedCiss.size(); m++) {
+		        	if (userCissMetadata.get(m).split("---")[0].equals(thisCis.getCisId()))
+		        		cisMetadata = userCissMetadata.get(m);
+		        }
+		        if (cisMetadata.split("---")[0].equals(thisCis.getCisId()) && cisMetadata.contains("short-term temporary"))
+		        	deleteThisCis = true;
 		        //deadFeed = thisCis.feed.getActivities(it[0], "CommunityLifecycleManagement metadata: temporary short-term", "forever")
 			    if (deadFeed == null) {
-	                cissToDelete.add(thisCis);
+			    	deleteThisCis = true;
 		        }
 			    //could also check changed location on location-defined CIS and other things
 		    }
@@ -231,9 +240,18 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 		    if (deadFeed == null) {
 		//    if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - (longestTimeWithoutActivity/1440)) {
 		        deadFeed = null;
+		        
+		        String cisMetadata = "";
+		        for (int m = 0; m < userJoinedCiss.size(); m++) {
+		        	if (userCissMetadata.get(m).split("---")[0].equals(thisCis.getCisId()))
+		        		cisMetadata = userCissMetadata.get(m);
+		        }
+		        if (cisMetadata.split("---")[0].equals(thisCis.getCisId()) && cisMetadata.contains("medium-term temporary"))
+		        	deleteThisCis = true;
+		        
 		        //deadFeed = thisCis.feed.getActivities(it[0], "CommunityLifecycleManagement metadata: temporary medium-term", "forever")
 			    if (deadFeed == null) {
-	                cissToDelete.add(thisCis);
+			    	deleteThisCis = true;
 		        }
 		    }
 		    
@@ -241,21 +259,41 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 		    if (deadFeed == null) {
 		//    if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - (longestTimeWithoutActivity/1440)) {
 		        deadFeed = null;
+		        
+		        String cisMetadata = "";
+		        for (int m = 0; m < userJoinedCiss.size(); m++) {
+		        	if (userCissMetadata.get(m).split("---")[0].equals(thisCis.getCisId()))
+		        		cisMetadata = userCissMetadata.get(m);
+		        }
+		        if (cisMetadata.split("---")[0].equals(thisCis.getCisId()) && cisMetadata.contains("long-term temporary"))
+		        	deleteThisCis = true;
+		        
 		        //deadFeed = thisCis.feed.getActivities(it[0], "CommunityLifecycleManagement metadata: temporary long-term", "forever")
 			    if (deadFeed == null) {
-	                cissToDelete.add(thisCis);
+			    	deleteThisCis = true;
 		        }
 		    }
-		//if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - 1 week) {
-				//    if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - (longestTimeWithoutActivity/1440)) {
-				//        if (theCisRecord.getActivityFeed().search("CommunityLifecycleManagement metadata: temporary medium-term)) {
-			    //            cissToDelete.add(theCisRecord);
-				//        }
-		//if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - 18 months) {
-				//    if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - (longestTimeWithoutActivity/1440)) {
-				//        if (theCisRecord.getActivityFeed().search("CommunityLifecycleManagement metadata: temporary long-term)) {
-			    //            cissToDelete.add(theCisRecord);
-				//        }
+		    
+		    //if (thisCis.getMembersList().size() == 0) {
+		    //    ArrayList<ICisRecord> refusedTimes = new ArrayList<ICisRecord>();
+		    //    for (int m = 0; m < recentRefusals.size(); m++) {
+		    //        if ((recentRefusals().get(m).getCisId() == thisCis.getCisId()))
+		    //            refusedTimes.add(recentRefusals.get(m));
+		    //    }
+		    //    if (refusedTimes.size() > 0) {
+		    //        int noMembersRefusalCounter = 0;
+		    //        for (int m = 0; m < refusedTimes.size(); m++) {
+		    //            if (refusedTimes.get(m).getMembersList().size() == 0)
+		    //                noMembersRefusalCounter++;
+		    //        }
+		    //        if (noMembersRefusalCounter == 0)
+		    //            deleteThisCis = true;
+		    //    }
+		    //}
+		    
+		    if (deleteThisCis == true)
+		        cissToDelete.add(thisCis);
+		
 		//        If the CIS has never gone such a long period without activity before, 
 		//        suggest deletion via User Agent to CIS owner/administrators, i.e. whoever
 		//        this deployment runs on behalf of.
@@ -266,12 +304,15 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 		//           2010-03-08 14:59:30.252
 		//
 		//        Future directions here can include - being able to identify CISs to delete very soon,
-		//        or at more flexible time than just the 5 days as above,
+		//        or at more flexible time,
 		//        after lack of activity or other key event e.g. purpose fulfillment or location change.
 		
 		//    }
 		//}
 		}
+		HashMap<String, ArrayList<ICisRecord>> deletionSuggestions = new HashMap<String, ArrayList<ICisRecord>>();
+		deletionSuggestions.put("Delete CISs", cissToDelete);
+		suggestedCommunityAnalyser.processEgocentricRecommendations(deletionSuggestions, new ArrayList<String>());
 		
 		//Can't use GUI in tests
         //cissToDelete = getUserFeedbackOnDeletion(cissToDelete);
@@ -282,48 +323,6 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 		
 		
 		
-	}
-	
-	public ArrayList<ICisRecord> getUserFeedbackOnDeletion(ArrayList<ICisRecord> cissToDelete) {
-		ArrayList<ICisRecord> realCissToDelete = new ArrayList<ICisRecord>();
-		List<String> options = new ArrayList<String>();
-		options.add("options");
-		userResponse = null;
-		boolean responded = false;
-		//userFeedback.getExplicitFB(0,  new ExpProposalContent("SOCIETIES suspects these CISs may be obsolete. If you would like to delete one or more of these CISs, please check them.", options), userFeedbackCallback);
-		for (int i = 0; i < 300; i++) {
-		    if (userResponse == null)
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			else
-			    responded = true;
-		}
-		
-		if (responded == false) {
-		    //User obviously isn't paying attention to CSS, so put the message in the background/list of messages for them to see at their leisure.
-		    String background = "This message is in your inbox or something, waiting for you to read it";
-		}
-		else {
-		   	Iterator<ICisRecord> iterator = cissToDelete.iterator();
-			while (iterator.hasNext()) {
-			    ICisRecord potentiallyDeletableCis = iterator.next();
-		        if (userResponse.equals("Yes")) {
-				    realCissToDelete.add(potentiallyDeletableCis);
-			       // cisManager.deleteCis(linkedCss, potentiallyDeletableCis.getCisId());
-		        }
-		        else {
-		    	    recentRefusals.add(potentiallyDeletableCis);
-		    	    //store as context the CIS is marked as one level up on the Ongoing/Temporary chain
-		    	    //(short-term temporary becomes medium-term, becomes long-term, becomes ongoing.
-		    	    //Purely a mechanic for use by this service.
-		        }
-		   }
-		}
-		return realCissToDelete;
 	}
 	
     public void initialiseEgocentricCommunityDeletionManager() {

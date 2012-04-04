@@ -24,42 +24,76 @@
  */
 package org.societies.privacytrust.trust.api.model;
 
-import java.net.URI;
-import java.util.Set;
-
 /**
  * This class represents trusted services. A TrustedService object is referenced
  * by its TrustedEntityId, while the associated Trust value objects express the
  * trustworthiness of this service, i.e. direct, indirect and user-perceived. Each
  * trusted service is also associated with a TrustedCSS which represents its
  * provider.
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
  */
 public class TrustedService extends TrustedEntity {
 
 	private static final long serialVersionUID = 8253551733059925542L;
 	
-	private Set<TrustedCis> communities;
-	private URI id;
-	private TrustedCss provider;
-	private String type;
-	public TrustedDeveloper developer;
+	/** The CSS providing this service. */
+	private final TrustedCss provider;
+	
+	/* The communities sharing this service. */
+	//private final Set<TrustedCis> communities = new CopyOnWriteArraySet<TrustedCis>();
+	
+	/** The type of this service. */
+	private final String type;
+	
+	/** The developer of this service. */
+	private TrustedDeveloper developer;
 
-	public TrustedService() {
+	public TrustedService(TrustedEntityId trustor, TrustedEntityId teid, String type, TrustedCss provider) {
+		
+		super(trustor, teid);
+		this.type = type;
+		this.provider = provider;
 	}
 
-	public Set<TrustedCis> getCommunities(){
-		return this.communities;
+	/**
+	 * Returns the type of this service.
+	 * 
+	 * @return the type of this service.
+	 */
+	public String getType() {
+		
+		return this.type;
 	}
-
-	public URI getId(){
-		return this.id;
-	}
-
-	public TrustedCss getProvider(){
+	
+	/**
+	 * Returns the CSS providing this service.
+	 * 
+	 * @return the CSS providing this service.
+	 */
+	public TrustedCss getProvider() {
+		
 		return this.provider;
 	}
-
-	public String getType(){
-		return this.type;
+	
+	/** 
+	 * Returns the developer of this service.
+	 * 
+	 * @return the developer of this service.
+	 */
+	public TrustedDeveloper getDeveloper() {
+		
+		return this.developer;
+	}
+	
+	/**
+	 * Sets the developer of this service.
+	 * 
+	 * @param developer the service developer to set. 
+	 */
+	public void setDeveloper(TrustedDeveloper developer) {
+		
+		this.developer = developer;
 	}
 }

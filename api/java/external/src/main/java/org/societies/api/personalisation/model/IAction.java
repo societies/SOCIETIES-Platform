@@ -25,11 +25,13 @@
 
 package org.societies.api.personalisation.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.Serializable;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 
 
@@ -37,6 +39,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  * @author Elizabeth
  *
  */
+@SocietiesExternalInterface(type=SocietiesInterfaceType.REQUIRED)
 public interface IAction extends Serializable{
 	/**
 	 * 

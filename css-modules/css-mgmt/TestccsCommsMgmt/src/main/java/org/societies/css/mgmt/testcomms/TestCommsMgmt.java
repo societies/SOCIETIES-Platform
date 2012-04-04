@@ -2,25 +2,43 @@ package org.societies.css.mgmt.testcomms;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.internal.css.management.CSSManagerEnums;
 import org.societies.api.internal.css.management.ICSSManagerCallback;
 import org.societies.api.internal.css.management.ICSSRemoteManager;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
+import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
 
 public class TestCommsMgmt {
 
 	private ICSSRemoteManager remoteCSSManager;
 	private static Logger LOG = LoggerFactory.getLogger(TestCommsMgmt.class);
+	
+	public static final String TEST_IDENTITY_1 = "node11";
+	public static final String TEST_IDENTITY_2 = "node22";
+
+	public static final String TEST_IDENTITY = "android";
+	public static final String TEST_INACTIVE_DATE = "20121029";
+	public static final String TEST_REGISTERED_DATE = "20120229";
+	public static final int TEST_UPTIME = 7799;
+	public static final String TEST_EMAIL = "somebody@tssg.org";
+	public static final String TEST_FORENAME = "4Name";
+	public static final String TEST_HOME_LOCATION = "The Hearth";
+	public static final String TEST_IDENTITY_NAME = "Id Name";
+	public static final String TEST_IM_ID = "somebody.tssg.org";
+	public static final String TEST_NAME = "The CSS";
+	public static final String TEST_PASSWORD = "androidpass";
+	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
+
 
 	
 	public void startTest() {
-		
-		
-		for (int i = 0; i < 20; i++) {
+		LOG.info("Calling remote CSSManagar server for method loginCSS");
+		for (int i = 0; i < 1; i++) {
 			
-			this.remoteCSSManager.registerXMPPServer(new CssRecord(), new ICSSManagerCallback() {
+//			this.remoteCSSManager.registerXMPPServer(new CssRecord(), new ICSSManagerCallback() {
+			this.remoteCSSManager.loginCSS(createCSSRecord(), new ICSSManagerCallback() {
 				
-				@Override
 				public void receiveResult(CssInterfaceResult result) {
 					LOG.info("Received result from remote call");
 					LOG.info("Result Status: " + result.isResultStatus());
@@ -31,6 +49,57 @@ public class TestCommsMgmt {
 		}
 	}
 
+	/**
+	 * Create a default CSSrecord
+	 * This is a temporary measure until genuine CSSs can be created
+	 * 
+	 * @return CssRecord
+	 */
+	private CssRecord createCSSRecord() {
+		
+    	CssNode cssNode_1, cssNode_2;
+
+		cssNode_1 = new CssNode();
+		cssNode_1.setIdentity(TEST_IDENTITY_1);
+		cssNode_1.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
+		cssNode_1.setType(CSSManagerEnums.nodeType.Rich.ordinal());
+
+		cssNode_2 = new CssNode();
+		cssNode_2.setIdentity(TEST_IDENTITY_2);
+		cssNode_2.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
+		cssNode_2.setType(CSSManagerEnums.nodeType.Android.ordinal());
+		
+
+		CssRecord cssProfile = new CssRecord();
+		cssProfile.getCssNodes().add(cssNode_1);
+		cssProfile.getCssNodes().add(cssNode_2);
+		cssProfile.getArchiveCSSNodes().add(cssNode_1);
+		cssProfile.getArchiveCSSNodes().add(cssNode_2);
+		
+		cssProfile.setCssIdentity(TEST_IDENTITY);
+		cssProfile.setCssInactivation(TEST_INACTIVE_DATE);
+		cssProfile.setCssRegistration(TEST_REGISTERED_DATE);
+		cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
+		cssProfile.setCssUpTime(TEST_UPTIME);
+		cssProfile.setEmailID(TEST_EMAIL);
+		cssProfile.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
+		cssProfile.setForeName(TEST_FORENAME);
+		cssProfile.setHomeLocation(TEST_HOME_LOCATION);
+		cssProfile.setIdentityName(TEST_IDENTITY_NAME);
+		cssProfile.setImID(TEST_IM_ID);
+		cssProfile.setName(TEST_NAME);
+		cssProfile.setPassword(TEST_PASSWORD);
+		cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
+		cssProfile.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
+		cssProfile.setSocialURI(TEST_SOCIAL_URI);
+
+		LOG.info("created CSS Record identity: " + cssProfile.getCssIdentity());
+		LOG.info("created CSS Record password: " + cssProfile.getPassword());
+		
+		return cssProfile;
+	}
+
+	
 	//Spring injection methods
 
 	public ICSSRemoteManager getRemoteCSSManager() {
@@ -39,6 +108,8 @@ public class TestCommsMgmt {
 
 	public void setRemoteCSSManager(ICSSRemoteManager remoteCSSManager) {
 		this.remoteCSSManager = remoteCSSManager;
+		
+		startTest();
 	}
 
 

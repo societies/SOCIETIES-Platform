@@ -26,12 +26,16 @@
 package org.societies.api.internal.security.policynegotiator;
 
 /**
+ * DEPRECATED class because the requester will not be as integrated with
+ * privacy policy negotiation. Use {@link INegotiation} instead.
+ * 
  * Interface for invoking the requester.
  * To be used by privacy policy components on the same node.
  * 
  * @author Mitja Vardjan
  *
  */
+@Deprecated
 public interface INegotiationRequester {
 
 	/**
@@ -43,6 +47,7 @@ public interface INegotiationRequester {
 	 * @param sessionId ID of this session
 	 * @param selectedPolicyOptionId The selected policy alternative
 	 */
+	@Deprecated
 	public void acceptUnmodifiedPolicy(int sessionId, String selectedPolicyOptionId);
 	
 	/**
@@ -50,6 +55,7 @@ public interface INegotiationRequester {
 	 * 
 	 * @param sessionId ID of this session
 	 */
+	@Deprecated
 	public void reject(int sessionId);
 
 	/**
@@ -63,5 +69,6 @@ public interface INegotiationRequester {
 	 * @param agreement The final terms. Apart from missing final signatures,
 	 * this is the final version of document.
 	 */
+	@Deprecated
 	public void acceptModifiedPolicy(int sessionId, Object agreement);
 }

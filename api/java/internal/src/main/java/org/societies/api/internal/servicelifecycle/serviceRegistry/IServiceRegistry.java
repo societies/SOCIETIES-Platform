@@ -32,6 +32,7 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.Ser
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceUpdateException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
@@ -134,4 +135,13 @@ public interface IServiceRegistry {
 	 */
 	
 	public boolean clearServiceSharedCIS(String CISId) throws CISNotFoundException;
+	
+	
+	/**
+	 * Description: Update a service record inside the Registry with the new Service object. Attributes set to null are ignored.
+	 * @param service
+	 * @return
+	 * @throws ServiceUpdateException
+	 */
+	public boolean updateRegisteredService(Service service) throws ServiceUpdateException;
 }

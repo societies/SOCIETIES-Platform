@@ -13,7 +13,7 @@
 		interface="org.societies.example.service.api.IAddService">
 		<osgi:service-properties>
 			<entry key="TargetPlatform" value="SOCIETIES" />
-			<entry key="ServiceProvider" value="IST-SOCIETIES" />			
+			<entry key="ServiceProvider" value="ICT-SOCIETIES" />			
 			<entry key="ServiceMetaModel" value-ref="serMetamodel" />
 		</osgi:service-properties>
 	</osgi:service>

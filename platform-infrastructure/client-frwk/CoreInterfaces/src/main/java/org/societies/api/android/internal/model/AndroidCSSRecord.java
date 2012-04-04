@@ -25,7 +25,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.api.android.internal.model;
 
-
 import java.util.List;
 
 import org.societies.api.schema.cssmanagement.CssNode;
@@ -127,17 +126,17 @@ public class AndroidCSSRecord extends CssRecord implements Parcelable {
 		this.cssIdentity = cssIdentity;
 	}
 	public AndroidCSSNode[] getCSSNodes() {
-		AndroidCSSNode androidNodes [] = new AndroidCSSNode[cssNodes.size()];
+		AndroidCSSNode androidNodes [] = new AndroidCSSNode[getCssNodes().size()];
 		
-		for (int i = 0; i < cssNodes.size(); i++) {
-			androidNodes[i] = (AndroidCSSNode) cssNodes.get(i);
+		for (int i = 0; i < getCssNodes().size(); i++) {
+			androidNodes[i] = (AndroidCSSNode) getCssNodes().get(i);
 		}
 		return androidNodes;
 	}
 	public void setCSSNodes(AndroidCSSNode[] androidCSSNodes) {
-		cssNodes.clear();
+		getCssNodes().clear();
 		for (int i = 0; i < androidCSSNodes.length; i++) {
-			cssNodes.add(androidCSSNodes[i]);
+			getCssNodes().add(androidCSSNodes[i]);
 		}
 	}
 	public int getStatus() {
@@ -165,17 +164,17 @@ public class AndroidCSSRecord extends CssRecord implements Parcelable {
 		this.cssUpTime = cssUpTime;
 	}
 	public AndroidCSSNode[] getArchivedCSSNodes() {
-		AndroidCSSNode androidNodes [] = new AndroidCSSNode[archiveCSSNodes.size()];
+		AndroidCSSNode androidNodes [] = new AndroidCSSNode[getArchiveCSSNodes().size()];
 		
-		for (int i = 0; i < archiveCSSNodes.size(); i++) {
-			androidNodes[i] = (AndroidCSSNode) archiveCSSNodes.get(i);
+		for (int i = 0; i < getArchiveCSSNodes().size(); i++) {
+			androidNodes[i] = (AndroidCSSNode) getArchiveCSSNodes().get(i);
 		}
 		return androidNodes;
 	}
 	public void setArchiveCSSNodes(AndroidCSSNode[] androidArchiveCSSNodes) {
-		archiveCSSNodes.clear();
+		getArchiveCSSNodes().clear();
 		for (int i = 0; i < androidArchiveCSSNodes.length; i++) {
-			archiveCSSNodes.add(androidArchiveCSSNodes[i]);
+			getArchiveCSSNodes().add(androidArchiveCSSNodes[i]);
 		}
 	}
 	public int getPresence() {
@@ -183,6 +182,53 @@ public class AndroidCSSRecord extends CssRecord implements Parcelable {
 	}
 	public void setPresence(int presence) {
 		this.presence = presence;
+	}
+	/**
+	 * Convert a given CssRecord to an AndroidCSSRecord
+	 * 
+	 * @param cssRecord
+	 * @return AndroidCSSRecord
+	 */
+	public static AndroidCSSRecord convertCssRecord(CssRecord cssRecord) {
+		AndroidCSSRecord arecord = new AndroidCSSRecord();
+
+			
+		arecord.setArchiveCSSNodes(convertCssNodes(cssRecord.getArchiveCSSNodes()));
+		arecord.setCssHostingLocation(cssRecord.getCssHostingLocation());
+		arecord.setCssIdentity(cssRecord.getCssIdentity());
+		arecord.setCssInactivation(cssRecord.getCssInactivation());
+		arecord.setCSSNodes(convertCssNodes(cssRecord.getCssNodes()));
+		arecord.setCssRegistration(cssRecord.getCssRegistration());
+		arecord.setCssUpTime(cssRecord.getCssUpTime());
+		arecord.setDomainServer(cssRecord.getDomainServer());
+		arecord.setEmailID(cssRecord.getEmailID());
+		arecord.setEntity(cssRecord.getEntity());
+		arecord.setForeName(cssRecord.getForeName());
+		arecord.setHomeLocation(cssRecord.getHomeLocation());
+		arecord.setIdentityName(cssRecord.getIdentityName());
+		arecord.setImID(cssRecord.getImID());
+		arecord.setName(cssRecord.getName());
+		arecord.setPassword(cssRecord.getPassword());
+		arecord.setPresence(cssRecord.getPresence());
+		arecord.setSex(cssRecord.getSex());
+		arecord.setSocialURI(cssRecord.getSocialURI());
+		arecord.setStatus(cssRecord.getStatus());
+		
+		return arecord;
+	}
+
+	/**
+	 * Convert a List of CssNodes to an array of AndroidCSSNode
+	 * @param list
+	 * @return
+	 */
+	public static AndroidCSSNode [] convertCssNodes(List<CssNode> list) {
+		AndroidCSSNode acssNodes [] = new AndroidCSSNode[list.size()];
+		
+		for (int i = 0; i < list.size(); i++) {
+			acssNodes[i] = AndroidCSSNode.convertCssNode(list.get(i));
+		}
+		return acssNodes;
 	}
 	/**
 	 * Private constructor 
@@ -203,14 +249,13 @@ public class AndroidCSSRecord extends CssRecord implements Parcelable {
 		setSex(in.readInt());
 		setHomeLocation(in.readString());
 		setCssIdentity(in.readString());
-		setCSSNodes((AndroidCSSNode[]) in.readParcelableArray(AndroidCSSNode.class.getClassLoader()));
+		setCSSNodes(convertParcels(in.readParcelableArray(AndroidCSSNode.class.getClassLoader())));
 		setStatus(in.readInt());
 		setCssRegistration(in.readString());
 		setCssInactivation(in.readString());
 		setCssUpTime(in.readInt());
 		
-//		CSSDevice encounteredCIS[] = null;
-		setArchiveCSSNodes((AndroidCSSNode[]) in.readParcelableArray(AndroidCSSNode.class.getClassLoader()));
+		setArchiveCSSNodes(convertParcels(in.readParcelableArray(AndroidCSSNode.class.getClassLoader())));
 		setPresence(in.readInt());
 
 	}
@@ -241,7 +286,6 @@ public class AndroidCSSRecord extends CssRecord implements Parcelable {
 		out.writeString(getCssInactivation());
 		out.writeInt(getCssUpTime());
 		
-//		CSSDevice encounteredCIS[] = null;
 		out.writeParcelableArray(getArchivedCSSNodes(), 0);
 		out.writeInt(getPresence());
 
@@ -259,4 +303,16 @@ public class AndroidCSSRecord extends CssRecord implements Parcelable {
 		}
 		
 	};
+	/**
+	 * Convert Parcelable array to AndroidCSSNode array
+	 * @param parcels
+	 * @return AndroidCSSNode array
+	 */
+	private AndroidCSSNode [] convertParcels(Parcelable parcels []) {
+		AndroidCSSNode cssNodes [] = new AndroidCSSNode [parcels.length];
+		for (int i = 0; i < parcels.length; i++) {
+			cssNodes[i] = (AndroidCSSNode) parcels[i];
+		}
+		return cssNodes;
+	}
 }

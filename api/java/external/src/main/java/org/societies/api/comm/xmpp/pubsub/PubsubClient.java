@@ -41,12 +41,8 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
-import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
-import org.societies.api.comm.xmpp.pubsub.Affiliation;
-import org.societies.api.comm.xmpp.pubsub.Subscriber;
-import org.societies.api.comm.xmpp.pubsub.Subscription;
-import org.societies.api.comm.xmpp.pubsub.SubscriptionState;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.identity.IIdentity;
 import org.w3c.dom.Element;
 

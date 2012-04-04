@@ -53,7 +53,7 @@ import org.societies.api.schema.css.directory.MethodType;
 public class CommsClient implements ICssDirectoryRemote, ICommCallback {
 	private static final List<String> NAMESPACES = Collections
 			.unmodifiableList(Arrays
-					.asList("http://societies.org/api/schema/css/direcory"));
+					.asList("http://societies.org/api/schema/css/directory"));
 	private static final List<String> PACKAGES = Collections
 			.unmodifiableList(Arrays
 					.asList("org.societies.api.schema.css.directory"));

@@ -129,18 +129,22 @@ class SocialDatabaseAdapter {
 	 * @param _community
 	 * @return
 	 */
-	public long insertCis(ICisRecord _cis){
-		// Create a new row of values to insert: 
-		ContentValues newValues = new ContentValues();
-		newValues.put(SocialContract.Groups._ID, _cis.getCisId());
-		newValues.put(SocialContract.Groups.NAME, _cis.getName());
-		newValues.put(SocialContract.Groups.OWNER_ID, _cis.getOwnerId());
-		newValues.put(SocialContract.Groups.DISPLAY_NAME, _cis.getUserDefineName());
-//		newValues.put(KEY_CREATION_DATE, _cis.getCreationDate());
+//	public long insertCis(ICisRecord _cis){
+//		// Create a new row of values to insert: 
+//		ContentValues newValues = new ContentValues();
+//		newValues.put(SocialContract.Groups._ID, _cis.getCisId());
+//		newValues.put(SocialContract.Groups.NAME, _cis.getName());
+//		newValues.put(SocialContract.Groups.OWNER_ID, _cis.getOwnerId());
+//		newValues.put(SocialContract.Groups.DISPLAY_NAME, _cis.getUserDefineName());
+////		newValues.put(KEY_CREATION_DATE, _cis.getCreationDate());
+//		//Insert the row:
+//		return db.insert(GROUP_TABLE_NAME, null, newValues);
+//	}
+	public long insertCis(ContentValues _cis){
 		//Insert the row:
-		return db.insert(GROUP_TABLE_NAME, null, newValues);
+		return db.insert(GROUP_TABLE_NAME, null, _cis);
 	}
-	
+
 	/**
 	 * Remove a CIS from the database.
 	 * @param _rowIndex

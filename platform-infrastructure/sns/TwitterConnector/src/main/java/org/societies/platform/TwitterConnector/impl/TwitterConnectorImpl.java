@@ -11,7 +11,7 @@ import org.societies.platform.TwitterConnector.*;
 import org.societies.platform.TwitterConnector.model.TwitterToken;
 
 /*
- * twitter sn client 
+ * twitter connector implementation
  */
 public class TwitterConnectorImpl implements TwitterConnector{
 

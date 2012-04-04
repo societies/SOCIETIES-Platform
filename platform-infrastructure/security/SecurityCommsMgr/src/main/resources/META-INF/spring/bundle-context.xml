@@ -31,12 +31,11 @@
 	
 	<bean id="SecurityCommsServer"
 		class="org.societies.security.commsmgr.CommsServer"
-		depends-on="CommManagerBundle,NegotiationProvider,NegotiationRequester"
+		depends-on="CommManagerBundle,NegotiationProvider"
 		init-method="init"
   		>
   		<property name="commMgr" ref="CommManagerBundle"/>
         <property name="negotiationProvider" ref="NegotiationProvider"/>
-        <property name="negotiationRequester" ref="NegotiationRequester"/>
 	</bean>
 	
 	<bean id="NegotiationProviderRemote"

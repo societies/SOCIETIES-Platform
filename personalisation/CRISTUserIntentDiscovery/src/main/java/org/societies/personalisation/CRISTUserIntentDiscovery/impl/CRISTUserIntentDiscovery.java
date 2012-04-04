@@ -25,12 +25,26 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.ICRISTUserIntentDiscovery;
+import org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager;
 
 public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 
+	private ICRISTUserIntentTaskManager cristTaskManager;
 	ArrayList<MockHistoryData> historyList = new ArrayList<MockHistoryData>();
 	LinkedHashMap<String, Integer> intentModel = new LinkedHashMap<String, Integer>();
 
+	public CRISTUserIntentDiscovery(ICRISTUserIntentTaskManager cristTaskManager){
+		this.setCristTaskManager(cristTaskManager);
+	}
+	
+	public ICRISTUserIntentTaskManager getCristTaskManager(){
+		return cristTaskManager;
+	}
+	
+	public void setCristTaskManager(ICRISTUserIntentTaskManager cristTaskManager){
+		this.cristTaskManager = cristTaskManager;
+	}
+	
 	public void initialiseCRISTDiscovery() {
 		System.out.println("Yo!! I'm a brand new service and my interface is: "
 				+ this.getClass().getName());
@@ -87,7 +101,7 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 		// By mining user behavior patterns
 		// Identify all the possible user behaviors
 		for (int i = 0; i < historySize; i++) {
-			MockHistoryData currentHisData = historyList.get(i);
+			MockHistoryData currentHisData = this.historyList.get(i);
 			String currentHisAction = currentHisData.getActionValue();
 			String currentHisSituation = currentHisData.getSituationValue();
 			String currentBehavior = currentHisAction + "@"
@@ -99,7 +113,7 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 
 		// Convert history data to the "Action#Situation" format
 		for (int i = 0; i < historySize; i++) {
-			MockHistoryData currentHisData = historyList.get(i);
+			MockHistoryData currentHisData = this.historyList.get(i);
 			String currentHisAction = currentHisData.getActionValue();
 			String currentHisSituation = currentHisData.getSituationValue();
 			String currentBehavior = currentHisAction + "@"
@@ -119,11 +133,11 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 					int currentIndex = indexList[j] + k;
 					if (indexList[j] + k < historySize
 							&& behaviorRecords.get(i).endsWith(
-									historyList.get(currentIndex)
+									this.historyList.get(currentIndex)
 											.getSituationValue())) {
 						currentCadidate = currentCadidate
 								+ "#"
-								+ historyList.get(currentIndex)
+								+ this.historyList.get(currentIndex)
 										.getActionValue();
 					} else {
 						break;

@@ -77,16 +77,13 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 //import org.societies.api.internal.context.broker.IUserCtxDBMgrCallback;
 
 import org.societies.api.context.model.CtxAttributeValueType;
-import org.societies.api.internal.cis.management.ICisManager;
-import org.societies.api.internal.cis.management.ICisRecord;
-
-//import org.societies.api.cis.management.ICisRecord;
-//import org.societies.api.cis.management.ICisManager;
-//import org.societies.api.cis.management.ICisOwned;
-//import org.societies.api.cis.management.ICisSubscribed;
-//import org.societies.api.cis.management.ICisEditor;
-//import org.societies.api.cis.management.ICisActivity;
-//import org.societies.api.cis.management.ICisActivityFeed;
+import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.cis.management.ICisSubscribed;
+import org.societies.api.cis.management.ICisEditor;
+import org.societies.api.cis.management.ICisActivity;
+import org.societies.api.cis.management.ICisActivityFeed;
 //import org.societies.api.cis.management.ICis;
 
 
