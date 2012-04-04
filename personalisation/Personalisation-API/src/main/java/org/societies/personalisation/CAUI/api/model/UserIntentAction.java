@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 import org.societies.api.personalisation.model.Action;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
 /**
@@ -48,8 +49,8 @@ public class UserIntentAction extends Action implements IUserIntentAction, Seria
 
 	private long duration;
 
-	public UserIntentAction(String par, String val,Long id, double transProb){
-		super(par,val);
+	public UserIntentAction(ServiceResourceIdentifier serviceID, String serviceType, String par, String val,Long id, double transProb){
+		super(serviceID, serviceType, val, val);
 		this.actionID = par +"="+val+"/"+id; 
 		this.transProb = transProb;
 		this.confidenceLevel = 51;
