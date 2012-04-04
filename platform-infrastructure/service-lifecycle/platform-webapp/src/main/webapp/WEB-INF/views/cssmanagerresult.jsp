@@ -10,7 +10,14 @@
 </head>
 <body>
 <body>
+	<!-- HEADER -->
+	<jsp:include page="header.jsp" />
+	<!-- END HEADER -->
 
+	<!-- LEFTBAR -->
+	<jsp:include page="leftbar.jsp" />
+	<!-- END LEFTBAR -->
+<!-- .................PLACE YOUR CONTENT HERE ................ -->
 	<h4>${methodcalled}</h4>
 	<br />
 	<h4>${res}</h4>
@@ -42,22 +49,11 @@
 	</Table>
 	<br />
 	<br />
-	<br />
-	<br />
 
-	<h4>Please click the service to use .....</h4>
-
-	<table>
-		<tr>
-			<td><a href="servicediscovery.html">Service Discovery
-					Service</a></td>
-		</tr>
-		<tr>
-			<td><a href="servicecontrol.html">Service Control Service</a></td>
-		</tr>
-		<tr>
-			<td><a href="cssmanager.html">Css Manager Service</a></td>
-		</tr>
-	</table>
+<!-- .................END PLACE YOUR CONTENT HERE ................ -->
+	<!-- FOOTER -->
+	<jsp:include page="footer.jsp" />
+	<!-- END FOOTER -->
+	
 </body>
 </html>

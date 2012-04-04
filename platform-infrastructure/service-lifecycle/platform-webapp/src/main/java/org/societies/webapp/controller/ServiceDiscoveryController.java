@@ -65,14 +65,20 @@ public class ServiceDiscoveryController {
 	@RequestMapping(value = "/servicediscovery.html", method = RequestMethod.GET)
 	public ModelAndView Servicediscovery() {
 
+		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("message", "Please input values and submit");
+		
+		//ADD THE BEAN THAT CONTAINS ALL THE FORM DATA FOR THIS PAGE
 		ServiceDiscoveryForm sdForm = new ServiceDiscoveryForm();
+		model.put("sdForm", sdForm);
+		
+		//ADD ALL THE SELECT BOX VALUES USED ON THE FORM
 		Map<String, String> methods = new LinkedHashMap<String, String>();
 		methods.put("GetServices", "Get Service for node");
 		methods.put("GetLocalServices", "Get Local Services");
 		model.put("methods", methods);
-		model.put("sdForm", sdForm);
+		
 		model.put("servicediscoveryResult", "Service Discovery Result :");
 		return new ModelAndView("servicediscovery", model);
 	}

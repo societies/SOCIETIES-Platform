@@ -32,11 +32,13 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 
 /**
+ * 
  * The interface class for the Service Control component. It permits a caller to tell the SLM to
  * start a service, to stop a service, to install a new service and to uninstall a service.
  *
  * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
+ * --provided--
  */
 public interface IServiceControl {
 		
