@@ -28,6 +28,8 @@ import java.util.List;
 
 import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 
 /**
@@ -35,6 +37,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  * @version 1.0
  * @created 08-Nov-2011 13:25:58
  */
+@SocietiesExternalInterface(type=SocietiesInterfaceType.REQUIRED)
 public interface IActionConsumer {
 
 	/**

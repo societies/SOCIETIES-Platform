@@ -44,6 +44,7 @@
 		
 		<!-- Utilities -->
 		<module>../utilities/DBC</module>
+		<module>../utilities/societies-annotations</module>
 		<module>../common-modules/data-source</module>
 		<module>../common-modules/hibernate_classes</module>
 

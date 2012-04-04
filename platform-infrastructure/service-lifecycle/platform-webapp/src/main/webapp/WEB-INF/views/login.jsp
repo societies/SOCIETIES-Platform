@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Socieites user login</title>
+<title>Societies user login</title>
 <style>
 .error {
 	color: #ff0000;
@@ -23,6 +23,14 @@
 </head>
 
 <body>
+	<!-- HEADER -->
+	<jsp:include page="header.jsp" />
+	<!-- END HEADER -->
+
+	<!-- LEFTBAR -->
+	<jsp:include page="leftbar.jsp" />
+	<!-- END LEFTBAR -->
+<!-- .................PLACE YOUR CONTENT HERE ................ -->
 <h1>${message}</h1>
 	<h3>please user below user name and password</h3>
 	 
@@ -53,7 +61,12 @@
 				<td colspan="3"><input type="submit" /></td>
 			</tr>
 		</table>
-	</form:form> 
+	</form:form>
+
+<!-- .................END PLACE YOUR CONTENT HERE ................ -->
+	<!-- FOOTER -->
+	<jsp:include page="footer.jsp" />
+	<!-- END FOOTER --> 
 </body>
 </html>
 

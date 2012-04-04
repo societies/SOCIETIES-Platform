@@ -30,14 +30,17 @@ import java.util.concurrent.Future;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
+ * 
  * The interface class for the Service Control component. It permits a caller to tell the SLM to
  * start a service, to stop a service, to install a new service and to uninstall a service.
  *
  * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
- *
  */
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface IServiceControl {
 		
 	/**

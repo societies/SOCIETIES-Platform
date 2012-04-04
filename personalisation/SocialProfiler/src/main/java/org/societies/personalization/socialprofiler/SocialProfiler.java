@@ -25,11 +25,12 @@ public class SocialProfiler implements ISocialProfiler {
 	private static final Logger 	logger 			= Logger.getLogger(ISocialProfiler.class);
 	private Properties 				props 			= new Properties();
 	private String 					configFileName	= "config.properties";
-	private EmbeddedGraphDatabase 	neo;
 	private GraphManager	 		graph;
 	private DatabaseConnection  	databaseConnection;
 
 	private ProfilerEngine 			engine;
+	
+	private Timer 					timer;
 	
 	
 	public SocialProfiler(){
@@ -64,16 +65,15 @@ public class SocialProfiler implements ISocialProfiler {
 		}
 		
 		// Start and Create (if necessary) the Graph
-		this.neo 					= new EmbeddedGraphDatabase(neoDBPath);
+		EmbeddedGraphDatabase neo	= new EmbeddedGraphDatabase(neoDBPath);
 		this.graph					= new GraphManager(neo);
 		this.databaseConnection	    = new DatabaseConnection(props);
 		
 		logger.info("Engine Initialization ...");
 		this.engine	= new ProfilerEngine(graph, databaseConnection, socialdata);
-		this.engine.generateCompleteNetwork();
-	
 		
-		
+		// start Scheduler
+		scheduleNetworkUpdate();
 	}
 
 	
@@ -105,12 +105,12 @@ public class SocialProfiler implements ISocialProfiler {
 			//int period = initialDelay;
 			
 	    	int initialDelay =0;
-			int period		 = (int)(1000 * 60 * 60 * 24 * daysFull);
-	    	Timer timer = new Timer();
+			int period		 = 30000; //(int)(1000 * 60 * 60 * 24 * daysFull);
+	    	this.timer = new Timer();
 			SocialTimerTask task = new SocialTimerTask(this.engine,  this.databaseConnection);
 			timer.scheduleAtFixedRate(task, initialDelay, period);
 			logger.info("Next network update scheduled in " + daysFull + " days. The procedure will be repeated every " + daysFull + " days.");
-		}
+	 }
 
 
 	 
@@ -131,7 +131,7 @@ public class SocialProfiler implements ISocialProfiler {
 			
 			}
 			
-			engine.UpdateNetwork(200);
+			engine.UpdateNetwork(ProfilerEngine.UPDATE_EVERYTHING);
 	 	    
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -169,7 +169,8 @@ public class SocialProfiler implements ISocialProfiler {
 	
 	public void shutdown(){
 		logger.info("No connector Available -- Stop component task");
-		neo.shutdown();
+		timer.cancel();
+		graph.shutdown();
 		databaseConnection.closeMysql();
 		logger.info("Engine stopped - DB closed");
 	}

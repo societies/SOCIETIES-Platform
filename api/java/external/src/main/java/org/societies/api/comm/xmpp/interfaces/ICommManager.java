@@ -26,8 +26,6 @@
 
 package org.societies.api.comm.xmpp.interfaces;
 
-import java.util.List;
-
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPNode;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;

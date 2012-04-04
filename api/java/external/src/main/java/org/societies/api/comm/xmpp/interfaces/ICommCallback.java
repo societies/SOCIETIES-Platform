@@ -30,8 +30,9 @@ import java.util.List;
 
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.comm.xmpp.datatypes.XMPPNode;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
  * @author Miquel Martin (NEC)
@@ -40,7 +41,7 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
  * from {@link Stanza} messages of the IQ type.
  * 
  */
-
+@SocietiesExternalInterface(type=SocietiesInterfaceType.REQUIRED)
 public interface ICommCallback {
 	
 	List<String> getXMLNamespaces();

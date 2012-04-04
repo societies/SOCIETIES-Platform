@@ -42,7 +42,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 /**
- * This service monitors services and tasks and can optionally filter
+ * This Android Service monitors services and tasks and can optionally filter
  * for given filter values.
  *
  */
@@ -53,6 +53,12 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 	private static final int MAX_SERVICES = 30;
 	private static final int MAX_TASKS = 30;
 	
+	/**
+	 * CoreServiceMonitor intents
+	 * Used to create to create Intents to signal return values of a called method
+	 * If the method is locally bound it is possible to directly return a value but is discouraged
+	 * as called methods usually involve making asynchronous calls. 
+	 */
 	public static final String ACTIVE_SERVICES = "org.societies.android.platform.servicemonitor.ACTIVE_SERVICES";
 	public static final String ACTIVE_FILTERED_SERVICES = "org.societies.android.platform.servicemonitor.ACTIVE_FILTERED_SERVICES";
 	public static final String ACTIVE_TASKS = "org.societies.android.platform.servicemonitor.ACTIVE_TASKS";

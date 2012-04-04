@@ -1,17 +1,25 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="ISO-8859-1"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Societies WelcomePage</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <title>Societies Homepage</title>
 </head>
-<body>
-	<h2>Wecome to Societies! Please click login</h2>
-	<table>
-		<tr>
-			<td><a href="login.html">login</a></td>
-		</tr>
-	</table>
+<body >
+	<!-- HEADER -->
+	<jsp:include page="header.jsp" />
+	<!-- END HEADER -->
+
+	<!-- LEFTBAR -->
+	<jsp:include page="leftbar.jsp" />
+	<!-- END LEFTBAR -->
+<!-- .................PLACE YOUR CONTENT HERE ................ -->
+Welcome to the societies admin page
+
+
+<!-- .................END PLACE YOUR CONTENT HERE ................ -->
+	<!-- FOOTER -->
+	<jsp:include page="footer.jsp" />
+	<!-- END FOOTER -->
 </body>
 </html>

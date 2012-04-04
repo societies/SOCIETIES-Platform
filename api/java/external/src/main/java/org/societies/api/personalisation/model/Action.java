@@ -25,9 +25,9 @@
 package org.societies.api.personalisation.model;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.Serializable;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
@@ -51,12 +51,6 @@ public class Action implements IAction, Serializable{
 		this.serviceType = "not_initialised";
 		this.parameterName = "not_initialised";
 		this.value = "not_initialised";
-	}
-	
-	@Deprecated
-	public Action(String par, String val){
-		this.parameterName = par;
-		this.value = val;
 	}
 
 	public Action(ServiceResourceIdentifier serviceID, String serviceType, String parameterName, String value){
