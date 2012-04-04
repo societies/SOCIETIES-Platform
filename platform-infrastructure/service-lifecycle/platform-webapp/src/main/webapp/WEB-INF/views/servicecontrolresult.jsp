@@ -9,25 +9,24 @@
 <title>Societies Service Control Result</title>
 </head>
 <body>
+	<!-- HEADER -->
+	<jsp:include page="header.jsp" />
+	<!-- END HEADER -->
+
+	<!-- LEFTBAR -->
+	<jsp:include page="leftbar.jsp" />
+	<!-- END LEFTBAR -->
+<!-- .................PLACE YOUR CONTENT BELOW HERE ................ -->
 
 <h4>${result}</h4>
 <br/>
 <br/>
 <h4>${serviceResult}</h4>
 <br/>
-<br/>		
-	<h4>Please click the service to use .....</h4>
-		
-		<table>	
-		<tr>
-			<td><a href="servicediscovery.html">Service Discovery Service</a></td>
-		</tr>
-		<tr>	
-			<td><a href="servicecontrol.html">Service Control Service</a></td>
-		</tr>
-		<tr>	
-			<td><a href="cssmanager.html">Css Manager Service</a></td>
-		</tr>			
-	</table>
+
+<!-- .................END PLACE YOUR CONTENT ................ -->
+	<!-- FOOTER -->
+	<jsp:include page="footer.jsp" />
+	<!-- END FOOTER -->
 </body>
 </html>

@@ -40,7 +40,6 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
-import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.MethodType;
 import org.societies.comm.xmpp.client.impl.ClientCommunicationMgr;
 import org.societies.identity.IdentityManagerImpl;
@@ -50,10 +49,14 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.Messenger;
 import android.os.Parcelable;
 import android.util.Log;
 
+/**
+ * This Android Service is a Societies core service that implements local CSSManager
+ * functionality and where relevant makes remote calls on its OSGi peer.
+ *
+ */
 public class LocalCSSManagerService extends Service implements IAndroidCSSManager {
 
 	//Logging tag
@@ -70,6 +73,9 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
     
 	/**
 	 * CSS Manager intents
+	 * Used to create to create Intents to signal return values of a called method
+	 * If the method is locally bound it is possible to directly return a value but is discouraged
+	 * as called methods usually involve making asynchronous calls. 
 	 */
 	//Intents corresponding to return values of methods
 	public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.platform.cssmanager.ReturnValue";
@@ -91,7 +97,7 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 	public static final String UNREGISTER_CSS_DEVICE = "org.societies.android.platform.cssmanager.UNREGISTER_CSS_DEVICE";
 	public static final String UNREGISTER_XMPP_SERVER = "org.societies.android.platform.cssmanager.UNREGISTER_XMPP_SERVER";
 
-
+	
     private IIdentity toXCManager = null;
     private ClientCommunicationMgr ccm;
 
@@ -315,7 +321,10 @@ public class LocalCSSManagerService extends Service implements IAndroidCSSManage
 		Log.d(LOG_TAG, "unregisterXMPPServer called with client: " + client);
 		return null;
 	}
-
+	/**
+	 * Callback used with Android Comms
+	 *
+	 */
 	private class CSSManagerCallback implements ICommCallback {
 		String returnIntent;
 		String client;

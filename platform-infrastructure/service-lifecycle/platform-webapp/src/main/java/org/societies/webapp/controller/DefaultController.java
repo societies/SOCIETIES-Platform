@@ -22,31 +22,39 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.servicelifecycle.model;
+package org.societies.webapp.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
- * Public interface class for the Service object
+ * Describe your class here...
  *
- * @author sanchocsa
- * @deprecated Use {@link org.societies.api.schema.servicelifecycle.model.Service} instead
- *
+ * @author aleckey
  */
-@Deprecated
-public interface IService {
 
-	public String getVersion();
+@Controller
+public class DefaultController {
 
-	public String getServiceName();
+	/**
+	 * This method get called when user request for login page by using
+	 * url http://localhost:8080/societies/login.html
+	 * @return login jsp page and model object
+	 */
+	@RequestMapping(value="/default.html",method = RequestMethod.GET)
+	public ModelAndView DefaultPage() {
+		//model is nothing but a standard Map object
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("message", "Please login to your Societies account");
 
-	public String getServiceDescription(); 
-
-	public IServiceResourceIdentifier getServiceIdentifier();
+		return new ModelAndView("Default", model) ;
+	}
 	
-	public ServiceInstance getServiceInstance();
 	
-	public String getAuthorSignature();
-	public ServiceStatus getServiceStatus();
-	public String getServiceEndpoint() ;
-	public ServiceLocation getServiceLocation ();
 	
 }

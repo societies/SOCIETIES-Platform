@@ -2,6 +2,7 @@ package org.societies.comm.test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
@@ -40,6 +41,8 @@ public class TestCISCommMgr extends Thread {
 			PubsubServiceRouter psr = new PubsubServiceRouter(ccm);
 			
 		} catch (InvalidFormatException e) {
+			e.printStackTrace();
+		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
 	}

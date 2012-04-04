@@ -24,7 +24,11 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
+/**
+ * Called when HTML page has been loaded
+ * Add custom PhoneGap plugins
+ * N.B. Ensure that res/xml/plugins.xml file is updated
+ */
 function onDeviceReady() {
 	console.log("PhoneGap Loaded, Device Ready");
 	
@@ -43,12 +47,13 @@ function onDeviceReady() {
 
 /**
  * LocalCSSManagerService object
- * @return Instance of ConnectionListener
  */
 var LocalCSSManagerService = function() { 
 }
 
 /**
+ * Connect to LocalCSSManager service
+ * 
  * @param successCallback The callback which will be called when Java method is successful
  * @param failureCallback The callback which will be called when Java method has an error
 */
@@ -63,6 +68,8 @@ LocalCSSManagerService.prototype.connectService = function(successCallback, fail
 };
 
 /**
+ * Disconnect from LocalCSSManager service
+ * 
  * @param successCallback The callback which will be called when Java method is successful
  * @param failureCallback The callback which will be called when Java method has an error
 */
@@ -78,6 +85,8 @@ LocalCSSManagerService.prototype.disconnectService = function(successCallback, f
 
 
 /**
+ * Login to CSS on cloud/rich node
+ * 
  * @param successCallback The callback which will be called when Java method is successful
  * @param failureCallback The callback which will be called when Java method has an error
 */
@@ -121,13 +130,13 @@ LocalCSSManagerService.prototype.loginCSS = function(successCallback, failureCal
 
 /**
  * CoreServiceMonitorService object
- * @return Instance of CoreServiceMonitorService
  */
 var CoreServiceMonitorService = function() { 
 }
 
 /**
- * Used to bind to service that plugin connects to
+ * Connect to CoreServiceMonitorService service
+ * 
  * @param successCallback The callback which will be called when Java method is successful
  * @param failureCallback The callback which will be called when Java method has an error
 */
@@ -143,7 +152,8 @@ CoreServiceMonitorService.prototype.connectService = function(successCallback, f
 };
 
 /**
- * Used to unbind service that plugin connects to
+ * Disconnect from CoreServiceMonitorService service
+ * 
  * @param successCallback The callback which will be called when Java method is successful
  * @param failureCallback The callback which will be called when Java method has an error
 */
@@ -159,6 +169,8 @@ CoreServiceMonitorService.prototype.disconnectService = function(successCallback
 };
 
 /**
+ * Get all active services
+ * 
  * @param successCallback The callback which will be called when Java method is successful
  * @param failureCallback The callback which will be called when Java method has an error
 */
@@ -174,6 +186,8 @@ CoreServiceMonitorService.prototype.activeServices = function(successCallback, f
 };
 
 /**
+ * Get all active tasks, i.e. apps
+ * 
  * @param successCallback The callback which will be called when Java method is successful
  * @param failureCallback The callback which will be called when Java method has an error
 */
@@ -189,6 +203,9 @@ CoreServiceMonitorService.prototype.activeTasks = function(successCallback, fail
 	["org.societies.android.platform.gui"]);        //Passing a list of arguments to the plugin
 };
 
+/**
+ * Populate HTML elements with device information
+ */
 var deviceInfo = function() {
 	console.log("Get device information");
 	
@@ -205,7 +222,10 @@ var deviceInfo = function() {
 
 };
 
-
+/**
+ * Login to CSS 
+ * @param actionFunction function to be called if successful
+ */
 var connectToLocalCSSManager = function(actionFunction) {
 	console.log("Connect to LocalCSSManager");
 		
@@ -218,7 +238,9 @@ var connectToLocalCSSManager = function(actionFunction) {
 	}
     window.plugins.LocalCSSManagerService.connectService(success, failure);
 }
-
+/**
+ * Actions carried in the event that a successful CSS login occurs
+ */
 var successfulLogin = function() {
 	console.log("Login to CSS");
 
@@ -243,7 +265,10 @@ var resetDeviceMgr = function(){
     
     
 }
-
+/**
+ * Bind to the CoreServiceMonitor service
+ * @param actionFunction function to be invoked if action successful
+ */
 var connectToCoreServiceMonitor = function(actionFunction) {
 	console.log("Connect to CoreServiceMonitor");
 		
@@ -257,7 +282,9 @@ var connectToCoreServiceMonitor = function(actionFunction) {
 	}
     window.plugins.CoreServiceMonitorService.connectService(success, failure);
 }
-
+/**
+ * List active services
+ */
 var refreshActiveServices = function() {
 	console.log("Refresh Active Service");
 
@@ -282,6 +309,9 @@ var refreshActiveServices = function() {
 	window.plugins.CoreServiceMonitorService.activeServices(success, failure);
 	
 };
+/**
+ * List active tasks, i.e. apps
+ */
 var refreshActiveTasks = function() {
 	console.log("Refresh Active Tasks");
 
@@ -306,7 +336,10 @@ var refreshActiveTasks = function() {
 	window.plugins.CoreServiceMonitorService.activeTasks(success, failure);
 };
 
-//Convert an elapsed time in milliseconds
+/**
+ * Convert an elapsed time in milliseconds
+ * @param milliseconds time elapsed
+ */
 var convertMilliseconds = function(milliseconds) {
 	value = milliseconds / 1000
 	seconds = value % 60

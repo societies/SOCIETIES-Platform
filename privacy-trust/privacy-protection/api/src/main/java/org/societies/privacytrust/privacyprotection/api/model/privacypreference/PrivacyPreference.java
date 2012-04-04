@@ -150,11 +150,6 @@ public class PrivacyPreference extends DefaultMutableTreeNode implements IPrivac
 
 	}
 
-	@Deprecated
-	public void setUserObject(Object object){
-
-	}
-
 	@Override
 	public Enumeration children() {
 		return super.children();
