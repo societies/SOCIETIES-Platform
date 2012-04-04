@@ -28,7 +28,7 @@ public class SocialTimerTask extends TimerTask {
 //		}
 		
 		//this.engine.setDatabaseConnection(databaseConnection);
-		//this.updateNetwork();
+		this.updateNetwork();
 		//databaseConnection.closeMysql();
 		logger.info("Network update routine terminated.");
 	}
@@ -36,7 +36,7 @@ public class SocialTimerTask extends TimerTask {
 	
 	private void updateNetwork() {
 			logger.info("Update Network ....");
-	   		engine.UpdateNetwork(200);
+	   		engine.UpdateNetwork(ProfilerEngine.UPDATE_EVERYTHING);
 //	   		engine.generateUniformProfilePercentagesUsingBayesianSistem(); // this creates a bayesian system overall
 //	   		engine.updateCentralityParameters();
 	}

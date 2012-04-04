@@ -1,5 +1,5 @@
 /**
-git * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
  * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
  * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
@@ -24,27 +24,41 @@ git * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOG
  */
 package org.societies.personalization.socialprofiler.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.personalization.socialprofiler.SocialProfiler;
+import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
+import org.societies.platform.socialdata.SocialData;
+
 
 public class TesterSN {
 
 	
-//	private static String access_token = "AAAFPIhZAkC90BAEyaX4NPG1aNhb9u2fNxwoFZANhKyfDObZAXt6ZAwSQoLLQspKOhpcdML8qBZBVK2S3nu6K2n8f7Ax4EmM968fsviMwKVAZDZD";
-//
-//	public static void main(String[] args) {
-//		
-//		SocialProfiler 	 profiler 		= new SocialProfiler();
-//		SocialData		 socialData 	= new SocialData();
-//		
-//		/////////////////////////////////////////////////////////////////
-//		ISocialConnector fbConn 		= new FacebookConnectorImpl(access_token , null);
-//		List <ISocialConnector> snList 	= new ArrayList<ISocialConnector>();
-//		snList.add(fbConn);
-//		
-//		profiler.setSocialdata(socialData);
-//		profiler.addSocialNetwork(snList);
-//		
-//		
-//	}
+	private static String access_token = "AAAFPIhZAkC90BABQNbZBfnJNokzK6J3929FoHLk51JUG9f0jjD78pF1KKCOI7ezsd7f6fVW47YKIWo3dcc5KdSLFg9E1u1fRxZAuzKbWwZDZD";
+
+	public static void main(String[] args) {
+		
+		SocialProfiler 	 profiler 		= new SocialProfiler();
+		SocialData		 socialData 	= new SocialData();
+		
+		/////////////////////////////////////////////////////////////////
+		ISocialConnector fbConn 		= new FacebookConnectorImpl(access_token , null);
+		List <ISocialConnector> snList 	= new ArrayList<ISocialConnector>();
+		snList.add(fbConn);
+		profiler.setSocialdata(socialData);
+		profiler.addSocialNetwork(snList);
+		
+		try {
+			Thread.sleep(15000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			profiler.shutdown();
+		}
+	}
 
 	
 	
