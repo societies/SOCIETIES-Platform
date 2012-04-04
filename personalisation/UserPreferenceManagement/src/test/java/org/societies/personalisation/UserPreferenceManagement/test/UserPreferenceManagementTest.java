@@ -109,10 +109,10 @@ public class UserPreferenceManagementTest  {
 	public void TestgetOutcomeWithActionEvent() {
 		
 		try {
-			IAction action = new Action("volume","10");
+			
 			ServiceResourceIdentifier sId = new ServiceResourceIdentifier();
 			sId.setIdentifier(new URI("css://mycss.com/MediaPlayer"));
-			
+			IAction action = new Action(sId, "media", "volume","10");
 			action.setServiceID(sId);
 			action.setServiceType("media");			
 			

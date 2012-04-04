@@ -27,13 +27,18 @@ package org.societies.api.personalisation.mgmt;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
- * Describe your class here...
+ * This interface is used by the PersonalisationManager to return a preference or intent action
+ * to a service (core or 3p) when that service requests it explicitly by calling the methods
+ * of the org.societies.api.personalisation.mgmt.IPersonalisationManager interface.
  *
  * @author Eliza
  *
  */
+@SocietiesExternalInterface(type=SocietiesInterfaceType.REQUIRED)
 public interface IPersonalisationCallback {
 
 	public void receiveIAction(IIdentity providerId, IIdentity userId, ServiceResourceIdentifier serviceId, IAction action);

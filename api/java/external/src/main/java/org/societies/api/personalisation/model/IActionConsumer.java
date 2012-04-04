@@ -33,6 +33,8 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
 
 
 /**
+ * This interface must be implemented by 3rd party services that wish to be personalised
+ * proactively by the SOCIETIES platform.
  * @author Elizabeth
  * @version 1.0
  * @created 08-Nov-2011 13:25:58
@@ -41,7 +43,7 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
 public interface IActionConsumer {
 
 	/**
-	 * 	// replace with ServiceResourceIdentifier 
+	 * 	
 	 * This method is used by the User Agent Subsystem to locate the right instance
 	 * of a IActionConsumer by filtering them based on their service identifier
 	 * @return 		The service has to return its own service identifier
