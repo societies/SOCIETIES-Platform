@@ -34,7 +34,14 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 
 
 
-
+/**
+ * 
+ * This class must be used to create action objects in order to send user actions
+ * to the SOCIETIES platform using the IUserActionMonitor interface. 
+ *
+ * @author Eliza
+ *
+ */
 public class Action implements IAction, Serializable{
 
 	private String value;
@@ -44,7 +51,6 @@ public class Action implements IAction, Serializable{
 	private String serviceType;
 	private ArrayList<String> types;
 	
-	private int confidenceLevel;
 
 	public Action(){
 		this.serviceID = null;

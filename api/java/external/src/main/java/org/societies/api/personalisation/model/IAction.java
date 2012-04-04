@@ -36,6 +36,7 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
 
 
 /**
+ * This interface is used to represent a user action. 
  * @author Elizabeth
  *
  */

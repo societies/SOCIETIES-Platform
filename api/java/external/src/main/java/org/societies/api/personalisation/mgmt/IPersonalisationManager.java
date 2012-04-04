@@ -27,7 +27,6 @@ package org.societies.api.personalisation.mgmt;
 
 
 import org.societies.api.identity.IIdentity;
-import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
