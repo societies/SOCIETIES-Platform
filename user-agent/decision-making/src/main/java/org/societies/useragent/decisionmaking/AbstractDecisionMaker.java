@@ -28,7 +28,10 @@ package org.societies.useragent.decisionmaking;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.internal.useragent.conflict.IConflictResolutionManager;
 import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
@@ -36,6 +39,8 @@ import org.societies.useragent.conflict.*;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.personalisation.model.IAction;
+import org.societies.api.personalisation.model.IActionConsumer;
+import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.internal.personalisation.model.IOutcome;
 
 public abstract class AbstractDecisionMaker implements IDecisionMaker {
@@ -57,8 +62,6 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 	public void setFeedbackHandler(IUserFeedback feedbackHandler) {
 		this.feedbackHandler = feedbackHandler;
 	}
-
-
 
 	@Override
 	public void makeDecision(List<IOutcome> intents, List<IOutcome> preferences) {
