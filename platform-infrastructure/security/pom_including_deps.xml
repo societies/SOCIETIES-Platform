@@ -22,6 +22,7 @@
 	<modules>
 		<module>../../parent/version.xml</module>
 		<module>../../parent/spring-osgi.xml</module>
+		<module>../../utilities/societies-annotations</module>
 
 		<!-- API -->
 		<module>../../api/schema/external</module>

@@ -25,12 +25,16 @@
 
 package org.societies.api.security.digsig;
 
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
 /**
  * Methods to digitally sign given data and methods to verify given signatures.
  * 
  * @author Mitja Vardjan
  *
  */
+@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface ISignatureMgr {
 
 	/**
