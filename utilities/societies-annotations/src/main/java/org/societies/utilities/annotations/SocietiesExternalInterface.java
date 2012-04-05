@@ -15,10 +15,8 @@ import java.lang.annotation.Target;
  * </li>
  * <li>
  * are required to be implemented by 3rd Party Services 
- * from the Societies Framework (<b>type = required</b>)
+ * from the Societies Framework <br>(only if those 3rd Party Services want to use the SOCIETIES components that define them) (<b>type = required</b>)
  * </li></ol>
- * 
- * This annotation can only be applied to types (see @Target value). 
  * 
  * @author gspadotto
  *
