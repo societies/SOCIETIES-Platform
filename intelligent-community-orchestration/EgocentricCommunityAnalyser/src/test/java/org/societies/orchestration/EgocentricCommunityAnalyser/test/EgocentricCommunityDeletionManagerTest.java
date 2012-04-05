@@ -26,6 +26,7 @@
 package org.societies.orchestration.EgocentricCommunityAnalyser.test;
 
 import static org.mockito.Mockito.mock;
+
 import org.junit.Test;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisRecord;

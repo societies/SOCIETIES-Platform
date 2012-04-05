@@ -35,6 +35,8 @@ import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.orchestration.CommunityLifecycleManagement.impl.SuggestedCommunityAnalyser;
+
+
 /**
  * This is the test class for the Suggested Community Analyser component
  * 
