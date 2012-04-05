@@ -22,48 +22,74 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
+package org.societies.privacytrust.trust.impl;
+
+import org.societies.api.internal.privacytrust.trust.TrustException;
 
 /**
- * The constants of this enumerated type specify the type of a {@link TrustedEntity}.
- * More specifically, trusted entities can be of one of the following types:
- * <ul>
- * <li>{@link #CSS}: Denotes a trusted individual</li>
- * <li>{@link #CIS}: Denotes a trusted community</li>
- * <li>{@link #SVC}: Denotes a trusted service</li>
- * <li>{@link #DVP}: Denotes a trusted service developer</li>
- * <li>{@link #LGC}: Denotes a trusted legacy entity, i.e. non-SOCIETIES
- * entity</li>
- * </ul>
+ * Thrown to indicate that the Trust Broker could not handle a request.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.3
+ * @since 0.0.5
  */
-public enum TrustedEntityType {
+public class TrustBrokerException extends TrustException {
 
 	/**
-	 * The enum constant for trusted individuals
+	 * 
 	 */
-	CSS,
-	
+	private static final long serialVersionUID = 1L;
+
 	/**
-	 * The enum constant for trusted communities
-	 */
-	CIS,
-	
-	/**
-	 * The enum constant for trusted services
-	 */
-	SVC,
-	
-	/**
-	 * The enum constant for trusted service developers
-	 */
-	DVP,
-	
-	/**
-	 * The enum constant for trusted legacy entities, i.e. non-SOCIETIES
-	 * entities
-	 */
-	LGC,
+     * Constructs a <code>TrustBrokerException</code> with no detail message.
+     */
+    public TrustBrokerException() {
+    	
+        super();
+    }
+
+    /**
+     * Constructs a <code>TrustBrokerException</code> with the specified detail
+     * message.
+     * 
+     * @param message
+     *            the detail message.
+     */
+    public TrustBrokerException(String message) {
+    	
+        super(message);
+    }
+
+    /**
+     * Creates a <code>TrustBrokerException</code> with the specified detail message
+     * and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustBrokerException(String message, Throwable cause) {
+    	
+        super(message, cause);
+    }
+
+    /**
+     * Creates a <code>TrustBrokerException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustBrokerException(Throwable cause) {
+    	
+        super(cause);
+    }
 }

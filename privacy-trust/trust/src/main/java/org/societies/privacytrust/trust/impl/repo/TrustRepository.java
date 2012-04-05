@@ -22,48 +22,60 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
+package org.societies.privacytrust.trust.impl.repo;
+
+import org.societies.privacytrust.trust.api.model.TrustedEntity;
+import org.societies.privacytrust.trust.api.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.repo.ITrustRepository;
+import org.societies.privacytrust.trust.api.repo.TrustRepositoryException;
+import org.springframework.stereotype.Repository;
 
 /**
- * The constants of this enumerated type specify the type of a {@link TrustedEntity}.
- * More specifically, trusted entities can be of one of the following types:
- * <ul>
- * <li>{@link #CSS}: Denotes a trusted individual</li>
- * <li>{@link #CIS}: Denotes a trusted community</li>
- * <li>{@link #SVC}: Denotes a trusted service</li>
- * <li>{@link #DVP}: Denotes a trusted service developer</li>
- * <li>{@link #LGC}: Denotes a trusted legacy entity, i.e. non-SOCIETIES
- * entity</li>
- * </ul>
+ * Implementation of the {@link ITrustRepository} interface.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.3
+ * @since 0.0.5
  */
-public enum TrustedEntityType {
+@Repository
+public class TrustRepository implements ITrustRepository {
 
-	/**
-	 * The enum constant for trusted individuals
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#addEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)
 	 */
-	CSS,
-	
-	/**
-	 * The enum constant for trusted communities
+	@Override
+	public boolean addEntity(TrustedEntity entity)
+			throws TrustRepositoryException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#retrieveEntity(org.societies.privacytrust.trust.api.model.TrustedEntityId)
 	 */
-	CIS,
-	
-	/**
-	 * The enum constant for trusted services
+	@Override
+	public TrustedEntity retrieveEntity(TrustedEntityId teid)
+			throws TrustRepositoryException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#updateEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)
 	 */
-	SVC,
-	
-	/**
-	 * The enum constant for trusted service developers
+	@Override
+	public TrustedEntity updateEntity(TrustedEntity entity)
+			throws TrustRepositoryException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#removeEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)
 	 */
-	DVP,
-	
-	/**
-	 * The enum constant for trusted legacy entities, i.e. non-SOCIETIES
-	 * entities
-	 */
-	LGC,
+	@Override
+	public boolean removeEntity(TrustedEntity entity)
+			throws TrustRepositoryException {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
