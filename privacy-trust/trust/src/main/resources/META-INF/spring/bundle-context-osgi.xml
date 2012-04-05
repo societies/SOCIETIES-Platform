@@ -14,4 +14,5 @@
        testing of the bundle outside of an OSGi container -->
 
 	<osgi:service ref="trustBroker" interface="org.societies.api.internal.privacytrust.trust.ITrustBroker" />
+	<osgi:service ref="trustRepository" interface="org.societies.privacytrust.trust.api.repo.ITrustRepository" />
 </beans>

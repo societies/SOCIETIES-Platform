@@ -24,13 +24,22 @@
  */
 package org.societies.privacytrust.trust.impl;
 
+import java.net.URISyntaxException;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.TrustUpdateListener;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.privacytrust.trust.api.model.TrustedEntity;
+import org.societies.privacytrust.trust.api.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.model.TrustedEntityType;
+import org.societies.privacytrust.trust.api.repo.ITrustRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
@@ -45,6 +54,9 @@ import org.springframework.stereotype.Service;
 public class TrustBroker implements ITrustBroker {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(TrustBroker.class);
+	
+	@Autowired(required=true)
+	private ITrustRepository trustRepo;
 			
 	TrustBroker() {
 		
@@ -57,11 +69,49 @@ public class TrustBroker implements ITrustBroker {
 	@Async
 	@Override
 	public Future<Double> retrieveTrust(Object entityId) throws TrustException {
-		// TODO Auto-generated method stub
+		
 		if (entityId == null)
 			throw new NullPointerException("entityId can't be null");
 		
-		return new AsyncResult<Double>(null);
+		final Double trustValue;
+		
+		final String entityIdStr = entityId.toString();
+		final TrustedEntityType entityType;
+		if (entityId instanceof IIdentity) {
+			IIdentity id = (IIdentity) entityId;
+			if (IdentityType.CSS.equals(id.getType()))
+				entityType = TrustedEntityType.CSS;
+			else if (IdentityType.CIS.equals(id.getType()))	
+				entityType = TrustedEntityType.CIS;
+			else
+				entityType = TrustedEntityType.LGC;
+		} else if (entityId instanceof ServiceResourceIdentifier) {
+			entityType = TrustedEntityType.SVC;
+		} else {
+			entityType = TrustedEntityType.LGC;
+		}
+		
+		final TrustedEntityId teid;
+		try {
+			teid = new TrustedEntityId(entityType, entityIdStr);
+		} catch (URISyntaxException urise) {	
+			throw new TrustBrokerException("Could not create TrustedEntityId for entity '"
+					+ entityId + "'", urise);
+		}
+		
+		if (this.trustRepo == null)
+			throw new TrustBrokerException("Could not retrieve trust value for entity '"
+					+ teid + "': ITrustRepositoryService is not available");
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving trust value for entity '"
+					+ teid + "' from Trust Repository");
+		final TrustedEntity entity = this.trustRepo.retrieveEntity(teid);
+		if (entity != null)
+			trustValue = entity.getUserPerceivedTrust().getValue();
+		else
+			trustValue = null;
+			
+		return new AsyncResult<Double>(trustValue);
 	}
 
 	/* (non-Javadoc)
