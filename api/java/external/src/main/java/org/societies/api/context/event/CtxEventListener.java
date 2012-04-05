@@ -26,6 +26,9 @@ package org.societies.api.context.event;
 
 import java.util.EventListener;
 
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
 /**
  * A listener for receiving {@link CtxEvent CtxEvents}. Extensions of this
  * interface (e.g. {@link CtxChangeEventListener}) define methods for handling
@@ -34,5 +37,6 @@ import java.util.EventListener;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.4
  */
+@SocietiesExternalInterface(type = SocietiesInterfaceType.REQUIRED)
 public interface CtxEventListener extends EventListener {
 }

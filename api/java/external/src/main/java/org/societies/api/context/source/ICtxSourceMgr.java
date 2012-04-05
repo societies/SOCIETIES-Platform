@@ -28,7 +28,10 @@ import java.io.Serializable;
 import java.util.concurrent.Future;
 
 import org.societies.api.context.model.CtxEntity;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface ICtxSourceMgr {
 
 	/**

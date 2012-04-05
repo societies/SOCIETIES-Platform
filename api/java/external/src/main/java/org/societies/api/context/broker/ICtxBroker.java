@@ -43,6 +43,8 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
  * This interface provides access to current, past and future context data. The
@@ -56,6 +58,7 @@ import org.societies.api.identity.IIdentity;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.2
  */
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface ICtxBroker {
 
 	/**
