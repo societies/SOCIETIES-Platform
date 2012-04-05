@@ -127,6 +127,10 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
 	
 	private ICommManager commManager;
 	private IIdentityManager identityManager;
+	
+	private IPrivacyDataManager privacyDataManager;
+	private IPersonalisationManager personalisationManager;
+	private IPersonalisationCallback personalisationCallback;
     
 	/*
      * Constructor for SuggestedCommunityAnalyser
@@ -249,12 +253,15 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
     
     public ArrayList<String> checkForPrivacyConflicts() {
     	ArrayList<String> conflictingPrivacyPolicies = new ArrayList<String>();
+    	//privacyDataManager.checkPermission(arg0, arg1, arg2, arg3);
     	return conflictingPrivacyPolicies;
     	
     }
     
     public ArrayList<String> checkForPreferenceConflicts() {
     	ArrayList<String> conflictingPreferences = new ArrayList<String>();
+    	
+    	//personalisationManager.getPreference(arg0, arg1, arg2, arg3, "refuse CIS action with given criteria", arg5)
 		return conflictingPreferences;
     	
     }
@@ -335,6 +342,30 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
     
     public void setCommManager(ICommManager commManager) {
     	this.commManager = commManager;
+    }
+    
+    public IPrivacyDataManager getPrivacyDataManager() {
+    	return privacyDataManager;
+    }
+    
+    public void setPrivacyDataManager(IPrivacyDataManager privacyDataManager) {
+    	this.privacyDataManager = privacyDataManager;
+    }
+    
+    public IPersonalisationManager getPersonalisationManager() {
+    	return personalisationManager;
+    }
+    
+    public void setPersonalisationManager(IPersonalisationManager personalisationManager) {
+    	this.personalisationManager = personalisationManager;
+    }
+    
+    public IPersonalisationCallback getPersonalisationCallback() {
+    	return personalisationCallback;
+    }
+    
+    public void setPersonalisationCallback(IPersonalisationCallback personalisationCallback) {
+    	this.personalisationCallback = personalisationCallback;
     }
     
     /**Returns the list of package names of the message beans you'll be passing*/

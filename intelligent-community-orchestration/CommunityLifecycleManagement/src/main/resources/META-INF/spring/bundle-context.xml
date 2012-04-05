@@ -22,6 +22,9 @@
    <property name="userFeedback" ref="IUserFeedback"></property>
    <property name="userFeedbackCallback" ref="IUserFeedbackCallback"></property>
    <property name="communityRecommender" ref="CommunityRecommender"></property>
+   <property name="privacyDataManager" ref="IPrivacyDataManager"></property>
+   <property name="personalisationManager" ref="IPersonalisationManager"></property>
+   <property name="personalisationCallback" ref="IPersonalisationCallback"></property>
    </bean>
    
    <bean id="CommunityRecommender" class="org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityRecommender" 

@@ -36,7 +36,9 @@
 		<!-- <osgi:reference id="CommunityCtxBroker" interface="org.societies.api.internal.context.broker.ICommunityCtxBroker"/> -->
 		<osgi:reference id="IUserFeedback" interface="org.societies.api.internal.useragent.feedback.IUserFeedback"/>
 		<osgi:reference id="IUserFeedbackCallback" interface="org.societies.api.internal.useragent.feedback.IUserFeedbackCallback"/>
-		
+		<osgi:reference id="IPrivacyDataManager" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager"/>
+        <osgi:reference id="IPersonalisationManager" interface="org.societies.api.personalisation.mgmt.IPersonalisationManager"/>
+        <osgi:reference id="IPersonalisationCallback" interface="org.societies.api.personalisation.mgmt.IPersonalisationCallback"/>
 		<!--  <osgi:reference id="upcm" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/> -->
 		
 </beans>
