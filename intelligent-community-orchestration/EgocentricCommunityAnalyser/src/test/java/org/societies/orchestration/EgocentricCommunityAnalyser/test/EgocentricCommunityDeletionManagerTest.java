@@ -25,10 +25,8 @@
 
 package org.societies.orchestration.EgocentricCommunityAnalyser.test;
 
+import static org.mockito.Mockito.mock;
 import org.junit.Test;
-
-import static org.mockito.Mockito.*;
-
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.context.model.CtxEntityIdentifier;
