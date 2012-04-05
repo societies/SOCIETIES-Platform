@@ -25,31 +25,14 @@
 
 package org.societies.orchestration.EgocentricCommunityAnalyser.test;
 
+import static org.mockito.Mockito.mock;
+
 import java.util.HashMap;
 
-import junit.framework.Assert;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.mockito.Mockito.*;
-
-import org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityConfigurationManager;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.context.model.CtxEntityIdentifier;
-
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-
-import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.cis.management.ICisManager;
-import org.societies.api.cis.management.ICisOwned;
-import org.societies.api.cis.management.ICisSubscribed;
-import org.societies.api.cis.management.ICisEditor;
-import org.societies.api.cis.management.ICisActivity;
-import org.societies.api.cis.management.ICisActivityFeed;
-
-import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityConfigurationManager;
 
 /**
  * This is the test class for the Egocentric Community Configuration Manager component

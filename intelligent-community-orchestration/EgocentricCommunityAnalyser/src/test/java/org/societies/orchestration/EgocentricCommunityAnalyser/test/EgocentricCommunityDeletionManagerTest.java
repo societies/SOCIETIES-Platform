@@ -25,33 +25,15 @@
 
 package org.societies.orchestration.EgocentricCommunityAnalyser.test;
 
-import org.junit.Assert;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.mockito.Mockito.*;
 
-import org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityDeletionManager;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.context.model.CtxEntityIdentifier;
-
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-
-import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.cis.management.ICisManager;
-import org.societies.api.cis.management.ICisOwned;
-import org.societies.api.cis.management.ICisSubscribed;
-import org.societies.api.cis.management.ICisEditor;
-import org.societies.api.cis.management.ICisActivity;
-import org.societies.api.cis.management.ICisActivityFeed;
-
-import org.societies.api.css.directory.ICssDirectory;
-import org.societies.api.css.directory.ICssAdvertisementRecord;
-
-import org.societies.api.css.management.ICssRecord;
-
+import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityDeletionManager;
 import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 
 /**

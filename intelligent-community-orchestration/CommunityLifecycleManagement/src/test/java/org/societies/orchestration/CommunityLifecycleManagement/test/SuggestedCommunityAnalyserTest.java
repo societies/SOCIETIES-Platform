@@ -25,29 +25,16 @@
 
 package org.societies.orchestration.CommunityLifecycleManagement.test;
 
+import static org.mockito.Mockito.mock;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import junit.framework.Assert;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.mockito.Mockito.*;
-
-import org.societies.orchestration.CommunityLifecycleManagement.impl.SuggestedCommunityAnalyser;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.context.model.CtxEntityIdentifier;
-
-import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.cis.management.ICisManager;
-import org.societies.api.cis.management.ICisOwned;
-import org.societies.api.cis.management.ICisSubscribed;
-import org.societies.api.cis.management.ICisEditor;
-import org.societies.api.cis.management.ICisActivity;
-import org.societies.api.cis.management.ICisActivityFeed;
-
+import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.orchestration.CommunityLifecycleManagement.impl.SuggestedCommunityAnalyser;
 
 /**
  * This is the test class for the Suggested Community Analyser component
