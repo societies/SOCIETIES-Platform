@@ -36,7 +36,8 @@ public interface INegotiationCallback {
 	
 	/**
 	 * Async return for
-	 * {@link INegotiation#startNegotiation(INegotiationCallback, String)}
+	 * {@link INegotiation#startNegotiation(org.societies.api.identity.IIdentity,
+	 * String, INegotiationCallback)}
 	 * 
 	 * @param agreementKey The key to get Service Level Agreement (SLA) from
 	 * {@link ISecureStorage}. If negotiation has not been successful, this
