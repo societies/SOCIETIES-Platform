@@ -24,7 +24,8 @@
  */
 package org.societies.context.api.community.inheritance;
 
-import org.societies.api.mock.EntityIdentifier;
+//import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
 
@@ -39,7 +40,7 @@ public interface ICommunityCtxInheritanceMgr {
 	 * @param cidIdentifier
 	 * @since 0.0.1
 	 */
-	public void getParentCis(EntityIdentifier cidIdentifier);
+	public void getParentCis(IIdentity cidIdentifier);
 
 	/**
 	 * 
@@ -48,7 +49,7 @@ public interface ICommunityCtxInheritanceMgr {
 	 * @param cisId
 	 * @since 0.0.1
 	 */
-	public void inheritContext(CtxAttributeIdentifier ctxAttributeIdentifier, CtxAttributeValueType type, EntityIdentifier cisId);
+	public void inheritContext(CtxAttributeIdentifier ctxAttributeIdentifier, CtxAttributeValueType type, IIdentity cisId);
 
 	/**
 	 * 
@@ -57,6 +58,6 @@ public interface ICommunityCtxInheritanceMgr {
 	 * @param cisId
 	 * @since 0.0.1
 	 */
-	public void retrieveCtx(CtxAttributeIdentifier ctxAttributeIdentifier, CtxAttributeValueType type, EntityIdentifier cisId);
+	public void retrieveCtx(CtxAttributeIdentifier ctxAttributeIdentifier, CtxAttributeValueType type, IIdentity cisId);
 
 }

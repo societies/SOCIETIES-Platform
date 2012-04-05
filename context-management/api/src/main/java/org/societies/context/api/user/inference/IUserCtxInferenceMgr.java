@@ -28,7 +28,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.societies.api.mock.EntityIdentifier;
+//import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.identity.IIdentity;
+
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
@@ -79,7 +81,7 @@ public interface IUserCtxInferenceMgr {
 	 * @param cisid
 	 * @since 0.0.1
 	 */
-	public void inheritContext(CtxAttributeIdentifier ctxAttrId, CtxAttributeValueType type, EntityIdentifier cisid);
+	public void inheritContext(CtxAttributeIdentifier ctxAttrId, CtxAttributeValueType type, IIdentity cisid);
 
 	/**
 	 * Predicts context using indicated date. 
