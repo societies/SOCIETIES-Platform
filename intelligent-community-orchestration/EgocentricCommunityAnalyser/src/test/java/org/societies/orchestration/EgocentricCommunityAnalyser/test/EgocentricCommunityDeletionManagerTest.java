@@ -38,7 +38,6 @@ import org.societies.api.identity.IIdentity;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 //import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.mock.EntityIdentifier;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
