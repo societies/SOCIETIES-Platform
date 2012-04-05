@@ -27,6 +27,10 @@ package org.societies.api.qosmonitor;
 
 import java.io.Serializable;
 
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
+@SocietiesExternalInterface(type=SocietiesInterfaceType.REQUIRED)
 public interface IQoSReporterCallback {
 
 	/**

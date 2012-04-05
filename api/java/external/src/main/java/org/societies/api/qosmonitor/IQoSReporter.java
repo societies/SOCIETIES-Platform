@@ -25,6 +25,9 @@
 
 package org.societies.api.qosmonitor;
 
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
 /**
  * Interface for invoking the Quality of Service (QoS) Reporter.
  * To be used by 3rd party QoS Monitor.
@@ -32,6 +35,7 @@ package org.societies.api.qosmonitor;
  * @author Mitja Vardjan
  *
  */
+@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface IQoSReporter {
 	
 	/**
