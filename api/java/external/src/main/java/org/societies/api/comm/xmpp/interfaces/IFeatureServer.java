@@ -30,6 +30,8 @@ import java.util.List;
 
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
  * 
@@ -46,6 +48,7 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
  *            the type of the messages it intends to return upon receiving a
  *            Query
  */
+@SocietiesExternalInterface(type=SocietiesInterfaceType.REQUIRED)
 public interface IFeatureServer {
 	/**
 	 * Get the xml namespaces for this FeatureServer. This will be used in the

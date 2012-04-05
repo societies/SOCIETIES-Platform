@@ -41,6 +41,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceManagement.impl.evaluation.PreferenceConditionExtractor;
 import org.societies.personalisation.UserPreferenceManagement.impl.evaluation.PreferenceEvaluator;
@@ -62,6 +63,7 @@ public class UserPreferenceManagement{
 	private Hashtable<IPreferenceOutcome, List<CtxIdentifier>> outcomeConditionListTable; 
 	private ICtxBroker broker;	
 	private IIdentity userId; 
+	private IEventMgr eventMgr;
 	
 	public UserPreferenceManagement(IIdentity userId, ICtxBroker broker){
 		this.userId = userId;
@@ -69,6 +71,7 @@ public class UserPreferenceManagement{
 		this.contextCache = new PrivateContextCache(this.broker);
 		this.preferenceCache = new PrivatePreferenceCache(this.userId,this.broker);
 		outcomeConditionListTable = new Hashtable<IPreferenceOutcome,List<CtxIdentifier>>();
+		
 
 	}
 
@@ -364,5 +367,13 @@ public class UserPreferenceManagement{
 	public IPreferenceTreeModel getModel(IIdentity ownerDPI,
 			PreferenceDetails details){
 		return this.preferenceCache.getPreference(details);
+	}
+
+	public IEventMgr getEventMgr() {
+		return eventMgr;
+	}
+
+	public void setEventMgr(IEventMgr eventMgr) {
+		this.eventMgr = eventMgr;
 	}
 }

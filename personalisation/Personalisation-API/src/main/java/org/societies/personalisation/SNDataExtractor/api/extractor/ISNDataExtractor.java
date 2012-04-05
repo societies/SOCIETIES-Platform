@@ -26,7 +26,7 @@ package org.societies.personalisation.SNDataExtractor.api.extractor;
 
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.mock.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.SNDataExtractor.api.extractor.mock.SNConnector;
 
 

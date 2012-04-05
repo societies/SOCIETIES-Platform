@@ -37,9 +37,12 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
+import org.societies.api.osgi.event.CSSEvent;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.comm.xmpp.event.InternalEvent;
 import org.societies.personalisation.UserPreferenceManagement.impl.UserPreferenceManagement;
 import org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor;
 import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Learning;
@@ -47,10 +50,9 @@ import org.societies.personalisation.preference.api.model.IC45Consumer;
 import org.societies.personalisation.preference.api.model.IC45Output;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
-import org.springframework.context.ApplicationListener;
+import org.societies.api.osgi.event.EventListener;
 
-
-public class MergingManager implements IC45Consumer, ApplicationListener<InternalEvent>{
+public class MergingManager extends EventListener implements IC45Consumer{
 
 
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
@@ -62,16 +64,19 @@ public class MergingManager implements IC45Consumer, ApplicationListener<Interna
 
 
 	private IC45Learning c45Learning;
+	private final IEventMgr eventMgr;
 	
-	public MergingManager(IC45Learning c45Learning, UserPreferenceManagement prefImpl, UserPreferenceConditionMonitor pcm){
+	public MergingManager(IC45Learning c45Learning, UserPreferenceManagement prefImpl, UserPreferenceConditionMonitor pcm, IEventMgr eventMgr){
 		this.c45Learning = c45Learning;
 		this.prefImpl = prefImpl;
 		this.pcm = pcm;
+		this.eventMgr = eventMgr;
 	}
 
 	public void initialise(){
 		
 		this.counters = new Hashtable<IIdentity,Hashtable<IAction, Integer>>();
+		this.eventMgr.subscribeInternalEvent(this, new String[]{EventTypes.UIM_EVENT}, "");
 		//this.eventMgr.registerListener(this, new String[]{PSSEventTypes.UIM_USERACTION_EVENT}, null);
 		//this.eventMgr.registerListener(this, new String[]{PSSEventTypes.PROACTIVITY_FEEDBACK}, null);
 		logging.debug("**********************"+this.getClass()+"Initialised **********************");    	
@@ -222,6 +227,21 @@ public class MergingManager implements IC45Consumer, ApplicationListener<Interna
 		}
 	}
 
+	@Override
+	public void handleExternalEvent(CSSEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleInternalEvent(InternalEvent event) {
+		if (event.geteventType().equalsIgnoreCase(EventTypes.UIM_EVENT)){
+			UIMEvent uimEvent = (UIMEvent) event.geteventInfo();
+			this.processActionReceived(uimEvent.getAction(), uimEvent.getUserId());
+		}
+		
+	}
+
 	/*
 	 * REPLACE with direct call to PCM
 	 */
@@ -236,7 +256,7 @@ public class MergingManager implements IC45Consumer, ApplicationListener<Interna
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.context.ApplicationListener#onApplicationEvent(org.springframework.context.ApplicationEvent)
-	 */
+	 
 	@Override
 	public void onApplicationEvent(InternalEvent event) {
 		if (event.getEventNode().equals("UIM_EVENT")){
@@ -245,6 +265,8 @@ public class MergingManager implements IC45Consumer, ApplicationListener<Interna
 		}
 		
 	}
+	
+	*/
 
 
 }

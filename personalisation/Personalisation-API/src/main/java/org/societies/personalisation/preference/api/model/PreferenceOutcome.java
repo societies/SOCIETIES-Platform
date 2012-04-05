@@ -29,6 +29,7 @@ import java.util.ArrayList;
 
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.personalisation.model.Action;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
 
@@ -47,8 +48,8 @@ public class PreferenceOutcome extends Action implements IPreferenceOutcome, Ser
 		super();
 	}
 
-	public PreferenceOutcome(String par, String val){
-		super(par,val);
+	public PreferenceOutcome(ServiceResourceIdentifier serviceID, String serviceType, String parameterName, String value){
+		super(serviceID, serviceType, parameterName, value);
 		this.confidenceLevel = 51;
 	}
 

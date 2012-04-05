@@ -31,14 +31,65 @@
  */
 package org.societies.useragent.decisionmaking;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
 import org.societies.api.internal.personalisation.model.IOutcome;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.useragent.conflict.*;
+import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.personalisation.model.IAction;
+import org.societies.api.personalisation.model.IActionConsumer;
+import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.useragent.conflict.ConfidenceTradeoffRule;
 import org.societies.useragent.conflict.ConflictResolutionManager;
 import org.societies.useragent.conflict.IntentPriorRule;
 
 public class DecisionMaker extends AbstractDecisionMaker {
+
+	private EntityIdentifier entityID;
+	
+	private List<IActionConsumer> temporal=null;
+	
+	private IServiceDiscovery SerDiscovery;
+	
+	public IServiceDiscovery getSerDiscovery() {
+		return SerDiscovery;
+	}
+	public void setSerDiscovery(IServiceDiscovery serDiscovery) {
+		SerDiscovery = serDiscovery;
+	}
+	private void refreshServiceLookup(){
+		List<IActionConsumer> lst=new ArrayList<IActionConsumer>();
+		try {
+			List<Service> ls=this.SerDiscovery.getLocalServices().get();
+			for(Service ser:ls){
+				if(ser instanceof IActionConsumer){
+					lst.add((IActionConsumer)ser);
+				}
+			}
+		} catch (ServiceDiscoveryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		this.temporal=lst;
+	}
+	
+	public EntityIdentifier getEntityID() {
+		return entityID;
+	}
+	public void setEntityID(EntityIdentifier entityID) {
+		this.entityID = entityID;
+	}
 
 	public DecisionMaker(){
 		ConflictResolutionManager man=new ConflictResolutionManager();
@@ -65,17 +116,27 @@ public class DecisionMaker extends AbstractDecisionMaker {
 			return ConflictType.UNKNOWN_CONFLICT;
 		}
 	}
+	@Override
+	public void makeDecision(List<IOutcome> intents, List<IOutcome> preferences) {
+		this.refreshServiceLookup();
+		super.makeDecision(intents, preferences);
+	}
 
 	@Override
 	protected void implementIAction(IAction action) {
 		// TODO Auto-generated method stub
 		//@temporal solution depends on the 3rd party-services
-		System.out.println("****************************************");
-		System.out.println("implement the Action:\t"+action);
-		System.out.println("of Type:\t"+action.getServiceType());
-		System.out.println("with Parameter:\t"+action.getparameterName());
-		System.out.println("with Parameter:\t"+action.getvalue());
-		System.out.println("****************************************");
+		//System.out.println("****************************************");
+		//System.out.println("implement the Action:\t"+action);
+		//System.out.println("of Type:\t"+action.getServiceType());
+		//System.out.println("with Parameter:\t"+action.getparameterName());
+		//System.out.println("with Parameter:\t"+action.getvalue());
+		//System.out.println("****************************************");
+		for(IActionConsumer consumer:this.temporal){
+			if(consumer.getServiceIdentifier().equals(action.getServiceID())){
+				consumer.setIAction(this.entityID, action);
+			}
+		}
 		
 	}
 

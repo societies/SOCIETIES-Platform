@@ -25,33 +25,16 @@
 
 package org.societies.orchestration.CommunityLifecycleManagement.test;
 
+import static org.mockito.Mockito.mock;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import junit.framework.Assert;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.mockito.Mockito.*;
-
-import org.societies.orchestration.CommunityLifecycleManagement.impl.SuggestedCommunityAnalyser;
-//import org.societies.orchestration.EgocentricCommunityAnalyser.test.ownerId;
-import org.societies.api.identity.IIdentity;
-//import org.societies.api.comm.xmpp.datatypes.Identity;
-import org.societies.api.context.model.CtxEntityIdentifier;
-//import org.societies.api.internal.servicelifecycle.model.Service;
-//import org.societies.api.internal.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.mock.EntityIdentifier;
-
-import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.cis.management.ICisManager;
-import org.societies.api.cis.management.ICisOwned;
-import org.societies.api.cis.management.ICisSubscribed;
-import org.societies.api.cis.management.ICisEditor;
-import org.societies.api.cis.management.ICisActivity;
-import org.societies.api.cis.management.ICisActivityFeed;
+import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.orchestration.CommunityLifecycleManagement.impl.SuggestedCommunityAnalyser;
 
 
 /**

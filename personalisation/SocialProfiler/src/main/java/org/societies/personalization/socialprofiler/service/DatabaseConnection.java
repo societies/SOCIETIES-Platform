@@ -22,8 +22,6 @@ import org.apache.log4j.Logger;
 import org.jfree.data.xy.XYSeries;
 import org.societies.personalization.socialprofiler.Variables;
 
-import apple.awt.ClientPropertyApplicator.Property;
-
 
 
 public class DatabaseConnection implements Variables {

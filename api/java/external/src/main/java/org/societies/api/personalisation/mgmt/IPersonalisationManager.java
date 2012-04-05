@@ -27,18 +27,24 @@ package org.societies.api.personalisation.mgmt;
 
 
 import org.societies.api.identity.IIdentity;
-import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 
 
 
 
 /**
+ * This is the interface of the Personalisation Manager. Services can use this interface
+ * to request a preference or intent action from the Personalisation system. Method calls are 
+ * asynchronous so the service calling this interface should implement the 
+ * IPersonalisationCallback interface to receive the result. 
  * @author Eliza
  * @version 1.0
  * @created 11-Nov-2011 14:42:55
  */
+@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface IPersonalisationManager {
 
 	/**

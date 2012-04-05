@@ -26,19 +26,24 @@ package org.societies.api.personalisation.model;
 
 import java.util.List;
 
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 
 /**
+ * This interface must be implemented by 3rd party services that wish to be personalised
+ * proactively by the SOCIETIES platform.
  * @author Elizabeth
  * @version 1.0
  * @created 08-Nov-2011 13:25:58
  */
+@SocietiesExternalInterface(type=SocietiesInterfaceType.REQUIRED)
 public interface IActionConsumer {
 
 	/**
-	 * 	// replace with ServiceResourceIdentifier 
+	 * 	
 	 * This method is used by the User Agent Subsystem to locate the right instance
 	 * of a IActionConsumer by filtering them based on their service identifier
 	 * @return 		The service has to return its own service identifier
@@ -65,9 +70,9 @@ public interface IActionConsumer {
 	 * @return		The service should return true if the action was implemented
 	 * successfully or false if not.
 	 * 
-	 * @param dpi    The Digital Identity of the user currently using the service 	// replace with EntityIdentifier
+	 * @param userId    The Identity of the user currently using the service 	
 	 * @param obj    The IAction object to be implemented
 	 */
-	public boolean setIAction(EntityIdentifier dpi, IAction obj);
+	public boolean setIAction(IIdentity userId, IAction obj);
 
 }

@@ -185,7 +185,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		 * populates the context database with this information as soon as it receives an action from a service. 
 		 */
 		List<IPreferenceOutcome> outcomes = new ArrayList<IPreferenceOutcome>();
-		IPreferenceOutcome outcome = new PreferenceOutcome(action.getparameterName(), action.getvalue());
+		IPreferenceOutcome outcome = new PreferenceOutcome(action.getServiceID(), action.getServiceType(), action.getparameterName(), action.getvalue());
 		outcome.setServiceID(action.getServiceID());
 		outcome.setServiceType(action.getServiceType());
 		outcomes.add(outcome);

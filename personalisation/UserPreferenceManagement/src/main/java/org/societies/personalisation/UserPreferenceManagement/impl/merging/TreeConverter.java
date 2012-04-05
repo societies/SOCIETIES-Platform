@@ -94,7 +94,7 @@ public class TreeConverter {
 			
 			IAction a = (IAction) node.getUserObject();
 			//log("Instance of IAction: "+a.toString()+" and isleaf: "+node.isLeaf());
-			PreferenceOutcome outcome = new PreferenceOutcome(a.getparameterName(), a.getvalue());
+			PreferenceOutcome outcome = new PreferenceOutcome(a.getServiceID(), a.getServiceType(), a.getparameterName(), a.getvalue());
 			outcome.setConfidenceLevel(51);
 			outcome.setServiceID(a.getServiceID());
 			outcome.setServiceType(a.getServiceType());
