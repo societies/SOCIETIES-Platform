@@ -69,18 +69,4 @@ public enum CtxAttributeValueType {
 	 * Denotes that the {@link CtxAttribute} value is of type <code>byte[]</code>
 	 */
 	BINARY,
-	
-	/**
-	 * Denotes that the {@link CtxAttribute} belongs to a {@link IndividualCtxEntity}
-	 * @deprecated Should denote the CtxAttribute value type, e.g. {@link #STRING}
-	 */
-	@Deprecated
-	INDIVIDUAL,
-	
-	/**
-	 * Denotes that the {@link CtxAttribute} belongs to a {@link CommunityCtxEntity}
-	 * @deprecated Should denote the CtxAttribute value type, e.g. {@link #STRING}
-	 */
-	@Deprecated
-	COMMUNITY,
 }
