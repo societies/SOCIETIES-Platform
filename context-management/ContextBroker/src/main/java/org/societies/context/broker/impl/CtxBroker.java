@@ -182,35 +182,6 @@ public class CtxBroker implements ICtxBroker {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	@Override
-	public void registerForUpdates(IIdentity requester,
-			CtxAttributeIdentifier attrId) throws CtxException {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public void unregisterForUpdates(IIdentity requester,
-			CtxAttributeIdentifier attrId) throws CtxException {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public void registerForUpdates(IIdentity requester,
-			CtxEntityIdentifier scope, String attrType) throws CtxException {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public void unregisterForUpdates(IIdentity requester,
-			CtxEntityIdentifier scope, String attributeType)
-			throws CtxException {
-		// TODO Auto-generated method stub
-		
-	}
 	
 	/* (non-Javadoc)
 	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.identity.IIdentity, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)

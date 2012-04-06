@@ -129,56 +129,6 @@ public interface ICtxBroker {
 	 * @throws CtxException 
 	 */
 	public Future<List<CtxEntityIdentifier>> lookupEntities(IIdentity requester, String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue) throws CtxException;
-
-	/**
-	 * Registers the specified EventListener for value modification events of the
-	 * specified context attribute.
-	 * 
-	 * @param requester
-	 * @param attrId
-	 * @throws CtxException
-	 * @deprecated As of 0.0.3, use {@link #registerForChanges(IIdentity, CtxChangeEventListener, CtxIdentifier)}
-	 */
-	@Deprecated
-	public void registerForUpdates(IIdentity requester, CtxAttributeIdentifier attrId) throws CtxException;
-
-	/**
-	 * Registers the specified EventListener for value modification events of the
-	 * specified context attribute.
-	 * 
-	 * @param requester
-	 * @param attrId
-	 * @throws CtxException
-	 * @deprecated As of 0.0.3, use {@link #unregisterFromChanges(IIdentity, CtxChangeEventListener, CtxIdentifier)} 
-	 */
-	@Deprecated
-	public void unregisterForUpdates(IIdentity requester, CtxAttributeIdentifier attrId) throws CtxException;
-	
-	/**
-	 * Registers the specified EventListener for value modification events of context
-	 * attribute(s) with the supplied scope and type.
-	 * 
-	 * @param requester
-	 * @param scope
-	 * @param attrType
-	 * @throws CtxException
-	 * @deprecated As of 0.0.3, use {@link #registerForChanges(IIdentity, CtxChangeEventListener, CtxEntityIdentifier, String)}  
-	 */
-	@Deprecated
-	public void registerForUpdates(IIdentity requester, CtxEntityIdentifier scope, String attrType) throws CtxException;
-	
-	/**
-	 * Unregisters the specified EventListener for value modification events of
-	 * context attribute(s) with the supplied scope and type.
-	 * 
-	 * @param requester
-	 * @param scope
-	 * @param attributeType
-	 * @throws CtxException 
-	 * @deprecated As of 0.0.3, use {@link #unregisterFromChanges(IIdentity, CtxChangeEventListener, CtxEntityIdentifier, String)}
-	 */
-	@Deprecated
-	public void unregisterForUpdates(IIdentity requester, CtxEntityIdentifier scope, String attributeType) throws CtxException;
 	
 	/**
 	 * Registers the specified {@link CtxChangeEventListener} for changes
