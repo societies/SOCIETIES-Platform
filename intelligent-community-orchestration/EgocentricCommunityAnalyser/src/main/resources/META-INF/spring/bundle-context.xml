@@ -17,10 +17,11 @@
    <property name="egocentricConfigurationManager" ref="EgocentricCommunityConfigurationManager"></property>
    <property name="egocentricDeletionManager" ref="EgocentricCommunityDeletionManager"></property>
    <property name="commManager" ref="ICommManager"></property>
+   <property name="deviceManager" ref="IDeviceManager"></property>
    </bean>
    
    <bean id="EgocentricCommunityCreationManager" class="org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityCreationManager" 
-   depends-on="ICssDirectory, ICssDiscovery, ICssActivityFeed, ServiceSharingRecord, ICisActivityFeed, ICisRecord, ICisManager, ICtxBroker, IIdentity, ICommManager, IUserFeedback, IUserFeedbackCallback" init-method="initialiseEgocentricCommunityCreationManager">
+   depends-on="ICssDirectory, ICssDiscovery, ICssActivityFeed, ServiceSharingRecord, ICisActivityFeed, ICisRecord, ICisManager, ICtxBroker, IIdentity, ICommManager, ICommCallback, ISuggestedCommunityAnalyser, SuggestedCommunityAnalyserBean, SuggestedCommunityAnalyserResultBean, SuggestedCommunityAnalyserMethodType, IIdentityManager, IUserFeedback, IUserFeedbackCallback, IDeviceManager" init-method="initialiseEgocentricCommunityCreationManager">
    <property name="linkedCss" ref="IIdentity"></property>
    <property name="cisManager" ref="ICisManager"></property>
    <!-- <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>-->
@@ -28,14 +29,23 @@
    <!-- <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>-->
    <!-- <property name="communityContextBroker" ref="CommunityCtxBroker"></property>-->
    <property name="commManager" ref="ICommManager"></property>
+   <property name="commCallback" ref="ICommCallback"></property>
    <property name="userFeedback" ref="IUserFeedback"></property>
    <property name="userFeedbackCallback" ref="IUserFeedbackCallback"></property>
    <property name="cssManager" ref="ICSSLocalManager"></property>
    <property name="activityFeed" ref="ICssActivityFeed"></property>
+   <property name="serviceDiscovery" ref="IServiceDiscovery"></property>
+   <property name="serviceDiscoveryCallback" ref="IServiceDiscoveryCallback"></property>
+   <property name="suggestedCommunityAnalyser" ref="ISuggestedCommunityAnalyser"></property>
+   <property name="suggestedCommunityAnalyserBean" ref="SuggestedCommunityAnalyserBean"></property>
+   <property name="suggestedCommunityAnalyserResultBean" ref="SuggestedCommunityAnalyserResultBean"></property>
+   <property name="suggestedCommunityAnalyserMethodType" ref="SuggestedCommunityAnalyserMethodType"></property>
+   <property name="linkedCssManager" ref="IIdentityManager"></property>
+   <property name="deviceManager" ref="IDeviceManager"></property>
    </bean>
    
    <bean id="EgocentricCommunityConfigurationManager" class="org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityConfigurationManager" 
-   depends-on="ICssDirectory, ICssDiscovery, ICssActivityFeed, ServiceSharingRecord, ICisActivityFeed, ICisRecord, ICisManager, ICtxBroker, IIdentity, ICommManager, IUserFeedback, IUserFeedbackCallback" init-method="initialiseEgocentricCommunityConfigurationManager">
+   depends-on="ICssDirectory, ICssDiscovery, ICssActivityFeed, ServiceSharingRecord, ICisActivityFeed, ICisRecord, ICisManager, ICtxBroker, IIdentity, ICommManager, ICommCallback, ISuggestedCommunityAnalyser, SuggestedCommunityAnalyserBean, SuggestedCommunityAnalyserResultBean, SuggestedCommunityAnalyserMethodType, IIdentityManager, IUserFeedback, IUserFeedbackCallback, IDeviceManager" init-method="initialiseEgocentricCommunityConfigurationManager">
    <property name="linkedCss" ref="IIdentity"></property>
    <property name="cisManager" ref="ICisManager"></property>
    <!-- <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>-->
@@ -43,14 +53,23 @@
    <!-- <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>-->
    <!-- <property name="communityContextBroker" ref="CommunityCtxBroker"></property>-->
    <property name="commManager" ref="ICommManager"></property>
+   <property name="commCallback" ref="ICommCallback"></property>
    <property name="userFeedback" ref="IUserFeedback"></property>
    <property name="userFeedbackCallback" ref="IUserFeedbackCallback"></property>
    <property name="cssManager" ref="ICSSLocalManager"></property>
    <property name="activityFeed" ref="ICssActivityFeed"></property>
+   <property name="serviceDiscovery" ref="IServiceDiscovery"></property>
+   <property name="serviceDiscoveryCallback" ref="IServiceDiscoveryCallback"></property>
+   <property name="suggestedCommunityAnalyser" ref="ISuggestedCommunityAnalyser"></property>
+   <property name="suggestedCommunityAnalyserBean" ref="SuggestedCommunityAnalyserBean"></property>
+   <property name="suggestedCommunityAnalyserResultBean" ref="SuggestedCommunityAnalyserResultBean"></property>
+   <property name="suggestedCommunityAnalyserMethodType" ref="SuggestedCommunityAnalyserMethodType"></property>
+   <property name="linkedCssManager" ref="IIdentityManager"></property>
+   <property name="deviceManager" ref="IDeviceManager"></property>
    </bean>
    
    <bean id="EgocentricCommunityDeletionManager" class="org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityDeletionManager" 
-   depends-on="ICssDirectory, ICssDiscovery, ICssActivityFeed, ServiceSharingRecord, ICisActivityFeed, ICisRecord, ICisManager, ICtxBroker, IIdentity, ICommManager, IUserFeedback, IUserFeedbackCallback" init-method="initialiseEgocentricCommunityDeletionManager">
+   depends-on="ICssDirectory, ICssDiscovery, ICssActivityFeed, ServiceSharingRecord, ICisActivityFeed, ICisRecord, ICisManager, ICtxBroker, IIdentity, ICommManager, ICommCallback, ISuggestedCommunityAnalyser, SuggestedCommunityAnalyserBean, SuggestedCommunityAnalyserResultBean, SuggestedCommunityAnalyserMethodType, IIdentityManager, IUserFeedback, IUserFeedbackCallback, IDeviceManager" init-method="initialiseEgocentricCommunityDeletionManager">
    <property name="linkedCss" ref="IIdentity"></property>
    <property name="cisManager" ref="ICisManager"></property>
    <!-- <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>-->
@@ -58,10 +77,19 @@
    <!-- <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>-->
    <!-- <property name="communityContextBroker" ref="CommunityCtxBroker"></property>-->
    <property name="commManager" ref="ICommManager"></property>
+   <property name="commCallback" ref="ICommCallback"></property>
    <property name="userFeedback" ref="IUserFeedback"></property>
    <property name="userFeedbackCallback" ref="IUserFeedbackCallback"></property>
    <property name="cssManager" ref="ICSSLocalManager"></property>
    <property name="activityFeed" ref="ICssActivityFeed"></property>
+   <property name="serviceDiscovery" ref="IServiceDiscovery"></property>
+   <property name="serviceDiscoveryCallback" ref="IServiceDiscoveryCallback"></property>
+   <property name="suggestedCommunityAnalyser" ref="ISuggestedCommunityAnalyser"></property>
+   <property name="suggestedCommunityAnalyserBean" ref="SuggestedCommunityAnalyserBean"></property>
+   <property name="suggestedCommunityAnalyserResultBean" ref="SuggestedCommunityAnalyserResultBean"></property>
+   <property name="suggestedCommunityAnalyserMethodType" ref="SuggestedCommunityAnalyserMethodType"></property>
+   <property name="linkedCssManager" ref="IIdentityManager"></property>
+   <property name="deviceManager" ref="IDeviceManager"></property>
    </bean>
 <!--   <context:component-scan base-package="org.societies.orchestration.CommunityLifecycleManagement.impl"></context:component-scan> -->
 </beans>

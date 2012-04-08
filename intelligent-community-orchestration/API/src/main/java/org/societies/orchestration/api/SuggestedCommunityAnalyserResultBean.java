@@ -21,13 +21,18 @@ package org.societies.orchestration.api;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
-import org.societies.api.internal.cis.management.ICisRecord;
+import org.societies.api.cis.management.ICisRecord;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SuggestedCommunityAnalyserResultBean {
 
 	private ArrayList<String> cisMetadata;
+	
+    public SuggestedCommunityAnalyserResultBean() {
+		
+	}
 	
 	public ArrayList<String> getCisMetadata(){
 		return this.cisMetadata;
@@ -36,5 +41,7 @@ public class SuggestedCommunityAnalyserResultBean {
 	public void setCisMetadata(ArrayList<String> ciss){
 		this.cisMetadata = cisMetadata;
 	}
+	
+    
 	
 }
