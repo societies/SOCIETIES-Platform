@@ -28,7 +28,11 @@ package org.societies.orchestration.EgocentricCommunityAnalyser.impl;
 import static org.mockito.Mockito.*;
 
 import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
+import org.societies.orchestration.api.SuggestedCommunityAnalyserBean;
+import org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType;
+import org.societies.orchestration.api.SuggestedCommunityAnalyserResultBean;
 
+import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 import org.societies.api.internal.css.directory.ICssDirectory;
 
 import org.societies.api.internal.css.discovery.ICssDiscovery;
@@ -70,11 +74,13 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 //import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 //import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
 
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
@@ -89,6 +95,8 @@ import java.util.List;
 
 
 //import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 
@@ -142,8 +150,18 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 	private IUserFeedbackCallback userFeedbackCallback;
 	
 	private ISuggestedCommunityAnalyser suggestedCommunityAnalyser;
+	private SuggestedCommunityAnalyserBean suggestedCommunityAnalyserBean;
+	private SuggestedCommunityAnalyserResultBean suggestedCommunityAnalyserResultBean;
+	private SuggestedCommunityAnalyserMethodType suggestedCommunityAnalyserMethodType;
 	
 	private ICommManager commManager;
+	private ICommCallback commCallback;
+	private IIdentityManager identityManager;
+	
+	private IServiceDiscovery serviceDiscovery;
+	private IServiceDiscoveryCallback serviceDiscoveryCallback;
+	
+	private IDeviceManager deviceManager;
 	
 	/*
      * Constructor for EgocentricCommunityDeletionManager
@@ -194,7 +212,15 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 		
 		it[0] = linkedCss.getIdentifier();
 		//ICisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new ICisRecord(null, null, null, null, null, it, null, null, null));
-		ICisRecord[] listOfUserJoinedCiss = new ICisRecord[0];
+		//ICisRecord[] listOfUserJoinedCiss = new ICisRecord[0];
+		
+		ICisRecord record = cisManager.getCis(linkedCss.toString(), "default CIS");
+		//edit out all CIS attributes
+		
+		ICisRecord[] listOfUserJoinedCiss = cisManager.getCisList(record);
+		//ICisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new ICisRecord(null, null, null, null, null, it, null, null, null));
+		//ICisRecord[] listOfUserJoinedCiss = new ICisRecord[0];
+		
 		ArrayList<ICisRecord> userJoinedCiss = new ArrayList<ICisRecord>();
 		
 		ICisRecord[] records;
@@ -213,14 +239,20 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 		//}
 		
 		ArrayList<ICisRecord> cissToDelete = new ArrayList<ICisRecord>();
-		
+		Date theDate = new Date();
 		for (int i = 0; i < userJoinedCiss.size(); i++) {
 			boolean deleteThisCis = false;
 			ICisRecord thisCis = userJoinedCiss.get(i);
 			String deadFeed = null;
-			//deadFeed = (thisCis.feed.getActivities(it[0], "between now and 2 hours ago"));
-		    if (deadFeed == null) {
-		//    if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - (longestTimeWithoutActivity/1440)) {
+			//deadFeed = (thisCis.feed.getActivities(it[0],  (new Timestamp(theDate.getDate() - (1000 * 60 * 60 * 2))), new Timestamp(theDate.getDate())); //between now and 2 hours ago
+		    if (deadFeed != null) {
+
+		    }
+		    //else if (deadFeed.size() > 0) {
+
+		    //}
+		    else {
+				//    if (theCisRecord.getActivityFeed().getHistory().latestDate() <= theDate.timestamp() - (longestTimeWithoutActivity/1440)) {
 		        deadFeed = null;
 		        String cisMetadata = "";
 		        for (int m = 0; m < userJoinedCiss.size(); m++) {
@@ -236,7 +268,7 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 			    //could also check changed location on location-defined CIS and other things
 		    }
 		    
-		  //deadFeed = (thisCis.feed.getActivities(it[0], "between now and 2 weeks ago"));
+		  //deadFeed = (thisCis.feed.getActivities(it[0],  (new Timestamp(theDate.getDate() - (1000 * 60 * 60 * 24 * 7 * 2))), new Timestamp(theDate.getDate())); //"between now and 2 weeks ago"
 		    if (deadFeed == null) {
 		//    if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - (longestTimeWithoutActivity/1440)) {
 		        deadFeed = null;
@@ -255,7 +287,8 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 		        }
 		    }
 		    
-		  //deadFeed = (thisCis.feed.getActivities(it[0], "between now and 6 months ago"));
+		  
+		  //deadFeed = (thisCis.feed.getActivities(it[0],  (new Timestamp(theDate.getDate() - (1000 * 60 * 60 * 24 * 7 * 4 * 6))), new Timestamp(theDate.getDate())); //"between now and 6 months ago"
 		    if (deadFeed == null) {
 		//    if (theCisRecord.getActivityFeed().getHistory().latestDate() <= Date.timestamp() - (longestTimeWithoutActivity/1440)) {
 		        deadFeed = null;
@@ -410,6 +443,38 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
     
     public void setCommManager(ICommManager commManager) {
     	this.commManager = commManager;
+    }
+    
+    public ICommCallback getCommCallback() {
+    	return commCallback;
+    }
+    
+    public void setCommCallback(ICommCallback commCallback) {
+    	this.commCallback = commCallback;
+    }
+    
+    public IServiceDiscovery getServiceDiscovery() {
+    	return serviceDiscovery;
+    }
+    
+    public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
+    	this.serviceDiscovery = serviceDiscovery;
+    }
+    
+    public IServiceDiscoveryCallback getServiceDiscoveryCallback() {
+    	return serviceDiscoveryCallback;
+    }
+    
+    public void setServiceDiscoveryCallback(IServiceDiscoveryCallback serviceDiscoveryCallback) {
+    	this.serviceDiscoveryCallback = serviceDiscoveryCallback;
+    }
+    
+    public IDeviceManager getDeviceManager() {
+    	return deviceManager;
+    }
+    
+    public void setDeviceManager(IDeviceManager deviceManager) {
+    	this.deviceManager = deviceManager;
     }
     
     /**Returns the list of package names of the message beans you'll be passing*/

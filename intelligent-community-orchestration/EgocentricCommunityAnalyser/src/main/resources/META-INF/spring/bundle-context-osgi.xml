@@ -19,6 +19,7 @@
         </osgi:service>
        
         <osgi:reference id="ICommManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" />
+		<osgi:reference id="ICommCallback" interface="org.societies.api.comm.xmpp.interfaces.ICommCallback" />
 		
 	    <osgi:reference id="ICssDirectory" interface="org.societies.api.internal.css.directory.ICssDirectory"/>
 		<osgi:reference id="ICssDiscovery" interface="org.societies.api.internal.css.discovery.ICssDiscovery"/>
@@ -40,6 +41,14 @@
 		<!-- <osgi:reference id="CommunityCtxBroker" interface="org.societies.api.internal.context.broker.ICommunityCtxBroker"/> -->
 		<osgi:reference id="IUserFeedback" interface="org.societies.api.internal.useragent.feedback.IUserFeedback"/>
 		<osgi:reference id="IUserFeedbackCallback" interface="org.societies.api.internal.useragent.feedback.IUserFeedbackCallback"/>
+		<osgi:reference id="IServiceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"/>
+		<osgi:reference id="IServiceDiscoveryCallback" interface="org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback"/>
+		<osgi:reference id="ISuggestedCommunityAnalyser" interface="org.societies.orchestration.api.ISuggestedCommunityAnalyser"/>
+		<osgi:reference id="ISuggestedCommunityAnalyserBean" interface="org.societies.orchestration.api.SuggestedCommunityAnalyserBean"/>
+		<osgi:reference id="ISuggestedCommunityAnalyserResultBean" interface="org.societies.orchestration.api.SuggestedCommunityAnalyserBeanResult"/>
+		<osgi:reference id="ISuggestedCommunityAnalyserMethodType" interface="org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType"/>
+		<osgi:reference id="IIdentityManager" interface="org.societies.api.internal.useragent.feedback.IUserFeedbackCallback"/>
+		<osgi:reference id="IDeviceManager" interface="org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager"/>
 		
 		<!--  <osgi:reference id="upcm" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/> -->
 		

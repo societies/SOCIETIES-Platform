@@ -27,6 +27,7 @@ package org.societies.orchestration.CommunityLifecycleManagement.impl;
 
 import static org.mockito.Mockito.*;
 
+import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 import org.societies.api.internal.css.directory.ICssDirectory;
 
 import org.societies.api.internal.css.discovery.ICssDiscovery;
@@ -59,6 +60,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 //import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 //import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
 
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
@@ -80,6 +82,8 @@ import java.util.List;
 
 
 //import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 
@@ -120,6 +124,12 @@ public class CommunityRecommender //implements ICommCallback
 	private ArrayList<ICisRecord> cissToDelete;
 	
 	private ICommManager commManager;
+	private ICommCallback commCallback;
+	
+	private IServiceDiscovery serviceDiscovery;
+	private IServiceDiscoveryCallback serviceDiscoveryCallback;
+	
+	private IDeviceManager deviceManager;
 	
 	/*
      * Constructor for Community Recommender
@@ -165,11 +175,38 @@ public class CommunityRecommender //implements ICommCallback
 	}
 	
 	public void identifyCisActionForCSCW(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisPossibilities) {
+		ArrayList<String> cisAddMetadata = new ArrayList<String>();
+		ArrayList<String> cisDeleteMetadata = new ArrayList<String>();
+		ArrayList<String> cisConfigureMetadata = new ArrayList<String>();
+		if (cisPossibilities.get("Create CISs") != null)
+		    identifyCissToCreate(cisPossibilities.get("Create CISs").get(0), null);
+		if (cisPossibilities.get("Delete CISs") != null)
+		    identifyCissToDelete(cisPossibilities.get("Delete CISs").get(0), null);
+		HashMap<String, ArrayList<ArrayList<ICisRecord>>> temp = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
+		temp.put("Configure CISs", cisPossibilities.get("Configure CISs"));
+		temp.put("Merge CISs", cisPossibilities.get("Merge CISs"));
+		temp.put("Split CISs", cisPossibilities.get("Split CISs"));
+		
+		if (temp.size() > 0)
+		    cisConfigureMetadata = identifyCissToConfigure(temp, null);
 		
 	}
 	
     public void identifyCisActionForCSMAnalyser(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisPossibilities) {
+    	ArrayList<String> cisAddMetadata = new ArrayList<String>();
+		ArrayList<String> cisDeleteMetadata = new ArrayList<String>();
+		ArrayList<String> cisConfigureMetadata = new ArrayList<String>();
+		if (cisPossibilities.get("Create CISs") != null)
+		    identifyCissToCreate(cisPossibilities.get("Create CISs").get(0), null);
+		if (cisPossibilities.get("Delete CISs") != null)
+		    identifyCissToDelete(cisPossibilities.get("Delete CISs").get(0), null);
+		HashMap<String, ArrayList<ArrayList<ICisRecord>>> temp = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
+		temp.put("Configure CISs", cisPossibilities.get("Configure CISs"));
+		temp.put("Merge CISs", cisPossibilities.get("Merge CISs"));
+		temp.put("Split CISs", cisPossibilities.get("Split CISs"));
 		
+		if (temp.size() > 0)
+		    cisConfigureMetadata = identifyCissToConfigure(temp, null);
 	}
 	
 	/*
@@ -507,6 +544,38 @@ public class CommunityRecommender //implements ICommCallback
     
     public void setCommManager(ICommManager commManager) {
     	this.commManager = commManager;
+    }
+    
+    public ICommCallback getCommCallback() {
+    	return commCallback;
+    }
+    
+    public void setCommCallback(ICommCallback commCallback) {
+    	this.commCallback = commCallback;
+    }
+    
+    public IServiceDiscovery getServiceDiscovery() {
+    	return serviceDiscovery;
+    }
+    
+    public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
+    	this.serviceDiscovery = serviceDiscovery;
+    }
+    
+    public IServiceDiscoveryCallback getServiceDiscoveryCallback() {
+    	return serviceDiscoveryCallback;
+    }
+    
+    public void setServiceDiscoveryCallback(IServiceDiscoveryCallback serviceDiscoveryCallback) {
+    	this.serviceDiscoveryCallback = serviceDiscoveryCallback;
+    }
+    
+    public IDeviceManager getDeviceManager() {
+    	return deviceManager;
+    }
+    
+    public void setDeviceManager(IDeviceManager deviceManager) {
+    	this.deviceManager = deviceManager;
     }
     
     /**Returns the list of package names of the message beans you'll be passing*/

@@ -34,6 +34,7 @@ import java.util.Iterator;
 
 import static org.mockito.Mockito.*;
 
+import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 import org.societies.api.internal.css.directory.ICssDirectory;
 
 import org.societies.api.internal.css.discovery.ICssDiscovery;
@@ -65,6 +66,8 @@ import org.societies.api.cis.management.ICisActivityFeed;
 import org.societies.api.internal.context.broker.ICtxBroker;
 //import org.societies.api.internal.context.broker.ICommunityCtxBroker;
 //import org.societies.api.internal.context.broker.IUserCtxBrokerCallback;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
@@ -81,7 +84,10 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserBean;
+import org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType;
+import org.societies.orchestration.api.SuggestedCommunityAnalyserResultBean;
 
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
@@ -103,7 +109,7 @@ import java.util.concurrent.Future;
  * 
  */
 
-public class SuggestedCommunityAnalyser //implements ICommCallback
+public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 {
 	
 	private IIdentity linkedCss;
@@ -126,11 +132,22 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
 	private CommunityRecommender communityRecommender;
 	
 	private ICommManager commManager;
+    private ICommCallback commCallback;
 	private IIdentityManager identityManager;
 	
 	private IPrivacyDataManager privacyDataManager;
 	private IPersonalisationManager personalisationManager;
 	private IPersonalisationCallback personalisationCallback;
+	
+	private IServiceDiscovery serviceDiscovery;
+	private IServiceDiscoveryCallback serviceDiscoveryCallback;
+	
+	private IDeviceManager deviceManager;
+	
+	//private ISuggestedCommunityAnalyser suggestedCommunityAnalyser;
+	private SuggestedCommunityAnalyserBean suggestedCommunityAnalyserBean;
+	private SuggestedCommunityAnalyserResultBean suggestedCommunityAnalyserResultBean;
+	private SuggestedCommunityAnalyserMethodType suggestedCommunityAnalyserMethodType;
     
 	/*
      * Constructor for SuggestedCommunityAnalyser
@@ -173,7 +190,12 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
     	    convertedRecommendations.put("Delete CISs", abstractDeletions);
     	}
     	
-    	return communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(convertedRecommendations, cissToCreateMetadata);
+    	ArrayList<String> preferenceConflicts = checkForPreferenceConflicts();
+    	if (preferenceConflicts == null)
+    		return null;
+    	else if (preferenceConflicts.size() == 0)
+    		return null;
+    	else return communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(convertedRecommendations, cissToCreateMetadata);
     	
     }
     
@@ -342,6 +364,38 @@ public class SuggestedCommunityAnalyser //implements ICommCallback
     
     public void setCommManager(ICommManager commManager) {
     	this.commManager = commManager;
+    }
+    
+    public ICommCallback getCommCallback() {
+    	return commCallback;
+    }
+    
+    public void setCommCallback(ICommCallback commCallback) {
+    	this.commCallback = commCallback;
+    }
+    
+    public IServiceDiscovery getServiceDiscovery() {
+    	return serviceDiscovery;
+    }
+    
+    public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
+    	this.serviceDiscovery = serviceDiscovery;
+    }
+    
+    public IServiceDiscoveryCallback getServiceDiscoveryCallback() {
+    	return serviceDiscoveryCallback;
+    }
+    
+    public void setServiceDiscoveryCallback(IServiceDiscoveryCallback serviceDiscoveryCallback) {
+    	this.serviceDiscoveryCallback = serviceDiscoveryCallback;
+    }
+    
+    public IDeviceManager getDeviceManager() {
+    	return deviceManager;
+    }
+    
+    public void setDeviceManager(IDeviceManager deviceManager) {
+    	this.deviceManager = deviceManager;
     }
     
     public IPrivacyDataManager getPrivacyDataManager() {

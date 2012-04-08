@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -19,47 +24,9 @@
  */
 package org.societies.orchestration.api;
 
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.cis.management.ICisRecord;
-import org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
-public class SuggestedCommunityAnalyserBean {
-
-	private SuggestedCommunityAnalyserMethodType method;
-	private HashMap<String, ArrayList<ICisRecord>> ciss;
-	private HashMap<String, ArrayList<ArrayList<ICisRecord>>> configureCiss;
-
-	public SuggestedCommunityAnalyserBean() {
-		
-	}
-	
-	public SuggestedCommunityAnalyserMethodType getMethod(){
-		return method;
-	}
-
-	public void setMethod(SuggestedCommunityAnalyserMethodType method){
-		this.method = method;
-	}
-	
-	public HashMap<String, ArrayList<ICisRecord>> getciss(){
-		return this.ciss;
-	}
-	
-	public void setCiss(HashMap<String, ArrayList<ICisRecord>> ciss){
-		this.ciss = ciss;
-	}
-	
-	public HashMap<String, ArrayList<ArrayList<ICisRecord>>> getConfigureCiss(){
-		return this.configureCiss;
-	}
-	
-	public void setConfigureCiss(HashMap<String, ArrayList<ArrayList<ICisRecord>>> configureCiss){
-		this.configureCiss = configureCiss;
-	}
-	
-	
+public enum SuggestedCommunityAnalyserMethodType {
+	processEgocentricRecommendations, processEgocentricConfigurationRecommendations,
+    processCSCWRecommendations, processCSCWConfigurationRecommendations,
+    processCSMRecommendations, processCSMConfigurationRecommendations,
 	
 }
