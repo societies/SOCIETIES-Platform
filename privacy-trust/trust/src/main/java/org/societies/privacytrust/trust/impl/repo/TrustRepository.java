@@ -24,6 +24,8 @@
  */
 package org.societies.privacytrust.trust.impl.repo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.privacytrust.trust.api.model.TrustedEntity;
 import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
@@ -39,6 +41,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class TrustRepository implements ITrustRepository {
 
+	private static final Logger LOG = LoggerFactory.getLogger(TrustRepository.class);
+	
+	TrustRepository() {
+		
+		LOG.info(this.getClass() + " instantiated");
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#addEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)
 	 */
