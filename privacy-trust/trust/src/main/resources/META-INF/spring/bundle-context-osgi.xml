@@ -13,6 +13,9 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
 
+	<osgi:service ref="trustEventMgr" interface="org.societies.privacytrust.trust.api.event.ITrustEventMgr" />
 	<osgi:service ref="trustBroker" interface="org.societies.api.internal.privacytrust.trust.ITrustBroker" />
 	<osgi:service ref="trustRepository" interface="org.societies.privacytrust.trust.api.repo.ITrustRepository" />
+	
+	<osgi:reference id="eventMgr" interface="org.societies.api.osgi.event.IEventMgr" />
 </beans>

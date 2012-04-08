@@ -35,6 +35,7 @@ import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.TrustUpdateListener;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.model.TrustedEntity;
 import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.TrustedEntityType;
@@ -54,6 +55,9 @@ import org.springframework.stereotype.Service;
 public class TrustBroker implements ITrustBroker {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(TrustBroker.class);
+	
+	@Autowired(required=true)
+	private ITrustEventMgr trustEventMgr;
 	
 	@Autowired(required=true)
 	private ITrustRepository trustRepo;
