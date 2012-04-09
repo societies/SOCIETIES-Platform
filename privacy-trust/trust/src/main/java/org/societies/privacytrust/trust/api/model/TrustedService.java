@@ -24,6 +24,9 @@
  */
 package org.societies.privacytrust.trust.api.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 /**
  * This class represents trusted services. A TrustedService object is referenced
  * by its TrustedEntityId, while the associated Trust value objects express the
@@ -34,6 +37,8 @@ package org.societies.privacytrust.trust.api.model;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
+@Entity
+@Table(name="t_services")
 public class TrustedService extends TrustedEntity {
 
 	private static final long serialVersionUID = 8253551733059925542L;

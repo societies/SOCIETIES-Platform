@@ -24,12 +24,14 @@
  */
 package org.societies.privacytrust.trust.impl.repo;
 
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.privacytrust.trust.api.model.TrustedEntity;
 import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.societies.privacytrust.trust.api.repo.TrustRepositoryException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -41,7 +43,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class TrustRepository implements ITrustRepository {
 
+	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(TrustRepository.class);
+	
+	private SessionFactory sessionFactory;
 	
 	TrustRepository() {
 		

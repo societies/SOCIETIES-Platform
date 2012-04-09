@@ -27,6 +27,9 @@ package org.societies.privacytrust.trust.api.model;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 /**
  * This class represents trusted CSSs. A <code>TrustedCss</code> object is
  * referenced by its {@link TrustedEntityId}, while the associated 
@@ -39,6 +42,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
+@Entity
+@Table(name="t_users")
 public class TrustedCss extends TrustedEntity {
 	
 	private static final long serialVersionUID = -5663024798098392757L;
