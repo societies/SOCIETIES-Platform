@@ -252,6 +252,18 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	}
     	
     	for (int i = 0; i < convertedRecommendations.size(); i++) {
+    		if (checkForPreferenceConflicts().size() != 0)
+    			continue;
+    		ArrayList<String> privacyConflicts = checkForPrivacyConflicts();
+    		boolean refuseSuggestion = false;
+    		if (privacyConflicts.size() != 0) {
+    			for (int m = 0; m < privacyConflicts.size(); m++) {
+    				if (privacyConflicts.get(m).equals("User policy"))
+    				    refuseSuggestion = true;
+    			}
+    		}
+    		if (refuseSuggestion == true)
+    			continue;
     		//userContextBroker.evaluateSimilarity("location", convertedRecommendations.get(i).get(0).getMembersList());
     		//if > 90% of members share that context, and there's no other context with more coverage of members,
     		//let this be the highest level CIS criteria.
@@ -285,8 +297,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	
     	//personalisationManager.getPreference(arg0, arg1, arg2, arg3, "refuse CIS action with given criteria", arg5)
 		return conflictingPreferences;
-    	
     }
+    
     public IIdentity getLinkedCss() {
     	return linkedCss;
     }
