@@ -29,6 +29,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -45,7 +46,11 @@ import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxModelType;
+import org.societies.context.api.community.estimation.ICommunityCtxEstimationMgr;
+import org.societies.context.broker.impl.CtxBroker;
 import org.societies.context.broker.impl.InternalCtxBroker;
+import org.societies.context.community.estimation.impl.CommunityContextEstimation;
 import org.societies.context.user.db.impl.UserCtxDBMgr;
 import org.societies.context.userHistory.impl.UserContextHistoryManagement;
 
@@ -68,7 +73,7 @@ public class TE_ST2 {
  
 	 ******************************************************************************************/
 
-	private InternalCtxBroker internalCtxBroker;
+	InternalCtxBroker iB;
 	CtxEntityIdentifier ctxEntityId1 = null;
 	CtxEntityIdentifier ctxEntityId2 = null;
 	CtxIdentifier ctxAttributeStringIdentifier = null;
@@ -92,9 +97,9 @@ public class TE_ST2 {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		internalCtxBroker = new InternalCtxBroker();
-		internalCtxBroker.setUserCtxDBMgr(new UserCtxDBMgr());
-		internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
+		iB = new InternalCtxBroker();
+		iB.setUserCtxDBMgr(new UserCtxDBMgr());
+		iB.setUserCtxHistoryMgr(new UserContextHistoryManagement());
 		
 		//initialization add create & retrieve methods
 		createEntities();
@@ -106,7 +111,7 @@ public class TE_ST2 {
 	 */
 	@After
 	public void tearDown() throws Exception {
-		internalCtxBroker = null;
+		iB = null;
 	}
 	
 	@Test
@@ -115,10 +120,10 @@ public class TE_ST2 {
 		final CtxAttribute ctxAttribute;
 		final CtxEntity ctxEntity;
 		
-		final Future<CtxEntity> futureCtxEntity = internalCtxBroker.createEntity("entType");
+		final Future<CtxEntity> futureCtxEntity = iB.createEntity("entType");
 		ctxEntity = futureCtxEntity.get();
 		
-		Future<CtxAttribute> futureCtxAttribute = internalCtxBroker.createAttribute(ctxEntity.getId(), "attrType");
+		Future<CtxAttribute> futureCtxAttribute = iB.createAttribute(ctxEntity.getId(), "attrType");
 		ctxAttribute = futureCtxAttribute.get();
 		
 		assertNotNull(ctxAttribute.getId());
@@ -132,18 +137,23 @@ public class TE_ST2 {
 	public void TestCalculation() throws CtxException, Exception, Exception{
 		
 		InternalCtxBroker brok = Mockito.mock(InternalCtxBroker.class);
-
+		CtxBroker br = Mockito.mock(CtxBroker.class);
+		CommunityContextEstimationTest CCET = Mockito.mock(CommunityContextEstimationTest.class);
+		
 		//Create two futureEntities
 
 		
-	}	
+	}
 	
+	
+	
+	@Test
 		public void createEntities(){
 		Future<CtxEntity> futureEnt1, futureEnt2;
 		
 		try {
-			futureEnt1 = this.internalCtxBroker.createEntity("Person");
-			futureEnt2 = this.internalCtxBroker.createEntity("Person");
+			futureEnt1 = this.iB.createEntity("Person");
+			futureEnt2 = this.iB.createEntity("Person");
 			
 			System.out.println(futureEnt1);
 			System.out.println(futureEnt2);
@@ -164,8 +174,8 @@ public class TE_ST2 {
 		//	System.out.println("2. ctxEntity.getId()="+ this.ctxEntityIdentifier.getType());//getObjectNumber()); //=null/ENTITY/Device/2 (operatorID/modelType/Type/ObjectNumber)
 						
 			//create ctxAttribute with a String value that it is assigned to the previously created ctxEntity			
-			Future<CtxAttribute> futureCtxAttrString1 = this.internalCtxBroker.createAttribute(ctxEntity1.getId(), "Age"); //null/ENTITY/Device/2
-			Future<CtxAttribute> futureCtxAttrString2 = this.internalCtxBroker.createAttribute(ctxEntity2.getId(), "Age");
+			Future<CtxAttribute> futureCtxAttrString1 = this.iB.createAttribute(ctxEntity1.getId(), "Age"); //null/ENTITY/Device/2
+			Future<CtxAttribute> futureCtxAttrString2 = this.iB.createAttribute(ctxEntity2.getId(), "Age");
 			
 			// get the object of the created CtxAttribute
 			CtxAttribute ctxAttributeString1 = (CtxAttribute) futureCtxAttrString1.get();
@@ -188,7 +198,7 @@ public class TE_ST2 {
 			System.out.println("7. getIntegerType2: " + ctxAttributeString2.getIntegerValue()); //device1234
 
 			// with this update the attribute is stored in Context DB
-			Future<CtxModelObject> futureAttrUpdated = this.internalCtxBroker.update(ctxAttributeString1);
+			Future<CtxModelObject> futureAttrUpdated = this.iB.update(ctxAttributeString1);
 			
 			// get the updated CtxAttribute object and identifier (to be used later for retrieval purposes)
 			ctxAttributeString1 = (CtxAttribute) futureAttrUpdated.get();
@@ -252,6 +262,7 @@ public class TE_ST2 {
 		return 0;
 		
 	}
+
 		
 	@Test	
 	public void retrieveContext() {
@@ -265,8 +276,8 @@ public class TE_ST2 {
 		// Retrieve is also possible to be performed based on the type of the CtxEntity. This will be demonstrated in a later example.
 
 			
-		Future<CtxModelObject> ctxEntityRetrievedFuture1 = this.internalCtxBroker.retrieve(this.ctxEntityId1);
-		Future<CtxModelObject> ctxEntityRetrievedFuture2 = this.internalCtxBroker.retrieve(this.ctxEntityId2);
+		Future<CtxModelObject> ctxEntityRetrievedFuture1 = this.iB.retrieve(this.ctxEntityId1);
+		Future<CtxModelObject> ctxEntityRetrievedFuture2 = this.iB.retrieve(this.ctxEntityId2);
 		
 		System.out.println("0.2:" + ctxEntityRetrievedFuture1.get());
 		CtxEntity retrievedCtxEntity = (CtxEntity) ctxEntityRetrievedFuture1.get();
@@ -300,8 +311,8 @@ public class TE_ST2 {
 		Integer attrValue1 = retrievedCtxEntity.getAttributes("Age").iterator().next().getIntegerValue();
 		assertEquals(new Integer(39), attrValue1);
 		// retrieve ctxAttribute with the binary value
-		Future<CtxModelObject> ctxAttributeRetrievedBinaryFuture = this.internalCtxBroker.retrieve(this.ctxAttributeBinaryIdentifier);
-		CtxAttribute ctxAttributeRetrievedBinary = (CtxAttribute) ctxAttributeRetrievedBinaryFuture.get();
+//		Future<CtxModelObject> ctxAttributeRetrievedBinaryFuture = this.internalCtxBroker.retrieve(this.ctxAttributeBinaryIdentifier);
+//		CtxAttribute ctxAttributeRetrievedBinary = (CtxAttribute) ctxAttributeRetrievedBinaryFuture.get();
 
 //		MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(ctxAttributeRetrievedBinary.getBinaryValue(), this.getClass().getClassLoader());
 //		this.log.info("Retrieved ctxAttribute id " +ctxAttributeRetrievedBinary.getId()+ "and value: "+ retrievedBlob.toString());
@@ -320,5 +331,5 @@ public class TE_ST2 {
 		}
 
 		}
-	
+		
 }
