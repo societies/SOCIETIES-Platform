@@ -68,6 +68,7 @@ public class NetworkConverter {
 
 	// *** End Layout constant
 
+	
 	/**
 	 * Creates a Java object of type
 	 * de.dlr.kn.bayesianLibrary.inference.structures.impl.DAG from a file,
