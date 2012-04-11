@@ -47,6 +47,8 @@ import org.societies.personalization.socialprofiler.datamodel.SocialPerson;
 import org.societies.personalization.socialprofiler.datamodel.impl.RelTypes;
 import org.societies.personalization.socialprofiler.datamodel.impl.SocialPersonImpl;
 import org.societies.personalization.socialprofiler.exception.NeoException;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public class ProfilerEngine implements Variables{
 
@@ -297,10 +299,9 @@ public class ProfilerEngine implements Variables{
 			long week_time=604800;
 			long end_date=current_time-week_time;
 			long end_date1=end_date*1000;
-			Date d_end = new Date(end_date1);
 			
 			///// ANALIZZARE LE ACTIVITIES
-			//generateInitialProfileContent(current_id, activities, d_end); 		//till one week before , then update
+			generateProfileContent(current_id, activities, end_date1); 		//till one week before , then update
 								
 			for(int i=0;i<friends.size();i++){
 				
@@ -585,44 +586,147 @@ public class ProfilerEngine implements Variables{
 	}
 	
 	public void generateProfileContent(String current_id,List<?> posts,long date ){
-		logger.debug("Generating stream information for user "+current_id+" .....");
+		logger.debug("Generating profile information from stream for user "+current_id+" .....");
 	
 			long date_s=date*1000;
 			Date d = new Date(date_s);
 			
-			logger.debug("analysing each post of the user"+current_id+" 's Wall");
+			logger.debug("analysing each post of the user "+current_id+" 's Wall");
 			//NOTE going backwards through the DOM, the most recent are first
 			for(int j=posts.size()-1;j>=0;j--){
-//				ActivityEntry activity=(ActivityEntry) posts.get(j);
-//				
-//				String post=activity.getContent();
-//				String viewer=activity.getActor().getDisplayName();
-//				String source=activity.getActor().getDisplayName();
-//				String type=activity.item(3).getTextContent();
-//				String message=activity.item(8).getTextContent();
-//				logger.debug("----post "+post+" viewer "+viewer+" source "+source+" type "+type+" message "+message);
-//				
-//				if (activity.item(3).getNodeName().equals("type")){
-//					if (type.equals("")){
-//						type="999"; //there exist facebook posts without any type -> this avoids null type error
-//					}
-//					if (viewer.equals(source)){  //viewer=source  -> the posts of the actual user from his Wall
-//						postFiltering(activity, current_id, viewer, source, type, message);
-//						repliesComments(activity, source, viewer, current_id, REPLY_TO_ME);
-//					}else if (!viewer.equals(source)){
-//						String actor =activity.item(6).getTextContent();
-//						String target =activity.item(7).getTextContent();
-//						if (viewer.equals(actor)){
-//							postFilteringAdvanced(activity, current_id, actor, target, type, message);
-//						}
-//						if (serviceXml.checkIfUserExists(credentials_facebook_auxiliary, "facebook", source)){			//viewer!=source and source on AUP -> posts of other AUP users on his Wall
-//							repliesComments(activity, source, viewer, current_id, REPLY_TO_OTHER_CA);
-//						}else{																							// if (!serviceXml.checkIfUserExists(credentials_facebook_auxiliary, "facebook", source)){ //viewer!=source and source not on AUP ->posts of other non AUP users on his Wall  
-//							repliesComments(activity, source, viewer, current_id, REPLY_TO_STRANGER_CA);
-//						}
-//					}
-//				}//if equals type
+				ActivityEntry activity=(ActivityEntry) posts.get(j);
+				
+				String viewer=current_id;
+				String source=activity.getActor().getDisplayName();
+				String type="note";
+				try {
+					type = activity.getObject().getObjectType();
+				} catch (Exception e) {}
+				String message=activity.getContent();
+				logger.debug("----post: viewer "+viewer+" source "+source+" type "+type+" message "+message);
+				
+				if (viewer.equals(source)){  //viewer=source  -> the posts of the actual user from his Wall
+					postFiltering(activity, current_id, viewer, source, type, message);
+					repliesComments(activity, source, viewer, current_id, REPLY_TO_ME);
+				} else {
+//					String actor = source;
+//					String target =activity.getTarget();
+//					if (viewer.equals(actor)){
+//						postFilteringAdvanced(activity, current_id, actor, target, type, message);
+//					}																						// if (!serviceXml.checkIfUserExists(credentials_facebook_auxiliary, "facebook", source)){ //viewer!=source and source not on AUP ->posts of other non AUP users on his Wall  
+					repliesComments(activity, source, viewer, current_id, REPLY_TO_STRANGER_CA);
+				}
 			}//for each post
+	}
+	
+	private void postFiltering(ActivityEntry activity ,String current_id,String viewer, String source , String type , String message){
+		logger.debug("+++++ analysing post , type "+type+", for user "+current_id);
+
+		String lastTime=activity.getUpdated();
+		if ("note".equals(type)){ //status message
+				String  profile_last_time=graph.getNarcissismManiacLastTime(current_id+"_NarcissismManiac");
+				if (Integer.parseInt(profile_last_time)<Integer.parseInt(lastTime)){
+					logger.debug("Narcissism Profile interaction");
+					graph.incrementNarcissismManiacNumber(current_id+"_NarcissismManiac");
+					updateProfileStatistics(current_id, lastTime, profile_last_time, NARCISSISM_PROFILE);
+				}
+		} else if ("image".equals(type)){
+				String profile_last_time=graph.getPhotoManiacLastTime(current_id+"_PhotoManiac");
+				if (Integer.parseInt(profile_last_time)<Integer.parseInt(lastTime)){
+					logger.debug("Photo Maniac interaction");
+					//TODO : improvement : detect if album or photo ; normally is a photo but could be also an album
+					graph.incrementPhotoManiacNumber(current_id+"_PhotoManiac");
+					updateProfileStatistics(current_id,lastTime,profile_last_time,PHOTO_PROFILE);
+				}
+		} else if ("bookmark".equals(type)){ //link , youtube or others
+			String  profile_last_time=graph.getSurfManiacLastTime(current_id+"_SurfManiac");
+			if (Integer.parseInt(profile_last_time)<Integer.parseInt(lastTime)){
+				logger.debug("Surf Maniac interaction");
+				graph.incrementSurfManiacNumber(current_id+"_SurfManiac");
+				updateProfileStatistics(current_id,lastTime,profile_last_time,SURF_PROFILE);
+			}
+		} else if ("quiz".equals(type)){  //TODO quiz,applications
+				String  profile_last_time=graph.getQuizManiacLastTime(current_id+"_QuizManiac");
+				if (Integer.parseInt(profile_last_time)<Integer.parseInt(lastTime)){
+					logger.debug("Quiz Maniac interaction");
+					graph.incrementQuizManiacNumber(current_id+"_QuizManiac");
+					updateProfileStatistics(current_id,lastTime,profile_last_time,QUIZ_PROFILE);
+				}
+		} else if ("video".equals(type)){   //TODO posts containing movies , mp4 link inside the post 
+				String  profile_last_time=graph.getSurfManiacLastTime(current_id+"_SurfManiac");
+				if (Integer.parseInt(profile_last_time)<Integer.parseInt(lastTime)){
+					logger.debug("Surf Maniac interaction");
+					graph.incrementSurfManiacNumber(current_id+"_SurfManiac");
+					updateProfileStatistics(current_id,lastTime,profile_last_time,SURF_PROFILE);
+				}
+		} else if ("profile".equals(type)){ //TODO profile photos -> this is consider narcissist
+				String  profile_last_time=graph.getNarcissismManiacLastTime(current_id+"_NarcissismManiac");
+				if (Integer.parseInt(profile_last_time)<Integer.parseInt(lastTime)){
+					logger.debug("Narcissism Profile interaction");
+					graph.incrementNarcissismManiacNumber(current_id+"_NarcissismManiac");
+					updateProfileStatistics(current_id, lastTime, profile_last_time, NARCISSISM_PROFILE);
+				}
+		} else if ("message".equals(type)){ //TODO
+				//logger.debug("the user received a direct message- however since no Popularity Profile still available nothing will be done with this post information");
+		} else if ("message-event".equals(type)){ //TODO
+				//messages with events , for the moment are not treated since no Informative Profile,
+				//could be added to the narcissist category and also super active
+		} else if ("message-link".equals(type)){ //TODO
+				//messages with link , events , for the moment are not treated since no Informative Profile,
+				//could be added to the narcissist category and also super active
+		} else {
+				logger.warn("****WARNING this type is unknown for the engine *** ::"+type);
+		} //end switch case	
+	}
+	
+	private void repliesComments(ActivityEntry activity, String source , String viewer , String current_id,int option ){
+//		logger.debug("analysing possible comments of the post");
+//		org.w3c.dom.Element comments=(Element)activity.item(12);
+//		NodeList comment_list=comments.getElementsByTagName("comment");
+//		for (int k=0;k<comment_list.getLength();k++){
+//			org.w3c.dom.Node comment=comment_list.item(k).getFirstChild();
+//			if(comment.getNodeName().equals("fromid")){
+//				
+//				//comments of the stream post
+//				String comment_sourceId=comment.getTextContent();
+//				String profile_lastTime=service.getSuperActiveManiacLastTime(current_id+"_SuperActiveManiac");
+//				String lastTime=comment.getNextSibling().getTextContent();
+//				String text=comment.getNextSibling().getNextSibling().getTextContent();
+//				logger.debug(" comment fromid "+comment_sourceId+" text "+text+" lastTime "+lastTime );
+//					
+//				if (comment_sourceId.equals(viewer)){        
+//					if (Integer.parseInt(profile_lastTime)<Integer.parseInt(lastTime)){
+//						logger.debug("Super Active Altruist Maniac interaction - comment reply");
+//						service.incrementSuperActiveManiacNumber(current_id+"_SuperActiveManiac");
+//						updateProfileStatistics(current_id, lastTime, profile_lastTime, SUPERACTIVE_PROFILE);
+//												
+////					    try { //FIXME: disabilitato la pubblicazione sul blog
+////							switch(option){
+////								case REPLY_TO_ME:{
+////									publishOnBlog("Super - Active Interaction",textGenerator.replyCommentToMe(lastTime, text),service.getPersonCAName(current_id));
+////									break;
+////								}
+////								case REPLY_TO_OTHER_CA:{
+////									publishOnBlog("Super - Active Interaction",textGenerator.replyCommentToCAUser(lastTime.toString(), text, service.getPersonCAName(source)), service.getPersonCAName(current_id));
+////									break;
+////								}
+////								case REPLY_TO_STRANGER_CA:{
+////									publishOnBlog("Super - Active Interaction",textGenerator.replyCommentToCAStranger(lastTime, text), service.getPersonCAName(current_id));
+////									break;
+////								}
+////							}
+////							
+////						} catch (MalformedURLException e) {
+////							logger.error("unable to publish post on blog;Reason "+e);
+////							e.printStackTrace();
+////						} catch (XmlRpcException e) {
+////							logger.error("unable to publish post on blog;Reason "+e);
+////							e.printStackTrace();
+////						}
+//					}
+//				}
+//			}// if from_id	
+//		}//for comment_list	
 	}
 
 	private Group findGroup(String groupId) {
@@ -664,13 +768,15 @@ public class ProfilerEngine implements Variables{
 				graph.updateGeneralInfo(current_id+"_GeneralInfo", 
 										user.getName().getGivenName(), 
 										user.getName().getFamilyName(),	
-										user.getBirthday().toString(), 
-										user.getGender().name(), 
+										null, 
+										null, 
 										user.getLivingArrangement(), 
-										user.getCurrentLocation().getFormatted(), 
+										null,
 										user.getPoliticalViews(), 
 										user.getReligion());
-			} catch (Exception e){}
+			} catch (Exception e){
+				e.printStackTrace();
+			}
 		}else {
 			graph.updateInterests(current_id+"_Interests", 
 								  "activities", 
@@ -718,5 +824,72 @@ public class ProfilerEngine implements Variables{
 		//		graph.linkQuizManiac(person, current_id+"_QuizManiac");
 		//		graph.updateQuizManiac(current_id+"_QuizManiac", "0", "0","0");
 	}
+	
+	public void updateProfileStatistics(String  userId, String lastTime, String lastTime_old,int option)
+	{	
+		
+		switch(option){
+			case NARCISSISM_PROFILE:{  
+				int number=	Integer.parseInt(graph.getNarcissismManiacNumber(userId+"_NarcissismManiac"));								
+				databaseConnection.sendMomentToDatabase(userId,lastTime,number,option);
+				if (number >=2){
+					int old_frequency=Integer.parseInt(graph.getNarcissismManiacFrequency(userId+"_NarcissismManiac"));
+					int frequency=(Integer.parseInt(lastTime)-Integer.parseInt(lastTime_old)+((number-2)*old_frequency))/(number-1);
+					graph.updateNarcissismManiac(userId+"_NarcissismManiac", String.valueOf(frequency),lastTime, null);
+				}else{
+					graph.updateNarcissismManiac(userId+"_NarcissismManiac", null,lastTime, null);;
+				}
+				break;
+			}
+			case SUPERACTIVE_PROFILE:{
+				int number=	Integer.parseInt(graph.getSuperActiveManiacNumber(userId+"_SuperActiveManiac"));								
+				databaseConnection.sendMomentToDatabase(userId,lastTime,number,option);
+				if (number >=2){
+					int old_frequency=Integer.parseInt(graph.getSuperActiveManiacFrequency(userId+"_SuperActiveManiac"));
+					int frequency=(Integer.parseInt(lastTime)-Integer.parseInt(lastTime_old)+((number-2)*old_frequency))/(number-1);
+					graph.updateSuperActiveManiac(userId+"_SuperActiveManiac", String.valueOf(frequency),lastTime, null);
+				}else{
+					graph.updateSuperActiveManiac(userId+"_SuperActiveManiac", null,lastTime, null);;
+				}
+				break;
+			}
+			case PHOTO_PROFILE:{
+				int number=	Integer.parseInt(graph.getPhotoManiacNumber(userId+"_PhotoManiac"));								
+				databaseConnection.sendMomentToDatabase(userId,lastTime,number,option);
+				if (number >=2){
+					int old_frequency=Integer.parseInt(graph.getPhotoManiacFrequency(userId+"_PhotoManiac"));
+					int frequency=(Integer.parseInt(lastTime)-Integer.parseInt(lastTime_old)+((number-2)*old_frequency))/(number-1);
+					graph.updatePhotoManiac(userId+"_PhotoManiac", String.valueOf(frequency),lastTime, null);
+				}else{
+					graph.updatePhotoManiac(userId+"_PhotoManiac", null,lastTime, null);;
+				}
+				break;
+			}
+			case SURF_PROFILE:{
+				int number=	Integer.parseInt(graph.getSurfManiacNumber(userId+"_SurfManiac"));								
+				databaseConnection.sendMomentToDatabase(userId,lastTime,number,option);
+				if (number >=2){
+					int old_frequency=Integer.parseInt(graph.getSurfManiacFrequency(userId+"_SurfManiac"));
+					int frequency=(Integer.parseInt(lastTime)-Integer.parseInt(lastTime_old)+((number-2)*old_frequency))/(number-1);
+					graph.updateSurfManiac(userId+"_SurfManiac", String.valueOf(frequency),lastTime, null);
+				}else{
+					graph.updateSurfManiac(userId+"_SurfManiac", null,lastTime, null);;
+				}
+				break;
+			}
+			case QUIZ_PROFILE:{
+				int number=	Integer.parseInt(graph.getQuizManiacNumber(userId+"_QuizManiac"));								
+				databaseConnection.sendMomentToDatabase(userId,lastTime,number,option);
+				if (number >=2){
+					int old_frequency=Integer.parseInt(graph.getQuizManiacFrequency(userId+"_QuizManiac"));
+					int frequency=(Integer.parseInt(lastTime)-Integer.parseInt(lastTime_old)+((number-2)*old_frequency))/(number-1);
+					graph.updateQuizManiac(userId+"_QuizManiac", String.valueOf(frequency),lastTime, null);
+				}else{
+					graph.updateQuizManiac(userId+"_QuizManiac", null,lastTime, null);;
+				}
+				break;
+			}
+		}
+	}	
 	
 }

@@ -59,7 +59,7 @@ public class TesterSN {
 		try {
 			Thread.sleep(10000);
 			System.out.println("Retrieving info for user 0");
-			GeneralInfo info = profiler.getGraph().getGeneralInfo("0");
+			GeneralInfo info = profiler.getGraph().getGeneralInfo("0_GeneralInfo");
 				System.out.println(info.getLastName());
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
