@@ -24,6 +24,10 @@
  */
 package org.societies.privacytrust.trust.api.model;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -72,13 +76,13 @@ public class TrustedEntityId implements Serializable {
     public static final String URN_NID = "teid";
 
     /** The trusted entity type. */
-    private final TrustedEntityType entityType;
+    private transient TrustedEntityType entityType;
     
     /** The String representation of the unique identifier of the referenced trusted entity. */
-    private final String entityId;
+    private transient String entityId;
 	
     /** The URN-formatted representation of this trusted entity identifier. */
-	private final URI urn;
+	private volatile URI urn; // The only serialisable field
 
 	/**
 	 * Constructs a <code>TrustedEntityId</code> with the specified entity type and id.
@@ -89,19 +93,42 @@ public class TrustedEntityId implements Serializable {
 	 *            the String representation of the unique identifier of the
 	 *            referenced trusted entity
 	 *        
-	 * @throws URISyntaxException if the URN of this identifier cannot be created
+	 * @throws MalformedTrustedEntityIdException 
+	 *             if the URN of this identifier cannot be created
 	 */
-	public TrustedEntityId(TrustedEntityType entityType, String entityId) throws URISyntaxException {
+	public TrustedEntityId(TrustedEntityType entityType, String entityId) throws MalformedTrustedEntityIdException {
 		
 		this.entityType = entityType;
 		this.entityId = entityId;
-		this.urn = URI.create(URI_SCHEME 
-                + URN_DELIM
-                + URN_NID
-                + URN_DELIM 
-                + this.getEntityType()
-                + URN_DELIM
-                + this.getEntityId()); 
+		try {
+			this.urn = URI.create(URI_SCHEME 
+					+ URN_DELIM
+					+ URN_NID
+					+ URN_DELIM 
+					+ this.getEntityType()
+					+ URN_DELIM
+					+ this.getEntityId());
+		} catch (IllegalArgumentException iae) {
+			throw new MalformedTrustedEntityIdException(
+					"Could not create trusted entity identifier URN", iae);
+		}
+	}
+	
+	/**
+	 * Constructs a <code>TrustedEntityId</code> from the specified string
+	 * representation. 
+	 * 
+	 * @param str
+	 *            the string representation from which to construct the
+	 *            TrustedEntityId instance
+	 * @throws MalformedTrustedEntityIdException
+	 *            if the specified TrustedEntityId string representation is
+	 *            malformed.
+	 * @since 0.0.5
+	 */
+	public TrustedEntityId(String str) throws MalformedTrustedEntityIdException {
+		
+		this.parseString(str);
 	}
 
 	/**
@@ -191,4 +218,92 @@ public class TrustedEntityId implements Serializable {
 		
 		return true;
 	}
+	
+	/**
+     * Writes the contents of this TrustedEntityId to the given object output
+     * stream.
+     * <p> 
+     * The only serialisable field of a TrustedEntityId instance is its 
+     * {@link #urn} field. That field is given a value, if it does not have one
+     * already, and then the {@link java.io.ObjectOutputStream#defaultWriteObject()}
+     * method of the given object-output stream is invoked.
+     *
+     * @param os
+     *            the object output stream to which this object is to be written
+     */
+    private void writeObject(ObjectOutputStream os)	throws IOException {
+    	
+    	os.defaultWriteObject();	// Write the urn field only
+    }
+
+    /**
+     * Reconstructs a TrustedEntityId from the given serial stream.
+     * <p> 
+     * The {@link java.io.ObjectInputStream#defaultReadObject()} method is
+     * invoked to read the value of the {@link #urn} field. The result is then
+     * parsed in the usual way.
+     *
+     * @param is
+     *            the object input stream from which this object is being read
+     */
+    private void readObject(ObjectInputStream is) throws ClassNotFoundException, IOException {
+	
+    	is.defaultReadObject();     // Read the urn field only
+    	try {
+    		this.parseUrn(this.urn);
+    	} catch (MalformedTrustedEntityIdException mteide) {
+    		IOException ioe = new InvalidObjectException("Invalid trusted entity identifier");
+    		ioe.initCause(mteide);
+    		throw ioe;
+    	}
+    }
+    
+    private void parseUrn(URI input) throws MalformedTrustedEntityIdException {
+    	
+    	final String scheme = input.getScheme();
+    	if (scheme == null)
+    		throw new MalformedTrustedEntityIdException("'" + input + "'"
+    				+ ": Missing URI scheme");
+    	if (!URI_SCHEME.equals(scheme))
+    		throw new MalformedTrustedEntityIdException("'" + input + "'"
+    				+ ": '" + scheme + "': Invalid URI scheme, expected '" + URI_SCHEME + "'");
+    	
+    	final String ssp = input.getSchemeSpecificPart();
+    	
+    	// parts = ["teid" , entity-type , entity-id]
+    	final String[] parts = ssp.split(URN_DELIM);
+    	if (parts.length != 3)
+			throw new MalformedTrustedEntityIdException("'" + input + "'"
+					+ ": Malformed scheme specific part, expected format 'teid:entityType:entityId'");
+    	
+    	if (!URN_NID.equals(parts[0]))
+    		throw new MalformedTrustedEntityIdException("'" + input + "'"
+    				+ ((parts[0].isEmpty()) 
+    						? ": Missing URN namespace identifier, expected '" + URN_NID + "'" 
+    						: ": '" + parts[0] + "': Invalid URN namespace identifier, expected '" + URN_NID + "'"));
+    	
+    	try {
+			this.entityType = TrustedEntityType.valueOf(parts[1]);
+		} catch (IllegalArgumentException iae) {
+			throw new MalformedTrustedEntityIdException("'" + input + "'"
+					+ ((parts[1].isEmpty()) 
+    						? ": Missing trusted entity type"
+    						: ": '" + parts[1] + "': Invalid trusted entity type"), iae);
+		}   
+    	
+		this.entityId = parts[2];
+		if (this.entityId.isEmpty())
+			throw new MalformedTrustedEntityIdException("'" + input + "'" 
+					+ ": Entity identifier cannot be empty");
+    }
+    
+    private void parseString(String input) throws MalformedTrustedEntityIdException {
+    	
+    	try {
+			this.urn = new URI(input);
+			this.parseUrn(this.urn);
+		} catch (URISyntaxException use) {
+			throw new MalformedTrustedEntityIdException("'" + input + "'", use);
+		}
+    }
 }

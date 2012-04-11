@@ -105,38 +105,30 @@ public class TrustedEntityIdTest {
 	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#getUri()}.
 	 */
 	@Test
-	public void testGetUri() {
+	public void testGetUri() throws Exception {
 		
 		assertNotNull(this.teid.getUri());
-		assertEquals(TrustedEntityId.URI_SCHEME, this.teid.getUri().getScheme());
-		// TODO use regex
-		assertTrue(this.teid.getUri().getSchemeSpecificPart().startsWith(TrustedEntityId.URN_NID));
-		// assertTrue(this.teid.getUri().getSchemeSpecificPart().contains(ENTITY_TYPE));
-		assertTrue(this.teid.getUri().getSchemeSpecificPart().endsWith(ENTITY_ID));
+		final TrustedEntityId sameTeid = new TrustedEntityId(this.teid.getUri().toString());
+		assertEquals(this.teid.getUri(), sameTeid.getUri());
 	}
 
 	/**
 	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#toString()}.
 	 */
 	@Test
-	public void testToString() {
+	public void testToString() throws Exception {
 		
 		assertNotNull(this.teid.toString());
-		assertEquals(TrustedEntityId.URI_SCHEME 
-				+ TrustedEntityId.URN_DELIM 
-				+ TrustedEntityId.URN_NID 
-				+ TrustedEntityId.URN_DELIM
-				+ ENTITY_TYPE
-				+ TrustedEntityId.URN_DELIM
-				+ ENTITY_ID, this.teid.toString());
+		final TrustedEntityId sameTeid = new TrustedEntityId(this.teid.toString());
+		assertEquals(this.teid.toString(), sameTeid.toString());
 	}
 	
 	/**
 	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#equals()}.
-	 * @throws URISyntaxException 
+	 * @throws Exception 
 	 */
 	@Test
-	public void testEquals() throws URISyntaxException {
+	public void testEquals() throws Exception {
 		
 		final TrustedEntityId sameTeid = new TrustedEntityId(ENTITY_TYPE, ENTITY_ID);
 		assertTrue(this.teid.equals(sameTeid));
@@ -144,7 +136,7 @@ public class TrustedEntityIdTest {
 		final TrustedEntityId differentTeid1 = new TrustedEntityId(ENTITY_TYPE, "bar");
 		assertFalse(this.teid.equals(differentTeid1));
 		
-		final TrustedEntityId differentTeid2 = new TrustedEntityId(TrustedEntityType.DVP, ENTITY_ID);
+		final TrustedEntityId differentTeid2 = new TrustedEntityId(TrustedEntityType.LGC, ENTITY_ID);
 		assertFalse(this.teid.equals(differentTeid2));
 	}
 }
