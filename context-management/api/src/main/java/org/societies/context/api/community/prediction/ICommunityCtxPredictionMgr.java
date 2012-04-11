@@ -26,7 +26,8 @@ package org.societies.context.api.community.prediction;
 
 import java.util.Date;
 
-import org.societies.api.mock.EntityIdentifier;
+//import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 
@@ -42,7 +43,7 @@ public interface ICommunityCtxPredictionMgr {
 	 * 
 	 * @param cisID
 	 */
-	public void getCommunity(EntityIdentifier cisID);
+	public void getCommunity(IIdentity cisID);
 
 	/**
 	 * 

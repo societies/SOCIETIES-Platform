@@ -14,10 +14,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import jaxb.JAXBContext;
-import jaxb.JAXBException;
-import jaxb.Marshaller;
-import jaxb.Unmarshaller;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;

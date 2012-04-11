@@ -32,6 +32,8 @@ package org.societies.privacytrust.trust.api.model;
  * <li>{@link #CIS}: Denotes a trusted community</li>
  * <li>{@link #SVC}: Denotes a trusted service</li>
  * <li>{@link #DVP}: Denotes a trusted service developer</li>
+ * <li>{@link #LGC}: Denotes a trusted legacy entity, i.e. non-SOCIETIES
+ * entity</li>
  * </ul>
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
@@ -58,4 +60,10 @@ public enum TrustedEntityType {
 	 * The enum constant for trusted service developers
 	 */
 	DVP,
+	
+	/**
+	 * The enum constant for trusted legacy entities, i.e. non-SOCIETIES
+	 * entities
+	 */
+	LGC,
 }

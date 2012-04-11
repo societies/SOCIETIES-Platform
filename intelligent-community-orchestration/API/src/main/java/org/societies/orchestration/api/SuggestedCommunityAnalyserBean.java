@@ -20,24 +20,27 @@
 package org.societies.orchestration.api;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.internal.cis.management.ICisRecord;
+import org.societies.api.cis.management.ICisRecord;
+import org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SuggestedCommunityAnalyserBean {
 
-	public enum methodType {processEgocentricRecommendations, processEgocentricConfigurationRecommendations,
-		                    processCSCWRecommendations, processCSCWConfigurationRecommendations,
-		                    processCSMRecommendations, processCSMConfigurationRecommendations};
-	private methodType method;
+	private SuggestedCommunityAnalyserMethodType method;
 	private HashMap<String, ArrayList<ICisRecord>> ciss;
 	private HashMap<String, ArrayList<ArrayList<ICisRecord>>> configureCiss;
 
-	public methodType getMethod(){
+	public SuggestedCommunityAnalyserBean() {
+		
+	}
+	
+	public SuggestedCommunityAnalyserMethodType getMethod(){
 		return method;
 	}
 
-	public void setMethod(methodType method){
+	public void setMethod(SuggestedCommunityAnalyserMethodType method){
 		this.method = method;
 	}
 	
@@ -56,5 +59,7 @@ public class SuggestedCommunityAnalyserBean {
 	public void setConfigureCiss(HashMap<String, ArrayList<ArrayList<ICisRecord>>> configureCiss){
 		this.configureCiss = configureCiss;
 	}
+	
+	
 	
 }

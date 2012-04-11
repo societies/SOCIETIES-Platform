@@ -22,64 +22,11 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.user.inference.impl;
+package org.societies.orchestration.api;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxAttributeValueType;
-import org.societies.api.context.model.CtxModelObject;
-import org.societies.api.identity.IIdentity;
-import org.societies.context.api.user.inference.IUserCtxInferenceMgr;
-
-public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
-
-	@Override
-	public void checkQuality(CtxModelObject arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Double evaluateSimilarity(CtxAttributeIdentifier arg0,
-			CtxAttributeIdentifier arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Map<CtxAttributeIdentifier, Double> evaluateSimilarity(
-			List<CtxAttributeIdentifier> arg0, List<CtxAttributeIdentifier> arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void inheritContext(CtxAttributeIdentifier arg0,
-			CtxAttributeValueType arg1, IIdentity arg2) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public CtxAttribute predictContext(CtxAttributeIdentifier arg0, Date arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CtxAttribute predictContext(CtxAttributeIdentifier arg0, int arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void refineContext(CtxAttributeIdentifier arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
+public enum SuggestedCommunityAnalyserMethodType {
+	processEgocentricRecommendations, processEgocentricConfigurationRecommendations,
+    processCSCWRecommendations, processCSCWConfigurationRecommendations,
+    processCSMRecommendations, processCSMConfigurationRecommendations,
+	
 }

@@ -35,11 +35,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.useragent.conflict.*;
-import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.personalisation.model.IActionConsumer;
 import org.societies.api.schema.servicelifecycle.model.Service;
@@ -49,7 +49,7 @@ import org.societies.useragent.conflict.IntentPriorRule;
 
 public class DecisionMaker extends AbstractDecisionMaker {
 
-	private EntityIdentifier entityID;
+	private IIdentity entityID;
 	
 	private List<IActionConsumer> temporal=null;
 	
@@ -84,10 +84,10 @@ public class DecisionMaker extends AbstractDecisionMaker {
 		this.temporal=lst;
 	}
 	
-	public EntityIdentifier getEntityID() {
+	public IIdentity getEntityID() {
 		return entityID;
 	}
-	public void setEntityID(EntityIdentifier entityID) {
+	public void setEntityID(IIdentity entityID) {
 		this.entityID = entityID;
 	}
 

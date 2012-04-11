@@ -24,6 +24,9 @@
  */
 package org.societies.api.context.event;
 
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
 /**
  * A listener for receiving {@link CtxChangeEvent CtxChangeEvents}. More
  * specifically, it defines methods for reacting to the addition, update,
@@ -32,6 +35,7 @@ package org.societies.api.context.event;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.3
  */
+@SocietiesExternalInterface(type = SocietiesInterfaceType.REQUIRED)
 public interface CtxChangeEventListener extends CtxEventListener {
 	
 	/**

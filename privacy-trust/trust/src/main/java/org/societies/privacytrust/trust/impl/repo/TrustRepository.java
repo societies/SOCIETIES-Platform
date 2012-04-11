@@ -22,83 +22,74 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
+package org.societies.privacytrust.trust.impl.repo;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import org.hibernate.SessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.privacytrust.trust.api.model.TrustedEntity;
+import org.societies.privacytrust.trust.api.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.repo.ITrustRepository;
+import org.societies.privacytrust.trust.api.repo.TrustRepositoryException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 /**
- * This class represents trusted services. A TrustedService object is referenced
- * by its TrustedEntityId, while the associated Trust value objects express the
- * trustworthiness of this service, i.e. direct, indirect and user-perceived. Each
- * trusted service is also associated with a TrustedCSS which represents its
- * provider.
- * 
+ * Implementation of the {@link ITrustRepository} interface.
+ *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.1
+ * @since 0.0.5
  */
-@Entity
-@Table(name="t_services")
-public class TrustedService extends TrustedEntity {
+@Repository
+public class TrustRepository implements ITrustRepository {
 
-	private static final long serialVersionUID = 8253551733059925542L;
+	/** The logging facility. */
+	private static final Logger LOG = LoggerFactory.getLogger(TrustRepository.class);
 	
-	/** The CSS providing this service. */
-	private final TrustedCss provider;
+	private SessionFactory sessionFactory;
 	
-	/* The communities sharing this service. */
-	//private final Set<TrustedCis> communities = new CopyOnWriteArraySet<TrustedCis>();
-	
-	/** The type of this service. */
-	private final String type;
-	
-	/** The developer of this service. */
-	private TrustedDeveloper developer;
-
-	public TrustedService(TrustedEntityId trustor, TrustedEntityId teid, String type, TrustedCss provider) {
+	TrustRepository() {
 		
-		super(trustor, teid);
-		this.type = type;
-		this.provider = provider;
+		LOG.info(this.getClass() + " instantiated");
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#addEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)
+	 */
+	@Override
+	public boolean addEntity(TrustedEntity entity)
+			throws TrustRepositoryException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
-	/**
-	 * Returns the type of this service.
-	 * 
-	 * @return the type of this service.
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#retrieveEntity(org.societies.privacytrust.trust.api.model.TrustedEntityId)
 	 */
-	public String getType() {
-		
-		return this.type;
+	@Override
+	public TrustedEntity retrieveEntity(TrustedEntityId teid)
+			throws TrustRepositoryException {
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
-	/**
-	 * Returns the CSS providing this service.
-	 * 
-	 * @return the CSS providing this service.
+
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#updateEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)
 	 */
-	public TrustedCss getProvider() {
-		
-		return this.provider;
+	@Override
+	public TrustedEntity updateEntity(TrustedEntity entity)
+			throws TrustRepositoryException {
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
-	/** 
-	 * Returns the developer of this service.
-	 * 
-	 * @return the developer of this service.
+
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#removeEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)
 	 */
-	public TrustedDeveloper getDeveloper() {
-		
-		return this.developer;
-	}
-	
-	/**
-	 * Sets the developer of this service.
-	 * 
-	 * @param developer the service developer to set. 
-	 */
-	public void setDeveloper(TrustedDeveloper developer) {
-		
-		this.developer = developer;
+	@Override
+	public boolean removeEntity(TrustedEntity entity)
+			throws TrustRepositoryException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

@@ -163,11 +163,6 @@ Hints use your profile ~/.m2/settings.xml or set via the command line -Dandroid.
     <!-- Defines versions of the plugin tools ie. tools used during the build -->
     <pluginManagement>
       <plugins>
-	<plugin>
-		<groupId>org.codehaus.mojo</groupId>
-		<artifactId>cobertura-maven-plugin</artifactId>
-		<version>2.3</version>
-	</plugin>
         <plugin>
 		<groupId>org.codehaus.mojo</groupId>
 		<artifactId>cobertura-maven-plugin</artifactId>

@@ -26,6 +26,8 @@ package org.societies.privacytrust.trust.api.model;
 
 import java.io.Serializable;
 
+import javax.persistence.MappedSuperclass;
+
 /**
  * This abstract class is used to represent an entity trusted by the trustor,
  * i.e. the owner of a CSS. Each trusted entity is referenced by its
@@ -36,6 +38,7 @@ import java.io.Serializable;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1 
  */
+@MappedSuperclass
 public abstract class TrustedEntity implements Serializable {
 	
 	private static final long serialVersionUID = -495088232194787430L;

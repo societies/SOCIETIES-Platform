@@ -11,7 +11,7 @@
        for integration testing outside of an OSGi environment -->
    
    <bean id="SuggestedCommunityAnalyser" class="org.societies.orchestration.CommunityLifecycleManagement.impl.SuggestedCommunityAnalyser" 
-   depends-on="ICssDirectory, ICssDiscovery, ICssActivityFeed, ServiceSharingRecord, ICisActivityFeed, ICisRecord, ICisManager, ICtxBroker, IIdentity, ICommManager, IUserFeedback, IUserFeedbackCallback, CommunityRecommender" init-method="initialiseSuggestedCommunityAnalyser">
+   depends-on="ICssDirectory, ICssDiscovery, ICssActivityFeed, ServiceSharingRecord, ICisActivityFeed, ICisRecord, ICisManager, ICtxBroker, IIdentity, ICommManager, IUserFeedback, IUserFeedbackCallback, CommunityRecommender, ICommCallback, IIdentityManager, IDeviceManager,  ISuggestedCommunityAnalyser, SuggestedCommunityAnalyserBean, SuggestedCommunityAnalyserResultBean, SuggestedCommunityAnalyserMethodType" init-method="initialiseSuggestedCommunityAnalyser">
    <property name="linkedCss" ref="IIdentity"></property>
    <property name="cisManager" ref="ICisManager"></property>
    <!-- <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>-->
@@ -19,13 +19,23 @@
    <!-- <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>-->
    <!-- <property name="communityContextBroker" ref="CommunityCtxBroker"></property>-->
    <property name="commManager" ref="ICommManager"></property>
+   <property name="commCallback" ref="ICommCallback"></property>
    <property name="userFeedback" ref="IUserFeedback"></property>
    <property name="userFeedbackCallback" ref="IUserFeedbackCallback"></property>
    <property name="communityRecommender" ref="CommunityRecommender"></property>
+   <property name="privacyDataManager" ref="IPrivacyDataManager"></property>
+   <property name="personalisationManager" ref="IPersonalisationManager"></property>
+   <property name="personalisationCallback" ref="IPersonalisationCallback"></property>
+   <property name="linkedCssManager" ref="IIdentityManager"></property>
+   <property name="deviceManager" ref="IDeviceManager"></property>
+   <property name="suggestedCommunityAnalyser" ref="ISuggestedCommunityAnalyser"></property>
+   <property name="suggestedCommunityAnalyserBean" ref="SuggestedCommunityAnalyserBean"></property>
+   <property name="suggestedCommunityAnalyserResultBean" ref="SuggestedCommunityAnalyserResultBean"></property>
+   <property name="suggestedCommunityAnalyserMethodType" ref="SuggestedCommunityAnalyserMethodType"></property>
    </bean>
    
    <bean id="CommunityRecommender" class="org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityRecommender" 
-   depends-on="ICssDirectory, ICssDiscovery, ICssActivityFeed, ServiceSharingRecord, ICisActivityFeed, ICisRecord, ICisManager, ICtxBroker, IIdentity, ICommManager, IUserFeedback, IUserFeedbackCallback" init-method="initialiseCommunityRecommender">
+   depends-on="ICssDirectory, ICssDiscovery, ICssActivityFeed, ServiceSharingRecord, ICisActivityFeed, ICisRecord, ICisManager, ICtxBroker, IIdentity, ICommManager, IUserFeedback, IUserFeedbackCallback, ICommCallback, IIdentityManager, IDeviceManager,  ISuggestedCommunityAnalyser, SuggestedCommunityAnalyserBean, SuggestedCommunityAnalyserResultBean, SuggestedCommunityAnalyserMethodType" init-method="initialiseCommunityRecommender">
    <property name="linkedCss" ref="IIdentity"></property>
    <property name="cisManager" ref="ICisManager"></property>
    <!-- <property name="userContextDatabaseManager" ref="UserCtxDBMgr"></property>-->
@@ -33,8 +43,15 @@
    <!-- <property name="userContextBrokerCallback" ref="UserCtxBrokerCallback"></property>-->
    <!-- <property name="communityContextBroker" ref="CommunityCtxBroker"></property>-->
    <property name="commManager" ref="ICommManager"></property>
+   <property name="commCallback" ref="ICommCallback"></property>
    <property name="userFeedback" ref="IUserFeedback"></property>
    <property name="userFeedbackCallback" ref="IUserFeedbackCallback"></property>
+   <property name="linkedCssManager" ref="IIdentityManager"></property>
+   <property name="deviceManager" ref="IDeviceManager"></property>
+   <property name="suggestedCommunityAnalyser" ref="ISuggestedCommunityAnalyser"></property>
+   <property name="suggestedCommunityAnalyserBean" ref="SuggestedCommunityAnalyserBean"></property>
+   <property name="suggestedCommunityAnalyserResultBean" ref="SuggestedCommunityAnalyserResultBean"></property>
+   <property name="suggestedCommunityAnalyserMethodType" ref="SuggestedCommunityAnalyserMethodType"></property>
    </bean>
 <!--   <context:component-scan base-package="org.societies.orchestration.CommunityLifecycleManagement.impl"></context:component-scan> -->
 </beans>

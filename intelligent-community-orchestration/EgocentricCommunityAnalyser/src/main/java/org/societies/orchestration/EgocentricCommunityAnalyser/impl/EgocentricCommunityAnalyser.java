@@ -36,9 +36,13 @@ import static org.mockito.Mockito.*;
 //import org.societies.api.internal.cis.management.ICisManager;
 //import org.societies.api.cis.management.ICisManager;
 //import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 //import org.societies.api.internal.cis.management.ICisRecord;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 
 import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.cis.management.ICisManager;
@@ -53,6 +57,7 @@ import org.societies.api.cis.management.ICisActivityFeed;
 
 import org.societies.api.identity.IIdentity;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
+import org.societies.api.identity.IIdentityManager;
 
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer;
@@ -89,6 +94,13 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
 	private ICisManager cisManager;
 	
 	private ICommManager commManager;
+    private ICommCallback commCallback;
+    private IIdentityManager identityManager;
+	
+	private IServiceDiscovery serviceDiscovery;
+	private IServiceDiscoveryCallback serviceDiscoveryCallback;
+	
+	private IDeviceManager deviceManager;
 	
 	/*
      * Constructor for EgocentricCommunityAnalyser
@@ -254,6 +266,38 @@ public class EgocentricCommunityAnalyser //implements ICommCallback
     
     public void setCommManager(ICommManager commManager) {
     	this.commManager = commManager;
+    }
+    
+    public ICommCallback getCommCallback() {
+    	return commCallback;
+    }
+    
+    public void setCommCallback(ICommCallback commCallback) {
+    	this.commCallback = commCallback;
+    }
+    
+    public IServiceDiscovery getServiceDiscovery() {
+    	return serviceDiscovery;
+    }
+    
+    public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
+    	this.serviceDiscovery = serviceDiscovery;
+    }
+    
+    public IServiceDiscoveryCallback getServiceDiscoveryCallback() {
+    	return serviceDiscoveryCallback;
+    }
+    
+    public void setServiceDiscoveryCallback(IServiceDiscoveryCallback serviceDiscoveryCallback) {
+    	this.serviceDiscoveryCallback = serviceDiscoveryCallback;
+    }
+    
+    public IDeviceManager getDeviceManager() {
+    	return deviceManager;
+    }
+    
+    public void setDeviceManager(IDeviceManager deviceManager) {
+    	this.deviceManager = deviceManager;
     }
     
     /**Returns the list of package names of the message beans you'll be passing*/

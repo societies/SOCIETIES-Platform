@@ -43,6 +43,8 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
  * This interface provides access to current, past and future context data. The
@@ -56,6 +58,7 @@ import org.societies.api.identity.IIdentity;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.2
  */
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface ICtxBroker {
 
 	/**
@@ -126,56 +129,6 @@ public interface ICtxBroker {
 	 * @throws CtxException 
 	 */
 	public Future<List<CtxEntityIdentifier>> lookupEntities(IIdentity requester, String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue) throws CtxException;
-
-	/**
-	 * Registers the specified EventListener for value modification events of the
-	 * specified context attribute.
-	 * 
-	 * @param requester
-	 * @param attrId
-	 * @throws CtxException
-	 * @deprecated As of 0.0.3, use {@link #registerForChanges(IIdentity, CtxChangeEventListener, CtxIdentifier)}
-	 */
-	@Deprecated
-	public void registerForUpdates(IIdentity requester, CtxAttributeIdentifier attrId) throws CtxException;
-
-	/**
-	 * Registers the specified EventListener for value modification events of the
-	 * specified context attribute.
-	 * 
-	 * @param requester
-	 * @param attrId
-	 * @throws CtxException
-	 * @deprecated As of 0.0.3, use {@link #unregisterFromChanges(IIdentity, CtxChangeEventListener, CtxIdentifier)} 
-	 */
-	@Deprecated
-	public void unregisterForUpdates(IIdentity requester, CtxAttributeIdentifier attrId) throws CtxException;
-	
-	/**
-	 * Registers the specified EventListener for value modification events of context
-	 * attribute(s) with the supplied scope and type.
-	 * 
-	 * @param requester
-	 * @param scope
-	 * @param attrType
-	 * @throws CtxException
-	 * @deprecated As of 0.0.3, use {@link #registerForChanges(IIdentity, CtxChangeEventListener, CtxEntityIdentifier, String)}  
-	 */
-	@Deprecated
-	public void registerForUpdates(IIdentity requester, CtxEntityIdentifier scope, String attrType) throws CtxException;
-	
-	/**
-	 * Unregisters the specified EventListener for value modification events of
-	 * context attribute(s) with the supplied scope and type.
-	 * 
-	 * @param requester
-	 * @param scope
-	 * @param attributeType
-	 * @throws CtxException 
-	 * @deprecated As of 0.0.3, use {@link #unregisterFromChanges(IIdentity, CtxChangeEventListener, CtxEntityIdentifier, String)}
-	 */
-	@Deprecated
-	public void unregisterForUpdates(IIdentity requester, CtxEntityIdentifier scope, String attributeType) throws CtxException;
 	
 	/**
 	 * Registers the specified {@link CtxChangeEventListener} for changes

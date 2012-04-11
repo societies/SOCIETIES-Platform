@@ -31,32 +31,33 @@ public interface ITrustRepository {
 
 	/**
 	 * 
-	 * 
 	 * @param entity
+	 * @return
 	 * @throws TrustRepositoryException
-	 * @since 0.0.5
 	 */
-	public void addEntity(final TrustedEntity entity) throws TrustRepositoryException;
+	public boolean addEntity(final TrustedEntity entity) throws TrustRepositoryException;
 
 	/**
 	 * 
 	 * @param teid
+	 * @return
 	 * @throws TrustRepositoryException
 	 */
-	public void retrieveEntity(final TrustedEntityId teid) throws TrustRepositoryException;
+	public TrustedEntity retrieveEntity(final TrustedEntityId teid) throws TrustRepositoryException;
 	
 	/**
 	 * 
 	 * @param entity
+	 * @return
 	 * @throws TrustRepositoryException
 	 */
-	public void updateEntity(TrustedEntity entity) throws TrustRepositoryException;
+	public TrustedEntity updateEntity(TrustedEntity entity) throws TrustRepositoryException;
 	
 	/**
 	 * 
 	 * @param entity
+	 * @return
+	 * @throws TrustRepositoryException
 	 */
-	public void removeEntity(TrustedEntity entity) throws TrustRepositoryException;
-
-	public void registerEntityEventListener();
+	public boolean removeEntity(TrustedEntity entity) throws TrustRepositoryException;
 }
