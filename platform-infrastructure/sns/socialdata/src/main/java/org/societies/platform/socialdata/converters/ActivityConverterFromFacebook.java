@@ -16,8 +16,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.societies.platform.socialdata.model.ActionLink;
 
-import com.sun.tools.internal.ws.wsdl.framework.Entity;
-
 public class ActivityConverterFromFacebook implements ActivityConverter {
 
 	
