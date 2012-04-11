@@ -32,43 +32,63 @@ import org.societies.api.context.model.CtxEntity;
 public interface ICtxSourceMgr {
 
 	/**
+	 * Registers a context source with the context source manager. This is necessary
+	 * in order to be able to send updates, i.e. new context information.
+	 * The return type is a String serving as identifier of this context source 
+	 * which is valid until the unregistration. 
 	 * 
-	 * @param name
-	 * @param contextType
-	 * @param ctxSourceCallback
+	 * @param name self-chosen name of the context source
+	 * @param contextType type of the context information which shall be provided by the updates
+	 * @return identifier to be used in the sendUpdate method
 	 */
 	public Future<String> register(String name, String contextType);
 
 	/**
+	 * Sends modified context information to the CSM which stores it in the context data base.
+	 * This is only possible after a registration.
+	 * The data thereby can be specified as belonging to a different user than the node-owner.
 	 * 
-	 * @param identifier
-	 * @param data
-	 * @param owner
+	 * @param identifier retrieved in the register call
+	 * @param data actual payload, the context update
+	 * @param owner the entity data is referring to 
+	 * @return true iff update was received and stored successfully
 	 */
 	public Future<Boolean> sendUpdate(String identifier, Serializable data, CtxEntity owner);
 
 	/**
+	 * Sends modified context information to the CSM which stores it in the context data base.
+	 * This is only possible after a registration.
+	 * The data thereby can be specified as belonging to a different user than the node-owner.
+	 * In addition the three Quality of Context (QoC) properties OriginType, Precision and UpdateFrequency
+	 * can be set.
 	 * 
-	 * @param identifier
-	 * @param data
-	 * @param owner
-	 * @param inferred
-	 * @param precision
-	 * @param frequency in Hz
+	 * @param identifier retrieved in the register call
+	 * @param data actual payload, the context update
+	 * @param owner the entity data is referring to
+	 * @param inferred boolean describing the QoC attribute "inferred", hence if the data attribute was inferred or not @see CtxQuality#getOriginType()
+	 * @param precision the precision QoC attribute  @see CtxQuality#getPrecision()
+	 * @param frequency frequency of data in Hz @see CtxQuality#getUpdateFrequency()
+	 * @return true iff update was received and stored successfully
 	 */ 
 	public Future<Boolean> sendUpdate(String identifier, Serializable data, CtxEntity owner,
             boolean inferred, double precision, double frequency);
 
 	/**
+	 * Sends modified context information to the CSM which stores it in the context data base.
+	 * This is only possible after a registration.
 	 * 
-	 * @param identifier
-	 * @param data
+	 * @param identifier retrieved in the register call
+	 * @param data actual payload, the context update
+	 * @return true iff update was received and stored successfully
 	 */
 	public Future<Boolean> sendUpdate(String identifier, Serializable data);
 
 	/**
+	 * Counterpart of the register method. unregisters a context soruce.
+	 * Afterwards, no updates can be sent any longer.
 	 * 
 	 * @param identifier
+	 * @return true iff unregistration was successful
 	 */
 	public Future<Boolean> unregister(String identifier);
 }
