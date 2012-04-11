@@ -7,7 +7,6 @@ import org.apache.shindig.social.core.model.AccountImpl;
 import org.apache.shindig.social.core.model.NameImpl;
 import org.apache.shindig.social.core.model.PersonImpl;
 import org.apache.shindig.social.opensocial.model.Account;
-import org.apache.shindig.social.opensocial.model.Name;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,6 +18,8 @@ public class FriendsConverterFromFacebook implements FriendsConverter{
 	
 	
 	public List<Person> load(String  data){
+		
+		
 		List <Person> friends = new ArrayList<Person>();
 		Account fb = new AccountImpl();
 		fb.setDomain("facebook.com");
@@ -27,8 +28,20 @@ public class FriendsConverterFromFacebook implements FriendsConverter{
 		
 		try {
 			JSONObject jdata  = new JSONObject(data);
+			if (jdata.has("error")){
+				return new ArrayList<Person>();
+			}
 			
-			JSONArray  jfriends = jdata.getJSONArray("data");
+			JSONArray  jfriends  =  null;
+			if (jdata.has("body")){
+				JSONObject body = new JSONObject("body");
+				jfriends = body.getJSONArray("data");
+			}
+			else if (jdata.has("data"))
+				jfriends = jdata.getJSONArray("data");
+			else jfriends = new JSONArray(data);
+			
+			 
 			for (int i =0; i<jfriends.length();i++){
 				JSONObject jfriend = jfriends.getJSONObject(i);
 				Person p = new PersonImpl();

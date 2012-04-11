@@ -114,11 +114,10 @@ public class SocialData implements ISocialData {
 			ISocialConnector connector = it.next();
 		    
 			getActivities(connector);
+			
 			updateProfile(connector);
-			updateFriends(connector);
 			updateGroups(connector);
-			
-			
+			updateFriends(connector);
 			/// UPDATE ALL DATA
 			
 			
@@ -154,7 +153,6 @@ public class SocialData implements ISocialData {
 		
 		ActivityConverter parser = ActivityConveterFactory.getActivityConverter(connector);
 		List<?> activities = parser.load(connector.getUserActivities());
-		System.out.println("N. attività:"+activities.size());
 		socialActivities.put(connector.getID(), activities);
 	}
 
@@ -162,7 +160,7 @@ public class SocialData implements ISocialData {
 	private void updateFriends(ISocialConnector connector) {
 		
 		FriendsConverter parser = FriendsConveterFactory.getPersonConverter(connector);
-		List<Person> friends = parser.load(connector.getUserProfile());
+		List<Person> friends = parser.load(connector.getUserFriends());
 		Iterator<Person> it = friends.iterator();
 		
 		while (it.hasNext()){
