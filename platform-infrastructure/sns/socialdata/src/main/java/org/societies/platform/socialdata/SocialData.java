@@ -143,7 +143,9 @@ public class SocialData implements ISocialData {
 
 
 	private void getActivities(ISocialConnector connector) {
-		ActivityConverter parser = ActivityConveterFactory.getPersonConverter(connector);
+		
+		ActivityConverter parser = ActivityConveterFactory.getActivityConverter(connector);
+		
 		socialActivities.put(connector.getID(), parser.load(connector.getUserActivities()));
 	}
 

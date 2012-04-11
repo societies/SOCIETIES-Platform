@@ -11,8 +11,6 @@ public class FacebookConnectorTest extends TestCase{
 	public void test() {
 		ISocialConnector facebook = new FacebookConnectorImpl("", "");
 		assertTrue(facebook.getConnectorName(), facebook.getConnectorName()==ISocialConnector.FACEBOOK_CONN);
-		
-    
 	}
 
 }

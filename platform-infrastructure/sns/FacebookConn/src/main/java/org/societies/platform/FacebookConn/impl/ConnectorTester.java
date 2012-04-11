@@ -2,6 +2,7 @@ package org.societies.platform.FacebookConn.impl;
 
 
 import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.platform.FacebookConn.FacebookConnector;
 
 
 
@@ -12,8 +13,10 @@ public class ConnectorTester {
 	 * http://wd.teamlife.it/fbconnector.php that allows to get the access token
 	 */
 	public static void main(String[] args) {
-		String access_token = "AAAFPIhZAkC90BACxKegPyIwc7rxot9Yn7zblMnv79S5sKveE08LENLiWXO97ZCL8NS7JFc3CU09k1ODJxlnZAWap1YUPykLmXrGZCt9gzAZDZD";
-		ISocialConnector connector = new FacebookConnectorImpl(access_token,null);
+		String access_token = "AAAFs43XOj3IBAGbtrA2I7cibWs8YD1ODGr7JiqXl0ZCJ4DBkeXKeSsth9r2EbRGj6jh1eBIhUAkIZBNs1nKOJU1Ys81xKxUqZAC13DwBAZDZD";
+		FacebookConnectorImpl connector = new FacebookConnectorImpl(access_token,null);
+		
+		
 		/*
 		System.out.println("User Profile:"+connector.getUserProfile());
 		System.out.println("User Groups:"+connector.getUserGroups());
@@ -21,7 +24,7 @@ public class ConnectorTester {
 		System.out.println("User Activies:"+connector.getUserActivities());	
 		*/
 		
-		System.out.println(" PROFILO" + connector.getUserGroups());
+		System.out.println(" FEED" + connector.getUserActivities());
 		System.out.println("=== END ===");
 
 	}
