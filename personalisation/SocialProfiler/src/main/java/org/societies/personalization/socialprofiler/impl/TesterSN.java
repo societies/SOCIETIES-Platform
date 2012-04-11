@@ -24,11 +24,14 @@
  */
 package org.societies.personalization.socialprofiler.impl;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.personalization.socialprofiler.SocialProfiler;
+import org.societies.personalization.socialprofiler.datamodel.GeneralInfo;
 import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
 import org.societies.platform.socialdata.SocialData;
 
@@ -39,6 +42,9 @@ public class TesterSN {
 	private static String access_token = "AAAFPIhZAkC90BABQNbZBfnJNokzK6J3929FoHLk51JUG9f0jjD78pF1KKCOI7ezsd7f6fVW47YKIWo3dcc5KdSLFg9E1u1fRxZAuzKbWwZDZD";
 
 	public static void main(String[] args) {
+		
+		File f = new File("data");
+		f.delete();
 		
 		SocialProfiler 	 profiler 		= new SocialProfiler();
 		SocialData		 socialData 	= new SocialData();
@@ -51,7 +57,10 @@ public class TesterSN {
 		profiler.addSocialNetwork(snList);
 		
 		try {
-			Thread.sleep(15000);
+			Thread.sleep(10000);
+			System.out.println("Retrieving info for user 0");
+			GeneralInfo info = profiler.getGraph().getGeneralInfo("0");
+				System.out.println(info.getLastName());
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

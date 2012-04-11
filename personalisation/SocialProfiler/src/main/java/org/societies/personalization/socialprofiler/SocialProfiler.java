@@ -196,11 +196,10 @@ public class SocialProfiler implements ISocialProfiler {
 	@Override
 	public List<ISocialConnector> getListOfLinkedSN() {
 		return this.engine.getSocialData().getSocialConnectors();
+	}	
+
+	public GraphManager getGraph() {
+		return this.graph;
 	}
-
-
-	
-
-	
 
 }

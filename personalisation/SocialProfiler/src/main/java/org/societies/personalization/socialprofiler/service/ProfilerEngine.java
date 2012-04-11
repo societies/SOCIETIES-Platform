@@ -134,6 +134,12 @@ public class ProfilerEngine implements Variables{
 		groups 	 	= socialData.getSocialGroups();
 		activities	= socialData.getSocialActivity();
 		
+		try {
+			Thread.sleep(8000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		if (!databaseConnection.connectMysql()){
 		   logger.error("Cannot proceed with request due to database connection problems.");
@@ -143,9 +149,9 @@ public class ProfilerEngine implements Variables{
 	
 		
 		
-		logger.debug("=============================================================");
-		logger.debug("=== Traversing NEO GRAPH     "); 
-		logger.debug("=============================================================");
+		logger.debug("=============================");
+		logger.debug("=== Traversing NEO GRAPH  ==="); 
+		logger.debug("=============================");
 		
 		// ANALIZZO ESISTENTI
 		ArrayList<String> list_usersIds = new ArrayList<String>();  // empty LIST
@@ -584,7 +590,7 @@ public class ProfilerEngine implements Variables{
 			long date_s=date*1000;
 			Date d = new Date(date_s);
 			
-			logger.debug("analysing each post of the user"+current_id+" ' Wall");
+			logger.debug("analysing each post of the user"+current_id+" 's Wall");
 			//NOTE going backwards through the DOM, the most recent are first
 			for(int j=posts.size()-1;j>=0;j--){
 //				ActivityEntry activity=(ActivityEntry) posts.get(j);
@@ -634,7 +640,10 @@ public class ProfilerEngine implements Variables{
 		ArrayList <Long> userId=new ArrayList<Long> ();
 		userId.add(Long.parseLong(current_id));
 		
-		Person user = (Person) profiles.get(0); // to be improved!!!!
+		Person user = null;
+		
+		if (profiles.size()>0)
+			user = (Person) profiles.get(0); // to be improved!!!!
 		
 		if (user != null) {
 			// TODO: Transform List of values into strings!
