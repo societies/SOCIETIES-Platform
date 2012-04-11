@@ -1,14 +1,6 @@
 package org.societies.platform.socialdata.service;
 
-import java.util.Iterator;
-import java.util.List;
-
-import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.json.JSONObject;
-import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.platform.FacebookConn.FacebookConnector;
-import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
-import org.societies.platform.socialdata.converters.ActivityConverterFromFacebook;
 
 
 
