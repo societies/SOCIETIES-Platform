@@ -36,16 +36,16 @@ public class JsonToSocialDataService {
 //		  
 //		  try {
 //			
-//			String data = c.getUserActivities();
+//			String data = c.getUserFriends();
 //			
 //			int index=0;
-//			ActivityConverterFromFacebook parser = new ActivityConverterFromFacebook();
+//			FriendsConverterFromFacebook parser = new FriendsConverterFromFacebook();
 //			
-//			List<ActivityEntry> list = parser.load(data);
-//			Iterator<ActivityEntry> it = list.iterator();
+//			List<Person> list = parser.load(data);
+//			Iterator<Person> it = list.iterator();
 //			while (it.hasNext()){
-//				ActivityEntry entry = it.next();
-//				System.out.println("-- " + index  + "Data:"+ entry.getPublished() + " From:" +entry.getActor().getDisplayName() + "  "+entry.getVerb() + " Message:"+entry.getContent());
+//				Person entry = it.next();
+//				System.out.println("-- "+entry.getName().getFormatted() + " is a "+entry.getRelationshipStatus());
 //				index++;
 //			}
 //		

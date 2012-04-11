@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
-import javax.media.jai.UntiledOpImage;
-
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.platform.FacebookConn.FacebookConnector;
 
@@ -37,7 +35,7 @@ public class FacebookConnectorImpl implements FacebookConnector {
 	private String 				identity	 = null;
 	private String 				name;
 	private String 				id;
-	private String				lastUpdate   = "last week";
+	private String				lastUpdate   = "yesterday";
 	
 	private Properties			parameters;
 	private FacebookClient 		facebookClient;

@@ -218,8 +218,8 @@ public class PersonConverterFromFacebook implements PersonConverter{
 			name.setFormatted(getString(NAME));
 		}
 		
-		if (getString(FIRSTNAME)!=null) name.setGivenName(getString(FIRSTNAME));
-		if (getString(FAMILYNAME)!=null) name.setGivenName(getString(FAMILYNAME));
+		if (getString(FIRSTNAME)!=null)  name.setGivenName(getString(FIRSTNAME));
+		if (getString(LASTNAME) !=null) name.setFamilyName(getString(LASTNAME));
 		
 		
 		return name;
