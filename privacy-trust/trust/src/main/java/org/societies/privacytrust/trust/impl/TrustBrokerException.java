@@ -34,10 +34,7 @@ import org.societies.api.internal.privacytrust.trust.TrustException;
  */
 public class TrustBrokerException extends TrustException {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 25724331779602381L;
 
 	/**
      * Constructs a <code>TrustBrokerException</code> with no detail message.
