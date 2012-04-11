@@ -29,6 +29,7 @@ import java.util.concurrent.Future;
 
 import org.societies.api.context.model.CtxEntity;
 
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface ICtxSourceMgr {
 
 	/**
