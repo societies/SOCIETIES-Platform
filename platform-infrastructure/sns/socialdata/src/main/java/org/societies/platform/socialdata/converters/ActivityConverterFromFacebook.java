@@ -24,6 +24,8 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 	public static final String DATA					=	"data";
 	public static final String ID					=	"id";
 	public static final String POST					=	"post";
+	private static final String STORY 				=   "story";
+	private static final String CAPTION 				=   "caption";
 	
 	
 	private static final String AUTHOR_NAME 		= "name";
@@ -36,6 +38,7 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 	private static final String LINK 				= "link";
 	private static final String APPLICATION 		= "application";
 	private static final String ACTIONLINKS 		= "actionLinks";
+	
 	
 	
 	String		imageUrl   	 = "https://graph.facebook.com/FBID/picture?type=normal&access_token=";      
@@ -62,8 +65,16 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 				entry.setActor(setActor(elm.getString(FROM)));
 				
 				if (elm.has(ICON)) 	  entry.setIcon(getIcon(elm));
+				
 				if (elm.has(MESSAGE)) 
 					entry.setContent(elm.getString(MESSAGE));
+				else if (elm.has(STORY))
+					entry.setContent(elm.getString(STORY));
+				else if (elm.has(CAPTION)){
+					entry.setContent(elm.getString(CAPTION));
+				}
+				//else entry.setContent("???");
+				
 				
 				entry.setVerb(POST);
 				entry.setUpdated(elm.getString(UPDATED_TIME));
