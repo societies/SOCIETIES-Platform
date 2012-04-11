@@ -24,7 +24,6 @@
  */
 package org.societies.privacytrust.trust.impl;
 
-import java.net.URISyntaxException;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
@@ -36,6 +35,7 @@ import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.TrustUpdateListener;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
+import org.societies.privacytrust.trust.api.model.MalformedTrustedEntityIdException;
 import org.societies.privacytrust.trust.api.model.TrustedEntity;
 import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.TrustedEntityType;
@@ -98,9 +98,9 @@ public class TrustBroker implements ITrustBroker {
 		final TrustedEntityId teid;
 		try {
 			teid = new TrustedEntityId(entityType, entityIdStr);
-		} catch (URISyntaxException urise) {	
+		} catch (MalformedTrustedEntityIdException mteide) {	
 			throw new TrustBrokerException("Could not create TrustedEntityId for entity '"
-					+ entityId + "'", urise);
+					+ entityId + "'", mteide);
 		}
 		
 		if (this.trustRepo == null)

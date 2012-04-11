@@ -22,42 +22,42 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.impl;
+package org.societies.privacytrust.trust.api.model;
 
 import org.societies.api.internal.privacytrust.trust.TrustException;
 
 /**
- * Thrown to indicate that the Trust Broker could not handle a request.
+ * Thrown to indicate a malformed {@link TrustedEntityId}.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.5
  */
-public class TrustBrokerException extends TrustException {
+public class MalformedTrustedEntityIdException extends TrustException {
 
-	private static final long serialVersionUID = 25724331779602381L;
+	private static final long serialVersionUID = -1528636958746998120L;
 
 	/**
-     * Constructs a <code>TrustBrokerException</code> with no detail message.
+     * Constructs a <code>MalformedTrustedEntityIdException</code> with no detail message.
      */
-    public TrustBrokerException() {
+    public MalformedTrustedEntityIdException() {
     	
         super();
     }
 
     /**
-     * Constructs a <code>TrustBrokerException</code> with the specified detail
+     * Constructs a <code>MalformedTrustedEntityIdException</code> with the specified detail
      * message.
      * 
      * @param message
      *            the detail message.
      */
-    public TrustBrokerException(String message) {
+    public MalformedTrustedEntityIdException(String message) {
     	
         super(message);
     }
 
     /**
-     * Creates a <code>TrustBrokerException</code> with the specified detail message
+     * Creates a <code>MalformedTrustedEntityIdException</code> with the specified detail message
      * and cause.
      * 
      * @param message
@@ -69,13 +69,13 @@ public class TrustBrokerException extends TrustException {
      *            permitted, and indicates that the cause is nonexistent or
      *            unknown.)
      */
-    public TrustBrokerException(String message, Throwable cause) {
+    public MalformedTrustedEntityIdException(String message, Throwable cause) {
     	
         super(message, cause);
     }
 
     /**
-     * Creates a <code>TrustBrokerException</code> with the specified cause and a
+     * Creates a <code>MalformedTrustedEntityIdException</code> with the specified cause and a
      * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
      * typically contains the class and detail message of <tt>cause</tt>).
      * 
@@ -85,7 +85,7 @@ public class TrustBrokerException extends TrustException {
      *            permitted, and indicates that the cause is nonexistent or
      *            unknown.)
      */
-    public TrustBrokerException(Throwable cause) {
+    public MalformedTrustedEntityIdException(Throwable cause) {
     	
         super(cause);
     }
