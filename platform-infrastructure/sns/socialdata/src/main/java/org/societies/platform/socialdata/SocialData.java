@@ -1,6 +1,7 @@
 package org.societies.platform.socialdata;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -83,7 +84,13 @@ public class SocialData implements ISocialData {
 
 	@Override
 	public List<Object> getSocialActivity() {
-		return new ArrayList(socialActivities.values());
+		List activities = new ArrayList();
+	    Iterator it = socialActivities.values().iterator();
+	    while (it.hasNext()){
+	    	Collection acts = (Collection)it.next();
+	    	activities.addAll(acts);
+	    }
+		return activities;
 	}
 
 	@Override
@@ -106,10 +113,11 @@ public class SocialData implements ISocialData {
 		while (it.hasNext()){
 			ISocialConnector connector = it.next();
 		    
+			getActivities(connector);
 			updateProfile(connector);
 			updateFriends(connector);
 			updateGroups(connector);
-			getActivities(connector);
+			
 			
 			/// UPDATE ALL DATA
 			
@@ -145,12 +153,14 @@ public class SocialData implements ISocialData {
 	private void getActivities(ISocialConnector connector) {
 		
 		ActivityConverter parser = ActivityConveterFactory.getActivityConverter(connector);
-		
-		socialActivities.put(connector.getID(), parser.load(connector.getUserActivities()));
+		List<?> activities = parser.load(connector.getUserActivities());
+		System.out.println("N. attività:"+activities.size());
+		socialActivities.put(connector.getID(), activities);
 	}
 
 
 	private void updateFriends(ISocialConnector connector) {
+		
 		FriendsConverter parser = FriendsConveterFactory.getPersonConverter(connector);
 		List<Person> friends = parser.load(connector.getUserProfile());
 		Iterator<Person> it = friends.iterator();
