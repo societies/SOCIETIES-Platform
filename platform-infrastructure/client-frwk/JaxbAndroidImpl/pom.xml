@@ -26,4 +26,40 @@
 	    </dependency>
     </dependencies>
     
+    
+    <build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId> 
+				<artifactId>maven-dependency-plugin</artifactId> 
+				<version>2.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>copy-dependencies</goal> 
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.societies.comm.android</groupId>
+	       							<artifactId>JaxbAndroidApi</artifactId>
+  								</artifactItem>
+  							</artifactItems>
+  							<outputDirectory>${project.build.directory}/endorsed</outputDirectory> 
+  						</configuration>
+  					</execution>
+  				</executions>
+  			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId> 
+				<artifactId>maven-compiler-plugin</artifactId> 
+				<version>2.3.2</version> 
+				<configuration>
+					<source>1.6</source> 
+					<target>1.6</target> 
+					<compilerArgument>-Djava.endorsed.dirs=${project.build.directory}/endorsed</compilerArgument> 
+ 				</configuration>
+ 			</plugin>
+    	</plugins>
+    </build>
 </project>
