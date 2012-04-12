@@ -26,10 +26,6 @@ package org.societies.personalization.socialprofiler.service;
 
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -42,13 +38,10 @@ import org.neo4j.graphdb.Transaction;
 import org.societies.api.internal.sns.ISocialData;
 import org.societies.personalization.socialprofiler.Variables;
 import org.societies.personalization.socialprofiler.datamodel.Interests;
-import org.societies.personalization.socialprofiler.datamodel.SocialGroup;
 import org.societies.personalization.socialprofiler.datamodel.SocialPerson;
 import org.societies.personalization.socialprofiler.datamodel.impl.RelTypes;
 import org.societies.personalization.socialprofiler.datamodel.impl.SocialPersonImpl;
 import org.societies.personalization.socialprofiler.exception.NeoException;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 public class ProfilerEngine implements Variables{
 
@@ -59,16 +52,12 @@ public class ProfilerEngine implements Variables{
 	
 	private List<?> 			friends 	= new ArrayList<Person>();
 	private List<?> 			profiles 	= new ArrayList<Person>();
-	private List<?>	 			groups 		= new ArrayList<Group>();
 	private List<?> 			activities = new ArrayList<ActivityEntry>();
 	
 	private boolean 			firstTime   = true;
+	public static final String	INITIAL_USER_ID = "0";
 	
-	
-	private Hashtable<String, ArrayList<String>>  credentials_sn			= new Hashtable<String, ArrayList<String>> ();
-	private Hashtable<String, ArrayList<String>>  credentials_sn_auxiliary	= new Hashtable<String, ArrayList<String>> ();
-	
-	
+		
 	public ProfilerEngine(GraphManager graph, DatabaseConnection databaseConnection, ISocialData socialData){
 	
 		this.graph 					= graph;
@@ -88,16 +77,6 @@ public class ProfilerEngine implements Variables{
 		
 	}
 	
-	
-	/**
-	 * returns the service given as parameter to the constructor
-	 * @return ServiceImpl
-	 */
-	 public GraphManager getService() {
-		return graph;
-	}
-
-	
 	/**
 	 * returns the databaseConnection given as parameter to the constructor
 	 * @return
@@ -109,8 +88,6 @@ public class ProfilerEngine implements Variables{
 	public void setDatabaseConnection(DatabaseConnection databaseConnection) {
 		this.databaseConnection = databaseConnection;
 	}
-	
-	
 	
 	
 	/**
@@ -133,7 +110,6 @@ public class ProfilerEngine implements Variables{
 		// Update data source
 		profiles 	= socialData.getSocialProfiles();
 		friends  	= socialData.getSocialPeople();
-		groups 	 	= socialData.getSocialGroups();
 		activities	= socialData.getSocialActivity();
 		
 		try {
@@ -146,10 +122,7 @@ public class ProfilerEngine implements Variables{
 		if (!databaseConnection.connectMysql()){
 		   logger.error("Cannot proceed with request due to database connection problems.");
 		   return;
-	   }
-		
-	
-		
+	    }
 		
 		logger.debug("=============================");
 		logger.debug("=== Traversing NEO GRAPH  ==="); 
@@ -178,7 +151,7 @@ public class ProfilerEngine implements Variables{
 		
 		
 		
-		databaseConnection.addInfoForCommunityProfile();
+//		databaseConnection.addInfoForCommunityProfile();
 
 		databaseConnection.closeMysql();
 		logger.debug("=============================================================");
@@ -188,20 +161,23 @@ public class ProfilerEngine implements Variables{
 	
 	private void generateCompleteNetwork(){
 		logger.debug("GENERATING the whole network including isolated clusters and/or nodes");
-		graph.createPerson("ROOT");
-		
-		// creating base user (needs to be a number)
-		String userId = "0";
-		logger.debug("### adding new cluster using user "+userId); 
+		graph.createPerson(SocialPerson.ROOT);
 		
 		if (!databaseConnection.connectMysql()){
 		   logger.error("Cannot proceed with request due to database connection problems.");
 		   return;
 	    }
-		generateTree(userId,null,FIRST_TIME); 
 		
-		databaseConnection.addInfoForCommunityProfile();
+		createInitialUsers();
+		
+//		databaseConnection.addInfoForCommunityProfile();
 		databaseConnection.closeMysql();
+	}
+	
+	private void createInitialUsers(){
+		// creating base user (needs to be a number)
+		logger.debug("Creating initial user: "+INITIAL_USER_ID); 
+		generateTree(INITIAL_USER_ID,null,FIRST_TIME);		
 	}
 	
 	
@@ -213,7 +189,7 @@ public class ProfilerEngine implements Variables{
 		Transaction tx = graph.getNeoService().beginTx();
 		try{
 			Node startPersonNode	=  ((SocialPersonImpl) p).getUnderlyingNode();
-			Node rootNode			=  ((SocialPersonImpl) graph.getPerson("ROOT")).getUnderlyingNode();
+			Node rootNode			=  ((SocialPersonImpl) graph.getPerson(SocialPerson.ROOT)).getUnderlyingNode();
 			
 			startPersonNode.createRelationshipTo(rootNode, RelTypes.TRAVERSER);
 			tx.success();
@@ -252,8 +228,7 @@ public class ProfilerEngine implements Variables{
 			linkToRoot(startPerson);
 			
 			databaseConnection.addUserToDatabase(current_id, startPerson.getName());
-			credentials_sn.remove(current_id);
-			
+						
 			logger.debug("---# initialising user"+current_id+" profile percentages");
 			
 			// TODO - initialize percentages
@@ -273,23 +248,16 @@ public class ProfilerEngine implements Variables{
 			
 			
 			
-			// ADD GROUP for the USER	
-			createGroupsAndCategories(current_id, startPerson, (List<Group>)groups);			 	
 			
-			// TODO: actually is not used
+			// TODO
 			//     createFanPagesAndCategories(current_id, startPerson, client);    
 			
 			// Update USER INTERESTs
-			initialiseUserInformation(current_id, startPerson);
+			initialiseUserInformation(current_id, startPerson);			
+			generateUserInformation(current_id, profiles);			
+			initialiseUserProfiles(current_id, activities);			
 			
-			generateUserInformation(current_id, (List<Person>)profiles);
-			
-			initialiseUserProfiles(current_id, (List<Person>)profiles);
-			
-			
-			//// SET WINDOW TIME to get the last Activities
-			
-			
+			//// SET WINDOW TIME to get the last Activities			
 			//current time- 1 week				
 			java.util.TimeZone.setDefault(TimeZone.getTimeZone("GMT")); 
 			java.util.Date today = new java.util.Date();
@@ -357,13 +325,12 @@ public class ProfilerEngine implements Variables{
 			}
 			else if((option==UPDATE_EVERYTHING)		||
 					(option==UPDATE_ONLY_STREAM)	||
-					(option==UPDATE_STREAM_AND_FANPAGES_AND_GROUPS)	||
+					(option==UPDATE_STREAM_AND_FANPAGES)	||
 					(option==UPDATE_STREAM_AND_USER_INFORMATION)){
 					// checking if current user still exists. always true for now
 					boolean exists=true;
 					if (exists){
 							logger.debug("--current user "+current_id+" found");	
-							credentials_sn.remove(current_id);
 							// checking if current user has valid credentials (eg token). always true for now
 							boolean valid=true;
 							if (!valid){		
@@ -408,7 +375,6 @@ public class ProfilerEngine implements Variables{
 						switch (option){
 							case UPDATE_EVERYTHING :{
 //								createFanPagesAndCategories(current_id, startPerson, client); //adding additional fan pages if necessary
-								createGroupsAndCategories(current_id, startPerson, groups);	// adding additional groups if necessary
 								updateUserInformation(current_id, startPerson, profiles);//modifying general info if necessary
 								updateProfileContent(current_id, startPerson, activities);//updating profile content information if necessary
 								break;
@@ -417,9 +383,8 @@ public class ProfilerEngine implements Variables{
 								updateProfileContent(current_id, startPerson, activities);//updating profile content information if necessary
 								break;
 							}
-							case UPDATE_STREAM_AND_FANPAGES_AND_GROUPS :{
+							case UPDATE_STREAM_AND_FANPAGES :{
 //								createFanPagesAndCategories(current_id, startPerson, client); //adding additional fan pages if necessary
-								createGroupsAndCategories(current_id, startPerson, groups);	// adding additional groups if necessary
 								updateProfileContent(current_id, startPerson, activities);//updating profile content information if necessary
 								break;
 							}
@@ -432,8 +397,6 @@ public class ProfilerEngine implements Variables{
 								logger.debug("ERROR , nothing will be updated , the update option introduced doesn't exist");
 							}
 						}						
-						
-						credentials_sn.remove(current_id);
 					}
 				}else{ // dead code for now.
 					logger.debug("removing current id"+current_id+" from neo network , index ");
@@ -449,68 +412,21 @@ public class ProfilerEngine implements Variables{
 	}
 
 	
-	/**
-	 * Create associtation between USER <==> GROUP
-	 * @param current_id
-	 * @param startPerson
-	 * @param groups
-	 */
-	public void createGroupsAndCategories(String current_id,  SocialPerson startPerson, List<?> groups){
-
-		logger.debug(" === [ GROUPS ] followed by user "+current_id);	
-					
-		ArrayList <String> groups_ids=new ArrayList <String> ();
-		
-		ArrayList <Long> existent_groups_ids	=  graph.getListOfGroups(current_id);
-		ArrayList <Long> remaining_groups_ids	=  graph.convertArrayOfStringToLong(groups_ids);
-		
-		graph.projectArrays(remaining_groups_ids, existent_groups_ids);
-				
-		for(int j=0;j<remaining_groups_ids.size();j++){
-			
-			String groupId=remaining_groups_ids.get(j).toString();
-			
-			if (groupId!=null){
-			
-				logger.debug("Group[id] => "+ groupId);
-				SocialGroup group	=	graph.linkGroup(startPerson, groupId);
-				logger.debug("[ADD] Content to [GROUP]:"+groupId);
-				
-				
-				Group currentGroup 	= findGroup(groupId);
-				String type			= currentGroup.getTitle();
-				String subType		= currentGroup.getDescription();
-				
-				graph.updateGroup	(groupId, currentGroup.getId().getGroupId() , type, subType,
-									null/*group_data.get(5)*/,null/*group_data.get(1)*/,null/*group_data.get(4)*/
-					);
-				
-				if ((!type.equals(""))&&(type!=null)&&(!subType.equals(""))&&(subType!=null)){
-//					logger.debug("checking if type "+type+" and subtype "+subType+" of Group "+groupId+" exists" );
-//					group.linkGroupCategoryAndSubCategory(group, type, subType, startPerson);
-				}
-			}
-			else logger.warn(" Group [NULL]");
 	
-		}
-	}
-
 	
 	
 	public void initialiseUserInformation(String current_id, SocialPerson person){
 		
-		logger.debug("[INIT] GeneralInfo and Interest for user "+current_id);
-		
+		logger.debug("[INIT] GeneralInfo and Interests for user "+current_id);
 		logger.debug("[INTERESTS]");
 		
-		graph.linkInterests(person,current_id+"_Interests" );   
-		
-		graph.updateInterests(current_id+"_Interests","nothing_yet","nothing_yet","nothing_yet","nothing_yet","nothing_yet","nothing_yet","nothing_yet","0");
+		graph.linkInterests(person,current_id+"_Interests");		
+		graph.updateInterests(current_id+"_Interests","","","","","","","","0");
 		
 		logger.debug("[GENERAL_INFO]");
 		
 		graph.linkGeneralInfo(person,current_id+"_GeneralInfo"); 
-		graph.updateGeneralInfo(current_id+"_GeneralInfo","nothing_yet","nothing_yet","nothing_yet","nothing_yet", "nothing_yet","nothing_yet","nothing_yet","nothing_yet");
+		graph.updateGeneralInfo(current_id+"_GeneralInfo","","","","", "","","","");
 	}
 	
 	public void updateUserInformation(String current_id,SocialPerson person, List<?> profiles){
@@ -727,14 +643,7 @@ public class ProfilerEngine implements Variables{
 //				}
 //			}// if from_id	
 //		}//for comment_list	
-	}
-
-	private Group findGroup(String groupId) {
-		for (int i=0; i<groups.size(); i++)
-			if (groupId.equals(((Group)groups.get(i)).getId().getGroupId())) return (Group)groups.get(i);	
-		return null;
-	}
-	
+	}	
 	
 	public void generateUserInformation(String current_id, List<?> profiles){
 		
@@ -805,7 +714,7 @@ public class ProfilerEngine implements Variables{
 	
 	
 	
-	public void initialiseUserProfiles(String current_id, List<Person> profiles){
+	public void initialiseUserProfiles(String current_id, List<?> activities){
 		
 		logger.info("@@@@ creating and initialising the user profiles @@@@");
 		//		logger.debug(" ---- NarcissismManiac---Profile  ");		

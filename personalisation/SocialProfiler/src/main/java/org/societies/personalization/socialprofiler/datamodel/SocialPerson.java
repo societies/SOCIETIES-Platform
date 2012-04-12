@@ -31,6 +31,10 @@ import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile;
 public interface SocialPerson {
 
 	
+	public final String ROOT = "ROOT";
+
+
+
 	/**
 	 * Set a new profile in the Person Behaviour
 	 * @param profile Settings
