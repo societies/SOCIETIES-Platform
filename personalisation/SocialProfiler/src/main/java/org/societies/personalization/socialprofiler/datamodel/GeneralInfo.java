@@ -64,14 +64,14 @@ public interface GeneralInfo {
 	 * returns the sex of the user
 	 * @return String sex
 	 */
-	public String getSex();
+	public String getGender();
 	
 	/**
 	 * set the sex of the user
 	 * @param sex
 	 * 			String sex of user
 	 */	
-	public void setSex(String sex);
+	public void setGender(String sex);
 	
 	/**
 	 * returns the hometown of the user
@@ -114,11 +114,11 @@ public interface GeneralInfo {
 	 * returns the religious of the user
 	 * @return String religious
 	 */
-	public String getReligious();
+	public String getReligion();
 	
 	/**
 	 * sets the religious of the user
 	 * @param String religious
 	 */
-	public void setReligious(String religious);
+	public void setReligion(String religious);
 }

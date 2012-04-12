@@ -83,11 +83,11 @@ public interface NodeProperties {
 	public static final String FIRST_NAME_PROPERTY							="firstName";
 	public static final String LAST_NAME_PROPERTY							="lastName";
 	public static final String BIRTHDAY_PROPERTY							="birthday";
-	public static final String SEX_PROPERTY									="sex";
+	public static final String GENDER_PROPERTY									="sex";
 	public static final String HOMETOWN_PROPERTY							="hometown";
 	public static final String CURRENT_LOCATION_PROPERTY					="currentLocation";
 	public static final String POLITICAL_PROPERTY							="political";
-	public static final String RELIGIOUS_PROPERTY							="religious";
+	public static final String RELIGION_PROPERTY							="religious";
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Interests properties

@@ -39,6 +39,7 @@ import org.societies.api.internal.sns.ISocialData;
 import org.societies.personalization.socialprofiler.Variables;
 import org.societies.personalization.socialprofiler.datamodel.Interests;
 import org.societies.personalization.socialprofiler.datamodel.SocialPerson;
+import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile;
 import org.societies.personalization.socialprofiler.datamodel.impl.RelTypes;
 import org.societies.personalization.socialprofiler.datamodel.impl.SocialPersonImpl;
 import org.societies.personalization.socialprofiler.exception.NeoException;
@@ -54,7 +55,6 @@ public class ProfilerEngine implements Variables{
 	private List<?> 			profiles 	= new ArrayList<Person>();
 	private List<?> 			activities = new ArrayList<ActivityEntry>();
 	
-	private boolean 			firstTime   = true;
 	public static final String	INITIAL_USER_ID = "0";
 	
 		
@@ -232,7 +232,7 @@ public class ProfilerEngine implements Variables{
 			logger.debug("---# initialising user"+current_id+" profile percentages");
 			
 			// TODO - initialize percentages
-			//graph.updatePersonPercentages(current_id,"0", "0", "0", "0","0","0");
+			graph.updatePersonPercentages(current_id,"0", "0", "0", "0","0","0");
 			
 			logger.debug("---*checking previous user id in order to create relationship");
 			
@@ -244,18 +244,17 @@ public class ProfilerEngine implements Variables{
 				SocialPerson endPerson=graph.getPerson(previous_id);
 				logger.info("---# Trying to create relationship between "+current_id+" and "+previous_id+" with name "+nameDescription);
 				graph.createDescription(startPerson, endPerson, current_id, previous_id);
-			}
-			
-			
-			
+			}			
 			
 			// TODO
 			//     createFanPagesAndCategories(current_id, startPerson, client);    
 			
-			// Update USER INTERESTs
+			// Initialize USER Generic information
 			initialiseUserInformation(current_id, startPerson);			
-			generateUserInformation(current_id, profiles);			
-			initialiseUserProfiles(current_id, activities);			
+			generateUserInformation(current_id, profiles);		
+			
+			// Initialize USER Behavioural profiles
+			initialiseUserProfiles(current_id, startPerson);			
 			
 			//// SET WINDOW TIME to get the last Activities			
 			//current time- 1 week				
@@ -665,12 +664,12 @@ public class ProfilerEngine implements Variables{
 			if (updatedDate != null)
 				updatedDateS = updatedDate.toString();
 			graph.updateInterests(current_id+"_Interests", 
-								  "activities", 
-								  "interestList", 
-							      "music",
-							      "movies", 
-							      "books", 
-							      "quotations", 
+								  "", 
+								  "", 
+							      "",
+							      "", 
+							      "", 
+							      "", 
 							      user.getAboutMe(),
 								  updatedDateS);
 			try {
@@ -688,12 +687,12 @@ public class ProfilerEngine implements Variables{
 			}
 		}else {
 			graph.updateInterests(current_id+"_Interests", 
-								  "activities", 
-								  "interestList", 
-							      "music",
-							      "movies", 
-							      "books", 
-							      "quotations", 
+								  "", 
+								  "", 
+							      "",
+							      "", 
+							      "", 
+							      "", 
 							      null,
 								  null);
 				
@@ -714,24 +713,24 @@ public class ProfilerEngine implements Variables{
 	
 	
 	
-	public void initialiseUserProfiles(String current_id, List<?> activities){
+	public void initialiseUserProfiles(String current_id, SocialPerson person){
 		
 		logger.info("@@@@ creating and initialising the user profiles @@@@");
-		//		logger.debug(" ---- NarcissismManiac---Profile  ");		
-		//		graph.linkNarcissismManiac(person,current_id+"_NarcissismManiac" );
-		//		graph.updateNarcissismManiac(current_id+"_NarcissismManiac", "0", "0", "0");
-		//		logger.debug(" ---- SuperActiveManiac---Profile  ");
-		//		graph.linkSuperActiveManiac(person, current_id+"_SuperActiveManiac");
-		//		graph.updateSuperActiveManiac(current_id+"_SuperActiveManiac", "0", "0", "0");
-		//		logger.debug(" ---- PhotoManiac---Profile  ");
-		//		graph.linkPhotoManiac(person, current_id+"_PhotoManiac");
-		//		graph.updatePhotoManiac(current_id+"_PhotoManiac", "0", "0", "0");
-		//		logger.debug(" ---- SurfManiac---Profile  ");
-		//		graph.linkSurfManiac(person, current_id+"_SurfManiac");
-		//		graph.updateSurfManiac(current_id+"_SurfManiac", "0", "0", "0");
-		//		logger.debug(" ---- QuizManiac---Profile  ");
-		//		graph.linkQuizManiac(person, current_id+"_QuizManiac");
-		//		graph.updateQuizManiac(current_id+"_QuizManiac", "0", "0","0");
+		logger.debug(" ---- NarcissismManiac---Profile  ");		
+		graph.linkManiac(person,current_id+"_NarcissismManiac", Profile.Type.EGO_CENTRIC);
+		graph.updateNarcissismManiac(current_id+"_NarcissismManiac", "0", "0", "0");
+		logger.debug(" ---- SuperActiveManiac---Profile  ");
+		graph.linkManiac(person, current_id+"_SuperActiveManiac", Profile.Type.SUPER_ACTIVE);
+		graph.updateSuperActiveManiac(current_id+"_SuperActiveManiac", "0", "0", "0");
+		logger.debug(" ---- PhotoManiac---Profile  ");
+		graph.linkManiac(person, current_id+"_PhotoManiac", Profile.Type.PHOTO_MANIAC);
+		graph.updatePhotoManiac(current_id+"_PhotoManiac", "0", "0", "0");
+		logger.debug(" ---- SurfManiac---Profile  ");
+		graph.linkManiac(person, current_id+"_SurfManiac", Profile.Type.SURF_MANIAC);
+		graph.updateSurfManiac(current_id+"_SurfManiac", "0", "0", "0");
+		logger.debug(" ---- QuizManiac---Profile  ");
+		graph.linkManiac(person, current_id+"_QuizManiac", Profile.Type.QUIZ_MANIAC);
+		graph.updateQuizManiac(current_id+"_QuizManiac", "0", "0","0");
 	}
 	
 	public void updateProfileStatistics(String  userId, String lastTime, String lastTime_old,int option)
