@@ -24,7 +24,7 @@ public class GeneralInfoImpl implements GeneralInfo, NodeProperties{
 	}
 
 	/**
-	 * returns the underlyong node of the GeneralInfo
+	 * returns the underlying node of the GeneralInfo
 	 * @return	Node underlyingNode
 	 */
 	public Node getUnderlyingNode() {

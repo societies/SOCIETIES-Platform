@@ -18,7 +18,7 @@ public interface Variables {
 	public final int FIRST_TIME=100;
 	public final int UPDATE_ONLY_STREAM=200;
 	public final int UPDATE_STREAM_AND_USER_INFORMATION=300;
-	public final int UPDATE_STREAM_AND_FANPAGES_AND_GROUPS=400;
+	public final int UPDATE_STREAM_AND_FANPAGES=400;
 	public final int UPDATE_EVERYTHING=500;
 
 	public final int SIMPLE_INFO=10;

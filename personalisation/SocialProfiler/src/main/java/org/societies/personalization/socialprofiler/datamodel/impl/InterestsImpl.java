@@ -19,7 +19,7 @@ public class InterestsImpl implements Interests,NodeProperties {
 	}
 
 	/**
-	 * returns the underlyong node of the group
+	 * returns the underlying node of the interests
 	 * @return	Node underlyingNode
 	 */
 	public Node getUnderlyingNode() {

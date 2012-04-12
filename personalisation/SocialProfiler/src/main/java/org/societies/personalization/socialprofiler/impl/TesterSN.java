@@ -32,6 +32,7 @@ import java.util.List;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.personalization.socialprofiler.SocialProfiler;
 import org.societies.personalization.socialprofiler.datamodel.GeneralInfo;
+import org.societies.personalization.socialprofiler.service.ProfilerEngine;
 import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
 import org.societies.platform.socialdata.SocialData;
 
@@ -39,7 +40,7 @@ import org.societies.platform.socialdata.SocialData;
 public class TesterSN {
 
 	
-	private static String access_token = "AAAFPIhZAkC90BABQNbZBfnJNokzK6J3929FoHLk51JUG9f0jjD78pF1KKCOI7ezsd7f6fVW47YKIWo3dcc5KdSLFg9E1u1fRxZAuzKbWwZDZD";
+	private static String access_token = "AAAFs43XOj3IBAM6SpqsYm9VsKPziTCFH5v3S8cYRL8uO6yFvsO8KAVBjDLp66rZBueFbZAoFoowa7Ah7pQCtx55OqFMrXslZCe5INKRggZDZD";
 
 	public static void main(String[] args) {
 		
@@ -58,9 +59,10 @@ public class TesterSN {
 		
 		try {
 			Thread.sleep(10000);
-			System.out.println("Retrieving info for user 0");
-			GeneralInfo info = profiler.getGraph().getGeneralInfo("0");
+			System.out.println("Retrieving info for user " + ProfilerEngine.INITIAL_USER_ID);
+			GeneralInfo info = profiler.getGraph().getGeneralInfo(ProfilerEngine.INITIAL_USER_ID + "_GeneralInfo");
 				System.out.println(info.getLastName());
+				System.out.println(info.getFirstName());
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
