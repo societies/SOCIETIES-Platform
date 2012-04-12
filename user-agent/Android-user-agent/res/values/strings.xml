@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello! Feedback GUI coming soon..</string>
+    <string name="app_name">User Agent</string>
+    
+    <!-- Buttons -->
+    <string name="monitoring_name">Monitoring</string>
+    <string name="feedback_name">Feedback</string>
+    <string name="uam_sayHelloButton">Say Hello!</string>
+    <string name="uam_sayGoodbyeButton">Say Goodbye!</string>
+
+</resources>

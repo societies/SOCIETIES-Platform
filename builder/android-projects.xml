@@ -50,6 +50,8 @@
 		<module>../platform-infrastructure/client-frwk/AndroidPubsubApi</module>
 		<module>../platform-infrastructure/client-frwk/AndroidAgent</module>
 		<module>../platform-infrastructure/client-frwk/AndroidPubsub</module>
+		<module>../platform-infrastructure/client-frwk/JaxbAndroidApi</module>
+		<module>../platform-infrastructure/client-frwk/JaxbAndroidImpl</module>
 
 
 		<!-- API -->
@@ -74,6 +76,9 @@
 
 		<!-- Test applications N.B. Requires that emulator is started -->
 		<!--module>../platform-infrastructure/client-frwk/TestIPCServices</module -->
+		
+		<!-- Android User Agent -->
+		<module>../user-agent/Android-user-agent</module>
 
 	</modules>
 </project>

@@ -122,8 +122,8 @@
 		<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser</module>
 
 		<!-- Privacy & Trust -->
-		<module>../privacy-trust/privacy-protection</module>
-		<module>../privacy-trust/trust</module>
+		<module>../privacy-trust/java/privacy-protection</module>
+		<module>../privacy-trust/java/trust</module>
 
 		<!-- PlatForm Web App -->	
 		<module>../platform-infrastructure/service-lifecycle/platform-webapp/</module>

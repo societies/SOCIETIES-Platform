@@ -22,25 +22,22 @@ import org.neo4j.graphdb.Traverser;
 import org.neo4j.index.lucene.LuceneIndexService;
 import org.societies.personalization.socialprofiler.Variables;
 import org.societies.personalization.socialprofiler.datamodel.GeneralInfo;
-import org.societies.personalization.socialprofiler.datamodel.GroupCategory;
-import org.societies.personalization.socialprofiler.datamodel.GroupSubCategory;
 import org.societies.personalization.socialprofiler.datamodel.Interests;
 import org.societies.personalization.socialprofiler.datamodel.RelationshipDescription;
-import org.societies.personalization.socialprofiler.datamodel.SocialGroup;
 import org.societies.personalization.socialprofiler.datamodel.SocialPage;
 import org.societies.personalization.socialprofiler.datamodel.SocialPageCategory;
 import org.societies.personalization.socialprofiler.datamodel.SocialPerson;
 import org.societies.personalization.socialprofiler.datamodel.UserInfo;
+import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile;
 import org.societies.personalization.socialprofiler.datamodel.impl.InterestsImpl;
+import org.societies.personalization.socialprofiler.datamodel.impl.ProfileImpl;
 import org.societies.personalization.socialprofiler.datamodel.impl.RelTypes;
 import org.societies.personalization.socialprofiler.datamodel.impl.RelationshipDescriptionImpl;
-import org.societies.personalization.socialprofiler.datamodel.impl.SocialGroupImpl;
 import org.societies.personalization.socialprofiler.datamodel.impl.SocialPersonImpl;
 import org.societies.personalization.socialprofiler.datamodel.impl.GeneralInfoImpl;
 import org.societies.personalization.socialprofiler.datamodel.utils.IntegerAdder;
 import org.societies.personalization.socialprofiler.datamodel.utils.IntegerDivider;
 import org.societies.personalization.socialprofiler.exception.NeoException;
-
 
 public class GraphManager implements Variables{
 
@@ -465,131 +462,6 @@ public class GraphManager implements Variables{
 			tx.finish();
 		}		 
         return description;
-	}
-	
-	public SocialGroup createGroup(String name) {
-		SocialGroup group=null;
-		Transaction tx = getNeoService().beginTx();
-		try{
-		
-			logger.debug("creating group with name "+name);
-			logger.debug(" verying there is no group in the index with the same name");
-			SocialGroup test=getGroup(name);
-			if (test!=null){
-				logger.info("unable to create group with name "+name+", already exists a group with this name");
-				return null;
-			}
-		
-			logger.debug("no group found with the same name=>ALLOW-> creating group properly");
-			final Node groupNode=neoService.createNode();
-			group=new SocialGroupImpl(groupNode);
-			group.setName(name);
-		
-			logger.debug("indexing new created group to Lucene");
-			luceneIndexService.index(groupNode,NAME_INDEX,name);
-			tx.success();
-		}finally{
-			tx.finish();
-		}																			
-		return group;
-	}
-	
-	public SocialGroup getGroup(String name) {
-		SocialGroup group = null;
-		Transaction tx = getNeoService().beginTx();
-		try{
-			logger.debug("**Reading Lucene Index**  searching for group "+name);
-			Node groupNode = luceneIndexService.getSingleNode( NAME_INDEX, name );
-			if ( groupNode == null )
-			{
-				logger.debug("group "+name+" was not found in lucene index");
-			}
-			
-			if ( groupNode != null )
-			{
-				logger.debug("group "+name+" was found on Lucene index => returning it");
-				group = new SocialGroupImpl( groupNode );
-				if(group==null){logger.error("ERROR while creating instance of group - to be returned");}
-			}else{
-				logger.debug("returning NULL: Reason : no group found on Lucene with that name ");
-			}
-			tx.success();
-		}finally{
-			tx.finish();
-		}						
-		return group;
-	}
-	
-	public SocialGroup linkGroup(SocialPerson person,String groupId){
-		logger.debug("linking group to person");
-		SocialGroup group=null;
-		Transaction tx = getNeoService().beginTx();
-		try{
-			if (person==null){
-				logger.error("ERROR-person-null");
-			}else{
-				logger.debug("checking to see if a new group will be created or it exists already");
-				group=getGroup(groupId);
-				if (group==null){
-					logger.debug("creating new group before linking");
-					group=createGroup(groupId);
-					if (group==null){
-						logger.fatal("ERROR - group seemed not to exist - was created - but is null");
-					}
-				}else{
-					logger.debug("group solved => linking");
-				}
-				final Node startNode = ((SocialPersonImpl) person).getUnderlyingNode();
-				final Node endNode = ((SocialGroupImpl) group).getUnderlyingNode();
-				@SuppressWarnings("unused")
-				final Relationship relationship = startNode.createRelationshipTo( endNode, RelTypes.IS_A_MEMBER_OF );
-			
-				logger.debug(" [Relationship] created");
-				logger.debug(" [USER] "+person.getName()+" IS A MEMBER OF [GROUP]"+group.getName());
-			}
-			tx.success();
-		}finally{
-			tx.finish();
-		}		
-		return group;
-	}
-	
-
-	public void updateGroup (String groupId,String realName,String type,String subType, String updateTime,String description,String creator){
-		
-		logger.debug("[UPDATE GROUP]");
-		Transaction tx = getNeoService().beginTx();
-		try{
-			SocialGroup group=getGroup(groupId);
-			if (group==null){
-				logger.error("[NULL] group is null - impossible to update it");
-			}
-			else{
-				if (realName!=null){
-					group.setRealName(realName);
-				}
-				if (type!=null){
-					group.setGroupType(type);
-				}
-				if (subType!=null){
-					group.setGroupSubType(subType);
-				}
-				if (updateTime!=null){
-					group.setUpdateTime(updateTime);
-				}
-				if (description!=null){
-					group.setDescription(description);
-				}
-				if (creator!=null){
-					group.setCreator(creator);
-				}
-				logger.debug("group information was updated successfully");
-			}
-			tx.success();
-		}finally{
-			tx.finish();
-		}	
-		
 	}
 
 	/* (non-Javadoc)
@@ -1157,52 +1029,6 @@ public class GraphManager implements Variables{
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.socialprofiler.service.Service#createGroupCategory(java.lang.String)
-	 */
-	
-	public GroupCategory createGroupCategory(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.socialprofiler.service.Service#getGroupCategory(java.lang.String)
-	 */
-	
-	public GroupCategory getGroupCategory(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.socialprofiler.service.Service#createGroupSubCategory(java.lang.String)
-	 */
-	
-	public GroupSubCategory createGroupSubCategory(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.socialprofiler.service.Service#getGroupSubCategory(java.lang.String)
-	 */
-	
-	public GroupSubCategory getGroupSubCategory(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.socialprofiler.service.Service#linkGroupCategoryAndSubCategory(org.societies.personalisation.socialprofiler.datamodel.Group, java.lang.String, java.lang.String, org.societies.personalisation.socialprofiler.datamodel.Person)
-	 */
-	
-	public void linkGroupCategoryAndSubCategory(SocialGroup group, String type,
-			String subType, SocialPerson person) {
-		// TODO Auto-generated method stub
-		
-	}
 	
 	@SuppressWarnings("unchecked")
 	public boolean existsRelationship(final SocialPerson startPerson, final SocialPerson endPerson){
@@ -1243,46 +1069,6 @@ public class GraphManager implements Variables{
 			tx.finish();
 		}		 
         return result;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.socialprofiler.service.Service#existsRelationshipGroupGroupSubCategory(org.societies.personalisation.socialprofiler.datamodel.Group, org.societies.personalisation.socialprofiler.datamodel.GroupSubCategory)
-	 */
-	
-	public boolean existsRelationshipGroupGroupSubCategory(SocialGroup group,
-			GroupSubCategory groupSubCategory) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.socialprofiler.service.Service#existsRelationshipGroupSubCategoryGroupCategory(org.societies.personalisation.socialprofiler.datamodel.GroupSubCategory, org.societies.personalisation.socialprofiler.datamodel.GroupCategory)
-	 */
-	
-	public boolean existsRelationshipGroupSubCategoryGroupCategory(
-			GroupSubCategory groupSubCategory, GroupCategory groupCategory) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.socialprofiler.service.Service#existsRelationshipPersonGroupSubCategory(org.societies.personalisation.socialprofiler.datamodel.Person, org.societies.personalisation.socialprofiler.datamodel.GroupSubCategory)
-	 */
-	
-	public boolean existsRelationshipPersonGroupSubCategory(SocialPerson startPerson,
-			GroupSubCategory groupSubCategory) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.socialprofiler.service.Service#existsRelationshipPersonGroupCategory(org.societies.personalisation.socialprofiler.datamodel.Person, org.societies.personalisation.socialprofiler.datamodel.GroupCategory)
-	 */
-	
-	public boolean existsRelationshipPersonGroupCategory(SocialPerson startPerson,
-			GroupCategory groupCategory) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 	
 	public ArrayList<String> getTopNGlobalPreferences(SocialPerson person, int n) {
@@ -1442,92 +1228,94 @@ public class GraphManager implements Variables{
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.socialprofiler.service.Service#getUsersWhoLikeGroupCategory(java.lang.String, java.util.ArrayList, int)
-	 */
 	
-	public ArrayList<String> getUsersWhoLikeGroupCategory(
-			String groupCategoryName, ArrayList<Float> array_users_numbers,
-			int option) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.socialprofiler.service.Service#getTopNUsersWhoLikeGroupCategory(java.lang.String, int)
-	 */
-	
-	public ArrayList<UserInfo> getTopNUsersWhoLikeGroupCategory(
-			String groupCategoryName, int n) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.socialprofiler.service.Service#getUsersWhoLikeGroupSubCategory(java.lang.String, java.util.ArrayList, int)
-	 */
-	
-	public ArrayList<String> getUsersWhoLikeGroupSubCategory(
-			String groupSubCategoryName, ArrayList<Float> array_users_numbers,
-			int option) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.socialprofiler.service.Service#getTopNUsersWhoLikeGroupSubCategory(java.lang.String, int)
-	 */
-	
-	public ArrayList<UserInfo> getTopNUsersWhoLikeGroupSubCategory(
-			String groupSubCategoryName, int n) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
-	
-	public ArrayList<Long> getListOfGroups(String userId){
+	public Profile createManiac(final String name, Profile.Type type){
+		Profile maniac=null;
+		Transaction tx_maniac = getNeoService().beginTx();
+		try{
 		
-		ArrayList<Long> listOfGroups = new ArrayList<Long>();
-		SocialPerson person=getPerson(userId);
+			logger.debug("creating maniac with name "+name);
+			logger.debug(" verying there is no maniac in the index with the same name");
+			Profile test=getManiac(name, type);
+			if (test!=null){
+				logger.info("unable to create maniac with name "+name+", already " +
+						"exists a Maniac profile with this name");
+				return null;
+			}
+		
+			logger.debug("no maniac found with the same name=>ALLOW-> creating " +
+					"maniac properly");
+			final Node maniacNode=neoService.createNode();
+			maniac=new ProfileImpl(maniacNode, type);
+			maniac.setName(name);
+		
+			logger.debug("indexing new created maniac to Lucene");
+			luceneIndexService.index(maniacNode,NAME_INDEX,name);
+			tx_maniac.success();
+		}finally{
+			tx_maniac.finish();
+		}																			
+		return maniac;
+	}
+	
+	public void linkManiac(SocialPerson person, String maniacId, Profile.Type type) {
+		logger.debug("linking NarcissismManiac to person");
 		Transaction tx = getNeoService().beginTx();
 		try{
-			
-			final Node startNode = ((SocialPersonImpl)person ).getUnderlyingNode();
-			Iterator <Relationship> list_relationships= (Iterator <Relationship>) startNode.getRelationships(RelTypes.IS_A_MEMBER_OF,Direction.OUTGOING);
-			while(list_relationships.hasNext()){
-				Relationship rel	=	list_relationships.next();
-				Node groupNode		=	rel.getEndNode();
-				SocialGroup group	=	new SocialGroupImpl(groupNode);
-				
-				String group_name=group.getName();
-				listOfGroups.add(Long.parseLong(group_name));
-			}	
+			if (person==null){
+				logger.error("ERROR-person which was suposed to be linked with narcissismManiac is null");
+			}else{
+				logger.debug("verifying there is no other narcissim Maniac for this person");
+				Profile p=getManiac(maniacId, type);
+				if (p==null){
+					logger.debug("creating the narcissismManiac and then linking it");
+					p=createManiac(maniacId, type);
+					if (p==null){
+						logger.fatal("ERROR - Narcissism Maniac seemed not to exist - " +
+								"was created - but is null");
+					}
+				}else{
+					logger.debug("NarcissismManiac was found succesfully => linking");
+				}
+				final Node startNode = ((SocialPersonImpl) person).getUnderlyingNode();
+				final Node endNode = ((ProfileImpl) p).getUnderlyingNode();
+				@SuppressWarnings("unused")
+				final Relationship relationship = startNode.createRelationshipTo( endNode,
+	        		RelTypes.HAS_A_PROFILE );
+				logger.debug("relationship was created");
+				logger.debug("Now user "+person.getName()+"HAS A PROFILE , MANIAC"+p.getName());
+			}
 			tx.success();
 		}finally{
 			tx.finish();
-		}		 	
-		return listOfGroups;
+		}		
 	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.socialprofiler.service.Service#linkNarcissismManiac(org.societies.personalisation.socialprofiler.datamodel.Person, java.lang.String)
-	 */
-	
-	public void linkNarcissismManiac(SocialPerson person, String narcissismManiacId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.socialprofiler.service.Service#updateNarcissismManiac(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
 	
 	public void updateNarcissismManiac(String narcissismManiacId,
 			String frequency, String lastTime, String number) {
-		// TODO Auto-generated method stub
-		
+		logger.debug("updating NarcissismManiac information using the latest info found");
+		Transaction tx = getNeoService().beginTx();
+		try{
+			Profile narcissismManiac=getManiac(narcissismManiacId, Profile.Type.EGO_CENTRIC);
+			if (narcissismManiac==null){
+				logger.error("narcissismManiac is null - impossible to update it");
+			}else{
+				if (frequency!=null){
+					narcissismManiac.setFrequency(frequency);
+				}
+				if (lastTime!=null){
+					narcissismManiac.setLastTime(lastTime);
+				}
+				if (number!=null){
+					narcissismManiac.setNumber(number);
+				}
+				
+				logger.debug("NarcissismManiac information was updated successfully");
+			}
+			tx.success();
+		}finally{
+			tx.finish();
+		}	
 	}
 
 	/* (non-Javadoc)
@@ -1564,6 +1352,34 @@ public class GraphManager implements Variables{
 	public String getNarcissismManiacNumber(String narcissismManiacId) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public Profile getManiac(String name, Profile.Type type){
+		Profile maniac = null;
+		Transaction tx_Man = getNeoService().beginTx();
+		try{
+			logger.debug("**Reading Lucene Index**  searching for Maniac profile "+name);
+			Node maniacNode = luceneIndexService.getSingleNode( NAME_INDEX, name );
+			if ( maniacNode == null )
+			{
+				logger.debug("Maniac "+name+" was not found in lucene index");
+			}
+			
+			if ( maniacNode != null )
+			{
+				logger.debug("Maniac "+name+" was found on Lucene index => returning it");
+				maniac = new ProfileImpl( maniacNode, type );
+				if(maniac==null){logger.error("ERROR while creating instance of " +
+						"Maniac - to be returned");}
+			}else{
+				logger.debug("returning NULL: Reason : no Maniac found " +
+						"on Lucene with that name ");
+			}
+			tx_Man.success();
+		}finally{
+			tx_Man.finish();
+		}						
+		return maniac;
 	}
 
 	/* (non-Javadoc)
@@ -1871,16 +1687,9 @@ public class GraphManager implements Variables{
 			if ( interestsNode == null )
 			{
 				logger.debug("404 [Interest] "+name+" was not found in lucene index");
-			}
-			
-			if ( interestsNode != null )
-			{
+			} else {
 				logger.info(" [Interest] "+name+" was found on Lucene index => returning it");
 				interests = new InterestsImpl( interestsNode );
-			}
-			else{
-				
-				logger.info("returning NULL: Reason : no Interests found on Lucene with that name ");
 			}
 			tx_active.success();
 		}finally{
@@ -2100,8 +1909,8 @@ public class GraphManager implements Variables{
 	 */
 	
 	public void updateGeneralInfo(String generalInfoId, String firstName,
-			String lastName, String birthday, String sex, String hometown,
-			String current_location, String political, String religious) {
+			String lastName, String birthday, String gender, String hometown,
+			String current_location, String political, String religion) {
 		logger.debug("updating GeneralInfo information using the latest info found");
 		Transaction tx = getNeoService().beginTx();
 		try{
@@ -2118,8 +1927,8 @@ public class GraphManager implements Variables{
 				if (birthday!=null){
 					generalInfo.setBirthday(birthday);
 				}
-				if (sex!=null){
-					generalInfo.setSex(sex);
+				if (gender!=null){
+					generalInfo.setGender(gender);
 				}
 				if (hometown!=null){
 					generalInfo.setHometown(hometown);
@@ -2130,8 +1939,8 @@ public class GraphManager implements Variables{
 				if (political!=null){
 					generalInfo.setPolitical(political);
 				}
-				if (religious!=null){
-					generalInfo.setReligious(religious);
+				if (religion!=null){
+					generalInfo.setReligion(religion);
 				}
 				logger.debug("GeneralInfo information was updated successfully");
 			}
@@ -2232,7 +2041,7 @@ public class GraphManager implements Variables{
 		Traverser graph =null;
 		Transaction tx = getNeoService().beginTx();
 		try{
-			SocialPersonImpl person=  (SocialPersonImpl) getPerson("ROOT");
+			SocialPersonImpl person=  (SocialPersonImpl) getPerson(SocialPerson.ROOT);
 		   
 			graph = person.getUnderlyingNode().traverse(
 			Traverser.Order.BREADTH_FIRST,
@@ -2478,6 +2287,42 @@ public class GraphManager implements Variables{
 		}finally{
 			tx.finish();
 		}	
+	}
+	
+	public void updatePersonPercentages (String personId,String narcissismManiac,String superActiveManiac,
+			String photoManiac,	String surfManiac,String quizManiac,String totalActions){
+		logger.debug("updating person profile percentages ");
+		Transaction tx = getNeoService().beginTx();
+		try{
+			SocialPerson person=getPerson(personId);
+			if (person==null){
+				logger.error("person is null - impossible to update it");
+			}else{
+				if (narcissismManiac!=null){
+					person.setProfilePercentage(Profile.Type.EGO_CENTRIC, narcissismManiac);
+				}
+				if (superActiveManiac!=null){
+					person.setProfilePercentage(Profile.Type.SUPER_ACTIVE, superActiveManiac);
+				}
+				if (photoManiac!=null){
+					person.setProfilePercentage(Profile.Type.PHOTO_MANIAC, photoManiac);
+				}
+				if (surfManiac!=null){
+					person.setProfilePercentage(Profile.Type.SURF_MANIAC, surfManiac);
+				}
+				if (quizManiac!=null){
+					person.setProfilePercentage(Profile.Type.QUIZ_MANIAC, quizManiac);
+				}
+				if (totalActions!=null){
+					person.setTotalNumberOfActions(totalActions);
+				}
+				logger.debug("person information was updated successfully");
+			}
+			tx.success();
+		}finally{
+			tx.finish();
+		}	
+		
 	}
 
 	/* (non-Javadoc)

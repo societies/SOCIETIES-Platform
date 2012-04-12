@@ -105,6 +105,8 @@ public interface ICRISTUserIntentTaskManager {
 	public ArrayList<CRISTUserAction> predictUserIntent(IIdentity entityID, CtxAttribute ctxAttribute);
 	
 	public ArrayList<CRISTUserAction> predictUserIntent(IIdentity entityID, CRISTUserAction userAction);
+	
+	public CRISTUserAction getCurrentUserIntent(IIdentity entityID, ServiceResourceIdentifier serviceID, String parameterName);
 
 	/**
 	 * This method returns a map of next user tasks and the relevant probabilities given the
