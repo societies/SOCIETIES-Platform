@@ -72,13 +72,13 @@ public class GeneralInfoImpl implements GeneralInfo, NodeProperties{
 	}
 
 	//@Override
-	public String getReligious() {
-		return (String) underlyingNode.getProperty( RELIGIOUS_PROPERTY );
+	public String getReligion() {
+		return (String) underlyingNode.getProperty( RELIGION_PROPERTY );
 	}
 
 	//@Override
-	public String getSex() {
-		return (String) underlyingNode.getProperty( SEX_PROPERTY );
+	public String getGender() {
+		return (String) underlyingNode.getProperty( GENDER_PROPERTY );
 	}
 
 	//@Override
@@ -112,12 +112,12 @@ public class GeneralInfoImpl implements GeneralInfo, NodeProperties{
 	}
 
 	//@Override
-	public void setReligious(String religious) {
-		underlyingNode.setProperty( RELIGIOUS_PROPERTY, religious );	
+	public void setReligion(String religion) {
+		underlyingNode.setProperty( RELIGION_PROPERTY, religion );	
 	}
 
 	//@Override
-	public void setSex(String sex) {
-		underlyingNode.setProperty( SEX_PROPERTY, sex );
+	public void setGender(String gender) {
+		underlyingNode.setProperty( GENDER_PROPERTY, gender );
 	}
 }

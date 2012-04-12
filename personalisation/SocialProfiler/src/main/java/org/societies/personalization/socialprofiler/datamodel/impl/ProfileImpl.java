@@ -1,24 +1,26 @@
-package org.societies.personalization.socialprofiler.datamodel.behaviour;
+package org.societies.personalization.socialprofiler.datamodel.impl;
 
 import org.neo4j.graphdb.Node;
+import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile;
+import org.societies.personalization.socialprofiler.datamodel.behaviour.ProfileUtils;
+import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile.Type;
 import org.societies.personalization.socialprofiler.datamodel.utils.NodeProperties;
 
-public class NodeProfile implements Profile, NodeProperties{
+public class ProfileImpl implements Profile, NodeProperties{
 
 	private final Node underlyingNode;
-	private final int id;
+	private final Profile.Type type;
 	
-	public NodeProfile(Node underlyingNode) {
+	public ProfileImpl(Node underlyingNode, Profile.Type type) {
 		super();
 		this.underlyingNode = underlyingNode;
-		this.id = ProfileUtils.DEFAULT_PROFILE_ID;
+		this.type = type;
 		underlyingNode.setProperty( NAME_PROPERTY, ProfileUtils.DEFAULT_PROFILE_NAME );
-		
 	}
 
 	
 	/**
-	 * returns the underlyong node of the profile
+	 * returns the underlying node of the profile
 	 * @return	Node underlyingNode
 	 */
 	public Node getUnderlyingNode() {
@@ -27,13 +29,13 @@ public class NodeProfile implements Profile, NodeProperties{
 
 	
 	@Override
-	public void setName(Profile.Type name) {
-		underlyingNode.setProperty( NAME_PROPERTY, (Profile.Type)name );
+	public void setName(String name) {
+		underlyingNode.setProperty( NAME_PROPERTY, name );
 	}
 	
 	@Override
-	public Profile.Type getName() {
-		return (Profile.Type) underlyingNode.getProperty( NAME_PROPERTY );
+	public String getName() {
+		return (String) underlyingNode.getProperty( NAME_PROPERTY );
 	}
 
 	@Override
@@ -42,8 +44,8 @@ public class NodeProfile implements Profile, NodeProperties{
 	}
 
 	@Override
-	public int getId() {
-		return this.id;
+	public Profile.Type getType() {
+		return this.type;
 	}
 
 	@Override
@@ -73,12 +75,12 @@ public class NodeProfile implements Profile, NodeProperties{
 	}
 
 	@Override
-	public void setNumber(int number) {
+	public void setNumber(String number) {
 		underlyingNode.setProperty(NAME_PROPERTY, number);
 	}
 
 	@Override
-	public void setFrequency(int frequency) {
+	public void setFrequency(String frequency) {
 		underlyingNode.setProperty( FREQUENCY_PROPERTY, frequency );
 		
 	}
