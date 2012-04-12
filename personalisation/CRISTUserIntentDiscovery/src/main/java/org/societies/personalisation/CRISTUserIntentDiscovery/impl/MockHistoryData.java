@@ -8,7 +8,7 @@ public class MockHistoryData {
 	String actionValue;
 	String situationValue;
 
-	MockHistoryData(String action, String situation, List<String> context) {
+	public MockHistoryData(String action, String situation, List<String> context) {
 		this.actionValue = action;
 		this.situationValue = situation;
 		this.context = context;

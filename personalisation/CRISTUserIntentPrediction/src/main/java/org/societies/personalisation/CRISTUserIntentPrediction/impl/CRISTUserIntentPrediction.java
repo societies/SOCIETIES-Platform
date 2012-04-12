@@ -99,6 +99,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		try{
 			// TODO
 			// this.preManager.registerForContextUpdate(myId, myCtxId);
+			
 			System.out.println("CRIST Predictor registered the Context Update Event");
 		}catch(Exception e){
 			System.err.println("Exception when trying to register the Context Update Event");
@@ -151,7 +152,13 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 			CtxAttribute ctxAttribute) {
 		// TODO Auto-generated method stub
 		List<CRISTUserAction> results = new ArrayList<CRISTUserAction>();
-		results = this.cristTaskManager.predictUserIntent(entityID, ctxAttribute);
+		if (this.cristTaskManager!=null){
+			results = this.cristTaskManager.predictUserIntent(entityID, ctxAttribute);
+		}else{
+			System.out.println("The CRIST Taks Manager is NULL. Initiating a new mananger...");
+			// TODO
+			
+		}
 		
 		return new AsyncResult<List<CRISTUserAction>>(results);
 	}
@@ -164,8 +171,14 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 			IAction action) {
 		// TODO Auto-generated method stub
 		List<CRISTUserAction> results = new ArrayList<CRISTUserAction>();
-		results = this.cristTaskManager.predictUserIntent(entityID, (CRISTUserAction) action);
-		
+		if (this.cristTaskManager!=null){
+			results = this.cristTaskManager.predictUserIntent(entityID, (CRISTUserAction) action);
+		}else{
+			System.out.println("The CRIST Taks Manager is NULL. Initiating a new mananger...");
+			// TODO
+			
+		}
+
 		return new AsyncResult<List<CRISTUserAction>>(results);
 	}
 
@@ -178,7 +191,15 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	public Future<CRISTUserAction> getCurrentUserIntentAction(
 			IIdentity ownerID, ServiceResourceIdentifier serviceID, String parameterName) { 
 		// TODO Auto-generated method stub
+		CRISTUserAction result = null;
+		if (this.cristTaskManager!=null){
+			result = this.cristTaskManager.getCurrentUserIntent(ownerID, serviceID, parameterName);
+		}else{
+			System.out.println("The CRIST Taks Manager is NULL. Initiating a new mananger...");
+			// TODO
+			
+		}
 		
-		return null;
+		return new AsyncResult<CRISTUserAction>(result);
 	}
 }

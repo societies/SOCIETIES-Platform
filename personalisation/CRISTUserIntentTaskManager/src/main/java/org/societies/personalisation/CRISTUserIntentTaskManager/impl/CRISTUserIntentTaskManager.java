@@ -62,6 +62,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 
 	public CRISTUserIntentTaskManager() {
 		System.out.println("Hello! I'm the CRIST User Intent Manager!");
+		this.initialiseCRISTUserIntentManager();
 	}
 
 	public CRISTUserIntentTaskManager(ICRISTUserIntentPrediction cristPrediction) {
@@ -94,37 +95,21 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	}
 
 	public void initialiseCRISTUserIntentManager() {
-
-		if (this.getCristPrediction() == null) {
-			System.out.println(this.getClass().getName()
-					+ "CRIST UI Predictor is null");
-		} else {
-			System.out.println(this.getClass().getName()
-					+ "CRIST UI Predictor is NOT null");
-		}
-
 		System.out.println("Yo!! I'm a brand new service and my interface is: "
 				+ this.getClass().getName());
-		try {
-			// this.getCristPrediction().getCRISTPrediction(myID, myCtx);
-			System.out.println("CRIST Tester got the CRIST Prediction Result");
-		} catch (Exception e) {
-			System.err
-					.println("Exception when trying to get the CRIST Prediction Result");
-			System.err.println(e.toString());
-		}
 
 		ArrayList<String> historyAction = new ArrayList<String>();
 		ArrayList<String> historySituation = new ArrayList<String>();
 		ArrayList<ArrayList<String>> historyContext = new ArrayList<ArrayList<String>>();
-		// Assuming that the following sensors are available: light, sound, temperature, gps
+		// Assuming that the following sensors are available: light, sound,
+		// temperature, gps
 		this.registeredContext.add("Light");
 		this.registeredContext.add("Sound");
 		this.registeredContext.add("Temperature");
 		this.registeredContext.add("GPS");
-		
+
 		ArrayList<String> historyContextClique = new ArrayList<String>();
-		
+
 		// Mock history data
 		historyAction.add("Turn on MP3 Player");
 		historySituation.add("Study Hall");
@@ -133,7 +118,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-		
+
 		historyAction.add("Turn down volume");
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
@@ -141,7 +126,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-		
+
 		historyAction.add("Switch songs");
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
@@ -149,7 +134,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-		
+
 		historyAction.add("Turn off MP3 Player");
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
@@ -157,7 +142,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-		
+
 		historyAction.add("Start the GPS navigator");
 		historySituation.add("Outdoor");
 		historyContextClique.add("120");
@@ -165,7 +150,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("15");
 		historyContextClique.add("55,1.33");
 		historyContext.add(historyContextClique);
-		
+
 		historyAction.add("Input a location name");
 		historySituation.add("Outdoor");
 		historyContextClique.add("120");
@@ -173,7 +158,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("15");
 		historyContextClique.add("55,1.33");
 		historyContext.add(historyContextClique);
-		
+
 		historyAction.add("Close the GPS navigator");
 		historySituation.add("Shopping Mall");
 		historyContextClique.add("100");
@@ -181,7 +166,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-		
+
 		historyAction.add("Turn on MP3 Player");
 		historySituation.add("Outdoor");
 		historyContextClique.add("120");
@@ -189,7 +174,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("15");
 		historyContextClique.add("55,1.33");
 		historyContext.add(historyContextClique);
-		
+
 		historyAction.add("Turn up volume");
 		historySituation.add("Outdoor");
 		historyContextClique.add("120");
@@ -197,7 +182,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("15");
 		historyContextClique.add("55,1.33");
 		historyContext.add(historyContextClique);
-		
+
 		historyAction.add("Switch songs");
 		historySituation.add("Outdoor");
 		historyContextClique.add("120");
@@ -205,7 +190,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("15");
 		historyContextClique.add("55,1.33");
 		historyContext.add(historyContextClique);
-		
+
 		historyAction.add("Turn off MP3 Player");
 		historySituation.add("Office");
 		historyContextClique.add("100");
@@ -213,7 +198,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("26");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-		
+
 		historyAction.add("Start the GPS navigator");
 		historySituation.add("Outdoor");
 		historyContextClique.add("120");
@@ -221,7 +206,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("15");
 		historyContextClique.add("55,1.33");
 		historyContext.add(historyContextClique);
-		
+
 		historyAction.add("Input a location name");
 		historySituation.add("Outdoor");
 		historyContextClique.add("120");
@@ -229,7 +214,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("15");
 		historyContextClique.add("55,1.33");
 		historyContext.add(historyContextClique);
-		
+
 		historyAction.add("Close the GPS navigator");
 		historySituation.add("Shopping Mall");
 		historyContextClique.add("100");
@@ -237,7 +222,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-		
+
 		historyAction.add("Turn on MP3 Player");
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
@@ -245,7 +230,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-		
+
 		historyAction.add("Turn down volume");
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
@@ -253,7 +238,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-		
+
 		historyAction.add("Switch songs");
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
@@ -261,7 +246,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-		
+
 		historyAction.add("Turn off MP3 Player");
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
@@ -269,7 +254,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-		
+
 		historyAction.add("Turn on MP3 Player");
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
@@ -277,7 +262,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-		
+
 		historyAction.add("Turn down volume");
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
@@ -288,7 +273,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 
 		for (int i = 0; i < historyAction.size(); i++) {
 			MockHistoryData currentHisData = new MockHistoryData(
-					historyAction.get(i), historySituation.get(i), historyContext.get(i));
+					historyAction.get(i), historySituation.get(i),
+					historyContext.get(i));
 			this.historyList.add(currentHisData);
 		}
 	}
@@ -331,6 +317,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	@Override
 	public ArrayList<CRISTUserAction> getActionsByType(String arg0, String arg1) {
 		// TODO Auto-generated method stub
+
 		return null;
 	}
 
@@ -374,15 +361,19 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		return this.currentUserSituationMap.get(entityID);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager#getCurrentUserContext(org.societies.api.identity.IIdentity)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.
+	 * ICRISTUserIntentTaskManager
+	 * #getCurrentUserContext(org.societies.api.identity.IIdentity)
 	 */
 	@Override
 	public ArrayList<String> getCurrentUserContext(IIdentity entityID) {
 		// TODO Auto-generated method stub
 		return this.currentUserContextMap.get(entityID);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -395,66 +386,78 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	public void updateUserSituation(IIdentity entityID,
 			CtxAttribute ctxAttribute) {
 		// TODO Auto-generated method stub
-		// TODO: Identify the user's current situation based on her real-time context
-		// Retrieve the user's real-time context: How to retrieve a given user's context
+		// TODO: Identify the user's current situation based on her real-time
+		// context
+		// Retrieve the user's real-time context: How to retrieve a given user's
+		// context
 		// this.ctxBroker.retrieve();
 		int currentPos = this.historyList.size();
-		ArrayList<String> lastContextClique = this.historyList.get(currentPos).getContext();
+		ArrayList<String> lastContextClique = this.historyList.get(currentPos)
+				.getContext();
 		ArrayList<String> currentContextClique = new ArrayList<String>();
-		
-		// Generate a new context clique based on the newly received ctxAttribute
+
+		// Generate a new context clique based on the newly received
+		// ctxAttribute
 		String contextID = ctxAttribute.getSourceId();
-		for (int i=0;i<lastContextClique.size();i++){
+		for (int i = 0; i < lastContextClique.size(); i++) {
 			String oneContextID = this.registeredContext.get(i);
-			if (oneContextID.equals(contextID)){
+			if (oneContextID.equals(contextID)) {
 				currentContextClique.add(ctxAttribute.getStringValue());
-			}else{
+			} else {
 				currentContextClique.add(lastContextClique.get(i));
 			}
 		}
-		
+
 		CRISTUserSituation userSituation = inferUserSituation(currentContextClique);
-		
+
 		// CRISTUserSituation userSituation = new CRISTUserSituation();
 		// MOCK
 		// userSituation.setSituationID("Outdoor");
-		if (this.currentUserSituationMap.containsKey(entityID)){
+		if (this.currentUserSituationMap.containsKey(entityID)) {
 			this.currentUserSituationMap.remove(entityID);
 			this.currentUserSituationMap.put(entityID, userSituation);
-		}else{
+		} else {
 			this.currentUserSituationMap.put(entityID, userSituation);
 		}
-		if (this.currentUserContextMap.containsKey(entityID)){
+		if (this.currentUserContextMap.containsKey(entityID)) {
 			this.currentUserContextMap.remove(entityID);
 			this.currentUserContextMap.put(entityID, currentContextClique);
-		}else{
+		} else {
 			this.currentUserContextMap.put(entityID, currentContextClique);
 		}
 	}
 
-	private CRISTUserSituation inferUserSituation(ArrayList<String> contextClique){
+	private CRISTUserSituation inferUserSituation(
+			ArrayList<String> contextClique) {
 		double currentLight = Double.parseDouble(contextClique.get(1));
 		double currentSound = Double.parseDouble(contextClique.get(2));
 		double currentTemp = Double.parseDouble(contextClique.get(3));
 		String currentGPS = contextClique.get(4);
-		
-		// Currently we simply use predefined rules to infer the situation, a more valid way should 
-		// be constructing a situation-model based on the history context based supervised learning mechanism 
+
+		// Currently we simply use predefined rules to infer the situation, a
+		// more valid way should
+		// be constructing a situation-model based on the history context based
+		// supervised learning mechanism
 		CRISTUserSituation situation = new CRISTUserSituation();
-		if (currentLight>80&&currentLight<120&&currentSound<50&&currentTemp>16&&currentTemp<24&&currentGPS.equals("N/A")){
+		if (currentLight > 80 && currentLight < 120 && currentSound < 50
+				&& currentTemp > 16 && currentTemp < 24
+				&& currentGPS.equals("N/A")) {
 			situation.setSituationID("Study Hall");
-		}else if(!currentGPS.equals("N/A")){
+		} else if (!currentGPS.equals("N/A")) {
 			situation.setSituationID("Outdoor");
-		}else if(currentLight>100&&currentSound>60&&currentTemp>22&&currentGPS.equals("N/A")){
+		} else if (currentLight > 100 && currentSound > 60 && currentTemp > 22
+				&& currentGPS.equals("N/A")) {
 			situation.setSituationID("Shopping Mall");
-		}else if(currentLight>80&&currentSound<50&&currentTemp>20&&currentTemp<28&&currentGPS.equals("N/A")){
+		} else if (currentLight > 80 && currentSound < 50 && currentTemp > 20
+				&& currentTemp < 28 && currentGPS.equals("N/A")) {
 			situation.setSituationID("Office");
-		}else{
+		} else {
 			situation.setSituationID("Home");
 		}
-		
+
 		return situation;
 	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -467,15 +470,19 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	public ArrayList<CRISTUserAction> predictUserIntent(IIdentity entityID,
 			CtxAttribute ctxAttribute) {
 		// TODO Auto-generated method stub
-		updateUserSituation(entityID, ctxAttribute);
-		CRISTUserAction currentUserAction = getCurrentUserAction(entityID);
-		CRISTUserSituation currentUserSituation = getCurrentUserSituation(entityID);
-
-		// Predict user intent based on one's current action
-		ArrayList<CRISTUserAction> results = getNextActions(entityID,
-				currentUserAction, currentUserSituation);
-
-		return results;
+		if (this.intentModel!=null){
+			updateUserSituation(entityID, ctxAttribute);
+			CRISTUserAction currentUserAction = getCurrentUserAction(entityID);
+			CRISTUserSituation currentUserSituation = getCurrentUserSituation(entityID);
+	
+			// Predict user intent based on one's current action
+			ArrayList<CRISTUserAction> results = getNextActions(entityID,
+					currentUserAction, currentUserSituation);
+			return results;
+		}else{
+			System.out.println("The CRIST UI Model is NULL.");
+			return null;
+		}		
 	}
 
 	/*
@@ -500,9 +507,10 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 
 		CRISTUserSituation currentUserSituation = getCurrentUserSituation(entityID);
 		ArrayList<String> currentContextClique = getCurrentUserContext(entityID);
-		MockHistoryData oneHisData = new MockHistoryData(userAction.getActionID(),
-				currentUserSituation.getSituationID(),currentContextClique);
-		
+		MockHistoryData oneHisData = new MockHistoryData(
+				userAction.getActionID(),
+				currentUserSituation.getSituationID(), currentContextClique);
+
 		this.historyList.add(oneHisData);
 		// Predict user intent based on one's current action
 		ArrayList<CRISTUserAction> results = getNextActions(entityID,
@@ -516,9 +524,55 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	 * 
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.
 	 * ICRISTUserIntentTaskManager
+	 * #getCurrentUserIntent(org.societies.api.identity.IIdentity,
+	 * org.societies.
+	 * api.schema.servicelifecycle.model.ServiceResourceIdentifier,
+	 * java.lang.String)
+	 */
+	@Override
+	public CRISTUserAction getCurrentUserIntent(IIdentity entityID,
+			ServiceResourceIdentifier serviceID, String parameterName) {
+		// TODO Auto-generated method stub
+		CRISTUserAction currentUserAction = null;
+		CRISTUserSituation currentUserSituation = null;
+		CRISTUserAction predictedUserAction = null;
+
+		if (this.currentUserActionMap.containsKey(entityID)) {
+			currentUserAction = this.currentUserActionMap.get(entityID);
+		}
+		if (this.currentUserSituationMap.containsKey(entityID)) {
+			currentUserSituation = this.currentUserSituationMap.get(entityID);
+		}
+
+		ArrayList<CRISTUserAction> results = new ArrayList<CRISTUserAction>();
+		if (currentUserAction != null && currentUserSituation != null) {
+			results = getNextActions(entityID, currentUserAction,
+					currentUserSituation);
+			
+			ServiceResourceIdentifier currentServiceID = null;
+			String currentParameterName = null;					
+			for(int i = 0;i<results.size();i++){
+				currentServiceID = results.get(i).getServiceID();
+				currentParameterName = results.get(i).getparameterName();
+				if (currentServiceID.equals(serviceID)&&currentParameterName.equalsIgnoreCase(currentParameterName)){
+					predictedUserAction = results.get(i);
+					break;
+				}
+			}
+		}
+		
+		return predictedUserAction;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.
+	 * ICRISTUserIntentTaskManager
 	 * #getNextActions(org.societies.personalisation.CRIST
 	 * .api.model.CRISTUserAction)
 	 */
+	@SuppressWarnings({ "unchecked" })
 	@Override
 	public ArrayList<CRISTUserAction> getNextActions(IIdentity entityID,
 			CRISTUserAction currentAction, CRISTUserSituation currentSituation) {
