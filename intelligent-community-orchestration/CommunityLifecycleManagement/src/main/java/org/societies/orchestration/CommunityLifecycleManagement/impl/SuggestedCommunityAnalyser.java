@@ -148,6 +148,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	private SuggestedCommunityAnalyserBean suggestedCommunityAnalyserBean;
 	private SuggestedCommunityAnalyserResultBean suggestedCommunityAnalyserResultBean;
 	private SuggestedCommunityAnalyserMethodType suggestedCommunityAnalyserMethodType;
+	
+	private ArrayList<ArrayList<String>> refusedOrAmendedSuggestions;
     
 	/*
      * Constructor for SuggestedCommunityAnalyser
@@ -190,7 +192,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	    convertedRecommendations.put("Delete CISs", abstractDeletions);
     	}
     	
-    	ArrayList<String> preferenceConflicts = checkForPreferenceConflicts();
+    	ArrayList<String> preferenceConflicts = checkForPreferenceConflicts(convertedRecommendations);
     	if (preferenceConflicts == null)
     		return null;
     	else if (preferenceConflicts.size() == 0)
@@ -252,6 +254,18 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	}
     	
     	for (int i = 0; i < convertedRecommendations.size(); i++) {
+    		if (checkForPreferenceConflicts(convertedRecommendations).size() != 0)
+    			continue;
+    		ArrayList<String> privacyConflicts = checkForPrivacyConflicts(convertedRecommendations);
+    		boolean refuseSuggestion = false;
+    		if (privacyConflicts.size() != 0) {
+    			for (int m = 0; m < privacyConflicts.size(); m++) {
+    				if (privacyConflicts.get(m).equals("User policy"))
+    				    refuseSuggestion = true;
+    			}
+    		}
+    		if (refuseSuggestion == true)
+    			continue;
     		//userContextBroker.evaluateSimilarity("location", convertedRecommendations.get(i).get(0).getMembersList());
     		//if > 90% of members share that context, and there's no other context with more coverage of members,
     		//let this be the highest level CIS criteria.
@@ -263,7 +277,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     		//    convertedRecommendations.remove(i);
     	}
     	
-    	communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations);
+    	ArrayList<String> actionMetadata = communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations);
     }
     
     public void processCSMAnalyserConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
@@ -273,20 +287,20 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	
     }
     
-    public ArrayList<String> checkForPrivacyConflicts() {
+    public ArrayList<String> checkForPrivacyConflicts(HashMap<String, ArrayList<ArrayList<ICisRecord>>> recommendations) {
     	ArrayList<String> conflictingPrivacyPolicies = new ArrayList<String>();
     	//privacyDataManager.checkPermission(arg0, arg1, arg2, arg3);
     	return conflictingPrivacyPolicies;
     	
     }
     
-    public ArrayList<String> checkForPreferenceConflicts() {
+    public ArrayList<String> checkForPreferenceConflicts(HashMap<String, ArrayList<ArrayList<ICisRecord>>> recommendations) {
     	ArrayList<String> conflictingPreferences = new ArrayList<String>();
     	
     	//personalisationManager.getPreference(arg0, arg1, arg2, arg3, "refuse CIS action with given criteria", arg5)
 		return conflictingPreferences;
-    	
     }
+    
     public IIdentity getLinkedCss() {
     	return linkedCss;
     }
