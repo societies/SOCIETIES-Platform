@@ -23,7 +23,7 @@
        for integration testing outside of an OSGi environment -->
 
   <bean id="nominalTestCase" class="org.societies.integration.test.bit.math_example.NominalTestCase" init-method="startTest">
-		<property name="iConsumer" ref ="iConsumer" />
+		<property name="mathServiceConsumer" ref ="mathServiceConsumer" />
   	</bean>
 
 </beans>

@@ -8,4 +8,6 @@
 	
 	<osgi:reference id="mathService" interface="org.societies.service.api.IMathService" />
 	
+	<osgi:service ref="mathConsumer" interface="org.societies.service.api.IConsumer" />
+	
 </beans>
