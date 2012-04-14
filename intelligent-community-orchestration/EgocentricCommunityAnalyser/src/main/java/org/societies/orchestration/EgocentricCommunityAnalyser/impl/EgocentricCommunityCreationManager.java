@@ -38,6 +38,8 @@ import org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType;
 
 import static org.mockito.Mockito.*;
 
+import org.societies.api.schema.context.contextschema.CtxBroker;
+
 import org.societies.api.internal.css.directory.ICssDirectory;
 
 import org.societies.api.internal.css.discovery.ICssDiscovery;
