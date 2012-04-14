@@ -178,10 +178,21 @@ public class CommunityRecommender //implements ICommCallback
 		ArrayList<String> cisAddMetadata = new ArrayList<String>();
 		ArrayList<String> cisDeleteMetadata = new ArrayList<String>();
 		ArrayList<String> cisConfigureMetadata = new ArrayList<String>();
-		if (cisPossibilities.get("Create CISs") != null)
-		    cisAddMetadata = identifyCissToCreate(cisPossibilities.get("Create CISs").get(0), null);
-		if (cisPossibilities.get("Delete CISs") != null)
-			cisDeleteMetadata = identifyCissToDelete(cisPossibilities.get("Delete CISs").get(0), null);
+		if (cisPossibilities.get("Create CISs") != null) {
+			ArrayList<ArrayList<ICisRecord>> theList = cisPossibilities.get("Create CISs");
+			ArrayList<ICisRecord> theSubList = new ArrayList<ICisRecord>();
+			for (int i = 0; i < theList.size(); i++)
+				theSubList.add(theList.get(i).get(0));
+			identifyCissToCreate(theSubList, null);
+		}
+		    
+		if (cisPossibilities.get("Delete CISs") != null) {
+			ArrayList<ArrayList<ICisRecord>> theList = cisPossibilities.get("Delete CISs");
+			ArrayList<ICisRecord> theSubList = new ArrayList<ICisRecord>();
+			for (int i = 0; i < theList.size(); i++)
+				theSubList.add(theList.get(i).get(0));
+			identifyCissToDelete(theSubList, null);
+		}
 		HashMap<String, ArrayList<ArrayList<ICisRecord>>> temp = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
 		temp.put("Configure CISs", cisPossibilities.get("Configure CISs"));
 		temp.put("Merge CISs", cisPossibilities.get("Merge CISs"));
@@ -205,10 +216,21 @@ public class CommunityRecommender //implements ICommCallback
     	ArrayList<String> cisAddMetadata = new ArrayList<String>();
 		ArrayList<String> cisDeleteMetadata = new ArrayList<String>();
 		ArrayList<String> cisConfigureMetadata = new ArrayList<String>();
-		if (cisPossibilities.get("Create CISs") != null)
-		    identifyCissToCreate(cisPossibilities.get("Create CISs").get(0), null);
-		if (cisPossibilities.get("Delete CISs") != null)
-		    identifyCissToDelete(cisPossibilities.get("Delete CISs").get(0), null);
+		if (cisPossibilities.get("Create CISs") != null) {
+			ArrayList<ArrayList<ICisRecord>> theList = cisPossibilities.get("Create CISs");
+			ArrayList<ICisRecord> theSubList = new ArrayList<ICisRecord>();
+			for (int i = 0; i < theList.size(); i++)
+				theSubList.add(theList.get(i).get(0));
+			identifyCissToCreate(theSubList, null);
+		}
+		    
+		if (cisPossibilities.get("Delete CISs") != null) {
+			ArrayList<ArrayList<ICisRecord>> theList = cisPossibilities.get("Delete CISs");
+			ArrayList<ICisRecord> theSubList = new ArrayList<ICisRecord>();
+			for (int i = 0; i < theList.size(); i++)
+				theSubList.add(theList.get(i).get(0));
+			identifyCissToDelete(theSubList, null);
+		}
 		HashMap<String, ArrayList<ArrayList<ICisRecord>>> temp = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
 		temp.put("Configure CISs", cisPossibilities.get("Configure CISs"));
 		temp.put("Merge CISs", cisPossibilities.get("Merge CISs"));

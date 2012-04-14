@@ -179,25 +179,62 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	//go straight to Community Recommender
     	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
     	ArrayList<ICisRecord> creations = cisRecommendations.get("Create CISs");
+    	if (creations == null)
+    		creations = new ArrayList<ICisRecord>();
+    	ArrayList<ICisRecord> deletions = cisRecommendations.get("Delete CISs");
+    	if (deletions == null)
+    		deletions = new ArrayList<ICisRecord>();
+    	ArrayList<ArrayList<ICisRecord>> abstractCreations = new ArrayList<ArrayList<ICisRecord>>();
+    	ArrayList<ArrayList<ICisRecord>> abstractDeletions = new ArrayList<ArrayList<ICisRecord>>();
+    	
+    	if (creations != null)
+    		if (creations.size() != 0)
+    			for (int i = 0; i < creations.size(); i++) {
+    				ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+    				it.add(creations.get(i));
+    	            abstractCreations.add(it);
+    			}
+    	
+    	
+    	if (deletions != null) {
+    		if (deletions.size() != 0)
+    			for (int i = 0; i < deletions.size(); i++) {
+    				ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+    				it.add(deletions.get(i));
+    	            abstractDeletions.add(it);
+    			}
+    	}
+    	
     	if (creations != null) {
-    	    ArrayList<ArrayList<ICisRecord>> abstractCreations = new ArrayList<ArrayList<ICisRecord>>();
+    	    abstractCreations = new ArrayList<ArrayList<ICisRecord>>();
     	    abstractCreations.add(creations);
     	    convertedRecommendations.put("Create CISs", abstractCreations);
     	}
-    	
-    	ArrayList<ICisRecord> deletions = cisRecommendations.get("Delete CISs");
+
     	if (deletions != null) {
-    	    ArrayList<ArrayList<ICisRecord>> abstractDeletions = new ArrayList<ArrayList<ICisRecord>>();
+    	    abstractDeletions = new ArrayList<ArrayList<ICisRecord>>();
     	    abstractDeletions.add(deletions);
     	    convertedRecommendations.put("Delete CISs", abstractDeletions);
     	}
     	
-    	ArrayList<String> preferenceConflicts = checkForPreferenceConflicts(convertedRecommendations);
-    	if (preferenceConflicts == null)
-    		return null;
-    	else if (preferenceConflicts.size() == 0)
-    		return null;
-    	else return communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(convertedRecommendations, cissToCreateMetadata);
+    	for (int i = 0; i < creations.size(); i++) {
+    		if (checkForPreferenceConflicts("Create CISs", abstractCreations).size() != 0) {
+    			creations.remove(i);
+    			cissToCreateMetadata.set(i, "FAILED");
+    		}
+    	}
+    	
+    	for (int i = 0; i < deletions.size() && deletions != null; i++) {
+    		if (checkForPreferenceConflicts("Delete CISs", abstractDeletions).size() != 0) {
+    			deletions.remove(i);
+    		    cissToCreateMetadata.set(i, "FAILED");
+    	    }
+    	}
+    	
+    	if (convertedRecommendations.size() != 0) {
+    		return communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(convertedRecommendations, cissToCreateMetadata);
+    	}
+    	else return null;
     	
     }
     
@@ -346,7 +383,6 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     		ArrayList<String> actionMetadata = communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations);
     	}
     	
-    	communityRecommender.identifyCisActionForCSCW(convertedRecommendations);
     }
     
     public void processCSCWConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
@@ -456,7 +492,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     		//else
     		//    convertedRecommendations.remove(i);
     		
-    		//If activity feed shows history in last few minutes, it's temporary; otherwise, 8 months - ongoing, last month - long-term; last few days - medium-term
+    		//If activity feed shows history in last few minutes, it's temporary and should be made immediately, as sub-CIS if an encapsulating CIS is available; otherwise, 8 months - ongoing, last month - long-term; last few days - medium-term
     	    
     		//Friends, CSS directory, working colleagues, same address: ongoing
     		//Shared interests, personal attributes like languages spoken and age: sub-CIS.
