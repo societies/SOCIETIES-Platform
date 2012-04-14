@@ -289,13 +289,30 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     
     public ArrayList<String> checkForPrivacyConflicts(HashMap<String, ArrayList<ArrayList<ICisRecord>>> recommendations) {
     	ArrayList<String> conflictingPrivacyPolicies = new ArrayList<String>();
-    	//privacyDataManager.checkPermission(arg0, arg1, arg2, arg3);
+    	for (int i = 0; i < recommendations.size(); i++) {
+    		//for (int m = 0; m < recommendations.get(i).get(0).getMembershipCriteria().size(); m++) {
+    		    //for (int n = 0; n < recommendations.get(i).get(0).getMembersList().size(); n++) {
+    			    //boolean passed = privacyDataManager.checkPermission(recommendations.get(i).get(0).getMembershipCriteria().get(m), recommendations.get(i).get(0).getMembers(n), arg2, arg3);
+    			    //if (passed == false) conflictingPrivacyPolicies.add(recommendations.get(i).get(0).getMembershipCriteria().get(m))
+    		    //}
+    		//}
+    	}
+    	
     	return conflictingPrivacyPolicies;
     	
     }
     
     public ArrayList<String> checkForPreferenceConflicts(HashMap<String, ArrayList<ArrayList<ICisRecord>>> recommendations) {
     	ArrayList<String> conflictingPreferences = new ArrayList<String>();
+    	
+    	for (int i = 0; i < recommendations.size(); i++) {
+    		//for (int m = 0; m < recommendations.get(i).get(0).getMembershipCriteria().size(); m++) {
+    		    //for (int n = 0; n < recommendations.get(i).get(0).getMembersList().size(); n++) {
+    			    //boolean passed = personalisationManager.getPreference(recommendations.get(i).get(0).getMembershipCriteria().get(m), recommendations.get(i).get(0).getMembers(n), "refuse CIS action with given criteria", arg3) != null;
+    			    //if (passed == false) conflictingPreferences.add(recommendations.get(i))
+    		    //}
+    		//}
+    	}
     	
     	//personalisationManager.getPreference(arg0, arg1, arg2, arg3, "refuse CIS action with given criteria", arg5)
 		return conflictingPreferences;
@@ -461,13 +478,59 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	switch(scaBean.getMethod()){
 		case processEgocentricRecommendations:
 			try {
-				//IIdentity owner = identityManager.fromJid(scaBean.getIdentity());
+				//IIdentity owner = identityManager.fromJid(scaBean..getIdentity());
 				//String serviceType = scaBean.getServiceType();
+				processEgocentricRecommendations(scaBean.getCiss(), scaBean.getCissMetadata());
 				break;
 			} catch (RuntimeException e) {
 				e.printStackTrace();
 			}
+		case processEgocentricConfigurationRecommendations:
+			try {
+				//IIdentity owner = identityManager.fromJid(scaBean..getIdentity());
+				//String serviceType = scaBean.getServiceType();
+				processEgocentricConfigurationRecommendations(scaBean.getConfigureCiss(), scaBean.getCissMetadata());
+				break;
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+			}
+        case processCSMRecommendations:
+		try {
+			//IIdentity owner = identityManager.fromJid(scaBean..getIdentity());
+			//String serviceType = scaBean.getServiceType();
+			processCSMAnalyserRecommendations(scaBean.getCiss());
+			break;
+		} catch (RuntimeException e) {
+			e.printStackTrace();
 		}
+        case processCSMConfigurationRecommendations:
+    		try {
+    			//IIdentity owner = identityManager.fromJid(scaBean..getIdentity());
+    			//String serviceType = scaBean.getServiceType();
+    			processCSMAnalyserConfigurationRecommendations(scaBean.getConfigureCiss());
+    			break;
+    		} catch (RuntimeException e) {
+    			e.printStackTrace();
+    		}
+        case processCSCWRecommendations:
+    		try {
+    			//IIdentity owner = identityManager.fromJid(scaBean..getIdentity());
+    			//String serviceType = scaBean.getServiceType();
+    			processCSCWRecommendations(scaBean.getCiss());
+    			break;
+    		} catch (RuntimeException e) {
+    			e.printStackTrace();
+    		}
+        case processCSCWConfigurationRecommendations:
+    		try {
+    			//IIdentity owner = identityManager.fromJid(scaBean..getIdentity());
+    			//String serviceType = scaBean.getServiceType();
+    			processCSCWConfigurationRecommendations(scaBean.getConfigureCiss());
+    			break;
+    		} catch (RuntimeException e) {
+    			e.printStackTrace();
+    		}
+    	}
     	
     	return null;
     }
