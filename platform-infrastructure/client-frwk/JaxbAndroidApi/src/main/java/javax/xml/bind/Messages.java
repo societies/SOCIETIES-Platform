@@ -13,7 +13,8 @@ import java.util.ResourceBundle;
  */
 class Messages
 {
-    static String format( String property ) {
+	
+	static String format( String property ) {
         return format( property, null );
     }
     
@@ -34,8 +35,8 @@ class Messages
     /** Loads a string resource and formats it with specified arguments. */
     static String format( String property, Object[] args ) {
     	System.out.println("bundleNameJaxb: "+Messages.class.getName());
-        String text = ResourceBundle.getBundle(Messages.class.getName()).getString(property);
-    	//String text = getMessageFormat(property);
+        //String text = ResourceBundle.getBundle(Messages.class.getName()).getString(property);
+        String text = ResourceBundle.getBundle(MESSAGES_ORIGINAL_NAME).getString(property);
         return MessageFormat.format(text,args);
     }
     
@@ -72,35 +73,6 @@ class Messages
         "JAXBContext.IllegalCast";
     
     
-    // Replacement to the properties file by jmgoncalves - ugly stuff, dont look
-    static String getMessageFormat(String property) {
-    	if (property.equals(PROVIDER_NOT_FOUND))
-    		return "Provider {0} not found";
-    	
-    	if (property.equals(COULD_NOT_INSTANTIATE))
-    		return "Provider {0} could not be instantiated: {1}";	
-
-    	if (property.equals(CANT_FIND_PROPERTIES_FILE))
-    		return "Unable to locate jaxb.properties for package {0}";
-    	
-    	if (property.equals(CANT_MIX_PROVIDERS))
-    			return "You may not mix JAXB Providers on the context path";
-    	
-    	if (property.equals(MISSING_PROPERTY))
-    			return "jaxb.properties in package {0} does not contain the {1} property.";
-
-    	if (property.equals(NO_PACKAGE_IN_CONTEXTPATH))
-    			return "No package name is given";
-
-        if (property.equals(NAME_VALUE))
-        		return "name: {0} value: {1}";
-    	
-    	if (property.equals(CONVERTER_MUST_NOT_BE_NULL))
-    			return "The DatatypeConverterInterface parameter must not be null";
-    	
-    	if (property.equals(ILLEGAL_CAST))
-    			return "ClassCastException: attempting to cast {0} to {1}.  Please make sure that you are specifying the proper ClassLoader.";
-    	
-    	return "";
-    }
+    // Ugly fix for loading unshaded properties file
+    static final String MESSAGES_ORIGINAL_NAME = "javax.xml.bind.Messages";
 }

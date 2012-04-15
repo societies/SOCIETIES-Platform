@@ -1,0 +1,63 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.societies.android.api</groupId>
+	<!-- change the artifactid to your project artifactid -->
+	<artifactId>societies-android-api</artifactId>
+	<name>SOCIETIES API for Android (External/3rd Party)</name>
+	<!-- the api version is the same as the release -->
+	<version>${release.version}</version>
+	<!-- the packaging tag enables the creation of the correct manifest using 
+		the maven-bundle-plugin -->
+	<packaging>jar</packaging>
+
+	<description>
+    	This jar file provides the external interfaces of the SOCIETIES platform version XX.
+    </description>
+
+	<developers>
+		<developer>
+			<name>Babak Farshchian </name>
+			<organization>SINTEF</organization>
+			<organizationUrl>http://www.sintef.com/</organizationUrl>
+		</developer>
+	</developers>
+
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>android-parent</artifactId>
+		<relativePath>../../../parent/android.xml</relativePath>
+		<version>0.1</version>
+	</parent>
+
+	<dependencies>
+		<!-- add your dependencies here -->
+		<dependency>
+			<groupId>org.societies.api.schema</groupId>
+			<artifactId>societies-api-schema</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+		<!-- Needed for Societies-specific annotations -->
+		<dependency>
+			<groupId>org.societies.utilities</groupId>
+			<artifactId>societies-annotations</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+        <dependency>
+            <groupId>android</groupId>
+            <artifactId>android</artifactId>
+        </dependency>
+	</dependencies>
+
+	<build>
+        <finalName>${project.artifactId}</finalName>
+        <sourceDirectory>src</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <artifactId>android-maven-plugin</artifactId>
+            </plugin>
+        </plugins>	
+	</build>
+</project>
