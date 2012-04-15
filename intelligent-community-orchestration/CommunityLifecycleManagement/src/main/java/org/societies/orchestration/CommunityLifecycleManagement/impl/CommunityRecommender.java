@@ -263,7 +263,8 @@ public class CommunityRecommender //implements ICommCallback
 	public ArrayList<String> identifyCissToCreate(ArrayList<ICisRecord> creatableCiss, ArrayList<String> cissToCreateMetadata) {		
 		//Can't use GUI in tests
 		//cissToCreate = getUserFeedbackOnCreation(cissToCreate);
-		
+		if (cissToCreateMetadata == null)
+			cissToCreateMetadata = new ArrayList<String> ();
 		cissToCreate = creatableCiss;
 		for (int i = 0; i < cissToCreateMetadata.size(); i++) {
 			if (!(cissToCreateMetadata.get(i).split("---")[0].substring(0, 3).equals("CIS")))
