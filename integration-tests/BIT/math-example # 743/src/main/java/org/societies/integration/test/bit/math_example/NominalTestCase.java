@@ -9,43 +9,35 @@ public class NominalTestCase {
 	private IConsumer mathServiceConsumer;
 	private static Logger LOG = LoggerFactory.getLogger(NominalTestCase.class);
 	
-	public NominalTestCase() {
+	public NominalTestCase(IConsumer mathServiceConsumer) {
 		super();
-
-	}
-
-	
-	public IConsumer getMathServiceConsumer() {
-		return mathServiceConsumer;
-	}
-	
-	public void setMathServiceConsumer(IConsumer mathServiceConsumer) {
 		this.mathServiceConsumer = mathServiceConsumer;
+		this.setUp();
+		this.body();
+		this.tearDown();
+	}
+
+	private void setUp() {
+
+	}
+
+	private void body() {
+		if (mathServiceConsumer.barycenter(1, 2, 3) == 1) {
+			LOG.info("----- 743 PASS");
+		}
+		else {
+			LOG.info("Test FAIL");
+		}
+		if (mathServiceConsumer.barycenter(1, 3, 3) == 1) {
+			LOG.info("Test PASS");
+		}
+		else {
+			LOG.info("Test FAIL");
+		}
 	}
 	
-	/**
-	 * 
-	 */
-	private void startTest() {
+	private void tearDown() {
 		
-		
-		if (mathServiceConsumer.barycenter(1, 2, 3) == 1) 
-		{
-			LOG.info("Test PASS");
-		}
-		else
-		{
-			LOG.info("Test FAIL");
-		}
-		
-		if (mathServiceConsumer.barycenter(1, 3, 3) == 1) 
-		{
-			LOG.info("Test PASS");
-		}
-		else
-		{
-			LOG.info("Test FAIL");
-		}
 	}
 
 }
