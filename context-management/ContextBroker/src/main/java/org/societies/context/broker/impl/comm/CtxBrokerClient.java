@@ -135,7 +135,8 @@ public class CtxBrokerClient implements ICommCallback {
 
 		//send the message
 		try {
-			this.commManager.sendIQGet(stanza, ctxBrokerCreateEntityBean, this);
+			//this.commManager.sendIQGet(stanza, ctxBrokerCreateEntityBean, this);
+			this.commManager.sendMessage(stanza, ctxBrokerCreateEntityBean);
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -171,7 +172,8 @@ public class CtxBrokerClient implements ICommCallback {
 
 		//send the message
 		try {
-			this.commManager.sendIQGet(stanza, ctxBrokerCreateAttributeBean, this);
+			//this.commManager.sendIQGet(stanza, ctxBrokerCreateAttributeBean, this);
+			this.commManager.sendMessage(stanza, ctxBrokerCreateAttributeBean);
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -204,7 +206,8 @@ public class CtxBrokerClient implements ICommCallback {
 
 		//send the message
 		try {
-			this.commManager.sendIQGet(stanza, ctxBrokerCreateAssociationBean, this);
+			//this.commManager.sendIQGet(stanza, ctxBrokerCreateAssociationBean, this);
+			this.commManager.sendMessage(stanza, ctxBrokerCreateAssociationBean);
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -237,7 +240,8 @@ public class CtxBrokerClient implements ICommCallback {
 
 		//send the message
 		try {
-			this.commManager.sendIQGet(stanza, ctxBrokerRemoveBean, this);
+			//this.commManager.sendIQGet(stanza, ctxBrokerRemoveBean, this);
+			this.commManager.sendMessage(stanza, ctxBrokerRemoveBean);
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -272,7 +276,8 @@ public class CtxBrokerClient implements ICommCallback {
 
 		//send the message
 		try {
-			this.commManager.sendIQGet(stanza, ctxBrokerUpdateBean, this);
+			//this.commManager.sendIQGet(stanza, ctxBrokerUpdateBean, this);
+			this.commManager.sendMessage(stanza, ctxBrokerUpdateBean);
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -307,7 +312,8 @@ public class CtxBrokerClient implements ICommCallback {
 
 		//send the message
 		try {
-			this.commManager.sendIQGet(stanza, ctxBrokerUpdateAttributeBean, this);
+			//this.commManager.sendIQGet(stanza, ctxBrokerUpdateAttributeBean, this);
+			this.commManager.sendMessage(stanza, ctxBrokerUpdateAttributeBean);
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -343,7 +349,8 @@ public class CtxBrokerClient implements ICommCallback {
 
 		//send the message
 		try {
-			this.commManager.sendIQGet(stanza, ctxBrokerRetrieveBean, this);
+			//this.commManager.sendIQGet(stanza, ctxBrokerRetrieveBean, this);
+			this.commManager.sendMessage(stanza, ctxBrokerRetrieveBean);
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -378,7 +385,8 @@ public class CtxBrokerClient implements ICommCallback {
 
 		//send the message
 		try {
-			this.commManager.sendIQGet(stanza, ctxBrokerLookupBean, this);
+			//this.commManager.sendIQGet(stanza, ctxBrokerLookupBean, this);
+			this.commManager.sendMessage(stanza, ctxBrokerLookupBean);
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
