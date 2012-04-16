@@ -24,6 +24,8 @@
  */
 package org.societies.service.api;
 
+import java.util.concurrent.ExecutionException;
+
 /**
  * Describe your class here...
  *
@@ -32,6 +34,6 @@ package org.societies.service.api;
  */
 public interface IConsumer {
 	
-	public int barycenter (int a, int b, int c);
+	public float barycenter (int a, int b, int c) throws InterruptedException, ExecutionException;
 
 }

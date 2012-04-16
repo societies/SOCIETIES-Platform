@@ -18,8 +18,7 @@ public class MathServiceConsumer implements IConsumer {
 	public MathServiceConsumer(int a, int b) {
 		this.num_a = a;
 		this.num_b = b;
-		System.out
-				.println("numbers from property file :" + num_a + " " + num_b);
+		System.out.println("numbers from property file :" + num_a + " " + num_b);
 	}
 
 	// Start Bean mandatory methods
@@ -62,8 +61,7 @@ public class MathServiceConsumer implements IConsumer {
 	}
 
 	// used to demonstrate how the mock can manage the Asynch Interface.
-	public boolean collaborationAsynchronousCall(int num_a, int num_b,
-			int result) throws InterruptedException, ExecutionException {
+	public boolean collaborationAsynchronousCall(int num_a, int num_b, int result) throws InterruptedException, ExecutionException {
 		Future<Integer> res = null;
 		res = getMathService().multiply(num_a, num_b);
 		if (result == res.get()) {
@@ -96,10 +94,18 @@ public class MathServiceConsumer implements IConsumer {
 	}
 
 	@Override
-	public int barycenter(int arg0, int arg1, int arg2) {
-		return 1;
+	public float barycenter(int a, int b, int c) throws InterruptedException, ExecutionException {
+		// barycenter of a and b is RES with RES = (a * b) / c
+		Float f = new Float(1);
+		Integer a1 = new Integer(1);
+		Future<Integer> res = null;
+		res = getMathService().multiply(a, b);
+		if (c != 0) {
+			a1 = res.get();
+			f = (float) (a1/c) ;
+		} else {
+			f = (float) -1;
+		}
+		return f;
 	}
-
-	
-
 }

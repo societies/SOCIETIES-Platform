@@ -7,6 +7,8 @@ package org.societies.integration.test.bit.math_example;
  * @author Bruno
  *
  */
+import java.util.concurrent.ExecutionException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.service.api.IConsumer;
@@ -25,8 +27,8 @@ public class TestCase743 {
 		this.mathServiceConsumer = mathServiceConsumer;
 	}
 	
-	private void startTest() {
-		nominalTestCase = new NominalTestCase(mathServiceConsumer);		
+	private void startTest() throws InterruptedException, ExecutionException {
+			nominalTestCase = new NominalTestCase(mathServiceConsumer);
 	}
 
 
