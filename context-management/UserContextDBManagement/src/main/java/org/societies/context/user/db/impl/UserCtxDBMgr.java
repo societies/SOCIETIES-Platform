@@ -197,8 +197,9 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	}
 
 	@Override
-	public List<CtxEntityIdentifier> lookupEntities(String arg0, String arg1, Serializable arg2,
-			Serializable arg3) throws CtxException {
+	public List<CtxEntityIdentifier> lookupEntities(String entityType,
+			String attribType, Serializable minAttribValue,
+			Serializable maxAttribValue) throws CtxException {
 		// TODO Auto-generated method stub
 		return null;
 	}
