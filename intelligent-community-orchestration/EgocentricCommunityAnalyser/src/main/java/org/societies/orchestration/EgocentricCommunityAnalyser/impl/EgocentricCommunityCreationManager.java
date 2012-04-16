@@ -413,7 +413,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 					//    // and the time passed since then is at least the last 10% of its life... sub-CIS the old friends into a new overall one?
 					//    }
 					//    if ((subCisExistsAlready == false))
-					//        cissToCreate.add(new CisRecord(null, linkedCss.toString(), "Your friends in your CSS Directory", null, null, null, "friend", identifiedFriends, null));
+					//        cissToCreate.add(new ICisRecord(null, linkedCss.toString(), "Your friends in your CSS Directory", null, null, null, "friend", identifiedFriends, null));
 					}
 				}
 				
@@ -516,7 +516,52 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				
 				if (theFriends.size() >= 2) {
 				    ArrayList<ArrayList<IIdentity>> mutualFriendsGroups = new ArrayList<ArrayList<IIdentity>>();
-				
+				    ArrayList<IIdentity> membersCovered = new ArrayList<IIdentity>();
+				    for (int i = 0; i < theFriends.size(); i++) {
+				    	ArrayList<IIdentity> mutualFriendsCisMembers = new ArrayList<IIdentity>();
+				    	IIdentity temp = null;
+						try {
+							temp = identityManager.fromJid(theFriends.get(i).toString());
+						} catch (InvalidFormatException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+				    	mutualFriendsCisMembers.add(temp);
+				    	for (int m = 0; m < theFriends.size(); m++) {
+				    		if (i == m) continue;
+				    		boolean notMutualFriend = false;
+				    		for (int n = 0; n < mutualFriendsCisMembers.size(); n++) {
+				    			//if (!(userCtxBroker.lookupOtherUser(theFriends.get(m), "close friends").contains(mutualFriendsCisMembers.get(n)) && 
+					    		//    userCtxBroker.lookupOtherUser(mutualFriendsCisMembers.get(n), "close friends").contains(theFriends.get(m))))
+				    			//    notMutualFriend = true;
+				    		}
+				    		if (notMutualFriend == false) {
+				    			try {
+									temp = identityManager.fromJid(theFriends.get(i).toString());
+								} catch (InvalidFormatException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+						    	mutualFriendsCisMembers.add(temp);
+				    		}
+				    		//
+				    		//    if CIS doesn't already exist
+				    		//    ICisRecord mutualFriendsCis = cisManager.getBlankCisRecord();
+				    		//    mutualFriendsCis.setMembersList(theFriends.get(i), theFriends.get(m));
+				    		//    cissToCreate.add(mutualFriendsCis);
+				    		//    cissToCreateMetadata.add("Ongoing");
+				    		//membersCovered.add(mutualFriends.get(i));
+				    		
+				    		//
+				    	}if (!mutualFriendsGroups.contains(mutualFriendsCisMembers)) {
+//				    	    if CIS doesn't already exist
+				    		//    ICisRecord mutualFriendsCis = cisManager.getBlankCisRecord();
+				    		//    mutualFriendsCis.setMembersList(theFriends.get(i), theFriends.get(m));
+				    		//    cissToCreate.add(mutualFriendsCis);
+				    		//    cissToCreateMetadata.add("Ongoing");
+				    		//membersCovered.add(mutualFriends.get(i));
+				    	}
+				    }
 				    for (int i = 0; i < userJoinedCiss.size(); i++) {
 					    ArrayList<IIdentity> membersOfCis = new ArrayList<IIdentity>();
 					    //String[] membersOfCisStringArray = userJoinedCiss.get(i).membersCss;
@@ -585,14 +630,11 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				}
 				if (cisExistsAlready == false) {
 					ICisRecord temp = cisManager.getCis(linkedCss.toString(), "Default CIS");
-					//temp.setName("PERSONAL CIS containing your CSS directory members");
-					//temp.setMembers(cssDirectoryMembers);
-				    //cissToCreate.add(new ICisRecord(null, linkedCss.toString(), "PERSONAL CIS containing your CSS directory members", null, null, null, cssDirectoryMembers, null, null));
+					//temp.setName("Mutual friends CIS");
+					//temp.setMembers(these members);
+				    //cissToCreate.add(new ICisRecord(null, linkedCss.toString(), "Mutual friends CIS", null, null, null, cssDirectoryMembers, null, null));
 				    cissToCreate.add(temp);
-					personalCiss.remove("CSS Directory");
-				    //personalCiss.put("CSS Directory", new ICisRecord(null, linkedCss.toString(), "PERSONAL CIS containing your CSS directory members", null, null, null, cssDirectoryMembers, null, null));
-			        personalCiss.put("CSS Directory", temp);
-					cissToCreateMetadata.add("PERSONAL CIS containing your CSS directory members");
+					cissToCreateMetadata.add("Mutual friends CIS");
 				
 				}
 				
