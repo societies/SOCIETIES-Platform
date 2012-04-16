@@ -30,5 +30,6 @@ public interface FacebookConnector extends ISocialConnector {
 	public String NOTES	 	 = "me/notes";
 	public String ACCOUNTS	 = "me/accounts";
 	public String THUMB		 = "me/picture";
+	public String LIKES		 = "me/likes";
 	
 }
