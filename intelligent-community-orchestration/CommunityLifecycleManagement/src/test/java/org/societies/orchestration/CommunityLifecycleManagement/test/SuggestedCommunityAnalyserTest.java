@@ -36,6 +36,7 @@ import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityRecommender;
 import org.societies.orchestration.CommunityLifecycleManagement.impl.SuggestedCommunityAnalyser;
 
 
@@ -52,6 +53,7 @@ public class SuggestedCommunityAnalyserTest {
 	private SuggestedCommunityAnalyser suggestedCommunityAnalyser;
 	private ICisManager cisManager;
 	private ICtxBroker userCtxBroker;
+	private CommunityRecommender communityRecommender;
 	
 	@Test
     public void testProcessEgocentricRecommendations() {
@@ -61,13 +63,20 @@ public class SuggestedCommunityAnalyserTest {
     	
 		cisManager = mock(ICisManager.class);
 		userCtxBroker = mock(ICtxBroker.class);
+		communityRecommender = mock(CommunityRecommender.class);
+		
+		
 		
 		//create CIS for James where James himself has been inactive for 1 year.
 	    
 		//CisRecord jamesCisRecord = cisManager.createCis("James", "James CIS");
 		
     	suggestedCommunityAnalyser = new SuggestedCommunityAnalyser(ownerId, "CSS");
-		HashMap<String, ArrayList<ICisRecord>> recommendations = new HashMap<String, ArrayList<ICisRecord>>();
+    	suggestedCommunityAnalyser.setCommunityRecommender(communityRecommender);
+    	suggestedCommunityAnalyser.setUserContextBroker(userCtxBroker);
+    	suggestedCommunityAnalyser.setCisManager(cisManager);
+    	
+    	HashMap<String, ArrayList<ICisRecord>> recommendations = new HashMap<String, ArrayList<ICisRecord>>();
 		suggestedCommunityAnalyser.processEgocentricRecommendations(recommendations, new ArrayList<String>());
 		
 		//James should have been suggested to leave the CIS.
@@ -85,12 +94,16 @@ public class SuggestedCommunityAnalyserTest {
     	
 		cisManager = mock(ICisManager.class);
 		userCtxBroker = mock(ICtxBroker.class);
+		communityRecommender = mock(CommunityRecommender.class);
 		
 		//create CIS for James where James himself has been inactive for 1 year.
 	    
 		//CisRecord jamesCisRecord = cisManager.createCis("James", "James CIS");
 		
     	suggestedCommunityAnalyser = new SuggestedCommunityAnalyser(ownerId, "CSS");
+    	suggestedCommunityAnalyser.setCommunityRecommender(communityRecommender);
+    	suggestedCommunityAnalyser.setUserContextBroker(userCtxBroker);
+    	suggestedCommunityAnalyser.setCisManager(cisManager);
 		HashMap<String, ArrayList<ICisRecord>> recommendations = new HashMap<String, ArrayList<ICisRecord>>();
 		suggestedCommunityAnalyser.processEgocentricRecommendations(recommendations, new ArrayList<String>());
 		
@@ -109,12 +122,16 @@ public class SuggestedCommunityAnalyserTest {
     	
 		cisManager = mock(ICisManager.class);
 		userCtxBroker = mock(ICtxBroker.class);
+		communityRecommender = mock(CommunityRecommender.class);
 		
 		//create CIS for James where James himself has been inactive for 1 year.
 	    
 		//CisRecord jamesCisRecord = cisManager.createCis("James", "James CIS");
 		
     	suggestedCommunityAnalyser = new SuggestedCommunityAnalyser(ownerId, "CSS");
+    	suggestedCommunityAnalyser.setCommunityRecommender(communityRecommender);
+    	suggestedCommunityAnalyser.setUserContextBroker(userCtxBroker);
+    	suggestedCommunityAnalyser.setCisManager(cisManager);
 		HashMap<String, ArrayList<ICisRecord>> recommendations = new HashMap<String, ArrayList<ICisRecord>>();
 		suggestedCommunityAnalyser.processEgocentricRecommendations(recommendations, new ArrayList<String>());
 		
