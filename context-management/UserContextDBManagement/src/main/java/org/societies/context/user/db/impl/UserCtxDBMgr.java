@@ -25,6 +25,7 @@
 package org.societies.context.user.db.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -182,9 +183,17 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	}
 
 	@Override
-	public List<CtxIdentifier> lookup(CtxModelType arg0, String arg1) throws CtxException {
+	public List<CtxIdentifier> lookup(CtxModelType modelType, String type) throws CtxException {
 		// TODO Auto-generated method stub
-		return null;
+		
+		final List<CtxIdentifier> foundList = new ArrayList<CtxIdentifier>();
+		
+		for (CtxIdentifier identifier : modelObjects.keySet()) {
+			if (identifier.getModelType().equals(modelType) && identifier.getType().equals(type)) {
+				foundList.add(identifier);
+			}		
+		}
+		return foundList;
 	}
 
 	@Override
