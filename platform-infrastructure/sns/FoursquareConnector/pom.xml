@@ -5,7 +5,7 @@
 	<name>Foursquare Connector</name>
 	<groupId>org.societies.platform</groupId>
 	<artifactId>foursquare_connector</artifactId>
-	<version>${release.version}-SNAPSHOT</version>
+	<version>${release.version}</version>
 	<packaging>bundle</packaging>
 
 	<parent>
@@ -67,6 +67,13 @@
 			<groupId>com.googlecode.json-simple</groupId>
 			<artifactId>json-simple</artifactId>
 			<version>1.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.9</version>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
