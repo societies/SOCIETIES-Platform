@@ -22,6 +22,7 @@ public class DecisionMakingBean {
 	private List<Integer> intentConfidenceLevel;
 	private int intentSize;
 	private int preferenceSize;
+	public  DecisionMakingBean(){}
 	public  DecisionMakingBean(List<IOutcome> intents,List<IOutcome> preferences){
 		this.intentSize=intents.size();
 		this.preferenceSize=preferences.size();
