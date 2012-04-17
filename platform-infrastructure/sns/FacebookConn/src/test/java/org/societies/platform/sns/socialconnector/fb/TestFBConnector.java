@@ -4,7 +4,8 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.logging.Logger;
 
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
@@ -18,14 +19,19 @@ public class TestFBConnector {
 	private static final Logger logger   = Logger.getLogger(TestFBConnector.class.getSimpleName());
 	
 	
-	@BeforeClass
-	public static void initConnector() {
+	@Before
+	public void setUp() {
 		connector = new FacebookConnectorImpl("PUT HERE YOUR TOKEN", "Luca");
 		
 		logger.info("Connector name: "+ connector.getConnectorName());
 		logger.info("Connector id: "+ connector.getID());
 		assertNotNull(connector);
 	
+	}
+	
+	@After
+	public void tearDown() throws Exception {
+		connector = null;
 	}
 	
 	@Test
