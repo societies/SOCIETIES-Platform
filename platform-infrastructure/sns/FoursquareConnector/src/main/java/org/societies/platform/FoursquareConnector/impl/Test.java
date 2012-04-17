@@ -1,5 +1,7 @@
 package org.societies.platform.FoursquareConnector.impl;
 
+import org.societies.platform.FoursquareConnector.impl.FoursquareConnectorImpl;
+
 
 class Test{
 

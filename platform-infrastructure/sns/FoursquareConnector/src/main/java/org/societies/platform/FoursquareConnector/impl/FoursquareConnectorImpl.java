@@ -84,7 +84,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector{
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.sns.ISocialConnector#getID()
 	 */
-	@Override
+	
 	public String getID() {
 		// TODO Auto-generated method stub
 		return null;
@@ -94,7 +94,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector{
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.sns.ISocialConnector#setToken(java.lang.String)
 	 */
-	@Override
+	
 	public void setToken(String access_token) {
 		// TODO Auto-generated method stub
 		
@@ -104,7 +104,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector{
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.sns.ISocialConnector#setTokenExpiration(long)
 	 */
-	@Override
+	
 	public void setTokenExpiration(long expires) {
 		// TODO Auto-generated method stub
 		
@@ -114,7 +114,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector{
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.sns.ISocialConnector#getTokenExpiration()
 	 */
-	@Override
+	
 	public long getTokenExpiration() {
 		// TODO Auto-generated method stub
 		return 0;
@@ -124,7 +124,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector{
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.sns.ISocialConnector#getToken()
 	 */
-	@Override
+	
 	public String getToken() {
 		// TODO Auto-generated method stub
 		return null;
@@ -134,7 +134,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector{
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.sns.ISocialConnector#setConnectorName(java.lang.String)
 	 */
-	@Override
+	
 	public void setConnectorName(String name) {
 		// TODO Auto-generated method stub
 		
@@ -144,7 +144,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector{
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.sns.ISocialConnector#getConnectorName()
 	 */
-	@Override
+	
 	public String getConnectorName() {
 		// TODO Auto-generated method stub
 		return null;
@@ -154,7 +154,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector{
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.sns.ISocialConnector#getSocialData(java.lang.String)
 	 */
-	@Override
+	
 	public String getSocialData(String path) {
 		// TODO Auto-generated method stub
 		return null;
@@ -164,7 +164,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector{
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.sns.ISocialConnector#requireAccessToken()
 	 */
-	@Override
+	
 	public Map<String, String> requireAccessToken() {
 		// TODO Auto-generated method stub
 		return null;
@@ -174,7 +174,6 @@ public class FoursquareConnectorImpl implements FoursquareConnector{
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.sns.ISocialConnector#disconnect()
 	 */
-	@Override
 	public void disconnect() {
 		// TODO Auto-generated method stub
 		
@@ -184,7 +183,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector{
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.sns.ISocialConnector#setMaxPostLimit(int)
 	 */
-	@Override
+	
 	public void setMaxPostLimit(int postLimit) {
 		// TODO Auto-generated method stub
 		
@@ -194,7 +193,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector{
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.sns.ISocialConnector#setParameter(java.lang.String, java.lang.String)
 	 */
-	@Override
+	
 	public void setParameter(String key, String value) {
 		// TODO Auto-generated method stub
 		
@@ -204,7 +203,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector{
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.sns.ISocialConnector#resetParameters()
 	 */
-	@Override
+	
 	public void resetParameters() {
 		// TODO Auto-generated method stub
 		
@@ -214,7 +213,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector{
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.sns.ISocialConnector#getUserFriends()
 	 */
-	@Override
+	
 	public String getUserFriends() {
 		// TODO Auto-generated method stub
 		return null;
@@ -224,7 +223,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector{
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.sns.ISocialConnector#getUserActivities()
 	 */
-	@Override
+	
 	public String getUserActivities() {
 		// TODO Auto-generated method stub
 		return null;
@@ -234,7 +233,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector{
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.sns.ISocialConnector#getUserGroups()
 	 */
-	@Override
+	
 	public String getUserGroups() {
 		// TODO Auto-generated method stub
 		return null;
