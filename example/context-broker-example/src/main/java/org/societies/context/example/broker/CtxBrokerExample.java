@@ -25,6 +25,7 @@
 package org.societies.context.example.broker;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -40,6 +41,7 @@ import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,6 +71,7 @@ public class CtxBrokerExample 	{
 		LOG.info("Starting examples...");
 		this.createContext();
 		this.retrieveContext();
+		this.lookupContext();
 		this.registerForContextChanges();
 	}
 
@@ -144,6 +147,34 @@ public class CtxBrokerExample 	{
 		}
 	}
 
+	
+
+	/**
+	 * This method demonstrates how to retrieve context data from the context database
+	 */
+	private void lookupContext() {
+		try {
+		
+			List<CtxIdentifier> idsEntities =this.internalCtxBroker.lookup(CtxModelType.ENTITY, "Device").get();
+			LOG.info("lookup results for Entity type: 'Device' " +idsEntities);
+			
+			List<CtxIdentifier> idsAttribute =this.internalCtxBroker.lookup(CtxModelType.ATTRIBUTE, "DeviceID").get();
+			LOG.info("lookup results for Attribute type: 'DeviceID' " +idsAttribute);
+		
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+		
+	
+	
 	/**
 	 * This method demonstrates how to retrieve context data from the context database
 	 */
