@@ -42,6 +42,8 @@ import static org.mockito.Mockito.*;
 import org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityCreationManager;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -60,7 +62,7 @@ import org.societies.api.cis.management.ICisEditor;
 import org.societies.api.cis.management.ICisActivity;
 import org.societies.api.cis.management.ICisActivityFeed;
 
-import org.societies.api.css.directory.ICssDirectory;
+import org.societies.api.internal.css.directory.ICssDirectory;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
@@ -90,8 +92,11 @@ public class EgocentricCommunityCreationManagerTest {
 	private ICisManager cisManager;
 	
 	private ICssDirectory cssDirectory;
+	private IIdentityManager linkedCssManager;
+	private ICommManager commManager;
+	private ISuggestedCommunityAnalyser suggestedCommunityAnalyser;
 	
-	//@Test
+	@Test
 	public void testNonExtensiveCreationCheck() {
 		
 		IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
@@ -100,11 +105,17 @@ public class EgocentricCommunityCreationManagerTest {
     	
 		cisManager = mock(ICisManager.class);
 		userCtxBroker = mock(ICtxBroker.class);
-		
+		linkedCssManager = mock(IIdentityManager.class);
+		commManager = mock(ICommManager.class);
+		suggestedCommunityAnalyser = mock(ISuggestedCommunityAnalyser.class);
+		cssDirectory = mock(ICssDirectory.class);
 		
     	egocentricCommunityCreationManager = new EgocentricCommunityCreationManager(ownerId, "CSS");
 		
-    	
+    	egocentricCommunityCreationManager.setLinkedCssManager(linkedCssManager);
+    	egocentricCommunityCreationManager.setCommManager(commManager);
+    	egocentricCommunityCreationManager.setSuggestedCommunityAnalyser(suggestedCommunityAnalyser);
+    	egocentricCommunityCreationManager.setUserCssDirectory(cssDirectory);
     	
     	//create some test context data for the CSS?
     	//ServiceResourceIdentifier userInterfacedService = new ServiceResourceIdentifier(/**new URI("Chat system")*/);
@@ -131,7 +142,7 @@ public class EgocentricCommunityCreationManagerTest {
     	egocentricCommunityCreationManager.setCisManager(cisManager);
     	
 		//check user joined CISs before
-		egocentricCommunityCreationManager.identifyCissToCreate("not extensive", null);
+		egocentricCommunityCreationManager.identifyCissToCreate("not extensive", new HashMap<IIdentity, String>());
 		//check and compare user joined CISs after
 		boolean success = false;
 		//if (cisManager.getCisList().size() > 0) success = true;
@@ -144,18 +155,25 @@ public class EgocentricCommunityCreationManagerTest {
 		//Assert.assertNull(cisManager.getCisList(new ICisRecord(null, null, null, null, null, members, null, null, null)));
 	}
 	
-	//@Test
+	@Test
     public void testExtensiveCreationCheck() {
     	
+		cisManager = mock(ICisManager.class);
+		userCtxBroker = mock(ICtxBroker.class);
+		
     	IIdentity ownerId = mock(IIdentity.class); //James Jents CSS
     	IIdentity friend1Id = mock(IIdentity.class); //Friend 1 CSS
     	IIdentity friend2Id = mock(IIdentity.class); //Friend 2 CSS
+    	linkedCssManager = mock(IIdentityManager.class);
+    	commManager = mock(ICommManager.class);
+    	suggestedCommunityAnalyser = mock(ISuggestedCommunityAnalyser.class);
+    	cssDirectory = mock(ICssDirectory.class);
     	
     	CssAdvertisementRecord friend1Ad = mock(CssAdvertisementRecord.class);
     	CssAdvertisementRecord friend2Ad = mock(CssAdvertisementRecord.class);
     	
-    	cssDirectory.addCssAdvertisementRecord(friend1Ad);
-    	cssDirectory.addCssAdvertisementRecord(friend2Ad);
+    	//cssDirectory.addCssAdvertisementRecord(friend1Ad);
+    	//cssDirectory.addCssAdvertisementRecord(friend2Ad);
     
         ICssRecord thisCss = mock(ICssRecord.class);
         //thisCss.addCssDirectory(cssDirectory);
@@ -170,7 +188,12 @@ public class EgocentricCommunityCreationManagerTest {
 		
     	egocentricCommunityCreationManager = new EgocentricCommunityCreationManager(ownerId, "CSS");
 		
-    	
+    	egocentricCommunityCreationManager.setLinkedCssManager(linkedCssManager);
+    	egocentricCommunityCreationManager.setCommManager(commManager);
+    	egocentricCommunityCreationManager.setSuggestedCommunityAnalyser(suggestedCommunityAnalyser);
+    	egocentricCommunityCreationManager.setCisManager(cisManager);
+    	egocentricCommunityCreationManager.setUserCssDirectory(cssDirectory);
+    	egocentricCommunityCreationManager.setUserContextBroker(userCtxBroker);
     	
     	//create some test context data for the CSS?
     	//ServiceResourceIdentifier userInterfacedService = new ServiceResourceIdentifier(/**new URI("Chat system")*/);
@@ -199,7 +222,7 @@ public class EgocentricCommunityCreationManagerTest {
     	//userCtxBroker.addAttribute(ownerIdContextEntity, CtxAttributeValueType.INDIVIDUAL, "CSS proximity", IUserCtxBrokerCallback);
     	
     	//check user joined CISs before
-		egocentricCommunityCreationManager.identifyCissToCreate("extensive", null);
+		egocentricCommunityCreationManager.identifyCissToCreate("extensive", new HashMap<IIdentity, String>());
 		//check and compare user joined CISs after
 		
 		//Assert.assertNotNull(/**User's joined CISs*/);

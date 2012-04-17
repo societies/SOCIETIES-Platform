@@ -71,13 +71,20 @@ public interface ISuggestedCommunityAnalyser {
 	 * 
 	 * Key: "Configure CISs attributes" Value: Arraylist(1) of arraylist(2) of CisRecords. (1) has one entry per configuration recommendation.
 	 * (2) Has two entries for each of (1) - the first is the CisRecord to be configured, and the second is the CisRecord that would 
-	 * result if the configuration happens.
-	 * 
-	 *  Key: "Split CISs" Value: Arraylist(1) of arraylist(2) of CisRecords. (1) has one entry per configuration recommendation.
+	 * result if the configuration happens. Among other things this can be used to:
+	 *  - Add and remove CIS members (edit the members list)
+	 *  - Add, remove, or amend membership criteria (edit the membership criteria) 
+	 *  - Add and remove CIS services (edit the CIS's shared services) 
+	 *  - Add, remove, or amend name and description (edit the name and description)
+	 *  - Change the owner (edit the owner attribute)
+	 *  - Add and remove administrators (edit the administrators list)
+	 *  - Add and remove sub-CISs and super-CISs (edit the sub-CIS and super-CIS lists)
+	 *  
+	 * Key: "Split CISs" Value: Arraylist(1) of arraylist(2) of CisRecords. (1) has one entry per configuration recommendation.
 	 * (2) Has three entries for each of (1) - the first is the CisRecord to be split, and the other two are the new CISs to be
 	 * created by the split.
 	 * 
-	 *  Key: "Merge CISs" Value: Arraylist(1) of arraylist(2) of CisRecords. (1) has one entry per configuration recommendation.
+	 * Key: "Merge CISs" Value: Arraylist(1) of arraylist(2) of CisRecords. (1) has one entry per configuration recommendation.
 	 * (2) Has three entries for each of (1) - the first two are the CisRecords that are to be merged into one. The third is optional,
 	 * and it is the CisRecord that is to be created by the merge. This could be used in order to specify
 	 * for example who the new owner should be.
@@ -112,7 +119,23 @@ public interface ISuggestedCommunityAnalyser {
 	 * 
 	 * Key: "Configure CISs" Value: Arraylist(1) of arraylist(2) of CisRecords. (1) has one entry per configuration recommendation.
 	 * (2) Has two entries for each of (1) - the first is the CisRecord to be configured, and the second is the CisRecord that would 
-	 * result if the configuration happens.
+	 * result if the configuration happens. Among other things this can be used to:
+	 *  - Add and remove CIS members (edit the members list)
+	 *  - Add, remove, or amend membership criteria (edit the membership criteria) 
+	 *  - Add and remove CIS services (edit the CIS's shared services) 
+	 *  - Add, remove, or amend name and description (edit the name and description)
+	 *  - Change the owner (edit the owner attribute)
+	 *  - Add and remove administrators (edit the administrators list)
+	 *  - Add and remove sub-CISs and super-CISs (edit the sub-CIS and super-CIS lists)
+	 *  
+	 * Key: "Split CISs" Value: Arraylist(1) of arraylist(2) of CisRecords. (1) has one entry per configuration recommendation.
+	 * (2) Has three entries for each of (1) - the first is the CisRecord to be split, and the other two are the new CISs to be
+	 * created by the split.
+	 * 
+	 * Key: "Merge CISs" Value: Arraylist(1) of arraylist(2) of CisRecords. (1) has one entry per configuration recommendation.
+	 * (2) Has three entries for each of (1) - the first two are the CisRecords that are to be merged into one. The third is optional,
+	 * and it is the CisRecord that is to be created by the merge. This could be used in order to specify
+	 * for example who the new owner should be.
 	 * 
 	 */
     public void processCSMAnalyserConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations);
@@ -141,7 +164,23 @@ public interface ISuggestedCommunityAnalyser {
 	 * 
 	 * Key: "Configure CISs" Value: Arraylist(1) of arraylist(2) of CisRecords. (1) has one entry per configuration recommendation.
 	 * (2) Has two entries for each of (1) - the first is the CisRecord to be configured, and the second is the CisRecord that would 
-	 * result if the configuration happens.
+	 * result if the configuration happens. Among other things this can be used to:
+	 *  - Add and remove CIS members (edit the members list)
+	 *  - Add, remove, or amend membership criteria (edit the membership criteria) 
+	 *  - Add and remove CIS services (edit the CIS's shared services) 
+	 *  - Add, remove, or amend name and description (edit the name and description)
+	 *  - Change the owner (edit the owner attribute)
+	 *  - Add and remove administrators (edit the administrators list)
+	 *  - Add and remove sub-CISs and super-CISs (edit the sub-CIS and super-CIS lists)
+	 *  
+	 * Key: "Split CISs" Value: Arraylist(1) of arraylist(2) of CisRecords. (1) has one entry per configuration recommendation.
+	 * (2) Has three entries for each of (1) - the first is the CisRecord to be split, and the other two are the new CISs to be
+	 * created by the split.
+	 * 
+	 * Key: "Merge CISs" Value: Arraylist(1) of arraylist(2) of CisRecords. (1) has one entry per configuration recommendation.
+	 * (2) Has three entries for each of (1) - the first two are the CisRecords that are to be merged into one. The third is optional,
+	 * and it is the CisRecord that is to be created by the merge. This could be used in order to specify
+	 * for example who the new owner should be.
 	 * 
 	 */
     public ArrayList<String> processEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations, ArrayList<String> cissToCreateMetadata);

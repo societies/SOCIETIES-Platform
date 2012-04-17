@@ -105,7 +105,7 @@ public class SocialProfiler implements ISocialProfiler {
 			//int period = initialDelay;
 			
 	    	int initialDelay =0;
-			int period		 = 30000; //(int)(1000 * 60 * 60 * 24 * daysFull);
+			int period		 = (int)(1000 * 60 * 60 * 24 * daysFull); //30000
 	    	this.timer = new Timer();
 			SocialTimerTask task = new SocialTimerTask(this.engine,  this.databaseConnection);
 			timer.scheduleAtFixedRate(task, initialDelay, period);
@@ -196,11 +196,10 @@ public class SocialProfiler implements ISocialProfiler {
 	@Override
 	public List<ISocialConnector> getListOfLinkedSN() {
 		return this.engine.getSocialData().getSocialConnectors();
+	}	
+
+	public GraphManager getGraph() {
+		return this.graph;
 	}
-
-
-	
-
-	
 
 }

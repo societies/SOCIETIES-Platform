@@ -55,6 +55,8 @@ import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.internal.css.management.ICSSManagerCallback;
 import org.societies.api.internal.css.management.ICSSRemoteManager;
 
+import org.societies.api.schema.context.contextschema.CtxBroker;
+
 import java.util.concurrent.Future;
 
 //import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;

@@ -6,7 +6,7 @@ import org.societies.api.internal.sns.ISocialConnector;
 
 public class ActivityConveterFactory{
 	
-	public static ActivityConverter getPersonConverter(ISocialConnector connector){
+	public static ActivityConverter getActivityConverter(ISocialConnector connector){
 		if (connector.getConnectorName().equals(ISocialConnector.FACEBOOK_CONN)) 
 			return new ActivityConverterFromFacebook();
 		else if (connector.getConnectorName().equals(ISocialConnector.TWITTER_CONN))

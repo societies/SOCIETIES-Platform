@@ -80,8 +80,7 @@
 				<instructions>
 				    <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>						
-						<Export-Package>org.societies.orchestration.api.*</Export-Package>
-						<Export-Package>org.societies.orchestration.api.schema.communitylifecyclemanagement.*</Export-Package>
+						<Export-Package>org.societies.orchestration.api.**</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>

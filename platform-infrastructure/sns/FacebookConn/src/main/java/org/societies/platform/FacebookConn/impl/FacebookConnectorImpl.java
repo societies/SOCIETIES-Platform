@@ -1,6 +1,6 @@
 package org.societies.platform.FacebookConn.impl;
 
-import java.io.IOException;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,11 +13,16 @@ import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.platform.FacebookConn.FacebookConnector;
 
 import com.restfb.DefaultFacebookClient;
-import com.restfb.DefaultWebRequestor;
+import com.restfb.DefaultJsonMapper;
 import com.restfb.FacebookClient;
 import com.restfb.FacebookClient.AccessToken;
-import com.restfb.WebRequestor;
+import com.restfb.JsonMapper;
+import com.restfb.Parameter;
 import com.restfb.WebRequestor.Response;
+import com.restfb.batch.BatchRequest;
+import com.restfb.batch.BatchRequest.BatchRequestBuilder;
+import com.restfb.batch.BatchResponse;
+import com.restfb.json.JsonArray;
 import com.restfb.json.JsonObject;
 
 
@@ -28,10 +33,11 @@ public class FacebookConnectorImpl implements FacebookConnector {
 	private String 				identity	 = null;
 	private String 				name;
 	private String 				id;
+	private String				lastUpdate   = "yesterday";
 	
 	private Properties			parameters;
 	private FacebookClient 		facebookClient;
-	private int					maxPostLimit = 50;
+	private int					maxPostLimit = 200;
 	private long				tokenExpiration=0;
 	
 	public FacebookConnectorImpl(){}
@@ -43,6 +49,7 @@ public class FacebookConnectorImpl implements FacebookConnector {
 		this.name 			= ISocialConnector.FACEBOOK_CONN;
 		this.id				= this.name + "_" + UUID.randomUUID();
 		facebookClient		= new DefaultFacebookClient(access_token);
+		
 	}
 	
 	public String getID(){
@@ -55,6 +62,14 @@ public class FacebookConnectorImpl implements FacebookConnector {
 		
 		
 	}
+	public String getLastUpdate() {
+		return lastUpdate;
+	}
+
+	public void setLastUpdate(String lastUpdate) {
+		this.lastUpdate = lastUpdate;
+	}
+
 	public String getToken() {
 		
 		facebookClient = new DefaultFacebookClient();
@@ -82,34 +97,55 @@ public class FacebookConnectorImpl implements FacebookConnector {
 	
 	public String getSocialData(String path)  {
 		
-		if (access_token==null) return null;
+		try{
+		if (access_token==null) genError("Access token is null", "Connector with no token", 500);
 		
-		System.out.println("Execute query:"+path);
-		return facebookClient.fetchObject(path, JsonObject.class).toString();
+		BatchRequest request = new BatchRequestBuilder(path).parameters(Parameter.with("until", lastUpdate), Parameter.with("limit", maxPostLimit)).build();
+		List<BatchResponse> batchResponses = facebookClient.executeBatch(request);
+		BatchResponse response = batchResponses.get(0);
 		
+		
+		
+		lastUpdate= new Date().toString();
+		
+		if (response==null) 
+			return genError("No response from Facebook (Empty)", "Empty response", 200);
+		else if (response.getBody().length()==0)
+			return response.toString();
+		else{
+		    JsonObject result = new JsonObject(response.getBody());
+		   return result.toString(1);
+		}
+		}
+		catch(Exception ex){
+		  return genError(ex.getMessage(), "Request failure", 400);
+		}
+	
 
 	}
 	
-	
+	private String genError(String message, String type,  int code){
+		return "{  \"error\" : {\"message\":  \""+ message + " \", \"type\": \"" + type + "\", \"code\" :\"" +code +"\"} }";
+	}
 	
 	
 	public Map<String, String> requireAccessToken() {
 
 		HashMap<String, String > credential = new HashMap<String, String>();
-		try {
-		
-			WebRequestor doGet = new DefaultWebRequestor();
-			Response response = doGet.executeGet("http://wd.teamlife.it/fbconnector.php");
-			System.out.println("Auth: " +response.getBody()+ " code:" + response.getStatusCode());
-			
-		} 
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		
-		// this should be provided by an external component
-		credential.put(AUTH_TOKEN, "");
+//		try {
+//		
+//			WebRequestor doGet = new DefaultWebRequestor();
+//			Response response = doGet.executeGet("http://wd.teamlife.it/fbconnector.php");
+//			System.out.println("Auth: " +response.getBody()+ " code:" + response.getStatusCode());
+//			
+//		} 
+//		catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		
+//		// this should be provided by an external component
+//		credential.put(AUTH_TOKEN, "");
 		
 		return credential;
 	}
@@ -149,45 +185,129 @@ public class FacebookConnectorImpl implements FacebookConnector {
 		parameters = new Properties();
 	}
 
+
 	
 
 	public String getUserProfile() {
+		try{
+		BatchRequest reqME = new BatchRequestBuilder(ME).build();
+		BatchRequest reqBOOK = new BatchRequestBuilder(BOOKS).build();
+		BatchRequest reqINTEREST = new BatchRequestBuilder(INTERESTS).build();
+		BatchRequest reqMUSIC = new BatchRequestBuilder(MUSIC).build();
+		BatchRequest reqLIKES = new BatchRequestBuilder(LIKES).build();
 		
-			
-			if (access_token==null) return null;
-			facebookClient = new DefaultFacebookClient(access_token);
-			
-			JsonObject profile 		= facebookClient.fetchObject(ME, JsonObject.class); 
-			//JsonObject photos		= facebookClient.fetchObject(THUMB,JsonObject.class );
-			//JsonObject activities   = facebookClient.fetchObject(ACTIVITIES, JsonObject.class);
-			//JsonObject books		= facebookClient.fetchObject(BOOKS, JsonObject.class);
-			//JsonObject movies		= facebookClient.fetchObject(MOVIES, JsonObject.class);
-			
-			// We can add whatever is missing
-			//JsonObject photo = new JsonObject();
-			//photo.put("type", "thumb");
-			//photo.put("primary", true);
-			//photo.put("value", photos);
-			
-//			profile.accumulate("photos",	 new JSONArray().put(photo));
-//			profile.accumulate("books", 	 books.getString("data"));
-//			profile.accumulate("activities", activities.getString("data"));
-//			profile.accumulate("movies", 	 movies.getString("data"));
-			
+		List<BatchResponse> batchResponses = facebookClient.executeBatch(reqME,reqBOOK,reqINTEREST,reqMUSIC, reqLIKES);
 		
-			return profile.toString(1);
+		BatchResponse responseMe   		= batchResponses.get(0);
+		BatchResponse responseBook	 	= batchResponses.get(1);
+		BatchResponse responseInterest	= batchResponses.get(2);
+		BatchResponse responseMusic	    = batchResponses.get(3);
+		BatchResponse responseLikes	    = batchResponses.get(4);
+		
+		JsonObject me = new JsonObject(responseMe.getBody());
+//		System.out.println("ME:"+me.toString(1));		
+//		System.out.println("Book:"+responseBook.getBody());	
+//		System.out.println("Interest:"+responseInterest.getBody());	
+//		System.out.println("Music:"+responseMusic.getBody());	
+//		System.out.println("Likes:"+responseLikes.getBody());	
+		
+		
+		
+		me.put("turnOns", convertToPluralField(responseLikes.getBody()));
+		me.put("books", convertToPluralField(responseBook.getBody()));
+		me.put("music", convertToPluralField(responseMusic.getBody()));
+		me.put("interest", convertToPluralField(responseInterest.getBody()));
+		return me.toString(1);   
+		}
+		  catch(Exception ex){
+			  return genError(ex.getMessage(), "Request failure", 400);
+		  }
+		
+		
 		
 	}
 
 	
-	public String getUserFriends() {
+	private JsonArray convertToPluralField(String data){
+		
+		JsonObject jDataObj = new JsonObject(data);
+		JsonArray  jData = jDataObj.getJsonArray("data");
+		
+		JsonArray  pluralFields = new JsonArray();
+		
+		for (int i=0; i<jData.length(); i++){
+			JsonObject like = jData.getJsonObject(i);
+			JsonObject field = new JsonObject();
+			
+			field.put("value", like.get("name"));
+			field.put("type",  like.get("category"));
+			
+			pluralFields.put(field);
+			
+		}
+		
+		return pluralFields;
+	}
 	
-		return getSocialData(FRIENDS);
+	
+	public String getUserFriends() {
+
+		try{
+			JsonArray fullFriends = new JsonArray();
+			
+	 		BatchRequest request = new BatchRequestBuilder(FRIENDS).build();
+			List<BatchResponse> batchResponses = facebookClient.executeBatch(request);
+			BatchResponse response = batchResponses.get(0);
+			JsonObject friends = new JsonObject(response.getBody());
+			fullFriends = friends.getJsonArray("data");
+			boolean goOn = friends.has("paging");
+			
+			
+			while (goOn){
+				
+				if (friends.getJsonObject("paging").has("next")){
+					
+				    String url = friends.getJsonObject("paging").getString("next");
+					Response resp = facebookClient.getWebRequestor().executeGet(url);
+					if (resp!=null){
+						friends = new JsonObject(resp.getBody());
+						if (friends.has("data")){
+						    JsonArray moreFriends = new JsonArray(friends.getString("data"));
+						    for(int i=0; i<moreFriends.length();i++)
+						    	fullFriends.put(moreFriends.getJsonObject(i));
+						}
+						else goOn=false;
+					}
+					goOn = friends.has("paging");
+				}
+				else goOn=false;
+			}
+			
+			JsonObject jresp = new JsonObject();
+			jresp.put("data", fullFriends);
+			return jresp.toString(1);
+		}catch(Exception ex){
+			return genError(ex.getMessage(), "Unable to get Friends", 400);
+		}
+		//return getSocialData(FRIENDS);
 	}
 
 	public String getUserActivities() {
 		
-		return getSocialData(FEED);
+		BatchRequest request   = null;
+		BatchResponse response = null;
+		try{
+			request= new BatchRequestBuilder(FEED).parameters(Parameter.with("since", lastUpdate), Parameter.with("limit", maxPostLimit)).build();
+			List<BatchResponse> batchResponses = facebookClient.executeBatch(request);
+			response = batchResponses.get(0);
+			System.out.println("response:::"+response.toString());
+		
+		return response.getBody();
+		}
+		  catch(Exception ex){
+			  return genError(ex.getMessage(), "Request failure", 400);
+		  }
+		
 		
 	}
 	
@@ -204,7 +324,43 @@ public class FacebookConnectorImpl implements FacebookConnector {
 		this.tokenExpiration = expiration;
 	}
 
+	public Map<String, String> getAllSocialData(){
+		
 	
+		
+		BatchRequest meRequest = new BatchRequestBuilder(ME).build();
+		BatchRequest feedRequest = new BatchRequestBuilder(FEED).parameters(Parameter.with("from", "yesterday")).build();
+		BatchRequest groupRequest = new BatchRequestBuilder(GROUPS).build();
+		BatchRequest friendsRequest = new BatchRequestBuilder(FRIENDS).build();
+		
+		List<BatchResponse> batchResponses = facebookClient.executeBatch(meRequest, feedRequest, groupRequest, friendsRequest);
+		
+		
+		// Responses are ordered to match up with their corresponding requests.
+
+		BatchResponse meResponse = batchResponses.get(0);
+		BatchResponse feedResponse = batchResponses.get(1);
+		BatchResponse groupResponse = batchResponses.get(2);
+		BatchResponse friendsResponse = batchResponses.get(3);
+		
+		// Since batches can have heterogenous response types, it's up to you
+		// to parse the JSON into Java objects yourself. Luckily RestFB has some built-in
+		// support to help you with this.
+
+		JsonMapper jsonMapper = new DefaultJsonMapper();
+		Map<String, String> results = new HashMap<String, String>();
+		
+		results.put(ME, jsonMapper.toJavaObject(meResponse.getBody(), JsonObject.class).toString());
+		results.put(FEED, jsonMapper.toJavaObject(feedResponse.getBody(), JsonObject.class).toString());
+		results.put(GROUPS, jsonMapper.toJavaObject(groupResponse.getBody(), JsonObject.class).toString());
+		results.put(FRIENDS, jsonMapper.toJavaObject(friendsResponse.getBody(), JsonObject.class).toString());
+		
+		
+		return results;
+	
+		
+		
+	}
 	
 	
 }

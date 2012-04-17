@@ -34,7 +34,8 @@ import org.neo4j.graphdb.TraversalPosition;
 import org.neo4j.graphdb.Traverser;
 import org.societies.personalization.socialprofiler.datamodel.SocialPerson;
 import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile;
-import org.societies.personalization.socialprofiler.datamodel.behaviour.RelTypes;
+import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile.Type;
+import org.societies.personalization.socialprofiler.datamodel.impl.RelTypes;
 import org.societies.personalization.socialprofiler.datamodel.utils.NodeProperties;
 
 
@@ -153,36 +154,56 @@ public class SocialPersonImpl implements SocialPerson, NodeProperties/*,DirtyMak
 
 
     //////////////   PROFILE IMPLEMENTATION
-    
+    private String getTypeProperty (Type profileType)  {
+		String property = null;
+		
+		switch (profileType) {
+			case EGO_CENTRIC:
+				property = NARCISSISM_PERCENTAGE_PROPERTY;
+			case PHOTO_MANIAC:
+				property = PHOTO_PERCENTAGE_PROPERTY;
+			case SUPER_ACTIVE:
+				property = SUPER_ACTIVE_PERCENTAGE_PROPERTY;
+			case SURF_MANIAC:
+				property = SURF_PERCENTAGE_PROPERTY;
+			case QUIZ_MANIAC:
+				property = QUIZ_PERCENTAGE_PROPERTY;
+		}
+		return property;
+    }
     
 	@Override
-	public int getProfilePercentage(int profileID) {
-		// TODO Auto-generated method stub
-		return 0;
+	public String getProfilePercentage(Type profileType) {
+		String property = getTypeProperty (profileType);
+		
+		if (property != null)	
+			return (String) underlyingNode.getProperty( property);
+		
+		return property;
 	}
 
 
 
 	@Override
-	public void setProfilePercentage(int profileID, int numberOfActions) {
-		// TODO Auto-generated method stub
+	public void setProfilePercentage(Type profileType, String numberOfActions) {
+		String property = getTypeProperty (profileType);
 		
+		if (property != null)
+			underlyingNode.setProperty( property, numberOfActions );
 	}
 
 
 
 	@Override
 	public String getTotalNumberOfActions() {
-		// TODO Auto-generated method stub
-		return null;
+		return (String) underlyingNode.getProperty( TOTAL_ACTIONS_PROPERTY);
 	}
 
 
 
 	@Override
-	public void setTotalNumberOfActions(int totalActions) {
-		// TODO Auto-generated method stub
-		
+	public void setTotalNumberOfActions(String totalActions) {
+		underlyingNode.setProperty( TOTAL_ACTIONS_PROPERTY, totalActions );
 	}
 
 

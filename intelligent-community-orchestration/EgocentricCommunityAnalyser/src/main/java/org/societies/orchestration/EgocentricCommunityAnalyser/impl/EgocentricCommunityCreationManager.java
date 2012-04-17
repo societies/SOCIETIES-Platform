@@ -38,6 +38,8 @@ import org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType;
 
 import static org.mockito.Mockito.*;
 
+import org.societies.api.schema.context.contextschema.CtxBroker;
+
 import org.societies.api.internal.css.directory.ICssDirectory;
 
 import org.societies.api.internal.css.discovery.ICssDiscovery;
@@ -60,7 +62,7 @@ import org.societies.api.cis.management.ICisSubscribed;
 import org.societies.api.cis.management.ICisEditor;
 import org.societies.api.cis.management.ICisActivity;
 import org.societies.api.cis.management.ICisActivityFeed;
-//import org.societies.api.cis.management.ICis;
+//import org.societies.api.cis.management.ICis;t
 
 import org.societies.api.internal.css.management.CSSRecord;
 import org.societies.api.internal.css.management.ICssActivity;
@@ -162,7 +164,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 	
 	private IDeviceManager deviceManager;
 	
-	
+	private ArrayList<String> returnMetadata;
 	
 	
 	public enum methodType {processEgocentricRecommendations, processEgocentricConfigurationRecommendations,
@@ -185,6 +187,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 			this.linkedCss = linkedEntity;
 		else
 			this.linkedDomain = linkedEntity;
+		personalCiss = new HashMap<String, ICisRecord>();
 	}
 	
 	/*
@@ -214,7 +217,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 	
 	public ArrayList<String> identifyCissToCreate(String evaluationType, HashMap<IIdentity, String> userCissMetadata) {
 		
-		
+		returnMetadata = null;
 		
 		ArrayList<IIdentity> interactedCssIDs = new ArrayList<IIdentity>();
 		ArrayList<IIdentity> friendCssIDs = new ArrayList<IIdentity>();
@@ -294,9 +297,9 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				    if (userCissMetadata.get(i).contains("PERSONAL CIS containing your CSS directory members"))
 				        cisExistsAlready = true;
 				}
-				
-				if (joinedCisIDs.contains(personalCiss.get("CSS Directory").getCisId()) && !cisExistsAlready)
-					cisExistsAlready = true;
+				if (personalCiss.get("CSS Directory") != null)
+				    if (joinedCisIDs.contains(personalCiss.get("CSS Directory").getCisId()) && !cisExistsAlready)
+					    cisExistsAlready = true;
 				if (cssDirectoryMembers.size() >= 2  && !cisExistsAlready)
 				    for (int i = 0; i < userJoinedCiss.size(); i++) {
 					    ArrayList<IIdentity> membersOfCis = new ArrayList<IIdentity>();
@@ -376,33 +379,30 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				
 				}
 				
-				//Repeat the above for: friends, family members, working colleagues, and any other
+				//Repeat the above for: friends, family members, working colleagues. This should suffice, don't want
+				//to make PERSONAL CISs the focus of SOCIETIES. But can also have any other
 				//sufficiently important context containing a list of CSSs. The context ontology is used
 				//to determine what is worthy of this (except it won't be provided for 1st trial, so
 				//context labels substitute for ontology and fulfill same criteria.
 				
-				
+				List<CtxIdentifier> theFriends = lookupContextAttribute("closeFriends");
 				
 				//Does Personal CSS directory CIS need sub-CISs:
 				
 				if (cisExistsAlready == true) {
-					ICisRecord thisCis = null;
+					ICisRecord thisCis = personalCiss.get("CSS Directory");
 					boolean subCisExistsAlready = false;
-					//for (int i = 0; i < userJoinedCiss; i++) {
-					//    if (userJoinedCiss.get(i).getMetadata().contains("Personal CSS Directory")) {
-					//        thisCis = userJoinedCiss.get(i);
-					//    }
-					//}
-					//int confidence = 0;
-					//ArrayList<IIdentity> identifiedFriends = new ArrayList<IIdentity>();
-					//for (int i = 0; i < theFriends.size(); i++) {
-					//
-					//    if (thisCis.getMembersList().contains(theFriends.get(i))) {
-					//        confidence++;
-					//        identifiedFriends.add(theFriends.get(i));
-					//    }
-					//}
-					//if (confidence >= 3) {
+					
+					int confidence = 0;
+					ArrayList<IIdentity> identifiedFriends = new ArrayList<IIdentity>();
+					for (int i = 0; i < theFriends.size(); i++) {
+					
+					    //if (thisCis.getMembersList().contains(theFriends.get(i))) {
+					      //  confidence++;
+					        //identifiedFriends.add(theFriends.get(i));
+					    //}
+					}
+					if (confidence >= 3) {
 					//    ArrayList<CisRecord> subCiss = thisCis.getSubCiss();
 					//    for (int i = 0; i < subCiss.size(); i++) {
 					//        if (subCiss.get(i).getMembersList().contains(identifiedFriends) && subCiss.get(i).getMembershipCriteria.contains("friend"))
@@ -414,7 +414,8 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 					//    // and the time passed since then is at least the last 10% of its life... sub-CIS the old friends into a new overall one?
 					//    }
 					//    if ((subCisExistsAlready == false))
-					//        cissToCreate.add(new CisRecord(null, linkedCss.toString(), "Your friends in your CSS Directory", null, null, null, "friend", identifiedFriends, null));
+					//        cissToCreate.add(new ICisRecord(null, linkedCss.toString(), "Your friends in your CSS Directory", null, null, null, "friend", identifiedFriends, null));
+					}
 				}
 				
 				//friends?
@@ -425,7 +426,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				//userContextBroker.lookup(CtxModelType.ENTITY, "FanPage", userContextBrokerCallback);
 				//userContextBrokerCallback.ctxModelObjectsLookedUp(List<CtxIdentifier> list);
 				
-				//Mutual friends CIS creator
+				
 				
 				Future<List<CtxIdentifier>> friendsFuture = null;
 				try {
@@ -441,7 +442,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				//	continue;
 				//}
 				
-				List<CtxIdentifier> theFriends = null;
+				theFriends = null;
 				try {
 					if (friendsFuture != null)
 					    theFriends = friendsFuture.get();
@@ -496,6 +497,148 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		        //    cissToCreate.add(new CisRecord(null, linkedCss.toString(), "Mutual friends", null, null, null, null, null, null));
 				    
 				//}
+				
+				//Now non-personal CISs
+				
+				//Can be based on, among agreed things: shared workAddress, address, homeAddress,
+				//education, courses
+				//subCIS: languagesSpoken, nationality, occupation, education, courses
+				
+				
+				
+				//Mutual friends CIS creator
+				
+				
+				
+				//}
+				cisExistsAlready = false;
+				
+				
+				if (theFriends == null)
+					theFriends = new ArrayList<CtxIdentifier>();
+				if (theFriends.size() >= 2) {
+				    ArrayList<ArrayList<IIdentity>> mutualFriendsGroups = new ArrayList<ArrayList<IIdentity>>();
+				    ArrayList<IIdentity> membersCovered = new ArrayList<IIdentity>();
+				    for (int i = 0; i < theFriends.size(); i++) {
+				    	ArrayList<IIdentity> mutualFriendsCisMembers = new ArrayList<IIdentity>();
+				    	IIdentity temp = null;
+						try {
+							temp = identityManager.fromJid(theFriends.get(i).toString());
+						} catch (InvalidFormatException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+				    	mutualFriendsCisMembers.add(temp);
+				    	for (int m = 0; m < theFriends.size(); m++) {
+				    		if (i == m) continue;
+				    		boolean notMutualFriend = false;
+				    		for (int n = 0; n < mutualFriendsCisMembers.size(); n++) {
+				    			//if (!(userCtxBroker.lookupOtherUser(theFriends.get(m), "close friends").contains(mutualFriendsCisMembers.get(n)) && 
+					    		//    userCtxBroker.lookupOtherUser(mutualFriendsCisMembers.get(n), "close friends").contains(theFriends.get(m))))
+				    			//    notMutualFriend = true;
+				    		}
+				    		if (notMutualFriend == false) {
+				    			try {
+									temp = identityManager.fromJid(theFriends.get(i).toString());
+								} catch (InvalidFormatException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+						    	mutualFriendsCisMembers.add(temp);
+				    		}
+				    		//
+				    		//    if CIS doesn't already exist
+				    		//    ICisRecord mutualFriendsCis = cisManager.getBlankCisRecord();
+				    		//    mutualFriendsCis.setMembersList(theFriends.get(i), theFriends.get(m));
+				    		//    cissToCreate.add(mutualFriendsCis);
+				    		//    cissToCreateMetadata.add("Ongoing");
+				    		//membersCovered.add(mutualFriends.get(i));
+				    		
+				    		//
+				    	}if (!mutualFriendsGroups.contains(mutualFriendsCisMembers)) {
+//				    	    if CIS doesn't already exist
+				    		//    ICisRecord mutualFriendsCis = cisManager.getBlankCisRecord();
+				    		//    mutualFriendsCis.setMembersList(theFriends.get(i), theFriends.get(m));
+				    		//    cissToCreate.add(mutualFriendsCis);
+				    		//    cissToCreateMetadata.add("Ongoing");
+				    		//membersCovered.add(mutualFriends.get(i));
+				    	}
+				    }
+				    for (int i = 0; i < userJoinedCiss.size(); i++) {
+					    ArrayList<IIdentity> membersOfCis = new ArrayList<IIdentity>();
+					    //String[] membersOfCisStringArray = userJoinedCiss.get(i).membersCss;
+					    String[] membersOfCisStringArray = new String[1];
+					    for (int m = 0; m < membersOfCisStringArray.length; m++) {
+					    	
+							try {
+								IIdentity id = identityManager.fromJid(membersOfCisStringArray[m]);
+								membersOfCis.add(id);
+							} catch (InvalidFormatException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+					    	
+					        
+					    }
+					    boolean membersIdentical = false;
+					    for (int m = 0; m < membersOfCis.size(); m++) {
+					    	if ((membersOfCis.size() == cssDirectoryMembers.size() ||
+					    		 ((membersOfCis.size() - 1) == cssDirectoryMembers.size() && membersOfCis.contains(linkedCss)))) 
+					    	{
+					    		int counter = 0;
+					    		for (int n = 0; n < membersOfCis.size(); n++) {
+					    			if (membersOfCis.contains(cssDirectoryMembers.get(n)))
+					    				counter++;
+					    		}
+					    		if (counter == cssDirectoryMembers.size())
+					    		    membersIdentical = true;
+					    	}
+					    	else if ((membersOfCis.size() > (cssDirectoryMembers.size() * 0.8)) &&
+					    			!(cssDirectoryMembers.size() > membersOfCis.size())) {
+					    		int counter = 0;
+					    		for (int n = 0; n < membersOfCis.size(); n++) {
+					    			if (membersOfCis.contains(cssDirectoryMembers.get(n)))
+					    				counter++;
+					    		}
+					    		if (counter > (cssDirectoryMembers.size() * 0.8)) {
+					    			counter = 0;
+					    			for (int n = 0; n < cssDirectoryMembers.size(); n++) {
+						    			if (cssDirectoryMembers.contains(membersOfCis.get(n)))
+						    				counter++;
+						    		}
+					    			if (counter == cssDirectoryMembers.size())
+						    		    membersIdentical = true;
+					    			else
+					    			    membersIdentical = false;
+					    		}    
+					    	}
+					    }
+				        if ((membersIdentical == true) && (userJoinedCiss.get(i).toString()/**membershipCriteria*/.equals("null")))
+				             cisExistsAlready = true;
+				        // else if ((cssDirectoryMembers.contains(userJoinedCiss.get(i).membersCss) && (userJoinedCiss.get(i).membershipCriteria.equals("")))) {
+				        //     /**ArrayList<CisActivity> thisCisActivityHistory = */userJoinedCiss.get(i).feed.getActivities(linkedCss.toString(), "time");
+				             ///**ArrayList<CssActivity> thisCssActivityHistory = */userCssManager.feed.getActivities("time");
+				             //Date cisCreationDate = thisCisActivityHistory.getEarliestDate();
+				             //thisCssActivityHistory = thisCssActivityHistory.split(cisCreationDate)[0];
+				             //if (!thisCssActivityHistory.contains(userJoinedCiss[i].getMembers())
+				             //    cisExistsAlready = true;
+				        // }
+				         //else if ((userJoinedCiss.get(i).getActivityHistory().contains("personal css directory cis")))
+				         //    cisExistsAlready = true;
+				         //else if ((userJoinedCiss.get(i).getOrchestrationMetadata().contains("personal css directory cis")))
+				         //    cisExistsAlready = true;
+				    /**    if (!cisManager.getCiss().get(i).getMembers() == people)*/
+				    }
+				}
+				if (cisExistsAlready == false) {
+					ICisRecord temp = cisManager.getCis(linkedCss.toString(), "Default CIS");
+					//temp.setName("Mutual friends CIS");
+					//temp.setMembers(these members);
+				    //cissToCreate.add(new ICisRecord(null, linkedCss.toString(), "Mutual friends CIS", null, null, null, cssDirectoryMembers, null, null));
+				    cissToCreate.add(temp);
+					cissToCreateMetadata.add("Mutual friends CIS");
+				
+				}
 				
 				
 				
@@ -990,11 +1133,13 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 
 		// creating the identity of the CtxBroker that will be contacted
 		IIdentity toIdentity = null;
-		try {
-			toIdentity = linkedCssManager.fromJid("XCManager.societies.local");
-		} catch (InvalidFormatException e1) {
-			e1.printStackTrace();
-		}
+		//try {
+			
+		    //toIdentity = linkedCssManager.fromJid("XCManager.societies.local");
+			toIdentity = linkedCss;
+		//} catch (InvalidFormatException e1) {
+		//	e1.printStackTrace();
+		//}
 
 		//create the message to be sent
 		Stanza stanza = new Stanza(toIdentity);
@@ -1004,7 +1149,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		// add the signatures of the method
 		
 		
-		
+		suggestedCommunityAnalyserBean = new SuggestedCommunityAnalyserBean();
 		suggestedCommunityAnalyserBean.setMethod(suggestedCommunityAnalyserMethodType.processEgocentricRecommendations);
 		suggestedCommunityAnalyserBean.setCiss(theResult);
 
@@ -1018,6 +1163,9 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 			e.printStackTrace();
 		}
 		//return new AsyncResult<CtxModelObject>(model);
+		
+		//while (returnMetadata == null);
+		//return returnMetadata;
 		
 		return suggestedCommunityAnalyser.processEgocentricRecommendations(theResult, cissToCreateMetadata);
 		//if (cissToCreate != null) 
@@ -1362,6 +1510,35 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		
 		return proximityCsss;
 	}
+	
+	public List<CtxIdentifier> lookupContextAttribute(String contextAttribute) {
+		Future<List<CtxIdentifier>> friendsFuture = null;
+		try {
+		    friendsFuture = userContextBroker.lookup(CtxModelType.ATTRIBUTE, contextAttribute);
+		    //Filter to friends who all consider each-other friends, within the group of user's friends
+		    //Need API in place to obtain this data
+	    } catch (CtxException e) {
+		    // TODO Auto-generated catch block
+		    e.printStackTrace();
+	    }
+		
+		//while (friendsFuture == null) {
+		//	continue;
+		//}
+		
+		List<CtxIdentifier> theFriends = null;
+		try {
+			if (friendsFuture != null)
+			    theFriends = friendsFuture.get();
+		} catch (InterruptedException e3) {
+			// TODO Auto-generated catch block
+			e3.printStackTrace();
+		} catch (ExecutionException e3) {
+			// TODO Auto-generated catch block
+			e3.printStackTrace();
+		}
+		return theFriends;
+	}
 
     
     public IIdentity getLinkedCss() {
@@ -1386,6 +1563,14 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
     
     public void setLinkedDomain(IIdentity linkedDomain) {
     	this.linkedDomain = linkedDomain;
+    }
+    
+    public ICssDirectory getUserCssDirectory() {
+    	return userCssDirectory;
+    }
+    
+    public void setUserCssDirectory(ICssDirectory userCssDirectory) {
+    	this.userCssDirectory = userCssDirectory;
     }
     
     /**public IUserCtxDBMgr getUserContextDatabaseManager() {
@@ -1425,6 +1610,14 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
     
     public void setSuggestedCommunityAnalyser(ISuggestedCommunityAnalyser suggestedCommunityAnalyser) {
     	this.suggestedCommunityAnalyser = suggestedCommunityAnalyser;
+    }
+    
+    public void setSuggestedCommunityAnalyserBean(SuggestedCommunityAnalyserBean suggestedCommunityAnalyserBean) {
+    	this.suggestedCommunityAnalyserBean = suggestedCommunityAnalyserBean;
+    }
+    
+    public void setSuggestedCommunityAnalyserResultBean(SuggestedCommunityAnalyserResultBean suggestedCommunityAnalyserResultBean) {
+    	this.suggestedCommunityAnalyserResultBean = suggestedCommunityAnalyserResultBean;
     }
     
     public IUserFeedback getUserFeedback() {
@@ -1508,9 +1701,11 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
     //}
     
     /** Put your functionality here if there IS a return object */
-    //public Object getQuery(Stanza stanza, Object messageBean) {
-    //	return null;
-    //}
+    public Object getQuery(Stanza stanza, Object messageBean) {
+    	SuggestedCommunityAnalyserResultBean theBean = (SuggestedCommunityAnalyserResultBean) messageBean;
+    	returnMetadata = theBean.getCisMetadata();
+    	return null;
+    }
     
     /** Put your functionality here if there IS a return object and you are updating also */
     //public Object setQuery(Stanza arg0, Object arg1) {

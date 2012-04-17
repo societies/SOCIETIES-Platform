@@ -31,6 +31,7 @@ public class SuggestedCommunityAnalyserBean {
 	private SuggestedCommunityAnalyserMethodType method;
 	private HashMap<String, ArrayList<ICisRecord>> ciss;
 	private HashMap<String, ArrayList<ArrayList<ICisRecord>>> configureCiss;
+	private ArrayList<String> cissMetadata;
 
 	public SuggestedCommunityAnalyserBean() {
 		
@@ -44,7 +45,7 @@ public class SuggestedCommunityAnalyserBean {
 		this.method = method;
 	}
 	
-	public HashMap<String, ArrayList<ICisRecord>> getciss(){
+	public HashMap<String, ArrayList<ICisRecord>> getCiss(){
 		return this.ciss;
 	}
 	
@@ -60,6 +61,12 @@ public class SuggestedCommunityAnalyserBean {
 		this.configureCiss = configureCiss;
 	}
 	
+	public ArrayList<String> getCissMetadata(){
+		return this.cissMetadata;
+	}
 	
+	public void setCissMetadata(ArrayList<String> cissMetadata){
+		this.cissMetadata = cissMetadata;
+	}
 	
 }
