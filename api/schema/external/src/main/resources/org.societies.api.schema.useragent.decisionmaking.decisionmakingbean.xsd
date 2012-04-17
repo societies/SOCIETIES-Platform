@@ -2,6 +2,7 @@
 <xs:schema elementFormDefault="qualified" version="1.0"
 	xmlns:ns1="http://societies.org/api/schema/servicelifecycle/model"
 	targetNamespace="http://societies.org/api/schema/useragent/decisionmaking"
+	xmlns:tns="http://societies.org/api/schema/servicelifecycle/model"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 	<xs:import namespace="http://societies.org/api/schema/servicelifecycle/model"
@@ -20,7 +21,6 @@
 			<xs:element name="intentSize" type="xs:int" />
 			<xs:element name="intentValues" type="xs:string" nillable="true"
 				minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="method" type="methodType" minOccurs="0" />
 			<xs:element name="preferenceConfidenceLevel" type="xs:int"
 				nillable="true" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="preferenceParameterNames" type="xs:string"
@@ -34,11 +34,5 @@
 				nillable="true" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
-
-	<xs:simpleType name="methodType">
-		<xs:restriction base="xs:string">
-			<xs:enumeration value="makeDecision" />
-		</xs:restriction>
-	</xs:simpleType>
 </xs:schema>
 
