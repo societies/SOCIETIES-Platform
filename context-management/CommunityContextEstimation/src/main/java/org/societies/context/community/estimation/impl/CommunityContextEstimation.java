@@ -24,12 +24,16 @@
  */
 package org.societies.context.community.estimation.impl;
 
+import java.awt.Point;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.junit.Test;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
@@ -183,8 +187,72 @@ public class CommunityContextEstimation<communityMembers> implements ICommunityC
 		return listOfCtxEntities;
 	}
 		
+
+
+
+	public void convexHaul() {
+//		int nPoints;
+//		int[] xCord = {1,2,2,3,6};
+//		int[] yCord= {4,2,1,7,9};
 		
-// Setters and Getters for the private fields ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^//^
+
+//  Convex Haul  
+//		for all points p in S
+//	    for all points q in S
+//	      if p != q
+//	        draw a line from p to q
+//	        if all points in S except p and q lie to the left of the line
+//	          add the directed vector pq to the solution set		
+		
+		Point point1 = new Point(1,4);
+		Point point2 = new Point(2,2);
+		Point point3 = new Point(2,1);
+		Point point4 = new Point(3,7);
+		Point point5 = new Point(6,9);
+		
+		ArrayList<Point> pSet = new ArrayList();
+		pSet.add(point1);
+		pSet.add(point2);
+		pSet.add(point3);
+		pSet.add(point4);
+		pSet.add(point5);
+		
+//		for (Point p:pSet){
+//			if (pSet.iterator().hasNext()){
+//				Point q = pSet.iterator().next();
+//				for (Point q:pSet){
+//					if (p!=q){
+//						Point a = pSet.iterator().next();
+//						checkPointsPosition(p,q,a);
+//					}
+//				}
+//			}
+//			
+//		}
+		
+		}
+
+	
+
+	
+	
+	private ArrayList<Point> checkPointsPosition(Point a, Point b, Point p) {
+		// TODO Auto-generated method stub
+		ArrayList<Point> solutionSet = new ArrayList();
+		if ((b.x-a.x)*(p.y-a.y)-(b.y-a.y)*(p.x-a.x)>0){
+			solutionSet.add(p);
+		}
+		return solutionSet;
+	
+	}
+	
+	// Setters and Getters for the private fields ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^//^
+
+
+
+
+
+
 
 	public InternalCtxBroker getB() {                                                                                                  
 		return b;																												 
