@@ -45,6 +45,10 @@ public class PersonConverterFromFacebook implements PersonConverter{
 	public static String EMAIL			= "email";
 	public static String PROFILELINK 	= "link";
 	public static String PHOTOS 		= "photos";
+	public static String TURNONS		= "turnOns";
+	public static String INTERESTS		= "interests";
+	public static String MUSIC		    = "music";
+	public static String BOOKS		    = "books";
 	
 	
 	// portable contact ids
@@ -80,6 +84,9 @@ public class PersonConverterFromFacebook implements PersonConverter{
 			if (db.has(GENDER))			person.setGender(gender(db.getString(GENDER)));
 			if (db.has(EMAIL))			person.setEmails(getMails(db.getString(EMAIL)));
 			if (db.has(PHOTOS))			person.setPhotos(getPhotos(db.getString(PHOTOS)));
+			if (db.has(TURNONS))		person.setTurnOns(jarrayToList(db.getString(TURNONS)));
+			if (db.has(MUSIC))		    person.setMusic(jarrayToList(db.getString(MUSIC)));
+			if (db.has(INTERESTS))	    person.setInterests(jarrayToList(db.getString(INTERESTS)));
 										
 			
 		}
@@ -95,6 +102,22 @@ public class PersonConverterFromFacebook implements PersonConverter{
 		return person;
 	}
 	
+	private List<String> jarrayToList(String data) {
+		
+		List<String> list = new ArrayList<String>();
+		try {
+			JSONArray jdata = new JSONArray(data);
+			for(int i=0; i<jdata.length();i++){
+				list.add(jdata.getString(i));
+			}
+			
+		}
+		catch (JSONException e) {
+			
+		}
+		return list;
+	}
+
 	private List<ListField> getPhotos(String data) {
 		List<ListField> photos = new ArrayList<ListField>();
 		try {
@@ -107,6 +130,7 @@ public class PersonConverterFromFacebook implements PersonConverter{
 				photo.setType(p.getString("type"));
 				photo.setValue(p.getString("value"));
 				photos.add(photo);
+				
 				
 			}
 		}

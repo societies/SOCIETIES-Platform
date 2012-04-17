@@ -1,8 +1,8 @@
 package org.societies.platform.FacebookConn.impl;
 
-
 import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.platform.FacebookConn.FacebookConnector;
+
+
 
 
 
@@ -24,7 +24,10 @@ public class ConnectorTester {
 		System.out.println("User Activies:"+connector.getUserActivities());	
 		*/
 		
-		System.out.println(" FEED" + connector.getUserActivities());
+		//System.out.println(" Profile:\n" + connector.getUserProfile());
+		//System.out.println(" GROUP:\n" + connector.getUserGroups());
+	//	System.out.println(" Friends:\n" + connector.getUserFriends());
+		System.out.println(" Activities:\n" + connector.getUserActivities());
 		System.out.println("=== END ===");
 
 	}

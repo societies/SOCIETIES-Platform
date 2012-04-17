@@ -88,6 +88,25 @@ public class MathServiceConsumerMockitoTest {
 		verify(mock).divise(1, 1, divCallBack);
 	}
 
+	@Test
+	public void barycenterTest() throws InterruptedException, ExecutionException {
+		// set mock class Behavior
+		Future<Integer> res = new AsyncResult<Integer>(2);
+		when(mock.multiply(1, 2)).thenReturn(res);
+
+		// call the method of your class under test
+		float f = classUnderTest.barycenter(1, 2,1);
+
+		System.out.println("barycenter = " + f);
+		
+		// then check whether the call to mock has been performed as expected
+		verify(mock).multiply(1, 2);
+
+		//assertEquals(f,2);
+
+	}
+
+	
 	@After
 	public void tearDown() {
 		mock = null;
