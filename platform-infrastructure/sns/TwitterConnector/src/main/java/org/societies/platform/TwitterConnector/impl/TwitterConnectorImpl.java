@@ -23,7 +23,7 @@ public class TwitterConnectorImpl implements TwitterConnector{
 		this.service = twToken.getAuthService();
 	}
 
-	
+	@Override
 	public String getUserProfile(){
 		OAuthRequest request = new OAuthRequest(Verb.GET, ACCOUNT_VERIFICATION);
 		this.service.signRequest(twToken.getAccessToken(), request);
@@ -43,6 +43,7 @@ public class TwitterConnectorImpl implements TwitterConnector{
 			return null;
 	}
 	
+	@Override
 	public String getUserFriends(){
 		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FRIENDS_URL);
 		this.service.signRequest(twToken.getAccessToken(), request);
@@ -62,6 +63,7 @@ public class TwitterConnectorImpl implements TwitterConnector{
 			return null;
 	}
 
+	@Override
 	public String getUserFollowers(){
 		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FOLLOWERS_URL);
 		this.service.signRequest(twToken.getAccessToken(), request);
@@ -81,6 +83,25 @@ public class TwitterConnectorImpl implements TwitterConnector{
 			return null;
 	}
 
+	@Override
+	public String getOtherProfile(String id){
+		OAuthRequest request = new OAuthRequest(Verb.GET, GET_OTHER_PROFILE_URL);
+		this.service.signRequest(twToken.getAccessToken(), request);
+		Response response = request.send();
+		JSONParser parser=new JSONParser();
+		Object obj=null;
+		try {
+			obj = parser.parse(response.getBody());
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		JSONObject res=(JSONObject)obj;
+		if(res!=null)
+			return res.toJSONString();
+		else 
+			return null;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.sns.ISocialConnector#getID()
@@ -230,5 +251,7 @@ public class TwitterConnectorImpl implements TwitterConnector{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
 
 }
