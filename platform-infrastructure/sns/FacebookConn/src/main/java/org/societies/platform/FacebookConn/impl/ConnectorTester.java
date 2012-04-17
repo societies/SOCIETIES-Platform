@@ -13,7 +13,7 @@ public class ConnectorTester {
 	 * http://wd.teamlife.it/fbconnector.php that allows to get the access token
 	 */
 	public static void main(String[] args) {
-		String access_token = "";
+		String access_token = "AAAFs43XOj3IBAGbtrA2I7cibWs8YD1ODGr7JiqXl0ZCJ4DBkeXKeSsth9r2EbRGj6jh1eBIhUAkIZBNs1nKOJU1Ys81xKxUqZAC13DwBAZDZD";
 		FacebookConnectorImpl connector = new FacebookConnectorImpl(access_token,null);
 		
 		
@@ -26,8 +26,8 @@ public class ConnectorTester {
 		
 		//System.out.println(" Profile:\n" + connector.getUserProfile());
 		//System.out.println(" GROUP:\n" + connector.getUserGroups());
-		System.out.println(" Friends:\n" + connector.getUserFriends());
-	//	System.out.println(" Activities:\n" + connector.getUserActivities());
+	//	System.out.println(" Friends:\n" + connector.getUserFriends());
+		System.out.println(" Activities:\n" + connector.getUserActivities());
 		System.out.println("=== END ===");
 
 	}

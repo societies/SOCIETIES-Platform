@@ -2,6 +2,7 @@ package org.societies.platform.socialdata;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +31,7 @@ public class SocialData implements ISocialData {
     
     Map<String, Object>	 			socialActivities;
     
-    long lastUpate;
+    long lastUpate ;
     
     
     public SocialData(){
@@ -40,7 +41,7 @@ public class SocialData implements ISocialData {
     	socialProfiles			= new HashMap<String, Object>();
     	
     	socialActivities		= new HashMap<String, Object>();
-    	
+    	lastUpate				= new Date().getTime();
     }
     
 
@@ -123,7 +124,7 @@ public class SocialData implements ISocialData {
 			
 		}
 		
-		lastUpate = System.currentTimeMillis();
+		lastUpate = new Date().getTime();
 		
 		
 	}
