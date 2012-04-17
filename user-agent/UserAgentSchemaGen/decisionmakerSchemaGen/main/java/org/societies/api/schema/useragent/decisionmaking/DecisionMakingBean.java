@@ -7,9 +7,6 @@ import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 public class DecisionMakingBean {
-
-	public enum methodType {makeDecision};
-	private methodType method;
 	private List<ServiceResourceIdentifier> intentServiceIds;
 	private List<String> intentServiceTypes;
 	private List<String> intentParameterNames; //IOutcome.parameterName
@@ -61,13 +58,7 @@ public class DecisionMakingBean {
 	public void setPreferenceSize(int preferenceSize) {
 		this.preferenceSize = preferenceSize;
 	}
-
-	public methodType getMethod() {
-		return method;
-	}
-	public void setMethod(methodType method) {
-		this.method = method;
-	}
+	
 	public List<ServiceResourceIdentifier> getIntentServiceIds() {
 		return intentServiceIds;
 	}
