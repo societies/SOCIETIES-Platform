@@ -26,6 +26,7 @@ package org.societies.personalization.socialprofiler.datamodel;
 
 import org.neo4j.graphdb.Traverser;
 import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile;
+import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile.Type;
 
 
 public interface SocialPerson {
@@ -47,15 +48,15 @@ public interface SocialPerson {
      * @return String percentage
      * 			
      */
-	public int getProfilePercentage(int profileID);
+	public String getProfilePercentage(Type profileType);
 	
 	
 	/**
 	 * Set the current Percentage value for a specific Profile
-	 * @param profileID profile identifier
+	 * @param profileType profile identifier
 	 * @param numberOfActions related to this Profile
 	 */
-	public void setProfilePercentage(int profileID, int numberOfActions);
+	public void setProfilePercentage(Type profileType, String numberOfActions);
 	
 	/**
      * returns the total number of actions this user realized on the Social Network
@@ -70,7 +71,7 @@ public interface SocialPerson {
      * @param totalActions
      *            number of actions realized
      */
-	void setTotalNumberOfActions( int totalActions );
+	void setTotalNumberOfActions( String totalActions );
 	
 
 	/**

@@ -41,9 +41,13 @@ import org.junit.Test;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 
@@ -148,7 +152,7 @@ public class InternalCtxBrokerTest {
 		assertTrue(ctxEntity.getType().equalsIgnoreCase("entType"));
 	}
 
-	
+
 	/**
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createEntity(java.lang.String)}.
 	 * 
@@ -166,8 +170,8 @@ public class InternalCtxBrokerTest {
 		assertNotNull(individualCtxEnt);
 		assertTrue(individualCtxEnt.getType().equalsIgnoreCase("Person"));
 	}
-	
-	
+
+
 	/**
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createAssociation(java.lang.String)}.
 	 */
@@ -261,10 +265,55 @@ public class InternalCtxBrokerTest {
 	/**
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#lookup(org.societies.api.context.model.CtxModelType)}.
 	 */
-	@Ignore
+
 	@Test
 	public void testLookupCtxModelTypeString() {
-		fail("Not yet implemented");
+
+		try {
+			final CtxEntity ent1 = internalCtxBroker.createEntity("FooBar").get();
+			final CtxEntity ent2 = internalCtxBroker.createEntity("Foo").get();
+			final CtxEntity ent3 = internalCtxBroker.createEntity("Bar").get();
+
+			// Create test attributes.
+			final CtxAttribute attr1 = internalCtxBroker.createAttribute(ent1.getId(),"attrFooBar").get();
+			final CtxAttribute attr2 = internalCtxBroker.createAttribute(ent2.getId(),"attrFoo").get();
+			final CtxAttribute attr3 = internalCtxBroker.createAttribute(ent3.getId(),"attrBar").get();
+
+			assertNotNull(ent1);
+			assertNotNull(ent2);
+			assertNotNull(ent3);
+			assertNotNull(attr1);
+			assertNotNull(attr2);
+			assertNotNull(attr3);
+
+
+			List<CtxIdentifier> ids =internalCtxBroker.lookup(CtxModelType.ENTITY, "FooBar").get();
+			assertTrue(ids.contains(ent1.getId()));
+			assertEquals(1, ids.size());
+
+			ids = internalCtxBroker.lookup(CtxModelType.ATTRIBUTE, "attrFooBar").get();
+			assertTrue(ids.contains(attr1.getId()));
+			assertEquals(1, ids.size());
+
+			ids = internalCtxBroker.lookup(CtxModelType.ATTRIBUTE, "xxxx").get();
+			assertFalse(ids.contains(attr1.getId()));
+			assertEquals(0, ids.size());
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+
+
+
 	}
 
 	/**
@@ -372,43 +421,43 @@ public class InternalCtxBrokerTest {
 			// Set the attribute's initial value
 			emptyAttribute.setIntegerValue(100);
 			emptyAttribute.setHistoryRecorded(true);
-			
+
 			Future<CtxModelObject> futureCtxModelObject = internalCtxBroker.update(emptyAttribute);
 			initialisedAttribute = (CtxAttribute) futureCtxModelObject.get();
 			// Verify the initial attribute value
 			assertEquals(new Integer(100), initialisedAttribute.getIntegerValue());
-		
+
 			emptyAttribute.setIntegerValue(200);
 			futureCtxModelObject = internalCtxBroker.update(emptyAttribute);
 			initialisedAttribute = (CtxAttribute) futureCtxModelObject.get();
 			// Verify the initial attribute value
 			assertEquals(new Integer(200), initialisedAttribute.getIntegerValue());
-			
+
 			emptyAttribute.setIntegerValue(300);
 			futureCtxModelObject = internalCtxBroker.update(emptyAttribute);
 			initialisedAttribute = (CtxAttribute) futureCtxModelObject.get();
 			// Verify the initial attribute value
 			assertEquals(new Integer(300), initialisedAttribute.getIntegerValue());
-			
+
 			Future<List<CtxHistoryAttribute>> historyFuture = internalCtxBroker.retrieveHistory(initialisedAttribute.getId(), null, null);
-			
+
 			List<CtxHistoryAttribute> history = historyFuture.get();
-			
+
 			CtxHistoryAttribute hocAttr1 = history.get(0);
 			CtxHistoryAttribute hocAttr2 = history.get(1);
 			CtxHistoryAttribute hocAttr3 = history.get(2);
-					
+
 			System.out.println(hocAttr1.getLastModified());
-		
+
 			assertEquals(new Integer(100), hocAttr1.getIntegerValue());
 			assertEquals(new Integer(200), hocAttr2.getIntegerValue());
 			assertEquals(new Integer(300), hocAttr3.getIntegerValue());
 			assertEquals(history.size(),3);
-			
+
 			assertNotNull(hocAttr1.getLastModified());
 			assertNotNull(hocAttr2.getLastModified());
 			assertNotNull(hocAttr3.getLastModified());
-			
+
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -419,7 +468,7 @@ public class InternalCtxBrokerTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
 
@@ -565,7 +614,7 @@ public class InternalCtxBrokerTest {
 		binaryAttribute = (CtxAttribute) futureAttribute.get();
 		assertNotNull(binaryAttribute.getBinaryValue());
 		final MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(
-						binaryAttribute.getBinaryValue(), this.getClass().getClassLoader());
+				binaryAttribute.getBinaryValue(), this.getClass().getClassLoader());
 		assertEquals(blob, retrievedBlob);
 	}
 
@@ -581,30 +630,30 @@ public class InternalCtxBrokerTest {
 	@Ignore
 	@Test
 	public void testSetHistoryTuples() throws CtxException, InterruptedException, ExecutionException {
-		
+
 		final CtxAttribute primaryAttribute;
 		final CtxAttribute escortingAttribute1;
 		final CtxAttribute escortingAttribute2;
-		
+
 		final CtxEntity scope;
-		
+
 		final Future<CtxEntity> futureEntity = internalCtxBroker.createEntity("entType");
 		scope = (CtxEntity) futureEntity.get();
 
 		// Create the attribute to be tested
 		Future<CtxAttribute> futurePrimaryAttribute = internalCtxBroker.createAttribute(scope.getId(), "primaryAttribute");
 		primaryAttribute = (CtxAttribute) futurePrimaryAttribute.get();
-		
+
 		Future<CtxAttribute> futureEscortingAttribute1 = internalCtxBroker.createAttribute(scope.getId(), "escortingAttribute1");
 		escortingAttribute1 = (CtxAttribute) futureEscortingAttribute1.get();
-		
+
 		Future<CtxAttribute> futureEscortingAttribute2 = internalCtxBroker.createAttribute(scope.getId(), "escortingAttribute2");
 		escortingAttribute2 = (CtxAttribute) futureEscortingAttribute2.get();
-		
+
 		assertNotNull(primaryAttribute);
 		assertNotNull(escortingAttribute1);
 		assertNotNull(escortingAttribute2);
-	
+
 		List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
 		listOfEscortingAttributeIds.add(escortingAttribute1.getId());
 		listOfEscortingAttributeIds.add(escortingAttribute2.getId());

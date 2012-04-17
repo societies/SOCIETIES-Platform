@@ -31,7 +31,6 @@ import java.util.Set;
 import java.util.concurrent.Future;
 
 import org.societies.api.context.CtxException;
-import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
@@ -44,110 +43,206 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 
-import org.societies.context.api.user.db.IUserCtxDBMgr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 3p Context Broker Implementation
  */
-public class CtxBroker implements ICtxBroker {
+@Service
+public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
-	private IUserCtxDBMgr userDB;
-	
-	public CtxBroker() throws CtxException { 
-	}
-	
-	public CtxBroker(IUserCtxDBMgr userDB) throws CtxException {
-		this.userDB = userDB;
+	/** The logging facility. */
+	private static final Logger LOG = LoggerFactory.getLogger(InternalCtxBroker.class);
+
+	/**
+	 * The Internal Ctx Broker service reference.
+	 *
+	 * @see {@link #setCtxBroker(ICtxBroker)}
+	 */
+	@Autowired(required=true)
+	private ICtxBroker internalCtxBroker = null;
+
+	/**
+	 * The Internal Ctx Broker service reference.
+	 *
+	 * @see {@link #setidentManager(IIdentityManager)}
+	 */
+	@Autowired(required=true)
+	private IIdentityManager identManager= null;
+
+
+	public CtxBroker() throws CtxException {
+		LOG.info(this.getClass().getName()+": External Broker ");
+		LOG.info(this.getClass().getName()+": Return internalCtxBroker "+ this.internalCtxBroker);
+		LOG.info(this.getClass().getName()+": Return identManager "+ this.identManager);
 	}
 
 	@Override
 	public Future<CtxAssociation> createAssociation(IIdentity requester,
 			String type) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		Future<CtxAssociation> ctxAssoc = null;
+
+		if (identManager.isMine(requester)){
+			ctxAssoc = internalCtxBroker.createAssociation(type);
+		} else{
+			LOG.info("remote call");
+		}
+
+		return ctxAssoc;
 	}
 
 	@Override
 	public Future<CtxAttribute> createAttribute(IIdentity requester,
 			CtxEntityIdentifier scope, String type) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		Future<CtxAttribute> ctxAttribute = null;
+		if (identManager.isMine(requester)){
+			ctxAttribute = internalCtxBroker.createAttribute(scope, type);
+		}else{
+			LOG.info("remote call");
+		}
+		return ctxAttribute;
 	}
 
 	@Override
 	public Future<CtxEntity> createEntity(IIdentity requester,
 			String type) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		Future<CtxEntity> entity = null;
+		if (identManager.isMine(requester)){
+			entity = internalCtxBroker.createEntity(type);
+		}else{
+			LOG.info("remote call");
+		}
+
+		return entity;
 	}
 
 	@Override
 	public Future<List<Object>> evaluateSimilarity(
 			Serializable objectUnderComparison,
 			List<Serializable> referenceObjects) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		Future<List<Object>> obj = internalCtxBroker.evaluateSimilarity(objectUnderComparison, referenceObjects);
+		return obj;
 	}
 
 
 	@Override
 	public Future<CtxModelObject> remove(IIdentity requester,
 			CtxIdentifier identifier) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		Future<CtxModelObject> obj = null;
+		if (identManager.isMine(requester)){
+			obj = internalCtxBroker.remove(identifier);
+		}else{
+			LOG.info("remote call");
+		}
+		return obj;
 	}
 
 	@Override
 	public Future<CtxModelObject> retrieve(IIdentity requester,
 			CtxIdentifier identifier) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		Future<CtxModelObject> obj = null;
+		if (identManager.isMine(requester)){
+			obj = internalCtxBroker.retrieve(identifier);
+		}else{
+			LOG.info("remote call");
+		}
+		return obj;
 	}
 
 	@Override
 	public Future<List<CtxAttribute>> retrieveFuture(
 			IIdentity requester, CtxAttributeIdentifier attrId, Date date) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		Future<List<CtxAttribute>> futureObj = null;
+
+		if (identManager.isMine(requester)){
+			futureObj = internalCtxBroker.retrieveFuture(attrId, date);
+		}else{
+			LOG.info("remote call");
+		}
+		return futureObj;
 	}
 
 	@Override
 	public Future<List<CtxAttribute>> retrieveFuture(
 			IIdentity requester, CtxAttributeIdentifier attrId,
 			int modificationIndex) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		Future<List<CtxAttribute>> futureObj = null;
+		if (identManager.isMine(requester)){
+			futureObj = internalCtxBroker.retrieveFuture(attrId, modificationIndex);
+		}else{
+			LOG.info("remote call");
+		}
+		return futureObj;
 	}
 
 	@Override
 	public Future<List<CtxHistoryAttribute>> retrieveHistory(
 			IIdentity requester, CtxAttributeIdentifier attrId,
 			int modificationIndex) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		Future<List<CtxHistoryAttribute>> hocObj = null;
+		if (identManager.isMine(requester)){
+			hocObj = internalCtxBroker.retrieveHistory(attrId, modificationIndex);
+		}else{
+			LOG.info("remote call");
+		}
+
+		return hocObj;
 	}
 
 	@Override
 	public Future<List<CtxHistoryAttribute>> retrieveHistory(
 			IIdentity requester, CtxAttributeIdentifier attrId,
 			Date startDate, Date endDate) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		Future<List<CtxHistoryAttribute>> hocObj = null;
+		if (identManager.isMine(requester)){
+			hocObj = internalCtxBroker.retrieveHistory(attrId, startDate, endDate);
+		}else{
+			LOG.info("remote call");
+		}
+
+		return hocObj;
 	}
 
 
 	@Override
 	public Future<CtxModelObject> update(IIdentity requester,
 			CtxModelObject object) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		Future<CtxModelObject> obj = null;
+
+		if (identManager.isMine(requester)){
+			obj = internalCtxBroker.update(object);
+		}else{
+			LOG.info("remote call");
+		}
+
+		return obj;
 	}
 
 	@Override
 	public Future<CtxEntity> retrieveAdministratingCSS(
 			IIdentity requester, CtxEntityIdentifier communityEntId) throws CtxException {
-		// TODO Auto-generated method stub
+
+		// change return type
+		//Future<CtxEntity> admEntity = internalCtxBroker.retrieveAdministratingCSS(communityEntId);
 		return null;
 	}
 
@@ -156,69 +251,107 @@ public class CtxBroker implements ICtxBroker {
 	@Override
 	public Future<List<CtxEntityIdentifier>> retrieveCommunityMembers(
 			IIdentity requester, CtxEntityIdentifier community) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		Future<List<CtxEntityIdentifier>> entID = null;
+
+		if (identManager.isMine(requester)){
+			entID = internalCtxBroker.retrieveCommunityMembers(community);
+		}else{
+			LOG.info("remote call");
+		}
+
+		return entID;
 	}
 
 	@Override
 	public Future<List<CtxEntityIdentifier>> retrieveParentCommunities(
 			IIdentity requester, CtxEntityIdentifier community) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		Future<List<CtxEntityIdentifier>> entityList = null;
+		if (identManager.isMine(requester)){
+			entityList = internalCtxBroker.retrieveParentCommunities(community);
+		}else{
+			LOG.info("remote call");
+		}
+		return entityList;
 	}
 
 	@Override
 	public Future<List<CtxIdentifier>> lookup(IIdentity requester,
 			CtxModelType modelType, String type) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		Future<List<CtxIdentifier>> ctxIdList = null;
+		if (identManager.isMine(requester)){
+			ctxIdList = internalCtxBroker.lookup(modelType, type);
+		}else{
+			LOG.info("remote call");
+		}
+
+		return ctxIdList;
 	}
 
 	@Override
 	public Future<List<CtxEntityIdentifier>> lookupEntities(
 			IIdentity requester, String entityType, String attribType,
 			Serializable minAttribValue, Serializable maxAttribValue)
-			throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+					throws CtxException {
+
+		Future<List<CtxEntityIdentifier>> entIdList = null;
+
+		if (identManager.isMine(requester)){
+			entIdList = internalCtxBroker.lookupEntities(entityType, attribType, minAttribValue, maxAttribValue);
+		}else{
+			LOG.info("remote call");
+		}
+		return entIdList;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.identity.IIdentity, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
 	 */
 	@Override
 	public void registerForChanges(final IIdentity requester,
 			final CtxChangeEventListener listener, final CtxIdentifier ctxId)
-			throws CtxException {
-		
+					throws CtxException {
+
 		if (requester == null)
 			throw new NullPointerException("requester can't be null");
 		if (listener == null)
 			throw new NullPointerException("listener can't be null");
 		if (ctxId == null)
 			throw new NullPointerException("ctxId can't be null");
-		
-		// TODO Auto-generated method stub
+
+		if (identManager.isMine(requester)){
+			internalCtxBroker.registerForChanges(listener, ctxId);
+		}else{
+			LOG.info("remote call");
+		}
+
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.societies.api.context.broker.ICtxBroker#unregisterFromChanges(org.societies.api.identity.IIdentity, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxIdentifier)
 	 */
 	@Override
 	public void unregisterFromChanges(final IIdentity requester,
 			final CtxChangeEventListener listener, final CtxIdentifier ctxId)
-			throws CtxException {
-		
+					throws CtxException {
+
 		if (requester == null)
 			throw new NullPointerException("requester can't be null");
 		if (listener == null)
 			throw new NullPointerException("listener can't be null");
 		if (ctxId == null)
 			throw new NullPointerException("ctxId can't be null");
-		
-		// TODO Auto-generated method stub
+
+		if (identManager.isMine(requester)){
+			internalCtxBroker.unregisterFromChanges(listener, ctxId);
+		}else{
+			LOG.info("remote call");
+		}
+
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.societies.api.context.broker.ICtxBroker#registerForChanges(org.societies.api.identity.IIdentity, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
 	 */
@@ -226,7 +359,7 @@ public class CtxBroker implements ICtxBroker {
 	public void registerForChanges(final IIdentity requester,
 			final CtxChangeEventListener listener, final CtxEntityIdentifier scope,
 			final String attrType) throws CtxException {
-		
+
 		if (requester == null)
 			throw new NullPointerException("requester can't be null");
 		if (listener == null)
@@ -235,10 +368,14 @@ public class CtxBroker implements ICtxBroker {
 			throw new NullPointerException("scope can't be null");
 		if (attrType == null)
 			throw new NullPointerException("attrType can't be null");
-		
-		// TODO Auto-generated method stub
+
+		if (identManager.isMine(requester)){
+			internalCtxBroker.registerForChanges(listener, scope,attrType);
+		}else{
+			LOG.info("remote call");
+		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.societies.api.context.broker.ICtxBroker#unregisterFromChanges(org.societies.api.identity.datatypes.IIdentity, org.societies.api.context.event.CtxChangeEventListener, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
 	 */
@@ -246,7 +383,7 @@ public class CtxBroker implements ICtxBroker {
 	public void unregisterFromChanges(final IIdentity requester,
 			final CtxChangeEventListener listener, final CtxEntityIdentifier scope,
 			final String attrType) throws CtxException {
-		
+
 		if (requester == null)
 			throw new NullPointerException("requester can't be null");
 		if (listener == null)
@@ -255,22 +392,40 @@ public class CtxBroker implements ICtxBroker {
 			throw new NullPointerException("scope can't be null");
 		if (attrType == null)
 			throw new NullPointerException("attrType can't be null");
-		
-		// TODO Auto-generated method stub
+
+		if (identManager.isMine(requester)){
+			internalCtxBroker.unregisterFromChanges(listener, scope, attrType);
+		}else{
+			LOG.info("remote call");
+		}
 	}
 
 	@Override
 	public Future<Set<CtxBond>> retrieveBonds(IIdentity requester,
 			CtxEntityIdentifier community) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		Future<Set<CtxBond>> bonds = null;
+		if (identManager.isMine(requester)){
+			bonds = internalCtxBroker.retrieveBonds(community);
+		}else{
+			LOG.info("remote call");
+		}
+
+		return bonds;
 	}
 
 	@Override
 	public Future<List<CtxEntityIdentifier>> retrieveSubCommunities(
 			IIdentity requester, CtxEntityIdentifier community)
-			throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+					throws CtxException {
+
+		Future<List<CtxEntityIdentifier>> ctxEntIdList = null;
+		if (identManager.isMine(requester)){
+			ctxEntIdList = internalCtxBroker.retrieveSubCommunities(community);
+		}else{
+			LOG.info("remote call");
+		}
+
+		return ctxEntIdList;
 	}
 }

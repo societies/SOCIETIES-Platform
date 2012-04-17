@@ -24,14 +24,16 @@
  */
 package org.societies.personalization.socialprofiler.datamodel.behaviour;
 
+import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile.Type;
+
 public interface Profile {
 	
 	public enum Type {
-		EGO_MANIAC, 
+		EGO_CENTRIC, 
 		PHOTO_MANIAC,
 		QUIZ_MANIAC,
 		SUPER_ACTIVE,
-		SURF
+		SURF_MANIAC
 		};
 		
 		
@@ -39,14 +41,14 @@ public interface Profile {
 	 * Set the profile name
 	 * @param name
 	 */
-	public void setName(Profile.Type name);
+	public void setName(String name);
 	
 	
 	/**
 	 * Profile name, that define in a single string the main character of the profile
 	 * @return Profile string name
 	 */
-	public Profile.Type getName();
+	public String getName();
 	
 	/**
 	 * Short description about the behavior of this Profile
@@ -58,7 +60,7 @@ public interface Profile {
 	 * Unique Identifier of a Profile for matching and internal purposes
 	 * @return id (int)
 	 */
-	public int getId();
+	public Profile.Type getType();
 	
 	/**
 	 * Get the frequency on how the action of a Person reflect this profile
@@ -70,7 +72,7 @@ public interface Profile {
 	 * Set a value of the frequency about this profile
 	 * @param frequency inter value [0-100]
 	 */
-	public void setFrequency(int frequency);
+	public void setFrequency(String frequency);
 
 	/**
 	 * Calculate a new frequency value based on the number of actions done related to this profile.
@@ -99,10 +101,10 @@ public interface Profile {
 	public int getNumber();
 	
 	/**
-	 * sets sets the number of times which conclued to this profile - number of points of the analysis
+	 * sets sets the number of times which concluded to this profile - number of points of the analysis
 	 * @param String number
 	 */
-	public void setNumber(int number);
+	public void setNumber(String number);
 	
 	
 	/**

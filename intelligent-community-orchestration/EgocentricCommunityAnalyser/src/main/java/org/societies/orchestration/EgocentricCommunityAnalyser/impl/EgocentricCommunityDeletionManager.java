@@ -37,6 +37,8 @@ import org.societies.api.internal.css.directory.ICssDirectory;
 
 import org.societies.api.internal.css.discovery.ICssDiscovery;
 
+import org.societies.api.schema.context.contextschema.CtxBroker;
+
 //import org.societies.api.internal.cis.management.ICisActivityFeed;
 //import org.societies.api.internal.cis.management.ServiceSharingRecord;
 //import org.societies.api.internal.cis.management.ICisActivity;

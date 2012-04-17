@@ -93,7 +93,7 @@
                         <artifactItem>
                             <groupId>${project.groupId}</groupId>
                             <artifactId>${project.artifactId}</artifactId>
-                            <version>${release.version}-SNAPSHOT</version>
+                            <version>${release.version}</version>
                             <type>bundle</type>
                             <overWrite>true</overWrite>
                             <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
