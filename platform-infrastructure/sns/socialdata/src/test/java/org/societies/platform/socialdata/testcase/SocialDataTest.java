@@ -6,6 +6,9 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -36,23 +39,16 @@ public class SocialDataTest {
 	public static void setUp() throws Exception {
 		
 		
+		 
+		
 		  mockedSocialConnector = mock(ISocialConnector.class);
 		  stub(mockedSocialConnector.getConnectorName()).toReturn("facebook");
 		  stub(mockedSocialConnector.getID()).toReturn("facebook_0001");
-		  stub(mockedSocialConnector.getUserFriends()).toReturn("{\"data\": [" +
-		                                                                   " { " +
-		                                                                   "  \"id\": \"123\", "+
-		                                                                   "\"name\": \"Friend ONE\""+
-		                                                                   "}," +
-		                                                                   "{" +
-		                                                                   " 	  \"id\": \"124\"," +
-		                                                                   "\"name\": \"Friend TWO\""+
-		                                                                   "}]}");
-		  
-		  stub(mockedSocialConnector.getUserActivities()).toReturn("	");
-		  stub(mockedSocialConnector.getUserGroups()).toReturn("{\"data\":[]}");
-		  stub(mockedSocialConnector.getUserProfile()).toReturn("{\"data\":[]}");
-		  
+		  stub(mockedSocialConnector.getUserFriends()).toReturn(readFileAsString("mocks/friends.txt"));
+		  stub(mockedSocialConnector.getUserActivities()).toReturn(readFileAsString("mocks/activities.txt"));
+		  stub(mockedSocialConnector.getUserGroups()).toReturn(readFileAsString("mocks/groups.txt"));
+		  stub(mockedSocialConnector.getUserProfile()).toReturn(readFileAsString("mocks/profile.txt"));
+
 		  
 		 // fbConnector = new FacebookConnectorImpl(access_token, null);
 		  socialData  = new SocialData();
@@ -76,6 +72,23 @@ public class SocialDataTest {
 		  
 		
 	}
+	
+	private static String readFileAsString(String filePath)
+		    throws java.io.IOException{
+		        StringBuffer fileData = new StringBuffer(1000);
+		        BufferedReader reader = new BufferedReader(
+		                new FileReader(filePath));
+		        char[] buf = new char[1024];
+		        int numRead=0;
+		        while((numRead=reader.read(buf)) != -1){
+		            String readData = String.valueOf(buf, 0, numRead);
+		            fileData.append(readData);
+		            buf = new char[1024];
+		        }
+		        reader.close();
+		        return fileData.toString();
+		    }
+
 	
 	/**
 	 * @throws java.lang.Exception
