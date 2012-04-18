@@ -3,61 +3,41 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.cis</groupId>
-	<artifactId>cis-manager</artifactId>
+	<artifactId>cis-persistance</artifactId>
+	<name>CIS Persistance</name>
 	<packaging>bundle</packaging>
-	<name>CIS Manager</name>
-	<version>${version.cis}</version>
-
+	<version>${release.version}-SNAPSHOT</version>
 	<developers>
 		<developer>
-			<id>tcarlyle</id>
-			<name>Thomas Vilarinho</name>
-			<email>thomas.vilarinho@sintef.no</email>
-			<organization>Sintef</organization>
-			<roles>
-				<role>owner</role>
-			</roles>
+			<name>Bjørn Magnus Mathisen</name>
+			<email>bjornmagnus.mathisen@sintef.com</email>
 		</developer>
 	</developers>
 
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
+		<relativePath>../../../parent/spring-osgi.xml</relativePath>
 		<version>0.1</version>
 	</parent>
 
 	<dependencies>
 		<!-- add your dependencies here -->
-		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
 
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
 			<version>${release.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.comm.xmpp</groupId>
-			<artifactId>CommunicationFrameworkCommons</artifactId>
-			<version>${version.comm}</version>
-			<scope>compile</scope>
+			<groupId>org.societies</groupId>
+			<artifactId>data-source</artifactId>
+			<version>${release.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.comm.xmpp.pubsub</groupId>
-			<artifactId>PubsubClientBundle</artifactId>
-			<version>${version.comm}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.cis</groupId>
-			<artifactId>cis-persistance</artifactId>
-			<version>${version.cis}</version>
+			<groupId>org.societies</groupId>
+			<artifactId>hibernate_classes</artifactId>
+			<version>${release.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -94,23 +74,8 @@
 						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
-						<Import-Package>
-							org.springframework.beans.factory.annotation*;version="0",
-							org.springframework.stereotype*;version="0",
-							org.xmpp.packet*,
-							!org.gjt.*,
-							!org.jaxen.*,
-							!org.mortbay.*,
-							!org.relaxng.*,
-							!org.jvnet.staxex,
-							!org.jvnet.fastinfoset,
-							!com.sun.xml.fastinfoset.*,
-							!com.sun.msv.*,
-							*;resolution:=optional</Import-Package>
-						<Export-Package>
-							org.societies.api.schema.cis.community,
-							org.societies.api.schema.cis.manager
-						</Export-Package>
+						<Import-Package>*;resolution:=optional</Import-Package>
+						<Export-Package></Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>
