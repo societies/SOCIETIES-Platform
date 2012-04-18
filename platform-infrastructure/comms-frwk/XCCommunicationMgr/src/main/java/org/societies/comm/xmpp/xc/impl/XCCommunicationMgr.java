@@ -179,16 +179,20 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 	protected void handlePresence(Presence presence) {
 		log.info("RECEIVED: "+presence.toXML());
 		try {
-			INetworkNode node = idm.fromFullJid(presence.getFrom().toFullJID());
-			if (presence.getType().equals(Presence.Type.unavailable)) {
-				otherNodes.remove(node);
-			}
-			if (presence.getType()==null) {
-				otherNodes.add(node);
+			IIdentity nodeIdentity = idm.fromJid(presence.getFrom().toString());
+			if (nodeIdentity instanceof INetworkNode) {
+				INetworkNode node = (INetworkNode)nodeIdentity;
+				if (presence.getType()==null) {
+					otherNodes.add(node);
+				}
+				else if (presence.getType().equals(Presence.Type.unavailable)) {
+					otherNodes.remove(node);
+				}
 			}
 		} catch (InvalidFormatException e) {
 			e.printStackTrace();
 		}
+		
 		log.info("otherNodes: "+Arrays.toString(otherNodes.toArray()));
 	}
 
@@ -279,6 +283,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 	public INetworkNode newMainIdentity(String identifier, String domain,
 			String password) throws XMPPError {
 		// TODO Auto-generated method stub
+		// TODO when identity is created it needs to add the component to the roster for presence
 		return null;
 	}
 
@@ -291,5 +296,13 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 	@Override
 	public Set<INetworkNode> getOtherNodes() {
 		return otherNodes;
+	}
+
+	@Override
+	public boolean isConnected() {
+		if (idm!=null && idm.getThisNetworkNode()!=null)
+			return true;
+		else
+			return false;
 	}
 }
