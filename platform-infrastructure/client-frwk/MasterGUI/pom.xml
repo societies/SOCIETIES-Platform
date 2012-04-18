@@ -9,8 +9,8 @@
         <relativePath>../../../parent/android.xml</relativePath>
    </parent>
 
-   <groupId>org.societies.android</groupId>
-   <artifactId>platform.MasterGUI</artifactId>
+   <groupId>org.societies.android.platform</groupId>
+   <artifactId>MasterGUI</artifactId>
    <name>MasterGUI</name>
    <version>${release.version}</version>
    <packaging>apk</packaging>
@@ -26,66 +26,104 @@
 
 
     <dependencies>
-      <!-- Android target version 2 assumes that Android JAR is retrieved from remote repository -->
+		<dependency>
+		    <groupId>org.societies.utilities</groupId>
+		    <artifactId>DBC</artifactId>
+		    <version>${release.version}</version>
+		</dependency>
+    
+      	<!-- Android target version 2 assumes that Android JAR is retrieved from remote repository -->
         <!--dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
             <version>2.2.1</version>
             <scope>provided</scope>
-        </dependency-->
-        <dependency>
+		</dependency-->
+		<dependency>
             <groupId>android</groupId>
             <artifactId>android</artifactId>
-        </dependency>
-        <dependency>
+		</dependency>
+		<dependency>
             <groupId>com.phonegap</groupId>
             <artifactId>phonegap</artifactId>
-        </dependency>
-        <dependency>
-		<groupId>org.societies.android.platform</groupId>
-		<artifactId>CoreInterfaces</artifactId>
-		<version>${release.version}</version>
-        </dependency>
-    	<dependency>
-		<groupId>org.asmack</groupId>
-	        <artifactId>asmack</artifactId>
-	</dependency>
- 	<dependency>
+		</dependency>
+	
+	
+		<dependency>
 	    	<groupId>org.societies.api.external</groupId>
 	    	<artifactId>societies-api</artifactId>
 	    	<version>${release.version}</version>
-	</dependency>
+		</dependency>
+		<dependency>
+		    <groupId>org.societies.comm.xmpp</groupId>
+		    <artifactId>CommunicationFrameworkCommons</artifactId>
+		    <version>${version.comm}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>AndroidAgentApi</artifactId>
+			<version>${version.comm}</version>
+			<!--exclusions>
+		   		<exclusion>
+					<groupId>org.societies.android.jaxb</groupId>
+					<artifactId>jaxb-android-societies</artifactId>
+	 	   		</exclusion>
+			</exclusions-->
+		</dependency>
+		<dependency>
+			<groupId>org.asmack</groupId>
+	    	<artifactId>asmack</artifactId>
+		</dependency>
 	
-	<dependency>
- 		 <groupId>org.slf4j</groupId>
-  		<artifactId>slf4j-api</artifactId>
-		<version>1.6.2</version>
-	</dependency>	
+		<dependency>
+			<groupId>org.societies.android.platform</groupId>
+			<artifactId>CoreInterfaces</artifactId>
+			<version>${release.version}</version>
+		</dependency>
 	
-	<dependency>
-	    <groupId>xerces</groupId>
-	    <artifactId>xercesImpl</artifactId>
-	    <version>2.10.0</version>
-	    <exclusions>
-		<exclusion>
-		    <groupId>xml-apis</groupId> 
-		    <artifactId>xml-apis</artifactId>
-		</exclusion>
-	    </exclusions>
-	</dependency>
+		<dependency>
+ 			<groupId>org.slf4j</groupId>
+  			<artifactId>slf4j-api</artifactId>
+			<version>1.6.2</version>
+		</dependency>	
+	
+		<!--dependency>
+	    	<groupId>xerces</groupId>
+	    	<artifactId>xercesImpl</artifactId>
+	    	<version>2.10.0</version>
+	    	<exclusions>
+				<exclusion>
+		    		<groupId>xml-apis</groupId> 
+		    		<artifactId>xml-apis</artifactId>
+				</exclusion>
+	    	</exclusions>
+		</dependency-->
 		
-	<dependency>
-		<groupId>org.societies</groupId>
-		<artifactId>AndroidAgentApi</artifactId>
-		<version>${version.comm}</version>
-	</dependency>
+		<dependency>
+	    	<groupId>org.societies.android.jaxb</groupId>
+	    	<artifactId>jaxb-android-societies</artifactId>
+	    	<version>0.1</version>
+		</dependency>
 
-        <dependency>
-                <groupId>com.google.code.gson</groupId>
-                <artifactId>gson</artifactId>
-		<version>2.1</version>
-                <scope>compile</scope>
-        </dependency>
+		<!--dependency>
+	    	<groupId>org.societies.comm.android</groupId>
+	    	<artifactId>JaxbAndroidApi</artifactId>
+	    	<version>${version.comm}</version>
+		</dependency-->
+
+		<dependency>
+   			<groupId>org.societies.android.platform</groupId>
+   			<artifactId>SocietiesServiceMonitor</artifactId>
+   			<version>${release.version}</version>
+   			<type>apklib</type>
+		</dependency>
+
+    	<dependency>
+    		<groupId>com.google.code.gson</groupId>
+        	<artifactId>gson</artifactId>
+			<version>2.1</version>
+        	<scope>compile</scope>
+		</dependency>
 
         
     </dependencies>
@@ -101,12 +139,12 @@
 		<extensions>true</extensions>
                 <configuration>
                     <sdk>
-			<platform>8</platform>
+			<platform>${test.android.apilevel}</platform>
                     <path>${android.home}</path>
 		    </sdk>
 		    <emulator>
 		        <!-- the name of the avd device to use for starting the emulator -->
-		        <avd>Test22Device</avd>
+		        <avd>${test.android.avd}</avd>
 		    </emulator>
 		    <undeployBeforeDeploy>true</undeployBeforeDeploy>
 		    <unpackDependencies>false</unpackDependencies>

@@ -65,7 +65,10 @@
 		</module>
 		<module>../platform-infrastructure/client-frwk/devicestatusgui</module>
 
-		<!-- Client Framework 
+		<!-- Client Framework -->
+
+		<module>../platform-infrastructure/client-frwk/SocietiesServiceMonitor</module>
+		<!--
 		<module>../platform-infrastructure/client-frwk/MasterGUI</module>
 		-->
 		<!-- CIS manager light modules -->
