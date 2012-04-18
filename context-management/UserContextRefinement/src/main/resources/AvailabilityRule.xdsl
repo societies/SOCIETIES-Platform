@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<smile discsamples="10000" id="src/main/resources/AvailabilityRule" numsamples="1000" version="1.0">
+<nodes>
+<cpt id="Caller">
+<state id="none"/>
+<state id="Family"/>
+<state id="Boss"/>
+<state id="unknown"/>
+<probabilities>0.98 0.01 0.0050 0.0050 </probabilities>
+</cpt>
+<cpt id="Working_Day">
+<state id="yes"/>
+<state id="no"/>
+<probabilities>0.6 0.4 </probabilities>
+</cpt>
+<cpt id="Time">
+<state id="morning"/>
+<state id="afternoon"/>
+<state id="evening"/>
+<state id="night"/>
+<probabilities>0.25 0.25 0.25 0.25 </probabilities>
+</cpt>
+<cpt id="ActivityType">
+<state id="DangerousActivity"/>
+<state id="IntellectualActivity"/>
+<state id="CommunicationActivity"/>
+<state id="IdleActivity"/>
+<state id="PassiveActivity"/>
+<parents>Working_Day Time </parents>
+<probabilities>0.0 0.5 0.3 0.0 0.2 0.0 0.5 0.3 0.0 0.2 0.2 0.2 0.1 0.2 0.3 0.1 0.0 0.1 0.7 0.1 0.1 0.0 0.1 0.5 0.3 0.3 0.1 0.3 0.1 0.2 0.2 0.1 0.2 0.2 0.3 0.2 0.0 0.2 0.5 0.1 </probabilities>
+</cpt>
+<cpt id="status">
+<state id="busy"/>
+<state id="free"/>
+<parents>Caller ActivityType </parents>
+<probabilities>1.0 0.0 0.7 0.3 0.8 0.2 0.0 1.0 0.4 0.6 1.0 0.0 0.3 0.7 0.5 0.5 0.0 1.0 0.4 0.6 1.0 0.0 0.0 1.0 0.1 0.9 0.0 1.0 0.2 0.8 1.0 0.0 0.7 0.3 0.8 0.2 0.0 1.0 0.4 0.6 </probabilities>
+</cpt>
+<cpt id="Used_Services">
+<state id="WordProcessor"/>
+<state id="VoIP"/>
+<state id="Newscast"/>
+<state id="NoActivity"/>
+<parents>ActivityType </parents>
+<probabilities>0.0 0.2 0.0 0.8 0.6 0.3 0.0 0.1 0.1 0.5 0.2 0.2 0.0 0.0 0.0 1.0 0.0 0.0 0.8 0.2 </probabilities>
+</cpt>
+<cpt id="activity">
+<state id="Walking"/>
+<state id="Standing"/>
+<state id="Sitting"/>
+<parents>ActivityType </parents>
+<probabilities>0.8 0.2 0.0 0.15 0.15 0.7 0.2 0.2 0.6 0.0 0.1 0.9 0.2 0.1 0.7 </probabilities>
+</cpt>
+<cpt id="Location">
+<state id="Home"/>
+<state id="Office"/>
+<state id="MeetingRoom"/>
+<state id="Outdoor"/>
+<parents>ActivityType </parents>
+<probabilities>0.1 0.1 0.1 0.7 0.2 0.5 0.2 0.1 0.25 0.1 0.4 0.25 0.6 0.1 0.1 0.2 0.5 0.1 0.2 0.2 </probabilities>
+</cpt>
+<cpt id="Noise_Level">
+<state id="Noisy"/>
+<state id="Conversation"/>
+<state id="Quiet"/>
+<parents>ActivityType </parents>
+<probabilities>0.5 0.0 0.5 0.0 0.3 0.7 0.1 0.8 0.1 0.1 0.1 0.8 0.3 0.6 0.1 </probabilities>
+</cpt>
+<cpt id="MovementSensor">
+<state id="high"/>
+<state id="medium"/>
+<state id="low"/>
+<parents>Location activity </parents>
+<probabilities>0.4 0.5 0.1 0.0 0.3 0.7 0.0 0.1 0.9 0.4 0.5 0.1 0.0 0.3 0.7 0.0 0.1 0.9 0.4 0.5 0.1 0.0 0.3 0.7 0.0 0.1 0.9 0.4 0.5 0.1 0.0 0.3 0.7 0.0 0.1 0.9 </probabilities>
+</cpt>
+<cpt id="symLoc">
+<state id="Home"/>
+<state id="Office"/>
+<state id="MeetingRoom"/>
+<state id="Outdoor"/>
+<parents>Location </parents>
+<probabilities>1.0 0.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0 1.0 </probabilities>
+</cpt>
+<cpt id="Microphone">
+<state id="Loud"/>
+<state id="Medium"/>
+<state id="Silent"/>
+<parents>Noise_Level </parents>
+<probabilities>0.9 0.1 0.0 0.2 0.7 0.1 0.0 0.1 0.9 </probabilities>
+</cpt>
+</nodes>
+<extensions>
+<genie app="" faultnameformat="nodestate" name="src/main/resources/AvailabilityRule" version="1.0">
+<node id="Caller">
+<name>Caller</name>
+<interior color="e5f6f7"/>
+<outline color="000080"/>
+<font color="000000" name="Arial" size="8"/>
+<position>420 260 450 300</position>
+</node>
+<node id="Working_Day">
+<name>Working_Day</name>
+<interior color="e5f6f7"/>
+<outline color="000080"/>
+<font color="000000" name="Arial" size="8"/>
+<position>420 260 450 300</position>
+</node>
+<node id="Time">
+<name>Time</name>
+<interior color="e5f6f7"/>
+<outline color="000080"/>
+<font color="000000" name="Arial" size="8"/>
+<position>420 260 450 300</position>
+</node>
+<node id="ActivityType">
+<name>ActivityType</name>
+<interior color="e5f6f7"/>
+<outline color="000080"/>
+<font color="000000" name="Arial" size="8"/>
+<position>420 260 450 300</position>
+</node>
+<node id="status">
+<name>status</name>
+<interior color="e5f6f7"/>
+<outline color="000080"/>
+<font color="000000" name="Arial" size="8"/>
+<position>420 260 450 300</position>
+</node>
+<node id="Used_Services">
+<name>Used_Services</name>
+<interior color="e5f6f7"/>
+<outline color="000080"/>
+<font color="000000" name="Arial" size="8"/>
+<position>420 260 450 300</position>
+</node>
+<node id="activity">
+<name>activity</name>
+<interior color="e5f6f7"/>
+<outline color="000080"/>
+<font color="000000" name="Arial" size="8"/>
+<position>420 260 450 300</position>
+</node>
+<node id="Location">
+<name>Location</name>
+<interior color="e5f6f7"/>
+<outline color="000080"/>
+<font color="000000" name="Arial" size="8"/>
+<position>420 260 450 300</position>
+</node>
+<node id="Noise_Level">
+<name>Noise_Level</name>
+<interior color="e5f6f7"/>
+<outline color="000080"/>
+<font color="000000" name="Arial" size="8"/>
+<position>420 260 450 300</position>
+</node>
+<node id="MovementSensor">
+<name>MovementSensor</name>
+<interior color="e5f6f7"/>
+<outline color="000080"/>
+<font color="000000" name="Arial" size="8"/>
+<position>420 260 450 300</position>
+</node>
+<node id="symLoc">
+<name>symLoc</name>
+<interior color="e5f6f7"/>
+<outline color="000080"/>
+<font color="000000" name="Arial" size="8"/>
+<position>420 260 450 300</position>
+</node>
+<node id="Microphone">
+<name>Microphone</name>
+<interior color="e5f6f7"/>
+<outline color="000080"/>
+<font color="000000" name="Arial" size="8"/>
+<position>420 260 450 300</position>
+</node>
+</genie>
+</extensions>
+</smile>

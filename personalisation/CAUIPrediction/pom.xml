@@ -49,6 +49,15 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
+				<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.context</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.beans</artifactId>
+		</dependency>
+		
 		
 		<!-- <dependency> <groupId>org.societies.context-management</groupId> <artifactId>css_contextBroker_impl</artifactId> 
 			<version>${version.cm}</version> </dependency> <dependency> <groupId>org.societies.context-management</groupId> 

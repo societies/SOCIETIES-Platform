@@ -24,8 +24,8 @@
  */
 package org.societies.personalisation.SNDataExtractor.api.extractor;
 
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.SNDataExtractor.api.extractor.mock.SNConnector;
 
@@ -39,14 +39,14 @@ public interface ISNDataExtractor  {
 	 * @param ownerId the DigitalIdentity of the user (entity)
 	 * @param 
 	 */
-	public SNConnector doConnectionToSN(EntityIdentifier entityId, String connectorType);
+	public SNConnector doConnectionToSN(IIdentity entityId, String connectorType);
 	
 	
 	/**
 	 * This method will provide the preferences from the SN of an entity User.
 	 * @param ownerId the DigitalIdentity of the user (entity)
 	 */
-	public IOutcome getPreferences(EntityIdentifier entityId);
+	public IOutcome getPreferences(IIdentity entityId);
 	
 	/**
 	 * This method will provide the raw data from a specific social network 
@@ -54,7 +54,7 @@ public interface ISNDataExtractor  {
 	 * @parem connector the Social Network connector
      * @param serviceId	the service identifier of the service requesting the outcome
 	 */
-	public String getSocialPreferences(EntityIdentifier entityId, SNConnector connector, ServiceResourceIdentifier serviceId);
+	public String getSocialPreferences(IIdentity entityId, SNConnector connector, ServiceResourceIdentifier serviceId);
 	
 	/**
 	 * This method will remove the entity User from the graph and its connection with the social network
@@ -62,7 +62,7 @@ public interface ISNDataExtractor  {
 	 * @parem connector the Social Network connector
      * @param serviceId	the service identifier of the service requesting the outcome
 	 */
-	public boolean removeConnection(EntityIdentifier entityId, SNConnector connector);
+	public boolean removeConnection(IIdentity entityId, SNConnector connector);
 	
 	
 	/**
@@ -70,7 +70,7 @@ public interface ISNDataExtractor  {
 	 * @param ownerId the DigitalIdentity of the user (entity)
 	 * @parem connector the Social Network connector
 	 */
-	public void resetPreferences(EntityIdentifier entityId, SNConnector connector);
+	public void resetPreferences(IIdentity entityId, SNConnector connector);
 	
 		
 }

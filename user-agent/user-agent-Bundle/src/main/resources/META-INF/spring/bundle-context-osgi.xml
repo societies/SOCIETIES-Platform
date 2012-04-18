@@ -17,6 +17,12 @@
 		</osgi:interfaces>
 	</osgi:service>
 	
+	<osgi:service ref="dm">
+		<osgi:interfaces>
+			<value>org.societies.api.internal.useragent.decisionmaking.IDecisionMaker</value>
+		</osgi:interfaces>
+	</osgi:service>
+	
 	<osgi:service ref="feedback">
         <osgi:interfaces>
         	<value>org.societies.api.internal.useragent.feedback.IUserFeedback</value>
@@ -25,6 +31,10 @@
 
 	<!-- context Broker is needed by uam (at least) -->
 	<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker">
+	</osgi:reference>
+	
+	<!-- IServiceDiscovery is needed by dm (at least) -->
+	<osgi:reference id="servicedis" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery">
 	</osgi:reference>
 
 </beans>
