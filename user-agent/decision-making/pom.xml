@@ -38,7 +38,7 @@
 		<dependency>
 			<groupId>org.societies.useragent</groupId>
 			<artifactId>conflict</artifactId>
-			<version>${version.ua}</version>
+			<version>${release.version}</version>
 		</dependency>
 		<dependency>
 	<groupId>org.societies.useragent</groupId>
