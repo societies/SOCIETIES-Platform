@@ -35,6 +35,8 @@ package org.societies.cis.manager;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.societies.cis.activity.ActivityFeed;
+
 
 public class CisActivityFeed {
 	public Set<CisActivity> activitySet;
@@ -48,6 +50,7 @@ public class CisActivityFeed {
 	public CisActivityFeed() {
 		activityFeedUri = "";
 		activitySet = new HashSet<CisActivity>();
+		ActivityFeed act = new ActivityFeed();
 	};
 	
 	

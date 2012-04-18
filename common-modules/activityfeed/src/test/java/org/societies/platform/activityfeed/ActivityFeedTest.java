@@ -31,6 +31,9 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.junit.Test;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.CISNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.CSSNotFoundException;
@@ -122,5 +125,21 @@ public class ActivityFeedTest extends
 		
 	}
 
+	@Test
+	@Rollback(false)
+	public void testBootStrap(){
+		SessionFactory ses = ActivityFeed.getStaticSessionFactory();
+		Session s = ses.openSession();
+		Transaction t = s.beginTransaction();
+		t.begin();
+		for(int i=0;i<10;i++){
+			ActivityFeed feed = new ActivityFeed();
+			feed.setId(Integer.toString(i));
+			s.save(feed);
+		}
+		t.commit();
+		ActivityFeed queryFeed = ActivityFeed.startUp("0");
+		assert(queryFeed != null);
+	}
 
 }
