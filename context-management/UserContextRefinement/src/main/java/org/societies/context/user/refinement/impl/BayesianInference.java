@@ -5,14 +5,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxOriginType;
@@ -22,15 +20,29 @@ import org.societies.context.user.refinement.impl.bayesianLibrary.inference.solv
 import org.societies.context.user.refinement.impl.bayesianLibrary.inference.structures.impl.DAG;
 import org.societies.context.user.refinement.impl.bayesianLibrary.inference.structures.impl.Node;
 import org.societies.context.user.refinement.impl.bayesianLibrary.inference.structures.impl.Probability;
-import org.societies.context.user.refinement.impl.tools.NetworkConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 
-//@Component(name="Bayesian Inference", immediate=true)
-//@Service(value=ICtxRefiner.class)
 public class BayesianInference// implements ICtxRefiner<BayesianRule> {
 {
-	// @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY, policy =
-	// ReferencePolicy.DYNAMIC)
+
+	/**
+	 * The Context Broker service reference.
+	 * 
+	 * @see {@link #setCtxBroker(ICtxBroker)}
+	 */
+	@Autowired(required = true)
 	protected ICtxBroker broker;
+
+	/**
+	 * Sets the Context Broker service reference
+	 * 
+	 * @param ctxBroker
+	 *            the ctxBroker to set
+	 */
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		this.broker = ctxBroker;
+	}
+	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private String readFileAsString(String filePath) throws java.io.IOException {
@@ -63,6 +75,7 @@ public class BayesianInference// implements ICtxRefiner<BayesianRule> {
 		return new String(file);
 	}
 
+	/* hardcoded rules
 	private DAG getTaskRule() {
 		// DAG taskRule = GenieJava.genieToJava("TaskRule.xdsl");
 
@@ -73,6 +86,8 @@ public class BayesianInference// implements ICtxRefiner<BayesianRule> {
 			e.printStackTrace();
 		}
 		DAG result = new DAG();
+		
+		
 		result.setRule(ruleString);
 		ArrayList<String> outputs = new ArrayList<String>();
 		outputs.add("Task");
@@ -114,13 +129,22 @@ public class BayesianInference// implements ICtxRefiner<BayesianRule> {
 		result.setOutputs(outputs);
 		return result;
 	}
+	*/
 
 	public Collection<CtxAttribute> eval(CtxAttribute inferredAttribute,
 			DAG graph) {
 		JunctionTree jtree = new JunctionTree(graph);
 		jtree.initialiseJTree();
 
-		HashSet<String> inputs = new HashSet<String>(arg0.getInputTypes());
+		//get Input types:
+		Node[] inputArray = graph.getNodes();
+		HashSet<String> inputs = new HashSet<String>();
+		
+		for (Node n:inputArray){
+			if (!n.getName().equals(inferredAttribute.getType()))
+				inputs.add(n.getName());
+		}
+		
 		boolean evidenceAvailable = false;
 
 		HashMap<String, Node> nodeMap = new HashMap<String, Node>();
@@ -137,16 +161,19 @@ public class BayesianInference// implements ICtxRefiner<BayesianRule> {
 
 		if (inputs != null && inputs.size() != 0)
 			for (String ctxType : inputs) {
-				temp = caller.getEvaluationInputs(target, ctxType);
-				if (temp == null || temp.size() == 0) {
-					try {
-						temp = caller.getEvaluationInputs(broker
-								.retrieveDevice().getCtxIdentifier(), ctxType);
-						logger.debug("From device entity: " + temp);
-					} catch (CtxException e) {
-						e.printStackTrace();
-					}
-				}
+				
+				//TODO get all evaluation inputs from rule
+				//TODO try to retrieve them from the broker or inference manager.
+//				temp = broker.getEvaluationInputs(target, ctxType);
+//				if (temp == null || temp.size() == 0) {
+//					try {
+//						temp = caller.getEvaluationInputs(broker
+//								.retrieveDevice().getCtxIdentifier(), ctxType);
+//						logger.debug("From device entity: " + temp);
+//					} catch (CtxException e) {
+//						e.printStackTrace();
+//					}
+//				}
 				if (temp != null && temp.size() != 0) {
 					ctxAttribute = temp.iterator().next(); // we assume there is
 															// only one. if
@@ -162,7 +189,7 @@ public class BayesianInference// implements ICtxRefiner<BayesianRule> {
 								//TODO BLOB handling
 								//getBlobValue(this.getClass().getClassLoader()); 
 								value = (String) ctxAttribute.getStringValue();
-							} catch (CtxException e) {
+							} catch (Exception e) { // was: CtxException e) {
 								logger.debug("Error retrieving Blob value for attribute "
 										+ ctxType);
 							}
