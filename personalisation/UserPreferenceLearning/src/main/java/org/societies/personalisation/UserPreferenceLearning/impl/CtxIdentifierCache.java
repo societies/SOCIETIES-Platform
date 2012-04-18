@@ -60,14 +60,13 @@ public class CtxIdentifierCache {
         }
     }
     
-    public IPreferenceCondition getPreferenceCondition(IIdentity dpi, IAction action){
-        String parameter = action.getparameterName();
-        CtxAttributeIdentifier id = retrieveCtxIdentifier(dpi, parameter);
+    public IPreferenceCondition getPreferenceCondition(IIdentity dpi, String parameterName, String value){
+        CtxAttributeIdentifier id = retrieveCtxIdentifier(dpi, parameterName);
         IPreferenceCondition translated = new ContextPreferenceCondition(
                 id, 
                 OperatorConstants.EQUALS, 
-                action.getvalue(), 
-                parameter);
+                value, 
+                parameterName);
         
         return translated;
     }

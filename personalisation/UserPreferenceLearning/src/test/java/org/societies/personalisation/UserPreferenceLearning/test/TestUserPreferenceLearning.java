@@ -300,8 +300,7 @@ public class TestUserPreferenceLearning extends TestCase{
 				CtxAttributeIdentifier action_attrId = new CtxAttributeIdentifier(entityId, "action", new Long(12345));
 				CtxAttribute action_attribute = new CtxAttribute(action_attrId);
 				if(toggle == 1) toggle = 0; else toggle = 1;
-				Action value = new Action(tennisActionTypes[toggle], instance[0]);
-				value.setServiceID(serviceId1);
+				Action value = new Action(serviceId1, "testService", tennisActionTypes[toggle], instance[0]);
 				byte[] blobValue = SerialisationHelper.serialise(value);
 				action_attribute.setBinaryValue(blobValue);
 				CtxHistoryAttribute action = new CtxHistoryAttribute(action_attribute, ng.getNextValue());
@@ -341,8 +340,7 @@ public class TestUserPreferenceLearning extends TestCase{
 				CtxAttributeIdentifier action_attrId = new CtxAttributeIdentifier(entityId, "action", new Long(12345));
 				CtxAttribute action_attribute = new CtxAttribute(action_attrId);
 				if(toggle == 1) toggle = 0; else toggle = 1;
-				Action value = new Action(lymphActionTypes[toggle], instance[0]);
-				value.setServiceID(serviceId2);
+				Action value = new Action(serviceId2, "testService", lymphActionTypes[toggle], instance[0]);
 				byte[] blobValue = SerialisationHelper.serialise(value);
 				action_attribute.setBinaryValue(blobValue);
 				CtxHistoryAttribute action = new CtxHistoryAttribute(action_attribute, ng.getNextValue());
@@ -411,8 +409,7 @@ public class TestUserPreferenceLearning extends TestCase{
 				CtxAttributeIdentifier action_attrId = new CtxAttributeIdentifier(entityId, "action", new Long(12345));
 				CtxAttribute action_attribute = new CtxAttribute(action_attrId);
 				if(toggle == 1) toggle = 0; else toggle = 1;
-				Action value = new Action(tennisActionTypes[toggle], instance[0]);
-				value.setServiceID(serviceId1);
+				Action value = new Action(serviceId1, "testService", tennisActionTypes[toggle], instance[0]);
 				byte[] blobValue = SerialisationHelper.serialise(value);
 				action_attribute.setBinaryValue(blobValue);
 				CtxHistoryAttribute action = new CtxHistoryAttribute(action_attribute, ng.getNextValue());
@@ -446,8 +443,7 @@ public class TestUserPreferenceLearning extends TestCase{
 				CtxAttributeIdentifier action_attrId = new CtxAttributeIdentifier(entityId, "action", new Long(12345));
 				CtxAttribute action_attribute = new CtxAttribute(action_attrId);
 				if(toggle == 1) toggle = 0; else toggle = 1;
-				Action value = new Action(lymphActionTypes[toggle], instance[0]);
-				value.setServiceID(serviceId1);
+				Action value = new Action(serviceId1, "testService", lymphActionTypes[toggle], instance[0]);
 				byte[] blobValue = SerialisationHelper.serialise(value);
 				action_attribute.setBinaryValue(blobValue);
 				CtxHistoryAttribute action = new CtxHistoryAttribute(action_attribute, ng.getNextValue());
@@ -492,8 +488,7 @@ public class TestUserPreferenceLearning extends TestCase{
 
 				CtxAttributeIdentifier action_attrId = new CtxAttributeIdentifier(entityId, "action", new Long(12345));
 				CtxAttribute action_attribute = new CtxAttribute(action_attrId);
-				Action value = new Action("tennis", instance[0]);
-				value.setServiceID(serviceId1);
+				Action value = new Action(serviceId1, "testService", "tennis", instance[0]);
 				byte[] blobValue = SerialisationHelper.serialise(value);
 				action_attribute.setBinaryValue(blobValue);
 				CtxHistoryAttribute action = new CtxHistoryAttribute(action_attribute, ng.getNextValue());
