@@ -63,12 +63,16 @@ public class NegotiationRequesterUnitTest {
 		// Signature manager
 		signatureMgrMock = mock(ISignatureMgr.class);
 
+		// Secure Storage
+		secureStorageMock = mock(ISecureStorage.class);
+
 		// Security comms group manager
 		groupMgrMock = mock(INegotiationProviderRemote.class);
 		idMgrMock = mock(IIdentityManager.class);
 		when(groupMgrMock.getIdMgr()).thenReturn(idMgrMock); 
 //		verify(groupMgrMock).getIdMgr();
-		secureStorageMock = mock(ISecureStorage.class);
+		
+		// Personalization Manager
 		personalizationMgrMock = mock(IPersonalisationManager.class);
 
 		// Class under test
