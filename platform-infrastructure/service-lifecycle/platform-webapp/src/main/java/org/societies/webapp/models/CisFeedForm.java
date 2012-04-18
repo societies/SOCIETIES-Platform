@@ -22,19 +22,118 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.servicelifecycle;
-
-import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
+package org.societies.webapp.models;
 
 /**
- * The callback to a remote service control call
- * 
- * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
+ * Describe your class here...
+ *
+ * @author aleckey
  *
  */
-public interface IServiceControlCallback {
+public class CisFeedForm {
 
-	public void setResult(ServiceControlResult result);
-	
-	public ServiceControlResult getResult();
+	private String method;
+	private String cssId;
+	private String timePeriod;
+	private String query;
+	private String verb;
+	private String actor;
+	private String object;
+	private String target;
+	/**
+	 * @return the method
+	 */
+	public String getMethod() {
+		return method;
+	}
+	/**
+	 * @param method the method to set
+	 */
+	public void setMethod(String method) {
+		this.method = method;
+	}
+	/**
+	 * @return the cssId
+	 */
+	public String getCssId() {
+		return cssId;
+	}
+	/**
+	 * @param cssId the cssId to set
+	 */
+	public void setCssId(String cssId) {
+		this.cssId = cssId;
+	}
+	/**
+	 * @return the timePeriod
+	 */
+	public String getTimePeriod() {
+		return timePeriod;
+	}
+	/**
+	 * @param timePeriod the timePeriod to set
+	 */
+	public void setTimePeriod(String timePeriod) {
+		this.timePeriod = timePeriod;
+	}
+	/**
+	 * @return the query
+	 */
+	public String getQuery() {
+		return query;
+	}
+	/**
+	 * @param query the query to set
+	 */
+	public void setQuery(String query) {
+		this.query = query;
+	}
+	/**
+	 * @return the verb
+	 */
+	public String getVerb() {
+		return verb;
+	}
+	/**
+	 * @param verb the verb to set
+	 */
+	public void setVerb(String verb) {
+		this.verb = verb;
+	}
+	/**
+	 * @return the actor
+	 */
+	public String getActor() {
+		return actor;
+	}
+	/**
+	 * @param actor the actor to set
+	 */
+	public void setActor(String actor) {
+		this.actor = actor;
+	}
+	/**
+	 * @return the object
+	 */
+	public String getObject() {
+		return object;
+	}
+	/**
+	 * @param object the object to set
+	 */
+	public void setObject(String object) {
+		this.object = object;
+	}
+	/**
+	 * @return the target
+	 */
+	public String getTarget() {
+		return target;
+	}
+	/**
+	 * @param target the target to set
+	 */
+	public void setTarget(String target) {
+		this.target = target;
+	}
 }

@@ -22,37 +22,19 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.api.internal.servicelifecycle;
+
+import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 
 /**
- * Is a feed of activities that are collected from CIS members and their shared services.
+ * The callback to a remote service control call
  * 
- * @link CISActivity
- * @author Babak.Farshchian@sintef.no
- * @version 0
+ * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
+ *
  */
-package org.societies.cis.manager;
+public interface IServiceControlCallback {
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.societies.cis.activity.ActivityFeed;
-
-
-public class CisActivityFeed {
-	public Set<CisActivity> activitySet;
-	public void getActivities(String CssId, String timePeriod){};
-	public void getActivities(String CssId, String query, String timePeriod){};
-	public void addCisActivity(CisActivity activity){};
-	public void cleanupFeed(String criteria){}
+	public void setResult(ServiceControlResult result);
 	
-	String activityFeedUri;
-	
-	public CisActivityFeed() {
-		activityFeedUri = "";
-		activitySet = new HashSet<CisActivity>();
-		ActivityFeed act = new ActivityFeed();
-	};
-	
-	
-
+	public ServiceControlResult getResult();
 }

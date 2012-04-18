@@ -22,37 +22,93 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.webapp.models;
 
 /**
- * Is a feed of activities that are collected from CIS members and their shared services.
- * 
- * @link CISActivity
- * @author Babak.Farshchian@sintef.no
- * @version 0
+ * Describe your class here...
+ *
+ * @author aleckey
+ *
  */
-package org.societies.cis.manager;
+public class CisManagerForm {
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.societies.cis.activity.ActivityFeed;
-
-
-public class CisActivityFeed {
-	public Set<CisActivity> activitySet;
-	public void getActivities(String CssId, String timePeriod){};
-	public void getActivities(String CssId, String query, String timePeriod){};
-	public void addCisActivity(CisActivity activity){};
-	public void cleanupFeed(String criteria){}
+	private String method;
+	private String cisId;
+	private String cisPassword;
+	private String cisName;
+	private String cisType;
+	private Integer cisMode;
+	/**
+	 * @return the method
+	 */
+	public String getMethod() {
+		return method;
+	}
+	/**
+	 * @param method the method to set
+	 */
+	public void setMethod(String method) {
+		this.method = method;
+	}
+	/**
+	 * @return the cisId
+	 */
+	public String getCisId() {
+		return cisId;
+	}
+	/**
+	 * @param cisId the cisId to set
+	 */
+	public void setCisId(String cisId) {
+		this.cisId = cisId;
+	}
+	/**
+	 * @return the cisPassword
+	 */
+	public String getCisPassword() {
+		return cisPassword;
+	}
+	/**
+	 * @param cisPassword the cisPassword to set
+	 */
+	public void setCisPassword(String cisPassword) {
+		this.cisPassword = cisPassword;
+	}
+	/**
+	 * @return the cisName
+	 */
+	public String getCisName() {
+		return cisName;
+	}
+	/**
+	 * @param cisName the cisName to set
+	 */
+	public void setCisName(String cisName) {
+		this.cisName = cisName;
+	}
+	/**
+	 * @return the cisType
+	 */
+	public String getCisType() {
+		return cisType;
+	}
+	/**
+	 * @param cisType the cisType to set
+	 */
+	public void setCisType(String cisType) {
+		this.cisType = cisType;
+	}
+	/**
+	 * @return the cisMode
+	 */
+	public Integer getCisMode() {
+		return cisMode;
+	}
+	/**
+	 * @param cisMode the cisMode to set
+	 */
+	public void setCisMode(Integer cisMode) {
+		this.cisMode = cisMode;
+	}
 	
-	String activityFeedUri;
-	
-	public CisActivityFeed() {
-		activityFeedUri = "";
-		activitySet = new HashSet<CisActivity>();
-		ActivityFeed act = new ActivityFeed();
-	};
-	
-	
-
 }
