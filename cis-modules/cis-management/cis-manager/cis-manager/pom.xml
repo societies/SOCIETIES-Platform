@@ -28,6 +28,13 @@
 
 	<dependencies>
 	<!-- add your dependencies here -->	
+		 <dependency>
+           <groupId>junit</groupId>
+           <artifactId>junit</artifactId>
+           <scope>test</scope>
+        </dependency>
+	
+	
     	<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
