@@ -56,8 +56,8 @@ import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscove
 import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryResultBean;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.servicelifecycle.IServiceControlCallback;
-import org.societies.api.servicelifecycle.IServiceControlRemote;
+import org.societies.api.internal.servicelifecycle.IServiceControlCallback;
+import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 
 /**
  * Comms Client that initiates the remote communication for the Service Lifecycle

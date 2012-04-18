@@ -5,10 +5,10 @@
 
 	<groupId>org.societies.platform</groupId>
 	<artifactId>socialdata</artifactId>
-	<packaging>jar</packaging>
 	<version>${release.version}</version>
+	<packaging>jar</packaging>
 	
-
+	
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
@@ -27,6 +27,7 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -58,6 +59,16 @@
 			<artifactId>shindig-social-api</artifactId>
 			<version>3.0.0-beta4</version>
 		</dependency>
+		
+		<!-- 
+		
+		<dependency>
+			<groupId>org.societies.comm</groupId>
+			<artifactId>CommonLibraries</artifactId>
+			<version>${version.comm}</version>
+		</dependency>
+		
+		 -->
 
 
 	</dependencies>
@@ -74,11 +85,11 @@
 					
 					<instructions>	
     					<Import-Package>
-    						org.apache.shindig*;version="3.0.0-beta4",
+    						org.apache.shindig*;version="*",
     						*;resolution:=optional
     					</Import-Package>
     					<Export-Package>
-							org.societies.platform.socialdata*;
+    					   org.societies.platform.socialdata*;
 		           		</Export-Package>
 		           		<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>

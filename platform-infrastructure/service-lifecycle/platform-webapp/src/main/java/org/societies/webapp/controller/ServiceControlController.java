@@ -47,12 +47,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
-import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
-import org.societies.api.servicelifecycle.IServiceControl;
-import org.societies.api.servicelifecycle.ServiceControlException;
+import org.societies.api.internal.servicelifecycle.IServiceControl;
+import org.societies.api.internal.servicelifecycle.ServiceControlException;
 
 
 @Controller

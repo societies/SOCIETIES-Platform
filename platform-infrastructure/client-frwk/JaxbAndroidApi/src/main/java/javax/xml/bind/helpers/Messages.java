@@ -13,7 +13,7 @@ import java.util.ResourceBundle;
  */
 class Messages
 {
-    static String format( String property ) {
+	static String format( String property ) {
         return format( property, null );
     }
     
@@ -33,8 +33,9 @@ class Messages
     
     /** Loads a string resource and formats it with specified arguments. */
     static String format( String property, Object[] args ) {
-    	System.err.println("............................................");
-        String text = ResourceBundle.getBundle(Messages.class.getName()).getString(property);
+    	//System.err.println("............................................");
+        //String text = ResourceBundle.getBundle(Messages.class.getName()).getString(property);
+        String text = ResourceBundle.getBundle(HELPER_MESSAGES_ORIGINAL_NAME).getString(property);
         return MessageFormat.format(text,args);
     	/*if(property.equals("AbstractMarshallerImpl.MustBeBoolean"))
     		return "{0} must be boolean";
@@ -99,4 +100,8 @@ class Messages
         
     static final String MUST_NOT_BE_NULL = // 1 arg
         "Shared.MustNotBeNull";
+    
+    
+    // Ugly fix for loading unshaded properties file
+    static final String HELPER_MESSAGES_ORIGINAL_NAME = "javax.xml.bind.helpers.Messages";
 }

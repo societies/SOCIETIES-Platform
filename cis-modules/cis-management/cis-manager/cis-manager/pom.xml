@@ -95,6 +95,12 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>activityfeed</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

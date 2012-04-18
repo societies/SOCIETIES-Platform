@@ -39,7 +39,7 @@ import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResultBean;
 import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryResultBean;
-import org.societies.api.servicelifecycle.IServiceControlCallback;
+import org.societies.api.internal.servicelifecycle.IServiceControlCallback;
 
 
 /**

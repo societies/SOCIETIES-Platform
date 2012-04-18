@@ -22,60 +22,67 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.servicelifecycle;
-
-import java.net.URL;
-
-import org.societies.api.identity.IIdentity;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+package org.societies.api.internal.servicelifecycle;
 
 /**
- * The interface class for remote calls to the Service Control component. It permits a caller to tell the SLM to
- * start a service, to stop a service, to install a new service and to uninstall a service.
+ * ServiceControlException is thrown by the Service Control component when an error occurs that
+ * must be propagated upwards.
  *
  * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
  */
-public interface IServiceControlRemote {
+public final class ServiceControlException extends Exception {
 
-	/**
-	 * This method starts the service that is identified by the </code>ServiceResourceIdentifier</code>
-	 * 
-	 * @param serviceId unique service identifier
-	 * @param node The node where the service is located
-	 * @param callback The callback object
-	 */
-	
-	public void startService(ServiceResourceIdentifier serviceId, IIdentity node, IServiceControlCallback callback);
+    private static final long serialVersionUID = 3769214814858706876L;
 
-	
-	/**
-	 * This method stops the service running in the container that is identified by the </code>ServiceResourceIdentifier</code>
-	 * 
-	 * @param serviceId unique service identifier
-	 * @param node The node where the service is located
-	 * @param callback The callback object
-	 */
-	public void stopService(ServiceResourceIdentifier serviceId, IIdentity node, IServiceControlCallback callback);
-	
-	/**
-	 * This method install a new service into the container
-	 * 
-	 * @param serviceLocation the URL of the bundle to install
-	 * @param node The node where the service is located
-	 * @param callback The callback object
-	 */
-	public void installService(URL bundleLocation, IIdentity node, IServiceControlCallback callback);
+    /**
+     * Constructs a <code>ServiceControlException</code> with no detail message.
+     */
+	public ServiceControlException() {
+		super();
+	}
 
-	/**
-	 * This method removes a service from the container.
-	 * 
-	 * @param serviceId unique service identifier
-	 * @param node The node where the service is located
-	 * @param callback The callback object
-	 */
-	public void uninstallService(ServiceResourceIdentifier serviceId, IIdentity node, IServiceControlCallback callback);
+    /**
+     * Constructs a <code>ServiceControlException</code> with the specified detailed
+     * message.
+     * 
+     * @param message
+     *            the detailed message.
+     */
+	public ServiceControlException(String message) {
+		super(message);
+	}
 
-	
-	
+    /**
+     * Creates a <code>ServiceControlException</code> with the specified cause and a
+     * detailed message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+	public ServiceControlException(Throwable cause) {
+		super(cause);
+	}
+
+    /**
+     * Creates a <code>ServiceControlException</code> with the specified detailed message
+     * and the throwable cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+	public ServiceControlException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
 }

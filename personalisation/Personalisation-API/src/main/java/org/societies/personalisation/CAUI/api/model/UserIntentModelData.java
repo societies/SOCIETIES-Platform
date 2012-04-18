@@ -24,6 +24,10 @@
  */
 package org.societies.personalisation.CAUI.api.model;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Helper class for user intent model storage.
@@ -31,6 +35,42 @@ package org.societies.personalisation.CAUI.api.model;
  * @author nikosk
  * @version 0.0.1
  */
-public class TaskModelData {
+public class UserIntentModelData implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	String uiModelID;
+	
+	private List<IUserIntentTask> tasks = new ArrayList<IUserIntentTask>();
+	Double [][] matrix = null;
+	
+	
+	public UserIntentModelData(List<IUserIntentTask> tasks, Double [][] matrix){
+		this.tasks = tasks;
+		this.matrix = matrix;
+	}
+
+
+	public List<IUserIntentTask> getTaskList() {
+		return tasks;
+	}
+
+
+	public void setTaskList(List<IUserIntentTask> tasks) {
+		this.tasks = tasks;
+	}
+
+
+	public Double[][] getMatrix() {
+		return matrix;
+	}
+
+
+	public void setMatrix(Double[][] matrix) {
+		this.matrix = matrix;
+	}
+	
 }
