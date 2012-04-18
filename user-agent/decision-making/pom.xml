@@ -39,6 +39,7 @@
 			<groupId>org.societies.useragent</groupId>
 			<artifactId>conflict</artifactId>
 			<version>${version.ua}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 	<groupId>org.societies.useragent</groupId>
