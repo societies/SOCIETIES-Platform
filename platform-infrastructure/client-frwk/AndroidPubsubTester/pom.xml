@@ -62,12 +62,12 @@
 		<extensions>true</extensions>
                 <configuration>
                     <sdk>
-			<platform>8</platform>
+			<platform>${test.android.apilevel}</platform>
                     <path>${android.home}</path>
 		    </sdk>
 		    <emulator>
 		        <!-- the name of the avd device to use for starting the emulator -->
-		        <avd>Test22Device</avd>
+		        <avd>${test.android.avd}</avd>
 		    </emulator>
 		    <undeployBeforeDeploy>true</undeployBeforeDeploy>
 		    <unpackDependencies>false</unpackDependencies>
