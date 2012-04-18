@@ -92,10 +92,12 @@ public class iDisasterApplication extends Application {
 	    editor.commit ();
 
 //TODO: remove test code
-    	for (int i = 1; i < 10; i = i + 1) {
-    		disasterNameList.add ("Disaster " + Integer.toString (i));
-		}
-
+//    	for (int i = 1; i < 10; i = i + 1) {
+//    		disasterNameList.add ("Disaster " + Integer.toString (i));
+//		}
+		disasterNameList.add ("Cyprus AMC November 2010");
+		disasterNameList.add ("Cyprus AMC April 2011");
+		disasterNameList.add ("Aquila");
 
 	    if (getUserName () != getString(R.string.noPreference)){
 	    	platformLogIn();	// Instantiate the Societies platform

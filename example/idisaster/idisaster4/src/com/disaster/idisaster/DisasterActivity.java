@@ -53,20 +53,20 @@ public class DisasterActivity extends TabActivity {
 
         // Initialize a TabSpec for each tab and add it to the TabHost
         spec = tabHost.newTabSpec("activities").setIndicator("Activities",
-                          res.getDrawable(R.drawable.ic_tab_home))
+                          res.getDrawable(R.drawable.ic_tab_activities))
                       .setContent(intent);
         tabHost.addTab(spec);
 
         // Do the same for the other tabs
         intent = new Intent().setClass(this, UserActivity.class);
         spec = tabHost.newTabSpec("users").setIndicator("Users",
-                          res.getDrawable(R.drawable.ic_tab_home))
+                          res.getDrawable(R.drawable.ic_tab_users))
                       .setContent(intent);
         tabHost.addTab(spec);
 
         intent = new Intent().setClass(this, ServiceActivity.class);
         spec = tabHost.newTabSpec("services").setIndicator("Services",
-                          res.getDrawable(R.drawable.ic_tab_home))
+                          res.getDrawable(R.drawable.ic_tab_services))
                       .setContent(intent);
         tabHost.addTab(spec);
 

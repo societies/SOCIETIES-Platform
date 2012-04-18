@@ -42,8 +42,7 @@ import android.widget.Toast;
  *
  */
 public class FeedActivity extends ListActivity {
-    static final String[] FEEDLIST = new String[] { "Feed 1", "Feed 2", "Feed 3", "Feed 4",
-	"Feed 5", "Feed 6", "Feed 7", "Feed 8"};
+    static final String[] FEEDLIST = new String[] { "Images sent", "Lakarna assessment postponed", "Translation Request: Kren-douar"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
