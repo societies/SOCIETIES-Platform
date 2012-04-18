@@ -49,8 +49,8 @@ import org.societies.api.schema.servicelifecycle.model.ServiceLocation;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceType;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
-import org.societies.api.servicelifecycle.IServiceControlCallback;
-import org.societies.api.servicelifecycle.IServiceControlRemote;
+import org.societies.api.internal.servicelifecycle.IServiceControlCallback;
+import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 
 /**
  * Junit Test for Service Control

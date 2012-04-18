@@ -49,7 +49,7 @@ import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlMs
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResultBean;
 import org.societies.api.schema.servicelifecycle.model.Service;
-import org.societies.api.servicelifecycle.IServiceControl;
+import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 

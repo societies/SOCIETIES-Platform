@@ -25,32 +25,66 @@
 	STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN 
 	ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
 	OF SUCH DAMAGE. -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-	
-<!-- 	<bean -->
-<!-- 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> -->
-<!-- 		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />		 -->
-<!-- 		<property name="ignoreResourceNotFound" value="true" /> -->
-<!-- 		<property name="locations"> -->
-<!-- 			<list> -->
-<!-- 				local testing -->
-<!-- 				<value>classpath:META-INF/spring/derby_database.properties</value> -->
-<!-- 				final deployment into server  -->
-<!-- 				<value>file:${CONFIG_DIR}\org.societies.platform.properties</value> -->
-<!-- 			</list> -->
-<!-- 		</property> -->
-<!-- 	</bean> -->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+    xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+		http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd" >
+			
+    <context:annotation-config />
+    <tx:annotation-driven />
 
-<!-- 	<bean id="activityDataSource" class="org.societies.cis.activity.SOCIETIESDataSource" -->
-<!-- 		init-method="createDataSource" destroy-method="close"> -->
-<!-- 		<property name="driverClassName" value="${jdbc.driverClassName}" /> -->
-<!-- 		<property name="url" value="${jdbc.url}" /> -->
-<!-- 		<property name="username" value="${jdbc.username}" /> -->
-<!-- 		<property name="password" value="${jdbc.password}" /> -->
-<!-- 		<property name="initialSize" value="2" /> -->
-<!-- 		<property name="maxActive" value="5" /> -->
-<!-- 	</bean> -->
+    <bean id="ServiceRegPropConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" >
+        <property name="ignoreResourceNotFound" value="false" ></property>
+    </bean>
+
+    <bean
+        id="sessionFactory"
+        class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean" >
+
+        <property name="dataSource" ref="societiesDataSource" />
+        <property name="annotatedClasses" >
+            <list>
+                <value>org.societies.cis.activity.ActivityFeed</value>
+                <value>org.societies.cis.activity.model.CisActivity</value>
+            </list>
+        </property>
+
+        <property name="annotatedPackages" >
+
+            <list>
+                <value>org.societies.cis.activity.model</value>
+            </list>
+        </property>
+
+        <property name="hibernateProperties" >
+            <props>
+                <prop key="hibernate.show_sql" >true</prop>
+                <prop key="hibernate.cache.use_second_level_cache" >false</prop>
+                <prop key="hibernate.hbm2ddl.auto" >create-drop</prop>
+                <prop key="hibernate.format_sql" >true</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- enable the configuration of transactional behavior based on annotations -->
+
+    <tx:annotation-driven transaction-manager="transactionManager" />
+
+    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager" >
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+
+    <bean id="actFeed" class="org.societies.cis.activity.ActivityFeed" >
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
 
 </beans>

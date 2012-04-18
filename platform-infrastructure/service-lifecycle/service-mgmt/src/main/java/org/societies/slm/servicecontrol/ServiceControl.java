@@ -39,9 +39,9 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegis
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
-import org.societies.api.servicelifecycle.IServiceControl;
-import org.societies.api.servicelifecycle.IServiceControlRemote;
-import org.societies.api.servicelifecycle.ServiceControlException;
+import org.societies.api.internal.servicelifecycle.IServiceControl;
+import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
+import org.societies.api.internal.servicelifecycle.ServiceControlException;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.scheduling.annotation.AsyncResult;
 
