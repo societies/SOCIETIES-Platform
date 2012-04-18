@@ -3,6 +3,7 @@ package org.societies.api.internal.comm;
 import java.util.Set;
 
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.identity.INetworkNode;
 
 public interface ICommManagerController {
@@ -14,5 +15,7 @@ public interface ICommManagerController {
 	boolean destroyMainIdentity();
 	
 	// CSS Node Discovery
+	//String getOtherNodes(ICommCallback callback);
 	Set<INetworkNode> getOtherNodes();
+	
 }
