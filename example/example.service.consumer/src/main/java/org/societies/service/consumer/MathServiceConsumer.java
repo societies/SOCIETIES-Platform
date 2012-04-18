@@ -94,18 +94,25 @@ public class MathServiceConsumer implements IConsumer {
 	}
 
 	@Override
-	public float barycenter(int a, int b, int c) throws InterruptedException, ExecutionException {
+	public int barycenter(int a, int b, int c){
 		// barycenter of a and b is RES with RES = (a * b) / c
-		Float f = new Float(1);
-		Integer a1 = new Integer(1);
-		Future<Integer> res = null;
-		res = getMathService().multiply(a, b);
-		if (c != 0) {
-			a1 = res.get();
-			f = (float) (a1/c) ;
-		} else {
-			f = (float) -1;
+		Future<Integer> futureAb = getMathService().multiply(a, b);
+		
+		int ab = 0;
+		try {
+			ab = futureAb.get();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		} catch (ExecutionException e1) {
+			e1.printStackTrace();
 		}
-		return f;
+		
+		if (0 != c) 
+		{
+			int result = ab/c;
+			
+			return result;
+		}
+		return -1;
 	}
 }
