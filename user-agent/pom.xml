@@ -58,6 +58,7 @@
 		<module>user-feedback</module>
 		<module>user-action-monitor</module>
 		<module>user-agent-Bundle</module>
+		<module>decision-making</module>
 		<!-- add additional modules here -->
 	</modules>
 </project>
