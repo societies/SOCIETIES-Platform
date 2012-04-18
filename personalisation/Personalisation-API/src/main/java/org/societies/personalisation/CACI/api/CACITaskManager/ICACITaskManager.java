@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.societies.personalisation.CAUI.api.model.CommunityIntentAction;
 import org.societies.personalisation.CAUI.api.model.CommunityIntentTask;
-import org.societies.personalisation.CAUI.api.model.TaskModelData;
+import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 import org.societies.personalisation.CAUI.api.model.UserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentTask;
 
@@ -117,7 +117,7 @@ public interface ICACITaskManager {
 	 * 
 	 * @param modelId
 	 */
-	public TaskModelData retrieveModel(String modelId);
+	public UserIntentModelData retrieveModel(String modelId);
 
 	/**
 	 * This method sets the level of commonality for  a community action.

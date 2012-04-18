@@ -89,7 +89,7 @@ public interface IUserIntentAction  extends IOutcome, Serializable{
      * Returns the transition probability from previous UserAction to this UserAction.
      * @return
      */
-    public double getTransProb(); 
+  //  public double getTransProb(); 
     
     /**
      * This method returns the durations in milliseconds that an action is expected to last.

@@ -19,15 +19,23 @@
  */
 package org.societies.personalisation.CAUIDiscovery.impl;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
-//import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
-import org.societies.personalisation.CAUIDiscovery.test.MockHistoryData;
 
 
 public class CAUIDiscovery implements ICAUIDiscovery{
@@ -35,8 +43,16 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	private ICAUITaskManager cauiTaskManager;
 	private ICtxBroker ctxBroker;
 
+	LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary = null;
+	LinkedHashMap<String,HashMap<String,Double>> transProb = null;
+
+
+
+	List<String> charList = null;
+	List<MockHistoryData> historyList = null;
+
 	public CAUIDiscovery(){
-		dictionary = new LinkedHashMap<String,Integer>();
+		actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
 	}
 
 	public ICAUITaskManager getCauiTaskManager() {
@@ -44,7 +60,6 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 		return cauiTaskManager;
 	}
-
 
 	public void setCauiTaskManager(ICAUITaskManager cauiTaskManager) {
 		System.out.println(this.getClass().getName()+": Got cauiTaskManager");
@@ -56,7 +71,6 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		return ctxBroker;
 	}
 
-
 	public void setCtxBroker(ICtxBroker ctxBroker) {
 		System.out.println(this.getClass().getName()+": Got ctxBroker");
 		this.ctxBroker = ctxBroker;
@@ -65,102 +79,257 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 	// constructor
 	public void initialiseCAUIDiscovery(){
-		dictionary = new LinkedHashMap<String,Integer>();
+		actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
 	}
 
-	LinkedHashMap<String,Integer> dictionary = null;
-	List<String> charList = null;
-	List<MockHistoryData> historyList = null;
 
 	@Override
 	public void generateNewUserModel() {
+
+		/*
+		ConstructUIModel cmodel = new ConstructUIModel(cauiTaskManager,ctxBroker); 
+		// null will be substituted by the transition probability dictionary produced by populateActionCtxDictionary
+		cmodel.constructModel(null);
+		 */
 	}
 
-	public void generateNewUserModel(List data) {
+	public void generateNewUserModel(List<MockHistoryData> data) {
+
 		this.historyList = data;
-		populateDictionary();
+		this.actCtxDictionary = getDictionary(); 
+		this.actCtxDictionary = populateActionCtxDictionary();
+		this.setActiveDictionary(actCtxDictionary);
+		printDictionary(actCtxDictionary);
+		TransitionProbabilitiesCalc transProb  = new TransitionProbabilitiesCalc(actCtxDictionary);
+		LinkedHashMap<String,HashMap<String,Double>> trans2ProbDictionary = transProb.calcTrans2Prob();	
+		printTransProbDictionary(trans2ProbDictionary);
+
+		LinkedHashMap<String,HashMap<String,Double>> trans3ProbDictionary = transProb.calcTrans3Prob();	
+		printTransProbDictionary(trans3ProbDictionary);
+		//TaskDiscovery taskDisc = new TaskDiscovery(actCtxDictionary);
+		//taskDisc.populateTaskDictionary();
+
+
+		// runs only in virgo
+		/*
+		ConstructUIModel cmodel = new ConstructUIModel(cauiTaskManager,ctxBroker); 
+		cmodel.constructModel(null);
+		 */
 	}
 
-	public void  populateDictionary(){
+	public LinkedHashMap<List<String>,ActionDictObject> getDictionary(){
+		return this.actCtxDictionary;
+	}
 
+	public LinkedHashMap<String,ActionDictObject> retrieveModel(){
+		LinkedHashMap<String,ActionDictObject> model = new  LinkedHashMap<String,ActionDictObject>();
+		System.out.println("retrieve file 'taskModel' ");
+
+		File file = new File("taskModel");  
+		FileInputStream f;
+		try {
+			f = new FileInputStream(file);
+			ObjectInputStream s = new ObjectInputStream(f);  
+			model = (LinkedHashMap<String,ActionDictObject>)s.readObject();         
+			s.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}  
+		return model;
+	}
+
+
+	public void setActiveDictionary(LinkedHashMap<List<String>,ActionDictObject> model){
+		this.actCtxDictionary = model;
+		System.out.println("model imported #size : "+this.actCtxDictionary.size());
+	}
+
+	public void clearActiveDictionary(){
+		this.actCtxDictionary = null;
+		System.out.println("model cleared "+this.actCtxDictionary);
+	}
+
+
+	public void storeDictionary(LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary ){
+
+		System.out.println("storing to file 'taskModel' ");
+		this.actCtxDictionary = actCtxDictionary;
+		File file = new File("taskModel");  
+		FileOutputStream f;
+		try {
+			f = new FileOutputStream(file);
+			ObjectOutputStream s = new ObjectOutputStream(f);          
+			s.writeObject(actCtxDictionary);
+			s.flush();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}  
+	}
+
+	public LinkedHashMap<List<String>,ActionDictObject>  populateActionCtxDictionary(){
+
+		//LinkedHashMap<String,DictObject> actCtxDictionary = new LinkedHashMap<String,DictObject>();
+		///	LinkedHashMap<List<String>,ActionDictObject> newActCtxDictionary = this.actCtxDictionary;
 		int historySize = this.historyList.size();
-		String currentPhrase = null;
+		System.out.println("historySize "+historySize);
+		System.out.println(this.historyList);
 
-		// j is the step and the longest phrase has 5 actions
+
+		List<String> currentActPhrase = null;
+		List<String> currentCtxPhrase = null;
+
+		// j is the step and the longest phrase has 3 actions
 		for (int j=1; j<5; j++) {
-		//	System.out.println("dictionary "+this.dictionary);
-		//	System.out.println("-------");
 
 			for (int i = 0; i < historySize ; i++) {
-				//	currentPhrase = array.substring(i, i+j);
-				LinkedList<String> actionNameObj = new LinkedList<String>();
 				MockHistoryData currentHocData =  this.historyList.get(i);
+				List<String> actionNameObjTemp = new ArrayList<String>();
 				String actionName = currentHocData.getActionValue();
-				actionNameObj.add(actionName);
-		//		System.out.println("j="+j+" i="+i+" actionName "+actionName);
+				//	System.out.println("prin "+actionNameObjTemp);
+				//	System.out.println(j+" "+ i+" "+actionName);
+				actionNameObjTemp.add(actionName);
+				//	System.out.println("meta "+actionNameObjTemp);
 
+
+				LinkedList<String> ctxObjTemp = new LinkedList<String>();
+				ctxObjTemp.add(currentHocData.getContext());
+				//System.out.println("j="+j+" i="+i+" actionName "+actionName+" context"+currentHocData.getContext());
 				MockHistoryData tempHocData = null;
-				LinkedList<String> nextActName = new LinkedList<String>();
 
 				for (int k=1; k<j; k++){
-					if( i+k < historySize ){ 
+					//avoid null pointer at end of file
+					if( i+k < historySize ){
 						tempHocData = this.historyList.get(i+k);
 						String tempNextActName = tempHocData.getActionValue();
-						//nextActName = nextActName + tempNextActName;
-						nextActName.add(tempNextActName);
-			//			System.out.println("k="+k+" nextActName "+nextActName);
+						String tempNextCtx = tempHocData.getContext();
+						//System.out.println(".."+tempNextActName);
+						actionNameObjTemp.add(tempNextActName);
+						//nextActName.add(tempNextActName);
+						ctxObjTemp.add(tempNextCtx);
+						//	System.out.println("k="+k+" nextActName "+nextActName);
 					}
 				}
-				actionNameObj.addAll(nextActName);
-				//currentPhrase = actionName + nextActName;
-		//		System.out.println("j="+j+" i="+i+" currentPhrase "+actionNameObj);
-				currentPhrase = actionNameObj.toString();
-		//		System.out.println(" actionNameObj.toString "+currentPhrase);
-				if (actionNameObj.size() == j){
-					if( this.dictionary.containsKey(currentPhrase)){
+				//actionNameObjTemp.addAll(nextActName);
+				//currentActPhrase = actionNameObjTemp.toString();
+				currentActPhrase = actionNameObjTemp;
+				currentCtxPhrase = ctxObjTemp;
+
+
+				if (actionNameObjTemp.size() == j){
+					//System.out.println("j="+j+" i="+i+" actionName "+actionName+ " phrase "+currentActPhrase +" context"+currentHocData.getContext()+" ");
+
+					if(actCtxDictionary.containsKey(currentActPhrase)){
 						//	HashMap<String,Integer> container = dictionary.get(currentChar);
-						Integer previousScore = this.dictionary.get(currentPhrase);
-						this.dictionary.put(currentPhrase,previousScore+1);
+
+						//get current dictObj
+						ActionDictObject dicObj = actCtxDictionary.get(currentActPhrase);
+						//update total score
+						Integer previousScore = dicObj.getTotalOccurences();
+						dicObj.setTotalOccurences(previousScore+1);
+
+						//update context map
+						HashMap<List<String>,Integer> currentCtxMap  = dicObj.getContextMap();
+						HashMap<List<String>,Integer> updatedMap = mergeCtxMaps(currentCtxPhrase,currentCtxMap);
+
+						dicObj.setContextMap(updatedMap);
+						//System.out.println("k="+dicObj);
+						//add updated data to dictionary
+						actCtxDictionary.put(currentActPhrase,dicObj);
+						//System.out.println("actCtxDictionary.put 1"+ actCtxDictionary);
 					} else {
-						this.dictionary.put(currentPhrase, 1);
+						ActionDictObject newDictObj = new ActionDictObject();
+						newDictObj.setTotalOccurences(1);
+						HashMap<List<String>,Integer> newCtxMap =  new HashMap<List<String>,Integer>();
+						newCtxMap.put(currentCtxPhrase, 1);
+						newDictObj.setContextMap(newCtxMap);
+						actCtxDictionary.put(currentActPhrase,newDictObj);
+						//System.out.println("actCtxDictionary.put 2"+ actCtxDictionary);
 					}
 				}
 			}
 		}
-		System.out.println("dictionary "+this.dictionary);
+		return actCtxDictionary;
 	}
 
-	public LinkedHashMap<String,Integer> getDictionary(){
-		return this.dictionary;
-	}
 
-	public void findOccurences(int step, String array){
+	private HashMap<List<String>,Integer> mergeCtxMaps(List<String> newCtxPhrase, HashMap<List<String>,Integer> oldMap){
+		HashMap<List<String>,Integer> results = oldMap;
 
-		int arraySize = array.length();
-		String currentPhrase = null;
-
-		for (int i = 0; i < arraySize-step ; i++){
-			currentPhrase = array.substring(i, i+step);
-			System.out.println(" currentChar "+currentPhrase);
-
-			if(this.dictionary.containsKey(currentPhrase)){
-				//HashMap<String,Integer> container = dictionary.get(currentChar);
-				Integer previousScore = this.dictionary.get(currentPhrase);
-				this.dictionary.put(currentPhrase,previousScore+1);
-			} else {
-				this.dictionary.put(currentPhrase, 1);
-			}
-		}
-	}
-	
-	public LinkedHashMap<String,Integer> getMaxFreqSeq(int score){
-		LinkedHashMap<String,Integer> results = new LinkedHashMap<String,Integer>();
-		LinkedHashMap<String,Integer> dic = getDictionary();
-		
-		for (String act : dic.keySet()){
-		if(dic.get(act) > score) results.put(act, dic.get(act));	
-		}
+		if(results.containsKey(newCtxPhrase)){
+			Integer value = results.get(newCtxPhrase);
+			results.put(newCtxPhrase, value+1);
+		}else{
+			results.put(newCtxPhrase,1);
+		}	
 		return results;
+	}
+
+	public void printDictionary(LinkedHashMap<List<String>,ActionDictObject> dictionary){
+
+		System.out.println ("**** printing dictionary contents *****");
+		System.out.println ("**** total number of entries:" + dictionary.size());
+
+		for(List<String> actions : dictionary.keySet()){
+			ActionDictObject dicObj = dictionary.get(actions);
+			int occurences = dicObj.getTotalOccurences();
+
+			System.out.println("Action:"+actions+ "# "+occurences+" | context: "+dicObj.getContextMap());
+		}
+	}
+
+
+	//LinkedHashMap<String,HashMap<String,Double>> transProbDictionary
+	public void printTransProbDictionary (LinkedHashMap<String,HashMap<String,Double>> dictionary){
+
+		System.out.println ("**** printing TransProbDictionary contents *****");
+		//System.out.println ("**** total number of entries:" + dictionary.size());
+
+		for(String actions : dictionary.keySet()){
+			HashMap<String,Double> transTargets = dictionary.get(actions);
+
+			System.out.println("Action:"+actions+ "| target: "+transTargets);
+		}
+	}
+
+	public LinkedHashMap<List<String>,ActionDictObject> getSeqs(int score){
+		LinkedHashMap<List<String>,ActionDictObject> results = new LinkedHashMap<List<String>,ActionDictObject>();
+		LinkedHashMap<List<String>,ActionDictObject> dict = getDictionary();
+
+		for (List<String> act : dict.keySet()){
+			int totalOccur = dict.get(act).getTotalOccurences();
+			if( totalOccur > score) results.put(act, dict.get(act));	
+		}
+
+		System.out.println("total entries in model "+dict.size()); 
+		System.out.println("entries occured more than "+score); 
+		return results;
+	}
+
+
+	// steps are string characters and will change to real actions
+
+	private Integer retrieveTransNum(int steps){
+		int total2Trans = 0; 
+		LinkedHashMap<List<String>,ActionDictObject> dict = getDictionary();
+
+		for (List<String> act : dict.keySet()){
+			if(act.size() == steps){
+				ActionDictObject actDictObj = dict.get(act);	
+				total2Trans = total2Trans+actDictObj.getTotalOccurences();
+			}
+		}		
+		return total2Trans;
 	}
 
 }

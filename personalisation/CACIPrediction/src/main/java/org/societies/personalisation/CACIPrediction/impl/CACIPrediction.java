@@ -20,6 +20,7 @@
 package org.societies.personalisation.CACIPrediction.impl;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 import org.societies.api.context.model.CtxAttribute;
 //import org.societies.api.mock.EntityIdentifier;
@@ -29,7 +30,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentAction;
-import org.societies.personalisation.common.api.management.IPersonalisationInternalCallback;
+
 
 
 
@@ -49,28 +50,31 @@ public class CACIPrediction implements ICAUIPrediction{
 	}
 
 	@Override
-	public IUserIntentAction getCurrentIntentAction(IIdentity arg0,
-			ServiceResourceIdentifier arg1, String arg2) {
+	public List<List<String>> getPredictionHistory() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void getPrediction(IIdentity arg0, IAction arg1,
-			IPersonalisationInternalCallback arg2) {
+	public Future<IUserIntentAction> getCurrentIntentAction(IIdentity ownerID,
+			ServiceResourceIdentifier serviceID, String userActionType) {
 		// TODO Auto-generated method stub
-		
+		return null;
+	}
+
+
+
+
+	@Override
+	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor,
+			IAction action) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
-	public void getPrediction(IIdentity arg0, CtxAttribute arg1,
-			IPersonalisationInternalCallback arg2) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public List<List<String>> getPredictionHistory() {
+	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor,
+			CtxAttribute contextAttribute) {
 		// TODO Auto-generated method stub
 		return null;
 	}

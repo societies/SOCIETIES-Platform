@@ -35,6 +35,8 @@ public class CAUIDiscoveryTest {
 	
 	@Test
 	public void testGenerateNewUserModel() {
+		
+		/*
 		CAUIDiscovery cd = new CAUIDiscovery();
 		//String array = "AAABABBBBAABCCDDCBAAA";
 		//String array = "ABCEZDEFJKABCODEFPABCIOIKDEF";
@@ -45,6 +47,7 @@ public class CAUIDiscoveryTest {
 			cd.findOccurences(i ,array);
 		}
 		System.out.println("populated dictionary :"+cd.getDictionary());
+*/
 	}
 	
 	@Ignore
