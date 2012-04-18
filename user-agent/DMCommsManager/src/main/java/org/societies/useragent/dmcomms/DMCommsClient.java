@@ -1,4 +1,5 @@
 package org.societies.useragent.dmcomms;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.useragent.decisionmaking.DecisionMakingBean;
 
 public class DMCommsClient implements IDecisionMaker, ICommCallback{	
@@ -48,6 +50,31 @@ public class DMCommsClient implements IDecisionMaker, ICommCallback{
 		idManager = commManager.getIdManager();
 	}
 
+	public static DecisionMakingBean packageBean(List<IOutcome> intents,List<IOutcome> preferences){
+		DecisionMakingBean result=new DecisionMakingBean();
+		result.setIntentSize(intents.size());
+		result.setPreferenceSize(preferences.size());
+		result.getIntentServiceIds();
+		result.getIntentParameterNames();
+		result.getIntentServiceTypes();
+		result.getPreferenceServiceIds();
+		result.getPreferenceParameterNames();
+		result.getPreferenceServiceTypes();
+		for(int i=0;i<result.getIntentSize();i++){
+			result.getIntentServiceIds().add(intents.get(i).getServiceID());
+			result.getIntentServiceTypes().add(intents.get(i).getServiceType());
+			result.getIntentParameterNames().add(intents.get(i).getparameterName());
+			result.getIntentConfidenceLevel().add(intents.get(i).getConfidenceLevel());
+		}
+		for(int i=0;i<result.getPreferenceSize();i++){
+			result.getPreferenceServiceIds().add(preferences.get(i).getServiceID());
+			result.getPreferenceServiceTypes().add(preferences.get(i).getServiceType());
+			result.getPreferenceParameterNames().add(preferences.get(i).getparameterName());
+			result.getPreferenceConfidenceLevel().add(preferences.get(i).getConfidenceLevel());
+		}
+		return result;
+	}
+	
 	//asynchronous call
 	@Override
 	public void makeDecision(List<IOutcome> intents, 
@@ -61,7 +88,7 @@ public class DMCommsClient implements IDecisionMaker, ICommCallback{
 		Stanza stanza = new Stanza(toIdentity);
 
 		//CREATE MESSAGE BEAN
-		DecisionMakingBean dmBean = new DecisionMakingBean(intents,preferences);
+		DecisionMakingBean dmBean = packageBean(intents,preferences);
 	//	dmBean.setMethod(DecisionMakingBean.methodType.makeDecision);
 		try {
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
