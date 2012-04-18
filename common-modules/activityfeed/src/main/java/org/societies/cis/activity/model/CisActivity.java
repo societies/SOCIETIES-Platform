@@ -2,14 +2,24 @@ package org.societies.cis.activity.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.societies.api.cis.management.ICisActivity;
+import org.societies.cis.activity.ActivityFeed;
 
 @Entity
 @Table(name = "Activity")
 public class CisActivity implements ICisActivity {
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private String id;
 	
+	@ManyToOne
+	private ActivityFeed feed;
 	public CisActivity(){}
 	public CisActivity(ICisActivity icis)
 	{
@@ -69,6 +79,18 @@ public class CisActivity implements ICisActivity {
 	public void setTarget(String target) {
 		// TODO Auto-generated method stub
 		
+	}
+	public ActivityFeed getFeed() {
+		return feed;
+	}
+	public void setFeed(ActivityFeed feed) {
+		this.feed = feed;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
 	}
 
 }

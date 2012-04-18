@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plan name="org.societies.css.mgmt.plan" version="3.0.0" scoped="false" atomic="true" 
+<plan name="org.societies.cismanagement.plan" version="3.0.0" scoped="false" atomic="false" 
         xmlns="http://www.eclipse.org/virgo/schema/plan" 
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
         xsi:schemaLocation=" 
@@ -9,6 +9,7 @@
 
     <artifact type="bundle" name="org.societies.comm.CommonLibraries"/>
     <artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
+<!--     <artifact type="plan" name="org.societies.activity.plan"/> -->
     <artifact type="bundle" name="org.societies.cis.manager"/>
 
 

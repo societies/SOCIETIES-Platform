@@ -27,8 +27,16 @@
 	</parent>
 
 	<dependencies>
-		<!-- add your dependencies here -->
-		<dependency>
+
+	<!-- add your dependencies here -->	
+		 <dependency>
+           <groupId>junit</groupId>
+           <artifactId>junit</artifactId>
+           <scope>test</scope>
+        </dependency>
+	
+	
+    	<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
@@ -80,6 +88,12 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>activityfeed</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
