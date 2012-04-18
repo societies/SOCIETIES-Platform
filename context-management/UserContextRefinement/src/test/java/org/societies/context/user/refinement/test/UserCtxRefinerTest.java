@@ -24,6 +24,15 @@
  */
 package org.societies.context.user.refinement.test;
 
+import org.junit.Test;
+import org.societies.context.user.refinement.impl.UserCtxRefiner;
+
 public class UserCtxRefinerTest {
+	
+	@Test
+	public void testingInferenceEngineCreation(){
+		UserCtxRefiner ucr = new UserCtxRefiner();
+		assert(true);
+	}
 
 }
