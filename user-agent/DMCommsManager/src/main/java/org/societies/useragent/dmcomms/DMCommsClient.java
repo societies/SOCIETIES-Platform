@@ -54,12 +54,12 @@ public class DMCommsClient implements IDecisionMaker, ICommCallback{
 		DecisionMakingBean result=new DecisionMakingBean();
 		result.setIntentSize(intents.size());
 		result.setPreferenceSize(preferences.size());
-		result.setIntentServiceIds(new ArrayList<ServiceResourceIdentifier>());
-		result.setIntentParameterNames(new ArrayList<String>());
-		result.setIntentServiceTypes(new ArrayList<String>());
-		result.setPreferenceServiceIds(new ArrayList<ServiceResourceIdentifier>());
-		result.setPreferenceParameterNames(new ArrayList<String>());
-		result.setPreferenceServiceTypes(new ArrayList<String>());
+		result.getIntentServiceIds();
+		result.getIntentParameterNames();
+		result.getIntentServiceTypes();
+		result.getPreferenceServiceIds();
+		result.getPreferenceParameterNames();
+		result.getPreferenceServiceTypes();
 		for(int i=0;i<result.getIntentSize();i++){
 			result.getIntentServiceIds().add(intents.get(i).getServiceID());
 			result.getIntentServiceTypes().add(intents.get(i).getServiceType());
