@@ -6,7 +6,7 @@
 	<artifactId>cis-persistance</artifactId>
 	<name>CIS Persistance</name>
 	<packaging>bundle</packaging>
-	<version>0.1</version>
+	<version>${release.version}-SNAPSHOT</version>
 	<developers>
 		<developer>
 			<name>Bjørn Magnus Mathisen</name>
