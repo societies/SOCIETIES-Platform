@@ -102,7 +102,7 @@
 						
 						<Embed-Dependency>
 							user-agent-api;scope=compile|runtime,
-							conflict;scope=compile,
+							conflict;scope=compile|runtime,
 							decisionmaking;scope=compile|runtime,
 							resourcesharing;scope=compile|runtime,
 							monitoring;scope=compile|runtime,
