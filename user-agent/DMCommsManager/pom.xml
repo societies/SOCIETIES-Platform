@@ -12,26 +12,35 @@
 	<artifactId>DMCommsManager</artifactId>
 	<packaging>bundle</packaging>
 	<version>${release.version}</version>
-	
+
 	<developers>
-	    <developer>
-	      <name>Haoyi XIONG</name>
-	      <email>haoyi.xiong@it-sudparis.eu</email>
-	      <roles>
-	        <role>Developer</role>
-	      </roles>
-	    </developer>
+		<developer>
+			<name>Haoyi XIONG</name>
+			<email>haoyi.xiong@it-sudparis.eu</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+		</developer>
 	</developers>
-    
-    <properties>
-        <slf4j.version>1.5.8</slf4j.version>
-        <spring.maven.artifact.version>2.5.6.SEC01</spring.maven.artifact.version>
-        <spring.osgi.version>1.2.1</spring.osgi.version>
-        <equinox.ver>3.2.2</equinox.ver>
-    </properties>
-    
+
+	<properties>
+		<slf4j.version>1.5.8</slf4j.version>
+		<spring.maven.artifact.version>2.5.6.SEC01</spring.maven.artifact.version>
+		<spring.osgi.version>1.2.1</spring.osgi.version>
+		<equinox.ver>3.2.2</equinox.ver>
+	</properties>
+
 	<dependencies>
-	 
+		<dependency>
+			<groupId>org.societies.useragent.decisionmaking</groupId>
+			<artifactId>DecisionMakingBean</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.useragent</groupId>
+			<artifactId>decisionmaking</artifactId>
+			<version>${version.ua}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
@@ -56,7 +65,7 @@
 			<version>${version.ua}</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- Communication Manager  -->
+		<!-- Communication Manager -->
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>CommunicationFrameworkCommons</artifactId>
@@ -67,6 +76,7 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
+			<version>${spring.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -92,8 +102,8 @@
 				<configuration>
 					<instructions>
 						<Import-Package>
-    						org.springframework.beans.factory.annotation*;version="0",
-    						org.springframework.stereotype*;version="0",
+							org.springframework.beans.factory.annotation*;version="0",
+							org.springframework.stereotype*;version="0",
 							*
 						</Import-Package>
 						<Export-Package>

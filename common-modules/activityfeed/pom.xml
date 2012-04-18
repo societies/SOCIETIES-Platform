@@ -27,16 +27,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>data-source</artifactId>
-	<description>common data source bundle</description>
+	<artifactId>activityfeed</artifactId>
+	<description>common activityfeed bundle</description>
 	<packaging>bundle</packaging>
-
+	<version>${release.version}-SNAPSHOT</version>
+	
 	<developers>
 		<developer>
-			<id>pkudaiyar</id>
-			<name>Perumal K</name>
-			<email>kperumalin@hotmail.com</email>
-			<organization>Intel</organization>
+			<id>bjornmm</id>
+			<name>Bjorn Magnus Mathisen</name>
+			<email>bjornmagnus.mathisen@sintef.no</email>
+			<organization>SINTEF</organization>
 			<roles>
 				<role>owner, developer</role>
 			</roles>
@@ -50,58 +51,88 @@
 	</parent>
 
 	<dependencies>
-		<dependency>
+			<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
+			<version>${spring.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- logging -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<!-- databases -->
 		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>com.springsource.org.apache.derby</artifactId>
 			<version>10.5.1000001.764942</version>
 		</dependency>
 		<dependency>
-			<groupId>org.hsqldb</groupId>
-			<artifactId>com.springsource.org.hsqldb</artifactId>
-			<version>1.8.0.10</version>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.9</version>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.test</artifactId>
+			<version>3.0.5.RELEASE</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>com.springsource.javax.persistence</artifactId>
+			<version>2.0.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.transaction</groupId>
+			<artifactId>com.springsource.javax.transaction</artifactId>
+			<version>1.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>com.springsource.org.hibernate</artifactId>
+			<version>3.3.2.GA</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>com.springsource.org.hibernate.annotations</artifactId>
+			<version>3.4.0.GA-A</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>com.springsource.org.hibernate.annotations.common</artifactId>
+			<version>3.3.0.ga</version>
+			<scope>provided</scope>
 		</dependency>
 
-		<!-- apache commons -->
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>com.springsource.org.apache.commons.dbcp</artifactId>
-			<version>1.2.2.osgi</version>
+			<groupId>org.societies.cis</groupId>
+			<artifactId>cis-persistance</artifactId>
+			<version>0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>com.springsource.org.apache.commons.pool</artifactId>
-			<version>1.5.3</version>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>com.springsource.org.apache.commons.collections</artifactId>
-			<version>3.2.1</version>
+			<groupId>org.societies</groupId>
+			<artifactId>data-source</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>hibernate_classes</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	<build>
@@ -118,7 +149,26 @@
 					</instructions>
 				</configuration>
 			</plugin>
-
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptors>
+						<descriptor></descriptor>
+					</descriptors>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.11</version>
+				<configuration>
+					<skipTests>false</skipTests>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>

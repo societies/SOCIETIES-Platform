@@ -52,6 +52,7 @@ import org.societies.api.identity.IIdentityManager;
 
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.cis.manager.CisEditor;
+import org.societies.cis.persistance.IPersistanceManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -78,6 +79,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 	IIdentity cisManagerId;
 	ICommManager CSSendpoint;
 	Set<CisRecord> subscribedCISs;
+	IPersistanceManager pm;
 	
 	private final static List<String> NAMESPACES = Collections
 			//.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
@@ -92,7 +94,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 			.getLogger(CisManager.class);
 
 	@Autowired
-	public CisManager(ICISCommunicationMgrFactory ccmFactory,ICommManager CSSendpoint) {
+	public CisManager(ICISCommunicationMgrFactory ccmFactory,ICommManager CSSendpoint, IPersistanceManager pm) {
 		this.CSSendpoint = CSSendpoint;
 		this.ccmFactory = ccmFactory;
 

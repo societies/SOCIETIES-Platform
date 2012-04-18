@@ -62,7 +62,7 @@ public class DMCommsClient implements IDecisionMaker, ICommCallback{
 
 		//CREATE MESSAGE BEAN
 		DecisionMakingBean dmBean = new DecisionMakingBean(intents,preferences);
-		dmBean.setMethod(DecisionMakingBean.methodType.makeDecision);
+	//	dmBean.setMethod(DecisionMakingBean.methodType.makeDecision);
 		try {
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
 			commManager.sendMessage(stanza, dmBean);

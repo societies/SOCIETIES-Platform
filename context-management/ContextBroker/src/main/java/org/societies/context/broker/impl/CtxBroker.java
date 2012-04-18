@@ -75,7 +75,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 	 *
 	 * @see {@link #setidentManager(IIdentityManager)}
 	 */
-	@Autowired(required=true)
+	@Autowired(required=false)
 	private IIdentityManager identManager= null;
 
 
