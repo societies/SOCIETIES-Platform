@@ -83,4 +83,19 @@ public class IdentityManagerImpl implements IIdentityManager {
 	public IIdentityContextMapper getIdentityContextMapper() {
 		return ctxMapper;
 	}
+
+	public IIdentity newMemorableIdentity(String memorableIdentifier) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public boolean releaseMemorableIdentity(IIdentity memorableIdentity) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public IIdentity newTransientIdentity() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

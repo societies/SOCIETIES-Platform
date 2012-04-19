@@ -30,7 +30,7 @@
 	<artifactId>activityfeed</artifactId>
 	<description>common activityfeed bundle</description>
 	<packaging>bundle</packaging>
-	<version>${release.version}-SNAPSHOT</version>
+	<version>${version.cis}</version>
 	
 	<developers>
 		<developer>
@@ -119,13 +119,15 @@
 		</dependency>
 		<dependency>
 			<groupId>org.societies</groupId>
-			<artifactId>data-source</artifactId>
+			<artifactId>common-data-source</artifactId>
 			<version>${release.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>hibernate_classes</artifactId>
 			<version>${release.version}</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -145,6 +147,10 @@
 					<instructions>
 						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
+						<Export-Package>
+						org.societies.cis.activity.*,
+						org.societies.cis.activity.model.*
+						</Export-Package>
 						<Import-Package>*;resolution:=optional</Import-Package>
 					</instructions>
 				</configuration>

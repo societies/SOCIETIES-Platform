@@ -25,7 +25,7 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 	public static final String ID					=	"id";
 	public static final String POST					=	"post";
 	private static final String STORY 				=   "story";
-	private static final String CAPTION 				=   "caption";
+	private static final String CAPTION 			=   "caption";
 	
 	
 	private static final String AUTHOR_NAME 		= "name";

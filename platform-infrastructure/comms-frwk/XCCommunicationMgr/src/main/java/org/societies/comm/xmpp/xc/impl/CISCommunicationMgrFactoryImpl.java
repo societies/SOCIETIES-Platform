@@ -44,8 +44,9 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 	@Override
 	public ICommManager getNewCommManager(IIdentity cisIdentity, String credentials) throws CommunicationException {
 		XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), credentials);
+		commMgr.loginFromConfig();
 		if (commMgr.getIdManager()==null)
-			throw new CommunicationException("Not connected to domain!");
+			throw new CommunicationException("Unable to connect!");
 		cisCommManagers.put(cisIdentity, commMgr);
 		return commMgr;
 	}
@@ -66,6 +67,9 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 			// TODO verify if exists
 			IIdentity cisIdentity = idm.fromJid(randomCisIdentifier);
 			XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), genericPassword);
+			commMgr.loginFromConfig();
+			if (commMgr.getIdManager()==null)
+				throw new CommunicationException("Unable to connect!");
 			cisCommManagers.put(cisIdentity, commMgr);
 			return commMgr;
 		} catch (InvalidFormatException e) {

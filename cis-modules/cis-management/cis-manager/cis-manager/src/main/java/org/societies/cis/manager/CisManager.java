@@ -94,7 +94,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 			.getLogger(CisManager.class);
 
 	@Autowired
-	public CisManager(ICISCommunicationMgrFactory ccmFactory,ICommManager CSSendpoint, IPersistanceManager pm) {
+	public CisManager(ICISCommunicationMgrFactory ccmFactory,ICommManager CSSendpoint) {
 		this.CSSendpoint = CSSendpoint;
 		this.ccmFactory = ccmFactory;
 
