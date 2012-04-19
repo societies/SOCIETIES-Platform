@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.integration.test</groupId>
+	<groupId>org.societies.integration.test.bit</groupId>
 	<artifactId>useservice</artifactId>
 	<name>Use a 3P service automatically</name>
 	<packaging>bundle</packaging>
@@ -28,6 +28,36 @@
 	</parent>
 
 	<dependencies>
+	    <dependency>
+			<groupId>org.societies.api.schema</groupId>
+			<artifactId>societies-api-schema</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.comm.xmpp</groupId>
+			<artifactId>XCCommunicationMgr</artifactId>
+			<version>0.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.example</groupId>
+			<artifactId>internalAPI</artifactId>
+			<version>0.1</version>
+			<scope>provided</scope>			
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
@@ -41,12 +71,18 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>4.1.0</version>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.0</version>
 			<scope>compile</scope>
 		</dependency>	
 	</dependencies>
+	
 	<build>
 		<plugins>
 			<plugin>
@@ -55,18 +91,18 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Bundle-SymbolicName>${pom.groupId}.${pom.artifactId}</Bundle-SymbolicName>
-						<Bundle-Name>${pom.artifactId}</Bundle-Name>
-						<Bundle-Version>${pom.version}</Bundle-Version>
+						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+						<Bundle-Name>${project.artifactId}</Bundle-Name>
+						<Bundle-Version>${project.version}</Bundle-Version>
 						<Embed-Dependency>
 							junit;scope=compile|runtime, 
 						</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
-						<Import-Package>
+						<!-- <Import-Package>
 							org.slf4j.*,
 							org.societies.service.api,
 							org.junit.*,
-						</Import-Package>
+						</Import-Package> -->
 
 					</instructions>
 				</configuration>
@@ -84,7 +120,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.11</version>
 				<configuration>
-					<skipTests>false</skipTests>
+					<skipTests>true</skipTests>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -109,6 +145,5 @@
 			</plugin>
 		</plugins>
 	</build>
-
 
 </project>
