@@ -6,7 +6,8 @@
 	<groupId>org.societies.platform</groupId>
 	<artifactId>foursquare_connector</artifactId>
 	<version>${release.version}</version>
-	<packaging>bundle</packaging>
+	<packaging>jar</packaging>
+
 
 	<parent>
 		<groupId>org.societies</groupId>
@@ -76,6 +77,7 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
 			</plugin>
+			<!-- 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -92,6 +94,7 @@
 					</artifactItems>
 				</configuration>
 			</plugin>
+			-->
 		</plugins>
 	</build>
 
