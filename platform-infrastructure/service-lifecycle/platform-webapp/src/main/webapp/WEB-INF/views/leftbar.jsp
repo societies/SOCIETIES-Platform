@@ -12,6 +12,7 @@
 	  
 	  <tr><td><b>CSS Management</b></td></tr>
 	  <tr><td align="right"><a href="cssmanager.html">CSS Management</a></td></tr>
+	  <tr><td align="right"><a href="deviceregistry.html">Devices</a></td></tr>
 	  <tr><td>&nbsp;</td></tr>
 
 	  <tr><td><b>CIS Management</b></td></tr>
