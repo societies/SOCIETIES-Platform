@@ -25,12 +25,16 @@
 
 package org.societies.api.css.devicemgmt;
 
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
 /**
  * Interface used to declare a device state variable
  * 
  * @author Rafik (Trialog)
  *
  */
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface IDeviceStateVariable {
 
 	/**

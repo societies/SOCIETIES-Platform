@@ -22,51 +22,13 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.css.devicemgmt;
 
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+package org.societies.useragent.monitoring;
 
-/**
- * 
- * Interface used to declare  a driver device service
- * @author Rafik (Trialog)
- *
- */
-@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
-public interface IDriverService {
-	
-	 /**
-     * 
-     * @param actionName
-     * @return null if no action matches the argument actionName.
-     */
-    public IAction getAction (String actionName);
-    
-    /**
-     * 
-     * @return
-     */
-    public IAction [] getActions();
-    
-    /**
-     * 
-     * @param stateVariableName
-     * @return null if no state variable matches the agrument stateVariableName
-     */
-    public IDeviceStateVariable getStateVariable (String stateVariableName);
-    
-    /**
-     * 
-     * @return A list of state variables used by this driver device service
-     */
-    public IDeviceStateVariable [] getStateVariables ();
+public class Snapshots {
 
-    
-    /**
-     * 
-     * @return driver device service id
-     */
-    public String getId ();
-    
+	public static String[] snapshot1 = {"symLoc", "status", "activity"};
+	public static String[] snapshot2 = {"symLoc", "day"};
+	public enum snapshots {snapshot1, snapshot2};
+
 }

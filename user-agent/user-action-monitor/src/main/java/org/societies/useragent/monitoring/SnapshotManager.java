@@ -22,51 +22,49 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.css.devicemgmt;
 
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+package org.societies.useragent.monitoring;
 
-/**
- * 
- * Interface used to declare  a driver device service
- * @author Rafik (Trialog)
- *
- */
-@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
-public interface IDriverService {
-	
-	 /**
-     * 
-     * @param actionName
-     * @return null if no action matches the argument actionName.
-     */
-    public IAction getAction (String actionName);
-    
-    /**
-     * 
-     * @return
-     */
-    public IAction [] getActions();
-    
-    /**
-     * 
-     * @param stateVariableName
-     * @return null if no state variable matches the agrument stateVariableName
-     */
-    public IDeviceStateVariable getStateVariable (String stateVariableName);
-    
-    /**
-     * 
-     * @return A list of state variables used by this driver device service
-     */
-    public IDeviceStateVariable [] getStateVariables ();
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
 
-    
-    /**
-     * 
-     * @return driver device service id
-     */
-    public String getId ();
-    
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.internal.context.broker.ICtxBroker;
+
+//register listeners to update snapshot if context attributes not yet available
+public class SnapshotManager {
+
+	private ICtxBroker ctxBroker;
+	Hashtable <String, String[]> snapshots;
+
+	/*
+	 * SNAPSHOT DEFINITIONS
+	 */
+	String[][] snapshotDefinitions = {
+			{"symLoc", "status", "activity"},  //SNAPSHOT 1
+			{"symLoc", "day"}  //SNAPSHOT 2
+	};
+	/*
+	 * END DEFINITIONS
+	 */
+
+	public SnapshotManager(ICtxBroker ctxBroker){
+		this.ctxBroker = ctxBroker;
+		initialiseSnapshots();
+	}
+
+	private void initialiseSnapshots(){
+		snapshots = new Hashtable <String, String[]>();
+		for(int i = 0; i<snapshotDefinitions.length; i++){
+			snapshots.put("snapshot"+i, snapshotDefinitions[i]);
+		}
+	}
+
+	public List<CtxAttributeIdentifier> getSnapshot(String snapshotName){
+		ArrayList<CtxAttributeIdentifier> snapshot = new ArrayList<CtxAttributeIdentifier>();
+		String[] definition = snapshots.get(snapshotName);
+		
+		return snapshot;
+	}
 }

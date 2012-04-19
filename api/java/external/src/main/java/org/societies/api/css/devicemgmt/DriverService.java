@@ -31,6 +31,8 @@ import org.societies.api.css.devicemgmt.IAction;
 import org.societies.api.css.devicemgmt.IDriverService;
 import org.societies.api.css.devicemgmt.IDeviceStateVariable;
 import org.societies.api.osgi.event.IEventMgr;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
  * Abstract class to create more easily driver services
