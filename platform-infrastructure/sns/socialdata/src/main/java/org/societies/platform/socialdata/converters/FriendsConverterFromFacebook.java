@@ -45,7 +45,7 @@ public class FriendsConverterFromFacebook implements FriendsConverter{
 			for (int i =0; i<jfriends.length();i++){
 				JSONObject jfriend = jfriends.getJSONObject(i);
 				Person p = new PersonImpl();
-				p.setId(jfriend.getString("id"));
+				p.setId("facebook:"+jfriend.getString("id"));
 				p.setRelationshipStatus("friend");
 				p.setName(new NameImpl(jfriend.getString("name")));
 				p.setAccounts(accounts);

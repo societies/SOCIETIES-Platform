@@ -27,9 +27,10 @@ public class GroupConverterFromFacebook implements GroupConverter {
 					Group g = new GroupImpl();
 					JSONObject jGroup = jgroups.getJSONObject(i);
 					g.setDescription(jGroup.getString("name"));
-					g.setTitle(jGroup.getString("name"));
-					g.setId(new GroupId(Type.groupId, jGroup.getString("id")));
+					g.setTitle("facebook");
+					g.setId(new GroupId(Type.groupId, "facebook:"+jGroup.getString("id")));
 					groups.add(g);
+					
 				}
 				
 				
