@@ -21,33 +21,26 @@ import org.societies.integration.test.IntegrationTestUtils;
 public class NominalTestCaseUpperTester {
 	private static Logger LOG = LoggerFactory.getLogger(NominalTestCaseUpperTester.class);
 
-	/**
-	 * Tools for integration test
-	 */
-	public IntegrationTestUtils integrationTestUtils;
-
-
-	public NominalTestCaseUpperTester() {
-		integrationTestUtils = new IntegrationTestUtils();
-	}
-
 
 	/**
 	 * This method is called before every @Test methods.
 	 */
 	@Before
 	public void setUp() {
-		LOG.info("###759... setUp");
+		LOG.info("###759... NominalTestCaseUpperTester::setUp");
 	}
 
 	/**
 	 * This method is called after every @Test methods
+	 * stop and uninstall the Calculator service
 	 */
 	@After
 	public void tearDown() {
 		LOG.info("###759.. tearDown");
 
-		// TODO: At the moment Calculator service can't stop without crashing the system
+		// TODO: uninstall and stop the Calculator service
+		// At the moment Calculator service can't stop without crashing the system, so this must wait.
+		
 //		Future<ServiceControlResult> asynchResult = null;
 //		ServiceControlResult scresult = null;
 //		try {

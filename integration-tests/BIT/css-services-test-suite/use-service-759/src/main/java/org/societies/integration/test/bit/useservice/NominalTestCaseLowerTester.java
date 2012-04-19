@@ -73,11 +73,11 @@ public class NominalTestCaseLowerTester {
 
 	/**
 	 * This method is called before every @Test methods.
-	 * Verify that the Calculator Service is installed and started
+	 * Verify that the Calculator Service is installed
 	 */
 	@Before
 	public void setUp() {
-		LOG.info("###759... setUp");
+		LOG.info("###759... NominalTestCaseLowerTester::setUp");
 
 		Future<ServiceControlResult> asyncinstallResult = null;
 		ServiceControlResult installResult = null;

@@ -32,5 +32,11 @@
         class="org.societies.integration.test.bit.useservice.NominalTestCaseLowerTester">
         <property name="calculatorService" ref ="calculatorService" />
     </bean>
+    
+    <bean
+        id="SpecificTestCaseUpperTester"
+        class="org.societies.integration.test.bit.useservice.SpecificTestCaseUpperTester">
+        <property name="calculatorService" ref ="calculatorService" />
+    </bean>
 
 </beans>

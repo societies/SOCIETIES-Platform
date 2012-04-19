@@ -28,6 +28,10 @@ import org.junit.runner.Result;
 
 /**
  * Test case specific for integration
+ * The "run" method launch the whole test case
+ * This class has to be extended and may help
+ * to implement integration test case.
+ * This class use the stateless IntegrationTestUtils
  * 
  * @author Rafik Said-Mansour (Trialog)
  * @author Olivier Maridat (Trialog)
@@ -47,7 +51,11 @@ public abstract class IntegrationTestCase {
 	 */
 	public Class testCaseClasses[];
 	
-	
+	/**
+	 * This constructor has to be extended in order
+	 * to specifiy the test case number
+	 * and the array of test case classes to run
+	 */
 	public IntegrationTestCase() {
 		integrationTestUtils = new IntegrationTestUtils();
 	}
