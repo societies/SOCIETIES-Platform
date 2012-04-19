@@ -37,6 +37,8 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerBean;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerBeanResult;
+import org.societies.api.schema.context.model.CtxEntityBean;
 
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -101,10 +103,10 @@ public class CtxBrokerServer implements IFeatureServer{
 			CtxBrokerBean cbPayload = (CtxBrokerBean) payload;
 
 			//checks if the payload contains the createEntity method
-			/*if (cbPayload.getCreate()!=null) {
+			if (cbPayload.getCreate()!=null) {
 
 				// get the identity based on Jid and the identity manager
-				String xmppIdentityJid = cbPayload.getCreate().getOperatorIdjid();
+				String xmppIdentityJid = cbPayload.getCreate().getRequester();
 				IIdentity requesterIdentity;
 				try {
 					requesterIdentity = this.identMgr.fromJid(xmppIdentityJid);
@@ -114,15 +116,19 @@ public class CtxBrokerServer implements IFeatureServer{
 					CtxEntity newCtxEntity = newEntityFuture.get();
 					// the entity is created
 
-					//create the response based on the created CtxEntity
-					CtxBrokerCreateEntityBean createResponse = new CtxBrokerCreateEntityBean();
+					//create the response based on the created CtxEntity - the response should be a result bean
+					CtxBrokerBeanResult createResponse = new CtxBrokerBeanResult();
+					CtxEntityBean ctxBean = new CtxEntityBean();
+					/*
+					ctxBean.setId(newCtxEntity.getId().toString());
+					
+					createResponse.setCtxBrokerCreateEntityBeanResult()
 					createResponse.setType(newCtxEntity.getType());
 					createResponse.setObjectNumber(newCtxEntity.getObjectNumber());
 					createResponse.setOperatorIdjid(requesterIdentity.toString());
-					//
 
 					response.setCreate(createResponse);
-
+					*/
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -138,7 +144,7 @@ public class CtxBrokerServer implements IFeatureServer{
 				}
 
 			}
-*/
+
 			//checks if the payload contains the createAssociation method
 	/*		if (cbPayload.getCreateAssoc()!=null) {
 
