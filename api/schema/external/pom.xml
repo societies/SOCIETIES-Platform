@@ -58,6 +58,7 @@
 								<exclude>pubsub#owner.xsd</exclude>
 								<exclude>pubsub#event.xsd</exclude>
 							</schemaExcludes>
+							<args><arg>-Xcollection-setter-injector</arg></args>
 						</configuration>
 					</execution>
 					<execution>
@@ -143,6 +144,11 @@
 					<readOnly>yes</readOnly>
 					<removeOldOutput>true</removeOldOutput>
 				</configuration>
+				<dependencies><dependency>
+			<groupId>net.java.dev.vcc.thirdparty</groupId>
+			<artifactId>collection-setter-injector</artifactId>
+			<version>0.5.0-1</version>
+		</dependency></dependencies>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

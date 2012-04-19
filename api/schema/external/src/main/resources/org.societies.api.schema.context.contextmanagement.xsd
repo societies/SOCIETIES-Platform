@@ -56,7 +56,7 @@
 	<xs:complexType name="ctxBrokerLookupBean">
 		<xs:sequence>
 			<xs:element name="requester" type="xs:string" minOccurs="0"/>
-			<xs:element name="modelType" type="tns:ctxModelType" minOccurs="0"/>
+			<xs:element name="modelType" type="tns:ctxModelTypeBean" minOccurs="0"/>
 			<xs:element name="type" type="xs:string" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>

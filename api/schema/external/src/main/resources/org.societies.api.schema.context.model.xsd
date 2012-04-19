@@ -61,7 +61,7 @@
           <xs:element name="integerValue" type="xs:int" nillable="true"/>
           <xs:element name="doubleValue" type="xs:double" nillable="true"/>
           <xs:element name="binaryValue" type="xs:base64Binary" nillable="true"/>
-          <xs:element name="valueType" type="tns:ctxAttributeValueType"/>
+          <xs:element name="valueType" type="tns:ctxAttributeValueTypeBean"/>
           <xs:element name="valueMetric" type="xs:string" nillable="true"/>
           <xs:element name="quality" type="tns:ctxQualityBean"/>
           <xs:element name="sourceId" type="xs:string" nillable="true"/>
@@ -73,9 +73,8 @@
 
   <xs:complexType name="ctxQualityBean">
     <xs:sequence>
-      <xs:element name="attribute" type="tns:ctxAttributeBean" minOccurs="0"/>
       <xs:element name="lastUpdated" type="xs:dateTime" nillable="true"/>
-      <xs:element name="originType" type="tns:ctxOriginType" nillable="true"/>
+      <xs:element name="originType" type="tns:ctxOriginTypeBean" nillable="true"/>
       <xs:element name="precision" type="xs:double" nillable="true"/>
       <xs:element name="updateFrequency" type="xs:double" nillable="true"/>
     </xs:sequence>
@@ -123,9 +122,9 @@
 
   <xs:complexType name="ctxBondBean" abstract="true">
     <xs:sequence>
-      <xs:element name="modelType" type="tns:ctxModelType"/>
+      <xs:element name="modelType" type="tns:ctxModelTypeBean"/>
       <xs:element name="type" type="xs:string"/>
-      <xs:element name="originType" type="tns:ctxBondOriginType"/>
+      <xs:element name="originType" type="tns:ctxBondOriginTypeBean"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -143,7 +142,7 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:simpleType name="ctxModelType">
+  <xs:simpleType name="ctxModelTypeBean">
     <xs:restriction base="xs:string">
       <xs:enumeration value="ENTITY"/>
       <xs:enumeration value="ATTRIBUTE"/>
@@ -151,7 +150,7 @@
     </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="ctxBondOriginType">
+  <xs:simpleType name="ctxBondOriginTypeBean">
     <xs:restriction base="xs:string">
       <xs:enumeration value="MANUALLY_SET"/>
       <xs:enumeration value="DISCOVERED"/>
@@ -159,7 +158,7 @@
     </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="ctxAttributeValueType">
+  <xs:simpleType name="ctxAttributeValueTypeBean">
     <xs:restriction base="xs:string">
       <xs:enumeration value="EMPTY"/>
       <xs:enumeration value="STRING"/>
@@ -169,7 +168,7 @@
     </xs:restriction>
   </xs:simpleType>
 
-  <xs:simpleType name="ctxOriginType">
+  <xs:simpleType name="ctxOriginTypeBean">
     <xs:restriction base="xs:string">
       <xs:enumeration value="MANUALLY_SET"/>
       <xs:enumeration value="SENSED"/>

@@ -70,6 +70,7 @@ import org.societies.api.schema.context.model.CtxEntityBean;
 import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
 import org.societies.api.schema.context.model.CtxIdentifierBean;
 import org.societies.api.schema.context.model.CtxModelObjectBean;
+import org.societies.api.schema.context.model.CtxModelTypeBean;
 import org.societies.context.broker.api.ICtxCallback;
 
 
@@ -447,13 +448,16 @@ public class CtxBrokerClient implements ICommCallback {
 		CtxBrokerBean cbPacket = new CtxBrokerBean();
 		// use the method : lookup
 		CtxBrokerLookupBean ctxBrokerLookupBean = new CtxBrokerLookupBean();
+		
+		//TODO use translator
+		
 		// add the signatures of the method
 		if (modelType.equals(CtxModelType.ENTITY))
-			ctxBrokerLookupBean.setModelType(org.societies.api.schema.context.model.CtxModelType.ENTITY);
+			ctxBrokerLookupBean.setModelType(CtxModelTypeBean.ENTITY);
 		else if (modelType.equals(CtxModelType.ASSOCIATION))
-			ctxBrokerLookupBean.setModelType(org.societies.api.schema.context.model.CtxModelType.ASSOCIATION);
+			ctxBrokerLookupBean.setModelType(CtxModelTypeBean.ASSOCIATION);
 		else if (modelType.equals(CtxModelType.ATTRIBUTE))
-			ctxBrokerLookupBean.setModelType(org.societies.api.schema.context.model.CtxModelType.ATTRIBUTE);
+			ctxBrokerLookupBean.setModelType(CtxModelTypeBean.ATTRIBUTE);
 		
 		ctxBrokerLookupBean.setType(type);
 		ctxBrokerLookupBean.setRequester("FOO");
