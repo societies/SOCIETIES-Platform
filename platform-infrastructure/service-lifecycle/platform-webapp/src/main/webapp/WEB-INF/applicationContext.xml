@@ -36,9 +36,9 @@
 <osgi:reference id="ServiceDiscoveryBundle" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery" cardinality="0..1"/>
 <osgi:reference id="ServiceControlBundle" interface="org.societies.api.internal.servicelifecycle.IServiceControl" cardinality="0..1"/>
 <osgi:reference id="CssManagementBundle" interface="org.societies.api.internal.css.management.ICSSLocalManager" cardinality="0..1"/>
-
 <osgi:reference id="CisManagementBundle" interface="org.societies.api.cis.management.ICisManager" cardinality="0..1" /> 
 <osgi:reference id="CisActivityFeed" interface="org.societies.api.cis.management.ICisActivityFeed" cardinality="0..1" />
 <osgi:reference id="DeviceRegistryBundle" interface="org.societies.api.internal.css.devicemgmt.IDeviceRegistry" cardinality="0..1" /> 
+<osgi:reference id="SocialDataBundle"       interface="org.societies.api.internal.sns.ISocialData" cardinality="0..1" /> 
 
 </beans>
