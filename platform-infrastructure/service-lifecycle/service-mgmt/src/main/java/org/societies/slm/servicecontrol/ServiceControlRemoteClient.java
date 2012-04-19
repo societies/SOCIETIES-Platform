@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
-import org.societies.api.servicelifecycle.IServiceControlCallback;
+import org.societies.api.internal.servicelifecycle.IServiceControlCallback;
 
 /**
  * The callback to a remote service control call

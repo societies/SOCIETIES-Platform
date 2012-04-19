@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0"
+	targetNamespace="http://societies.org/api/schema/useragent/decisionmaking"
+	xmlns:ns1="http://societies.org/api/schema/servicelifecycle/model"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:import namespace="http://societies.org/api/schema/servicelifecycle/model"
+		schemaLocation="org.societies.api.schema.servicelifecycle.model.xsd" />
+
+	<xs:complexType name="decisionMakingBean">
+		<xs:sequence>
+			<xs:element name="intentConfidenceLevel" type="xs:int"
+				nillable="true" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="intentParameterNames" type="xs:string"
+				nillable="true" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="intentServiceIds" type="ns1:serviceResourceIdentifier"
+				nillable="true" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="intentServiceTypes" type="xs:string"
+				nillable="true" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="intentSize" type="xs:int" />
+			<xs:element name="intentValues" type="xs:string" nillable="true"
+				minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="preferenceConfidenceLevel" type="xs:int"
+				nillable="true" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="preferenceParameterNames" type="xs:string"
+				nillable="true" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="preferenceServiceIds" type="ns1:serviceResourceIdentifier"
+				nillable="true" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="preferenceServiceTypes" type="xs:string"
+				nillable="true" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="preferenceSize" type="xs:int" />
+			<xs:element name="preferenceValues" type="xs:string"
+				nillable="true" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

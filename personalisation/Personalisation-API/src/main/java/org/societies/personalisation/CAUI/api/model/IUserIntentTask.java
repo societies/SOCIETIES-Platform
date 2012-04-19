@@ -25,7 +25,7 @@
 package org.societies.personalisation.CAUI.api.model;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,17 +52,30 @@ public interface IUserIntentTask {
      *    
      * @return map
      */
-    public Map<IUserIntentAction,Double > getActions();
+  //  public Map<IUserIntentAction,Double > getActions();
 
+    /**
+     * Returns a List of UserIntentActions contained in the UserTask 
+     *    
+     * @return List
+     */
+    public List<IUserIntentAction> getActions();
+    
     /**
      * Adds a map of userActions to the UserTask. The map contains the action object and the transition
      * probability to the next action. 
      * 
      * @param userActions
      */
-    public void addActions(LinkedHashMap<IUserIntentAction,Double> userActions);
+  //  public void addActions(LinkedHashMap<IUserIntentAction,Double> userActions);
 
-
+    /**
+     * Adds a list of userActions to the UserTask.
+     * 
+     * @param userActions
+     */
+    public void setActions(List<IUserIntentAction> userActions);
+ 
     /**
      * Returns a map with context types and values associated with this task.
      * In the map the key is the type of context model object and the object the 
@@ -103,9 +116,22 @@ public interface IUserIntentTask {
      */
     public int getConfidenceLevel();
     
+    
     /**
      * Returns the transition probability from previous UserTask to this UserTask.
      * @return
      */
-    public double getTransProb(); 
+    public Double [][] getMatrix();
+    
+    /**
+     * Returns the transition probability from previous UserTask to this UserTask.
+     * @return
+     */
+    public void setMatrix(Double [][] matrix);
+    
+    /**
+     * Returns the transition probability from previous UserTask to this UserTask.
+     * @return
+     */
+  //  public double getTransProb(); 
 }

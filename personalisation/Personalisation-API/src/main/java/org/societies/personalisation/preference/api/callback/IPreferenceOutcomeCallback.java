@@ -24,7 +24,7 @@
  */
 package org.societies.personalisation.preference.api.callback;
 
-import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
@@ -37,5 +37,5 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  */
 public interface IPreferenceOutcomeCallback {
 
-	public void receivePreferenceOutcome(EntityIdentifier providerId, EntityIdentifier userId, ServiceResourceIdentifier serviceId, IAction action);
+	public void receivePreferenceOutcome(IIdentity providerId, IIdentity userId, ServiceResourceIdentifier serviceId, IAction action);
 }

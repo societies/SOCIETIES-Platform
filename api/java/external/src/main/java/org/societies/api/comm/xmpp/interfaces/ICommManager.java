@@ -47,6 +47,8 @@ import org.societies.api.identity.IIdentityManager;
  * 
  */
 public interface ICommManager {
+	public boolean isConnected();
+	
 	public void register(IFeatureServer featureServer) throws CommunicationException;
 	
 	public void register(ICommCallback messageCallback) throws CommunicationException;

@@ -27,8 +27,6 @@ package org.societies.personalisation.UserPreferenceLearning.impl;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.personalisation.model.Action;
-import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceCondition;
@@ -200,20 +198,18 @@ public class PostProcessor
 		String noBars = removeChar(temp, '|');
 		noBars.trim();
 		String[] tuple = noBars.split("=");
-		IAction action = new Action(tuple[0].trim(), tuple[1].trim());
-		IPreferenceCondition condition = cache.getPreferenceCondition(dataOwner, action);
+		//IAction action = new Action(ServiceResourceIdentifier, ServiceType, tuple[0].trim(), tuple[1].trim());
+		IPreferenceCondition condition = cache.getPreferenceCondition(dataOwner, tuple[0].trim(), tuple[1].trim());
 
 		return condition;
 	}
 
-	private IOutcome createOutcome(String paramName, String temp, ServiceResourceIdentifier serviceId, String serviceType){
+	private IOutcome createOutcome(String paramName, String value, ServiceResourceIdentifier serviceId, String serviceType){
 
-		System.out.println("Creating outcome from String: "+temp);
-		IOutcome action = new PreferenceOutcome(paramName, temp);
-		action.setServiceID(serviceId);
-		action.setServiceType(serviceType);
+		System.out.println("Creating outcome from String: "+value);
+		IOutcome outcome = new PreferenceOutcome(serviceId, serviceType, paramName, value);
 
-		return action;
+		return outcome;
 	}
 
 	private String removeChar(String s, char c) {

@@ -28,7 +28,7 @@ import org.societies.platform.socialdata.SocialData;
 public class SocialDataTest {
 
 	
-    private static String access_token = "AAAFs43XOj3IBAGbtrA2I7cibWs8YD1ODGr7JiqXl0ZCJ4DBkeXKeSsth9r2EbRGj6jh1eBIhUAkIZBNs1nKOJU1Ys81xKxUqZAC13DwBAZDZD";
+    private static String access_token = "";
 	private static ISocialConnector fbConnector=null;
 	private static ISocialData		socialData =null;
 	private static final Logger logger   = Logger.getLogger(SocialDataTest.class.getSimpleName());
