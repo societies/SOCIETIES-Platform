@@ -125,5 +125,9 @@ public class PubsubService extends Service {
 		public IIdentityManager getIdManager() {
 			return clientCommunicationMgr.getIdManager();
 		}
+
+		public boolean isConnected() {
+			return clientCommunicationMgr.isConnected();
+		}
     }
 }
