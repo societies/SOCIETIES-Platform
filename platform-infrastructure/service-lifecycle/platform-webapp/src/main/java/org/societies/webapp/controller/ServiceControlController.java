@@ -50,9 +50,8 @@ import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
-import org.societies.api.internal.servicelifecycle.IServiceControl;
-import org.societies.api.internal.servicelifecycle.ServiceControlException;
-
+import org.societies.api.servicelifecycle.IServiceControl;
+import org.societies.api.servicelifecycle.ServiceControlException;
 
 @Controller
 public class ServiceControlController {
