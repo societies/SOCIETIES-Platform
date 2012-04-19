@@ -58,8 +58,8 @@ public class FacebookConnectorImpl implements FacebookConnector {
 	
 	public void setToken(String access_token) {
 		this.access_token = access_token;
-		
-		
+		facebookClient		= new DefaultFacebookClient(access_token);
+		this.id				= this.name + "_" + UUID.randomUUID();
 		
 	}
 	public String getLastUpdate() {

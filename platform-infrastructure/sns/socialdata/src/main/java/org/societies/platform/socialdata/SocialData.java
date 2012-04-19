@@ -12,6 +12,7 @@ import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialData;
+import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
 import org.societies.platform.socialdata.converters.ActivityConverter;
 import org.societies.platform.socialdata.converters.ActivityConveterFactory;
 import org.societies.platform.socialdata.converters.FriendsConverter;
@@ -21,7 +22,8 @@ import org.societies.platform.socialdata.converters.GroupConveterFactory;
 import org.societies.platform.socialdata.converters.PersonConverter;
 import org.societies.platform.socialdata.converters.PersonConverterFactory;
 
-public class SocialData implements ISocialData {
+
+public class SocialData implements ISocialData{
 
     HashMap<String, ISocialConnector> connectors = new HashMap<String, ISocialConnector>();
     
@@ -39,9 +41,11 @@ public class SocialData implements ISocialData {
     	socialFriends 			= new HashMap<String, Object>();
     	socialGroups			= new HashMap<String, Object>();
     	socialProfiles			= new HashMap<String, Object>();
-    	
     	socialActivities		= new HashMap<String, Object>();
+    	
     	lastUpate				= new Date().getTime();
+    	
+    	System.out.println("SocialData Bundle is started");
     }
     
 
@@ -50,6 +54,8 @@ public class SocialData implements ISocialData {
 		if (connectors.containsKey(socialConnector.getID())){
 			throw new Exception("this connetor already exists");
 		}
+		
+	
 		connectors.put(socialConnector.getID(), socialConnector);
 		log("Add connector "+socialConnector.getID());
 	}
@@ -223,6 +229,23 @@ public class SocialData implements ISocialData {
 		else throw new Exception("Connector not found");
 		
 	}
+
+	@Override
+	public ISocialConnector createConnector(String snName, Map<String, String> params) {
+		
+		if (ISocialConnector.FACEBOOK_CONN.equals(snName)){
+			return (ISocialConnector) new FacebookConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), "");
+		}
+		else if (ISocialConnector.TWITTER_CONN.equals(snName)){
+			
+		}
+		else if (ISocialConnector.FOURSQUARE_CONN.equals(snName)){
+			
+		}
+		
+		return null;
+	}
  
+	
 
 }
