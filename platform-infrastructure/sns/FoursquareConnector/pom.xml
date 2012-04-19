@@ -30,28 +30,7 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>org.societies.context-management</groupId>
-			<artifactId>context-mgmt-api</artifactId>
-			<version>${version.cm}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.societies.context-management</groupId>
-			<artifactId>context-broker</artifactId>
-			<version>${version.cm}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.societies.context-management</groupId>
-			<artifactId>user-context-db-mgmt</artifactId>
-			<version>${version.cm}</version>
-			<scope>provided</scope>
-		</dependency>
-
+		
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
