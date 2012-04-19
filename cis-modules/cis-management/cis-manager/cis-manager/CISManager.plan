@@ -9,7 +9,7 @@
 
     <artifact type="bundle" name="org.societies.comm.CommonLibraries"/>
     <artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
-<!--     <artifact type="plan" name="org.societies.activity.plan"/> -->
+    <artifact type="plan" name="org.societies.activityfeed.plan"/>
     <artifact type="bundle" name="org.societies.cis.manager"/>
 
 
