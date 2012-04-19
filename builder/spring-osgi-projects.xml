@@ -45,8 +45,10 @@
 		<!-- Utilities -->
 		<module>../utilities/DBC</module>
 		<module>../utilities/societies-annotations</module>
+		<module>../common-modules/common-data-source</module>
 		<module>../common-modules/data-source</module>
 		<module>../common-modules/hibernate_classes</module>
+		<module>../common-modules/activityfeed</module>
 
 		<!-- API -->
 		<module>../api/schema/external</module>

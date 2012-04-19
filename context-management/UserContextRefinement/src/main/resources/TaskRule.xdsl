@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<smile version="1.0" id="Network3" numsamples="1000" discsamples="10000">
+	<nodes>
+		<cpt id="Task">
+			<state id="Listening" />
+			<state id="Presenting" />
+			<state id="Break" />
+			<state id="Other" />
+			<probabilities>0.7 0.15 0.1 0.05</probabilities>
+		</cpt>
+		<cpt id="Activity">
+			<state id="Sitting" />
+			<state id="Standing" />
+			<state id="Walking" />
+			<state id="Running" />
+			<state id="Jumping" />
+			<state id="Falling" />
+			<state id="Lying" />
+			<state id="UpDown" />
+			<parents>Task</parents>
+			<probabilities>0.7 0.2 0.05 0 0 0 0 0.05 0.1 0.7 0.15 0 0 0 0 0.05 0.2 0.4 0.2 0.05 0.02 0.02 0.03 0.08 0.3 0.2 0.1 0.07499999999999998 0.07499999999999998 0.07499999999999998 0.07499999999999998 0.1</probabilities>
+		</cpt>
+		<cpt id="Ambient_Sound">
+			<state id="UserTalking" />
+			<state id="SomeoneTalking" />
+			<state id="Silent" />
+			<parents>Task</parents>
+			<probabilities>0.05 0.85 0.1 0.88 0.1 0.02 0.5 0.5 0 0.3 0.6 0.1</probabilities>
+		</cpt>
+		<cpt id="AgendaSlot">
+			<state id="YourSlot" />
+			<state id="NotYours" />
+			<parents>Task</parents>
+			<probabilities>0.2 0.8 0.9 0.1 0.2 0.8 0.05 0.95</probabilities>
+		</cpt>
+	</nodes>
+	<extensions>
+		<genie version="1.0" app="GeNIe 2.0.3568.0" name="Network3" faultnameformat="nodestate">
+			<node id="Task">
+				<name>MeetingActivity</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>401 90 485 142</position>
+				<barchart active="true" width="128" height="90" />
+			</node>
+			<node id="Activity">
+				<name>Physical Activity</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>130 304 219 359</position>
+				<barchart active="true" width="128" height="162" />
+			</node>
+			<node id="Ambient_Sound">
+				<name>Ambient Sound</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>398 308 482 360</position>
+				<barchart active="true" width="128" height="72" />
+			</node>
+			<node id="AgendaSlot">
+				<name>AgendaSlot</name>
+				<interior color="e5f6f7" />
+				<outline color="000080" />
+				<font color="000000" name="Arial" size="8" />
+				<position>698 306 767 349</position>
+				<barchart active="true" width="128" height="64" />
+			</node>
+		</genie>
+	</extensions>
+</smile>

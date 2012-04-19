@@ -6,6 +6,21 @@
 	<groupId>org.societies.context-management</groupId>
 	<artifactId>user-context-refinement</artifactId>
 	<version>${version.cm}</version>
+
+	<developers>
+		<developer>
+			<name>Korbinian Frank</name>
+			<email>korbinian.frank@dlr.de</email>
+			<organization>DLR</organization>
+			<organizationUrl>http://www.dlr.de</organizationUrl>
+			<roles>
+				<role>Developer</role>
+				<role>Owner</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
+
 	<packaging>bundle</packaging>
 	<dependencies>
 		<dependency>
@@ -26,6 +41,56 @@
 			<version>${version.cm}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>user-context-db-mgmt</artifactId>
+			<version>${version.cm}</version>
+			<scope>test</scope>
+		</dependency>
+
+
+  		<dependency>
+  		  <groupId>colt</groupId>
+  		  <artifactId>colt</artifactId>
+  		  <version>1.0</version>
+  		</dependency>
+  		<dependency>
+  		  <groupId>concurrent</groupId>
+  		  <artifactId>concurrent</artifactId>
+  		  <version>1.0</version>
+  		</dependency>
+  		
+  		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.beans</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.context</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+		</dependency>
+
 	</dependencies>
 	<parent>
 		<groupId>org.societies</groupId>
@@ -71,21 +136,9 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<!-- More Project Information -->
 	<name>User Context Refinement</name>
 	<description>This component provides user context refinement facilities.</description>
-	<developers>
-		<developer>
-			<name>Korbinian Frank</name>
-			<email>korbinian.frank@dlr.de</email>
-			<organization>DLR</organization>
-			<organizationUrl>http://www.dlr.de</organizationUrl>
-			<roles>
-				<role>Developer</role>
-				<role>Owner</role>
-			</roles>
-			<timezone>+1</timezone>
-		</developer>
-	</developers>
+
 </project>
