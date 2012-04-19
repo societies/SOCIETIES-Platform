@@ -25,57 +25,10 @@
 
 package org.societies.useragent.monitoring;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.useragent.monitoring.IInternalUserActionMonitor;
-import org.societies.api.internal.useragent.monitoring.IUserActionListener;
-import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.useragent.monitoring.IUserActionMonitor;
+public class Snapshots {
 
-public class UserActionMonitor implements IUserActionMonitor, IInternalUserActionMonitor{
+	public static String[] snapshot1 = {"symLoc", "status", "activity"};
+	public static String[] snapshot2 = {"symLoc", "day"};
+	public enum snapshots {snapshot1, snapshot2};
 
-	private boolean cloud;
-	private ICtxBroker ctxBroker;
-	private ContextCommunicator ctxComm;
-
-	@Override
-	public void monitor(IIdentity owner, IAction action) {
-		System.out.println("Received user action!");
-
-		//save action in context - IIdentity > ServiceId > paramName
-		//create new entities and attributes if necessary
-		ctxComm.updateHistory(owner, action);
-
-		//update interactionDevice if NOT on cloud node
-		if(!cloud){
-			ctxComm.updateUID(owner);
-		}
-	}
-
-	@Override
-	public void registerForActionUpdates(IUserActionListener listener) {
-		// TODO Auto-generated method stub	
-	}
-
-
-
-	public void initialiseUserActionMonitor(){
-		System.out.println("Initialising user action monitor!");
-		ctxComm = new ContextCommunicator(ctxBroker);
-
-		//Set cloud flag - get device type from Identity Manager (speak to Alec)
-	}
-
-	public void setCtxBroker(ICtxBroker broker){
-		this.ctxBroker = broker;
-	}
-
-
-	@Deprecated
-	public void monitor(ServiceResourceIdentifier arg0, IIdentity arg1,
-			String arg2) {
-		// TODO Auto-generated method stub
-
-	}
 }

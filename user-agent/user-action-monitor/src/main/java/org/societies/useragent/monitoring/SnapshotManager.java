@@ -25,57 +25,46 @@
 
 package org.societies.useragent.monitoring;
 
-import org.societies.api.identity.IIdentity;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.useragent.monitoring.IInternalUserActionMonitor;
-import org.societies.api.internal.useragent.monitoring.IUserActionListener;
-import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.useragent.monitoring.IUserActionMonitor;
 
-public class UserActionMonitor implements IUserActionMonitor, IInternalUserActionMonitor{
+//register listeners to update snapshot if context attributes not yet available
+public class SnapshotManager {
 
-	private boolean cloud;
 	private ICtxBroker ctxBroker;
-	private ContextCommunicator ctxComm;
+	Hashtable <String, String[]> snapshots;
 
-	@Override
-	public void monitor(IIdentity owner, IAction action) {
-		System.out.println("Received user action!");
+	/*
+	 * SNAPSHOT DEFINITIONS
+	 */
+	String[][] snapshotDefinitions = {
+			{"symLoc", "status", "activity"},  //SNAPSHOT 1
+			{"symLoc", "day"}  //SNAPSHOT 2
+	};
+	/*
+	 * END DEFINITIONS
+	 */
 
-		//save action in context - IIdentity > ServiceId > paramName
-		//create new entities and attributes if necessary
-		ctxComm.updateHistory(owner, action);
+	public SnapshotManager(ICtxBroker ctxBroker){
+		this.ctxBroker = ctxBroker;
+		initialiseSnapshots();
+	}
 
-		//update interactionDevice if NOT on cloud node
-		if(!cloud){
-			ctxComm.updateUID(owner);
+	private void initialiseSnapshots(){
+		snapshots = new Hashtable <String, String[]>();
+		for(int i = 0; i<snapshotDefinitions.length; i++){
+			snapshots.put("snapshot"+i, snapshotDefinitions[i]);
 		}
 	}
 
-	@Override
-	public void registerForActionUpdates(IUserActionListener listener) {
-		// TODO Auto-generated method stub	
-	}
-
-
-
-	public void initialiseUserActionMonitor(){
-		System.out.println("Initialising user action monitor!");
-		ctxComm = new ContextCommunicator(ctxBroker);
-
-		//Set cloud flag - get device type from Identity Manager (speak to Alec)
-	}
-
-	public void setCtxBroker(ICtxBroker broker){
-		this.ctxBroker = broker;
-	}
-
-
-	@Deprecated
-	public void monitor(ServiceResourceIdentifier arg0, IIdentity arg1,
-			String arg2) {
-		// TODO Auto-generated method stub
-
+	public List<CtxAttributeIdentifier> getSnapshot(String snapshotName){
+		ArrayList<CtxAttributeIdentifier> snapshot = new ArrayList<CtxAttributeIdentifier>();
+		String[] definition = snapshots.get(snapshotName);
+		
+		return snapshot;
 	}
 }
