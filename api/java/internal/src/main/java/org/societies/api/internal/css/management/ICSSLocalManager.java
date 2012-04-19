@@ -28,8 +28,11 @@ package org.societies.api.internal.css.management;
 import java.util.concurrent.Future;
 import java.util.List;
 
+
+import org.societies.api.schema.cssmanagement.CssAdvertisementRecordDetailed;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssRecord;
+import org.societies.api.schema.cssmanagement.CssRequest;
 
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.servicelifecycle.model.Service;
@@ -214,5 +217,18 @@ public interface ICSSLocalManager {
 	 */
 	Future<List<Service>> findAllCssServiceDetails(
 			List<CssAdvertisementRecord> listCssAds);
+	
+	/* get list of css's and status that you have asked to join/jined */
+	Future<List<CssRequest>> findAllCssFriendRequests();
+	/* get lost of requests from people that have asked to join/joined your css */
+	Future<List<CssRequest>> findAllCssRequests();
+	/* Add update a reuest sent to join your css */
+	void updateCssRequest(CssRequest request);
+	/* send a request to remote css to join  */
+	void sendCssFriendRequest(String friendCssId);
+	/* Called by remote css is response t your request to join*/
+	void updateCssFriendRequest(CssRequest request);
+	
+ Future<List<CssAdvertisementRecordDetailed>> getCssAdvertisementRecordsFull() ;
 
 }
