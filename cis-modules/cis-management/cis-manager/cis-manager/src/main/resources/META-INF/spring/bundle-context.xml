@@ -14,7 +14,7 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-  <bean id="CISManager" class="org.societies.cis.manager.CisManager" />
+  <bean id="CisManagementBundle" class="org.societies.cis.manager.CisManager" />
   
   <context:component-scan base-package="org.societies.cis.manager"></context:component-scan>
 

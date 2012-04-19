@@ -28,9 +28,11 @@ package org.societies.orchestration.EgocentricCommunityAnalyser.test;
 import static org.mockito.Mockito.mock;
 
 import java.util.HashMap;
+import java.util.concurrent.Future;
 
 import org.junit.Test;
 import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.identity.IIdentity;
@@ -61,7 +63,7 @@ public class EgocentricCommunityConfigurationManagerTest {
     	
 		//create CIS for James where James himself has been inactive for 1 year.
 	    
-		ICisRecord jamesCisRecord = cisManager.createCis(ownerId.toString(), "James password", "James CIS", "generic type", 0);
+		Future<ICisOwned> jamesCisRecord = cisManager.createCis(ownerId.toString(), "James password", "James CIS", "generic type", 0);
 		
 		
 		
@@ -89,7 +91,7 @@ public class EgocentricCommunityConfigurationManagerTest {
 	    
 		//CisRecord jamesCisRecord = cisManager.createCis("James", "James CIS");
 		
-		ICisRecord jamesCisRecord = cisManager.createCis(ownerId.toString(), "James password", "James CIS", "generic type", 0);
+		Future<ICisOwned> jamesCisRecord = cisManager.createCis(ownerId.toString(), "James password", "James CIS", "generic type", 0);
 		
     	egocentricCommunityConfigurationManager = new EgocentricCommunityConfigurationManager(ownerId, "CSS");
     	egocentricCommunityConfigurationManager.setCisManager(cisManager);
@@ -115,7 +117,7 @@ public class EgocentricCommunityConfigurationManagerTest {
 	    
 		//CisRecord jamesCisRecord = cisManager.createCis("James", "James CIS");
 		
-		ICisRecord jamesCisRecord = cisManager.createCis(ownerId.toString(), "James password", "James CIS", "generic type", 0);
+		Future<ICisOwned> jamesCisRecord = cisManager.createCis(ownerId.toString(), "James password", "James CIS", "generic type", 0);
 		
     	egocentricCommunityConfigurationManager = new EgocentricCommunityConfigurationManager(ownerId, "CSS");
     	egocentricCommunityConfigurationManager.setCisManager(cisManager);
@@ -141,7 +143,7 @@ public class EgocentricCommunityConfigurationManagerTest {
 	    
 		//CisRecord jamesCisRecord = cisManager.createCis("James", "James CIS");
 		
-		ICisRecord jamesCisRecord = cisManager.createCis(ownerId.toString(), "James password", "James CIS", "generic type", 0);
+		Future<ICisOwned> jamesCisRecord = cisManager.createCis(ownerId.toString(), "James password", "James CIS", "generic type", 0);
 		
     	egocentricCommunityConfigurationManager = new EgocentricCommunityConfigurationManager(ownerId, "CSS");
     	egocentricCommunityConfigurationManager.setCisManager(cisManager);
@@ -167,7 +169,7 @@ public class EgocentricCommunityConfigurationManagerTest {
 	    
 		//CisRecord jamesCisRecord = cisManager.createCis("James", "James CIS");
 		
-		ICisRecord jamesCisRecord = cisManager.createCis(ownerId.toString(), "James password", "James CIS", "generic type", 0);
+		Future<ICisOwned> jamesCisRecord = cisManager.createCis(ownerId.toString(), "James password", "James CIS", "generic type", 0);
 		
     	egocentricCommunityConfigurationManager = new EgocentricCommunityConfigurationManager(ownerId, "CSS");
     	egocentricCommunityConfigurationManager.setCisManager(cisManager);
@@ -193,7 +195,7 @@ public class EgocentricCommunityConfigurationManagerTest {
 	    
 		//CisRecord jamesCisRecord = cisManager.createCis("James", "James CIS");
 		
-		ICisRecord jamesCisRecord = cisManager.createCis(ownerId.toString(), "James password", "James CIS", "generic type", 0);
+		Future<ICisOwned> jamesCisRecord = cisManager.createCis(ownerId.toString(), "James password", "James CIS", "generic type", 0);
 		
     	egocentricCommunityConfigurationManager = new EgocentricCommunityConfigurationManager(ownerId, "CSS");
     	egocentricCommunityConfigurationManager.setCisManager(cisManager);

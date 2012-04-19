@@ -12,6 +12,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.api.internal.comm.ICommManagerController;
 
 public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFactory {
 
@@ -44,8 +45,9 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 	@Override
 	public ICommManager getNewCommManager(IIdentity cisIdentity, String credentials) throws CommunicationException {
 		XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), credentials);
+		commMgr.loginFromConfig();
 		if (commMgr.getIdManager()==null)
-			throw new CommunicationException("Not connected to domain!");
+			throw new CommunicationException("Unable to create CISCommManager!");
 		cisCommManagers.put(cisIdentity, commMgr);
 		return commMgr;
 	}
@@ -66,11 +68,22 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 			// TODO verify if exists
 			IIdentity cisIdentity = idm.fromJid(randomCisIdentifier);
 			XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), genericPassword);
+			commMgr.loginFromConfig();
+			if (commMgr.getIdManager()==null)
+				throw new CommunicationException("Unable to connect!");
 			cisCommManagers.put(cisIdentity, commMgr);
 			return commMgr;
 		} catch (InvalidFormatException e) {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public void destroyAllConnections() {
+		for (ICommManager cm : cisCommManagers.values()) {
+			if (cm instanceof ICommManagerController) {
+				((ICommManagerController)cm).logout();
+			}
+		}
 	}
 }

@@ -24,12 +24,16 @@
  */
 package org.societies.api.css.devicemgmt;
 
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
 /**
  * 
  * Interface used to declare  a driver device service
  * @author Rafik (Trialog)
  *
  */
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface IDriverService {
 	
 	 /**
