@@ -23,20 +23,11 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.useragent.resourcesharing;
-import org.societies.api.useragent.resourcesharing.model.ISharable;
+package org.societies.api.useragent.resourcesharing.model;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
-/**
- * 
- * @author S.Gallacher@hw.ac.uk
- *
- */
-@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
-public interface IResourceSharing
-{
-	public void addSharableResource(ISharable sharableResource);
-	
-	public void newSharingRequest();
+@SocietiesExternalInterface(type=SocietiesInterfaceType.REQUIRED)
+public interface ISharable {
+
 }
