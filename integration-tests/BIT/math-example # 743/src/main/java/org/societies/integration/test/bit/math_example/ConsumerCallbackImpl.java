@@ -22,22 +22,40 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.service.api;
+package org.societies.integration.test.bit.math_example;
 
-import java.util.concurrent.Future;
+import org.societies.service.api.IConsumerCallback;
 
 /**
- * Describe your class here...
  *
- * @author rafik
+ * @author Rafik
  *
  */
-public interface IConsumer {
-	
-	public int barycenter (int a, int b, int c);
-	
-	public void asyncBarycenter (int a, int b, int c, IConsumerCallback consumerCallback);
+public class ConsumerCallbackImpl implements IConsumerCallback{
 
-	public Future<Integer> futureBarycenter (int a, int b, int c);
+	private Integer asyncResult = null;
+	
+	/**
+	 * 
+	 */
+	public ConsumerCallbackImpl() {
+		super();
+
+	}
+
+	@Override
+	public void sendResult(int result) {
+		this.asyncResult = result;	
+		synchronized (this) {
+            notifyAll( );
+        }
+	}
+	
+	/**
+	 * @return the asyncResult
+	 */
+	public Integer getAsyncResult() {
+		return asyncResult;
+	}
 
 }
