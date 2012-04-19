@@ -43,7 +43,7 @@ public class TestFSConnector {
 	@Test
 	public void getSocialProfileTest() {
 		String profile = connector.getUserProfile();
-		logger.info("Profile (JSON STRING):\n" + profile);
+		logger.info("Social Profile (JSON STRING):\n" + profile);
 		assertNotNull("Social Profile (JSON STRING)", profile);
 	}
 
