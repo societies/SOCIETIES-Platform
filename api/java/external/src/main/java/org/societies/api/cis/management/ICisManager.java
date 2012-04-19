@@ -24,6 +24,11 @@
  */
 package org.societies.api.cis.management;
 
+import java.util.List;
+import java.util.concurrent.Future;
+
+
+
 
 /**
  * @author Babak.Farshchian@sintef.no
@@ -49,7 +54,7 @@ public interface ICisManager {
 	 * @return link to the {@link ICisEditor} representing the new CIS, or 
 	 * null if the CIS was not created.
 	 */
-	ICisOwned createCis(String cssId, String cssPassword, String cisName, String cisType, int mode);
+	Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode);
 	/**
 	 * Delete a specific CIS represented by cisId. The cisId is available in the
 	 * method of {@link ICisEditor} representing the CIS to be deleted. This method
@@ -82,6 +87,14 @@ public interface ICisManager {
 	 * @return Array of CIS Records that match the query.
 	 */
 	ICisRecord[] getCisList(ICisRecord query);
+
+	/**
+	 * Return an array of all the CISs that the user own or participates. 
+	 * 
+	 * @return Array of CIS Records .
+	 */
+	List<ICisRecord> getCisList();
+
 	
 	Boolean requestNewCisOwner(String currentOwnerCssId, String currentOwnerCssPassword,
 		String newOwnerCssId, String cisId);

@@ -33,13 +33,16 @@ package org.societies.api.css.devicemgmt.model;
 public class DeviceMgmtConstants {
 	
 	
+
 	/**
-	 * Constant to be used to get or set device service id property
+	 * Unique Identifier of a device. Visible globally in the Societies Platform
+	 * this constant is to be used to get or set device service id property
 	 * @value "deviceId"
 	 */
 	public static final String DEVICE_ID = "deviceId";
 	
 	/**
+	 * Specific name of the device. e.g. “Light Sensor Corridor”. Provided during configuration
 	 * Constant to be used to get or set device service name property
 	 * @value "deviceName"
 	 */
@@ -47,6 +50,7 @@ public class DeviceMgmtConstants {
 	
 	
 	/**
+	 * Generic type of the device. e.g. LightSensor
 	 * Constant to be used to get or set device service type property
 	 * @value "deviceType"
 	 */
@@ -54,6 +58,9 @@ public class DeviceMgmtConstants {
 	
 	
 	/**
+	 * Generic term associated to the driver to which the device is attached.
+	 * it represents the the driver symbolic name of the bundle that manages this device 
+	 * e.g. TrialogZigbeeDriver
 	 * Constant to be used to get or set device service family property
 	 * @value "deviceFamily"
 	 */
@@ -61,6 +68,7 @@ public class DeviceMgmtConstants {
 	
 	
 	/**
+	 * Description of the device in few words
 	 * Constant to be used to get or set device service description property
 	 * @value "deviceDescription"
 	 */
@@ -68,6 +76,8 @@ public class DeviceMgmtConstants {
 	
 	
 	/**
+	 * The location of the device related to its real physical. 
+	 * E.g. “room 127”, in a human readable format. Setup during configuration
 	 * Constant to be used to get or set device service location property
 	 * @value "deviceLocation"
 	 */
@@ -75,6 +85,7 @@ public class DeviceMgmtConstants {
 	
 	
 	/**
+	 * Name of the manufacturer.
 	 * Constant to be used to get or set device service provider property
 	 * @value "deviceProvider"
 	 */
@@ -82,6 +93,7 @@ public class DeviceMgmtConstants {
 	
 	
 	/**
+	 * Generic name of the underlying protocol. E.g. Zigbee, Bluetooth
 	 * Constant to be used to get or set device service connection type property
 	 * @value "deviceConnectionType"
 	 */
@@ -89,6 +101,7 @@ public class DeviceMgmtConstants {
 	
 	
 	/**
+	 * This indicating whether the device is context compliant.
 	 * Constant to be used to get or set device service context compliant property
 	 * @value "contextCompliant"
 	 */

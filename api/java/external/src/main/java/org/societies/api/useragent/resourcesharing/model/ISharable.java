@@ -22,51 +22,12 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.css.devicemgmt;
 
+package org.societies.api.useragent.resourcesharing.model;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
-/**
- * 
- * Interface used to declare  a driver device service
- * @author Rafik (Trialog)
- *
- */
-@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
-public interface IDriverService {
-	
-	 /**
-     * 
-     * @param actionName
-     * @return null if no action matches the argument actionName.
-     */
-    public IAction getAction (String actionName);
-    
-    /**
-     * 
-     * @return
-     */
-    public IAction [] getActions();
-    
-    /**
-     * 
-     * @param stateVariableName
-     * @return null if no state variable matches the agrument stateVariableName
-     */
-    public IDeviceStateVariable getStateVariable (String stateVariableName);
-    
-    /**
-     * 
-     * @return A list of state variables used by this driver device service
-     */
-    public IDeviceStateVariable [] getStateVariables ();
+@SocietiesExternalInterface(type=SocietiesInterfaceType.REQUIRED)
+public interface ISharable {
 
-    
-    /**
-     * 
-     * @return driver device service id
-     */
-    public String getId ();
-    
 }

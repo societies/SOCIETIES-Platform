@@ -22,51 +22,69 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.css.devicemgmt;
-
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+/**
+ * 
+ */
+package org.societies.webapp.models;
 
 /**
  * 
- * Interface used to declare  a driver device service
- * @author Rafik (Trialog)
- *
+ * @author Luca Lamorte
+ * This Form will add minimum information to add a connector... 
+ *       
  */
-@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
-public interface IDriverService {
-	
-	 /**
-     * 
-     * @param actionName
-     * @return null if no action matches the argument actionName.
-     */
-    public IAction getAction (String actionName);
-    
-    /**
-     * 
-     * @return
-     */
-    public IAction [] getActions();
-    
-    /**
-     * 
-     * @param stateVariableName
-     * @return null if no state variable matches the agrument stateVariableName
-     */
-    public IDeviceStateVariable getStateVariable (String stateVariableName);
-    
-    /**
-     * 
-     * @return A list of state variables used by this driver device service
-     */
-    public IDeviceStateVariable [] getStateVariables ();
+public class SocialDataForm {
 
-    
-    /**
-     * 
-     * @return driver device service id
-     */
-    public String getId ();
-    
+	private String method;
+
+	// SocialData Configuration
+	private String token;
+	private String snName;
+	private String id;
+	private String params;
+	
+
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public String getSnName() {
+		return snName;
+	}
+
+	public void setSnName(String snName) {
+		this.snName = snName;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getParams() {
+		return params;
+	}
+
+	public void setParams(String params) {
+		this.params = params;
+	}
+
+	public String getMethod() {
+		return method;
+	}
+
+	public void setMethod(String method) {
+		this.method = method;
+	}
+	
+	
+
 }

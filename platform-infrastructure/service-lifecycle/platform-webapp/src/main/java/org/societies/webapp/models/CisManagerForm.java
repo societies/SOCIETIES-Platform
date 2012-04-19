@@ -33,7 +33,7 @@ package org.societies.webapp.models;
 public class CisManagerForm {
 
 	private String method;
-	private String cisId;
+	private String cssId;
 	private String cisPassword;
 	private String cisName;
 	private String cisType;
@@ -51,16 +51,16 @@ public class CisManagerForm {
 		this.method = method;
 	}
 	/**
-	 * @return the cisId
+	 * @return the cssId
 	 */
-	public String getCisId() {
-		return cisId;
+	public String getCssId() {
+		return cssId;
 	}
 	/**
-	 * @param cisId the cisId to set
+	 * @param cssId the cssId to set
 	 */
-	public void setCisId(String cisId) {
-		this.cisId = cisId;
+	public void setCssId(String cisId) {
+		this.cssId = cisId;
 	}
 	/**
 	 * @return the cisPassword

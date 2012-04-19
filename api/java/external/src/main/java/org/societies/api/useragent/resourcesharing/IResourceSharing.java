@@ -24,15 +24,19 @@
  */
 
 package org.societies.api.useragent.resourcesharing;
+import org.societies.api.useragent.resourcesharing.model.ISharable;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
  * 
  * @author S.Gallacher@hw.ac.uk
  *
  */
+@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface IResourceSharing
 {
-	public void addSharableResource();
+	public void addSharableResource(ISharable sharableResource);
 	
 	public void newSharingRequest();
 }

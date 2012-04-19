@@ -57,10 +57,10 @@
 		<br />
 		<table id="CisAdvertisementRecordDetails">
 			<tr>
-				<td>CIS ID:</td>
-				<td><form:input path="cisId" /></td>
-				<td><form:errors path="cisId" cssClass="error" /></td>
-				<td>eg: trekkies</td>
+				<td>CsS ID:</td>
+				<td><form:input path="cssId" /></td>
+				<td><form:errors path="cssId" cssClass="error" /></td>
+				<td>Users CSS jid eg: paul@societies.com</td>
 			</tr>
 			<tr>
 				<td>password:</td>

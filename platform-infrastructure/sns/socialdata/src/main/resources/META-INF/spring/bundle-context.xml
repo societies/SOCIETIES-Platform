@@ -9,7 +9,9 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment
     -->
-
+    <bean id="iSocialData" class="org.societies.platform.socialdata.SocialData"/>
+           
+    
     
 
 </beans>
