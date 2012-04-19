@@ -23,7 +23,6 @@ package org.societies.webapp.controller;
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -32,6 +31,8 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.apache.shindig.social.opensocial.model.ActivityEntry;
+import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialData;
@@ -109,7 +110,7 @@ public class SocialDataController {
 		model.put(SNNAME, snName);
 		
 		model.put(TOKEN,  "");
-		model.put(ID, 	"last update " + socialdata.getLastUpdate());
+		model.put(ID, 	"");
 		return new ModelAndView("socialdata", model);
 	}
 
@@ -136,17 +137,24 @@ public class SocialDataController {
 			if (ADD.equalsIgnoreCase(method)) {
 				
 				// DO add Connectore HERE
-				res       = "[" + method+"] Connector ";
+				res       = "[" + method+"] new Social Connector ";
 				HashMap <String, String> params = new HashMap<String, String>();
 				params.put(ISocialConnector.AUTH_TOKEN, sdForm.getToken());
 				
+				String error="no error";
 				try {
+					error= "unable to create connector";
 					ISocialConnector con = socialdata.createConnector(sdForm.getSnName(), params);
+					error ="unable to add connector:"+con.getConnectorName();
 					socialdata.addSocialConnector(con);
-				} catch (Exception e) {
+					socialdata.updateSocialData();
+					content   = "<b>Connector</b> ID:"+sdForm.getId() + " for " + sdForm.getSnName() +" with token: "+ sdForm.getToken() + "<br>";
+				}
+				
+				catch (Exception e) {
 					res       = "Internal Error";
 					content  = "<p> Unable to generate a connecotor with those parameters <p>";
-					content  +="Error type is "+e.getMessage();
+					content  +="Error type is "+error + " trace: "+e.getMessage();
 					content  += "<ul><li> Social Network:"+sdForm.getSnName()+"</li>";
 					content  += "<li> Method:"+sdForm.getMethod() + "</li>";
 					Iterator<String>  it = params.keySet().iterator();
@@ -158,7 +166,7 @@ public class SocialDataController {
 					e.printStackTrace();
 				}
 				
-				//content   = "<b>Connector</b> ID:"+sdForm.getId() + " for " + sdForm.getSnName() +" with token: "+ sdForm.getToken() + "<br>";
+				
 					
 			}
 			else if (LIST.equalsIgnoreCase(method)) {
@@ -186,7 +194,7 @@ public class SocialDataController {
 				else {
 					try {
 						socialdata.removeSocialConnector(sdForm.getId());
-						content   = "<p> Connector ID:"+sdForm.getId()+  "has been removed correctly</p>";
+						content   += "<p> Connector ID:"+sdForm.getId()+  "has been removed correctly</p>";
 					} catch (Exception e) {
 						res       = "Internal Error";
 						content = "<p> Unable to remove this connector due to:</p>";
@@ -210,7 +218,9 @@ public class SocialDataController {
 					
 					//////// IN THIS PART YOU SHOULD PUT THE RIGHT CODE
 					Person p= it.next();
-					content +="<li>" + p.getName().getFormatted() + "</li>" ;
+					String[] id = p.getId().split(":");
+					
+					content +="<li>[" + id[0] +"] " + p.getName().getFormatted() + " id:"+ id[1] + "</li>" ;
 				}
 				content   += "</ul>";
 					
@@ -221,16 +231,16 @@ public class SocialDataController {
 				res       = "Social Profiles";
 				
 				
-				ArrayList<String> list = new ArrayList<String>();
-				list.add("Luca Facebook Profile");
-				Iterator<String> it = list.iterator();
+				List<Person> list = (List<Person>)socialdata.getSocialProfiles();
+				Iterator<Person> it = list.iterator();
 				content ="<h4> My Social Profiles </h4>";
 				content +="<ul>";
 				while(it.hasNext()){
 					
 					//////// IN THIS PART YOU SHOULD PUT THE RIGHT CODE
-					String s= it.next();
-					content +="<li>" + s + "</li>" ;
+					Person p = it.next();
+					String[] id = p.getId().split(":");
+					content +="<li> [" + id[0] +" Profile] " + p.getName().getFormatted()  + "</li>" ;
 				}
 				content   += "</ul>";
 					
@@ -240,20 +250,17 @@ public class SocialDataController {
 				// DO add Connectore HERE
 				res       = "Social Groups";
 				
-				//List<?>friends = socialdata.getSocialPeople();
-				ArrayList<String> list = new ArrayList<String>();
-				list.add("SOCIETIES");
-				list.add("Telecomitalia");
-				list.add("Google");
-				list.add("HOME SWEET HOME");
-				Iterator<String> it = list.iterator();
+				List<Group>list = (List<Group>)socialdata.getSocialGroups();
+				
+				Iterator<Group> it = list.iterator();
 				content ="<h4> My Social Groups </h4>";
 				content +="<ul>";
 				while(it.hasNext()){
 					
 					//////// IN THIS PART YOU SHOULD PUT THE RIGHT CODE
-					String s= it.next();
-					content +="<li>" + s + "</li>" ;
+					Group g= it.next();
+					String[] id = g.getId().getGroupId().split(":");
+					content +="<li> ["+id[0]+"] ID:" + id[1] +" Title:"+ g.getDescription() + "</li>" ;
 				}
 				content   += "</ul>";
 					
@@ -263,18 +270,16 @@ public class SocialDataController {
 				// DO add Connectore HERE
 				res       = "Social Activities";
 				
-				//List<?>friends = socialdata.getSocialPeople();
-				ArrayList<String> list = new ArrayList<String>();
-				list.add("X1 have done Y1 to Z1");
-				list.add("X2 have done Y2 to Z2");
+				List<ActivityEntry>list = (List<ActivityEntry>)socialdata.getSocialActivity();
 				content ="<h4> My Social Activities </h4>";
 				content +="<ul>";
-				Iterator<String> it = list.iterator();
+				Iterator<ActivityEntry> it = list.iterator();
 				while(it.hasNext()){
 					
 					//////// IN THIS PART YOU SHOULD PUT THE RIGHT CODE
-					String s= it.next();
-					content +="<li>" + s + "</li>" ;
+					ActivityEntry entry= it.next();
+					String id[] = entry.getId().split(":");
+					content +="<li> ["+id[0]+"]" + entry.getActor().getDisplayName() + " "+ entry.getVerb() + " --> "+entry.getContent() +"</li>" ;
 				}
 				content   += "</ul>";
 			}

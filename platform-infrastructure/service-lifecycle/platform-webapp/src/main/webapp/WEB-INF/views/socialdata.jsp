@@ -48,9 +48,9 @@
 
 	<h3>Social Network Data</h3>
 	      <p> All your social data are stored in a common language and used by the platform to perform social operations</p>  
-	      <div class="connectors" style="width: 289px; ">
+	      <div class="connectors" style="width: 50%; ">
 	     	
-	      <input onclick="window.open('http://dev.lucasimone.eu/fb.php', 'Facebook Connector', 'height=100', 'width=100');" type="image" src="images/facebook.png">
+	      <input onclick="window.open('http://dev.lucasimone.eu/fb.php', 'Facebook Connector', 'height50', 'width=50');" type="image" src="images/facebook.png">
 		  <input onclick="alert('Not implemented yet')";" type="image" src="images/Twitter.jpg">
 		  <input onclick="alert('Not implemented yet')";" type="image" src="images/Foursquare.png">
 		  <input onclick="alert('Not implemented yet')";" type="image" src="images/Linkedin.png">
