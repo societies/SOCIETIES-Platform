@@ -28,11 +28,15 @@ package org.societies.api.css.devicemgmt;
 import java.util.Dictionary;
 import java.util.List;
 
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
 /**
  * Interface used to invoke action in a device 
  * @author Rafik (Trialog)
  *
  */
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface IAction {
 	
 	/**
