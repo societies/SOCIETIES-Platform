@@ -27,10 +27,11 @@ package org.societies.integration.test;
 import org.junit.runner.Result;
 
 /**
- * Test case specific for integration
- * The "run" method launch the whole test case
- * This class has to be extended and may help
- * to implement integration test case.
+ * Specific test case class for integration test
+ * 
+ * This class has to be extended, its entry point is
+ * the "run" method: it launch the whole test case.
+ * This may help to implement integration test case.
  * This class use the stateless IntegrationTestUtils
  * 
  * @author Rafik Said-Mansour (Trialog)
@@ -53,7 +54,7 @@ public abstract class IntegrationTestCase {
 	
 	/**
 	 * This constructor has to be extended in order
-	 * to specifiy the test case number
+	 * to specify the test case number
 	 * and the array of test case classes to run
 	 */
 	public IntegrationTestCase() {

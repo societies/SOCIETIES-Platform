@@ -3,8 +3,8 @@ package org.societies.integration.test.bit.useservice;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -14,10 +14,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
-import org.societies.api.servicelifecycle.ServiceControlException;
 import org.societies.example.calculator.ICalc;
-import org.societies.integration.test.IntegrationTestUtils;
 
 /**
  * This test case aims to verify that a service
@@ -37,6 +38,10 @@ public class SpecificTestCaseUpperTester {
 	 * URL of the JAR of the Calculator 3P service Bundle
 	 */
 	private static String serviceBundleUrl;
+	/**
+	 * Id of the Calculator 3P service
+	 */
+	public static ServiceResourceIdentifier calculatorServiceId;
 
 
 	/**
@@ -45,9 +50,9 @@ public class SpecificTestCaseUpperTester {
 	 */
 	@BeforeClass
 	public static void initialization() {
-		LOG.info("###759... Initialization");
-		LOG.info("###759... Prerequisite: The CSS is created");
-		LOG.info("###759... Prerequisite: The user is logged to the CSS");
+		LOG.info("[#759] Initialization");
+		LOG.info("[#759] Prerequisite: The CSS is created");
+		LOG.info("[#759] Prerequisite: The user is logged to the CSS");
 
 		serviceBundleUrl = "file:C:/Application/Virgo/repository/usr/Calculator.jar";
 	}
@@ -57,7 +62,7 @@ public class SpecificTestCaseUpperTester {
 	 */
 	@Before
 	public void setUp() {
-		LOG.info("###759... SpecificTestCaseUpperTester::setUp");
+		LOG.info("[#759] SpecificTestCaseUpperTester::setUp");
 	}
 
 	/**
@@ -65,7 +70,7 @@ public class SpecificTestCaseUpperTester {
 	 */
 	@After
 	public void tearDown() {
-		LOG.info("###759.. tearDown");
+		LOG.info("[#759] tearDown");
 	}
 
 
@@ -76,49 +81,64 @@ public class SpecificTestCaseUpperTester {
 	 */
 	@Test(expected=NullPointerException.class)
 	public void bodyUseNotAvailableService() {
-		LOG.info("###759... bodyUseNotAvailableService");
+		LOG.info("[#759] bodyUseNotAvailableService");
 
-		// TODO: Verify that the service is nor installed nor started
-		// At the moment Calculator service can't stop without crashing the system
-		// So we can't be sure that this service is not already started...
+		// --- Preamble: stop/uninstall the Calculator service if necessary
+		try {
+			// -- Search all local services
+			Future<List<Service>> asyncServices = TestCase759.serviceDiscovery.getLocalServices();
+			List<Service> services = asyncServices.get();
 
-		//		Future<ServiceControlResult> asynchResult = null;
-		//		ServiceControlResult scresult = null;
-		//		try {
-		//			LOG.info("###759... Stop the service");
-		//			asynchResult = TestCase759.serviceControl.stopService(NominalTestCaseLowerTester.calculatorServiceId);
-		//			scresult = asynchResult.get();
-		//			if (!scresult.equals(ServiceControlResult.SUCCESS)) {
-		//				throw new Exception("Can't stop the service. Returned value: "+scresult.value());
-		//			}
-		//
-		//			LOG.info("###759... Uninstall the service");
-		//			asynchResult = TestCase759.serviceControl.uninstallService(NominalTestCaseLowerTester.calculatorServiceId);
-		//			scresult = asynchResult.get();
-		//			if (!scresult.equals(ServiceControlResult.SUCCESS)) {
-		//				throw new Exception("Can't uninstall the service. Returned value: "+scresult.value());
-		//			}
-		//		}
-		//		catch (Exception e)
-		//		{
-		//			LOG.info("###759... Unknown Exception", e);
-		//			fail("###759.. Unknown Exception: "+e.getMessage());
-		//			return;
-		//		}
+			// -- Verify that the Calculator Service is really not available
+			// - Search the Calculator Service
+			for(Service service : services) {
+				// - Calculator found
+				if (service.getServiceLocation().value().equals(serviceBundleUrl)) {
+					// - Retrieve service id
+					calculatorServiceId = service.getServiceIdentifier();
+					// - Service is running: Stop the service
+					if (service.getServiceStatus().equals(ServiceStatus.STARTED)) {
+						LOG.info("[#759] Stop the service");
+						Future<ServiceControlResult> asynchResult = TestCase759.serviceControl.stopService(calculatorServiceId);
+						ServiceControlResult scresult = asynchResult.get();
+						if (!scresult.equals(ServiceControlResult.SUCCESS)) {
+							throw new Exception("Can't stop the service. Returned value: "+scresult.value());
+						}
+					}
 
+					// - Uninstall the service
+					LOG.info("[#759] Uninstall the service");
+					Future<ServiceControlResult> asynchResult = TestCase759.serviceControl.uninstallService(calculatorServiceId);
+					ServiceControlResult scresult = asynchResult.get();
+					if (!scresult.equals(ServiceControlResult.SUCCESS)) {
+						throw new Exception("Can't uninstall the service. Returned value: "+scresult.value());
+					}
+					break;
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			LOG.info("[#759] Unknown Exception", e);
+			fail("[#759] Unknown Exception: "+e.getMessage());
+			return;
+		}
+
+		
+		// --- Body
 		// -- Consume the service
 		int expected = 3;
 		int actual = 0;
 		try {
 			actual = NominalTestCaseLowerTester.calculatorService.Add(1, 2).get();
-			LOG.info("###759... Consume Calculator Service 1+2="+actual);
-			assertEquals("###759... Consume Calculator Service", expected, actual);
+			LOG.info("[#759] Consume Calculator Service 1+2="+actual);
+			assertEquals("[#759] Consume Calculator Service", expected, actual);
 		} catch (InterruptedException e) {
-			LOG.info("###759... InterruptedException", e);
-			fail("###759.. InterruptedException: "+e.getMessage());
+			LOG.info("[#759] InterruptedException", e);
+			fail("[#759] InterruptedException: "+e.getMessage());
 		} catch (ExecutionException e) {
-			LOG.info("###759... ExecutionException", e);
-			fail("###759.. ExecutionException: "+e.getMessage());
+			LOG.info("[#759] ExecutionException", e);
+			fail("[#759] ExecutionException: "+e.getMessage());
 		}
 	}
 
@@ -128,64 +148,90 @@ public class SpecificTestCaseUpperTester {
 	 */
 	@Test(expected=NullPointerException.class)
 	public void bodyUseStillNotAvailableService() {
-		LOG.info("###759... bodyUseStillNotAvailableService");
+		LOG.info("[#759] bodyUseStillNotAvailableService");
 
+		// --- Preamble: install/stop the Calculator service if necessary
 		try {
-			// -- Install the service
-			LOG.info("###759... Preamble: Install the service");
-			URL serviceUrl = new URL(serviceBundleUrl);
-			Future<ServiceControlResult> asyncInstallResult = TestCase759.serviceControl.installService(serviceUrl, "");
-			ServiceControlResult installResult = asyncInstallResult.get();
-			if (!installResult.equals(ServiceControlResult.SUCCESS)) {
-				LOG.info("###759... Can't install the service. Returned value: "+installResult.value());
-				return;
+			// -- Search all local services
+			Future<List<Service>> asyncServices = TestCase759.serviceDiscovery.getLocalServices();
+			List<Service> services = asyncServices.get();
+
+			// -- Verify that the Calculator Service is really not available
+			// - Search the Calculator Service
+			boolean found = false;
+			for(Service service : services) {
+				// - Calculator found
+				if (service.getServiceLocation().value().equals(serviceBundleUrl)) {
+					found = true;
+					// - Retrieve the service id
+					calculatorServiceId = service.getServiceIdentifier();
+					// - Service is running: Stop the service
+					if (service.getServiceStatus().equals(ServiceStatus.STARTED)) {
+						LOG.info("[#759] Stop the service");
+						Future<ServiceControlResult> asynchResult = TestCase759.serviceControl.stopService(calculatorServiceId);
+						ServiceControlResult scresult = asynchResult.get();
+						if (!scresult.equals(ServiceControlResult.SUCCESS)) {
+							throw new Exception("Can't stop the service. Returned value: "+scresult.value());
+						}
+					}
+					break;
+				}
 			}
-
-			// -- Verify that the service is not started
-			// TODO: verify that the service is not started
-			// This is not possible at the moment because stopping the Calculator service kill the system 
-
-			// -- Consume the service
-			int actual = 0;
-			actual = NominalTestCaseLowerTester.calculatorService.Add(1, 2).get();
-			LOG.info("###759... Consume Calculator Service 1+2="+actual);
-		} catch (InterruptedException e) {
-			LOG.info("###759... InterruptedException", e);
-			fail("###759.. InterruptedException: "+e.getMessage());
-		} catch (ExecutionException e) {
-			LOG.info("###759... ExecutionException", e);
-			fail("###759.. ExecutionException: "+e.getMessage());
-		} catch (MalformedURLException e) {
-			LOG.info("###759... MalformedURLException", e);
-			fail("###759.. MalformedURLException: "+e.getMessage());
-		} catch (ServiceControlException e) {
-			LOG.info("###759... ServiceControlException", e);
-			fail("###759.. ServiceControlException: "+e.getMessage());
+			// - Service not installed: install it
+			if (!found) {
+				// - Install the service
+				LOG.info("[#759] Install the service");
+				URL serviceUrl = new URL(serviceBundleUrl);
+				Future<ServiceControlResult> asynchResult = TestCase759.serviceControl.installService(serviceUrl, "");
+				ServiceControlResult scresult = asynchResult.get();
+				if (!scresult.equals(ServiceControlResult.SUCCESS)) {
+					throw new Exception("Can't install the service. Returned value: "+scresult.value());
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			LOG.info("[#759] Unknown Exception", e);
+			fail("[#759] Unknown Exception: "+e.getMessage());
+			return;
 		}
 
-		// TODO: uninstall the Calculator service
-		// At the moment Calculator service can't stop without crashing the system, so this must wait.
+		// --- Body
+		try {
+			// -- Consume the service
+			int expected = 3;
+			int actual = 0;
+			actual = NominalTestCaseLowerTester.calculatorService.Add(1, 2).get();
+			LOG.info("[#759] Consume Calculator Service 1+2="+actual);
+			assertEquals("[#759] Consume Calculator Service", expected, actual);
+		} catch (InterruptedException e) {
+			LOG.info("[#759] InterruptedException", e);
+			fail("[#759] InterruptedException: "+e.getMessage());
+		} catch (ExecutionException e) {
+			LOG.info("[#759] ExecutionException", e);
+			fail("[#759] ExecutionException: "+e.getMessage());
+		}
 
-		//				Future<ServiceControlResult> asynchResult = null;
-		//				ServiceControlResult scresult = null;
-		//				try {
-		//					LOG.info("###759... Uninstall the service");
-		//					asynchResult = TestCase759.serviceControl.uninstallService(NominalTestCaseLowerTester.calculatorServiceId);
-		//					scresult = asynchResult.get();
-		//					if (!scresult.equals(ServiceControlResult.SUCCESS)) {
-		//						throw new Exception("Can't uninstall the service. Returned value: "+scresult.value());
-		//					}
-		//				}
-		//				catch (Exception e)
-		//				{
-		//					LOG.info("###759... Unknown Exception", e);
-		//					fail("###759.. Unknown Exception: "+e.getMessage());
-		//					return;
-		//				}
+
+		// --- Postemble
+		try {
+			LOG.info("[#759] Uninstall the service");
+			Future<ServiceControlResult> asynchResult = TestCase759.serviceControl.uninstallService(NominalTestCaseLowerTester.calculatorServiceId);
+			ServiceControlResult scresult = asynchResult.get();
+			if (!scresult.equals(ServiceControlResult.SUCCESS)) {
+				throw new Exception("Can't uninstall the service. Returned value: "+scresult.value());
+			}
+		}
+		catch (Exception e)
+		{
+			LOG.info("[#759] Unknown Exception", e);
+			fail("[#759] Unknown Exception: "+e.getMessage());
+			return;
+		}
 	}
 
 	public void setCalculatorService(ICalc calculatorService) {
-		LOG.info("###759... Calculator Service injected");
+		LOG.info("[#759] Calculator Service injected");
 		this.calculatorService = calculatorService;
 	}
 }

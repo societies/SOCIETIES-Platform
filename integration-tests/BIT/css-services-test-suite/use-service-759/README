@@ -1,0 +1,6 @@
+To launch this test case:
+- put the use-service-759.plan on Virgo pickup/ directory
+- don't forget to add the xc.properties on Virgo pickup/ directory
+- start Openfire
+- start Virgo
+- Follow the tag [#759] on the log

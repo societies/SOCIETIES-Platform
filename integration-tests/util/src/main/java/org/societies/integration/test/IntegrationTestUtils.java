@@ -56,11 +56,17 @@ public class IntegrationTestUtils {
 	 * @return result of the test case
 	 */
 	public Result run(int testCaseNumber, Class... testCaseClasses) {
-		LOG.info("[#"+testCaseNumber+"] Start the integration test case #"+testCaseNumber);
+		// -- Display test case title
+		StringBuffer title = new StringBuffer("[#"+testCaseNumber+"] Start the integration test case for classes: ");
+		for (int j=0; j<testCaseClasses.length; j++) {
+			title.append(testCaseClasses[j].getSimpleName()+(j == (testCaseClasses.length-1) ? "" : ", "));
+		}
+		LOG.info(title.toString());
 		
-		// Run test case
+		// -- Run the test case
 		Result testCaseResult = jUnitCore.run(testCaseClasses);
 		
+		// -- Display result
 		String results = new String();
 		String testClass = "Class: ";
 		String testFailCt = "Failure Count: ";

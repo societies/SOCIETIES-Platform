@@ -62,9 +62,9 @@ public class NominalTestCaseLowerTester {
 	 */
 	@BeforeClass
 	public static void initialization() {
-		LOG.info("###759... Initialization");
-		LOG.info("###759... Prerequisite: The CSS is created");
-		LOG.info("###759... Prerequisite: The user is logged to the CSS");
+		LOG.info("[#759] Initialization");
+		LOG.info("[#759] Prerequisite: The CSS is created");
+		LOG.info("[#759] Prerequisite: The user is logged to the CSS");
 
 		serviceBundleUrl = "file:C:/Application/Virgo/repository/usr/Calculator.jar";
 		calculatorServiceEndPoint = "XCManager.societies.local/CalculatorService";
@@ -77,14 +77,14 @@ public class NominalTestCaseLowerTester {
 	 */
 	@Before
 	public void setUp() {
-		LOG.info("###759... NominalTestCaseLowerTester::setUp");
+		LOG.info("[#759] NominalTestCaseLowerTester::setUp");
 
 		Future<ServiceControlResult> asyncinstallResult = null;
 		ServiceControlResult installResult = null;
 
 		try {
 			// -- Install the service
-			LOG.info("###759... Preamble: Install the service");
+			LOG.info("[#759] Preamble: Install the service");
 			URL serviceUrl = new URL(serviceBundleUrl);
 			asyncinstallResult = TestCase759.serviceControl.installService(serviceUrl, "");
 			installResult = asyncinstallResult.get();
@@ -93,13 +93,13 @@ public class NominalTestCaseLowerTester {
 			}
 		}
 		catch (ServiceDiscoveryException e) {
-			LOG.info("###759... ServiceDiscoveryException", e);
-			fail("###759.. ServiceDiscoveryException: "+e.getMessage());
+			LOG.info("[#759] ServiceDiscoveryException", e);
+			fail("[#759] ServiceDiscoveryException: "+e.getMessage());
 			return;
 		}
 		catch (Exception e) {
-			LOG.info("###759... Preamble installService: Unknown Exception", e);
-			fail("###759.. Preamble installService: Unknown Exception: "+e.getMessage());
+			LOG.info("[#759] Preamble installService: Unknown Exception", e);
+			fail("[#759] Preamble installService: Unknown Exception: "+e.getMessage());
 			return;
 		}
 	}
@@ -110,7 +110,7 @@ public class NominalTestCaseLowerTester {
 	 */
 	@After
 	public void tearDown() {
-		LOG.info("###759.. tearDown");
+		LOG.info("[#759] tearDown");
 	}
 
 
@@ -120,7 +120,7 @@ public class NominalTestCaseLowerTester {
 	 */
 	@Test
 	public void bodyUseService() {
-		LOG.info("###759... bodyUseService part 1");
+		LOG.info("[#759] bodyUseService part 1");
 
 		Future<List<Service>> asyncServices = null;
 		List<Service> services =  new ArrayList<Service>();
@@ -135,7 +135,7 @@ public class NominalTestCaseLowerTester {
 				// - Service found
 				if (service.getServiceEndpoint().equals(calculatorServiceEndPoint)) {
 					// Mark the service as found
-					LOG.info("###759... Calculator service found");
+					LOG.info("[#759] Calculator service found");
 
 					// Retrieve the Service Resource Identifier
 					calculatorServiceId = service.getServiceIdentifier();
@@ -143,14 +143,14 @@ public class NominalTestCaseLowerTester {
 					// - If Calculator service not started yet: start it
 					if (!service.getServiceStatus().equals(ServiceStatus.STARTED)) {
 						// Start the service
-						LOG.info("###759... Calculator service starting");
+						LOG.info("[#759] Calculator service starting");
 						Future<ServiceControlResult> asyncStartResult = TestCase759.serviceControl.startService(calculatorServiceId);
 						ServiceControlResult startResult = asyncStartResult.get();
 						// Service can't be started
 						if (!startResult.value().equals("SUCCESS")) {
 							throw new Exception("Can't start the service. Returned value: "+startResult.value());
 						}
-						LOG.info("###759... Calculator service started");
+						LOG.info("[#759] Calculator service started");
 					}
 					break;
 				}
@@ -160,21 +160,22 @@ public class NominalTestCaseLowerTester {
 			// The injection of ICalc will launch the UpperTester
 		}
 		catch (ServiceDiscoveryException e) {
-			LOG.info("###759... ServiceDiscoveryException", e);
-			fail("###759.. ServiceDiscoveryException: "+e.getMessage());
+			LOG.info("[#759] ServiceDiscoveryException", e);
+			fail("[#759] ServiceDiscoveryException: "+e.getMessage());
 			return;
 		}
 		catch (Exception e) {
-			LOG.info("###759... Preamble installService: Unknown Exception", e);
-			fail("###759.. Preamble installService: Unknown Exception: "+e.getMessage());
+			LOG.info("[#759] Preamble installService: Unknown Exception", e);
+			fail("[#759] Preamble installService: Unknown Exception: "+e.getMessage());
 			return;
 		}
 	}
 
 	public void setCalculatorService(ICalc calculatorService) {
-		LOG.info("###759... Calculator Service injected");
+		LOG.info("[#759] Calculator Service injected");
 		this.calculatorService = calculatorService;
 		// -- Launch the UpperTester to continue the test case by consuming a service
+		NominalTestCaseUpperTester.calculatorServiceId = calculatorServiceId;
 		integrationTestUtils.run(TestCase759.testCaseNumber, NominalTestCaseUpperTester.class);
 	}
 }
