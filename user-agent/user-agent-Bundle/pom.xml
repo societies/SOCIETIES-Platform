@@ -57,12 +57,18 @@
 			<artifactId>user-agent-api</artifactId>
 			<version>${version.ua}</version>
 		</dependency>
-		<!-- 
+
 		<dependency>
 			<groupId>org.societies.useragent</groupId>
 			<artifactId>decisionmaking</artifactId>
 			<version>${version.ua}</version>
-		</dependency>		
+		</dependency>
+		<dependency>
+			<groupId>org.societies.useragent</groupId>
+			<artifactId>conflict</artifactId>
+			<version>${version.ua}</version>
+		</dependency>	
+				<!-- 	
 		<dependency>
 			<groupId>org.societies.useragent</groupId>
 			<artifactId>resourcesharing</artifactId>
@@ -96,7 +102,8 @@
 						
 						<Embed-Dependency>
 							user-agent-api;scope=compile|runtime,
-							<!--  decisionmaking;scope=compile|runtime, -->
+							conflict;scope=compile|runtime,
+							decisionmaking;scope=compile|runtime,
 							resourcesharing;scope=compile|runtime,
 							monitoring;scope=compile|runtime,
 							feedback;scope=compile|runtime

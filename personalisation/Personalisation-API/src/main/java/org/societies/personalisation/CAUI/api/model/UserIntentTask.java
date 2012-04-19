@@ -26,7 +26,8 @@ package org.societies.personalisation.CAUI.api.model;
 
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class UserIntentTask implements IUserIntentTask{
@@ -34,63 +35,47 @@ public class UserIntentTask implements IUserIntentTask{
 	String taskID;
 
 	int confidenceLevel;
-
+	private List<IUserIntentAction> actions = new ArrayList<IUserIntentAction>();
+	Double [][] matrix = null;
+	
 	private double transProb;
 
 	//A map that contains the context type and the context values assigned to this UserTask;
 	Map<String, Serializable> taskContext;
 
-	// A set with the action object belonging to this task and their probabilities
-	LinkedHashMap<IUserIntentAction,Double > userActions ;
-
+	
 	UserIntentTask(){
-
 	}
 
 
-	public UserIntentTask (String taskName, Long uniqueNumber,double transProb){
+	public UserIntentTask (String taskName, Long uniqueNumber, List<IUserIntentAction> actions, Double[][] matrix){
 		this.taskID = taskName+"/"+uniqueNumber;
 		this.confidenceLevel = 51;
-		this.transProb = transProb;
+		this.matrix = matrix; 
+		this.actions = actions;
+		//this.transProb = transProb;
 	}
-	/*
-    public UserIntentTask (String taskID, LinkedHashMap<IUserIntentAction,Double> userActions){
-        this.taskID = taskID;
-        this.userActions = userActions;
-    }
-	 */
+
 
 	@Override
 	public String getTaskID() {
-		// TODO Auto-generated method stub
 		return taskID;
 	}
 
-	@Override
-	public Map<IUserIntentAction, Double> getActions() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void addActions(LinkedHashMap<IUserIntentAction, Double> userActions) {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
 	public Map<String, Serializable> getTaskContext() {
 		return taskContext;
 	}
 
+	
 	@Override
 	public void setTaskContext(Map<String, Serializable> taskContext) {
 		this.taskContext = taskContext;
-
 	}
 
 	public String toString(){
-		String string = this.taskID+" "+transProb;
+		String string = this.taskID;
 		return string;
 	}
 
@@ -98,20 +83,32 @@ public class UserIntentTask implements IUserIntentTask{
 	@Override
 	public void setConfidenceLevel(int confidenceLevel) {
 		this.confidenceLevel = confidenceLevel;
-
 	}
-
 
 	@Override
 	public int getConfidenceLevel() {
 		return this.confidenceLevel;
 	}
 
-
 	@Override
-	public double getTransProb() {
-
-		return transProb;
+	public List<IUserIntentAction> getActions() {
+		
+		return this.actions;
 	}
 
+	@Override
+	public void setActions(List<IUserIntentAction> userActions) {
+		this.actions = userActions;
+
+	}
+
+	@Override
+	public Double[][] getMatrix() {
+		return this.matrix;
+	}
+
+	@Override
+	public void setMatrix(Double[][] matrix) {
+		this.matrix = matrix;		
+	}
 }

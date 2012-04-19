@@ -58,6 +58,8 @@
 		<module>user-feedback</module>
 		<module>user-action-monitor</module>
 		<module>user-agent-Bundle</module>
+		<module>decision-making</module>
+		<module>conflict-resolution</module>
 		<!-- add additional modules here -->
 	</modules>
 </project>

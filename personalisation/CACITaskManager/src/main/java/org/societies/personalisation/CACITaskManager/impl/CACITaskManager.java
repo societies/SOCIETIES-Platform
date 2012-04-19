@@ -24,7 +24,7 @@ import java.util.List;
 import org.societies.personalisation.CACI.api.CACITaskManager.ICACITaskManager;
 import org.societies.personalisation.CAUI.api.model.CommunityIntentAction;
 import org.societies.personalisation.CAUI.api.model.CommunityIntentTask;
-import org.societies.personalisation.CAUI.api.model.TaskModelData;
+import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 import org.societies.personalisation.CAUI.api.model.UserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentTask;
 
@@ -97,7 +97,7 @@ public class CACITaskManager implements ICACITaskManager{
 	}
 
 	@Override
-	public TaskModelData retrieveModel(String arg0) {
+	public UserIntentModelData retrieveModel(String arg0) {
 		// TODO Auto-generated method stub
 		return null;
 	}

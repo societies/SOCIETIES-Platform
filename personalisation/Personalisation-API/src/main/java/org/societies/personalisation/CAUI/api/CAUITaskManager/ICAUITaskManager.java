@@ -25,22 +25,16 @@
 package org.societies.personalisation.CAUI.api.CAUITaskManager;
 
 
-
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+
 import java.util.List;
 import java.util.Map;
-
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-
-
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
-import org.societies.personalisation.CAUI.api.model.TaskModelData;
+import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 import org.societies.personalisation.CAUI.api.model.UserIntentAction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentTask;
 
@@ -53,33 +47,23 @@ import org.societies.personalisation.CAUI.api.model.IUserIntentTask;
 
 public interface ICAUITaskManager {
 
-	
-	
 	public boolean actionBelongsToModel(IUserIntentAction userAction);
 	
 	public boolean taskBelongsToModel(IUserIntentTask userTask);
 	
-	public void visualiseModel();
 	/**
 	 * 
 	 * @return
 	 */
-	public DefaultMutableTreeNode retrieveModel();
+	public UserIntentModelData retrieveModel();
 	
 	/**
+	 * Set an active User Intent model  
 	 * 
-	 * @param top
+	 * @param UserIntentModelData
 	 */
-	public void updateModel(DefaultMutableTreeNode top);
-	
-	/**
-	 * This method returns the model in a tree form. Useful for visualisation with java swing.
-	 * 
-	 * @return model in a tree form
-	 */
-	public JTree getModelTree();
-	
-	
+	public void updateModel(UserIntentModelData model);
+
 	/**
 	 * Creates an UserAction object based on the specified string ID.
 	 * 
@@ -88,7 +72,7 @@ public interface ICAUITaskManager {
 	 * @param transProb
 	 * @return the UserAction object
 	 */
-	public IUserIntentAction createAction(String par, String val, double transProb);
+	public IUserIntentAction createAction(ServiceResourceIdentifier serviceID, String serviceType, String par, String val);
 
 	/**
 	 * Creates a task and assigns a task id to it.
@@ -97,23 +81,25 @@ public interface ICAUITaskManager {
 	 * @param taskID
 	 * @param trans Prob
 	 */
-	public IUserIntentTask createTask(String taskName, double transProb);
+	public IUserIntentTask createTask(String taskName, List<IUserIntentAction> actions, Double [][] matrix);
 
+	
 	/**
 	 * Creates a task and assigns a task id to it.
 	 * @return the UserTask
 	 * 
 	 * @param taskID
+	 * @param trans Prob
 	 */
-	public IUserIntentTask createTask(String taskName);
-
+	public UserIntentModelData createModel(List<IUserIntentTask> tasks, Double [][] matrix);
+	
 	/**
 	 * Returns the UserAction object of the specified id.
 	 * @return the action object
 	 * 
 	 * @param actionID
 	 */
-	public UserIntentAction retrieveAction(String actionID);
+	public IUserIntentAction retrieveAction(String actionID);
 
 	/**
 	 * Returns a list of Actions from the model of the same type and value with these
@@ -123,8 +109,7 @@ public interface ICAUITaskManager {
 	 * @param par    the parameter name
 	 * @param val    the value
 	 */
-	public List<UserIntentAction> retrieveActionsByTypeValue(String par, String val);
-
+	public List<IUserIntentAction> retrieveActionsByTypeValue(String par, String val);
 	
 	/**
 	 * Returns a list of Actions from the model of the same type with this
@@ -133,10 +118,10 @@ public interface ICAUITaskManager {
 	 * 
 	 * @param par    the parameter name
 	 */
-	public List<UserIntentAction> retrieveActionsByType(String par);
+	public List<IUserIntentAction> retrieveActionsByType(String par);
 	
 	/**
-	 * Allows any service to request an context-based evaluated preference outcome.
+	 * Allows any service to request a context-based evaluated preference outcome.
 	 * @return					the outcome in the form of an IAction object
 	 * 
 	 * @param requestor    the DigitalIdentity of the service requesting the outcome
@@ -149,39 +134,12 @@ public interface ICAUITaskManager {
 	public UserIntentAction retrieveCurrentIntentAction(IIdentity requestor, IIdentity ownerID, ServiceResourceIdentifier serviceID, String preferenceName);
 
 	/**
-	 * Returns a map of next userActions and the relevant probabilities given the
-	 * current action. Next userActions are only one step from the given action.
-	 * @return map
-	 * 
-	 * @param userAction
-	 */
-	public HashMap<UserIntentAction, Double> retrieveNextAction(UserIntentAction userAction);
-
-	/**
-	 * Returns a map of next userTasks and the relevant probabilities given the
-	 * current task. Next tasks are only one step from the given task.
-	 * @return map
-	 * 
-	 * @param userTask
-	 */
-	public HashMap<String, Double> retrieveNextTask(IUserIntentTask userTask);
-
-	/**
 	 * Returns the UserTask specified by the taskID
 	 * @return the user task object
 	 * 
 	 * @param taskID
 	 */
 	public IUserIntentTask retrieveTask(String taskID);
-
-
-	/**
-	 * Returns a list of Tasks containing the specified action.
-	 * @return list
-	 * 
-	 * @param userAction
-	 */
-	public List<IUserIntentTask> retrieveTasks(UserIntentAction userAction);
 
 	/**
 	 * Identifies a IUserAction and the corresponding IUserTask that has the same
@@ -193,42 +151,9 @@ public interface ICAUITaskManager {
 	 * @param currentContext
 	 * @param lastAction
 	 */
-	public Map<UserIntentAction, IUserIntentTask> identifyActionTaskInModel(String par, String val, HashMap<String, Serializable> currentContext, String[] lastAction);
+	public Map<IUserIntentAction, IUserIntentTask> identifyActionTaskInModel(String par, String val, HashMap<String, Serializable> currentContext, String[] lastAction);
 
-	/**
-	 * Given the current actions in model determine the next action based on
-	 * transition probabilities, if previous action was in the same task  and action's
-	 * associated context  Score(A->B) = a*P(A->B) + b*(belongInSameTask) +
-	 * c*contextSimilarity  The confidence level of the returned action is set based
-	 * on calculated score.
-	 * @return predicted action
-	 * 
-	 * @param identifiedActionTaskMap
-	 * @param previousPredictionsTaskID
-	 * @param userCurrentContext
-	 */
-	public UserIntentAction identifyNextAction(Map<UserIntentAction,IUserIntentTask> identifiedActionTaskMap, String previousPredictionsTaskID, Map<String,Serializable> userCurrentContext);
-
-
-	/**
-	 * Creates a weighted link between two Actions.
-	 * @param targetActionID
-	 * 
-	 * @param sourceAction
-	 * @param targetAction
-	 * @param weigth    the transition probability
-	 */
-	public void setNextActionLink(IUserIntentAction sourceAction, IUserIntentAction targetAction, Double weigth);
-	public void setNextActionLink(IUserIntentAction actionSrc, Map<IUserIntentAction,Double> actionTrgts);
-	/**
-	 * Creates a weighted link between two Tasks.
-	 * If sourceTask is null, then the task is added to root level.
-	 * 
-	 * @param sourceTask
-	 * @param targetTask
-	 * @param weigth    
-	 */
-	public void setNextTaskLink(IUserIntentTask sourceTask, IUserIntentTask targetTask, Double weigth);
-
+	public void displayTask (IUserIntentTask task);
 	
+	public void displayModel (UserIntentModelData model);
 }

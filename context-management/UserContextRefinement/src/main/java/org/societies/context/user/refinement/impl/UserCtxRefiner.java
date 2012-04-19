@@ -24,18 +24,54 @@
  */
 package org.societies.context.user.refinement.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.context.api.user.refinement.IUserCtxRefiner;
+import org.societies.context.user.refinement.impl.bayesianLibrary.inference.structures.impl.DAG;
+import org.springframework.stereotype.Service;
 
+/**
+ * UserCtxRefiner Implementation This class implements the interface between the
+ * context broker, context inference manager and the Bayesian library
+ */
+@Service
 public class UserCtxRefiner implements IUserCtxRefiner {
 
-	/* (non-Javadoc)
-	 * @see org.societies.context.api.user.refinement.IUserCtxRefiner#refineContext(org.societies.api.context.model.CtxAttributeIdentifier)
+	private BayesEngine learner = BayesEngine.getInstance();
+
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	private BayesianInference bayesianInference;
+
+
+	public UserCtxRefiner() {
+		initialise();
+	}
+		
+	public void initialise(){
+		this.bayesianInference = new BayesianInference();
+		logger.info("{}", "CSM started");
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.societies.context.api.user.refinement.IUserCtxRefiner#refineContext
+	 * (org.societies.api.context.model.CtxAttributeIdentifier)
 	 */
 	@Override
 	public void refineContext(CtxAttributeIdentifier arg0) {
-		// TODO Auto-generated method stub
 		
+		CtxAttribute toRefine = null;
+		//TODO retrieve CtxAttribute to modify from its identifier
+		
+		DAG rule = null;
+		
+		bayesianInference.eval(toRefine, rule);
+
 	}
 
 }
