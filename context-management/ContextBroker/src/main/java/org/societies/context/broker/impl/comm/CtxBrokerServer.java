@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerBean;
 
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -53,7 +54,6 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.context.broker.impl.CtxBroker;
 
-import org.societies.api.schema.context.contextschema.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -95,13 +95,13 @@ public class CtxBrokerServer implements IFeatureServer{
 	@Override
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
 
-		org.societies.api.schema.context.contextschema.CtxBroker response = null;
+		CtxBrokerBean response = null;
 
-		if (payload.getClass().equals(org.societies.api.schema.context.contextschema.CtxBroker.class)) {
-			org.societies.api.schema.context.contextschema.CtxBroker cbPayload = (org.societies.api.schema.context.contextschema.CtxBroker) payload;
+		if (payload.getClass().equals(CtxBrokerBean.class)) {
+			CtxBrokerBean cbPayload = (CtxBrokerBean) payload;
 
 			//checks if the payload contains the createEntity method
-			if (cbPayload.getCreate()!=null) {
+			/*if (cbPayload.getCreate()!=null) {
 
 				// get the identity based on Jid and the identity manager
 				String xmppIdentityJid = cbPayload.getCreate().getOperatorIdjid();
@@ -138,9 +138,9 @@ public class CtxBrokerServer implements IFeatureServer{
 				}
 
 			}
-
+*/
 			//checks if the payload contains the createAssociation method
-			if (cbPayload.getCreateAssoc()!=null) {
+	/*		if (cbPayload.getCreateAssoc()!=null) {
 
 				// get the identity based on Jid and the identity manager
 				String xmppIdentityJid = cbPayload.getCreateAssoc().getOperatorIdjid();
@@ -404,7 +404,7 @@ public class CtxBrokerServer implements IFeatureServer{
 				}
 
 
-			}
+			}*/
 
 			//checks if the payload contains the updateAttr method
 			if (cbPayload.getUpdateAttr()!=null) {
@@ -416,7 +416,6 @@ public class CtxBrokerServer implements IFeatureServer{
 
 			}
 		}
-
 
 
 		//org.jabber.protocol.pubsub.owner.Pubsub ops = (org.jabber.protocol.pubsub.owner.Pubsub) payload;

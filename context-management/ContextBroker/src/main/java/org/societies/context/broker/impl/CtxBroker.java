@@ -46,6 +46,9 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerCreateEntityBean;
+import org.societies.context.broker.api.ICtxCallback;
+import org.societies.context.broker.impl.comm.CtxBrokerClient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +60,7 @@ import org.springframework.stereotype.Service;
  * 3p Context Broker Implementation
  */
 @Service
-public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
+public class CtxBroker implements org.societies.api.context.broker.ICtxBroker, ICtxCallback {
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(InternalCtxBroker.class);
@@ -120,11 +123,26 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		Future<CtxEntity> entity = null;
 		if (identManager.isMine(requester)){
 			entity = internalCtxBroker.createEntity(type);	
-		}else{
+		} else{
+			CtxBrokerClient remClient = new CtxBrokerClient();
+			remClient.createRemoteEntity(requester, type, this);
 			LOG.info("remote call");
 		}
 
 		return entity;
+	}
+	
+	public void createEntityAsync(IIdentity requester,
+			String type) throws CtxException {
+
+		Future<CtxEntity> entity = null;
+		if (identManager.isMine(requester)){
+			entity = internalCtxBroker.createEntity(type);	
+		} else{
+			CtxBrokerClient remClient = new CtxBrokerClient();
+			remClient.createRemoteEntity(requester, type, this);
+			LOG.info("remote call");
+		}
 	}
 
 	@Override
@@ -456,5 +474,27 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		}	
 
 		return ctxEntIdList;
+	}
+
+	@Override
+	public void receiveCtxResult(Object retObject) {
+
+		if (retObject.equals(CtxBrokerCreateEntityBean.class)){
+			CtxBrokerCreateEntityBean entityBean = (CtxBrokerCreateEntityBean) retObject;
+			CtxEntity ctxEntity = null;
+			
+			try {
+				CtxEntityIdentifier ctxEntityIdentifier = new CtxEntityIdentifier(entityBean.toString());				
+				ctxEntity = new CtxEntity(ctxEntityIdentifier);
+				
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+			
+		}
+		
 	}
 }

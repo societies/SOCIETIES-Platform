@@ -54,8 +54,11 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerBean;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerCreateEntityBean;
+import org.societies.context.broker.api.ICtxCallback;
 
-import org.societies.api.schema.context.contextschema.*;
+
 
 public class CtxBrokerClient implements ICommCallback {
 
@@ -75,7 +78,7 @@ public class CtxBrokerClient implements ICommCallback {
 	private IIdentityManager idMgr;
 
 
-	CtxBrokerClient(){
+	public CtxBrokerClient(){
 
 	}
 
@@ -110,7 +113,7 @@ public class CtxBrokerClient implements ICommCallback {
 
 	}
 
-	public Future<CtxEntity> createRemoteEntity(IIdentity identity, String type){
+	public void createRemoteEntity(IIdentity identity, String type, ICtxCallback callback){
 
 		final CtxEntity entity = null;
 
@@ -124,27 +127,28 @@ public class CtxBrokerClient implements ICommCallback {
 
 		//create the message to be sent
 		Stanza stanza = new Stanza(toIdentity);
-		org.societies.api.schema.context.contextschema.CtxBroker cbPacket = new org.societies.api.schema.context.contextschema.CtxBroker();
+		CtxBrokerBean cbPacket = new CtxBrokerBean();
 		// use the create entity method : createCtxEntity(String type)
-		org.societies.api.schema.context.contextschema.CtxBrokerCreateEntityBean ctxBrokerCreateEntityBean = new org.societies.api.schema.context.contextschema.CtxBrokerCreateEntityBean();
+		//org.societies.api.schema.context.contextschema.CtxBrokerCreateEntityBean ctxBrokerCreateEntityBean = new org.societies.api.schema.context.contextschema.CtxBrokerCreateEntityBean();
+		CtxBrokerCreateEntityBean ctxBrokerCreateEntityBean = new CtxBrokerCreateEntityBean();
 		// add the signatures of the method
-		ctxBrokerCreateEntityBean.setOperatorIdjid(identity.getJid());
 		ctxBrokerCreateEntityBean.setType(type);
+		ctxBrokerCreateEntityBean.setRequester("FOO");
 		cbPacket.setCreate(ctxBrokerCreateEntityBean);
 
-
+		CtxBrokerCommCallback commCallback = new CtxBrokerCommCallback(stanza.getId(), callback);
 		//send the message
 		try {
-			//this.commManager.sendIQGet(stanza, ctxBrokerCreateEntityBean, this);
-			this.commManager.sendMessage(stanza, ctxBrokerCreateEntityBean);
+			this.commManager.sendIQGet(stanza, ctxBrokerCreateEntityBean, this);
+			//this.commManager.sendMessage(stanza, ctxBrokerCreateEntityBean);
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return new AsyncResult<CtxEntity>(entity);
+		
 	}
 
-
+/*
 
 
 	public Future<CtxAttribute> createRemoteAttribute(IIdentity identity, CtxEntityIdentifier scope, String type){
@@ -172,8 +176,8 @@ public class CtxBrokerClient implements ICommCallback {
 
 		//send the message
 		try {
-			//this.commManager.sendIQGet(stanza, ctxBrokerCreateAttributeBean, this);
-			this.commManager.sendMessage(stanza, ctxBrokerCreateAttributeBean);
+			this.commManager.sendIQGet(stanza, ctxBrokerCreateAttributeBean, this);
+			//this.commManager.sendMessage(stanza, ctxBrokerCreateAttributeBean);
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -206,8 +210,8 @@ public class CtxBrokerClient implements ICommCallback {
 
 		//send the message
 		try {
-			//this.commManager.sendIQGet(stanza, ctxBrokerCreateAssociationBean, this);
-			this.commManager.sendMessage(stanza, ctxBrokerCreateAssociationBean);
+			this.commManager.sendIQGet(stanza, ctxBrokerCreateAssociationBean, this);
+			//this.commManager.getIdManager().getThisNetworkNode()sendMessage(stanza, ctxBrokerCreateAssociationBean);
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -394,7 +398,7 @@ public class CtxBrokerClient implements ICommCallback {
 		return new AsyncResult<List<CtxIdentifier>>(listOfIdentifiers);
 	}
 
-
+*/
 	@Override
 	public List<String> getJavaPackages() {
 		return PACKAGES;

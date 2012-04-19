@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-targetNamespace="http://societies.org/api/schema/context/contextSchema"
-            xmlns="http://societies.org/api/schema/context/contextSchema" >
+targetNamespace="http://societies.org/api/schema/context/contextmanagement"
+            xmlns="http://societies.org/api/schema/context/contextmanagement"
+            xmlns:tns="http://societies.org/api/schema/context/model" >
 
-<xs:element name="ctxBroker">
+<xs:import namespace="http://societies.org/api/schema/context/model" 
+  			 schemaLocation="org.societies.api.schema.context.model.xsd"/>
+  			 
+<xs:element name="ctxBrokerBean">
 <xs:complexType>
-<xs:choice minOccurs='0' maxOccurs='1'>
+<xs:sequence minOccurs='0' maxOccurs='1'>
 <xs:element name="retrieve" type="ctxBrokerRetrieveBean"/>
 <xs:element name="lookup" type="ctxBrokerLookupBean"/>
 <xs:element name="create" type="ctxBrokerCreateEntityBean"/>
@@ -14,7 +18,15 @@ targetNamespace="http://societies.org/api/schema/context/contextSchema"
 <xs:element name="remove" type="ctxBrokerRemoveBean"/>
 <xs:element name="update" type="ctxBrokerUpdateBean"/>
 <xs:element name="createAttr" type="ctxBrokerCreateAttributeBean"/>
-</xs:choice>
+</xs:sequence>
+</xs:complexType>
+  </xs:element>
+  
+<xs:element name="ctxBrokerBeanResult">
+<xs:complexType>
+<xs:sequence minOccurs='0' maxOccurs='1'>
+<xs:element name="ctxBrokerCreateEntityBeanResult" type="tns:ctxEntityBean" minOccurs="0"/>
+</xs:sequence>
 </xs:complexType>
   </xs:element>
   
@@ -37,8 +49,7 @@ targetNamespace="http://societies.org/api/schema/context/contextSchema"
 
   <xs:complexType name="ctxBrokerCreateEntityBean">
     <xs:sequence>
-      <xs:element name="objectNumber" type="xs:long" minOccurs="0"/>
-      <xs:element name="operatorIdjid" type="xs:string" minOccurs="0"/>
+      <xs:element name="requester" type="xs:string" minOccurs="0"/>
       <xs:element name="type" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
