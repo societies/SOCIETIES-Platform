@@ -30,7 +30,7 @@
 	<artifactId>activityfeed</artifactId>
 	<description>common activityfeed bundle</description>
 	<packaging>bundle</packaging>
-	<version>${release.version}-SNAPSHOT</version>
+	<version>${version.cis}</version>
 	
 	<developers>
 		<developer>

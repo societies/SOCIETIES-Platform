@@ -98,7 +98,7 @@
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>activityfeed</artifactId>
-			<version>${release.version}</version>
+			<version>${version.cis}</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
