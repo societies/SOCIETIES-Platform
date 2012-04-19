@@ -22,7 +22,9 @@
                 <constructor-arg value="${secretKey}"/>
         </bean>
         
-        <bean id="cisCommMgrFactory" class="org.societies.comm.xmpp.xc.impl.CISCommunicationMgrFactoryImpl">
+        <bean id="cisCommMgrFactory" 
+        	class="org.societies.comm.xmpp.xc.impl.CISCommunicationMgrFactoryImpl"
+        	destroy-method="destroyAllConnections">
         	<constructor-arg ref="xcCommunication"/>
             <constructor-arg value="${secretKey}"/>
         </bean>

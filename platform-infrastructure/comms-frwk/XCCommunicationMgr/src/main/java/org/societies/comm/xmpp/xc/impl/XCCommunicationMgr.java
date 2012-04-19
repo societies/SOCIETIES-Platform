@@ -53,13 +53,19 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 		this.subDomain = identifier+"."+domain;
 		this.secretKey = password;
 		initWhackCommManager();
-		return idm.getThisNetworkNode();
+		if (idm!=null)
+			return idm.getThisNetworkNode();
+		else
+			return null;
 	}
 
 	@Override
 	public INetworkNode loginFromConfig() {
 		initWhackCommManager();
-		return idm.getThisNetworkNode();
+		if (idm!=null)
+			return idm.getThisNetworkNode();
+		else
+			return null;
 	}
 
 	@Override
@@ -71,7 +77,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 		manager = new ExternalComponentManager(host);
 		manager.setSecretKey(subDomain, secretKey);
 
-		log.info("Connected!");
+		log.info("Connecting...");
 		try {
 			manager.addComponent(subDomain, this);
 			idm = new IdentityManagerImpl(subDomain);
@@ -79,12 +85,13 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 			
 			probePresence();
 		} catch (ComponentException e) {
+			log.warn("Could not connect to '"+host+"' as '"+subDomain+"': "+e.getMessage());
 			e.printStackTrace();
 		} catch (InvalidFormatException e) {
+			log.warn("Could not connect to '"+host+"' as '"+subDomain+"': "+e.getMessage());
 			e.printStackTrace();
 		}
-		log.info("Added the component!");
-		
+		log.info("Connected to '"+host+"' as '"+subDomain+"'!");
 	}
 
 	private void probePresence() {

@@ -22,67 +22,54 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.css.cssRegistry;
+package org.societies.integration.test;
 
-import java.util.List;
-
-import org.societies.api.internal.css.cssRegistry.exception.CssRegistrationException;
-import org.societies.api.schema.cssmanagement.CssInterfaceResult;
-import org.societies.api.schema.cssmanagement.CssRecord;
-import org.societies.api.schema.cssmanagement.CssRequest;
-
-
+import org.junit.runner.Result;
 
 /**
- * @author Maria Mannion - Intel
+ * Specific test case class for integration test
+ * 
+ * This class has to be extended, its entry point is
+ * the "run" method: it launch the whole test case.
+ * This may help to implement integration test case.
+ * This class use the stateless IntegrationTestUtils
+ * 
+ * @author Rafik Said-Mansour (Trialog)
+ * @author Olivier Maridat (Trialog)
+ *
  */
-public interface ICssRegistry {
-
+public abstract class IntegrationTestCase {
 	/**
-	 * Description: This method provides the interface to add a new Css.
-	 * 				
-	 * @param cssDetails
-	 * @throws CssRegistrationException
+	 * Tools for integration test
 	 */
-	public CssInterfaceResult registerCss (CssRecord cssDetails) throws CssRegistrationException;
+	public IntegrationTestUtils integrationTestUtils;
+	/**
+	 * Number of the test case on Redmine
+	 */
+	public static int testCaseNumber;
+	/**
+	 * Test case classes to launch on Virgo for this integration test case
+	 */
+	public Class testCaseClasses[];
 	
 	/**
-	 * Description: This method permits you to unregister a css
-	 * @param cssDetails
-	 * @throws CssRegistrationException
+	 * This constructor has to be extended in order
+	 * to specify the test case number
+	 * and the array of test case classes to run
 	 */
-	public void unregisterCss (CssRecord cssDetails) throws CssRegistrationException;
-
+	public IntegrationTestCase() {
+		integrationTestUtils = new IntegrationTestUtils();
+	}
+	
+	
 	/**
-	 * Description: This method permits you to update the css Record
-	 * @param cssDetails
-	 * @throws CssRegistrationException
+	 * Run the test case
+	 * 
+	 * @param testCaseNumber Test case number
+	 * @param testCaseClasses Classes to run to manage the test case
+	 * @return result of the test case
 	 */
-	public void updateCssRecord(CssRecord cssDetails) throws CssRegistrationException; 
-		
-
-	/**
-	 * Description: Returns the css record details
-	 * @param none
-	 * @throws CssRegistrationException
-	 */
-	public CssRecord getCssRecord() throws CssRegistrationException; 
-
-	
-	List<CssRequest>  getCssFriendRequests()
-			throws CssRegistrationException;
-	
-	void updateCssFriendRequestRecord(CssRequest cssRequest)
-			throws CssRegistrationException ;
-	
-	List<CssRequest>  getCssRequests()
-			throws CssRegistrationException;
-	
-	void updateCssRequestRecord(CssRequest cssRequest)
-			throws CssRegistrationException;
-	
-	CssRequest  getCssFriendRequest(String friendId)
-			throws CssRegistrationException;
-	
-			
+	public Result run() {
+		return integrationTestUtils.run(testCaseNumber, testCaseClasses);
+	}
 }

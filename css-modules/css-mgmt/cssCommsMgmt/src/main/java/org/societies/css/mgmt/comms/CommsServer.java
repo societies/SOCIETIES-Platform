@@ -43,6 +43,8 @@ import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
 import org.societies.api.schema.cssmanagement.CssRecord;
+import org.societies.api.schema.cssmanagement.CssRequest;
+import org.societies.api.schema.cssmanagement.CssRequestStatusType;
 import org.societies.utilities.DBC.Dbc;
 
 public class CommsServer implements IFeatureServer {
@@ -149,7 +151,9 @@ public class CommsServer implements IFeatureServer {
 			case REGISTER_CSS_NODE:
 				asyncResult = this.cssManager.registerCSSNode((CssRecord) bean.getProfile());
 				break;
-			default:
+				
+				
+				default:
 				break;
 			}
 			
@@ -179,10 +183,43 @@ public class CommsServer implements IFeatureServer {
 
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
+		
+		if (payload instanceof CssManagerMessageBean) {
+			CssManagerMessageBean bean = (CssManagerMessageBean) payload;
+			
+			CssRequest request = new CssRequest();
+			
+			
+			switch (bean.getMethod())
+			{
+			case SEND_CSS_FRIEND_REQUEST:
+
+				request.setCssIdentity(stanza.getFrom().getJid());
+				request.setRequestStatus(CssRequestStatusType.PENDING);
+				
+				this.cssManager.updateCssRequest(request);
+				break;
+			case UPDATE_CSS_FRIEND_REQUEST:
+
+				request.setCssIdentity(stanza.getFrom().getJid());
+				request.setRequestStatus(bean.getRequestStatus());
+			//	request.setRequestStatus(bean.ge);
+				this.cssManager.updateCssFriendRequest(request);
+			break;
+			
+			
+				
+				
+			}
+			
+		}
+		
 	}
 
 	@Override
 	public Object setQuery(Stanza stanza, Object payload) throws XMPPError {
+		
+		
 		// TODO Auto-generated method stub
 		return null;
 	}

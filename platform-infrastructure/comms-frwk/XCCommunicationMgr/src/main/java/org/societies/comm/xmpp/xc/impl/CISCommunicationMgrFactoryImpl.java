@@ -12,6 +12,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.api.internal.comm.ICommManagerController;
 
 public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFactory {
 
@@ -46,7 +47,7 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 		XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), credentials);
 		commMgr.loginFromConfig();
 		if (commMgr.getIdManager()==null)
-			throw new CommunicationException("Unable to connect!");
+			throw new CommunicationException("Unable to create CISCommManager!");
 		cisCommManagers.put(cisIdentity, commMgr);
 		return commMgr;
 	}
@@ -76,5 +77,13 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public void destroyAllConnections() {
+		for (ICommManager cm : cisCommManagers.values()) {
+			if (cm instanceof ICommManagerController) {
+				((ICommManagerController)cm).logout();
+			}
+		}
 	}
 }
