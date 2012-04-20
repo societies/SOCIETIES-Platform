@@ -24,9 +24,12 @@
  */
 package org.societies.api.internal.css.cssRegistry;
 
+import java.util.List;
+
 import org.societies.api.internal.css.cssRegistry.exception.CssRegistrationException;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssRecord;
+import org.societies.api.schema.cssmanagement.CssRequest;
 
 
 
@@ -66,4 +69,20 @@ public interface ICssRegistry {
 	public CssRecord getCssRecord() throws CssRegistrationException; 
 
 	
+	List<CssRequest>  getCssFriendRequests()
+			throws CssRegistrationException;
+	
+	void updateCssFriendRequestRecord(CssRequest cssRequest)
+			throws CssRegistrationException ;
+	
+	List<CssRequest>  getCssRequests()
+			throws CssRegistrationException;
+	
+	void updateCssRequestRecord(CssRequest cssRequest)
+			throws CssRegistrationException;
+	
+	CssRequest  getCssFriendRequest(String friendId)
+			throws CssRegistrationException;
+	
+			
 }

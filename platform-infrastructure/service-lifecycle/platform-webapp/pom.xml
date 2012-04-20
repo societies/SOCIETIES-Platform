@@ -134,6 +134,22 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.societies.platform</groupId>
+	        <artifactId>socialdata</artifactId>
+	         <version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.shindig</groupId>
+			<artifactId>shindig-social-api</artifactId>
+			<version>3.0.0-beta4</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		
 		<!-- 
 		<dependency>
 			<groupId>org.societies.api.schema</groupId>

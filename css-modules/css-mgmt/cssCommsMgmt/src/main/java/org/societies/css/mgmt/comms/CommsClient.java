@@ -42,14 +42,15 @@ import org.societies.api.internal.css.management.ICSSManagerCallback;
 import org.societies.api.internal.css.management.ICSSRemoteManager;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssRecord;
+import org.societies.api.schema.cssmanagement.CssRequest;
 import org.societies.api.schema.cssmanagement.MethodType;
 import org.societies.utilities.DBC.Dbc;
-
+import org.societies.api.identity.INetworkNode;
 
 public class CommsClient implements ICommCallback, ICSSRemoteManager {
 	private final static String EXTERNAL_COMMUNICATION_MANAGER = "XCManager.societies.local";
 	private final static String XMPP_SERVER = "societies.local";
-	
+
 	private static Logger LOG = LoggerFactory.getLogger(CommsClient.class);
 
 	private ICommManager commManager;
@@ -60,6 +61,7 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 	 */
 	public CommsClient() {
 	}
+
 	/**
 	 * Used by Spring to initialise bean
 	 */
@@ -86,69 +88,79 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 		return toIdentity;
 
 	}
-	
+
 	// ICommCallback implementation
 	@Override
 	public List<String> getJavaPackages() {
-		Dbc.ensure("Message bean Java packages list must have at least one member ", CommsServer.MESSAGE_BEAN_PACKAGES != null && CommsServer.MESSAGE_BEAN_PACKAGES.size() > 0);
+		Dbc.ensure(
+				"Message bean Java packages list must have at least one member ",
+				CommsServer.MESSAGE_BEAN_PACKAGES != null
+						&& CommsServer.MESSAGE_BEAN_PACKAGES.size() > 0);
 		return CommsServer.MESSAGE_BEAN_PACKAGES;
 	}
 
 	@Override
 	public List<String> getXMLNamespaces() {
-		Dbc.ensure("Message bean namespaces list must have at least one member ", CommsServer.MESSAGE_BEAN_NAMESPACES != null && CommsServer.MESSAGE_BEAN_NAMESPACES.size() > 0);
+		Dbc.ensure(
+				"Message bean namespaces list must have at least one member ",
+				CommsServer.MESSAGE_BEAN_NAMESPACES != null
+						&& CommsServer.MESSAGE_BEAN_NAMESPACES.size() > 0);
 		return CommsServer.MESSAGE_BEAN_NAMESPACES;
 	}
 
 	@Override
 	public void receiveError(Stanza stanza, XMPPError exception) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void receiveInfo(Stanza stanza, String arg1, XMPPInfo exception) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void receiveItems(Stanza stanza, String arg1, List<String> list) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void receiveMessage(Stanza stanza, Object object) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void receiveResult(Stanza stanza, Object object) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
-	//Spring injection points
+
+	// Spring injection points
 	public ICommManager getCommManager() {
 		return commManager;
 	}
+
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
 	}
-	
-	//Remote interface methods
+
+	// Remote interface methods
 	@Override
-	public void changeCSSNodeStatus(CssRecord profile, ICSSManagerCallback callback) {
+	public void changeCSSNodeStatus(CssRecord profile,
+			ICSSManagerCallback callback) {
 		// TODO Auto-generated method stub
-		
+
 	}
+
 	@Override
 	public void getCssRecord(ICSSManagerCallback profile) {
 		// TODO Auto-generated method stub
-		
+
 	}
+
 	@Override
 	public void loginCSS(CssRecord profile, ICSSManagerCallback callback) {
 		LOG.debug("Remote call on loginCSS");
@@ -159,16 +171,21 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 		try {
 			toIdentity = getIdentity();
 			Stanza stanza = new Stanza(toIdentity);
-			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
-			
+			CommsClientCallback commsCallback = new CommsClientCallback(
+					stanza.getId(), callback);
+
 			CssManagerMessageBean messageBean = new CssManagerMessageBean();
 			messageBean.setProfile(profile);
 			messageBean.setMethod(MethodType.LOGIN_CSS);
-			LOG.debug("Message Bean profile identity: " + messageBean.getProfile().getCssIdentity());
-			LOG.debug("Message Bean profile password: " + messageBean.getProfile().getPassword());
-			
+			LOG.debug("Message Bean profile identity: "
+					+ messageBean.getProfile().getCssIdentity());
+			LOG.debug("Message Bean profile password: "
+					+ messageBean.getProfile().getPassword());
+
 			try {
-				LOG.debug("Sending stanza with CSS identity: " + profile.getCssIdentity() + " and password: " + profile.getPassword());
+				LOG.debug("Sending stanza with CSS identity: "
+						+ profile.getCssIdentity() + " and password: "
+						+ profile.getPassword());
 				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
 			} catch (CommunicationException e) {
 				// TODO Auto-generated catch block
@@ -179,7 +196,7 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			e1.printStackTrace();
 		}
 	}
-		
+
 	@Override
 	public void loginXMPPServer(CssRecord profile, ICSSManagerCallback callback) {
 		LOG.debug("Remote call on loginXMPPServer");
@@ -188,12 +205,13 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 		try {
 			toIdentity = getIdentity();
 			Stanza stanza = new Stanza(toIdentity);
-			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
-			
+			CommsClientCallback commsCallback = new CommsClientCallback(
+					stanza.getId(), callback);
+
 			CssManagerMessageBean messageBean = new CssManagerMessageBean();
 			messageBean.setProfile(profile);
 			messageBean.setMethod(MethodType.LOGIN_XMPP_SERVER);
-			
+
 			try {
 				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
 			} catch (CommunicationException e) {
@@ -205,6 +223,7 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			e1.printStackTrace();
 		}
 	}
+
 	@Override
 	public void logoutCSS(CssRecord profile, ICSSManagerCallback callback) {
 		LOG.debug("Remote call on logoutCSS");
@@ -213,12 +232,13 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 		try {
 			toIdentity = getIdentity();
 			Stanza stanza = new Stanza(toIdentity);
-			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
-			
+			CommsClientCallback commsCallback = new CommsClientCallback(
+					stanza.getId(), callback);
+
 			CssManagerMessageBean messageBean = new CssManagerMessageBean();
 			messageBean.setProfile(profile);
 			messageBean.setMethod(MethodType.LOGOUT_CSS);
-			
+
 			try {
 				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
 			} catch (CommunicationException e) {
@@ -230,6 +250,7 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			e1.printStackTrace();
 		}
 	}
+
 	@Override
 	public void logoutXMPPServer(CssRecord profile, ICSSManagerCallback callback) {
 		LOG.debug("Remote call on logoutXMPPServer");
@@ -238,12 +259,13 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 		try {
 			toIdentity = getIdentity();
 			Stanza stanza = new Stanza(toIdentity);
-			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
-			
+			CommsClientCallback commsCallback = new CommsClientCallback(
+					stanza.getId(), callback);
+
 			CssManagerMessageBean messageBean = new CssManagerMessageBean();
 			messageBean.setProfile(profile);
 			messageBean.setMethod(MethodType.LOGOUT_XMPP_SERVER);
-			
+
 			try {
 				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
 			} catch (CommunicationException e) {
@@ -255,6 +277,7 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			e1.printStackTrace();
 		}
 	}
+
 	@Override
 	public void modifyCssRecord(CssRecord profile, ICSSManagerCallback callback) {
 		LOG.debug("Remote call on modifyCssRecord");
@@ -263,12 +286,13 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 		try {
 			toIdentity = getIdentity();
 			Stanza stanza = new Stanza(toIdentity);
-			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
-			
+			CommsClientCallback commsCallback = new CommsClientCallback(
+					stanza.getId(), callback);
+
 			CssManagerMessageBean messageBean = new CssManagerMessageBean();
 			messageBean.setProfile(profile);
 			messageBean.setMethod(MethodType.MODIFY_CSS_RECORD);
-			
+
 			try {
 				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
 			} catch (CommunicationException e) {
@@ -280,6 +304,7 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			e1.printStackTrace();
 		}
 	}
+
 	@Override
 	public void registerCSS(CssRecord profile, ICSSManagerCallback callback) {
 		LOG.debug("Remote call on registerCSS");
@@ -288,12 +313,13 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 		try {
 			toIdentity = getIdentity();
 			Stanza stanza = new Stanza(toIdentity);
-			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
-			
+			CommsClientCallback commsCallback = new CommsClientCallback(
+					stanza.getId(), callback);
+
 			CssManagerMessageBean messageBean = new CssManagerMessageBean();
 			messageBean.setProfile(profile);
 			messageBean.setMethod(MethodType.REGISTER_CSS);
-			
+
 			try {
 				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
 			} catch (CommunicationException e) {
@@ -305,6 +331,7 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			e1.printStackTrace();
 		}
 	}
+
 	@Override
 	public void registerCSSNode(CssRecord profile, ICSSManagerCallback callback) {
 		LOG.debug("Remote call on registerCSSNode");
@@ -313,12 +340,13 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 		try {
 			toIdentity = getIdentity();
 			Stanza stanza = new Stanza(toIdentity);
-			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
-			
+			CommsClientCallback commsCallback = new CommsClientCallback(
+					stanza.getId(), callback);
+
 			CssManagerMessageBean messageBean = new CssManagerMessageBean();
 			messageBean.setProfile(profile);
 			messageBean.setMethod(MethodType.REGISTER_CSS_NODE);
-			
+
 			try {
 				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
 			} catch (CommunicationException e) {
@@ -330,20 +358,23 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			e1.printStackTrace();
 		}
 	}
+
 	@Override
-	public void registerXMPPServer(CssRecord profile, ICSSManagerCallback callback) {
+	public void registerXMPPServer(CssRecord profile,
+			ICSSManagerCallback callback) {
 		LOG.debug("Remote call on registerXMPPServer");
 
 		IIdentity toIdentity;
 		try {
 			toIdentity = getIdentity();
 			Stanza stanza = new Stanza(toIdentity);
-			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
-			
+			CommsClientCallback commsCallback = new CommsClientCallback(
+					stanza.getId(), callback);
+
 			CssManagerMessageBean messageBean = new CssManagerMessageBean();
 			messageBean.setProfile(profile);
 			messageBean.setMethod(MethodType.REGISTER_XMPP_SERVER);
-			
+
 			try {
 				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
 			} catch (CommunicationException e) {
@@ -355,21 +386,23 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			e1.printStackTrace();
 		}
 	}
-	
+
 	@Override
-	public void setPresenceStatus(CssRecord profile, ICSSManagerCallback callback) {
+	public void setPresenceStatus(CssRecord profile,
+			ICSSManagerCallback callback) {
 		LOG.debug("Remote call on setPresenceStatus");
 
 		IIdentity toIdentity;
 		try {
 			toIdentity = getIdentity();
 			Stanza stanza = new Stanza(toIdentity);
-			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
-			
+			CommsClientCallback commsCallback = new CommsClientCallback(
+					stanza.getId(), callback);
+
 			CssManagerMessageBean messageBean = new CssManagerMessageBean();
 			messageBean.setProfile(profile);
 			messageBean.setMethod(MethodType.SET_PRESENCE_STATUS);
-			
+
 			try {
 				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
 			} catch (CommunicationException e) {
@@ -381,6 +414,7 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			e1.printStackTrace();
 		}
 	}
+
 	@Override
 	public void synchProfile(CssRecord profile, ICSSManagerCallback callback) {
 		LOG.debug("Remote call on synchProfile");
@@ -389,12 +423,13 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 		try {
 			toIdentity = getIdentity();
 			Stanza stanza = new Stanza(toIdentity);
-			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
-			
+			CommsClientCallback commsCallback = new CommsClientCallback(
+					stanza.getId(), callback);
+
 			CssManagerMessageBean messageBean = new CssManagerMessageBean();
 			messageBean.setProfile(profile);
 			messageBean.setMethod(MethodType.SYNCH_PROFILE);
-			
+
 			try {
 				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
 			} catch (CommunicationException e) {
@@ -406,7 +441,7 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			e1.printStackTrace();
 		}
 	}
-		
+
 	@Override
 	public void unregisterCSS(CssRecord profile, ICSSManagerCallback callback) {
 		LOG.debug("Remote call on unregisterCSS");
@@ -415,12 +450,13 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 		try {
 			toIdentity = getIdentity();
 			Stanza stanza = new Stanza(toIdentity);
-			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
-			
+			CommsClientCallback commsCallback = new CommsClientCallback(
+					stanza.getId(), callback);
+
 			CssManagerMessageBean messageBean = new CssManagerMessageBean();
 			messageBean.setProfile(profile);
 			messageBean.setMethod(MethodType.UNREGISTER_CSS);
-			
+
 			try {
 				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
 			} catch (CommunicationException e) {
@@ -432,20 +468,23 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			e1.printStackTrace();
 		}
 	}
+
 	@Override
-	public void unregisterCSSNode(CssRecord profile, ICSSManagerCallback callback) {
+	public void unregisterCSSNode(CssRecord profile,
+			ICSSManagerCallback callback) {
 		LOG.debug("Remote call on unregisterCSSNode");
 
 		IIdentity toIdentity;
 		try {
 			toIdentity = getIdentity();
 			Stanza stanza = new Stanza(toIdentity);
-			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
-			
+			CommsClientCallback commsCallback = new CommsClientCallback(
+					stanza.getId(), callback);
+
 			CssManagerMessageBean messageBean = new CssManagerMessageBean();
 			messageBean.setProfile(profile);
 			messageBean.setMethod(MethodType.UNREGISTER_CSS_NODE);
-			
+
 			try {
 				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
 			} catch (CommunicationException e) {
@@ -457,20 +496,23 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			e1.printStackTrace();
 		}
 	}
+
 	@Override
-	public void unregisterXMPPServer(CssRecord profile, ICSSManagerCallback callback) {
+	public void unregisterXMPPServer(CssRecord profile,
+			ICSSManagerCallback callback) {
 		LOG.debug("Remote call on unregisterXMPPServer");
 
 		IIdentity toIdentity;
 		try {
 			toIdentity = getIdentity();
 			Stanza stanza = new Stanza(toIdentity);
-			CommsClientCallback commsCallback = new CommsClientCallback(stanza.getId(), callback);
-			
+			CommsClientCallback commsCallback = new CommsClientCallback(
+					stanza.getId(), callback);
+
 			CssManagerMessageBean messageBean = new CssManagerMessageBean();
 			messageBean.setProfile(profile);
 			messageBean.setMethod(MethodType.UNREGISTER_XMPP_SERVER);
-			
+
 			try {
 				this.commManager.sendIQGet(stanza, messageBean, commsCallback);
 			} catch (CommunicationException e) {
@@ -483,4 +525,59 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 		}
 	}
 
+	// @Override
+	public void sendCssFriendRequest(String cssFriendId) {
+
+		LOG.debug("Remote call on sendCssFriendRequest");
+
+		try {
+
+			Stanza stanza = new Stanza(commManager.getIdManager().fromJid(
+					cssFriendId));
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+
+			messageBean.setMethod(MethodType.SEND_CSS_FRIEND_REQUEST);
+
+			try {
+				this.commManager.sendMessage(stanza, messageBean);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.css.management.ICSSRemoteManager#updateCssFriendRequest(org.societies.api.schema.cssmanagement.CssRequest)
+	 */
+	@Override
+	public void updateCssFriendRequest(CssRequest request) {
+		// TODO Auto-generated method stub
+		LOG.debug("Remote call on sendCssFriendRequest");
+
+		try {
+
+			Stanza stanza = new Stanza(commManager.getIdManager().fromJid(
+					request.getCssIdentity()));
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+
+			messageBean.setMethod(MethodType.UPDATE_CSS_FRIEND_REQUEST);
+			messageBean.setRequestStatus(request.getRequestStatus());
+
+			try {
+				this.commManager.sendMessage(stanza, messageBean);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+	}
 }
