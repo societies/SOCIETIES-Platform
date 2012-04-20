@@ -59,6 +59,9 @@ public class ContextCommunicator {
 		//check cache first for ctxAttrIdentifier to update
 		String key = action.getServiceID()+"|"+action.getparameterName();
 		if(mappings.containsKey(key)){  //already has service attribute
+			//confirm snapshot -> check that it is complete, if not then update
+			snpshotMgr.confirmSnapshot(key);
+			//update attribute
 			CtxAttributeIdentifier attrID = mappings.get(key);
 			try {
 				ctxBroker.updateAttribute(attrID, action.getvalue());
@@ -89,7 +92,7 @@ public class ContextCommunicator {
 						Future<CtxAttribute> futureAttribute = ctxBroker.createAttribute(entityId, action.getparameterName());
 						CtxAttribute newAttribute = futureAttribute.get();
 						//set history tuples
-						ctxBroker.setHistoryTuples(newAttribute.getId(), snpshtMgr.get); //add list of context snapshot IDs
+						ctxBroker.setHistoryTuples(newAttribute.getId(), null); //add list of context snapshot IDs
 						//set as recorded
 						//populate attribute with action value
 						ctxBroker.updateAttribute(newAttribute.getId(), action.getvalue());
