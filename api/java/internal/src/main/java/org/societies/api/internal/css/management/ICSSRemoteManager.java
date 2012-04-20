@@ -26,6 +26,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 package org.societies.api.internal.css.management;
 
 import org.societies.api.schema.cssmanagement.CssRecord;
+import org.societies.api.schema.cssmanagement.CssRequest;
 
 
 
@@ -166,4 +167,11 @@ public interface ICSSRemoteManager {
 	 * @param callback
 	 */
 	 void setPresenceStatus(CssRecord profile, ICSSManagerCallback callback);
+	 
+
+		/* send a request to remote css to join  */
+		void sendCssFriendRequest(String friendCssId);
+		/* Called by remote css is response t your request to join*/
+		void updateCssFriendRequest(CssRequest request);
+		
 }

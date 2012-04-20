@@ -7,11 +7,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.shindig.social.core.model.ActivityObjectImpl;
 import org.apache.shindig.social.core.model.AddressImpl;
 import org.apache.shindig.social.core.model.ListFieldImpl;
 import org.apache.shindig.social.core.model.NameImpl;
 import org.apache.shindig.social.core.model.PersonImpl;
 import org.apache.shindig.social.opensocial.model.Account;
+import org.apache.shindig.social.opensocial.model.ActivityObject;
 import org.apache.shindig.social.opensocial.model.Address;
 import org.apache.shindig.social.opensocial.model.ListField;
 import org.apache.shindig.social.opensocial.model.Name;
@@ -66,10 +68,17 @@ public class PersonConverterFromFacebook implements PersonConverter{
 		person = new PersonImpl();
 		this.rawData = data;
 		
+		ActivityObject providerObj = new ActivityObjectImpl();
+		providerObj.setContent("facebook");
+		providerObj.setUrl("www.facebook.com");
+		providerObj.setId("facebook");
+		providerObj.setDisplayName("Facebook");
+		
 		try{
 			
 			db = new JSONObject(this.rawData);
-			person.setId(db.getString(ID));
+			person.setId("facebook:"+db.getString(ID));
+
 			
 			//if(db.has(UCT)) person.setUtcOffset(db.getLong(UCT));
 			if (db.has(BIO))		 	person.setAboutMe(db.getString(BIO));

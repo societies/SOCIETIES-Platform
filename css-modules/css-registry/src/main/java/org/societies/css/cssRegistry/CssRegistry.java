@@ -25,21 +25,30 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.css.cssRegistry;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Example;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.societies.api.internal.css.cssRegistry.ICssRegistry;
 import org.societies.api.internal.css.cssRegistry.exception.CssRegistrationException;
+
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
+import org.societies.api.schema.cssmanagement.CssRequest;
+import org.societies.css.cssRegistry.model.CssFriendEntry;
 import org.societies.css.cssRegistry.model.CssNodeEntry;
 import org.societies.css.cssRegistry.model.CssRegistryEntry;
+import org.societies.css.cssRegistry.model.CssRequestEntry;
+import org.societies.api.schema.cssmanagement.CssRequestStatusType;
+
 
 public class CssRegistry implements ICssRegistry {
 	private SessionFactory sessionFactory;
@@ -208,7 +217,8 @@ public class CssRegistry implements ICssRegistry {
 		Transaction t = session.beginTransaction();
 		try {
 
-			List<CssRegistryEntry> tmpRegistryEntryList = session.createCriteria(CssRegistryEntry.class).list();
+			List<CssRegistryEntry> tmpRegistryEntryList = session
+					.createCriteria(CssRegistryEntry.class).list();
 
 			cssDetails.setDomainServer(tmpRegistryEntryList.get(0)
 					.getDomainServer());
@@ -349,4 +359,265 @@ public class CssRegistry implements ICssRegistry {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.societies.api.internal.css.cssRegistry.ICssRegistry#registerCss(org
+	 * .societies.api.internal.css.management.CSSRecord)
+	 */
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public void updateCssRequestRecord(CssRequest cssRequest)
+			throws CssRegistrationException {
+
+		Session session = sessionFactory.openSession();
+		CssRequestEntry filterRegistryEntry = new CssRequestEntry();
+
+		Transaction t = session.beginTransaction();
+		try {
+
+			filterRegistryEntry.setCssIdentity(cssRequest.getCssIdentity());
+
+			List<CssRequestEntry> tmpRegistryEntryList = sessionFactory
+					.openSession().createCriteria(CssRequestEntry.class)
+					.add(Example.create(filterRegistryEntry).enableLike())
+					.list();
+			if (tmpRegistryEntryList != null) {
+				for (CssRequestEntry tmpEn : tmpRegistryEntryList) {
+					session.delete(tmpEn);
+				}
+			}
+
+			filterRegistryEntry.setRequestStatus(cssRequest.getRequestStatus()
+					.value());
+
+			session.save(filterRegistryEntry);
+
+			t.commit();
+		} catch (Exception e) {
+			t.rollback();
+			e.printStackTrace();
+			throw new CssRegistrationException(e);
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+
+	}
+
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.societies.api.internal.css.cssRegistry.ICssRegistry#registerCss(org
+	 * .societies.api.internal.css.management.CSSRecord)
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<CssRequest>  getCssRequests()
+			throws CssRegistrationException {
+
+		Session session = sessionFactory.openSession();
+		CssRequest registryEntry = null;
+		List<CssRequest> requestList = new ArrayList<CssRequest>();
+
+
+		try {
+
+			List<CssRequestEntry> tmpRegistryEntryList = sessionFactory
+					.openSession().createCriteria(CssRequestEntry.class)
+					.list();
+			if (tmpRegistryEntryList != null) {
+				for (CssRequestEntry tmpEn : tmpRegistryEntryList) {
+					registryEntry = new CssRequest();
+					
+					registryEntry.setCssIdentity(tmpEn.getCssIdentity());
+					
+					registryEntry.setRequestStatus(CssRequestStatusType.valueOf(tmpEn.getRequestStatus()));
+					requestList.add(registryEntry);
+
+					
+
+				}
+			}
+
+
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			throw new CssRegistrationException(e);
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		
+		return requestList;
+
+	}
+
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.societies.api.internal.css.cssRegistry.ICssRegistry#registerCss(org
+	 * .societies.api.internal.css.management.CSSRecord)
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public void updateCssFriendRequestRecord(CssRequest cssRequest)
+			throws CssRegistrationException {
+
+		Session session = sessionFactory.openSession();
+		CssFriendEntry filterRegistryEntry = new CssFriendEntry();
+
+		Transaction t = session.beginTransaction();
+		try {
+
+			filterRegistryEntry.setFriendIdentity(cssRequest.getCssIdentity());
+
+			List<CssRequestEntry> tmpRegistryEntryList = sessionFactory
+					.openSession().createCriteria(CssRequestEntry.class)
+					.add(Example.create(filterRegistryEntry).enableLike())
+					.list();
+			if (tmpRegistryEntryList != null) {
+				for (CssRequestEntry tmpEn : tmpRegistryEntryList) {
+					session.delete(tmpEn);
+				}
+			}
+
+			filterRegistryEntry.setRequestStatus(cssRequest.getRequestStatus()
+					.value());
+
+			session.save(filterRegistryEntry);
+
+			t.commit();
+		} catch (Exception e) {
+			t.rollback();
+			e.printStackTrace();
+			throw new CssRegistrationException(e);
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+
+	}
+
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.societies.api.internal.css.cssRegistry.ICssRegistry#registerCss(org
+	 * .societies.api.internal.css.management.CSSRecord)
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<CssRequest>  getCssFriendRequests()
+			throws CssRegistrationException {
+
+		Session session = sessionFactory.openSession();
+		CssRequest registryEntry = null;
+		List<CssRequest> requestList = new ArrayList<CssRequest>();
+
+
+		try {
+
+			List<CssFriendEntry> tmpRegistryEntryList = sessionFactory
+					.openSession().createCriteria(CssFriendEntry.class)
+					.list();
+			if (tmpRegistryEntryList != null) {
+				for (CssFriendEntry tmpEn : tmpRegistryEntryList) {
+					registryEntry = new CssRequest();
+					
+					registryEntry.setCssIdentity(tmpEn.getFriendIdentity());
+					
+					registryEntry.setRequestStatus(CssRequestStatusType.valueOf(tmpEn.getRequestStatus()));
+					requestList.add(registryEntry);
+
+					
+
+				}
+			}
+
+
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			throw new CssRegistrationException(e);
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		
+		return requestList;
+
+	}
+	
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.societies.api.internal.css.cssRegistry.ICssRegistry#registerCss(org
+	 * .societies.api.internal.css.management.CSSRecord)
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public CssRequest  getCssFriendRequest(String cssFriendId)
+			throws CssRegistrationException {
+
+		Session session = sessionFactory.openSession();
+		CssRequest registryEntry = new CssRequest();
+		CssFriendEntry filterRegistryEntry = new CssFriendEntry();
+		registryEntry.setCssIdentity(cssFriendId);
+		registryEntry.setRequestStatus(CssRequestStatusType.NOTREQUESTED); // default value
+
+
+		try {
+
+			List<CssFriendEntry> tmpRegistryEntryList = session
+					.createCriteria(CssFriendEntry.class)
+					.add(Restrictions.eq("friendIdentity", cssFriendId)).list();
+			
+		
+
+			if (tmpRegistryEntryList != null && tmpRegistryEntryList.size() > 0)
+			{
+				registryEntry.setRequestStatus(CssRequestStatusType.valueOf(tmpRegistryEntryList.get(0).getRequestStatus()));
+
+			}
+
+
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			throw new CssRegistrationException(e);
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		
+		return registryEntry;
+
+	}
+
+	
+	
+	
+	
+
+	
+	
 }

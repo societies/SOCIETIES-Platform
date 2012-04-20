@@ -57,6 +57,7 @@ public class SocialData implements ISocialData{
 		
 	
 		connectors.put(socialConnector.getID(), socialConnector);
+
 		log("Add connector "+socialConnector.getID());
 	}
 	
@@ -232,18 +233,24 @@ public class SocialData implements ISocialData{
 
 	@Override
 	public ISocialConnector createConnector(String snName, Map<String, String> params) {
+		System.out.println("Create a new connector");
 		
-		if (ISocialConnector.FACEBOOK_CONN.equals(snName)){
-			return (ISocialConnector) new FacebookConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), "");
-		}
-		else if (ISocialConnector.TWITTER_CONN.equals(snName)){
-			
-		}
-		else if (ISocialConnector.FOURSQUARE_CONN.equals(snName)){
-			
-		}
+//		if (ISocialConnector.FACEBOOK_CONN.equals(snName)){
+//			return (ISocialConnector) new FacebookConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), "");
+//		}
+//		else if (ISocialConnector.TWITTER_CONN.equals(snName)){
+//			
+//		}
+//		else if (ISocialConnector.FOURSQUARE_CONN.equals(snName)){
+//			
+//		}
 		
-		return null;
+		System.out.println("token:"+params.get(ISocialConnector.AUTH_TOKEN));
+	
+		String auth_token = params.get(ISocialConnector.AUTH_TOKEN);
+		String identity   ="";
+		
+		return (ISocialConnector) new FacebookConnectorImpl(auth_token, identity);
 	}
  
 	

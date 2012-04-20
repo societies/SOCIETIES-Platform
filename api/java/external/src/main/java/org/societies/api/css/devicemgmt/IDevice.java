@@ -27,11 +27,15 @@ package org.societies.api.css.devicemgmt;
 
 import java.util.List;
 
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
 /**
  * Interface used to expose a device as an OSGI Service, this interface will be used by a device consumer to get device metadata and to get device services
  * @author Rafik (Trialog)
  *
  */
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface IDevice {
 
 	/**
