@@ -22,41 +22,32 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
+package org.societies.api.identity;
 
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
-
-
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
- * This class is used to define the level of obfuscation that has to be applied to
- * a context attribute before being disclosed to an external entity.
- * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 17:06:54
+ * This class is used to represent a Service (provided by a CSS) requesting access to resources.
+ *
+ * @author Olivier, Eliza, Nicolas 
+ *
  */
-public class DObfOutcome implements IPrivacyOutcome, IDObfAction {
+public class RequestorService extends Requestor{
 
-	private double obfuscationLevel;
-
-	public DObfOutcome(double obfuscationLevel){
-		this.obfuscationLevel = obfuscationLevel;
+	private final ServiceResourceIdentifier requestorServiceId;
+	
+	public RequestorService(IIdentity requestorId, ServiceResourceIdentifier requestorServiceId) {
+		super(requestorId);
+		this.requestorServiceId = requestorServiceId;
+		// TODO Auto-generated constructor stub
 	}
 
-	public void finalize() throws Throwable {
-
+	/**
+	 * @return the requestorServiceId
+	 */
+	public ServiceResourceIdentifier getRequestorServiceId() {
+		return requestorServiceId;
 	}
 
-	public int getConfidenceLevel(){
-		return 0;
-	}
-
-	public PrivacyPreferenceTypeConstants getOutcomeType(){
-		return PrivacyPreferenceTypeConstants.DOBF;
-	}
-
-	public double getObfuscationLevel(){
-		return obfuscationLevel;
-	}
-
+	
 }

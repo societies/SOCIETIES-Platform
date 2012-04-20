@@ -22,41 +22,30 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
-
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
-
-
+package org.societies.api.identity;
 
 /**
- * This class is used to define the level of obfuscation that has to be applied to
- * a context attribute before being disclosed to an external entity.
- * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 17:06:54
+ * This class is used to represent a CSS requesting resources 
+ *
+ * @author Eliza, Nicolas, Olivier
+ *
  */
-public class DObfOutcome implements IPrivacyOutcome, IDObfAction {
+public class Requestor {
 
-	private double obfuscationLevel;
+	private final IIdentity requestorId;
 
-	public DObfOutcome(double obfuscationLevel){
-		this.obfuscationLevel = obfuscationLevel;
+	public Requestor(IIdentity requestorId){
+		this.requestorId = requestorId;
+		
+	}
+	/**
+	 * @return the requestorId
+	 */
+	public IIdentity getRequestorId() {
+		return requestorId;
 	}
 
-	public void finalize() throws Throwable {
 
-	}
-
-	public int getConfidenceLevel(){
-		return 0;
-	}
-
-	public PrivacyPreferenceTypeConstants getOutcomeType(){
-		return PrivacyPreferenceTypeConstants.DOBF;
-	}
-
-	public double getObfuscationLevel(){
-		return obfuscationLevel;
-	}
-
+	
+	
 }
