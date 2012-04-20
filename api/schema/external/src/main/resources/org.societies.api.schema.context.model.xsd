@@ -80,7 +80,7 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="ctxAssociation">
+  <xs:complexType name="ctxAssociationBean">
     <xs:complexContent>
       <xs:extension base="tns:ctxModelObjectBean">
         <xs:sequence>

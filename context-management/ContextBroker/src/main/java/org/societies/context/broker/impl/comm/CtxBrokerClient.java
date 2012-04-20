@@ -260,16 +260,9 @@ public class CtxBrokerClient implements ICommCallback {
 		ctxBrokerRemoveBean.setRequester("FOO");
 		
 		//create the bean
-		CtxIdentifierBean ctxIdBean = null;
-		if (identifier.getModelType().equals(CtxModelType.ENTITY)) {
-			ctxIdBean = new CtxEntityIdentifierBean();
-		}
-		else if (identifier.getModelType().equals(CtxModelType.ATTRIBUTE)) {
-			ctxIdBean = new CtxAttributeIdentifierBean();
-		}
-		else if (identifier.getModelType().equals(CtxModelType.ASSOCIATION)) {
-			ctxIdBean = new CtxAssociationIdentifierBean();
-		}
+		CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+		// add the signatures of the method
+		CtxIdentifierBean ctxIdBean=ctxBeanTranslator.fromCtxIdentifier(identifier);
 		
 		ctxIdBean.setString(identifier.toString());
 		ctxBrokerRemoveBean.setId(ctxIdBean);
@@ -400,17 +393,9 @@ public class CtxBrokerClient implements ICommCallback {
 		CtxBrokerBean cbPacket = new CtxBrokerBean();
 		// use the method : retrieve
 		CtxBrokerRetrieveBean ctxBrokerRetrieveBean = new CtxBrokerRetrieveBean();
+		CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
 		// add the signatures of the method
-		CtxIdentifierBean ctxIdBean=null;
-		if (identifier.getModelType().equals(CtxModelType.ENTITY)) {
-			ctxIdBean = new CtxEntityIdentifierBean();
-		}
-		else if (identifier.getModelType().equals(CtxModelType.ATTRIBUTE)) {
-			ctxIdBean = new CtxAttributeIdentifierBean();
-		}
-		else if (identifier.getModelType().equals(CtxModelType.ASSOCIATION)) {
-			ctxIdBean = new CtxAssociationIdentifierBean();
-		}
+		CtxIdentifierBean ctxIdBean=ctxBeanTranslator.fromCtxIdentifier(identifier);
 		
 		ctxIdBean.setString(identifier.toString());
 		ctxBrokerRetrieveBean.setId(ctxIdBean);
@@ -448,17 +433,9 @@ public class CtxBrokerClient implements ICommCallback {
 		CtxBrokerBean cbPacket = new CtxBrokerBean();
 		// use the method : lookup
 		CtxBrokerLookupBean ctxBrokerLookupBean = new CtxBrokerLookupBean();
-		
-		//TODO use translator
-		
+		CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
 		// add the signatures of the method
-		if (modelType.equals(CtxModelType.ENTITY))
-			ctxBrokerLookupBean.setModelType(CtxModelTypeBean.ENTITY);
-		else if (modelType.equals(CtxModelType.ASSOCIATION))
-			ctxBrokerLookupBean.setModelType(CtxModelTypeBean.ASSOCIATION);
-		else if (modelType.equals(CtxModelType.ATTRIBUTE))
-			ctxBrokerLookupBean.setModelType(CtxModelTypeBean.ATTRIBUTE);
-		
+		ctxBrokerLookupBean.setModelType(ctxBeanTranslator.CtxModelTypeBeanFromCtxModelType(modelType));
 		ctxBrokerLookupBean.setType(type);
 		ctxBrokerLookupBean.setRequester("FOO");
 		cbPacket.setLookup(ctxBrokerLookupBean);
