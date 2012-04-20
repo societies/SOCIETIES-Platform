@@ -16,6 +16,7 @@
 		<property name="persoMgr" ref="persoMgr"></property>
 		<property name="ctxBroker" ref="ctxBroker"></property>
 		<property name="eventMgr" ref="eventMgmtRef"></property>
+		<property name="userPrefLearning" ref="userPrefLearning"></property>
 	</bean>
 
 	<bean id="cauiTaskManager"

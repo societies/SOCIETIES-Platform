@@ -47,6 +47,7 @@ import org.societies.personalisation.UserPreferenceManagement.impl.evaluation.Pr
 import org.societies.personalisation.UserPreferenceManagement.impl.evaluation.PreferenceEvaluator;
 import org.societies.personalisation.UserPreferenceManagement.impl.evaluation.PrivateContextCache;
 import org.societies.personalisation.UserPreferenceManagement.impl.management.PrivatePreferenceCache;
+import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Learning;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceConditionIOutcomeName;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
@@ -63,7 +64,6 @@ public class UserPreferenceManagement{
 	private Hashtable<IPreferenceOutcome, List<CtxIdentifier>> outcomeConditionListTable; 
 	private ICtxBroker broker;	
 	private IIdentity userId; 
-	private IEventMgr eventMgr;
 	
 	public UserPreferenceManagement(IIdentity userId, ICtxBroker broker){
 		this.userId = userId;
@@ -369,11 +369,7 @@ public class UserPreferenceManagement{
 		return this.preferenceCache.getPreference(details);
 	}
 
-	public IEventMgr getEventMgr() {
-		return eventMgr;
-	}
 
-	public void setEventMgr(IEventMgr eventMgr) {
-		this.eventMgr = eventMgr;
-	}
+
+
 }

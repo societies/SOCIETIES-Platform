@@ -35,6 +35,6 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
  */
 public interface IDObfAction {
 
-	public int getObfuscationLevel();
+	public double getObfuscationLevel();
 
 }

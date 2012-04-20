@@ -28,6 +28,7 @@ package org.societies.privacytrust.privacyprotection.api;
 import java.util.List;
 
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
@@ -36,6 +37,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceTreeModel;
 
@@ -163,6 +165,24 @@ public interface IPrivacyPreferenceManager {
 	 */
 	public IIdentity evaluateIdSPreference(ServiceResourceIdentifier service_id);
 
+	
+	
+	/**
+	 * 
+	 * @param contextType
+	 * @return
+	 */
+	public DObfOutcome evaluateDObfPreference(IIdentity requestor, IIdentity owner, ServiceResourceIdentifier serviceID, IIdentity cisID, String contextType);
+	
+	/**
+	 * 
+	 * @param contextID
+	 * @return
+	 */
+	public DObfOutcome evaluateDObfOutcome(CtxIdentifier contextID);
+	
+	
+	
 	/**
 	 * Method to retrieve the list of IDSPreferences that affect the given DPI and
 	 * service provider
