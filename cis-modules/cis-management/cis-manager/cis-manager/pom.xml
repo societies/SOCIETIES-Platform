@@ -129,10 +129,8 @@
 							*;resolution:=optional</Import-Package>
 						<Export-Package>
 							org.societies.api.schema.cis.community,
-							org.societies.cis.manager.CisManager,
-							org.societies.cis.manager.CisEditor,
 							org.societies.api.schema.cis.manager
-						</Export-Package>
+						</Export-Package> 
 					</instructions>
 				</configuration>
 			</plugin>

@@ -16,6 +16,6 @@
 	<osgi:reference id="cisCommMgrFactory" interface="org.societies.api.internal.comm.ICISCommunicationMgrFactory"/>
 	<osgi:reference id="xcCommunication" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
 
-	<osgi:service ref="CisManagementBundle" interface="org.societies.api.cis.management.ICisManager"/>
+  	<osgi:service ref="CisManagementBundle" interface="org.societies.api.cis.management.ICisManager"/>
 	
 </beans>
