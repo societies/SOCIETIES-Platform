@@ -81,8 +81,11 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 	
 	public void destroyAllConnections() {
 		for (ICommManager cm : cisCommManagers.values()) {
-			if (cm instanceof ICommManagerController) {
+			LOG.info("Disconnecting CIS '"+cm.getIdManager().getThisNetworkNode().getJid()+"'");
+			try {
 				((ICommManagerController)cm).logout();
+			} catch (ClassCastException e) {
+				LOG.error("ICommManager cannot be casted to ICommManagerController!!!", e);
 			}
 		}
 	}
