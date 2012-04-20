@@ -26,9 +26,10 @@ package org.societies.context.api.community.estimation;
 
 import java.util.List;
 
-import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.context.api.community.estimation.EstimationModels;
 
 /**
  * @author yboul
@@ -51,7 +52,7 @@ public interface ICommunityCtxEstimationMgr {
 	 * @param list
 	 * @since 0.0.1
 	 */
-	public void retrieveCurrentCisContext(boolean Current, EntityIdentifier communityID, List<CtxAttribute> list);
+	public void retrieveCurrentCisContext(boolean Current, CtxEntityIdentifier communityID, List<CtxAttribute> list);
 
 	/**
 	 * 
@@ -60,7 +61,7 @@ public interface ICommunityCtxEstimationMgr {
 	 * @param list
 	 * @since 0.0.1
 	 */
-	public void retrieveHistoryCisContext(boolean Current, EntityIdentifier communityID, List<CtxAttribute> list);
+	public void retrieveHistoryCisContext(boolean Current, CtxEntityIdentifier communityID, List<CtxAttribute> list);
 
 	/**
 	 * 

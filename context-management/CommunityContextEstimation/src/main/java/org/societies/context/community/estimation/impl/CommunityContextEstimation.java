@@ -40,7 +40,8 @@ import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
-import org.societies.api.mock.EntityIdentifier;
+//import org.societies.api.mock.EntityIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.context.api.community.estimation.EstimationModels;
 import org.societies.context.api.community.estimation.ICommunityCtxEstimationMgr;
 import org.societies.context.broker.impl.InternalCtxBroker;
@@ -81,13 +82,13 @@ public class CommunityContextEstimation<communityMembers> implements ICommunityC
 	
 
 	@Override
-	public void retrieveCurrentCisContext(boolean Current, EntityIdentifier communityID, List<CtxAttribute> list) {
+	public void retrieveCurrentCisContext(boolean Current, CtxEntityIdentifier communityID, List<CtxAttribute> list) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void retrieveHistoryCisContext(boolean Current, EntityIdentifier communityID, List<CtxAttribute> list) {
+	public void retrieveHistoryCisContext(boolean Current, IIdentity communityID, List<CtxAttribute> list) {
 		// TODO Auto-generated method stub
 		
 	}
