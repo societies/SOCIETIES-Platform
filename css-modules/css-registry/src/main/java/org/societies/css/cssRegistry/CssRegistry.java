@@ -49,7 +49,6 @@ import org.societies.css.cssRegistry.model.CssRegistryEntry;
 import org.societies.css.cssRegistry.model.CssRequestEntry;
 import org.societies.api.schema.cssmanagement.CssRequestStatusType;
 
-
 public class CssRegistry implements ICssRegistry {
 	private SessionFactory sessionFactory;
 	private static Logger log = LoggerFactory.getLogger(CssRegistry.class);
@@ -366,7 +365,7 @@ public class CssRegistry implements ICssRegistry {
 	 * org.societies.api.internal.css.cssRegistry.ICssRegistry#registerCss(org
 	 * .societies.api.internal.css.management.CSSRecord)
 	 */
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void updateCssRequestRecord(CssRequest cssRequest)
@@ -380,8 +379,7 @@ public class CssRegistry implements ICssRegistry {
 
 			filterRegistryEntry.setCssIdentity(cssRequest.getCssIdentity());
 
-			List<CssRequestEntry> tmpRegistryEntryList = sessionFactory
-					.openSession().createCriteria(CssRequestEntry.class)
+			List<CssRequestEntry> tmpRegistryEntryList = session.createCriteria(CssRequestEntry.class)
 					.add(Example.create(filterRegistryEntry).enableLike())
 					.list();
 			if (tmpRegistryEntryList != null) {
@@ -390,11 +388,12 @@ public class CssRegistry implements ICssRegistry {
 				}
 			}
 
-			filterRegistryEntry.setRequestStatus(cssRequest.getRequestStatus()
-					.value());
+			if (cssRequest.getRequestStatus() != CssRequestStatusType.CANCELLED) {
+				filterRegistryEntry.setRequestStatus(cssRequest
+						.getRequestStatus().value());
 
-			session.save(filterRegistryEntry);
-
+				session.save(filterRegistryEntry);
+			}
 			t.commit();
 		} catch (Exception e) {
 			t.rollback();
@@ -408,7 +407,6 @@ public class CssRegistry implements ICssRegistry {
 
 	}
 
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -418,34 +416,27 @@ public class CssRegistry implements ICssRegistry {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<CssRequest>  getCssRequests()
-			throws CssRegistrationException {
+	public List<CssRequest> getCssRequests() throws CssRegistrationException {
 
 		Session session = sessionFactory.openSession();
 		CssRequest registryEntry = null;
 		List<CssRequest> requestList = new ArrayList<CssRequest>();
 
-
 		try {
 
-			List<CssRequestEntry> tmpRegistryEntryList = sessionFactory
-					.openSession().createCriteria(CssRequestEntry.class)
-					.list();
+			List<CssRequestEntry> tmpRegistryEntryList = session.createCriteria(CssRequestEntry.class).list();
 			if (tmpRegistryEntryList != null) {
 				for (CssRequestEntry tmpEn : tmpRegistryEntryList) {
 					registryEntry = new CssRequest();
-					
-					registryEntry.setCssIdentity(tmpEn.getCssIdentity());
-					
-					registryEntry.setRequestStatus(CssRequestStatusType.valueOf(tmpEn.getRequestStatus()));
-					requestList.add(registryEntry);
 
-					
+					registryEntry.setCssIdentity(tmpEn.getCssIdentity());
+
+					registryEntry.setRequestStatus(CssRequestStatusType
+							.valueOf(tmpEn.getRequestStatus().toUpperCase()));
+					requestList.add(registryEntry);
 
 				}
 			}
-
-
 
 		} catch (Exception e) {
 
@@ -456,12 +447,11 @@ public class CssRegistry implements ICssRegistry {
 				session.close();
 			}
 		}
-		
+
 		return requestList;
 
 	}
 
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -482,21 +472,24 @@ public class CssRegistry implements ICssRegistry {
 
 			filterRegistryEntry.setFriendIdentity(cssRequest.getCssIdentity());
 
-			List<CssRequestEntry> tmpRegistryEntryList = sessionFactory
-					.openSession().createCriteria(CssRequestEntry.class)
-					.add(Example.create(filterRegistryEntry).enableLike())
-					.list();
+			List<CssFriendEntry> tmpRegistryEntryList = session
+					.createCriteria(CssFriendEntry.class)
+					.add(Restrictions.eq("friendIdentity",
+							cssRequest.getCssIdentity())).list();
+
 			if (tmpRegistryEntryList != null) {
-				for (CssRequestEntry tmpEn : tmpRegistryEntryList) {
+				for (CssFriendEntry tmpEn : tmpRegistryEntryList) {
 					session.delete(tmpEn);
 				}
 			}
 
-			filterRegistryEntry.setRequestStatus(cssRequest.getRequestStatus()
-					.value());
+			if (cssRequest.getRequestStatus() != CssRequestStatusType.CANCELLED) {
 
-			session.save(filterRegistryEntry);
+				filterRegistryEntry.setRequestStatus(cssRequest
+						.getRequestStatus().value());
 
+				session.save(filterRegistryEntry);
+			}
 			t.commit();
 		} catch (Exception e) {
 			t.rollback();
@@ -510,7 +503,6 @@ public class CssRegistry implements ICssRegistry {
 
 	}
 
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -520,34 +512,28 @@ public class CssRegistry implements ICssRegistry {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<CssRequest>  getCssFriendRequests()
+	public List<CssRequest> getCssFriendRequests()
 			throws CssRegistrationException {
 
 		Session session = sessionFactory.openSession();
 		CssRequest registryEntry = null;
 		List<CssRequest> requestList = new ArrayList<CssRequest>();
 
-
 		try {
 
-			List<CssFriendEntry> tmpRegistryEntryList = sessionFactory
-					.openSession().createCriteria(CssFriendEntry.class)
-					.list();
+			List<CssFriendEntry> tmpRegistryEntryList = session.createCriteria(CssFriendEntry.class).list();
 			if (tmpRegistryEntryList != null) {
 				for (CssFriendEntry tmpEn : tmpRegistryEntryList) {
 					registryEntry = new CssRequest();
-					
-					registryEntry.setCssIdentity(tmpEn.getFriendIdentity());
-					
-					registryEntry.setRequestStatus(CssRequestStatusType.valueOf(tmpEn.getRequestStatus()));
-					requestList.add(registryEntry);
 
-					
+					registryEntry.setCssIdentity(tmpEn.getFriendIdentity());
+
+					registryEntry.setRequestStatus(CssRequestStatusType
+							.valueOf(tmpEn.getRequestStatus().toUpperCase()));
+					requestList.add(registryEntry);
 
 				}
 			}
-
-
 
 		} catch (Exception e) {
 
@@ -558,12 +544,11 @@ public class CssRegistry implements ICssRegistry {
 				session.close();
 			}
 		}
-		
+
 		return requestList;
 
 	}
-	
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -573,31 +558,28 @@ public class CssRegistry implements ICssRegistry {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public CssRequest  getCssFriendRequest(String cssFriendId)
+	public CssRequest getCssFriendRequest(String cssFriendId)
 			throws CssRegistrationException {
 
 		Session session = sessionFactory.openSession();
 		CssRequest registryEntry = new CssRequest();
 		CssFriendEntry filterRegistryEntry = new CssFriendEntry();
 		registryEntry.setCssIdentity(cssFriendId);
-		registryEntry.setRequestStatus(CssRequestStatusType.NOTREQUESTED); // default value
-
+		registryEntry.setRequestStatus(CssRequestStatusType.NOTREQUESTED); // default
+																			// value
 
 		try {
 
 			List<CssFriendEntry> tmpRegistryEntryList = session
 					.createCriteria(CssFriendEntry.class)
 					.add(Restrictions.eq("friendIdentity", cssFriendId)).list();
-			
-		
 
-			if (tmpRegistryEntryList != null && tmpRegistryEntryList.size() > 0)
-			{
-				registryEntry.setRequestStatus(CssRequestStatusType.valueOf(tmpRegistryEntryList.get(0).getRequestStatus()));
+			if (tmpRegistryEntryList != null && tmpRegistryEntryList.size() > 0) {
+				registryEntry.setRequestStatus(CssRequestStatusType
+						.valueOf(tmpRegistryEntryList.get(0).getRequestStatus()
+								.toUpperCase()));
 
 			}
-
-
 
 		} catch (Exception e) {
 
@@ -608,16 +590,9 @@ public class CssRegistry implements ICssRegistry {
 				session.close();
 			}
 		}
-		
+
 		return registryEntry;
 
 	}
 
-	
-	
-	
-	
-
-	
-	
 }
