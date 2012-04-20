@@ -24,7 +24,7 @@
 <Table>
 <tr><td><B>ID</B></td><!--<td><B>Name</B></td><td><B>Owner</B></td>
 <!-- <td><B>Endpoint</B></td><td><B>Type</B></td> -->
-<!--<td><B>Status</B></td></tr> -->
+<!--<td><B>Status</B></td> --></tr>
 
 	<xc:forEach var="record" items="${records}">
         <tr>
@@ -38,6 +38,8 @@
     </xc:forEach>
     	
 	</table>
+	
+	<h4>${res}</h4>
 	
 <!-- .................END PLACE YOUR CONTENT ................ -->
 	<!-- FOOTER -->
