@@ -26,14 +26,9 @@
 <!-- <td><B>Endpoint</B></td><td><B>Type</B></td> -->
 <!--<td><B>Status</B></td> --></tr>
 
-	<xc:forEach var="record" items="${records}">
+	<xc:forEach var="record" items="${cisrecords}">
         <tr>
         	<td>${record.getCisId()}</td>
-         	<!--<td>${record.getName()}</td>
-            <td>${record.getOwnerId()}</td> -->
-            <!-- <td>${service.serviceEndpoint}</td>        
-            <td>${service.serviceType}</td>  -->
-            <!-- td>${record.serviceStatus}</td> -->     
         </tr>
     </xc:forEach>
     	
