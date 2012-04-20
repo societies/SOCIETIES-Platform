@@ -60,7 +60,7 @@ public class ContextCommunicator {
 		String key = action.getServiceID()+"|"+action.getparameterName();
 		if(mappings.containsKey(key)){  //already has service attribute
 			//confirm snapshot -> check that it is complete, if not then update
-			snpshotMgr.confirmSnapshot(key);
+			snpshtMgr.confirmSnapshot(key);
 			//update attribute
 			CtxAttributeIdentifier attrID = mappings.get(key);
 			try {
