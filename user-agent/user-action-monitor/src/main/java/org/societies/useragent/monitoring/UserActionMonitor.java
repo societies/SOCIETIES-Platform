@@ -65,6 +65,7 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 		ctxComm = new ContextCommunicator(ctxBroker);
 
 		//Set cloud flag - get device type from Identity Manager (speak to Alec)
+		
 	}
 
 	public void setCtxBroker(ICtxBroker broker){

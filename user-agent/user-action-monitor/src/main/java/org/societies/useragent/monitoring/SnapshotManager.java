@@ -37,6 +37,7 @@ public class SnapshotManager {
 
 	private ICtxBroker ctxBroker;
 	Hashtable <String, String[]> snapshots;
+	Hashtable <String, List<String>> snapshotUpdates;
 
 	/*
 	 * SNAPSHOT DEFINITIONS
@@ -51,6 +52,7 @@ public class SnapshotManager {
 
 	public SnapshotManager(ICtxBroker ctxBroker){
 		this.ctxBroker = ctxBroker;
+		snapshotUpdates = new Hashtable <String, List<String>>();
 		initialiseSnapshots();
 	}
 
@@ -60,11 +62,27 @@ public class SnapshotManager {
 			snapshots.put("snapshot"+i, snapshotDefinitions[i]);
 		}
 	}
+	
+	public void confirmSnapshot(String key){
+		if(snapshotUpdates.containsKey(key)){
+			List<String> contextAttributes = snapshotUpdates.get(key);
+			for(String s: contextAttributes){
+				//CtxAttributeIdentifier 
+			}
+		}
+	}
 
 	public List<CtxAttributeIdentifier> getSnapshot(String snapshotName){
 		ArrayList<CtxAttributeIdentifier> snapshot = new ArrayList<CtxAttributeIdentifier>();
 		String[] definition = snapshots.get(snapshotName);
-		
+		for(int i = 0; i<definition.length; i++){  //for each item in snapshot definition -> get context attribute if exists
+			
+		}
 		return snapshot;
+	}
+	
+	private CtxAttributeIdentifier getAttribute(String attributeName){
+		CtxAttributeIdentifier attribute = null;
+		return attribute;
 	}
 }
