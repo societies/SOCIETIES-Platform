@@ -17,9 +17,12 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.model.CtxQuality;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.schema.context.model.CtxAssociationBean;
 import org.societies.api.schema.context.model.CtxAssociationIdentifierBean;
 import org.societies.api.schema.context.model.CtxAttributeBean;
@@ -28,9 +31,11 @@ import org.societies.api.schema.context.model.CtxAttributeValueTypeBean;
 import org.societies.api.schema.context.model.CtxEntityBean;
 import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
 import org.societies.api.schema.context.model.CtxIdentifierBean;
+import org.societies.api.schema.context.model.CtxModelObjectBean;
 import org.societies.api.schema.context.model.CtxModelTypeBean;
 import org.societies.api.schema.context.model.CtxOriginTypeBean;
 import org.societies.api.schema.context.model.CtxQualityBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public final class CtxModelBeanTranslator {
 	
@@ -60,13 +65,13 @@ public final class CtxModelBeanTranslator {
 		bean.setAssociations(assocIdBeans);
 		
 		
-		return null;
+		return bean;
 		
 	}
 	
+	
 	public CtxIdentifierBean fromCtxIdentifier(CtxIdentifier identifier) {
 		
-		CtxIdentifierBean ctxIdBean=null;
 		if (identifier.getModelType().equals(CtxModelType.ENTITY)) {
 			return new CtxEntityIdentifierBean();
 		}
@@ -113,10 +118,16 @@ public final class CtxModelBeanTranslator {
 			childEntities.add(childEntitiesBeanFromChildEntities(child));
 		}
 		bean.setChildEntities(childEntities);
-		
-		List<CtxEntityIdentifierBean> parentEntity = new ArrayList<CtxEntityIdentifierBean>();
 		bean.setParentEntity(parentEntityBeanFromParentEntity(assoc.getParentEntity()));
 		
+		return bean;
+		
+	}
+	
+	public CtxIdentifierBean fromCtxModelObject(CtxModelObject object) {
+		
+		CtxIdentifierBean bean=new CtxEntityIdentifierBean();
+		bean.setString(object.toString());
 		return bean;
 		
 	}

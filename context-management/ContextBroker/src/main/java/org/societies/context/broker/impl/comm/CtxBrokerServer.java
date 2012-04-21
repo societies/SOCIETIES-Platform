@@ -25,11 +25,14 @@
 
 package org.societies.context.broker.impl.comm;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+
+import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +41,14 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerBeanResult;
+import org.societies.api.schema.context.model.CtxAssociationBean;
+import org.societies.api.schema.context.model.CtxAssociationIdentifierBean;
+import org.societies.api.schema.context.model.CtxAttributeBean;
 import org.societies.api.schema.context.model.CtxEntityBean;
+import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
+import org.societies.api.schema.context.model.CtxIdentifierBean;
+import org.societies.api.schema.context.model.CtxModelObjectBean;
+import org.societies.api.schema.context.model.CtxModelTypeBean;
 
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -97,7 +107,7 @@ public class CtxBrokerServer implements IFeatureServer{
 	@Override
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
 
-		CtxBrokerBean response = null;
+		CtxBrokerBeanResult createResponse = new CtxBrokerBeanResult();
 
 		if (payload.getClass().equals(CtxBrokerBean.class)) {
 			CtxBrokerBean cbPayload = (CtxBrokerBean) payload;
@@ -115,20 +125,12 @@ public class CtxBrokerServer implements IFeatureServer{
 					newEntityFuture = ctxbroker.createEntity(requesterIdentity, cbPayload.getCreate().getType());
 					CtxEntity newCtxEntity = newEntityFuture.get();
 					// the entity is created
-
 					//create the response based on the created CtxEntity - the response should be a result bean
-					CtxBrokerBeanResult createResponse = new CtxBrokerBeanResult();
-					CtxEntityBean ctxBean = new CtxEntityBean();
-					/*
-					ctxBean.setId(newCtxEntity.getId().toString());
-					
-					createResponse.setCtxBrokerCreateEntityBeanResult()
-					createResponse.setType(newCtxEntity.getType());
-					createResponse.setObjectNumber(newCtxEntity.getObjectNumber());
-					createResponse.setOperatorIdjid(requesterIdentity.toString());
+					CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+					CtxEntityBean ctxBean = ctxBeanTranslator.fromCtxEntity(newCtxEntity);
+					//setup the CtxEntityBean from CtxEntity				
+					createResponse.setCtxBrokerCreateEntityBeanResult(ctxBean);
 
-					response.setCreate(createResponse);
-					*/
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -139,6 +141,9 @@ public class CtxBrokerServer implements IFeatureServer{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (InvalidFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (DatatypeConfigurationException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -146,28 +151,22 @@ public class CtxBrokerServer implements IFeatureServer{
 			}
 
 			//checks if the payload contains the createAssociation method
-	/*		if (cbPayload.getCreateAssoc()!=null) {
+			if (cbPayload.getCreateAssoc()!=null) {
 
 				// get the identity based on Jid and the identity manager
-				String xmppIdentityJid = cbPayload.getCreateAssoc().getOperatorIdjid();
+				String xmppIdentityJid = cbPayload.getCreateAssoc().getRequester();
 				try {
 					IIdentity requesterIdentity = this.identMgr.fromJid(xmppIdentityJid);
-
 
 					Future<CtxAssociation> newAssociationFuture;
 					newAssociationFuture = ctxbroker.createAssociation(requesterIdentity, cbPayload.getCreateAssoc().getType());
 					CtxAssociation newCtxAssociation = newAssociationFuture.get();
 					// the association is created
-
-					//create the response based on the created CtxEntity
-					CtxBrokerCreateAssociationBean createResponse = new CtxBrokerCreateAssociationBean();
-					createResponse.setType(newCtxAssociation.getType());
-					createResponse.setObjectNumber(newCtxAssociation.getObjectNumber());
-					createResponse.setOperatorIdjid(requesterIdentity.toString());
-					//
-
-					response.setCreateAssoc(createResponse);
-
+					//create the response based on the created CtxAssociation - the response should be a result bean
+					CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+					CtxAssociationBean ctxBean = ctxBeanTranslator.fromCtxAssociation(newCtxAssociation);			
+					createResponse.setCtxBrokerCreateAssociationBeanResult(ctxBean);
+					
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -178,6 +177,9 @@ public class CtxBrokerServer implements IFeatureServer{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (InvalidFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (DatatypeConfigurationException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -189,26 +191,22 @@ public class CtxBrokerServer implements IFeatureServer{
 			if (cbPayload.getCreateAttr()!=null) {
 
 				// get the identity based on Jid and the identity manager
-				String xmppIdentityJid = cbPayload.getCreateAttr().getOperatorIdjid();
+				String xmppIdentityJid = cbPayload.getCreateAttr().getRequester();
 				try {
 					IIdentity requesterIdentity = this.identMgr.fromJid(xmppIdentityJid);
 
 
 					Future<CtxAttribute> newAttributeFuture;
 					newAttributeFuture = ctxbroker.createAttribute(requesterIdentity,
-							new CtxEntityIdentifier(requesterIdentity.toString(), cbPayload.getCreateAttr().getType(), cbPayload.getCreateAttr().getObjectNumber()),
+							new CtxEntityIdentifier(cbPayload.getCreateAttr().getType()), 
 							cbPayload.getCreateAttr().getType());
 					CtxAttribute newCtxAttribute= newAttributeFuture.get();
 					// the attribute is created
 
-					//create the response based on the created CtxEntity
-					CtxBrokerCreateAttributeBean createResponse = new CtxBrokerCreateAttributeBean();
-					createResponse.setType(newCtxAttribute.getType());
-					createResponse.setObjectNumber(newCtxAttribute.getObjectNumber());
-					createResponse.setOperatorIdjid(requesterIdentity.toString());
-					//
-
-					response.setCreateAttr(createResponse);
+					//create the response based on the created CtxAttribute
+					CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+					CtxAttributeBean ctxBean = ctxBeanTranslator.fromCtxAttribute(newCtxAttribute);			
+					createResponse.setCtxBrokerCreateAttributeBeanResult(ctxBean);
 
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
@@ -222,6 +220,9 @@ public class CtxBrokerServer implements IFeatureServer{
 				} catch (InvalidFormatException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+				} catch (DatatypeConfigurationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 
 
@@ -231,7 +232,7 @@ public class CtxBrokerServer implements IFeatureServer{
 			if (cbPayload.getRemove()!=null) {
 
 				// get the identity based on Jid and the identity manager
-				String xmppIdentityJid = cbPayload.getRemove().getOperatorIdjid();
+				String xmppIdentityJid = cbPayload.getRemove().getRequester();
 
 
 				try {
@@ -239,19 +240,15 @@ public class CtxBrokerServer implements IFeatureServer{
 					IIdentity requesterIdentity = this.identMgr.fromJid(xmppIdentityJid);
 					Future<CtxModelObject> removeModelObjectFuture;
 					removeModelObjectFuture = ctxbroker.remove(requesterIdentity,
-							new CtxEntityIdentifier(requesterIdentity.toString(), cbPayload.getRemove().getType(), cbPayload.getRemove().getObjectNumber()) );
+							new CtxEntityIdentifier(cbPayload.getRemove().toString()));
 
 					CtxModelObject removedModelObject = removeModelObjectFuture.get();
 					// the object has been removed
 
 					//create the response based on the removed model object
-					CtxBrokerRemoveBean createResponse = new CtxBrokerRemoveBean();
-					createResponse.setType(removedModelObject.getType());
-					createResponse.setObjectNumber(removedModelObject.getObjectNumber());
-					createResponse.setOperatorIdjid(requesterIdentity.toString());
-					//
-
-					response.setRemove(createResponse);
+					CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+					CtxEntityIdentifierBean ctxBean = (CtxEntityIdentifierBean) ctxBeanTranslator.fromCtxModelObject(removedModelObject);			
+					createResponse.setCtxBrokerRemoveBeanResult(ctxBean);
 
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
@@ -274,26 +271,22 @@ public class CtxBrokerServer implements IFeatureServer{
 			if (cbPayload.getRetrieve()!=null) {
 
 				// get the identity based on Jid and the identity manager
-				String xmppIdentityJid = cbPayload.getRetrieve().getOperatorIdjid();
+				String xmppIdentityJid = cbPayload.getRetrieve().getRequester();
 				try {
 					IIdentity requesterIdentity = this.identMgr.fromJid(xmppIdentityJid);
 
 
 					Future<CtxModelObject> retrieveModelObjectFuture;
 					retrieveModelObjectFuture = ctxbroker.retrieve(requesterIdentity,
-							new CtxEntityIdentifier(requesterIdentity.toString(), cbPayload.getRetrieve().getType(), cbPayload.getRetrieve().getObjectNumber()) );
+							new CtxEntityIdentifier(cbPayload.getRetrieve().toString()));
 
 					CtxModelObject retrievedModelObject = retrieveModelObjectFuture.get();
 					// the object has been retrieved
 
 					//create the response based on the retrieved model object
-					CtxBrokerRetrieveBean createResponse = new CtxBrokerRetrieveBean();
-					createResponse.setType(retrievedModelObject.getType());
-					createResponse.setObjectNumber(retrievedModelObject.getObjectNumber());
-					createResponse.setOperatorIdjid(requesterIdentity.toString());
-					//
-
-					response.setRetrieve(createResponse);
+					CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+					CtxIdentifierBean ctxBean = ctxBeanTranslator.fromCtxModelObject(retrievedModelObject);			
+					createResponse.setCtxBrokerRetrieveBeanResult(ctxBean);
 
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
@@ -316,39 +309,36 @@ public class CtxBrokerServer implements IFeatureServer{
 			if (cbPayload.getLookup()!=null) {
 
 				// get the identity based on Jid and the identity manager
-				String xmppIdentityJid = cbPayload.getLookup().getOperatorIdjid();
+				String xmppIdentityJid = cbPayload.getLookup().getRequester();
 
 				try {
 
 					IIdentity requesterIdentity = this.identMgr.fromJid(xmppIdentityJid);
 					Future<List<CtxIdentifier>> lookupObjectsFuture;
-					//find out which enum we have
-					CtxModelType modelType = null;
-					for (CtxModelType t: CtxModelType.values()){
-						if((t.name()).equals(cbPayload.getLookup().getModelTypeName()))
-							modelType = t;
-					}
+					
 					//get the lookup
-					lookupObjectsFuture = ctxbroker.lookup(requesterIdentity, modelType, cbPayload.getLookup().getType());
+					lookupObjectsFuture = ctxbroker.lookup(requesterIdentity, 
+							CtxModelType.valueOf(cbPayload.getLookup().getModelType().toString()), 
+							cbPayload.getLookup().getType());
 
 					List<CtxIdentifier> lookedupModelObjects = lookupObjectsFuture.get();
 					// the object has been looked-up
 
 					//create the response based on the looked-up model object
-					CtxBrokerLookupBean createResponse = new CtxBrokerLookupBean();
-
 					//is the lookup null?
 					if (lookedupModelObjects!=null) {
-						//from the first element in the list set up the object
-						createResponse.setType(lookedupModelObjects.get(0).getType());
-						createResponse.setObjectNumber(lookedupModelObjects.get(0).getObjectNumber());
-						createResponse.setModelTypeName(lookedupModelObjects.get(0).getModelType().name());
-						createResponse.setOperatorIdjid(requesterIdentity.toString());
+						List<CtxIdentifierBean> beans = new ArrayList<CtxIdentifierBean>();
+						CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+						CtxIdentifierBean ctxBean = null;			
+						//for each identifier create a bean and add it in the beans list
+						for (CtxIdentifier lookedups : lookedupModelObjects) {
+							ctxBean = ctxBeanTranslator.fromCtxIdentifier(lookedups);
+							beans.add(ctxBean);
+						}
+						
+						createResponse.setCtxBrokerLookupBeanResult(beans);
 					}
-					//
-
-					response.setLookup(createResponse);
-
+					
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -368,7 +358,7 @@ public class CtxBrokerServer implements IFeatureServer{
 			if (cbPayload.getUpdate()!=null) {
 
 				// get the identity based on Jid and the identity manager
-				String xmppIdentityJid = cbPayload.getUpdate().getOperatorIdjid();
+				String xmppIdentityJid = cbPayload.getUpdate().getRequester();
 		
 				
 				try {
@@ -376,24 +366,16 @@ public class CtxBrokerServer implements IFeatureServer{
 					IIdentity requesterIdentity = this.identMgr.fromJid(xmppIdentityJid);
 					Future<CtxModelObject> updateModelObjectFuture;
 
-					CtxEntityIdentifier innerIdentifier = new CtxEntityIdentifier(requesterIdentity.toString(), cbPayload.getUpdate().getType(),
-							cbPayload.getUpdate().getObjectNumber());
+					CtxEntityIdentifier innerIdentifier = new CtxEntityIdentifier(cbPayload.getUpdate().toString());
 					CtxModelObject innerModelObject = new CtxEntity(innerIdentifier);
 
 					updateModelObjectFuture = ctxbroker.update(requesterIdentity, innerModelObject);
-
 					CtxModelObject updatedModelObject = updateModelObjectFuture.get();
 					// the object has been updated
-
 					//create the response based on the updated model object
-					CtxBrokerUpdateBean createResponse = new CtxBrokerUpdateBean();
-					createResponse.setType(updatedModelObject.getType());
-					createResponse.setObjectNumber(updatedModelObject.getObjectNumber());
-					createResponse.setOperatorIdjid(requesterIdentity.toString());
-					createResponse.setModelTypeName(updatedModelObject.getModelType().name());
-					//
-
-					response.setUpdate(createResponse);
+					CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+					CtxEntityIdentifierBean ctxBean = (CtxEntityIdentifierBean) ctxBeanTranslator.fromCtxModelObject(updatedModelObject);			
+					createResponse.setCtxBrokerUpdateBeanResult(ctxBean);
 
 				} catch (CtxException e) {
 					// TODO Auto-generated catch block
@@ -410,7 +392,7 @@ public class CtxBrokerServer implements IFeatureServer{
 				}
 
 
-			}*/
+			}
 
 			//checks if the payload contains the updateAttr method
 			if (cbPayload.getUpdateAttr()!=null) {
@@ -426,7 +408,7 @@ public class CtxBrokerServer implements IFeatureServer{
 
 		//org.jabber.protocol.pubsub.owner.Pubsub ops = (org.jabber.protocol.pubsub.owner.Pubsub) payload;
 
-		return response;
+		return createResponse;
 	}
 
 

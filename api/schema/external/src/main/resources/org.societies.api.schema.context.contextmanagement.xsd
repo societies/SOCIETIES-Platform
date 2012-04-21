@@ -27,20 +27,20 @@
 			<xs:sequence minOccurs='0' maxOccurs='1'>
 				<xs:element name="ctxBrokerCreateEntityBeanResult" type="tns:ctxEntityBean"
 					minOccurs="0" />
-				<xs:element name="ctxBrokerLookupBeanBeanResult" type="tns:ctxIdentifierBean"
+				<xs:element name="ctxBrokerLookupBeanResult" type="tns:ctxIdentifierBean"
 					minOccurs="0" maxOccurs="unbounded" />
-				<xs:element name="ctxBrokerRetrieveBeanResult" type="tns:ctxModelObjectBean"
+				<xs:element name="ctxBrokerRetrieveBeanResult" type="tns:ctxIdentifierBean"
 					minOccurs="0" />
 				<xs:element name="ctxBrokerUpdateAttributeBeanResult"
 					type="tns:ctxAttributeIdentifierBean" minOccurs="0" />
 				<xs:element name="ctxBrokerCreateAssociationBeanResult"
-					type="tns:ctxAssociationIdentifierBean" minOccurs="0" />
+					type="tns:ctxAssociationBean" minOccurs="0" />
 				<xs:element name="ctxBrokerRemoveBeanResult" type="tns:ctxEntityIdentifierBean"
 					minOccurs="0" />
 				<xs:element name="ctxBrokerUpdateBeanResult" type="tns:ctxEntityIdentifierBean"
 					minOccurs="0" />
 				<xs:element name="ctxBrokerCreateAttributeBeanResult"
-					type="tns:ctxAttributeIdentifierBean" minOccurs="0" />
+					type="tns:ctxAttributeBean" minOccurs="0" />
 
 			</xs:sequence>
 		</xs:complexType>
