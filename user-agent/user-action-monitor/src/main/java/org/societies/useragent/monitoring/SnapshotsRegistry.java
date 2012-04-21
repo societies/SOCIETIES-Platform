@@ -25,10 +25,33 @@
 
 package org.societies.useragent.monitoring;
 
-public class Snapshots {
+import java.io.Serializable;
+import java.util.Hashtable;
+import java.util.List;
 
-	public static String[] snapshot1 = {"symLoc", "status", "activity"};
-	public static String[] snapshot2 = {"symLoc", "day"};
-	public enum snapshots {snapshot1, snapshot2};
+import org.societies.api.context.model.CtxAttributeIdentifier;
 
+public class SnapshotsRegistry implements Serializable{
+
+	Hashtable<CtxAttributeIdentifier, List<CtxAttributeIdentifier>> snpshtMappings;
+	
+	public SnapshotsRegistry(){
+		snpshtMappings = new Hashtable<CtxAttributeIdentifier, List<CtxAttributeIdentifier>>();
+	}
+	
+	public void addMapping(CtxAttributeIdentifier primary, List<CtxAttributeIdentifier> snapshot){
+		snpshtMappings.put(primary, snapshot);
+	}
+	
+	public void removeMapping(CtxAttributeIdentifier primary){
+		snpshtMappings.remove(primary);
+	}
+	
+	public List<CtxAttributeIdentifier> getSnapshot(CtxAttributeIdentifier primary){
+		return snpshtMappings.get(primary);
+	}
+	
+	public void updateMapping(CtxAttributeIdentifier primary, List<CtxAttributeIdentifier> newSnapshot){
+		snpshtMappings.put(primary, newSnapshot);
+	}
 }

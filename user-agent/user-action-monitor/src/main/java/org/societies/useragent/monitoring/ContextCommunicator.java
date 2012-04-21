@@ -59,14 +59,11 @@ public class ContextCommunicator {
 		//check cache first for ctxAttrIdentifier to update
 		String key = action.getServiceID()+"|"+action.getparameterName();
 		if(mappings.containsKey(key)){  //already has service attribute
-			//confirm snapshot -> check that it is complete, if not then update
-			snpshtMgr.confirmSnapshot(key);
 			//update attribute
 			CtxAttributeIdentifier attrID = mappings.get(key);
 			try {
-				ctxBroker.updateAttribute(attrID, action.getvalue());
+				ctxBroker.updateAttribute(attrID, action);
 			} catch (CtxException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}else{
@@ -84,7 +81,7 @@ public class ContextCommunicator {
 					Set<CtxAttribute> attributes = serviceEntity.getAttributes(action.getparameterName());
 					if(attributes.size() > 0){  //attribute found under this entityId
 						CtxAttribute attribute = attributes.iterator().next();
-						ctxBroker.updateAttribute(attribute.getId(), action.getvalue());
+						ctxBroker.updateAttribute(attribute.getId(), action);
 						mappings.put(key, attribute.getId());
 						
 					}else{  //no attribute found under this entityId
@@ -92,10 +89,10 @@ public class ContextCommunicator {
 						Future<CtxAttribute> futureAttribute = ctxBroker.createAttribute(entityId, action.getparameterName());
 						CtxAttribute newAttribute = futureAttribute.get();
 						//set history tuples
-						ctxBroker.setHistoryTuples(newAttribute.getId(), null); //add list of context snapshot IDs
+						ctxBroker.setHistoryTuples(newAttribute.getId(), snpshtMgr.getSnapshot(newAttribute.getId())); //add list of context snapshot IDs
 						//set as recorded
 						//populate attribute with action value
-						ctxBroker.updateAttribute(newAttribute.getId(), action.getvalue());
+						ctxBroker.updateAttribute(newAttribute.getId(), action);
 						//update mappings
 						mappings.put(key, newAttribute.getId());
 					}
@@ -108,10 +105,10 @@ public class ContextCommunicator {
 					Future<CtxAttribute> futureAttribute = ctxBroker.createAttribute(newEntity.getId(), action.getparameterName());
 					CtxAttribute newAttribute = futureAttribute.get();
 					//set as history
-					ctxBroker.setHistoryTuples(newAttribute.getId(), null); //add list of context snapshot IDs
+					ctxBroker.setHistoryTuples(newAttribute.getId(), snpshtMgr.getSnapshot(newAttribute.getId())); //add list of context snapshot IDs
 					//set as recorded
 					//populate attribute with action value
-					ctxBroker.updateAttribute(newAttribute.getId(), action.getvalue());
+					ctxBroker.updateAttribute(newAttribute.getId(), action);
 					//update mappings with new key and CtxAttrIdentifier
 					mappings.put(key, newAttribute.getId());
 				}
