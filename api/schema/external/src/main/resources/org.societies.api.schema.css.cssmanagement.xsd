@@ -141,6 +141,7 @@
 			<xs:enumeration value="accepted" />
 			<xs:enumeration value="denied" />
 			<xs:enumeration value="pending" />
+			<xs:enumeration value="cancelled" />
 			<xs:enumeration value="notrequested" />
 		</xs:restriction>
 	</xs:simpleType>
