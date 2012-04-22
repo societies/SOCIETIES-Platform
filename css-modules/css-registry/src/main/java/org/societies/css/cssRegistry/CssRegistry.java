@@ -380,8 +380,8 @@ public class CssRegistry implements ICssRegistry {
 			filterRegistryEntry.setCssIdentity(cssRequest.getCssIdentity());
 
 			List<CssRequestEntry> tmpRegistryEntryList = session.createCriteria(CssRequestEntry.class)
-					.add(Example.create(filterRegistryEntry).enableLike())
-					.list();
+					.add(Restrictions.eq("cssIdentity",
+							cssRequest.getCssIdentity()).ignoreCase()).list();
 			if (tmpRegistryEntryList != null) {
 				for (CssRequestEntry tmpEn : tmpRegistryEntryList) {
 					session.delete(tmpEn);
@@ -475,7 +475,7 @@ public class CssRegistry implements ICssRegistry {
 			List<CssFriendEntry> tmpRegistryEntryList = session
 					.createCriteria(CssFriendEntry.class)
 					.add(Restrictions.eq("friendIdentity",
-							cssRequest.getCssIdentity())).list();
+							cssRequest.getCssIdentity()).ignoreCase()).list();
 
 			if (tmpRegistryEntryList != null) {
 				for (CssFriendEntry tmpEn : tmpRegistryEntryList) {
@@ -572,7 +572,7 @@ public class CssRegistry implements ICssRegistry {
 
 			List<CssFriendEntry> tmpRegistryEntryList = session
 					.createCriteria(CssFriendEntry.class)
-					.add(Restrictions.eq("friendIdentity", cssFriendId)).list();
+					.add(Restrictions.eq("friendIdentity", cssFriendId).ignoreCase()).list();
 
 			if (tmpRegistryEntryList != null && tmpRegistryEntryList.size() > 0) {
 				registryEntry.setRequestStatus(CssRequestStatusType
