@@ -93,18 +93,20 @@ public class CssRegistry implements ICssRegistry {
 		Transaction t = session.beginTransaction();
 		try {
 
-			for (CssNode cssNode : cssRecord.getCssNodes()) {
-				tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
+			if (cssRecord.getCssNodes() != null) {
+				for (CssNode cssNode : cssRecord.getCssNodes()) {
+					tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
 						cssNode.getStatus(), cssNode.getType(), false);
-				session.save(tmpNodeEntry);
+					session.save(tmpNodeEntry);
+				}
 			}
-
-			for (CssNode cssNode : cssRecord.getArchiveCSSNodes()) {
-				tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
+			if (cssRecord.getArchiveCSSNodes() != null) {
+				for (CssNode cssNode : cssRecord.getArchiveCSSNodes()) {
+					tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
 						cssNode.getStatus(), cssNode.getType(), true);
-				session.save(tmpNodeEntry);
+					session.save(tmpNodeEntry);
+				}
 			}
-
 			tmpRegistryEntry = new CssRegistryEntry(
 					cssRecord.getCssHostingLocation(),
 					cssRecord.getCssIdentity(), cssRecord.getCssInactivation(),
@@ -158,18 +160,22 @@ public class CssRegistry implements ICssRegistry {
 		Transaction t = session.beginTransaction();
 		try {
 
-			for (CssNode cssNode : cssRecord.getCssNodes()) {
-				tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
+			if (cssRecord.getCssNodes() != null) {
+				for (CssNode cssNode : cssRecord.getCssNodes()) {
+					tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
 						cssNode.getStatus(), cssNode.getType(), false);
-				session.delete(tmpNodeEntry);
+					session.delete(tmpNodeEntry);
+				}
 			}
-
-			for (CssNode cssNode : cssRecord.getArchiveCSSNodes()) {
-				tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
+			
+			if (cssRecord.getArchiveCSSNodes() != null) {
+				for (CssNode cssNode : cssRecord.getArchiveCSSNodes()) {
+					tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
 						cssNode.getStatus(), cssNode.getType(), true);
-				session.delete(tmpNodeEntry);
+					session.delete(tmpNodeEntry);
+				}
 			}
-
+			
 			tmpRegistryEntry = new CssRegistryEntry(
 					cssRecord.getCssHostingLocation(),
 					cssRecord.getCssIdentity(), cssRecord.getCssInactivation(),
@@ -248,16 +254,18 @@ public class CssRegistry implements ICssRegistry {
 			List<CssNodeEntry> tmpNodeRegistryEntryList = session
 					.createCriteria(CssNodeEntry.class).list();
 
-			for (CssNodeEntry savedNode : tmpNodeRegistryEntryList) {
-				cssNodeDetails = new CssNode();
-				cssNodeDetails.setIdentity(savedNode.getIdentity());
-				cssNodeDetails.setType(savedNode.getType());
-				cssNodeDetails.setStatus(savedNode.getStatus());
+			if (tmpNodeRegistryEntryList != null) {
+				for (CssNodeEntry savedNode : tmpNodeRegistryEntryList) {
+					cssNodeDetails = new CssNode();
+					cssNodeDetails.setIdentity(savedNode.getNodeIdentity());
+					cssNodeDetails.setType(savedNode.getType());
+					cssNodeDetails.setStatus(savedNode.getStatus());
 
-				if (savedNode.getArchived() == true)
-					cssDetails.getArchiveCSSNodes().add(cssNodeDetails);
-				else
-					cssDetails.getCssNodes().add(cssNodeDetails);
+					if (savedNode.getArchived() == true) 
+						cssDetails.getArchiveCSSNodes().add(cssNodeDetails);
+					else
+						cssDetails.getCssNodes().add(cssNodeDetails);
+				}
 			}
 
 		} catch (Exception e) {
@@ -296,16 +304,20 @@ public class CssRegistry implements ICssRegistry {
 					.createCriteria(CssNodeEntry.class).list();
 			session.delete(tmpNodeRegistryEntryList);
 
-			for (CssNode cssNode : cssDetails.getCssNodes()) {
-				tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
+			if (cssDetails.getCssNodes() != null) {
+				for (CssNode cssNode : cssDetails.getCssNodes()) {
+					tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
 						cssNode.getStatus(), cssNode.getType(), false);
-				session.save(tmpNodeEntry);
+					session.save(tmpNodeEntry);
+				}
 			}
 
-			for (CssNode cssNode : cssDetails.getArchiveCSSNodes()) {
-				tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
+			if (cssDetails.getArchiveCSSNodes() != null) {
+				for (CssNode cssNode : cssDetails.getArchiveCSSNodes()) {
+					tmpNodeEntry = new CssNodeEntry(cssNode.getIdentity(),
 						cssNode.getStatus(), cssNode.getType(), true);
-				session.save(tmpNodeEntry);
+					session.save(tmpNodeEntry);
+				}
 			}
 
 			List<CssRegistryEntry> tmpCssRegistryEntryList = session

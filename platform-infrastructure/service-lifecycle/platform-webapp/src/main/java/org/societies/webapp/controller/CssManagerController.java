@@ -156,6 +156,7 @@ public class CssManagerController {
 		}
 
 		cmControllerLoginForm.setCssIdentity(cmLoginForm.getCssIdentity());
+		cmControllerLoginForm.setCssAdId(cmLoginForm.getCssIdentity());
 		
 		// Now we go a logon to the Css
 		CssRecord loginRecord = new CssRecord();
@@ -164,15 +165,18 @@ public class CssManagerController {
 		loginRecord.setCssIdentity(cmLoginForm.getCssIdentity());
 		loginRecord.setPassword(cmLoginForm.getPassword());
 		
-		loginRecord.setCssHostingLocation(cmLoginForm.getCssHostingLocation());
-		loginRecord.setDomainServer(cmLoginForm.getDomainServer());
-		loginRecord.setEmailID(cmLoginForm.getEmailID());
-		loginRecord.setHomeLocation(cmLoginForm.getHomeLocation());
-		loginRecord.setIdentityName(cmLoginForm.getIdentityName());
-		loginRecord.setImID(cmLoginForm.getImID());
-		loginRecord.setName(cmLoginForm.getName());
-		loginRecord.setSex(cmLoginForm.getSex());
-		
+		if (cmLoginForm.getButtonLabel().contentEquals("Save"))
+		{
+			
+			loginRecord.setCssHostingLocation(cmLoginForm.getCssHostingLocation());
+			loginRecord.setDomainServer(cmLoginForm.getDomainServer());
+			loginRecord.setEmailID(cmLoginForm.getEmailID());
+			loginRecord.setHomeLocation(cmLoginForm.getHomeLocation());
+			loginRecord.setIdentityName(cmLoginForm.getIdentityName());
+			loginRecord.setImID(cmLoginForm.getImID());
+			loginRecord.setName(cmLoginForm.getName());
+			loginRecord.setSex(cmLoginForm.getSex());
+		}
 		
 		
 		if (cmLoginForm.getButtonLabel().contentEquals("Save"))
@@ -193,7 +197,8 @@ public class CssManagerController {
 
 			Future<CssInterfaceResult> loginResult = getCssLocalManager()
 					.getCssRecord();
-
+			
+			CssInterfaceResult cssDetails = null; 
 			if (loginResult == null) {
 				// No CssRecord we eed to create one
 				loginResult = getCssLocalManager().registerCSS(loginRecord);
@@ -204,12 +209,14 @@ public class CssManagerController {
 					loginResult = getCssLocalManager().registerCSS(loginRecord);
 					model.put("message", "created Css Record");
 				} else {
+					cssDetails = loginResult.get();
+					
 					if (cmLoginForm.getButtonLabel().contentEquals("Logon"))
 					{
 						loginResult = getCssLocalManager().loginCSS(loginRecord);
+						
 
-						if (((CssInterfaceResult) loginResult.get())
-							.isResultStatus() == false) {
+						if (cssDetails.isResultStatus() == false) {
 
 							model.put("message",
 								"Css ManagerService Incorrect Password");
@@ -221,10 +228,42 @@ public class CssManagerController {
 					else if (cmLoginForm.getButtonLabel().contentEquals("Save"))
 					{
 						getCssLocalManager().modifyCssRecord(loginRecord);
+						Future<CssInterfaceResult> asynCssDetails = getCssLocalManager().getCssRecord();
+						 cssDetails = asynCssDetails.get();
+						 
+						
+						 CssAdvertisementRecord cssAdOld = new CssAdvertisementRecord();
+						 CssAdvertisementRecord cssAdNew = new CssAdvertisementRecord();
+						 cssAdOld.setId(cmControllerLoginForm.getCssAdId());
+						 cssAdOld.setName(cmControllerLoginForm.getCssAdName());
+						 cssAdNew.setUri(cmControllerLoginForm.getCssAdUri());
+						 cssAdNew.setId(cmLoginForm.getCssAdId());
+						 cssAdNew.setName(cmLoginForm.getCssAdName());
+						 cssAdNew.setUri(cmLoginForm.getCssAdUri());
+						 
+						 getCssLocalManager().updateAdvertisementRecord(cssAdOld, cssAdNew);
+						 
+						 
 					}
+					
+					
+					cmControllerLoginForm.setCssHostingLocation(cssDetails.getProfile().getCssHostingLocation());
+					cmControllerLoginForm.setDomainServer(cssDetails.getProfile().getDomainServer());
+					cmControllerLoginForm.setEmailID(cssDetails.getProfile().getEmailID());
+					cmControllerLoginForm.setHomeLocation(cssDetails.getProfile().getHomeLocation());
+					cmControllerLoginForm.setIdentityName(cssDetails.getProfile().getIdentityName());
+					cmControllerLoginForm.setImID(cssDetails.getProfile().getImID());
+					cmControllerLoginForm.setName(cssDetails.getProfile().getName());
+					cmControllerLoginForm.setSex(cssDetails.getProfile().getSex());
+					
 				}
 			}
-
+			
+			
+			
+			
+		
+			
 				// Update all data
 			Future<List<CssAdvertisementRecordDetailed>> cssadverts = getCssLocalManager()
 					.getCssAdvertisementRecordsFull();
@@ -250,8 +289,13 @@ public class CssManagerController {
 				requestActiveCount = 1;
 				for (CssAdvertisementRecordDetailed cssAdDetails : dbCssAds) {
 					// We don't want to show ourselfs!
-					if (!cssAdDetails.getResultCssAdvertisementRecord().getId()
-							.contentEquals(cmLoginForm.getCssIdentity())) {
+					if (cssAdDetails.getResultCssAdvertisementRecord().getId().contentEquals(cmLoginForm.getCssIdentity())) {
+						cmControllerLoginForm.setCssAdId(cssAdDetails.getResultCssAdvertisementRecord().getId());
+						cmControllerLoginForm.setCssAdName(cssAdDetails.getResultCssAdvertisementRecord().getName());
+						cmControllerLoginForm.setCssAdUri(cssAdDetails.getResultCssAdvertisementRecord().getUri());
+									
+					}
+					else {
 						switch (requestActiveCount) {
 						case 1:
 							cmControllerLoginForm.getCssAdRequests1()
@@ -494,23 +538,23 @@ public class CssManagerController {
 			for ( int j = 0; (j < myServices.size()) && (j < 5); j++)
 			{
 				switch (j) {
-				case 1:
+				case 0:
 					cmControllerLoginForm.getCssService1().setServiceDetails(myServices.get(j));
 					cmControllerLoginForm.getCssService1().setActive(true);
 					break;
-				case 2:
+				case 1:
 					cmControllerLoginForm.getCssService2().setServiceDetails(myServices.get(j));
 					cmControllerLoginForm.getCssService2().setActive(true);
 					break;
-				case 3:
+				case 2:
 					cmControllerLoginForm.getCssService3().setServiceDetails(myServices.get(j));
 					cmControllerLoginForm.getCssService3().setActive(true);
 					break;
-				case 4:
+				case 3:
 					cmControllerLoginForm.getCssService4().setServiceDetails(myServices.get(j));
 					cmControllerLoginForm.getCssService4().setActive(true);
 					break;
-				case 5:
+				case 4:
 					cmControllerLoginForm.getCssService5().setServiceDetails(myServices.get(j));
 					cmControllerLoginForm.getCssService5().setActive(true);
 					break;
@@ -568,7 +612,7 @@ public class CssManagerController {
 		archiveCSSNodes = new ArrayList<CssNode>();
 	}
 	
-	void startService(String bundle, String uri)
+	void startService(CssServiceModel serviceModel)
 	{
 		
 	
@@ -576,9 +620,9 @@ public class CssManagerController {
 	
 	Future<ServiceControlResult> asynchResult = null;
 	
-	serviceId.setServiceInstanceIdentifier(cmControllerLoginForm.getCssFriendService11().getServiceDetails().getServiceIdentifier().getServiceInstanceIdentifier());
+	serviceId.setServiceInstanceIdentifier(serviceModel.getServiceDetails().getServiceIdentifier().getServiceInstanceIdentifier());
 	try {
-		serviceId.setIdentifier(new URI(cmControllerLoginForm.getCssFriendService11().getServiceDetails().getServiceIdentifier().getIdentifier().toString()));
+		serviceId.setIdentifier(new URI(serviceModel.getServiceDetails().getServiceIdentifier().getIdentifier().toString()));
 		asynchResult=this.getSCService().startService(serviceId);
 		asynchResult.get();
 		
@@ -597,7 +641,7 @@ public class CssManagerController {
 	}
 	}
 	
-	void stopService(String bundle, String uri)
+	void stopService(CssServiceModel serviceModel)
 	{
 		
 	
@@ -605,9 +649,9 @@ public class CssManagerController {
 	
 	Future<ServiceControlResult> asynchResult = null;
 	
-	serviceId.setServiceInstanceIdentifier(cmControllerLoginForm.getCssFriendService11().getServiceDetails().getServiceIdentifier().getServiceInstanceIdentifier());
+	serviceId.setServiceInstanceIdentifier(serviceModel.getServiceDetails().getServiceIdentifier().getServiceInstanceIdentifier());
 	try {
-		serviceId.setIdentifier(new URI(cmControllerLoginForm.getCssFriendService11().getServiceDetails().getServiceIdentifier().getIdentifier().toString()));
+		serviceId.setIdentifier(new URI(serviceModel.getServiceDetails().getServiceIdentifier().getIdentifier().toString()));
 		asynchResult=this.getSCService().stopService(serviceId);
 		asynchResult.get();
 		
@@ -630,10 +674,10 @@ public class CssManagerController {
 	{
 		if (command.contentEquals("1")) { //stop service
 			
-			this.stopService(serviceModel.getServiceDetails().getServiceIdentifier().getServiceInstanceIdentifier(), serviceModel.getServiceDetails().getServiceIdentifier().getIdentifier().toString());
+			this.stopService(serviceModel);
 			
 		} else if (command.contentEquals("2")) { //start service
-			this.startService(serviceModel.getServiceDetails().getServiceIdentifier().getServiceInstanceIdentifier(), serviceModel.getServiceDetails().getServiceIdentifier().getIdentifier().toString());
+			this.startService(serviceModel);
 			
 		}
 		
@@ -690,6 +734,16 @@ public class CssManagerController {
 	void doUpdatesMessaging(CssManagerLoginForm cmLoginForm)
 	{
 
+		// Update ad record
+		
+		CssAdvertisementRecord newCssAd = new CssAdvertisementRecord();
+
+		newCssAd.setName(cmLoginForm.getCssAdName());
+		newCssAd.setId(cmLoginForm.getCssAdId());
+		newCssAd.setUri(cmLoginForm.getCssAdUri());
+
+		this.getCssLocalManager().addAdvertisementRecord(newCssAd);
+		
 		
 		// Check Services first
 		

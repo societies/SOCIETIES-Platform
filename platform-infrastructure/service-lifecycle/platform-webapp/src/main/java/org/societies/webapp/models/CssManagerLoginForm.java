@@ -117,6 +117,12 @@ public class CssManagerLoginForm {
 	    /** Css Record Details end **/
 		
 	    
+	 // CssAdvertisementRecordDetails
+		private String cssAdName;
+		private String cssAdId;
+		private String cssAdUri;
+
+		
 	    String buttonLabel;
 	    
 	    
@@ -629,6 +635,42 @@ public class CssManagerLoginForm {
 		 */
 		public void setCssService5(CssServiceModel cssService5) {
 			this.cssService5 = cssService5;
+		}
+		/**
+		 * @return the cssAdName
+		 */
+		public String getCssAdName() {
+			return cssAdName;
+		}
+		/**
+		 * @param cssAdName the cssAdName to set
+		 */
+		public void setCssAdName(String cssAdName) {
+			this.cssAdName = cssAdName;
+		}
+		/**
+		 * @return the cssAdId
+		 */
+		public String getCssAdId() {
+			return cssAdId;
+		}
+		/**
+		 * @param cssAdId the cssAdId to set
+		 */
+		public void setCssAdId(String cssAdId) {
+			this.cssAdId = cssAdId;
+		}
+		/**
+		 * @return the cssAdUri
+		 */
+		public String getCssAdUri() {
+			return cssAdUri;
+		}
+		/**
+		 * @param cssAdUri the cssAdUri to set
+		 */
+		public void setCssAdUri(String cssAdUri) {
+			this.cssAdUri = cssAdUri;
 		}
 
 

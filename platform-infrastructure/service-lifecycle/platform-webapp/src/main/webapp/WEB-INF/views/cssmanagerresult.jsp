@@ -22,8 +22,8 @@ Tabview code from www.javascriptsource.com css tab-view.html -->div.TabView div.
 div.TabView div.Tabs a {
 	float: left;
 	display: block;
-	width: 150px;
-	text-align: center;
+	width: 200px;
+	text-align: left;
 	height: 24px;
 	line-height: 28px;
 	vertical-align: middle;
@@ -76,16 +76,9 @@ div.TabView div.Pages div.Page div.Pad {
 	<!-- .................PLACE YOUR CONTENT HERE ................ -->
 	<h4>${message}</h4>
 	<br />
-	<h4>${res}</h4>
-	<br />
 	<h4>${error}</h4>
 	<br />
-	<h4>${buttonmessage}  -- what we selected</h4>
-	<br />
-
-	
-
-					<form:form method="POST" action="cssmanager.html"
+				<form:form method="POST" action="cssmanager.html"
 						commandName="cmLoginForm">
 						<form:errors path="*" cssClass="errorblock" element="div" />
 						
@@ -94,8 +87,8 @@ div.TabView div.Pages div.Page div.Pad {
 
 		<!-- *** Tabs ************************************************************** -->
 
-		<div class="Tabs" style="width: 700px;">
-			<a>Css Admin </a> <a>Yellow Pages</a> <a>Services</a> <a>Css 
+		<div class="Tabs" style="width: 800px;">
+			<a>&nbsp; &nbsp; Css Admin </a> <a>&nbsp; &nbsp; Yellow Pages</a> <a>&nbsp; &nbsp; Services</a> <a>&nbsp; &nbsp; Css 
 				Requests</a>
 		</div>
 
@@ -112,6 +105,8 @@ div.TabView div.Pages div.Page div.Pad {
 
 
 						<form:errors path="*" cssClass="errorblock" element="div" />
+						
+						<b>CSS Details</b>
 						
 						<table>
 							<tr>
@@ -174,8 +169,30 @@ div.TabView div.Pages div.Page div.Pad {
 
 							
 						</table>
+						<br/>
+						<b>CSS Advertisement Details</b>
 				
-
+		<table >
+			<!-- name="CssAdvertisementRecordDetails" -->
+			<tr>
+				<td>Id</td>
+				<td><form:input path="cssAdId"  size="50" readonly="true" /></td>
+				<td><form:errors path="cssAdId" cssClass="error" /></td>
+				
+			</tr>
+			<tr>
+				<td>Name</td>
+				<td><form:input path="cssAdName"  size="100" /></td>
+				<td><form:errors path="cssAdName" cssClass="error" /></td>
+				
+			</tr>
+			<tr>
+				<td>Uri</td>
+				<td><form:input path="cssAdUri"  size="100" /></td>
+				<td><form:errors path="cssAdUri" cssClass="error" /></td>
+				
+			</tr>
+		</table>
 
 					<!-- *** Css Admin End ***** -->
 
@@ -189,7 +206,8 @@ div.TabView div.Pages div.Page div.Pad {
 					<br />
 
 
-						<Table>
+						<table>
+						
 
 
 						<xc:if test="${cmLoginForm.cssAdRequests1.active == true}"> 
@@ -324,7 +342,93 @@ div.TabView div.Pages div.Page div.Pad {
 									
 						</tr>
 						</xc:if> 
+						<xc:if test="${cmLoginForm.cssAdRequests4.active == true}"> 
+					<tr>
+						<td>${cmLoginForm.cssAdRequests4.adRecObj.resultCssAdvertisementRecord.id}</td>
+									
+									<td>${cmLoginForm.cssAdRequests4.adRecObj.resultCssAdvertisementRecord.name}</td>
 
+									<td>${cmLoginForm.cssAdRequests4.adRecObj.resultCssAdvertisementRecord.uri}</td>
+									<td>${cmLoginForm.cssAdRequests4.adRecObj.status}</td>
+									
+								
+									
+									<xc:if test="${cmLoginForm.cssAdRequests4.adRecObj.status == 'NOTREQUESTED'}">
+			
+										<td>
+										<form:radiobutton 
+											path="cssAdRequests4.value"
+											value="1"  /> Send Request<br />
+										</td>
+										<td><form:errors path="${cmLoginForm.cssAdRequests4.value}" cssClass="error" /></td>
+										
+										
+									</xc:if>
+									<xc:if test="${cmLoginForm.cssAdRequests4.adRecObj.status == 'PENDING'}">
+
+									<td>
+										<form:radiobutton 
+										path="cssAdRequests4.value"
+											value="2"  /> Cancel Pending Request<br />
+										</td>
+										<td><form:errors path="${cmLoginForm.cssAdRequests4.value}" cssClass="error" /></td>
+									
+									</xc:if>
+									<xc:if test="${cmLoginForm.cssAdRequests4.adRecObj.status == 'ACCEPTED'}">
+									<td>
+										<form:radiobutton 
+											path="cssAdRequests4.value"
+											value="3"  /> Cancel Request<br />
+										</td>
+									<td><form:errors path="${cmLoginForm.cssAdRequests4.value}" cssClass="error" /></td>
+										</xc:if>
+									
+						</tr>
+						</xc:if> 
+
+								<xc:if test="${cmLoginForm.cssAdRequests5.active == true}"> 
+					<tr>
+						<td>${cmLoginForm.cssAdRequests5.adRecObj.resultCssAdvertisementRecord.id}</td>
+									
+									<td>${cmLoginForm.cssAdRequests5.adRecObj.resultCssAdvertisementRecord.name}</td>
+
+									<td>${cmLoginForm.cssAdRequests5.adRecObj.resultCssAdvertisementRecord.uri}</td>
+									<td>${cmLoginForm.cssAdRequests5.adRecObj.status}</td>
+									
+								
+									
+									<xc:if test="${cmLoginForm.cssAdRequests5.adRecObj.status == 'NOTREQUESTED'}">
+			
+										<td>
+										<form:radiobutton 
+											path="cssAdRequests5.value"
+											value="1"  /> Send Request<br />
+										</td>
+										<td><form:errors path="${cmLoginForm.cssAdRequests5.value}" cssClass="error" /></td>
+										
+										
+									</xc:if>
+									<xc:if test="${cmLoginForm.cssAdRequests5.adRecObj.status == 'PENDING'}">
+
+									<td>
+										<form:radiobutton 
+										path="cssAdRequests5.value"
+											value="2"  /> Cancel Pending Request<br />
+										</td>
+										<td><form:errors path="${cmLoginForm.cssAdRequests5.value}" cssClass="error" /></td>
+									
+									</xc:if>
+									<xc:if test="${cmLoginForm.cssAdRequests5.adRecObj.status == 'ACCEPTED'}">
+									<td>
+										<form:radiobutton 
+											path="cssAdRequests5.value"
+											value="3"  /> Cancel Request<br />
+										</td>
+									<td><form:errors path="${cmLoginForm.cssAdRequests5.value}" cssClass="error" /></td>
+										</xc:if>
+									
+						</tr>
+						</xc:if> 
 						
 
 						</table>
@@ -342,7 +446,8 @@ div.TabView div.Pages div.Page div.Pad {
 
 
 
-					<Table>
+					<table>
+					
 					
 					<tr>
 					<td><b>My Services</b></td>
@@ -567,12 +672,12 @@ div.TabView div.Pages div.Page div.Pad {
 
 					<!-- *** Page4 Start *** -->
 
-					Here is css requests to you
+					
 
 					
 				
 						
-						<Table>
+						<table>
 
 
 						<xc:if test="${cmLoginForm.cssRequests1.active == true}"> 
