@@ -55,7 +55,7 @@
 				</td>
 			</tr>						
 			<tr>
-				<td colspan="3"><input type="submit" value="Logon to Css Manager" /></td>
+				<td colspan="3"><form:input type="submit" path="buttonLabel" value="Logon to Css Manager" /></td>
 			</tr>
 		</table>
 	</form:form>
