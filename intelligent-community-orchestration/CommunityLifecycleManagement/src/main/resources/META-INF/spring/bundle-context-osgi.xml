@@ -42,10 +42,10 @@
         <osgi:reference id="IPersonalisationCallback" interface="org.societies.api.personalisation.mgmt.IPersonalisationCallback"/>
 		<osgi:reference id="IServiceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"/>
 		<osgi:reference id="IServiceDiscoveryCallback" interface="org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback"/>
-		<osgi:reference id="ISuggestedCommunityAnalyser" interface="org.societies.orchestration.api.ISuggestedCommunityAnalyser"/>
-		<osgi:reference id="ISuggestedCommunityAnalyserBean" interface="org.societies.orchestration.api.SuggestedCommunityAnalyserBean"/>
-		<osgi:reference id="ISuggestedCommunityAnalyserResultBean" interface="org.societies.orchestration.api.SuggestedCommunityAnalyserResultBean"/>
-		<osgi:reference id="ISuggestedCommunityAnalyserMethodType" interface="org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType"/>
+		<!-- <osgi:reference id="ISuggestedCommunityAnalyser" interface="org.societies.orchestration.api.ISuggestedCommunityAnalyser"/>
+		<osgi:reference id="SuggestedCommunityAnalyserBean" interface="org.societies.orchestration.api.SuggestedCommunityAnalyserBean"/>
+		<osgi:reference id="SuggestedCommunityAnalyserResultBean" interface="org.societies.orchestration.api.SuggestedCommunityAnalyserResultBean"/>
+		<osgi:reference id="SuggestedCommunityAnalyserMethodType" interface="org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType"/> -->
 		<osgi:reference id="IIdentityManager" interface="org.societies.api.internal.useragent.feedback.IUserFeedbackCallback"/>
 		<osgi:reference id="IDeviceManager" interface="org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager"/>
 		<!--  <osgi:reference id="upcm" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/> -->
