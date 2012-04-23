@@ -22,6 +22,8 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacya
 
 import java.util.Date;
 
+import org.societies.api.identity.IIdentity;
+
 /**
  * Interface for appending to log
  * 
@@ -29,19 +31,53 @@ import java.util.Date;
  */
 public interface IPrivacyLogAppend {
 
-		/**
-		 * Log any outgoing information
-		 * 
-		 * @param dataType
-		 * @param time
-		 * @param sentToGroup    True if multicast
-		 * @param receiverId    CSS ID of the receiver
-		 * @param senderId    CSS ID of the sender
-		 * @param channelId    ID of the channel. Examples: facebook, facebook wall post,
-		 * twitter, XMPP
-		 */
-		public void log(String dataType, Date time, boolean sentToGroup, String receiverId,
-				String senderId, ChannelType channelId);
-		
-		public void log(LogEntry entry);
+	/**
+	 * Log any outgoing information
+	 * 
+	 * @param dataType
+	 * @param time
+	 * @param sentToGroup    True if multicast
+	 * @param sender    CSS ID of the sender
+	 * @param receiver    CSS ID of the receiver
+	 * @param channelId    ID of the channel. Examples: facebook, facebook wall post,
+	 * twitter, XMPP
+	 * 
+	 * @return true if OK to send the data, false to cancel
+	 */
+	//public boolean log(String dataType, Date time, boolean sentToGroup, IIdentity sender,
+	//		IIdentity receiver, ChannelType channelId);
+
+	/**
+	 * Log any outgoing information that is being sent through Communication Framework with
+	 * sendMessage() or sendIQGet()
+	 * 
+	 * @param sender    CSS ID of the sender
+	 * @param receiver    CSS ID of the receiver
+	 * @param payload The payload for sendMessage() or sendIQGet()
+	 * 
+	 * @return true if OK to send the data, false to cancel
+	 */
+	// the type parameter in comms fw is not type of data. It is not even used at the moment. Only option is to call getClass() on the payload. For any more info the Object payload should be typecasted and parsed (not feasible)
+	// implementation: call IIdentity.getType() to see if receiver is CIS (CIS), some other CSS (CSS), or another node within same CSS (CSS_LIGHT, CSS_RICH)
+	// implementation: sentToGroup: true if receiver is CIS
+	// implementation: channelId = XMPP
+	public boolean logCommsFw(IIdentity sender, IIdentity receiver, Object payload);
+	
+	/**
+	 * Log any outgoing information that is being sent from local CSS to a social network.
+	 * 
+	 * @param dataType
+	 * @param time
+	 * @param sentToGroup    True if multicast
+	 * @param sender    CSS ID of the sender
+	 * @param receiver    CSS ID of the receiver
+	 * @param channelId    ID of the channel. Examples: facebook, facebook wall post,
+	 * twitter, XMPP
+	 * 
+	 * @return true if OK to send the data, false to cancel
+	 */
+	public boolean logSN(String dataType, Date time, boolean sentToGroup, IIdentity sender,
+			IIdentity receiver, ChannelType channelId);
+
+	public boolean log(LogEntry entry);
 }
