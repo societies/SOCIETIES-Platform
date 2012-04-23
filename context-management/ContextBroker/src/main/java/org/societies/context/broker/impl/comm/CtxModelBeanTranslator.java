@@ -69,6 +69,15 @@ public final class CtxModelBeanTranslator {
 		
 	}
 	
+	public CtxEntity fromCtxEntityBean(CtxEntityBean entityBean) throws DatatypeConfigurationException{
+		
+		CtxEntity entity=null;
+		//TODO: create the setters to form-up the entity
+		
+		return entity;
+		
+	}
+	
 	
 	public CtxIdentifierBean fromCtxIdentifier(CtxIdentifier identifier) {
 		
@@ -80,6 +89,24 @@ public final class CtxModelBeanTranslator {
 		}
 		else if (identifier.getModelType().equals(CtxModelType.ASSOCIATION)) {
 			return new CtxAssociationIdentifierBean();
+		}
+		else
+			return null;
+		
+	}
+	
+	public CtxIdentifier fromCtxIdentifierBean(CtxIdentifierBean identifierBean) throws MalformedCtxIdentifierException {
+		
+		if (identifierBean.getClass().equals(CtxEntityIdentifierBean.class)) {
+			return new CtxEntityIdentifier(identifierBean.getString());
+		}
+		else if (identifierBean.getString().equals(CtxAttributeIdentifierBean.class)) {
+			//TODO: check
+			return new CtxAttributeIdentifier(new CtxEntityIdentifier(identifierBean.getString()), "TYPE", 0L);
+		}
+		else if (identifierBean.getString().equals(CtxAssociationIdentifierBean.class)) {
+			//TODO: check
+			return new CtxAssociationIdentifier(identifierBean.getString(), "TYPE", 0L);
 		}
 		else
 			return null;
@@ -106,6 +133,22 @@ public final class CtxModelBeanTranslator {
 		
 	}
 	
+	public CtxAttribute fromCtxAttributeBean(CtxAttributeBean attrBean) throws DatatypeConfigurationException, MalformedCtxIdentifierException {
+		
+		CtxAttribute attribute=new CtxAttribute(new CtxAttributeIdentifier(new CtxEntityIdentifier(attrBean.toString()), "TYPE", 0L));
+		attribute.setBinaryValue(attrBean.getBinaryValue());
+		attribute.setDoubleValue(attrBean.getDoubleValue());
+		attribute.setHistoryRecorded(attrBean.isHistoryRecorded());
+		attribute.setIntegerValue(attrBean.getIntegerValue());
+		attribute.setSourceId(attrBean.getSourceId());
+		attribute.setStringValue(attrBean.getStringValue());
+		attribute.setValueMetric(attrBean.getValueMetric());
+		attribute.setValueType(fromCtxAttributeValueTypeBean(attrBean.getValueType()));
+		
+		return attribute;
+		
+	}
+	
 	public CtxAssociationBean fromCtxAssociation(CtxAssociation assoc) throws DatatypeConfigurationException {
 		
 		CtxAssociationBean bean=new CtxAssociationBean();
@@ -124,6 +167,24 @@ public final class CtxModelBeanTranslator {
 		
 	}
 	
+	public CtxAssociation fromCtxAssociationBean(CtxAssociationBean assocBean) throws DatatypeConfigurationException, MalformedCtxIdentifierException {
+		
+		CtxAssociation assoc=new CtxAssociation(new CtxAssociationIdentifier(assocBean.toString(), "TYPE", 0L));
+		//TODO setters
+		//assoc.setLastModified(XMLGregorianCalendarToDate(assocBean.getLastModified()));
+		//assoc.setId(assocBean.getId());
+		//assoc.setChildEntities()
+		/*List<CtxEntityIdentifierBean> childEntities = new ArrayList<CtxEntityIdentifierBean>();
+		for (CtxEntityIdentifier child : assoc.getChildEntities()) {
+			childEntities.add(childEntitiesBeanFromChildEntities(child));
+		}*/
+		
+		assoc.setParentEntity(parentEntityFromParentEntityBean(assocBean.getParentEntity()));
+		
+		return assoc;
+		
+	}
+	
 	public CtxIdentifierBean fromCtxModelObject(CtxModelObject object) {
 		
 		CtxIdentifierBean bean=new CtxEntityIdentifierBean();
@@ -138,6 +199,13 @@ public final class CtxModelBeanTranslator {
 		CtxEntityIdentifierBean bean = new CtxEntityIdentifierBean();
 		bean.setString(parentEntity.toString());
 		return bean;
+	}
+	
+	private CtxEntityIdentifier parentEntityFromParentEntityBean(
+			CtxEntityIdentifierBean parentEntityBean) throws MalformedCtxIdentifierException {
+		
+		CtxEntityIdentifier entity = new CtxEntityIdentifier(parentEntityBean.getString());
+		return entity;
 	}
 
 	public CtxEntityIdentifierBean childEntitiesBeanFromChildEntities(
@@ -165,15 +233,32 @@ public final class CtxModelBeanTranslator {
 		return CtxOriginTypeBean.valueOf(originType.toString());	
 	}
 	
+	public CtxOriginType CtxOriginTypeFromCtxOriginTypeBean(
+			CtxOriginTypeBean originTypeBean) {
+		
+		return CtxOriginType.valueOf(originTypeBean.toString());	
+	}
+	
 	public CtxModelTypeBean CtxModelTypeBeanFromCtxModelType(
 			CtxModelType modelType) {
 		
 		return CtxModelTypeBean.valueOf(modelType.toString());	
 	}
 	
+	public CtxModelType CtxModelTypeFromCtxModelTypeBean(
+			CtxModelTypeBean modelTypeBean) {
+		
+		return CtxModelType.valueOf(modelTypeBean.toString());	
+	}
+	
 	public CtxAttributeValueTypeBean fromCtxAttributeValueType(CtxAttributeValueType valueType) {
 		
 		return CtxAttributeValueTypeBean.valueOf(valueType.toString());	
+	}
+	
+	public CtxAttributeValueType fromCtxAttributeValueTypeBean(CtxAttributeValueTypeBean valueTypeBean) {
+		
+		return CtxAttributeValueType.valueOf(valueTypeBean.toString());	
 	}
 	
 	public XMLGregorianCalendar DateToXMLGregorianCalendar(Date myDate) throws DatatypeConfigurationException {
@@ -182,6 +267,12 @@ public final class CtxModelBeanTranslator {
 		c.setTime(myDate);
 		XMLGregorianCalendar xmlDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
 		return xmlDate;
+	}
+	
+	public Date XMLGregorianCalendarToDate(XMLGregorianCalendar xml) throws DatatypeConfigurationException {
+		
+		Date dt = xml.toGregorianCalendar().getTime();
+		return dt;
 	}
 	
 	@Override
