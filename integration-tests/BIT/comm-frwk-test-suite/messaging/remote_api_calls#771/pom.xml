@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>math.example</artifactId>
-	<name>math test bed example bundle</name>
+	<artifactId>integration.test.bit.remote_api_calls_711</artifactId>
+	<name>remote api calls test bed bundle</name>
 	<packaging>bundle</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 
@@ -40,13 +40,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>example.service.api</artifactId>
-			<version>0.1</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.0</version>
@@ -70,8 +63,7 @@
 						<Embed-Transitive>false</Embed-Transitive>
 						<Import-Package>
 							org.slf4j.*,
-							org.societies.service.api,
-							org.junit.*,
+							org.junit.*
 						</Import-Package>
 
 					</instructions>

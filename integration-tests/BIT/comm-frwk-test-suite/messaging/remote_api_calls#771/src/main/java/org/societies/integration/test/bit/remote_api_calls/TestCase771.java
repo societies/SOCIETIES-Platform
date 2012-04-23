@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.societies.integration.test.bit.math_example;
+package org.societies.integration.test.bit.remote_api_calls;
 
 /**
  * @author Bruno
@@ -14,26 +14,26 @@ import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.service.api.IConsumer;
 
-public class TestCase743 {
 
-	public static IConsumer mathServiceConsumer;
-	private static Logger LOG = LoggerFactory.getLogger(TestCase743.class);
+public class TestCase771 {
+
+	private static Logger LOG = LoggerFactory.getLogger(TestCase771.class);
 	private String results = new String();
 
 	
 	private JUnitCore jUnitCore;
 		
-	public TestCase743() {
+	public TestCase771() {
 	}
 	
-	public void setMathServiceConsumer(IConsumer mathServiceConsumer) {
-		this.mathServiceConsumer = mathServiceConsumer;
-	}
+	//Dependency Injection
+//	public void setMathServiceConsumer(IConsumer mathServiceConsumer) {
+//		this.mathServiceConsumer = mathServiceConsumer;
+//	}
 	
 	private void startTest() {
-		LOG.info("###743... startTest");
+		LOG.info("###771... startTest");
 		jUnitCore = new JUnitCore();
 		Result res = jUnitCore.run(NominalTestCase.class);
 		
@@ -59,6 +59,6 @@ public class TestCase743 {
         results += testRunTm + res.getRunTime() + newln;
         results += testSuccess + res.wasSuccessful() + newln;
 
-		LOG.info("###743 " + results);
+		LOG.info("###771 " + results);
 	}
 }
