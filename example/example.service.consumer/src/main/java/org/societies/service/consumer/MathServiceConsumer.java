@@ -1,9 +1,12 @@
 package org.societies.service.consumer;
 
+import java.util.Calendar;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.societies.service.api.*;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 public class MathServiceConsumer implements IConsumer {
 
@@ -97,7 +100,7 @@ public class MathServiceConsumer implements IConsumer {
 	public int barycenter(int a, int b, int c){
 		// barycenter of a and b is RES with RES = (a * b) / c
 		Future<Integer> futureAb = getMathService().multiply(a, b);
-		
+
 		int ab = 0;
 		try {
 			ab = futureAb.get();
@@ -106,13 +109,111 @@ public class MathServiceConsumer implements IConsumer {
 		} catch (ExecutionException e1) {
 			e1.printStackTrace();
 		}
-		
+
 		if (0 != c) 
 		{
 			int result = ab/c;
-			
+
 			return result;
 		}
 		return -1;
+	}
+
+	@Override
+	public void asyncBarycenter(int a, int b, int c, IConsumerCallback consumerCallback) {
+
+		System.out.println("*** MathServiceConsumerasync Barycenter");
+
+		Calendar calendar = Calendar.getInstance();
+		long start = calendar.getTimeInMillis();
+		for(int i = 0; i<300000; i++)
+		{
+			System.out.println("*** MathServiceConsumerasync i: " + i);
+			i++;
+		}
+
+		calendar = Calendar.getInstance();
+		long end = calendar.getTimeInMillis();
+		System.out.println("*** MathServiceConsumerasync delay: " + ((end-start)/1000));
+
+
+		// try {
+		//
+		// wait(10*1000);
+		// } catch (InterruptedException e) {
+		// System.out.println("InterruptedException "+ e.getMessage());
+		// e.printStackTrace();
+		// }
+
+		System.out.println("After waiting");
+
+		// barycenter of a and b is RES with RES = (a * b) / c
+		Future<Integer> futureAb = getMathService().multiply(a, b);
+
+		int ab = 0;
+		try {
+			ab = futureAb.get();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		} catch (ExecutionException e1) {
+			e1.printStackTrace();
+		}
+
+		if (0 != c)
+		{
+			int result = ab/c;
+			consumerCallback.sendResult(result);
+		}
+		else
+		{
+			consumerCallback.sendResult(-1);
+		}
+
+	}
+
+
+	@Async
+	@Override
+	public Future<Integer> futureBarycenter(int a, int b, int c) {
+
+		// try {
+		// wait(10*1000);
+		// } catch (InterruptedException e) {
+		// System.out.println("InterruptedException "+ e.getMessage());
+		// e.printStackTrace();
+		// }
+
+		Calendar calendar = Calendar.getInstance();
+		long start = calendar.getTimeInMillis();
+		for(int i = 0; i<300000; i++)
+		{
+			System.out.println("*** MathServiceConsumerasync i: " + i);
+			i++;
+		}
+
+		calendar = Calendar.getInstance();
+		long end = calendar.getTimeInMillis();
+		System.out.println("*** MathServiceConsumerasync delay: " + ((end-start)/1000));
+
+
+		System.out.println("After waiting");
+
+		Future<Integer> futureAb = getMathService().multiply(a, b);
+
+		int ab = 0;
+		try {
+			ab = futureAb.get();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		} catch (ExecutionException e1) {
+			e1.printStackTrace();
+		}
+
+		if (0 != c)
+		{
+			int result = ab/c;
+			return new AsyncResult<Integer>(result);
+		}
+		return new AsyncResult<Integer>(0);
 	}
 }
