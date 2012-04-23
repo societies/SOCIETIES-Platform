@@ -1,0 +1,32 @@
+How to implement a new integration test?
+* Maven configuration
+Add at least the following Maven dependencies on your test case POM project:
+<dependency>
+	<groupId>org.societies.integration.test.util</groupId>
+	<artifactId>integrationtestutil</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<scope>compile</scope>
+</dependency>
+<dependency>
+	<groupId>junit</groupId>
+	<artifactId>junit</artifactId>
+	<version>4.0</version>
+	<scope>compile</scope>
+</dependency>
+	
+* Test Case Creation
+Create a Java class to extend "IntegrationTestCase"
+You only have to extend the default constructor as follow
+public YourTestCase() {
+	// Call the super constructor
+	super();
+	// Define the test case number, and test classes to launch
+	testCaseNumber = 759;
+	testCaseClasses = new Class[]{YourNominalTestCase.class, YourSpecificTestCase.class};
+}
+
+And to create your test case classes "YourNominalTestCase" and "YourSpecificTestCase" using the jUnit tool.
+
+* Virgo configuration
+Then your need to launch the "run" method of this class. This can be done automatically through Virgo:
+init-method="run"

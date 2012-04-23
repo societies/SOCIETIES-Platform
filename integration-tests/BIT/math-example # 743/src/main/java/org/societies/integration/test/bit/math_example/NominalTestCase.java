@@ -29,8 +29,8 @@ public class NominalTestCase {
 	}
 	
 	@Test
-	public void asyncTest1() {
-		LOG.info("###743... asyncTest1");
+	public void asyncTest() {
+		LOG.info("###743... asyncTest");
 
 		TestCase743.mathServiceConsumer.asyncBarycenter(1, 2, 2, consumerCallbackImpl);
 	
@@ -40,7 +40,7 @@ public class NominalTestCase {
 
 			 	try {
 			 		LOG.info("###743... 2");
-			 		consumerCallbackImpl.wait(1);
+			 		consumerCallbackImpl.wait(15*1000);
 			 		LOG.info("###743... 3");
 				} catch (InterruptedException e) {
 					LOG.info("###743... 4");
@@ -74,11 +74,9 @@ public class NominalTestCase {
 		
 		LOG.info("after call");
 		
-		// Get the result
-
 			try {
 				LOG.info("before geting result: result isDone? " + futureRes.isDone());
-				result = futureRes.get(2, TimeUnit.SECONDS);
+				result = futureRes.get(15, TimeUnit.SECONDS);
 			} catch (InterruptedException e) {
 				fail("InterruptedException");
 				e.printStackTrace();

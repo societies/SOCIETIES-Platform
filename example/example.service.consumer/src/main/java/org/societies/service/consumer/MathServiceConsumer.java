@@ -122,30 +122,22 @@ public class MathServiceConsumer implements IConsumer {
 	@Override
 	public void asyncBarycenter(int a, int b, int c, IConsumerCallback consumerCallback) {
 
-		System.out.println("*** MathServiceConsumerasync Barycenter");
+		System.out.println("*** MathServiceConsumer asyncBarycenter");
 
 		Calendar calendar = Calendar.getInstance();
 		long start = calendar.getTimeInMillis();
-		for(int i = 0; i<300000; i++)
-		{
-			System.out.println("*** MathServiceConsumerasync i: " + i);
-			i++;
+
+		try {
+			Thread.sleep(10*1000);
+		} catch (InterruptedException e) {
+			System.out.println("*** MathServiceConsumer asyncBarycenter InterruptedException: " + e.getMessage());
+			e.printStackTrace();
 		}
 
 		calendar = Calendar.getInstance();
 		long end = calendar.getTimeInMillis();
-		System.out.println("*** MathServiceConsumerasync delay: " + ((end-start)/1000));
+		System.out.println("*** MathServiceConsumer asyncBarycenter delay: " + ((end-start)/1000));
 
-
-		// try {
-		//
-		// wait(10*1000);
-		// } catch (InterruptedException e) {
-		// System.out.println("InterruptedException "+ e.getMessage());
-		// e.printStackTrace();
-		// }
-
-		System.out.println("After waiting");
 
 		// barycenter of a and b is RES with RES = (a * b) / c
 		Future<Integer> futureAb = getMathService().multiply(a, b);
@@ -176,27 +168,21 @@ public class MathServiceConsumer implements IConsumer {
 	@Override
 	public Future<Integer> futureBarycenter(int a, int b, int c) {
 
-		// try {
-		// wait(10*1000);
-		// } catch (InterruptedException e) {
-		// System.out.println("InterruptedException "+ e.getMessage());
-		// e.printStackTrace();
-		// }
+		System.out.println("*** MathServiceConsumer futureBarycenter");
 
 		Calendar calendar = Calendar.getInstance();
 		long start = calendar.getTimeInMillis();
-		for(int i = 0; i<300000; i++)
-		{
-			System.out.println("*** MathServiceConsumerasync i: " + i);
-			i++;
+		
+		try {
+			Thread.sleep(10*1000);
+		} catch (InterruptedException e) {
+			System.out.println("*** MathServiceConsumer futureBarycenter InterruptedException: " + e.getMessage());
+			e.printStackTrace();
 		}
 
 		calendar = Calendar.getInstance();
 		long end = calendar.getTimeInMillis();
-		System.out.println("*** MathServiceConsumerasync delay: " + ((end-start)/1000));
-
-
-		System.out.println("After waiting");
+		System.out.println("*** MathServiceConsumer futureBarycenter delay: " + ((end-start)/1000));
 
 		Future<Integer> futureAb = getMathService().multiply(a, b);
 
