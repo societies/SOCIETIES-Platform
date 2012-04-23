@@ -21,7 +21,7 @@ startAVD() {
 	echo ""
 	echo "Start the test emulator: $1"
 	echo "-----------------------"
-	emulator -avd $1 -partition-size 128
+	emulator -avd $1 -partition-size 256 
 
 	if [ $? -ne 0 ]
  	then
