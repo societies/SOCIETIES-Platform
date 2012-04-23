@@ -22,7 +22,7 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-  <bean id="TestCase743" class="org.societies.integration.test.bit.math_example.TestCase743" init-method="startTest">
+  <bean id="TestCase743" class="org.societies.integration.test.bit.math_example.TestCase743" init-method="run">
 		<property name="mathServiceConsumer" ref ="mathServiceConsumer" />
   	</bean>
 
