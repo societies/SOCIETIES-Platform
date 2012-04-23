@@ -53,12 +53,10 @@ public abstract class IntegrationTestCase {
 	public final Class testCaseClasses[];
 	
 	/**
-	 * This constructor has to be extended in order
-	 * to specify the test case number
+	 * This constructor specifies the test case number
 	 * and the array of test case classes to run
 	 */
 	public IntegrationTestCase(int testCaseNumber, Class... testCaseClasses) {
-		
 		this.testCaseNumber = testCaseNumber;
 		this.testCaseClasses = testCaseClasses;
 		integrationTestUtils = new IntegrationTestUtils();
