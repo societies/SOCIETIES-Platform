@@ -44,6 +44,7 @@ import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssRequest;
+import org.societies.api.schema.cssmanagement.CssRequestOrigin;
 import org.societies.api.schema.cssmanagement.CssRequestStatusType;
 import org.societies.utilities.DBC.Dbc;
 
@@ -196,15 +197,26 @@ public class CommsServer implements IFeatureServer {
 
 				request.setCssIdentity(stanza.getFrom().getJid());
 				request.setRequestStatus(CssRequestStatusType.PENDING);
+				request.setOrigin(CssRequestOrigin.REMOTE);
 				
 				this.cssManager.updateCssRequest(request);
 				break;
+
 			case UPDATE_CSS_FRIEND_REQUEST:
 
 				request.setCssIdentity(stanza.getFrom().getJid());
 				request.setRequestStatus(bean.getRequestStatus());
+				request.setOrigin(CssRequestOrigin.REMOTE);
 			//	request.setRequestStatus(bean.ge);
 				this.cssManager.updateCssFriendRequest(request);
+			break;
+			case UPDATE_CSS_REQUEST:
+
+				request.setCssIdentity(stanza.getFrom().getJid());
+				request.setRequestStatus(bean.getRequestStatus());
+				request.setOrigin(CssRequestOrigin.REMOTE);
+			//	request.setRequestStatus(bean.ge);
+				this.cssManager.updateCssRequest(request);
 			break;
 			
 			

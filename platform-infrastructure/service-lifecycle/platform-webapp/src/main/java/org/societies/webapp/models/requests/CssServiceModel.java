@@ -22,41 +22,63 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
-
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
+package org.societies.webapp.models.requests;
 
 
+
+
+import org.societies.api.schema.servicelifecycle.model.Service;
 
 /**
- * This class is used to define the level of obfuscation that has to be applied to
- * a context attribute before being disclosed to an external entity.
- * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 17:06:54
+ * Describe your class here...
+ *
+ * @author mmanniox
+ *
  */
-public class DObfOutcome implements IPrivacyOutcome, IDObfAction {
+public class CssServiceModel {
+	
 
-	private double obfuscationLevel;
-
-	public DObfOutcome(double obfuscationLevel){
-		this.obfuscationLevel = obfuscationLevel;
+	boolean active;
+	String value;
+	Service serviceDetails;
+	/**
+	 * @return the active
+	 */
+	public boolean isActive() {
+		return active;
 	}
-
-	public void finalize() throws Throwable {
-
+	/**
+	 * @param active the active to set
+	 */
+	public void setActive(boolean active) {
+		this.active = active;
 	}
-
-	public int getConfidenceLevel(){
-		return 0;
+	/**
+	 * @return the value
+	 */
+	public String getValue() {
+		return value;
 	}
-
-	public PrivacyPreferenceTypeConstants getOutcomeType(){
-		return PrivacyPreferenceTypeConstants.DOBF;
+	/**
+	 * @param value the value to set
+	 */
+	public void setValue(String value) {
+		this.value = value;
 	}
-
-	public double getObfuscationLevel(){
-		return obfuscationLevel;
+	/**
+	 * @return the serviceDetails
+	 */
+	public Service getServiceDetails() {
+		return serviceDetails;
 	}
+	/**
+	 * @param serviceDetails the serviceDetails to set
+	 */
+	public void setServiceDetails(Service serviceDetails) {
+		this.serviceDetails = serviceDetails;
+	}
+	
 
+
+	
 }

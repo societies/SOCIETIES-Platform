@@ -22,41 +22,90 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
-
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
+package org.societies.webapp.models.requests;
 
 
+
+import org.societies.api.schema.cssmanagement.CssAdvertisementRecordDetailed;
+import org.societies.api.schema.cssmanagement.CssRequest;
 
 /**
- * This class is used to define the level of obfuscation that has to be applied to
- * a context attribute before being disclosed to an external entity.
- * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 17:06:54
+ * Describe your class here...
+ *
+ * @author mmanniox
+ *
  */
-public class DObfOutcome implements IPrivacyOutcome, IDObfAction {
+public class CssRequestModel {
+	
 
-	private double obfuscationLevel;
+	boolean active;
+	String value;
+	CssAdvertisementRecordDetailed adRecObj;
+	CssRequest cssRequestObj;
+	
 
-	public DObfOutcome(double obfuscationLevel){
-		this.obfuscationLevel = obfuscationLevel;
+	
+	
+	/**
+	 * @return the adRecObj
+	 */
+	public CssAdvertisementRecordDetailed getAdRecObj() {
+		return adRecObj;
+	}
+	/**
+	 * @param adRecObj the adRecObj to set
+	 */
+	public void setAdRecObj(CssAdvertisementRecordDetailed adRecObj) {
+		this.adRecObj = adRecObj;
+	}
+	/**
+	 * @return the cssRequestObj
+	 */
+	public CssRequest getCssRequestObj() {
+		return cssRequestObj;
+	}
+	/**
+	 * @param cssRequestObj the cssRequestObj to set
+	 */
+	public void setCssRequestObj(CssRequest cssRequestObj) {
+		this.cssRequestObj = cssRequestObj;
+	}
+	
+	
+	
+	
+	/**
+	 * @return the value
+	 */
+	public String getValue() {
+		return value;
+	}
+	/**
+	 * @param value the value to set
+	 */
+	public void setValue(String value) {
+		this.value = value;
+	}
+	/**
+	 * 
+	 */
+	public CssRequestModel() {
+		super();
+	}
+	/**
+	 * @return the active
+	 */
+	public boolean isActive() {
+		return active;
+	}
+	/**
+	 * @param active the active to set
+	 */
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
-	public void finalize() throws Throwable {
-
-	}
-
-	public int getConfidenceLevel(){
-		return 0;
-	}
-
-	public PrivacyPreferenceTypeConstants getOutcomeType(){
-		return PrivacyPreferenceTypeConstants.DOBF;
-	}
-
-	public double getObfuscationLevel(){
-		return obfuscationLevel;
-	}
-
+	
+	
+	
 }

@@ -117,6 +117,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 	public boolean UnRegisterCommManager() {
 		try {
 			manager.removeComponent(subDomain);
+			log.info("'"+subDomain+"' disconnected!");
 		} catch (ComponentException e) {
 			e.printStackTrace();
 			return false;

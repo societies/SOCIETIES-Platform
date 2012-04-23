@@ -22,41 +22,36 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
+package org.societies.useragent.monitoring;
 
+import java.io.Serializable;
+import java.util.Hashtable;
+import java.util.List;
 
+import org.societies.api.context.model.CtxAttributeIdentifier;
 
-/**
- * This class is used to define the level of obfuscation that has to be applied to
- * a context attribute before being disclosed to an external entity.
- * @author Eliza
- * @version 1.0
- * @created 11-Nov-2011 17:06:54
- */
-public class DObfOutcome implements IPrivacyOutcome, IDObfAction {
+public class SnapshotsRegistry implements Serializable{
 
-	private double obfuscationLevel;
-
-	public DObfOutcome(double obfuscationLevel){
-		this.obfuscationLevel = obfuscationLevel;
+	Hashtable<CtxAttributeIdentifier, List<CtxAttributeIdentifier>> snpshtMappings;
+	
+	public SnapshotsRegistry(){
+		snpshtMappings = new Hashtable<CtxAttributeIdentifier, List<CtxAttributeIdentifier>>();
 	}
-
-	public void finalize() throws Throwable {
-
+	
+	public void addMapping(CtxAttributeIdentifier primary, List<CtxAttributeIdentifier> snapshot){
+		snpshtMappings.put(primary, snapshot);
 	}
-
-	public int getConfidenceLevel(){
-		return 0;
+	
+	public void removeMapping(CtxAttributeIdentifier primary){
+		snpshtMappings.remove(primary);
 	}
-
-	public PrivacyPreferenceTypeConstants getOutcomeType(){
-		return PrivacyPreferenceTypeConstants.DOBF;
+	
+	public List<CtxAttributeIdentifier> getSnapshot(CtxAttributeIdentifier primary){
+		return snpshtMappings.get(primary);
 	}
-
-	public double getObfuscationLevel(){
-		return obfuscationLevel;
+	
+	public void updateMapping(CtxAttributeIdentifier primary, List<CtxAttributeIdentifier> newSnapshot){
+		snpshtMappings.put(primary, newSnapshot);
 	}
-
 }

@@ -93,6 +93,10 @@
 			<osgi:listener bind-method="setPcm" ref="persoMgr"></osgi:listener>
 		</osgi:reference>
 		
+		<osgi:reference id="userPrefLearning" interface="org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Learning" cardinality="1..1">
+			<osgi:listener bind-method="setC45Learning" ref="pcm"></osgi:listener>
+		
+		</osgi:reference>
 		<!-- dianne is needed by personalisationManager -->
 		<osgi:reference id="dianne" interface="org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE" cardinality="0..1"> 
 			<osgi:listener bind-method="setDianne" ref="persoMgr"></osgi:listener>

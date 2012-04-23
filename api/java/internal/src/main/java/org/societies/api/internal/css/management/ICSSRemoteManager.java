@@ -173,5 +173,7 @@ public interface ICSSRemoteManager {
 		void sendCssFriendRequest(String friendCssId);
 		/* Called by remote css is response t your request to join*/
 		void updateCssFriendRequest(CssRequest request);
-		
+	
+		/* Called by remote css is response t your request to join*/
+		void updateCssRequest(CssRequest request);
 }

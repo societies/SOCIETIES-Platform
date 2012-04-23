@@ -46,7 +46,7 @@ public class CssNodeEntry implements Serializable {
 	 */
 	private static final long serialVersionUID = 8165777485272476371L;
 	
-	private String identity;
+	private String nodeIdentity;
 	private int status;
 	private int type;
 	private boolean archived;
@@ -54,15 +54,15 @@ public class CssNodeEntry implements Serializable {
 	 * @return the identity
 	 */
 	@Id
-	@Column(name = "Identity")
-	public String getIdentity() {
-		return identity;
+	@Column(name = "NodeIdentity")
+	public String getNodeIdentity() {
+		return nodeIdentity;
 	}
 	/**
 	 * @param identity the identity to set
 	 */
-	public void setIdentity(String identity) {
-		this.identity = identity;
+	public void setNodeIdentity(String nodeIdentity) {
+		this.nodeIdentity = nodeIdentity;
 	}
 	/**
 	 * @return the status
@@ -110,9 +110,9 @@ public class CssNodeEntry implements Serializable {
 	 * @param status
 	 * @param type
 	 */
-	public CssNodeEntry(String identity, int status, int type, boolean archived) {
+	public CssNodeEntry(String nodeIdentity, int status, int type, boolean archived) {
 		super();
-		this.identity = identity;
+		this.nodeIdentity = nodeIdentity;
 		this.status = status;
 		this.type = type;
 		this.archived = archived;

@@ -42,6 +42,7 @@ import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssRequest;
+import org.societies.api.schema.cssmanagement.CssRequestOrigin;
 import org.societies.api.schema.cssmanagement.CssRequestStatusType;
 import org.societies.api.schema.cssmanagement.CssAdvertisementRecordDetailed;
 import org.springframework.scheduling.annotation.Async;
@@ -636,15 +637,24 @@ public class CSSManager implements ICSSLocalManager {
 			e.printStackTrace();
 		}
 
-		// If we accepted we should let them know
-		// If we ignored them , we can just forget about it, 
-		if (request.getRequestStatus() == CssRequestStatusType.ACCEPTED)
+		
+
+
+		// We only want to sent messages to remote Css's for this function if we initiated the call locally
+		if (request.getOrigin() == CssRequestOrigin.LOCAL)
 		{
-		//called updateCssFriendRequest on remote
-			cssManagerRemote.updateCssFriendRequest(request);
+			
+			// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
+			// otherwise send message to remote css
+			if (request.getRequestStatus() != CssRequestStatusType.DENIED )
+			{
+				//called updateCssFriendRequest on remote
+				request.setOrigin(CssRequestOrigin.REMOTE);
+				cssManagerRemote.updateCssFriendRequest(request);
+			}	
 		}
+		
 	}
-	
 	
 	/*
 	 * (non-Javadoc)
@@ -667,6 +677,22 @@ public class CSSManager implements ICSSLocalManager {
 			e.printStackTrace();
 		}
 	
+		// If this was initiated locally then inform remote css
+		// We only want to sent messages to remote Css's for this function if we initiated the call locally
+		if (request.getOrigin() == CssRequestOrigin.LOCAL)
+		{
+			
+			// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
+			// otherwise send message to remote css
+
+				//called updateCssFriendRequest on remote
+				request.setOrigin(CssRequestOrigin.REMOTE);
+				cssManagerRemote.updateCssRequest(request);
+	
+		}
+		
+		
+				
 	}
 
 
@@ -690,6 +716,7 @@ public class CSSManager implements ICSSLocalManager {
 			e.printStackTrace();
 		}
 		
+		// This will always be initalliated locally so no need to check origin
 		// db updated ow send it to friend and forget about it
 		//cssManagerRemote.se
 		cssManagerRemote.sendCssFriendRequest(cssFriendId);

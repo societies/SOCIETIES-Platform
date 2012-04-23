@@ -22,13 +22,30 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.api.identity;
 
-package org.societies.useragent.monitoring;
+/**
+ * This class is used to represent a CIS requesting access to resources.
+ *
+ * @author Nicolas, Olivier, Eliza
+ *
+ */
+public class RequestorCis extends Requestor{
 
-public class Snapshots {
+	private final IIdentity cisRequestorId;
+	
+	public RequestorCis(IIdentity requestorId, IIdentity cisRequestorId) {
+		
+		super(requestorId);
+		this.cisRequestorId = cisRequestorId;
+		// TODO Auto-generated constructor stub
+	}
 
-	public static String[] snapshot1 = {"symLoc", "status", "activity"};
-	public static String[] snapshot2 = {"symLoc", "day"};
-	public enum snapshots {snapshot1, snapshot2};
+	/**
+	 * @return the cisRequestorId
+	 */
+	public IIdentity getCisRequestorId() {
+		return cisRequestorId;
+	}
 
 }
