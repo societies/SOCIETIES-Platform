@@ -20,11 +20,8 @@ public class TestCase743 extends IntegrationTestCase{
 	
 	public TestCase743() {
 		//Don't forget to add the super
-		super();
-		//Don't forget to specify the tes case number as bellow
-		testCaseNumber = 743;
 		//Don't forget to put all classes that contain tests in the Class table, as bellow
-	    testCaseClasses = new Class[]{NominalTestCase.class, SpecificTestCase.class};
+		super(743, new Class[]{NominalTestCase.class, SpecificTestCase.class});
 	}
 	
 	// IConsumer injection
