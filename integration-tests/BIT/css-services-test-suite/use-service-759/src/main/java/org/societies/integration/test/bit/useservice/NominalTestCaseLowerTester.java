@@ -48,6 +48,10 @@ public class NominalTestCaseLowerTester {
 	 * Tools for integration test
 	 */
 	public IntegrationTestUtils integrationTestUtils;
+	/**
+	 * Test case number
+	 */
+	public static int testCaseNumber;
 
 
 	public NominalTestCaseLowerTester() {
@@ -176,6 +180,6 @@ public class NominalTestCaseLowerTester {
 		this.calculatorService = calculatorService;
 		// -- Launch the UpperTester to continue the test case by consuming a service
 		NominalTestCaseUpperTester.calculatorServiceId = calculatorServiceId;
-		integrationTestUtils.run(TestCase759.testCaseNumber, NominalTestCaseUpperTester.class);
+		integrationTestUtils.run(testCaseNumber, NominalTestCaseUpperTester.class);
 	}
 }
