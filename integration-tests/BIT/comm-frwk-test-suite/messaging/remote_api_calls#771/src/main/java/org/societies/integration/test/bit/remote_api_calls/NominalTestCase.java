@@ -1,4 +1,4 @@
-package org.societies.integration.test.bit.math_example;
+package org.societies.integration.test.bit.remote_api_calls;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -16,44 +16,18 @@ public class NominalTestCase {
 
 	@Before
 	public void setUp() {
-		LOG.info("###743... setUp");
+		LOG.info("###771... setUp");
 	}
 
 	@Test
-	public void body1() {
-		LOG.info("###743... body1");
+	public void body() {
+		LOG.info("###771... body");
 			
-		Assert.assertEquals(new Integer(0),TestCase743.mathServiceConsumer.barycenter(1, 2, 4) );
 
 	}
-	
-	@Test
-	public void body2() {
-		LOG.info("###743... body2");
-		
-		Assert.assertEquals(new Integer(1),TestCase743.mathServiceConsumer.barycenter(2, 2, 2) );
-
-	}
-	
-	@Test
-	public void body3() {
-		LOG.info("###743... body4");
-		
-		Assert.assertEquals(new Integer(2),TestCase743.mathServiceConsumer.barycenter(2, 2, 2) );
-
-	}
-	
-	
-	@Test
-	public void body4() {
-		LOG.info("###743... body4");
-			
-		Assert.assertEquals(new Integer(2), TestCase743.mathServiceConsumer.barycenter(1, 2, 2) );
-	}
-
 	
 	@After
 	public void tearDown() {
-		LOG.info("###743... tearDown");
+		LOG.info("###771... tearDown");
 	}
 }
