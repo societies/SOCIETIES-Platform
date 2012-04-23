@@ -66,6 +66,8 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 
 //import org.societies.api.comm.xmpp.datatypes.Identity;
@@ -130,6 +132,8 @@ public class CommunityRecommender //implements ICommCallback
 	private IServiceDiscoveryCallback serviceDiscoveryCallback;
 	
 	private IDeviceManager deviceManager;
+	
+	private IIdentityManager identityManager;
 	
 	/*
      * Constructor for Community Recommender
@@ -270,10 +274,11 @@ public class CommunityRecommender //implements ICommCallback
 			if (!(cissToCreateMetadata.get(i).split("---")[0].substring(0, 3).equals("CIS")))
 				cissToCreateMetadata.set(i, cissToCreateMetadata.get(i).concat(cissToCreate.get(i).toString()));
 		}
+		
+		if (cissToCreate != null) 
+		    for (int i = 0; i < cissToCreate.size(); i++)
+			    cisManager.createCis(linkedCss.getIdentifier(), null, null, null, 0);
 		return new ArrayList<String>();
-		//if (cissToCreate != null) 
-		  //  for (int i = 0; i < cissToCreate.size(); i++)
-			//    cisManager.createCis(linkedCss.getIdentifier(), cissToCreate.get(i).getCisId());
 	}
 	
 	public ArrayList<ICisRecord> getUserFeedbackOnCreation(ArrayList<ICisRecord> cissToCreate) {
@@ -332,18 +337,18 @@ public class CommunityRecommender //implements ICommCallback
 		
 		cissToDelete = cisPossibilities;
 		
-		//for (int i = 0; i < cissToDelete.size(); i++) {
-			//cisManager.deleteCis(linkedCss.getIdentifier(), cissToDelete.get(i).getCisId());
-	    //}
-		//for (int i = 0; i < cisPossibilities.size(); i++) {
-		//    if (!cissToDelete.contains(cisPossibilities.get(i)))
-		//        if (cissToCreateMetadata.get(i).contains("short-term temporary"))
-		//            cissToCreateMetadata.set(i, cissToCreateMetadata.get(i).replace("short-term temporary", "medium-term temporary");
-		//        if (cissToCreateMetadata.get(i).contains("medium-term temporary"))
-		//            cissToCreateMetadata.set(i, cissToCreateMetadata.get(i).replace("medium-term temporary", "long-term temporary");
-		//        if (cissToCreateMetadata.get(i).contains("long-term temporary"))
-		//            cissToCreateMetadata.set(i, cissToCreateMetadata.get(i).replace("long-term temporary", "ongoing");
-		//}
+		for (int i = 0; i < cissToDelete.size(); i++) {
+			cisManager.deleteCis(linkedCss.getIdentifier(), cissToDelete.get(i).getCisId(), null);
+	    }
+		for (int i = 0; i < cisPossibilities.size(); i++) {
+		    if (!cissToDelete.contains(cisPossibilities.get(i)))
+		        if (cissToCreateMetadata.get(i).contains("short-term temporary"))
+		            cissToCreateMetadata.set(i, cissToCreateMetadata.get(i).replace("short-term temporary", "medium-term temporary"));
+		        if (cissToCreateMetadata.get(i).contains("medium-term temporary"))
+		            cissToCreateMetadata.set(i, cissToCreateMetadata.get(i).replace("medium-term temporary", "long-term temporary"));
+		        if (cissToCreateMetadata.get(i).contains("long-term temporary"))
+		            cissToCreateMetadata.set(i, cissToCreateMetadata.get(i).replace("long-term temporary", "ongoing"));
+		}
 		return new ArrayList<String>();
 	}
 	
@@ -399,15 +404,19 @@ public class CommunityRecommender //implements ICommCallback
 	
 	    
 	    //can't use GUI in tests
-	    //finalConfiguredCiss = getUserFeedbackOnConfiguration(cissToConfigure);
-	
-	    //finalConfiguredCiss = cissToConfigure;
+	    //cissToConfigure = getUserFeedbackOnConfiguration(cissToConfigure);
 	
 	    //Iterator<ArrayList<ICisRecord>> iterator = cissToConfigure.iterator();
 	
 	    for (int i = 0; i < cissToConfigure.size(); i++) {
 	        ArrayList<ICisRecord> configurableCis = cissToConfigure.get("Configure CISs").get(i);
-            //IIdentity cisID = configurableCis.get(i).get(0).getCisId();
+            IIdentity cisID = null;
+	        try {
+				cisID = identityManager.fromJid(configurableCis.get(0).getCisId());
+			} catch (InvalidFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		    //if (cisManager.get(cisID).getMembersList() != configurableCis.get(i).get(1).getMembersList())
 	        //    cisManager.setMembersList(cisID, configurableCis.get(i).get(1).getMembersList();
 	        //if (cisManager.get(cisID).getMembershipCriteria() != configurableCis.get(i).get(1).getMembershipCriteria())
@@ -421,7 +430,8 @@ public class CommunityRecommender //implements ICommCallback
         	//    where if a user deletion from CIS attempt is made, 
         	//    that user will be informed by the system and given a chance to respond?
         	//    The admin/owner could have an override option in case e.g. offensive person is being deleted.
-        	//if "merge with other CIS"
+        	
+	        //if "merge with other CIS"
         	//
 	        configurableCis = cissToConfigure.get("Merge CISs").get(i);
 	        //
