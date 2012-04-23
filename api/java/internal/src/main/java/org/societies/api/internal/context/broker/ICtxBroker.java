@@ -276,6 +276,18 @@ public interface ICtxBroker {
 	public Future<CtxModelObject> retrieve(CtxIdentifier identifier) throws CtxException;
 	
 	/**
+	 * Retrieves the {@link IndividualCtxEntity} which represents the operator
+	 * of the CSS. IndividualCtxEntities are most commonly of type "person";
+	 * however they can also be organisations, smart space infrastructures, 
+	 * autonomous or semi-autonomous agents, etc.
+	 * 
+	 * @throws CtxException 
+	 *             if the IndividualCtxEntity representing the operator of the
+	 *             CSS cannot be retrieved
+	 */
+	public Future<IndividualCtxEntity> retrieveCssOperator() throws CtxException;
+	
+	/**
 	 * Updates a single context model object.
 	 * 
 	 * @param identifier

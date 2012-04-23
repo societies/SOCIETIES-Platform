@@ -22,55 +22,63 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test;
+package org.societies.webapp.models.requests;
 
-import org.junit.runner.Result;
+
+
+
+import org.societies.api.schema.servicelifecycle.model.Service;
 
 /**
- * Specific test case class for integration test
- * 
- * This class has to be extended, its entry point is
- * the "run" method: it launch the whole test case.
- * This may help to implement integration test case.
- * This class use the stateless IntegrationTestUtils
- * 
- * @author Rafik Said-Mansour (Trialog)
- * @author Olivier Maridat (Trialog)
+ * Describe your class here...
+ *
+ * @author mmanniox
  *
  */
-public abstract class IntegrationTestCase {
-	/**
-	 * Tools for integration test
-	 */
-	public IntegrationTestUtils integrationTestUtils;
-	/**
-	 * Number of the test case on Redmine
-	 */
-	public final Integer testCaseNumber ;
-	/**
-	 * Test case classes to launch on Virgo for this integration test case
-	 */
-	public final Class testCaseClasses[];
+public class CssServiceModel {
 	
+
+	boolean active;
+	String value;
+	Service serviceDetails;
 	/**
-	 * This constructor specifies the test case number
-	 * and the array of test case classes to run
+	 * @return the active
 	 */
-	public IntegrationTestCase(int testCaseNumber, Class... testCaseClasses) {
-		this.testCaseNumber = testCaseNumber;
-		this.testCaseClasses = testCaseClasses;
-		integrationTestUtils = new IntegrationTestUtils();
+	public boolean isActive() {
+		return active;
+	}
+	/**
+	 * @param active the active to set
+	 */
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+	/**
+	 * @return the value
+	 */
+	public String getValue() {
+		return value;
+	}
+	/**
+	 * @param value the value to set
+	 */
+	public void setValue(String value) {
+		this.value = value;
+	}
+	/**
+	 * @return the serviceDetails
+	 */
+	public Service getServiceDetails() {
+		return serviceDetails;
+	}
+	/**
+	 * @param serviceDetails the serviceDetails to set
+	 */
+	public void setServiceDetails(Service serviceDetails) {
+		this.serviceDetails = serviceDetails;
 	}
 	
+
+
 	
-	/**
-	 * Run the test case
-	 * 
-	 * @param testCaseNumber Test case number
-	 * @param testCaseClasses Classes to run to manage the test case
-	 * @return result of the test case
-	 */
-	public Result run() {
-		return integrationTestUtils.run(testCaseNumber, testCaseClasses);
-	}
 }

@@ -72,6 +72,7 @@
 			<xs:element name="cssIdentity" type="xs:string" minOccurs="0" />
 			<xs:element name="requestStatus" type="tns:cssRequestStatusType"
 				minOccurs="0" />
+			<xs:element name="origin" type="tns:cssRequestOrigin" minOccurs="0"/>	
 		</xs:sequence>
 	</xs:complexType>
 
@@ -146,11 +147,20 @@
 		</xs:restriction>
 	</xs:simpleType>
 	
+	<xs:simpleType name="cssRequestOrigin">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="local" />
+			<xs:enumeration value="remote" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	
 	<xs:complexType name="cssAdvertisementRecordDetailed">
 		<xs:sequence>
 				<xs:element name="resultCssAdvertisementRecord" type="tnd:cssAdvertisementRecord"
 					minOccurs="0"/>
 			<xs:element name="status" type="tns:cssRequestStatusType" minOccurs="0"/>
+			<xs:element name="origin" type="tns:cssRequestOrigin" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 	

@@ -1,0 +1,44 @@
+How to implement a new integration test?
+* Maven configuration
+Add at least the following Maven dependencies on your test case POM project:
+<dependency>
+	<groupId>org.societies.integration.test.util</groupId>
+	<artifactId>integrationtestutil</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<scope>compile</scope>
+</dependency>
+<dependency>
+	<groupId>junit</groupId>
+	<artifactId>junit</artifactId>
+	<version>4.0</version>
+	<scope>compile</scope>
+</dependency>
+
+Depending of your "Maven bundle plugin" configuration, you may need to explicitly embed these dependencies to your bundle, as follow:
+
+<Embed-Dependency>
+    junit;scope=compile|runtime, 
+    integrationtestutil;scope=compile|runtime, 
+</Embed-Dependency>
+
+	
+* Test Case Creation
+Create a Java class to extend "IntegrationTestCase" (e.g. "YourTestCase")
+In this class, you only have to fill the test case number and an array of test case classes.
+This may be done by creating a default constructor and by calling the parent constructor
+public YourTestCase() {
+	// Call the super constructor
+	// with test case number
+	// and test case classes to run
+	super(759, new Class[]{SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
+}
+Or directly through Virgo configuration if you prefer.
+
+And to create your test case classes "YourNominalTestCase" and "YourSpecificTestCase" using the jUnit tool.
+
+As you can see in the "math-example", you may use these classes as normal Java classes,
+and for example, add Virgo injections if necessary (e.g. CommFramework...).
+
+* Virgo configuration
+Then your need to launch the "run" method of this class. This can be done automatically through Virgo:
+init-method="run"

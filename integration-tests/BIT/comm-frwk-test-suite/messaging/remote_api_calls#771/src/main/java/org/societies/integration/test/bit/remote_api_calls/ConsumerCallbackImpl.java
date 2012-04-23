@@ -22,55 +22,39 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test;
+package org.societies.integration.test.bit.remote_api_calls;
 
-import org.junit.runner.Result;
 
 /**
- * Specific test case class for integration test
- * 
- * This class has to be extended, its entry point is
- * the "run" method: it launch the whole test case.
- * This may help to implement integration test case.
- * This class use the stateless IntegrationTestUtils
- * 
- * @author Rafik Said-Mansour (Trialog)
- * @author Olivier Maridat (Trialog)
+ *
+ * @author Rafik
  *
  */
-public abstract class IntegrationTestCase {
-	/**
-	 * Tools for integration test
-	 */
-	public IntegrationTestUtils integrationTestUtils;
-	/**
-	 * Number of the test case on Redmine
-	 */
-	public final Integer testCaseNumber ;
-	/**
-	 * Test case classes to launch on Virgo for this integration test case
-	 */
-	public final Class testCaseClasses[];
+public class ConsumerCallbackImpl implements IConsumerCallback{
+
+	private Integer asyncResult = null;
 	
 	/**
-	 * This constructor specifies the test case number
-	 * and the array of test case classes to run
-	 */
-	public IntegrationTestCase(int testCaseNumber, Class... testCaseClasses) {
-		this.testCaseNumber = testCaseNumber;
-		this.testCaseClasses = testCaseClasses;
-		integrationTestUtils = new IntegrationTestUtils();
-	}
-	
-	
-	/**
-	 * Run the test case
 	 * 
-	 * @param testCaseNumber Test case number
-	 * @param testCaseClasses Classes to run to manage the test case
-	 * @return result of the test case
 	 */
-	public Result run() {
-		return integrationTestUtils.run(testCaseNumber, testCaseClasses);
+	public ConsumerCallbackImpl() {
+		super();
+
 	}
+
+	@Override
+	public void sendResult(int result) {
+		this.asyncResult = result;	
+		synchronized (this) {
+            notifyAll( );
+        }
+	}
+	
+	/**
+	 * @return the asyncResult
+	 */
+	public Integer getAsyncResult() {
+		return asyncResult;
+	}
+
 }

@@ -85,7 +85,8 @@ public class CtxBrokerServer implements IFeatureServer{
 					requesterIdentity = this.identMgr.fromJid(xmppIdentityJid);
 
 					Future<CtxEntity> newEntityFuture;
-					newEntityFuture = ctxbroker.createEntity(requesterIdentity, cbPayload.getCreate().getType());
+					// TODO Change based on updated 3P ICtxBroker
+					newEntityFuture = ctxbroker.createEntity(null, null, cbPayload.getCreate().getType());
 					CtxEntity newCtxEntity = newEntityFuture.get();
 					// the entity is created
 
@@ -124,7 +125,8 @@ public class CtxBrokerServer implements IFeatureServer{
 
 
 					Future<CtxAssociation> newAssociationFuture;
-					newAssociationFuture = ctxbroker.createAssociation(requesterIdentity, cbPayload.getCreateAssoc().getType());
+					// TODO Change based on updated 3P ICtxBroker
+					newAssociationFuture = ctxbroker.createAssociation(null, null, cbPayload.getCreateAssoc().getType());
 					CtxAssociation newCtxAssociation = newAssociationFuture.get();
 					// the association is created
 
@@ -164,7 +166,8 @@ public class CtxBrokerServer implements IFeatureServer{
 
 
 					Future<CtxAttribute> newAttributeFuture;
-					newAttributeFuture = ctxbroker.createAttribute(requesterIdentity,
+					// TODO Change based on updated 3P ICtxBroker
+					newAttributeFuture = ctxbroker.createAttribute(null,
 							new CtxEntityIdentifier(requesterIdentity.toString(), cbPayload.getCreateAttr().getType(), cbPayload.getCreateAttr().getObjectNumber()),
 							cbPayload.getCreateAttr().getType());
 					CtxAttribute newCtxAttribute= newAttributeFuture.get();
@@ -207,7 +210,8 @@ public class CtxBrokerServer implements IFeatureServer{
 
 					IIdentity requesterIdentity = this.identMgr.fromJid(xmppIdentityJid);
 					Future<CtxModelObject> removeModelObjectFuture;
-					removeModelObjectFuture = ctxbroker.remove(requesterIdentity,
+					// TODO Change based on updated 3P ICtxBroker
+					removeModelObjectFuture = ctxbroker.remove(null,
 							new CtxEntityIdentifier(requesterIdentity.toString(), cbPayload.getRemove().getType(), cbPayload.getRemove().getObjectNumber()) );
 
 					CtxModelObject removedModelObject = removeModelObjectFuture.get();
@@ -249,7 +253,8 @@ public class CtxBrokerServer implements IFeatureServer{
 
 
 					Future<CtxModelObject> retrieveModelObjectFuture;
-					retrieveModelObjectFuture = ctxbroker.retrieve(requesterIdentity,
+					// TODO Change based on updated 3P ICtxBroker
+					retrieveModelObjectFuture = ctxbroker.retrieve(null,
 							new CtxEntityIdentifier(requesterIdentity.toString(), cbPayload.getRetrieve().getType(), cbPayload.getRetrieve().getObjectNumber()) );
 
 					CtxModelObject retrievedModelObject = retrieveModelObjectFuture.get();
@@ -298,7 +303,8 @@ public class CtxBrokerServer implements IFeatureServer{
 							modelType = t;
 					}
 					//get the lookup
-					lookupObjectsFuture = ctxbroker.lookup(requesterIdentity, modelType, cbPayload.getLookup().getType());
+					// TODO Change based on updated 3P ICtxBroker
+					lookupObjectsFuture = ctxbroker.lookup(null, null, modelType, cbPayload.getLookup().getType());
 
 					List<CtxIdentifier> lookedupModelObjects = lookupObjectsFuture.get();
 					// the object has been looked-up
@@ -349,7 +355,8 @@ public class CtxBrokerServer implements IFeatureServer{
 							cbPayload.getUpdate().getObjectNumber());
 					CtxModelObject innerModelObject = new CtxEntity(innerIdentifier);
 
-					updateModelObjectFuture = ctxbroker.update(requesterIdentity, innerModelObject);
+					// TODO Change based on updated 3P ICtxBroker
+					updateModelObjectFuture = ctxbroker.update(null, innerModelObject);
 
 					CtxModelObject updatedModelObject = updateModelObjectFuture.get();
 					// the object has been updated
