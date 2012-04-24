@@ -26,6 +26,8 @@ package org.societies.privacytrust.trust.api.model;
 
 import java.io.Serializable;
 
+import org.societies.privacytrust.trust.impl.repo.model.Trust;
+
 /**
  * This interface is used to represent an entity trusted by the trustor,
  * i.e. the owner of a CSS. Each trusted entity is referenced by its
@@ -48,9 +50,8 @@ public interface ITrustedEntity extends Serializable {
 	/**
 	 * 
 	 * @return
-	 *
-	public DirectTrust getDirectTrust();
 	 */
+	public IDirectTrust getDirectTrust();
 
 	/**
 	 * 

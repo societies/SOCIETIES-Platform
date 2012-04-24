@@ -27,12 +27,14 @@ package org.societies.privacytrust.trust.impl.repo.model;
 /**
  * Describe your class here...
  *
- * @author nlia
- *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.7
  */
 public class TableName {
 
 	public static final String TRUSTED_CSS = "t_users";
 	
 	public static final String TRUSTED_CIS = "t_communities";
+	
+	public static final String DIRECT_TRUST = "t_direct_trust";
 }

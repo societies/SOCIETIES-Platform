@@ -22,15 +22,18 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
+package org.societies.privacytrust.trust.impl.repo.model;
+
+import org.societies.privacytrust.trust.api.model.IUserPerceivedTrust;
 
 /**
- * This class is used to represent the direct trust in a TrustedEntity. The
- * DirectTrust value is evaluated based on the experiences of direct interactions
- * between the trustor and the TrustedEntity.
+ * Implementation of the {@link IUserPerceivedTrust} interface.
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
  */
-public class DirectTrust extends Trust {
+public class UserPerceivedTrust extends Trust implements IUserPerceivedTrust {
 
-	private static final long serialVersionUID = 2604976855460869815L;
+	private static final long serialVersionUID = -3856234754824690743L;
 
 }

@@ -24,34 +24,26 @@
  */
 package org.societies.privacytrust.trust.impl.repo.model;
 
-import javax.persistence.CascadeType;
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToOne;
 
-import org.hibernate.annotations.Columns;
-import org.hibernate.annotations.Type;
-import org.societies.privacytrust.trust.api.model.IDirectTrust;
-import org.societies.privacytrust.trust.api.model.ITrustedEntity;
-import org.societies.privacytrust.trust.api.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.model.ITrust;
 
 /**
- * This abstract class is used to represent an entity trusted by the trustor,
- * i.e. the owner of a CSS. Each trusted entity is referenced by its
- * {@link TrustedEntityId}, while the associated {@link Trust} objects express
- * the trustworthiness of that entity, i.e. direct, indirect and user-perceived
- * trust.
+ * Implementation of the {@link ITrust} interface.
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.1 
+ * @since 0.0.1
  */
 @MappedSuperclass
-public abstract class TrustedEntity implements ITrustedEntity {
-	
-	private static final long serialVersionUID = -6065344074845695865L;
+public abstract class Trust implements ITrust {
 
+	private static final long serialVersionUID = 3965922195661451444L;
+	
 	/* The surrogate key used by Hibernate. */
 	@Id
 	@GeneratedValue
@@ -59,94 +51,64 @@ public abstract class TrustedEntity implements ITrustedEntity {
 	@SuppressWarnings("unused")
 	private long id;
 	
-	/** The identifier of this trusted entity. */
-	@Columns(columns={
-			@Column(name = "trustorId", nullable = false, updatable = false, length = 256),
-			@Column(name = "trusteeId", nullable = false, updatable = false, length = 256)
-	})
-	@Type(type="org.societies.privacytrust.trust.impl.repo.model.hibernate.TrustedEntityIdUserType")
-	private final TrustedEntityId teid;
+	private double value;
 	
-	@OneToOne(cascade = CascadeType.ALL)
-	private DirectTrust directTrust;
+	private Date lastModified;
 	
-	//private IndirectTrust indirectTrust ;
-	//private UserPerceivedTrust userPerceivedTrust;
+	private Date lastUpdated;
 
-	TrustedEntity(final TrustedEntityId teid) {
-		
-		this.teid = teid;
-	}
-	
 	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getTeid()
+	 * @see org.societies.privacytrust.trust.api.model.ITrust#getValue()
 	 */
 	@Override
-	public TrustedEntityId getTeid() {
+	public double getValue() {
 		
-		return this.teid;
+		return this.value;
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getDirectTrust()
+
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.model.ITrust#setValue(double)
 	 */
 	@Override
-	public IDirectTrust getDirectTrust() {
+	public void setValue(double value) {
 		
-		return this.directTrust;
+		this.value = value;
 	}
-	
-	/**
-	 * 
-	 * @param directTrust
-	 * @since 0.0.3
-	 *
-	public void setDirectTrust(DirectTrust directTrust) {
+
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.model.ITrust#getLastModified()
+	 */
+	@Override
+	public Date getLastModified() {
 		
-		this.directTrust = directTrust;
+		return this.lastModified;
 	}
-	
+
 	/**
-	 * 
-	 * @return
-	 * @since 0.0.3
-	 *
-	public IndirectTrust getIndirectTrust() {
+	 * @param lastModified the lastModified to set
+	 */
+	public void setLastModified(Date lastModified) {
 		
-		return this.indirectTrust;
+		this.lastModified = lastModified;
 	}
-	
-	/**
-	 * 
-	 * @param indirectTrust
-	 * @since 0.0.3
-	 *
-	public void setIndirectTrust(IndirectTrust indirectTrust) {
+
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.model.ITrust#getLastUpdated()
+	 */
+	@Override
+	public Date getLastUpdated() {
 		
-		this.indirectTrust = indirectTrust;
+		return this.lastUpdated;
 	}
-	
+
 	/**
-	 * 
-	 * @return
-	 * @since 0.0.3
-	 *
-	public UserPerceivedTrust getUserPerceivedTrust() {
+	 * @param lastUpdated the lastUpdated to set
+	 */
+	public void setLastUpdated(Date lastUpdated) {
 		
-		return this.userPerceivedTrust;
+		this.lastUpdated = lastUpdated;
 	}
-	
-	/**
-	 * 
-	 * @param userPerceivedTrust
-	 * @since 0.0.3
-	 *
-	public void setUserPerceivedTrust(UserPerceivedTrust userPerceivedTrust) {
-		
-		this.userPerceivedTrust = userPerceivedTrust;
-	}*/
-	
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -155,7 +117,13 @@ public abstract class TrustedEntity implements ITrustedEntity {
 		
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.teid == null) ? 0 : this.teid.hashCode());
+		result = prime * result
+				+ ((this.lastModified == null) ? 0 : this.lastModified.hashCode());
+		result = prime * result
+				+ ((this.lastUpdated == null) ? 0 : this.lastUpdated.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(this.value);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
 		
 		return result;
 	}
@@ -173,12 +141,19 @@ public abstract class TrustedEntity implements ITrustedEntity {
 		if (this.getClass() != that.getClass())
 			return false;
 		
-		final TrustedEntity other = (TrustedEntity) that;
-		
-		if (this.teid == null) {
-			if (other.teid != null)
+		Trust other = (Trust) that;
+		if (this.lastModified == null) {
+			if (other.lastModified != null)
 				return false;
-		} else if (!this.teid.equals(other.teid))
+		} else if (!this.lastModified.equals(other.lastModified))
+			return false;
+		if (this.lastUpdated == null) {
+			if (other.lastUpdated != null)
+				return false;
+		} else if (!this.lastUpdated.equals(other.lastUpdated))
+			return false;
+		if (Double.doubleToLongBits(this.value) != 
+				Double.doubleToLongBits(other.value))
 			return false;
 		
 		return true;

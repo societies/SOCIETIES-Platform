@@ -24,59 +24,39 @@
  */
 package org.societies.privacytrust.trust.api.model;
 
-import java.util.Set;
-
-import org.societies.privacytrust.trust.impl.repo.model.Trust;
-import org.societies.privacytrust.trust.impl.repo.model.TrustedCis;
-import org.societies.privacytrust.trust.impl.repo.model.TrustedService;
+import java.io.Serializable;
+import java.util.Date;
 
 /**
- * This interface represents trusted CSSs. An <code>ITrustedCss</code> object is
- * referenced by its {@link TrustedEntityId}, while the associated 
- * {@link Trust} value objects express the trustworthiness of this CSS, i.e.
- * direct, indirect and user-perceived. Each trusted CSS is assigned a set of
- * {@link TrustedCis} objects representing the communities this CSS is member
- * of. In addition, the services provided by a TrustedCss are modelled as
- * {@link TrustedService} objects.
+ * This interface is used to represent the trustworthiness of ITrustedEntities.
+ * The {@link IDirectTrust}, {@link IIndirectTrust} and {@link IUserPerceivedTrust}
+ * extend this interface in order to model the direct, indirect and user-perceived
+ * trust in an entity, respectively.
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.7
  */
-public interface ITrustedCss extends ITrustedEntity {
+public interface ITrust extends Serializable {
 
 	/**
 	 * 
 	 * @return
-	 *
-	public Set<TrustedCis> getCommunities();
-	*/
+	 */
+	public double getValue();
 
 	/**
 	 * 
-	 * @param community
-	 *
-	public void addCommunity(final TrustedCis community);
-	*/
+	 * @param value
+	 */
+	public void setValue(double value);
 
 	/**
-	 * 
-	 * @param community
-	 *
-	public void removeCommunity(final ITrustedCis community);
-	*/
+	 * @return the lastModified
+	 */
+	public Date getLastModified();
 
 	/**
-	 * Returns a set containing the services provided by this CSS.
-	 * 
-	 * @return a set containing the services provided by this CSS.
-	 *
-	public Set<TrustedService> getServices();
-	*/
-
-	/**
-	 * 
-	 * @param service
-	 *
-	public void addService(final TrustedService service);
-	*/
+	 * @return the lastUpdated
+	 */
+	public Date getLastUpdated();
 }

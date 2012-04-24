@@ -36,7 +36,6 @@ import javax.persistence.Table;
 
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
-import org.societies.privacytrust.trust.api.model.Trust;
 import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 
 /**

@@ -22,61 +22,18 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
+package org.societies.privacytrust.trust.impl.repo.model;
 
-import java.util.Set;
-
-import org.societies.privacytrust.trust.impl.repo.model.Trust;
-import org.societies.privacytrust.trust.impl.repo.model.TrustedCis;
-import org.societies.privacytrust.trust.impl.repo.model.TrustedService;
+import org.societies.privacytrust.trust.api.model.IIndirectTrust;
 
 /**
- * This interface represents trusted CSSs. An <code>ITrustedCss</code> object is
- * referenced by its {@link TrustedEntityId}, while the associated 
- * {@link Trust} value objects express the trustworthiness of this CSS, i.e.
- * direct, indirect and user-perceived. Each trusted CSS is assigned a set of
- * {@link TrustedCis} objects representing the communities this CSS is member
- * of. In addition, the services provided by a TrustedCss are modelled as
- * {@link TrustedService} objects.
+ * Implementation of the {@link IIndirectTrust} interface.
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.7
+ * @since 0.0.1
  */
-public interface ITrustedCss extends ITrustedEntity {
+public class IndirectTrust extends Trust implements IIndirectTrust {
 
-	/**
-	 * 
-	 * @return
-	 *
-	public Set<TrustedCis> getCommunities();
-	*/
+	private static final long serialVersionUID = -5920971093636087917L;
 
-	/**
-	 * 
-	 * @param community
-	 *
-	public void addCommunity(final TrustedCis community);
-	*/
-
-	/**
-	 * 
-	 * @param community
-	 *
-	public void removeCommunity(final ITrustedCis community);
-	*/
-
-	/**
-	 * Returns a set containing the services provided by this CSS.
-	 * 
-	 * @return a set containing the services provided by this CSS.
-	 *
-	public Set<TrustedService> getServices();
-	*/
-
-	/**
-	 * 
-	 * @param service
-	 *
-	public void addService(final TrustedService service);
-	*/
 }

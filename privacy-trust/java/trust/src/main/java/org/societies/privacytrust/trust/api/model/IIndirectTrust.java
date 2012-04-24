@@ -24,75 +24,14 @@
  */
 package org.societies.privacytrust.trust.api.model;
 
-import java.io.Serializable;
-import java.util.Date;
-
 /**
- * This abstract class is used to represent the trustworthiness of TrustedEntities.
- * The {@link DirectTrust}, {@link IndirectTrust} and {@link UserPerceivedTrust}
- * classes are concrete implementations of this class used to model the direct,
- * indirect and user-perceived trust in an entity, respectively.
- * 
+ * This interface is used to represent the indirect trust in a {@link ITrustedEntity}.
+ * The IIndirectTrust value is evaluated based on the recommendations of another
+ * TrustedEntity or a chain of TrustedEntities (trust path).
+ *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.1
+ * @since 0.0.7
  */
-public abstract class Trust implements Serializable {
+public interface IIndirectTrust extends ITrust {
 
-	private static final long serialVersionUID = 3965922195661451444L;
-	
-	private double value;
-	
-	private Date lastModified;
-	
-	private Date lastUpdated;
-
-	/**
-	 * 
-	 * @return
-	 */
-	public double getValue() {
-		
-		return this.value;
-	}
-
-	/**
-	 * 
-	 * @param value
-	 */
-	public void setValue(double value){
-		
-		this.value = value;
-	}
-
-	/**
-	 * @return the lastModified
-	 */
-	public Date getLastModified() {
-		
-		return this.lastModified;
-	}
-
-	/**
-	 * @param lastModified the lastModified to set
-	 */
-	public void setLastModified(Date lastModified) {
-		
-		this.lastModified = lastModified;
-	}
-
-	/**
-	 * @return the lastUpdated
-	 */
-	public Date getLastUpdated() {
-		
-		return this.lastUpdated;
-	}
-
-	/**
-	 * @param lastUpdated the lastUpdated to set
-	 */
-	public void setLastUpdated(Date lastUpdated) {
-		
-		this.lastUpdated = lastUpdated;
-	}
 }

@@ -24,59 +24,14 @@
  */
 package org.societies.privacytrust.trust.api.model;
 
-import java.util.Set;
-
-import org.societies.privacytrust.trust.impl.repo.model.Trust;
-import org.societies.privacytrust.trust.impl.repo.model.TrustedCis;
-import org.societies.privacytrust.trust.impl.repo.model.TrustedService;
-
 /**
- * This interface represents trusted CSSs. An <code>ITrustedCss</code> object is
- * referenced by its {@link TrustedEntityId}, while the associated 
- * {@link Trust} value objects express the trustworthiness of this CSS, i.e.
- * direct, indirect and user-perceived. Each trusted CSS is assigned a set of
- * {@link TrustedCis} objects representing the communities this CSS is member
- * of. In addition, the services provided by a TrustedCss are modelled as
- * {@link TrustedService} objects.
- * 
+ * This interface is used to represent the direct trust in a {@link ITrustedEntity}.
+ * The IDirectTrust value is evaluated based on the experiences of direct interactions
+ * between the trustor and the trustee.
+ *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.7
  */
-public interface ITrustedCss extends ITrustedEntity {
+public interface IDirectTrust extends ITrust {
 
-	/**
-	 * 
-	 * @return
-	 *
-	public Set<TrustedCis> getCommunities();
-	*/
-
-	/**
-	 * 
-	 * @param community
-	 *
-	public void addCommunity(final TrustedCis community);
-	*/
-
-	/**
-	 * 
-	 * @param community
-	 *
-	public void removeCommunity(final ITrustedCis community);
-	*/
-
-	/**
-	 * Returns a set containing the services provided by this CSS.
-	 * 
-	 * @return a set containing the services provided by this CSS.
-	 *
-	public Set<TrustedService> getServices();
-	*/
-
-	/**
-	 * 
-	 * @param service
-	 *
-	public void addService(final TrustedService service);
-	*/
 }

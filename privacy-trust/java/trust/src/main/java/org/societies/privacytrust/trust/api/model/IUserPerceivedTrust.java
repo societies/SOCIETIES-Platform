@@ -25,12 +25,14 @@
 package org.societies.privacytrust.trust.api.model;
 
 /**
- * This class is used to represent the indirect trust in a TrustedEntity. The
- * IndirectTrust value is evaluated based on the recommendations of another
- * TrustedEntity or a chain of TrustedEntities (trust path).
+ * This interface is used to represent the trust in an entity as perceived by the
+ * trustor, i.e. the owner of a CSS. The IUserPerceivedTrust value is evaluated
+ * based on an accumulation of the {@link IDirectTrust} and {@link IIndirectTrust}
+ * values associated with the {@link ITrustedEntity}.
+ *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.7
  */
-public class IndirectTrust extends Trust {
-
-	private static final long serialVersionUID = -5920971093636087917L;
+public interface IUserPerceivedTrust extends ITrust {
 
 }

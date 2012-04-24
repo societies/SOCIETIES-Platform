@@ -22,16 +22,23 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
+package org.societies.privacytrust.trust.impl.repo.model;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.societies.privacytrust.trust.api.model.IDirectTrust;
 
 /**
- * This class is used to represent the trust in an entity as perceived by the
- * trustor, i.e. the owner of a CSS. The UserPerceivedTrust value is evaluated
- * based on an accumulation of the DirectTrust and IndirectTrust values associated
- * with the TrustedEntity.
+ * Implementation of the {@link IDirectTrust} interface.
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
  */
-public class UserPerceivedTrust extends Trust {
+@Entity
+@Table(name = TableName.DIRECT_TRUST)
+public class DirectTrust extends Trust implements IDirectTrust {
 
-	private static final long serialVersionUID = -3856234754824690743L;
+	private static final long serialVersionUID = 2604976855460869815L;
 
 }

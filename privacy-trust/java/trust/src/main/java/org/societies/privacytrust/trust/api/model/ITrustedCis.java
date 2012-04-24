@@ -26,6 +26,8 @@ package org.societies.privacytrust.trust.api.model;
 
 import java.util.Set;
 
+import org.societies.privacytrust.trust.impl.repo.model.Trust;
+
 /**
  * This interface represents trusted CISs. A <code>TrustedCis</code> object is
  * referenced by its {@link TrustedEntityId}, while the associated {@link Trust}
