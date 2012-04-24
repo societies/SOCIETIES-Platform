@@ -22,42 +22,69 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.repo;
+package org.societies.privacytrust.trust.api.model;
 
-import org.societies.privacytrust.trust.api.model.ITrustedEntity;
-import org.societies.privacytrust.trust.api.model.TrustedEntityId;
+import java.io.Serializable;
 
-public interface ITrustRepository {
+/**
+ * This interface is used to represent an entity trusted by the trustor,
+ * i.e. the owner of a CSS. Each trusted entity is referenced by its
+ * {@link TrustedEntityId}, while the associated {@link Trust} objects express
+ * the trustworthiness of that entity, i.e. direct, indirect and user-perceived
+ * trust.
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.7
+ */
+public interface ITrustedEntity extends Serializable {
+
+	/**
+	 * Returns the identifier of this trusted entity.
+	 * 
+	 * @return the identifier of this trusted entity.
+	 */
+	public TrustedEntityId getTeid();
 
 	/**
 	 * 
-	 * @param entity
 	 * @return
-	 * @throws TrustRepositoryException
+	 *
+	public DirectTrust getDirectTrust();
 	 */
-	public boolean addEntity(final ITrustedEntity entity) throws TrustRepositoryException;
 
 	/**
 	 * 
-	 * @param teid
-	 * @return
-	 * @throws TrustRepositoryException
+	 * @param directTrust
+	 *
+	public void setDirectTrust(DirectTrust directTrust);
 	 */
-	public ITrustedEntity retrieveEntity(final TrustedEntityId teid) throws TrustRepositoryException;
-	
+
 	/**
 	 * 
-	 * @param entity
 	 * @return
-	 * @throws TrustRepositoryException
+	 *
+	public IndirectTrust getIndirectTrust();
 	 */
-	public ITrustedEntity updateEntity(ITrustedEntity entity) throws TrustRepositoryException;
-	
+
 	/**
 	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
+	 * @param indirectTrust
+	 *
+	public void setIndirectTrust(IndirectTrust indirectTrust);
 	 */
-	public boolean removeEntity(ITrustedEntity entity) throws TrustRepositoryException;
+
+	/**
+	 * 
+	 * @return
+	 *
+	public UserPerceivedTrust getUserPerceivedTrust();
+	 */
+
+	/**
+	 * 
+	 * @param userPerceivedTrust
+	 *
+	public void setUserPerceivedTrust(
+			UserPerceivedTrust userPerceivedTrust);
+	 */
 }

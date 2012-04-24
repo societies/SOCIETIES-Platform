@@ -24,118 +24,44 @@
  */
 package org.societies.privacytrust.trust.api.model;
 
-import java.io.Serializable;
-
-import javax.persistence.MappedSuperclass;
-
 /**
- * This abstract class is used to represent an entity trusted by the trustor,
- * i.e. the owner of a CSS. Each trusted entity is referenced by its
- * {@link TrustedEntityId}, while the associated {@link Trust} objects express
- * the trustworthiness of that entity, i.e. direct, indirect and user-perceived
- * trust.
+ * This interface represents trusted services. A TrustedService object is referenced
+ * by its TrustedEntityId, while the associated Trust value objects express the
+ * trustworthiness of this service, i.e. direct, indirect and user-perceived. Each
+ * trusted service is also associated with a TrustedCSS which represents its
+ * provider.
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.1 
+ * @since 0.0.7
  */
-@MappedSuperclass
-public abstract class TrustedEntity implements Serializable {
-	
-	private static final long serialVersionUID = -495088232194787430L;
+public interface ITrustedService extends ITrustedEntity {
 
-	/** The identifier of the trustor. */
-	private final TrustedEntityId trustor;
-	
-	/** The identifier of this trusted entity. */
-	private final TrustedEntityId teid;
-	
-	private DirectTrust directTrust ;
-	private IndirectTrust indirectTrust ;
-	private UserPerceivedTrust userPerceivedTrust;
+	/**
+	 * Returns the type of this service.
+	 * 
+	 * @return the type of this service.
+	 */
+	public String getType();
 
-	TrustedEntity(TrustedEntityId trustor, TrustedEntityId teid) {
-		
-		this.trustor = trustor;
-		this.teid = teid;
-	}
-	
 	/**
-	 * Returns the identifier of the trustor.
+	 * Returns the CSS providing this service.
 	 * 
-	 * @return the identifier of the trustor.
+	 * @return the CSS providing this service.
 	 */
-	public TrustedEntityId getTrustor() {
-		
-		return this.trustor;
-	}
-	
+	public ITrustedCss getProvider();
+
+	/** 
+	 * Returns the developer of this service.
+	 * 
+	 * @return the developer of this service.
+	 */
+	public ITrustedDeveloper getDeveloper();
+
 	/**
-	 * Returns the identifier of this trusted entity.
+	 * Sets the developer of this service.
 	 * 
-	 * @return the identifier of this trusted entity.
+	 * @param developer the service developer to set. 
 	 */
-	public TrustedEntityId getId() {
-		
-		return this.teid;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 * @since 0.0.3
-	 */
-	public DirectTrust getDirectTrust() {
-		
-		return this.directTrust;
-	}
-	
-	/**
-	 * 
-	 * @param directTrust
-	 * @since 0.0.3
-	 */
-	public void setDirectTrust(DirectTrust directTrust) {
-		
-		this.directTrust = directTrust;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 * @since 0.0.3
-	 */
-	public IndirectTrust getIndirectTrust() {
-		
-		return this.indirectTrust;
-	}
-	
-	/**
-	 * 
-	 * @param indirectTrust
-	 * @since 0.0.3
-	 */
-	public void setIndirectTrust(IndirectTrust indirectTrust) {
-		
-		this.indirectTrust = indirectTrust;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 * @since 0.0.3
-	 */
-	public UserPerceivedTrust getUserPerceivedTrust() {
-		
-		return this.userPerceivedTrust;
-	}
-	
-	/**
-	 * 
-	 * @param userPerceivedTrust
-	 * @since 0.0.3
-	 */
-	public void setUserPerceivedTrust(UserPerceivedTrust userPerceivedTrust) {
-		
-		this.userPerceivedTrust = userPerceivedTrust;
-	}
+	public void setDeveloper(ITrustedDeveloper developer);
+
 }

@@ -22,42 +22,45 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.repo;
+package org.societies.privacytrust.trust.test.util;
 
-import org.societies.privacytrust.trust.api.model.ITrustedEntity;
-import org.societies.privacytrust.trust.api.model.TrustedEntityId;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.FactoryBean;
 
-public interface ITrustRepository {
+/**
+ * A {@link FactoryBean} for creating mock beans based on Mockito so that they
+ * can be {@link @Autowired} into Spring test configurations.
+ *
+ * @author Mattias Severson, Jayway
+ *
+ * @see FactoryBean
+ * @see org.mockito.Mockito 
+ */
+public class MockitoFactoryBean<T> implements FactoryBean<T> {
 
-	/**
-	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public boolean addEntity(final ITrustedEntity entity) throws TrustRepositoryException;
+    private Class<T> classToBeMocked;
 
-	/**
-	 * 
-	 * @param teid
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public ITrustedEntity retrieveEntity(final TrustedEntityId teid) throws TrustRepositoryException;
-	
-	/**
-	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public ITrustedEntity updateEntity(ITrustedEntity entity) throws TrustRepositoryException;
-	
-	/**
-	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public boolean removeEntity(ITrustedEntity entity) throws TrustRepositoryException;
+    /**
+     * Creates a Mockito mock instance of the provided class.
+     * @param classToBeMocked The class to be mocked.
+     */
+    public MockitoFactoryBean(Class<T> classToBeMocked) {
+        this.classToBeMocked = classToBeMocked;
+    }
+
+    @Override
+    public T getObject() throws Exception {
+    	
+        return Mockito.mock(classToBeMocked);
+    }
+
+    @Override
+    public Class<?> getObjectType() {
+        return classToBeMocked;
+    }
+
+    @Override
+    public boolean isSingleton() {
+        return true;
+    }
 }

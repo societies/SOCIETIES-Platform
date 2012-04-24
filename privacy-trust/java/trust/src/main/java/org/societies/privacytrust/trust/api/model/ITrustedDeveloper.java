@@ -22,42 +22,23 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.repo;
+package org.societies.privacytrust.trust.api.model;
 
-import org.societies.privacytrust.trust.api.model.ITrustedEntity;
-import org.societies.privacytrust.trust.api.model.TrustedEntityId;
+import java.util.Set;
 
-public interface ITrustRepository {
+import org.societies.privacytrust.trust.impl.repo.model.TrustedService;
 
-	/**
-	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public boolean addEntity(final ITrustedEntity entity) throws TrustRepositoryException;
+/**
+ * This class represents service developers. A TrustedDeveloper object is
+ * referenced by its TrustedEntityId, while the associated Trust value objects
+ * express the trustworthiness of this developer, i.e. direct, indirect and user-
+ * perceived. Each trusted developer is assigned a set of TrustedService objects.
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.7
+ */
+public interface ITrustedDeveloper extends ITrustedEntity {
 
-	/**
-	 * 
-	 * @param teid
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public ITrustedEntity retrieveEntity(final TrustedEntityId teid) throws TrustRepositoryException;
-	
-	/**
-	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public ITrustedEntity updateEntity(ITrustedEntity entity) throws TrustRepositoryException;
-	
-	/**
-	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public boolean removeEntity(ITrustedEntity entity) throws TrustRepositoryException;
+	public abstract Set<TrustedService> getServices();
+
 }

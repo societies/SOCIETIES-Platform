@@ -24,13 +24,20 @@
  */
 package org.societies.privacytrust.trust.impl.repo;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.privacytrust.trust.api.model.TrustedEntity;
+import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 import org.societies.privacytrust.trust.api.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.societies.privacytrust.trust.api.repo.TrustRepositoryException;
+import org.societies.privacytrust.trust.impl.repo.model.TrustedCis;
+import org.societies.privacytrust.trust.impl.repo.model.TrustedCss;
+import org.societies.privacytrust.trust.impl.repo.model.TrustedEntity;
+import org.societies.privacytrust.trust.impl.repo.model.TrustedService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -46,6 +53,7 @@ public class TrustRepository implements ITrustRepository {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(TrustRepository.class);
 	
+	@Autowired
 	private SessionFactory sessionFactory;
 	
 	TrustRepository() {
@@ -57,27 +65,53 @@ public class TrustRepository implements ITrustRepository {
 	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#addEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)
 	 */
 	@Override
-	public boolean addEntity(TrustedEntity entity)
+	public boolean addEntity(ITrustedEntity entity)
 			throws TrustRepositoryException {
-		// TODO Auto-generated method stub
-		return false;
+		
+		boolean result = false;
+
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
+		try {
+			session.save(entity);
+			transaction.commit();
+			result = true;
+		} catch (Exception e) {
+			LOG.warn("Rolling back transaction for entity " + entity);
+			transaction.rollback();
+			throw new TrustRepositoryException("Could not add entity " + entity, e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+		return result;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#retrieveEntity(org.societies.privacytrust.trust.api.model.TrustedEntityId)
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#retrieveEntity(java.lang.String, org.societies.privacytrust.trust.api.model.TrustedEntityId)
 	 */
 	@Override
-	public TrustedEntity retrieveEntity(TrustedEntityId teid)
+	public ITrustedEntity retrieveEntity(TrustedEntityId teid)
 			throws TrustRepositoryException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		ITrustedEntity result = null;
+		
+		final Session session = sessionFactory.openSession();
+		if (TrustedEntityType.CSS.equals(teid.getEntityType()))
+			result = (ITrustedEntity) session.get(TrustedCss.class, null);
+		else if (TrustedEntityType.CIS.equals(teid.getEntityType()))
+			result = (ITrustedEntity) session.get(TrustedCis.class, null);
+		else if (TrustedEntityType.SVC.equals(teid.getEntityType()))
+			result = (ITrustedEntity) session.get(TrustedService.class, null);
+			
+		return result;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#updateEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)
 	 */
 	@Override
-	public TrustedEntity updateEntity(TrustedEntity entity)
+	public ITrustedEntity updateEntity(ITrustedEntity entity)
 			throws TrustRepositoryException {
 		// TODO Auto-generated method stub
 		return null;
@@ -87,7 +121,7 @@ public class TrustRepository implements ITrustRepository {
 	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#removeEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)
 	 */
 	@Override
-	public boolean removeEntity(TrustedEntity entity)
+	public boolean removeEntity(ITrustedEntity entity)
 			throws TrustRepositoryException {
 		// TODO Auto-generated method stub
 		return false;

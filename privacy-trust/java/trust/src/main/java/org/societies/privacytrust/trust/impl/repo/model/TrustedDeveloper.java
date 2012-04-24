@@ -22,9 +22,12 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
+package org.societies.privacytrust.trust.impl.repo.model;
 
 import java.util.Set;
+
+import org.societies.privacytrust.trust.api.model.ITrustedDeveloper;
+import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 
 /**
  * This class represents service developers. A TrustedDeveloper object is
@@ -32,16 +35,20 @@ import java.util.Set;
  * express the trustworthiness of this developer, i.e. direct, indirect and user-
  * perceived. Each trusted developer is assigned a set of TrustedService objects.
  */
-public class TrustedDeveloper extends TrustedEntity {
+public class TrustedDeveloper extends TrustedEntity implements ITrustedDeveloper {
 
 	private static final long serialVersionUID = -7272100351846916160L;
 	
 	private Set<TrustedService> services;
 
-	public TrustedDeveloper(TrustedEntityId trustor, TrustedEntityId teid) {
-		super(trustor, teid);
+	public TrustedDeveloper(TrustedEntityId teid) {
+		super(teid);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedDeveloper#getServices()
+	 */
+	@Override
 	public Set<TrustedService> getServices() {
 		return this.services;
 	}

@@ -22,10 +22,15 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
+package org.societies.privacytrust.trust.impl.repo.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
+
+import org.societies.privacytrust.trust.api.model.ITrustedCss;
+import org.societies.privacytrust.trust.api.model.ITrustedDeveloper;
+import org.societies.privacytrust.trust.api.model.ITrustedService;
+import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 
 /**
  * This class represents trusted services. A TrustedService object is referenced
@@ -39,12 +44,12 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="t_services")
-public class TrustedService extends TrustedEntity {
+public class TrustedService extends TrustedEntity implements ITrustedService {
 
 	private static final long serialVersionUID = 8253551733059925542L;
 	
 	/** The CSS providing this service. */
-	private final TrustedCss provider;
+	private final ITrustedCss provider;
 	
 	/* The communities sharing this service. */
 	//private final Set<TrustedCis> communities = new CopyOnWriteArraySet<TrustedCis>();
@@ -53,51 +58,47 @@ public class TrustedService extends TrustedEntity {
 	private final String type;
 	
 	/** The developer of this service. */
-	private TrustedDeveloper developer;
+	private ITrustedDeveloper developer;
 
-	public TrustedService(TrustedEntityId trustor, TrustedEntityId teid, String type, TrustedCss provider) {
+	public TrustedService(TrustedEntityId teid, String type, ITrustedCss provider) {
 		
-		super(trustor, teid);
+		super(teid);
 		this.type = type;
 		this.provider = provider;
 	}
 
-	/**
-	 * Returns the type of this service.
-	 * 
-	 * @return the type of this service.
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedService#getType()
 	 */
+	@Override
 	public String getType() {
 		
 		return this.type;
 	}
 	
-	/**
-	 * Returns the CSS providing this service.
-	 * 
-	 * @return the CSS providing this service.
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedService#getProvider()
 	 */
-	public TrustedCss getProvider() {
+	@Override
+	public ITrustedCss getProvider() {
 		
 		return this.provider;
 	}
 	
-	/** 
-	 * Returns the developer of this service.
-	 * 
-	 * @return the developer of this service.
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedService#getDeveloper()
 	 */
-	public TrustedDeveloper getDeveloper() {
+	@Override
+	public ITrustedDeveloper getDeveloper() {
 		
 		return this.developer;
 	}
 	
-	/**
-	 * Sets the developer of this service.
-	 * 
-	 * @param developer the service developer to set. 
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedService#setDeveloper(org.societies.privacytrust.trust.api.model.TrustedDeveloper)
 	 */
-	public void setDeveloper(TrustedDeveloper developer) {
+	@Override
+	public void setDeveloper(ITrustedDeveloper developer) {
 		
 		this.developer = developer;
 	}

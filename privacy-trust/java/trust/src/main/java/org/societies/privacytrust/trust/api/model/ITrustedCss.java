@@ -22,42 +22,60 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.repo;
+package org.societies.privacytrust.trust.api.model;
 
-import org.societies.privacytrust.trust.api.model.ITrustedEntity;
-import org.societies.privacytrust.trust.api.model.TrustedEntityId;
+import java.util.Set;
 
-public interface ITrustRepository {
+import org.societies.privacytrust.trust.impl.repo.model.TrustedCis;
+import org.societies.privacytrust.trust.impl.repo.model.TrustedService;
+
+/**
+ * This interface represents trusted CSSs. An <code>ITrustedCss</code> object is
+ * referenced by its {@link TrustedEntityId}, while the associated 
+ * {@link Trust} value objects express the trustworthiness of this CSS, i.e.
+ * direct, indirect and user-perceived. Each trusted CSS is assigned a set of
+ * {@link TrustedCis} objects representing the communities this CSS is member
+ * of. In addition, the services provided by a TrustedCss are modelled as
+ * {@link TrustedService} objects.
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.7
+ */
+public interface ITrustedCss extends ITrustedEntity {
 
 	/**
 	 * 
-	 * @param entity
 	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public boolean addEntity(final ITrustedEntity entity) throws TrustRepositoryException;
+	 *
+	public Set<TrustedCis> getCommunities();
+	*/
 
 	/**
 	 * 
-	 * @param teid
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public ITrustedEntity retrieveEntity(final TrustedEntityId teid) throws TrustRepositoryException;
-	
+	 * @param community
+	 *
+	public void addCommunity(final TrustedCis community);
+	*/
+
 	/**
 	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public ITrustedEntity updateEntity(ITrustedEntity entity) throws TrustRepositoryException;
-	
+	 * @param community
+	 *
+	public void removeCommunity(final ITrustedCis community);
+	*/
+
+	/**
+	 * Returns a set containing the services provided by this CSS.
+	 * 
+	 * @return a set containing the services provided by this CSS.
+	 *
+	public Set<TrustedService> getServices();
+	*/
+
 	/**
 	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public boolean removeEntity(ITrustedEntity entity) throws TrustRepositoryException;
+	 * @param service
+	 *
+	public void addService(final TrustedService service);
+	*/
 }
