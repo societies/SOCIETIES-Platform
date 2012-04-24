@@ -22,10 +22,10 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
+package org.societies.api.internal.privacytrust.trust.model;
 
 /**
- * The constants of this enumerated type specify the type of a {@link TrustedEntity}.
+ * The constants of this enumerated type specify the type of a trusted entity.
  * More specifically, trusted entities can be of one of the following types:
  * <ul>
  * <li>{@link #CSS}: Denotes a trusted individual</li>

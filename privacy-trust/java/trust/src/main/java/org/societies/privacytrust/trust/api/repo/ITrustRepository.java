@@ -24,8 +24,8 @@
  */
 package org.societies.privacytrust.trust.api.repo;
 
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
-import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 
 public interface ITrustRepository {
 

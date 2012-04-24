@@ -26,6 +26,7 @@ package org.societies.privacytrust.trust.api.model;
 
 import java.io.Serializable;
 
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.impl.repo.model.Trust;
 
 /**

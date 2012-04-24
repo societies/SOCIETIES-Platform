@@ -33,9 +33,9 @@ import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.Type;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.IDirectTrust;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
-import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 
 /**
  * This abstract class is used to represent an entity trusted by the trustor,
