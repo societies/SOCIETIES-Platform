@@ -28,7 +28,6 @@ import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -38,7 +37,9 @@ import org.hibernate.usertype.CompositeUserType;
 import org.societies.privacytrust.trust.api.model.MalformedTrustedEntityIdException;
 import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.TrustedEntityType;
-import org.societies.privacytrust.trust.impl.repo.model.TableName;
+import org.societies.privacytrust.trust.impl.repo.model.TrustedCis;
+import org.societies.privacytrust.trust.impl.repo.model.TrustedCss;
+import org.societies.privacytrust.trust.impl.repo.model.TrustedService;
 
 /**
  * This class is used to serialize instances of {@link TrustedEntityId} to and from JDBC.
@@ -49,6 +50,12 @@ import org.societies.privacytrust.trust.impl.repo.model.TableName;
 public class TrustedEntityIdUserType implements CompositeUserType {
 	
 	private static final Class<TrustedEntityId> TRUSTED_ENTITY_ID_CLASS = TrustedEntityId.class;
+	
+	private static final Class<TrustedCss> TRUSTED_CSS_CLASS = TrustedCss.class;
+	
+	private static final Class<TrustedCis> TRUSTED_CIS_CLASS = TrustedCis.class;
+	
+	private static final Class<TrustedService> TRUSTED_SERVICE_CLASS = TrustedService.class;
 	
 	private static final String[] PROPERTY_NAMES = { "trustorId", "trusteeId" };
 	
@@ -121,9 +128,25 @@ public class TrustedEntityIdUserType implements CompositeUserType {
 	@Override
 	public Object getPropertyValue(Object component, int property) throws HibernateException {
 		
+		final String result;
 		final TrustedEntityId teid = (TrustedEntityId) component;
 		
-		return (property == 0) ? teid.getTrustorId() : teid.getTrusteeId();
+		switch (property) {
+
+		case 0:
+			result = teid.getTrustorId();
+			break;
+
+		case 1:
+			result = teid.getTrusteeId();
+			break;
+
+		default:
+			throw new IllegalArgumentException("Unknown property: " + property);
+
+		}
+		
+		return result;
 	}
 
 	/* (non-Javadoc)
@@ -151,19 +174,23 @@ public class TrustedEntityIdUserType implements CompositeUserType {
 	public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor session, Object owner)
 			throws HibernateException, SQLException {
 		
-		if (rs.wasNull())
+		final String trustorId = (String) Hibernate.STRING.nullSafeGet(rs, names[0]);
+		final String trusteeId = (String) Hibernate.STRING.nullSafeGet(rs, names[1]);
+		
+		if (trustorId == null || trusteeId == null)
 			return null;
 		
-		final String tableName = rs.getMetaData().getTableName(1);
 		final TrustedEntityType entityType;
-		if (TableName.TRUSTED_CSS.equals(tableName))
+		if (TRUSTED_CSS_CLASS.equals(owner.getClass()))
 			entityType = TrustedEntityType.CSS;
-		else if (TableName.TRUSTED_CIS.equals(tableName))
+		else if (TRUSTED_CIS_CLASS.equals(owner.getClass()))
 			entityType = TrustedEntityType.CIS;
+		else if (TRUSTED_SERVICE_CLASS.equals(owner.getClass()))
+			entityType = TrustedEntityType.SVC;
 		else
 			entityType = TrustedEntityType.LGC;
 		try {
-			return new TrustedEntityId(rs.getString(names[0]), entityType, rs.getString(names[1]));
+			return new TrustedEntityId(trustorId, entityType, trusteeId);
 		} catch (MalformedTrustedEntityIdException mteide) {
 			throw new HibernateException(
 					"Could not create TrustedEntityId instance from stored values", mteide);
@@ -177,14 +204,10 @@ public class TrustedEntityIdUserType implements CompositeUserType {
 	public void nullSafeSet(PreparedStatement st, Object value, int index, SessionImplementor session)
 			throws HibernateException, SQLException {
 		
-		if (null == value) {
-			st.setNull(index, Types.VARCHAR);
-			st.setNull(index + 1, Types.VARCHAR);
-		} else {
-			final TrustedEntityId teid = (TrustedEntityId) value;
-			st.setString(index, teid.getTrustorId());
-			st.setString(index + 1, teid.getTrusteeId());
-		}
+		final TrustedEntityId teid = (TrustedEntityId) value;
+		
+		Hibernate.STRING.nullSafeSet(st, teid.getTrustorId(), index);
+		Hibernate.STRING.nullSafeSet(st, teid.getTrusteeId(), index + 1);
 	}
 
 	/* (non-Javadoc)

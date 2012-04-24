@@ -24,9 +24,13 @@
  */
 package org.societies.privacytrust.trust.impl.repo;
 
+import java.util.List;
+
+import org.hibernate.FetchMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
@@ -94,17 +98,23 @@ public class TrustRepository implements ITrustRepository {
 	public ITrustedEntity retrieveEntity(TrustedEntityId teid)
 			throws TrustRepositoryException {
 		
-		ITrustedEntity result = null;
+		Class<? extends TrustedEntity> entityClass = TrustedEntity.class;
+		if (TrustedEntityType.CSS.equals(teid.getEntityType()))
+			entityClass = TrustedCss.class;
+		else if (TrustedEntityType.CIS.equals(teid.getEntityType()))
+			entityClass = TrustedCis.class;
+		else if (TrustedEntityType.SVC.equals(teid.getEntityType()))
+			entityClass = TrustedService.class;
+		// TODO TrustedEntityType.LGC
 		
 		final Session session = sessionFactory.openSession();
-		if (TrustedEntityType.CSS.equals(teid.getEntityType()))
-			result = (ITrustedEntity) session.get(TrustedCss.class, null);
-		else if (TrustedEntityType.CIS.equals(teid.getEntityType()))
-			result = (ITrustedEntity) session.get(TrustedCis.class, null);
-		else if (TrustedEntityType.SVC.equals(teid.getEntityType()))
-			result = (ITrustedEntity) session.get(TrustedService.class, null);
+		@SuppressWarnings("unchecked")
+		List<ITrustedEntity> results = session.createCriteria(entityClass)
+			.add(Restrictions.eq("teid", teid))
+			.setFetchMode("directTrust", FetchMode.JOIN)
+			.list();
 			
-		return result;
+		return (results.isEmpty()) ? null : results.get(0);
 	}
 
 	/* (non-Javadoc)

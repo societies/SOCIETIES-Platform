@@ -107,11 +107,15 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	 * @throws TrustRepositoryException 
 	 */
 	@Test
-	@Ignore
 	public void testRetrieveEntity() throws TrustRepositoryException {
 		
 		ITrustedEntity trusteeFromDb = this.trustRepo.retrieveEntity(trustee.getTeid());
 		assertNotNull(trusteeFromDb);
+		assertNotNull(trusteeFromDb.getTeid());
+		assertNotNull(trusteeFromDb.getTeid().getTrustorId());
+		assertNotNull(trusteeFromDb.getTeid().getEntityType());
+		assertNotNull(trusteeFromDb.getTeid().getTrusteeId());
+		assertEquals(trustee, trusteeFromDb);
 	}
 
 	/**
