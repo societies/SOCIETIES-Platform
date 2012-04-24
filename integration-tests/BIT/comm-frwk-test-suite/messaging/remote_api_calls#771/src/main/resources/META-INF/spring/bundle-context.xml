@@ -22,8 +22,15 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-  <bean id="TestCase743" class="org.societies.integration.test.bit.math_example.TestCase743" init-method="startTest">
-		<property name="mathServiceConsumer" ref ="mathServiceConsumer" />
+  	<bean id="TestCase771" 
+  		class="org.societies.integration.test.bit.remote_api_calls.TestCase771" init-method="run"
+  		depends-on="CommManagerBundle">
+		<property name="commManager" ref="CommManagerBundle"/>
   	</bean>
-
+  	
+  	<!-- <bean id="LowerTester" 
+  		class="org.societies.integration.test.bit.remote_api_calls.LowerTester"
+  		depends-on="CommManagerBundle">
+		<property name="commManager" ref="CommManagerBundle"/>
+  	</bean> -->
 </beans>
