@@ -645,6 +645,24 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		}
 	
 		for (int i = 0; i < creations.size(); i++) {
+			ICisRecord cisProposal = creations.get(i);
+			ArrayList<ICisRecord> userJoinedCiss = cisManager.getCisList();
+			for (int m = 0; m < userJoinedCiss.size(); m++) {
+				//if (userJoinedCiss.get(m).getMembershipCriteria == cisProposal.getMembershipCriteria()) {
+				    //if (userJoinedCiss.get(m).getMembersList() == cisProposal.getMembersList()) {
+				        //creations.remove(i);
+				        //Feedback to CSM Analyser suggesting to either remove this model,
+				        //add another attribute to it (suggest one?), or change one or more
+				        //model attributes (specify them?)
+			        //}
+				    //else if (userJoinedCiss.get(m).getMembersList().size() >= (1.3 * cisProposal.getMembersList().size()) {
+				    //    creations.add(sub-CIS for shared CSSs);
+				    //}
+				//}
+				//if the membership criteria for the existing CIS somehow conflict with that of the suggestion,
+				//may be grounds to delete the old CIS. E.g. the suggestion is based on location,
+				//which is different to the location of an existing CIS, which is known to be short-term temporary.
+			}
 			//userContextBroker.evaluateSimilarity("location", convertedRecommendations.get(i).get(0).getMembersList());
 			//if user isn't a member of another CIS that matches this, OK
 		
