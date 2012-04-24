@@ -38,6 +38,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 //import org.societies.api.internal.cis.management.ICisRecord;
 //import org.societies.api.internal.cis.management.ICisManager;
 
+import org.societies.api.cis.directory.ICisAdvertisementRecord;
 import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
@@ -80,6 +81,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Future;
 
 
 
@@ -276,8 +278,15 @@ public class CommunityRecommender //implements ICommCallback
 		}
 		
 		if (cissToCreate != null) 
-		    for (int i = 0; i < cissToCreate.size(); i++)
-			    cisManager.createCis(linkedCss.getIdentifier(), null, null, null, 0);
+		    for (int i = 0; i < cissToCreate.size(); i++) {
+			    Future<ICisOwned> createdCis = cisManager.createCis(linkedCss.getIdentifier(), null, null, null, 0);
+			    //ICisAdvertisementRecord createdCisAdvert = new ICisAdvertisementRecord(createdCis.get().getName() + createdCis.getDescription(), createdCis.getCisEditor().getURI());
+			    //for (int m = 0; m < cissToCreate.get(i).getMembersList(); m++) {
+			    //    ICssRecord member = cssManager.getCssRecord(cissToCreate.get(i).getMembersList().get(m));
+			    //    ICssActivityFeed feed = member.getActivityFeed();
+			    //    feed.addActivity(createdCisAdvert);
+		        //}
+		    }
 		return new ArrayList<String>();
 	}
 	

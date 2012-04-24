@@ -646,7 +646,11 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	
 		for (int i = 0; i < creations.size(); i++) {
 			ICisRecord cisProposal = creations.get(i);
-			ArrayList<ICisRecord> userJoinedCiss = cisManager.getCisList();
+			List<ICisRecord> userJoinedCissTemp = cisManager.getCisList();
+			ArrayList<ICisRecord> userJoinedCiss = new ArrayList<ICisRecord>();
+			for (int m = 0; m < userJoinedCissTemp.size(); m++) {
+				userJoinedCiss.add(userJoinedCissTemp.get(m));
+			}
 			for (int m = 0; m < userJoinedCiss.size(); m++) {
 				//if (userJoinedCiss.get(m).getMembershipCriteria == cisProposal.getMembershipCriteria()) {
 				    //if (userJoinedCiss.get(m).getMembersList() == cisProposal.getMembersList()) {
@@ -718,7 +722,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     		    //for (int n = 0; n < recommendations.get(i).get(0).getMembersList().size(); n++) {
     		        //IIdentity thisMember = recommendations.get(i).get(0).getMembersList().get(n);
     			    //CtxAttribute thisAttribute = recommendations.get(i).get(0).getMembershipCriteria.().get(m);
-    		        //boolean passed = privacyDataManager.checkPermission(thisAttribute, thisMember, arg2, arg3);
+    		        //boolean passed = privacyDataManager.checkPermission(thisAttribute, thisMember, "arg2", "arg3");
     			    //if (passed == false) conflictingPrivacyPolicies.add(recommendations.get(i).get(0).getMembershipCriteria().get(m))
     		        //if (ctxBroker.get(thisMember, thisAttribute).equals("Access refused"))
     		        //    conflictingPrivacyPolicies.add("CSS: " + thisMember.toString());
