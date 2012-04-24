@@ -22,15 +22,34 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
+package org.societies.privacytrust.trust.impl.repo.model;
+
+import java.util.Set;
+
+import org.societies.privacytrust.trust.api.model.ITrustedDeveloper;
+import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 
 /**
- * This class is used to represent the direct trust in a TrustedEntity. The
- * DirectTrust value is evaluated based on the experiences of direct interactions
- * between the trustor and the TrustedEntity.
+ * This class represents service developers. A TrustedDeveloper object is
+ * referenced by its TrustedEntityId, while the associated Trust value objects
+ * express the trustworthiness of this developer, i.e. direct, indirect and user-
+ * perceived. Each trusted developer is assigned a set of TrustedService objects.
  */
-public class DirectTrust extends Trust {
+public class TrustedDeveloper extends TrustedEntity implements ITrustedDeveloper {
 
-	private static final long serialVersionUID = 2604976855460869815L;
+	private static final long serialVersionUID = -7272100351846916160L;
+	
+	private Set<TrustedService> services;
 
+	public TrustedDeveloper(TrustedEntityId teid) {
+		super(teid);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedDeveloper#getServices()
+	 */
+	@Override
+	public Set<TrustedService> getServices() {
+		return this.services;
+	}
 }

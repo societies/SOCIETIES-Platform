@@ -24,75 +24,44 @@
  */
 package org.societies.privacytrust.trust.api.model;
 
-import java.io.Serializable;
-import java.util.Date;
-
 /**
- * This abstract class is used to represent the trustworthiness of TrustedEntities.
- * The {@link DirectTrust}, {@link IndirectTrust} and {@link UserPerceivedTrust}
- * classes are concrete implementations of this class used to model the direct,
- * indirect and user-perceived trust in an entity, respectively.
+ * This interface represents trusted services. A TrustedService object is referenced
+ * by its TrustedEntityId, while the associated Trust value objects express the
+ * trustworthiness of this service, i.e. direct, indirect and user-perceived. Each
+ * trusted service is also associated with a TrustedCSS which represents its
+ * provider.
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.1
+ * @since 0.0.7
  */
-public abstract class Trust implements Serializable {
-
-	private static final long serialVersionUID = 3965922195661451444L;
-	
-	private double value;
-	
-	private Date lastModified;
-	
-	private Date lastUpdated;
+public interface ITrustedService extends ITrustedEntity {
 
 	/**
+	 * Returns the type of this service.
 	 * 
-	 * @return
+	 * @return the type of this service.
 	 */
-	public double getValue() {
-		
-		return this.value;
-	}
+	public String getType();
 
 	/**
+	 * Returns the CSS providing this service.
 	 * 
-	 * @param value
+	 * @return the CSS providing this service.
 	 */
-	public void setValue(double value){
-		
-		this.value = value;
-	}
+	public ITrustedCss getProvider();
+
+	/** 
+	 * Returns the developer of this service.
+	 * 
+	 * @return the developer of this service.
+	 */
+	public ITrustedDeveloper getDeveloper();
 
 	/**
-	 * @return the lastModified
+	 * Sets the developer of this service.
+	 * 
+	 * @param developer the service developer to set. 
 	 */
-	public Date getLastModified() {
-		
-		return this.lastModified;
-	}
+	public void setDeveloper(ITrustedDeveloper developer);
 
-	/**
-	 * @param lastModified the lastModified to set
-	 */
-	public void setLastModified(Date lastModified) {
-		
-		this.lastModified = lastModified;
-	}
-
-	/**
-	 * @return the lastUpdated
-	 */
-	public Date getLastUpdated() {
-		
-		return this.lastUpdated;
-	}
-
-	/**
-	 * @param lastUpdated the lastUpdated to set
-	 */
-	public void setLastUpdated(Date lastUpdated) {
-		
-		this.lastUpdated = lastUpdated;
-	}
 }

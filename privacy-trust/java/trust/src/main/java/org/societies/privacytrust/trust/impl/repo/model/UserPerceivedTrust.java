@@ -22,15 +22,17 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
+package org.societies.privacytrust.trust.impl.repo.model;
+
+import org.societies.privacytrust.trust.api.model.IUserPerceivedTrust;
 
 /**
- * This class is used to represent the trust in an entity as perceived by the
- * trustor, i.e. the owner of a CSS. The UserPerceivedTrust value is evaluated
- * based on an accumulation of the DirectTrust and IndirectTrust values associated
- * with the TrustedEntity.
+ * Implementation of the {@link IUserPerceivedTrust} interface.
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.1
  */
-public class UserPerceivedTrust extends Trust {
+public class UserPerceivedTrust extends Trust implements IUserPerceivedTrust {
 
 	private static final long serialVersionUID = -3856234754824690743L;
 

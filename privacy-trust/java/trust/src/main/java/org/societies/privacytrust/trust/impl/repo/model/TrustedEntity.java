@@ -22,11 +22,20 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
+package org.societies.privacytrust.trust.impl.repo.model;
 
-import java.io.Serializable;
-
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToOne;
+
+import org.hibernate.annotations.Columns;
+import org.hibernate.annotations.Type;
+import org.societies.privacytrust.trust.api.model.IDirectTrust;
+import org.societies.privacytrust.trust.api.model.ITrustedEntity;
+import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 
 /**
  * This abstract class is used to represent an entity trusted by the trustor,
@@ -39,52 +48,51 @@ import javax.persistence.MappedSuperclass;
  * @since 0.0.1 
  */
 @MappedSuperclass
-public abstract class TrustedEntity implements Serializable {
+public abstract class TrustedEntity implements ITrustedEntity {
 	
-	private static final long serialVersionUID = -495088232194787430L;
+	private static final long serialVersionUID = -6065344074845695865L;
 
-	/** The identifier of the trustor. */
-	private final TrustedEntityId trustor;
+	/* The surrogate key used by Hibernate. */
+	@Id
+	@GeneratedValue
+	@Column(name = "id")
+	@SuppressWarnings("unused")
+	private long id;
 	
 	/** The identifier of this trusted entity. */
+	@Columns(columns={
+			@Column(name = "trustorId", nullable = false, updatable = false, length = 256),
+			@Column(name = "trusteeId", nullable = false, updatable = false, length = 256)
+	})
+	@Type(type="org.societies.privacytrust.trust.impl.repo.model.hibernate.TrustedEntityIdUserType")
 	private final TrustedEntityId teid;
 	
-	private DirectTrust directTrust ;
-	private IndirectTrust indirectTrust ;
-	private UserPerceivedTrust userPerceivedTrust;
+	@OneToOne(cascade = CascadeType.ALL)
+	private DirectTrust directTrust;
+	
+	//private IndirectTrust indirectTrust ;
+	//private UserPerceivedTrust userPerceivedTrust;
 
-	TrustedEntity(TrustedEntityId trustor, TrustedEntityId teid) {
+	TrustedEntity(final TrustedEntityId teid) {
 		
-		this.trustor = trustor;
 		this.teid = teid;
 	}
 	
-	/**
-	 * Returns the identifier of the trustor.
-	 * 
-	 * @return the identifier of the trustor.
+	/* (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getTeid()
 	 */
-	public TrustedEntityId getTrustor() {
-		
-		return this.trustor;
-	}
-	
-	/**
-	 * Returns the identifier of this trusted entity.
-	 * 
-	 * @return the identifier of this trusted entity.
-	 */
-	public TrustedEntityId getId() {
+	@Override
+	public TrustedEntityId getTeid() {
 		
 		return this.teid;
 	}
 	
-	/**
-	 * 
-	 * @return
-	 * @since 0.0.3
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getDirectTrust()
 	 */
-	public DirectTrust getDirectTrust() {
+	@Override
+	public IDirectTrust getDirectTrust() {
 		
 		return this.directTrust;
 	}
@@ -93,7 +101,7 @@ public abstract class TrustedEntity implements Serializable {
 	 * 
 	 * @param directTrust
 	 * @since 0.0.3
-	 */
+	 *
 	public void setDirectTrust(DirectTrust directTrust) {
 		
 		this.directTrust = directTrust;
@@ -103,7 +111,7 @@ public abstract class TrustedEntity implements Serializable {
 	 * 
 	 * @return
 	 * @since 0.0.3
-	 */
+	 *
 	public IndirectTrust getIndirectTrust() {
 		
 		return this.indirectTrust;
@@ -113,7 +121,7 @@ public abstract class TrustedEntity implements Serializable {
 	 * 
 	 * @param indirectTrust
 	 * @since 0.0.3
-	 */
+	 *
 	public void setIndirectTrust(IndirectTrust indirectTrust) {
 		
 		this.indirectTrust = indirectTrust;
@@ -123,7 +131,7 @@ public abstract class TrustedEntity implements Serializable {
 	 * 
 	 * @return
 	 * @since 0.0.3
-	 */
+	 *
 	public UserPerceivedTrust getUserPerceivedTrust() {
 		
 		return this.userPerceivedTrust;
@@ -133,9 +141,46 @@ public abstract class TrustedEntity implements Serializable {
 	 * 
 	 * @param userPerceivedTrust
 	 * @since 0.0.3
-	 */
+	 *
 	public void setUserPerceivedTrust(UserPerceivedTrust userPerceivedTrust) {
 		
 		this.userPerceivedTrust = userPerceivedTrust;
+	}*/
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.teid == null) ? 0 : this.teid.hashCode());
+		
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object that) {
+		
+		if (this == that)
+			return true;
+		if (that == null)
+			return false;
+		if (this.getClass() != that.getClass())
+			return false;
+		
+		final TrustedEntity other = (TrustedEntity) that;
+		
+		if (this.teid == null) {
+			if (other.teid != null)
+				return false;
+		} else if (!this.teid.equals(other.teid))
+			return false;
+		
+		return true;
 	}
 }

@@ -22,42 +22,41 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.repo;
+package org.societies.privacytrust.trust.api.model;
 
-import org.societies.privacytrust.trust.api.model.ITrustedEntity;
-import org.societies.privacytrust.trust.api.model.TrustedEntityId;
+import java.io.Serializable;
+import java.util.Date;
 
-public interface ITrustRepository {
+/**
+ * This interface is used to represent the trustworthiness of ITrustedEntities.
+ * The {@link IDirectTrust}, {@link IIndirectTrust} and {@link IUserPerceivedTrust}
+ * extend this interface in order to model the direct, indirect and user-perceived
+ * trust in an entity, respectively.
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.7
+ */
+public interface ITrust extends Serializable {
 
 	/**
 	 * 
-	 * @param entity
 	 * @return
-	 * @throws TrustRepositoryException
 	 */
-	public boolean addEntity(final ITrustedEntity entity) throws TrustRepositoryException;
+	public double getValue();
 
 	/**
 	 * 
-	 * @param teid
-	 * @return
-	 * @throws TrustRepositoryException
+	 * @param value
 	 */
-	public ITrustedEntity retrieveEntity(final TrustedEntityId teid) throws TrustRepositoryException;
-	
+	public void setValue(double value);
+
 	/**
-	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
+	 * @return the lastModified
 	 */
-	public ITrustedEntity updateEntity(ITrustedEntity entity) throws TrustRepositoryException;
-	
+	public Date getLastModified();
+
 	/**
-	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
+	 * @return the lastUpdated
 	 */
-	public boolean removeEntity(ITrustedEntity entity) throws TrustRepositoryException;
+	public Date getLastUpdated();
 }

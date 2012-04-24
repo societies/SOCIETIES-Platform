@@ -25,96 +25,58 @@
 package org.societies.privacytrust.trust.api.model;
 
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import org.societies.privacytrust.trust.impl.repo.model.Trust;
+import org.societies.privacytrust.trust.impl.repo.model.TrustedCis;
+import org.societies.privacytrust.trust.impl.repo.model.TrustedService;
 
 /**
- * This class represents trusted CISs. A <code>TrustedCis</code> object is
- * referenced by its {@link TrustedEntityId}, while the associated {@link Trust}
- * value objects express the trustworthiness of this community, i.e. direct, 
- * indirect and user-perceived. Each trusted CIS is assigned a set of 
- * {@link TrustedCss} objects, which represent its members.
+ * This interface represents trusted CSSs. An <code>ITrustedCss</code> object is
+ * referenced by its {@link TrustedEntityId}, while the associated 
+ * {@link Trust} value objects express the trustworthiness of this CSS, i.e.
+ * direct, indirect and user-perceived. Each trusted CSS is assigned a set of
+ * {@link TrustedCis} objects representing the communities this CSS is member
+ * of. In addition, the services provided by a TrustedCss are modelled as
+ * {@link TrustedService} objects.
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.1
+ * @since 0.0.7
  */
-@Entity
-@Table(name="t_communities")
-public class TrustedCis extends TrustedEntity {
-
-	private static final long serialVersionUID = -438368876927927076L;
-	
-	/** The members of this trusted CIS. */
-	private Set<TrustedCss> members = new CopyOnWriteArraySet<TrustedCss>();
-	
-	/* TODO The services shared by this trusted CIS. */
-	// private Set<TrustedService> services = new CopyOnWriteArraySet<TrustedService>();
+public interface ITrustedCss extends ITrustedEntity {
 
 	/**
-	 * @param trustor
-	 * @param teid
-	 */
-	public TrustedCis(TrustedEntityId trustor, TrustedEntityId teid) {
-		
-		super(trustor, teid);
-	}
-
-	/**
-	 * Returns a set containing the members of this community.
 	 * 
-	 * @return a set containing the members of this community.
-	 */
-	public Set<TrustedCss> getMembers() {
-		
-		return this.members;
-	}
-	
-	/**
-	 * Adds the specified trusted individual to the members of this community.
-	 * 
-	 * @param member
-	 *            the trusted individual to add to the members of this community
-	 * @since 0.0.3
-	 */
-	public void addMember(final TrustedCss member) {
-		
-		if (!this.members.contains(member))
-			this.members.add(member);
-		
-		if (!member.getCommunities().contains(this))
-			member.getCommunities().add(this);
-	}
-	
-	/**
-	 * Removes the specified trusted individual from the members of this community.
-	 * 
-	 * @param member
-	 *            the trusted individual to remove from the members of this community
-	 * @since 0.0.3
-	 */
-	public void removeMember(final TrustedCss member) {
-		
-		if (this.members.contains(member))
-			this.members.remove(member);
-		
-		if (member.getCommunities().contains(this))
-			member.getCommunities().remove(this);
-	}
-
-	/*
-	 * TODO			
+	 * @return
 	 *
-	public Set<TrustedService> getServices() {
-		return this.services;
-	}
+	public Set<TrustedCis> getCommunities();
+	*/
 
 	/**
 	 * 
-	 * @param s
+	 * @param community
 	 *
-	public Set<TrustedService> getServices(String serviceType) {
-		return null;
-	}*/
+	public void addCommunity(final TrustedCis community);
+	*/
+
+	/**
+	 * 
+	 * @param community
+	 *
+	public void removeCommunity(final ITrustedCis community);
+	*/
+
+	/**
+	 * Returns a set containing the services provided by this CSS.
+	 * 
+	 * @return a set containing the services provided by this CSS.
+	 *
+	public Set<TrustedService> getServices();
+	*/
+
+	/**
+	 * 
+	 * @param service
+	 *
+	public void addService(final TrustedService service);
+	*/
 }

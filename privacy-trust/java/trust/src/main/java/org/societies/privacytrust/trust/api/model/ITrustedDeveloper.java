@@ -24,13 +24,21 @@
  */
 package org.societies.privacytrust.trust.api.model;
 
-/**
- * This class is used to represent the indirect trust in a TrustedEntity. The
- * IndirectTrust value is evaluated based on the recommendations of another
- * TrustedEntity or a chain of TrustedEntities (trust path).
- */
-public class IndirectTrust extends Trust {
+import java.util.Set;
 
-	private static final long serialVersionUID = -5920971093636087917L;
+import org.societies.privacytrust.trust.impl.repo.model.TrustedService;
+
+/**
+ * This class represents service developers. A TrustedDeveloper object is
+ * referenced by its TrustedEntityId, while the associated Trust value objects
+ * express the trustworthiness of this developer, i.e. direct, indirect and user-
+ * perceived. Each trusted developer is assigned a set of TrustedService objects.
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.7
+ */
+public interface ITrustedDeveloper extends ITrustedEntity {
+
+	public abstract Set<TrustedService> getServices();
 
 }

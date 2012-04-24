@@ -22,13 +22,16 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
+package org.societies.privacytrust.trust.impl.repo.model;
 
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
+import org.societies.privacytrust.trust.api.model.ITrustedCss;
+import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 
 /**
  * This class represents trusted CSSs. A <code>TrustedCss</code> object is
@@ -43,28 +46,35 @@ import javax.persistence.Table;
  * @since 0.0.1
  */
 @Entity
-@Table(name="t_users")
-public class TrustedCss extends TrustedEntity {
+@Table(name = TableName.TRUSTED_CSS, uniqueConstraints={@UniqueConstraint(columnNames={"trustorId", "trusteeId"})})
+public class TrustedCss extends TrustedEntity implements ITrustedCss {
 	
-	private static final long serialVersionUID = -5663024798098392757L;
+	private static final long serialVersionUID = 6564159563124215460L;
 	
 	/** The communities this CSS is member of. */
-	private final Set<TrustedCis> communities = new CopyOnWriteArraySet<TrustedCis>();
+	//private final Set<TrustedCis> communities = new CopyOnWriteArraySet<TrustedCis>();
 	
 	/** The services provided by this CSS. */
-	private final Set<TrustedService> services = new CopyOnWriteArraySet<TrustedService>();
+	//private final Set<TrustedService> services = new CopyOnWriteArraySet<TrustedService>();
+
+	/* Empty constructor required by Hibernate */
+	private TrustedCss() {
+		
+		super(null);
+	}
 	
 	/**
+	 * Constructs a <code>TrustedCss</code> with the specified identifier.
 	 * 
-	 * @param trustor
 	 * @param teid
+	 *            the identifier of the new <code>TrustedCss</code>
 	 */
-	public TrustedCss(TrustedEntityId trustor, TrustedEntityId teid) {
+	public TrustedCss(final TrustedEntityId teid) {
 		
-		super(trustor, teid);
+		super(teid);
 	}
 
-	public Set<TrustedCis> getCommunities(){
+	/*public Set<TrustedCis> getCommunities(){
 		
 		return this.communities;
 	}
@@ -73,7 +83,7 @@ public class TrustedCss extends TrustedEntity {
 	 * 
 	 * @param community
 	 * @since 0.0.3
-	 */
+	 *
 	public void addCommunity(final TrustedCis community) {
 		
 		if (!this.communities.contains(community))
@@ -87,7 +97,7 @@ public class TrustedCss extends TrustedEntity {
 	 * 
 	 * @param community
 	 * @since 0.0.3
-	 */
+	 *
 	public void removeCommunity(final TrustedCis community) {
 		
 		if (this.communities.contains(community))
@@ -101,7 +111,7 @@ public class TrustedCss extends TrustedEntity {
 	 * Returns a set containing the services provided by this CSS.
 	 * 
 	 * @return a set containing the services provided by this CSS.
-	 */
+	 *
 	public Set<TrustedService> getServices() {
 		
 		return this.services;
@@ -114,10 +124,10 @@ public class TrustedCss extends TrustedEntity {
 	public Set<TrustedService> getServices(String serviceType) {
 		return null;
 	}*/
-	
+/*	
 	public void addService(final TrustedService service) {
 		
 		if (!this.services.contains(service))
 			this.services.add(service);
-	}
+	}*/
 }

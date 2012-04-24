@@ -22,42 +22,46 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.repo;
+package org.societies.privacytrust.trust.api.model;
 
-import org.societies.privacytrust.trust.api.model.ITrustedEntity;
-import org.societies.privacytrust.trust.api.model.TrustedEntityId;
+import java.util.Set;
 
-public interface ITrustRepository {
+import org.societies.privacytrust.trust.impl.repo.model.Trust;
+
+/**
+ * This interface represents trusted CISs. A <code>TrustedCis</code> object is
+ * referenced by its {@link TrustedEntityId}, while the associated {@link Trust}
+ * value objects express the trustworthiness of this community, i.e. direct, 
+ * indirect and user-perceived. Each trusted CIS is assigned a set of 
+ * {@link TrustedCss} objects, which represent its members.
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.7
+ */
+public interface ITrustedCis extends ITrustedEntity {
 
 	/**
+	 * Returns a set containing the members of this community.
 	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public boolean addEntity(final ITrustedEntity entity) throws TrustRepositoryException;
+	 * @return a set containing the members of this community.
+	 *
+	public Set<ITrustedCss> getMembers();
 
 	/**
+	 * Adds the specified trusted individual to the members of this community.
 	 * 
-	 * @param teid
-	 * @return
-	 * @throws TrustRepositoryException
+	 * @param member
+	 *            the trusted individual to add to the members of this community
+	 *
+	public void addMember(final TrustedCss member);
 	 */
-	public ITrustedEntity retrieveEntity(final TrustedEntityId teid) throws TrustRepositoryException;
-	
+
 	/**
+	 * Removes the specified trusted individual from the members of this community.
 	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
+	 * @param member
+	 *            the trusted individual to remove from the members of this community
+	 *
+	public void removeMember(final ITrustedCss member);
 	 */
-	public ITrustedEntity updateEntity(ITrustedEntity entity) throws TrustRepositoryException;
-	
-	/**
-	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public boolean removeEntity(ITrustedEntity entity) throws TrustRepositoryException;
 }

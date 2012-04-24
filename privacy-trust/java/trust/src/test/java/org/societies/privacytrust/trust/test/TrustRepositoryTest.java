@@ -26,35 +26,49 @@ package org.societies.privacytrust.trust.test;
 
 import static org.junit.Assert.*;
 
-import java.net.URISyntaxException;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.TrustedEntityType;
+import org.societies.privacytrust.trust.api.repo.ITrustRepository;
+import org.societies.privacytrust.trust.api.repo.TrustRepositoryException;
+import org.societies.privacytrust.trust.impl.repo.model.TrustedCss;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 
 /**
- * Tests the {@link TrustedEntityId} class.
+ * Test cases for the TrustRepository
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.3
+ * @since 0.0.6
  */
-public class TrustedEntityIdTest {
-
-	private static final String TRUSTOR_ID = "aTrustor";
-	private static final TrustedEntityType ENTITY_TYPE = TrustedEntityType.CSS;
-	private static final String TRUSTEE_ID = "aTrustee";
+@ContextConfiguration(locations = {"classpath:META-INF/spring/test-context.xml"})
+public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 	
-	private TrustedEntityId teid;
+	private static final String TRUSTOR_ID = "aFooTrustorIIdentity";
+	
+	private static final TrustedEntityType ENTITY_TYPE = TrustedEntityType.CSS;
+	private static final String TRUSTEE_ID = "aFooTrusteeIIdentity";
+	
+	private static ITrustedEntity trustee;
+	
+	@Autowired
+	private ITrustRepository trustRepo;
 	
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+	
+		final TrustedEntityId teid = new TrustedEntityId(TRUSTOR_ID, ENTITY_TYPE, TRUSTEE_ID);
+		trustee = new TrustedCss(teid);
 	}
 
 	/**
@@ -63,14 +77,12 @@ public class TrustedEntityIdTest {
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 	}
-
+	
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
-		
-		this.teid = new TrustedEntityId(TRUSTOR_ID, ENTITY_TYPE, TRUSTEE_ID);
 	}
 
 	/**
@@ -81,77 +93,46 @@ public class TrustedEntityIdTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#getTrustorId()}.
-	 * @throws URISyntaxException 
+	 * Test method for {@link org.societies.privacytrust.trust.impl.repo.TrustRepository#addEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)}.
+	 * @throws TrustRepositoryException 
 	 */
 	@Test
-	public void testGetTrustorId() throws URISyntaxException {
+	public void testAddEntity() throws TrustRepositoryException {
 		
-		assertNotNull(this.teid.getTrustorId());
-		assertEquals(TRUSTOR_ID, this.teid.getTrustorId());
-	}
-	
-	/**
-	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#getEntityType()}.
-	 * @throws URISyntaxException 
-	 */
-	@Test
-	public void testGetEntityType() throws URISyntaxException {
-		
-		assertNotNull(this.teid.getEntityType());
-		assertEquals(ENTITY_TYPE, this.teid.getEntityType());
+		assertTrue(this.trustRepo.addEntity(trustee));
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#getTrusteeId()}.
-	 * @throws URISyntaxException 
+	 * Test method for {@link org.societies.privacytrust.trust.impl.repo.TrustRepository#retrieveEntity(org.societies.privacytrust.trust.api.model.TrustedEntityId)}.
+	 * @throws TrustRepositoryException 
 	 */
 	@Test
-	public void testGetTrusteeId() throws URISyntaxException {
+	public void testRetrieveEntity() throws TrustRepositoryException {
 		
-		assertNotNull(this.teid.getTrusteeId());
-		assertEquals(TRUSTEE_ID, this.teid.getTrusteeId());
+		ITrustedEntity trusteeFromDb = this.trustRepo.retrieveEntity(trustee.getTeid());
+		assertNotNull(trusteeFromDb);
+		assertNotNull(trusteeFromDb.getTeid());
+		assertNotNull(trusteeFromDb.getTeid().getTrustorId());
+		assertNotNull(trusteeFromDb.getTeid().getEntityType());
+		assertNotNull(trusteeFromDb.getTeid().getTrusteeId());
+		assertEquals(trustee, trusteeFromDb);
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#getUri()}.
+	 * Test method for {@link org.societies.privacytrust.trust.impl.repo.TrustRepository#updateEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)}.
 	 */
 	@Test
-	public void testGetUri() throws Exception {
-		
-		assertNotNull(this.teid.getUri());
-		final TrustedEntityId sameTeid = new TrustedEntityId(this.teid.getUri().toString());
-		assertEquals(this.teid.getUri(), sameTeid.getUri());
+	@Ignore
+	public void testUpdateEntity() {
+		fail("Not yet implemented");
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#toString()}.
+	 * Test method for {@link org.societies.privacytrust.trust.impl.repo.TrustRepository#removeEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)}.
 	 */
 	@Test
-	public void testToString() throws Exception {
-		
-		assertNotNull(this.teid.toString());
-		final TrustedEntityId sameTeid = new TrustedEntityId(this.teid.toString());
-		assertEquals(this.teid.toString(), sameTeid.toString());
-	}
-	
-	/**
-	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#equals()}.
-	 * @throws Exception 
-	 */
-	@Test
-	public void testEquals() throws Exception {
-		
-		final TrustedEntityId sameTeid = new TrustedEntityId(TRUSTOR_ID, ENTITY_TYPE, TRUSTEE_ID);
-		assertTrue(this.teid.equals(sameTeid));
-		
-		final TrustedEntityId differentTeid1 = new TrustedEntityId("foo", ENTITY_TYPE, TRUSTEE_ID);
-		assertFalse(this.teid.equals(differentTeid1));
-		
-		final TrustedEntityId differentTeid2 = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.LGC, TRUSTEE_ID);
-		assertFalse(this.teid.equals(differentTeid2));
-		
-		final TrustedEntityId differentTeid3 = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.LGC, "bar");
-		assertFalse(this.teid.equals(differentTeid3));
+	@Ignore
+	public void testRemoveEntity() {
+		fail("Not yet implemented");
 	}
 }
