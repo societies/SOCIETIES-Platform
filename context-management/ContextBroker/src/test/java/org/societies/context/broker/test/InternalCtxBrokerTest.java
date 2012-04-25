@@ -924,7 +924,7 @@ public class InternalCtxBrokerTest {
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = internalCtxBroker.retrieveHistoryTuples(primaryAttribute.getId(), listOfEscortingAttributeIds, null, null).get();
 
 		assertEquals(4,tupleResults.size());
-		//System.out.println("tupleResults: "+tupleResults);
+		System.out.println("tupleResults: "+tupleResults);
 		printHocTuplesDB(tupleResults);
 
 		//TODO : add more test for attribute values of type binary
