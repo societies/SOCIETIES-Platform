@@ -25,16 +25,14 @@
 
 package org.societies.android.platform.useragent;
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.IBinder;
+import android.app.Activity;
+import android.os.Bundle;
 
-public class UserFeedback extends Service{
+public class GUI_feedback extends Activity{
 
 	@Override
-	public IBinder onBind(Intent arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.feedback);
 	}
-
 }

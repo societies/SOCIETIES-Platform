@@ -25,16 +25,31 @@
 
 package org.societies.android.platform.useragent;
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.IBinder;
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 
-public class UserFeedback extends Service{
-
-	@Override
-	public IBinder onBind(Intent arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+public class GUI_monitoring extends Activity implements OnClickListener{
+	/** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.uam);
+        
+        Button sayHello = (Button)findViewById(R.id.sayHello);
+        sayHello.setOnClickListener(this);
+        
+        Button sayGoodbye = (Button)findViewById(R.id.sayGoodbye);
+        sayGoodbye.setOnClickListener(this);
+    }
+    
+    public void onClick(View v){
+    	if(v.getId() == R.id.sayHello){
+			//send hello message to backend
+		}else if(v.getId() == R.id.sayGoodbye){
+			//send goodbye message to backend
+		}
+    }
 }
