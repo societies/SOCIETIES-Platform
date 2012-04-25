@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.societies.integration.test.bit.useservice;
+package org.societies.integration.test.bit.installservice;
 
 /**
  * The test case 713 aims to test 3P service usage.

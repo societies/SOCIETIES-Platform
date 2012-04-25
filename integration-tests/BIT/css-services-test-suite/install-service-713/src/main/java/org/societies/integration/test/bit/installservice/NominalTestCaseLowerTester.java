@@ -1,4 +1,4 @@
-package org.societies.integration.test.bit.useservice;
+package org.societies.integration.test.bit.installservice;
 
 import static org.junit.Assert.fail;
 
