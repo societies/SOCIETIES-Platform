@@ -22,42 +22,24 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.repo;
+package org.societies.privacytrust.trust.api.event;
 
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
-import org.societies.privacytrust.trust.api.model.ITrustedEntity;
+/**
+ * The constants of this type specify the topic name of a trust event.
+ * The following names have been identified:
+ * <ul>
+ * <li>{@link #USER_PERCEIVED_TRUST_UPDATED}: User-perceived trust update event</li>
+ * </ul>
+ *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.7
+ */
+public class TrustEventTopic {
 
-public interface ITrustRepository {
-
-	/**
-	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public boolean addEntity(final ITrustedEntity entity) throws TrustRepositoryException;
-
-	/**
-	 * 
-	 * @param teid
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public ITrustedEntity retrieveEntity(final TrustedEntityId teid) throws TrustRepositoryException;
+	private static final String BASE_TOPIC = "org/societies/privacytrust/trust/event/"; 
 	
-	/**
-	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public ITrustedEntity updateEntity(ITrustedEntity entity) throws TrustRepositoryException;
+	public static final String USER_PERCEIVED_TRUST_UPDATED = BASE_TOPIC + "USER-PERCEIVED_TRUST_UPDATED";
 	
-	/**
-	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public boolean removeEntity(ITrustedEntity entity) throws TrustRepositoryException;
+	/* Prevents instantiation */
+	private TrustEventTopic() {}
 }

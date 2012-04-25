@@ -22,62 +22,98 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.event;
+package org.societies.api.internal.privacytrust.trust.event;
 
-import org.societies.api.internal.privacytrust.trust.event.ITrustEventListener;
-import org.societies.api.internal.privacytrust.trust.event.TrustEvent;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 
 /**
- * The Trust Event Manager is responsible for the subscription and publishing
- * of trust-related events.
+ * This event is fired whenever a trust value is updated. A 
+ * <code>TrustUpdateEvent</code> object is sent as an argument to the
+ * {@link ITrustUpdateEventListener} methods.
+ * <p>
+ * Normally, TrustUpdateEvents are accompanied by the source, i.e. the 
+ * {@link TrustedEntityId identifier} of the entity whose trust value was
+ * updated, as well as, the old and new value. 
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.5
+ * @since 0.0.2
  */
-public interface ITrustEventMgr {
+public class TrustUpdateEvent extends TrustEvent {
 
+	private static final long serialVersionUID = -4292086499526921194L;
+
+	/** The old trust value */
+	private final Double oldValue;
+	
+	/** The new trust value */
+	private final Double newValue;
+	
 	/**
-     * Publishes the specified {@link TrustEvent}.
-     * 
-     * @param event
-     *            the event to be published.
-     * @param topics
-     *            the topics to which the event will be published.
-     * @param source
-     *            the publisher of the event.
-     * @throws TrustEventMgrExceptionException 
-     *             if publishing of the specified event fails.
-     * @throws NullPointerException
-     *             if any of the specified parameters is <code>null</code>.
-     * @since 0.0.7
-     */
-    public void postEvent(final TrustEvent event, final String[] topics, 
-    		final String source) throws TrustEventMgrException;
-    
-    /**
-     * Registers the specified {@link ITrustEventListener} for events of the
-     * supplied topics. Once registered, the <code>ITrustEventListener</code>
-     * will handle {@link TrustEvent TrustEvents} associated with the
-     * identified trusted entity.
-     * <p>
-     * To unregister the specified <code>ITrustEventListener</code>, use the
-     * {@link #unregisterListener(TODO)}
-     * method.
-     * 
-     * @param listener
-     *            the <code>ITrustEventListener</code> to register.
-     * @param topics
-     *            the event topics to register for.
-     * @param teid
-     *            the identifier of the trusted entity whose events to
-     *            register for.
-     * @throws TrustEventMgrException
-     *             if the registration process of the specified
-     *             <code>ITrustEventListener</code> fails.
-     * @throws NullPointerException
-     *             if any of the specified parameters is <code>null</code>.
-     */
-    public void registerListener(final ITrustEventListener listener, 
-			final String[] topics, final TrustedEntityId teid) throws TrustEventMgrException;
+	 * Constructs a <code>TrustUpdateEvent</code> object with the specified
+	 * source, old and new trust value.
+	 *  
+	 * @param source
+	 *            the identifier of the entity whose trust value was updated
+	 * @param oldValue
+	 *            the old trust value
+	 * @param newValue
+	 *            the new trust value
+	 */
+	public TrustUpdateEvent(TrustedEntityId source, Double oldValue, Double newValue) {
+		
+		super(source);
+		
+		this.oldValue = oldValue;
+		this.newValue = newValue;
+	}
+	
+	/**
+	 * Returns the identifier of the entity whose trust value was updated.
+	 * 
+	 * @return the identifier of the entity whose trust value was updated.
+	 * @since 0.0.7
+	 */
+	public TrustedEntityId getId() {
+		
+		return (TrustedEntityId) super.getSource();
+	}
+	
+	/**
+	 * Returns the old trust value.
+	 * 
+	 * @return the old trust value.
+	 */
+	public Double getOldValue() {
+		
+		return this.oldValue;
+	}
+	
+	/**
+	 * Returns the new trust value.
+	 * 
+	 * @return the new trust value.
+	 */
+	public Double getNewValue() {
+		
+		return this.newValue;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.util.EventObject#toString()
+	 */
+	@Override
+	public String toString() {
+		
+		final StringBuilder sb = new StringBuilder();
+		sb.append("{");
+		sb.append("id=" + this.getId());
+		sb.append(", ");
+		sb.append("oldValue=" + this.getOldValue());
+		sb.append(", ");
+		sb.append("newValue=" + this.getNewValue());
+		sb.append("}");
+		
+		return sb.toString();
+	}
 }

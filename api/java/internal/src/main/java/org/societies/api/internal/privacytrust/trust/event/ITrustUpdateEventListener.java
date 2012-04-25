@@ -22,67 +22,23 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.trust;
-
-import java.util.EventObject;
+package org.societies.api.internal.privacytrust.trust.event;
 
 /**
- * This event is fired whenever a trust value is updated. A 
- * <code>TrustUpdateEvent</code> object is sent as an argument to the
- * {@link TrustUpdateListener} methods.
- * <p>
- * Normally, TrustUpdateEvents are accompanied by the source, i.e. the identifier
- * of the entity whose trust value was updated, as well as, the old and new value. 
+ * An interface that must be implemented by a component that wants to be notified
+ * when a trust value is updated.  
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.2
  */
-public class TrustUpdateEvent extends EventObject {
-
-	private static final long serialVersionUID = -4292086499526921194L;
-
-	/** The old trust value */
-	private final Double oldValue;
-	
-	/** The new trust value */
-	private final Double newValue;
+public interface ITrustUpdateEventListener extends ITrustEventListener {
 	
 	/**
-	 * Constructs a <code>TrustUpdateEvent</code> object with the specified
-	 * source, old and new trust value.
-	 *  
-	 * @param source
-	 *            the identifier of the entity whose trust value was updated
-	 * @param oldValue
-	 *            the old trust value
-	 * @param newValue
-	 *            the new trust value
-	 */
-	public TrustUpdateEvent(Object source, Double oldValue, Double newValue) {
-		
-		super(source);
-		
-		this.oldValue = oldValue;
-		this.newValue = newValue;
-	}
-	
-	/**
-	 * Returns the old trust value.
+	 * Notifies registered listeners that a trust value is updated.
 	 * 
-	 * @return the old trust value.
+	 * @param evt
+	 *            the <code>TrustUpdateEvent</code> object describing the
+	 *            event source, as well as, the old and new trust value.
 	 */
-	public Double getOldValue() {
-		
-		return this.oldValue;
-	}
-	
-	/**
-	 * Returns the new trust value.
-	 * 
-	 * @return the new trust value.
-	 */
-	public Double getNewValue() {
-		
-		return this.newValue;
-	}
+	public void trustValueUpdated(TrustUpdateEvent evt);
 }

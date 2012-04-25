@@ -22,6 +22,7 @@
 				<role>owner</role>
 				<role>developer</role>
 			</roles>
+			<timezone>+1</timezone>
 		</developer>
 	</developers>
 

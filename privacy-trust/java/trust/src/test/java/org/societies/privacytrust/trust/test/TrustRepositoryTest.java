@@ -32,9 +32,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
-import org.societies.privacytrust.trust.api.model.TrustedEntityId;
-import org.societies.privacytrust.trust.api.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.societies.privacytrust.trust.api.repo.TrustRepositoryException;
 import org.societies.privacytrust.trust.impl.repo.model.TrustedCss;
@@ -103,7 +103,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.repo.TrustRepository#retrieveEntity(org.societies.privacytrust.trust.api.model.TrustedEntityId)}.
+	 * Test method for {@link org.societies.privacytrust.trust.impl.repo.TrustRepository#retrieveEntity(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)}.
 	 * @throws TrustRepositoryException 
 	 */
 	@Test
