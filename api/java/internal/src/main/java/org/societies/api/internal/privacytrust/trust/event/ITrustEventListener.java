@@ -22,25 +22,18 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.trust;
+package org.societies.api.internal.privacytrust.trust.event;
 
 import java.util.EventListener;
 
 /**
- * An interface that must be implemented by a component that wants to be notified
- * when a trust value is updated.  
+ * A listener for receiving {@link TrustEvent TrustEvents}. Extensions of this
+ * interface (e.g. {@link TrustUpdateEventListener}) define methods for handling
+ * concrete implementations of the <code>TrustEvent</code> class.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.2
+ * @since 0.0.7
  */
-public interface TrustUpdateListener extends EventListener {
-	
-	/**
-	 * Notifies registered listeners that a trust value is updated.
-	 * 
-	 * @param evt
-	 *            the <code>TrustUpdateEvent</code> object describing the
-	 *            event source, as well as, the old and new trust value.
-	 */
-	public void trustValueUpdated(TrustUpdateEvent evt);
+public interface ITrustEventListener extends EventListener {
+
 }

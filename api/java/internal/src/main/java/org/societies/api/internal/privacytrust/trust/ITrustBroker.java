@@ -26,6 +26,7 @@ package org.societies.api.internal.privacytrust.trust;
 
 import java.util.concurrent.Future;
 
+import org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 
 /**
@@ -63,7 +64,7 @@ public interface ITrustBroker {
 	 * @throws NullPointerException if any of the specified listener or entity
 	 *         identifier is <code>null</code>
 	 */
-	public void registerTrustUpdateEventListener(final TrustUpdateListener listener,
+	public void registerTrustUpdateEventListener(final ITrustUpdateEventListener listener,
 			final TrustedEntityId entityId) throws TrustException;
 	
 	/**
@@ -79,6 +80,6 @@ public interface ITrustBroker {
 	 * @throws NullPointerException if any of the specified listener or entity
 	 *         identifier is <code>null</code>
 	 */
-	public void unregisterTrustUpdateEventListener(final TrustUpdateListener listener,
+	public void unregisterTrustUpdateEventListener(final ITrustUpdateEventListener listener,
 			final TrustedEntityId teid) throws TrustException;
 }

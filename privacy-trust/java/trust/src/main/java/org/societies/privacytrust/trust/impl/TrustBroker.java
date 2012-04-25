@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.privacytrust.trust.TrustException;
-import org.societies.api.internal.privacytrust.trust.TrustUpdateListener;
+import org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
@@ -94,7 +94,7 @@ public class TrustBroker implements ITrustBroker {
 	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateEventListener(org.societies.api.internal.privacytrust.trust.TrustUpdateListener, org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public void registerTrustUpdateEventListener(final TrustUpdateListener listener,
+	public void registerTrustUpdateEventListener(final ITrustUpdateEventListener listener,
 			final TrustedEntityId teid) throws TrustException {
 		// TODO Auto-generated method stub
 		if (listener == null)
@@ -111,7 +111,7 @@ public class TrustBroker implements ITrustBroker {
 	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateEventListener(org.societies.api.internal.privacytrust.trust.TrustUpdateListener, org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public void unregisterTrustUpdateEventListener(final TrustUpdateListener listener,
+	public void unregisterTrustUpdateEventListener(final ITrustUpdateEventListener listener,
 			final TrustedEntityId teid) throws TrustException {
 		// TODO Auto-generated method stub
 		if (listener == null)
