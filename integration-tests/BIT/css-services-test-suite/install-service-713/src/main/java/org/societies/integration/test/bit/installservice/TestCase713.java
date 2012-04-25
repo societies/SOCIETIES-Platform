@@ -14,7 +14,7 @@ package org.societies.integration.test.bit.useservice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
-import org.societies.api.servicelifecycle.IServiceControl;
+import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.integration.test.IntegrationTestCase;
 
 public class TestCase713 extends IntegrationTestCase {
