@@ -722,13 +722,79 @@ public class InternalCtxBrokerTest {
 		assertEquals(results.size(),3);
 	}
 
-	@Test
-	public void testHistoryTupleDataRetrieval() throws CtxException, InterruptedException, ExecutionException {
 
+	/**
+	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#updateHistoryTuples(CtxAttributeIdentifier primaryAttrIdentifier, List<CtxAttributeIdentifier> arg1)}.
+	 */
+
+	@Test
+	public void testUpdateHistoryTuples() {
+
+		final CtxEntity scope;
 		CtxAttribute primaryAttribute;
 		CtxAttribute escortingAttribute1;
 		CtxAttribute escortingAttribute2;
+		CtxAttribute escortingAttribute3;
+		System.out.println("********* testUpdateHistoryTuples");
+		try {
+			scope = (CtxEntity)internalCtxBroker.createEntity("entType").get();
+			// Create the attribute to be tested
+			primaryAttribute = (CtxAttribute) internalCtxBroker.createAttribute(scope.getId(), "primaryAttribute").get();
+			primaryAttribute.setStringValue("fistValue");
+			primaryAttribute.setHistoryRecorded(true);
+			internalCtxBroker.update(primaryAttribute);
+
+			escortingAttribute1 = (CtxAttribute)internalCtxBroker.createAttribute(scope.getId(), "escortingAttribute1").get();
+			escortingAttribute1.setHistoryRecorded(true);
+			escortingAttribute2 = (CtxAttribute)internalCtxBroker.createAttribute(scope.getId(), "escortingAttribute2").get();
+			escortingAttribute2.setHistoryRecorded(true);
+
+			escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingValue1").get();
+			escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingValue2").get();
+
+
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
+			listOfEscortingAttributeIds.add(escortingAttribute1.getId());
+			listOfEscortingAttributeIds.add(escortingAttribute2.getId());
+
+			assertTrue(internalCtxBroker.setHistoryTuples(primaryAttribute.getId(), listOfEscortingAttributeIds).get());	
+			internalCtxBroker.update(primaryAttribute);
+
+			List<CtxAttributeIdentifier> tuplesBeforeUpdate = internalCtxBroker.getHistoryTuples(primaryAttribute.getId(), null).get();
+			System.out.println("********* tuplesBeforeUpdate "+tuplesBeforeUpdate +" size "+tuplesBeforeUpdate.size());
+			assertEquals(3,tuplesBeforeUpdate.size());
+
+			escortingAttribute3 = (CtxAttribute)internalCtxBroker.createAttribute(scope.getId(), "escortingAttribute3").get();
+			listOfEscortingAttributeIds.add(escortingAttribute3.getId());
+			System.out.println("listOfEscortingAttributeIds "+listOfEscortingAttributeIds.size());
+
+			internalCtxBroker.updateHistoryTuples(primaryAttribute.getId(),listOfEscortingAttributeIds);
+			List<CtxAttributeIdentifier> tuplesAfterUpdate = internalCtxBroker.getHistoryTuples(primaryAttribute.getId(), null).get();
+			assertEquals(4,tuplesAfterUpdate.size());
+			System.out.println("********* tuplesAfterUpdate "+tuplesAfterUpdate +" size "+tuplesAfterUpdate.size());
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	@Test
+	public void testHistoryMultipleSizeTupleDataRetrieval() throws CtxException, InterruptedException, ExecutionException {
+
+
+		System.out.println("testHistoryMultipleSizeTupleDataRetrieval");
 		final CtxEntity scope;
+		CtxAttribute primaryAttribute;
+		CtxAttribute escortingAttribute1;
+		CtxAttribute escortingAttribute2;
 
 		scope = (CtxEntity)internalCtxBroker.createEntity("entType").get();
 		// Create the attribute to be tested
@@ -741,22 +807,106 @@ public class InternalCtxBrokerTest {
 		escortingAttribute1.setHistoryRecorded(true);
 		escortingAttribute2 = (CtxAttribute)internalCtxBroker.createAttribute(scope.getId(), "escortingAttribute2").get();
 		escortingAttribute2.setHistoryRecorded(true);
-		
-		escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingValue1").get();
-		escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingValue2").get();
-		
-		
+
+		escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingValue1_xx").get();
+		escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingValue2_xx").get();
+
+
 		List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
 		listOfEscortingAttributeIds.add(escortingAttribute1.getId());
 		listOfEscortingAttributeIds.add(escortingAttribute2.getId());
 
 		assertTrue(internalCtxBroker.setHistoryTuples(primaryAttribute.getId(), listOfEscortingAttributeIds).get());	
 		internalCtxBroker.update(primaryAttribute);
-		
+
 		primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"secondValue").get();
 		//CtxAttribute tupleAttr = lookupAttrHelp("tuple_primaryAttribute");
 		assertNotNull(lookupAttrHelp("tuple_primaryAttribute"));
-		
+
+		//System.out.println("1 tupleAttrType: "+tupleAttr.getType());
+		//List historyList = internalCtxBroker.retrieveHistory(primaryAttribute.getId(), null,null).get();
+		//System.out.println("2. "+historyList);
+
+		escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingValue1_zz").get();
+		//escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingValue2_yy").get();
+
+		primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"thirdValue").get();
+
+		escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingValue1_oo").get();
+		escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingValue2_tt").get();
+
+		primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"forthValue").get();
+
+		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = internalCtxBroker.retrieveHistoryTuples(primaryAttribute.getId(), listOfEscortingAttributeIds, null, null).get();
+
+		assertEquals(4,tupleResults.size());
+
+		printHocTuplesDB(tupleResults);
+		System.out.println("add new attribute in an existing tuple");
+
+		CtxAttribute escortingAttribute3 = (CtxAttribute) internalCtxBroker.createAttribute(scope.getId(),"escortingAttribute3").get();
+		//escortingAttribute3.setHistoryRecorded(true);
+		List<CtxAttributeIdentifier> newlistOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
+		newlistOfEscortingAttributeIds.add(escortingAttribute1.getId());
+		newlistOfEscortingAttributeIds.add(escortingAttribute2.getId());
+		newlistOfEscortingAttributeIds.add(escortingAttribute3.getId());
+		internalCtxBroker.updateHistoryTuples(primaryAttribute.getId(), newlistOfEscortingAttributeIds);
+
+		escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingValue1_XX").get();
+		escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingValue2_YY").get();
+		escortingAttribute3 =  internalCtxBroker.updateAttribute(escortingAttribute3.getId(),(Serializable)"escortingValue3_ZZ").get();
+		primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"fifthValue").get();
+
+		escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingValue1_XXX").get();
+		escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingValue2_YYY").get();
+		escortingAttribute3 =  internalCtxBroker.updateAttribute(escortingAttribute3.getId(),(Serializable)"escortingValue3_ZZZ").get();
+		primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"sixthValue").get();
+
+		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> updatedTupleResults = internalCtxBroker.retrieveHistoryTuples(primaryAttribute.getId(), listOfEscortingAttributeIds, null, null).get();
+		System.out.println("updatedTupleResults "+updatedTupleResults);
+		assertEquals(4,tupleResults.size());
+		//printHocTuplesDB(updatedTupleResults);
+		//TODO : add more test for attribute values of type binary
+	}
+
+
+
+
+	@Test
+	public void testHistoryTupleDataRetrieval() throws CtxException, InterruptedException, ExecutionException {
+
+		final CtxEntity scope;
+		CtxAttribute primaryAttribute;
+		CtxAttribute escortingAttribute1;
+		CtxAttribute escortingAttribute2;
+
+		scope = (CtxEntity)internalCtxBroker.createEntity("entType").get();
+		// Create the attribute to be tested
+		primaryAttribute = (CtxAttribute) internalCtxBroker.createAttribute(scope.getId(), "primaryAttribute").get();
+		primaryAttribute.setStringValue("fistValue");
+		primaryAttribute.setHistoryRecorded(true);
+		internalCtxBroker.update(primaryAttribute);
+
+		escortingAttribute1 = (CtxAttribute)internalCtxBroker.createAttribute(scope.getId(), "escortingAttribute1").get();
+		escortingAttribute1.setHistoryRecorded(true);
+		escortingAttribute2 = (CtxAttribute)internalCtxBroker.createAttribute(scope.getId(), "escortingAttribute2").get();
+		escortingAttribute2.setHistoryRecorded(true);
+
+		escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingValue1").get();
+		escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingValue2").get();
+
+
+		List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
+		listOfEscortingAttributeIds.add(escortingAttribute1.getId());
+		listOfEscortingAttributeIds.add(escortingAttribute2.getId());
+
+		assertTrue(internalCtxBroker.setHistoryTuples(primaryAttribute.getId(), listOfEscortingAttributeIds).get());	
+		internalCtxBroker.update(primaryAttribute);
+
+		primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"secondValue").get();
+		//CtxAttribute tupleAttr = lookupAttrHelp("tuple_primaryAttribute");
+		assertNotNull(lookupAttrHelp("tuple_primaryAttribute"));
+
 		//System.out.println("1 tupleAttrType: "+tupleAttr.getType());
 		//List historyList = internalCtxBroker.retrieveHistory(primaryAttribute.getId(), null,null).get();
 		//System.out.println("2. "+historyList);
@@ -765,18 +915,18 @@ public class InternalCtxBrokerTest {
 		escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingValue4").get();
 
 		primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"thirdValue").get();
-		
+
 		escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingValue5").get();
-		escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingValue6").get();
+		escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),null).get();
 
 		primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"forthValue").get();
-		
+
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = internalCtxBroker.retrieveHistoryTuples(primaryAttribute.getId(), listOfEscortingAttributeIds, null, null).get();
-		
+
 		assertEquals(4,tupleResults.size());
 		//System.out.println("tupleResults: "+tupleResults);
 		printHocTuplesDB(tupleResults);
-	
+
 		//TODO : add more test for attribute values of type binary
 	}
 
@@ -824,7 +974,7 @@ public class InternalCtxBrokerTest {
 		for (CtxHistoryAttribute primary : tupleResults.keySet()){
 			String primaryValue = null;
 			if (primary.getStringValue() != null) primaryValue =primary.getStringValue();
-			
+
 
 			String escValueTotal = null;
 			for(CtxHistoryAttribute escortingAttr: tupleResults.get(primary)){
