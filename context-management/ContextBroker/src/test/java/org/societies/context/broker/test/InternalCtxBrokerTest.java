@@ -411,28 +411,42 @@ public class InternalCtxBrokerTest {
 		CtxEntity ctxEntity;
 		try {
 			ctxEntity = internalCtxBroker.createEntity("PersonEntity").get();
-			CtxAttribute ctxAttribute =  internalCtxBroker.createAttribute(ctxEntity.getId(), "PersontAttribute").get();
+			CtxAttribute ctxAttribute =  internalCtxBroker.createAttribute(ctxEntity.getId(), "PersonAttribute").get();
 			Date date1 = new Date();
 			String value = "valueString1";
 			CtxHistoryAttribute hocAttr1 = internalCtxBroker.createHistoryAttribute(ctxAttribute.getId(), date1, value, CtxAttributeValueType.STRING).get();
 
 			Date date2 = new Date();
-			value = "valueString2";
-			CtxHistoryAttribute hocAttr2 = internalCtxBroker.createHistoryAttribute(ctxAttribute.getId(), date2, value, CtxAttributeValueType.STRING).get();
-
+			final MockBlobClass mock = new MockBlobClass(666);
+			byte[] blobValue = SerialisationHelper.serialise(mock);
+		
+			CtxHistoryAttribute hocAttr2 = internalCtxBroker.createHistoryAttribute(ctxAttribute.getId(), date2, blobValue, CtxAttributeValueType.BINARY).get();
+			assertEquals(hocAttr2.getLastModified(),date2);
+			assertEquals(hocAttr2.getType(),"PersonAttribute");
+			assertEquals(hocAttr2.getModelType(),CtxModelType.ATTRIBUTE);
+			final MockBlobClass retrievedMock = (MockBlobClass) SerialisationHelper.deserialise(hocAttr2.getBinaryValue(), this.getClass().getClassLoader());
+			assertEquals(mock,retrievedMock);
+			
 			Date date3 = new Date();
 			value = "valueString3";
 			CtxHistoryAttribute hocAttr3 = internalCtxBroker.createHistoryAttribute(ctxAttribute.getId(), date3, value, CtxAttributeValueType.STRING).get();
 
 			List<CtxHistoryAttribute> history = internalCtxBroker.retrieveHistory(ctxAttribute.getId(), null, null).get();
 			assertEquals(3, history.size());
-
+		
 			CtxHistoryAttribute ctxHocAttr = history.get(0);
 			assertEquals(ctxHocAttr.getLastModified(),date1);
 			assertEquals(ctxHocAttr.getStringValue(),"valueString1");
-			assertEquals(ctxHocAttr.getType(),"PersontAttribute");
+			assertEquals(ctxHocAttr.getType(),"PersonAttribute");
 			assertEquals(ctxHocAttr.getModelType(),CtxModelType.ATTRIBUTE);
 
+			CtxHistoryAttribute ctxHocAttrBlob = history.get(1);
+			assertEquals(ctxHocAttrBlob.getLastModified(),date2);
+			assertEquals(ctxHocAttrBlob.getType(),"PersonAttribute");
+			assertEquals(ctxHocAttrBlob.getModelType(),CtxModelType.ATTRIBUTE);
+			final MockBlobClass retrievedMockFromHocDB = (MockBlobClass) SerialisationHelper.deserialise(hocAttr2.getBinaryValue(), this.getClass().getClassLoader());
+			assertEquals(mock,retrievedMockFromHocDB);
+						
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -440,6 +454,12 @@ public class InternalCtxBrokerTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
