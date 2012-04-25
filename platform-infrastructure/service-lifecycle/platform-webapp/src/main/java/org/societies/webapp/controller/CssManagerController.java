@@ -1,5 +1,7 @@
 package org.societies.webapp.controller;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -13,6 +15,7 @@ import javax.validation.Valid;
 import org.societies.webapp.models.CssManagerForm;
 import org.societies.webapp.models.CssManagerLoginForm;
 import org.societies.webapp.models.LoginForm;
+import org.societies.webapp.models.requests.CssServiceModel;
 import org.societies.webapp.models.requests.CssRequestModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,14 +27,21 @@ import org.springframework.web.servlet.ModelAndView;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.css.management.ICSSLocalManager;
+import org.societies.api.internal.servicelifecycle.IServiceControl;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.internal.servicelifecycle.ServiceControlException;
+import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssAdvertisementRecordDetailed;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssRequest;
+import org.societies.api.schema.cssmanagement.CssRequestOrigin;
 import org.societies.api.schema.cssmanagement.CssRequestStatusType;
 import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 
 @Controller
@@ -44,7 +54,13 @@ public class CssManagerController {
 	private ICSSLocalManager cssLocalManager;
 	@Autowired
 	private ICommManager commManager;
-
+	@Autowired
+	private IServiceDiscovery sdService;
+	@Autowired
+	private IServiceControl scService;
+	
+	
+	
 	private CssManagerLoginForm cmControllerLoginForm = new CssManagerLoginForm();
 
 	public ICSSLocalManager getCssLocalManager() {
@@ -62,6 +78,24 @@ public class CssManagerController {
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
 	}
+	
+	public IServiceDiscovery getSDService() {
+		return sdService;
+	}
+
+	public void getSDService(IServiceDiscovery sdService) {
+		this.sdService = sdService;
+	}
+	
+	public IServiceControl getSCService() {
+		return scService;
+	}
+
+	public void setSCService(IServiceControl scService) {
+		this.scService = scService;
+	}
+	
+	final int MAX_REQUESTS = 5;
 
 	@RequestMapping(value = "/cssmanager.html", method = RequestMethod.GET)
 	public ModelAndView cssManager() {
@@ -101,6 +135,7 @@ public class CssManagerController {
 			BindingResult result, Map model) {
 
 		int requestActiveCount = 1;
+		int friendServiceCount = 1;
 
 		if (result.hasErrors()) {
 			model.put("message", "Css Manager form error");
@@ -120,201 +155,50 @@ public class CssManagerController {
 			return new ModelAndView("cssmanager", model);
 		}
 
+		cmControllerLoginForm.setCssIdentity(cmLoginForm.getCssIdentity());
+		cmControllerLoginForm.setCssAdId(cmLoginForm.getCssIdentity());
+		
 		// Now we go a logon to the Css
 		CssRecord loginRecord = new CssRecord();
 		setupEmptyCssRecord(loginRecord);
 
 		loginRecord.setCssIdentity(cmLoginForm.getCssIdentity());
 		loginRecord.setPassword(cmLoginForm.getPassword());
-
-		// List<CssRequestModel> cssads = cmLoginForm.getCssadLists();
-		// List<CssRequestModel> cssFriends = cmLoginForm.getCssFriendsLists();
-		// List<CssRequestModel> cssPendingRequests =
-		// cmLoginForm.getCssRequestsLists();
-
-		CssRequest request = new CssRequest();
 		
-		cmControllerLoginForm.setCssIdentity(cmLoginForm.getCssIdentity());
-		
-
-		// now each 'every one' of the request to see if they changed!
-		if (cmControllerLoginForm.getCssAdRequests1().isActive()) {
-			if (cmLoginForm.getCssAdRequests1().getValue() != null)
-			{
-			if (cmLoginForm.getCssAdRequests1().getValue().contentEquals("1")) { //send friend request
-				getCssLocalManager().sendCssFriendRequest(
-						cmControllerLoginForm.getCssAdRequests1().getAdRecObj()
-								.getResultCssAdvertisementRecord().getId());
-			} else if (cmLoginForm.getCssAdRequests1().getValue().contentEquals("2") //cancel pending request
-					|| cmLoginForm.getCssAdRequests1().getValue().contentEquals("3")) { //leave 
-				
-				request.setCssIdentity(cmControllerLoginForm.getCssAdRequests1().getAdRecObj().getResultCssAdvertisementRecord().getId());
-				request.setRequestStatus(CssRequestStatusType.CANCELLED);
-
-				getCssLocalManager().updateCssFriendRequest(request);
-
-			}
-			}
-		}
-		if (cmControllerLoginForm.getCssAdRequests2().isActive()) {
-			if (cmLoginForm.getCssAdRequests2().getValue() != null) {
-			if (cmLoginForm.getCssAdRequests2().getValue().contentEquals("1")) {
-				getCssLocalManager().sendCssFriendRequest(
-						cmControllerLoginForm.getCssAdRequests2().getAdRecObj()
-								.getResultCssAdvertisementRecord().getId());
-			} else if (cmLoginForm.getCssAdRequests2().getValue().contentEquals("2") //cancel pending request
-					|| cmLoginForm.getCssAdRequests2().getValue().contentEquals("3")) { //leave   
-				request.setCssIdentity(cmControllerLoginForm.getCssAdRequests2().getAdRecObj().getResultCssAdvertisementRecord().getId());
-				request.setRequestStatus(CssRequestStatusType.CANCELLED);
-
-				getCssLocalManager().updateCssFriendRequest(request);
-			}
-			}
-		}
-		if (cmLoginForm.getCssAdRequests3().isActive()) {
-			if (cmLoginForm.getCssAdRequests3().getValue() != null) {
-			if (cmLoginForm.getCssAdRequests3().getValue().contentEquals("1")) {
-				getCssLocalManager().sendCssFriendRequest(
-						cmLoginForm.getCssAdRequests3().getAdRecObj()
-								.getResultCssAdvertisementRecord().getId());
-			} else if (cmLoginForm.getCssAdRequests3().getValue().contentEquals("2") //cancel pending request
-					|| cmLoginForm.getCssAdRequests3().getValue().contentEquals("3")) { //leave   
-				request.setCssIdentity(cmControllerLoginForm.getCssAdRequests3().getAdRecObj().getResultCssAdvertisementRecord().getId());
-				request.setRequestStatus(CssRequestStatusType.CANCELLED);
-
-				getCssLocalManager().updateCssFriendRequest(request);
-			}
-		}
-		}
-		
-		if (cmControllerLoginForm.getCssRequests1().isActive()) {
-			if (cmLoginForm.getCssRequests1().getValue() != null)
-			{
-				if (cmLoginForm.getCssRequests1().getValue().contentEquals("1")) { //accept
-				
-				request.setCssIdentity(cmControllerLoginForm.getCssRequests1().getCssRequestObj().getCssIdentity());
-				request.setRequestStatus(CssRequestStatusType.ACCEPTED);
-				getCssLocalManager().updateCssRequest(request);
-				
-					
-				}else if (cmLoginForm.getCssRequests1().getValue().contentEquals("2")) { //reject
-					
-					request.setCssIdentity(cmControllerLoginForm.getCssRequests1().getCssRequestObj().getCssIdentity());
-					request.setRequestStatus(CssRequestStatusType.DENIED);
-					getCssLocalManager().updateCssRequest(request);
-					
-						
-				} else if (cmLoginForm.getCssRequests1().getValue().contentEquals("3")) { //reject
-					
-					request.setCssIdentity(cmControllerLoginForm.getCssRequests1().getCssRequestObj().getCssIdentity());
-					request.setRequestStatus(CssRequestStatusType.CANCELLED);
-					getCssLocalManager().updateCssRequest(request);
-					
-						
-				} 
-				
+		if (cmLoginForm.getButtonLabel().contentEquals("Save"))
+		{
 			
-			}
+			loginRecord.setCssHostingLocation(cmLoginForm.getCssHostingLocation());
+			loginRecord.setDomainServer(cmLoginForm.getDomainServer());
+			loginRecord.setEmailID(cmLoginForm.getEmailID());
+			loginRecord.setHomeLocation(cmLoginForm.getHomeLocation());
+			loginRecord.setIdentityName(cmLoginForm.getIdentityName());
+			loginRecord.setImID(cmLoginForm.getImID());
+			loginRecord.setName(cmLoginForm.getName());
+			loginRecord.setSex(cmLoginForm.getSex());
 		}
 		
-		if (cmControllerLoginForm.getCssRequests2().isActive()) {
-			if (cmLoginForm.getCssRequests2().getValue() != null)
-			{
-				if (cmLoginForm.getCssRequests2().getValue().contentEquals("1")) { //accept
+		
+		if (cmLoginForm.getButtonLabel().contentEquals("Save"))
+		{
+			doUpdatesMessaging(cmLoginForm);
+			model.put("buttonmessage", "Did the updates");
+		}
+		else
+		{
+			model.put("buttonmessage", "didn't do updates");
 				
-				request.setCssIdentity(cmControllerLoginForm.getCssRequests2().getCssRequestObj().getCssIdentity());
-				request.setRequestStatus(CssRequestStatusType.ACCEPTED);
-				getCssLocalManager().updateCssRequest(request);
+		}
 				
-					
-				}else if (cmLoginForm.getCssRequests2().getValue().contentEquals("2")) { //reject
-					
-					request.setCssIdentity(cmControllerLoginForm.getCssRequests2().getCssRequestObj().getCssIdentity());
-					request.setRequestStatus(CssRequestStatusType.DENIED);
-					getCssLocalManager().updateCssRequest(request);
-					
-						
-				} else if (cmLoginForm.getCssRequests2().getValue().contentEquals("3")) { //reject
-					
-					request.setCssIdentity(cmControllerLoginForm.getCssRequests2().getCssRequestObj().getCssIdentity());
-					request.setRequestStatus(CssRequestStatusType.CANCELLED);
-					getCssLocalManager().updateCssRequest(request);
-					
-						
-				} 
-				
+		
 			
-			}
-		}
-		
-		if (cmControllerLoginForm.getCssRequests3().isActive()) {
-			if (cmLoginForm.getCssRequests3().getValue() != null)
-			{
-				if (cmLoginForm.getCssRequests3().getValue().contentEquals("1")) { //accept
-				
-				request.setCssIdentity(cmControllerLoginForm.getCssRequests3().getCssRequestObj().getCssIdentity());
-				request.setRequestStatus(CssRequestStatusType.ACCEPTED);
-				getCssLocalManager().updateCssRequest(request);
-				
-					
-				}else if (cmLoginForm.getCssRequests3().getValue().contentEquals("2")) { //reject
-					
-					request.setCssIdentity(cmControllerLoginForm.getCssRequests3().getCssRequestObj().getCssIdentity());
-					request.setRequestStatus(CssRequestStatusType.DENIED);
-					getCssLocalManager().updateCssRequest(request);
-					
-						
-				} else if (cmLoginForm.getCssRequests3().getValue().contentEquals("3")) { //reject
-					
-					request.setCssIdentity(cmControllerLoginForm.getCssRequests3().getCssRequestObj().getCssIdentity());
-					request.setRequestStatus(CssRequestStatusType.CANCELLED);
-					getCssLocalManager().updateCssRequest(request);
-					
-						
-				} 
-				
-			
-			}
-		}
-		
 	
-		/*
-		 * if (cssFriends != null && cssFriends.size() > 0){ for
-		 * (CssRequestModel cssFriendRequestmodel : cssFriends) {
-		 * 
-		 * 
-		 * if (cssFriendRequestmodel.getValue().contentEquals("1")) { //
-		 * getCssLocalManager
-		 * ().sendCssFriendRequest(cssFriendRequestmodel.getCssRequestObj
-		 * ().getCssIdentity()); }
-		 * 
-		 * } } if (cssPendingRequests != null && cssPendingRequests.size() > 0){
-		 * for (CssRequestModel cssPending : cssPendingRequests) {
-		 * 
-		 * 
-		 * if (cssPending.getValue().contentEquals("1")) {
-		 * cssPending.getCssRequestObj
-		 * ().setRequestStatus(CssRequestStatusType.ACCEPTED);
-		 * getCssLocalManager().updateCssRequest(cssPending.getCssRequestObj());
-		 * } else if (cssPending.getValue().contentEquals("2")) {
-		 * cssPending.getCssRequestObj
-		 * ().setRequestStatus(CssRequestStatusType.DENIED);
-		 * getCssLocalManager().updateCssRequest(cssPending.getCssRequestObj());
-		 * }
-		 * 
-		 * } } /*break; case 2 : // accept friend request request = new
-		 * CssRequest(); request.setCssIdentity(cssRequested.getIdentity());
-		 * request.setRequestStatus(CssRequestStatusType.ACCEPTED);
-		 * getCssLocalManager().updateCssRequest(request); break;
-		 * 
-		 * } }
-		 */
-
 		try {
 
 			Future<CssInterfaceResult> loginResult = getCssLocalManager()
 					.getCssRecord();
-
+			
+			CssInterfaceResult cssDetails = null; 
 			if (loginResult == null) {
 				// No CssRecord we eed to create one
 				loginResult = getCssLocalManager().registerCSS(loginRecord);
@@ -325,33 +209,72 @@ public class CssManagerController {
 					loginResult = getCssLocalManager().registerCSS(loginRecord);
 					model.put("message", "created Css Record");
 				} else {
-					loginResult = getCssLocalManager().loginCSS(loginRecord);
+					cssDetails = loginResult.get();
+					
+					if (cmLoginForm.getButtonLabel().contentEquals("Logon"))
+					{
+						loginResult = getCssLocalManager().loginCSS(loginRecord);
+						
 
-					if (((CssInterfaceResult) loginResult.get())
-							.isResultStatus() == false) {
+						if (cssDetails.isResultStatus() == false) {
 
-						model.put("message",
+							model.put("message",
 								"Css ManagerService Incorrect Password");
-						return new ModelAndView("cssmanager", model);
-					}
-					model.put("message",
+							return new ModelAndView("cssmanager", model);
+						}
+						model.put("message",
 							"Welcome to the Css Manager Controller Page");
+					}
+					else if (cmLoginForm.getButtonLabel().contentEquals("Save"))
+					{
+						getCssLocalManager().modifyCssRecord(loginRecord);
+						Future<CssInterfaceResult> asynCssDetails = getCssLocalManager().getCssRecord();
+						 cssDetails = asynCssDetails.get();
+						 
+						
+						 CssAdvertisementRecord cssAdOld = new CssAdvertisementRecord();
+						 CssAdvertisementRecord cssAdNew = new CssAdvertisementRecord();
+						 cssAdOld.setId(cmControllerLoginForm.getCssAdId());
+						 cssAdOld.setName(cmControllerLoginForm.getCssAdName());
+						 cssAdOld.setUri(cmControllerLoginForm.getCssAdUri());
+						 cssAdNew.setId(cmLoginForm.getCssAdId());
+						 cssAdNew.setName(cmLoginForm.getCssAdName());
+						 cssAdNew.setUri(cmLoginForm.getCssAdUri());
+						 
+						 getCssLocalManager().updateAdvertisementRecord(cssAdOld, cssAdNew);
+						 
+						 
+					}
+					
+					
+					cmControllerLoginForm.setCssHostingLocation(cssDetails.getProfile().getCssHostingLocation());
+					cmControllerLoginForm.setDomainServer(cssDetails.getProfile().getDomainServer());
+					cmControllerLoginForm.setEmailID(cssDetails.getProfile().getEmailID());
+					cmControllerLoginForm.setHomeLocation(cssDetails.getProfile().getHomeLocation());
+					cmControllerLoginForm.setIdentityName(cssDetails.getProfile().getIdentityName());
+					cmControllerLoginForm.setImID(cssDetails.getProfile().getImID());
+					cmControllerLoginForm.setName(cssDetails.getProfile().getName());
+					cmControllerLoginForm.setSex(cssDetails.getProfile().getSex());
+					
 				}
 			}
-
-			// else if (model.get("state").equals("2"))
-			// {
-			// send requests
-			// model.get(key)
-			// }
-
-			// Update all data
+			
+			
+			
+			
+		
+			
+				// Update all data
 			Future<List<CssAdvertisementRecordDetailed>> cssadverts = getCssLocalManager()
 					.getCssAdvertisementRecordsFull();
 			Future<List<CssRequest>> friendCss = getCssLocalManager()
 					.findAllCssFriendRequests();
 			Future<List<CssRequest>> cssRequests = getCssLocalManager()
 					.findAllCssRequests();
+			
+			Future<List<Service>> asynchServices = null;
+			List<Service> friendServices =  new ArrayList<Service>();
+			
 
 			List<CssAdvertisementRecordDetailed> dbCssAds = cssadverts.get();
 			CssRequestModel cssRM = null;
@@ -366,8 +289,13 @@ public class CssManagerController {
 				requestActiveCount = 1;
 				for (CssAdvertisementRecordDetailed cssAdDetails : dbCssAds) {
 					// We don't want to show ourselfs!
-					if (!cssAdDetails.getResultCssAdvertisementRecord().getId()
-							.contentEquals(cmLoginForm.getCssIdentity())) {
+					if (cssAdDetails.getResultCssAdvertisementRecord().getId().contentEquals(cmLoginForm.getCssIdentity())) {
+						cmControllerLoginForm.setCssAdId(cssAdDetails.getResultCssAdvertisementRecord().getId());
+						cmControllerLoginForm.setCssAdName(cssAdDetails.getResultCssAdvertisementRecord().getName());
+						cmControllerLoginForm.setCssAdUri(cssAdDetails.getResultCssAdvertisementRecord().getUri());
+									
+					}
+					else {
 						switch (requestActiveCount) {
 						case 1:
 							cmControllerLoginForm.getCssAdRequests1()
@@ -375,6 +303,54 @@ public class CssManagerController {
 							cmControllerLoginForm.getCssAdRequests1()
 									.setActive(true);
 							requestActiveCount++;
+							
+							cmControllerLoginForm.getCssFriendService11().setActive(false);
+							cmControllerLoginForm.getCssFriendService12().setActive(false);
+							cmControllerLoginForm.getCssFriendService13().setActive(false);
+							cmControllerLoginForm.getCssFriendService14().setActive(false);
+							cmControllerLoginForm.getCssFriendService15().setActive(false);
+							
+							
+							// if friends, then get services
+							if (cssAdDetails.getStatus() == CssRequestStatusType.ACCEPTED)
+							{
+								try {
+									asynchServices = this.getSDService().getServices(cssAdDetails.getResultCssAdvertisementRecord().getId());
+									friendServices = asynchServices.get();
+								} catch (ServiceDiscoveryException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								
+								friendServiceCount = 1;
+								for ( int j = 0; (j < friendServices.size()) && (j < 5); j++)
+								{
+									switch (friendServiceCount) {
+									case 1:
+										cmControllerLoginForm.getCssFriendService11().setServiceDetails(friendServices.get(j));
+										cmControllerLoginForm.getCssFriendService11().setActive(true);
+										break;
+									case 2:
+										cmControllerLoginForm.getCssFriendService12().setServiceDetails(friendServices.get(j));
+										cmControllerLoginForm.getCssFriendService12().setActive(true);
+										break;
+									case 3:
+										cmControllerLoginForm.getCssFriendService13().setServiceDetails(friendServices.get(j));
+										cmControllerLoginForm.getCssFriendService13().setActive(true);
+										break;
+									case 4:
+										cmControllerLoginForm.getCssFriendService14().setServiceDetails(friendServices.get(j));
+										cmControllerLoginForm.getCssFriendService14().setActive(true);
+										break;
+									case 5:
+										cmControllerLoginForm.getCssFriendService15().setServiceDetails(friendServices.get(j));
+										cmControllerLoginForm.getCssFriendService15().setActive(true);
+										break;
+									}	
+									friendServiceCount++;
+								}
+							}
+							
 							break;
 						case 2:
 							cmControllerLoginForm.getCssAdRequests2()
@@ -382,6 +358,54 @@ public class CssManagerController {
 							cmControllerLoginForm.getCssAdRequests2()
 									.setActive(true);
 							requestActiveCount++;
+							
+							cmControllerLoginForm.getCssFriendService21().setActive(false);
+							cmControllerLoginForm.getCssFriendService22().setActive(false);
+							cmControllerLoginForm.getCssFriendService23().setActive(false);
+							cmControllerLoginForm.getCssFriendService24().setActive(false);
+							cmControllerLoginForm.getCssFriendService25().setActive(false);
+							
+							// if friends, then get services
+							if (cssAdDetails.getStatus() == CssRequestStatusType.ACCEPTED)
+							{
+								try {
+									asynchServices = this.getSDService().getServices(cssAdDetails.getResultCssAdvertisementRecord().getId());
+									friendServices = asynchServices.get();
+								} catch (ServiceDiscoveryException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								
+								friendServiceCount = 1;
+								for ( int j = 0; (j < friendServices.size()) && (j < 5); j++)
+								{
+									switch (friendServiceCount) {
+									case 1:
+										cmControllerLoginForm.getCssFriendService21().setServiceDetails(friendServices.get(j));
+										cmControllerLoginForm.getCssFriendService21().setActive(true);
+										break;
+									case 2:
+										cmControllerLoginForm.getCssFriendService22().setServiceDetails(friendServices.get(j));
+										cmControllerLoginForm.getCssFriendService22().setActive(true);
+										break;
+									case 3:
+										cmControllerLoginForm.getCssFriendService23().setServiceDetails(friendServices.get(j));
+										cmControllerLoginForm.getCssFriendService23().setActive(true);
+										break;
+									case 4:
+										cmControllerLoginForm.getCssFriendService24().setServiceDetails(friendServices.get(j));
+										cmControllerLoginForm.getCssFriendService24().setActive(true);
+										break;
+									case 5:
+										cmControllerLoginForm.getCssFriendService25().setServiceDetails(friendServices.get(j));
+										cmControllerLoginForm.getCssFriendService25().setActive(true);
+										break;
+									}	
+
+									friendServiceCount++;
+								}
+							
+							}
 							break;
 						case 3:
 							cmControllerLoginForm.getCssAdRequests3()
@@ -389,6 +413,54 @@ public class CssManagerController {
 							cmControllerLoginForm.getCssAdRequests3()
 									.setActive(true);
 							requestActiveCount++;
+							
+							cmControllerLoginForm.getCssFriendService31().setActive(false);
+							cmControllerLoginForm.getCssFriendService32().setActive(false);
+							cmControllerLoginForm.getCssFriendService33().setActive(false);
+							cmControllerLoginForm.getCssFriendService34().setActive(false);
+							cmControllerLoginForm.getCssFriendService35().setActive(false);
+							
+							// if friends, then get services
+							if (cssAdDetails.getStatus() == CssRequestStatusType.ACCEPTED)
+							{
+								try {
+									asynchServices = this.getSDService().getServices(cssAdDetails.getResultCssAdvertisementRecord().getId());
+									friendServices = asynchServices.get();
+								} catch (ServiceDiscoveryException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								
+								friendServiceCount = 1;
+								for ( int j = 0; (j < friendServices.size()) && (j < 5); j++)
+								{
+									switch (friendServiceCount) {
+									case 1:
+										cmControllerLoginForm.getCssFriendService31().setServiceDetails(friendServices.get(j));
+										cmControllerLoginForm.getCssFriendService31().setActive(true);
+										break;
+									case 2:
+										cmControllerLoginForm.getCssFriendService32().setServiceDetails(friendServices.get(j));
+										cmControllerLoginForm.getCssFriendService32().setActive(true);
+										break;
+									case 3:
+										cmControllerLoginForm.getCssFriendService33().setServiceDetails(friendServices.get(j));
+										cmControllerLoginForm.getCssFriendService33().setActive(true);
+										break;
+									case 4:
+										cmControllerLoginForm.getCssFriendService34().setServiceDetails(friendServices.get(j));
+										cmControllerLoginForm.getCssFriendService34().setActive(true);
+										break;
+									case 5:
+										cmControllerLoginForm.getCssFriendService35().setServiceDetails(friendServices.get(j));
+										cmControllerLoginForm.getCssFriendService35().setActive(true);
+										break;
+									}	
+
+									friendServiceCount++;
+								}
+								
+							}
 							break;
 						case 4:
 							cmControllerLoginForm.getCssAdRequests4()
@@ -462,95 +534,54 @@ public class CssManagerController {
 
 						}
 					}
-				}
-
-			
-			List<CssRequest> dbCssFriendsRequests = friendCss.get();
-			
-			cmControllerLoginForm.getCssFriendRequests1().setActive(false);
-			cmControllerLoginForm.getCssFriendRequests2().setActive(false);
-			cmControllerLoginForm.getCssFriendRequests3().setActive(false);
-			cmControllerLoginForm.getCssFriendRequests4().setActive(false);
-			cmControllerLoginForm.getCssFriendRequests5().setActive(false);
-
-			if (dbCssFriendsRequests != null && dbCssFriendsRequests.size() > 0) {
-				requestActiveCount = 1;
-				for (CssRequest cssFriendRequestDB : dbCssFriendsRequests) {
-					
-					
-						switch (requestActiveCount) {
-						case 1:
-							cmControllerLoginForm.getCssFriendRequests1().setCssRequestObj(cssFriendRequestDB);
-							cmControllerLoginForm.getCssFriendRequests1().setActive(true);
-							requestActiveCount++;
-							break;
-						case 2:
-							cmControllerLoginForm.getCssFriendRequests2().setCssRequestObj(cssFriendRequestDB);
-							cmControllerLoginForm.getCssFriendRequests2().setActive(true);
-							requestActiveCount++;
-							break;
-						case 3:
-							cmControllerLoginForm.getCssFriendRequests3().setCssRequestObj(cssFriendRequestDB);
-							cmControllerLoginForm.getCssFriendRequests3().setActive(true);
-							requestActiveCount++;
-							break;
-						case 4:
-							cmControllerLoginForm.getCssFriendRequests4().setCssRequestObj(cssFriendRequestDB);
-							cmControllerLoginForm.getCssFriendRequests4().setActive(true);
-							requestActiveCount++;
-							break;
-						case 5:
-							cmControllerLoginForm.getCssFriendRequests5().setCssRequestObj(cssFriendRequestDB);
-							cmControllerLoginForm.getCssFriendRequests5().setActive(true);
-							requestActiveCount++;
-							break;
-						default:
-							// since we can't se dynamic lists we are
-							// constrainted to 5 so .....
-
-						}
-					}
-				}
-
+				
+			}
 			
 			
-			/*
-			 * 
-			 * List<CssRequest> dbCssFriends = friendCss.get();
-			 * cssFriends.clear();
-			 * 
-			 * if (dbCssFriends != null && dbCssFriends.size() > 0){ for
-			 * (CssRequest cssFriendsDetails : dbCssFriends) {
-			 * cssRM.setCssRequestObj(cssFriendsDetails);
-			 * cssRM.setChanged(false); // cssRM.setValue("1");
-			 * cssFriends.add(cssRM);
-			 * 
-			 * }
-			 * 
-			 * }
-			 * 
-			 * 
-			 * model.put("friendCss", friendCss.get());
-			 * model.put("friendCssDetails", cssFriends);
-			 * 
-			 * 
-			 * List<CssRequest> dbCssRequest = cssRequests.get();
-			 * cssPendingRequests.clear();
-			 * 
-			 * if (dbCssRequest != null && dbCssRequest.size() > 0){ for
-			 * (CssRequest cssRequestDetails : dbCssRequest) {
-			 * cssRM.setCssRequestObj(cssRequestDetails);
-			 * cssRM.setChanged(false); // cssRM.setValue("1");
-			 * cssPendingRequests.add(cssRM);
-			 * 
-			 * }
-			 * 
-			 * }
-			 * 
-			 * model.put("cssRequests", cssRequests.get());
-			 * model.put("cssPendingRequests", cssPendingRequests); // We have
-			 * sucessfully login in , now display details
-			 */
+			List<Service> myServices = null;
+			Future<List<Service>> asynchMyServices = null;
+			try {
+				asynchMyServices = this.getSDService().getLocalServices();
+				myServices = asynchMyServices.get();
+			} catch (ServiceDiscoveryException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			cmControllerLoginForm.getCssService1().setActive(false);
+			cmControllerLoginForm.getCssService2().setActive(false);
+			cmControllerLoginForm.getCssService3().setActive(false);
+			cmControllerLoginForm.getCssService4().setActive(false);
+			cmControllerLoginForm.getCssService5().setActive(false);
+			
+			for ( int j = 0; (j < myServices.size()) && (j < 5); j++)
+			{
+				switch (j) {
+				case 0:
+					cmControllerLoginForm.getCssService1().setServiceDetails(myServices.get(j));
+					cmControllerLoginForm.getCssService1().setActive(true);
+					break;
+				case 1:
+					cmControllerLoginForm.getCssService2().setServiceDetails(myServices.get(j));
+					cmControllerLoginForm.getCssService2().setActive(true);
+					break;
+				case 2:
+					cmControllerLoginForm.getCssService3().setServiceDetails(myServices.get(j));
+					cmControllerLoginForm.getCssService3().setActive(true);
+					break;
+				case 3:
+					cmControllerLoginForm.getCssService4().setServiceDetails(myServices.get(j));
+					cmControllerLoginForm.getCssService4().setActive(true);
+					break;
+				case 4:
+					cmControllerLoginForm.getCssService5().setServiceDetails(myServices.get(j));
+					cmControllerLoginForm.getCssService5().setActive(true);
+					break;
+				}	
+				friendServiceCount++;
+			}
+			
+		
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			model.put("message", e.getMessage());
@@ -569,6 +600,9 @@ public class CssManagerController {
 
 	}
 
+
+
+	
 	void setupEmptyCssRecord(CssRecord rec) {
 		rec.setCssIdentity("");
 		rec.setPassword("");
@@ -596,5 +630,204 @@ public class CssManagerController {
 		List<CssNode> archiveCSSNodes = rec.getCssNodes();
 		archiveCSSNodes = new ArrayList<CssNode>();
 	}
+	
+	void startService(CssServiceModel serviceModel)
+	{
+		
+	
+	ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
+	
+	Future<ServiceControlResult> asynchResult = null;
+	
+	serviceId.setServiceInstanceIdentifier(serviceModel.getServiceDetails().getServiceIdentifier().getServiceInstanceIdentifier());
+	try {
+		serviceId.setIdentifier(new URI(serviceModel.getServiceDetails().getServiceIdentifier().getIdentifier().toString()));
+		asynchResult=this.getSCService().startService(serviceId);
+		asynchResult.get();
+		
+	} catch (URISyntaxException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	} catch (ServiceControlException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (ExecutionException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
+	
+	void stopService(CssServiceModel serviceModel)
+	{
+		
+	
+	ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
+	
+	Future<ServiceControlResult> asynchResult = null;
+	
+	serviceId.setServiceInstanceIdentifier(serviceModel.getServiceDetails().getServiceIdentifier().getServiceInstanceIdentifier());
+	try {
+		serviceId.setIdentifier(new URI(serviceModel.getServiceDetails().getServiceIdentifier().getIdentifier().toString()));
+		asynchResult=this.getSCService().stopService(serviceId);
+		asynchResult.get();
+		
+	} catch (URISyntaxException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	} catch (ServiceControlException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (ExecutionException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
+	
+	void doControlService(CssServiceModel serviceModel, String command)
+	{
+		if (command.contentEquals("1")) { //stop service
+			
+			this.stopService(serviceModel);
+			
+		} else if (command.contentEquals("2")) { //start service
+			this.startService(serviceModel);
+			
+		}
+		
+	}
+	
+	void doControlFriendRequests(CssAdvertisementRecordDetailed requestModel, String command)
+	{
+		if (command.contentEquals("1")) { //send friend request
+			
+			getCssLocalManager().sendCssFriendRequest(requestModel.getResultCssAdvertisementRecord().getId());
+		} else if (command.contentEquals("2") //cancel pending request
+			|| command.contentEquals("3")) { //leave
+			CssRequest request = new CssRequest();
+			request.setOrigin(CssRequestOrigin.LOCAL);
+			request.setCssIdentity(requestModel.getResultCssAdvertisementRecord().getId());
+			request.setRequestStatus(CssRequestStatusType.CANCELLED);
 
+			getCssLocalManager().updateCssFriendRequest(request);
+
+		}
+		
+	}
+	
+	void doControlCssRequests(CssRequest requestModel, String command)
+	{
+		CssRequest request = new CssRequest();
+		
+		
+		if (command.contentEquals("1")) { //accept
+			request.setOrigin(CssRequestOrigin.LOCAL);
+			request.setCssIdentity(requestModel.getCssIdentity());
+			request.setRequestStatus(CssRequestStatusType.ACCEPTED);
+			getCssLocalManager().updateCssRequest(request);
+			
+		}else if (command.contentEquals("2")) { //reject
+			
+			request.setOrigin(CssRequestOrigin.LOCAL);
+			request.setCssIdentity(requestModel.getCssIdentity());
+			request.setRequestStatus(CssRequestStatusType.DENIED);
+			getCssLocalManager().updateCssRequest(request);
+				
+		} else if (command.contentEquals("3")) { //reject
+			request.setOrigin(CssRequestOrigin.LOCAL);
+			request.setCssIdentity(requestModel.getCssIdentity());
+			request.setRequestStatus(CssRequestStatusType.CANCELLED);
+			getCssLocalManager().updateCssRequest(request);
+				
+		} 
+		
+	
+		
+	}
+	
+	void doUpdatesMessaging(CssManagerLoginForm cmLoginForm)
+	{
+
+		
+		// Check Services first
+		
+		if ((cmControllerLoginForm.getCssService1().isActive()) &&  (cmLoginForm.getCssService1().getValue() != null)) {
+			doControlService(cmControllerLoginForm.getCssService1(), cmLoginForm.getCssService1().getValue());
+
+		}
+		
+		if ((cmControllerLoginForm.getCssService2().isActive()) &&  (cmLoginForm.getCssService2().getValue() != null)) {
+			doControlService(cmControllerLoginForm.getCssService2(), cmLoginForm.getCssService2().getValue());
+
+		}
+		if ((cmControllerLoginForm.getCssService3().isActive()) &&  (cmLoginForm.getCssService3().getValue() != null)) {
+			doControlService(cmControllerLoginForm.getCssService3(), cmLoginForm.getCssService3().getValue());
+
+		}
+		if ((cmControllerLoginForm.getCssService4().isActive()) &&  (cmLoginForm.getCssService4().getValue() != null)) {
+			doControlService(cmControllerLoginForm.getCssService4(), cmLoginForm.getCssService4().getValue());
+
+		}
+		if ((cmControllerLoginForm.getCssService5().isActive()) &&  (cmLoginForm.getCssService5().getValue() != null)) {
+			doControlService(cmControllerLoginForm.getCssService5(), cmLoginForm.getCssService5().getValue());
+
+		}
+		
+		if ((cmControllerLoginForm.getCssFriendService11().isActive()) &&  (cmLoginForm.getCssFriendService11().getValue() != null)) {
+				doControlService(cmControllerLoginForm.getCssFriendService11(), cmLoginForm.getCssFriendService11().getValue());
+	
+		}
+		if ((cmControllerLoginForm.getCssFriendService12().isActive()) &&  (cmLoginForm.getCssFriendService12().getValue() != null)) {
+			doControlService(cmControllerLoginForm.getCssFriendService12(), cmLoginForm.getCssFriendService12().getValue());
+
+		}
+		if ((cmControllerLoginForm.getCssFriendService13().isActive()) &&  (cmLoginForm.getCssFriendService13().getValue() != null)) {
+			doControlService(cmControllerLoginForm.getCssFriendService13(), cmLoginForm.getCssFriendService13().getValue());
+
+		}
+		if ((cmControllerLoginForm.getCssFriendService14().isActive()) &&  (cmLoginForm.getCssFriendService14().getValue() != null)) {
+			doControlService(cmControllerLoginForm.getCssFriendService14(), cmLoginForm.getCssFriendService14().getValue());
+
+		}
+		if ((cmControllerLoginForm.getCssFriendService15().isActive()) &&  (cmLoginForm.getCssFriendService15().getValue() != null)) {
+			doControlService(cmControllerLoginForm.getCssFriendService15(), cmLoginForm.getCssFriendService15().getValue());
+
+		}
+		
+		
+		
+		
+
+		// now each 'every one' of the request to see if they changed!
+		if ((cmControllerLoginForm.getCssAdRequests1().isActive())  && (cmLoginForm.getCssAdRequests1().getValue() != null)) {
+			doControlFriendRequests(cmControllerLoginForm.getCssAdRequests1().getAdRecObj(), cmLoginForm.getCssAdRequests1().getValue());
+		}
+		if ((cmControllerLoginForm.getCssAdRequests2().isActive())  && (cmLoginForm.getCssAdRequests2().getValue() != null)) {
+			doControlFriendRequests(cmControllerLoginForm.getCssAdRequests2().getAdRecObj(), cmLoginForm.getCssAdRequests2().getValue());
+		}
+		if ((cmControllerLoginForm.getCssAdRequests3().isActive())  && (cmLoginForm.getCssAdRequests3().getValue() != null)) {
+			doControlFriendRequests(cmControllerLoginForm.getCssAdRequests3().getAdRecObj(), cmLoginForm.getCssAdRequests3().getValue());
+		}
+		
+	
+		
+		if ((cmControllerLoginForm.getCssRequests1().isActive()) &&  (cmLoginForm.getCssRequests1().getValue() != null)) {
+			this.doControlCssRequests(cmControllerLoginForm.getCssRequests1().getCssRequestObj(), cmLoginForm.getCssRequests1().getValue());
+		}
+		if ((cmControllerLoginForm.getCssRequests2().isActive()) &&  (cmLoginForm.getCssRequests2().getValue() != null)) {
+			this.doControlCssRequests(cmControllerLoginForm.getCssRequests2().getCssRequestObj(), cmLoginForm.getCssRequests2().getValue());
+		}
+		if ((cmControllerLoginForm.getCssRequests3().isActive()) &&  (cmLoginForm.getCssRequests3().getValue() != null)) {
+			this.doControlCssRequests(cmControllerLoginForm.getCssRequests3().getCssRequestObj(), cmLoginForm.getCssRequests3().getValue());
+		}
+		
+
+	}
+
+	
 }

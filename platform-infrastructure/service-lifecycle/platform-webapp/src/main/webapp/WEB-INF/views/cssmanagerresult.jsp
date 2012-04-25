@@ -22,8 +22,8 @@ Tabview code from www.javascriptsource.com css tab-view.html -->div.TabView div.
 div.TabView div.Tabs a {
 	float: left;
 	display: block;
-	width: 90px;
-	text-align: center;
+	width: 200px;
+	text-align: left;
 	height: 24px;
 	line-height: 28px;
 	vertical-align: middle;
@@ -76,12 +76,9 @@ div.TabView div.Pages div.Page div.Pad {
 	<!-- .................PLACE YOUR CONTENT HERE ................ -->
 	<h4>${message}</h4>
 	<br />
-	<h4>${res}</h4>
-	<br />
 	<h4>${error}</h4>
 	<br />
-
-					<form:form method="POST" action="cssmanager.html"
+				<form:form method="POST" action="cssmanager.html"
 						commandName="cmLoginForm">
 						<form:errors path="*" cssClass="errorblock" element="div" />
 						
@@ -90,24 +87,27 @@ div.TabView div.Pages div.Page div.Pad {
 
 		<!-- *** Tabs ************************************************************** -->
 
-		<div class="Tabs" style="width: 500px;">
-			<a>Css Admin </a> <a>Yellow Pages</a> <a>Friends' Services</a> <a>Css 
+		<div class="Tabs" style="width: 800px;">
+			<a>&nbsp; &nbsp; Css Admin </a> <a>&nbsp; &nbsp; Yellow Pages</a> <a>&nbsp; &nbsp; Services</a> <a>&nbsp; &nbsp; Css 
 				Requests</a>
 		</div>
 
 		<!-- *** Pages ************************************************************* -->
 
 		<div class="Pages"
-			style="width: 800px; height: 300px; text-align: left;">
+			style="width: 1000px; height: 300px; text-align: left;">
 
 			<div class="Page">
 				<div class="Pad">
 
 					<!-- *** Css Admin Start *** -->
-					Here goes the admin stuff
+					
 
 
 						<form:errors path="*" cssClass="errorblock" element="div" />
+						
+						<b>CSS Details</b>
+						
 						<table>
 							<tr>
 								<td>Css Identity :</td>
@@ -115,12 +115,84 @@ div.TabView div.Pages div.Page div.Pad {
 										value="${cmLoginForm.cssIdentity}" readonly="true" size="50" />
 								</td>
 							</tr>
+							<tr>		
+								<td>Domain Server</td>
+								<td><form:input path="domainServer"
+										value="${cmLoginForm.domainServer}"  size="50" />
+								</td>
+							</tr>
+							<tr>
+								<td>Hosting Location</td>
+								<td><form:input path="cssHostingLocation"
+										value="${cmLoginForm.cssHostingLocation}"  size="50" />
+								</td>
+															</tr>
+							<tr>
+								<td>Email</td>
+								<td><form:input path="emailID"
+										value="${cmLoginForm.emailID}"  size="50" />
+								</td>
+															</tr>
+							<tr>
+							<td>Name</td>
+								<td><form:input path="name"
+										value="${cmLoginForm.name}"  size="50" />
+								</td>
+														</tr>
+							<tr>
+								<td>Home Location</td>
+								<td><form:input path="homeLocation"
+										value="${cmLoginForm.homeLocation}"  size="50" />
+								</td>
+														</tr>
+							<tr>
+								<td>Identity Name</td>
+								<td><form:input path="identityName"
+										value="${cmLoginForm.identityName}"  size="50" />
+								</td>
+														</tr>
+							<tr>
+								<td>IM ID</td>
+								<td><form:input path="imID"
+										value="${cmLoginForm.imID}"  size="50" />
+								</td>
+														</tr>
+							<tr>
+								<td>Sex</td>
+								<td><form:input path="sex"
+										value="${cmLoginForm.sex}" size="50" />
+								</td>
+				
+		
+							</tr>
 
 
 							
 						</table>
+						<br/>
+						<b>CSS Advertisement Details</b>
 				
-
+		<table >
+			<!-- name="CssAdvertisementRecordDetails" -->
+			<tr>
+				<td>Id</td>
+				<td><form:input path="cssAdId"  size="50" readonly="true" /></td>
+				<td><form:errors path="cssAdId" cssClass="error" /></td>
+				
+			</tr>
+			<tr>
+				<td>Name</td>
+				<td><form:input path="cssAdName"  size="100" /></td>
+				<td><form:errors path="cssAdName" cssClass="error" /></td>
+				
+			</tr>
+			<tr>
+				<td>Uri</td>
+				<td><form:input path="cssAdUri"  size="100" /></td>
+				<td><form:errors path="cssAdUri" cssClass="error" /></td>
+				
+			</tr>
+		</table>
 
 					<!-- *** Css Admin End ***** -->
 
@@ -131,11 +203,11 @@ div.TabView div.Pages div.Page div.Pad {
 
 			<div class="Page">
 				<div class="Pad">
-					<br /> Here is the listing from css directory
+					<br />
 
 
-
-						<Table>
+						<table>
+						
 
 
 						<xc:if test="${cmLoginForm.cssAdRequests1.active == true}"> 
@@ -154,7 +226,7 @@ div.TabView div.Pages div.Page div.Pad {
 										<td>
 										<form:radiobutton 
 											path="cssAdRequests1.value"
-											value="1"  /> Join<br />
+											value="1"  /> Send Request<br />
 										</td>
 										<td><form:errors path="${cmLoginForm.cssAdRequests1.value}" cssClass="error" /></td>
 										
@@ -165,7 +237,7 @@ div.TabView div.Pages div.Page div.Pad {
 									<td>
 										<form:radiobutton 
 										path="cssAdRequests1.value"
-											value="2"  /> Cancel<br />
+											value="2"  /> Cancel Pending Request <br />
 										</td>
 										<td><form:errors path="${cmLoginForm.cssAdRequests1.value}" cssClass="error" /></td>
 									
@@ -174,7 +246,7 @@ div.TabView div.Pages div.Page div.Pad {
 									<td>
 										<form:radiobutton 
 											path="cssAdRequests1.value"
-											value="3"  /> Leave<br />
+											value="3"  /> Cancel Request <br />
 										</td>
 									<td><form:errors path="${cmLoginForm.cssAdRequests1.value}" cssClass="error" /></td>
 										</xc:if>
@@ -200,7 +272,7 @@ div.TabView div.Pages div.Page div.Pad {
 										<td>
 										<form:radiobutton 
 											path="cssAdRequests2.value"
-											value="1"  /> Join<br />
+											value="1"  /> Send Request<br />
 										</td>
 										<td><form:errors path="${cmLoginForm.cssAdRequests2.value}" cssClass="error" /></td>
 										
@@ -211,7 +283,7 @@ div.TabView div.Pages div.Page div.Pad {
 									<td>
 										<form:radiobutton 
 										path="cssAdRequests2.value"
-											value="2"  /> Cancel<br />
+											value="2"  /> Cancel Pending Request <br />
 										</td>
 										<td><form:errors path="${cmLoginForm.cssAdRequests2.value}" cssClass="error" /></td>
 									
@@ -220,7 +292,7 @@ div.TabView div.Pages div.Page div.Pad {
 									<td>
 										<form:radiobutton 
 											path="cssAdRequests2.value"
-											value="3"  /> Leave<br />
+											value="3"  /> Cancel Request<br />
 										</td>
 									<td><form:errors path="${cmLoginForm.cssAdRequests2.value}" cssClass="error" /></td>
 										</xc:if>
@@ -243,7 +315,7 @@ div.TabView div.Pages div.Page div.Pad {
 										<td>
 										<form:radiobutton 
 											path="cssAdRequests3.value"
-											value="1"  /> Join<br />
+											value="1"  /> Send Request<br />
 										</td>
 										<td><form:errors path="${cmLoginForm.cssAdRequests3.value}" cssClass="error" /></td>
 										
@@ -254,7 +326,7 @@ div.TabView div.Pages div.Page div.Pad {
 									<td>
 										<form:radiobutton 
 										path="cssAdRequests3.value"
-											value="2"  /> Cancel<br />
+											value="2"  /> Cancel Pending Request<br />
 										</td>
 										<td><form:errors path="${cmLoginForm.cssAdRequests3.value}" cssClass="error" /></td>
 									
@@ -263,14 +335,100 @@ div.TabView div.Pages div.Page div.Pad {
 									<td>
 										<form:radiobutton 
 											path="cssAdRequests3.value"
-											value="3"  /> Leave<br />
+											value="3"  /> Cancel Request<br />
 										</td>
 									<td><form:errors path="${cmLoginForm.cssAdRequests3.value}" cssClass="error" /></td>
 										</xc:if>
 									
 						</tr>
 						</xc:if> 
+						<xc:if test="${cmLoginForm.cssAdRequests4.active == true}"> 
+					<tr>
+						<td>${cmLoginForm.cssAdRequests4.adRecObj.resultCssAdvertisementRecord.id}</td>
+									
+									<td>${cmLoginForm.cssAdRequests4.adRecObj.resultCssAdvertisementRecord.name}</td>
 
+									<td>${cmLoginForm.cssAdRequests4.adRecObj.resultCssAdvertisementRecord.uri}</td>
+									<td>${cmLoginForm.cssAdRequests4.adRecObj.status}</td>
+									
+								
+									
+									<xc:if test="${cmLoginForm.cssAdRequests4.adRecObj.status == 'NOTREQUESTED'}">
+			
+										<td>
+										<form:radiobutton 
+											path="cssAdRequests4.value"
+											value="1"  /> Send Request<br />
+										</td>
+										<td><form:errors path="${cmLoginForm.cssAdRequests4.value}" cssClass="error" /></td>
+										
+										
+									</xc:if>
+									<xc:if test="${cmLoginForm.cssAdRequests4.adRecObj.status == 'PENDING'}">
+
+									<td>
+										<form:radiobutton 
+										path="cssAdRequests4.value"
+											value="2"  /> Cancel Pending Request<br />
+										</td>
+										<td><form:errors path="${cmLoginForm.cssAdRequests4.value}" cssClass="error" /></td>
+									
+									</xc:if>
+									<xc:if test="${cmLoginForm.cssAdRequests4.adRecObj.status == 'ACCEPTED'}">
+									<td>
+										<form:radiobutton 
+											path="cssAdRequests4.value"
+											value="3"  /> Cancel Request<br />
+										</td>
+									<td><form:errors path="${cmLoginForm.cssAdRequests4.value}" cssClass="error" /></td>
+										</xc:if>
+									
+						</tr>
+						</xc:if> 
+
+								<xc:if test="${cmLoginForm.cssAdRequests5.active == true}"> 
+					<tr>
+						<td>${cmLoginForm.cssAdRequests5.adRecObj.resultCssAdvertisementRecord.id}</td>
+									
+									<td>${cmLoginForm.cssAdRequests5.adRecObj.resultCssAdvertisementRecord.name}</td>
+
+									<td>${cmLoginForm.cssAdRequests5.adRecObj.resultCssAdvertisementRecord.uri}</td>
+									<td>${cmLoginForm.cssAdRequests5.adRecObj.status}</td>
+									
+								
+									
+									<xc:if test="${cmLoginForm.cssAdRequests5.adRecObj.status == 'NOTREQUESTED'}">
+			
+										<td>
+										<form:radiobutton 
+											path="cssAdRequests5.value"
+											value="1"  /> Send Request<br />
+										</td>
+										<td><form:errors path="${cmLoginForm.cssAdRequests5.value}" cssClass="error" /></td>
+										
+										
+									</xc:if>
+									<xc:if test="${cmLoginForm.cssAdRequests5.adRecObj.status == 'PENDING'}">
+
+									<td>
+										<form:radiobutton 
+										path="cssAdRequests5.value"
+											value="2"  /> Cancel Pending Request<br />
+										</td>
+										<td><form:errors path="${cmLoginForm.cssAdRequests5.value}" cssClass="error" /></td>
+									
+									</xc:if>
+									<xc:if test="${cmLoginForm.cssAdRequests5.adRecObj.status == 'ACCEPTED'}">
+									<td>
+										<form:radiobutton 
+											path="cssAdRequests5.value"
+											value="3"  /> Cancel Request<br />
+										</td>
+									<td><form:errors path="${cmLoginForm.cssAdRequests5.value}" cssClass="error" /></td>
+										</xc:if>
+									
+						</tr>
+						</xc:if> 
 						
 
 						</table>
@@ -286,40 +444,219 @@ div.TabView div.Pages div.Page div.Pad {
 
 					<!-- *** Page3 Start *** -->
 
-					Here is control of friend css's
 
 
-					<Table>
-<!--  
+					<table>
+					
+					
+					<tr>
+					<td><b>My Services</b></td>
+					</tr>
+					<xc:if test="${cmLoginForm.cssService1.active == true}">
+					
+					 <tr>
 
-						<xc:forEach var="friendCssDetails" items="${friendCssDetails}">
-							<tr>
-								<td>${friendCssDetails.cssIdentity}</td>
-								<td>${friendCssDetails.requestStatus}</td>
-
-								
-								
-									<xc:if test="${friendCssDetails.cssRequestObj.status == 'PENDING'}">
-									<td>
-										<form:radiobutton type="radio"
-											path="${friendCssDetails.value}"
-											value="2"  /> Cancel<br />
+                        <td>${cmLoginForm.cssService1.serviceDetails.serviceName}</td>
+         				<td>${cmLoginForm.cssService1.serviceDetails.serviceDescription}</td>
+            			<td>${cmLoginForm.cssService1.serviceDetails.serviceStatus}</td>
+            			
+            			 <xc:if test="${cmLoginForm.cssService1.serviceDetails.serviceStatus == 'STARTED'}">
+			
+										<td>
+										<form:radiobutton 
+											path="cssService1.value"
+											value="1"  /> Stop<br />
 										</td>
-										<td><form:errors path="${friendCssDetails.value}" cssClass="error" /></td>
-									</xc:if>
-									<xc:if test="${friendCssDetails.cssRequestObj.status == 'ACCEPTED'}">
-									<td>
-										<form:radiobutton type="radio"
-											path="${friendCssDetails.value}"
-											value="3"  /> Leave<br />
+										<td><form:errors path="${cmLoginForm.cssService1.value}" cssClass="error" /></td>
+										
+										
+							</xc:if>
+						 <xc:if test="${cmLoginForm.cssService1.serviceDetails.serviceStatus == 'STOPPED'}">
+			
+										<td>
+										<form:radiobutton 
+											path="cssService1.value"
+											value="2"  /> Start<br />
 										</td>
-										<td><form:errors path="${friendCssDetails.value}" cssClass="error" /></td>
-									</xc:if>
+										<td><form:errors path="${cmLoginForm.cssService1.value}" cssClass="error" /></td>
+										
+										
+							</xc:if>
+										
+            		</tr>
+            		</xc:if>
+            		<xc:if test="${cmLoginForm.cssService2.active == true}">
+					
+					 <tr>
 
+                        <td>${cmLoginForm.cssService2.serviceDetails.serviceName}</td>
+         				<td>${cmLoginForm.cssService2.serviceDetails.serviceDescription}</td>
+            			<td>${cmLoginForm.cssService2.serviceDetails.serviceStatus}</td>
+            			
+            			 <xc:if test="${cmLoginForm.cssService2.serviceDetails.serviceStatus == 'STARTED'}">
+			
+										<td>
+										<form:radiobutton 
+											path="cssService2.value"
+											value="1"  /> Stop<br />
+										</td>
+										<td><form:errors path="${cmLoginForm.cssService2.value}" cssClass="error" /></td>
+										
+										
+							</xc:if>
+						 <xc:if test="${cmLoginForm.cssService2.serviceDetails.serviceStatus == 'STOPPED'}">
+			
+										<td>
+										<form:radiobutton 
+											path="cssService2.value"
+											value="2"  /> Start<br />
+										</td>
+										<td><form:errors path="${cmLoginForm.cssService2.value}" cssClass="error" /></td>
+										
+										
+							</xc:if>
+										
+            		</tr>
+            		</xc:if>
+            		<xc:if test="${cmLoginForm.cssService3.active == true}">
+					
+					 <tr>
 
-								</tr>
-							</xc:forEach>
--->
+                        <td>${cmLoginForm.cssService3.serviceDetails.serviceName}</td>
+         				<td>${cmLoginForm.cssService3.serviceDetails.serviceDescription}</td>
+            			<td>${cmLoginForm.cssService3.serviceDetails.serviceStatus}</td>
+            			
+            			 <xc:if test="${cmLoginForm.cssService3.serviceDetails.serviceStatus == 'STARTED'}">
+			
+										<td>
+										<form:radiobutton 
+											path="cssService3.value"
+											value="1"  /> Stop<br />
+										</td>
+										<td><form:errors path="${cmLoginForm.cssService3.value}" cssClass="error" /></td>
+										
+										
+							</xc:if>
+						 <xc:if test="${cmLoginForm.cssService3.serviceDetails.serviceStatus == 'STOPPED'}">
+			
+										<td>
+										<form:radiobutton 
+											path="cssService3.value"
+											value="2"  /> Start<br />
+										</td>
+										<td><form:errors path="${cmLoginForm.cssService3.value}" cssClass="error" /></td>
+										
+										
+							</xc:if>
+										
+            		</tr>
+            		</xc:if>
+            		
+            		<tr></tr>
+            		<tr></tr>
+            		<tr></tr>
+            		
+
+					<xc:if test="${cmLoginForm.cssFriendService11.active == true}">
+					<tr>
+					<td><b>${cmLoginForm.cssAdRequests1.adRecObj.resultCssAdvertisementRecord.id}</b></td>
+					</tr>
+					 <tr>
+
+                        <td>${cmLoginForm.cssFriendService11.serviceDetails.serviceName}</td>
+         				<td>${cmLoginForm.cssFriendService11.serviceDetails.serviceDescription}</td>
+            			<td>${cmLoginForm.cssFriendService11.serviceDetails.serviceStatus}</td>
+            			
+            			 <xc:if test="${cmLoginForm.cssFriendService11.serviceDetails.serviceStatus == 'STARTED'}">
+			
+										<td>
+										<form:radiobutton 
+											path="cssFriendService11.value"
+											value="1"  /> Stop<br />
+										</td>
+										<td><form:errors path="${cmLoginForm.cssFriendService11.value}" cssClass="error" /></td>
+										
+										
+							</xc:if>
+						 <xc:if test="${cmLoginForm.cssFriendService11.serviceDetails.serviceStatus == 'STOPPED'}">
+			
+										<td>
+										<form:radiobutton 
+											path="cssFriendService11.value"
+											value="2"  /> Start<br />
+										</td>
+										<td><form:errors path="${cmLoginForm.cssFriendService11.value}" cssClass="error" /></td>
+										
+										
+							</xc:if>
+										
+            		</tr>
+					</xc:if>
+					<xc:if test="${cmLoginForm.cssFriendService12.active == true}">
+					
+					 <tr>
+                        <td>${cmLoginForm.cssFriendService12.serviceDetails.serviceName}</td>
+         				<td>${cmLoginForm.cssFriendService12.serviceDetails.serviceDescription}</td>
+            			<td>${cmLoginForm.cssFriendService12.serviceDetails.serviceStatus}</td>
+            			
+            			 <xc:if test="${cmLoginForm.cssFriendService12.serviceDetails.serviceStatus == 'STARTED'}">
+			
+										<td>
+										<form:radiobutton 
+											path="cssFriendService12.value"
+											value="1"  /> Stop<br />
+										</td>
+										<td><form:errors path="${cmLoginForm.cssFriendService12.value}" cssClass="error" /></td>
+										
+										
+							</xc:if>
+						 <xc:if test="${cmLoginForm.cssFriendService12.serviceDetails.serviceStatus == 'STOPPED'}">
+			
+										<td>
+										<form:radiobutton 
+											path="cssFriendService12.value"
+											value="2"  /> Start<br />
+										</td>
+										<td><form:errors path="${cmLoginForm.cssFriendService12.value}" cssClass="error" /></td>
+										
+										
+							</xc:if>
+										
+            		</tr>
+					</xc:if>
+					<xc:if test="${cmLoginForm.cssFriendService13.active == true}">
+					
+					 <tr>
+                        <td>${cmLoginForm.cssFriendService13.serviceDetails.serviceName}</td>
+         				<td>${cmLoginForm.cssFriendService13.serviceDetails.serviceDescription}</td>
+            			<td>${cmLoginForm.cssFriendService13.serviceDetails.serviceStatus}</td>
+            			
+            			 <xc:if test="${cmLoginForm.cssFriendService13.serviceDetails.serviceStatus == 'STARTED'}">
+			
+										<td>
+										<form:radiobutton 
+											path="cssFriendService13.value"
+											value="1"  /> Stop<br />
+										</td>
+										<td><form:errors path="${cmLoginForm.cssFriendService13.value}" cssClass="error" /></td>
+										
+										
+							</xc:if>
+						 <xc:if test="${cmLoginForm.cssFriendService13.serviceDetails.serviceStatus == 'STOPPED'}">
+			
+										<td>
+										<form:radiobutton 
+											path="cssFriendService13.value"
+											value="2"  /> Start<br />
+										</td>
+										<td><form:errors path="${cmLoginForm.cssFriendService13.value}" cssClass="error" /></td>
+										
+										
+							</xc:if>
+										
+            		</tr>
+					</xc:if>
+	
 
 					</table>
 
@@ -335,12 +672,12 @@ div.TabView div.Pages div.Page div.Pad {
 
 					<!-- *** Page4 Start *** -->
 
-					Here is css requests to you
+					
 
 					
 				
 						
-						<Table>
+						<table>
 
 
 						<xc:if test="${cmLoginForm.cssRequests1.active == true}"> 
@@ -521,7 +858,8 @@ div.TabView div.Pages div.Page div.Pad {
 		</div>
 	</div>
 
-<input type="submit" value="Save" />
+<form:input type="submit" path="buttonLabel" value="Save" />
+<form:input type="submit" path="buttonLabel" value="Refresh" />
 </form:form>
 
 

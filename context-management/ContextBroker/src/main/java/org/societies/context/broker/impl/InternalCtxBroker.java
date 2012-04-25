@@ -218,6 +218,18 @@ public class InternalCtxBroker implements ICtxBroker {
 		return new AsyncResult<CtxModelObject>(modelObj);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#retrieveCssOperator()
+	 */
+	@Override
+	@Async
+	public Future<IndividualCtxEntity> retrieveCssOperator()
+			throws CtxException {
+		// TODO Auto-generated method stub
+		final IndividualCtxEntity operatorCss = null; // TODO this.userCtxDBMgr.retrieveOperatorCss();
+		
+		return new AsyncResult<IndividualCtxEntity>(operatorCss);
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -655,6 +667,5 @@ public class InternalCtxBroker implements ICtxBroker {
 		else
 			throw new IllegalArgumentException(value + ": Invalid value type");
 	}
-
 
 }

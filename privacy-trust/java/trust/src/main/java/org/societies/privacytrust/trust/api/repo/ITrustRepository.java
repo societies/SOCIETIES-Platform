@@ -24,7 +24,7 @@
  */
 package org.societies.privacytrust.trust.api.repo;
 
-import org.societies.privacytrust.trust.api.model.TrustedEntity;
+import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 
 public interface ITrustRepository {
@@ -35,7 +35,7 @@ public interface ITrustRepository {
 	 * @return
 	 * @throws TrustRepositoryException
 	 */
-	public boolean addEntity(final TrustedEntity entity) throws TrustRepositoryException;
+	public boolean addEntity(final ITrustedEntity entity) throws TrustRepositoryException;
 
 	/**
 	 * 
@@ -43,7 +43,7 @@ public interface ITrustRepository {
 	 * @return
 	 * @throws TrustRepositoryException
 	 */
-	public TrustedEntity retrieveEntity(final TrustedEntityId teid) throws TrustRepositoryException;
+	public ITrustedEntity retrieveEntity(final TrustedEntityId teid) throws TrustRepositoryException;
 	
 	/**
 	 * 
@@ -51,7 +51,7 @@ public interface ITrustRepository {
 	 * @return
 	 * @throws TrustRepositoryException
 	 */
-	public TrustedEntity updateEntity(TrustedEntity entity) throws TrustRepositoryException;
+	public ITrustedEntity updateEntity(ITrustedEntity entity) throws TrustRepositoryException;
 	
 	/**
 	 * 
@@ -59,5 +59,5 @@ public interface ITrustRepository {
 	 * @return
 	 * @throws TrustRepositoryException
 	 */
-	public boolean removeEntity(TrustedEntity entity) throws TrustRepositoryException;
+	public boolean removeEntity(ITrustedEntity entity) throws TrustRepositoryException;
 }
