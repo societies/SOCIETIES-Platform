@@ -22,13 +22,13 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.management;
+package org.societies.api.activity;
 
 /**
  * @author Babak.Farshchian@sintef.no
  *
  */
-public interface ICisActivity {
+public interface IActivity {
 	public String getVerb();
 	public void setVerb(String verb);
 	public String getActor();

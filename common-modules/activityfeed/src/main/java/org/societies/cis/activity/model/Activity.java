@@ -8,20 +8,20 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.societies.api.cis.management.ICisActivity;
+import org.societies.api.activity.IActivity;
 import org.societies.cis.activity.ActivityFeed;
 
 @Entity
-@Table(name = "Activity")
-public class CisActivity implements ICisActivity {
+@Table(name = "org.societies.cis.activity.model.Activity")
+public class Activity implements IActivity {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private String id;
 	
 	@ManyToOne
 	private ActivityFeed feed;
-	public CisActivity(){}
-	public CisActivity(ICisActivity icis)
+	public Activity(){}
+	public Activity(IActivity icis)
 	{
 		this.setActor(icis.getActor());
 		this.setObject(icis.getObject());

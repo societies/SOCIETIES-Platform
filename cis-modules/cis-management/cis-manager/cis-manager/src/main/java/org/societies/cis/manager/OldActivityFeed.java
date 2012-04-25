@@ -22,17 +22,37 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.management;
-
-import org.societies.api.cis.management.ICisActivity;
 
 /**
+ * Is a feed of activities that are collected from CIS members and their shared services.
+ * 
+ * @link CISActivity
  * @author Babak.Farshchian@sintef.no
- *
+ * @version 0
  */
-public interface ICisActivityFeed {
-	public void getActivities(String CssId, String timePeriod);
-	public void getActivities(String CssId, String query, String timePeriod);
-	public void addCisActivity(ICisActivity activity);
-	public void cleanupFeed(String criteria);
+package org.societies.cis.manager;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import org.societies.cis.activity.ActivityFeed;
+
+
+public class OldActivityFeed {
+	public Set<CisActivity> activitySet;
+	public void getActivities(String CssId, String timePeriod){};
+	public void getActivities(String CssId, String query, String timePeriod){};
+	public void addCisActivity(CisActivity activity){};
+	public void cleanupFeed(String criteria){}
+	
+	String activityFeedUri;
+	
+	public OldActivityFeed() {
+		activityFeedUri = "";
+		activitySet = new HashSet<CisActivity>();
+		
+	};
+	
+	
+
 }

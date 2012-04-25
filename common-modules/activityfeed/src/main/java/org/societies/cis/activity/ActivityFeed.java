@@ -15,18 +15,18 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.cis.management.ICisActivity;
-import org.societies.api.cis.management.ICisActivityFeed;
-import org.societies.cis.activity.model.CisActivity;
+import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeed;
+import org.societies.cis.activity.model.Activity;
 
 @Entity
 @Table(name = "ActivityFeed")
-public class ActivityFeed implements ICisActivityFeed {
+public class ActivityFeed implements IActivityFeed {
 	@Id
 	private String id;
 	@OneToMany(cascade=CascadeType.ALL)
 	private
-	Set<CisActivity> list;
+	Set<Activity> list;
 	
 	
 	private static SessionFactory sessionFactory;
@@ -46,12 +46,12 @@ public class ActivityFeed implements ICisActivityFeed {
 	}
 
 	@Override
-	public void addCisActivity(ICisActivity activity) {
+	public void addCisActivity(IActivity activity) {
 		
 		//persist.
 		Session session = getSessionFactory().openSession();
 		Transaction t = session.beginTransaction();
-		CisActivity newact = new CisActivity(activity);
+		Activity newact = new Activity(activity);
 		session.save(newact);
 		t.commit();
 		
@@ -91,11 +91,11 @@ public class ActivityFeed implements ICisActivityFeed {
 		this.id = id;
 	}
 
-	public Set<CisActivity> getList() {
+	public Set<Activity> getList() {
 		return list;
 	}
 
-	public void setList(Set<CisActivity> list) {
+	public void setList(Set<Activity> list) {
 		this.list = list;
 	}
 

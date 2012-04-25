@@ -42,8 +42,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import org.societies.api.cis.management.ICisActivity;
-import org.societies.api.cis.management.ICisActivityFeed;
+import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeed;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.schema.servicelifecycle.model.Service;
@@ -56,17 +56,17 @@ public class ActivityFeedController {
 	 * OSGI service get auto injected
 	 */
 	@Autowired
-	private ICisActivityFeed activtyFeed;
+	private IActivityFeed activtyFeed;
 
 	/**
 	 * @return the activtyFeed*/
-	public ICisActivityFeed getActivtyFeed() {
+	public IActivityFeed getActivtyFeed() {
 		return activtyFeed;
 	}
 
 	/**
 	 * @param activtyFeed the activtyFeed to set*/
-	public void setActivtyFeed(ICisActivityFeed activtyFeed) {
+	public void setActivtyFeed(IActivityFeed activtyFeed) {
 		this.activtyFeed = activtyFeed;
 	}
 
@@ -110,7 +110,7 @@ public class ActivityFeedController {
 		try {
 		
 			if (method.equalsIgnoreCase("addCisActivity")) {
-				ICisActivity activity = null; 
+				IActivity activity = null; 
 				getActivtyFeed().addCisActivity(activity);
 				res="Activty added for cssID: " + cssId;
 				
