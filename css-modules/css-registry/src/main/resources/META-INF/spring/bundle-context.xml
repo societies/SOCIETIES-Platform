@@ -34,6 +34,8 @@
 			<list>
 				<value>org.societies.css.cssRegistry.model.CssRegistryEntry</value>
 				<value>org.societies.css.cssRegistry.model.CssNodeEntry</value>
+				<value>org.societies.css.cssRegistry.model.CssFriendEntry</value>
+				<value>org.societies.css.cssRegistry.model.CssRequestEntry</value>
 			</list>
 		</property>
 

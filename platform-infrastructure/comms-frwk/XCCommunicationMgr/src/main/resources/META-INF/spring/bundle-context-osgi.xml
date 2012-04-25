@@ -18,7 +18,7 @@
     <osgi-compendium:cm-properties id="componentConfig" persistent-id="xc">
     	<!-- Default values if none found -->
     	<prop key="host">societies.local</prop>
-    	<prop key="subDomain">XCManager.societies.local</prop>
+    	<prop key="subDomain">xcmanager.societies.local</prop>
     	<prop key="secretKey">password.societies.local</prop>
     </osgi-compendium:cm-properties>
 </beans>

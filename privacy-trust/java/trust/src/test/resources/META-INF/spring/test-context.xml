@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/context 
+    http://www.springframework.org/schema/context/spring-context-3.0.xsd
+    http://www.springframework.org/schema/jdbc 
+    http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+    http://www.springframework.org/schema/tx 
+    http://www.springframework.org/schema/tx/spring-tx-3.0.xsd"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:tx="http://www.springframework.org/schema/tx">
+
+  <!-- regular spring configuration file defining the beans for this
+       bundle. The configuration of OSGi definitions is kept in a separate 
+       configuration file so that this file can easily be used
+       for integration testing outside of an OSGi environment -->
+
+	<context:component-scan base-package="org.societies.privacytrust.trust.impl" />
+	
+	<bean id="TrustRepositoryConfig"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreResourceNotFound" value="true"></property>
+		<property name="locations">
+			<list>
+				<value>classpath:META-INF/spring/derby.properties</value>	
+			</list>
+		</property>	
+	</bean>
+	
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+
+		<property name="annotatedClasses">
+			<list>
+				<value>org.societies.privacytrust.trust.impl.repo.model.TrustedCss</value>
+				<value>org.societies.privacytrust.trust.impl.repo.model.TrustedCis</value>
+				<value>org.societies.privacytrust.trust.impl.repo.model.DirectTrust</value>
+			</list>
+		</property>
+
+		<property name="annotatedPackages">
+			<list>
+				<value>org.societies.privacytrust.trust.impl.repo.model</value>
+			</list>
+		</property>
+
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.show_ddl">true</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.cache.use_second_level_cache">false</prop>
+				<prop key="hibernate.hbm2ddl.auto">create</prop>
+				<prop key="hibernate.format_sql">true</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- enable the configuration of transactional behavior based on annotations -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		init-method="createDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="initialSize" value="2" />
+		<property name="maxActive" value="5" />
+	</bean>
+	
+	<bean id="eventMgr" class="org.societies.privacytrust.trust.test.util.MockitoFactoryBean">
+		<constructor-arg name="classToBeMocked" value="org.societies.api.osgi.event.IEventMgr" />
+	</bean>
+	
+</beans>

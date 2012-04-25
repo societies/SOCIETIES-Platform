@@ -171,6 +171,8 @@ public class CisEditor implements IFeatureServer {
 			e.printStackTrace();
 		}
 		
+		LOG.info("CIS got new comm manager");
+		
 		try {
 		cisIdentity = CISendpoint.getIdManager().getThisNetworkNode();//CISendpoint.getIdManager().fromJid(CISendpoint.getIdManager().getThisNetworkNode().getJid());
 		} catch (Exception e) {

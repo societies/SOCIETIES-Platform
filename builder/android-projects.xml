@@ -45,14 +45,13 @@
 		<module>../utilities/DBC</module>
 
 		<!-- Android Communication components -->
+		<module>../platform-infrastructure/client-frwk/JaxbAndroidApi</module>
+		<module>../platform-infrastructure/client-frwk/JaxbAndroidImpl</module>
 		<module>../platform-infrastructure/client-frwk/AndroidIPC</module>
 		<module>../platform-infrastructure/client-frwk/AndroidAgentApi</module>
 		<module>../platform-infrastructure/client-frwk/AndroidPubsubApi</module>
 		<module>../platform-infrastructure/client-frwk/AndroidAgent</module>
 		<module>../platform-infrastructure/client-frwk/AndroidPubsub</module>
-		<module>../platform-infrastructure/client-frwk/JaxbAndroidApi</module>
-		<module>../platform-infrastructure/client-frwk/JaxbAndroidImpl</module>
-
 
 		<!-- API -->
 		<module>../platform-infrastructure/client-frwk/CoreInterfaces</module>
@@ -72,8 +71,8 @@
 		<module>../platform-infrastructure/client-frwk/MasterGUI</module>
 		-->
 		<!-- CIS manager light modules -->
-		<module>../cis-modules/android/client-lib-android</module>
-		<module>../cis-modules/android/cis-management</module>
+		<!-- <module>../cis-modules/android/client-lib-android</module> -->
+		<!-- <module>../cis-modules/android/cis-management</module> -->
 		<!-- CIS manager light test modules. Give error due to missing emulator. Not sure where these should go -->
 		<!-- <module>../cis-modules/android/client-lib-android-test</module> -->
 		<!-- <module>../cis-modules/android/cis-management-test</module> -->		

@@ -17,19 +17,8 @@
        bundle. The configuration of OSGi definitions is kept in a separate 
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
-       
-	<context:component-scan base-package="org.societies.privacytrust.trust.impl" />
 	
-	<bean id="TrustRepositoryConfig"
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="ignoreResourceNotFound" value="true"></property>
-		<property name="locations">
-			<list>
-			<value>classpath:META-INF/spring/derby.properties</value>
-			<!--    <value>file:${CONFIG_DIR}\org.societies.platform.properties</value>  -->	
-			</list>
-		</property>	
-	</bean>
+	<context:component-scan base-package="org.societies.privacytrust.trust.impl" />
 	
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
@@ -37,25 +26,25 @@
 
 		<property name="annotatedClasses">
 			<list>
-				<!-- <value>org.societies.platform.servicelifecycle.serviceRegistry.model.RegistryEntry</value>
-				<value>org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceInstanceDAO</value>
-				<value>org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceImplementationDAO</value>
-			<value>org.societies.platform.servicelifecycle.serviceRegistry.model.ServiceSharedInCISDAO</value> -->
+				<value>org.societies.privacytrust.trust.impl.repo.model.TrustedCss</value>
+				<value>org.societies.privacytrust.trust.impl.repo.model.TrustedCis</value>
+				<value>org.societies.privacytrust.trust.impl.repo.model.DirectTrust</value>
 			</list>
 		</property>
 
 		<property name="annotatedPackages">
 			<list>
-				<!--<value>org.societies.platform.servicelifecycle.serviceRegistry.model</value> -->
+				<value>org.societies.privacytrust.trust.impl.repo.model</value>
 			</list>
 		</property>
 
 		<property name="hibernateProperties">
 			<props>
-				<!--<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.show_ddl">true</prop>
 				<prop key="hibernate.cache.use_second_level_cache">false</prop>
 				<prop key="hibernate.hbm2ddl.auto">update</prop>
-				<prop key="hibernate.format_sql">true</prop> -->
+				<prop key="hibernate.format_sql">true</prop>
 			</props>
 		</property>
 	</bean>
@@ -67,4 +56,5 @@
 		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
+	
 </beans>

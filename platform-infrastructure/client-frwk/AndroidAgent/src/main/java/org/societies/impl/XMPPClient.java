@@ -300,4 +300,8 @@ public class XMPPClient implements XMPPAgent {
 			return false;
 		}
 	}
+
+	public Boolean isConnected() {
+		return connection.isConnected();
+	}
 }

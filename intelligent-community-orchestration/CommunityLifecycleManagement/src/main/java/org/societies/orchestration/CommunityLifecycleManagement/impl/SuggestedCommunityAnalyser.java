@@ -75,6 +75,8 @@ import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxIdentifier;
@@ -83,6 +85,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.css.management.ICssActivity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserBean;
@@ -392,7 +395,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	
     }
     
-    public void processCSMAnalyserRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
+    /**public void processCSMAnalyserRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
     	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
     	ArrayList<ICisRecord> creations = cisRecommendations.get("Create CISs");
     	if (creations == null)
@@ -533,6 +536,183 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	
     	communityRecommender.identifyCisActionForCSMAnalyser(cisRecommendations);
     	
+    }*/
+    
+    public void processCSMAnalyserRecommendations(ArrayList<IIdentity> cssList, ArrayList<CtxAttribute> sharedContextAttributes, ArrayList<CtxAssociation> sharedContextAssociations, ArrayList<ICssActivity> sharedCssActivities, ArrayList<ICisActivity> sharedCisActivities) {
+    	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
+		//ICisRecord proposedCis = cisManager.getBlankCisRecord();
+    	ICisRecord proposedCis = cisManager.getCisList().get(0);
+    	//proposedCis.setMembersList(cssList);
+    	ArrayList<Object> membershipCriteria = new ArrayList<Object>();
+    	for (int i = 0; i < sharedContextAttributes.size(); i++) {
+    		membershipCriteria.add(sharedContextAttributes.get(i));
+    	}
+    	for (int i = 0; i < sharedContextAssociations.size(); i++) {
+    		membershipCriteria.add(sharedContextAssociations.get(i));
+    	}
+    	for (int i = 0; i < sharedCisActivities.size(); i++) {
+    		membershipCriteria.add(sharedCisActivities.get(i));
+    	}
+    	for (int i = 0; i < sharedCssActivities.size(); i++) {
+    		membershipCriteria.add(sharedCssActivities.get(i));
+    	}
+    	//proposedCis.setMembershipCriteria(membershipCriteria);
+    	
+    	ArrayList<ICisRecord> creations = new ArrayList<ICisRecord>();
+    	creations.add(proposedCis);
+		if (creations == null)
+			creations = new ArrayList<ICisRecord>();
+		ArrayList<ICisRecord> deletions = null;
+		if (deletions == null)
+			deletions = new ArrayList<ICisRecord>();
+		ArrayList<ArrayList<ICisRecord>> abstractCreations = new ArrayList<ArrayList<ICisRecord>>();
+		ArrayList<ArrayList<ICisRecord>> abstractDeletions = new ArrayList<ArrayList<ICisRecord>>();
+	
+		if (creations != null)
+			if (creations.size() != 0)
+				for (int i = 0; i < creations.size(); i++) {
+					ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+					it.add(creations.get(i));
+	            	abstractCreations.add(it);
+				}
+	
+	
+		if (deletions != null) {
+			if (deletions.size() != 0)
+				for (int i = 0; i < deletions.size(); i++) {
+					ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+					it.add(deletions.get(i));
+					abstractDeletions.add(it);
+				}
+		}
+	
+	
+		for (int i = 0; i < creations.size(); i++) {
+			if (checkForPreferenceConflicts("Create CISs", abstractCreations).size() != 0)
+				creations.remove(i);
+		}
+	
+		for (int i = 0; i < deletions.size() && deletions != null; i++) {
+			if (checkForPreferenceConflicts("Delete CISs", abstractDeletions).size() != 0)
+				deletions.remove(i);
+		}
+	
+		for (int i = 0; i < creations.size(); i++) {
+	
+			ArrayList<String> privacyConflicts = checkForPrivacyConflicts(abstractCreations);
+			boolean refuseSuggestion = false;
+			if (privacyConflicts.size() != 0) {
+				for (int m = 0; m < privacyConflicts.size(); m++) {
+					if (privacyConflicts.get(m).contains("User policy"))
+				    	refuseSuggestion = true;
+					else if (privacyConflicts.get(m).contains("CSS: ")) {
+						ICisRecord updatedCreation = creations.get(i);
+						//ArrayList<IIdentity> theMembers = updatedCreation.getMembersList();
+						//theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
+						//updatedCreation.setMembersList();
+						creations.set(i, updatedCreation);
+					}
+					
+				}
+			}
+			if (refuseSuggestion == true)
+				creations.remove(i);
+		
+		
+		}
+	
+		for (int i = 0; i < deletions.size(); i++) {
+    	
+			ArrayList<String> privacyConflicts = checkForPrivacyConflicts(abstractDeletions);
+			boolean refuseSuggestion = false;
+			if (privacyConflicts.size() != 0) {
+				for (int m = 0; m < privacyConflicts.size(); m++) {
+					if (privacyConflicts.get(m).equals("User policy"))
+				    	refuseSuggestion = true;
+					else if (privacyConflicts.get(m).contains("CSS: ")) {
+						ICisRecord updatedCreation = creations.get(i);
+						//ArrayList<IIdentity> theMembers = updatedCreation.getMembersList();
+						//theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
+						//updatedCreation.setMembersList();
+						creations.set(i, updatedCreation);
+					}
+				}
+			}
+			if (refuseSuggestion == true)
+				deletions.remove(i);
+		
+		
+		}
+	
+		for (int i = 0; i < creations.size(); i++) {
+			ICisRecord cisProposal = creations.get(i);
+			List<ICisRecord> userJoinedCissTemp = cisManager.getCisList();
+			ArrayList<ICisRecord> userJoinedCiss = new ArrayList<ICisRecord>();
+			for (int m = 0; m < userJoinedCissTemp.size(); m++) {
+				userJoinedCiss.add(userJoinedCissTemp.get(m));
+			}
+			for (int m = 0; m < userJoinedCiss.size(); m++) {
+				//if (userJoinedCiss.get(m).getMembershipCriteria == cisProposal.getMembershipCriteria()) {
+				    //if (userJoinedCiss.get(m).getMembersList() == cisProposal.getMembersList()) {
+				        //creations.remove(i);
+				        //Feedback to CSM Analyser suggesting to either remove this model,
+				        //add another attribute to it (suggest one?), or change one or more
+				        //model attributes (specify them?)
+			        //}
+				    //else if (userJoinedCiss.get(m).getMembersList().size() >= (1.3 * cisProposal.getMembersList().size()) {
+				    //    creations.add(sub-CIS for shared CSSs);
+				    //}
+				//}
+				//if the membership criteria for the existing CIS somehow conflict with that of the suggestion,
+				//may be grounds to delete the old CIS. E.g. the suggestion is based on location,
+				//which is different to the location of an existing CIS, which is known to be short-term temporary.
+			}
+			//userContextBroker.evaluateSimilarity("location", convertedRecommendations.get(i).get(0).getMembersList());
+			//if user isn't a member of another CIS that matches this, OK
+		
+			//if > 90% of members share that context, and there's no other context with more coverage of members,
+			//let this be the highest level CIS criteria.
+			//
+			//else if (more members share some other context)
+			//    convertedRecommendations.replace(i, same but with criteria changed to other context, or original as sub-CIS too);
+		
+			//else
+			//    convertedRecommendations.remove(i);
+		
+			//If activity feed shows history in last few minutes, it's temporary and should be made immediately, as sub-CIS if an encapsulating CIS is available; otherwise, 8 months - ongoing, last month - long-term; last few days - medium-term
+	    
+			//Friends, CSS directory, working colleagues, same address: ongoing
+			//Shared interests, personal attributes like languages spoken and age: sub-CIS.
+		}
+	
+	    for (int i = 0; i < deletions.size(); i++) {
+		    //If activity feed of CIS is dead for a while, depending on criteria it's based on, OK.
+	    }
+	
+	
+	    abstractCreations.clear();
+	    if (creations.size() != 0) {
+		    for (int i = 0; i < creations.size(); i++) {
+			    ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+			    it.add(creations.get(i));
+                abstractCreations.add(it);
+		    }
+	        convertedRecommendations.put("Create CISs", abstractCreations);
+	    }
+	
+	    abstractDeletions.clear();
+	    if (deletions.size() != 0) {
+		    for (int i = 0; i < deletions.size(); i++) {
+			    ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+			    it.add(deletions.get(i));
+                abstractDeletions.add(it);
+		    }
+	        convertedRecommendations.put("Delete CISs", abstractDeletions);
+	    }
+	
+	    if (convertedRecommendations.size() != 0) {
+	    	ArrayList<String> actionMetadata = communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations);
+	    }
     }
     
     public ArrayList<String> checkForPrivacyConflicts(ArrayList<ArrayList<ICisRecord>> recommendations) {
@@ -542,7 +722,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     		    //for (int n = 0; n < recommendations.get(i).get(0).getMembersList().size(); n++) {
     		        //IIdentity thisMember = recommendations.get(i).get(0).getMembersList().get(n);
     			    //CtxAttribute thisAttribute = recommendations.get(i).get(0).getMembershipCriteria.().get(m);
-    		        //boolean passed = privacyDataManager.checkPermission(thisAttribute, thisMember, arg2, arg3);
+    		        //boolean passed = privacyDataManager.checkPermission(thisAttribute, thisMember, "arg2", "arg3");
     			    //if (passed == false) conflictingPrivacyPolicies.add(recommendations.get(i).get(0).getMembershipCriteria().get(m))
     		        //if (ctxBroker.get(thisMember, thisAttribute).equals("Access refused"))
     		        //    conflictingPrivacyPolicies.add("CSS: " + thisMember.toString());
@@ -750,12 +930,12 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		try {
 			//IIdentity owner = identityManager.fromJid(scaBean..getIdentity());
 			//String serviceType = scaBean.getServiceType();
-			processCSMAnalyserRecommendations(scaBean.getCiss());
+			processCSMAnalyserRecommendations(scaBean.getCssList(), scaBean.getSharedContextAttributes(), scaBean.getSharedContextAssociations(), scaBean.getSharedCssActivities(), scaBean.getSharedCisActivities());
 			break;
 		} catch (RuntimeException e) {
 			e.printStackTrace();
 		}
-        case processCSMConfigurationRecommendations:
+        /**case processCSMConfigurationRecommendations:
     		try {
     			//IIdentity owner = identityManager.fromJid(scaBean..getIdentity());
     			//String serviceType = scaBean.getServiceType();
@@ -763,7 +943,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     			break;
     		} catch (RuntimeException e) {
     			e.printStackTrace();
-    		}
+    		}*/
         case processCSCWRecommendations:
     		try {
     			//IIdentity owner = identityManager.fromJid(scaBean..getIdentity());

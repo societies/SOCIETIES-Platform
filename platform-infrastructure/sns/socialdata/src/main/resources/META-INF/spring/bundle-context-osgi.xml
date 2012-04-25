@@ -13,4 +13,8 @@
        testing of the bundle outside of an OSGi container
     -->
 
+     <osgi:service ref="iSocialData" interface="org.societies.api.internal.sns.ISocialData"/>
+	
+	
+	
 </beans>

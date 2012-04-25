@@ -26,7 +26,9 @@ package org.societies.webapp.controller;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 import javax.validation.Valid;
 
@@ -104,21 +106,22 @@ public class CisManagerController {
 			if (method.equalsIgnoreCase("CreateCis")) {
 				model.put("methodcalled", "CreateCis");
 
-				ICisOwned cisResult = this.getCisManager().createCis(
-						cisForm.getCisId(), 
+				Future<ICisOwned> cisResult = this.getCisManager().createCis(
+						cisForm.getCssId(), 
 						cisForm.getCisPassword(), 
 						cisForm.getCisName(),
 						cisForm.getCisType(),
 						cisForm.getCisMode());
 
-				res = "Successfully created CIS: " + cisResult.getName();
+				res = "Successfully created CIS: " + cisResult.get().getCisId();
 				model.put("res", res);
 
 			} else if (method.equalsIgnoreCase("GetCisList")) {
 				model.put("methodcalled", "GetCisList");
 
-				ICisRecord searchRecord = null;
-				ICisRecord[] records = this.getCisManager().getCisList(searchRecord);
+				//ICisRecord searchRecord = null;
+				//ICisRecord[] records = this.getCisManager().getCisList(searchRecord);
+				List<ICisRecord> records = this.getCisManager().getCisList();
 				model.put("cisrecords", records);
 
 			} else {

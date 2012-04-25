@@ -24,6 +24,7 @@
   <property name="cssRegistry" ref="CssRegistryBundle"/>
   <property name="cssDirectoryRemote" ref="cssDirectoryRemote"/>
   <property name="serviceDiscovery" ref="serviceDiscoveryRef"/>
+  <property name="cssManagerRemote" ref="CSSManagerRemote"/>
   </bean>
 
 </beans>

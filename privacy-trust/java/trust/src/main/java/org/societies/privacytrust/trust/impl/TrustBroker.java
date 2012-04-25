@@ -35,8 +35,8 @@ import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.TrustUpdateListener;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
+import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 import org.societies.privacytrust.trust.api.model.MalformedTrustedEntityIdException;
-import org.societies.privacytrust.trust.api.model.TrustedEntity;
 import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
@@ -77,7 +77,7 @@ public class TrustBroker implements ITrustBroker {
 		if (entityId == null)
 			throw new NullPointerException("entityId can't be null");
 		
-		final Double trustValue;
+		/*final*/ Double trustValue = null;
 		
 		final String entityIdStr = entityId.toString();
 		final TrustedEntityType entityType;
@@ -97,7 +97,7 @@ public class TrustBroker implements ITrustBroker {
 		
 		final TrustedEntityId teid;
 		try {
-			teid = new TrustedEntityId(entityType, entityIdStr);
+			teid = new TrustedEntityId(null, entityType, entityIdStr); // TODO add trustor param
 		} catch (MalformedTrustedEntityIdException mteide) {	
 			throw new TrustBrokerException("Could not create TrustedEntityId for entity '"
 					+ entityId + "'", mteide);
@@ -109,9 +109,10 @@ public class TrustBroker implements ITrustBroker {
 		if (LOG.isDebugEnabled())
 			LOG.debug("Retrieving trust value for entity '"
 					+ teid + "' from Trust Repository");
-		final TrustedEntity entity = this.trustRepo.retrieveEntity(teid);
+		
+		final ITrustedEntity entity = this.trustRepo.retrieveEntity(teid);
 		if (entity != null)
-			trustValue = entity.getUserPerceivedTrust().getValue();
+			;// TODO trustValue = entity.getUserPerceivedTrust().getValue();
 		else
 			trustValue = null;
 			
