@@ -24,6 +24,8 @@
  */
 package org.societies.api.cis.management;
 
+import org.societies.api.activity.IActivityFeed;
+
 /**
  * We need to remove this from the API. It is implementation specific.
  * @author Babak.Farshchian@sintef.no
@@ -39,7 +41,7 @@ public interface ICisEditor {
      * @param cisId The ID of the CIS.
      * @return The CISActivityFeed of the CIS.
      */
-    ICisActivityFeed getActivityFeed(String cssId, String cisId);
+    IActivityFeed getActivityFeed(String cssId, String cisId);
     String getCisId();
     /**
      * Updates an existing CIS with the data in the newCis. Update is done canonical. If it fails, the old CIS is
