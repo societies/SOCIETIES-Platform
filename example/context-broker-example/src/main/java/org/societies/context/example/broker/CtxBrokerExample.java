@@ -25,7 +25,10 @@
 package org.societies.context.example.broker;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -39,6 +42,7 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
@@ -54,7 +58,7 @@ public class CtxBrokerExample 	{
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CtxBrokerExample.class);
-	
+
 	/** The Internal Context Broker service reference. */
 	private ICtxBroker internalCtxBroker;
 
@@ -64,15 +68,17 @@ public class CtxBrokerExample 	{
 
 	@Autowired(required=true)
 	public CtxBrokerExample(ICtxBroker internalCtxBroker) {
-		
+
 		LOG.info("CtxBrokerExample instantiated");
 		this.internalCtxBroker = internalCtxBroker;
-		
+
 		LOG.info("Starting examples...");
 		this.createContext();
 		this.retrieveContext();
 		this.lookupContext();
 		this.registerForContextChanges();
+		this.simpleCtxHistoryTest();
+		this.tuplesCtxHistoryTest();
 	}
 
 	/**
@@ -82,7 +88,7 @@ public class CtxBrokerExample 	{
 	private void createContext(){
 
 		LOG.info("*** createContext");
-		
+
 		//create ctxEntity of type "Device"
 		Future<CtxEntity> futureEnt;
 		try {
@@ -147,20 +153,20 @@ public class CtxBrokerExample 	{
 		}
 	}
 
-	
+
 
 	/**
 	 * This method demonstrates how to retrieve context data from the context database
 	 */
 	private void lookupContext() {
 		try {
-		
+
 			List<CtxIdentifier> idsEntities =this.internalCtxBroker.lookup(CtxModelType.ENTITY, "Device").get();
 			LOG.info("lookup results for Entity type: 'Device' " +idsEntities);
-			
+
 			List<CtxIdentifier> idsAttribute =this.internalCtxBroker.lookup(CtxModelType.ATTRIBUTE, "DeviceID").get();
 			LOG.info("lookup results for Attribute type: 'DeviceID' " +idsAttribute);
-		
+
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -172,14 +178,14 @@ public class CtxBrokerExample 	{
 			e.printStackTrace();
 		}
 	}
-		
-	
-	
+
+
+
 	/**
 	 * This method demonstrates how to retrieve context data from the context database
 	 */
 	private void retrieveContext() {
-		
+
 		LOG.info("*** retrieveContext");
 
 		// if the CtxEntityID or CtxAttributeID is known the retrieval is performed by using the ctxBroker.retrieve(CtxIdentifier) method
@@ -224,30 +230,174 @@ public class CtxBrokerExample 	{
 		}
 
 	}
-	
+
+
+
+	/**
+	 * This method demonstrates how to create and retrieve context history data
+	 */
+	private void simpleCtxHistoryTest() {
+
+		CtxAttribute ctxAttribute;
+		final CtxEntity ctxEntity;
+		// Create the attribute's scope
+
+		try {
+			ctxEntity = internalCtxBroker.createEntity("entType").get();
+
+			// Create the attribute to be tested
+			ctxAttribute = internalCtxBroker.createAttribute(ctxEntity.getId(), "attrType").get();
+			ctxAttribute.setHistoryRecorded(true);
+
+			ctxAttribute.setIntegerValue(100);
+			ctxAttribute = (CtxAttribute) internalCtxBroker.update(ctxAttribute).get();
+
+			ctxAttribute.setIntegerValue(200);
+			ctxAttribute = (CtxAttribute) internalCtxBroker.update(ctxAttribute).get();
+
+			ctxAttribute.setIntegerValue(300);
+			ctxAttribute = (CtxAttribute) internalCtxBroker.update(ctxAttribute).get();
+
+			List<CtxHistoryAttribute> history = internalCtxBroker.retrieveHistory(ctxAttribute.getId(), null, null).get();
+
+			for(CtxHistoryAttribute hocAttr: history){
+				System.out.println("history List id:"+hocAttr.getId()+" getLastMod:"+hocAttr.getLastModified() +" hocAttr value:"+hocAttr.getIntegerValue());		
+			}
+
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+	}
+
+	/**
+	 * This method demonstrates how to create and retrieve context history data in tuples, and how to update the tuple types.
+	 */
+	private void tuplesCtxHistoryTest() {
+
+		final CtxEntity ctxEntity;
+		CtxAttribute primaryAttribute;
+		CtxAttribute escortingAttribute1;
+		CtxAttribute escortingAttribute2;
+		CtxAttribute escortingAttribute3;
+
+		try {
+			ctxEntity = (CtxEntity)internalCtxBroker.createEntity("entType").get();
+
+			// Create the attribute to be tested
+			primaryAttribute = (CtxAttribute) internalCtxBroker.createAttribute(ctxEntity.getId(), "primaryAttribute").get();
+			primaryAttribute.setHistoryRecorded(true);
+			primaryAttribute.setStringValue("fistValue");
+			internalCtxBroker.update(primaryAttribute);
+
+			escortingAttribute1 = (CtxAttribute)internalCtxBroker.createAttribute(ctxEntity.getId(), "escortingAttribute1").get();
+			escortingAttribute2 = (CtxAttribute)internalCtxBroker.createAttribute(ctxEntity.getId(), "escortingAttribute2").get();
+
+			escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingAttribute1_firstValue").get();
+			escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingAttribute2_firstValue").get();
+
+			List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
+			listOfEscortingAttributeIds.add(escortingAttribute1.getId());
+			listOfEscortingAttributeIds.add(escortingAttribute2.getId());
+			internalCtxBroker.setHistoryTuples(primaryAttribute.getId(), listOfEscortingAttributeIds).get();	
+
+			//this update stores also the attributes in tuples
+			internalCtxBroker.update(primaryAttribute);
+
+			escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingAttribute1_secondValue").get();
+			escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingAttribute2_secondValue").get();
+			primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"secondValue").get();
+
+			escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingAttribute1_thirdValue").get();
+			escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingAttribute2_thirdValue").get();
+			primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"thirdValue").get();
+
+			//primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"forthValue").get();
+			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = internalCtxBroker.retrieveHistoryTuples(primaryAttribute.getId(), listOfEscortingAttributeIds, null, null).get();
+			printHocTuples(tupleResults);
+			System.out.println("add new attribute in an existing tuple");
+
+			escortingAttribute3 = (CtxAttribute) internalCtxBroker.createAttribute(ctxEntity.getId(),"escortingAttribute3").get();
+			//escortingAttribute3.setHistoryRecorded(true);
+			List<CtxAttributeIdentifier> newlistOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
+			newlistOfEscortingAttributeIds.add(escortingAttribute1.getId());
+			newlistOfEscortingAttributeIds.add(escortingAttribute2.getId());
+			newlistOfEscortingAttributeIds.add(escortingAttribute3.getId());
+			internalCtxBroker.updateHistoryTuples(primaryAttribute.getId(), newlistOfEscortingAttributeIds);
+
+			// newly add attribute doesn't contain any value yet, a null ref should be added in tuple
+			escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingAttribute1_forthValue").get();
+			escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingAttribute2_forthValue").get();
+			//escortingAttribute3 =  internalCtxBroker.updateAttribute(escortingAttribute3.getId(),(Serializable)"escortingValue3_forthValue").get();
+			primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"forthValue").get();
+
+			escortingAttribute1 =  internalCtxBroker.updateAttribute(escortingAttribute1.getId(),(Serializable)"escortingAttribute1_fifthValue").get();
+			escortingAttribute2 =  internalCtxBroker.updateAttribute(escortingAttribute2.getId(),(Serializable)"escortingAttribute2_fifthValue").get();
+			escortingAttribute3 =  internalCtxBroker.updateAttribute(escortingAttribute3.getId(),(Serializable)"escortingAttribute3_fifthValue").get();
+			primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"fifthValue").get();
+
+			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> updatedTupleResults = internalCtxBroker.retrieveHistoryTuples(primaryAttribute.getId(), listOfEscortingAttributeIds, null, null).get();
+			printHocTuples(updatedTupleResults);
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	protected void printHocTuples(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults){
+
+		int i = 0;
+		for (CtxHistoryAttribute primary : tupleResults.keySet()){
+			String primaryValue = null;
+			if (primary.getStringValue() != null) primaryValue =primary.getStringValue();
+			String escValueTotal = "";
+			for(CtxHistoryAttribute escortingAttr: tupleResults.get(primary)){
+				String escValue = "";
+				if (escortingAttr.getStringValue() != null )  escValue =escortingAttr.getStringValue();	
+				escValueTotal = escValueTotal+" "+escValue; 
+			}
+			System.out.println(i+ " primaryValue: "+primaryValue+ " escValues: "+escValueTotal);
+			i++;
+		}
+	}	
+
 	/**
 	 * This method demonstrates how to register for context change events in the context database
 	 */
 	private void registerForContextChanges() {
-		
+
 		LOG.info("*** registerForContextChanges");
-		
+
 		try {
 			// 1a. Register listener by specifying the context attribute identifier
 			this.internalCtxBroker.registerForChanges(new MyCtxChangeEventListener(), this.ctxAttributeStringIdentifier);
-			
+
 			// 1b. Register listener by specifying the context attribute scope and type
 			this.internalCtxBroker.registerForChanges(new MyCtxChangeEventListener(), this.ctxEntityIdentifier, "DeviceID");
-			
+
 			// 2. Update attribute to see some event action
 			this.internalCtxBroker.updateAttribute((CtxAttributeIdentifier) this.ctxAttributeStringIdentifier, "newDeviceIdValue");
-			
+
 		} catch (CtxException ce) {
-			
+
 			LOG.error("CM sucks", ce);
 		}
 	}
-	
+
 	private class MyCtxChangeEventListener implements CtxChangeEventListener {
 
 		/* (non-Javadoc)
@@ -255,7 +405,7 @@ public class CtxBrokerExample 	{
 		 */
 		@Override
 		public void onCreation(CtxChangeEvent event) {
-			
+
 			LOG.info(event.getId() + ": *** CREATED event ***");
 		}
 
@@ -264,7 +414,7 @@ public class CtxBrokerExample 	{
 		 */
 		@Override
 		public void onModification(CtxChangeEvent event) {
-			
+
 			LOG.info(event.getId() + ": *** MODIFIED event ***");
 		}
 
@@ -273,7 +423,7 @@ public class CtxBrokerExample 	{
 		 */
 		@Override
 		public void onRemoval(CtxChangeEvent event) {
-			
+
 			LOG.info(event.getId() + ": *** REMOVED event ***");
 		}
 
@@ -282,7 +432,7 @@ public class CtxBrokerExample 	{
 		 */
 		@Override
 		public void onUpdate(CtxChangeEvent event) {
-			
+
 			LOG.info(event.getId() + ": *** UPDATED event ***");
 		}
 	}
