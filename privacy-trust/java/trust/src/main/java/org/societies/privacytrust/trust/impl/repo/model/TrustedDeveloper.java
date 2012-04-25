@@ -26,8 +26,8 @@ package org.societies.privacytrust.trust.impl.repo.model;
 
 import java.util.Set;
 
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.ITrustedDeveloper;
-import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 
 /**
  * This class represents service developers. A TrustedDeveloper object is

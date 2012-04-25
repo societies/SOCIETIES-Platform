@@ -33,8 +33,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.societies.privacytrust.trust.api.model.TrustedEntityId;
-import org.societies.privacytrust.trust.api.model.TrustedEntityType;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
 
 /**
  * Tests the {@link TrustedEntityId} class.
@@ -81,7 +81,7 @@ public class TrustedEntityIdTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#getTrustorId()}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.model.TrustedEntityId#getTrustorId()}.
 	 * @throws URISyntaxException 
 	 */
 	@Test
@@ -92,7 +92,7 @@ public class TrustedEntityIdTest {
 	}
 	
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#getEntityType()}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.model.TrustedEntityId#getEntityType()}.
 	 * @throws URISyntaxException 
 	 */
 	@Test
@@ -103,7 +103,7 @@ public class TrustedEntityIdTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#getTrusteeId()}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.model.TrustedEntityId#getTrusteeId()}.
 	 * @throws URISyntaxException 
 	 */
 	@Test
@@ -114,7 +114,7 @@ public class TrustedEntityIdTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#getUri()}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.model.TrustedEntityId#getUri()}.
 	 */
 	@Test
 	public void testGetUri() throws Exception {
@@ -125,7 +125,7 @@ public class TrustedEntityIdTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#toString()}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.model.TrustedEntityId#toString()}.
 	 */
 	@Test
 	public void testToString() throws Exception {
@@ -136,7 +136,7 @@ public class TrustedEntityIdTest {
 	}
 	
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#equals()}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.model.TrustedEntityId#equals()}.
 	 * @throws Exception 
 	 */
 	@Test

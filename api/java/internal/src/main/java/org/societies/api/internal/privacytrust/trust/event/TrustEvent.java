@@ -22,42 +22,29 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.repo;
+package org.societies.api.internal.privacytrust.trust.event;
 
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
-import org.societies.privacytrust.trust.api.model.ITrustedEntity;
+import java.util.EventObject;
 
-public interface ITrustRepository {
+/**
+ * This abstract class is used to represent an event emitted by the Trust
+ * Management & Evaluation system.
+ *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.7
+ */
+public abstract class TrustEvent extends EventObject {
 
-	/**
-	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public boolean addEntity(final ITrustedEntity entity) throws TrustRepositoryException;
-
-	/**
-	 * 
-	 * @param teid
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public ITrustedEntity retrieveEntity(final TrustedEntityId teid) throws TrustRepositoryException;
+	private static final long serialVersionUID = 7234801758138292681L;
 	
 	/**
+	 * Constructs a <code>TrustEvent</code> with the specified source.
 	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
+	 * @param source
+	 *            the object upon which this event occurred.
 	 */
-	public ITrustedEntity updateEntity(ITrustedEntity entity) throws TrustRepositoryException;
-	
-	/**
-	 * 
-	 * @param entity
-	 * @return
-	 * @throws TrustRepositoryException
-	 */
-	public boolean removeEntity(ITrustedEntity entity) throws TrustRepositoryException;
+	public TrustEvent(Object source) {
+		
+		super(source);
+	}
 }

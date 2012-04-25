@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
+package org.societies.api.internal.privacytrust.trust.model;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -70,7 +70,7 @@ public class TrustedEntityId implements Serializable {
 
 	private static final long serialVersionUID = 7390835311816850816L;
 	
-	/** The URI encoding scheme to use for representing trusted entity identifiers. */
+    /** The URI encoding scheme to use for representing trusted entity identifiers. */
     public static final String URI_SCHEME = "urn";
     
     /** The URN delimiter. */
