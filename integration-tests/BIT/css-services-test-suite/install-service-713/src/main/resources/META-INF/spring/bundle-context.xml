@@ -30,13 +30,13 @@
     <bean
         id="NominalTestCaseLowerTester"
         class="org.societies.integration.test.bit.installservice.NominalTestCaseLowerTester">
-        <property name="calculatorService" ref ="calculatorService" />
+        <!--property name="calculatorService" ref ="calculatorService" /-->
     </bean>
     
-    <bean
+    <!--bean
         id="SpecificTestCaseUpperTester"
         class="org.societies.integration.test.bit.installservice.SpecificTestCaseUpperTester">
         <property name="calculatorService" ref ="calculatorService" />
-    </bean>
+    </bean-->
 
 </beans>

@@ -4,12 +4,7 @@
 package org.societies.integration.test.bit.installservice;
 
 /**
- * The test case 713 aims to test 3P service usage.
- * This test case select a 3P service (the Calculator service) as an example
- * and try to consume it. Installation, starting, stoping and unstallation
- * have already being tested in other test cases.
- * @author Olivier Maridat (Trialog)
- *
+ * The test case 713 aims to test 3P service installation.
  */
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,27 +18,38 @@ public class TestCase713 extends IntegrationTestCase {
 	/**
 	 * Service control manager (injected)
 	 */
-	public static IServiceControl serviceControl;
+	private static IServiceControl serviceControl;
 
 	/**
 	 * Service discovery manager (injected)
 	 */
-	public static IServiceDiscovery serviceDiscovery;
+	private static IServiceDiscovery serviceDiscovery;
 
 
 	public TestCase713() {
 		// Call the super constructor
 		// with test case number
 		// and test case classes to run
-		super(713, new Class[] {SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
+		//super(713, new Class[] {SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
+		super(713, new Class[] {NominalTestCaseLowerTester.class});
 		NominalTestCaseLowerTester.testCaseNumber = 713;
 	}
 
 
 	public void setServiceControl(IServiceControl serviceControl) {
-		this.serviceControl = serviceControl;
+		LOG.debug("[#713] setServiceControl()");
+		TestCase713.serviceControl = serviceControl;
 	}
 	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
-		this.serviceDiscovery = serviceDiscovery;
+		LOG.debug("[#713] setServiceDiscovery()");
+		TestCase713.serviceDiscovery = serviceDiscovery;
+	}
+	
+	protected static IServiceControl getServiceControl() {
+		return serviceControl;
+	}
+
+	protected static IServiceDiscovery getServiceDiscovery() {
+		return serviceDiscovery;
 	}
 }

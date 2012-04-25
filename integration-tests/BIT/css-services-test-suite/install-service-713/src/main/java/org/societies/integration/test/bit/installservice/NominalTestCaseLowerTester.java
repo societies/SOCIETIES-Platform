@@ -1,10 +1,11 @@
 package org.societies.integration.test.bit.installservice;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.junit.After;
@@ -13,12 +14,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
-import org.societies.example.calculator.ICalc;
 import org.societies.integration.test.IntegrationTestUtils;
 
 /**
@@ -26,28 +26,31 @@ import org.societies.integration.test.IntegrationTestUtils;
  *
  */
 public class NominalTestCaseLowerTester {
+	
 	private static Logger LOG = LoggerFactory.getLogger(NominalTestCaseLowerTester.class);
 
+	private static IServiceControl serviceControl;
+	
 	/**
-	 * URL of the JAR of the Calculator 3P service Bundle
+	 * URL of the JAR of the 3P service Bundle
 	 */
-	private static String serviceBundleUrl;
+	private static URL serviceBundleUrl;
+
 	/**
-	 * URL endpoint of the Calculator 3P service
+	 * Relative path to the jar file in resources folder
 	 */
-	private static String calculatorServiceEndPoint;
+	private static final String SERVICE_PATH = "Calculator-0.1.jar";
+
 	/**
-	 * Id of the Calculator 3P service
+	 * Id of the 3P service
 	 */
-	public static ServiceResourceIdentifier calculatorServiceId;
-	/**
-	 * Injection of ICalc interface
-	 */
-	public static ICalc calculatorService;
+	private static ServiceResourceIdentifier serviceId;
+
 	/**
 	 * Tools for integration test
 	 */
-	public IntegrationTestUtils integrationTestUtils;
+	private IntegrationTestUtils integrationTestUtils;
+	
 	/**
 	 * Test case number
 	 */
@@ -58,7 +61,6 @@ public class NominalTestCaseLowerTester {
 		integrationTestUtils = new IntegrationTestUtils();
 	}
 
-
 	/**
 	 * This method is called only one time, at the very beginning of the process
 	 * (after the constructor) in order to initialize the process.
@@ -66,51 +68,29 @@ public class NominalTestCaseLowerTester {
 	 */
 	@BeforeClass
 	public static void initialization() {
+		
 		LOG.info("[#713] Initialization");
 		LOG.info("[#713] Prerequisite: The CSS is created");
 		LOG.info("[#713] Prerequisite: The user is logged to the CSS");
 
-		serviceBundleUrl = "file:C:/Application/Virgo/repository/usr/Calculator.jar";
-		calculatorServiceEndPoint = "XCManager.societies.local/CalculatorService";
-		calculatorServiceId = new ServiceResourceIdentifier();
+		serviceBundleUrl = NominalTestCaseLowerTester.class.getClassLoader().getResource(SERVICE_PATH);
+		serviceControl = TestCase713.getServiceControl();
+		
+		assertNotNull(serviceBundleUrl);
+		assertNotNull(serviceControl);
 	}
 
 	/**
 	 * This method is called before every @Test methods.
-	 * Verify that the Calculator Service is installed
+	 * Verify that the service is installed
 	 */
 	@Before
 	public void setUp() {
 		LOG.info("[#713] NominalTestCaseLowerTester::setUp");
-
-		Future<ServiceControlResult> asyncinstallResult = null;
-		ServiceControlResult installResult = null;
-
-		try {
-			// -- Install the service
-			LOG.info("[#713] Preamble: Install the service");
-			URL serviceUrl = new URL(serviceBundleUrl);
-			asyncinstallResult = TestCase713.serviceControl.installService(serviceUrl, "");
-			installResult = asyncinstallResult.get();
-			if (!installResult.equals(ServiceControlResult.SUCCESS)) {
-				throw new Exception("Can't install the service. Returned value: "+installResult.value());
-			}
-		}
-		catch (ServiceDiscoveryException e) {
-			LOG.info("[#713] ServiceDiscoveryException", e);
-			fail("[#713] ServiceDiscoveryException: "+e.getMessage());
-			return;
-		}
-		catch (Exception e) {
-			LOG.info("[#713] Preamble installService: Unknown Exception", e);
-			fail("[#713] Preamble installService: Unknown Exception: "+e.getMessage());
-			return;
-		}
 	}
 
 	/**
 	 * This method is called after every @Test methods
-	 * Stop and uninstal the Calculator Service
 	 */
 	@After
 	public void tearDown() {
@@ -119,67 +99,115 @@ public class NominalTestCaseLowerTester {
 
 
 	/**
-	 * Try to consume the calculator service
+	 * Try to consume the service
 	 * Part 1: select the service and start it if necessary
 	 */
 	@Test
-	public void bodyUseService() {
-		LOG.info("[#713] bodyUseService part 1");
+	public void testInstallService() throws Exception {
+		
+		LOG.info("[#713] testInstallService");
+
+		List<Service> servicesBefore;
+		List<Service> servicesAfter;
+		List<Service> servicesNew;
+		
+		servicesBefore = getLocalServices();
+		serviceId = installService();
+		assertNotNull(serviceId);
+		servicesAfter = getLocalServices();
+		servicesNew = getAdditionalServices(servicesBefore, servicesAfter);
+		
+		assertEquals("Number of all services not increased by exactly 1", 1, servicesAfter.size() - servicesBefore.size());
+		assertEquals("Number of new services not exactly 1", 1, servicesNew.size());
+
+		// -- Find the service
+		for (Service service : servicesAfter) {
+//			if (service.getServiceIdentifier().equals(serviceId)) {
+//				// Mark the service as found
+//				LOG.info("[#713] service " + serviceId + "found");
+//				break;
+//			}
+		}
+		
+		uninstallService(serviceId);
+		
+		servicesAfter = getLocalServices();
+		servicesNew = getAdditionalServices(servicesBefore, servicesAfter);
+		assertEquals("Number of all services not same as before installation", 0, servicesAfter.size() - servicesBefore.size());
+		assertEquals("Number of new services not exactly 0", 0, servicesNew.size());
+	}
+	
+	/**
+	 * Install the service to local node
+	 * 
+	 * @return ID of the installed service (NOT IMPLEMENTED YET!)
+	 * @throws Exception on any error
+	 */
+	private ServiceResourceIdentifier installService() throws Exception {
+		
+		Future<ServiceControlResult> asyncResult = null;
+		ServiceControlResult result = null;
+
+		// -- Install the service
+		LOG.info("[#713] Preamble: Install the service");
+		asyncResult = serviceControl.installService(serviceBundleUrl);
+		result = asyncResult.get();
+		if (!result.equals(ServiceControlResult.SUCCESS)) {
+			throw new Exception("Can't install the service. Returned value: " + result.value());
+		}
+		LOG.debug("[#713] installService(): " + result.value());
+		
+		//return installResult.getServiceId();
+		// FIXME: Return the service ID when ServiceControlResult is expanded. Sancho has already implemented the change but it will be merged in May.
+		return new ServiceResourceIdentifier();
+	}
+	
+	/**
+	 * Uninstall the service
+	 * 
+	 * @param serviceId ID of the service to uninstall
+	 * @throws Exception on any error
+	 */
+	private void uninstallService(ServiceResourceIdentifier serviceId) throws Exception {
+		
+		Future<ServiceControlResult> asyncResult = null;
+		ServiceControlResult result = null;
+
+		// -- Install the service
+		LOG.info("[#713] Preamble: Uninstall the service");
+		asyncResult = serviceControl.uninstallService(serviceId);
+		result = asyncResult.get();
+		if (!result.equals(ServiceControlResult.SUCCESS)) {
+			throw new Exception("Can't uninstall the service. Returned value: " + result.value());
+		}
+		LOG.debug("[#713] uninstallService(): " + result.value());
+	}
+	
+	private List<Service> getLocalServices() throws ServiceDiscoveryException, InterruptedException, ExecutionException {
 
 		Future<List<Service>> asyncServices = null;
 		List<Service> services =  new ArrayList<Service>();
 
-		try {
-			// -- Search all local services
-			asyncServices = TestCase713.serviceDiscovery.getLocalServices();
-			services = asyncServices.get();
+		// -- Search all local services
+		asyncServices = TestCase713.getServiceDiscovery().getLocalServices();
+		services = asyncServices.get();
 
-			// -- Find the Calculator Service in these services
-			for(Service service : services) {
-				// - Service found
-				if (service.getServiceEndpoint().equals(calculatorServiceEndPoint)) {
-					// Mark the service as found
-					LOG.info("[#713] Calculator service found");
+		return services;
+	}
+	
+	private List<Service> getAdditionalServices(List<Service> services1, List<Service> services2) {
 
-					// Retrieve the Service Resource Identifier
-					calculatorServiceId = service.getServiceIdentifier();
-
-					// - If Calculator service not started yet: start it
-					if (!service.getServiceStatus().equals(ServiceStatus.STARTED)) {
-						// Start the service
-						LOG.info("[#713] Calculator service starting");
-						Future<ServiceControlResult> asyncStartResult = TestCase713.serviceControl.startService(calculatorServiceId);
-						ServiceControlResult startResult = asyncStartResult.get();
-						// Service can't be started
-						if (!startResult.value().equals("SUCCESS")) {
-							throw new Exception("Can't start the service. Returned value: "+startResult.value());
-						}
-						LOG.info("[#713] Calculator service started");
-					}
-					break;
+		List<Service> servicesNew = new ArrayList<Service>();
+		
+		// -- Find the service
+		for (Service service : services2) {
+			
+			for (Service sBefore : services1) {
+				if (sBefore.getServiceIdentifier().equals(service.getServiceIdentifier())) {
+					servicesNew.add(sBefore);
 				}
 			}
-
-			// -- Test case is now ready to consume the service
-			// The injection of ICalc will launch the UpperTester
 		}
-		catch (ServiceDiscoveryException e) {
-			LOG.info("[#713] ServiceDiscoveryException", e);
-			fail("[#713] ServiceDiscoveryException: "+e.getMessage());
-			return;
-		}
-		catch (Exception e) {
-			LOG.info("[#713] Preamble installService: Unknown Exception", e);
-			fail("[#713] Preamble installService: Unknown Exception: "+e.getMessage());
-			return;
-		}
-	}
-
-	public void setCalculatorService(ICalc calculatorService) {
-		LOG.info("[#713] Calculator Service injected");
-		this.calculatorService = calculatorService;
-		// -- Launch the UpperTester to continue the test case by consuming a service
-		NominalTestCaseUpperTester.calculatorServiceId = calculatorServiceId;
-		integrationTestUtils.run(testCaseNumber, NominalTestCaseUpperTester.class);
+		return servicesNew;
 	}
 }
