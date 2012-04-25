@@ -34,9 +34,9 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
-import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 
 /**
  * This class represents trusted CISs. A <code>TrustedCis</code> object is

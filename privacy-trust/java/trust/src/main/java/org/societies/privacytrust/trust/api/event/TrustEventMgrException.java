@@ -24,60 +24,69 @@
  */
 package org.societies.privacytrust.trust.api.event;
 
-import org.societies.api.internal.privacytrust.trust.event.ITrustEventListener;
-import org.societies.api.internal.privacytrust.trust.event.TrustEvent;
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.internal.privacytrust.trust.TrustException;
 
 /**
- * The Trust Event Manager is responsible for the subscription and publishing
- * of trust-related events.
+ * Thrown to indicate Trust Event Manager exceptions.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.5
+ * @since 0.0.7
  */
-public interface ITrustEventMgr {
+public class TrustEventMgrException extends TrustException {
+
+	private static final long serialVersionUID = 8683413340119922000L;
 
 	/**
-     * Publishes the specified {@link TrustEvent}.
-     * 
-     * @param event
-     *            the event to be published.
-     * @param topics
-     *            the topics to which the event will be published.
-     * @param source
-     *            the publisher of the event.
-     * @throws TrustEventMgrExceptionException 
-     *             if publishing of the specified event fails.
-     * @throws NullPointerException
-     *             if any of the specified parameters is <code>null</code>.
-     * @since 0.0.7
+     * Constructs a <code>TrustBrokerException</code> with no detail message.
      */
-    public void postEvent(final TrustEvent event, final String[] topics, 
-    		final String source) throws TrustEventMgrException;
-    
+    public TrustEventMgrException() {
+    	
+        super();
+    }
+
     /**
-     * Registers the specified {@link ITrustEventListener} for events of the
-     * supplied topics. Once registered, the <code>ITrustEventListener</code>
-     * will handle {@link TrustEvent TrustEvents} associated with the
-     * identified trusted entity.
-     * <p>
-     * To unregister the specified <code>ITrustEventListener</code>, use the
-     * {@link #unregisterListener(TODO)}
-     * method.
+     * Constructs a <code>TrustBrokerException</code> with the specified detail
+     * message.
      * 
-     * @param listener
-     *            the <code>ITrustEventListener</code> to register.
-     * @param topics
-     *            the event topics to register for.
-     * @param teid
-     *            the identifier of the trusted entity whose events to
-     *            register for.
-     * @throws TrustEventMgrException
-     *             if the registration process of the specified
-     *             <code>ITrustEventListener</code> fails.
-     * @throws NullPointerException
-     *             if any of the specified parameters is <code>null</code>.
+     * @param message
+     *            the detail message.
      */
-    public void registerListener(final ITrustEventListener listener, 
-			final String[] topics, final TrustedEntityId teid) throws TrustEventMgrException;
+    public TrustEventMgrException(String message) {
+    	
+        super(message);
+    }
+
+    /**
+     * Creates a <code>TrustBrokerException</code> with the specified detail message
+     * and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustEventMgrException(String message, Throwable cause) {
+    	
+        super(message, cause);
+    }
+
+    /**
+     * Creates a <code>TrustBrokerException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustEventMgrException(Throwable cause) {
+    	
+        super(cause);
+    }
 }
