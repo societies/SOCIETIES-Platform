@@ -645,6 +645,28 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		}
 	
 		for (int i = 0; i < creations.size(); i++) {
+			ICisRecord cisProposal = creations.get(i);
+			List<ICisRecord> userJoinedCissTemp = cisManager.getCisList();
+			ArrayList<ICisRecord> userJoinedCiss = new ArrayList<ICisRecord>();
+			for (int m = 0; m < userJoinedCissTemp.size(); m++) {
+				userJoinedCiss.add(userJoinedCissTemp.get(m));
+			}
+			for (int m = 0; m < userJoinedCiss.size(); m++) {
+				//if (userJoinedCiss.get(m).getMembershipCriteria == cisProposal.getMembershipCriteria()) {
+				    //if (userJoinedCiss.get(m).getMembersList() == cisProposal.getMembersList()) {
+				        //creations.remove(i);
+				        //Feedback to CSM Analyser suggesting to either remove this model,
+				        //add another attribute to it (suggest one?), or change one or more
+				        //model attributes (specify them?)
+			        //}
+				    //else if (userJoinedCiss.get(m).getMembersList().size() >= (1.3 * cisProposal.getMembersList().size()) {
+				    //    creations.add(sub-CIS for shared CSSs);
+				    //}
+				//}
+				//if the membership criteria for the existing CIS somehow conflict with that of the suggestion,
+				//may be grounds to delete the old CIS. E.g. the suggestion is based on location,
+				//which is different to the location of an existing CIS, which is known to be short-term temporary.
+			}
 			//userContextBroker.evaluateSimilarity("location", convertedRecommendations.get(i).get(0).getMembersList());
 			//if user isn't a member of another CIS that matches this, OK
 		
@@ -700,7 +722,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     		    //for (int n = 0; n < recommendations.get(i).get(0).getMembersList().size(); n++) {
     		        //IIdentity thisMember = recommendations.get(i).get(0).getMembersList().get(n);
     			    //CtxAttribute thisAttribute = recommendations.get(i).get(0).getMembershipCriteria.().get(m);
-    		        //boolean passed = privacyDataManager.checkPermission(thisAttribute, thisMember, arg2, arg3);
+    		        //boolean passed = privacyDataManager.checkPermission(thisAttribute, thisMember, "arg2", "arg3");
     			    //if (passed == false) conflictingPrivacyPolicies.add(recommendations.get(i).get(0).getMembershipCriteria().get(m))
     		        //if (ctxBroker.get(thisMember, thisAttribute).equals("Access refused"))
     		        //    conflictingPrivacyPolicies.add("CSS: " + thisMember.toString());

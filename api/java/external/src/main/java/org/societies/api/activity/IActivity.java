@@ -22,39 +22,19 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.bit.remote_api_calls;
-
+package org.societies.api.activity;
 
 /**
- *
- * @author Rafik
+ * @author Babak.Farshchian@sintef.no
  *
  */
-public class ConsumerCallbackImpl implements IConsumerCallback{
-
-	private Integer asyncResult = null;
-	
-	/**
-	 * 
-	 */
-	public ConsumerCallbackImpl() {
-		super();
-
-	}
-
-	@Override
-	public void sendResult(int result) {
-		this.asyncResult = result;	
-		synchronized (this) {
-            notifyAll( );
-        }
-	}
-	
-	/**
-	 * @return the asyncResult
-	 */
-	public Integer getAsyncResult() {
-		return asyncResult;
-	}
-
+public interface IActivity {
+	public String getVerb();
+	public void setVerb(String verb);
+	public String getActor();
+	public void setActor(String actor);
+	public String getObject();
+	public void setObject(String object);
+	public String getTarget();
+	public void setTarget(String target);
 }

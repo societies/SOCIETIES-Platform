@@ -24,6 +24,7 @@
  */
 package org.societies.context.api.user.history;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import java.util.Map;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxHistoryAttribute;
 
 /**
@@ -184,4 +186,11 @@ public interface IUserCtxHistoryMgr {
 	 * @param date
 	 */
 	public void storeHoCAttribute(CtxAttribute hocAttribute) throws CtxException;
+	
+	public CtxHistoryAttribute createHistoryAttribute(CtxAttribute ctxAttribute);
+	
+	public CtxHistoryAttribute createHistoryAttribute(CtxAttributeIdentifier attID, Date date, Serializable value, CtxAttributeValueType valueType);
+		
+	
+	public void printHocDB();
 }
