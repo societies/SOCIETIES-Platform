@@ -15,5 +15,7 @@
 
     <osgi:reference id="serviceControl" interface="org.societies.api.servicelifecycle.IServiceControl" />
     <osgi:reference id="serviceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"/>
-       
+
+	<!--osgi:service ref="Test713" interface="org.societies.integration.test.bit.installservice.TestCase713" /-->
+
 </beans>
