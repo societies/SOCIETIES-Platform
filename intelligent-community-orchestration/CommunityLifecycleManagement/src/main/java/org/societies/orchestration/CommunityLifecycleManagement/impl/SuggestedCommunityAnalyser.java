@@ -50,8 +50,9 @@ import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisSubscribed;
 import org.societies.api.cis.management.ICisEditor;
-import org.societies.api.cis.management.ICisActivity;
-import org.societies.api.cis.management.ICisActivityFeed;
+import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeed;
+
 //import org.societies.api.cis.management.ICis;
 
 //import org.societies.api.internal.context.user.similarity.IUserCtxSimilarityEvaluator;
@@ -538,7 +539,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	
     }*/
     
-    public void processCSMAnalyserRecommendations(ArrayList<IIdentity> cssList, ArrayList<CtxAttribute> sharedContextAttributes, ArrayList<CtxAssociation> sharedContextAssociations, ArrayList<ICssActivity> sharedCssActivities, ArrayList<ICisActivity> sharedCisActivities) {
+    @Override
+    public void processCSMAnalyserRecommendations(ArrayList<IIdentity> cssList, ArrayList<CtxAttribute> sharedContextAttributes, ArrayList<CtxAssociation> sharedContextAssociations, ArrayList<ICssActivity> sharedCssActivities, ArrayList<IActivity> sharedCisActivities) {
     	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
 		//ICisRecord proposedCis = cisManager.getBlankCisRecord();
     	ICisRecord proposedCis = cisManager.getCisList().get(0);
