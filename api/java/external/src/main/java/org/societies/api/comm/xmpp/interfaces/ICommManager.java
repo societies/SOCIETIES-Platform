@@ -74,6 +74,8 @@ public interface ICommManager {
 	public String getItems(IIdentity entity, String node, ICommCallback callback) throws CommunicationException;
 	
 	public IIdentityManager getIdManager();
+	
+	public boolean UnRegisterCommManager();
 
 	// void sendResult(? originalPayload, Object resultPayload); //TODO only
 	// needed for asynch IQ handling

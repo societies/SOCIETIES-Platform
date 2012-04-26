@@ -46,22 +46,24 @@ import org.societies.api.cis.management.ICisSubscribed;
 public class CisRecord implements ICisOwned, ICisSubscribed{
 	public CisActivityFeed feed;
 	public String ownerCss;
-	public int membershipCriteria;
+	public int membershipCriteria; // also know as mode
+
+
+
 	public String cisName;
 	public String cisJID;
 	public String cisType;
+
 
 
 	/**
 	 * permaLink is a permanent URL to this CIS. A type of CIS homepage.
 	 */
 	public String permaLink;
-	public Set<CisParticipant> membersCss; //TODO: maybe this should be moved to the CIS Editor (or in other words, we should 
-	// not keep track of members of CISs which we do not own 
+	public Set<CisParticipant> membersCss; //this is currently kept at the CIS editor and just the pointer to the set is stored here 
 	private String password = "none";
 	private String host = "none";
-	public Set<IServiceSharingRecord> sharedServices;//TODO: maybe this should be moved to the CIS Editor (or in other words, we should 
-	// not keep track of members of CISs which we do not own
+	public Set<IServiceSharingRecord> sharedServices; //this is currently kept at the CIS editor and just the pointer to the set is stored here
 	
 
 	
@@ -142,13 +144,35 @@ public class CisRecord implements ICisOwned, ICisSubscribed{
 	}
 
 	
+	@Override
+	public String getCisType() {
+		return cisType;
+	}
+
+
+
+	public void setCisType(String cisType) {
+		this.cisType = cisType;
+	}
+
+
+	
 	
 	public String getOwnerCss() {
 		return ownerCss;
 	}
 
 
+	@Override
+	public int getMembershipCriteria() {
+		return membershipCriteria;
+	}
 
+
+
+	public void setMembershipCriteria(int membershipCriteria) {
+		this.membershipCriteria = membershipCriteria;
+	}
 
 
 	public void setOwnerCss(String ownerCss) {

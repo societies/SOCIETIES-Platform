@@ -114,6 +114,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 	/**
 	 * Unregisters the XC Manager as an external component from the XMPP Server
 	 */
+	@Override
 	public boolean UnRegisterCommManager() {
 		try {
 			manager.removeComponent(subDomain);
