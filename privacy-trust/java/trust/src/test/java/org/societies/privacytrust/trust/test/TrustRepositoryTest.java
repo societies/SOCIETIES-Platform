@@ -55,7 +55,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	
 	private static final String TRUSTOR_ID = "aFooTrustorIIdentity";
 	
-	private static final String TRUSTED_CSS_ID = "aFooTrusteeIIdentity";
+	private static final String TRUSTED_CSS_ID = "aFooCssIIdentity";
 	
 	private static ITrustedCss trustedCss;
 	
@@ -103,6 +103,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	public void testAddTrustedCss() throws TrustRepositoryException {
 		
 		assertTrue(this.trustRepo.addEntity(trustedCss));
+		assertFalse(this.trustRepo.addEntity(trustedCss));
 	}
 
 	/**

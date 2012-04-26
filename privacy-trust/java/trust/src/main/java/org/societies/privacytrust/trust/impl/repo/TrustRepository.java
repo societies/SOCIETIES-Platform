@@ -31,6 +31,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
@@ -72,14 +73,21 @@ public class TrustRepository implements ITrustRepository {
 	public boolean addEntity(ITrustedEntity entity)
 			throws TrustRepositoryException {
 		
+		if (entity == null)
+			throw new NullPointerException("entity can't be null");
+		
 		boolean result = false;
 
 		final Session session = sessionFactory.openSession();
 		final Transaction transaction = session.beginTransaction();
 		try {
+			if (LOG.isDebugEnabled())
+				LOG.debug("Adding trusted entity " + entity + " to the Trust Repository...");
 			session.save(entity);
 			transaction.commit();
 			result = true;
+		} catch (ConstraintViolationException cve) {
+			result = false;
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for entity " + entity);
 			transaction.rollback();
