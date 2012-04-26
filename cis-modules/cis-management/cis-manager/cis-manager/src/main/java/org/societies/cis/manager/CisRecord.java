@@ -40,11 +40,12 @@ import org.societies.api.cis.collaboration.IServiceSharingRecord;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.cis.management.ICisSubscribed;
+import org.societies.cis.activity.ActivityFeed;
 
 
 
 public class CisRecord implements ICisOwned, ICisSubscribed{
-	public CisActivityFeed feed;
+	public ActivityFeed feed;
 	public String ownerCss;
 	public int membershipCriteria;
 	public String cisName;
@@ -65,7 +66,7 @@ public class CisRecord implements ICisOwned, ICisSubscribed{
 	
 
 	
-	public CisRecord(CisActivityFeed feed, String ownerCss,
+	public CisRecord(ActivityFeed feed, String ownerCss,
 			int membershipCriteria, String cisId, String permaLink,
 			Set<CisParticipant> membersCss, String password, String host,
 			Set<IServiceSharingRecord> sharedServices) {
@@ -87,7 +88,7 @@ public class CisRecord implements ICisOwned, ICisSubscribed{
 	
 
 	
-	public CisRecord(CisActivityFeed feed, String ownerCss,
+	public CisRecord(ActivityFeed feed, String ownerCss,
 			int membershipCriteria, String cisJid, String permaLink,
 			Set<CisParticipant> membersCss, String password,
 			Set<IServiceSharingRecord> sharedServices, String cisType, String cisName) {

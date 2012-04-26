@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+    xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/jdbc 
+		http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+		http://www.springframework.org/schema/osgi-compendium 
+		http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx.xsd" >
+
+    <bean
+        id="TestCase713"
+        class="org.societies.integration.test.bit.installservice.TestCase713"
+        init-method="run">
+        <property name="serviceControl" ref ="serviceControl" />
+        <property name="serviceDiscovery" ref ="serviceDiscovery" />
+    </bean>
+    
+    <bean
+        id="NominalTestCaseLowerTester"
+        class="org.societies.integration.test.bit.installservice.NominalTestCaseLowerTester">
+        <!--property name="calculatorService" ref ="calculatorService" /-->
+    </bean>
+    
+    <!--bean
+        id="SpecificTestCaseUpperTester"
+        class="org.societies.integration.test.bit.installservice.SpecificTestCaseUpperTester">
+        <property name="calculatorService" ref ="calculatorService" />
+    </bean-->
+
+</beans>

@@ -24,14 +24,19 @@
  */
 package org.societies.privacytrust.trust.impl.repo;
 
+import java.util.List;
+
+import org.hibernate.FetchMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
-import org.societies.privacytrust.trust.api.model.TrustedEntityId;
-import org.societies.privacytrust.trust.api.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.societies.privacytrust.trust.api.repo.TrustRepositoryException;
 import org.societies.privacytrust.trust.impl.repo.model.TrustedCis;
@@ -68,14 +73,21 @@ public class TrustRepository implements ITrustRepository {
 	public boolean addEntity(ITrustedEntity entity)
 			throws TrustRepositoryException {
 		
+		if (entity == null)
+			throw new NullPointerException("entity can't be null");
+		
 		boolean result = false;
 
 		final Session session = sessionFactory.openSession();
 		final Transaction transaction = session.beginTransaction();
 		try {
+			if (LOG.isDebugEnabled())
+				LOG.debug("Adding trusted entity " + entity + " to the Trust Repository...");
 			session.save(entity);
 			transaction.commit();
 			result = true;
+		} catch (ConstraintViolationException cve) {
+			result = false;
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for entity " + entity);
 			transaction.rollback();
@@ -94,17 +106,25 @@ public class TrustRepository implements ITrustRepository {
 	public ITrustedEntity retrieveEntity(TrustedEntityId teid)
 			throws TrustRepositoryException {
 		
-		ITrustedEntity result = null;
+		Class<? extends TrustedEntity> entityClass = TrustedEntity.class;
+		if (TrustedEntityType.CSS.equals(teid.getEntityType()))
+			entityClass = TrustedCss.class;
+		else if (TrustedEntityType.CIS.equals(teid.getEntityType()))
+			entityClass = TrustedCis.class;
+		else if (TrustedEntityType.SVC.equals(teid.getEntityType()))
+			entityClass = TrustedService.class;
+		// TODO TrustedEntityType.LGC
 		
 		final Session session = sessionFactory.openSession();
-		if (TrustedEntityType.CSS.equals(teid.getEntityType()))
-			result = (ITrustedEntity) session.get(TrustedCss.class, null);
-		else if (TrustedEntityType.CIS.equals(teid.getEntityType()))
-			result = (ITrustedEntity) session.get(TrustedCis.class, null);
-		else if (TrustedEntityType.SVC.equals(teid.getEntityType()))
-			result = (ITrustedEntity) session.get(TrustedService.class, null);
+		@SuppressWarnings("unchecked")
+		List<ITrustedEntity> results = session.createCriteria(entityClass)
+			.add(Restrictions.eq("teid", teid))
+			.setFetchMode("directTrust", FetchMode.JOIN)
+			.list();
+		if (session != null)
+			session.close();
 			
-		return result;
+		return (results.isEmpty()) ? null : results.get(0);
 	}
 
 	/* (non-Javadoc)
@@ -113,8 +133,23 @@ public class TrustRepository implements ITrustRepository {
 	@Override
 	public ITrustedEntity updateEntity(ITrustedEntity entity)
 			throws TrustRepositoryException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		ITrustedEntity result = null;
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
+		try {
+			result = (ITrustedEntity) session.merge(entity);
+			transaction.commit();
+		} catch (Exception e) {
+			LOG.warn("Rolling back transaction for entity " + entity);
+			transaction.rollback();
+			throw new TrustRepositoryException("Could not add entity " + entity, e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+		
+		return result;
 	}
 
 	/* (non-Javadoc)

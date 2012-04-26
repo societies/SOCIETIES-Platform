@@ -38,6 +38,7 @@
 			<list>
 				<value>org.societies.privacytrust.trust.impl.repo.model.TrustedCss</value>
 				<value>org.societies.privacytrust.trust.impl.repo.model.TrustedCis</value>
+				<value>org.societies.privacytrust.trust.impl.repo.model.DirectTrust</value>
 			</list>
 		</property>
 
@@ -52,7 +53,7 @@
 				<prop key="hibernate.show_ddl">true</prop>
 				<prop key="hibernate.show_sql">true</prop>
 				<prop key="hibernate.cache.use_second_level_cache">false</prop>
-				<prop key="hibernate.hbm2ddl.auto">create</prop>
+				<prop key="hibernate.hbm2ddl.auto">create-drop</prop>
 				<prop key="hibernate.format_sql">true</prop>
 			</props>
 		</property>
@@ -72,8 +73,8 @@
 		<property name="url" value="${jdbc.url}" />
 		<property name="username" value="${jdbc.username}" />
 		<property name="password" value="${jdbc.password}" />
-		<property name="initialSize" value="2" />
-		<property name="maxActive" value="5" />
+		<property name="initialSize" value="10" />
+		<property name="maxActive" value="100" />
 	</bean>
 	
 	<bean id="eventMgr" class="org.societies.privacytrust.trust.test.util.MockitoFactoryBean">

@@ -137,7 +137,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 		String host = this.CSSendpoint.getIdManager().getThisNetworkNode().getDomain();
 		String password = "password.thomas.local";
 
-		return this.createCis(creatorCssId, cisId, host, password);
+		return null;//this.createCis(creatorCssId, cisId, host, password);
 	}
 	
 	
@@ -188,8 +188,9 @@ public class CisManager implements ICisManager, IFeatureServer{
 		
 	}
 
-	
-	public boolean subscribeToCis(ICisRecord i) {
+	// internal method used to register that the user has subscribed into a CIS
+	// it is triggered by the subscription notification on XMPP
+	private boolean subscribeToCis(ICisRecord i) {
 
 		this.subscribedCISs.add(new CisRecord(i.getCisId()));
 		return true;
@@ -210,7 +211,9 @@ public class CisManager implements ICisManager, IFeatureServer{
 	 * 
 	 */
 	
-	private CisRecord createCis(String creatorCssId, String cisId, String host, String password) {
+	/*not being used anylonger
+	 * 
+	 * private CisRecord createCis(String creatorCssId, String cisId, String host, String password) {
 		//TODO: check if 
 		// cIs already exist in the database or if this is a new CIS
 		CisEditor cis = new  CisEditor(creatorCssId,
@@ -219,7 +222,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 			return cis.getCisRecord();
 		else
 			return null;
-	}
+	}*/
 
 
 

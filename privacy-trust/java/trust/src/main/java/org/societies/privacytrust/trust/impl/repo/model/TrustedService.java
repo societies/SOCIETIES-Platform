@@ -27,10 +27,10 @@ package org.societies.privacytrust.trust.impl.repo.model;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedDeveloper;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
-import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 
 /**
  * This class represents trusted services. A TrustedService object is referenced

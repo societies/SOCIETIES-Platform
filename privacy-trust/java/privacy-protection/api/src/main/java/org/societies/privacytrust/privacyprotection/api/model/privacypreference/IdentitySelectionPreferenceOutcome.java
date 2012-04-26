@@ -26,8 +26,7 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 
 
 import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Subject;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.identity.Requestor;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
 
@@ -41,9 +40,8 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 public class IdentitySelectionPreferenceOutcome implements IPrivacyOutcome{
 
 	private int confidenceLevel;
-	private IIdentity dpi;
-	private ServiceResourceIdentifier serviceID;
-	private Subject requestor;
+	private IIdentity userIdentity;
+	private Requestor requestor;
 	/* (non-Javadoc)
 	 * @see org.personalsmartspace.spm.preference.api.platform.IPrivacyOutcome#getOutcomeType()
 	 */
@@ -63,28 +61,23 @@ public class IdentitySelectionPreferenceOutcome implements IPrivacyOutcome{
 		this.confidenceLevel = c;
 	}
 	
-	public void setIdentity(IIdentity dpi){
-		this.dpi = dpi;
+	public void setIdentity(IIdentity userId){
+		this.userIdentity = userId;
 	}
 	
 	public IIdentity getIdentity(){
-		return this.dpi;
+		return this.userIdentity;
 	}
-	public void setServiceID(ServiceResourceIdentifier serviceID) {
-		this.serviceID = serviceID;
-	}
-	public ServiceResourceIdentifier getServiceID() {
-		return serviceID;
-	}
-	public void setRequestor(Subject requestor) {
+	
+	public void setRequestor(Requestor requestor) {
 		this.requestor = requestor;
 	}
-	public Subject getRequestor() {
+	public Requestor getRequestor() {
 		return requestor;
 	}
 	
 	public String toString(){
-		return "Select: "+this.dpi.toString();
+		return "Select: "+this.userIdentity.toString();
 	}
 	
 }
