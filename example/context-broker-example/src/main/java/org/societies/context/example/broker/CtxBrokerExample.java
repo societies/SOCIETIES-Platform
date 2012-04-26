@@ -27,6 +27,7 @@ package org.societies.context.example.broker;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -40,6 +41,7 @@ import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
@@ -239,6 +241,7 @@ public class CtxBrokerExample 	{
 	private void simpleCtxHistoryTest() {
 
 		CtxAttribute ctxAttribute;
+		
 		final CtxEntity ctxEntity;
 		// Create the attribute's scope
 
@@ -263,7 +266,29 @@ public class CtxBrokerExample 	{
 			for(CtxHistoryAttribute hocAttr: history){
 				System.out.println("history List id:"+hocAttr.getId()+" getLastMod:"+hocAttr.getLastModified() +" hocAttr value:"+hocAttr.getIntegerValue());		
 			}
-
+			
+			//test createHistory methods
+			CtxAttribute fakeAttribute = internalCtxBroker.createAttribute(ctxEntity.getId(), "historyAttribute").get();
+			List<CtxHistoryAttribute> historyList = new ArrayList<CtxHistoryAttribute>();
+			
+			Date date = new Date();
+			date.setTime(1000);
+			CtxHistoryAttribute hocAttr1 = internalCtxBroker.createHistoryAttribute(fakeAttribute.getId(), date, "one", CtxAttributeValueType.STRING).get();
+			date.setTime(2000);
+			CtxHistoryAttribute hocAttr2 = internalCtxBroker.createHistoryAttribute(fakeAttribute.getId(), date, "two", CtxAttributeValueType.STRING).get();
+			date.setTime(3000);
+			CtxHistoryAttribute hocAttr3 = internalCtxBroker.createHistoryAttribute(fakeAttribute.getId(), date, "three", CtxAttributeValueType.STRING).get();
+			historyList.add(hocAttr1);
+			historyList.add(hocAttr2);
+			historyList.add(hocAttr3);
+			
+			List<CtxHistoryAttribute> historyListRetrieved = internalCtxBroker.retrieveHistory(fakeAttribute.getId(), null, null).get();
+			if(historyListRetrieved.equals(historyListRetrieved)) System.out.println("Succesfull Retrieval of created hoc Attributes");
+			
+			for (CtxHistoryAttribute ctxHistAttr : historyListRetrieved){
+				System.out.println("Hoc attribute value:" +ctxHistAttr.getStringValue()+" time:"+ctxHistAttr.getLastModified().getTime());
+			}
+			
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
