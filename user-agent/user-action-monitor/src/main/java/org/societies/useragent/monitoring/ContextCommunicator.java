@@ -57,7 +57,7 @@ public class ContextCommunicator {
 
 	public void updateHistory(IIdentity owner, IAction action){
 		//check cache first for ctxAttrIdentifier to update
-		String key = action.getServiceID()+"|"+action.getparameterName();
+		String key = action.getServiceID()+action.getparameterName();
 		if(mappings.containsKey(key)){  //already has service attribute
 			//update attribute
 			CtxAttributeIdentifier attrID = mappings.get(key);
