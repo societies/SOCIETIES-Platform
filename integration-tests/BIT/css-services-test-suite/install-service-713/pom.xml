@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.integration.test.bit</groupId>
-	<artifactId>installservice</artifactId>
+	<artifactId>bit-713-installservice</artifactId>
 	<name>#713 Install a 3P service</name>
 	<packaging>bundle</packaging>
 	<version>0.0.1-SNAPSHOT</version>
@@ -54,17 +54,11 @@
 			<version>1.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
+		<!--dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>XCCommunicationMgr</artifactId>
 			<version>0.1-SNAPSHOT</version>
 			<scope>provided</scope>
-		</dependency>
-		<!--dependency>
-			<groupId>org.societies.example</groupId>
-			<artifactId>internalAPI</artifactId>
-			<version>0.1</version>
-			<scope>provided</scope>			
 		</dependency-->
 		<dependency>
 			<groupId>org.springframework</groupId>
