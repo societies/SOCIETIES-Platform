@@ -28,17 +28,12 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.privacytrust.trust.TrustException;
-import org.societies.api.internal.privacytrust.trust.TrustUpdateListener;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventListener;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
-import org.societies.privacytrust.trust.api.model.MalformedTrustedEntityIdException;
-import org.societies.privacytrust.trust.api.model.TrustedEntity;
-import org.societies.privacytrust.trust.api.model.TrustedEntityId;
-import org.societies.privacytrust.trust.api.model.TrustedEntityType;
+import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -68,50 +63,27 @@ public class TrustBroker implements ITrustBroker {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrust(java.lang.Object)
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrust(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Async
 	@Override
-	public Future<Double> retrieveTrust(Object entityId) throws TrustException {
+	public Future<Double> retrieveTrust(final TrustedEntityId teid) throws TrustException {
 		
-		if (entityId == null)
-			throw new NullPointerException("entityId can't be null");
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
 		
-		final Double trustValue;
-		
-		final String entityIdStr = entityId.toString();
-		final TrustedEntityType entityType;
-		if (entityId instanceof IIdentity) {
-			IIdentity id = (IIdentity) entityId;
-			if (IdentityType.CSS.equals(id.getType()))
-				entityType = TrustedEntityType.CSS;
-			else if (IdentityType.CIS.equals(id.getType()))	
-				entityType = TrustedEntityType.CIS;
-			else
-				entityType = TrustedEntityType.LGC;
-		} else if (entityId instanceof ServiceResourceIdentifier) {
-			entityType = TrustedEntityType.SVC;
-		} else {
-			entityType = TrustedEntityType.LGC;
-		}
-		
-		final TrustedEntityId teid;
-		try {
-			teid = new TrustedEntityId(entityType, entityIdStr);
-		} catch (MalformedTrustedEntityIdException mteide) {	
-			throw new TrustBrokerException("Could not create TrustedEntityId for entity '"
-					+ entityId + "'", mteide);
-		}
-		
-		if (this.trustRepo == null)
-			throw new TrustBrokerException("Could not retrieve trust value for entity '"
-					+ teid + "': ITrustRepositoryService is not available");
 		if (LOG.isDebugEnabled())
 			LOG.debug("Retrieving trust value for entity '"
 					+ teid + "' from Trust Repository");
-		final TrustedEntity entity = this.trustRepo.retrieveEntity(teid);
+		/* TODO final */ Double trustValue = null;
+		
+		if (this.trustRepo == null)
+			throw new TrustBrokerException("Could not retrieve trust value for entity '"
+					+ teid + "': ITrustRepository service is not available");
+		
+		final ITrustedEntity entity = this.trustRepo.retrieveEntity(teid);
 		if (entity != null)
-			trustValue = entity.getUserPerceivedTrust().getValue();
+			;// TODO trustValue = entity.getUserPerceivedTrust().getValue();
 		else
 			trustValue = null;
 			
@@ -119,28 +91,36 @@ public class TrustBroker implements ITrustBroker {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateEventListener(org.societies.api.internal.privacytrust.trust.TrustUpdateListener, java.lang.Object)
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateEventListener(org.societies.api.internal.privacytrust.trust.TrustUpdateListener, org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public void registerTrustUpdateEventListener(TrustUpdateListener listener,
-			Object entityId) throws TrustException {
+	public void registerTrustUpdateEventListener(final ITrustUpdateEventListener listener,
+			final TrustedEntityId teid) throws TrustException {
 		// TODO Auto-generated method stub
 		if (listener == null)
 			throw new NullPointerException("listener can't be null");
-		if (entityId == null)
-			throw new NullPointerException("entityId can't be null");
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
+		
+		if (this.trustEventMgr == null)
+			throw new TrustBrokerException("Could not register trust update listener for entity '"
+					+ teid + "': ITrustEventMgr service is not available");
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateEventListener(org.societies.api.internal.privacytrust.trust.TrustUpdateListener, java.lang.Object)
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateEventListener(org.societies.api.internal.privacytrust.trust.TrustUpdateListener, org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public void unregisterTrustUpdateEventListener(TrustUpdateListener listener,
-			Object entityId) throws TrustException {
+	public void unregisterTrustUpdateEventListener(final ITrustUpdateEventListener listener,
+			final TrustedEntityId teid) throws TrustException {
 		// TODO Auto-generated method stub
 		if (listener == null)
 			throw new NullPointerException("listener can't be null");
-		if (entityId == null)
-			throw new NullPointerException("entityId can't be null");
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
+		
+		if (this.trustEventMgr == null)
+			throw new TrustBrokerException("Could not unregister trust update listener for entity '"
+					+ teid + "': ITrustEventMgr service is not available");
 	}
 }

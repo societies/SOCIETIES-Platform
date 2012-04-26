@@ -28,10 +28,10 @@
    <property name="personalisationCallback" ref="IPersonalisationCallback"></property>
    <property name="linkedCssManager" ref="IIdentityManager"></property>
    <property name="deviceManager" ref="IDeviceManager"></property>
-   <property name="suggestedCommunityAnalyser" ref="ISuggestedCommunityAnalyser"></property>
+   <!-- <property name="suggestedCommunityAnalyser" ref="ISuggestedCommunityAnalyser"></property>
    <property name="suggestedCommunityAnalyserBean" ref="SuggestedCommunityAnalyserBean"></property>
    <property name="suggestedCommunityAnalyserResultBean" ref="SuggestedCommunityAnalyserResultBean"></property>
-   <property name="suggestedCommunityAnalyserMethodType" ref="SuggestedCommunityAnalyserMethodType"></property>
+   <property name="suggestedCommunityAnalyserMethodType" ref="SuggestedCommunityAnalyserMethodType"></property> -->
    </bean>
    
    <bean id="CommunityRecommender" class="org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityRecommender" 

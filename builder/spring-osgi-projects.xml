@@ -119,7 +119,7 @@
 		<module>../user-agent</module>
 
 		<!-- Personalisation -->
-		<!-- <module>../personalisation</module> TEMPORARILY REMOVED until refactoring of ServiceResourceIdentifier finishes -->
+		<module>../personalisation</module> 
 		
 		<!-- Intelligent Community Orchestration -->
 		<module>../intelligent-community-orchestration/API</module>

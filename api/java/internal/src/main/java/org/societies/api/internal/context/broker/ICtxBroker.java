@@ -276,6 +276,18 @@ public interface ICtxBroker {
 	public Future<CtxModelObject> retrieve(CtxIdentifier identifier) throws CtxException;
 	
 	/**
+	 * Retrieves the {@link IndividualCtxEntity} which represents the operator
+	 * of the CSS. IndividualCtxEntities are most commonly of type "person";
+	 * however they can also be organisations, smart space infrastructures, 
+	 * autonomous or semi-autonomous agents, etc.
+	 * 
+	 * @throws CtxException 
+	 *             if the IndividualCtxEntity representing the operator of the
+	 *             CSS cannot be retrieved
+	 */
+	public Future<IndividualCtxEntity> retrieveCssOperator() throws CtxException;
+	
+	/**
 	 * Updates a single context model object.
 	 * 
 	 * @param identifier
@@ -531,7 +543,17 @@ public interface ICtxBroker {
 	 */
 	public Future<Integer> removeHistory(String type, Date startDate, Date endDate) throws CtxException;
 
-	
+	/**
+	 * Creates a context history attribute without 
+	 * 
+	 * @param attID
+	 * @param date
+	 * @param value
+	 * @param valueType
+	 * @throws CtxException 
+	 */
+	public Future<CtxHistoryAttribute> createHistoryAttribute(CtxAttributeIdentifier attID, Date date, Serializable value, CtxAttributeValueType valueType);
+		
 	/**
 	 * Enables context recording to Context History Database
 	 * @throws CtxException 

@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
@@ -90,8 +91,26 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	 */
 	@Override
 	public CtxAssociation createAssociation(String type) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+
+		final CtxAssociationIdentifier identifier = new CtxAssociationIdentifier(this.privateIdtoString, 
+				type, CtxModelObjectNumberGenerator.getNextValue());
+		final CtxAssociation association = new  CtxAssociation(identifier);
+		this.modelObjects.put(association.getId(), association);		
+
+		if (this.ctxEventMgr != null) {
+			this.ctxEventMgr.post(new CtxChangeEvent(association.getId()), 
+					new String[] { CtxChangeEventTopic.CREATED }, CtxEventScope.LOCAL);
+		} else {
+			LOG.warn("Could not send context change event to topics '" 
+					+ CtxChangeEventTopic.CREATED 
+					+ "' with scope '" + CtxEventScope.LOCAL + "': "
+					+ "ICtxEventMgr service is not available");
+		}
+		
+		return association;
 	}
 	
 	/*

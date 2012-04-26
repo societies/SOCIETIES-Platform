@@ -59,7 +59,9 @@ public class PreferenceDetails implements Serializable {
 	 * @param preferenceName
 	 */
 	public PreferenceDetails(String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
-
+		this.serviceID = serviceID;
+		this.serviceType = serviceType;
+		this.preferenceName = preferenceName;
 	}
 
 	/**
@@ -68,7 +70,8 @@ public class PreferenceDetails implements Serializable {
 	 * @param preferenceName
 	 */
 	public PreferenceDetails(String serviceType, String preferenceName){
-
+		this.serviceType = serviceType;
+		this.preferenceName = preferenceName;
 	}
 
 	/**
@@ -76,7 +79,7 @@ public class PreferenceDetails implements Serializable {
 	 * @param preferenceName
 	 */
 	public PreferenceDetails(String preferenceName){
-
+		this.preferenceName = preferenceName;
 	}
 
 	/**
@@ -84,7 +87,7 @@ public class PreferenceDetails implements Serializable {
 	 * @param prefName
 	 */
 	private boolean comparePreferenceName(String prefName){
-		return false;
+		return this.preferenceName.equalsIgnoreCase(prefName);
 	}
 
 	/**
@@ -92,7 +95,7 @@ public class PreferenceDetails implements Serializable {
 	 * @param sID
 	 */
 	private boolean compareServiceID(ServiceResourceIdentifier sID){
-		return false;
+		return this.serviceID.toString().equalsIgnoreCase(sID.toString());
 	}
 
 	/**
@@ -100,7 +103,7 @@ public class PreferenceDetails implements Serializable {
 	 * @param sType
 	 */
 	private boolean compareServiceType(String sType){
-		return false;
+		return this.serviceType.equalsIgnoreCase(sType);
 	}
 
 	/**
@@ -109,6 +112,15 @@ public class PreferenceDetails implements Serializable {
 	 */
 	@Override
 	public boolean equals(Object details){
+		if (details instanceof PreferenceDetails){
+			if (compareServiceType(((PreferenceDetails) details).getServiceType())){
+				if (compareServiceID(((PreferenceDetails) details).getServiceID())){
+					if (comparePreferenceName(((PreferenceDetails) details).getPreferenceName())){
+						return true;
+					}
+				}
+			}
+		}
 		return false;
 	}
 
@@ -117,6 +129,15 @@ public class PreferenceDetails implements Serializable {
 	 * @param details
 	 */
 	public boolean equalsServiceOnlyDetails(PreferenceDetails details){
+		
+			if (compareServiceType(((PreferenceDetails) details).getServiceType())){
+				if (compareServiceID(((PreferenceDetails) details).getServiceID())){
+					
+						return true;
+					
+				}
+			}
+		
 		return false;
 	}
 
@@ -126,19 +147,27 @@ public class PreferenceDetails implements Serializable {
 	 * @param serviceID
 	 */
 	public boolean equalsServiceOnlyDetails(String serviceType, ServiceResourceIdentifier serviceID){
-		return false;
+		if (compareServiceType(serviceType)){
+			if (compareServiceID(serviceID)){
+				
+					return true;
+				
+			}
+		}
+	
+	return false;
 	}
 
 	public String getPreferenceName(){
-		return "";
+		return this.preferenceName;
 	}
 
 	public ServiceResourceIdentifier getServiceID(){
-		return null;
+		return this.serviceID;
 	}
 
 	public String getServiceType(){
-		return "";
+		return this.serviceType;
 	}
 
 	/**
@@ -146,7 +175,7 @@ public class PreferenceDetails implements Serializable {
 	 * @param preferenceName
 	 */
 	public void setPreferenceName(String preferenceName){
-
+		this.preferenceName = preferenceName;
 	}
 
 	/**
@@ -154,7 +183,7 @@ public class PreferenceDetails implements Serializable {
 	 * @param serviceID
 	 */
 	public void setServiceID(ServiceResourceIdentifier serviceID){
-
+		this.serviceID = serviceID;
 	}
 
 	/**
@@ -162,11 +191,13 @@ public class PreferenceDetails implements Serializable {
 	 * @param serviceType
 	 */
 	public void setServiceType(String serviceType){
-
+		this.serviceType = serviceType;
 	}
 
 	public String toString(){
-		return "";
+		return "ServiceType: "+this.serviceType+"\n"
+				+ "ServiceID: "+this.serviceID.toString()+"\n"
+				+ "PreferenceName: "+this.preferenceName+"\n";
 	}
 
 }

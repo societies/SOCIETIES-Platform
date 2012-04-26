@@ -34,39 +34,49 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 
 public class UserActionMonitor implements IUserActionMonitor, IInternalUserActionMonitor{
-	
+
+	private boolean cloud;
 	private ICtxBroker ctxBroker;
+	private ContextCommunicator ctxComm;
 
 	@Override
 	public void monitor(IIdentity owner, IAction action) {
 		System.out.println("Received user action!");
+
+		//save action in context - IIdentity > ServiceId > paramName
+		//create new entities and attributes if necessary
+		ctxComm.updateHistory(owner, action);
+
+		//update interactionDevice if NOT on cloud node
+		if(!cloud){
+			ctxComm.updateUID(owner);
+		}
 	}
-	
+
 	@Override
 	public void registerForActionUpdates(IUserActionListener listener) {
 		// TODO Auto-generated method stub	
 	}
-	
-	
-	
+
+
+
 	public void initialiseUserActionMonitor(){
 		System.out.println("Initialising user action monitor!");
-		if(this.ctxBroker == null){
-			System.out.println("ctxBroker is null :(");
-		}else{
-			System.out.println("ctxBroker is not null :)");
-		}
+		ctxComm = new ContextCommunicator(ctxBroker);
+
+		//Set cloud flag - get device type from Identity Manager (speak to Alec)
+		
 	}
 
 	public void setCtxBroker(ICtxBroker broker){
 		this.ctxBroker = broker;
 	}
 
-	
+
 	@Deprecated
 	public void monitor(ServiceResourceIdentifier arg0, IIdentity arg1,
 			String arg2) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

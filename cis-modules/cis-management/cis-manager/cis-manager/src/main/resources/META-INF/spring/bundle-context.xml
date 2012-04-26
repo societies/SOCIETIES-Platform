@@ -7,14 +7,16 @@
     http://www.springframework.org/schema/beans 
     http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
     http://www.springframework.org/schema/context 
-    http://www.springframework.org/schema/context/spring-context-2.5.xsd">
-    
+    http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+    xmlns:tx="http://www.springframework.org/schema/tx">
+  
+
   <!-- regular spring configuration file defining the beans for this
        bundle. We've kept the osgi definitions in a separate 
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-  <bean id="CISManager" class="org.societies.cis.manager.CisManager" />
+  <bean id="CisManagementBundle" class="org.societies.cis.manager.CisManager" />
   
   <context:component-scan base-package="org.societies.cis.manager"></context:component-scan>
 

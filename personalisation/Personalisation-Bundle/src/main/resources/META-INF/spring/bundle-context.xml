@@ -16,6 +16,7 @@
 		<property name="persoMgr" ref="persoMgr"></property>
 		<property name="ctxBroker" ref="ctxBroker"></property>
 		<property name="eventMgr" ref="eventMgmtRef"></property>
+		<property name="userPrefLearning" ref="userPrefLearning"></property>
 	</bean>
 
 	<bean id="cauiTaskManager"
@@ -61,7 +62,7 @@
 
 	<bean id="persoMgr"
 		class="org.societies.personalisation.management.impl.PersonalisationManager"
-		name="persoMgr" depends-on="ctxBroker" lazy-init="true"
+		name="persoMgr" lazy-init="true"
 		init-method="initialisePersonalisationManager">
 		<property name="pcm" ref="pcm"></property>
 		<property name="dianne" ref="dianne"></property>
@@ -69,6 +70,8 @@
 		<property name="idm" ref="idm"></property>
 		<property name="decisionMaker" ref="decisionMaker"></property>
 		<property name="eventMgr" ref="eventMgmtRef"></property>
+		<property name="cristPrediction" ref="cristPrediction"></property>
+		<property name="cauiPrediction" ref="cauiPrediction"></property>
 	</bean>
 
 	<bean id="dianne" class="org.societies.personalisation.dianne.DIANNE"

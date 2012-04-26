@@ -43,6 +43,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
@@ -62,39 +63,51 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
 public interface ICtxBroker {
 
 	/**
-	 * Creates a CtxAssociation
+	 * Creates a {@link CtxEntity} with the specified type on the identified CSS.
 	 * 
-	 * @param requester
+	 * @param requestor
+	 *            the entity requesting to create the context entity.
+	 * @param targetCss
+	 *            the {@link IIdentity} of the CSS where the context
+	 *            association will be created
 	 * @param type
+	 *            the type of the context entity to create
 	 * @throws CtxException 
 	 */
-	public Future<CtxAssociation> createAssociation(IIdentity requester, String type) throws CtxException;
-
+	public Future<CtxEntity> createEntity(final Requestor requestor, 
+			final IIdentity targetCss, final String type) throws CtxException;
+	
 	/**
-	 * Creates a {@link CtxAttribute} of the specified type which is associated to
+	 * Creates a {@link CtxAttribute} with the specified type which is associated to
 	 * the identified context entity (scope).
 	 * 
-	 * @param requester
-	 *            the identifier of the requester
+	 * @param requestor
+	 *            the entity requesting to create the context attribute
 	 * @param scope
 	 *            the identifier of the context entity to associate with the new
 	 *            attribute
 	 * @param type
 	 *            the type of the context attribute to create
 	 * @throws CtxException 
-	 * @since 0.0.1
 	 */
-	public Future<CtxAttribute> createAttribute(IIdentity requester, CtxEntityIdentifier scope, String type) throws CtxException;
+	public Future<CtxAttribute> createAttribute(final Requestor requestor, final CtxEntityIdentifier scope, final String type) throws CtxException;
 
 	/**
-	 * Creates a CtxEntity
+	 * Creates a {@link CtxAssociation} with the specified type on the identified
+	 * CSS.
 	 * 
-	 * @param requester
+	 * @param requestor
+	 *            the entity requesting to create the context association
+	 * @param targetCss
+	 *            the {@link IIdentity} of the CSS where the context
+	 *            association will be created
 	 * @param type
+	 *            the type of the context association to create
 	 * @throws CtxException 
 	 */
-	public Future<CtxEntity> createEntity(IIdentity requester, String type) throws CtxException;
-
+	public Future<CtxAssociation> createAssociation(final Requestor requestor, 
+			final IIdentity targetCss, final String type) throws CtxException;
+	
 	/**
 	 * There are several methods missing that would express the similarity of context
 	 * values or objects in a quantifiable form (and not via a sorted list of
@@ -104,38 +117,48 @@ public interface ICtxBroker {
 	 * @param referenceObjects
 	 * @throws CtxException 
 	 */
-	public Future<List<Object>> evaluateSimilarity(Serializable objectUnderComparison, List<Serializable> referenceObjects) throws CtxException;
+	public Future<List<Object>> evaluateSimilarity(final Serializable objectUnderComparison, final List<Serializable> referenceObjects) throws CtxException;
 
 	/**
 	 * Looks up for a list of CtxModelObjects defined by the CtxModelType (CtxEntity,
 	 * CtxAttribute, CtxAssociation) of  the specified type.
 	 * 
-	 * @param requester
+	 * @param requestor
+	 * @param targetCss
+	 *            the {@link IIdentity} of the CSS where to perform the look-up 
 	 * @param modelType
 	 * @param type
 	 * @throws CtxException 
 	 */
-	public Future<List<CtxIdentifier>> lookup(IIdentity requester, CtxModelType modelType, String type) throws CtxException;
+	public Future<List<CtxIdentifier>> lookup(final Requestor requestor,
+			final IIdentity targetCss, final CtxModelType modelType,
+			final String type) throws CtxException;
 
 	/**
 	 * Looks up for a list of CtxEntities of  the specified type, containing the
 	 * specified attributes
 	 * 
-	 * @param requester
+	 * @param requestor
+	 * @param targetCss
+	 *            the {@link IIdentity} of the CSS where to perform the look-up
 	 * @param entityType
 	 * @param attribType
 	 * @param minAttribValue
 	 * @param maxAttribValue
 	 * @throws CtxException 
 	 */
-	public Future<List<CtxEntityIdentifier>> lookupEntities(IIdentity requester, String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue) throws CtxException;
+	public Future<List<CtxEntityIdentifier>> lookupEntities(
+			final Requestor requestor, final IIdentity targetCss,
+			final String entityType, final String attribType,
+			final Serializable minAttribValue,
+			final Serializable maxAttribValue) throws CtxException;
 	
 	/**
 	 * Registers the specified {@link CtxChangeEventListener} for changes
 	 * related to the context model object referenced by the specified identifier.
 	 * 
-	 * @param requester
-	 *            the IIdentity of the requester
+	 * @param requestor
+	 *            the entity requesting to register for context changes
 	 * @param listener
 	 *            the listener to register for context changes 
 	 * @param ctxId
@@ -145,15 +168,16 @@ public interface ICtxBroker {
 	 * @throws NullPointerException if any of the specified parameters is <code>null</code>
 	 * @since 0.0.3
 	 */
-	public void registerForChanges(final IIdentity requester, final CtxChangeEventListener listener, 
-			final CtxIdentifier ctxId) throws CtxException;
+	public void registerForChanges(final Requestor requestor, 
+			final CtxChangeEventListener listener, final CtxIdentifier ctxId)
+					throws CtxException;
 	
 	/**
 	 * Unregisters the specified {@link CtxChangeEventListener} from changes
 	 * related to the context model object referenced by the specified identifier.
 	 * 
-	 * @param requester
-	 *            the IIdentity of the requester
+	 * @param requestor
+	 *            the entity requesting to unregister from context changes
 	 * @param listener
 	 *            the listener to unregister from context changes 
 	 * @param ctxId
@@ -163,15 +187,16 @@ public interface ICtxBroker {
 	 * @throws NullPointerException if any of the specified parameters is <code>null</code>
 	 * @since 0.0.3
 	 */
-	public void unregisterFromChanges(final IIdentity requester, final CtxChangeEventListener listener, 
-			final CtxIdentifier ctxId) throws CtxException;
+	public void unregisterFromChanges(final Requestor requestor,
+			final CtxChangeEventListener listener, final CtxIdentifier ctxId)
+					throws CtxException;
 
 	/**
 	 * Registers the specified {@link CtxChangeEventListener} for changes
 	 * related to the context attribute(s) with the supplied scope and type.
 	 * 
-	 * @param requester
-	 *            the IIdentity of the requester
+	 * @param requestor
+	 *            the entity requesting to register for context changes
 	 * @param listener
 	 *            the listener to register for context changes
 	 * @param scope
@@ -184,15 +209,16 @@ public interface ICtxBroker {
 	 * @throws NullPointerException if any of the specified parameters is <code>null</code>
 	 * @since 0.0.3
 	 */
-	public void registerForChanges(final IIdentity requester, final CtxChangeEventListener listener,
-			final CtxEntityIdentifier scope, String attrType) throws CtxException;
+	public void registerForChanges(final Requestor requestor, 
+			final CtxChangeEventListener listener, final CtxEntityIdentifier scope,
+			final String attrType) throws CtxException;
 	
 	/**
 	 * Unregisters the specified {@link CtxChangeEventListener} from changes
 	 * related to the context attribute(s) with the supplied scope and type.
 	 * 
-	 * @param requester
-	 *            the IIdentity of the requester
+	 * @param requestor
+	 *            the entity requesting to unregister from context changes
 	 * @param listener
 	 *            the listener to unregister from context changes
 	 * @param scope
@@ -205,125 +231,140 @@ public interface ICtxBroker {
 	 * @throws NullPointerException if any of the specified parameters is <code>null</code>
 	 * @since 0.0.3
 	 */
-	public void unregisterFromChanges(final IIdentity requester, final CtxChangeEventListener listener,
-			final CtxEntityIdentifier scope, String attrType) throws CtxException;
+	public void unregisterFromChanges(final Requestor requestor, 
+			final CtxChangeEventListener listener, final CtxEntityIdentifier scope,
+			final String attrType) throws CtxException;
 
 	/**
 	 * Removes the specified context model object.
 	 * 
-	 * @param requester
+	 * @param requestor
 	 * @param identifier
 	 * @throws CtxException 
 	 */
-	public Future<CtxModelObject> remove(IIdentity requester, CtxIdentifier identifier) throws CtxException;
+	public Future<CtxModelObject> remove(final Requestor requestor, 
+			final CtxIdentifier identifier) throws CtxException;
 
 	/**
 	 * Retrieves the specified context model object.
 	 * 
-	 * @param requester
+	 * @param requestor
 	 * @param identifier
 	 * @throws CtxException 
 	 */
-	public Future<CtxModelObject> retrieve(IIdentity requester, CtxIdentifier identifier) throws CtxException;
+	public Future<CtxModelObject> retrieve(final Requestor requestor, 
+			final CtxIdentifier identifier) throws CtxException;
 
 	/**
 	 * Predicts a future context attribute for the specified time.
 	 * 
-	 * @param requester
+	 * @param requestor
 	 * @param attrId
 	 * @param date
 	 * @throws CtxException 
 	 */
-	public Future<List<CtxAttribute>> retrieveFuture(IIdentity requester, CtxAttributeIdentifier attrId, Date date) throws CtxException;
+	public Future<List<CtxAttribute>> retrieveFuture(final Requestor requestor, 
+			final CtxAttributeIdentifier attrId, final Date date) throws CtxException;
 
 	/**
 	 * Predicts the identified by the modification index  future context attribute.
 	 * 
-	 * @param requester
+	 * @param requestor
 	 * @param attrId
 	 * @param modificationIndex
 	 * @throws CtxException 
 	 */
-	public Future<List<CtxAttribute>> retrieveFuture(IIdentity requester, CtxAttributeIdentifier attrId, int modificationIndex) throws CtxException;
+	public Future<List<CtxAttribute>> retrieveFuture(final Requestor requestor,
+			final CtxAttributeIdentifier attrId, final int modificationIndex) 
+					throws CtxException;
 
 	/**
 	 * Retrieves context attributes stored in the Context History Log based on the
 	 * specified modificationIndex.
 	 * 
-	 * @param requester
+	 * @param requestor
 	 * @param attrId
 	 * @param modificationIndex
 	 * @throws CtxException 
 	 */
-	public Future<List<CtxHistoryAttribute>> retrieveHistory(IIdentity requester, CtxAttributeIdentifier attrId, int modificationIndex) throws CtxException;
+	public Future<List<CtxHistoryAttribute>> retrieveHistory(final Requestor requestor,
+			final CtxAttributeIdentifier attrId, final int modificationIndex)
+					throws CtxException;
 
 	/**
 	 * Retrieves context attributes stored in the Context History Log based on the
 	 * specified date and time information.
 	 * 
-	 * @param requester
+	 * @param requestor
 	 * @param attrId
 	 * @param startDate
 	 * @param endDate
 	 * @throws CtxException 
 	 */
-	public Future<List<CtxHistoryAttribute>> retrieveHistory(IIdentity requester, CtxAttributeIdentifier attrId, Date startDate, Date endDate) throws CtxException;
+	public Future<List<CtxHistoryAttribute>> retrieveHistory(final Requestor requestor, 
+			final CtxAttributeIdentifier attrId, final Date startDate,
+			final Date endDate) throws CtxException;
 		
 	/**
 	 * Updates a single context model object.
 	 * 
-	 * @param requester
+	 * @param requestor
 	 * @param object
 	 * @throws CtxException 
 	 */
-	public Future<CtxModelObject> update(IIdentity requester, CtxModelObject object) throws CtxException;
-	
+	public Future<CtxModelObject> update(final Requestor requestor,
+			final CtxModelObject object) throws CtxException;
 	
 	/**
 	 * 
-	 * @param requester
+	 * @param requestor
 	 * @param community
 	 * @throws CtxException 
 	 */
-	public Future<CtxEntity> retrieveAdministratingCSS(IIdentity requester, CtxEntityIdentifier communityEntId) throws CtxException;
+	public Future<CtxEntity> retrieveAdministratingCSS(final Requestor requestor,
+			final CtxEntityIdentifier communityEntId) throws CtxException;
 
 	/**
 	 * Retrieves the context attribute(s) that acts as a bond of the community of
 	 * entities specified by the CtxEntityIdentifier.
 	 * 
-	 * @param requester
+	 * @param requestor
 	 * @param community
 	 * @throws CtxException 
 	 */
-	public Future<Set<CtxBond>> retrieveBonds(IIdentity requester, CtxEntityIdentifier community) throws CtxException;
+	public Future<Set<CtxBond>> retrieveBonds(final Requestor requestor, 
+			final CtxEntityIdentifier community) throws CtxException;
 
 	/**
 	 * Retrieves the sub-communities of the specified community Entity.
 	 * 
-	 * @param requester
+	 * @param requestor
 	 * @param community
 	 * @throws CtxException 
 	 */
-	public Future<List<CtxEntityIdentifier>> retrieveSubCommunities(IIdentity requester, CtxEntityIdentifier community) throws CtxException;
+	public Future<List<CtxEntityIdentifier>> retrieveSubCommunities(final Requestor requestor,
+			final CtxEntityIdentifier community) throws CtxException;
 
 	/**
      * Retrieves a list of Individual Context Entities that are members of the specified community Entity 
 	 * (individuals or subcommunities).
 	 * 
-	 * @param requester
+	 * @param requestor
 	 * @param community
 	 * @throws CtxException 
 	 */
-	public Future<List<CtxEntityIdentifier>> retrieveCommunityMembers(IIdentity requester, CtxEntityIdentifier community) throws CtxException;
+	public Future<List<CtxEntityIdentifier>> retrieveCommunityMembers(final Requestor requestor,
+			final CtxEntityIdentifier community) throws CtxException;
 
 	/**
 	 * This applies for Community hierarchies. Retrieves the parent communities
 	 * of the specified CtxEntity.
 	 * 
-	 * @param requester
+	 * @param requestor
 	 * @param community
 	 * @throws CtxException 
 	 */
-	public Future<List<CtxEntityIdentifier>> retrieveParentCommunities(IIdentity requester, CtxEntityIdentifier community) throws CtxException;
+	public Future<List<CtxEntityIdentifier>> retrieveParentCommunities(final Requestor requestor,
+			final CtxEntityIdentifier community) throws CtxException;
 	
 }

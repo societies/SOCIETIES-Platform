@@ -24,6 +24,8 @@
  */
 package org.societies.service.api;
 
+import java.util.concurrent.Future;
+
 /**
  * Describe your class here...
  *
@@ -33,5 +35,9 @@ package org.societies.service.api;
 public interface IConsumer {
 	
 	public int barycenter (int a, int b, int c);
+	
+	public void asyncBarycenter (int a, int b, int c, IConsumerCallback consumerCallback);
+
+	public Future<Integer> futureBarycenter (int a, int b, int c);
 
 }

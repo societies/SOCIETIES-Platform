@@ -36,12 +36,15 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceManagement.impl.UserPreferenceManagement;
+import org.societies.personalisation.UserPreferenceManagement.impl.merging.MergingManager;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
 import org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor;
+import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Learning;
 import org.societies.personalisation.preference.api.model.IPreferenceConditionIOutcomeName;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 import org.societies.personalisation.preference.api.model.PreferenceOutcome;
@@ -61,9 +64,12 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	private ICtxBroker ctxBroker;
 	private UserPreferenceManagement prefMgr;
 	private IInternalPersonalisationManager persoMgr;
+	private MergingManager merging;
+	private IC45Learning c45Learning;
+	private IEventMgr eventMgr;
 
 	public UserPreferenceConditionMonitor(){
-		
+		merging = new MergingManager(c45Learning, prefMgr, this, eventMgr);
 	}
 	
 	
@@ -93,6 +99,21 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	}
 
 	
+	public IC45Learning getC45Learning() {
+		return c45Learning;
+	}
+
+	public void setC45Learning(IC45Learning c45Learning) {
+		this.c45Learning = c45Learning;
+	}
+	
+	public IEventMgr getEventMgr() {
+		return eventMgr;
+	}
+
+	public void setEventMgr(IEventMgr eventMgr) {
+		this.eventMgr = eventMgr;
+	}
 	
 	public void initialisePreferenceManagement(){
 		this.prefMgr = new UserPreferenceManagement(null, this.getCtxBroker());
@@ -254,4 +275,13 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 			ServiceResourceIdentifier serviceID, String preferenceName) {
 		return new AsyncResult<IPreferenceOutcome> (this.prefMgr.getPreference(ownerID, "", serviceID, preferenceName));
 	}
+
+
+	/**
+	 * @return the prefMgr
+	 */
+	public UserPreferenceManagement getPrefMgr() {
+		return prefMgr;
+	}
+
 }

@@ -36,6 +36,7 @@ import java.util.Set;
 //import org.societies.cis.mgmt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.activity.IActivityFeed;
 import org.societies.api.cis.collaboration.IServiceSharingRecord;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -45,10 +46,10 @@ import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
-import org.societies.api.cis.management.ICisActivityFeed;
 import org.societies.api.cis.management.ICisEditor;
 import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.cis.activity.ActivityFeed;
 import org.societies.cis.manager.CisParticipant.MembershipType;
 import org.societies.identity.IdentityImpl;
 
@@ -72,11 +73,11 @@ import org.societies.api.schema.cis.manager.SubscribedTo;
 */
 
 //@Component
-public class CisEditor implements IFeatureServer {
+public class CisEditor implements IFeatureServer,ICisEditor {
 
 
 	public CisRecord cisRecord;
-	public CisActivityFeed cisActivityFeed;
+	public ActivityFeed activityFeed;
 	public Set<IServiceSharingRecord> sharedServices; 
 //	public CommunityManagement commMgmt;
 	
@@ -109,7 +110,7 @@ public class CisEditor implements IFeatureServer {
 	public CisEditor(String ownerCss, String cisId,String host,
 			int membershipCriteria, String permaLink, String password,ICISCommunicationMgrFactory ccmFactory) {
 		
-		cisActivityFeed = new CisActivityFeed();
+		activityFeed = ActivityFeed.startUp(cisId);
 		sharedServices = new HashSet<IServiceSharingRecord>();
 		membersCss = new HashSet<CisParticipant>();
 		membersCss.add(new CisParticipant(ownerCss,MembershipType.owner));
@@ -138,7 +139,7 @@ public class CisEditor implements IFeatureServer {
 		
 		
 		
-		cisRecord = new CisRecord(cisActivityFeed,ownerCss, membershipCriteria, cisId, permaLink, membersCss,
+		cisRecord = new CisRecord(activityFeed,ownerCss, membershipCriteria, cisId, permaLink, membersCss,
 				password, host, sharedServices);
 		
 		LOG.info("CIS creating pub sub service");
@@ -158,7 +159,7 @@ public class CisEditor implements IFeatureServer {
 	// constructor of a CIS without a pre-determined ID or host
 	public CisEditor(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory) {
 		
-		cisActivityFeed = new CisActivityFeed();
+		activityFeed = ActivityFeed.startUp(this.getCisId());
 		sharedServices = new HashSet<IServiceSharingRecord>();
 		membersCss = new HashSet<CisParticipant>();
 		membersCss.add(new CisParticipant(cssOwner,MembershipType.owner));
@@ -169,7 +170,10 @@ public class CisEditor implements IFeatureServer {
 		CISendpoint = ccmFactory.getNewCommManager();
 		} catch  (CommunicationException e) {
 			e.printStackTrace();
+			LOG.info("could not start comm manager!");
 		}
+		
+		LOG.info("CIS got new comm manager");
 		
 		try {
 		cisIdentity = CISendpoint.getIdManager().getThisNetworkNode();//CISendpoint.getIdManager().fromJid(CISendpoint.getIdManager().getThisNetworkNode().getJid());
@@ -185,13 +189,14 @@ public class CisEditor implements IFeatureServer {
 			CISendpoint.register(this);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
+			LOG.info("could not start comm manager!");
 		} // TODO unregister??
 		
 		LOG.info("CIS listener registered");
 		
 		
 		// TODO: we have to get a proper identity and pwd for the CIS...
-		cisRecord = new CisRecord(cisActivityFeed,cssOwner, mode, cisIdentity.getJid(), "", membersCss,
+		cisRecord = new CisRecord(activityFeed,cssOwner, mode, cisIdentity.getJid(), "", membersCss,
 				cisIdentity.getDomain(), sharedServices,cisType,cisName);
 		
 		LOG.info("CIS creating pub sub service");
@@ -298,7 +303,7 @@ public class CisEditor implements IFeatureServer {
 		
 		this.cisRecord = cisRecord; 
 		
-		this.cisActivityFeed = this.cisRecord.feed;
+		this.activityFeed = this.cisRecord.feed;
 		this.sharedServices = this.cisRecord.sharedServices;
 		//CISendpoint = 	new XCCommunicationMgr(cisRecord.getHost(), cisRecord.getCisId(),cisRecord.getPassword());
 		
@@ -462,7 +467,7 @@ public class CisEditor implements IFeatureServer {
 
 	@Override
 	public void receiveMessage(Stanza arg0, Object arg1) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
@@ -478,6 +483,18 @@ public class CisEditor implements IFeatureServer {
 	public String getCisId() {
 	
 		return this.cisRecord.getCisId();
+	}
+
+	@Override
+	public IActivityFeed getActivityFeed(String cssId, String cisId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Boolean update(String cssId, ICisRecord newCis, String oldCisId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

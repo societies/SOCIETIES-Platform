@@ -44,7 +44,7 @@ public class TestTWConnector {
 	@Test
 	public void getSocialProfileTest(){
 		String profile = connector.getUserProfile();
-		logger.info("Facebook Profile (JSON STRING):\n" + profile);
+		logger.info("Social Profile (JSON STRING):\n" + profile);
 		assertNotNull("Social Profile (JSON STRING)", profile);
 	}
 	

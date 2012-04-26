@@ -36,80 +36,30 @@
 	<h3>Css Manager Service</h3>
 
 
-	<form:form method="POST" action="cssmanager.html" commandName="cmForm">
+	<H4>${message}</h4> 
+
+<form:form method="POST" action="cssmanager.html" commandName="cmLoginForm">
 		<form:errors path="*" cssClass="errorblock" element="div" />
 		<table>
 			<tr>
-				<td>Css Manager Methods :</td>
-				<td><form:select path="method">
-						<form:option value="NONE" label="--- Select ---" />
-						<form:options items="${methods}" />
-					</form:select></td>
-
-				<td><form:errors path="method" cssClass="error" /></td>
-			</tr>
+				<td>Css Identity :</td>
+				<td><form:input path="cssIdentity" value="${cmLoginForm.cssIdentity}" readonly="true" size="50"/>
+				</td>
+			</tr>	
+			
 			<tr>
-				<td colspan="3"><input type="submit" /></td>
+				<td>Password :</td>
+				<td><form:password path="password" value="" />
+				</td>
+				<td><form:errors path="password" cssClass="error" />
+				</td>
+			</tr>						
+			<tr>
+				<td colspan="3"><form:input type="submit" path="buttonLabel" value="Logon to Css Manager" /></td>
 			</tr>
 		</table>
-		<br />
-		<!-- 
-		Populate the 3 Fields Below if you select Register Css 
-		<br/> 
-			<table id="CssRecordDetails"> 
-			<tr>
-				<td>Css : Identity</td>
-				<td><form:input path="cssRecordCssIdentity" />
-				</td>
-				<td><form:errors path="cssRecordCssIdentity" cssClass="error" />
-				</td>
-			</tr>
-			<tr>
-				<td>Css : name</td>
-				<td><form:input path="cssRecordName" />
-				</td>
-				<td><form:errors path="cssRecordName" cssClass="error" />
-				</td>
-			</tr>
-			<tr>
-				<td>Css : password</td>
-				<td><form:input path="cssRecordPassword" />
-				</td>
-				<td><form:errors path="cssRecordPassword" cssClass="error" />
-				</td>
-			</tr>		
-		</table>
-		-->
-		<br />
-		Populate the 3 Fields Below if you select Register CssAdvertisement Record 
-		<br />
-		<table id="CssAdvertisementRecordDetails">
-			<!-- name="CssAdvertisementRecordDetails" -->
-			<tr>
-				<td>Css Advert : Name</td>
-				<td><form:input path="cssAdName" /></td>
-				<td><form:errors path="cssAdName" cssClass="error" /></td>
-				<td>Hint: Something Like XCManager Advert</td>
-			</tr>
-			<tr>
-				<td>Css Advert : Id</td>
-				<td><form:input path="cssAdId" /></td>
-				<td><form:errors path="cssAdId" cssClass="error" /></td>
-				<td>Hint: Something Like XCManager.societies.local</td>
-			</tr>
-			<tr>
-				<td>Css Advert : Uri</td>
-				<td><form:input path="cssAdUri" /></td>
-				<td><form:errors path="cssAdUri" cssClass="error" /></td>
-				<td>Hint : Something like http://XCManager.societies.local</td>
-			</tr>
-		</table>
-
-
-
-
-
 	</form:form>
+	
 
 <!-- .................END PLACE YOUR CONTENT HERE ................ -->
 	<!-- FOOTER -->

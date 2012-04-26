@@ -33,8 +33,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.societies.privacytrust.trust.api.model.TrustedEntityId;
-import org.societies.privacytrust.trust.api.model.TrustedEntityType;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
 
 /**
  * Tests the {@link TrustedEntityId} class.
@@ -44,8 +44,9 @@ import org.societies.privacytrust.trust.api.model.TrustedEntityType;
  */
 public class TrustedEntityIdTest {
 
+	private static final String TRUSTOR_ID = "aTrustor";
 	private static final TrustedEntityType ENTITY_TYPE = TrustedEntityType.CSS;
-	private static final String ENTITY_ID = "foo";
+	private static final String TRUSTEE_ID = "aTrustee";
 	
 	private TrustedEntityId teid;
 	
@@ -69,7 +70,7 @@ public class TrustedEntityIdTest {
 	@Before
 	public void setUp() throws Exception {
 		
-		this.teid = new TrustedEntityId(ENTITY_TYPE, ENTITY_ID);
+		this.teid = new TrustedEntityId(TRUSTOR_ID, ENTITY_TYPE, TRUSTEE_ID);
 	}
 
 	/**
@@ -80,7 +81,18 @@ public class TrustedEntityIdTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#getEntityType()}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.model.TrustedEntityId#getTrustorId()}.
+	 * @throws URISyntaxException 
+	 */
+	@Test
+	public void testGetTrustorId() throws URISyntaxException {
+		
+		assertNotNull(this.teid.getTrustorId());
+		assertEquals(TRUSTOR_ID, this.teid.getTrustorId());
+	}
+	
+	/**
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.model.TrustedEntityId#getEntityType()}.
 	 * @throws URISyntaxException 
 	 */
 	@Test
@@ -91,18 +103,18 @@ public class TrustedEntityIdTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#getEntityId()}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.model.TrustedEntityId#getTrusteeId()}.
 	 * @throws URISyntaxException 
 	 */
 	@Test
-	public void testGetEntityId() throws URISyntaxException {
+	public void testGetTrusteeId() throws URISyntaxException {
 		
-		assertNotNull(this.teid.getEntityId());
-		assertEquals(ENTITY_ID, this.teid.getEntityId());
+		assertNotNull(this.teid.getTrusteeId());
+		assertEquals(TRUSTEE_ID, this.teid.getTrusteeId());
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#getUri()}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.model.TrustedEntityId#getUri()}.
 	 */
 	@Test
 	public void testGetUri() throws Exception {
@@ -113,7 +125,7 @@ public class TrustedEntityIdTest {
 	}
 
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#toString()}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.model.TrustedEntityId#toString()}.
 	 */
 	@Test
 	public void testToString() throws Exception {
@@ -124,19 +136,22 @@ public class TrustedEntityIdTest {
 	}
 	
 	/**
-	 * Test method for {@link org.societies.privacytrust.trust.api.model.TrustedEntityId#equals()}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.model.TrustedEntityId#equals()}.
 	 * @throws Exception 
 	 */
 	@Test
 	public void testEquals() throws Exception {
 		
-		final TrustedEntityId sameTeid = new TrustedEntityId(ENTITY_TYPE, ENTITY_ID);
+		final TrustedEntityId sameTeid = new TrustedEntityId(TRUSTOR_ID, ENTITY_TYPE, TRUSTEE_ID);
 		assertTrue(this.teid.equals(sameTeid));
 		
-		final TrustedEntityId differentTeid1 = new TrustedEntityId(ENTITY_TYPE, "bar");
+		final TrustedEntityId differentTeid1 = new TrustedEntityId("foo", ENTITY_TYPE, TRUSTEE_ID);
 		assertFalse(this.teid.equals(differentTeid1));
 		
-		final TrustedEntityId differentTeid2 = new TrustedEntityId(TrustedEntityType.LGC, ENTITY_ID);
+		final TrustedEntityId differentTeid2 = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.LGC, TRUSTEE_ID);
 		assertFalse(this.teid.equals(differentTeid2));
+		
+		final TrustedEntityId differentTeid3 = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.LGC, "bar");
+		assertFalse(this.teid.equals(differentTeid3));
 	}
 }

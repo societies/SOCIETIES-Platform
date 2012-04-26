@@ -210,4 +210,18 @@ public class ClientCommunicationMgr {
 		}
 		return identityJid;
 	}
+
+	public boolean isConnected() {
+		boolean connected;
+		try {
+			connected = (Boolean)miServiceConnection.invoke(new IMethodInvocation<XMPPAgent>() {
+				public Object invoke(XMPPAgent agent) throws Throwable {
+					return agent.isConnected();
+				}
+			});
+		} catch (Throwable e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+		return connected;
+	}
 }
