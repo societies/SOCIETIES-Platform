@@ -183,4 +183,21 @@ public abstract class TrustedEntity implements ITrustedEntity {
 		
 		return true;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		
+		final StringBuilder sb = new StringBuilder();
+		sb.append("{");
+		sb.append("teid=" + this.teid);
+		sb.append(",");
+		sb.append("directTrust=" + this.directTrust);
+		sb.append("}");
+		
+		return sb.toString();
+	}
 }
