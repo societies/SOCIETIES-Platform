@@ -55,6 +55,7 @@ public interface ICisManager {
 	 * null if the CIS was not created.
 	 */
 	Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode);
+	
 	/**
 	 * Delete a specific CIS represented by cisId. The cisId is available in the
 	 * method of {@link ICisEditor} representing the CIS to be deleted. This method
@@ -66,7 +67,7 @@ public interface ICisManager {
 	 * @param cisId The ID of the CIS to be deleted.
 	 * @return true if deleted, false otherwise.
 	 */
-	Boolean deleteCis(String cssId, String cssPassword, String cisId);
+	boolean deleteCis(String cssId, String cssPassword, String cisId);
 	/**
 	 * Get a CIS Record with the ID cisId.
 	 * 

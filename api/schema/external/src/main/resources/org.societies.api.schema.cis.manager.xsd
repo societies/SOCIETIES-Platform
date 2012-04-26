@@ -49,17 +49,6 @@
 	    </xs:complexType>
 	</xs:element>
 	
-	<xs:element name='subscribedTo'>
-	    <xs:complexType>
-	      <xs:simpleContent>
-	        <xs:extension base='empty'>
-	          <xs:attribute name='cis-jid' type='xs:string' use='required'/> 
-	          <xs:attribute name='cis-role' type='xs:string' use='required'/> 
-	        </xs:extension>
-	      </xs:simpleContent>
-	    </xs:complexType>
-	</xs:element>
-
 
 	<xs:element name='community-manager'>
 	   <xs:complexType>
@@ -69,7 +58,7 @@
 			  <xs:element ref='list'/>
 			  <xs:element ref='search-cis'/>
 			  <xs:element ref='configure'/>
-			  <xs:element ref='subscribedTo'/>
+			  <xs:element ref='notification'/>
 	      </xs:choice>
 	    </xs:complexType>
 	</xs:element>
@@ -121,12 +110,48 @@
     <xs:complexType>
       <xs:simpleContent>
         <xs:extension base='empty'>
-          <xs:attribute name='jid' type='xs:string' use='required'/>
+          <xs:attribute name='owner-jid' type='xs:string'/>
           <xs:attribute name='community-jid' type='xs:string' use='required'/> <!-- xs:attribute name='jid' type='xs:string' use='required'/ -->
         </xs:extension>
       </xs:simpleContent>
     </xs:complexType>
   </xs:element>
+  
+  
+  <xs:element name='notification'>
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref='delete-notification'/>
+        <xs:element ref='subscribedTo'/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  
+  
+  
+   <xs:element name='delete-notification'>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base='empty'>
+          <xs:attribute name='owner-jid' type='xs:string'/> 
+          <xs:attribute name='community-jid' type='xs:string'  use='required'/> 
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+	<xs:element name='subscribedTo'>
+	    <xs:complexType>
+	      <xs:simpleContent>
+	        <xs:extension base='empty'>
+	          <xs:attribute name='cis-jid' type='xs:string' use='required'/> 
+	          <xs:attribute name='cis-role' type='xs:string' use='required'/> 
+	        </xs:extension>
+	      </xs:simpleContent>
+	    </xs:complexType>
+	</xs:element>
+
+
   
     <xs:simpleType name='empty'>
     <xs:restriction base='xs:string'>
