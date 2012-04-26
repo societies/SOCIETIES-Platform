@@ -68,7 +68,7 @@ public abstract class TrustedEntity implements ITrustedEntity {
 	private final TrustedEntityId teid;
 	
 	@OneToOne(cascade = CascadeType.ALL)
-	private DirectTrust directTrust;
+	private DirectTrust directTrust = new DirectTrust();
 	
 	//private IndirectTrust indirectTrust ;
 	//private UserPerceivedTrust userPerceivedTrust;

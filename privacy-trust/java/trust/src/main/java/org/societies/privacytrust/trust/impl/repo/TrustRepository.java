@@ -113,6 +113,8 @@ public class TrustRepository implements ITrustRepository {
 			.add(Restrictions.eq("teid", teid))
 			.setFetchMode("directTrust", FetchMode.JOIN)
 			.list();
+		if (session != null)
+			session.close();
 			
 		return (results.isEmpty()) ? null : results.get(0);
 	}
@@ -123,8 +125,23 @@ public class TrustRepository implements ITrustRepository {
 	@Override
 	public ITrustedEntity updateEntity(ITrustedEntity entity)
 			throws TrustRepositoryException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		ITrustedEntity result = null;
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
+		try {
+			result = (ITrustedEntity) session.merge(entity);
+			transaction.commit();
+		} catch (Exception e) {
+			LOG.warn("Rolling back transaction for entity " + entity);
+			transaction.rollback();
+			throw new TrustRepositoryException("Could not add entity " + entity, e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+		
+		return result;
 	}
 
 	/* (non-Javadoc)
