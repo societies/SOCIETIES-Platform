@@ -25,7 +25,7 @@
 package org.societies.privacytrust.privacyprotection.privacypreferencemanager.merging;
 
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 
 /**
  * Describe your class here...
@@ -35,7 +35,7 @@ import org.societies.api.context.model.CtxIdentifier;
  */
 public class SingleContextAttributeSnapshot {
 
-	private final CtxIdentifier ctxId;
+	private final CtxAttributeIdentifier ctxId;
 	private final CtxAttribute ctxAttribute;
 	
 	public SingleContextAttributeSnapshot(CtxAttribute ctxAttribute){
@@ -43,7 +43,7 @@ public class SingleContextAttributeSnapshot {
 		this.ctxId = ctxAttribute.getId();
 		
 	}
-	public CtxIdentifier getId() {
+	public CtxAttributeIdentifier getId() {
 		// TODO Auto-generated method stub
 		return ctxId;
 	}
