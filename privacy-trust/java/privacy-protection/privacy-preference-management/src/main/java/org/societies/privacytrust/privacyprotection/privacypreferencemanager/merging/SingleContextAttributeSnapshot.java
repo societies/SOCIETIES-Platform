@@ -22,27 +22,34 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy;
+package org.societies.privacytrust.privacyprotection.privacypreferencemanager.merging;
 
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 
-import java.util.List;
+/**
+ * Describe your class here...
+ *
+ * @author Eliza
+ *
+ */
+public class SingleContextAttributeSnapshot {
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.Requestor;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-
-public interface IAgreement {
+	private final CtxAttributeIdentifier ctxId;
+	private final CtxAttribute ctxAttribute;
 	
-	
-	public List<RequestItem> getRequestedItems();
+	public SingleContextAttributeSnapshot(CtxAttribute ctxAttribute){
+		this.ctxAttribute = ctxAttribute;
+		this.ctxId = ctxAttribute.getId();
 		
-	public IIdentity getUserIdentity();
-	
-	public void setUserIdentity(IIdentity userId);
-	
-	public IIdentity getUserPublicIdentity();
-	
-	public void setUserPublicIdentity(IIdentity userPublicId);
-	
-	public Requestor getRequestor();
+	}
+	public CtxAttributeIdentifier getId() {
+		// TODO Auto-generated method stub
+		return ctxId;
+	}
+	public String getValue() {
+		// TODO Auto-generated method stub
+		return ctxAttribute.getStringValue();
+	}
+
 }

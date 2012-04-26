@@ -26,20 +26,32 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 
 import java.io.Serializable;
 
+import org.societies.api.identity.Requestor;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
 
 public class FailedNegotiationEvent implements Serializable{
 
-	private ServiceResourceIdentifier serviceID;
-	public FailedNegotiationEvent(ServiceResourceIdentifier serviceID){
-		this.setServiceID(serviceID);
+
+	private Requestor requestor;
+	
+	public FailedNegotiationEvent(Requestor requestor){
+		this.setRequestor(requestor);
 	}
-	public void setServiceID(ServiceResourceIdentifier serviceID) {
-		this.serviceID = serviceID;
+
+	/**
+	 * @return the requestor
+	 */
+	public Requestor getRequestor() {
+		return requestor;
 	}
-	public ServiceResourceIdentifier getServiceID() {
-		return serviceID;
+
+	/**
+	 * @param requestor the requestor to set
+	 */
+	public void setRequestor(Requestor requestor) {
+		this.requestor = requestor;
 	}
+
 }
