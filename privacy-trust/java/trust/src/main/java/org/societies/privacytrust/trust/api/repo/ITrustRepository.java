@@ -30,10 +30,20 @@ import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 public interface ITrustRepository {
 
 	/**
+	 * Adds the specified {@link ITrustedEntity} to the repository if it is not
+	 * already present. If the repository already contains the entity, the call
+	 * leaves the repository unchanged and returns <code>false</code>. This
+	 * prevents duplicate entities in the repository.
 	 * 
 	 * @param entity
-	 * @return
+	 *            the entity to be added to the repository
+	 * @return <code>true</code> if the repository did not already contain the
+	 *         specified entity; <code>false</code> otherwise
+	 * @throws NullPointerException
+	 *             if the specified entity is <code>null</code>
 	 * @throws TrustRepositoryException
+	 *             if the specified entity is not already present but cannot be
+	 *             added to the repository
 	 */
 	public boolean addEntity(final ITrustedEntity entity) throws TrustRepositoryException;
 
