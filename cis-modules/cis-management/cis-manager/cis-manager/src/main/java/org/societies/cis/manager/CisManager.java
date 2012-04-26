@@ -63,6 +63,8 @@ import org.societies.api.schema.cis.manager.Community;
 import org.societies.api.schema.cis.manager.Communities;
 import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.Create;
+import org.societies.api.schema.cis.manager.Delete;
+import org.societies.api.schema.cis.manager.DeleteNotification;
 import org.societies.api.schema.cis.manager.SubscribedTo;
 
 
@@ -76,6 +78,8 @@ import org.societies.api.schema.cis.manager.SubscribedTo;
 @Component
 public class CisManager implements ICisManager, IFeatureServer{
 
+	
+	
 	Set<CisEditor> ownedCISs; 
 	ICISCommunicationMgrFactory ccmFactory;
 	IIdentity cisManagerId;
@@ -168,6 +172,39 @@ public class CisManager implements ICisManager, IFeatureServer{
 			return new AsyncResult<ICisOwned>(i);
 		
 	}
+	
+	
+	
+	private CisEditor getOwnedCisByJid(String jid){
+		Iterator<CisEditor> it = ownedCISs.iterator();
+		 
+		while(it.hasNext()){
+			 CisEditor element = it.next();
+			 if (element.getCisRecord().getCisId().equals(jid))
+				 return element;
+	     }
+		return null;
+		
+	}
+	
+	
+	// local version of the deleteCIS
+	private boolean deleteOwnedCis(String cssId, String cssPassword, String cisJid){
+		// TODO: how do we check fo the cssID/pwd?
+		
+		boolean ret = true;
+		if(ownedCISs.contains(new CisEditor(new CisRecord(cisJid)))){
+			CisEditor cis = this.getOwnedCisByJid(cisJid);
+			ret = cis.deleteCIS();
+			ret = ret && ownedCISs.remove(cis);
+		}
+		
+		return ret;
+	}
+	
+
+	
+	
 	
 	// local version of the createCis
 	private ICisOwned localCreateCis(String cssId, String cssPassword, String cisName, String cisType, int mode) {
@@ -338,22 +375,39 @@ public class CisManager implements ICisManager, IFeatureServer{
 						 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 				     }
 				}
-			
-				
 				
 				return com;
 
 			}
+				// END OF LIST
+				
+			// DELETE CIS
+			if (c.getDelete() != null) {
+
+				LOG.info("delete CIS received");
+				String senderjid = stanza.getFrom().getBareJid();
+				LOG.info("sender JID = " + senderjid);
+				
+				//TODO: check if the sender is allowed to delete a CIS
+				
+				Delete delete = c.getDelete();
+				Delete d2 = new Delete();
+				
+				if(!this.deleteOwnedCis(senderjid, "", delete.getCommunityJid()))
+					d2.setValue("error"); // TODO: replace for a proper XMPP error message
+
+				c.setDelete(d2);
+				return c;
+			}
+			// END OF DELETE
+				
+
 			if (c.getConfigure() != null) {
 				LOG.info("configure received");
 				return c;
 			}
 
 			
-			if (c.getDelete() != null) {
-				LOG.info("delete received");
-				return c;
-			}
 		}
 		return null;
 
@@ -375,11 +429,21 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 			CommunityManager c = (CommunityManager) payload;
 
-			if (c.getSubscribedTo()!= null) {
+			// treating getSubscribedTo notifications
+			if (c.getNotification().getSubscribedTo()!= null) {
 				LOG.info("subscribedTo received");
-				SubscribedTo s = (SubscribedTo) c.getSubscribedTo();
+				SubscribedTo s = (SubscribedTo) c.getNotification().getSubscribedTo();
 				CisRecord r = new CisRecord(s.getCisJid());
 				this.subscribeToCis(r);
+				return;
+			}
+			
+			// treating delete notifications
+			if (c.getNotification().getDeleteNotification() != null) {
+				LOG.info("delete notification received");
+				DeleteNotification d = (DeleteNotification) c.getNotification().getDeleteNotification();
+				if (!this.subscribedCISs.remove(new CisRecord(d.getCommunityJid())))
+					LOG.info("CIS is not part of the list of subscribed CISs");
 				return;
 			}
 		}
@@ -397,9 +461,9 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 
 	@Override
-	public Boolean deleteCis(String arg0, String arg1, String arg2) {
+	public boolean deleteCis(String cssId, String cssPassword, String cisId) {
 		// TODO Auto-generated method stub
-		return null;
+		return 	this.deleteOwnedCis(cssId, cssPassword, cisId);
 	}
 
 	@Override

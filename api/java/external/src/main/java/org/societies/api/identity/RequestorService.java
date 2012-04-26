@@ -24,6 +24,8 @@
  */
 package org.societies.api.identity;
 
+import java.io.Serializable;
+
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
@@ -32,7 +34,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  * @author Olivier, Eliza, Nicolas 
  *
  */
-public class RequestorService extends Requestor{
+public class RequestorService extends Requestor implements Serializable{
 
 	private final ServiceResourceIdentifier requestorServiceId;
 	
@@ -49,5 +51,58 @@ public class RequestorService extends Requestor{
 		return requestorServiceId;
 	}
 
+	@Override
+	public String toXMLString(){
+		String parent = super.toXMLString();
+		String str = "";
+		str = str.concat("\n\t<Attribute AttributeId=\"serviceID\"" +
+				"\n\t\t\tDataType=\"org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier\">");
+		str = str.concat("\n\t\t<AttributeValue>");
+		str = str.concat(this.requestorServiceId.toString());
+		str = str.concat("</AttributeValue>");
+		str = str.concat("\n\t</Attribute>");
+		return parent.concat("\n"+str);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime
+				* result
+				+ ((requestorServiceId == null) ? 0 : requestorServiceId
+						.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!super.equals(obj)) {
+			return false;
+		}
+		if (!(obj instanceof RequestorService)) {
+			return false;
+		}
+		RequestorService other = (RequestorService) obj;
+		if (requestorServiceId == null) {
+			if (other.requestorServiceId != null) {
+				return false;
+			}
+		} else if (!requestorServiceId.equals(other.requestorServiceId)) {
+			return false;
+		}
+		return true;
+	}
+	
+	
 	
 }

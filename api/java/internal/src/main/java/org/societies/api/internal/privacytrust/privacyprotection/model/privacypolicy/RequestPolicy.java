@@ -29,6 +29,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.societies.api.identity.Requestor;
+
 /**
  * This class represents the Request Policy of the Provider and lists the context types it is requesting access to, the Actions it is going to perform 
  * to these items and its own terms and conditions that define what happens to the data after disclosure
@@ -38,7 +40,7 @@ import java.util.List;
  */
 public class RequestPolicy implements Serializable{
 
-	private Subject requestor;
+	private Requestor requestor;
 	private List<RequestItem> requests;
 
 	private RequestPolicy(){
@@ -48,7 +50,7 @@ public class RequestPolicy implements Serializable{
 	public RequestPolicy(List<RequestItem> requests){
 		this.requests = requests;
 	}
-	public RequestPolicy(Subject sub, List<RequestItem> requests) {
+	public RequestPolicy(Requestor sub, List<RequestItem> requests) {
 		this.requestor = sub;
 		this.requests = requests;
 	}
@@ -57,11 +59,11 @@ public class RequestPolicy implements Serializable{
 		return this.requests;
 	}
 
-	public Subject getRequestor(){
+	public Requestor getRequestor(){
 		return this.requestor;
 	}
 
-	public void setRequestor(Subject subject){
+	public void setRequestor(Requestor subject){
 		this.requestor = subject;
 	}
 	public String toXMLString(){

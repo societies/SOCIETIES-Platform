@@ -35,5 +35,7 @@ public interface ICisRecord {
     public String getOwnerId();
     public String setUserDefinedName(String _name);
     public String getUserDefineName();
+    public String getCisType();
+    public int getMembershipCriteria();
 
 }

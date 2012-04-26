@@ -1,5 +1,7 @@
 package org.societies.android.platform.cis;
 
+import org.societies.android.platform.CisRecord;
+
 import android.app.Activity;
 import android.os.Bundle;
 
