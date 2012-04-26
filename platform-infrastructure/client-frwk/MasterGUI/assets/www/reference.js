@@ -94,6 +94,50 @@ LocalCSSManagerService.prototype.loginCSS = function(successCallback, failureCal
 	var client = "org.societies.android.platform.gui";
 	var cssRecord = {
 			  			"archiveCSSNodes": [],
+	                    "cssIdentity": jQuery("#username").val(),
+	                    "cssInactivation": null,
+	                    "cssNodes": [{
+	                        "identity": "android@societies.local/androidOne",
+	                        "status": 0,
+	                        "type": 0}],
+	                    "cssRegistration": null,
+	                    "cssHostingLocation" : null,
+	                    "domainServer" : null,
+	                    "cssUpTime": 0,
+	                    "emailID": null,
+	                    "entity": 0,
+	                    "foreName": null,
+	                    "homeLocation": null,
+	                    "identityName": null,
+	                    "imID": null,
+	                    "name": null,
+	                    "password": jQuery("#userpass").val(),
+	                    "presence": 0,
+	                    "sex": 0,
+	                    "socialURI": null,
+	                    "status": 0
+			                  }
+
+
+	console.log("Call LocalCSSManagerService - loginCSS");
+
+	return PhoneGap.exec(successCallback,    //Callback which will be called when plugin action is successful
+	failureCallback,     //Callback which will be called when plugin action encounters an error
+	'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
+	'loginCSS',          //Telling the plugin, which action we want to perform
+	[client, cssRecord]);        //Passing a list of arguments to the plugin
+};
+
+/**
+ * Login to CSS on cloud/rich node
+ * 
+ * @param successCallback The callback which will be called when Java method is successful
+ * @param failureCallback The callback which will be called when Java method has an error
+*/
+LocalCSSManagerService.prototype.logoutCSS = function(successCallback, failureCallback) {
+	var client = "org.societies.android.platform.gui";
+	var cssRecord = {
+			  			"archiveCSSNodes": [],
 	                    "cssIdentity": "android",
 	                    "cssInactivation": null,
 	                    "cssNodes": [{
@@ -119,15 +163,14 @@ LocalCSSManagerService.prototype.loginCSS = function(successCallback, failureCal
 			                  }
 
 
-	console.log("Call LocalCSSManagerService - loginCSS");
+	console.log("Call LocalCSSManagerService - logoutCSS");
 
 	return PhoneGap.exec(successCallback,    //Callback which will be called when plugin action is successful
 	failureCallback,     //Callback which will be called when plugin action encounters an error
 	'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
-	'loginCSS',          //Telling the plugin, which action we want to perform
+	'logoutCSS',          //Telling the plugin, which action we want to perform
 	[client, cssRecord]);        //Passing a list of arguments to the plugin
 };
-
 /**
  * CoreServiceMonitorService object
  */
@@ -223,7 +266,7 @@ var deviceInfo = function() {
 };
 
 /**
- * Login to CSS 
+ * Connect to CSSManager 
  * @param actionFunction function to be called if successful
  */
 var connectToLocalCSSManager = function(actionFunction) {
@@ -239,23 +282,82 @@ var connectToLocalCSSManager = function(actionFunction) {
     window.plugins.LocalCSSManagerService.connectService(success, failure);
 }
 /**
+ * Disconnect from CSSManager 
+ * @param actionFunction function to be called if successful
+ */
+var disconnectFromLocalCSSManager = function() {
+	console.log("Disconnect from LocalCSSManager");
+		
+	function success(data) {
+		console.log(data);
+	}
+	
+	function failure(data) {
+		alert("failure: " + data);
+	}
+    window.plugins.LocalCSSManagerService.disconnectService(success, failure);
+}
+/**
  * Actions carried in the event that a successful CSS login occurs
  */
 var successfulLogin = function() {
 	console.log("Login to CSS");
 
 	function success(data) {
+		
+		var status = ["Available for Use", "Unavailable", "Not active but on alert"];
+		var type = ["Android based client", "Cloud Node", "JVM based client"];
+		
+		jQuery("#cssrecordforename").val(data.foreName);
+		jQuery("#cssrecordname").val(data.name);
+		jQuery("#cssrecordemaildetails").val(data.emailID);
+		jQuery("#cssrecordimdetails").val(data.imID);
+		jQuery("#cssrecorduserlocation").val(data.homeLocation);
+		jQuery("#cssrecordsnsdetails").val(data.socialURI);
+		jQuery("#cssrecordidentity").val(data.cssIdentity);
+		jQuery("#cssrecordorgtype").val(data.entity);
+		jQuery("#cssrecordsextype").val(data.sex);
+		
+		//empty table
+		jQuery('#cssNodesTable tbody').remove();
+		
+		for (i  = 0; i < data.cssNodes.length; i++) {
+			var tableEntry = "<tr>" + 
+			"<td>" + data.cssNodes[i].identity + "</td>" + 
+			"<td>" + status[data.cssNodes[i].status] + "</td>" + 
+			"<td>" + type[data.cssNodes[i].type] + "</td>" + 
+				+ "</tr>"
+
+			jQuery('#cssNodesTable').append(tableEntry);
+		}
+
+		
+		
 		$.mobile.changePage( ($("#menu")), { transition: "slideup"} );
 	}
 	
 	function failure(data) {
-		alert(data);
+		alert("failure: " + data);
 	}
     window.plugins.LocalCSSManagerService.loginCSS(success, failure);
 
 };
 
+var successfulLogout = function() {
+	console.log("Logout from CSS");
 
+	function success(data) {
+		jQuery("#username").val("");
+		jQuery("#userpass").val("");
+	}
+
+	function failure(data) {
+		alert("failure: " + data);
+	}
+	
+    window.plugins.LocalCSSManagerService.logoutCSS(success, failure);
+
+};
 
 var resetDeviceMgr = function(){
     jQuery("#connStatuslist").text("");
@@ -298,7 +400,7 @@ var refreshActiveServices = function() {
 			"<td>" + convertMilliseconds(data[i].activeSince) + "</td>" + 
 				+ "</tr>"
 
-			jQuery('#activeServicesTable tr:last').after(tableEntry);
+			jQuery('#activeServicesTable').append(tableEntry);
 		}
 	}
 	
@@ -318,14 +420,15 @@ var refreshActiveTasks = function() {
 	function success(data) {
 		//empty table
 		jQuery('#activeTasksTable tbody').remove();
-		
+
+		//add rows
 		for (i  = 0; i < data.length; i++) {
 			var tableEntry = "<tr>" + 
 			"<td>" + data[i].className + "</td>" + 
 			"<td>" + data[i].numRunningActivities + "</td>" + 
 				+ "</tr>"
 
-			jQuery('#activeTasksTable tr:last').after(tableEntry);
+			jQuery('#activeTasksTable').append(tableEntry);
 		}
 	}
 	
@@ -352,6 +455,20 @@ var convertMilliseconds = function(milliseconds) {
 	return "d: " + days + " h: " + hours + " m:" + minutes;
 }
 /**
+ * Validate user login credentials
+ * @param name username
+ * @param password 
+ */
+var validateCredentials = function(name, password) {
+	var retValue = true;
+
+	if (name.length === 0 || password.length === 0) {
+		retValue  = false;
+		alert("User credentials must be entered");
+	}
+	return retValue;
+}
+/**
  * Add Javascript functions to various HTML tags using JQuery
  */
 
@@ -365,7 +482,9 @@ jQuery(function() {
 	});
 
 	$('#connectXMPP').click(function() {
-		connectToLocalCSSManager(successfulLogin);
+		if (validateCredentials(jQuery("#username").val(), jQuery("#userpass").val())) {
+			connectToLocalCSSManager(successfulLogin);
+		}
 	});
 	
 	$('#resetDeviceManager').click(function() {
@@ -378,6 +497,11 @@ jQuery(function() {
 
 	$('#refreshTasks').click(function() {
 		connectToCoreServiceMonitor(refreshActiveTasks);
+	});
+	$("#logoutIcon").click(function() {
+		connectToLocalCSSManager(successfulLogout);
+		disconnectFromLocalCSSManager();
+		
 	});
 
 });

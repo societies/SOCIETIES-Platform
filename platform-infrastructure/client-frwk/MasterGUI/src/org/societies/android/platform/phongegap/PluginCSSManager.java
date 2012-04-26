@@ -170,7 +170,14 @@ public class PluginCSSManager extends Plugin {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			} 
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 5))) {
+				try {
+					this.localCSSManager.logoutCSS(data.getString(0), createCSSRecord(data.getJSONObject(1)));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 			
 			// Don't return any result now, since status results will be sent when events come in from broadcast receiver 
             result = new PluginResult(PluginResult.Status.NO_RESULT);
