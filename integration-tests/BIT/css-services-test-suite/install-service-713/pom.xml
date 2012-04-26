@@ -60,12 +60,12 @@
 			<version>0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
+		<!--dependency>
 			<groupId>org.societies.example</groupId>
 			<artifactId>internalAPI</artifactId>
 			<version>0.1</version>
 			<scope>provided</scope>			
-		</dependency>
+		</dependency-->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
@@ -82,12 +82,13 @@
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
 			<version>4.1.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.0</version>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>	
 	</dependencies>
 	
