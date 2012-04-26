@@ -18,5 +18,5 @@ public interface IUserActionMonitor
 	public void monitor(IIdentity owner, IAction action);
 	
 	//Deprecated
-	public void monitor(ServiceResourceIdentifier serviceId, IIdentity owner, String action);
+	//public void monitor(ServiceResourceIdentifier serviceId, IIdentity owner, String action);
 }
