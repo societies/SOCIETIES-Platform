@@ -14,11 +14,6 @@
 	<artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubServiceBundle"/>
 	<artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubClientBundle"/>
 
-	<!--<artifact type="bundle" name="org.societies.comm.examples.Calculator" />
-	<artifact type="bundle" name="org.societies.comm.examples.FortuneCookie"/>
-	<artifact type="bundle" name="org.societies.example.complexservice"/>
-	<artifact type="bundle" name="org.societies.comm.examples.ExampleCommsManager"/>-->
-
 	<artifact type="bundle" name="org.societies.data-source"/>
 	<artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceRegistry"/>
 	<artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceManagement"/>
