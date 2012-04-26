@@ -43,7 +43,7 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 	public void monitor(IIdentity owner, IAction action) {
 		System.out.println("Received user action!");
 
-		//save action in context - IIdentity > ServiceId > paramName
+		//save action in context - IIdentity (Person) > ServiceId > paramName
 		//create new entities and attributes if necessary
 		ctxComm.updateHistory(owner, action);
 
