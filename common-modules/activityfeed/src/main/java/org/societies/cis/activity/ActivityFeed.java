@@ -1,5 +1,5 @@
 package org.societies.cis.activity;
-import java.util.ArrayList;
+
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -20,7 +20,7 @@ import org.societies.api.activity.IActivityFeed;
 import org.societies.cis.activity.model.Activity;
 
 @Entity
-@Table(name = "ActivityFeed")
+@Table(name = "org.societies.cis.activity.ActivityFeed")
 public class ActivityFeed implements IActivityFeed {
 	@Id
 	private String id;
