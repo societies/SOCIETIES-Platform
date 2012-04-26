@@ -1,4 +1,4 @@
-package org.societies.android.platform.cis;
+package org.societies.android.platform;
 
 import android.net.Uri;
 

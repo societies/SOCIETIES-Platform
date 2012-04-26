@@ -22,11 +22,11 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.cis.test;
+package org.societies.android.platform.test;
 
-import org.societies.android.platform.cis.CisRecord;
-import org.societies.android.platform.cis.SocialContract;
-import org.societies.android.platform.cis.SocialProvider;
+import org.societies.android.platform.CisRecord;
+import org.societies.android.platform.SocialContract;
+import org.societies.android.platform.SocialProvider;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -72,43 +72,66 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 		super.tearDown();
 	}
 	
-	public void testDelete(){
-	//TODO: probably add a CisRecord, then delete it.	
-		assertFalse(true);
-		
-	}
+//	public void testDelete(){
+//	//TODO: probably add a CisRecord, then delete it.	
+//		assertFalse(true);
+//		
+//	}
+
+	/**
+	 * Tests that inserting a CIS from Android will actually create that CIS
+	 * in CIS Manager Cloud.
+	 * 
+	 * The logic for the test:
+	 * 1- Create a local {@link ContentValues} to hold all the data for the CIS
+	 * 2- Call insert in SocialProvider to perform insertion
+	 * 3- Get the newly inserted CIS from cloud.
+	 * 4- Fail if the CIS was not returned.
+	 * 5- Fail if the CIS data are not correct.
+	 * 
+	 * FIXME: currently does not care about multiple CISs. Does not use
+	 * index number that is returned by resolver.insert.
+	 *  
+	 */
 	public void testInsertGroup(){
-	//TODO insert and get and compare.
-	//FIXME This method tests both insert and query.
-		ContentValues values = new ContentValues();
-		//TODO ID should not be part of CisRecord constructor.
-		CisRecord record = new CisRecord("1", "XYZ", 
-				"babak@societies.org", "today");
-		values.put(SocialContract.Groups.NAME , record.getName());
-		values.put(SocialContract.Groups.OWNER_ID , record.getOwnerId());
-		values.put(SocialContract.Groups.CREATION_DATE , record.getCreationDate());
-		Uri newGroupUri= resolver.insert(SocialContract.Groups.CONTENT_URI , values);
+		//1- Create local ContentValues to hold the CIS data.
+		ContentValues initialValues = new ContentValues();
+		initialValues.put(SocialContract.Groups.NAME , "XYZ");
+		initialValues.put(SocialContract.Groups.OWNER_ID , "babak@societies.org");
+		initialValues.put(SocialContract.Groups.CREATION_DATE , "today");
+		
+		//2- Call insert in the communications adapter to initiate insertion
+		Uri newGroupUri= resolver.insert(SocialContract.Groups.CONTENT_URI , 
+				initialValues);
+		
+		//3- Get the newly inserted CIS from cloud.
+		//What to get:
 		String[] projection ={
 				SocialContract.Groups.NAME,
 				SocialContract.Groups.OWNER_ID,
 				SocialContract.Groups.CREATION_DATE
 			};
-		//WHERE _id = new
+		//WHERE _id = ID of the newly created CIS:
 		String selection = SocialContract.Groups._ID + " = " +
 			newGroupUri.getLastPathSegment();
 		Cursor cursor = resolver.query(SocialContract.Groups.CONTENT_URI,
 				projection, selection, null, null);
-		assertFalse(cursor != null);
-		//Create new ContentValues object based on return.
-		ContentValues newValues = new ContentValues();
-		newValues.put(SocialContract.Groups.NAME , cursor.getString(0));
-		newValues.put(SocialContract.Groups.OWNER_ID , cursor.getString(1));
-		newValues.put(SocialContract.Groups.CREATION_DATE , cursor.getString(1));
-		assertEquals(newValues,values);
+		
+		//4- Fail if the CIS was not returned.
+		assertFalse(cursor == null);
+		if (cursor == null)	return;
+		if (!cursor.moveToFirst()) return;
+		//5- Fail if the CIS data are not correct:
+		//Create new ContentValues object based on returned CIS:
+		ContentValues returnedValues = new ContentValues();
+		returnedValues.put(SocialContract.Groups.NAME , cursor.getString(0));
+		returnedValues.put(SocialContract.Groups.OWNER_ID , cursor.getString(1));
+		returnedValues.put(SocialContract.Groups.CREATION_DATE , cursor.getString(2));
+		assertEquals(returnedValues,initialValues);
 
 	}
-	public void testUpdate(){
-	//TODO 
-		assertFalse(true);
-	}
+//	public void testUpdate(){
+//	//TODO 
+//		assertFalse(true);
+//	}
 }

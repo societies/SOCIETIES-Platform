@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="org.societies.android.platform.cis" android:versionCode="1" android:versionName="0.0.1-SNAPSHOT">
+    package="org.societies.android.platform"
+    android:versionCode="1"
+    android:versionName="1.0" >
 
-<!-- Permission needed to read social data from SocialProvider -->
+<uses-sdk android:targetSdkVersion="8" android:minSdkVersion="8"/>
+
 <permission
     android:name="org.societies.cis.android.SocialProvider.READ"
     android:label="@string/provider_read_permission"
@@ -16,14 +19,17 @@
     android:protectionLevel="dangerous"
     android:description="@string/provider_write_permission_desc">
 </permission>
-<uses-sdk android:targetSdkVersion="8" android:minSdkVersion="8"/>
-
-  <application android:icon="@drawable/ic_launcher" android:label="@string/app_name">
-    <activity android:name=".CisManagerActivity">
-      <intent-filter>
-        <action android:name="android.intent.action.MAIN" />
-        <category android:name="android.intent.category.LAUNCHER" />
-      </intent-filter>
+    
+<application
+	android:icon="@drawable/ic_launcher"
+    android:label="@string/app_name" >
+    <activity
+    	android:name=".SocialproviderActivity"
+        android:label="@string/app_name" >
+        <intent-filter>
+        	<action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
     </activity>
     <provider
         android:name="org.societies.android.platform.SocialProvider"
@@ -34,6 +40,7 @@
         android:readPermission="org.societies.cis.android.SocialProvider.READ"
         android:writePermission="org.societies.cis.android.SocialProvider.WRITE">
     </provider>
-  </application>
+</application>
 
+<!-- Permission needed to read social data from SocialProvider -->
 </manifest>
