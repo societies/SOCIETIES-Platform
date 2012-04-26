@@ -20,7 +20,7 @@ import org.societies.api.activity.IActivityFeed;
 import org.societies.cis.activity.model.Activity;
 
 @Entity
-@Table(name = "org.societies.cis.activity.ActivityFeed")
+@Table(name = "org_societies_cis_activity_ActivityFeed")
 public class ActivityFeed implements IActivityFeed {
 	@Id
 	private String id;

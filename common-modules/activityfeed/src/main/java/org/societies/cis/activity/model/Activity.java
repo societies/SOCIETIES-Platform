@@ -12,7 +12,7 @@ import org.societies.api.activity.IActivity;
 import org.societies.cis.activity.ActivityFeed;
 
 @Entity
-@Table(name = "org.societies.cis.activity.model.Activity")
+@Table(name = "org_societies_cis_activity_model_Activity")
 public class Activity implements IActivity {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
