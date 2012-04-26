@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails;
@@ -195,18 +196,16 @@ public class PrivatePreferenceCache {
 		}
 	}
 	
-	public IPrivacyPreferenceTreeModel getPPNPreference(String contextType, CtxAttributeIdentifier affectedCtxID, IIdentity dpi, ServiceResourceIdentifier serviceID){
+	public IPrivacyPreferenceTreeModel getPPNPreference(String contextType, CtxAttributeIdentifier affectedCtxID, Requestor requestor){
 		PPNPreferenceDetails details = new PPNPreferenceDetails(contextType);
 		details.setAffectedCtxID(affectedCtxID);
-		details.setRequestorDPI(dpi);
-		details.setServiceID(serviceID);
+		details.setRequestor(requestor);
 		return this.getPPNPreference(details);
 	}
 	
-	public IPrivacyPreferenceTreeModel getIDSPreference(IIdentity affectedDPI, IIdentity providerDPI, ServiceResourceIdentifier serviceID){
+	public IPrivacyPreferenceTreeModel getIDSPreference(IIdentity affectedDPI, Requestor requestor){
 		IDSPreferenceDetails details = new IDSPreferenceDetails(affectedDPI);
-		details.setProviderDPI(providerDPI);
-		details.setServiceID(serviceID);
+		details.setRequestor(requestor);
 		return this.getIDSPreference(details);
 	}
 	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType){
@@ -259,10 +258,10 @@ public class PrivatePreferenceCache {
 		return modelList;
 	}
 	
-	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, CtxAttributeIdentifier affectedCtxID, IIdentity requestorDPI){
+	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, CtxAttributeIdentifier affectedCtxID, Requestor requestor){
 		this.logging.debug("Request for preferences for context type: \n"+contextType+" and affectedCtxID: "+affectedCtxID.toString());
 		List<IPrivacyPreferenceTreeModel> modelList = new ArrayList<IPrivacyPreferenceTreeModel>();
-		List<CtxAttributeIdentifier> preferenceCtxIDs = this.registry.getPPNPreferences(contextType, affectedCtxID, requestorDPI);
+		List<CtxAttributeIdentifier> preferenceCtxIDs = this.registry.getPPNPreferences(contextType, affectedCtxID, requestor);
 		
 		for (CtxAttributeIdentifier ctxID : preferenceCtxIDs){
 			IPrivacyPreferenceTreeModel model = this.findPPNPreference(ctxID);
@@ -275,10 +274,10 @@ public class PrivatePreferenceCache {
 
 		return modelList;
 	}
-	public List<IPrivacyPreferenceTreeModel> getIDSPreferences(IIdentity affectedDPI, IIdentity providerDPI){
-		this.logging.debug("Request for IDS preferences for dpi: \n"+affectedDPI.toString()+", providerDPI: "+providerDPI.toString());
+	public List<IPrivacyPreferenceTreeModel> getIDSPreferences(IIdentity affectedDPI, Requestor requestor){
+		this.logging.debug("Request for IDS preferences for dpi: \n"+affectedDPI.toString()+", requestor: "+requestor.toString());
 		List<IPrivacyPreferenceTreeModel> modelList = new ArrayList<IPrivacyPreferenceTreeModel>();
-		List<CtxAttributeIdentifier> preferenceCtxIDs = this.registry.getIDSPreferences(affectedDPI, providerDPI);
+		List<CtxAttributeIdentifier> preferenceCtxIDs = this.registry.getIDSPreferences(affectedDPI, requestor);
 		
 		for (CtxAttributeIdentifier ctxID : preferenceCtxIDs){
 			IPrivacyPreferenceTreeModel model = this.findIDSPreference(ctxID);
@@ -287,18 +286,35 @@ public class PrivatePreferenceCache {
 			}
 		}
 		
-		this.logging.debug("Found "+modelList.size()+" IDS preferences for dpi: \n"+affectedDPI.toString()+", providerDPI: "+providerDPI.toString());
+		this.logging.debug("Found "+modelList.size()+" IDS preferences for dpi: \n"+affectedDPI.toString()+", providerDPI: "+requestor.toString());
 
 		return modelList;
 	}
 	
 	
 	
-	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, IIdentity dpi){
+	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, Requestor requestor){
+		this.logging.debug("Request for preferences for context type: \n"+contextType+" and requestor: "+requestor.toString());
+
+		List<IPrivacyPreferenceTreeModel> modelList = new ArrayList<IPrivacyPreferenceTreeModel>();
+		List<CtxAttributeIdentifier> preferenceCtxIDs = this.registry.getPPNPreferences(contextType, requestor);
+		
+		for (CtxAttributeIdentifier ctxID : preferenceCtxIDs){
+			IPrivacyPreferenceTreeModel model = this.findPPNPreference(ctxID);
+			if (model!=null){
+				modelList.add(model);
+			}
+		}
+		this.logging.debug("Found "+modelList.size()+" preferences for contextType: "+contextType+" and requestor: "+requestor.toString());
+
+		return modelList;
+	}
+	
+	/*public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, IIdentity dpi, ServiceResourceIdentifier serviceID){
 		this.logging.debug("Request for preferences for context type: \n"+contextType+" and requestorDPI: "+dpi.toString());
 
 		List<IPrivacyPreferenceTreeModel> modelList = new ArrayList<IPrivacyPreferenceTreeModel>();
-		List<CtxAttributeIdentifier> preferenceCtxIDs = this.registry.getPPNPreferences(contextType, dpi);
+		List<CtxAttributeIdentifier> preferenceCtxIDs = this.registry.getPPNPreferences(contextType, requestor);
 		
 		for (CtxAttributeIdentifier ctxID : preferenceCtxIDs){
 			IPrivacyPreferenceTreeModel model = this.findPPNPreference(ctxID);
@@ -309,23 +325,7 @@ public class PrivatePreferenceCache {
 		this.logging.debug("Found "+modelList.size()+" preferences for contextType: "+contextType+" and requestorDPI: "+dpi.toString());
 
 		return modelList;
-	}
-	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, IIdentity dpi, ServiceResourceIdentifier serviceID){
-		this.logging.debug("Request for preferences for context type: \n"+contextType+" and requestorDPI: "+dpi.toString());
-
-		List<IPrivacyPreferenceTreeModel> modelList = new ArrayList<IPrivacyPreferenceTreeModel>();
-		List<CtxAttributeIdentifier> preferenceCtxIDs = this.registry.getPPNPreferences(contextType, dpi, serviceID);
-		
-		for (CtxAttributeIdentifier ctxID : preferenceCtxIDs){
-			IPrivacyPreferenceTreeModel model = this.findPPNPreference(ctxID);
-			if (model!=null){
-				modelList.add(model);
-			}
-		}
-		this.logging.debug("Found "+modelList.size()+" preferences for contextType: "+contextType+" and requestorDPI: "+dpi.toString());
-
-		return modelList;
-	}
+	}*/
 	public void removePPNPreference(PPNPreferenceDetails details){
 		this.logging.debug("Request to remove preference : \n"+details.toString());
 		CtxAttributeIdentifier preferenceCtxID = this.registry.getPPNPreference(details);

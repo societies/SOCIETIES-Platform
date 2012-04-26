@@ -24,13 +24,15 @@
  */
 package org.societies.api.identity;
 
+import java.io.Serializable;
+
 /**
  * This class is used to represent a CIS requesting access to resources.
  *
  * @author Nicolas, Olivier, Eliza
  *
  */
-public class RequestorCis extends Requestor{
+public class RequestorCis extends Requestor implements Serializable{
 
 	private final IIdentity cisRequestorId;
 	
@@ -48,4 +50,56 @@ public class RequestorCis extends Requestor{
 		return cisRequestorId;
 	}
 
+	@Override
+	public String toXMLString(){
+		String parent = super.toXMLString();
+		String str = "";
+		str = str.concat("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:subject-id\"" +
+		"\n \t\t\tDataType=\"org.societies.api.identity.IIdentity\">");
+
+		str = str.concat("\n\t\t<AttributeValue>");
+		str = str.concat(this.cisRequestorId.toString());
+		str = str.concat("</AttributeValue>");
+
+		str = str.concat("\n\t</Attribute>");
+		return parent.concat("\n"+str);
+	}
+	
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result
+				+ ((cisRequestorId == null) ? 0 : cisRequestorId.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!super.equals(obj)) {
+			return false;
+		}
+		if (!(obj instanceof RequestorCis)) {
+			return false;
+		}
+		RequestorCis other = (RequestorCis) obj;
+		if (cisRequestorId == null) {
+			if (other.cisRequestorId != null) {
+				return false;
+			}
+		} else if (!cisRequestorId.equals(other.cisRequestorId)) {
+			return false;
+		}
+		return true;
+	}
 }

@@ -50,8 +50,8 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IdentitySelectionPreferenceOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyPreference;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.OperatorConstants;
-import org.societies.privacytrust.privacyprotection.privacypreferencemanager.CtxTypes;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager;
+
 
 public class PrivacyPreferenceMerger {
 
@@ -65,12 +65,10 @@ public class PrivacyPreferenceMerger {
 		
 	}
 	
-	public void addIDSDecision(IIdentity selectedDPI,
-			IIdentity providerDPI, ServiceResourceIdentifier serviceID){
+	public void addIDSDecision(IIdentity selectedDPI, Requestor requestor){
 		ContextSnapshot snapshot = this.takeSnapshot();
 		IDSPreferenceDetails details = new IDSPreferenceDetails(selectedDPI);
-		details.setProviderDPI(providerDPI);
-		details.setServiceID(serviceID);
+		details.setRequestor(requestor);
 		IPrivacyPreferenceTreeModel existingModel = ppMgr.getIDSPreference(details);
 		if (existingModel==null){
 			this.ppMgr.storeIDSPreference(details, this.createIDSPreference(snapshot, details));
