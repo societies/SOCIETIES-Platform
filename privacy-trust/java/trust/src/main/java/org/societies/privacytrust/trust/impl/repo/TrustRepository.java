@@ -120,6 +120,8 @@ public class TrustRepository implements ITrustRepository {
 		List<ITrustedEntity> results = session.createCriteria(entityClass)
 			.add(Restrictions.eq("teid", teid))
 			.setFetchMode("directTrust", FetchMode.JOIN)
+			.setFetchMode("indirectTrust", FetchMode.JOIN)
+			.setFetchMode("userPerceivedTrust", FetchMode.JOIN)
 			.list();
 		if (session != null)
 			session.close();

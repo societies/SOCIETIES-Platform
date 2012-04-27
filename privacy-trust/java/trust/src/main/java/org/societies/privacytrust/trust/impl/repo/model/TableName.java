@@ -37,4 +37,8 @@ public class TableName {
 	public static final String TRUSTED_CIS = "t_communities";
 	
 	public static final String DIRECT_TRUST = "t_direct_trust";
+	
+	public static final String INDIRECT_TRUST = "t_indirect_trust";
+	
+	public static final String USER_PERCEIVED_TRUST = "t_user_perceived_trust";
 }

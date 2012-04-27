@@ -185,6 +185,140 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		assertTrue(lastModified3.getTime() == lastModified2.getTime());
 		assertTrue(lastUpdated3.getTime() > lastUpdated2.getTime());
 	}
+	
+	/**
+	 * Test method for {@link org.societies.privacytrust.trust.impl.repo.TrustRepository#updateEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)}.
+	 * @throws TrustRepositoryException 
+	 */
+	@Test
+	public void testUpdateTrustedCssIndirectTrust() throws TrustRepositoryException {
+		
+		// test params
+		final double trustValue1 = 0.5d;
+		final double trustValue2 = 0.8d;
+		final Date lastModified1;
+		final Date lastUpdated1;
+		final Date lastModified2;
+		final Date lastUpdated2;
+		final Date lastModified3;
+		final Date lastUpdated3;
+		
+		ITrustedCss trustedCssFromDb;
+		
+		//this.trustRepo.addEntity(trustedCss);
+		
+		// set indirect trust to trustValue1
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCss.getTeid());
+		trustedCssFromDb.getIndirectTrust().setValue(trustValue1);
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.updateEntity(trustedCssFromDb);
+		// verify update
+		assertNotNull(trustedCssFromDb.getIndirectTrust().getValue());
+		assertEquals(new Double(trustValue1), trustedCssFromDb.getIndirectTrust().getValue());
+		lastModified1 = trustedCssFromDb.getIndirectTrust().getLastModified(); 
+		lastUpdated1 = trustedCssFromDb.getIndirectTrust().getLastUpdated();
+		assertNotNull(lastModified1);
+		assertNotNull(lastUpdated1);
+		assertEquals(lastModified1, lastUpdated1);
+		
+		// update indirect trust with new value, i.e. trustValue2
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCss.getTeid());
+		trustedCssFromDb.getIndirectTrust().setValue(trustValue2);
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.updateEntity(trustedCssFromDb);
+		// verify update
+		assertNotNull(trustedCssFromDb.getIndirectTrust().getValue());
+		assertEquals(new Double(trustValue2), trustedCssFromDb.getIndirectTrust().getValue());
+		lastModified2 = trustedCssFromDb.getIndirectTrust().getLastModified(); 
+		lastUpdated2 = trustedCssFromDb.getIndirectTrust().getLastUpdated();
+		assertNotNull(lastModified2);
+		assertNotNull(lastUpdated2);
+		assertEquals(lastModified2, lastUpdated2);
+		// verify update of lastModified/Updated props
+		assertTrue(lastModified2.getTime() > lastModified1.getTime());
+		assertTrue(lastUpdated2.getTime() > lastUpdated1.getTime());
+		
+		// update indirect trust with same value, i.e. trustValue2
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCss.getTeid());
+		trustedCssFromDb.getIndirectTrust().setValue(trustValue2);
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.updateEntity(trustedCssFromDb);
+		// verify update
+		assertNotNull(trustedCssFromDb.getIndirectTrust().getValue());
+		assertEquals(new Double(trustValue2), trustedCssFromDb.getIndirectTrust().getValue());
+		lastModified3 = trustedCssFromDb.getIndirectTrust().getLastModified(); 
+		lastUpdated3 = trustedCssFromDb.getIndirectTrust().getLastUpdated();
+		assertNotNull(lastModified3);
+		assertNotNull(lastUpdated3);
+		assertFalse(lastModified3.equals(lastUpdated3));
+		// Verify update of lastModified/Updated props
+		assertTrue(lastModified3.getTime() == lastModified2.getTime());
+		assertTrue(lastUpdated3.getTime() > lastUpdated2.getTime());
+	}
+	
+	/**
+	 * Test method for {@link org.societies.privacytrust.trust.impl.repo.TrustRepository#updateEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)}.
+	 * @throws TrustRepositoryException 
+	 */
+	@Test
+	public void testUpdateTrustedCssUserPerceivedTrust() throws TrustRepositoryException {
+		
+		// test params
+		final double trustValue1 = 0.5d;
+		final double trustValue2 = 0.8d;
+		final Date lastModified1;
+		final Date lastUpdated1;
+		final Date lastModified2;
+		final Date lastUpdated2;
+		final Date lastModified3;
+		final Date lastUpdated3;
+		
+		ITrustedCss trustedCssFromDb;
+		
+		//this.trustRepo.addEntity(trustedCss);
+		
+		// set user-perceived trust to trustValue1
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCss.getTeid());
+		trustedCssFromDb.getUserPerceivedTrust().setValue(trustValue1);
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.updateEntity(trustedCssFromDb);
+		// verify update
+		assertNotNull(trustedCssFromDb.getUserPerceivedTrust().getValue());
+		assertEquals(new Double(trustValue1), trustedCssFromDb.getUserPerceivedTrust().getValue());
+		lastModified1 = trustedCssFromDb.getUserPerceivedTrust().getLastModified(); 
+		lastUpdated1 = trustedCssFromDb.getUserPerceivedTrust().getLastUpdated();
+		assertNotNull(lastModified1);
+		assertNotNull(lastUpdated1);
+		assertEquals(lastModified1, lastUpdated1);
+		
+		// update user-perceived trust with new value, i.e. trustValue2
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCss.getTeid());
+		trustedCssFromDb.getUserPerceivedTrust().setValue(trustValue2);
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.updateEntity(trustedCssFromDb);
+		// verify update
+		assertNotNull(trustedCssFromDb.getUserPerceivedTrust().getValue());
+		assertEquals(new Double(trustValue2), trustedCssFromDb.getUserPerceivedTrust().getValue());
+		lastModified2 = trustedCssFromDb.getUserPerceivedTrust().getLastModified(); 
+		lastUpdated2 = trustedCssFromDb.getUserPerceivedTrust().getLastUpdated();
+		assertNotNull(lastModified2);
+		assertNotNull(lastUpdated2);
+		assertEquals(lastModified2, lastUpdated2);
+		// verify update of lastModified/Updated props
+		assertTrue(lastModified2.getTime() > lastModified1.getTime());
+		assertTrue(lastUpdated2.getTime() > lastUpdated1.getTime());
+		
+		// update user-perceived trust with same value, i.e. trustValue2
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCss.getTeid());
+		trustedCssFromDb.getUserPerceivedTrust().setValue(trustValue2);
+		trustedCssFromDb = (ITrustedCss) this.trustRepo.updateEntity(trustedCssFromDb);
+		// verify update
+		assertNotNull(trustedCssFromDb.getUserPerceivedTrust().getValue());
+		assertEquals(new Double(trustValue2), trustedCssFromDb.getUserPerceivedTrust().getValue());
+		lastModified3 = trustedCssFromDb.getUserPerceivedTrust().getLastModified(); 
+		lastUpdated3 = trustedCssFromDb.getUserPerceivedTrust().getLastUpdated();
+		assertNotNull(lastModified3);
+		assertNotNull(lastUpdated3);
+		assertFalse(lastModified3.equals(lastUpdated3));
+		// Verify update of lastModified/Updated props
+		assertTrue(lastModified3.getTime() == lastModified2.getTime());
+		assertTrue(lastUpdated3.getTime() > lastUpdated2.getTime());
+	}
 
 	/**
 	 * Test method for {@link org.societies.privacytrust.trust.impl.repo.TrustRepository#removeEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)}.

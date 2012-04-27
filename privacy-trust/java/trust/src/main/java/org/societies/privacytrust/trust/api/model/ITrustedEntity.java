@@ -49,44 +49,23 @@ public interface ITrustedEntity extends Serializable {
 	public TrustedEntityId getTeid();
 
 	/**
+	 * Returns the direct trust in this entity.
 	 * 
-	 * @return
+	 * @return the direct trust in this entity.
 	 */
 	public IDirectTrust getDirectTrust();
 
 	/**
+	 * Returns the indirect trust in this entity.
 	 * 
-	 * @param directTrust
-	 *
-	public void setDirectTrust(DirectTrust directTrust);
+	 * @return the indirect trust in this entity.
 	 */
+	public IIndirectTrust getIndirectTrust();
 
 	/**
+	 * Returns the user-perceived trust in this entity.
 	 * 
-	 * @return
-	 *
-	public IndirectTrust getIndirectTrust();
+	 * @return the user-perceived trust in this entity.
 	 */
-
-	/**
-	 * 
-	 * @param indirectTrust
-	 *
-	public void setIndirectTrust(IndirectTrust indirectTrust);
-	 */
-
-	/**
-	 * 
-	 * @return
-	 *
-	public UserPerceivedTrust getUserPerceivedTrust();
-	 */
-
-	/**
-	 * 
-	 * @param userPerceivedTrust
-	 *
-	public void setUserPerceivedTrust(
-			UserPerceivedTrust userPerceivedTrust);
-	 */
+	public IUserPerceivedTrust getUserPerceivedTrust();
 }

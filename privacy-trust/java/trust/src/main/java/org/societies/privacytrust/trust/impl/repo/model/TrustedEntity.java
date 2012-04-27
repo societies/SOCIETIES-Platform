@@ -35,7 +35,9 @@ import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.Type;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.IDirectTrust;
+import org.societies.privacytrust.trust.api.model.IIndirectTrust;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
+import org.societies.privacytrust.trust.api.model.IUserPerceivedTrust;
 
 /**
  * This abstract class is used to represent an entity trusted by the trustor,
@@ -67,11 +69,17 @@ public abstract class TrustedEntity implements ITrustedEntity {
 	@Type(type="org.societies.privacytrust.trust.impl.repo.model.hibernate.TrustedEntityIdUserType")
 	private final TrustedEntityId teid;
 	
+	/** The direct trust in this entity. */
 	@OneToOne(cascade = CascadeType.ALL)
 	private DirectTrust directTrust = new DirectTrust();
 	
-	//private IndirectTrust indirectTrust ;
-	//private UserPerceivedTrust userPerceivedTrust;
+	/** The indirect trust in this entity. */
+	@OneToOne(cascade = CascadeType.ALL)
+	private IndirectTrust indirectTrust = new IndirectTrust();
+	
+	/** The user-perceived trust in this entity. */
+	@OneToOne(cascade = CascadeType.ALL)
+	private UserPerceivedTrust userPerceivedTrust = new UserPerceivedTrust();
 
 	TrustedEntity(final TrustedEntityId teid) {
 		
@@ -97,55 +105,25 @@ public abstract class TrustedEntity implements ITrustedEntity {
 		return this.directTrust;
 	}
 	
-	/**
-	 * 
-	 * @param directTrust
-	 * @since 0.0.3
-	 *
-	public void setDirectTrust(DirectTrust directTrust) {
-		
-		this.directTrust = directTrust;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 * @since 0.0.3
-	 *
-	public IndirectTrust getIndirectTrust() {
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getIndirectTrust()
+	 */
+	@Override
+	public IIndirectTrust getIndirectTrust() {
 		
 		return this.indirectTrust;
 	}
 	
-	/**
-	 * 
-	 * @param indirectTrust
-	 * @since 0.0.3
-	 *
-	public void setIndirectTrust(IndirectTrust indirectTrust) {
-		
-		this.indirectTrust = indirectTrust;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 * @since 0.0.3
-	 *
-	public UserPerceivedTrust getUserPerceivedTrust() {
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getUserPerceivedTrust()
+	 */
+	@Override
+	public IUserPerceivedTrust getUserPerceivedTrust() {
 		
 		return this.userPerceivedTrust;
 	}
-	
-	/**
-	 * 
-	 * @param userPerceivedTrust
-	 * @since 0.0.3
-	 *
-	public void setUserPerceivedTrust(UserPerceivedTrust userPerceivedTrust) {
-		
-		this.userPerceivedTrust = userPerceivedTrust;
-	}*/
 	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
