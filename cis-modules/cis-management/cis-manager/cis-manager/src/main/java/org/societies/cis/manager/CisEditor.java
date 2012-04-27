@@ -47,7 +47,6 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.cis.management.ICisActivityFeed;
 import org.societies.api.cis.management.ICisEditor;
 import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
