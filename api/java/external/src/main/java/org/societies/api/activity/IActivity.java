@@ -28,6 +28,11 @@ package org.societies.api.activity;
  * @author Babak.Farshchian@sintef.no
  *
  */
+/**
+ * MISSING_ANNOTATION
+ * MISSING_JAVADOCS
+ */
+
 public interface IActivity {
 	public String getVerb();
 	public void setVerb(String verb);

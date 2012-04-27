@@ -31,6 +31,11 @@ import org.societies.api.activity.IActivityFeed;
  * @author Babak.Farshchian@sintef.no
  *
  */
+/**
+ * Remove if deprecated
+ * MISSING_ANNOTATION
+ */
+
 @Deprecated
 public interface ICisEditor {
 

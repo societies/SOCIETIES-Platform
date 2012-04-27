@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -42,6 +43,8 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
@@ -178,12 +181,122 @@ public class InternalCtxBrokerTest {
 	/**
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createAssociation(java.lang.String)}.
 	 */
-	@Ignore
 	@Test
 	public void testCreateAssociationString() {
-		fail("Not yet implemented");
+		try {
+			CtxAssociation ctxAssocHasServ = internalCtxBroker.createAssociation("hasService").get();
+			
+			List<CtxIdentifier> assocIdentifierList = internalCtxBroker.lookup(CtxModelType.ASSOCIATION, "hasService").get();
+			assertEquals(assocIdentifierList.size(),1);
+			CtxIdentifier retrievedAssocHasServID = assocIdentifierList.get(0);
+			assertEquals(retrievedAssocHasServID.toString(),ctxAssocHasServ.getId().toString());
+			System.out.println("assocID "+ retrievedAssocHasServID.toString());
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
 	}
 
+	/**
+	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createAssociation(java.lang.String)}.
+	 */
+	@Test
+	public void testRetrieveEntitiesAssociationString() {
+		try {
+			System.out.println("testRetrieveEntitiesAssociationString");
+		
+			CtxEntity person = this.internalCtxBroker.createEntity("Person").get();
+			CtxEntity serviceEnt = this.internalCtxBroker.createEntity("ServiceID").get();
+			CtxAttribute serviceAttr = this.internalCtxBroker.createAttribute(serviceEnt.getId(), "parameterName1").get();
+			serviceAttr.setStringValue("paramValue");
+
+			CtxAssociation hasServiceAssoc = this.internalCtxBroker.createAssociation("hasService").get();
+			hasServiceAssoc.addChildEntity(serviceEnt.getId());
+			hasServiceAssoc.addChildEntity(person.getId());
+			hasServiceAssoc.setParentEntity(person.getId());
+					
+			hasServiceAssoc = (CtxAssociation) this.internalCtxBroker.update(hasServiceAssoc).get();
+			System.out.println("hasServiceAssoc "+hasServiceAssoc);
+
+			serviceEnt = (CtxEntity) this.internalCtxBroker.update(serviceEnt).get();
+			person = (CtxEntity) this.internalCtxBroker.update(person).get();
+			
+			
+			//retrieve assoc data
+			CtxAssociationIdentifier retrievedAssocID = null;
+			CtxEntity serviceRetrieved = null;
+			CtxAttribute ctxServiceAttrRetrieved = null;
+
+			List<CtxIdentifier> list = this.internalCtxBroker.lookup(CtxModelType.ENTITY ,"Person").get();
+			if(list.size()>0) {
+				System.out.println("list "+list);
+				CtxIdentifier persID = list.get(0);				
+				CtxEntity retrievedEnt = (CtxEntity) this.internalCtxBroker.retrieve(persID).get();
+				System.out.println("retrievedEnt "+retrievedEnt);
+
+				Set<CtxAssociationIdentifier> assocIDSet = retrievedEnt.getAssociations();
+				System.out.println("Association1 set " + assocIDSet);
+				System.out.println("Association1 set " + assocIDSet.size());
+				
+				Set<CtxAssociationIdentifier> assocIDSet2 = retrievedEnt.getAssociations("hasService");
+				System.out.println("6");
+				System.out.println("assocIDSet2 size "+assocIDSet2.size());
+				System.out.println("assocIDSet2 "+assocIDSet2);
+
+
+				/*
+				for(CtxAssociationIdentifier assocID : assocIDSet2 ){
+					System.out.println("Association2 set " + assocID);
+					retrievedAssocID = assocID;
+				}
+				CtxAssociation hasServiceRetrieved = (CtxAssociation) this.internalCtxBroker.retrieve(retrievedAssocID).get();
+				System.out.println("7");
+
+				if(hasServiceRetrieved != null && hasService != null){
+					if(hasServiceRetrieved.equals(hasService))System.out.println("CtxAssociation Retrieved matches created CtxAssociation");	
+				}
+
+				System.out.println("hasServiceRetrieved "+ hasServiceRetrieved);
+
+				Set<CtxEntityIdentifier> assocEntitiesSet = hasServiceRetrieved.getChildEntities();
+				for(CtxEntityIdentifier ctxAssocEntityId : assocEntitiesSet ){
+					serviceRetrieved = (CtxEntity) this.internalCtxBroker.retrieve(ctxAssocEntityId).get();		
+					System.out.println("ctxAssocEntityId "+ ctxAssocEntityId);
+				}
+
+				if(serviceRetrieved.equals(serviceEnt)) System.out.println("CtxAssociation Retrieved matches created CtxAssociation");
+				System.out.println("8");
+				for(CtxAttribute ctxAttributeRetrived : serviceRetrieved.getAttributes("parameterName1") ){
+					System.out.println("ctxAttributeRetrived "+ ctxAttributeRetrived);
+					ctxServiceAttrRetrieved = ctxAttributeRetrived;
+				}
+				if(ctxServiceAttrRetrieved.equals(serviceAttr)) System.out.println("ctxServiceAttrRetrieved Retrieved matches created serviceAttr");
+				System.out.println("9");
+
+				 */
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	
 	/**
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#retrieveAdministratingCSS(org.societies.api.context.model.CtxEntityIdentifier)}.
 	 */

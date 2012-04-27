@@ -23,15 +23,16 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.api.internal.useragent.monitoring;
+package org.societies.android.platform.useragent;
 
-import org.societies.api.personalisation.model.IAction;
+import android.app.Activity;
+import android.os.Bundle;
 
-public interface IUserActionListener {
-	
-	/**
-	 * This method should be implemented by IUserActionListeners so that they can receive user action updates
-	 */
-	public void handleUserAction(IAction action);
+public class GUI_feedback extends Activity{
 
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.feedback);
+	}
 }

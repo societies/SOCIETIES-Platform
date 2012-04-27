@@ -1,4 +1,4 @@
-package org.societies.android.platform.cis.test;
+package org.societies.android.platform.test;
 
 import android.test.AndroidTestCase;
 

@@ -22,14 +22,23 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants;
 
-package org.societies.api.internal.useragent.monitoring;
-
-public interface IInternalUserActionMonitor {
+/**
+ * @author Elizabeth
+ *
+ */
+public enum PrivacyOutcomeConstants {
 	
-	/**
-	 * This method allows platform components to register for events that occur when actions are received
-	 */
-	public void registerForActionUpdates(IUserActionListener listener);
+	ALLOW(1), BLOCK(0);
+	
+	private int decision;
+	PrivacyOutcomeConstants(int i){
+		this.decision = i;
+	}
 
+
+	public int getInt(){
+		return this.decision;
+	}
 }

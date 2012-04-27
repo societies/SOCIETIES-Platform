@@ -57,7 +57,7 @@ public class ContextCommunicator {
 
 	public void updateHistory(IIdentity owner, IAction action){
 		//check cache first for ctxAttrIdentifier to update
-		String key = action.getServiceID()+"|"+action.getparameterName();
+		String key = action.getServiceID()+action.getparameterName();
 		if(mappings.containsKey(key)){  //already has service attribute
 			//update attribute
 			CtxAttributeIdentifier attrID = mappings.get(key);
@@ -69,7 +69,19 @@ public class ContextCommunicator {
 		}else{
 			//check context second for ctx attribute to update
 			try {
-				//Look for Entity with serviceId
+				//Look for hasService Associations under Person Entity
+				/*Future<List<CtxIdentifier>> futurePersonIds = ctxBroker.lookup(CtxModelType.ENTITY, "PERSON");
+				List<CtxIdentifier> personIds = futurePersonIds.get();
+				if(personIds.size() > 0){
+					CtxIdentifier personId = personIds.get(0);
+					
+				}else{
+					System.out.println("ERROR - cannot find person entity for CSS owner");
+				}
+				
+				
+				Future<List<CtxIdentifier>> futureAssocIds = ctxBroker.lookup(CtxModelType.ASSOCIATION, "hasService");*/
+				
 				Future<List<CtxIdentifier>> futureEntityIDs = ctxBroker.lookup(CtxModelType.ENTITY, action.getServiceID().getIdentifier().toString());
 				List<CtxIdentifier> entityIds = futureEntityIDs.get();
 				if(entityIds.size() > 0){

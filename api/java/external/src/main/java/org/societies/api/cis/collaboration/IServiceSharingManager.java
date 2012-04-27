@@ -30,6 +30,11 @@ import org.societies.api.cis.collaboration.IServiceSharingRecord;
  * @author Babak.Farshchian@sintef.no
  *
  */
+/**
+ * MISSING_ANNOTATION
+ * MISSING_JAVADOCS
+ */
+
 public interface IServiceSharingManager {
     boolean addServiceSharingRecord(String cisId, IServiceSharingRecord sharingRecord);
 }

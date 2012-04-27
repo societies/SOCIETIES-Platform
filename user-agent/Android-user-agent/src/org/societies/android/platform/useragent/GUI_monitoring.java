@@ -22,23 +22,34 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants;
 
-/**
- * @author Elizabeth
- *
- */
-public enum PrivacyOutcomeConstants {
-	
-	ALLOW(1), BLOCK(0);
-	
-	private int decision;
-	PrivacyOutcomeConstants(int i){
-		this.decision = i;
-	}
+package org.societies.android.platform.useragent;
 
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 
-	public int getInt(){
-		return this.decision;
-	}
+public class GUI_monitoring extends Activity implements OnClickListener{
+	/** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.uam);
+        
+        Button sayHello = (Button)findViewById(R.id.sayHello);
+        sayHello.setOnClickListener(this);
+        
+        Button sayGoodbye = (Button)findViewById(R.id.sayGoodbye);
+        sayGoodbye.setOnClickListener(this);
+    }
+    
+    public void onClick(View v){
+    	if(v.getId() == R.id.sayHello){
+			//send hello message to backend
+		}else if(v.getId() == R.id.sayGoodbye){
+			//send goodbye message to backend
+		}
+    }
 }

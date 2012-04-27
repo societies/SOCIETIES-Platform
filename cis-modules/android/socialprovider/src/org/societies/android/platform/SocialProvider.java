@@ -22,19 +22,20 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.cis;
+package org.societies.android.platform;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.net.Uri;
 
 /**
- * This is the Android-based SocialProvider. It provides a content provider interface to access CIS and related data.
- * Currently it is working with a local database due to the problems we have with the communication manager working
- * on Android.
+ * This is the Android-based SocialProvider. It provides a content provider interface
+ * to access CIS and related data. Currently it is working with a local database due 
+ * to the problems we have with the communication manager working on Android.
  * 
  * 
  * @author Babak.Farshchian@sintef.no
@@ -42,12 +43,12 @@ import android.net.Uri;
  */
 public class SocialProvider extends ContentProvider {
 
-    
+    //will contain all the legal URIs:
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     private boolean online = false; // True when we are online.
     private SocialDatabaseAdapter dbAdapter = null;
-    //private CommunicationAdapter comAdapter = null;
+    private CommunicationAdapter comAdapter = null;
     /* 
      * Here I should do the following:
      * - Create a {@link CommunicationAdapter} and try to get connection with cloud CisManager (currently not here 
@@ -62,12 +63,12 @@ public class SocialProvider extends ContentProvider {
 	Context context = getContext();
 	//TODO: to be used in later versions with local caching:
 	dbAdapter = new SocialDatabaseAdapter(context);
-	//Used to send queries over network: Currently not working.
-//	comAdapter = new CommunicationAdapter(context);
-//	comAdapter.goOnline();
-//	if (comAdapter.isOnline()){
-//	    online = true;
-//	}
+	//Used to send queries over network:
+	comAdapter = new CommunicationAdapter(context);
+	comAdapter.goOnline();
+	if (comAdapter.isOnline()){
+	    online = true;
+	}
 	//Construct all the legal query URIs:
 	//TODO replace with constants or move to SocialContract.
 	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people", 1);
@@ -102,26 +103,24 @@ public class SocialProvider extends ContentProvider {
      * (non-Javadoc)
      * @see android.content.ContentProvider#insert(android.net.Uri, android.content.ContentValues)
      */
+
     @Override
     public Uri insert(Uri _uri, ContentValues _values) {
 	// TODO Auto-generated method stub
-	long id = dbAdapter.insertCis(_values);
-	return Uri.withAppendedPath(_uri, Long.toString(id));
+    	return comAdapter.insert(_uri, _values);
+	//long id = dbAdapter.insertCis(_values);
     }
 
-    /* (non-Javadoc)
-     * @see android.content.ContentProvider#onCreate()
-     */
-    /* (non-Javadoc)
+    /* 
+     * Return a cursor that contains the contents of a query
+     * 
+     * (non-Javadoc)
      * @see android.content.ContentProvider#query(android.net.Uri, java.lang.String[], java.lang.String, java.lang.String[], java.lang.String)
      */
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
 	    String[] selectionArgs, String sortOrder) {
-	// TODO Auto-generated method stub
-	//SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-
-	return null;
+    	return comAdapter.query(uri, projection, selection, selectionArgs, sortOrder);
     }
 
     /* (non-Javadoc)

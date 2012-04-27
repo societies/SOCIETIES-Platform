@@ -22,20 +22,48 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.css.directory;
 
-/**
- * @author Babak.Farshchian@sintef.no
- *
- *Class deprecated : use org.societies.api.schema.css.directory.CssAdvertisementRecord
- */
+package org.societies.useragent.monitoring.test;
 
-@Deprecated
-public interface ICssAdvertisementRecord {
-	public String getName();
-	public void setName(String name);
-	public String getId();
-	public String getUri();
-	public void setUri(String uri);
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
+
+public class MockIdentity implements IIdentity{
+	
+	IdentityType type;
+	String identifier;
+	String domainIdentifier;
+
+	public MockIdentity(IdentityType type, String identifier,
+			String domainIdentifier) {
+		this.type = type;
+		this.identifier = identifier;
+		this.domainIdentifier = domainIdentifier;
+	}
+
+	@Override
+	public String getJid() {
+		return null;
+	}
+
+	@Override
+	public String getBareJid() {
+		return null;
+	}
+
+	@Override
+	public String getDomain() {
+		return domainIdentifier;
+	}
+
+	@Override
+	public String getIdentifier() {
+		return identifier;
+	}
+
+	@Override
+	public IdentityType getType() {
+		return type;
+	}
 
 }

@@ -24,13 +24,15 @@
  */
 package org.societies.api.identity;
 
+import java.io.Serializable;
+
 /**
  * This class is used to represent a CSS requesting resources 
  *
  * @author Eliza, Nicolas, Olivier
  *
  */
-public class Requestor {
+public class Requestor implements Serializable{
 
 	private final IIdentity requestorId;
 
@@ -46,6 +48,58 @@ public class Requestor {
 	}
 
 
+
+	public String toXMLString(){
+		String str = "";
+		str = str.concat("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:subject-id\"" +
+		"\n \t\t\tDataType=\"org.societies.api.identity.IIdentity\">");
+
+		str = str.concat("\n\t\t<AttributeValue>");
+		str = str.concat(this.requestorId.toString());
+		str = str.concat("</AttributeValue>");
+
+		str = str.concat("\n\t</Attribute>");
+		return str;
+	}
 	
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((requestorId == null) ? 0 : requestorId.hashCode());
+		return result;
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Requestor)) {
+			return false;
+		}
+		
+		if (!(obj.getClass().equals(Requestor.class))){
+			return false;
+		}
+		Requestor other = (Requestor) obj;
+		if (requestorId == null) {
+			if (other.requestorId != null) {
+				return false;
+			}
+		} else if (!requestorId.equals(other.requestorId)) {
+			return false;
+		}
+		return true;
+	}
 }
