@@ -30,6 +30,11 @@ package org.societies.api.cis.management;
  * @author Babak.Farshchian@sintef.no
  *
  */
+/**
+ * Empty interface?
+ * MISSING_ANNOTATION
+ * MISSING_JAVADOCS
+ */
 public interface ICisOwned extends ICisRecord {
 
 }
