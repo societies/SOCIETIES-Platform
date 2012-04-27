@@ -51,6 +51,10 @@ public class RequestorCis extends Requestor implements Serializable{
 	}
 
 	@Override
+	public String toString(){
+		return super.toString()+"\n"+"CIS Id: "+this.cisRequestorId.getJid();
+	}
+	@Override
 	public String toXMLString(){
 		String parent = super.toXMLString();
 		String str = "";

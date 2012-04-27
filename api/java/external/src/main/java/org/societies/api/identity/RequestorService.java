@@ -52,6 +52,11 @@ public class RequestorService extends Requestor implements Serializable{
 	}
 
 	@Override
+	public String toString(){
+		return super.toString()+"\nService Id: "+requestorServiceId.getServiceInstanceIdentifier();
+	}
+	
+	@Override
 	public String toXMLString(){
 		String parent = super.toXMLString();
 		String str = "";

@@ -28,15 +28,20 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.trust.ITrustBroker;
+import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ContextPreferenceCondition;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceCondition;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.TrustPreferenceCondition;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.OperatorConstants;
 
 
@@ -45,10 +50,11 @@ public class PreferenceEvaluator {
 	
 	private PrivateContextCache contextCache;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
-	
-	public PreferenceEvaluator(PrivateContextCache cache){
+	private ITrustBroker trustBroker;
+	public PreferenceEvaluator(PrivateContextCache cache, ITrustBroker broker){
 		
 		this.contextCache = cache;
+		trustBroker = broker;
 	}
 	
 	public Hashtable<IPrivacyOutcome,List<CtxIdentifier>> evaluatePreference(IPrivacyPreference ptn){
@@ -175,6 +181,25 @@ public class PreferenceEvaluator {
 			}
 			else
 				return this.evaluateInt(parseString(contextCond.getValue()), parseString(currentContextValue), operator);
+		}else if (cond instanceof TrustPreferenceCondition){
+			TrustPreferenceCondition trustCond = (TrustPreferenceCondition) cond;
+			try {
+				Double trustValue = this.trustBroker.retrieveTrust(trustCond.getTrustId()).get();
+				if (trustValue.compareTo(trustCond.getTrustThreshold())>=0){
+					return true;
+				}else{
+					return false;
+				}
+			} catch (TrustException e) {
+				e.printStackTrace();
+				return false;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				return false;
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+				return false;
+			}
 		}else{
 			throw new PrivacyException("PM: Condition is not a Context condition");
 		}
