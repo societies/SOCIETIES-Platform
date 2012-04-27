@@ -30,6 +30,10 @@ import org.societies.api.cis.directory.ICisAdvertisementRecord;
  * @author Babak.Farshchian@sintef.no
  *
  */
+/**
+ * MISSING_ANNOTATION
+ * MISSING_JAVADOCS
+ */
 public interface ICisDirectory {
 	/*
 	 * Various search methods that return an array of CISAdvertisementRecords.

@@ -28,6 +28,10 @@ package org.societies.api.cis.management;
  * @author Babak.Farshchian@sintef.no
  *
  */
+/**
+ * MISSING_ANNOTATION
+ * MISSING_JAVADOCS
+ */
 public interface ICisRecord {
 
     public String getCisId();

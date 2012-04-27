@@ -30,6 +30,12 @@ package org.societies.api.cis.collaboration;
  * @author Babak.Farshchian@sintef.no
  * @version 0
  */
+/**
+ * What's the use of an empty interface?
+ * 
+ * MISSING_ANNOTATION
+ * MISSING_JAVADOCS
+ */
 public interface ICisSubscriber {
 
 }
