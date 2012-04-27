@@ -54,6 +54,7 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
@@ -84,7 +85,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * 
 	 * @see {@link #setUserCtxDBMgr(IUserCtxDBMgr)}
 	 */
-	@Autowired(required=true)
+	
 	private IUserCtxDBMgr userCtxDBMgr = null;
 
 	/**
@@ -95,6 +96,21 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Autowired(required=true)
 	private IUserCtxHistoryMgr userCtxHistoryMgr = null;
 
+
+	public InternalCtxBroker(){
+		//createCSSOperator();
+	}
+
+
+	public void createCSSOperator(){
+		try {
+			userCtxDBMgr.createIndividualCtxEntity(CtxEntityTypes.PERSON);
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.societies.api.internal.context.broker.ICtxBroker#createAssociation(java.lang.String)
@@ -104,7 +120,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<CtxAssociation> createAssociation(String type) throws CtxException {
 
 		CtxAssociation association = userCtxDBMgr.createAssociation(type);
-		
+
 		if (association!=null)
 			return new AsyncResult<CtxAssociation>(association);
 		else 
@@ -228,9 +244,12 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Async
 	public Future<IndividualCtxEntity> retrieveCssOperator()
 			throws CtxException {
-		// TODO Auto-generated method stub
-		final IndividualCtxEntity operatorCss = null; // TODO this.userCtxDBMgr.retrieveOperatorCss();
-		
+
+		IndividualCtxEntity operatorCss = null; // TODO this.userCtxDBMgr.retrieveOperatorCss();
+		List<CtxIdentifier> entIds = this.userCtxDBMgr.lookup(CtxModelType.ENTITY, CtxEntityTypes.PERSON);
+		for (CtxIdentifier entId : entIds) {
+			if (entId.getObjectNumber() == 0) operatorCss = (IndividualCtxEntity) this.userCtxDBMgr.retrieve(entId);
+		}
 		return new AsyncResult<IndividualCtxEntity>(operatorCss);
 	}
 
@@ -725,7 +744,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				// log.warn("**********"+ ic );
 				// get the list of hoc attrs stored as BlobValue
 				List<CtxHistoryAttribute> tupleValueList = (List<CtxHistoryAttribute>) SerialisationHelper.deserialise(hocAttr.getBinaryValue(), this.getClass().getClassLoader());
-				
+
 				// list of historic attributes contained in "tuple_status" retrieved
 
 				//int ia = 0;
@@ -737,7 +756,7 @@ public class InternalCtxBroker implements ICtxBroker {
 					List<CtxHistoryAttribute> listEscHocAttrs = new ArrayList<CtxHistoryAttribute>();
 					//for each historic attr in blob value check if the identifier equals the primary identifier
 					if (tupledHoCAttrTemp.getId().toString().equals(primaryAttrId.toString())){
-					//	ia++;
+						//	ia++;
 						keyAttr = tupledHoCAttrTemp;
 						for (CtxHistoryAttribute tupledHoCAttrEscorting : tupleValueList){
 							if (!(tupledHoCAttrEscorting.getId().toString().equals(primaryAttrId.toString()))){
@@ -903,8 +922,10 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * @param userDB
 	 *            the User Context DB Mgmt service reference to set.
 	 */
+	@Autowired(required=true)
 	public void setUserCtxDBMgr(IUserCtxDBMgr userDB) {
 		this.userCtxDBMgr = userDB;
+		createCSSOperator();
 	}
 
 	/**

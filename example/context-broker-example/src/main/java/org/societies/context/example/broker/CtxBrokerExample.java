@@ -48,6 +48,7 @@ import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,6 +75,21 @@ public class CtxBrokerExample 	{
 		LOG.info("CtxBrokerExample instantiated");
 		this.internalCtxBroker = internalCtxBroker;
 
+		try {
+			IndividualCtxEntity operator = this.internalCtxBroker.retrieveCssOperator().get();
+			LOG.info(" operator: " +operator);
+		
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		LOG.info("Starting examples...");
 		this.createContext();
 		this.retrieveContext();

@@ -95,6 +95,7 @@ public class InternalCtxBrokerTest {
 		internalCtxBroker = new InternalCtxBroker();
 		internalCtxBroker.setUserCtxDBMgr(new UserCtxDBMgr());
 		internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
+	//	internalCtxBroker.createCSSOperator();
 	}
 
 	/**
@@ -105,6 +106,35 @@ public class InternalCtxBrokerTest {
 		internalCtxBroker = null;
 	}
 
+	
+	/**
+	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createCSSOperator}.
+	 * 
+	 * @throws CtxException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testCreateCSSOperator() {
+		
+		//internalCtxBroker.createCSSOperator();
+		try {
+			IndividualCtxEntity ctxEntity = internalCtxBroker.retrieveCssOperator().get();
+		
+	      System.out.println("operator entity " +ctxEntity);
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
 	/**
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#evaluateSimilarity(java.io.Serializable, java.util.List, org.societies.api.internal.context.broker.IUserCtxBrokerCallback)}.
 	 */
@@ -139,7 +169,7 @@ public class InternalCtxBrokerTest {
 		assertEquals(ctxAttribute.getId().getScope(), ctxEntity.getId());
 		assertTrue(ctxAttribute.getType().equalsIgnoreCase("attrType"));
 	}
-
+	
 	/**
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createEntity(java.lang.String)}.
 	 * 
