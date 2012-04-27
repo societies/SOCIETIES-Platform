@@ -199,7 +199,7 @@ public class CisEditor implements IFeatureServer,ICisEditor {
 		
 		
 		// TODO: we have to get a proper identity and pwd for the CIS...
-		cisRecord = new CisRecord(activityFeed,cssOwner, mode, cisIdentity.getJid(), "", membersCss,
+		cisRecord = new CisRecord(cssOwner, mode, cisIdentity.getJid(), "", membersCss,
 				cisIdentity.getDomain(), sharedServices,cisType,cisName);
 		
 		LOG.info("CIS creating pub sub service");
@@ -311,7 +311,6 @@ public class CisEditor implements IFeatureServer,ICisEditor {
 		
 		this.cisRecord = cisRecord; 
 		
-		this.activityFeed = this.cisRecord.feed;
 		this.sharedServices = this.cisRecord.sharedServices;
 		//CISendpoint = 	new XCCommunicationMgr(cisRecord.getHost(), cisRecord.getCisId(),cisRecord.getPassword());
 		

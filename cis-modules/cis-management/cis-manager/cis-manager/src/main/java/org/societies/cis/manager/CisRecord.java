@@ -45,7 +45,7 @@ import org.societies.cis.activity.ActivityFeed;
 
 
 public class CisRecord implements ICisOwned, ICisSubscribed{
-	public ActivityFeed feed;
+	
 	public String ownerCss;
 	public int membershipCriteria; // also know as mode
 
@@ -68,12 +68,11 @@ public class CisRecord implements ICisOwned, ICisSubscribed{
 	
 
 	
-	public CisRecord(ActivityFeed feed, String ownerCss,
+	public CisRecord(String ownerCss,
 			int membershipCriteria, String cisId, String permaLink,
 			Set<CisParticipant> membersCss, String password, String host,
 			Set<IServiceSharingRecord> sharedServices) {
 		super();
-		this.feed = feed;
 		this.ownerCss = ownerCss;
 		this.membershipCriteria = membershipCriteria;
 		this.cisName = cisId;
@@ -90,12 +89,11 @@ public class CisRecord implements ICisOwned, ICisSubscribed{
 	
 
 	
-	public CisRecord(ActivityFeed feed, String ownerCss,
+	public CisRecord(String ownerCss,
 			int membershipCriteria, String cisJid, String permaLink,
 			Set<CisParticipant> membersCss, String password,
 			Set<IServiceSharingRecord> sharedServices, String cisType, String cisName) {
 		super();
-		this.feed = feed;
 		this.ownerCss = ownerCss;
 		this.membershipCriteria = membershipCriteria;
 		this.cisName = cisName;
