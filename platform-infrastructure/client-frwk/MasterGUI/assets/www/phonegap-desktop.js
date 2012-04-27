@@ -61,21 +61,29 @@ phonegapdesktop.internal = {
     },
     
     parseConfigFile: function(fileName){
-        var data = '';
-        var jsonReq = new XMLHttpRequest();
-        try {
-            jsonReq.open("GET", fileName, false);
-        } 
-        catch (err) {
-            jsonReq = new ActiveXObject('Microsoft.XMLHTTP');
-            jsonReq.open("GET", fileName, false);
-        }
-        jsonReq.send();
-        
-        data = jsonReq.responseText;
-        
-        
-        phonegapdesktop.internal.debugdata = phonegapdesktop.utility.mergeRecursive(phonegapdesktop.internal.debugdata, JSON.parse(data));
+    	console.log("Parsing file: " + fileName);
+    	
+    	try {
+            var data = '';
+            var jsonReq = new XMLHttpRequest();
+            try {
+                jsonReq.open("GET", fileName, false);
+            } 
+            catch (err) {
+                jsonReq = new ActiveXObject('Microsoft.XMLHTTP');
+                jsonReq.open("GET", fileName, false);
+            }
+            jsonReq.send();
+            
+            data = jsonReq.responseText;
+            
+            
+            phonegapdesktop.internal.debugdata = phonegapdesktop.utility.mergeRecursive(phonegapdesktop.internal.debugdata, JSON.parse(data));
+    		
+    	}
+    	catch (exception) {
+    	    console.log("Parse config file exception: " + exception);
+    	}
     },
     
     dispatchTouchEvent: function(mouseArgs, eventName){
@@ -102,30 +110,46 @@ phonegapdesktop.internal = {
         var useIndex = 0;
         var node = this.debugdata[nodeName];
         var inSequence = true;
+        var elementAsArray = false;
         
+        // Pick an element from the array
+        if (node.arraySequence != undefined) {
+            inSequence = node.arraySequence;
+        }
+        else {
+            inSequence = phonegapdesktop.internal.debugdata.internal.arraySequence;
+        }
+        
+        // Treat element as array
+        // Extension to allow debug data array elements to be retrieved as an array
+        
+        if (node.allArray != undefined) {
+        	elementAsArray = node.allArray;
+        }
+        else {
+        	elementAsArray = phonegapdesktop.internal.debugdata.internal.allArray;
+        }
+
         if (Object.prototype.toString.call(node[element]) === '[object Array]') {
-            // Pick an element from the array
-            if (node.arraySequence != undefined) {
-                inSequence = node.arraySequence;
-            }
-            else {
-                inSequence = phonegapdesktop.internal.debugdata.internal.arraySequence;
-            }
-            if (inSequence) {
-                if (typeof(node[indexPrefix + element]) === 'number') {
-                    useIndex = node[indexPrefix + element] + 1;
-                    if (useIndex >= node[element].length) {
-                        useIndex = 0;
+        	if (!elementAsArray) {
+                if (inSequence) {
+                    if (typeof(node[indexPrefix + element]) === 'number') {
+                        useIndex = node[indexPrefix + element] + 1;
+                        if (useIndex >= node[element].length) {
+                            useIndex = 0;
+                        }
                     }
+                    node[indexPrefix + element] = useIndex;
+                    
+                    return node[element][useIndex];
                 }
-                node[indexPrefix + element] = useIndex;
-                
-                return node[element][useIndex];
-            }
-            else {
-                return node[element][Math.floor(Math.random() * node[element].length)];
-            }
-            
+                else {
+                    return node[element][Math.floor(Math.random() * node[element].length)];
+                }
+        	} else {
+                // Return the whole array
+                return node[element];
+        	}
         }
         else {
             // Return the raw element
@@ -775,6 +799,13 @@ navigator.notification = {
     }
 };
 
+var PhoneGap = {};
+
+PhoneGap.addConstructor = function(func) {
+    console.log("Dummy PhoneGap constructor");
+};
+
+
 // NOTE: Storage functions should be provided by the browser
 
 // This is not documented in the API for some reason
@@ -795,5 +826,9 @@ navigator.app = {
         window.close();
     }
 };
+
+window.plugins = {};
+
+
 
 

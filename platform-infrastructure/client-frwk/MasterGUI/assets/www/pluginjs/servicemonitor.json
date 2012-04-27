@@ -1,13 +1,24 @@
 {
-	"barcodescanner" : {
-		"scans" : [
-			{ "text" : "1234567890123",
-				"format" : "ean13",
-				"cancelled" : "false"},
-			{ "text" : "9876543210987",
-				"format" : "ean13",
-				"cancelled" : "false"}
-
-		]
+"CoreServiceMonitorService" : {
+		"exceptionThreshold" : 0,
+		"allArray" : true,
+		"connectService" : "connected",
+		"disconnectService" : "disconnected",
+		"activeServices" : [
+							{"className" : "service1",
+							 "activeSince" : 10000},
+							{"className" : "service2",
+							 "activeSince" : 400000},
+							{"className" : "service3",
+							 "activeSince" : 900000}
+							],
+		"activeTasks" : [
+							{"className" : "app1",
+							 "numRunningActivities" : 1},
+							{"className" : "app2",
+							 "numRunningActivities" : 4},
+							{"className" : "app3",
+							 "numRunningActivities" : 9}
+							]
 	}
 }
