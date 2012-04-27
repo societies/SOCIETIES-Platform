@@ -110,7 +110,7 @@ public class CisEditor implements IFeatureServer,ICisEditor {
 
 
 	// at the moment we are not using this constructor, but just the one below, as that one generates the CIS id for us
-	public CisEditor(String ownerCss, String cisId,String host,
+/*	public CisEditor(String ownerCss, String cisId,String host,
 			int membershipCriteria, String permaLink, String password,ICISCommunicationMgrFactory ccmFactory) {
 		
 		activityFeed = ActivityFeed.startUp(cisId);
@@ -157,12 +157,12 @@ public class CisEditor implements IFeatureServer,ICisEditor {
 		LOG.info("CIS autowired PubSubClient");
 		// TODO: broadcast its creation to other nodes?
 
-	}
+	}*/
 
 	// constructor of a CIS without a pre-determined ID or host
 	public CisEditor(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory) {
 		
-		activityFeed = ActivityFeed.startUp(this.getCisId());
+		
 		sharedServices = new HashSet<IServiceSharingRecord>();
 		membersCss = new HashSet<CisParticipant>();
 		membersCss.add(new CisParticipant(cssOwner,MembershipType.owner));
@@ -213,6 +213,9 @@ public class CisEditor implements IFeatureServer,ICisEditor {
 		
 		LOG.info("CIS autowired PubSubClient");
 		// TODO: broadcast its creation to other nodes?
+		
+		
+		activityFeed = ActivityFeed.startUp(this.getCisId()); // this must be called just after the CisRecord has been set
 
 	}
 	
