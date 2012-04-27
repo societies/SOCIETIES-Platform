@@ -52,15 +52,13 @@ public class NominalTestCase {
 		 
 		 LOG.info("###743... 6");
 		
+		 // if the method times out, fail
+		 assertNotNull("Timed out", consumerCallbackImpl.getAsyncResult());
+		 
+		 // otherwise, check the result
 		 // Get the result
 		 Integer result = consumerCallbackImpl.getAsyncResult();
-		 
 		 LOG.info("asyncTest1 result: " + result);
-		 
-		 // if the method times out, fail
-		 assertNotNull("Timed out", result);
-		 
-		// otherwise, check the result
 		 assertEquals(new Integer(1), result);
 	}
 	

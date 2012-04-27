@@ -39,6 +39,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ContextPreferenceCondition;
@@ -53,6 +54,7 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.CtxTypes;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager;
 
+
 public class PrivacyPreferenceMerger {
 
 	private ICtxBroker broker;
@@ -62,15 +64,13 @@ public class PrivacyPreferenceMerger {
 	public PrivacyPreferenceMerger(ICtxBroker broker, PrivacyPreferenceManager ppMgr){
 		this.broker = broker;
 		this.ppMgr = ppMgr;
-		
+
 	}
-	
-	public void addIDSDecision(IIdentity selectedDPI,
-			IIdentity providerDPI, ServiceResourceIdentifier serviceID){
+
+	public void addIDSDecision(IIdentity selectedDPI, Requestor requestor){
 		ContextSnapshot snapshot = this.takeSnapshot();
 		IDSPreferenceDetails details = new IDSPreferenceDetails(selectedDPI);
-		details.setProviderDPI(providerDPI);
-		details.setServiceID(serviceID);
+		details.setRequestor(requestor);
 		IPrivacyPreferenceTreeModel existingModel = ppMgr.getIDSPreference(details);
 		if (existingModel==null){
 			this.ppMgr.storeIDSPreference(details, this.createIDSPreference(snapshot, details));
@@ -81,11 +81,11 @@ public class PrivacyPreferenceMerger {
 			}
 		}
 	}
-	
-	
-	
+
+
+
 	public IPrivacyPreference mergeIDSPreference(IDSPreferenceDetails d, IPrivacyPreference node, ContextSnapshot snapshot){
-		
+
 
 		if (node.isLeaf()){
 			this.logging.debug("existing node does not contain context condition. merging as leaf");
@@ -94,14 +94,14 @@ public class PrivacyPreferenceMerger {
 			p.add(node);
 			return p;
 		}
-		
-		
+
+
 		ArrayList<SingleRule> singleRules = this.convertToSingleRules(snapshot);
-		
-		
+
+
 		IPrivacyPreference mergedTree = node;
 		for (int i = 0; i< singleRules.size(); i++){
-			
+
 			SingleRule sr = singleRules.get(i);
 			//logging.debug("Merging new Single Rule: "+sr.toString());
 			//logging.debug("\twith: "+mergedTree.toTreeString());
@@ -110,25 +110,25 @@ public class PrivacyPreferenceMerger {
 				return null;
 			}
 			mergedTree = temp; //in the MergingManager if this method returns null, it means we have to request a full learning cycle
-			
+
 		}
 		//DisplayPreferenceTree dpt = new DisplayPreferenceTree(new PreferenceTreeModel(oldTree),"Merged Tree :"+title);
 
 		return mergedTree;
 	}
-	
-	
+
+
 	private IPrivacyPreference merge(IPrivacyPreference oldTree, SingleRule sr){
 		//IPreference newTree = null;
 		ArrayList<SingleRule> oldRules = this.convertToSingleRules(oldTree);
-		
+
 		//check if we're in Situation 1 (same conditions different outcomes)
 		ArrayList<SingleRule> temp = this.checkConflicts(oldRules, sr);
 		if (temp.size()>0){
 			return null;
 		}
 		this.logging.debug("Not in situation 1");
-		
+
 		//check if we're in Situation 2 (100% match)
 		temp = this.checkMatches(oldRules, sr);
 		if (temp.size()>0){
@@ -136,12 +136,12 @@ public class PrivacyPreferenceMerger {
 			return oldTree;
 		}
 		this.logging.debug("Not in Situation 2");
-		
+
 		//we're going to find a branch that has the most common conditions with this rule.
 		IPrivacyPreference commonNode = this.findCommonNode(oldTree, sr);
-		
-		
-		
+
+
+
 		if (null==commonNode){
 			IPrivacyPreference root = (IPrivacyPreference) oldTree.getRoot();
 			if (null==root.getUserObject()){
@@ -151,20 +151,20 @@ public class PrivacyPreferenceMerger {
 			newRoot.add(root);
 			return this.addToNode(newRoot, sr);
 		}
-		
+
 		return this.addToNode(commonNode, sr);
-		
+
 		//ArrayList<SingleRule> sortedRules = sortTree(oldRules);
 		//newTree = createTree(sortedRules);
 		//return newTree;
-		
-		
+
+
 	}
-	
+
 	private ArrayList<SingleRule> checkMatches(ArrayList<SingleRule> oldRules, SingleRule newRule){
-		
+
 		for (int i=0; i< oldRules.size(); i++){
-			
+
 			SingleRule sr = oldRules.get(i);
 			if (sr.equals(newRule)){
 				oldRules.set(i, this.increaseConfidenceLevel(sr));
@@ -173,20 +173,20 @@ public class PrivacyPreferenceMerger {
 		}
 		return new ArrayList<SingleRule>();
 	}
-	
+
 	private SingleRule increaseConfidenceLevel(SingleRule sr){
 		//need to increase the confidence level by running the algorithm
 		return sr;
 	}
-	
 
-	
-	
-	
+
+
+
+
 	private IPrivacyPreference findCommonNode(IPrivacyPreference ptn, SingleRule sr){
-		
+
 		CommonNodeCounter cnc = new CommonNodeCounter();
-		
+
 		//if it's an empty root, we have to repeat with all its children
 		if (ptn.getUserObject() == null){
 			this.logging.debug("current node is empty root");
@@ -197,21 +197,21 @@ public class PrivacyPreferenceMerger {
 				cnc = findCommonNode(p,sr, cnc);
 			}
 		}else{
-			
+
 			cnc = findCommonNode(ptn,sr,cnc);
 		}
-		
+
 		return cnc.getMostCommonNode();
 	}
-	
+
 	private CommonNodeCounter findCommonNode(IPrivacyPreference ptn, SingleRule sr, CommonNodeCounter cnc){
-		
+
 		//unlikely
 		if (ptn.isLeaf()){
 			this.logging.debug("current node is leaf. returning common node counter");
 			return cnc;
 		}
-		
+
 		IPrivacyPreferenceCondition pc = (IPrivacyPreferenceCondition) ptn.getUserObject();
 		//if they have a common condition, go to the children, otherwise, return and continue with siblings
 		if (sr.hasCondition(pc)){
@@ -224,26 +224,26 @@ public class PrivacyPreferenceMerger {
 		}
 		return cnc;
 	}
-	
-	
+
+
 	private ArrayList<SingleRule> checkConflicts(ArrayList<SingleRule> oldRules, SingleRule newRule){
-		
+
 		for (int i=0; i< oldRules.size(); i++){
 			SingleRule sr = oldRules.get(i);
 			if (sr.conflicts(newRule)){
 				oldRules.set(i, this.resolveConflict(sr, newRule));
 				return oldRules;
 			}
-			
+
 		}
-		
+
 		return new ArrayList<SingleRule>();
 	}
 	private SingleRule resolveConflict(SingleRule oldRule, SingleRule newRule){
 		//resolve
 		return oldRule;
 	}
-	
+
 	public ArrayList<SingleRule> convertToSingleRules(IPrivacyPreference ptn){
 		ArrayList<SingleRule> singleRules = new ArrayList<SingleRule>();
 		//Enumeration<IPreference> newNodeEnum = ptn.depthFirstEnumeration();
@@ -265,15 +265,15 @@ public class PrivacyPreferenceMerger {
 				}
 				singleRules.add(sr);
 			}
-			
+
 		}	
-		
+
 		for (int i=0; i<singleRules.size(); i++){
 			logging.debug("::"+singleRules.get(i).toString());
 		}
 		return singleRules;
 	}
-	
+
 	public ArrayList<SingleRule> convertToSingleRules(ContextSnapshot snapshot){
 		ArrayList<SingleRule> srlist = new ArrayList<SingleRule>();
 		List<SingleContextAttributeSnapshot> slist = snapshot.getList();
@@ -295,11 +295,11 @@ public class PrivacyPreferenceMerger {
 			IPrivacyPreference temp = new PrivacyPreference(this.getContextConditionPreference(s));
 			temp.add(p);
 			p = temp;
-			
+
 		}
 		return p;
 	}
-	
+
 	private IPrivacyPreferenceCondition getContextConditionPreference(SingleContextAttributeSnapshot attrSnapshot){
 		ContextPreferenceCondition condition = new ContextPreferenceCondition(attrSnapshot.getId(),OperatorConstants.EQUALS, attrSnapshot.getValue());
 		//IPrivacyPreference pref = new PrivacyPreference(condition); 
@@ -321,7 +321,7 @@ public class PrivacyPreferenceMerger {
 		}
 		return snapshot;
 	}
-	
+
 	private SingleContextAttributeSnapshot takeAttributeSnapshot(String type){
 		CtxIdentifier id;
 		try {
@@ -331,8 +331,7 @@ public class PrivacyPreferenceMerger {
 			}
 			id = l.get(0);
 			CtxAttribute attr = (CtxAttribute) this.broker.retrieve(id);
-			String value = attr.getStringValue();
-			SingleContextAttributeSnapshot attrSnapshot = new SingleContextAttributeSnapshot((CtxAttributeIdentifier) id, value);
+			SingleContextAttributeSnapshot attrSnapshot = new SingleContextAttributeSnapshot(attr);
 			return attrSnapshot;
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
@@ -346,16 +345,16 @@ public class PrivacyPreferenceMerger {
 		}
 		return null;
 	}
-	
-	
-private IPrivacyPreference addToNode(IPrivacyPreference ptn, SingleRule sr){
-		
+
+
+	private IPrivacyPreference addToNode(IPrivacyPreference ptn, SingleRule sr){
+
 		logging.debug("BEFORE REMOVAL: "+sr.toString());
 		if (null!=ptn.getUserObject()){
 			logging.debug(" found common node: "+ptn.getUserObject().toString());
 			//IPreferenceCondition[] cons = new IPreferenceCondition[ptn.getLevel()];
 			Object[] objs = ptn.getUserObjectPath();
-			
+
 			for (int i = 0; i< objs.length; i++){
 				if (objs[i] instanceof ContextPreferenceCondition){
 					ContextPreferenceCondition con = (ContextPreferenceCondition) objs[i];
@@ -374,8 +373,8 @@ private IPrivacyPreference addToNode(IPrivacyPreference ptn, SingleRule sr){
 		}else{
 			logging.debug(" not found common node");
 		}
-		
-		
+
+
 		logging.debug("AFTER REMOVAL: "+sr.toString());
 		IPrivacyPreference leaf = new PrivacyPreference(sr.getOutcome());
 		for (int i = 0; i< sr.getConditions().size(); i++){
@@ -386,20 +385,20 @@ private IPrivacyPreference addToNode(IPrivacyPreference ptn, SingleRule sr){
 			if (sr.getConditions().get(i) == null){
 				logging.debug("even weirder");
 			}
-			
-				//log("pc: "+pc.toString());
+
+			//log("pc: "+pc.toString());
 			logging.debug("sr con: "+sr.getConditions().get(i).toString());
 			IPrivacyPreference temp = new PrivacyPreference(sr.getConditions().get(i));
-				ptn.add(temp);
-				ptn = temp;
-			
-			
+			ptn.add(temp);
+			ptn = temp;
+
+
 		}
-		
+
 		ptn.add(leaf);
 		return (IPrivacyPreference) ptn.getRoot();
 	}
-	
-	
-	
+
+
+
 }

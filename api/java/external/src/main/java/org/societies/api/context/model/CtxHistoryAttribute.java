@@ -24,6 +24,9 @@
  */
 package org.societies.api.context.model;
 
+import java.io.Serializable;
+import java.util.Date;
+
 /**
  * This class is used in order to represent context history attributes
  * maintained in the context history database.
@@ -39,16 +42,16 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	private final Long historyRecordId;
 	
 	/** The text value of this context history attribute. */
-	private final String stringValue;
+	private String stringValue;
 	
 	/** The integer value of this context history attribute. */
-	private final Integer integerValue;
+	private  Integer integerValue;
 	
 	/** The double-precision floating point numeric value of this context history attribute. */
-	private final Double doubleValue;
+	private  Double doubleValue;
 	
 	/** The binary value of this context history attribute. */
-	private final byte[] binaryValue;
+	private  byte[] binaryValue;
 
 	public CtxHistoryAttribute(CtxAttribute ctxAttribute, Long historyRecordId) {
 		super(ctxAttribute.getId());
@@ -60,6 +63,39 @@ public class CtxHistoryAttribute extends CtxModelObject {
 		this.binaryValue = ctxAttribute.getBinaryValue();
 	}
 
+	public CtxHistoryAttribute(CtxAttributeIdentifier attID, Date date, Serializable value, CtxAttributeValueType valueType, Long historyRecordId) {
+		super(attID);
+		super.setLastModified(date);
+		this.historyRecordId = historyRecordId;
+		
+		if (valueType.equals(CtxAttributeValueType.DOUBLE)){
+			this.doubleValue = (Double) value;
+			this.stringValue = null;
+			this.integerValue = null;
+			this.binaryValue = null;
+		}else if (valueType.equals(CtxAttributeValueType.INTEGER)){
+			this.doubleValue = null;
+			this.stringValue = null;
+			this.integerValue = (Integer) value;
+			this.binaryValue = null;
+		}else if (valueType.equals(CtxAttributeValueType.STRING)){
+			this.doubleValue = null;
+			this.stringValue = (String) value;
+			this.integerValue = null;
+			this.binaryValue = null;
+		}else if (valueType.equals(CtxAttributeValueType.BINARY)){
+			this.binaryValue =   (byte[]) value;
+			this.doubleValue = null;
+			this.stringValue = null;
+			this.integerValue = null;
+		}else if (valueType.equals(CtxAttributeValueType.EMPTY)){
+			this.binaryValue = null;
+			this.doubleValue = null;
+			this.stringValue = null;
+			this.integerValue = null;
+		}
+}
+	
 	/**
 	 * Returns the identifier of this historic context attribute.
 	 * 

@@ -34,6 +34,9 @@ import org.societies.api.schema.css.directory.CssAdvertisementRecord;
  * @author aleckey
  *
  */
+/**
+ * MISSING_ANNOTATION
+ */
 public interface ICssDirectoryCallback {
 	
 	public void getResult(List<CssAdvertisementRecord> cssAdvertisementRecords);

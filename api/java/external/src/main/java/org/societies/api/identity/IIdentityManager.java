@@ -2,6 +2,10 @@ package org.societies.api.identity;
 
 import java.util.Set;
 
+/**
+ * MISSING_ANNOTATION
+ * MISSING_JAVADOCS
+ */
 public interface IIdentityManager {
 	IIdentity fromJid(String jid)  throws InvalidFormatException;
 	INetworkNode fromFullJid(String jid) throws InvalidFormatException;

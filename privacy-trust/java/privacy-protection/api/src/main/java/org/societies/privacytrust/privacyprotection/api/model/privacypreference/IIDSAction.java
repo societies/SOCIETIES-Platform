@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
@@ -46,6 +47,6 @@ public interface IIDSAction {
 
 	public ServiceResourceIdentifier getServiceIdentifier();
 
-	public IIdentity getServiceIdentity();
+	public Requestor getRequestor();
 
 }

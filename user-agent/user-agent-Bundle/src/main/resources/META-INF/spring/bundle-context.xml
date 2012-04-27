@@ -11,13 +11,15 @@
 
 
 	<bean id="uam" class="org.societies.useragent.monitoring.UserActionMonitor"
-		name="uam" depends-on="ctxBroker" init-method="initialiseUserActionMonitor">
+		name="uam" depends-on="ctxBroker, eventMgr" init-method="initialiseUserActionMonitor">
 		<property name="ctxBroker" ref="ctxBroker"></property>
-	</bean>
+		<property name="eventMgr" ref="eventMgr"/>
+	</bean>	
 
 	<bean id="feedback" class="org.societies.useragent.feedback.UserFeedback"
 		name="feedback" init-method="initialiseUserFeedback">
 	</bean>
+	
 	<bean id="dm" class="org.societies.useragent.decisionmaking.DecisionMaker"
 		name="dm" depends-on="conflict,feedback,servicedis">
 		<property name="manager" ref="conflict"></property>

@@ -24,15 +24,18 @@
  */
 package org.societies.privacytrust.trust.impl.repo.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.Type;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.model.IDirectTrust;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
-import org.societies.privacytrust.trust.api.model.TrustedEntityId;
 
 /**
  * This abstract class is used to represent an entity trusted by the trustor,
@@ -49,11 +52,11 @@ public abstract class TrustedEntity implements ITrustedEntity {
 	
 	private static final long serialVersionUID = -6065344074845695865L;
 
+	/* The surrogate key used by Hibernate. */
 	@Id
 	@GeneratedValue
 	@Column(name = "id")
 	@SuppressWarnings("unused")
-	/* The surrogate key used by Hibernate. */
 	private long id;
 	
 	/** The identifier of this trusted entity. */
@@ -64,7 +67,9 @@ public abstract class TrustedEntity implements ITrustedEntity {
 	@Type(type="org.societies.privacytrust.trust.impl.repo.model.hibernate.TrustedEntityIdUserType")
 	private final TrustedEntityId teid;
 	
-	//private DirectTrust directTrust ;
+	@OneToOne(cascade = CascadeType.ALL)
+	private DirectTrust directTrust = new DirectTrust();
+	
 	//private IndirectTrust indirectTrust ;
 	//private UserPerceivedTrust userPerceivedTrust;
 
@@ -82,12 +87,12 @@ public abstract class TrustedEntity implements ITrustedEntity {
 		return this.teid;
 	}
 	
-	/**
-	 * 
-	 * @return
-	 * @since 0.0.3
-	 *
-	public DirectTrust getDirectTrust() {
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getDirectTrust()
+	 */
+	@Override
+	public IDirectTrust getDirectTrust() {
 		
 		return this.directTrust;
 	}
@@ -177,5 +182,22 @@ public abstract class TrustedEntity implements ITrustedEntity {
 			return false;
 		
 		return true;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		
+		final StringBuilder sb = new StringBuilder();
+		sb.append("{");
+		sb.append("teid=" + this.teid);
+		sb.append(",");
+		sb.append("directTrust=" + this.directTrust);
+		sb.append("}");
+		
+		return sb.toString();
 	}
 }

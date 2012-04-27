@@ -46,7 +46,7 @@ public abstract class CtxModelObject implements Serializable {
 	private final CtxIdentifier id;
 	
 	/** The last modification time of this context model object. */
-	private Date lastModified;
+	private Date lastModified = new Date();
 	
 	/**
 	 * Constructs a CtxModelObject with the specified identifier

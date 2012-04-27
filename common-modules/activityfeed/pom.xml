@@ -107,11 +107,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.societies.cis</groupId>
-			<artifactId>cis-persistance</artifactId>
-			<version>0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>

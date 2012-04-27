@@ -70,9 +70,16 @@ public interface ICommCallback {
 	 */
 	void receiveError(Stanza stanza, XMPPError error);
 	
+	/**
+	 * MISSING_JAVADOCS
+	 */
 	void receiveInfo(Stanza stanza, String node, XMPPInfo info);
-	
+	/**
+	 * MISSING_ANNOTATION
+	 */
 	void receiveItems(Stanza stanza, String node, List<String> items);
-	
+	/**
+	 * MISSING_JAVADOCS
+	 */
 	void receiveMessage(Stanza stanza, Object payload);
 }

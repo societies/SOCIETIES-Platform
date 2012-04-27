@@ -28,6 +28,10 @@ package org.societies.api.css.management;
  * @author Babak.Farshchian@sintef.no
  *
  */
+/**
+ * MISSING_ANNOTATION
+ * MISSING_JAVADOCS
+ */
 public interface ICssActivity {
 	public String getVerb();
 	public void setVerb(String verb);

@@ -36,6 +36,9 @@ import org.societies.api.schema.css.directory.CssAdvertisementRecord;
  * @author Maria Mannion
  * 
  */
+/**
+ * MISSING_ANNOTATIONS
+ */
 public interface ICssDirectory {
 	/**
 	 * Description: This method provide interface to add new CSS object to CSS

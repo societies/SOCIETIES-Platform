@@ -33,6 +33,10 @@
 	<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker">
 	</osgi:reference>
 	
+	<!-- event manager (local eventing) is needed by the uam -->
+	<osgi:reference id="eventMgr" interface="org.societies.api.osgi.event.IEventMgr">
+	</osgi:reference>
+	
 	<!-- IServiceDiscovery is needed by dm (at least) -->
 	<osgi:reference id="servicedis" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery">
 	</osgi:reference>

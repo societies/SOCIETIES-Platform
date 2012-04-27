@@ -27,6 +27,9 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 import java.io.Serializable;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.RequestorService;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
@@ -38,8 +41,7 @@ public class IDSPreferenceDetails implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	private IIdentity affectedDPI;
-	private IIdentity providerDPI;
-	private ServiceResourceIdentifier serviceID;
+	private Requestor requestor;
 	
 	public IDSPreferenceDetails(IIdentity affectedDPI){
 		this.affectedDPI = affectedDPI;
@@ -53,34 +55,19 @@ public class IDSPreferenceDetails implements Serializable{
 		return affectedDPI;
 	}
 
-	public void setServiceID(ServiceResourceIdentifier serviceID) {
-		this.serviceID = serviceID;
-	}
-
-	public ServiceResourceIdentifier getServiceID() {
-		return serviceID;
-	}
-
-	public void setProviderDPI(IIdentity providerDPI) {
-		this.providerDPI = providerDPI;
-	}
-
-	public IIdentity getProviderDPI() {
-		return providerDPI;
-	}
 	
-	private boolean compareProviderDPI(IIdentity requestorDPI){
-		if (requestorDPI==null){
-			if (this.providerDPI==null){
+	private boolean compareRequestorIdentities(IIdentity id){
+		if (id==null){
+			if (this.getRequestor().getRequestorId()==null){
 				return true;
 			}else{
 				return false;
 			}
 		}else{
-			if (requestorDPI==null){
+			if (this.getRequestor().getRequestorId()==null){
 				return false;
 			}else{
-				if (requestorDPI.toString().equalsIgnoreCase(this.providerDPI.toString())){
+				if (id.toString().equals(getRequestor().getRequestorId().toString())){
 					return true;
 				}else{
 					return false;
@@ -90,34 +77,36 @@ public class IDSPreferenceDetails implements Serializable{
 	}
 	
 	private boolean compareServiceID(ServiceResourceIdentifier serviceID2){
-		if (serviceID2==null){
-			if (this.serviceID == null){
-				return true;
-			}else{
-				return false;
-			}
-		}else{
+		
+		if (this.getRequestor() instanceof RequestorService){
 			if (serviceID2==null){
-				return false;
-			}else{
-				if (serviceID2.toString().equalsIgnoreCase(this.serviceID.toString())){
+				if (((RequestorService) this.getRequestor()).getRequestorServiceId() == null){
 					return true;
 				}else{
 					return false;
 				}
+			}else{
+				if (((RequestorService) this.getRequestor()).getRequestorServiceId()==null){
+					return false;
+				}else{
+					if (serviceID2.toString().equalsIgnoreCase(((RequestorService) this.getRequestor()).getRequestorServiceId().toString())){
+						return true;
+					}else{
+						return false;
+					}
+				}
 			}
+		}else{
+			return false;
 		}
+		
 	}
 	@Override
 	public boolean equals(Object obj){
 		if (obj instanceof IDSPreferenceDetails){
 			IDSPreferenceDetails details = (IDSPreferenceDetails) obj;
 			if (getAffectedDPI().toString().equalsIgnoreCase(details.getAffectedDPI().toString())){
-				if (this.compareProviderDPI(details.getProviderDPI())){
-					return this.compareServiceID(details.getServiceID());
-				}else{
-					return false;
-				}
+				return this.compareRequestors(details.getRequestor());
 			}else{
 				return false;
 			}
@@ -125,19 +114,53 @@ public class IDSPreferenceDetails implements Serializable{
 			return false;
 		}
 	}
+	
+	
+	private boolean compareRequestors(Requestor requestor) {
+		if (this.compareRequestorIdentities(requestor.getRequestorId())){
+			if (this.requestor instanceof RequestorService){
+				if (requestor instanceof RequestorService){
+					return this.compareServiceID(((RequestorService) requestor).getRequestorServiceId());
+				}
+			}else if (this.requestor instanceof RequestorCis){
+				if (requestor instanceof RequestorCis){
+					return this.compareCisID(((RequestorCis) requestor).getCisRequestorId());
+				}
+			}
+		}
+		
+		return false;
+	}
+	private boolean compareCisID(IIdentity cisRequestorId) {
+		if (this.requestor instanceof RequestorCis){
+			return (((RequestorCis) this.requestor).getCisRequestorId().toString().equals(cisRequestorId.toString()));
+		}
+		return false;
+	}
 	@Override
 	public String toString(){
 		String str = "\n";
 		str = str.concat("AffectedDPI: "+this.getAffectedDPI().toString());
 		
-		if (this.providerDPI!=null){
-			str = str.concat("\nProvider DPI: "+this.providerDPI.toString());
-		}
-		if (this.serviceID!=null){
-			str = str.concat("\nServiceID :"+this.serviceID.toString());
+		if (this.getRequestor()!=null){
+			str = str.concat("\nRequestor DPI: "+this.getRequestor().toString());
 		}
 		str = str.concat("\n");
 		return str;
+	}
+
+	/**
+	 * @return the requestor
+	 */
+	public Requestor getRequestor() {
+		return requestor;
+	}
+
+	/**
+	 * @param requestor the requestor to set
+	 */
+	public void setRequestor(Requestor requestor) {
+		this.requestor = requestor;
 	}
 
 

@@ -25,10 +25,12 @@
 
 package org.societies.api.internal.useragent.monitoring;
 
+import java.io.Serializable;
+
 import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
 
-public class UIMEvent {
+public class UIMEvent implements Serializable{
 
     private IIdentity userId;
     private IAction action;

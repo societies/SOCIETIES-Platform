@@ -36,6 +36,7 @@ import java.util.Set;
 //import org.societies.cis.mgmt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.activity.IActivityFeed;
 import org.societies.api.cis.collaboration.IServiceSharingRecord;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -45,10 +46,11 @@ import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
-import org.societies.api.cis.management.ICisActivityFeed;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.cis.management.ICisEditor;
 import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.cis.activity.ActivityFeed;
 import org.societies.cis.manager.CisParticipant.MembershipType;
 import org.societies.identity.IdentityImpl;
 
@@ -60,6 +62,8 @@ import org.societies.api.schema.cis.community.ParticipantRole;
 import org.societies.api.schema.cis.community.Add;
 import org.societies.api.schema.cis.community.Subscription;
 import org.societies.api.schema.cis.manager.CommunityManager;
+import org.societies.api.schema.cis.manager.DeleteNotification;
+import org.societies.api.schema.cis.manager.Notification;
 import org.societies.api.schema.cis.manager.SubscribedTo;
 
 /**
@@ -72,11 +76,11 @@ import org.societies.api.schema.cis.manager.SubscribedTo;
 */
 
 //@Component
-public class CisEditor implements IFeatureServer {
+public class CisEditor implements IFeatureServer,ICisEditor {
 
 
 	public CisRecord cisRecord;
-	public CisActivityFeed cisActivityFeed;
+	public ActivityFeed activityFeed;
 	public Set<IServiceSharingRecord> sharedServices; 
 //	public CommunityManagement commMgmt;
 	
@@ -106,17 +110,17 @@ public class CisEditor implements IFeatureServer {
 
 
 	// at the moment we are not using this constructor, but just the one below, as that one generates the CIS id for us
-	public CisEditor(String ownerCss, String cisId,String host,
+/*	public CisEditor(String ownerCss, String cisId,String host,
 			int membershipCriteria, String permaLink, String password,ICISCommunicationMgrFactory ccmFactory) {
 		
-		cisActivityFeed = new CisActivityFeed();
+		activityFeed = ActivityFeed.startUp(cisId);
 		sharedServices = new HashSet<IServiceSharingRecord>();
 		membersCss = new HashSet<CisParticipant>();
 		membersCss.add(new CisParticipant(ownerCss,MembershipType.owner));
 
 		LOG.info("CIS editor created");
 		
-		cisIdentity = new IdentityImpl(IdentityType.CIS, cisId, host);
+		cisIdentity = new IdentityImpl(IdentityType.CIS, cisId, host); // TODO: this constructor should not be used
 
 		try{
 		CISendpoint = ccmFactory.getNewCommManager(cisIdentity, password);
@@ -138,7 +142,7 @@ public class CisEditor implements IFeatureServer {
 		
 		
 		
-		cisRecord = new CisRecord(cisActivityFeed,ownerCss, membershipCriteria, cisId, permaLink, membersCss,
+		cisRecord = new CisRecord(activityFeed,ownerCss, membershipCriteria, cisId, permaLink, membersCss,
 				password, host, sharedServices);
 		
 		LOG.info("CIS creating pub sub service");
@@ -153,12 +157,12 @@ public class CisEditor implements IFeatureServer {
 		LOG.info("CIS autowired PubSubClient");
 		// TODO: broadcast its creation to other nodes?
 
-	}
+	}*/
 
 	// constructor of a CIS without a pre-determined ID or host
 	public CisEditor(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory) {
 		
-		cisActivityFeed = new CisActivityFeed();
+		
 		sharedServices = new HashSet<IServiceSharingRecord>();
 		membersCss = new HashSet<CisParticipant>();
 		membersCss.add(new CisParticipant(cssOwner,MembershipType.owner));
@@ -169,6 +173,7 @@ public class CisEditor implements IFeatureServer {
 		CISendpoint = ccmFactory.getNewCommManager();
 		} catch  (CommunicationException e) {
 			e.printStackTrace();
+			LOG.info("could not start comm manager!");
 		}
 		
 		LOG.info("CIS got new comm manager");
@@ -187,13 +192,14 @@ public class CisEditor implements IFeatureServer {
 			CISendpoint.register(this);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
+			LOG.info("could not start comm manager!");
 		} // TODO unregister??
 		
 		LOG.info("CIS listener registered");
 		
 		
 		// TODO: we have to get a proper identity and pwd for the CIS...
-		cisRecord = new CisRecord(cisActivityFeed,cssOwner, mode, cisIdentity.getJid(), "", membersCss,
+		cisRecord = new CisRecord(activityFeed,cssOwner, mode, cisIdentity.getJid(), "", membersCss,
 				cisIdentity.getDomain(), sharedServices,cisType,cisName);
 		
 		LOG.info("CIS creating pub sub service");
@@ -207,6 +213,9 @@ public class CisEditor implements IFeatureServer {
 		
 		LOG.info("CIS autowired PubSubClient");
 		// TODO: broadcast its creation to other nodes?
+		
+		
+		activityFeed = ActivityFeed.startUp(this.getCisId()); // this must be called just after the CisRecord has been set
 
 	}
 	
@@ -229,8 +238,9 @@ public class CisEditor implements IFeatureServer {
 	 * @param role, if the role is null, the member will be set as a participant
 	 * @return true if it worked and false if the jid was already there
 	 * @throws CommunicationException 
+	 * @throws InvalidFormatException 
 	 */
-	public boolean addMember(String jid, MembershipType role) throws  CommunicationException{
+	public boolean addMember(String jid, MembershipType role) throws  CommunicationException, InvalidFormatException{
 		
 		
 		LOG.info("add member invoked");
@@ -247,15 +257,16 @@ public class CisEditor implements IFeatureServer {
 
 			
 			CommunityManager cMan = new CommunityManager();
+			Notification n = new Notification();
 			SubscribedTo s = new SubscribedTo();
 			s.setCisJid(this.getCisId());
 			s.setCisRole(role.toString());
-			cMan.setSubscribedTo(s);
-			
+			n.setSubscribedTo(s);
+			cMan.setNotification(n);
 			
 			LOG.info("finished building notification");
 
-			IIdentity targetCssIdentity = new IdentityImpl(jid);
+			IIdentity targetCssIdentity = this.CISendpoint.getIdManager().fromJid(jid);//new IdentityImpl(jid);
 			Stanza sta = new Stanza(targetCssIdentity);
 			CISendpoint.sendMessage(sta, cMan);
 					
@@ -279,7 +290,7 @@ public class CisEditor implements IFeatureServer {
 			while(it.hasNext()){
 				CisParticipant element = it.next();
 				LOG.info("sending notification to " + element.getMembersJid());
-				targetCssIdentity = new IdentityImpl(element.getMembersJid());
+				targetCssIdentity = this.CISendpoint.getIdManager().fromJid(element.getMembersJid());//new IdentityImpl(element.getMembersJid());
 				sta = new Stanza(targetCssIdentity);
 				CISendpoint.sendMessage(sta, c);
 				
@@ -300,7 +311,7 @@ public class CisEditor implements IFeatureServer {
 		
 		this.cisRecord = cisRecord; 
 		
-		this.cisActivityFeed = this.cisRecord.feed;
+		this.activityFeed = this.cisRecord.feed;
 		this.sharedServices = this.cisRecord.sharedServices;
 		//CISendpoint = 	new XCCommunicationMgr(cisRecord.getHost(), cisRecord.getCisId(),cisRecord.getPassword());
 		
@@ -372,6 +383,9 @@ public class CisEditor implements IFeatureServer {
 					}
 						
 				}catch(CommunicationException e){
+					e.printStackTrace();
+				} catch (InvalidFormatException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				Community result = new Community();
@@ -464,7 +478,7 @@ public class CisEditor implements IFeatureServer {
 
 	@Override
 	public void receiveMessage(Stanza arg0, Object arg1) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
@@ -483,7 +497,86 @@ public class CisEditor implements IFeatureServer {
 	}
 
 
+	@Override
+	public IActivityFeed getActivityFeed(String cssId, String cisId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Boolean update(String cssId, ICisRecord newCis, String oldCisId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
+	
+
+	//"destructor" class which send a message to all users and closes the connection immediately
+	public boolean deleteCIS(){
+		boolean ret = true;
+
+		// TODO: do we need to make sure that at this point we are not taking any other XMPP input or api call?
+
+		//**** delete all members and send them a xmpp notification that the community has been deleted
+		CommunityManager message = new CommunityManager();
+		Notification n = new Notification();
+		DeleteNotification d = new DeleteNotification();
+		d.setCommunityJid(this.getCisId());
+		
+		n.setDeleteNotification(d);
+		message.setNotification(n);
+
+		
+		Set<CisParticipant> s = this.getMembersCss();
+		Iterator<CisParticipant> it = s.iterator();
+		
+		while(it.hasNext()){
+			CisParticipant element = it.next();
+			
+			try {
+				// send notification
+				LOG.info("sending delete notification to " + element.getMembersJid());
+				IIdentity targetCssIdentity = this.CISendpoint.getIdManager().fromJid(element.getMembersJid());//new IdentityImpl(element.getMembersJid());
+
+				LOG.info("iidentity created");
+				Stanza sta = new Stanza(targetCssIdentity);
+				LOG.info("stanza created");
+
+				this.CISendpoint.sendMessage(sta, message);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvalidFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			// delete user
+			it.remove();
+	     }
+		
+		
+		//**** end of delete all members and send them a xmpp notification 
+		
+		//cisRecord = null; this cant be called as it will be used for comparisson later. I hope the garbage collector can take care of it...
+		sharedServices = null; 
+		activityFeed = null; // TODO: replace with proper way of destroying it
+		
+		
+		ret = CISendpoint.UnRegisterCommManager();
+		if(ret)
+			CISendpoint = null;
+		else
+			LOG.warn("could not unregister CIS");
+		//TODO: possibly do something in case we cant close it
+		
+		//cisIdentity =null;
+		PubsubClient psc = null; // TODO: replace with proper way of destroying it
+
+		membersCss = null; 
+		
+		return ret;
+		
+	}
 
     
     

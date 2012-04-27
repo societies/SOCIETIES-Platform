@@ -38,6 +38,9 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
  * @author Eliza
  *
  */
+/**
+ * MISSING_JAVADOCS
+ */
 @SocietiesExternalInterface(type=SocietiesInterfaceType.REQUIRED)
 public interface IPersonalisationCallback {
 
