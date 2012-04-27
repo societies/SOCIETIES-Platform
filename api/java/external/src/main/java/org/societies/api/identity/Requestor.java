@@ -62,6 +62,10 @@ public class Requestor implements Serializable{
 		return str;
 	}
 	
+	@Override
+	public String toString(){
+		return "Identity: "+this.requestorId.getJid();
+	}
 	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
