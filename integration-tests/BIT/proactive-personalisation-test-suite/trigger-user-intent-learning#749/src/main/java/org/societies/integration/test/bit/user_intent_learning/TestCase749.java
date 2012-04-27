@@ -9,17 +9,20 @@ package org.societies.integration.test.bit.user_intent_learning;
  */
 import java.util.List;
 
+import org.societies.integration.test.IntegrationTestCase;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.personalisation.IPersonalisationManager;
+import org.societies.api.useragent.monitoring.IUserActionMonitor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TestCase749 {
+public class TestCase749 extends IntegrationTestCase{
 
 	private static Logger LOG = LoggerFactory.getLogger(TestCase749.class);
 	private String results = new String();
@@ -28,17 +31,20 @@ public class TestCase749 {
 	private JUnitCore jUnitCore;
 	
 	@Autowired(required=true)
-	private ICtxBroker internalCtxBroker;
+	public ICtxBroker internalCtxBroker;
 
-		
+	@Autowired(required=true)
+	public IPersonalisationManager persManager;
+	
+	@Autowired(required=true)
+	public IUserActionMonitor uamMonitor;
+	
 	public TestCase749() {
-		System.out.println(internalCtxBroker.toString());
+		super(749, new Class[]{NominalTestCase.class, SpecificTestCase.class});
+		
+		UserIntentLearningTest uiTest = new UserIntentLearningTest(internalCtxBroker,persManager,uamMonitor);
 	}
-	/*
-	public void setMathServiceConsumer(IConsumer mathServiceConsumer) {
-		this.mathServiceConsumer = mathServiceConsumer;
-	}
-	 */
+	
 	private void startTest() {
 		LOG.info("###749... startTest");
 		jUnitCore = new JUnitCore();
