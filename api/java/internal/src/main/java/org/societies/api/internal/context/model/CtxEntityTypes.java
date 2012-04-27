@@ -22,35 +22,18 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.api.internal.context.model;
 
-package org.societies.api.css.directory;
-
-import org.societies.api.css.directory.ICssDirectoryCallback;
-import org.societies.api.schema.css.directory.CssAdvertisementRecord;
-
+import org.societies.api.context.model.CtxEntity;
 
 /**
- *  Each method requires a callback to receive the result
+ * This class defines common {@link CtxEntity context entity} types in
+ * addition to the ones defined in {@link org.societies.api.context.model.CtxEntityTypes}.
  * 
- *
- * @author mmannion
- *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.7
  */
-/**
- * MISSING_ANNOTATION
- * MISSING_JAVADOCS
- */
-public interface ICssDirectoryRemote {
-    
-    public void addCssAdvertisementRecord(CssAdvertisementRecord cssAdvert);
-    public void deleteCssAdvertisementRecord(CssAdvertisementRecord cssAdvert);
-	public void updateCssAdvertisementRecord(CssAdvertisementRecord oldCssAdvert,
-			CssAdvertisementRecord updatedCssAdvert);
+public class CtxEntityTypes extends
+		org.societies.api.context.model.CtxEntityTypes {
 
-	public void findAllCssAdvertisementRecords(ICssDirectoryCallback callback);
-	public void findForAllCss(CssAdvertisementRecord cssFilter, ICssDirectoryCallback callback);
-	
 }
-
-
-

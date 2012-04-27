@@ -35,6 +35,10 @@ import org.societies.api.css.directory.ICssDirectory;
  * @author Babak.Farshchian@sintef.no
  *
  */
+/**
+ * MISSING_ANNOTATION
+ * MISSING_JAVADOCS
+ */
 public interface ISocietiesApp {
     //TODO: Fix this Object.
     public Object getCssManager();

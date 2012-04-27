@@ -25,11 +25,15 @@
 package org.societies.api.cis.management;
 
 /**
- * This interfacerepresents CISs that are not owned by this CSS but that this
+ * This interface represents CISs that are not owned by this CSS but that this
  * CIS subscribes to (is a member of).
  * 
  * @author Babak.Farshchian@sintef.no
  *
+ */
+/**
+ * MISSING_ANNOTATION
+ * MISSING_JAVADOCS
  */
 public interface ICisSubscribed extends ICisRecord {
 

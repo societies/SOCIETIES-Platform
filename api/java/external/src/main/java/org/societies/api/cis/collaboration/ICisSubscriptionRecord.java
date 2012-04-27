@@ -28,6 +28,11 @@ package org.societies.api.cis.collaboration;
  * @author Babak.Farshchian@sintef.no
  *
  */
+/**
+ * MISSING_ANNOTATION
+ * MISSING_JAVADOCS
+ */
+
 public interface ICisSubscriptionRecord {
 	public String getSubscriptionMode();
 	public void setSubscriptionMode(String subscriptionMode);
