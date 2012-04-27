@@ -277,7 +277,7 @@ var connectToLocalCSSManager = function(actionFunction) {
 	}
 	
 	function failure(data) {
-		alert(data);
+		alert("connectToLocalCSSManager - failure: " + data);
 	}
     window.plugins.LocalCSSManagerService.connectService(success, failure);
 }
@@ -293,7 +293,7 @@ var disconnectFromLocalCSSManager = function() {
 	}
 	
 	function failure(data) {
-		alert("failure: " + data);
+		alert("disconnectFromLocalCSSManager - failure: " + data);
 	}
     window.plugins.LocalCSSManagerService.disconnectService(success, failure);
 }
@@ -337,7 +337,7 @@ var successfulLogin = function() {
 	}
 	
 	function failure(data) {
-		alert("failure: " + data);
+		alert("successfulLogin - failure: " + data);
 	}
     window.plugins.LocalCSSManagerService.loginCSS(success, failure);
 
@@ -349,10 +349,12 @@ var successfulLogout = function() {
 	function success(data) {
 		jQuery("#username").val("");
 		jQuery("#userpass").val("");
+		disconnectFromLocalCSSManager();
+
 	}
 
 	function failure(data) {
-		alert("failure: " + data);
+		alert("successfulLogout : " + "failure: " + data);
 	}
 	
     window.plugins.LocalCSSManagerService.logoutCSS(success, failure);
@@ -375,12 +377,11 @@ var connectToCoreServiceMonitor = function(actionFunction) {
 	console.log("Connect to CoreServiceMonitor");
 		
 	function success(data) {
-//		alert("Success result: " + data);
 		actionFunction();
 	}
 	
 	function failure(data) {
-		alert(data);
+		alert("connectToCoreServiceMonitor - failure: " + data);
 	}
     window.plugins.CoreServiceMonitorService.connectService(success, failure);
 }
@@ -405,7 +406,7 @@ var refreshActiveServices = function() {
 	}
 	
 	function failure(data) {
-		alert(data);
+		alert("refreshActiveServices - failure: " + data);
 	}
 	
 	window.plugins.CoreServiceMonitorService.activeServices(success, failure);
@@ -433,7 +434,7 @@ var refreshActiveTasks = function() {
 	}
 	
 	function failure(data) {
-		alert(data);
+		alert("refreshActiveTasks - failure: " + data);
 	}
 	
 	window.plugins.CoreServiceMonitorService.activeTasks(success, failure);
@@ -464,7 +465,7 @@ var validateCredentials = function(name, password) {
 
 	if (name.length === 0 || password.length === 0) {
 		retValue  = false;
-		alert("User credentials must be entered");
+		alert("validateCredentials: " + "User credentials must be entered");
 	}
 	return retValue;
 }
@@ -500,8 +501,6 @@ jQuery(function() {
 	});
 	$("#logoutIcon").click(function() {
 		connectToLocalCSSManager(successfulLogout);
-		disconnectFromLocalCSSManager();
-		
 	});
 
 });
