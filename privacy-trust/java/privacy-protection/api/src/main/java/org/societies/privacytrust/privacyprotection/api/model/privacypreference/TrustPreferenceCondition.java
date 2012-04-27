@@ -26,6 +26,7 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 
 import java.io.Serializable;
 
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyConditionConstants;
 
 /**
@@ -35,38 +36,77 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
  */
 public class TrustPreferenceCondition implements IPrivacyPreferenceCondition, Serializable {
 
-	/*
-	private ITrustValue trustValue;
-	private PrivacyConditionConstants myType;
 	
-	public TrustPreferenceCondition(ITrustValue trustVal){
-		this.trustValue = trustVal;
+	private TrustedEntityId trustId;
+	private PrivacyConditionConstants myType;
+	private final double trustThreshold;
+	
+	public TrustPreferenceCondition(TrustedEntityId trustId, double value){
+		this.trustThreshold = value;
+		this.setTrustId(trustId);
 		this.myType = PrivacyConditionConstants.TRUST;
 	}
-
-	public ITrustValue getTrustValue(){
-		return this.trustValue;
-	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((myType == null) ? 0 : myType.hashCode());
+		result = prime * result + ((trustId == null) ? 0 : trustId.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(getTrustThreshold());
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
 
-	public boolean equals(IPrivacyPreferenceCondition pc){
-
-		if (!(pc instanceof TrustPreferenceCondition)){
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
 			return false;
-		}
-		TrustPreferenceCondition tpc = (TrustPreferenceCondition) pc;
-		if (tpc.getTrustValue().compareTo(this.getTrustValue())!=0){
+		if (getClass() != obj.getClass())
 			return false;
-		}
-
-		
+		TrustPreferenceCondition other = (TrustPreferenceCondition) obj;
+		if (myType != other.myType)
+			return false;
+		if (trustId == null) {
+			if (other.trustId != null)
+				return false;
+		} else if (!trustId.equals(other.trustId))
+			return false;
+		if (Double.doubleToLongBits(getTrustThreshold()) != Double
+				.doubleToLongBits(other.getTrustThreshold()))
+			return false;
 		return true;
 	}
 
-*/
 	@Override
 	public PrivacyConditionConstants getType() {
 		return PrivacyConditionConstants.TRUST; 
+	}
+
+
+	/**
+	 * @return the trustId
+	 */
+	public TrustedEntityId getTrustId() {
+		return trustId;
+	}
+
+
+	/**
+	 * @param trustId the trustId to set
+	 */
+	public void setTrustId(TrustedEntityId trustId) {
+		this.trustId = trustId;
+	}
+
+	/**
+	 * @return the trustValue
+	 */
+	public double getTrustThreshold() {
+		return trustThreshold;
 	}
 
 

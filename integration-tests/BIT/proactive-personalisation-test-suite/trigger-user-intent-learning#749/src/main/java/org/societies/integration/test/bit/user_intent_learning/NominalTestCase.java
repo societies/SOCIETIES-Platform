@@ -22,8 +22,12 @@ public class NominalTestCase {
 
 	@Test
 	public void body1() {
-		LOG.info("###749... body1");
-		//Assert.assertEquals();
+		
+		
+		
+		
+	
+	
 	}
 
 	@Ignore

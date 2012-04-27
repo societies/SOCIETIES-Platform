@@ -32,7 +32,11 @@ package org.societies.api.context.model;
  */
 public class CtxEntityTypes {
 
-    /**
+	/**
+     * 
+     */
+    public static final String CSS_OPERATOR = "cssOperator";
+	/**
      * 
      */
     public static final String PERSON = "person";

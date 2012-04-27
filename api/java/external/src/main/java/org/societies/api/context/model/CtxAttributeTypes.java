@@ -61,4 +61,15 @@ public class CtxAttributeTypes {
      * 
      */
     public static final String TEMPERATURE = "temperature";
+    
+    /**
+     * 
+     */
+    public static final String CAUI_MODEL = "caui_model";
+    
+    /**
+     * 
+     */
+    public static final String CRIST_MODEL = "crist_model";
+    
 }
