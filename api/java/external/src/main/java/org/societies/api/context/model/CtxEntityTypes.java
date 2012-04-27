@@ -60,4 +60,11 @@ public class CtxEntityTypes {
      * 
      */
     public static final String SERVICE = "service";
+    
+    /**
+     * 
+     */
+    public static final String PRIVACY_POLICY = "privacyPolicy";
+    
+
 }
