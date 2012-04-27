@@ -57,7 +57,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RuleTarget;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails;
@@ -86,18 +86,48 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	private PrivateContextCache contextCache;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 
-	private ICtxBroker broker;
+	private ICtxBroker ctxBroker;
 
-	protected synchronized void setCtxBroker(ICtxBroker ctxbroker){
-		this.logging.debug("Binding CtxBroker to PolicyMgr");
-		this.broker = ctxbroker;
-	}
-
-	public void initialisePrivacyPreferenceManager(ICtxBroker broker){
-		this.broker = broker;
+	private ITrustBroker trustBroker;
+	
+	public PrivacyPreferenceManager(){
 		
 	}
+	
 
+	public void initialisePrivacyPreferenceManager(ICtxBroker ctxBroker, ITrustBroker trustBroker){
+		this.setCtxBroker(ctxBroker);
+		this.trustBroker = trustBroker;
+		
+	}
+	
+	/**
+	 * @return the ctxBroker
+	 */
+	public ICtxBroker getCtxBroker() {
+		return ctxBroker;
+	}
+
+	/**
+	 * @param ctxBroker the ctxBroker to set
+	 */
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		this.ctxBroker = ctxBroker;
+	}
+
+	/**
+	 * @return the trustBroker
+	 */
+	public ITrustBroker getTrustBroker() {
+		return trustBroker;
+	}
+	/**
+	 * @param trustBroker the trustBroker to set
+	 */
+	public void setTrustBroker(ITrustBroker trustBroker) {
+		this.trustBroker = trustBroker;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#checkPermission(org.societies.api.identity.Requestor, org.societies.api.context.model.CtxAttributeIdentifier, java.util.List)
@@ -181,7 +211,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 			actionList = actionList.concat(a.toString());
 		}
 		try {
-			Future<List<CtxIdentifier>> futureCtxIds = this.broker.lookup(CtxModelType.ATTRIBUTE, ctxType);
+			Future<List<CtxIdentifier>> futureCtxIds = this.getCtxBroker().lookup(CtxModelType.ATTRIBUTE, ctxType);
 
 			List<CtxIdentifier> ctxIds = futureCtxIds.get();
 
@@ -607,7 +637,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 				actionList = actionList.concat(a.toString());
 			}
 			try {
-				Future<List<CtxIdentifier>> futureCtxIds = this.broker.lookup(CtxModelType.ATTRIBUTE, ctxType);
+				Future<List<CtxIdentifier>> futureCtxIds = this.getCtxBroker().lookup(CtxModelType.ATTRIBUTE, ctxType);
 
 				List<CtxIdentifier> ctxIds = futureCtxIds.get();
 
@@ -701,7 +731,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	}
 	
 	private IPrivacyOutcome evaluatePreference(IPrivacyPreference privPref){
-		PreferenceEvaluator ppE = new PreferenceEvaluator(this.contextCache);
+		PreferenceEvaluator ppE = new PreferenceEvaluator(this.contextCache, trustBroker);
 		Hashtable<IPrivacyOutcome, List<CtxIdentifier>> results = ppE.evaluatePreference(privPref);
 		Enumeration<IPrivacyOutcome> outcomes = results.keys();
 		if (outcomes.hasMoreElements()){
@@ -908,6 +938,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		details.setRequestor(requestor);
 		IPrivacyPreferenceTreeModel model = this.getIDSPreference(details);
 	}
+
 
 	/*	public static void main(String[] args){
 		PrivacyPreferenceManager pm = new PrivacyPreferenceManager();
