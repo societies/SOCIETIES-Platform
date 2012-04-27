@@ -154,13 +154,33 @@ public class TrustRepository implements ITrustRepository {
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#removeEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#removeEntity(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public boolean removeEntity(ITrustedEntity entity)
+	public void removeEntity(final TrustedEntityId teid)
 			throws TrustRepositoryException {
-		// TODO Auto-generated method stub
-		return false;
+
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
+		
+		final ITrustedEntity entity = this.retrieveEntity(teid);
+		if (entity == null)
+			return;
+		
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
+		try {
+			session.delete(entity);
+			transaction.commit();
+		} catch (Exception e) {
+			LOG.warn("Rolling back transaction for entity " + entity);
+			transaction.rollback();
+			throw new TrustRepositoryException("Could not remove entity " + entity, e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
 	}
 }

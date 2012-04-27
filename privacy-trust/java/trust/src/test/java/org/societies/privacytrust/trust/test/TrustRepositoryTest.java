@@ -32,7 +32,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
@@ -322,10 +321,13 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 
 	/**
 	 * Test method for {@link org.societies.privacytrust.trust.impl.repo.TrustRepository#removeEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)}.
+	 * @throws TrustRepositoryException 
 	 */
 	@Test
-	@Ignore
-	public void testRemoveEntity() {
-		fail("Not yet implemented");
+	public void testRemoveEntity() throws TrustRepositoryException {
+		
+		this.trustRepo.addEntity(trustedCss);
+		this.trustRepo.removeEntity(trustedCss.getTeid());
+		assertNull(this.trustRepo.retrieveEntity(trustedCss.getTeid()));
 	}
 }
