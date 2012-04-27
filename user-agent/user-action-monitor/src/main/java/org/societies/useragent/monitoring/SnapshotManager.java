@@ -40,14 +40,21 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 
-//register listeners to update snapshot if context attributes not yet available
 public class SnapshotManager {
 
 	/*
 	 * DEFAULT SNAPSHOT DEFINITION
 	 */
-	String[] defaultDef = {"symLoc", "status", "temperature"};
+	String[] defaultDef = {
+			CtxAttributeTypes.LOCATION_SYMBOLIC, 
+			CtxAttributeTypes.STATUS, 
+			CtxAttributeTypes.TEMPERATURE
+			};
+	/*
+	 * End of definition
+	 */
 
 	private ICtxBroker ctxBroker;
 	private SnapshotsRegistry snpshtRegistry;

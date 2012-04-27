@@ -28,8 +28,6 @@ package org.societies.useragent.monitoring.test;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -42,17 +40,13 @@ import org.junit.Test;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.personalisation.model.Action;
-import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.useragent.monitoring.SnapshotManager;
 import org.societies.useragent.monitoring.SnapshotsRegistry;
 import org.societies.useragent.monitoring.UserActionMonitor;
@@ -198,10 +192,34 @@ public class TestUserActionMonitor extends TestCase{
 
 	@Test
 	public void testSnapshotManager() {
+		/*
+		 * UAM: initialiseUserActionMonitor
+		 *-> ContextCommunicator: constructor
+		 *-->SnapshotManager: constructor
+		 *--->SnapshotManager: initialiseDefaultSnpsht
+		 *---->SnapshotManager: retrieveSnpshtRegistry
+		 */
+		try {
+			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC)).thenReturn(mockSymLocIdFuture);
+			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.STATUS)).thenReturn(mockStatusIdFuture);
+			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.TEMPERATURE)).thenReturn(mockTempIdFuture);
+			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, "snpshtRegistry")).thenReturn(mockSnpshtRegistryIdFuture);
+			when(mockCtxBroker.retrieve(mockSnpshtRegistryId)).thenReturn(mockSnpshtRegistryObjectFuture);
+		} catch (CtxException e) {
+			e.printStackTrace();
+		}
 		//create class under test
-		/*System.out.println("Creating snpshtManager");
+		System.out.println("Creating snpshtManager");
 		snpshtMgr = new SnapshotManager(mockCtxBroker);  //default snapshot created and registry retrieved
-
+		try {
+			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC);
+			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.STATUS);
+			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.TEMPERATURE);
+			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, "snpshtRegistry");
+			verify(mockCtxBroker).retrieve(mockSnpshtRegistryId);
+		} catch (CtxException e) {
+			e.printStackTrace();
+		}
 
 		//try to retrieve new snapshot
 		System.out.println("Requesting snapshot for volume");
@@ -236,65 +254,7 @@ public class TestUserActionMonitor extends TestCase{
 		retrievedSnpsht = snpshtMgr.getSnapshot(colourPrimary);
 		Assert.assertEquals(mockSymLocId, retrievedSnpsht.get(0));
 		Assert.assertEquals(mockStatusId, retrievedSnpsht.get(1));
-		Assert.assertEquals(mockTempId, retrievedSnpsht.get(2));*/
-	}
-
-	@Test
-	public void testMonitoring(){
-		/*
-		 * UAM: initialiseUserActionMonitor
-		 *-> ContextCommunicator: constructor
-		 *-->SnapshotManager: constructor
-		 *--->SnapshotManager: initialiseDefaultSnpsht
-		 *---->SnapshotManager: retrieveSnpshtRegistry
-		 */
-		try {
-			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, "symLoc")).thenReturn(mockSymLocIdFuture);
-			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, "status")).thenReturn(mockStatusIdFuture);
-			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, "temperature")).thenReturn(mockTempIdFuture);
-			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, "snpshtRegistry")).thenReturn(mockSnpshtRegistryIdFuture);
-			when(mockCtxBroker.retrieve(mockSnpshtRegistryId)).thenReturn(mockSnpshtRegistryObjectFuture);
-		} catch (CtxException e) {
-			e.printStackTrace();
-		}
-		uam.initialiseUserActionMonitor();  //creates ContextCommunicator -> creates SnapshotManager
-		try {
-			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, "symLoc");
-			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, "status");
-			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, "temperature");
-			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, "snpshtRegistry");
-			verify(mockCtxBroker).retrieve(mockSnpshtRegistryId);
-		} catch (CtxException e) {
-			e.printStackTrace();
-		}
-
-		/*
-		 * UAM: monitor
-		 * -> ContextCommunicator: updateHistory
-		 * --> SnapshotManager: getSnapshot
-		 */
-		/*IIdentity identity = new MockIdentity(IdentityType.CSS, "sarah", "societies.org");
-		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
-		ServiceResourceIdentifier serviceId2 = new ServiceResourceIdentifier();
-		try {
-			serviceId1.setIdentifier(new URI("testService1"));
-			serviceId2.setIdentifier(new URI("testService2"));
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		//action 1
-		IAction action1 = new Action(serviceId1, "testService", "volume", "high");
-		//action 2
-		IAction action2 = new Action(serviceId2, "testService", "volume", "high");
-		//action 3
-		IAction action3 = new Action(serviceId1, "testService", "volume", "low");
-		//action 4
-		IAction action4 = new Action(serviceId2, "testService", "bgcolour", "blue");
-		//action 5
-		IAction action5 = new Action(serviceId2, "testService", "bgcolour", "red");
-
-		
-		uam.monitor(identity, action1);*/
+		Assert.assertEquals(mockTempId, retrievedSnpsht.get(2));
 	}
 
 	private void executeFuture(FutureTask task){
