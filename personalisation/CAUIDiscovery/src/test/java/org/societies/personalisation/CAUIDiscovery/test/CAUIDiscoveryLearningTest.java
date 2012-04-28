@@ -31,15 +31,15 @@ public class CAUIDiscoveryLearningTest {
 		//use option 1 or 2
 		
 		//1. create mock data sets
-		List<MockHistoryData> historySet = createHistorySet();
+		//List<MockHistoryData> historySet = createHistorySet();
 		//System.out.println("createHistorySet() size "+historySet.size());
 
 		//2.create mock data sets based on History Attribute Tuples
-		//List<MockHistoryData> historySet = convertHistoryData(createContextHistoryAttributesSet());
+		List<MockHistoryData> historySet = convertHistoryData(createContextHistoryAttributesSet());
 	
 		
 		System.out.println("generateNewUserModel");
-		discover.generateNewUserModel(historySet);
+		discover.generateTransitionsDictionary(historySet);
 
 		LinkedHashMap<List<String>,ActionDictObject> model = discover.getDictionary();
 

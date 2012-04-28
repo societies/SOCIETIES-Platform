@@ -29,10 +29,12 @@ public class ConstructUIModel {
 		this.ctxBroker = ctxBroker;
 	}
 
-
-	public void constructModel(LinkedHashMap<String, HashMap<String, Double>> trans3ProbDictionary) {
-
-		constructFakeModel();
+	
+	public UserIntentModelData constructModel(LinkedHashMap<List<String>,ActionDictObject> actionDictionary) {
+		
+		UserIntentModelData modelData = null;
+		
+		return modelData;
 	}
 
 

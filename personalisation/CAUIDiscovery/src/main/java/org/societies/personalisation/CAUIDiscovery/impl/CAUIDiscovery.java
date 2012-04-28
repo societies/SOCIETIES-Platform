@@ -31,14 +31,22 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
+import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
+
 
 
 public class CAUIDiscovery implements ICAUIDiscovery{
+
+	private static final Logger LOG = LoggerFactory.getLogger(CAUIDiscovery.class);
 
 	private ICAUITaskManager cauiTaskManager;
 	private ICtxBroker ctxBroker;
@@ -82,18 +90,41 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
 	}
 
-
 	@Override
 	public void generateNewUserModel() {
 
-		/*
+		LOG.info("1. Retrieve History Data");
+		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData = retrieveHistoryData();
+
+		LOG.info("2. Convert History Data");
+		List<MockHistoryData> mockData = convertHistoryData(mapHocData);
+		
+		LOG.info("3. Generate Transition Dictionary");
+		LinkedHashMap<List<String>,ActionDictObject> currentActCtxDictionary = generateTransitionsDictionary(mockData);
+		
+		LOG.info("3. Generate UserIntentModelData");
 		ConstructUIModel cmodel = new ConstructUIModel(cauiTaskManager,ctxBroker); 
-		// null will be substituted by the transition probability dictionary produced by populateActionCtxDictionary
-		cmodel.constructModel(null);
-		 */
+		UserIntentModelData modelData = cmodel.constructModel(currentActCtxDictionary);
+		
+		LOG.info("4. Store UserIntentModelData to ctx DB");
+		storeModelCtxDB(modelData);
 	}
 
-	public void generateNewUserModel(List<MockHistoryData> data) {
+
+	protected Boolean storeModelCtxDB (UserIntentModelData modelData){
+		boolean modelStored = false;
+
+		return modelStored;
+	}
+
+	protected Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> retrieveHistoryData(){
+		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
+
+		return mapHocData;
+	}
+
+
+	public LinkedHashMap<List<String>,ActionDictObject> generateTransitionsDictionary(List<MockHistoryData> data) {
 
 		this.historyList = data;
 		this.actCtxDictionary = getDictionary(); 
@@ -109,12 +140,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		//TaskDiscovery taskDisc = new TaskDiscovery(actCtxDictionary);
 		//taskDisc.populateTaskDictionary();
 
-
-		// runs only in virgo
-		/*
-		ConstructUIModel cmodel = new ConstructUIModel(cauiTaskManager,ctxBroker); 
-		cmodel.constructModel(null);
-		 */
+		return actCtxDictionary;
 	}
 
 	public LinkedHashMap<List<String>,ActionDictObject> getDictionary(){
@@ -331,5 +357,27 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		}		
 		return total2Trans;
 	}
+
+
+	protected List<MockHistoryData> convertHistoryData (Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData){
+
+		List<MockHistoryData> result = new ArrayList<MockHistoryData>();
+		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> ctxHocTuples = mapHocData;
+
+		for(CtxHistoryAttribute primaryHocAttr: ctxHocTuples.keySet()){
+			String primaryCtxValue = primaryHocAttr.getStringValue();
+			List<CtxHistoryAttribute> listHocAttrs = ctxHocTuples.get(primaryHocAttr);
+			//assume that only one escorting context object exists 
+			CtxHistoryAttribute escortingHocAttr = listHocAttrs.get(0);
+			String escortingHocAttrValue = escortingHocAttr.getStringValue();
+
+			MockHistoryData mockHocData = new MockHistoryData(primaryCtxValue,escortingHocAttrValue);
+			result.add(mockHocData);
+		}
+
+		return result;
+	}
+
+
 
 }
