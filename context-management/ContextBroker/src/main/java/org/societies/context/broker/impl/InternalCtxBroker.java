@@ -61,8 +61,8 @@ import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
 import org.societies.context.broker.api.CtxBrokerException;
-import org.societies.context.user.db.impl.UserCtxDBMgr;
-import org.societies.context.userHistory.impl.UserContextHistoryManagement;
+//import org.societies.context.user.db.impl.UserCtxDBMgr;
+//import org.societies.context.userHistory.impl.UserContextHistoryManagement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -102,8 +102,8 @@ public class InternalCtxBroker implements ICtxBroker {
 
 	public InternalCtxBroker(){
 		//remove after testing
-		setUserCtxDBMgr(new UserCtxDBMgr());
-		setUserCtxHistoryMgr(new UserContextHistoryManagement());
+		//setUserCtxDBMgr(new UserCtxDBMgr());
+		//setUserCtxHistoryMgr(new UserContextHistoryManagement());
 	}
 
 

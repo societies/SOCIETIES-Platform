@@ -61,7 +61,17 @@ public class CtxAttributeTypes {
      * 
      */
     public static final String TEMPERATURE = "temperature";
-    
+   
+    /**
+     * 
+     */
+    public static final String ACTION = "action";
+   
+    /**
+     * 
+     */
+    public static final String PRIVACY_POLICY_REGISTRY = "privacyPolicyRegistry";
+   
     /**
      * 
      */
