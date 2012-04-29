@@ -28,6 +28,7 @@
 			<list>
 				<value>org.societies.privacytrust.trust.impl.repo.model.TrustedCss</value>
 				<value>org.societies.privacytrust.trust.impl.repo.model.TrustedCis</value>
+				<value>org.societies.privacytrust.trust.impl.repo.model.TrustedService</value>
 				<value>org.societies.privacytrust.trust.impl.repo.model.DirectTrust</value>
 				<value>org.societies.privacytrust.trust.impl.repo.model.IndirectTrust</value>
 				<value>org.societies.privacytrust.trust.impl.repo.model.UserPerceivedTrust</value>
