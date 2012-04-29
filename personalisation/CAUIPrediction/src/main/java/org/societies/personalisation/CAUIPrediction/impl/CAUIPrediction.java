@@ -80,6 +80,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 		System.out.println(this.getClass().getName()+": Return cauiDiscovery");
 		return cauiDiscovery;
 	}
+	
 
 	public void setCauiDiscovery(ICAUIDiscovery cauiDiscovery) {
 		System.out.println(this.getClass().getName()+": Got cauiDiscovery");
@@ -98,6 +99,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 		this.ctxBroker = ctxBroker;
 	}
 
+	
 	public IInternalPersonalisationManager getPersoMgr() {
 		System.out.println(this.getClass().getName()+": Return persoMgr");
 		return persoMgr;
@@ -109,11 +111,13 @@ public class CAUIPrediction implements ICAUIPrediction{
 		this.persoMgr = persoMgr;
 	}
 
+	
 	public ICAUITaskManager getCauiTaskManager() {
 		System.out.println(this.getClass().getName()+": Return cauiTaskManager");
 		return cauiTaskManager;
 	}
 
+	
 	public void setCauiTaskManager(ICAUITaskManager cauiTaskManager) {
 		System.out.println(this.getClass().getName()+": Got cauiTaskManager");
 		this.cauiTaskManager = cauiTaskManager;
@@ -128,6 +132,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 		registerForNewUiModelEvent();
 	}
 
+	
 	@Override
 	public void enablePrediction(Boolean bool) {
 		this.enablePrediction = bool;
@@ -207,13 +212,13 @@ public class CAUIPrediction implements ICAUIPrediction{
 		return actionResult;
 	}
 
+	
 	@Override
 	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor,
 			CtxAttribute contextAttribute) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 
 
 	void registerForNewUiModelEvent(){
@@ -250,6 +255,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 		}			
 	}
 
+
 	public void setActiveModel(UserIntentModelData newUIModelData){
 		// retrieve model from Context DB
 		// set model as active in CauiTaskManager
@@ -259,9 +265,9 @@ public class CAUIPrediction implements ICAUIPrediction{
 			cauiTaskManager.updateModel(newUIModelData);
 			modelExists = true;		 
 		}
-
 	}
 
+	
 	private void createFakeModel(){
 		/*
 		//create Task A

@@ -60,7 +60,7 @@ public class CAUIPredictionTest {
 
 
 	CAUIPrediction prediction = null;
-
+	
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -130,6 +130,7 @@ public class CAUIPredictionTest {
 			prediction.getPrediction(identity, action3);
 			IAction action4 = new Action(serviceId, "testService", "volume", "high");
 			prediction.getPrediction(identity, action4);
+			// learn model
 			IAction action5 = new Action(serviceId, "testService", "volume", "high");
 			prediction.getPrediction(identity, action5);		
 			
