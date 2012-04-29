@@ -10,7 +10,10 @@ import java.util.concurrent.Future;
 
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
@@ -29,47 +32,19 @@ public class ConstructUIModel {
 		this.ctxBroker = ctxBroker;
 	}
 
-	
-	public UserIntentModelData constructModel(LinkedHashMap<List<String>,ActionDictObject> actionDictionary) {
-		
-		UserIntentModelData modelData = null;
-		
+
+	public UserIntentModelData constructModel(LinkedHashMap<String,HashMap<String,Double>> transDictionary) {
+
+		UserIntentModelData modelData = constructFakeModel();
+		//UserIntentModelData modelData = constructFakeModel(transDictionary);
 		return modelData;
-	}
+	}	
+	
 
 
-	void storeModelCtxDB(UserIntentModelData modelData){
-		try {
-			Future<CtxEntity> futureCtxEntity = ctxBroker.createEntity("FakeEntity");
-			CtxEntity ctxEntity = futureCtxEntity.get();
-			Future<CtxAttribute> futureCtxAttr =  ctxBroker.createAttribute(ctxEntity.getId(), "uiModel");
-			CtxAttribute ctxAttr = futureCtxAttr.get();
-			byte[] blobBytes = SerialisationHelper.serialise(modelData);
 
-			//ctxAttr.setBinaryValue(blobBytes);
-
-			ctxBroker.updateAttribute(ctxAttr.getId(), blobBytes);
-
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-
-	private void constructFakeModel(){
+	private UserIntentModelData constructFakeModel(){
 		//create Task A
-		
-		
 		IUserIntentAction userActionA = cauiTaskManager.createAction(null,"ServiceType","A-homePc","off");
 		IUserIntentAction userActionB = cauiTaskManager.createAction(null,"ServiceType","F-homePc","off");
 		IUserIntentAction userActionC = cauiTaskManager.createAction(null,"ServiceType","C-homePc","off");
@@ -138,9 +113,10 @@ public class ConstructUIModel {
 		taskMatrix[0][1] = 1.0;
 
 		UserIntentModelData modelData = cauiTaskManager.createModel(taskList, taskMatrix);
+		System.out.println("*********** modelData ******* getMatrix "+modelData.getMatrix()+" getTaskList"+modelData.getTaskList() );
 		cauiTaskManager.displayModel(modelData);
 		cauiTaskManager.updateModel(modelData);
 
-		storeModelCtxDB(modelData);
+		return modelData;
 	}
 }

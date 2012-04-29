@@ -63,7 +63,7 @@
 			<scope>test</scope>
 		</dependency>
 		
-		<dependency>
+		<!--  dependency>
 			<groupId>org.societies.personalisation</groupId>
 			<artifactId>CAUITaskManager</artifactId>
 			<version>${version.pm}</version>
@@ -92,7 +92,7 @@
 			<artifactId>user-context-history-mgmt</artifactId>
 			<version>${version.cm}</version>
 			<scope>test</scope>
-		</dependency>
+		</dependency-->
 		
 		<dependency>
 			<groupId>org.slf4j</groupId>

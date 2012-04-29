@@ -1,5 +1,6 @@
 package org.societies.personalisation.CAUIDiscovery.test;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -91,28 +92,28 @@ public class CAUIDiscoveryLearningTest {
 	public List<MockHistoryData> createHistorySet(){
 		List<MockHistoryData>  data = new ArrayList<MockHistoryData>();
 		//MockHistoryData(String action, String parameterName, Map<String,String> context){
-		Map<String,String> context = new HashMap<String,String>();
+		Map<String,Serializable> context = new HashMap<String,Serializable>();
 		context.put("temperature","hot");
-		context.put("status","free");
-		
+		context.put("SymLoc","free");
+		//Map<String,Serializable> context
 		data.add(new MockHistoryData("volume","mute",context));
-		data.add(new MockHistoryData("A","B",context));
-		data.add(new MockHistoryData("A","B",context));
-		data.add(new MockHistoryData("B","B",context));
-		data.add(new MockHistoryData("A","B",context));
-		data.add(new MockHistoryData("B","B",context));
-		data.add(new MockHistoryData("B","B",context));
-		data.add(new MockHistoryData("B","B",context));
-		data.add(new MockHistoryData("B","B",context));
-		data.add(new MockHistoryData("B","B",context));
-		data.add(new MockHistoryData("A","B",context));
-		data.add(new MockHistoryData("A","B",context));
-		data.add(new MockHistoryData("B","B",context));
-		data.add(new MockHistoryData("C","B",context));
-		data.add(new MockHistoryData("C","B",context));
-		data.add(new MockHistoryData("D","B",context));
-		data.add(new MockHistoryData("D","B",context));
-		data.add(new MockHistoryData("C","B",context));
+		data.add(new MockHistoryData("paramA","valueA",context));
+		data.add(new MockHistoryData("paramB","valueB",context));
+		data.add(new MockHistoryData("paramC","valueC",context));
+		data.add(new MockHistoryData("paramX","valueX",context));
+		data.add(new MockHistoryData("paramY","valueY",context));
+		data.add(new MockHistoryData("paramA","valueA",context));
+		data.add(new MockHistoryData("paramB","valueB",context));
+		data.add(new MockHistoryData("paramC","valueC",context));
+		data.add(new MockHistoryData("paramO","valueO",context));
+		data.add(new MockHistoryData("paramP","valueP",context));
+		data.add(new MockHistoryData("paramA","valueA",context));
+		data.add(new MockHistoryData("paramB","valueB",context));
+		data.add(new MockHistoryData("paramC","valueC",context));
+		data.add(new MockHistoryData("paramL","valueL",context));
+		data.add(new MockHistoryData("paramA","valueA",context));
+		data.add(new MockHistoryData("paramB","valueB",context));
+		data.add(new MockHistoryData("paramC","valueC",context));
 		
 		List<MockHistoryData> newSet = new ArrayList<MockHistoryData>();
 

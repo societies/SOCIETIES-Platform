@@ -75,7 +75,8 @@
 			<version>${version.pm}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
+		
+		<!-- dependency>
 			<groupId>org.societies.context-management</groupId>
 			<artifactId>context-broker</artifactId>
 			<version>${version.cm}</version>
@@ -92,7 +93,7 @@
 			<artifactId>user-context-history-mgmt</artifactId>
 			<version>${version.cm}</version>
 			<scope>test</scope>
-		</dependency>
+		</dependency-->
 
 
 		<!-- <dependency> <groupId>org.societies.context-management</groupId> <artifactId>css_contextBroker_impl</artifactId> 
