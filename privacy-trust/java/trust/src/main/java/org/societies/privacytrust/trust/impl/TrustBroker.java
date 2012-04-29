@@ -72,10 +72,11 @@ public class TrustBroker implements ITrustBroker {
 		if (teid == null)
 			throw new NullPointerException("teid can't be null");
 		
+		final Double trustValue;
+		
 		if (LOG.isDebugEnabled())
 			LOG.debug("Retrieving trust value for entity '"
 					+ teid + "' from Trust Repository");
-		/* TODO final */ Double trustValue = null;
 		
 		if (this.trustRepo == null)
 			throw new TrustBrokerException("Could not retrieve trust value for entity '"
@@ -83,7 +84,7 @@ public class TrustBroker implements ITrustBroker {
 		
 		final ITrustedEntity entity = this.trustRepo.retrieveEntity(teid);
 		if (entity != null)
-			;// TODO trustValue = entity.getUserPerceivedTrust().getValue();
+			trustValue = entity.getUserPerceivedTrust().getValue();
 		else
 			trustValue = null;
 			
