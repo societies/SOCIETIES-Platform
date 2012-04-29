@@ -78,16 +78,16 @@ public class TrustedService extends TrustedEntity implements ITrustedService {
 	
 	/* (non-Javadoc)
 	 * @see org.societies.privacytrust.trust.api.model.ITrustedService#getProvider()
-	 */
+	 *
 	@Override
 	public ITrustedCss getProvider() {
 		
 		return this.provider;
-	}
+	}*/
 	
 	/* (non-Javadoc)
 	 * @see org.societies.privacytrust.trust.api.model.ITrustedService#getDeveloper()
-	 */
+	 *
 	@Override
 	public ITrustedDeveloper getDeveloper() {
 		
@@ -96,10 +96,10 @@ public class TrustedService extends TrustedEntity implements ITrustedService {
 	
 	/* (non-Javadoc)
 	 * @see org.societies.privacytrust.trust.api.model.ITrustedService#setDeveloper(org.societies.privacytrust.trust.api.model.TrustedDeveloper)
-	 */
+	 *
 	@Override
 	public void setDeveloper(ITrustedDeveloper developer) {
 		
 		this.developer = developer;
-	}
+	}*/
 }
