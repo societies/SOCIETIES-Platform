@@ -22,58 +22,23 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection;
+package org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client;
 
-import org.societies.api.schema.identity.RequestorBean;
-
+import org.societies.api.identity.Requestor;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 
 /**
- * Describe your class here...
- *
- * @author Eliza
+ * @author Elizabeth
  *
  */
-public class NegotiationAgentBean {
+public interface INegotiationClient {
 
-	public enum negAgentMethodType {acknowledgeAgreement, getPolicy, getProviderIdentity,negotiate};
-	private negAgentMethodType method;
-	private byte[] agreementEnvelope;
-	private RequestorBean requestor;
-	private byte[] responsePolicy;
-	
-	
-	public byte[] getAgreementEnvelope() {
-		return agreementEnvelope;
-	}
-	public void setAgreementEnvelope(byte[] agreementEnvelope) {
-		this.agreementEnvelope = agreementEnvelope;
-	}
-
-	public byte[] getResponsePolicy() {
-		return responsePolicy;
-	}
-	public void setResponsePolicy(byte[] responsePolicy) {
-		this.responsePolicy = responsePolicy;
-	}
-	/**
-	 * @return the requestor
-	 */
-	public RequestorBean getRequestor() {
-		return requestor;
-	}
-	/**
-	 * @param requestor the requestor to set
-	 */
-	public void setRequestor(RequestorBean requestor) {
-		this.requestor = requestor;
-	}
-	public negAgentMethodType getMethod() {
-		return method;
-	}
-	public void setMethod(negAgentMethodType method) {
-		this.method = method;
-	}
-	
+	public void receiveProviderIdentity(Requestor requestor);
+	public void receiveProviderPolicy(RequestPolicy policy);
+	public void receiveNegotiationResponse(ResponsePolicy policy);
+	public void acknowledgeAgreement(Requestor requestor, IAgreementEnvelope envelope, boolean b);
 	
 	
 }

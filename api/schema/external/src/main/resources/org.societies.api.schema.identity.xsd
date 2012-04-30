@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0"
+targetNamespace="http://societies.org/api/schema/identity" 
+xmlns="http://societies.org/api/schema/identity"
+	xmlns:tns="http://societies.org/api/schema/servicelifecycle/model"
+	xmlns:tns2="http://societies.org/api/schema/identity" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:import namespace="http://societies.org/api/schema/servicelifecycle/model"
+		schemaLocation="org.societies.api.schema.servicelifecycle.model.xsd" />
+		
+	<xs:complexType name="RequestorBean">
+    <xs:sequence>
+      <xs:element name="requestorId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="RequestorCisBean">
+  <xs:complexContent>
+      <xs:extension base="tns2:RequestorBean">
+        <xs:sequence>
+          <xs:element name="cisRequestorId" type="xs:string"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:complexType name="RequestorServiceBean">
+  <xs:complexContent>
+      <xs:extension base="tns2:RequestorBean">
+        <xs:sequence>
+          <xs:element name="requestorServiceId" type="tns:serviceResourceIdentifier"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  
+</xs:schema>

@@ -34,6 +34,9 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
@@ -41,6 +44,9 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegAgentMethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationAgentBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationBeanResult;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.identity.RequestorCisBean;
+import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
@@ -56,7 +62,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
  * @author aleckey
  *
  */
-public class CommsClient implements INegotiationAgent, ICommCallback{
+public class NegotiationCommsClient implements INegotiationAgent, ICommCallback{
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			  Arrays.asList("http://societies.org/api/internal/schema/privacytrust/privacyprotection/negotiation", 
 					  		"http://societies.org/api/schema/servicelifecycle/model"));
@@ -66,7 +72,7 @@ public class CommsClient implements INegotiationAgent, ICommCallback{
 
 	//PRIVATE VARIABLES
 	private ICommManager commManager;
-	private static Logger LOG = LoggerFactory.getLogger(CommsClient.class);
+	private static Logger LOG = LoggerFactory.getLogger(NegotiationCommsClient.class);
 	private IIdentityManager idMgr;
 	private NegotiationBeanResult negBeanResult = null;
 	
@@ -79,7 +85,7 @@ public class CommsClient implements INegotiationAgent, ICommCallback{
 		this.commManager = commManager;
 	}
 
-	public CommsClient() {	}
+	public NegotiationCommsClient() {	}
 
 	public void InitService() {
 		//REGISTER OUR ServiceManager WITH THE XMPP Communication Manager
@@ -140,16 +146,16 @@ public class CommsClient implements INegotiationAgent, ICommCallback{
 	 */
 
 	@Override
-	public Future<Boolean> acknowledgeAgreement(IAgreementEnvelope arg0) {
-		IIdentity toIdentity = null;
-		try {
+	public Future<Boolean> acknowledgeAgreement(IAgreementEnvelope envelope) {
+		IIdentity toIdentity = envelope.getAgreement().getRequestor().getRequestorId();
+/*		try {
 			toIdentity = idMgr.fromJid("XCManager.societies.local");
 		} catch (InvalidFormatException e1) {
 			e1.printStackTrace();
-		}
+		}*/
 		Stanza stanza = new Stanza(toIdentity);
 		NegotiationAgentBean bean = new NegotiationAgentBean();
-		bean.setAgreementEnvelope(Util.toByteArray(arg0));
+		bean.setAgreementEnvelope(Util.toByteArray(envelope));
 		bean.setMethod(NegAgentMethodType.ACKNOWLEDGE_AGREEMENT);
 		try {
 			this.commManager.sendIQGet(stanza, bean, this);
@@ -171,16 +177,17 @@ public class CommsClient implements INegotiationAgent, ICommCallback{
 	}
 
 	@Override
-	public Future<RequestPolicy> getPolicy(ServiceResourceIdentifier serviceId) {
-		IIdentity toIdentity = null;
+	public Future<RequestPolicy> getPolicy(Requestor requestor) {
+/*		IIdentity toIdentity = null;
 		try {
 			toIdentity = idMgr.fromJid("XCManager.societies.local");
 		} catch (InvalidFormatException e1) {
 			e1.printStackTrace();
 		}
-		Stanza stanza = new Stanza(toIdentity);
+		Stanza stanza = new Stanza(toIdentity);*/
+		Stanza stanza = new Stanza(requestor.getRequestorId());
 		NegotiationAgentBean bean = new NegotiationAgentBean();
-		bean.setServiceID(serviceId);
+		bean.setRequestor(createRequestorBean(requestor));
 		bean.setMethod(NegAgentMethodType.GET_POLICY);
 		
 		try{
@@ -248,18 +255,19 @@ public class CommsClient implements INegotiationAgent, ICommCallback{
 	}
 
 	@Override
-	public Future<ResponsePolicy> negotiate(ServiceResourceIdentifier serviceId,
-			ResponsePolicy policy) {
-		IIdentity toIdentity = null;
+	public Future<ResponsePolicy> negotiate(Requestor requestor, ResponsePolicy policy) {
+		/*		IIdentity toIdentity = null;
 		try {
+			
 			toIdentity = idMgr.fromJid("XCManager.societies.local");
 		} catch (InvalidFormatException e1) {
 			e1.printStackTrace();
 		}
-		Stanza stanza = new Stanza(toIdentity);
+		Stanza stanza = new Stanza(toIdentity);*/
+		Stanza stanza = new Stanza(requestor.getRequestorId());
 		NegotiationAgentBean bean = new NegotiationAgentBean();
 		bean.setMethod(NegAgentMethodType.NEGOTIATE);
-		bean.setServiceID(serviceId);
+		bean.setRequestor(createRequestorBean(requestor));
 		bean.setResponsePolicy(Util.toByteArray(policy));
 		try{
 			this.commManager.sendIQGet(stanza, bean, this);
@@ -281,7 +289,23 @@ public class CommsClient implements INegotiationAgent, ICommCallback{
 		return new AsyncResult<ResponsePolicy> (resp);		
 	}
 	
-	
+	private RequestorBean createRequestorBean(Requestor requestor){
+		if (requestor instanceof RequestorCis){
+			RequestorCisBean cisRequestorBean = new RequestorCisBean();
+			cisRequestorBean.setRequestorId(requestor.getRequestorId().getBareJid());
+			cisRequestorBean.setCisRequestorId(((RequestorCis) requestor).getCisRequestorId().getBareJid());
+			return cisRequestorBean;
+		}else if (requestor instanceof RequestorService){
+			RequestorServiceBean serviceRequestorBean = new RequestorServiceBean();
+			serviceRequestorBean.setRequestorId(requestor.getRequestorId().getBareJid());
+			serviceRequestorBean.setRequestorServiceId(((RequestorService) requestor).getRequestorServiceId());
+			return serviceRequestorBean;
+		}else{
+			RequestorBean requestorBean = new RequestorBean();
+			requestorBean.setRequestorId(requestor.getRequestorId().getBareJid());
+			return requestorBean;
+		}
+	}
 	
 
 

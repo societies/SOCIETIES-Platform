@@ -22,58 +22,32 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection;
+package org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client;
 
-import org.societies.api.schema.identity.RequestorBean;
+import java.util.List;
 
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 
 /**
- * Describe your class here...
- *
- * @author Eliza
+ * @author Elizabeth
  *
  */
-public class NegotiationAgentBean {
+public class AgreementCreator {
 
-	public enum negAgentMethodType {acknowledgeAgreement, getPolicy, getProviderIdentity,negotiate};
-	private negAgentMethodType method;
-	private byte[] agreementEnvelope;
-	private RequestorBean requestor;
-	private byte[] responsePolicy;
+	private List<ResponseItem> requestedItems;
 	
-	
-	public byte[] getAgreementEnvelope() {
-		return agreementEnvelope;
-	}
-	public void setAgreementEnvelope(byte[] agreementEnvelope) {
-		this.agreementEnvelope = agreementEnvelope;
-	}
-
-	public byte[] getResponsePolicy() {
-		return responsePolicy;
-	}
-	public void setResponsePolicy(byte[] responsePolicy) {
-		this.responsePolicy = responsePolicy;
-	}
-	/**
-	 * @return the requestor
-	 */
-	public RequestorBean getRequestor() {
-		return requestor;
-	}
-	/**
-	 * @param requestor the requestor to set
-	 */
-	public void setRequestor(RequestorBean requestor) {
-		this.requestor = requestor;
-	}
-	public negAgentMethodType getMethod() {
-		return method;
-	}
-	public void setMethod(negAgentMethodType method) {
-		this.method = method;
+	public AgreementCreator(List<ResponseItem> items){
+		this.requestedItems = items;
 	}
 	
-	
-	
+	public IAgreement createAgreement(Requestor requestor, IIdentity userIdentity){
+		NegotiationAgreement na = new NegotiationAgreement(this.requestedItems);
+		na.getRequestor();
+		na.setUserIdentity(userIdentity);
+		return na;
+	}
 }
