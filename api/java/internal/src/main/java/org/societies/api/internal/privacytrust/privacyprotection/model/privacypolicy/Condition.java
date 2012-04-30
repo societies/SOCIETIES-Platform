@@ -77,7 +77,7 @@ public class Condition implements Serializable{
 	public String toXMLString(){
 		String str = "\n<Condition>";
 		str = str.concat("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" " +
-				"\n\t\t\tDataType=\"org.personalsmartspace.spm.preference.api.platform.constants.ConditionConstants\">");
+				"\n\t\t\tDataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">");
 		str = str.concat("\n\t\t<AttributeValue DataType=\""+this.theCondition.toString()+"\">");
 		str = str.concat(this.value);
 		str = str.concat("</AttributeValue>");

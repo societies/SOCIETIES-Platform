@@ -35,6 +35,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.personalisation.model.IAction;
@@ -270,10 +271,14 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	}
 
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.personalisation.preference.IUserPreferenceManagement#getOutcome(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)
+	 */
 	@Override
-	public Future<IPreferenceOutcome> getOutcome(IIdentity ownerID,
+	public Future<IOutcome> getOutcome(IIdentity ownerID,
 			ServiceResourceIdentifier serviceID, String preferenceName) {
-		return new AsyncResult<IPreferenceOutcome> (this.prefMgr.getPreference(ownerID, "", serviceID, preferenceName));
+		return new AsyncResult<IOutcome> (this.prefMgr.getPreference(ownerID, "", serviceID, preferenceName));
 	}
 
 
