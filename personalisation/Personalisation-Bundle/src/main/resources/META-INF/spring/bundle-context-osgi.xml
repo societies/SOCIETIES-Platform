@@ -143,6 +143,7 @@
         </osgi:reference>
 		
 		<osgi:reference id="commsMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"> 
+			<osgi:listener bind-method="setCommsMgr" ref="persoMgr"></osgi:listener>
 		</osgi:reference>
 		
 		<!--  <osgi:reference id="upcm" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/> -->

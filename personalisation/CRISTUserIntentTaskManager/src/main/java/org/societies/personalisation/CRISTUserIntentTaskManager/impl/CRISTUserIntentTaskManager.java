@@ -62,7 +62,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 
 	public CRISTUserIntentTaskManager() {
 		System.out.println("Hello! I'm the CRIST User Intent Manager!");
-		this.initialiseCRISTUserIntentManager();
+		//this.initialiseCRISTUserIntentManager();
 	}
 
 	public CRISTUserIntentTaskManager(ICRISTUserIntentPrediction cristPrediction) {
