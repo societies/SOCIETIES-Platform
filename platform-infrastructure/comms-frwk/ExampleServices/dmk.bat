@@ -140,8 +140,8 @@ rem ------------------------------
 
   rem do Clean work:
     if not "%CLEAN_FLAG%"=="" (
-      rmdir /Q /S "%KERNEL_HOME%\serviceability"
-      rmdir /Q /S "%KERNEL_HOME%\work"
+     rmdir /Q /S "%CONFIG_DIR%"\serviceability"
+     rmdir /Q /S "%CONFIG_DIR%"\work"
       set LAUNCH_OPTS=%LAUNCH_OPTS% -Fosgi.clean=true
     )
 
@@ -160,11 +160,16 @@ rem ------------------------------
     set JMX_OPTS=%JMX_OPTS% -Djavax.net.ssl.keyStorePassword=%KEYSTORE_PASSWORD% 
     set JMX_OPTS=%JMX_OPTS% -Dcom.sun.management.jmxremote.ssl=true 
     set JMX_OPTS=%JMX_OPTS% -Dcom.sun.management.jmxremote.ssl.need.client.auth=false
+    set JMX_OPTS=%JMX_OPTS% -Dcom.springsource.kernel.home="%CONFIG_DIR%\" 
+    set JMX_OPTS=%JMX_OPTS% -Dosgi.instance.area="%CONFIG_DIR%\" 
 
     if not "%NO_START_FLAG%"=="" goto :eof
     rem ensure that the tmp directory exists:
-      set TMP_DIR="%KERNEL_HOME%\work\tmp"
+      set TMP_DIR="%CONFIG_DIR%\work\tmp"
       if not exist "%TMP_DIR%" mkdir "%TMP_DIR%"
+    rem ensure that the osgi config directory exists:
+    set TMP_OSGI_DIR="%CONFIG_DIR%\work\osgi\configuration"
+    if not exist "%TMP_OSGI_DIR%" mkdir "%TMP_OSGI_DIR%"
 
     rem Run the server
   
@@ -172,22 +177,25 @@ rem ------------------------------
       set KERNEL_JAVA_PARMS=%JAVA_OPTS% %DEBUG_OPTS% %JMX_OPTS%
 
       set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -XX:+HeapDumpOnOutOfMemoryError 
-      set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -XX:ErrorFile="%KERNEL_HOME%\serviceability\error.log" 
-      set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -XX:HeapDumpPath="%KERNEL_HOME%\serviceability\heap_dump.hprof"
+      set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -XX:ErrorFile="%CONFIG_DIR%"\serviceability\error.log" 
+      set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -XX:HeapDumpPath="%CONFIG_DIR%"\serviceability\heap_dump.hprof"
       set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -Djava.security.auth.login.config="%CONFIG_DIR%\org.eclipse.virgo.kernel.authentication.config" 
       set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -Dorg.eclipse.virgo.kernel.authentication.file="%CONFIG_DIR%\org.eclipse.virgo.kernel.users.properties" 
       set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -Djava.io.tmpdir="%TMP_DIR%" 
-      set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -Dorg.eclipse.virgo.kernel.home="%KERNEL_HOME%" 
+      set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -Dorg.eclipse.virgo.kernel.home="%CONFIG_DIR%" 
       set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -Dorg.eclipse.equinox.console.jaas.file="%CONFIG_DIR%/store"
       set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -Dssh.server.keystore="%CONFIG_DIR%/hostkey.ser" 
       set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -Dgosh.args="--nointeractive" 
       set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -classpath "%CLASSPATH%" 
       set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% org.eclipse.virgo.osgi.launcher.Launcher 
-      set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -config "%KERNEL_HOME%\lib\org.eclipse.virgo.kernel.launch.properties" 
-      set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -Forg.eclipse.virgo.kernel.home="%KERNEL_HOME%" 
+      set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -config "%CONFIG_DIR%\org.eclipse.virgo.kernel.launch.properties" 
+      set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -Forg.eclipse.virgo.kernel.home="%CONFIG_DIR%" 
       set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -Forg.eclipse.virgo.kernel.config="%CONFIG_DIR%" 
-      set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -Fosgi.configuration.area="%KERNEL_HOME%\work\osgi\configuration" 
+      set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -Fosgi.configuration.area="%CONFIG_DIR%\work\osgi\configuration" 
       set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -Fosgi.java.profile="file:%KERNEL_HOME%\lib\java6-server.profile" 
+      
+	set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -Fcom.springsource.kernel.home="%CONFIG_DIR%" 
+	set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% -Fcom.springsource.kernel.config="%CONFIG_DIR%" 
       set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% %LAUNCH_OPTS%
       set KERNEL_JAVA_PARMS=%KERNEL_JAVA_PARMS% %ADDITIONAL_ARGS%
   
