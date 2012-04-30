@@ -1,4 +1,4 @@
-package org.societies.cis.activity.model;
+package org.societies.activity.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,8 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.societies.activity.ActivityFeed;
 import org.societies.api.activity.IActivity;
-import org.societies.cis.activity.ActivityFeed;
 
 @Entity
 @Table(name = "org_societies_cis_activity_model_Activity")

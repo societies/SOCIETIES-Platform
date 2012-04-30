@@ -27,7 +27,6 @@ package org.societies.cis.manager;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -40,13 +39,12 @@ import org.junit.Test;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.cis.persistance.IPersistanceManager;
-import org.societies.identity.IdentityImpl;
 import org.societies.identity.NetworkNodeImpl;
+import org.springframework.test.context.ContextConfiguration;
 
 import static org.mockito.Mockito.*;
 
@@ -56,7 +54,7 @@ import static org.mockito.Mockito.*;
  * @author Thomas Vilarinho (Sintef)
  *
  */
-
+@ContextConfiguration(locations = { "../../../../META-INF/CisManagerTest-context.xml" })
 public class TestCisManager {
 	
 	
