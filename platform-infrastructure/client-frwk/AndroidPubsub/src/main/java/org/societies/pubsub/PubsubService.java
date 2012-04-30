@@ -129,5 +129,12 @@ public class PubsubService extends Service {
 		public boolean isConnected() {
 			return clientCommunicationMgr.isConnected();
 		}
+		/**
+		* TODO: Needs to have method body correctly written
+		*/
+	        public boolean UnRegisterCommManager() {
+			return false;
+		}
+
     }
 }

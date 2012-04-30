@@ -45,29 +45,25 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  */
 public class NegotiationAgreement implements IAgreement, Serializable {
 
-	private List<RequestItem> items;
+	private List<ResponseItem> items;
 	private Requestor requestor;
 	private IIdentity userId;
 	private IIdentity userPublicId;
 
 	private NegotiationAgreement(){
-		this.items = new ArrayList<RequestItem>();
+		this.items = new ArrayList<ResponseItem>();
 	}
 
 	public NegotiationAgreement(ResponsePolicy policy){
 		this.requestor = policy.getRequestor();
-		List<RequestItem> l = new ArrayList<RequestItem>();
-		for (ResponseItem r : policy.getResponseItems()){
-			l.add(r.getRequestItem());
-		}
-		this.items = java.util.Collections.unmodifiableList(l);
+		this.items = java.util.Collections.unmodifiableList(policy.getResponseItems());
 	}
-	public NegotiationAgreement(List<RequestItem> items){
+	public NegotiationAgreement(List<ResponseItem> items){
 		this.items = java.util.Collections.unmodifiableList(items);
 	}
 	
 	
-	public void setRequestItems(List<RequestItem> items){
+	public void setResponseItems(List<ResponseItem> items){
 		this.items = java.util.Collections.unmodifiableList(items);
 	}
 
@@ -110,7 +106,7 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement#getRequestedItems()
 	 */
 	@Override
-	public List<RequestItem> getRequestedItems() {
+	public List<ResponseItem> getRequestedItems() {
 		return this.items;
 	}
 

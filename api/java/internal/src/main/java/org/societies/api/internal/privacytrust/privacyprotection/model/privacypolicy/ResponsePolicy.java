@@ -90,7 +90,7 @@ public class ResponsePolicy implements Serializable{
 	private String statusToXML(){
 		String str = "\n<NegotiationStatus>";
 		str = str.concat("\n\t<Attribute AttributeId=\"Decision\" " +
-		"\n\t\t\tDataType=\"org.personalsmartspace.spm.negotiation.api.platform.NegotiationStatus\">");
+		"\n\t\t\tDataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationStatus\">");
 		str = str.concat("\n\t\t<AttributeValue>");
 		str = str.concat(this.status.toString());
 		str = str.concat("</AttributeValue>");

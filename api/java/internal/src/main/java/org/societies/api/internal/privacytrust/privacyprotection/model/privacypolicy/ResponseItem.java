@@ -70,7 +70,7 @@ public class ResponseItem implements Serializable{
 	public String decisionAsXML(){
 		String str = "\n<Decision>";
 		str = str.concat("\n\t<Attribute AttributeId=\"Decision\" " +
-		"\n\t\t\tDataType=\"org.personalsmartspace.spm.negotiation.api.platform.Decision\">");
+		"\n\t\t\tDataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision\">");
 		str = str.concat("\n\t\t<AttributeValue>");
 		str = str.concat(this.decision.toString());
 		str = str.concat("</AttributeValue>");

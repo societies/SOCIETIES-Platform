@@ -85,7 +85,7 @@ public class Resource implements Serializable{
 	private String ctxIDToXMLString(){
 		String str = "";
 		str = str.concat("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:resource-id\"" +
-		"\n \t\t\tDataType=\"org.personalsmartspace.cm.model.api.pss3p.ICtxAttributeIdentifier\">");
+		"\n \t\t\tDataType=\"org.societies.api.context.model.CtxIdentifier\">");
 
 		str = str.concat("\n\t\t<AttributeValue>");
 		str = str.concat(this.ctxIdentifier.toUriString());

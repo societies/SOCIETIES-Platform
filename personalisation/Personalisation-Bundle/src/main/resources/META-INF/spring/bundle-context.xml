@@ -30,6 +30,7 @@
 		name="cauiPrediction" init-method="initialiseCAUIPrediction">
 		<property name="persoMgr" ref="persoMgr"></property>
 		<property name="ctxBroker" ref="ctxBroker"></property>
+		<property name="cauiDiscovery" ref="cauiDiscovery"></property>
 	</bean>
 
 	<bean id="cauiDiscovery"
@@ -67,7 +68,7 @@
 		<property name="pcm" ref="pcm"></property>
 		<property name="dianne" ref="dianne"></property>
 		<property name="ctxBroker" ref="ctxBroker"></property>
-		<property name="idm" ref="idm"></property>
+		<property name="commsMgr" ref="commsMgr"></property>
 		<property name="decisionMaker" ref="decisionMaker"></property>
 		<property name="eventMgr" ref="eventMgmtRef"></property>
 		<property name="cristPrediction" ref="cristPrediction"></property>

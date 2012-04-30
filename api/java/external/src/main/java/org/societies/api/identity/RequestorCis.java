@@ -58,7 +58,7 @@ public class RequestorCis extends Requestor implements Serializable{
 	public String toXMLString(){
 		String parent = super.toXMLString();
 		String str = "";
-		str = str.concat("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:subject-id\"" +
+		str = str.concat("\n\t<Attribute AttributeId=\"CisId\"" +
 		"\n \t\t\tDataType=\"org.societies.api.identity.IIdentity\">");
 
 		str = str.concat("\n\t\t<AttributeValue>");

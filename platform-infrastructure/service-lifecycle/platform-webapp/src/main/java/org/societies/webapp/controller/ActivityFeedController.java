@@ -24,17 +24,13 @@
  */
 package org.societies.webapp.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Future;
 
 import javax.validation.Valid;
 
 import org.societies.webapp.models.CisFeedForm;
-import org.societies.webapp.models.ServiceDiscoveryForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -42,12 +38,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import org.societies.api.activity.IActivity;
-import org.societies.api.activity.IActivityFeed;
-import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
-import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
-import org.societies.api.schema.servicelifecycle.model.Service;
-
+import org.societies.api.internal.cis.management.ICisActivity;
+import org.societies.api.internal.cis.management.ICisActivityFeed;
 
 @Controller
 public class ActivityFeedController {
@@ -56,17 +48,17 @@ public class ActivityFeedController {
 	 * OSGI service get auto injected
 	 */
 	@Autowired
-	private IActivityFeed activtyFeed;
+	private ICisActivityFeed activtyFeed;
 
 	/**
 	 * @return the activtyFeed*/
-	public IActivityFeed getActivtyFeed() {
+	public ICisActivityFeed getActivtyFeed() {
 		return activtyFeed;
 	}
 
 	/**
 	 * @param activtyFeed the activtyFeed to set*/
-	public void setActivtyFeed(IActivityFeed activtyFeed) {
+	public void setActivtyFeed(ICisActivityFeed activtyFeed) {
 		this.activtyFeed = activtyFeed;
 	}
 
@@ -110,7 +102,7 @@ public class ActivityFeedController {
 		try {
 		
 			if (method.equalsIgnoreCase("addCisActivity")) {
-				IActivity activity = null; 
+				ICisActivity activity = null; 
 				getActivtyFeed().addCisActivity(activity);
 				res="Activty added for cssID: " + cssId;
 				

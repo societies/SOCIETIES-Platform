@@ -396,148 +396,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	
     }
     
-    /**public void processCSMAnalyserRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
-    	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
-    	ArrayList<ICisRecord> creations = cisRecommendations.get("Create CISs");
-    	if (creations == null)
-    		creations = new ArrayList<ICisRecord>();
-    	ArrayList<ICisRecord> deletions = cisRecommendations.get("Delete CISs");
-    	if (deletions == null)
-    		deletions = new ArrayList<ICisRecord>();
-    	ArrayList<ArrayList<ICisRecord>> abstractCreations = new ArrayList<ArrayList<ICisRecord>>();
-    	ArrayList<ArrayList<ICisRecord>> abstractDeletions = new ArrayList<ArrayList<ICisRecord>>();
-    	
-    	if (creations != null)
-    		if (creations.size() != 0)
-    			for (int i = 0; i < creations.size(); i++) {
-    				ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
-    				it.add(creations.get(i));
-    	            abstractCreations.add(it);
-    			}
-    	
-    	
-    	if (deletions != null) {
-    		if (deletions.size() != 0)
-    			for (int i = 0; i < deletions.size(); i++) {
-    				ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
-    				it.add(deletions.get(i));
-    	            abstractDeletions.add(it);
-    			}
-    	}
-    	
-    	
-    	for (int i = 0; i < creations.size(); i++) {
-    		if (checkForPreferenceConflicts("Create CISs", abstractCreations).size() != 0)
-    			creations.remove(i);
-    	}
-    	
-    	for (int i = 0; i < deletions.size() && deletions != null; i++) {
-    		if (checkForPreferenceConflicts("Delete CISs", abstractDeletions).size() != 0)
-    			deletions.remove(i);
-    	}
-    	
-    	for (int i = 0; i < creations.size(); i++) {
-    	
-    		ArrayList<String> privacyConflicts = checkForPrivacyConflicts(abstractCreations);
-    		boolean refuseSuggestion = false;
-    		if (privacyConflicts.size() != 0) {
-    			for (int m = 0; m < privacyConflicts.size(); m++) {
-    				if (privacyConflicts.get(m).contains("User policy"))
-    				    refuseSuggestion = true;
-    				else if (privacyConflicts.get(m).contains("CSS: ")) {
-    					ICisRecord updatedCreation = creations.get(i);
-    					//ArrayList<IIdentity> theMembers = updatedCreation.getMembersList();
-    					//theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
-    					//updatedCreation.setMembersList();
-    					creations.set(i, updatedCreation);
-    				}
-    					
-    			}
-    		}
-    		if (refuseSuggestion == true)
-    			creations.remove(i);
-    		
-    		
-    	}
-    	
-    	for (int i = 0; i < deletions.size(); i++) {
-        	
-    		ArrayList<String> privacyConflicts = checkForPrivacyConflicts(abstractDeletions);
-    		boolean refuseSuggestion = false;
-    		if (privacyConflicts.size() != 0) {
-    			for (int m = 0; m < privacyConflicts.size(); m++) {
-    				if (privacyConflicts.get(m).equals("User policy"))
-    				    refuseSuggestion = true;
-    				else if (privacyConflicts.get(m).contains("CSS: ")) {
-    					ICisRecord updatedCreation = creations.get(i);
-    					//ArrayList<IIdentity> theMembers = updatedCreation.getMembersList();
-    					//theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
-    					//updatedCreation.setMembersList();
-    					creations.set(i, updatedCreation);
-    				}
-    			}
-    		}
-    		if (refuseSuggestion == true)
-    			deletions.remove(i);
-    		
-    		
-    	}
-    	
-    	for (int i = 0; i < creations.size(); i++) {
-    		//userContextBroker.evaluateSimilarity("location", convertedRecommendations.get(i).get(0).getMembersList());
-    		//if user isn't a member of another CIS that matches this, OK
-    		
-    		//if > 90% of members share that context, and there's no other context with more coverage of members,
-    		//let this be the highest level CIS criteria.
-    		//
-    		//else if (more members share some other context)
-    		//    convertedRecommendations.replace(i, same but with criteria changed to other context, or original as sub-CIS too);
-    		
-    		//else
-    		//    convertedRecommendations.remove(i);
-    		
-    		//If activity feed shows history in last few minutes, it's temporary and should be made immediately, as sub-CIS if an encapsulating CIS is available; otherwise, 8 months - ongoing, last month - long-term; last few days - medium-term
-    	    
-    		//Friends, CSS directory, working colleagues, same address: ongoing
-    		//Shared interests, personal attributes like languages spoken and age: sub-CIS.
-    	}
-    	
-    	for (int i = 0; i < deletions.size(); i++) {
-    		//If activity feed of CIS is dead for a while, depending on criteria it's based on, OK.
-    	}
-    	
-    	
-    	abstractCreations.clear();
-    	if (creations.size() != 0) {
-    		for (int i = 0; i < creations.size(); i++) {
-				ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
-				it.add(creations.get(i));
-	            abstractCreations.add(it);
-			}
-    	    convertedRecommendations.put("Create CISs", abstractCreations);
-    	}
-    	
-    	abstractDeletions.clear();
-    	if (deletions.size() != 0) {
-    		for (int i = 0; i < deletions.size(); i++) {
-				ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
-				it.add(deletions.get(i));
-	            abstractDeletions.add(it);
-			}
-    	    convertedRecommendations.put("Delete CISs", abstractDeletions);
-    	}
-    	
-    	if (convertedRecommendations.size() != 0) {
-    		ArrayList<String> actionMetadata = communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations);
-    	}
-    }
     
-    public void processCSMAnalyserConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
-    	//go straight to Community Recommender
-    	
-    	communityRecommender.identifyCisActionForCSMAnalyser(cisRecommendations);
-    	
-    }*/
     
     @Override
     public void processCSMAnalyserRecommendations(ArrayList<IIdentity> cssList, ArrayList<CtxAttribute> sharedContextAttributes, ArrayList<CtxAssociation> sharedContextAssociations, ArrayList<ICssActivity> sharedCssActivities, ArrayList<IActivity> sharedCisActivities) {
@@ -685,6 +544,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	    
 			//Friends, CSS directory, working colleagues, same address: ongoing
 			//Shared interests, personal attributes like languages spoken and age: sub-CIS.
+			cisProposal = advancedCisCreationAnalysis(cisProposal);
 		}
 	
 	    for (int i = 0; i < deletions.size(); i++) {
@@ -750,6 +610,10 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	
     	//personalisationManager.getPreference(arg0, arg1, arg2, arg3, "refuse CIS action with given criteria", arg5)
 		return conflictingPreferences;
+    }
+    
+    public ICisRecord advancedCisCreationAnalysis(ICisRecord proposedCis) {
+    	return null;
     }
     
     public IIdentity getLinkedCss() {
@@ -973,5 +837,150 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     //public Object setQuery(Stanza arg0, Object arg1) {
     //	return null;
     //}
+    
+    
+    
+    /**public void processCSMAnalyserRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
+	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
+	ArrayList<ICisRecord> creations = cisRecommendations.get("Create CISs");
+	if (creations == null)
+		creations = new ArrayList<ICisRecord>();
+	ArrayList<ICisRecord> deletions = cisRecommendations.get("Delete CISs");
+	if (deletions == null)
+		deletions = new ArrayList<ICisRecord>();
+	ArrayList<ArrayList<ICisRecord>> abstractCreations = new ArrayList<ArrayList<ICisRecord>>();
+	ArrayList<ArrayList<ICisRecord>> abstractDeletions = new ArrayList<ArrayList<ICisRecord>>();
+	
+	if (creations != null)
+		if (creations.size() != 0)
+			for (int i = 0; i < creations.size(); i++) {
+				ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+				it.add(creations.get(i));
+	            abstractCreations.add(it);
+			}
+	
+	
+	if (deletions != null) {
+		if (deletions.size() != 0)
+			for (int i = 0; i < deletions.size(); i++) {
+				ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+				it.add(deletions.get(i));
+	            abstractDeletions.add(it);
+			}
+	}
+	
+	
+	for (int i = 0; i < creations.size(); i++) {
+		if (checkForPreferenceConflicts("Create CISs", abstractCreations).size() != 0)
+			creations.remove(i);
+	}
+	
+	for (int i = 0; i < deletions.size() && deletions != null; i++) {
+		if (checkForPreferenceConflicts("Delete CISs", abstractDeletions).size() != 0)
+			deletions.remove(i);
+	}
+	
+	for (int i = 0; i < creations.size(); i++) {
+	
+		ArrayList<String> privacyConflicts = checkForPrivacyConflicts(abstractCreations);
+		boolean refuseSuggestion = false;
+		if (privacyConflicts.size() != 0) {
+			for (int m = 0; m < privacyConflicts.size(); m++) {
+				if (privacyConflicts.get(m).contains("User policy"))
+				    refuseSuggestion = true;
+				else if (privacyConflicts.get(m).contains("CSS: ")) {
+					ICisRecord updatedCreation = creations.get(i);
+					//ArrayList<IIdentity> theMembers = updatedCreation.getMembersList();
+					//theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
+					//updatedCreation.setMembersList();
+					creations.set(i, updatedCreation);
+				}
+					
+			}
+		}
+		if (refuseSuggestion == true)
+			creations.remove(i);
+		
+		
+	}
+	
+	for (int i = 0; i < deletions.size(); i++) {
+    	
+		ArrayList<String> privacyConflicts = checkForPrivacyConflicts(abstractDeletions);
+		boolean refuseSuggestion = false;
+		if (privacyConflicts.size() != 0) {
+			for (int m = 0; m < privacyConflicts.size(); m++) {
+				if (privacyConflicts.get(m).equals("User policy"))
+				    refuseSuggestion = true;
+				else if (privacyConflicts.get(m).contains("CSS: ")) {
+					ICisRecord updatedCreation = creations.get(i);
+					//ArrayList<IIdentity> theMembers = updatedCreation.getMembersList();
+					//theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
+					//updatedCreation.setMembersList();
+					creations.set(i, updatedCreation);
+				}
+			}
+		}
+		if (refuseSuggestion == true)
+			deletions.remove(i);
+		
+		
+	}
+	
+	for (int i = 0; i < creations.size(); i++) {
+		//userContextBroker.evaluateSimilarity("location", convertedRecommendations.get(i).get(0).getMembersList());
+		//if user isn't a member of another CIS that matches this, OK
+		
+		//if > 90% of members share that context, and there's no other context with more coverage of members,
+		//let this be the highest level CIS criteria.
+		//
+		//else if (more members share some other context)
+		//    convertedRecommendations.replace(i, same but with criteria changed to other context, or original as sub-CIS too);
+		
+		//else
+		//    convertedRecommendations.remove(i);
+		
+		//If activity feed shows history in last few minutes, it's temporary and should be made immediately, as sub-CIS if an encapsulating CIS is available; otherwise, 8 months - ongoing, last month - long-term; last few days - medium-term
+	    
+		//Friends, CSS directory, working colleagues, same address: ongoing
+		//Shared interests, personal attributes like languages spoken and age: sub-CIS.
+	}
+	
+	for (int i = 0; i < deletions.size(); i++) {
+		//If activity feed of CIS is dead for a while, depending on criteria it's based on, OK.
+	}
+	
+	
+	abstractCreations.clear();
+	if (creations.size() != 0) {
+		for (int i = 0; i < creations.size(); i++) {
+			ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+			it.add(creations.get(i));
+            abstractCreations.add(it);
+		}
+	    convertedRecommendations.put("Create CISs", abstractCreations);
+	}
+	
+	abstractDeletions.clear();
+	if (deletions.size() != 0) {
+		for (int i = 0; i < deletions.size(); i++) {
+			ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+			it.add(deletions.get(i));
+            abstractDeletions.add(it);
+		}
+	    convertedRecommendations.put("Delete CISs", abstractDeletions);
+	}
+	
+	if (convertedRecommendations.size() != 0) {
+		ArrayList<String> actionMetadata = communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations);
+	}
+}
+
+public void processCSMAnalyserConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
+	//go straight to Community Recommender
+	
+	communityRecommender.identifyCisActionForCSMAnalyser(cisRecommendations);
+	
+}*/
     
 }

@@ -35,6 +35,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.personalisation.model.IAction;
@@ -65,11 +66,11 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	private UserPreferenceManagement prefMgr;
 	private IInternalPersonalisationManager persoMgr;
 	private MergingManager merging;
-	private IC45Learning c45Learning;
+	private IC45Learning userPrefLearning;
 	private IEventMgr eventMgr;
 
 	public UserPreferenceConditionMonitor(){
-		merging = new MergingManager(c45Learning, prefMgr, this, eventMgr);
+		merging = new MergingManager(getUserPrefLearning(), prefMgr, this, eventMgr);
 	}
 	
 	
@@ -98,15 +99,24 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		this.persoMgr = persoMgr;
 	}
 
+
 	
-	public IC45Learning getC45Learning() {
-		return c45Learning;
+	/**
+	 * @return the userPrefLearning
+	 */
+	public IC45Learning getUserPrefLearning() {
+		return userPrefLearning;
 	}
 
-	public void setC45Learning(IC45Learning c45Learning) {
-		this.c45Learning = c45Learning;
+
+	/**
+	 * @param userPrefLearning the userPrefLearning to set
+	 */
+	public void setUserPrefLearning(IC45Learning userPrefLearning) {
+		this.userPrefLearning = userPrefLearning;
 	}
-	
+
+
 	public IEventMgr getEventMgr() {
 		return eventMgr;
 	}
@@ -270,10 +280,14 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	}
 
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.personalisation.preference.IUserPreferenceManagement#getOutcome(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)
+	 */
 	@Override
-	public Future<IPreferenceOutcome> getOutcome(IIdentity ownerID,
+	public Future<IOutcome> getOutcome(IIdentity ownerID,
 			ServiceResourceIdentifier serviceID, String preferenceName) {
-		return new AsyncResult<IPreferenceOutcome> (this.prefMgr.getPreference(ownerID, "", serviceID, preferenceName));
+		return new AsyncResult<IOutcome> (this.prefMgr.getPreference(ownerID, "", serviceID, preferenceName));
 	}
 
 
