@@ -33,6 +33,7 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
@@ -49,12 +50,14 @@ import org.societies.api.internal.personalisation.model.IFeedbackEvent;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
+import org.societies.api.osgi.event.CSSEvent;
+import org.societies.api.osgi.event.EventListener;
+import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.comm.xmpp.event.InternalEvent;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
@@ -65,10 +68,9 @@ import org.societies.personalisation.common.api.management.IInternalPersonalisat
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
 import org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
-import org.springframework.context.ApplicationListener;
 
-public class PersonalisationManager implements IPersonalisationManager,
-		IInternalPersonalisationManager, CtxChangeEventListener, ApplicationListener<InternalEvent> {
+public class PersonalisationManager extends EventListener implements IPersonalisationManager,
+		IInternalPersonalisationManager, CtxChangeEventListener {
 
 	// services
 	private ICtxBroker ctxBroker;
@@ -79,7 +81,7 @@ public class PersonalisationManager implements IPersonalisationManager,
 	private ICRISTUserIntentPrediction cristPrediction;
 	private IIdentityManager idm;
 	private IDecisionMaker decisionMaker;
-	
+	private ICommManager commsMgr;
 
 	// data structures
 	ArrayList<CtxAttributeIdentifier> dianneList;
@@ -106,14 +108,15 @@ public class PersonalisationManager implements IPersonalisationManager,
 		this.cristList = new ArrayList<CtxAttributeIdentifier>();
 	}
 
-	public void initialisePersonalisationManager(ICtxBroker broker, IUserPreferenceConditionMonitor pcm, IDIANNE dianne, ICAUIPrediction cauiPrediction, ICRISTUserIntentPrediction cristPrediction, IIdentityManager idm, IDecisionMaker decisionMaker){
+	public void initialisePersonalisationManager(ICtxBroker broker, IUserPreferenceConditionMonitor pcm, IDIANNE dianne, ICAUIPrediction cauiPrediction, ICRISTUserIntentPrediction cristPrediction, ICommManager commsMgr, IDecisionMaker decisionMaker){
 		this.ctxBroker = broker;
 		this.pcm = pcm;
 		this.dianne = dianne;
 		this.cauiPrediction = cauiPrediction;
 		this.cristPrediction = cristPrediction;
+		this.commsMgr = commsMgr;
 		this.decisionMaker = decisionMaker;
-		this.idm = idm;
+		this.idm = this.commsMgr.getIdManager();
 		retrieveConfidenceLevels();
 		
 	}
@@ -330,11 +333,11 @@ public class PersonalisationManager implements IPersonalisationManager,
 			ServiceResourceIdentifier serviceID, String preferenceName,
 			IPersonalisationCallback callback) {
 		Future<List<IDIANNEOutcome>> futureDianneOuts = this.dianne.getOutcome(ownerID, serviceID, preferenceName);
-		Future<IPreferenceOutcome> futurePrefOuts = this.pcm.getOutcome(ownerID, serviceID, preferenceName);
+		Future<IOutcome> futurePrefOuts = this.pcm.getOutcome(ownerID, serviceID, preferenceName);
 		IAction action;
 		try {
 			IDIANNEOutcome dianneOut = futureDianneOuts.get().get(0);
-			IPreferenceOutcome prefOut = futurePrefOuts.get();
+			IPreferenceOutcome prefOut = (IPreferenceOutcome) futurePrefOuts.get();
 			
 			if (dianneOut.getvalue().equalsIgnoreCase(prefOut.getvalue())){
 				action = new Action(serviceID, serviceType, preferenceName, prefOut.getvalue());
@@ -560,7 +563,7 @@ public class PersonalisationManager implements IPersonalisationManager,
 					dianneOutcomes = futureDianneOutcomes.get();
 					
 					for (IDIANNEOutcome dOut : dianneOutcomes) {
-						IPreferenceOutcome pOut = this.pcm.getOutcome(userId, dOut.getServiceID(), dOut.getparameterName()).get();
+						IPreferenceOutcome pOut = (IPreferenceOutcome) this.pcm.getOutcome(userId, dOut.getServiceID(), dOut.getparameterName()).get();
 						if (pOut.getvalue().equalsIgnoreCase(dOut.getvalue())) {
 							results.add(dOut);
 						} else {
@@ -714,9 +717,10 @@ public class PersonalisationManager implements IPersonalisationManager,
 	}
 
 	@Override
-	public void onApplicationEvent(InternalEvent event) {
-		if (event.getEventNode().equals("UIM_EVENT")){
-			UIMEvent uimEvent = (UIMEvent) event.getEventInfo();
+	public void handleInternalEvent(InternalEvent event) {
+		
+		if (event.geteventType().equals("UIM_EVENT")){
+			UIMEvent uimEvent = (UIMEvent) event.geteventInfo();
 			Future<List<IUserIntentAction>> futureCauiActions = this.cauiPrediction.getPrediction(uimEvent.getUserId(), uimEvent.getAction());
 			
 			Future<List<CRISTUserAction>> futureCristActions = this.cristPrediction.getCRISTPrediction(uimEvent.getUserId(), uimEvent.getAction());
@@ -800,6 +804,12 @@ public class PersonalisationManager implements IPersonalisationManager,
 		}
 		
 		return false;
+	}
+
+	@Override
+	public void handleExternalEvent(CSSEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
