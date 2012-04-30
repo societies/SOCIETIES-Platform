@@ -146,7 +146,7 @@ public class ServiceControlController {
 
 		String node = scForm.getNode();
 		String method = scForm.getMethod();
-		String url = scForm.getUrl();
+		String url = "file:" + scForm.getUrl();
 		//Service service = scForm.getService();
 		String serviceUri = scForm.getService();
 		String endpoint = scForm.getEndpoint();

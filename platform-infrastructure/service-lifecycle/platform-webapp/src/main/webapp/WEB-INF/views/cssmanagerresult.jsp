@@ -162,13 +162,21 @@ div.TabView div.Pages div.Page div.Pad {
 								<td><form:input path="sex"
 										value="${cmLoginForm.sex}" size="50" />
 								</td>
-				
-		
 							</tr>
-
-
-							
 						</table>
+						<br/>
+						
+						<b>My CSS Nodes</b>
+						<table>
+						<tr><td><b>ID</b></td><td><b>Type</b></td></tr>
+						<xc:forEach var="aNode" items="${allNodes}">
+					        <tr>
+					        	<td>${aNode.getJid()}</td>
+					         	<td>${aNode.getType()}</td>
+					        </tr>
+					    </xc:forEach>
+						</table>
+						
 						<br/>
 						<b>CSS Advertisement Details</b>
 				
