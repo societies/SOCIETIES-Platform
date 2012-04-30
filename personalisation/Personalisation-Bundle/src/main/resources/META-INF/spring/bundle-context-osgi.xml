@@ -135,9 +135,6 @@
 <!-- importing external services -->
 	
 		<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker">
-		</osgi:reference>        
-
-		<osgi:reference id="idm" interface="org.societies.api.identity.IIdentityManager">
 		</osgi:reference>
 		
 		<osgi:reference id="decisionMaker" interface="org.societies.api.internal.useragent.decisionmaking.IDecisionMaker">
