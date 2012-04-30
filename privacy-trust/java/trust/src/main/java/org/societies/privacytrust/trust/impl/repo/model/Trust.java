@@ -162,4 +162,23 @@ public abstract class Trust implements ITrust {
 		
 		return true;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		
+		final StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		sb.append("value=" + this.value);
+		sb.append(",");
+		sb.append("lastModified=" + this.lastModified);
+		sb.append(",");
+		sb.append("lastUpdated=" + this.lastUpdated);
+		sb.append("]");
+		
+		return sb.toString();
+	}
 }
