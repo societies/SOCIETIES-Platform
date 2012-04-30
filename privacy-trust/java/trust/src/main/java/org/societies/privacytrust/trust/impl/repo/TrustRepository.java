@@ -44,6 +44,7 @@ import org.societies.privacytrust.trust.impl.repo.model.TrustedCss;
 import org.societies.privacytrust.trust.impl.repo.model.TrustedEntity;
 import org.societies.privacytrust.trust.impl.repo.model.TrustedService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -53,6 +54,7 @@ import org.springframework.stereotype.Repository;
  * @since 0.0.5
  */
 @Repository
+@Lazy(value = false)
 public class TrustRepository implements ITrustRepository {
 
 	/** The logging facility. */
