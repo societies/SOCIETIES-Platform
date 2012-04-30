@@ -22,28 +22,35 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.event;
+package org.societies.privacytrust.trust.impl.engine;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
+import org.societies.privacytrust.trust.api.repo.ITrustRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
- * The constants of this type specify the topic name of a trust event.
- * The following names have been identified:
- * <ul>
- * <li>{@link #USER_PERCEIVED_TRUST_UPDATED}: User-perceived trust update event</li>
- * </ul>
- *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.7
+ * @since 0.0.8
  */
-public class TrustEventTopic {
+@Service
+public class UserPerceivedTrustEngine {
 
-	private static final String BASE_TOPIC = "org/societies/privacytrust/trust/event/"; 
+	/** The logging facility. */
+	private static final Logger LOG = LoggerFactory.getLogger(UserPerceivedTrustEngine.class);
 	
-	public static final String DIRECT_TRUST_UPDATED = BASE_TOPIC + "DIRECT_TRUST_UPDATED";
+	/** The Trust Event Mgr service reference. */
+	private ITrustEventMgr trustEventMgr;
 	
-	public static final String INDIRECT_TRUST_UPDATED = BASE_TOPIC + "INDIRECT_TRUST_UPDATED";
+	/** The Trust Repository service reference. */
+	@Autowired
+	private ITrustRepository trustRepo;
 	
-	public static final String USER_PERCEIVED_TRUST_UPDATED = BASE_TOPIC + "USER-PERCEIVED_TRUST_UPDATED";
-	
-	/* Prevents instantiation */
-	private TrustEventTopic() {}
+	@Autowired
+	UserPerceivedTrustEngine(ITrustEventMgr trustEventMgr) {
+		
+		LOG.info(this.getClass() + " instantiated");
+	}
 }

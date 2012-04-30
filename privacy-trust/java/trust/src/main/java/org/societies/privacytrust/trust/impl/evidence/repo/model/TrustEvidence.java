@@ -22,28 +22,72 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.event;
+package org.societies.privacytrust.trust.impl.evidence.repo.model;
+
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 
 /**
- * The constants of this type specify the topic name of a trust event.
- * The following names have been identified:
- * <ul>
- * <li>{@link #USER_PERCEIVED_TRUST_UPDATED}: User-perceived trust update event</li>
- * </ul>
+ * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.7
+ * @since 0.0.8
  */
-public class TrustEventTopic {
+public abstract class TrustEvidence implements ITrustEvidence {
 
-	private static final String BASE_TOPIC = "org/societies/privacytrust/trust/event/"; 
+	private static final long serialVersionUID = 5024340898894704006L;
 	
-	public static final String DIRECT_TRUST_UPDATED = BASE_TOPIC + "DIRECT_TRUST_UPDATED";
+	/** The identifier of the trusted entity this evidence refers to. */
+	private final TrustedEntityId teid;
 	
-	public static final String INDIRECT_TRUST_UPDATED = BASE_TOPIC + "INDIRECT_TRUST_UPDATED";
+	TrustEvidence(final TrustedEntityId teid) {
+		
+		this.teid = teid;
+	}
 	
-	public static final String USER_PERCEIVED_TRUST_UPDATED = BASE_TOPIC + "USER-PERCEIVED_TRUST_UPDATED";
+	/*
+	 * @see org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence#getTeid()
+	 */
+	@Override
+	public TrustedEntityId getTeid() {
+		
+		return this.teid;
+	}
 	
-	/* Prevents instantiation */
-	private TrustEventTopic() {}
+	/*
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.teid == null) ? 0 : this.teid.hashCode());
+		
+		return result;
+	}
+
+	/*
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object that) {
+		
+		if (this == that)
+			return true;
+		if (that == null)
+			return false;
+		if (this.getClass() != that.getClass())
+			return false;
+		
+		final TrustEvidence other = (TrustEvidence) that;
+		
+		if (this.teid == null) {
+			if (other.teid != null)
+				return false;
+		} else if (!this.teid.equals(other.teid))
+			return false;
+		
+		return true;
+	}
 }

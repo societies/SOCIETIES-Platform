@@ -22,28 +22,61 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.event;
+package org.societies.privacytrust.trust.impl.evidence.repo;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
+import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
+import org.societies.privacytrust.trust.api.evidence.repo.TrustEvidenceRepositoryException;
+import org.societies.privacytrust.trust.impl.repo.TrustRepository;
+import org.springframework.stereotype.Repository;
 
 /**
- * The constants of this type specify the topic name of a trust event.
- * The following names have been identified:
- * <ul>
- * <li>{@link #USER_PERCEIVED_TRUST_UPDATED}: User-perceived trust update event</li>
- * </ul>
+ * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.7
+ * @since 0.0.8
  */
-public class TrustEventTopic {
+@Repository
+public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 
-	private static final String BASE_TOPIC = "org/societies/privacytrust/trust/event/"; 
+	/** The logging facility. */
+	private static final Logger LOG = LoggerFactory.getLogger(TrustEvidenceRepository.class);
 	
-	public static final String DIRECT_TRUST_UPDATED = BASE_TOPIC + "DIRECT_TRUST_UPDATED";
+	TrustEvidenceRepository() {
+		
+		LOG.info(this.getClass() + " instantiated");
+	}
 	
-	public static final String INDIRECT_TRUST_UPDATED = BASE_TOPIC + "INDIRECT_TRUST_UPDATED";
-	
-	public static final String USER_PERCEIVED_TRUST_UPDATED = BASE_TOPIC + "USER-PERCEIVED_TRUST_UPDATED";
-	
-	/* Prevents instantiation */
-	private TrustEventTopic() {}
+	/*
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#addEvidence(org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence)
+	 */
+	@Override
+	public void addEvidence(ITrustEvidence evidence)
+			throws TrustEvidenceRepositoryException {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
+	 */
+	@Override
+	public ITrustEvidence retrieveEvidence(TrustedEntityId teid)
+			throws TrustEvidenceRepositoryException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#removeEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
+	 */
+	@Override
+	public void removeEvidence(TrustedEntityId teid)
+			throws TrustEvidenceRepositoryException {
+		// TODO Auto-generated method stub
+
+	}
 }

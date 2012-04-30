@@ -22,28 +22,23 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.event;
+package org.societies.privacytrust.trust.api.evidence.model;
+
+import java.io.Serializable;
+
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 
 /**
- * The constants of this type specify the topic name of a trust event.
- * The following names have been identified:
- * <ul>
- * <li>{@link #USER_PERCEIVED_TRUST_UPDATED}: User-perceived trust update event</li>
- * </ul>
+ * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.7
+ * @since 0.0.8
  */
-public class TrustEventTopic {
+public interface ITrustEvidence extends Serializable {
 
-	private static final String BASE_TOPIC = "org/societies/privacytrust/trust/event/"; 
-	
-	public static final String DIRECT_TRUST_UPDATED = BASE_TOPIC + "DIRECT_TRUST_UPDATED";
-	
-	public static final String INDIRECT_TRUST_UPDATED = BASE_TOPIC + "INDIRECT_TRUST_UPDATED";
-	
-	public static final String USER_PERCEIVED_TRUST_UPDATED = BASE_TOPIC + "USER-PERCEIVED_TRUST_UPDATED";
-	
-	/* Prevents instantiation */
-	private TrustEventTopic() {}
+	/**
+	 * 
+	 * @return
+	 */
+	public TrustedEntityId getTeid();
 }

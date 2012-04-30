@@ -174,6 +174,10 @@ public abstract class TrustedEntity implements ITrustedEntity {
 		sb.append("teid=" + this.teid);
 		sb.append(",");
 		sb.append("directTrust=" + this.directTrust);
+		sb.append(",");
+		sb.append("indirectTrust=" + this.indirectTrust);
+		sb.append(",");
+		sb.append("userPerceivedTrust=" + this.userPerceivedTrust);
 		sb.append("}");
 		
 		return sb.toString();

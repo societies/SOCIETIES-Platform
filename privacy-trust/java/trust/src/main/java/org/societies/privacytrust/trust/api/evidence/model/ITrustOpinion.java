@@ -22,40 +22,14 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api;
+package org.societies.privacytrust.trust.api.evidence.model;
 
-import java.util.Date;
+/**
+ * Describe your class here...
+ *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 0.0.8
+ */
+public interface ITrustOpinion extends IIndirectTrustEvidence {
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-
-public interface ITrustEvidenceCollector {
-
-	/**
-	 * 
-	 * @param trustor
-	 * @param provider
-	 * @param serviceId
-	 * @param rating
-	 * @param timestamp
-	 */
-	public void addServiceExperience(IIdentity trustor, IIdentity provider, ServiceResourceIdentifier serviceId, double rating, Date timestamp);
-
-	/**
-	 * 
-	 * @param trustor
-	 * @param trustee
-	 * @param value
-	 */
-	public void addTrustOpinion(IIdentity trustor, IIdentity trustee, double value);
-
-	/**
-	 * 
-	 * @param trustor
-	 * @param trustee
-	 * @param type
-	 * @param rating
-	 * @param timestamp
-	 */
-	public void addUserInteractionExperience(IIdentity trustor, IIdentity trustee, String type, double rating, Date timestamp);
 }

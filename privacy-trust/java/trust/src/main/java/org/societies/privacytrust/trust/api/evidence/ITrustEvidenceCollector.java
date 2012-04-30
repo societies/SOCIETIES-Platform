@@ -22,28 +22,40 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.event;
+package org.societies.privacytrust.trust.api.evidence;
 
-/**
- * The constants of this type specify the topic name of a trust event.
- * The following names have been identified:
- * <ul>
- * <li>{@link #USER_PERCEIVED_TRUST_UPDATED}: User-perceived trust update event</li>
- * </ul>
- *
- * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.7
- */
-public class TrustEventTopic {
+import java.util.Date;
 
-	private static final String BASE_TOPIC = "org/societies/privacytrust/trust/event/"; 
-	
-	public static final String DIRECT_TRUST_UPDATED = BASE_TOPIC + "DIRECT_TRUST_UPDATED";
-	
-	public static final String INDIRECT_TRUST_UPDATED = BASE_TOPIC + "INDIRECT_TRUST_UPDATED";
-	
-	public static final String USER_PERCEIVED_TRUST_UPDATED = BASE_TOPIC + "USER-PERCEIVED_TRUST_UPDATED";
-	
-	/* Prevents instantiation */
-	private TrustEventTopic() {}
+import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
+public interface ITrustEvidenceCollector {
+
+	/**
+	 * 
+	 * @param trustor
+	 * @param provider
+	 * @param serviceId
+	 * @param rating
+	 * @param timestamp
+	 */
+	public void addServiceExperience(IIdentity trustor, IIdentity provider, ServiceResourceIdentifier serviceId, double rating, Date timestamp);
+
+	/**
+	 * 
+	 * @param trustor
+	 * @param trustee
+	 * @param value
+	 */
+	public void addTrustOpinion(IIdentity trustor, IIdentity trustee, double value);
+
+	/**
+	 * 
+	 * @param trustor
+	 * @param trustee
+	 * @param type
+	 * @param rating
+	 * @param timestamp
+	 */
+	public void addUserInteractionExperience(IIdentity trustor, IIdentity trustee, String type, double rating, Date timestamp);
 }
