@@ -102,6 +102,15 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
 			</plugin>
+						 <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/privacynegotiation/**</exclude>                        
+                    </excludes>
+                </configuration>
+             </plugin> 
 		</plugins>
 	</build>
 </project>
