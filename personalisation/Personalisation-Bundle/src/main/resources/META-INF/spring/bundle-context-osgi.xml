@@ -94,7 +94,7 @@
 		</osgi:reference>
 		
 		<osgi:reference id="userPrefLearning" interface="org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Learning" cardinality="1..1">
-			<osgi:listener bind-method="setC45Learning" ref="pcm"></osgi:listener>
+			<osgi:listener bind-method="setUserPrefLearning" ref="pcm"></osgi:listener>
 										
 		</osgi:reference>
 		<!-- dianne is needed by personalisationManager -->
