@@ -40,5 +40,5 @@ public interface ITrustUpdateEventListener extends ITrustEventListener {
 	 *            the <code>TrustUpdateEvent</code> object describing the
 	 *            event source, as well as, the old and new trust value.
 	 */
-	public void trustValueUpdated(TrustUpdateEvent evt);
+	public void onUpdate(TrustUpdateEvent evt);
 }
