@@ -107,6 +107,9 @@
 			<osgi:listener bind-method="setCAUIPrediction" ref="persoMgr"></osgi:listener>
 		</osgi:reference>
 		
+		<osgi:reference id="cauiDiscovery" interface="org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery">
+			<osgi:listener bind-method="setCauiDiscovery" ref="cauiPrediction"></osgi:listener>
+		</osgi:reference>
 		<!-- cauiPrediction and cauiDiscovery depend on the cauiTaskManager  -->
 		<osgi:reference id="cauiTaskManager" interface="org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager" cardinality="0..1">
 			<osgi:listener bind-method="setCauiTaskManager" ref="cauiPrediction"></osgi:listener>
@@ -132,9 +135,6 @@
 <!-- importing external services -->
 	
 		<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker">
-		</osgi:reference>        
-
-		<osgi:reference id="idm" interface="org.societies.api.identity.IIdentityManager">
 		</osgi:reference>
 		
 		<osgi:reference id="decisionMaker" interface="org.societies.api.internal.useragent.decisionmaking.IDecisionMaker">
@@ -142,7 +142,8 @@
         <osgi:reference id="eventMgmtRef" interface="org.societies.api.osgi.event.IEventMgr">
         </osgi:reference>
 		
-		
+		<osgi:reference id="commsMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"> 
+		</osgi:reference>
 		
 		<!--  <osgi:reference id="upcm" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/> -->
 		

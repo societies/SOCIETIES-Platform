@@ -1,6 +1,8 @@
 package org.societies.personalisation.CAUIDiscovery.test;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,14 +34,14 @@ public class CAUIDiscoveryLearningTest {
 		
 		//1. create mock data sets
 		List<MockHistoryData> historySet = createHistorySet();
-		//System.out.println("createHistorySet() size "+historySet.size());
+		System.out.println("createHistorySet() size "+historySet.size());
 
 		//2.create mock data sets based on History Attribute Tuples
 		//List<MockHistoryData> historySet = convertHistoryData(createContextHistoryAttributesSet());
 	
 		
 		System.out.println("generateNewUserModel");
-		discover.generateNewUserModel(historySet);
+		discover.generateTransitionsDictionary(historySet);
 
 		LinkedHashMap<List<String>,ActionDictObject> model = discover.getDictionary();
 
@@ -89,35 +91,30 @@ public class CAUIDiscoveryLearningTest {
 
 	public List<MockHistoryData> createHistorySet(){
 		List<MockHistoryData>  data = new ArrayList<MockHistoryData>();
-
-		data.add(new MockHistoryData("A","C1"));
-		data.add(new MockHistoryData("A","C2"));
-		data.add(new MockHistoryData("A","C3"));
-		data.add(new MockHistoryData("B","Cx"));
-		data.add(new MockHistoryData("A","C1"));
-		data.add(new MockHistoryData("B","C2"));
-		data.add(new MockHistoryData("B","C4"));
-		data.add(new MockHistoryData("B","Cz"));
-		data.add(new MockHistoryData("B","C9"));
-		data.add(new MockHistoryData("B","C9"));
-		data.add(new MockHistoryData("A","C9"));
-		data.add(new MockHistoryData("A","C9"));
-		data.add(new MockHistoryData("B","Cz"));
-		data.add(new MockHistoryData("C","Cz"));
-		data.add(new MockHistoryData("C","C9"));
-		data.add(new MockHistoryData("D","C2"));
-		data.add(new MockHistoryData("D","C3"));
-		data.add(new MockHistoryData("C","Co"));
-		data.add(new MockHistoryData("B","C1"));
-		data.add(new MockHistoryData("A","C2"));
-		data.add(new MockHistoryData("A","C5"));
-		data.add(new MockHistoryData("A","Ch"));
-		data.add(new MockHistoryData("A","Ch"));
-		//data.add(new MockHistoryData("E","C9"));
-		//data.add(new MockHistoryData("F","C9"));
-		//data.add(new MockHistoryData("G","C9"));
-		//AAABABBBBAABCCDDCBAAA
-
+		//MockHistoryData(String action, String parameterName, Map<String,String> context){
+		Map<String,Serializable> context = new HashMap<String,Serializable>();
+		context.put("temperature","hot");
+		context.put("SymLoc","free");
+		//Map<String,Serializable> context
+		data.add(new MockHistoryData("volume","mute",context));
+		data.add(new MockHistoryData("paramA","valueA",context));
+		data.add(new MockHistoryData("paramB","valueB",context));
+		data.add(new MockHistoryData("paramC","valueC",context));
+		data.add(new MockHistoryData("paramX","valueX",context));
+		data.add(new MockHistoryData("paramY","valueY",context));
+		data.add(new MockHistoryData("paramA","valueA",context));
+		data.add(new MockHistoryData("paramB","valueB",context));
+		data.add(new MockHistoryData("paramC","valueC",context));
+		data.add(new MockHistoryData("paramO","valueO",context));
+		data.add(new MockHistoryData("paramP","valueP",context));
+		data.add(new MockHistoryData("paramA","valueA",context));
+		data.add(new MockHistoryData("paramB","valueB",context));
+		data.add(new MockHistoryData("paramC","valueC",context));
+		data.add(new MockHistoryData("paramL","valueL",context));
+		data.add(new MockHistoryData("paramA","valueA",context));
+		data.add(new MockHistoryData("paramB","valueB",context));
+		data.add(new MockHistoryData("paramC","valueC",context));
+		
 		List<MockHistoryData> newSet = new ArrayList<MockHistoryData>();
 
 		for(int i=0; i<1; i++){
@@ -143,7 +140,7 @@ public class CAUIDiscoveryLearningTest {
 	}
 	 */
 
-
+/*
 	protected List<MockHistoryData> convertHistoryData (Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData){
 
 		List<MockHistoryData> result = new ArrayList<MockHistoryData>();
@@ -162,7 +159,7 @@ public class CAUIDiscoveryLearningTest {
 			
 		return result;
 	}
-
+*/
 
 	private CtxHistoryAttribute createMockHocAttr(String ctxAttrType, String ctxAttrValue){
 

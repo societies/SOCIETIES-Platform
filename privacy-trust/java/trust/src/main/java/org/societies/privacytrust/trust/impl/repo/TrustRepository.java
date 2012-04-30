@@ -31,6 +31,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
@@ -43,6 +44,7 @@ import org.societies.privacytrust.trust.impl.repo.model.TrustedCss;
 import org.societies.privacytrust.trust.impl.repo.model.TrustedEntity;
 import org.societies.privacytrust.trust.impl.repo.model.TrustedService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -52,6 +54,7 @@ import org.springframework.stereotype.Repository;
  * @since 0.0.5
  */
 @Repository
+@Lazy(value = false)
 public class TrustRepository implements ITrustRepository {
 
 	/** The logging facility. */
@@ -72,14 +75,21 @@ public class TrustRepository implements ITrustRepository {
 	public boolean addEntity(ITrustedEntity entity)
 			throws TrustRepositoryException {
 		
+		if (entity == null)
+			throw new NullPointerException("entity can't be null");
+		
 		boolean result = false;
 
 		final Session session = sessionFactory.openSession();
 		final Transaction transaction = session.beginTransaction();
 		try {
+			if (LOG.isDebugEnabled())
+				LOG.debug("Adding trusted entity " + entity + " to the Trust Repository...");
 			session.save(entity);
 			transaction.commit();
 			result = true;
+		} catch (ConstraintViolationException cve) {
+			result = false;
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for entity " + entity);
 			transaction.rollback();
@@ -112,7 +122,11 @@ public class TrustRepository implements ITrustRepository {
 		List<ITrustedEntity> results = session.createCriteria(entityClass)
 			.add(Restrictions.eq("teid", teid))
 			.setFetchMode("directTrust", FetchMode.JOIN)
+			.setFetchMode("indirectTrust", FetchMode.JOIN)
+			.setFetchMode("userPerceivedTrust", FetchMode.JOIN)
 			.list();
+		if (session != null)
+			session.close();
 			
 		return (results.isEmpty()) ? null : results.get(0);
 	}
@@ -123,17 +137,52 @@ public class TrustRepository implements ITrustRepository {
 	@Override
 	public ITrustedEntity updateEntity(ITrustedEntity entity)
 			throws TrustRepositoryException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		ITrustedEntity result = null;
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
+		try {
+			result = (ITrustedEntity) session.merge(entity);
+			transaction.commit();
+		} catch (Exception e) {
+			LOG.warn("Rolling back transaction for entity " + entity);
+			transaction.rollback();
+			throw new TrustRepositoryException("Could not add entity " + entity, e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+		
+		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#removeEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#removeEntity(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public boolean removeEntity(ITrustedEntity entity)
+	public void removeEntity(final TrustedEntityId teid)
 			throws TrustRepositoryException {
-		// TODO Auto-generated method stub
-		return false;
+
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
+		
+		final ITrustedEntity entity = this.retrieveEntity(teid);
+		if (entity == null)
+			return;
+		
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
+		try {
+			session.delete(entity);
+			transaction.commit();
+		} catch (Exception e) {
+			LOG.warn("Rolling back transaction for entity " + entity);
+			transaction.rollback();
+			throw new TrustRepositoryException("Could not remove entity " + entity, e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
 	}
 }

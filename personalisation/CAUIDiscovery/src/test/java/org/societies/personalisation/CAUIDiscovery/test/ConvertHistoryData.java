@@ -16,7 +16,7 @@ public class ConvertHistoryData {
 	}
 
 
-	
+	/*
 	protected List<MockHistoryData> convertHistoryData (Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData){
 
 		List<MockHistoryData> result = new ArrayList<MockHistoryData>();
@@ -36,4 +36,5 @@ public class ConvertHistoryData {
 		
 		return result;
 	}
+*/
 }

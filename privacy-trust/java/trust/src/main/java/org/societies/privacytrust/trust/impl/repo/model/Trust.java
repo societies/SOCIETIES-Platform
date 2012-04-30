@@ -51,7 +51,7 @@ public abstract class Trust implements ITrust {
 	@SuppressWarnings("unused")
 	private long id;
 	
-	private double value;
+	private Double value;
 	
 	private Date lastModified;
 	
@@ -61,18 +61,22 @@ public abstract class Trust implements ITrust {
 	 * @see org.societies.privacytrust.trust.api.model.ITrust#getValue()
 	 */
 	@Override
-	public double getValue() {
+	public Double getValue() {
 		
 		return this.value;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.trust.api.model.ITrust#setValue(double)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.model.ITrust#setValue(java.lang.Double)
 	 */
 	@Override
-	public void setValue(double value) {
+	public void setValue(Double newValue) {
 		
-		this.value = value;
+		this.lastUpdated = new Date();
+		if ((this.value == null && newValue != null) ||	(!this.value.equals(newValue)))
+			this.lastModified = this.lastUpdated;
+		this.value = newValue;
 	}
 
 	/* (non-Javadoc)
@@ -121,9 +125,7 @@ public abstract class Trust implements ITrust {
 				+ ((this.lastModified == null) ? 0 : this.lastModified.hashCode());
 		result = prime * result
 				+ ((this.lastUpdated == null) ? 0 : this.lastUpdated.hashCode());
-		long temp;
-		temp = Double.doubleToLongBits(this.value);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((this.value == null) ? 0 : this.value.hashCode());
 		
 		return result;
 	}
@@ -152,8 +154,10 @@ public abstract class Trust implements ITrust {
 				return false;
 		} else if (!this.lastUpdated.equals(other.lastUpdated))
 			return false;
-		if (Double.doubleToLongBits(this.value) != 
-				Double.doubleToLongBits(other.value))
+		if (this.value == null) {
+			if (other.value != null)
+				return false;
+		} else if (!this.value.equals(other.value))
 			return false;
 		
 		return true;

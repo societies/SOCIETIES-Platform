@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
@@ -44,100 +45,75 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  */
 public class NegotiationAgreement implements IAgreement, Serializable {
 
-	private List<RequestItem> items;
-	private ServiceResourceIdentifier serviceID;
-	private IIdentity serviceDPI;
-	private IIdentity userDPI;
-	private IIdentity userPublicDPI;
+	private List<ResponseItem> items;
+	private Requestor requestor;
+	private IIdentity userId;
+	private IIdentity userPublicId;
 
 	private NegotiationAgreement(){
-		this.items = new ArrayList<RequestItem>();
+		this.items = new ArrayList<ResponseItem>();
 	}
 
 	public NegotiationAgreement(ResponsePolicy policy){
-		this.serviceID = policy.getSubject().getServiceID();
-		this.serviceDPI = policy.getSubject().getDPI();
-		List<RequestItem> l = new ArrayList<RequestItem>();
-		for (ResponseItem r : policy.getResponseItems()){
-			l.add(r.getRequestItem());
-		}
-		this.items = java.util.Collections.unmodifiableList(l);
+		this.requestor = policy.getRequestor();
+		this.items = java.util.Collections.unmodifiableList(policy.getResponseItems());
 	}
-	public NegotiationAgreement(List<RequestItem> items){
+	public NegotiationAgreement(List<ResponseItem> items){
 		this.items = java.util.Collections.unmodifiableList(items);
-	}
-	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#getServiceIdentifier()
-	 */
-	@Override
-	public ServiceResourceIdentifier getServiceIdentifier() {
-		
-		return this.serviceID;
 	}
 	
-	public void setRequestItems(List<RequestItem> items){
+	
+	public void setResponseItems(List<ResponseItem> items){
 		this.items = java.util.Collections.unmodifiableList(items);
 	}
 
 
-	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#getServiceDPI()
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement#getUserIdentity()
 	 */
 	@Override
-	public IIdentity getServiceDPI() {
-		return this.serviceDPI;
+	public IIdentity getUserIdentity() {
+		return this.userId;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#getUserDPI()
+	@Override
+	public IIdentity getUserPublicIdentity(){
+		return this.userPublicId;
+	}
+
+	@Override
+	public void setUserPublicIdentity(IIdentity userPublicId){
+		this.userPublicId = userPublicId;
+	}
+
+
+	public void setRequestor(Requestor requestor){
+		this.requestor = requestor;
+	}
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement#setUserDPI(org.societies.api.identity.IIdentity)
 	 */
 	@Override
-	public IIdentity getUserDPI() {
-		return this.userDPI;
-	}
-
-	public IIdentity getUserPublicDPI(){
-		return this.userPublicDPI;
-	}
-
-	public void setUserPublicDPI(IIdentity userPublicDPI){
-		this.userPublicDPI = userPublicDPI;
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#setServiceDPI(org.personalsmartspace.sre.api.pss3p.Identity)
-	 */
-	@Override
-	public void setServiceDPI(IIdentity serviceDPI) {
-		this.serviceDPI = serviceDPI;
+	public void setUserIdentity(IIdentity userDPI) {
+		this.userId = userDPI;
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#setServiceIdentifier(org.personalsmartspace.sre.api.pss3p.ServiceResourceIdentifier)
+	/* 
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement#getRequestedItems()
 	 */
 	@Override
-	public void setServiceIdentifier(ServiceResourceIdentifier serviceId) {
-		this.serviceID = serviceId;
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#setUserDPI(org.personalsmartspace.sre.api.pss3p.Identity)
-	 */
-	@Override
-	public void setUserDPI(IIdentity userDPI) {
-		this.userDPI = userDPI;
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see org.personalsmartspace.spm.policy.api.platform.IAgreement#getRequestedItems()
-	 */
-	@Override
-	public List<RequestItem> getRequestedItems() {
+	public List<ResponseItem> getRequestedItems() {
 		return this.items;
+	}
+
+	@Override
+	public Requestor getRequestor() {
+		// TODO Auto-generated method stub
+		return this.requestor;
 	}
 
 }

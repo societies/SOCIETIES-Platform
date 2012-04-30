@@ -24,6 +24,9 @@
  */
 package org.societies.privacytrust.trust.impl.repo.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 import org.societies.privacytrust.trust.api.model.IUserPerceivedTrust;
 
 /**
@@ -32,6 +35,8 @@ import org.societies.privacytrust.trust.api.model.IUserPerceivedTrust;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
  */
+@Entity
+@Table(name = TableName.USER_PERCEIVED_TRUST)
 public class UserPerceivedTrust extends Trust implements IUserPerceivedTrust {
 
 	private static final long serialVersionUID = -3856234754824690743L;

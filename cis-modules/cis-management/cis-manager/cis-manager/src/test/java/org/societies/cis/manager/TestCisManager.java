@@ -179,15 +179,20 @@ public class TestCisManager {
 
 	
 	@Test
-	public void testListCIS() {
+	public void testListCIS() throws InterruptedException, ExecutionException {
 
 		cisManagerUnderTest = new CisManager(mockCcmFactory,mockCSSendpoint);
-		cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
-				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE);
-		cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
-				TEST_CIS_NAME_2, TEST_CIS_TYPW , TEST_CIS_MODE);
-		cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
-				TEST_CIS_NAME_3, TEST_CIS_TYPW , TEST_CIS_MODE);
+		
+		
+		ICisOwned[] ciss = new ICisOwned [3]; 
+		int[] cissCheck = {0,0,0};
+		
+		ciss[0] =  (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
+				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+		ciss[1] = (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
+				TEST_CIS_NAME_2, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+		ciss[2] = (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
+				TEST_CIS_NAME_3, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
 
 		List<ICisRecord> l = cisManagerUnderTest.getCisList();
 		Iterator<ICisRecord> it = l.iterator();
@@ -195,12 +200,62 @@ public class TestCisManager {
 		while(it.hasNext()){
 			 ICisRecord element = it.next();
 			 assertEquals(element.getOwnerId(),TEST_CSSID);
+			 for(int i=0;i<ciss.length;i++){
+				 if(element.getName().equals(ciss[i].getName()) 
+				&& 	element.getCisId().equals(ciss[i].getCisId())
+				&& 	element.getCisType().equals(ciss[i].getCisType())
+				&& 	(element.getMembershipCriteria() == ciss[i].getMembershipCriteria())		 
+						 )
+					 cissCheck[i] = 1; // found a matching CIS
+					 
+			 }
+			 
 			 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 	     }
 		
-		
+		// check if it found all matching CISs
+		 for(int i=0;i<ciss.length;i++){
+			 assertEquals(cissCheck[i], 1);
+		 }
 	
 	}
 
+	@Test
+	public void testdeleteCIS() throws InterruptedException, ExecutionException {
 
+		cisManagerUnderTest = new CisManager(mockCcmFactory,mockCSSendpoint);
+
+		ICisOwned[] ciss = new ICisOwned [2]; 
+		String jidTobeDeleted = "";
+		
+		ciss[0] =  (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
+				TEST_CIS_NAME_1, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+		ciss[1] = (cisManagerUnderTest.createCis(TEST_CSSID, TEST_CSS_PWD,
+				TEST_CIS_NAME_2, TEST_CIS_TYPW , TEST_CIS_MODE)).get();
+		
+		List<ICisRecord> l = cisManagerUnderTest.getCisList();
+		Iterator<ICisRecord> it = l.iterator();
+		ICisRecord element = it.next(); 
+		jidTobeDeleted = element.getCisId();
+		
+		cisManagerUnderTest.deleteCis(jidTobeDeleted, "", "");
+		
+		// get a new iterator
+		it = l.iterator();
+		boolean presence = false;
+		int interactions = 0;
+		while(it.hasNext()){
+			 element = it.next();
+			 interactions++;
+			 if(element.getCisId().equals(jidTobeDeleted))		 
+						presence = true; // found a matching CIS
+	     }
+		
+		//assertEquals(false,presence);
+		//assertEquals(1,interactions);
+		
+	
+	}
+	
+	
 }

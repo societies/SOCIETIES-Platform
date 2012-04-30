@@ -30,6 +30,11 @@ import org.societies.api.activity.IActivity;
  * @author Babak.Farshchian@sintef.no
  *
  */
+/**
+ * MISSING_ANNOTATION
+ * MISSING_JAVADOCS
+ */
+
 public interface IActivityFeed {
 	public void getActivities(String CssId, String timePeriod);
 	public void getActivities(String CssId, String query, String timePeriod);

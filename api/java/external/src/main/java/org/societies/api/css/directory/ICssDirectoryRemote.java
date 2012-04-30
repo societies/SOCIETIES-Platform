@@ -36,6 +36,10 @@ import org.societies.api.schema.css.directory.CssAdvertisementRecord;
  * @author mmannion
  *
  */
+/**
+ * MISSING_ANNOTATION
+ * MISSING_JAVADOCS
+ */
 public interface ICssDirectoryRemote {
     
     public void addCssAdvertisementRecord(CssAdvertisementRecord cssAdvert);

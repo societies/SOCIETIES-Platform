@@ -42,13 +42,13 @@ public interface ITrust extends Serializable {
 	 * 
 	 * @return
 	 */
-	public double getValue();
+	public Double getValue();
 
 	/**
 	 * 
 	 * @param value
 	 */
-	public void setValue(double value);
+	public void setValue(Double value);
 
 	/**
 	 * @return the lastModified

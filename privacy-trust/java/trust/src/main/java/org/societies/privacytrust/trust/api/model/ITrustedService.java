@@ -49,19 +49,26 @@ public interface ITrustedService extends ITrustedEntity {
 	 * @return the CSS providing this service.
 	 */
 	public ITrustedCss getProvider();
-
+	
+	/**
+	 * Sets the CSS providing this service.
+	 * 
+	 * @since 0.0.7
+	 */
+	public void setProvider(ITrustedCss provider);
+    
 	/** 
 	 * Returns the developer of this service.
 	 * 
 	 * @return the developer of this service.
-	 */
+	 *
 	public ITrustedDeveloper getDeveloper();
 
 	/**
 	 * Sets the developer of this service.
 	 * 
 	 * @param developer the service developer to set. 
-	 */
+	 *
 	public void setDeveloper(ITrustedDeveloper developer);
-
+	 */
 }
