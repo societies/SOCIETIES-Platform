@@ -1,12 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plan name="org.societies.bit.743.plan" version="3.0.0" scoped="false" atomic="true" 
-        xmlns="http://www.eclipse.org/virgo/schema/plan" 
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-        xsi:schemaLocation=" 
-                http://www.eclipse.org/virgo/schema/plan 
-                http://www.eclipse.org/virgo/schema/plan/eclipse-virgo-plan.xsd">
-
-  <?xml version="1.0" encoding="UTF-8"?>
 <plan name="org.societies.plan" version="3.0.0" scoped="false" atomic="true" 
         xmlns="http://www.eclipse.org/virgo/schema/plan" 
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -51,15 +43,16 @@
         <artifact type="bundle" name="org.societies.context-management.user-context-history-mgmt"/> 
         <artifact type="bundle" name="org.societies.context-management.context-broker"/>
 
+	<!--artifact type="bundle" name="org.societies.context-management.context-broker-example"/-->
+
+	<!-- User Agent -->	
+        <artifact type="bundle" name="org.societies.useragent.userAgentBundle"/>
+
 	<!-- Personalisation Management -->		
 	<artifact type="bundle" name="org.societies.personalisation.personalisationBundle"/>
 	
-	<!-- User Agent Monitorin -->		
-	<artifact type="bundle" name="org.societies.useragent.monitoring"/>
+	<!--artifact type="jar" name="org.societies.integration.test.util.integrationtestutil"/-->
+	<artifact type="bundle" name="org.societies.integration.test.bit.user_intent_learning_749"/>
 
-	
-</plan>
-
-	
 	
 </plan>

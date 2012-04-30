@@ -16,9 +16,9 @@ import org.junit.runner.notification.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.personalisation.IPersonalisationManager;
+//import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,22 +29,47 @@ public class TestCase749 extends IntegrationTestCase{
 
 
 	private JUnitCore jUnitCore;
-	
-	@Autowired(required=true)
-	public ICtxBroker internalCtxBroker;
 
-	@Autowired(required=true)
-	public IPersonalisationManager persManager;
-	
-	@Autowired(required=true)
-	public IUserActionMonitor uamMonitor;
-	
+	public static ICtxBroker ctxBroker;
+	public static IUserActionMonitor uam;
+	//public static IEventMgr eventMgr;
+
 	public TestCase749() {
-		super(749, new Class[]{NominalTestCase.class, SpecificTestCase.class});
-		
-		UserIntentLearningTest uiTest = new UserIntentLearningTest(internalCtxBroker,persManager,uamMonitor);
+
+		super(749, new Class[]{ContextStorageTest.class, RetrieveLearnedModelTest.class});
+
+		//UserIntentLearningTest uiTest = new UserIntentLearningTest(internalCtxBroker,persManager,uamMonitor);
 	}
-	
+
+
+	public void setCtxBroker(ICtxBroker ctxBroker){
+		TestCase749.ctxBroker = ctxBroker;
+	}
+
+	public void setUam(IUserActionMonitor uam){
+		TestCase749.uam = uam;
+	}
+
+	/*
+	public void setEventMgr(IEventMgr eventMgr){
+		TestCase749.eventMgr = eventMgr;
+	}
+
+		protected static IEventMgr getEventMgr(){
+		return TestCase749.eventMgr;
+	}
+
+	 */
+	protected static ICtxBroker getCtxBroker(){
+		return TestCase749.ctxBroker;
+	}
+
+	protected static IUserActionMonitor getUam(){
+		return TestCase749.uam;
+	}
+
+
+	/*
 	private void startTest() {
 		LOG.info("###749... startTest");
 		jUnitCore = new JUnitCore();
@@ -74,4 +99,5 @@ public class TestCase749 extends IntegrationTestCase{
 
 		LOG.info("###749 " + results);
 	}
+	 */
 }
