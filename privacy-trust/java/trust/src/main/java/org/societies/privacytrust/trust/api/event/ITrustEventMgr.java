@@ -24,13 +24,60 @@
  */
 package org.societies.privacytrust.trust.api.event;
 
+import org.societies.api.internal.privacytrust.trust.event.ITrustEventListener;
+import org.societies.api.internal.privacytrust.trust.event.TrustEvent;
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+
 /**
- * Describe your class here...
+ * The Trust Event Manager is responsible for the subscription and publishing
+ * of trust-related events.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.5
  */
 public interface ITrustEventMgr {
 
-	
+	/**
+     * Publishes the specified {@link TrustEvent}.
+     * 
+     * @param event
+     *            the event to be published.
+     * @param topics
+     *            the topics to which the event will be published.
+     * @param source
+     *            the publisher of the event.
+     * @throws TrustEventMgrExceptionException 
+     *             if publishing of the specified event fails.
+     * @throws NullPointerException
+     *             if any of the specified parameters is <code>null</code>.
+     * @since 0.0.7
+     */
+    public void postEvent(final TrustEvent event, final String[] topics, 
+    		final String source) throws TrustEventMgrException;
+    
+    /**
+     * Registers the specified {@link ITrustEventListener} for events of the
+     * supplied topics. Once registered, the <code>ITrustEventListener</code>
+     * will handle {@link TrustEvent TrustEvents} associated with the
+     * identified trusted entity.
+     * <p>
+     * To unregister the specified <code>ITrustEventListener</code>, use the
+     * {@link #unregisterListener(TODO)}
+     * method.
+     * 
+     * @param listener
+     *            the <code>ITrustEventListener</code> to register.
+     * @param topics
+     *            the event topics to register for.
+     * @param teid
+     *            the identifier of the trusted entity whose events to
+     *            register for.
+     * @throws TrustEventMgrException
+     *             if the registration process of the specified
+     *             <code>ITrustEventListener</code> fails.
+     * @throws NullPointerException
+     *             if any of the specified parameters is <code>null</code>.
+     */
+    public void registerListener(final ITrustEventListener listener, 
+			final String[] topics, final TrustedEntityId teid) throws TrustEventMgrException;
 }

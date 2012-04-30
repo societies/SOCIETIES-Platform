@@ -643,7 +643,7 @@ div.TabView div.Pages div.Page div.Pad {
 			
 										<td>
 										<form:radiobutton 
-											path="cssFriendService11.value"
+											path="cssFriendService13.value"
 											value="1"  /> Stop<br />
 										</td>
 										<td><form:errors path="${cmLoginForm.cssFriendService13.value}" cssClass="error" /></td>

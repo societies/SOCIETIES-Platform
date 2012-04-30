@@ -258,7 +258,7 @@ public class CssManagerController {
 						 CssAdvertisementRecord cssAdNew = new CssAdvertisementRecord();
 						 cssAdOld.setId(cmControllerLoginForm.getCssAdId());
 						 cssAdOld.setName(cmControllerLoginForm.getCssAdName());
-						 cssAdNew.setUri(cmControllerLoginForm.getCssAdUri());
+						 cssAdOld.setUri(cmControllerLoginForm.getCssAdUri());
 						 cssAdNew.setId(cmLoginForm.getCssAdId());
 						 cssAdNew.setName(cmLoginForm.getCssAdName());
 						 cssAdNew.setUri(cmLoginForm.getCssAdUri());
@@ -326,6 +326,13 @@ public class CssManagerController {
 									.setActive(true);
 							requestActiveCount++;
 							
+							cmControllerLoginForm.getCssFriendService11().setActive(false);
+							cmControllerLoginForm.getCssFriendService12().setActive(false);
+							cmControllerLoginForm.getCssFriendService13().setActive(false);
+							cmControllerLoginForm.getCssFriendService14().setActive(false);
+							cmControllerLoginForm.getCssFriendService15().setActive(false);
+							
+							
 							// if friends, then get services
 							if (cssAdDetails.getStatus() == CssRequestStatusType.ACCEPTED)
 							{
@@ -373,6 +380,12 @@ public class CssManagerController {
 							cmControllerLoginForm.getCssAdRequests2()
 									.setActive(true);
 							requestActiveCount++;
+							
+							cmControllerLoginForm.getCssFriendService21().setActive(false);
+							cmControllerLoginForm.getCssFriendService22().setActive(false);
+							cmControllerLoginForm.getCssFriendService23().setActive(false);
+							cmControllerLoginForm.getCssFriendService24().setActive(false);
+							cmControllerLoginForm.getCssFriendService25().setActive(false);
 							
 							// if friends, then get services
 							if (cssAdDetails.getStatus() == CssRequestStatusType.ACCEPTED)
@@ -422,6 +435,12 @@ public class CssManagerController {
 							cmControllerLoginForm.getCssAdRequests3()
 									.setActive(true);
 							requestActiveCount++;
+							
+							cmControllerLoginForm.getCssFriendService31().setActive(false);
+							cmControllerLoginForm.getCssFriendService32().setActive(false);
+							cmControllerLoginForm.getCssFriendService33().setActive(false);
+							cmControllerLoginForm.getCssFriendService34().setActive(false);
+							cmControllerLoginForm.getCssFriendService35().setActive(false);
 							
 							// if friends, then get services
 							if (cssAdDetails.getStatus() == CssRequestStatusType.ACCEPTED)
@@ -756,16 +775,6 @@ public class CssManagerController {
 	void doUpdatesMessaging(CssManagerLoginForm cmLoginForm)
 	{
 
-		// Update ad record
-		
-		CssAdvertisementRecord newCssAd = new CssAdvertisementRecord();
-
-		newCssAd.setName(cmLoginForm.getCssAdName());
-		newCssAd.setId(cmLoginForm.getCssAdId());
-		newCssAd.setUri(cmLoginForm.getCssAdUri());
-
-		this.getCssLocalManager().addAdvertisementRecord(newCssAd);
-		
 		
 		// Check Services first
 		

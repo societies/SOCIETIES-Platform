@@ -170,7 +170,14 @@ public class PluginCSSManager extends Plugin {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			} 
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 5))) {
+				try {
+					this.localCSSManager.logoutCSS(data.getString(0), createCSSRecord(data.getJSONObject(1)));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 			
 			// Don't return any result now, since status results will be sent when events come in from broadcast receiver 
             result = new PluginResult(PluginResult.Status.NO_RESULT);
@@ -206,6 +213,8 @@ public class PluginCSSManager extends Plugin {
 		AndroidCSSRecord cssRecord = (AndroidCSSRecord) intent.getParcelableExtra(LocalCSSManagerService.INTENT_RETURN_VALUE_KEY);
 		boolean resultStatus = intent.getBooleanExtra(LocalCSSManagerService.INTENT_RETURN_STATUS_KEY, false);
 		
+		Log.d(LOG_TAG, "Result status of remote call: " + resultStatus);
+		
 		if (resultStatus) {
 			PluginResult result = new PluginResult(PluginResult.Status.OK, convertCSSRecord(cssRecord));
 			result.setKeepCallback(false);
@@ -213,7 +222,7 @@ public class PluginCSSManager extends Plugin {
 		} else {
 			PluginResult result = new PluginResult(PluginResult.Status.ERROR);
 			result.setKeepCallback(false);
-			this.success(result, methodCallbackId);
+			this.error(result, methodCallbackId);
 		}
 			
 		
@@ -345,7 +354,7 @@ public class PluginCSSManager extends Plugin {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
 			} else if (intent.getAction().equals(LocalCSSManagerService.LOGOUT_CSS)) {
-				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 3);
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 5);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {

@@ -34,7 +34,7 @@ import java.util.Map;
  * @author <a href="mailto:nikoskal@cn.ntua.gr">Nikos Kalatzis</a> (ICCS)
  * @version 0.0.1
  */
-public interface IUserIntentTask {
+public interface IUserIntentTask extends Serializable{
 	
 	/**
      * Returns a string with the UserTask ID. The task ID should be set upon creation of task.

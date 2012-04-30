@@ -23,7 +23,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 import org.societies.api.cis.management.ICisRecord;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType;
 
-import org.societies.api.cis.management.ICisActivity;
+import org.societies.api.activity.IActivity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.css.management.ICssActivity;
@@ -44,7 +44,7 @@ public class SuggestedCommunityAnalyserBean {
 	private ArrayList<CtxAttribute> sharedContextAttributes;
 	private ArrayList<CtxAssociation> sharedContextAssociations;
 	private ArrayList<ICssActivity> sharedCssActivities;
-	private ArrayList<ICisActivity> sharedCisActivities;
+	private ArrayList<IActivity> sharedCisActivities;
 	
 	public SuggestedCommunityAnalyserBean() {
 		
@@ -114,11 +114,11 @@ public class SuggestedCommunityAnalyserBean {
 		this.sharedCssActivities = sharedCssActivities;
 	}
 	
-	public ArrayList<ICisActivity> getSharedCisActivities(){
+	public ArrayList<IActivity> getSharedCisActivities(){
 		return this.sharedCisActivities;
 	}
 	
-	public void setSharedCisActivities(ArrayList<ICisActivity> sharedCisActivities){
+	public void setSharedCisActivities(ArrayList<IActivity> sharedCisActivities){
 		this.sharedCisActivities = sharedCisActivities;
 	}
 	

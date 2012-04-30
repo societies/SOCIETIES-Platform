@@ -30,6 +30,7 @@ import java.io.Serializable;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
@@ -44,15 +45,14 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 public class IDSPrivacyPreferenceTreeModel extends DefaultTreeModel implements IPrivacyPreferenceTreeModel, Serializable {
 
 	
-	private IIdentity affectedDPI;
-	private IIdentity serviceDPI;
-	private ServiceResourceIdentifier serviceID;
+	private IIdentity affectedIdentity;
 	private PrivacyPreferenceTypeConstants myPrivacyType;
 	private IPrivacyPreference pref;
+	private Requestor requestor;
 	
-	public IDSPrivacyPreferenceTreeModel(IIdentity affectedDPI,  IPrivacyPreference preference){
+	public IDSPrivacyPreferenceTreeModel(IIdentity affectedId,  IPrivacyPreference preference){
 		super(preference);
-		this.setAffectedDPI(affectedDPI);
+		this.setAffectedIdentity(affectedId);
 		this.myPrivacyType = PrivacyPreferenceTypeConstants.IDS;
 		this.pref = preference;
 	}
@@ -75,33 +75,29 @@ public class IDSPrivacyPreferenceTreeModel extends DefaultTreeModel implements I
 	}
 
 
-	public void setAffectedDPI(IIdentity affectedDPI) {
-		this.affectedDPI = affectedDPI;
+	public void setAffectedIdentity(IIdentity affectedDPI) {
+		this.affectedIdentity = affectedDPI;
 	}
 
 
 	public IIdentity getAffectedDPI() {
-		return affectedDPI;
+		return affectedIdentity;
 	}
 
 
-	public void setServiceID(ServiceResourceIdentifier serviceID) {
-		this.serviceID = serviceID;
+	/**
+	 * @return the requestor
+	 */
+	public Requestor getRequestor() {
+		return requestor;
 	}
 
 
-	public ServiceResourceIdentifier getServiceID() {
-		return serviceID;
-	}
-
-
-	public void setServiceDPI(IIdentity serviceDPI) {
-		this.serviceDPI = serviceDPI;
-	}
-
-
-	public IIdentity getServiceDPI() {
-		return serviceDPI;
+	/**
+	 * @param requestor the requestor to set
+	 */
+	public void setRequestor(Requestor requestor) {
+		this.requestor = requestor;
 	}
 
 }

@@ -29,11 +29,11 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Condition;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RuleTarget;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Subject;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyOutcomeConstants;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
 /**
@@ -76,11 +76,11 @@ public class PPNPOutcome implements IPrivacyOutcome, Serializable {
 		return this.effect;
 	}
 	
-	public boolean affectsSubject(Subject subject){
-		if (null==this.rule.getSubjects()){
+	public boolean affectsSubject(Requestor requestor){
+		if (null==this.rule.getRequestors()){
 			return true;
 		}
-		if (this.rule.getSubjects().contains(subject)){
+		if (this.rule.getRequestors().contains(requestor)){
 			return true;
 		}
 		return false;

@@ -28,7 +28,7 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
+import org.societies.api.identity.Requestor;
 
 /**
  * The ResponsePolicy class represents the response of the user to a requestPolicy of a service provider. 
@@ -41,7 +41,7 @@ public class ResponsePolicy implements Serializable{
 
 	private NegotiationStatus status;
 	private List<ResponseItem> responses;
-	private Subject subject;
+	private Requestor Requestor;
 	
 	private ResponsePolicy(){
 		this.responses = new ArrayList<ResponseItem>();
@@ -49,15 +49,15 @@ public class ResponsePolicy implements Serializable{
 	/**
 	 * @param results
 	 */
-	public ResponsePolicy(Subject subject, List<ResponseItem> responses, NegotiationStatus status) {
-		this.subject = subject;
+	public ResponsePolicy(Requestor Requestor, List<ResponseItem> responses, NegotiationStatus status) {
+		this.Requestor = Requestor;
 		this.responses = responses;
 		this.status = status;
 		
 	}
 
-	public Subject getSubject(){
-		return this.subject;
+	public Requestor getRequestor(){
+		return this.Requestor;
 	}
 	public NegotiationStatus getStatus(){
 		return this.status;
@@ -76,7 +76,7 @@ public class ResponsePolicy implements Serializable{
 	}
 	public String toXMLString(){
 		String str = "\n<ResponsePolicy>";
-		str = str.concat(this.subject.toXMLString());
+		str = str.concat(this.Requestor.toXMLString());
 		str = str.concat(this.statusToXML());
 		str = str.concat("\n<Responses>");
 		for (ResponseItem item : responses){
@@ -90,7 +90,7 @@ public class ResponsePolicy implements Serializable{
 	private String statusToXML(){
 		String str = "\n<NegotiationStatus>";
 		str = str.concat("\n\t<Attribute AttributeId=\"Decision\" " +
-		"\n\t\t\tDataType=\"org.personalsmartspace.spm.negotiation.api.platform.NegotiationStatus\">");
+		"\n\t\t\tDataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationStatus\">");
 		str = str.concat("\n\t\t<AttributeValue>");
 		str = str.concat(this.status.toString());
 		str = str.concat("</AttributeValue>");

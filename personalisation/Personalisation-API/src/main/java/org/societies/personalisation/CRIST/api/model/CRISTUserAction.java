@@ -62,6 +62,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	private int confidenceLevel;
 	public CRISTUserTask m_CRISTUserTask;
 
+
 	public void finalize() throws Throwable {
 		super.finalize();
 	}
@@ -70,7 +71,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 * Constructor
 	 */
 	public CRISTUserAction() {
-
+		
 	}
 
 	/**
@@ -160,35 +161,35 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 * This method will return the contents of this action in a String mode
 	 */
 	public String toString() {
-		return this.toString();
+		return super.toString();
 	}
 
 	/**
 	 * @return the name of the action (i.e. volume)
 	 */
 	public String getparameterName() {
-		return "";
+		return super.getparameterName();
 	}
 
 	/**
 	 * @return any other names this action might also be called
 	 */
 	public ArrayList<String> getparameterNames() {
-		return null;
+		return super.getparameterNames();
 	}
 
 	/**
 	 * @return the identifier of the service to which this action is applied to
 	 */
 	public ServiceResourceIdentifier getServiceID() {
-		return null;
+		return super.getServiceID();
 	}
 
 	/**
 	 * @return the type of service this action can be applied to
 	 */
 	public String getServiceType() {
-		return "";
+		return super.getServiceType();
 	}
 
 	/**
@@ -196,7 +197,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 *         to.
 	 */
 	public List<String> getServiceTypes() {
-		return null;
+		return super.getServiceTypes();
 	}
 
 	/**
@@ -204,7 +205,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 *         value would be an int from 0 to 100
 	 */
 	public String getvalue() {
-		return "";
+		return super.getvalue();
 	}
 
 	/**
@@ -213,6 +214,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 *            the identifier of the service this action is applied to
 	 */
 	public void setServiceID(ServiceResourceIdentifier id) {
+		super.setServiceID(id);
 
 	}
 
@@ -222,6 +224,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 *            the type of service this action is applied to
 	 */
 	public void setServiceType(String type) {
+		super.setServiceType(type);
 
 	}
 
@@ -231,6 +234,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 *            a list of alternative types this action can be applied to
 	 */
 	public void setServiceTypes(List<String> types) {
+		super.setServiceTypes(types);
 
 	}
 

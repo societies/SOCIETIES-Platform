@@ -61,9 +61,18 @@ public interface IFeatureServer {
 	 */
 	List<String> getJavaPackages();
 
+	/**
+	 * MISSING_JAVADOCS
+	 */
 	void receiveMessage(Stanza stanza, Object payload);
 
+	/**
+	 * MISSING_JAVADOCS
+	 */
 	Object getQuery(Stanza stanza, Object payload) throws XMPPError;
 	
+	/**
+	 * MISSING_JAVADOCS
+	 */
 	Object setQuery(Stanza stanza, Object payload) throws XMPPError;
 }

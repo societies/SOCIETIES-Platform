@@ -59,8 +59,8 @@ import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisSubscribed;
 import org.societies.api.cis.management.ICisEditor;
-import org.societies.api.cis.management.ICisActivity;
-import org.societies.api.cis.management.ICisActivityFeed;
+import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeed;
 
 import org.societies.api.internal.css.directory.ICssDirectory;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;

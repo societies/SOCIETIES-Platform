@@ -54,7 +54,7 @@
         <property name="annotatedClasses" >
             <list>
                 <value>org.societies.cis.activity.ActivityFeed</value>
-                <value>org.societies.cis.activity.model.CisActivity</value>
+                <value>org.societies.cis.activity.model.Activity</value>
             </list>
         </property>
 

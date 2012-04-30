@@ -32,6 +32,7 @@ import java.util.List;
 
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPreferenceDetails;
@@ -178,33 +179,29 @@ public class Registry implements Serializable{
 
 		return preferenceCtxIDs;
 	}
-	List<CtxAttributeIdentifier> getPPNPreferences(String contextType, IIdentity dpi){
+	List<CtxAttributeIdentifier> getPPNPreferences(String contextType, Requestor requestor){
 		List<CtxAttributeIdentifier> preferenceCtxIDs = new ArrayList<CtxAttributeIdentifier>();
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
 		while (e.hasMoreElements()){
 			PPNPreferenceDetails d = e.nextElement();
 			if (d.getContextType().equals(contextType)){
-				if (d.getRequestorDPI()!=null){
-					if (d.getRequestorDPI().equals(dpi)){
-						preferenceCtxIDs.add(this.ppnpMappings.get(d));
-					}
+				if (d.getRequestor().equals(requestor)){
+					preferenceCtxIDs.add(this.ppnpMappings.get(d));
 				}
 			}
 		}
 		return preferenceCtxIDs;
 	}
 
-	List<CtxAttributeIdentifier> getIDSPreferences(IIdentity affectedDPI, IIdentity providerDPI){
+	List<CtxAttributeIdentifier> getIDSPreferences(IIdentity affectedDPI, Requestor requestor){
 		List<CtxAttributeIdentifier> preferenceCtxIDs = new ArrayList<CtxAttributeIdentifier>();
 		Enumeration<IDSPreferenceDetails> e = this.idsMappings.keys();
 
 		while (e.hasMoreElements()){
 			IDSPreferenceDetails d = e.nextElement();
 			if (d.getAffectedDPI().equals(affectedDPI)){
-				if (d.getProviderDPI()!=null){
-					if (d.getProviderDPI().equals(providerDPI)){
-						preferenceCtxIDs.add(this.idsMappings.get(d));
-					}
+				if (d.getRequestor().equals(requestor)){
+					preferenceCtxIDs.add(this.idsMappings.get(d));
 				}
 			}
 		}
@@ -229,7 +226,7 @@ public class Registry implements Serializable{
 
 
 
-	List<CtxAttributeIdentifier> getPPNPreferences(String contextType, CtxAttributeIdentifier affectedCtxID, IIdentity dpi){
+	List<CtxAttributeIdentifier> getPPNPreferences(String contextType, CtxAttributeIdentifier affectedCtxID, Requestor requestor){
 		List<CtxAttributeIdentifier> preferenceCtxIDs = new ArrayList<CtxAttributeIdentifier>();
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
 		while (e.hasMoreElements()){
@@ -237,12 +234,8 @@ public class Registry implements Serializable{
 			if (d.getContextType().equals(contextType)){
 				if (d.getAffectedCtxID()!=null){
 					if (d.getAffectedCtxID().toString().equalsIgnoreCase(affectedCtxID.toString())){
-						if (d.getRequestorDPI()!=null){
-							if (d.getRequestorDPI().toString().equalsIgnoreCase(dpi.toString())){
-								preferenceCtxIDs.add(ppnpMappings.get(d));
-							}
-						}
-
+						if (d.getRequestor().equals(requestor))
+							preferenceCtxIDs.add(ppnpMappings.get(d));
 					}
 				}
 			}
@@ -252,7 +245,7 @@ public class Registry implements Serializable{
 
 
 
-	List<CtxAttributeIdentifier> getPPNPreferences(String contextType, IIdentity dpi, ServiceResourceIdentifier serviceID){
+/*	List<CtxAttributeIdentifier> getPPNPreferences(String contextType, Requestor requestor){
 		List<CtxAttributeIdentifier> preferenceCtxIDs = new ArrayList<CtxAttributeIdentifier>();
 
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
@@ -272,24 +265,19 @@ public class Registry implements Serializable{
 			}
 		}
 		return preferenceCtxIDs;
-	}
+	}*/
 
 
-	CtxAttributeIdentifier getPPNPreference(String contextType, CtxAttributeIdentifier affectedCtxID, IIdentity dpi, ServiceResourceIdentifier serviceID){
+	CtxAttributeIdentifier getPPNPreference(String contextType, CtxAttributeIdentifier affectedCtxID, Requestor requestor){
 		Enumeration<PPNPreferenceDetails> e = this.ppnpMappings.keys();
 		while (e.hasMoreElements()){
 			PPNPreferenceDetails d = e.nextElement();
 			if (d.getContextType().equals(contextType)){
 				if (d.getAffectedCtxID()!=null){
 					if (d.getAffectedCtxID().toString().equalsIgnoreCase(affectedCtxID.toString())){
-						if (d.getRequestorDPI()!=null){
-							if (d.getRequestorDPI().toString().equalsIgnoreCase(dpi.toString())){
-								if (d.getServiceID().toString().equalsIgnoreCase(serviceID.toString())){
-									return this.ppnpMappings.get(d);
-								}
-							}
-						}
-
+						if (d.getRequestor().equals(requestor)){
+							return this.ppnpMappings.get(d);
+						}						
 					}
 				}
 			}
@@ -298,34 +286,18 @@ public class Registry implements Serializable{
 	}
 
 
-	CtxAttributeIdentifier getIDSPreference(IIdentity affectedDPI, IIdentity providerDPI, ServiceResourceIdentifier serviceID){
+	CtxAttributeIdentifier getIDSPreference(IIdentity affectedDPI, Requestor requestor){
 		Enumeration<IDSPreferenceDetails> e = this.idsMappings.keys();
 
 		while (e.hasMoreElements()){
 			IDSPreferenceDetails d = e.nextElement();
 			if (d.getAffectedDPI().toString().equalsIgnoreCase(affectedDPI.toString())){
-				if (d.getProviderDPI()!=null){
-					if (d.getProviderDPI().toString().equalsIgnoreCase(providerDPI.toString())){
-						if (d.getServiceID()!=null){
-							if (d.getServiceID().toString().equalsIgnoreCase(serviceID.toString())){
-								return this.idsMappings.get(d);
-							}
-						}
-					}
-				}
+				if (d.getRequestor().equals(requestor)){
+					return this.idsMappings.get(d);
+				}			
 			}
 		}
 		return null;
-	}
-
-	public static void main(String[] args){
-		PPNPreferenceDetails d = new PPNPreferenceDetails("symloc");
-		IIdentity dpi = null;
-		if (d.getRequestorDPI().equals(dpi)){
-			System.out.println("works");
-		}else{
-			System.out.println("doesn't work");
-		}
 	}
 
 	public String toString(){

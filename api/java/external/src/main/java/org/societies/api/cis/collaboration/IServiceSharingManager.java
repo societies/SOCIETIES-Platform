@@ -25,11 +25,22 @@
 package org.societies.api.cis.collaboration;
 
 import org.societies.api.cis.collaboration.IServiceSharingRecord;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
  * @author Babak.Farshchian@sintef.no
  *
  */
+/**
+ * This components allows a CSS specify which services are shared in which CISs.
+ * The CSS will call this component with a link to the service to be shared and
+ * a link to the CIS in which to share the service.
+ * Service sharing currently means that the service will be
+ * 1) allowed to write events to CIS activity feed.
+ * 2) allowed to be notified about certain events occurring in the CIS activity feed.
+ */
+@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface IServiceSharingManager {
     boolean addServiceSharingRecord(String cisId, IServiceSharingRecord sharingRecord);
 }

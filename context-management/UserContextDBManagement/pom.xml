@@ -15,6 +15,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>		
+		<dependency>
 			<groupId>org.societies.context-management</groupId>
 			<artifactId>context-mgmt-api</artifactId>
 			<version>${version.cm}</version>

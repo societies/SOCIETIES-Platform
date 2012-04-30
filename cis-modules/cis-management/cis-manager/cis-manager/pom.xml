@@ -34,7 +34,12 @@
            <artifactId>junit</artifactId>
            <scope>test</scope>
         </dependency>
-	
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.test</artifactId>
+			<version>3.0.5.RELEASE</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 		  	<groupId>org.mockito</groupId>
   			<artifactId>mockito-all</artifactId>
@@ -60,7 +65,7 @@
 			<groupId>org.societies.comm.xmpp</groupId>
 			<artifactId>CommunicationFrameworkCommons</artifactId>
 			<version>${version.comm}</version>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.comm.xmpp.pubsub</groupId>

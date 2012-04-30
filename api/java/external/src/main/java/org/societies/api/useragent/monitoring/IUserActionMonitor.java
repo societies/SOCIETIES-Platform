@@ -11,6 +11,9 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
  * @author S.Gallacher@hw.ac.uk
  *
  */
+/**
+ * MISSING_JAVADOCS
+ */
 @SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface IUserActionMonitor
 {
@@ -18,5 +21,5 @@ public interface IUserActionMonitor
 	public void monitor(IIdentity owner, IAction action);
 	
 	//Deprecated
-	public void monitor(ServiceResourceIdentifier serviceId, IIdentity owner, String action);
+	//public void monitor(ServiceResourceIdentifier serviceId, IIdentity owner, String action);
 }

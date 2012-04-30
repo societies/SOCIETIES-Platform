@@ -24,66 +24,70 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection;
 
-import java.util.List;
 import java.util.Map;
 
+import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
- * External Interface to do actions relative to a privacy policy or a privacy
- * agreement.
- * @author olivierm
- * @version 1.0
+ * Interface exposed to Societies components in order to do actions relative
+ * to a privacy policy
+ * @author Olivier Maridat (Trialog)
  * @created 09-nov.-2011 16:45:29
  */
 public interface IPrivacyPolicyManager {
 	/**
-	 * Retrieve a (CIS or Service) privacy policy by its ID.
+	 * Retrieve a CIS privacy policy by the ID of the CIS
 	 * Example of use:
 	 * - CIS Management, when it sends the CIS data (URI, description and privacy
 	 * policy) to let a user join it.
 	 * - CIS Management, to edit a policy (GUI call)
 	 * 
-	 * @param id
+	 * @param cisId Id of the CIS
+	 * @return the CIS privacy policy
+	 * @throws PrivacyException
 	 */
-	public RequestPolicy getPrivacyPolicy(String id);
-
+	public RequestPolicy getPrivacyPolicy(IIdentity cisId) throws PrivacyException;
+	
 	/**
-	 * Retrieve (CIS or Service)  privacy policy using criteria
-	 * Example of use:
-	 * - CIS Management, when it sends CIS data (URI, description and privacy
-	 * policy) to let a user join it.
-	 * - CIS Management, to edit a policy (GUI call)
-	 * - CIS Management, to list policies (to choose one to edit for example)
+	 * Retrieve a 3P Service privacy policy by the ID of the 3P Service
 	 * 
-	 * @param criteria
+	 * @param serviceId Id of the 3P Service
+	 * @return the CIS privacy policy
+	 * @throws PrivacyException
 	 */
-	public List<RequestPolicy> getPrivacyPolicies(Map criteria);
+	public RequestPolicy getPrivacyPolicy(ServiceResourceIdentifier serviceId) throws PrivacyException;
 
 	/**
-	 * Store or update a (CIS or Service) privacy policy
+	 * Store or update a (CIS or 3P Service) privacy policy
 	 * Example of use:
 	 * - CIS Management, to create a policy for a CIS.
 	 * - 3rd Service Creation, to attach a policy to a service
 	 * - More generally: GUI, to edit a policy.
 	 * 
-	 * @param privacyPolicy
+	 * @param privacyPolicy The privacy policy
+	 * @return The stored privacy policy
 	 */
-	public RequestPolicy updatePrivacyPolicy(RequestPolicy privacyPolicy);
+	public RequestPolicy updatePrivacyPolicy(RequestPolicy privacyPolicy) throws PrivacyException;
+	
+	/**
+	 * Delete a CIS privacy policy by the ID of the Service
+	 * 
+	 * @param cisId Id of the CIS
+	 * @return True if the privacy policy is successfully deleted
+	 */
+	public boolean deletePrivacyPolicy(IIdentity cisId) throws PrivacyException;
 
 	/**
-	 * Delete a (CIS or Service) privacy policy by its ID.
+	 * Delete a 3P Service privacy policy by the ID of the Service
 	 * 
-	 * @param id
+	 * @param serviceId Id of the 3P service
+	 * @return True if the privacy policy is successfully deleted
 	 */
-	public boolean deletePrivacyPolicy(String id);
-
-	/**
-	 * Delete one or more (CIS or Service) privacy policies.
-	 * 
-	 * @param criteria
-	 */
-	public boolean deletePrivacyPolicies(Map criteria);
+	public boolean deletePrivacyPolicy(ServiceResourceIdentifier serviceId) throws PrivacyException;
 
 	/**
 	 * Help a developer or a user to create a privacy policy by inferring a default
@@ -94,8 +98,9 @@ public interface IPrivacyPolicyManager {
 	 * Example of use:
 	 * - CIS Management, or 3rd Service Creation, to create a policy
 	 * 
-	 * @param configuration
-	 * @param privacyPolicyType CIS or Service
+	 * @param privacyPolicyType 1 means CIS privacy policy, 0 means 3P Service privacy policy
+	 * @param configuration Configuration of the CIS or the 3P service
+	 * @return A not complete privacy policy
 	 */
-	public RequestPolicy inferPrivacyPolicy(Map configuration, Object privacyPolicyType);
+	public RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType, Map configuration) throws PrivacyException;
 }

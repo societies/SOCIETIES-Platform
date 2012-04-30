@@ -24,15 +24,15 @@
  */
 package org.societies.privacytrust.privacyprotection.api;
 
+import java.util.concurrent.Future;
+
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 
 /**
  * Internal interface to protect a data by obfuscating it
- * @author olivierm
- * @version 1.0
+ * @author Olivier Maridat (Trialog)
  * @created 09-nov.-2011 16:45:53
  */
 public interface IDataObfuscationManager {
@@ -49,11 +49,10 @@ public interface IDataObfuscationManager {
 	 * - Anyone who wants to obfuscate a data
 	 * @param dataWrapper Data wrapped in a relevant data wrapper. Use DataWrapperFactory to select the relevant DataWrapper
 	 * @param obfuscationLevel Obfuscation level, a real number between 0 and 1. With 0 there is no obfuscation
-	 * @param listener A listener to receive the result
 	 * @return Obfuscated data wrapped in a DataWrapper (of the same type that the one used to instantiate the obfuscator)
-	 * @throws Exception
+	 * @throws PrivacyException
 	 */
-	public IDataWrapper obfuscateData(IDataWrapper dataWrapper, double obfuscationLevel, IDataObfuscationListener listener) throws PrivacyException;
+	public IDataWrapper obfuscateData(IDataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException;
 
 	/**
 	 * Check if there is an obfuscated version of the data and return its ID.
@@ -66,10 +65,9 @@ public interface IDataObfuscationManager {
 	 * - Anyone who wants to obfuscate a data
 	 * @param dataWrapper Data ID wrapped in the relevant DataWrapper. Only the ID information is mandatory to retrieve an obfuscated version. Use DataWrapperFactory to select the relevant DataWrapper
 	 * @param obfuscationLevel Obfuscation level, a real number between 0 and 1. With 0 there is no obfuscation
-	 * @param listener A listener to receive the result
 	 * @return ID of the obfuscated version of the data if the persistence is enabled and if the obfuscated data exists
 	 * @return otherwise ID of the non-obfuscated data
-	 * @throws Exception
+	 * @throws PrivacyException
 	 */
-	public CtxIdentifier hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel, IDataObfuscationListener listener) throws PrivacyException;
+	public CtxIdentifier hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException;
 }

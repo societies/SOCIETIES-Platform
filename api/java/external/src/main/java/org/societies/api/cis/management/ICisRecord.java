@@ -28,6 +28,10 @@ package org.societies.api.cis.management;
  * @author Babak.Farshchian@sintef.no
  *
  */
+/**
+ * MISSING_ANNOTATION
+ * MISSING_JAVADOCS
+ */
 public interface ICisRecord {
 
     public String getCisId();
@@ -35,5 +39,7 @@ public interface ICisRecord {
     public String getOwnerId();
     public String setUserDefinedName(String _name);
     public String getUserDefineName();
+    public String getCisType();
+    public int getMembershipCriteria();
 
 }

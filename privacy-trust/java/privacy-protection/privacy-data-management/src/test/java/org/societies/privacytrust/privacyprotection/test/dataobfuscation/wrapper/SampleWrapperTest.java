@@ -19,15 +19,16 @@
  */
 package org.societies.privacytrust.privacyprotection.test.dataobfuscation.wrapper;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.internal.mock.DataIdentifier;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.DataWrapper;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper.SampleWrapper;
 
 /**
@@ -54,6 +55,7 @@ public class SampleWrapperTest {
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.dataobfuscation.DataWrapper#equals(java.lang.Object)}.
 	 */
 	@Test
+	@Ignore
 	public void testEqualsNullObject() {
 		SampleWrapper obj1 = new SampleWrapper(3);
 		SampleWrapper obj2 = null;
@@ -63,6 +65,7 @@ public class SampleWrapperTest {
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper.SampleWrapper#equals(java.lang.Object)}.
 	 */
 	@Test
+	@Ignore
 	public void testEqualsSameInstance() {
 		SampleWrapper obj1 = new SampleWrapper(3);
 		assertTrue(obj1.equals(obj1));
@@ -71,6 +74,7 @@ public class SampleWrapperTest {
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper.SampleWrapper#equals(java.lang.Object)}.
 	 */
 	@Test
+	@Ignore
 	public void testEqualsSameObject() {
 		SampleWrapper obj1 = new SampleWrapper(3);
 		SampleWrapper obj2 = new SampleWrapper(3);
@@ -80,6 +84,7 @@ public class SampleWrapperTest {
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper.SampleWrapper#equals(java.lang.Object)}.
 	 */
 	@Test
+	@Ignore
 	public void testEqualsDifferentDataWrapper() {
 		SampleWrapper obj1 = new SampleWrapper(3);
 		SampleWrapper obj2 = new SampleWrapper(3);
@@ -90,6 +95,7 @@ public class SampleWrapperTest {
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper.SampleWrapper#equals(java.lang.Object)}.
 	 */
 	@Test
+	@Ignore
 	public void testEqualsDifferentObject() {
 		SampleWrapper obj1 = new SampleWrapper(3);
 		SampleWrapper obj2 = new SampleWrapper(4);
@@ -101,6 +107,7 @@ public class SampleWrapperTest {
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper.wrapper.SampleWrapper#getParam1()}.
 	 */
 	@Test
+	@Ignore
 	public void testGetParam1() {
 		double expected = 3;
 		SampleWrapper obj1 = new SampleWrapper(3);
@@ -111,6 +118,7 @@ public class SampleWrapperTest {
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper.SampleWrapper#setParam1(int)}.
 	 */
 	@Test
+	@Ignore
 	public void testSetParam1() {
 		double expected = 4;
 		SampleWrapper obj1 = new SampleWrapper(3);

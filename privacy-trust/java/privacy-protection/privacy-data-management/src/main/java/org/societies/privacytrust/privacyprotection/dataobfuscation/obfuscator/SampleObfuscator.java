@@ -25,9 +25,9 @@
 package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator;
 
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper.SampleWrapper;
 
 /**
@@ -45,8 +45,7 @@ public class SampleObfuscator implements IDataObfuscator {
 	
 	// -- METHODS
 	@Override
-	public IDataWrapper obfuscateData(double obfuscationLevel,
-			IDataObfuscationListener listener) throws PrivacyException {
+	public IDataWrapper obfuscateData(double obfuscationLevel) throws PrivacyException {
 		// TODO : populate this stub function
 		// Obfuscate
 		param1= 0;

@@ -28,6 +28,11 @@ package org.societies.api.cis.directory;
  * @author Babak.Farshchian@sintef.no
  *
  */
+/**
+ * MISSING_ANNOTATION
+ * MISSING_JAVADOCS
+ */
+
 public interface ICisAdvertisementRecord {
 	public String getName();
 	public void setName(String name);

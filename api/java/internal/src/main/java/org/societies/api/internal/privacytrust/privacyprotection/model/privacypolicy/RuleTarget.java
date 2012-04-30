@@ -28,6 +28,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.societies.api.identity.Requestor;
+
 
 /**
  * The RuleTarget is an XACML defined tag and encapsulates a Resource, a list of Actions and a list of Conditions. 
@@ -38,15 +40,15 @@ import java.util.List;
  *
  */
 public class RuleTarget implements Serializable{
-	private List<Subject> subjects;
+	private List<Requestor> subjects;
 	private Resource resource;
 	private List<Action> actions;
 	
 	private RuleTarget(){
-		this.subjects = new ArrayList<Subject>();
+		this.subjects = new ArrayList<Requestor>();
 		this.actions = new ArrayList<Action>();
 	}
-	public RuleTarget(List<Subject> subjects, Resource resource, List<Action> actions){
+	public RuleTarget(List<Requestor> subjects, Resource resource, List<Action> actions){
 		this.subjects = subjects;
 		this.resource = resource;
 		this.actions = actions;
@@ -57,7 +59,7 @@ public class RuleTarget implements Serializable{
 		
 	}
 	
-	public List<Subject> getSubjects(){
+	public List<Requestor> getRequestors(){
 		return this.subjects;
 	}
 	
@@ -65,9 +67,9 @@ public class RuleTarget implements Serializable{
 		return this.actions;
 	}
 	
-	public void addSubject(Subject subject){
+	public void addRequestor(Requestor subject){
 		if (null==this.subjects){
-			this.subjects = new ArrayList<Subject>();
+			this.subjects = new ArrayList<Requestor>();
 		}
 		if (!this.subjects.contains(subject)){
 			this.subjects.add(subject);
@@ -86,8 +88,8 @@ public class RuleTarget implements Serializable{
 	
 	public String toString(){
 		String print = "RuleTarget:\n";
-		print = print.concat("\tSubjects\n");
-		for (Subject s : subjects){
+		print = print.concat("\tRequestors\n");
+		for (Requestor s : subjects){
 			print = print.concat("\t\t"+s.toString()+"\n");
 		}
 		
