@@ -41,5 +41,6 @@
 <osgi:reference id="DeviceRegistryBundle" interface="org.societies.api.internal.css.devicemgmt.IDeviceRegistry" cardinality="0..1" /> 
 <osgi:reference id="SocialDataBundle"       interface="org.societies.api.internal.sns.ISocialData" cardinality="0..1" /> 
 <osgi:reference id="commMngrRef" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" cardinality="0..1"/>
+<osgi:reference id="commMngrController" interface="org.societies.api.internal.comm.ICommManagerController" cardinality="0..1"/>
 
 </beans>
