@@ -30,6 +30,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
@@ -91,7 +92,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#inferPrivacyPolicy(int, java.util.Map)
 	 */
 	@Override
-	public RequestPolicy inferPrivacyPolicy(int privacyPolicyType,
+	public RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType,
 			Map configuration) throws PrivacyException {
 		// TODO Auto-generated method stub
 		return null;

@@ -35,8 +35,8 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
@@ -88,7 +88,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			Mockito.when(ownerId.getIdentifier()).thenReturn("me@societies.local");
 			CtxIdentifier dataId = null;
 			List<Action> actions = null;
-			PrivacyOutcomeConstants permission = PrivacyOutcomeConstants.ALLOW;
+			Decision permission = Decision.PERMIT;
 			if (null == privacyDataManagerInternal) {
 				log.info("privacyDataManagerInternal null");
 			}
@@ -113,7 +113,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			IIdentity ownerId = null;
 			CtxIdentifier dataId = null;
 			List<Action> actions = null;
-			PrivacyOutcomeConstants permission = PrivacyOutcomeConstants.ALLOW;
+			Decision permission = Decision.PERMIT;
 			if (null == privacyDataManagerInternal) {
 				log.info("privacyDataManagerInternal null");
 			}

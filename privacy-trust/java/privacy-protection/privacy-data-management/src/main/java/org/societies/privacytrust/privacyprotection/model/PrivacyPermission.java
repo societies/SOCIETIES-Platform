@@ -45,8 +45,8 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyOutcomeConstants;
 
 /**
  *
@@ -80,7 +80,7 @@ public class PrivacyPermission implements Serializable {
 	private String actions;
 
 	@Enumerated
-	private PrivacyOutcomeConstants permission;
+	private Decision permission;
 
 
 
@@ -102,7 +102,7 @@ public class PrivacyPermission implements Serializable {
 	public PrivacyPermission(String requestorId,
 			PrivacyPolicyTypeConstants permissionType, String serviceId,
 			String cisId, String ownerId, String dataId, String actions,
-			PrivacyOutcomeConstants permission) {
+			Decision permission) {
 		super();
 		this.requestorId = requestorId;
 		this.permissionType = permissionType;
@@ -120,7 +120,7 @@ public class PrivacyPermission implements Serializable {
 	 * @param actions
 	 * @param permission
 	 */
-	public PrivacyPermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, List<Action> actions, PrivacyOutcomeConstants permission) {
+	public PrivacyPermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, List<Action> actions, Decision permission) {
 		super();
 		if (requestor != null) {
 			this.requestorId = requestor.getRequestorId().getIdentifier();
@@ -158,7 +158,7 @@ public class PrivacyPermission implements Serializable {
 	 * @param permission
 	 */
 	public PrivacyPermission(Requestor requestor, IIdentity ownerId, ResponseItem permission) {
-		this(requestor, ownerId, permission.getRequestItem().getResource().getCtxIdentifier(), permission.getRequestItem().getActions(), (permission.getDecision().equals(Decision.PERMIT) ? PrivacyOutcomeConstants.ALLOW : PrivacyOutcomeConstants.BLOCK));
+		this(requestor, ownerId, permission.getRequestItem().getResource().getCtxIdentifier(), permission.getRequestItem().getActions(), permission.getDecision());
 	}
 
 
@@ -182,14 +182,14 @@ public class PrivacyPermission implements Serializable {
 	/**
 	 * @return the permission
 	 */
-	public PrivacyOutcomeConstants getPermission() {
+	public Decision getPermission() {
 		return permission;
 	}
 
 	/**
 	 * @param permission the permission to set
 	 */
-	public void setPermission(PrivacyOutcomeConstants permission) {
+	public void setPermission(Decision permission) {
 		this.permission = permission;
 	}
 

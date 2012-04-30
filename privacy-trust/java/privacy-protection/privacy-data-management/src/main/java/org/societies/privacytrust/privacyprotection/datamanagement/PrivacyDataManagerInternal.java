@@ -37,8 +37,8 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.model.PrivacyPermission;
 
@@ -86,7 +86,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#updatePermission(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxIdentifier, java.util.List, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants)
 	 */
 	@Override
-	public boolean updatePermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, List<Action> actions, PrivacyOutcomeConstants permission) throws PrivacyException {
+	public boolean updatePermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, List<Action> actions, Decision permission) throws PrivacyException {
 		Session session = sessionFactory.openSession();
 		PrivacyPermission privacyPermissionEntry = null;
 		Transaction t = session.beginTransaction();

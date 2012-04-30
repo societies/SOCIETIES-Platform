@@ -34,6 +34,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
 import org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager;
 
 /**
@@ -122,7 +123,7 @@ public class PrivacyPolicyManagerTest {
 		RequestPolicy expected = null;
 		RequestPolicy actual = null;
 		try {
-			actual = privacyPolicyManager.inferPrivacyPolicy(0, null);
+			actual = privacyPolicyManager.inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, null);
 		} catch (PrivacyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
