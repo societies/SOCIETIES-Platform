@@ -24,25 +24,64 @@
  */
 package org.societies.privacytrust.privacyprotection.api;
 
+import java.util.List;
+
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants;
 
 /**
- * Internal interface to manage data access control and data access conditions.
- * @author olivierm
- * @version 1.0
- * @created 09-nov.-2011 16:45:57
+ * Interface internal to privacy components to manage data access control and data access conditions.
+ * @author Olivier Maridat (Trialog)
  */
 public interface IPrivacyDataManagerInternal {
-
+	/**
+	 * Find the relevant permission
+	 * 
+	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
+	 * @param dataId ID of the requested data.
+	 * @param ownerId the ID of the owner of the data. Generally the local CSS Id.
+	 * @return The ResponseItem of this permission
+	 * @throws PrivacyException
+	 */
+	public ResponseItem getPermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId) throws PrivacyException;
+	
 	/**
 	 * Update access control permissions over a data
 	 * 
-	 * @param dataId
-	 * @param agreementId
-	 * @param ownerId
-	 * @param requestorId
+	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
+	 * @param dataId ID of the requested data.
+	 * @param ownerId the ID of the owner of the data. Generally the local CSS Id.
+	 * @param actions List of actions to request over this data.
+	 * @param permission Permission.
+	 * @return Success of the operation
+	 * @throws PrivacyException
 	 */
-	public void updatePermissions(CtxIdentifier dataId, String agreementId, IIdentity ownerId, IIdentity requestorId);
+	public boolean updatePermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, List<Action> actions, PrivacyOutcomeConstants permission) throws PrivacyException;
+	
+	/**
+	 * Update access control permissions over a data
+	 * 
+	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
+	 * @param permission Expression of the permission
+	 * @return Success of the operation
+	 * @throws PrivacyException
+	 */
+	public boolean updatePermission(Requestor requestor, ResponseItem permission) throws PrivacyException;
+	
+	/**
+	 * Delete the relevant permission
+	 * 
+	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
+	 * @param dataId ID of the requested data.
+	 * @param ownerId the ID of the owner of the data. Generally the local CSS Id.
+	 * @return Success of the operation
+	 * @throws PrivacyException
+	 */
+	public boolean deletePermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId) throws PrivacyException;
 
 }

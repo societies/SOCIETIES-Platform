@@ -22,59 +22,119 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator;
+package org.societies.privacytrust.privacyprotection.model;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper.SampleWrapper;
+import java.io.Serializable;
+
+import javax.persistence.Entity;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants;
 
 /**
- * @state skeleton 
- * @author olivierm
+ *
+ * @author Olivier Maridat (Trialog)
+ *
  */
-public class SampleObfuscator implements IDataObfuscator {
-	private int param1;
+@Entity
+@Table(name = "PrivacyPermission")
+public class PrivacyPermission implements Serializable {
+	private static final long serialVersionUID = -5745233622018708564L;
 	
-	// -- CONSTRUCTOR
-	public SampleObfuscator(int param1) {
-		this.param1 = param1;
+	@Id
+	@GeneratedValue
+	private Long id;
+//	private Requestor requestor;
+	private String ownerId;
+	private String dataId;
+//	private List<Action> actions;
+	@Enumerated
+	private PrivacyOutcomeConstants permission;
+	
+	
+
+	
+	public PrivacyPermission() {
+		super();
 	}
 
-	
-	// -- METHODS
-	@Override
-	public IDataWrapper obfuscateData(double obfuscationLevel) throws PrivacyException {
-		// TODO : populate this stub function
-		// Obfuscate
-		param1= 0;
-		return new SampleWrapper(param1);
-	}
-
-
-	// -- GET/SET
 	/**
-	 * @return the param1
+	 * @param ownerId
+	 * @param dataId
+	 * @param permission
 	 */
-	public int getParam1() {
-		return param1;
+	public PrivacyPermission(String ownerId, String dataId,
+			PrivacyOutcomeConstants permission) {
+		super();
+		this.ownerId = ownerId;
+		this.dataId = dataId;
+		this.permission = permission;
 	}
+
+
+
 	/**
-	 * @param param1 the param1 to set
+	 * @return the id
 	 */
-	public void setParam1(int param1) {
-		this.param1 = param1;
+	public Long getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
+	/**
+	 * @return the permission
+	 */
+	public PrivacyOutcomeConstants getPermission() {
+		return permission;
+	}
+
+	/**
+	 * @param permission the permission to set
+	 */
+	public void setPermission(PrivacyOutcomeConstants permission) {
+		this.permission = permission;
 	}
 
 
-	/*
-	 * @see java.lang.Object#equals(java.lang.Object)
+	/**
+	 * @return the ownerId
 	 */
-	@Override
-	public boolean equals(Object obj) {
-		return (obj==this || obj instanceof SampleObfuscator);
+	public String getOwnerId() {
+		return ownerId;
 	}
-	
-	
+
+
+	/**
+	 * @param ownerId the ownerId to set
+	 */
+	public void setOwnerId(String ownerId) {
+		this.ownerId = ownerId;
+	}
+
+
+	/**
+	 * @return the dataId
+	 */
+	public String getDataId() {
+		return dataId;
+	}
+
+
+	/**
+	 * @param dataId the dataId to set
+	 */
+	public void setDataId(String dataId) {
+		this.dataId = dataId;
+	}
+
+
 }

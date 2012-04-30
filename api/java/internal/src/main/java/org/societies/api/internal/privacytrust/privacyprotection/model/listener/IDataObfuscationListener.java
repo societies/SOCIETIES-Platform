@@ -22,59 +22,20 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator;
+package org.societies.api.internal.privacytrust.privacyprotection.model.listener;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper.SampleWrapper;
+
 
 /**
- * @state skeleton 
+ * This interface defines a listener for an obfuscation operation.
  * @author olivierm
+ * @date 14 oct. 2011
  */
-public class SampleObfuscator implements IDataObfuscator {
-	private int param1;
-	
-	// -- CONSTRUCTOR
-	public SampleObfuscator(int param1) {
-		this.param1 = param1;
-	}
-
-	
-	// -- METHODS
-	@Override
-	public IDataWrapper obfuscateData(double obfuscationLevel) throws PrivacyException {
-		// TODO : populate this stub function
-		// Obfuscate
-		param1= 0;
-		return new SampleWrapper(param1);
-	}
-
-
-	// -- GET/SET
-	/**
-	 * @return the param1
-	 */
-	public int getParam1() {
-		return param1;
-	}
-	/**
-	 * @param param1 the param1 to set
-	 */
-	public void setParam1(int param1) {
-		this.param1 = param1;
-	}
-
-
-	/*
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		return (obj==this || obj instanceof SampleObfuscator);
-	}
-	
-	
+public interface IDataObfuscationListener {
+	public void onObfuscationDone(IDataWrapper data);
+	public void onObfuscationCancelled(String msg);
+	public void onObfuscationAborted(String msg, Exception e);
+	public void onObfuscatedVersionRetrieved(CtxIdentifier dataId, boolean retrieved);
 }

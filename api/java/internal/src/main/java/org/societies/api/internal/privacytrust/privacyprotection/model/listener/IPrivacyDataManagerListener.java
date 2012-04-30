@@ -22,20 +22,18 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener;
+package org.societies.api.internal.privacytrust.privacyprotection.model.listener;
 
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 
 
 /**
- * This interface defines a listener for an obfuscation operation.
- * @author olivierm
- * @date 14 oct. 2011
+ * This interface defines a listener for an access control operation over a personal data.
+ * @author Olivier Maridat (Trialog)
+ * @date 27 apr. 2012
  */
-public interface IDataObfuscationListener {
-	public void onObfuscationDone(IDataWrapper data);
-	public void onObfuscationCancelled(String msg);
-	public void onObfuscationAborted(String msg, Exception e);
-	public void onObfuscatedVersionRetrieved(CtxIdentifier dataId, boolean retrieved);
+public interface IPrivacyDataManagerListener {
+	public void onAccessControlChecked(ResponseItem permission);
+	public void onAccessControlCancelled(String msg);
+	public void onAccessControlAborted(String msg, Exception e);
 }

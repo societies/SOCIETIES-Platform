@@ -24,80 +24,35 @@
  */
 package org.societies.privacytrust.privacyprotection.privacypolicy;
 
-import java.util.List;
-import java.util.Map;
-
 import org.societies.api.identity.IIdentity;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.internal.privacytrust.privacyprotection.IPolicyAgreementManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager;
 
 /**
- * @author olivierm
+ * @author Olivier Maridat (Trialog)
  * @date 5 déc. 2011
  */
 public class PolicyAgreementManager implements IPolicyAgreementManager {
 
 	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager#deleteAgreement(java.lang.String)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager#getAgreement(org.societies.api.identity.IIdentity)
 	 */
 	@Override
-	public boolean deleteAgreement(String id) {
+	public IAgreementEnvelope getAgreement(IIdentity cisId)
+			throws PrivacyException {
 		// TODO Auto-generated method stub
-		return false;
+		return null;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager#deleteAgreements(java.util.Map)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManager#getAgreement(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)
 	 */
 	@Override
-	public boolean deleteAgreements(Map criteria) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public NegotiationAgreement getAgreement(String id) {
+	public IAgreementEnvelope getAgreement(ServiceResourceIdentifier serviceId)
+			throws PrivacyException {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	@Override
-	public List<NegotiationAgreement> getAgreements(Map criteria) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseItem getPermissionConditionsInAgreement(
-			CtxIdentifier dataId, IIdentity ownerId,
-			IIdentity requestorId, ServiceResourceIdentifier serviceId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseItem getPermissionConditionsInAgreement(
-			CtxIdentifier dataId, IIdentity ownerId,
-			IIdentity requestorId, IIdentity cisId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public NegotiationAgreement updateAgreement(NegotiationAgreement agreement,
-			IIdentity myId, ServiceResourceIdentifier serviceId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public NegotiationAgreement updateAgreement(NegotiationAgreement agreement,
-			IIdentity myId, IIdentity cisId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
