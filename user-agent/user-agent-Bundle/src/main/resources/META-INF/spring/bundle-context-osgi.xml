@@ -13,7 +13,6 @@
 	<osgi:service ref="uam">
 		<osgi:interfaces>
 			<value>org.societies.api.useragent.monitoring.IUserActionMonitor</value>
-			<value>org.societies.api.internal.useragent.monitoring.IInternalUserActionMonitor</value>
 		</osgi:interfaces>
 	</osgi:service>
 	
