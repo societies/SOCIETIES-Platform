@@ -58,7 +58,7 @@ public class ContextStorageTest {
 	private static ICtxBroker ctxBroker;
 
 	public void setUp(){
-		uam = TestCase747.getUAM();
+		uam = TestCase747.getUam();
 		ctxBroker = TestCase747.getCtxBroker();
 	}
 

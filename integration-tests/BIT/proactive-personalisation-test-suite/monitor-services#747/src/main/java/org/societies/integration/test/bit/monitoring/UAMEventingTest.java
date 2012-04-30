@@ -51,7 +51,7 @@ public class UAMEventingTest extends EventListener{
 	private InternalEvent event;
 
 	public void setUp(){
-		uam = TestCase747.getUAM();
+		uam = TestCase747.getUam();
 		eventMgr = TestCase747.getEventMgr();
 		event = null;
 	}

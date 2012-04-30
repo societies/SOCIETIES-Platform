@@ -44,7 +44,7 @@ public class TestCase747 extends IntegrationTestCase{
 		TestCase747.ctxBroker = ctxBroker;
 	}
 	
-	public void setUAM(IUserActionMonitor uam){
+	public void setUam(IUserActionMonitor uam){
 		TestCase747.uam = uam;
 	}
 	
@@ -56,7 +56,7 @@ public class TestCase747 extends IntegrationTestCase{
 		return TestCase747.ctxBroker;
 	}
 	
-	protected static IUserActionMonitor getUAM(){
+	protected static IUserActionMonitor getUam(){
 		return TestCase747.uam;
 	}
 	
