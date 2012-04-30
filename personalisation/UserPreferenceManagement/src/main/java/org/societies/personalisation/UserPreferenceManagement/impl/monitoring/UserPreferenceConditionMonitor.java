@@ -66,11 +66,11 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	private UserPreferenceManagement prefMgr;
 	private IInternalPersonalisationManager persoMgr;
 	private MergingManager merging;
-	private IC45Learning c45Learning;
+	private IC45Learning userPrefLearning;
 	private IEventMgr eventMgr;
 
 	public UserPreferenceConditionMonitor(){
-		merging = new MergingManager(c45Learning, prefMgr, this, eventMgr);
+		merging = new MergingManager(userPrefLearning, prefMgr, this, eventMgr);
 	}
 	
 	
@@ -101,11 +101,11 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 
 	
 	public IC45Learning getC45Learning() {
-		return c45Learning;
+		return userPrefLearning;
 	}
 
-	public void setC45Learning(IC45Learning c45Learning) {
-		this.c45Learning = c45Learning;
+	public void setC45Learning(IC45Learning userPrefLearning) {
+		this.userPrefLearning = userPrefLearning;
 	}
 	
 	public IEventMgr getEventMgr() {
