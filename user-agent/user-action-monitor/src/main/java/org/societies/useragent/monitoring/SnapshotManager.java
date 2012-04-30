@@ -38,6 +38,7 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
@@ -147,11 +148,12 @@ public class SnapshotManager {
 				snpshtRegistry = (SnapshotsRegistry)SerialisationHelper.deserialise(attr.getBinaryValue(), this.getClass().getClassLoader());
 			}else{  //create new mappings attribute and populate
 				snpshtRegistry = new SnapshotsRegistry();
-				Future<List<CtxIdentifier>> futurePersonCtxIDs = ctxBroker.lookup(CtxModelType.ENTITY, "PERSON");  //get PERSON entity to store mappings for
-				List<CtxIdentifier> personCtxIDs = futurePersonCtxIDs.get();
-				Future<CtxAttribute> futureAttribute = ctxBroker.createAttribute((CtxEntityIdentifier)personCtxIDs.get(0), registryName);
+				Future<IndividualCtxEntity> futurePersonEntity = ctxBroker.retrieveCssOperator();  //get PERSON entity to store mappings for
+				IndividualCtxEntity personEntity = futurePersonEntity.get();
+				Future<CtxAttribute> futureAttribute = ctxBroker.createAttribute((CtxEntityIdentifier)personEntity.getId(), registryName);
 				CtxAttribute newAttribute = futureAttribute.get();
-				ctxBroker.updateAttribute(newAttribute.getId(), snpshtRegistry);
+				byte[] blobRegistry = SerialisationHelper.serialise(snpshtRegistry);
+				newAttribute.setBinaryValue(blobRegistry);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
