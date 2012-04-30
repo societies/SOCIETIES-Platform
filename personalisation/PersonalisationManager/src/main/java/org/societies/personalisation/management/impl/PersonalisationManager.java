@@ -114,9 +114,9 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 		this.dianne = dianne;
 		this.cauiPrediction = cauiPrediction;
 		this.cristPrediction = cristPrediction;
-		this.commsMgr = commsMgr;
+		this.setCommsMgr(commsMgr);
 		this.decisionMaker = decisionMaker;
-		this.idm = this.commsMgr.getIdManager();
+		this.idm = this.getCommsMgr().getIdManager();
 		retrieveConfidenceLevels();
 		
 	}
@@ -251,6 +251,20 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 
 	public void setDecisionMaker(IDecisionMaker decisionMaker) {
 		this.decisionMaker = decisionMaker;
+	}
+
+	/**
+	 * @return the commsMgr
+	 */
+	public ICommManager getCommsMgr() {
+		return commsMgr;
+	}
+
+	/**
+	 * @param commsMgr the commsMgr to set
+	 */
+	public void setCommsMgr(ICommManager commsMgr) {
+		this.commsMgr = commsMgr;
 	}
 
 	/*
