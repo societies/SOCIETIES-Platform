@@ -25,7 +25,6 @@
 package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator;
 
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 
 
@@ -41,9 +40,8 @@ public interface IDataObfuscator {
 	 * Protect data wrapped in the obfuscator to a correct obfuscation level.
 	 * 
 	 * @param obfuscationLevel Obfuscation level, a real number between 0 and 1.  With 0, there is no obfuscation
-	 * @param listener A listener to receive the result
 	 * @return Obfuscated data wrapped in a DataWrapper (of the same type that the one used to instanciate the obfuscator)
 	 * @throws Exception
 	 */
-	public IDataWrapper obfuscateData(double obfuscationLevel, IDataObfuscationListener listener) throws PrivacyException;
+	public IDataWrapper obfuscateData(double obfuscationLevel) throws PrivacyException;
 }

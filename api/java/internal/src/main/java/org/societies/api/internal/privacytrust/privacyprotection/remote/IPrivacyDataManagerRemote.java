@@ -22,59 +22,41 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator;
+package org.societies.api.internal.privacytrust.privacyprotection.remote;
 
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.obfuscator.IDataObfuscator;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.wrapper.SampleWrapper;
+import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 
 /**
- * @state skeleton 
- * @author olivierm
+ * Interface exposed to Societies components in order to remotely manage access control over resources
+ * @author Olivier Maridat (Trialog)
+ * @created 27 apr. 2012
  */
-public class SampleObfuscator implements IDataObfuscator {
-	private int param1;
-	
-	// -- CONSTRUCTOR
-	public SampleObfuscator(int param1) {
-		this.param1 = param1;
-	}
-
-	
-	// -- METHODS
-	@Override
-	public IDataWrapper obfuscateData(double obfuscationLevel) throws PrivacyException {
-		// TODO : populate this stub function
-		// Obfuscate
-		param1= 0;
-		return new SampleWrapper(param1);
-	}
-
-
-	// -- GET/SET
+public interface IPrivacyDataManagerRemote {
 	/**
-	 * @return the param1
+	 * Remote call to check permission to access/use/disclose a data
+	 * 
+	 * @param requestor Requestor of the obfuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
+	 * @param dataId ID of the requested data.
+	 * @param ownerId ID of the owner of the data. This is the CSS which will receive this remote call.
+	 * @param action Action requested over this data.
+	 * @param listener The callback object
 	 */
-	public int getParam1() {
-		return param1;
-	}
+	public void checkPermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, Action action, IPrivacyDataManagerListener listener);
+
 	/**
-	 * @param param1 the param1 to set
+	 * Remote call to protect a data following the user preferences by obfuscating it to a correct
+	 * 
+	 * @param requestor Requestor of the obfuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
+	 * @param ownerId ID of the owner of the data. This is the CSS which will receive this remote call.
+	 * @param dataWrapper Data wrapped in a relevant data wrapper. Use DataWrapperFactory to select the relevant DataWrapper
+	 * @param listener The callback object
 	 */
-	public void setParam1(int param1) {
-		this.param1 = param1;
-	}
-
-
-	/*
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		return (obj==this || obj instanceof SampleObfuscator);
-	}
-	
-	
+	public void obfuscateData(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper, IDataObfuscationListener listener) throws PrivacyException;
 }

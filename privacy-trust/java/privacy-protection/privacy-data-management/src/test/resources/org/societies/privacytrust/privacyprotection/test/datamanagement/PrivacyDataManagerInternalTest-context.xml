@@ -21,11 +21,11 @@
 		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
-
-	<bean name="PrivacyPolicyManager"
-		class="org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager">
-		<!-- <property name="privacyPolicyManager" ref="privacyPolicyManager" /> -->
-	</bean>
+	
+<!-- 	<bean name="PrivacyDataManagerInternalTest"
+		class="org.societies.privacytrust.privacyprotection.test.datamanagement.PrivacyDataManagerInternalTest">
+		<property name="privacyDataManagerInternal" ref="PrivacyDataManagerInternal" />
+	</bean> -->
 
 
 	<!-- Persistance Configuration -->
@@ -36,12 +36,22 @@
 	
 	<bean id="PrivacyPermissionRegistryPropertiesConfig"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="ignoreResourceNotFound" value="true"></property>
+		<property name="ignoreResourceNotFound" value="false"></property>
 		<property name="locations">
 			<list>
-				<value>file:${CONFIG_DIR}\org.societies.platform.properties</value>
+				<value>classpath:META-INF/spring/derby_database.properties</value>
 			</list>
 		</property>
+	</bean>
+	
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		init-method="createDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="initialSize" value="2" />
+		<property name="maxActive" value="5" />
 	</bean>
 
 	<bean id="sessionFactory"
@@ -60,9 +70,8 @@
 		<property name="hibernateProperties">
 			<props>
 				<prop key="hibernate.show_sql">true</prop>
-				<prop key="hibernate.show_dlll">true</prop>
 				<prop key="hibernate.cache.use_second_level_cache">false</prop>
-				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.hbm2ddl.auto">create-drop</prop>
 				<prop key="hibernate.format_sql">true</prop>
 			</props>
 		</property>

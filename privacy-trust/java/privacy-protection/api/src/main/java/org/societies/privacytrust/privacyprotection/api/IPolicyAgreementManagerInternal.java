@@ -24,85 +24,53 @@
  */
 package org.societies.privacytrust.privacyprotection.api;
 
-import java.util.List;
-import java.util.Map;
-
-import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
- * @author olivierm
- * @version 1.0
+ * Interface internal to privacy components to manage privacy agreements
+ * @author Olivier Maridat (Trialog)
  * @created 17-nov.-2011 11:12:31
  */
-public interface IPolicyAgreementManager {
+public interface IPolicyAgreementManagerInternal {
 	/**
-	 * Delete and agreement
-	 * @param id
-	 */
-	public boolean deleteAgreement(String id);
-
-	/**
-	 * Delete agreements following criteria
-	 * @param criteria
-	 */
-	public boolean deleteAgreements(Map criteria);
-
-	/**
-	 * Retrieve an agreement
-	 * @param id
-	 */
-	public NegotiationAgreement getAgreement(String id);
-
-	/**
-	 * Retrieve agreements following criteria
-	 * @param criteria
-	 */
-	public List<NegotiationAgreement> getAgreements(Map criteria);
-
-	/**
-	 * The objective here is to retrieve the part of the SERVICE negotiation agreement
-	 * which is relevant about this data for this consumer, in order to know usage
-	 * conditions of this data. E.g. obfuscation or not, disclosure conditions...
+	 * Update a CIS privacy agreement by the ID of the CIS
 	 * 
-	 * @param dataId
-	 * @param ownerId
-	 * @param requestorId
-	 * @param serviceId
+	 * @param cisId Id of the CIS
+	 * @param agreement Agreement
+	 * @return Success result of the operation
+	 * @throws PrivacyException
 	 */
-	public ResponseItem getPermissionConditionsInAgreement(CtxIdentifier dataId, IIdentity ownerId, IIdentity requestorId, ServiceResourceIdentifier serviceId);
-
+	public boolean updateAgreement(IIdentity cisId, IAgreementEnvelope agreement) throws PrivacyException;
+	
 	/**
-	 * The objective here is to retrieve the part of the CIS negotiation agreement
-	 * which is relevant about this data for this consumer, in order to know usage
-	 * conditions of this data. E.g. obfuscation or not, disclosure conditions...
+	 * Update a Service privacy agreement by the ID of the Service
 	 * 
-	 * @param dataId
-	 * @param ownerId
-	 * @param requestorId
-	 * @param cisId
+	 * @param serviceId Id of the Service
+	 * @param agreement Agreement
+	 * @return Success result of the operation
+	 * @throws PrivacyException
 	 */
-	public ResponseItem getPermissionConditionsInAgreement(CtxIdentifier dataId, IIdentity ownerId, IIdentity requestorId, IIdentity cisId);
-
+	public boolean updateAgreement(ServiceResourceIdentifier serviceId, IAgreementEnvelope agreement) throws PrivacyException;
+	
 	/**
-	 * Update Negotiation Agreement (with a Service)
+	 * Delete a CIS privacy agreement by the ID of the CIS
 	 * 
-	 * @param agreement
-	 * @param myId
-	 * @param serviceId
+	 * @param cisId Id of the CIS
+	 * @return Success result of the operation
+	 * @throws PrivacyException
 	 */
-	public NegotiationAgreement updateAgreement(NegotiationAgreement agreement, IIdentity myId, ServiceResourceIdentifier serviceId);
-
+	public IAgreementEnvelope deleteAgreement(IIdentity cisId) throws PrivacyException;
+	
 	/**
-	 * Update Negotiation Agreement (with a CIS)
+	 * Delete a 3P service privacy agreement by the ID of the Service
 	 * 
-	 * @param agreement
-	 * @param myId
-	 * @param cisId
+	 * @param serviceId Id of the Service
+	 * @return Success result of the operation
+	 * @throws PrivacyException
 	 */
-	public NegotiationAgreement updateAgreement(NegotiationAgreement agreement, IIdentity myId, IIdentity cisId);
+	public IAgreementEnvelope deleteAgreement(ServiceResourceIdentifier serviceId) throws PrivacyException;
 
 }
