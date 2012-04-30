@@ -29,15 +29,16 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants;
-import org.societies.api.context.model.CtxIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.model.PrivacyPermission;
 
@@ -59,8 +60,26 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	@Override
 	public ResponseItem getPermission(Requestor requestor, IIdentity ownerId,
 			CtxIdentifier dataId) throws PrivacyException {
-		// TODO Auto-generated method stub
-		return null;
+		Session session = sessionFactory.openSession();
+		ResponseItem permission = null;
+		Transaction t = session.beginTransaction();
+		try {
+			PrivacyPermission privacyPermission = (PrivacyPermission) session
+					.createCriteria(PrivacyPermission.class)
+					.add(Restrictions.eq("ownerId", ownerId.getIdentifier()))
+					.uniqueResult();
+				log.info(privacyPermission.toString());
+				permission = privacyPermission.createResponseItem();
+			log.debug("PrivacyPermission retrieved.");
+		} catch (Exception e) {
+			t.rollback();
+			throw new PrivacyException("Error during the persistance of the privacy permission", e);
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		return permission;
 	}
 
 	/* (non-Javadoc)
@@ -72,7 +91,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		PrivacyPermission privacyPermissionEntry = null;
 		Transaction t = session.beginTransaction();
 		try {
-			privacyPermissionEntry = new PrivacyPermission("me@societies.local", "myData", permission);
+			privacyPermissionEntry = new PrivacyPermission(requestor, ownerId, dataId, actions, permission); 
 			session.save(privacyPermissionEntry);
 			t.commit();
 			log.debug("PrivacyPermission saved.");
@@ -91,10 +110,25 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#updatePermission(org.societies.api.identity.Requestor, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem)
 	 */
 	@Override
-	public boolean updatePermission(Requestor requestor, ResponseItem permission)
+	public boolean updatePermission(Requestor requestor, IIdentity ownerId, ResponseItem permission)
 			throws PrivacyException {
-		// TODO Auto-generated method stub
-		return false;
+		Session session = sessionFactory.openSession();
+		PrivacyPermission privacyPermissionEntry = null;
+		Transaction t = session.beginTransaction();
+		try {
+			privacyPermissionEntry = new PrivacyPermission(requestor, ownerId, permission); 
+			session.save(privacyPermissionEntry);
+			t.commit();
+			log.debug("PrivacyPermission saved.");
+		} catch (Exception e) {
+			t.rollback();
+			throw new PrivacyException("Error during the persistance of the privacy permission", e);
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		return true;
 	}
 
 	/* (non-Javadoc)

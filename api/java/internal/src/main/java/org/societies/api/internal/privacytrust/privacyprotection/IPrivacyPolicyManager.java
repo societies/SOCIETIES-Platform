@@ -29,6 +29,7 @@ import java.util.Map;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
@@ -101,5 +102,5 @@ public interface IPrivacyPolicyManager {
 	 * @param configuration Configuration of the CIS or the 3P service
 	 * @return A not complete privacy policy
 	 */
-	public RequestPolicy inferPrivacyPolicy(int privacyPolicyType, Map configuration) throws PrivacyException;
+	public RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType, Map configuration) throws PrivacyException;
 }

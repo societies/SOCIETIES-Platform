@@ -71,7 +71,7 @@ public interface IPrivacyDataManagerInternal {
 	 * @return Success of the operation
 	 * @throws PrivacyException
 	 */
-	public boolean updatePermission(Requestor requestor, ResponseItem permission) throws PrivacyException;
+	public boolean updatePermission(Requestor requestor, IIdentity ownerId, ResponseItem permission) throws PrivacyException;
 	
 	/**
 	 * Delete the relevant permission

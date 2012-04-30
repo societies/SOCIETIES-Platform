@@ -27,6 +27,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifier;
@@ -34,6 +35,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +48,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Olivier Maridat (Trialog)
  *
  */
-//@ContextConfiguration(locations = { "../../../../../../META-INF/PrivacyPermissionRegistryTest-context.xml" })
+// Run this test case using Spring jUnit
 @RunWith(SpringJUnit4ClassRunner.class)
+// Search context configuration file in classpath:<ClassName>-context.xml
 @ContextConfiguration
 public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4SpringContextTests {
 	private static Logger log = LoggerFactory.getLogger(PrivacyDataManagerInternalTest.class.getSimpleName());
@@ -69,6 +72,33 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 	@After
 	public void tearDown() throws Exception {
 //		privacyDataManagerInternal = null;
+	}
+	
+	/**
+	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal#updatePermissions(org.societies.privacytrust.privacyprotection.mock.DataIdentifier, java.lang.String, org.societies.api.comm.xmpp.datatypes.Identity, org.societies.api.comm.xmpp.datatypes.Identity)}.
+	 */
+	@Test
+	@Rollback(false)
+	public void testGetPermission() {
+		boolean dataUpdated = false;
+		ResponseItem responseItem = null;
+		try {
+			Requestor requestor = null;
+			IIdentity ownerId = Mockito.mock(IIdentity.class);
+			Mockito.when(ownerId.getIdentifier()).thenReturn("me@societies.local");
+			CtxIdentifier dataId = null;
+			List<Action> actions = null;
+			PrivacyOutcomeConstants permission = PrivacyOutcomeConstants.ALLOW;
+			if (null == privacyDataManagerInternal) {
+				log.info("privacyDataManagerInternal null");
+			}
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, ownerId, dataId, actions, permission);
+			responseItem = privacyDataManagerInternal.getPermission(requestor, ownerId, dataId);
+		} catch (PrivacyException e) {
+			log.info("PrivacyException", e);
+			e.printStackTrace();
+		}
+		assertTrue(dataUpdated);
 	}
 
 	/**

@@ -25,14 +25,28 @@
 package org.societies.privacytrust.privacyprotection.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyOutcomeConstants;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
 
 /**
  *
@@ -43,36 +57,111 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 @Table(name = "PrivacyPermission")
 public class PrivacyPermission implements Serializable {
 	private static final long serialVersionUID = -5745233622018708564L;
-	
+
 	@Id
 	@GeneratedValue
 	private Long id;
-//	private Requestor requestor;
+
+	private String requestorId;
+	@Enumerated
+	private PrivacyPolicyTypeConstants permissionType; 
+	@Basic(optional=true)
+	private String serviceId;
+	@Basic(optional=true)
+	private String cisId;
+
 	private String ownerId;
+
 	private String dataId;
-//	private List<Action> actions;
+
+	/**
+	 * Formatted: {actions: [{name: READ, optional: true}, ...]} 
+	 */
+	private String actions;
+
 	@Enumerated
 	private PrivacyOutcomeConstants permission;
-	
-	
 
-	
+
+
+
 	public PrivacyPermission() {
 		super();
 	}
 
 	/**
+	 * @param requestorId
+	 * @param permissionType
+	 * @param serviceId
+	 * @param cisId
 	 * @param ownerId
 	 * @param dataId
+	 * @param actions
 	 * @param permission
 	 */
-	public PrivacyPermission(String ownerId, String dataId,
+	public PrivacyPermission(String requestorId,
+			PrivacyPolicyTypeConstants permissionType, String serviceId,
+			String cisId, String ownerId, String dataId, String actions,
 			PrivacyOutcomeConstants permission) {
 		super();
+		this.requestorId = requestorId;
+		this.permissionType = permissionType;
+		this.serviceId = serviceId;
+		this.cisId = cisId;
 		this.ownerId = ownerId;
 		this.dataId = dataId;
+		this.actions = actions;
 		this.permission = permission;
 	}
+	/**
+	 * @param requestor
+	 * @param ownerId
+	 * @param dataId
+	 * @param actions
+	 * @param permission
+	 */
+	public PrivacyPermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, List<Action> actions, PrivacyOutcomeConstants permission) {
+		super();
+		if (requestor != null) {
+			this.requestorId = requestor.getRequestorId().getIdentifier();
+			if (requestor instanceof RequestorCis) {
+				this.permissionType = PrivacyPolicyTypeConstants.CIS;
+				this.serviceId = null;
+				this.cisId = ((RequestorCis) requestor).getCisRequestorId().getIdentifier();
+			}
+			else if (requestor instanceof RequestorService) {
+				this.permissionType = PrivacyPolicyTypeConstants.CIS;
+				this.serviceId = ((RequestorService) requestor).getRequestorServiceId().getServiceInstanceIdentifier();
+				this.cisId = null;
+			}
+		}
+		if (ownerId != null) {
+			this.ownerId = ownerId.getIdentifier();
+		}
+		if (dataId != null) {
+			this.dataId = dataId.toUriString();
+		}
+		this.actions = "{\"actions\":[";
+		if (null != actions) {
+			for(int i=0; i<actions.size(); i++) {
+				this.actions += "{\"name\": "+actions.get(i).getActionType().toString()+", \"optional\": "+actions.get(i).isOptional()+"}";
+				if (i != (actions.size()-1)) {
+					this.actions += ", ";
+				}
+			}
+		}
+		this.actions = "]}";
+		this.permission = permission;
+	}
+	/**
+	 * @param requestor
+	 * @param permission
+	 */
+	public PrivacyPermission(Requestor requestor, IIdentity ownerId, ResponseItem permission) {
+		this(requestor, ownerId, permission.getRequestItem().getResource().getCtxIdentifier(), permission.getRequestItem().getActions(), (permission.getDecision().equals(Decision.PERMIT) ? PrivacyOutcomeConstants.ALLOW : PrivacyOutcomeConstants.BLOCK));
+	}
+
+
 
 
 
@@ -89,7 +178,7 @@ public class PrivacyPermission implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
 	/**
 	 * @return the permission
 	 */
@@ -134,6 +223,104 @@ public class PrivacyPermission implements Serializable {
 	 */
 	public void setDataId(String dataId) {
 		this.dataId = dataId;
+	}
+
+	/**
+	 * @return the requestorId
+	 */
+	public String getRequestorId() {
+		return requestorId;
+	}
+
+	/**
+	 * @param requestorId the requestorId to set
+	 */
+	public void setRequestorId(String requestorId) {
+		this.requestorId = requestorId;
+	}
+
+	/**
+	 * @return the permissionType
+	 */
+	public PrivacyPolicyTypeConstants getPermissionType() {
+		return permissionType;
+	}
+
+	/**
+	 * @param permissionType the permissionType to set
+	 */
+	public void setPermissionType(PrivacyPolicyTypeConstants permissionType) {
+		this.permissionType = permissionType;
+	}
+
+	/**
+	 * @return the serviceId
+	 */
+	public String getServiceId() {
+		return serviceId;
+	}
+
+	/**
+	 * @param serviceId the serviceId to set
+	 */
+	public void setServiceId(String serviceId) {
+		this.serviceId = serviceId;
+	}
+
+	/**
+	 * @return the cisId
+	 */
+	public String getCisId() {
+		return cisId;
+	}
+
+	/**
+	 * @param cisId the cisId to set
+	 */
+	public void setCisId(String cisId) {
+		this.cisId = cisId;
+	}
+
+	/**
+	 * @return the actions
+	 */
+	public String getActions() {
+		return actions;
+	}
+
+	/**
+	 * @param actions the actions to set
+	 */
+	public void setActions(String actions) {
+		this.actions = actions;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "PrivacyPermission [id=" + id + ", requestorId=" + requestorId
+				+ ", permissionType=" + permissionType + ", serviceId="
+				+ serviceId + ", cisId=" + cisId + ", ownerId=" + ownerId
+				+ ", dataId=" + dataId + ", actions=" + actions
+				+ ", permission=" + permission + "]";
+	}
+
+	/**
+	 * @return
+	 */
+	public ResponseItem createResponseItem() {
+		Decision decision = Decision.DENY;
+		if (PrivacyOutcomeConstants.ALLOW.equals(permission)) {
+			decision = Decision.PERMIT;
+		}
+		// TODO
+		Resource resource = null;
+		List<Action> actions = new ArrayList<Action>();
+		RequestItem requestItem = new RequestItem(resource, actions, null);
+		ResponseItem reponseItem = new ResponseItem(requestItem, decision);
+		return reponseItem;
 	}
 
 

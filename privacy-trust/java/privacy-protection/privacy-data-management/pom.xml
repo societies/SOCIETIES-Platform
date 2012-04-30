@@ -72,12 +72,9 @@
 			<artifactId>api</artifactId>
 			<version>${version.pt}</version>
 		</dependency>
-<!-- 		<dependency>
-			<groupId>org.societies.privacytrust.privacyprotection</groupId>
-			<artifactId>privacypreferencemanagement</artifactId>
-			<version>${version.pt}</version>
-			<scope>provided</scope>
-		</dependency> -->
+		<!-- <dependency> <groupId>org.societies.privacytrust.privacyprotection</groupId> 
+			<artifactId>privacypreferencemanagement</artifactId> <version>${version.pt}</version> 
+			<scope>provided</scope> </dependency> -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
@@ -98,6 +95,12 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.test</artifactId>
 			<version>3.0.5.RELEASE</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.0</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- logging -->
@@ -193,13 +196,13 @@
 				<artifactId>maven-clean-plugin</artifactId>
 				<configuration>
 					<filesets>
-						<fileset> 
+						<fileset>
 							<!-- created after mvn test using the Derby DBMS -->
 							<directory>privacydb</directory>
 						</fileset>
 						<fileset>
 							<directory>.</directory>
-							<includes> 
+							<includes>
 								<!-- created after mvn test using the Derby DBMS -->
 								<include>derby.log</include>
 							</includes>
