@@ -32,6 +32,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
+import org.societies.api.internal.useragent.monitoring.UIMEvent;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.CSSEventConstants;
 import org.societies.api.osgi.event.EventListener;
@@ -94,6 +95,10 @@ public class UAMEventingTest extends EventListener{
 		Assert.assertEquals("newaction", event.geteventName());
 		Assert.assertEquals("org/societies/useragent/monitoring", event.geteventSource());
 		Assert.assertEquals(EventTypes.UIM_EVENT, event.geteventType());
+		
+		UIMEvent payload = (UIMEvent)event.geteventInfo();
+		Assert.assertEquals(identity, payload.getUserId());
+		Assert.assertEquals(action1, payload.getAction());
 	}
 
 
