@@ -158,6 +158,11 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	
 	private ArrayList<ArrayList<String>> refusedOrAmendedSuggestions;
     
+	private HashMap<String, String> recordedMetadata;
+	
+	private ArrayList<String> currentActionsMetadata;
+	private ArrayList<Integer> proposedActionsWithMetadata;
+	
 	/*
      * Constructor for SuggestedCommunityAnalyser
      * 
@@ -179,11 +184,15 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     public void initialiseSuggestedCommunityAnalyser() {
     	//getCommManager().register(this);
     	identityManager = commManager.getIdManager();
+    	recordedMetadata = new HashMap<String, String>();
     	new SuggestedCommunityAnalyser(linkedCss, "CSS");
     }
     
     public ArrayList<String> processEgocentricRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations, ArrayList<String> cissToCreateMetadata) {
     	//go straight to Community Recommender
+    	currentActionsMetadata = new ArrayList<String>();
+    	proposedActionsWithMetadata = new ArrayList<Integer>();
+    	
     	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
     	ArrayList<ICisRecord> creations = cisRecommendations.get("Create CISs");
     	if (creations == null)
@@ -247,6 +256,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     
     public ArrayList<String> processEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations, ArrayList<String> cissToCreateMetadata) {
     	//go straight to Community Recommender
+    	currentActionsMetadata = new ArrayList<String>();
+    	proposedActionsWithMetadata = new ArrayList<Integer>();
     	
     	return communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(cisRecommendations, cissToCreateMetadata);
     	
@@ -254,7 +265,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     
     public void processCSCWRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
     	
-    	
+    	currentActionsMetadata = new ArrayList<String>();
+    	proposedActionsWithMetadata = new ArrayList<Integer>();
     	
     	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
     	ArrayList<ICisRecord> creations = cisRecommendations.get("Create CISs");
@@ -394,6 +406,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     
     public void processCSCWConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
     	//go straight to Community Recommender
+    	currentActionsMetadata = new ArrayList<String>();
+    	proposedActionsWithMetadata = new ArrayList<Integer>();
     	
     	communityRecommender.identifyCisActionForCSCW(cisRecommendations);
     	
@@ -403,6 +417,9 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     
     @Override
     public void processCSMAnalyserRecommendations(ArrayList<IIdentity> cssList, ArrayList<CtxAttribute> sharedContextAttributes, ArrayList<CtxAssociation> sharedContextAssociations, ArrayList<ICssActivity> sharedCssActivities, ArrayList<IActivity> sharedCisActivities) {
+    	currentActionsMetadata = new ArrayList<String>();
+    	proposedActionsWithMetadata = new ArrayList<Integer>(); 
+    	
     	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
 		//ICisRecord proposedCis = cisManager.getBlankCisRecord();
     	ICisRecord proposedCis = cisManager.getCisList().get(0);
@@ -536,7 +553,14 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	    }*/
 	
 	    if (convertedRecommendations.size() != 0) {
-	    	ArrayList<String> actionMetadata = communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations);
+	    	currentActionsMetadata = communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations);
+	    	ArrayList<String> cisIds = new ArrayList<String>();
+	    	
+	        for (int i = 0; i < currentActionsMetadata.size(); i++) {
+	        	cisIds.add(currentActionsMetadata.get(i).split("---")[0].split("CIS ID: ")[1]);
+	        	if (recordedMetadata.get(cisIds.get(i)) == null)
+	        		recordedMetadata.put(cisIds.get(i), currentActionsMetadata.get(i));
+	        }
 	    }
     }
     
@@ -579,7 +603,29 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	HashMap<String, ArrayList<ArrayList<ICisRecord>>> finalisedCiss = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
     	for (int i = 0; i < proposedCiss.size(); i++) {
     		ICisRecord thisCis = proposedCiss.get(i);
-    		//for (int m = 0; m < thisCis.getMembershipCriteria(); m++) {
+    		boolean allAttributes = true;
+    		//for (int m = 0; m < thisCis.getMembershipCriteria().size(); m++) {
+    		    //if (thisCis.getMembershipCriteria.get(m) instanceof CtxAssociation)
+    		        //allAttributes = false;
+    		//}
+    		//if (allAttributes == true) {
+    		    //if (thisCis.getMembershipCriteria().get(m).getType().equals("address") {
+		            //if (thisCis.getMembershipCriteria().contains("friends")) {
+    		            //Put address as sub-CIS of friends CIS
+    		            //proposedActionsWithMetadata.add(i);
+    	            //}
+    		        //else
+    		            //Put address first, and other attributes as sub-CISs.
+    		    //        
+		        //}
+    		    //else {
+    		        //ArrayList<ArrayList<ICisRecord>> csmFeedback = new ArrayList<ArrayList<ICisRecord>();
+    		        //csmFeedback
+    		        //finalisedCiss.put("Remove from CSM", csmFeedback);
+    		        
+    	        //}
+    		//}
+    		//for (int m = 0; m < thisCis.getMembershipCriteria().size(); m++) {
     		    //if (thisCis.getMembershipCriteria.get(m) instanceof CtxAssociation) {
     		    //    CtxAssociation theCriteria = thisCis.getMembershipCriteria.get(m);
     		    //    if (theCriteria.getId().getType().equals("proximity")) {
