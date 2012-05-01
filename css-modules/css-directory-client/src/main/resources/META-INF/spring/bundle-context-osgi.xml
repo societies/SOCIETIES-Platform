@@ -12,6 +12,8 @@
        testing of the bundle outside of an OSGi container -->
 	
 	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
-	<osgi:service ref="cssDirectory" interface="org.societies.api.css.directory.ICssDirectory" />
+
+	<osgi:service ref="CssDirectoryRemote" interface="org.societies.api.css.directory.ICssDirectoryRemote" />
+	<osgi:reference id="CommManagerBundle" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" />
 	
 </beans>

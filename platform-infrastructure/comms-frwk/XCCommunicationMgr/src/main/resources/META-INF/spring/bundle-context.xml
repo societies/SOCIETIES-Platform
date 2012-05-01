@@ -20,6 +20,7 @@
                 <constructor-arg value="${host}"/>
                 <constructor-arg value="${subDomain}"/>
                 <constructor-arg value="${secretKey}"/>
+                <constructor-arg value="${daNode}"/>
         </bean>
         
         <bean id="cisCommMgrFactory" 
