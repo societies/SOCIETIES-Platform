@@ -41,18 +41,18 @@ public class TestCase747 extends IntegrationTestCase{
 	}
 
 	public void setCtxBroker(ICtxBroker ctxBroker){
-		TestCase747.ctxBroker = ctxBroker;
+		this.ctxBroker = ctxBroker;
 	}
 	
 	public void setUam(IUserActionMonitor uam){
-		TestCase747.uam = uam;
+		this.uam = uam;
 	}
 	
 	public void setEventMgr(IEventMgr eventMgr){
-		TestCase747.eventMgr = eventMgr;
+		this.eventMgr = eventMgr;
 	}
 	
-	protected static ICtxBroker getCtxBroker(){
+	/*protected static ICtxBroker getCtxBroker(){
 		return TestCase747.ctxBroker;
 	}
 	
@@ -62,5 +62,5 @@ public class TestCase747 extends IntegrationTestCase{
 	
 	protected static IEventMgr getEventMgr(){
 		return TestCase747.eventMgr;
-	}
+	}*/
 }
