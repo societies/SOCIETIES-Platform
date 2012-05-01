@@ -71,7 +71,7 @@ public class HelloWorld implements IHelloWorld, IActionConsumer{
 
 	@Override
 	public boolean setIAction(IIdentity userId, IAction action) {
-		System.out.println("Received action: "+action.toString());
+		log("Received action: "+action.toString());
 		if (action.getparameterName().equalsIgnoreCase("bgColour")){
 			this.colours.put(userId, action.getvalue());
 		}else if (action.getparameterName().equalsIgnoreCase("volume")){
@@ -82,6 +82,7 @@ public class HelloWorld implements IHelloWorld, IActionConsumer{
 	@Override
 	public void setBackgroundColour(IIdentity userId, String colour) {
 		IAction action = new Action(this.myServiceID, "HelloWorld", "bgColour", colour);
+		log("sending action to uam: "+action.toString());
 		this.uam.monitor(userId, action);
 	}
 	@Override
@@ -119,5 +120,7 @@ public class HelloWorld implements IHelloWorld, IActionConsumer{
 		return "";
 		
 	}
-
+	private void log(String msg){
+		System.out.println(this.getClass().getName()+": "+msg);
+	}
 }
