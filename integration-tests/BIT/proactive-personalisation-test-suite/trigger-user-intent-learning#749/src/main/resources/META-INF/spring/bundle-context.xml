@@ -26,7 +26,12 @@
 		<property name="mathServiceConsumer" ref ="mathServiceConsumer" />
   	</bean -->
 
-<context:component-scan base-package="org.societies.integration.test.bit.user_intent_learning"></context:component-scan>
-
+<!-- >context:component-scan base-package="org.societies.integration.test.bit.user_intent_learning"></context:component-scan-->
+	
+	<bean id="TestCase749" class="org.societies.integration.test.bit.user_intent_learning.TestCase749" init-method="run">
+		<property name="ctxBroker" ref ="ctxBroker" />
+		<property name="uam" ref="uam" />
+		
+  	</bean>
 
 </beans>

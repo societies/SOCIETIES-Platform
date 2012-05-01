@@ -3,12 +3,15 @@
 	targetNamespace="http://societies.org/api/internal/schema/privacytrust/privacyprotection/negotiation"
 	xmlns="http://societies.org/api/internal/schema/privacytrust/privacyprotection/negotiation"
 	xmlns:tns="http://societies.org/api/schema/servicelifecycle/model"
+	xmlns:ns1="http://societies.org/api/schema/identity"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 
 	<xs:import namespace="http://societies.org/api/schema/servicelifecycle/model"
 		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.servicelifecycle.model.xsd" />
-
+		
+	<xs:import namespace="http://societies.org/api/schema/identity" 
+		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.identity.xsd"/>
 	<xs:element name="negotiationAgentBean">
 		<xs:complexType>
 			<xs:sequence>
@@ -18,8 +21,8 @@
 					minOccurs="0" />
 				<xs:element name="responsePolicy" type="xs:base64Binary"
 					minOccurs="0" />
-				<xs:element name="serviceID" type="tns:serviceResourceIdentifier"
-					minOccurs="0" />
+				<xs:element name="requestor" type="ns1:RequestorBean" 
+					minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -47,5 +50,6 @@
 			<xs:enumeration value="negotiate" />
 		</xs:restriction>
 	</xs:simpleType>
+	
 </xs:schema>
 

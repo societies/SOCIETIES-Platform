@@ -24,8 +24,7 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection;
 
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-
+import org.societies.api.schema.identity.RequestorBean;
 
 
 /**
@@ -39,7 +38,7 @@ public class NegotiationAgentBean {
 	public enum negAgentMethodType {acknowledgeAgreement, getPolicy, getProviderIdentity,negotiate};
 	private negAgentMethodType method;
 	private byte[] agreementEnvelope;
-	private ServiceResourceIdentifier serviceID;
+	private RequestorBean requestor;
 	private byte[] responsePolicy;
 	
 	
@@ -49,17 +48,24 @@ public class NegotiationAgentBean {
 	public void setAgreementEnvelope(byte[] agreementEnvelope) {
 		this.agreementEnvelope = agreementEnvelope;
 	}
-	public ServiceResourceIdentifier getServiceID() {
-		return serviceID;
-	}
-	public void setServiceID(ServiceResourceIdentifier serviceID) {
-		this.serviceID = serviceID;
-	}
+
 	public byte[] getResponsePolicy() {
 		return responsePolicy;
 	}
 	public void setResponsePolicy(byte[] responsePolicy) {
 		this.responsePolicy = responsePolicy;
+	}
+	/**
+	 * @return the requestor
+	 */
+	public RequestorBean getRequestor() {
+		return requestor;
+	}
+	/**
+	 * @param requestor the requestor to set
+	 */
+	public void setRequestor(RequestorBean requestor) {
+		this.requestor = requestor;
 	}
 	public negAgentMethodType getMethod() {
 		return method;

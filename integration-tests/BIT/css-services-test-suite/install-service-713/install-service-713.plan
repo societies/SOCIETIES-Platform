@@ -18,7 +18,8 @@
 	<artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceRegistry"/>
 	<artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceManagement"/>
 	<artifact type="bundle" name="org.societies.slm.SLMCommsManager"/>
+
 	<artifact type="bundle" name="societies-webapp"/>
 
-	<artifact type="bundle" name="org.societies.integration.test.bit.installservice" />
+	<artifact type="bundle" name="org.societies.integration.test.bit.bit-713-installservice" />
 </plan>

@@ -52,6 +52,8 @@ import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.EventListener;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
@@ -82,6 +84,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 	private IIdentityManager idm;
 	private IDecisionMaker decisionMaker;
 	private ICommManager commsMgr;
+	private IEventMgr eventMgr;
 
 	// data structures
 	ArrayList<CtxAttributeIdentifier> dianneList;
@@ -118,8 +121,15 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 		this.decisionMaker = decisionMaker;
 		this.idm = this.getCommsMgr().getIdManager();
 		retrieveConfidenceLevels();
+		this.registerForUIMEvents();
+		
 		
 	}
+	private void registerForUIMEvents() {
+		this.getEventMgr().subscribeInternalEvent(this, new String[]{EventTypes.UIM_EVENT}, null);
+		
+	}
+
 	private void retrieveConfidenceLevels() {
 		try {
 			Future<List<CtxIdentifier>> futuredianneConf = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, "dianneConfidenceLevel");
@@ -184,6 +194,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 		this.cristList = new ArrayList<CtxAttributeIdentifier>();
 		System.out.println("Empty init. Yo!! I'm a brand new service and my interface is: "
 						+ this.getClass().getName());
+		this.registerForUIMEvents();
 		retrieveConfidenceLevels();
 	}
 
@@ -265,6 +276,20 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 	 */
 	public void setCommsMgr(ICommManager commsMgr) {
 		this.commsMgr = commsMgr;
+	}
+
+	/**
+	 * @return the eventMgr
+	 */
+	public IEventMgr getEventMgr() {
+		return eventMgr;
+	}
+
+	/**
+	 * @param eventMgr the eventMgr to set
+	 */
+	public void setEventMgr(IEventMgr eventMgr) {
+		this.eventMgr = eventMgr;
 	}
 
 	/*

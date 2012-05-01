@@ -22,13 +22,32 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.repo;
+package org.societies.privacytrust.trust.api.evidence.repo;
+
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 
 public interface ITrustEvidenceRepository {
 
 	/**
 	 * 
-	 * @param listener
+	 * @param evidence
+	 * @throws TrustEvidenceRepositoryException
 	 */
-	public void registerTrustEvidenceEventListener(TrustEvidenceEventListener listener);
+	public void addEvidence(final ITrustEvidence evidence) throws TrustEvidenceRepositoryException;
+	
+	/**
+	 * 
+	 * @param teid
+	 * @return
+	 * @throws TrustEvidenceRepositoryException
+	 */
+	public ITrustEvidence retrieveEvidence(final TrustedEntityId teid) throws TrustEvidenceRepositoryException;
+	
+	/**
+	 * 
+	 * @param teid
+	 * @throws TrustEvidenceRepositoryException
+	 */
+	public void removeEvidence(final TrustedEntityId teid) throws TrustEvidenceRepositoryException;
 }
