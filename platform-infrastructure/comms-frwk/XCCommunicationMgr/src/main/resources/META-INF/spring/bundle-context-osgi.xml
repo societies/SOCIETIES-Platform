@@ -13,7 +13,14 @@
        in a separate file if you do not want to. The rationale for 
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
-	<osgi:service ref="xcCommunication" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
+	<osgi:service ref="xcCommunication"> 
+		<osgi:interfaces>
+     	<value>org.societies.api.comm.xmpp.interfaces.ICommManager</value>
+     	<value>org.societies.api.internal.comm.ICommManagerController</value>
+  	</osgi:interfaces>
+	</osgi:service>
+	
+	
 	<osgi:service ref="cisCommMgrFactory" interface="org.societies.api.internal.comm.ICISCommunicationMgrFactory"/>
     <osgi-compendium:cm-properties id="componentConfig" persistent-id="xc">
     	<!-- Default values if none found -->

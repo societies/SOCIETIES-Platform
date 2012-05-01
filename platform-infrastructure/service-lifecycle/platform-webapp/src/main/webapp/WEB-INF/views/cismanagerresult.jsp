@@ -22,13 +22,12 @@
 <br/>
 <br/>
 <Table>
-<tr><td><B>ID</B></td><!--<td><B>Name</B></td><td><B>Owner</B></td>
-<!-- <td><B>Endpoint</B></td><td><B>Type</B></td> -->
-<!--<td><B>Status</B></td> --></tr>
+<tr><td><B>Name</B></td><td><B>ID</B></td></tr>
 
 	<xc:forEach var="record" items="${cisrecords}">
         <tr>
-        	<td>${record.getCisId()}</td>
+        	<td>${record.getName()}&nbsp;</td>
+        	<td>${record.getCisId()}&nbsp;</td>
         </tr>
     </xc:forEach>
     	

@@ -24,17 +24,13 @@
  */
 package org.societies.webapp.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Future;
 
 import javax.validation.Valid;
 
 import org.societies.webapp.models.CisFeedForm;
-import org.societies.webapp.models.ServiceDiscoveryForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -44,10 +40,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
-import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
-import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
-import org.societies.api.schema.servicelifecycle.model.Service;
-
 
 @Controller
 public class ActivityFeedController {

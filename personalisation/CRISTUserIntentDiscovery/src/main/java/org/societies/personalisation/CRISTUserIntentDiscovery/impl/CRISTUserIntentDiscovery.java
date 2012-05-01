@@ -33,6 +33,9 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 	ArrayList<MockHistoryData> historyList = new ArrayList<MockHistoryData>();
 	LinkedHashMap<String, Integer> intentModel = new LinkedHashMap<String, Integer>();
 
+	public CRISTUserIntentDiscovery(){
+		
+	}
 	public CRISTUserIntentDiscovery(ICRISTUserIntentTaskManager cristTaskManager){
 		this.setCristTaskManager(cristTaskManager);
 	}
