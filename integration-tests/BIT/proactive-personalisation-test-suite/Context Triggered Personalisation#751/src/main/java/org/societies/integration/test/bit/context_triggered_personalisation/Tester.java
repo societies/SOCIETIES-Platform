@@ -30,6 +30,7 @@ import java.util.concurrent.Future;
 
 import junit.framework.Assert;
 
+import org.junit.Before;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
@@ -62,16 +63,25 @@ public class Tester {
 	private CtxAttribute statusAttribute;
 	
 	public Tester(){
+
+	}
+	
+	@Before
+	public void setUp(){
+		try{
 		this.uam = Test751.getUam();
 		this.idm = Test751.getCommsMgr().getIdManager();
 		this.helloWorldService = Test751.getHelloWorld();
 		this.ctxBroker = Test751.getCtxBroker();
-		
-		setupContext();
-		
 		userId = idm.getThisNetworkNode();
-		
+		setupContext();
+		System.out.println("751SETUPCOMPLETE");
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+			
 	}
+	
 	
 	@org.junit.Test
 	public void Test(){

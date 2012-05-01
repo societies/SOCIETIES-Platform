@@ -56,8 +56,8 @@ public class Test751 extends IntegrationTestCase{
 	/**
 	 * @param ctxBroker the ctxBroker to set
 	 */
-	public static void setCtxBroker(ICtxBroker ctxBroker) {
-		Test751.ctxBroker = ctxBroker;
+	public  void setCtxBroker(ICtxBroker ctxBroker) {
+		this.ctxBroker = ctxBroker;
 	}
 
 	/**
@@ -70,8 +70,8 @@ public class Test751 extends IntegrationTestCase{
 	/**
 	 * @param uam the uam to set
 	 */
-	public static void setUam(IUserActionMonitor uam) {
-		Test751.uam = uam;
+	public void setUam(IUserActionMonitor uam) {
+		this.uam = uam;
 	}
 
 	/**
@@ -84,8 +84,8 @@ public class Test751 extends IntegrationTestCase{
 	/**
 	 * @param commsMgr the commsMgr to set
 	 */
-	public static void setCommsMgr(ICommManager commsMgr) {
-		Test751.commsMgr = commsMgr;
+	public void setCommsMgr(ICommManager commsMgr) {
+		this.commsMgr = commsMgr;
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class Test751 extends IntegrationTestCase{
 	/**
 	 * @param helloWorld the helloWorld to set
 	 */
-	public static void setHelloWorld(IHelloWorld helloWorld) {
-		Test751.helloWorld = helloWorld;
+	public void setHelloWorld(IHelloWorld helloWorld) {
+		this.helloWorld = helloWorld;
 	}
 }

@@ -35,7 +35,7 @@
 		<property name="HelloWorld" ref="HelloWorld"></property>
   	</bean>
   	
-  	<bean id="HelloWorld" class="org.societies.integration.test.bit.context_triggered_personalisation.HelloWorldService">
+  	<bean id="HelloWorld" class="org.societies.integration.test.bit.context_triggered_personalisation.HelloWorld">
   		<property name="uam" ref="uam"/>
   	</bean>
   	

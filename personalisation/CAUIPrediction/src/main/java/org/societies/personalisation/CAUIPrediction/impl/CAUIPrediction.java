@@ -125,11 +125,11 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 	// constructor
 	public void initialiseCAUIPrediction(){
-
+		registerForNewUiModelEvent();
 	}
 
 	public CAUIPrediction(){
-		registerForNewUiModelEvent();
+		
 	}
 
 	
