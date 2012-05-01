@@ -76,12 +76,12 @@ public class UAMEventingTest extends EventListener{
 
 		//register for local events
 		LOG.info("Monitor services #747 - Subscribing for local events of type UIM_Event");
-		String eventFilter = "(&" + 
+		/*String eventFilter = "(&" + 
 				"(" + CSSEventConstants.EVENT_NAME + "=newaction)" +
 				"(" + CSSEventConstants.EVENT_SOURCE + "=org/societies/useragent/monitoring)" +
-				")";
+				")";*/
 		try{
-			TestCase747.eventMgr.subscribeInternalEvent(this, new String[] {EventTypes.UIM_EVENT}, eventFilter);
+			TestCase747.eventMgr.subscribeInternalEvent(this, new String[] {EventTypes.UIM_EVENT}, null);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
