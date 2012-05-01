@@ -117,6 +117,12 @@
    			<version>${release.version}</version>
    			<type>apklib</type>
 		</dependency>
+		<dependency>
+   			<groupId>org.societies.android.platform</groupId>
+   			<artifactId>SocietiesCSSManager</artifactId>
+   			<version>${release.version}</version>
+   			<type>apklib</type>
+		</dependency>
 
     	<dependency>
     		<groupId>com.google.code.gson</groupId>
