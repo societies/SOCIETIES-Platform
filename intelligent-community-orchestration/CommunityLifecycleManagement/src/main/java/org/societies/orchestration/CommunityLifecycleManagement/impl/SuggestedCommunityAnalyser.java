@@ -77,6 +77,7 @@ import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxModelType;
@@ -574,8 +575,32 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		return conflictingPreferences;
     }
     
-    public HashMap<String, ArrayList<ArrayList<ICisRecord>>> advancedCisCreationAnalysis(ArrayList<ICisRecord> proposedCis) {
-    	return null;
+    public HashMap<String, ArrayList<ArrayList<ICisRecord>>> advancedCisCreationAnalysis(ArrayList<ICisRecord> proposedCiss) {
+    	HashMap<String, ArrayList<ArrayList<ICisRecord>>> finalisedCiss = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
+    	for (int i = 0; i < proposedCiss.size(); i++) {
+    		ICisRecord thisCis = proposedCiss.get(i);
+    		//for (int m = 0; m < thisCis.getMembershipCriteria(); m++) {
+    		    //if (thisCis.getMembershipCriteria.get(m) instanceof CtxAssociation) {
+    		    //    CtxAssociation theCriteria = thisCis.getMembershipCriteria.get(m);
+    		    //    if (theCriteria.getId().getType().equals("proximity")) {
+    		    //        //need access to proximity on other CSSs and
+    		              //timestamp on proximity associations
+    		    //    }
+    	
+    		    //}
+    		    //else if (thisCis.getMembershipCriteria.get(m) instanceof CtxAttribute) {
+		        //    CtxAttribute theCriteria = thisCis.getMembershipCriteria.get(m);
+    		    //    if (thisCis.getMembershipCriteria().get(m).getType().equals("address") {
+		        //        //if (thisCis.getMembershipCriteria().contains("friends"))
+    		                  //Put address as sub-CIS of friends CIS
+    		              //else
+    		                  //Put address first, and other attributes as sub-CISs.
+    		    //        
+		        //    }
+		        //}
+    		//}
+    	}
+    	return finalisedCiss;
     }
     
     public IIdentity getLinkedCss() {
