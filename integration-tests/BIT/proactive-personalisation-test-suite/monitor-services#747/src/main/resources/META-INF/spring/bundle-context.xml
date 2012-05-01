@@ -10,7 +10,8 @@
 		this file can easily be used for integration testing outside of an OSGi environment -->
 
 	
-	<bean id="TestCase747" class="org.societies.integration.test.bit.monitoring.TestCase747" init-method="run">
+	<bean id="TestCase747" class="org.societies.integration.test.bit.monitoring.TestCase747" 
+	    name="testCase747" depends-on="ctxBroker, uam, eventMgr" init-method="run">
 		<property name="ctxBroker" ref ="ctxBroker" />
 		<property name="uam" ref="uam" />
 		<property name="eventMgr" ref ="eventMgr" />
