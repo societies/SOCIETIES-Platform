@@ -49,13 +49,13 @@ import org.societies.api.useragent.monitoring.IUserActionMonitor;
 public class UAMEventingTest extends EventListener{
 
 	private static Logger LOG = LoggerFactory.getLogger(UAMEventingTest.class);
-	private static IUserActionMonitor uam;	
-	private static IEventMgr eventMgr;
+	//private static IUserActionMonitor uam;	
+	//private static IEventMgr eventMgr;
 	private InternalEvent event;
 
 	public void setUp(){
-		uam = TestCase747.getUam();
-		eventMgr = TestCase747.getEventMgr();
+		//uam = TestCase747.getUam();
+		//eventMgr = TestCase747.getEventMgr();
 		event = null;
 	}
 
@@ -81,17 +81,14 @@ public class UAMEventingTest extends EventListener{
 				"(" + CSSEventConstants.EVENT_SOURCE + "=org/societies/useragent/monitoring)" +
 				")";
 		try{
-			if(eventMgr == null){
-				LOG.error("EventMgr is null!!");
-			}
-			eventMgr.subscribeInternalEvent(this, new String[] {EventTypes.UIM_EVENT}, eventFilter);
+			TestCase747.eventMgr.subscribeInternalEvent(this, new String[] {EventTypes.UIM_EVENT}, eventFilter);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 
 		//send action
 		LOG.info("Monitor services #747 - sending mock action to trigger UAM event");
-		uam.monitor(identity, action1);
+		TestCase747.uam.monitor(identity, action1);
 
 		//10 second timeout
 		int counter = 10;
