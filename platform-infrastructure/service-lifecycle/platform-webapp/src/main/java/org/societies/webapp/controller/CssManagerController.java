@@ -224,11 +224,27 @@ public class CssManagerController {
 			if (loginResult == null) {
 				// No CssRecord we eed to create one
 				loginResult = getCssLocalManager().registerCSS(loginRecord);
+				
+				// If there was no cssRecord, there was no css advertisement record
+				 CssAdvertisementRecord cssAdvert = new CssAdvertisementRecord();
+				 cssAdvert.setId(cmLoginForm.getCssIdentity());
+				 cssAdvert.setName(" ");
+				 cssAdvert.setUri(" ");
+				 getCssLocalManager().addAdvertisementRecord(cssAdvert);
+				
 				model.put("message", "created Css Record");
 			} else {
 				if (((CssInterfaceResult) loginResult.get()).isResultStatus() == false) {
 					// No CssRecord we eed to create one
 					loginResult = getCssLocalManager().registerCSS(loginRecord);
+					
+					// If there was no cssRecord, there was no css advertisement record
+					 CssAdvertisementRecord cssAdvert = new CssAdvertisementRecord();
+					 cssAdvert.setId(cmLoginForm.getCssIdentity());
+					 cssAdvert.setName(" ");
+					 cssAdvert.setUri(" ");
+					getCssLocalManager().addAdvertisementRecord(cssAdvert);
+					
 					model.put("message", "created Css Record");
 				} else {
 					cssDetails = loginResult.get();
