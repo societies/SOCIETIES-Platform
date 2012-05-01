@@ -36,6 +36,8 @@ import java.util.concurrent.Future;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
@@ -54,6 +56,7 @@ import org.societies.api.useragent.monitoring.IUserActionMonitor;
 
 public class ContextStorageTest {
 
+	private static Logger LOG = LoggerFactory.getLogger(ContextStorageTest.class);
 	private static IUserActionMonitor uam;
 	private static ICtxBroker ctxBroker;
 
@@ -64,6 +67,7 @@ public class ContextStorageTest {
 
 	@Test
 	public void test() {
+		LOG.info("Monitor services #747 - Running ContextStorageTest....");
 		//create actions
 		IIdentity identity = new MockIdentity(IdentityType.CSS, "sarah", "societies.org");
 		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
@@ -83,6 +87,7 @@ public class ContextStorageTest {
 		IAction action5 = new Action(serviceId2, "testService", "colour", "green");
 
 		//send actions
+		LOG.info("Monitor services #747 - sending mock actions for storage");
 		uam.monitor(identity, action1);
 		uam.monitor(identity, action2);
 		uam.monitor(identity, action3);
