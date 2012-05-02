@@ -26,6 +26,7 @@ package org.societies.privacytrust.privacyprotection.datamanagement;
 
 import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -35,10 +36,13 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.model.PrivacyPermission;
 
@@ -51,7 +55,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	private SessionFactory sessionFactory;
 
 	public PrivacyDataManagerInternal() {
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -60,16 +64,39 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	@Override
 	public ResponseItem getPermission(Requestor requestor, IIdentity ownerId,
 			CtxIdentifier dataId) throws PrivacyException {
+		// Check Dependency injection
+		if (!isDepencyInjectionDone()) {
+			throw new PrivacyException("[Dependency Injection] Data Storage Manager not ready");
+		}
+
 		Session session = sessionFactory.openSession();
 		ResponseItem permission = null;
 		Transaction t = session.beginTransaction();
 		try {
-			PrivacyPermission privacyPermission = (PrivacyPermission) session
+			// -- Retrieve the privacy permission
+			Criteria criteria = session
 					.createCriteria(PrivacyPermission.class)
+					.add(Restrictions.eq("requestorId", requestor.getRequestorId().getIdentifier()))
 					.add(Restrictions.eq("ownerId", ownerId.getIdentifier()))
-					.uniqueResult();
-				log.info(privacyPermission.toString());
-				permission = privacyPermission.createResponseItem();
+					.add(Restrictions.eq("dataId", dataId.toUriString()));
+			if (requestor instanceof RequestorCis) {
+				criteria.add(Restrictions.eq("cisId", ((RequestorCis) requestor).getCisRequestorId().getIdentifier()));
+			}
+			else if (requestor instanceof RequestorService) {
+				criteria.add(Restrictions.eq("serviceId", ((RequestorService) requestor).getRequestorServiceId().getIdentifier()));
+			}
+			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.uniqueResult();
+
+
+			// -- Generate the response item
+			// - Privacy Permission doesn't exist
+			if (null == privacyPermission) {
+				log.debug("PrivacyPermission not available");
+				return null;
+			}
+			// - Privacy permission retrieved
+			log.info(privacyPermission.toString());
+			permission = privacyPermission.createResponseItem();
 			log.debug("PrivacyPermission retrieved.");
 		} catch (Exception e) {
 			t.rollback();
@@ -87,14 +114,49 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	 */
 	@Override
 	public boolean updatePermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, List<Action> actions, Decision permission) throws PrivacyException {
+		// Check Dependency injection
+		if (!isDepencyInjectionDone()) {
+			throw new PrivacyException("[Dependency Injection] Data Storage Manager not ready");
+		}
+
 		Session session = sessionFactory.openSession();
-		PrivacyPermission privacyPermissionEntry = null;
+		boolean result = false;
 		Transaction t = session.beginTransaction();
 		try {
-			privacyPermissionEntry = new PrivacyPermission(requestor, ownerId, dataId, actions, permission); 
-			session.save(privacyPermissionEntry);
+			// -- Retrieve the privacy permission
+			Criteria criteria = session
+					.createCriteria(PrivacyPermission.class)
+					.add(Restrictions.eq("requestorId", requestor.getRequestorId().getIdentifier()))
+					.add(Restrictions.eq("ownerId", ownerId.getIdentifier()))
+					.add(Restrictions.eq("dataId", dataId.toUriString()));
+			if (requestor instanceof RequestorCis) {
+				criteria.add(Restrictions.eq("cisId", ((RequestorCis) requestor).getCisRequestorId().getIdentifier()));
+			}
+			else if (requestor instanceof RequestorService) {
+				criteria.add(Restrictions.eq("serviceId", ((RequestorService) requestor).getRequestorServiceId().getIdentifier()));
+			}
+			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.uniqueResult();
+
+
+			// -- Update this privacy permission
+			// - Privacy Permission doesn't exist: create a new one
+			if (null == privacyPermission) {
+				log.debug("PrivacyPermission not available");
+				privacyPermission = new PrivacyPermission(requestor, ownerId, dataId, actions, permission);
+			}
+			// - Privacy permission already exists: update it
+			else {
+				privacyPermission.setRequestor(requestor);
+				privacyPermission.setOwnerId(ownerId);
+				privacyPermission.setDataId(dataId);
+				privacyPermission.setActions(actions);
+				privacyPermission.setPermission(permission);
+			}
+			// - Update
+			session.save(privacyPermission);
 			t.commit();
 			log.debug("PrivacyPermission saved.");
+			result = true;
 		} catch (Exception e) {
 			t.rollback();
 			throw new PrivacyException("Error during the persistance of the privacy permission", e);
@@ -103,7 +165,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 				session.close();
 			}
 		}
-		return true;
+		return result;
 	}
 
 	/* (non-Javadoc)
@@ -112,14 +174,48 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	@Override
 	public boolean updatePermission(Requestor requestor, IIdentity ownerId, ResponseItem permission)
 			throws PrivacyException {
+		// Check Dependency injection
+		if (!isDepencyInjectionDone()) {
+			throw new PrivacyException("[Dependency Injection] Data Storage Manager not ready");
+		}
+
+		// Manage persistency
 		Session session = sessionFactory.openSession();
-		PrivacyPermission privacyPermissionEntry = null;
+		boolean result = false;
 		Transaction t = session.beginTransaction();
 		try {
-			privacyPermissionEntry = new PrivacyPermission(requestor, ownerId, permission); 
-			session.save(privacyPermissionEntry);
+			// -- Retrieve the privacy permission
+			Criteria criteria = session
+					.createCriteria(PrivacyPermission.class)
+					.add(Restrictions.eq("requestorId", requestor.getRequestorId().getIdentifier()))
+					.add(Restrictions.eq("ownerId", ownerId.getIdentifier()))
+					.add(Restrictions.eq("dataId", permission.getRequestItem().getResource().getCtxIdentifier().toUriString()));
+			if (requestor instanceof RequestorCis) {
+				criteria.add(Restrictions.eq("cisId", ((RequestorCis) requestor).getCisRequestorId().getIdentifier()));
+			}
+			else if (requestor instanceof RequestorService) {
+				criteria.add(Restrictions.eq("serviceId", ((RequestorService) requestor).getRequestorServiceId().getIdentifier()));
+			}
+			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.uniqueResult();
+
+
+			// -- Update this privacy permission
+			// - Privacy Permission doesn't exist: create a new one
+			if (null == privacyPermission) {
+				log.debug("PrivacyPermission not available");
+				privacyPermission = new PrivacyPermission(requestor, ownerId, permission);
+			}
+			// - Privacy permission already exists: update it
+			else {
+				privacyPermission.setRequestor(requestor);
+				privacyPermission.setOwnerId(ownerId);
+				privacyPermission.setResponseItem(permission);
+			}
+			// - Update
+			session.save(privacyPermission);
 			t.commit();
 			log.debug("PrivacyPermission saved.");
+			result = true;
 		} catch (Exception e) {
 			t.rollback();
 			throw new PrivacyException("Error during the persistance of the privacy permission", e);
@@ -128,7 +224,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 				session.close();
 			}
 		}
-		return true;
+		return result;
 	}
 
 	/* (non-Javadoc)
@@ -137,11 +233,53 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	@Override
 	public boolean deletePermission(Requestor requestor, IIdentity ownerId,
 			CtxIdentifier dataId) throws PrivacyException {
-		// TODO Auto-generated method stub
-		return false;
+		// Check Dependency injection
+		if (!isDepencyInjectionDone()) {
+			throw new PrivacyException("[Dependency Injection] Data Storage Manager not ready");
+		}
+
+		Session session = sessionFactory.openSession();
+		boolean result = false;
+		Transaction t = session.beginTransaction();
+		try {
+			// -- Retrieve the privacy permission
+			Criteria criteria = session
+					.createCriteria(PrivacyPermission.class)
+					.add(Restrictions.eq("requestorId", requestor.getRequestorId().getIdentifier()))
+					.add(Restrictions.eq("ownerId", ownerId.getIdentifier()))
+					.add(Restrictions.eq("dataId", dataId.toUriString()));
+			if (requestor instanceof RequestorCis) {
+				criteria.add(Restrictions.eq("cisId", ((RequestorCis) requestor).getCisRequestorId().getIdentifier()));
+			}
+			else if (requestor instanceof RequestorService) {
+				criteria.add(Restrictions.eq("serviceId", ((RequestorService) requestor).getRequestorServiceId().getIdentifier()));
+			}
+			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.uniqueResult();
+
+			// -- Delete the privacy permission
+			// - Privacy Permission doesn't exist
+			if (null == privacyPermission) {
+				log.debug("PrivacyPermission not available: no need to delete");
+			}
+			// - Privacy permission retrieved: delete it
+			else {
+				log.info(privacyPermission.toString());
+				session.delete(privacyPermission);
+				log.debug("PrivacyPermission deleted.");
+			}
+			result = true;
+		} catch (Exception e) {
+			t.rollback();
+			throw new PrivacyException("Error during the removal of the privacy permission", e);
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		return result;
 	}
-	
-	
+
+
 	// --- Dependency Injection
 	public SessionFactory getSessionFactory() {
 		return sessionFactory;
@@ -149,6 +287,17 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		log.info("sessionFactory injected");
 		this.sessionFactory = sessionFactory;
+	}
+
+	private boolean isDepencyInjectionDone() {
+		return isDepencyInjectionDone(0);
+	}
+	private boolean isDepencyInjectionDone(int level) {
+		boolean result = true;
+		if (null == sessionFactory) {
+			result = false;
+		}
+		return result;
 	}
 
 }

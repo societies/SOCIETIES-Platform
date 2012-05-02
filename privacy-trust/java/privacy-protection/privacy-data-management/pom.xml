@@ -72,6 +72,12 @@
 			<artifactId>api</artifactId>
 			<version>${version.pt}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.1</version>
+			<scope>compile</scope>
+		</dependency>
 		<!-- <dependency> <groupId>org.societies.privacytrust.privacyprotection</groupId> 
 			<artifactId>privacypreferencemanagement</artifactId> <version>${version.pt}</version> 
 			<scope>provided</scope> </dependency> -->
