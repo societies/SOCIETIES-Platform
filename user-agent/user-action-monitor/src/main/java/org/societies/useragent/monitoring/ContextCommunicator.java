@@ -68,8 +68,11 @@ public class ContextCommunicator {
 			//update attribute
 			CtxAttributeIdentifier attrID = mappings.get(key);
 			try {
-				ctxBroker.updateAttribute(attrID, action);
+				ctxBroker.updateAttribute(attrID, SerialisationHelper.serialise(action));
 			} catch (CtxException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}else{
