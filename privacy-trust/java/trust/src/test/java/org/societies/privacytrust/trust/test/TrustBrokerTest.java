@@ -34,6 +34,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
@@ -48,6 +49,7 @@ import org.societies.privacytrust.trust.impl.repo.model.TrustedService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Test cases for the TrustBroker
@@ -55,10 +57,11 @@ import org.springframework.test.context.junit4.AbstractTransactionalJUnit4Spring
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.7
  */
+@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:META-INF/spring/test-context.xml"})
 public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTests {
 	
-private static final String TRUSTOR_ID = "aFooTrustorIIdentity";
+	private static final String TRUSTOR_ID = "aFooTrustorIIdentity";
 	
 	private static final String TRUSTED_CSS_ID = "aFooCssIIdentity";
 	
