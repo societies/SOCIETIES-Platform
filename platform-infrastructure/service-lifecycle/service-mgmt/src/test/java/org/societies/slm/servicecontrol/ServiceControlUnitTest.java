@@ -39,6 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Version;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
@@ -77,7 +78,7 @@ public class ServiceControlUnitTest {
 	private String hostJid;
 	private String remoteJid;
 	private Service testService;
-	private Service filterService;
+	private Service filter;
 	private ServiceResourceIdentifier testServiceId;
 	private ServiceResourceIdentifier otherServiceId;
 
@@ -130,6 +131,31 @@ public class ServiceControlUnitTest {
 				
 		testUrl = new URL("http://www.testurl.com/teststuff.jar");
 		
+		filter = new Service();
+		filter.setAuthorSignature(null);
+		filter.setServiceDescription(null);
+		filter.setServiceEndpoint(null);
+		filter.setServiceLocation(null);
+		filter.setServiceName(null);
+		filter.setServiceType(null);
+		filter.setServiceStatus(null);
+		
+		ServiceResourceIdentifier filterIdentifier = new ServiceResourceIdentifier();
+		filterIdentifier.setIdentifier(null);
+		filterIdentifier.setServiceInstanceIdentifier(String.valueOf(999));
+		filter.setServiceIdentifier(filterIdentifier);
+		
+		ServiceInstance filterInstance = new ServiceInstance();
+		filterInstance.setFullJid(null);
+		filterInstance.setXMPPNode(null);
+		
+		ServiceImplementation filterImplementation = new ServiceImplementation();
+		filterImplementation.setServiceNameSpace(null);
+		filterImplementation.setServiceProvider(null);
+		filterImplementation.setServiceVersion("1.0.2");
+		filterInstance.setServiceImpl(filterImplementation);
+		filter.setServiceInstance(filterInstance);
+		
 		fakeServiceRemote = new FakeServiceRemote();
 		
 		// Now we create the class under test
@@ -139,7 +165,8 @@ public class ServiceControlUnitTest {
 		classUnderTest.setCommMngr(mockedCommManager);
 		classUnderTest.setBundleContext(mockedBundleContext);
 		
-
+		
+		
 	}
 
 	/**
@@ -474,10 +501,14 @@ public class ServiceControlUnitTest {
 
 			stub(mockedBundleContext.installBundle(testUrl.toString())).toReturn(mockedBundle);
 			stub(mockedBundle.getState()).toReturn(Bundle.ACTIVE);
-			Service filter = new Service();
-			List<Service> serviceList = new ArrayList<Service>();
-			serviceList.add(testService);
-			stub(mockedServiceReg.findServices(filter)).toReturn(serviceList);
+			stub(mockedBundle.getSymbolicName()).toReturn("mockedBundle");
+			Version version = new Version("1.0.2");
+			stub(mockedBundle.getVersion()).toReturn(version);
+			stub(mockedBundle.getBundleId()).toReturn(new Long(999));
+			List<Service> serviceTestList = new ArrayList<Service>();
+			serviceTestList.add(testService);
+			System.out.println(serviceTestList.size());
+			stub(mockedServiceReg.findServices(filter)).toReturn(serviceTestList);
 			
 			Future<ServiceControlResult> futureResult;
 			ServiceControlResult result;
@@ -503,7 +534,8 @@ public class ServiceControlUnitTest {
 
 			stub(mockedBundleContext.installBundle(testUrl.toString())).toReturn(mockedBundle);
 			stub(mockedBundle.getState()).toReturn(Bundle.RESOLVED);
-			
+			Version version = new Version("1.0.2");
+			stub(mockedBundle.getVersion()).toReturn(version);
 			Future<ServiceControlResult> futureResult;
 			ServiceControlResult result;
 			
@@ -528,9 +560,13 @@ public class ServiceControlUnitTest {
 			
 			stub(mockedCommManager.getIdManager()).toReturn(mockedIdentityManager);
 			stub(mockedCommManager.getIdManager().getThisNetworkNode()).toReturn(mockedHost);
+			stub(mockedIdentityManager.getThisNetworkNode()).toReturn(mockedHost);
 			stub(mockedHost.getJid()).toReturn(hostJid);
 			stub(mockedCommManager.getIdManager().getThisNetworkNode().getJid()).toReturn(hostJid);
 			stub(mockedNode.getJid()).toReturn(remoteJid);
+			Version version = new Version("1.0.2");
+			stub(mockedBundle.getVersion()).toReturn(version);
+			
 			Service filter = new Service();
 			List<Service> serviceList = new ArrayList<Service>();
 			serviceList.add(testService);
@@ -563,6 +599,8 @@ public class ServiceControlUnitTest {
 			stub(mockedCommManager.getIdManager().getThisNetworkNode().getJid()).toReturn(hostJid);
 			stub(mockedNode.getJid()).toReturn(remoteJid);
 			stub(mockedCommManager.getIdManager().fromJid(remoteJid)).toReturn(mockedNode);
+			Version version = new Version("1.0.2");
+			stub(mockedBundle.getVersion()).toReturn(version);
 			Service filter = new Service();
 			List<Service> serviceList = new ArrayList<Service>();
 			serviceList.add(testService);
@@ -737,7 +775,7 @@ public class ServiceControlUnitTest {
 				IIdentity node, IServiceControlCallback callback) {
 			
 			ServiceControlResult result = new ServiceControlResult();
-			result.
+			result.setServiceId(serviceId);
 			result.setMessage(ResultMessage.SUCCESS);
 			callback.setResult(result);
 			
@@ -748,6 +786,7 @@ public class ServiceControlUnitTest {
 				IIdentity node, IServiceControlCallback callback) {
 			
 			ServiceControlResult result = new ServiceControlResult();
+			result.setServiceId(serviceId);
 			result.setMessage(ResultMessage.SUCCESS);
 			callback.setResult(result);
 			
@@ -768,6 +807,7 @@ public class ServiceControlUnitTest {
 				IIdentity node, IServiceControlCallback callback) {
 			
 			ServiceControlResult result = new ServiceControlResult();
+			result.setServiceId(serviceId);
 			result.setMessage(ResultMessage.SUCCESS);
 			callback.setResult(result);
 			

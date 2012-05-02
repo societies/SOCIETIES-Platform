@@ -414,7 +414,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				
 			} else
 			{
-				if(logger.isDebugEnabled()) logger.debug("It's the local node, installing...");
+				if(logger.isDebugEnabled())
+					logger.debug("It's the local node, installing...");
+				
 				Future<ServiceControlResult> asyncResult = null;
 				
 				asyncResult = installService(bundleLocation);
@@ -653,9 +655,12 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		filterInstance.setServiceImpl(filterImplementation);
 		filter.setServiceInstance(filterInstance);
 		
+		logger.info("filter: " + filter.getServiceIdentifier().getServiceInstanceIdentifier());
+		
 		List<Service> listServices;
 		try {
 			listServices = getServiceReg().findServices(filter);
+			logger.info("list: " + listServices.size());
 		} catch (ServiceRetrieveException e) {
 			logger.error("Exception while searching for services:" + e.getMessage());
 			e.printStackTrace();
