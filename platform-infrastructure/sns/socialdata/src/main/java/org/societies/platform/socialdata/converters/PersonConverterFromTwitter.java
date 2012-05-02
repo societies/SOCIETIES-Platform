@@ -1,14 +1,22 @@
 package org.societies.platform.socialdata.converters;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.shindig.social.core.model.AccountImpl;
 import org.apache.shindig.social.core.model.AddressImpl;
+import org.apache.shindig.social.core.model.ListFieldImpl;
+import org.apache.shindig.social.core.model.NameImpl;
 import org.apache.shindig.social.core.model.PersonImpl;
 import org.apache.shindig.social.opensocial.model.Account;
 import org.apache.shindig.social.opensocial.model.Address;
+import org.apache.shindig.social.opensocial.model.ListField;
 import org.apache.shindig.social.opensocial.model.Person;
+import org.apache.shindig.social.opensocial.model.Person.Gender;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,7 +35,10 @@ public class PersonConverterFromTwitter implements PersonConverter {
 	public static String STATUSES_COUNT	= "statuses_count";
 	public static String DESCRIPTION	= "description";
 	public static String TIMEZONE		= "time_zone";
-	
+	public static String BIRTHDAY		= "birthday";
+	public static String EMAIL			= "email";
+	public static String GENDER 		= "gender";
+
 	public static String STATUS 		= "status";
 	public static String COORDINATES	= "coordinates";
 	public static String TEXT			= "text";
@@ -35,42 +46,45 @@ public class PersonConverterFromTwitter implements PersonConverter {
 	public static String GEO			= "geo";
 	public static String RETWEETED		= "retweeted";
 	public static String TWEET_ID		= "id";
-	
-	
+
+
 	private String     rawData;
 	private JSONObject db;
 	private Person 	   person;
-	@Override
+
 	public Person load(String data){
-		
+
 		person = new PersonImpl();
 		this.rawData = data;
-		
+
 		try{
 			db = new JSONObject(data);
 			person.setId(db.getString(ID));
+			//			System.out.println("id: "+db.getString(ID));
 			//if(db.has(UCT)) person.setUtcOffset(db.getLong(UCT));
-			if (db.has(NAME))			person.setNickname(db.getString(NAME));
+			if (db.has(NAME))			person.setName(new NameImpl(db.getString(NAME)));
+			if (db.has(NAME))			person.setDisplayName(db.getString(SCREEN_NAME));
 			if (db.has(DESCRIPTION))	person.setAboutMe(db.getString(DESCRIPTION));
 			if (db.has(LOCATION))		person.setCurrentLocation(setLocation(db.getString(LOCATION)));
-			if (db.has(SCREEN_NAME))	person.setDisplayName(db.getString(SCREEN_NAME));
-			if (db.has(SCREEN_NAME))	person.setDisplayName(db.getString(SCREEN_NAME));
-			
-			
+//			if (db.has(EMAIL))			person.setEmails(getMails(db.getString(EMAIL)));
+//			if (db.has(BIRTHDAY))		person.setBirthday(getBirthDay(db.getString(BIRTHDAY)));
+//			if (db.has(GENDER))			person.setGender(gender(db.getString(GENDER)));
+
 		}
 		catch (JSONException e) {
 			e.printStackTrace();
 		}
-		
+
 		setAccount();  // Set Twitter Account
 		person.setLanguagesSpoken(genLanguages());
+		//		System.out.println("profile:\n"+person.getTurnOns().toString());
 		return person;
 	}
-	
-	
-	
+
+
+
 	private List<String> genLanguages(){
-		
+
 		ArrayList<String> langs = new ArrayList<String>();
 		try {
 			if(!db.has(LANGUAGE)) 
@@ -90,26 +104,25 @@ public class PersonConverterFromTwitter implements PersonConverter {
 		catch (JSONException e) {
 			e.printStackTrace();
 		}
-		
+
 		//Add the twitter account
 		List<Account> accounts = new ArrayList<Account>();
 		accounts.add(account);
 		person.setAccounts(accounts);
 	}
-	
+
 	private Address setLocation(String data) {
 		Address address = new AddressImpl();
 		try{
-			
-			JSONObject loc = new JSONObject(data);
-			address.setFormatted(loc.getString("name"));
-		
+
+			address.setFormatted(data);
+
 		}
 		catch(Exception ex){}
-		
+
 		return address;
 	}
-	
+
 	public Object getData(String key){
 		try {
 			if (db.has(key)){
@@ -121,7 +134,7 @@ public class PersonConverterFromTwitter implements PersonConverter {
 		return null;
 
 	}
-	
+
 	public String getString(String key){
 		try {
 			if (db.has(key)){
@@ -133,9 +146,37 @@ public class PersonConverterFromTwitter implements PersonConverter {
 		return "";
 
 	}
-	
+
 	public String getRawData(){
 		return rawData;
 	}
 
+	private List<ListField> getMails(String mail){
+
+		List<ListField> emails = new ArrayList<ListField>();
+		ListField email = new ListFieldImpl();
+		email.setPrimary(true);
+		email.setType("home");
+		email.setValue(mail);
+		emails.add(email);
+		return emails;
+	}
+
+	private Gender gender(String g){
+		if (g.equals("male"))
+			return Gender.male;
+		else
+			return Gender.female;
+	}
+
+	private Date getBirthDay(String date) {
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			return df.parse(date);
+		} catch (ParseException e) {
+
+		}
+		return null;
+
+	}
 }

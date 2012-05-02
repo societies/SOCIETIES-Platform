@@ -13,6 +13,7 @@ class Test{
 		testProfileExtraction(t);
 		testFriendsExtraction(t);
 		testFollowersExtraction(t);
+		testTweetsExtraction(t);
 	}
 		
 	public static void testProfileExtraction(TwitterConnector t){
@@ -41,6 +42,16 @@ class Test{
 		else
 		System.out.println(r);
 	}
+	
+	public static void testTweetsExtraction(TwitterConnector t){
+		String r = null;
+		r = t.getUserActivities();
+		if(r==null)
+			System.out.println("user profile = null");
+		else
+		System.out.println(r);
+	}
+	
 	
 	
 }

@@ -1,12 +1,14 @@
 package org.societies.platform.TwitterConnector.impl;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.scribe.model.*;
 import org.scribe.oauth.*;
+import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.platform.TwitterConnector.*;
 import org.societies.platform.TwitterConnector.model.TwitterToken;
 
@@ -15,15 +17,21 @@ import org.societies.platform.TwitterConnector.model.TwitterToken;
  */
 public class TwitterConnectorImpl implements TwitterConnector{
 
-	private TwitterToken twToken = null;
-	private OAuthService service;
+	private TwitterToken 	twToken = null;
+	private OAuthService 	service;
+	private String 			name;
+	private String 			id;
+	private String			lastUpdate   = "yesterday";
 
 	public TwitterConnectorImpl(){
-		this.twToken = new TwitterToken();
-		this.service = twToken.getAuthService();
+		this.twToken 		= new TwitterToken();
+		this.service 		= twToken.getAuthService();
+		this.name 			= ISocialConnector.TWITTER_CONN;
+		this.id				= this.name + "_" + UUID.randomUUID();
+
 	}
 
-	
+
 	public String getUserProfile(){
 		OAuthRequest request = new OAuthRequest(Verb.GET, ACCOUNT_VERIFICATION);
 		this.service.signRequest(twToken.getAccessToken(), request);
@@ -42,8 +50,8 @@ public class TwitterConnectorImpl implements TwitterConnector{
 		else
 			return null;
 	}
-	
-	
+
+
 	public String getUserFriends(){
 		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FRIENDS_URL);
 		this.service.signRequest(twToken.getAccessToken(), request);
@@ -57,13 +65,28 @@ public class TwitterConnectorImpl implements TwitterConnector{
 			e.printStackTrace();
 		}
 		JSONObject res=(JSONObject)obj;
+		JSONArray friendsIDList = (JSONArray) res.get("ids");
+		JSONArray friendsList = new JSONArray();
+		JSONObject other = null;
+		JSONObject friends = new JSONObject();
+		
+		for(int i=0;i<friendsIDList.size();i++){
+			//			System.out.println(friendsIDList.get(i).toString());
+			other = getOtherProfileJson(friendsIDList.get(i).toString());
+			//			System.out.println(other);
+			if (!other.toJSONString().contains("No user matches for specified terms"))
+				friendsList.add(other);
+		}
+
+		friends.put("friends", friendsList);
 		if(res!=null)
-			return res.toJSONString();
+			//			return res.toJSONString();
+			return friends.toString();
 		else
 			return null;
 	}
 
-	
+
 	public String getUserFollowers(){
 		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FOLLOWERS_URL);
 		this.service.signRequest(twToken.getAccessToken(), request);
@@ -77,15 +100,31 @@ public class TwitterConnectorImpl implements TwitterConnector{
 			e.printStackTrace();
 		}
 		JSONObject res=(JSONObject)obj;
+		JSONArray followersIDList = (JSONArray) res.get("ids");
+		JSONArray followersList = new JSONArray();
+		JSONObject other = null;
+		JSONObject followers = new JSONObject();
+		
+		for(int i=0;i<followersIDList.size();i++){
+			//			System.out.println(friendsIDList.get(i).toString());
+			other = getOtherProfileJson(followersIDList.get(i).toString());
+			//			System.out.println(other);
+			if (!other.toJSONString().contains("No user matches for specified terms"))
+				followersList.add(other);
+		}
+
+		followers.put("friends", followersList);
 		if(res!=null)
-			return res.toJSONString();
-		else 
+			//			return res.toJSONString();
+			return followers.toString();
+		else
 			return null;
+
 	}
 
-	
-	public String getOtherProfile(String id){
-		OAuthRequest request = new OAuthRequest(Verb.GET, GET_OTHER_PROFILE_URL);
+
+	public String getOtherProfileString(String id){
+		OAuthRequest request = new OAuthRequest(Verb.GET, GET_OTHER_PROFILE_URL+id);
 		this.service.signRequest(twToken.getAccessToken(), request);
 		Response response = request.send();
 		JSONParser parser=new JSONParser();
@@ -96,162 +135,131 @@ public class TwitterConnectorImpl implements TwitterConnector{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		JSONObject res=(JSONObject)obj;
+		JSONArray res = (JSONArray) obj;
 		if(res!=null)
-			return res.toJSONString();
+			return res.get(0).toString();
 		else 
 			return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getID()
-	 */
-	
-	public String getID() {
-		// TODO Auto-generated method stub
-		return null;
+	public JSONObject getOtherProfileJson(String id){
+		OAuthRequest request = new OAuthRequest(Verb.GET, GET_OTHER_PROFILE_URL+id);
+		this.service.signRequest(twToken.getAccessToken(), request);
+		Response response = request.send();
+		JSONParser parser=new JSONParser();
+		Object obj=null;
+		try {
+			obj = parser.parse(response.getBody());
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		JSONArray res = (JSONArray) obj;
+		if(res!=null)
+			return (JSONObject) res.get(0);
+		else 
+			return null;
 	}
 
+/*
+ * Activities in Twitter is defined as tweets
+ * @see org.societies.api.internal.sns.ISocialConnector#getUserActivities()
+ */
+	public String getUserActivities() {
+		OAuthRequest request = new OAuthRequest(Verb.GET, GET_TWEETS_URL);
+		this.service.signRequest(twToken.getAccessToken(), request);
+		Response response = request.send();
+		JSONParser parser=new JSONParser();
+		Object obj=null;
+		try {
+			obj = parser.parse(response.getBody());
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		JSONArray res = (JSONArray) obj;
+//		System.out.println(res.toString());
+		if(res!=null)
+			return res.toString();
+		else 
+			return null;
+	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#setToken(java.lang.String)
-	 */
-	
+	public String getID() {
+		return this.id;
+	}
+
+	public String getLastUpdate() {
+		return lastUpdate;
+	}
+
+	public void setLastUpdate(String lastUpdate) {
+		this.lastUpdate = lastUpdate;
+	}
+
 	public void setToken(String access_token) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#setTokenExpiration(long)
-	 */
-	
 	public void setTokenExpiration(long expires) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getTokenExpiration()
-	 */
-	
 	public long getTokenExpiration() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getToken()
-	 */
-	
 	public String getToken() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#setConnectorName(java.lang.String)
-	 */
-	
 	public void setConnectorName(String name) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getConnectorName()
-	 */
-	
 	public String getConnectorName() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getSocialData(java.lang.String)
-	 */
-	
 	public String getSocialData(String path) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#requireAccessToken()
-	 */
-	
 	public Map<String, String> requireAccessToken() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#disconnect()
-	 */
-	
 	public void disconnect() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#setMaxPostLimit(int)
-	 */
-	
 	public void setMaxPostLimit(int postLimit) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#setParameter(java.lang.String, java.lang.String)
-	 */
-	
 	public void setParameter(String key, String value) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#resetParameters()
-	 */
-	
 	public void resetParameters() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getUserActivities()
-	 */
-	
-	public String getUserActivities() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getUserGroups()
-	 */
-	
 	public String getUserGroups() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-
 
 }
