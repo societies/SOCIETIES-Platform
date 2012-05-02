@@ -1,4 +1,4 @@
-package org.societies.cis.activity;
+package org.societies.activity;
 
 import java.util.Set;
 
@@ -15,12 +15,12 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.activity.model.Activity;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
-import org.societies.cis.activity.model.Activity;
 
 @Entity
-@Table(name = "org_societies_cis_activity_ActivityFeed")
+@Table(name = "org_societies_activity_ActivityFeed")
 public class ActivityFeed implements IActivityFeed {
 	@Id
 	private String id;
@@ -98,5 +98,13 @@ public class ActivityFeed implements IActivityFeed {
 	public void setList(Set<Activity> list) {
 		this.list = list;
 	}
-
+	public void init()
+	{
+		log.info("in activityfeed init");
+	}
+	
+	public void close()
+	{
+		
+	}
 }
