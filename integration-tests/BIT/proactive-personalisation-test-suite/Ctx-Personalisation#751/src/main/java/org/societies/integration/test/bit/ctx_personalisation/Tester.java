@@ -31,6 +31,8 @@ import java.util.concurrent.Future;
 import junit.framework.Assert;
 
 import org.junit.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
@@ -61,7 +63,8 @@ public class Tester {
 	private CtxEntity person;
 	private CtxAttribute symLocAttribute;
 	private CtxAttribute statusAttribute;
-	
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
+
 	public Tester(){
 
 	}
@@ -75,7 +78,8 @@ public class Tester {
 		this.ctxBroker = Test751.getCtxBroker();
 		userId = idm.getThisNetworkNode();
 		setupContext();
-		System.out.println("751SETUPCOMPLETE");
+		
+		logging.debug("751SETUPCOMPLETE");
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -119,7 +123,7 @@ public class Tester {
 			
 			this.statusAttribute.setStringValue(statusValue);
 			this.statusAttribute = (CtxAttribute) this.ctxBroker.update(statusAttribute).get();
-			System.out.println("changeContext("+symLocValue+", "+statusValue+");");
+			logging.debug("changeContext("+symLocValue+", "+statusValue+");");
 
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
@@ -235,7 +239,7 @@ public class Tester {
 	
 	
 	private void log(String msg){
-		System.out.println(this.getClass().getName()+": "+msg);
+		logging.debug(this.getClass().getName()+": "+msg);
 	}
 	/*
 	private List<IIdentity> identities = new ArrayList<IIdentity>();
@@ -290,7 +294,7 @@ public class Tester {
 	public static void main(String[] args){
 		try {
 			URI uri = new URI("css://eliza@societies.org");
-			System.out.println(uri.toString());
+			logging.debug(uri.toString());
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

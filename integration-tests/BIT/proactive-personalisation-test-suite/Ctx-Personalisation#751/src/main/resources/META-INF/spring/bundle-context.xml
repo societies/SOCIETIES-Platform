@@ -28,14 +28,14 @@
 
 <!-- >context:component-scan base-package="org.societies.integration.test.bit.user_intent_learning"></context:component-scan-->
 	
-	<bean id="TestCase751" class="org.societies.integration.test.bit.context_triggered_personalisation.Test751" init-method="run">
+	<bean id="TestCase751" class="org.societies.integration.test.bit.ctx_personalisation.Test751" init-method="run">
 		<property name="ctxBroker" ref ="ctxBroker" />
 		<property name="uam" ref="uam" />
 		<property name="commsMgr" ref="commsMgr"/>
 		<property name="HelloWorld" ref="HelloWorld"></property>
   	</bean>
   	
-  	<bean id="HelloWorld" class="org.societies.integration.test.bit.context_triggered_personalisation.HelloWorld">
+  	<bean id="HelloWorld" class="org.societies.integration.test.bit.ctx_personalisation.HelloWorld">
   		<property name="uam" ref="uam"/>
   	</bean>
   	
