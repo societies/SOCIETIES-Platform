@@ -22,45 +22,49 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.privacytrust.privacyprotection.privacynegotiation.test;
 
-package org.societies.integration.test.bit.monitoring;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.personalisation.preference.IUserPreferenceManagement;
 import org.societies.api.osgi.event.IEventMgr;
-import org.societies.api.useragent.monitoring.IUserActionMonitor;
-import org.societies.integration.test.IntegrationTestCase;
+import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 
-public class TestCase747 extends IntegrationTestCase{
-	
-	public static ICtxBroker ctxBroker;
-	public static IUserActionMonitor uam;
-	public static IEventMgr eventMgr;
+/**
+ * Describe your class here...
+ *
+ * @author Eliza
+ *
+ */
+public class PrivacyNegotiationTest {
 
-	public TestCase747(){
-		super(747, new Class[]{ContextStorageTest.class, UAMEventingTest.class, UIDUpdateTest.class});
-	}
+	private IUserPreferenceManagement prefMgr;
+	private ICtxBroker ctxBroker;
+	private IEventMgr eventMgr;
+	private IPrivacyPreferenceManager privacyPreferenceManager;
 
-	public void setCtxBroker(ICtxBroker ctxBroker){
-		this.ctxBroker = ctxBroker;
+
+	@Before
+	public void setUp(){
+		
 	}
 	
-	public void setUam(IUserActionMonitor uam){
-		this.uam = uam;
+	@Test
+	public void testGetProviderPolicy(){
+		
 	}
 	
-	public void setEventMgr(IEventMgr eventMgr){
-		this.eventMgr = eventMgr;
+	@Test
+	public void testNegotiate(){
+		
+	}
+	@Test
+	public void testAcknowledgeAgreement(){
+		
 	}
 	
-	/*protected static ICtxBroker getCtxBroker(){
-		return TestCase747.ctxBroker;
-	}
 	
-	protected static IUserActionMonitor getUam(){
-		return TestCase747.uam;
-	}
 	
-	protected static IEventMgr getEventMgr(){
-		return TestCase747.eventMgr;
-	}*/
+	
 }

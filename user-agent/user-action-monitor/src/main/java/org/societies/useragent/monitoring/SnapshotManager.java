@@ -79,12 +79,15 @@ public class SnapshotManager {
 				Future<List<CtxIdentifier>> futureAttrIds = ctxBroker.lookup(CtxModelType.ATTRIBUTE, registryName);
 				List<CtxIdentifier> attrIds = futureAttrIds.get();
 				CtxAttributeIdentifier attrId = (CtxAttributeIdentifier)attrIds.get(0);
-				ctxBroker.updateAttribute(attrId, snpshtRegistry);
+				ctxBroker.updateAttribute(attrId, SerialisationHelper.serialise(snpshtRegistry));
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (ExecutionException e) {
 				e.printStackTrace();
 			} catch (CtxException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

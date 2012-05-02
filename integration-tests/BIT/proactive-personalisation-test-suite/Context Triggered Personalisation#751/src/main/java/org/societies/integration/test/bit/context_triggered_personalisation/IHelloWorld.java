@@ -22,45 +22,20 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.integration.test.bit.context_triggered_personalisation;
 
-package org.societies.integration.test.bit.monitoring;
+import org.societies.api.identity.IIdentity;
 
-import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.osgi.event.IEventMgr;
-import org.societies.api.useragent.monitoring.IUserActionMonitor;
-import org.societies.integration.test.IntegrationTestCase;
+/**
+ * Describe your class here...
+ *
+ * @author Eliza
+ *
+ */
+public interface IHelloWorld {
 
-public class TestCase747 extends IntegrationTestCase{
-	
-	public static ICtxBroker ctxBroker;
-	public static IUserActionMonitor uam;
-	public static IEventMgr eventMgr;
-
-	public TestCase747(){
-		super(747, new Class[]{ContextStorageTest.class, UAMEventingTest.class, UIDUpdateTest.class});
-	}
-
-	public void setCtxBroker(ICtxBroker ctxBroker){
-		this.ctxBroker = ctxBroker;
-	}
-	
-	public void setUam(IUserActionMonitor uam){
-		this.uam = uam;
-	}
-	
-	public void setEventMgr(IEventMgr eventMgr){
-		this.eventMgr = eventMgr;
-	}
-	
-	/*protected static ICtxBroker getCtxBroker(){
-		return TestCase747.ctxBroker;
-	}
-	
-	protected static IUserActionMonitor getUam(){
-		return TestCase747.uam;
-	}
-	
-	protected static IEventMgr getEventMgr(){
-		return TestCase747.eventMgr;
-	}*/
+	public void setBackgroundColour(IIdentity userId, String colour);
+	public void setVolume(IIdentity userId, String volume);
+	public String getBackgroundColour(IIdentity userId);
+	public String getVolume(IIdentity userId);
 }
