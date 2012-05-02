@@ -46,18 +46,19 @@ public abstract class IntegrationTestCase {
 	/**
 	 * Number of the test case on Redmine
 	 */
-	public static int testCaseNumber;
+	public final Integer testCaseNumber ;
 	/**
 	 * Test case classes to launch on Virgo for this integration test case
 	 */
-	public Class testCaseClasses[];
+	public final Class testCaseClasses[];
 	
 	/**
-	 * This constructor has to be extended in order
-	 * to specify the test case number
+	 * This constructor specifies the test case number
 	 * and the array of test case classes to run
 	 */
-	public IntegrationTestCase() {
+	public IntegrationTestCase(int testCaseNumber, Class... testCaseClasses) {
+		this.testCaseNumber = testCaseNumber;
+		this.testCaseClasses = testCaseClasses;
 		integrationTestUtils = new IntegrationTestUtils();
 	}
 	

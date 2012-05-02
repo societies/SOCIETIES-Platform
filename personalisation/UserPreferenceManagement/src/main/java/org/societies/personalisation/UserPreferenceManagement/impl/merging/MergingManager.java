@@ -52,11 +52,11 @@ import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 import org.societies.api.osgi.event.EventListener;
 
-public class MergingManager extends EventListener implements IC45Consumer{
+public class MergingManager implements IC45Consumer{
 
 
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
-	private Hashtable<IIdentity,Hashtable<IAction, Integer>> counters;
+	private Hashtable<IIdentity,Hashtable<IAction, Integer>> counters = new Hashtable<IIdentity,Hashtable<IAction, Integer>>();;
 
 	private UserPreferenceManagement prefImpl;
 
@@ -64,24 +64,12 @@ public class MergingManager extends EventListener implements IC45Consumer{
 
 
 	private IC45Learning c45Learning;
-	private final IEventMgr eventMgr;
 	
-	public MergingManager(IC45Learning c45Learning, UserPreferenceManagement prefImpl, UserPreferenceConditionMonitor pcm, IEventMgr eventMgr){
+	public MergingManager(IC45Learning c45Learning, UserPreferenceManagement prefImpl, UserPreferenceConditionMonitor pcm){
 		this.c45Learning = c45Learning;
 		this.prefImpl = prefImpl;
 		this.pcm = pcm;
-		this.eventMgr = eventMgr;
 	}
-
-	public void initialise(){
-		
-		this.counters = new Hashtable<IIdentity,Hashtable<IAction, Integer>>();
-		this.eventMgr.subscribeInternalEvent(this, new String[]{EventTypes.UIM_EVENT}, "");
-		//this.eventMgr.registerListener(this, new String[]{PSSEventTypes.UIM_USERACTION_EVENT}, null);
-		//this.eventMgr.registerListener(this, new String[]{PSSEventTypes.PROACTIVITY_FEEDBACK}, null);
-		logging.debug("**********************"+this.getClass()+"Initialised **********************");    	
-	}
-
 
 
 
@@ -178,7 +166,7 @@ public class MergingManager extends EventListener implements IC45Consumer{
 	}
 
 
-	private void processActionReceived(IAction action, IIdentity userId){
+	public void processActionReceived(IIdentity userId, IAction action){
 		if (this.counters.containsKey(userId)){
 			logging.debug(this.getClass().getName()+"hashtable for identity: "+userId.toString()+" exists");
 			Hashtable<IAction, Integer> tempTable = counters.get(userId);
@@ -225,21 +213,6 @@ public class MergingManager extends EventListener implements IC45Consumer{
 			table.put(action, new Integer(0));
 			this.counters.put(userId, table);
 		}
-	}
-
-	@Override
-	public void handleExternalEvent(CSSEvent event) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void handleInternalEvent(InternalEvent event) {
-		if (event.geteventType().equalsIgnoreCase(EventTypes.UIM_EVENT)){
-			UIMEvent uimEvent = (UIMEvent) event.geteventInfo();
-			this.processActionReceived(uimEvent.getAction(), uimEvent.getUserId());
-		}
-		
 	}
 
 	/*

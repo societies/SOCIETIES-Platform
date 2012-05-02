@@ -108,7 +108,9 @@ public class Action implements IAction, Serializable{
 
 
 	public String toString(){
-		return this.parameterName+"="+this.value;
+		return "ServiceID: "+this.serviceID.getServiceInstanceIdentifier()+
+				"\n"+"ServiceType: "+this.serviceType+
+				"\n"+this.parameterName+" = "+this.value;
 	}
 	
 	public boolean equals(IAction po){

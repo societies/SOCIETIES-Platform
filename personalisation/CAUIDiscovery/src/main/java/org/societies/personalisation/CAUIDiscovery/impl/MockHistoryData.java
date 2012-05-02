@@ -1,23 +1,28 @@
 package org.societies.personalisation.CAUIDiscovery.impl;
 
-import java.util.List;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MockHistoryData {
 
-	String context;
+	Map<String,Serializable> context = new HashMap<String,Serializable>();
+	String contextValue = "";
+
+	String parameterName;
 	String actionValue;
-	
-	public MockHistoryData(String action, String context){
-		this.actionValue = action;
+
+	public MockHistoryData(String parameterName,String actionValue, Map<String,Serializable> context){
+		this.parameterName = parameterName;
+		this.actionValue = actionValue;
 		this.context = context;
 	}
 
-	
-	public String getContext() {
+	public Map<String,Serializable> getContext() {
 		return context;
 	}
 
-	public void setContext(String context) {
+	public void setContext(Map<String,Serializable> context) {
 		this.context = context;
 	}
 
@@ -29,8 +34,36 @@ public class MockHistoryData {
 		this.actionValue = actionValue;
 	}
 
+	public String getParameterName() {
+		return parameterName;
+	}
+
+
+	public void setParameterName(String parameterName) {
+		this.parameterName = parameterName;
+	}
+
+
+	public String getContextValue(String type) {
+		if(context.containsKey(type)){
+			Serializable valueSerial = context.get(type);
+			if (valueSerial instanceof String) {
+				String value = (String) valueSerial;	
+				contextValue = value;
+			}
+		}
+		return contextValue;
+	}
+
+
+	public void setSymLoc() {
+		
+	}
+
+
+
 	public String toString(){
-		String string = this.actionValue+" "+this.context;
+		String string = this.parameterName+" "+this.actionValue+" "+this.context;
 		return string; 
 	}
 }

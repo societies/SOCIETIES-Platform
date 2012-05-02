@@ -30,6 +30,9 @@ import org.osgi.service.event.EventConstants;
  * @author pkuppuud
  *
  */
+/**
+ * MISSING_ANNOTATION
+ */
 public interface IEventMgr {
 
 	/**
@@ -41,7 +44,7 @@ public interface IEventMgr {
 	 */
 	public void subscribeInternalEvent(EventListener listener, String[] eventTypes, String filterOption);
 	/**
-	 * To unSubscribe a listerner for events
+	 * To unSubscribe a listener for internal events
 	 * @param listener
 	 * @param eventTypes
 	 * @param filterOption

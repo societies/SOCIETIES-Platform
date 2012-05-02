@@ -25,25 +25,35 @@
 
 package org.societies.useragent.monitoring;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.useragent.monitoring.IInternalUserActionMonitor;
-import org.societies.api.internal.useragent.monitoring.IUserActionListener;
+import org.societies.api.internal.useragent.monitoring.UIMEvent;
+import org.societies.api.osgi.event.EMSException;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 
-public class UserActionMonitor implements IUserActionMonitor, IInternalUserActionMonitor{
+public class UserActionMonitor implements IUserActionMonitor{
 
+	private static Logger LOG = LoggerFactory.getLogger(UserActionMonitor.class);
 	private boolean cloud;
 	private ICtxBroker ctxBroker;
+	private IEventMgr eventMgr;
 	private ContextCommunicator ctxComm;
 
 	@Override
 	public void monitor(IIdentity owner, IAction action) {
-		System.out.println("Received user action!");
+		LOG.info("UAM - Received user action!");
+		LOG.info("action ServiceId: "+action.getServiceID().toString());
+		LOG.info("action serviceType: "+action.getServiceType());
+		LOG.info("action parameterName: "+action.getparameterName());
+		LOG.info("action value: "+action.getvalue());
 
-		//save action in context - IIdentity > ServiceId > paramName
+		//save action in context - IIdentity (Person) > ServiceId > paramName
 		//create new entities and attributes if necessary
 		ctxComm.updateHistory(owner, action);
 
@@ -51,31 +61,40 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 		if(!cloud){
 			ctxComm.updateUID(owner);
 		}
+
+		//send local event
+		UIMEvent payload = new UIMEvent(owner, action);
+		InternalEvent event = new InternalEvent(EventTypes.UIM_EVENT, "newaction", "org/societies/useragent/monitoring", payload);
+		try {
+			eventMgr.publishInternalEvent(event);
+		} catch (EMSException e) {
+			e.printStackTrace();
+		}
 	}
-
-	@Override
-	public void registerForActionUpdates(IUserActionListener listener) {
-		// TODO Auto-generated method stub	
-	}
-
-
 
 	public void initialiseUserActionMonitor(){
 		System.out.println("Initialising user action monitor!");
 		ctxComm = new ContextCommunicator(ctxBroker);
 
 		//Set cloud flag - get device type from Identity Manager (speak to Alec)
+		//TODO
 	}
 
 	public void setCtxBroker(ICtxBroker broker){
 		this.ctxBroker = broker;
 	}
 
-
+	public void setEventMgr(IEventMgr eventMgr){
+		this.eventMgr = eventMgr;
+	}
+	
+/*
 	@Deprecated
 	public void monitor(ServiceResourceIdentifier arg0, IIdentity arg1,
 			String arg2) {
-		// TODO Auto-generated method stub
-
 	}
+	
+	@Deprecated
+	public void registerForActionUpdates(IUserActionListener listener) {
+	}*/
 }

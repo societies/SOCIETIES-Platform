@@ -83,8 +83,8 @@ import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisSubscribed;
 import org.societies.api.cis.management.ICisEditor;
-import org.societies.api.cis.management.ICisActivity;
-import org.societies.api.cis.management.ICisActivityFeed;
+import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeed;
 //import org.societies.api.cis.management.ICis;
 
 
@@ -125,7 +125,7 @@ public class CommunityRecommenderTest {
 		ArrayList<ICisRecord> oneSuggestion = new ArrayList<ICisRecord>();
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
-    	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, null);
+    	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
     	
 		//Assert.assertNull(cisManager.getCisList(new ICisRecord(null, null, null, null, null, members, null, null, null)));
 	}
@@ -148,7 +148,7 @@ public class CommunityRecommenderTest {
 		ArrayList<ICisRecord> oneSuggestion = new ArrayList<ICisRecord>();
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
-    	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, null);
+    	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
     	
 		//Assert.assertNull(cisManager.getCisList(new ICisRecord(null, null, null, null, null, members, null, null, null)));
 	}
@@ -171,7 +171,7 @@ public class CommunityRecommenderTest {
 		ArrayList<ICisRecord> oneSuggestion = new ArrayList<ICisRecord>();
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
-    	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, null);
+    	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
     	
 		//Assert.assertNull(cisManager.getCisList(new ICisRecord(null, null, null, null, null, members, null, null, null)));
 	}
@@ -194,7 +194,7 @@ public class CommunityRecommenderTest {
 		ArrayList<ICisRecord> oneSuggestion = new ArrayList<ICisRecord>();
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
-    	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, null);
+    	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
     	
 		//Assert.assertNull(cisManager.getCisList(new ICisRecord(null, null, null, null, null, members, null, null, null)));
 	}
@@ -217,7 +217,7 @@ public class CommunityRecommenderTest {
 		ArrayList<ICisRecord> oneSuggestion = new ArrayList<ICisRecord>();
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
-    	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, null);
+    	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
     	
 		//Assert.assertNull(cisManager.getCisList(new ICisRecord(null, null, null, null, null, members, null, null, null)));
 	}
@@ -240,7 +240,7 @@ public class CommunityRecommenderTest {
 		ArrayList<ICisRecord> oneSuggestion = new ArrayList<ICisRecord>();
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
-    	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, null);
+    	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
     	
 		//Assert.assertNull(cisManager.getCisList(new ICisRecord(null, null, null, null, null, members, null, null, null)));
 	}
@@ -263,7 +263,7 @@ public class CommunityRecommenderTest {
 		ArrayList<ICisRecord> oneSuggestion = new ArrayList<ICisRecord>();
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
-    	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, null);
+    	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
     	
 		//Assert.assertNull(cisManager.getCisList(new ICisRecord(null, null, null, null, null, members, null, null, null)));
 	}
@@ -286,7 +286,7 @@ public class CommunityRecommenderTest {
 		ArrayList<ICisRecord> oneSuggestion = new ArrayList<ICisRecord>();
 		theSuggestions.add(oneSuggestion);
     	suggestions.put("Create CISs", theSuggestions);
-    	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, null);
+    	communityRecommender.identifyCisActionForEgocentricCommunityAnalyser(suggestions, new ArrayList<String>());
     	
 		//Assert.assertNull(cisManager.getCisList(new ICisRecord(null, null, null, null, null, members, null, null, null)));
 	}

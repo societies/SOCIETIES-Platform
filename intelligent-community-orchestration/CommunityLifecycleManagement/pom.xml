@@ -30,7 +30,7 @@
 	</dependency>
 
     <dependency>
-	<groupId>org.societies.orchestration</groupId>
+	<groupId>org.societies.orchestration.api</groupId>
 	<artifactId>intelligent-community-orchestration-api</artifactId>
 	<version>${version.ico}</version>
 	<scope>provided</scope>

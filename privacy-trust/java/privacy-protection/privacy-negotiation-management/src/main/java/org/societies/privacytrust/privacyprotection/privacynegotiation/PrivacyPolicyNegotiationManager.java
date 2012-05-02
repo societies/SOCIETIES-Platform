@@ -1,0 +1,401 @@
+/**
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
+ * conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package org.societies.privacytrust.privacyprotection.privacynegotiation;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+import javax.swing.JOptionPane;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.identity.IIdentitySelection;
+import org.societies.api.internal.personalisation.preference.IUserPreferenceManagement;
+import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.osgi.event.CSSEvent;
+import org.societies.api.osgi.event.EventListener;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManagerInternal;
+import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
+import org.societies.privacytrust.privacyprotection.api.IPrivacyPolicyNegotiationManager;
+import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.FailedNegotiationEvent;
+import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client.NegotiationClient;
+import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.provider.PrivacyPolicyRegistryManager;
+import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.provider.PolicyRetriever;
+
+
+public class PrivacyPolicyNegotiationManager extends EventListener implements IPrivacyPolicyNegotiationManager {
+	
+	//private NegotiationClient negClient;
+	private PrivacyPolicyRegistryManager privacyPolicyRegMgr;
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
+	private IIdentity myPublicDPI;
+	private PolicyRetriever servicePolicyRetriever;
+	private Hashtable<Requestor, NegotiationClient> negClients ;
+	private LocalServiceStartedListener localServiceStartedListener; 
+	
+	private IUserPreferenceManagement prefMgr;
+
+	private ICtxBroker ctxBroker;
+	
+	private IEventMgr eventMgr;
+	private IPrivacyPreferenceManager privacyPreferenceManager;
+	//ICommManager!
+	private IIdentityManager idm;
+	
+	private IPolicyAgreementManagerInternal policyAgreementMgr;
+	private IPrivacyDataManagerInternal privacyDataManager;
+	
+	private INegotiationAgent negotiationAgent;
+	
+	private IIdentitySelection identitySelection;
+	
+	/**
+	 * @return the prefMgr
+	 */
+	public IUserPreferenceManagement getPrefMgr() {
+		return prefMgr;
+	}
+	/**
+	 * @param prefMgr the prefMgr to set
+	 */
+	public void setPrefMgr(IUserPreferenceManagement prefMgr) {
+		this.prefMgr = prefMgr;
+	}
+
+	public PrivacyPolicyRegistryManager getPrivacyPolicyRegMgr(){
+		return this.privacyPolicyRegMgr;
+	}
+	
+
+	/**
+	 * @param privacyPolicyRegMgr the privacyPolicyRegMgr to set
+	 */
+	public void setPrivacyPolicyRegMgr(PrivacyPolicyRegistryManager privacyPolicyRegMgr) {
+		this.privacyPolicyRegMgr = privacyPolicyRegMgr;
+	}
+	public IPrivacyPreferenceManager getPrivacyPreferenceManager() {
+		// TODO Auto-generated method stub
+		return privacyPreferenceManager;
+	}
+    /**
+	 * @param privacyPreferenceManager the privacyPreferenceManager to set
+	 */
+	public void setPrivacyPreferenceManager(IPrivacyPreferenceManager privacyPreferenceManager) {
+		this.privacyPreferenceManager = privacyPreferenceManager;
+	}
+	/**
+	 * @return the idm
+	 */
+	public IIdentityManager getIdm() {
+		return idm;
+	}
+	/**
+	 * @param idm the idm to set
+	 */
+	public void setIdm(IIdentityManager idm) {
+		this.idm = idm;
+	}
+	/**
+	 * @return the ctxBroker
+	 */
+	public ICtxBroker getCtxBroker() {
+		return ctxBroker;
+	}
+	/**
+	 * @param ctxBroker the ctxBroker to set
+	 */
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		this.ctxBroker = ctxBroker;
+	}
+	/**
+	 * @return the eventMgr
+	 */
+	public IEventMgr getEventMgr() {
+		return eventMgr;
+	}
+	/**
+	 * @param eventMgr the eventMgr to set
+	 */
+	public void setEventMgr(IEventMgr eventMgr) {
+		this.eventMgr = eventMgr;
+	}
+	/**
+	 * @return the policyAgreementMgr
+	 */
+	public IPolicyAgreementManagerInternal getPolicyAgreementMgr() {
+		return policyAgreementMgr;
+	}
+	/**
+	 * @param policyAgreementMgr the policyAgreementMgr to set
+	 */
+	public void setPolicyAgreementMgr(IPolicyAgreementManagerInternal policyAgreementMgr) {
+		this.policyAgreementMgr = policyAgreementMgr;
+	}
+	/**
+	 * @return the privacyDataManager
+	 */
+	public IPrivacyDataManagerInternal getPrivacyDataManager() {
+		return privacyDataManager;
+	}
+	/**
+	 * @param privacyDataManager the privacyDataManager to set
+	 */
+	public void setPrivacyDataManager(IPrivacyDataManagerInternal privacyDataManager) {
+		this.privacyDataManager = privacyDataManager;
+	}
+	/**
+	 * @return the negotiationAgent
+	 */
+	public INegotiationAgent getNegotiationAgent() {
+		return negotiationAgent;
+	}
+	/**
+	 * @param negotiationAgent the negotiationAgent to set
+	 */
+	public void setNegotiationAgent(INegotiationAgent negotiationAgent) {
+		this.negotiationAgent = negotiationAgent;
+	}
+	/**
+	 * @return the identitySelection
+	 */
+	public IIdentitySelection getIdentitySelection() {
+		return identitySelection;
+	}
+	/**
+	 * @param identitySelection the identitySelection to set
+	 */
+	public void setIdentitySelection(IIdentitySelection identitySelection) {
+		this.identitySelection = identitySelection;
+	}
+	public PrivacyPolicyNegotiationManager(){	
+		
+	}
+
+    public void initialisePrivacyPolicyNegotiationManager(){
+		/*
+		this.myPublicDPI = this.IDM.getPublicDigitalPersonalIdentifier();
+		String localServiceID = (String) cc.getProperties().get(PssConstants._FW_SERVICE_ID);
+		this.policyMgrServiceID = new PssServiceIdentifier(localServiceID, this.myPublicDPI);
+		*/
+		//Register Negotiation Agent and Client with OSGi so that the ONM-SM can find them
+		
+		this.privacyPolicyRegMgr = new PrivacyPolicyRegistryManager(this.getCtxBroker());
+		//this.privacyPolicyRegMgr.setPublicDPI(this.myPublicDPI);
+		
+		
+		this.servicePolicyRetriever = new PolicyRetriever(this, this.getEventMgr());
+		this.negClients = new Hashtable<Requestor, NegotiationClient>();
+		/*
+		 * TODO: this has to start automatically
+		 * this.negAgent = new NegotiationAgent(this.myContext, this.myPublicDPI, this.getPrivacyPolicyRegMgr(), this.adMgr);
+		 * this.myContext.registerService(INegotiationAgent.class.getName(), this.negAgent, new Hashtable<String,Object>());
+		 */
+		this.localServiceStartedListener = new LocalServiceStartedListener(getEventMgr(), getIdm(), this.getPrivacyPolicyRegMgr()); 
+		
+		//JOptionPane.showMessageDiathis.logging.debug(null, "PolicyManager initialised");
+		this.registerForFailedNegotiationEvent();
+		this.logging.debug("DS: Started PolicyManager");
+    }
+  
+	
+	
+/*	public PrivacyOutcomeConstants checkPermission(Permission permission, IIdentity requestorDPI) {
+		if (permission instanceof CtxPermission){
+			CtxPermission ctxPermission = (CtxPermission) permission;
+			return this.checkPermission(ctxPermission, requestorDPI);
+		}
+		return PrivacyOutcomeConstants.BLOCK;
+	}
+
+	public PrivacyOutcomeConstants checkPermission(CtxPermission permission, IIdentity requestorDPI) {
+		try {
+			Action action = this.createActionObject(permission);
+			return this.privPrefMgr.checkPermission(permission.getResource(),action,requestorDPI);
+		} catch (PrivacyPreferenceException e) {
+			e.printStackTrace();
+			return PrivacyOutcomeConstants.BLOCK;
+		}
+		
+		
+	}
+
+	private Action createActionObject(CtxPermission permission) throws PrivacyPreferenceException{
+		String strAction = permission.getActions().toUpperCase();
+		try{
+			return new Action(ActionConstants.valueOf(strAction));
+		}catch (IllegalArgumentException e){
+			this.logging.debug("Action: "+strAction+"  is not recognised as valid ActionConstants value");
+		}
+	
+		throw new PrivacyPreferenceException("Permission action "+permission.getActions()+"not recognisable");
+	}
+
+	
+	public IIdentity selectExactIdentity(List<IIdentity> dpis, IAgreement agreement) {
+		return this.privPrefMgr.evaluateIDSPreferences(agreement, dpis);
+	}*/
+
+	
+
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPolicyNegotiationManager#negotiateCISPolicy(org.societies.api.identity.RequestorCis)
+	 */
+	@Override
+	public void negotiateCISPolicy(RequestorCis requestor){
+		if (this.negClients.containsKey(requestor)){
+			int n = JOptionPane.showConfirmDialog(null, "A Privacy Policy Negotiation process has already started with CIS : \n"
+				    +requestor.toString()+". Do you want to abort current negotiation and start a new one?", "Privacy Policy Negotiation Manager message", JOptionPane.YES_NO_OPTION);
+			if (n==JOptionPane.NO_OPTION){	
+				return;
+			}
+			this.negClients.remove(requestor);
+		}
+		this.logging.debug("Starting new negotiation with cis: "+requestor.toString());
+		NegotiationClient negClient = new NegotiationClient(this.negotiationAgent, this);
+		negClient.startNegotiation(requestor);
+		this.negClients.put(requestor, negClient);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPolicyNegotiationManager#negotiateServicePolicy(org.societies.api.identity.RequestorService)
+	 */
+	@Override
+	public void negotiateServicePolicy(RequestorService requestor){
+		if (this.negClients.containsKey(requestor)){
+			int n = JOptionPane.showConfirmDialog(null, "A Privacy Policy Negotiation process has already started with service: \n"
+				    +requestor.toString()+". Do you want to abort current negotiation and start a new one?", "Privacy Policy Negotiation Manager message", JOptionPane.YES_NO_OPTION);
+			if (n==JOptionPane.NO_OPTION){	
+				return;
+			}
+			this.negClients.remove(requestor);
+		}
+		this.logging.debug("Starting new negotiation with service: "+requestor.toString());
+		NegotiationClient negClient = new NegotiationClient(this.negotiationAgent, this);
+		negClient.startNegotiation(requestor);
+		this.negClients.put(requestor, negClient);		
+	}
+	
+/*	public void addPrivacyPolicyForService(Requestor serviceID,
+			RequestPolicy policy) {
+		if (serviceID !=null){
+			try {
+				Subject sub = new Subject(this.getIdm().parseDigitalPersonalIdentifier(serviceID.getOperatorId()), serviceID);
+				policy.setRequestor(sub);
+				this.getPrivacyPolicyRegMgr().addPolicy(serviceID, policy);
+				
+			} catch (MalformedDigitialPersonalIdentifierException e) {
+				this.logging.debug("Could not parse DPI from Requestor. Privacy Policy not added for serviceID "+serviceID.toUriString());
+				e.printStackTrace();
+			}
+		}else{
+			this.logging.debug("Attempted to add a new service privacy policy with a null service ID. Service Privacy Policy NOT added");
+		}
+		
+	}
+	
+	
+	public void addPrivacyPolicyForService(Requestor serviceID, File xmlFile) {
+		XMLPolicyReader reader = new XMLPolicyReader(this.myContext);
+		RequestPolicy policy = reader.readPolicyFromFile(xmlFile);
+		this.getPrivacyPolicyRegMgr().addPolicy(serviceID, policy);
+		
+	}
+	
+	
+	
+	public void setFinalIdentity(IIdentity serviceDPI,
+			IIdentity userDPI, Requestor serviceID) {
+		this.privPrefMgr.addIDSDecision(userDPI, serviceDPI, serviceID);
+		if (userDPI==null){
+			//abort
+			this.negClients.remove(serviceID);
+			return;
+		}
+		//JOptionPane.showMessageDialog(null, "SET FINAL IDENTITY :"+userDPI.toUriString()+" for serviceID: "+serviceID.toUriString());
+		if (this.negClients.containsKey(serviceID)){
+			NegotiationClient client = this.negClients.get(serviceID);
+			this.negClients.remove(serviceID);
+			client.setFinalIdentity(serviceDPI, userDPI, serviceID);
+			
+			//JOptionPane.showMessageDialog(null, "Negotiation process complete. Removing negClient");
+		}else{
+			JOptionPane.showMessageDialog(null, "NegClients doesn't contain serviceID: "+serviceID.toUriString());
+		}
+		
+		
+	}*/
+	
+
+	@Override
+	public void handleInternalEvent(InternalEvent event) {
+		if (event.geteventType().equals(EventTypes.FAILED_NEGOTIATION_EVENT)){
+			FailedNegotiationEvent negEvent = (FailedNegotiationEvent) event.geteventInfo();
+			Requestor id = negEvent.getRequestor();
+			if(this.negClients.containsKey(id)){
+				//INegotiationClient client = this.negClients.get(id);
+				this.negClients.remove(id);
+				//JOptionPane.showMessageDialog(null, "Negotiation with: "+id.toUriString()+" failed.");
+			}
+		}
+		
+	}
+	
+
+	private void registerForFailedNegotiationEvent(){
+		this.eventMgr.subscribeInternalEvent(this, new String[]{EventTypes.FAILED_NEGOTIATION_EVENT}, null);
+		
+		this.logging.debug("Registered for events: "+EventTypes.FAILED_NEGOTIATION_EVENT);
+
+	}
+
+	@Override
+	public void handleExternalEvent(CSSEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	
+	
+	
+}
+	

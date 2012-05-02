@@ -33,6 +33,7 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
@@ -40,6 +41,7 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
@@ -48,12 +50,17 @@ import org.societies.api.internal.personalisation.model.IFeedbackEvent;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
+import org.societies.api.osgi.event.CSSEvent;
+import org.societies.api.osgi.event.CSSEventConstants;
+import org.societies.api.osgi.event.EventListener;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.comm.xmpp.event.InternalEvent;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
@@ -64,10 +71,9 @@ import org.societies.personalisation.common.api.management.IInternalPersonalisat
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
 import org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
-import org.springframework.context.ApplicationListener;
 
-public class PersonalisationManager implements IPersonalisationManager,
-		IInternalPersonalisationManager, CtxChangeEventListener, ApplicationListener<InternalEvent> {
+public class PersonalisationManager extends EventListener implements IPersonalisationManager,
+		IInternalPersonalisationManager, CtxChangeEventListener {
 
 	// services
 	private ICtxBroker ctxBroker;
@@ -78,6 +84,8 @@ public class PersonalisationManager implements IPersonalisationManager,
 	private ICRISTUserIntentPrediction cristPrediction;
 	private IIdentityManager idm;
 	private IDecisionMaker decisionMaker;
+	private ICommManager commsMgr;
+	private IEventMgr eventMgr;
 
 	// data structures
 	ArrayList<CtxAttributeIdentifier> dianneList;
@@ -85,94 +93,117 @@ public class PersonalisationManager implements IPersonalisationManager,
 	ArrayList<CtxAttributeIdentifier> cauiList;
 	ArrayList<CtxAttributeIdentifier> cristList;
 
+	//internal confidence levels for each personalisation source
+	private int dianneConfidenceLevel;
+	private int prefMgrConfidenceLevel;
+	private int cauiConfidenceLevel;
+	private int cristConfidenceLevel;
 	/*
 	 * test test test!
 	 */
 
 	public PersonalisationManager() {
-		System.out.println(this.getClass().getName()
-				+ "HELLO! I'm a brand new service and my interface is: "
-				+ this.getClass().getName());
-
+		this.dianneList = new ArrayList<CtxAttributeIdentifier>();
+		this.prefMgrList = new ArrayList<CtxAttributeIdentifier>();
+		this.cauiList = new ArrayList<CtxAttributeIdentifier>();
+		this.cristList = new ArrayList<CtxAttributeIdentifier>();
+		this.logging.debug("executed constructor");
 	}
 
-	/*
-	 * INITIALISE SERVICES
-	 */
-	public void initialisePersonalisationManager(ICtxBroker ctxBroker,
-			IUserPreferenceConditionMonitor pcm) {
-		this.ctxBroker = ctxBroker;
+	public void initialisePersonalisationManager(ICtxBroker broker, IUserPreferenceConditionMonitor pcm, IDIANNE dianne, ICAUIPrediction cauiPrediction, ICRISTUserIntentPrediction cristPrediction, ICommManager commsMgr, IDecisionMaker decisionMaker){
+		this.ctxBroker = broker;
 		this.pcm = pcm;
-		/*
-		 * this.dianne = dianne; this.cauiPrediction = cauiPrediction;
-		 * this.cristPrediction = cristPrediction;
-		 */
-
-		this.dianneList = new ArrayList<CtxAttributeIdentifier>();
-		this.prefMgrList = new ArrayList<CtxAttributeIdentifier>();
-		this.cauiList = new ArrayList<CtxAttributeIdentifier>();
-		this.cristList = new ArrayList<CtxAttributeIdentifier>();
-		if (this.ctxBroker == null) {
-			System.out.println(this.getClass().getName() + "CtxBroker is null");
-		} else {
-			System.out.println(this.getClass().getName()
-					+ "CtxBroker is NOT null");
-		}
-
-		if (this.pcm == null) {
-			System.out.println(this.getClass().getName() + "PCM is null");
-		} else {
-			System.out.println(this.getClass().getName() + "PCM is NOT null");
-		}
-
-		System.out
-				.println("Full init. Yo!! I'm a brand new service and my interface is: "
-						+ this.getClass().getName());
-
+		this.dianne = dianne;
+		this.cauiPrediction = cauiPrediction;
+		this.cristPrediction = cristPrediction;
+		this.setCommsMgr(commsMgr);
+		this.decisionMaker = decisionMaker;
+		this.idm = this.getCommsMgr().getIdManager();
+		retrieveConfidenceLevels();
+		this.registerForUIMEvents();
+		this.logging.debug("initialisePersonalisationManager(ICtxBroker broker, IUserPreferenceConditionMonitor pcm, IDIANNE dianne, ICAUIPrediction cauiPrediction, ICRISTUserIntentPrediction cristPrediction, ICommManager commsMgr, IDecisionMaker decisionMaker)");
+		
 	}
-
-	public void initialisePersonalisationManager(ICtxBroker ctxBroker) {
-		this.ctxBroker = ctxBroker;
-
-		/*
-		 * this.dianne = dianne; this.cauiPrediction = cauiPrediction;
-		 * this.cristPrediction = cristPrediction;
-		 */
-
-		this.dianneList = new ArrayList<CtxAttributeIdentifier>();
-		this.prefMgrList = new ArrayList<CtxAttributeIdentifier>();
-		this.cauiList = new ArrayList<CtxAttributeIdentifier>();
-		this.cristList = new ArrayList<CtxAttributeIdentifier>();
-		if (this.ctxBroker == null) {
-			System.out.println(this.getClass().getName() + "CtxBroker is null");
-		} else {
-			System.out.println(this.getClass().getName()
-					+ "CtxBroker is NOT null");
-		}
-
-		/*
-		 * if (this.pcm==null){
-		 * System.out.println(this.getClass().getName()+"PCM is null"); }else{
-		 * System.out.println(this.getClass().getName()+"PCM is NOT null"); }
-		 */
-
-		System.out
-				.println("Ctx init. Yo!! I'm a brand new service and my interface is: "
-						+ this.getClass().getName());
-
-	}
-
+	
 	public void initialisePersonalisationManager() {
 
 		this.dianneList = new ArrayList<CtxAttributeIdentifier>();
 		this.prefMgrList = new ArrayList<CtxAttributeIdentifier>();
 		this.cauiList = new ArrayList<CtxAttributeIdentifier>();
 		this.cristList = new ArrayList<CtxAttributeIdentifier>();
-		System.out
-				.println("Empty init. Yo!! I'm a brand new service and my interface is: "
-						+ this.getClass().getName());
-
+		this.registerForUIMEvents();
+		retrieveConfidenceLevels();
+		this.logging.debug("initialisePersonalisationManager()");
 	}
+	
+	
+	private void registerForUIMEvents() {
+		String eventFilter = "(&" + 
+		"(" + CSSEventConstants.EVENT_NAME + "=newaction)" +
+		"(" + CSSEventConstants.EVENT_SOURCE + "=org/societies/useragent/monitoring)" +
+		")";
+		this.getEventMgr().subscribeInternalEvent(this, new String[]{EventTypes.UIM_EVENT}, eventFilter);
+		this.logging.debug("Subscribed to "+EventTypes.UIM_EVENT+" events");
+		
+	}
+
+	private void retrieveConfidenceLevels() {
+		try {
+			Future<List<CtxIdentifier>> futuredianneConf = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, "dianneConfidenceLevel");
+			List<CtxIdentifier> dianneConfs = futuredianneConf.get();
+			if (dianneConfs.isEmpty()){
+				this.dianneConfidenceLevel = 50;
+			}else{
+				CtxAttribute tempAttr = (CtxAttribute) this.ctxBroker.retrieve(dianneConfs.get(0)).get();
+				this.dianneConfidenceLevel = tempAttr.getIntegerValue();
+			}
+			
+			Future<List<CtxIdentifier>> futureprefMgrConf = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, "prefMgrConfidenceLevel");
+			List<CtxIdentifier> prefMgrConf = futureprefMgrConf.get();
+			if (prefMgrConf.isEmpty()){
+				this.prefMgrConfidenceLevel = 50;
+			}else{
+				CtxAttribute tempAttr = (CtxAttribute) this.ctxBroker.retrieve(prefMgrConf.get(0)).get();
+				this.prefMgrConfidenceLevel = tempAttr.getIntegerValue();
+			}
+			
+			Future<List<CtxIdentifier>> futurecauiConf = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, "cauiConfidenceLevel");
+			List<CtxIdentifier> cauiConf = futurecauiConf.get();
+			if (cauiConf.isEmpty()){
+				this.cauiConfidenceLevel = 50;
+			}else{
+				CtxAttribute tempAttr = (CtxAttribute) this.ctxBroker.retrieve(cauiConf.get(0)).get();
+				this.cauiConfidenceLevel = tempAttr.getIntegerValue();
+			}
+			
+			
+			Future<List<CtxIdentifier>> futurecristConf = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, "cristConfidenceLevel");
+			List<CtxIdentifier> cristConf = futurecauiConf.get();
+			if (cristConf.isEmpty()){
+				this.cristConfidenceLevel = 50;
+			}else{
+				CtxAttribute tempAttr = (CtxAttribute) this.ctxBroker.retrieve(cristConf.get(0)).get();
+				this.cristConfidenceLevel = tempAttr.getIntegerValue();
+			}
+			
+			logging.debug("retrieved confidence levels");
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+
+
+
+
 
 	public ICAUIPrediction getCauiPrediction() {
 		return cauiPrediction;
@@ -238,6 +269,34 @@ public class PersonalisationManager implements IPersonalisationManager,
 
 	public void setDecisionMaker(IDecisionMaker decisionMaker) {
 		this.decisionMaker = decisionMaker;
+	}
+
+	/**
+	 * @return the commsMgr
+	 */
+	public ICommManager getCommsMgr() {
+		return commsMgr;
+	}
+
+	/**
+	 * @param commsMgr the commsMgr to set
+	 */
+	public void setCommsMgr(ICommManager commsMgr) {
+		this.commsMgr = commsMgr;
+	}
+
+	/**
+	 * @return the eventMgr
+	 */
+	public IEventMgr getEventMgr() {
+		return eventMgr;
+	}
+
+	/**
+	 * @param eventMgr the eventMgr to set
+	 */
+	public void setEventMgr(IEventMgr eventMgr) {
+		this.eventMgr = eventMgr;
 	}
 
 	/*
@@ -320,11 +379,11 @@ public class PersonalisationManager implements IPersonalisationManager,
 			ServiceResourceIdentifier serviceID, String preferenceName,
 			IPersonalisationCallback callback) {
 		Future<List<IDIANNEOutcome>> futureDianneOuts = this.dianne.getOutcome(ownerID, serviceID, preferenceName);
-		Future<IPreferenceOutcome> futurePrefOuts = this.pcm.getOutcome(ownerID, serviceID, preferenceName);
+		Future<IOutcome> futurePrefOuts = this.pcm.getOutcome(ownerID, serviceID, preferenceName);
 		IAction action;
 		try {
 			IDIANNEOutcome dianneOut = futureDianneOuts.get().get(0);
-			IPreferenceOutcome prefOut = futurePrefOuts.get();
+			IPreferenceOutcome prefOut = (IPreferenceOutcome) futurePrefOuts.get();
 			
 			if (dianneOut.getvalue().equalsIgnoreCase(prefOut.getvalue())){
 				action = new Action(serviceID, serviceType, preferenceName, prefOut.getvalue());
@@ -550,7 +609,7 @@ public class PersonalisationManager implements IPersonalisationManager,
 					dianneOutcomes = futureDianneOutcomes.get();
 					
 					for (IDIANNEOutcome dOut : dianneOutcomes) {
-						IPreferenceOutcome pOut = this.pcm.getOutcome(userId, dOut.getServiceID(), dOut.getparameterName()).get();
+						IPreferenceOutcome pOut = (IPreferenceOutcome) this.pcm.getOutcome(userId, dOut.getServiceID(), dOut.getparameterName()).get();
 						if (pOut.getvalue().equalsIgnoreCase(dOut.getvalue())) {
 							results.add(dOut);
 						} else {
@@ -587,22 +646,109 @@ public class PersonalisationManager implements IPersonalisationManager,
 	
 	
 	private List<IOutcome> comparePreferenceConflicts(List<IDIANNEOutcome> dOuts, List<IPreferenceOutcome> pOuts){
+		List<IOutcome> result = new ArrayList<IOutcome>();
+		for (IDIANNEOutcome dOut: dOuts){
+			boolean matches = false;
+			IPreferenceOutcome matchedOutcome = null;
+			for (IPreferenceOutcome pOut :pOuts){
+				if (dOut.getparameterName().equalsIgnoreCase(pOut.getparameterName())){
+					matches = true;
+					matchedOutcome = pOut;
+				}else{
+					matches = false;
+				}
+			}
+			if (!matches){
+				result.add(dOut);
+			}else{
+				result.add(this.resolvePreferenceConflicts(dOut, matchedOutcome));
+			}
+		}
 		
 		
-		return new ArrayList<IOutcome>();
+		for (IPreferenceOutcome pOut : pOuts){
+			IOutcome out = matches(pOut, result);
+				
+			
+			if (out==null){
+				result.add(pOut);
+			}
+		}
+		
+		return result ;
 	}
 
-	private List<IOutcome> compareIntentConflicts(List<IUserIntentAction> caui, List<CRISTUserAction> crist) {
-		// TODO Auto-generated method stub
+	
+	private IOutcome matches(IOutcome outcome, List<IOutcome> outcomes){
+		for (IOutcome out: outcomes){
+			if (outcome.getServiceID().equals(out.getServiceID())){
+				if (outcome.getparameterName().equalsIgnoreCase(out.getparameterName())){
+					return out;
+				}
+			}
+		}
+		
 		return null;
 	}
+	private List<IOutcome> compareIntentConflicts(List<IUserIntentAction> cauiOuts, List<CRISTUserAction> cristOuts) {
+		List<IOutcome> result = new ArrayList<IOutcome>();
+		for (IUserIntentAction cauiOut: cauiOuts){
+			boolean matches = false;
+			CRISTUserAction matchedOutcome = null;
+			for (CRISTUserAction cristOut :cristOuts){
+				if (cauiOut.getparameterName().equalsIgnoreCase(cristOut.getparameterName())){
+					matches = true;
+					matchedOutcome = cristOut;
+				}else{
+					matches = false;
+				}
+			}
+			if (!matches){
+				result.add(cauiOut);
+			}else{
+				result.add(this.resolveIntentConflicts(matchedOutcome, cauiOut));
+			}
+		}
+		
+		
+		for (CRISTUserAction cristOut : cristOuts){
+			IOutcome out = matches(cristOut, result);
+				
+			
+			if (out==null){
+				result.add(cristOut);
+			}
+		}
+		
+		return result ;		
+	}
 	private IOutcome resolvePreferenceConflicts(IDIANNEOutcome dOut, IPreferenceOutcome pOut){
-		return null;
+		
+		int dConf = this.dianneConfidenceLevel * dOut.getConfidenceLevel();
+		
+		int pConf = this.prefMgrConfidenceLevel * pOut.getConfidenceLevel();
+		
+		if (dConf > pConf){
+			return dOut;
+		}else{
+			return pOut;
+		}
+		
+		
+		
 	}
 
 	private IOutcome resolveIntentConflicts(CRISTUserAction cristAction, IUserIntentAction cauiAction) {
-		// TODO Auto-generated method stub
-		return null;
+		int cauiConf = this.cauiConfidenceLevel * cauiAction.getConfidenceLevel();
+		
+		int cristConf = this.cristConfidenceLevel * cristAction.getConfidenceLevel();
+		
+		if (cauiConf > cristConf){
+			return cauiAction;
+		}else{
+			return cristAction;
+		}
+		
 	}
 	@Override
 	public void onRemoval(CtxChangeEvent arg0) {
@@ -617,18 +763,36 @@ public class PersonalisationManager implements IPersonalisationManager,
 	}
 
 	@Override
-	public void onApplicationEvent(InternalEvent event) {
-		if (event.getEventNode().equals("UIM_EVENT")){
-			UIMEvent uimEvent = (UIMEvent) event.getEventInfo();
+	public void handleInternalEvent(InternalEvent event) {
+		this.logging.debug("Received UIM event:");
+		this.logging.debug("Event name "+event.geteventName()+
+				"Event info: "+event.geteventInfo().toString()+
+				"Event source: "+event.geteventSource()+
+				"Event type: "+event.geteventType());
+		
+		
+		if (event.geteventType().equals(EventTypes.UIM_EVENT)){
+			UIMEvent uimEvent = (UIMEvent) event.geteventInfo();
 			Future<List<IUserIntentAction>> futureCauiActions = this.cauiPrediction.getPrediction(uimEvent.getUserId(), uimEvent.getAction());
 			
 			Future<List<CRISTUserAction>> futureCristActions = this.cristPrediction.getCRISTPrediction(uimEvent.getUserId(), uimEvent.getAction());
 			
+			Future<List<IDIANNEOutcome>> futureDianneActions = this.dianne.getOutcome(uimEvent.getUserId(), uimEvent.getAction());
+			
+			Future<List<IPreferenceOutcome>> futurePreferenceActions = this.pcm.getOutcome(uimEvent.getUserId(), uimEvent.getAction());
+			
+			
 			try {
+				
+				/**
+				 * get intent outcomes 
+				 */
 				List<IUserIntentAction> cauiActions = futureCauiActions.get();
+				logging.debug("cauiPrediction returned: "+cauiActions.size()+" outcomes");
 				List<CRISTUserAction> cristActions = futureCristActions.get();
+				logging.debug("cristPrediction returned: "+cristActions.size()+" outcomes");
 				Hashtable<IUserIntentAction,CRISTUserAction> overlapping = new Hashtable<IUserIntentAction,CRISTUserAction>(); 
-				List<IOutcome> nonOverlapping = new ArrayList<IOutcome>();
+				List<IOutcome> intentNonOverlapping = new ArrayList<IOutcome>();
 				
 				
 				
@@ -636,7 +800,7 @@ public class PersonalisationManager implements IPersonalisationManager,
 				for (IUserIntentAction caui : cauiActions){
 					CRISTUserAction crist = this.exists(cristActions, caui);
 					if (null==crist){
-						nonOverlapping.add(caui);
+						intentNonOverlapping.add(caui);
 					}else{
 						overlapping.put(caui, crist);
 					}
@@ -645,7 +809,7 @@ public class PersonalisationManager implements IPersonalisationManager,
 				for (CRISTUserAction crist: cristActions){
 					IUserIntentAction caui = this.exists(cauiActions, crist);
 					if (null==caui){
-						nonOverlapping.add(crist);
+						intentNonOverlapping.add(crist);
 					}
 				}
 				
@@ -654,10 +818,46 @@ public class PersonalisationManager implements IPersonalisationManager,
 				while (cauiEnum.hasMoreElements()){
 					IUserIntentAction caui = cauiEnum.nextElement();
 					CRISTUserAction crist = overlapping.get(caui);
-					nonOverlapping.add(this.resolveIntentConflicts(crist,caui));
+					intentNonOverlapping.add(this.resolveIntentConflicts(crist,caui));
 				}
 				
-				this.decisionMaker.makeDecision(nonOverlapping, new ArrayList<IOutcome>());
+				
+				/**
+				 * get preference outcomes
+				 */
+				
+				List<IDIANNEOutcome> dianneActions = futureDianneActions.get();
+				logging.debug("DIANNE returned: "+dianneActions.size()+" outcomes");
+				List<IPreferenceOutcome> prefActions = futurePreferenceActions.get();
+				logging.debug("PCM returned: "+prefActions.size()+" outcomes");
+				Hashtable<IPreferenceOutcome, IDIANNEOutcome> prefOverlapping = new Hashtable<IPreferenceOutcome, IDIANNEOutcome>();
+				List<IOutcome> prefNonOverlapping = new ArrayList<IOutcome>();
+				
+				for (IDIANNEOutcome d : dianneActions){
+					IPreferenceOutcome p = this.exists(prefActions, d);
+					if (null==p){
+						prefNonOverlapping.add(d);
+					}else{
+						prefOverlapping.put(p, d);
+					}
+				}
+				
+				for (IPreferenceOutcome p : prefActions){
+					IDIANNEOutcome d = this.exists(dianneActions, p);
+					if (null==d){
+						prefNonOverlapping.add(p);
+					}
+				}
+				
+				Enumeration<IPreferenceOutcome> prefEnum = prefOverlapping.keys();
+				
+				while(prefEnum.hasMoreElements()){
+					IPreferenceOutcome pref = prefEnum.nextElement();
+					IDIANNEOutcome dianne = prefOverlapping.get(pref);
+					prefNonOverlapping.add(this.resolvePreferenceConflicts(dianne, pref));
+				}
+				
+				this.decisionMaker.makeDecision(intentNonOverlapping, prefNonOverlapping);
 				
 				
 			} catch (InterruptedException e) {
@@ -683,7 +883,7 @@ public class PersonalisationManager implements IPersonalisationManager,
 		}		return null;
 	}
 
-	private CRISTUserAction exists(List<CRISTUserAction> cristActions, IOutcome caui){
+	private CRISTUserAction exists(List<CRISTUserAction> cristActions, IUserIntentAction caui){
 		
 		for (CRISTUserAction o : cristActions){
 			if (this.outcomesMatch(o, caui)){
@@ -694,7 +894,24 @@ public class PersonalisationManager implements IPersonalisationManager,
 		return null;
 	}
 	
+	private IDIANNEOutcome exists(List<IDIANNEOutcome> dianneActions, IPreferenceOutcome prefOutcome){
+		for (IDIANNEOutcome d: dianneActions){
+			if (this.outcomesMatch(d, prefOutcome)){
+				return d;
+			}
+		}
+		return null;
+	}
 	
+	
+	private IPreferenceOutcome exists(List<IPreferenceOutcome> prefActions, IDIANNEOutcome dianneOutcome){
+		for (IPreferenceOutcome p : prefActions){
+			if (this.outcomesMatch(p, dianneOutcome)){
+				return p;
+			}
+		}
+		return null;
+	}
 	private boolean outcomesMatch(IOutcome outcome1, IOutcome outcome2){
 		if (outcome1.getServiceID().getServiceInstanceIdentifier().equalsIgnoreCase(outcome2.getServiceID().getServiceInstanceIdentifier())){
 			if (outcome1.getparameterName().equalsIgnoreCase(outcome2.getparameterName())){
@@ -703,6 +920,12 @@ public class PersonalisationManager implements IPersonalisationManager,
 		}
 		
 		return false;
+	}
+
+	@Override
+	public void handleExternalEvent(CSSEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

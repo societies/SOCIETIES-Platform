@@ -19,6 +19,7 @@
  */
 package org.societies.personalisation.CAUIPrediction.impl;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,25 +27,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.event.CtxChangeEvent;
+import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentTask;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
 
 
 /**
@@ -56,28 +64,42 @@ import java.util.concurrent.Future;
 public class CAUIPrediction implements ICAUIPrediction{
 
 	//CAUIPrediction depends on CauiTaskManager,PersonalisationManager and CtxBroker
+	private static final Logger LOG = LoggerFactory.getLogger(CAUIPrediction.class);
+	boolean modelExists = false;
 
 	private ICtxBroker ctxBroker;
 	private IInternalPersonalisationManager persoMgr;
 	private ICAUITaskManager cauiTaskManager;
-
+	private ICAUIDiscovery cauiDiscovery;
+	
 	private Boolean enablePrediction = true;  
 	private String [] lastActions = null;
+	int predictionRequestsCounter = 0;
+
+	public ICAUIDiscovery getCauiDiscovery() {
+		System.out.println(this.getClass().getName()+": Return cauiDiscovery");
+		return cauiDiscovery;
+	}
+	
+
+	public void setCauiDiscovery(ICAUIDiscovery cauiDiscovery) {
+		System.out.println(this.getClass().getName()+": Got cauiDiscovery");
+		this.cauiDiscovery = cauiDiscovery;
+	}
 
 
 	public ICtxBroker getCtxBroker() {
 		System.out.println(this.getClass().getName()+": Return ctxBroker");
-
 		return ctxBroker;
 	}
 
 
 	public void setCtxBroker(ICtxBroker ctxBroker) {
 		System.out.println(this.getClass().getName()+": Got ctxBroker");
-
 		this.ctxBroker = ctxBroker;
 	}
 
+	
 	public IInternalPersonalisationManager getPersoMgr() {
 		System.out.println(this.getClass().getName()+": Return persoMgr");
 		return persoMgr;
@@ -89,30 +111,28 @@ public class CAUIPrediction implements ICAUIPrediction{
 		this.persoMgr = persoMgr;
 	}
 
+	
 	public ICAUITaskManager getCauiTaskManager() {
 		System.out.println(this.getClass().getName()+": Return cauiTaskManager");
-
 		return cauiTaskManager;
 	}
 
+	
 	public void setCauiTaskManager(ICAUITaskManager cauiTaskManager) {
 		System.out.println(this.getClass().getName()+": Got cauiTaskManager");
-
 		this.cauiTaskManager = cauiTaskManager;
 	}
 
-
-
-
 	// constructor
 	public void initialiseCAUIPrediction(){
-
+		registerForNewUiModelEvent();
 	}
 
-	CAUIPrediction(){
-
+	public CAUIPrediction(){
+		
 	}
 
+	
 	@Override
 	public void enablePrediction(Boolean bool) {
 		this.enablePrediction = bool;
@@ -137,12 +157,26 @@ public class CAUIPrediction implements ICAUIPrediction{
 	@Override
 	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor,
 			IAction action) {
-
+		
+		//System.out.println("getPrediction requestor:" + requestor+" action:"+action);
+		//System.out.println("modelExists: "+ modelExists+" cauiDiscovery:" +cauiDiscovery);
+		predictionRequestsCounter = predictionRequestsCounter +1;
+		
 		List<IUserIntentAction> results = new ArrayList<IUserIntentAction>();
-
-		if(enablePrediction == true){
+		if(modelExists == false && enablePrediction == true && cauiDiscovery != null){
+			System.out.println("no model predictionRequestsCounter:" +predictionRequestsCounter);
+			if(predictionRequestsCounter >= 5){
+				System.out.println("this.cauiDiscovery.generateNewUserModel()");
+				this.cauiDiscovery.generateNewUserModel();	
+				predictionRequestsCounter = 0;
+				//time wait for new model generation
+			}
+		}
+		
+		if(modelExists == true && enablePrediction == true){
+			System.out.println("model exists, generateNewUserModel" +modelExists);
 			//UIModelBroker setModel = new UIModelBroker(ctxBroker,cauiTaskManager);	
-			setActiveModel(requestor);
+			//setActiveModel(requestor);
 			String par = action.getparameterName();
 			String val = action.getvalue();
 			// add code here for retrieving current context;
@@ -178,6 +212,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 		return actionResult;
 	}
 
+	
 	@Override
 	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor,
 			CtxAttribute contextAttribute) {
@@ -186,16 +221,55 @@ public class CAUIPrediction implements ICAUIPrediction{
 	}
 
 
+	void registerForNewUiModelEvent(){
+
+		if (this.ctxBroker == null) {
+			LOG.error("Could not register context event listener: ctxBroker is not available");
+			return;
+		}
+
+		CtxAttributeIdentifier uiModelAttributeId = null;
+		IndividualCtxEntity operator;
+		try {
+			operator = this.ctxBroker.retrieveCssOperator().get();
+			List<CtxIdentifier> ls = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CAUI_MODEL).get();
+			if (ls.size()>0) {
+				uiModelAttributeId = (CtxAttributeIdentifier) ls.get(0);
+			} else {
+				CtxAttribute attr = this.ctxBroker.createAttribute(operator.getId(), CtxAttributeTypes.CAUI_MODEL).get();
+				uiModelAttributeId = attr.getId();
+			}
+			if (uiModelAttributeId != null){
+				this.ctxBroker.registerForChanges(new MyCtxChangeEventListener(),uiModelAttributeId);	
+			}		
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}			
+	}
 
 
-	public void setActiveModel(IIdentity requestor){
+	public void setActiveModel(UserIntentModelData newUIModelData){
 		// retrieve model from Context DB
 		// set model as active in CauiTaskManager
 		// until then create and use a fake model
-		createFakeModel();
+		//createFakeModel();
+		if (newUIModelData.getMatrix() != null && newUIModelData.getTaskList() != null){
+			cauiTaskManager.updateModel(newUIModelData);
+			modelExists = true;		 
+		}
 	}
 
+	
 	private void createFakeModel(){
+		/*
 		//create Task A
 		IUserIntentAction userActionA = cauiTaskManager.createAction(null,"ServiceType","A-homePc","off");
 		IUserIntentAction userActionB = cauiTaskManager.createAction(null,"ServiceType","F-homePc","off");
@@ -267,6 +341,70 @@ public class CAUIPrediction implements ICAUIPrediction{
 		UserIntentModelData modelData = cauiTaskManager.createModel(taskList, taskMatrix);
 		cauiTaskManager.displayModel(modelData);
 		cauiTaskManager.updateModel(modelData);
+		 */
 	}
+
+
+	private class MyCtxChangeEventListener implements CtxChangeEventListener {
+
+
+
+		MyCtxChangeEventListener(){
+
+		}
+
+		@Override
+		public void onCreation(CtxChangeEvent event) {
+			// TODO Auto-generated method stub
+		}
+
+		@Override
+		public void onUpdate(CtxChangeEvent event) {
+			LOG.info(event.getId() + ": *** Update event ***");
+			CtxIdentifier uiModelAttrID = event.getId();
+
+			if(uiModelAttrID instanceof CtxAttributeIdentifier){
+				CtxAttribute uiModelAttr;
+				try {
+					uiModelAttr = (CtxAttribute) ctxBroker.retrieve(uiModelAttrID).get();
+					UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(uiModelAttr.getBinaryValue(), this.getClass().getClassLoader());
+					setActiveModel(newUIModelData);
+
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (CtxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}	
+			}
+
+		}
+
+		@Override
+		public void onModification(CtxChangeEvent event) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onRemoval(CtxChangeEvent event) {
+			// TODO Auto-generated method stub
+
+		}
+
+
+
+	}
+
 
 }

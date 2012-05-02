@@ -19,6 +19,7 @@
  */
 package org.societies.privacytrust.privacyprotection.test;
 
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
@@ -38,7 +39,7 @@ public class Test {
 		this.privacyDataManager = privacyDataManager;
 		System.out.println("************* privacyDataManager injected");
 		try {
-			privacyDataManager.hasObfuscatedVersion(null, 1, null);
+			privacyDataManager.hasObfuscatedVersion(null, null, null);
 		} catch (PrivacyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -49,7 +50,14 @@ public class Test {
 	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
 		this.privacyPolicyManager = privacyPolicyManager;
 		System.out.println("************* privacyPolicyManager injected");
-		boolean result = privacyPolicyManager.deletePrivacyPolicy("ahah");
+		IIdentity cisId = null;
+		boolean result = false;
+		try {
+			result = privacyPolicyManager.deletePrivacyPolicy(cisId);
+		} catch (PrivacyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.println("************* privacyPolicyManager "+result);
 	}
 

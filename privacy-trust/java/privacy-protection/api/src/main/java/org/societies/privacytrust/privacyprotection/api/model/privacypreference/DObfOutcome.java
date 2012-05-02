@@ -37,8 +37,10 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
  */
 public class DObfOutcome implements IPrivacyOutcome, IDObfAction {
 
-	public DObfOutcome(){
+	private double obfuscationLevel;
 
+	public DObfOutcome(double obfuscationLevel){
+		this.obfuscationLevel = obfuscationLevel;
 	}
 
 	public void finalize() throws Throwable {
@@ -53,8 +55,8 @@ public class DObfOutcome implements IPrivacyOutcome, IDObfAction {
 		return PrivacyPreferenceTypeConstants.DOBF;
 	}
 
-	public int getObfuscationLevel(){
-		return 0;
+	public double getObfuscationLevel(){
+		return obfuscationLevel;
 	}
 
 }

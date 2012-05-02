@@ -28,6 +28,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -38,6 +39,8 @@ import org.junit.Test;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -45,8 +48,12 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.internal.context.model.CtxEntityTypes;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.societies.context.user.db.impl.CtxModelObjectNumberGenerator;
 import org.societies.context.user.db.impl.UserCtxDBMgr;
 
 /**
@@ -60,10 +67,18 @@ import org.societies.context.user.db.impl.UserCtxDBMgr;
 
 public class UserContextDBManagementTest {
 
+    private static final String ENT_TYPE_1 = "entType1";
+    private static final String ENT_TYPE_2 = "entType2";
+    
+    private static final String ATTR_TYPE_1 = "attrType1";
+    private static final String ATTR_TYPE_2 = "attrType2";
+    private static final String ATTR_TYPE_3 = "attrType3";
+
 	private UserCtxDBMgr userDB;
 	CtxEntity entity;	
 	IndividualCtxEntity indEntity;
 	CtxAttribute attribute;
+	CtxAssociation association;
 	CtxModelObject modObj;
 	List<CtxIdentifier> foundList = new ArrayList<CtxIdentifier>();
 
@@ -107,6 +122,58 @@ public class UserContextDBManagementTest {
 	}
 
    @Test
+ 	public void testCreateCtxAssociation() throws CtxException{
+		System.out.println("---- testCreateCtxAssociation");
+		association = userDB.createAssociation("IsRelatedWith");
+		assertNotNull(association);
+		assertEquals("IsRelatedWith", association.getType());
+	}
+
+   @Test
+ 	public void testAssociations() throws CtxException{
+		System.out.println("---- testAssociations");
+
+		association = userDB.createAssociation("IsRelatedWith");
+
+		//Set Parent Entity
+		final CtxEntityIdentifier entId1 = userDB.createEntity("person").getId();
+		association.setParentEntity(entId1);		
+		assertEquals(entId1, association.getParentEntity());
+
+		//Add Child Entities
+		final CtxEntityIdentifier entId2 = userDB.createEntity("person").getId();
+		final CtxEntityIdentifier entId3 = userDB.createEntity("person").getId();
+		association.addChildEntity(entId2);
+		association.addChildEntity(entId3);
+		assertTrue(association.getChildEntities().contains(entId2));
+		assertTrue(association.getChildEntities().contains(entId3));
+		assertTrue(association.getChildEntities("person").contains(entId2));
+		assertTrue(association.getChildEntities("person").contains(entId3));
+
+		//Remove Parent Entity
+		association.setParentEntity(null);
+		assertEquals(null, association.getParentEntity());
+
+		//Remove Child Entities
+		association.removeChildEntity(entId2);
+		association.removeChildEntity(entId3);
+		assertTrue(association.getChildEntities().isEmpty());
+	}
+
+   @Test
+   public void testRetrieveAssociation() throws CtxException{
+	   System.out.println("---- testRetrieveAssociation");
+	   ////////////////
+	   association = userDB.createAssociation("IsRelatedWith");
+
+	   
+	   modObj = userDB.retrieve(association.getId());
+	   association = (CtxAssociation) modObj;
+
+	   assertNotNull(association);
+   }
+
+   @Test
 	public void testCreateAttribute() throws CtxException{
 	   System.out.println("---- testCreateAttribute");
 	   indEntity = userDB.createIndividualCtxEntity("house");
@@ -115,8 +182,9 @@ public class UserContextDBManagementTest {
 
 	   assertNotNull(attribute);
 	   assertEquals("name", attribute.getType());
-   }
 
+   }
+   
    @Test
    public void testRetrieveAttribute() throws CtxException{
 	   System.out.println("---- testRetrieveAttribute");
@@ -128,7 +196,6 @@ public class UserContextDBManagementTest {
 	   attribute = (CtxAttribute) modObj;
 
 	   assertNotNull(attribute);
-	   //attribute = (CtxAttribute) callback.getCtxModelObject();
    }
 
    @Test
@@ -155,7 +222,7 @@ public class UserContextDBManagementTest {
    
    @Test
    public void testLookup() throws CtxException{
-	   System.out.println("---- testUpdateAttribute");
+	   System.out.println("---- testLookup");
 	   
        List<CtxIdentifier> ids;
        
@@ -169,87 +236,89 @@ public class UserContextDBManagementTest {
        final CtxAttributeIdentifier attrId2 = userDB.createAttribute(entId1, CtxAttributeValueType.EMPTY, "Foo").getId();
        final CtxAttributeIdentifier attrId3 = userDB.createAttribute(entId1, CtxAttributeValueType.EMPTY, "Bar").getId();
        
+       // Create test attributes.
+       final CtxAssociationIdentifier assocId1 = userDB.createAssociation("FooBar").getId();
+       final CtxAssociationIdentifier assocId2 = userDB.createAssociation("Foo").getId();
+       final CtxAssociationIdentifier assocId3 = userDB.createAssociation("Bar").getId();
+
        //
        // Lookup entities
        //
        
-       // Search by exact type.
        ids =userDB.lookup(CtxModelType.ENTITY, "FooBar");
        assertTrue(ids.contains(entId1));
        assertEquals(1, ids.size());
-       
-       // Search by wildcard type.
-//       ids = userDB.lookup(CtxModelType.ENTITY, "%");
-//       assertTrue(ids.contains(entId1));
-//       assertTrue(ids.contains(entId2));
-//       assertTrue(ids.contains(entId3));
-      
-       // Search by wildcard type.
-//       ids = userDB.lookup(CtxModelType.ENTITY, "%Foo");
-//       assertTrue(ids.contains(entId2));
-//       assertEquals(1, ids.size());
-       
+              
        ids = userDB.lookup(CtxModelType.ENTITY, "Foo");
        assertTrue(ids.contains(entId2));
        assertEquals(1, ids.size());
        
-       // Search by wildcard type.
-//       ids = userDB.lookup(CtxModelType.ENTITY, "Bar%");
-//       assertTrue(ids.contains(entId3));
-//       assertEquals(1, ids.size());
-
        ids = userDB.lookup(CtxModelType.ENTITY, "Bar");
        assertTrue(ids.contains(entId3));
        assertEquals(1, ids.size());
        
-       // Search by wildcard type.
-//       ids = userDB.lookup(CtxModelType.ENTITY, "%Foo%");
-//       assertTrue(ids.contains(entId1));
-//       assertTrue(ids.contains(entId2));
-//       assertEquals(2, ids.size());
-
-       // Search by wildcard type.
-//       ids = userDB.lookup(CtxModelType.ENTITY, "%Bar%");
-//       assertTrue(ids.contains(entId1));
-//       assertTrue(ids.contains(entId3));
-//       assertEquals(2, ids.size());
-
        //
        // Lookup attributes
        //
        
-       // Search by exact type.
        ids = userDB.lookup(CtxModelType.ATTRIBUTE, "FooBar");
        assertTrue(ids.contains(attrId1));
        assertEquals(1, ids.size());
-       
-       // Search by wildcard type.
-//       ids = userDB.lookup(CtxModelType.ATTRIBUTE, "%");
-//       assertTrue(ids.contains(attrId1));
-//       assertTrue(ids.contains(attrId2));
-//       assertTrue(ids.contains(attrId3));
-       
-       // Search by wildcard type.
+              
        ids = userDB.lookup(CtxModelType.ATTRIBUTE, "Foo");
        assertTrue(ids.contains(attrId2));
        assertEquals(1, ids.size());
        
-       // Search by wildcard type.
        ids = userDB.lookup(CtxModelType.ATTRIBUTE, "Bar");
        assertTrue(ids.contains(attrId3));
        assertEquals(1, ids.size());
        
-       // Search by wildcard type.
-//       ids = userDB.lookup(CtxModelType.ATTRIBUTE, "%Foo%");
-//       assertTrue(ids.contains(attrId1));
-//       assertTrue(ids.contains(attrId2));
-//       assertEquals(2, ids.size());
+       //
+       // Lookup associations.
+       //
        
-       // Search by wildcard type.
-//       ids = userDB.lookup(CtxModelType.ATTRIBUTE, "%Bar%");
-//       assertTrue(ids.contains(attrId1));
-//       assertTrue(ids.contains(attrId3));
-//       assertEquals(2, ids.size());    	   
+       ids = userDB.lookup(CtxModelType.ASSOCIATION, "FooBar");
+       assertTrue(ids.contains(assocId1));
+       assertEquals(1, ids.size());
+             
+       ids = userDB.lookup(CtxModelType.ASSOCIATION, "Foo");
+       assertTrue(ids.contains(assocId2));
+       assertEquals(1, ids.size());
+       
+       ids = userDB.lookup(CtxModelType.ASSOCIATION, "Bar");
+       assertTrue(ids.contains(assocId3));
+       assertEquals(1, ids.size());
+       
 	}
+   
+   @Test
+   public void testLookupEntitiesByAttrType() throws CtxException {
+       List<CtxEntityIdentifier> identifiers;
+       CtxEntity entity;
+       CtxAttribute attribute;
+       CtxEntityIdentifier entityId;
+
+       entity = userDB.createEntity("PERSON");
+       attribute = userDB.createAttribute((CtxEntityIdentifier)entity.getId(), CtxAttributeValueType.EMPTY, "NAME");
+     
+       // lookup by name attribute
+       System.out.println("Paul".compareTo("Lora"));
+       System.out.println("Paul".compareTo("Steven"));
+       
+       identifiers = userDB.lookupEntities("PERSON", "NAME", "Lora", "Steven");
+       assertEquals(0, identifiers.size());
+       attribute.setStringValue("Paul");
+       attribute.setValueType(CtxAttributeValueType.STRING);
+       userDB.update(attribute);
+      //update with DB
+       identifiers = userDB.lookupEntities("PERSON", "NAME", "Lora", "Steven");
+       assertEquals(1, identifiers.size());
+       
+       assertTrue(identifiers.get(0)instanceof CtxEntityIdentifier);
+       entityId = (CtxEntityIdentifier) identifiers.get(0);
+       assertEquals(CtxModelType.ENTITY, entityId.getModelType());
+       assertEquals("PERSON", entityId.getType());
+
+   }
 	   
 }

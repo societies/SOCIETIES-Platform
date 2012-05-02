@@ -43,6 +43,7 @@ import org.societies.api.internal.css.management.ICSSRemoteManager;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssRequest;
+import org.societies.api.schema.cssmanagement.CssRequestOrigin;
 import org.societies.api.schema.cssmanagement.MethodType;
 import org.societies.utilities.DBC.Dbc;
 import org.societies.api.identity.INetworkNode;
@@ -535,6 +536,7 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 			Stanza stanza = new Stanza(commManager.getIdManager().fromJid(
 					cssFriendId));
 			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+			
 
 			messageBean.setMethod(MethodType.SEND_CSS_FRIEND_REQUEST);
 
@@ -565,6 +567,8 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 					request.getCssIdentity()));
 			CssManagerMessageBean messageBean = new CssManagerMessageBean();
 
+			request.setOrigin(CssRequestOrigin.REMOTE);
+			
 			messageBean.setMethod(MethodType.UPDATE_CSS_FRIEND_REQUEST);
 			messageBean.setRequestStatus(request.getRequestStatus());
 
@@ -580,4 +584,35 @@ public class CommsClient implements ICommCallback, ICSSRemoteManager {
 		}
 		
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.css.management.ICSSRemoteManager#updateCssFriendRequest(org.societies.api.schema.cssmanagement.CssRequest)
+	 */
+	@Override
+	public void updateCssRequest(CssRequest request) {
+		// TODO Auto-generated method stub
+		LOG.debug("Remote call on updateCssRequest");
+
+		try {
+
+			Stanza stanza = new Stanza(commManager.getIdManager().fromJid(
+					request.getCssIdentity()));
+			CssManagerMessageBean messageBean = new CssManagerMessageBean();
+
+			messageBean.setMethod(MethodType.UPDATE_CSS_REQUEST);
+			request.setOrigin(CssRequestOrigin.REMOTE);
+			messageBean.setRequestStatus(request.getRequestStatus());
+
+			try {
+				this.commManager.sendMessage(stanza, messageBean);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+		
 }

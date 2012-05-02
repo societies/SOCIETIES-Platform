@@ -25,26 +25,31 @@
 
 package org.societies.useragent.monitoring;
 
+import java.io.IOException;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
-import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.personalisation.model.IAction;
 
 public class ContextCommunicator {
 
+	private static Logger LOG = LoggerFactory.getLogger(ContextCommunicator.class);
 	ICtxBroker ctxBroker;
 	SnapshotManager snpshtMgr;
 	Hashtable<String, CtxAttributeIdentifier> mappings;
@@ -57,73 +62,106 @@ public class ContextCommunicator {
 
 	public void updateHistory(IIdentity owner, IAction action){
 		//check cache first for ctxAttrIdentifier to update
-		String key = action.getServiceID()+"|"+action.getparameterName();
+		String key = action.getServiceID().toString()+action.getparameterName();
 		if(mappings.containsKey(key)){  //already has service attribute
+			LOG.info("Mapping exists for key: "+key);
+			//update attribute
 			CtxAttributeIdentifier attrID = mappings.get(key);
 			try {
-				ctxBroker.updateAttribute(attrID, action.getvalue());
+				ctxBroker.updateAttribute(attrID, SerialisationHelper.serialise(action));
 			} catch (CtxException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}else{
+			LOG.info("Mapping doesn't yet exist for key: "+key);
 			//check context second for ctx attribute to update
 			try {
-				//Look for Entity with serviceId
-				Future<List<CtxIdentifier>> futureEntityIDs = ctxBroker.lookup(CtxModelType.ENTITY, action.getServiceID().getIdentifier().toString());
-				List<CtxIdentifier> entityIds = futureEntityIDs.get();
-				if(entityIds.size() > 0){
-					//Get Attribute from Entity with parameter name
-					CtxEntityIdentifier entityId = (CtxEntityIdentifier)entityIds.get(0);
-					Future<CtxModelObject> futureEntity = ctxBroker.retrieve(entityId);
-					CtxEntity serviceEntity = (CtxEntity)futureEntity.get();
-					//search for attributes of type parameterName associated to service entity
-					Set<CtxAttribute> attributes = serviceEntity.getAttributes(action.getparameterName());
-					if(attributes.size() > 0){  //attribute found under this entityId
-						CtxAttribute attribute = attributes.iterator().next();
-						ctxBroker.updateAttribute(attribute.getId(), action.getvalue());
-						mappings.put(key, attribute.getId());
-						
-					}else{  //no attribute found under this entityId
-						//create new attribute for parameterName
-						Future<CtxAttribute> futureAttribute = ctxBroker.createAttribute(entityId, action.getparameterName());
-						CtxAttribute newAttribute = futureAttribute.get();
-						//set history tuples
-						ctxBroker.setHistoryTuples(newAttribute.getId(), snpshtMgr.get); //add list of context snapshot IDs
-						//set as recorded
-						//populate attribute with action value
-						ctxBroker.updateAttribute(newAttribute.getId(), action.getvalue());
-						//update mappings
-						mappings.put(key, newAttribute.getId());
+				//get cssOperator (Person)
+				//Future<IndividualCtxEntity> cssOperator = ctxBroker.retrieveCssOperator();
+				Future<List<CtxEntityIdentifier>> futureServiceEntities = ctxBroker.lookupEntities(
+						CtxEntityTypes.SERVICE, 
+						CtxAttributeTypes.ID, 
+						action.getServiceID(), 
+						action.getServiceID());
+				List<CtxEntityIdentifier> serviceEntities = futureServiceEntities.get();
+				if(serviceEntities.size() > 0){  //service entity with matching serviceID found
+					CtxEntityIdentifier serviceEntityId = serviceEntities.get(0);
+					Future<CtxModelObject> futureServiceEntity = ctxBroker.retrieve(serviceEntityId);
+					CtxEntity serviceEntity = (CtxEntity)futureServiceEntity.get();
+					Set<CtxAttribute> serviceAttributes = serviceEntity.getAttributes();
+					
+					//search for param attribute under entity and update
+					boolean found = false;
+					for(CtxAttribute nextAttr: serviceAttributes){
+						if(nextAttr.getType().equals(action.getparameterName())){
+							found = true;
+							ctxBroker.updateAttribute(nextAttr.getId(), SerialisationHelper.serialise(action));
+							
+							//update mappings with new key and CtxAttrIdentifier
+							mappings.put(key, nextAttr.getId());
+						}
 					}
 					
-				}else{ //no entities for this serviceId
-					//create new entity for serviceId
-					Future<CtxEntity> futureEntity = ctxBroker.createEntity(action.getServiceID().toString());
-					CtxEntity newEntity = futureEntity.get();
-					//create new attribute for parameterName
-					Future<CtxAttribute> futureAttribute = ctxBroker.createAttribute(newEntity.getId(), action.getparameterName());
-					CtxAttribute newAttribute = futureAttribute.get();
-					//set as history
-					ctxBroker.setHistoryTuples(newAttribute.getId(), null); //add list of context snapshot IDs
-					//set as recorded
-					//populate attribute with action value
-					ctxBroker.updateAttribute(newAttribute.getId(), action.getvalue());
+					//create new attribute if no matching already exists
+					if(!found){
+						//create new attribute for action with type action.getParameterName()
+						Future<CtxAttribute> futureParamAttr = ctxBroker.createAttribute(serviceEntityId, action.getparameterName());
+						CtxAttribute newParamAttr = futureParamAttr.get();
+						byte[] paramBlob = SerialisationHelper.serialise(action);
+						newParamAttr.setBinaryValue(paramBlob);
+						
+						//set history tuples on param attribute
+						ctxBroker.setHistoryTuples(newParamAttr.getId(), snpshtMgr.getSnapshot(newParamAttr.getId()));
+
+						//update mappings with new key and CtxAttrIdentifier
+						mappings.put(key, newParamAttr.getId());
+					}
+
+				}else{  //no entity yet exists for this serviceID
+					LOG.info("No entity exists yet for service with serviceId: "+action.getServiceID()+" - CREATING");
+					//create new service entity with type CtxEntityTypes.SERVICE
+					Future<CtxEntity> futureServiceEntity = ctxBroker.createEntity(CtxEntityTypes.SERVICE);
+					CtxEntity newServiceEntity = futureServiceEntity.get();
+
+					//create new ID attribute with type: CtxAttributeTypes.ID and value: action.getServiceID
+					LOG.info("Creating new ID attribute with value "+action.getServiceID()+" under new service entity");
+					Future<CtxAttribute> futureIDAttr = ctxBroker.createAttribute(newServiceEntity.getId(), CtxAttributeTypes.ID);
+					CtxAttribute newIDAttr = futureIDAttr.get();
+					byte[] idBlob = SerialisationHelper.serialise(action.getServiceID());
+					newIDAttr.setBinaryValue(idBlob);
+
+					//create new attribute for action with type action.getParameterName()
+					LOG.info("Creating new parameter attribute with value "+action+" under new service entity");
+					Future<CtxAttribute> futureParamAttr = ctxBroker.createAttribute(newServiceEntity.getId(), action.getparameterName());
+					CtxAttribute newParamAttr = futureParamAttr.get();
+					byte[] paramBlob = SerialisationHelper.serialise(action);
+					newParamAttr.setBinaryValue(paramBlob);
+
+					//set history tuples on param attribute
+					LOG.info("Setting HoC tuples for new parameter attribute");
+					ctxBroker.setHistoryTuples(newParamAttr.getId(), snpshtMgr.getSnapshot(newParamAttr.getId()));
+
 					//update mappings with new key and CtxAttrIdentifier
-					mappings.put(key, newAttribute.getId());
+					LOG.info("Adding new mapping to mapping table -> key: "+key+" CtxAttributeIdentifier: "+newParamAttr.getId());
+					mappings.put(key, newParamAttr.getId());
 				}
-				
+
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (ExecutionException e) {
 				e.printStackTrace();
 			} catch (CtxException e) {
 				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	public void updateUID(IIdentity owner){
-		
+
 	}
 }

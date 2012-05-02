@@ -7,15 +7,60 @@
     http://www.springframework.org/schema/beans 
     http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
     http://www.springframework.org/schema/context 
-    http://www.springframework.org/schema/context/spring-context-2.5.xsd">
-    
+    http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+    xmlns:tx="http://www.springframework.org/schema/tx">
+  
+
   <!-- regular spring configuration file defining the beans for this
        bundle. We've kept the osgi definitions in a separate 
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
-  <bean id="CisManagementBundle" class="org.societies.cis.manager.CisManager" />
-  
   <context:component-scan base-package="org.societies.cis.manager"></context:component-scan>
+   <context:annotation-config />
+    <tx:annotation-driven />
 
+    <bean id="ServiceRegPropConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" >
+        <property name="ignoreResourceNotFound" value="false" ></property>
+    </bean>
+
+    <bean
+        id="sessionFactory"
+        class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean" >
+
+        <property name="dataSource" ref="societiesDataSource" />
+        <property name="annotatedClasses" >
+            <list>
+                <value>org.societies.activity.ActivityFeed</value>
+                <value>org.societies.activity.model.Activity</value>
+            </list>
+        </property>
+
+        <property name="annotatedPackages" >
+
+            <list>
+                <value>org.societies.activity.model</value>
+            </list>
+        </property>
+
+        <property name="hibernateProperties" >
+            <props>
+                <prop key="hibernate.show_sql" >true</prop>
+                <prop key="hibernate.cache.use_second_level_cache" >false</prop>
+                <prop key="hibernate.hbm2ddl.auto" >create-drop</prop>
+                <prop key="hibernate.format_sql" >true</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- enable the configuration of transactional behavior based on annotations -->
+
+    <tx:annotation-driven transaction-manager="transactionManager" />
+
+    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager" >
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="CisManagementBundle" class="org.societies.cis.manager.CisManager" >
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
 </beans>

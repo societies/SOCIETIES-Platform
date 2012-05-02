@@ -35,13 +35,17 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceManagement.impl.UserPreferenceManagement;
+import org.societies.personalisation.UserPreferenceManagement.impl.merging.MergingManager;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
 import org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor;
+import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Learning;
 import org.societies.personalisation.preference.api.model.IPreferenceConditionIOutcomeName;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 import org.societies.personalisation.preference.api.model.PreferenceOutcome;
@@ -61,9 +65,12 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	private ICtxBroker ctxBroker;
 	private UserPreferenceManagement prefMgr;
 	private IInternalPersonalisationManager persoMgr;
+	private MergingManager merging;
+	private IC45Learning userPrefLearning;
+	private IEventMgr eventMgr;
 
 	public UserPreferenceConditionMonitor(){
-		
+		merging = new MergingManager(getUserPrefLearning(), prefMgr, this);
 	}
 	
 	
@@ -92,7 +99,31 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		this.persoMgr = persoMgr;
 	}
 
+
 	
+	/**
+	 * @return the userPrefLearning
+	 */
+	public IC45Learning getUserPrefLearning() {
+		return userPrefLearning;
+	}
+
+
+	/**
+	 * @param userPrefLearning the userPrefLearning to set
+	 */
+	public void setUserPrefLearning(IC45Learning userPrefLearning) {
+		this.userPrefLearning = userPrefLearning;
+	}
+
+
+	public IEventMgr getEventMgr() {
+		return eventMgr;
+	}
+
+	public void setEventMgr(IEventMgr eventMgr) {
+		this.eventMgr = eventMgr;
+	}
 	
 	public void initialisePreferenceManagement(){
 		this.prefMgr = new UserPreferenceManagement(null, this.getCtxBroker());
@@ -184,6 +215,8 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		 * The PCM is notified of changes in the personalisable parameters of a service using context. the User Action Monitor 
 		 * populates the context database with this information as soon as it receives an action from a service. 
 		 */
+		this.logging.debug("request for outcome with input: "+ownerId.getJid()+"\n"+action.toString());
+		this.merging.processActionReceived(ownerId, action);
 		List<IPreferenceOutcome> outcomes = new ArrayList<IPreferenceOutcome>();
 		IPreferenceOutcome outcome = new PreferenceOutcome(action.getServiceID(), action.getServiceType(), action.getparameterName(), action.getvalue());
 		outcome.setServiceID(action.getServiceID());
@@ -249,9 +282,22 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	}
 
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.personalisation.preference.IUserPreferenceManagement#getOutcome(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)
+	 */
 	@Override
-	public Future<IPreferenceOutcome> getOutcome(IIdentity ownerID,
+	public Future<IOutcome> getOutcome(IIdentity ownerID,
 			ServiceResourceIdentifier serviceID, String preferenceName) {
-		return new AsyncResult<IPreferenceOutcome> (this.prefMgr.getPreference(ownerID, "", serviceID, preferenceName));
+		return new AsyncResult<IOutcome> (this.prefMgr.getPreference(ownerID, "", serviceID, preferenceName));
 	}
+
+
+	/**
+	 * @return the prefMgr
+	 */
+	public UserPreferenceManagement getPrefMgr() {
+		return prefMgr;
+	}
+
 }

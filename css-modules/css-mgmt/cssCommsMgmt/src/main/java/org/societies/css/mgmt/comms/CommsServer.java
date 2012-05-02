@@ -44,6 +44,7 @@ import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssRequest;
+import org.societies.api.schema.cssmanagement.CssRequestOrigin;
 import org.societies.api.schema.cssmanagement.CssRequestStatusType;
 import org.societies.utilities.DBC.Dbc;
 
@@ -115,10 +116,11 @@ public class CommsServer implements IFeatureServer {
 				asyncResult = this.cssManager.registerXMPPServer((CssRecord) bean.getProfile());
 				break;
 			case LOGIN_CSS:
-				LOG.debug("Sending stanza with CSS identity: " + bean.getProfile().getCssIdentity() + " and password: " + bean.getProfile().getPassword());
+				LOG.debug("Login - Sending stanza with CSS identity: " + bean.getProfile().getCssIdentity() + " and password: " + bean.getProfile().getPassword());
 				asyncResult = this.cssManager.loginCSS((CssRecord) bean.getProfile());
 				break;
 			case LOGOUT_CSS:
+				LOG.debug("Logout - Sending stanza with CSS identity: " + bean.getProfile().getCssIdentity() + " and password: " + bean.getProfile().getPassword());
 				asyncResult = this.cssManager.logoutCSS((CssRecord) bean.getProfile());
 				break;
 			case LOGIN_XMPP_SERVER:
@@ -196,15 +198,26 @@ public class CommsServer implements IFeatureServer {
 
 				request.setCssIdentity(stanza.getFrom().getJid());
 				request.setRequestStatus(CssRequestStatusType.PENDING);
+				request.setOrigin(CssRequestOrigin.REMOTE);
 				
 				this.cssManager.updateCssRequest(request);
 				break;
+
 			case UPDATE_CSS_FRIEND_REQUEST:
 
 				request.setCssIdentity(stanza.getFrom().getJid());
 				request.setRequestStatus(bean.getRequestStatus());
+				request.setOrigin(CssRequestOrigin.REMOTE);
 			//	request.setRequestStatus(bean.ge);
 				this.cssManager.updateCssFriendRequest(request);
+			break;
+			case UPDATE_CSS_REQUEST:
+
+				request.setCssIdentity(stanza.getFrom().getJid());
+				request.setRequestStatus(bean.getRequestStatus());
+				request.setOrigin(CssRequestOrigin.REMOTE);
+			//	request.setRequestStatus(bean.ge);
+				this.cssManager.updateCssRequest(request);
 			break;
 			
 			

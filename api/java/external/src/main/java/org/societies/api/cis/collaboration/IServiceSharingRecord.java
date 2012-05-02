@@ -24,10 +24,17 @@
  */
 package org.societies.api.cis.collaboration;
 
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
 /**
  * @author Babak.Farshchian@sintef.no
  *
  */
+/**
+ * MISSING_JAVADOCS
+ */
+@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface IServiceSharingRecord {
 
 }

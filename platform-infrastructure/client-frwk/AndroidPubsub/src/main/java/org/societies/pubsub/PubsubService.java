@@ -1,5 +1,8 @@
 package org.societies.pubsub;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.slf4j.Logger;
@@ -64,6 +67,7 @@ public class PubsubService extends Service {
     private static class CommManagerAdapter implements ICommManager {
     	
     	private ClientCommunicationMgr clientCommunicationMgr;
+    	private Collection<ICommCallback> callbacks = new LinkedList<ICommCallback>();
     	
     	public CommManagerAdapter(ClientCommunicationMgr clientCommunicationMgr) {
     		this.clientCommunicationMgr = clientCommunicationMgr;
@@ -77,6 +81,7 @@ public class PubsubService extends Service {
 		public void register(ICommCallback messageCallback)
 				throws CommunicationException {
 			clientCommunicationMgr.register(PubsubClientImpl.getXMLElements(), messageCallback);
+			callbacks.add(messageCallback);
 		}
 
 		public void sendIQGet(Stanza stanza, Object payload,
@@ -129,5 +134,12 @@ public class PubsubService extends Service {
 		public boolean isConnected() {
 			return clientCommunicationMgr.isConnected();
 		}
+		
+	    public boolean UnRegisterCommManager() {
+			for(ICommCallback callback:callbacks)
+				clientCommunicationMgr.unregister(PubsubClientImpl.getXMLElements(), callback);
+			return true;
+		}
+
     }
 }

@@ -28,7 +28,10 @@ package org.societies.android.platform.gui;
 
 
 
+import org.societies.android.platform.phongegap.PluginCSSManager;
+
 import com.phonegap.DroidGap;
+import com.phonegap.api.LOG;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,7 +41,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 public class MasterGUIActivity extends DroidGap {
-/** Called when the activity is first created. */
+	//Logging tag
+	private static final String LOG_TAG = MasterGUIActivity.class.getName();
+
+	
+	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,4 +88,14 @@ public class MasterGUIActivity extends DroidGap {
             return super.onOptionsItemSelected(item);
         }
     }
+    
+    @Override
+    /**
+     * The final call you receive before your activity is destroyed. 
+     */
+    public void onDestroy() {
+    	super.onDestroy();
+    	LOG.d(LOG_TAG, "MasterGUIActivity being destroyed");
+    }
+
 }

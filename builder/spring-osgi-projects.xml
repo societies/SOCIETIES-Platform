@@ -67,6 +67,8 @@
 		<module>../platform-infrastructure/comms-frwk/PubsubServiceBundle</module>
 		<module>../platform-infrastructure/comms-frwk/PubsubClientBundle</module>
 		<module>../platform-infrastructure/comms-frwk/EventMgmtBundle</module>
+		<!-- Domain Authority Modules -->
+		<module>../domain-authority/group-manager</module>
 		<!-- Example 3rd party services
 		<module>../platform-infrastructure/comms-frwk/ExampleServices/Calculator</module>  
 		<module>../platform-infrastructure/comms-frwk/ExampleServices/FortuneCookie</module>  
@@ -87,10 +89,12 @@
 
 		<module>../css-modules/css-registry</module>
 		<module>../css-modules/css-directory</module>
+		<module>../css-modules/css-directory-client</module>
 		<module>../css-modules/css-mgmt/cssCommsMgmt</module>
 		<module>../css-modules/css-mgmt/cssmgmt</module>
 		<module>../css-modules/css-mgmt/TestccsCommsMgmt</module>
 
+		
 		<!-- CIS Mgmt -->
 		<module>../cis-modules/cis-persistance/</module>
 		<module>../cis-modules/cis-management/cis-manager/cis-manager/</module>
@@ -119,7 +123,7 @@
 		<module>../user-agent</module>
 
 		<!-- Personalisation -->
-		<!-- <module>../personalisation</module> TEMPORARILY REMOVED until refactoring of ServiceResourceIdentifier finishes -->
+		<module>../personalisation</module> 
 		
 		<!-- Intelligent Community Orchestration -->
 		<module>../intelligent-community-orchestration/API</module>

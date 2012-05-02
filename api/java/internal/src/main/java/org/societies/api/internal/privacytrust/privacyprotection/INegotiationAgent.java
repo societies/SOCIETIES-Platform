@@ -29,6 +29,7 @@ package org.societies.api.internal.privacytrust.privacyprotection;
 import java.util.concurrent.Future;
 
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
@@ -50,17 +51,17 @@ public interface INegotiationAgent {
 	public Future<Boolean> acknowledgeAgreement(IAgreementEnvelope contract);
 
 	/**
-	 * this method is called by any PSS that wants to read the service's provider
-	 * RequestPolicy for a specific service it provides
+	 * this method is called by any CSS that wants to read the  RequestPolicy of a service or CIS
+	 * 
 	 * @return				the policy of the service provider in the format of RequestPolicy
 	 * 
-	 * @param serviceID    the service identifier of the service for which the
-	 * negotiation will be performed
+	 * @param requestor    the details of the service provider or CIS administrator
+	 *
 	 */
-	public Future<RequestPolicy> getPolicy(ServiceResourceIdentifier serviceID);
+	public Future<RequestPolicy> getPolicy(Requestor requestor);
 
 	/**
-	 * This method is called by any PSS to get the Identity of the service provider.
+	 * This method is called by any CSS to get the Identity of the service provider or CIS administrator.
 	 * This is needed to do trust evaluation and evaluation of privacy preferences
 	 * where applicable
 	 * @return				the identity of the service provider
@@ -69,16 +70,15 @@ public interface INegotiationAgent {
 
 	/**
 	 * this method is called by the client and informs the provider that it wants to
-	 * initiate a negotiation process for the specified serviceID and provides its
+	 * initiate a negotiation process in order to start a service or join a CIS and provides its
 	 * policy which is a response to the provider's advertised privacy policy. this
 	 * method can be called a number of times until the ResponsePolicy.getStatus
 	 * method returns SUCCESSFUL or FAILED status.
 	 * @return 				the ResponsePolicy to the client's privacy policy.
 	 * 
-	 * @param serviceID    the service identifier for which the negotiation is going
-	 * to be performed
-	 * @param policy    the ResponsePolicy to the provider's privacy policy
+	 * @param requestor    	the details of the service provider or CIS administrator
+	 * @param policy   		the ResponsePolicy to the provider's privacy policy
 	 */
-	public Future<ResponsePolicy> negotiate(ServiceResourceIdentifier serviceID, ResponsePolicy policy);
+	public Future<ResponsePolicy> negotiate(Requestor requestor, ResponsePolicy policy);
 
 }

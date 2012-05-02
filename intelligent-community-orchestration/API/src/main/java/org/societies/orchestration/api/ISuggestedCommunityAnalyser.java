@@ -27,7 +27,12 @@ package org.societies.orchestration.api;
 
 import java.util.ArrayList;
 
+import org.societies.api.activity.IActivity;
 import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.css.management.ICssActivity;
+import org.societies.api.identity.IIdentity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,51 +99,21 @@ public interface ISuggestedCommunityAnalyser {
 	 */
     public void processCSCWConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations);
     
-    /**
-	 * Takes as input a collection of CISs, and what they represent, and performs analysis on them
-	 * which may lead to action being taken for some or all of them.
+   /** @param communitySuggestions
+	 * This contains a list of CSSs and the context state model they all match
+	 * which suggests a possible community. If the model is a defined data type
+	 * in the system, then this interface can take 2 parameters: an arraylist of the
+	 * CSSs and the model object. In the meantime the following method can be called:
 	 * 
-	 * @param cisRecommendations
-	 * Holds all the CIS recommendation information, as a String-to-Arraylist hashmap. The possible values are as follows:
-	 * 
-	 * Key: "Create CISs" Value: Arraylist of CisRecords.  
-	 * It contains all the CisRecords to create, each of which must include its parent if it's a sub-CIS.
-	 * 
-	 * Key: "Delete CISs" Value: Arraylist of CisRecords.  
-	 * It contains all the CisRecords to delete.
-	 * 
-	 */
-    public void processCSMAnalyserRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations);
-    
-    /**
-	 * Takes as input a collection of CISs, and what they represent, and performs analysis on them
-	 * which may lead to action being taken for some or all of them.
-	 * 
-	 * @param cisRecommendations
-	 * Holds all the CIS recommendation information, as a String-to-Arraylist hashmap. The possible values are as follows:
-	 * 
-	 * Key: "Configure CISs" Value: Arraylist(1) of arraylist(2) of CisRecords. (1) has one entry per configuration recommendation.
-	 * (2) Has two entries for each of (1) - the first is the CisRecord to be configured, and the second is the CisRecord that would 
-	 * result if the configuration happens. Among other things this can be used to:
-	 *  - Add and remove CIS members (edit the members list)
-	 *  - Add, remove, or amend membership criteria (edit the membership criteria) 
-	 *  - Add and remove CIS services (edit the CIS's shared services) 
-	 *  - Add, remove, or amend name and description (edit the name and description)
-	 *  - Change the owner (edit the owner attribute)
-	 *  - Add and remove administrators (edit the administrators list)
-	 *  - Add and remove sub-CISs and super-CISs (edit the sub-CIS and super-CIS lists)
-	 *  
-	 * Key: "Split CISs" Value: Arraylist(1) of arraylist(2) of CisRecords. (1) has one entry per configuration recommendation.
-	 * (2) Has three entries for each of (1) - the first is the CisRecord to be split, and the other two are the new CISs to be
-	 * created by the split.
-	 * 
-	 * Key: "Merge CISs" Value: Arraylist(1) of arraylist(2) of CisRecords. (1) has one entry per configuration recommendation.
-	 * (2) Has three entries for each of (1) - the first two are the CisRecords that are to be merged into one. The third is optional,
-	 * and it is the CisRecord that is to be created by the merge. This could be used in order to specify
-	 * for example who the new owner should be.
-	 * 
-	 */
-    public void processCSMAnalyserConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations);
+	 * This method has the following parameters:
+	 *  - an arraylist of the CSSs as the 1st parameter, 
+	 *  - an arraylist of matching context attributes from the model as the 2nd parameter, 
+	 *  - an arraylist of matching context associations from the model as the 3nd parameter,
+	 *  - an arraylist of matching CSS activities (from CSS and CIS activity feeds) as the 4th
+	 *    parameter 
+	 *  - and an arraylist of matching CIS activities as the 5th parameter..
+     */
+    public void processCSMAnalyserRecommendations(ArrayList<IIdentity> cssList, ArrayList<CtxAttribute> sharedContextAttributes, ArrayList<CtxAssociation> sharedContextAssociations, ArrayList<ICssActivity> sharedCssActivities, ArrayList<IActivity> sharedCisActivities);
     /**
 	 * Takes as input a collection of CISs, and what they represent, and performs analysis on them
 	 * which may lead to action being taken for some or all of them.

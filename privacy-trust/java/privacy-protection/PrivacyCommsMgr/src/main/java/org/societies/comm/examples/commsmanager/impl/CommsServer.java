@@ -43,12 +43,20 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationAgentBean;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.identity.RequestorCisBean;
+import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
@@ -161,7 +169,8 @@ public class CommsServer implements IFeatureServer {
 			}
 		}else if (bean.getMethod().equals("getPolicy")){
 			try{
-			RequestPolicy policy =  this.negAgent.getPolicy((ServiceResourceIdentifier) bean.getServiceID()).get();
+				
+			RequestPolicy policy =  this.negAgent.getPolicy(this.getRequestorFromBean(bean.getRequestor())).get();
 			if (policy!=null){
 				return Util.toByteArray(policy);
 			}
@@ -188,7 +197,7 @@ public class CommsServer implements IFeatureServer {
 			Object obj = Util.convertToObject(responseArray,this.getClass());
 			if (obj!=null){
 				if (obj instanceof ResponsePolicy){
-					ResponsePolicy policy = (this.negAgent.negotiate(bean.getServiceID(), (ResponsePolicy) obj)).get();
+					ResponsePolicy policy = (this.negAgent.negotiate(this.getRequestorFromBean(bean.getRequestor()), (ResponsePolicy) obj)).get();
 					if (policy!=null){
 						return Util.toByteArray(policy);
 					}
@@ -215,6 +224,25 @@ public class CommsServer implements IFeatureServer {
 		return null;
 	}
 	
+	private Requestor getRequestorFromBean(RequestorBean bean){
+		IIdentityManager idm = this.commManager.getIdManager();
+		try {
+			if (bean instanceof RequestorCisBean){
+				RequestorCis requestor = new RequestorCis(idm.fromJid(bean.getRequestorId()), idm.fromJid(((RequestorCisBean) bean).getCisRequestorId()));
+				return requestor;
+
+			}else if (bean instanceof RequestorServiceBean){
+				RequestorService requestor = new RequestorService(idm.fromJid(bean.getRequestorId()), ((RequestorServiceBean) bean).getRequestorServiceId());
+				return requestor;
+			}else{
+				return new Requestor(idm.fromJid(bean.getRequestorId()));
+			}
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
 	
 
 }

@@ -24,32 +24,13 @@
  */
 package org.societies.platform.activityfeed;
 
-import static org.junit.Assert.assertTrue;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.junit.Test;
-import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.CISNotFoundException;
-import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.CSSNotFoundException;
-import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
-import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
-import org.societies.api.schema.servicelifecycle.model.Service;
-import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
-import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
-import org.societies.api.schema.servicelifecycle.model.ServiceLocation;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
-import org.societies.api.schema.servicelifecycle.model.ServiceType;
-import org.societies.cis.activity.ActivityFeed;
+import org.societies.activity.ActivityFeed;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.test.annotation.ExpectedException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
@@ -57,7 +38,7 @@ import org.springframework.test.context.junit4.AbstractTransactionalJUnit4Spring
 /**
  * 
  * 
- * @author solutanet
+ * @author bjornmagnus adopted from solutanet
  * 
  */
 @ContextConfiguration(locations = { "../../../../META-INF/ActivityFeedTest-context.xml" })

@@ -23,8 +23,15 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 import org.societies.api.cis.management.ICisRecord;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType;
 
+import org.societies.api.activity.IActivity;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.css.management.ICssActivity;
+import org.societies.api.identity.IIdentity;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+
 
 public class SuggestedCommunityAnalyserBean {
 
@@ -32,7 +39,13 @@ public class SuggestedCommunityAnalyserBean {
 	private HashMap<String, ArrayList<ICisRecord>> ciss;
 	private HashMap<String, ArrayList<ArrayList<ICisRecord>>> configureCiss;
 	private ArrayList<String> cissMetadata;
-
+	
+	private ArrayList<IIdentity> cssList;
+	private ArrayList<CtxAttribute> sharedContextAttributes;
+	private ArrayList<CtxAssociation> sharedContextAssociations;
+	private ArrayList<ICssActivity> sharedCssActivities;
+	private ArrayList<IActivity> sharedCisActivities;
+	
 	public SuggestedCommunityAnalyserBean() {
 		
 	}
@@ -67,6 +80,46 @@ public class SuggestedCommunityAnalyserBean {
 	
 	public void setCissMetadata(ArrayList<String> cissMetadata){
 		this.cissMetadata = cissMetadata;
+	}
+	
+	public ArrayList<IIdentity> getCssList(){
+		return this.cssList;
+	}
+	
+	public void setCssList(ArrayList<IIdentity> cssList){
+		this.cssList = cssList;
+	}
+	
+	public ArrayList<CtxAttribute> getSharedContextAttributes(){
+		return this.sharedContextAttributes;
+	}
+	
+	public void setSharedContextAttributes(ArrayList<CtxAttribute> sharedContextAttributes){
+		this.sharedContextAttributes = sharedContextAttributes;
+	}
+	
+	public ArrayList<CtxAssociation> getSharedContextAssociations(){
+		return this.sharedContextAssociations;
+	}
+	
+	public void setSharedContextAssociations(ArrayList<CtxAssociation> sharedContextAssociations){
+		this.sharedContextAssociations = sharedContextAssociations;
+	}
+	
+	public ArrayList<ICssActivity> getSharedCssActivities(){
+		return this.sharedCssActivities;
+	}
+	
+	public void setSharedCssActivities(ArrayList<ICssActivity> sharedCssActivities){
+		this.sharedCssActivities = sharedCssActivities;
+	}
+	
+	public ArrayList<IActivity> getSharedCisActivities(){
+		return this.sharedCisActivities;
+	}
+	
+	public void setSharedCisActivities(ArrayList<IActivity> sharedCisActivities){
+		this.sharedCisActivities = sharedCisActivities;
 	}
 	
 }

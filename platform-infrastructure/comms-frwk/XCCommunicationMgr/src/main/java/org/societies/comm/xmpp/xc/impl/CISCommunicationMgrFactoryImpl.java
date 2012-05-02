@@ -44,7 +44,8 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 	
 	@Override
 	public ICommManager getNewCommManager(IIdentity cisIdentity, String credentials) throws CommunicationException {
-		XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), credentials);
+		
+		XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), credentials, this.idm.getDomainAuthorityNode().getJid());
 		commMgr.loginFromConfig();
 		if (commMgr.getIdManager()==null)
 			throw new CommunicationException("Unable to create CISCommManager!");
@@ -67,7 +68,7 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 			String randomCisIdentifier = UUID.randomUUID().toString()+"."+domainName;
 			// TODO verify if exists
 			IIdentity cisIdentity = idm.fromJid(randomCisIdentifier);
-			XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), genericPassword);
+			XCCommunicationMgr commMgr = new XCCommunicationMgr(cisIdentity.getDomain(), cisIdentity.getJid(), genericPassword, this.idm.getDomainAuthorityNode().getJid());
 			commMgr.loginFromConfig();
 			if (commMgr.getIdManager()==null)
 				throw new CommunicationException("Unable to connect!");
@@ -81,8 +82,11 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 	
 	public void destroyAllConnections() {
 		for (ICommManager cm : cisCommManagers.values()) {
-			if (cm instanceof ICommManagerController) {
+			LOG.info("Disconnecting CIS '"+cm.getIdManager().getThisNetworkNode().getJid()+"'");
+			try {
 				((ICommManagerController)cm).logout();
+			} catch (ClassCastException e) {
+				LOG.error("ICommManager cannot be casted to ICommManagerController!!!", e);
 			}
 		}
 	}

@@ -28,7 +28,7 @@ package org.societies.api.internal.privacytrust.privacyprotection;
 
 import java.util.concurrent.Future;
 
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.identity.RequestorBean;
 
 
 /**
@@ -48,17 +48,17 @@ public interface INegotiationAgent {
 	public Future<Boolean> acknowledgeAgreement(byte[] agreementEnvelope);
 
 	/**
-	 * this method is called by any CSS that wants to read the service's provider
+	 * this method is called by any CSS that wants to read the entity's
 	 * RequestPolicy for a specific service it provides
 	 * @return				the policy of the service provider in the format of RequestPolicy
 	 * 
-	 * @param serviceID    the service identifier of the service for which the
+	 * @param requestor    the entity with which we negotiate
 	 * negotiation will be performed
 	 */
-	public Future<byte[]> getPolicy(ServiceResourceIdentifier serviceID);
+	public Future<byte[]> getPolicy(RequestorBean requestor);
 
 	/**
-	 * This method is called by any CSS to get the Identity of the service provider.
+	 * This method is called by any CSS to get the Identity of the negotiating entity.
 	 * This is needed to do trust evaluation and evaluation of privacy preferences
 	 * where applicable
 	 * 
@@ -67,16 +67,15 @@ public interface INegotiationAgent {
 
 	/**
 	 * this method is called by the client and informs the provider that it wants to
-	 * initiate a negotiation process for the specified serviceID and provides its
-	 * policy which is a response to the provider's advertised privacy policy. this
+	 * initiate a negotiation process with the requestor and provides its
+	 * policy which is a response to the requestor's advertised privacy policy. this
 	 * method can be called a number of times until the ResponsePolicy.getStatus
 	 * method returns SUCCESSFUL or FAILED status.
 	 * 
 	 * 
-	 * @param serviceID    the service identifier for which the negotiation is going
-	 * to be performed
+	 * @param requestor    the entity with which we negotiate
 	 * @param policy    the ResponsePolicy to the provider's privacy policy
 	 */
-	public Future<byte[]> negotiate(ServiceResourceIdentifier serviceID, byte[] responsePolicy);
+	public Future<byte[]> negotiate(RequestorBean requestor, byte[] responsePolicy);
 
 }

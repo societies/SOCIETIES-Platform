@@ -24,17 +24,17 @@
  */
 package org.societies.privacytrust.trust.api.repo;
 
-import org.societies.privacytrust.trust.api.model.TrustedEntity;
+import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 
 public class TrustEntityEvent {
 
-	private TrustedEntity entity;
+	private ITrustedEntity entity;
 
 	public TrustEntityEvent(){
 
 	}
 
-	public TrustedEntity getEntity(){
+	public ITrustedEntity getEntity(){
 		return this.entity;
 	}
 }

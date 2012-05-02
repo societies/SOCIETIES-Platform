@@ -33,6 +33,9 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
  * @author S.Gallacher@hw.ac.uk
  *
  */
+/**
+ * MISSING_JAVADOCS
+ */
 @SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface IResourceSharing
 {

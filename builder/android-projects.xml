@@ -67,12 +67,14 @@
 		<!-- Client Framework -->
 
 		<module>../platform-infrastructure/client-frwk/SocietiesServiceMonitor</module>
-		<!--
+                <module>../platform-infrastructure/client-frwk/SocietiesCSSManager</module>
+
+		<!--	
 		<module>../platform-infrastructure/client-frwk/MasterGUI</module>
 		-->
 		<!-- CIS manager light modules -->
-		<module>../cis-modules/android/client-lib-android</module>
-		<module>../cis-modules/android/cis-management</module>
+		<!-- <module>../cis-modules/android/client-lib-android</module> -->
+		<!-- <module>../cis-modules/android/cis-management</module> -->
 		<!-- CIS manager light test modules. Give error due to missing emulator. Not sure where these should go -->
 		<!-- <module>../cis-modules/android/client-lib-android-test</module> -->
 		<!-- <module>../cis-modules/android/cis-management-test</module> -->		

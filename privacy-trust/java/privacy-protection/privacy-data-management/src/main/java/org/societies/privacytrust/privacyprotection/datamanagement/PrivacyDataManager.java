@@ -24,37 +24,101 @@
  */
 package org.societies.privacytrust.privacyprotection.datamanagement;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Future;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
+import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.DataObfuscationManager;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
- * @state skeleton 
- * @author olivierm
+ * @author Olivier Maridat (Trialog)
  */
 public class PrivacyDataManager implements IPrivacyDataManager {
+	IPrivacyDataManagerInternal privacyDataManager;
+//	IPrivacyPreferenceManager privacyPreferenceManager;
 	IDataObfuscationManager dataObfuscationManager;
-	
+
 	public PrivacyDataManager()  {
 		dataObfuscationManager = new DataObfuscationManager();
+//		privacyPreferenceManager = new PrivacyPreferenceManager();
+		privacyDataManager = new PrivacyDataManagerInternal();
 	}
+
+
+	/*
+	 * 
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.internal.mock.CtxIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.servicelifecycle.model.ServiceResourceIdentifier)
+	 */
+	@Override
+	public ResponseItem checkPermission(Requestor requestor,IIdentity ownerId, CtxIdentifier dataId, Action action) throws PrivacyException {
+		// -- Verify parameters
+		verifyParemeters(requestor, ownerId, null, dataId);
+
+		// -- Retrieve a stored permission
+		ResponseItem permission = privacyDataManager.getPermission(requestor, ownerId, dataId);
+		// - Permission available: check actions
+		if (null != permission) {
+			// Actions available
+			if (null != permission.getRequestItem() && permission.getRequestItem().getActions().contains(action)) {
+				// Return only used actions for this request
+				List<Action> actions = new ArrayList<Action>();
+				actions.add(action);
+				permission.getRequestItem().setActions(actions);
+			}
+			// Actions not available
+			else if(null != permission.getRequestItem()) {
+				permission = new ResponseItem(null, Decision.DENY);
+			}
+
+		}
+
+		// -- Permission not available: ask to PrivacyPreferenceManager
+		if (null == permission) {
+			//			permission = privacyPreferenceManager.checkPermission(ctxId, action, requestorIIdentity);
+			// Permission still not available: deny access
+			if (null == permission) {
+				permission = new ResponseItem(null, Decision.DENY);
+			}
+		}
+		return permission;
+	}
+
 	/*
 	 * 
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#obfuscateData(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)
 	 */
+	@Async
 	@Override
-	public IDataWrapper obfuscateData(IDataWrapper dataWrapper,
-			double obfuscationLevel, IDataObfuscationListener listener)
-			throws PrivacyException {
-		return dataObfuscationManager.obfuscateData(dataWrapper, obfuscationLevel, listener);
+	public Future<IDataWrapper> obfuscateData(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper) throws PrivacyException {
+		// -- Verify parameters
+		verifyParemeters(requestor, ownerId, dataWrapper, null);
+
+		// -- Retrieve the obfuscation level
+		//		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, owner, dataWrapper.getDataId());
+		//		double obfuscationLevel = dataObfuscationPreferences.getObfuscationLevel();
+		double obfuscationLevel = 1;
+		// If no obfuscation is required: return directly the wrapped data
+		if (1 == obfuscationLevel) {
+			return new AsyncResult<IDataWrapper>(dataWrapper);
+		}
+
+		// -- Obfuscate the data
+		IDataWrapper obfuscatedDataWrapper = dataObfuscationManager.obfuscateData(dataWrapper, obfuscationLevel);
+		return new AsyncResult<IDataWrapper>(obfuscatedDataWrapper);
 	}
 
 	/*
@@ -62,42 +126,26 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#hasObfuscatedVersion(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)
 	 */
 	@Override
-	public CtxIdentifier hasObfuscatedVersion(IDataWrapper dataWrapper,
-			double obfuscationLevel, IDataObfuscationListener listener)
-			throws PrivacyException {
-		return dataObfuscationManager.hasObfuscatedVersion(dataWrapper, obfuscationLevel, listener);
+	public CtxIdentifier hasObfuscatedVersion(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper) throws PrivacyException {
+		// -- Verify parameters
+		verifyParemeters(requestor, ownerId, dataWrapper, null);
+
+		// -- Retrieve the obfuscation level
+		//		DObfOutcome dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(requestor, owner, dataWrapper.getDataId());
+		//		double obfuscationLevel = dataObfuscationPreferences.getObfuscationLevel();
+		double obfuscationLevel = 1;
+
+		// -- Check if an obfuscated version is available
+		return dataObfuscationManager.hasObfuscatedVersion(dataWrapper, obfuscationLevel);
 	}
 
-	/*
-	 * 
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.internal.mock.CtxIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.servicelifecycle.model.ServiceResourceIdentifier)
-	 */
-	@Override
-	public ResponseItem checkPermission(CtxIdentifier dataId, IIdentity ownerId,
-			IIdentity requestorId, ServiceResourceIdentifier serviceId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	/*
-	 * 
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.internal.mock.CtxIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier)
-	 */
-	@Override
-	public ResponseItem checkPermission(CtxIdentifier dataId, IIdentity ownerId,
-			IIdentity requestorId, IIdentity cisId) {
-		// TODO Auto-generated method stub
-		return null;
+	private void verifyParemeters(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper, CtxIdentifier dataId) throws PrivacyException {
+		if (null == requestor || null == ownerId) {
+			throw new NullPointerException("Not enought information to knwo how to obfuscate this data");
+		}
+		if (null == dataId && (null == dataWrapper || null == dataWrapper.getDataId())) {
+			throw new PrivacyException("Not enought information in the wrapper to obfuscate this data");
+		}
 	}
-
-	/*
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.internal.mock.CtxIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.mock.EntityIdentifier, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
-	 */
-	@Override
-	public ResponseItem checkPermission(CtxIdentifier dataId, IIdentity ownerId,
-			IIdentity requestorId, RequestPolicy usage) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
