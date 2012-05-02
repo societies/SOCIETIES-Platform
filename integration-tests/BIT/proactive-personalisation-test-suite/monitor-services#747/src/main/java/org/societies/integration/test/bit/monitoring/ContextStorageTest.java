@@ -36,6 +36,8 @@ import java.util.concurrent.Future;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
@@ -54,16 +56,18 @@ import org.societies.api.useragent.monitoring.IUserActionMonitor;
 
 public class ContextStorageTest {
 
-	private static IUserActionMonitor uam;
-	private static ICtxBroker ctxBroker;
+	private static Logger LOG = LoggerFactory.getLogger(ContextStorageTest.class);
+	//private static IUserActionMonitor uam;
+	//private static ICtxBroker ctxBroker;
 
 	public void setUp(){
-		uam = TestCase747.getUam();
-		ctxBroker = TestCase747.getCtxBroker();
+		//uam = TestCase747.getUam();
+		//ctxBroker = TestCase747.getCtxBroker();
 	}
 
 	@Test
 	public void test() {
+		LOG.info("Monitor services #747 - Running ContextStorageTest....");
 		//create actions
 		IIdentity identity = new MockIdentity(IdentityType.CSS, "sarah", "societies.org");
 		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
@@ -83,18 +87,20 @@ public class ContextStorageTest {
 		IAction action5 = new Action(serviceId2, "testService", "colour", "green");
 
 		//send actions
-		uam.monitor(identity, action1);
-		uam.monitor(identity, action2);
-		uam.monitor(identity, action3);
-		uam.monitor(identity, action4);
-		uam.monitor(identity, action5);
+		LOG.info("Monitor services #747 - sending mock actions for storage");
+		TestCase747.uam.monitor(identity, action1);
+		TestCase747.uam.monitor(identity, action2);
+		TestCase747.uam.monitor(identity, action3);
+		TestCase747.uam.monitor(identity, action4);
+		TestCase747.uam.monitor(identity, action5);
 
 		//check context storage structure
 		try {
 			
 			//Check service 1
 			
-			Future<List<CtxEntityIdentifier>> futureServiceEntityIDs = ctxBroker.lookupEntities(CtxEntityTypes.SERVICE, CtxAttributeTypes.ID, serviceId1, serviceId1);
+			Future<List<CtxEntityIdentifier>> futureServiceEntityIDs = 
+					TestCase747.ctxBroker.lookupEntities(CtxEntityTypes.SERVICE, CtxAttributeTypes.ID, serviceId1, serviceId1);
 			List<CtxEntityIdentifier> serviceEntityIDs = futureServiceEntityIDs.get();
 
 			//Check number of service entities returned
@@ -102,7 +108,7 @@ public class ContextStorageTest {
 			Assert.assertTrue(serviceEntityIDs.size() == 1);	
 
 			//check attributes for service 1
-			Future<CtxModelObject> futureServiceEntity = ctxBroker.retrieve(serviceEntityIDs.get(0));
+			Future<CtxModelObject> futureServiceEntity = TestCase747.ctxBroker.retrieve(serviceEntityIDs.get(0));
 			CtxEntity serviceEntity = (CtxEntity)futureServiceEntity.get();
 			Set<CtxAttribute> attributes = serviceEntity.getAttributes();
 
@@ -143,7 +149,8 @@ public class ContextStorageTest {
 		//Check service 2
 		
 		try {
-			Future<List<CtxEntityIdentifier>> futureServiceEntityIDs = ctxBroker.lookupEntities(CtxEntityTypes.SERVICE, CtxAttributeTypes.ID, serviceId2, serviceId2);
+			Future<List<CtxEntityIdentifier>> futureServiceEntityIDs = 
+					TestCase747.ctxBroker.lookupEntities(CtxEntityTypes.SERVICE, CtxAttributeTypes.ID, serviceId2, serviceId2);
 			List<CtxEntityIdentifier> serviceEntityIDs = futureServiceEntityIDs.get();
 		
 			//Check number of service entities returned
@@ -151,7 +158,7 @@ public class ContextStorageTest {
 			Assert.assertTrue(serviceEntityIDs.size() == 1);
 		
 			//check attributes for service 2
-			Future<CtxModelObject> futureServiceEntity = ctxBroker.retrieve(serviceEntityIDs.get(0));
+			Future<CtxModelObject> futureServiceEntity = TestCase747.ctxBroker.retrieve(serviceEntityIDs.get(0));
 			CtxEntity serviceEntity = (CtxEntity)futureServiceEntity.get();
 			Set<CtxAttribute> attributes = serviceEntity.getAttributes();
 			

@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.bit.context_triggered_personalisation;
+package org.societies.integration.test.bit.ctx_personalisation;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -71,7 +71,7 @@ public class HelloWorld implements IHelloWorld, IActionConsumer{
 
 	@Override
 	public boolean setIAction(IIdentity userId, IAction action) {
-		System.out.println("Received action: "+action.toString());
+		log("Received action: "+action.toString());
 		if (action.getparameterName().equalsIgnoreCase("bgColour")){
 			this.colours.put(userId, action.getvalue());
 		}else if (action.getparameterName().equalsIgnoreCase("volume")){
@@ -82,6 +82,7 @@ public class HelloWorld implements IHelloWorld, IActionConsumer{
 	@Override
 	public void setBackgroundColour(IIdentity userId, String colour) {
 		IAction action = new Action(this.myServiceID, "HelloWorld", "bgColour", colour);
+		log("sending action to uam: "+action.toString());
 		this.uam.monitor(userId, action);
 	}
 	@Override
@@ -119,5 +120,7 @@ public class HelloWorld implements IHelloWorld, IActionConsumer{
 		return "";
 		
 	}
-
+	private void log(String msg){
+		System.out.println(this.getClass().getName()+": "+msg);
+	}
 }

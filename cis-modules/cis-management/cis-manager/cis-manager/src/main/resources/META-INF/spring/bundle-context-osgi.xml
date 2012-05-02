@@ -17,5 +17,5 @@
 	<osgi:reference id="xcCommunication" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
 
   	<osgi:service ref="CisManagementBundle" interface="org.societies.api.cis.management.ICisManager"/>
-	
+		<osgi:reference id="societiesDataSource" interface="javax.sql.DataSource"/>
 </beans>

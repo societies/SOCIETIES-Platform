@@ -75,6 +75,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	
 	private IEventMgr eventMgr;
 	private IPrivacyPreferenceManager privacyPreferenceManager;
+	//ICommManager!
 	private IIdentityManager idm;
 	
 	private IPolicyAgreementManagerInternal policyAgreementMgr;

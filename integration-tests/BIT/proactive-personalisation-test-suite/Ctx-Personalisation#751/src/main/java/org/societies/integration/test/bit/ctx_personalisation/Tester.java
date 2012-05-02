@@ -23,7 +23,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.integration.test.bit.context_triggered_personalisation;
+package org.societies.integration.test.bit.ctx_personalisation;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -85,25 +85,27 @@ public class Tester {
 	
 	@org.junit.Test
 	public void Test(){
+	
 		changeContext("home", "free");
 		
-
-		
 		for (int i=0; i<5; i++){
+			log("Step: "+i);
+			
 			this.helloWorldService.setBackgroundColour(userId, "red");
 			
 			changeContext("work", "busy");
 			
 			this.helloWorldService.setBackgroundColour(userId, "black");
 			
-			changeContext("home", "free");			
-			
+			changeContext("home", "free");	
+		}
+					
 			Assert.assertEquals("red", this.helloWorldService.getBackgroundColour(userId));
 			
 			changeContext("work", "busy");
 			
 			Assert.assertEquals("black", this.helloWorldService.getBackgroundColour(userId));
-		}
+		
 		
 		
 	}
@@ -117,6 +119,8 @@ public class Tester {
 			
 			this.statusAttribute.setStringValue(statusValue);
 			this.statusAttribute = (CtxAttribute) this.ctxBroker.update(statusAttribute).get();
+			System.out.println("changeContext("+symLocValue+", "+statusValue+");");
+
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -153,8 +157,11 @@ public class Tester {
 				person = (CtxEntity) this.ctxBroker.retrieve(persons.get(0)).get();
 			}
 			
-			
-			
+			if (person==null){
+				log("Person CtxEntity is null");
+			}else{
+				log("Got Person CtxEntity - NOT NULL");
+			}
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -176,6 +183,12 @@ public class Tester {
 			}else{
 				symLocAttribute = (CtxAttribute) this.ctxBroker.retrieve(attrs.get(0)).get();
 			}
+			if (symLocAttribute==null){
+				log(CtxAttributeTypes.LOCATION_SYMBOLIC+" CtxAttribute is null");
+			}else{
+				log(CtxAttributeTypes.LOCATION_SYMBOLIC+" CtxAttribute - NOT NULL");
+			}
+			
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -185,6 +198,9 @@ public class Tester {
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch(Exception e){
+			e.printStackTrace();
+			this.log("EXCEPTION!");
 		}
 			
 	}
@@ -199,6 +215,12 @@ public class Tester {
 			}else{
 				statusAttribute = (CtxAttribute) this.ctxBroker.retrieve(attrs.get(0)).get();
 			}
+			
+			if (statusAttribute==null){
+				log(CtxAttributeTypes.STATUS+" CtxAttribute is null");
+			}else{
+				log(CtxAttributeTypes.STATUS+" CtxAttribute - NOT NULL");
+			}
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -211,6 +233,10 @@ public class Tester {
 		}
 	}	
 	
+	
+	private void log(String msg){
+		System.out.println(this.getClass().getName()+": "+msg);
+	}
 	/*
 	private List<IIdentity> identities = new ArrayList<IIdentity>();
 	private List<IAction> actions = new ArrayList<IAction>();

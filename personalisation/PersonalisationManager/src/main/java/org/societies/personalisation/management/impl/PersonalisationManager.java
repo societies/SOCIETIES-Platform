@@ -51,6 +51,7 @@ import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
 import org.societies.api.osgi.event.CSSEvent;
+import org.societies.api.osgi.event.CSSEventConstants;
 import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
@@ -126,7 +127,12 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 		
 	}
 	private void registerForUIMEvents() {
-		this.getEventMgr().subscribeInternalEvent(this, new String[]{EventTypes.UIM_EVENT}, null);
+		String eventFilter = "(&" + 
+		"(" + CSSEventConstants.EVENT_NAME + "=newaction)" +
+		"(" + CSSEventConstants.EVENT_SOURCE + "=org/societies/useragent/monitoring)" +
+		")";
+		this.getEventMgr().subscribeInternalEvent(this, new String[]{EventTypes.UIM_EVENT}, eventFilter);
+		this.logging.debug("Subscribed to "+EventTypes.UIM_EVENT+" events");
 		
 	}
 
@@ -757,6 +763,12 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 
 	@Override
 	public void handleInternalEvent(InternalEvent event) {
+		this.logging.debug("Received UIM event:");
+		this.logging.debug("Event name "+event.geteventName()+
+				"Event info: "+event.geteventInfo().toString()+
+				"Event source: "+event.geteventSource()+
+				"Event type: "+event.geteventType());
+		
 		
 		if (event.geteventType().equals("UIM_EVENT")){
 			UIMEvent uimEvent = (UIMEvent) event.geteventInfo();

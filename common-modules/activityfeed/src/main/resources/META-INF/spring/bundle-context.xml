@@ -53,15 +53,15 @@
         <property name="dataSource" ref="societiesDataSource" />
         <property name="annotatedClasses" >
             <list>
-                <value>org.societies.cis.activity.ActivityFeed</value>
-                <value>org.societies.cis.activity.model.Activity</value>
+                <value>org.societies.activity.ActivityFeed</value>
+                <value>org.societies.activity.model.Activity</value>
             </list>
         </property>
 
         <property name="annotatedPackages" >
 
             <list>
-                <value>org.societies.cis.activity.model</value>
+                <value>org.societies.activity.model</value>
             </list>
         </property>
 
@@ -83,7 +83,7 @@
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
 
-    <bean id="actFeed" class="org.societies.cis.activity.ActivityFeed" >
+    <bean id="actFeed" class="org.societies.activity.ActivityFeed">
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
 

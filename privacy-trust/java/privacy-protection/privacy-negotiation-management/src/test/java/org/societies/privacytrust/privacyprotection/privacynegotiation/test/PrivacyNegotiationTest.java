@@ -22,83 +22,49 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.bit.context_triggered_personalisation;
+package org.societies.privacytrust.privacyprotection.privacynegotiation.test;
 
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.junit.Before;
+import org.junit.Test;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.useragent.monitoring.IUserActionMonitor;
-import org.societies.integration.test.IntegrationTestCase;
+import org.societies.api.internal.personalisation.preference.IUserPreferenceManagement;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 
 /**
- * Class that tests Context Triggered Personalisation. 
+ * Describe your class here...
  *
  * @author Eliza
  *
  */
-public class Test751 extends IntegrationTestCase{
+public class PrivacyNegotiationTest {
 
-	private static ICtxBroker ctxBroker;
-	private static IUserActionMonitor uam;
-	private static ICommManager commsMgr;
-	private static IHelloWorld helloWorld;
+	private IUserPreferenceManagement prefMgr;
+	private ICtxBroker ctxBroker;
+	private IEventMgr eventMgr;
+	private IPrivacyPreferenceManager privacyPreferenceManager;
+
+
+	@Before
+	public void setUp(){
+		
+	}
 	
-	public Test751(){
-		super(751, new Class[]{Tester.class});
+	@Test
+	public void testGetProviderPolicy(){
+		
 	}
-
-	/**
-	 * @return the ctxBroker
-	 */
-	public static ICtxBroker getCtxBroker() {
-		return ctxBroker;
+	
+	@Test
+	public void testNegotiate(){
+		
 	}
-
-	/**
-	 * @param ctxBroker the ctxBroker to set
-	 */
-	public  void setCtxBroker(ICtxBroker ctxBroker) {
-		this.ctxBroker = ctxBroker;
+	@Test
+	public void testAcknowledgeAgreement(){
+		
 	}
-
-	/**
-	 * @return the uam
-	 */
-	public static IUserActionMonitor getUam() {
-		return uam;
-	}
-
-	/**
-	 * @param uam the uam to set
-	 */
-	public void setUam(IUserActionMonitor uam) {
-		this.uam = uam;
-	}
-
-	/**
-	 * @return the commsMgr
-	 */
-	public static ICommManager getCommsMgr() {
-		return commsMgr;
-	}
-
-	/**
-	 * @param commsMgr the commsMgr to set
-	 */
-	public void setCommsMgr(ICommManager commsMgr) {
-		this.commsMgr = commsMgr;
-	}
-
-	/**
-	 * @return the helloWorld
-	 */
-	public static IHelloWorld getHelloWorld() {
-		return helloWorld;
-	}
-
-	/**
-	 * @param helloWorld the helloWorld to set
-	 */
-	public void setHelloWorld(IHelloWorld helloWorld) {
-		this.helloWorld = helloWorld;
-	}
+	
+	
+	
+	
 }

@@ -33,9 +33,16 @@ import java.util.List;
 
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
 //import org.societies.cis.mgmt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.activity.ActivityFeed;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.cis.collaboration.IServiceSharingRecord;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -50,7 +57,6 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.cis.management.ICisEditor;
 import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
-import org.societies.cis.activity.ActivityFeed;
 import org.societies.cis.manager.CisParticipant.MembershipType;
 import org.societies.identity.IdentityImpl;
 
@@ -75,12 +81,15 @@ import org.societies.api.schema.cis.manager.SubscribedTo;
  * This object corresponds to an owned CIS. The CIS record will be the CIS data which is stored on DataBase
 */
 
-//@Component
+@Entity
+@Table(name = "org_societies_cis_manager_CisEditor")
 public class CisEditor implements IFeatureServer,ICisEditor {
 
-
+	@OneToOne(cascade=CascadeType.ALL)
 	public CisRecord cisRecord;
+	@OneToOne(cascade=CascadeType.ALL)
 	public ActivityFeed activityFeed;
+	//TODO: should this be persisted?
 	public Set<IServiceSharingRecord> sharedServices; 
 //	public CommunityManagement commMgmt;
 	
@@ -98,9 +107,30 @@ public class CisEditor implements IFeatureServer,ICisEditor {
 	
 	private IIdentity cisIdentity;
 	private PubsubClient psc;
-
+	@OneToMany(cascade=CascadeType.ALL)
 	public Set<CisParticipant> membersCss; // TODO: this may be implemented in the CommunityManagement bundle. we need to define how they work together
 	
+
+
+	public ActivityFeed getActivityFeed() {
+		return activityFeed;
+	}
+
+
+	public void setActivityFeed(ActivityFeed activityFeed) {
+		this.activityFeed = activityFeed;
+	}
+
+
+	public Set<IServiceSharingRecord> getSharedServices() {
+		return sharedServices;
+	}
+
+
+	public void setSharedServices(Set<IServiceSharingRecord> sharedServices) {
+		this.sharedServices = sharedServices;
+	}
+
 
 
 	private static Logger LOG = LoggerFactory
@@ -199,7 +229,7 @@ public class CisEditor implements IFeatureServer,ICisEditor {
 		
 		
 		// TODO: we have to get a proper identity and pwd for the CIS...
-		cisRecord = new CisRecord(activityFeed,cssOwner, mode, cisIdentity.getJid(), "", membersCss,
+		cisRecord = new CisRecord(cssOwner, mode, cisIdentity.getJid(), "", membersCss,
 				cisIdentity.getDomain(), sharedServices,cisType,cisName);
 		
 		LOG.info("CIS creating pub sub service");
@@ -311,7 +341,6 @@ public class CisEditor implements IFeatureServer,ICisEditor {
 		
 		this.cisRecord = cisRecord; 
 		
-		this.activityFeed = this.cisRecord.feed;
 		this.sharedServices = this.cisRecord.sharedServices;
 		//CISendpoint = 	new XCCommunicationMgr(cisRecord.getHost(), cisRecord.getCisId(),cisRecord.getPassword());
 		
