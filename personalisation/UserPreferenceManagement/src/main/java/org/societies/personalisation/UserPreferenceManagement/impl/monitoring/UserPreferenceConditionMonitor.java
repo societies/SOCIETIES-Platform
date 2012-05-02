@@ -215,6 +215,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		 * The PCM is notified of changes in the personalisable parameters of a service using context. the User Action Monitor 
 		 * populates the context database with this information as soon as it receives an action from a service. 
 		 */
+		this.logging.debug("request for outcome with input: "+ownerId.getJid()+"\n"+action.toString());
 		this.merging.processActionReceived(ownerId, action);
 		List<IPreferenceOutcome> outcomes = new ArrayList<IPreferenceOutcome>();
 		IPreferenceOutcome outcome = new PreferenceOutcome(action.getServiceID(), action.getServiceType(), action.getparameterName(), action.getvalue());
