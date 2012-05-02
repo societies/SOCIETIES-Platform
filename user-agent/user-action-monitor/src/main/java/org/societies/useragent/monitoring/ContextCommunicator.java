@@ -68,8 +68,11 @@ public class ContextCommunicator {
 			//update attribute
 			CtxAttributeIdentifier attrID = mappings.get(key);
 			try {
-				ctxBroker.updateAttribute(attrID, action);
+				ctxBroker.updateAttribute(attrID, SerialisationHelper.serialise(action));
 			} catch (CtxException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}else{
@@ -95,7 +98,7 @@ public class ContextCommunicator {
 					for(CtxAttribute nextAttr: serviceAttributes){
 						if(nextAttr.getType().equals(action.getparameterName())){
 							found = true;
-							ctxBroker.updateAttribute(nextAttr.getId(), action);
+							ctxBroker.updateAttribute(nextAttr.getId(), SerialisationHelper.serialise(action));
 							
 							//update mappings with new key and CtxAttrIdentifier
 							mappings.put(key, nextAttr.getId());
