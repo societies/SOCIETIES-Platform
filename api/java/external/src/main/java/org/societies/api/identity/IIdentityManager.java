@@ -28,4 +28,9 @@ public interface IIdentityManager {
 	// TODO this should be the External method (available to 3rd party services)
 	// 3rd parties should run in an identity sandbox
 	//IIdentity getIdentity();
+	
+	
+	// Returns the Domain Authority Node
+	INetworkNode getDomainAuthorityNode();
+	
 }
