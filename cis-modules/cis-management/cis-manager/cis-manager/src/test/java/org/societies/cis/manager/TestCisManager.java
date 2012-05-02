@@ -48,7 +48,6 @@ import org.societies.identity.NetworkNodeImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
-
 import static org.mockito.Mockito.*;
 
 /**
@@ -93,7 +92,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	IIdentityManager mockIICisId_3;
 	
 	void setUpFactory() throws Exception {
-		
+		System.out.println("in setupFactory!");
 		mockCcmFactory = mock(ICISCommunicationMgrFactory.class);
 		mockCISendpoint1 = mock (ICommManager.class);
 		mockCISendpoint2 = mock (ICommManager.class);
@@ -127,7 +126,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	@Before
 	public void setUp() throws Exception {
 		// create mocked class
-		
+		System.out.println("in setup!");
 		mockCSSendpoint = mock (ICommManager.class);
 		mockPM = mock(IPersistanceManager.class);
 
