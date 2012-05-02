@@ -655,12 +655,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		filterInstance.setServiceImpl(filterImplementation);
 		filter.setServiceInstance(filterInstance);
 		
-		logger.info("filter: " + filter.getServiceIdentifier().getServiceInstanceIdentifier());
-		
 		List<Service> listServices;
 		try {
 			listServices = getServiceReg().findServices(filter);
-			logger.info("list: " + listServices.size());
 		} catch (ServiceRetrieveException e) {
 			logger.error("Exception while searching for services:" + e.getMessage());
 			e.printStackTrace();
