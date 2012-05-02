@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
@@ -47,7 +49,8 @@ public class HelloWorld implements IHelloWorld, IActionConsumer{
 	private IUserActionMonitor uam; 
 	Hashtable<IIdentity, String> colours;
 	Hashtable<IIdentity, String> volumes;
-	
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
+
 	public HelloWorld(){
 		colours = new Hashtable<IIdentity, String>();
 		volumes = new Hashtable<IIdentity, String>();
@@ -121,6 +124,6 @@ public class HelloWorld implements IHelloWorld, IActionConsumer{
 		
 	}
 	private void log(String msg){
-		System.out.println(this.getClass().getName()+": "+msg);
+		logging.debug(this.getClass().getName()+": "+msg);
 	}
 }
