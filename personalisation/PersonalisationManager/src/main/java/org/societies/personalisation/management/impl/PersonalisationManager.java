@@ -51,6 +51,7 @@ import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
 import org.societies.api.osgi.event.CSSEvent;
+import org.societies.api.osgi.event.CSSEventConstants;
 import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
@@ -102,13 +103,11 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 	 */
 
 	public PersonalisationManager() {
-		System.out.println(this.getClass().getName()
-				+ "HELLO! I'm a brand new service and my interface is: "
-				+ this.getClass().getName());
 		this.dianneList = new ArrayList<CtxAttributeIdentifier>();
 		this.prefMgrList = new ArrayList<CtxAttributeIdentifier>();
 		this.cauiList = new ArrayList<CtxAttributeIdentifier>();
 		this.cristList = new ArrayList<CtxAttributeIdentifier>();
+		this.logging.debug("executed constructor");
 	}
 
 	public void initialisePersonalisationManager(ICtxBroker broker, IUserPreferenceConditionMonitor pcm, IDIANNE dianne, ICAUIPrediction cauiPrediction, ICRISTUserIntentPrediction cristPrediction, ICommManager commsMgr, IDecisionMaker decisionMaker){
@@ -122,11 +121,29 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 		this.idm = this.getCommsMgr().getIdManager();
 		retrieveConfidenceLevels();
 		this.registerForUIMEvents();
-		
+		this.logging.debug("initialisePersonalisationManager(ICtxBroker broker, IUserPreferenceConditionMonitor pcm, IDIANNE dianne, ICAUIPrediction cauiPrediction, ICRISTUserIntentPrediction cristPrediction, ICommManager commsMgr, IDecisionMaker decisionMaker)");
 		
 	}
+	
+	public void initialisePersonalisationManager() {
+
+		this.dianneList = new ArrayList<CtxAttributeIdentifier>();
+		this.prefMgrList = new ArrayList<CtxAttributeIdentifier>();
+		this.cauiList = new ArrayList<CtxAttributeIdentifier>();
+		this.cristList = new ArrayList<CtxAttributeIdentifier>();
+		this.registerForUIMEvents();
+		retrieveConfidenceLevels();
+		this.logging.debug("initialisePersonalisationManager()");
+	}
+	
+	
 	private void registerForUIMEvents() {
-		this.getEventMgr().subscribeInternalEvent(this, new String[]{EventTypes.UIM_EVENT}, null);
+		String eventFilter = "(&" + 
+		"(" + CSSEventConstants.EVENT_NAME + "=newaction)" +
+		"(" + CSSEventConstants.EVENT_SOURCE + "=org/societies/useragent/monitoring)" +
+		")";
+		this.getEventMgr().subscribeInternalEvent(this, new String[]{EventTypes.UIM_EVENT}, eventFilter);
+		this.logging.debug("Subscribed to "+EventTypes.UIM_EVENT+" events");
 		
 	}
 
@@ -186,17 +203,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 
 
 
-	public void initialisePersonalisationManager() {
 
-		this.dianneList = new ArrayList<CtxAttributeIdentifier>();
-		this.prefMgrList = new ArrayList<CtxAttributeIdentifier>();
-		this.cauiList = new ArrayList<CtxAttributeIdentifier>();
-		this.cristList = new ArrayList<CtxAttributeIdentifier>();
-		System.out.println("Empty init. Yo!! I'm a brand new service and my interface is: "
-						+ this.getClass().getName());
-		this.registerForUIMEvents();
-		retrieveConfidenceLevels();
-	}
 
 	public ICAUIPrediction getCauiPrediction() {
 		return cauiPrediction;
@@ -757,18 +764,35 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 
 	@Override
 	public void handleInternalEvent(InternalEvent event) {
+		this.logging.debug("Received UIM event:");
+		this.logging.debug("Event name "+event.geteventName()+
+				"Event info: "+event.geteventInfo().toString()+
+				"Event source: "+event.geteventSource()+
+				"Event type: "+event.geteventType());
 		
-		if (event.geteventType().equals("UIM_EVENT")){
+		
+		if (event.geteventType().equals(EventTypes.UIM_EVENT)){
 			UIMEvent uimEvent = (UIMEvent) event.geteventInfo();
 			Future<List<IUserIntentAction>> futureCauiActions = this.cauiPrediction.getPrediction(uimEvent.getUserId(), uimEvent.getAction());
 			
 			Future<List<CRISTUserAction>> futureCristActions = this.cristPrediction.getCRISTPrediction(uimEvent.getUserId(), uimEvent.getAction());
 			
+			Future<List<IDIANNEOutcome>> futureDianneActions = this.dianne.getOutcome(uimEvent.getUserId(), uimEvent.getAction());
+			
+			Future<List<IPreferenceOutcome>> futurePreferenceActions = this.pcm.getOutcome(uimEvent.getUserId(), uimEvent.getAction());
+			
+			
 			try {
+				
+				/**
+				 * get intent outcomes 
+				 */
 				List<IUserIntentAction> cauiActions = futureCauiActions.get();
+				logging.debug("cauiPrediction returned: "+cauiActions.size()+" outcomes");
 				List<CRISTUserAction> cristActions = futureCristActions.get();
+				logging.debug("cristPrediction returned: "+cristActions.size()+" outcomes");
 				Hashtable<IUserIntentAction,CRISTUserAction> overlapping = new Hashtable<IUserIntentAction,CRISTUserAction>(); 
-				List<IOutcome> nonOverlapping = new ArrayList<IOutcome>();
+				List<IOutcome> intentNonOverlapping = new ArrayList<IOutcome>();
 				
 				
 				
@@ -776,7 +800,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 				for (IUserIntentAction caui : cauiActions){
 					CRISTUserAction crist = this.exists(cristActions, caui);
 					if (null==crist){
-						nonOverlapping.add(caui);
+						intentNonOverlapping.add(caui);
 					}else{
 						overlapping.put(caui, crist);
 					}
@@ -785,7 +809,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 				for (CRISTUserAction crist: cristActions){
 					IUserIntentAction caui = this.exists(cauiActions, crist);
 					if (null==caui){
-						nonOverlapping.add(crist);
+						intentNonOverlapping.add(crist);
 					}
 				}
 				
@@ -794,10 +818,46 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 				while (cauiEnum.hasMoreElements()){
 					IUserIntentAction caui = cauiEnum.nextElement();
 					CRISTUserAction crist = overlapping.get(caui);
-					nonOverlapping.add(this.resolveIntentConflicts(crist,caui));
+					intentNonOverlapping.add(this.resolveIntentConflicts(crist,caui));
 				}
 				
-				this.decisionMaker.makeDecision(nonOverlapping, new ArrayList<IOutcome>());
+				
+				/**
+				 * get preference outcomes
+				 */
+				
+				List<IDIANNEOutcome> dianneActions = futureDianneActions.get();
+				logging.debug("DIANNE returned: "+dianneActions.size()+" outcomes");
+				List<IPreferenceOutcome> prefActions = futurePreferenceActions.get();
+				logging.debug("PCM returned: "+prefActions.size()+" outcomes");
+				Hashtable<IPreferenceOutcome, IDIANNEOutcome> prefOverlapping = new Hashtable<IPreferenceOutcome, IDIANNEOutcome>();
+				List<IOutcome> prefNonOverlapping = new ArrayList<IOutcome>();
+				
+				for (IDIANNEOutcome d : dianneActions){
+					IPreferenceOutcome p = this.exists(prefActions, d);
+					if (null==p){
+						prefNonOverlapping.add(d);
+					}else{
+						prefOverlapping.put(p, d);
+					}
+				}
+				
+				for (IPreferenceOutcome p : prefActions){
+					IDIANNEOutcome d = this.exists(dianneActions, p);
+					if (null==d){
+						prefNonOverlapping.add(p);
+					}
+				}
+				
+				Enumeration<IPreferenceOutcome> prefEnum = prefOverlapping.keys();
+				
+				while(prefEnum.hasMoreElements()){
+					IPreferenceOutcome pref = prefEnum.nextElement();
+					IDIANNEOutcome dianne = prefOverlapping.get(pref);
+					prefNonOverlapping.add(this.resolvePreferenceConflicts(dianne, pref));
+				}
+				
+				this.decisionMaker.makeDecision(intentNonOverlapping, prefNonOverlapping);
 				
 				
 			} catch (InterruptedException e) {
@@ -823,7 +883,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 		}		return null;
 	}
 
-	private CRISTUserAction exists(List<CRISTUserAction> cristActions, IOutcome caui){
+	private CRISTUserAction exists(List<CRISTUserAction> cristActions, IUserIntentAction caui){
 		
 		for (CRISTUserAction o : cristActions){
 			if (this.outcomesMatch(o, caui)){
@@ -834,7 +894,24 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 		return null;
 	}
 	
+	private IDIANNEOutcome exists(List<IDIANNEOutcome> dianneActions, IPreferenceOutcome prefOutcome){
+		for (IDIANNEOutcome d: dianneActions){
+			if (this.outcomesMatch(d, prefOutcome)){
+				return d;
+			}
+		}
+		return null;
+	}
 	
+	
+	private IPreferenceOutcome exists(List<IPreferenceOutcome> prefActions, IDIANNEOutcome dianneOutcome){
+		for (IPreferenceOutcome p : prefActions){
+			if (this.outcomesMatch(p, dianneOutcome)){
+				return p;
+			}
+		}
+		return null;
+	}
 	private boolean outcomesMatch(IOutcome outcome1, IOutcome outcome2){
 		if (outcome1.getServiceID().getServiceInstanceIdentifier().equalsIgnoreCase(outcome2.getServiceID().getServiceInstanceIdentifier())){
 			if (outcome1.getparameterName().equalsIgnoreCase(outcome2.getparameterName())){
