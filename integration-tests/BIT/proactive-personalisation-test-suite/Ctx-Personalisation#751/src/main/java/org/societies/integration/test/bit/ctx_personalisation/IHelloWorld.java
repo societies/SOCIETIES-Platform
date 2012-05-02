@@ -22,83 +22,20 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.bit.context_triggered_personalisation;
+package org.societies.integration.test.bit.ctx_personalisation;
 
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.useragent.monitoring.IUserActionMonitor;
-import org.societies.integration.test.IntegrationTestCase;
+import org.societies.api.identity.IIdentity;
 
 /**
- * Class that tests Context Triggered Personalisation. 
+ * Describe your class here...
  *
  * @author Eliza
  *
  */
-public class Test751 extends IntegrationTestCase{
+public interface IHelloWorld {
 
-	private static ICtxBroker ctxBroker;
-	private static IUserActionMonitor uam;
-	private static ICommManager commsMgr;
-	private static IHelloWorld helloWorld;
-	
-	public Test751(){
-		super(751, new Class[]{Tester.class});
-	}
-
-	/**
-	 * @return the ctxBroker
-	 */
-	public static ICtxBroker getCtxBroker() {
-		return ctxBroker;
-	}
-
-	/**
-	 * @param ctxBroker the ctxBroker to set
-	 */
-	public  void setCtxBroker(ICtxBroker ctxBroker) {
-		this.ctxBroker = ctxBroker;
-	}
-
-	/**
-	 * @return the uam
-	 */
-	public static IUserActionMonitor getUam() {
-		return uam;
-	}
-
-	/**
-	 * @param uam the uam to set
-	 */
-	public void setUam(IUserActionMonitor uam) {
-		this.uam = uam;
-	}
-
-	/**
-	 * @return the commsMgr
-	 */
-	public static ICommManager getCommsMgr() {
-		return commsMgr;
-	}
-
-	/**
-	 * @param commsMgr the commsMgr to set
-	 */
-	public void setCommsMgr(ICommManager commsMgr) {
-		this.commsMgr = commsMgr;
-	}
-
-	/**
-	 * @return the helloWorld
-	 */
-	public static IHelloWorld getHelloWorld() {
-		return helloWorld;
-	}
-
-	/**
-	 * @param helloWorld the helloWorld to set
-	 */
-	public void setHelloWorld(IHelloWorld helloWorld) {
-		this.helloWorld = helloWorld;
-	}
+	public void setBackgroundColour(IIdentity userId, String colour);
+	public void setVolume(IIdentity userId, String volume);
+	public String getBackgroundColour(IIdentity userId);
+	public String getVolume(IIdentity userId);
 }
