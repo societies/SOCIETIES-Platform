@@ -41,18 +41,14 @@ public class IPreferenceConditionIOutcomeName {
 	public IPreferenceConditionIOutcomeName(){
 
 	}
-
-	public void finalize() throws Throwable {
-
-	}
-
 	/**
 	 * 
 	 * @param id
 	 * @param preferenceName
 	 */
 	public IPreferenceConditionIOutcomeName(CtxAttributeIdentifier id, String preferenceName){
-
+		this.ctxIdentifier = id;
+		this.prefName = preferenceName;
 	}
 
 	/**
@@ -61,7 +57,7 @@ public class IPreferenceConditionIOutcomeName {
 	 * @return 	the context identifier
 	 */
 	public CtxAttributeIdentifier getICtxIdentifier(){
-		return null;
+		return ctxIdentifier;
 	}
 
 	/**
@@ -69,7 +65,7 @@ public class IPreferenceConditionIOutcomeName {
 	 * @return	the name of the preference
 	 */
 	public String getPreferenceName(){
-		return "";
+		return prefName;
 	}
 
 }

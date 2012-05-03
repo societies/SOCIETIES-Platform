@@ -220,7 +220,7 @@ public class PreferenceStorer {
 					broker.update(attr);					
 					this.logging.debug("Successfully updated preference registry for userId: "+userId.toString());
 				}else{
-					this.logging.debug("PreferenceRegistry not found in DB for userId:"+userId.toString()+". Creating new registry");
+					this.logging.debug("PreferenceRegistry not found in DB for userId:. Creating new registry");
 					
 					Future<List<CtxIdentifier>> futurePersonCtxIDs = broker.lookup(CtxModelType.ENTITY, "PERSON");
 					List<CtxIdentifier> personCtxIDs = futurePersonCtxIDs.get();

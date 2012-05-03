@@ -108,21 +108,65 @@ public class Action implements IAction, Serializable{
 
 
 	public String toString(){
-		return "ServiceID: "+this.serviceID.getServiceInstanceIdentifier()+
+		return "ServiceID: "+this.serviceID.getIdentifier()+
 				"\n"+"ServiceType: "+this.serviceType+
 				"\n"+this.parameterName+" = "+this.value;
 	}
 	
-	public boolean equals(IAction po){
-		
-		String par = po.getparameterName();
-		String val = po.getvalue();
-		
-		if (this.parameterName.equalsIgnoreCase(par) && this.value.equalsIgnoreCase(val)){
+
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((parameterName == null) ? 0 : parameterName.hashCode());
+		result = prime * result
+				+ ((serviceID == null) ? 0 : serviceID.hashCode());
+		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
 			return true;
 		}
-		return false;
-		
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Action)) {
+			return false;
+		}
+		Action other = (Action) obj;
+		if (parameterName == null) {
+			if (other.parameterName != null) {
+				return false;
+			}
+		} else if (!parameterName.equals(other.parameterName)) {
+			return false;
+		}
+		if (serviceID == null) {
+			if (other.serviceID != null) {
+				return false;
+			}
+		} else if (!serviceID.equals(other.serviceID)) {
+			return false;
+		}
+		if (value == null) {
+			if (other.value != null) {
+				return false;
+			}
+		} else if (!value.equals(other.value)) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override
