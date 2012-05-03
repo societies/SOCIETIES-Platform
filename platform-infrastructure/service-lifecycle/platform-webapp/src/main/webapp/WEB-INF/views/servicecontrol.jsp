@@ -66,7 +66,7 @@
 			</tr>			
 			<tr>
 				<td>Bundle Url: </td>
-				<td><form:input type="file" path="url" />
+				<td><form:input path="url" />
 				</td>
 				<td><form:errors path="url" cssClass="error" />
 				</td>
