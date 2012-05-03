@@ -2,3 +2,4 @@
 # ignore Database files:
 derby.log
 serviceregdb/
+.\\serviceregdb/

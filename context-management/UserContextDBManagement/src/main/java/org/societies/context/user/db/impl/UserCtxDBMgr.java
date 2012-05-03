@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -232,34 +233,33 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
                 if (attribute.getScope().getType().equals(entityType)) {
                 	if (minAttribValue instanceof String && maxAttribValue instanceof String) {
                 		if (attribute.getStringValue()!=null) {
-		                		String valueStr = attribute.getStringValue();
-		                			if(valueStr.compareTo(minAttribValue.toString()) >=0 && valueStr.compareTo(maxAttribValue.toString()) <=0)
-		                				foundList.add(attribute.getScope());                			
+		                	String valueStr = attribute.getStringValue();
+		                		if(valueStr.compareTo(minAttribValue.toString()) >=0 && valueStr.compareTo(maxAttribValue.toString()) <=0)
+		               				foundList.add(attribute.getScope());                			
         				}
                 	} else if (minAttribValue instanceof Integer && maxAttribValue instanceof Integer) {
-                		if (attribute.getIntegerValue().equals(attribType)) {
-                			if(attribute.getIntegerValue()!=null) {
-		                		Integer valueInt = attribute.getIntegerValue();
-		               			if(valueInt.compareTo((Integer) minAttribValue) >=0 && valueInt.compareTo((Integer) maxAttribValue) <=0)
-		                			foundList.add(attribute.getScope());
-                			}
+                		if(attribute.getIntegerValue()!=null) {
+		               		Integer valueInt = attribute.getIntegerValue();
+		          			if(valueInt.compareTo((Integer) minAttribValue) >=0 && valueInt.compareTo((Integer) maxAttribValue) <=0)
+		               			foundList.add(attribute.getScope());
                 		}
                 	} else if (minAttribValue instanceof Double && maxAttribValue instanceof Double) {
-                		if (attribute.getIntegerValue().equals(attribType)) {
-                			if(attribute.getDoubleValue()!=null) {
-		                		Double valueDouble = attribute.getDoubleValue();
-		               			if(valueDouble.compareTo((Double) minAttribValue) >= 0 && valueDouble.compareTo((Double) maxAttribValue) <= 0)
-		                			foundList.add(attribute.getScope());                			
-                			}
+                		if(attribute.getDoubleValue()!=null) {
+		               		Double valueDouble = attribute.getDoubleValue();
+		           			if(valueDouble.compareTo((Double) minAttribValue) >= 0 && valueDouble.compareTo((Double) maxAttribValue) <= 0)
+		               			foundList.add(attribute.getScope());                			
                 		}
                 	} else {
+                		byte[] valueBytes;
                 		byte[] minValueBytes;
                 		byte[] maxValueBytes;
 						try {
 							minValueBytes = SerialisationHelper.serialise(minAttribValue);
 							maxValueBytes = SerialisationHelper.serialise(maxAttribValue);
+							valueBytes = SerialisationHelper.serialise(attribute.getBinaryValue());
 							if (Arrays.equals(minValueBytes, maxValueBytes))
-	                			foundList.add(attribute.getScope());
+								if (Arrays.equals(valueBytes, minValueBytes))
+									foundList.add(attribute.getScope());
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -306,6 +306,29 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 						+ "': ICtxEventMgr service is not available");
 			}
 		}
+		
+		 if (modelObject instanceof CtxAssociation) {
+
+			   CtxEntity ent = null;
+			   CtxEntityIdentifier entId;
+
+			   // Add association to parent entity
+			   entId = ((CtxAssociation) modelObject).getParentEntity();
+			   if (entId != null)
+			     ent = (CtxEntity) this.retrieve(entId);
+			     if (ent != null)
+			       ent.addAssociation(((CtxAssociation) modelObject).getId());
+
+			    // Add association to child entities
+			    Set<CtxEntityIdentifier> entIds = ((CtxAssociation) modelObject).getChildEntities();
+			    for (CtxEntityIdentifier entIdent : entIds) {
+			    	entIdent = ((CtxAssociation) modelObject).getParentEntity();
+			    	ent = (CtxEntity) this.retrieve(entIdent);
+			    	if (ent != null)
+			    		ent.addAssociation(((CtxAssociation) modelObject).getId());
+			    }
+		}
+			      
 		return modelObject;
 	}	
 }

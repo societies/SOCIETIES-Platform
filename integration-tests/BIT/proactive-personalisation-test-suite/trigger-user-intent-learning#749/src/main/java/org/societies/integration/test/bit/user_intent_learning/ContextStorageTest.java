@@ -47,7 +47,9 @@ import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxHistoryAttribute;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
@@ -60,17 +62,17 @@ import org.societies.api.useragent.monitoring.IUserActionMonitor;
 
 public class ContextStorageTest {
 
-	private static IUserActionMonitor uam;
-	private static ICtxBroker ctxBroker;
+	//	private static IUserActionMonitor uam;
+	//	private static ICtxBroker ctxBroker;
 
 	public void setUp(){
 		System.out.println("Test 749 started : ContextStorageTest");
-		uam = TestCase749.getUam();
-		ctxBroker = TestCase749.getCtxBroker();
+		//	uam = TestCase749.getUam();
+		//	ctxBroker = TestCase749.getCtxBroker();
 	}
 
 	@Test
-	void createHistorySet(){
+	public void createHistorySet(){
 
 		IndividualCtxEntity operator = null;
 
@@ -84,66 +86,73 @@ public class ContextStorageTest {
 		}
 
 		try {
-			operator = ctxBroker.retrieveCssOperator().get();
+			System.out.println("ctxBroker service: "+TestCase749.ctxBroker);
+
+			operator = TestCase749.ctxBroker.retrieveCssOperator().get();
+			printAttr(operator);
 
 			// primary attribute
-			CtxAttribute actAttr = ctxBroker.createAttribute(operator.getId(), CtxAttributeTypes.ACTION).get();
+			CtxAttribute actAttr = TestCase749.ctxBroker.createAttribute(operator.getId(), "SymAction").get();
 			actAttr.setHistoryRecorded(true);
-			actAttr = (CtxAttribute) ctxBroker.update(actAttr).get();
+			actAttr = (CtxAttribute) TestCase749.ctxBroker.update(actAttr).get();
 
 			//escorting attributes
-			CtxAttribute statusAttr = ctxBroker.createAttribute(operator.getId(), CtxAttributeTypes.STATUS).get();
+			CtxAttribute statusAttr = TestCase749.ctxBroker.createAttribute(operator.getId(), CtxAttributeTypes.STATUS).get();
 			statusAttr.setHistoryRecorded(true);
-			statusAttr =  ctxBroker.updateAttribute(statusAttr.getId(),(Serializable)"free").get();
+			statusAttr =  TestCase749.ctxBroker.updateAttribute(statusAttr.getId(),(Serializable)"free").get();
 
-			CtxAttribute tempAttr = ctxBroker.createAttribute(operator.getId(), CtxAttributeTypes.TEMPERATURE).get();
+			CtxAttribute tempAttr = TestCase749.ctxBroker.createAttribute(operator.getId(), CtxAttributeTypes.TEMPERATURE).get();
 			tempAttr.setHistoryRecorded(true);
-			tempAttr =  ctxBroker.updateAttribute(tempAttr.getId(),(Serializable)12).get();
+			tempAttr =  TestCase749.ctxBroker.updateAttribute(tempAttr.getId(),(Serializable)12).get();
 
-			CtxAttribute symLocAttr = ctxBroker.createAttribute(operator.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+			CtxAttribute symLocAttr = TestCase749.ctxBroker.createAttribute(operator.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC).get();
 			symLocAttr.setHistoryRecorded(true);
-			symLocAttr =  ctxBroker.updateAttribute(symLocAttr.getId(),(Serializable)"home").get();
-			/*
+			symLocAttr =  TestCase749.ctxBroker.updateAttribute(symLocAttr.getId(),(Serializable)"home").get();
+
+			//remove this part when integration with uam is complete
 			// set history tuples
 			List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
 			listOfEscortingAttributeIds.add(statusAttr.getId());
 			listOfEscortingAttributeIds.add(tempAttr.getId());
 			listOfEscortingAttributeIds.add(symLocAttr.getId());
-			ctxBroker.setHistoryTuples(actAttr.getId(), listOfEscortingAttributeIds).get();	
-			 */
+			TestCase749.ctxBroker.setHistoryTuples(actAttr.getId(), listOfEscortingAttributeIds).get();	
+
 			for(int i=0; i<3; i++){
 				//primary attribute value
 				IAction action1 = new Action(serviceId, "testService", "volume", "high");
-				symLocAttr =  ctxBroker.updateAttribute(symLocAttr.getId(),(Serializable)"office").get();
-				uam.monitor(identity, action1);
-				/*
-			byte[] binaryAction1  = SerialisationHelper.serialise(action1);
-			actAttr.setBinaryValue(binaryAction1);
-			actAttr = (CtxAttribute) ctxBroker.update(actAttr).get();
-				 */
+				symLocAttr =  TestCase749.ctxBroker.updateAttribute(symLocAttr.getId(),(Serializable)"office").get();
+				TestCase749.uam.monitor(identity, action1);
+
+				byte[] binaryAction1  = SerialisationHelper.serialise(action1);
+				actAttr.setBinaryValue(binaryAction1);
+				actAttr = (CtxAttribute) TestCase749.ctxBroker.update(actAttr).get();
+
+
 				IAction action2 = new Action(serviceId, "testService", "volume", "low");
-				symLocAttr =  ctxBroker.updateAttribute(symLocAttr.getId(),(Serializable)"restaurant").get();
-				uam.monitor(identity, action2);
-				/*
-			byte[] binaryAction2 = SerialisationHelper.serialise(action2);
-			actAttr.setBinaryValue(binaryAction2);
-			actAttr = (CtxAttribute) ctxBroker.update(actAttr).get();
-				 */
+				symLocAttr =  TestCase749.ctxBroker.updateAttribute(symLocAttr.getId(),(Serializable)"restaurant").get();
+				TestCase749.uam.monitor(identity, action2);
+
+				byte[] binaryAction2 = SerialisationHelper.serialise(action2);
+				actAttr.setBinaryValue(binaryAction2);
+				actAttr = (CtxAttribute) TestCase749.ctxBroker.update(actAttr).get();
+
+
 				IAction action3 = new Action(serviceId, "testService", "volume", "mute");
-				symLocAttr =  ctxBroker.updateAttribute(symLocAttr.getId(),(Serializable)"home").get();
-				uam.monitor(identity, action2);
-				/*
-			byte[] binaryAction3 = SerialisationHelper.serialise(action3);
-			actAttr.setBinaryValue(binaryAction3);
-			actAttr = (CtxAttribute) ctxBroker.update(actAttr).get();
-				 */
+				symLocAttr =  TestCase749.ctxBroker.updateAttribute(symLocAttr.getId(),(Serializable)"home").get();
+				TestCase749.uam.monitor(identity, action3);
+
+				byte[] binaryAction3 = SerialisationHelper.serialise(action3);
+				actAttr.setBinaryValue(binaryAction3);
+				actAttr = (CtxAttribute) TestCase749.ctxBroker.update(actAttr).get();
+
 			}
-
-			//			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = ctxBroker.retrieveHistoryTuples(actAttr.getId(), listOfEscortingAttributeIds, null, null).get();
-
-			//			System.out.println("hoc tuple results size "+tupleResults.size());
-			//			System.out.println("hoc tuple results "+tupleResults);
-
+			operator = TestCase749.ctxBroker.retrieveCssOperator().get();
+			printAttr(operator);
+			//CtxAttribute volumeAttr = lookupRetrieveAttrHelp("service");
+			//System.out.println("volumeAttr "+volumeAttr);
+			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = TestCase749.ctxBroker.retrieveHistoryTuples(actAttr.getId(), listOfEscortingAttributeIds, null, null).get();
+			System.out.println("hoc tuple results size "+tupleResults.size());
+			System.out.println("hoc tuple results "+tupleResults);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -153,11 +162,13 @@ public class ContextStorageTest {
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-
-
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+	}	
 
-		/*
+	/*
 	@Test
 	public void test() {
 		//create actions
@@ -291,6 +302,39 @@ public class ContextStorageTest {
 			e.printStackTrace();
 		}
 	}	
-		 */
+	 */
+
+	private void printAttr(CtxEntity entity) throws InterruptedException, ExecutionException, CtxException{
+
+		//IndividualCtxEntity operator = TestCase749.ctxBroker.retrieveCssOperator().get();
+		System.out.println("operator: "+entity);
+		Set<CtxAttribute> attrSet = entity.getAttributes();
+		System.out.println("operator attrs : "+attrSet);
+		for(CtxAttribute attrs: attrSet){
+			System.out.println("attr type: "+attrs.getType());
+			if(attrs.getStringValue() != null) System.out.println(" value "+attrs.getStringValue());
+		}
+	}
+
+	protected CtxAttribute lookupRetrieveAttrHelp(String type){
+		CtxAttribute ctxAttr = null;
+		try {
+			List<CtxIdentifier> tupleAttrList = TestCase749.ctxBroker.lookup(CtxModelType.ATTRIBUTE,type).get();
+			if(tupleAttrList.size() >0 ){
+				CtxIdentifier ctxId = tupleAttrList.get(0);
+				ctxAttr =  (CtxAttribute) TestCase749.ctxBroker.retrieve(ctxId).get();	
+				System.out.println("lookupRetrieveAttrHelp "+ ctxAttr);
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ctxAttr;
 	}
 }
