@@ -3,15 +3,18 @@ package org.societies.platform.FoursquareConnector.impl;
 import java.util.Map;
 import java.util.UUID;
 
-import org.json.simple.*;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+//import org.json.simple.*;
+//import org.json.simple.parser.JSONParser;
+//import org.json.simple.parser.ParseException;
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.builder.api.Foursquare2Api;
 import org.scribe.model.*;
 import org.scribe.oauth.*;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.platform.FoursquareConnector.FoursquareConnector;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /*
  * Foursquare connector implementation
@@ -55,17 +58,15 @@ public class FoursquareConnectorImpl implements FoursquareConnector {
 				+ accessToken.getToken());
 		this.service.signRequest(accessToken, request);
 		Response response = request.send();
-		JSONParser parser = new JSONParser();
-		Object obj = null;
+		JSONObject res = null;
 		try {
-			obj = parser.parse(response.getBody());
-		} catch (ParseException e) {
+			res = new JSONObject(response.getBody());
+		} catch (JSONException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return response.getBody();
 		}
-		JSONObject res = (JSONObject) obj;
 		if (res != null)
-			return res.toJSONString();
+			return res.toString();
 		else
 			return null;
 	}
@@ -75,17 +76,15 @@ public class FoursquareConnectorImpl implements FoursquareConnector {
 				+ accessToken.getToken());
 		this.service.signRequest(accessToken, request);
 		Response response = request.send();
-		JSONParser parser = new JSONParser();
-		Object obj = null;
+		JSONObject res = null;
 		try {
-			obj = parser.parse(response.getBody());
-		} catch (ParseException e) {
+			res = new JSONObject(response.getBody());
+		} catch (JSONException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return response.getBody();
 		}
-		JSONObject res = (JSONObject) obj;
 		if (res != null)
-			return res.toJSONString();
+			return res.toString();
 		else
 			return null;
 	}
@@ -99,17 +98,15 @@ public class FoursquareConnectorImpl implements FoursquareConnector {
 				+ accessToken.getToken());
 		this.service.signRequest(accessToken, request);
 		Response response = request.send();
-		JSONParser parser = new JSONParser();
-		Object obj = null;
+		JSONObject res = null;
 		try {
-			obj = parser.parse(response.getBody());
-		} catch (ParseException e) {
+			res = new JSONObject(response.getBody());
+		} catch (JSONException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return response.getBody();
 		}
-		JSONObject res = (JSONObject) obj;
 		if (res != null)
-			return res.toJSONString();
+			return res.toString();
 		else
 			return null;
 	}

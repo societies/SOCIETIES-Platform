@@ -3,191 +3,198 @@ package org.societies.platform.TwitterConnector.impl;
 import java.util.Map;
 import java.util.UUID;
 
-import org.json.simple.*;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+//import org.json.simple.JSONArray;
+//import org.json.simple.JSONObject;
+//import org.json.simple.parser.JSONParser;
+//import org.json.simple.parser.ParseException;
 import org.scribe.model.*;
 import org.scribe.oauth.*;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.platform.TwitterConnector.*;
 import org.societies.platform.TwitterConnector.model.TwitterToken;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /*
  * twitter connector implementation
  */
-public class TwitterConnectorImpl implements TwitterConnector{
+public class TwitterConnectorImpl implements TwitterConnector {
 
-	private TwitterToken 	twToken = null;
-	private OAuthService 	service;
-	private String 			name;
-	private String 			id;
-	private String			lastUpdate   = "yesterday";
+	private TwitterToken twToken = null;
+	private OAuthService service;
+	private String name;
+	private String id;
+	private String lastUpdate = "yesterday";
 
+	public TwitterConnectorImpl() {
+		this.twToken = new TwitterToken();
+		this.service = twToken.getAuthService();
+		this.name = ISocialConnector.TWITTER_CONN;
+		this.id = this.name + "_" + UUID.randomUUID();
 
-
-	public TwitterConnectorImpl(){
-		this.twToken 		= new TwitterToken();
-		this.service 		= twToken.getAuthService();
-		this.name 			= ISocialConnector.TWITTER_CONN;
-		this.id				= this.name + "_" + UUID.randomUUID();
-
-		
 	}
 
 	public TwitterConnectorImpl(String access_token, String identity) {
-		
+		this.twToken = new TwitterToken(access_token);
+		this.service = twToken.getAuthService();
+		this.name = ISocialConnector.TWITTER_CONN;
+		this.id = this.name + "_" + UUID.randomUUID();
 	}
-	
-	public String getUserProfile(){
+
+	public String getUserProfile() {
 		OAuthRequest request = new OAuthRequest(Verb.GET, ACCOUNT_VERIFICATION);
 		this.service.signRequest(twToken.getAccessToken(), request);
 		Response response = request.send();
-		JSONParser parser=new JSONParser();
-		Object obj=null;
+		JSONObject res = null;
 		try {
-			obj = parser.parse(response.getBody());
-		} catch (ParseException e) {
+			res = new JSONObject(response.getBody());
+		} catch (JSONException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return response.getBody();
 		}
-		JSONObject res=(JSONObject)obj;
-		if(res!=null)
-			return res.toJSONString();
+		if (res != null)
+			return res.toString();
 		else
 			return null;
 	}
 
-
-	public String getUserFriends(){
+	public String getUserFriends() {
 		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FRIENDS_URL);
 		this.service.signRequest(twToken.getAccessToken(), request);
 		Response response = request.send();
-		JSONParser parser=new JSONParser();
-		Object obj=null;
+		JSONObject res =null;
 		try {
-			obj = parser.parse(response.getBody());
-		} catch (ParseException e) {
+			res = new JSONObject(response.getBody());
+		} catch (JSONException e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e1.printStackTrace();
 		}
-		JSONObject res=(JSONObject)obj;
-		JSONArray friendsIDList = (JSONArray) res.get("ids");
-		JSONArray friendsList = new JSONArray();
-		JSONObject other = null;
 		JSONObject friends = new JSONObject();
-		
-		for(int i=0;i<friendsIDList.size();i++){
-			//			System.out.println(friendsIDList.get(i).toString());
-			other = getOtherProfileJson(friendsIDList.get(i).toString());
-			//			System.out.println(other);
-			if (!other.toJSONString().contains("No user matches for specified terms"))
-				friendsList.add(other);
-		}
+		JSONArray friendsList = new JSONArray();
+//		System.out.println(res.toString());
+		try {
+			JSONArray friendsIDList = res.getJSONArray("ids");
+			
+			JSONObject other = null;
+			
+			for (int i = 0; i < friendsIDList.length(); i++) {
+				// System.out.println(friendsIDList.get(i).toString());
 
-		friends.put("friends", friendsList);
-		if(res!=null)
-			//			return res.toJSONString();
+				other = getOtherProfileJson(friendsIDList.get(i).toString());
+
+				// System.out.println(other);
+				if (!other.toString().contains(
+						"No user matches for specified terms"))
+					friendsList.put(other);
+				friends.put("friends", friendsList);
+			}
+		} catch (JSONException e) {
+			return response.getBody();
+		}
+		
+		if (res != null)
+			// return res.toJSONString();
 			return friends.toString();
 		else
 			return null;
 	}
 
-
-	public String getUserFollowers(){
+	public String getUserFollowers() {
 		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FOLLOWERS_URL);
 		this.service.signRequest(twToken.getAccessToken(), request);
 		Response response = request.send();
-		JSONParser parser=new JSONParser();
-		Object obj=null;
-		try {
-			obj = parser.parse(response.getBody());
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		JSONObject res=(JSONObject)obj;
-		JSONArray followersIDList = (JSONArray) res.get("ids");
-		JSONArray followersList = new JSONArray();
-		JSONObject other = null;
+		JSONObject res = null;
 		JSONObject followers = new JSONObject();
-		
-		for(int i=0;i<followersIDList.size();i++){
-			//			System.out.println(friendsIDList.get(i).toString());
-			other = getOtherProfileJson(followersIDList.get(i).toString());
-			//			System.out.println(other);
-			if (!other.toJSONString().contains("No user matches for specified terms"))
-				followersList.add(other);
-		}
+		JSONArray followersList = new JSONArray();
+		try {
+			res = new JSONObject(response.getBody());
+			JSONArray followersIDList = res.getJSONArray("ids");
+			
+			JSONObject other = null;
+			
+			for (int i = 0; i < followersIDList.length(); i++) {
+				// System.out.println(friendsIDList.get(i).toString());
 
-		followers.put("friends", followersList);
-		if(res!=null)
-			//			return res.toJSONString();
+				other = getOtherProfileJson(followersIDList.get(i).toString());
+
+				// System.out.println(other);
+				if (!other.toString().contains(
+						"No user matches for specified terms"))
+					followersList.put(other);
+				followers.put("friends", followersList);
+			}
+		} catch (JSONException e) {
+			response.getBody();
+		}
+		
+		if (res != null)
+			// return res.toJSONString();
 			return followers.toString();
 		else
 			return null;
 
 	}
 
-
-	public String getOtherProfileString(String id){
-		OAuthRequest request = new OAuthRequest(Verb.GET, GET_OTHER_PROFILE_URL+id);
+	public String getOtherProfileString(String id) {
+		OAuthRequest request = new OAuthRequest(Verb.GET, GET_OTHER_PROFILE_URL
+				+ id);
 		this.service.signRequest(twToken.getAccessToken(), request);
 		Response response = request.send();
-		JSONParser parser=new JSONParser();
-		Object obj=null;
+		JSONArray res = null;
+		JSONObject user =null;
 		try {
-			obj = parser.parse(response.getBody());
-		} catch (ParseException e) {
+			res = new JSONArray(response.getBody());
+			user = res.getJSONObject(0);
+		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		JSONArray res = (JSONArray) obj;
-		if(res!=null)
-			return res.get(0).toString();
-		else 
+		if (res != null)
+			return user.toString();
+		else
 			return null;
 	}
 
-	public JSONObject getOtherProfileJson(String id){
-		OAuthRequest request = new OAuthRequest(Verb.GET, GET_OTHER_PROFILE_URL+id);
+	public JSONObject getOtherProfileJson(String id) {
+		OAuthRequest request = new OAuthRequest(Verb.GET, GET_OTHER_PROFILE_URL
+				+ id);
 		this.service.signRequest(twToken.getAccessToken(), request);
 		Response response = request.send();
-		JSONParser parser=new JSONParser();
-		Object obj=null;
+		JSONArray res = null;
+		JSONObject user =null;
 		try {
-			obj = parser.parse(response.getBody());
-		} catch (ParseException e) {
+			res = new JSONArray(response.getBody());
+			user = res.getJSONObject(0);
+		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		JSONArray res = (JSONArray) obj;
-		if(res!=null)
-			return (JSONObject) res.get(0);
-		else 
+		if (res != null)
+			return user;
+		else
 			return null;
 	}
 
-/*
- * Activities in Twitter is defined as tweets
- * @see org.societies.api.internal.sns.ISocialConnector#getUserActivities()
- */
+	/*
+	 * Activities in Twitter is defined as tweets
+	 * 
+	 * @see org.societies.api.internal.sns.ISocialConnector#getUserActivities()
+	 */
 	public String getUserActivities() {
 		OAuthRequest request = new OAuthRequest(Verb.GET, GET_TWEETS_URL);
 		this.service.signRequest(twToken.getAccessToken(), request);
 		Response response = request.send();
-		JSONParser parser=new JSONParser();
-		Object obj=null;
+		JSONArray res = null;
 		try {
-			obj = parser.parse(response.getBody());
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			res = new JSONArray(response.getBody());
+		} catch (JSONException e) {
+			return response.getBody();
 		}
-		JSONArray res = (JSONArray) obj;
-//		System.out.println(res.toString());
-		if(res!=null)
+		// System.out.println(res.toString());
+		if (res != null)
 			return res.toString();
-		else 
+		else
 			return null;
 	}
 

@@ -5,14 +5,11 @@ import java.util.List;
 
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.Person;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
-import org.societies.platform.TwitterConnector.impl.TwitterConnectorImpl;
-import org.societies.platform.socialdata.converters.ActivityConverterFromTwitter;
-import org.societies.platform.socialdata.converters.FriendsConverterFromTwitter;
-import org.societies.platform.socialdata.converters.PersonConverterFromTwitter;
+import org.societies.platform.FoursquareConnector.impl.FoursquareConnectorImpl;
+import org.societies.platform.socialdata.converters.ActivityConverterFromFoursquare;
+import org.societies.platform.socialdata.converters.FriendsConverterFromFoursquare;
+import org.societies.platform.socialdata.converters.PersonConverterFromFoursquare;
 
 
 
@@ -20,16 +17,36 @@ public class JsonToSocialDataServiceFoursquareTest {
 
 	public static void main(String[] args){
 		System.out.println("Convert JSON to SocialDATA");
-		String access_token = "";
-		ISocialConnector c = new TwitterConnectorImpl();
+		String access_token = "5ZAFZUGOUSFQAEDSWPCXQLJVMBFY1GDI41T5SNMUJP5B2QNA";
+		ISocialConnector c = new FoursquareConnectorImpl(access_token,"dingqi");
 
-		//		friends test
+		//		profile test
+		try {
+
+			String dataPro = c.getUserProfile();
+			System.out.println("\n"+dataPro);
+
+			PersonConverterFromFoursquare parserP = new PersonConverterFromFoursquare();
+
+			Person profile = parserP.load(dataPro);
+			System.out.println("profile:"
+					+"\n Name : " + profile.getName().getGivenName()+" "+profile.getName().getFamilyName()
+					+"\n Short description : "+profile.getAboutMe()
+					+"\n home location : "+profile.getAddresses().get(0).getFormatted()
+					+"\n email : "+profile.getEmails().get(0).getValue());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		
+//		friends test
 		try {
 
 			String dataF = c.getUserFriends();
-			//			System.out.println(data);
+			System.out.println("\n"+dataF);
 
-			FriendsConverterFromTwitter parserF = new FriendsConverterFromTwitter();
+			FriendsConverterFromFoursquare parserF = new FriendsConverterFromFoursquare();
 
 			List<Person> f= parserF.load(dataF);
 			//			System.out.println("p:"+p.getTurnOns().toString());
@@ -43,48 +60,22 @@ public class JsonToSocialDataServiceFoursquareTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		//		profile test
-		try {
-
-			String dataPro = c.getUserProfile();
-//			System.out.println(dataPro);
-
-			PersonConverterFromTwitter parserP = new PersonConverterFromTwitter();
-
-			//			Person pro= parserP.load(dataPro);
-			Person profile = parserP.load(dataPro);
-			System.out.println("\nprofile:"
-					+"\n Name : " + profile.getName().getFormatted()
-					+"\n Dsiplay Name : "+profile.getDisplayName()
-					+"\n Short description : "+profile.getAboutMe()
-					+"\n home location : "+profile.getCurrentLocation().getFormatted());
-			//			System.out.println("friends are : ");
-			//			Iterator<Person> it = f.iterator();
-			//			while (it.hasNext()){
-			//				Person p = it.next();
-			//				System.out.println(p.getName().getFormatted() + " ("+p.getId()+")");
-			//			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
+		
 		//		activity test
 		try {
 
 			String dataAct = c.getUserActivities();
-//			System.out.println(dataAct);
+			System.out.println("\n"+dataAct);
 
-			ActivityConverterFromTwitter parserA = new ActivityConverterFromTwitter();
+			ActivityConverterFromFoursquare parserA = new ActivityConverterFromFoursquare();
 
 			//			Person pro= parserP.load(dataPro);
 			List<ActivityEntry> activities = parserA.load(dataAct);
-			System.out.println("\nActivity:");
+			System.out.println("Activity:");
 			Iterator<ActivityEntry> it = activities.iterator();
 			while (it.hasNext()){
 				ActivityEntry elm = it.next();
-				System.out.println(elm.getActor().getDisplayName() + " "+ elm.getVerb() +" : " + elm.getContent());
+				System.out.println("You "+ elm.getVerb() +" : " + elm.getContent());
 			}
 
 		} catch (Exception e) {

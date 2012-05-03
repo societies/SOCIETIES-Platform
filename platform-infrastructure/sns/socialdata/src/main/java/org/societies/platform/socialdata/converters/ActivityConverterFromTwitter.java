@@ -29,8 +29,14 @@ public class ActivityConverterFromTwitter implements ActivityConverter {
 		providerObj.setId("twitter");
 		providerObj.setDisplayName("Twitter");
 
-		try{
+		System.out.println();
+		try {
 			elements  = new JSONArray(data);
+		} catch (JSONException e1) {
+			return activities;
+		}
+		try{
+			
 
 			for (int i=0; i<elements.length(); i++){
 				JSONObject elm = elements.getJSONObject(i);
@@ -51,7 +57,8 @@ public class ActivityConverterFromTwitter implements ActivityConverter {
 				entry.setProvider(providerObj);
 				activities.add(entry);
 			}
-		} catch (JSONException e) {
+		} 
+		catch (JSONException e) {
 			
 			e.printStackTrace();
 		}
