@@ -33,7 +33,6 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyEx
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 
 /**
  * Interface internal to privacy components to manage data access control and data access conditions.

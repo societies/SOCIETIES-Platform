@@ -222,7 +222,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 */
 	@Override
 	@Async
-	public Future<List<CtxEntityIdentifier>> lookup(List<CtxEntityIdentifier> ctxEntityIDList, String ctxAttributeType, Serializable value){
+	public Future<List<CtxEntityIdentifier>> lookupEntities(List<CtxEntityIdentifier> ctxEntityIDList, String ctxAttributeType, Serializable value){
 
 		List<CtxEntityIdentifier> entityList = new ArrayList<CtxEntityIdentifier>(); 
 		try {

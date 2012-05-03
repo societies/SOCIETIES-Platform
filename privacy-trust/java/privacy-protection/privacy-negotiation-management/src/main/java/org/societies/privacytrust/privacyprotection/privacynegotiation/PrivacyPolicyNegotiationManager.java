@@ -24,10 +24,7 @@
  */
 package org.societies.privacytrust.privacyprotection.privacynegotiation;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;
 
 import javax.swing.JOptionPane;
 
@@ -39,20 +36,18 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.identity.IIdentitySelection;
 import org.societies.api.internal.personalisation.preference.IUserPreferenceManagement;
 import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
-import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPolicyAgreementManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPolicyNegotiationManager;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
+import org.societies.privacytrust.privacyprotection.api.identity.IIdentitySelection;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.FailedNegotiationEvent;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client.NegotiationClient;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.provider.PrivacyPolicyRegistryManager;
