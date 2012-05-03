@@ -47,6 +47,7 @@ import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscove
 import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryResultBean;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlMsgBean;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResultBean;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
@@ -261,12 +262,18 @@ public class CommsServer implements IFeatureServer {
 						break;
 					}
 					default:
-						serviceResult.setControlResult(ServiceControlResult.COMMUNICATION_ERROR);
+						ServiceControlResult result = new ServiceControlResult();
+						result.setServiceId(serviceMessage.getServiceId());
+						result.setMessage(ResultMessage.COMMUNICATION_ERROR);
+						serviceResult.setControlResult(result);
 				}
 			} catch (Exception e) {
 				LOG.error("Exception: " + e);
 				e.printStackTrace();
-				serviceResult.setControlResult(ServiceControlResult.EXCEPTION_ON_REMOTE);
+				ServiceControlResult result = new ServiceControlResult();
+				result.setServiceId(serviceMessage.getServiceId());
+				result.setMessage(ResultMessage.EXCEPTION_ON_REMOTE);
+				serviceResult.setControlResult(result);
 			};
 				
 			//RETURN MESSAGEBEAN RESULT
