@@ -27,6 +27,7 @@ package org.societies.slm.servicecontrol;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
+import static org.mockito.Mockito.anyObject;
 
 import java.net.URI;
 import java.net.URL;
@@ -499,7 +500,7 @@ public class ServiceControlUnitTest {
 	/**
 	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#installService(java.net.URL)}.
 	 */
-	/*
+	
 	@Test
 	public void testInstallServiceURLSuccess() {
 		
@@ -515,7 +516,7 @@ public class ServiceControlUnitTest {
 			List<Service> serviceTestList = new ArrayList<Service>();
 			serviceTestList.add(testService);
 			System.out.println(serviceTestList.size());
-			stub(mockedServiceReg.findServices(mockedFilter)).toReturn(serviceTestList);
+			stub(mockedServiceReg.findServices((Service) anyObject())).toReturn(serviceTestList);
 			
 			Future<ServiceControlResult> futureResult;
 			ServiceControlResult result;
@@ -530,7 +531,7 @@ public class ServiceControlUnitTest {
 		}
 		
 	}
-	*/
+	
 
 	/**
 	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#installService(java.net.URL)}.

@@ -215,8 +215,8 @@ public class ServiceRegistryListener implements BundleContextAware,
 				} else{
 					if(log.isDebugEnabled()) log.debug(service.getServiceName() + " already exists, setting status to STARTED");
 					this.getServiceReg().changeStatusOfService(service.getServiceIdentifier(), ServiceStatus.STARTED);
-
 				}
+				
 			} catch (Exception e) {
 				log.error("Error while persisting service meta data");
 				e.printStackTrace();
