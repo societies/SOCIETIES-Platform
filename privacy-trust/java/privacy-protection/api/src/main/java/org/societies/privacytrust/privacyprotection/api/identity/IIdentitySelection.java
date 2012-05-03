@@ -1,4 +1,4 @@
-package org.societies.api.internal.identity;
+package org.societies.privacytrust.privacyprotection.api.identity;
 
 import java.util.List;
 
