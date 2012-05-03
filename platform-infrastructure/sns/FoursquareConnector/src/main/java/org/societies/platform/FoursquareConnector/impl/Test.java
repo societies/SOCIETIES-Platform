@@ -11,6 +11,7 @@ class Test{
 		FoursquareConnectorImpl f = new FoursquareConnectorImpl(defaultAccessTokenString,"yangdingqi");
 		
 		testProfileExtraction(f);
+		testFriendsExtraction(f);
 		testCheckinsExtraction(f);
 	}
 		
@@ -23,9 +24,18 @@ class Test{
 		System.out.println(r);
 	}
 	
+	public static void testFriendsExtraction(FoursquareConnectorImpl f){
+		String r = null;
+		r = f.getUserFriends();
+		if(r==null)
+			System.out.println("user profile = null");
+		else
+		System.out.println(r);
+	}
+	
 	public static void testCheckinsExtraction(FoursquareConnectorImpl f){
 		String r = null;
-		r = f.getRecentCheckins();
+		r = f.getUserActivities();
 		if(r==null)
 			System.out.println("user recent checkins = null");
 		else

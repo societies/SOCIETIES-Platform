@@ -1,257 +1,278 @@
 package org.societies.platform.TwitterConnector.impl;
 
 import java.util.Map;
+import java.util.UUID;
 
-import org.json.simple.*;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+//import org.json.simple.JSONArray;
+//import org.json.simple.JSONObject;
+//import org.json.simple.parser.JSONParser;
+//import org.json.simple.parser.ParseException;
 import org.scribe.model.*;
 import org.scribe.oauth.*;
+import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.platform.TwitterConnector.*;
 import org.societies.platform.TwitterConnector.model.TwitterToken;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /*
  * twitter connector implementation
  */
-public class TwitterConnectorImpl implements TwitterConnector{
+public class TwitterConnectorImpl implements TwitterConnector {
 
 	private TwitterToken twToken = null;
 	private OAuthService service;
+	private String name;
+	private String id;
+	private String lastUpdate = "yesterday";
 
-	public TwitterConnectorImpl(){
+	public TwitterConnectorImpl() {
 		this.twToken = new TwitterToken();
 		this.service = twToken.getAuthService();
+		this.name = ISocialConnector.TWITTER_CONN;
+		this.id = this.name + "_" + UUID.randomUUID();
+
 	}
 
-	
-	public String getUserProfile(){
+	public TwitterConnectorImpl(String access_token, String identity) {
+		this.twToken = new TwitterToken(access_token);
+		this.service = twToken.getAuthService();
+		this.name = ISocialConnector.TWITTER_CONN;
+		this.id = this.name + "_" + UUID.randomUUID();
+	}
+
+	public String getUserProfile() {
 		OAuthRequest request = new OAuthRequest(Verb.GET, ACCOUNT_VERIFICATION);
 		this.service.signRequest(twToken.getAccessToken(), request);
 		Response response = request.send();
-		JSONParser parser=new JSONParser();
-		Object obj=null;
+		JSONObject res = null;
 		try {
-			obj = parser.parse(response.getBody());
-		} catch (ParseException e) {
+			res = new JSONObject(response.getBody());
+		} catch (JSONException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return response.getBody();
 		}
-		JSONObject res=(JSONObject)obj;
-		if(res!=null)
-			return res.toJSONString();
+		if (res != null)
+			return res.toString();
 		else
 			return null;
 	}
-	
-	
-	public String getUserFriends(){
+
+	public String getUserFriends() {
 		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FRIENDS_URL);
 		this.service.signRequest(twToken.getAccessToken(), request);
 		Response response = request.send();
-		JSONParser parser=new JSONParser();
-		Object obj=null;
+		JSONObject res =null;
 		try {
-			obj = parser.parse(response.getBody());
-		} catch (ParseException e) {
+			res = new JSONObject(response.getBody());
+		} catch (JSONException e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e1.printStackTrace();
 		}
-		JSONObject res=(JSONObject)obj;
-		if(res!=null)
-			return res.toJSONString();
+		JSONObject friends = new JSONObject();
+		JSONArray friendsList = new JSONArray();
+//		System.out.println(res.toString());
+		try {
+			JSONArray friendsIDList = res.getJSONArray("ids");
+			
+			JSONObject other = null;
+			
+			for (int i = 0; i < friendsIDList.length(); i++) {
+				// System.out.println(friendsIDList.get(i).toString());
+
+				other = getOtherProfileJson(friendsIDList.get(i).toString());
+
+				// System.out.println(other);
+				if (!other.toString().contains(
+						"No user matches for specified terms"))
+					friendsList.put(other);
+				friends.put("friends", friendsList);
+			}
+		} catch (JSONException e) {
+			return response.getBody();
+		}
+		
+		if (res != null)
+			// return res.toJSONString();
+			return friends.toString();
 		else
 			return null;
 	}
 
-	
-	public String getUserFollowers(){
+	public String getUserFollowers() {
 		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FOLLOWERS_URL);
 		this.service.signRequest(twToken.getAccessToken(), request);
 		Response response = request.send();
-		JSONParser parser=new JSONParser();
-		Object obj=null;
+		JSONObject res = null;
+		JSONObject followers = new JSONObject();
+		JSONArray followersList = new JSONArray();
 		try {
-			obj = parser.parse(response.getBody());
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			res = new JSONObject(response.getBody());
+			JSONArray followersIDList = res.getJSONArray("ids");
+			
+			JSONObject other = null;
+			
+			for (int i = 0; i < followersIDList.length(); i++) {
+				// System.out.println(friendsIDList.get(i).toString());
+
+				other = getOtherProfileJson(followersIDList.get(i).toString());
+
+				// System.out.println(other);
+				if (!other.toString().contains(
+						"No user matches for specified terms"))
+					followersList.put(other);
+				followers.put("friends", followersList);
+			}
+		} catch (JSONException e) {
+			response.getBody();
 		}
-		JSONObject res=(JSONObject)obj;
-		if(res!=null)
-			return res.toJSONString();
-		else 
+		
+		if (res != null)
+			// return res.toJSONString();
+			return followers.toString();
+		else
 			return null;
+
 	}
 
-	
-	public String getOtherProfile(String id){
-		OAuthRequest request = new OAuthRequest(Verb.GET, GET_OTHER_PROFILE_URL);
+	public String getOtherProfileString(String id) {
+		OAuthRequest request = new OAuthRequest(Verb.GET, GET_OTHER_PROFILE_URL
+				+ id);
 		this.service.signRequest(twToken.getAccessToken(), request);
 		Response response = request.send();
-		JSONParser parser=new JSONParser();
-		Object obj=null;
+		JSONArray res = null;
+		JSONObject user =null;
 		try {
-			obj = parser.parse(response.getBody());
-		} catch (ParseException e) {
+			res = new JSONArray(response.getBody());
+			user = res.getJSONObject(0);
+		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		JSONObject res=(JSONObject)obj;
-		if(res!=null)
-			return res.toJSONString();
-		else 
+		if (res != null)
+			return user.toString();
+		else
 			return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getID()
-	 */
-	
-	public String getID() {
-		// TODO Auto-generated method stub
-		return null;
+	public JSONObject getOtherProfileJson(String id) {
+		OAuthRequest request = new OAuthRequest(Verb.GET, GET_OTHER_PROFILE_URL
+				+ id);
+		this.service.signRequest(twToken.getAccessToken(), request);
+		Response response = request.send();
+		JSONArray res = null;
+		JSONObject user =null;
+		try {
+			res = new JSONArray(response.getBody());
+			user = res.getJSONObject(0);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (res != null)
+			return user;
+		else
+			return null;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#setToken(java.lang.String)
+	/*
+	 * Activities in Twitter is defined as tweets
+	 * 
+	 * @see org.societies.api.internal.sns.ISocialConnector#getUserActivities()
 	 */
-	
+	public String getUserActivities() {
+		OAuthRequest request = new OAuthRequest(Verb.GET, GET_TWEETS_URL);
+		this.service.signRequest(twToken.getAccessToken(), request);
+		Response response = request.send();
+		JSONArray res = null;
+		try {
+			res = new JSONArray(response.getBody());
+		} catch (JSONException e) {
+			return response.getBody();
+		}
+		// System.out.println(res.toString());
+		if (res != null)
+			return res.toString();
+		else
+			return null;
+	}
+
+	public String getID() {
+		return this.id;
+	}
+
+	public String getLastUpdate() {
+		return lastUpdate;
+	}
+
+	public void setLastUpdate(String lastUpdate) {
+		this.lastUpdate = lastUpdate;
+	}
+
 	public void setToken(String access_token) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#setTokenExpiration(long)
-	 */
-	
 	public void setTokenExpiration(long expires) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getTokenExpiration()
-	 */
-	
 	public long getTokenExpiration() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getToken()
-	 */
-	
 	public String getToken() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#setConnectorName(java.lang.String)
-	 */
-	
 	public void setConnectorName(String name) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getConnectorName()
-	 */
-	
 	public String getConnectorName() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getSocialData(java.lang.String)
-	 */
-	
 	public String getSocialData(String path) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#requireAccessToken()
-	 */
-	
 	public Map<String, String> requireAccessToken() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#disconnect()
-	 */
-	
 	public void disconnect() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#setMaxPostLimit(int)
-	 */
-	
 	public void setMaxPostLimit(int postLimit) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#setParameter(java.lang.String, java.lang.String)
-	 */
-	
 	public void setParameter(String key, String value) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#resetParameters()
-	 */
-	
 	public void resetParameters() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getUserActivities()
-	 */
-	
-	public String getUserActivities() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getUserGroups()
-	 */
-	
 	public String getUserGroups() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-
 
 }

@@ -11,7 +11,7 @@ public interface TwitterConnector extends ISocialConnector {
 	public static final String GET_FRIENDS_URL = "https://api.twitter.com/1/friends/ids.json?user_id=";
 	public static final String GET_FOLLOWERS_URL = "https://api.twitter.com/1/followers/ids.json?user_id=";
 	public static final String GET_OTHER_PROFILE_URL = "https://api.twitter.com/1/users/lookup.json?user_id=";
-	
+	public static final String GET_TWEETS_URL = "http://api.twitter.com/1/statuses/home_timeline.json";
 	/**
 	 * @return
 	 */
@@ -20,5 +20,5 @@ public interface TwitterConnector extends ISocialConnector {
 	 * @param id
 	 * @return
 	 */
-	String getOtherProfile(String id);
+	String getOtherProfileString(String id);
 }
