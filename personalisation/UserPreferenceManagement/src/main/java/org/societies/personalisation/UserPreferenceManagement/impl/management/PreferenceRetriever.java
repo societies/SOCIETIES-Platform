@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
@@ -53,7 +54,7 @@ public class PreferenceRetriever {
 		this.broker = broker;
 	}
 	
-	public Registry retrieveRegistry(IIdentity dpi){
+	public Registry retrieveRegistry(IIdentity userId){
 		try {
 			Future<List<CtxIdentifier>> futureAttrList = broker.lookup(CtxModelType.ATTRIBUTE, "PREFERENCE_REGISTRY");
 			if (futureAttrList==null){

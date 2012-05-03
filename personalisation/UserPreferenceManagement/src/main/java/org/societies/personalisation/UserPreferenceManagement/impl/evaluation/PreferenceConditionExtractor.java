@@ -29,6 +29,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceCondition;
@@ -61,7 +62,8 @@ public class PreferenceConditionExtractor {
 				if (temp.getUserObject() instanceof IPreferenceCondition){
 					CtxIdentifier id = temp.getCondition().getCtxIdentifier();
 					if (!hasCondition(list,id)){
-						IPreferenceConditionIOutcomeName tuple = new IPreferenceConditionIOutcomeName(temp.getCondition().getCtxIdentifier(),preferenceName);
+						CtxAttributeIdentifier ctxId = temp.getCondition().getCtxIdentifier();
+						IPreferenceConditionIOutcomeName tuple = new IPreferenceConditionIOutcomeName(ctxId,preferenceName);
 						list.add(tuple);
 					}
 				}
@@ -74,8 +76,9 @@ public class PreferenceConditionExtractor {
 	private boolean hasCondition(ArrayList<IPreferenceConditionIOutcomeName> list, CtxIdentifier id){
 		Iterator<IPreferenceConditionIOutcomeName> tuplesIt = list.iterator();
 		while (tuplesIt.hasNext()){
-			IPreferenceConditionIOutcomeName tuple = tuplesIt.next();
-			CtxIdentifier ctxId = tuple.getICtxIdentifier();
+			IPreferenceConditionIOutcomeName pcOut = tuplesIt.next();
+			CtxIdentifier ctxId = pcOut.getICtxIdentifier();
+			
 			if (ctxId.equals(id)){
 				return true;
 			}

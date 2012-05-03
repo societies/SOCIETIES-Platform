@@ -28,6 +28,7 @@ package org.societies.integration.test.bit.monitoring;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -39,12 +40,16 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationIdentifier;
+import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
@@ -73,8 +78,8 @@ public class ContextStorageTest {
 		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
 		ServiceResourceIdentifier serviceId2 = new ServiceResourceIdentifier();
 		try {
-			serviceId1.setIdentifier(new URI("testService1"));
-			serviceId2.setIdentifier(new URI("testService2"));
+			serviceId1.setIdentifier(new URI("http://testService1"));
+			serviceId2.setIdentifier(new URI("http://testService2"));
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -86,49 +91,166 @@ public class ContextStorageTest {
 		IAction action4 = new Action(serviceId2, "testService", "colour", "blue");
 		IAction action5 = new Action(serviceId2, "testService", "colour", "green");
 
-		//send actions
+		//send actions - 1 second apart
 		LOG.info("Monitor services #747 - sending mock actions for storage");
 		TestCase747.uam.monitor(identity, action1);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 		TestCase747.uam.monitor(identity, action2);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 		TestCase747.uam.monitor(identity, action3);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 		TestCase747.uam.monitor(identity, action4);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 		TestCase747.uam.monitor(identity, action5);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 
 		//check context storage structure
+
+		Set<CtxEntityIdentifier> serviceEntityIDs = null;
+
+		IndividualCtxEntity person;
 		try {
-			
-			//Check service 1
-			
-			Future<List<CtxEntityIdentifier>> futureServiceEntityIDs = 
-					TestCase747.ctxBroker.lookupEntities(CtxEntityTypes.SERVICE, CtxAttributeTypes.ID, serviceId1, serviceId1);
-			List<CtxEntityIdentifier> serviceEntityIDs = futureServiceEntityIDs.get();
+			person = TestCase747.ctxBroker.retrieveCssOperator().get();
+
+			if(person == null){
+				LOG.error("Person entity is NULL");
+			}
+			Assert.assertNotNull(person);
+
+			Set<CtxAssociationIdentifier> usesServiceAssocIDs = person.getAssociations(CtxAssociationTypes.USES_SERVICE);
+			if(usesServiceAssocIDs == null){
+				LOG.error("USES_SERVICE association IDs in null");
+			}
+			if(usesServiceAssocIDs.size() != 1){
+				LOG.error("Incorrect number of USES_SERVICE association IDs :"+usesServiceAssocIDs.size());
+			}
+			Assert.assertNotNull(usesServiceAssocIDs);
+			Assert.assertTrue(usesServiceAssocIDs.size() == 1);
+
+			CtxAssociation usesServiceAssoc = (CtxAssociation)TestCase747.ctxBroker.retrieve(usesServiceAssocIDs.iterator().next()).get();
+			if(usesServiceAssoc == null){
+				LOG.error("USES_SERVICE association is NULL");
+			}
+			Assert.assertNotNull(usesServiceAssoc);
+
+			serviceEntityIDs = usesServiceAssoc.getChildEntities();
+			if(serviceEntityIDs.size() != 2){
+				LOG.error("Wrong number of SERVICE entity IDs for USES_SERVICE association: "+serviceEntityIDs.size());
+			}
+			Assert.assertTrue(serviceEntityIDs.size() == 2);  //2 service entities
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		} catch (ExecutionException e1) {
+			e1.printStackTrace();
+		} catch (CtxException e1) {
+			e1.printStackTrace();
+		}
+
+		try{
+			/*
+			 * CHECK SERVICE 1
+			 */
+			ArrayList<CtxEntityIdentifier> serviceEntityIDsList = new ArrayList<CtxEntityIdentifier>(serviceEntityIDs);
+
+			List<CtxEntityIdentifier> check1ServiceIDs = 
+					TestCase747.ctxBroker.lookupEntities(serviceEntityIDsList, CtxAttributeTypes.ID, serviceId1).get();
 
 			//Check number of service entities returned
+			if(check1ServiceIDs == null){
+				LOG.error("1) NULL - no SERVICE entity exists with ID: "+serviceId1);
+			}
+			if(check1ServiceIDs.size() <= 0){
+				LOG.error("1) EMPTY - no SERVICE entity exists with ID: "+serviceId1);
+			}
 			Assert.assertNotNull(serviceEntityIDs);
 			Assert.assertTrue(serviceEntityIDs.size() == 1);	
 
-			//check attributes for service 1
-			Future<CtxModelObject> futureServiceEntity = TestCase747.ctxBroker.retrieve(serviceEntityIDs.get(0));
-			CtxEntity serviceEntity = (CtxEntity)futureServiceEntity.get();
+			//check service ID attribute
+			CtxEntity serviceEntity = (CtxEntity)TestCase747.ctxBroker.retrieve(check1ServiceIDs.get(0)).get();
+
 			Set<CtxAttribute> attributes = serviceEntity.getAttributes();
-
+			if(attributes == null){
+				LOG.error("1) NULL - no attributes under SERVICE entity");
+			}
+			if(attributes.size() != 1){
+				LOG.error("1) Wrong number of attributes under SERVICE entity: "+attributes.size());
+			}
 			Assert.assertNotNull(attributes);
-			Assert.assertTrue(attributes.size() == 2); //ID, volume
+			Assert.assertTrue(attributes.size() == 1);
 
-			for(CtxAttribute attribute: attributes){
-				if(attribute.getType().equals(CtxAttributeTypes.ID)){  //check service ID
-					ServiceResourceIdentifier actualServiceId = 
-							(ServiceResourceIdentifier)SerialisationHelper.deserialise(attribute.getBinaryValue(), this.getClass().getClassLoader());
+			CtxAttribute idAttr = attributes.iterator().next();
+			ServiceResourceIdentifier actualServiceId = (ServiceResourceIdentifier)SerialisationHelper.deserialise(idAttr.getBinaryValue(), this.getClass().getClassLoader());
+			if(!serviceId1.equals(actualServiceId)){
+				LOG.error("1) wrong serviceID stored with SERVICE entity.  Expected: "+serviceId1+", Actual: "+actualServiceId);
+			}
+			Assert.assertEquals(serviceId1, actualServiceId);
 
-					Assert.assertEquals(serviceId1, actualServiceId);
+			//check service HAS_PARAMETER associations
+			Set<CtxAssociationIdentifier> hasParamIDs = serviceEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETER);
+			if(hasParamIDs == null){
+				LOG.error("1) NULL - no HAS_PARAMETER associations for SERVICE entity");
+			}
+			if(hasParamIDs.size() != 1){
+				LOG.error("1) Wrong numbder of HAS_PARAMETER associations under SERVICE entity: "+hasParamIDs.size());
+			}
+			Assert.assertNotNull(hasParamIDs);
+			Assert.assertTrue(hasParamIDs.size() == 1);
 
-				}else if(attribute.getType().equals("volume")){  //check volume parameter
-					IAction actualAction = (IAction)SerialisationHelper.deserialise(attribute.getBinaryValue(), this.getClass().getClassLoader());
+			CtxAssociation hasParamAssoc = (CtxAssociation)TestCase747.ctxBroker.retrieve(hasParamIDs.iterator().next()).get();
+			if(hasParamAssoc == null){
+				LOG.error("1) HAS_PARAMETER association is NULL");
+			}
+			Assert.assertNotNull(hasParamAssoc);
 
+			Set<CtxEntityIdentifier> serviceParamIDs = hasParamAssoc.getChildEntities();
+			if(serviceParamIDs.size() != 1){
+				LOG.error("1) Wrong number of SERVICE_PARAMETER entity IDs for HAS_PARAMETERS association "+serviceParamIDs.size());
+			}
+			Assert.assertTrue(serviceParamIDs.size() == 1);
+
+			CtxEntity serviceParam = (CtxEntity)TestCase747.ctxBroker.retrieve(serviceParamIDs.iterator().next());
+
+			Set<CtxAttribute> serviceParamAttrs = serviceParam.getAttributes(); 
+
+			for(CtxAttribute nextAttr: serviceParamAttrs){
+				if(nextAttr.getType().equals(CtxAttributeTypes.PARAMETER_NAME)){  //check name
+					String actualParameterName = nextAttr.getStringValue();
+
+					LOG.info("1) volume should be the same as "+actualParameterName);
+					Assert.assertEquals("volume", actualParameterName);
+
+				}else if(nextAttr.getType().equals(CtxAttributeTypes.LAST_ACTION)){  //check last action
+					IAction actualAction = (IAction)SerialisationHelper.deserialise(nextAttr.getBinaryValue(), this.getClass().getClassLoader());
+
+					LOG.info("1) "+action3+" should be the same as "+actualAction);
 					Assert.assertEquals(action3, actualAction);
-
+				}else if(nextAttr.getType().equals("tuple_volume")){
+					//ignore
+				}else if(nextAttr.getType().equals("tupleIds_volume")){
+					//ignore
 				}else{ //unknown parameter!
 
+					LOG.error("1) received unknown attribute type: "+nextAttr.getType());
 					Assert.fail("Unknown parameter type for serviceId1");
 
 				}
@@ -145,50 +267,96 @@ public class ContextStorageTest {
 			e.printStackTrace();
 		}
 
-		
-		//Check service 2
-		
-		try {
-			Future<List<CtxEntityIdentifier>> futureServiceEntityIDs = 
-					TestCase747.ctxBroker.lookupEntities(CtxEntityTypes.SERVICE, CtxAttributeTypes.ID, serviceId2, serviceId2);
-			List<CtxEntityIdentifier> serviceEntityIDs = futureServiceEntityIDs.get();
-		
+
+		/*
+		 * CHECK SERVICE 2
+		 */
+		try{
+			ArrayList<CtxEntityIdentifier> serviceEntityIDsList = new ArrayList<CtxEntityIdentifier>(serviceEntityIDs);
+
+			List<CtxEntityIdentifier> check2ServiceIDs = 
+					TestCase747.ctxBroker.lookupEntities(serviceEntityIDsList, CtxAttributeTypes.ID, serviceId2).get();
+
 			//Check number of service entities returned
+			if(check2ServiceIDs == null){
+				LOG.error("2) NULL - no SERVICE entity exists with ID: "+serviceId2);
+			}
+			if(check2ServiceIDs.size() <= 0){
+				LOG.error("2) EMPTY - no SERVICE entity exists with ID: "+serviceId2);
+			}
 			Assert.assertNotNull(serviceEntityIDs);
-			Assert.assertTrue(serviceEntityIDs.size() == 1);
-		
-			//check attributes for service 2
-			Future<CtxModelObject> futureServiceEntity = TestCase747.ctxBroker.retrieve(serviceEntityIDs.get(0));
-			CtxEntity serviceEntity = (CtxEntity)futureServiceEntity.get();
+			Assert.assertTrue(serviceEntityIDs.size() == 1);	
+
+			//check service ID attribute
+			CtxEntity serviceEntity = (CtxEntity)TestCase747.ctxBroker.retrieve(check2ServiceIDs.get(0)).get();
+
 			Set<CtxAttribute> attributes = serviceEntity.getAttributes();
-			
+			if(attributes == null){
+				LOG.error("2) NULL - no attributes under SERVICE entity");
+			}
+			if(attributes.size() != 1){
+				LOG.error("2) Wrong number of attributes under SERVICE entity: "+attributes.size());
+			}
 			Assert.assertNotNull(attributes);
-			Assert.assertTrue(attributes.size() == 3); //ID, volume, colour
+			Assert.assertTrue(attributes.size() == 1);
 
-			for(CtxAttribute attribute: attributes){
-				if(attribute.getType().equals(CtxAttributeTypes.ID)){  //check service ID
-					ServiceResourceIdentifier actualServiceId = 
-							(ServiceResourceIdentifier)SerialisationHelper.deserialise(attribute.getBinaryValue(), this.getClass().getClassLoader());
+			CtxAttribute idAttr = attributes.iterator().next();
+			ServiceResourceIdentifier actualServiceId = (ServiceResourceIdentifier)SerialisationHelper.deserialise(idAttr.getBinaryValue(), this.getClass().getClassLoader());
+			if(!serviceId2.equals(actualServiceId)){
+				LOG.error("2) wrong serviceID stored with SERVICE entity.  Expected: "+serviceId2+", Actual: "+actualServiceId);
+			}
+			Assert.assertEquals(serviceId2, actualServiceId);
 
-					Assert.assertEquals(serviceId2, actualServiceId);
+			//check service HAS_PARAMETER associations
+			Set<CtxAssociationIdentifier> hasParamIDs = serviceEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETER);
+			if(hasParamIDs == null){
+				LOG.error("2) NULL - no HAS_PARAMETER associations for SERVICE entity");
+			}
+			if(hasParamIDs.size() != 1){
+				LOG.error("2) Wrong numbder of HAS_PARAMETER associations under SERVICE entity: "+hasParamIDs.size());
+			}
+			Assert.assertNotNull(hasParamIDs);
+			Assert.assertTrue(hasParamIDs.size() == 1);
 
-				}else if(attribute.getType().equals("volume")){  //check volume parameter
-					IAction actualAction = (IAction)SerialisationHelper.deserialise(attribute.getBinaryValue(), this.getClass().getClassLoader());
+			CtxAssociation hasParamAssoc = (CtxAssociation)TestCase747.ctxBroker.retrieve(hasParamIDs.iterator().next()).get();
+			if(hasParamAssoc == null){
+				LOG.error("2) HAS_PARAMETER association is NULL");
+			}
+			Assert.assertNotNull(hasParamAssoc);
 
-					Assert.assertEquals(action2, actualAction);
+			Set<CtxEntityIdentifier> serviceParamIDs = hasParamAssoc.getChildEntities();
+			if(serviceParamIDs.size() != 2){
+				LOG.error("2) Wrong number of SERVICE_PARAMETER entity IDs for HAS_PARAMETERS association "+serviceParamIDs.size());
+			}
+			Assert.assertTrue(serviceParamIDs.size() == 2);
 
-				}else if(attribute.getType().equals("colour")){
-					IAction actualAction = (IAction)SerialisationHelper.deserialise(attribute.getBinaryValue(), this.getClass().getClassLoader());
-					
-					Assert.assertEquals(action5, actualAction);
-					
+			CtxEntity serviceParam = (CtxEntity)TestCase747.ctxBroker.retrieve(serviceParamIDs.iterator().next());
+
+			Set<CtxAttribute> serviceParamAttrs = serviceParam.getAttributes(); 
+
+			for(CtxAttribute nextAttr: serviceParamAttrs){
+				if(nextAttr.getType().equals(CtxAttributeTypes.PARAMETER_NAME)){  //check name
+					String actualParameterName = nextAttr.getStringValue();
+
+					LOG.info("2) actual parameter name is: "+actualParameterName);
+					//Assert.assertEquals("volume", actualParameterName);
+
+				}else if(nextAttr.getType().equals(CtxAttributeTypes.LAST_ACTION)){  //check last action
+					IAction actualAction = (IAction)SerialisationHelper.deserialise(nextAttr.getBinaryValue(), this.getClass().getClassLoader());
+
+					LOG.info("1) "+action3+" should be the same as "+actualAction);
+					Assert.assertEquals(action3, actualAction);
+				}else if(nextAttr.getType().equals("tuple_volume")){
+					//ignore
+				}else if(nextAttr.getType().equals("tupleIds_volume")){
+					//ignore
 				}else{ //unknown parameter!
 
+					LOG.error("1) received unknown attribute type: "+nextAttr.getType());
 					Assert.fail("Unknown parameter type for serviceId1");
 
 				}
 			}
-		
 		} catch (CtxException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
