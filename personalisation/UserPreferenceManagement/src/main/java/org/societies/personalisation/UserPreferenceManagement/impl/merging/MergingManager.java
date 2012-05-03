@@ -180,7 +180,7 @@ public class MergingManager implements IC45Consumer{
 					actionExists = true;
 
 					int counter = tempTable.get(tempAction);
-					this.logging.info("Counter for :"+action.toString()+" is "+counter);
+					this.logging.debug("Counter for :"+action.toString()+" is "+counter);
 					if (counter>=2){
 						this.logging.debug("Counter reached 2, requesting learning and resetting counter");
 						tempTable.put(tempAction, new Integer(0)); //reset counter
@@ -198,7 +198,7 @@ public class MergingManager implements IC45Consumer{
 					}else{
 						logging.debug(this.getClass().getName()+" incrementing counter for action: "+action.toString());
 						counter ++;
-						this.logging.info("Counter for :"+action.toString()+" is "+counter);
+						this.logging.debug("Counter for :"+action.toString()+" is "+counter);
 						tempTable.put(tempAction, new Integer(counter));
 					}
 				}
