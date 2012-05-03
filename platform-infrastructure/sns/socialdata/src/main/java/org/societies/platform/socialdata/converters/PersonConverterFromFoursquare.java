@@ -15,12 +15,13 @@ import org.apache.shindig.social.core.model.PersonImpl;
 import org.apache.shindig.social.opensocial.model.Account;
 import org.apache.shindig.social.opensocial.model.Address;
 import org.apache.shindig.social.opensocial.model.ListField;
+import org.apache.shindig.social.opensocial.model.Name;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.apache.shindig.social.opensocial.model.Person.Gender;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class PersonConverterFromTwitter implements PersonConverter {
+public class PersonConverterFromFoursquare implements PersonConverter {
 
 	public static String STATUS_COUNT 	= "statuses_count";
 	public static String LANGUAGE		= "lang";
@@ -28,16 +29,20 @@ public class PersonConverterFromTwitter implements PersonConverter {
 	public static String NAME 			= "name";
 	public static String SCREEN_NAME	= "screen_name";
 	public static String CREATED_AT 	= "created_at";
+	public static String HOME_LOCATION	= "homeCity";
 	public static String LOCATION		= "location";
 	public static String FRIENDS_COUNT	= "friends_count";
 	public static String IMAGE			= "profile_image_url";
 	public static String FOLLOWERS_COUNT= "followers_count";
 	public static String STATUSES_COUNT	= "statuses_count";
-	public static String DESCRIPTION	= "description";
+	public static String DESCRIPTION	= "bio";
 	public static String TIMEZONE		= "time_zone";
 	public static String BIRTHDAY		= "birthday";
 	public static String EMAIL			= "email";
 	public static String GENDER 		= "gender";
+	public static String FIRSTNAME 		= "firstName";
+	public static String LASTNAME 		= "lastName";
+	public static String CONTACT		= "contact";
 
 	public static String STATUS 		= "status";
 	public static String COORDINATES	= "coordinates";
@@ -48,38 +53,41 @@ public class PersonConverterFromTwitter implements PersonConverter {
 	public static String TWEET_ID		= "id";
 
 
-	private String     rawData;
-	private JSONObject db;
+	private JSONObject response;
 	private Person 	   person;
+	private JSONObject db = null;
 
 	public Person load(String data){
 
 		person = new PersonImpl();
-		this.rawData = data;
 
 		try{
-			db = new JSONObject(data);
-			if (db.has("error"))
-				return person;
-			person.setId(db.getString(ID));
-			//			System.out.println("id: "+db.getString(ID));
-			//if(db.has(UCT)) person.setUtcOffset(db.getLong(UCT));
-			if (db.has(NAME))			person.setName(new NameImpl(db.getString(NAME)));
-			if (db.has(SCREEN_NAME))	person.setDisplayName(db.getString(SCREEN_NAME));
-			if (db.has(DESCRIPTION))	person.setAboutMe(db.getString(DESCRIPTION));
-			if (db.has(LOCATION))		person.setCurrentLocation(setLocation(db.getString(LOCATION)));
-//			if (db.has(EMAIL))			person.setEmails(getMails(db.getString(EMAIL)));
-//			if (db.has(BIRTHDAY))		person.setBirthday(getBirthDay(db.getString(BIRTHDAY)));
-//			if (db.has(GENDER))			person.setGender(gender(db.getString(GENDER)));
+			response = new JSONObject(data);
+//			System.out.println(response);
+			
+			if (response.has("response")) {
+				JSONObject user = (JSONObject) response.get("response");
+//				System.out.println(user);
+				if (user.has("user")){
+					db = (JSONObject) user.get("user");
+//					System.out.println(db);
+					person.setId(db.getString(ID));
 
+					if (db.has(DESCRIPTION))	person.setAboutMe(db.getString(DESCRIPTION));
+					if (db.has(GENDER))			person.setGender(gender(db.getString(GENDER)));
+					if (db.has(HOME_LOCATION))	person.setAddresses(setAddress(db.getString(HOME_LOCATION)));
+					if (db.has(CONTACT))		person.setEmails(getMails(db.getString(CONTACT)));
+					person.setName(genName());
+					setAccount();  
+				}
+			}
+			
 		}
 		catch (JSONException e) {
 			e.printStackTrace();
 		}
 
-		setAccount();  // Set Twitter Account
-		person.setLanguagesSpoken(genLanguages());
-		//		System.out.println("profile:\n"+person.getTurnOns().toString());
+		
 		return person;
 	}
 
@@ -99,8 +107,8 @@ public class PersonConverterFromTwitter implements PersonConverter {
 	private void setAccount(){
 		Account account = new AccountImpl();
 		try{
-			account.setDomain("twitter.com");
-			account.setUsername(db.getString(NAME));
+			account.setDomain("foursquare.com");
+			account.setUsername(db.getString(FIRSTNAME)+" "+db.getString(LASTNAME));
 			account.setUserId(db.getString(ID));
 		}
 		catch (JSONException e) {
@@ -113,17 +121,19 @@ public class PersonConverterFromTwitter implements PersonConverter {
 		person.setAccounts(accounts);
 	}
 
-	private Address setLocation(String data) {
-		Address address = new AddressImpl();
+	private List<Address> setAddress(String data) {
+		List<Address> addresses = new ArrayList<Address>();
 		try{
-
+			AddressImpl address = new AddressImpl();
 			address.setFormatted(data);
-
+			addresses.add(address);
 		}
 		catch(Exception ex){}
 
-		return address;
+		return addresses;
 	}
+	
+	
 
 	public Object getData(String key){
 		try {
@@ -137,38 +147,18 @@ public class PersonConverterFromTwitter implements PersonConverter {
 
 	}
 
-	public String getString(String key){
-		try {
-			if (db.has(key)){
-				return db.getString(key);
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return "";
+	private List<ListField> getMails(String mail) throws JSONException{
 
-	}
-
-	public String getRawData(){
-		return rawData;
-	}
-
-	private List<ListField> getMails(String mail){
-
+		
+		JSONObject obj = new JSONObject(mail);
+		
 		List<ListField> emails = new ArrayList<ListField>();
 		ListField email = new ListFieldImpl();
 		email.setPrimary(true);
 		email.setType("home");
-		email.setValue(mail);
+		email.setValue(obj.get("email").toString());
 		emails.add(email);
 		return emails;
-	}
-
-	private Gender gender(String g){
-		if (g.equals("male"))
-			return Gender.male;
-		else
-			return Gender.female;
 	}
 
 	private Date getBirthDay(String date) {
@@ -179,6 +169,41 @@ public class PersonConverterFromTwitter implements PersonConverter {
 
 		}
 		return null;
+
+	}
+	
+	private Name genName(){
+		Name name = null;
+		if (getString(NAME)!=null) {
+			name = new NameImpl(getString(NAME));
+			person.setDisplayName(getString(NAME));
+			name.setFormatted(getString(NAME));
+		}
+		
+		if (getString(FIRSTNAME)!=null) name.setGivenName(getString(FIRSTNAME));
+		if (getString(LASTNAME) !=null) name.setFamilyName(getString(LASTNAME));
+		
+		
+		return name;
+	}
+	
+	private Gender gender(String g){
+			if (g.equals("male"))
+				return Gender.male;
+			else
+				return Gender.female;
+	}
+	
+	private String getString(String key){
+		try {
+			if (db.has(key)){
+//				System.out.println(db.getString(key).toString());
+				return db.getString(key);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return "";
 
 	}
 }
