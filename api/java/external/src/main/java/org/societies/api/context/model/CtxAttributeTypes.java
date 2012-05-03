@@ -81,12 +81,7 @@ public class CtxAttributeTypes {
      * 
      */
     public static final String CRIST_MODEL = "crist_model";
-    
-    /**
-     * 
-     */
-    public static final String SERVICE_PARAMETER = "serviceParameter";
-    
+       
     /**
      * 
      */

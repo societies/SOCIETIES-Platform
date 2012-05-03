@@ -35,4 +35,7 @@ public class CtxAssociationTypes {
 	public static final String USES_SERVICE = "usesService";
 
 	public static final String HAS_PRIVACY_POLICIES = "hasPrivacyPolicies";
+
+	public static final String HAS_PARAMETER = "hasParameter";
+	
 }

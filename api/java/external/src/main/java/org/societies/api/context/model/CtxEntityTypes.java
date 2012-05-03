@@ -62,5 +62,8 @@ public class CtxEntityTypes {
      */
     public static final String PRIVACY_POLICY = "privacyPolicy";
     
-
+    /**
+     * 
+     */
+    public static final String SERVICE_PARAMETER = "serviceParameter";
 }
