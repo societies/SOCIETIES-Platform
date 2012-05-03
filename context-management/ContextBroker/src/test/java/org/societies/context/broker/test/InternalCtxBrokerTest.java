@@ -220,7 +220,7 @@ public class InternalCtxBrokerTest {
 	public void testCreateAssociationString() {
 		try {
 			CtxAssociation ctxAssocHasServ = internalCtxBroker.createAssociation("hasService").get();
-
+			
 			List<CtxIdentifier> assocIdentifierList = internalCtxBroker.lookup(CtxModelType.ASSOCIATION, "hasService").get();
 			assertEquals(assocIdentifierList.size(),1);
 			CtxIdentifier retrievedAssocHasServID = assocIdentifierList.get(0);
@@ -1063,7 +1063,7 @@ public class InternalCtxBrokerTest {
 				allServiceEntIds.add(cxtEnt);
 			}
 
-			List<CtxEntityIdentifier> serviceEntIdBlobs = internalCtxBroker.lookup(allServiceEntIds, "blobValue", binaryValue1).get();
+			List<CtxEntityIdentifier> serviceEntIdBlobs = internalCtxBroker.lookupEntities(allServiceEntIds, "blobValue", binaryValue1).get();
 
 			//System.out.println("results serviceEntIds:"+serviceEntIdBlobs);
 			CtxEntityIdentifier entIdBlob = serviceEntIdBlobs.get(0);
@@ -1077,7 +1077,7 @@ public class InternalCtxBrokerTest {
 			}
 	
 
-			List<CtxEntityIdentifier> serviceEntIdStrings = internalCtxBroker.lookup(allServiceEntIds, "stringValue", "StringB").get();
+			List<CtxEntityIdentifier> serviceEntIdStrings = internalCtxBroker.lookupEntities(allServiceEntIds, "stringValue", "StringB").get();
 			//System.out.println("results serviceEntIds:"+serviceEntIdStrings);
 
 			CtxEntityIdentifier entIdString = serviceEntIdStrings.get(0);

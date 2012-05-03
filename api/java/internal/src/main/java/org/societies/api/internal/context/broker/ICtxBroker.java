@@ -151,7 +151,7 @@ public interface ICtxBroker {
 	 * @param value
 	 * @return
 	 */
-	public Future<List<CtxEntityIdentifier>> lookup(List<CtxEntityIdentifier> ctxEntityIDList, String ctxAttributeType, Serializable value);
+	public Future<List<CtxEntityIdentifier>> lookupEntities(List<CtxEntityIdentifier> ctxEntityIDList, String ctxAttributeType, Serializable value);
 	
 	
 	/**

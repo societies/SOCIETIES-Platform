@@ -26,7 +26,14 @@
   </xs:complexType>
 </xs:element>
 
-  <xs:simpleType name="serviceControlResult">
+  <xs:complexType name="serviceControlResult">
+  	<xs:sequence>
+  		<xs:element name="message" type="tns:resultMessage" minOccurs="0" />
+  		<xs:element name="serviceId" type="ns1:serviceResourceIdentifier" minOccurs="0" />
+  	</xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="resultMessage">
     <xs:restriction base="xs:string">
       <xs:enumeration value="SUCCESS"/>
       <xs:enumeration value="SERVICE_NOT_FOUND"/>
