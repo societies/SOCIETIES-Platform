@@ -20,6 +20,21 @@ public class TwitterToken{
 	private Token accessToken = null;
 	private OAuthService service = null;
 
+	public TwitterToken(String accessToken){
+		this.service = new ServiceBuilder()
+		.provider(TwitterApi.class)
+		.apiKey(defaultApiKey)
+		.apiSecret(defaultApiSecret)
+		.build();
+
+		String[] tokenList=null;
+		if(accessToken.contains(",")){
+			tokenList = accessToken.split(",");
+			this.accessToken = new Token(tokenList[0], tokenList[1]);
+		}
+		else this.accessToken = new Token(defaultAccessToken, defaultAccessTokenSecret);
+	}
+	
 	public TwitterToken(){
 		this.service = new ServiceBuilder()
 		.provider(TwitterApi.class)

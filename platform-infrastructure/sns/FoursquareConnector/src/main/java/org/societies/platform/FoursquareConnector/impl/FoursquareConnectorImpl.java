@@ -1,6 +1,7 @@
 package org.societies.platform.FoursquareConnector.impl;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
@@ -9,6 +10,7 @@ import org.scribe.builder.ServiceBuilder;
 import org.scribe.builder.api.Foursquare2Api;
 import org.scribe.model.*;
 import org.scribe.oauth.*;
+import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.platform.FoursquareConnector.FoursquareConnector;
 
 /*
@@ -16,228 +18,173 @@ import org.societies.platform.FoursquareConnector.FoursquareConnector;
  * 
  * dingqi yang
  */
-public class FoursquareConnectorImpl implements FoursquareConnector{
+public class FoursquareConnectorImpl implements FoursquareConnector {
 
-	private String 	accessTokenString = null;
-	private Token 	accessToken = null;
-	private String 	identity = null;
-
-
+	private String accessTokenString = null;
+	private Token accessToken = null;
+	private String identity = null;
+	private String name;
+	private String id;
+	private String lastUpdate   = "yesterday";
+	private long tokenExpiration=0;
+	
 	private String apiKey = "LTNRV3JPEKSFUCMOF4HY05GZHW4BWIZ1Y2YGBJCLMGEXZFG4";
 	private String apiSecret = "2Y0YDIH5XQV13P2ZE3EWZDGEAIHXXQNMOUAEVU4XIWRYRBBS";
 
 	private OAuthService service;
+	
+	public FoursquareConnectorImpl(){};
 
-	public FoursquareConnectorImpl(String access_token, String identity){
+	public FoursquareConnectorImpl(String access_token, String identity) {
 		this.accessTokenString = access_token;
 		this.identity = identity;
-		this.service =  new ServiceBuilder()
-							.provider(Foursquare2Api.class)
-							.apiKey(apiKey)
-							.apiSecret(apiSecret)
-							.callback("http://localhost:8080/examples/servlets/auth")
-							.build();
-		this.accessToken = new Token(this.accessTokenString,"");
+		this.name 	= ISocialConnector.TWITTER_CONN;
+		this.id		= this.name + "_" + UUID.randomUUID();
+		this.service = new ServiceBuilder()
+				.provider(Foursquare2Api.class)
+				.apiKey(apiKey)
+				.apiSecret(apiSecret)
+				.callback(
+						"http://157.159.160.188:8080/examples/servlets/servlet/FoursquareOauth")
+				.build();
+		this.accessToken = new Token(this.accessTokenString, "");
 	}
 
-	
-	public String getUserProfile(){
-		OAuthRequest request = new OAuthRequest(Verb.GET, RECENT_CHECKINS + accessToken.getToken());
+	public String getUserProfile() {
+		OAuthRequest request = new OAuthRequest(Verb.GET, USER_PROFILE
+				+ accessToken.getToken());
 		this.service.signRequest(accessToken, request);
 		Response response = request.send();
-		JSONParser parser=new JSONParser();
-		Object obj=null;
+		JSONParser parser = new JSONParser();
+		Object obj = null;
 		try {
 			obj = parser.parse(response.getBody());
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		JSONObject res=(JSONObject)obj;
-		if(res!=null)
+		JSONObject res = (JSONObject) obj;
+		if (res != null)
 			return res.toJSONString();
 		else
 			return null;
 	}
-	
-	
-	public String getRecentCheckins(){
-		OAuthRequest request = new OAuthRequest(Verb.GET, USER_PROFILE + accessToken.getToken());
+
+	public String getUserFriends() {
+		OAuthRequest request = new OAuthRequest(Verb.GET, USER_PROFILE
+				+ accessToken.getToken());
 		this.service.signRequest(accessToken, request);
 		Response response = request.send();
-		JSONParser parser=new JSONParser();
-		Object obj=null;
+		JSONParser parser = new JSONParser();
+		Object obj = null;
 		try {
 			obj = parser.parse(response.getBody());
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		JSONObject res=(JSONObject)obj;
-		if(res!=null)
+		JSONObject res = (JSONObject) obj;
+		if (res != null)
 			return res.toJSONString();
 		else
 			return null;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getID()
+	/*
+	 * Activity in foursquare is defined as check-in
+	 * @see org.societies.api.internal.sns.ISocialConnector#getUserActivities()
 	 */
-	
+	public String getUserActivities() {
+		OAuthRequest request = new OAuthRequest(Verb.GET, RECENT_CHECKINS
+				+ accessToken.getToken());
+		this.service.signRequest(accessToken, request);
+		Response response = request.send();
+		JSONParser parser = new JSONParser();
+		Object obj = null;
+		try {
+			obj = parser.parse(response.getBody());
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		JSONObject res = (JSONObject) obj;
+		if (res != null)
+			return res.toJSONString();
+		else
+			return null;
+	}
+
 	public String getID() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.id;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#setToken(java.lang.String)
-	 */
-	
 	public void setToken(String access_token) {
-		// TODO Auto-generated method stub
-		
+		this.accessTokenString = access_token;
+		this.accessToken = new Token(this.accessTokenString, "");
+
 	}
 
+	public String getLastUpdate() {
+		return lastUpdate;
+	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#setTokenExpiration(long)
-	 */
+	public void setLastUpdate(String lastUpdate) {
+		this.lastUpdate = lastUpdate;
+	}
 	
 	public void setTokenExpiration(long expires) {
-		// TODO Auto-generated method stub
-		
+		this.tokenExpiration = expires;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getTokenExpiration()
-	 */
+	public void setConnectorName(String name) {
+		this.name= name;
+		
+	}
+	public String getConnectorName() {
+		return name;
+	}
 	
 	public long getTokenExpiration() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.tokenExpiration;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getToken()
-	 */
-	
-	public String getToken() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getToken() {		
+		return this.accessTokenString;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#setConnectorName(java.lang.String)
-	 */
-	
-	public void setConnectorName(String name) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getConnectorName()
-	 */
-	
-	public String getConnectorName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getSocialData(java.lang.String)
-	 */
-	
 	public String getSocialData(String path) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#requireAccessToken()
-	 */
-	
 	public Map<String, String> requireAccessToken() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#disconnect()
-	 */
 	public void disconnect() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#setMaxPostLimit(int)
-	 */
-	
 	public void setMaxPostLimit(int postLimit) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#setParameter(java.lang.String, java.lang.String)
-	 */
-	
 	public void setParameter(String key, String value) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#resetParameters()
-	 */
-	
 	public void resetParameters() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getUserFriends()
-	 */
-	
-	public String getUserFriends() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getUserActivities()
-	 */
-	
-	public String getUserActivities() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.sns.ISocialConnector#getUserGroups()
-	 */
-	
 	public String getUserGroups() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 
 }

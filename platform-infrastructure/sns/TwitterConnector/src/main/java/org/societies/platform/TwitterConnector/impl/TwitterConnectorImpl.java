@@ -23,15 +23,21 @@ public class TwitterConnectorImpl implements TwitterConnector{
 	private String 			id;
 	private String			lastUpdate   = "yesterday";
 
+
+
 	public TwitterConnectorImpl(){
 		this.twToken 		= new TwitterToken();
 		this.service 		= twToken.getAuthService();
 		this.name 			= ISocialConnector.TWITTER_CONN;
 		this.id				= this.name + "_" + UUID.randomUUID();
 
+		
 	}
 
-
+	public TwitterConnectorImpl(String access_token, String identity) {
+		
+	}
+	
 	public String getUserProfile(){
 		OAuthRequest request = new OAuthRequest(Verb.GET, ACCOUNT_VERIFICATION);
 		this.service.signRequest(twToken.getAccessToken(), request);
