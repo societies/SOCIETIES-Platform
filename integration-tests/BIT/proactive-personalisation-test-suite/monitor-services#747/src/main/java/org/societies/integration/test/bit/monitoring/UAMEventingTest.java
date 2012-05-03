@@ -49,13 +49,9 @@ import org.societies.api.useragent.monitoring.IUserActionMonitor;
 public class UAMEventingTest extends EventListener{
 
 	private static Logger LOG = LoggerFactory.getLogger(UAMEventingTest.class);
-	//private static IUserActionMonitor uam;	
-	//private static IEventMgr eventMgr;
 	private InternalEvent event;
 
 	public void setUp(){
-		//uam = TestCase747.getUam();
-		//eventMgr = TestCase747.getEventMgr();
 		event = null;
 	}
 
@@ -64,15 +60,13 @@ public class UAMEventingTest extends EventListener{
 		LOG.info("Monitor services #747 - Running UAMEventingTest");
 		//create action
 		IIdentity identity = new MockIdentity(IdentityType.CSS, "sarah", "societies.org");
-		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
-		ServiceResourceIdentifier serviceId2 = new ServiceResourceIdentifier();
+		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 		try {
-			serviceId1.setIdentifier(new URI("testService1"));
-			serviceId2.setIdentifier(new URI("testService2"));
+			serviceId.setIdentifier(new URI("http://testService3"));
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
-		IAction action1 = new Action(serviceId1, "testService", "volume", "high");
+		IAction action1 = new Action(serviceId, "testService", "volume", "high");
 
 		//register for local events
 		LOG.info("Monitor services #747 - Subscribing for local events of type UIM_Event");
@@ -124,6 +118,8 @@ public class UAMEventingTest extends EventListener{
 		LOG.info("Monitor services #747 - Event type: "+event.geteventType());
 		LOG.info("Monitor services #747 - Event name: "+event.geteventName());
 		LOG.info("Monitor services #747 - Event source: "+event.geteventSource());
+		UIMEvent payload = (UIMEvent)event.geteventInfo();
+		LOG.info("Monitor services #747 - Event payload -> Identity: "+payload.getUserId()+", Action: "+payload.getAction());
 		this.event = event;
 	}
 

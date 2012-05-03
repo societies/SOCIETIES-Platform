@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import junit.framework.Assert;
 
@@ -47,29 +46,18 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxEntityTypes;
-import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
-import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.useragent.monitoring.IUserActionMonitor;
 
 public class ContextStorageTest {
 
 	private static Logger LOG = LoggerFactory.getLogger(ContextStorageTest.class);
-	//private static IUserActionMonitor uam;
-	//private static ICtxBroker ctxBroker;
-
-	public void setUp(){
-		//uam = TestCase747.getUam();
-		//ctxBroker = TestCase747.getCtxBroker();
-	}
-
+	
 	@Test
 	public void test() {
 		LOG.info("Monitor services #747 - Running ContextStorageTest....");
@@ -179,11 +167,11 @@ public class ContextStorageTest {
 			if(check1ServiceIDs == null){
 				LOG.error("1) NULL - no SERVICE entity exists with ID: "+serviceId1);
 			}
-			if(check1ServiceIDs.size() <= 0){
-				LOG.error("1) EMPTY - no SERVICE entity exists with ID: "+serviceId1);
+			if(check1ServiceIDs.size() != 1){
+				LOG.error("1) Wrong number of SERVICE entities with serviceID: "+serviceId1+" -> "+check1ServiceIDs.size());
 			}
-			Assert.assertNotNull(serviceEntityIDs);
-			Assert.assertTrue(serviceEntityIDs.size() == 1);	
+			Assert.assertNotNull(check1ServiceIDs);
+			Assert.assertTrue(check1ServiceIDs.size() == 1);	
 
 			//check service ID attribute
 			CtxEntity serviceEntity = (CtxEntity)TestCase747.ctxBroker.retrieve(check1ServiceIDs.get(0)).get();
@@ -281,11 +269,11 @@ public class ContextStorageTest {
 			if(check2ServiceIDs == null){
 				LOG.error("2) NULL - no SERVICE entity exists with ID: "+serviceId2);
 			}
-			if(check2ServiceIDs.size() <= 0){
+			if(check2ServiceIDs.size() != 1){
 				LOG.error("2) EMPTY - no SERVICE entity exists with ID: "+serviceId2);
 			}
-			Assert.assertNotNull(serviceEntityIDs);
-			Assert.assertTrue(serviceEntityIDs.size() == 1);	
+			Assert.assertNotNull(check2ServiceIDs);
+			Assert.assertTrue(check2ServiceIDs.size() == 1);	
 
 			//check service ID attribute
 			CtxEntity serviceEntity = (CtxEntity)TestCase747.ctxBroker.retrieve(check2ServiceIDs.get(0)).get();

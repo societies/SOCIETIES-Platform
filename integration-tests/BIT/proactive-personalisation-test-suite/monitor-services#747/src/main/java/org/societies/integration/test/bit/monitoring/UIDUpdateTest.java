@@ -25,15 +25,48 @@
 
 package org.societies.integration.test.bit.monitoring;
 
-import static org.junit.Assert.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import junit.framework.Assert;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
+import org.societies.api.personalisation.model.Action;
+import org.societies.api.personalisation.model.IAction;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 public class UIDUpdateTest {
 
+	private static Logger LOG = LoggerFactory.getLogger(ContextStorageTest.class);
+
 	@Test
 	public void test() {
-		//fail("Not yet implemented");
+		LOG.info("Monitor services #747 - Running UIDUpdateTest....");
+
+		//create action
+		IIdentity identity = new MockIdentity(IdentityType.CSS, "sarah", "societies.org");
+		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
+		try {
+			serviceId.setIdentifier(new URI("http://testService4"));
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		IAction action1 = new Action(serviceId, "testService", "font", "large");
+		
+		LOG.info("Monitor services #747 - sending mock action to UAM");
+		TestCase747.uam.monitor(identity, action1);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		
+		//check context to ensure that UID is updated correctly
+		Assert.assertNotNull(action1);  //CHANGE THIS!!
 	}
 
 }
