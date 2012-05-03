@@ -42,7 +42,6 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyEx
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.model.PrivacyPermission;
 
@@ -53,10 +52,6 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	private static Logger log = LoggerFactory.getLogger(PrivacyDataManagerInternal.class.getSimpleName());
 
 	private SessionFactory sessionFactory;
-
-	public PrivacyDataManagerInternal() {
-
-	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#getPermission(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxIdentifier)
@@ -76,14 +71,14 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			// -- Retrieve the privacy permission
 			Criteria criteria = session
 					.createCriteria(PrivacyPermission.class)
-					.add(Restrictions.eq("requestorId", requestor.getRequestorId().getIdentifier()))
-					.add(Restrictions.eq("ownerId", ownerId.getIdentifier()))
+					.add(Restrictions.eq("requestorId", requestor.getRequestorId().getJid()))
+					.add(Restrictions.eq("ownerId", ownerId.getJid()))
 					.add(Restrictions.eq("dataId", dataId.toUriString()));
 			if (requestor instanceof RequestorCis) {
-				criteria.add(Restrictions.eq("cisId", ((RequestorCis) requestor).getCisRequestorId().getIdentifier()));
+				criteria.add(Restrictions.eq("cisId", ((RequestorCis) requestor).getCisRequestorId().getJid()));
 			}
 			else if (requestor instanceof RequestorService) {
-				criteria.add(Restrictions.eq("serviceId", ((RequestorService) requestor).getRequestorServiceId().getIdentifier()));
+				criteria.add(Restrictions.eq("serviceId", ((RequestorService) requestor).getRequestorServiceId().getIdentifier().toString()));
 			}
 			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.uniqueResult();
 
@@ -91,13 +86,13 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			// -- Generate the response item
 			// - Privacy Permission doesn't exist
 			if (null == privacyPermission) {
-				log.debug("PrivacyPermission not available");
+				log.info("PrivacyPermission not available");
 				return null;
 			}
 			// - Privacy permission retrieved
 			log.info(privacyPermission.toString());
 			permission = privacyPermission.createResponseItem();
-			log.debug("PrivacyPermission retrieved.");
+			log.info("PrivacyPermission retrieved.");
 		} catch (Exception e) {
 			t.rollback();
 			throw new PrivacyException("Error during the persistance of the privacy permission", e);
@@ -126,14 +121,14 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			// -- Retrieve the privacy permission
 			Criteria criteria = session
 					.createCriteria(PrivacyPermission.class)
-					.add(Restrictions.eq("requestorId", requestor.getRequestorId().getIdentifier()))
-					.add(Restrictions.eq("ownerId", ownerId.getIdentifier()))
+					.add(Restrictions.eq("requestorId", requestor.getRequestorId().getJid()))
+					.add(Restrictions.eq("ownerId", ownerId.getJid()))
 					.add(Restrictions.eq("dataId", dataId.toUriString()));
 			if (requestor instanceof RequestorCis) {
-				criteria.add(Restrictions.eq("cisId", ((RequestorCis) requestor).getCisRequestorId().getIdentifier()));
+				criteria.add(Restrictions.eq("cisId", ((RequestorCis) requestor).getCisRequestorId().getJid()));
 			}
 			else if (requestor instanceof RequestorService) {
-				criteria.add(Restrictions.eq("serviceId", ((RequestorService) requestor).getRequestorServiceId().getIdentifier()));
+				criteria.add(Restrictions.eq("serviceId", ((RequestorService) requestor).getRequestorServiceId().getIdentifier().toString()));
 			}
 			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.uniqueResult();
 
@@ -141,7 +136,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			// -- Update this privacy permission
 			// - Privacy Permission doesn't exist: create a new one
 			if (null == privacyPermission) {
-				log.debug("PrivacyPermission not available");
+				log.info("PrivacyPermission not available: create it");
 				privacyPermission = new PrivacyPermission(requestor, ownerId, dataId, actions, permission);
 			}
 			// - Privacy permission already exists: update it
@@ -155,7 +150,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			// - Update
 			session.save(privacyPermission);
 			t.commit();
-			log.debug("PrivacyPermission saved.");
+			log.info("PrivacyPermission saved.");
 			result = true;
 		} catch (Exception e) {
 			t.rollback();
@@ -174,57 +169,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	@Override
 	public boolean updatePermission(Requestor requestor, IIdentity ownerId, ResponseItem permission)
 			throws PrivacyException {
-		// Check Dependency injection
-		if (!isDepencyInjectionDone()) {
-			throw new PrivacyException("[Dependency Injection] Data Storage Manager not ready");
-		}
-
-		// Manage persistency
-		Session session = sessionFactory.openSession();
-		boolean result = false;
-		Transaction t = session.beginTransaction();
-		try {
-			// -- Retrieve the privacy permission
-			Criteria criteria = session
-					.createCriteria(PrivacyPermission.class)
-					.add(Restrictions.eq("requestorId", requestor.getRequestorId().getIdentifier()))
-					.add(Restrictions.eq("ownerId", ownerId.getIdentifier()))
-					.add(Restrictions.eq("dataId", permission.getRequestItem().getResource().getCtxIdentifier().toUriString()));
-			if (requestor instanceof RequestorCis) {
-				criteria.add(Restrictions.eq("cisId", ((RequestorCis) requestor).getCisRequestorId().getIdentifier()));
-			}
-			else if (requestor instanceof RequestorService) {
-				criteria.add(Restrictions.eq("serviceId", ((RequestorService) requestor).getRequestorServiceId().getIdentifier()));
-			}
-			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.uniqueResult();
-
-
-			// -- Update this privacy permission
-			// - Privacy Permission doesn't exist: create a new one
-			if (null == privacyPermission) {
-				log.debug("PrivacyPermission not available");
-				privacyPermission = new PrivacyPermission(requestor, ownerId, permission);
-			}
-			// - Privacy permission already exists: update it
-			else {
-				privacyPermission.setRequestor(requestor);
-				privacyPermission.setOwnerId(ownerId);
-				privacyPermission.setResponseItem(permission);
-			}
-			// - Update
-			session.save(privacyPermission);
-			t.commit();
-			log.debug("PrivacyPermission saved.");
-			result = true;
-		} catch (Exception e) {
-			t.rollback();
-			throw new PrivacyException("Error during the persistance of the privacy permission", e);
-		} finally {
-			if (session != null) {
-				session.close();
-			}
-		}
-		return result;
+		return updatePermission(requestor, ownerId, permission.getRequestItem().getResource().getCtxIdentifier(), permission.getRequestItem().getActions(), permission.getDecision());
 	}
 
 	/* (non-Javadoc)
@@ -245,14 +190,14 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			// -- Retrieve the privacy permission
 			Criteria criteria = session
 					.createCriteria(PrivacyPermission.class)
-					.add(Restrictions.eq("requestorId", requestor.getRequestorId().getIdentifier()))
-					.add(Restrictions.eq("ownerId", ownerId.getIdentifier()))
+					.add(Restrictions.eq("requestorId", requestor.getRequestorId().getJid()))
+					.add(Restrictions.eq("ownerId", ownerId.getJid()))
 					.add(Restrictions.eq("dataId", dataId.toUriString()));
 			if (requestor instanceof RequestorCis) {
-				criteria.add(Restrictions.eq("cisId", ((RequestorCis) requestor).getCisRequestorId().getIdentifier()));
+				criteria.add(Restrictions.eq("cisId", ((RequestorCis) requestor).getCisRequestorId().getJid()));
 			}
 			else if (requestor instanceof RequestorService) {
-				criteria.add(Restrictions.eq("serviceId", ((RequestorService) requestor).getRequestorServiceId().getIdentifier()));
+				criteria.add(Restrictions.eq("serviceId", ((RequestorService) requestor).getRequestorServiceId().getIdentifier().toString()));
 			}
 			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.uniqueResult();
 
@@ -265,6 +210,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			else {
 				log.info(privacyPermission.toString());
 				session.delete(privacyPermission);
+				t.commit();
 				log.debug("PrivacyPermission deleted.");
 			}
 			result = true;

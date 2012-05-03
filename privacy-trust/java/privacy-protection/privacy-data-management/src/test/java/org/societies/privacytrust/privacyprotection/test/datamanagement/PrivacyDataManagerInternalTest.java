@@ -20,6 +20,7 @@
 package org.societies.privacytrust.privacyprotection.test.datamanagement;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
@@ -85,17 +87,19 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 	@Test
 	@Rollback(true)
 	public void testGetPermission() {
+		log.info("### testGetPermission");
 		boolean dataUpdated = false;
 		ResponseItem responseItem = null;
 		try {
 			IIdentity requestorId = Mockito.mock(IIdentity.class);
-			Mockito.when(requestorId.getIdentifier()).thenReturn("mycis.societies.local");
+			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
 			Requestor requestor = new Requestor(requestorId);
 			IIdentity ownerId = Mockito.mock(IIdentity.class);
-			Mockito.when(ownerId.getIdentifier()).thenReturn("me@societies.local");
+			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
 			CtxIdentifier dataId = Mockito.mock(CtxIdentifier.class);
-			Mockito.when(dataId.toUriString()).thenReturn("myData");
-			List<Action> actions = null;
+			Mockito.when(dataId.toUriString()).thenReturn("john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
+			List<Action> actions = new ArrayList<Action>();
+			actions.add(new Action(ActionConstants.READ));
 			Decision permission = Decision.PERMIT;
 			if (null == privacyDataManagerInternal) {
 				log.info("privacyDataManagerInternal null");
@@ -105,8 +109,8 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		} catch (PrivacyException e) {
 			log.info("PrivacyException: testGetPermission", e);
 		}
-		assertTrue(dataUpdated);
-		assertNotNull(responseItem);
+		assertTrue("Data not updated", dataUpdated);
+		assertNotNull("ResponseItem permission can't be retrieved", responseItem);
 	}
 
 	/**
@@ -115,15 +119,16 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 	@Test
 	@Rollback(true)
 	public void testUpdatePermission() {
+		log.info("### testUpdatePermission");
 		boolean dataUpdated = false;
 		try {
 			IIdentity requestorId = Mockito.mock(IIdentity.class);
-			Mockito.when(requestorId.getIdentifier()).thenReturn("mycis.societies.local");
+			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
 			Requestor requestor = new Requestor(requestorId);
 			IIdentity ownerId = Mockito.mock(IIdentity.class);
-			Mockito.when(ownerId.getIdentifier()).thenReturn("me@societies.local");
+			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
 			CtxIdentifier dataId = Mockito.mock(CtxIdentifier.class);
-			Mockito.when(dataId.toUriString()).thenReturn("myData");
+			Mockito.when(dataId.toUriString()).thenReturn("john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
 			List<Action> actions = new ArrayList<Action>();
 			Decision permission = Decision.PERMIT;
 			if (null == privacyDataManagerInternal) {
@@ -143,15 +148,16 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 	@Test
 	@Rollback(true)
 	public void testUpdatePermissionResponseItem() {
+		log.info("### testUpdatePermissionResponseItem");
 		boolean dataUpdated = false;
 		try {
 			IIdentity requestorId = Mockito.mock(IIdentity.class);
-			Mockito.when(requestorId.getIdentifier()).thenReturn("mycis.societies.local");
+			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
 			Requestor requestor = new Requestor(requestorId);
 			IIdentity ownerId = Mockito.mock(IIdentity.class);
-			Mockito.when(ownerId.getIdentifier()).thenReturn("me@societies.local");
+			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
 			CtxAttributeIdentifier dataId = Mockito.mock(CtxAttributeIdentifier.class);
-			Mockito.when(dataId.toUriString()).thenReturn("myData");
+			Mockito.when(dataId.toUriString()).thenReturn("john@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
 			List<Action> actions = new ArrayList<Action>();
 			Decision decision = Decision.PERMIT;
 			Resource resource = new Resource(dataId);
@@ -173,16 +179,18 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 	@Test
 	@Rollback(true)
 	public void testDeletePermission() {
+		log.info("### testDeletePermission");
 		boolean dataUpdated = false;
 		boolean dataDeleted = false;
+		ResponseItem responseItem = null;
 		try {
 			IIdentity requestorId = Mockito.mock(IIdentity.class);
-			Mockito.when(requestorId.getIdentifier()).thenReturn("mycis.societies.local");
+			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
 			Requestor requestor = new Requestor(requestorId);
 			IIdentity ownerId = Mockito.mock(IIdentity.class);
-			Mockito.when(ownerId.getIdentifier()).thenReturn("me@societies.local");
+			Mockito.when(ownerId.getJid()).thenReturn("me@societies.local");
 			CtxIdentifier dataId = Mockito.mock(CtxIdentifier.class);
-			Mockito.when(dataId.toUriString()).thenReturn("myData");
+			Mockito.when(dataId.toUriString()).thenReturn("me@societies.local/ENTITY/person/1/ATTRIBUTE/name/13");
 			List<Action> actions = null;
 			Decision permission = Decision.PERMIT;
 			if (null == privacyDataManagerInternal) {
@@ -190,11 +198,13 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			}
 			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, ownerId, dataId, actions, permission);
 			dataDeleted = privacyDataManagerInternal.deletePermission(requestor, ownerId, dataId);
+			responseItem = privacyDataManagerInternal.getPermission(requestor, ownerId, dataId);
 		} catch (PrivacyException e) {
 			log.info("PrivacyException: testDeletePermission", e);
 		}
-		assertTrue(dataUpdated);
-		assertTrue(dataDeleted);
+		assertTrue("Privacy permission not added", dataUpdated);
+		assertTrue("Privacy permission not deleted", dataDeleted);
+		assertNull("ResponseItem permission still available", responseItem);
 	}
 
 	
