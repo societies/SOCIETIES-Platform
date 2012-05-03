@@ -336,6 +336,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				
 				// Now we need to search the service registry for the list of services and find the correct one!
 				if(logger.isDebugEnabled()) logger.debug("Now searching for the service installed by the new bundle");
+				
+				//TODO Something to assure the other function is called first...
+				
 				Service service = getServiceFromBundle(newBundle);
 				if(service != null){
 					if(logger.isDebugEnabled()) logger.debug("Found service: " + service.getServiceName());
@@ -539,22 +542,13 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			logger.info("Uninstalling service " + service.getServiceName());
 			
-			if(logger.isDebugEnabled()) logger.debug("Attempting to uninstall bundle: ");
+			if(logger.isDebugEnabled()) logger.debug("Attempting to uninstall bundle: " + serviceBundle.getSymbolicName());
 			
 			serviceBundle.uninstall();
 			
 			if(serviceBundle.getState() == Bundle.UNINSTALLED){
 				if(logger.isDebugEnabled()) logger.debug("Bundle: " + serviceBundle.getSymbolicName() + " has been uninstalled.");
 
-				//It's not enough to simply uninstall the service. We must also remove the service itself from the repository manually
-				List<Service> servicesToRemove = new ArrayList<Service>();
-				servicesToRemove.add(service);
-				
-				if(logger.isDebugEnabled()) logger.debug("Removing service: " + service.getServiceName() + " from SOCIETIES Registry");
-				getServiceReg().unregisterServiceList(servicesToRemove);
-	
-				logger.info("Service " + service.getServiceName() + " has been uninstalled");
-				
 				returnResult.setMessage(ResultMessage.SUCCESS);
 				return new AsyncResult<ServiceControlResult>(returnResult);
 				
@@ -631,26 +625,14 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		
 		// Preparing the search filter
 		Service filter = new Service();
-		filter.setAuthorSignature(null);
-		filter.setServiceDescription(null);
-		filter.setServiceEndpoint(null);
-		filter.setServiceLocation(null);
-		filter.setServiceName(null);
-		filter.setServiceType(null);
-		filter.setServiceStatus(null);
-		
+
 		ServiceResourceIdentifier filterIdentifier = new ServiceResourceIdentifier();
-		filterIdentifier.setIdentifier(null);
 		filterIdentifier.setServiceInstanceIdentifier(String.valueOf(bundle.getBundleId()));
 		filter.setServiceIdentifier(filterIdentifier);
 		
 		ServiceInstance filterInstance = new ServiceInstance();
-		filterInstance.setFullJid(null);
-		filterInstance.setXMPPNode(null);
-		
+
 		ServiceImplementation filterImplementation = new ServiceImplementation();
-		filterImplementation.setServiceNameSpace(null);
-		filterImplementation.setServiceProvider(null);
 		filterImplementation.setServiceVersion(bundle.getVersion().toString());
 		filterInstance.setServiceImpl(filterImplementation);
 		filter.setServiceInstance(filterInstance);
