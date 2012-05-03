@@ -16,7 +16,7 @@ import org.societies.platform.socialdata.converters.PersonConverterFromTwitter;
 
 
 
-public class JsonToSocialDataServiceTwitterTest {
+public class JsonToSocialDataServiceFoursquareTest {
 
 	public static void main(String[] args){
 		System.out.println("Convert JSON to SocialDATA");

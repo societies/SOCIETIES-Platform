@@ -15,8 +15,8 @@ public class TwitterToken{
 
 	private String defaultApiKey = "cLD3W6l4bfXs8cwlzXGmRQ";
 	private String defaultApiSecret = "IN6Oo79VnduEt5HRI9IQY07SpW86xkcN4UICuFg1zA0";
-	private String defaultAccessToken = "468234144-1rapLRk4vm1u8H0zCQkV19pps7mVbuST8ANVMhDp";
-	private String defaultAccessTokenSecret = "LKDpdsiNb0k98X49u9FI4ouyXblYk4E3mdDXLC0WCk";
+	private String defaultAccessToken = "468234144-7jBtrulMAriO1yjg2J9POY6aeW2TwnwrEXWeDWYn";
+	private String defaultAccessTokenSecret = "1lY5pClLbeJ2MGC8A9995Dlx7gxNqdnLPQarsplwLpU";
 	private Token accessToken = null;
 	private OAuthService service = null;
 
