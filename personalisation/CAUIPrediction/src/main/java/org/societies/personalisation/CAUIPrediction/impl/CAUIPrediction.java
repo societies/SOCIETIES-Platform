@@ -150,6 +150,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 	public Future<IUserIntentAction> getCurrentIntentAction(IIdentity ownerID,
 			ServiceResourceIdentifier serviceID, String userActionType) {
 		// TODO Auto-generated method stub
+		LOG.info("prediction request "+predictionRequestsCounter+" serviceID"+ serviceID+" identity requestor"+ownerID+" userActionType"+userActionType);
 		return null;
 	}
 
@@ -160,6 +161,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 		
 		//System.out.println("getPrediction requestor:" + requestor+" action:"+action);
 		//System.out.println("modelExists: "+ modelExists+" cauiDiscovery:" +cauiDiscovery);
+		LOG.info("prediction request "+predictionRequestsCounter+" action"+ action+" identity requestor"+requestor);
 		predictionRequestsCounter = predictionRequestsCounter +1;
 		
 		List<IUserIntentAction> results = new ArrayList<IUserIntentAction>();
@@ -217,6 +219,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor,
 			CtxAttribute contextAttribute) {
 		// TODO Auto-generated method stub
+		LOG.info("prediction request "+predictionRequestsCounter+" contextAttribute"+ contextAttribute.getId().toString()+" identity requestor"+requestor);
 		return null;
 	}
 
@@ -243,6 +246,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 				this.ctxBroker.registerForChanges(new MyCtxChangeEventListener(),uiModelAttributeId);	
 			}		
 
+			LOG.info("registration for context attribute updates of type "+uiModelAttributeId);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -361,6 +365,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 		@Override
 		public void onUpdate(CtxChangeEvent event) {
 			LOG.info(event.getId() + ": *** Update event ***");
+			
 			CtxIdentifier uiModelAttrID = event.getId();
 
 			if(uiModelAttrID instanceof CtxAttributeIdentifier){
@@ -369,7 +374,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 					uiModelAttr = (CtxAttribute) ctxBroker.retrieve(uiModelAttrID).get();
 					UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(uiModelAttr.getBinaryValue(), this.getClass().getClassLoader());
 					setActiveModel(newUIModelData);
-
+					LOG.info("UserIntentModelData "+newUIModelData);
+					LOG.info("UserIntentModelData matrix"+newUIModelData.getMatrix()+" tasks "+newUIModelData.getTaskList());
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
