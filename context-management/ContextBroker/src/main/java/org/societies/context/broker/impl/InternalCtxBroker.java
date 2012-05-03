@@ -216,6 +216,46 @@ public class InternalCtxBroker implements ICtxBroker {
 	}
 
 
+	
+	/*
+	 * returns a list of entities with a specified value for a specified attribute type
+	 */
+	@Override
+	@Async
+	public Future<List<CtxEntityIdentifier>> lookup(List<CtxEntityIdentifier> ctxEntityIDList, String ctxAttributeType, Serializable value){
+
+		List<CtxEntityIdentifier> entityList = new ArrayList<CtxEntityIdentifier>(); 
+		try {
+			for(CtxEntityIdentifier entityId :ctxEntityIDList){
+				CtxEntity entity = (CtxEntity) this.retrieve(entityId).get();
+
+				Set<CtxAttribute> ctxAttrSet = entity.getAttributes(ctxAttributeType);
+				for(CtxAttribute ctxAttr : ctxAttrSet){
+					System.out.println("---- lookup attr id " +ctxAttr.getId());
+					if(compareAttributeValues(ctxAttr,value)) {
+						entityList.add(entityId);
+					}
+				}
+			}
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+		return new AsyncResult<List<CtxEntityIdentifier>>(entityList);
+	
+
+	}
+
+
 	@Override
 	public Future<CtxModelObject> remove(CtxIdentifier identifier) throws CtxException {
 
@@ -1007,4 +1047,42 @@ public class InternalCtxBroker implements ICtxBroker {
 			throw new IllegalArgumentException(value + ": Invalid value type");
 	}
 
+	protected Boolean compareAttributeValues(CtxAttribute attribute, Serializable value){
+
+		Boolean areEqual = false;
+		if (value instanceof String ) {
+			if (attribute.getStringValue()!=null) {
+				String valueStr = attribute.getStringValue();
+				if(valueStr.equals(value.toString())) return true;             			
+			}
+		} else if (value instanceof Integer) {
+			if(attribute.getIntegerValue()!=null) {
+				Integer valueInt = attribute.getIntegerValue();
+				if(valueInt.equals((Integer)value)) return true;  
+			}
+		} else if (value instanceof Double) {
+			if(attribute.getDoubleValue()!=null) {
+				Double valueDouble = attribute.getDoubleValue();
+				if(valueDouble.equals((Double) value)) return true;             			
+			}
+		} else {
+			byte[] valueBytes;
+			byte[] attributeValueBytes;
+			try {
+				valueBytes = attribute.getBinaryValue();
+				attributeValueBytes = SerialisationHelper.serialise(value);
+				if (Arrays.equals(valueBytes, attributeValueBytes)) {
+					areEqual = true;
+					return true;
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}                		
+		}
+		return areEqual;
+	}
+
+	
+	
 }
