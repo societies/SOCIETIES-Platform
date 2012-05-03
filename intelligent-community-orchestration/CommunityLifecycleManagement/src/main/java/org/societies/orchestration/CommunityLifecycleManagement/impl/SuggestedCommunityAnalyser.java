@@ -422,7 +422,12 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	
     	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
 		//ICisRecord proposedCis = cisManager.getBlankCisRecord();
-    	ICisRecord proposedCis = cisManager.getCisList().get(0);
+    	ICisRecord proposedCis = null;
+    	if (cisManager != null)
+    		if (cisManager.getCisList().size() > 0)
+    			proposedCis = cisManager.getCisList().get(0);
+    		else
+    			return;
     	//proposedCis.setName("");
     	//proposedCis.setType("");
     	//proposedCis.setMembershipCriteria(-1);
