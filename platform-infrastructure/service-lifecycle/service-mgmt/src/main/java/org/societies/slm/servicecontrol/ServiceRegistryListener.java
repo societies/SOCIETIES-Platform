@@ -224,6 +224,14 @@ public class ServiceRegistryListener implements BundleContextAware,
 				if(existService == null){
 					if(log.isDebugEnabled()) log.debug("Registering Service: " + service.getServiceName());
 					this.getServiceReg().registerServiceList(serviceList);
+					
+					//The service is now registered, so we update the hashmap
+					if(ServiceControl.installingBundle(serBndl.getBundleId())){
+						if(log.isDebugEnabled())
+							log.debug("ServiceControl is installing the bundle, so we need to tell it it's done");
+						ServiceControl.serviceInstalled(serBndl.getBundleId(), service);
+					}
+					
 				} else{
 					if(log.isDebugEnabled()) log.debug(service.getServiceName() + " already exists, setting status to STARTED");
 					this.getServiceReg().changeStatusOfService(service.getServiceIdentifier(), ServiceStatus.STARTED);
@@ -256,7 +264,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 		}
 		
 		if(log.isDebugEnabled())
-			log.debug("Bundle Ininstalled Event arrived!");
+			log.debug("Bundle Uninstalled Event arrived!");
 		// Now we search for services in the registry corresponding to this bundle.
 		Service serviceToRemove = getServiceFromBundle(event.getBundle());
 		
