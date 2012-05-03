@@ -593,7 +593,7 @@ public class CommunityRecommender //implements ICommCallback
         	//
 	        // cisManager.configureCis(linkedCss, potentiallyConfigurableCis.getCisId());
         }
-	    return new ArrayList<String>();
+	    return cissToCreateMetadata;
     }
 
     public HashMap<String, ArrayList<ArrayList<ICisRecord>>> getUserFeedbackOnConfiguration(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cissToConfigure) {

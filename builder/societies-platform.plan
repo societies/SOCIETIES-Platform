@@ -12,6 +12,9 @@
     <artifact type="bundle" name="org.societies.comm.xmpp.pubsub.PubsubClientBundle"/>
     <artifact type="bundle" name="org.societies.comm.event.mgmt"/>
 
+    <!-- Domain Authority  -->
+    <artifact type="bundle" name="org.societies.domain-authority.DomainAuthorityGroupManager"/>
+
     <!-- Service Discovery & Registry  -->
     <artifact type="bundle" name="org.societies.data-source"/>
     <artifact type="bundle" name="org.societies.platform.servicelifecycle.serviceRegistry"/>
@@ -26,6 +29,7 @@
 
     <!-- CSS / CIS Management -->
     <artifact type="bundle" name="org.societies.css.CssDirectory"/>
+    <artifact type="bundle" name="org.societies.css.CssDirectoryClient"/>
     <artifact type="bundle" name="org.societies.css.CssRegistry"/>
     <artifact type="bundle" name="org.societies.css.mgmt.cssmgmt"/>
     <artifact type="bundle" name="org.societies.css.mgmt.comms.cssmgmt-comms"/>

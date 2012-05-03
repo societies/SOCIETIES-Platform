@@ -24,8 +24,6 @@
  */
 package org.societies.privacytrust.trust.impl.repo;
 
-import java.util.List;
-
 import org.hibernate.FetchMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -80,16 +78,22 @@ public class TrustRepository implements ITrustRepository {
 		
 		boolean result = false;
 
+		// check if the entity is already present
+		if (this.retrieveEntity(entity.getTeid()) != null)
+			return false;
+		
 		final Session session = sessionFactory.openSession();
 		final Transaction transaction = session.beginTransaction();
 		try {
 			if (LOG.isDebugEnabled())
 				LOG.debug("Adding trusted entity " + entity + " to the Trust Repository...");
+	
 			session.save(entity);
+			session.flush();
 			transaction.commit();
 			result = true;
 		} catch (ConstraintViolationException cve) {
-			result = false;
+			transaction.rollback();
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for entity " + entity);
 			transaction.rollback();
@@ -118,17 +122,16 @@ public class TrustRepository implements ITrustRepository {
 		// TODO TrustedEntityType.LGC
 		
 		final Session session = sessionFactory.openSession();
-		@SuppressWarnings("unchecked")
-		List<ITrustedEntity> results = session.createCriteria(entityClass)
+		ITrustedEntity result = (ITrustedEntity) session.createCriteria(entityClass)
 			.add(Restrictions.eq("teid", teid))
 			.setFetchMode("directTrust", FetchMode.JOIN)
 			.setFetchMode("indirectTrust", FetchMode.JOIN)
 			.setFetchMode("userPerceivedTrust", FetchMode.JOIN)
-			.list();
+			.uniqueResult();
 		if (session != null)
 			session.close();
 			
-		return (results.isEmpty()) ? null : results.get(0);
+		return result;
 	}
 
 	/* (non-Javadoc)

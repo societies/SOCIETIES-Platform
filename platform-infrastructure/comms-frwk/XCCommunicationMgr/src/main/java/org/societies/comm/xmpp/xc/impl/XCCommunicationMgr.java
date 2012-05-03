@@ -33,18 +33,21 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 	private String host;
 	private String subDomain;
 	private String secretKey;
+	private String daNode;
 	private ExternalComponentManager manager;
 	private IIdentity thisIdentity;
 	private IIdentityManager idm;
 	private Set<INetworkNode> otherNodes;
 
 	public XCCommunicationMgr(String host, String subDomain,
-			String secretKey) {
+			String secretKey, String daNode) {
 		this.helper = new CommManagerHelper();
 		this.host = host;
 		this.subDomain = subDomain;
 		this.secretKey = secretKey;
+		this.daNode = daNode;
 		otherNodes = new HashSet<INetworkNode>();
+		
 	}
 	
 	@Override
@@ -80,7 +83,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 		log.info("Connecting...");
 		try {
 			manager.addComponent(subDomain, this);
-			idm = new IdentityManagerImpl(subDomain);
+			idm = new IdentityManagerImpl(subDomain, daNode);
 			thisIdentity = idm.getThisNetworkNode();
 			
 			probePresence();

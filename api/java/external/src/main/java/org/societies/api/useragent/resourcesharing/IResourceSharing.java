@@ -34,7 +34,6 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
  *
  */
 /**
- * MISSING_ANNOTATION
  * MISSING_JAVADOCS
  */
 @SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
