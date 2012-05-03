@@ -18,6 +18,7 @@ import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.integration.test.IntegrationTestUtils;
 
@@ -119,15 +120,16 @@ public class NominalTestCaseLowerTester {
 		
 		assertEquals("Number of all services not increased by exactly 1", 1, servicesAfter.size() - servicesBefore.size());
 		assertEquals("Number of new services not exactly 1", 1, servicesNew.size());
+		assertEquals(servicesNew.get(0), serviceId);
 
 		// -- Find the service
-		for (Service service : servicesAfter) {
+//		for (Service service : servicesAfter) {
 //			if (service.getServiceIdentifier().equals(serviceId)) {
 //				// Mark the service as found
 //				LOG.info("[#713] service " + serviceId + "found");
 //				break;
 //			}
-		}
+//		}
 		
 		uninstallService(serviceId);
 		
@@ -135,6 +137,8 @@ public class NominalTestCaseLowerTester {
 		servicesNew = getAdditionalServices(servicesBefore, servicesAfter);
 		assertEquals("Number of all services not same as before installation", 0, servicesAfter.size() - servicesBefore.size());
 		assertEquals("Number of new services not exactly 0", 0, servicesNew.size());
+		
+		LOG.info("[#713] testInstallService: SUCCESS");
 	}
 	
 	/**
@@ -149,17 +153,17 @@ public class NominalTestCaseLowerTester {
 		ServiceControlResult result = null;
 
 		// -- Install the service
-		LOG.info("[#713] Preamble: Install the service");
+		LOG.debug("[#713] Preamble: Install the service");
 		asyncResult = serviceControl.installService(serviceBundleUrl);
 		result = asyncResult.get();
-		if (!result.equals(ServiceControlResult.SUCCESS)) {
-			throw new Exception("Can't install the service. Returned value: " + result.value());
-		}
-		LOG.debug("[#713] installService(): " + result.value());
+		ResultMessage message = result.getMessage();
 		
-		//return installResult.getServiceId();
-		// FIXME: Return the service ID when ServiceControlResult is expanded. Sancho has already implemented the change but it will be merged in May.
-		return new ServiceResourceIdentifier();
+		if (!message.equals(ResultMessage.SUCCESS)) {
+			throw new Exception("Can't install the service. Returned value: " + message);
+		}
+		LOG.debug("[#713] installService(): " + message);
+		
+		return result.getServiceId();
 	}
 	
 	/**
@@ -174,13 +178,15 @@ public class NominalTestCaseLowerTester {
 		ServiceControlResult result = null;
 
 		// -- Install the service
-		LOG.info("[#713] Preamble: Uninstall the service");
+		LOG.debug("[#713] Preamble: Uninstall the service");
 		asyncResult = serviceControl.uninstallService(serviceId);
 		result = asyncResult.get();
-		if (!result.equals(ServiceControlResult.SUCCESS)) {
-			throw new Exception("Can't uninstall the service. Returned value: " + result.value());
+		ResultMessage message = result.getMessage();
+
+		if (!message.equals(ResultMessage.SUCCESS)) {
+			throw new Exception("Can't uninstall the service. Returned value: " + message);
 		}
-		LOG.debug("[#713] uninstallService(): " + result.value());
+		LOG.debug("[#713] uninstallService(): " + message);
 	}
 	
 	private List<Service> getLocalServices() throws ServiceDiscoveryException, InterruptedException, ExecutionException {
