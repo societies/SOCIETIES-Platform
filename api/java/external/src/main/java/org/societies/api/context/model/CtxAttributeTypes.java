@@ -81,5 +81,15 @@ public class CtxAttributeTypes {
      * 
      */
     public static final String CRIST_MODEL = "crist_model";
+       
+    /**
+     * 
+     */
+    public static final String PARAMETER_NAME = "parameterName";
+    
+    /**
+     * 
+     */
+    public static final String LAST_ACTION = "lastAction";
     
 }
