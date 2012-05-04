@@ -27,9 +27,12 @@ package org.societies.slm.servicecontrol;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.stub;
+import static org.mockito.Mockito.anyObject;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Future;
 
 import org.junit.After;
@@ -37,6 +40,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Version;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
@@ -48,6 +52,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import org.societies.api.schema.servicelifecycle.model.ServiceLocation;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceType;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.internal.servicelifecycle.IServiceControlCallback;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
@@ -78,7 +83,8 @@ public class ServiceControlUnitTest {
 	private ServiceResourceIdentifier otherServiceId;
 
 
-	private URL testUrl; 
+	private URL testUrl;
+
 	
 	/**
 	 * @throws java.lang.Exception
@@ -135,7 +141,8 @@ public class ServiceControlUnitTest {
 		classUnderTest.setCommMngr(mockedCommManager);
 		classUnderTest.setBundleContext(mockedBundleContext);
 		
-
+		
+		
 	}
 
 	/**
@@ -182,7 +189,7 @@ public class ServiceControlUnitTest {
 			
 			futureResult = classUnderTest.startService(testServiceId);
 			result = futureResult.get();
-			assertTrue(result.equals(ServiceControlResult.SUCCESS));
+			assertTrue(result.getMessage().equals(ResultMessage.SUCCESS));
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -210,7 +217,7 @@ public class ServiceControlUnitTest {
 			
 			futureResult = classUnderTest.startService(otherServiceId);
 			result = futureResult.get();
-			assertTrue(result.equals(ServiceControlResult.SUCCESS));
+			assertTrue(result.getMessage().equals(ResultMessage.SUCCESS));
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -241,7 +248,7 @@ public class ServiceControlUnitTest {
 			
 			futureResult = classUnderTest.startService(testServiceId);
 			result = futureResult.get();
-			assertTrue(result.equals(ServiceControlResult.OSGI_PROBLEM));
+			assertTrue(result.getMessage().equals(ResultMessage.OSGI_PROBLEM));
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -272,7 +279,7 @@ public class ServiceControlUnitTest {
 			
 			futureResult = classUnderTest.startService(testServiceId);
 			result = futureResult.get();
-			assertTrue(result.equals(ServiceControlResult.SERVICE_NOT_FOUND));
+			assertTrue(result.getMessage().equals(ResultMessage.SERVICE_NOT_FOUND));
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -303,7 +310,7 @@ public class ServiceControlUnitTest {
 			
 			futureResult = classUnderTest.startService(testServiceId);
 			result = futureResult.get();
-			assertTrue(result.equals(ServiceControlResult.BUNDLE_NOT_FOUND));
+			assertTrue(result.getMessage().equals(ResultMessage.BUNDLE_NOT_FOUND));
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -334,7 +341,7 @@ public class ServiceControlUnitTest {
 			
 			futureResult = classUnderTest.stopService(testServiceId);
 			result = futureResult.get();
-			assertTrue(result.equals(ServiceControlResult.SUCCESS));
+			assertTrue(result.getMessage().equals(ResultMessage.SUCCESS));
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -361,7 +368,7 @@ public class ServiceControlUnitTest {
 			
 			futureResult = classUnderTest.stopService(otherServiceId);
 			result = futureResult.get();
-			assertTrue(result.equals(ServiceControlResult.SUCCESS));
+			assertTrue(result.getMessage().equals(ResultMessage.SUCCESS));
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -392,7 +399,7 @@ public class ServiceControlUnitTest {
 			
 			futureResult = classUnderTest.stopService(testServiceId);
 			result = futureResult.get();
-			assertTrue(result.equals(ServiceControlResult.OSGI_PROBLEM));
+			assertTrue(result.getMessage().equals(ResultMessage.OSGI_PROBLEM));
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -422,7 +429,7 @@ public class ServiceControlUnitTest {
 			
 			futureResult = classUnderTest.stopService(testServiceId);
 			result = futureResult.get();
-			assertTrue(result.equals(ServiceControlResult.SERVICE_NOT_FOUND));
+			assertTrue(result.getMessage().equals(ResultMessage.SERVICE_NOT_FOUND));
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -452,7 +459,7 @@ public class ServiceControlUnitTest {
 			
 			futureResult = classUnderTest.stopService(testServiceId);
 			result = futureResult.get();
-			assertTrue(result.equals(ServiceControlResult.BUNDLE_NOT_FOUND));
+			assertTrue(result.getMessage().equals(ResultMessage.BUNDLE_NOT_FOUND));
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -463,6 +470,7 @@ public class ServiceControlUnitTest {
 	/**
 	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#installService(java.net.URL)}.
 	 */
+	
 	@Test
 	public void testInstallServiceURLSuccess() {
 		
@@ -470,13 +478,22 @@ public class ServiceControlUnitTest {
 
 			stub(mockedBundleContext.installBundle(testUrl.toString())).toReturn(mockedBundle);
 			stub(mockedBundle.getState()).toReturn(Bundle.ACTIVE);
+			stub(mockedBundle.getSymbolicName()).toReturn("mockedBundle");
+			Version version = new Version("1.0.2");
+			stub(mockedBundle.getVersion()).toReturn(version);
+			stub(mockedBundle.getBundleId()).toReturn(new Long(999));
+			
+			List<Service> serviceTestList = new ArrayList<Service>();
+			serviceTestList.add(testService);
+			System.out.println(serviceTestList.size());
+			stub(mockedServiceReg.findServices((Service) anyObject())).toReturn(serviceTestList);
 			
 			Future<ServiceControlResult> futureResult;
 			ServiceControlResult result;
 			
 			futureResult = classUnderTest.installService(testUrl);
 			result = futureResult.get();
-			assertTrue(result.equals(ServiceControlResult.SUCCESS));
+			assertTrue(result.getMessage().equals(ResultMessage.SUCCESS));
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -484,6 +501,7 @@ public class ServiceControlUnitTest {
 		}
 		
 	}
+	
 
 	/**
 	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#installService(java.net.URL)}.
@@ -495,14 +513,14 @@ public class ServiceControlUnitTest {
 
 			stub(mockedBundleContext.installBundle(testUrl.toString())).toReturn(mockedBundle);
 			stub(mockedBundle.getState()).toReturn(Bundle.RESOLVED);
-			
+			Version version = new Version("1.0.2");
+			stub(mockedBundle.getVersion()).toReturn(version);
 			Future<ServiceControlResult> futureResult;
 			ServiceControlResult result;
 			
 			futureResult = classUnderTest.installService(testUrl);
 			result = futureResult.get();
-			assertTrue(result.equals(ServiceControlResult.OSGI_PROBLEM));
-
+			assertTrue(result.getMessage().equals(ResultMessage.OSGI_PROBLEM));
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -521,17 +539,18 @@ public class ServiceControlUnitTest {
 			
 			stub(mockedCommManager.getIdManager()).toReturn(mockedIdentityManager);
 			stub(mockedCommManager.getIdManager().getThisNetworkNode()).toReturn(mockedHost);
+			stub(mockedIdentityManager.getThisNetworkNode()).toReturn(mockedHost);
 			stub(mockedHost.getJid()).toReturn(hostJid);
+			
 			stub(mockedCommManager.getIdManager().getThisNetworkNode().getJid()).toReturn(hostJid);
 			stub(mockedNode.getJid()).toReturn(remoteJid);
-		
+
 			Future<ServiceControlResult> futureResult;
 			ServiceControlResult result;
 			
 			futureResult = classUnderTest.installService(testUrl,mockedNode);
 			result = futureResult.get();
-			assertTrue(result.equals(ServiceControlResult.SUCCESS));
-
+			assertTrue(result.getMessage().equals(ResultMessage.SUCCESS));
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -549,17 +568,20 @@ public class ServiceControlUnitTest {
 
 			stub(mockedCommManager.getIdManager()).toReturn(mockedIdentityManager);
 			stub(mockedCommManager.getIdManager().getThisNetworkNode()).toReturn(mockedHost);
+			stub(mockedIdentityManager.getThisNetworkNode()).toReturn(mockedHost);
+			
 			stub(mockedHost.getJid()).toReturn(hostJid);
 			stub(mockedCommManager.getIdManager().getThisNetworkNode().getJid()).toReturn(hostJid);
+			
 			stub(mockedNode.getJid()).toReturn(remoteJid);
 			stub(mockedCommManager.getIdManager().fromJid(remoteJid)).toReturn(mockedNode);
-		
+			
 			Future<ServiceControlResult> futureResult;
 			ServiceControlResult result;
 			
 			futureResult = classUnderTest.installService(testUrl,remoteJid);
 			result = futureResult.get();
-			assertTrue(result.equals(ServiceControlResult.SUCCESS));
+			assertTrue(result.getMessage().equals(ResultMessage.SUCCESS));
 
 			
 		} catch(Exception e){
@@ -590,7 +612,7 @@ public class ServiceControlUnitTest {
 			
 			futureResult = classUnderTest.uninstallService(testServiceId);
 			result = futureResult.get();
-			assertTrue(result.equals(ServiceControlResult.SUCCESS));
+			assertTrue(result.getMessage().equals(ResultMessage.SUCCESS));
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -617,7 +639,7 @@ public class ServiceControlUnitTest {
 			
 			futureResult = classUnderTest.uninstallService(otherServiceId);
 			result = futureResult.get();
-			assertTrue(result.equals(ServiceControlResult.SUCCESS));
+			assertTrue(result.getMessage().equals(ResultMessage.SUCCESS));
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -648,7 +670,7 @@ public class ServiceControlUnitTest {
 			
 			futureResult = classUnderTest.uninstallService(testServiceId);
 			result = futureResult.get();
-			assertTrue(result.equals(ServiceControlResult.OSGI_PROBLEM));
+			assertTrue(result.getMessage().equals(ResultMessage.OSGI_PROBLEM));
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -678,7 +700,7 @@ public class ServiceControlUnitTest {
 			
 			futureResult = classUnderTest.uninstallService(testServiceId);
 			result = futureResult.get();
-			assertTrue(result.equals(ServiceControlResult.SERVICE_NOT_FOUND));
+			assertTrue(result.getMessage().equals(ResultMessage.SERVICE_NOT_FOUND));
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -708,7 +730,7 @@ public class ServiceControlUnitTest {
 			
 			futureResult = classUnderTest.uninstallService(testServiceId);
 			result = futureResult.get();
-			assertTrue(result.equals(ServiceControlResult.BUNDLE_NOT_FOUND));
+			assertTrue(result.getMessage().equals(ResultMessage.BUNDLE_NOT_FOUND));
 			
 		} catch(Exception e){
 			e.printStackTrace();
@@ -722,7 +744,10 @@ public class ServiceControlUnitTest {
 		public void startService(ServiceResourceIdentifier serviceId,
 				IIdentity node, IServiceControlCallback callback) {
 			
-			callback.setResult(ServiceControlResult.SUCCESS);
+			ServiceControlResult result = new ServiceControlResult();
+			result.setServiceId(serviceId);
+			result.setMessage(ResultMessage.SUCCESS);
+			callback.setResult(result);
 			
 		}
 
@@ -730,7 +755,10 @@ public class ServiceControlUnitTest {
 		public void stopService(ServiceResourceIdentifier serviceId,
 				IIdentity node, IServiceControlCallback callback) {
 			
-			callback.setResult(ServiceControlResult.SUCCESS);
+			ServiceControlResult result = new ServiceControlResult();
+			result.setServiceId(serviceId);
+			result.setMessage(ResultMessage.SUCCESS);
+			callback.setResult(result);
 			
 		}
 
@@ -738,7 +766,9 @@ public class ServiceControlUnitTest {
 		public void installService(URL bundleLocation, IIdentity node,
 				IServiceControlCallback callback) {
 			
-			callback.setResult(ServiceControlResult.SUCCESS);
+			ServiceControlResult result = new ServiceControlResult();
+			result.setMessage(ResultMessage.SUCCESS);
+			callback.setResult(result);
 			
 		}
 
@@ -746,7 +776,10 @@ public class ServiceControlUnitTest {
 		public void uninstallService(ServiceResourceIdentifier serviceId,
 				IIdentity node, IServiceControlCallback callback) {
 			
-			callback.setResult(ServiceControlResult.SUCCESS);
+			ServiceControlResult result = new ServiceControlResult();
+			result.setServiceId(serviceId);
+			result.setMessage(ResultMessage.SUCCESS);
+			callback.setResult(result);
 			
 		}
 		

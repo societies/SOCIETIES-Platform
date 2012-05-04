@@ -31,6 +31,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
+import org.hibernate.annotations.Type;
 import org.societies.privacytrust.trust.api.model.ITrust;
 
 /**
@@ -51,10 +52,15 @@ public abstract class Trust implements ITrust {
 	@SuppressWarnings("unused")
 	private long id;
 	
+	@Column(name = "value")
 	private Double value;
 	
+	@Column(name = "lastModified")
+	@Type(type="org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType")
 	private Date lastModified;
 	
+	@Column(name = "lastUpdated")
+	@Type(type="org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType")
 	private Date lastUpdated;
 
 	/* (non-Javadoc)

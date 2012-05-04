@@ -220,7 +220,7 @@ public class InternalCtxBrokerTest {
 	public void testCreateAssociationString() {
 		try {
 			CtxAssociation ctxAssocHasServ = internalCtxBroker.createAssociation("hasService").get();
-
+			
 			List<CtxIdentifier> assocIdentifierList = internalCtxBroker.lookup(CtxModelType.ASSOCIATION, "hasService").get();
 			assertEquals(assocIdentifierList.size(),1);
 			CtxIdentifier retrievedAssocHasServID = assocIdentifierList.get(0);
@@ -312,7 +312,7 @@ public class InternalCtxBrokerTest {
 		}
 	}
 
-	
+
 
 	/**
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createAssociation(java.lang.String)}.
@@ -1027,6 +1027,88 @@ public class InternalCtxBrokerTest {
 		}
 
 	}
+
+
+
+	@Test
+	public void testLookupAttributeValues(){
+
+		try {
+			CtxEntity entity1 = internalCtxBroker.createEntity(CtxEntityTypes.SERVICE).get();
+			CtxAttribute ctxAttribute10 = internalCtxBroker.createAttribute(entity1.getId(), "blobValue").get();
+
+			MockBlobClass binaryValue1 = new MockBlobClass(125);
+			ctxAttribute10.setBinaryValue(SerialisationHelper.serialise(binaryValue1));
+			internalCtxBroker.update(ctxAttribute10);
+			CtxAttribute ctxAttribute11 = internalCtxBroker.createAttribute(entity1.getId(), "stringValue").get();
+			ctxAttribute11.setStringValue("StrinA");
+			internalCtxBroker.update(ctxAttribute11);
+
+			CtxEntity entity2 = internalCtxBroker.createEntity(CtxEntityTypes.SERVICE).get();
+			CtxAttribute ctxAttribute2 = internalCtxBroker.createAttribute(entity2.getId(), "blobValue").get();
+
+			MockBlobClass binaryValue2 = new MockBlobClass(135);
+			ctxAttribute2.setBinaryValue(SerialisationHelper.serialise(binaryValue2));
+			internalCtxBroker.update(ctxAttribute2);
+			CtxAttribute ctxAttribute21 = internalCtxBroker.createAttribute(entity2.getId(), "stringValue").get();
+			ctxAttribute11.setStringValue("StringB");
+			internalCtxBroker.update(ctxAttribute21);
+
+
+			List<CtxEntityIdentifier> allServiceEntIds = new ArrayList<CtxEntityIdentifier>();
+
+			List<CtxIdentifier> listServiceCtxIds = internalCtxBroker.lookup(CtxModelType.ENTITY,CtxEntityTypes.SERVICE).get();
+			for(CtxIdentifier ctxId: listServiceCtxIds){
+				CtxEntityIdentifier cxtEnt = (CtxEntityIdentifier) ctxId;
+				allServiceEntIds.add(cxtEnt);
+			}
+
+			List<CtxEntityIdentifier> serviceEntIdBlobs = internalCtxBroker.lookupEntities(allServiceEntIds, "blobValue", binaryValue1).get();
+
+			//System.out.println("results serviceEntIds:"+serviceEntIdBlobs);
+			CtxEntityIdentifier entIdBlob = serviceEntIdBlobs.get(0);
+
+			CtxEntity ent1 = (CtxEntity) internalCtxBroker.retrieve(entIdBlob).get();
+			Set<CtxAttribute> atrrSet1 = ent1.getAttributes("blobValue");
+			for(CtxAttribute attr: atrrSet1){
+				final MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(attr.getBinaryValue(), this.getClass().getClassLoader());
+			//	System.out.println("retrievedBlob.getSeed() "+retrievedBlob.getSeed());
+				assertEquals(retrievedBlob.getSeed(),125);
+			}
+	
+
+			List<CtxEntityIdentifier> serviceEntIdStrings = internalCtxBroker.lookupEntities(allServiceEntIds, "stringValue", "StringB").get();
+			//System.out.println("results serviceEntIds:"+serviceEntIdStrings);
+
+			CtxEntityIdentifier entIdString = serviceEntIdStrings.get(0);
+			CtxEntity ent2 = (CtxEntity) internalCtxBroker.retrieve(entIdString).get();
+			Set<CtxAttribute> atrrSet2 = ent2.getAttributes("stringValue");
+			for(CtxAttribute attr: atrrSet2){
+				//System.out.println("retrieved string "+attr.getStringValue());
+				assertEquals(attr.getStringValue(),"StringB");
+			}
+
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+
 
 	@Test
 	public void testHistoryMultipleSizeTupleDataRetrieval() throws CtxException, InterruptedException, ExecutionException {

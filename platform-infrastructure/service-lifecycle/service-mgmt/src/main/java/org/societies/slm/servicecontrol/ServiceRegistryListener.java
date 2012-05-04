@@ -29,6 +29,8 @@ import java.util.List;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleListener;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceEvent;
@@ -39,9 +41,11 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
 import org.societies.api.schema.servicelifecycle.model.ServiceLocation;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import org.societies.api.schema.servicelifecycle.model.ServiceType;
@@ -59,7 +63,7 @@ import org.springframework.osgi.util.OsgiListenerUtils;
  */
 
 public class ServiceRegistryListener implements BundleContextAware,
-		ServiceListener {
+		ServiceListener, BundleListener {
 
 	private BundleContext bctx;
 	private static Logger log = LoggerFactory.getLogger(ServiceRegistryListener.class);
@@ -96,19 +100,27 @@ public class ServiceRegistryListener implements BundleContextAware,
 	public void registerListener() {
 		Filter fltr = null;
 		
+		if(log.isDebugEnabled()) 
+			log.debug("Registering Listener!");
+		
 		try {
 			fltr = this.bctx.createFilter("(TargetPlatform=SOCIETIES)");
-			log.info("Filter Registered");
+			log.info("Service Filter Registered");
 		} catch (InvalidSyntaxException e) {
 			log.error("Error creating Service Listener Filter");
 			e.printStackTrace();
 		}
 		OsgiListenerUtils.addServiceListener(this.bctx, this, fltr);
+		
+		log.info("Bundle Listener Registered");
+		this.bctx.addBundleListener(this);
 	}
 
 	public void unRegisterListener() {
 		log.info("Service Management unregistering service listener");
 		OsgiListenerUtils.removeServiceListener(this.bctx, this);
+		log.info("Service Management unregistering bundle listener");
+		this.bctx.removeBundleListener(this);
 	}
 
 	@Override
@@ -215,8 +227,8 @@ public class ServiceRegistryListener implements BundleContextAware,
 				} else{
 					if(log.isDebugEnabled()) log.debug(service.getServiceName() + " already exists, setting status to STARTED");
 					this.getServiceReg().changeStatusOfService(service.getServiceIdentifier(), ServiceStatus.STARTED);
-
 				}
+				
 			} catch (Exception e) {
 				log.error("Error while persisting service meta data");
 				e.printStackTrace();
@@ -226,7 +238,6 @@ public class ServiceRegistryListener implements BundleContextAware,
 		case ServiceEvent.UNREGISTERING:
 			if(log.isDebugEnabled()) log.debug("Service Unregistered, so we set it to stopped but do not remove from registry");			
 			service.setServiceIdentifier(ServiceMetaDataUtils.generateServiceResourceIdentifier(service, serBndl));
-			//serviceList.add(service);
 			
 			try {
 				this.getServiceReg().changeStatusOfService(service.getServiceIdentifier(), ServiceStatus.STOPPED);
@@ -235,5 +246,99 @@ public class ServiceRegistryListener implements BundleContextAware,
 				e.printStackTrace();
 			}
 		}
+	}
+
+	@Override
+	public void bundleChanged(BundleEvent event) {
+				
+		if( event.getType() != BundleEvent.UNINSTALLED ){
+			return;
+		}
+		
+		if(log.isDebugEnabled())
+			log.debug("Bundle Ininstalled Event arrived!");
+		// Now we search for services in the registry corresponding to this bundle.
+		Service serviceToRemove = getServiceFromBundle(event.getBundle());
+		
+		if(serviceToRemove == null){
+			if(log.isDebugEnabled())
+				log.debug("It was not a SOCIETIES-related bundle, ignoring event!");
+			return;
+		}
+		
+		if(log.isDebugEnabled())
+			log.debug("Uninstalled bundle that had service: " + serviceToRemove.getServiceEndpoint());
+			
+			
+		List<Service> servicesToRemove = new ArrayList<Service>();
+		servicesToRemove.add(serviceToRemove);
+			
+		if(log.isDebugEnabled()) log.debug("Removing service: " + serviceToRemove.getServiceName() + " from SOCIETIES Registry");
+			
+		try {
+			getServiceReg().unregisterServiceList(servicesToRemove);
+			log.info("Service " + serviceToRemove.getServiceName() + " has been uninstalled");
+
+		} catch (ServiceRegistrationException e) {
+			e.printStackTrace();
+			log.error("Exception while unregistering service: " + e.getMessage());
+		}
+		
+	}
+	
+	
+	/**
+	 * This method is used to obtain the Service that is exposed by given Bundle
+	 * 
+	 * @param The Bundle that exposes this service
+	 * @return The Service object whose bundle we wish to find
+	 */
+	private Service getServiceFromBundle(Bundle bundle) {
+		
+		if(log.isDebugEnabled()) log.debug("Obtaining Service that corresponds to a bundle: " + bundle.getSymbolicName());
+		
+		// Preparing the search filter
+		Service filter = new Service();
+		ServiceResourceIdentifier filterIdentifier = new ServiceResourceIdentifier();
+		filterIdentifier.setServiceInstanceIdentifier(String.valueOf(bundle.getBundleId()));
+		filter.setServiceIdentifier(filterIdentifier);
+		
+		ServiceInstance filterInstance = new ServiceInstance();
+		
+		ServiceImplementation filterImplementation = new ServiceImplementation();
+		filterImplementation.setServiceVersion(bundle.getVersion().toString());
+		filterInstance.setServiceImpl(filterImplementation);
+		filter.setServiceInstance(filterInstance);
+		
+		List<Service> listServices;
+		try {
+			listServices = getServiceReg().findServices(filter);
+		} catch (ServiceRetrieveException e) {
+			log.error("Exception while searching for services:" + e.getMessage());
+			e.printStackTrace();
+			return null;
+		}
+		
+		if(listServices == null)
+			return null;
+		
+		if(listServices.isEmpty()){
+			if(log.isDebugEnabled()) log.debug("Couldn't find any services that fulfill the criteria");
+			return null;
+		} 
+		
+		if(listServices.size() > 1){
+			if(log.isDebugEnabled()) log.debug("More than one service found... this is not good!");
+		}
+		
+		Service result = listServices.get(0);
+		// First we get the bundleId
+
+		 if(log.isDebugEnabled()) 
+			 log.debug("The service corresponding to bundle " + bundle.getSymbolicName() + "is "+ result.getServiceName() );
+			
+		// Finally, we return
+		 return result;
+		 
 	}
 }

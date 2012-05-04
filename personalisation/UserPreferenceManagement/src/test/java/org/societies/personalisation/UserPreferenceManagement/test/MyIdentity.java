@@ -37,8 +37,15 @@ import org.societies.api.identity.IdentityType;
 public class MyIdentity implements IIdentity {
 
 	
+	private final IdentityType type;
+	private final String identifier;
+	private final String domainIdentifier;
+
 	public MyIdentity(IdentityType type, String identifier,
 			String domainIdentifier) {
+				this.type = type;
+				this.identifier = identifier;
+				this.domainIdentifier = domainIdentifier;
 		
 		
 		// TODO Auto-generated constructor stub
@@ -46,32 +53,28 @@ public class MyIdentity implements IIdentity {
 
 	@Override
 	public String getJid() {
-		// TODO Auto-generated method stub
-		return null;
+		return type+"://"+identifier+"@"+domainIdentifier;
 	}
 
 	@Override
 	public String getBareJid() {
 		// TODO Auto-generated method stub
-		return null;
+		return "";
 	}
 
 	@Override
 	public String getDomain() {
-		// TODO Auto-generated method stub
-		return null;
+		return domainIdentifier;
 	}
 
 	@Override
 	public String getIdentifier() {
-		// TODO Auto-generated method stub
-		return null;
+		return identifier;
 	}
 
 	@Override
 	public IdentityType getType() {
-		// TODO Auto-generated method stub
-		return null;
+		return type;
 	}
 
 }

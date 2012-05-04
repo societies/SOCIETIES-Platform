@@ -46,7 +46,9 @@ public class ActivityConverterFromFacebook implements ActivityConverter {
 	
 	@Override
 	public List<ActivityEntry> load(String data) {
-			
+		
+		System.out.println("Parsing DATA:\n"+data);
+		
 		ArrayList<ActivityEntry> activities = new ArrayList<ActivityEntry>();
 		JSONArray elements;
 		
