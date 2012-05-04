@@ -37,9 +37,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.societies.activity.ActivityFeed;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
@@ -56,10 +63,12 @@ import static org.mockito.Mockito.*;
  * @author Thomas Vilarinho (Sintef)
  *
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest( { ActivityFeed.class })
 @ContextConfiguration(locations = { "../../../../CisManagerTest-context.xml" })
 public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTests {
 	
-	@Autowired
+	//@Autowired
 	private CisManager cisManagerUnderTest;
 	private ICISCommunicationMgrFactory mockCcmFactory;
 	private ICommManager mockCSSendpoint;
@@ -94,17 +103,19 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	void setUpFactory() throws Exception {
 		System.out.println("in setupFactory!");
 		mockCcmFactory = mock(ICISCommunicationMgrFactory.class);
+		
+		// mocking the IcomManagers
 		mockCISendpoint1 = mock (ICommManager.class);
 		mockCISendpoint2 = mock (ICommManager.class);
 		mockCISendpoint3 = mock (ICommManager.class);
 
-
+		// mocking their Identity Manager
 		mockIICisId_1 = mock (IIdentityManager.class);
 		mockIICisId_2 = mock (IIdentityManager.class);
 		mockIICisId_3 = mock (IIdentityManager.class);
 
 		
-		
+		// creating a NetworkNordImpl for each Identity Manager		
 		testCisId_1 = new NetworkNodeImpl(TEST_CISID_1);
 		testCisId_2 = new NetworkNodeImpl(TEST_CISID_2);
 		testCisId_3 = new NetworkNodeImpl(TEST_CISID_3);
@@ -133,9 +144,15 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		mockIICisManagerId = mock (IIdentityManager.class);
 		
 		testCisManagerId = new NetworkNodeImpl(TEST_GOOD_JID);
+		
+		// mocking the CISManager
 		when(mockCSSendpoint.getIdManager()).thenReturn(mockIICisManagerId);
 		when(mockIICisManagerId.getThisNetworkNode()).thenReturn(testCisManagerId);
+		doNothing().when(mockCSSendpoint).register(any(org.societies.api.comm.xmpp.interfaces.IFeatureServer.class));
 		
+		// mocking the activity feed static methods
+		PowerMockito.mockStatic(ActivityFeed.class);
+		Mockito.when(ActivityFeed.startUp(anyString())).thenReturn(new ActivityFeed());
 		setUpFactory();
 		
 	}
@@ -148,7 +165,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		testCisManagerId = null;
 
 	}
-	@Ignore
+
 	@Test
 	public void testConstructor() {
 

@@ -24,6 +24,9 @@
  */
 package org.societies.api.cis.management;
 
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
 /**
  * This interface represents CISs that are not owned by this CSS but that this
  * CIS subscribes to (is a member of).
@@ -32,9 +35,9 @@ package org.societies.api.cis.management;
  *
  */
 /**
- * MISSING_ANNOTATION
  * MISSING_JAVADOCS
  */
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface ICisSubscribed extends ICisRecord {
 
 }

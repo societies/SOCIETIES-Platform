@@ -25,9 +25,12 @@
 package org.societies.slm.servicecontrol;
 
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -65,6 +68,10 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	private ICommManager commMngr;
 	private IServiceControlRemote serviceControlRemote;
 
+	private static HashMap<Long,BlockingQueue<Service>> installServiceMap = new HashMap<Long,BlockingQueue<Service>>();
+	
+	private final long TIMEOUT = 5;
+	
 	public IServiceRegistry getServiceReg() {
 		return serviceReg;
 	}
@@ -72,7 +79,6 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	public void setServiceReg(IServiceRegistry serviceReg) {
 		this.serviceReg = serviceReg;
 	}
-
 
 	public void setCommMngr(ICommManager commMngr) {
 		this.commMngr = commMngr;
@@ -90,7 +96,6 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		return serviceControlRemote;
 	}
 	
-	
 	@Override
 	public void setBundleContext(BundleContext bundleContext) {
 		
@@ -99,7 +104,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		if(logger.isDebugEnabled()) logger.debug("BundleContextSet");
 	}
 
-
+	
 	@Override
 	public Future<ServiceControlResult> startService(ServiceResourceIdentifier serviceId)
 			throws ServiceControlException {
@@ -325,6 +330,14 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				logger.debug("Service bundle "+newBundle.getSymbolicName() +" is in state: " + getStateName(newBundle.getState()));
 			}
 			
+			//Before we start the bundle we prepare the entry on the hashmap
+			BlockingQueue<Service> idList = new ArrayBlockingQueue<Service>(1);
+			Long bundleId = new Long(newBundle.getBundleId());
+			
+			synchronized(this){		
+				installServiceMap.put(bundleId, idList);
+			}
+						
 			//Now we need to start the bundle so that its services are registered with the OSGI Registry, and then SOCIETIES Registry
 			if(logger.isDebugEnabled())
 				logger.debug("Attempting to start bundle: " + newBundle.getSymbolicName() );
@@ -338,10 +351,16 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				if(logger.isDebugEnabled()) logger.debug("Now searching for the service installed by the new bundle");
 				
 				//TODO Something to assure the other function is called first...
+				Service service = idList.poll(TIMEOUT, TimeUnit.SECONDS);
 				
-				Service service = getServiceFromBundle(newBundle);
+				synchronized(this){
+					installServiceMap.remove(bundleId);
+				}
+				
+				//Service service = getServiceFromBundle(newBundle);
+				
 				if(service != null){
-					if(logger.isDebugEnabled()) logger.debug("Found service: " + service.getServiceName());
+					if(logger.isDebugEnabled()) logger.debug("Found service: " + service.getServiceName() + " so install was success!");
 					returnResult.setServiceId(service.getServiceIdentifier());
 					returnResult.setMessage(ResultMessage.SUCCESS);
 					return new AsyncResult<ServiceControlResult>(returnResult);
@@ -613,6 +632,18 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		 
 	}
 
+	protected static boolean installingBundle(long bundleId){
+		if(logger.isDebugEnabled()) logger.debug("installingBundle Called");
+		return installServiceMap.containsKey(new Long(bundleId));
+	}
+	
+	protected static void serviceInstalled(long bundleIdentifier, Service newService){
+		Long bundleId = new Long(bundleIdentifier);
+		if(logger.isDebugEnabled()) logger.debug("serviceInstalled Called for bundleId: " + bundleId );
+		BlockingQueue<Service> queue = installServiceMap.get(bundleId);
+		queue.add(newService);
+	}
+	
 	/**
 	 * This method is used to obtain the Service that is exposed by given Bundle
 	 * 
