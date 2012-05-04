@@ -3,18 +3,16 @@ package org.societies.platform.TwitterConnector.impl;
 import java.util.Map;
 import java.util.UUID;
 
-//import org.json.simple.JSONArray;
-//import org.json.simple.JSONObject;
-//import org.json.simple.parser.JSONParser;
-//import org.json.simple.parser.ParseException;
-import org.scribe.model.*;
-import org.scribe.oauth.*;
-import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.platform.TwitterConnector.*;
-import org.societies.platform.TwitterConnector.model.TwitterToken;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.scribe.model.OAuthRequest;
+import org.scribe.model.Response;
+import org.scribe.model.Verb;
+import org.scribe.oauth.OAuthService;
+import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.platform.TwitterConnector.TwitterConnector;
+import org.societies.platform.TwitterConnector.model.TwitterToken;
 
 /*
  * twitter connector implementation
@@ -231,18 +229,18 @@ public class TwitterConnectorImpl implements TwitterConnector {
 	}
 
 	public void setConnectorName(String name) {
-		// TODO Auto-generated method stub
+		this.name = name;
 
 	}
 
 	public String getConnectorName() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return name;
 	}
 
 	public String getSocialData(String path) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return "{}";
 	}
 
 	public Map<String, String> requireAccessToken() {
@@ -251,7 +249,8 @@ public class TwitterConnectorImpl implements TwitterConnector {
 	}
 
 	public void disconnect() {
-		// TODO Auto-generated method stub
+		this.service = null;
+		this.twToken = null;
 
 	}
 
@@ -271,8 +270,8 @@ public class TwitterConnectorImpl implements TwitterConnector {
 	}
 
 	public String getUserGroups() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return  "{\"data\" : []}";
 	}
 
 }

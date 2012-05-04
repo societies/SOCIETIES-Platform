@@ -27,7 +27,6 @@ package org.societies.security.policynegotiator.requester;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
@@ -63,15 +62,15 @@ public class NegotiationRequester implements INegotiation {
 
 		LOG.debug("init(): group manager = {}", groupMgr.toString());
 		
-		// TODO: remove when somebody else (Marketplace?) initiates negotiation
-		IIdentityManager idMgr = groupMgr.getIdMgr();
-		IIdentity provider = idMgr.getThisNetworkNode();
-		startNegotiation(provider, "service-123", new INegotiationCallback() {
-			@Override
-			public void onNegotiationComplete(String agreementKey) {
-				LOG.info("onNegotiationComplete({})", agreementKey);
-			}
-		});
+		// Test: initialization of negotiation. Integration test is available to replace this.
+//		IIdentityManager idMgr = groupMgr.getIdMgr();
+//		IIdentity provider = idMgr.getThisNetworkNode();
+//		startNegotiation(provider, "service-123", new INegotiationCallback() {
+//			@Override
+//			public void onNegotiationComplete(String agreementKey) {
+//				LOG.info("onNegotiationComplete({})", agreementKey);
+//			}
+//		});
 	}
 
 	// Getters and setters for other OSGi services

@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.example.calculator.ICalc;
 
@@ -101,8 +102,8 @@ public class SpecificTestCaseUpperTester {
 						LOG.info("[#759] Stop the service");
 						Future<ServiceControlResult> asynchResult = TestCase759.serviceControl.stopService(calculatorServiceId);
 						ServiceControlResult scresult = asynchResult.get();
-						if (!scresult.equals(ServiceControlResult.SUCCESS)) {
-							throw new Exception("Can't stop the service. Returned value: "+scresult.value());
+						if (!scresult.getMessage().equals(ResultMessage.SUCCESS)) {
+							throw new Exception("Can't stop the service. Returned value: "+scresult.getMessage());
 						}
 					}
 
@@ -110,8 +111,8 @@ public class SpecificTestCaseUpperTester {
 					LOG.info("[#759] Uninstall the service");
 					Future<ServiceControlResult> asynchResult = TestCase759.serviceControl.uninstallService(calculatorServiceId);
 					ServiceControlResult scresult = asynchResult.get();
-					if (!scresult.equals(ServiceControlResult.SUCCESS)) {
-						throw new Exception("Can't uninstall the service. Returned value: "+scresult.value());
+					if (!scresult.getMessage().equals(ResultMessage.SUCCESS)) {
+						throw new Exception("Can't uninstall the service. Returned value: "+scresult.getMessage());
 					}
 					break;
 				}
@@ -170,8 +171,8 @@ public class SpecificTestCaseUpperTester {
 						LOG.info("[#759] Stop the service");
 						Future<ServiceControlResult> asynchResult = TestCase759.serviceControl.stopService(calculatorServiceId);
 						ServiceControlResult scresult = asynchResult.get();
-						if (!scresult.equals(ServiceControlResult.SUCCESS)) {
-							throw new Exception("Can't stop the service. Returned value: "+scresult.value());
+						if (!scresult.getMessage().equals(ResultMessage.SUCCESS)) {
+							throw new Exception("Can't stop the service. Returned value: "+scresult.getMessage());
 						}
 					}
 					break;
@@ -184,8 +185,8 @@ public class SpecificTestCaseUpperTester {
 				URL serviceUrl = new URL(serviceBundleUrl);
 				Future<ServiceControlResult> asynchResult = TestCase759.serviceControl.installService(serviceUrl, "");
 				ServiceControlResult scresult = asynchResult.get();
-				if (!scresult.equals(ServiceControlResult.SUCCESS)) {
-					throw new Exception("Can't install the service. Returned value: "+scresult.value());
+				if (!scresult.getMessage().equals(ResultMessage.SUCCESS)) {
+					throw new Exception("Can't install the service. Returned value: "+scresult.getMessage());
 				}
 			}
 		}
@@ -218,8 +219,8 @@ public class SpecificTestCaseUpperTester {
 			LOG.info("[#759] Uninstall the service");
 			Future<ServiceControlResult> asynchResult = TestCase759.serviceControl.uninstallService(NominalTestCaseLowerTester.calculatorServiceId);
 			ServiceControlResult scresult = asynchResult.get();
-			if (!scresult.equals(ServiceControlResult.SUCCESS)) {
-				throw new Exception("Can't uninstall the service. Returned value: "+scresult.value());
+			if (!scresult.getMessage().equals(ResultMessage.SUCCESS)) {
+				throw new Exception("Can't uninstall the service. Returned value: "+scresult.getMessage());
 			}
 		}
 		catch (Exception e)

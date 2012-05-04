@@ -92,13 +92,13 @@ import org.societies.api.schema.cis.manager.SubscribedTo;
 public class CisManager implements ICisManager, IFeatureServer{
 
 	
-	private 
+
 	Set<CisEditor> ownedCISs; 
 	ICISCommunicationMgrFactory ccmFactory;
 	IIdentity cisManagerId;
 	ICommManager CSSendpoint;
 	Set<CisRecord> subscribedCISs;
-	private static SessionFactory sessionFactory;
+	@Autowired private static SessionFactory sessionFactory;
 	
 	public void startup(){
 		ActivityFeed ret = null;

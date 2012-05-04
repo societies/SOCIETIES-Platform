@@ -27,6 +27,9 @@ package org.societies.api.cis.management;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
 
 
 
@@ -34,10 +37,8 @@ import java.util.concurrent.Future;
  * @author Babak.Farshchian@sintef.no
  *
  */
-/**
- * MISSING_ANNOTATION
- */
 
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface ICisManager {
 	/**
 	 * Create a new CIS for the CSS represented by cssId. Password is needed and is the
