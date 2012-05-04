@@ -122,14 +122,14 @@ public class SocialData implements ISocialData{
 			ISocialConnector connector = it.next();
 		    
 			getActivities(connector);
-			
 			updateProfile(connector);
 			updateGroups(connector);
 			updateFriends(connector);
 			/// UPDATE ALL DATA
-			
-			
+	
 		}
+		
+		
 		
 		lastUpate = new Date().getTime();
 		
