@@ -164,7 +164,7 @@ var getLocation = function() {
 var deviceInfo = function() {
 	console.log("Get device information");
 	
-	jQuery("#phoneGapVer").text(device.phonegap);
+	jQuery("#phoneGapVer").text(device.cordova);
 	jQuery("#platform").text(device.platform);
 	jQuery("#version").text(device.version);
 	jQuery("#uuid").text(device.uuid);

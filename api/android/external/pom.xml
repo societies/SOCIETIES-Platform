@@ -45,9 +45,9 @@
 			<version>${release.version}</version>
 		</dependency>
         <dependency>
-            <groupId>android</groupId>
+            <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
-        </dependency>
+	</dependency>
 	</dependencies>
 
 	<build>
