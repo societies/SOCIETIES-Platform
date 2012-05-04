@@ -231,18 +231,18 @@ public class TwitterConnectorImpl implements TwitterConnector {
 	}
 
 	public void setConnectorName(String name) {
-		// TODO Auto-generated method stub
+		this.name = name;
 
 	}
 
 	public String getConnectorName() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return name;
 	}
 
 	public String getSocialData(String path) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return "{}";
 	}
 
 	public Map<String, String> requireAccessToken() {
@@ -251,7 +251,8 @@ public class TwitterConnectorImpl implements TwitterConnector {
 	}
 
 	public void disconnect() {
-		// TODO Auto-generated method stub
+		this.service = null;
+		this.twToken = null;
 
 	}
 
@@ -271,8 +272,8 @@ public class TwitterConnectorImpl implements TwitterConnector {
 	}
 
 	public String getUserGroups() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return  "{\"data\" : []}";
 	}
 
 }
