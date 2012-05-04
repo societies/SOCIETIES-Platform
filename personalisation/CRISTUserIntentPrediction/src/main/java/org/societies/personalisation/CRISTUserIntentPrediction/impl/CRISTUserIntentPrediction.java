@@ -132,6 +132,8 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	@Override
 	public void sendFeedback(FeedbackEvent feedbackEvent) {
 		// TODO Auto-generated method stub
+		///
+		
 		
 	}
 
@@ -144,7 +146,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		
 	}
 
-	/* (non-Javadoc)
+	/* (non-Javadoc) External 1/3 
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCRISTPrediction(org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxAttribute)
 	 */
 	@Override
@@ -163,7 +165,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		return new AsyncResult<List<CRISTUserAction>>(results);
 	}
 
-	/* (non-Javadoc)
+	/* (non-Javadoc) External 2/3 
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCRISTPrediction(org.societies.api.identity.IIdentity, org.societies.api.personalisation.model.IAction)
 	 */
 	@Override
@@ -182,7 +184,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		return new AsyncResult<List<CRISTUserAction>>(results);
 	}
 
-	/* (non-Javadoc)
+	/* (non-Javadoc) External 3/3 
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCurrentUserIntentAction(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)
 	 * 
 	 * parameterName: the name of the outcome (e.g., volume, font, backgroundColour etc.)

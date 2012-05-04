@@ -108,9 +108,10 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		this.registeredContext.add("Temperature");
 		this.registeredContext.add("GPS");
 
+		// Mock history data
+		
 		ArrayList<String> historyContextClique = new ArrayList<String>();
 
-		// Mock history data
 		historyAction.add("Turn on MP3 Player");
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
@@ -118,7 +119,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-
+		
+		historyContextClique = new ArrayList<String>();
 		historyAction.add("Turn down volume");
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
@@ -126,7 +128,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-
+		
+		historyContextClique = new ArrayList<String>();
 		historyAction.add("Switch songs");
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
@@ -134,7 +137,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-
+		
+		historyContextClique = new ArrayList<String>();
 		historyAction.add("Turn off MP3 Player");
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
@@ -142,7 +146,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-
+		
+		historyContextClique = new ArrayList<String>();
 		historyAction.add("Start the GPS navigator");
 		historySituation.add("Outdoor");
 		historyContextClique.add("120");
@@ -150,7 +155,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("15");
 		historyContextClique.add("55,1.33");
 		historyContext.add(historyContextClique);
-
+		
+		historyContextClique = new ArrayList<String>();
 		historyAction.add("Input a location name");
 		historySituation.add("Outdoor");
 		historyContextClique.add("120");
@@ -158,7 +164,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("15");
 		historyContextClique.add("55,1.33");
 		historyContext.add(historyContextClique);
-
+		
+		historyContextClique = new ArrayList<String>();
 		historyAction.add("Close the GPS navigator");
 		historySituation.add("Shopping Mall");
 		historyContextClique.add("100");
@@ -166,7 +173,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-
+		
+		historyContextClique = new ArrayList<String>();
 		historyAction.add("Turn on MP3 Player");
 		historySituation.add("Outdoor");
 		historyContextClique.add("120");
@@ -174,7 +182,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("15");
 		historyContextClique.add("55,1.33");
 		historyContext.add(historyContextClique);
-
+		
+		historyContextClique = new ArrayList<String>();
 		historyAction.add("Turn up volume");
 		historySituation.add("Outdoor");
 		historyContextClique.add("120");
@@ -182,7 +191,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("15");
 		historyContextClique.add("55,1.33");
 		historyContext.add(historyContextClique);
-
+		
+		historyContextClique = new ArrayList<String>();
 		historyAction.add("Switch songs");
 		historySituation.add("Outdoor");
 		historyContextClique.add("120");
@@ -190,7 +200,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("15");
 		historyContextClique.add("55,1.33");
 		historyContext.add(historyContextClique);
-
+		
+		historyContextClique = new ArrayList<String>();
 		historyAction.add("Turn off MP3 Player");
 		historySituation.add("Office");
 		historyContextClique.add("100");
@@ -198,7 +209,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("26");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-
+		
+		historyContextClique = new ArrayList<String>();
 		historyAction.add("Start the GPS navigator");
 		historySituation.add("Outdoor");
 		historyContextClique.add("120");
@@ -206,7 +218,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("15");
 		historyContextClique.add("55,1.33");
 		historyContext.add(historyContextClique);
-
+		
+		historyContextClique = new ArrayList<String>();
 		historyAction.add("Input a location name");
 		historySituation.add("Outdoor");
 		historyContextClique.add("120");
@@ -214,7 +227,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("15");
 		historyContextClique.add("55,1.33");
 		historyContext.add(historyContextClique);
-
+		
+		historyContextClique = new ArrayList<String>();
 		historyAction.add("Close the GPS navigator");
 		historySituation.add("Shopping Mall");
 		historyContextClique.add("100");
@@ -222,7 +236,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-
+		
+		historyContextClique = new ArrayList<String>();
 		historyAction.add("Turn on MP3 Player");
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
@@ -230,7 +245,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-
+		
+		historyContextClique = new ArrayList<String>();
 		historyAction.add("Turn down volume");
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
@@ -238,7 +254,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-
+		
+		historyContextClique = new ArrayList<String>();
 		historyAction.add("Switch songs");
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
@@ -246,7 +263,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-
+		
+		historyContextClique = new ArrayList<String>();
 		historyAction.add("Turn off MP3 Player");
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
@@ -254,7 +272,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-
+		
+		historyContextClique = new ArrayList<String>();
 		historyAction.add("Turn on MP3 Player");
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
@@ -262,7 +281,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
-
+		
+		historyContextClique = new ArrayList<String>();
 		historyAction.add("Turn down volume");
 		historySituation.add("Study Hall");
 		historyContextClique.add("100");
@@ -270,6 +290,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		historyContextClique.add("22");
 		historyContextClique.add("N/A");
 		historyContext.add(historyContextClique);
+
 
 		for (int i = 0; i < historyAction.size(); i++) {
 			MockHistoryData currentHisData = new MockHistoryData(
@@ -415,16 +436,14 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		// userSituation.setSituationID("Outdoor");
 		if (this.currentUserSituationMap.containsKey(entityID)) {
 			this.currentUserSituationMap.remove(entityID);
-			this.currentUserSituationMap.put(entityID, userSituation);
-		} else {
-			this.currentUserSituationMap.put(entityID, userSituation);
 		}
+		this.currentUserSituationMap.put(entityID, userSituation);
+		
 		if (this.currentUserContextMap.containsKey(entityID)) {
 			this.currentUserContextMap.remove(entityID);
-			this.currentUserContextMap.put(entityID, currentContextClique);
-		} else {
-			this.currentUserContextMap.put(entityID, currentContextClique);
-		}
+		} 
+		this.currentUserContextMap.put(entityID, currentContextClique);
+		
 	}
 
 	private CRISTUserSituation inferUserSituation(
@@ -500,11 +519,9 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		// Update the given user's current action
 		if (this.currentUserActionMap.containsKey(entityID)) {
 			this.currentUserActionMap.remove(entityID);
-			this.currentUserActionMap.put(entityID, userAction);
-		} else {
-			this.currentUserActionMap.put(entityID, userAction);
 		}
-
+		this.currentUserActionMap.put(entityID, userAction);
+		
 		CRISTUserSituation currentUserSituation = getCurrentUserSituation(entityID);
 		ArrayList<String> currentContextClique = getCurrentUserContext(entityID);
 		MockHistoryData oneHisData = new MockHistoryData(
