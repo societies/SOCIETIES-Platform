@@ -32,9 +32,20 @@
 	<artifactId>assessment</artifactId>
 	<name>Assessment</name>
 	<packaging>jar</packaging>
-	<version>0.1-SNAPSHOT</version>
+	<version>${version.pt}</version>
 	<developers>
-		<!--  To be defined -->
+		<developer>
+			<id>mvardjan</id>
+			<name>Mitja Vardjan</name>
+			<email>mitja.vardjan@setcce.si</email>
+			<organization>SETCCE</organization>
+			<organizationUrl>http://www.setcce.si</organizationUrl>
+			<roles>
+				<role>owner</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
 	</developers>
 
 	<parent>
