@@ -234,19 +234,23 @@ public class NominalTestCaseLowerTester {
 		List<Service> servicesNew = new ArrayList<Service>();
 		String id1;
 		String id2;
+		boolean exists;
 		
-		// -- Find the service
 		for (Service service : services2) {
 			id2 = service.getServiceIdentifier().getServiceInstanceIdentifier();
+			exists = false;
 			LOG.debug("id2 = " + id2);
 			for (Service sBefore : services1) {
 				id1 = sBefore.getServiceIdentifier().getServiceInstanceIdentifier();
 				LOG.debug("id1 = " + id1);
 				if (id1.equals(id2)) {
+					exists = true;
 					break;
 				}
-				servicesNew.add(sBefore);
-				LOG.debug("Added = " + id1);
+			}
+			if (!exists) {
+				servicesNew.add(service);
+				LOG.debug("Added = " + id2);
 			}
 		}
 		return servicesNew;
