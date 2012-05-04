@@ -198,6 +198,7 @@ public class ContextCommunicator {
 			
 			//set parent entity
 			usesServiceAssoc.setParentEntity(parent.getId());
+			ctxBroker.update(usesServiceAssoc);
 			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -218,10 +219,12 @@ public class ContextCommunicator {
 			
 			//add as child to USES_SERVICE association
 			usesServiceAssoc.addChildEntity(serviceEntity.getId());
+			ctxBroker.update(usesServiceAssoc);
 			
 			//create new ID attribute, update and add to entity
 			LOG.info("Creating ID attribute under SERVICE entity");
 			CtxAttribute newIDAttr = ctxBroker.createAttribute(serviceEntity.getId(), CtxAttributeTypes.ID).get();
+			LOG.info("Setting value of ID attribute to: "+serviceID);
 			ctxBroker.updateAttribute(newIDAttr.getId(), SerialisationHelper.serialise(serviceID));
 			
 		} catch (InterruptedException e) {
@@ -246,6 +249,7 @@ public class ContextCommunicator {
 			
 			//set parent entity
 			hasParameterAssoc.setParentEntity(parentEntity.getId());
+			ctxBroker.update(hasParameterAssoc);
 			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -264,7 +268,8 @@ public class ContextCommunicator {
 			CtxEntity serviceParamEntity = ctxBroker.createEntity(CtxEntityTypes.SERVICE_PARAMETER).get();
 			
 			//add as child to HAS_PARAMETER association
-			hasParameterAssoc.addChildEntity(serviceParamEntity.getId());		
+			hasParameterAssoc.addChildEntity(serviceParamEntity.getId());	
+			ctxBroker.update(hasParameterAssoc);
 			
 			//create new PARAMETER_NAME attribute, update and add to entity
 			LOG.info("Creating PARAMETER_NAME attribute under SERVICE_PARAMETER entity with value: "+parameterName);

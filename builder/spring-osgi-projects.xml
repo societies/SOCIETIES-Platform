@@ -41,7 +41,7 @@
 	<modules>
 		<module>../parent/version.xml</module>
 		<module>../parent/spring-osgi.xml</module>
-		
+
 		<!-- Utilities -->
 		<module>../utilities/DBC</module>
 		<module>../utilities/societies-annotations</module>
@@ -56,29 +56,33 @@
 		<module>../api/schema/internal</module>
 		<module>../api/java/internal</module>
 
-		
+
 
 
 		<!-- Platform Infrastructure -->
 		<!-- Communications Infrastructure -->
 		<module>../platform-infrastructure/comms-frwk/CommonLibraries</module>
-		<module>../platform-infrastructure/comms-frwk/CommunicationFrameworkCommons</module>
-		<module>../platform-infrastructure/comms-frwk/XCCommunicationMgr</module>
-		<module>../platform-infrastructure/comms-frwk/PubsubServiceBundle</module>
-		<module>../platform-infrastructure/comms-frwk/PubsubClientBundle</module>
+		<module>../platform-infrastructure/comms-frwk/CommunicationFrameworkCommons
+		</module>
+		<module>../platform-infrastructure/comms-frwk/XCCommunicationMgr
+		</module>
+		<module>../platform-infrastructure/comms-frwk/PubsubServiceBundle
+		</module>
+		<module>../platform-infrastructure/comms-frwk/PubsubClientBundle
+		</module>
 		<module>../platform-infrastructure/comms-frwk/EventMgmtBundle</module>
 		<!-- Domain Authority Modules -->
 		<module>../domain-authority/group-manager</module>
-		<!-- Example 3rd party services
-		<module>../platform-infrastructure/comms-frwk/ExampleServices/Calculator</module>  
-		<module>../platform-infrastructure/comms-frwk/ExampleServices/FortuneCookie</module>  
-		<module>../platform-infrastructure/comms-frwk/ExampleServices/ComplexServiceBundle</module>
-		<module>../platform-infrastructure/comms-frwk/ExampleServices/ExampleServiceMgr</module> 
-		-->
+		<!-- Example 3rd party services <module>../platform-infrastructure/comms-frwk/ExampleServices/Calculator</module> 
+			<module>../platform-infrastructure/comms-frwk/ExampleServices/FortuneCookie</module> 
+			<module>../platform-infrastructure/comms-frwk/ExampleServices/ComplexServiceBundle</module> 
+			<module>../platform-infrastructure/comms-frwk/ExampleServices/ExampleServiceMgr</module> -->
 		<!-- Service Registry -->
 		<module>../css-modules/serviceRegistry</module>
-		<module>../platform-infrastructure/service-lifecycle/service-mgmt/</module>
-		<module>../platform-infrastructure/service-lifecycle/sl-comms-mgr/</module>
+		<module>../platform-infrastructure/service-lifecycle/service-mgmt/
+		</module>
+		<module>../platform-infrastructure/service-lifecycle/sl-comms-mgr/
+		</module>
 
 		<!-- Security and Dependability Mgmt -->
 		<module>../platform-infrastructure/security/SecurityServices</module>
@@ -94,10 +98,11 @@
 		<module>../css-modules/css-mgmt/cssmgmt</module>
 		<module>../css-modules/css-mgmt/TestccsCommsMgmt</module>
 
-		
+
 		<!-- CIS Mgmt -->
 		<module>../cis-modules/cis-persistance/</module>
-		<module>../cis-modules/cis-management/cis-manager/cis-manager/</module>
+		<module>../cis-modules/cis-management/cis-manager/cis-manager/
+		</module>
 		<module>../cis-modules/cis-discovery/</module>
 		<module>../cis-modules/cis-collaboration/</module>
 
@@ -113,8 +118,11 @@
 
 		<!-- SNS -->
 		<module>../platform-infrastructure/sns/FacebookConn</module>
+		<module>../platform-infrastructure/sns/FoursquareConnector</module>
+		<module>../platform-infrastructure/sns/TwitterConnector</module>
 		<module>../platform-infrastructure/sns/socialdata</module>
-		
+
+
 		<!-- WP5 Modules -->
 		<!-- Context Management -->
 		<module>../context-management</module>
@@ -123,19 +131,22 @@
 		<module>../user-agent</module>
 
 		<!-- Personalisation -->
-		<module>../personalisation</module> 
-		
+		<module>../personalisation</module>
+
 		<!-- Intelligent Community Orchestration -->
 		<module>../intelligent-community-orchestration/API</module>
-		<module>../intelligent-community-orchestration/CommunityLifecycleManagement</module>
-		<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser</module>
+		<module>../intelligent-community-orchestration/CommunityLifecycleManagement
+		</module>
+		<module>../intelligent-community-orchestration/EgocentricCommunityAnalyser
+		</module>
 
 		<!-- Privacy & Trust -->
 		<module>../privacy-trust/java/privacy-protection</module>
 		<module>../privacy-trust/java/trust</module>
 
-		<!-- PlatForm Web App -->	
-		<module>../platform-infrastructure/service-lifecycle/platform-webapp/</module>
+		<!-- PlatForm Web App -->
+		<module>../platform-infrastructure/service-lifecycle/platform-webapp/
+		</module>
 
 	</modules>
 </project>

@@ -52,16 +52,16 @@ public class ProviderCallback implements INegotiationProviderCallback {
 	private INegotiationCallback finalCallback;
 	private String serviceId;
 	
-	public ProviderCallback(NegotiationRequester requester, IIdentity provider,
-			String serviceId, MethodType method) {
-		
-		LOG.debug("ProviderCallback({})", method);
-
-		this.requester = requester;
-		this.method = method;
-		this.provider = provider;
-		this.serviceId = serviceId;
-	}
+//	public ProviderCallback(NegotiationRequester requester, IIdentity provider,
+//			String serviceId, MethodType method) {
+//		
+//		LOG.debug("ProviderCallback({})", method);
+//
+//		this.requester = requester;
+//		this.method = method;
+//		this.provider = provider;
+//		this.serviceId = serviceId;
+//	}
 	
 	public ProviderCallback(NegotiationRequester requester, IIdentity provider,
 			String serviceId, MethodType method, INegotiationCallback callback) {
@@ -73,9 +73,9 @@ public class ProviderCallback implements INegotiationProviderCallback {
 		this.provider = provider;
 		this.serviceId = serviceId;
 		this.finalCallback = callback;
-		if (method != MethodType.GET_POLICY_OPTIONS) {
-			LOG.warn("Wrong constructor is used");
-		}
+//		if (method != MethodType.GET_POLICY_OPTIONS) {
+//			LOG.warn("Wrong constructor is used");
+//		}
 	}
 
 	/* (non-Javadoc)
@@ -99,7 +99,7 @@ public class ProviderCallback implements INegotiationProviderCallback {
 					// TODO: use real identity when it can be gathered from other components
 					sop = requester.getSignatureMgr().signXml(sop, selectedSop, "identity");
 					ProviderCallback callback = new ProviderCallback(requester, provider, serviceId,
-							MethodType.ACCEPT_POLICY_AND_GET_SLA); 
+							MethodType.ACCEPT_POLICY_AND_GET_SLA, finalCallback); 
 					requester.getGroupMgr().acceptPolicyAndGetSla(
 							sessionId,
 							sop,
@@ -122,7 +122,12 @@ public class ProviderCallback implements INegotiationProviderCallback {
 					requester.getSecureStorage().putDocument(key, sla.getBytes());
 					// TODO: store the SLA when secure services are implemented
 					if (finalCallback != null) {
+						LOG.debug("receiveResult(): invoking final callback");
 						finalCallback.onNegotiationComplete(key);
+						LOG.info("receiveResult(): negotiation finished, final callback invoked");
+					}
+					else {
+						LOG.info("receiveResult(): negotiation finished");
 					}
 				}
 				else {
