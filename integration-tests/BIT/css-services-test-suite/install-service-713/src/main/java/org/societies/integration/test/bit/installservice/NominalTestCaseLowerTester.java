@@ -121,6 +121,7 @@ public class NominalTestCaseLowerTester {
 		
 		serviceId = installService();
 		LOG.info("[#713] testInstallService 2");
+		Thread.sleep(2000);
 		assertNotNull("Service ID is null", serviceId.getServiceInstanceIdentifier());
 		LOG.info("[#713] testInstallService 3");
 		servicesAfter = getLocalServices();
@@ -131,11 +132,12 @@ public class NominalTestCaseLowerTester {
 		int numServices = 0;
 		
 		LOG.info("[#713] testInstallService 4");
-		//assertEquals("Number of all services not increased by exactly 1", 1, servicesAfter.size() - servicesBefore.size());
+		assertEquals("Number of all services not increased by exactly 1", 1, servicesAfter.size() - servicesBefore.size());
 		LOG.info("[#713] testInstallService 5");
-		//assertEquals("Number of new services not exactly 1", 1, servicesNew.size());
+		assertEquals("Number of new services not exactly 1", 1, servicesNew.size());
 		LOG.info("[#713] testInstallService 6");
-		//assertEquals("Incorrect service ID", servicesNew.get(0), serviceId);
+		assertEquals("Incorrect service ID", servicesNew.get(0).getServiceIdentifier().getServiceInstanceIdentifier(),
+				serviceId.getServiceInstanceIdentifier());
 		LOG.info("[#713] testInstallService 7");
 
 		// -- Find the service
@@ -152,12 +154,13 @@ public class NominalTestCaseLowerTester {
 		LOG.info("[#713] testInstallService 7.2");
 		
 		uninstallService(serviceId);
+		Thread.sleep(2000);
 		
 		servicesAfter = getLocalServices();
 		servicesNew = getAdditionalServices(servicesBefore, servicesAfter);
-		//assertEquals("Number of all services not same as before installation", 0, servicesAfter.size() - servicesBefore.size());
+		assertEquals("Number of all services not same as before installation", 0, servicesAfter.size() - servicesBefore.size());
 		LOG.info("[#713] testInstallService 8");
-		//assertEquals("Number of new services not exactly 0", 0, servicesNew.size());
+		assertEquals("Number of new services not exactly 0", 0, servicesNew.size());
 		LOG.info("[#713] testInstallService 9");
 		
 		LOG.info("[#713] testInstallService: SUCCESS");
@@ -229,16 +232,21 @@ public class NominalTestCaseLowerTester {
 	private List<Service> getAdditionalServices(List<Service> services1, List<Service> services2) {
 
 		List<Service> servicesNew = new ArrayList<Service>();
+		String id1;
+		String id2;
 		
 		// -- Find the service
 		for (Service service : services2) {
-			
+			id2 = service.getServiceIdentifier().getServiceInstanceIdentifier();
+			LOG.debug("id2 = " + id2);
 			for (Service sBefore : services1) {
-				if (sBefore.getServiceIdentifier().getServiceInstanceIdentifier().equals(
-						service.getServiceIdentifier().getServiceInstanceIdentifier())) {
-					
-					servicesNew.add(sBefore);
+				id1 = sBefore.getServiceIdentifier().getServiceInstanceIdentifier();
+				LOG.debug("id1 = " + id1);
+				if (id1.equals(id2)) {
+					break;
 				}
+				servicesNew.add(sBefore);
+				LOG.debug("Added = " + id1);
 			}
 		}
 		return servicesNew;
