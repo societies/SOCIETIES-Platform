@@ -22,7 +22,7 @@ z * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY 
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalization.socialprofiler.service;
+package org.societies.personalisation.socialprofiler.service;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -31,18 +31,17 @@ import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
-import org.apache.shindig.social.opensocial.model.Group;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.societies.api.internal.sns.ISocialData;
-import org.societies.personalization.socialprofiler.Variables;
-import org.societies.personalization.socialprofiler.datamodel.Interests;
-import org.societies.personalization.socialprofiler.datamodel.SocialPerson;
-import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile;
-import org.societies.personalization.socialprofiler.datamodel.impl.RelTypes;
-import org.societies.personalization.socialprofiler.datamodel.impl.SocialPersonImpl;
-import org.societies.personalization.socialprofiler.exception.NeoException;
+import org.societies.personalisation.socialprofiler.Variables;
+import org.societies.personalisation.socialprofiler.datamodel.Interests;
+import org.societies.personalisation.socialprofiler.datamodel.SocialPerson;
+import org.societies.personalisation.socialprofiler.datamodel.impl.RelTypes;
+import org.societies.personalisation.socialprofiler.datamodel.impl.SocialPersonImpl;
+import org.societies.personalisation.socialprofiler.exception.NeoException;
+import org.societies.personalisation.socialprofiler.datamodel.behaviour.Profile;
 
 public class ProfilerEngine implements Variables{
 

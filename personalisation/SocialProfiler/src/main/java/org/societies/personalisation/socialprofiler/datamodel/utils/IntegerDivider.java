@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.societies.personalization.socialprofiler.datamodel.utils;
+package org.societies.personalisation.socialprofiler.datamodel.utils;
 
 import org.neo4j.graphalgo.impl.centrality.CostDivider;
 

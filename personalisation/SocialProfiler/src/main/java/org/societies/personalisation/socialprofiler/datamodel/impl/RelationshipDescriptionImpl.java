@@ -1,11 +1,11 @@
 /**
  * 
  */
-package org.societies.personalization.socialprofiler.datamodel.impl;
+package org.societies.personalisation.socialprofiler.datamodel.impl;
 
 import org.neo4j.graphdb.Relationship;
-import org.societies.personalization.socialprofiler.datamodel.RelationshipDescription;
-import org.societies.personalization.socialprofiler.datamodel.utils.NodeProperties;
+import org.societies.personalisation.socialprofiler.datamodel.RelationshipDescription;
+import org.societies.personalisation.socialprofiler.datamodel.utils.NodeProperties;
 
 
 

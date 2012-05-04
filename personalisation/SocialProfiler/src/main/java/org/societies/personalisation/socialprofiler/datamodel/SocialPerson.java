@@ -22,11 +22,10 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalization.socialprofiler.datamodel;
+package org.societies.personalisation.socialprofiler.datamodel;
 
 import org.neo4j.graphdb.Traverser;
-import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile;
-import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile.Type;
+import org.societies.personalisation.socialprofiler.datamodel.behaviour.Profile;
 
 
 public interface SocialPerson {
@@ -48,7 +47,7 @@ public interface SocialPerson {
      * @return String percentage
      * 			
      */
-	public String getProfilePercentage(Type profileType);
+	public String getProfilePercentage(Profile.Type profileType);
 	
 	
 	/**
@@ -56,7 +55,7 @@ public interface SocialPerson {
 	 * @param profileType profile identifier
 	 * @param numberOfActions related to this Profile
 	 */
-	public void setProfilePercentage(Type profileType, String numberOfActions);
+	public void setProfilePercentage(Profile.Type profileType, String numberOfActions);
 	
 	/**
      * returns the total number of actions this user realized on the Social Network

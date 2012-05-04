@@ -1,4 +1,4 @@
-package org.societies.personalization.socialprofiler.datamodel;
+package org.societies.personalisation.socialprofiler.datamodel;
 
 public class UserInfo {
 

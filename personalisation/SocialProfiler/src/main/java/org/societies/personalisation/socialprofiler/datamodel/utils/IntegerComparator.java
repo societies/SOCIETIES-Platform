@@ -1,4 +1,4 @@
-package org.societies.personalization.socialprofiler.datamodel.utils;
+package org.societies.personalisation.socialprofiler.datamodel.utils;
 
 
 public class IntegerComparator {

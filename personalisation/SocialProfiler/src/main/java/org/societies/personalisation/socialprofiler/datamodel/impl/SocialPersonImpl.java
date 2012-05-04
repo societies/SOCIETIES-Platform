@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalization.socialprofiler.datamodel.impl;
+package org.societies.personalisation.socialprofiler.datamodel.impl;
 
 import java.util.HashMap;
 
@@ -32,11 +32,9 @@ import org.neo4j.graphdb.ReturnableEvaluator;
 import org.neo4j.graphdb.StopEvaluator;
 import org.neo4j.graphdb.TraversalPosition;
 import org.neo4j.graphdb.Traverser;
-import org.societies.personalization.socialprofiler.datamodel.SocialPerson;
-import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile;
-import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile.Type;
-import org.societies.personalization.socialprofiler.datamodel.impl.RelTypes;
-import org.societies.personalization.socialprofiler.datamodel.utils.NodeProperties;
+import org.societies.personalisation.socialprofiler.datamodel.SocialPerson;
+import org.societies.personalisation.socialprofiler.datamodel.behaviour.Profile;
+import org.societies.personalisation.socialprofiler.datamodel.utils.NodeProperties;
 
 
 
@@ -154,7 +152,7 @@ public class SocialPersonImpl implements SocialPerson, NodeProperties/*,DirtyMak
 
 
     //////////////   PROFILE IMPLEMENTATION
-    private String getTypeProperty (Type profileType)  {
+    private String getTypeProperty (Profile.Type profileType)  {
 		String property = null;
 		
 		switch (profileType) {
@@ -173,7 +171,7 @@ public class SocialPersonImpl implements SocialPerson, NodeProperties/*,DirtyMak
     }
     
 	@Override
-	public String getProfilePercentage(Type profileType) {
+	public String getProfilePercentage(Profile.Type profileType) {
 		String property = getTypeProperty (profileType);
 		
 		if (property != null)	
@@ -185,7 +183,7 @@ public class SocialPersonImpl implements SocialPerson, NodeProperties/*,DirtyMak
 
 
 	@Override
-	public void setProfilePercentage(Type profileType, String numberOfActions) {
+	public void setProfilePercentage(Profile.Type profileType, String numberOfActions) {
 		String property = getTypeProperty (profileType);
 		
 		if (property != null)

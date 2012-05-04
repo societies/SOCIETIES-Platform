@@ -1,4 +1,4 @@
-package org.societies.personalization.socialprofiler;
+package org.societies.personalisation.socialprofiler;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,10 +14,10 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.societies.api.internal.personalisation.ISocialProfiler;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialData;
-import org.societies.personalization.socialprofiler.service.DatabaseConnection;
-import org.societies.personalization.socialprofiler.service.GraphManager;
-import org.societies.personalization.socialprofiler.service.ProfilerEngine;
-import org.societies.personalization.socialprofiler.service.SocialTimerTask;
+import org.societies.personalisation.socialprofiler.service.DatabaseConnection;
+import org.societies.personalisation.socialprofiler.service.GraphManager;
+import org.societies.personalisation.socialprofiler.service.ProfilerEngine;
+import org.societies.personalisation.socialprofiler.service.SocialTimerTask;
 
 
 public class SocialProfiler implements ISocialProfiler {

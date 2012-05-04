@@ -1,4 +1,4 @@
-package org.societies.personalization.socialprofiler.exception;
+package org.societies.personalisation.socialprofiler.exception;
 
 public class NeoException extends Exception {
 

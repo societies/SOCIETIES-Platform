@@ -1,4 +1,4 @@
-package org.societies.personalization.socialprofiler.service;
+package org.societies.personalisation.socialprofiler.service;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,24 +20,24 @@ import org.neo4j.graphdb.StopEvaluator;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.Traverser;
 import org.neo4j.index.lucene.LuceneIndexService;
-import org.societies.personalization.socialprofiler.Variables;
-import org.societies.personalization.socialprofiler.datamodel.GeneralInfo;
-import org.societies.personalization.socialprofiler.datamodel.Interests;
-import org.societies.personalization.socialprofiler.datamodel.RelationshipDescription;
-import org.societies.personalization.socialprofiler.datamodel.SocialPage;
-import org.societies.personalization.socialprofiler.datamodel.SocialPageCategory;
-import org.societies.personalization.socialprofiler.datamodel.SocialPerson;
-import org.societies.personalization.socialprofiler.datamodel.UserInfo;
-import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile;
-import org.societies.personalization.socialprofiler.datamodel.impl.InterestsImpl;
-import org.societies.personalization.socialprofiler.datamodel.impl.ProfileImpl;
-import org.societies.personalization.socialprofiler.datamodel.impl.RelTypes;
-import org.societies.personalization.socialprofiler.datamodel.impl.RelationshipDescriptionImpl;
-import org.societies.personalization.socialprofiler.datamodel.impl.SocialPersonImpl;
-import org.societies.personalization.socialprofiler.datamodel.impl.GeneralInfoImpl;
-import org.societies.personalization.socialprofiler.datamodel.utils.IntegerAdder;
-import org.societies.personalization.socialprofiler.datamodel.utils.IntegerDivider;
-import org.societies.personalization.socialprofiler.exception.NeoException;
+import org.societies.personalisation.socialprofiler.Variables;
+import org.societies.personalisation.socialprofiler.datamodel.GeneralInfo;
+import org.societies.personalisation.socialprofiler.datamodel.Interests;
+import org.societies.personalisation.socialprofiler.datamodel.RelationshipDescription;
+import org.societies.personalisation.socialprofiler.datamodel.SocialPage;
+import org.societies.personalisation.socialprofiler.datamodel.SocialPageCategory;
+import org.societies.personalisation.socialprofiler.datamodel.SocialPerson;
+import org.societies.personalisation.socialprofiler.datamodel.UserInfo;
+import org.societies.personalisation.socialprofiler.datamodel.behaviour.Profile;
+import org.societies.personalisation.socialprofiler.datamodel.impl.GeneralInfoImpl;
+import org.societies.personalisation.socialprofiler.datamodel.impl.InterestsImpl;
+import org.societies.personalisation.socialprofiler.datamodel.impl.ProfileImpl;
+import org.societies.personalisation.socialprofiler.datamodel.impl.RelTypes;
+import org.societies.personalisation.socialprofiler.datamodel.impl.RelationshipDescriptionImpl;
+import org.societies.personalisation.socialprofiler.datamodel.impl.SocialPersonImpl;
+import org.societies.personalisation.socialprofiler.datamodel.utils.IntegerAdder;
+import org.societies.personalisation.socialprofiler.datamodel.utils.IntegerDivider;
+import org.societies.personalisation.socialprofiler.exception.NeoException;
 
 public class GraphManager implements Variables{
 

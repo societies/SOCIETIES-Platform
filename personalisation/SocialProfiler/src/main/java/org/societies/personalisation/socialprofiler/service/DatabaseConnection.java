@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.societies.personalization.socialprofiler.service;
+package org.societies.personalisation.socialprofiler.service;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -15,12 +15,9 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
-
 import org.apache.log4j.Logger;
 import org.jfree.data.xy.XYSeries;
-import org.societies.personalization.socialprofiler.Variables;
+import org.societies.personalisation.socialprofiler.Variables;
 
 
 

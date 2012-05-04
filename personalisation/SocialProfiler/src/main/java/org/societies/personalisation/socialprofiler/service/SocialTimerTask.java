@@ -1,4 +1,4 @@
-package org.societies.personalization.socialprofiler.service;
+package org.societies.personalisation.socialprofiler.service;
 
 import java.util.TimerTask;
 

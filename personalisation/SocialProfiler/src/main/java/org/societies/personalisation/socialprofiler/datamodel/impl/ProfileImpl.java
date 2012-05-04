@@ -1,10 +1,10 @@
-package org.societies.personalization.socialprofiler.datamodel.impl;
+package org.societies.personalisation.socialprofiler.datamodel.impl;
+
 
 import org.neo4j.graphdb.Node;
-import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile;
-import org.societies.personalization.socialprofiler.datamodel.behaviour.ProfileUtils;
-import org.societies.personalization.socialprofiler.datamodel.behaviour.Profile.Type;
-import org.societies.personalization.socialprofiler.datamodel.utils.NodeProperties;
+import org.societies.personalisation.socialprofiler.datamodel.behaviour.Profile;
+import org.societies.personalisation.socialprofiler.datamodel.behaviour.ProfileUtils;
+import org.societies.personalisation.socialprofiler.datamodel.utils.NodeProperties;
 
 public class ProfileImpl implements Profile, NodeProperties{
 

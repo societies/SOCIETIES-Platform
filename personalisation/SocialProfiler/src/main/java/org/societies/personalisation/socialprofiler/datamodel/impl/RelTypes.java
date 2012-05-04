@@ -1,4 +1,4 @@
-package org.societies.personalization.socialprofiler.datamodel.impl;
+package org.societies.personalisation.socialprofiler.datamodel.impl;
 
 import org.neo4j.graphdb.RelationshipType;
 

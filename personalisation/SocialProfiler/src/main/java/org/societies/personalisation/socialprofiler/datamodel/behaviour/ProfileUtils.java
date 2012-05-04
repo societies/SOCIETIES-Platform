@@ -1,4 +1,4 @@
-package org.societies.personalization.socialprofiler.datamodel.behaviour;
+package org.societies.personalisation.socialprofiler.datamodel.behaviour;
 
 public class ProfileUtils {
 	

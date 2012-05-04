@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.societies.personalization.socialprofiler.datamodel;
+package org.societies.personalisation.socialprofiler.datamodel;
 
 /**
  * used to describe a relation between 2 persons , 
