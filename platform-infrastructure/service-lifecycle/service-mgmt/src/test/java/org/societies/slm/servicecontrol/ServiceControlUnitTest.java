@@ -79,14 +79,12 @@ public class ServiceControlUnitTest {
 	private String hostJid;
 	private String remoteJid;
 	private Service testService;
-	private Service filter;
 	private ServiceResourceIdentifier testServiceId;
 	private ServiceResourceIdentifier otherServiceId;
 
 
 	private URL testUrl;
 
-	private Service mockedFilter; 
 	
 	/**
 	 * @throws java.lang.Exception
@@ -101,7 +99,6 @@ public class ServiceControlUnitTest {
 		mockedBundle = mock(Bundle.class);
 		mockedNode = mock(IIdentity.class);
 		mockedHost = mock(INetworkNode.class);
-		mockedFilter = mock(Service.class);
 		
 		testService = new Service();
 		testService.setAuthorSignature("authorSignature");
@@ -134,33 +131,6 @@ public class ServiceControlUnitTest {
 		testService.setServiceIdentifier(testServiceId);
 				
 		testUrl = new URL("http://www.testurl.com/teststuff.jar");
-		
-		// Create the filter
-		filter = new Service();
-		filter.setAuthorSignature(null);
-		filter.setServiceDescription(null);
-		filter.setServiceEndpoint(null);
-		filter.setServiceLocation(null);
-		filter.setServiceName(null);
-		filter.setServiceType(null);
-		filter.setServiceStatus(null);
-		
-		ServiceResourceIdentifier filterIdentifier = new ServiceResourceIdentifier();
-		filterIdentifier.setIdentifier(null);
-		filterIdentifier.setServiceInstanceIdentifier(String.valueOf(999));
-		filter.setServiceIdentifier(filterIdentifier);
-		
-		ServiceInstance filterInstance = new ServiceInstance();
-		filterInstance.setFullJid(null);
-		filterInstance.setXMPPNode(null);
-		
-		ServiceImplementation filterImplementation = new ServiceImplementation();
-		filterImplementation.setServiceNameSpace(null);
-		filterImplementation.setServiceProvider(null);
-		filterImplementation.setServiceVersion("1.0.2");
-		filterInstance.setServiceImpl(filterImplementation);
-		filter.setServiceInstance(filterInstance);
-		
 		
 		fakeServiceRemote = new FakeServiceRemote();
 		

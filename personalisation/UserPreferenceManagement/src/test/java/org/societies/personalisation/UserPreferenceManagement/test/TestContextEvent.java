@@ -60,7 +60,7 @@ import org.societies.personalisation.preference.api.model.PreferenceOutcome;
 import org.societies.personalisation.preference.api.model.PreferenceTreeNode;
 import org.springframework.scheduling.annotation.AsyncResult;
 
-public class UserPreferenceManagementTest  {
+public class TestContextEvent  {
 
 	UserPreferenceConditionMonitor pcm ;
 	IInternalPersonalisationManager persoMgr = Mockito.mock(IInternalPersonalisationManager.class);
@@ -225,12 +225,6 @@ public class UserPreferenceManagementTest  {
 			e.printStackTrace();
 		}
 		
-		
-	}
-
-
-	@Test
-	public void TestMerging(){
 		
 	}
 }

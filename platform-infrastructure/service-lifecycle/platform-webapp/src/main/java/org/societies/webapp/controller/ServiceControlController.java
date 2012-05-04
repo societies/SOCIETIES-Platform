@@ -86,7 +86,7 @@ public class ServiceControlController {
 	}
 	
 	@RequestMapping(value = "/servicecontrol.html", method = RequestMethod.GET)
-	public ModelAndView Servicediscovery() {
+	public ModelAndView serviceControlGet() {
 
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("message", "Please input values and submit");
@@ -131,7 +131,7 @@ public class ServiceControlController {
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/servicecontrol.html", method = RequestMethod.POST)
-	public ModelAndView serviceDiscovery(@Valid ServiceControlForm scForm,
+	public ModelAndView serviceControlPost(@Valid ServiceControlForm scForm,
 			BindingResult result, Map model) {
 
 		if (result.hasErrors()) {
@@ -146,7 +146,7 @@ public class ServiceControlController {
 
 		String node = scForm.getNode();
 		String method = scForm.getMethod();
-		String url = "file:" + scForm.getUrl();
+		String url = scForm.getUrl();
 		//Service service = scForm.getService();
 		String serviceUri = scForm.getService();
 		String endpoint = scForm.getEndpoint();
