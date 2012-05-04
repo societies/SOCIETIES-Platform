@@ -1,0 +1,14 @@
+<xs:schema targetNamespace='http://societies.org/test'
+	elementFormDefault='qualified' xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://societies.org/test">
+
+	<xs:element name='testnode'>
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base='xs:string'>
+					<xs:attribute name='testattribute' type='xs:string' use='required'/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	
+</xs:schema>
