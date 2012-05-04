@@ -213,7 +213,7 @@ public class NominalTestCaseLowerTester {
 		TestCase755.cssLocalManager.unregisterCSSNode(profile);
 		try {
 			cssDetails = TestCase755.cssRegistry.getCssRecord();
-			assertFalse(null != cssDetails);
+			assertTrue(null == cssDetails);
 		} catch (CssRegistrationException e) {
 			LOG.info("[#755] CssRegistrationException - Could not delete node from the CSS Registry");
 			e.printStackTrace();
