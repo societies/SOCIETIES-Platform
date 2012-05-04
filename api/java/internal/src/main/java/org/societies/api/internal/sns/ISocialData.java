@@ -68,13 +68,13 @@ public interface ISocialData {
      */
     long getLastUpdate();
     
-    /**
-     * Generate an connector based on the name of the social Network and the parameters passed
-     * @param socialNetworkName 
-     * @param params
-     * @return ISocialConnector reference
-     */
-    ISocialConnector createConnector(String socialNetworkName, Map<String, String> params);
+     /**
+      * Generate an connector based on the name of the social Network and the parameters passed
+      * @param socialNetworkName
+      * @param params  to generate correctly the connector (Must be present the token)
+      * @return the implementation of the spicific social connector castest as the interfeace ISocialConnector
+      */
+    ISocialConnector createConnector(ISocialConnector.SocialNetwork socialNetworkName, Map<String, String> params);
     
     
     /**

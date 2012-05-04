@@ -16,7 +16,7 @@
      <osgi:service ref="iSocialData" interface="org.societies.api.internal.sns.ISocialData"/>
 	
 	
-	<osgi:reference id="CommManagerBundle" interface="org.societies.comm.xmpp.interfaces.CommManager" />
+	
 
    
 	

@@ -1,7 +1,10 @@
 package org.societies.platform.socialdata.service;
 
+import org.apache.shindig.social.opensocial.model.Person;
 import org.json.JSONObject;
 import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.platform.socialdata.SocialData;
+import org.societies.platform.socialdata.converters.PersonConverterFromTwitter;
 
 
 
@@ -31,30 +34,34 @@ public class JsonToSocialDataService {
 	  }
 	  
 	  public static void main(String[]args){
+		  
+		  
+		  
+		  SocialData sd= new SocialData();
 		  //System.out.println("Convert JSON to SocialDATA");
 		  String access_token = "";
-		 // ISocialConnector c = new FacebookConnectorImpl(access_token, null);
+		  ISocialConnector c = sd.createConnector(ISocialConnector.SocialNetwork.twitter, null);
 		  
 		  
-//		  try {
-//			
-//			String data = c.getUserProfile();
-//			
-//			int index=0;
-//			PersonConverterFromFacebook parser = new PersonConverterFromFacebook();
-//			
-//			Person p= parser.load(data);
-//			System.out.println("p:"+p.getTurnOns().toString());
-////			Iterator<ActivityEntry> it = list.iterator();
-////			while (it.hasNext()){
-////				ActivityEntry entry = it.next();
-////				System.out.println("-- "+entry.getActor().getDisplayName() + " made a  "+entry.getVerb() + " ? " + entry.getContent());
-////				index++;
-////			}
-//		
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+		  try {
+			
+			String data = c.getUserProfile();
+			
+			int index=0;
+			PersonConverterFromTwitter parser = new PersonConverterFromTwitter();
+			
+			Person p= parser.load(data);
+			System.out.println("p:"+p.getAboutMe());
+//			Iterator<ActivityEntry> it = list.iterator();
+//			while (it.hasNext()){
+//				ActivityEntry entry = it.next();
+//				System.out.println("-- "+entry.getActor().getDisplayName() + " made a  "+entry.getVerb() + " ? " + entry.getContent());
+//				index++;
+//			}
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		  
 	  }
 	  
