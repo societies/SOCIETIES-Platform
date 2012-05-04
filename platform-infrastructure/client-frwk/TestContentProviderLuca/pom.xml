@@ -10,7 +10,7 @@
    </parent>
 
    <groupId>org.societies.android.platform</groupId>
-   <artifactId>TestContentProviderAlan</artifactId>
+   <artifactId>TestContentProviderLuca</artifactId>
    <name>TestContentProviderAlan</name>
    <version>${release.version}</version>
    <packaging>apk</packaging>
@@ -28,8 +28,7 @@
             <groupId>com.google.android</groupId>
             <artifactId>android-test</artifactId>
         </dependency>
-        
-        
+         
         <dependency>
             <groupId>android</groupId>
             <artifactId>android</artifactId>

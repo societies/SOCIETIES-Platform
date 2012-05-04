@@ -3,7 +3,6 @@ package org.societies.clientframework.contentprovider.test;
 
 import org.societies.clientframework.contentprovider.services.SocietiesCP;
 
-import android.content.ContentProvider;
 import android.content.ContentProviderClient;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -18,16 +17,16 @@ public class TestSocietiesCP extends ProviderTestCase2<SocietiesCP> {
 	
 	private static final String AUTHORITY = "org.societies.android.platform.contentprovider";
 	// Database table
-	public static final String CREDENTIAL_TABLE_NAME			 = "credential";
+	public static final String CREDENTIAL_TABLE_NAME		= "credential";
 
-	public static final String CREDENTIAL_KEY_ID 				 = "_id";
+	public static final String CREDENTIAL_KEY_ID 			 = "_id";
 	public static final String CREDENTIAL_KEY_USERNAME 		 = "username";
 	public static final String CREDENTIAL_KEY_PASSWORD 		 = "password" ;
-	public static final String CREDENTIAL_KEY_SERVICE 	  	 	= "service";
-	public static final String CREDENTIAL_KEY_FIRSTNAME 	 	= "firstname";
-	public static final String CREDENTIAL_KEY_LASTNAME	 	 	= "lastname";
-	public static final String CREDENTIAL_KEY_COMPANY	 	 	= "company";
-	public static final String CREDENTIAL_KEY_APPLICATION 	 	= "app";
+	public static final String CREDENTIAL_KEY_SERVICE 	  	 = "service";
+	public static final String CREDENTIAL_KEY_FIRSTNAME 	 = "firstname";
+	public static final String CREDENTIAL_KEY_LASTNAME	 	 = "lastname";
+	public static final String CREDENTIAL_KEY_COMPANY	 	 = "company";
+	public static final String CREDENTIAL_KEY_APPLICATION 	 = "app";
 	public static final String CREDENTIAL_KEY_TOKEN		 	 = "token";
 	public static final String CREDENTIAL_KEY_USEPROXY 		 = "useproxy";
 	public static final String CREDENTIAL_KEY_PROXY_URL		 = "proxy_url";
