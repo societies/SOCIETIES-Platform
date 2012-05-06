@@ -26,22 +26,43 @@
 
 package org.societies.cis.manager;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 
 /**
  * @author Thomas Vilarinho (Sintef)
 */
 
-
+@Entity
+@Table(name = "org_societies_cis_manager_CisParticipant")
 public class CisParticipant {
-	
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private Long id;
+	public Long getId() {
+		return id;
+	}
+
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+
 	public enum MembershipType {
 		   owner, participant, admin		 }
-	
+	@Column
 	 String membersJid;
+	@Column
 	 MembershipType mtype;
 	
 	
-	
+	public CisParticipant(){}
 	
 	public CisParticipant(String membersJid, MembershipType mtype) {
 		super();

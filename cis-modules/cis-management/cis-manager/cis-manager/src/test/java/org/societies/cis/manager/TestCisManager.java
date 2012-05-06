@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 
+import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -63,13 +64,15 @@ import static org.mockito.Mockito.*;
  * @author Thomas Vilarinho (Sintef)
  *
  */
-@RunWith(PowerMockRunner.class)
+//@RunWith(PowerMockRunner.class)
 @PrepareForTest( { ActivityFeed.class })
 @ContextConfiguration(locations = { "../../../../CisManagerTest-context.xml" })
 public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTests {
 	
 	//@Autowired
 	private CisManager cisManagerUnderTest;
+	@Autowired
+	private SessionFactory sessionFactory;
 	private ICISCommunicationMgrFactory mockCcmFactory;
 	private ICommManager mockCSSendpoint;
 	private IPersistanceManager mockPM;
@@ -152,7 +155,10 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		// mocking the activity feed static methods
 		PowerMockito.mockStatic(ActivityFeed.class);
-		Mockito.when(ActivityFeed.startUp(anyString())).thenReturn(new ActivityFeed());
+		System.out.println("in setup! cisManagerUnderTest.getSessionFactory(): "+sessionFactory);
+		ActivityFeed.setStaticSessionFactory(sessionFactory);
+		cisManagerUnderTest.setSessionFactory(sessionFactory);
+//		Mockito.when(ActivityFeed.startUp(anyString())).thenReturn(new ActivityFeed());
 		setUpFactory();
 		
 	}
@@ -173,7 +179,6 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		assertEquals(TEST_GOOD_JID, cisManagerUnderTest.cisManagerId.getJid());
 	}
 
-	@Ignore
 	@Test
 	public void testCreateCIS() {
 
@@ -193,7 +198,6 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 	
 	}
-
 	@Ignore
 	@Test
 	public void testListCIS() throws InterruptedException, ExecutionException {

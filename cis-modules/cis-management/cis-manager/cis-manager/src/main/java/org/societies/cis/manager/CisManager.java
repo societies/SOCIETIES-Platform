@@ -100,6 +100,14 @@ public class CisManager implements ICisManager, IFeatureServer{
 	Set<CisRecord> subscribedCISs;
 	@Autowired private static SessionFactory sessionFactory;
 	
+	public static SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
+
+	public static void setSessionFactory(SessionFactory sessionFactory) {
+		CisManager.sessionFactory = sessionFactory;
+	}
+
 	public void startup(){
 		ActivityFeed ret = null;
 	

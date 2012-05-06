@@ -27,8 +27,10 @@ public class ActivityFeed implements IActivityFeed {
 	@OneToMany(cascade=CascadeType.ALL)
 	private
 	Set<Activity> list;
-	
-	
+	public ActivityFeed(){}
+	public ActivityFeed(String id){
+		this.id = id;
+	}
 	private static SessionFactory sessionFactory;
 	private static Logger log = LoggerFactory.getLogger(ActivityFeed.class);
 	
@@ -69,7 +71,10 @@ public class ActivityFeed implements IActivityFeed {
 	public static SessionFactory getStaticSessionFactory() {
 		return sessionFactory;
 	}
-
+	public static void setStaticSessionFactory(SessionFactory isessionFactory) {
+		sessionFactory = isessionFactory;
+	}
+	
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
@@ -77,7 +82,13 @@ public class ActivityFeed implements IActivityFeed {
 	public static ActivityFeed startUp(String id){
 		ActivityFeed ret = null;
 		Session session = sessionFactory.openSession();
-		Query q = session.createQuery("select a from ActivityFeed a where a.id = ?");
+		
+		Query q = session.createQuery("select a from ActivityFeed a");
+		long l = q.list().size();
+		System.out.println("l: "+l);
+		if(l== 0)
+			return new ActivityFeed(id);
+		q = session.createQuery("select a from ActivityFeed a where a.id = ?");
 		q.setString(0, id);
 		ret = (ActivityFeed) q.uniqueResult();
 		return ret;
