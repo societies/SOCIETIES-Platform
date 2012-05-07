@@ -70,7 +70,7 @@ public final class CtxModelBeanTranslator {
 		for (CtxAttribute attr : entity.getAttributes()) {
 			attrIdBeans.add(fromCtxAttribute(attr));
 		}
-		bean.setAssociations(assocIdBeans);
+		bean.setAttributes(attrIdBeans);
 		
 		
 		return bean;

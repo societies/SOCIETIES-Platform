@@ -24,8 +24,13 @@
 
 package org.societies.context.broker.api;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+
 
 public interface ICtxCallback {
 
-	public void receiveCtxResult(Object retObject);
+	public void receiveCtxResult(Object retObject) throws DatatypeConfigurationException;
+
+	public void receiveCtxResult(Object retObject, String type)
+			throws DatatypeConfigurationException;
 }

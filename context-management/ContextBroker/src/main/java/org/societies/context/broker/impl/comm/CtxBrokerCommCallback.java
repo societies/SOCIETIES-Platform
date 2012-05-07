@@ -24,11 +24,23 @@
 
 package org.societies.context.broker.impl.comm;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+
 import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerBeanResult;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerCreateEntityBean;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerLookupBean;
+import org.societies.api.schema.context.model.CtxAssociationBean;
+import org.societies.api.schema.context.model.CtxAttributeBean;
+import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
+import org.societies.api.schema.context.model.CtxEntityBean;
+import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
+import org.societies.api.schema.context.model.CtxIdentifierBean;
 import org.societies.context.broker.api.ICtxCallback;
 
 public class CtxBrokerCommCallback {
@@ -41,7 +53,8 @@ public class CtxBrokerCommCallback {
 		//STORE THIS CALLBACK WITH THIS REQUEST ID
 		ctxClients.put(clientID, ctxBrokerClient);
 	}
-
+	
+	/*
 	public void receiveResult(Stanza returnStanza, Object msgBean) {
 		//CHECK WHICH END SERVICE IS SENDING US A MESSAGE
 		if (msgBean.getClass().equals(CtxBrokerCreateEntityBean.class)) {
@@ -50,6 +63,86 @@ public class CtxBrokerCommCallback {
 			
 			ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
 			ctxCallbackClient.receiveCtxResult(entityBean);
+		}
+	}
+	*/
+	
+	public void receiveResult(Stanza returnStanza, Object msgBean) throws Exception {
+		//CHECK WHICH END SERVICE IS SENDING US A MESSAGE
+		if (msgBean.getClass().equals(CtxBrokerBeanResult.class)) {
+			
+			CtxBrokerBeanResult payload = new CtxBrokerBeanResult();
+			
+			//what is the payload?
+			//create entity
+			if (payload.getCtxBrokerCreateEntityBeanResult()!=null){
+				CtxEntityBean bean = 
+						(CtxEntityBean) payload.getCtxBrokerCreateEntityBeanResult();
+				
+				ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
+				ctxCallbackClient.receiveCtxResult(bean, "entity");
+			}
+			//create attribute
+			else if (payload.getCtxBrokerCreateAttributeBeanResult()!=null){
+				CtxAttributeBean bean = 
+						(CtxAttributeBean) payload.getCtxBrokerCreateAttributeBeanResult();
+				
+				ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
+				ctxCallbackClient.receiveCtxResult(bean, "attribute");
+			}
+			//create association
+			else if (payload.getCtxBrokerCreateAssociationBeanResult()!=null){
+				CtxAssociationBean bean = 
+						(CtxAssociationBean) payload.getCtxBrokerCreateAssociationBeanResult();
+				
+				ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
+				ctxCallbackClient.receiveCtxResult(bean, "association");
+			}
+			//remove
+			else if (payload.getCtxBrokerRemoveBeanResult()!=null){
+				CtxEntityIdentifierBean bean = 
+						(CtxEntityIdentifierBean) payload.getCtxBrokerRemoveBeanResult();
+				
+				ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
+				ctxCallbackClient.receiveCtxResult(bean, "remove");
+			}
+			//retrieve
+			else if (payload.getCtxBrokerRetrieveBeanResult()!=null){
+				CtxIdentifierBean bean = 
+						(CtxIdentifierBean) payload.getCtxBrokerRetrieveBeanResult();
+				
+				ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
+				ctxCallbackClient.receiveCtxResult(bean, "retrieve");
+			}
+			//lookup
+			else if (payload.getCtxBrokerLookupBeanResult()!=null){
+				List<CtxIdentifierBean> bean = new ArrayList<CtxIdentifierBean>();
+				bean = (ArrayList<CtxIdentifierBean>)payload.getCtxBrokerLookupBeanResult();
+				
+				ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
+				ctxCallbackClient.receiveCtxResult(bean, "lookup");
+			}
+			else if (payload.getCtxBrokerUpdateBeanResult()!=null){
+				CtxEntityIdentifierBean bean = 
+						(CtxEntityIdentifierBean) payload.getCtxBrokerUpdateBeanResult();
+				
+				ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
+				ctxCallbackClient.receiveCtxResult(bean, "update");
+			}
+			else if (payload.getCtxBrokerUpdateAttributeBeanResult()!=null){
+				CtxAttributeIdentifierBean bean = 
+						(CtxAttributeIdentifierBean) payload.getCtxBrokerUpdateAttributeBeanResult();
+				
+				ICtxCallback ctxCallbackClient = getRequestingClient(returnStanza.getId());
+				ctxCallbackClient.receiveCtxResult(bean, "update attribute");
+			}
+			
+			else 
+				throw new Exception("The payload is not appropriate for the CtxBrokerCommCallback receiveResult method!");
+			
+			
+			
+			
 		}
 	}
 	

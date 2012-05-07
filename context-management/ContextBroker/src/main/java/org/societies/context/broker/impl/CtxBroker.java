@@ -25,10 +25,13 @@
 package org.societies.context.broker.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
+
+import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEventListener;
@@ -40,13 +43,27 @@ import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelBeanTranslator;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerBean;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerBeanResult;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerCreateAssociationBean;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerCreateAttributeBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerCreateEntityBean;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerLookupBean;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerRemoveBean;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerRetrieveBean;
+import org.societies.api.schema.context.contextmanagement.CtxBrokerUpdateBean;
+import org.societies.api.schema.context.model.CtxAssociationBean;
+import org.societies.api.schema.context.model.CtxAttributeBean;
+import org.societies.api.schema.context.model.CtxEntityBean;
+import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
+import org.societies.api.schema.context.model.CtxIdentifierBean;
 import org.societies.context.broker.api.ICtxCallback;
 import org.societies.context.broker.impl.comm.CtxBrokerClient;
 
@@ -477,24 +494,124 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker, I
 	}
 
 	@Override
-	public void receiveCtxResult(Object retObject) {
+	/*
+	 * TODO: Complete the action after the instantiation of the various types
+	 * */
+	public void receiveCtxResult(Object retObject, String type) throws DatatypeConfigurationException {
 
-		if (retObject.equals(CtxBrokerCreateEntityBean.class)){
-			CtxBrokerCreateEntityBean entityBean = (CtxBrokerCreateEntityBean) retObject;
-			CtxEntity ctxEntity = null;
+		if (retObject.equals(CtxEntityBean.class)){
+			CtxEntityBean entityBean = (CtxEntityBean) retObject;
 			
 			try {
-				CtxEntityIdentifier ctxEntityIdentifier = new CtxEntityIdentifier(entityBean.toString());				
-				ctxEntity = new CtxEntity(ctxEntityIdentifier);
+				//create the entity from the entityBean using the CtxModelBeanTranslator methods
+				CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+				CtxEntity ctxEntity = ctxBeanTranslator.fromCtxEntityBean(entityBean);
+				
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
+		}
+		
+		else if (retObject.equals(CtxAssociationBean.class)){
+			CtxAssociationBean associationBean = (CtxAssociationBean) retObject;
+			CtxAssociation ctxAssociation = null;
+			
+			try {
+				//create the association from the associationBean using the CtxModelBeanTranslator methods
+				CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+				ctxAssociation = ctxBeanTranslator.fromCtxAssociationBean(associationBean);
+				
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		else if (retObject.equals(CtxAttributeBean.class)){
+			CtxAttributeBean attributeBean = (CtxAttributeBean) retObject;
+			CtxAttribute attribute = null;
+			
+			try {
+				//create the attribute from the attributeBean using the CtxModelBeanTranslator methods
+				CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+				attribute = ctxBeanTranslator.fromCtxAttributeBean(attributeBean);
+				
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		else if (retObject.equals(ArrayList.class) && type.equals("lookup")){		
+			List<CtxIdentifierBean> bean = (ArrayList<CtxIdentifierBean>) retObject;
+			List<CtxIdentifier> lookups = new ArrayList<CtxIdentifier>();
+			try {
+				//lookup using the CtxModelBeanTranslator methods
+				CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+				if (!bean.isEmpty()) {
+					for (CtxIdentifierBean currentBean:bean){
+						lookups.add(ctxBeanTranslator.fromCtxIdentifierBean(currentBean));
+					}
+				}
 				
 			} catch (CtxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
-			
-			
 		}
+		
+		else if (retObject.equals(CtxEntityIdentifierBean.class) && type.equals("remove")){
+			CtxEntityIdentifierBean removeBean = (CtxEntityIdentifierBean) retObject;
+			CtxIdentifier remove = null;
+			try {
+				//remove from the removeBean using the CtxModelBeanTranslator methods
+				CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+				remove = ctxBeanTranslator.fromCtxIdentifierBean(removeBean);
+				
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		else if (retObject.equals(CtxIdentifierBean.class) && type.equals("retrieve")){
+			CtxIdentifierBean retrieveBean = (CtxIdentifierBean) retObject;
+			CtxIdentifier retrieve = null;
+			
+			try {
+				//retrieve from the retrieveBean using the CtxModelBeanTranslator methods
+				CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+				retrieve = ctxBeanTranslator.fromCtxIdentifierBean(retrieveBean);
+				
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		else if (retObject.equals(CtxEntityIdentifierBean.class) && type.equals("update")){
+			CtxEntityIdentifierBean updateBean = (CtxEntityIdentifierBean) retObject;
+			CtxIdentifier update = null;
+				
+			try {
+				//update from the updateBean using the CtxModelBeanTranslator methods
+				CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+				update = ctxBeanTranslator.fromCtxIdentifierBean(updateBean);
+				
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+	}
+
+	@Override
+	public void receiveCtxResult(Object retObject)
+			throws DatatypeConfigurationException {
+		// TODO Auto-generated method stub
 		
 	}
 }
