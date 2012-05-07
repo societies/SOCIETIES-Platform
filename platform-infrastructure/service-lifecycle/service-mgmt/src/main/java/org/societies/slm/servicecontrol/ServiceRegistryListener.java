@@ -303,20 +303,33 @@ public class ServiceRegistryListener implements BundleContextAware,
 	 */
 	private Service getServiceFromBundle(Bundle bundle) {
 		
-		if(log.isDebugEnabled()) log.debug("Obtaining Service that corresponds to a bundle: " + bundle.getSymbolicName());
+		if(log.isDebugEnabled()) log.debug("Obtaining Service that corresponds to a bundle: " + bundle.getSymbolicName() + " with Id " + bundle.getBundleId());
 		
 		// Preparing the search filter
 		Service filter = new Service();
+		filter.setAuthorSignature(null);
+		filter.setServiceDescription(null);
+		filter.setServiceEndpoint(null);
+		filter.setServiceName(null);
+		filter.setServiceStatus(null);
+		filter.setServiceType(null);
+		
 		ServiceResourceIdentifier filterIdentifier = new ServiceResourceIdentifier();
 		filterIdentifier.setServiceInstanceIdentifier(String.valueOf(bundle.getBundleId()));
 		filter.setServiceIdentifier(filterIdentifier);
 		
 		ServiceInstance filterInstance = new ServiceInstance();
+		filterInstance.setFullJid(null);
+		filterInstance.setXMPPNode(null);
 		
 		ServiceImplementation filterImplementation = new ServiceImplementation();
 		filterImplementation.setServiceVersion(bundle.getVersion().toString());
+		filterImplementation.setServiceNameSpace(null);
+		filterImplementation.setServiceProvider(null);
+		
 		filterInstance.setServiceImpl(filterImplementation);
 		filter.setServiceInstance(filterInstance);
+		
 		
 		List<Service> listServices;
 		try {
