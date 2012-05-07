@@ -44,6 +44,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxModelBeanTranslator;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
