@@ -44,6 +44,9 @@ public class CommsFwLogger implements MethodInterceptor {
 	 */
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
+		
+		LOG.info("invoke()");
+		
 		return null;
 	}
 

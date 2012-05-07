@@ -24,12 +24,15 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.test;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.LogEntry;
 import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLogAppender;
 
 /**
@@ -40,7 +43,7 @@ import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLogApp
  */
 public class PrivacyLogAppenderTest {
 
-	private static Logger log = LoggerFactory.getLogger(PrivacyLogAppenderTest.class.getSimpleName());
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyLogAppenderTest.class.getSimpleName());
 	
 	private PrivacyLogAppender privacyLogAppender;
 	
@@ -61,6 +64,14 @@ public class PrivacyLogAppenderTest {
 	}
 
 	@Test
-	public void testSomething() {
+	public void testLog() {
+		
+		LOG.debug("testLog()");
+		
+		LogEntry entry = mock(LogEntry.class);
+		boolean result;
+		
+		result = privacyLogAppender.log(entry);
+		assertTrue(result);
 	}
 }

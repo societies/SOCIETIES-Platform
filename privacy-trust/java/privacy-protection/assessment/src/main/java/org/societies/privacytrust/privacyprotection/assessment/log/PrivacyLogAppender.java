@@ -48,6 +48,9 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	 */
 	@Override
 	public boolean log(LogEntry entry) {
+		
+		LOG.debug("log()");
+
 		return true;
 	}
 
@@ -56,6 +59,9 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	 */
 	@Override
 	public boolean logCommsFw(IIdentity sender, IIdentity receiver, Object payload) {
+		
+		LOG.debug("logCommsFw()");
+
 		return true;
 	}
 
@@ -65,6 +71,9 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	@Override
 	public boolean logSN(String dataType, Date time, boolean sentToGroup, IIdentity sender,
 			IIdentity receiver, ChannelType channelId) {
+		
+		LOG.debug("logSN()");
+
 		return true;
 	}
 

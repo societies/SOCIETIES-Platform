@@ -42,11 +42,17 @@ public class PrivacyLog implements IPrivacyLog {
 
 	@Override
 	public LogEntry[] search(PrivacyLogFilter filter) {
+		
+		LOG.debug("search({})", filter);
+		
 		return null;
 	}
 	
 	@Override
 	public LogEntry[] getAll() {
+		
+		LOG.debug("getAll()");
+		
 		return null;
 	}
 }
