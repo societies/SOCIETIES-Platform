@@ -30,11 +30,22 @@ import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 public interface ITrustEvidenceRepository {
 
 	/**
+	 * Adds the specified {@link ITrustedEvidence} to the repository if it is not
+	 * already present. If the repository already contains the evidence, the call
+	 * leaves the repository unchanged and returns <code>false</code>. This
+	 * prevents duplicate evidence in the repository.
 	 * 
 	 * @param evidence
+	 *            the evidence to be added to the repository
+	 * @return <code>true</code> if the repository did not already contain the
+	 *         specified evidence; <code>false</code> otherwise
+	 * @throws NullPointerException
+	 *             if the specified evidence is <code>null</code>
 	 * @throws TrustEvidenceRepositoryException
+	 *             if the specified evidence is not already present but cannot be
+	 *             added to the repository
 	 */
-	public void addEvidence(final ITrustEvidence evidence) throws TrustEvidenceRepositoryException;
+	public boolean addEvidence(final ITrustEvidence evidence) throws TrustEvidenceRepositoryException;
 	
 	/**
 	 * 
