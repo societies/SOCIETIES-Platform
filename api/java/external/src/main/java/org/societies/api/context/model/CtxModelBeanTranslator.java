@@ -82,6 +82,7 @@ public final class CtxModelBeanTranslator {
 		CtxEntity entity=null;
 		//TODO: create the setters to form-up the entity
 		
+		
 		return entity;
 		
 	}
@@ -105,20 +106,7 @@ public final class CtxModelBeanTranslator {
 	
 	public CtxIdentifier fromCtxIdentifierBean(CtxIdentifierBean identifierBean) throws MalformedCtxIdentifierException {
 		
-		if (identifierBean.getClass().equals(CtxEntityIdentifierBean.class)) {
-			return new CtxEntityIdentifier(identifierBean.getString());
-		}
-		else if (identifierBean.getString().equals(CtxAttributeIdentifierBean.class)) {
-			//TODO: check
-			return new CtxAttributeIdentifier(new CtxEntityIdentifier(identifierBean.getString()), "TYPE", 0L);
-		}
-		else if (identifierBean.getString().equals(CtxAssociationIdentifierBean.class)) {
-			//TODO: check
-			return new CtxAssociationIdentifier(identifierBean.getString(), "TYPE", 0L);
-		}
-		else
-			return null;
-		
+		return CtxIdentifierFactory.getInstance().fromString(identifierBean.getString());
 	}
 	
 	public CtxAttributeBean fromCtxAttribute(CtxAttribute attr) throws DatatypeConfigurationException {
