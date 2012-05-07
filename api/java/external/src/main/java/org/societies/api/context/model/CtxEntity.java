@@ -170,6 +170,14 @@ public class CtxEntity extends CtxModelObject {
         attributes.add(attribute);
     }
 
+	/**	
+	 * TO BE REMOVED DO NOT USE
+	 */
+	@Deprecated
+	public void addAssociation(CtxAssociationIdentifier association) {
+		associations.add(association);
+	}
+	
 	/* TODO
 	@Override
 	public String toString() {
