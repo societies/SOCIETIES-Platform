@@ -35,9 +35,9 @@ import org.slf4j.LoggerFactory;
  * @author Mitja Vardjan
  *
  */
-public class CommsFwLogger implements MethodInterceptor {
+public class CommsFwAdvice implements MethodInterceptor {
 
-	private static Logger LOG = LoggerFactory.getLogger(CommsFwLogger.class);
+	private static Logger LOG = LoggerFactory.getLogger(CommsFwAdvice.class);
 	
 	/* (non-Javadoc)
 	 * @see MethodInterceptor#invoke(MethodInvocation)
