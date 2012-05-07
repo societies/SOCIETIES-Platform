@@ -31,11 +31,9 @@
 
 
 	<dependencies>
-		<!-- Android target version 2 assumes that Android JAR is retrieved from 
-			remote repository -->
 		<dependency>
-			<groupId>android</groupId>
-			<artifactId>android</artifactId>
+		        <groupId>com.google.android</groupId>
+            		<artifactId>android</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.android.platform</groupId>

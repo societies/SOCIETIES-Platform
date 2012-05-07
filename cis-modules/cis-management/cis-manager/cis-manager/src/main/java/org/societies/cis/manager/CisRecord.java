@@ -39,8 +39,12 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.societies.activity.ActivityFeed;
 import org.societies.api.cis.collaboration.IServiceSharingRecord;
@@ -55,6 +59,20 @@ public class CisRecord implements ICisOwned, ICisSubscribed{
 	
 	public String ownerCss;
 	public int membershipCriteria; // also know as mode
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private Long id;
+
+
+	public Long getId() {
+		return id;
+	}
+
+
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 
 
@@ -62,19 +80,21 @@ public class CisRecord implements ICisOwned, ICisSubscribed{
 	public String cisJID;
 	public String cisType;
 
-
+	public CisRecord(){}
 
 	/**
 	 * permaLink is a permanent URL to this CIS. A type of CIS homepage.
 	 */
 	@Column
 	public String permaLink;
+	@Transient
 	public Set<CisParticipant> membersCss; //this is currently kept at the CIS editor and just the pointer to the set is stored here 
 	@Column
 	private String password = "none";
 	@Column
 	private String host = "none";
-	@OneToMany(cascade=CascadeType.ALL)
+	//@OneToMany(cascade=CascadeType.ALL)
+	@Transient
 	public Set<IServiceSharingRecord> sharedServices; //this is currently kept at the CIS editor and just the pointer to the set is stored here
 	
 

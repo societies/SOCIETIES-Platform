@@ -133,7 +133,7 @@ public class Tools {
 	}
 
 	private void log(String message){
-		this.logging.info(this.getClass().getName()+" : "+message);
+		this.logging.debug(this.getClass().getName()+" : "+message);
 	}
 
 }

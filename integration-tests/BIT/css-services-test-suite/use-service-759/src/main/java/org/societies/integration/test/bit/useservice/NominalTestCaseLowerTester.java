@@ -17,6 +17,7 @@ import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.example.calculator.ICalc;
 import org.societies.integration.test.IntegrationTestUtils;
@@ -32,10 +33,6 @@ public class NominalTestCaseLowerTester {
 	 * URL of the JAR of the Calculator 3P service Bundle
 	 */
 	private static String serviceBundleUrl;
-	/**
-	 * URL endpoint of the Calculator 3P service
-	 */
-	private static String calculatorServiceEndPoint;
 	/**
 	 * Id of the Calculator 3P service
 	 */
@@ -71,8 +68,7 @@ public class NominalTestCaseLowerTester {
 		LOG.info("[#759] Prerequisite: The user is logged to the CSS");
 
 		serviceBundleUrl = "file:C:/Application/Virgo/repository/usr/Calculator.jar";
-		calculatorServiceEndPoint = "XCManager.societies.local/CalculatorService";
-		calculatorServiceId = new ServiceResourceIdentifier();
+		calculatorServiceId = null;
 	}
 
 	/**
@@ -92,9 +88,10 @@ public class NominalTestCaseLowerTester {
 			URL serviceUrl = new URL(serviceBundleUrl);
 			asyncinstallResult = TestCase759.serviceControl.installService(serviceUrl, "");
 			installResult = asyncinstallResult.get();
-			if (!installResult.equals(ServiceControlResult.SUCCESS)) {
-				throw new Exception("Can't install the service. Returned value: "+installResult.value());
+			if (!installResult.getMessage().equals(ResultMessage.SUCCESS)) {
+				throw new Exception("Can't install the service. Returned value: "+installResult.getMessage());
 			}
+			calculatorServiceId = installResult.getServiceId();
 		}
 		catch (ServiceDiscoveryException e) {
 			LOG.info("[#759] ServiceDiscoveryException", e);
@@ -130,35 +127,15 @@ public class NominalTestCaseLowerTester {
 		List<Service> services =  new ArrayList<Service>();
 
 		try {
-			// -- Search all local services
-			asyncServices = TestCase759.serviceDiscovery.getLocalServices();
-			services = asyncServices.get();
-
-			// -- Find the Calculator Service in these services
-			for(Service service : services) {
-				// - Service found
-				if (service.getServiceEndpoint().equals(calculatorServiceEndPoint)) {
-					// Mark the service as found
-					LOG.info("[#759] Calculator service found");
-
-					// Retrieve the Service Resource Identifier
-					calculatorServiceId = service.getServiceIdentifier();
-
-					// - If Calculator service not started yet: start it
-					if (!service.getServiceStatus().equals(ServiceStatus.STARTED)) {
-						// Start the service
-						LOG.info("[#759] Calculator service starting");
-						Future<ServiceControlResult> asyncStartResult = TestCase759.serviceControl.startService(calculatorServiceId);
-						ServiceControlResult startResult = asyncStartResult.get();
-						// Service can't be started
-						if (!startResult.value().equals("SUCCESS")) {
-							throw new Exception("Can't start the service. Returned value: "+startResult.value());
-						}
-						LOG.info("[#759] Calculator service started");
-					}
-					break;
-				}
+			// Start the service
+			LOG.info("[#759] Calculator service starting");
+			Future<ServiceControlResult> asyncStartResult = TestCase759.serviceControl.startService(calculatorServiceId);
+			ServiceControlResult startResult = asyncStartResult.get();
+			// Service can't be started
+			if (!startResult.getMessage().equals(ResultMessage.SUCCESS)) {
+				throw new Exception("Can't start the service. Returned value: "+startResult.getMessage());
 			}
+			LOG.info("[#759] Calculator service started");
 
 			// -- Test case is now ready to consume the service
 			// The injection of ICalc will launch the UpperTester

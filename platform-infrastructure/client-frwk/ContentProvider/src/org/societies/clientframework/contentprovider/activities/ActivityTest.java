@@ -1,7 +1,12 @@
 package org.societies.clientframework.contentprovider.activities;
 
-import org.societies.api.android.internal.model.CredentialTable;
-import org.societies.api.android.internal.model.ServiceTable;
+import java.util.List;
+
+import org.societies.api.android.internal.tables.CredentialTable;
+import org.societies.api.android.internal.tables.CssNodeTable;
+import org.societies.api.android.internal.tables.CssUtils;
+import org.societies.api.android.internal.tables.ServiceTable;
+import org.societies.api.internal.css.management.CSSNode;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -17,6 +22,13 @@ public class ActivityTest extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
+		
+		
+		Uri delUri = Uri.parse(CredentialTable.CREDENTIAL_DATA_URI);
+		int deleted = getContentResolver().delete(delUri, CredentialTable.KEY_USERNAME + " = ?", new String[]{"lucasimone"});
+		Log.v("ContentProvider", "deleted "+deleted + " element is "+delUri.toString() + " with username=lucasimone");
+		
+
 		
 		// Add credential
 		ContentValues data = new ContentValues();
@@ -51,10 +63,31 @@ public class ActivityTest extends Activity {
 		data.put(ServiceTable.KEY_VALUE, "value2");
 		data.put(ServiceTable.KEY_SERVICE, "service1");
 		result = getContentResolver().insert(serviceURI, data);
+		result = getContentResolver().insert(serviceURI, data);
 		
 		
 		Log.w("ContentProvider", "Uri is "+result.toString());
+		Uri nodeURI = Uri.parse(CssNodeTable.CSS_NODE_URI);
+		CSSNode node = new CSSNode();
+		node.setIdentity("luca");
+		node.setStatus(200);
+		node.setType(1);
+		result = getContentResolver().insert(nodeURI, CssUtils.convertFromCssNode(node));
+		Log.w("ContentProvider", "Node Uri is "+result.toString());
+		
+		
+		
+		
+	    
+		List<CSSNode> list = CssUtils.cursor2Node(getContentResolver().query(nodeURI, null, null, null, null));
+	    
+		for (CSSNode n: list){
+	    	
+	    	Log.v("ContentProvider" , "Android CSSNODE:" + n.getIdentity() + " stauts:"+n.getStatus() + " - type:"+n.getType());
+	    }
 
+	    
+	    
 		
 		
 		String[] projection = {CredentialTable.KEY_FIRSTNAME, CredentialTable.KEY_LASTNAME, CredentialTable.KEY_ID};
@@ -68,7 +101,8 @@ public class ActivityTest extends Activity {
 			Log.v("ContentProvider", "number of entries: "+c.getCount());
 			c.moveToFirst();
 			do{
-			Log.v("ContentProvider", "ID :+ "+c.getString(c.getColumnIndexOrThrow(CredentialTable.KEY_ID)) + " Full Name: "+ c.getString(c.getColumnIndexOrThrow(CredentialTable.KEY_FIRSTNAME)) +  " " + c.getString(c.getColumnIndexOrThrow(CredentialTable.KEY_LASTNAME)));
+			Log.v("ContentProvider", "ID :+ "+c.getString(c.getColumnIndexOrThrow(CredentialTable.KEY_ID)) + " Full Name: "+
+			c.getString(c.getColumnIndexOrThrow(CredentialTable.KEY_FIRSTNAME)) +  " " + c.getString(c.getColumnIndexOrThrow(CredentialTable.KEY_LASTNAME)));
 			}while(c.moveToNext());
 			
 		}

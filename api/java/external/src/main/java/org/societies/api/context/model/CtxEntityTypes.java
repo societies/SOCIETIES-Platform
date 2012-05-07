@@ -35,10 +35,6 @@ public class CtxEntityTypes {
 	/**
      * 
      */
-    public static final String CSS_OPERATOR = "cssOperator";
-	/**
-     * 
-     */
     public static final String PERSON = "person";
     
     /**
@@ -66,5 +62,8 @@ public class CtxEntityTypes {
      */
     public static final String PRIVACY_POLICY = "privacyPolicy";
     
-
+    /**
+     * 
+     */
+    public static final String SERVICE_PARAMETER = "serviceParameter";
 }

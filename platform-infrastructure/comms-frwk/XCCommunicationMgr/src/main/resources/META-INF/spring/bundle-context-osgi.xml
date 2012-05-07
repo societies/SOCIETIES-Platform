@@ -27,5 +27,6 @@
     	<prop key="host">societies.local</prop>
     	<prop key="subDomain">xcmanager.societies.local</prop>
     	<prop key="secretKey">password.societies.local</prop>
+    	<prop key="daNode">admin.societies.local</prop>
     </osgi-compendium:cm-properties>
 </beans>

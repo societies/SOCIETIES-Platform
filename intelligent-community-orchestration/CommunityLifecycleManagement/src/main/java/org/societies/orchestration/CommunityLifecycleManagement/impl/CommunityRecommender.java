@@ -593,16 +593,34 @@ public class CommunityRecommender //implements ICommCallback
         	//
 	        // cisManager.configureCis(linkedCss, potentiallyConfigurableCis.getCisId());
         }
-	    return new ArrayList<String>();
+	    return cissToCreateMetadata;
     }
 
     public HashMap<String, ArrayList<ArrayList<ICisRecord>>> getUserFeedbackOnConfiguration(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cissToConfigure) {
 	    HashMap<String, ArrayList<ArrayList<ICisRecord>>> realCissToConfigure = new HashMap<String, ArrayList<ArrayList<ICisRecord>>> ();
-	    String[] options = new String[cissToConfigure.size()];
+	    String[] options = new String[cissToConfigure.get("Configure CISs").size() + cissToConfigure.get("Merge CISs").size() + cissToConfigure.get("Split CISs").size()];
 	    options[0] = "options";
 	    for (int i = 0; i < cissToConfigure.get("Configure CISs").size(); i++) {
-			
-	    	options[i] = cissToConfigure.get("Configure CISs").get(i).get(1).toString();
+			ICisRecord thisCis = cissToConfigure.get("Configure CISs").get(i).get(0);
+			ICisRecord thisCisConfigured = cissToConfigure.get("Configure CISs").get(i).get(1);
+			//if (thisCis.getMembersList().size() < thisCisConfigured.getMembersList().size()) {
+			    //String members = "";
+			    //for (int m = 0; m < thisCisConfigured.getMembersList()) {
+			    //    if (!thisCis.getMembersList().contains(thisCisConfigured.getMembersList().get(m)))
+			    //        members.append(thisCisConfigured.getMembersList().get(m));
+			    //}
+				//options[i] = "Change the CIS " + thisCis.getId() + thisCis.getName() + " to add the following members: " + members;
+			//}
+			//if (thisCis.getMembersList().size() > thisCisConfigured.getMembersList().size()) {
+		        //String members = "";
+		        //for (int m = 0; m < thisCis.getMembersList()) {
+		        //    if (!thisCisConfigured.getMembersList().contains(thisCis.getMembersList().get(m)))
+		        //        members.append(thisCis.getMembersList().get(m));
+		        //}
+			    //options[i] = "Change the CIS " + thisCis.getId() + thisCis.getName() + " to remove the following members: " + members;
+		    //}
+			//if (thisCis.getMembersList().size() == thisCisConfigured.getMembersList().size())
+				options[i] = cissToConfigure.get("Configure CISs").get(i).get(1).toString();
 		}
         for (int i = 0; i < cissToConfigure.get("Merge CISs").size(); i++) {
 			

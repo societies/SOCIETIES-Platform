@@ -26,26 +26,30 @@
 package org.societies.useragent.monitoring;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationIdentifier;
+import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.personalisation.model.IAction;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 public class ContextCommunicator {
 
@@ -62,7 +66,9 @@ public class ContextCommunicator {
 
 	public void updateHistory(IIdentity owner, IAction action){
 		//check cache first for ctxAttrIdentifier to update
-		String key = action.getServiceID().toString()+action.getparameterName();
+		ServiceResourceIdentifier serviceID = action.getServiceID();
+		String parameterName = action.getparameterName();
+		String key = serviceID+parameterName;
 		if(mappings.containsKey(key)){  //already has service attribute
 			LOG.info("Mapping exists for key: "+key);
 			//update attribute
@@ -72,7 +78,6 @@ public class ContextCommunicator {
 			} catch (CtxException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}else{
@@ -80,73 +85,96 @@ public class ContextCommunicator {
 			//check context second for ctx attribute to update
 			try {
 				//get cssOperator (Person)
-				//Future<IndividualCtxEntity> cssOperator = ctxBroker.retrieveCssOperator();
-				Future<List<CtxEntityIdentifier>> futureServiceEntities = ctxBroker.lookupEntities(
-						CtxEntityTypes.SERVICE, 
-						CtxAttributeTypes.ID, 
-						action.getServiceID(), 
-						action.getServiceID());
-				List<CtxEntityIdentifier> serviceEntities = futureServiceEntities.get();
-				if(serviceEntities.size() > 0){  //service entity with matching serviceID found
-					CtxEntityIdentifier serviceEntityId = serviceEntities.get(0);
-					Future<CtxModelObject> futureServiceEntity = ctxBroker.retrieve(serviceEntityId);
-					CtxEntity serviceEntity = (CtxEntity)futureServiceEntity.get();
-					Set<CtxAttribute> serviceAttributes = serviceEntity.getAttributes();
+				IndividualCtxEntity cssOperator = ctxBroker.retrieveCssOperator().get();
+				LOG.info("Retrieved PERSON entity");
+
+				//get USES_SERVICE associations for this person entity
+				Set<CtxAssociationIdentifier> usesServiceAssocIDs = cssOperator.getAssociations(CtxAssociationTypes.USES_SERVICE);
+				if(usesServiceAssocIDs.size() > 0){  //USES_SERVICE associations found!
+					LOG.info("Found USES_SERVICE association under PERSON entity");
+					CtxAssociation usesServiceAssoc = (CtxAssociation)ctxBroker.retrieve(usesServiceAssocIDs.iterator().next()).get();
 					
-					//search for param attribute under entity and update
-					boolean found = false;
-					for(CtxAttribute nextAttr: serviceAttributes){
-						if(nextAttr.getType().equals(action.getparameterName())){
-							found = true;
-							ctxBroker.updateAttribute(nextAttr.getId(), SerialisationHelper.serialise(action));
-							
-							//update mappings with new key and CtxAttrIdentifier
-							mappings.put(key, nextAttr.getId());
-						}
-					}
-					
-					//create new attribute if no matching already exists
-					if(!found){
-						//create new attribute for action with type action.getParameterName()
-						Future<CtxAttribute> futureParamAttr = ctxBroker.createAttribute(serviceEntityId, action.getparameterName());
-						CtxAttribute newParamAttr = futureParamAttr.get();
-						byte[] paramBlob = SerialisationHelper.serialise(action);
-						newParamAttr.setBinaryValue(paramBlob);
+					//Get SERVICE entities under USES_SERVICE association
+					Set<CtxEntityIdentifier> serviceEntityIDs = usesServiceAssoc.getChildEntities();
+										
+					//find SERVICE entity with correct ID
+					List<CtxEntityIdentifier> serviceEntityIDsList = new ArrayList<CtxEntityIdentifier>(serviceEntityIDs);
+					List<CtxEntityIdentifier> returnedServiceIDs = ctxBroker.lookupEntities(serviceEntityIDsList, CtxAttributeTypes.ID, serviceID).get();
+					if(returnedServiceIDs.size() > 0){  //SERVICE entity with this serviceID found!
+						LOG.info("Found SERVICE entity with serviceID: "+serviceID);
 						
-						//set history tuples on param attribute
-						ctxBroker.setHistoryTuples(newParamAttr.getId(), snpshtMgr.getSnapshot(newParamAttr.getId()));
-
-						//update mappings with new key and CtxAttrIdentifier
-						mappings.put(key, newParamAttr.getId());
+						CtxEntity serviceEntity = (CtxEntity)ctxBroker.retrieve(returnedServiceIDs.get(0)).get();
+						
+						//Get HAS_PARAMETER associations for this service entity
+						Set<CtxAssociationIdentifier> hasParamAssocIDs = serviceEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETER);
+						if(hasParamAssocIDs.size() > 0){  //HAS_PARAMETER associations found!
+							LOG.info("Found HAS_PARAMETER association under SERVICE entity");
+							CtxAssociation hasParamAssoc = (CtxAssociation)ctxBroker.retrieve(hasParamAssocIDs.iterator().next()).get();
+							
+							//Get SERVICE_PARAMETER entities under HAS_PARAMETER association
+							Set<CtxEntityIdentifier> paramEntityIDs = hasParamAssoc.getChildEntities();
+							
+							//find SERVICE_PARAMETER entity with correct name
+							List<CtxEntityIdentifier> paramEntityIDsList = new ArrayList<CtxEntityIdentifier>(paramEntityIDs);
+							List<CtxEntityIdentifier> returnedParamIDs = ctxBroker.lookupEntities(paramEntityIDsList, CtxAttributeTypes.PARAMETER_NAME, parameterName).get();
+							if(returnedParamIDs.size() > 0){  //SERVICE_PARAMETER entity with this name found!
+								LOG.info("Found SERVICE_PARAMETER entity with parameterName: "+parameterName);
+								CtxEntity parameterEntity = (CtxEntity)ctxBroker.retrieve(returnedParamIDs.get(0)).get();
+								
+								//Get LAST_ACTION attribute
+								Set<CtxAttribute> returnedAttributes = parameterEntity.getAttributes(CtxAttributeTypes.LAST_ACTION);
+								CtxAttribute lastActionAttr = returnedAttributes.iterator().next();
+								
+								//update LAST_ACTION value
+								LOG.info("Updating LAST_ACTION attribute with action");
+								ctxBroker.updateAttribute(lastActionAttr.getId(), SerialisationHelper.serialise(action));
+								
+								//update mappings
+								LOG.info("Updating mappings table with key: "+key+" and attributeID: "+lastActionAttr.getId());
+								mappings.put(key, lastActionAttr.getId());
+								
+							}else{  //no SERVICE_PARAMETER entity found :(
+								
+								//CREATING NEW SERVICE_PARAMETER
+								//setting as child of HAS_PARAMETER association
+								//adding PARAMETER_NAME attribute
+								//adding LAST_ACTION attribute
+								//adding to mappings with key
+								createServiceParameter(key, hasParamAssoc, parameterName, action);
+							}
+							
+						}else{  //no HAS_PARAMETER associations found :(
+							
+							//creating new HAS_PARAMETER association and setting SERVICE entity as parent
+							CtxAssociation newHasParamAssoc = createHasParameterAssociation(serviceEntity);
+							//creating new SERVICE_PARAMETER entity, setting as child of HAS_PARAMETER association
+							//adding ID and PARAMETER_NAME attributes
+							createServiceParameter(key, newHasParamAssoc, parameterName, action);
+							
+						}
+						
+					}else{  //no SERVICE entity with this serviceID found :(
+						
+						//creating new SERVICE entity
+						CtxEntity newServiceEntity = createServiceEntity(usesServiceAssoc, serviceID);
+						//creating new HAS_PARAMETER association and setting service entity as parent
+						CtxAssociation newHasParamAssoc = createHasParameterAssociation(newServiceEntity);
+						//creating new SERVICE_PARAMETER entity, setting as child of HAS_PARAMETER association
+						//adding ID and PARAMETER_NAME attributes
+						createServiceParameter(key, newHasParamAssoc, parameterName, action);
 					}
-
-				}else{  //no entity yet exists for this serviceID
-					LOG.info("No entity exists yet for service with serviceId: "+action.getServiceID()+" - CREATING");
-					//create new service entity with type CtxEntityTypes.SERVICE
-					Future<CtxEntity> futureServiceEntity = ctxBroker.createEntity(CtxEntityTypes.SERVICE);
-					CtxEntity newServiceEntity = futureServiceEntity.get();
-
-					//create new ID attribute with type: CtxAttributeTypes.ID and value: action.getServiceID
-					LOG.info("Creating new ID attribute with value "+action.getServiceID()+" under new service entity");
-					Future<CtxAttribute> futureIDAttr = ctxBroker.createAttribute(newServiceEntity.getId(), CtxAttributeTypes.ID);
-					CtxAttribute newIDAttr = futureIDAttr.get();
-					byte[] idBlob = SerialisationHelper.serialise(action.getServiceID());
-					newIDAttr.setBinaryValue(idBlob);
-
-					//create new attribute for action with type action.getParameterName()
-					LOG.info("Creating new parameter attribute with value "+action+" under new service entity");
-					Future<CtxAttribute> futureParamAttr = ctxBroker.createAttribute(newServiceEntity.getId(), action.getparameterName());
-					CtxAttribute newParamAttr = futureParamAttr.get();
-					byte[] paramBlob = SerialisationHelper.serialise(action);
-					newParamAttr.setBinaryValue(paramBlob);
-
-					//set history tuples on param attribute
-					LOG.info("Setting HoC tuples for new parameter attribute");
-					ctxBroker.setHistoryTuples(newParamAttr.getId(), snpshtMgr.getSnapshot(newParamAttr.getId()));
-
-					//update mappings with new key and CtxAttrIdentifier
-					LOG.info("Adding new mapping to mapping table -> key: "+key+" CtxAttributeIdentifier: "+newParamAttr.getId());
-					mappings.put(key, newParamAttr.getId());
+					
+				}else{  //no USES_SERVICE associations found :(
+					
+					//creating new USE_SERVICE ASSOCATION
+					CtxAssociation newUsesServiceAssoc = createUsesServiceAssociation(cssOperator);
+					//creating new SERVICE entity
+					CtxEntity newServiceEntity = createServiceEntity(newUsesServiceAssoc, serviceID);
+					//creating new HAS_PARAMETER association and setting service entity as parent
+					CtxAssociation newHasParamAssoc = createHasParameterAssociation(newServiceEntity);
+					//creating new SERVICE_PARAMETER entity, setting as child of HAS_PARAMETER association
+					//adding ID and PARAMETER_NAME attributes
+					createServiceParameter(key, newHasParamAssoc, parameterName, action);
 				}
 
 			} catch (InterruptedException e) {
@@ -158,6 +186,113 @@ public class ContextCommunicator {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	private CtxAssociation createUsesServiceAssociation(CtxEntity parent){
+		CtxAssociation usesServiceAssoc = null;
+		try {
+			//create USES_SERVICE association
+			LOG.info("Creating USE_SERVICE association with parent: "+parent.getType());
+			usesServiceAssoc = ctxBroker.createAssociation(CtxAssociationTypes.USES_SERVICE).get();
+			
+			//set parent entity
+			usesServiceAssoc.setParentEntity(parent.getId());
+			ctxBroker.update(usesServiceAssoc);
+			
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		} catch (CtxException e) {
+			e.printStackTrace();
+		}
+		return usesServiceAssoc;
+	}
+	
+	private CtxEntity createServiceEntity(CtxAssociation usesServiceAssoc, ServiceResourceIdentifier serviceID){
+		CtxEntity serviceEntity = null;
+		try {
+			//create new SERVICE entity
+			LOG.info("Creating SERVICE entity and adding as child to association: "+usesServiceAssoc.getType());
+			serviceEntity = ctxBroker.createEntity(CtxEntityTypes.SERVICE).get();
+			
+			//add as child to USES_SERVICE association
+			usesServiceAssoc.addChildEntity(serviceEntity.getId());
+			ctxBroker.update(usesServiceAssoc);
+			
+			//create new ID attribute, update and add to entity
+			LOG.info("Creating ID attribute under SERVICE entity");
+			CtxAttribute newIDAttr = ctxBroker.createAttribute(serviceEntity.getId(), CtxAttributeTypes.ID).get();
+			LOG.info("Setting value of ID attribute to: "+serviceID);
+			ctxBroker.updateAttribute(newIDAttr.getId(), SerialisationHelper.serialise(serviceID));
+			
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		} catch (CtxException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return serviceEntity;
+	}
+	
+	private CtxAssociation createHasParameterAssociation(CtxEntity parentEntity){
+		CtxAssociation hasParameterAssoc = null;
+		try {
+			//create new HAS_PARAMETER association
+			LOG.info("Creating HAS_PARAMETER association with parent: "+parentEntity.getType());
+			hasParameterAssoc = ctxBroker.createAssociation(CtxAssociationTypes.HAS_PARAMETER).get();
+			
+			//set parent entity
+			hasParameterAssoc.setParentEntity(parentEntity.getId());
+			ctxBroker.update(hasParameterAssoc);
+			
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		} catch (CtxException e) {
+			e.printStackTrace();
+		}
+		return hasParameterAssoc;
+	}
+	
+	private void createServiceParameter(String key, CtxAssociation hasParameterAssoc, String parameterName, IAction lastAction){
+		try {
+			//create new SERVICE_PARAMETER entity
+			LOG.info("Creating SERVICE_PARAMETER entity and adding as child to association: "+hasParameterAssoc.getType());
+			CtxEntity serviceParamEntity = ctxBroker.createEntity(CtxEntityTypes.SERVICE_PARAMETER).get();
+			
+			//add as child to HAS_PARAMETER association
+			hasParameterAssoc.addChildEntity(serviceParamEntity.getId());	
+			ctxBroker.update(hasParameterAssoc);
+			
+			//create new PARAMETER_NAME attribute, update and add to entity
+			LOG.info("Creating PARAMETER_NAME attribute under SERVICE_PARAMETER entity with value: "+parameterName);
+			CtxAttribute newParamAttr = ctxBroker.createAttribute(serviceParamEntity.getId(), CtxAttributeTypes.PARAMETER_NAME).get();
+			ctxBroker.updateAttribute(newParamAttr.getId(), parameterName);
+			
+			//create new LAST_ACTION attribute, update and add to entity
+			LOG.info("Creating LAST_ACTION attribute under SERVICE_PARAMETER entity with value: "+lastAction);
+			CtxAttribute newLastActionAttr = ctxBroker.createAttribute(serviceParamEntity.getId(), CtxAttributeTypes.LAST_ACTION).get();
+			ctxBroker.updateAttribute(newLastActionAttr.getId(), SerialisationHelper.serialise(lastAction));
+			
+			//update mappings
+			LOG.info("Updating mappings table with key: "+key+" and attributeID: "+newLastActionAttr.getId());
+			mappings.put(key, newLastActionAttr.getId());
+			
+		} catch (CtxException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 

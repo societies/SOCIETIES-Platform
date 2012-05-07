@@ -24,12 +24,12 @@
     <context:annotation-config />
     <tx:annotation-driven />
 <!--     <mockito:mock id="cisCommMgrFactory" class="org.societies.comm.xmpp.xc.impl.CISCommunicationMgrFactoryImpl" /> -->
-    <bean id="cisCommMgrFactory" class="org.mockito.Mockito" factory-method="mock"> 
+<!--     <bean id="cisCommMgrFactory" class="org.mockito.Mockito" factory-method="mock"> 
     	<constructor-arg value="org.societies.api.internal.comm.ICISCommunicationMgrFactory" /> 
 	</bean> 
 	<bean id="commMgr" class="org.mockito.Mockito" factory-method="mock">
 	    <constructor-arg value="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
-	</bean>
+	</bean> -->
     <bean id="ServiceRegPropConfig"
         class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" >
 
@@ -44,18 +44,12 @@
     </bean>
 
 
-    <bean id="cisManagerUnderTest" class="org.societies.cis.manager.CisManager" >
-        <property name="sessionFactory" ref="sessionFactory" />
-        <constructor-arg><ref bean="cisCommMgrFactory"/></constructor-arg>
-        <constructor-arg><ref bean="commMgr"/></constructor-arg>
-    </bean>
+
     
     
     <tx:annotation-driven transaction-manager="transactionManager" />
 
-    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager" >
-        <property name="sessionFactory" ref="sessionFactory" />
-    </bean>
+
     <bean
         id="sessionFactory"
         class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean" >
@@ -63,15 +57,18 @@
         <property name="dataSource" ref="dataSource" />
         <property name="annotatedClasses" >
             <list>
-                <value>org.societies.activity.ActivityFeed</value>
+                <value>org.societies.cis.manager.CisEditor</value>
+                <value>org.societies.cis.manager.CisRecord</value>
+                <value>org.societies.cis.manager.CisParticipant</value>
                 <value>org.societies.activity.model.Activity</value>
+                <value>org.societies.activity.ActivityFeed</value>
             </list>
         </property>
 
         <property name="annotatedPackages" >
 
             <list>
-                <value>org.societies.activity.model</value>
+                <value>org.societies.cis.manager</value>
             </list>
         </property>
 
@@ -84,7 +81,7 @@
             </props>
         </property>
     </bean>
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+    <bean id="dataSource" class="org.societies.datasource.SOCIETIESDataSource"
         destroy-method="close"
         init-method="createDataSource" >
         
@@ -95,4 +92,13 @@
         <property name="initialSize" value="2" />
         <property name="maxActive" value="5" />
     </bean>
+        <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager" >
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="cisManagerUnderTest" class="org.societies.cis.manager.CisManager" lazy-init="true" depends-on="sessionFactory">
+       <property name="sessionFactory" ref="sessionFactory" />
+       <!--    <constructor-arg><ref bean="cisCommMgrFactory"/></constructor-arg>
+        <constructor-arg><ref bean="commMgr"/></constructor-arg>-->
+    </bean>
+    
 </beans>

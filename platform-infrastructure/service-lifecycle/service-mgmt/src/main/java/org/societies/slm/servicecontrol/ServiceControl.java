@@ -25,9 +25,12 @@
 package org.societies.slm.servicecontrol;
 
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -36,9 +39,13 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
+import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
@@ -61,6 +68,10 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	private ICommManager commMngr;
 	private IServiceControlRemote serviceControlRemote;
 
+	private static HashMap<Long,BlockingQueue<Service>> installServiceMap = new HashMap<Long,BlockingQueue<Service>>();
+	
+	private final long TIMEOUT = 5;
+	
 	public IServiceRegistry getServiceReg() {
 		return serviceReg;
 	}
@@ -68,7 +79,6 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	public void setServiceReg(IServiceRegistry serviceReg) {
 		this.serviceReg = serviceReg;
 	}
-
 
 	public void setCommMngr(ICommManager commMngr) {
 		this.commMngr = commMngr;
@@ -86,7 +96,6 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		return serviceControlRemote;
 	}
 	
-	
 	@Override
 	public void setBundleContext(BundleContext bundleContext) {
 		
@@ -95,12 +104,15 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		if(logger.isDebugEnabled()) logger.debug("BundleContextSet");
 	}
 
-
+	
 	@Override
 	public Future<ServiceControlResult> startService(ServiceResourceIdentifier serviceId)
 			throws ServiceControlException {
 		
 		if(logger.isDebugEnabled()) logger.debug("Service Management: startService method");
+		
+		ServiceControlResult returnResult = new ServiceControlResult();
+		returnResult.setServiceId(serviceId);
 		
 		try{
 					
@@ -130,7 +142,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					if(logger.isDebugEnabled())
 						logger.debug("Error with communication to remote client");
 					
-					return new AsyncResult<ServiceControlResult>(ServiceControlResult.COMMUNICATION_ERROR);
+					returnResult.setMessage(ResultMessage.COMMUNICATION_ERROR);
+					return new AsyncResult<ServiceControlResult>(returnResult);
 				} else{
 					if(logger.isDebugEnabled())
 						logger.debug("Result of operation was: " + result);
@@ -152,7 +165,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			// Check to see if we actually got a service
 			if(service == null){
 				if(logger.isDebugEnabled()) logger.debug("Service represented by " + serviceId + " does not exist in SOCIETIES Registry");
-				return new AsyncResult<ServiceControlResult>(ServiceControlResult.SERVICE_NOT_FOUND);
+				
+				returnResult.setMessage(ResultMessage.SERVICE_NOT_FOUND);
+				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
 			
 			// Next step, we obtain the bundle that corresponds to this service			
@@ -161,7 +176,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			// And we check if it isn't null!
 			if(serviceBundle == null){
 				if(logger.isDebugEnabled()) logger.debug("Service Bundle obtained from " + service.getServiceName() + " couldn't be found");
-				return new AsyncResult<ServiceControlResult>(ServiceControlResult.BUNDLE_NOT_FOUND);			
+				
+				returnResult.setMessage(ResultMessage.BUNDLE_NOT_FOUND);
+				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
 			
 			// Now we need to start the bundle
@@ -175,11 +192,14 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			if(serviceBundle.getState() == Bundle.ACTIVE ){
 				logger.info("Service " + service.getServiceName() + " has been started.");
-				return new AsyncResult<ServiceControlResult>(ServiceControlResult.SUCCESS);
+				
+				returnResult.setMessage(ResultMessage.SUCCESS);
+				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
 			else{
 				logger.info("Service " + service.getServiceName() + " has NOT been started successfully.");
-				return new AsyncResult<ServiceControlResult>(ServiceControlResult.OSGI_PROBLEM);
+				returnResult.setMessage(ResultMessage.OSGI_PROBLEM);
+				return new AsyncResult<ServiceControlResult>(returnResult);
 			}						
 		} catch(Exception ex){
 			logger.error("Exception occured while starting Service: " + ex.getMessage());
@@ -194,6 +214,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			throws ServiceControlException {
 		
 		if(logger.isDebugEnabled()) logger.debug("Service Management: stopService method");
+		
+		ServiceControlResult returnResult = new ServiceControlResult();
+		returnResult.setServiceId(serviceId);
 		
 		try{
 			
@@ -223,7 +246,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					if(logger.isDebugEnabled())
 						logger.debug("Error with communication to remote client");
 					
-					return new AsyncResult<ServiceControlResult>(ServiceControlResult.COMMUNICATION_ERROR);
+					returnResult.setMessage(ResultMessage.COMMUNICATION_ERROR);
+					return new AsyncResult<ServiceControlResult>(returnResult);
+
 				} else{
 					if(logger.isDebugEnabled())
 						logger.debug("Result of operation was: " + result);
@@ -245,8 +270,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			// Check to see if we actually got a service
 			if(service == null){
 				if(logger.isDebugEnabled()) logger.debug("Service represented by " + serviceId + " does not exist in SOCIETIES Registry");
-				return new AsyncResult<ServiceControlResult>(ServiceControlResult.SERVICE_NOT_FOUND);
-			}
+				returnResult.setMessage(ResultMessage.SERVICE_NOT_FOUND);
+				return new AsyncResult<ServiceControlResult>(returnResult);			}
 			
 			// Next step, we obtain the bundle that corresponds to this service			
 			Bundle serviceBundle = getBundleFromService(service);
@@ -254,7 +279,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			// And we check if it isn't null!
 			if(serviceBundle == null){
 				if(logger.isDebugEnabled()) logger.debug("Service Bundle obtained from " + service.getServiceName() + " couldn't be found");
-				return new AsyncResult<ServiceControlResult>(ServiceControlResult.BUNDLE_NOT_FOUND);			
+				returnResult.setMessage(ResultMessage.BUNDLE_NOT_FOUND);
+				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
 
 			
@@ -269,11 +295,13 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			if(serviceBundle.getState() == Bundle.RESOLVED ){
 				logger.info("Service " + service.getServiceName() + " has been stopped.");
-				return new AsyncResult<ServiceControlResult>(ServiceControlResult.SUCCESS);
+				returnResult.setMessage(ResultMessage.SUCCESS);
+				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
 			else{
 				logger.info("Service " + service.getServiceName() + " has NOT been stopped successfully.");
-				return new AsyncResult<ServiceControlResult>(ServiceControlResult.OSGI_PROBLEM);
+				returnResult.setMessage(ResultMessage.OSGI_PROBLEM);
+				return new AsyncResult<ServiceControlResult>(returnResult);
 			}	
 			
 		} catch(Exception ex){
@@ -288,8 +316,11 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	public Future<ServiceControlResult> installService(URL bundleLocation)
 			throws ServiceControlException {
 		
-		if(logger.isDebugEnabled()) logger.debug("Service Management: installService method");
-				
+		if(logger.isDebugEnabled()) logger.debug("Service Management: installService method, local node");
+		
+		ServiceControlResult returnResult = new ServiceControlResult();
+		returnResult.setServiceId(null);
+		
 		try {
 			logger.info("Installing service bundle from location: " + bundleLocation);
 			Bundle newBundle = bundleContext.installBundle(bundleLocation.toString());
@@ -299,6 +330,14 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				logger.debug("Service bundle "+newBundle.getSymbolicName() +" is in state: " + getStateName(newBundle.getState()));
 			}
 			
+			//Before we start the bundle we prepare the entry on the hashmap
+			BlockingQueue<Service> idList = new ArrayBlockingQueue<Service>(1);
+			Long bundleId = new Long(newBundle.getBundleId());
+			
+			synchronized(this){		
+				installServiceMap.put(bundleId, idList);
+			}
+						
 			//Now we need to start the bundle so that its services are registered with the OSGI Registry, and then SOCIETIES Registry
 			if(logger.isDebugEnabled())
 				logger.debug("Attempting to start bundle: " + newBundle.getSymbolicName() );
@@ -307,11 +346,36 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			if(newBundle.getState() == Bundle.ACTIVE ){
 				logger.info("Bundle " + newBundle.getSymbolicName() + " has been installed and activated.");
-				return new AsyncResult<ServiceControlResult>(ServiceControlResult.SUCCESS);
+				
+				// Now we need to search the service registry for the list of services and find the correct one!
+				if(logger.isDebugEnabled()) logger.debug("Now searching for the service installed by the new bundle");
+				
+				//TODO Something to assure the other function is called first...
+				Service service = idList.poll(TIMEOUT, TimeUnit.SECONDS);
+				
+				synchronized(this){
+					installServiceMap.remove(bundleId);
+				}
+				
+				//Service service = getServiceFromBundle(newBundle);
+				
+				if(service != null){
+					if(logger.isDebugEnabled()) logger.debug("Found service: " + service.getServiceName() + " so install was success!");
+					returnResult.setServiceId(service.getServiceIdentifier());
+					returnResult.setMessage(ResultMessage.SUCCESS);
+					return new AsyncResult<ServiceControlResult>(returnResult);
+				} else{
+					if(logger.isDebugEnabled()) logger.debug("Couldn't find the service!");
+					returnResult.setMessage(ResultMessage.SERVICE_NOT_FOUND);
+					return new AsyncResult<ServiceControlResult>(returnResult);
+				}
+				
 			}
 			else{
 				logger.info("Bundle " + newBundle.getSymbolicName()  + " has been installed, but not activated.");
-				return new AsyncResult<ServiceControlResult>(ServiceControlResult.OSGI_PROBLEM);
+				
+				returnResult.setMessage(ResultMessage.OSGI_PROBLEM);
+				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
 			
 		} catch (Exception ex) {
@@ -325,8 +389,11 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	public Future<ServiceControlResult> installService(URL bundleLocation, IIdentity node)
 			throws ServiceControlException {
 		
-		if(logger.isDebugEnabled()) logger.debug("Service Management: installService method, on another node");
-				
+		if(logger.isDebugEnabled()) logger.debug("Service Management: installService method, on a given node, Identity input");
+		
+		ServiceControlResult returnResult = new ServiceControlResult();
+		returnResult.setServiceId(null);
+		
 		try {
 			
 			// Our first task is to verify if we're installing in the right node..
@@ -357,7 +424,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					if(logger.isDebugEnabled())
 						logger.debug("Error with communication to remote client");
 					
-					return new AsyncResult<ServiceControlResult>(ServiceControlResult.COMMUNICATION_ERROR);
+					returnResult.setMessage(ResultMessage.COMMUNICATION_ERROR);
+					return new AsyncResult<ServiceControlResult>(returnResult);
 					
 				} else{
 					if(logger.isDebugEnabled())
@@ -366,31 +434,19 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					return new AsyncResult<ServiceControlResult>(result);
 				}
 				
+			} else
+			{
+				if(logger.isDebugEnabled())
+					logger.debug("It's the local node, installing...");
+				
+				Future<ServiceControlResult> asyncResult = null;
+				
+				asyncResult = installService(bundleLocation);
+				ServiceControlResult result = asyncResult.get();
+				
+				return new AsyncResult<ServiceControlResult>(result);
 			}
-			
-			logger.info("Installing service bundle from location: " + bundleLocation);
-			Bundle newBundle = bundleContext.installBundle(bundleLocation.toString());
-			
-			if(logger.isDebugEnabled()){
-				logger.debug("Service bundle "+newBundle.getSymbolicName() +" has been installed with id: " + newBundle.getBundleId());
-				logger.debug("Service bundle "+newBundle.getSymbolicName() +" is in state: " + getStateName(newBundle.getState()));
-			}
-			
-			//Now we need to start the bundle so that its services are registered with the OSGI Registry, and then SOCIETIES Registry
-			if(logger.isDebugEnabled())
-				logger.debug("Attempting to start bundle: " + newBundle.getSymbolicName() );
-			
-			newBundle.start();
-			
-			if(newBundle.getState() == Bundle.ACTIVE ){
-				logger.info("Bundle " + newBundle.getSymbolicName() + " has been installed and activated.");
-				return new AsyncResult<ServiceControlResult>(ServiceControlResult.SUCCESS);
-			}
-			else{
-				logger.info("Bundle " + newBundle.getSymbolicName()  + " has been installed, but not activated.");
-				return new AsyncResult<ServiceControlResult>(ServiceControlResult.OSGI_PROBLEM);
-			}
-			
+					
 		} catch (Exception ex) {
 			logger.error("Exception while attempting to install a bundle: " + ex.getMessage());
 			throw new ServiceControlException("Exception while attempting to install a bundle.", ex);
@@ -402,7 +458,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	public Future<ServiceControlResult> installService(URL bundleLocation, String nodeJid)
 			throws ServiceControlException {
 		
-		if(logger.isDebugEnabled()) logger.debug("Service Management: installService method, on another node");
+		if(logger.isDebugEnabled()) logger.debug("Service Management: installService method, on given node, String input");
 				
 		try {
 			
@@ -433,6 +489,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		
 		if(logger.isDebugEnabled()) logger.debug("Service Management: uninstallService method");
 		
+		ServiceControlResult returnResult = new ServiceControlResult();
+		returnResult.setServiceId(serviceId);
+		
 		try{
 			
 			// Our first task is to determine whether the service we're searching for is local or remote
@@ -461,7 +520,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					if(logger.isDebugEnabled())
 						logger.debug("Error with communication to remote client");
 					
-					return new AsyncResult<ServiceControlResult>(ServiceControlResult.COMMUNICATION_ERROR);
+					returnResult.setMessage(ResultMessage.COMMUNICATION_ERROR);
+					return new AsyncResult<ServiceControlResult>(returnResult);
 				} else{
 					if(logger.isDebugEnabled())
 						logger.debug("Result of operation was: " + result);
@@ -483,7 +543,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			// Check to see if we actually got a service
 			if(service == null){
 				if(logger.isDebugEnabled()) logger.debug("Service represented by " + serviceId + " does not exist in SOCIETIES Registry");
-				return new AsyncResult<ServiceControlResult>(ServiceControlResult.SERVICE_NOT_FOUND);
+				
+				returnResult.setMessage(ResultMessage.SERVICE_NOT_FOUND);
+				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
 			
 			// Next step, we obtain the bundle that corresponds to this service			
@@ -492,31 +554,28 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			// And we check if it isn't null!
 			if(serviceBundle == null){
 				if(logger.isDebugEnabled()) logger.debug("Service Bundle obtained from " + service.getServiceName() + " couldn't be found");
-				return new AsyncResult<ServiceControlResult>(ServiceControlResult.BUNDLE_NOT_FOUND);			
+				
+				returnResult.setMessage(ResultMessage.BUNDLE_NOT_FOUND);
+				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
 			
 			logger.info("Uninstalling service " + service.getServiceName());
 			
-			if(logger.isDebugEnabled()) logger.debug("Attempting to uninstall bundle: ");
+			if(logger.isDebugEnabled()) logger.debug("Attempting to uninstall bundle: " + serviceBundle.getSymbolicName());
 			
 			serviceBundle.uninstall();
 			
 			if(serviceBundle.getState() == Bundle.UNINSTALLED){
 				if(logger.isDebugEnabled()) logger.debug("Bundle: " + serviceBundle.getSymbolicName() + " has been uninstalled.");
 
-				//It's not enough to simply uninstall the service. We must also remove the service itself from the repository manually
-				List<Service> servicesToRemove = new ArrayList<Service>();
-				servicesToRemove.add(service);
-				
-				if(logger.isDebugEnabled()) logger.debug("Removing service: " + service.getServiceName() + " from SOCIETIES Registry");
-				getServiceReg().unregisterServiceList(servicesToRemove);
-	
-				logger.info("Service " + service.getServiceName() + " has been uninstalled");
-				return new AsyncResult<ServiceControlResult>(ServiceControlResult.SUCCESS);	
+				returnResult.setMessage(ResultMessage.SUCCESS);
+				return new AsyncResult<ServiceControlResult>(returnResult);
 				
 			} else{
 				logger.info("Service " + service.getServiceName() + " has NOT been uninstalled");
-				return new AsyncResult<ServiceControlResult>(ServiceControlResult.OSGI_PROBLEM);	
+				
+				returnResult.setMessage(ResultMessage.OSGI_PROBLEM);
+				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
 
 		} catch(Exception ex){
@@ -573,4 +632,71 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		 
 	}
 
+	protected static boolean installingBundle(long bundleId){
+		if(logger.isDebugEnabled()) logger.debug("installingBundle Called");
+		return installServiceMap.containsKey(new Long(bundleId));
+	}
+	
+	protected static void serviceInstalled(long bundleIdentifier, Service newService){
+		Long bundleId = new Long(bundleIdentifier);
+		if(logger.isDebugEnabled()) logger.debug("serviceInstalled Called for bundleId: " + bundleId );
+		BlockingQueue<Service> queue = installServiceMap.get(bundleId);
+		queue.add(newService);
+	}
+	
+	/**
+	 * This method is used to obtain the Service that is exposed by given Bundle
+	 * 
+	 * @param The Bundle that exposes this service
+	 * @return The Service object whose bundle we wish to find
+	 */
+	private Service getServiceFromBundle(Bundle bundle) {
+		
+		if(logger.isDebugEnabled()) logger.debug("Obtaining Service that corresponds to a bundle: " + bundle.getSymbolicName());
+		
+		// Preparing the search filter
+		Service filter = new Service();
+
+		ServiceResourceIdentifier filterIdentifier = new ServiceResourceIdentifier();
+		filterIdentifier.setServiceInstanceIdentifier(String.valueOf(bundle.getBundleId()));
+		filter.setServiceIdentifier(filterIdentifier);
+		
+		ServiceInstance filterInstance = new ServiceInstance();
+
+		ServiceImplementation filterImplementation = new ServiceImplementation();
+		filterImplementation.setServiceVersion(bundle.getVersion().toString());
+		filterInstance.setServiceImpl(filterImplementation);
+		filter.setServiceInstance(filterInstance);
+		
+		List<Service> listServices;
+		try {
+			listServices = getServiceReg().findServices(filter);
+		} catch (ServiceRetrieveException e) {
+			logger.error("Exception while searching for services:" + e.getMessage());
+			e.printStackTrace();
+			return null;
+		}
+		
+		if(listServices == null)
+			return null;
+		
+		if(listServices.isEmpty()){
+			if(logger.isDebugEnabled()) logger.debug("Couldn't find any services that fulfill the criteria");
+			return null;
+		} 
+		
+		if(listServices.size() > 1){
+			if(logger.isDebugEnabled()) logger.debug("More than one service found... this is not good!");
+		}
+		
+		Service result = listServices.get(0);
+		// First we get the bundleId
+
+		 if(logger.isDebugEnabled()) 
+				logger.debug("The service corresponding to bundle " + bundle.getSymbolicName() + "is "+ result.getServiceName() );
+			
+		// Finally, we return
+		 return result;
+		 
+	}
 }

@@ -50,6 +50,7 @@ public class SocialDataTest {
 		  stub(mockedSocialConnector.getUserProfile()).toReturn(readFileAsString("mocks/profile.txt"));
 
 		  
+		  
 		 // fbConnector = new FacebookConnectorImpl(access_token, null);
 		  socialData  = new SocialData();
 		  

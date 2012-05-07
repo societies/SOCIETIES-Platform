@@ -29,6 +29,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifier;
@@ -82,15 +84,15 @@ public class PreferenceEvaluator {
 		}
 	}
 	private IPreference evaluatePreferenceInternal(IPreference ptn){
-		log("evaluating preference");
+		logging.debug("evaluating preference");
 		//a non-context aware preference
 		if (ptn.isLeaf()){
-			log("preference is not context-dependent. returning IAction object"+ptn.getOutcome().toString());
+			logging.debug("preference is not context-dependent. returning IAction object"+ptn.getOutcome().toString());
 			return ptn;
 		}
 		//if the root object is null then the tree is split so we have to evaluate more than one tree
 		if (ptn.getUserObject()==null){
-			log("preference tree is split. we might have a conflict");
+			logging.debug("preference tree is split. we might have a conflict");
 			Enumeration<IPreference> e = ptn.children();
 			ArrayList<IPreference> prefList = new ArrayList<IPreference>(); 
 			while (e.hasMoreElements()){
@@ -103,32 +105,32 @@ public class PreferenceEvaluator {
 			}
 			//if only one IOutcome is applicable with the current context return that
 			if (prefList.size()==1){
-				log("PrefEvaluator> Returning: "+ prefList.get(0).toString());
+				logging.debug("PrefEvaluator> Returning: "+ prefList.get(0).toString());
 				return prefList.get(0);
 			}
 			//if no IOutcome is applicable, return a null object
 			else if (prefList.size()==0){
-				log("PrefEvaluator> No preference applicable");
+				logging.debug("PrefEvaluator> No preference applicable");
 				return null;
 			}
 			//if more than one IOutcome objs is applicable, use conflict resolution and return the most applicable
 			else{
 				ConflictResolver cr = new ConflictResolver();
 				IPreference io = cr.resolveConflicts(prefList);
-				log("PrefEvaluator> Returning: "+io.toString());
+				logging.debug("PrefEvaluator> Returning: "+io.toString());
 				return io;
 			}
 		}
 		//if the root node is not empty
 		else{
-			log("preference tree is not split. no conflicts here");
+			logging.debug("preference tree is not split. no conflicts here");
 			//and it's a condition
 			if (ptn.isBranch()){
 				//evaluate the condition
 				IPreferenceCondition con = ptn.getCondition();
 				try {
 					if (evaluatesToTrue(con)){
-						log(con.toString()+" is true - descending tree levels");
+						logging.debug(con.toString()+" is true - descending tree levels");
 						//traverse the tree in preorder traversal to evaluate all the conditions under this branch and find an Action 
 						Enumeration<IPreference> e = ptn.children();
 						while (e.hasMoreElements()){
@@ -139,7 +141,7 @@ public class PreferenceEvaluator {
 							}
 						}		
 					}else{
-						log(con.toString()+" is false - returning");
+						logging.debug(con.toString()+" is false - returning");
 					}
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -147,7 +149,7 @@ public class PreferenceEvaluator {
 				}
 			}//and it's not a condition but an Outcome (i.e. not a branch but a leaf)
 			else{
-				log("PrefEvaluator> Returning: "+ptn.getOutcome());
+				logging.debug("PrefEvaluator> Returning: "+ptn.getOutcome());
 				return ptn;
 			}
 		}
@@ -164,8 +166,9 @@ public class PreferenceEvaluator {
 			String currentContextValue = this.getValueFromContext(cond.getCtxIdentifier());
 			OperatorConstants operator = cond.getoperator();
 			
-			log("evaluating cond: "+cond.toString()+" against current value: "+currentContextValue);
+			logging.debug("evaluating cond: "+cond.toString()+" against current value: "+currentContextValue);
 			if (operator.equals(OperatorConstants.EQUALS)){
+				//JOptionPane.showMessageDialog(null, "Comparing: "+cond.getvalue()+" with current context value: "+currentContextValue);
 				return currentContextValue.equalsIgnoreCase(cond.getvalue());
 			}
 			else
@@ -191,7 +194,7 @@ public class PreferenceEvaluator {
 		case LESS_THAN:
 			result = valueInContext < valueInPreference;
 			break;
-		default: log("Invalid Operator");
+		default: logging.debug("Invalid Operator");
 		}
 		
 		return result;
@@ -212,15 +215,12 @@ public class PreferenceEvaluator {
 		try{
 			return Integer.parseInt(str);
 		}catch (NumberFormatException nbe){
-			log("Could not parse String to int");
+			logging.debug("Could not parse String to int");
 			return 0;
 		}
 		
 	}
-	
-	private void log(String message){
-		this.logging.info(this.getClass().getName()+" : "+message);
-	}
+
 	
 /*	public static void main(String[] args){
 		ICtxBroker sbroker = new StubCtxBroker();

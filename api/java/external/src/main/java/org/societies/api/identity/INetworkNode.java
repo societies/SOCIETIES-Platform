@@ -1,9 +1,12 @@
 package org.societies.api.identity;
 
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
 /**
- * MISSING_ANNOTATION
- * MISSING_JAVADOCS
+ * Returns the identity of this node
  */
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface INetworkNode extends IIdentity {
 	String getNodeIdentifier();
 }

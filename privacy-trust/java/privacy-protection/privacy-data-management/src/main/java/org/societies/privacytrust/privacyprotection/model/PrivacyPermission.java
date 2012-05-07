@@ -25,6 +25,7 @@
 package org.societies.privacytrust.privacyprotection.model;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +36,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxIdentifierFactory;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
@@ -46,10 +50,12 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Resource;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyOutcomeConstants;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 /**
- *
+ * Entity to store privacy permissions for access control management
  * @author Olivier Maridat (Trialog)
  *
  */
@@ -57,6 +63,7 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 @Table(name = "PrivacyPermission")
 public class PrivacyPermission implements Serializable {
 	private static final long serialVersionUID = -5745233622018708564L;
+
 
 	@Id
 	@GeneratedValue
@@ -75,14 +82,12 @@ public class PrivacyPermission implements Serializable {
 	private String dataId;
 
 	/**
-	 * Formatted: {actions: [{name: READ, optional: true}, ...]} 
+	 * Formatted:  [{"action": READ, "optional": true}, ...]
 	 */
 	private String actions;
 
 	@Enumerated
 	private Decision permission;
-
-
 
 
 	public PrivacyPermission() {
@@ -113,6 +118,7 @@ public class PrivacyPermission implements Serializable {
 		this.actions = actions;
 		this.permission = permission;
 	}
+	
 	/**
 	 * @param requestor
 	 * @param ownerId
@@ -122,37 +128,13 @@ public class PrivacyPermission implements Serializable {
 	 */
 	public PrivacyPermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, List<Action> actions, Decision permission) {
 		super();
-		if (requestor != null) {
-			this.requestorId = requestor.getRequestorId().getIdentifier();
-			if (requestor instanceof RequestorCis) {
-				this.permissionType = PrivacyPolicyTypeConstants.CIS;
-				this.serviceId = null;
-				this.cisId = ((RequestorCis) requestor).getCisRequestorId().getIdentifier();
-			}
-			else if (requestor instanceof RequestorService) {
-				this.permissionType = PrivacyPolicyTypeConstants.CIS;
-				this.serviceId = ((RequestorService) requestor).getRequestorServiceId().getServiceInstanceIdentifier();
-				this.cisId = null;
-			}
-		}
-		if (ownerId != null) {
-			this.ownerId = ownerId.getIdentifier();
-		}
-		if (dataId != null) {
-			this.dataId = dataId.toUriString();
-		}
-		this.actions = "{\"actions\":[";
-		if (null != actions) {
-			for(int i=0; i<actions.size(); i++) {
-				this.actions += "{\"name\": "+actions.get(i).getActionType().toString()+", \"optional\": "+actions.get(i).isOptional()+"}";
-				if (i != (actions.size()-1)) {
-					this.actions += ", ";
-				}
-			}
-		}
-		this.actions = "]}";
-		this.permission = permission;
+		setRequestor(requestor);
+		setOwnerId(ownerId);
+		setDataId(dataId);
+		setActions(actions);
+		setPermission(permission);
 	}
+	
 	/**
 	 * @param requestor
 	 * @param permission
@@ -162,9 +144,92 @@ public class PrivacyPermission implements Serializable {
 	}
 
 
+	
+	/* --- Intelegint Setters --- */
+	
+	/**
+	 * Retrieve the access control permission as a ResponseItem
+	 * @return Permission wrapped as a ResponseItem
+	 * @throws MalformedCtxIdentifierException 
+	 */
+	public ResponseItem createResponseItem() throws MalformedCtxIdentifierException {
+		// - Create the resource
+		CtxAttributeIdentifier dataId = (CtxAttributeIdentifier) CtxIdentifierFactory.getInstance().fromString(this.dataId);
+		Resource resource = new Resource(dataId);
 
+		// - Create the list of actions from JSON
+		Gson jsonManager = new Gson();
+		List<Action> actions = new ArrayList<Action>();
+		if (null != this.actions && !"".equals(this.actions)) {
+			Type actionsType = new TypeToken<List<Action>>(){}.getType();
+			actions = jsonManager.fromJson(this.actions, actionsType);
+		}
 
+		// - Create the ResponseItem
+		RequestItem requestItem = new RequestItem(resource, actions, null);
+		ResponseItem reponseItem = new ResponseItem(requestItem, permission);
 
+		return reponseItem;
+	}
+	
+	public void setRequestor(Requestor requestor) {
+		if (requestor != null) {
+			this.requestorId = requestor.getRequestorId().getJid();
+			if (requestor instanceof RequestorCis) {
+				this.permissionType = PrivacyPolicyTypeConstants.CIS;
+				this.serviceId = null;
+				this.cisId = ((RequestorCis) requestor).getCisRequestorId().getIdentifier();
+			}
+			else if (requestor instanceof RequestorService) {
+				this.permissionType = PrivacyPolicyTypeConstants.CIS;
+				this.serviceId = ((RequestorService) requestor).getRequestorServiceId().getIdentifier().toString();
+				this.cisId = null;
+			}
+		}
+	}
+
+	public void setOwnerId(IIdentity ownerId) {
+		if (ownerId != null) {
+			this.ownerId = ownerId.getJid();
+		}
+
+	}
+
+	public void setDataId(CtxIdentifier dataId) {
+		if (dataId != null) {
+			this.dataId = dataId.toUriString();
+		}
+	}
+
+	/*
+	 * Set a list of actions as a JSOn formatted string
+	 */
+	public void setActions(List<Action> actions) {
+		this.actions = "[";
+		if (null != actions) {
+			for(int i=0; i<actions.size(); i++) {
+				this.actions += "{\"action\": "+actions.get(i).getActionType().toString()+", \"optional\": "+actions.get(i).isOptional()+"}";
+				if (i != (actions.size()-1)) {
+					this.actions += ", ";
+				}
+			}
+		}
+		this.actions += "]";
+	}
+
+	/**
+	 * @param permission ResponseItem permission
+	 */
+	public void setResponseItem(ResponseItem permission) {
+		setDataId(permission.getRequestItem().getResource().getCtxIdentifier());
+		setActions(permission.getRequestItem().getActions());
+		setPermission(permission.getDecision());
+	}
+	
+	
+	
+	/* --- Normal Setters ---*/
+	
 	/**
 	 * @return the id
 	 */
@@ -193,14 +258,12 @@ public class PrivacyPermission implements Serializable {
 		this.permission = permission;
 	}
 
-
 	/**
 	 * @return the ownerId
 	 */
 	public String getOwnerId() {
 		return ownerId;
 	}
-
 
 	/**
 	 * @param ownerId the ownerId to set
@@ -295,6 +358,8 @@ public class PrivacyPermission implements Serializable {
 		this.actions = actions;
 	}
 
+	
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -306,22 +371,4 @@ public class PrivacyPermission implements Serializable {
 				+ ", dataId=" + dataId + ", actions=" + actions
 				+ ", permission=" + permission + "]";
 	}
-
-	/**
-	 * @return
-	 */
-	public ResponseItem createResponseItem() {
-		Decision decision = Decision.DENY;
-		if (PrivacyOutcomeConstants.ALLOW.equals(permission)) {
-			decision = Decision.PERMIT;
-		}
-		// TODO
-		Resource resource = null;
-		List<Action> actions = new ArrayList<Action>();
-		RequestItem requestItem = new RequestItem(resource, actions, null);
-		ResponseItem reponseItem = new ResponseItem(requestItem, decision);
-		return reponseItem;
-	}
-
-
 }

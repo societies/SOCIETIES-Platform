@@ -105,8 +105,8 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 		// which attribute id to use for context history retrieval?
 		CtxAttributeIdentifier ctxAttrID = null;
-		if(lookupAttrHelp("Action") != null){
-			CtxAttribute ctxAttr = lookupAttrHelp("Action");
+		if(lookupAttrHelp("SymAction") != null){
+			CtxAttribute ctxAttr = lookupAttrHelp("SymAction");
 			ctxAttrID = ctxAttr.getId();
 		}
 
