@@ -138,15 +138,27 @@ public final class CtxModelBeanTranslator {
 	
 	public CtxAttribute fromCtxAttributeBean(CtxAttributeBean attrBean) throws DatatypeConfigurationException, MalformedCtxIdentifierException {
 		
-		CtxAttribute attribute=new CtxAttribute(new CtxAttributeIdentifier(new CtxEntityIdentifier(attrBean.toString()), "TYPE", 0L));
+		CtxAttribute attribute = new CtxAttribute(
+				(CtxAttributeIdentifier) fromCtxIdentifierBean(attrBean.getId()));
+		attribute.setLastModified(XMLGregorianCalendarToDate(attrBean.getLastModified()));
+		// Handle value
 		attribute.setBinaryValue(attrBean.getBinaryValue());
 		attribute.setDoubleValue(attrBean.getDoubleValue());
-		attribute.setHistoryRecorded(attrBean.isHistoryRecorded());
 		attribute.setIntegerValue(attrBean.getIntegerValue());
-		attribute.setSourceId(attrBean.getSourceId());
 		attribute.setStringValue(attrBean.getStringValue());
+		// Handle value meta-data
 		attribute.setValueMetric(attrBean.getValueMetric());
 		attribute.setValueType(fromCtxAttributeValueTypeBean(attrBean.getValueType()));
+		// Handle other params
+		attribute.setHistoryRecorded(attrBean.isHistoryRecorded());
+		attribute.setSourceId(attrBean.getSourceId());
+		// Handle QoC
+		attribute.getQuality().setLastUpdated(
+				XMLGregorianCalendarToDate(attrBean.getQuality().getLastUpdated()));
+		attribute.getQuality().setOriginType(
+				fromCtxOriginTypeBean(attrBean.getQuality().getOriginType()));
+		attribute.getQuality().setPrecision(attrBean.getQuality().getPrecision());
+		attribute.getQuality().setUpdateFrequency(attrBean.getQuality().getUpdateFrequency());
 		
 		return attribute;
 		
@@ -224,19 +236,19 @@ public final class CtxModelBeanTranslator {
 		CtxQualityBean bean=new CtxQualityBean();
 		bean.setPrecision(quality.getPrecision());
 		bean.setUpdateFrequency(quality.getUpdateFrequency());
-		bean.setOriginType(CtxOriginTypeBeanFromCtxOriginType(quality.getOriginType()));
+		bean.setOriginType(fromCtxOriginType(quality.getOriginType()));
 		bean.setLastUpdated(DateToXMLGregorianCalendar(quality.getLastUpdated()));
 		
 		return bean;
 	}
 
-	public CtxOriginTypeBean CtxOriginTypeBeanFromCtxOriginType(
+	public CtxOriginTypeBean fromCtxOriginType(
 			CtxOriginType originType) {
 		
 		return CtxOriginTypeBean.valueOf(originType.toString());	
 	}
 	
-	public CtxOriginType CtxOriginTypeFromCtxOriginTypeBean(
+	public CtxOriginType fromCtxOriginTypeBean(
 			CtxOriginTypeBean originTypeBean) {
 		
 		return CtxOriginType.valueOf(originTypeBean.toString());	
