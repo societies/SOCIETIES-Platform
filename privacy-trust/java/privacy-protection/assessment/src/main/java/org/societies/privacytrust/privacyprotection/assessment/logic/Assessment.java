@@ -22,27 +22,18 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.assessment;
-
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLog;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.LogEntry;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.PrivacyLogFilter;
+package org.societies.privacytrust.privacyprotection.assessment.logic;
 
 /**
+ * Parses the log and tries to find potential privacy breaches that occurred in the past.
+ * This can be used for the a-posteriori assessment.
  * 
+ * Estimates whether a particular data transmission is a potential privacy breach or not.
+ * This can be used for the a-priori assessment.
  *
  * @author Mitja Vardjan
  *
  */
-public class PrivacyLog implements IPrivacyLog {
+public class Assessment {
 
-	@Override
-	public LogEntry[] search(PrivacyLogFilter filter) {
-		return null;
-	}
-	
-	@Override
-	public LogEntry[] getAll() {
-		return null;
-	}
 }

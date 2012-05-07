@@ -24,12 +24,13 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.test;
 
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.privacytrust.privacyprotection.assessment.PrivacyLogAppender;
+import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLogAppender;
 
 /**
  * Test case for Privacy Assessment

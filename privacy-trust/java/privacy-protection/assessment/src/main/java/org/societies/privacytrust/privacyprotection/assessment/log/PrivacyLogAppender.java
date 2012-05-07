@@ -22,58 +22,46 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.privacytrust.privacyprotection.assessment.log;
 
-package org.societies.privacytrust.privacyprotection.assessment.test;
+import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.PrivacyLogFilter;
-import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.ChannelType;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.LogEntry;
 
 /**
- * Test case for Privacy Assessment
+ * 
  *
- * @author Mitja Vardjan (SETCCE)
+ * @author Mitja Vardjan
  *
  */
-public class PrivacyLogTest {
-	
-	private static Logger log = LoggerFactory.getLogger(PrivacyLogTest.class.getSimpleName());
-	
-	private PrivacyLog privacyLog;
-	
-	/**
-	 * @throws java.lang.Exception
+public class PrivacyLogAppender implements IPrivacyLogAppender {
+
+	/* (non-Javadoc)
+	 * @see IPrivacyLogAppender#log(LogEntry)
 	 */
-	@Before
-	public void setUp() throws Exception {
-		privacyLog = new PrivacyLog();
+	@Override
+	public boolean log(LogEntry entry) {
+		return true;
 	}
 
-	/**
-	 * @throws java.lang.Exception
+	/* (non-Javadoc)
+	 * @see IPrivacyLogAppender#logCommsFw(IIdentity, IIdentity, Object)
 	 */
-	@After
-	public void tearDown() throws Exception {
-		privacyLog = null;
+	@Override
+	public boolean logCommsFw(IIdentity sender, IIdentity receiver, Object payload) {
+		return true;
 	}
 
-	@Test
-	public void testGetAll() {
-		privacyLog.getAll();
+	/* (non-Javadoc)
+	 * @see IPrivacyLogAppender#logSN(String, Date, boolean, IIdentity, IIdentity, ChannelType)
+	 */
+	@Override
+	public boolean logSN(String dataType, Date time, boolean sentToGroup, IIdentity sender,
+			IIdentity receiver, ChannelType channelId) {
+		return true;
 	}
 
-	@Test
-	public void testSearch() {
-		
-		PrivacyLogFilter filter = new PrivacyLogFilter();
-		
-		privacyLog.search(filter);
-	}
 }

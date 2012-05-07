@@ -22,46 +22,14 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.assessment;
-
-import java.util.Date;
-
-import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.ChannelType;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.LogEntry;
+package org.societies.privacytrust.privacyprotection.assessment.logger;
 
 /**
- * 
+ * Observe and log read access to the context through Context Broker
  *
  * @author Mitja Vardjan
  *
  */
-public class PrivacyLogAppender implements IPrivacyLogAppender {
-
-	/* (non-Javadoc)
-	 * @see IPrivacyLogAppender#log(LogEntry)
-	 */
-	@Override
-	public boolean log(LogEntry entry) {
-		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see IPrivacyLogAppender#logCommsFw(IIdentity, IIdentity, Object)
-	 */
-	@Override
-	public boolean logCommsFw(IIdentity sender, IIdentity receiver, Object payload) {
-		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see IPrivacyLogAppender#logSN(String, Date, boolean, IIdentity, IIdentity, ChannelType)
-	 */
-	@Override
-	public boolean logSN(String dataType, Date time, boolean sentToGroup, IIdentity sender,
-			IIdentity receiver, ChannelType channelId) {
-		return true;
-	}
+public class LoggerContext {
 
 }

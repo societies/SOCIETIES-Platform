@@ -22,58 +22,15 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package org.societies.privacytrust.privacyprotection.assessment.test;
-
-import static org.junit.Assert.assertEquals;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.PrivacyLogFilter;
-import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
+package org.societies.privacytrust.privacyprotection.assessment.logic;
 
 /**
- * Test case for Privacy Assessment
+ * Parses the log and creates report about data that has been transmitted between CSSs and CISs.
+ * The report should be suitable to be displayed in web browser.
  *
- * @author Mitja Vardjan (SETCCE)
+ * @author Mitja Vardjan
  *
  */
-public class PrivacyLogTest {
-	
-	private static Logger log = LoggerFactory.getLogger(PrivacyLogTest.class.getSimpleName());
-	
-	private PrivacyLog privacyLog;
-	
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@Before
-	public void setUp() throws Exception {
-		privacyLog = new PrivacyLog();
-	}
+public class DataTransferAnalyzer {
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@After
-	public void tearDown() throws Exception {
-		privacyLog = null;
-	}
-
-	@Test
-	public void testGetAll() {
-		privacyLog.getAll();
-	}
-
-	@Test
-	public void testSearch() {
-		
-		PrivacyLogFilter filter = new PrivacyLogFilter();
-		
-		privacyLog.search(filter);
-	}
 }
