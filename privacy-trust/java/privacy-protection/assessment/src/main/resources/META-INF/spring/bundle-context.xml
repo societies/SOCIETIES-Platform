@@ -15,7 +15,7 @@
 		We've kept the osgi definitions in a separate configuration file so that 
 		this file can easily be used for integration testing outside of an OSGi environment -->
 
-	<bean id="aopBean" class="org.societies.api.comm.xmpp.datatypes.Stanza">
+	<bean id="aopBean" class="org.societies.api.comm.xmpp.interfaces.ICommManager">
 		<!--property name="aspectName" value="No_Aspect" /-->
 	</bean>
 
