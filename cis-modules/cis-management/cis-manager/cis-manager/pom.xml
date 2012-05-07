@@ -73,6 +73,7 @@
 			<groupId>org.apache.derby</groupId>
 			<artifactId>com.springsource.org.apache.derby</artifactId>
 			<version>10.5.1000001.764942</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -116,15 +117,12 @@
 			<version>3.3.0.ga</version>
 			<scope>provided</scope>
 		</dependency>
-	
     	<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
-
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
@@ -142,11 +140,6 @@
 			<artifactId>PubsubClientBundle</artifactId>
 			<version>${version.comm}</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.societies.cis</groupId>
-			<artifactId>cis-persistance</artifactId>
-			<version>${version.cis}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -176,7 +169,7 @@
 			<version>${version.cis}</version>
 			<scope>provided</scope>
 		</dependency>
-				<dependency>
+		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>common-data-source</artifactId>
 			<version>${release.version}</version>
@@ -199,6 +192,10 @@
 							org.springframework.beans.factory.annotation*;version="0",
 							org.springframework.stereotype*;version="0",
 							org.xmpp.packet*,
+							org.societies.activity.*,
+							org.societies.activity.model.*,
+							org.societies.activity,
+							org.societies.activity.model,
 							!org.gjt.*,
 							!org.jaxen.*,
 							!org.mortbay.*,

@@ -65,7 +65,6 @@ import org.societies.api.identity.IIdentityManager;
 
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.cis.manager.CisEditor;
-import org.societies.cis.persistance.IPersistanceManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
@@ -98,7 +97,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 	IIdentity cisManagerId;
 	ICommManager CSSendpoint;
 	Set<CisSubscribedImp> subscribedCISs;
-	@Autowired private static SessionFactory sessionFactory;
+	private SessionFactory sessionFactory;
 	private Session session;
 	
 
@@ -573,12 +572,12 @@ public class CisManager implements ICisManager, IFeatureServer{
 		t.commit();
 	}
 	
-	public static SessionFactory getSessionFactory() {
+	public  SessionFactory getSessionFactory() {
 		return sessionFactory;
 	}
 
-	public static void setSessionFactory(SessionFactory sessionFactory) {
-		CisManager.sessionFactory = sessionFactory;
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
 	}
 
 	

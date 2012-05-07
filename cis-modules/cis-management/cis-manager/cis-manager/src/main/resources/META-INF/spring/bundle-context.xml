@@ -20,10 +20,32 @@
   <context:component-scan base-package="org.societies.cis.manager"></context:component-scan>
    <context:annotation-config />
     <tx:annotation-driven />
+<!--     <bean id="ServiceRegPropConfig" -->
+<!--         class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" > -->
 
-    <bean id="ServiceRegPropConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" >
-        <property name="ignoreResourceNotFound" value="false" ></property>
-    </bean>
+<!--         <property name="ignoreResourceNotFound" value="false" > </property> -->
+
+<!--         <property name="locations" > -->
+<!--             <list> -->
+<!--                 <value>classpath:/derby_database.properties</value> -->
+<!--                 <value>file:${VIRGO_HOME}\config\org.societies.platform.properties</value> -->
+<!--             </list> -->
+<!--         </property> -->
+<!--     </bean> -->
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />		
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations">
+			<list>
+				<!-- local testing -->
+				<value>classpath:META-INF/spring/derby_database.properties</value>
+				<!-- final deployment into server --> 
+				<value>file:${CONFIG_DIR}\org.societies.platform.properties</value>
+			</list>
+		</property>
+	</bean>
+
 
     <bean
         id="sessionFactory"
@@ -32,15 +54,18 @@
         <property name="dataSource" ref="societiesDataSource" />
         <property name="annotatedClasses" >
             <list>
-                <value>org.societies.activity.ActivityFeed</value>
+                <value>org.societies.cis.manager.CisEditor</value>
+                <value>org.societies.cis.manager.CisRecord</value>
+                <value>org.societies.cis.manager.CisParticipant</value>
                 <value>org.societies.activity.model.Activity</value>
+                <value>org.societies.activity.ActivityFeed</value>
             </list>
         </property>
 
         <property name="annotatedPackages" >
 
             <list>
-                <value>org.societies.activity.model</value>
+                <value>org.societies.cis.manager</value>
             </list>
         </property>
 
@@ -50,10 +75,11 @@
                 <prop key="hibernate.cache.use_second_level_cache" >false</prop>
                 <prop key="hibernate.hbm2ddl.auto" >create-drop</prop>
                 <prop key="hibernate.format_sql" >true</prop>
+                <prop key="hibernate.query.factory_class">org.hibernate.hql.classic.ClassicQueryTranslatorFactory</prop>
+
             </props>
         </property>
     </bean>
-
     <!-- enable the configuration of transactional behavior based on annotations -->
 
     <tx:annotation-driven transaction-manager="transactionManager" />
