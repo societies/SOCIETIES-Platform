@@ -129,6 +129,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	 * @throws TrustException
 	 */
 	@Test
+	@Ignore
 	public void testTrustedCssCRUD() throws TrustException {
 		
 		this.testAddTrustedCss();
@@ -145,6 +146,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	 * @throws TrustException
 	 */
 	@Test
+	@Ignore
 	public void testTrustedCisCRUD() throws TrustException {
 		
 		this.testAddTrustedCis();
@@ -161,6 +163,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	 * @throws TrustException
 	 */
 	@Test
+	@Ignore
 	public void testTrustedServiceCRUD() throws TrustException {
 		
 		this.testAddTrustedService();
