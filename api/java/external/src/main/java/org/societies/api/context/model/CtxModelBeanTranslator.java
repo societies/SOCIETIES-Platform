@@ -90,18 +90,25 @@ public final class CtxModelBeanTranslator {
 	
 	public CtxIdentifierBean fromCtxIdentifier(CtxIdentifier identifier) {
 		
+		CtxIdentifierBean ctxIdBean = null;
+		
 		if (identifier.getModelType().equals(CtxModelType.ENTITY)) {
-			return new CtxEntityIdentifierBean();
+			
+			ctxIdBean = new CtxEntityIdentifierBean(); 
+			ctxIdBean.setString(identifier.toString());
 		}
 		else if (identifier.getModelType().equals(CtxModelType.ATTRIBUTE)) {
-			return new CtxAttributeIdentifierBean();
+			
+			ctxIdBean = new CtxAttributeIdentifierBean(); 
+			ctxIdBean.setString(identifier.toString()); 
 		}
 		else if (identifier.getModelType().equals(CtxModelType.ASSOCIATION)) {
-			return new CtxAssociationIdentifierBean();
+			
+			ctxIdBean = new CtxAssociationIdentifierBean(); 
+			ctxIdBean.setString(identifier.toString());
 		}
-		else
-			return null;
 		
+		return ctxIdBean;
 	}
 	
 	public CtxIdentifier fromCtxIdentifierBean(CtxIdentifierBean identifierBean) throws MalformedCtxIdentifierException {
