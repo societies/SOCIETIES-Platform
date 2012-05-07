@@ -23,105 +23,32 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-package org.societies.cis.manager;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import org.societies.api.cis.management.ICisParticipant;
-
+package org.societies.api.cis.management;
 
 /**
- * @author Thomas Vilarinho (Sintef)
-*/
+ * @author Thomas.Vilarinho@sintef.no
+ *
+ */
 
-@Entity
-@Table(name = "org_societies_cis_manager_CisParticipant")
-public class CisParticipant implements ICisParticipant {
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Long id;
-	public Long getId() {
-		return id;
-	}
+import org.societies.api.activity.IActivityFeed;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-
-	public enum MembershipType {
-		   owner, participant, admin		 }
-	@Column
-	 String membersJid;
-	@Column
-	 MembershipType mtype;
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
+public interface ICisParticipant {
 	
+	/**
+	 * Gets jid of the participant
+	 * @param 
+	 * @return jid of the participant
+	 */
+	public String getMembersJid();
 	
-	public CisParticipant(){}
-	
-	public CisParticipant(String membersJid, MembershipType mtype) {
-		super();
-		this.membersJid = membersJid;
-		this.mtype = mtype;
-	}
-	
-	@Override
-	public String getMembersJid() {
-		return membersJid;
-	}
-	public void setMembersJid(String membersJid) {
-		this.membersJid = membersJid;
-	}
-	public MembershipType getMtype() {
-		return mtype;
-	}
-	public void setMtype(MembershipType mtype) {
-		this.mtype = mtype;
-	}
-
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((membersJid == null) ? 0 : membersJid.hashCode());
-		return result;
-	}
-
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		CisParticipant other = (CisParticipant) obj;
-		if (membersJid == null) {
-			if (other.membersJid != null)
-				return false;
-		} else if (!membersJid.equals(other.membersJid))
-			return false;
-		return true;
-	}
-
-
-	@Override
-	public String getMembershipType() {
-		return this.mtype.toString();
-	}
-	
-	
-	
-	
+	/**
+	 * Gets the role that the member plays in the CIS
+	 * @param 
+	 * @return String ("owner", "participant", "admin" where admin has not been defined yet)
+	 */
+	public String getMembershipType();
 
 }

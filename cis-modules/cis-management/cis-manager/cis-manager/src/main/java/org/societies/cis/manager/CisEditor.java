@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import java.util.Set;
+import java.util.concurrent.Future;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -59,6 +60,8 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.cis.management.ICisEditor;
+import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.cis.manager.CisParticipant.MembershipType;
@@ -75,6 +78,7 @@ import org.societies.api.schema.cis.manager.CommunityManager;
 import org.societies.api.schema.cis.manager.DeleteNotification;
 import org.societies.api.schema.cis.manager.Notification;
 import org.societies.api.schema.cis.manager.SubscribedTo;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
  * @author Thomas Vilarinho (Sintef)
@@ -87,7 +91,7 @@ import org.societies.api.schema.cis.manager.SubscribedTo;
 
 @Entity
 @Table(name = "org_societies_cis_manager_CisEditor")
-public class CisEditor implements IFeatureServer,ICisEditor {
+public class CisEditor implements IFeatureServer, ICisOwned {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
@@ -123,13 +127,17 @@ public class CisEditor implements IFeatureServer,ICisEditor {
 	public Set<CisParticipant> membersCss; // TODO: this may be implemented in the CommunityManagement bundle. we need to define how they work together
 	
 
-
-	public ActivityFeed getActivityFeed() {
+	@Override
+	public Future<IActivityFeed> getCisActivityFeed(){
+		return  new AsyncResult<IActivityFeed>(activityFeed);
+	}
+	
+	private ActivityFeed getActivityFeed() {
 		return activityFeed;
 	}
 
 
-	public void setActivityFeed(ActivityFeed activityFeed) {
+	private void setActivityFeed(ActivityFeed activityFeed) {
 		this.activityFeed = activityFeed;
 	}
 
@@ -153,55 +161,7 @@ public class CisEditor implements IFeatureServer,ICisEditor {
 	}
 
 
-	// at the moment we are not using this constructor, but just the one below, as that one generates the CIS id for us
-/*	public CisEditor(String ownerCss, String cisId,String host,
-			int membershipCriteria, String permaLink, String password,ICISCommunicationMgrFactory ccmFactory) {
-		
-		activityFeed = ActivityFeed.startUp(cisId);
-		sharedServices = new HashSet<IServiceSharingRecord>();
-		membersCss = new HashSet<CisParticipant>();
-		membersCss.add(new CisParticipant(ownerCss,MembershipType.owner));
 
-		LOG.info("CIS editor created");
-		
-		cisIdentity = new IdentityImpl(IdentityType.CIS, cisId, host); // TODO: this constructor should not be used
-
-		try{
-		CISendpoint = ccmFactory.getNewCommManager(cisIdentity, password);
-		} catch (CommunicationException e) {
-			e.printStackTrace();
-		}
-				
-		LOG.info("CIS endpoint created");
-		
-		
-		
-		try {
-			CISendpoint.register(this);
-		} catch (CommunicationException e) {
-			e.printStackTrace();
-		} // TODO unregister??
-		
-		LOG.info("CIS listener registered");
-		
-		
-		
-		cisRecord = new CisRecord(activityFeed,ownerCss, membershipCriteria, cisId, permaLink, membersCss,
-				password, host, sharedServices);
-		
-		LOG.info("CIS creating pub sub service");
-		
-//		PubsubServiceRouter psr = new PubsubServiceRouter(CISendpoint);
-
-		
-		LOG.info("CIS pub sub service created");
-		
-		//this.psc = psc;
-		
-		LOG.info("CIS autowired PubSubClient");
-		// TODO: broadcast its creation to other nodes?
-
-	}*/
 
 	// constructor of a CIS without a pre-determined ID or host
 	public CisEditor(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory) {
@@ -243,8 +203,8 @@ public class CisEditor implements IFeatureServer,ICisEditor {
 		
 		
 		// TODO: we have to get a proper identity and pwd for the CIS...
-		cisRecord = new CisRecord(cssOwner, mode, cisIdentity.getJid(), "", membersCss,
-				cisIdentity.getDomain(), sharedServices,cisType,cisName);
+		cisRecord = new CisRecord(cssOwner, mode, cisIdentity.getJid(), "",
+				cisIdentity.getDomain(),cisType,cisName);
 		
 		LOG.info("CIS creating pub sub service");
 		
@@ -274,17 +234,24 @@ public class CisEditor implements IFeatureServer,ICisEditor {
 	}
 	
 
-	/**
-	 * add a member to the CIS and at the same time send the XMPP notification to all the other users that this user has been added to the community
-	 * and send a notification to that user
-	 * 
-	 * @param jid is the full jid of the user
-	 * @param role, if the role is null, the member will be set as a participant
-	 * @return true if it worked and false if the jid was already there
-	 * @throws CommunicationException 
-	 * @throws InvalidFormatException 
-	 */
-	public boolean addMember(String jid, MembershipType role) throws  CommunicationException, InvalidFormatException{
+	@Override
+	public Future<Boolean> addMember(String jid, String role) throws  CommunicationException, InvalidFormatException{
+		MembershipType typedRole;
+		try{
+			typedRole = MembershipType.valueOf(role);
+		}catch(IllegalArgumentException e) {
+			return new AsyncResult<Boolean>(new Boolean(false)); //the string was not valid
+		}
+		catch( NullPointerException e) {
+			return new AsyncResult<Boolean>(new Boolean(false)); //the string was not valid
+		}
+		return new AsyncResult<Boolean>(this.addMember(jid, typedRole));
+		
+	}
+	
+	
+	// internal implementation of the method above
+	private boolean addMember(String jid, MembershipType role) throws  CommunicationException, InvalidFormatException{
 		
 		
 		LOG.info("add member invoked");
@@ -350,12 +317,11 @@ public class CisEditor implements IFeatureServer,ICisEditor {
 
 
 	// constructor for creating a CIS from a CIS record, maybe the case when we are retrieving data from a database
-	// TODO: double check if we should clone the related objects or just copy the reference (as it is now)
+	// TODO: review as it is almost empty!!
 	public CisEditor(CisRecord cisRecord) {
 		
 		this.cisRecord = cisRecord; 
 		
-		this.sharedServices = this.cisRecord.sharedServices;
 		//CISendpoint = 	new XCCommunicationMgr(cisRecord.getHost(), cisRecord.getCisId(),cisRecord.getPassword());
 		
 		
@@ -513,6 +479,14 @@ public class CisEditor implements IFeatureServer,ICisEditor {
 		return null;
 	}
 
+	
+	@Override 
+	public Future<Set<ICisParticipant>> getMemberList(){
+		Set<ICisParticipant> s = new  HashSet<ICisParticipant>();
+		s.addAll(this.getMembersCss());
+		return new AsyncResult<Set<ICisParticipant>>(s);
+	}
+	
 	@Override
 	public List<String> getXMLNamespaces() {
 		return NAMESPACES;
@@ -533,25 +507,14 @@ public class CisEditor implements IFeatureServer,ICisEditor {
 	}
 
 
-
+	@Override
 	public String getCisId() {
 	
 		return this.cisRecord.getCisId();
 	}
 
 
-	@Override
-	public IActivityFeed getActivityFeed(String cssId, String cisId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public Boolean update(String cssId, ICisRecord newCis, String oldCisId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
 	
 
 	//"destructor" class which send a message to all users and closes the connection immediately
@@ -628,6 +591,44 @@ public class CisEditor implements IFeatureServer,ICisEditor {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+
+	@Override
+	public String getName() {
+		return this.cisRecord.getCisName();
+	}
+
+
+	@Override
+	public String getOwnerId() {
+		return this.cisRecord.ownerCss;
+	}
+
+
+	@Override
+	public String setUserDefinedName(String _name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public String getUserDefineName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public String getCisType() {
+		return this.cisRecord.getCisType();
+	}
+
+
+	@Override
+	public int getMembershipCriteria() {
+		return this.cisRecord.getMembershipCriteria();
 	}
     
 }
