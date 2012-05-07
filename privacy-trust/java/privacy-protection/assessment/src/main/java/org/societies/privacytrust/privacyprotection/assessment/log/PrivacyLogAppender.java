@@ -26,6 +26,8 @@ package org.societies.privacytrust.privacyprotection.assessment.log;
 
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.ChannelType;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
@@ -38,6 +40,8 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacyas
  *
  */
 public class PrivacyLogAppender implements IPrivacyLogAppender {
+
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyLogAppender.class);
 
 	/* (non-Javadoc)
 	 * @see IPrivacyLogAppender#log(LogEntry)

@@ -24,6 +24,9 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Observe and log read access to the context through Context Broker
  *
@@ -31,5 +34,7 @@ package org.societies.privacytrust.privacyprotection.assessment.logger;
  *
  */
 public class ContextLogger {
+
+	private static Logger LOG = LoggerFactory.getLogger(ContextLogger.class);
 
 }

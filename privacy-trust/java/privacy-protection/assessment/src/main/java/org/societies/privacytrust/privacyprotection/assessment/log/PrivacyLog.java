@@ -24,6 +24,8 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.log;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLog;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.LogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.PrivacyLogFilter;
@@ -35,6 +37,8 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacyas
  *
  */
 public class PrivacyLog implements IPrivacyLog {
+
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyLog.class);
 
 	@Override
 	public LogEntry[] search(PrivacyLogFilter filter) {

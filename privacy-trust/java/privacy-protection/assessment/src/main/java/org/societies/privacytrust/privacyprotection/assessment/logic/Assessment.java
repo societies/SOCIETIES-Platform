@@ -24,6 +24,9 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Parses the log and tries to find potential privacy breaches that occurred in the past.
  * This can be used for the a-posteriori assessment.
@@ -35,5 +38,7 @@ package org.societies.privacytrust.privacyprotection.assessment.logic;
  *
  */
 public class Assessment {
+
+	private static Logger LOG = LoggerFactory.getLogger(Assessment.class);
 
 }

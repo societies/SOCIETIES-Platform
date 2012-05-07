@@ -24,6 +24,9 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Observe and log sending data to social networks through the SN connector.
  * To be implemented only if and when the SN connector allows sending data from CSS to SN.
@@ -32,5 +35,7 @@ package org.societies.privacytrust.privacyprotection.assessment.logger;
  *
  */
 public class SNLogger {
+
+	private static Logger LOG = LoggerFactory.getLogger(SNLogger.class);
 
 }

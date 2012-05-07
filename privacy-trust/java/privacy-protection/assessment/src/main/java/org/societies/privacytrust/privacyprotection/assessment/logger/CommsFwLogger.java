@@ -24,12 +24,27 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logger;
 
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Observe and log sending data through the comms framework
  *
  * @author Mitja Vardjan
  *
  */
-public class CommsFwLogger {
+public class CommsFwLogger implements MethodInterceptor {
+
+	private static Logger LOG = LoggerFactory.getLogger(CommsFwLogger.class);
+	
+	/* (non-Javadoc)
+	 * @see MethodInterceptor#invoke(MethodInvocation)
+	 */
+	@Override
+	public Object invoke(MethodInvocation invocation) throws Throwable {
+		return null;
+	}
 
 }

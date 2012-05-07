@@ -24,6 +24,9 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Parses the log and creates report about data that has been transmitted between CSSs and CISs.
  * The report should be suitable to be displayed in web browser.
@@ -32,5 +35,7 @@ package org.societies.privacytrust.privacyprotection.assessment.logic;
  *
  */
 public class DataTransferAnalyzer {
+
+	private static Logger LOG = LoggerFactory.getLogger(DataTransferAnalyzer.class);
 
 }
