@@ -77,14 +77,19 @@ public final class CtxModelBeanTranslator {
 		
 	}
 	
-	public CtxEntity fromCtxEntityBean(CtxEntityBean entityBean) throws DatatypeConfigurationException{
+	public CtxEntity fromCtxEntityBean(CtxEntityBean entityBean) throws DatatypeConfigurationException, MalformedCtxIdentifierException{
 		
-		CtxEntity entity=null;
-		//TODO: create the setters to form-up the entity
+		CtxEntity entity = new CtxEntity(
+				(CtxEntityIdentifier) fromCtxIdentifierBean(entityBean.getId()));
+		entity.setLastModified(XMLGregorianCalendarToDate(entityBean.getLastModified()));
+		// Handle entity attributes
+		for (CtxAttributeBean attrBean : entityBean.getAttributes())
+			entity.addAttribute(fromCtxAttributeBean(attrBean));
+		// Handle entity association IDs
+		for (CtxAssociationIdentifierBean assocIdBean : entityBean.getAssociations())
+			entity.addAssociation((CtxAssociationIdentifier) fromCtxIdentifierBean(assocIdBean));
 		
-		
-		return entity;
-		
+		return entity;	
 	}
 	
 	
@@ -173,7 +178,7 @@ public final class CtxModelBeanTranslator {
 		
 		List<CtxEntityIdentifierBean> childEntities = new ArrayList<CtxEntityIdentifierBean>();
 		for (CtxEntityIdentifier child : assoc.getChildEntities()) {
-			childEntities.add(childEntitiesBeanFromChildEntities(child));
+			childEntities.add((CtxEntityIdentifierBean) fromCtxIdentifier(child));
 		}
 		bean.setChildEntities(childEntities);
 		bean.setParentEntity(parentEntityBeanFromParentEntity(assoc.getParentEntity()));
@@ -184,20 +189,16 @@ public final class CtxModelBeanTranslator {
 	
 	public CtxAssociation fromCtxAssociationBean(CtxAssociationBean assocBean) throws DatatypeConfigurationException, MalformedCtxIdentifierException {
 		
-		CtxAssociation assoc=new CtxAssociation(new CtxAssociationIdentifier(assocBean.toString(), "TYPE", 0L));
-		//TODO setters
-		//assoc.setLastModified(XMLGregorianCalendarToDate(assocBean.getLastModified()));
-		//assoc.setId(assocBean.getId());
-		//assoc.setChildEntities()
-		/*List<CtxEntityIdentifierBean> childEntities = new ArrayList<CtxEntityIdentifierBean>();
-		for (CtxEntityIdentifier child : assoc.getChildEntities()) {
-			childEntities.add(childEntitiesBeanFromChildEntities(child));
-		}*/
-		
-		assoc.setParentEntity(parentEntityFromParentEntityBean(assocBean.getParentEntity()));
+		CtxAssociation assoc = new CtxAssociation(
+				(CtxAssociationIdentifier) fromCtxIdentifierBean(assocBean.getId()));
+		assoc.setLastModified(XMLGregorianCalendarToDate(assocBean.getLastModified()));
+		// Handle parent entity
+		assoc.setParentEntity((CtxEntityIdentifier) fromCtxIdentifierBean(assocBean.getParentEntity()));
+		// Handle child entities
+		for (CtxEntityIdentifierBean childEntityIdBean : assocBean.getChildEntities())
+			assoc.addChildEntity((CtxEntityIdentifier) fromCtxIdentifierBean(childEntityIdBean));
 		
 		return assoc;
-		
 	}
 	
 	public CtxIdentifierBean fromCtxModelObject(CtxModelObject object) {
@@ -213,21 +214,6 @@ public final class CtxModelBeanTranslator {
 		
 		CtxEntityIdentifierBean bean = new CtxEntityIdentifierBean();
 		bean.setString(parentEntity.toString());
-		return bean;
-	}
-	
-	private CtxEntityIdentifier parentEntityFromParentEntityBean(
-			CtxEntityIdentifierBean parentEntityBean) throws MalformedCtxIdentifierException {
-		
-		CtxEntityIdentifier entity = new CtxEntityIdentifier(parentEntityBean.getString());
-		return entity;
-	}
-
-	public CtxEntityIdentifierBean childEntitiesBeanFromChildEntities(
-			CtxEntityIdentifier child) {
-		
-		CtxEntityIdentifierBean bean = new CtxEntityIdentifierBean();
-		bean.setString(child.toString());
 		return bean;
 	}
 
