@@ -16,6 +16,7 @@
 	<osgi:service ref="trustEventMgr" interface="org.societies.privacytrust.trust.api.event.ITrustEventMgr" />
 	<osgi:service ref="trustBroker" interface="org.societies.api.internal.privacytrust.trust.ITrustBroker" />
 	<osgi:service ref="trustRepository" interface="org.societies.privacytrust.trust.api.repo.ITrustRepository" />
+	<osgi:service ref="trustEvidenceRepository" interface="org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository" />
 	
 	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
 	<osgi:reference id="eventMgr" interface="org.societies.api.osgi.event.IEventMgr" />

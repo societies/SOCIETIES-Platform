@@ -97,26 +97,21 @@ public class CisManager implements ICisManager, IFeatureServer{
 	ICISCommunicationMgrFactory ccmFactory;
 	IIdentity cisManagerId;
 	ICommManager CSSendpoint;
-	Set<CisRecord> subscribedCISs;
+	Set<CisSubscribedImp> subscribedCISs;
 	@Autowired private static SessionFactory sessionFactory;
+	private Session session;
 	
-	public static SessionFactory getSessionFactory() {
-		return sessionFactory;
-	}
-
-	public static void setSessionFactory(SessionFactory sessionFactory) {
-		CisManager.sessionFactory = sessionFactory;
-	}
 
 	public void startup(){
 		ActivityFeed ret = null;
 	
-		Session session = sessionFactory.openSession();
+		if(session == null)
+			session = this.getSession();//sessionFactory.openSession();
 		//getting owned CISes
 		Query q = session.createQuery("select o from org_societies_cis_manager_CisEditor o");
 		this.ownedCISs = (Set<CisEditor>) q.list();
 		q = session.createQuery("select s from org_societies_cis_manager_CisRecord s");
-		this.subscribedCISs = (Set<CisRecord>) q.list();
+		this.subscribedCISs = (Set<CisSubscribedImp>) q.list();
 	}
 
 	private final static List<String> NAMESPACES = Collections
@@ -149,33 +144,11 @@ public class CisManager implements ICisManager, IFeatureServer{
 			LOG.info("listener registered");
 
 			setOwnedCISs(new HashSet<CisEditor>());	
-			subscribedCISs = new HashSet<CisRecord>();
+			subscribedCISs = new HashSet<CisSubscribedImp>();
 
 	}
 
-	/** Deprecated, has been replaced by the function bellow
-	 * 
-	 * Create a CIS Editor with default settings and returns a CIS Record 
-	 * This function should generate automatically the jid for the CIS and the pwd
-	 * 
-	 * @param  creatorCssId  bareJid of the user creating the CIS
-	 * @param  cisname 		 term used by the user to map the CIS. needs to be matched with the real
-	 * 						 cis XMPP credentials in the database
-	 * @return      CisRecord
-	 * 
-	 */
-	@Deprecated
-	public CisRecord createCis(String creatorCssId, String cisname) {
-		// TODO: create and identity for the CIS and map it in the database with the cisname
-		// cisName = randon unused JID;
-		// cisId_pwd = random password;
-		String cisId = "cis1";
-		String host = this.CSSendpoint.getIdManager().getThisNetworkNode().getDomain();
-		String password = "password.thomas.local";
 
-		return null;//this.createCis(creatorCssId, cisId, host, password);
-	}
-	
 	
 	/**
 	 * Create a new CIS for the CSS represented by cssId. Password is needed and is the
@@ -250,7 +223,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 		CisEditor cis = new  CisEditor(cssId, cisName, cisType, mode,this.ccmFactory);
 		this.persist(cis);
 		if (getOwnedCISs().add(cis)){
-			ICisOwned i = cis.getCisRecord();
+			ICisOwned i = cis;
 			return i;
 		}else{
 			return null;
@@ -260,47 +233,18 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 	// internal method used to register that the user has subscribed into a CIS
 	// it is triggered by the subscription notification on XMPP
-	private boolean subscribeToCis(ICisRecord i) {
+	// TODO: review
+	private boolean subscribeToCis(CisRecord i) {
 
-		this.subscribedCISs.add(new CisRecord(i.getCisId()));
+		this.subscribedCISs.add(new CisSubscribedImp (new CisRecord(i.getCisId())));
 		return true;
 		
 	}
 
-	private void persist(Object o){
-		Session s = sessionFactory.openSession();
-		Transaction t = s.beginTransaction();
-		s.save(o);
-		t.commit();
-	}
-	/**
-	 * Create a CIS Editor with default settings and returns a CIS Record 
-	 * Function to be called from the XMPP or to be used by the 
-	 *  public method CisRecord createCis(String creatorCssId, String cisName) 
-	 * 
-	 * @param  creatorCssId  bareJid of the user creating the CIS
-	 * @param  cisName 		 jid to be given to the CIS
-	 * @param  host 		 jid to be given to the CIS
-	 * @password  host 		 jid to be given to the CIS
-	 * @return      CisRecord
-	 * 
-	 */
-	
-	/*not being used anylonger
-	 * 
-	 * private CisRecord createCis(String creatorCssId, String cisId, String host, String password) {
-		//TODO: check if 
-		// cIs already exist in the database or if this is a new CIS
-		CisEditor cis = new  CisEditor(creatorCssId,
-				cisId,host,0,"",password,this.ccmFactory);
-		if (ownedCISs.add(cis))
-			return cis.getCisRecord();
-		else
-			return null;
-	}*/
 
 
 
+/*
 	public List<CisRecord> getOwnedCisList() {
 		
 		List<CisRecord> l = new ArrayList<CisRecord>();
@@ -320,7 +264,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 		
 		List<CisRecord> l = new ArrayList<CisRecord>(this.subscribedCISs);
 		return l;
-	}
+	}*/
 
 
 
@@ -388,11 +332,11 @@ public class CisManager implements ICisManager, IFeatureServer{
 				
 				if(listingType.equals("owned") || listingType.equals("all")){
 				// GET LIST CODE of ownedCIS
-					List<CisRecord> l = this.getOwnedCisList();
-					Iterator<CisRecord> it = l.iterator();
+					
+					Iterator<CisEditor> it = ownedCISs.iterator();
 					
 					while(it.hasNext()){
-						CisRecord element = it.next();
+						CisRecord element = it.next().getCisRecord();
 						Community community = new Community();
 						community.setCommunityJid(element.getCisId());
 						com.getCommunity().add(community);
@@ -402,11 +346,11 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 				// GET LIST CODE of subscribedCIS
 				if(listingType.equals("subscribed") || listingType.equals("all")){
-					List<CisRecord> li = this.getSubscribedCisList();
-					Iterator<CisRecord> it = li.iterator();
+					//List<CisRecord> li = this.getSubscribedCisList();
+					Iterator<CisSubscribedImp> it = subscribedCISs.iterator();
 					
 					while(it.hasNext()){
-						CisRecord element = it.next();
+						CisSubscribedImp element = it.next();
 						Community community = new Community();
 						community.setCommunityJid(element.getCisId());
 						com.getCommunity().add(community);
@@ -512,17 +456,17 @@ public class CisManager implements ICisManager, IFeatureServer{
 		l.addAll(subscribedCISs);
 
 		
-		// add owned CIS to the list to be returned
+		/*// add owned CIS to the list to be returned
 		List<ICisRecord> l2 = new ArrayList<ICisRecord>();
 
 		Iterator<CisEditor> it = getOwnedCISs().iterator();
 		 
 		while(it.hasNext()){
 			 CisEditor element = it.next();
-			 l2.add(element.getCisRecord());
+			 l2.add(element);
 			 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
-	     }
-		l.addAll(l2);
+	     }*/
+		l.addAll(ownedCISs);
 		
 		return l;
 	}
@@ -538,10 +482,10 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 
 	@Override
-	public Boolean requestNewCisOwner(String arg0, String arg1, String arg2,
+	public boolean requestNewCisOwner(String arg0, String arg1, String arg2,
 			String arg3) {
 		// TODO Auto-generated method stub
-		return null;
+		return false;
 	}
 
 
@@ -566,13 +510,13 @@ public class CisManager implements ICisManager, IFeatureServer{
 		while(it.hasNext()){
 			 CisEditor element = it.next();
 			 if (element.getCisId().equals(cisId))
-				 return element.cisRecord;
+				 return element;
 	     }
 		
 		// then we check on the subscribed CISs
-		Iterator<CisRecord> iterator = this.subscribedCISs.iterator();
+		Iterator<CisSubscribedImp> iterator = this.subscribedCISs.iterator();
 		while(iterator.hasNext()){
-			CisRecord element = iterator.next();
+			CisSubscribedImp element = iterator.next();
 			 if (element.getCisId().equals(cisId))
 				 return element;
 	     }
@@ -590,12 +534,53 @@ public class CisManager implements ICisManager, IFeatureServer{
 	}
 	
 	
-	public Set<CisRecord> getSubscribedCISs() {
+	public Set<CisSubscribedImp> getSubscribedCISs() {
 		return subscribedCISs;
 	}
 
-	public void setSubscribedCISs(Set<CisRecord> subscribedCISs) {
+	public void setSubscribedCISs(Set<CisSubscribedImp> subscribedCISs) {
 		this.subscribedCISs = subscribedCISs;
 	}
+
+	@Override
+	public ICisOwned getOwnedCis(String cisId) {
+		// first we check it on the owned CISs		
+		Iterator<CisEditor> it = getOwnedCISs().iterator();
+		while(it.hasNext()){
+			 CisEditor element = it.next();
+			 if (element.getCisId().equals(cisId))
+				 return element;
+	     }
+		
+		return null;
+	}
+	
+	// session related methods
+
+	public void setSession(Session s){
+		 session = s;
+	}
+	public Session getSession()
+	{
+		if(session == null)
+			session = sessionFactory.openSession();
+		return session;
+	}
+	private void persist(Object o){
+		Session s = getSession();
+		Transaction t = s.beginTransaction();
+		s.save(o);
+		t.commit();
+	}
+	
+	public static SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
+
+	public static void setSessionFactory(SessionFactory sessionFactory) {
+		CisManager.sessionFactory = sessionFactory;
+	}
+
+	
 
 }

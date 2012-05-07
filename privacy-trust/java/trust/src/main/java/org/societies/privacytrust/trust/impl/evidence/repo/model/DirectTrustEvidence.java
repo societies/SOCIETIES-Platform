@@ -22,12 +22,14 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.evidence.model;
+package org.societies.privacytrust.trust.impl.evidence.repo.model;
 
-import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.MappedSuperclass;
+
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
 
 /**
  * Describe your class here...
@@ -35,17 +37,14 @@ import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
  */
-public interface ITrustEvidence extends Serializable {
+@MappedSuperclass
+public abstract class DirectTrustEvidence extends TrustEvidence implements
+		IDirectTrustEvidence {
 
-	/**
-	 * 
-	 * @return
-	 */
-	public TrustedEntityId getTeid();
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public Date getTimestamp();
+	private static final long serialVersionUID = 1470145009236839996L;
+
+	DirectTrustEvidence(final TrustedEntityId teid, final Date timestamp) {
+		
+		super(teid, timestamp);
+	}
 }

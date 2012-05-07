@@ -24,13 +24,16 @@
  */
 package org.societies.privacytrust.trust.impl.evidence.repo;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.api.evidence.repo.TrustEvidenceRepositoryException;
-import org.societies.privacytrust.trust.impl.repo.TrustRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -45,6 +48,9 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(TrustEvidenceRepository.class);
 	
+	@Autowired
+	private SessionFactory sessionFactory;
+	
 	TrustEvidenceRepository() {
 		
 		LOG.info(this.getClass() + " instantiated");
@@ -54,10 +60,38 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#addEvidence(org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence)
 	 */
 	@Override
-	public void addEvidence(ITrustEvidence evidence)
+	public boolean addEvidence(ITrustEvidence evidence)
 			throws TrustEvidenceRepositoryException {
-		// TODO Auto-generated method stub
+		
+		if (evidence == null)
+			throw new NullPointerException("evidence can't be null");
+		
+		boolean result = false;
 
+		// TODO check if the entity is already present
+		// if (this.retrieveEntity(entity.getTeid()) != null)
+		//	return false;
+		
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
+		try {
+			if (LOG.isDebugEnabled())
+				LOG.debug("Adding trust evidence " + evidence + " to the Trust Evidence Repository...");
+	
+			session.save(evidence);
+			session.flush();
+			transaction.commit();
+			result = true;
+		} catch (Exception e) {
+			LOG.warn("Rolling back transaction for trust evidence " + evidence);
+			transaction.rollback();
+			throw new TrustEvidenceRepositoryException("Could not add evidence " + evidence, e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+		
+		return result;
 	}
 
 	/*
