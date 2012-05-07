@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -121,6 +122,7 @@ public class NominalTestCaseLowerTester {
 		
 		serviceId = installService();
 		LOG.info("[#713] testInstallService 2");
+		Thread.sleep(2000);
 		assertNotNull("Service ID is null", serviceId.getServiceInstanceIdentifier());
 		LOG.info("[#713] testInstallService 3");
 		servicesAfter = getLocalServices();
@@ -131,11 +133,12 @@ public class NominalTestCaseLowerTester {
 		int numServices = 0;
 		
 		LOG.info("[#713] testInstallService 4");
-		//assertEquals("Number of all services not increased by exactly 1", 1, servicesAfter.size() - servicesBefore.size());
+		assertEquals("Number of all services not increased by exactly 1", 1, servicesAfter.size() - servicesBefore.size());
 		LOG.info("[#713] testInstallService 5");
-		//assertEquals("Number of new services not exactly 1", 1, servicesNew.size());
+		assertEquals("Number of new services not exactly 1", 1, servicesNew.size());
 		LOG.info("[#713] testInstallService 6");
-		//assertEquals("Incorrect service ID", servicesNew.get(0), serviceId);
+		assertEquals("Incorrect service ID", servicesNew.get(0).getServiceIdentifier().getServiceInstanceIdentifier(),
+				serviceId.getServiceInstanceIdentifier());
 		LOG.info("[#713] testInstallService 7");
 
 		// -- Find the service
@@ -152,12 +155,13 @@ public class NominalTestCaseLowerTester {
 		LOG.info("[#713] testInstallService 7.2");
 		
 		uninstallService(serviceId);
+		Thread.sleep(2000);
 		
 		servicesAfter = getLocalServices();
 		servicesNew = getAdditionalServices(servicesBefore, servicesAfter);
-		//assertEquals("Number of all services not same as before installation", 0, servicesAfter.size() - servicesBefore.size());
+		assertEquals("Number of all services not same as before installation", 0, servicesAfter.size() - servicesBefore.size());
 		LOG.info("[#713] testInstallService 8");
-		//assertEquals("Number of new services not exactly 0", 0, servicesNew.size());
+		assertEquals("Number of new services not exactly 0", 0, servicesNew.size());
 		LOG.info("[#713] testInstallService 9");
 		
 		LOG.info("[#713] testInstallService: SUCCESS");
@@ -218,10 +222,14 @@ public class NominalTestCaseLowerTester {
 
 		// -- Search all local services
 		LOG.debug("[#713] getLocalServices() 1");
-		asyncServices = TestCase713.getServiceDiscovery().getLocalServices();
+		IServiceDiscovery serviceDiscovery = TestCase713.getServiceDiscovery();
 		LOG.debug("[#713] getLocalServices() 2");
-		services = asyncServices.get();
+		assertNotNull(serviceDiscovery);
+		LOG.debug("[#713] getLocalServices(): " + serviceDiscovery.toString());
+		asyncServices = serviceDiscovery.getLocalServices();
 		LOG.debug("[#713] getLocalServices() 3");
+		services = asyncServices.get();
+		LOG.debug("[#713] getLocalServices() 4");
 
 		return services;
 	}
@@ -229,16 +237,25 @@ public class NominalTestCaseLowerTester {
 	private List<Service> getAdditionalServices(List<Service> services1, List<Service> services2) {
 
 		List<Service> servicesNew = new ArrayList<Service>();
+		String id1;
+		String id2;
+		boolean exists;
 		
-		// -- Find the service
 		for (Service service : services2) {
-			
+			id2 = service.getServiceIdentifier().getServiceInstanceIdentifier();
+			exists = false;
+			LOG.debug("id2 = " + id2);
 			for (Service sBefore : services1) {
-				if (sBefore.getServiceIdentifier().getServiceInstanceIdentifier().equals(
-						service.getServiceIdentifier().getServiceInstanceIdentifier())) {
-					
-					servicesNew.add(sBefore);
+				id1 = sBefore.getServiceIdentifier().getServiceInstanceIdentifier();
+				LOG.debug("id1 = " + id1);
+				if (id1.equals(id2)) {
+					exists = true;
+					break;
 				}
+			}
+			if (!exists) {
+				servicesNew.add(service);
+				LOG.debug("Added = " + id2);
 			}
 		}
 		return servicesNew;
