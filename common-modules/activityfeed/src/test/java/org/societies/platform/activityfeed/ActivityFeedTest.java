@@ -114,8 +114,8 @@ public class ActivityFeedTest extends
 		Transaction t = s.beginTransaction();
 		t.begin();
 		for(int i=0;i<10;i++){
-			ActivityFeed feed = new ActivityFeed();
-			feed.setId(Integer.toString(i));
+			ActivityFeed feed = new ActivityFeed(Integer.toString(i));
+			
 			s.save(feed);
 		}
 		t.commit();

@@ -27,8 +27,10 @@ public class ActivityFeed implements IActivityFeed {
 	@OneToMany(cascade=CascadeType.ALL)
 	private
 	Set<Activity> list;
-	
-	
+	public ActivityFeed(){}
+	public ActivityFeed(String id){
+		this.id = id;
+	}
 	private static SessionFactory sessionFactory;
 	private static Logger log = LoggerFactory.getLogger(ActivityFeed.class);
 	
@@ -49,7 +51,7 @@ public class ActivityFeed implements IActivityFeed {
 	public void addCisActivity(IActivity activity) {
 		
 		//persist.
-		Session session = getSessionFactory().openSession();
+		Session session = ActivityFeed.getSession();//getSessionFactory().openSession();
 		Transaction t = session.beginTransaction();
 		Activity newact = new Activity(activity);
 		session.save(newact);
@@ -62,6 +64,20 @@ public class ActivityFeed implements IActivityFeed {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
+	private static Session session;
+	public static void setSession(Session s){
+		 session = s;
+	}
+	public static Session getSession()
+	{
+		if(session == null)
+			session = sessionFactory.openSession();
+		return session;
+	}
+	
+	
 
 	public SessionFactory getSessionFactory() {
 		return sessionFactory;
@@ -69,15 +85,24 @@ public class ActivityFeed implements IActivityFeed {
 	public static SessionFactory getStaticSessionFactory() {
 		return sessionFactory;
 	}
-
+	public static void setStaticSessionFactory(SessionFactory isessionFactory) {
+		sessionFactory = isessionFactory;
+	}
+	
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
 	
 	public static ActivityFeed startUp(String id){
 		ActivityFeed ret = null;
-		Session session = sessionFactory.openSession();
-		Query q = session.createQuery("select a from ActivityFeed a where a.id = ?");
+		Session session = ActivityFeed.getSession();//sessionFactory.getCurrentSession();
+		
+		Query q = session.createQuery("select a from ActivityFeed a");
+		long l = q.list().size();
+		System.out.println("l: "+l);
+		if(l== 0)
+			return new ActivityFeed(id);
+		q = session.createQuery("select a from ActivityFeed a where a.id = ?");
 		q.setString(0, id);
 		ret = (ActivityFeed) q.uniqueResult();
 		return ret;

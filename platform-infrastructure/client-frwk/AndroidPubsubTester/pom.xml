@@ -16,9 +16,9 @@
 
     <dependencies>
 	<dependency>
-            <groupId>android</groupId>
+	    <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
-        </dependency>
+	</dependency>
 	<dependency>
 		<groupId>org.societies.comm.android</groupId>
 		<artifactId>AndroidAgent</artifactId>

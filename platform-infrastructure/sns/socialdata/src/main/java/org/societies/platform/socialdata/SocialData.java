@@ -13,6 +13,8 @@ import org.apache.shindig.social.opensocial.model.Person;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialData;
 import org.societies.platform.FacebookConn.impl.FacebookConnectorImpl;
+import org.societies.platform.FoursquareConnector.impl.FoursquareConnectorImpl;
+import org.societies.platform.TwitterConnector.impl.TwitterConnectorImpl;
 import org.societies.platform.socialdata.converters.ActivityConverter;
 import org.societies.platform.socialdata.converters.ActivityConveterFactory;
 import org.societies.platform.socialdata.converters.FriendsConverter;
@@ -21,6 +23,7 @@ import org.societies.platform.socialdata.converters.GroupConverter;
 import org.societies.platform.socialdata.converters.GroupConveterFactory;
 import org.societies.platform.socialdata.converters.PersonConverter;
 import org.societies.platform.socialdata.converters.PersonConverterFactory;
+
 
 
 public class SocialData implements ISocialData{
@@ -232,25 +235,30 @@ public class SocialData implements ISocialData{
 	}
 
 	@Override
-	public ISocialConnector createConnector(String snName, Map<String, String> params) {
+	public ISocialConnector createConnector(ISocialConnector.SocialNetwork snName, Map<String, String> params) {
+		
+		
+		
 		System.out.println("Create a new connector");
+		switch(snName){
+				case Facebook:   return (ISocialConnector) new FacebookConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), "test");
+				
+				case twitter:    
+					// Just for now that we don't have a way to use our persona token
+						return (ISocialConnector) new TwitterConnectorImpl();
+					//    return (ISocialConnector) new TwitterConnectorImpl (params.get(ISocialConnector.AUTH_TOKEN), "test");
+				
+				case Foursquare: 
+					
+						// Just for now ...
+					    return (ISocialConnector) new FoursquareConnectorImpl();
+					    //return (ISocialConnector) new FoursquareConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), "test");
+
+				default : return null;
+		}
 		
-//		if (ISocialConnector.FACEBOOK_CONN.equals(snName)){
-//			return (ISocialConnector) new FacebookConnectorImpl(params.get(ISocialConnector.AUTH_TOKEN), "");
-//		}
-//		else if (ISocialConnector.TWITTER_CONN.equals(snName)){
-//			
-//		}
-//		else if (ISocialConnector.FOURSQUARE_CONN.equals(snName)){
-//			
-//		}
 		
-		System.out.println("token:"+params.get(ISocialConnector.AUTH_TOKEN));
-	
-		String auth_token = params.get(ISocialConnector.AUTH_TOKEN);
-		String identity   ="";
-		
-		return (ISocialConnector) new FacebookConnectorImpl(auth_token, identity);
+
 	}
  
 	

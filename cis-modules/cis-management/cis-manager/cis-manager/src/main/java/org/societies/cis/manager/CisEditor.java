@@ -35,9 +35,13 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 //import org.societies.cis.mgmt;
 import org.slf4j.Logger;
@@ -84,12 +88,19 @@ import org.societies.api.schema.cis.manager.SubscribedTo;
 @Entity
 @Table(name = "org_societies_cis_manager_CisEditor")
 public class CisEditor implements IFeatureServer,ICisEditor {
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private Long id;
+
+
+
 
 	@OneToOne(cascade=CascadeType.ALL)
 	public CisRecord cisRecord;
 	@OneToOne(cascade=CascadeType.ALL)
 	public ActivityFeed activityFeed;
 	//TODO: should this be persisted?
+	@Transient
 	public Set<IServiceSharingRecord> sharedServices; 
 //	public CommunityManagement commMgmt;
 	
@@ -102,10 +113,11 @@ public class CisEditor implements IFeatureServer,ICisEditor {
 			//.singletonList("org.societies.api.schema.cis.community");
 	.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
 		"org.societies.api.schema.cis.community"));
-	
+	@Transient
 	private ICommManager CISendpoint;
-	
+	@Transient
 	private IIdentity cisIdentity;
+	@Transient
 	private PubsubClient psc;
 	@OneToMany(cascade=CascadeType.ALL)
 	public Set<CisParticipant> membersCss; // TODO: this may be implemented in the CommunityManagement bundle. we need to define how they work together
@@ -136,7 +148,9 @@ public class CisEditor implements IFeatureServer,ICisEditor {
 	private static Logger LOG = LoggerFactory
 			.getLogger(CisEditor.class);	
 	
-
+	public CisEditor(){
+		
+	}
 
 
 	// at the moment we are not using this constructor, but just the one below, as that one generates the CIS id for us
@@ -607,6 +621,13 @@ public class CisEditor implements IFeatureServer,ICisEditor {
 		
 	}
 
-    
+	public Long getId() {
+		return id;
+	}
+
+
+	public void setId(Long id) {
+		this.id = id;
+	}
     
 }

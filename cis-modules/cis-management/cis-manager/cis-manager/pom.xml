@@ -176,6 +176,12 @@
 			<version>${version.cis}</version>
 			<scope>provided</scope>
 		</dependency>
+				<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-data-source</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

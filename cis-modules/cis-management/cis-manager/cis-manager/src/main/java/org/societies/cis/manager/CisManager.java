@@ -100,10 +100,19 @@ public class CisManager implements ICisManager, IFeatureServer{
 	Set<CisRecord> subscribedCISs;
 	@Autowired private static SessionFactory sessionFactory;
 	
+	public static SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
+
+	public static void setSessionFactory(SessionFactory sessionFactory) {
+		CisManager.sessionFactory = sessionFactory;
+	}
+
 	public void startup(){
 		ActivityFeed ret = null;
 	
-		Session session = sessionFactory.openSession();
+		if(session == null)
+			session = this.getSession();//sessionFactory.openSession();
 		//getting owned CISes
 		Query q = session.createQuery("select o from org_societies_cis_manager_CisEditor o");
 		this.ownedCISs = (Set<CisEditor>) q.list();
@@ -258,9 +267,18 @@ public class CisManager implements ICisManager, IFeatureServer{
 		return true;
 		
 	}
-
+	private Session session;
+	public void setSession(Session s){
+		 session = s;
+	}
+	public Session getSession()
+	{
+		if(session == null)
+			session = sessionFactory.openSession();
+		return session;
+	}
 	private void persist(Object o){
-		Session s = sessionFactory.openSession();
+		Session s = getSession();
 		Transaction t = s.beginTransaction();
 		s.save(o);
 		t.commit();

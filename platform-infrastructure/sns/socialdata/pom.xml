@@ -68,7 +68,7 @@
 		    <version>${release.version}</version>
 		</dependency>
 		
-		<!--    
+		
 		
 		<dependency>
 		   <groupId>org.societies.platform</groupId>
@@ -81,7 +81,7 @@
 	       <artifactId>foursquare_connector</artifactId>
 		    <version>${release.version}</version>
 		</dependency>
-		-->
+		
 		
 		<!-- 
 		
