@@ -51,7 +51,7 @@ public class ActivityFeed implements IActivityFeed {
 	public void addCisActivity(IActivity activity) {
 		
 		//persist.
-		Session session = getSessionFactory().openSession();
+		Session session = ActivityFeed.getSession();//getSessionFactory().openSession();
 		Transaction t = session.beginTransaction();
 		Activity newact = new Activity(activity);
 		session.save(newact);
@@ -64,6 +64,20 @@ public class ActivityFeed implements IActivityFeed {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
+	private static Session session;
+	public static void setSession(Session s){
+		 session = s;
+	}
+	public static Session getSession()
+	{
+		if(session == null)
+			session = sessionFactory.openSession();
+		return session;
+	}
+	
+	
 
 	public SessionFactory getSessionFactory() {
 		return sessionFactory;
@@ -81,7 +95,7 @@ public class ActivityFeed implements IActivityFeed {
 	
 	public static ActivityFeed startUp(String id){
 		ActivityFeed ret = null;
-		Session session = sessionFactory.openSession();
+		Session session = ActivityFeed.getSession();//sessionFactory.getCurrentSession();
 		
 		Query q = session.createQuery("select a from ActivityFeed a");
 		long l = q.list().size();
