@@ -28,7 +28,7 @@ import java.util.Date;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.ChannelType;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppend;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.LogEntry;
 
 /**
@@ -37,10 +37,10 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacyas
  * @author Mitja Vardjan
  *
  */
-public class PrivacyLogAppend implements IPrivacyLogAppend {
+public class PrivacyLogAppender implements IPrivacyLogAppender {
 
 	/* (non-Javadoc)
-	 * @see IPrivacyLogAppend#log(LogEntry)
+	 * @see IPrivacyLogAppender#log(LogEntry)
 	 */
 	@Override
 	public boolean log(LogEntry entry) {
@@ -48,7 +48,7 @@ public class PrivacyLogAppend implements IPrivacyLogAppend {
 	}
 
 	/* (non-Javadoc)
-	 * @see IPrivacyLogAppend#logCommsFw(IIdentity, IIdentity, Object)
+	 * @see IPrivacyLogAppender#logCommsFw(IIdentity, IIdentity, Object)
 	 */
 	@Override
 	public boolean logCommsFw(IIdentity sender, IIdentity receiver, Object payload) {
@@ -56,7 +56,7 @@ public class PrivacyLogAppend implements IPrivacyLogAppend {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppend#logSN(java.lang.String, java.util.Date, boolean, org.societies.api.identity.IIdentity, org.societies.api.identity.IIdentity, org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.ChannelType)
+	 * @see IPrivacyLogAppender#logSN(String, Date, boolean, IIdentity, IIdentity, ChannelType)
 	 */
 	@Override
 	public boolean logSN(String dataType, Date time, boolean sentToGroup, IIdentity sender,
