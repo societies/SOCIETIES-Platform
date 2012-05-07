@@ -22,12 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.evidence.model;
-
-import java.io.Serializable;
-import java.util.Date;
-
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+package org.societies.privacytrust.trust.impl.evidence.repo.model;
 
 /**
  * Describe your class here...
@@ -35,16 +30,7 @@ import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
  */
-public interface ITrustEvidence extends Serializable {
+public class TableName {
 
-	/**
-	 * 
-	 * @return
-	 */
-	public TrustedEntityId getTeid();
 	
-	/*
-	 * 
-	 */
-	public Date getTimestamp();
 }
