@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.impl.evidence.repo.model;
+package org.societies.privacytrust.trust.api.evidence.model;
 
 /**
  * Describe your class here...
@@ -30,7 +30,6 @@ package org.societies.privacytrust.trust.impl.evidence.repo.model;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
  */
-public class TableName {
+public interface IIndirectTrustOpinion extends IIndirectTrustEvidence {
 
-	public static final String DIRECT_TRUST_OPINION = "t_direct_trust_opinions";
 }

@@ -43,8 +43,9 @@ public interface ITrustEvidence extends Serializable {
 	 */
 	public TrustedEntityId getTeid();
 	
-	/*
+	/**
 	 * 
+	 * @return
 	 */
 	public Date getTimestamp();
 }

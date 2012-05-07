@@ -24,13 +24,43 @@
  */
 package org.societies.privacytrust.trust.impl.evidence.repo.model;
 
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
+
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence;
+
 /**
  * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
  */
-public class TableName {
+@MappedSuperclass
+public abstract class IndirectTrustEvidence extends TrustEvidence implements
+		IIndirectTrustEvidence {
 
-	public static final String DIRECT_TRUST_OPINION = "t_direct_trust_opinions";
+	private static final long serialVersionUID = 1470145009236839996L;
+	
+	/** The source of this evidence. */
+	@Column(name = "source", nullable = false, updatable = false)
+	private final String source;
+
+	IndirectTrustEvidence(final TrustedEntityId teid, final Date timestamp,
+			final String source) {
+		
+		super(teid, timestamp);
+		this.source = source;
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence#getSource()
+	 */
+	@Override
+	public String getSource() {
+		
+		return this.source;
+	}
 }

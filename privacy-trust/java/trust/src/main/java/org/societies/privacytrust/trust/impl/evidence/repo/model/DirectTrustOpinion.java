@@ -24,13 +24,58 @@
  */
 package org.societies.privacytrust.trust.impl.evidence.repo.model;
 
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustOpinion;
+
 /**
  * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
  */
-public class TableName {
+@Entity
+@Table(name = TableName.DIRECT_TRUST_OPINION, uniqueConstraints={@UniqueConstraint(columnNames={"trustorId", "trusteeId", "timestamp"})})
+public class DirectTrustOpinion extends DirectTrustEvidence implements
+		IDirectTrustOpinion {
 
-	public static final String DIRECT_TRUST_OPINION = "t_direct_trust_opinions";
+	private static final long serialVersionUID = 1259370033409872732L;
+	
+	/** The trust rating assigned to the trustee by the trustor. */
+	@Column(name = "trustRating", nullable = false, updatable = false)
+	private final Double trustRating;
+	
+	/* Empty constructor required by Hibernate */
+	private DirectTrustOpinion(final Double TrustRating) {
+		
+		super(null, null);
+		this.trustRating = null;
+	}
+	
+	/**
+	 * 
+	 * @param teid
+	 * @param timestamp
+	 */
+	public DirectTrustOpinion(final TrustedEntityId teid, final Date timestamp,
+			final Double trustRating) {
+		
+		super(teid, timestamp);
+		this.trustRating = trustRating;
+	}
+
+	/*
+	 * @see org.societies.privacytrust.trust.api.evidence.model.IDirectTrustOpinion#getTrustRating()
+	 */
+	@Override
+	public Double getTrustRating() {
+		
+		return this.trustRating;
+	}
 }

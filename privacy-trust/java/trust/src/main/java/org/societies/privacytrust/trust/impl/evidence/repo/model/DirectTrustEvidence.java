@@ -24,13 +24,27 @@
  */
 package org.societies.privacytrust.trust.impl.evidence.repo.model;
 
+import java.util.Date;
+
+import javax.persistence.MappedSuperclass;
+
+import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
+
 /**
  * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
  */
-public class TableName {
+@MappedSuperclass
+public abstract class DirectTrustEvidence extends TrustEvidence implements
+		IDirectTrustEvidence {
 
-	public static final String DIRECT_TRUST_OPINION = "t_direct_trust_opinions";
+	private static final long serialVersionUID = 1470145009236839996L;
+
+	DirectTrustEvidence(final TrustedEntityId teid, final Date timestamp) {
+		
+		super(teid, timestamp);
+	}
 }
