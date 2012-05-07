@@ -25,11 +25,11 @@
 package org.societies.privacytrust.privacyprotection.assessment.logger;
 
 /**
- * Observe and log sending data through the comms framework
+ * Observe and log read access to the context through Context Broker
  *
  * @author Mitja Vardjan
  *
  */
-public class LoggerCommsFw {
+public class ContextLogger {
 
 }

@@ -25,12 +25,11 @@
 package org.societies.privacytrust.privacyprotection.assessment.logger;
 
 /**
- * Observe and log sending data to social networks through the SN connector.
- * To be implemented only if and when the SN connector allows sending data from CSS to SN.
+ * Observe and log sending data through the comms framework
  *
  * @author Mitja Vardjan
  *
  */
-public class LoggerSN {
+public class CommsFwLogger {
 
 }

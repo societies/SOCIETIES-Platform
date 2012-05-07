@@ -25,11 +25,12 @@
 package org.societies.privacytrust.privacyprotection.assessment.logger;
 
 /**
- * Observe and log read access to the context through Context Broker
+ * Observe and log sending data to social networks through the SN connector.
+ * To be implemented only if and when the SN connector allows sending data from CSS to SN.
  *
  * @author Mitja Vardjan
  *
  */
-public class LoggerContext {
+public class SNLogger {
 
 }
