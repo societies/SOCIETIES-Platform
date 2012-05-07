@@ -12,21 +12,10 @@
 	xmlns:tx="http://www.springframework.org/schema/tx">
 
 	<!-- Privacy Data Management Configuration -->
-	
-	<bean name="PrivacyDataManager"
-		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager">
-	</bean>
-	
 	<bean name="PrivacyDataManagerInternal"
 		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
-
-	<bean name="PrivacyPolicyManager"
-		class="org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager">
-		<!-- <property name="privacyPolicyManager" ref="privacyPolicyManager" /> -->
-	</bean>
-
 
 	<!-- Persistance Configuration -->
 	

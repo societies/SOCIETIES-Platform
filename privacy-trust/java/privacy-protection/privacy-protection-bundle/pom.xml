@@ -135,11 +135,12 @@
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Embed-Dependency>
 							commons-lang3;scope=compile|runtime,
+							gson;scope=compile|runtime,
 							api;scope=compile|runtime,
 							privacydatamanagement;scope=compile|runtime,
 							privacypolicymanagement;scope=compile|runtime
 							</Embed-Dependency>
-						<Embed-Transitive>false</Embed-Transitive>
+						<Embed-Transitive>true</Embed-Transitive>
 
 						<Export-Package></Export-Package>
 					</instructions>

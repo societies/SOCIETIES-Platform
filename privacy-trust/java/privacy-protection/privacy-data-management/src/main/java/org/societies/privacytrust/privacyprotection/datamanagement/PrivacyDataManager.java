@@ -141,9 +141,12 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 	private void verifyParemeters(Requestor requestor, IIdentity ownerId, IDataWrapper dataWrapper, CtxIdentifier dataId) throws PrivacyException {
 		if (null == requestor || null == ownerId) {
-			throw new NullPointerException("Not enought information to knwo how to obfuscate this data");
+			throw new NullPointerException("Not enought information");
 		}
 		if (null == dataId && (null == dataWrapper || null == dataWrapper.getDataId())) {
+			if (null == dataId) {
+				throw new PrivacyException("Not enought information: data id missing");
+			}
 			throw new PrivacyException("Not enought information in the wrapper to obfuscate this data");
 		}
 	}
