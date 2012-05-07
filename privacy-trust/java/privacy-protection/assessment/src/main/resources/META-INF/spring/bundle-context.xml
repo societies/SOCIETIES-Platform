@@ -15,5 +15,28 @@
 		We've kept the osgi definitions in a separate configuration file so that 
 		this file can easily be used for integration testing outside of an OSGi environment -->
 
+	<bean id="aopBean" class="org.societies.api.comm.xmpp.datatypes.Stanza">
+		<!--property name="aspectName" value="No_Aspect" /-->
+	</bean>
+
+	<bean id="catchBeforeMethod" class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwAdvice" />
+	<bean id="pointcut" class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwPointcut" />
+
+	<bean name="methodPointcut"
+		class="org.springframework.aop.support.DefaultPointcutAdvisor">
+		<property name="advice" ref="catchBeforeMethod" />
+		<property name="pointcut" ref="pointcut" />
+	</bean>
+
+	<bean id="aopBeanProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+
+		<property name="target" ref="aopBean" />
+
+		<property name="interceptorNames">
+			<list>
+				<value>methodPointcut</value>
+			</list>
+		</property>
+	</bean>
 
 </beans>
