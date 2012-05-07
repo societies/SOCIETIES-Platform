@@ -246,22 +246,20 @@ public class ServiceDiscovery implements IServiceDiscovery {
 			}
 		} else{
 			if(logger.isDebugEnabled()){
-				if(serviceList == null)
-					logger.debug("ServiceList is null!");
-				else{
-					if(serviceList.isEmpty())
-						logger.debug("getServices: no services found!");
 					
-					Iterator<Service> it = serviceList.iterator();
-					String logStuff = "getServices: ";
+				if(serviceList.isEmpty())	
+					logger.debug("getServices: no services found!");
+					
+				Iterator<Service> it = serviceList.iterator();
+				String logStuff = "getServices: ";
 
-					while(it.hasNext()){
-						logStuff += it.next().getServiceName() + "; \n";
-					}
-					
-					logger.debug(logStuff);
+				while(it.hasNext()){
+					logStuff += it.next().getServiceName() + "; \n";
 				}
+					
+				logger.debug(logStuff);
 			}
+			
 		}
 		
 		

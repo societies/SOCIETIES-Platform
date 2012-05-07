@@ -305,31 +305,15 @@ public class ServiceRegistryListener implements BundleContextAware,
 		
 		if(log.isDebugEnabled()) log.debug("Obtaining Service that corresponds to a bundle: " + bundle.getSymbolicName() + " with Id " + bundle.getBundleId());
 		
-		// Preparing the search filter
-		Service filter = new Service();
-		filter.setAuthorSignature(null);
-		filter.setServiceDescription(null);
-		filter.setServiceEndpoint(null);
-		filter.setServiceName(null);
-		filter.setServiceStatus(null);
-		filter.setServiceType(null);
+		// Preparing the search filter		
+		Service filter = ServiceMetaDataUtils.generateEmptyFilter();
+		filter.getServiceIdentifier().setServiceInstanceIdentifier(String.valueOf(bundle.getBundleId()));
+		filter.getServiceInstance().getServiceImpl().setServiceVersion(bundle.getVersion().toString());
 		
-		ServiceResourceIdentifier filterIdentifier = new ServiceResourceIdentifier();
-		filterIdentifier.setServiceInstanceIdentifier(String.valueOf(bundle.getBundleId()));
-		filter.setServiceIdentifier(filterIdentifier);
-		
-		ServiceInstance filterInstance = new ServiceInstance();
-		filterInstance.setFullJid(null);
-		filterInstance.setXMPPNode(null);
-		
-		ServiceImplementation filterImplementation = new ServiceImplementation();
-		filterImplementation.setServiceVersion(bundle.getVersion().toString());
-		filterImplementation.setServiceNameSpace(null);
-		filterImplementation.setServiceProvider(null);
-		
-		filterInstance.setServiceImpl(filterImplementation);
-		filter.setServiceInstance(filterInstance);
-		
+		if(log.isDebugEnabled()){
+			log.debug("Filter has version: " + filter.getServiceInstance().getServiceImpl().getServiceVersion() );
+			log.debug("Filter has bundleId: " + filter.getServiceIdentifier().getServiceInstanceIdentifier() );			
+		}
 		
 		List<Service> listServices;
 		try {
