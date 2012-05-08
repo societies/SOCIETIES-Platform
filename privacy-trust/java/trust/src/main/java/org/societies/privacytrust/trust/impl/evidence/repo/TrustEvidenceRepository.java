@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -104,10 +105,9 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 		if (teid == null)
 			throw new NullPointerException("teid can't be null");
 		
-		final Set<IDirectTrustEvidence> result = new HashSet<IDirectTrustEvidence>();
-		result.addAll(this.retrieve(teid, DirectTrustOpinion.class));
-		
-		return result;
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving all direct trust evidence for TEID " + teid + " from the Trust Evidence Repository...");		
+		return this.retrieveDirectEvidence(teid, null, null);
 	}
 
 	/*
@@ -117,11 +117,17 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 	public Set<IDirectTrustEvidence> retrieveDirectEvidence(
 			TrustedEntityId teid, Date startDate, Date endDate)
 			throws TrustEvidenceRepositoryException {
-		// TODO Auto-generated method stub
+		
 		if (teid == null)
 			throw new NullPointerException("teid can't be null");
 		
-		return null;
+		final Set<IDirectTrustEvidence> result = new HashSet<IDirectTrustEvidence>();
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving direct trust evidence between dates '"
+					+ startDate + "' and '" + endDate + "' for TEID " + teid + " from the Trust Evidence Repository...");
+		result.addAll(this.retrieve(teid, DirectTrustOpinion.class, startDate, endDate));
+		
+		return result;
 	}
 
 	/*
@@ -207,14 +213,23 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 	
 	@SuppressWarnings("unchecked")
 	private <T extends TrustEvidence> Set<T> retrieve(
-			final TrustedEntityId teid, final Class<T> evidenceClass) throws TrustEvidenceRepositoryException {
+			final TrustedEntityId teid, final Class<T> evidenceClass,
+			final Date startDate, final Date endDate) throws TrustEvidenceRepositoryException {
 		
 		final Set<T> result = new HashSet<T>();
 		
 		final Session session = sessionFactory.openSession();
-		result.addAll(session.createCriteria(evidenceClass)
-			.add(Restrictions.eq("teid", teid))
-			.list());
+		final Criteria criteria = session.createCriteria(evidenceClass)
+			.add(Restrictions.eq("teid", teid));
+		
+		if (startDate != null) 
+			criteria.add(Restrictions.ge("timestamp", startDate));
+		
+		if (endDate != null)
+			criteria.add(Restrictions.le("timestamp", endDate));
+	
+		result.addAll(criteria.list());
+		
 		if (session != null)
 			session.close();
 			

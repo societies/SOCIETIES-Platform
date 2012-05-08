@@ -57,9 +57,10 @@ public abstract class TrustEvidence implements ITrustEvidence {
 	/** The identifier of the trusted entity this evidence refers to. */
 	@Columns(columns={
 			@Column(name = "trustorId", nullable = false, updatable = false, length = 256),
+			@Column(name = "entityType", nullable = false, updatable = false, length = 3),
 			@Column(name = "trusteeId", nullable = false, updatable = false, length = 256)
 	})
-	@Type(type="org.societies.privacytrust.trust.impl.repo.model.hibernate.TrustedEntityIdUserType")
+	@Type(type="org.societies.privacytrust.trust.impl.evidence.repo.model.hibernate.TrustedEntityIdUserType")
 	private final TrustedEntityId teid;
 	
 	@Column(name = "timestamp", nullable = false, updatable = false)
@@ -135,5 +136,19 @@ public abstract class TrustEvidence implements ITrustEvidence {
 		return true;
 	}
 	
-	
+	/*
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		
+		final StringBuilder sb = new StringBuilder();
+		sb.append("{");
+		sb.append("teid=" + this.teid);
+		sb.append(",");
+		sb.append("timestamp=" + this.timestamp);
+		sb.append("}");
+		
+		return sb.toString();
+	}
 }
