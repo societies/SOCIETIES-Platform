@@ -54,7 +54,6 @@ public class CommsFwAdvice implements MethodInterceptor {
 		Method method = invocation.getMethod();
 		AccessibleObject staticPart = invocation.getStaticPart();
 		Object target = invocation.getThis();
-		
 		LOG.debug("invoke(): method = " + method.getName());
 		
 		return null;

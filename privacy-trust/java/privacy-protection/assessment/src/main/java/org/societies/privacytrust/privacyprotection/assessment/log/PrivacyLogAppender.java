@@ -62,6 +62,17 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		
 		LOG.debug("logCommsFw()");
 
+		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+		LOG.debug("stackTrace length = {}", stackTrace.length);
+		if (stackTrace != null) {
+			for (StackTraceElement st : stackTrace) {
+				LOG.debug(" ");
+				LOG.debug("  ClassName : {}", st.getClassName());
+				//LOG.debug("  FileName  : {}", st.getFileName());
+				//LOG.debug("  MethodName: {}", st.getMethodName());
+			}
+		}
+
 		return true;
 	}
 

@@ -30,7 +30,7 @@
 		<!--property name="aspectName" value="No_Aspect" /-->
 	<!--/bean-->
 
-	<bean id="aopBean" class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean"/>
+	<!--bean id="aopBean" class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean"/>
 
 	<bean id="catchBeforeMethod"
 		class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwAdvice" />
@@ -46,7 +46,7 @@
 	<bean id="aopBeanProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
 
 		<property name="target" ref="aopBean" />
-		<!--property name="target" ref="commMgr" /-->
+		<property name="target" ref="commMgr" />
 
 		<property name="interceptorNames">
 			<list>
@@ -68,6 +68,6 @@
 		>
 		<property name="commMgr" ref="CommManagerBundle"/>
 		<property name="testBean" ref="CommsFwTestBean"/>
-	</bean>
+	</bean-->
 
 </beans>
