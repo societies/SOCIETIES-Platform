@@ -27,6 +27,7 @@ package org.societies.privacytrust.trust.test;
 import static org.junit.Assert.*;
 
 import java.util.Date;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -38,6 +39,7 @@ import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.model.MalformedTrustedEntityIdException;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityType;
+import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustOpinion;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.api.evidence.repo.TrustEvidenceRepositoryException;
@@ -108,55 +110,30 @@ public class TrustEvidenceRepositoryTest extends AbstractTransactionalJUnit4Spri
 	@Test
 	public void testDirectTrustOpinionCRUD() throws TrustException {
 		
-		this.testAddDirectTrustOpinion();
-		//this.testRetrieveDirectTrustOpinion();
-		//this.testRemoveDirectTrustOpinion();
-	}
-	
-	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.evidence.repo.TrustEvidenceRepository#addEvidence(org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence)}.
-	 * @throws MalformedTrustedEntityIdException 
-	 * @throws TrustEvidenceRepositoryException 
-	 * @throws TrustRepositoryException 
-	 */
-	private void testAddDirectTrustOpinion() throws MalformedTrustedEntityIdException, TrustEvidenceRepositoryException {
-		
 		// test params
+		// TEID1
 		final TrustedEntityId teid1 = new TrustedEntityId(TRUSTOR_ID, TrustedEntityType.CSS, TRUSTED_CSS_ID);
-		final IDirectTrustOpinion directTrustOpinion1 = new DirectTrustOpinion(teid1, new Date(), new Double(0.5d));
-		assertTrue(this.trustEvidenceRepo.addEvidence(directTrustOpinion1));
-		// test duplicate entity 
-		// TODO assertFalse(this.trustRepo.addEntity(trustedCss));
-	}
-	
-	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.repo.TrustRepository#retrieveEntity(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)}.
-	 * @throws TrustRepositoryException 
-	 * @throws MalformedTrustedEntityIdException 
-	 */
-	private void testRetrieveDirectTrustOpinion() {
+		// TEID2
+		final TrustedEntityId teid2 = new TrustedEntityId(TRUSTOR_ID2, TrustedEntityType.CSS, TRUSTED_CSS_ID);
+		// reference timestamp
+		final Date date = new Date();
 		
-		/*ITrustedCss trustedCssFromDb;
-	
-		// test retrieval of existing entity
-		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(trustedCss.getTeid());
-		assertNotNull(trustedCssFromDb);
-		assertEquals(trustedCss.getTeid(), trustedCssFromDb.getTeid());
-		assertEquals(trustedCss, trustedCssFromDb);
+		Set<IDirectTrustEvidence> directEvidence;
 		
-		// test retrieval of non-existing entity
-		trustedCssFromDb = (ITrustedCss) this.trustRepo.retrieveEntity(
-				new TrustedEntityId(TRUSTOR_ID2, TrustedEntityType.CSS, TRUSTED_CSS_ID));
-		assertNull(trustedCssFromDb);*/
-	}
-	
-	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.repo.TrustRepository#removeEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)}.
-	 * @throws TrustRepositoryException 
-	 */
-	private void testRemoveDirectTrustOpinion() {
-		/*
-		this.trustRepo.removeEntity(trustedCss.getTeid());
-		assertNull(this.trustRepo.retrieveEntity(trustedCss.getTeid()));*/
+		directEvidence = this.trustEvidenceRepo.retrieveAllDirectEvidence(teid1);
+		assertNotNull(directEvidence);
+		assertTrue(directEvidence.isEmpty());
+		
+		this.trustEvidenceRepo.addEvidence(new DirectTrustOpinion(teid1, date, new Double(0.5d)));
+		this.trustEvidenceRepo.addEvidence(new DirectTrustOpinion(teid2, date, new Double(0.5d)));
+		this.trustEvidenceRepo.addEvidence(new DirectTrustOpinion(teid1, new Date(date.getTime()+1), new Double(1.0d)));
+		
+		directEvidence = this.trustEvidenceRepo.retrieveAllDirectEvidence(teid1);
+		assertNotNull(directEvidence);
+		assertEquals(2, directEvidence.size());
+		
+		directEvidence = this.trustEvidenceRepo.retrieveAllDirectEvidence(teid2);
+		assertNotNull(directEvidence);
+		assertEquals(1, directEvidence.size());
 	}
 }

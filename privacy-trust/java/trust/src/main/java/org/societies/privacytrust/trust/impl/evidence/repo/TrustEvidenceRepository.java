@@ -24,15 +24,24 @@
  */
 package org.societies.privacytrust.trust.impl.evidence.repo;
 
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
+import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.api.evidence.repo.TrustEvidenceRepositoryException;
+import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustOpinion;
+import org.societies.privacytrust.trust.impl.evidence.repo.model.TrustEvidence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -60,17 +69,11 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#addEvidence(org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence)
 	 */
 	@Override
-	public boolean addEvidence(ITrustEvidence evidence)
+	public void addEvidence(ITrustEvidence evidence)
 			throws TrustEvidenceRepositoryException {
 		
 		if (evidence == null)
 			throw new NullPointerException("evidence can't be null");
-		
-		boolean result = false;
-
-		// TODO check if the entity is already present
-		// if (this.retrieveEntity(entity.getTeid()) != null)
-		//	return false;
 		
 		final Session session = sessionFactory.openSession();
 		final Transaction transaction = session.beginTransaction();
@@ -81,7 +84,6 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 			session.save(evidence);
 			session.flush();
 			transaction.commit();
-			result = true;
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for trust evidence " + evidence);
 			transaction.rollback();
@@ -90,27 +92,132 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 			if (session != null)
 				session.close();
 		}
+	}
+
+	/*
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveAllDirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
+	 */
+	@Override
+	public Set<IDirectTrustEvidence> retrieveAllDirectEvidence(
+			TrustedEntityId teid) throws TrustEvidenceRepositoryException {
+		
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
+		
+		final Set<IDirectTrustEvidence> result = new HashSet<IDirectTrustEvidence>();
+		result.addAll(this.retrieve(teid, DirectTrustOpinion.class));
 		
 		return result;
 	}
 
 	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveDirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, java.util.Date, java.util.Date)
 	 */
 	@Override
-	public ITrustEvidence retrieveEvidence(TrustedEntityId teid)
+	public Set<IDirectTrustEvidence> retrieveDirectEvidence(
+			TrustedEntityId teid, Date startDate, Date endDate)
 			throws TrustEvidenceRepositoryException {
 		// TODO Auto-generated method stub
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
+		
 		return null;
 	}
 
 	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#removeEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveAllIndirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public void removeEvidence(TrustedEntityId teid)
+	public Set<IIndirectTrustEvidence> retrieveAllIndirectEvidence(
+			TrustedEntityId teid) throws TrustEvidenceRepositoryException {
+		// TODO Auto-generated method stub
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
+		
+		return null;
+	}
+
+	/*
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveIndirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, java.util.Date, java.util.Date)
+	 */
+	@Override
+	public Set<IIndirectTrustEvidence> retrieveIndirectEvidence(
+			TrustedEntityId teid, Date startDate, Date endDate)
 			throws TrustEvidenceRepositoryException {
 		// TODO Auto-generated method stub
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
+		
+		return null;
+	}
 
+	/*
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#removeAllDirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
+	 */
+	@Override
+	public Set<IDirectTrustEvidence> removeAllDirectEvidence(
+			TrustedEntityId teid) throws TrustEvidenceRepositoryException {
+		// TODO Auto-generated method stub
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
+		
+		return null;
+	}
+
+	/*
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#removeDirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, java.util.Date, java.util.Date)
+	 */
+	@Override
+	public Set<IDirectTrustEvidence> removeDirectEvidence(TrustedEntityId teid,
+			Date startDate, Date endDate)
+			throws TrustEvidenceRepositoryException {
+		// TODO Auto-generated method stub
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
+		
+		return null;
+	}
+
+	/*
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#removeAllIndirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
+	 */
+	@Override
+	public Set<IIndirectTrustEvidence> removeAllIndirectEvidence(
+			TrustedEntityId teid) throws TrustEvidenceRepositoryException {
+		// TODO Auto-generated method stub
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
+		
+		return null;
+	}
+
+	/*
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#removeIndirectEvidence(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId, java.util.Date, java.util.Date)
+	 */
+	@Override
+	public Set<IIndirectTrustEvidence> removeIndirectEvidence(
+			TrustedEntityId teid, Date startDate, Date endDate)
+			throws TrustEvidenceRepositoryException {
+		// TODO Auto-generated method stub
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
+		
+		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <T extends TrustEvidence> Set<T> retrieve(
+			final TrustedEntityId teid, final Class<T> evidenceClass) throws TrustEvidenceRepositoryException {
+		
+		final Set<T> result = new HashSet<T>();
+		
+		final Session session = sessionFactory.openSession();
+		result.addAll(session.createCriteria(evidenceClass)
+			.add(Restrictions.eq("teid", teid))
+			.list());
+		if (session != null)
+			session.close();
+			
+		return result;
 	}
 }

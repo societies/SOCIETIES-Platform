@@ -52,7 +52,7 @@ public class DirectTrustOpinion extends DirectTrustEvidence implements
 	private final Double trustRating;
 	
 	/* Empty constructor required by Hibernate */
-	private DirectTrustOpinion(final Double TrustRating) {
+	private DirectTrustOpinion() {
 		
 		super(null, null);
 		this.trustRating = null;
