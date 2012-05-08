@@ -28,6 +28,7 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.ChannelType;
@@ -66,6 +67,10 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 //		testBean.setAspectName("ahoj");
 //		aspectName = testBean.getAspectName();
 //		LOG.debug("init(): 4 aspectName = " + aspectName);
+		
+		LOG.debug("init(): 1");
+		commMgr.getIdManager();
+		LOG.debug("init(): 2");
 		
 //		try {
 //			LOG.debug("init(): 1");
