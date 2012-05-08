@@ -26,11 +26,10 @@
 	</bean>
 	
 	
-	<!--bean id="aopBean" class="org.societies.comm.xmpp.xc.impl.XCCommunicationMgr"-->
-		<!--property name="aspectName" value="No_Aspect" /-->
-	<!--/bean-->
+	<!--bean id="aopBean" class="org.societies.comm.xmpp.xc.impl.XCCommunicationMgr">
+	</bean>
 
-	<!--bean id="aopBean" class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean"/>
+	<bean id="aopBean" class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean"/>
 
 	<bean id="catchBeforeMethod"
 		class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwAdvice" />
@@ -59,15 +58,15 @@
 		class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean"
 		init-method="init"
 		>
-	</bean>
+	</bean-->
 
-	<bean id="PrivacyLog"
-		class="org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog"
+	<bean id="PrivacyLogAppender"
+		class="org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLogAppender"
 		init-method="init"
 		depends-on="CommManagerBundle"
 		>
 		<property name="commMgr" ref="CommManagerBundle"/>
-		<property name="testBean" ref="CommsFwTestBean"/>
-	</bean-->
+		<!--property name="testBean" ref="CommsFwTestBean"/-->
+	</bean>
 
 </beans>

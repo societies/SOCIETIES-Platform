@@ -28,10 +28,12 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.ChannelType;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.LogEntry;
+import org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean;
 
 /**
  * 
@@ -42,6 +44,71 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacyas
 public class PrivacyLogAppender implements IPrivacyLogAppender {
 
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyLogAppender.class);
+
+	private CommsFwTestBean testBean;
+	private ICommManager commMgr;
+
+	public PrivacyLogAppender() {
+		LOG.info("constructor");
+	}
+
+	public void init() {
+		LOG.info("init()");
+		
+		//ApplicationContext appContext = new ClassPathXmlApplicationContext(new String[] { "META-INF/spring/bundle-context.xml" });
+		//LOG.debug("init(): 1");
+		//CommsFwTestBean aopBean = (CommsFwTestBean) appContext.getBean("aopBeanProxy");
+		
+		
+//		LOG.debug("init(): 2");
+//		String aspectName = testBean.getAspectName();
+//		LOG.debug("init(): 3 aspectName = " + aspectName);
+//		testBean.setAspectName("ahoj");
+//		aspectName = testBean.getAspectName();
+//		LOG.debug("init(): 4 aspectName = " + aspectName);
+		
+//		try {
+//			LOG.debug("init(): 1");
+//			commMgr.sendIQGet(null, null, null);
+//			LOG.debug("init(): 2");
+//		} catch (CommunicationException e) {
+//			LOG.warn("init()", e);
+//		}
+		
+//		logStack();
+	}
+	
+	public void logStack() {
+
+		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+		LOG.debug("stackTrace length = {}", stackTrace.length);
+		if (stackTrace != null) {
+			for (StackTraceElement st : stackTrace) {
+				LOG.debug(" ");
+				LOG.debug("  ClassName : {}", st.getClassName());
+				LOG.debug("  FileName  : {}", st.getFileName());
+				LOG.debug("  MethodName: {}", st.getMethodName());
+			}
+		}
+	}
+
+	// Getters and setters for beans
+	public ICommManager getCommMgr() {
+		LOG.debug("getCommMgr()");
+		return commMgr;
+	}
+	public void setCommMgr(ICommManager commMgr) {
+		LOG.debug("setCommMgr()");
+		this.commMgr = commMgr;
+	}
+	public CommsFwTestBean getTestBean() {
+		LOG.debug("getTestBean()");
+		return testBean;
+	}
+	public void setTestBean(CommsFwTestBean testBean) {
+		LOG.debug("setTestBean()");
+		this.testBean = testBean;
+	}
 
 	/* (non-Javadoc)
 	 * @see IPrivacyLogAppender#log(LogEntry)
@@ -61,17 +128,6 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	public boolean logCommsFw(IIdentity sender, IIdentity receiver, Object payload) {
 		
 		LOG.debug("logCommsFw()");
-
-		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-		LOG.debug("stackTrace length = {}", stackTrace.length);
-		if (stackTrace != null) {
-			for (StackTraceElement st : stackTrace) {
-				LOG.debug(" ");
-				LOG.debug("  ClassName : {}", st.getClassName());
-				//LOG.debug("  FileName  : {}", st.getFileName());
-				//LOG.debug("  MethodName: {}", st.getMethodName());
-			}
-		}
 
 		return true;
 	}
