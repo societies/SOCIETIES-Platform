@@ -1,7 +1,5 @@
 package org.societies.platform.TwitterConnector.impl;
 
-import org.json.simple.*;
-import org.json.simple.parser.ParseException;
 import org.societies.platform.TwitterConnector.TwitterConnector;
 
 class Test {

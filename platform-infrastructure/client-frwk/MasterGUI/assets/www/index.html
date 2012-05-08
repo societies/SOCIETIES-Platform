@@ -5,7 +5,7 @@
 		<script type="text/javascript" charset="utf-8" src="phonegap-1.2.0.js"></script>
 
 		<!-- Uncomment line below to enable PhoneGap desktop and comment out real PhoneGap jS library-->
-		<!-- script type="text/javascript" charset="utf-8" src="phonegap-desktop.js"></script-->
+		<!--script type="text/javascript" charset="utf-8" src="phonegap-desktop.js"></script-->
 		<link rel="stylesheet" href="themes/Kilkenny.css"/>
 		<link rel="stylesheet" href="jquery.mobile.structure-1.0.css" /> 
 		<script type="text/javascript" src="jquery-1.6.4.js"></script>
@@ -14,8 +14,9 @@
 		<link rel="stylesheet" href="societies.css"/> 
 	
 		<!-- Uncomment lines below to enable PhoneGap desktop-->
-		<!--script type="text/javascript" charset="utf-8" src="pluginjs/cssmanager.js"></script>
-		<script type="text/javascript" charset="utf-8" src="pluginjs/servicemonitor.js"></script-->
+		<!-- script type="text/javascript" charset="utf-8" src="pluginjs/cssmanager.js"></script>
+		<script type="text/javascript" charset="utf-8" src="pluginjs/servicemonitor.js"></script>
+		<script type="text/javascript" charset="utf-8" src="pluginjs/devicestatus.js"></script-->
 
 
 		<!-- Ignore -->
@@ -73,6 +74,7 @@
     	<a href="#cssRecord" data-theme="a" data-transition="pop" data-role="button" >CSS Record</a>
     	<a href="#activeServices" data-theme="a" data-transition="pop" data-role="button" >Active Services Monitor</a>
     	<a href="#activeTasks" data-theme="a" data-transition="pop" data-role="button" >Active Tasks Monitor</a>
+    	<a href="#deviceMonitor" data-theme="a" data-transition="pop" data-role="button" >Device Monitor</a>
 	
 	</div><!-- /content -->
 
@@ -413,6 +415,23 @@
 	</div><!-- /footer -->
 </div><!-- /page -->
 
+<section data-role="page" id="deviceMonitor">
+	<header data-role="header" data-theme="a" data-position="fixed">
+		<p><img src="societies-images/societies_xsmall.png" alt="Societies" align="top" />&nbsp;&nbsp;&nbsp;Device Status</p>
+	</header>
+	
+	<article data-role="content">
+		<input type="button" name="connectivity" id="connectivity" value="Connectivity Status" data-role="button" data-inline="true" />
+		<input type="button" name="location" id="location" value="Location Status" data-role="button" data-inline="true" />
+		<input type="button" name="battery" id="battery" value="Battery Status" data-role="button" data-inline="true" />
+		<input type="button" name="registerBattery" id="registerBattery" value="Register to Battery Status" data-role="button" data-inline="true" />
+		<br />
+	</article>
+	
+	<footer data-role="footer" data-position="fixed">
+		<a href="#menu" data-role="button" data-icon="back" data-inline="true">menu</a>
+	</footer>
+</section>
 
 </body>
 </html>

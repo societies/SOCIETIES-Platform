@@ -224,6 +224,14 @@ public class ServiceRegistryListener implements BundleContextAware,
 				if(existService == null){
 					if(log.isDebugEnabled()) log.debug("Registering Service: " + service.getServiceName());
 					this.getServiceReg().registerServiceList(serviceList);
+					
+					//The service is now registered, so we update the hashmap
+					if(ServiceControl.installingBundle(serBndl.getBundleId())){
+						if(log.isDebugEnabled())
+							log.debug("ServiceControl is installing the bundle, so we need to tell it it's done");
+						ServiceControl.serviceInstalled(serBndl.getBundleId(), service);
+					}
+					
 				} else{
 					if(log.isDebugEnabled()) log.debug(service.getServiceName() + " already exists, setting status to STARTED");
 					this.getServiceReg().changeStatusOfService(service.getServiceIdentifier(), ServiceStatus.STARTED);
@@ -256,7 +264,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 		}
 		
 		if(log.isDebugEnabled())
-			log.debug("Bundle Ininstalled Event arrived!");
+			log.debug("Bundle Uninstalled Event arrived!");
 		// Now we search for services in the registry corresponding to this bundle.
 		Service serviceToRemove = getServiceFromBundle(event.getBundle());
 		
@@ -295,20 +303,12 @@ public class ServiceRegistryListener implements BundleContextAware,
 	 */
 	private Service getServiceFromBundle(Bundle bundle) {
 		
-		if(log.isDebugEnabled()) log.debug("Obtaining Service that corresponds to a bundle: " + bundle.getSymbolicName());
+		if(log.isDebugEnabled()) log.debug("Obtaining Service that corresponds to a bundle: " + bundle.getSymbolicName() + " with Id " + bundle.getBundleId());
 		
-		// Preparing the search filter
-		Service filter = new Service();
-		ServiceResourceIdentifier filterIdentifier = new ServiceResourceIdentifier();
-		filterIdentifier.setServiceInstanceIdentifier(String.valueOf(bundle.getBundleId()));
-		filter.setServiceIdentifier(filterIdentifier);
-		
-		ServiceInstance filterInstance = new ServiceInstance();
-		
-		ServiceImplementation filterImplementation = new ServiceImplementation();
-		filterImplementation.setServiceVersion(bundle.getVersion().toString());
-		filterInstance.setServiceImpl(filterImplementation);
-		filter.setServiceInstance(filterInstance);
+		// Preparing the search filter		
+		Service filter = ServiceMetaDataUtils.generateEmptyFilter();
+		filter.getServiceIdentifier().setServiceInstanceIdentifier(String.valueOf(bundle.getBundleId()));
+		filter.getServiceInstance().getServiceImpl().setServiceVersion(bundle.getVersion().toString());
 		
 		List<Service> listServices;
 		try {
@@ -319,22 +319,48 @@ public class ServiceRegistryListener implements BundleContextAware,
 			return null;
 		}
 		
-		if(listServices == null)
-			return null;
-		
-		if(listServices.isEmpty()){
+
+		if(listServices == null || listServices.isEmpty()){
 			if(log.isDebugEnabled()) log.debug("Couldn't find any services that fulfill the criteria");
 			return null;
 		} 
 		
+		Service result = null;
+		/*
 		if(listServices.size() > 1){
-			if(log.isDebugEnabled()) log.debug("More than one service found... this is not good!");
+			if(log.isDebugEnabled()) log.debug("More than one service found... this is not good! Time to fix it.");
+			
+			for(Service service: listServices){
+				Long serBundleId = Long.parseLong(service.getServiceIdentifier().getServiceInstanceIdentifier());
+				
+				if(log.isDebugEnabled())
+					log.debug("Checking service " + service.getServiceName() + " with bundleId " + service.getServiceIdentifier().getServiceInstanceIdentifier());
+				
+				if(serBundleId == bundle.getBundleId()){
+					result = service;
+					break;
+				}
+			}
+			
+		} else{
+			result = listServices.get(0);
 		}
 		
-		Service result = listServices.get(0);
-		// First we get the bundleId
-
-		 if(log.isDebugEnabled()) 
+		*/
+		
+		for(Service service: listServices){
+			Long serBundleId = Long.parseLong(service.getServiceIdentifier().getServiceInstanceIdentifier());
+			
+			if(log.isDebugEnabled())
+				log.debug("Checking service " + service.getServiceName() + " with bundleId " + service.getServiceIdentifier().getServiceInstanceIdentifier());
+			
+			if(serBundleId == bundle.getBundleId()){
+				result = service;
+				break;
+			}
+		}
+		
+		 if(log.isDebugEnabled() && result != null) 
 			 log.debug("The service corresponding to bundle " + bundle.getSymbolicName() + "is "+ result.getServiceName() );
 			
 		// Finally, we return

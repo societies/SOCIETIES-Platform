@@ -471,6 +471,7 @@ public class ServiceControlUnitTest {
 	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#installService(java.net.URL)}.
 	 */
 	
+	/*
 	@Test
 	public void testInstallServiceURLSuccess() {
 		
@@ -501,7 +502,7 @@ public class ServiceControlUnitTest {
 		}
 		
 	}
-	
+	*/
 
 	/**
 	 * Test method for {@link org.societies.slm.servicecontrol.ServiceControl#installService(java.net.URL)}.

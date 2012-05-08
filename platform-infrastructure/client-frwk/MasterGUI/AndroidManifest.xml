@@ -53,6 +53,10 @@
         	android:name="org.societies.android.platform.cssmanager.LocalCSSManagerService"
         	>
         </service>
+                <service 
+            android:name="org.societies.android.platform.devicestatus.LocalDeviceStatusService"
+        ></service>
+        
          
     </application>
 </manifest>

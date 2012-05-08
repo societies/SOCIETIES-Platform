@@ -113,6 +113,19 @@ public class SocialDataController {
 		model.put(ID, 	"");
 		return new ModelAndView("socialdata", model);
 	}
+	
+	private ISocialConnector.SocialNetwork getSocialNetowkName(String name){
+		
+		
+		if ("facebook".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.Facebook;
+		if ("FB".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.Facebook;
+		if ("twitter".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.twitter;
+		if ("TW".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.twitter;
+		if ("foursquare".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.Foursquare;
+		if ("FQ".equalsIgnoreCase(name)) return ISocialConnector.SocialNetwork.Foursquare;
+		return null;
+	}
+	
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/socialdata.html", method = RequestMethod.POST)
@@ -144,7 +157,7 @@ public class SocialDataController {
 				String error="no error";
 				try {
 					error= "unable to create connector";
-					ISocialConnector con = socialdata.createConnector(sdForm.getSnName(), params);
+					ISocialConnector con = socialdata.createConnector(getSocialNetowkName(sdForm.getSnName()), params);
 					error ="unable to add connector:"+con.getConnectorName();
 					socialdata.addSocialConnector(con);
 					socialdata.updateSocialData();

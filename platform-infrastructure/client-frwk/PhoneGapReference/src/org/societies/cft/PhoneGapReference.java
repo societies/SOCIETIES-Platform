@@ -1,6 +1,7 @@
 package org.societies.cft;
 
-import com.phonegap.DroidGap;
+import org.apache.cordova.DroidGap;
+
 import android.os.Bundle;
 
 public class PhoneGapReference extends DroidGap {

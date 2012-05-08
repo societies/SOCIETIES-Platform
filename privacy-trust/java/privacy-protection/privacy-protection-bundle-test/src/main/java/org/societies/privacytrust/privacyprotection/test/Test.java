@@ -19,46 +19,50 @@
  */
 package org.societies.privacytrust.privacyprotection.test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants;
 
 /**
- * @author olivierm
+ * @author Olivier Maridat (Trialog)
  *
  */
 public class Test {
+	private static Logger log = LoggerFactory.getLogger(Test.class.getSimpleName());
+	
 	private IPrivacyDataManager privacyDataManager;
 	private IPrivacyPolicyManager privacyPolicyManager;
 	
-	public Test() {
-	}
-	
 	public void setPrivacyDataManager(IPrivacyDataManager privacyDataManager) {
 		this.privacyDataManager = privacyDataManager;
-		System.out.println("************* privacyDataManager injected");
+		log.info("************* privacyDataManager injected");
 		try {
-			privacyDataManager.hasObfuscatedVersion(null, null, null);
-		} catch (PrivacyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ResponseItem permission = privacyDataManager.checkPermission(null, null, null, null);
+			log.info("Permission checked: "+permission.toString());
+		} catch (Exception e) {
+			log.error("************* Error PrivacyException: "+e.getMessage(), e);
 		}
-		System.out.println("************* privacyDataManager hasObfuscatedVersion");
 	}
 	
 	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
 		this.privacyPolicyManager = privacyPolicyManager;
-		System.out.println("************* privacyPolicyManager injected");
+		log.info("************* privacyPolicyManager injected");
 		IIdentity cisId = null;
 		boolean result = false;
 		try {
 			result = privacyPolicyManager.deletePrivacyPolicy(cisId);
-		} catch (PrivacyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.info("************* privacyPolicyManager "+result);
+		} catch (Exception e) {
+			log.error("************* Error PrivacyException: "+e.getMessage(), e);
 		}
-		System.out.println("************* privacyPolicyManager "+result);
 	}
 
 }

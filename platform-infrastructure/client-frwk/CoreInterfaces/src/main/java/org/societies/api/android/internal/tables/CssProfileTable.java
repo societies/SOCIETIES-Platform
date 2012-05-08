@@ -43,6 +43,11 @@ public class CssProfileTable implements IContentProvider {
 			public static final String KEY_PRESENCE		 = "presence";
 			public static final String KEY_CSS_INACTIV   = "css_inactivation";
 			
+			public static final String KEY_CSS_NODES	 	= "css_nodes";
+			public static final String KEY_CSS_NODES_ARCH   = "css_node_archive";
+			
+			
+			
 			
 			public static String CSS_PROFILE_URI		 =	"content://" + AUTHORITY + "/" + TABLE_NAME;
 			
@@ -72,6 +77,8 @@ public class CssProfileTable implements IContentProvider {
 					+ KEY_CSS_IDENTITY 	+ " text not null, " 
 					+ KEY_CSS_INACTIV 	+ " text not null, " 
 					+ KEY_CSS_REGISTR 	+ " text not null, " 
+					+ KEY_CSS_NODES		+ " text, "
+					+ KEY_CSS_NODES_ARCH+ " text, "
 					+ KEY_PRESENCE 	+ " integer, "
 					+ KEY_UPTIME 	+ " integer  " 
 					+ ");";

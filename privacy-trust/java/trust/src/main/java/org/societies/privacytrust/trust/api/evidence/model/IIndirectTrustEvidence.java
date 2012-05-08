@@ -32,4 +32,9 @@ package org.societies.privacytrust.trust.api.evidence.model;
  */
 public interface IIndirectTrustEvidence extends ITrustEvidence {
 
+	/**
+	 * 
+	 * @return
+	 */
+	public String getSource();
 }

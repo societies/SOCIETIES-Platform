@@ -160,13 +160,16 @@ public class ServiceRegistry implements IServiceRegistry {
 	public List<Service> retrieveServicesSharedByCSS(String CSSID)
 			throws ServiceRetrieveException {
 		List<Service> returnedServiceList = new ArrayList<Service>();
+		
 		Session session = sessionFactory.openSession();
+		
 		try {
 
 			List<RegistryEntry> tmpRegistryEntryList = session
 					.createCriteria(RegistryEntry.class)
 					.createCriteria("serviceInstance")
 					.add(Restrictions.eq("fullJid", CSSID)).list();
+						
 			for (RegistryEntry registryEntry : tmpRegistryEntryList) {
 				returnedServiceList.add(registryEntry
 						.createServiceFromRegistryEntry());
@@ -290,6 +293,7 @@ public class ServiceRegistry implements IServiceRegistry {
 							.getServiceInstance().getServiceImpl()
 							.getServiceVersion());
 				}
+				tmpServiceInstanceDAO.setServiceImpl(tmpServiceImplementationDAO);
 			}
 			filterRegistryEntry.setServiceInstance(tmpServiceInstanceDAO);
 		}
@@ -306,10 +310,14 @@ public class ServiceRegistry implements IServiceRegistry {
 			filterRegistryEntry.setServiceType(filter.getServiceType()
 					.toString());
 		}
-
-		List<RegistryEntry> tmpRegistryEntryList = sessionFactory.openSession()
-				.createCriteria(RegistryEntry.class)
+		
+		Session session = sessionFactory.openSession();
+		
+		List<RegistryEntry> tmpRegistryEntryList = session.createCriteria(RegistryEntry.class)
 				.add(Example.create(filterRegistryEntry).enableLike()).list();
+		
+		session.close();
+		
 		return createListService(tmpRegistryEntryList);
 	}
 

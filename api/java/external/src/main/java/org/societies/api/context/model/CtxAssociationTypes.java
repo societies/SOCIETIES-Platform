@@ -31,11 +31,68 @@ package org.societies.api.context.model;
  * @since 0.0.7
  */
 public class CtxAssociationTypes {
-
-	public static final String USES_SERVICE = "usesService";
-
-	public static final String HAS_PRIVACY_POLICIES = "hasPrivacyPolicies";
-
+	
+	/**
+	 * Undirected context association.
+	 * 
+	 * @since 0.0.8
+	 */
+	public static final String ARE_FAMILY = "areFamily";
+	
+	/**
+	 * Undirected context association.
+	 * 
+	 * @since 0.0.8
+	 */
+	public static final String ARE_FRIENDS = "areFriends";
+	
+	/**
+	 * Undirected context association.
+	 * 
+	 * @since 0.0.8
+	 */
+	public static final String ARE_WORK_COLLEAGUES = "areWorkColleagues";
+	
+	/**
+	 * Directed context association.
+	 * 
+	 * @deprecated As of 0.0.8, use the {@link #HAS_PARAMETERS} type instead
+	 */
+	@Deprecated
 	public static final String HAS_PARAMETER = "hasParameter";
 	
+	/**
+	 * Directed context association.
+	 * 
+	 * @since 0.0.8
+	 */
+	public static final String HAS_PARAMETERS = "hasParameters";
+	
+	/**
+	 * Directed context association.
+	 */
+	public static final String HAS_PRIVACY_POLICIES = "hasPrivacyPolicies";
+	
+	/**
+	 * Directed context association.
+	 */
+	public static final String OWNS_SERVICES = "ownsServices";
+	
+	/**
+	 * Directed context association.
+	 */
+	public static final String SHARES_SERVICES = "sharesServices";
+			
+	/**
+	 * @deprecated As of 0.0.8, use the {@link #USES_SERVICES} type instead.
+	 */
+	@Deprecated
+	public static final String USES_SERVICE = "usesService";
+	
+	/**
+	 * Directed context association.
+	 * 
+	 * @since 0.0.8
+	 */
+	public static final String USES_SERVICES = "usesServices";
 }

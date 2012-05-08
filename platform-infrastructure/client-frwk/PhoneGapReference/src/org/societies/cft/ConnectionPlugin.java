@@ -1,5 +1,8 @@
 package org.societies.cft;
 
+import org.apache.cordova.api.Plugin;
+import org.apache.cordova.api.PluginResult;
+import org.apache.cordova.api.PluginResult.Status;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,9 +13,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
-import com.phonegap.api.Plugin;
-import com.phonegap.api.PluginResult;
-import com.phonegap.api.PluginResult.Status;
 
 public class ConnectionPlugin extends Plugin {
 	public static final String CREATE_CONNECTION_LISTENER = "createListener";
@@ -50,7 +50,7 @@ public class ConnectionPlugin extends Plugin {
 	                    	updateConnectionInfo(intent);              
 	                    }
 	                };
-	                ctx.registerReceiver(this.receiver, intentFilter);
+	                this.ctx.getContext().registerReceiver(this.receiver, intentFilter);
 	            }
 	            // Don't return any result now, since status results will be sent when events come in from broadcast receiver 
 	            result = new PluginResult(PluginResult.Status.NO_RESULT);
