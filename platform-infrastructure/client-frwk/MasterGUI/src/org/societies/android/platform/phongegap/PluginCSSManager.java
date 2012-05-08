@@ -49,8 +49,9 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.phonegap.api.Plugin;
-import com.phonegap.api.PluginResult;
+import org.apache.cordova.api.Plugin;
+import org.apache.cordova.api.PluginResult;
+import org.apache.cordova.api.PluginResult.Status;
 
 /**
  * PhoneGap plugin to allow the CSSManager service to be used by HTML web views.
@@ -94,15 +95,15 @@ public class PluginCSSManager extends Plugin {
      */
     private void initialiseServiceBinding() {
     	//Create intent to select service to bind to
-    	Intent intent = new Intent(this.ctx, LocalCSSManagerService.class);
+    	Intent intent = new Intent(this.ctx.getContext(), LocalCSSManagerService.class);
     	//bind to the service
-    	this.ctx.bindService(intent, ccsManagerConnection, Context.BIND_AUTO_CREATE);
+    	this.ctx.getContext().bindService(intent, ccsManagerConnection, Context.BIND_AUTO_CREATE);
 
     	//register broadcast receiver to receive CSSManager return values 
         IntentFilter intentFilter = new IntentFilter() ;
         intentFilter.addAction(LocalCSSManagerService.LOGIN_CSS);
         intentFilter.addAction(LocalCSSManagerService.LOGOUT_CSS);
-        this.ctx.registerReceiver(new bReceiver(), intentFilter);
+        this.ctx.getContext().registerReceiver(new bReceiver(), intentFilter);
     	
     }
     
@@ -111,7 +112,7 @@ public class PluginCSSManager extends Plugin {
      */
     private void disconnectServiceBinding() {
     	if (connectedtoCSSManager) {
-    		this.ctx.unbindService(ccsManagerConnection);
+    		this.ctx.getContext().unbindService(ccsManagerConnection);
     	}
     }
 
