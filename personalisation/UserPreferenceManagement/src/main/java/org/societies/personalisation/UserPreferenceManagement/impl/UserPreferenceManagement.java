@@ -375,4 +375,9 @@ public class UserPreferenceManagement{
 		this.contextCache = new PrivateContextCache(ctxBroker);
 	}
 
+	public void updateContext(CtxAttribute attribute) {
+		this.contextCache.updateCache(attribute);
+		
+	}
+
 }
