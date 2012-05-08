@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -221,10 +222,14 @@ public class NominalTestCaseLowerTester {
 
 		// -- Search all local services
 		LOG.debug("[#713] getLocalServices() 1");
-		asyncServices = TestCase713.getServiceDiscovery().getLocalServices();
+		IServiceDiscovery serviceDiscovery = TestCase713.getServiceDiscovery();
 		LOG.debug("[#713] getLocalServices() 2");
-		services = asyncServices.get();
+		assertNotNull(serviceDiscovery);
+		LOG.debug("[#713] getLocalServices(): " + serviceDiscovery.toString());
+		asyncServices = serviceDiscovery.getLocalServices();
 		LOG.debug("[#713] getLocalServices() 3");
+		services = asyncServices.get();
+		LOG.debug("[#713] getLocalServices() 4");
 
 		return services;
 	}

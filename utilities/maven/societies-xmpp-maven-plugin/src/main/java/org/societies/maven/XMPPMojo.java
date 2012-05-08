@@ -79,7 +79,6 @@ public class XMPPMojo extends AbstractMojo
 	 * Path to schema API of the schema
 	 *
 	 * @parameter default-value="../api/java/schema/"
-	 * @required
 	 */
 	private String pathToParentSchema;
 	/**
@@ -180,9 +179,9 @@ public class XMPPMojo extends AbstractMojo
 		    newFile.close();
 		    
 		    // - Step 5: Save in the Societies Schema API
-		    FileWriter finalSchema = new FileWriter(pathToParentSchema+folderOutputDirectory+packageName+".xsd");
-		    finalSchema.write(newSchemaContent);
-		    finalSchema.close();
+//		    FileWriter finalSchema = new FileWriter(pathToParentSchema+folderOutputDirectory+packageName+".xsd");
+//		    finalSchema.write(newSchemaContent);
+//		    finalSchema.close();
 			
 		} catch (FileNotFoundException e) {
 			getLog().error("File not found");

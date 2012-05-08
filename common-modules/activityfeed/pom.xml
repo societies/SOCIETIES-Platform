@@ -143,8 +143,10 @@
 						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Export-Package>
-						org.societies.cis.activity.*,
-						org.societies.cis.activity.model.*
+						org.societies.activity,
+						org.societies.activity.*,
+						org.societies.activity.model,
+						org.societies.activity.model.*
 						</Export-Package>
 						<Import-Package>*;resolution:=optional</Import-Package>
 					</instructions>

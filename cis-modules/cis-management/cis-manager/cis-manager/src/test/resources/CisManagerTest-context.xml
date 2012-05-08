@@ -49,9 +49,7 @@
     
     <tx:annotation-driven transaction-manager="transactionManager" />
 
-    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager" >
-        <property name="sessionFactory" ref="sessionFactory" />
-    </bean>
+
     <bean
         id="sessionFactory"
         class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean" >
@@ -59,15 +57,18 @@
         <property name="dataSource" ref="dataSource" />
         <property name="annotatedClasses" >
             <list>
-                <value>org.societies.activity.ActivityFeed</value>
+                <value>org.societies.cis.manager.CisEditor</value>
+                <value>org.societies.cis.manager.CisRecord</value>
+                <value>org.societies.cis.manager.CisParticipant</value>
                 <value>org.societies.activity.model.Activity</value>
+                <value>org.societies.activity.ActivityFeed</value>
             </list>
         </property>
 
         <property name="annotatedPackages" >
 
             <list>
-                <value>org.societies.activity.model</value>
+                <value>org.societies.cis.manager</value>
             </list>
         </property>
 
@@ -80,7 +81,7 @@
             </props>
         </property>
     </bean>
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+    <bean id="dataSource" class="org.societies.datasource.SOCIETIESDataSource"
         destroy-method="close"
         init-method="createDataSource" >
         
@@ -91,7 +92,9 @@
         <property name="initialSize" value="2" />
         <property name="maxActive" value="5" />
     </bean>
-    
+        <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager" >
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
     <bean id="cisManagerUnderTest" class="org.societies.cis.manager.CisManager" lazy-init="true" depends-on="sessionFactory">
        <property name="sessionFactory" ref="sessionFactory" />
        <!--    <constructor-arg><ref bean="cisCommMgrFactory"/></constructor-arg>

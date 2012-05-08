@@ -23,7 +23,6 @@
     	<dependency>
                 <groupId>com.phonegap</groupId>
                 <artifactId>cordova</artifactId>
-                <version>1.7.0</version>
     	</dependency>
     </dependencies>
 

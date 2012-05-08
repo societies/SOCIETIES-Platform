@@ -125,6 +125,27 @@ public class ServiceRegistryTest extends
 		assertTrue(returnedList.get(0).getServiceName().equals(tmpServiceFilter.getServiceName()));
 	}
 	
+	@Test
+	@Rollback(false)
+	public void testForBug1004() throws ServiceRetrieveException{
+		Service tmpServiceFilter=new Service();
+		ServiceResourceIdentifier sid = new ServiceResourceIdentifier();
+		int i = 0;
+		try {
+			while (i < _numberOfServiceCreated) {
+				sid.setIdentifier(new URI("societies", "the/path/of/the/service/v" + i, null));
+				sid.setServiceInstanceIdentifier("instance_" + i);
+				tmpServiceFilter.setServiceIdentifier(sid);
+				List<Service> returnedList = serReg.findServices(tmpServiceFilter);
+				assertTrue(returnedList.size() == 1);
+				i++;
+			}
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			throw new ServiceRetrieveException(e);
+		}
+	}
+	
 
 	@Test
 	@Rollback(false)

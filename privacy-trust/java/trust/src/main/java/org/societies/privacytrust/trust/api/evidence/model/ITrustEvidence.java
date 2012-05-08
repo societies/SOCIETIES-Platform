@@ -25,6 +25,7 @@
 package org.societies.privacytrust.trust.api.evidence.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 
@@ -41,4 +42,10 @@ public interface ITrustEvidence extends Serializable {
 	 * @return
 	 */
 	public TrustedEntityId getTeid();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Date getTimestamp();
 }

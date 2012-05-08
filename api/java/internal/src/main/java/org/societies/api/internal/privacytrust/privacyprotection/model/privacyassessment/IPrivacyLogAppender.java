@@ -29,7 +29,7 @@ import org.societies.api.identity.IIdentity;
  * 
  * @author Mitja Vardjan
  */
-public interface IPrivacyLogAppend {
+public interface IPrivacyLogAppender {
 
 	/**
 	 * Log any outgoing information

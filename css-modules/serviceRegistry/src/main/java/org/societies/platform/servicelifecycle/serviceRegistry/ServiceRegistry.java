@@ -46,6 +46,7 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.Ser
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceUpdateException;
 import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
@@ -160,13 +161,16 @@ public class ServiceRegistry implements IServiceRegistry {
 	public List<Service> retrieveServicesSharedByCSS(String CSSID)
 			throws ServiceRetrieveException {
 		List<Service> returnedServiceList = new ArrayList<Service>();
+		
 		Session session = sessionFactory.openSession();
+		
 		try {
 
 			List<RegistryEntry> tmpRegistryEntryList = session
 					.createCriteria(RegistryEntry.class)
 					.createCriteria("serviceInstance")
 					.add(Restrictions.eq("fullJid", CSSID)).list();
+						
 			for (RegistryEntry registryEntry : tmpRegistryEntryList) {
 				returnedServiceList.add(registryEntry
 						.createServiceFromRegistryEntry());
@@ -213,103 +217,78 @@ public class ServiceRegistry implements IServiceRegistry {
 		return returnedServiceList;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry
-	 * #notifyServiceIsSharedInCIS(java.lang.String, java.lang.String)
-	 */
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry
-	 * #findServices(java.lang.Object)
-	 */
+	private Criteria createCriteriaFromService(Service filter, Session session) {
+		Criteria c = session.createCriteria(RegistryEntry.class);
+		
+		// Direct Attributes
+		if (filter.getServiceName() != null)
+			c.add(Restrictions.like("serviceName", filter.getServiceName()));
+		if (filter.getServiceDescription() != null)
+			c.add(Restrictions.like("serviceDescription", filter.getServiceDescription()));
+		if (filter.getAuthorSignature() != null)
+			c.add(Restrictions.like("authorSignature", filter.getAuthorSignature()));
+		if (filter.getServiceEndpoint() != null)
+			c.add(Restrictions.like("serviceEndPoint", filter.getServiceEndpoint()));
+		if (filter.getServiceLocation() != null)
+			c.add(Restrictions.like("serviceLocation", filter.getServiceLocation().toString()));
+		if (filter.getServiceStatus() != null) 
+			c.add(Restrictions.like("serviceStatus", filter.getServiceStatus().toString()));
+		if (filter.getServiceType() != null) 
+			c.add(Restrictions.like("serviceType", filter.getServiceType().toString()));
+		
+		//Service Identifier
+		ServiceResourceIdentifier servId = filter.getServiceIdentifier(); 
+		if (servId != null) {
+			//c.createAlias("serviceIdentifier", "sri");
+			if (servId.getIdentifier() != null) {
+				c.add(Restrictions.like("serviceIdentifier.identifier", servId.getIdentifier().toString()));
+			}
+			if (servId.getServiceInstanceIdentifier() != null) {
+				c.add(Restrictions.like("serviceIdentifier.instanceId", servId.getServiceInstanceIdentifier()));
+			}
+		}		
+		//Service Instance
+		ServiceInstance servInst = filter.getServiceInstance(); 
+		if (servInst != null) {
+			c.createAlias("serviceInstance", "servInst");
+			if (servInst.getFullJid() != null) {
+				c.add(Restrictions.like("servInst.fullJid", servInst.getFullJid()));
+			}
+			if (servInst.getXMPPNode() != null) {
+				c.add(Restrictions.like("servInst.XMPPNode", servInst.getXMPPNode()));
+			}
+			ServiceImplementation si = servInst.getServiceImpl();
+			if ( si != null) {
+				c.createAlias("servInst.serviceImpl", "servImpl");
+				if (si.getServiceNameSpace() != null) {
+					c.add(Restrictions.like("servImpl.serviceNameSpace", si.getServiceNameSpace()));
+				}
+				if (si.getServiceProvider() != null) {
+					c.add(Restrictions.like("servImpl.serviceProvider", si.getServiceProvider()));
+				}
+				if (si.getServiceVersion() != null) {
+					c.add(Restrictions.like("servImpl.serviceVersion", si.getServiceVersion()));
+				}
+			}
+		}
+		return c;
+	}
+	
 	@Override
 	public List<Service> findServices(Service filter)
 			throws ServiceRetrieveException {
-		RegistryEntry filterRegistryEntry = new RegistryEntry();
-		// Map and check null values
-		if (filter.getServiceName() != null)
-			filterRegistryEntry.setServiceName(filter.getServiceName());
-		if (filter.getServiceDescription() != null)
-			filterRegistryEntry.setServiceDescription(filter
-					.getServiceDescription());
-		if (filter.getAuthorSignature() != null)
-			filterRegistryEntry.setAuthorSignature(filter.getAuthorSignature());
-		if (filter.getServiceEndpoint() != null)
-			filterRegistryEntry.setServiceEndPoint(filter.getServiceEndpoint());
-
-		if (filter.getServiceIdentifier() != null) {
-			ServiceResourceIdentiferDAO tmpServiceResourceIdentifierDAO = new ServiceResourceIdentiferDAO();
-
-			if (filter.getServiceIdentifier().getIdentifier() != null) {
-				tmpServiceResourceIdentifierDAO.setIdentifier(filter
-						.getServiceIdentifier().getIdentifier().toString());
-			}
-			if (filter.getServiceIdentifier().getServiceInstanceIdentifier() != null) {
-				tmpServiceResourceIdentifierDAO.setInstanceId(filter
-						.getServiceIdentifier().getServiceInstanceIdentifier());
-			}
-			filterRegistryEntry
-					.setServiceIdentifier(tmpServiceResourceIdentifierDAO);
-		}
-		if (filter.getServiceInstance() != null) {
-			ServiceInstanceDAO tmpServiceInstanceDAO = new ServiceInstanceDAO();
-			if (filter.getServiceInstance().getFullJid() != null) {
-				tmpServiceInstanceDAO.setFullJid(filter.getServiceInstance()
-						.getFullJid());
-
-			}
-			if (filter.getServiceInstance().getXMPPNode() != null) {
-				tmpServiceInstanceDAO.setXMPPNode(filter.getServiceInstance()
-						.getXMPPNode());
-
-			}
-			if (filter.getServiceInstance().getServiceImpl() != null) {
-				ServiceImplementationDAO tmpServiceImplementationDAO = new ServiceImplementationDAO();
-				if (filter.getServiceInstance().getServiceImpl()
-						.getServiceNameSpace() != null) {
-					tmpServiceImplementationDAO.setServiceNameSpace(filter
-							.getServiceInstance().getServiceImpl()
-							.getServiceNameSpace());
-				}
-				if (filter.getServiceInstance().getServiceImpl()
-						.getServiceProvider() != null) {
-					tmpServiceImplementationDAO.setServiceProvider(filter
-							.getServiceInstance().getServiceImpl()
-							.getServiceProvider());
-
-				}
-				if (filter.getServiceInstance().getServiceImpl()
-						.getServiceVersion() != null) {
-					tmpServiceImplementationDAO.setServiceVersion(filter
-							.getServiceInstance().getServiceImpl()
-							.getServiceVersion());
-				}
-			}
-			filterRegistryEntry.setServiceInstance(tmpServiceInstanceDAO);
-		}
-		if (filter.getServiceLocation() != null) {
-			filterRegistryEntry.setServiceLocation(filter.getServiceLocation()
-					.toString());
-		}
-		if (filter.getServiceStatus() != null) {
-			filterRegistryEntry.setServiceStatus(filter.getServiceStatus()
-					.toString());
-
-		}
-		if (filter.getServiceType() != null) {
-			filterRegistryEntry.setServiceType(filter.getServiceType()
-					.toString());
-		}
-
-		List<RegistryEntry> tmpRegistryEntryList = sessionFactory.openSession()
-				.createCriteria(RegistryEntry.class)
-				.add(Example.create(filterRegistryEntry).enableLike()).list();
+		
+		//RegistryEntry filterRegistryEntry = this.map2registryEntry(filter);
+				
+		Session session = sessionFactory.openSession();
+		
+		//Example e = Example.create(filterRegistryEntry).enableLike();
+		Criteria c = this.createCriteriaFromService(filter, session);//session.createCriteria(RegistryEntry.class);
+		//c.add(e);
+		List<RegistryEntry> tmpRegistryEntryList = c.list();
+		
+		session.close();
+		
 		return createListService(tmpRegistryEntryList);
 	}
 

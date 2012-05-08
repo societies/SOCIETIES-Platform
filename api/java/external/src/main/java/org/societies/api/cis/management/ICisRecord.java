@@ -31,13 +31,25 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
  * @author Babak.Farshchian@sintef.no
  *
  */
+
+
+
 /**
  * MISSING_JAVADOCS
  */
 @SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface ICisRecord {
 
-    public String getCisId();
+    
+	/**
+	 * Returns the jid of the CIS
+	 * 
+	 * @param 
+	 * @return jid to address the CIS as a string
+	 */
+	public String getCisId();
+    
+    
     public String getName();
     public String getOwnerId();
     public String setUserDefinedName(String _name);

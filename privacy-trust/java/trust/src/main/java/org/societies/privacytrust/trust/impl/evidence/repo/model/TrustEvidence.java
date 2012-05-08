@@ -24,6 +24,15 @@
  */
 package org.societies.privacytrust.trust.impl.evidence.repo.model;
 
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+
+import org.hibernate.annotations.Columns;
+import org.hibernate.annotations.Type;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 
@@ -33,16 +42,34 @@ import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
  */
+@MappedSuperclass
 public abstract class TrustEvidence implements ITrustEvidence {
 
 	private static final long serialVersionUID = 5024340898894704006L;
 	
+	/* The surrogate key used by Hibernate. */
+	@Id
+	@GeneratedValue
+	@Column(name = "id")
+	@SuppressWarnings("unused")
+	private long id;
+	
 	/** The identifier of the trusted entity this evidence refers to. */
+	@Columns(columns={
+			@Column(name = "trustorId", nullable = false, updatable = false, length = 256),
+			@Column(name = "trusteeId", nullable = false, updatable = false, length = 256)
+	})
+	@Type(type="org.societies.privacytrust.trust.impl.repo.model.hibernate.TrustedEntityIdUserType")
 	private final TrustedEntityId teid;
 	
-	TrustEvidence(final TrustedEntityId teid) {
+	@Column(name = "timestamp", nullable = false, updatable = false)
+	@Type(type="org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType")
+	private final Date timestamp;
+	
+	TrustEvidence(final TrustedEntityId teid, final Date timestamp) {
 		
 		this.teid = teid;
+		this.timestamp = timestamp;
 	}
 	
 	/*
@@ -55,14 +82,26 @@ public abstract class TrustEvidence implements ITrustEvidence {
 	}
 	
 	/*
+	 * @see org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence#getTimestamp()
+	 */
+	@Override
+	public Date getTimestamp() {
+		
+		return this.timestamp;
+	}
+
+	/*
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
 	public int hashCode() {
 		
 		final int prime = 31;
+		
 		int result = 1;
 		result = prime * result + ((this.teid == null) ? 0 : this.teid.hashCode());
+		result = prime * result
+				+ ((this.timestamp == null) ? 0 : this.timestamp.hashCode());
 		
 		return result;
 	}
@@ -80,14 +119,21 @@ public abstract class TrustEvidence implements ITrustEvidence {
 		if (this.getClass() != that.getClass())
 			return false;
 		
-		final TrustEvidence other = (TrustEvidence) that;
+		TrustEvidence other = (TrustEvidence) that;
 		
 		if (this.teid == null) {
 			if (other.teid != null)
 				return false;
 		} else if (!this.teid.equals(other.teid))
 			return false;
+		if (this.timestamp == null) {
+			if (other.timestamp != null)
+				return false;
+		} else if (!this.timestamp.equals(other.timestamp))
+			return false;
 		
 		return true;
 	}
+	
+	
 }

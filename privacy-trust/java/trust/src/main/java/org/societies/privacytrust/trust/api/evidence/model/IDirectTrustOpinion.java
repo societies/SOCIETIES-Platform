@@ -30,6 +30,11 @@ package org.societies.privacytrust.trust.api.evidence.model;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
  */
-public interface ITrustOpinion extends IIndirectTrustEvidence {
+public interface IDirectTrustOpinion extends IDirectTrustEvidence {
 
+	/**
+	 * 
+	 * @return
+	 */
+	public Double getTrustRating();
 }

@@ -48,8 +48,6 @@ Sample:
 			<!-- Namespace define in the CommClient and CommServer of the beans -->
 			<packageName>org.societies.example.complexservice.schema</packageName>
 			<httpNamespace>http://societies.org/example/complexservice/schema</httpNamespace>
-			<!-- Path to the Societies Schema API. The refactored schema will be copied to this location (pathToParentSchema+folderOutputDirectory) -->
-			<pathToParentSchema>../../../api/java/schema/</pathToParentSchema>
 			<!-- Output and input directories -->
 			<!-- <folderInputDirectory>${project.build.directory}/generated-resources/schemagen</folderInputDirectory> -->
 			<!-- <file>schema1.xsd</file> -->
@@ -66,6 +64,7 @@ in <folderOutputDirectory><packageName>.xsd
 ! To do list
 A lot of improvement are still possible for this Maven plugin. Please, feel free
 to participate by creating a new version. Here are some ideas of improvements:
+* Copy directly to Societies global schema folder (<!-- Path to the Societies Schema API. The refactored schema will be copied to this location (pathToParentSchema+folderOutputDirectory) --><pathToParentSchema>../../../api/java/schema/</pathToParentSchema>)
 * Find a way to launch this task in a Maven goal not in the Maven "install" goal, to avoid regenerating everytime XSD schemas.
 * Find a way to use this plugin directly with the jaxb2:schemagen plugin
 * Add configuration possibilities

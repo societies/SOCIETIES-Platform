@@ -24,15 +24,26 @@
  */
 package org.societies.privacytrust.trust.api.evidence.repo;
 
+import java.util.Date;
+import java.util.Set;
+
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
+import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 
 public interface ITrustEvidenceRepository {
 
 	/**
+	 * Adds the specified {@link ITrustEvidence} to the trust evidence
+	 * repository.
 	 * 
 	 * @param evidence
+	 *            the evidence to be added to the repository
 	 * @throws TrustEvidenceRepositoryException
+	 *             if the specified evidence cannot be added to the repository
+	 * @throws NullPointerException
+	 *             if the specified evidence is <code>null</code>
 	 */
 	public void addEvidence(final ITrustEvidence evidence) throws TrustEvidenceRepositoryException;
 	
@@ -42,12 +53,77 @@ public interface ITrustEvidenceRepository {
 	 * @return
 	 * @throws TrustEvidenceRepositoryException
 	 */
-	public ITrustEvidence retrieveEvidence(final TrustedEntityId teid) throws TrustEvidenceRepositoryException;
+	public Set<IDirectTrustEvidence> retrieveAllDirectEvidence(final TrustedEntityId teid)
+			throws TrustEvidenceRepositoryException;
 	
 	/**
 	 * 
 	 * @param teid
+	 * @param startDate
+	 * @param endDate
+	 * @return
 	 * @throws TrustEvidenceRepositoryException
 	 */
-	public void removeEvidence(final TrustedEntityId teid) throws TrustEvidenceRepositoryException;
+	public Set<IDirectTrustEvidence> retrieveDirectEvidence(final TrustedEntityId teid,
+			final Date startDate, final Date endDate) throws TrustEvidenceRepositoryException;
+	
+	/**
+	 * 
+	 * @param teid
+	 * @return
+	 * @throws TrustEvidenceRepositoryException
+	 */
+	public Set<IIndirectTrustEvidence> retrieveAllIndirectEvidence(final TrustedEntityId teid)
+			throws TrustEvidenceRepositoryException;
+	
+	/**
+	 * 
+	 * @param teid
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 * @throws TrustEvidenceRepositoryException
+	 */
+	public Set<IIndirectTrustEvidence> retrieveIndirectEvidence(final TrustedEntityId teid,
+			final Date startDate, final Date endDate) throws TrustEvidenceRepositoryException;
+	
+	/**
+	 * 
+	 * @param teid
+	 * @return
+	 * @throws TrustEvidenceRepositoryException
+	 */
+	public Set<IDirectTrustEvidence> removeAllDirectEvidence(final TrustedEntityId teid)
+			throws TrustEvidenceRepositoryException;
+	
+	/**
+	 * 
+	 * @param teid
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 * @throws TrustEvidenceRepositoryException
+	 */
+	public Set<IDirectTrustEvidence> removeDirectEvidence(final TrustedEntityId teid,
+			final Date startDate, final Date endDate) throws TrustEvidenceRepositoryException;
+	
+	/**
+	 * 
+	 * @param teid
+	 * @return
+	 * @throws TrustEvidenceRepositoryException
+	 */
+	public Set<IIndirectTrustEvidence> removeAllIndirectEvidence(final TrustedEntityId teid)
+			throws TrustEvidenceRepositoryException;
+	
+	/**
+	 * 
+	 * @param teid
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 * @throws TrustEvidenceRepositoryException
+	 */
+	public Set<IIndirectTrustEvidence> removeIndirectEvidence(final TrustedEntityId teid,
+			final Date startDate, final Date endDate) throws TrustEvidenceRepositoryException;
 }
