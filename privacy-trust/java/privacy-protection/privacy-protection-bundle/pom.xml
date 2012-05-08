@@ -101,6 +101,7 @@
 			<groupId>org.societies.privacytrust.privacyprotection</groupId>
 			<artifactId>assessment</artifactId>
 			<version>${version.pt}</version>
+			<!--scope>compile</scope-->
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -151,7 +152,7 @@
 							gson;scope=compile|runtime,
 							api;scope=compile|runtime,
 							privacydatamanagement;scope=compile|runtime,
-							privacypolicymanagement;scope=compile|runtime
+							privacypolicymanagement;scope=compile|runtime,
 							assessment;scope=compile|runtime
 							</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
