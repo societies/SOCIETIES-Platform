@@ -49,8 +49,9 @@ import android.os.Parcelable;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.phonegap.api.Plugin;
-import com.phonegap.api.PluginResult;
+import org.apache.cordova.api.Plugin;
+import org.apache.cordova.api.PluginResult;
+import org.apache.cordova.api.PluginResult.Status;
 /**
  * PhoneGap plugin to allow the CoreMonitor service to be used by HTML web views.
  * 
@@ -95,21 +96,21 @@ public class PluginCoreServiceMonitor extends Plugin {
      */
     private void initialiseServiceBinding() {
     	//Create intent to select service to bind to
-    	Intent intent = new Intent(this.ctx, CoreServiceMonitor.class);
+    	Intent intent = new Intent(this.ctx.getContext(), CoreServiceMonitor.class);
     	//bind to the service
-    	this.ctx.bindService(intent, coreServiceMonitorConnection, Context.BIND_AUTO_CREATE);
+    	this.ctx.getContext().bindService(intent, coreServiceMonitorConnection, Context.BIND_AUTO_CREATE);
     	//register broad
         IntentFilter intentFilter = new IntentFilter() ;
         intentFilter.addAction(CoreServiceMonitor.ACTIVE_SERVICES);
         intentFilter.addAction(CoreServiceMonitor.ACTIVE_TASKS);
-        this.ctx.registerReceiver(new bReceiver(), intentFilter);
+        this.ctx.getContext().registerReceiver(new bReceiver(), intentFilter);
     }
     /**
      * Unbind from service
      */
     private void disconnectServiceBinding() {
     	if (connectedtoCoreMonitor) {
-    		this.ctx.unbindService(coreServiceMonitorConnection);
+    		this.ctx.getContext().unbindService(coreServiceMonitorConnection);
     	}
     }
     

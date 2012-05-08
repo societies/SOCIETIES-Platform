@@ -34,16 +34,16 @@ function onDeviceReady() {
 	
 	//Register any PhoneGap plugins here. Example shown for illustration
 	 
-	PhoneGap.addConstructor(function() {
+	cordova.addConstructor(function() {
 		//Register the javascript plugin with PhoneGap
 		console.log("Register CoreServiceMonitorService plugin ");
-		PhoneGap.addPlugin('CoreServiceMonitorService', new CoreServiceMonitorService());
+		cordova.addPlugin('CoreServiceMonitorService', new CoreServiceMonitorService());
 		
 		console.log("Register LocalCSSManagerService plugin ");
-		PhoneGap.addPlugin('LocalCSSManagerService', new LocalCSSManagerService());
+		cordova.addPlugin('LocalCSSManagerService', new LocalCSSManagerService());
 		
 		console.log("Register DeviceStatus Service plugin ");
-		PhoneGap.addPlugin("DeviceStatus", DeviceStatus);
+		cordova.addPlugin("DeviceStatus", DeviceStatus);
 
 	});
 }
@@ -93,7 +93,7 @@ var DeviceStatus = {
 		 */
 		getConnectivityStatus: function(successCallback, failureCallback){
 			var parameters = null;
-			return PhoneGap.exec(
+			return cordova.exec(
 					successCallback,
 					failureCallback,
 					'DeviceStatus',
@@ -139,7 +139,7 @@ var DeviceStatus = {
 		 */
 		getLocationStatus: function(successCallback, failureCallback){
 			var parameters = null;
-			return PhoneGap.exec(
+			return cordova.exec(
 					successCallback,
 					failureCallback,
 					'DeviceStatus',
@@ -204,7 +204,7 @@ var DeviceStatus = {
 		 */
 		getBatteryStatus: function(successCallback, failureCallback){
 			var parameters = null;
-			return PhoneGap.exec(
+			return cordova.exec(
 					successCallback,
 					failureCallback,
 					'DeviceStatus',
@@ -269,7 +269,7 @@ var DeviceStatus = {
 		 */
 		registerToBatteryStatus: function(successCallback, failureCallback){
 			var parameters = {"register":true};
-			return PhoneGap.exec(
+			return cordova.exec(
 					successCallback,
 					failureCallback,
 					'DeviceStatus',
@@ -294,7 +294,7 @@ var LocalCSSManagerService = function() {
 LocalCSSManagerService.prototype.connectService = function(successCallback, failureCallback) {
 	console.log("Call LocalCSSManagerService - connectService");
 
-	return PhoneGap.exec(successCallback,    //Callback which will be called when plugin action is successful
+	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 	failureCallback,     //Callback which will be called when plugin action encounters an error
 	'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
 	'connectService',          //Telling the plugin, which action we want to perform
@@ -310,7 +310,7 @@ LocalCSSManagerService.prototype.connectService = function(successCallback, fail
 LocalCSSManagerService.prototype.disconnectService = function(successCallback, failureCallback) {
 	console.log("Call LocalCSSManagerService - disconnectService");
 
-	return PhoneGap.exec(successCallback,    //Callback which will be called when plugin action is successful
+	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 	failureCallback,     //Callback which will be called when plugin action encounters an error
 	'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
 	'disconnectService',          //Telling the plugin, which action we want to perform
@@ -355,7 +355,7 @@ LocalCSSManagerService.prototype.loginCSS = function(successCallback, failureCal
 
 	console.log("Call LocalCSSManagerService - loginCSS");
 
-	return PhoneGap.exec(successCallback,    //Callback which will be called when plugin action is successful
+	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 	failureCallback,     //Callback which will be called when plugin action encounters an error
 	'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
 	'loginCSS',          //Telling the plugin, which action we want to perform
@@ -399,7 +399,7 @@ LocalCSSManagerService.prototype.logoutCSS = function(successCallback, failureCa
 
 	console.log("Call LocalCSSManagerService - logoutCSS");
 
-	return PhoneGap.exec(successCallback,    //Callback which will be called when plugin action is successful
+	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 	failureCallback,     //Callback which will be called when plugin action encounters an error
 	'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
 	'logoutCSS',          //Telling the plugin, which action we want to perform
@@ -421,7 +421,7 @@ CoreServiceMonitorService.prototype.connectService = function(successCallback, f
 
 	console.log("Call CoreServiceMonitorService - connectService");
 
-	return PhoneGap.exec(successCallback,    //Callback which will be called when plugin action is successful
+	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 	failureCallback,     //Callback which will be called when plugin action encounters an error
 	'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
 	'connectService',              //Telling the plugin, which action we want to perform
@@ -438,7 +438,7 @@ CoreServiceMonitorService.prototype.disconnectService = function(successCallback
 
 	console.log("Call CoreServiceMonitorService - disconnectService");
 
-	return PhoneGap.exec(successCallback,    //Callback which will be called when plugin action is successful
+	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 	failureCallback,     //Callback which will be called when plugin action encounters an error
 	'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
 	'disconnectService',              //Telling the plugin, which action we want to perform
@@ -455,7 +455,7 @@ CoreServiceMonitorService.prototype.activeServices = function(successCallback, f
 
 	console.log("Call CoreServiceMonitorService - activeServices");
 
-	return PhoneGap.exec(successCallback,    //Callback which will be called when plugin action is successful
+	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 	failureCallback,     //Callback which will be called when plugin action encounters an error
 	'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
 	'activeServices',              //Telling the plugin, which action we want to perform
@@ -473,7 +473,7 @@ CoreServiceMonitorService.prototype.activeTasks = function(successCallback, fail
 
 	console.log("Call CoreServiceMonitorService - activeTasks");
 
-	return PhoneGap.exec(successCallback,    //Callback which will be called when plugin action is successful
+	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 	failureCallback,     //Callback which will be called when plugin action encounters an error
 	'PluginCoreServiceMonitor',  //Telling PhoneGap that we want to run specified plugin
 	'activeTasks',              //Telling the plugin, which action we want to perform
@@ -486,7 +486,7 @@ CoreServiceMonitorService.prototype.activeTasks = function(successCallback, fail
 var deviceInfo = function() {
 	console.log("Get device information");
 	
-	jQuery("#phoneGapVer").text(device.phonegap);
+	jQuery("#phoneGapVer").text(device.cordova);
 	jQuery("#platform").text(device.platform);
 	jQuery("#version").text(device.version);
 	jQuery("#uuid").text(device.uuid);
