@@ -25,6 +25,13 @@
 
 package org.societies.android.platform.useragent;
 
+import ClientCommunicationMgr;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.societies.api.identity.IIdentity;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
@@ -32,6 +39,19 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 public class UserActionMonitor extends Activity implements OnClickListener {
+	
+	private static final String LOG_TAG = UserActionMonitor.class.getName();
+	private static final List<String> ELEMENT_NAMES = Arrays.asList("userActionMonitorBean");
+    private static final List<String> NAME_SPACES = Arrays.asList(
+    		"http://societies.org/api/schema/useragent/monitoring");
+    private static final List<String> PACKAGES = Arrays.asList(
+		"org.societies.api.schema.useragent.monitoring");
+    
+    private static final String DESTINATION = "xcmanager.societies.local";
+    
+    private final IIdentity toXCManager;
+    //private ClientCommunicationMgr ccm;
+	
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
