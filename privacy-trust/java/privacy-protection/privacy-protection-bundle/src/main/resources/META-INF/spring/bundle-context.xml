@@ -17,12 +17,12 @@
 
 	<bean name="PrivacyDataManager"
 		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager">
-		<property name="privacyDataManager" ref="privacyDataManager" />
+ 		<!-- <property name="privacyDataManager" ref="privacyDataManager" /> -->
 	</bean>
 
 	<bean name="PrivacyPolicyManager"
 		class="org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager">
-		<property name="privacyPolicyManager" ref="privacyPolicyManager" />
+		<!-- <property name="privacyPolicyManager" ref="privacyPolicyManager" /> -->
 	</bean>
 	
 	
