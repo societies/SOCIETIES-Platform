@@ -26,102 +26,63 @@
 
 package org.societies.cis.manager;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import org.societies.api.cis.management.ICisParticipant;
-
+import org.societies.api.cis.management.ICisRecord;
 
 /**
  * @author Thomas Vilarinho (Sintef)
 */
 
-@Entity
-@Table(name = "org_societies_cis_manager_CisParticipant")
-public class CisParticipant implements ICisParticipant {
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Long id;
-	public Long getId() {
-		return id;
-	}
 
+public class CisSubscribedImp implements ICisRecord {
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-
-	public enum MembershipType {
-		   owner, participant, admin		 }
-	@Column
-	 String membersJid;
-	@Column
-	 MembershipType mtype;
 	
+	private CisRecord cisRecord;
 	
-	public CisParticipant(){}
-	
-	public CisParticipant(String membersJid, MembershipType mtype) {
+	public CisSubscribedImp(CisRecord cisRecord) {
 		super();
-		this.membersJid = membersJid;
-		this.mtype = mtype;
+		this.cisRecord = cisRecord;
 	}
-	
-	@Override
-	public String getMembersJid() {
-		return membersJid;
-	}
-	public void setMembersJid(String membersJid) {
-		this.membersJid = membersJid;
-	}
-	public MembershipType getMtype() {
-		return mtype;
-	}
-	public void setMtype(MembershipType mtype) {
-		this.mtype = mtype;
-	}
-
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((membersJid == null) ? 0 : membersJid.hashCode());
-		return result;
+	public String getCisId() {
+		// TODO Auto-generated method stub
+		return null;
 	}
-
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		CisParticipant other = (CisParticipant) obj;
-		if (membersJid == null) {
-			if (other.membersJid != null)
-				return false;
-		} else if (!membersJid.equals(other.membersJid))
-			return false;
-		return true;
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
 	}
-
 
 	@Override
-	public String getMembershipType() {
-		return this.mtype.toString();
+	public String getOwnerId() {
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
-	
-	
-	
+
+	@Override
+	public String setUserDefinedName(String _name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getUserDefineName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getCisType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getMembershipCriteria() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
 }

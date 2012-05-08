@@ -52,7 +52,6 @@ import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
-import org.societies.cis.persistance.IPersistanceManager;
 import org.societies.identity.NetworkNodeImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -76,7 +75,6 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	private SessionFactory sessionFactory;
 	private ICISCommunicationMgrFactory mockCcmFactory;
 	private ICommManager mockCSSendpoint;
-	private IPersistanceManager mockPM;
 	private ICommManager mockCISendpoint1;
 	private ICommManager mockCISendpoint2;
 	private ICommManager mockCISendpoint3;
@@ -93,7 +91,6 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	public static final String TEST_CIS_NAME_2 = "Santos Futebol Clube";
 	public static final String TEST_CISID_3 = "palmeiras.societies.local";
 	public static final String TEST_CIS_NAME_3 = "Palmeiras Futebol Clube";
-	
 	
 	IIdentityManager mockIICisManagerId;
 	INetworkNode testCisManagerId;
@@ -144,7 +141,6 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		// create mocked class
 		System.out.println("in setup!");
 		mockCSSendpoint = mock (ICommManager.class);
-		mockPM = mock(IPersistanceManager.class);
 
 		mockIICisManagerId = mock (IIdentityManager.class);
 		
@@ -160,7 +156,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		this.session = sessionFactory.openSession();
 		System.out.println("in setup! cisManagerUnderTest.getSessionFactory(): "+sessionFactory);
 		ActivityFeed.setStaticSessionFactory(sessionFactory);
-		cisManagerUnderTest.setSessionFactory(sessionFactory);
+		//cisManagerUnderTest.setSessionFactory(sessionFactory);
 //		Mockito.when(ActivityFeed.startUp(anyString())).thenReturn(new ActivityFeed());
 		setUpFactory();
 		
@@ -170,7 +166,6 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	public void tearDown() throws Exception {
 		mockCcmFactory = null;
 		mockCSSendpoint = null;
-		mockPM = null;
 		testCisManagerId = null;
 
 	}

@@ -24,28 +24,12 @@
  */
 package org.societies.privacytrust.trust.api.evidence.model;
 
-import java.io.Serializable;
-import java.util.Date;
-
-import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
-
 /**
  * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
  */
-public interface ITrustEvidence extends Serializable {
+public interface IIndirectTrustOpinion extends IIndirectTrustEvidence {
 
-	/**
-	 * 
-	 * @return
-	 */
-	public TrustedEntityId getTeid();
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public Date getTimestamp();
 }

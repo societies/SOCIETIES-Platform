@@ -27,6 +27,7 @@ package org.societies.slm.servicediscovery;
 
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -107,7 +108,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 
 		// TODO : Fix this up!
 		INetworkNode currentNode = commMngr.getIdManager().getThisNetworkNode();
-
+		
 		Future<List<Service>> asyncResult = null;
 		List<Service> result = null;
 
@@ -147,8 +148,8 @@ public class ServiceDiscovery implements IServiceDiscovery {
 			
 			asyncResult = this.getServices(commMngr.getIdManager().fromJid(jid));
 
-		
 			result = asyncResult.get();
+						
 			} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -178,6 +179,9 @@ public class ServiceDiscovery implements IServiceDiscovery {
 			throws ServiceDiscoveryException {
 		List<Service>  serviceList = new ArrayList<Service>();
 
+		if(logger.isDebugEnabled())
+			logger.debug("getServices(Identity node) for node: " + node.getJid());
+		
 		try
 		{
 			//Object filter = "*.*"; //placeholder for a filter to all
@@ -205,25 +209,44 @@ public class ServiceDiscovery implements IServiceDiscovery {
 		} 
 
 
-
 		if (serviceList == null || serviceList.isEmpty())
 		{
+			if(logger.isDebugEnabled())
+				logger.debug("No services retrieved from local node...");
+			
 			IIdentity currentNode = commMngr.getIdManager().getThisNetworkNode();
 			
 			if (!currentNode.getJid().contentEquals(node.getJid()))
 			{
 				
-				ServiceDiscoveryRemoteClient callback = new ServiceDiscoveryRemoteClient();
+				if(logger.isDebugEnabled())
+					logger.debug("Attempting to retrieve services from remote node: " + node.getJid());
 				
+				ServiceDiscoveryRemoteClient callback = new ServiceDiscoveryRemoteClient();
 				getServiceDiscoveryRemote().getServices(node, callback); 
 				serviceList = callback.getResultList();
-				
+								
 			}
 		}
+		
+		// Quick log message
+		if(logger.isDebugEnabled()){
+						
+			if(serviceList.isEmpty())	
+				logger.debug("getServices: no services found!");
+			else{				
+				Iterator<Service> it = serviceList.iterator();
+				String logStuff = "getServices: ";
+		
+				while(it.hasNext()){
+					logStuff += it.next().getServiceName() + "; \n";
+				}
+							
+				logger.debug(logStuff);
+			}
+		}
+				
 		return new AsyncResult<List<Service>>(serviceList);
-
-
-
 
 	}
 

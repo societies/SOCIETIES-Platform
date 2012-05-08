@@ -32,12 +32,14 @@
 				<value>org.societies.privacytrust.trust.impl.repo.model.DirectTrust</value>
 				<value>org.societies.privacytrust.trust.impl.repo.model.IndirectTrust</value>
 				<value>org.societies.privacytrust.trust.impl.repo.model.UserPerceivedTrust</value>
+				<value>org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustOpinion</value>
 			</list>
 		</property>
 
 		<property name="annotatedPackages">
 			<list>
 				<value>org.societies.privacytrust.trust.impl.repo.model</value>
+				<value>org.societies.privacytrust.trust.impl.evidence.repo.model</value>
 			</list>
 		</property>
 

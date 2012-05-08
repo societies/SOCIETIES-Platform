@@ -40,13 +40,18 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
 
 @SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface ICisManager {
+
+	
+	// API implementing server functionality
+	
+	
 	/**
-	 * Create a new CIS for the CSS represented by cssId. Password is needed and is the
-	 * same as the CSS password.
-	 * After this method is called a CIS is created with mode set to mode.
+	 * Create a new CIS for the CSS whose JID is the one in cssId. Password is needed and is the
+	 * same as the CSS password (at the moment this is not checked).
 	 * 
-	 * The CSS who creates the CIS will be the owner. Ownership can be changed
-	 * later.
+	 * 
+	 * The CSS who creates the CIS will be the owner. Ownership should be possible to be changed
+	 * later, but it is not right now.
 	 * 
 	 * TODO: define what values mode can have and what each means.
 	 * TODO: change the type from String to proper type when CSS ID datatype is defined.
@@ -54,39 +59,72 @@ public interface ICisManager {
 	 * @param cssId and cssPassword are to recognise the user
 	 * @param cisName is user given name for the CIS, e.g. "Footbal".
 	 * @param cisType E.g. "disaster"
-	 * @param mode membership type, e.g 1= read-only.
-	 * TODO define mode better.
-	 * @return link to the {@link ICisEditor} representing the new CIS, or 
+	 * @param mode membership type, e.g 1= read-only (will be defined in the future).
+	 * @return a Future link to the {@link ICisOwned} representing the new CIS, or 
 	 * null if the CIS was not created.
 	 */
 	Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode);
 	
 	/**
 	 * Delete a specific CIS represented by cisId. The cisId is available in the
-	 * method of {@link ICisEditor} representing the CIS to be deleted. This method
+	 * method of {@link ICisOwned} representing the CIS to be deleted. This method
 	 * will delete only one CIS with the ID passed as cisId.
 	 * 
-	 * TODO: Need to give a more meaningful return.
 	 * 
 	 * @param cssId and cssPassword of the owner of the CIS.
 	 * @param cisId The ID of the CIS to be deleted.
 	 * @return true if deleted, false otherwise.
 	 */
 	boolean deleteCis(String cssId, String cssPassword, String cisId);
+	
 	/**
 	 * Get a CIS Record with the ID cisId.
+	 * The one calling the api must be aware that he will get a {@link ICisRecord} which
+	 * will not implement all the methods for the case of CIS that the user owns
 	 * 
-	 * TODO: Check the return value. Should be something more meaningful.
-	 * 
+	 * @param cssId The ID (jabber ID) of the CSS triggering the command (TODO: do we really need it?).
 	 * @param cisId The ID (jabber ID) of the CIS to get.
-	 * @return the CISRecord with the ID cisID, or null if no such CIS exists.
+	 * @return the {@link ICisRecord} matching the input cisID, or null if no such CIS is owned or subscribed by the user.
+	 * 
 	 */
 	ICisRecord getCis(String cssId, String cisId);
 	
 	/**
+	 * Get a CIS Owned Interface with the ID cisId.
+	 * 
+	 * TODO: Check the return value. Should be something more meaningful.
+	 * 
+	 * @param cisId The ID (jabber ID) of the CIS to get.
+	 * @return the {@link ICisOwned} matching the input cisID, or null if no such CIS is owned by the user.
+	 */
+	ICisOwned getOwnedCis(String cisId);
+	
+	
+	/**
+	 * Return an array of all the CISs that the user own or participates. 
+	 * 
+	 * @return Array of {@linkICisRecord} .
+	 */
+	List<ICisRecord> getCisList();
+
+	
+	// END OF API implementing server functionality
+	
+	// API implementing client functionality (to be called from webapp)
+
+	
+	
+	// END of API implementing client functionality
+
+	
+	
+	// API which is not yet properly defined
+	
+	/**
 	 * Return an array of all the CISs that match the query. 
 	 * 
-	 * TODO: need to refine this to something better. I am not sure how the query will be created.
+	 * TODO: DO NOT USE THIS METHOD YET
+	 * We need to refine first what to be searched
 	 * 
 	 * @param cssId The ID of the owner CSS
 	 * @param query Defines what to search for.
@@ -94,15 +132,23 @@ public interface ICisManager {
 	 */
 	ICisRecord[] getCisList(ICisRecord query);
 
-	/**
-	 * Return an array of all the CISs that the user own or participates. 
-	 * 
-	 * @return Array of CIS Records .
-	 */
-	List<ICisRecord> getCisList();
-
 	
-	Boolean requestNewCisOwner(String currentOwnerCssId, String currentOwnerCssPassword,
+	
+	
+	
+	/**
+	 * Method not yet defined. 
+	 * 
+	 * TODO: DO NOT USE THIS METHOD YET - not yet defined
+	 * 
+	 * 
+	 * @param currentOwnerCssId The ID of the owner CSS
+	 * @param currentOwnerCssPassword passwod of the owner of the CIS
+	 * @param newOwnerCssId JID of the new owner
+	 * @param cisId JID of the CIS which will have its owner changed
+	 * @return boolean stating if the operation worked or failed
+	 */
+	boolean requestNewCisOwner(String currentOwnerCssId, String currentOwnerCssPassword,
 		String newOwnerCssId, String cisId);
 
 }
