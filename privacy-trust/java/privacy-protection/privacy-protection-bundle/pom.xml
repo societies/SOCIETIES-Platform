@@ -151,9 +151,9 @@
 							gson;scope=compile|runtime,
 							api;scope=compile|runtime,
 							privacydatamanagement;scope=compile|runtime,
-							privacypolicymanagement;scope=compile|runtime,
+							privacypolicymanagement;scope=compile|runtime
 							assessment;scope=compile|runtime
-						</Embed-Dependency>
+							</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 
 						<Export-Package></Export-Package>
