@@ -167,6 +167,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	 */
 	@Override
 	public Future<List<IPreferenceOutcome>> getOutcome(IIdentity ownerId, CtxAttribute attribute){
+		this.prefMgr.updateContext(attribute);
 		/*
 		 * in this method, we need to check what preferences are affected, request re-evaluation of them, compare last ioutcome with new and send it to 
 		 * the proactivity decision maker component
