@@ -26,6 +26,7 @@
 package org.societies.useragent.monitoring;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -66,9 +67,9 @@ public class ContextCommunicator {
 
 	public void updateHistory(IIdentity owner, IAction action){
 		//check cache first for ctxAttrIdentifier to update
-		ServiceResourceIdentifier serviceID = action.getServiceID();
+		URI serviceID = action.getServiceID().getIdentifier();
 		String parameterName = action.getparameterName();
-		String key = serviceID+parameterName;
+		String key = serviceID+"|"+parameterName;
 		if(mappings.containsKey(key)){  //already has service attribute
 			LOG.info("Mapping exists for key: "+key);
 			//update attribute
@@ -210,7 +211,7 @@ public class ContextCommunicator {
 		return usesServiceAssoc;
 	}
 	
-	private CtxEntity createServiceEntity(CtxAssociation usesServiceAssoc, ServiceResourceIdentifier serviceID){
+	private CtxEntity createServiceEntity(CtxAssociation usesServiceAssoc, URI serviceID){
 		CtxEntity serviceEntity = null;
 		try {
 			//create new SERVICE entity
@@ -226,6 +227,16 @@ public class ContextCommunicator {
 			CtxAttribute newIDAttr = ctxBroker.createAttribute(serviceEntity.getId(), CtxAttributeTypes.ID).get();
 			LOG.info("Setting value of ID attribute to: "+serviceID);
 			ctxBroker.updateAttribute(newIDAttr.getId(), SerialisationHelper.serialise(serviceID));
+			LOG.info("Testing serialisation and deserialisation");
+			byte[] serialised = SerialisationHelper.serialise(serviceID);
+			LOG.info("SERIALISED: "+serialised);
+			try {
+				URI deserialised = (URI)SerialisationHelper.deserialise(serialised, this.getClass().getClassLoader());
+				LOG.info("DESERIALISED: "+deserialised);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			
 			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
