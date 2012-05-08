@@ -75,6 +75,11 @@
 			<version>${version.pt}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.societies.comm.xmpp</groupId>
+			<artifactId>XCCommunicationMgr</artifactId>
+			<version>${version.comm}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.1</version>

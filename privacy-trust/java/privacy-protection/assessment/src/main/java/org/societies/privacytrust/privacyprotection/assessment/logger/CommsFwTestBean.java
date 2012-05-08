@@ -24,51 +24,43 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logger;
 
-import java.lang.reflect.Method;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.aop.support.StaticMethodMatcherPointcut;
 
 /**
- * Aspect Oriented Programming (AOP) Pointcut.
  * 
- * Implemented with a static method matcher. This is less flexible - you can't
- * check the method invocation arguments, but much faster, as the check is only
- * performed once, rather than at every method invocation.
- * 
- * Reference: https://nikunjp.wordpress.com/2011/07/24/spring-aop-a-go-through-with-simple-example/
  *
  * @author Mitja Vardjan
+ *
  */
-public class CommsFwPointcut extends StaticMethodMatcherPointcut {
+public class CommsFwTestBean {
 
-	private static Logger LOG = LoggerFactory.getLogger(CommsFwPointcut.class);
+	private static Logger LOG = LoggerFactory.getLogger(CommsFwTestBean.class);
 
-	/* (non-Javadoc)
-	 * @see MethodMatcher#matches(java.lang.reflect.Method, Class)
-	 */
+	private String aspectName;
+
+	public CommsFwTestBean() {
+		LOG.debug("constructor");
+	}
+	
+	public void init() {
+		LOG.info("init()");
+	}
+	
+	public String getAspectName() {
+		LOG.debug("getAspectName()");
+		LOG.debug("getAspectName(): {}", aspectName);
+		return aspectName;
+	}
+
+	public void setAspectName(String aspectName) {
+		LOG.debug("setAspectName()");
+		LOG.debug("setAspectName({})", aspectName);
+		this.aspectName = aspectName;
+	}
+
 	@Override
-	public boolean matches(Method method, Class<?> targetClass) {
-		
-		LOG.debug("matches()");
-		
-		String methodName = method.getName();
-		
-		if (methodName.equals("sendIQGet")) {
-			return true;
-		}
-		else if (methodName.equals("sendMessage")) {
-			return true;
-		}
-		else if (methodName.equals("getAspectName")) {  // TODO: remove
-			return true;
-		}
-		else if (methodName.equals("setAspectName")) {  // TODO: remove
-			return true;
-		}
-		else {
-			return false;
-		}
+	public String toString() {
+		return "CommsFwTestBean [aspectName=" + aspectName + "]";
 	}
 }

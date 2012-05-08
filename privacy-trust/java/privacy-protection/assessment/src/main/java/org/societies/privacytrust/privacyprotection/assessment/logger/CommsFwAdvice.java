@@ -24,6 +24,9 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logger;
 
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Method;
+
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.slf4j.Logger;
@@ -46,6 +49,13 @@ public class CommsFwAdvice implements MethodInterceptor {
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		
 		LOG.info("invoke()");
+		
+		Object[] args = invocation.getArguments();
+		Method method = invocation.getMethod();
+		AccessibleObject staticPart = invocation.getStaticPart();
+		Object target = invocation.getThis();
+		
+		LOG.debug("invoke(): method = " + method.getName());
 		
 		return null;
 	}
