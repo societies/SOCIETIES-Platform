@@ -109,8 +109,8 @@ public class Action implements IAction, Serializable{
 
 	public String toString(){
 		return "ServiceID: "+this.serviceID.getIdentifier()+
-				"\n"+"ServiceType: "+this.serviceType+
-				"\n"+this.parameterName+" = "+this.value;
+				"\n "+"ServiceType: "+this.serviceType+
+				"\n "+this.parameterName+" = "+this.value;
 	}
 	
 
@@ -156,7 +156,7 @@ public class Action implements IAction, Serializable{
 			if (other.serviceID != null) {
 				return false;
 			}
-		} else if (!serviceID.equals(other.serviceID)) {
+		} else if (!serviceID.getIdentifier().equals(other.serviceID.getIdentifier())) {
 			return false;
 		}
 		if (value == null) {

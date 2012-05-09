@@ -90,10 +90,9 @@ public interface ITrustEvidenceRepository {
 	/**
 	 * 
 	 * @param teid
-	 * @return
 	 * @throws TrustEvidenceRepositoryException
 	 */
-	public Set<IDirectTrustEvidence> removeAllDirectEvidence(final TrustedEntityId teid)
+	public void removeAllDirectEvidence(final TrustedEntityId teid)
 			throws TrustEvidenceRepositoryException;
 	
 	/**
@@ -101,19 +100,17 @@ public interface ITrustEvidenceRepository {
 	 * @param teid
 	 * @param startDate
 	 * @param endDate
-	 * @return
 	 * @throws TrustEvidenceRepositoryException
 	 */
-	public Set<IDirectTrustEvidence> removeDirectEvidence(final TrustedEntityId teid,
+	public void removeDirectEvidence(final TrustedEntityId teid,
 			final Date startDate, final Date endDate) throws TrustEvidenceRepositoryException;
 	
 	/**
 	 * 
 	 * @param teid
-	 * @return
 	 * @throws TrustEvidenceRepositoryException
 	 */
-	public Set<IIndirectTrustEvidence> removeAllIndirectEvidence(final TrustedEntityId teid)
+	public void removeAllIndirectEvidence(final TrustedEntityId teid)
 			throws TrustEvidenceRepositoryException;
 	
 	/**
@@ -121,9 +118,8 @@ public interface ITrustEvidenceRepository {
 	 * @param teid
 	 * @param startDate
 	 * @param endDate
-	 * @return
 	 * @throws TrustEvidenceRepositoryException
 	 */
-	public Set<IIndirectTrustEvidence> removeIndirectEvidence(final TrustedEntityId teid,
+	public void removeIndirectEvidence(final TrustedEntityId teid,
 			final Date startDate, final Date endDate) throws TrustEvidenceRepositoryException;
 }

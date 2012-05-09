@@ -62,10 +62,13 @@ public class TrustEvidenceRepositoryTest extends AbstractTransactionalJUnit4Spri
 	
 	private static final String TRUSTED_CSS_ID = "aFooCssIIdentity";
 	
+	@SuppressWarnings("unused")
 	private static final String TRUSTED_CIS_ID = "aFooCisIIdentity";
 	
+	@SuppressWarnings("unused")
 	private static final String TRUSTED_SERVICE_ID = "aFooServiceResourceIdentifier";
 	
+	@SuppressWarnings("unused")
 	private static final String TRUSTED_SERVICE_TYPE = "aFooServiceType";
 	
 	@Autowired
@@ -205,5 +208,54 @@ public class TrustEvidenceRepositoryTest extends AbstractTransactionalJUnit4Spri
 		assertNotNull(directEvidence);
 		assertEquals(1, directEvidence.size());
 		assertTrue(directEvidence.contains(directOpinion2));
+		
+		// remove ALL evidence for teid1
+		this.trustEvidenceRepo.removeAllDirectEvidence(teid1);
+		// verify
+		directEvidence = this.trustEvidenceRepo.retrieveAllDirectEvidence(teid1);
+		assertTrue(directEvidence.isEmpty());
+		directEvidence = this.trustEvidenceRepo.retrieveAllDirectEvidence(teid2);
+		assertEquals(1, directEvidence.size());
+		assertTrue(directEvidence.contains(directOpinion2));
+		
+		// remove ALL evidence for teid2
+		this.trustEvidenceRepo.removeAllDirectEvidence(teid2);
+		// verify
+		directEvidence = this.trustEvidenceRepo.retrieveAllDirectEvidence(teid1);
+		assertTrue(directEvidence.isEmpty());
+		directEvidence = this.trustEvidenceRepo.retrieveAllDirectEvidence(teid2);
+		assertTrue(directEvidence.isEmpty());
+		
+		// re-add evidence
+		this.trustEvidenceRepo.addEvidence(directOpinion1);
+		this.trustEvidenceRepo.addEvidence(directOpinion2);
+		this.trustEvidenceRepo.addEvidence(directOpinion3);
+		
+		// remove evidence for teid1 before startDate (inclusive)
+		this.trustEvidenceRepo.removeDirectEvidence(teid1, null, startDate);
+		// verify
+		directEvidence = this.trustEvidenceRepo.retrieveAllDirectEvidence(teid1);
+		assertEquals(1, directEvidence.size());
+		assertTrue(directEvidence.contains(directOpinion3));
+		directEvidence = this.trustEvidenceRepo.retrieveAllDirectEvidence(teid2);
+		assertEquals(1, directEvidence.size());
+		assertTrue(directEvidence.contains(directOpinion2));
+						
+		// remove evidence for teid1 after startDate (inclusive)
+		this.trustEvidenceRepo.removeDirectEvidence(teid1, startDate, null);
+		// verify
+		directEvidence = this.trustEvidenceRepo.retrieveAllDirectEvidence(teid1);
+		assertTrue(directEvidence.isEmpty());
+		directEvidence = this.trustEvidenceRepo.retrieveAllDirectEvidence(teid2);
+		assertEquals(1, directEvidence.size());
+		assertTrue(directEvidence.contains(directOpinion2));
+		
+		// remove evidence for teid2 between startDate and endDate (inclusive)
+		this.trustEvidenceRepo.removeDirectEvidence(teid2, startDate, endDate);
+		// verify
+		directEvidence = this.trustEvidenceRepo.retrieveAllDirectEvidence(teid1);
+		assertTrue(directEvidence.isEmpty());
+		directEvidence = this.trustEvidenceRepo.retrieveAllDirectEvidence(teid2);
+		assertTrue(directEvidence.isEmpty());
 	}
-}
+} 
