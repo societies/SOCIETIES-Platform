@@ -172,7 +172,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		// TODO Auto-generated method stub
 		List<CRISTUserAction> results = new ArrayList<CRISTUserAction>();
 		if (this.cristTaskManager!=null){
-			results = this.cristTaskManager.predictUserIntent(entityID, (CRISTUserAction) action);
+			results = this.cristTaskManager.predictUserIntent(entityID, new CRISTUserAction(action));
 		}else{
 			System.out.println("The CRIST Taks Manager is NULL. Initiating a new mananger...");
 			// TODO
