@@ -26,14 +26,39 @@
 package org.societies.orchestration.CommunityLifecycleManagement.test;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import java.lang.InterruptedException;
 
 import org.junit.Test;
-import org.societies.api.cis.management.ICisManager;
+import org.societies.api.activity.IActivity;
+
+/**import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.cis.management.ICisEditor;
+import org.societies.api.cis.management.ICisSubscribed;*/
+
+import org.societies.orchestration.api.ICisRecord;
+import org.societies.orchestration.api.ICisManager;
+import org.societies.orchestration.api.ICisOwned;
+import org.societies.orchestration.api.ICisEditor;
+
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.css.management.ICssActivity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.orchestration.CommunityLifecycleManagement.impl.CommunityRecommender;
@@ -105,7 +130,7 @@ public class SuggestedCommunityAnalyserTest {
     	suggestedCommunityAnalyser.setUserContextBroker(userCtxBroker);
     	suggestedCommunityAnalyser.setCisManager(cisManager);
 		HashMap<String, ArrayList<ICisRecord>> recommendations = new HashMap<String, ArrayList<ICisRecord>>();
-		suggestedCommunityAnalyser.processEgocentricRecommendations(recommendations, new ArrayList<String>());
+		suggestedCommunityAnalyser.processCSCWRecommendations(recommendations);
 		
 		//James should have been suggested to leave the CIS.
 		// (No members list function in CisRecord API yet)
@@ -124,16 +149,76 @@ public class SuggestedCommunityAnalyserTest {
 		userCtxBroker = mock(ICtxBroker.class);
 		communityRecommender = mock(CommunityRecommender.class);
 		
+		CtxAttribute theAttr = null;
+		theAttr = new CtxAttribute(new CtxAttributeIdentifier(entityId, "address", new Long(12345)));
+       /** Future<CtxAttribute> attrFuture = null;
+		try {
+			attrFuture = userCtxBroker.createAttribute(new CtxEntityIdentifier(""), "address");
+		} catch (MalformedCtxIdentifierException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		CtxAttribute attr = null;
+		/**try {
+			attr = attrFuture.get();
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ExecutionException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}*/
+		theAttr.setStringValue("15 Fragrance Street");
+		try {
+			userCtxBroker.update(attr);
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//CtxIdentifier id = new CtxAttributeIdentifier(new CtxEntityIdentifier(""), "address", new Long(0));
+        //Future<ArrayList<CtxIdentifier>> theFuture = new Future<ArrayList<CtxIdentifier>>();
+		ArrayList<CtxIdentifier> array = new ArrayList<CtxIdentifier>();
+		
+		ArrayList<CtxAttribute> attributes = new ArrayList<CtxAttribute>();
+		attributes.add(theAttr);
+		//array.add(id);
+        //theFuture.add(array);
+		//when(userCtxBroker.lookup(CtxModelType.ATTRIBUTE, "address")).thenReturn(theFuture);
+		
 		//create CIS for James where James himself has been inactive for 1 year.
 	    
 		//CisRecord jamesCisRecord = cisManager.createCis("James", "James CIS");
 		
+		ArrayList<IIdentity> csss = new ArrayList<IIdentity>();
+		
+		csss.add(mock(IIdentity.class));
+		csss.add(mock(IIdentity.class));
+		csss.add(mock(IIdentity.class));
+		csss.add(mock(IIdentity.class));
+		csss.add(mock(IIdentity.class));
+		
     	suggestedCommunityAnalyser = new SuggestedCommunityAnalyser(ownerId, "CSS");
     	suggestedCommunityAnalyser.setCommunityRecommender(communityRecommender);
     	suggestedCommunityAnalyser.setUserContextBroker(userCtxBroker);
+    	
+    	
+    	ArrayList<ICisRecord> ciss = new ArrayList<ICisRecord>();
+    	//try {
+		//	ciss.add(cisManager.createCis("","","","", 0).get());
+		//} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+		//} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+		//}
+    	when(cisManager.getCisList()).thenReturn(ciss);
     	suggestedCommunityAnalyser.setCisManager(cisManager);
 		HashMap<String, ArrayList<ICisRecord>> recommendations = new HashMap<String, ArrayList<ICisRecord>>();
-		suggestedCommunityAnalyser.processEgocentricRecommendations(recommendations, new ArrayList<String>());
+		suggestedCommunityAnalyser.processCSMAnalyserRecommendations(csss, attributes, new ArrayList<CtxAssociation>(), new ArrayList<ICssActivity>(), new ArrayList<IActivity>());
 		
 		//James should have been suggested to leave the CIS.
 		// (No members list function in CisRecord API yet)

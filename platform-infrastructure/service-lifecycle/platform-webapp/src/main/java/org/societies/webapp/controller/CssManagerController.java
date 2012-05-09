@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -26,6 +27,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.internal.comm.ICommManagerController;
 import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
@@ -58,10 +60,25 @@ public class CssManagerController {
 	private IServiceDiscovery sdService;
 	@Autowired
 	private IServiceControl scService;
-	
+	@Autowired
+	private ICommManagerController commManagerControl;
 	
 	
 	private CssManagerLoginForm cmControllerLoginForm = new CssManagerLoginForm();
+
+	/**
+	 * @return the commManagerControl
+	 */
+	public ICommManagerController getCommManagerControl() {
+		return commManagerControl;
+	}
+
+	/**
+	 * @param commManagerControl the commManagerControl to set
+	 */
+	public void setCommManagerControl(ICommManagerController commManagerControl) {
+		this.commManagerControl = commManagerControl;
+	}
 
 	public ICSSLocalManager getCssLocalManager() {
 		return cssLocalManager;
@@ -117,10 +134,9 @@ public class CssManagerController {
 		// TODO : Check should we do this some other way!
 		INetworkNode myNode = this.getCommManager().getIdManager()
 				.getThisNetworkNode();
-
 		cmLoginForm.setCssIdentity(myNode.getBareJid());
-
 		model.put("cmLoginForm", cmLoginForm);
+			
 		/*
 		 * return modelandview object and passing login (jsp page name) and
 		 * model object as constructor
@@ -148,6 +164,12 @@ public class CssManagerController {
 			return new ModelAndView("cssmanager", model);
 		}
 
+		if(getCommManagerControl() != null) {
+			Set<INetworkNode> allNodes = getCommManagerControl().getOtherNodes();
+			allNodes.add(getCommManager().getIdManager().getThisNetworkNode());
+			model.put("allNodes", allNodes);
+		}
+		
 		if (cmLoginForm.getPassword() != null
 				&& cmLoginForm.getPassword().length() == 0) {
 			model.put("message", "Error : Password must be entered");
@@ -202,11 +224,27 @@ public class CssManagerController {
 			if (loginResult == null) {
 				// No CssRecord we eed to create one
 				loginResult = getCssLocalManager().registerCSS(loginRecord);
+				
+				// If there was no cssRecord, there was no css advertisement record
+				 CssAdvertisementRecord cssAdvert = new CssAdvertisementRecord();
+				 cssAdvert.setId(cmLoginForm.getCssIdentity());
+				 cssAdvert.setName(" ");
+				 cssAdvert.setUri(" ");
+				 getCssLocalManager().addAdvertisementRecord(cssAdvert);
+				
 				model.put("message", "created Css Record");
 			} else {
 				if (((CssInterfaceResult) loginResult.get()).isResultStatus() == false) {
 					// No CssRecord we eed to create one
 					loginResult = getCssLocalManager().registerCSS(loginRecord);
+					
+					// If there was no cssRecord, there was no css advertisement record
+					 CssAdvertisementRecord cssAdvert = new CssAdvertisementRecord();
+					 cssAdvert.setId(cmLoginForm.getCssIdentity());
+					 cssAdvert.setName(" ");
+					 cssAdvert.setUri(" ");
+					getCssLocalManager().addAdvertisementRecord(cssAdvert);
+					
 					model.put("message", "created Css Record");
 				} else {
 					cssDetails = loginResult.get();

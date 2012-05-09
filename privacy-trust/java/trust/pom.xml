@@ -126,8 +126,10 @@
 				<artifactId>maven-bundle-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>
-					<instructions>
-						<Export-Package/>						
+					<instructions><!-- TODO should not export any packages!! -->
+						<Export-Package>
+							org.societies.privacytrust.trust.api.**
+						</Export-Package>						
 					</instructions> 
 				</configuration>
 			</plugin>

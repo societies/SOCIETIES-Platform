@@ -89,8 +89,12 @@ public class IntegrationTestUtils {
 		results += testRunCt + testCaseResult.getRunCount() + newln;
 		results += testRunTm + testCaseResult.getRunTime() + newln;
 		results += testSuccess + testCaseResult.wasSuccessful() + newln;
-
+		
 		LOG.info("[#"+testCaseNumber+"] "+ results);
+		
+		for (Failure x: failures) {
+			x.getException().printStackTrace();
+		}
 		return testCaseResult;
 	}
 }

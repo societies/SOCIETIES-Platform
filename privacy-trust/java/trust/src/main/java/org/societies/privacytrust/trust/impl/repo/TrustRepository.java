@@ -24,8 +24,6 @@
  */
 package org.societies.privacytrust.trust.impl.repo;
 
-import java.util.List;
-
 import org.hibernate.FetchMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -44,6 +42,7 @@ import org.societies.privacytrust.trust.impl.repo.model.TrustedCss;
 import org.societies.privacytrust.trust.impl.repo.model.TrustedEntity;
 import org.societies.privacytrust.trust.impl.repo.model.TrustedService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -53,6 +52,7 @@ import org.springframework.stereotype.Repository;
  * @since 0.0.5
  */
 @Repository
+@Lazy(value = false)
 public class TrustRepository implements ITrustRepository {
 
 	/** The logging facility. */
@@ -78,16 +78,22 @@ public class TrustRepository implements ITrustRepository {
 		
 		boolean result = false;
 
+		// check if the entity is already present
+		if (this.retrieveEntity(entity.getTeid()) != null)
+			return false;
+		
 		final Session session = sessionFactory.openSession();
 		final Transaction transaction = session.beginTransaction();
 		try {
 			if (LOG.isDebugEnabled())
 				LOG.debug("Adding trusted entity " + entity + " to the Trust Repository...");
+	
 			session.save(entity);
+			session.flush();
 			transaction.commit();
 			result = true;
 		} catch (ConstraintViolationException cve) {
-			result = false;
+			transaction.rollback();
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for entity " + entity);
 			transaction.rollback();
@@ -116,15 +122,16 @@ public class TrustRepository implements ITrustRepository {
 		// TODO TrustedEntityType.LGC
 		
 		final Session session = sessionFactory.openSession();
-		@SuppressWarnings("unchecked")
-		List<ITrustedEntity> results = session.createCriteria(entityClass)
+		ITrustedEntity result = (ITrustedEntity) session.createCriteria(entityClass)
 			.add(Restrictions.eq("teid", teid))
 			.setFetchMode("directTrust", FetchMode.JOIN)
-			.list();
+			.setFetchMode("indirectTrust", FetchMode.JOIN)
+			.setFetchMode("userPerceivedTrust", FetchMode.JOIN)
+			.uniqueResult();
 		if (session != null)
 			session.close();
 			
-		return (results.isEmpty()) ? null : results.get(0);
+		return result;
 	}
 
 	/* (non-Javadoc)
@@ -152,13 +159,33 @@ public class TrustRepository implements ITrustRepository {
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#removeEntity(org.societies.privacytrust.trust.api.model.TrustedEntity)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#removeEntity(org.societies.api.internal.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public boolean removeEntity(ITrustedEntity entity)
+	public void removeEntity(final TrustedEntityId teid)
 			throws TrustRepositoryException {
-		// TODO Auto-generated method stub
-		return false;
+
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
+		
+		final ITrustedEntity entity = this.retrieveEntity(teid);
+		if (entity == null)
+			return;
+		
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
+		try {
+			session.delete(entity);
+			transaction.commit();
+		} catch (Exception e) {
+			LOG.warn("Rolling back transaction for entity " + entity);
+			transaction.rollback();
+			throw new TrustRepositoryException("Could not remove entity " + entity, e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
 	}
 }

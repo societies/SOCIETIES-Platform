@@ -9,40 +9,58 @@ package org.societies.integration.test.bit.user_intent_learning;
  */
 import java.util.List;
 
+import org.societies.integration.test.IntegrationTestCase;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.societies.api.useragent.monitoring.IUserActionMonitor;
 
-@Service
-public class TestCase749 {
+
+
+public class TestCase749 extends IntegrationTestCase{
 
 	private static Logger LOG = LoggerFactory.getLogger(TestCase749.class);
 	private String results = new String();
 
 
 	private JUnitCore jUnitCore;
-	
-	@Autowired(required=true)
-	private ICtxBroker internalCtxBroker;
 
-		
+	public static ICtxBroker ctxBroker;
+	public static IUserActionMonitor uam;
+
 	public TestCase749() {
-		System.out.println(internalCtxBroker.toString());
+		super(749, new Class[]{ContextStorageTest.class, RetrieveLearnedModelTest.class});
+		System.out.println("Test 749 started : TestCase749() ");
+		//UserIntentLearningTest uil = new UserIntentLearningTest(ctxBroker,uam);
+		//uil.createHistorySet();
+		startTest(); 
 	}
-	/*
-	public void setMathServiceConsumer(IConsumer mathServiceConsumer) {
-		this.mathServiceConsumer = mathServiceConsumer;
+
+
+	public void setCtxBroker(ICtxBroker ctxBroker){
+		TestCase749.ctxBroker = ctxBroker;
 	}
-	 */
+
+	public void setUam(IUserActionMonitor uam){
+		TestCase749.uam = uam;
+	}
+
+	protected static ICtxBroker getCtxBroker(){
+		return TestCase749.ctxBroker;
+	}
+
+	protected static IUserActionMonitor getUam(){
+		return TestCase749.uam;
+	}
+
+	
 	private void startTest() {
 		LOG.info("###749... startTest");
 		jUnitCore = new JUnitCore();
-		Result res = jUnitCore.run(NominalTestCase.class);
+		Result res = jUnitCore.run(RetrieveLearnedModelTest.class);
 
 
 		String testClass = "Class: ";
@@ -52,7 +70,7 @@ public class TestCase749 {
 		String testRunTm = "Run Time: ";
 		String testSuccess = "Success: ";
 		String newln = "\n";
-		results += testClass + NominalTestCase.class.getName() + newln;
+		results += testClass + RetrieveLearnedModelTest.class.getName() + newln;
 		results += testFailCt + res.getFailureCount() + newln;
 		results += testFalures + newln;
 		List<Failure> failures = res.getFailures();
@@ -68,4 +86,5 @@ public class TestCase749 {
 
 		LOG.info("###749 " + results);
 	}
+	 
 }

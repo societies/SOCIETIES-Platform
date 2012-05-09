@@ -29,7 +29,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.junit.Test;
-import org.societies.cis.activity.ActivityFeed;
+import org.societies.activity.ActivityFeed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
@@ -114,8 +114,8 @@ public class ActivityFeedTest extends
 		Transaction t = s.beginTransaction();
 		t.begin();
 		for(int i=0;i<10;i++){
-			ActivityFeed feed = new ActivityFeed();
-			feed.setId(Integer.toString(i));
+			ActivityFeed feed = new ActivityFeed(Integer.toString(i));
+			
 			s.save(feed);
 		}
 		t.commit();

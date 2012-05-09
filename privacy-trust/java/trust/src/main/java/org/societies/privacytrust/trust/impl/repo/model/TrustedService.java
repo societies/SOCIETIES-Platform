@@ -24,8 +24,10 @@
  */
 package org.societies.privacytrust.trust.impl.repo.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
@@ -43,28 +45,35 @@ import org.societies.privacytrust.trust.api.model.ITrustedService;
  * @since 0.0.1
  */
 @Entity
-@Table(name="t_services")
+@Table(name=TableName.TRUSTED_SERVICE, uniqueConstraints={@UniqueConstraint(columnNames={"trustorId", "trusteeId"})})
 public class TrustedService extends TrustedEntity implements ITrustedService {
 
 	private static final long serialVersionUID = 8253551733059925542L;
 	
+	/** The type of this service. */
+	@Column(name = "type", nullable = false, updatable = false, length = 256)
+	private final String type;
+	
 	/** The CSS providing this service. */
-	private final ITrustedCss provider;
+	private ITrustedCss provider;
+	
+	/** The developer of this service. */
+	//private ITrustedDeveloper developer;
 	
 	/* The communities sharing this service. */
 	//private final Set<TrustedCis> communities = new CopyOnWriteArraySet<TrustedCis>();
-	
-	/** The type of this service. */
-	private final String type;
-	
-	/** The developer of this service. */
-	private ITrustedDeveloper developer;
 
-	public TrustedService(TrustedEntityId teid, String type, ITrustedCss provider) {
+	/* Empty constructor required by Hibernate */
+	private TrustedService() {
+		
+		super(null);
+		this.type = null;
+	}
+	
+	public TrustedService(final TrustedEntityId teid, final String type) {
 		
 		super(teid);
 		this.type = type;
-		this.provider = provider;
 	}
 
 	/* (non-Javadoc)
@@ -85,9 +94,19 @@ public class TrustedService extends TrustedEntity implements ITrustedService {
 		return this.provider;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedService#setProvider(org.societies.privacytrust.trust.api.model.ITrustedCss)
+	 */
+	@Override
+	public void setProvider(ITrustedCss provider) {
+		
+		this.provider = provider;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.societies.privacytrust.trust.api.model.ITrustedService#getDeveloper()
-	 */
+	 *
 	@Override
 	public ITrustedDeveloper getDeveloper() {
 		
@@ -96,10 +115,10 @@ public class TrustedService extends TrustedEntity implements ITrustedService {
 	
 	/* (non-Javadoc)
 	 * @see org.societies.privacytrust.trust.api.model.ITrustedService#setDeveloper(org.societies.privacytrust.trust.api.model.TrustedDeveloper)
-	 */
+	 *
 	@Override
 	public void setDeveloper(ITrustedDeveloper developer) {
 		
 		this.developer = developer;
-	}
+	}*/
 }

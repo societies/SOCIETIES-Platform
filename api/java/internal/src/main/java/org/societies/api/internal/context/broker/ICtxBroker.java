@@ -142,7 +142,18 @@ public interface ICtxBroker {
 	 * @throws CtxException 
 	 */
 	public Future<List<CtxEntityIdentifier>> lookupEntities(String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue) throws CtxException;
-
+		
+	/**
+	 * Lookups for a list of CtxEntities that maintain a CtxAttribute of the type and the value defined.
+	 * 
+	 * @param ctxEntityIDList
+	 * @param ctxAttributeType
+	 * @param value
+	 * @return
+	 */
+	public Future<List<CtxEntityIdentifier>> lookupEntities(List<CtxEntityIdentifier> ctxEntityIDList, String ctxAttributeType, Serializable value);
+	
+	
 	/**
 	 * Registers the specified EventListener for value modification events of the
 	 * specified context attribute.

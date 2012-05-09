@@ -26,22 +26,45 @@
 
 package org.societies.cis.manager;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.societies.api.cis.management.ICisParticipant;
+
 
 /**
  * @author Thomas Vilarinho (Sintef)
 */
 
+@Entity
+@Table(name = "org_societies_cis_manager_CisParticipant")
+public class CisParticipant implements ICisParticipant {
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private Long id;
+	public Long getId() {
+		return id;
+	}
 
-public class CisParticipant {
-	
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+
 	public enum MembershipType {
 		   owner, participant, admin		 }
-	
+	@Column
 	 String membersJid;
+	@Column
 	 MembershipType mtype;
 	
 	
-	
+	public CisParticipant(){}
 	
 	public CisParticipant(String membersJid, MembershipType mtype) {
 		super();
@@ -49,7 +72,7 @@ public class CisParticipant {
 		this.mtype = mtype;
 	}
 	
-	
+	@Override
 	public String getMembersJid() {
 		return membersJid;
 	}
@@ -89,6 +112,12 @@ public class CisParticipant {
 		} else if (!membersJid.equals(other.membersJid))
 			return false;
 		return true;
+	}
+
+
+	@Override
+	public String getMembershipType() {
+		return this.mtype.toString();
 	}
 	
 	

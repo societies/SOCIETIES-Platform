@@ -36,18 +36,43 @@ package org.societies.cis.manager;
 
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.societies.activity.ActivityFeed;
 import org.societies.api.cis.collaboration.IServiceSharingRecord;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.cis.management.ICisSubscribed;
-import org.societies.cis.activity.ActivityFeed;
 
 
-
-public class CisRecord implements ICisOwned, ICisSubscribed{
-	public ActivityFeed feed;
+@Entity
+@Table(name = "org_societies_cis_manager_CisRecord")
+public class CisRecord {
+	
 	public String ownerCss;
 	public int membershipCriteria; // also know as mode
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private Long id;
+
+
+	public Long getId() {
+		return id;
+	}
+
+
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 
 
@@ -55,33 +80,34 @@ public class CisRecord implements ICisOwned, ICisSubscribed{
 	public String cisJID;
 	public String cisType;
 
-
+	public CisRecord(){}
 
 	/**
 	 * permaLink is a permanent URL to this CIS. A type of CIS homepage.
 	 */
+	@Column
 	public String permaLink;
-	public Set<CisParticipant> membersCss; //this is currently kept at the CIS editor and just the pointer to the set is stored here 
+	
+	// public Set<CisParticipant> membersCss; moved to only CIS Editor 
+	@Column
 	private String password = "none";
+	@Column
 	private String host = "none";
-	public Set<IServiceSharingRecord> sharedServices; //this is currently kept at the CIS editor and just the pointer to the set is stored here
+	//@OneToMany(cascade=CascadeType.ALL)
+	
+	// public Set<IServiceSharingRecord> sharedServices; moved to only CIS Editor
 	
 
 	
-	public CisRecord(ActivityFeed feed, String ownerCss,
-			int membershipCriteria, String cisId, String permaLink,
-			Set<CisParticipant> membersCss, String password, String host,
-			Set<IServiceSharingRecord> sharedServices) {
+	public CisRecord(String ownerCss,
+			int membershipCriteria, String cisId, String permaLink, String password, String host) {
 		super();
-		this.feed = feed;
 		this.ownerCss = ownerCss;
 		this.membershipCriteria = membershipCriteria;
 		this.cisName = cisId;
 		this.permaLink = permaLink;
-		this.membersCss = membersCss;
 		this.password = password;
 		this.host = host;
-		this.sharedServices = sharedServices;
 		
 		this.cisJID = cisId + "." + host;
 		
@@ -90,20 +116,15 @@ public class CisRecord implements ICisOwned, ICisSubscribed{
 	
 
 	
-	public CisRecord(ActivityFeed feed, String ownerCss,
-			int membershipCriteria, String cisJid, String permaLink,
-			Set<CisParticipant> membersCss, String password,
-			Set<IServiceSharingRecord> sharedServices, String cisType, String cisName) {
+	public CisRecord(String ownerCss,
+			int membershipCriteria, String cisJid, String permaLink,String password,String cisType, String cisName) {
 		super();
-		this.feed = feed;
 		this.ownerCss = ownerCss;
 		this.membershipCriteria = membershipCriteria;
 		this.cisName = cisName;
 		this.permaLink = permaLink;
-		this.membersCss = membersCss;
 		this.password = password;
 		this.host = host;
-		this.sharedServices = sharedServices;
 		
 		this.cisJID = cisJid;
 		
@@ -145,7 +166,7 @@ public class CisRecord implements ICisOwned, ICisSubscribed{
 	}
 
 	
-	@Override
+
 	public String getCisType() {
 		return cisType;
 	}
@@ -164,7 +185,7 @@ public class CisRecord implements ICisOwned, ICisSubscribed{
 	}
 
 
-	@Override
+
 	public int getMembershipCriteria() {
 		return membershipCriteria;
 	}
@@ -212,37 +233,29 @@ public class CisRecord implements ICisOwned, ICisSubscribed{
 	}
 
 
-	@Override
+
 	public String getCisId() {
 		return cisJID;
 	}
 
 
 
-
-	@Override
 	public String getName() {
 		return cisName;
 	}
 
-
-
-	@Override
 	public String getOwnerId() {
 		return this.ownerCss;
 	}
 
 
 
-	@Override
 	public String getUserDefineName() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 
-
-	@Override
 	public String setUserDefinedName(String arg0) {
 		// TODO Auto-generated method stub
 		return null;

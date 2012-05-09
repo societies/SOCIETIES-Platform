@@ -25,6 +25,8 @@
 
 package org.societies.useragent.monitoring;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
@@ -37,6 +39,7 @@ import org.societies.api.useragent.monitoring.IUserActionMonitor;
 
 public class UserActionMonitor implements IUserActionMonitor{
 
+	private static Logger LOG = LoggerFactory.getLogger(UserActionMonitor.class);
 	private boolean cloud;
 	private ICtxBroker ctxBroker;
 	private IEventMgr eventMgr;
@@ -44,7 +47,11 @@ public class UserActionMonitor implements IUserActionMonitor{
 
 	@Override
 	public void monitor(IIdentity owner, IAction action) {
-		System.out.println("Received user action!");
+		LOG.info("UAM - Received user action!");
+		LOG.info("action ServiceId: "+action.getServiceID().toString());
+		LOG.info("action serviceType: "+action.getServiceType());
+		LOG.info("action parameterName: "+action.getparameterName());
+		LOG.info("action value: "+action.getvalue());
 
 		//save action in context - IIdentity (Person) > ServiceId > paramName
 		//create new entities and attributes if necessary

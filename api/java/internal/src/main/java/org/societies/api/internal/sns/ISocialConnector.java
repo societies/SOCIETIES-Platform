@@ -13,10 +13,18 @@ public interface ISocialConnector {
 	public final static String LINKEDIN_CONN 		= "linkedin";
 	public final static String GOOGLEPLUS_CONN 		= "googleplus";
 	
+	public enum SocialNetwork{
+		Facebook,
+		Foursquare,
+		twitter
+	}
+	
+	
 	/**
 	 * Constants
 	 */
 	public final static String AUTH_TOKEN 			= "auth_token";
+	public final static String IDENTITY 			= "identity";
 
 	
 	public enum  SocialDataType{
@@ -26,6 +34,10 @@ public interface ISocialConnector {
 		ACTIVITY
 	}
 	
+	/**
+	 * Get Social Connector id, because for a single social network there can be more than one instance for the same user.
+	 * @return unique string, which the first part should contains the name of the SN
+	 */
 	String getID();
 	
 	/**

@@ -65,9 +65,8 @@ public interface ITrustRepository {
 	
 	/**
 	 * 
-	 * @param entity
-	 * @return
+	 * @param teid
 	 * @throws TrustRepositoryException
 	 */
-	public boolean removeEntity(ITrustedEntity entity) throws TrustRepositoryException;
+	public void removeEntity(TrustedEntityId teid) throws TrustRepositoryException;
 }

@@ -49,8 +49,9 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.phonegap.api.Plugin;
-import com.phonegap.api.PluginResult;
+import org.apache.cordova.api.Plugin;
+import org.apache.cordova.api.PluginResult;
+import org.apache.cordova.api.PluginResult.Status;
 
 /**
  * PhoneGap plugin to allow the CSSManager service to be used by HTML web views.
@@ -94,15 +95,15 @@ public class PluginCSSManager extends Plugin {
      */
     private void initialiseServiceBinding() {
     	//Create intent to select service to bind to
-    	Intent intent = new Intent(this.ctx, LocalCSSManagerService.class);
+    	Intent intent = new Intent(this.ctx.getContext(), LocalCSSManagerService.class);
     	//bind to the service
-    	this.ctx.bindService(intent, ccsManagerConnection, Context.BIND_AUTO_CREATE);
+    	this.ctx.getContext().bindService(intent, ccsManagerConnection, Context.BIND_AUTO_CREATE);
 
     	//register broadcast receiver to receive CSSManager return values 
         IntentFilter intentFilter = new IntentFilter() ;
         intentFilter.addAction(LocalCSSManagerService.LOGIN_CSS);
         intentFilter.addAction(LocalCSSManagerService.LOGOUT_CSS);
-        this.ctx.registerReceiver(new bReceiver(), intentFilter);
+        this.ctx.getContext().registerReceiver(new bReceiver(), intentFilter);
     	
     }
     
@@ -111,7 +112,7 @@ public class PluginCSSManager extends Plugin {
      */
     private void disconnectServiceBinding() {
     	if (connectedtoCSSManager) {
-    		this.ctx.unbindService(ccsManagerConnection);
+    		this.ctx.getContext().unbindService(ccsManagerConnection);
     	}
     }
 
@@ -170,7 +171,14 @@ public class PluginCSSManager extends Plugin {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			} 
+			} else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 5))) {
+				try {
+					this.localCSSManager.logoutCSS(data.getString(0), createCSSRecord(data.getJSONObject(1)));
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 			
 			// Don't return any result now, since status results will be sent when events come in from broadcast receiver 
             result = new PluginResult(PluginResult.Status.NO_RESULT);
@@ -206,6 +214,8 @@ public class PluginCSSManager extends Plugin {
 		AndroidCSSRecord cssRecord = (AndroidCSSRecord) intent.getParcelableExtra(LocalCSSManagerService.INTENT_RETURN_VALUE_KEY);
 		boolean resultStatus = intent.getBooleanExtra(LocalCSSManagerService.INTENT_RETURN_STATUS_KEY, false);
 		
+		Log.d(LOG_TAG, "Result status of remote call: " + resultStatus);
+		
 		if (resultStatus) {
 			PluginResult result = new PluginResult(PluginResult.Status.OK, convertCSSRecord(cssRecord));
 			result.setKeepCallback(false);
@@ -213,7 +223,7 @@ public class PluginCSSManager extends Plugin {
 		} else {
 			PluginResult result = new PluginResult(PluginResult.Status.ERROR);
 			result.setKeepCallback(false);
-			this.success(result, methodCallbackId);
+			this.error(result, methodCallbackId);
 		}
 			
 		
@@ -345,7 +355,7 @@ public class PluginCSSManager extends Plugin {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
 			} else if (intent.getAction().equals(LocalCSSManagerService.LOGOUT_CSS)) {
-				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 3);
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 5);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {

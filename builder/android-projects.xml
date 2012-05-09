@@ -67,7 +67,10 @@
 		<!-- Client Framework -->
 
 		<module>../platform-infrastructure/client-frwk/SocietiesServiceMonitor</module>
-		<!--
+                <module>../platform-infrastructure/client-frwk/SocietiesCSSManager</module>
+                <module>../platform-infrastructure/client-frwk/SocietiesDeviceStatus</module>
+
+		<!--	
 		<module>../platform-infrastructure/client-frwk/MasterGUI</module>
 		-->
 		<!-- CIS manager light modules -->

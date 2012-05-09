@@ -32,7 +32,22 @@ package org.societies.api.context.model;
  */
 public class CtxEntityTypes {
 
-    /**
+	/**
+     * @since 0.0.8 
+     */
+    public static final String CSS_NODE = "cssNode";
+	
+	/**
+     * @since 0.0.8 
+     */
+    public static final String DEVICE = "device";
+	
+	/**
+     * 
+     */
+    public static final String ORGANISATION = "organisation";
+    
+	/**
      * 
      */
     public static final String PERSON = "person";
@@ -40,12 +55,12 @@ public class CtxEntityTypes {
     /**
      * 
      */
-    public static final String ORGANISATION = "organisation";
+    public static final String PREFERENCE = "preference";
     
     /**
      * 
      */
-    public static final String PREFERENCE = "preference";
+    public static final String PRIVACY_POLICY = "privacyPolicy";
     
     /**
      * 
@@ -56,4 +71,9 @@ public class CtxEntityTypes {
      * 
      */
     public static final String SERVICE = "service";
+    
+    /**
+     * 
+     */
+    public static final String SERVICE_PARAMETER = "serviceParameter";
 }

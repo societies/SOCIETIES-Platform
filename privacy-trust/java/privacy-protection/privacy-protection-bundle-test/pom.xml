@@ -109,6 +109,12 @@
 			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.0</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -125,13 +131,18 @@
 						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-Name>${project.name}</Bundle-Name>
 						<Bundle-Version>${project.version}</Bundle-Version>
-						<Import-Package>
-							org.societies.api.context.*,
-							org.societies.api.internal.privacytrust.privacyprotection.*,
-							org.societies.api.servicelifecycle.*,
-							org.societies.api.comm.*,
-							org.slf4j.*
-						</Import-Package>
+						<Embed-Dependency>
+							commons-lang3;scope=compile|runtime,
+							gson;scope=compile|runtime,
+							api;scope=compile|runtime,
+							privacydatamanagement;scope=compile|runtime,
+							privacypolicymanagement;scope=compile|runtime
+						</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
+						<!-- <Import-Package>
+							*,
+							COM.jrockit.reflect.*
+						</Import-Package> -->
 						<Export-Package></Export-Package>
 					</instructions>
 				</configuration>

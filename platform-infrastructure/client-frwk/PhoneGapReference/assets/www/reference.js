@@ -5,10 +5,10 @@
 function onDeviceReady() {
 	console.log("PhoneGap Loaded, Device Ready");
 	
-	PhoneGap.addConstructor(function() {
+	cordova.addConstructor(function() {
 	//Register the javascript plugin with PhoneGap
 		console.log("Register Connection Listener plugin ");
-		PhoneGap.addPlugin('ConnectionListener', new ConnectionListener());
+		cordova.addPlugin('ConnectionListener', new ConnectionListener());
 	 
 	//Register the native class of plugin with PhoneGap : Not required anymore with 1.0.0
 		//Use plugins.xml
@@ -36,7 +36,7 @@ ConnectionListener.prototype.createListener = function(successCallback, failureC
  
 	console.log("Create Connection Listener");
 
-	return PhoneGap.exec(successCallback,    //Callback which will be called when plugin action is successful
+	return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
 	failureCallback,     //Callback which will be called when plugin action encounters an error
 	'ConnectionPlugin',  //Telling PhoneGap that we want to run specified plugin
 	'createListener',              //Telling the plugin, which action we want to perform
@@ -164,7 +164,7 @@ var getLocation = function() {
 var deviceInfo = function() {
 	console.log("Get device information");
 	
-	jQuery("#phoneGapVer").text(device.phonegap);
+	jQuery("#phoneGapVer").text(device.cordova);
 	jQuery("#platform").text(device.platform);
 	jQuery("#version").text(device.version);
 	jQuery("#uuid").text(device.uuid);

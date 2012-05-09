@@ -15,25 +15,25 @@
     </parent>
 
     <dependencies>
-    	<dependency>
+    		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.societies.comm.xmpp</groupId>
-		    <artifactId>CommunicationFrameworkCommons</artifactId>
-		    <version>${version.comm}</version>
+		    	<groupId>org.societies.comm.xmpp</groupId>
+		    	<artifactId>CommunicationFrameworkCommons</artifactId>
+		    	<version>${version.comm}</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.societies.utilities</groupId>
-		    <artifactId>DBC</artifactId>
-		    <version>${release.version}</version>
+		    	<groupId>org.societies.utilities</groupId>
+		    	<artifactId>DBC</artifactId>
+		    	<version>${release.version}</version>
 		</dependency>
-	    <dependency>
-	        <groupId>android</groupId>
-	        <artifactId>android</artifactId>
-	    </dependency>
+	    	<dependency>
+	                <groupId>com.google.android</groupId>
+            		<artifactId>android</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>AndroidAgentApi</artifactId>
@@ -41,7 +41,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.asmack</groupId>
-	        <artifactId>asmack</artifactId>
+	        	<artifactId>asmack</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.android.jaxb</groupId>

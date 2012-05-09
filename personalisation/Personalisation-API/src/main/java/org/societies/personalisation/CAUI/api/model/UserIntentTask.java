@@ -30,7 +30,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class UserIntentTask implements IUserIntentTask{
+public class UserIntentTask implements IUserIntentTask,Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	String taskID;
 

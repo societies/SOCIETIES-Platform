@@ -44,6 +44,7 @@ import org.societies.api.osgi.event.InternalEvent;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.TrustEventMgrException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
@@ -53,6 +54,7 @@ import org.springframework.stereotype.Service;
  * @since 0.0.5
  */
 @Service
+@Lazy(value = false)
 public class TrustEventMgr implements ITrustEventMgr {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TrustEventMgr.class); 
@@ -201,7 +203,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 						eventInfo.getOldValue(), eventInfo.getNewValue());
 				if (LOG.isDebugEnabled())
 					LOG.debug("Forwarding TrustUpdateEvent " + event + " to listener");
-				this.listener.trustValueUpdated(event);
+				this.listener.onUpdate(event);
 			} catch (MalformedTrustedEntityIdException mteide) {
 				
 				LOG.error("Cannot forward TrustUpdateEvent to listener:"

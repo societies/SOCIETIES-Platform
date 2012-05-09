@@ -24,38 +24,77 @@
  */
 package org.societies.privacytrust.privacyprotection.privacypolicy;
 
-import java.util.List;
 import java.util.Map;
 
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
- * @author olivierm
+ * @author Olivier Maridat (Trialog)
  * @date 5 déc. 2011
  */
 public class PrivacyPolicyManager implements IPrivacyPolicyManager {
-	public RequestPolicy getPrivacyPolicy(String id) {
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#getPrivacyPolicy(org.societies.api.identity.IIdentity)
+	 */
+	@Override
+	public RequestPolicy getPrivacyPolicy(IIdentity cisId)
+			throws PrivacyException {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public List<RequestPolicy> getPrivacyPolicies(Map criteria) {
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#getPrivacyPolicy(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)
+	 */
+	@Override
+	public RequestPolicy getPrivacyPolicy(ServiceResourceIdentifier serviceId)
+			throws PrivacyException {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public RequestPolicy updatePrivacyPolicy(RequestPolicy privacyPolicy) {
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#updatePrivacyPolicy(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
+	 */
+	@Override
+	public RequestPolicy updatePrivacyPolicy(RequestPolicy privacyPolicy)
+			throws PrivacyException {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public boolean deletePrivacyPolicy(String id) {
-		return true;
-	}
-
-	public boolean deletePrivacyPolicies(Map criteria) {
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#deletePrivacyPolicy(org.societies.api.identity.IIdentity)
+	 */
+	@Override
+	public boolean deletePrivacyPolicy(IIdentity cisId) throws PrivacyException {
+		// TODO Auto-generated method stub
 		return false;
 	}
 
-	public RequestPolicy inferPrivacyPolicy(Map configuration, Object privacyPolicyType) {
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#deletePrivacyPolicy(org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)
+	 */
+	@Override
+	public boolean deletePrivacyPolicy(ServiceResourceIdentifier serviceId)
+			throws PrivacyException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#inferPrivacyPolicy(int, java.util.Map)
+	 */
+	@Override
+	public RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType,
+			Map configuration) throws PrivacyException {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

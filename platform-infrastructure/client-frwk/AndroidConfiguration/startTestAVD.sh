@@ -1,6 +1,19 @@
 #!/bin/bash
 # Start curr ent AVD 
 
+testOS() {
+	osName=`uname -o`
+
+	echo "OS is: $osName"
+
+	if [ $osName = "Cygwin" ]
+	   then
+		echo "Do not use this script on Windows"
+		return 1
+           else
+		return 0 
+	fi
+}
 testParams() {
 	if [ $1 -eq 1 ]
 	then
@@ -30,6 +43,13 @@ startAVD() {
         fi
 
 }
+
+testOS
+
+if [ $?  -eq 1 ]
+  then
+   exit 1
+fi 
 
 testParams $#
 if [ $?  -eq 0 ] 

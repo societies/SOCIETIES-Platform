@@ -35,6 +35,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.personalisation.model.IAction;
@@ -65,48 +66,57 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	private UserPreferenceManagement prefMgr;
 	private IInternalPersonalisationManager persoMgr;
 	private MergingManager merging;
-	private IC45Learning c45Learning;
+	private IC45Learning userPrefLearning;
 	private IEventMgr eventMgr;
 
 	public UserPreferenceConditionMonitor(){
-		merging = new MergingManager(c45Learning, prefMgr, this, eventMgr);
+		merging = new MergingManager(getUserPrefLearning(), prefMgr, this);
 	}
 	
 	
 	public ICtxBroker getCtxBroker() {
-		System.out.println(this.getClass().getName()+": Return ctxBroker");
+		logging.debug(this.getClass().getName()+": Return ctxBroker");
 
 		return ctxBroker;
 	}
 
 
 	public void setCtxBroker(ICtxBroker ctxBroker) {
-		System.out.println(this.getClass().getName()+": Got ctxBroker");
+		logging.debug(this.getClass().getName()+": Got ctxBroker");
 		
 		this.ctxBroker = ctxBroker;
 	}
 
 
 	public IInternalPersonalisationManager getPersoMgr() {
-		System.out.println(this.getClass().getName()+": Return persoMgr");
+		logging.debug(this.getClass().getName()+": Return persoMgr");
 		return persoMgr;
 	}
 
 
 	public void setPersoMgr(IInternalPersonalisationManager persoMgr) {
-		System.out.println(this.getClass().getName()+": Got persoMgr");
+		logging.debug(this.getClass().getName()+": Got persoMgr");
 		this.persoMgr = persoMgr;
 	}
 
+
 	
-	public IC45Learning getC45Learning() {
-		return c45Learning;
+	/**
+	 * @return the userPrefLearning
+	 */
+	public IC45Learning getUserPrefLearning() {
+		return userPrefLearning;
 	}
 
-	public void setC45Learning(IC45Learning c45Learning) {
-		this.c45Learning = c45Learning;
+
+	/**
+	 * @param userPrefLearning the userPrefLearning to set
+	 */
+	public void setUserPrefLearning(IC45Learning userPrefLearning) {
+		this.userPrefLearning = userPrefLearning;
 	}
-	
+
+
 	public IEventMgr getEventMgr() {
 		return eventMgr;
 	}
@@ -119,34 +129,34 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		this.prefMgr = new UserPreferenceManagement(null, this.getCtxBroker());
 		mt = new MonitoringTable();
 		registered = new ArrayList<CtxAttributeIdentifier>();
-		System.out.println(this.getClass().toString()+": INITIALISED");
+		logging.debug(this.getClass().toString()+": INITIALISED");
 	}
 	
 	public void initialisePreferenceManagement(ICtxBroker broker, IInternalPersonalisationManager persoMgr/*, UserPreferenceManagement prefMgr*/){
 		if (getPersoMgr()==null){
-			System.out.println(this.getClass().toString()+": found PersonalisationManager");
+			logging.debug(this.getClass().toString()+": found PersonalisationManager");
 		}else{
-			System.out.println(this.getClass().toString()+": PersonalisationManager NOT FOUND");
+			logging.debug(this.getClass().toString()+": PersonalisationManager NOT FOUND");
 		}
 		setPersoMgr(persoMgr);
 		
 		if (getCtxBroker() == null){
-			System.out.println(this.getClass().toString()+": found ctxBroker");
+			logging.debug(this.getClass().toString()+": found ctxBroker");
 		}else{
-			System.out.println(this.getClass().toString()+": CtxBroker NOT FOUND");
+			logging.debug(this.getClass().toString()+": CtxBroker NOT FOUND");
 		}
 		this.setCtxBroker(broker);
 		
 		
 		if (prefMgr == null){
-			System.out.println(this.getClass().toString()+" found PreferenceManager");
+			logging.debug(this.getClass().toString()+" found PreferenceManager");
 		}else{
-			System.out.println(this.getClass().toString()+" PreferenceManager NOT FOUND");
+			logging.debug(this.getClass().toString()+" PreferenceManager NOT FOUND");
 		}
 		this.prefMgr = new UserPreferenceManagement(null, this.getCtxBroker());
 		mt = new MonitoringTable();
 		registered = new ArrayList<CtxAttributeIdentifier>();
-		System.out.println(this.getClass().toString()+": INITIALISED");
+		logging.debug(this.getClass().toString()+": INITIALISED");
 	}
 	/**
 	 * 
@@ -157,19 +167,20 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	 */
 	@Override
 	public Future<List<IPreferenceOutcome>> getOutcome(IIdentity ownerId, CtxAttribute attribute){
+		this.prefMgr.updateContext(attribute);
 		/*
 		 * in this method, we need to check what preferences are affected, request re-evaluation of them, compare last ioutcome with new and send it to 
 		 * the proactivity decision maker component
 		 */
-		logging.info("Processing context event : "+attribute.getType());
+		logging.debug("Processing context event : "+attribute.getType());
 		List<PreferenceDetails> affectedPreferences = this.mt.getAffectedPreferences(attribute.getId());
 		if (affectedPreferences.size()==0){
 			//JOptionPane.showMessageDialog(null, "no affected preferences found for ctxID: "+ctxAttr.getCtxIdentifier().toUriString()+",\n ignoring event");
-			System.out.println("no affected preferences found for ctxID: "+attribute.getId().toString()+", ignoring event");
+			logging.debug("no affected preferences found for ctxID: "+attribute.getId().toString()+", ignoring event");
 			this.logging.debug("no affected preferences found for ctxID: "+attribute.getId().toString()+", ignoring event");
 			return new AsyncResult<List<IPreferenceOutcome>>(new ArrayList<IPreferenceOutcome>());
 		}else{
-			System.out.println("found affected preferences");
+			logging.debug("found affected preferences");
 			this.logging.debug("found affected preferences");
 			if (null == this.prefMgr){
 				
@@ -180,9 +191,9 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 			}
 			
 			List<IPreferenceOutcome> outcomes = prefMgr.reEvaluatePreferences(ownerId,attribute, affectedPreferences);
-			System.out.println("requested re-evaluation of preferences");
-			logging.info("requested re-evaluation of preferences");
-			System.out.println("Returning outcome");
+			logging.debug("requested re-evaluation of preferences");
+			logging.debug("requested re-evaluation of preferences");
+			logging.debug("Returning outcome");
 			return new AsyncResult<List<IPreferenceOutcome>>(outcomes);			
 		}
 	}
@@ -205,11 +216,13 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		 * The PCM is notified of changes in the personalisable parameters of a service using context. the User Action Monitor 
 		 * populates the context database with this information as soon as it receives an action from a service. 
 		 */
+		this.logging.debug("request for outcome with input: "+ownerId.getJid()+"\n"+action.toString());
+		this.merging.processActionReceived(ownerId, action);
 		List<IPreferenceOutcome> outcomes = new ArrayList<IPreferenceOutcome>();
-		IPreferenceOutcome outcome = new PreferenceOutcome(action.getServiceID(), action.getServiceType(), action.getparameterName(), action.getvalue());
-		outcome.setServiceID(action.getServiceID());
-		outcome.setServiceType(action.getServiceType());
-		outcomes.add(outcome);
+		IPreferenceOutcome outcome = this.prefMgr.getPreference(ownerId, action.getServiceType(), action.getServiceID(), action.getparameterName());
+		if (outcome!=null){
+			outcomes.add(outcome);
+		}
 		return new AsyncResult<List<IPreferenceOutcome>>(outcomes);
 		
 		
@@ -233,7 +246,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 				this.getPersoMgr().registerForContextUpdate(userId, PersonalisationTypes.UserPreference, info.getICtxIdentifier());
 				//this.registerForContextEvent((CtxAttributeIdentifier) info.getICtxIdentifier());
 				this.registered.add((CtxAttributeIdentifier) info.getICtxIdentifier());
-				this.logging.info(userId.toString()+" Registered for :"+info.getICtxIdentifier().toUriString());
+				this.logging.debug(userId.getJid()+" Registered for :"+info.getICtxIdentifier().toUriString());
 			}
 		}
 	}
@@ -243,7 +256,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		if (this.mt.isServiceRunning(serviceType, serviceID)){
 			mt.removeServiceInfo(serviceType, serviceID);
 		}else{
-			logging.info("The details of this service were not properly loaded. Nothing to do!");
+			logging.debug("The details of this service were not properly loaded. Nothing to do!");
 		}
 	}
 	
@@ -270,10 +283,14 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	}
 
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.personalisation.preference.IUserPreferenceManagement#getOutcome(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)
+	 */
 	@Override
-	public Future<IPreferenceOutcome> getOutcome(IIdentity ownerID,
+	public Future<IOutcome> getOutcome(IIdentity ownerID,
 			ServiceResourceIdentifier serviceID, String preferenceName) {
-		return new AsyncResult<IPreferenceOutcome> (this.prefMgr.getPreference(ownerID, "", serviceID, preferenceName));
+		return new AsyncResult<IOutcome> (this.prefMgr.getPreference(ownerID, "", serviceID, preferenceName));
 	}
 
 
@@ -284,4 +301,5 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		return prefMgr;
 	}
 
+	
 }

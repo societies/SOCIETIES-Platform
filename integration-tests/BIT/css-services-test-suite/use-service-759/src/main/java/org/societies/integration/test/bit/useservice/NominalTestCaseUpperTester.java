@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.integration.test.IntegrationTestUtils;
 
@@ -53,15 +54,15 @@ public class NominalTestCaseUpperTester {
 			LOG.info("[#759] Stop the service: "+calculatorServiceId.getIdentifier());
 			asynchResult = TestCase759.serviceControl.stopService(calculatorServiceId);
 			scresult = asynchResult.get();
-			if (!scresult.equals(ServiceControlResult.SUCCESS)) {
-				throw new Exception("Can't stop the service. Returned value: "+scresult.value());
+			if (!scresult.getMessage().equals(ResultMessage.SUCCESS)) {
+				throw new Exception("Can't stop the service. Returned value: "+scresult.getMessage());
 			}
 
 			LOG.info("[#759] Uninstall the service: "+calculatorServiceId.getIdentifier());
 			asynchResult = TestCase759.serviceControl.uninstallService(calculatorServiceId);
 			scresult = asynchResult.get();
-			if (!scresult.equals(ServiceControlResult.SUCCESS)) {
-				throw new Exception("Can't uninstall the service. Returned value: "+scresult.value());
+			if (!scresult.getMessage().equals(ResultMessage.SUCCESS)) {
+				throw new Exception("Can't uninstall the service. Returned value: "+scresult.getMessage());
 			}
 		}
 		catch (Exception e)

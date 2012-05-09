@@ -51,4 +51,6 @@ public class EventTypes {
 	public static final String FAILED_SERVICE_EVENT = "org/societies/servicemgmt/service/failedservice";        
 	
 	public static final String UIM_EVENT = "org/societies/useragent/monitoring/newaction";
+	
+	public static final String FAILED_NEGOTIATION_EVENT = "org/societies/privacyprotection/negotiation/failednegotiation";
 }

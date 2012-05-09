@@ -38,6 +38,10 @@ public class TrustEventTopic {
 
 	private static final String BASE_TOPIC = "org/societies/privacytrust/trust/event/"; 
 	
+	public static final String DIRECT_TRUST_UPDATED = BASE_TOPIC + "DIRECT_TRUST_UPDATED";
+	
+	public static final String INDIRECT_TRUST_UPDATED = BASE_TOPIC + "INDIRECT_TRUST_UPDATED";
+	
 	public static final String USER_PERCEIVED_TRUST_UPDATED = BASE_TOPIC + "USER-PERCEIVED_TRUST_UPDATED";
 	
 	/* Prevents instantiation */

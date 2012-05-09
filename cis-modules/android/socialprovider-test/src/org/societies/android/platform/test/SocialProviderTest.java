@@ -81,40 +81,41 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 	/**
 	 * Tests that inserting a CIS from Android will actually create that CIS
 	 * in CIS Manager Cloud.
+	 * TODO: Currently only local DB so no cloud change is being done.
 	 * 
 	 * The logic for the test:
 	 * 1- Create a local {@link ContentValues} to hold all the data for the CIS
 	 * 2- Call insert in SocialProvider to perform insertion
-	 * 3- Get the newly inserted CIS from cloud.
+	 * 3- Get the newly inserted CIS from SocialProvider.
 	 * 4- Fail if the CIS was not returned.
-	 * 5- Fail if the CIS data are not correct.
+	 * 5- Fail if the CIS data are not the same as those inserted in step 2.
 	 * 
 	 * FIXME: currently does not care about multiple CISs. Does not use
 	 * index number that is returned by resolver.insert.
 	 *  
 	 */
-	public void testInsertGroup(){
-		//1- Create local ContentValues to hold the CIS data.
+	public void testInsertCommunity(){
+		//1- Create local ContentValues to hold the community data.
 		ContentValues initialValues = new ContentValues();
-		initialValues.put(SocialContract.Groups.NAME , "XYZ");
-		initialValues.put(SocialContract.Groups.OWNER_ID , "babak@societies.org");
-		initialValues.put(SocialContract.Groups.CREATION_DATE , "today");
+		initialValues.put(SocialContract.Community.NAME , "XYZ");
+		initialValues.put(SocialContract.Community.OWNER_ID , "babak@societies.org");
+		initialValues.put(SocialContract.Community.CREATION_DATE , "today");
 		
-		//2- Call insert in the communications adapter to initiate insertion
-		Uri newGroupUri= resolver.insert(SocialContract.Groups.CONTENT_URI , 
+		//2- Call insert in SocialProvider to initiate insertion
+		Uri newGroupUri= resolver.insert(SocialContract.Community.CONTENT_URI , 
 				initialValues);
 		
-		//3- Get the newly inserted CIS from cloud.
+		//3- Get the newly inserted CIS from SocialProvider.
 		//What to get:
 		String[] projection ={
-				SocialContract.Groups.NAME,
-				SocialContract.Groups.OWNER_ID,
-				SocialContract.Groups.CREATION_DATE
+				SocialContract.Community.NAME,
+				SocialContract.Community.OWNER_ID,
+				SocialContract.Community.CREATION_DATE
 			};
 		//WHERE _id = ID of the newly created CIS:
-		String selection = SocialContract.Groups._ID + " = " +
+		String selection = SocialContract.Community._ID + " = " +
 			newGroupUri.getLastPathSegment();
-		Cursor cursor = resolver.query(SocialContract.Groups.CONTENT_URI,
+		Cursor cursor = resolver.query(SocialContract.Community.CONTENT_URI,
 				projection, selection, null, null);
 		
 		//4- Fail if the CIS was not returned.
@@ -124,9 +125,9 @@ public class SocialProviderTest extends ProviderTestCase2<SocialProvider> {
 		//5- Fail if the CIS data are not correct:
 		//Create new ContentValues object based on returned CIS:
 		ContentValues returnedValues = new ContentValues();
-		returnedValues.put(SocialContract.Groups.NAME , cursor.getString(0));
-		returnedValues.put(SocialContract.Groups.OWNER_ID , cursor.getString(1));
-		returnedValues.put(SocialContract.Groups.CREATION_DATE , cursor.getString(2));
+		returnedValues.put(SocialContract.Community.NAME , cursor.getString(0));
+		returnedValues.put(SocialContract.Community.OWNER_ID , cursor.getString(1));
+		returnedValues.put(SocialContract.Community.CREATION_DATE , cursor.getString(2));
 		assertEquals(returnedValues,initialValues);
 
 	}

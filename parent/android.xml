@@ -67,22 +67,13 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
     -->
   <dependencyManagement>
     <dependencies>
-      <!-- Android target version 1 assumes that Android JAR has been installed in local repository 
-	using the Android Maven SDK Helper Maven plugin-->
-        <dependency>
-            <groupId>android</groupId>
-            <artifactId>android</artifactId>
-            <version>2.2_r3</version>
-            <scope>provided</scope>
-        </dependency>
 
-      <!-- Android target version 2 assumes that Android JAR is retrieved from remote repository -->
-        <!--dependency>
+        <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
-            <version>2.2.1</version>
+            <version>4.0.1.2</version>
             <scope>provided</scope>
-        </dependency-->
+        </dependency>
 	<!-- Android test dependency -->
         <dependency>
             <groupId>com.google.android</groupId>
@@ -100,6 +91,13 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
         <scope>compile</scope>
       </dependency>
 
+	<!-- PhoneGap is now an Apache incubator project - Cordova-->
+	<dependency>
+  		<groupId>com.phonegap</groupId>
+  		<artifactId>cordova</artifactId>
+  		<version>1.7.0</version>
+	</dependency>
+	<!-- PhoneGap before Apache Cordova created -->
         <dependency>
             <groupId>com.phonegap</groupId>
             <artifactId>phonegap</artifactId>

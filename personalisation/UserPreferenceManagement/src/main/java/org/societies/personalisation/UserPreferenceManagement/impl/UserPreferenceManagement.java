@@ -34,6 +34,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttribute;
@@ -62,16 +64,15 @@ public class UserPreferenceManagement{
 	private PrivateContextCache contextCache;
 	private PrivatePreferenceCache preferenceCache;
 	private Hashtable<IPreferenceOutcome, List<CtxIdentifier>> outcomeConditionListTable; 
-	private ICtxBroker broker;	
+	private ICtxBroker ctxBroker;	
 	private IIdentity userId; 
 	
 	public UserPreferenceManagement(IIdentity userId, ICtxBroker broker){
 		this.userId = userId;
-		this.broker = broker;
-		this.contextCache = new PrivateContextCache(this.broker);
-		this.preferenceCache = new PrivatePreferenceCache(this.userId,this.broker);
+		this.ctxBroker = broker;
+		this.contextCache = new PrivateContextCache(this.ctxBroker);
+		this.preferenceCache = new PrivatePreferenceCache(this.userId,this.ctxBroker);
 		outcomeConditionListTable = new Hashtable<IPreferenceOutcome,List<CtxIdentifier>>();
-		
 
 	}
 
@@ -340,7 +341,7 @@ public class UserPreferenceManagement{
 		PreferenceConditionExtractor pce = new PreferenceConditionExtractor();
 		IPreferenceTreeModel model = this.preferenceCache.getPreference(serviceType, serviceID, preferenceName);
 		if (model==null){
-			this.logging.debug("Preference for "+new Tools(this.broker).convertToKey(serviceType, serviceID.toString(), preferenceName)+" doesn't exist");
+			this.logging.debug("Preference for "+new Tools(this.ctxBroker).convertToKey(serviceType, serviceID.toString(), preferenceName)+" doesn't exist");
 			return new ArrayList<CtxIdentifier>();
 		}
 		List<IPreferenceConditionIOutcomeName> list = pce.extractConditions(model);
@@ -370,6 +371,13 @@ public class UserPreferenceManagement{
 	}
 
 
+	public void emptyContextCache(){
+		this.contextCache = new PrivateContextCache(ctxBroker);
+	}
 
+	public void updateContext(CtxAttribute attribute) {
+		this.contextCache.updateCache(attribute);
+		
+	}
 
 }

@@ -15,10 +15,10 @@
     </parent>
 
     <dependencies>
-	    <dependency>
-	        <groupId>android</groupId>
-	        <artifactId>android</artifactId>
-	    </dependency>
+	<dependency>
+	    <groupId>com.google.android</groupId>
+            <artifactId>android</artifactId>
+	</dependency>
     </dependencies>
     
 </project>

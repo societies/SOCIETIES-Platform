@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 
+import org.societies.orchestration.api.ICisRecord;
 import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserBean;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserResultBean;
@@ -55,11 +56,18 @@ import org.societies.api.internal.css.devicemgmt.devicemanager.IDeviceManager;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
-import org.societies.api.cis.management.ICisRecord;
+/**import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.cis.management.ICisEditor;*/
+
+//import org.societies.orchestration.api.ICisRecord;
+import org.societies.orchestration.api.ICisManager;
+import org.societies.orchestration.api.ICisOwned;
+import org.societies.orchestration.api.ICisEditor;
+
 import org.societies.api.cis.management.ICisSubscribed;
-import org.societies.api.cis.management.ICisEditor;
+
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 //import org.societies.api.cis.management.ICis;t
@@ -268,15 +276,19 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				for (int i = 0; i < userJoinedCiss.size(); i++)
 					joinedCisIDs.add(userJoinedCiss.get(i).getCisId());
 				
-				for (int i = 0; i < userCissMetadata.size(); i++) {
-				    if (userCissMetadata.get(i).contains("PERSONAL CIS containing your CSS directory members"))
-				        personalCiss.put("CSS Directory", cisManager.getCis(linkedCss.toString(), userCissMetadata.get(i).split("---")[0]));
-				    if (userCissMetadata.get(i).contains("PERSONAL CIS containing your friends"))
-				        personalCiss.put("Friends", cisManager.getCis(linkedCss.toString(), userCissMetadata.get(i).split("---")[0]));
-				    if (userCissMetadata.get(i).contains("PERSONAL CIS containing your family"))
-				        personalCiss.put("Family", cisManager.getCis(linkedCss.toString(), userCissMetadata.get(i).split("---")[0]));
-				    if (userCissMetadata.get(i).contains("PERSONAL CIS containing your work colleagues"))
-				        personalCiss.put("Work colleagues", cisManager.getCis(linkedCss.toString(), userCissMetadata.get(i).split("---")[0]));
+				Iterator metadataCissIterator = userCissMetadata.keySet().iterator();
+				while (metadataCissIterator.hasNext()) {
+					IIdentity thisID = (IIdentity) metadataCissIterator.next();
+					if (joinedCisIDs.contains(thisID)) {
+						if (userCissMetadata.get(thisID).contains("PERSONAL CIS containing your CSS directory members"))
+					        personalCiss.put("CSS Directory", cisManager.getCis(linkedCss.toString(), userCissMetadata.get(thisID).split("---")[0]));
+				        if (userCissMetadata.get(thisID).contains("PERSONAL CIS containing your friends"))
+				            personalCiss.put("Friends", cisManager.getCis(linkedCss.toString(), userCissMetadata.get(thisID).split("---")[0]));
+				        if (userCissMetadata.get(thisID).contains("PERSONAL CIS containing your family"))
+				            personalCiss.put("Family", cisManager.getCis(linkedCss.toString(), userCissMetadata.get(thisID).split("---")[0]));
+				        if (userCissMetadata.get(thisID).contains("PERSONAL CIS containing your work colleagues"))
+				            personalCiss.put("Work colleagues", cisManager.getCis(linkedCss.toString(), userCissMetadata.get(thisID).split("---")[0]));
+					}		
 				}
 				
 				//first step: look for more obvious CISs on high-priority kinds of context,
@@ -293,10 +305,14 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				}
 				boolean cisExistsAlready = false;
 				
-				for (int i = 0; i < userCissMetadata.size(); i++) {
-				    if (userCissMetadata.get(i).contains("PERSONAL CIS containing your CSS directory members"))
+				
+				Collection<String> metadata = userCissMetadata.values();
+				Iterator<String> metadataIterator = metadata.iterator();
+				while (metadataIterator.hasNext()) {
+				    if (metadataIterator.next().contains("PERSONAL CIS containing your CSS directory members"))
 				        cisExistsAlready = true;
 				}
+				
 				if (personalCiss.get("CSS Directory") != null)
 				    if (joinedCisIDs.contains(personalCiss.get("CSS Directory").getCisId()) && !cisExistsAlready)
 					    cisExistsAlready = true;
@@ -455,8 +471,10 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 				}
 				
 				cisExistsAlready = false;
-				for (int i = 0; i < userCissMetadata.size(); i++) {
-				    if (userCissMetadata.get(i).contains("PERSONAL CIS containing your friends"))
+				
+				metadataIterator = metadata.iterator();
+				while (metadataIterator.hasNext()) {
+				    if (metadataIterator.next().contains("PERSONAL CIS containing your friends"))
 				        cisExistsAlready = true;
 				}
 				

@@ -28,8 +28,14 @@ package org.societies.orchestration.EgocentricCommunityAnalyser.test;
 import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
-import org.societies.api.cis.management.ICisManager;
-import org.societies.api.cis.management.ICisRecord;
+/**import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisRecord;*/
+
+import org.societies.orchestration.api.ICisRecord;
+import org.societies.orchestration.api.ICisManager;
+import org.societies.orchestration.api.ICisOwned;
+import org.societies.orchestration.api.ICisEditor;
+
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCommunityDeletionManager;

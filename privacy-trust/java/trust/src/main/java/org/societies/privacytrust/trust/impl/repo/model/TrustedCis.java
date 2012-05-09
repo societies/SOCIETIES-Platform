@@ -33,6 +33,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
@@ -49,7 +50,7 @@ import org.societies.privacytrust.trust.api.model.ITrustedCss;
  * @since 0.0.1
  */
 @Entity
-@Table(name = TableName.TRUSTED_CIS)
+@Table(name = TableName.TRUSTED_CIS, uniqueConstraints={@UniqueConstraint(columnNames={"trustorId", "trusteeId"})})
 public class TrustedCis extends TrustedEntity implements ITrustedCis {
 
 	private static final long serialVersionUID = -438368876927927076L;

@@ -35,7 +35,7 @@ package org.societies.cis.manager;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.societies.cis.activity.ActivityFeed;
+import org.societies.activity.ActivityFeed;
 
 
 public class OldActivityFeed {

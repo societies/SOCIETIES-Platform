@@ -26,9 +26,9 @@
     </dependency>
     
 	<dependency>
-            <groupId>android</groupId>
-            <artifactId>android</artifactId>
-        </dependency>
+            	<groupId>com.google.android</groupId>
+            	<artifactId>android</artifactId>
+	</dependency>
 	<dependency>
 	    	<groupId>org.societies.api.external</groupId>
 	    	<artifactId>societies-api</artifactId>

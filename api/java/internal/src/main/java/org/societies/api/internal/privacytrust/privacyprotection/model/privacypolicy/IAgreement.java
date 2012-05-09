@@ -34,7 +34,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 public interface IAgreement {
 	
 	
-	public List<RequestItem> getRequestedItems();
+	public List<ResponseItem> getRequestedItems();
 		
 	public IIdentity getUserIdentity();
 	

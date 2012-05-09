@@ -26,85 +26,57 @@ package org.societies.privacytrust.privacyprotection.dataobfuscation;
 
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener;
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
 
 /**
  * Implementation of IDataObfuscationManager
- * @state skeleton 
- * @author olivierm
+ * @author Olivier Maridat (Trialog)
  */
 public class DataObfuscationManager implements IDataObfuscationManager {
 	@Override
-	public IDataWrapper obfuscateData(IDataWrapper dataWrapper, double obfuscationLevel, IDataObfuscationListener listener) throws PrivacyException {
+	public IDataWrapper obfuscateData(IDataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException {
 		// TODO : populate this stub function
-		
+
 		// -- Verify params
-		if (null == dataWrapper) {
-			PrivacyException e = new PrivacyException("No data to obfuscate");
-			if (null != listener) {
-				listener.onObfuscationAborted("No data to obfuscate", e);
-			}
-			return null;
-		}
 		if (dataWrapper instanceof DataWrapper && null == ((DataWrapper) dataWrapper).getObfuscator()) {
-			PrivacyException e = new PrivacyException("Not enought information in the wrapper to obfuscate this data");
-			if (null != listener) {
-				listener.onObfuscationAborted("Not enought information in the wrapper to obfuscate this data", e);
-			}
-			return null;
+			throw new NullPointerException("Not enought information in the wrapper to obfuscate this data");
 		}
-		
-		// -- Obfuscate
-		IDataWrapper obfuscatedDataWrapper = null;
 		// Check if it is ready for obfuscation
 		if (!dataWrapper.isReadyForObfuscation()) {
-			PrivacyException e = new PrivacyException("This data wrapper is not ready for obfuscation. Data are needed.");
-			listener.onObfuscationAborted("This data wrapper is not ready for obfuscation. Data are needed.", e);
-			return null;
+			throw new PrivacyException("This data wrapper is not ready for obfuscation. Data are needed.");
 		}
+
+		// -- Obfuscate
+		IDataWrapper obfuscatedDataWrapper = null;
 		try {
 			// Obfuscation
-			obfuscatedDataWrapper = ((DataWrapper) dataWrapper).getObfuscator().obfuscateData(obfuscationLevel, listener);
+			obfuscatedDataWrapper = ((DataWrapper) dataWrapper).getObfuscator().obfuscateData(obfuscationLevel);
 			// Persistence
 			if (dataWrapper.isPersistenceEnabled()) {
 				// TODO: persiste the obfuscated data using a data broker
-//				System.out.println("Persist the data "+dataWrapper.getDataId());
+				//				System.out.println("Persist the data "+dataWrapper.getDataId());
 			}
-			// Call listener
-			listener.onObfuscationDone(obfuscatedDataWrapper);
 		}
 		catch(Exception e) {
-			listener.onObfuscationAborted("Obfuscation aborted", e);
+			throw new PrivacyException("Obfuscation aborted", e);
 		}
 		return obfuscatedDataWrapper;
 	}
 
 	@Override
-	public CtxIdentifier hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel, IDataObfuscationListener listener) throws PrivacyException {
+	public CtxIdentifier hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException {
 		// TODO : populate this stub function
-		
-		// -- Verify params
-		if (null == dataWrapper) {
-			PrivacyException e = new PrivacyException("No data: so, we can't search obfuscated version");
-			if (null != listener) {
-				listener.onObfuscationAborted("No data: so, we can't search obfuscated version", e);
-			}
-			return null;
-		}
-
 		
 		// -- Search obfuscatred version
 		if (dataWrapper.isPersistenceEnabled()) {
 			// TODO: retrieve obfsucated data ID using data broker
 			// An obfuscated version exist
-//			if (false) {
-//				System.out.println("Retrieve the persisted data id of data id "+dataWrapper.getDataId());
-//			}
+			//			if (false) {
+			//				System.out.println("Retrieve the persisted data id of data id "+dataWrapper.getDataId());
+			//			}
 		}
-		// There is no obfuscated version
-		listener.onObfuscatedVersionRetrieved(dataWrapper.getDataId(), false);
 		return dataWrapper.getDataId();
 	}
 

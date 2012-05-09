@@ -24,17 +24,56 @@
  */
 package org.societies.api.cis.management;
 
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Future;
+
+import org.societies.api.activity.IActivityFeed;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
 /**
  * This interface represents the CISs that are owned by this CSS.
  * 
  * @author Babak.Farshchian@sintef.no
  *
  */
-/**
- * Empty interface?
- * MISSING_ANNOTATION
- * MISSING_JAVADOCS
- */
+
+
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface ICisOwned extends ICisRecord {
+	
+	
+	/**
+	 * Gets the interface for working with the ActivityFeed of the CIS
+	 * 
+	 * 
+	 * @param 
+	 * @return {@link IActivityFeed} of that CIS
+	 */
+	public Future<IActivityFeed> getCisActivityFeed();
+	
+	/**
+	 * get list of members
+	 * 
+	 * @return list of participants of the CIS as {@link ICisParticipant} 
+	 * @throws CommunicationException 
+	 * @throws InvalidFormatException 
+	 */
+	public Future<Set<ICisParticipant>> getMemberList();
+	
+	
+	/**
+	 * add a member to the CIS 
+	 * 
+	 * @param jid is the full jid of the user to be added
+	 * @param role of the user. At the moment it can be "participant" or "owner"
+	 * @return true if it worked and false if the jid was already there
+	 * @throws CommunicationException 
+	 * @throws InvalidFormatException 
+	 */
+	public Future<Boolean> addMember(String jid, String role) throws  CommunicationException, InvalidFormatException;
 
 }

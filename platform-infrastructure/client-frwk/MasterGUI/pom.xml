@@ -9,7 +9,7 @@
         <relativePath>../../../parent/android.xml</relativePath>
    </parent>
 
-   <groupId>org.societies.android.platform</groupId>
+   <groupId>org.societies.android.platform.gui</groupId>
    <artifactId>MasterGUI</artifactId>
    <name>MasterGUI</name>
    <version>${release.version}</version>
@@ -32,21 +32,14 @@
 		    <version>${release.version}</version>
 		</dependency>
     
-      	<!-- Android target version 2 assumes that Android JAR is retrieved from remote repository -->
-        <!--dependency>
-            <groupId>com.google.android</groupId>
-            <artifactId>android</artifactId>
-            <version>2.2.1</version>
-            <scope>provided</scope>
-		</dependency-->
 		<dependency>
-            <groupId>android</groupId>
-            <artifactId>android</artifactId>
+		        <groupId>com.google.android</groupId>
+            		<artifactId>android</artifactId>
 		</dependency>
-		<dependency>
-            <groupId>com.phonegap</groupId>
-            <artifactId>phonegap</artifactId>
-		</dependency>
+    	<dependency>
+                <groupId>com.phonegap</groupId>
+                <artifactId>cordova</artifactId>
+    	</dependency>
 	
 	
 		<dependency>
@@ -112,8 +105,20 @@
 		</dependency-->
 
 		<dependency>
-   			<groupId>org.societies.android.platform</groupId>
+   			<groupId>org.societies.android.platform.servicemonitor</groupId>
    			<artifactId>SocietiesServiceMonitor</artifactId>
+    		<version>${release.version}</version>
+   			<type>apklib</type>
+		</dependency>
+		<dependency>
+  	 		<groupId>org.societies.android.platform.cssmanager</groupId>
+   			<artifactId>SocietiesCSSManager</artifactId>
+   			<version>${release.version}</version>
+   			<type>apklib</type>
+		</dependency>
+		<dependency>
+    		<groupId>org.societies.android.platform.devicestatus</groupId>
+   			<artifactId>LocalDeviceStatus</artifactId>
    			<version>${release.version}</version>
    			<type>apklib</type>
 		</dependency>

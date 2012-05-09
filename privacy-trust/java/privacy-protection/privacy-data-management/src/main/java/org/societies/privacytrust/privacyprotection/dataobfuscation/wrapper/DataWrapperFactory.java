@@ -59,7 +59,7 @@ public class DataWrapperFactory {
 	
 //	// -- GEOLOCATION
 //	/**
-//	 * To get a Ge olocaltionDataWrapper
+//	 * To get a GeolocaltionDataWrapper
 //	 * The persistence is disabled by default, the obfuscated geolocation will not
 //	 * be stored after obfuscation.
 //	 * @param latitude Latitude

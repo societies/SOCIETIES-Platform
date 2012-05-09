@@ -24,6 +24,7 @@
  */
 package org.societies.privacytrust.trust.impl;
 
+import java.util.Arrays;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
@@ -33,9 +34,11 @@ import org.societies.api.internal.privacytrust.trust.TrustException;
 import org.societies.api.internal.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.internal.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
+import org.societies.privacytrust.trust.api.event.TrustEventTopic;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
@@ -47,13 +50,16 @@ import org.springframework.stereotype.Service;
  * @since 0.0.3
  */
 @Service
+@Lazy(value = false)
 public class TrustBroker implements ITrustBroker {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(TrustBroker.class);
 	
+	/** The Trust Event Mgr service. */
 	@Autowired(required=true)
 	private ITrustEventMgr trustEventMgr;
 	
+	/** The Trust Repository Service. */
 	@Autowired(required=true)
 	private ITrustRepository trustRepo;
 			
@@ -72,10 +78,11 @@ public class TrustBroker implements ITrustBroker {
 		if (teid == null)
 			throw new NullPointerException("teid can't be null");
 		
+		final Double trustValue;
+		
 		if (LOG.isDebugEnabled())
 			LOG.debug("Retrieving trust value for entity '"
 					+ teid + "' from Trust Repository");
-		/* TODO final */ Double trustValue = null;
 		
 		if (this.trustRepo == null)
 			throw new TrustBrokerException("Could not retrieve trust value for entity '"
@@ -83,7 +90,7 @@ public class TrustBroker implements ITrustBroker {
 		
 		final ITrustedEntity entity = this.trustRepo.retrieveEntity(teid);
 		if (entity != null)
-			;// TODO trustValue = entity.getUserPerceivedTrust().getValue();
+			trustValue = entity.getUserPerceivedTrust().getValue();
 		else
 			trustValue = null;
 			
@@ -96,7 +103,7 @@ public class TrustBroker implements ITrustBroker {
 	@Override
 	public void registerTrustUpdateEventListener(final ITrustUpdateEventListener listener,
 			final TrustedEntityId teid) throws TrustException {
-		// TODO Auto-generated method stub
+		
 		if (listener == null)
 			throw new NullPointerException("listener can't be null");
 		if (teid == null)
@@ -105,6 +112,12 @@ public class TrustBroker implements ITrustBroker {
 		if (this.trustEventMgr == null)
 			throw new TrustBrokerException("Could not register trust update listener for entity '"
 					+ teid + "': ITrustEventMgr service is not available");
+		
+		final String[] topics = new String[] { TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
+		if (LOG.isDebugEnabled())
+			LOG.debug("Registering event listener for entity " + teid + " to topics '"
+					+ Arrays.toString(topics) + "'");
+		this.trustEventMgr.registerListener(listener, topics, teid);
 	}
 	
 	/* (non-Javadoc)

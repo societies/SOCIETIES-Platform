@@ -8,10 +8,10 @@
 
 
     <artifact type="bundle" name="org.societies.comm.xmpp.XCCommunicationMgr"/>
-    <artifact type="plan" name="org.societies.activity.plan"/> 
-	<artifact type="bundle" name="org.societies.data-source"/>
+    <artifact type="plan" name="org.societies.activityfeed.plan"/> 
+	    <artifact type="bundle" name="org.societies.common-data-source"/>
     <artifact type="bundle" name="org.societies.cis.manager"/>
-	<artifact type="bundle" name="societies-webapp"/>
+
 
 
 </plan>

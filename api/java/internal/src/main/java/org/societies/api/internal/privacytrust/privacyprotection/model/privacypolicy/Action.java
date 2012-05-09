@@ -73,7 +73,7 @@ public class Action implements Serializable{
 	public String toXMLString(){
 		String str = "\n<Action>";
 		str = str.concat("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" " +
-				"\n\t\t\tDataType=\"org.personalsmartspace.spm.preference.api.platform.constants.ActionConstants\">");
+				"\n\t\t\tDataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants\">");
 		str = str.concat("\n\t\t<AttributeValue>");
 		str = str.concat(this.action.toString());
 		str = str.concat("</AttributeValue>");
