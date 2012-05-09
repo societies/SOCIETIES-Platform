@@ -8,10 +8,24 @@ public class MockHistoryData {
 	String actionValue;
 	String situationValue;
 
-	MockHistoryData(String action, String situation, ArrayList<String> context) {
-		this.actionValue = action;
-		this.situationValue = situation;
-		this.context = context;
+	public MockHistoryData(String action, String situation, ArrayList<String> context) {
+		if (action == null) {
+			this.actionValue = "";
+		} else {
+			this.actionValue = action;
+		}
+		
+		if (situation == null) {
+			this.situationValue = "";
+		} else {
+			this.situationValue = situation;
+		}
+		
+		if (context == null) {
+			this.context = new ArrayList<String>();
+		} else {
+			this.context = context;
+		}
 	}
 
 	public ArrayList<String> getContext() {

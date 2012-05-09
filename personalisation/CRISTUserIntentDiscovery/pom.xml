@@ -42,6 +42,13 @@
 			<version>${version.pm}</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.societies.personalisation</groupId>
+			<artifactId>CRISTUserIntentTaskManager</artifactId>
+			<version>${version.pm}</version>
+			<scope>provided</scope>
+		</dependency>
 
 	</dependencies>
 
