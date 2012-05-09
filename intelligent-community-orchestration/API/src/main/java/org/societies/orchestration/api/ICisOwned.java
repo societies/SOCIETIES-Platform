@@ -1,5 +1,10 @@
 /**
- * Copyright (c) 2011, SOCIETIES Consortium
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -19,30 +24,23 @@
  */
 package org.societies.orchestration.api;
 
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
-//import org.societies.api.cis.management.ICisRecord;
-import org.societies.orchestration.api.ICisRecord;
+/**
+ * This interface represents the CISs that are owned by this CSS.
+ * 
+ * @author Babak.Farshchian@sintef.no
+ *
+ */
+/**
+ * Empty interface?
+ * MISSING_JAVADOCS
+ */
 
-import java.util.ArrayList;
-import java.util.HashMap;
+public class ICisOwned extends ICisRecord {
 
-public class SuggestedCommunityAnalyserResultBean {
-
-	private ArrayList<String> cisMetadata;
-	
-    public SuggestedCommunityAnalyserResultBean() {
+	public ICisOwned() {
 		
 	}
-	
-	public ArrayList<String> getCisMetadata(){
-		return this.cisMetadata;
-	}
-	
-	public void setCisMetadata(ArrayList<String> ciss){
-		this.cisMetadata = cisMetadata;
-	}
-	
-    
-	
 }

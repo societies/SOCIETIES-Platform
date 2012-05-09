@@ -28,7 +28,8 @@ package org.societies.orchestration.api;
 import java.util.ArrayList;
 
 import org.societies.api.activity.IActivity;
-import org.societies.api.cis.management.ICisRecord;
+//import org.societies.api.cis.management.ICisRecord;
+//import org.societies.orchestration.CommunityLifecycleManagement.impl.ICisRecord;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.css.management.ICssActivity;
