@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.ICRISTUserIntentDiscovery;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager;
+import org.societies.personalisation.CRISTUserIntentTaskManager.impl.MockHistoryData;
 
 public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 
@@ -134,6 +135,7 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 				String currentCadidate = "";
 				for (int k = 1; k <= 3; k++) {
 					int currentIndex = indexList[j] + k;
+
 					if (indexList[j] + k < historySize
 							&& behaviorRecords.get(i).endsWith(
 									this.historyList.get(currentIndex)

@@ -517,6 +517,11 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	@Override
 	public ArrayList<CRISTUserAction> predictUserIntent(IIdentity entityID,
 			CRISTUserAction userAction) {
+		
+		if (userAction == null)
+		{
+			System.out.println("userAction is null.");
+		}
 		// TODO Auto-generated method stub
 		// Update the given user's current action
 		if (this.currentUserActionMap.containsKey(entityID)) {
@@ -525,11 +530,24 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		this.currentUserActionMap.put(entityID, userAction);
 		
 		CRISTUserSituation currentUserSituation = getCurrentUserSituation(entityID);
+		
+
+		String situationID;
+		if (currentUserSituation == null)
+		{
+			System.out.println("getCurrentUserSituation(entityID) is null.");
+			situationID = null;
+		}
+		else
+		{
+			situationID = currentUserSituation.getSituationID();
+		}
+		
 		ArrayList<String> currentContextClique = getCurrentUserContext(entityID);
 		//why not keep mock and test code separate?
 		MockHistoryData oneHisData = new MockHistoryData(
 				userAction.getActionID(),
-				currentUserSituation.getSituationID(), currentContextClique);
+				situationID, currentContextClique);
 
 		this.historyList.add(oneHisData);
 		// Predict user intent based on one's current action
@@ -598,6 +616,10 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 			CRISTUserAction currentAction, CRISTUserSituation currentSituation) {
 		// TODO Auto-generated method stub
 		String actionValue = currentAction.getActionID();
+		if (actionValue == null) {
+			System.out.println("actionValue is null. Set to \"\".");
+			actionValue = "";
+		}
 		ArrayList<CRISTUserAction> predictedAction = new ArrayList<CRISTUserAction>();
 		String currentPrediction = "";
 		HashMap<String, Integer> predictionResult = new HashMap<String, Integer>();
@@ -626,7 +648,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		if (this.intentModel != null) {
 			// TODO: Get the next actions
 			LinkedHashMap<String, Integer> candidateAction = new LinkedHashMap<String, Integer>();
-			if (currentSituation.toString().length() > 0) {
+			if (currentSituation != null && currentSituation.toString().length() > 0) {
 				// In case the user's current situation is available
 				String situationValue = currentSituation.getSituationID();
 				String currentBehavior = actionValue + "@" + situationValue;
