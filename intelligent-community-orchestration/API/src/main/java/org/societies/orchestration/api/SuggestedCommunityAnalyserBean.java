@@ -20,7 +20,8 @@
 package org.societies.orchestration.api;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.cis.management.ICisRecord;
+//import org.societies.api.cis.management.ICisRecord;
+import org.societies.orchestration.api.ICisRecord;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType;
 
 import org.societies.api.activity.IActivity;

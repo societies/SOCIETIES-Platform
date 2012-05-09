@@ -29,14 +29,16 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.MatrixCursor;
 import android.net.Uri;
 
 /**
  * This is the Android-based SocialProvider. It provides a content provider interface
- * to access CIS and related data. Currently it is working with a local database due 
- * to the problems we have with the communication manager working on Android.
- * 
+ * to access CSS/CIS and related data. The design is documented in CSS/CIS Redmine wiki.
+ * This provider will have a number of adapters where CSS/CIS data can be stored.
+ * Currently it works with a local DB Adapter and an XMPP adapter is under
+ * development which will use cloud data. The local DB adapter will gradually 
+ * function as a local cache. The logic to operate remote data and local cache
+ * will reside in this class.
  * 
  * @author Babak.Farshchian@sintef.no
  *
@@ -47,8 +49,7 @@ public class SocialProvider extends ContentProvider {
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     private boolean online = false; // True when we are online.
-    private SocialDatabaseAdapter dbAdapter = null;
-    private CommunicationAdapter comAdapter = null;
+    private LocalDBAdapter dbAdapter = null;
     /* 
      * Here I should do the following:
      * - Create a {@link CommunicationAdapter} and try to get connection with cloud CisManager (currently not here 
@@ -61,24 +62,23 @@ public class SocialProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
 	Context context = getContext();
-	//TODO: to be used in later versions with local caching:
-	dbAdapter = new SocialDatabaseAdapter(context);
-	//Used to send queries over network:
-	comAdapter = new CommunicationAdapter(context);
-	comAdapter.goOnline();
-	if (comAdapter.isOnline()){
-	    online = true;
-	}
+	//Used for local testing that ContentProvider works:
+	//TODO: to be used in later versions with local caching.
+	dbAdapter = new LocalDBAdapter(context);
+	dbAdapter.connect();
+	
+	//TODO: Add Edgar's CommunicationAdapter initialization here.
+	
 	//Construct all the legal query URIs:
 	//TODO replace with constants or move to SocialContract.
 	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people", 1);
 	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "people/#", 2);
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "groups", 3);
-	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "groups/#", 4);
+	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "communities", 3);
+	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "communities/#", 4);
 	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "services", 5);
 	sUriMatcher.addURI(SocialContract.AUTHORITY.getAuthority(), "services/#", 6);
 
-	return false;
+	return dbAdapter.isConnected();
     }
 
     /* (non-Javadoc)
@@ -107,7 +107,7 @@ public class SocialProvider extends ContentProvider {
     @Override
     public Uri insert(Uri _uri, ContentValues _values) {
 	// TODO Auto-generated method stub
-    	return comAdapter.insert(_uri, _values);
+    	return dbAdapter.insert(_uri, _values);
 	//long id = dbAdapter.insertCis(_values);
     }
 
@@ -120,7 +120,7 @@ public class SocialProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
 	    String[] selectionArgs, String sortOrder) {
-    	return comAdapter.query(uri, projection, selection, selectionArgs, sortOrder);
+    	return dbAdapter.query(uri, projection, selection, selectionArgs, sortOrder);
     }
 
     /* (non-Javadoc)
@@ -130,14 +130,16 @@ public class SocialProvider extends ContentProvider {
     public int update(Uri uri, ContentValues values, String selection,
 	    String[] selectionArgs) {
 	// TODO Auto-generated method stub
-	return 0;
+    	return dbAdapter.update(uri, values, selection, selectionArgs);
     }
     /**
-     * Constants and helpers for the CIS metadata table
+     * 
      * 
      * @author Babak.Farshchian@sintef.no
      *
      */
+    //TODO: probably delete this:
+    
     public boolean isOnline(){
 	return online;
     };
