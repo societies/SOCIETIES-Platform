@@ -57,7 +57,7 @@ public class CRISTUserIntentPredictionTesting {
 		if (results == null) {
 			System.out.println("The result is NULL.");
 		} else {
-			System.out.println(results.toString());
+			System.out.println("results: " + results.toString());
 		}
 	}
 

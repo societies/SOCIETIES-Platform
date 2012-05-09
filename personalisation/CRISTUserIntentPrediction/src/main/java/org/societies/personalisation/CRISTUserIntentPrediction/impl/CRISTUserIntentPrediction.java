@@ -42,6 +42,7 @@ import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTU
 import org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager;
 import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
 import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
+import org.societies.personalisation.CRISTUserIntentTaskManager.impl.CRISTUserIntentTaskManager;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 
 // @Component
@@ -132,6 +133,8 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	@Override
 	public void sendFeedback(FeedbackEvent feedbackEvent) {
 		// TODO Auto-generated method stub
+		///
+		
 		
 	}
 
@@ -144,26 +147,41 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		
 	}
 
-	/* (non-Javadoc)
+	/* (non-Javadoc) External 1/3 
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCRISTPrediction(org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxAttribute)
 	 */
 	@Override
 	public Future<List<CRISTUserAction>> getCRISTPrediction(IIdentity entityID,
 			CtxAttribute ctxAttribute) {
+		//handle null parameters
+		if (entityID == null)
+		{
+			System.out.println("The entityID is null, getCRISTPrediction can not run.");
+			return null;
+		}
+		if (ctxAttribute == null)
+		{
+			System.out.println("The ctxAttribute is null, getCRISTPrediction can not run.");
+			return null;
+		}
+		
 		// TODO Auto-generated method stub
 		List<CRISTUserAction> results = new ArrayList<CRISTUserAction>();
-		if (this.cristTaskManager!=null){
-			results = this.cristTaskManager.predictUserIntent(entityID, ctxAttribute);
-		}else{
-			System.out.println("The CRIST Taks Manager is NULL. Initiating a new mananger...");
+		if (this.cristTaskManager == null){
+			System.out.println("The CRIST Taks Manager is NULL. Initiating a new manager...");
 			// TODO
+			cristTaskManager = new CRISTUserIntentTaskManager();
+			((CRISTUserIntentTaskManager) cristTaskManager).initialiseCRISTUserIntentManager();
+			
+			
 			
 		}
 		
+		results = this.cristTaskManager.predictUserIntent(entityID, ctxAttribute);
 		return new AsyncResult<List<CRISTUserAction>>(results);
 	}
 
-	/* (non-Javadoc)
+	/* (non-Javadoc) External 2/3 
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCRISTPrediction(org.societies.api.identity.IIdentity, org.societies.api.personalisation.model.IAction)
 	 */
 	@Override
@@ -182,7 +200,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		return new AsyncResult<List<CRISTUserAction>>(results);
 	}
 
-	/* (non-Javadoc)
+	/* (non-Javadoc) External 3/3 
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#getCurrentUserIntentAction(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier)
 	 * 
 	 * parameterName: the name of the outcome (e.g., volume, font, backgroundColour etc.)
