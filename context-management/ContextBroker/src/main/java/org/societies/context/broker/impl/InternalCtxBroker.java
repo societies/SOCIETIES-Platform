@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,7 +110,10 @@ public class InternalCtxBroker implements ICtxBroker {
 
 	public void createCSSOperator(){
 		try {
-			userCtxDBMgr.createIndividualCtxEntity(CtxEntityTypes.PERSON);
+			IndividualCtxEntity operator = userCtxDBMgr.createIndividualCtxEntity(CtxEntityTypes.PERSON);
+			this.createAttribute(operator.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC);
+			this.createAttribute(operator.getId(), CtxAttributeTypes.STATUS);
+			this.createAttribute(operator.getId(), CtxAttributeTypes.TEMPERATURE);
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -216,7 +220,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	}
 
 
-	
+
 	/*
 	 * returns a list of entities with a specified value for a specified attribute type
 	 */
@@ -231,10 +235,10 @@ public class InternalCtxBroker implements ICtxBroker {
 
 				Set<CtxAttribute> ctxAttrSet = entity.getAttributes(ctxAttributeType);
 				for(CtxAttribute ctxAttr : ctxAttrSet){
-					LOG.info("---- lookupEntities,  attr id " +ctxAttr.getId());
-					
+					//LOG.info("---- lookupEntities,  attr id " +ctxAttr.getId());
+
 					if(compareAttributeValues(ctxAttr,value)) {
-						LOG.info("---- lookupEntities,  " +ctxAttr.getId());
+						//LOG.info("---- lookupEntities,  " +ctxAttr.getId());
 						entityList.add(entityId);
 					}
 				}
@@ -253,7 +257,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 
 		return new AsyncResult<List<CtxEntityIdentifier>>(entityList);
-	
+
 
 	}
 
@@ -626,7 +630,8 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		List<CtxAttributeIdentifier> tupleAttrIDs = new ArrayList<CtxAttributeIdentifier>(); 
 
-		final String tupleAttrType = "tupleIds_" + primaryAttrIdentifier.getType();
+		//	final String tupleAttrType = "tupleIds_" + primaryAttrIdentifier.getType();
+		final String tupleAttrType = "tupleIds_" + primaryAttrIdentifier.toString();
 		List<CtxIdentifier> ls;
 		try {
 			ls = this.lookup(CtxModelType.ATTRIBUTE, tupleAttrType).get();
@@ -694,8 +699,9 @@ public class InternalCtxBroker implements ICtxBroker {
 			// set hoc recording flag for the attributes contained in tuple list --end
 
 			//this attr will maintain the attr ids of all the (not only the escorting) hoc_attibutes in a blob
-			final String tupleAttrType = "tupleIds_" + primaryAttrIdentifier.getType();
-			//final String tupleAttrType = "tupleIds_" + primaryAttrIdentifier.toString();
+			//final String tupleAttrType = "tupleIds_" + primaryAttrIdentifier.getType();
+			final String tupleAttrType = "tupleIds_" + primaryAttrIdentifier.toString();
+
 			final CtxAttribute tupleAttr = (CtxAttribute) this.createAttribute(primaryAttrIdentifier.getScope(), tupleAttrType).get();
 
 			byte[] attrIdsBlob = SerialisationHelper.serialise((Serializable) allAttrIds);
@@ -732,7 +738,8 @@ public class InternalCtxBroker implements ICtxBroker {
 				this.update(attr);
 			}
 			//			List<CtxAttributeIdentifier> oldTupleAttrIDs = new ArrayList<CtxAttributeIdentifier>();
-			final String tupleAttrType = "tupleIds_" + primaryAttrIdentifier.getType();
+			//final String tupleAttrType = "tupleIds_" + primaryAttrIdentifier.getType();
+			final String tupleAttrType = "tupleIds_" + primaryAttrIdentifier.toString();
 			List<CtxAttributeIdentifier> newTupleAttrIDs = new ArrayList<CtxAttributeIdentifier>(); 
 			newTupleAttrIDs.add(0,primaryAttrIdentifier);
 			newTupleAttrIDs.addAll(newAttrList);
@@ -771,16 +778,57 @@ public class InternalCtxBroker implements ICtxBroker {
 
 	@Override
 	public Future<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>> retrieveHistoryTuples(
+			String attributeType, List<CtxAttributeIdentifier> escortingAttrIds,
+			Date startDate, Date endDate) {
+		
+		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = new HashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
+	
+		try {
+			List<CtxIdentifier> ctxAttrListIds = this.lookup(CtxModelType.ATTRIBUTE, attributeType).get();
+			//LOG.info("ctxAttribute list "+ctxAttrListIds);
+			CtxAttributeIdentifier primaryAttrId = null;
+					
+			for(int i=0; i< ctxAttrListIds.size(); i++){
+				primaryAttrId = (CtxAttributeIdentifier) ctxAttrListIds.get(i);
+				List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
+				Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tempTupleResults = new HashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>(); 
+
+				tempTupleResults =	retrieveHistoryTuples(primaryAttrId, listOfEscortingAttributeIds, startDate, endDate).get();
+				tupleResults.putAll(tempTupleResults);
+			}			
+			// short tupleResults data based on timestamps
+
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return new AsyncResult<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>>(tupleResults);
+	}
+
+
+
+
+
+
+	@Override
+	public Future<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>> retrieveHistoryTuples(
 			CtxAttributeIdentifier primaryAttrId, List<CtxAttributeIdentifier> escortingAttrIds,
 			Date arg2, Date arg3) throws CtxException {
 
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> results = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 
-		LOG.info("retrieveHistoryTuples updating hocAttrs primaryAttr: "+primaryAttrId);
+		//LOG.info("retrieveHistoryTuples updating hocAttrs primaryAttr: "+primaryAttrId);
 
 		if(primaryAttrId!= null){
 
-			String tupleAttrType = "tuple_"+primaryAttrId.getType().toString();
+			String tupleAttrType = "tuple_"+primaryAttrId.toString();
 			List<CtxIdentifier> listIds;
 
 			try {
@@ -798,7 +846,7 @@ public class InternalCtxBroker implements ICtxBroker {
 					List<CtxHistoryAttribute> tupleValueList = (List<CtxHistoryAttribute>) SerialisationHelper.deserialise(hocAttr.getBinaryValue(), this.getClass().getClassLoader());
 
 					// list of historic attributes contained in "tuple_status" retrieved
-					LOG.info("retrieveHistoryTuples tupleValueList: "+tupleValueList);
+					//LOG.info("retrieveHistoryTuples tupleValueList: "+tupleValueList);
 					//int ia = 0;
 					//for each historic attr 
 					for (CtxHistoryAttribute tupledHoCAttrTemp : tupleValueList){
@@ -848,8 +896,9 @@ public class InternalCtxBroker implements ICtxBroker {
 
 	public void storeHoCAttributeTuples(CtxAttribute primaryAttr){
 
-		String tupleAttrType = "tuple_"+primaryAttr.getType().toString();
+		//String tupleAttrType = "tuple_"+primaryAttr.getType().toString();
 
+		String tupleAttrType = "tuple_"+primaryAttr.getId().toString();
 		// the attr that will maintain the tuples; 
 		CtxAttribute tupleAttr = null;
 		List<CtxHistoryAttribute> tupleValueList = new ArrayList<CtxHistoryAttribute>();
@@ -1086,6 +1135,6 @@ public class InternalCtxBroker implements ICtxBroker {
 		return areEqual;
 	}
 
-	
-	
+
+
 }

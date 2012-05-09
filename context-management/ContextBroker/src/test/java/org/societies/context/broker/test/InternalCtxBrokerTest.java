@@ -1211,7 +1211,8 @@ public class InternalCtxBrokerTest {
 
 		primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"secondValue").get();
 		//CtxAttribute tupleAttr = lookupAttrHelp("tuple_primaryAttribute");
-		assertNotNull(lookupAttrHelp("tuple_primaryAttribute"));
+		String tupletype = "tuple_"+primaryAttribute.getId().toString();
+		assertNotNull(lookupAttrHelp(tupletype));
 
 		//System.out.println("1 tupleAttrType: "+tupleAttr.getType());
 		//List historyList = internalCtxBroker.retrieveHistory(primaryAttribute.getId(), null,null).get();
@@ -1295,7 +1296,8 @@ public class InternalCtxBrokerTest {
 
 		primaryAttribute =  internalCtxBroker.updateAttribute(primaryAttribute.getId(),(Serializable)"secondValue").get();
 		//CtxAttribute tupleAttr = lookupAttrHelp("tuple_primaryAttribute");
-		assertNotNull(lookupAttrHelp("tuple_primaryAttribute"));
+		String tupletype = "tuple_"+primaryAttribute.getId().toString();
+		assertNotNull(lookupAttrHelp(tupletype));
 
 		//System.out.println("1 tupleAttrType: "+tupleAttr.getType());
 		//List historyList = internalCtxBroker.retrieveHistory(primaryAttribute.getId(), null,null).get();

@@ -545,6 +545,20 @@ public interface ICtxBroker {
 	public Future<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>> retrieveHistoryTuples(CtxAttributeIdentifier primaryAttrID, List<CtxAttributeIdentifier> listOfEscortingAttributeIds, Date startDate, Date endDate) throws CtxException;
 
 	/**
+	 * This method returns a linked map with key the CtxAttribute and value 
+	 * a list of CtxAttributes recorded on the same time.
+	 * 
+	 * @param attributeType
+	 * @param escortingAttrIds
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	public Future<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>> retrieveHistoryTuples(
+			String attributeType, List<CtxAttributeIdentifier> escortingAttrIds,
+			Date startDate, Date endDate);
+	
+	/**
 	 * Removes context history records defined by type for the specified time period. 
 	 * 
 	 * @param type

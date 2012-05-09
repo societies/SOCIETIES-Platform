@@ -30,6 +30,8 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -68,115 +70,11 @@ import org.societies.api.useragent.monitoring.IUserActionMonitor;
 public class ContextStorageTest {
 
 	private static Logger LOG = LoggerFactory.getLogger(TestCase749.class);
-	//	private static IUserActionMonitor uam;
-	//	private static ICtxBroker ctxBroker;
 
 	public void setUp(){
 		System.out.println("Test 749 started : ContextStorageTest");
-		//	uam = TestCase749.getUam();
-		//	ctxBroker = TestCase749.getCtxBroker();
 	}
 
-	/*
-	@Test
-	public void createHistorySet(){
-
-		IndividualCtxEntity operator = null;
-
-		IIdentity identity = new MockIdentity(IdentityType.CSS, "user", "societies.org");
-
-		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
-		try {
-			serviceId.setIdentifier(new URI("testServiceId"));
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			System.out.println("ctxBroker service: "+TestCase749.ctxBroker);
-
-			operator = TestCase749.ctxBroker.retrieveCssOperator().get();
-			printAttr(operator);
-
-			// primary attribute
-			CtxAttribute actAttr = TestCase749.ctxBroker.createAttribute(operator.getId(), "SymAction").get();
-			actAttr.setHistoryRecorded(true);
-			actAttr = (CtxAttribute) TestCase749.ctxBroker.update(actAttr).get();
-
-			//escorting attributes
-			CtxAttribute statusAttr = TestCase749.ctxBroker.createAttribute(operator.getId(), CtxAttributeTypes.STATUS).get();
-			statusAttr.setHistoryRecorded(true);
-			statusAttr =  TestCase749.ctxBroker.updateAttribute(statusAttr.getId(),(Serializable)"free").get();
-
-			CtxAttribute tempAttr = TestCase749.ctxBroker.createAttribute(operator.getId(), CtxAttributeTypes.TEMPERATURE).get();
-			tempAttr.setHistoryRecorded(true);
-			tempAttr =  TestCase749.ctxBroker.updateAttribute(tempAttr.getId(),(Serializable)12).get();
-
-			CtxAttribute symLocAttr = TestCase749.ctxBroker.createAttribute(operator.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC).get();
-			symLocAttr.setHistoryRecorded(true);
-			symLocAttr =  TestCase749.ctxBroker.updateAttribute(symLocAttr.getId(),(Serializable)"home").get();
-
-			//remove this part when integration with uam is complete
-			// set history tuples
-			List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
-			listOfEscortingAttributeIds.add(statusAttr.getId());
-			listOfEscortingAttributeIds.add(tempAttr.getId());
-			listOfEscortingAttributeIds.add(symLocAttr.getId());
-			TestCase749.ctxBroker.setHistoryTuples(actAttr.getId(), listOfEscortingAttributeIds).get();	
-
-			for(int i=0; i<3; i++){
-				//primary attribute value
-				IAction action1 = new Action(serviceId, "testService", "volume", "high");
-				symLocAttr =  TestCase749.ctxBroker.updateAttribute(symLocAttr.getId(),(Serializable)"office").get();
-				TestCase749.uam.monitor(identity, action1);
-
-				byte[] binaryAction1  = SerialisationHelper.serialise(action1);
-				actAttr.setBinaryValue(binaryAction1);
-				actAttr = (CtxAttribute) TestCase749.ctxBroker.update(actAttr).get();
-
-
-				IAction action2 = new Action(serviceId, "testService", "volume", "low");
-				symLocAttr =  TestCase749.ctxBroker.updateAttribute(symLocAttr.getId(),(Serializable)"restaurant").get();
-				TestCase749.uam.monitor(identity, action2);
-
-				byte[] binaryAction2 = SerialisationHelper.serialise(action2);
-				actAttr.setBinaryValue(binaryAction2);
-				actAttr = (CtxAttribute) TestCase749.ctxBroker.update(actAttr).get();
-
-
-				IAction action3 = new Action(serviceId, "testService", "volume", "mute");
-				symLocAttr =  TestCase749.ctxBroker.updateAttribute(symLocAttr.getId(),(Serializable)"home").get();
-				TestCase749.uam.monitor(identity, action3);
-
-				byte[] binaryAction3 = SerialisationHelper.serialise(action3);
-				actAttr.setBinaryValue(binaryAction3);
-				actAttr = (CtxAttribute) TestCase749.ctxBroker.update(actAttr).get();
-
-			}
-			operator = TestCase749.ctxBroker.retrieveCssOperator().get();
-			printAttr(operator);
-			//CtxAttribute volumeAttr = lookupRetrieveAttrHelp("service");
-			//System.out.println("volumeAttr "+volumeAttr);
-			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = TestCase749.ctxBroker.retrieveHistoryTuples(actAttr.getId(), listOfEscortingAttributeIds, null, null).get();
-			System.out.println("hoc tuple results size "+tupleResults.size());
-			System.out.println("hoc tuple results "+tupleResults);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}	
-
-	 */
-	
 	@Test
 	public void monitorActionsContext() {
 
@@ -198,13 +96,10 @@ public class ContextStorageTest {
 		IAction action4 = new Action(serviceId2, "testService", "colour", "blue");
 		IAction action5 = new Action(serviceId2, "testService", "colour", "green");
 
-
 		//set context data
-		//CtxAttribute attr = null;
-		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, (Serializable)"home");
+		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "home");
 		setContext(CtxAttributeTypes.TEMPERATURE, 25);
 		setContext(CtxAttributeTypes.STATUS, "free");
-
 
 		//send actions - 1 second apart
 		LOG.info("Monitor services #749 - sending mock actions for storage");
@@ -214,7 +109,7 @@ public class ContextStorageTest {
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, (Serializable)"office");
+		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "office");
 		setContext(CtxAttributeTypes.TEMPERATURE, 45);
 		setContext(CtxAttributeTypes.STATUS, "busy");
 
@@ -225,7 +120,7 @@ public class ContextStorageTest {
 			e1.printStackTrace();
 		}
 
-		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, (Serializable)"park");
+		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC,"park");
 		setContext(CtxAttributeTypes.TEMPERATURE, 45);
 		setContext(CtxAttributeTypes.STATUS, "busy");
 
@@ -236,7 +131,7 @@ public class ContextStorageTest {
 			e1.printStackTrace();
 		}
 
-		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, (Serializable)"zoo");
+		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "zoo");
 		setContext(CtxAttributeTypes.TEMPERATURE, 45);
 		setContext(CtxAttributeTypes.STATUS, "busy");
 
@@ -247,7 +142,7 @@ public class ContextStorageTest {
 			e1.printStackTrace();
 		}
 
-		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, (Serializable)"university");
+		setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "university");
 		setContext(CtxAttributeTypes.TEMPERATURE, 45);
 		setContext(CtxAttributeTypes.STATUS, "busy");
 
@@ -258,69 +153,51 @@ public class ContextStorageTest {
 			e1.printStackTrace();
 		}
 
-		//check context storage structure
-
-		Set<CtxEntityIdentifier> serviceEntityIDs = null;
-
-		IndividualCtxEntity person;
+		/*
+		 * CHECK HISTORY DATA
+		 */
+		LOG.info("*********** CHECK HISTORY DATA ************");
+		List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
+		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = new HashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 		try {
-			person = TestCase749.ctxBroker.retrieveCssOperator().get();
-
-			if(person == null){
-				LOG.error("Person entity is NULL");
-			}
-			Assert.assertNotNull(person);
-
-			Set<CtxAssociationIdentifier> usesServiceAssocIDs = person.getAssociations(CtxAssociationTypes.USES_SERVICE);
-			if(usesServiceAssocIDs == null){
-				LOG.error("USES_SERVICE association IDs in null");
-			}
-			if(usesServiceAssocIDs.size() != 1){
-				LOG.error("Incorrect number of USES_SERVICE association IDs :"+usesServiceAssocIDs.size());
-			}
-			Assert.assertNotNull(usesServiceAssocIDs);
-			Assert.assertTrue(usesServiceAssocIDs.size() == 1);
-
-			CtxAssociation usesServiceAssoc = (CtxAssociation)TestCase749.ctxBroker.retrieve(usesServiceAssocIDs.iterator().next()).get();
-			if(usesServiceAssoc == null){
-				LOG.error("USES_SERVICE association is NULL");
-			}
-			Assert.assertNotNull(usesServiceAssoc);
-
-			serviceEntityIDs = usesServiceAssoc.getChildEntities();
-			if(serviceEntityIDs.size() != 2){
-				LOG.error("Wrong number of SERVICE entity IDs for USES_SERVICE association: "+serviceEntityIDs.size());
-			}
-			Assert.assertTrue(serviceEntityIDs.size() == 2);  //2 service entities
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		} catch (ExecutionException e1) {
-			e1.printStackTrace();
-		} catch (CtxException e1) {
-			e1.printStackTrace();
+			tupleResults  = TestCase749.ctxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, listOfEscortingAttributeIds, null, null).get();
+			Assert.assertTrue(tupleResults.size() == 5);
+			printHocTuplesDB(tupleResults);
+		
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		
-		// check what is stored in history
-		LOG.info("*********** check what is stored in history ************");
-		//Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = TestCase749.ctxBroker.retrieveHistoryTuples(actAttr.getId(), listOfEscortingAttributeIds, null, null).get();
+	/*	
+		
 		try {
 			List<CtxIdentifier> ctxAttrListIds = TestCase749.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.LAST_ACTION).get();
 			LOG.info("ctxAttribute list "+ctxAttrListIds);
-				
+			CtxAttributeIdentifier primaryAttrId = null;
+			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = new HashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 			for(int i=0; i< ctxAttrListIds.size(); i++){
-				CtxAttributeIdentifier id = (CtxAttributeIdentifier) ctxAttrListIds.get(i);
-				List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
-				List<CtxAttributeIdentifier> tupleIds = TestCase749.ctxBroker.getHistoryTuples(id, listOfEscortingAttributeIds).get();	
-				LOG.info("tupleIds list "+"i="+i+" ids:"+ tupleIds);
+				primaryAttrId = (CtxAttributeIdentifier) ctxAttrListIds.get(i);
+
 				
-				TestCase749.ctxBroker.retrieveHistory(id, 0);
+				Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tempTupleResults = new HashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>(); 
+
+				tempTupleResults =	TestCase749.ctxBroker.retrieveHistoryTuples(primaryAttrId, listOfEscortingAttributeIds, null, null).get();
+				//LOG.info("*********** print tempTupleResults data ************"+ tempTupleResults);
+				Assert.assertNotNull(tempTupleResults);
+				tupleResults.putAll(tempTupleResults);
+				//LOG.info("*********** print tupleResults data ************"+ tupleResults);
 			}			
-			
-			
-			
-			
-		} catch (CtxException e) {
+			//LOG.info("*********** final tupleResults data ************"+ tupleResults);
+			Assert.assertTrue(tupleResults.size() == 5);
+			printHocTuplesDB(tupleResults);
+			//			LOG.info("*********** print all history data ************");
+			//			TestCase749.ctxBroker.retrieveHistory(primaryAttrId, 0);
+	} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
@@ -330,213 +207,10 @@ public class ContextStorageTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		/*
-		try{
-
-		 * CHECK SERVICE 1
-
-			ArrayList<CtxEntityIdentifier> serviceEntityIDsList = new ArrayList<CtxEntityIdentifier>(serviceEntityIDs);
-
-			List<CtxEntityIdentifier> check1ServiceIDs = 
-					TestCase749.ctxBroker.lookupEntities(serviceEntityIDsList, CtxAttributeTypes.ID, serviceId1).get();
-
-			//Check number of service entities returned
-			if(check1ServiceIDs == null){
-				LOG.error("1) NULL - no SERVICE entity exists with ID: "+serviceId1);
-			}
-			if(check1ServiceIDs.size() != 1){
-				LOG.error("1) Wrong number of SERVICE entities with serviceID: "+serviceId1+" -> "+check1ServiceIDs.size());
-			}
-			Assert.assertNotNull(check1ServiceIDs);
-			Assert.assertTrue(check1ServiceIDs.size() == 1);	
-
-			//check service ID attribute
-			CtxEntity serviceEntity = (CtxEntity)TestCase749.ctxBroker.retrieve(check1ServiceIDs.get(0)).get();
-
-			Set<CtxAttribute> attributes = serviceEntity.getAttributes();
-			if(attributes == null){
-				LOG.error("1) NULL - no attributes under SERVICE entity");
-			}
-			if(attributes.size() != 1){
-				LOG.error("1) Wrong number of attributes under SERVICE entity: "+attributes.size());
-			}
-			Assert.assertNotNull(attributes);
-			Assert.assertTrue(attributes.size() == 1);
-
-			CtxAttribute idAttr = attributes.iterator().next();
-			ServiceResourceIdentifier actualServiceId = (ServiceResourceIdentifier)SerialisationHelper.deserialise(idAttr.getBinaryValue(), this.getClass().getClassLoader());
-			if(!serviceId1.equals(actualServiceId)){
-				LOG.error("1) wrong serviceID stored with SERVICE entity.  Expected: "+serviceId1+", Actual: "+actualServiceId);
-			}
-			Assert.assertEquals(serviceId1, actualServiceId);
-
-			//check service HAS_PARAMETER associations
-			Set<CtxAssociationIdentifier> hasParamIDs = serviceEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETER);
-			if(hasParamIDs == null){
-				LOG.error("1) NULL - no HAS_PARAMETER associations for SERVICE entity");
-			}
-			if(hasParamIDs.size() != 1){
-				LOG.error("1) Wrong numbder of HAS_PARAMETER associations under SERVICE entity: "+hasParamIDs.size());
-			}
-			Assert.assertNotNull(hasParamIDs);
-			Assert.assertTrue(hasParamIDs.size() == 1);
-
-			CtxAssociation hasParamAssoc = (CtxAssociation)TestCase749.ctxBroker.retrieve(hasParamIDs.iterator().next()).get();
-			if(hasParamAssoc == null){
-				LOG.error("1) HAS_PARAMETER association is NULL");
-			}
-			Assert.assertNotNull(hasParamAssoc);
-
-			Set<CtxEntityIdentifier> serviceParamIDs = hasParamAssoc.getChildEntities();
-			if(serviceParamIDs.size() != 1){
-				LOG.error("1) Wrong number of SERVICE_PARAMETER entity IDs for HAS_PARAMETERS association "+serviceParamIDs.size());
-			}
-			Assert.assertTrue(serviceParamIDs.size() == 1);
-
-			CtxEntity serviceParam = (CtxEntity)TestCase749.ctxBroker.retrieve(serviceParamIDs.iterator().next());
-
-			Set<CtxAttribute> serviceParamAttrs = serviceParam.getAttributes(); 
-
-			for(CtxAttribute nextAttr: serviceParamAttrs){
-				if(nextAttr.getType().equals(CtxAttributeTypes.PARAMETER_NAME)){  //check name
-					String actualParameterName = nextAttr.getStringValue();
-
-					LOG.info("1) volume should be the same as "+actualParameterName);
-					Assert.assertEquals("volume", actualParameterName);
-
-				}else if(nextAttr.getType().equals(CtxAttributeTypes.LAST_ACTION)){  //check last action
-					IAction actualAction = (IAction)SerialisationHelper.deserialise(nextAttr.getBinaryValue(), this.getClass().getClassLoader());
-
-					LOG.info("1) "+action3+" should be the same as "+actualAction);
-					Assert.assertEquals(action3, actualAction);
-				}else if(nextAttr.getType().equals("tuple_volume")){
-					//ignore
-				}else if(nextAttr.getType().equals("tupleIds_volume")){
-					//ignore
-				}else{ //unknown parameter!
-
-					LOG.error("1) received unknown attribute type: "+nextAttr.getType());
-					Assert.fail("Unknown parameter type for serviceId1");
-
-				}
-			}
-		} catch (CtxException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-
-		 */
-
-		/*
-		 * CHECK SERVICE 2
-
-		try{
-			ArrayList<CtxEntityIdentifier> serviceEntityIDsList = new ArrayList<CtxEntityIdentifier>(serviceEntityIDs);
-
-			List<CtxEntityIdentifier> check2ServiceIDs = 
-					TestCase749.ctxBroker.lookupEntities(serviceEntityIDsList, CtxAttributeTypes.ID, serviceId2).get();
-
-			//Check number of service entities returned
-			if(check2ServiceIDs == null){
-				LOG.error("2) NULL - no SERVICE entity exists with ID: "+serviceId2);
-			}
-			if(check2ServiceIDs.size() != 1){
-				LOG.error("2) EMPTY - no SERVICE entity exists with ID: "+serviceId2);
-			}
-			Assert.assertNotNull(check2ServiceIDs);
-			Assert.assertTrue(check2ServiceIDs.size() == 1);	
-
-			//check service ID attribute
-			CtxEntity serviceEntity = (CtxEntity)TestCase749.ctxBroker.retrieve(check2ServiceIDs.get(0)).get();
-
-			Set<CtxAttribute> attributes = serviceEntity.getAttributes();
-			if(attributes == null){
-				LOG.error("2) NULL - no attributes under SERVICE entity");
-			}
-			if(attributes.size() != 1){
-				LOG.error("2) Wrong number of attributes under SERVICE entity: "+attributes.size());
-			}
-			Assert.assertNotNull(attributes);
-			Assert.assertTrue(attributes.size() == 1);
-
-			CtxAttribute idAttr = attributes.iterator().next();
-			ServiceResourceIdentifier actualServiceId = (ServiceResourceIdentifier)SerialisationHelper.deserialise(idAttr.getBinaryValue(), this.getClass().getClassLoader());
-			if(!serviceId2.equals(actualServiceId)){
-				LOG.error("2) wrong serviceID stored with SERVICE entity.  Expected: "+serviceId2+", Actual: "+actualServiceId);
-			}
-			Assert.assertEquals(serviceId2, actualServiceId);
-
-			//check service HAS_PARAMETER associations
-			Set<CtxAssociationIdentifier> hasParamIDs = serviceEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETER);
-			if(hasParamIDs == null){
-				LOG.error("2) NULL - no HAS_PARAMETER associations for SERVICE entity");
-			}
-			if(hasParamIDs.size() != 1){
-				LOG.error("2) Wrong numbder of HAS_PARAMETER associations under SERVICE entity: "+hasParamIDs.size());
-			}
-			Assert.assertNotNull(hasParamIDs);
-			Assert.assertTrue(hasParamIDs.size() == 1);
-
-			CtxAssociation hasParamAssoc = (CtxAssociation)TestCase749.ctxBroker.retrieve(hasParamIDs.iterator().next()).get();
-			if(hasParamAssoc == null){
-				LOG.error("2) HAS_PARAMETER association is NULL");
-			}
-			Assert.assertNotNull(hasParamAssoc);
-
-			Set<CtxEntityIdentifier> serviceParamIDs = hasParamAssoc.getChildEntities();
-			if(serviceParamIDs.size() != 2){
-				LOG.error("2) Wrong number of SERVICE_PARAMETER entity IDs for HAS_PARAMETERS association "+serviceParamIDs.size());
-			}
-			Assert.assertTrue(serviceParamIDs.size() == 2);
-
-			CtxEntity serviceParam = (CtxEntity)TestCase749.ctxBroker.retrieve(serviceParamIDs.iterator().next());
-
-			Set<CtxAttribute> serviceParamAttrs = serviceParam.getAttributes(); 
-
-			for(CtxAttribute nextAttr: serviceParamAttrs){
-				if(nextAttr.getType().equals(CtxAttributeTypes.PARAMETER_NAME)){  //check name
-					String actualParameterName = nextAttr.getStringValue();
-
-					LOG.info("2) actual parameter name is: "+actualParameterName);
-					//Assert.assertEquals("volume", actualParameterName);
-
-				}else if(nextAttr.getType().equals(CtxAttributeTypes.LAST_ACTION)){  //check last action
-					IAction actualAction = (IAction)SerialisationHelper.deserialise(nextAttr.getBinaryValue(), this.getClass().getClassLoader());
-
-					LOG.info("1) "+action3+" should be the same as "+actualAction);
-					Assert.assertEquals(action3, actualAction);
-				}else if(nextAttr.getType().equals("tuple_volume")){
-					//ignore
-				}else if(nextAttr.getType().equals("tupleIds_volume")){
-					//ignore
-				}else{ //unknown parameter!
-
-					LOG.error("1) received unknown attribute type: "+nextAttr.getType());
-					Assert.fail("Unknown parameter type for serviceId1");
-
-				}
-			}
-		} catch (CtxException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		 */
+	*/
+	
 	}
+
 
 	private CtxAttribute setContext(String type, Serializable value){
 
@@ -569,8 +243,7 @@ public class ContextStorageTest {
 
 
 	private void printAttr(CtxEntity entity) throws InterruptedException, ExecutionException, CtxException{
-
-		//IndividualCtxEntity operator = TestCase749.ctxBroker.retrieveCssOperator().get();
+		
 		System.out.println("operator: "+entity);
 		Set<CtxAttribute> attrSet = entity.getAttributes();
 		System.out.println("operator attrs : "+attrSet);
@@ -600,5 +273,50 @@ public class ContextStorageTest {
 			e.printStackTrace();
 		}
 		return ctxAttr;
+	}
+
+
+	protected void printHocTuplesDB(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults){
+
+		LOG.info("printing Tuples");
+		int i = 0;
+		for (CtxHistoryAttribute primary : tupleResults.keySet()){
+
+			try {
+				IAction action = (IAction)SerialisationHelper.deserialise(primary.getBinaryValue(),this.getClass().getClassLoader());
+				LOG.info(i+ " action name: "+action.getparameterName()+" action value: "+action.getvalue()+ " action service "+action.getServiceID().getIdentifier());
+				for(CtxHistoryAttribute escortingAttr: tupleResults.get(primary)){
+					String result = getValue(escortingAttr);
+					LOG.info("escording attribute type: "+escortingAttr.getType()+" value:"+result);
+				}
+				i++;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	protected String getValue(CtxHistoryAttribute attribute){
+
+		String result = "";
+
+		if (attribute.getStringValue()!=null) {
+			result = attribute.getStringValue();
+			return result;             			
+		}
+		else if(attribute.getIntegerValue()!=null) {
+			Integer valueInt = attribute.getIntegerValue();
+			result = valueInt.toString();
+			return result; 
+		} else if (attribute.getDoubleValue()!=null) {
+			Double valueDouble = attribute.getDoubleValue();
+			result = valueDouble.toString();  			
+			return result; 
+		} 
+		return result; 
 	}
 }

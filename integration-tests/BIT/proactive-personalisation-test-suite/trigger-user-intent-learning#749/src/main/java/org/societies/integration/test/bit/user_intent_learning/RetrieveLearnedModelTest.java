@@ -10,6 +10,8 @@ import junit.framework.Assert;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -21,44 +23,26 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 
 public class RetrieveLearnedModelTest {
 
-	private static ICtxBroker ctxBroker;
-
+	private static Logger LOG = LoggerFactory.getLogger(TestCase749.class);
+	
 	public void setUp(){
-		//System.out.println("Test 749 started : RetrieveLearnedModelTest");
-		//ctxBroker = TestCase749.getCtxBroker();
-		//System.out.println(" ctxBroker "+ctxBroker);
+
 	}
 
-	@Ignore
 	@Test
 	public void test() {
 		try {
 			IndividualCtxEntity operator = TestCase749.getCtxBroker().retrieveCssOperator().get();
 			Set<CtxAttribute> setAttr = operator.getAttributes(CtxAttributeTypes.CAUI_MODEL);
-			
-			
-		for(CtxAttribute attrRetr : setAttr){
-			try {
-				Serializable userIntentModel = (Serializable) SerialisationHelper.deserialise(attrRetr.getBinaryValue(), this.getClass().getClassLoader());
+		//	LOG.info("attributes refering to caui model "+ setAttr  );
 
-				Assert.assertNotNull(setAttr);
-				Assert.assertEquals(1, setAttr.size());
-				Assert.assertNotNull(userIntentModel);
-			
-				System.out.println("asserts completed "+ userIntentModel);
-			
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			for(CtxAttribute attrRetr : setAttr){
+					Assert.assertNotNull(setAttr);
+					Assert.assertEquals(1, setAttr.size());
+					Assert.assertNotNull(attrRetr.getBinaryValue());
+					LOG.info("attributes refering to caui model "+attrRetr  );
+					//System.out.println("Test 749 started : "+   );	
 			}
-			//System.out.println("Test 749 started : "+   );	
-		}
-			 
-
-			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
