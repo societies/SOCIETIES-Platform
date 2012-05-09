@@ -65,6 +65,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		//this.initialiseCRISTUserIntentManager();
 	}
 
+	// how to use this?
 	public CRISTUserIntentTaskManager(ICRISTUserIntentPrediction cristPrediction) {
 		System.out.println("This is the testing class for CRIST Model!");
 		this.setCristPrediction(cristPrediction);
@@ -412,14 +413,14 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		// Retrieve the user's real-time context: How to retrieve a given user's
 		// context
 		// this.ctxBroker.retrieve();
-		int currentPos = this.historyList.size();
+		int currentPos = this.historyList.size() - 1;// bug fixed --Zhiyong Yu
 		ArrayList<String> lastContextClique = this.historyList.get(currentPos)
 				.getContext();
 		ArrayList<String> currentContextClique = new ArrayList<String>();
 
 		// Generate a new context clique based on the newly received
 		// ctxAttribute
-		String contextID = ctxAttribute.getSourceId();
+		String contextID = ctxAttribute.getSourceId(); // how to handle when ctxAttribute is null?
 		for (int i = 0; i < lastContextClique.size(); i++) {
 			String oneContextID = this.registeredContext.get(i);
 			if (oneContextID.equals(contextID)) {
@@ -489,7 +490,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	public ArrayList<CRISTUserAction> predictUserIntent(IIdentity entityID,
 			CtxAttribute ctxAttribute) {
 		// TODO Auto-generated method stub
-		if (this.intentModel!=null){
+		//if (this.intentModel!=null){
+			//where use intentModel?
 			updateUserSituation(entityID, ctxAttribute);
 			CRISTUserAction currentUserAction = getCurrentUserAction(entityID);
 			CRISTUserSituation currentUserSituation = getCurrentUserSituation(entityID);
@@ -498,10 +500,10 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 			ArrayList<CRISTUserAction> results = getNextActions(entityID,
 					currentUserAction, currentUserSituation);
 			return results;
-		}else{
-			System.out.println("The CRIST UI Model is NULL.");
-			return null;
-		}		
+		//}else{
+		//	System.out.println("The CRIST user intent Model is NULL."); //why not build one?
+		//	return null;
+		//}		
 	}
 
 	/*
@@ -524,6 +526,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		
 		CRISTUserSituation currentUserSituation = getCurrentUserSituation(entityID);
 		ArrayList<String> currentContextClique = getCurrentUserContext(entityID);
+		//why not keep mock and test code separate?
 		MockHistoryData oneHisData = new MockHistoryData(
 				userAction.getActionID(),
 				currentUserSituation.getSituationID(), currentContextClique);
@@ -548,7 +551,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	 */
 	@Override
 	public CRISTUserAction getCurrentUserIntent(IIdentity entityID,
-			ServiceResourceIdentifier serviceID, String parameterName) {
+			ServiceResourceIdentifier serviceID, String parameterName) {//parameterName no use?
 		// TODO Auto-generated method stub
 		CRISTUserAction currentUserAction = null;
 		CRISTUserSituation currentUserSituation = null;
@@ -638,7 +641,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 					}
 				}
 			} else {
-				// In case the user's current situation is not available
+				// In case the user's current situation is not available, consider all situations
 				String currentBehavior = actionValue;
 				Set<String> modelKeys = this.intentModel.keySet();
 				Object[] keyArray = modelKeys.toArray();
