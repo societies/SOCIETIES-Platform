@@ -205,5 +205,7 @@ public class TrustEvidenceRepositoryTest extends AbstractTransactionalJUnit4Spri
 		assertNotNull(directEvidence);
 		assertEquals(1, directEvidence.size());
 		assertTrue(directEvidence.contains(directOpinion2));
+		
+		this.trustEvidenceRepo.removeAllDirectEvidence(teid1);
 	}
 }
