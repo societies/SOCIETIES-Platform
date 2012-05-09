@@ -67,6 +67,9 @@ public class CommsFwPointcut extends StaticMethodMatcherPointcut {
 		else if (methodName.equals("setAspectName")) {  // TODO: remove
 			return true;
 		}
+		else if (methodName.equals("getIdManager")) {  // TODO: remove
+			return true;
+		}
 		else {
 			return false;
 		}
