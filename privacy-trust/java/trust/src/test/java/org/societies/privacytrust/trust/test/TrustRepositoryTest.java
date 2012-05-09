@@ -32,7 +32,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.societies.api.internal.privacytrust.trust.TrustException;
@@ -129,7 +128,6 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	 * @throws TrustException
 	 */
 	@Test
-	@Ignore
 	public void testTrustedCssCRUD() throws TrustException {
 		
 		this.testAddTrustedCss();
@@ -146,7 +144,6 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	 * @throws TrustException
 	 */
 	@Test
-	@Ignore
 	public void testTrustedCisCRUD() throws TrustException {
 		
 		this.testAddTrustedCis();
@@ -163,7 +160,6 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	 * @throws TrustException
 	 */
 	@Test
-	@Ignore
 	public void testTrustedServiceCRUD() throws TrustException {
 		
 		this.testAddTrustedService();
