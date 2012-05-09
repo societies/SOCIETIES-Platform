@@ -125,7 +125,7 @@ public class ContextStorageTest {
 			}
 			Assert.assertNotNull(person);
 
-			Set<CtxAssociationIdentifier> usesServiceAssocIDs = person.getAssociations(CtxAssociationTypes.USES_SERVICE);
+			Set<CtxAssociationIdentifier> usesServiceAssocIDs = person.getAssociations(CtxAssociationTypes.USES_SERVICES);
 			if(usesServiceAssocIDs == null){
 				LOG.error("USES_SERVICE association IDs in null");
 			}
@@ -194,7 +194,7 @@ public class ContextStorageTest {
 			Assert.assertEquals(serviceId1.getIdentifier(), actualServiceId);
 
 			//check service HAS_PARAMETER associations
-			Set<CtxAssociationIdentifier> hasParamIDs = serviceEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETER);
+			Set<CtxAssociationIdentifier> hasParamIDs = serviceEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS);
 			if(hasParamIDs == null){
 				LOG.error("1) NULL - no HAS_PARAMETER associations for SERVICE entity");
 			}
@@ -296,7 +296,7 @@ public class ContextStorageTest {
 			Assert.assertEquals(serviceId2.getIdentifier(), actualServiceId);
 
 			//check service HAS_PARAMETER associations
-			Set<CtxAssociationIdentifier> hasParamIDs = serviceEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETER);
+			Set<CtxAssociationIdentifier> hasParamIDs = serviceEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS);
 			if(hasParamIDs == null){
 				LOG.error("2) NULL - no HAS_PARAMETER associations for SERVICE entity");
 			}
