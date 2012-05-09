@@ -22,52 +22,50 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.orchestration.api;
 
-package org.societies.android.platform.useragent;
+import org.societies.api.activity.IActivityFeed;
 
-import java.util.Arrays;
-import java.util.List;
+/**
+ * We need to remove this from the API. It is implementation specific.
+ * @author Babak.Farshchian@sintef.no
+ *
+ */
+/**
+ * Remove if deprecated
+ * MISSING_ANNOTATION
+ */
 
-import org.societies.api.identity.IIdentity;
+public class ICisEditor {
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-
-public class UserActionMonitor extends Activity implements OnClickListener {
+	public ICisEditor() {
+		
+	}
 	
-	private static final String LOG_TAG = UserActionMonitor.class.getName();
-	private static final List<String> ELEMENT_NAMES = Arrays.asList("userActionMonitorBean");
-    private static final List<String> NAME_SPACES = Arrays.asList(
-    		"http://societies.org/api/schema/useragent/monitoring");
-    private static final List<String> PACKAGES = Arrays.asList(
-		"org.societies.api.schema.useragent.monitoring");
-    
-    private static final String DESTINATION = "xcmanager.societies.local";
-    
-    private final IIdentity toXCManager = null;
-    //private ClientCommunicationMgr ccm;
-	
-	/** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.uam);
-        
-        Button sayHello = (Button)findViewById(R.id.sayHello);
-        sayHello.setOnClickListener(this);
-        
-        Button sayGoodbye = (Button)findViewById(R.id.sayGoodbye);
-        sayGoodbye.setOnClickListener(this);
+    /**
+     * Returns the CISActivityFeed for a specific CIS.
+     * 
+     * @param cssId The ID of the owner CSS.
+     * @param cisId The ID of the CIS.
+     * @return The CISActivityFeed of the CIS.
+     */
+    public IActivityFeed getActivityFeed(String cssId, String cisId) {
+    	return null;
     }
-    
-    public void onClick(View v){
-    	if(v.getId() == R.id.sayHello){
-			//send hello message to backend
-		}else if(v.getId() == R.id.sayGoodbye){
-			//send goodbye message to backend
-		}
+    public String getCisId() {
+    	return "";
     }
+    /**
+     * Updates an existing CIS with the data in the newCis. Update is done canonical. If it fails, the old CIS is
+     * not changed at all.
+     * 
+     * @param cssId The ID of the owner CSS
+     * @param newCis the data to be updated is specified in this CISRecord.
+     * @param oldCisId The ID of the CIS that needs to be updated.
+     * @return true if update was successful, 
+     */
+    public Boolean update(String cssId, ICisRecord newCis, String oldCisId) {
+    	return true;
+    }
+
 }
