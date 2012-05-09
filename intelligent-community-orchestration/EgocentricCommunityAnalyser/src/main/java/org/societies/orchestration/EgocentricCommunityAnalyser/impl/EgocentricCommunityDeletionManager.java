@@ -47,11 +47,19 @@ import org.societies.api.schema.context.contextschema.CtxBroker;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
-import org.societies.api.cis.management.ICisRecord;
+/**import org.societies.api.cis.management.ICisRecord;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
+
+import org.societies.api.cis.management.ICisEditor;*/
+
+import org.societies.orchestration.api.ICisRecord;
+import org.societies.orchestration.api.ICisManager;
+import org.societies.orchestration.api.ICisOwned;
+import org.societies.orchestration.api.ICisEditor;
 import org.societies.api.cis.management.ICisSubscribed;
-import org.societies.api.cis.management.ICisEditor;
+
+
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 //import org.societies.api.cis.management.ICis;
