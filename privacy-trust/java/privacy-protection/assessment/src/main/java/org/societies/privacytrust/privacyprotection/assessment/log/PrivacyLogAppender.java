@@ -129,6 +129,15 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	/* (non-Javadoc)
 	 * @see IPrivacyLogAppender#logCommsFw(IIdentity, IIdentity, Object)
 	 */
+	// The type parameter in comms fw is not type of data. It is not even used at the moment.
+	// The only option is to call getClass() on the payload. For any more info the Object payload
+	// should be typecasted and parsed (not feasible).
+	// implementation: call IIdentity.getType() to see if receiver is:
+	//   - CIS (CIS),
+	//   - some other CSS (CSS),
+	//   - or another node within same CSS (CSS_LIGHT, CSS_RICH)
+	// implementation: sentToGroup: true if receiver is CIS
+	// implementation: channelId = XMPP
 	@Override
 	public boolean logCommsFw(IIdentity sender, IIdentity receiver, Object payload) {
 		
