@@ -24,20 +24,10 @@
  */
 package org.societies.android.platform;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.societies.api.comm.xmpp.interfaces.ICommCallback;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.InvalidFormatException;
-import org.societies.identity.IdentityManagerImpl;
-
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
-import android.util.Log;
 
 
 /**
@@ -52,65 +42,60 @@ import android.util.Log;
  * @author Babak.Farshchian@sintef.no
  *
  */
-class CommunicationAdapter implements SocialAdapter{
+class CommunicationAdapter implements ISocialAdapter{
 
-    private boolean online = false;
-	
-    // Get an identifier for log messages:
-    private static final String LOG_TAG = CommunicationAdapter.class.getName();
-    //CIS manager relevant messages:
-    private static final List<String> ELEMENT_NAMES = Arrays.asList("communities", "subscribedTo",
-	    	"community-manager", "community", "create", "configure", "search-cis", "list", "delete");
-    //Specify the XCCom name spaces you understand:
-    private static final List<String> NAME_SPACES = Arrays.asList(
-	    		"http://societies.org/api/schema/cis/manager",
-	    		"http://societies.org/api/schema/cis/community");
-    // TODO: What does this mean?
-    private static final List<String> PACKAGES = Arrays.asList(
-			"org.societies.api.schema.cis.manager",
-			"org.societies.api.schema.cis.community");
-    //TODO: Address of the cloud node? I thought this was set in the comms manager?
-    private static final String DESTINATION = "xcmanager.jabber.sintef9013.com";
-
-    private final IIdentity toXCManager;
-    private final ICommCallback callback;
-   // private ClientCommunicationMgr ccm;
-    private Context context;
-
-    public CommunicationAdapter(Context _context){
-	context = _context;
-	//Create a callback class that will handle incoming messages:
-	callback = new CommunicationCallback(context, NAME_SPACES,PACKAGES);
-	//Get a JID-compatible identity for the XCManager in the cloud node:
-	// TODO: Why can't I use DESTINATION directly?
-   	try {
-  	    toXCManager = IdentityManagerImpl.staticfromJid(DESTINATION);
-    	    } catch (InvalidFormatException e) {
-    		Log.e(LOG_TAG, e.getMessage(), e);
-		throw new RuntimeException(e);
-		}     
-    }
+//    private boolean online = false;
+//	
+//    // Get an identifier for log messages:
+//    private static final String LOG_TAG = CommunicationAdapter.class.getName();
+//    //CIS manager relevant messages:
+//    private static final List<String> ELEMENT_NAMES = Arrays.asList("communities", "subscribedTo",
+//	    	"community-manager", "community", "create", "configure", "search-cis", "list", "delete");
+//    //Specify the XCCom name spaces you understand:
+//    private static final List<String> NAME_SPACES = Arrays.asList(
+//	    		"http://societies.org/api/schema/cis/manager",
+//	    		"http://societies.org/api/schema/cis/community");
+//    // TODO: What does this mean?
+//    private static final List<String> PACKAGES = Arrays.asList(
+//			"org.societies.api.schema.cis.manager",
+//			"org.societies.api.schema.cis.community");
+//    //TODO: Address of the cloud node? I thought this was set in the comms manager?
+//    private static final String DESTINATION = "xcmanager.jabber.sintef9013.com";
+//
+//    private final IIdentity toXCManager;
+//    private final ICommCallback callback;
+//   // private ClientCommunicationMgr ccm;
+//    private Context context;
+//
+//    public CommunicationAdapter(Context _context){
+//	context = _context;
+//	//Create a callback class that will handle incoming messages:
+//	callback = new CommunicationCallback(context, NAME_SPACES,PACKAGES);
+//	//Get a JID-compatible identity for the XCManager in the cloud node:
+//	// TODO: Why can't I use DESTINATION directly?
+//   	try {
+//  	    toXCManager = IdentityManagerImpl.staticfromJid(DESTINATION);
+//    	    } catch (InvalidFormatException e) {
+//    		Log.e(LOG_TAG, e.getMessage(), e);
+//		throw new RuntimeException(e);
+//		}     
+//    }
 	    
     /**
      * TODO: Need to implement this. It is going to be either done through a presence
      * value or through rela XMPP login.
      * @return
      */
-    public boolean isOnline(){
-	return online;
+    public boolean isConnected(){
+	return false;
     }
     /**
      * When CommunicationAdapter is created it does not go online automatically
      * You have to call this method explicitly
      * 
      * @return:
-     * 0 means not even tried
-     * 1 means I am online
-     * 2 means no network available on device
-     * 3 means service not responding
-     * 4 means authentication error
      */
-    int goOnline(){
+    public int connect(){
 	//TODO: log in to network.
 	
 	return 0;
@@ -119,8 +104,8 @@ class CommunicationAdapter implements SocialAdapter{
     /**
      * @return
      */
-    int goOffline(){
-	online = false;
+    public int disconnect(){
+//	online = false;
 	// TODO: clean up network
 	return 0;
     }
@@ -130,9 +115,9 @@ class CommunicationAdapter implements SocialAdapter{
     		String selection, 
     		String[] selectionArgs, 
     		String sortOrder){
-    	String[] columnNames = {SocialContract.Groups.NAME,
-				SocialContract.Groups.OWNER_ID,
-				SocialContract.Groups.CREATION_DATE};
+    	String[] columnNames = {SocialContract.Community.NAME,
+				SocialContract.Community.OWNER_ID,
+				SocialContract.Community.CREATION_DATE};
     	MatrixCursor cursor= new MatrixCursor(columnNames, 10);
     	String[] columnValues = {"XYZ", "babak@societies.org", "today"};
     	cursor.addRow(columnValues);
@@ -155,6 +140,11 @@ class CommunicationAdapter implements SocialAdapter{
 	}
 
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	@Override
+	public int connect(String username, String password) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
