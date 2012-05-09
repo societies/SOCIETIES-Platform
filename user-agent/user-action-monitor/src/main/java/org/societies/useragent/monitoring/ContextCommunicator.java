@@ -290,6 +290,7 @@ public class ContextCommunicator {
 			//create new LAST_ACTION attribute, update and add to entity
 			LOG.info("Creating LAST_ACTION attribute under SERVICE_PARAMETER entity with value: "+lastAction);
 			CtxAttribute newLastActionAttr = ctxBroker.createAttribute(serviceParamEntity.getId(), CtxAttributeTypes.LAST_ACTION).get();
+			ctxBroker.setHistoryTuples(newLastActionAttr.getId(), snpshtMgr.getSnapshot(newLastActionAttr.getId()));
 			ctxBroker.updateAttribute(newLastActionAttr.getId(), SerialisationHelper.serialise(lastAction));
 			
 			//update mappings
