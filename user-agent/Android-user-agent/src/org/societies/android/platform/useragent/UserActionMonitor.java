@@ -25,8 +25,6 @@
 
 package org.societies.android.platform.useragent;
 
-import ClientCommunicationMgr;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -49,7 +47,7 @@ public class UserActionMonitor extends Activity implements OnClickListener {
     
     private static final String DESTINATION = "xcmanager.societies.local";
     
-    private final IIdentity toXCManager;
+    private final IIdentity toXCManager = null;
     //private ClientCommunicationMgr ccm;
 	
 	/** Called when the activity is first created. */

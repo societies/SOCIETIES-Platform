@@ -46,7 +46,7 @@ public class GUI_UserAgent extends Activity implements OnClickListener{
 		feedbackButton.setOnClickListener(this);		
 	}
 
-	@Override
+	//@Override
 	public void onClick(View v) {
 		if(v.getId() == R.id.button1){
 			Intent showMonitoringGUI = new Intent();
