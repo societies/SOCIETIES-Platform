@@ -1,16 +1,22 @@
 package societies.integration.test.bit.user_preference_learning;
 
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.useragent.monitoring.IUserActionMonitor;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 import org.societies.integration.test.IntegrationTestCase;
-import org.societies.integration.test.IntegrationTestCase;
+import org.societies.api.internal.personalisation.IPersonalisationManager;
+
 
 public class Test748 extends IntegrationTestCase{
 	private static ICtxBroker ctxBroker;
 	private static IUserActionMonitor uam;
+	private static IPersonalisationManager personMan;
+	public static IPersonalisationManager getPersonMan() {
+		return personMan;
+	}
+
+	public static void setPersonMan(IPersonalisationManager personMan) {
+		Test748.personMan = personMan;
+	}
 
 	public Test748(int testCaseNumber, Class[] testCaseClasses) {
 		super(testCaseNumber, testCaseClasses);

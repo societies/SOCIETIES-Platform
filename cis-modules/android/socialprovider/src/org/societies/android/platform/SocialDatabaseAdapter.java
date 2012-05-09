@@ -37,6 +37,10 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
+ * This adapter will implement a local cache of Social Data.
+ * TODO: Currently it is used for testing purposes.
+ * All SQLite-related code is inside here.
+ * 
  * 
  * @author Babak.Farshchian@sintef.no
  *
@@ -64,11 +68,11 @@ class SocialDatabaseAdapter {
 		//SQL query for creating the Group DB:
 		private static final String GROUP_DB_CREAT = "create table " + GROUP_TABLE_NAME
 				+ " (" + 
-				SocialContract.Groups._ID + " integer primary key autoincrement, " +
-				SocialContract.Groups.NAME + " text not null, " + 
-				SocialContract.Groups.DISPLAY_NAME + " text not null, " + 
-				SocialContract.Groups.OWNER_ID + " text not null, " +
-				SocialContract.Groups.CREATION_DATE + "text not null);";
+				SocialContract.Community._ID + " integer primary key autoincrement, " +
+				SocialContract.Community.NAME + " text not null, " + 
+				SocialContract.Community.DISPLAY_NAME + " text not null, " + 
+				SocialContract.Community.OWNER_ID + " text not null, " +
+				SocialContract.Community.CREATION_DATE + "text not null);";
 		//TODO: Need the same for other DBs, e.g. people.
 
 		
@@ -152,7 +156,7 @@ class SocialDatabaseAdapter {
 	 * @return
 	 */
 	public boolean deleteCis(long _rowIndex){
-		return db.delete(GROUP_TABLE_NAME, SocialContract.Groups._ID + "=" + _rowIndex, null) > 0;
+		return db.delete(GROUP_TABLE_NAME, SocialContract.Community._ID + "=" + _rowIndex, null) > 0;
 	}
 	
 	/**
@@ -163,9 +167,9 @@ class SocialDatabaseAdapter {
 	 */
 	public boolean updateCis(long _rowIndex, String _name){
 		ContentValues newValues = new ContentValues();
-		newValues.put(SocialContract.Groups.NAME, _name);
+		newValues.put(SocialContract.Community.NAME, _name);
 		return db.update(GROUP_TABLE_NAME, newValues, 
-			SocialContract.Groups._ID + "=" + _rowIndex, null) >0;
+			SocialContract.Community._ID + "=" + _rowIndex, null) >0;
 	}
 	
 	/**
@@ -177,18 +181,18 @@ class SocialDatabaseAdapter {
 	public Cursor getAllCisCursor(){
 		return db.query(GROUP_TABLE_NAME, 
 				new String[]{
-			SocialContract.Groups._ID,
-			SocialContract.Groups.NAME, 
-			SocialContract.Groups.OWNER_ID,
-			SocialContract.Groups.DISPLAY_NAME }, 
+			SocialContract.Community._ID,
+			SocialContract.Community.NAME, 
+			SocialContract.Community.OWNER_ID,
+			SocialContract.Community.DISPLAY_NAME }, 
 					null, null, null, null, null);
 	}
 	
 	public Cursor setCursorToCis(long _rowIndex) throws SQLException {
 		Cursor result = db.query(true, GROUP_TABLE_NAME,
-			new String[] {SocialContract.Groups._ID, 
-			SocialContract.Groups.DISPLAY_NAME},
-			SocialContract.Groups._ID + "=" + _rowIndex, 
+			new String[] {SocialContract.Community._ID, 
+			SocialContract.Community.DISPLAY_NAME},
+			SocialContract.Community._ID + "=" + _rowIndex, 
 			null, null, null, null, null);
 		
 		if ((result.getCount() == 0) || !result.moveToFirst()) {
@@ -201,11 +205,11 @@ class SocialDatabaseAdapter {
 		Cursor cursor = db.query(true, 
 				GROUP_TABLE_NAME, 
 				new String[] {
-			SocialContract.Groups._ID,
-			SocialContract.Groups.NAME, 
-			SocialContract.Groups.OWNER_ID,
-			SocialContract.Groups.DISPLAY_NAME},
-			SocialContract.Groups._ID + "=" + _rowIndex,
+			SocialContract.Community._ID,
+			SocialContract.Community.NAME, 
+			SocialContract.Community.OWNER_ID,
+			SocialContract.Community.DISPLAY_NAME},
+			SocialContract.Community._ID + "=" + _rowIndex,
 			null, null, null, null, null);
 		
 		if((cursor.getCount() == 0) || !cursor.moveToFirst()) {
