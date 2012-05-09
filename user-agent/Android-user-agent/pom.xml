@@ -32,7 +32,7 @@
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
-	</dependency>
+		</dependency>
         <dependency>
             <groupId>com.phonegap</groupId>
             <artifactId>phonegap</artifactId>
