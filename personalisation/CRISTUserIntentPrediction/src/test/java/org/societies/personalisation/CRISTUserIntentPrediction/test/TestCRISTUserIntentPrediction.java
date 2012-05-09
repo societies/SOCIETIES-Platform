@@ -60,7 +60,7 @@ public class TestCRISTUserIntentPrediction {
 	private CtxAttribute myCtx;
 	private IAction myAction;
 	
-	
+	/*
 	@Before
 	public void setUp() throws Exception {
 		
@@ -104,5 +104,5 @@ public class TestCRISTUserIntentPrediction {
 						serviceID, "volume");
 		fail("Not yet implemented");
 	}
-
+*/
 }
