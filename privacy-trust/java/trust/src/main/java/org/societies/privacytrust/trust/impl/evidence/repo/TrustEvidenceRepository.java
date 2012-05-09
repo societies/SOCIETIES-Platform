@@ -52,7 +52,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 /**
- * Describe your class here...
+ * Implementation of the {@link ITrustEvidenceRepository} interface.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.8
@@ -211,9 +211,13 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 	@Override
 	public void removeAllIndirectEvidence(final TrustedEntityId teid) 
 			throws TrustEvidenceRepositoryException {
-		// TODO Auto-generated method stub
+		
 		if (teid == null)
 			throw new NullPointerException("teid can't be null");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Removing all indirect trust evidence for TEID " + teid + " from the Trust Evidence Repository...");
+		this.removeIndirectEvidence(teid, null, null);
 	}
 
 	/*
@@ -223,9 +227,14 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 	public void removeIndirectEvidence(final TrustedEntityId teid,
 			final Date startDate, final Date endDate)
 			throws TrustEvidenceRepositoryException {
-		// TODO Auto-generated method stub
+		
 		if (teid == null)
 			throw new NullPointerException("teid can't be null");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Removing indirect trust evidence between dates '"
+					+ startDate + "' and '" + endDate + "' for TEID " + teid + " from the Trust Evidence Repository...");
+		// TODO this.remove(teid, X.class, startDate, endDate);
 	}
 	
 	@SuppressWarnings("unchecked")
