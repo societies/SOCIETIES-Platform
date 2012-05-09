@@ -28,6 +28,8 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -59,14 +61,15 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
-import org.societies.api.personalisation.model.Action;
-import org.societies.api.personalisation.model.IAction;
-
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.context.broker.impl.InternalCtxBroker;
 
 import org.societies.context.broker.test.util.MockBlobClass;
 import org.societies.context.user.db.impl.UserCtxDBMgr;
 import org.societies.context.userHistory.impl.UserContextHistoryManagement;
+
 
 /**
  * Describe your class here...
@@ -220,7 +223,7 @@ public class InternalCtxBrokerTest {
 	public void testCreateAssociationString() {
 		try {
 			CtxAssociation ctxAssocHasServ = internalCtxBroker.createAssociation("hasService").get();
-			
+
 			List<CtxIdentifier> assocIdentifierList = internalCtxBroker.lookup(CtxModelType.ASSOCIATION, "hasService").get();
 			assertEquals(assocIdentifierList.size(),1);
 			CtxIdentifier retrievedAssocHasServID = assocIdentifierList.get(0);
@@ -240,12 +243,78 @@ public class InternalCtxBrokerTest {
 
 	}
 
+	@Test
+	public void testStoreRetrieveServiceParameters2() {
+		
+		
+		//	ServiceResourceIdentifier serviceId2 = new ServiceResourceIdentifier();
+//		serviceId2.setIdentifier(new URI("http://testService2"));
+		IIdentity identity = new MockIdentity(IdentityType.CSS, "sarah", "societies.org");
+		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
+		try {
+			serviceId1.setIdentifier(new URI("http://testService1"));
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		System.out.println("testStoreRetrieveServiceParameters service created :"+ serviceId1);
+		
+		try {
+			IndividualCtxEntity operator = (IndividualCtxEntity) this.internalCtxBroker.createIndividualEntity("Person").get();
+			//IndividualCtxEntity operator = this.internalCtxBroker.retrieveCssOperator().get();
+			//System.out.println("operator "+operator);
+			// create service attribute
+			CtxAttribute service1Attr = this.internalCtxBroker.createAttribute(operator.getId(), "service").get();
+			final byte[] service1Blob = SerialisationHelper.serialise(serviceId1);
+			service1Attr = this.internalCtxBroker.updateAttribute(service1Attr.getId(), service1Blob).get();
+
+			// retrieve service attribute
+			List<CtxIdentifier> listAttrs = this.internalCtxBroker.lookup(CtxModelType.ATTRIBUTE, "service").get();
+			CtxIdentifier serviceAttrID = listAttrs.get(0);
+			CtxAttribute ctxAttrRetrieved = (CtxAttribute) this.internalCtxBroker.retrieve(serviceAttrID).get();
+						
+			ServiceResourceIdentifier ctxAttrRetrievedValue = (ServiceResourceIdentifier) SerialisationHelper.deserialise(ctxAttrRetrieved.getBinaryValue(), this.getClass().getClassLoader());
+			
+			System.out.println("testStoreRetrieveServiceParameters service retrieved :"+ ctxAttrRetrievedValue);
+			
+			
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+	}
+
+
+
 	/**
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#createAssociation(java.lang.String)}.
 	 */
 	@Ignore
 	@Test
 	public void testStoreRetrieveServiceParameters() {
+
+		IIdentity identity = new MockIdentity(IdentityType.CSS, "sarah", "societies.org");
+		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
+		ServiceResourceIdentifier serviceId2 = new ServiceResourceIdentifier();
+		try {
+			serviceId1.setIdentifier(new URI("http://testService1"));
+			serviceId2.setIdentifier(new URI("http://testService2"));
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
 
 		try {
 			IndividualCtxEntity operator = this.internalCtxBroker.retrieveCssOperator().get();
@@ -333,11 +402,10 @@ public class InternalCtxBrokerTest {
 			hasServiceAssoc.setParentEntity(person.getId());
 
 			hasServiceAssoc = (CtxAssociation) this.internalCtxBroker.update(hasServiceAssoc).get();
-			System.out.println("hasServiceAssoc "+hasServiceAssoc);
+			//System.out.println("hasServiceAssoc "+hasServiceAssoc);
 
 			serviceEnt = (CtxEntity) this.internalCtxBroker.update(serviceEnt).get();
 			person = (CtxEntity) this.internalCtxBroker.update(person).get();
-
 
 			//retrieve assoc data
 			CtxAssociationIdentifier retrievedAssocID = null;
@@ -346,51 +414,51 @@ public class InternalCtxBrokerTest {
 
 			List<CtxIdentifier> list = this.internalCtxBroker.lookup(CtxModelType.ENTITY ,"Person").get();
 			if(list.size()>0) {
-				System.out.println("list "+list);
 				CtxIdentifier persID = list.get(0);				
 				CtxEntity retrievedEnt = (CtxEntity) this.internalCtxBroker.retrieve(persID).get();
-				System.out.println("retrievedEnt "+retrievedEnt);
 
+				assertEquals(retrievedEnt,person);			
 				Set<CtxAssociationIdentifier> assocIDSet = retrievedEnt.getAssociations();
-				System.out.println("Association1 set " + assocIDSet);
-				System.out.println("Association1 set " + assocIDSet.size());
+
+				for(CtxAssociationIdentifier assocID :assocIDSet){
+					assertEquals(assocID,hasServiceAssoc.getId());
+				}
+
+				//	System.out.println("Association1 set " + assocIDSet);
+				//	System.out.println("Association1 set " + assocIDSet.size());
 
 				Set<CtxAssociationIdentifier> assocIDSet2 = retrievedEnt.getAssociations("hasService");
-				System.out.println("6");
-				System.out.println("assocIDSet2 size "+assocIDSet2.size());
-				System.out.println("assocIDSet2 "+assocIDSet2);
+				//		System.out.println("assocIDSet2 size "+assocIDSet2.size());
+				//		System.out.println("assocIDSet2 "+assocIDSet2);
 
-
-				/*
 				for(CtxAssociationIdentifier assocID : assocIDSet2 ){
-					System.out.println("Association2 set " + assocID);
+					//System.out.println("Association2 set " + assocID);
 					retrievedAssocID = assocID;
 				}
 				CtxAssociation hasServiceRetrieved = (CtxAssociation) this.internalCtxBroker.retrieve(retrievedAssocID).get();
-				System.out.println("7");
 
-				if(hasServiceRetrieved != null && hasService != null){
-					if(hasServiceRetrieved.equals(hasService))System.out.println("CtxAssociation Retrieved matches created CtxAssociation");	
+				if(hasServiceRetrieved != null && hasServiceAssoc != null){
+					assertEquals(hasServiceRetrieved,hasServiceAssoc);
+					//if(hasServiceRetrieved.equals(hasServiceAssoc))System.out.println("CtxAssociation Retrieved matches created CtxAssociation");	
 				}
 
-				System.out.println("hasServiceRetrieved "+ hasServiceRetrieved);
-
-				Set<CtxEntityIdentifier> assocEntitiesSet = hasServiceRetrieved.getChildEntities();
+				//System.out.println("hasServiceRetrieved "+ hasServiceRetrieved);
+				Set<CtxEntityIdentifier> assocEntitiesSet = hasServiceRetrieved.getChildEntities("ServiceID");
 				for(CtxEntityIdentifier ctxAssocEntityId : assocEntitiesSet ){
 					serviceRetrieved = (CtxEntity) this.internalCtxBroker.retrieve(ctxAssocEntityId).get();		
-					System.out.println("ctxAssocEntityId "+ ctxAssocEntityId);
+					//System.out.println("ctxAssocEntityId "+ ctxAssocEntityId);
 				}
+				System.out.println("^^^^^^^^^^^^^^^^ serviceRetrieved "+ serviceRetrieved.getId());
+				System.out.println("^^^^^^^^^^^^^^^^ serviceEnt "+ serviceEnt.getId());
+				assertEquals(serviceRetrieved,serviceEnt);
+				//if(serviceRetrieved.equals(serviceEnt)) System.out.println("CtxAssociation Retrieved matches created CtxAssociation");
 
-				if(serviceRetrieved.equals(serviceEnt)) System.out.println("CtxAssociation Retrieved matches created CtxAssociation");
-				System.out.println("8");
 				for(CtxAttribute ctxAttributeRetrived : serviceRetrieved.getAttributes("parameterName1") ){
-					System.out.println("ctxAttributeRetrived "+ ctxAttributeRetrived);
+					//	System.out.println("ctxAttributeRetrived "+ ctxAttributeRetrived);
 					ctxServiceAttrRetrieved = ctxAttributeRetrived;
 				}
-				if(ctxServiceAttrRetrieved.equals(serviceAttr)) System.out.println("ctxServiceAttrRetrieved Retrieved matches created serviceAttr");
-				System.out.println("9");
-
-				 */
+				//if(ctxServiceAttrRetrieved.equals(serviceAttr)) System.out.println("ctxServiceAttrRetrieved Retrieved matches created serviceAttr");
+				assertEquals(ctxServiceAttrRetrieved,serviceAttr);
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -402,9 +470,7 @@ public class InternalCtxBrokerTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
-
 
 	/**
 	 * Test method for {@link org.societies.context.broker.impl.InternalCtxBroker#retrieveAdministratingCSS(org.societies.api.context.model.CtxEntityIdentifier)}.
@@ -1072,10 +1138,10 @@ public class InternalCtxBrokerTest {
 			Set<CtxAttribute> atrrSet1 = ent1.getAttributes("blobValue");
 			for(CtxAttribute attr: atrrSet1){
 				final MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(attr.getBinaryValue(), this.getClass().getClassLoader());
-			//	System.out.println("retrievedBlob.getSeed() "+retrievedBlob.getSeed());
+				//	System.out.println("retrievedBlob.getSeed() "+retrievedBlob.getSeed());
 				assertEquals(retrievedBlob.getSeed(),125);
 			}
-	
+
 
 			List<CtxEntityIdentifier> serviceEntIdStrings = internalCtxBroker.lookupEntities(allServiceEntIds, "stringValue", "StringB").get();
 			//System.out.println("results serviceEntIds:"+serviceEntIdStrings);

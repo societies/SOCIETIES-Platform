@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
@@ -28,7 +29,7 @@ public class RetrieveLearnedModelTest {
 		//System.out.println(" ctxBroker "+ctxBroker);
 	}
 
-
+	@Ignore
 	@Test
 	public void test() {
 		try {

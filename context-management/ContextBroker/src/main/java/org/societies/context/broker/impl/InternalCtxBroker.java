@@ -231,8 +231,10 @@ public class InternalCtxBroker implements ICtxBroker {
 
 				Set<CtxAttribute> ctxAttrSet = entity.getAttributes(ctxAttributeType);
 				for(CtxAttribute ctxAttr : ctxAttrSet){
-					System.out.println("---- lookup attr id " +ctxAttr.getId());
+					LOG.info("---- lookupEntities,  attr id " +ctxAttr.getId());
+					
 					if(compareAttributeValues(ctxAttr,value)) {
+						LOG.info("---- lookupEntities,  " +ctxAttr.getId());
 						entityList.add(entityId);
 					}
 				}
@@ -693,6 +695,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 			//this attr will maintain the attr ids of all the (not only the escorting) hoc_attibutes in a blob
 			final String tupleAttrType = "tupleIds_" + primaryAttrIdentifier.getType();
+			//final String tupleAttrType = "tupleIds_" + primaryAttrIdentifier.toString();
 			final CtxAttribute tupleAttr = (CtxAttribute) this.createAttribute(primaryAttrIdentifier.getScope(), tupleAttrType).get();
 
 			byte[] attrIdsBlob = SerialisationHelper.serialise((Serializable) allAttrIds);
