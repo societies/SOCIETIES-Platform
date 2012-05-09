@@ -93,7 +93,7 @@ public class MergingManager implements IC45Consumer{
 	@Override
 	public void handleC45Output(List<IC45Output> list) {
 		try{
-			logging.debug(this.getClass().getName()+ " received C45Output!");
+			logging.debug(this.getClass().getName()+ " received C45Output! size of list:" +list.size());
 			for (IC45Output output : list){
 
 				IIdentity identity = output.getOwner();
