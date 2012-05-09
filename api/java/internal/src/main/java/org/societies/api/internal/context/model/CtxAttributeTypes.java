@@ -37,7 +37,12 @@ public class CtxAttributeTypes extends
 		org.societies.api.context.model.CtxAttributeTypes {
 	
 	/**
+     * @since 0.0.8
+     */
+    public static final String DIANNE = "dianne";
+	
+	/**
      * 
      */
-    public static final String PARAMETER_NAME = "parameterName";
+    public static final String PARAMETER_NAME = "parameterName";   
 }
