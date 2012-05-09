@@ -136,11 +136,13 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 	@Override
 	public Set<IIndirectTrustEvidence> retrieveAllIndirectEvidence(
 			TrustedEntityId teid) throws TrustEvidenceRepositoryException {
-		// TODO Auto-generated method stub
+		
 		if (teid == null)
 			throw new NullPointerException("teid can't be null");
 		
-		return null;
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving all indirect trust evidence for TEID " + teid + " from the Trust Evidence Repository...");		
+		return this.retrieveIndirectEvidence(teid, null, null);
 	}
 
 	/*
@@ -150,11 +152,17 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 	public Set<IIndirectTrustEvidence> retrieveIndirectEvidence(
 			TrustedEntityId teid, Date startDate, Date endDate)
 			throws TrustEvidenceRepositoryException {
-		// TODO Auto-generated method stub
+		
 		if (teid == null)
 			throw new NullPointerException("teid can't be null");
 		
-		return null;
+		final Set<IIndirectTrustEvidence> result = new HashSet<IIndirectTrustEvidence>();
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving indirect trust evidence between dates '"
+					+ startDate + "' and '" + endDate + "' for TEID " + teid + " from the Trust Evidence Repository...");
+		// TODO result.addAll(this.retrieve(teid, X.class, startDate, endDate));
+		
+		return result;
 	}
 
 	/*
