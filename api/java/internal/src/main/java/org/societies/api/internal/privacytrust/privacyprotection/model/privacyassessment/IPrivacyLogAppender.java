@@ -25,7 +25,10 @@ import java.util.Date;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.broker.ICtxBroker;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 
 /**
  * Interface for appending to log
@@ -33,22 +36,6 @@ import org.societies.api.identity.IIdentity;
  * @author Mitja Vardjan
  */
 public interface IPrivacyLogAppender {
-
-	/**
-	 * Log any outgoing information
-	 * 
-	 * @param dataType
-	 * @param time
-	 * @param sentToGroup    True if multicast
-	 * @param sender    CSS ID of the sender
-	 * @param receiver    CSS ID of the receiver
-	 * @param channelId    ID of the channel. Examples: facebook, facebook wall post,
-	 * twitter, XMPP
-	 * 
-	 * @return true if OK to send the data, false to cancel
-	 */
-	//public boolean log(String dataType, Date time, boolean sentToGroup, IIdentity sender,
-	//		IIdentity receiver, ChannelType channelId);
 
 	/**
 	 * Log any outgoing information that is being sent through Communication Framework with either:<br/>
@@ -80,5 +67,20 @@ public interface IPrivacyLogAppender {
 	public boolean logSN(String dataType, Date time, boolean sentToGroup, IIdentity sender,
 			IIdentity receiver, ChannelType channelId);
 
+	/**
+	 * Log any read access to context with
+	 * {@link ICtxBroker#retrieve(Requestor, CtxIdentifier)}
+	 * and other relevant retrieve* methods.
+	 * 
+	 * @param requestor
+	 */
+	public void logContext(Requestor requestor);
+	
+	/**
+	 * General logger.
+	 * 
+	 * @param entry
+	 * @return
+	 */
 	public boolean log(LogEntry entry);
 }

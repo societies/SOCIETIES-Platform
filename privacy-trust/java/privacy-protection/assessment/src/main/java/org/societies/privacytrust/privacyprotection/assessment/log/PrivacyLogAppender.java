@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.ChannelType;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.LogEntry;
@@ -144,6 +145,12 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		LOG.debug("logCommsFw()");
 
 		return true;
+	}
+	
+	@Override
+	public void logContext(Requestor requestor) {
+		
+		LOG.debug("logContext()");
 	}
 
 	/* (non-Javadoc)
