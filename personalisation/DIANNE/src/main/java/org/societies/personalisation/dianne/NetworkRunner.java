@@ -40,7 +40,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 
 public class NetworkRunner implements Runnable{
 
-	public Network networkModel;
+	public Network network;
 	private NetworkBuffer buffer;
 	private int nur = 1000;  //network update rate
 	private int contextNodeCount;
@@ -51,8 +51,9 @@ public class NetworkRunner implements Runnable{
 	private Object pauseMonitor = new Object();
 	private boolean paused = false;
 
-	public NetworkRunner(){
-		networkModel= new Network();
+	public NetworkRunner(Network network){
+		this.network = network;
+		
 		buffer = new NetworkBuffer();
 		contextNodeCount = 0;
 		outcomeNodeCount = 0;
@@ -123,7 +124,7 @@ public class NetworkRunner implements Runnable{
 			String nodeName = nextUpdate.getvalue();
 
 			//search for group
-			ContextGroup contextGroup = networkModel.getContextGroup(groupName);
+			ContextGroup contextGroup = network.getContextGroup(groupName);
 			if(contextGroup != null) //group exists
 			{
 				//file.println("Group "+groupName+" already exists");
@@ -180,14 +181,14 @@ public class NetworkRunner implements Runnable{
 		//create new context node for group
 		createNewContextNode(newContextGroup, nodeName);
 		//add new group to list
-		networkModel.addContextGroup(newContextGroup);
+		network.addContextGroup(newContextGroup);
 	}
 	
 	private void refreshActiveNodes()
 	{
 		//update outcome node potentials
 		//activate nodes with highest potentials
-		Iterator<OutcomeGroup> outcomeGroups_it = networkModel.getOutcomeGroups().iterator();
+		Iterator<OutcomeGroup> outcomeGroups_it = network.getOutcomeGroups().iterator();
 		while(outcomeGroups_it.hasNext())
 		{
 			OutcomeGroup nextGroup = (OutcomeGroup)outcomeGroups_it.next();
@@ -211,7 +212,7 @@ public class NetworkRunner implements Runnable{
 			String nodeName = nextUpdate.getvalue();
 
 			//search for group
-			OutcomeGroup outcomeGroup = networkModel.getOutcomeGroup(serviceId, groupName);
+			OutcomeGroup outcomeGroup = network.getOutcomeGroup(serviceId, groupName);
 			if(outcomeGroup != null) //group exists
 			{
 				//file.println("Group "+groupName+" already exists");
@@ -265,13 +266,13 @@ public class NetworkRunner implements Runnable{
 		//create new outcome node for group
 		createNewOutcomeNode(newOutcomeGroup, nodeName);
 		//add new group to list
-		networkModel.addOutcomeGroup(newOutcomeGroup);
+		network.addOutcomeGroup(newOutcomeGroup);
 	}
 
 	private void connectOutcomes(ContextNode node){
 		int preNodeID = node.getID();
 
-		Iterator<OutcomeGroup> list_it = networkModel.getOutcomeGroups().iterator();
+		Iterator<OutcomeGroup> list_it = network.getOutcomeGroups().iterator();
 		while(list_it.hasNext())
 		{
 			OutcomeGroup nextGroup = (OutcomeGroup)list_it.next();
@@ -292,7 +293,7 @@ public class NetworkRunner implements Runnable{
 				node.addSynapse(synapse);
 				nextNode.addSynapse(synapse);
 
-				networkModel.addSynapse(synapse);
+				network.addSynapse(synapse);
 			}
 		}
 	}
@@ -300,7 +301,7 @@ public class NetworkRunner implements Runnable{
 	private void connectContext(OutcomeNode node){
 		int postNodeID = node.getID();
 
-		Iterator<ContextGroup> list_it = networkModel.getContextGroups().iterator();
+		Iterator<ContextGroup> list_it = network.getContextGroups().iterator();
 		while(list_it.hasNext())
 		{
 			ContextGroup nextGroup = (ContextGroup)list_it.next();
@@ -321,7 +322,7 @@ public class NetworkRunner implements Runnable{
 				node.addSynapse(synapse);
 				nextNode.addSynapse(synapse);
 
-				networkModel.addSynapse(synapse);
+				network.addSynapse(synapse);
 			}
 		}
 	}
@@ -334,7 +335,7 @@ public class NetworkRunner implements Runnable{
 		//update synapses
 		updateSynapses();
 		//calculate new winners and communicate
-		Iterator<OutcomeGroup> outcomeGroups_it = networkModel.getOutcomeGroups().iterator();
+		Iterator<OutcomeGroup> outcomeGroups_it = network.getOutcomeGroups().iterator();
 		while(outcomeGroups_it.hasNext())
 		{
 			OutcomeGroup nextGroup = (OutcomeGroup)outcomeGroups_it.next();
@@ -344,7 +345,7 @@ public class NetworkRunner implements Runnable{
 
 	public void updateSynapses()
 	{
-		Iterator<Synapse> synapses_it = networkModel.getSynapses().iterator();
+		Iterator<Synapse> synapses_it = network.getSynapses().iterator();
 		while(synapses_it.hasNext())
 		{
 			Synapse nextSynapse = (Synapse)synapses_it.next();
