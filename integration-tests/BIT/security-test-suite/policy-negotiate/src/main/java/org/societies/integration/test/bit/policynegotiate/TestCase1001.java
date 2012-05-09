@@ -4,7 +4,7 @@
 package org.societies.integration.test.bit.policynegotiate;
 
 /**
- * The test case 713 aims to test 3P service installation.
+ * The test case 1001 aims to test 3P service installation.
  */
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +12,8 @@ import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.integration.test.IntegrationTestCase;
 
-public class TestCase713 extends IntegrationTestCase {
-	private static Logger LOG = LoggerFactory.getLogger(TestCase713.class);
+public class TestCase1001 extends IntegrationTestCase {
+	private static Logger LOG = LoggerFactory.getLogger(TestCase1001.class);
 
 	/**
 	 * Secure policy negotiator (injected)
@@ -25,18 +25,18 @@ public class TestCase713 extends IntegrationTestCase {
 	 */
 	private static INegotiationProviderRemote groupMgr;
 
-	public TestCase713() {
+	public TestCase1001() {
 		// Call the super constructor
 		// with test case number
 		// and test case classes to run
-		//super(713, new Class[] {SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
-		super(713, new Class[] {NominalTestCaseLowerTester.class});
-		NominalTestCaseLowerTester.testCaseNumber = 713;
+		//super(1001, new Class[] {SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
+		super(1001, new Class[] {NominalTestCaseLowerTester.class});
+		NominalTestCaseLowerTester.testCaseNumber = 1001;
 	}
 
 	public void setNegotiator(INegotiation negotiator) {
-		LOG.debug("[#713] setNegotiator()");
-		TestCase713.negotiator = negotiator;
+		LOG.debug("[#1001] setNegotiator()");
+		TestCase1001.negotiator = negotiator;
 	}
 	
 	protected static INegotiation getNegotiator() {
@@ -44,8 +44,8 @@ public class TestCase713 extends IntegrationTestCase {
 	}
 
 	public void setGroupMgr(INegotiationProviderRemote groupMgr) {
-		LOG.debug("[#713] setGroupMgr()");
-		TestCase713.groupMgr = groupMgr;
+		LOG.debug("[#1001] setGroupMgr()");
+		TestCase1001.groupMgr = groupMgr;
 	}
 	
 	protected static INegotiationProviderRemote getGroupMgr() {

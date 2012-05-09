@@ -20,8 +20,8 @@
 		http://www.springframework.org/schema/tx/spring-tx.xsd" >
 
     <bean
-        id="TestCase713"
-        class="org.societies.integration.test.bit.policynegotiate.TestCase713"
+        id="TestCase1001"
+        class="org.societies.integration.test.bit.policynegotiate.TestCase1001"
 		depends-on="NegotiationProviderRemote,NegotiationRequester"
         init-method="run">
   		<property name="groupMgr" ref="NegotiationProviderRemote"/>
