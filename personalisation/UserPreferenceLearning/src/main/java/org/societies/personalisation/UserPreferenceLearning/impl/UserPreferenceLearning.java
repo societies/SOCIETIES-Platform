@@ -38,55 +38,55 @@ import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45L
 import org.societies.personalisation.preference.api.model.IC45Consumer;
 
 public class UserPreferenceLearning implements IC45Learning{
-	
+
 	private AA_AI aa_ai;
 	private AA_SI aa_si;
 	private SA_AI sa_ai;
 	private SA_SI sa_si;
-	private HistoryRetriever historyRetriever;
 	private ICtxBroker ctxBroker;
 
 	@Override
 	//run preference learning on all actions for all identities
 	public void runC45Learning(IC45Consumer requestor, Date startDate) {
-		aa_ai = new AA_AI(requestor, startDate, historyRetriever);
-        aa_ai.start();
+		aa_ai = new AA_AI(requestor, startDate, ctxBroker);
+		aa_ai.start();
 	}
 
 	@Override
 	//run preference learning on specific service action parameterName for all identities
 	public void runC45Learning(IC45Consumer requestor, Date startDate,
 			ServiceResourceIdentifier serviceId, String parameterName) {
-		sa_ai = new SA_AI(requestor, startDate, serviceId, parameterName, historyRetriever);
-        sa_ai.start();
+		sa_ai = new SA_AI(requestor, startDate, serviceId, parameterName, ctxBroker);
+		sa_ai.start();
 	}
+
 	
+	/*
+	 * IIdentity parameter is ignored until further notice
+	 */
 	@Override
-    //run C45 on all actions for specific identity
-    public void runC45Learning(IC45Consumer requestor, Date startDate, IIdentity historyOwner){
-        aa_si = new AA_SI(requestor, startDate, historyOwner, historyRetriever);
-        aa_si.start();
-    }
+	//run C45 on all actions for specific identity
+	public void runC45Learning(IC45Consumer requestor, Date startDate, IIdentity historyOwner){
+		aa_si = new AA_SI(requestor, startDate, historyOwner, ctxBroker);
+		aa_si.start();
+	}
 
 	@Override
-    //run C45 learning on specific service action for specific identity
-    public void runC45Learning(IC45Consumer requestor, Date startDate, IIdentity historyOwner,
-    		ServiceResourceIdentifier serviceId, String parameterName){
-        sa_si = new SA_SI(requestor, startDate, historyOwner, serviceId, parameterName, historyRetriever);
-        sa_si.start();
-    }
-	
-	public void initialiseUserPreferenceLearning(){
-		if(this.ctxBroker == null){
-			System.out.println("ctxBroker is null :(");
-		}else{
-			System.out.println("ctxBroker is not null :)");
-			historyRetriever = new HistoryRetriever(ctxBroker);
-		}
+	//run C45 learning on specific service action for specific identity
+	public void runC45Learning(IC45Consumer requestor, Date startDate, IIdentity historyOwner,
+			ServiceResourceIdentifier serviceId, String parameterName){
+		sa_si = new SA_SI(requestor, startDate, historyOwner, serviceId, parameterName, ctxBroker);
+		sa_si.start();
 	}
 	
+	
+
+	public void initialiseUserPreferenceLearning(){
+		//null
+	}
+
 	public void setCtxBroker(ICtxBroker broker){
 		this.ctxBroker = broker;
 	}
-	
+
 }
