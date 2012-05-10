@@ -30,8 +30,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceLearning.impl.C45Output;
 import org.societies.personalisation.UserPreferenceLearning.impl.CtxIdentifierCache;
@@ -49,6 +52,7 @@ import weka.core.Instances;
 
 public class SA_SI extends Thread{
 
+	private Logger LOG = LoggerFactory.getLogger(SA_SI.class);
 	private IC45Consumer requestor;
 	private Date startDate;
 	private IIdentity historyOwner;
@@ -59,21 +63,22 @@ public class SA_SI extends Thread{
 	private PostProcessor postProcessor;
 
 	public SA_SI(IC45Consumer requestor, Date startDate, IIdentity historyOwner, 
-			ServiceResourceIdentifier serviceId, String parameterName, HistoryRetriever historyRetriever){
+			ServiceResourceIdentifier serviceId, String parameterName, ICtxBroker ctxBroker){
 		this.requestor = requestor;
 		this.startDate = startDate;
 		this.historyOwner = historyOwner;
 		this.serviceId = serviceId;
 		this.parameterName = parameterName;
-		this.historyRetriever = historyRetriever;
+		
+		historyRetriever = new HistoryRetriever(ctxBroker);
 		preProcessor = new PreProcessor();
 		postProcessor = new PostProcessor(); 
 	}
 
 	@Override
 	public void run(){
-		System.out.println("C45 REQUEST FROM: "+requestor.getClass().getName());
-		System.out.println("Starting C45 learning process for history owner: "+historyOwner.toString()+
+		LOG.info("C45 REQUEST FROM: "+requestor.getClass().getName());
+		LOG.info("Starting C45 learning process for history owner: "+historyOwner.toString()+
 				" on action: "+parameterName+" for serviceId: "+serviceId.toString());
 
 		//create new Cache for cycle
@@ -83,11 +88,11 @@ public class SA_SI extends Thread{
 
 		//get history
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history = 
-				historyRetriever.getHistory();
+				historyRetriever.getFullHistory(startDate);
 
 		if(history != null && history.size()>0){
 			//store context attribute identifiers with types
-			cache.cacheCtxIdentifiers(historyOwner, history);
+			cache.cacheCtxIdentifiers(history);
 
 			//extract instances with serviceId and action
 			//System.out.println("Extracting "+parameterName+" actions for service "+serviceId.toString()+" from history");
@@ -110,14 +115,14 @@ public class SA_SI extends Thread{
 				output.add(nextOutput);
 			}
 		}else{
-			System.out.println("No History found for history owner: "+historyOwner.toString());
+			LOG.error("No History found for history owner: "+historyOwner.toString());
 		}
 		//send DPI based output to requestor
-		System.out.println("RETURNING C45 OUTPUT TO: "+requestor.getClass().getName());
+		LOG.info("RETURNING C45 OUTPUT TO: "+requestor.getClass().getName());
 		try{
 			requestor.handleC45Output(output);
 		}catch(Exception e){
-			System.out.println("The C45 requestor service is not available to handle response");
+			LOG.error("The C45 requestor service is not available to handle response");
 		}
 	}
 
@@ -143,7 +148,7 @@ public class SA_SI extends Thread{
 
 		//convert tree strings into JTrees for output
 		String paramName = input.getParameterName();
-		return (IPreferenceTreeModel)postProcessor.process(historyOwner, paramName, outputString, cache, serviceId, serviceType);
+		return (IPreferenceTreeModel)postProcessor.process(paramName, outputString, cache, serviceId, serviceType);
 	}
 
 	private String executeAlgorithm(Instances input)throws Exception
