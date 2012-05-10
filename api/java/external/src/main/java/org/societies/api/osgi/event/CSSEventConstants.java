@@ -23,17 +23,31 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.societies.api.osgi.event;
+
 /**
- * 
- * @author pkuppuud
+ * The societies osgi CSSEventConstants class.
  *
+ * @author pkuppuud
  */
+
+
 public class CSSEventConstants {
 
+    /** The Constant EVENT_NAME. */
     public static final String EVENT_NAME = "event_name";
+    
+    /** The Constant EVENT_SOURCE. */
     public static final String EVENT_SOURCE = "event_source";
+    
+    /** The Constant EVENT_INFO. */
     public static final String EVENT_INFO = "event_info";
+    
+    /** The Constant EVENT_TARGET. */
     public static final String EVENT_TARGET = "eventTarget";
+    
+    /** The Constant INTERNAL_EVENT. */
     public static final String INTERNAL_EVENT = "internalEvent";
+    
+    /** The Constant EXTERNAL_EVENT. */
     public static final String EXTERNAL_EVENT = "externalEvent";
 }

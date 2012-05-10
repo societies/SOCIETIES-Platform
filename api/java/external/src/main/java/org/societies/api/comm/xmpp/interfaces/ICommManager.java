@@ -31,91 +31,153 @@ import org.societies.api.comm.xmpp.datatypes.XMPPNode;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
 
 /**
+ * The Interface ICommManager.
+ *
  * @author Joao M. Goncalves (PTIN)
  * 
- *         This is the interface of the service exposed by this OSGi bundle. It
- *         defines methods that allow other bundles to send and register for the
- *         receipt of XMPP messages. This service handles the connection,
- *         parsing and routing of messages, allowing individual bundles to focus
- *         on the specific logic. Each registered bundle must be able to address
- *         some namespace. After a bundle registrers with the
- *         CommunicationFrameworkBundle claiming some namespace, the
- *         CommunicationFrameworkBundle will automatically adjust its supported
- *         features in order to include that namespace.
- * 
+ * This is the interface of the service exposed by this OSGi bundle. It
+ * defines methods that allow other bundles to send and register for the
+ * receipt of XMPP messages. This service handles the connection,
+ * parsing and routing of messages, allowing individual bundles to focus
+ * on the specific logic. Each registered bundle must be able to address
+ * some namespace. After a bundle registrers with the
+ * CommunicationFrameworkBundle claiming some namespace, the
+ * CommunicationFrameworkBundle will automatically adjust its supported
+ * features in order to include that namespace.
  */
-/**
- * MISSING_ANNOTATION
- */
+@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface ICommManager {
+	
 	/**
-	 * MISSING_JAVADOCS
+	 * Checks if is connected.
+	 *
+	 * @return true, if is connected
 	 */
 	public boolean isConnected();
 	
+
 	/**
-	 * MISSING_JAVADOCS
+	 * Register the Feature Server.
+	 *
+	 * @param featureServer the feature server
+	 * @throws CommunicationException the communication exception {@link  org.societies.api.comm.xmpp.exceptions.CommunicationException}
 	 */
 	public void register(IFeatureServer featureServer) throws CommunicationException;
 	
+
 	/**
-	 * MISSING_JAVADOCS
+	 * Register the Callback class.
+	 *
+	 * @param messageCallback the message callback
+	 * @throws CommunicationException the communication exception {@link  org.societies.api.comm.xmpp.exceptions.CommunicationException}
 	 */
 	public void register(ICommCallback messageCallback) throws CommunicationException;
 
+
 	/**
-	 * MISSING_JAVADOCS
+	 * Send iq get to the XMPP Server.
+	 *
+	 * @param stanza the stanza
+	 * @param payload the payload
+	 * @param callback the callback
+	 * @throws CommunicationException the communication exception {@link  org.societies.api.comm.xmpp.exceptions.CommunicationException}
 	 */
 	public void sendIQGet(Stanza stanza, Object payload,
 			ICommCallback callback) throws CommunicationException;
 	
+
 	/**
-	 * MISSING_JAVADOCS
+	 * Send iq set to the XMPP Server.
+	 *
+	 * @param stanza the stanza
+	 * @param payload the payload
+	 * @param callback the callback
+	 * @throws CommunicationException the communication exception {@link  org.societies.api.comm.xmpp.exceptions.CommunicationException}
 	 */
 	public void sendIQSet(Stanza stanza, Object payload,
 			ICommCallback callback) throws CommunicationException;
 
+
 	/**
-	 * MISSING_JAVADOCS
+	 * Send a message to the XMPP Server.
+	 *
+	 * @param stanza the stanza
+	 * @param type the type
+	 * @param payload the payload
+	 * @throws CommunicationException the communication exception {@link  org.societies.api.comm.xmpp.exceptions.CommunicationException}
 	 */
 	public void sendMessage(Stanza stanza, String type, Object payload)
 			throws CommunicationException;
 	
+
 	/**
-	 * MISSING_JAVADOCS
+	 * Send a message to the XMPP Server.
+	 *
+	 * @param stanza the stanza
+	 * @param payload the payload
+	 * @throws CommunicationException the communication exception {@link  org.societies.api.comm.xmpp.exceptions.CommunicationException}
 	 */
 	public void sendMessage(Stanza stanza, Object payload)
 			throws CommunicationException;
 
+
 	/**
-	 * MISSING_JAVADOCS
+	 * Adds the root node.
+	 *
+	 * @param newNode the new node
 	 */
 	public void addRootNode(XMPPNode newNode);
 
+
 	/**
-	 * MISSING_JAVADOCS
+	 * Removes the root node.
+	 *
+	 * @param node the node to be removed
 	 */
 	public void removeRootNode(XMPPNode node);
 	
+
 	/**
-	 * MISSING_JAVADOCS
+	 * Gets the disco#info detail from the XMPP Server.
+	 *
+	 * @param entity the entity
+	 * @param node the node
+	 * @param callback the callback
+	 * @return the info
+	 * @throws CommunicationException the communication exception {@link  org.societies.api.comm.xmpp.exceptions.CommunicationException}
 	 */
 	public String getInfo(IIdentity entity, String node, ICommCallback callback) throws CommunicationException;
 	
+
 	/**
-	 * MISSING_JAVADOCS
+	 * Gets the disco#items detail from the XMPP Server.
+	 *
+	 * @param entity the entity
+	 * @param node the node
+	 * @param callback the callback
+	 * @return the items
+	 * @throws CommunicationException the communication exception {@link  org.societies.api.comm.xmpp.exceptions.CommunicationException}
 	 */
 	public String getItems(IIdentity entity, String node, ICommCallback callback) throws CommunicationException;
 	
+
 	/**
-	 * MISSING_JAVADOCS
+	 * Gets the ID manager.
+	 *
+	 * @return the id manager
 	 */
 	public IIdentityManager getIdManager();
 	
+
 	/**
-	 * MISSING_JAVADOCS
+	 * Unregister the Comm Manager.
+	 *
+	 * @return true, if successful
 	 */
 	public boolean UnRegisterCommManager();
 

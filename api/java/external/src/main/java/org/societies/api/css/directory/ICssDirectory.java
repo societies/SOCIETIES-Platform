@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
  * 
@@ -36,9 +38,7 @@ import org.societies.api.schema.css.directory.CssAdvertisementRecord;
  * @author Maria Mannion
  * 
  */
-/**
- * MISSING_ANNOTATIONS
- */
+@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface ICssDirectory {
 	/**
 	 * Description: This method provide interface to add new CSS object to CSS

@@ -27,17 +27,23 @@ package org.societies.api.css.directory;
 
 import java.util.List;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
- * Used as a generic callback class to handle asynch messaging
+ * A callback class to handle asynch messaging for  the Css Directory Client {@link org.societies.api.css.directory.ICssDirectoryRemote}.
  *
  * @author aleckey
- *
  */
-/**
- * MISSING_ANNOTATION
- */
+@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface ICssDirectoryCallback {
 	
+	
+	/**
+	 * Gets the result of the call to the remote CssDirectory.
+	 *
+	 * @param cssAdvertisementRecords a list to be populate with the list of Css Advertisement records {@link org.societies.api.schema.css.directory.CssAdvertisementRecord}  
+	 *  returned from the call to the CssDirectory
+	 */
 	public void getResult(List<CssAdvertisementRecord> cssAdvertisementRecords);
 }

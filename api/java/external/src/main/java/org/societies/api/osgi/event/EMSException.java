@@ -24,22 +24,35 @@
  */
 package org.societies.api.osgi.event;
 
+
 /**
- * 
- * @author pkuppuud
+ * The EMSException class.
  *
+ * @author pkuppuud
  */
+
+
 public class EMSException extends Exception {
 
-	/**
-	 * default
-	 */
+	/** default. */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Instantiates a new EMS exception.
+	 *
+	 * @param message the detail message of the exception
+	 */
 	public EMSException(String message) {
 		super(message);
 	}
 	
+	/**
+	 * Instantiates a new EMS exception.
+	 *
+	 * @param message the detail message of the exception 
+	 * @param ex the cause (which is saved for later retrieval by the Throwable.getCause() method). (A null value is permitted, and indicates that the cause is nonexistent or unknown.)
+
+	 */
 	public EMSException(String message, Throwable ex) {
 		super(message, ex);
 	}

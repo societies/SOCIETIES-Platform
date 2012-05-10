@@ -30,14 +30,23 @@ import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 
 /**
- * 
- * @author pkuppuud
+ * The listener interface for receiving event events.
+ * The class that is interested in processing a event
+ * event implements this interface, and the object created
+ * with that class is registered with a component using the
+ * component's <code>addEventListener<code> method. When
+ * the event event occurs, that object's appropriate
+ * method is invoked.
  *
+ * @author pkuppuud
  */
+
 public abstract class EventListener implements EventHandler {
 
 	/**
 	 * Cannot be overwritten. Implementation provided for abstraction.
+	 *
+	 * @param event the event {@link org.osgi.service.event.Event}
 	 */
 	public final void handleEvent(Event event) {
 		
@@ -57,17 +66,19 @@ public abstract class EventListener implements EventHandler {
 	}
 
 	/**
-	 * Must be implemented by sub class
-	 * 
+	 * Handler to handle internal event
+	 * Must be implemented by sub class.
+	 *
 	 * @param event InternalEvent
 	 */
 	public abstract void handleInternalEvent(InternalEvent event);
 	
 	/**
-    * Must be implemented by sub class
-    * 
-    * @param event PSSEvent
-    */
+	 * Handler to handle external event
+	 * Must be implemented by sub class.
+	 *
+	 * @param event PSSEvent
+	 */
 	public abstract void handleExternalEvent(CSSEvent event);
 
 }

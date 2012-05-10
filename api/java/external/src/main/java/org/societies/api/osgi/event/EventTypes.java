@@ -25,32 +25,51 @@
 package org.societies.api.osgi.event;
 
 /**
- * @author pkuppuud
+ * The Class EventTypes.
+ * 
  *
+ * @author pkuppuud
  */
+
+
 public class EventTypes {
 
+	/** User to notify peers of a css event */
 	public static final String CSS_ADV_EVENT = "org/societies/css/advert";	
+	
+	/** User to notify peers of a css event */
 	public static final String CSS_JOINED_EVENT = "eu/persist/css/joined";
+	
+	/** User to notify peers of a css event */
 	public static final String CSS_LEFT_EVENT = "org/societies/css/left";
+	
+	/** User to notify peers of a css event */
 	public static final String CSS_NOTIFICATION_EVENT = "org/societies/notification";
+	
+	/** User to notify peers of a context event */
 	public static final String CONTEXT_EVENT = "org/societies/context";
+	
+	/** User to notify peers of a service lifelycle event */
 	public static final String SERVICE_LIFECYCLE_EVENT = "org/societies/service/lifecycle";
+	
+	/** User to notify peers of a service fault */
 	public static final String SERVICE_FAULT_EVENT = "org/societies/service/fault";
 	
-	/**Used by Service Management (Session Manager) to publish events concerning the status of sessions */
+	/** Used by Service Management (Session Manager) to publish events concerning the status of sessions. */
     public static final String SERVICE_SESSION_EVENT = "org/societies/servicemgmt/session/status";
     
-    /**Used by Service Management (Service Discovery) to notify peers of a new service */
+    /** Used by Service Management (Service Discovery) to notify peers of a new service. */
 	public static final String NEW_SERVICE_EVENT = "org/societies/servicemgmt/service/newservice";
 	
-	/**Used by Service Management (Service Discovery) to notify peers of a removed service*/
+	/** Used by Service Management (Service Discovery) to notify peers of a removed service. */
 	public static final String REMOVED_SERVICE_EVENT = "org/societies/servicemgmt/service/removeservice";
 	
-	/**Used by Service Management (Service Discovery) to notify a local peer of a failed service */
+	/** Used by Service Management (Service Discovery) to notify a local peer of a failed service. */
 	public static final String FAILED_SERVICE_EVENT = "org/societies/servicemgmt/service/failedservice";        
 	
+	/** User by User Agent Montior to publish event relating to use actions. */
 	public static final String UIM_EVENT = "org/societies/useragent/monitoring/newaction";
 	
+	/** User to notify peers of a failed negotiation */
 	public static final String FAILED_NEGOTIATION_EVENT = "org/societies/privacyprotection/negotiation/failednegotiation";
 }

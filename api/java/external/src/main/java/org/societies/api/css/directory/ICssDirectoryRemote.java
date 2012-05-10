@@ -27,27 +27,55 @@ package org.societies.api.css.directory;
 
 import org.societies.api.css.directory.ICssDirectoryCallback;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 
 /**
- *  Each method requires a callback to receive the result
- * 
+ * A remote interface to the CssDirectory {@link org.societies.api.css.directory.ICssDirectory}
  *
  * @author mmannion
- *
  */
-/**
- * MISSING_ANNOTATION
- * MISSING_JAVADOCS
- */
+
+@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface ICssDirectoryRemote {
     
+    /**
+     * Adds the Css Advertisement Record {@link org.societies.api.schema.css.directory.CssAdvertisementRecord} to the CssDirectory.
+     *
+     * @param cssAdvert the Css Advertisement Record {@link org.societies.api.schema.css.directory.CssAdvertisementRecord} to be added to the CssDirectory
+     */
     public void addCssAdvertisementRecord(CssAdvertisementRecord cssAdvert);
+    
+    /**
+     * Delete the specified Css Advertisement Record {@link org.societies.api.schema.css.directory.CssAdvertisementRecord} from the CssDirectory
+     *
+     * @param cssAdvert the Css Advertisement Record {@link org.societies.api.schema.css.directory.CssAdvertisementRecord} to be deleted from the CssDirectory
+     */
     public void deleteCssAdvertisementRecord(CssAdvertisementRecord cssAdvert);
+	
+	/**
+	 * Updates the Css Advertisement Record {@link  org.societies.api.schema.css.directory.CssAdvertisementRecord} in the CssDirectory
+	 *
+	 * @param oldCssAdvert the old Css Advertisement Record {@link org.societies.api.schema.css.directory.CssAdvertisementRecord} to be removed from CssDirectory
+	 * @param updatedCssAdvert the updated Css Advertisement Record {@link org.societies.api.schema.css.directory.CssAdvertisementRecord} to be added to the CssDirectory
+	 */
 	public void updateCssAdvertisementRecord(CssAdvertisementRecord oldCssAdvert,
 			CssAdvertisementRecord updatedCssAdvert);
 
+	/**
+	 * Find all Css Advertisement Records {@link org.societies.api.schema.css.directory.CssAdvertisementRecord} in the CssDirectory.
+	 *
+	 * @param callback the callback class of the remote CssDirectory client
+	 */
 	public void findAllCssAdvertisementRecords(ICssDirectoryCallback callback);
+	
+	/**
+	 * Find all Css Advertisement Records {@link org.societies.api.schema.css.directory.CssAdvertisementRecord} that match the specified filter 
+	 *
+	 * @param cssFilter the filter to be applied to the CssDirectory database search
+	 * @param callback the callback class of the remote Css Directory client
+	 */
 	public void findForAllCss(CssAdvertisementRecord cssFilter, ICssDirectoryCallback callback);
 	
 }
