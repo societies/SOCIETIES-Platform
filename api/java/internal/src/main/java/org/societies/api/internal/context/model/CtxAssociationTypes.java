@@ -36,4 +36,10 @@ import org.societies.api.context.model.CtxAssociation;
 public class CtxAssociationTypes extends
 		org.societies.api.context.model.CtxAssociationTypes {
 
+	/**
+	 * Directed context association
+	 * 
+	 * @since 0.0.8
+	 */
+	public static final String HAS_DIANNE = "hasDianne";
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">This is the social content provider, and it rocks!</string>
+    <string name="hello">This is the social content provider, and it rocks! Also today!</string>
     <string name="app_name">SocialProvider</string>
     <string name="provider_authority">org.societies.cis.android.SocialProvider</string>
     <string name="provider_read_permission">Read social data</string>

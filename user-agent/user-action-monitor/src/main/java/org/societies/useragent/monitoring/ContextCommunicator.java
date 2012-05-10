@@ -26,6 +26,7 @@
 package org.societies.useragent.monitoring;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -37,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
-import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
@@ -46,10 +46,10 @@ import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 public class ContextCommunicator {
 
@@ -66,9 +66,9 @@ public class ContextCommunicator {
 
 	public void updateHistory(IIdentity owner, IAction action){
 		//check cache first for ctxAttrIdentifier to update
-		ServiceResourceIdentifier serviceID = action.getServiceID();
+		URI serviceID = action.getServiceID().getIdentifier();
 		String parameterName = action.getparameterName();
-		String key = serviceID+parameterName;
+		String key = serviceID+"|"+parameterName;
 		if(mappings.containsKey(key)){  //already has service attribute
 			LOG.info("Mapping exists for key: "+key);
 			//update attribute
@@ -89,7 +89,7 @@ public class ContextCommunicator {
 				LOG.info("Retrieved PERSON entity");
 
 				//get USES_SERVICE associations for this person entity
-				Set<CtxAssociationIdentifier> usesServiceAssocIDs = cssOperator.getAssociations(CtxAssociationTypes.USES_SERVICE);
+				Set<CtxAssociationIdentifier> usesServiceAssocIDs = cssOperator.getAssociations(CtxAssociationTypes.USES_SERVICES);
 				if(usesServiceAssocIDs.size() > 0){  //USES_SERVICE associations found!
 					LOG.info("Found USES_SERVICE association under PERSON entity");
 					CtxAssociation usesServiceAssoc = (CtxAssociation)ctxBroker.retrieve(usesServiceAssocIDs.iterator().next()).get();
@@ -106,7 +106,7 @@ public class ContextCommunicator {
 						CtxEntity serviceEntity = (CtxEntity)ctxBroker.retrieve(returnedServiceIDs.get(0)).get();
 						
 						//Get HAS_PARAMETER associations for this service entity
-						Set<CtxAssociationIdentifier> hasParamAssocIDs = serviceEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETER);
+						Set<CtxAssociationIdentifier> hasParamAssocIDs = serviceEntity.getAssociations(CtxAssociationTypes.HAS_PARAMETERS);
 						if(hasParamAssocIDs.size() > 0){  //HAS_PARAMETER associations found!
 							LOG.info("Found HAS_PARAMETER association under SERVICE entity");
 							CtxAssociation hasParamAssoc = (CtxAssociation)ctxBroker.retrieve(hasParamAssocIDs.iterator().next()).get();
@@ -210,7 +210,7 @@ public class ContextCommunicator {
 		return usesServiceAssoc;
 	}
 	
-	private CtxEntity createServiceEntity(CtxAssociation usesServiceAssoc, ServiceResourceIdentifier serviceID){
+	private CtxEntity createServiceEntity(CtxAssociation usesServiceAssoc, URI serviceID){
 		CtxEntity serviceEntity = null;
 		try {
 			//create new SERVICE entity
@@ -226,6 +226,16 @@ public class ContextCommunicator {
 			CtxAttribute newIDAttr = ctxBroker.createAttribute(serviceEntity.getId(), CtxAttributeTypes.ID).get();
 			LOG.info("Setting value of ID attribute to: "+serviceID);
 			ctxBroker.updateAttribute(newIDAttr.getId(), SerialisationHelper.serialise(serviceID));
+			LOG.info("Testing serialisation and deserialisation");
+			byte[] serialised = SerialisationHelper.serialise(serviceID);
+			LOG.info("SERIALISED: "+serialised);
+			try {
+				URI deserialised = (URI)SerialisationHelper.deserialise(serialised, this.getClass().getClassLoader());
+				LOG.info("DESERIALISED: "+deserialised);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			
 			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -279,6 +289,7 @@ public class ContextCommunicator {
 			//create new LAST_ACTION attribute, update and add to entity
 			LOG.info("Creating LAST_ACTION attribute under SERVICE_PARAMETER entity with value: "+lastAction);
 			CtxAttribute newLastActionAttr = ctxBroker.createAttribute(serviceParamEntity.getId(), CtxAttributeTypes.LAST_ACTION).get();
+			ctxBroker.setHistoryTuples(newLastActionAttr.getId(), snpshtMgr.getSnapshot(newLastActionAttr.getId()));
 			ctxBroker.updateAttribute(newLastActionAttr.getId(), SerialisationHelper.serialise(lastAction));
 			
 			//update mappings

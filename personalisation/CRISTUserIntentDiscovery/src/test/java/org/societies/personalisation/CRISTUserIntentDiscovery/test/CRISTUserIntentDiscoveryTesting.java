@@ -29,7 +29,7 @@ import java.util.LinkedHashMap;
 
 import org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.ICRISTUserIntentDiscovery;
 import org.societies.personalisation.CRISTUserIntentDiscovery.impl.CRISTUserIntentDiscovery;
-import org.societies.personalisation.CRISTUserIntentDiscovery.impl.MockHistoryData;
+import org.societies.personalisation.CRISTUserIntentTaskManager.impl.MockHistoryData;
 
 /**
  * Describe your class here...
