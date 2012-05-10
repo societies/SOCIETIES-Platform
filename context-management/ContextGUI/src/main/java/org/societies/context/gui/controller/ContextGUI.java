@@ -22,8 +22,47 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.gui.impl;
+package org.societies.context.gui.controller;
+
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Logger;
+
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.springframework.beans.factory.annotation.Autowired;
+
+
 
 public class ContextGUI {
+	
+	/** The Internal Context Broker service reference. */
+	@Autowired
+	private ICtxBroker internalCtxBroker;
+	
+	private static final Logger logger   = Logger.getLogger(ContextGUI.class.getSimpleName());
+	
+	public ContextGUI(){
+		// create an Entity that represents a device
+		try {
+			CtxEntity deviceEntity = this.internalCtxBroker.createEntity("device").get();
+			CtxEntityIdentifier deviceEntityId = deviceEntity.getId();
+			
+			logger.info("[CtxGUI]" + deviceEntityId.toString());
+		} 
+		catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
 
 }

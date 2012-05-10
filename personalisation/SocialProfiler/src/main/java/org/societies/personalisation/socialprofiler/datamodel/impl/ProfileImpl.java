@@ -11,11 +11,11 @@ public class ProfileImpl implements Profile, NodeProperties{
 	private final Node underlyingNode;
 	private final Profile.Type type;
 	
-	public ProfileImpl(Node underlyingNode, Profile.Type type) {
+	public ProfileImpl(Node underlyingNode, Profile.Type type, String name) {
 		super();
 		this.underlyingNode = underlyingNode;
 		this.type = type;
-		underlyingNode.setProperty( NAME_PROPERTY, ProfileUtils.DEFAULT_PROFILE_NAME );
+		underlyingNode.setProperty( NAME_PROPERTY, name);
 	}
 
 	
@@ -30,7 +30,7 @@ public class ProfileImpl implements Profile, NodeProperties{
 	
 	@Override
 	public void setName(String name) {
-		underlyingNode.setProperty( NAME_PROPERTY, name );
+		underlyingNode.setProperty(NAME_PROPERTY, name );
 	}
 	
 	@Override
@@ -49,8 +49,8 @@ public class ProfileImpl implements Profile, NodeProperties{
 	}
 
 	@Override
-	public int getFrequency() {
-		return Integer.parseInt(underlyingNode.getProperty( FREQUENCY_PROPERTY ).toString());
+	public long getFrequency() {
+		return Long.parseLong(underlyingNode.getProperty( FREQUENCY_PROPERTY ).toString());
 	}
 
 	
@@ -71,12 +71,12 @@ public class ProfileImpl implements Profile, NodeProperties{
 
 	@Override
 	public int getNumber() {
-		return (Integer)underlyingNode.getProperty( NUMBER_PROPERTY );
+		return Integer.parseInt(underlyingNode.getProperty( NUMBER_PROPERTY).toString());
 	}
 
 	@Override
 	public void setNumber(String number) {
-		underlyingNode.setProperty(NAME_PROPERTY, number);
+		underlyingNode.setProperty(NUMBER_PROPERTY, number);
 	}
 
 	@Override

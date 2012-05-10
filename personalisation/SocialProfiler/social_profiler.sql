@@ -27,7 +27,7 @@ USE social;
 
 DROP TABLE IF EXISTS `blog`;
 CREATE TABLE `blog` (
-  `week` smallint(6) NOT NULL,
+  `week` int(11) NOT NULL,
   PRIMARY KEY (`week`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -37,7 +37,7 @@ CREATE TABLE `blog` (
 
 DROP TABLE IF EXISTS `blog_info`;
 CREATE TABLE `blog_info` (
-  `week` tinyint(4) NOT NULL,
+  `week` int(11) NOT NULL,
   `user_id` bigint(20) NOT NULL,
   PRIMARY KEY (`week`,`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -48,7 +48,7 @@ CREATE TABLE `blog_info` (
 
 DROP TABLE IF EXISTS `info`;
 CREATE TABLE `info` (
-  `week` smallint(6) NOT NULL,
+  `week` int(11) NOT NULL,
   `starts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `profile` tinyint(4) NOT NULL,
   `last_time` bigint(20) NOT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE `info` (
 
 DROP TABLE IF EXISTS `total_info`;
 CREATE TABLE `total_info` (
-  `week` smallint(6) NOT NULL,
+  `week` int(11) NOT NULL,
   `profile` tinyint(4) NOT NULL,
   `number_actions` smallint(6) NOT NULL,
   PRIMARY KEY (`week`,`profile`)

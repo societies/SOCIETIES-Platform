@@ -245,6 +245,7 @@ public class FacebookConnectorImpl implements FacebookConnector {
 			
 			field.put("value", like.get("name"));
 			field.put("type",  like.get("category"));
+			field.put("id",  like.get("id"));
 			
 			pluralFields.put(field);
 			

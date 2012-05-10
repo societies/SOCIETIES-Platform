@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -200,6 +203,86 @@ public class SocialProfiler implements ISocialProfiler {
 
 	public GraphManager getGraph() {
 		return this.graph;
+	}
+	
+	public ArrayList<String> getPredominantProfileForUser(String personId,int option){
+		ArrayList <Integer> user_number_actions=getUserNumberActionsForProfiles(personId,option);
+		ArrayList<String> result=graph.getPredominantProfileForUser(personId,user_number_actions);
+		return result;
+	}
+	
+	private ArrayList <Integer> getUserNumberActionsForProfiles(String personId,int option){
+		ArrayList <Integer> user_number_actions=new ArrayList <Integer> ();
+		//current date
+		java.util.Date today = new java.util.Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+	    int current_week = 0;
+		try {
+			current_week = databaseConnection.calculateWeek(sdf.format(today));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    logger.debug("current week is "+current_week);
+	    //update week
+	    switch (option){
+	    	case ProfilerEngine.EVERYTHING : {
+	    		current_week=0;
+	    		break;
+	    	}
+	    	case ProfilerEngine.LAST_WEEK : {
+	    		current_week--;
+	    		break;
+	    	}
+	    	case ProfilerEngine.LAST_2_WEEKS : {
+	    		current_week=current_week-2;
+	    		break;
+	    	}
+	    	case ProfilerEngine.LAST_MONTH : {
+	    		current_week=current_week-5;
+	    		break;
+	    	}
+	    	case ProfilerEngine.LAST_2_MONTHS : {
+	    		current_week=current_week-9;
+	    		break;
+	    	}
+	    	case ProfilerEngine.LAST_3_MONTHS : {
+	    		current_week=current_week-14;
+	    		break;
+	    	}
+	    	case ProfilerEngine.LAST_6_MONTHS : {
+	    		current_week=current_week-28;
+	    		break;
+	    	}
+	    	case ProfilerEngine.LAST_YEAR : {
+	    		current_week=current_week-56;
+	    		break;
+	    	}
+	    }
+	    if (current_week<0){
+	    	current_week=0;	
+	    }
+	    logger.debug("current_week "+current_week);
+	    if (current_week==0){  //if week=0 then no need to use mysql queries , can use directly the information from graph
+	    	user_number_actions.add(0); //narcissism
+	    	user_number_actions.add(0); //photo
+	    	user_number_actions.add(0); //super 
+	    	user_number_actions.add(0); //quiz
+	    	user_number_actions.add(0); //surf
+	    }else{
+	    	user_number_actions.add(databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.NARCISSISM_PROFILE, personId));
+	    	user_number_actions.add(databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.PHOTO_PROFILE, personId));
+	    	user_number_actions.add(databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.SUPERACTIVE_PROFILE, personId));
+	    	user_number_actions.add(databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.QUIZ_PROFILE, personId));
+	    	user_number_actions.add(databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.SURF_PROFILE, personId));
+	    	
+	    	logger.debug(databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.NARCISSISM_PROFILE, personId));
+	    	logger.debug(databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.PHOTO_PROFILE, personId));
+	    	logger.debug(databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.SUPERACTIVE_PROFILE, personId));
+	    	logger.debug(databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.QUIZ_PROFILE, personId));
+	    	logger.debug(databaseConnection.getNumberOfActionInPast(current_week, ProfilerEngine.SURF_PROFILE, personId));
+	    }
+	    return user_number_actions;
 	}
 
 }

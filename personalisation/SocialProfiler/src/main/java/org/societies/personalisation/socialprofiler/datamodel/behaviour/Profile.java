@@ -65,7 +65,7 @@ public interface Profile {
 	 * Get the frequency on how the action of a Person reflect this profile
 	 * @return an integer (0-100) about the frequency value
 	 */
-	public int getFrequency();
+	public long getFrequency();
 
 	/**
 	 * Set a value of the frequency about this profile
