@@ -8,5 +8,8 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
  */
 @SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface INetworkNode extends IIdentity {
+	/**
+	 * Returns the Node Identifier
+	 */
 	String getNodeIdentifier();
 }
