@@ -36,4 +36,8 @@ import org.societies.api.context.model.CtxEntity;
 public class CtxEntityTypes extends
 		org.societies.api.context.model.CtxEntityTypes {
 
+	/**
+     * @since 0.0.8 
+     */
+    public static final String DIANNE = "dianne";
 }

@@ -8,14 +8,18 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.personalisation.model.IAction;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentTask;
@@ -23,7 +27,8 @@ import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 
 public class ConstructUIModel {
 
-
+	private static Logger LOG = LoggerFactory.getLogger(ConstructUIModel.class);
+	
 	private ICAUITaskManager cauiTaskManager;
 	private ICtxBroker ctxBroker;
 
@@ -35,14 +40,55 @@ public class ConstructUIModel {
 
 	public UserIntentModelData constructModel(LinkedHashMap<String,HashMap<String,Double>> transDictionary) {
 
-		UserIntentModelData modelData = constructFakeModel();
+		UserIntentModelData modelData = constructRealModel(transDictionary);
 		//UserIntentModelData modelData = constructFakeModel(transDictionary);
 		return modelData;
 	}	
 	
+	private UserIntentModelData constructRealModel(LinkedHashMap<String,HashMap<String,Double>> transDictionary){
+		
+		List<IUserIntentAction> actionList = new ArrayList<IUserIntentAction>();
+		
+			
+		int k = 0;
+		for (String action : transDictionary.keySet()){
+			LOG.info("action"+action);
+			
+			IUserIntentAction userAction = cauiTaskManager.createAction(null,"ServiceType","action",action);
+			actionList.add(k,userAction);
+		}
+		
+		
+		Double [][] actionMatrixA  = new Double[actionList.size()][actionList.size()] ;
 
+		for(int i=0; i<actionList.size();i++){
+			for (int j=0; j<actionList.size();j++){
+				actionMatrixA[i][j] = 0.0  ;
+			}
+		}
 
+		//actionMatrixA[0][1]=1.0;
+		//actionMatrixA[1][2]=1.0;
+		//actionMatrixA[2][3]=1.0;
+		
+		IUserIntentTask taskA = cauiTaskManager.createTask("TaskA", actionList, actionMatrixA);
 
+		cauiTaskManager.displayTask(taskA);
+
+		List<IUserIntentTask> taskList = new ArrayList<IUserIntentTask>();
+		taskList.add(0,taskA);
+		
+		Double [][] taskMatrix = new Double[taskList.size()][taskList.size()] ;
+		
+		UserIntentModelData modelData = cauiTaskManager.createModel(taskList, taskMatrix);
+		//System.out.println("*********** modelData ******* getMatrix "+modelData.getMatrix()+" getTaskList"+modelData.getTaskList() );
+		cauiTaskManager.displayModel(modelData);
+		cauiTaskManager.updateModel(modelData);
+
+		return modelData;
+	}
+
+	
 	private UserIntentModelData constructFakeModel(){
 		//create Task A
 		IUserIntentAction userActionA = cauiTaskManager.createAction(null,"ServiceType","A-homePc","off");

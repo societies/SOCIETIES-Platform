@@ -28,13 +28,12 @@ package org.societies.android.platform.gui;
 
 
 
-import org.societies.android.platform.phongegap.PluginCSSManager;
+import org.apache.cordova.DroidGap;
 
-import com.phonegap.DroidGap;
-import com.phonegap.api.LOG;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -95,7 +94,7 @@ public class MasterGUIActivity extends DroidGap {
      */
     public void onDestroy() {
     	super.onDestroy();
-    	LOG.d(LOG_TAG, "MasterGUIActivity being destroyed");
+    	Log.d(LOG_TAG, "MasterGUIActivity being destroyed");
     }
 
 }

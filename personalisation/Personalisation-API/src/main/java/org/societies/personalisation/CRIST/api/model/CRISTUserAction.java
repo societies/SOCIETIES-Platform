@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.societies.api.personalisation.model.Action;
+import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
@@ -83,6 +84,19 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 
 	}
 
+	/**
+	 * Constructor with Action parameter
+	 * @param action
+	 */
+	public CRISTUserAction(IAction action) {
+		this.setServiceID(action.getServiceID());
+		this.setServiceType(action.getServiceType());
+		this.setparameterName(action.getparameterName());
+		this.setvalue(action.getvalue());
+
+	}
+	
+	
 	/**
 	 * This method will return the related context information of the current
 	 * action

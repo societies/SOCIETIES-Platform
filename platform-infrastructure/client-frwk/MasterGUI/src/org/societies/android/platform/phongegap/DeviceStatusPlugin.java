@@ -27,6 +27,9 @@ package org.societies.android.platform.phongegap;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.cordova.api.Plugin;
+import org.apache.cordova.api.PluginResult;
+import org.apache.cordova.api.PluginResult.Status;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,10 +55,6 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.phonegap.api.PhonegapActivity;
-import com.phonegap.api.Plugin;
-import com.phonegap.api.PluginResult;
-import com.phonegap.api.PluginResult.Status;
 
 /**
  * PhoneGap plugin to use device status
@@ -114,14 +113,14 @@ public class DeviceStatusPlugin extends Plugin {
 		// /!\ This is dirty, but "onResume" method seems to be bugged. We will clean that later.
 		if (!deviceStatusServiceConnected && null != methodName && (ACTION_CONNECTIVITY.equals(methodName) || ACTION_LOCATION.equals(methodName))) {
 			Log.d(this.getClass().getSimpleName(), "Plugin Called (first time: connect to service)");
-			Intent deviceStatusIntent = new Intent(this.ctx, LocalDeviceStatusService.class);
+			Intent deviceStatusIntent = new Intent(this.ctx.getContext(), LocalDeviceStatusService.class);
 			// - Inform the JS side: async mode
 			PluginResult result = new PluginResult(Status.NO_RESULT);
 			result.setKeepCallback(true);
 			this.methodName = methodName;
 			this.arguments = arguments;
 			this.callbackID = callbackID;
-			this.ctx.bindService(deviceStatusIntent, deviceStatusServiceConnection, Context.BIND_AUTO_CREATE);
+			this.ctx.getContext().bindService(deviceStatusIntent, deviceStatusServiceConnection, Context.BIND_AUTO_CREATE);
 			return result;
 		}
 		else {
@@ -159,7 +158,7 @@ public class DeviceStatusPlugin extends Plugin {
 				// - Launch location status retrieval
 				// Register to the relevant broadcast receiver
 				IntentFilter filter = new IntentFilter(IDeviceStatus.CONNECTIVITY_STATUS);
-				ctx.registerReceiver(deviceStatusReceiver, filter);
+				this.ctx.getContext().registerReceiver(deviceStatusReceiver, filter);
 
 				// Launch the relevant method
 				// Fill the method name
@@ -188,7 +187,7 @@ public class DeviceStatusPlugin extends Plugin {
 				// - Launch location status retrieval
 				// Register to the relevant broadcast receiver
 				IntentFilter filter = new IntentFilter(IDeviceStatus.LOCATION_STATUS);
-				ctx.registerReceiver(deviceStatusReceiver, filter);
+				this.ctx.getContext().registerReceiver(deviceStatusReceiver, filter);
 
 				// Launch the relevant method
 				// Fill the method name
@@ -215,7 +214,7 @@ public class DeviceStatusPlugin extends Plugin {
 				this.success(result, callbackID);
 				// -- Launch the intent to retrieve the battery status
 				IntentFilter batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-				ctx.registerReceiver(deviceStatusReceiver, batteryLevelFilter);
+				this.ctx.getContext().registerReceiver(deviceStatusReceiver, batteryLevelFilter);
 			}
 			// - Register to battery status
 			else if (ACTION_BATTERY_REGISTER.equals(methodName)) {
@@ -229,7 +228,7 @@ public class DeviceStatusPlugin extends Plugin {
 				JSONObject params = (JSONObject) arguments.get(0);
 				batteryStatusRegistration = params.getBoolean("register");
 				IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-				ctx.registerReceiver(deviceStatusReceiver, filter);
+				this.ctx.getContext().registerReceiver(deviceStatusReceiver, filter);
 			}
 
 			// -- Error: Unknown method name
@@ -257,12 +256,12 @@ public class DeviceStatusPlugin extends Plugin {
 		Log.d(this.getClass().getSimpleName(), "DeviceStatusPlugin Destroy");
 		// -- Close the broadcast receiver
 		if (null != deviceStatusReceiver) {
-			ctx.unregisterReceiver(deviceStatusReceiver);
+			this.ctx.getContext().unregisterReceiver(deviceStatusReceiver);
 		}
 		// -- Unlink with services
 		if (deviceStatusServiceConnected) {
 			deviceStatusServiceConnected = false;
-			ctx.unbindService(deviceStatusServiceConnection);
+			this.ctx.getContext().unbindService(deviceStatusServiceConnection);
 		}
 	}
 

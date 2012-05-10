@@ -30,12 +30,16 @@ import android.net.Uri;
 
 /**
  * All adapters have to implement this interface. It follows a logic very
- * similar to Android content provider.
+ * similar to Android content provider. The authorities and URLs are documented
+ * in {@link SocialContract}. Currently it supports CRUD on people, groups and 
+ * apps.
+ * 
+ * for the first four methods below see Content Provider interfaces in Android.
  * 
  * @author Babak.Farshchian@sintef.no
  *
  */
-public interface SocialAdapter {
+public interface ISocialAdapter {
     public Cursor query(Uri uri, 
     		String[] projection, 
     		String selection, 
@@ -50,5 +54,27 @@ public interface SocialAdapter {
     public int delete(Uri uri, 
     		String selection, 
     		String[] selectionArgs);
-    boolean isOnline();
+    
+    /**
+     * A method that can be used to check whether this adapter is usable.
+     * @return true if connection is on.
+     */
+    public boolean isConnected();
+    
+    /**
+     * Called to make this adapter usable for storing and querying data. 
+     * @return 1 if connection was set up correctly
+     * TODO: Need to define other values for error reporting.
+     */
+    public int connect();
+    /**
+     * Called to make this adapter usable for storing and querying data in a location that requires credential.
+     * 
+     * @param username
+     * @param password
+     * @return 1 if connection was set up correctly. 
+     * 
+     */
+    public int connect(String username, String password);
+    public int disconnect();
     }

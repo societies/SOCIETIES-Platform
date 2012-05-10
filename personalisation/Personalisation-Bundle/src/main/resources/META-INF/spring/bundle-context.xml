@@ -78,6 +78,8 @@
 	<bean id="dianne" class="org.societies.personalisation.dianne.DIANNE"
 		name="dianne" init-method="initialiseDIANNELearning">
 		<property name="persoMgr" ref="persoMgr"></property>
+		<property name="ctxBroker" ref="ctxBroker"></property>
+		<property name="commsMgr" ref="commsMgr"></property>
 	</bean>
 
 

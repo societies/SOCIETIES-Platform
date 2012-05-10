@@ -25,13 +25,14 @@
 
 package org.societies.personalisation.dianne.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
-public class Network 
+public class Network implements Serializable
 {
 	private ArrayList<ContextGroup> contextGroups;
 	private ArrayList<OutcomeGroup> outcomeGroups;

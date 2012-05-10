@@ -70,7 +70,6 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	private IEventMgr eventMgr;
 
 	public UserPreferenceConditionMonitor(){
-		merging = new MergingManager(getUserPrefLearning(), prefMgr, this);
 	}
 	
 	
@@ -130,6 +129,8 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		mt = new MonitoringTable();
 		registered = new ArrayList<CtxAttributeIdentifier>();
 		logging.debug(this.getClass().toString()+": INITIALISED");
+		merging = new MergingManager(getUserPrefLearning(), prefMgr, this);
+
 	}
 	
 	public void initialisePreferenceManagement(ICtxBroker broker, IInternalPersonalisationManager persoMgr/*, UserPreferenceManagement prefMgr*/){
@@ -148,14 +149,11 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 		this.setCtxBroker(broker);
 		
 		
-		if (prefMgr == null){
-			logging.debug(this.getClass().toString()+" found PreferenceManager");
-		}else{
-			logging.debug(this.getClass().toString()+" PreferenceManager NOT FOUND");
-		}
 		this.prefMgr = new UserPreferenceManagement(null, this.getCtxBroker());
 		mt = new MonitoringTable();
 		registered = new ArrayList<CtxAttributeIdentifier>();
+		merging = new MergingManager(getUserPrefLearning(), prefMgr, this);
+
 		logging.debug(this.getClass().toString()+": INITIALISED");
 	}
 	/**
@@ -167,6 +165,7 @@ public class UserPreferenceConditionMonitor implements IUserPreferenceConditionM
 	 */
 	@Override
 	public Future<List<IPreferenceOutcome>> getOutcome(IIdentity ownerId, CtxAttribute attribute){
+		this.prefMgr.updateContext(attribute);
 		/*
 		 * in this method, we need to check what preferences are affected, request re-evaluation of them, compare last ioutcome with new and send it to 
 		 * the proactivity decision maker component
