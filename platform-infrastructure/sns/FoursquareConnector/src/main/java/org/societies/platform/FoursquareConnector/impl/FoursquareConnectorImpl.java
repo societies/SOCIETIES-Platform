@@ -1,3 +1,28 @@
+/**
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
+ * conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.societies.platform.FoursquareConnector.impl;
 
 import java.util.Map;
@@ -28,21 +53,22 @@ public class FoursquareConnectorImpl implements FoursquareConnector {
 	private String identity = null;
 	private String name;
 	private String id;
-	private String lastUpdate   = "yesterday";
-	private long tokenExpiration=0;
-	
+	private String lastUpdate = "yesterday";
+	private long tokenExpiration = 0;
+
 	private String apiKey = "LTNRV3JPEKSFUCMOF4HY05GZHW4BWIZ1Y2YGBJCLMGEXZFG4";
 	private String apiSecret = "2Y0YDIH5XQV13P2ZE3EWZDGEAIHXXQNMOUAEVU4XIWRYRBBS";
 
 	private OAuthService service;
-	
-	public FoursquareConnectorImpl(){};
+
+	public FoursquareConnectorImpl() {
+	};
 
 	public FoursquareConnectorImpl(String access_token, String identity) {
 		this.accessTokenString = access_token;
 		this.identity = identity;
-		this.name 	= ISocialConnector.TWITTER_CONN;
-		this.id		= this.name + "_" + UUID.randomUUID();
+		this.name = ISocialConnector.TWITTER_CONN;
+		this.id = this.name + "_" + UUID.randomUUID();
 		this.service = new ServiceBuilder()
 				.provider(Foursquare2Api.class)
 				.apiKey(apiKey)
@@ -91,6 +117,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector {
 
 	/*
 	 * Activity in foursquare is defined as check-in
+	 * 
 	 * @see org.societies.api.internal.sns.ISocialConnector#getUserActivities()
 	 */
 	public String getUserActivities() {
@@ -128,24 +155,25 @@ public class FoursquareConnectorImpl implements FoursquareConnector {
 	public void setLastUpdate(String lastUpdate) {
 		this.lastUpdate = lastUpdate;
 	}
-	
+
 	public void setTokenExpiration(long expires) {
 		this.tokenExpiration = expires;
 	}
 
 	public void setConnectorName(String name) {
-		this.name= name;
-		
+		this.name = name;
+
 	}
+
 	public String getConnectorName() {
 		return name;
 	}
-	
+
 	public long getTokenExpiration() {
 		return this.tokenExpiration;
 	}
 
-	public String getToken() {		
+	public String getToken() {
 		return this.accessTokenString;
 	}
 

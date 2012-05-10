@@ -75,7 +75,7 @@ public interface ICommCallback {
 	 */
 	void receiveInfo(Stanza stanza, String node, XMPPInfo info);
 	/**
-	 * MISSING_ANNOTATION
+	 * MISSING_JAVADOCS
 	 */
 	void receiveItems(Stanza stanza, String node, List<String> items);
 	/**

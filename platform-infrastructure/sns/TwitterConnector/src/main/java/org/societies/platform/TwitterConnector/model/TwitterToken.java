@@ -1,3 +1,27 @@
+/**
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
+ * conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.societies.platform.TwitterConnector.model;
 
 import org.scribe.builder.ServiceBuilder;
@@ -6,70 +30,65 @@ import org.scribe.model.Token;
 import org.scribe.model.Verifier;
 import org.scribe.oauth.OAuthService;
 
-
 /*
  * twitter access token manager
  */
-public class TwitterToken{
-
+public class TwitterToken {
 
 	private String defaultApiKey = "cLD3W6l4bfXs8cwlzXGmRQ";
 	private String defaultApiSecret = "IN6Oo79VnduEt5HRI9IQY07SpW86xkcN4UICuFg1zA0";
-	private String defaultAccessToken = "468234144-7jBtrulMAriO1yjg2J9POY6aeW2TwnwrEXWeDWYn";
-	private String defaultAccessTokenSecret = "1lY5pClLbeJ2MGC8A9995Dlx7gxNqdnLPQarsplwLpU";
 	private Token accessToken = null;
 	private OAuthService service = null;
 
-	public TwitterToken(String accessToken){
-		this.service = new ServiceBuilder()
-		.provider(TwitterApi.class)
-		.apiKey(defaultApiKey)
-		.apiSecret(defaultApiSecret)
-		.build();
+	public TwitterToken(String accessToken) {
+		this.service = new ServiceBuilder().provider(TwitterApi.class)
+				.apiKey(defaultApiKey).apiSecret(defaultApiSecret).build();
 
-		String[] tokenList=null;
-		if(accessToken.contains(",")){
+		String[] tokenList = null;
+		if (accessToken.contains(",")) {
 			tokenList = accessToken.split(",");
 			this.accessToken = new Token(tokenList[0], tokenList[1]);
-		}
-		else this.accessToken = new Token(defaultAccessToken, defaultAccessTokenSecret);
+		} else
+			this.accessToken = new Token("", "");
+		// else this.accessToken = new Token(defaultAccessToken,
+		// defaultAccessTokenSecret);
 	}
-	
-	public TwitterToken(){
-		this.service = new ServiceBuilder()
-		.provider(TwitterApi.class)
-		.apiKey(defaultApiKey)
-		.apiSecret(defaultApiSecret)
-		.build();
 
-		this.accessToken = new Token(defaultAccessToken, defaultAccessTokenSecret);
+	// public TwitterToken(){
+	// this.service = new ServiceBuilder()
+	// .provider(TwitterApi.class)
+	// .apiKey(defaultApiKey)
+	// .apiSecret(defaultApiSecret)
+	// .build();
+	//
+	// this.accessToken = new Token(defaultAccessToken,
+	// defaultAccessTokenSecret);
+	// }
+
+	public Token getAccessToken() {
+		return this.accessToken;
 	}
-	
-	public Token getAccessToken(){
-		return this.accessToken;	
+
+	public OAuthService getAuthService() {
+		return this.service;
 	}
-	
-	public OAuthService getAuthService(){
-		return this.service;	
-	}
-	
-//  get access token from user
-	public void getAccessTokenFromUser(){
+
+	// get access token from user
+	public void getAccessTokenFromUser() {
 		Token requestToken = service.getRequestToken();
 		String authUrl = service.getAuthorizationUrl(requestToken);
 		Verifier verifier = new Verifier("verifier you got from the user");
 		this.accessToken = service.getAccessToken(requestToken, verifier);
-		
+
 	}
-	
-//	get access token from context broker
-	public Token getAccessTokenFromContextBroker(){
+
+	// get access token from context broker
+	public Token getAccessTokenFromContextBroker() {
 		return null;
 	}
-	
 
-//	set access token from context broker
-	public boolean setAccessTokenToContextBrocker(){
+	// set access token from context broker
+	public boolean setAccessTokenToContextBrocker() {
 		return false;
 	}
 
