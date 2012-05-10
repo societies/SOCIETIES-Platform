@@ -27,9 +27,14 @@
 	
 	
 	<!--bean id="aopBean" class="org.societies.comm.xmpp.xc.impl.XCCommunicationMgr">
-	</bean>
+	</bean-->
 
-	<bean id="aopBean" class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean"/>
+	<!--bean id="aopBean" class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean"/>
+	<bean id="CommsFwTestBean"
+		class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean"
+		init-method="init"
+		>
+	</bean-->
 
 	<bean id="catchBeforeMethod"
 		class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwAdvice" />
@@ -44,8 +49,8 @@
 
 	<bean id="aopBeanProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
 
-		<property name="target" ref="aopBean" />
-		<property name="target" ref="commMgr" />
+		<!--property name="target" ref="aopBean" /-->
+		<property name="target" ref="CommManagerBundle" />
 
 		<property name="interceptorNames">
 			<list>
@@ -53,12 +58,6 @@
 			</list>
 		</property>
 	</bean>
-	
-	<bean id="CommsFwTestBean"
-		class="org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean"
-		init-method="init"
-		>
-	</bean-->
 
 	<bean id="PrivacyLogAppender"
 		class="org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLogAppender"

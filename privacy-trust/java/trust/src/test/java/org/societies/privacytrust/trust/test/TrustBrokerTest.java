@@ -61,15 +61,17 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = {"classpath:META-INF/spring/test-context.xml"})
 public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTests {
 	
-	private static final String TRUSTOR_ID = "aFooTrustorIIdentity";
+	private static final String BASE_ID = "tbt";
 	
-	private static final String TRUSTED_CSS_ID = "aFooCssIIdentity";
+	private static final String TRUSTOR_ID = BASE_ID + "TrustorIIdentity";
 	
-	private static final String TRUSTED_CIS_ID = "aFooCisIIdentity";
+	private static final String TRUSTED_CSS_ID = BASE_ID + "CssIIdentity";
 	
-	private static final String TRUSTED_SERVICE_ID = "aFooServiceResourceIdentifier";
+	private static final String TRUSTED_CIS_ID = BASE_ID + "CisIIdentity";
 	
-	private static final String TRUSTED_SERVICE_TYPE = "aFooServiceType";
+	private static final String TRUSTED_SERVICE_ID = BASE_ID + "ServiceResourceIdentifier";
+	
+	private static final String TRUSTED_SERVICE_TYPE = BASE_ID + "ServiceType";
 	
 	private static ITrustedCss trustedCss;
 	

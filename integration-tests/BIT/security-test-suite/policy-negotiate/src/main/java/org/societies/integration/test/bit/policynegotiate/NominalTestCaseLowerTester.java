@@ -55,11 +55,11 @@ public class NominalTestCaseLowerTester {
 	@BeforeClass
 	public static void initialization() {
 		
-		LOG.info("[#713] Initialization");
-		LOG.info("[#713] Prerequisite: The CSS is created");
-		LOG.info("[#713] Prerequisite: The user is logged to the CSS");
+		LOG.info("[#1001] Initialization");
+		LOG.info("[#1001] Prerequisite: The CSS is created");
+		LOG.info("[#1001] Prerequisite: The user is logged to the CSS");
 
-		negotiator = TestCase713.getNegotiator();
+		negotiator = TestCase1001.getNegotiator();
 		
 		assertNotNull(negotiator);
 	}
@@ -70,7 +70,7 @@ public class NominalTestCaseLowerTester {
 	 */
 	@Before
 	public void setUp() {
-		LOG.info("[#713] NominalTestCaseLowerTester::setUp");
+		LOG.info("[#1001] NominalTestCaseLowerTester::setUp");
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class NominalTestCaseLowerTester {
 	 */
 	@After
 	public void tearDown() {
-		LOG.info("[#713] tearDown");
+		LOG.info("[#1001] tearDown");
 	}
 
 
@@ -90,9 +90,9 @@ public class NominalTestCaseLowerTester {
 	@Test
 	public void testNegotiation() throws InterruptedException {
 		
-		LOG.info("[#713] testNegotiation()");
+		LOG.info("[#1001] testNegotiation()");
 
-		IIdentityManager idMgr = TestCase713.getGroupMgr().getIdMgr();
+		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
 		IIdentity provider = idMgr.getThisNetworkNode();
 		negotiator.startNegotiation(provider, "service-123", new INegotiationCallback() {
 			@Override
@@ -104,8 +104,8 @@ public class NominalTestCaseLowerTester {
 		});
 		
 		Thread.sleep(5000);
-		LOG.info("[#713] testNegotiation(): checking if successful");
+		LOG.info("[#1001] testNegotiation(): checking if successful");
 		assertTrue(success);
-		LOG.info("[#713] testNegotiation(): SUCCESS");
+		LOG.info("[#1001] testNegotiation(): SUCCESS");
 	}
 }

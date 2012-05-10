@@ -28,8 +28,10 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.ChannelType;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.LogEntry;
@@ -66,6 +68,10 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 //		testBean.setAspectName("ahoj");
 //		aspectName = testBean.getAspectName();
 //		LOG.debug("init(): 4 aspectName = " + aspectName);
+		
+		LOG.debug("init(): 1");
+		commMgr.getIdManager();
+		LOG.debug("init(): 2");
 		
 //		try {
 //			LOG.debug("init(): 1");
@@ -124,12 +130,27 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	/* (non-Javadoc)
 	 * @see IPrivacyLogAppender#logCommsFw(IIdentity, IIdentity, Object)
 	 */
+	// The type parameter in comms fw is not type of data. It is not even used at the moment.
+	// The only option is to call getClass() on the payload. For any more info the Object payload
+	// should be typecasted and parsed (not feasible).
+	// implementation: call IIdentity.getType() to see if receiver is:
+	//   - CIS (CIS),
+	//   - some other CSS (CSS),
+	//   - or another node within same CSS (CSS_LIGHT, CSS_RICH)
+	// implementation: sentToGroup: true if receiver is CIS
+	// implementation: channelId = XMPP
 	@Override
 	public boolean logCommsFw(IIdentity sender, IIdentity receiver, Object payload) {
 		
 		LOG.debug("logCommsFw()");
 
 		return true;
+	}
+	
+	@Override
+	public void logContext(Requestor requestor) {
+		
+		LOG.debug("logContext()");
 	}
 
 	/* (non-Javadoc)

@@ -27,10 +27,8 @@ package org.societies.privacytrust.trust.impl.repo.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -56,8 +54,12 @@ public class TrustedCis extends TrustedEntity implements ITrustedCis {
 	private static final long serialVersionUID = -438368876927927076L;
 	
 	/** The members of this trusted CIS. */
-	/*@ManyToMany(cascade = CascadeType.ALL)
-	@JoinTable(name = "t_", joinColumns = { @JoinColumn(name = "STUDENT_ID") }, inverseJoinColumns = { @JoinColumn(name = "COURSE_ID") })
+	@ManyToMany(
+	        mappedBy = "communities",
+	        targetEntity = TrustedCss.class,
+	        fetch = FetchType.EAGER
+	)
+	//@Fetch(FetchMode.JOIN)
 	private Set<ITrustedCss> members = new HashSet<ITrustedCss>();
 	
 	/* TODO The services shared by this trusted CIS. */
@@ -77,31 +79,31 @@ public class TrustedCis extends TrustedEntity implements ITrustedCis {
 		super(teid);
 	}
 
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.privacytrust.trust.api.model.ITrustedCis#getMembers()
-	 *
+	 */
 	@Override
 	public Set<ITrustedCss> getMembers() {
 		
 		return this.members;
 	}
 	
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.privacytrust.trust.api.model.ITrustedCis#addMember(org.societies.privacytrust.trust.api.model.TrustedCss)
-	 *
+	 */
 	@Override
-	public void addMember(final TrustedCss member) {
+	public void addMember(final ITrustedCss member) {
 		
 		if (!this.members.contains(member))
 			this.members.add(member);
 		
 		if (!member.getCommunities().contains(this))
 			member.getCommunities().add(this);
-	}*/
+	}
 	
-	/* (non-Javadoc)
+	/*
 	 * @see org.societies.privacytrust.trust.api.model.ITrustedCis#removeMember(org.societies.privacytrust.trust.api.model.ITrustedCss)
-	 *
+	 */
 	@Override
 	public void removeMember(final ITrustedCss member) {
 		
@@ -110,7 +112,7 @@ public class TrustedCis extends TrustedEntity implements ITrustedCis {
 		
 		if (member.getCommunities().contains(this))
 			member.getCommunities().remove(this);
-	}*/
+	}
      
 	/*
 	 * TODO			

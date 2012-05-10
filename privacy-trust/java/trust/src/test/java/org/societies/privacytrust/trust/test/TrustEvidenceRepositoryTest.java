@@ -57,19 +57,21 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = {"classpath:META-INF/spring/test-context.xml"})
 public class TrustEvidenceRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
 	
-	private static final String TRUSTOR_ID = "aFooTrustorIIdentity";
-	private static final String TRUSTOR_ID2 = "aBarTrustorIIdentity";
+	private static final String BASE_ID = "tert";
 	
-	private static final String TRUSTED_CSS_ID = "aFooCssIIdentity";
+	private static final String TRUSTOR_ID = BASE_ID + "TrustorIIdentity";
+	private static final String TRUSTOR_ID2 = BASE_ID + "TrustorIIdentity2";
 	
-	@SuppressWarnings("unused")
-	private static final String TRUSTED_CIS_ID = "aFooCisIIdentity";
-	
-	@SuppressWarnings("unused")
-	private static final String TRUSTED_SERVICE_ID = "aFooServiceResourceIdentifier";
+	private static final String TRUSTED_CSS_ID = BASE_ID + "CssIIdentity";
 	
 	@SuppressWarnings("unused")
-	private static final String TRUSTED_SERVICE_TYPE = "aFooServiceType";
+	private static final String TRUSTED_CIS_ID = BASE_ID + "CisIIdentity";
+	
+	@SuppressWarnings("unused")
+	private static final String TRUSTED_SERVICE_ID = BASE_ID + "ServiceResourceIdentifier";
+	
+	@SuppressWarnings("unused")
+	private static final String TRUSTED_SERVICE_TYPE = BASE_ID + "ServiceType";
 	
 	@Autowired
 	private ITrustEvidenceRepository trustEvidenceRepo;
