@@ -24,7 +24,7 @@
  */
 package org.societies.privacytrust.trust.impl.repo;
 
-import org.hibernate.FetchMode;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -93,6 +93,7 @@ public class TrustRepository implements ITrustRepository {
 			transaction.commit();
 			result = true;
 		} catch (ConstraintViolationException cve) {
+			LOG.warn("Rolling back transaction for entity " + entity);
 			transaction.rollback();
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for entity " + entity);
@@ -122,12 +123,17 @@ public class TrustRepository implements ITrustRepository {
 		// TODO TrustedEntityType.LGC
 		
 		final Session session = sessionFactory.openSession();
-		ITrustedEntity result = (ITrustedEntity) session.createCriteria(entityClass)
-			.add(Restrictions.eq("teid", teid))
-			.setFetchMode("directTrust", FetchMode.JOIN)
-			.setFetchMode("indirectTrust", FetchMode.JOIN)
-			.setFetchMode("userPerceivedTrust", FetchMode.JOIN)
-			.uniqueResult();
+		final Criteria criteria = session.createCriteria(entityClass)
+			.add(Restrictions.eq("teid", teid));
+		
+		//if (TrustedCss.class.equals(entityClass))
+		//	criteria.setFetchMode("communities", FetchMode.SELECT);
+		
+		//if (TrustedCis.class.equals(entityClass))
+		//	criteria.setFetchMode("members", FetchMode.SELECT);
+		
+		final ITrustedEntity result = (ITrustedEntity) criteria.uniqueResult();
+		
 		if (session != null)
 			session.close();
 			
