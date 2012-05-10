@@ -81,7 +81,7 @@ public class CRISTUserAction extends Action implements ICRISTUserAction {
 	 * @param actionID
 	 */
 	public CRISTUserAction(String actionID) {
-
+		this.actionID = actionID;
 	}
 
 	/**

@@ -1,3 +1,27 @@
+/**
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
+ * conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.societies.platform.TwitterConnector.impl;
 
 import java.util.Map;
@@ -25,14 +49,17 @@ public class TwitterConnectorImpl implements TwitterConnector {
 	private String id;
 	private String lastUpdate = "yesterday";
 
+	// public TwitterConnectorImpl() {
+	// this.twToken = new TwitterToken();
+	// this.service = twToken.getAuthService();
+	// this.name = ISocialConnector.TWITTER_CONN;
+	// this.id = this.name + "_" + UUID.randomUUID();
+	//
+	// }
+
 	public TwitterConnectorImpl() {
-		this.twToken = new TwitterToken();
-		this.service = twToken.getAuthService();
-		this.name = ISocialConnector.TWITTER_CONN;
-		this.id = this.name + "_" + UUID.randomUUID();
-
 	}
-
+	
 	public TwitterConnectorImpl(String access_token, String identity) {
 		this.twToken = new TwitterToken(access_token);
 		this.service = twToken.getAuthService();
@@ -51,6 +78,7 @@ public class TwitterConnectorImpl implements TwitterConnector {
 			// TODO Auto-generated catch block
 			return response.getBody();
 		}
+
 		if (res != null)
 			return res.toString();
 		else
@@ -61,7 +89,7 @@ public class TwitterConnectorImpl implements TwitterConnector {
 		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FRIENDS_URL);
 		this.service.signRequest(twToken.getAccessToken(), request);
 		Response response = request.send();
-		JSONObject res =null;
+		JSONObject res = null;
 		try {
 			res = new JSONObject(response.getBody());
 		} catch (JSONException e1) {
@@ -70,12 +98,12 @@ public class TwitterConnectorImpl implements TwitterConnector {
 		}
 		JSONObject friends = new JSONObject();
 		JSONArray friendsList = new JSONArray();
-//		System.out.println(res.toString());
+		// System.out.println(res.toString());
 		try {
 			JSONArray friendsIDList = res.getJSONArray("ids");
-			
+
 			JSONObject other = null;
-			
+
 			for (int i = 0; i < friendsIDList.length(); i++) {
 				// System.out.println(friendsIDList.get(i).toString());
 
@@ -90,7 +118,7 @@ public class TwitterConnectorImpl implements TwitterConnector {
 		} catch (JSONException e) {
 			return response.getBody();
 		}
-		
+
 		if (res != null)
 			// return res.toJSONString();
 			return friends.toString();
@@ -108,9 +136,9 @@ public class TwitterConnectorImpl implements TwitterConnector {
 		try {
 			res = new JSONObject(response.getBody());
 			JSONArray followersIDList = res.getJSONArray("ids");
-			
+
 			JSONObject other = null;
-			
+
 			for (int i = 0; i < followersIDList.length(); i++) {
 				// System.out.println(friendsIDList.get(i).toString());
 
@@ -125,7 +153,7 @@ public class TwitterConnectorImpl implements TwitterConnector {
 		} catch (JSONException e) {
 			response.getBody();
 		}
-		
+
 		if (res != null)
 			// return res.toJSONString();
 			return followers.toString();
@@ -140,7 +168,7 @@ public class TwitterConnectorImpl implements TwitterConnector {
 		this.service.signRequest(twToken.getAccessToken(), request);
 		Response response = request.send();
 		JSONArray res = null;
-		JSONObject user =null;
+		JSONObject user = null;
 		try {
 			res = new JSONArray(response.getBody());
 			user = res.getJSONObject(0);
@@ -160,7 +188,7 @@ public class TwitterConnectorImpl implements TwitterConnector {
 		this.service.signRequest(twToken.getAccessToken(), request);
 		Response response = request.send();
 		JSONArray res = null;
-		JSONObject user =null;
+		JSONObject user = null;
 		try {
 			res = new JSONArray(response.getBody());
 			user = res.getJSONObject(0);
@@ -234,12 +262,12 @@ public class TwitterConnectorImpl implements TwitterConnector {
 	}
 
 	public String getConnectorName() {
-		
+
 		return name;
 	}
 
 	public String getSocialData(String path) {
-		
+
 		return "{}";
 	}
 
@@ -270,8 +298,8 @@ public class TwitterConnectorImpl implements TwitterConnector {
 	}
 
 	public String getUserGroups() {
-		
-		return  "{\"data\" : []}";
+
+		return "{\"data\" : []}";
 	}
 
 }
