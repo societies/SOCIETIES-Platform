@@ -45,6 +45,7 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.IFeedbackEvent;
 import org.societies.api.internal.personalisation.model.IOutcome;
@@ -56,7 +57,6 @@ import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
-import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
@@ -71,6 +71,7 @@ import org.societies.personalisation.common.api.management.IInternalPersonalisat
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
 import org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 public class PersonalisationManager extends EventListener implements IPersonalisationManager,
 IInternalPersonalisationManager, CtxChangeEventListener {
@@ -376,9 +377,8 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 	 * org.societies.api.personalisation.mgmt.IPersonalisationCallback)
 	 */
 	@Override
-	public void getPreference(IIdentity ownerID, String serviceType,
-			ServiceResourceIdentifier serviceID, String preferenceName,
-			IPersonalisationCallback callback) {
+	public Future<IAction> getPreference(IIdentity ownerID, String serviceType,
+			ServiceResourceIdentifier serviceID, String preferenceName) {
 		Future<List<IDIANNEOutcome>> futureDianneOuts = this.dianne.getOutcome(ownerID, serviceID, preferenceName);
 		Future<IOutcome> futurePrefOuts = this.pcm.getOutcome(ownerID, serviceID, preferenceName);
 		IAction action;
@@ -391,9 +391,9 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 				action.setServiceID(serviceID);
 				action.setServiceType(serviceType);
 
-				callback.receiveIAction(null, ownerID, serviceID, action);
+				return new AsyncResult<IAction>(action);
 			}else{
-				callback.receiveIAction(null, ownerID, serviceID, this.resolvePreferenceConflicts(dianneOut, prefOut));
+				return new AsyncResult<IAction>(this.resolvePreferenceConflicts(dianneOut, prefOut));
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -403,6 +403,7 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 			e.printStackTrace();
 		}
 
+		return null;
 	}
 
 	/*
@@ -416,46 +417,33 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 	 * org.societies.api.personalisation.mgmt.IPersonalisationCallback)
 	 */
 	@Override
-	public void getIntentAction(IIdentity requestor, IIdentity ownerID,
-			ServiceResourceIdentifier serviceID, String preferenceName,
-			IPersonalisationCallback callback) {
-		this.getIntentAction(ownerID, serviceID, preferenceName, callback);
+	public Future<IAction> getIntentAction(Requestor requestor, IIdentity ownerID,
+			ServiceResourceIdentifier serviceID, String preferenceName) 
+	{
+		return this.getIntentAction(ownerID, serviceID, preferenceName);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.societies.api.personalisation.mgmt.IPersonalisationManager#getPreference
-	 * (org.societies.api.comm.xmpp.datatypes.IIdentity,
-	 * org.societies.api.comm.xmpp.datatypes.IIdentity, java.lang.String,
-	 * org.societies.api.servicelifecycle.model.ServiceResourceIdentifier,
-	 * java.lang.String,
-	 * org.societies.api.personalisation.mgmt.IPersonalisationCallback)
-	 */
+
+/*
+ * (non-Javadoc)
+ * @see org.societies.api.personalisation.mgmt.IPersonalisationManager#getPreference(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, java.lang.String, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)
+ */
 	@Override
-	public void getPreference(IIdentity requestor, IIdentity ownerID,
+	public Future<IAction> getPreference(Requestor requestor, IIdentity ownerID,
 			String serviceType, ServiceResourceIdentifier serviceID,
-			String preferenceName, IPersonalisationCallback callback) {
+			String preferenceName) {
 		//check with access control 
-		this.getPreference(ownerID, serviceType, serviceID, preferenceName, callback);
+		return this.getPreference(ownerID, serviceType, serviceID, preferenceName);
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.societies.personalisation.common.api.management.
-	 * IInternalPersonalisationManager
-	 * #getIntentAction(org.societies.api.comm.xmpp.datatypes.IIdentity,
-	 * org.societies.api.servicelifecycle.model.ServiceResourceIdentifier,
-	 * java.lang.String,
-	 * org.societies.api.personalisation.mgmt.IPersonalisationCallback)
-	 */
+/*
+ * (non-Javadoc)
+ * @see org.societies.personalisation.common.api.management.IInternalPersonalisationManager#getIntentAction(org.societies.api.identity.IIdentity, org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier, java.lang.String)
+ */
 	@Override
-	public void getIntentAction(IIdentity ownerID,
-			ServiceResourceIdentifier serviceID, String preferenceName,
-			IPersonalisationCallback callback) {
+	public Future<IAction> getIntentAction(IIdentity ownerID,
+			ServiceResourceIdentifier serviceID, String preferenceName) {
 
 		Future<IUserIntentAction> futureCAUIOuts = this.cauiPrediction.getCurrentIntentAction(ownerID, serviceID, preferenceName);
 		Future<CRISTUserAction> futureCRISTOuts = this.cristPrediction.getCurrentUserIntentAction(ownerID, serviceID, preferenceName);
@@ -467,9 +455,9 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 
 			if (cauiOut.getvalue().equalsIgnoreCase(cristOut.getvalue())){
 				action = new Action(serviceID, "", preferenceName, cauiOut.getvalue());
-				callback.receiveIAction(null, ownerID, serviceID, action);
+				return new AsyncResult<IAction>(action);
 			}else{
-				callback.receiveIAction(null, ownerID, serviceID, this.resolveIntentConflicts(cristOut, cauiOut));
+				return new AsyncResult<IAction>(this.resolveIntentConflicts(cristOut, cauiOut));
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -478,8 +466,7 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-
+		return null;
 	}
 
 

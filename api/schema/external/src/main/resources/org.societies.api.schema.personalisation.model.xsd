@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0"
+targetNamespace="http://societies.org/api/schema/personalisation/model" 
+xmlns="http://societies.org/api/schema/personalisation/model"
+	xmlns:tns="http://societies.org/api/schema/servicelifecycle/model"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+
+
+	<xs:import namespace="http://societies.org/api/schema/servicelifecycle/model"
+		schemaLocation="org.societies.api.schema.servicelifecycle.model.xsd" />
+
+
+	<xs:complexType name="ActionBean">
+		<xs:sequence>
+			<xs:element name="parameterName" type="xs:string" />
+			<xs:element name="serviceType" type="xs:string"/>
+			<xs:element name="serviceID" type="tns:serviceResourceIdentifier"></xs:element>
+			<xs:element name="value" type="xs:string"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+  
+  
+  
+</xs:schema>

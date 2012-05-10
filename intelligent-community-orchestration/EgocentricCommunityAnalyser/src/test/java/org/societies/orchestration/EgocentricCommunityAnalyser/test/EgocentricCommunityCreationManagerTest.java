@@ -43,6 +43,7 @@ import org.societies.orchestration.EgocentricCommunityAnalyser.impl.EgocentricCo
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.Requestor;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxEntity;
@@ -77,7 +78,8 @@ import org.societies.api.css.management.ICssRecord;
 
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
-import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
+//Eliza: commented this: doesn't exist anymore
+//import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 
 import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 
@@ -274,8 +276,11 @@ public class EgocentricCommunityCreationManagerTest {
     	ServiceResourceIdentifier serviceId = mock(ServiceResourceIdentifier.class);
     	
     	IPersonalisationManager personalisationManager = mock(IPersonalisationManager.class);
-    	IPersonalisationCallback pc = mock(IPersonalisationCallback.class);
-    	personalisationManager.getPreference(ownerId, ownerId, "refuse creation of " + cisRecord.toString(), serviceId, "", pc);
+    	//Eliza: this doesn't exist anymore (you were re supposed to implement this not mock it)
+    	//IPersonalisationCallback pc = mock(IPersonalisationCallback.class);
+    	//Eliza: the method signature has changed. The first identity parameter is now a Requestor (see replacement below 
+    	//personalisationManager.getPreference(ownerId, ownerId, "refuse creation of " + cisRecord.toString(), serviceId, "");
+    	personalisationManager.getPreference(new Requestor(ownerId), ownerId, "refuse creation of " + cisRecord.toString(), serviceId, "");
     	egocentricCommunityCreationManager = new EgocentricCommunityCreationManager(ownerId, "CSS");
 		
     	egocentricCommunityCreationManager.setCisManager(cisManager);

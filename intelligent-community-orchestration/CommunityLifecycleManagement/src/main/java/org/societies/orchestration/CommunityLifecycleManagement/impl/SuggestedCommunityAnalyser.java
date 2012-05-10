@@ -104,7 +104,6 @@ import org.societies.orchestration.api.SuggestedCommunityAnalyserResultBean;
 
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
-import org.societies.api.personalisation.mgmt.IPersonalisationCallback;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
@@ -152,7 +151,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	private IPrivacyDataManager privacyDataManager;
 	
 	private IPersonalisationManager personalisationManager;
-	private IPersonalisationCallback personalisationCallback;
+	//Eliza commented: (this doesn't exist anymore:
+	//private IPersonalisationCallback personalisationCallback;
 	
 	private IServiceDiscovery serviceDiscovery;
 	private IServiceDiscoveryCallback serviceDiscoveryCallback;
@@ -789,13 +789,14 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	this.personalisationManager = personalisationManager;
     }
     
-    public IPersonalisationCallback getPersonalisationCallback() {
+/*   Eliza: these are not needed anymore
+ *  public IPersonalisationCallback getPersonalisationCallback() {
     	return personalisationCallback;
     }
     
     public void setPersonalisationCallback(IPersonalisationCallback personalisationCallback) {
     	this.personalisationCallback = personalisationCallback;
-    }
+    }*/
     
     /**Returns the list of package names of the message beans you'll be passing*/
     public List<String> getJavaPackages() {
