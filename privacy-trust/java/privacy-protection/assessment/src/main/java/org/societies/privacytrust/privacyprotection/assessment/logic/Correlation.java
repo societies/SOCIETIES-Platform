@@ -24,22 +24,22 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.List;
+
+import org.societies.privacytrust.privacyprotection.assessment.logger.Point;
 
 /**
- * Parses the log and tries to find potential privacy breaches that occurred in the past.
- * This can be used for the a-posteriori assessment.
  * 
- * Estimates whether a particular data transmission is a potential privacy breach or not.
- * This can be used for the a-priori assessment.
  *
  * @author Mitja Vardjan
  *
  */
-public class Assessment {
+public class Correlation {
 
-	private static Logger LOG = LoggerFactory.getLogger(Assessment.class);
-
+	// TODO: add function: exp(-t) * (1 - a) + a)  where a should be configurable and typically about 0.2
+	// Better make it a sigmoid function.
 	
+	public Correlation(List<Point> dataAccess, List<Point> dataTransmission) {
+		
+	}
 }

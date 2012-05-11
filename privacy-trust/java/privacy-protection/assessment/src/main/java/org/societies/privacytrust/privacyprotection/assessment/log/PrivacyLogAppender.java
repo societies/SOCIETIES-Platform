@@ -148,7 +148,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	}
 	
 	@Override
-	public void logContext(Requestor requestor) {
+	public void logContext(Requestor requestor, IIdentity dataOwner) {
 		
 		LOG.debug("logContext()");
 	}
