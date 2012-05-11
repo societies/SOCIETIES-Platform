@@ -36,6 +36,8 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
 
 /**
  * MISSING_JAVADOCS
+ * 
+ * this will be changed on W20, please wait by then
  */
 @SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface ICisRecord {
@@ -49,12 +51,18 @@ public interface ICisRecord {
 	 */
 	public String getCisId();
     
-    
+	/**
+	 * Returns the Name of the CIS
+	 * 
+	 * @param 
+	 * @return name of the CIS as a string
+	 */ 
     public String getName();
-    public String getOwnerId();
-    public String setUserDefinedName(String _name);
-    public String getUserDefineName();
-    public String getCisType();
+    //public String getOwnerId();
+    //public String setUserDefinedName(String _name);
+   // public String getUserDefineName();
+    //public String getCisType();
+    
     public int getMembershipCriteria();
 
 }

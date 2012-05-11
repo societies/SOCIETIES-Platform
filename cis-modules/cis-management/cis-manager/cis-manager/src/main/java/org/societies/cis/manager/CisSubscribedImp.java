@@ -45,44 +45,18 @@ public class CisSubscribedImp implements ICisRecord {
 
 	@Override
 	public String getCisId() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.cisRecord.getCisJid();
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getOwnerId() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String setUserDefinedName(String _name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getUserDefineName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getCisType() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.cisRecord.getCisName();
 	}
 
 	@Override
 	public int getMembershipCriteria() {
-		// TODO Auto-generated method stub
-		return 0;
+
+		return this.cisRecord.getMembershipCriteria();
 	}
 
 }

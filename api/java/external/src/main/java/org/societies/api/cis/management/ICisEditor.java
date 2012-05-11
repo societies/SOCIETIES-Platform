@@ -34,6 +34,8 @@ import org.societies.api.activity.IActivityFeed;
 /**
  * Remove if deprecated
  * MISSING_ANNOTATION
+ * 
+ * It will be removed by W20
  */
 
 @Deprecated
