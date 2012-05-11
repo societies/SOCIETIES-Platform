@@ -22,24 +22,31 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.assessment.logic;
+package org.societies.privacytrust.privacyprotection.assessment.logger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Date;
 
 /**
- * Parses the log and tries to find potential privacy breaches that occurred in the past.
- * This can be used for the a-posteriori assessment.
  * 
- * Estimates whether a particular data transmission is a potential privacy breach or not.
- * This can be used for the a-priori assessment.
  *
  * @author Mitja Vardjan
  *
  */
-public class Assessment {
+public class Point {
 
-	private static Logger LOG = LoggerFactory.getLogger(Assessment.class);
-
+	private Date time;
+	private long dataSize;
 	
+	public Point(Date time, long dataSize) {
+		this.time = time;
+		this.dataSize = dataSize;
+	}
+	
+	public Date getTime() {
+		return time;
+	}
+	
+	public long getDataSize() {
+		return dataSize;
+	}
 }
