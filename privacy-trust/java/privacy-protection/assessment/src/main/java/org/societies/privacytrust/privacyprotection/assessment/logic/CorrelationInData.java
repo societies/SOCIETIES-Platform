@@ -28,7 +28,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Estimation of correlation between two events (data access and data transmission) based on size
+ * difference between the data in events.
  * 
+ * The function itself is basically e^(-x^2), usually without x axis shift, with max value
+ * of 1.
+ * This results in a correlation that: <br/>
+ * - is 1 if size of accessed data matches size of transmitted data. <br/>
+ * - continuously decreases with size difference <br/>
+ * - then asymptotically approaches a value greater than zero (multiple data can be accumulated and
+ * sent at once in a bigger chunk; on the other hand data can be compressed and smaller transmitted
+ * data does not necessarily mean the events are not correlated) <br/>
  *
  * @author Mitja Vardjan
  *

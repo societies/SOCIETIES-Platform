@@ -28,7 +28,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Estimation of correlation between two events (data access and data transmission) based on time
+ * difference between the events.
  * 
+ * The function itself is sigmoidal, shifted right (x axis), shifted up and scaled (y axis).
+ * For negative x values it is always zero.
+ * This results in a correlation that: <br/>
+ * - is 0 if data transmission occurred before data access <br/>
+ * - is 1 if data transmission occurred on same time as data access <br/>
+ * - at first decreases only slightly (to account for possible data processing before transmission) <br/>
+ * - then decreases faster (for data transmissions that occur much later) <br/>
+ * - then asymptotically approaches a value greater than zero (data can be accumulated and sent much later) <br/>
  *
  * @author Mitja Vardjan
  *
