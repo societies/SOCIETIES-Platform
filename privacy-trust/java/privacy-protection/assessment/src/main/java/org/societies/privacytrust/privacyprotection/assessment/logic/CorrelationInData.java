@@ -63,15 +63,18 @@ public class CorrelationInData {
 	/**
 	 * Constructor.
 	 * 
-	 * @param valueAtInf
+	 * @param valueAtInf Minimal correlation value for events that are most far apart.
 	 * 
 	 * @param sizeShift Shift the correlation function along the x axis.
 	 * 
-	 * @param sizeScaleLeft x axis scaling factor for cases when difference is negative.
+	 * @param sizeScaleLeft x axis scaling factor for cases when data size difference is negative.
+	 * Negative difference can occur for example when data has been compressed before sending.
 	 * If greater than 1, the correlation function gets wider (less sensitive to size differences).
 	 * If smaller than 1, the function gets more narrow (more sensitive to size differences).
 	 * 
-	 * @param sizeScaleRight x axis scaling factor for cases when difference is positive.
+	 * @param sizeScaleRight x axis scaling factor for cases when data size difference is positive.
+	 * Positive difference can occur for example when multiple pieces of data have been accumulated
+	 * before sending everything in a single packet.
 	 * If greater than 1, the correlation function gets wider (less sensitive to size differences).
 	 * If smaller than 1, the function gets more narrow (more sensitive to size differences).
 	 */
@@ -103,6 +106,15 @@ public class CorrelationInData {
 		return c;
 	}
 	
+	/**
+	 * Estimates correlation between two events (data access and data transmission) based on sizes
+	 * of data in both events.
+	 * 
+	 * @param deltaSize Difference in size of data in bytes.
+	 * Size of transmitted data - size of accessed data.
+	 * 
+	 * @return correlation based on difference in data sizes.
+	 */
 	public double correlation(long deltaSize) {
 		
 		double c;

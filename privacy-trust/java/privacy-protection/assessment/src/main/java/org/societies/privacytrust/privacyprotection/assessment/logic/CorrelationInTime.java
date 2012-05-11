@@ -46,12 +46,22 @@ public class CorrelationInTime {
 	private double normalizationFactor;
 	private double normalizationOffset;
 
+	/**
+	 * Constructor with default values.
+	 */
 	public CorrelationInTime() {
 		valueAtInf = VALUE_AT_INF_DEFAULT;
 		timeShift = TIME_SHIFT_DEFAULT;
 		calculateNormalizationParameters();
 	}
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param valueAtInf Minimal correlation value for events that are most far apart.
+	 * 
+	 * @param timeShift Shift the correlation function along the x axis.
+	 */
 	public CorrelationInTime(double valueAtInf, double timeShift) {
 		this.valueAtInf = valueAtInf;
 		this.timeShift = timeShift;
@@ -67,6 +77,14 @@ public class CorrelationInTime {
 		return c;
 	}
 	
+	/**
+	 * Estimates correlation between two events (data access and data transmission) based on time
+	 * of both events.
+	 * 
+	 * @param dt Difference in time in seconds. Time of data transmission - time of data access.
+	 * 
+	 * @return correlation based on difference in time.
+	 */
 	public double correlation(double dt) {
 		
 		double c;
