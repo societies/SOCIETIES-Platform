@@ -36,6 +36,8 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
  */
 /**
  * MISSING_JAVADOCS
+ * 
+ * this will be removed by W20
  */
 @SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface ICisSubscribed extends ICisRecord {

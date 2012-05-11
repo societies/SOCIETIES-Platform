@@ -74,6 +74,24 @@ public interface ICisOwned extends ICisRecord {
 	 * @throws CommunicationException 
 	 * @throws InvalidFormatException 
 	 */
-	public Future<Boolean> addMember(String jid, String role) throws  CommunicationException, InvalidFormatException;
+	public Future<Boolean> addMember(String jid, String role) throws  CommunicationException;
 
+	/**
+	 * remove a member from the CIS 
+	 * 
+	 * @param jid is the full jid of the user to be removed
+	 * @return true if it worked and false if the user was not part of the group
+	 * @throws CommunicationException 
+	 * @throws InvalidFormatException 
+	 */
+	public Future<Boolean> removeMemberFromCIS(String jid) throws  CommunicationException;
+	
+	
+	// some getters and setters. TODO: change them to return Future so they can work for both remote and local CISs
+	// as soon as this is done, we will add the javadoc as well
+	public String getOwnerId();
+	public String getCisType();
+	public String setCisType(String type);
+	public int getMembershipCriteria();
+	
 }

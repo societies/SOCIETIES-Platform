@@ -108,6 +108,14 @@ public interface ICisManager {
 	List<ICisRecord> getCisList();
 
 	
+	/**
+	 * retrieves the list of CISs owned by that CIS Manager
+	 * 
+	 * @return list of {@link ICisOwned}
+	 */
+	public List<ICisOwned> getListOfOwnedCis();
+
+	
 	// END OF API implementing server functionality
 	
 	// API implementing client functionality (to be called from webapp)
