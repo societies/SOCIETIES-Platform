@@ -57,7 +57,7 @@ import org.societies.orchestration.api.ICisRecord;
 import org.societies.orchestration.api.ICisManager;
 import org.societies.orchestration.api.ICisOwned;
 import org.societies.orchestration.api.ICisEditor;
-import org.societies.api.cis.management.ICisSubscribed;
+//import org.societies.api.cis.management.ICisSubscribed;
 
 
 import org.societies.api.activity.IActivity;
