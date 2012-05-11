@@ -92,6 +92,7 @@ public class HelloWorld implements IHelloWorld, IActionConsumer{
 	public void setVolume(IIdentity userId, String volume) {
 		
 		IAction action = new Action(this.myServiceID, "HelloWorld", "volume", volume);
+		log("sending action to uam: "+action.toString());
 		this.uam.monitor(userId, action);
 	}
 	/**
