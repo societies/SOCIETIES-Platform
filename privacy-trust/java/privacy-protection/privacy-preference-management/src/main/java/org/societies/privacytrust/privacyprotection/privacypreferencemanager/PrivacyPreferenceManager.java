@@ -36,11 +36,13 @@ import javax.swing.JOptionPane;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
@@ -58,6 +60,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RuleTarget;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
+import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails;
@@ -74,6 +77,7 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PreferenceEvaluator;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PrivateContextCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.management.PrivatePreferenceCache;
+import org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.PrivacyPreferenceConditionMonitor;
 
 /**
  * @author Elizabeth
@@ -90,6 +94,14 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 
 	private ITrustBroker trustBroker;
 	
+	private PrivacyPreferenceConditionMonitor privacyPCM;
+	
+	private IPrivacyDataManagerInternal privacyDataManager;
+	
+	private IIdentityManager idm;
+	
+	private ICommManager commsManager;
+	
 	public PrivacyPreferenceManager(){
 		
 	}
@@ -98,7 +110,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	public void initialisePrivacyPreferenceManager(ICtxBroker ctxBroker, ITrustBroker trustBroker){
 		this.setCtxBroker(ctxBroker);
 		this.trustBroker = trustBroker;
-		
+		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, getPrivacyDataManager(), idm);
 	}
 	
 	/**
@@ -318,6 +330,14 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		this.logging.debug("Number of applicable preferences: "+outcomes.size());
 		return outcomes;
 	}
+	
+	public IPrivacyOutcome evaluatePPNPreference(PPNPreferenceDetails detail){
+		IPrivacyPreferenceTreeModel model = this.prefCache.getPPNPreference(detail);
+		IPrivacyOutcome outcome = this.evaluatePreference(model.getRootPreference());
+		return outcome;
+	}
+
+	
 	
 	/*
 	 * (non-Javadoc)
@@ -938,6 +958,44 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		details.setRequestor(requestor);
 		IPrivacyPreferenceTreeModel model = this.getIDSPreference(details);
 	}
+
+
+	/**
+	 * @return the privacyDataManager
+	 */
+	public IPrivacyDataManagerInternal getPrivacyDataManager() {
+		return privacyDataManager;
+	}
+
+
+	/**
+	 * @param privacyDataManager the privacyDataManager to set
+	 */
+	public void setPrivacyDataManager(IPrivacyDataManagerInternal privacyDataManager) {
+		this.privacyDataManager = privacyDataManager;
+	}
+
+
+	/**
+	 * @return the commsManager
+	 */
+	public ICommManager getCommsManager() {
+		return commsManager;
+	}
+
+
+	/**
+	 * @param commsManager the commsManager to set
+	 */
+	public void setCommsManager(ICommManager commsManager) {
+		this.commsManager = commsManager;
+		this.idm = commsManager.getIdManager();
+	}
+
+
+
+
+
 
 
 	/*	public static void main(String[] args){
