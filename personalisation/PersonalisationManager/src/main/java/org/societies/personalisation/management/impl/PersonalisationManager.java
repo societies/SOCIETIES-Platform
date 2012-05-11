@@ -122,6 +122,7 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 		this.idm = this.getCommsMgr().getIdManager();
 		retrieveConfidenceLevels();
 		this.registerForUIMEvents();
+		this.dianne.registerContext();
 		this.logging.debug("initialisePersonalisationManager(ICtxBroker broker, IUserPreferenceConditionMonitor pcm, IDIANNE dianne, ICAUIPrediction cauiPrediction, ICRISTUserIntentPrediction cristPrediction, ICommManager commsMgr, IDecisionMaker decisionMaker)");
 
 	}
@@ -134,7 +135,9 @@ IInternalPersonalisationManager, CtxChangeEventListener {
 		this.cristList = new ArrayList<CtxAttributeIdentifier>();
 		this.registerForUIMEvents();
 		retrieveConfidenceLevels();
+		this.dianne.registerContext();
 		this.logging.debug("initialisePersonalisationManager()");
+		
 	}
 
 
