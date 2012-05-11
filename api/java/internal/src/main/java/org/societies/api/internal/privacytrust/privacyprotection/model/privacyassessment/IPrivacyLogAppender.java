@@ -95,5 +95,5 @@ public interface IPrivacyLogAppender {
 	 * @param entry
 	 * @return
 	 */
-	public boolean log(LogEntry entry);
+	public boolean log(DataTransmissionLogEntry entry);
 }

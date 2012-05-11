@@ -33,8 +33,8 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.ChannelType;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.LogEntry;
 import org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean;
 
 /**
@@ -120,7 +120,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	 * @see IPrivacyLogAppender#log(LogEntry)
 	 */
 	@Override
-	public boolean log(LogEntry entry) {
+	public boolean log(DataTransmissionLogEntry entry) {
 		
 		LOG.debug("log()");
 
@@ -151,6 +151,8 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	public void logContext(Requestor requestor, IIdentity dataOwner) {
 		
 		LOG.debug("logContext()");
+		
+		requestor.getRequestorId();
 	}
 
 	@Override

@@ -32,7 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.LogEntry;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
 import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLogAppender;
 
 /**
@@ -68,7 +68,7 @@ public class PrivacyLogAppenderTest {
 		
 		LOG.debug("testLog()");
 		
-		LogEntry entry = mock(LogEntry.class);
+		DataTransmissionLogEntry entry = mock(DataTransmissionLogEntry.class);
 		boolean result;
 		
 		result = privacyLogAppender.log(entry);

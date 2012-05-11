@@ -26,53 +26,43 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacya
 
 import java.util.Date;
 
+import org.societies.api.identity.IIdentity;
+
 /**
  * 
  *
  * @author Mitja Vardjan
  *
  */
-public class LogEntry {
+public class DataAccessLogEntry {
 	
-	private final String dataType;
 	private final Date time;
-	private final boolean sentToGroup;
-	private final String receiverId;	
-	private final String senderId;
-	private final ChannelType channelId;
+	private final IIdentity requestor;	
+	private final IIdentity owner;
+	private final long dataSize;
 	
-	public LogEntry(String dataType, Date time, boolean sentToGroup, String receiverId,
-			String senderId, ChannelType channelId) {
+	public DataAccessLogEntry(Date time, IIdentity requestor,
+			IIdentity owner, long payloadSize) {
 		
-		this.dataType = dataType;
 		this.time = time;
-		this.sentToGroup = sentToGroup;
-		this.receiverId = receiverId;
-		this.senderId = senderId;
-		this.channelId = channelId;
-	}
-	
-	public String getDataType() {
-		return dataType;
+		this.requestor = requestor;
+		this.owner = owner;
+		this.dataSize = payloadSize;
 	}
 	
 	public Date getTime() {
 		return time;
 	}
 	
-	public boolean getSentToGroup() {
-		return sentToGroup;
+	public IIdentity getRequestor() {
+		return requestor;
 	}
 	
-	public String getReceiverId() {
-		return receiverId;
+	public IIdentity getOwner() {
+		return owner;
 	}
 	
-	public String getSenderId() {
-		return senderId;
-	}
-	
-	public ChannelType getChannelId() {
-		return channelId;
+	public long getPayloadSize() {
+		return dataSize;
 	}
 }

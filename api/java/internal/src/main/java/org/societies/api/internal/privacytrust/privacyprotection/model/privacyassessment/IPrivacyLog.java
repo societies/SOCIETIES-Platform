@@ -33,12 +33,12 @@ public interface IPrivacyLog {
 	 * @param filter The filter to select log entries.
 	 * @return Log entries that match given filter.
 	 */
-	public LogEntry[] search(PrivacyLogFilter filter);
+	public DataTransmissionLogEntry[] search(PrivacyLogFilter filter);
 	
 	/**
 	 * Get all logs.
 	 * 
 	 * @return All entries in the log in no particular order.
 	 */
-	public LogEntry[] getAll();
+	public DataTransmissionLogEntry[] getAll();
 }

@@ -22,13 +22,12 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.assessment.log;
+package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLog;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.PrivacyLogFilter;
+import java.util.Date;
+
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
 
 /**
  * 
@@ -36,27 +35,65 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacyas
  * @author Mitja Vardjan
  *
  */
-public class PrivacyLog implements IPrivacyLog {
-
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyLog.class);
-
-	public PrivacyLog() {
-		LOG.info("constructor");
+public class DataTransmissionLogEntry {
+	
+	private final String dataType;
+	private final Date time;
+	private final boolean sentToGroup;
+	private final IIdentity receiver;	
+	private final IIdentity sender;
+	private final long payloadSize;
+	private final ChannelType channelId;
+	
+	public DataTransmissionLogEntry(String dataType, Date time, IIdentity receiver,
+			IIdentity sender, long payloadSize, ChannelType channelId) {
+		
+		this.dataType = dataType;
+		this.time = time;
+		this.sentToGroup = (receiver.getType() == IdentityType.CIS);
+		this.receiver = receiver;
+		this.sender = sender;
+		this.payloadSize = payloadSize;
+		this.channelId = channelId;
 	}
 	
-	@Override
-	public DataTransmissionLogEntry[] search(PrivacyLogFilter filter) {
+	public DataTransmissionLogEntry(String dataType, Date time, boolean sentToGroup, IIdentity receiver,
+			IIdentity sender, long payloadSize, ChannelType channelId) {
 		
-		LOG.debug("search({})", filter);
-		
-		return null;
+		this.dataType = dataType;
+		this.time = time;
+		this.sentToGroup = sentToGroup;
+		this.receiver = receiver;
+		this.sender = sender;
+		this.payloadSize = payloadSize;
+		this.channelId = channelId;
 	}
 	
-	@Override
-	public DataTransmissionLogEntry[] getAll() {
-		
-		LOG.debug("getAll()");
-		
-		return null;
+	public String getDataType() {
+		return dataType;
+	}
+	
+	public Date getTime() {
+		return time;
+	}
+	
+	public boolean getSentToGroup() {
+		return sentToGroup;
+	}
+	
+	public IIdentity getReceiver() {
+		return receiver;
+	}
+	
+	public IIdentity getSender() {
+		return sender;
+	}
+	
+	public long getPayloadSize() {
+		return payloadSize;
+	}
+	
+	public ChannelType getChannelId() {
+		return channelId;
 	}
 }
