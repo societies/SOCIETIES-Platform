@@ -96,11 +96,12 @@ public class Tester {
 			log("Step: "+i);
 			
 			this.helloWorldService.setBackgroundColour(userId, "red");
-			
+			changeContext("home", "busy");
+			this.helloWorldService.setVolume(userId, "10");
 			changeContext("work", "busy");
-			
 			this.helloWorldService.setBackgroundColour(userId, "black");
-			
+			changeContext("work", "free");
+			this.helloWorldService.setVolume(userId, "50");
 			changeContext("home", "free");	
 		}
 					
