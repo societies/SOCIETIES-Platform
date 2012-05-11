@@ -24,12 +24,15 @@
  */
 package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
+import java.io.Serializable;
+
 /**
  * Describe your class here...
  *
  * @author Eliza
  *
  */
-public class DObfPreferenceDetails {
+public class DObfPreferenceDetails implements Serializable{
 
+	
 }
