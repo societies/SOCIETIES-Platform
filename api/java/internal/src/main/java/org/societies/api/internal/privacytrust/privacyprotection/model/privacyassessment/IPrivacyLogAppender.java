@@ -64,6 +64,7 @@ public interface IPrivacyLogAppender {
 	 * 
 	 * @return true if OK to send the data, false to cancel
 	 */
+	@Deprecated
 	public boolean logSN(String dataType, Date time, boolean sentToGroup, IIdentity sender,
 			IIdentity receiver, ChannelType channelId);
 
