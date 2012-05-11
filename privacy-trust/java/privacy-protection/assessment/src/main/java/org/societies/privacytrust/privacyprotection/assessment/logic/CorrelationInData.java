@@ -24,6 +24,9 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * 
  *
@@ -31,45 +34,84 @@ package org.societies.privacytrust.privacyprotection.assessment.logic;
  *
  */
 public class CorrelationInData {
-	
-	private final double VALUE_AT_INF_DEFAULT = 0;
+
+	private static Logger LOG = LoggerFactory.getLogger(CorrelationInData.class);
+
+	private final double VALUE_AT_INF_DEFAULT = 0.1;
 	private final double SIZE_SHIFT_DEFAULT = 0;
+	private final double SIZE_SCALE_DEFAULT = 1;
 	
 	private double valueAtInf;
 	private double xShift;
+	private double xScaleLeft;
+	private double xScaleRight;
 
+	/**
+	 * Constructor with default values
+	 */
 	public CorrelationInData() {
 		valueAtInf = VALUE_AT_INF_DEFAULT;
 		xShift = SIZE_SHIFT_DEFAULT;
+		xScaleLeft = SIZE_SCALE_DEFAULT;
+		xScaleRight = SIZE_SCALE_DEFAULT;
 	}
 	
-	public CorrelationInData(double valueAtInf, double sizeShift) {
+	/**
+	 * Constructor
+	 * 
+	 * @param valueAtInf
+	 * 
+	 * @param sizeShift Shift the correlation function along the x axis.
+	 * 
+	 * @param sizeScaleLeft x axis scaling factor for cases when difference is negative.
+	 * If greater than 1, the correlation function gets wider (less sensitive to size differences).
+	 * If smaller than 1, the function gets more narrow (more sensitive to size differences).
+	 * 
+	 * @param sizeScaleRight x axis scaling factor for cases when difference is positive.
+	 * If greater than 1, the correlation function gets wider (less sensitive to size differences).
+	 * If smaller than 1, the function gets more narrow (more sensitive to size differences).
+	 */
+	public CorrelationInData(double valueAtInf, double sizeShift, double sizeScaleLeft, double sizeScaleRight) {
 		this.valueAtInf = valueAtInf;
 		this.xShift = sizeShift;
+		this.xScaleLeft = sizeScaleLeft;
+		this.xScaleRight = sizeScaleRight;
+		if (xShift != 0) {
+			LOG.warn("xShift set to non-zero: {}", xShift);
+		}
 	}
 	
-	private double correlationUnnormalized(double dt) {
+	private double correlationUnnormalized(double deltaSize) {
 		
 		double c;
+		double xScale;
 		
-		c = 1 - 1 / (1 + Math.exp(-(dt - xShift)));
+		if (deltaSize - xShift < 0) {
+			xScale = this.xScaleLeft;
+		}
+		else {
+			xScale = this.xScaleRight;
+		}
+		
+		c = (deltaSize - xShift) / xScale;
+		c = Math.exp(-Math.pow(c, 2));
 		return c;
 	}
 	
-	public double correlation(double dt) {
+	public double correlation(double deltaSize) {
 		
 		double c;
 		
-		if (dt < 0) {
+		if (deltaSize < 0) {
 			c = 0;
 		}
 		else {
-			c = normalize(correlationUnnormalized(dt));
+			c = normalize(correlationUnnormalized(deltaSize));
 		}
 		return c;
 	}
 	
-	public double normalize(double x) {
+	private double normalize(double x) {
 		
 		double k = 1 - valueAtInf;
 		double n = valueAtInf;

@@ -24,6 +24,9 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * 
  *
@@ -31,7 +34,9 @@ package org.societies.privacytrust.privacyprotection.assessment.logic;
  *
  */
 public class CorrelationInTime {
-	
+
+	private static Logger LOG = LoggerFactory.getLogger(CorrelationInTime.class);
+
 	private final double VALUE_AT_INF_DEFAULT = 0.2;
 	private final double TIME_SHIFT_DEFAULT = 3;
 	
@@ -70,7 +75,7 @@ public class CorrelationInTime {
 		return c;
 	}
 	
-	public double normalize(double x) {
+	private double normalize(double x) {
 		
 		double k = 1 - valueAtInf;
 		double n = valueAtInf;
