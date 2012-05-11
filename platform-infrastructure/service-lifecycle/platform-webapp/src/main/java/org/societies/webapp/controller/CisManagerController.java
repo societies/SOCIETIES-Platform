@@ -42,7 +42,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
-import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.cis.management.ICis;
 
 @Controller
 public class CisManagerController {
@@ -121,7 +121,7 @@ public class CisManagerController {
 
 				//ICisRecord searchRecord = null;
 				//ICisRecord[] records = this.getCisManager().getCisList(searchRecord);
-				List<ICisRecord> records = this.getCisManager().getCisList();
+				List<ICis> records = this.getCisManager().getCisList();
 				model.put("cisrecords", records);
 
 			} else {

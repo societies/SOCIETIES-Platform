@@ -60,10 +60,9 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.cis.management.ICisEditor;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisParticipant;
-import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.cis.management.ICis;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.cis.manager.CisParticipant.MembershipType;
 import org.societies.identity.IdentityImpl;
@@ -92,8 +91,8 @@ import org.springframework.scheduling.annotation.AsyncResult;
 */
 
 @Entity
-@Table(name = "org_societies_cis_manager_CisEditor")
-public class CisEditor implements IFeatureServer, ICisOwned {
+@Table(name = "org_societies_cis_manager_Cis")
+public class Cis implements IFeatureServer, ICisOwned {
 
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
@@ -175,16 +174,16 @@ public class CisEditor implements IFeatureServer, ICisOwned {
 
 
 	private static Logger LOG = LoggerFactory
-			.getLogger(CisEditor.class);	
+			.getLogger(Cis.class);	
 	
-	public CisEditor(){
+	public Cis(){
 		
 	}
 
 
 
 	// maximum constructor of a CIS without a pre-determined ID or host
-	public CisEditor(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory
+	public Cis(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory
 	,String permaLink,String password,String host, String description) {
 		this(cssOwner, cisName, cisType, mode,ccmFactory);
 		this.password = password;
@@ -196,7 +195,7 @@ public class CisEditor implements IFeatureServer, ICisOwned {
 	
 
 	// minimum constructor of a CIS without a pre-determined ID or host
-	public CisEditor(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory) {
+	public Cis(String cssOwner, String cisName, String cisType, int mode,ICISCommunicationMgrFactory ccmFactory) {
 		
 		this.owner = cssOwner;
 		this.cisType = cisType;
@@ -459,7 +458,7 @@ public class CisEditor implements IFeatureServer, ICisOwned {
 
 	// constructor for creating a CIS from a CIS record, maybe the case when we are retrieving data from a database
 	// TODO: review as it is almost empty!!
-	public CisEditor(CisRecord cisRecord) {
+	public Cis(CisRecord cisRecord) {
 		
 		this.cisRecord = cisRecord; 
 		
@@ -488,7 +487,7 @@ public class CisEditor implements IFeatureServer, ICisOwned {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		CisEditor other = (CisEditor) obj;
+		Cis other = (Cis) obj;
 		if (cisRecord == null) {
 			if (other.cisRecord != null)
 				return false;

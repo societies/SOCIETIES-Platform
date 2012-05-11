@@ -79,15 +79,15 @@ public interface ICisManager {
 	
 	/**
 	 * Get a CIS Record with the ID cisId.
-	 * The one calling the api must be aware that he will get a {@link ICisRecord} which
+	 * The one calling the api must be aware that he will get a {@link ICis} which
 	 * will not implement all the methods for the case of CIS that the user owns
 	 * 
 	 * @param cssId The ID (jabber ID) of the CSS triggering the command (TODO: do we really need it?).
 	 * @param cisId The ID (jabber ID) of the CIS to get.
-	 * @return the {@link ICisRecord} matching the input cisID, or null if no such CIS is owned or subscribed by the user.
+	 * @return the {@link ICis} matching the input cisID, or null if no such CIS is owned or subscribed by the user.
 	 * 
 	 */
-	ICisRecord getCis(String cssId, String cisId);
+	ICis getCis(String cssId, String cisId);
 	
 	/**
 	 * Get a CIS Owned Interface with the ID cisId.
@@ -105,7 +105,7 @@ public interface ICisManager {
 	 * 
 	 * @return Array of {@linkICisRecord} .
 	 */
-	List<ICisRecord> getCisList();
+	List<ICis> getCisList();
 
 	
 	/**
@@ -138,7 +138,7 @@ public interface ICisManager {
 	 * @param query Defines what to search for.
 	 * @return Array of CIS Records that match the query.
 	 */
-	ICisRecord[] getCisList(ICisRecord query);
+	ICis[] getCisList(ICis query);
 
 	
 	

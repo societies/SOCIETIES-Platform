@@ -26,14 +26,14 @@
 
 package org.societies.cis.manager;
 
-import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.cis.management.ICis;
 
 /**
  * @author Thomas Vilarinho (Sintef)
 */
 
 
-public class CisSubscribedImp implements ICisRecord {
+public class CisSubscribedImp implements ICis {
 
 	
 	private CisRecord cisRecord;
