@@ -175,6 +175,14 @@
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>		
+			<groupId>org.societies.privacytrust.privacyprotection</groupId>
+			<artifactId>privacydatamanagement</artifactId>
+			<version>0.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+				
 	</dependencies>
 
 	<build>

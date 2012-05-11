@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.activity.model.Activity;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Entity
 @Table(name = "org_societies_activity_ActivityFeed")
@@ -31,7 +32,7 @@ public class ActivityFeed implements IActivityFeed {
 	public ActivityFeed(String id){
 		this.id = id;
 	}
-	private static SessionFactory sessionFactory;
+	@Autowired private static SessionFactory sessionFactory;
 	private static Logger log = LoggerFactory.getLogger(ActivityFeed.class);
 	
 	

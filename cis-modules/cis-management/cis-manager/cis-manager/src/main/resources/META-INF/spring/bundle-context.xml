@@ -66,6 +66,7 @@
 
             <list>
                 <value>org.societies.cis.manager</value>
+                <value>org.societies.cis.activity</value>
             </list>
         </property>
 
