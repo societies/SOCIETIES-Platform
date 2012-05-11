@@ -66,7 +66,7 @@ public interface ISuggestedCommunityAnalyser {
 	 * It contains all the CisRecords to delete.
 	 * 
 	 */
-    public void processCSCWRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations);
+    public void processCSCWRecommendations(HashMap<String, ArrayList<ICis>> cisRecommendations);
 	
     /**
 	 * Takes as input a collection of CISs, and what they represent, and performs analysis on them
@@ -98,7 +98,7 @@ public interface ISuggestedCommunityAnalyser {
 	 * 
 	 * 
 	 */
-    public void processCSCWConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations);
+    public void processCSCWConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICis>>> cisRecommendations);
     
    /** @param communitySuggestions
 	 * This contains a list of CSSs and the context state model they all match
@@ -129,7 +129,7 @@ public interface ISuggestedCommunityAnalyser {
 	 * It contains all the CisRecords to delete.
 	 * 
 	 */
-    public ArrayList<String> processEgocentricRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations, ArrayList<String> cissToCreateMetadata);
+    public ArrayList<String> processEgocentricRecommendations(HashMap<String, ArrayList<ICis>> cisRecommendations, ArrayList<String> cissToCreateMetadata);
     
     /**
 	 * Takes as input a collection of CISs, and what they represent, and performs analysis on them
@@ -159,6 +159,6 @@ public interface ISuggestedCommunityAnalyser {
 	 * for example who the new owner should be.
 	 * 
 	 */
-    public ArrayList<String> processEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations, ArrayList<String> cissToCreateMetadata);
+    public ArrayList<String> processEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICis>>> cisRecommendations, ArrayList<String> cissToCreateMetadata);
 
 }

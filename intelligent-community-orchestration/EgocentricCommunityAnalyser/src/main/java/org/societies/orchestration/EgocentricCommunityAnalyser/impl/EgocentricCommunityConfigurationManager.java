@@ -37,17 +37,18 @@ import org.societies.api.internal.css.discovery.ICssDiscovery;
 //import org.societies.api.internal.cis.management.ServiceSharingRecord;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 //import org.societies.api.internal.cis.management.ICisActivity;
-//import org.societies.api.internal.cis.management.ICisRecord;
+//import org.societies.api.internal.cis.management.ICis;
 
-/**import org.societies.api.cis.management.ICisRecord;
+/**import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisEditor;*/
 
-//import org.societies.orchestration.api.ICisRecord;
+import org.societies.orchestration.api.ICis;
 import org.societies.orchestration.api.ICisManager;
 import org.societies.orchestration.api.ICisOwned;
-import org.societies.orchestration.api.ICisEditor;
+import org.societies.orchestration.api.ICisParticipant;
+//import org.societies.orchestration.api.ICisEditor;
 
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
@@ -89,7 +90,7 @@ import org.societies.api.context.model.CtxIdentifier;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
-import org.societies.orchestration.api.ICisRecord;
+import org.societies.orchestration.api.ICis;
 import org.societies.orchestration.api.ISuggestedCommunityAnalyser;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserBean;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType;
@@ -142,7 +143,7 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 	//private ICommunityCtxBroker communityContextBroker;
 	//private IUserCtxBrokerCallback userContextBrokerCallback;
 
-	private ArrayList<ICisRecord> recentRefusals;
+	private ArrayList<ICis> recentRefusals;
 
 	private IUserFeedback userFeedback;
 
@@ -193,21 +194,21 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 	 */
 	
 	public ArrayList<String> identifyCissToConfigure(HashMap <IIdentity, String> userCissMetadata) {
-		ArrayList<ICisRecord> cisRecords = new ArrayList();
-		ArrayList<ICisRecord> cissToConfigure = new ArrayList<ICisRecord>();
-		HashMap<ICisRecord, ICisRecord> configurationsToCiss = new HashMap<ICisRecord, ICisRecord>();
+		ArrayList<ICis> cisRecords = new ArrayList();
+		ArrayList<ICis> cissToConfigure = new ArrayList<ICis>();
+		HashMap<ICis, ICis> configurationsToCiss = new HashMap<ICis, ICis>();
 		
 		//cssManager = mock(ICSSLocalManager.class);
 		//activityFeed = mock(ICssActivityFeed.class);
 		
 		if (linkedCss != null) {
 			//CisRecord[] records = ICisManager.getCisList(/** CISs administrated by the CSS */);
-			ICisRecord record = cisManager.getCis(linkedCss.toString(), "default CIS");
+			ICis record = cisManager.getCis(linkedCss.toString(), "default CIS");
 			//edit out all CIS attributes and add attribute 'owner' or 'administrator'
 			
-			ICisRecord[] listOfUserJoinedCiss = cisManager.getCisList(record);
-			//ICisRecord[] listOfUserJoinedCiss = cisManager.getCisList(new ICisRecord(null, null, null, null, null, it, null, null, null));
-			//ICisRecord[] listOfUserJoinedCiss = new ICisRecord[0];
+			ICis[] listOfUserJoinedCiss = cisManager.getCisList(record);
+			//ICis[] listOfUserJoinedCiss = cisManager.getCisList(new ICis(null, null, null, null, null, it, null, null, null));
+			//ICis[] listOfUserJoinedCiss = new ICis[0];
 		}
 		
 		//if (linkedDomain != null) {
@@ -263,7 +264,7 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 		//Change owner or administrator
 		boolean stopLoop = false;
 		//for (int i = 0; (i < cisRecords.size()) && (stopLoop == false); i++) {
-		//    ICisRecord cisUnderAnalysis = cisRecords.get(i);
+		//    ICis cisUnderAnalysis = cisRecords.get(i);
 		//    ArrayList<IIdentity> cisMembers = cisUnderAnalysis.getMembers();
 		//    for (int i = 0; i < cisMembers.size(); i++) {
 		//        CisActivityFeed theFeed = cisUnderAnalysis.getActivityFeed();
@@ -293,7 +294,7 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 		//                            && cisMembers.get(n).ownedServices().contains("service X"))) {
 		//                            suggest rival as owner and stop top-level loop
 		//                            cissToConfigure.add(cisUnderAnalysis);
-		//                            configurationsToCiss.add(cisUnderAnalysis, new ICisRecord(copied except this is the owner));
+		//                            configurationsToCiss.add(cisUnderAnalysis, new ICis(copied except this is the owner));
 		//                            stopLoop = true;
 		//                        }
 		//                else
@@ -309,18 +310,18 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 		
 		
 		
-		HashMap<ICisRecord, ICisRecord> finalConfiguredCiss = new HashMap<ICisRecord, ICisRecord>();
+		HashMap<ICis, ICis> finalConfiguredCiss = new HashMap<ICis, ICis>();
 		
 		//can't use GUI in tests
 		//finalConfiguredCiss = getUserFeedbackOnConfiguration(cissToConfigure);
 		
 		finalConfiguredCiss = configurationsToCiss;
 		
-		Iterator<ICisRecord> iterator = cissToConfigure.iterator();
+		Iterator<ICis> iterator = cissToConfigure.iterator();
 		
 		while (iterator.hasNext()) {
-		    ICisRecord configurableCis = iterator.next();
-            ICisRecord cisConfiguration = finalConfiguredCiss.get(configurableCis);
+		    ICis configurableCis = iterator.next();
+            ICis cisConfiguration = finalConfiguredCiss.get(configurableCis);
 			    //if "remove members"
 	        	//    attempt to remove members - perhaps SOCIETIES platform itself should have mechanism
 	        	//    where if a user deletion from CIS attempt is made, 
@@ -340,8 +341,8 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 		
 	}
 	
-	public ArrayList<ICisRecord> getUserFeedbackOnConfiguration(ArrayList<ICisRecord> cissToConfigure) {
-		ArrayList<ICisRecord> finalisedCiss = null;
+	public ArrayList<ICis> getUserFeedbackOnConfiguration(ArrayList<ICis> cissToConfigure) {
+		ArrayList<ICis> finalisedCiss = null;
 		String[] options = new String[1];
 		options[0] = "options";
 		String userResponse = null;
@@ -364,9 +365,9 @@ public class EgocentricCommunityConfigurationManager //implements ICommCallback
 		    String background = "This message is in your inbox or something, waiting for you to read it";
 		}
 		else {
-		   	Iterator<ICisRecord> iterator = cissToConfigure.iterator();
+		   	Iterator<ICis> iterator = cissToConfigure.iterator();
 			while (iterator.hasNext()) {
-			    ICisRecord potentiallyCreatableCis = iterator.next();
+			    ICis potentiallyCreatableCis = iterator.next();
 		        if (userResponse.equals("Yes")) {
 				    finalisedCiss.add(potentiallyCreatableCis);
 			       // cisManager.createCis(linkedCss, potentiallyCreatableCis.getCisId());

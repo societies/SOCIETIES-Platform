@@ -24,48 +24,45 @@
  */
 package org.societies.orchestration.api;
 
-import org.societies.api.activity.IActivityFeed;
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
- * We need to remove this from the API. It is implementation specific.
  * @author Babak.Farshchian@sintef.no
  *
  */
+
+
+
 /**
- * Remove if deprecated
- * MISSING_ANNOTATION
+ * MISSING_JAVADOCS
+ * 
+ * this will be changed on W20, please wait by then
  */
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
+public interface ICis {
 
-public class ICisEditor {
-
-	public ICisEditor() {
-		
-	}
-	
-    /**
-     * Returns the CISActivityFeed for a specific CIS.
-     * 
-     * @param cssId The ID of the owner CSS.
-     * @param cisId The ID of the CIS.
-     * @return The CISActivityFeed of the CIS.
-     */
-    public IActivityFeed getActivityFeed(String cssId, String cisId) {
-    	return null;
-    }
-    public String getCisId() {
-    	return "";
-    }
-    /**
-     * Updates an existing CIS with the data in the newCis. Update is done canonical. If it fails, the old CIS is
-     * not changed at all.
-     * 
-     * @param cssId The ID of the owner CSS
-     * @param newCis the data to be updated is specified in this CISRecord.
-     * @param oldCisId The ID of the CIS that needs to be updated.
-     * @return true if update was successful, 
-     */
-    public Boolean update(String cssId, ICisRecord newCis, String oldCisId) {
-    	return true;
-    }
+    
+	/**
+	 * Returns the jid of the CIS
+	 * 
+	 * @param 
+	 * @return jid to address the CIS as a string
+	 */
+	public String getCisId();
+    
+	/**
+	 * Returns the Name of the CIS
+	 * 
+	 * @param 
+	 * @return name of the CIS as a string
+	 */ 
+    public String getName();
+    //public String getOwnerId();
+    //public String setUserDefinedName(String _name);
+   // public String getUserDefineName();
+    //public String getCisType();
+    
+    public int getMembershipCriteria();
 
 }

@@ -22,44 +22,33 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.societies.orchestration.api;
 
+/**
+ * @author Thomas.Vilarinho@sintef.no
+ *
+ */
+
+import org.societies.api.activity.IActivityFeed;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
-/**
- * @author Babak.Farshchian@sintef.no
- *
- */
-/**
- * MISSING_JAVADOCS
- */
-public class ICisRecord {
-
-	public ICisRecord() {
-		
-	}
+@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
+public interface ICisParticipant {
 	
-    public String getCisId() {
-    	return "";
-    }
-    public String getName() {
-    	return "";
-    }
-    public String getOwnerId() {
-    	return "";
-    }
-    public String setUserDefinedName(String _name) {
-    	return "";
-    }
-    public String getUserDefineName() {
-    	return "";
-    }
-    public String getCisType() {
-    	return "";
-    }
-    public int getMembershipCriteria() {
-    	return 0;
-    }
+	/**
+	 * Gets jid of the participant
+	 * @param 
+	 * @return jid of the participant
+	 */
+	public String getMembersJid();
+	
+	/**
+	 * Gets the role that the member plays in the CIS
+	 * @param 
+	 * @return String ("owner", "participant", "admin" where admin has not been defined yet)
+	 */
+	public String getMembershipType();
 
 }
