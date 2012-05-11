@@ -43,14 +43,19 @@ public class CorrelationInTime {
 	private double valueAtInf;
 	private double timeShift;
 
+	private double normalizationFactor;
+	private double normalizationOffset;
+
 	public CorrelationInTime() {
 		valueAtInf = VALUE_AT_INF_DEFAULT;
 		timeShift = TIME_SHIFT_DEFAULT;
+		calculateNormalizationParameters();
 	}
 	
 	public CorrelationInTime(double valueAtInf, double timeShift) {
 		this.valueAtInf = valueAtInf;
 		this.timeShift = timeShift;
+		calculateNormalizationParameters();
 	}
 	
 	private double correlationUnnormalized(double dt) {
@@ -75,10 +80,20 @@ public class CorrelationInTime {
 		return c;
 	}
 	
+	
+	/**
+	 * Normalize to interval [valueAtInf, 1]
+	 * 
+	 * @param x The value to normalize
+	 * @return Normalized value
+	 */
 	private double normalize(double x) {
+		return normalizationFactor * x + normalizationOffset;
+	}
+	
+	private void calculateNormalizationParameters() {
 		
-		double k = 1 - valueAtInf;
-		double n = valueAtInf;
-		return k * x + n;
+		this.normalizationFactor = 1 - valueAtInf;
+		this.normalizationOffset = valueAtInf;
 	}
 }

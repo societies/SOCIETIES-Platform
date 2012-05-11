@@ -38,26 +38,30 @@ public class CorrelationInData {
 	private static Logger LOG = LoggerFactory.getLogger(CorrelationInData.class);
 
 	private final double VALUE_AT_INF_DEFAULT = 0.1;
-	private final double SIZE_SHIFT_DEFAULT = 0;
+	private final long SIZE_SHIFT_DEFAULT = 0;
 	private final double SIZE_SCALE_DEFAULT = 1;
 	
 	private double valueAtInf;
-	private double xShift;
+	private long xShift;
 	private double xScaleLeft;
 	private double xScaleRight;
 
+	private double normalizationFactor;
+	private double normalizationOffset;
+	
 	/**
-	 * Constructor with default values
+	 * Constructor with default values.
 	 */
 	public CorrelationInData() {
 		valueAtInf = VALUE_AT_INF_DEFAULT;
 		xShift = SIZE_SHIFT_DEFAULT;
 		xScaleLeft = SIZE_SCALE_DEFAULT;
 		xScaleRight = SIZE_SCALE_DEFAULT;
+		calculateNormalizationParameters();
 	}
 	
 	/**
-	 * Constructor
+	 * Constructor.
 	 * 
 	 * @param valueAtInf
 	 * 
@@ -71,7 +75,7 @@ public class CorrelationInData {
 	 * If greater than 1, the correlation function gets wider (less sensitive to size differences).
 	 * If smaller than 1, the function gets more narrow (more sensitive to size differences).
 	 */
-	public CorrelationInData(double valueAtInf, double sizeShift, double sizeScaleLeft, double sizeScaleRight) {
+	public CorrelationInData(double valueAtInf, long sizeShift, double sizeScaleLeft, double sizeScaleRight) {
 		this.valueAtInf = valueAtInf;
 		this.xShift = sizeShift;
 		this.xScaleLeft = sizeScaleLeft;
@@ -79,9 +83,10 @@ public class CorrelationInData {
 		if (xShift != 0) {
 			LOG.warn("xShift set to non-zero: {}", xShift);
 		}
+		calculateNormalizationParameters();
 	}
 	
-	private double correlationUnnormalized(double deltaSize) {
+	private double correlationUnnormalized(long deltaSize) {
 		
 		double c;
 		double xScale;
@@ -98,23 +103,27 @@ public class CorrelationInData {
 		return c;
 	}
 	
-	public double correlation(double deltaSize) {
+	public double correlation(long deltaSize) {
 		
 		double c;
 		
-		if (deltaSize < 0) {
-			c = 0;
-		}
-		else {
-			c = normalize(correlationUnnormalized(deltaSize));
-		}
+		c = normalize(correlationUnnormalized(deltaSize));
 		return c;
 	}
 	
+	/**
+	 * Normalize to interval [valueAtInf, 1]
+	 * 
+	 * @param x The value to normalize
+	 * @return Normalized value
+	 */
 	private double normalize(double x) {
+		return normalizationFactor * x + normalizationOffset;
+	}
+	
+	private void calculateNormalizationParameters() {
 		
-		double k = 1 - valueAtInf;
-		double n = valueAtInf;
-		return k * x + n;
+		this.normalizationFactor = 1 - valueAtInf;
+		this.normalizationOffset = valueAtInf;
 	}
 }
