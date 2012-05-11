@@ -51,4 +51,10 @@ public class CtxAttributeTypes extends
      */
     public static final String SERVICE_PRIVACY_POLICY_REGISTRY = "servicePrivacyPolicyRegistry";
     
+    
+    /**
+     * @since 0.0.8
+     */
+    public static final String SNAPSHOT_REG = "snapshotReg";
+    
 }
