@@ -43,7 +43,7 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
 
 
 @SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
-public interface ICisOwned extends ICisRecord {
+public interface ICisOwned extends ICis {
 	
 	
 	/**
