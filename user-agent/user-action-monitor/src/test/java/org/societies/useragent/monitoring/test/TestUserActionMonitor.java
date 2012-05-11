@@ -40,15 +40,16 @@ import org.junit.Test;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.useragent.monitoring.SnapshotManager;
-import org.societies.useragent.monitoring.SnapshotsRegistry;
+import org.societies.useragent.monitoring.model.Snapshot;
+import org.societies.useragent.monitoring.model.SnapshotsRegistry;
 import org.societies.useragent.monitoring.UserActionMonitor;
 
 public class TestUserActionMonitor extends TestCase{
@@ -203,7 +204,7 @@ public class TestUserActionMonitor extends TestCase{
 			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC)).thenReturn(mockSymLocIdFuture);
 			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.STATUS)).thenReturn(mockStatusIdFuture);
 			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.TEMPERATURE)).thenReturn(mockTempIdFuture);
-			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, "snpshtRegistry")).thenReturn(mockSnpshtRegistryIdFuture);
+			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.SNAPSHOT_REG)).thenReturn(mockSnpshtRegistryIdFuture);
 			when(mockCtxBroker.retrieve(mockSnpshtRegistryId)).thenReturn(mockSnpshtRegistryObjectFuture);
 		} catch (CtxException e) {
 			e.printStackTrace();
@@ -215,7 +216,7 @@ public class TestUserActionMonitor extends TestCase{
 			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC);
 			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.STATUS);
 			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.TEMPERATURE);
-			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, "snpshtRegistry");
+			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.SNAPSHOT_REG);
 			verify(mockCtxBroker).retrieve(mockSnpshtRegistryId);
 		} catch (CtxException e) {
 			e.printStackTrace();
@@ -224,37 +225,38 @@ public class TestUserActionMonitor extends TestCase{
 		//try to retrieve new snapshot
 		System.out.println("Requesting snapshot for volume");
 		CtxAttributeIdentifier volumePrimary = new CtxAttributeIdentifier(mockEntityId, "volume", new Long(12345)); //serviceId-param attribute
-		List<CtxAttributeIdentifier> retrievedSnpsht = snpshtMgr.getSnapshot(volumePrimary);
-		Assert.assertEquals(mockSymLocId, retrievedSnpsht.get(0));
-		Assert.assertEquals(mockStatusId, retrievedSnpsht.get(1));
-		Assert.assertEquals(mockTempId, retrievedSnpsht.get(2));
+		List<CtxAttributeIdentifier> retrievedSnpsht = snpshtMgr.getSnapshot(volumePrimary).getIDList();
+		Assert.assertTrue(retrievedSnpsht.contains(mockSymLocId));
+		Assert.assertTrue(retrievedSnpsht.contains(mockStatusId));
+		Assert.assertTrue(retrievedSnpsht.contains(mockTempId));
 
 		//try to retrieve second new snapshot
 		CtxAttributeIdentifier colourPrimary = new CtxAttributeIdentifier(mockEntityId, "colour", new Long(12345)); //serviceId-param attribute
-		retrievedSnpsht = snpshtMgr.getSnapshot(colourPrimary);
-		Assert.assertEquals(mockSymLocId, retrievedSnpsht.get(0));
-		Assert.assertEquals(mockStatusId, retrievedSnpsht.get(1));
-		Assert.assertEquals(mockTempId, retrievedSnpsht.get(2));
+		retrievedSnpsht = snpshtMgr.getSnapshot(colourPrimary).getIDList();
+		Assert.assertTrue(retrievedSnpsht.contains(mockSymLocId));
+		Assert.assertTrue(retrievedSnpsht.contains(mockStatusId));
+		Assert.assertTrue(retrievedSnpsht.contains(mockTempId));
+		
 
 		//try update existing snapshot
 		CtxIdentifier mockActivityId = new CtxAttributeIdentifier(mockEntityId, "activity", new Long(12345));  //additional context attribute
-		List<CtxAttributeIdentifier> newSnapshot = new ArrayList<CtxAttributeIdentifier>();
-		newSnapshot.add((CtxAttributeIdentifier)mockSymLocId);
-		newSnapshot.add((CtxAttributeIdentifier)mockTempId);
-		newSnapshot.add((CtxAttributeIdentifier)mockActivityId);
+		Snapshot newSnapshot = new Snapshot();
+		newSnapshot.setTypeID(CtxAttributeTypes.LOCATION_SYMBOLIC, (CtxAttributeIdentifier)mockSymLocId);
+		newSnapshot.setTypeID(CtxAttributeTypes.TEMPERATURE, (CtxAttributeIdentifier)mockTempId);
+		newSnapshot.setTypeID("activity", (CtxAttributeIdentifier)mockActivityId);
 		snpshtMgr.updateSnapshot(volumePrimary, newSnapshot);
 
 		//try to retrieve updated existing snapshot
-		retrievedSnpsht = snpshtMgr.getSnapshot(volumePrimary);
-		Assert.assertEquals(mockSymLocId, retrievedSnpsht.get(0));
-		Assert.assertEquals(mockTempId, retrievedSnpsht.get(1));
-		Assert.assertEquals(mockActivityId, retrievedSnpsht.get(2));
+		retrievedSnpsht = snpshtMgr.getSnapshot(volumePrimary).getIDList();
+		Assert.assertTrue(retrievedSnpsht.contains(mockSymLocId));
+		Assert.assertTrue(retrievedSnpsht.contains(mockTempId));
+		Assert.assertTrue(retrievedSnpsht.contains(mockActivityId));
 
 		//check non-updated existing snapshot
-		retrievedSnpsht = snpshtMgr.getSnapshot(colourPrimary);
-		Assert.assertEquals(mockSymLocId, retrievedSnpsht.get(0));
-		Assert.assertEquals(mockStatusId, retrievedSnpsht.get(1));
-		Assert.assertEquals(mockTempId, retrievedSnpsht.get(2));
+		retrievedSnpsht = snpshtMgr.getSnapshot(colourPrimary).getIDList();
+		Assert.assertTrue(retrievedSnpsht.contains(mockSymLocId));
+		Assert.assertTrue(retrievedSnpsht.contains(mockStatusId));
+		Assert.assertTrue(retrievedSnpsht.contains(mockTempId));
 	}
 
 	private void executeFuture(FutureTask task){
