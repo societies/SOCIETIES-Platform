@@ -64,7 +64,7 @@ public class CorrelationInDataTest {
 	public void setUp() throws Exception {
 		LOG.debug("setUp()");
 		correlationInDataDefault = new CorrelationInData();
-		correlationInDataCustom = new CorrelationInData(0.43921, 3.9452, 0.6731);
+		correlationInDataCustom = new CorrelationInData(0.43921, 39.452, 3.6731);
 	}
 
 	/**
@@ -86,11 +86,13 @@ public class CorrelationInDataTest {
 		
 		deltaSize = Long.MIN_VALUE;
 		result = correlationInDataDefault.correlation(deltaSize);
-		assertEquals(0, result, 1e-5);
+		assertTrue(result < 1);
+		assertTrue(result > 0);
 		
 		deltaSize = -8;
 		result = correlationInDataDefault.correlation(deltaSize);
-		assertEquals(0, result, 1e-5);
+		assertTrue(result < 1);
+		assertTrue(result > 0);
 		
 		deltaSize = 0;
 		result = correlationInDataDefault.correlation(deltaSize);
@@ -117,23 +119,35 @@ public class CorrelationInDataTest {
 		
 		deltaSize = Long.MIN_VALUE;
 		result = correlationInDataCustom.correlation(deltaSize);
-		assertEquals(0, result, 1e-5);
+		assertEquals(0.43921, result, 1e-5);
 		
+		deltaSize = -29;
+		result = correlationInDataCustom.correlation(deltaSize);
+		assertEquals(0.76590, result, 1e-5);
+
 		deltaSize = -8;
 		result = correlationInDataCustom.correlation(deltaSize);
-		assertEquals(0, result, 1e-5);
+		assertEquals(0.97741, result, 1e-5);
+
+		deltaSize = -2;
+		result = correlationInDataCustom.correlation(deltaSize);
+		assertEquals(0.99856, result, 1e-5);
 		
 		deltaSize = 0;
 		result = correlationInDataCustom.correlation(deltaSize);
 		assertEquals(1, result, 1e-5);
-		
-		deltaSize = 31;
+
+		deltaSize = 2;
 		result = correlationInDataCustom.correlation(deltaSize);
-		assertEquals(0.99575, result, 1e-5);
+		assertEquals(0.85612, result, 1e-5);
 		
-		deltaSize = 873;
+		deltaSize = 8;
 		result = correlationInDataCustom.correlation(deltaSize);
-		assertEquals(0.69597, result, 1e-5);
+		assertEquals(0.44409, result, 1e-5);
+
+		deltaSize = 29;
+		result = correlationInDataCustom.correlation(deltaSize);
+		assertEquals(0.43921, result, 1e-5);
 		
 		deltaSize = Long.MAX_VALUE;
 		result = correlationInDataCustom.correlation(deltaSize);
