@@ -23,23 +23,25 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.societies.useragent.monitoring;
+package org.societies.useragent.monitoring.model;
 
 import java.io.Serializable;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 
 import org.societies.api.context.model.CtxAttributeIdentifier;
 
 public class SnapshotsRegistry implements Serializable{
 
-	Hashtable<CtxAttributeIdentifier, List<CtxAttributeIdentifier>> snpshtMappings;
+	private static final long serialVersionUID = 1L;
+	Hashtable<CtxAttributeIdentifier, Snapshot> snpshtMappings;
 	
 	public SnapshotsRegistry(){
-		snpshtMappings = new Hashtable<CtxAttributeIdentifier, List<CtxAttributeIdentifier>>();
+		snpshtMappings = new Hashtable<CtxAttributeIdentifier, Snapshot>();
 	}
 	
-	public void addMapping(CtxAttributeIdentifier primary, List<CtxAttributeIdentifier> snapshot){
+	public void addMapping(CtxAttributeIdentifier primary, Snapshot snapshot){
 		snpshtMappings.put(primary, snapshot);
 	}
 	
@@ -47,11 +49,21 @@ public class SnapshotsRegistry implements Serializable{
 		snpshtMappings.remove(primary);
 	}
 	
-	public List<CtxAttributeIdentifier> getSnapshot(CtxAttributeIdentifier primary){
+	public Snapshot getSnapshot(CtxAttributeIdentifier primary){
 		return snpshtMappings.get(primary);
 	}
 	
-	public void updateMapping(CtxAttributeIdentifier primary, List<CtxAttributeIdentifier> newSnapshot){
+	public void updateMapping(CtxAttributeIdentifier primary, Snapshot newSnapshot){
 		snpshtMappings.put(primary, newSnapshot);
+	}
+	
+	public void updateSnapshots(String type, CtxAttributeIdentifier ID){
+		Iterator<Snapshot> snpshtMappings_it = snpshtMappings.values().iterator();
+		while(snpshtMappings_it.hasNext()){
+			Snapshot nextSnpsht = snpshtMappings_it.next();
+			if(nextSnpsht.containsType(type)){
+				nextSnpsht.setTypeID(type, ID);
+			}
+		}
 	}
 }
