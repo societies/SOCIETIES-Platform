@@ -37,13 +37,13 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.css.directory.ICssDirectoryCallback;
-import org.societies.api.css.directory.ICssDirectoryRemote;
+import org.societies.api.cis.directory.*;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
-import org.societies.api.schema.css.directory.CssAdvertisementRecord;
-import org.societies.api.schema.css.directory.CssDirectoryBean;
-import org.societies.api.schema.css.directory.MethodType;
-import org.societies.css.directory.client.CssDirectoryClientCallback;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.api.schema.cis.directory.CisDirectoryBean;
+import org.societies.api.schema.cis.directory.MethodType;
+import org.societies.cis.directory.client.CisDirectoryClientCallback;
 
 /**
  * Comms Client that initiates the remote communication for the css discovery
@@ -54,14 +54,14 @@ import org.societies.css.directory.client.CssDirectoryClientCallback;
 public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 	private static final List<String> NAMESPACES = Collections
 			.unmodifiableList(Arrays
-					.asList("http://societies.org/api/schema/css/directory"));
+					.asList("http://societies.org/api/schema/cis/directory"));
 	private static final List<String> PACKAGES = Collections
 			.unmodifiableList(Arrays
-					.asList("org.societies.api.schema.css.directory"));
+					.asList("org.societies.api.schema.cis.directory"));
 
 	// PRIVATE VARIABLES
 	private ICommManager commManager;
-	private static Logger LOG = LoggerFactory.getLogger(CssDirectoryClient.class);
+	private static Logger LOG = LoggerFactory.getLogger(CisDirectoryClient.class);
 	private IIdentityManager idMgr;
 
 	// PROPERTIES
@@ -73,7 +73,7 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 		this.commManager = commManager;
 	}
 
-	public CssDirectoryClient() {
+	public CisDirectoryClient() {
 	}
 
 	public void InitService() {
@@ -188,17 +188,17 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 	 * (org.societies.api.schema.css.directory.CssAdvertisementRecord)
 	 */
 	@Override
-	public void addCssAdvertisementRecord(CssAdvertisementRecord cssAdvert) {
+	public void addCisAdvertisementRecord(CisAdvertisementRecord cisAdvert) {
 		// We want to sent all messages for CssDirectory to the domain authority Node
 		IIdentity toIdentity = idMgr.getDomainAuthorityNode();
 		Stanza stanza = new Stanza(toIdentity);
 
 		// CREATE MESSAGE BEAN
-		CssDirectoryBean cssDir = new CssDirectoryBean();
-		cssDir.setCssA(cssAdvert);
-		cssDir.setMethod(MethodType.ADD_CSS_ADVERTISEMENT_RECORD);
+		CisDirectoryBean cisDir = new CisDirectoryBean();
+		cisDir.setCisA(cisAdvert);
+		cisDir.setMethod(MethodType.ADD_CIS_ADVERTISEMENT_RECORD);
 		try {
-			commManager.sendMessage(stanza, cssDir);
+			commManager.sendMessage(stanza, cisDir);
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
 		}
@@ -214,17 +214,17 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 	 * (org.societies.api.schema.css.directory.CssAdvertisementRecord)
 	 */
 	@Override
-	public void deleteCssAdvertisementRecord(CssAdvertisementRecord cssAdvert) {
+	public void deleteCisAdvertisementRecord(CisAdvertisementRecord cisAdvert) {
 		// We want to sent all messages for CssDirectory to the domain authority Node
 		IIdentity toIdentity = idMgr.getDomainAuthorityNode();
 		Stanza stanza = new Stanza(toIdentity);
 
 		// CREATE MESSAGE BEAN
-		CssDirectoryBean cssDir = new CssDirectoryBean();
-		cssDir.setCssA(cssAdvert);
-		cssDir.setMethod(MethodType.DELETE_CSS_ADVERTISEMENT_RECORD);
+		CisDirectoryBean cisDir = new CisDirectoryBean();
+		cisDir.setCisA(cisAdvert);
+		cisDir.setMethod(MethodType.DELETE_CIS_ADVERTISEMENT_RECORD);
 		try {
-			commManager.sendMessage(stanza, cssDir);
+			commManager.sendMessage(stanza, cisDir);
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
 		}
@@ -240,24 +240,24 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 	 * (org.societies.api.css.directory.ICssDirectoryCallback)
 	 */
 	@Override
-	public void findAllCssAdvertisementRecords(
-			ICssDirectoryCallback cssDirCallback) {
+	public void findAllCisAdvertisementRecords(
+			ICisDirectoryCallback cisDirCallback) {
 		// We want to sent all messages for CssDirectory to the domain authority Node
 		IIdentity toIdentity = idMgr.getDomainAuthorityNode();
 		Stanza stanza = new Stanza(toIdentity);
 
 		// SETUP CssDirectory CLIENT RETURN STUFF
-		CssDirectoryClientCallback callback = new CssDirectoryClientCallback(stanza.getId(),
-				cssDirCallback);
+		CisDirectoryClientCallback callback = new CisDirectoryClientCallback(stanza.getId(),
+				cisDirCallback);
 
 		// CREATE MESSAGE BEAN
-		CssDirectoryBean cssDirBean = new CssDirectoryBean();
+		CisDirectoryBean cisDirBean = new CisDirectoryBean();
 
-		cssDirBean.setMethod(MethodType.FIND_ALL_CSS_ADVERTISEMENT_RECORDS);
+		cisDirBean.setMethod(MethodType.FIND_ALL_CIS_ADVERTISEMENT_RECORDS);
 		try {
 			// SEND INFORMATION QUERY - RESPONSE WILL BE IN
 			// "callback.RecieveMessage()"
-			commManager.sendIQGet(stanza, cssDirBean, callback);
+			commManager.sendIQGet(stanza, cisDirBean, callback);
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
 		}
@@ -273,25 +273,25 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 	 * org.societies.api.css.directory.ICssDirectoryCallback)
 	 */
 	@Override
-	public void findForAllCss(CssAdvertisementRecord cssAdvert,
-			ICssDirectoryCallback cssDirCallback) {
+	public void findForAllCis(CisAdvertisementRecord cisAdvert,
+			ICisDirectoryCallback cisDirCallback) {
 		// We want to sent all messages for CssDirectory to the domain authority Node
 		IIdentity toIdentity = idMgr.getDomainAuthorityNode();
 		Stanza stanza = new Stanza(toIdentity);
 
 		// SETUP CALC CLIENT RETURN STUFF
-		CssDirectoryClientCallback callback = new CssDirectoryClientCallback(stanza.getId(),
-				cssDirCallback);
+		CisDirectoryClientCallback callback = new CisDirectoryClientCallback(stanza.getId(),
+				cisDirCallback);
 
 		// CREATE MESSAGE BEAN
-		CssDirectoryBean cssDirBean = new CssDirectoryBean();
-		cssDirBean.setCssA(cssAdvert);
+		CisDirectoryBean cisDirBean = new CisDirectoryBean();
+		cisDirBean.setCisA(cisAdvert);
 
-		cssDirBean.setMethod(MethodType.FIND_FOR_ALL_CSS);
+		cisDirBean.setMethod(MethodType.FIND_FOR_ALL_CIS);
 		try {
 			// SEND INFORMATION QUERY - RESPONSE WILL BE IN
 			// "callback.RecieveMessage()"
-			commManager.sendIQGet(stanza, cssDirBean, callback);
+			commManager.sendIQGet(stanza, cisDirBean, callback);
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
 		}
@@ -308,20 +308,20 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 	 * org.societies.api.schema.css.directory.CssAdvertisementRecord)
 	 */
 	@Override
-	public void updateCssAdvertisementRecord(
-			CssAdvertisementRecord currentCssAdvert,
-			CssAdvertisementRecord updatedCssAdvert) {
+	public void updateCisAdvertisementRecord(
+			CisAdvertisementRecord currentCisAdvert,
+			CisAdvertisementRecord updatedCisAdvert) {
 		// GET CURRENT NODE IDENTITY
 		IIdentity toIdentity = idMgr.getDomainAuthorityNode();
 		Stanza stanza = new Stanza(toIdentity);
 
 		// CREATE MESSAGE BEAN
-		CssDirectoryBean cssDir = new CssDirectoryBean();
-		cssDir.setCssA(currentCssAdvert);
-		cssDir.setCssB(updatedCssAdvert);
-		cssDir.setMethod(MethodType.UPDATE_CSS_ADVERTISEMENT_RECORD);
+		CisDirectoryBean cisDir = new CisDirectoryBean();
+		cisDir.setCisA(currentCisAdvert);
+		cisDir.setCisB(updatedCisAdvert);
+		cisDir.setMethod(MethodType.UPDATE_CIS_ADVERTISEMENT_RECORD);
 		try {
-			commManager.sendMessage(stanza, cssDir);
+			commManager.sendMessage(stanza, cisDir);
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
 		}

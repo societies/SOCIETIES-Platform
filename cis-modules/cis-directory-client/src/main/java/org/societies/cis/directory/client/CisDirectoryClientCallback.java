@@ -36,8 +36,8 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.css.directory.ICssDirectoryCallback;
-import org.societies.api.schema.css.directory.CssDirectoryBeanResult;
+import org.societies.api.cis.directory.ICisDirectoryCallback;
+import org.societies.api.schema.cis.directory.CisDirectoryBeanResult;
 
 
 
@@ -50,23 +50,23 @@ import org.societies.api.schema.css.directory.CssDirectoryBeanResult;
 public class CisDirectoryClientCallback implements ICommCallback {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-			  Arrays.asList("http://societies.org/api/schema/css/direcory"));
+			  Arrays.asList("http://societies.org/api/schema/cis/direcory"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
-			  Arrays.asList("org.societies.api.schema.css.directory"));
+			  Arrays.asList("org.societies.api.schema.cis.directory"));
 
 
-	private static Logger logger = LoggerFactory.getLogger(CssDirectoryClientCallback.class);
+	private static Logger logger = LoggerFactory.getLogger(CisDirectoryClientCallback.class);
 
 	//MAP TO STORE THE ALL THE CLIENT CONNECTIONS
-	private static final Map<String, ICssDirectoryCallback> cssDirectoryClients = new HashMap<String, ICssDirectoryCallback>();
+	private static final Map<String, ICisDirectoryCallback> cisDirectoryClients = new HashMap<String, ICisDirectoryCallback>();
 
 	/** Constructor for callback
 	 * @param clientID unique ID of send request to comms framework
 	 * @param serviceDiscoveryClient callback from originating client
 	 */
-	public CssDirectoryClientCallback(String clientID, ICssDirectoryCallback cssDirectoryClient) {
+	public CisDirectoryClientCallback(String clientID, ICisDirectoryCallback cisDirectoryClient) {
 		//STORE THIS CALLBACK WITH THIS REQUEST ID
-		cssDirectoryClients.put(clientID, cssDirectoryClient);
+		cisDirectoryClients.put(clientID, cisDirectoryClient);
 	}
 
 
@@ -75,9 +75,9 @@ public class CisDirectoryClientCallback implements ICommCallback {
 	 * @return
 	 * @throws UnavailableException
 	 */
-	private ICssDirectoryCallback getRequestingClient(String requestID) {
-		ICssDirectoryCallback requestingClient = (ICssDirectoryCallback) cssDirectoryClients.get(requestID);
-		cssDirectoryClients.remove(requestID);
+	private ICisDirectoryCallback getRequestingClient(String requestID) {
+		ICisDirectoryCallback requestingClient = (ICisDirectoryCallback) cisDirectoryClients.get(requestID);
+		cisDirectoryClients.remove(requestID);
 		return requestingClient;
 	}
 
@@ -86,9 +86,9 @@ public class CisDirectoryClientCallback implements ICommCallback {
 	 * @return
 	 * @throws UnavailableException
 	 */
-	private ICssDirectoryCallback getRequestingControlClient(String requestID) {
-		ICssDirectoryCallback requestingClient = (ICssDirectoryCallback) cssDirectoryClients.get(requestID);
-		cssDirectoryClients.remove(requestID);
+	private ICisDirectoryCallback getRequestingControlClient(String requestID) {
+		ICisDirectoryCallback requestingClient = (ICisDirectoryCallback) cisDirectoryClients.get(requestID);
+		cisDirectoryClients.remove(requestID);
 		return requestingClient;
 	}
 
@@ -97,19 +97,19 @@ public class CisDirectoryClientCallback implements ICommCallback {
 	@Override
 	public void receiveResult(Stanza returnStanza, Object msgBean) {
 
-		if(logger.isDebugEnabled()) logger.debug("CSS Directory Callback called!");
+		if(logger.isDebugEnabled()) logger.debug("CIS Directory Callback called!");
 
 		//CHECK WHICH END SERVICE IS SENDING US A MESSAGE
 
-		// --------- Css Directory Bean ---------
-		if (msgBean.getClass().equals(CssDirectoryBeanResult.class)) {
+		// --------- Cis Directory Bean ---------
+		if (msgBean.getClass().equals(CisDirectoryBeanResult.class)) {
 
-			if(logger.isDebugEnabled()) logger.debug("CssDirectoryBeanResult!");
+			if(logger.isDebugEnabled()) logger.debug("CisDirectoryBeanResult!");
 
-			CssDirectoryBeanResult cssDirectoryResult = (CssDirectoryBeanResult) msgBean;
+			CisDirectoryBeanResult cisDirectoryResult = (CisDirectoryBeanResult) msgBean;
 
-			ICssDirectoryCallback cssDirectoryClient = getRequestingClient(returnStanza.getId());
-			cssDirectoryClient.getResult(cssDirectoryResult.getResultCss());
+			ICisDirectoryCallback cisDirectoryClient = getRequestingClient(returnStanza.getId());
+			cisDirectoryClient.getResult(cisDirectoryResult.getResultCis());
 
 		}
 
