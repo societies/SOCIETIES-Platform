@@ -24,28 +24,58 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
+ * Estimation of correlation between two events (data access and data transmission) based on time
+ * difference between the events.
  * 
+ * The function itself is sigmoidal, shifted right (x axis), shifted up and scaled (y axis).
+ * For negative x values it is always zero.
+ * This results in a correlation that: <br/>
+ * - is 0 if data transmission occurred before data access <br/>
+ * - is 1 if data transmission occurred on same time as data access <br/>
+ * - at first decreases only slightly (to account for possible data processing before transmission) <br/>
+ * - then decreases faster (for data transmissions that occur much later) <br/>
+ * - then asymptotically approaches a value greater than zero (data can be accumulated and sent much later) <br/>
  *
  * @author Mitja Vardjan
  *
  */
 public class CorrelationInTime {
-	
+
+	private static Logger LOG = LoggerFactory.getLogger(CorrelationInTime.class);
+
 	private final double VALUE_AT_INF_DEFAULT = 0.2;
 	private final double TIME_SHIFT_DEFAULT = 3;
 	
 	private double valueAtInf;
 	private double timeShift;
 
+	private double normalizationFactor;
+	private double normalizationOffset;
+
+	/**
+	 * Constructor with default values.
+	 */
 	public CorrelationInTime() {
 		valueAtInf = VALUE_AT_INF_DEFAULT;
 		timeShift = TIME_SHIFT_DEFAULT;
+		calculateNormalizationParameters();
 	}
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param valueAtInf Minimal correlation value for events that are most far apart.
+	 * 
+	 * @param timeShift Shift the correlation function along the x axis.
+	 */
 	public CorrelationInTime(double valueAtInf, double timeShift) {
 		this.valueAtInf = valueAtInf;
 		this.timeShift = timeShift;
+		calculateNormalizationParameters();
 	}
 	
 	private double correlationUnnormalized(double dt) {
@@ -57,6 +87,14 @@ public class CorrelationInTime {
 		return c;
 	}
 	
+	/**
+	 * Estimates correlation between two events (data access and data transmission) based on time
+	 * of both events.
+	 * 
+	 * @param dt Difference in time in seconds. Time of data transmission - time of data access.
+	 * 
+	 * @return correlation based on difference in time.
+	 */
 	public double correlation(double dt) {
 		
 		double c;
@@ -70,10 +108,20 @@ public class CorrelationInTime {
 		return c;
 	}
 	
-	public double normalize(double x) {
+	
+	/**
+	 * Normalize to interval [valueAtInf, 1]
+	 * 
+	 * @param x The value to normalize
+	 * @return Normalized value
+	 */
+	private double normalize(double x) {
+		return normalizationFactor * x + normalizationOffset;
+	}
+	
+	private void calculateNormalizationParameters() {
 		
-		double k = 1 - valueAtInf;
-		double n = valueAtInf;
-		return k * x + n;
+		this.normalizationFactor = (1 - valueAtInf) / (1 - 1 / (1 + Math.exp(-(0 - timeShift))));
+		this.normalizationOffset = valueAtInf;
 	}
 }

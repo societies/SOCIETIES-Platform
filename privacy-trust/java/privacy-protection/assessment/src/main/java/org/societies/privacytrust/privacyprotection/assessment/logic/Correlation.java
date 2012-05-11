@@ -26,6 +26,8 @@ package org.societies.privacytrust.privacyprotection.assessment.logic;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.privacytrust.privacyprotection.assessment.logger.Point;
 
 /**
@@ -35,6 +37,8 @@ import org.societies.privacytrust.privacyprotection.assessment.logger.Point;
  *
  */
 public class Correlation {
+
+	private static Logger LOG = LoggerFactory.getLogger(Correlation.class);
 
 	private List<Point> dataAccess;
 	private List<Point> dataTransmission;
