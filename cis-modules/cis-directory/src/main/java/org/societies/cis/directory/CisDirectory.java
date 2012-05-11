@@ -36,7 +36,7 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//import org.societies.api.schema.css.directory.CssAdvertisementRecord;
+
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.cis.directory.ICisAdvertisementRecord;
 import org.societies.api.cis.directory.ICisDirectory;
@@ -78,7 +78,7 @@ public class CisDirectory implements ICisDirectory {
 	 * org.societies.api.cis.directory.ICisDirectory#addCisAdvertisementRecord
 	 * (org.societies.api.schema.cis.directory.CisAdvertisementRecord)
 	 */
-	//@Override
+	@Override
 	public void addCisAdvertisementRecord(CisAdvertisementRecord cisAdRec) {
 		Session session = sessionFactory.openSession();
 		CisAdvertisementRecordEntry tmpEntry = null;
@@ -109,9 +109,10 @@ public class CisDirectory implements ICisDirectory {
 	 * (non-Javadoc)
 	 *
 	 * @see
-	 * org.societies.api.css.directory.ICssDirectory#deleteCssAdvertisementRecord
-	 * (org.societies.api.schema.css.directory.CssAdvertisementRecord)
+	 * org.societies.api.cis.directory.ICisDirectory#deleteCisAdvertisementRecord
+	 * (org.societies.api.schema.cis.directory.CisAdvertisementRecord)
 	 */
+	@Override
 	public void deleteCisAdvertisementRecord(CisAdvertisementRecord cisAdRec) {
 		Session session = sessionFactory.openSession();
 		CisAdvertisementRecordEntry tmpEntry = null;
@@ -142,11 +143,11 @@ public class CisDirectory implements ICisDirectory {
 	 * (non-Javadoc)
 	 *
 	 * @see
-	 * org.societies.api.css.directory.ICssDirectory#findAllCssAdvertisementRecords
+	 * org.societies.api.cis.directory.ICisDirectory#findAllCisAdvertisementRecords
 	 * ()
 	 */
 	@SuppressWarnings("unchecked")
-	//@Override
+	@Override
 	@Async
 	public Future<List<CisAdvertisementRecord>> findAllCisAdvertisementRecords() {
 		Session session = sessionFactory.openSession();
@@ -186,11 +187,11 @@ public class CisDirectory implements ICisDirectory {
 	 * (non-Javadoc)
 	 *
 	 * @see
-	 * org.societies.api.css.directory.ICssDirectory#findForAllCss(org.societies
-	 * .api.schema.css.directory.CssAdvertisementRecord)
+	 * org.societies.api.cis.directory.ICisDirectory#findForAllCis(org.societies
+	 * .api.schema.cis.directory.CisAdvertisementRecord)
 	 */
 	@SuppressWarnings("unchecked")
-	//@Override
+	@Override
 	@Async
 	public Future<List<CisAdvertisementRecord>> findForAllCis(
 			CisAdvertisementRecord filterCis) {
@@ -232,11 +233,11 @@ public class CisDirectory implements ICisDirectory {
 	 * (non-Javadoc)
 	 *
 	 * @see
-	 * org.societies.api.css.directory.ICssDirectory#updateCssAdvertisementRecord(org.societies
-	 * .api.schema.css.directory.CssAdvertisementRecord,
-	 * org.societies.api.schema.css.directory.CssAdvertisementRecord)
+	 * org.societies.api.cis.directory.ICisDirectory#updateCisAdvertisementRecord(org.societies
+	 * .api.schema.cis.directory.CisAdvertisementRecord,
+	 * org.societies.api.schema.cis.directory.CisAdvertisementRecord)
 	 */
-	//@Override
+	@Override
 	public void updateCisAdvertisementRecord(CisAdvertisementRecord oldCisValues,
 		CisAdvertisementRecord updatedCisValues) {
 		Session session = sessionFactory.openSession();

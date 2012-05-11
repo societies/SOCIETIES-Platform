@@ -33,8 +33,8 @@ import javax.persistence.Table;
 import javax.persistence.Id;
 
 /**
- * This is the Class accepted by the CssDiroectory when a cis wants to register
- * and advertisement record. This Object contains attributes used to retrieve
+ * This is the Class accepted by the CisDirectory when a cis wants to register
+ * an advertisement record. This Object contains attributes used to retrieve
  * services shared from/to a CSS/CIS and also information to retrieve
  * organization that has developed the service.
  *

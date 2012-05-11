@@ -36,8 +36,8 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.css.directory.ICssDirectoryCallback;
-import org.societies.api.cis.directory.*;
+import org.societies.api.cis.directory.ICisDirectoryRemote;
+import org.societies.api.cis.directory.ICisDirectoryCallback;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
@@ -46,7 +46,7 @@ import org.societies.api.schema.cis.directory.MethodType;
 import org.societies.cis.directory.client.CisDirectoryClientCallback;
 
 /**
- * Comms Client that initiates the remote communication for the css discovery
+ * Comms Client that initiates the remote communication for the cis discovery
  *
  * @author Maria Mannion
  *
