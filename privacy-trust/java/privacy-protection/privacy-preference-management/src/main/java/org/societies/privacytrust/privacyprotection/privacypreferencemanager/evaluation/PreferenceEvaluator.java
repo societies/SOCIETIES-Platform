@@ -88,6 +88,8 @@ public class PreferenceEvaluator {
 			return new Hashtable<IPrivacyOutcome,List<CtxIdentifier>>();
 		}
 	}
+	
+	
 	private IPrivacyPreference evaluatePreferenceInternal(IPrivacyPreference ptn){
 		log("evaluating preference");
 		//a non-context aware preference
@@ -252,6 +254,7 @@ public class PreferenceEvaluator {
 		this.logging.info(this.getClass().getName()+" : "+message);
 	}
 	
+
 /*	public static void main(String[] args){
 		ICtxBroker sbroker = new StubCtxBroker();
 		
