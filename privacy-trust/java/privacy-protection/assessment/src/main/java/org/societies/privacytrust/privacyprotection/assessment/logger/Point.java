@@ -34,15 +34,29 @@ import java.util.Date;
  */
 public class Point {
 
-	private Date time;
+	private long time;
 	private long dataSize;
-	
-	public Point(Date time, long dataSize) {
+
+	/**
+	 * 
+	 * @param time The number of milliseconds since January 1, 1970, 00:00:00 GMT 
+	 * @param dataSize Data size in bytes
+	 */
+	public Point(long time, long dataSize) {
 		this.time = time;
 		this.dataSize = dataSize;
 	}
+	/**
+	 * 
+	 * @param time Time of event 
+	 * @param dataSize Data size in bytes
+	 */
+	public Point(Date time, long dataSize) {
+		this.time = time.getTime();
+		this.dataSize = dataSize;
+	}
 	
-	public Date getTime() {
+	public long getTime() {
 		return time;
 	}
 	

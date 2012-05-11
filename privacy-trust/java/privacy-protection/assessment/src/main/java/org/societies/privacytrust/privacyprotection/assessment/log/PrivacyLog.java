@@ -24,8 +24,12 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLog;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.PrivacyLogFilter;
@@ -40,8 +44,23 @@ public class PrivacyLog implements IPrivacyLog {
 
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyLog.class);
 
+	private List<DataAccessLogEntry> dataAccess;
+	private List<DataTransmissionLogEntry> dataTransmission;
+	
 	public PrivacyLog() {
+		
 		LOG.info("constructor");
+		
+		dataAccess = new ArrayList<DataAccessLogEntry>();
+		dataTransmission = new ArrayList<DataTransmissionLogEntry>();
+	}
+	
+	public List<DataAccessLogEntry> getDataAccess() {
+		return dataAccess;
+	}
+	
+	public List<DataTransmissionLogEntry> getDataTransmission() {
+		return dataTransmission;
 	}
 	
 	@Override

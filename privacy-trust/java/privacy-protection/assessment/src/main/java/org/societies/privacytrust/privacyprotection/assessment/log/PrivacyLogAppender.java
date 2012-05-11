@@ -33,6 +33,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.ChannelType;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean;
@@ -49,6 +50,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 
 	private CommsFwTestBean testBean;
 	private ICommManager commMgr;
+	private PrivacyLog privacyLog = new PrivacyLog();
 
 	public PrivacyLogAppender() {
 		LOG.info("constructor");
@@ -117,17 +119,6 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	}
 
 	/* (non-Javadoc)
-	 * @see IPrivacyLogAppender#log(LogEntry)
-	 */
-	@Override
-	public boolean log(DataTransmissionLogEntry entry) {
-		
-		LOG.debug("log()");
-
-		return true;
-	}
-
-	/* (non-Javadoc)
 	 * @see IPrivacyLogAppender#logCommsFw(IIdentity, IIdentity, Object)
 	 */
 	// The type parameter in comms fw is not type of data. It is not even used at the moment.
@@ -144,21 +135,37 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		
 		LOG.debug("logCommsFw()");
 
+		DataTransmissionLogEntry logEntry = new DataTransmissionLogEntry(
+				payload.getClass().getSimpleName(),
+				new Date(),
+				receiver,
+				sender,
+				-1,
+				ChannelType.XMPP);
+		
+		privacyLog.getDataTransmission().add(logEntry);
+		
 		return true;
 	}
 	
 	@Override
-	public void logContext(Requestor requestor, IIdentity dataOwner) {
+	public void logContext(Requestor requestor, IIdentity owner) {
 		
 		LOG.debug("logContext()");
 		
-		requestor.getRequestorId();
+		DataAccessLogEntry logEntry = new DataAccessLogEntry(
+				new Date(), requestor.getRequestorId(), owner, -1);
+		privacyLog.getDataAccess().add(logEntry);
 	}
 
 	@Override
-	public void logContext(Requestor requestor, IIdentity dataOwner, int dataSize) {
+	public void logContext(Requestor requestor, IIdentity owner, int dataSize) {
 		
 		LOG.debug("logContext()");
+		
+		DataAccessLogEntry logEntry = new DataAccessLogEntry(
+				new Date(), requestor.getRequestorId(), owner, dataSize);
+		privacyLog.getDataAccess().add(logEntry);
 	}
 
 	/* (non-Javadoc)
@@ -173,4 +180,24 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see IPrivacyLogAppender#log(LogEntry)
+	 */
+	@Override
+	public boolean log(DataTransmissionLogEntry entry) {
+		
+		LOG.debug("log(DataTransmissionLogEntry)");
+
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender#log(org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry)
+	 */
+	@Override
+	public void log(DataAccessLogEntry entry) {
+
+		LOG.debug("log(DataAccessLogEntry)");
+		
+	}
 }
