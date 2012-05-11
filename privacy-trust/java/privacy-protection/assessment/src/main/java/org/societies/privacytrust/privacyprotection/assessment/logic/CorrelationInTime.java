@@ -121,7 +121,7 @@ public class CorrelationInTime {
 	
 	private void calculateNormalizationParameters() {
 		
-		this.normalizationFactor = 1 - valueAtInf;
+		this.normalizationFactor = (1 - valueAtInf) / (1 - 1 / (1 + Math.exp(-(0 - timeShift))));
 		this.normalizationOffset = valueAtInf;
 	}
 }
