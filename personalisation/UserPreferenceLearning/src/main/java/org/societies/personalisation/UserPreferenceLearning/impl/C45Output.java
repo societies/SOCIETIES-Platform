@@ -35,14 +35,13 @@ import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 
 public class C45Output implements IC45Output{
 
-    IIdentity dataOwner;
+	IIdentity dataOwner;
     ServiceResourceIdentifier serviceId;
     String serviceType;
     List<IPreferenceTreeModel> treeList;
     
     public C45Output(IIdentity dataOwner, ServiceResourceIdentifier serviceId, String serviceType){
-        
-        this.dataOwner = dataOwner;
+    	this.dataOwner = dataOwner;
         this.serviceId = serviceId;
         this.serviceType = serviceType;
         treeList = new ArrayList<IPreferenceTreeModel>();

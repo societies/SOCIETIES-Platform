@@ -27,7 +27,6 @@ package org.societies.personalisation.dianne;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -131,6 +130,7 @@ public class DIANNE implements IDIANNE{
 		retrieveNetworks();  //get Networks from context
 		initialiseNetworks();  //start runners for each network
 		registerForContext();  //register for default context updates from PersonalisationMgr
+		//start DIANNE storage thread - store DIANNEs every 1?/5? minute(s)
 	}
 	
 	private void retrieveNetworks(){
@@ -162,7 +162,6 @@ public class DIANNE implements IDIANNE{
 					}
 				}
 			}
-			
 		} catch (CtxException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {

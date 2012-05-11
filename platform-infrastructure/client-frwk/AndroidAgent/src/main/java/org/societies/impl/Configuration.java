@@ -22,24 +22,52 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.assessment.logic;
+package org.societies.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 /**
- * Parses the log and tries to find potential privacy breaches that occurred in the past.
- * This can be used for the a-posteriori assessment.
- * 
- * Estimates whether a particular data transmission is a potential privacy breach or not.
- * This can be used for the a-priori assessment.
+ * Android Agent XMPP Configuration
  *
- * @author Mitja Vardjan
+ * @author Edgar Domingues (PTIN)
  *
  */
-public class Assessment {
-
-	private static Logger LOG = LoggerFactory.getLogger(Assessment.class);
-
+class Configuration {
 	
+	private ResourceBundle configutationBundle;
+	
+	public Configuration(ResourceBundle configutationBundle) {
+		this.configutationBundle = configutationBundle;
+	}
+	
+	public String getServer() {
+		return configutationBundle.getString("server");
+	}
+	
+	public int getPort() {
+		return Integer.parseInt(configutationBundle.getString("port"));
+	}
+	
+	public String getUsername() {
+		return configutationBundle.getString("username");
+	}
+	
+	public String getPassword() {
+		return configutationBundle.getString("password");
+	}
+	
+	public String getResource() {
+		return configutationBundle.getString("resource");
+	}
+	
+	public boolean getDebug() {
+		boolean debug;
+		try {
+			debug = configutationBundle.getString("debug").equalsIgnoreCase("true");
+		} catch(MissingResourceException e) {
+			debug = false;
+		}
+		return debug;
+	}
 }

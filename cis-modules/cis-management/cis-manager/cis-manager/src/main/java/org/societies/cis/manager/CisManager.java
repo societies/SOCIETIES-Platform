@@ -64,6 +64,8 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
 import org.societies.cis.manager.CisEditor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -97,8 +99,9 @@ public class CisManager implements ICisManager, IFeatureServer{
 	IIdentity cisManagerId;
 	ICommManager CSSendpoint;
 	Set<CisSubscribedImp> subscribedCISs;
-	private SessionFactory sessionFactory;
+	@Autowired private SessionFactory sessionFactory;
 	private Session session;
+//	IPrivacyPolicyManager polManager;
 	
 
 	public void startup(){
@@ -142,8 +145,10 @@ public class CisManager implements ICisManager, IFeatureServer{
 			
 			LOG.info("listener registered");
 
-			setOwnedCISs(new HashSet<CisEditor>());	
+			this.ownedCISs = new HashSet<CisEditor>();	
 			subscribedCISs = new HashSet<CisSubscribedImp>();
+			
+			//polManager.inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, null);
 
 	}
 
@@ -184,7 +189,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 		 
 		while(it.hasNext()){
 			 CisEditor element = it.next();
-			 if (element.getCisRecord().getCisId().equals(jid))
+			 if (element.getCisRecord().getCisJid().equals(jid))
 				 return element;
 	     }
 		return null;
@@ -235,7 +240,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 	// TODO: review
 	private boolean subscribeToCis(CisRecord i) {
 
-		this.subscribedCISs.add(new CisSubscribedImp (new CisRecord(i.getCisId())));
+		this.subscribedCISs.add(new CisSubscribedImp (new CisRecord(i.getCisJid())));
 		return true;
 		
 	}
@@ -337,7 +342,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 					while(it.hasNext()){
 						CisRecord element = it.next().getCisRecord();
 						Community community = new Community();
-						community.setCommunityJid(element.getCisId());
+						community.setCommunityJid(element.getCisJid());
 						com.getCommunity().add(community);
 						 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
 				     }
@@ -469,6 +474,16 @@ public class CisManager implements ICisManager, IFeatureServer{
 		
 		return l;
 	}
+	
+	@Override
+	public List<ICisOwned> getListOfOwnedCis(){
+		
+		// add subscribed CIS to the list to be returned
+		List<ICisOwned> l = new ArrayList<ICisOwned>();
+		l.addAll(ownedCISs);
+		
+		return l;
+	}
 
 
 
@@ -493,7 +508,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 
 
 
-	@Override
+	
 	/**
 	 * Get a CIS Record with the ID cisId.
 	 * 
@@ -502,6 +517,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 	 * @param cisId The ID (jabber ID) of the CIS to get.
 	 * @return the CISRecord with the ID cisID, or null if no such CIS exists.
 	 */
+	@Override
 	public ICisRecord getCis(String cssId, String cisId) {
 		
 		// first we check it on the owned CISs		
@@ -524,22 +540,7 @@ public class CisManager implements ICisManager, IFeatureServer{
 		return null;
 	}
 
-	public Set<CisEditor> getOwnedCISs() {
-		return ownedCISs;
-	}
 
-	public void setOwnedCISs(Set<CisEditor> ownedCISs) {
-		this.ownedCISs = ownedCISs;
-	}
-	
-	
-	public Set<CisSubscribedImp> getSubscribedCISs() {
-		return subscribedCISs;
-	}
-
-	public void setSubscribedCISs(Set<CisSubscribedImp> subscribedCISs) {
-		this.subscribedCISs = subscribedCISs;
-	}
 
 	@Override
 	public ICisOwned getOwnedCis(String cisId) {
@@ -581,5 +582,17 @@ public class CisManager implements ICisManager, IFeatureServer{
 	}
 
 	
+
+	// getters and setters
+	
+	
+	public Set<CisEditor> getOwnedCISs() {
+		return ownedCISs;
+	}
+
+	public Set<CisSubscribedImp> getSubscribedCISs() {
+		return subscribedCISs;
+	}
+
 
 }

@@ -63,8 +63,11 @@ public class CisParticipant implements ICisParticipant {
 	@Column
 	 MembershipType mtype;
 	
-	
-	public CisParticipant(){}
+	// default membership is participant
+	public CisParticipant(String membersJid){
+		this.membersJid = membersJid;
+		this.mtype = MembershipType.participant;
+	}
 	
 	public CisParticipant(String membersJid, MembershipType mtype) {
 		super();

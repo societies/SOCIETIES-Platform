@@ -18,4 +18,6 @@
 
   	<osgi:service ref="CisManagementBundle" interface="org.societies.api.cis.management.ICisManager"/>
 		<osgi:reference id="societiesDataSource" interface="javax.sql.DataSource"/>
+	 <!--<osgi:reference id="PrivacyPolicyManager" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager"/>-->	
+		
 </beans>

@@ -64,6 +64,7 @@ public interface IPrivacyLogAppender {
 	 * 
 	 * @return true if OK to send the data, false to cancel
 	 */
+	@Deprecated
 	public boolean logSN(String dataType, Date time, boolean sentToGroup, IIdentity sender,
 			IIdentity receiver, ChannelType channelId);
 
@@ -72,9 +73,21 @@ public interface IPrivacyLogAppender {
 	 * {@link ICtxBroker#retrieve(Requestor, CtxIdentifier)}
 	 * and other relevant retrieve* methods.
 	 * 
-	 * @param requestor
+	 * @param requestor The requestor for 3P invocations, or null for platform invocations
+	 * @param dataOwner The CSS or CIS that owns the data, the CSS that data is related to.
 	 */
-	public void logContext(Requestor requestor);
+	public void logContext(Requestor requestor, IIdentity dataOwner);
+
+	/**
+	 * Log any read access to context with
+	 * {@link ICtxBroker#retrieve(Requestor, CtxIdentifier)}
+	 * and other relevant retrieve* methods.
+	 * 
+	 * @param requestor The requestor for 3P invocations, or null for platform invocations
+	 * @param dataOwner The CSS or CIS that owns the data, the CSS that data is related to.
+	 * @param dataSize Size of data in bytes
+	 */
+	public void logContext(Requestor requestor, IIdentity dataOwner, int dataSize);
 	
 	/**
 	 * General logger.

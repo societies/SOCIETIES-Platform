@@ -31,8 +31,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxHistoryAttribute;
-import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceLearning.impl.C45Output;
 import org.societies.personalisation.UserPreferenceLearning.impl.CtxIdentifierCache;
@@ -50,106 +52,107 @@ import weka.core.Instances;
 
 public class AA_AI extends Thread{
 
+	private Logger LOG = LoggerFactory.getLogger(AA_AI.class);
 	private IC45Consumer requestor;
 	private Date startDate;
 	private HistoryRetriever historyRetriever;
 	private PreProcessor preProcessor;
 	private PostProcessor postProcessor;
 
-	public AA_AI(IC45Consumer requestor, Date startDate, HistoryRetriever historyRetriever){
+	//All actions - All identities
+	public AA_AI(IC45Consumer requestor, Date startDate, ICtxBroker ctxBroker){
 		this.requestor = requestor;
 		this.startDate = startDate;
-		this.historyRetriever = historyRetriever;
-		//dpiRetriever = new DPIRetriever(bc);
+		
+		historyRetriever = new HistoryRetriever(ctxBroker);
 		preProcessor = new PreProcessor();
 		postProcessor = new PostProcessor(); 
 	}
 
 	@Override
 	public void run() {
-		
-		System.out.println("C45 REQUEST FROM: "+requestor.getClass().getName());
-		System.out.println("Starting C45 learning process on all actions for all history owners");
-		
+
+		LOG.info("C45 REQUEST FROM: "+requestor.getClass().getName());
+		LOG.info("Starting C45 learning process on all actions");
+
 		//create new Cache for cycle
 		CtxIdentifierCache cache = new CtxIdentifierCache();
 
-		//logging.info("Retrieving all DPIs");
-		IIdentity[] historyOwners = null; //dpiRetriever.getDPIs();
+		//Get all identities of the user
+		//Set<IIdentity> historyOwners = commsMgr.getIdManager().getPublicIdentities();
 
 		List<IC45Output> output = new ArrayList<IC45Output>();
 
 		//For each DPI
-		for(int i=0; i<historyOwners.length; i++){
+		//for(int i=0; i<historyOwners.length; i++){
 
-			IIdentity nextHistoryOwner = (IIdentity)historyOwners[i];
+		//IIdentity nextHistoryOwner = (IIdentity)historyOwners[i];
 
-			//get history
-			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history = 
-				historyRetriever.getHistory();
+		//get history
+		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history = 
+				historyRetriever.getFullHistory(startDate);
+		LOG.info("Retrieved full history");
 
-			//split history into subsets depending on serviceId and action
-			if(history!=null && history.size()>0){          	
+		//split history into subsets depending on serviceId and action
+		if(history!=null && history.size()>0){          	
 
-				//store context attribute identifiers with types
-				cache.cacheCtxIdentifiers(nextHistoryOwner, history);
+			//store context attribute identifiers with types
+			cache.cacheCtxIdentifiers(history);
+			LOG.info("Mapped context attribute identifiers with context snapshot types");
 
-				//System.out.println("Splitting history depending on serviceId and action");
-				List<ServiceSubset> splitHistory = preProcessor.splitHistory(history);
-				
-				//System.out.println("History is split!");
+			LOG.info("Splitting history depending on serviceID and parameterName");
+			List<ServiceSubset> splitHistory = preProcessor.splitHistory(history);
 
-				//for each service Identifier
-				Iterator<ServiceSubset> splitHistory_it = splitHistory.iterator();
-				while(splitHistory_it.hasNext()){
+			//for each service Identifier
+			Iterator<ServiceSubset> splitHistory_it = splitHistory.iterator();
+			while(splitHistory_it.hasNext()){
 
-					//System.out.println("Getting next split subset...");
-					ServiceSubset nextServiceSubset = (ServiceSubset)splitHistory_it.next();
+				LOG.info("Getting next split subset...");
+				ServiceSubset nextServiceSubset = (ServiceSubset)splitHistory_it.next();
 
-					//remove consistent context attributes from history
-					ServiceSubset trimmedHistory = preProcessor.trimServiceSubset(nextServiceSubset);
-					System.out.println("Split subset has been trimmed!");
+				//remove consistent context attributes from history
+				ServiceSubset trimmedHistory = preProcessor.trimServiceSubset(nextServiceSubset);
+				LOG.info("Split subset has been trimmed!");
 
-					ServiceResourceIdentifier nextServiceId = trimmedHistory.getServiceId();
-					String nextServiceType = trimmedHistory.getServiceType();
+				ServiceResourceIdentifier nextServiceId = trimmedHistory.getServiceId();
+				String nextServiceType = trimmedHistory.getServiceType();
 
-					//create new IC45Output object
-					IC45Output nextOutput = new C45Output(nextHistoryOwner, nextServiceId, nextServiceType);
+				//create new IC45Output object
+				IC45Output nextOutput = new C45Output(null, nextServiceId, nextServiceType);
 
-					//run cycle for each action subset
-					List<ActionSubset> actionSubsetList = trimmedHistory.getActionSubsets();
-					Iterator<ActionSubset> actionSubsetList_it = actionSubsetList.iterator();
-					while(actionSubsetList_it.hasNext()){
-						ActionSubset nextActionSubset = (ActionSubset)actionSubsetList_it.next();
-						if(nextActionSubset.size()>0){
-							IPreferenceTreeModel treeModel = runCycle(nextHistoryOwner, nextActionSubset, cache, nextServiceId, nextServiceType);
-							if(treeModel!=null){
-								nextOutput.addTree(treeModel);
-							}
+				//run cycle for each action subset
+				List<ActionSubset> actionSubsetList = trimmedHistory.getActionSubsets();
+				Iterator<ActionSubset> actionSubsetList_it = actionSubsetList.iterator();
+				while(actionSubsetList_it.hasNext()){
+					ActionSubset nextActionSubset = (ActionSubset)actionSubsetList_it.next();
+					if(nextActionSubset.size()>0){
+						IPreferenceTreeModel treeModel = runCycle(nextActionSubset, cache, nextServiceId, nextServiceType);
+						if(treeModel!=null){
+							nextOutput.addTree(treeModel);
 						}
 					}
-					//output.add(nextOutput);
 				}
-			}else{
-				System.out.println("No History found history owner: "+nextHistoryOwner.toString());
+				output.add(nextOutput);
 			}
+		}else{
+			LOG.error("No History found for this user!");
 		}
+		//}
 		//send DPI based output to requestor
-		System.out.println("RETURNING C45 OUTPUT TO: "+requestor.getClass().getName());
+		LOG.info("RETURNING C45 OUTPUT TO: "+requestor.getClass().getName());
 		try{
 			requestor.handleC45Output(output);
-        }catch(Exception e){
-            System.out.println("The C45 requestor service is not available to handle response");
-        }
+		}catch(Exception e){
+			LOG.error("The C45 requestor service is not available to handle response");
+		}
 	}
 
-	
-	 /*
-	  * Algorithm methods
-	  */
-	     
+
+	/*
+	 * Algorithm methods
+	 */
+
 	private IPreferenceTreeModel runCycle(
-			IIdentity historyOwner, 
 			ActionSubset input, 
 			CtxIdentifierCache cache,
 			ServiceResourceIdentifier serviceId,
@@ -169,7 +172,7 @@ public class AA_AI extends Thread{
 
 		//convert tree strings into JTrees for pref
 		String paramName = input.getParameterName();
-		return (IPreferenceTreeModel)postProcessor.process(historyOwner, paramName, outputString, cache, serviceId, serviceType);
+		return (IPreferenceTreeModel)postProcessor.process(paramName, outputString, cache, serviceId, serviceType);
 	}
 
 	private String executeAlgorithm(Instances input)throws Exception

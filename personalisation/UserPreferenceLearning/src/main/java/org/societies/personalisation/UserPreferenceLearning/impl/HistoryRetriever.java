@@ -25,11 +25,17 @@
 
 package org.societies.personalisation.UserPreferenceLearning.impl;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 public class HistoryRetriever {
 	
@@ -39,7 +45,21 @@ public class HistoryRetriever {
 		this.ctxBroker = ctxBroker;
 	}
 	
-	public Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> getHistory(){
-		return null;
+	public Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> getFullHistory(Date startDate){
+		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history = null;
+		try {
+			history = ctxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, new ArrayList<CtxAttributeIdentifier>(), startDate, null).get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		return history;
+	}
+	
+	public Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> getActionHistory(Date startDate, ServiceResourceIdentifier serviceID, String parameterName){
+		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history = null;
+		//use?
+		return history;
 	}
 }
