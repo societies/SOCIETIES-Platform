@@ -165,6 +165,7 @@ public class SnapshotManager implements CtxChangeEventListener{
 
 	@Override
 	public void onCreation(CtxChangeEvent event) {
+		LOG.info("Recieved Ctx Attribute Creation event for attribute: "+event.getId().getType());
 		CtxAttributeIdentifier attrID = (CtxAttributeIdentifier)event.getId();
 		String type = attrID.getType();
 		//check default snapshot

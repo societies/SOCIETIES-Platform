@@ -89,18 +89,23 @@ public class SA_SI extends Thread{
 		//get history
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history = 
 				historyRetriever.getFullHistory(startDate);
+		LOG.info("Retrieved full history");
 
 		if(history != null && history.size()>0){
+			LOG.info("History is not null and size is greater than 0");
 			//store context attribute identifiers with types
 			cache.cacheCtxIdentifiers(history);
+			LOG.info("Cached context identifiers");
 
 			//extract instances with serviceId and action
 			//System.out.println("Extracting "+parameterName+" actions for service "+serviceId.toString()+" from history");
 			ServiceSubset serviceSubset = 
 					preProcessor.extractServiceActions(history, serviceId, parameterName);
+			LOG.info("Extracted service action subsets from history");
 
 			//remove consistent context attributes from history
 			ServiceSubset trimmedHistory = preProcessor.trimServiceSubset(serviceSubset);
+			LOG.info("Trimmed subsets");
 
 			List<ActionSubset> actionSubsetList = trimmedHistory.getActionSubsets();
 			ActionSubset actionSubset = (ActionSubset)actionSubsetList.get(0);
@@ -137,12 +142,12 @@ public class SA_SI extends Thread{
 		//convert to Instances for each serviceId
 		Instances instances = preProcessor.toInstances(input);
 
-		//System.out.println("C45 executing...");
+		LOG.info("C45 executing...");
 		String outputString = null;
 		try{
 			outputString = executeAlgorithm(instances);
 		} catch (Exception e) {
-			System.out.println("No rules could be learned from the current history set");
+			LOG.error("No rules could be learned from the current history set");
 			return null;
 		}
 
