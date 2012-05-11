@@ -48,11 +48,9 @@ public class CorrelationInData {
 	private static Logger LOG = LoggerFactory.getLogger(CorrelationInData.class);
 
 	private final double VALUE_AT_INF_DEFAULT = 0.1;
-	private final long SIZE_SHIFT_DEFAULT = 0;
 	private final double SIZE_SCALE_DEFAULT = 1;
 	
 	private double valueAtInf;
-	private long xShift;
 	private double xScaleLeft;
 	private double xScaleRight;
 
@@ -64,7 +62,6 @@ public class CorrelationInData {
 	 */
 	public CorrelationInData() {
 		valueAtInf = VALUE_AT_INF_DEFAULT;
-		xShift = SIZE_SHIFT_DEFAULT;
 		xScaleLeft = SIZE_SCALE_DEFAULT;
 		xScaleRight = SIZE_SCALE_DEFAULT;
 		calculateNormalizationParameters();
@@ -74,8 +71,6 @@ public class CorrelationInData {
 	 * Constructor.
 	 * 
 	 * @param valueAtInf Minimal correlation value for events that are most far apart.
-	 * 
-	 * @param sizeShift Shift the correlation function along the x axis.
 	 * 
 	 * @param sizeScaleLeft x axis scaling factor for cases when data size difference is negative.
 	 * Negative difference can occur for example when data has been compressed before sending.
@@ -88,14 +83,10 @@ public class CorrelationInData {
 	 * If greater than 1, the correlation function gets wider (less sensitive to size differences).
 	 * If smaller than 1, the function gets more narrow (more sensitive to size differences).
 	 */
-	public CorrelationInData(double valueAtInf, long sizeShift, double sizeScaleLeft, double sizeScaleRight) {
+	public CorrelationInData(double valueAtInf, double sizeScaleLeft, double sizeScaleRight) {
 		this.valueAtInf = valueAtInf;
-		this.xShift = sizeShift;
 		this.xScaleLeft = sizeScaleLeft;
 		this.xScaleRight = sizeScaleRight;
-		if (xShift != 0) {
-			LOG.warn("xShift set to non-zero: {}", xShift);
-		}
 		calculateNormalizationParameters();
 	}
 	
@@ -104,15 +95,14 @@ public class CorrelationInData {
 		double c;
 		double xScale;
 		
-		if (deltaSize - xShift < 0) {
+		if (deltaSize < 0) {
 			xScale = this.xScaleLeft;
 		}
 		else {
 			xScale = this.xScaleRight;
 		}
 		
-		c = (deltaSize - xShift) / xScale;
-		c = Math.exp(-Math.pow(c, 2));
+		c = Math.exp(-Math.pow(deltaSize / xScale, 2));
 		return c;
 	}
 	
@@ -145,7 +135,9 @@ public class CorrelationInData {
 	
 	private void calculateNormalizationParameters() {
 		
-		this.normalizationFactor = 1 - valueAtInf;
+		// Value of Math.exp(-Math.pow(0 / xScale, 2)) is always 1
+		// => no need to divide normalizationFactor with it
+		this.normalizationFactor = (1 - valueAtInf);
 		this.normalizationOffset = valueAtInf;
 	}
 }

@@ -33,7 +33,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.privacytrust.privacyprotection.assessment.logic.CorrelationInData;
-import org.societies.privacytrust.privacyprotection.assessment.logic.CorrelationInTime;
 
 /**
  * Test case for Privacy Assessment
@@ -82,28 +81,28 @@ public class CorrelationInDataTest {
 		
 		LOG.debug("testCorrelationDefault()");
 		
-		double dt;
+		long deltaSize;
 		double result;
 		
-		dt = Double.NEGATIVE_INFINITY;
-		result = correlationInDataDefault.correlation(dt);
+		deltaSize = Long.MIN_VALUE;
+		result = correlationInDataDefault.correlation(deltaSize);
 		assertEquals(0, result, 1e-5);
 		
-		dt = -2.8;
-		result = correlationInDataDefault.correlation(dt);
+		deltaSize = -8;
+		result = correlationInDataDefault.correlation(deltaSize);
 		assertEquals(0, result, 1e-5);
 		
-		dt = 0;
-		result = correlationInDataDefault.correlation(dt);
+		deltaSize = 0;
+		result = correlationInDataDefault.correlation(deltaSize);
 		assertEquals(1, result, 1e-5);
 		
-		dt = 3.1;
-		result = correlationInDataDefault.correlation(dt);
+		deltaSize = 31;
+		result = correlationInDataDefault.correlation(deltaSize);
 		assertTrue(result < 1);
 		assertTrue(result > 0);
 		
-		dt = Double.MAX_VALUE;
-		result = correlationInDataDefault.correlation(dt);
+		deltaSize = Long.MAX_VALUE;
+		result = correlationInDataDefault.correlation(deltaSize);
 		assertTrue(result < 1);
 		assertTrue(result > 0);
 	}
@@ -113,31 +112,31 @@ public class CorrelationInDataTest {
 		
 		LOG.debug("testCorrelationCustom()");
 		
-		double dt;
+		long deltaSize;
 		double result;
 		
-		dt = Double.NEGATIVE_INFINITY;
-		result = correlationInDataCustom.correlation(dt);
+		deltaSize = Long.MIN_VALUE;
+		result = correlationInDataCustom.correlation(deltaSize);
 		assertEquals(0, result, 1e-5);
 		
-		dt = -2.8;
-		result = correlationInDataCustom.correlation(dt);
+		deltaSize = -8;
+		result = correlationInDataCustom.correlation(deltaSize);
 		assertEquals(0, result, 1e-5);
 		
-		dt = 0;
-		result = correlationInDataCustom.correlation(dt);
+		deltaSize = 0;
+		result = correlationInDataCustom.correlation(deltaSize);
 		assertEquals(1, result, 1e-5);
 		
-		dt = 3.1;
-		result = correlationInDataCustom.correlation(dt);
+		deltaSize = 31;
+		result = correlationInDataCustom.correlation(deltaSize);
 		assertEquals(0.99575, result, 1e-5);
 		
-		dt = 8.0973;
-		result = correlationInDataCustom.correlation(dt);
+		deltaSize = 873;
+		result = correlationInDataCustom.correlation(deltaSize);
 		assertEquals(0.69597, result, 1e-5);
 		
-		dt = Double.MAX_VALUE;
-		result = correlationInDataCustom.correlation(dt);
+		deltaSize = Long.MAX_VALUE;
+		result = correlationInDataCustom.correlation(deltaSize);
 		assertEquals(0.43921, result, 1e-5);
 	}
 }
