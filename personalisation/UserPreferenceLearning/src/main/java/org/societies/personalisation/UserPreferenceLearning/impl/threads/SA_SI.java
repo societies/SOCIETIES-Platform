@@ -125,6 +125,7 @@ public class SA_SI extends Thread{
 		//send DPI based output to requestor
 		LOG.info("RETURNING C45 OUTPUT TO: "+requestor.getClass().getName());
 		try{
+			printOutput(output);
 			requestor.handleC45Output(output);
 		}catch(Exception e){
 			LOG.error("The C45 requestor service is not available to handle response");
@@ -170,5 +171,17 @@ public class SA_SI extends Thread{
 		//System.out.println("ID3 output: "+id3.toString());
 
 		return id3.toString();
+	}
+	
+	private void printOutput(List<IC45Output> output){
+		for(IC45Output nextOutput: output){
+			LOG.info("Data owner: "+nextOutput.getOwner().getIdentifier());
+			LOG.info("Service ID: "+nextOutput.getServiceId().getServiceInstanceIdentifier());
+			LOG.info("Service Type: "+nextOutput.getServiceType());
+			List<IPreferenceTreeModel> trees = nextOutput.getTreeList();
+			for(IPreferenceTreeModel nextTree: trees){
+				LOG.info("Next preference: "+nextTree.getRootPreference().toTreeString());
+			}
+		}
 	}
 }
