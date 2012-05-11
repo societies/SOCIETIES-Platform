@@ -123,13 +123,30 @@ public class DIANNE implements IDIANNE{
 			System.out.println("No networks exist for this identity");
 		}
 	}
-
+	
+	@Override
+	public void registerContext(){
+		for(int i=0; i<defaultContext.length; i++){
+			try {
+				String nextType = defaultContext[i];
+				List<CtxIdentifier> attrIDs = ctxBroker.lookup(CtxModelType.ATTRIBUTE, nextType).get();
+				if(attrIDs.size() > 0){
+					persoMgr.registerForContextUpdate(personID, PersonalisationTypes.DIANNE, (CtxAttributeIdentifier)attrIDs.get(0));
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			} catch (CtxException e) {
+				e.printStackTrace();
+			}	
+		}
+	}
 
 	public void initialiseDIANNELearning(){
 		personID = commsMgr.getIdManager().getThisNetworkNode();
 		retrieveNetworks();  //get Networks from context
 		initialiseNetworks();  //start runners for each network
-		registerForContext();  //register for default context updates from PersonalisationMgr
 		//start DIANNE storage thread - store DIANNEs every 1?/5? minute(s)
 	}
 	
@@ -184,27 +201,6 @@ public class DIANNE implements IDIANNE{
 			runnerMappings.put(nextIdentity, nextRunner);
 		}
 	}
-
-	private void registerForContext(){
-		
-		for(int i=0; i<defaultContext.length; i++){
-			try {
-				String nextType = defaultContext[i];
-				List<CtxIdentifier> attrIDs = ctxBroker.lookup(CtxModelType.ATTRIBUTE, nextType).get();
-				if(attrIDs.size() > 0){
-					persoMgr.registerForContextUpdate(personID, PersonalisationTypes.DIANNE, (CtxAttributeIdentifier)attrIDs.get(0));
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
-			} catch (CtxException e) {
-				e.printStackTrace();
-			}
-			
-		}
-	}
-
 
 	/*
 	 * getter methods. Do not rename. The name of these methods are referenced in the spring osgi files
