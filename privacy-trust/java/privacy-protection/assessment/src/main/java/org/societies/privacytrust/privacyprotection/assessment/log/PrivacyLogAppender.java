@@ -153,6 +153,12 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		LOG.debug("logContext()");
 	}
 
+	@Override
+	public void logContext(Requestor requestor, IIdentity dataOwner, int dataSize) {
+		
+		LOG.debug("logContext()");
+	}
+
 	/* (non-Javadoc)
 	 * @see IPrivacyLogAppender#logSN(String, Date, boolean, IIdentity, IIdentity, ChannelType)
 	 */

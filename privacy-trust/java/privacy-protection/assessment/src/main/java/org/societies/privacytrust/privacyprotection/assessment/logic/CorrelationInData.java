@@ -24,24 +24,55 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
-import java.util.List;
-
-import org.societies.privacytrust.privacyprotection.assessment.logger.Point;
-
 /**
  * 
  *
  * @author Mitja Vardjan
  *
  */
-public class Correlation {
-
-	private List<Point> dataAccess;
-	private List<Point> dataTransmission;
+public class CorrelationInData {
 	
-	public Correlation(List<Point> dataAccess, List<Point> dataTransmission) {
-		this.dataAccess = dataAccess;
-		this.dataTransmission = dataTransmission;
+	private final double VALUE_AT_INF_DEFAULT = 0;
+	private final double SIZE_SHIFT_DEFAULT = 0;
+	
+	private double valueAtInf;
+	private double xShift;
+
+	public CorrelationInData() {
+		valueAtInf = VALUE_AT_INF_DEFAULT;
+		xShift = SIZE_SHIFT_DEFAULT;
 	}
 	
+	public CorrelationInData(double valueAtInf, double sizeShift) {
+		this.valueAtInf = valueAtInf;
+		this.xShift = sizeShift;
+	}
+	
+	private double correlationUnnormalized(double dt) {
+		
+		double c;
+		
+		c = 1 - 1 / (1 + Math.exp(-(dt - xShift)));
+		return c;
+	}
+	
+	public double correlation(double dt) {
+		
+		double c;
+		
+		if (dt < 0) {
+			c = 0;
+		}
+		else {
+			c = normalize(correlationUnnormalized(dt));
+		}
+		return c;
+	}
+	
+	public double normalize(double x) {
+		
+		double k = 1 - valueAtInf;
+		double n = valueAtInf;
+		return k * x + n;
+	}
 }
