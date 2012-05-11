@@ -189,7 +189,7 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 	 */
 	@Override
 	public void addCisAdvertisementRecord(CisAdvertisementRecord cisAdvert) {
-		// We want to sent all messages for CssDirectory to the domain authority Node
+		// We want to send all messages for CisDirectory to the domain authority Node
 		IIdentity toIdentity = idMgr.getDomainAuthorityNode();
 		Stanza stanza = new Stanza(toIdentity);
 
@@ -215,7 +215,7 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 	 */
 	@Override
 	public void deleteCisAdvertisementRecord(CisAdvertisementRecord cisAdvert) {
-		// We want to sent all messages for CssDirectory to the domain authority Node
+		// We want to send all messages for CisDirectory to the domain authority Node
 		IIdentity toIdentity = idMgr.getDomainAuthorityNode();
 		Stanza stanza = new Stanza(toIdentity);
 
@@ -242,11 +242,11 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 	@Override
 	public void findAllCisAdvertisementRecords(
 			ICisDirectoryCallback cisDirCallback) {
-		// We want to sent all messages for CssDirectory to the domain authority Node
+		// We want to send all messages for CisDirectory to the domain authority Node
 		IIdentity toIdentity = idMgr.getDomainAuthorityNode();
 		Stanza stanza = new Stanza(toIdentity);
 
-		// SETUP CssDirectory CLIENT RETURN STUFF
+		// SETUP CisDirectory CLIENT RETURN STUFF
 		CisDirectoryClientCallback callback = new CisDirectoryClientCallback(stanza.getId(),
 				cisDirCallback);
 
@@ -268,18 +268,18 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 	 * (non-Javadoc)
 	 *
 	 * @see
-	 * org.societies.api.css.directory.ICssDirectoryRemote#findForAllCss(org
-	 * .societies.api.schema.css.directory.CssAdvertisementRecord,
-	 * org.societies.api.css.directory.ICssDirectoryCallback)
+	 * org.societies.api.cis.directory.ICisDirectoryRemote#findForAllCis(org
+	 * .societies.api.schema.cis.directory.CisAdvertisementRecord,
+	 * org.societies.api.cis.directory.ICisDirectoryCallback)
 	 */
 	@Override
 	public void findForAllCis(CisAdvertisementRecord cisAdvert,
 			ICisDirectoryCallback cisDirCallback) {
-		// We want to sent all messages for CssDirectory to the domain authority Node
+		// We want to send all messages for CisDirectory to the domain authority Node
 		IIdentity toIdentity = idMgr.getDomainAuthorityNode();
 		Stanza stanza = new Stanza(toIdentity);
 
-		// SETUP CALC CLIENT RETURN STUFF
+		// SETUP CLIENT RETURN STUFF
 		CisDirectoryClientCallback callback = new CisDirectoryClientCallback(stanza.getId(),
 				cisDirCallback);
 
@@ -302,10 +302,10 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see org.societies.api.css.directory.ICssDirectoryRemote#
-	 * updateCssAdvertisementRecord
-	 * (org.societies.api.schema.css.directory.CssAdvertisementRecord,
-	 * org.societies.api.schema.css.directory.CssAdvertisementRecord)
+	 * @see org.societies.api.cis.directory.ICisDirectoryRemote#
+	 * updateCisAdvertisementRecord
+	 * (org.societies.api.schema.cis.directory.CisAdvertisementRecord,
+	 * org.societies.api.schema.cis.directory.CisAdvertisementRecord)
 	 */
 	@Override
 	public void updateCisAdvertisementRecord(

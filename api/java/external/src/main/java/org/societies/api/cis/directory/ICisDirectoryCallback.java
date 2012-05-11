@@ -31,7 +31,7 @@ import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
- * A callback class to handle asynch messaging for  the Css Directory Client {@link org.societies.api.css.directory.ICssDirectoryRemote}.
+ * A callback class to handle asynch messaging for  the Cis Directory Client {@link org.societies.api.cis.directory.ICisDirectoryRemote}.
  *
  * @author aleckey
  */

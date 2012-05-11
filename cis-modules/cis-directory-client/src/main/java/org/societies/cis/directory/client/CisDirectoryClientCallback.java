@@ -70,7 +70,7 @@ public class CisDirectoryClientCallback implements ICommCallback {
 	}
 
 
-	/**Returns the correct calculator client callback for this request
+	/**Returns the correct client callback for this request
 	 * @param requestID the id of the initiating request
 	 * @return
 	 * @throws UnavailableException
@@ -81,7 +81,7 @@ public class CisDirectoryClientCallback implements ICommCallback {
 		return requestingClient;
 	}
 
-	/**Returns the correct calculator client callback for this request
+	/**Returns the correct client callback for this request
 	 * @param requestID the id of the initiating request
 	 * @return
 	 * @throws UnavailableException

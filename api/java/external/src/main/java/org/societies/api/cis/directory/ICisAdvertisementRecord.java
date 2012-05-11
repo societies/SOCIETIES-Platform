@@ -24,6 +24,9 @@
  */
 package org.societies.api.cis.directory;
 
+import org.societies.utilities.annotations.SocietiesExternalInterface;
+import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+
 /**
  * @author Babak.Farshchian@sintef.no
  *
@@ -32,7 +35,7 @@ package org.societies.api.cis.directory;
  * MISSING_ANNOTATION
  * MISSING_JAVADOCS
  */
-
+@SocietiesExternalInterface(type=SocietiesInterfaceType.PROVIDED)
 public interface ICisAdvertisementRecord {
 	public String getName();
 	public void setName(String name);
