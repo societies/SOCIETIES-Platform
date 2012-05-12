@@ -39,6 +39,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfOutcome;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
@@ -220,6 +221,18 @@ public interface IPrivacyPreferenceManager {
 	 */
 	public IPrivacyPreferenceTreeModel getPPNPreference(PPNPreferenceDetails details);
 	
+	/**
+	 * Method to retrieve the Data Obfuscation preferences based on the given parameters
+	 * @param details		the specific details to which the preference requested relates to
+	 * @return				the preference to which the details relate to 
+	 */
+	public IPrivacyPreferenceTreeModel getDObfPreference(DObfPreferenceDetails details);
+	
+	/**
+	 * Method to retrieve the details of all the DObf preferences
+	 * @return				a list of DObfPreferenceDetails objects
+	 */
+	public List<DObfPreferenceDetails> getDObfPreferences();
 	/**
 	 * Method to store an IDS preference related to the specific details (param)
 	 * @param details		the details to which the preference to be stored relates to

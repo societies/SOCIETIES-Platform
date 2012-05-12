@@ -63,6 +63,7 @@ import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfOutcome;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPrivacyPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
@@ -508,6 +509,25 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	public IPrivacyPreferenceTreeModel getPPNPreference(PPNPreferenceDetails details) {
 		return this.prefCache.getPPNPreference(details);
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#getDObfPreference(org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfPreferenceDetails)
+	 */
+	@Override
+	public IPrivacyPreferenceTreeModel getDObfPreference(DObfPreferenceDetails details){
+		return this.prefCache.getDObfPreference(details);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#getDObfPreferences()
+	 */
+	@Override
+	public List<DObfPreferenceDetails> getDObfPreferences(){
+		return this.prefCache.getDObfPreferences();
+	}
+	
 	
 	/*
 	 * (non-Javadoc)

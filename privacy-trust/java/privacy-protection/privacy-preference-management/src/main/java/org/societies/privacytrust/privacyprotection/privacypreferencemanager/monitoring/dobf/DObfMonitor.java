@@ -24,7 +24,23 @@
  */
 package org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.dobf;
 
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
+
+import org.societies.api.context.CtxException;
+import org.societies.api.context.event.CtxChangeEvent;
+import org.societies.api.context.event.CtxChangeEventListener;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfPreferenceDetails;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceTreeModel;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager;
+import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PreferenceConditionExtractor;
 
 /**
  * Describe your class here...
@@ -32,12 +48,83 @@ import org.societies.privacytrust.privacyprotection.privacypreferencemanager.Pri
  * @author Eliza
  *
  */
-public class DObfMonitor {
+public class DObfMonitor implements CtxChangeEventListener {
 
 	private final PrivacyPreferenceManager privPrefMgr;
-
-	public DObfMonitor(PrivacyPreferenceManager privPrefMgr) {
+	Hashtable<CtxIdentifier, List<DObfPreferenceDetails>> monitoring = new Hashtable<CtxIdentifier, List<DObfPreferenceDetails>>();
+	private final ICtxBroker ctxBroker;
+	private final IIdentity userIdentity;
+	
+	
+	public DObfMonitor(IIdentity userId, PrivacyPreferenceManager privPrefMgr, ICtxBroker ctxBroker) {
+		userIdentity = userId;
 		this.privPrefMgr = privPrefMgr;
+		this.ctxBroker = ctxBroker;
+		
+	}
+	
+	
+	private void registerForEvents() {
+		Enumeration<CtxIdentifier> ctxIdEnum = monitoring.keys();
+		
+		while(ctxIdEnum.hasMoreElements()){
+			try {
+				ctxBroker.registerForChanges(this, ctxIdEnum.nextElement());
+			} catch (CtxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+	}
+
+
+	private void loadPreferenceDetails(){
+		List<DObfPreferenceDetails> details = privPrefMgr.getDObfPreferences();
+
+		for (DObfPreferenceDetails detail: details){
+			PreferenceConditionExtractor extractor = new PreferenceConditionExtractor();
+			IPrivacyPreferenceTreeModel model = privPrefMgr.getDObfPreference(detail);
+			if (null!=model){
+				List<CtxIdentifier> ctxIds = extractor.extractConditions(model);
+				for (CtxIdentifier ctxId: ctxIds){
+					if (monitoring.containsKey(ctxId)){
+						monitoring.get(ctxId).add(detail);
+					}else{
+						ArrayList<DObfPreferenceDetails> list = new ArrayList<DObfPreferenceDetails>();
+						list.add(detail);
+						monitoring.put(ctxId, list);
+
+					}
+				}
+			}
+
+		}
+	}
+	@Override
+	public void onCreation(CtxChangeEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void onModification(CtxChangeEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void onRemoval(CtxChangeEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void onUpdate(CtxChangeEvent arg0) {
+		// TODO Auto-generated method stub
 		
 	}
 }

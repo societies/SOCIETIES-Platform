@@ -34,6 +34,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPreferenceDetails;
@@ -50,7 +51,8 @@ public class PrivatePreferenceCache {
 	private Hashtable<CtxAttributeIdentifier, IPrivacyPreferenceTreeModel> ppnCtxIDtoModel;
 	//the key refers to the ctxID of the (ids) preference attribute (not the affected context attribute)
 	private Hashtable<CtxAttributeIdentifier, IPrivacyPreferenceTreeModel> idsCtxIDtoModel;
-	
+	//the key refers to the ctxID of the (ids) preference attribute (not the affected context attribute)
+	private Hashtable<CtxAttributeIdentifier, IPrivacyPreferenceTreeModel> dobfCtxIDtoModel;
 	
 	
 
@@ -375,6 +377,17 @@ public class PrivatePreferenceCache {
 	/*
 	 * OLD METHODS
 	 */
+
+
+	public IPrivacyPreferenceTreeModel getDObfPreference(DObfPreferenceDetails details) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	public List<DObfPreferenceDetails> getDObfPreferences() {
+		return this.registry.getDObfPreferenceDetails();
+	}
 
 
 

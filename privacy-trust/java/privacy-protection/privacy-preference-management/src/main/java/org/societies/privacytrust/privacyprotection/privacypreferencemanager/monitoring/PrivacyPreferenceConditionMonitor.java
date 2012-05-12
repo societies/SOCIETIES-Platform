@@ -60,7 +60,7 @@ public class PrivacyPreferenceConditionMonitor implements IPrivacyPreferenceCond
 		this.idm = idm;
 		userIdentity = idm.getThisNetworkNode();
 		ppnMonitor = new PPNMonitor(userIdentity, privPrefMgr, ctxBroker, privacyDataManager);
-		dobfMonitor = new DObfMonitor(privPrefMgr);
+		dobfMonitor = new DObfMonitor(userIdentity, privPrefMgr, ctxBroker);
 		idsMonitor = new IDSMonitor(userIdentity, ctxBroker, privPrefMgr);
 		
 		
