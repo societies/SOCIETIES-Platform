@@ -355,7 +355,9 @@ public class EgocentricCommunityDeletionManager //implements ICommCallback
 		}
 		HashMap<String, ArrayList<ICis>> deletionSuggestions = new HashMap<String, ArrayList<ICis>>();
 		deletionSuggestions.put("Delete CISs", cissToDelete);
-		suggestedCommunityAnalyser.processEgocentricRecommendations(deletionSuggestions, new ArrayList<String>());
+		
+		return;
+		//suggestedCommunityAnalyser.processEgocentricRecommendations(deletionSuggestions, new ArrayList<String>());
 		
 		//Can't use GUI in tests
         //cissToDelete = getUserFeedbackOnDeletion(cissToDelete);

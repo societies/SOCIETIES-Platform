@@ -37,8 +37,8 @@ import java.util.HashMap;
 public class SuggestedCommunityAnalyserBean {
 
 	private SuggestedCommunityAnalyserMethodType method;
-	private HashMap<String, ArrayList<ICis>> ciss;
-	private HashMap<String, ArrayList<ArrayList<ICis>>> configureCiss;
+	private HashMap<String, ArrayList<ICisOwned>> ciss;
+	private HashMap<String, ArrayList<ArrayList<ICisOwned>>> configureCiss;
 	private ArrayList<String> cissMetadata;
 	
 	private ArrayList<IIdentity> cssList;
@@ -59,19 +59,19 @@ public class SuggestedCommunityAnalyserBean {
 		this.method = method;
 	}
 	
-	public HashMap<String, ArrayList<ICis>> getCiss(){
+	public HashMap<String, ArrayList<ICisOwned>> getCiss(){
 		return this.ciss;
 	}
 	
-	public void setCiss(HashMap<String, ArrayList<ICis>> ciss){
+	public void setCiss(HashMap<String, ArrayList<ICisOwned>> ciss){
 		this.ciss = ciss;
 	}
 	
-	public HashMap<String, ArrayList<ArrayList<ICis>>> getConfigureCiss(){
+	public HashMap<String, ArrayList<ArrayList<ICisOwned>>> getConfigureCiss(){
 		return this.configureCiss;
 	}
 	
-	public void setConfigureCiss(HashMap<String, ArrayList<ArrayList<ICis>>> configureCiss){
+	public void setConfigureCiss(HashMap<String, ArrayList<ArrayList<ICisOwned>>> configureCiss){
 		this.configureCiss = configureCiss;
 	}
 	

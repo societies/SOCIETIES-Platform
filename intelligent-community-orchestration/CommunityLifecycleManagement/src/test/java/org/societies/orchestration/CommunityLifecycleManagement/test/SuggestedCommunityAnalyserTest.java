@@ -102,7 +102,7 @@ public class SuggestedCommunityAnalyserTest {
     	suggestedCommunityAnalyser.setUserContextBroker(userCtxBroker);
     	suggestedCommunityAnalyser.setCisManager(cisManager);
     	
-    	HashMap<String, ArrayList<ICis>> recommendations = new HashMap<String, ArrayList<ICis>>();
+    	HashMap<String, ArrayList<ICisOwned>> recommendations = new HashMap<String, ArrayList<ICisOwned>>();
 		suggestedCommunityAnalyser.processEgocentricRecommendations(recommendations, new ArrayList<String>());
 		
 		//James should have been suggested to leave the CIS.
@@ -130,7 +130,7 @@ public class SuggestedCommunityAnalyserTest {
     	suggestedCommunityAnalyser.setCommunityRecommender(communityRecommender);
     	suggestedCommunityAnalyser.setUserContextBroker(userCtxBroker);
     	suggestedCommunityAnalyser.setCisManager(cisManager);
-		HashMap<String, ArrayList<ICis>> recommendations = new HashMap<String, ArrayList<ICis>>();
+		HashMap<String, ArrayList<ICisOwned>> recommendations = new HashMap<String, ArrayList<ICisOwned>>();
 		suggestedCommunityAnalyser.processCSCWRecommendations(recommendations);
 		
 		//James should have been suggested to leave the CIS.

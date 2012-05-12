@@ -26,6 +26,8 @@ package org.societies.orchestration.api;
 
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+import org.societies.api.identity.IIdentity;
+import java.util.ArrayList;
 
 /**
  * @author Babak.Farshchian@sintef.no
@@ -39,17 +41,23 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
  * 
  * this will be changed on W20, please wait by then
  */
-@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
-public interface ICis {
+public class ICis {
 
+	private String cisId;
     
+	public ICis() {
+		cisId = "";
+	}
+	
 	/**
 	 * Returns the jid of the CIS
 	 * 
 	 * @param 
 	 * @return jid to address the CIS as a string
 	 */
-	public String getCisId();
+	public String getCisId() {
+		return cisId;
+	}
     
 	/**
 	 * Returns the Name of the CIS
@@ -57,12 +65,20 @@ public interface ICis {
 	 * @param 
 	 * @return name of the CIS as a string
 	 */ 
-    public String getName();
+    public String getName() {
+    	return "";
+    }
     //public String getOwnerId();
     //public String setUserDefinedName(String _name);
    // public String getUserDefineName();
     //public String getCisType();
     
-    public int getMembershipCriteria();
+    public ArrayList<IIdentity> getMembersList() {
+    	return new ArrayList<IIdentity>();
+    }
+    
+    public int getMembershipCriteria() {
+    	return 0;
+    }
 
 }

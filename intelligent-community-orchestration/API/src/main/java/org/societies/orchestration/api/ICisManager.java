@@ -25,6 +25,7 @@
 package org.societies.orchestration.api;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.Future;
 
 import org.societies.utilities.annotations.SocietiesExternalInterface;
@@ -38,8 +39,7 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
  *
  */
 
-@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
-public interface ICisManager {
+public class ICisManager {
 
 	
 	// API implementing server functionality
@@ -63,7 +63,9 @@ public interface ICisManager {
 	 * @return a Future link to the {@link ICisOwned} representing the new CIS, or 
 	 * null if the CIS was not created.
 	 */
-	Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode);
+	public Future<ICisOwned> createCis(String cssId, String cssPassword, String cisName, String cisType, int mode) {
+		return null;
+	}
 	
 	/**
 	 * Delete a specific CIS represented by cisId. The cisId is available in the
@@ -75,7 +77,9 @@ public interface ICisManager {
 	 * @param cisId The ID of the CIS to be deleted.
 	 * @return true if deleted, false otherwise.
 	 */
-	boolean deleteCis(String cssId, String cssPassword, String cisId);
+	public boolean deleteCis(String cssId, String cssPassword, String cisId) {
+		return true;
+	}
 	
 	/**
 	 * Get a CIS Record with the ID cisId.
@@ -87,7 +91,9 @@ public interface ICisManager {
 	 * @return the {@link ICis} matching the input cisID, or null if no such CIS is owned or subscribed by the user.
 	 * 
 	 */
-	ICis getCis(String cssId, String cisId);
+	public ICis getCis(String cssId, String cisId) {
+		return null;
+	}
 	
 	/**
 	 * Get a CIS Owned Interface with the ID cisId.
@@ -97,7 +103,9 @@ public interface ICisManager {
 	 * @param cisId The ID (jabber ID) of the CIS to get.
 	 * @return the {@link ICisOwned} matching the input cisID, or null if no such CIS is owned by the user.
 	 */
-	ICisOwned getOwnedCis(String cisId);
+	public ICisOwned getOwnedCis(String cisId) {
+		return null;
+	}
 	
 	
 	/**
@@ -105,7 +113,9 @@ public interface ICisManager {
 	 * 
 	 * @return Array of {@linkICisRecord} .
 	 */
-	List<ICis> getCisList();
+	public List<ICis> getCisList() {
+		return null;
+	}
 
 	
 	/**
@@ -113,7 +123,9 @@ public interface ICisManager {
 	 * 
 	 * @return list of {@link ICisOwned}
 	 */
-	public List<ICisOwned> getListOfOwnedCis();
+	public List<ICisOwned> getListOfOwnedCis() {
+		return null;
+	}
 
 	
 	// END OF API implementing server functionality
@@ -138,7 +150,17 @@ public interface ICisManager {
 	 * @param query Defines what to search for.
 	 * @return Array of CIS Records that match the query.
 	 */
-	ICis[] getCisList(ICis query);
+	public ICis[] getCisList(ICis query) {
+		return null;
+	}
+	
+	public ICisOwned getBlankCisOwned() {
+		return new ICisOwned();
+	}
+	
+	public ICis getBlankCis() {
+		return new ICis();
+	}
 
 	
 	
@@ -156,7 +178,9 @@ public interface ICisManager {
 	 * @param cisId JID of the CIS which will have its owner changed
 	 * @return boolean stating if the operation worked or failed
 	 */
-	boolean requestNewCisOwner(String currentOwnerCssId, String currentOwnerCssPassword,
-		String newOwnerCssId, String cisId);
+	public boolean requestNewCisOwner(String currentOwnerCssId, String currentOwnerCssPassword,
+		String newOwnerCssId, String cisId) {
+		return true;
+	}
 
 }

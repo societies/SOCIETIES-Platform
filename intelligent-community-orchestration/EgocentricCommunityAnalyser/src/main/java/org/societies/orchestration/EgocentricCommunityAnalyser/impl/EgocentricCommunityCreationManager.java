@@ -1170,7 +1170,7 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		
 		suggestedCommunityAnalyserBean = new SuggestedCommunityAnalyserBean();
 		suggestedCommunityAnalyserBean.setMethod(suggestedCommunityAnalyserMethodType.processEgocentricRecommendations);
-		suggestedCommunityAnalyserBean.setCiss(theResult);
+		//suggestedCommunityAnalyserBean.setCiss(theResult);
 
 		//cbPacket.setUpdateAttr(ctxBrokerUpdateAttributeBean);
 
@@ -1186,7 +1186,8 @@ public class EgocentricCommunityCreationManager //implements ICommCallback
 		//while (returnMetadata == null);
 		//return returnMetadata;
 		
-		return suggestedCommunityAnalyser.processEgocentricRecommendations(theResult, cissToCreateMetadata);
+		return null;
+		//return suggestedCommunityAnalyser.processEgocentricRecommendations(theResult, cissToCreateMetadata);
 		//if (cissToCreate != null) 
 		//    for (int i = 0; i < cissToCreate.size(); i++)
 		//	    cisManager.createCis(linkedCss.getIdentifier(), cissToCreate.get(i).getCisId());

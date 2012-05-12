@@ -163,7 +163,7 @@ public class CommunityRecommender //implements ICommCallback
 		//	this.linkedDomain = linkedEntity;
 	}
 	
-	public ArrayList<String> identifyCisActionForEgocentricCommunityAnalyser(HashMap<String, ArrayList<ArrayList<ICis>>> cisPossibilities, ArrayList<String> cissToCreateMetadata) {
+	public ArrayList<String> identifyCisActionForEgocentricCommunityAnalyser(HashMap<String, ArrayList<ArrayList<ICisOwned>>> cisPossibilities, ArrayList<String> cissToCreateMetadata) {
 		ArrayList<String> cisAddMetadata = new ArrayList<String>();
 		ArrayList<String> cisNotDeletedMetadata = new ArrayList<String>();
 		ArrayList<String> cisCreatedFromConfigurationMetadata = new ArrayList<String>();
@@ -171,7 +171,7 @@ public class CommunityRecommender //implements ICommCallback
 		    cisAddMetadata = identifyCissToCreate(cisPossibilities.get("Create CISs").get(0), cissToCreateMetadata);
 		if (cisPossibilities.get("Delete CISs") != null)
 		    cisNotDeletedMetadata = identifyCissToDelete(cisPossibilities.get("Delete CISs").get(0), cissToCreateMetadata);
-		HashMap<String, ArrayList<ArrayList<ICis>>> temp = new HashMap<String, ArrayList<ArrayList<ICis>>>();
+		HashMap<String, ArrayList<ArrayList<ICisOwned>>> temp = new HashMap<String, ArrayList<ArrayList<ICisOwned>>>();
 		temp.put("Configure CISs", cisPossibilities.get("Configure CISs"));
 		temp.put("Merge CISs", cisPossibilities.get("Merge CISs"));
 		temp.put("Split CISs", cisPossibilities.get("Split CISs"));
@@ -189,26 +189,26 @@ public class CommunityRecommender //implements ICommCallback
 		return cisMetadata;
 	}
 	
-	public ArrayList<String> identifyCisActionForCSCW(HashMap<String, ArrayList<ArrayList<ICis>>> cisPossibilities) {
+	public ArrayList<String> identifyCisActionForCSCW(HashMap<String, ArrayList<ArrayList<ICisOwned>>> cisPossibilities) {
 		ArrayList<String> cisAddMetadata = new ArrayList<String>();
 		ArrayList<String> cisNotDeletedMetadata = new ArrayList<String>();
 		ArrayList<String> cisCreatedFromConfigurationMetadata = new ArrayList<String>();
 		if (cisPossibilities.get("Create CISs") != null) {
-			ArrayList<ArrayList<ICis>> theList = cisPossibilities.get("Create CISs");
-			ArrayList<ICis> theSubList = new ArrayList<ICis>();
+			ArrayList<ArrayList<ICisOwned>> theList = cisPossibilities.get("Create CISs");
+			ArrayList<ICisOwned> theSubList = new ArrayList<ICisOwned>();
 			for (int i = 0; i < theList.size(); i++)
 				theSubList.add(theList.get(i).get(0));
 			cisAddMetadata = identifyCissToCreate(theSubList, null);
 		}
 		    
 		if (cisPossibilities.get("Delete CISs") != null) {
-			ArrayList<ArrayList<ICis>> theList = cisPossibilities.get("Delete CISs");
-			ArrayList<ICis> theSubList = new ArrayList<ICis>();
+			ArrayList<ArrayList<ICisOwned>> theList = cisPossibilities.get("Delete CISs");
+			ArrayList<ICisOwned> theSubList = new ArrayList<ICisOwned>();
 			for (int i = 0; i < theList.size(); i++)
 				theSubList.add(theList.get(i).get(0));
 			cisNotDeletedMetadata = identifyCissToDelete(theSubList, null);
 		}
-		HashMap<String, ArrayList<ArrayList<ICis>>> temp = new HashMap<String, ArrayList<ArrayList<ICis>>>();
+		HashMap<String, ArrayList<ArrayList<ICisOwned>>> temp = new HashMap<String, ArrayList<ArrayList<ICisOwned>>>();
 		temp.put("Configure CISs", cisPossibilities.get("Configure CISs"));
 		temp.put("Merge CISs", cisPossibilities.get("Merge CISs"));
 		temp.put("Split CISs", cisPossibilities.get("Split CISs"));
@@ -227,26 +227,26 @@ public class CommunityRecommender //implements ICommCallback
 		
 	}
 	
-    public ArrayList<String> identifyCisActionForCSMAnalyser(HashMap<String, ArrayList<ArrayList<ICis>>> cisPossibilities) {
+    public ArrayList<String> identifyCisActionForCSMAnalyser(HashMap<String, ArrayList<ArrayList<ICisOwned>>> cisPossibilities) {
     	ArrayList<String> cisAddMetadata = new ArrayList<String>();
 		ArrayList<String> cisNotDeletedMetadata = new ArrayList<String>();
 		ArrayList<String> cisCreatedFromConfigurationMetadata = new ArrayList<String>();
 		if (cisPossibilities.get("Create CISs") != null) {
-			ArrayList<ArrayList<ICis>> theList = cisPossibilities.get("Create CISs");
-			ArrayList<ICis> theSubList = new ArrayList<ICis>();
+			ArrayList<ArrayList<ICisOwned>> theList = cisPossibilities.get("Create CISs");
+			ArrayList<ICisOwned> theSubList = new ArrayList<ICisOwned>();
 			for (int i = 0; i < theList.size(); i++)
 				theSubList.add(theList.get(i).get(0));
 			cisAddMetadata = identifyCissToCreate(theSubList, null);
 		}
 		    
 		if (cisPossibilities.get("Delete CISs") != null) {
-			ArrayList<ArrayList<ICis>> theList = cisPossibilities.get("Delete CISs");
-			ArrayList<ICis> theSubList = new ArrayList<ICis>();
+			ArrayList<ArrayList<ICisOwned>> theList = cisPossibilities.get("Delete CISs");
+			ArrayList<ICisOwned> theSubList = new ArrayList<ICisOwned>();
 			for (int i = 0; i < theList.size(); i++)
 				theSubList.add(theList.get(i).get(0));
 			cisNotDeletedMetadata = identifyCissToDelete(theSubList, null);
 		}
-		HashMap<String, ArrayList<ArrayList<ICis>>> temp = new HashMap<String, ArrayList<ArrayList<ICis>>>();
+		HashMap<String, ArrayList<ArrayList<ICisOwned>>> temp = new HashMap<String, ArrayList<ArrayList<ICisOwned>>>();
 		temp.put("Configure CISs", cisPossibilities.get("Configure CISs"));
 		temp.put("Merge CISs", cisPossibilities.get("Merge CISs"));
 		temp.put("Split CISs", cisPossibilities.get("Split CISs"));
@@ -275,8 +275,8 @@ public class CommunityRecommender //implements ICommCallback
 	 *              on collective aspects like context attributes.
 	 */
 	
-	public ArrayList<String> identifyCissToCreate(ArrayList<ICis> creatableCiss, ArrayList<String> cissToCreateMetadata) {		
-		HashMap<Integer, ICis> cissToCreate = new HashMap<Integer, ICis>();
+	public ArrayList<String> identifyCissToCreate(ArrayList<ICisOwned> creatableCiss, ArrayList<String> cissToCreateMetadata) {		
+		HashMap<Integer, ICisOwned> cissToCreate = new HashMap<Integer, ICisOwned>();
 		
 		//Can't use GUI in tests
 		//cissToCreate = getUserFeedbackOnCreation(cissToCreate);
@@ -326,8 +326,8 @@ public class CommunityRecommender //implements ICommCallback
 		return cissToCreateMetadata;
 	}
 	
-	public HashMap<Integer, ICis> getUserFeedbackOnCreation(ArrayList<ICis> cissToCreate) {
-		HashMap<Integer, ICis> finalisedCiss = new HashMap<Integer, ICis>();
+	public HashMap<Integer, ICisOwned> getUserFeedbackOnCreation(ArrayList<ICisOwned> cissToCreate) {
+		HashMap<Integer, ICisOwned> finalisedCiss = new HashMap<Integer, ICisOwned>();
 		String[] options = new String[cissToCreate.size()];
 		options[0] = "options";
 		for (int i = 0; i < cissToCreate.size(); i++) {
@@ -354,7 +354,7 @@ public class CommunityRecommender //implements ICommCallback
 		}
 		else {
 		   	for (int i = 0; i < cissToCreate.size(); i++) {
-			    ICis potentiallyCreatableCis = cissToCreate.get(i);
+			    ICisOwned potentiallyCreatableCis = cissToCreate.get(i);
 		        if (userResponse.charAt(i) == 'Y') {
 				    finalisedCiss.put(new Integer(i), potentiallyCreatableCis);
 			       // cisManager.createCis(linkedCss, potentiallyCreatableCis.getCisId());
@@ -375,8 +375,8 @@ public class CommunityRecommender //implements ICommCallback
 	 *              a domain, the check is done on all CISs in that domain.
 	 */
 	
-	public ArrayList<String> identifyCissToDelete(ArrayList<ICis> cisPossibilities, ArrayList<String> cissToDeleteMetadata) {	
-		HashMap<Integer, ICis> cissToDelete = new HashMap<Integer, ICis>();
+	public ArrayList<String> identifyCissToDelete(ArrayList<ICisOwned> cisPossibilities, ArrayList<String> cissToDeleteMetadata) {	
+		HashMap<Integer, ICisOwned> cissToDelete = new HashMap<Integer, ICisOwned>();
 		
 		//Can't use GUI in tests
         //cissToDelete = getUserFeedbackOnDeletion(cisPossibilities);
@@ -450,10 +450,10 @@ public class CommunityRecommender //implements ICommCallback
 		return realCissToDelete;
 	}
 	
-	public ArrayList<String> identifyCissToConfigure(HashMap<String, ArrayList<ArrayList<ICis>>> cisPossibilities, ArrayList<String> cissToCreateMetadata) {
+	public ArrayList<String> identifyCissToConfigure(HashMap<String, ArrayList<ArrayList<ICisOwned>>> cisPossibilities, ArrayList<String> cissToCreateMetadata) {
 	
 		
-	    HashMap<String, ArrayList<ArrayList<ICis>>> cissToConfigure = new HashMap<String, ArrayList<ArrayList<ICis>>> ();
+	    HashMap<String, ArrayList<ArrayList<ICisOwned>>> cissToConfigure = new HashMap<String, ArrayList<ArrayList<ICisOwned>>> ();
 	
 	    
 	    //can't use GUI in tests
@@ -480,7 +480,7 @@ public class CommunityRecommender //implements ICommCallback
 	    		         (i < mergesSize) ||
 	    		         (i < splitsSize)); i++) {
 	        if (i < configuresSize) {
-	    	    ArrayList<ICis> configurableCis = cissToConfigure.get("Configure CISs").get(i);
+	    	    ArrayList<ICisOwned> configurableCis = cissToConfigure.get("Configure CISs").get(i);
                 IIdentity cisID = null;
 	            try {
 				    cisID = identityManager.fromJid(configurableCis.get(0).getCisId());
@@ -508,7 +508,7 @@ public class CommunityRecommender //implements ICommCallback
 	        	
 	            //if "merge with other CIS"
         	    //
-	            ArrayList<ICis> configurableCis = cissToConfigure.get("Merge CISs").get(i);
+	            ArrayList<ICisOwned> configurableCis = cissToConfigure.get("Merge CISs").get(i);
 	            //
 	            //IIdentity[] membersList = configurableCis.get(0).getMembersList();
 	            //IIdentity[] membersList2 = configurableCis.get(1).getMembersList()
@@ -572,7 +572,7 @@ public class CommunityRecommender //implements ICommCallback
 	        if (i < splitsSize) {
         	    //if "split into distinct CISs"
         	    //
-	            ArrayList<ICis> configurableCis = cissToConfigure.get("Split CISs").get(i);
+	            ArrayList<ICisOwned> configurableCis = cissToConfigure.get("Split CISs").get(i);
 	            //cisManager.createCis(configurableCis.get(1));
 	            //cisManager.createCis(configurableCis.get(2));
 	        
