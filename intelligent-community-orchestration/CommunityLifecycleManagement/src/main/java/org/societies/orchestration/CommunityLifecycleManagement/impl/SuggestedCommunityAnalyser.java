@@ -94,6 +94,7 @@ import org.societies.api.context.model.CtxIdentifier;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.css.management.ICssActivity;
@@ -105,6 +106,10 @@ import org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserResultBean;
 
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
@@ -358,7 +363,6 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     					
     					
     					theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
-    					//updatedCreation.setMembersList();
     					try {
 							updatedCreation.removeMemberFromCIS(privacyConflicts.get(m).split("CSS: ")[1]);
 						} catch (CommunicationException e) {
@@ -385,7 +389,33 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     				if (privacyConflicts.get(m).equals("User policy"))
     				    refuseSuggestion = true;
     				else if (privacyConflicts.get(m).contains("CSS: ")) {
+    					
     					ICisOwned updatedCreation = creations.get(i);
+    					Future<Set<ICisParticipant>> theParticipants = updatedCreation.getMemberList();
+    					ArrayList<IIdentity> theMembers = new ArrayList<IIdentity>();
+    					if (theParticipants != null) {
+    						Set<ICisParticipant> theParticipantsSet = null;
+							try {
+								theParticipantsSet = theParticipants.get();
+							} catch (InterruptedException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} catch (ExecutionException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+    						if (theParticipantsSet != null) {
+    							Iterator<ICisParticipant> it = theParticipantsSet.iterator();
+    							while (it.hasNext()) {
+        							try {
+										theMembers.add(identityManager.fromJid(it.next().toString()));
+									} catch (InvalidFormatException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+        						}
+    						}
+    					}
     					//ArrayList<IIdentity> theMembers = updatedCreation.getMembersList();
     					//theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
     					//updatedCreation.setMembersList();
@@ -512,10 +542,12 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	            	abstractCreations.add(it);
 				}
 	
-		for (int i = 0; i < creations.size(); i++) {
-			if (checkForPreferenceConflicts("Create CISs", abstractCreations).size() != 0)
-				creations.remove(i);
-		}
+		
+			ArrayList<String> preferenceConflicts = checkForPreferenceConflicts("Create CISs", abstractCreations);
+			if (preferenceConflicts.size() != 0)
+				for (int i = 0; i < preferenceConflicts.size(); i++) {
+				    creations.remove(Integer.valueOf(preferenceConflicts.get(i).split("---")[0]));
+		        }
 	
 		for (int i = 0; i < creations.size(); i++) {
 	
@@ -523,7 +555,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 			boolean refuseSuggestion = false;
 			if (privacyConflicts.size() != 0) {
 				for (int m = 0; m < privacyConflicts.size(); m++) {
-					if (privacyConflicts.get(m).contains("User policy"))
+					if (privacyConflicts.get(m).contains("User"))
 				    	refuseSuggestion = true;
 					else if (privacyConflicts.get(m).contains("CSS: ")) {
 						ICisOwned updatedCreation = creations.get(i);
@@ -621,16 +653,62 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     public ArrayList<String> checkForPrivacyConflicts(ArrayList<ArrayList<ICisOwned>> recommendations) {
     	ArrayList<String> conflictingPrivacyPolicies = new ArrayList<String>();
     	for (int i = 0; i < recommendations.size(); i++) {
-    		//for (int m = 0; m < recommendations.get(i).get(0).getMembershipCriteria().size(); m++) {
-    		    //for (int n = 0; n < recommendations.get(i).get(0).getMembersList().size(); n++) {
-    		        //IIdentity thisMember = recommendations.get(i).get(0).getMembersList().get(n);
-    			    //CtxAttribute thisAttribute = recommendations.get(i).get(0).getMembershipCriteria.().get(m);
-    		        //boolean passed = privacyDataManager.checkPermission(thisAttribute, thisMember, "arg2", "arg3");
-    			    //if (passed == false) conflictingPrivacyPolicies.add(recommendations.get(i).get(0).getMembershipCriteria().get(m))
-    		        //if (ctxBroker.get(thisMember, thisAttribute).equals("Access refused"))
-    		        //    conflictingPrivacyPolicies.add("CSS: " + thisMember.toString());
-    		    //}
-    		//}
+    		if (recommendations.get(i) != null) {
+    			if (recommendations.get(i).get(0) != null) {
+    				if (recommendations.get(i).get(0).getMembershipCriteria() != null) {
+    					for (int m = 0; m < recommendations.get(i).get(0).getMembershipCriteria().size(); m++) {
+    		    		    for (int n = 0; n < recommendations.get(i).get(0).getMembersList().size(); n++) {
+    		    		        IIdentity thisMember = recommendations.get(i).get(0).getMembersList().get(n);
+    		    			    Requestor thisRequestor = new Requestor(thisMember);
+    		    		        Future<List<CtxIdentifier>> id = null;
+    							try {
+    								id = userContextBroker.lookup(CtxModelType.ATTRIBUTE, recommendations.get(i).get(0).getMembershipCriteria().get(m));
+    							} catch (CtxException e) {
+    								// TODO Auto-generated catch block
+    								e.printStackTrace();
+    							}
+    		    		        List<CtxIdentifier> id2 = null;
+    							try {
+    								id2 = id.get();
+    							} catch (InterruptedException e) {
+    								// TODO Auto-generated catch block
+    								e.printStackTrace();
+    							} catch (ExecutionException e) {
+    								// TODO Auto-generated catch block
+    								e.printStackTrace();
+    							}
+    		    		        
+    		    		        CtxAttribute thisAttribute = null;
+    							try {
+    								thisAttribute = (CtxAttribute) userContextBroker.retrieve(id2.get(0)).get();
+    							} catch (InterruptedException e) {
+    								// TODO Auto-generated catch block
+    								e.printStackTrace();
+    							} catch (ExecutionException e) {
+    								// TODO Auto-generated catch block
+    								e.printStackTrace();
+    							} catch (CtxException e) {
+    								// TODO Auto-generated catch block
+    								e.printStackTrace();
+    							}
+    		    		        //Action xAction = new Action();
+    		    		        ResponseItem response = null;
+    							try {
+    								response = privacyDataManager.checkPermission(thisRequestor, linkedCss, id2.get(0), null);
+    							} catch (PrivacyException e) {
+    								// TODO Auto-generated catch block
+    								e.printStackTrace();
+    							}
+    		    			    Decision decision = response.getDecision();
+    		    		        if (decision.values()[0] != decision.PERMIT) conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "User");
+    		    		        //else if (ctxBroker.get(thisMember, thisAttribute).equals("Access refused"))
+    		    		        //    conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "CSS: " + thisMember.toString());
+    		    		    }
+    		    		}
+    				}
+    			}
+    		}
+    		
     	}
     	
     	return conflictingPrivacyPolicies;

@@ -77,8 +77,12 @@ public class ICis {
     	return new ArrayList<IIdentity>();
     }
     
-    public int getMembershipCriteria() {
-    	return 0;
+    //public int getMembershipCriteria() {
+    //	return 0;
+    //}
+    
+    public ArrayList<String> getMembershipCriteria() {
+    	return new ArrayList<String>();
     }
 
 }

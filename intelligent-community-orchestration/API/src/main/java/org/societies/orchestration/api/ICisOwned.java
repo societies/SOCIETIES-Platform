@@ -111,8 +111,9 @@ public class ICisOwned extends ICis {
 	public String setCisType(String type) {
 		return "";
 	}
-	public int getMembershipCriteria() {
-		return 0;
-	}
+	
+	//public int getMembershipCriteria() {
+	//	return 0;
+	//}
 	
 }
