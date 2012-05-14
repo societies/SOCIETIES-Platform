@@ -98,16 +98,19 @@ public class NominalTestCaseLowerTester {
 		start = cal.getTimeInMillis();
 		privacyLogAppender.logContext(requestor, owner);
 		end = cal.getTimeInMillis();
+		LOG.debug("[#1055] testSpeedOfExecution(): invocation took " + (end - start) + " ms");
 		assertTrue(end - start < PRIVACY_LOGGER_MAX_EXECUTION_TIME_IN_MS);
 		
 		start = cal.getTimeInMillis();
 		privacyLogAppender.logContext(requestor, owner, 6543);
 		end = cal.getTimeInMillis();
+		LOG.debug("[#1055] testSpeedOfExecution(): invocation took " + (end - start) + " ms");
 		assertTrue(end - start < PRIVACY_LOGGER_MAX_EXECUTION_TIME_IN_MS);
 		
 		start = cal.getTimeInMillis();
 		privacyLogAppender.logCommsFw(fromIdentity, toIdentity, payload);
 		end = cal.getTimeInMillis();
+		LOG.debug("[#1055] testSpeedOfExecution(): invocation took " + (end - start) + " ms");
 		assertTrue(end - start < PRIVACY_LOGGER_MAX_EXECUTION_TIME_IN_MS);
 		
 		LOG.info("[#1055] testSpeedOfExecution(): FINISHED");
