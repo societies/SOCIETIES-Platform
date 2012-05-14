@@ -294,140 +294,197 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	ArrayList<ArrayList<ICisOwned>> abstractCreations = new ArrayList<ArrayList<ICisOwned>>();
     	ArrayList<ArrayList<ICisOwned>> abstractDeletions = new ArrayList<ArrayList<ICisOwned>>();
     	
-    	if (creations != null)
-    		if (creations.size() != 0)
-    			for (int i = 0; i < creations.size(); i++) {
-    				ArrayList<ICisOwned> it = new ArrayList<ICisOwned>();
-    				it.add(creations.get(i));
-    	            abstractCreations.add(it);
-    			}
-    	
-    	
-    	if (deletions != null) {
-    		if (deletions.size() != 0)
-    			for (int i = 0; i < deletions.size(); i++) {
-    				ArrayList<ICisOwned> it = new ArrayList<ICisOwned>();
-    				it.add(deletions.get(i));
-    	            abstractDeletions.add(it);
-    			}
-    	}
-    	
-    	
-    	for (int i = 0; i < creations.size(); i++) {
-    		if (checkForPreferenceConflicts("Create CISs", abstractCreations).size() != 0)
-    			creations.remove(i);
-    	}
-    	
-    	for (int i = 0; i < deletions.size() && deletions != null; i++) {
-    		if (checkForPreferenceConflicts("Delete CISs", abstractDeletions).size() != 0)
-    			deletions.remove(i);
-    	}
-    	
-    	for (int i = 0; i < creations.size(); i++) {
-    	
-    		ArrayList<String> privacyConflicts = checkForPrivacyConflicts(abstractCreations);
-    		boolean refuseSuggestion = false;
-    		if (privacyConflicts.size() != 0) {
-    			for (int m = 0; m < privacyConflicts.size(); m++) {
-    				if (privacyConflicts.get(m).contains("User policy"))
-    				    refuseSuggestion = true;
-    				else if (privacyConflicts.get(m).contains("CSS: ")) {
-    					ICisOwned updatedCreation = creations.get(i);
-    					
-    					Future<Set<ICisParticipant>> theParticipants = updatedCreation.getMemberList();
-    					ArrayList<IIdentity> theMembers = new ArrayList<IIdentity>();
-    					if (theParticipants != null) {
-    						Set<ICisParticipant> theParticipantsSet = null;
-							try {
-								theParticipantsSet = theParticipants.get();
-							} catch (InterruptedException e1) {
+		
+		if (creations != null)
+			if (creations.size() != 0)
+				for (int i = 0; i < creations.size(); i++) {
+					ArrayList<ICisOwned> it = new ArrayList<ICisOwned>();
+					it.add(creations.get(i));
+	            	abstractCreations.add(it);
+				}
+	
+		    
+		
+    	//for (int i = 0; i < deletions.size() && deletions != null; i++) {
+    		//if (checkForPreferenceConflicts("Delete CISs", abstractDeletions).size() != 0)
+    			//deletions.remove(i);
+    	//}		
+		
+			ArrayList<String> preferenceConflicts = checkForPreferenceConflicts("Create CISs", abstractCreations);
+			if (preferenceConflicts.size() != 0)
+				for (int i = 0; i < preferenceConflicts.size(); i++) {
+				    creations.remove(Integer.valueOf(preferenceConflicts.get(i).split("---")[0]));
+		        }
+	
+			ArrayList<String> preferenceConflictsDeletion = checkForPreferenceConflicts("Delete CISs", abstractCreations);
+			if (preferenceConflictsDeletion.size() != 0)
+				for (int i = 0; i < preferenceConflictsDeletion.size(); i++) {
+				    deletions.remove(Integer.valueOf(preferenceConflictsDeletion.get(i).split("---")[0]));
+		        }
+			
+			for (int i = 0; i < creations.size(); i++) {
+		    	
+	    		ArrayList<String> privacyConflicts = checkForPrivacyConflicts(abstractCreations);
+	    		boolean refuseSuggestion = false;
+	    		if (privacyConflicts.size() != 0) {
+	    			for (int m = 0; m < privacyConflicts.size(); m++) {
+	    				if (privacyConflicts.get(m).contains("User"))
+	    				    refuseSuggestion = true;
+	    				else if (privacyConflicts.get(m).contains("CSS: ")) {
+	    					ICisOwned updatedCreation = creations.get(i);
+	    					
+	    					Future<Set<ICisParticipant>> theParticipants = updatedCreation.getMemberList();
+	    					ArrayList<IIdentity> theMembers = new ArrayList<IIdentity>();
+	    					if (theParticipants != null) {
+	    						Set<ICisParticipant> theParticipantsSet = null;
+								try {
+									theParticipantsSet = theParticipants.get();
+								} catch (InterruptedException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								} catch (ExecutionException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+	    						if (theParticipantsSet != null) {
+	    							Iterator<ICisParticipant> it = theParticipantsSet.iterator();
+	    							while (it.hasNext()) {
+	        							try {
+											theMembers.add(identityManager.fromJid(it.next().toString()));
+										} catch (InvalidFormatException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+	        						}
+	    						}
+	    					}
+	    						
+	    					
+	    					
+	    					theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
+	    					try {
+								updatedCreation.removeMemberFromCIS(privacyConflicts.get(m).split("CSS: ")[1]);
+							} catch (CommunicationException e) {
 								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							} catch (ExecutionException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
+								e.printStackTrace();
 							}
-    						if (theParticipantsSet != null) {
-    							Iterator<ICisParticipant> it = theParticipantsSet.iterator();
-    							while (it.hasNext()) {
-        							try {
-										theMembers.add(identityManager.fromJid(it.next().toString()));
-									} catch (InvalidFormatException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
-        						}
-    						}
-    					}
-    						
-    					
-    					
-    					theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
-    					try {
-							updatedCreation.removeMemberFromCIS(privacyConflicts.get(m).split("CSS: ")[1]);
-						} catch (CommunicationException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-    					creations.set(i, updatedCreation);
-    				}
-    					
-    			}
-    		}
-    		if (refuseSuggestion == true)
-    			creations.remove(i);
-    		
-    		
-    	}
+	    					creations.set(i, updatedCreation);
+	    				}
+	    					
+	    			}
+	    		}
+	    		if (refuseSuggestion == true)
+	    			creations.remove(i);
+	    		
+	    		
+	    	}
+	    	
+	    	for (int i = 0; i < deletions.size(); i++) {
+	        	
+	    		ArrayList<String> privacyConflicts = checkForPrivacyConflicts(abstractDeletions);
+	    		boolean refuseSuggestion = false;
+	    		if (privacyConflicts.size() != 0) {
+	    			for (int m = 0; m < privacyConflicts.size(); m++) {
+	    				if (privacyConflicts.get(m).equals("User policy"))
+	    				    refuseSuggestion = true;
+	    				else if (privacyConflicts.get(m).contains("CSS: ")) {
+	    					
+	    					ICisOwned updatedCreation = creations.get(i);
+	    					Future<Set<ICisParticipant>> theParticipants = updatedCreation.getMemberList();
+	    					ArrayList<IIdentity> theMembers = new ArrayList<IIdentity>();
+	    					if (theParticipants != null) {
+	    						Set<ICisParticipant> theParticipantsSet = null;
+								try {
+									theParticipantsSet = theParticipants.get();
+								} catch (InterruptedException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								} catch (ExecutionException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+	    						if (theParticipantsSet != null) {
+	    							Iterator<ICisParticipant> it = theParticipantsSet.iterator();
+	    							while (it.hasNext()) {
+	        							try {
+											theMembers.add(identityManager.fromJid(it.next().toString()));
+										} catch (InvalidFormatException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+	        						}
+	    						}
+	    					}
+	    					//ArrayList<IIdentity> theMembers = updatedCreation.getMembersList();
+	    					//theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
+	    					//updatedCreation.setMembersList();
+	    					creations.set(i, updatedCreation);
+	    				}
+	    			}
+	    		}
+	    		if (refuseSuggestion == true)
+	    			deletions.remove(i);
+	    		
+	    		
+	    	}
+	
+		for (int i = 0; i < creations.size(); i++) {
+			ICisOwned cisProposal = creations.get(i);
+			List<ICis> userJoinedCissTemp = cisManager.getCisList();
+			ArrayList<ICis> userJoinedCiss = new ArrayList<ICis>();
+			for (int m = 0; m < userJoinedCissTemp.size(); m++) {
+				userJoinedCiss.add(userJoinedCissTemp.get(m));
+			}
+			for (int m = 0; m < userJoinedCiss.size(); m++) {
+				//if (userJoinedCiss.get(m).getMembershipCriteria == cisProposal.getMembershipCriteria()) {
+				    //if (userJoinedCiss.get(m).getMembersList() == cisProposal.getMembersList()) {
+				        //creations.remove(i);
+				        //Feedback to CSM Analyser suggesting to either remove this model,
+				        //add another attribute to it (suggest one?), or change one or more
+				        //model attributes (specify them?)
+			        //}
+				    //else if (userJoinedCiss.get(m).getMembersList().size() >= (1.3 * cisProposal.getMembersList().size()) {
+				    //    creations.add(sub-CIS for shared CSSs);
+				    //}
+				//}
+				//if the membership criteria for the existing CIS somehow conflict with that of the suggestion,
+				//may be grounds to delete the old CIS. E.g. the suggestion is based on location,
+				//which is different to the location of an existing CIS, which is known to be short-term temporary.
+			}
+			//userContextBroker.evaluateSimilarity("location", convertedRecommendations.get(i).get(0).getMembersList());
+			//if user isn't a member of another CIS that matches this, OK
+		
+			//if > 90% of members share that context, and there's no other context with more coverage of members,
+			//let this be the highest level CIS criteria.
+			//
+			//else if (more members share some other context)
+			//    convertedRecommendations.replace(i, same but with criteria changed to other context, or original as sub-CIS too);
+		
+			//else
+			//    convertedRecommendations.remove(i);
+		
+			//If activity feed shows history in last few minutes, it's temporary and should be made immediately, as sub-CIS if an encapsulating CIS is available; otherwise, 8 months - ongoing, last month - long-term; last few days - medium-term
+	    
+			//Friends, CSS directory, working colleagues, same address: ongoing
+			//Shared interests, personal attributes like languages spoken and age: sub-CIS.
+			ArrayList<ICisOwned> ciss = new ArrayList<ICisOwned>();
+			ciss.add(cisProposal);
+			convertedRecommendations = advancedCisCreationAnalysis(ciss);
+			
+		}
+	
+	    
+	    
     	
-    	for (int i = 0; i < deletions.size(); i++) {
-        	
-    		ArrayList<String> privacyConflicts = checkForPrivacyConflicts(abstractDeletions);
-    		boolean refuseSuggestion = false;
-    		if (privacyConflicts.size() != 0) {
-    			for (int m = 0; m < privacyConflicts.size(); m++) {
-    				if (privacyConflicts.get(m).equals("User policy"))
-    				    refuseSuggestion = true;
-    				else if (privacyConflicts.get(m).contains("CSS: ")) {
-    					
-    					ICisOwned updatedCreation = creations.get(i);
-    					Future<Set<ICisParticipant>> theParticipants = updatedCreation.getMemberList();
-    					ArrayList<IIdentity> theMembers = new ArrayList<IIdentity>();
-    					if (theParticipants != null) {
-    						Set<ICisParticipant> theParticipantsSet = null;
-							try {
-								theParticipantsSet = theParticipants.get();
-							} catch (InterruptedException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							} catch (ExecutionException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-    						if (theParticipantsSet != null) {
-    							Iterator<ICisParticipant> it = theParticipantsSet.iterator();
-    							while (it.hasNext()) {
-        							try {
-										theMembers.add(identityManager.fromJid(it.next().toString()));
-									} catch (InvalidFormatException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
-        						}
-    						}
-    					}
-    					//ArrayList<IIdentity> theMembers = updatedCreation.getMembersList();
-    					//theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
-    					//updatedCreation.setMembersList();
-    					creations.set(i, updatedCreation);
-    				}
-    			}
-    		}
-    		if (refuseSuggestion == true)
-    			deletions.remove(i);
-    		
-    		
-    	}
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
     	
     	for (int i = 0; i < creations.size(); i++) {
     		//userContextBroker.evaluateSimilarity("location", convertedRecommendations.get(i).get(0).getMembersList());
@@ -474,8 +531,19 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	}
     	
     	if (convertedRecommendations.size() != 0) {
-    		ArrayList<String> actionMetadata = communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations);
-    	}
+	    	currentActionsMetadata = communityRecommender.identifyCisActionForCSCW(convertedRecommendations);
+	    	ArrayList<String> cisIds = new ArrayList<String>();
+	    	
+	        for (int i = 0; i < currentActionsMetadata.size(); i++) {
+	        	cisIds.add(currentActionsMetadata.get(i).split("---")[0].split("CIS ID: ")[1]);
+	        	if (recordedMetadata.get(cisIds.get(i)) == null)
+	        		recordedMetadata.put(cisIds.get(i), currentActionsMetadata.get(i));
+	        }
+	    }
+    	
+    	//if (convertedRecommendations.size() != 0) {
+    	//	ArrayList<String> actionMetadata = communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations);
+    	//}
     	
     }
     
@@ -549,7 +617,65 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 				    creations.remove(Integer.valueOf(preferenceConflicts.get(i).split("---")[0]));
 		        }
 	
-		for (int i = 0; i < creations.size(); i++) {
+			
+for (int i = 0; i < creations.size(); i++) {
+		    	
+	    		ArrayList<String> privacyConflicts = checkForPrivacyConflicts(abstractCreations);
+	    		boolean refuseSuggestion = false;
+	    		if (privacyConflicts.size() != 0) {
+	    			for (int m = 0; m < privacyConflicts.size(); m++) {
+	    				if (privacyConflicts.get(m).contains("User"))
+	    				    refuseSuggestion = true;
+	    				else if (privacyConflicts.get(m).contains("CSS: ")) {
+	    					ICisOwned updatedCreation = creations.get(i);
+	    					
+	    					Future<Set<ICisParticipant>> theParticipants = updatedCreation.getMemberList();
+	    					ArrayList<IIdentity> theMembers = new ArrayList<IIdentity>();
+	    					if (theParticipants != null) {
+	    						Set<ICisParticipant> theParticipantsSet = null;
+								try {
+									theParticipantsSet = theParticipants.get();
+								} catch (InterruptedException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								} catch (ExecutionException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+	    						if (theParticipantsSet != null) {
+	    							Iterator<ICisParticipant> it = theParticipantsSet.iterator();
+	    							while (it.hasNext()) {
+	        							try {
+											theMembers.add(identityManager.fromJid(it.next().toString()));
+										} catch (InvalidFormatException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+	        						}
+	    						}
+	    					}
+	    						
+	    					
+	    					
+	    					theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
+	    					try {
+								updatedCreation.removeMemberFromCIS(privacyConflicts.get(m).split("CSS: ")[1]);
+							} catch (CommunicationException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+	    					creations.set(i, updatedCreation);
+	    				}
+	    					
+	    			}
+	    		}
+	    		if (refuseSuggestion == true)
+	    			creations.remove(i);
+	    		
+	    		
+	    	}
+			
+		/**for (int i = 0; i < creations.size(); i++) {
 	
 			ArrayList<String> privacyConflicts = checkForPrivacyConflicts(abstractCreations);
 			boolean refuseSuggestion = false;
@@ -571,7 +697,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 				creations.remove(i);
 		
 		
-		}
+		}*/
 	
 		for (int i = 0; i < creations.size(); i++) {
 			ICisOwned cisProposal = creations.get(i);
