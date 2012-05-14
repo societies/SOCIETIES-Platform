@@ -111,6 +111,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
+
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
 //import org.societies.comm.xmpp.interfaces.ICommCallback;
@@ -178,6 +179,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	private ArrayList<String> currentActionsMetadata;
 	private ArrayList<Integer> proposedActionsWithMetadata;
 	
+	private ArrayList<ProximityRecord> proximityHistory;	
 	/*
      * Constructor for SuggestedCommunityAnalyser
      * 
@@ -194,6 +196,24 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		//else
 		//	this.linkedDomain = linkedEntity;
 		
+		proximityHistory = new ArrayList<ProximityRecord>();
+			
+		new ProximityRecordingThread().start();
+	}
+	
+	class ProximityRecordingThread extends Thread {
+		
+		public void run() {
+			
+			Long lastProximityCheck = new Date().getTime();
+			while (true) {
+				Date date = new Date();
+				if (date.getTime() >= (lastProximityCheck + (1000 * 30))) {
+					//get proximity data into history
+					lastProximityCheck = date.getTime();
+				}
+		    }
+		}
 	}
 	
     public void initialiseSuggestedCommunityAnalyser() {
@@ -559,7 +579,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     
     
     @Override
-    public void processCSMAnalyserRecommendations(ArrayList<IIdentity> cssList, ArrayList<CtxAttribute> sharedContextAttributes, ArrayList<CtxAssociation> sharedContextAssociations, ArrayList<ICssActivity> sharedCssActivities, ArrayList<IActivity> sharedCisActivities) {
+    public String processCSMAnalyserRecommendations(ArrayList<IIdentity> cssList, ArrayList<CtxAttribute> sharedContextAttributes, ArrayList<CtxAssociation> sharedContextAssociations, ArrayList<ICssActivity> sharedCssActivities, ArrayList<IActivity> sharedCisActivities) {
     	currentActionsMetadata = new ArrayList<String>();
     	proposedActionsWithMetadata = new ArrayList<Integer>(); 
     	
@@ -618,7 +638,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		        }
 	
 			
-for (int i = 0; i < creations.size(); i++) {
+            for (int i = 0; i < creations.size(); i++) {
 		    	
 	    		ArrayList<String> privacyConflicts = checkForPrivacyConflicts(abstractCreations);
 	    		boolean refuseSuggestion = false;
@@ -707,17 +727,18 @@ for (int i = 0; i < creations.size(); i++) {
 				userJoinedCiss.add(userJoinedCissTemp.get(m));
 			}
 			for (int m = 0; m < userJoinedCiss.size(); m++) {
-				//if (userJoinedCiss.get(m).getMembershipCriteria == cisProposal.getMembershipCriteria()) {
-				    //if (userJoinedCiss.get(m).getMembersList() == cisProposal.getMembersList()) {
-				        //creations.remove(i);
+				if (userJoinedCiss.get(m).getMembershipCriteria() == cisProposal.getMembershipCriteria()) {
+				    if (userJoinedCiss.get(m).getMembersList() == cisProposal.getMembersList()) {
+				        creations.remove(i);
+				        return "PERFECT MATCH CIS EXISTS";
 				        //Feedback to CSM Analyser suggesting to either remove this model,
 				        //add another attribute to it (suggest one?), or change one or more
 				        //model attributes (specify them?)
-			        //}
-				    //else if (userJoinedCiss.get(m).getMembersList().size() >= (1.3 * cisProposal.getMembersList().size()) {
-				    //    creations.add(sub-CIS for shared CSSs);
-				    //}
-				//}
+			        }
+				    else if (userJoinedCiss.get(m).getMembersList().size() >= (1.3 * cisProposal.getMembersList().size())) {
+				        //creations.add(sub-CIS for shared CSSs);
+				    }
+				}
 				//if the membership criteria for the existing CIS somehow conflict with that of the suggestion,
 				//may be grounds to delete the old CIS. E.g. the suggestion is based on location,
 				//which is different to the location of an existing CIS, which is known to be short-term temporary.
@@ -774,6 +795,9 @@ for (int i = 0; i < creations.size(); i++) {
 	        		recordedMetadata.put(cisIds.get(i), currentActionsMetadata.get(i));
 	        }
 	    }
+	    
+	    return "PASS";
+	    
     }
     
     public ArrayList<String> checkForPrivacyConflicts(ArrayList<ArrayList<ICisOwned>> recommendations) {
@@ -1276,3 +1300,4 @@ public void processCSMAnalyserConfigurationRecommendations(HashMap<String, Array
 }*/
     
 }
+

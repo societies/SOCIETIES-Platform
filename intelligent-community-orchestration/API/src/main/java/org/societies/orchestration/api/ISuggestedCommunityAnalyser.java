@@ -114,7 +114,7 @@ public interface ISuggestedCommunityAnalyser {
 	 *    parameter 
 	 *  - and an arraylist of matching CIS activities as the 5th parameter..
      */
-    public void processCSMAnalyserRecommendations(ArrayList<IIdentity> cssList, ArrayList<CtxAttribute> sharedContextAttributes, ArrayList<CtxAssociation> sharedContextAssociations, ArrayList<ICssActivity> sharedCssActivities, ArrayList<IActivity> sharedCisActivities);
+    public String processCSMAnalyserRecommendations(ArrayList<IIdentity> cssList, ArrayList<CtxAttribute> sharedContextAttributes, ArrayList<CtxAssociation> sharedContextAssociations, ArrayList<ICssActivity> sharedCssActivities, ArrayList<IActivity> sharedCisActivities);
     /**
 	 * Takes as input a collection of CISs, and what they represent, and performs analysis on them
 	 * which may lead to action being taken for some or all of them.
