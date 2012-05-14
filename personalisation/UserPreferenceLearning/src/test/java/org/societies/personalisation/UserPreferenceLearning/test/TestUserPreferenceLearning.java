@@ -84,8 +84,10 @@ public class TestUserPreferenceLearning extends TestCase implements IC45Consumer
 		mockCssOperator = "mockFooIdentity";
 		mockServiceID_A = new ServiceResourceIdentifier();
 		mockServiceID_A.setIdentifier(new URI("http://testServiceA"));
+		mockServiceID_A.setServiceInstanceIdentifier("testServiceA");
 		mockServiceID_B = new ServiceResourceIdentifier();
 		mockServiceID_B.setIdentifier(new URI("http://testServiceB"));
+		mockServiceID_B.setServiceInstanceIdentifier("testServiceB");
 		//startDate = new Date();
 		emptyList = new ArrayList<CtxAttributeIdentifier>();
 		ng = new NumberGenerator();

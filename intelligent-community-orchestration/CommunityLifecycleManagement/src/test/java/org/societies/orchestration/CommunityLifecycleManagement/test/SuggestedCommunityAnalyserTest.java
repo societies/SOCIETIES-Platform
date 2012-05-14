@@ -40,15 +40,16 @@ import org.junit.Test;
 import org.societies.api.activity.IActivity;
 
 /**import org.societies.api.cis.management.ICisManager;
-import org.societies.api.cis.management.ICisRecord;
+import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisEditor;
 import org.societies.api.cis.management.ICisSubscribed;*/
 
-import org.societies.orchestration.api.ICisRecord;
+import org.societies.orchestration.api.ICis;
 import org.societies.orchestration.api.ICisManager;
 import org.societies.orchestration.api.ICisOwned;
-import org.societies.orchestration.api.ICisEditor;
+import org.societies.orchestration.api.ICisParticipant;
+//import org.societies.orchestration.api.ICisEditor;
 
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
@@ -101,7 +102,7 @@ public class SuggestedCommunityAnalyserTest {
     	suggestedCommunityAnalyser.setUserContextBroker(userCtxBroker);
     	suggestedCommunityAnalyser.setCisManager(cisManager);
     	
-    	HashMap<String, ArrayList<ICisRecord>> recommendations = new HashMap<String, ArrayList<ICisRecord>>();
+    	HashMap<String, ArrayList<ICisOwned>> recommendations = new HashMap<String, ArrayList<ICisOwned>>();
 		suggestedCommunityAnalyser.processEgocentricRecommendations(recommendations, new ArrayList<String>());
 		
 		//James should have been suggested to leave the CIS.
@@ -129,7 +130,7 @@ public class SuggestedCommunityAnalyserTest {
     	suggestedCommunityAnalyser.setCommunityRecommender(communityRecommender);
     	suggestedCommunityAnalyser.setUserContextBroker(userCtxBroker);
     	suggestedCommunityAnalyser.setCisManager(cisManager);
-		HashMap<String, ArrayList<ICisRecord>> recommendations = new HashMap<String, ArrayList<ICisRecord>>();
+		HashMap<String, ArrayList<ICisOwned>> recommendations = new HashMap<String, ArrayList<ICisOwned>>();
 		suggestedCommunityAnalyser.processCSCWRecommendations(recommendations);
 		
 		//James should have been suggested to leave the CIS.
@@ -205,7 +206,7 @@ public class SuggestedCommunityAnalyserTest {
     	suggestedCommunityAnalyser.setUserContextBroker(userCtxBroker);
     	
     	
-    	ArrayList<ICisRecord> ciss = new ArrayList<ICisRecord>();
+    	ArrayList<ICis> ciss = new ArrayList<ICis>();
     	//try {
 		//	ciss.add(cisManager.createCis("","","","", 0).get());
 		//} catch (InterruptedException e) {
@@ -217,7 +218,7 @@ public class SuggestedCommunityAnalyserTest {
 		//}
     	when(cisManager.getCisList()).thenReturn(ciss);
     	suggestedCommunityAnalyser.setCisManager(cisManager);
-		HashMap<String, ArrayList<ICisRecord>> recommendations = new HashMap<String, ArrayList<ICisRecord>>();
+		HashMap<String, ArrayList<ICis>> recommendations = new HashMap<String, ArrayList<ICis>>();
 		suggestedCommunityAnalyser.processCSMAnalyserRecommendations(csss, attributes, new ArrayList<CtxAssociation>(), new ArrayList<ICssActivity>(), new ArrayList<IActivity>());
 		
 		//James should have been suggested to leave the CIS.

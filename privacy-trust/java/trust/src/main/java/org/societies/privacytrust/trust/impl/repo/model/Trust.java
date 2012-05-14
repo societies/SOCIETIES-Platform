@@ -56,11 +56,11 @@ public abstract class Trust implements ITrust {
 	private Double value;
 	
 	@Column(name = "lastModified")
-	@Type(type="org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType")
+	@Type(type = "org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType")
 	private Date lastModified;
 	
 	@Column(name = "lastUpdated")
-	@Type(type="org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType")
+	@Type(type = "org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType")
 	private Date lastUpdated;
 
 	/* (non-Javadoc)

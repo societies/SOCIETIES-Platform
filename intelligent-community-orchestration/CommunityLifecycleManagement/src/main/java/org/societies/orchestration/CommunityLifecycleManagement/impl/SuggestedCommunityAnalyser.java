@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 import static org.mockito.Mockito.*;
 
@@ -42,21 +43,21 @@ import org.societies.api.internal.css.discovery.ICssDiscovery;
 //import org.societies.api.internal.cis.management.ICisActivityFeed;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 //import org.societies.api.internal.cis.management.ICisActivity;
-//import org.societies.api.internal.cis.management.ICisRecord;
+//import org.societies.api.internal.cis.management.ICis;
 //import org.societies.api.internal.cis.management.ICisManager;
 
-/**import org.societies.api.cis.management.ICisRecord;
+/**import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 
 import org.societies.api.cis.management.ICisEditor;*/
 
-import org.societies.orchestration.api.ICisRecord;
+import org.societies.orchestration.api.ICis;
 import org.societies.orchestration.api.ICisManager;
 import org.societies.orchestration.api.ICisOwned;
-import org.societies.orchestration.api.ICisEditor;
-
-import org.societies.api.cis.management.ICisSubscribed;
+import org.societies.orchestration.api.ICisParticipant;
+//import org.societies.orchestration.api.ICisEditor;
+//import org.societies.api.cis.management.ICisSubscribed;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 
@@ -81,6 +82,7 @@ import org.societies.api.internal.useragent.feedback.IUserFeedbackCallback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 
 import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
@@ -92,6 +94,7 @@ import org.societies.api.context.model.CtxIdentifier;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.css.management.ICssActivity;
@@ -103,6 +106,10 @@ import org.societies.orchestration.api.SuggestedCommunityAnalyserMethodType;
 import org.societies.orchestration.api.SuggestedCommunityAnalyserResultBean;
 
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.PrivacyException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 //import org.societies.api.comm.xmpp.datatypes.Identity;
 //import org.societies.comm.examples.commsmanager.impl.CommsServer; 
@@ -131,7 +138,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	//private IUserCtxBroker userContextBroker;
 	//private ICommunityCtxBroker communityContextBroker;
 	//private IUserCtxBrokerCallback userContextBrokerCallback;
-	private ArrayList<ICisRecord> recentRefusals;
+	private ArrayList<ICis> recentRefusals;
 	
 	private IUserFeedback userFeedback;
 	private IUserFeedbackCallback userFeedbackCallback;
@@ -196,25 +203,26 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	new SuggestedCommunityAnalyser(linkedCss, "CSS");
     }
     
-    public ArrayList<String> processEgocentricRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations, ArrayList<String> cissToCreateMetadata) {
+    @Override
+    public ArrayList<String> processEgocentricRecommendations(HashMap<String, ArrayList<ICisOwned>> cisRecommendations, ArrayList<String> cissToCreateMetadata) {
     	//go straight to Community Recommender
     	currentActionsMetadata = new ArrayList<String>();
     	proposedActionsWithMetadata = new ArrayList<Integer>();
     	
-    	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
-    	ArrayList<ICisRecord> creations = cisRecommendations.get("Create CISs");
+    	HashMap<String, ArrayList<ArrayList<ICisOwned>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisOwned>>>();
+    	ArrayList<ICisOwned> creations = cisRecommendations.get("Create CISs");
     	if (creations == null)
-    		creations = new ArrayList<ICisRecord>();
-    	ArrayList<ICisRecord> deletions = cisRecommendations.get("Delete CISs");
+    		creations = new ArrayList<ICisOwned>();
+    	ArrayList<ICisOwned> deletions = cisRecommendations.get("Delete CISs");
     	if (deletions == null)
-    		deletions = new ArrayList<ICisRecord>();
-    	ArrayList<ArrayList<ICisRecord>> abstractCreations = new ArrayList<ArrayList<ICisRecord>>();
-    	ArrayList<ArrayList<ICisRecord>> abstractDeletions = new ArrayList<ArrayList<ICisRecord>>();
+    		deletions = new ArrayList<ICisOwned>();
+    	ArrayList<ArrayList<ICisOwned>> abstractCreations = new ArrayList<ArrayList<ICisOwned>>();
+    	ArrayList<ArrayList<ICisOwned>> abstractDeletions = new ArrayList<ArrayList<ICisOwned>>();
     	
     	if (creations != null)
     		if (creations.size() != 0)
     			for (int i = 0; i < creations.size(); i++) {
-    				ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+    				ArrayList<ICisOwned> it = new ArrayList<ICisOwned>();
     				it.add(creations.get(i));
     	            abstractCreations.add(it);
     			}
@@ -223,20 +231,20 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	if (deletions != null) {
     		if (deletions.size() != 0)
     			for (int i = 0; i < deletions.size(); i++) {
-    				ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+    				ArrayList<ICisOwned> it = new ArrayList<ICisOwned>();
     				it.add(deletions.get(i));
     	            abstractDeletions.add(it);
     			}
     	}
     	
     	if (creations != null) {
-    	    abstractCreations = new ArrayList<ArrayList<ICisRecord>>();
+    	    abstractCreations = new ArrayList<ArrayList<ICisOwned>>();
     	    abstractCreations.add(creations);
     	    convertedRecommendations.put("Create CISs", abstractCreations);
     	}
 
     	if (deletions != null) {
-    	    abstractDeletions = new ArrayList<ArrayList<ICisRecord>>();
+    	    abstractDeletions = new ArrayList<ArrayList<ICisOwned>>();
     	    abstractDeletions.add(deletions);
     	    convertedRecommendations.put("Delete CISs", abstractDeletions);
     	}
@@ -262,7 +270,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	
     }
     
-    public ArrayList<String> processEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations, ArrayList<String> cissToCreateMetadata) {
+    public ArrayList<String> processEgocentricConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisOwned>>> cisRecommendations, ArrayList<String> cissToCreateMetadata) {
     	//go straight to Community Recommender
     	currentActionsMetadata = new ArrayList<String>();
     	proposedActionsWithMetadata = new ArrayList<Integer>();
@@ -271,25 +279,25 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	
     }
     
-    public void processCSCWRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
+    public void processCSCWRecommendations(HashMap<String, ArrayList<ICisOwned>> cisRecommendations) {
     	
     	currentActionsMetadata = new ArrayList<String>();
     	proposedActionsWithMetadata = new ArrayList<Integer>();
     	
-    	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
-    	ArrayList<ICisRecord> creations = cisRecommendations.get("Create CISs");
+    	HashMap<String, ArrayList<ArrayList<ICisOwned>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisOwned>>>();
+    	ArrayList<ICisOwned> creations = cisRecommendations.get("Create CISs");
     	if (creations == null)
-    		creations = new ArrayList<ICisRecord>();
-    	ArrayList<ICisRecord> deletions = cisRecommendations.get("Delete CISs");
+    		creations = new ArrayList<ICisOwned>();
+    	ArrayList<ICisOwned> deletions = cisRecommendations.get("Delete CISs");
     	if (deletions == null)
-    		deletions = new ArrayList<ICisRecord>();
-    	ArrayList<ArrayList<ICisRecord>> abstractCreations = new ArrayList<ArrayList<ICisRecord>>();
-    	ArrayList<ArrayList<ICisRecord>> abstractDeletions = new ArrayList<ArrayList<ICisRecord>>();
+    		deletions = new ArrayList<ICisOwned>();
+    	ArrayList<ArrayList<ICisOwned>> abstractCreations = new ArrayList<ArrayList<ICisOwned>>();
+    	ArrayList<ArrayList<ICisOwned>> abstractDeletions = new ArrayList<ArrayList<ICisOwned>>();
     	
     	if (creations != null)
     		if (creations.size() != 0)
     			for (int i = 0; i < creations.size(); i++) {
-    				ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+    				ArrayList<ICisOwned> it = new ArrayList<ICisOwned>();
     				it.add(creations.get(i));
     	            abstractCreations.add(it);
     			}
@@ -298,7 +306,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	if (deletions != null) {
     		if (deletions.size() != 0)
     			for (int i = 0; i < deletions.size(); i++) {
-    				ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+    				ArrayList<ICisOwned> it = new ArrayList<ICisOwned>();
     				it.add(deletions.get(i));
     	            abstractDeletions.add(it);
     			}
@@ -324,10 +332,43 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     				if (privacyConflicts.get(m).contains("User policy"))
     				    refuseSuggestion = true;
     				else if (privacyConflicts.get(m).contains("CSS: ")) {
-    					ICisRecord updatedCreation = creations.get(i);
-    					//ArrayList<IIdentity> theMembers = updatedCreation.getMembersList();
-    					//theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
-    					//updatedCreation.setMembersList();
+    					ICisOwned updatedCreation = creations.get(i);
+    					
+    					Future<Set<ICisParticipant>> theParticipants = updatedCreation.getMemberList();
+    					ArrayList<IIdentity> theMembers = new ArrayList<IIdentity>();
+    					if (theParticipants != null) {
+    						Set<ICisParticipant> theParticipantsSet = null;
+							try {
+								theParticipantsSet = theParticipants.get();
+							} catch (InterruptedException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} catch (ExecutionException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+    						if (theParticipantsSet != null) {
+    							Iterator<ICisParticipant> it = theParticipantsSet.iterator();
+    							while (it.hasNext()) {
+        							try {
+										theMembers.add(identityManager.fromJid(it.next().toString()));
+									} catch (InvalidFormatException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+        						}
+    						}
+    					}
+    						
+    					
+    					
+    					theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
+    					try {
+							updatedCreation.removeMemberFromCIS(privacyConflicts.get(m).split("CSS: ")[1]);
+						} catch (CommunicationException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
     					creations.set(i, updatedCreation);
     				}
     					
@@ -348,7 +389,33 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     				if (privacyConflicts.get(m).equals("User policy"))
     				    refuseSuggestion = true;
     				else if (privacyConflicts.get(m).contains("CSS: ")) {
-    					ICisRecord updatedCreation = creations.get(i);
+    					
+    					ICisOwned updatedCreation = creations.get(i);
+    					Future<Set<ICisParticipant>> theParticipants = updatedCreation.getMemberList();
+    					ArrayList<IIdentity> theMembers = new ArrayList<IIdentity>();
+    					if (theParticipants != null) {
+    						Set<ICisParticipant> theParticipantsSet = null;
+							try {
+								theParticipantsSet = theParticipants.get();
+							} catch (InterruptedException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} catch (ExecutionException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+    						if (theParticipantsSet != null) {
+    							Iterator<ICisParticipant> it = theParticipantsSet.iterator();
+    							while (it.hasNext()) {
+        							try {
+										theMembers.add(identityManager.fromJid(it.next().toString()));
+									} catch (InvalidFormatException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+        						}
+    						}
+    					}
     					//ArrayList<IIdentity> theMembers = updatedCreation.getMembersList();
     					//theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
     					//updatedCreation.setMembersList();
@@ -389,7 +456,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	abstractCreations.clear();
     	if (creations.size() != 0) {
     		for (int i = 0; i < creations.size(); i++) {
-				ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+				ArrayList<ICisOwned> it = new ArrayList<ICisOwned>();
 				it.add(creations.get(i));
 	            abstractCreations.add(it);
 			}
@@ -399,7 +466,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	abstractDeletions.clear();
     	if (deletions.size() != 0) {
     		for (int i = 0; i < deletions.size(); i++) {
-				ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+				ArrayList<ICisOwned> it = new ArrayList<ICisOwned>();
 				it.add(deletions.get(i));
 	            abstractDeletions.add(it);
 			}
@@ -412,7 +479,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	
     }
     
-    public void processCSCWConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
+    public void processCSCWConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisOwned>>> cisRecommendations) {
     	//go straight to Community Recommender
     	currentActionsMetadata = new ArrayList<String>();
     	proposedActionsWithMetadata = new ArrayList<Integer>();
@@ -428,14 +495,18 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	currentActionsMetadata = new ArrayList<String>();
     	proposedActionsWithMetadata = new ArrayList<Integer>(); 
     	
-    	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
-		//ICisRecord proposedCis = cisManager.getBlankCisRecord();
-    	ICisRecord proposedCis = null;
+    	HashMap<String, ArrayList<ArrayList<ICisOwned>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisOwned>>>();
+		//ICis proposedCis = cisManager.getBlankCisRecord();
+    	ICisOwned proposedCis = null;
     	if (cisManager != null)
-    		if (cisManager.getCisList().size() > 0)
+    		proposedCis = cisManager.getBlankCisOwned();
+    	
+    	/**	if (cisManager.getCisList().size() > 0)
     			proposedCis = cisManager.getCisList().get(0);
     		else
     			return;
+    	*/
+    		
     	//proposedCis.setName("");
     	//proposedCis.setType("");
     	//proposedCis.setMembershipCriteria(-1);
@@ -456,25 +527,27 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     	}
     	//proposedCis.setMembershipCriteria(membershipCriteria);
     	
-    	ArrayList<ICisRecord> creations = new ArrayList<ICisRecord>();
+    	ArrayList<ICisOwned> creations = new ArrayList<ICisOwned>();
     	creations.add(proposedCis);
 		if (creations == null)
-			creations = new ArrayList<ICisRecord>();
+			creations = new ArrayList<ICisOwned>();
 		
-		ArrayList<ArrayList<ICisRecord>> abstractCreations = new ArrayList<ArrayList<ICisRecord>>();
+		ArrayList<ArrayList<ICisOwned>> abstractCreations = new ArrayList<ArrayList<ICisOwned>>();
 		
 		if (creations != null)
 			if (creations.size() != 0)
 				for (int i = 0; i < creations.size(); i++) {
-					ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+					ArrayList<ICisOwned> it = new ArrayList<ICisOwned>();
 					it.add(creations.get(i));
 	            	abstractCreations.add(it);
 				}
 	
-		for (int i = 0; i < creations.size(); i++) {
-			if (checkForPreferenceConflicts("Create CISs", abstractCreations).size() != 0)
-				creations.remove(i);
-		}
+		
+			ArrayList<String> preferenceConflicts = checkForPreferenceConflicts("Create CISs", abstractCreations);
+			if (preferenceConflicts.size() != 0)
+				for (int i = 0; i < preferenceConflicts.size(); i++) {
+				    creations.remove(Integer.valueOf(preferenceConflicts.get(i).split("---")[0]));
+		        }
 	
 		for (int i = 0; i < creations.size(); i++) {
 	
@@ -482,10 +555,10 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 			boolean refuseSuggestion = false;
 			if (privacyConflicts.size() != 0) {
 				for (int m = 0; m < privacyConflicts.size(); m++) {
-					if (privacyConflicts.get(m).contains("User policy"))
+					if (privacyConflicts.get(m).contains("User"))
 				    	refuseSuggestion = true;
 					else if (privacyConflicts.get(m).contains("CSS: ")) {
-						ICisRecord updatedCreation = creations.get(i);
+						ICisOwned updatedCreation = creations.get(i);
 						//ArrayList<IIdentity> theMembers = updatedCreation.getMembersList();
 						//theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
 						//updatedCreation.setMembersList();
@@ -501,9 +574,9 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		}
 	
 		for (int i = 0; i < creations.size(); i++) {
-			ICisRecord cisProposal = creations.get(i);
-			List<ICisRecord> userJoinedCissTemp = cisManager.getCisList();
-			ArrayList<ICisRecord> userJoinedCiss = new ArrayList<ICisRecord>();
+			ICisOwned cisProposal = creations.get(i);
+			List<ICis> userJoinedCissTemp = cisManager.getCisList();
+			ArrayList<ICis> userJoinedCiss = new ArrayList<ICis>();
 			for (int m = 0; m < userJoinedCissTemp.size(); m++) {
 				userJoinedCiss.add(userJoinedCissTemp.get(m));
 			}
@@ -539,7 +612,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	    
 			//Friends, CSS directory, working colleagues, same address: ongoing
 			//Shared interests, personal attributes like languages spoken and age: sub-CIS.
-			ArrayList<ICisRecord> ciss = new ArrayList<ICisRecord>();
+			ArrayList<ICisOwned> ciss = new ArrayList<ICisOwned>();
 			ciss.add(cisProposal);
 			convertedRecommendations = advancedCisCreationAnalysis(ciss);
 			
@@ -548,7 +621,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	    /**abstractCreations.clear();
 	    if (creations.size() != 0) {
 		    for (int i = 0; i < creations.size(); i++) {
-			    ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+			    ArrayList<ICis> it = new ArrayList<ICis>();
 			    it.add(creations.get(i));
                 abstractCreations.add(it);
 		    }
@@ -558,7 +631,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	    abstractDeletions.clear();
 	    if (deletions.size() != 0) {
 		    for (int i = 0; i < deletions.size(); i++) {
-			    ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+			    ArrayList<ICis> it = new ArrayList<ICis>();
 			    it.add(deletions.get(i));
                 abstractDeletions.add(it);
 		    }
@@ -577,26 +650,72 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	    }
     }
     
-    public ArrayList<String> checkForPrivacyConflicts(ArrayList<ArrayList<ICisRecord>> recommendations) {
+    public ArrayList<String> checkForPrivacyConflicts(ArrayList<ArrayList<ICisOwned>> recommendations) {
     	ArrayList<String> conflictingPrivacyPolicies = new ArrayList<String>();
     	for (int i = 0; i < recommendations.size(); i++) {
-    		//for (int m = 0; m < recommendations.get(i).get(0).getMembershipCriteria().size(); m++) {
-    		    //for (int n = 0; n < recommendations.get(i).get(0).getMembersList().size(); n++) {
-    		        //IIdentity thisMember = recommendations.get(i).get(0).getMembersList().get(n);
-    			    //CtxAttribute thisAttribute = recommendations.get(i).get(0).getMembershipCriteria.().get(m);
-    		        //boolean passed = privacyDataManager.checkPermission(thisAttribute, thisMember, "arg2", "arg3");
-    			    //if (passed == false) conflictingPrivacyPolicies.add(recommendations.get(i).get(0).getMembershipCriteria().get(m))
-    		        //if (ctxBroker.get(thisMember, thisAttribute).equals("Access refused"))
-    		        //    conflictingPrivacyPolicies.add("CSS: " + thisMember.toString());
-    		    //}
-    		//}
+    		if (recommendations.get(i) != null) {
+    			if (recommendations.get(i).get(0) != null) {
+    				if (recommendations.get(i).get(0).getMembershipCriteria() != null) {
+    					for (int m = 0; m < recommendations.get(i).get(0).getMembershipCriteria().size(); m++) {
+    		    		    for (int n = 0; n < recommendations.get(i).get(0).getMembersList().size(); n++) {
+    		    		        IIdentity thisMember = recommendations.get(i).get(0).getMembersList().get(n);
+    		    			    Requestor thisRequestor = new Requestor(thisMember);
+    		    		        Future<List<CtxIdentifier>> id = null;
+    							try {
+    								id = userContextBroker.lookup(CtxModelType.ATTRIBUTE, recommendations.get(i).get(0).getMembershipCriteria().get(m));
+    							} catch (CtxException e) {
+    								// TODO Auto-generated catch block
+    								e.printStackTrace();
+    							}
+    		    		        List<CtxIdentifier> id2 = null;
+    							try {
+    								id2 = id.get();
+    							} catch (InterruptedException e) {
+    								// TODO Auto-generated catch block
+    								e.printStackTrace();
+    							} catch (ExecutionException e) {
+    								// TODO Auto-generated catch block
+    								e.printStackTrace();
+    							}
+    		    		        
+    		    		        CtxAttribute thisAttribute = null;
+    							try {
+    								thisAttribute = (CtxAttribute) userContextBroker.retrieve(id2.get(0)).get();
+    							} catch (InterruptedException e) {
+    								// TODO Auto-generated catch block
+    								e.printStackTrace();
+    							} catch (ExecutionException e) {
+    								// TODO Auto-generated catch block
+    								e.printStackTrace();
+    							} catch (CtxException e) {
+    								// TODO Auto-generated catch block
+    								e.printStackTrace();
+    							}
+    		    		        //Action xAction = new Action();
+    		    		        ResponseItem response = null;
+    							try {
+    								response = privacyDataManager.checkPermission(thisRequestor, linkedCss, id2.get(0), null);
+    							} catch (PrivacyException e) {
+    								// TODO Auto-generated catch block
+    								e.printStackTrace();
+    							}
+    		    			    Decision decision = response.getDecision();
+    		    		        if (decision.values()[0] != decision.PERMIT) conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "User");
+    		    		        //else if (ctxBroker.get(thisMember, thisAttribute).equals("Access refused"))
+    		    		        //    conflictingPrivacyPolicies.add(i + "---" + thisAttribute + "---" + "CSS: " + thisMember.toString());
+    		    		    }
+    		    		}
+    				}
+    			}
+    		}
+    		
     	}
     	
     	return conflictingPrivacyPolicies;
     	
     }
     
-    public ArrayList<String> checkForPreferenceConflicts(String action, ArrayList<ArrayList<ICisRecord>> recommendations) {
+    public ArrayList<String> checkForPreferenceConflicts(String action, ArrayList<ArrayList<ICisOwned>> recommendations) {
     	ArrayList<String> conflictingPreferences = new ArrayList<String>();
     	
     	for (int i = 0; i < recommendations.size(); i++) {
@@ -612,10 +731,10 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 		return conflictingPreferences;
     }
     
-    public HashMap<String, ArrayList<ArrayList<ICisRecord>>> advancedCisCreationAnalysis(ArrayList<ICisRecord> proposedCiss) {
-    	HashMap<String, ArrayList<ArrayList<ICisRecord>>> finalisedCiss = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
+    public HashMap<String, ArrayList<ArrayList<ICisOwned>>> advancedCisCreationAnalysis(ArrayList<ICisOwned> proposedCiss) {
+    	HashMap<String, ArrayList<ArrayList<ICisOwned>>> finalisedCiss = new HashMap<String, ArrayList<ArrayList<ICisOwned>>>();
     	for (int i = 0; i < proposedCiss.size(); i++) {
-    		ICisRecord thisCis = proposedCiss.get(i);
+    		ICisOwned thisCis = proposedCiss.get(i);
     		boolean allAttributes = true;
     		//for (int m = 0; m < thisCis.getMembershipCriteria().size(); m++) {
     		    //if (thisCis.getMembershipCriteria.get(m) instanceof CtxAssociation)
@@ -632,7 +751,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     		    //        
 		        //}
     		    //else {
-    		        //ArrayList<ArrayList<ICisRecord>> csmFeedback = new ArrayList<ArrayList<ICisRecord>();
+    		        //ArrayList<ArrayList<ICis>> csmFeedback = new ArrayList<ArrayList<ICis>();
     		        //csmFeedback
     		        //finalisedCiss.put("Remove from CSM", csmFeedback);
     		        
@@ -887,21 +1006,21 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
     
     
     
-    /**public void processCSMAnalyserRecommendations(HashMap<String, ArrayList<ICisRecord>> cisRecommendations) {
-	HashMap<String, ArrayList<ArrayList<ICisRecord>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICisRecord>>>();
-	ArrayList<ICisRecord> creations = cisRecommendations.get("Create CISs");
+    /**public void processCSMAnalyserRecommendations(HashMap<String, ArrayList<ICis>> cisRecommendations) {
+	HashMap<String, ArrayList<ArrayList<ICis>>> convertedRecommendations = new HashMap<String, ArrayList<ArrayList<ICis>>>();
+	ArrayList<ICis> creations = cisRecommendations.get("Create CISs");
 	if (creations == null)
-		creations = new ArrayList<ICisRecord>();
-	ArrayList<ICisRecord> deletions = cisRecommendations.get("Delete CISs");
+		creations = new ArrayList<ICis>();
+	ArrayList<ICis> deletions = cisRecommendations.get("Delete CISs");
 	if (deletions == null)
-		deletions = new ArrayList<ICisRecord>();
-	ArrayList<ArrayList<ICisRecord>> abstractCreations = new ArrayList<ArrayList<ICisRecord>>();
-	ArrayList<ArrayList<ICisRecord>> abstractDeletions = new ArrayList<ArrayList<ICisRecord>>();
+		deletions = new ArrayList<ICis>();
+	ArrayList<ArrayList<ICis>> abstractCreations = new ArrayList<ArrayList<ICis>>();
+	ArrayList<ArrayList<ICis>> abstractDeletions = new ArrayList<ArrayList<ICis>>();
 	
 	if (creations != null)
 		if (creations.size() != 0)
 			for (int i = 0; i < creations.size(); i++) {
-				ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+				ArrayList<ICis> it = new ArrayList<ICis>();
 				it.add(creations.get(i));
 	            abstractCreations.add(it);
 			}
@@ -910,7 +1029,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	if (deletions != null) {
 		if (deletions.size() != 0)
 			for (int i = 0; i < deletions.size(); i++) {
-				ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+				ArrayList<ICis> it = new ArrayList<ICis>();
 				it.add(deletions.get(i));
 	            abstractDeletions.add(it);
 			}
@@ -936,7 +1055,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 				if (privacyConflicts.get(m).contains("User policy"))
 				    refuseSuggestion = true;
 				else if (privacyConflicts.get(m).contains("CSS: ")) {
-					ICisRecord updatedCreation = creations.get(i);
+					ICis updatedCreation = creations.get(i);
 					//ArrayList<IIdentity> theMembers = updatedCreation.getMembersList();
 					//theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
 					//updatedCreation.setMembersList();
@@ -960,7 +1079,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 				if (privacyConflicts.get(m).equals("User policy"))
 				    refuseSuggestion = true;
 				else if (privacyConflicts.get(m).contains("CSS: ")) {
-					ICisRecord updatedCreation = creations.get(i);
+					ICis updatedCreation = creations.get(i);
 					//ArrayList<IIdentity> theMembers = updatedCreation.getMembersList();
 					//theMembers.remove(privacyConflicts.get(m).split("CSS: ")[1]);
 					//updatedCreation.setMembersList();
@@ -1001,7 +1120,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	abstractCreations.clear();
 	if (creations.size() != 0) {
 		for (int i = 0; i < creations.size(); i++) {
-			ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+			ArrayList<ICis> it = new ArrayList<ICis>();
 			it.add(creations.get(i));
             abstractCreations.add(it);
 		}
@@ -1011,7 +1130,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	abstractDeletions.clear();
 	if (deletions.size() != 0) {
 		for (int i = 0; i < deletions.size(); i++) {
-			ArrayList<ICisRecord> it = new ArrayList<ICisRecord>();
+			ArrayList<ICis> it = new ArrayList<ICis>();
 			it.add(deletions.get(i));
             abstractDeletions.add(it);
 		}
@@ -1023,7 +1142,7 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	}
 }
 
-public void processCSMAnalyserConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICisRecord>>> cisRecommendations) {
+public void processCSMAnalyserConfigurationRecommendations(HashMap<String, ArrayList<ArrayList<ICis>>> cisRecommendations) {
 	//go straight to Community Recommender
 	
 	communityRecommender.identifyCisActionForCSMAnalyser(cisRecommendations);

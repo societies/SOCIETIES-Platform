@@ -86,12 +86,12 @@ public class ContextCommunicator {
 			try {
 				//get cssOperator (Person)
 				IndividualCtxEntity cssOperator = ctxBroker.retrieveCssOperator().get();
-				LOG.info("Retrieved PERSON entity");
+				LOG.info("Retrieved PERSON entity with ID: "+cssOperator.getId());
 
 				//get USES_SERVICE associations for this person entity
 				Set<CtxAssociationIdentifier> usesServiceAssocIDs = cssOperator.getAssociations(CtxAssociationTypes.USES_SERVICES);
 				if(usesServiceAssocIDs.size() > 0){  //USES_SERVICE associations found!
-					LOG.info("Found USES_SERVICE association under PERSON entity");
+					LOG.info("Found USES_SERVICES association under PERSON entity");
 					CtxAssociation usesServiceAssoc = (CtxAssociation)ctxBroker.retrieve(usesServiceAssocIDs.iterator().next()).get();
 					
 					//Get SERVICE entities under USES_SERVICE association
@@ -193,8 +193,8 @@ public class ContextCommunicator {
 		CtxAssociation usesServiceAssoc = null;
 		try {
 			//create USES_SERVICE association
-			LOG.info("Creating USE_SERVICE association with parent: "+parent.getType());
-			usesServiceAssoc = ctxBroker.createAssociation(CtxAssociationTypes.USES_SERVICE).get();
+			LOG.info("Creating USE_SERVICES association with parent: "+parent.getType());
+			usesServiceAssoc = ctxBroker.createAssociation(CtxAssociationTypes.USES_SERVICES).get();
 			
 			//set parent entity
 			usesServiceAssoc.setParentEntity(parent.getId());
@@ -255,7 +255,7 @@ public class ContextCommunicator {
 		try {
 			//create new HAS_PARAMETER association
 			LOG.info("Creating HAS_PARAMETER association with parent: "+parentEntity.getType());
-			hasParameterAssoc = ctxBroker.createAssociation(CtxAssociationTypes.HAS_PARAMETER).get();
+			hasParameterAssoc = ctxBroker.createAssociation(CtxAssociationTypes.HAS_PARAMETERS).get();
 			
 			//set parent entity
 			hasParameterAssoc.setParentEntity(parentEntity.getId());
@@ -289,7 +289,7 @@ public class ContextCommunicator {
 			//create new LAST_ACTION attribute, update and add to entity
 			LOG.info("Creating LAST_ACTION attribute under SERVICE_PARAMETER entity with value: "+lastAction);
 			CtxAttribute newLastActionAttr = ctxBroker.createAttribute(serviceParamEntity.getId(), CtxAttributeTypes.LAST_ACTION).get();
-			ctxBroker.setHistoryTuples(newLastActionAttr.getId(), snpshtMgr.getSnapshot(newLastActionAttr.getId()));
+			ctxBroker.setHistoryTuples(newLastActionAttr.getId(), snpshtMgr.getSnapshot(newLastActionAttr.getId()).getIDList());
 			ctxBroker.updateAttribute(newLastActionAttr.getId(), SerialisationHelper.serialise(lastAction));
 			
 			//update mappings

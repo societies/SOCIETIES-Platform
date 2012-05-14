@@ -156,7 +156,8 @@ public class TrustRepository implements ITrustRepository {
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for entity " + entity);
 			transaction.rollback();
-			throw new TrustRepositoryException("Could not add entity " + entity, e);
+			throw new TrustRepositoryException("Could not add entity " + entity
+					+ ": " + e.getLocalizedMessage(), e);
 		} finally {
 			if (session != null)
 				session.close();
@@ -188,7 +189,8 @@ public class TrustRepository implements ITrustRepository {
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for entity " + entity);
 			transaction.rollback();
-			throw new TrustRepositoryException("Could not remove entity " + entity, e);
+			throw new TrustRepositoryException("Could not remove entity " + entity
+					+ ": " + e.getLocalizedMessage(), e);
 		} finally {
 			if (session != null)
 				session.close();

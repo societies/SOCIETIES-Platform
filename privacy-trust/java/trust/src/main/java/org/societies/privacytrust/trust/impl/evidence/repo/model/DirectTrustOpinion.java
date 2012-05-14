@@ -41,7 +41,10 @@ import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustOpinion;
  * @since 0.0.8
  */
 @Entity
-@Table(name = TableName.DIRECT_TRUST_OPINION, uniqueConstraints={@UniqueConstraint(columnNames={"trustorId", "trusteeId", "timestamp"})})
+@Table(
+		name = TableName.DIRECT_TRUST_OPINION, 
+		uniqueConstraints = { @UniqueConstraint(columnNames = { "trustor_id", "trustee_id", "timestamp" }) }
+)
 public class DirectTrustOpinion extends DirectTrustEvidence implements
 		IDirectTrustOpinion {
 

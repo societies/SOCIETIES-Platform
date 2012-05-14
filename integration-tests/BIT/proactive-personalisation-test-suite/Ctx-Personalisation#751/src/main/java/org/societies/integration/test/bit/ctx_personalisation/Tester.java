@@ -92,7 +92,7 @@ public class Tester {
 	
 		changeContext("home", "free");
 		
-		for (int i=0; i<5; i++){
+		for (int i=0; i<10; i++){
 			log("Step: "+i);
 			
 			this.helloWorldService.setBackgroundColour(userId, "red");

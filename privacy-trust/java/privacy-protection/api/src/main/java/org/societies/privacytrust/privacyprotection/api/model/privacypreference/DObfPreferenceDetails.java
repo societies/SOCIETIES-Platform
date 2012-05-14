@@ -22,50 +22,17 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.orchestration.api;
+package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
 
-import org.societies.api.activity.IActivityFeed;
+import java.io.Serializable;
 
 /**
- * We need to remove this from the API. It is implementation specific.
- * @author Babak.Farshchian@sintef.no
+ * Describe your class here...
+ *
+ * @author Eliza
  *
  */
-/**
- * Remove if deprecated
- * MISSING_ANNOTATION
- */
+public class DObfPreferenceDetails implements Serializable{
 
-public class ICisEditor {
-
-	public ICisEditor() {
-		
-	}
 	
-    /**
-     * Returns the CISActivityFeed for a specific CIS.
-     * 
-     * @param cssId The ID of the owner CSS.
-     * @param cisId The ID of the CIS.
-     * @return The CISActivityFeed of the CIS.
-     */
-    public IActivityFeed getActivityFeed(String cssId, String cisId) {
-    	return null;
-    }
-    public String getCisId() {
-    	return "";
-    }
-    /**
-     * Updates an existing CIS with the data in the newCis. Update is done canonical. If it fails, the old CIS is
-     * not changed at all.
-     * 
-     * @param cssId The ID of the owner CSS
-     * @param newCis the data to be updated is specified in this CISRecord.
-     * @param oldCisId The ID of the CIS that needs to be updated.
-     * @return true if update was successful, 
-     */
-    public Boolean update(String cssId, ICisRecord newCis, String oldCisId) {
-    	return true;
-    }
-
 }

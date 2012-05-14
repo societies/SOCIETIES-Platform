@@ -59,7 +59,7 @@ public class PreProcessor {
 			try {
 				CtxHistoryAttribute nextActionAttr = (CtxHistoryAttribute)data_it.next();
 				Action nextAction = (Action) SerialisationHelper.deserialise(nextActionAttr.getBinaryValue(), this.getClass().getClassLoader());
-				if(nextAction.getServiceID().getIdentifier().equals(serviceId.getIdentifier())){
+				if(nextAction.getServiceID().getServiceInstanceIdentifier().equals(serviceId.getServiceInstanceIdentifier())){
 					if(nextAction.getparameterName().equals(parameterName)){
 						//add action and snapshot to extracted list
 						actionSubset.put(nextActionAttr, data.get(nextActionAttr));
@@ -166,7 +166,7 @@ public class PreProcessor {
 
 	public ServiceSubset trimServiceSubset(ServiceSubset history){
 
-		System.out.println("Inside trimServiceSubset");
+		//System.out.println("Inside trimServiceSubset");
 		ServiceSubset newServiceSubset = new ServiceSubset(history.getServiceId(), history.getServiceType(), new ArrayList<ActionSubset>());
 
 		List<ActionSubset> newActionSubsets = new ArrayList<ActionSubset>();
@@ -189,7 +189,7 @@ public class PreProcessor {
 	}
 
 	public ActionSubset trimActionSubset(ActionSubset actionSubset){
-		System.out.println("Inside trimActionSubset");
+		//System.out.println("Inside trimActionSubset");
 		//check if each ActionSubset snapshot variable has single value
 		ActionSubset newActionSubset = new ActionSubset(actionSubset.getParameterName());
 		
@@ -232,12 +232,12 @@ public class PreProcessor {
 		/*
 		 * test
 		 */
-		System.out.println("Printing singletons...");
+		/*System.out.println("Printing singletons...");
 		Iterator singletons_it = singletons.iterator();
 		while(singletons_it.hasNext()){
 			System.out.println((String)singletons_it.next());
 		}
-		System.out.println("--------------");
+		System.out.println("--------------");*/
 		/*
 		 * end
 		 */
@@ -350,7 +350,7 @@ public class PreProcessor {
 		/*
 		 * Print ruleVariables
 		 */
-		Iterator rule_it = ruleVariables.keySet().iterator();
+		/*Iterator rule_it = ruleVariables.keySet().iterator();
 		while(rule_it.hasNext()){
 			String key = (String)rule_it.next();
 			System.out.println("Key = "+key);
@@ -359,7 +359,7 @@ public class PreProcessor {
 			while(values_it.hasNext()){
 				System.out.println("next value = "+(String)values_it.next());
 			}
-		}
+		}*/
 		/*
 		 * end
 		 */

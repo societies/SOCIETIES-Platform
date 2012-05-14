@@ -26,40 +26,63 @@ package org.societies.orchestration.api;
 
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+import org.societies.api.identity.IIdentity;
+import java.util.ArrayList;
 
 /**
  * @author Babak.Farshchian@sintef.no
  *
  */
+
+
+
 /**
  * MISSING_JAVADOCS
+ * 
+ * this will be changed on W20, please wait by then
  */
-public class ICisRecord {
+public class ICis {
 
-	public ICisRecord() {
-		
+	private String cisId;
+    
+	public ICis() {
+		cisId = "";
 	}
 	
-    public String getCisId() {
-    	return "";
-    }
+	/**
+	 * Returns the jid of the CIS
+	 * 
+	 * @param 
+	 * @return jid to address the CIS as a string
+	 */
+	public String getCisId() {
+		return cisId;
+	}
+    
+	/**
+	 * Returns the Name of the CIS
+	 * 
+	 * @param 
+	 * @return name of the CIS as a string
+	 */ 
     public String getName() {
     	return "";
     }
-    public String getOwnerId() {
-    	return "";
+    //public String getOwnerId();
+    //public String setUserDefinedName(String _name);
+   // public String getUserDefineName();
+    //public String getCisType();
+    
+    public ArrayList<IIdentity> getMembersList() {
+    	return new ArrayList<IIdentity>();
     }
-    public String setUserDefinedName(String _name) {
-    	return "";
-    }
-    public String getUserDefineName() {
-    	return "";
-    }
-    public String getCisType() {
-    	return "";
-    }
-    public int getMembershipCriteria() {
-    	return 0;
+    
+    //public int getMembershipCriteria() {
+    //	return 0;
+    //}
+    
+    public ArrayList<String> getMembershipCriteria() {
+    	return new ArrayList<String>();
     }
 
 }
