@@ -8,7 +8,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
+import org.societies.identity.IdentityImpl;
 import org.societies.integration.test.IntegrationTestUtils;
 
 /**
@@ -70,7 +73,6 @@ public class NominalTestCaseLowerTester {
 		LOG.info("[#000] tearDown");
 	}
 
-
 	@Test
 	public void testLogCommsFw() throws InterruptedException {
 		
@@ -79,5 +81,19 @@ public class NominalTestCaseLowerTester {
 		privacyLogAppender.logCommsFw(null, null, null);
 
 		LOG.info("[#000] testLogCommsFw(): FINISHED");
+	}
+
+	@Test
+	public void testLogContextBroker() throws InterruptedException {
+		
+		LOG.info("[#000] testLogContextBroker()");
+
+		IIdentity owner = new IdentityImpl("owner1@a.com");
+		IIdentity requestorId = new IdentityImpl("requestor1@a.com");
+		Requestor requestor = new Requestor(requestorId);
+		
+		privacyLogAppender.logContext(requestor, owner);
+
+		LOG.info("[#000] testLogContextBroker(): FINISHED");
 	}
 }
