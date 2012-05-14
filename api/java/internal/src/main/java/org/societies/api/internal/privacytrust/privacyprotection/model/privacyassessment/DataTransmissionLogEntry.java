@@ -27,7 +27,6 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacya
 import java.util.Date;
 
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
 
 /**
  * 
@@ -36,10 +35,11 @@ import org.societies.api.identity.IdentityType;
  *
  */
 public class DataTransmissionLogEntry {
-	
+
 	private final String dataType;
 	private final Date time;
 	private final boolean sentToGroup;
+	private final boolean sentToLocalCss;
 	private final IIdentity receiver;	
 	private final IIdentity sender;
 	private final long payloadSize;
@@ -50,19 +50,36 @@ public class DataTransmissionLogEntry {
 		
 		this.dataType = dataType;
 		this.time = time;
-		this.sentToGroup = (receiver.getType() == IdentityType.CIS);
-		this.receiver = receiver;
-		this.sender = sender;
-		this.payloadSize = payloadSize;
-		this.channelId = channelId;
-	}
-	
-	public DataTransmissionLogEntry(String dataType, Date time, boolean sentToGroup, IIdentity receiver,
-			IIdentity sender, long payloadSize, ChannelType channelId) {
 		
-		this.dataType = dataType;
-		this.time = time;
-		this.sentToGroup = sentToGroup;
+		switch (receiver.getType()) {
+		case CIS:
+			// Some CIS
+			this.sentToGroup = true;
+			this.sentToLocalCss = false;
+			break;
+		case CSS:
+			// Some other CSS
+			this.sentToGroup = false;
+			this.sentToLocalCss = false;
+			break;
+		case CSS_LIGHT:
+			// User's own CSS
+			this.sentToGroup = false;
+			this.sentToLocalCss = true;
+			break;
+		case CSS_RICH:
+			// User's own CSS
+			this.sentToGroup = false;
+			this.sentToLocalCss = true;
+			break;
+		default:
+			//LOG.warn("isSentToLocalCss(): unrecognized receiver type: {}", receiver.getType());
+			
+			// Assume most problematic cases
+			this.sentToGroup = true;
+			this.sentToLocalCss = false;
+		}
+
 		this.receiver = receiver;
 		this.sender = sender;
 		this.payloadSize = payloadSize;
@@ -77,7 +94,7 @@ public class DataTransmissionLogEntry {
 		return time;
 	}
 	
-	public boolean getSentToGroup() {
+	public boolean isSentToGroup() {
 		return sentToGroup;
 	}
 	
@@ -95,5 +112,15 @@ public class DataTransmissionLogEntry {
 	
 	public ChannelType getChannelId() {
 		return channelId;
+	}
+	
+	/**
+	 * Checks if the message has been sent only to local CSS.
+	 * 
+	 * @return True if receiver's IIdentity.getType() returns either CSS_LIGHT or CSS_RICH.
+	 * False if CIS or CSS.
+	 */
+	public boolean isSentToLocalCss() {
+		return sentToLocalCss;
 	}
 }

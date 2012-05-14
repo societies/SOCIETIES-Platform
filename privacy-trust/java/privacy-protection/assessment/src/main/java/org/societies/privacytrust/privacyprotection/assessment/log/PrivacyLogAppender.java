@@ -37,7 +37,6 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacyas
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean;
-import org.societies.privacytrust.privacyprotection.assessment.logic.Assessment;
 
 /**
  * 
@@ -133,10 +132,6 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	// The type parameter in comms fw is not type of data. It is not even used at the moment.
 	// The only option is to call getClass() on the payload. For any more info the Object payload
 	// should be typecasted and parsed (not feasible).
-	// implementation: call IIdentity.getType() to see if receiver is:
-	//   - CIS (CIS),
-	//   - some other CSS (CSS),
-	//   - or another node within same CSS (CSS_LIGHT, CSS_RICH)
 	// implementation: sentToGroup: true if receiver is CIS
 	// implementation: channelId = XMPP
 	@Override
