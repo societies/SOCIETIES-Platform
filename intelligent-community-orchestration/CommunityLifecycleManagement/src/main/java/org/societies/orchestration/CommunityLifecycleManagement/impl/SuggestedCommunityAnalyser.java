@@ -736,7 +736,8 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 				        //model attributes (specify them?)
 			        }
 				    else if (userJoinedCiss.get(m).getMembersList().size() >= (1.3 * cisProposal.getMembersList().size())) {
-				        //creations.add(sub-CIS for shared CSSs);
+				        cisProposal.addParentCis(userJoinedCiss.get(m));
+				    	creations.set(i, cisProposal);
 				    }
 				}
 				//if the membership criteria for the existing CIS somehow conflict with that of the suggestion,

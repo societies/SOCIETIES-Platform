@@ -84,5 +84,21 @@ public class ICis {
     public ArrayList<String> getMembershipCriteria() {
     	return new ArrayList<String>();
     }
+    
+    public Boolean addSubCis(ICis cis) {
+    	return new Boolean(true);
+    }
+    
+    public Boolean addParentCis(ICis cis) {
+    	return new Boolean(true);
+    }
+    
+    public Boolean removeSubCis(ICis cis) {
+    	return new Boolean(true);
+    }
+    
+    public Boolean removeParentCis(ICis cis) {
+    	return new Boolean(true);
+    }
 
 }
