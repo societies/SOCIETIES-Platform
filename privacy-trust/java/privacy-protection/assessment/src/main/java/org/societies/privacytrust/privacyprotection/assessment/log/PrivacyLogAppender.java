@@ -139,8 +139,15 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		
 		LOG.debug("logCommsFw()");
 
+		String dataType;
+		if (payload != null) {
+			dataType = payload.getClass().getSimpleName();
+		}
+		else {
+			dataType = null;
+		}
 		DataTransmissionLogEntry logEntry = new DataTransmissionLogEntry(
-				payload.getClass().getSimpleName(),
+				dataType,
 				new Date(),
 				receiver,
 				sender,
@@ -192,7 +199,8 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	public boolean log(DataTransmissionLogEntry entry) {
 		
 		LOG.debug("log(DataTransmissionLogEntry)");
-		LOG.warn("log(): not implemented yet");
+
+		privacyLog.getDataTransmission().add(entry);
 
 		return true;
 	}
@@ -204,6 +212,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	public void log(DataAccessLogEntry entry) {
 
 		LOG.debug("log(DataAccessLogEntry)");
-		LOG.warn("log(): not implemented yet");
+
+		privacyLog.getDataAccess().add(entry);
 	}
 }
