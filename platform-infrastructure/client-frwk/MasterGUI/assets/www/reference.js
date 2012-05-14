@@ -25,8 +25,81 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 
 /**
+ * Disconnect from CSSManager 
+ * @param actionFunction function to be called if successful
+ */
+var disconnectFromLocalCSSManager = function() {
+	console.log("Disconnect from LocalCSSManager");
+		
+	function success(data) {
+		console.log(data);
+	}
+	
+	function failure(data) {
+		alert("disconnectFromLocalCSSManager - failure: " + data);
+	}
+    window.plugins.LocalCSSManagerService.disconnectService(success, failure);
+}
+
+var successfulLogout = function() {
+	console.log("Logout from CSS");
+
+	function success(data) {
+		jQuery("#username").val("");
+		jQuery("#userpass").val("");
+		disconnectFromLocalCSSManager();
+
+	}
+
+	function failure(data) {
+		alert("successfulLogout : " + "failure: " + data);
+	}
+	
+    window.plugins.LocalCSSManagerService.logoutCSS(success, failure);
+
+};
+
+/**
+ * Connect to CSSManager 
+ * @param actionFunction function to be called if successful
+ */
+var connectToLocalCSSManager = function(actionFunction) {
+	console.log("Connect to LocalCSSManager");
+		
+	function success(data) {
+		console.log(data);
+		actionFunction();
+	}
+	
+	function failure(data) {
+		alert("connectToLocalCSSManager - failure: " + data);
+	}
+    window.plugins.LocalCSSManagerService.connectService(success, failure);
+}
+
+
+function backButtonHandler(e) {
+	console.log("Back button handling");
+	
+	console.log("Back button handling on page: " + $.mobile.activePage[0].id );
+	
+    if ($.mobile.activePage[0].id === "main"){
+        e.preventDefault();
+        navigator.app.exitApp();
+    }
+    else if ($.mobile.activePage[0].id === "menu"){
+        e.preventDefault();
+        connectToLocalCSSManager(successfulLogout);
+    } else {
+        navigator.app.backHistory();
+    }
+}
+
+/**
  * Called when HTML page has been loaded
  * Add custom PhoneGap plugins
+ * All PhoneGap supported event registrations should be occur here
+ * 
  * N.B. Ensure that res/xml/plugins.xml file is updated
  */
 function onDeviceReady() {
@@ -46,6 +119,12 @@ function onDeviceReady() {
 		cordova.addPlugin("DeviceStatus", DeviceStatus);
 
 	});
+	
+	//handle the Android Back button 
+	//PhoneGap/ HTML views break semantics of Back button unless
+	//app intercepts button and simulates back button behaviour
+	document.addEventListener("backbutton", backButtonHandler, false);
+
 }
 /**
  * DeviceStatus object
@@ -500,38 +579,6 @@ var deviceInfo = function() {
 };
 
 /**
- * Connect to CSSManager 
- * @param actionFunction function to be called if successful
- */
-var connectToLocalCSSManager = function(actionFunction) {
-	console.log("Connect to LocalCSSManager");
-		
-	function success(data) {
-		actionFunction();
-	}
-	
-	function failure(data) {
-		alert("connectToLocalCSSManager - failure: " + data);
-	}
-    window.plugins.LocalCSSManagerService.connectService(success, failure);
-}
-/**
- * Disconnect from CSSManager 
- * @param actionFunction function to be called if successful
- */
-var disconnectFromLocalCSSManager = function() {
-	console.log("Disconnect from LocalCSSManager");
-		
-	function success(data) {
-		console.log(data);
-	}
-	
-	function failure(data) {
-		alert("disconnectFromLocalCSSManager - failure: " + data);
-	}
-    window.plugins.LocalCSSManagerService.disconnectService(success, failure);
-}
-/**
  * Actions carried in the event that a successful CSS login occurs
  */
 var successfulLogin = function() {
@@ -565,7 +612,8 @@ var successfulLogin = function() {
 			jQuery('#cssNodesTable').append(tableEntry);
 		}
 
-		
+		console.log("Current page: " + $.mobile.activePage[0].id);
+
 		
 		$.mobile.changePage( ($("#menu")), { transition: "slideup"} );
 	}
@@ -577,23 +625,6 @@ var successfulLogin = function() {
 
 };
 
-var successfulLogout = function() {
-	console.log("Logout from CSS");
-
-	function success(data) {
-		jQuery("#username").val("");
-		jQuery("#userpass").val("");
-		disconnectFromLocalCSSManager();
-
-	}
-
-	function failure(data) {
-		alert("successfulLogout : " + "failure: " + data);
-	}
-	
-    window.plugins.LocalCSSManagerService.logoutCSS(success, failure);
-
-};
 
 var resetDeviceMgr = function(){
     jQuery("#connStatuslist").text("");
@@ -718,6 +749,9 @@ function onFailure(e) {
 	$('.error').remove();
 	$('<span>').addClass('error').html(e).appendTo('#main article[data-role=content]');
 }
+
+
+
 /**
  * Add Javascript functions to various HTML tags using JQuery
  */
@@ -726,6 +760,8 @@ jQuery(function() {
 	console.log("jQuery calls");
 
 	document.addEventListener("deviceready", onDeviceReady, false);
+	
+
 	
 	$('#deviceChar').click(function() {
 		deviceInfo();

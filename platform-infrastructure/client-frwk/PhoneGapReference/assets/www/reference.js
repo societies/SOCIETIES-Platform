@@ -16,6 +16,20 @@ function onDeviceReady() {
 
 		navigator.add.addService("ConnectionPlugin","org.tssg.awalsh.ConnectionPlugin");*/
 	});
+	
+	//handle the Android Back button 
+	//PhoneGap/ HTML views break semantics of Back button unless
+	//app intercepts button and simulates back button behaviour
+	document.addEventListener("backbutton", function(e){
+	    if($.mobile.activePage.is('#main')){
+	        e.preventDefault();
+	        navigator.app.exitApp();
+	    }
+	    else {
+	        navigator.app.backHistory()
+	    }
+	}, false);
+
 }
 
 var watchID = null;
@@ -548,6 +562,7 @@ jQuery(function() {
 	console.log("jQuery calls");
 
 	document.addEventListener("deviceready", onDeviceReady, false);
+	
 
 	$('#toggleAcceleromter').click(function() {
 		toggleAccel();

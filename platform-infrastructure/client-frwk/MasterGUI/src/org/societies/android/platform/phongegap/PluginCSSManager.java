@@ -112,6 +112,7 @@ public class PluginCSSManager extends Plugin {
      */
     private void disconnectServiceBinding() {
     	if (connectedtoCSSManager) {
+    		Log.d(LOG_TAG,"Still connected - disconnecting service");
     		this.ctx.getContext().unbindService(ccsManagerConnection);
     	}
     }
@@ -128,21 +129,33 @@ public class PluginCSSManager extends Plugin {
 
 
 		PluginResult result = null;
-		//uses synchronous call to ensure that service is binded to
+
 		if (action.equals(CONNECT_SERVICE)) {
+
 			if (!connectedtoCSSManager) {
+				Log.d(LOG_TAG, "adding to Map store: " + callbackId + " for action: " + action);
+				this.methodCallbacks.put(action, callbackId);
+
+				result = new PluginResult(PluginResult.Status.NO_RESULT);
+	            result.setKeepCallback(true);
+
 				this.initialiseServiceBinding();
+			} else {
+	            result = new PluginResult(PluginResult.Status.OK, "connected");
+	            result.setKeepCallback(false);
 			}
-            result = new PluginResult(PluginResult.Status.OK, "connected");
-            result.setKeepCallback(false);
+            
             return result;
 		} 
 
 		//uses synchronous call to ensure that service is unbound
 		if (action.equals(DISCONNECT_SERVICE)) {
+
 			this.disconnectServiceBinding();
+
             result = new PluginResult(PluginResult.Status.OK, "disconnected");
             result.setKeepCallback(false);
+
             return result;
 		} 
 
@@ -367,12 +380,16 @@ public class PluginCSSManager extends Plugin {
 	};
     /**
      * CSSManager service connection
+     * 
+     * N.B. Unbinding from service does not callback. onServiceDisconnected is called back
+     * if service connection lost
      */
     private ServiceConnection ccsManagerConnection = new ServiceConnection() {
 
         public void onServiceDisconnected(ComponentName name) {
         	Log.d(LOG_TAG, "Disconnecting from LocalCSSManager service");
         	connectedtoCSSManager = false;
+
         }
 
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -382,6 +399,13 @@ public class PluginCSSManager extends Plugin {
             //obtain the service's API
             localCSSManager = (IAndroidCSSManager) binder.getService();
             connectedtoCSSManager = true;
+            
+			String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(CONNECT_SERVICE);
+
+			PluginResult result = new PluginResult(PluginResult.Status.OK, "connected");
+			result.setKeepCallback(false);
+			PluginCSSManager.this.success(result, methodCallbackId);
+
         }
     };
 
