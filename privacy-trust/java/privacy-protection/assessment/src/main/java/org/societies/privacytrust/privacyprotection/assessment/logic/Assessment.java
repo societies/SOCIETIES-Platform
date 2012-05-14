@@ -24,8 +24,14 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
+import java.util.concurrent.Future;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResult;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment;
+import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
  * Parses the log and tries to find potential privacy breaches that occurred in the past.
@@ -37,9 +43,39 @@ import org.slf4j.LoggerFactory;
  * @author Mitja Vardjan
  *
  */
-public class Assessment {
+public class Assessment implements IAssessment {
 
 	private static Logger LOG = LoggerFactory.getLogger(Assessment.class);
 
+	private PrivacyLog privacyLog;
 	
+	public Assessment() {
+		LOG.info("Constructor");
+	}
+	
+	// Getters and setters for beans
+	public PrivacyLog getPrivacyLog() {
+		return privacyLog;
+	}
+	public void setPrivacyLog(PrivacyLog privacyLog) {
+		this.privacyLog = privacyLog;
+	}
+
+	@Override
+	public void setAutoPeriod(int seconds) {
+		
+	}
+	
+	@Override
+	public Future<AssessmentResult> assessNow() {
+		
+		AssessmentResult result = new AssessmentResult();
+		
+		return new AsyncResult<AssessmentResult>(result);
+	}
+	
+	@Override
+	public AssessmentResult getLastResult() {
+		return null;
+	}
 }

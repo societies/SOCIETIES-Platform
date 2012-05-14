@@ -37,6 +37,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacyas
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean;
+import org.societies.privacytrust.privacyprotection.assessment.logic.Assessment;
 
 /**
  * 
@@ -50,7 +51,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 
 	private CommsFwTestBean testBean;
 	private ICommManager commMgr;
-	private PrivacyLog privacyLog = new PrivacyLog();
+	private PrivacyLog privacyLog;
 
 	public PrivacyLogAppender() {
 		LOG.info("constructor");
@@ -84,6 +85,14 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 //		}
 		
 //		logStack();
+	}
+	
+	// Getters and setters for beans
+	public PrivacyLog getPrivacyLog() {
+		return privacyLog;
+	}
+	public void setPrivacyLog(PrivacyLog privacyLog) {
+		this.privacyLog = privacyLog;
 	}
 	
 	private void logStack() {
