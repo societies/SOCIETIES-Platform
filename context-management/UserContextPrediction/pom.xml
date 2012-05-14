@@ -18,6 +18,17 @@
 
 	<developers>
 		<developer>
+			<id>jpapai</id>
+			<name>John Papaioannou</name>
+			<email>jpapai@cn.ntua.gr</email>
+			<organization>ICCS</organization>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>+2</timezone>
+		</developer>
+		<developer>
 			<id>nikoskal</id>
 			<name>Nikos Kalatzis</name>
 			<email>nikosk@cn.ntua.gr</email>
@@ -29,28 +40,17 @@
 			</roles>
 			<timezone>+2</timezone>
 		</developer>
-	    <developer>
-			<id>pkosmides</id>
-			<name>Pavlos Kosmides</name>
-			<email>pkosmidi@central.ntua.gr</email>
-			<organization>ICCS</organization>
-			<organizationUrl>http://www.iccs.gr/</organizationUrl>
-			<roles>
-				<role>developer</role>
-			</roles>
-			<timezone>+2</timezone>
-		</developer>
 	</developers>
 
 	<!-- List dependencies here -->
 	<dependencies>
-	<dependency>
+		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
-			<dependency>
+		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
 			<version>${release.version}</version>
@@ -95,7 +95,7 @@
 							<type>jar</type>
 							<overWrite>true</overWrite>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
-							</artifactItem>
+						</artifactItem>
 					</artifactItems>
 				</configuration>
 			</plugin>
