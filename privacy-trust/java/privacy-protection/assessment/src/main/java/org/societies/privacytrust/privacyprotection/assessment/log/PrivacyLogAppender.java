@@ -86,7 +86,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 //		logStack();
 	}
 	
-	public void logStack() {
+	private void logStack() {
 
 		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 		LOG.debug("stackTrace length = {}", stackTrace.length);
@@ -176,6 +176,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 			IIdentity receiver, ChannelType channelId) {
 		
 		LOG.debug("logSN()");
+		LOG.warn("logSN(): not implemented yet");
 
 		return true;
 	}
@@ -187,6 +188,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	public boolean log(DataTransmissionLogEntry entry) {
 		
 		LOG.debug("log(DataTransmissionLogEntry)");
+		LOG.warn("log(): not implemented yet");
 
 		return true;
 	}
@@ -198,6 +200,6 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	public void log(DataAccessLogEntry entry) {
 
 		LOG.debug("log(DataAccessLogEntry)");
-		
+		LOG.warn("log(): not implemented yet");
 	}
 }
