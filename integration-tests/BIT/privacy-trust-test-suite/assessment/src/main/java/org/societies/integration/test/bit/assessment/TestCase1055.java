@@ -11,15 +11,15 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.integration.test.IntegrationTestCase;
 
-public class TestCase000 extends IntegrationTestCase {
-	private static Logger LOG = LoggerFactory.getLogger(TestCase000.class);
+public class TestCase1055 extends IntegrationTestCase {
+	private static Logger LOG = LoggerFactory.getLogger(TestCase1055.class);
 
 	/**
 	 * Privacy Log Appender (injected)
 	 */
 	private static IPrivacyLogAppender privacyLogAppender;
 
-	public TestCase000() {
+	public TestCase1055() {
 		// Call the super constructor
 		// with test case number
 		// and test case classes to run
@@ -29,8 +29,8 @@ public class TestCase000 extends IntegrationTestCase {
 	}
 
 	public void setPrivacyLogAppender(IPrivacyLogAppender privacyLogAppender) {
-		LOG.debug("[#000] setNegotiator()");
-		TestCase000.privacyLogAppender = privacyLogAppender;
+		LOG.debug("[#1055] setNegotiator()");
+		TestCase1055.privacyLogAppender = privacyLogAppender;
 	}
 	
 	protected static IPrivacyLogAppender getPrivacyLogAppender() {

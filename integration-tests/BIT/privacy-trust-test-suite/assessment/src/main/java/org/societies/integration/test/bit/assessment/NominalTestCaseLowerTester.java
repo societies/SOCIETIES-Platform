@@ -52,11 +52,11 @@ public class NominalTestCaseLowerTester {
 	@BeforeClass
 	public static void initialization() {
 		
-		LOG.info("[#000] Initialization");
-		LOG.info("[#000] Prerequisite: The CSS is created");
-		LOG.info("[#000] Prerequisite: The user is logged to the CSS");
+		LOG.info("[#1055] Initialization");
+		LOG.info("[#1055] Prerequisite: The CSS is created");
+		LOG.info("[#1055] Prerequisite: The user is logged to the CSS");
 
-		privacyLogAppender = TestCase000.getPrivacyLogAppender();
+		privacyLogAppender = TestCase1055.getPrivacyLogAppender();
 		
 		assertNotNull(privacyLogAppender);
 	}
@@ -67,7 +67,7 @@ public class NominalTestCaseLowerTester {
 	 */
 	@Before
 	public void setUp() {
-		LOG.info("[#000] NominalTestCaseLowerTester::setUp");
+		LOG.info("[#1055] NominalTestCaseLowerTester::setUp");
 	}
 
 	/**
@@ -75,13 +75,13 @@ public class NominalTestCaseLowerTester {
 	 */
 	@After
 	public void tearDown() {
-		LOG.info("[#000] tearDown");
+		LOG.info("[#1055] tearDown");
 	}
 
 	@Test
 	public void testSpeedOfExecution() throws InterruptedException {
 		
-		LOG.info("[#000] testSpeedOfExecution()");
+		LOG.info("[#1055] testSpeedOfExecution()");
 
 		IIdentity owner = new IdentityImpl("owner-1@a.com");
 		IIdentity requestorId = new IdentityImpl("requestor-1@a.com");
@@ -101,10 +101,15 @@ public class NominalTestCaseLowerTester {
 		assertTrue(end - start < PRIVACY_LOGGER_MAX_EXECUTION_TIME_IN_MS);
 		
 		start = cal.getTimeInMillis();
+		privacyLogAppender.logContext(requestor, owner, 6543);
+		end = cal.getTimeInMillis();
+		assertTrue(end - start < PRIVACY_LOGGER_MAX_EXECUTION_TIME_IN_MS);
+		
+		start = cal.getTimeInMillis();
 		privacyLogAppender.logCommsFw(fromIdentity, toIdentity, payload);
 		end = cal.getTimeInMillis();
 		assertTrue(end - start < PRIVACY_LOGGER_MAX_EXECUTION_TIME_IN_MS);
 		
-		LOG.info("[#000] testSpeedOfExecution(): FINISHED");
+		LOG.info("[#1055] testSpeedOfExecution(): FINISHED");
 	}
 }
