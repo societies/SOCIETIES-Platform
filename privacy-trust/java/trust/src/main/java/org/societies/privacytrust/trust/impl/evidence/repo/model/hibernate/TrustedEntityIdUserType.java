@@ -48,7 +48,7 @@ public class TrustedEntityIdUserType implements CompositeUserType {
 	
 	private static final Class<TrustedEntityId> TRUSTED_ENTITY_ID_CLASS = TrustedEntityId.class;
 	
-	private static final String[] PROPERTY_NAMES = { "trustorId", "entityType", "trusteeId" };
+	private static final String[] PROPERTY_NAMES = { "trustor_id", "entity_type", "trustee_id" };
 	
 	private static final Type[] PROPERTY_TYPES = { Hibernate.STRING, Hibernate.STRING, Hibernate.STRING };
 

@@ -65,14 +65,14 @@ public interface ITrustedCss extends ITrustedEntity {
 	 * Returns a set containing the services provided by this CSS.
 	 * 
 	 * @return a set containing the services provided by this CSS.
+	 */
+	public Set<ITrustedService> getServices();
+	
+	/*
+	 * TODO 
+	 * @param serviceType
 	 *
-	public Set<TrustedService> getServices();
-	*/
-
-	/**
-	 * 
-	 * @param service
-	 *
-	public void addService(final TrustedService service);
-	*/
+	public Set<TrustedService> getServices(String serviceType) {
+		return null;
+	}*/
 }

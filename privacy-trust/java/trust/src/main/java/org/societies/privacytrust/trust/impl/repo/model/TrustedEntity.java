@@ -62,11 +62,11 @@ public abstract class TrustedEntity implements ITrustedEntity {
 	private long id;
 	
 	/** The identifier of this trusted entity. */
-	@Columns(columns={
-			@Column(name = "trustorId", nullable = false, updatable = false, length = 256),
-			@Column(name = "trusteeId", nullable = false, updatable = false, length = 256)
+	@Columns(columns = {
+			@Column(name = "trustor_id", nullable = false, updatable = false, length = 256),
+			@Column(name = "trustee_id", nullable = false, updatable = false, length = 256)
 	})
-	@Type(type="org.societies.privacytrust.trust.impl.repo.model.hibernate.TrustedEntityIdUserType")
+	@Type(type = "org.societies.privacytrust.trust.impl.repo.model.hibernate.TrustedEntityIdUserType")
 	private final TrustedEntityId teid;
 	
 	/** The direct trust in this entity. */
@@ -163,13 +163,13 @@ public abstract class TrustedEntity implements ITrustedEntity {
 	}
 	
 	/*
-	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
 		
 		final StringBuilder sb = new StringBuilder();
+		
 		sb.append("{");
 		sb.append("teid=" + this.teid);
 		sb.append(",");

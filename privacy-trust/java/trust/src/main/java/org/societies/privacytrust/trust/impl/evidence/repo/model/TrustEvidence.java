@@ -56,15 +56,15 @@ public abstract class TrustEvidence implements ITrustEvidence {
 	
 	/** The identifier of the trusted entity this evidence refers to. */
 	@Columns(columns={
-			@Column(name = "trustorId", nullable = false, updatable = false, length = 256),
-			@Column(name = "entityType", nullable = false, updatable = false, length = 3),
-			@Column(name = "trusteeId", nullable = false, updatable = false, length = 256)
+			@Column(name = "trustor_id", nullable = false, updatable = false, length = 256),
+			@Column(name = "entity_type", nullable = false, updatable = false, length = 3),
+			@Column(name = "trustee_id", nullable = false, updatable = false, length = 256)
 	})
-	@Type(type="org.societies.privacytrust.trust.impl.evidence.repo.model.hibernate.TrustedEntityIdUserType")
+	@Type(type = "org.societies.privacytrust.trust.impl.evidence.repo.model.hibernate.TrustedEntityIdUserType")
 	private final TrustedEntityId teid;
 	
 	@Column(name = "timestamp", nullable = false, updatable = false)
-	@Type(type="org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType")
+	@Type(type = "org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType")
 	private final Date timestamp;
 	
 	TrustEvidence(final TrustedEntityId teid, final Date timestamp) {

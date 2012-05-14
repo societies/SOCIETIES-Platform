@@ -48,7 +48,10 @@ import org.societies.privacytrust.trust.api.model.ITrustedCss;
  * @since 0.0.1
  */
 @Entity
-@Table(name = TableName.TRUSTED_CIS, uniqueConstraints={@UniqueConstraint(columnNames={"trustorId", "trusteeId"})})
+@Table(
+		name = TableName.TRUSTED_CIS, 
+		uniqueConstraints = { @UniqueConstraint(columnNames = { "trustor_id", "trustee_id" }) }
+)
 public class TrustedCis extends TrustedEntity implements ITrustedCis {
 
 	private static final long serialVersionUID = -438368876927927076L;
@@ -59,7 +62,6 @@ public class TrustedCis extends TrustedEntity implements ITrustedCis {
 	        targetEntity = TrustedCss.class,
 	        fetch = FetchType.EAGER
 	)
-	//@Fetch(FetchMode.JOIN)
 	private Set<ITrustedCss> members = new HashSet<ITrustedCss>();
 	
 	/* TODO The services shared by this trusted CIS. */
