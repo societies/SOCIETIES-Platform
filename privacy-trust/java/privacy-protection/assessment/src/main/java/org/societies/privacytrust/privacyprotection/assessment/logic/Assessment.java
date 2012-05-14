@@ -55,9 +55,11 @@ public class Assessment implements IAssessment {
 	
 	// Getters and setters for beans
 	public PrivacyLog getPrivacyLog() {
+		LOG.debug("getPrivacyLog()");
 		return privacyLog;
 	}
 	public void setPrivacyLog(PrivacyLog privacyLog) {
+		LOG.debug("setPrivacyLog()");
 		this.privacyLog = privacyLog;
 	}
 

@@ -49,7 +49,7 @@ public class PrivacyLog implements IPrivacyLog {
 	
 	public PrivacyLog() {
 		
-		LOG.info("constructor");
+		LOG.info("Constructor");
 		
 		dataAccess = new ArrayList<DataAccessLogEntry>();
 		dataTransmission = new ArrayList<DataTransmissionLogEntry>();

@@ -54,7 +54,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	private PrivacyLog privacyLog;
 
 	public PrivacyLogAppender() {
-		LOG.info("constructor");
+		LOG.info("Constructor");
 	}
 
 	public void init() {
@@ -87,14 +87,6 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 //		logStack();
 	}
 	
-	// Getters and setters for beans
-	public PrivacyLog getPrivacyLog() {
-		return privacyLog;
-	}
-	public void setPrivacyLog(PrivacyLog privacyLog) {
-		this.privacyLog = privacyLog;
-	}
-	
 	private void logStack() {
 
 		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
@@ -117,6 +109,14 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	public void setCommMgr(ICommManager commMgr) {
 		LOG.debug("setCommMgr()");
 		this.commMgr = commMgr;
+	}
+	public PrivacyLog getPrivacyLog() {
+		LOG.debug("getPrivacyLog()");
+		return privacyLog;
+	}
+	public void setPrivacyLog(PrivacyLog privacyLog) {
+		LOG.debug("setPrivacyLog()");
+		this.privacyLog = privacyLog;
 	}
 	public CommsFwTestBean getTestBean() {
 		LOG.debug("getTestBean()");
