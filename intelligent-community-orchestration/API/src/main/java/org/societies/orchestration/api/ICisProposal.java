@@ -78,6 +78,11 @@ public class ICisProposal {
 		activityFeed = null;
 	}
 	
+	/**
+	 * Get the proposed name for the CIS proposal.
+	 * 
+	 * @return String of the name of the CIS that would result from the CIS proposal 
+	 */
 	public String getName() {
 		return name;
 	}
@@ -91,6 +96,11 @@ public class ICisProposal {
 		this.name = name;
 	}
 	
+	/**
+	 * Get the proposed description for the CIS proposal.
+	 * 
+	 * @return String of the description that would be held on a CIS resulting from in the CIS proposal 
+	 */
 	public String getDescription() {
 		return description;
 	}
@@ -115,10 +125,22 @@ public class ICisProposal {
 		return activityFeed;
 	}
 	
+	/**
+	 * Set the proposed activity feed for the CIS proposal (probably only usable for when
+	 * merging or splitting CISs - the new ones may inherit activities or feeds.
+	 * 
+	 * @param IActivityFeed: the proposed activity feed for the CIS proposal 
+	 */
 	public void setCisActivityFeed(IActivityFeed activityFeed) {
 		this.activityFeed = activityFeed;
 	}
 	
+	/**
+	 * Add an activity to the activity feed of the CIS proposal (would probably only apply
+	 * for when the proposal is for a new CIS formed from a split or merge.
+	 * 
+	 * @param IActivityFeed: the proposed activity feed for the CIS proposal 
+	 */
 	public void addActivity(IActivity activity) {
 		activityFeed.addCisActivity(activity);
 	}
