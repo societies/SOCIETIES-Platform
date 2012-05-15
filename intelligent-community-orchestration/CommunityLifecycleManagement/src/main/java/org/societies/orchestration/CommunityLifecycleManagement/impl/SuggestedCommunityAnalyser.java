@@ -789,7 +789,6 @@ public class SuggestedCommunityAnalyser implements ISuggestedCommunityAnalyser
 	    if (convertedRecommendations.size() != 0) {
 	    	currentActionsMetadata = communityRecommender.identifyCisActionForCSMAnalyser(convertedRecommendations);
 	    	ArrayList<String> cisIds = new ArrayList<String>();
-	    	
 	        for (int i = 0; i < currentActionsMetadata.size(); i++) {
 	        	cisIds.add(currentActionsMetadata.get(i).split("---")[0].split("CIS ID: ")[1]);
 	        	if (recordedMetadata.get(cisIds.get(i)) == null)
