@@ -27,7 +27,9 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacya
 import org.societies.api.identity.IIdentity;
 
 /**
- * 
+ * Privacy Assessment result for a single sender in form of a particular {@link IIdentity}.
+ * Based on all data packets that were sent by this sender.
+ * This assessment is less reliable because the sender identity is given by the sender itself.
  *
  * @author Mitja Vardjan
  *

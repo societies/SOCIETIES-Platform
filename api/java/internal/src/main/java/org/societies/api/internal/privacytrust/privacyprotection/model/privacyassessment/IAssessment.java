@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 /**
- * 
+ * High-level interface for Privacy Assessment.
  *
  * @author Mitja Vardjan
  *
