@@ -24,6 +24,7 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
+import java.util.List;
 import java.util.concurrent.Future;
 
 /**
@@ -45,11 +46,11 @@ public interface IAssessment {
 	/**
 	 * Perform a-posteriori assessment now
 	 */
-	public Future<AssessmentResult> assessNow();
+	public Future<List<AssessmentResult>> assessNow();
 	
 	/**
 	 * 
 	 * @return Result of the most recent assessment
 	 */
-	public AssessmentResult getLastResult();
+	public List<AssessmentResult> getLastResult();
 }

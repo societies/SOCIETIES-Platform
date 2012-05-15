@@ -24,11 +24,14 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.logic;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResult;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment;
 import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -69,15 +72,18 @@ public class Assessment implements IAssessment {
 	}
 	
 	@Override
-	public Future<AssessmentResult> assessNow() {
+	public Future<List<AssessmentResult>> assessNow() {
 		
-		AssessmentResult result = new AssessmentResult();
+		List<AssessmentResult> allResults = new ArrayList<AssessmentResult>();
+		AssessmentResult result = new AssessmentResultClassName("classA");
 		
-		return new AsyncResult<AssessmentResult>(result);
+		allResults.add(result);
+		
+		return new AsyncResult<List<AssessmentResult>>(allResults);
 	}
 	
 	@Override
-	public AssessmentResult getLastResult() {
+	public List<AssessmentResult> getLastResult() {
 		return null;
 	}
 }

@@ -73,7 +73,11 @@ public class CorrelationInTime {
 	 * @param timeShift Shift the correlation function along the x axis.
 	 */
 	public CorrelationInTime(double valueAtInf, double timeShift) {
-		this.valueAtInf = valueAtInf;
+		if (valueAtInf >= 1 || valueAtInf < 0) {
+			LOG.warn("Unexpected value for valueAtInf: {}. Setting default value: {}",
+					valueAtInf, VALUE_AT_INF_DEFAULT);
+			this.valueAtInf = VALUE_AT_INF_DEFAULT;
+		}
 		this.timeShift = timeShift;
 		calculateNormalizationParameters();
 	}

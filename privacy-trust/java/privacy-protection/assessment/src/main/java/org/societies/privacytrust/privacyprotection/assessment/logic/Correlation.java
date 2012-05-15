@@ -42,10 +42,27 @@ public class Correlation {
 
 	private List<Point> dataAccess;
 	private List<Point> dataTransmission;
+	private CorrelationInData correlationInData;
+	private CorrelationInTime correlationInTime;
 	
 	public Correlation(List<Point> dataAccess, List<Point> dataTransmission) {
 		this.dataAccess = dataAccess;
 		this.dataTransmission = dataTransmission;
+		correlationInData = new CorrelationInData();
+		correlationInTime = new CorrelationInTime();
 	}
 	
+	public double correlation() {
+		
+		double cData;
+		double cTime;
+		
+		long deltaSize = 100;  // FIXME
+		double dt = 1;  // FIXME
+		
+		cData = correlationInData.correlation(deltaSize);
+		cTime = correlationInTime.correlation(dt);
+		
+		return cData * cTime;
+	}
 }

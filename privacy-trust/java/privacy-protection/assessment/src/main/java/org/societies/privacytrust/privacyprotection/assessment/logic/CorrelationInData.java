@@ -84,7 +84,15 @@ public class CorrelationInData {
 	 * If smaller than 1, the function gets more narrow (more sensitive to size differences).
 	 */
 	public CorrelationInData(double valueAtInf, double sizeScaleLeft, double sizeScaleRight) {
-		this.valueAtInf = valueAtInf;
+		
+		if (valueAtInf >= 1 || valueAtInf < 0) {
+			LOG.warn("Unexpected value for valueAtInf: {}. Setting default value: {}",
+					valueAtInf, VALUE_AT_INF_DEFAULT);
+			this.valueAtInf = VALUE_AT_INF_DEFAULT;
+		}
+		else {
+			this.valueAtInf = valueAtInf;
+		}
 		this.xScaleLeft = sizeScaleLeft;
 		this.xScaleRight = sizeScaleRight;
 		calculateNormalizationParameters();
@@ -139,5 +147,9 @@ public class CorrelationInData {
 		// => no need to divide normalizationFactor with it
 		this.normalizationFactor = (1 - valueAtInf);
 		this.normalizationOffset = valueAtInf;
+	}
+	
+	public double getMeanCorrelation() {
+		return (1 - valueAtInf) / 2;
 	}
 }

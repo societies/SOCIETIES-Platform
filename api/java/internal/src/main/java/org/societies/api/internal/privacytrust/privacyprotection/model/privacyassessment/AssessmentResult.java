@@ -30,6 +30,78 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacya
  * @author Mitja Vardjan
  *
  */
-public class AssessmentResult {
+public abstract class AssessmentResult {
 
+	protected Object sender;
+	private long numAllPackets = 0;
+	private long numPacketsPerMonth = 0;
+	private double corrWithDataAccessBySender = 0;
+	private double corrWithDataAccessByAll = 0;
+	
+	public AssessmentResult(Object sender) {
+		this.sender = sender;
+	}
+	
+	/**
+	 * @return the numAllPackets
+	 */
+	public long getNumAllPackets() {
+		return numAllPackets;
+	}
+
+	/**
+	 * @param numAllPackets the numAllPackets to set
+	 */
+	public void setNumAllPackets(long numAllPackets) {
+		this.numAllPackets = numAllPackets;
+	}
+
+	/**
+	 * @return the numPacketsPerMonth
+	 */
+	public long getNumPacketsPerMonth() {
+		return numPacketsPerMonth;
+	}
+
+	/**
+	 * @param numPacketsPerMonth the numPacketsPerMonth to set
+	 */
+	public void setNumPacketsPerMonth(long numPacketsPerMonth) {
+		this.numPacketsPerMonth = numPacketsPerMonth;
+	}
+
+	/**
+	 * @return the corrWithDataAccessBySender
+	 */
+	public double getCorrWithDataAccessBySender() {
+		return corrWithDataAccessBySender;
+	}
+
+	/**
+	 * @param corrWithDataAccessBySender the corrWithDataAccessBySender to set
+	 */
+	public void setCorrWithDataAccessBySender(double corrWithDataAccessBySender) {
+		this.corrWithDataAccessBySender = corrWithDataAccessBySender;
+	}
+
+	/**
+	 * @return the corrWithDataAccessByAll
+	 */
+	public double getCorrWithDataAccessByAll() {
+		return corrWithDataAccessByAll;
+	}
+
+	/**
+	 * @param corrWithDataAccessByAll the corrWithDataAccessByAll to set
+	 */
+	public void setCorrWithDataAccessByAll(double corrWithDataAccessByAll) {
+		this.corrWithDataAccessByAll = corrWithDataAccessByAll;
+	}
+
+	/**
+	 * @return the sender
+	 */
+	public Object getSender() {
+		return sender;
+	}
 }
