@@ -117,6 +117,5 @@ public interface ICisDirectory {
 	 *            for which list of CIS will retrieved from directory
 	 * @return list of CisAdvertisementRecords
 	 */
-	Future<List<CisAdvertisementRecord>> findForAllCis(
-			CisAdvertisementRecord cisFilter);
+	Future<List<CisAdvertisementRecord>> findForAllCis( CisAdvertisementRecord filteredcis, String filter);
 }

@@ -76,7 +76,7 @@ public interface ICisDirectoryRemote {
 	 * @param cisFilter the filter to be applied to the CisDirectory database search
 	 * @param callback the callback class of the remote Cis Directory client
 	 */
-	public void findForAllCis(CisAdvertisementRecord cisFilter, ICisDirectoryCallback callback);
+	public void findForAllCis(CisAdvertisementRecord filteredcis, String filter, ICisDirectoryCallback callback);
 	
 }
 

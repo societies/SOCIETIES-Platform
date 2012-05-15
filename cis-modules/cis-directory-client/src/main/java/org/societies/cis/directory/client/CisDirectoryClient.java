@@ -77,10 +77,10 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 	}
 
 	public void InitService() {
-		// Registry Css Directory with the Comms Manager
+		// Registry Cis Directory with the Comms Manager
 
 		if (LOG.isDebugEnabled())
-			LOG.debug("Registering the Css Directory with the XMPP Communication Manager");
+			LOG.debug("Registering the Cis Directory with the XMPP Communication Manager");
 
 		try {
 			getCommManager().register(this);
@@ -184,8 +184,8 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 	 * (non-Javadoc)
 	 *
 	 * @see
-	 * org.societies.api.css.directory.ICssDirectoryRemote#addCssAdvertisementRecord
-	 * (org.societies.api.schema.css.directory.CssAdvertisementRecord)
+	 * org.societies.api.cis.directory.ICisDirectoryRemote#addCisAdvertisementRecord
+	 * (org.societies.api.schema.cis.directory.CisAdvertisementRecord)
 	 */
 	@Override
 	public void addCisAdvertisementRecord(CisAdvertisementRecord cisAdvert) {
@@ -209,9 +209,9 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see org.societies.api.css.directory.ICssDirectoryRemote#
-	 * deleteCssAdvertisementRecord
-	 * (org.societies.api.schema.css.directory.CssAdvertisementRecord)
+	 * @see org.societies.api.cis.directory.ICisDirectoryRemote#
+	 * deleteCisAdvertisementRecord
+	 * (org.societies.api.schema.cis.directory.CisAdvertisementRecord)
 	 */
 	@Override
 	public void deleteCisAdvertisementRecord(CisAdvertisementRecord cisAdvert) {
@@ -235,9 +235,9 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see org.societies.api.css.directory.ICssDirectoryRemote#
-	 * findAllCssAdvertisementRecords
-	 * (org.societies.api.css.directory.ICssDirectoryCallback)
+	 * @see org.societies.api.cis.directory.ICisDirectoryRemote#
+	 * findAllCisAdvertisementRecords
+	 * (org.societies.api.cis.directory.ICisDirectoryCallback)
 	 */
 	@Override
 	public void findAllCisAdvertisementRecords(
@@ -273,7 +273,7 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 	 * org.societies.api.cis.directory.ICisDirectoryCallback)
 	 */
 	@Override
-	public void findForAllCis(CisAdvertisementRecord cisAdvert,
+	public void findForAllCis(CisAdvertisementRecord filteredcis, String filter,
 			ICisDirectoryCallback cisDirCallback) {
 		// We want to send all messages for CisDirectory to the domain authority Node
 		IIdentity toIdentity = idMgr.getDomainAuthorityNode();
@@ -285,7 +285,7 @@ public class CisDirectoryClient implements ICisDirectoryRemote, ICommCallback {
 
 		// CREATE MESSAGE BEAN
 		CisDirectoryBean cisDirBean = new CisDirectoryBean();
-		cisDirBean.setCisA(cisAdvert);
+		cisDirBean.setCisA(filteredcis);
 
 		cisDirBean.setMethod(MethodType.FIND_FOR_ALL_CIS);
 		try {

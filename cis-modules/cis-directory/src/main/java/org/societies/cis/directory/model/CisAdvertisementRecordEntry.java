@@ -58,6 +58,9 @@ public class CisAdvertisementRecordEntry implements Serializable {
 	private String name;
 	private String id;
 	private String uri;
+	private String password;
+	private String type;
+	private int mode;
 
 	/**
 	 * @return the name
@@ -107,17 +110,72 @@ public class CisAdvertisementRecordEntry implements Serializable {
 	public void setUri(String uri) {
 		this.uri = uri;
 	}
+	
+	
+	/**
+	 * @return the password
+	 */
+	@Column(name = "Password")
+	public String getpassword() {
+		return password;
+	}
+
+	/**
+	 * @param password
+	 *            the password to set
+	 */
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	/**
+	 * @return the Type
+	 */
+	@Column(name = "Type")
+	public String gettype() {
+		return type;
+	}
+
+	/**
+	 * @param Type
+	 *            the Type to set
+	 */
+	public void setType(String type) {
+		this.type = type;
+	}
+	
+	/**
+	 * @return the mode
+	 */
+	@Column(name = "Mode")
+	public int getmode() {
+		return mode;
+	}
+
+	/**
+	 * @param Mode
+	 *            the mode to set
+	 */
+	public void setMode(int mode) {
+		this.mode = mode;
+	}
 
 	/**
 	 * @param name
 	 * @param id
 	 * @param uri
+	 * @param password
+	 * @param type
+	 * @param mode
 	 */
-	public CisAdvertisementRecordEntry(String name, String id, String uri) {
+	public CisAdvertisementRecordEntry(String name, String id, String uri, String password, String type, int mode) {
 		super();
 		this.name = name;
 		this.id = id;
 		this.uri = uri;
+		this.password = password;
+		this.type = type;
+		this.mode = mode;
 	}
 
 	public CisAdvertisementRecordEntry(){

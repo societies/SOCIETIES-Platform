@@ -40,7 +40,7 @@ public interface ICisDirectoryCallback {
 	
 	
 	/**
-	 * Gets the result of the call to the remote CssDirectory.
+	 * Gets the result of the call to the remote CisDirectory.
 	 *
 	 * @param cisAdvertisementRecords a list to be populate with the list of Cis Advertisement records {@link org.societies.api.schema.cis.directory.CisAdvertisementRecord}  
 	 *  returned from the call to the CisDirectory

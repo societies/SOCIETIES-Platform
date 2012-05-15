@@ -15,16 +15,25 @@
 
 	<tx:annotation-driven />
 
-	<bean id="CssDirectoryPropConfig"
+	<bean id="CISDirectoryPropConfig"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="ignoreResourceNotFound" value="true"></property>
+		<property name="ignoreResourceNotFound" value="false"></property>
 		<property name="locations">
 			<list>
-			<!-- 	<value>classpath:META-INF/spring/derby_database.properties</value> -->
-				<value>file:${CONFIG_DIR}\org.societies.platform.properties</value>
+			 	<value>classpath:META-INF/spring/derby_database.properties</value>
 			</list>
 		</property>	
 	</bean>
+
+	 <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		init-method="createDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="initialSize" value="10" />
+		<property name="maxActive" value="100" />
+	</bean>  
 
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
@@ -46,12 +55,10 @@
 
 		<property name="hibernateProperties">
 			<props>
-				<!-- <prop key="hibernate.dialect">${hibernate.dialect}</prop>
-				<prop key="hibernate.hbm2ddl.auto">create-drop</prop>
-				<prop key="hibernate.jdbc.batch_size">0</prop> -->
+				<prop key="hibernate.show_ddl">true</prop>
 				<prop key="hibernate.show_sql">true</prop>
 				<prop key="hibernate.cache.use_second_level_cache">false</prop>
-				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.hbm2ddl.auto">create-drop</prop>
 				<prop key="hibernate.format_sql">true</prop>
 			</props>
 		</property>
@@ -64,10 +71,9 @@
 		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
-	
-	<bean id="cisDir" class="org.societies.cis.directory.CisDirectory">
+
+	<bean id="cisdirectory"
+		class="org.societies.cis.directory.CisDirectory">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
-
-
 </beans>

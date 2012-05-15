@@ -23,6 +23,9 @@
 			<xs:element name="name" type="xs:string" minOccurs="0" />
 			<xs:element name="id" type="xs:string" minOccurs="0" />
 			<xs:element name="uri" type="xs:string" minOccurs="0" />
+			<xs:element name="password" type="xs:string" minOccurs="0" />
+			<xs:element name="type" type="xs:string" minOccurs="0" />
+			<xs:element name="mode" type="xs:int" minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>
 

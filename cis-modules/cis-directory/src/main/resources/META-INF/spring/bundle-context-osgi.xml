@@ -12,6 +12,6 @@
        testing of the bundle outside of an OSGi container -->
 	
 	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
-	<osgi:service ref="cisDirectory" interface="org.societies.api.cis.directory.ICisDirectory" />
+	<osgi:service ref="cisDir" interface="org.societies.api.cis.directory.ICisDirectory" />
 	
 </beans>

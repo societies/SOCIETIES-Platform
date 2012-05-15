@@ -80,6 +80,11 @@ public class CisDirectory implements ICisDirectory {
 	 */
 	@Override
 	public void addCisAdvertisementRecord(CisAdvertisementRecord cisAdRec) {
+		
+		System.out.println("+++++++++++++++++++++++ Name is  = " + cisAdRec.getName());
+		System.out.println("+++++++++++++++++++++++ ID is  = " + cisAdRec.getId());
+		System.out.println("+++++++++++++++++++++++ Uri is  = " + cisAdRec.getUri());
+		
 		Session session = sessionFactory.openSession();
 		CisAdvertisementRecordEntry tmpEntry = null;
 
@@ -87,12 +92,12 @@ public class CisDirectory implements ICisDirectory {
 		try {
 
 			tmpEntry = new CisAdvertisementRecordEntry(cisAdRec.getName(),
-					cisAdRec.getId(), cisAdRec.getUri());
+					cisAdRec.getId(), cisAdRec.getUri(), cisAdRec.getPassword(), cisAdRec.getType(), cisAdRec.getMode());
 
 			session.save(tmpEntry);
 
 			t.commit();
-			log.debug("Css Advertisement Record Saved.");
+			log.debug("Cis Advertisement Record Saved.");
 
 		} catch (Exception e) {
 			t.rollback();
@@ -121,12 +126,12 @@ public class CisDirectory implements ICisDirectory {
 		try {
 
 			tmpEntry = new CisAdvertisementRecordEntry(cisAdRec.getName(),
-					cisAdRec.getId(), cisAdRec.getUri());
+					cisAdRec.getId(), cisAdRec.getUri(), cisAdRec.getPassword(), cisAdRec.getType(), cisAdRec.getMode());
 
 			session.delete(tmpEntry);
 
 			t.commit();
-			log.debug("Css Advertisement Record deleted.");
+			log.debug("Cis Advertisement Record deleted.");
 
 		} catch (Exception e) {
 			t.rollback();
@@ -166,6 +171,9 @@ public class CisDirectory implements ICisDirectory {
 				record.setName(entry.getName());
 				record.setId(entry.getId());
 				record.setUri(entry.getUri());
+				record.setPassword(entry.getpassword());
+				record.setType(entry.gettype());
+				record.setMode(entry.getmode());
 
 				returnList.add(record);
 
@@ -193,10 +201,9 @@ public class CisDirectory implements ICisDirectory {
 	@SuppressWarnings("unchecked")
 	@Override
 	@Async
-	public Future<List<CisAdvertisementRecord>> findForAllCis(
-			CisAdvertisementRecord filterCis) {
+	public Future<List<CisAdvertisementRecord>> findForAllCis( CisAdvertisementRecord filteredcis, String filter) {
 
-	//TODO : Need to add filter . for now it returns everything
+	//filter by name, search directory and return CISs that match the relevant name
 		Session session = sessionFactory.openSession();
 		List<CisAdvertisementRecordEntry> tmpAdvertList = new ArrayList<CisAdvertisementRecordEntry>();
 		List<CisAdvertisementRecord> returnList = new ArrayList<CisAdvertisementRecord>();
@@ -210,11 +217,17 @@ public class CisDirectory implements ICisDirectory {
 
 			for (CisAdvertisementRecordEntry entry : tmpAdvertList) {
 				record = new CisAdvertisementRecord();
-				record.setName(entry.getName());
-				record.setId(entry.getId());
-				record.setUri(entry.getUri());
+				if (record.getName().equals(filter)) {
+					record.setName(entry.getName());
+					record.setId(entry.getId());
+					record.setUri(entry.getUri());
+					record.setPassword(entry.getpassword());
+					record.setType(entry.gettype());
+					record.setMode(entry.getmode());
 
-				returnList.add(record);
+					returnList.add(record);
+				}
+					
 
 			}
 
@@ -247,16 +260,19 @@ public class CisDirectory implements ICisDirectory {
 		try {
 
 			tmpEntry = new CisAdvertisementRecordEntry(oldCisValues.getName(),
-					oldCisValues.getId(), oldCisValues.getUri());
+					oldCisValues.getId(), oldCisValues.getUri(), oldCisValues.getPassword(), oldCisValues.getType(), oldCisValues.getMode());
 			session.delete(tmpEntry);
 
 			tmpEntry.setName(updatedCisValues.getName());
 			tmpEntry.setId(updatedCisValues.getId());
 			tmpEntry.setUri(updatedCisValues.getUri());
+			tmpEntry.setPassword(updatedCisValues.getPassword());
+			tmpEntry.setType(updatedCisValues.getType());
+			tmpEntry.setMode(updatedCisValues.getMode());
 			session.save(tmpEntry);
 
 			t.commit();
-			log.debug("Css Advertisement Record updated.");
+			log.debug("Cis Advertisement Record updated.");
 
 		} catch (Exception e) {
 			t.rollback();
