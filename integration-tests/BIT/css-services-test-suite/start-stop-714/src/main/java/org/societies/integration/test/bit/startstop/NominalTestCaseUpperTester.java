@@ -214,7 +214,7 @@ public class NominalTestCaseUpperTester {
 			Future<ServiceControlResult> stopResultFuture = TestCase714.getServiceControl().stopService(serviceUnderTest.getServiceIdentifier());
 			ServiceControlResult stopResult = stopResultFuture.get();
 			
-			Assert.assertEquals(ResultMessage.SUCCESS, stopResult.getMessage());
+			Assert.assertEquals("[#714] Service was not stopped correctly!", ResultMessage.SUCCESS, stopResult.getMessage());
 			
 		} catch(Exception ex){
 			LOG.error("[#714] Error while running test: " + ex);
@@ -237,7 +237,7 @@ public class NominalTestCaseUpperTester {
 			
 			LOG.info("[#714] Service " + testService.getServiceName() + " is " + testService.getServiceStatus());
 
-			Assert.assertEquals(ServiceStatus.STOPPED, testService.getServiceStatus());
+			Assert.assertEquals("[#714] Service is not in the correct state!", ServiceStatus.STOPPED, testService.getServiceStatus());
 			
 		} catch(Exception ex){
 			LOG.error("[#714] Error while running test: " + ex);
@@ -257,7 +257,7 @@ public class NominalTestCaseUpperTester {
 			Future<ServiceControlResult> startResultFuture = TestCase714.getServiceControl().startService(serviceUnderTest.getServiceIdentifier());
 			ServiceControlResult startResult = startResultFuture.get();
 			
-			Assert.assertEquals(ResultMessage.SUCCESS, startResult.getMessage());
+			Assert.assertEquals("[#714] Service was not started correctly", ResultMessage.SUCCESS, startResult.getMessage());
 			
 			
 		} catch(Exception ex){
@@ -283,7 +283,7 @@ public class NominalTestCaseUpperTester {
 
 			LOG.info("[#714] Service " + testService.getServiceName() + " is " + testService.getServiceStatus());
 
-			Assert.assertEquals(ServiceStatus.STARTED, testService.getServiceStatus());
+			Assert.assertEquals("[#714] Service is not in the correct state!", ServiceStatus.STARTED, testService.getServiceStatus());
 			
 		} catch(Exception ex){
 			LOG.error("[#714] Error while running test: " + ex);
