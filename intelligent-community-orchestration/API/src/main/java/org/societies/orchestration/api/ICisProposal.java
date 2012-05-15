@@ -27,6 +27,7 @@ package org.societies.orchestration.api;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.concurrent.Future;
 
 import org.societies.api.identity.IIdentity;
@@ -39,12 +40,15 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
+import org.societies.api.identity.IIdentityManager;
+
 /**
- * This interface represents a CIS proposed to be created. Used internally within T5.1.
+ * This interface represents a CIS proposed to be created, or an existing CIS that is stored within
+ * it as an ICis. Used internally within T5.1.
  * This is a convenient way to store and pass around data on a CIS that could be created.
- * For configuration and deletion of CISs, the actual T4.5 ICis datatypes should be used
- * (except in configuration, when new CISs created from merge or split would be represented
- * as ICisProposals).
+ * For configuration and deletion of CISs, where existing CISs are involved, the CisProposal should
+ * still be used to pass suggestions to Community Lifecycle Management, but only pass it the ICis
+ * that exists.
  *
  */
 
@@ -53,8 +57,8 @@ public class ICisProposal {
 	private String name;
 	private String description;
 	
-	private Set<IIdentity> members;
-	private Set<IIdentity> administrators;
+	private Set<String> members;
+	private Set<String> administrators;
 	
 	private String ownerId;
 	private String cisType;
@@ -62,6 +66,13 @@ public class ICisProposal {
 	
 	private IActivityFeed activityFeed;
 	
+	private ICis actualCis;
+	private IIdentityManager identityManager;
+	
+	private ICisProposal parentCis;
+	private ICis actualParentCis;
+	private ArrayList<ICisProposal> subCiss;
+	private ArrayList<ICis> actualSubCiss;
 	
 	/**
 	 * Create a blank ICisProposal, which can then be populated with details that
@@ -71,11 +82,23 @@ public class ICisProposal {
 	public ICisProposal() {
 		name = "";
 		description = "";
-		members = new HashSet<IIdentity>();
+		members = new HashSet<String>();
+		administrators = new HashSet<String>();
 		ownerId = "";
 		cisType = "";
 		membershipCriteria = new ArrayList<String>();
 		activityFeed = null;
+		actualCis = null;
+		parentCis = null;
+		subCiss = new ArrayList<ICisProposal>();
+	}
+	
+	public ICis getActualCis() {
+		return actualCis;
+	}
+	
+	public void setActualCis(ICis actualCis) {
+		this.actualCis = actualCis;
 	}
 	
 	/**
@@ -92,7 +115,7 @@ public class ICisProposal {
 	 * 
 	 * @param String: the proposed name for the CIS proposal 
 	 */
-	public String setName(String name) {
+	public void setName(String name) {
 		this.name = name;
 	}
 	
@@ -152,7 +175,7 @@ public class ICisProposal {
 	 * @throws CommunicationException 
 	 * @throws InvalidFormatException 
 	 */
-	public Set<IIdentity> getMemberList() {
+	public Set<String> getMemberList() {
 		return members;
 	}
 	
@@ -161,7 +184,7 @@ public class ICisProposal {
 	 * 
 	 * @param Set<IIdentity>: the proposed set of members, each is an IIdentity/"jid", for the CIS proposal 
 	 */
-	public void setMemberList(Set<IIdentity> members) {
+	public void setMemberList(Set<String> members) {
 		this.members = members;
 	}
 	
@@ -172,7 +195,7 @@ public class ICisProposal {
 	 * @throws CommunicationException 
 	 * @throws InvalidFormatException 
 	 */
-	public Set<IIdentity> getAdministratorList() {
+	public Set<String> getAdministratorList() {
 		return administrators;
 	}
 	
@@ -187,11 +210,11 @@ public class ICisProposal {
 	 */
 	public Boolean addMember(String jid, String role) throws  CommunicationException {
 		if (members.contains(jid))
-			if (role.equals("administrator") && !(administrators.contains(jid)) {
+			if (role.equals("administrator") && !(administrators.contains(jid))) {
 				administrators.add(jid);
 				return true;
 			}
-			else if (role.equals("owner") && !(ownerId.equals(jid)) {
+			else if (role.equals("owner") && !(ownerId.equals(jid))) {
 				ownerId = jid;
 				return true;
 			}
@@ -215,7 +238,7 @@ public class ICisProposal {
 	 */
 	public Boolean removeMember(String jid) throws  CommunicationException {
 		if (members.contains(jid)) {
-			members.remove(members.indexOf(jid));
+			members.remove(jid);
 			return true;
 		}
 		else return false;
@@ -275,4 +298,93 @@ public class ICisProposal {
 		this.membershipCriteria = membershipCriteria;
 	}
 	
+	/**
+	 * Get the proposed parent CIS for the CIS proposal.
+	 * 
+	 * @return ICisProposal of the proposed parent CIS, involved in the CIS proposal 
+	 */
+	public ICisProposal getParentCis() {
+		return parentCis;
+	}
+	
+	/**
+	 * Get the proposed parent CIS for the CIS proposal, where the proposed parent is a real existing CIS.
+	 * 
+	 * @return ICis of the proposed parent CIS, involved in the CIS proposal 
+	 */
+	public ICis getActualParentCis() {
+		return actualParentCis;
+	}
+	
+	/**
+	 * Set the proposed parent CIS for the CIS proposal.
+	 * 
+	 * @param ICisProposal of the proposed parent CIS, involved in the CIS proposal
+	 */
+	public void setParentCis(ICisProposal parentCis) {
+		this.parentCis = parentCis;
+	}
+	
+	/**
+	 * Set the parent CIS for the CIS proposal, where the parent is a real existing CIS.
+	 * 
+	 * @param ICis of the potential parent CIS, involved in the CIS proposal
+	 */
+	public void setParentCis(ICis parentCis) {
+		this.actualParentCis = actualParentCis;
+	}
+	
+	/**
+	 * Get the proposed sub-CISs for the CIS proposal.
+	 * 
+	 * @return ArrayList of ICisProposal of the proposed sub-CISs, involved in the CIS proposal 
+	 */
+	public ArrayList<ICisProposal> getSubCiss() {
+		return subCiss;
+	}
+	
+	/**
+	 * Set the proposed sub-CISs for the CIS proposal.
+	 * 
+	 * @param ArrayList of ICisProposal of the proposed sub-CIS, involved in the CIS proposal
+	 */
+	public void setSubCiss(ArrayList<ICisProposal> subCiss) {
+		this.subCiss = subCiss;
+	}
+	
+	/**
+	 * Add a proposed sub-CIS for the CIS proposal.
+	 * 
+	 * @param ICisProposal of the proposed sub-CIS to be added to the CIS proposal
+	 */
+	public void addSubCis(ICisProposal subCis) {
+		subCiss.add(subCis);
+	}
+	
+	/**
+	 * Remove a proposed sub-CIS for the CIS proposal.
+	 * 
+	 * @param ICisProposal of the proposed sub-CIS to be removed from the CIS proposal
+	 */
+	public void removeSubCis(ICisProposal subCis) {
+		subCiss.remove(subCis);
+	}
+	
+	/**
+	 * Add a proposed sub-CIS for the CIS proposal, which is already a real existing CIS.
+	 * 
+	 * @param ICis of the proposed sub-CIS to be added to the CIS proposal
+	 */
+	public void addSubCis(ICis subCis) {
+		actualSubCiss.add(subCis);
+	}
+	
+	/**
+	 * Remove a proposed sub-CIS from the CIS proposal, which is a real existing CIS.
+	 * 
+	 * @param ICisProposal of the proposed sub-CIS to be removed from the CIS proposal
+	 */
+	public void removeSubCis(ICis subCis) {
+		actualSubCiss.remove(subCis);
+	}
 }
