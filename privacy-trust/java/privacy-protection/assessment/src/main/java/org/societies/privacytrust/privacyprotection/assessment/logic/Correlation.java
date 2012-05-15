@@ -28,10 +28,10 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.privacytrust.privacyprotection.assessment.logger.Point;
+import org.societies.privacytrust.privacyprotection.assessment.logger.DataEvent;
 
 /**
- * 
+ * Correlation between a single data access event and a single data transmission event
  *
  * @author Mitja Vardjan
  *
@@ -40,18 +40,24 @@ public class Correlation {
 
 	private static Logger LOG = LoggerFactory.getLogger(Correlation.class);
 
-	private List<Point> dataAccess;
-	private List<Point> dataTransmission;
+	private List<DataEvent> dataAccess;
+	private List<DataEvent> dataTransmission;
 	private CorrelationInData correlationInData;
 	private CorrelationInTime correlationInTime;
 	
-	public Correlation(List<Point> dataAccess, List<Point> dataTransmission) {
+	public Correlation(List<DataEvent> dataAccess, List<DataEvent> dataTransmission) {
 		this.dataAccess = dataAccess;
 		this.dataTransmission = dataTransmission;
 		correlationInData = new CorrelationInData();
 		correlationInTime = new CorrelationInTime();
 	}
 	
+	/**
+	 * Correlation between a single data transmission and a single data access.
+	 * 
+	 * @return correlation value, combined from correlation based on time and
+	 * correlation based on data
+	 */
 	public double correlation() {
 		
 		double cData;

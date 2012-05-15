@@ -35,7 +35,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacyas
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.PrivacyLogFilter;
 
 /**
- * 
+ * Storage of raw events (data access, data transmission)
  *
  * @author Mitja Vardjan
  *
