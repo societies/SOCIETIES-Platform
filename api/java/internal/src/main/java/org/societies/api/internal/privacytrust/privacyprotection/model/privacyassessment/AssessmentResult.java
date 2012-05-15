@@ -25,7 +25,7 @@
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
 /**
- * Privacy Assessment result for a single sender.
+ * Privacy Assessment result for a particular sender.
  * Based on all data packets that were sent by this sender.
  *
  * @author Mitja Vardjan

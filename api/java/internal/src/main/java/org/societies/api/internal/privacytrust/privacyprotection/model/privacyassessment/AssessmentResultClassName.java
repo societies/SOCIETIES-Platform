@@ -25,7 +25,7 @@
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
 /**
- * Privacy Assessment result for a single sender in form of a particular class name.
+ * Privacy Assessment result for a particular sender in form of a particular class name.
  * Based on all data packets that were sent by this sender.
  * This assessment is more reliable because the sender identity is determined by the assessment.
  *
