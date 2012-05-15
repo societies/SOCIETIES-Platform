@@ -48,6 +48,10 @@ import org.societies.api.css.directory.ICssDirectory;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.css.directory.CssDirectoryBean;
 import org.societies.api.schema.css.directory.CssDirectoryBeanResult;
+import org.societies.api.cis.directory.ICisDirectory;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.api.schema.cis.directory.CisDirectoryBean;
+import org.societies.api.schema.cis.directory.CisDirectoryBeanResult;
 
 
 
@@ -59,9 +63,15 @@ public class CommsServer implements IFeatureServer {
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			  Arrays.asList("org.societies.api.schema.css.directory"));
 	
+	private static final List<String> NAMESPACES1 = Collections.unmodifiableList(
+			  Arrays.asList("http://societies.org/api/schema/cis/directory"));
+	private static final List<String> PACKAGES1 = Collections.unmodifiableList(
+			  Arrays.asList("org.societies.api.schema.cis.directory"));
+	
 	//PRIVATE VARIABLES
 	private ICommManager commManager;
 	private ICssDirectory cssDirectory;
+	private ICisDirectory cisDirectory;
 	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
 
 	
@@ -79,6 +89,14 @@ public class CommsServer implements IFeatureServer {
 
 	public void setCssDirectory(ICssDirectory cssDirectory) {
 		this.cssDirectory = cssDirectory;
+	}
+	
+	public ICisDirectory getCisDirectory() {
+		return cisDirectory;
+	}
+
+	public void setCisDirectory(ICisDirectory cisDirectory) {
+		this.cisDirectory = cisDirectory;
 	}
 	
 
@@ -139,6 +157,29 @@ public class CommsServer implements IFeatureServer {
 					e.printStackTrace();
 			};
 		}
+			if (payload.getClass().equals(CisDirectoryBean.class)) {
+			
+			if(LOG.isDebugEnabled()) LOG.debug("Remote call to Css Directory");
+			
+			CisDirectoryBean messageBean = (CisDirectoryBean) payload;
+		
+			try
+			{
+				switch (messageBean.getMethod()) {
+					case ADD_CIS_ADVERTISEMENT_RECORD :
+						this.getCisDirectory().addCisAdvertisementRecord(messageBean.getCisA());
+						break;
+					case DELETE_CIS_ADVERTISEMENT_RECORD :
+						this.getCisDirectory().deleteCisAdvertisementRecord(messageBean.getCisA());
+						break;
+					case UPDATE_CIS_ADVERTISEMENT_RECORD :
+						this.getCisDirectory().updateCisAdvertisementRecord(messageBean.getCisA(), messageBean.getCisB());
+						break;
+				};
+			} catch (Exception e) {
+					e.printStackTrace();
+			};
+		}
 			
 	}
 
@@ -179,6 +220,59 @@ public class CommsServer implements IFeatureServer {
 					case FIND_FOR_ALL_CSS :
 					{
 						returnList = this.getCssDirectory().findForAllCss(messageBean.getCssA());
+						resultList =  returnList.get();
+						
+						if (resultList != null)
+						{
+							for (int i = 0; i < resultList.size(); i++)
+							{
+								resultBeanList.add(resultList.get(i));
+							}
+						}
+						
+						break;
+					}   
+				}
+			} catch (Exception e) {
+					e.printStackTrace();
+			};
+				
+		
+			return resultBean;
+			
+		}
+		
+		if (payload.getClass().equals(CisDirectoryBean.class)) {
+			
+			if(LOG.isDebugEnabled()) LOG.debug("Remote call to Service Discovery");
+			
+			CisDirectoryBean messageBean = (CisDirectoryBean) payload;
+			CisDirectoryBeanResult resultBean = new CisDirectoryBeanResult(); 
+			
+			Future<List<CisAdvertisementRecord>> returnList = null;
+			List<CisAdvertisementRecord> resultBeanList = resultBean.getResultCis();
+			List<CisAdvertisementRecord> resultList = null;
+			
+			try
+			{
+				switch (messageBean.getMethod()) {
+					case FIND_ALL_CIS_ADVERTISEMENT_RECORDS :
+					{
+						returnList = this.getCisDirectory().findAllCisAdvertisementRecords();
+						resultList =  returnList.get();
+						
+						if (resultList != null)
+						{
+							for (int i = 0; i < resultList.size(); i++)
+							{
+								resultBeanList.add(resultList.get(i));
+							}
+						}
+					}
+						break;
+					case FIND_FOR_ALL_CIS :
+					{
+						returnList = this.getCisDirectory().findForAllCis(messageBean.getCisA(), null);
 						resultList =  returnList.get();
 						
 						if (resultList != null)
