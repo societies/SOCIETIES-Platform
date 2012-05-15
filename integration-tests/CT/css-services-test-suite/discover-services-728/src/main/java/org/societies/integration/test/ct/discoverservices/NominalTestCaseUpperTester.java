@@ -51,7 +51,7 @@ public class NominalTestCaseUpperTester {
 	/**
 	 * The other node's JID
 	 */
-	private static String remoteJid = "othercss.societies.local";
+	private static final String REMOTEJID = "othercss.societies.local";
 		
 	/**
 	 * Test case number
@@ -100,9 +100,9 @@ public class NominalTestCaseUpperTester {
 		
 		try{
 			//STEP 1: Get the Services
-			if(LOG.isDebugEnabled()) LOG.debug("[#728] Getting remote Services from " + remoteJid);
+			if(LOG.isDebugEnabled()) LOG.debug("[#728] Getting remote Services from " + REMOTEJID);
 			
-			Future<List<Service>> asyncResult = TestCase728.getServiceDiscovery().getServices(remoteJid);
+			Future<List<Service>> asyncResult = TestCase728.getServiceDiscovery().getServices(REMOTEJID);
 			List<Service> resultList = asyncResult.get();
 			
 			//STEP 2: Check if we retrieved two services
@@ -113,13 +113,13 @@ public class NominalTestCaseUpperTester {
 			String localJid = TestCase728.getCommManager().getIdManager().getThisNetworkNode().getJid();
 			if(LOG.isDebugEnabled()) LOG.debug("[#728] Current JID is " + localJid);
 			
-			Assert.assertFalse("[#728] Current JID is same as Remote Jid!", localJid.equals(remoteJid));
+			Assert.assertFalse("[#728] Current JID is same as Remote Jid!", localJid.equals(REMOTEJID));
 			
 			//STEP 5, 6, 7 & 8
 			for(Service service: resultList){
 				String serviceJid = service.getServiceInstance().getXMPPNode();
 				if(LOG.isDebugEnabled()) LOG.debug("[#728] Service " + service.getServiceName() + " has jid " + serviceJid);
-				Assert.assertEquals("[#728] Service JID is not the correct one!", remoteJid, serviceJid);
+				Assert.assertEquals("[#728] Service JID is not the correct one!", REMOTEJID, serviceJid);
 				Assert.assertTrue(service.getServiceName().equals("Calculator") || service.getServiceName().equals("FortuneCookie"));
 			}
 			
