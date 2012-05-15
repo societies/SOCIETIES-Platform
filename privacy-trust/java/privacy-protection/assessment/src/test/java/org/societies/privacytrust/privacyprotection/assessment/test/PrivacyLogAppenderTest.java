@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
+import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
 import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLogAppender;
 
 /**
@@ -53,6 +54,8 @@ public class PrivacyLogAppenderTest {
 	@Before
 	public void setUp() throws Exception {
 		privacyLogAppender = new PrivacyLogAppender();
+		PrivacyLog privacyLog = new PrivacyLog();
+		privacyLogAppender.setPrivacyLog(privacyLog);
 	}
 
 	/**
