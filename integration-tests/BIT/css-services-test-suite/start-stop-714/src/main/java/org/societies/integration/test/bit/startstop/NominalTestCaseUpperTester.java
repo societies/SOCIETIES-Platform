@@ -77,7 +77,6 @@ public class NominalTestCaseUpperTester {
 	/**
 	 * This method is called only one time, at the very beginning of the process
 	 * (after the constructor) in order to initialize the process.
-	 * Select the relevant service example: the Calculator
 	 */
 	@BeforeClass
 	public static void initialization() {
