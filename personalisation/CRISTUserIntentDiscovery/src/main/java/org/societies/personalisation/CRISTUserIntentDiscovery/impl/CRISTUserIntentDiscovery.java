@@ -24,34 +24,36 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.event.CtxChangeEvent;
+import org.societies.api.context.event.CtxChangeEventListener;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.ICRISTUserIntentDiscovery;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager;
 import org.societies.personalisation.CRISTUserIntentTaskManager.impl.MockHistoryData;
 
 public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 
-	private ICRISTUserIntentTaskManager cristTaskManager;
-	ArrayList<MockHistoryData> historyList = new ArrayList<MockHistoryData>();
-	LinkedHashMap<String, Integer> intentModel = new LinkedHashMap<String, Integer>();
+	private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+	
+	private ArrayList<MockHistoryData> historyList = new ArrayList<MockHistoryData>();
+	private LinkedHashMap<String, Integer> intentModel = new LinkedHashMap<String, Integer>();
 
 	public CRISTUserIntentDiscovery(){
-		
+		LOG.info("Hello! I'm the CRIST User Intent Discovery!");
 	}
-	public CRISTUserIntentDiscovery(ICRISTUserIntentTaskManager cristTaskManager){
-		this.setCristTaskManager(cristTaskManager);
-	}
-	
-	public ICRISTUserIntentTaskManager getCristTaskManager(){
-		return cristTaskManager;
-	}
-	
-	public void setCristTaskManager(ICRISTUserIntentTaskManager cristTaskManager){
-		this.cristTaskManager = cristTaskManager;
-	}
+
 	
 	public void initialiseCRISTDiscovery() {
-		System.out.println("Yo!! I'm a brand new service and my interface is: "
+		LOG.info("Yo!! I'm a brand new service and my interface is: "
 				+ this.getClass().getName());
+		//registerForContextChanges();
 	}
 
 	/*
@@ -75,7 +77,7 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 	@Override
 	public LinkedHashMap generateNewCRISTUIModel() {
 		// TODO Auto-generated method stub
-		
+		//finish before 17, for all user? get context from broker?
 		return intentModel;
 	}
 
@@ -88,12 +90,14 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 	@Override
 	public LinkedHashMap generateNewCRISTUIModel(ArrayList historyData) {
 		// TODO Auto-generated method stub
+		// finish before 17, historyData is a list of CtxEntity=CtxAttribute, do not use mock
 		this.historyList = historyData;
 		constructModel();
 		
 		return intentModel;
 	}
 
+	// main function is implemented here
 	private void constructModel() {
 		int historySize = this.historyList.size();
 		ArrayList<String> behaviorRecords = new ArrayList<String>();
@@ -133,7 +137,7 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 			ArrayList<String> cadidateActionList = new ArrayList<String>();
 			for (int j = 0; j < indexList.length; j++) {
 				String currentCadidate = "";
-				for (int k = 1; k <= 3; k++) {
+				for (int k = 1; k <= maxPredictionStep; k++) {
 					int currentIndex = indexList[j] + k;
 
 					if (indexList[j] + k < historySize
@@ -191,4 +195,12 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 		}
 		return localIndex;
 	}
+	
+	
+	
+	
+
+	
+	
+	
 }

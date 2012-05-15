@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 // import javax.annotation.PostConstruct;
 // import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.stereotype.Component;
@@ -48,17 +51,21 @@ import org.societies.personalisation.common.api.management.IInternalPersonalisat
 // @Component
 public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 
+	private Logger LOG = LoggerFactory.getLogger(this.getClass());
+	 
 	private IInternalPersonalisationManager persoMgr;
-	private ICRISTUserIntentTaskManager cristTaskManager;
 	private ICtxBroker ctxBroker;
-	
+	private ICRISTUserIntentTaskManager cristTaskManager;
+
+	/*
 	private IIdentity myId;
 	private CtxAttributeIdentifier myCtxId;
 	private ServiceResourceIdentifier serviceId;
 	private ICRISTUserAction cristOutcome = null; 	
-
+	*/
+	
 	public CRISTUserIntentPrediction() {
-		System.out.println("Hello! I'm the CRIST User Intent Prediction!");
+		LOG.info("Hello! I'm the CRIST User Intent Prediction!");
 	}
 	
 	public IInternalPersonalisationManager getPersoMgr() {
@@ -87,37 +94,34 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	
 	public void initialiseCRISTPrediction() {
 
+		/*
 		if (this.getPersoMgr() == null) {
-			System.out
-					.println(this.getClass().getName() + "PreManager is null");
+			LOG.error(this.getClass().getName() + "PersoMgr is null");
 		} else {
-			System.out.println(this.getClass().getName()
-					+ "PreManager is NOT null");
+			LOG.info(this.getClass().getName() + "PersoMgr is NOT null");
 		}
+		if (this.getCtxBroker() == null) {
+			LOG.error(this.getClass().getName() + "CtxBroker is null");
+		} else {
+			LOG.info(this.getClass().getName() + "CtxBroker is NOT null");
+		}
+		if (this.cristTaskManager == null)
+		{
+			LOG.info("The CRIST Taks Manager is NULL. Initiating a new mananger...");
+			cristTaskManager = new CRISTUserIntentTaskManager();
+			((CRISTUserIntentTaskManager) cristTaskManager).initialiseCRISTUserIntentManager();
+		} else {
+			LOG.info(this.getClass().getName() + "CristTaskManager is NOT null");
+		}
+		*/
 
-		System.out.println("Yo!! I'm a brand new service and my interface is: "
+		LOG.info("Yo!! I'm a brand new service and my interface is: "
 				+ this.getClass().getName());
-		try{
-			// TODO
-			// this.preManager.registerForContextUpdate(myId, myCtxId);
-			
-			System.out.println("CRIST Predictor registered the Context Update Event");
-		}catch(Exception e){
-			System.err.println("Exception when trying to register the Context Update Event");
-			System.err.println(e.toString());
-		}
+		
+		//registerForContextUpdate(myId, myCtxId);
+
 	}
 	
-	public IInternalPersonalisationManager getPreManager() {
-		System.out.println(this.getClass().getName()+" Return InternalPreManager");
-		return (IInternalPersonalisationManager) getPersoMgr();
-	}
-
-	public void setPreManager(IInternalPersonalisationManager internalPreManager) {
-		System.out.println(this.getClass().getName()+" GOT InternalPreManager");
-		this.setPersoMgr(internalPreManager);
-	}
-
 	/* (non-Javadoc)
 	 * @see org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction#enableCRISTPrediction(boolean)
 	 */
@@ -156,28 +160,24 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		//handle null parameters
 		if (entityID == null)
 		{
-			System.out.println("The entityID is null, getCRISTPrediction can not run.");
+			LOG.error("The entityID is null, getCRISTPrediction can not run.");
 			return null;
 		}
 		if (ctxAttribute == null)
 		{
-			System.out.println("The ctxAttribute is null, getCRISTPrediction can not run.");
+			LOG.error("The ctxAttribute is null, getCRISTPrediction can not run.");
 			return null;
 		}
 		
-		// TODO Auto-generated method stub
-		List<CRISTUserAction> results = new ArrayList<CRISTUserAction>();
-		if (this.cristTaskManager == null){
-			System.out.println("The CRIST Taks Manager is NULL. Initiating a new manager...");
-			// TODO
+		
+		if (this.cristTaskManager == null)
+		{
+			LOG.info("The CRIST Taks Manager is NULL. Initiating a new mananger...");
 			cristTaskManager = new CRISTUserIntentTaskManager();
 			((CRISTUserIntentTaskManager) cristTaskManager).initialiseCRISTUserIntentManager();
-			
-			
-			
 		}
-		
-		results = this.cristTaskManager.predictUserIntent(entityID, ctxAttribute);
+
+		List<CRISTUserAction> results = this.cristTaskManager.predictUserIntent(entityID, ctxAttribute);
 		return new AsyncResult<List<CRISTUserAction>>(results);
 	}
 
@@ -187,15 +187,26 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	@Override
 	public Future<List<CRISTUserAction>> getCRISTPrediction(IIdentity entityID,
 			IAction action) {
-		// TODO Auto-generated method stub
-		List<CRISTUserAction> results = new ArrayList<CRISTUserAction>();
-		if (this.cristTaskManager!=null){
-			results = this.cristTaskManager.predictUserIntent(entityID, new CRISTUserAction(action));
-		}else{
-			System.out.println("The CRIST Taks Manager is NULL. Initiating a new mananger...");
-			// TODO
-			
+		//handle null parameters
+		if (entityID == null)
+		{
+			LOG.error("The entityID is null, getCRISTPrediction can not run.");
+			return null;
 		}
+		if (action == null)
+		{
+			LOG.error("The action is null, getCRISTPrediction can not run.");
+			return null;
+		}
+		
+		if (this.cristTaskManager == null)
+		{
+			LOG.info("The CRIST Taks Manager is NULL. Initiating a new mananger...");
+			cristTaskManager = new CRISTUserIntentTaskManager();
+			((CRISTUserIntentTaskManager) cristTaskManager).initialiseCRISTUserIntentManager();
+		}
+
+		List<CRISTUserAction> results = this.cristTaskManager.predictUserIntent(entityID, new CRISTUserAction(action));
 
 		return new AsyncResult<List<CRISTUserAction>>(results);
 	}
@@ -208,15 +219,33 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	@Override
 	public Future<CRISTUserAction> getCurrentUserIntentAction(
 			IIdentity ownerID, ServiceResourceIdentifier serviceID, String parameterName) { 
-		// TODO Auto-generated method stub
-		CRISTUserAction result = null;
-		if (this.cristTaskManager!=null){
-			result = this.cristTaskManager.getCurrentUserIntent(ownerID, serviceID, parameterName);
-		}else{
-			System.out.println("The CRIST Taks Manager is NULL. Initiating a new mananger...");
-			// TODO
-			
+		
+		//handle null parameters
+		if (ownerID == null)
+		{
+			LOG.error("The ownerID is null, getCurrentUserIntentAction can not run.");
+			return null;
 		}
+		if (serviceID == null)
+		{
+			LOG.error("The serviceID is null, getCurrentUserIntentAction can not run.");
+			return null;
+		}
+		if (parameterName == null)
+		{
+			LOG.error("The parameterName is null, getCurrentUserIntentAction can not run.");
+			return null;
+		}
+		
+		
+		if (this.cristTaskManager == null)
+		{
+			LOG.info("The CRIST Taks Manager is NULL. Initiating a new mananger...");
+			cristTaskManager = new CRISTUserIntentTaskManager();
+			((CRISTUserIntentTaskManager) cristTaskManager).initialiseCRISTUserIntentManager();
+		}
+		
+		CRISTUserAction result = this.cristTaskManager.getCurrentUserIntent(ownerID, serviceID, parameterName);
 		
 		return new AsyncResult<CRISTUserAction>(result);
 	}

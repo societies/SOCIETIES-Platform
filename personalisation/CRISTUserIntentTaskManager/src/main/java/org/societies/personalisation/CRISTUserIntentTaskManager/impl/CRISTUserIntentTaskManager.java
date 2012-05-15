@@ -27,7 +27,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -41,6 +44,8 @@ import org.societies.personalisation.CRIST.api.model.CRISTUserTaskModelData;
 
 public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 
+	private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+	
 	private LinkedHashMap<String, Integer> intentModel = null;
 	private LinkedHashMap<String, Integer> situationModel = null;
 	private ArrayList<String> registeredContext = new ArrayList<String>();
@@ -61,14 +66,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	private ArrayList<MockHistoryData> historyList = new ArrayList<MockHistoryData>();
 
 	public CRISTUserIntentTaskManager() {
-		System.out.println("Hello! I'm the CRIST User Intent Manager!");
-		//this.initialiseCRISTUserIntentManager();
-	}
-
-	// how to use this?
-	public CRISTUserIntentTaskManager(ICRISTUserIntentPrediction cristPrediction) {
-		System.out.println("This is the testing class for CRIST Model!");
-		this.setCristPrediction(cristPrediction);
+		LOG.info("Hello! I'm the CRIST User Intent Manager!");
 	}
 
 	public ICRISTUserIntentPrediction getCristPrediction() {
@@ -96,209 +94,18 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	}
 
 	public void initialiseCRISTUserIntentManager() {
-		System.out.println("Yo!! I'm a brand new service and my interface is: "
+		LOG.info("Yo!! I'm a brand new service and my interface is: "
 				+ this.getClass().getName());
+		
+		registeredContext.add("Light");
+		registeredContext.add("Sound");
+		registeredContext.add("Temperature");
+		registeredContext.add("GPS");
+		
+		ArrayList<CtxAttributeIdentifier> ctxAttributeIdentifierList = MockHistoryData.initializeHistory(registeredContext);
+		
+		historyList = MockHistoryData.retrieveHistoryData(ctxAttributeIdentifierList);
 
-		ArrayList<String> historyAction = new ArrayList<String>();
-		ArrayList<String> historySituation = new ArrayList<String>();
-		ArrayList<ArrayList<String>> historyContext = new ArrayList<ArrayList<String>>();
-		// Assuming that the following sensors are available: light, sound,
-		// temperature, gps
-		this.registeredContext.add("Light");
-		this.registeredContext.add("Sound");
-		this.registeredContext.add("Temperature");
-		this.registeredContext.add("GPS");
-
-		// Mock history data
-		
-		ArrayList<String> historyContextClique = new ArrayList<String>();
-
-		historyAction.add("Turn on MP3 Player");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn down volume");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Switch songs");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn off MP3 Player");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Start the GPS navigator");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Input a location name");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Close the GPS navigator");
-		historySituation.add("Shopping Mall");
-		historyContextClique.add("100");
-		historyContextClique.add("80");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn on MP3 Player");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn up volume");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Switch songs");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn off MP3 Player");
-		historySituation.add("Office");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("26");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Start the GPS navigator");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Input a location name");
-		historySituation.add("Outdoor");
-		historyContextClique.add("120");
-		historyContextClique.add("60");
-		historyContextClique.add("15");
-		historyContextClique.add("55,1.33");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Close the GPS navigator");
-		historySituation.add("Shopping Mall");
-		historyContextClique.add("100");
-		historyContextClique.add("80");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn on MP3 Player");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn down volume");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Switch songs");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn off MP3 Player");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn on MP3 Player");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-		
-		historyContextClique = new ArrayList<String>();
-		historyAction.add("Turn down volume");
-		historySituation.add("Study Hall");
-		historyContextClique.add("100");
-		historyContextClique.add("30");
-		historyContextClique.add("22");
-		historyContextClique.add("N/A");
-		historyContext.add(historyContextClique);
-
-
-		for (int i = 0; i < historyAction.size(); i++) {
-			MockHistoryData currentHisData = new MockHistoryData(
-					historyAction.get(i), historySituation.get(i),
-					historyContext.get(i));
-			this.historyList.add(currentHisData);
-		}
 	}
 
 	/*
@@ -420,7 +227,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 
 		// Generate a new context clique based on the newly received
 		// ctxAttribute
-		String contextID = ctxAttribute.getSourceId(); // how to handle when ctxAttribute is null?
+		String contextID = ctxAttribute.getType(); // how to handle when ctxAttribute is null?
 		for (int i = 0; i < lastContextClique.size(); i++) {
 			String oneContextID = this.registeredContext.get(i);
 			if (oneContextID.equals(contextID)) {
@@ -447,6 +254,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		
 	}
 
+	//only for mocked data?
 	private CRISTUserSituation inferUserSituation(
 			ArrayList<String> contextClique) {
 		double currentLight = Double.parseDouble(contextClique.get(1));
@@ -517,6 +325,12 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	@Override
 	public ArrayList<CRISTUserAction> predictUserIntent(IIdentity entityID,
 			CRISTUserAction userAction) {
+		
+		if (entityID == null)
+		{
+			System.out.println("entityID is null, predictUserIntent can not run.");
+			return null;
+		}
 		
 		if (userAction == null)
 		{
@@ -612,7 +426,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	 */
 	@SuppressWarnings({ "unchecked" })
 	@Override
-	public ArrayList<CRISTUserAction> getNextActions(IIdentity entityID,
+	public ArrayList<CRISTUserAction> getNextActions(IIdentity entityID, // this para isn't used
 			CRISTUserAction currentAction, CRISTUserSituation currentSituation) {
 		// TODO Auto-generated method stub
 		String actionValue = currentAction.getActionID();

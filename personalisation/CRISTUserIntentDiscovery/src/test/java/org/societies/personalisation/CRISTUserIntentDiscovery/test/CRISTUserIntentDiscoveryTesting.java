@@ -42,7 +42,7 @@ public class CRISTUserIntentDiscoveryTesting {
 	/**
 	 * @param args
 	 */
-	private static ICRISTUserIntentDiscovery cristDiscovery = new CRISTUserIntentDiscovery(null);
+	private static ICRISTUserIntentDiscovery cristDiscovery = new CRISTUserIntentDiscovery();
 	private static ArrayList<String> registeredContext = new ArrayList<String>();
 	private static ArrayList<MockHistoryData> historyList = new ArrayList<MockHistoryData>();
 	
