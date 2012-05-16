@@ -20,6 +20,8 @@
 
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
+import java.util.List;
+
 /**
  * Interface for reading and parsing the privacy breach log
  * 
@@ -33,12 +35,12 @@ public interface IPrivacyLog {
 	 * @param filter The filter to select log entries.
 	 * @return Log entries that match given filter.
 	 */
-	public DataTransmissionLogEntry[] search(PrivacyLogFilter filter);
+	public List<DataTransmissionLogEntry> search(PrivacyLogFilter filter);
 	
 	/**
 	 * Get all logs.
 	 * 
 	 * @return All entries in the log in no particular order.
 	 */
-	public DataTransmissionLogEntry[] getAll();
+	public List<DataTransmissionLogEntry> getAll();
 }

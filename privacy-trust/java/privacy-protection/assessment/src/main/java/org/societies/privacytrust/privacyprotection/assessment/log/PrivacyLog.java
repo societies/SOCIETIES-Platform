@@ -64,7 +64,7 @@ public class PrivacyLog implements IPrivacyLog {
 	}
 	
 	@Override
-	public DataTransmissionLogEntry[] search(PrivacyLogFilter filter) {
+	public List<DataTransmissionLogEntry> search(PrivacyLogFilter filter) {
 		
 		LOG.debug("search({})", filter);
 		
@@ -72,7 +72,7 @@ public class PrivacyLog implements IPrivacyLog {
 	}
 	
 	@Override
-	public DataTransmissionLogEntry[] getAll() {
+	public List<DataTransmissionLogEntry> getAll() {
 		
 		LOG.debug("getAll()");
 		
